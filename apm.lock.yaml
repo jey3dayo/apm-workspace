@@ -146,6 +146,27 @@ dependencies:
   - .copilot/skills/agentation-self-driving
   - .cursor/skills/agentation-self-driving
   content_hash: sha256:405cf94e4df9b048ab42e51f26ad971dc6b986167b74eb46393abd6f1f5b5f88
+- repo_url: jey3dayo/apm-workspace
+  host: github.com
+  resolved_commit: 7b62b2128a9875d94c931b8d6d3826d1683d7997
+  resolved_ref: main
+  virtual_path: internal-bundles/internal-first-batch
+  is_virtual: true
+  package_type: apm_package
+  deployed_files:
+  - .claude/skills/apm-usage
+  - .claude/skills/atomic-commit
+  - .claude/skills/greptileai
+  - .config/opencode/skills/apm-usage
+  - .config/opencode/skills/atomic-commit
+  - .config/opencode/skills/greptileai
+  - .copilot/skills/apm-usage
+  - .copilot/skills/atomic-commit
+  - .copilot/skills/greptileai
+  - .cursor/skills/apm-usage
+  - .cursor/skills/atomic-commit
+  - .cursor/skills/greptileai
+  content_hash: sha256:f824ed052a302a43bdb7843154044ecc8f030c173059bd9c6730b0cfe2ea8507
 - repo_url: millionco/react-doctor
   host: github.com
   resolved_commit: b5519b60465905e8c7eb0b8a9294924bf3736158
