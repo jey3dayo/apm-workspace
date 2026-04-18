@@ -1,4 +1,4 @@
-# Internal First Batch Bundle
+# internal-remaining Bundle
 
 This bundle is generated from ~/.config internal bundled skills for the global APM migration pilot.
 
