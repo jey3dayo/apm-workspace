@@ -188,6 +188,27 @@ dependencies:
   - .cursor/skills/codex-plan-review
   - .cursor/skills/generate-svg
   content_hash: sha256:165f7033b7b9bb10472eb7436212ce7433abff011dd6763dfd24066ead7c1abd
+- repo_url: jey3dayo/apm-workspace
+  host: github.com
+  resolved_commit: 091eb44c656599cf35e1f5aa2507931381c88526
+  resolved_ref: main
+  virtual_path: internal-bundles/internal-medium
+  is_virtual: true
+  package_type: apm_package
+  deployed_files:
+  - .claude/skills/rtk
+  - .claude/skills/tauri-dev-screenshot
+  - .claude/skills/tauri-webview-geometry
+  - .config/opencode/skills/rtk
+  - .config/opencode/skills/tauri-dev-screenshot
+  - .config/opencode/skills/tauri-webview-geometry
+  - .copilot/skills/rtk
+  - .copilot/skills/tauri-dev-screenshot
+  - .copilot/skills/tauri-webview-geometry
+  - .cursor/skills/rtk
+  - .cursor/skills/tauri-dev-screenshot
+  - .cursor/skills/tauri-webview-geometry
+  content_hash: sha256:805601ebe429ad53377d4e91a849357ed58b70f5307bdf47def6db5999138664
 - repo_url: millionco/react-doctor
   host: github.com
   resolved_commit: b5519b60465905e8c7eb0b8a9294924bf3736158
