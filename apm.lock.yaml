@@ -209,6 +209,23 @@ dependencies:
   - .cursor/skills/tauri-dev-screenshot
   - .cursor/skills/tauri-webview-geometry
   content_hash: sha256:805601ebe429ad53377d4e91a849357ed58b70f5307bdf47def6db5999138664
+- repo_url: jey3dayo/apm-workspace
+  host: github.com
+  resolved_commit: d22ce47a12798a3d27fb9715f5608541a6131014
+  resolved_ref: main
+  virtual_path: internal-bundles/internal-heavy
+  is_virtual: true
+  package_type: apm_package
+  deployed_files:
+  - .claude/skills/implementation-engine
+  - .claude/skills/task-router
+  - .config/opencode/skills/implementation-engine
+  - .config/opencode/skills/task-router
+  - .copilot/skills/implementation-engine
+  - .copilot/skills/task-router
+  - .cursor/skills/implementation-engine
+  - .cursor/skills/task-router
+  content_hash: sha256:d1068a2716a06b4f57793ede8456fc6c232b0d15ad1e93bffeb23f89b0a8b865
 - repo_url: millionco/react-doctor
   host: github.com
   resolved_commit: b5519b60465905e8c7eb0b8a9294924bf3736158

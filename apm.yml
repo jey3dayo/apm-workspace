@@ -55,5 +55,6 @@ dependencies:
   - jey3dayo/apm-workspace/internal-bundles/internal-first-batch#main
   - jey3dayo/apm-workspace/internal-bundles/internal-next-simple#main
   - jey3dayo/apm-workspace/internal-bundles/internal-medium#main
+  - jey3dayo/apm-workspace/internal-bundles/internal-heavy#main
   mcp: []
 scripts: {}
