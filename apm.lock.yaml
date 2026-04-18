@@ -1,10 +1,11 @@
 lockfile_version: '1'
-generated_at: '2026-04-18T20:17:45.419192+00:00'
+generated_at: '2026-04-18T20:47:22.311851+00:00'
 apm_version: 0.8.11
 dependencies:
 - repo_url: EpicenterHQ/epicenter
   host: github.com
   resolved_commit: 59c0daf70082fefaf670a8fe1b825ab7a28fbb92
+  resolved_ref: 59c0daf70082fefaf670a8fe1b825ab7a28fbb92
   virtual_path: .agents/skills/tauri
   is_virtual: true
   package_type: claude_skill
@@ -17,6 +18,7 @@ dependencies:
 - repo_url: Heyvhuang/ship-faster
   host: github.com
   resolved_commit: 64047d24e0ecb513a5aa879767d95ec7e0e44462
+  resolved_ref: 64047d24e0ecb513a5aa879767d95ec7e0e44462
   virtual_path: skills/cloudflare
   is_virtual: true
   package_type: claude_skill
@@ -29,6 +31,7 @@ dependencies:
 - repo_url: Heyvhuang/ship-faster
   host: github.com
   resolved_commit: 64047d24e0ecb513a5aa879767d95ec7e0e44462
+  resolved_ref: 64047d24e0ecb513a5aa879767d95ec7e0e44462
   virtual_path: skills/tool-openclaw
   is_virtual: true
   package_type: claude_skill
@@ -41,6 +44,7 @@ dependencies:
 - repo_url: Lum1104/Understand-Anything
   host: github.com
   resolved_commit: 716c3d60881b89bba2cfb4e713491f73471d880a
+  resolved_ref: 716c3d60881b89bba2cfb4e713491f73471d880a
   virtual_path: understand-anything-plugin/skills/understand
   is_virtual: true
   package_type: claude_skill
@@ -53,6 +57,7 @@ dependencies:
 - repo_url: Lum1104/Understand-Anything
   host: github.com
   resolved_commit: 716c3d60881b89bba2cfb4e713491f73471d880a
+  resolved_ref: 716c3d60881b89bba2cfb4e713491f73471d880a
   virtual_path: understand-anything-plugin/skills/understand-chat
   is_virtual: true
   package_type: claude_skill
@@ -65,6 +70,7 @@ dependencies:
 - repo_url: Lum1104/Understand-Anything
   host: github.com
   resolved_commit: 716c3d60881b89bba2cfb4e713491f73471d880a
+  resolved_ref: 716c3d60881b89bba2cfb4e713491f73471d880a
   virtual_path: understand-anything-plugin/skills/understand-dashboard
   is_virtual: true
   package_type: claude_skill
@@ -77,6 +83,7 @@ dependencies:
 - repo_url: Lum1104/Understand-Anything
   host: github.com
   resolved_commit: 716c3d60881b89bba2cfb4e713491f73471d880a
+  resolved_ref: 716c3d60881b89bba2cfb4e713491f73471d880a
   virtual_path: understand-anything-plugin/skills/understand-diff
   is_virtual: true
   package_type: claude_skill
@@ -89,6 +96,7 @@ dependencies:
 - repo_url: Lum1104/Understand-Anything
   host: github.com
   resolved_commit: 716c3d60881b89bba2cfb4e713491f73471d880a
+  resolved_ref: 716c3d60881b89bba2cfb4e713491f73471d880a
   virtual_path: understand-anything-plugin/skills/understand-explain
   is_virtual: true
   package_type: claude_skill
@@ -101,6 +109,7 @@ dependencies:
 - repo_url: Lum1104/Understand-Anything
   host: github.com
   resolved_commit: 716c3d60881b89bba2cfb4e713491f73471d880a
+  resolved_ref: 716c3d60881b89bba2cfb4e713491f73471d880a
   virtual_path: understand-anything-plugin/skills/understand-onboard
   is_virtual: true
   package_type: claude_skill
@@ -113,6 +122,7 @@ dependencies:
 - repo_url: anthropics/claude-code
   host: github.com
   resolved_commit: 0385848b4e737831fc3b973d9a78d31950a87d9d
+  resolved_ref: 0385848b4e737831fc3b973d9a78d31950a87d9d
   virtual_path: plugins/frontend-design/skills/frontend-design
   is_virtual: true
   package_type: claude_skill
@@ -125,6 +135,7 @@ dependencies:
 - repo_url: benjitaylor/agentation
   host: github.com
   resolved_commit: 7dc5d65378fa901e6eead81d4e2bb62950d49f0b
+  resolved_ref: 7dc5d65378fa901e6eead81d4e2bb62950d49f0b
   virtual_path: skills/agentation
   is_virtual: true
   package_type: claude_skill
@@ -137,6 +148,7 @@ dependencies:
 - repo_url: benjitaylor/agentation
   host: github.com
   resolved_commit: 7dc5d65378fa901e6eead81d4e2bb62950d49f0b
+  resolved_ref: 7dc5d65378fa901e6eead81d4e2bb62950d49f0b
   virtual_path: skills/agentation-self-driving
   is_virtual: true
   package_type: claude_skill
@@ -418,6 +430,7 @@ dependencies:
 - repo_url: millionco/react-doctor
   host: github.com
   resolved_commit: b5519b60465905e8c7eb0b8a9294924bf3736158
+  resolved_ref: b5519b60465905e8c7eb0b8a9294924bf3736158
   virtual_path: skills/react-doctor
   is_virtual: true
   package_type: claude_skill
@@ -430,6 +443,7 @@ dependencies:
 - repo_url: mizchi/chezmoi-dotfiles
   host: github.com
   resolved_commit: 8899529bac3bfcccb9fd0f90a19fd46c61768533
+  resolved_ref: 8899529bac3bfcccb9fd0f90a19fd46c61768533
   virtual_path: dot_claude/skills/empirical-prompt-tuning
   is_virtual: true
   package_type: claude_skill
@@ -442,6 +456,7 @@ dependencies:
 - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
   host: github.com
   resolved_commit: b7e3af80f6e331f6fb456667b82b12cade7c9d35
+  resolved_ref: b7e3af80f6e331f6fb456667b82b12cade7c9d35
   virtual_path: .claude/skills/ui-ux-pro-max
   is_virtual: true
   package_type: claude_skill
@@ -454,6 +469,7 @@ dependencies:
 - repo_url: nyosegawa/skills
   host: github.com
   resolved_commit: c1048fe35403a3f273132306a4d49278f189c64b
+  resolved_ref: c1048fe35403a3f273132306a4d49278f189c64b
   virtual_path: skills/skill-auditor
   is_virtual: true
   package_type: claude_skill
@@ -466,6 +482,7 @@ dependencies:
 - repo_url: obra/superpowers
   host: github.com
   resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
   virtual_path: skills/brainstorming
   is_virtual: true
   package_type: claude_skill
@@ -478,6 +495,7 @@ dependencies:
 - repo_url: obra/superpowers
   host: github.com
   resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
   virtual_path: skills/dispatching-parallel-agents
   is_virtual: true
   package_type: claude_skill
@@ -490,6 +508,7 @@ dependencies:
 - repo_url: obra/superpowers
   host: github.com
   resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
   virtual_path: skills/executing-plans
   is_virtual: true
   package_type: claude_skill
@@ -502,6 +521,7 @@ dependencies:
 - repo_url: obra/superpowers
   host: github.com
   resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
   virtual_path: skills/finishing-a-development-branch
   is_virtual: true
   package_type: claude_skill
@@ -514,6 +534,7 @@ dependencies:
 - repo_url: obra/superpowers
   host: github.com
   resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
   virtual_path: skills/receiving-code-review
   is_virtual: true
   package_type: claude_skill
@@ -526,6 +547,7 @@ dependencies:
 - repo_url: obra/superpowers
   host: github.com
   resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
   virtual_path: skills/requesting-code-review
   is_virtual: true
   package_type: claude_skill
@@ -538,6 +560,7 @@ dependencies:
 - repo_url: obra/superpowers
   host: github.com
   resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
   virtual_path: skills/subagent-driven-development
   is_virtual: true
   package_type: claude_skill
@@ -550,6 +573,7 @@ dependencies:
 - repo_url: obra/superpowers
   host: github.com
   resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
   virtual_path: skills/systematic-debugging
   is_virtual: true
   package_type: claude_skill
@@ -562,6 +586,7 @@ dependencies:
 - repo_url: obra/superpowers
   host: github.com
   resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
   virtual_path: skills/test-driven-development
   is_virtual: true
   package_type: claude_skill
@@ -574,6 +599,7 @@ dependencies:
 - repo_url: obra/superpowers
   host: github.com
   resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
   virtual_path: skills/using-git-worktrees
   is_virtual: true
   package_type: claude_skill
@@ -586,6 +612,7 @@ dependencies:
 - repo_url: obra/superpowers
   host: github.com
   resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
   virtual_path: skills/using-superpowers
   is_virtual: true
   package_type: claude_skill
@@ -598,6 +625,7 @@ dependencies:
 - repo_url: obra/superpowers
   host: github.com
   resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
   virtual_path: skills/verification-before-completion
   is_virtual: true
   package_type: claude_skill
@@ -610,6 +638,7 @@ dependencies:
 - repo_url: obra/superpowers
   host: github.com
   resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
   virtual_path: skills/writing-plans
   is_virtual: true
   package_type: claude_skill
@@ -622,6 +651,7 @@ dependencies:
 - repo_url: obra/superpowers
   host: github.com
   resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
   virtual_path: skills/writing-skills
   is_virtual: true
   package_type: claude_skill
@@ -634,6 +664,7 @@ dependencies:
 - repo_url: openai/codex-plugin-cc
   host: github.com
   resolved_commit: 6a5c2ba53b734f3cdd8daacbd49f68f3e6c8c167
+  resolved_ref: 6a5c2ba53b734f3cdd8daacbd49f68f3e6c8c167
   virtual_path: plugins/codex/skills/codex-cli-runtime
   is_virtual: true
   package_type: claude_skill
@@ -646,6 +677,7 @@ dependencies:
 - repo_url: openai/codex-plugin-cc
   host: github.com
   resolved_commit: 6a5c2ba53b734f3cdd8daacbd49f68f3e6c8c167
+  resolved_ref: 6a5c2ba53b734f3cdd8daacbd49f68f3e6c8c167
   virtual_path: plugins/codex/skills/codex-result-handling
   is_virtual: true
   package_type: claude_skill
@@ -658,6 +690,7 @@ dependencies:
 - repo_url: openai/codex-plugin-cc
   host: github.com
   resolved_commit: 6a5c2ba53b734f3cdd8daacbd49f68f3e6c8c167
+  resolved_ref: 6a5c2ba53b734f3cdd8daacbd49f68f3e6c8c167
   virtual_path: plugins/codex/skills/gpt-5-4-prompting
   is_virtual: true
   package_type: claude_skill
@@ -670,6 +703,7 @@ dependencies:
 - repo_url: openai/skills
   host: github.com
   resolved_commit: e940b8a86138adf03972802b990a1dfc57fcbf09
+  resolved_ref: e940b8a86138adf03972802b990a1dfc57fcbf09
   virtual_path: skills/.curated/gh-address-comments
   is_virtual: true
   package_type: claude_skill
@@ -682,6 +716,7 @@ dependencies:
 - repo_url: openai/skills
   host: github.com
   resolved_commit: e940b8a86138adf03972802b990a1dfc57fcbf09
+  resolved_ref: e940b8a86138adf03972802b990a1dfc57fcbf09
   virtual_path: skills/.curated/gh-fix-ci
   is_virtual: true
   package_type: claude_skill
@@ -694,6 +729,7 @@ dependencies:
 - repo_url: openai/skills
   host: github.com
   resolved_commit: e940b8a86138adf03972802b990a1dfc57fcbf09
+  resolved_ref: e940b8a86138adf03972802b990a1dfc57fcbf09
   virtual_path: skills/.system/skill-creator
   is_virtual: true
   package_type: claude_skill
@@ -706,6 +742,7 @@ dependencies:
 - repo_url: tokoroten/prompt-review
   host: github.com
   resolved_commit: 0a83fd9eeead58fe92d0b04522da9e6840a71940
+  resolved_ref: 0a83fd9eeead58fe92d0b04522da9e6840a71940
   virtual_path: .claude/skills/prompt-review
   is_virtual: true
   package_type: claude_skill
@@ -718,6 +755,7 @@ dependencies:
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
+  resolved_ref: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
   virtual_path: plugins/agentic-actions-auditor/skills/agentic-actions-auditor
   is_virtual: true
   package_type: claude_skill
@@ -730,6 +768,7 @@ dependencies:
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
+  resolved_ref: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
   virtual_path: plugins/audit-context-building/skills/audit-context-building
   is_virtual: true
   package_type: claude_skill
@@ -742,6 +781,7 @@ dependencies:
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
+  resolved_ref: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
   virtual_path: plugins/sharp-edges/skills/sharp-edges
   is_virtual: true
   package_type: claude_skill
@@ -754,6 +794,7 @@ dependencies:
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
+  resolved_ref: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
   virtual_path: plugins/static-analysis/skills/codeql
   is_virtual: true
   package_type: claude_skill
@@ -766,6 +807,7 @@ dependencies:
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
+  resolved_ref: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
   virtual_path: plugins/static-analysis/skills/sarif-parsing
   is_virtual: true
   package_type: claude_skill
@@ -778,6 +820,7 @@ dependencies:
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
+  resolved_ref: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
   virtual_path: plugins/static-analysis/skills/semgrep
   is_virtual: true
   package_type: claude_skill
@@ -790,6 +833,7 @@ dependencies:
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
+  resolved_ref: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
   virtual_path: plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor
   is_virtual: true
   package_type: claude_skill
@@ -802,6 +846,7 @@ dependencies:
 - repo_url: vercel-labs/agent-browser
   host: github.com
   resolved_commit: 717d1b09e1c841a4c0206033886a1a861e3ca5d9
+  resolved_ref: 717d1b09e1c841a4c0206033886a1a861e3ca5d9
   virtual_path: skills/agent-browser
   is_virtual: true
   package_type: claude_skill
@@ -814,6 +859,7 @@ dependencies:
 - repo_url: vercel-labs/agent-skills
   host: github.com
   resolved_commit: ce3e64e468f8fa09a2d075d102771838061fdac0
+  resolved_ref: ce3e64e468f8fa09a2d075d102771838061fdac0
   virtual_path: skills/composition-patterns
   is_virtual: true
   package_type: claude_skill
@@ -826,6 +872,7 @@ dependencies:
 - repo_url: vercel-labs/agent-skills
   host: github.com
   resolved_commit: ce3e64e468f8fa09a2d075d102771838061fdac0
+  resolved_ref: ce3e64e468f8fa09a2d075d102771838061fdac0
   virtual_path: skills/react-best-practices
   is_virtual: true
   package_type: claude_skill
@@ -838,6 +885,7 @@ dependencies:
 - repo_url: vercel-labs/agent-skills
   host: github.com
   resolved_commit: ce3e64e468f8fa09a2d075d102771838061fdac0
+  resolved_ref: ce3e64e468f8fa09a2d075d102771838061fdac0
   virtual_path: skills/web-design-guidelines
   is_virtual: true
   package_type: claude_skill
