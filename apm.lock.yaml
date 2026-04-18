@@ -1,0 +1,10 @@
+lockfile_version: '1'
+generated_at: '2026-04-18T17:07:34.512254+00:00'
+apm_version: 0.8.11
+dependencies:
+- repo_url: _local/apm-usage
+  package_type: claude_skill
+  deployed_files:
+  - .github/skills/apm-usage
+  source: local
+  local_path: ./packages/apm-usage
