@@ -30,6 +30,11 @@ run = "sh \"${APM_BOOTSTRAP_REPO:-$HOME/.config}/scripts/apm-workspace.sh\" doct
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\\.config\\scripts\\apm-workspace.ps1 doctor"
 
 [tasks.migrate]
-description = "Seed a legacy ~/.config skill into packages/<id> and record it in apm.yml"
+description = "Legacy vendor-seed helper for bundled ~/.config skills; not part of the normal global APM flow"
 run = "sh \"${APM_BOOTSTRAP_REPO:-$HOME/.config}/scripts/apm-workspace.sh\" migrate"
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\\.config\\scripts\\apm-workspace.ps1 migrate"
+
+[tasks.migrate-external]
+description = "Register enabled external skills by upstream ref in ~/.apm/apm.yml"
+run = "sh \"${APM_BOOTSTRAP_REPO:-$HOME/.config}/scripts/apm-workspace.sh\" migrate-external"
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\\.config\\scripts\\apm-workspace-migrate-external.ps1"
