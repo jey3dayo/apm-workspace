@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-04-18T18:33:48.793456+00:00'
+generated_at: '2026-04-18T20:17:45.419192+00:00'
 apm_version: 0.8.11
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -169,25 +169,21 @@ dependencies:
   content_hash: sha256:f824ed052a302a43bdb7843154044ecc8f030c173059bd9c6730b0cfe2ea8507
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: 1a620ff3cf6cd90cba8151d5b502a72cf34e6afc
+  resolved_commit: d22ce47a12798a3d27fb9715f5608541a6131014
   resolved_ref: main
-  virtual_path: internal-bundles/internal-next-simple
+  virtual_path: internal-bundles/internal-heavy
   is_virtual: true
   package_type: apm_package
   deployed_files:
-  - .claude/skills/codex-code-review
-  - .claude/skills/codex-plan-review
-  - .claude/skills/generate-svg
-  - .config/opencode/skills/codex-code-review
-  - .config/opencode/skills/codex-plan-review
-  - .config/opencode/skills/generate-svg
-  - .copilot/skills/codex-code-review
-  - .copilot/skills/codex-plan-review
-  - .copilot/skills/generate-svg
-  - .cursor/skills/codex-code-review
-  - .cursor/skills/codex-plan-review
-  - .cursor/skills/generate-svg
-  content_hash: sha256:165f7033b7b9bb10472eb7436212ce7433abff011dd6763dfd24066ead7c1abd
+  - .claude/skills/implementation-engine
+  - .claude/skills/task-router
+  - .config/opencode/skills/implementation-engine
+  - .config/opencode/skills/task-router
+  - .copilot/skills/implementation-engine
+  - .copilot/skills/task-router
+  - .cursor/skills/implementation-engine
+  - .cursor/skills/task-router
+  content_hash: sha256:d1068a2716a06b4f57793ede8456fc6c232b0d15ad1e93bffeb23f89b0a8b865
 - repo_url: jey3dayo/apm-workspace
   host: github.com
   resolved_commit: 091eb44c656599cf35e1f5aa2507931381c88526
@@ -211,21 +207,25 @@ dependencies:
   content_hash: sha256:805601ebe429ad53377d4e91a849357ed58b70f5307bdf47def6db5999138664
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: d22ce47a12798a3d27fb9715f5608541a6131014
+  resolved_commit: 1a620ff3cf6cd90cba8151d5b502a72cf34e6afc
   resolved_ref: main
-  virtual_path: internal-bundles/internal-heavy
+  virtual_path: internal-bundles/internal-next-simple
   is_virtual: true
   package_type: apm_package
   deployed_files:
-  - .claude/skills/implementation-engine
-  - .claude/skills/task-router
-  - .config/opencode/skills/implementation-engine
-  - .config/opencode/skills/task-router
-  - .copilot/skills/implementation-engine
-  - .copilot/skills/task-router
-  - .cursor/skills/implementation-engine
-  - .cursor/skills/task-router
-  content_hash: sha256:d1068a2716a06b4f57793ede8456fc6c232b0d15ad1e93bffeb23f89b0a8b865
+  - .claude/skills/codex-code-review
+  - .claude/skills/codex-plan-review
+  - .claude/skills/generate-svg
+  - .config/opencode/skills/codex-code-review
+  - .config/opencode/skills/codex-plan-review
+  - .config/opencode/skills/generate-svg
+  - .copilot/skills/codex-code-review
+  - .copilot/skills/codex-plan-review
+  - .copilot/skills/generate-svg
+  - .cursor/skills/codex-code-review
+  - .cursor/skills/codex-plan-review
+  - .cursor/skills/generate-svg
+  content_hash: sha256:165f7033b7b9bb10472eb7436212ce7433abff011dd6763dfd24066ead7c1abd
 - repo_url: jey3dayo/apm-workspace
   host: github.com
   resolved_commit: df67c5d78cf79eaf85bc2ed8a76879cd3cd76ed1
@@ -233,6 +233,187 @@ dependencies:
   virtual_path: internal-bundles/internal-remaining
   is_virtual: true
   package_type: apm_package
+  deployed_files:
+  - .claude/skills/agent-creator
+  - .claude/skills/cc-sdd
+  - .claude/skills/chrome-debug
+  - .claude/skills/claude-system
+  - .claude/skills/code-quality-improvement
+  - .claude/skills/code-review
+  - .claude/skills/codex-system
+  - .claude/skills/command-creator
+  - .claude/skills/dev-browser
+  - .claude/skills/distributions-manager
+  - .claude/skills/docs-index
+  - .claude/skills/docs-manager
+  - .claude/skills/documentation-management
+  - .claude/skills/dotfiles-integration
+  - .claude/skills/drawio
+  - .claude/skills/gemini-system
+  - .claude/skills/gh-create-pr
+  - .claude/skills/git-automation
+  - .claude/skills/git-worktree
+  - .claude/skills/golang
+  - .claude/skills/integration-framework
+  - .claude/skills/knowledge-creator
+  - .claude/skills/learnings-knowledge
+  - .claude/skills/linear-task-ops
+  - .claude/skills/mcp-tools
+  - .claude/skills/mise
+  - .claude/skills/nix-dotfiles
+  - .claude/skills/nvim
+  - .claude/skills/polish
+  - .claude/skills/pr-feedback-orchestrator
+  - .claude/skills/predictive-analysis
+  - .claude/skills/premortem
+  - .claude/skills/project-maintenance
+  - .claude/skills/react
+  - .claude/skills/react-grid-layout
+  - .claude/skills/refactoring
+  - .claude/skills/rules-creator
+  - .claude/skills/similarity
+  - .claude/skills/slide-docs
+  - .claude/skills/task-to-pr
+  - .claude/skills/tauri-icon-gen
+  - .claude/skills/tsr
+  - .claude/skills/typescript
+  - .claude/skills/wezterm
+  - .claude/skills/zsh
+  - .config/opencode/skills/agent-creator
+  - .config/opencode/skills/cc-sdd
+  - .config/opencode/skills/chrome-debug
+  - .config/opencode/skills/claude-system
+  - .config/opencode/skills/code-quality-improvement
+  - .config/opencode/skills/code-review
+  - .config/opencode/skills/codex-system
+  - .config/opencode/skills/command-creator
+  - .config/opencode/skills/dev-browser
+  - .config/opencode/skills/distributions-manager
+  - .config/opencode/skills/docs-index
+  - .config/opencode/skills/docs-manager
+  - .config/opencode/skills/documentation-management
+  - .config/opencode/skills/dotfiles-integration
+  - .config/opencode/skills/drawio
+  - .config/opencode/skills/gemini-system
+  - .config/opencode/skills/gh-create-pr
+  - .config/opencode/skills/git-automation
+  - .config/opencode/skills/git-worktree
+  - .config/opencode/skills/golang
+  - .config/opencode/skills/integration-framework
+  - .config/opencode/skills/knowledge-creator
+  - .config/opencode/skills/learnings-knowledge
+  - .config/opencode/skills/linear-task-ops
+  - .config/opencode/skills/mcp-tools
+  - .config/opencode/skills/mise
+  - .config/opencode/skills/nix-dotfiles
+  - .config/opencode/skills/nvim
+  - .config/opencode/skills/polish
+  - .config/opencode/skills/pr-feedback-orchestrator
+  - .config/opencode/skills/predictive-analysis
+  - .config/opencode/skills/premortem
+  - .config/opencode/skills/project-maintenance
+  - .config/opencode/skills/react
+  - .config/opencode/skills/react-grid-layout
+  - .config/opencode/skills/refactoring
+  - .config/opencode/skills/rules-creator
+  - .config/opencode/skills/similarity
+  - .config/opencode/skills/slide-docs
+  - .config/opencode/skills/task-to-pr
+  - .config/opencode/skills/tauri-icon-gen
+  - .config/opencode/skills/tsr
+  - .config/opencode/skills/typescript
+  - .config/opencode/skills/wezterm
+  - .config/opencode/skills/zsh
+  - .copilot/skills/agent-creator
+  - .copilot/skills/cc-sdd
+  - .copilot/skills/chrome-debug
+  - .copilot/skills/claude-system
+  - .copilot/skills/code-quality-improvement
+  - .copilot/skills/code-review
+  - .copilot/skills/codex-system
+  - .copilot/skills/command-creator
+  - .copilot/skills/dev-browser
+  - .copilot/skills/distributions-manager
+  - .copilot/skills/docs-index
+  - .copilot/skills/docs-manager
+  - .copilot/skills/documentation-management
+  - .copilot/skills/dotfiles-integration
+  - .copilot/skills/drawio
+  - .copilot/skills/gemini-system
+  - .copilot/skills/gh-create-pr
+  - .copilot/skills/git-automation
+  - .copilot/skills/git-worktree
+  - .copilot/skills/golang
+  - .copilot/skills/integration-framework
+  - .copilot/skills/knowledge-creator
+  - .copilot/skills/learnings-knowledge
+  - .copilot/skills/linear-task-ops
+  - .copilot/skills/mcp-tools
+  - .copilot/skills/mise
+  - .copilot/skills/nix-dotfiles
+  - .copilot/skills/nvim
+  - .copilot/skills/polish
+  - .copilot/skills/pr-feedback-orchestrator
+  - .copilot/skills/predictive-analysis
+  - .copilot/skills/premortem
+  - .copilot/skills/project-maintenance
+  - .copilot/skills/react
+  - .copilot/skills/react-grid-layout
+  - .copilot/skills/refactoring
+  - .copilot/skills/rules-creator
+  - .copilot/skills/similarity
+  - .copilot/skills/slide-docs
+  - .copilot/skills/task-to-pr
+  - .copilot/skills/tauri-icon-gen
+  - .copilot/skills/tsr
+  - .copilot/skills/typescript
+  - .copilot/skills/wezterm
+  - .copilot/skills/zsh
+  - .cursor/skills/agent-creator
+  - .cursor/skills/cc-sdd
+  - .cursor/skills/chrome-debug
+  - .cursor/skills/claude-system
+  - .cursor/skills/code-quality-improvement
+  - .cursor/skills/code-review
+  - .cursor/skills/codex-system
+  - .cursor/skills/command-creator
+  - .cursor/skills/dev-browser
+  - .cursor/skills/distributions-manager
+  - .cursor/skills/docs-index
+  - .cursor/skills/docs-manager
+  - .cursor/skills/documentation-management
+  - .cursor/skills/dotfiles-integration
+  - .cursor/skills/drawio
+  - .cursor/skills/gemini-system
+  - .cursor/skills/gh-create-pr
+  - .cursor/skills/git-automation
+  - .cursor/skills/git-worktree
+  - .cursor/skills/golang
+  - .cursor/skills/integration-framework
+  - .cursor/skills/knowledge-creator
+  - .cursor/skills/learnings-knowledge
+  - .cursor/skills/linear-task-ops
+  - .cursor/skills/mcp-tools
+  - .cursor/skills/mise
+  - .cursor/skills/nix-dotfiles
+  - .cursor/skills/nvim
+  - .cursor/skills/polish
+  - .cursor/skills/pr-feedback-orchestrator
+  - .cursor/skills/predictive-analysis
+  - .cursor/skills/premortem
+  - .cursor/skills/project-maintenance
+  - .cursor/skills/react
+  - .cursor/skills/react-grid-layout
+  - .cursor/skills/refactoring
+  - .cursor/skills/rules-creator
+  - .cursor/skills/similarity
+  - .cursor/skills/slide-docs
+  - .cursor/skills/task-to-pr
+  - .cursor/skills/tauri-icon-gen
+  - .cursor/skills/tsr
+  - .cursor/skills/typescript
+  - .cursor/skills/wezterm
+  - .cursor/skills/zsh
   content_hash: sha256:8df13528f8addfa8294e54a405490f6be8880d7131ca9808a58ad20dc9266e15
 - repo_url: millionco/react-doctor
   host: github.com
