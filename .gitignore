@@ -1,4 +1,6 @@
 
-.apm/
+/.apm/
 
-apm_modules/
+/apm_modules/
+
+/.internal-seed/
