@@ -226,6 +226,14 @@ dependencies:
   - .cursor/skills/implementation-engine
   - .cursor/skills/task-router
   content_hash: sha256:d1068a2716a06b4f57793ede8456fc6c232b0d15ad1e93bffeb23f89b0a8b865
+- repo_url: jey3dayo/apm-workspace
+  host: github.com
+  resolved_commit: df67c5d78cf79eaf85bc2ed8a76879cd3cd76ed1
+  resolved_ref: main
+  virtual_path: internal-bundles/internal-remaining
+  is_virtual: true
+  package_type: apm_package
+  content_hash: sha256:8df13528f8addfa8294e54a405490f6be8880d7131ca9808a58ad20dc9266e15
 - repo_url: millionco/react-doctor
   host: github.com
   resolved_commit: b5519b60465905e8c7eb0b8a9294924bf3736158
