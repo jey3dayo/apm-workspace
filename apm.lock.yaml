@@ -167,6 +167,27 @@ dependencies:
   - .cursor/skills/atomic-commit
   - .cursor/skills/greptileai
   content_hash: sha256:f824ed052a302a43bdb7843154044ecc8f030c173059bd9c6730b0cfe2ea8507
+- repo_url: jey3dayo/apm-workspace
+  host: github.com
+  resolved_commit: 1a620ff3cf6cd90cba8151d5b502a72cf34e6afc
+  resolved_ref: main
+  virtual_path: internal-bundles/internal-next-simple
+  is_virtual: true
+  package_type: apm_package
+  deployed_files:
+  - .claude/skills/codex-code-review
+  - .claude/skills/codex-plan-review
+  - .claude/skills/generate-svg
+  - .config/opencode/skills/codex-code-review
+  - .config/opencode/skills/codex-plan-review
+  - .config/opencode/skills/generate-svg
+  - .copilot/skills/codex-code-review
+  - .copilot/skills/codex-plan-review
+  - .copilot/skills/generate-svg
+  - .cursor/skills/codex-code-review
+  - .cursor/skills/codex-plan-review
+  - .cursor/skills/generate-svg
+  content_hash: sha256:165f7033b7b9bb10472eb7436212ce7433abff011dd6763dfd24066ead7c1abd
 - repo_url: millionco/react-doctor
   host: github.com
   resolved_commit: b5519b60465905e8c7eb0b8a9294924bf3736158

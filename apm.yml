@@ -53,5 +53,6 @@ dependencies:
   - mizchi/chezmoi-dotfiles/dot_claude/skills/empirical-prompt-tuning
   - nextlevelbuilder/ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-max
   - jey3dayo/apm-workspace/internal-bundles/internal-first-batch#main
+  - jey3dayo/apm-workspace/internal-bundles/internal-next-simple#main
   mcp: []
 scripts: {}
