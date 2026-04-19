@@ -1,6 +1,6 @@
 ---
 name: apm-usage
-description: Use when working with APM manifests, `~/.apm` global skill management, or migrating enabled external skills into `apm-workspace`.
+description: Use when editing the `~/.apm` global APM workspace, deciding whether a change belongs in `~/.config/agents/src/` or `~/.apm/`, or rolling out managed catalog updates.
 ---
 
 # APM Usage
@@ -25,6 +25,20 @@ Do not treat `packages/`, `~/.apm/skills/`, or workspace-root `.apm/` as the sou
 - Explaining the difference between upstream refs, `apm_modules/`, and deployed targets
 - Checking whether a skill should stay source-only instead of entering the global manifest
 
+## Quick Routing
+
+Start by routing the request into one of these lanes:
+
+- managed catalog content:
+  - edit `~/.config/agents/src/skills/**`, `AGENTS.md`, `agents/**`, `commands/**`, or `rules/**`
+  - then run `mise run stage-catalog`
+- workspace-owned files:
+  - edit `~/.apm/README.md`, `llms.md`, `apm.yml`, `apm.lock.yaml`, or `docs/**` directly
+  - do not restage the catalog unless managed content changed too
+- external dependency selection:
+  - edit `~/.config/nix/agent-skills-sources.nix` when the source selection itself changes
+  - then reconcile `~/.apm/apm.yml` through `mise run migrate-external` or normal APM install/update flows
+
 ## Rule Of Thumb
 
 Prefer `~/.apm` when:
@@ -36,12 +50,12 @@ Prefer `~/.apm` when:
 When a user says "fix what is in `~/.apm`", first decide which layer actually owns the change:
 
 - edit `~/.config/agents/src/**` for managed catalog content that is redistributed into `catalog/`
-- edit `~/.apm/README.md`, `llms.txt`, `llms.md`, `apm.yml`, or `apm.lock.yaml` for workspace-owned files that live only in the `~/.apm` repo
+- edit `~/.apm/README.md`, `llms.md`, `apm.yml`, or `apm.lock.yaml` for workspace-owned files that live only in the `~/.apm` repo
 - do not edit `~/.apm/catalog/**` first unless you are doing emergency repair and will immediately restage from the authoring source
 
 Treat `~/.config/agents/src/skills/<name>/` as the **authoring source of truth** for managed skills.
 Treat `~/.apm/catalog/` as the **tracked APM package artifact** that is generated from that source tree.
-Treat `~/.config/agents/src/AGENTS.md`, `agents/`, and `rules/` as additional managed authoring sources that are staged into the same catalog.
+Treat `~/.config/agents/src/AGENTS.md`, `agents/`, `commands/`, and `rules/` as additional managed authoring sources that are staged into the same catalog.
 
 For external skills, the source of truth is the upstream ref in `~/.apm/apm.yml`.  
 For installed sources, the on-disk cache is `~/.apm/apm_modules/`.
@@ -63,6 +77,7 @@ The same tracked catalog also carries:
 ```text
 ~/.apm/catalog/AGENTS.md
 ~/.apm/catalog/agents/**
+~/.apm/catalog/commands/**
 ~/.apm/catalog/rules/**
 ```
 
@@ -80,10 +95,12 @@ Managed shared guidance follows the same pattern:
 - authoring source:
   - `~/.config/agents/src/AGENTS.md`
   - `~/.config/agents/src/agents/**`
+  - `~/.config/agents/src/commands/**`
   - `~/.config/agents/src/rules/**`
 - tracked deployment package:
   - `~/.apm/catalog/AGENTS.md`
   - `~/.apm/catalog/agents/**`
+  - `~/.apm/catalog/commands/**`
   - `~/.apm/catalog/rules/**`
 
 The tracked package exists so APM can install one flat, repo-tracked catalog instead of many local-path entries.
@@ -96,13 +113,36 @@ Runtime targets are a third layer, not an editing surface:
   - other detected runtime targets
 - refresh path:
   - `stage-catalog` updates the tracked package in `~/.apm/catalog/`
-  - `register-catalog`, `apply`, or `update` installs that tracked package and syncs runtime guidance files
+  - `register-catalog`, `apply`, or `update` installs that tracked package and syncs runtime guidance files, including `commands/`
 
 In short:
 
 - authoring change: `~/.config/agents/src/**`
 - tracked package change: `~/.apm/catalog/**` via staging
 - runtime change: produced by install/sync, not hand-edited
+
+## Fast Paths
+
+Use these short flows for the common request shapes:
+
+1. Managed skill or guidance changed
+   - edit `~/.config/agents/src/**`
+   - run `mise run stage-catalog`
+   - review `~/.apm/catalog/**`
+   - commit/push `~/.apm`
+   - run `mise run register-catalog`
+   - run `mise run doctor`
+
+2. Only `~/.apm` docs or manifest files changed
+   - edit the workspace-owned files directly
+   - commit/push `~/.apm`
+   - run `mise run register-catalog` only if `catalog/` changed too
+
+3. External skill mapping changed
+   - update `nix/agent-skills-sources.nix`
+   - run `mise run migrate-external`
+   - run `mise run apply`
+   - run `mise run doctor`
 
 Not allowed:
 
@@ -120,6 +160,8 @@ mise run apm:bootstrap
 # Day-to-day global flow from ~/.apm
 cd ~/.apm
 mise install
+mise run format
+mise run ci:check
 mise run migrate-external
 mise run apply
 mise run doctor
@@ -127,7 +169,7 @@ mise run doctor
 
 ## Managed Catalog Workflow
 
-Use the workspace script when you need to refresh the tracked catalog package from `~/.config/agents/src/skills/`.
+Use the workspace script when you need to refresh the tracked catalog package from `~/.config/agents/src/`.
 
 ```bash
 # Refresh the tracked catalog artifact
@@ -142,7 +184,7 @@ That flow:
 
 - rebuilds `~/.apm/.catalog-build/catalog/` as a temporary package artifact
 - copies the result into `~/.apm/catalog/`
-- keeps `~/.config/agents/src/skills/`, `AGENTS.md`, `agents/`, and `rules/` as the authoring source
+- keeps `~/.config/agents/src/skills/`, `AGENTS.md`, `agents/`, `commands/`, and `rules/` as the authoring source
 - lets `~/.apm/apm.yml` keep a single upstream ref: `jey3dayo/apm-workspace/catalog#main`
 
 For a full managed-content rollout, the normal sequence is:
@@ -170,7 +212,7 @@ APM global skill management in this setup is centered on:
 - `apm.yml` tracks dependencies by upstream ref
 - `apm_modules/` holds downloaded sources
 - `catalog/` holds the tracked managed-skill package
-- `catalog/AGENTS.md`, `catalog/agents/`, and `catalog/rules/` hold tracked shared guidance assets
+- `catalog/AGENTS.md`, `catalog/agents/`, `catalog/commands/`, and `catalog/rules/` hold tracked shared guidance assets
 - `apm install -g` deploys the current global dependency set to user targets
 
 If you see `./packages/...` in `apm.yml`, that is legacy migration residue and should be removed from the global model.
@@ -203,7 +245,7 @@ When shared guidance changes under `agents/src`:
 - run `mise run stage-catalog`
 - review, commit, and push the updated `catalog/`
 - run `mise run register-catalog`
-- run `mise run doctor` and confirm target `config/agents/rules` are present
+- run `mise run doctor` and confirm target `config/agents/commands/rules` are present
 
 When the change is only for workspace-owned docs such as `~/.apm/README.md` or `llms.md`:
 
@@ -214,12 +256,16 @@ When the change is only for workspace-owned docs such as `~/.apm/README.md` or `
 ## Legacy Notes
 
 - `validate-catalog` now validates the tracked `catalog/` package against `~/.config/agents/src/skills/`
-- `validate-catalog` also validates `agents/src/AGENTS.md`, `agents/`, and `rules/`
+- `validate-catalog` also validates `agents/src/AGENTS.md`, `agents/`, `commands/`, and `rules/`
+- `validate-catalog` is available both as `mise run validate-catalog` and as a workspace script command
+- `format` formats Markdown / TOML / YAML inside `~/.apm`
+- `ci:check` runs format checks plus validation and smoke checks
+- `ci` formats, validates, applies, and verifies the local workspace rollout
+- `catalog:tidy` restages the tracked catalog, validates it, and prints workspace health
 - public maintenance commands should use `bundle-catalog`, `stage-catalog`, `register-catalog`, and `smoke-catalog`
-- `doctor` shows both catalog coverage and managed-vs-external selection overlap, plus target `config/agents/rules/skills` presence
+- `doctor` shows both catalog coverage and managed-vs-external selection overlap, plus target `config/agents/commands/rules/skills` presence
 - `apply` / `update` validate the tracked catalog before global install
-- `apply` / `update` sync tracked `AGENTS.md`, `agents/`, and `rules/` into user runtime targets after install
+- `apply` / `update` sync tracked `AGENTS.md`, `agents/`, `commands/`, and `rules/` into user runtime targets after install
 - `apply` / `update` should fail fast if `./packages/*` entries still remain in the global manifest
 - install helpers also fail when APM prints diagnostics such as `packages failed` or `error(s)` even if exit code is 0
 - install the APM CLI through `mise` in this repository unless you are doing manual recovery
-- top-level managed `commands/` are not in scope yet because `agents/src/` has no authoritative `commands/` tree today
