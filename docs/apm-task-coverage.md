@@ -39,13 +39,10 @@
 
 ## Current Remaining Tasks
 
-2026-04-20 時点で残っている実務上のタスクは次です。
+2026-04-20 時点で、この APM migration slice に未完了タスクはありません。
 
-1. `.config` 側の APM 変更を commit / push する
-   - 対象は `scripts/apm-workspace.ps1|.sh`、`agents/src/commands/`、`agents/src/skills/apm-usage/`、`docs/tools/apm-workspace.md` など
-2. `.apm` 側の workspace / tracked catalog 変更を commit / push する
-   - 対象は `catalog/commands/`、staged `apm-usage`、`docs/apm-task-coverage.md`、`README.md`、`llms.md`、`TODO.md` など
-3. `catalog/` を push したあとで `mise run register-catalog` を実行する
-   - `catalog#main` の upstream ref で再配布し、workspace install state を最新化する
+- `commands` の managed catalog 移管は完了
+- `.config` と `.apm` の関連変更は commit / push 済み
+- `mise run register-catalog` と lock refresh も実施済み
 
-それ以外の「commands を catalog に入れる」作業自体は完了扱いでよいです。
+今後の作業があるとすれば、APM 本筋ではなく `.config` 側に残っている unrelated な既存差分の整理です。
