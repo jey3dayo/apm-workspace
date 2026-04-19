@@ -4,8 +4,6 @@ description: APM project for apm-workspace
 author: jey3dayo
 dependencies:
   apm:
-  - benjitaylor/agentation/skills/agentation#7dc5d65378fa901e6eead81d4e2bb62950d49f0b
-  - benjitaylor/agentation/skills/agentation-self-driving#7dc5d65378fa901e6eead81d4e2bb62950d49f0b
   - openai/skills/skills/.curated/gh-address-comments#e940b8a86138adf03972802b990a1dfc57fcbf09
   - openai/skills/skills/.curated/gh-fix-ci#e940b8a86138adf03972802b990a1dfc57fcbf09
   - vercel-labs/agent-skills/skills/composition-patterns#ce3e64e468f8fa09a2d075d102771838061fdac0
@@ -14,7 +12,6 @@ dependencies:
   - vercel-labs/agent-browser/skills/agent-browser#717d1b09e1c841a4c0206033886a1a861e3ca5d9
   - Heyvhuang/ship-faster/skills/cloudflare#64047d24e0ecb513a5aa879767d95ec7e0e44462
   - Heyvhuang/ship-faster/skills/tool-openclaw#64047d24e0ecb513a5aa879767d95ec7e0e44462
-  - tokoroten/prompt-review/.claude/skills/prompt-review#0a83fd9eeead58fe92d0b04522da9e6840a71940
   - nyosegawa/skills/skills/skill-auditor#c1048fe35403a3f273132306a4d49278f189c64b
   - obra/superpowers/skills/brainstorming#b55764852ac78870e65c6565fb585b6cd8b3c5c9
   - obra/superpowers/skills/dispatching-parallel-agents#b55764852ac78870e65c6565fb585b6cd8b3c5c9
@@ -45,8 +42,6 @@ dependencies:
   - trailofbits/skills/plugins/static-analysis/skills/codeql#e8cc5baf9329ccb491bfa200e82eacbac83b1ead
   - trailofbits/skills/plugins/static-analysis/skills/sarif-parsing#e8cc5baf9329ccb491bfa200e82eacbac83b1ead
   - trailofbits/skills/plugins/static-analysis/skills/semgrep#e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  - trailofbits/skills/plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor#e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  - mizchi/chezmoi-dotfiles/dot_claude/skills/empirical-prompt-tuning#8899529bac3bfcccb9fd0f90a19fd46c61768533
   - nextlevelbuilder/ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-max#b7e3af80f6e331f6fb456667b82b12cade7c9d35
   - jey3dayo/apm-workspace/catalog#main
   mcp: []

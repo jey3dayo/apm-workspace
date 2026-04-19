@@ -106,41 +106,17 @@ dependencies:
   - .copilot/skills/understand-onboard
   - .cursor/skills/understand-onboard
   content_hash: sha256:2b3faf132aafb668ccc57fd743aac0584e7ec6966402c4693b9e7c180db34cce
-- repo_url: benjitaylor/agentation
-  host: github.com
-  resolved_commit: 7dc5d65378fa901e6eead81d4e2bb62950d49f0b
-  resolved_ref: 7dc5d65378fa901e6eead81d4e2bb62950d49f0b
-  virtual_path: skills/agentation
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/agentation
-  - .config/opencode/skills/agentation
-  - .copilot/skills/agentation
-  - .cursor/skills/agentation
-  content_hash: sha256:6ba2c955bee6ab3e9c7781b2553e3574b4c9ec35e539437d0831bfe368de8550
-- repo_url: benjitaylor/agentation
-  host: github.com
-  resolved_commit: 7dc5d65378fa901e6eead81d4e2bb62950d49f0b
-  resolved_ref: 7dc5d65378fa901e6eead81d4e2bb62950d49f0b
-  virtual_path: skills/agentation-self-driving
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/agentation-self-driving
-  - .config/opencode/skills/agentation-self-driving
-  - .copilot/skills/agentation-self-driving
-  - .cursor/skills/agentation-self-driving
-  content_hash: sha256:405cf94e4df9b048ab42e51f26ad971dc6b986167b74eb46393abd6f1f5b5f88
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: 909dc9aba63dd4402de7c8e647c13dfb83da8687
+  resolved_commit: dc7b7aad27d4e43fb1eac1a2024cf41d785e1cfb
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
   package_type: apm_package
   deployed_files:
   - .claude/skills/agent-creator
+  - .claude/skills/agentation
+  - .claude/skills/agentation-self-driving
   - .claude/skills/apm-usage
   - .claude/skills/atomic-commit
   - .claude/skills/cc-sdd
@@ -159,6 +135,7 @@ dependencies:
   - .claude/skills/documentation-management
   - .claude/skills/dotfiles-integration
   - .claude/skills/drawio
+  - .claude/skills/empirical-prompt-tuning
   - .claude/skills/frontend-design
   - .claude/skills/gemini-system
   - .claude/skills/generate-svg
@@ -181,6 +158,7 @@ dependencies:
   - .claude/skills/predictive-analysis
   - .claude/skills/premortem
   - .claude/skills/project-maintenance
+  - .claude/skills/prompt-review
   - .claude/skills/react
   - .claude/skills/react-doctor
   - .claude/skills/react-grid-layout
@@ -190,6 +168,7 @@ dependencies:
   - .claude/skills/similarity
   - .claude/skills/skill-creator
   - .claude/skills/slide-docs
+  - .claude/skills/supply-chain-risk-auditor
   - .claude/skills/task-router
   - .claude/skills/task-to-pr
   - .claude/skills/tauri
@@ -201,6 +180,8 @@ dependencies:
   - .claude/skills/wezterm
   - .claude/skills/zsh
   - .config/opencode/skills/agent-creator
+  - .config/opencode/skills/agentation
+  - .config/opencode/skills/agentation-self-driving
   - .config/opencode/skills/apm-usage
   - .config/opencode/skills/atomic-commit
   - .config/opencode/skills/cc-sdd
@@ -219,6 +200,7 @@ dependencies:
   - .config/opencode/skills/documentation-management
   - .config/opencode/skills/dotfiles-integration
   - .config/opencode/skills/drawio
+  - .config/opencode/skills/empirical-prompt-tuning
   - .config/opencode/skills/frontend-design
   - .config/opencode/skills/gemini-system
   - .config/opencode/skills/generate-svg
@@ -241,6 +223,7 @@ dependencies:
   - .config/opencode/skills/predictive-analysis
   - .config/opencode/skills/premortem
   - .config/opencode/skills/project-maintenance
+  - .config/opencode/skills/prompt-review
   - .config/opencode/skills/react
   - .config/opencode/skills/react-doctor
   - .config/opencode/skills/react-grid-layout
@@ -250,6 +233,7 @@ dependencies:
   - .config/opencode/skills/similarity
   - .config/opencode/skills/skill-creator
   - .config/opencode/skills/slide-docs
+  - .config/opencode/skills/supply-chain-risk-auditor
   - .config/opencode/skills/task-router
   - .config/opencode/skills/task-to-pr
   - .config/opencode/skills/tauri
@@ -261,6 +245,8 @@ dependencies:
   - .config/opencode/skills/wezterm
   - .config/opencode/skills/zsh
   - .copilot/skills/agent-creator
+  - .copilot/skills/agentation
+  - .copilot/skills/agentation-self-driving
   - .copilot/skills/apm-usage
   - .copilot/skills/atomic-commit
   - .copilot/skills/cc-sdd
@@ -279,6 +265,7 @@ dependencies:
   - .copilot/skills/documentation-management
   - .copilot/skills/dotfiles-integration
   - .copilot/skills/drawio
+  - .copilot/skills/empirical-prompt-tuning
   - .copilot/skills/frontend-design
   - .copilot/skills/gemini-system
   - .copilot/skills/generate-svg
@@ -301,6 +288,7 @@ dependencies:
   - .copilot/skills/predictive-analysis
   - .copilot/skills/premortem
   - .copilot/skills/project-maintenance
+  - .copilot/skills/prompt-review
   - .copilot/skills/react
   - .copilot/skills/react-doctor
   - .copilot/skills/react-grid-layout
@@ -310,6 +298,7 @@ dependencies:
   - .copilot/skills/similarity
   - .copilot/skills/skill-creator
   - .copilot/skills/slide-docs
+  - .copilot/skills/supply-chain-risk-auditor
   - .copilot/skills/task-router
   - .copilot/skills/task-to-pr
   - .copilot/skills/tauri
@@ -321,6 +310,8 @@ dependencies:
   - .copilot/skills/wezterm
   - .copilot/skills/zsh
   - .cursor/skills/agent-creator
+  - .cursor/skills/agentation
+  - .cursor/skills/agentation-self-driving
   - .cursor/skills/apm-usage
   - .cursor/skills/atomic-commit
   - .cursor/skills/cc-sdd
@@ -339,6 +330,7 @@ dependencies:
   - .cursor/skills/documentation-management
   - .cursor/skills/dotfiles-integration
   - .cursor/skills/drawio
+  - .cursor/skills/empirical-prompt-tuning
   - .cursor/skills/frontend-design
   - .cursor/skills/gemini-system
   - .cursor/skills/generate-svg
@@ -361,6 +353,7 @@ dependencies:
   - .cursor/skills/predictive-analysis
   - .cursor/skills/premortem
   - .cursor/skills/project-maintenance
+  - .cursor/skills/prompt-review
   - .cursor/skills/react
   - .cursor/skills/react-doctor
   - .cursor/skills/react-grid-layout
@@ -370,6 +363,7 @@ dependencies:
   - .cursor/skills/similarity
   - .cursor/skills/skill-creator
   - .cursor/skills/slide-docs
+  - .cursor/skills/supply-chain-risk-auditor
   - .cursor/skills/task-router
   - .cursor/skills/task-to-pr
   - .cursor/skills/tauri
@@ -380,20 +374,7 @@ dependencies:
   - .cursor/skills/typescript
   - .cursor/skills/wezterm
   - .cursor/skills/zsh
-  content_hash: sha256:22ee6252d8e235f55084c91906d0dd09e71b8a8570a165614644496fa39c5f10
-- repo_url: mizchi/chezmoi-dotfiles
-  host: github.com
-  resolved_commit: 8899529bac3bfcccb9fd0f90a19fd46c61768533
-  resolved_ref: 8899529bac3bfcccb9fd0f90a19fd46c61768533
-  virtual_path: dot_claude/skills/empirical-prompt-tuning
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/empirical-prompt-tuning
-  - .config/opencode/skills/empirical-prompt-tuning
-  - .copilot/skills/empirical-prompt-tuning
-  - .cursor/skills/empirical-prompt-tuning
-  content_hash: sha256:11f060101781b0c3d551801b670a960376d4ab5ee275232c92af9ed209b2b2c4
+  content_hash: sha256:df3b4b211338cd92d59562c56d8aa7cf1dd2895a5354a93b33af025c436b3ae4
 - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
   host: github.com
   resolved_commit: b7e3af80f6e331f6fb456667b82b12cade7c9d35
@@ -667,19 +648,6 @@ dependencies:
   - .copilot/skills/gh-fix-ci
   - .cursor/skills/gh-fix-ci
   content_hash: sha256:02b4d97e4bd91e342e3ec3efa06b7871097d6a64e8398f4ed5b69c64d8d902fb
-- repo_url: tokoroten/prompt-review
-  host: github.com
-  resolved_commit: 0a83fd9eeead58fe92d0b04522da9e6840a71940
-  resolved_ref: 0a83fd9eeead58fe92d0b04522da9e6840a71940
-  virtual_path: .claude/skills/prompt-review
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/prompt-review
-  - .config/opencode/skills/prompt-review
-  - .copilot/skills/prompt-review
-  - .cursor/skills/prompt-review
-  content_hash: sha256:8280504199d448d61d54028fc25f491378172d40e801c356eb9126c37a831a66
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
@@ -758,19 +726,6 @@ dependencies:
   - .copilot/skills/semgrep
   - .cursor/skills/semgrep
   content_hash: sha256:739945d5fdd22520a093010a9e9a2e5568a6f541f74604e4328c0ade79cda81e
-- repo_url: trailofbits/skills
-  host: github.com
-  resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  resolved_ref: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  virtual_path: plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/supply-chain-risk-auditor
-  - .config/opencode/skills/supply-chain-risk-auditor
-  - .copilot/skills/supply-chain-risk-auditor
-  - .cursor/skills/supply-chain-risk-auditor
-  content_hash: sha256:1b986d50308c2fbb2a77d5a10b71747c692ce1b7a8a8718eefc3b4c6e460cb0e
 - repo_url: vercel-labs/agent-browser
   host: github.com
   resolved_commit: 717d1b09e1c841a4c0206033886a1a861e3ca5d9
