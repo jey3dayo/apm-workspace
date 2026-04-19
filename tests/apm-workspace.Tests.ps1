@@ -64,6 +64,7 @@ Describe "public command surface" {
     $help | Should Match "validate-catalog"
     $help | Should Match "stage-catalog"
     $help | Should Match "register-catalog"
+    $help | Should Match "release-catalog"
     $help | Should Not Match "transitional mirror"
     $help | Should Not Match "validate-internal"
     $help | Should Not Match "stage-internal"
@@ -92,6 +93,7 @@ Describe "public command surface" {
     $miseToml | Should Match '\[tasks\.format\]'
     $miseToml | Should Match '\[tasks\."ci:check"\]'
     $miseToml | Should Match '\[tasks\.ci\]'
+    $miseToml | Should Match '\[tasks\."catalog:release"\]'
     $miseToml | Should Match '\[tasks\."catalog:tidy"\]'
   }
 
@@ -100,6 +102,18 @@ Describe "public command surface" {
 
     $readme | Should Match '~/.apm/catalog/.apm/skills/<id>/'
     $readme | Should Not Match 'transitional mirror'
+  }
+
+  It "runs catalog release as stage, release gate, and register flow" {
+    Mock Invoke-StageCatalog {}
+    Mock Assert-CatalogReleaseReady {}
+    Mock Invoke-RegisterCatalog {}
+
+    Invoke-ReleaseCatalog
+
+    Assert-MockCalled Invoke-StageCatalog -Times 1 -Exactly
+    Assert-MockCalled Assert-CatalogReleaseReady -Times 1 -Exactly
+    Assert-MockCalled Invoke-RegisterCatalog -Times 1 -Exactly
   }
 }
 
