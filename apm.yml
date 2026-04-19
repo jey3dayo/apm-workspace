@@ -52,10 +52,6 @@ dependencies:
   - EpicenterHQ/epicenter/.agents/skills/tauri#59c0daf70082fefaf670a8fe1b825ab7a28fbb92
   - mizchi/chezmoi-dotfiles/dot_claude/skills/empirical-prompt-tuning#8899529bac3bfcccb9fd0f90a19fd46c61768533
   - nextlevelbuilder/ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-max#b7e3af80f6e331f6fb456667b82b12cade7c9d35
-  - jey3dayo/apm-workspace/internal-bundles/internal-first-batch#main
-  - jey3dayo/apm-workspace/internal-bundles/internal-next-simple#main
-  - jey3dayo/apm-workspace/internal-bundles/internal-medium#main
-  - jey3dayo/apm-workspace/internal-bundles/internal-heavy#main
-  - jey3dayo/apm-workspace/internal-bundles/internal-remaining#main
+  - jey3dayo/apm-workspace/catalog#main
   mcp: []
 scripts: {}

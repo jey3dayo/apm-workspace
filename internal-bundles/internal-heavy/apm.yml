@@ -1,7 +1,0 @@
-name: internal-heavy
-version: 1.0.0
-description: Generated internal bundled skills pilot for global APM migration
-dependencies:
-  apm: []
-  mcp: []
-scripts: {}
