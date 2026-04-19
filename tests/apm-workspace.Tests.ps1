@@ -48,4 +48,49 @@ Describe "public command surface" {
     $help | Should Not Match "register-internal"
     $help | Should Not Match "migrate-internal"
   }
+
+  It "does not reference removed install helpers" {
+    $script = Get-Content -LiteralPath C:\Users\j138c\.config\scripts\apm-workspace.ps1 -Raw
+
+    $script | Should Not Match 'Invoke-InstallReference\b'
+  }
+}
+
+Describe "external overlap reporting" {
+  It "finds skills selected both externally and by the managed catalog" {
+    $previousLegacySkillsDir = $LegacySkillsDir
+    $previousExternalSourcesFile = $ExternalSourcesFile
+
+    try {
+      $LegacySkillsDir = Join-Path $TestDrive "skills"
+      $ExternalSourcesFile = Join-Path $TestDrive "agent-skills-sources.nix"
+
+      New-Item -ItemType Directory -Path (Join-Path $LegacySkillsDir "dev-browser") -Force | Out-Null
+      Set-Content -LiteralPath (Join-Path $LegacySkillsDir "dev-browser\SKILL.md") -Value "# dev-browser"
+      @"
+{
+  sawyerhood-dev-browser = {
+    url = "github:sawyerhood/skills";
+    catalogs = {
+      default = "skills";
+    };
+    selection.enable = [
+      "dev-browser"
+      "prompt-review"
+    ];
+  };
+}
+"@ | Set-Content -LiteralPath $ExternalSourcesFile
+
+      $overlaps = @(Get-ManagedExternalOverlapEntries)
+
+      $overlaps.Count | Should Be 1
+      $overlaps[0].SourceName | Should Be "sawyerhood-dev-browser"
+      $overlaps[0].SkillId | Should Be "dev-browser"
+    }
+    finally {
+      $LegacySkillsDir = $previousLegacySkillsDir
+      $ExternalSourcesFile = $previousExternalSourcesFile
+    }
+  }
 }
