@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-04-19T16:04:14.285757+00:00'
+generated_at: '2026-04-19T16:12:00.800941+00:00'
 apm_version: 0.8.11
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -690,19 +690,6 @@ dependencies:
   - .copilot/skills/gh-fix-ci
   - .cursor/skills/gh-fix-ci
   content_hash: sha256:02b4d97e4bd91e342e3ec3efa06b7871097d6a64e8398f4ed5b69c64d8d902fb
-- repo_url: openai/skills
-  host: github.com
-  resolved_commit: e940b8a86138adf03972802b990a1dfc57fcbf09
-  resolved_ref: e940b8a86138adf03972802b990a1dfc57fcbf09
-  virtual_path: skills/.system/skill-creator
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/skill-creator
-  - .config/opencode/skills/skill-creator
-  - .copilot/skills/skill-creator
-  - .cursor/skills/skill-creator
-  content_hash: sha256:d354f0a7ccb564cfa8f84818703b3cc03eae7005aeb3c107e6c8a4f2eb70f595
 - repo_url: tokoroten/prompt-review
   host: github.com
   resolved_commit: 0a83fd9eeead58fe92d0b04522da9e6840a71940

@@ -334,7 +334,7 @@ in {
     baseDir = "skills";
     selection.enable = [
       "gh-fix-ci"
-      "skill-creator"
+      "gh-address-comments"
       "task-to-pr"
     ];
   };

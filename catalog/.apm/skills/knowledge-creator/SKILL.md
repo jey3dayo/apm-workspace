@@ -375,7 +375,7 @@ Based on your answers, I'll recommend the best format.
 
 1. Activate `skill-creator` skill
 2. Provide analyzed context
-3. Guide Progressive Disclosure structure
+3. Guide managed catalog structure and concise skill layout
 4. Ensure YAML frontmatter completeness
 
 ### Agent Creator Integration
@@ -504,7 +504,7 @@ Activate this skill when:
 
 ## See Also
 
-- skill-creator - Create new skills with Progressive Disclosure
+- skill-creator - Create managed skills for this `~/.apm` workspace
 - agent-creator - Create autonomous task agents
 - command-creator - Create interactive user commands
 - rules-creator - Create project rules and steering documents

@@ -183,7 +183,7 @@ Flake の静的制約を満たしつつ、SSoT（Single Source of Truth）を維
     url = "github:openai/skills";
     flake = false;
     baseDir = "skills";
-    selection.enable = [ "gh-fix-ci" "skill-creator" ];
+    selection.enable = [ "gh-fix-ci" "gh-address-comments" ];
   };
   vercel-skills = {
     url = "github:vercel/next.js/tree/canary/examples";

@@ -120,7 +120,7 @@ ls -la ~/.claude/skills/
 
 ## Related Skills
 
-- `skill-creator`: bundled skill creation
+- `skill-creator`: managed skill creation in the `~/.apm` workflow
 - `command-creator`: command authoring guidance
 - `rules-creator`: bundled rule creation
 - `knowledge-creator`: routing related knowledge questions

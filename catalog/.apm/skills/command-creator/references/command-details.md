@@ -392,7 +392,7 @@ cp my-command.md .claude/commands/
 
 - agent-creator skill: サブエージェント定義の作成方法
 - rules-creator skill: コマンドが強制するルールの作成方法
-- skill-creator skill: より広いドメインの場合
+- skill-creator skill: この workspace で managed skill を作る場合
 - agents-and-commands skill: エージェントとコマンドの違い
 - integration-framework skill: 統合パターン
 

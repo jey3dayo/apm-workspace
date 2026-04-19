@@ -489,7 +489,7 @@ nix run ~/.config#catalog
 Available skills:
   - openai-skills:
     - gh-fix-ci
-    - skill-creator
+    - gh-address-comments
     - task-to-pr
   - vercel-skills:
     - app-router

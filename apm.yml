@@ -8,7 +8,6 @@ dependencies:
   - benjitaylor/agentation/skills/agentation-self-driving#7dc5d65378fa901e6eead81d4e2bb62950d49f0b
   - openai/skills/skills/.curated/gh-address-comments#e940b8a86138adf03972802b990a1dfc57fcbf09
   - openai/skills/skills/.curated/gh-fix-ci#e940b8a86138adf03972802b990a1dfc57fcbf09
-  - openai/skills/skills/.system/skill-creator#e940b8a86138adf03972802b990a1dfc57fcbf09
   - vercel-labs/agent-skills/skills/composition-patterns#ce3e64e468f8fa09a2d075d102771838061fdac0
   - vercel-labs/agent-skills/skills/react-best-practices#ce3e64e468f8fa09a2d075d102771838061fdac0
   - vercel-labs/agent-skills/skills/web-design-guidelines#ce3e64e468f8fa09a2d075d102771838061fdac0
