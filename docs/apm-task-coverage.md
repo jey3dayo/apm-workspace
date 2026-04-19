@@ -35,7 +35,7 @@
 
 - `register-catalog` は local diff をそのまま配る command ではなく、commit / push 済みの `catalog` を install する flow。
 - `validate-catalog` は `mise.toml` からも叩けるが、実体は workspace script 側の validation command。
-- 新しい managed skill は `~/.apm/catalog/.apm/skills/<id>/` に作る。runtime targets や `~/.config/agents` を起点にしない。
+- 新しい managed skill は `~/.apm/catalog/.apm/skills/<id>/` に作る。runtime targets を起点にしない。
 - 新しい skill の作成や移管は `skill-creator` を使い、manifest や配布モデル全体の判断は `apm-usage` で補う。
 
 ## Current Remaining Tasks

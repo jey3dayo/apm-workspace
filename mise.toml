@@ -35,7 +35,7 @@ run = "sh \"${APM_BOOTSTRAP_REPO:-$HOME/.config}/scripts/apm-workspace.sh\" vali
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\\.config\\scripts\\apm-workspace.ps1 validate-catalog"
 
 [tasks.stage-catalog]
-description = "Rebuild the tracked catalog package from ~/.config/agents/src"
+description = "Normalize the tracked catalog package in ~/.apm/catalog"
 run = "sh \"${APM_BOOTSTRAP_REPO:-$HOME/.config}/scripts/apm-workspace.sh\" stage-catalog"
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\\.config\\scripts\\apm-workspace.ps1 stage-catalog"
 

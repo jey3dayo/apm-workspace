@@ -95,11 +95,11 @@ Describe "public command surface" {
     $miseToml | Should Match '\[tasks\."catalog:tidy"\]'
   }
 
-  It "describes the catalog readme without requiring ~/.config/agents" {
+  It "describes the catalog readme without legacy mirror wording" {
     $readme = Get-CatalogReadmeContent
 
     $readme | Should Match '~/.apm/catalog/.apm/skills/<id>/'
-    $readme | Should Not Match '\.config/agents'
+    $readme | Should Not Match 'transitional mirror'
   }
 }
 
