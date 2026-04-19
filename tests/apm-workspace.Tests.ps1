@@ -97,15 +97,14 @@ Describe "public command surface" {
 
 Describe "external overlap reporting" {
   It "finds skills selected both externally and by the managed catalog" {
-    $previousLegacySkillsDir = $LegacySkillsDir
     $previousExternalSourcesFile = $ExternalSourcesFile
 
     try {
-      $LegacySkillsDir = Join-Path $TestDrive "skills"
       $ExternalSourcesFile = Join-Path $TestDrive "agent-skills-sources.nix"
 
-      New-Item -ItemType Directory -Path (Join-Path $LegacySkillsDir "dev-browser") -Force | Out-Null
-      Set-Content -LiteralPath (Join-Path $LegacySkillsDir "dev-browser\SKILL.md") -Value "# dev-browser"
+      $skillsRoot = Join-Path $WorkspaceDir "catalog\.apm\skills"
+      New-Item -ItemType Directory -Path (Join-Path $skillsRoot "dev-browser") -Force | Out-Null
+      Set-Content -LiteralPath (Join-Path $skillsRoot "dev-browser\SKILL.md") -Value "# dev-browser"
       @"
 {
   sawyerhood-dev-browser = {
@@ -128,7 +127,6 @@ Describe "external overlap reporting" {
       $overlaps[0].SkillId | Should Be "dev-browser"
     }
     finally {
-      $LegacySkillsDir = $previousLegacySkillsDir
       $ExternalSourcesFile = $previousExternalSourcesFile
     }
   }

@@ -1,11 +1,10 @@
 # catalog
 
-This catalog is generated from the managed source trees in `~/.config/agents/src/`.
+This directory is the managed catalog source of truth for the global APM workspace.
 
-- Source skills: `~/.config/agents/src/skills/<id>/`
-- Source instructions: `~/.config/agents/src/AGENTS.md`
-- Source agents: `~/.config/agents/src/agents/**`
-- Source commands: `~/.config/agents/src/commands/**`
-- Source rules: `~/.config/agents/src/rules/**`
-- Purpose: provide one tracked APM package for the managed skill set
+- Edit skills in `~/.apm/catalog/.apm/skills/<id>/`
+- Edit shared guidance in `~/.apm/catalog/AGENTS.md`, `agents/**`, `commands/**`, and `rules/**`
+- `skills` live under `.apm/skills/**` because they are installable APM package content
+- `commands/**` stays top-level because it is runtime-synced shared guidance, not nested skill package content
+- `mise run stage-catalog` normalizes this package and refreshes the transitional mirror in `~/.config/agents/src/`
 - Install ref: `jey3dayo/apm-workspace/catalog#main`

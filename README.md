@@ -15,14 +15,19 @@ This repository is the day-to-day working copy of `~/.apm`. It owns the global A
 
 ## Source Of Truth
 
-Managed catalog assets use a two-layer model:
+Managed catalog assets are edited directly in `~/.apm/catalog/`.
 
-- Authoring source: `~/.config/agents/src/skills/<id>/`
-- Authoring source: `~/.config/agents/src/AGENTS.md`, `agents/**`, `commands/**`, `rules/**`
-- Tracked package: `~/.apm/catalog/.apm/skills/<id>/`
-- Tracked package: `~/.apm/catalog/AGENTS.md`, `agents/**`, `commands/**`, `rules/**`
+- Skills: `~/.apm/catalog/.apm/skills/<id>/`
+- Shared guidance: `~/.apm/catalog/AGENTS.md`, `agents/**`, `commands/**`, `rules/**`
+- Transitional mirror: `~/.config/agents/src/**`
 
-The tracked package is generated from the authoring source and then installed through a single upstream ref in `apm.yml`:
+The layout difference between `catalog/.apm/skills/` and `catalog/commands/` is intentional.
+
+- `catalog/.apm/skills/<id>/` is the APM package namespace for installable skills.
+- `catalog/commands/**` is not a skill package subtree. It is shared runtime guidance that is synced into target roots as `commands/**` alongside `AGENTS.md`, `agents/**`, and `rules/**`.
+- Keep this split unless the runtime sync contract itself changes.
+
+`mise run stage-catalog` now normalizes the tracked package and refreshes the transitional mirror. Global install still happens through a single upstream ref in `apm.yml`:
 
 ```text
 jey3dayo/apm-workspace/catalog#main
@@ -54,13 +59,14 @@ mise run smoke-catalog
 
 ## Managed Skill Updates
 
-When a managed catalog asset changes under `~/.config/agents/src/`:
+When a managed catalog asset changes under `~/.apm/catalog/`:
 
-1. Update the authoring source.
+1. Update `catalog/` directly.
 2. Run `mise run stage-catalog`.
-3. Commit and push the updated `catalog/`.
-4. Run `mise run register-catalog`.
-5. Run `mise run doctor` and confirm:
+3. Review the normalized `catalog/` diff and the refreshed mirror under `~/.config/agents/src/`.
+4. Commit and push the updated `catalog/`.
+5. Run `mise run register-catalog`.
+6. Run `mise run doctor` and confirm:
    - `external selection overlap: count=0`
    - `catalog: ... status=ok`
    - target lines show `config=present agents=present commands=present rules=present`
@@ -71,6 +77,6 @@ If old package ownership from a previous install state is still hanging around, 
 
 - Operational reference: `~/.config/docs/tools/apm-workspace.md`
 - Task catalog: `~/.config/docs/tools/mise-tasks.md`
-- Managed-skill usage guidance: `~/.config/agents/src/skills/apm-usage/SKILL.md`
+- Managed-skill usage guidance: `~/.apm/catalog/.apm/skills/apm-usage/SKILL.md`
 - Task coverage memo: `docs/apm-task-coverage.md`
 - Remaining work: `TODO.md`

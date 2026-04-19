@@ -1,6 +1,6 @@
 name: catalog
 version: 1.0.0
-description: Generated catalog of managed skills for global APM rollout
+description: Managed catalog package for global APM rollout
 dependencies:
   apm: []
   mcp: []

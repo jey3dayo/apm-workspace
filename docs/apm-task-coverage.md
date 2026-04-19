@@ -6,11 +6,11 @@
 
 | 対象 | 今の正本 | APM task で配布できるか | 補足 |
 | --- | --- | --- | --- |
-| `skills` | `~/.config/agents/src/skills/**` | できる | `catalog/.apm/skills/**` に stage され、`catalog#main` から配布 |
-| `agents` | `~/.config/agents/src/agents/**` | できる | `catalog/agents/**` に入り runtime sync 対象 |
-| top-level `commands/` | `~/.config/agents/src/commands/**` | できる | `catalog/commands/**` に入り runtime sync 対象 |
-| `rules` | `~/.config/agents/src/rules/**` | できる | `catalog/rules/**` に入り runtime sync 対象 |
-| `AGENTS.md` | `~/.config/agents/src/AGENTS.md` | できる | tracked catalog の instructions として配布 |
+| `skills` | `~/.apm/catalog/.apm/skills/**` | できる | `stage-catalog` が正規化し、`catalog#main` から配布 |
+| `agents` | `~/.apm/catalog/agents/**` | できる | runtime sync 対象 |
+| top-level `commands/` | `~/.apm/catalog/commands/**` | できる | runtime sync 対象 |
+| `rules` | `~/.apm/catalog/rules/**` | できる | runtime sync 対象 |
+| `AGENTS.md` | `~/.apm/catalog/AGENTS.md` | できる | tracked catalog の instructions として配布 |
 | external skills | upstream repo | できる | `migrate-external` で `apm.yml` に ref 登録 |
 
 ## Task Coverage
@@ -23,7 +23,7 @@
 | `mise run format` | 間接 | 間接 | 間接 | 間接 | 間接 | workspace の Markdown / TOML / YAML を整形 |
 | `mise run ci:check` | ○ | ○ | ○ | ○ | ○ | format check + validate + validate-catalog + smoke-catalog |
 | `mise run ci` | ○ | ○ | ○ | ○ | ○ | format → validation → apply → doctor でローカル配布まで実行 |
-| `mise run stage-catalog` | ○ | ○ | ○ | ○ | ○ | authoring source から tracked catalog を再生成 |
+| `mise run stage-catalog` | ○ | ○ | ○ | ○ | ○ | `catalog/` を正規化し、`~/.config/agents/src/**` mirror を更新 |
 | `mise run catalog:tidy` | ○ | ○ | ○ | ○ | ○ | stage-catalog → validate-catalog → doctor の整理導線 |
 | `mise run register-catalog` | ○ | ○ | ○ | ○ | ○ | push 済みの `catalog` ref を install |
 | `mise run smoke-catalog` | ○ | ○ | ○ | ○ | ○ | temp install による smoke test |
@@ -35,14 +35,12 @@
 
 - `register-catalog` は local diff をそのまま配る command ではなく、commit / push 済みの `catalog` を install する flow。
 - `validate-catalog` は `mise.toml` からも叩けるが、実体は workspace script 側の validation command。
-- top-level `commands/` も managed catalog に移管済みなので、編集は `~/.config/agents/src/commands/` を起点に行う。
+- `~/.config/agents/src/**` は transitional mirror。編集の起点は `~/.apm/catalog/**`。
 
 ## Current Remaining Tasks
 
-2026-04-20 時点で、この APM migration slice に未完了タスクはありません。
+2026-04-20 時点の残件は follow-up だけです。
 
-- `commands` の managed catalog 移管は完了
-- `.config` と `.apm` の関連変更は commit / push 済み
-- `mise run register-catalog` と lock refresh も実施済み
-
-今後の作業があるとすれば、APM 本筋ではなく `.config` 側に残っている unrelated な既存差分の整理です。
+- PowerShell / POSIX の新しい `catalog` 正本フローを継続確認する
+- `~/.config/agents/src/**` mirror をいつ外すか決める
+- helper docs や prompts に残る旧 authoring 指示を掃除する
