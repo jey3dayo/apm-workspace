@@ -2,14 +2,11 @@
 
 ## Open Tasks
 
-- Decide whether top-level managed `commands/` should move into the APM catalog model.
-- If `commands/` will move, define an authoritative source tree under `~/.config/agents/src/commands/`.
-- Extend the catalog build/sync flow only after the `commands/` source-of-truth is defined.
-- Decide whether `validate-catalog` should become a real `mise run validate-catalog` task in `~/.apm/mise.toml`, or whether docs should consistently describe it as a maintenance command only.
-- Commit and push the current `~/.apm` doc updates, then run `mise run register-catalog` if the tracked catalog package changed.
+- Commit and push the `.config` APM changes (`scripts/apm-workspace.*`, `agents/src/commands/`, `agents/src/skills/apm-usage/`, `docs/tools/apm-workspace.md`).
+- Commit and push the `.apm` workspace / catalog changes (`catalog/commands/`, staged `apm-usage`, docs, tests, `llms.md`).
+- Run `mise run register-catalog` after the pushed `catalog/` is on the upstream branch.
 
 ## Notes
 
-- `skills`, `agents`, `rules`, and `AGENTS.md` are already on the managed catalog path.
-- Top-level `commands/` are the main remaining migration gap.
+- `skills`, `agents`, `commands`, `rules`, and `AGENTS.md` are on the managed catalog path.
 - The current coverage table lives in `docs/apm-task-coverage.md`.

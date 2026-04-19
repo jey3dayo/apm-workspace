@@ -21,12 +21,12 @@ Managed catalog assets are authored in `~/.config/agents/src/` and staged into `
 - Shared guidance:
   - source: `~/.config/agents/src/AGENTS.md`
   - source: `~/.config/agents/src/agents/**`
+  - source: `~/.config/agents/src/commands/**`
   - source: `~/.config/agents/src/rules/**`
   - tracked: `~/.apm/catalog/AGENTS.md`
   - tracked: `~/.apm/catalog/agents/**`
+  - tracked: `~/.apm/catalog/commands/**`
   - tracked: `~/.apm/catalog/rules/**`
-
-Top-level managed `commands/` are not migrated yet because `agents/src` has no authoritative `commands/` tree.
 
 ## Operational Rules
 
@@ -59,7 +59,14 @@ Healthy output includes:
 
 - `external selection overlap: count=0`
 - `catalog: ... status=ok`
-- target lines with `config=present agents=present rules=present`
+- target lines with `config=present agents=present commands=present rules=present`
+
+## Extra Tasks
+
+- `mise run format`: format Markdown, TOML, and YAML in the workspace
+- `mise run ci:check`: run formatting checks plus catalog validation smoke checks
+- `mise run ci`: format, validate, apply, and verify the local workspace rollout
+- `mise run catalog:tidy`: restage the tracked catalog, validate it, and print workspace health
 
 ## References
 

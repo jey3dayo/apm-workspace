@@ -9,7 +9,7 @@ This repository is the day-to-day working copy of `~/.apm`. It owns the global A
 - `apm.yml`: global dependency manifest for user-scope skill rollout
 - `apm.lock.yaml`: resolved commits and install state captured by APM
 - `apm_modules/`: downloaded dependency sources; cache only, not an editing surface
-- `catalog/`: tracked APM package for managed skills plus shared guidance assets (`AGENTS.md`, `agents/`, `rules/`)
+- `catalog/`: tracked APM package for managed skills plus shared guidance assets (`AGENTS.md`, `agents/`, `commands/`, `rules/`)
 - `mise.toml`: workspace-local tasks for install, migration, verification, and repair
 - `tests/`: Pester coverage for the workspace helpers
 
@@ -18,9 +18,9 @@ This repository is the day-to-day working copy of `~/.apm`. It owns the global A
 Managed catalog assets use a two-layer model:
 
 - Authoring source: `~/.config/agents/src/skills/<id>/`
-- Authoring source: `~/.config/agents/src/AGENTS.md`, `agents/**`, `rules/**`
+- Authoring source: `~/.config/agents/src/AGENTS.md`, `agents/**`, `commands/**`, `rules/**`
 - Tracked package: `~/.apm/catalog/.apm/skills/<id>/`
-- Tracked package: `~/.apm/catalog/AGENTS.md`, `agents/**`, `rules/**`
+- Tracked package: `~/.apm/catalog/AGENTS.md`, `agents/**`, `commands/**`, `rules/**`
 
 The tracked package is generated from the authoring source and then installed through a single upstream ref in `apm.yml`:
 
@@ -28,7 +28,7 @@ The tracked package is generated from the authoring source and then installed th
 jey3dayo/apm-workspace/catalog#main
 ```
 
-External skills stay in `apm.yml` as upstream refs and are downloaded into `apm_modules/`. Top-level managed `commands/` are not migrated yet because `agents/src` has no authoritative `commands/` tree.
+External skills stay in `apm.yml` as upstream refs and are downloaded into `apm_modules/`.
 
 ## Daily Flow
 
@@ -43,8 +43,11 @@ mise run doctor
 Useful maintenance commands:
 
 ```powershell
+mise run format
+mise run ci
 mise run validate-catalog
 mise run stage-catalog
+mise run catalog:tidy
 mise run register-catalog
 mise run smoke-catalog
 ```
@@ -60,7 +63,7 @@ When a managed catalog asset changes under `~/.config/agents/src/`:
 5. Run `mise run doctor` and confirm:
    - `external selection overlap: count=0`
    - `catalog: ... status=ok`
-   - target lines show `config=present agents=present rules=present`
+   - target lines show `config=present agents=present commands=present rules=present`
 
 If old package ownership from a previous install state is still hanging around, run `apm prune` once before re-applying.
 
