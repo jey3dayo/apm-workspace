@@ -122,6 +122,14 @@ mise run doctor
 """
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"mise run format; mise run ci:check; mise run apply; mise run doctor\""
 
+[tasks."catalog:release"]
+description = "Run local CI, require a clean pushed branch, then register the managed catalog"
+run = """
+mise run ci
+sh "${APM_BOOTSTRAP_REPO:-$HOME/.config}/scripts/apm-workspace.sh" release-catalog
+"""
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"mise run ci; powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\\.config\\scripts\\apm-workspace.ps1 release-catalog\""
+
 [tasks."catalog:tidy"]
 description = "Refresh, validate, and inspect the managed catalog package"
 run = """
