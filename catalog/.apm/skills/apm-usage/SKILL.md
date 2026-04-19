@@ -140,11 +140,18 @@ If you see `./packages/...` in `apm.yml`, that is legacy migration residue and s
 - lets APM place downloaded sources in `~/.apm/apm_modules/`
 - auto-runs `pin-external` at the end, rewriting those external refs to `#resolved_commit` based on `apm.lock.yaml`
 
+When a skill is moved into the managed catalog:
+
+- remove the overlapping selection from `nix/agent-skills-sources.nix`
+- run `mise run doctor` and confirm `external selection overlap: count=0`
+- run `apm prune` once if old package ownership is still hanging around from a previous install state
+
 ## Legacy Notes
 
 - `validate-catalog` now validates the tracked `catalog/` package against `~/.config/agents/src/skills/`
 - public maintenance commands should use `bundle-catalog`, `stage-catalog`, `register-catalog`, and `smoke-catalog`
-- `doctor` shows catalog coverage instead of the previous profile summary
+- `doctor` shows both catalog coverage and managed-vs-external selection overlap
 - `apply` / `update` validate the tracked catalog before global install
+- `apply` / `update` should fail fast if `./packages/*` entries still remain in the global manifest
 - install helpers also fail when APM prints diagnostics such as `packages failed` or `error(s)` even if exit code is 0
 - install the APM CLI through `mise` in this repository unless you are doing manual recovery
