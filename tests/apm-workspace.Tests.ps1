@@ -23,7 +23,7 @@ scripts: {}
     Test-ManifestHasCatalogReference | Should Be $true
   }
 
-  It "lists skill ids from the tracked catalog tree" {
+  It "lists skill ids from the managed catalog tree" {
     $skillsRoot = Join-Path $WorkspaceDir "catalog\.apm\skills"
     New-Item -ItemType Directory -Path (Join-Path $skillsRoot "mypc-manager") -Force | Out-Null
     New-Item -ItemType Directory -Path (Join-Path $skillsRoot "superpowers\brainstorming") -Force | Out-Null
@@ -35,7 +35,7 @@ scripts: {}
     $skillIds | Should Be @("mypc-manager", "superpowers:brainstorming")
   }
 
-  It "lists tracked agent, command, and rule files plus instructions" {
+  It "lists managed agent, command, and rule files plus instructions" {
     $agentsRoot = Join-Path $WorkspaceDir "catalog\agents"
     $commandsRoot = Join-Path $WorkspaceDir "catalog\commands"
     $rulesRoot = Join-Path $WorkspaceDir "catalog\rules"
