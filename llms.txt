@@ -1,8 +1,8 @@
 # apm-workspace
 
-> `C:\Users\j138c\.apm` is the working copy of the global APM skill workspace. It manages user-scope skill rollout through `apm.yml`, keeps downloaded upstream sources in `apm_modules/`, and publishes one tracked managed-skill package from `catalog/` as `jey3dayo/apm-workspace/catalog#main`.
+> `C:\Users\j138c\.apm` is the working copy of the global APM skill workspace. It manages user-scope skill rollout through `apm.yml`, keeps downloaded upstream sources in `apm_modules/`, and publishes one tracked managed catalog package from `catalog/` as `jey3dayo/apm-workspace/catalog#main`.
 
-Read `README.md` first for the operational model. Read `C:\Users\j138c\.config\docs\tools\apm-workspace.md` for the full contract. Managed skill authoring happens in `C:\Users\j138c\.config\agents\src\skills\`, not in `apm_modules/`.
+Read `README.md` first for the operational model. Read `C:\Users\j138c\.config\docs\tools\apm-workspace.md` for the full contract. Managed authoring happens in `C:\Users\j138c\.config\agents\src\`, not in `apm_modules/`.
 
 ## Start Here
 
@@ -10,19 +10,21 @@ Read `README.md` first for the operational model. Read `C:\Users\j138c\.config\d
 - [apm.yml](apm.yml): Global dependency manifest. External skills stay here as upstream refs.
 - [apm.lock.yaml](apm.lock.yaml): Resolved dependency commits and install state.
 - [mise.toml](mise.toml): Workspace task entrypoint.
-- [catalog](catalog/): Tracked managed-skill package published as `jey3dayo/apm-workspace/catalog#main`.
+- [catalog](catalog/): Tracked managed catalog package published as `jey3dayo/apm-workspace/catalog#main`.
 - [tests](tests/): Pester regression coverage for helper behavior.
 
 ## Important Constraints
 
 - Managed skills use a two-layer model: author in `C:\Users\j138c\.config\agents\src\skills\<id>\`, publish from `C:\Users\j138c\.apm\catalog\.apm\skills\<id>\`.
+- Managed shared guidance uses the same model: author in `C:\Users\j138c\.config\agents\src\AGENTS.md`, `agents\**`, `rules\**`, publish from `C:\Users\j138c\.apm\catalog\AGENTS.md`, `agents\**`, `rules\**`.
 - Do not treat `apm_modules/` as editable source.
 - Do not reintroduce `./packages/*` or `~/.apm/skills/` as the global source of truth.
 - After moving a skill into the managed catalog, remove the overlapping external selection from `C:\Users\j138c\.config\nix\agent-skills-sources.nix`.
+- Top-level managed `commands/` are intentionally out of scope until `agents/src` gets an authoritative `commands/` tree.
 
 ## Default Commands
 
-- `mise run apply`: validate the tracked catalog, install global dependencies, and compile Codex output.
+- `mise run apply`: validate the tracked catalog, install global dependencies, compile Codex output, then sync tracked `AGENTS.md` / `agents/` / `rules/`.
 - `mise run doctor`: show target presence, external pin state, overlap count, and catalog health.
 - `mise run stage-catalog`: regenerate `catalog/` from the authoring source tree.
 - `mise run register-catalog`: install the pushed catalog ref into the global workspace state.
@@ -37,4 +39,4 @@ Prefer this sequence after managed-skill changes:
 3. `mise run register-catalog`
 4. `mise run doctor`
 
-Healthy output includes `external selection overlap: count=0` and `catalog: ... status=ok`.
+Healthy output includes `external selection overlap: count=0`, `catalog: ... status=ok`, and target lines with `config=present agents=present rules=present`.
