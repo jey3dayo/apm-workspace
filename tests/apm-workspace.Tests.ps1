@@ -35,18 +35,23 @@ scripts: {}
     $skillIds | Should Be @("mypc-manager", "superpowers:brainstorming")
   }
 
-  It "lists tracked agent and rule files plus instructions" {
+  It "lists tracked agent, command, and rule files plus instructions" {
     $agentsRoot = Join-Path $WorkspaceDir "catalog\agents"
+    $commandsRoot = Join-Path $WorkspaceDir "catalog\commands"
     $rulesRoot = Join-Path $WorkspaceDir "catalog\rules"
     New-Item -ItemType Directory -Path (Join-Path $agentsRoot "kiro") -Force | Out-Null
+    New-Item -ItemType Directory -Path $commandsRoot -Force | Out-Null
     New-Item -ItemType Directory -Path (Join-Path $rulesRoot "tools") -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $WorkspaceDir "catalog\AGENTS.md") -Value "# shared guidance"
     Set-Content -LiteralPath (Join-Path $agentsRoot "code-reviewer.md") -Value "# agent"
     Set-Content -LiteralPath (Join-Path $agentsRoot "kiro\spec-design.md") -Value "# kiro"
+    Set-Content -LiteralPath (Join-Path $commandsRoot "review.md") -Value "# review"
+    Set-Content -LiteralPath (Join-Path $commandsRoot "setup.md") -Value "# setup"
     Set-Content -LiteralPath (Join-Path $rulesRoot "claude-md-design.md") -Value "# rule"
     Set-Content -LiteralPath (Join-Path $rulesRoot "tools\rtk.md") -Value "# rtk"
 
     @(Get-TrackedCatalogAgentRelativePaths) | Should Be @("code-reviewer.md", "kiro/spec-design.md")
+    @(Get-TrackedCatalogCommandRelativePaths) | Should Be @("review.md", "setup.md")
     @(Get-TrackedCatalogRuleRelativePaths) | Should Be @("claude-md-design.md", "tools/rtk.md")
     Test-Path -LiteralPath (Get-TrackedCatalogInstructionsPath) | Should Be $true
   }
@@ -77,6 +82,16 @@ Describe "public command surface" {
     ($targets | Where-Object Name -eq "claude").ConfigName | Should Be "CLAUDE.md"
     ($targets | Where-Object Name -eq "codex").ConfigName | Should Be "AGENTS.md"
     ($targets | Where-Object Name -eq "cursor").ConfigName | Should Be "AGENTS.md"
+  }
+
+  It "publishes workspace mise tasks for formatting and ci flow" {
+    $miseToml = Get-Content -LiteralPath C:\Users\j138c\.apm\mise.toml -Raw
+
+    $miseToml | Should Match '\[tasks\.validate-catalog\]'
+    $miseToml | Should Match '\[tasks\.format\]'
+    $miseToml | Should Match '\[tasks\."ci:check"\]'
+    $miseToml | Should Match '\[tasks\.ci\]'
+    $miseToml | Should Match '\[tasks\."catalog:tidy"\]'
   }
 }
 

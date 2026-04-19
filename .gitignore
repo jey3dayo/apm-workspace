@@ -1,7 +1,3 @@
 /.apm/
 /apm_modules/
 /.catalog-build/
-
-
-# APM dependencies
-apm_modules/
