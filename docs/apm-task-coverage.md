@@ -4,32 +4,32 @@
 
 ## Migration Status
 
-| 対象 | 今の正本 | APM task で配布できるか | 補足 |
-| --- | --- | --- | --- |
-| `skills` | `~/.apm/catalog/.apm/skills/**` | できる | `stage-catalog` が正規化し、`catalog#main` から配布 |
-| `agents` | `~/.apm/catalog/agents/**` | できる | runtime sync 対象 |
-| top-level `commands/` | `~/.apm/catalog/commands/**` | できる | runtime sync 対象 |
-| `rules` | `~/.apm/catalog/rules/**` | できる | runtime sync 対象 |
-| `AGENTS.md` | `~/.apm/catalog/AGENTS.md` | できる | tracked catalog の instructions として配布 |
-| external skills | upstream repo | できる | `migrate-external` で `apm.yml` に ref 登録 |
+| 対象                  | 今の正本                        | APM task で配布できるか | 補足                                                |
+| --------------------- | ------------------------------- | ----------------------- | --------------------------------------------------- |
+| `skills`              | `~/.apm/catalog/.apm/skills/**` | できる                  | `stage-catalog` が正規化し、`catalog#main` から配布 |
+| `agents`              | `~/.apm/catalog/agents/**`      | できる                  | runtime sync 対象                                   |
+| top-level `commands/` | `~/.apm/catalog/commands/**`    | できる                  | runtime sync 対象                                   |
+| `rules`               | `~/.apm/catalog/rules/**`       | できる                  | runtime sync 対象                                   |
+| `AGENTS.md`           | `~/.apm/catalog/AGENTS.md`      | できる                  | managed catalog の instructions として配布          |
+| external skills       | upstream repo                   | できる                  | `migrate-external` で `apm.yml` に ref 登録         |
 
 ## Task Coverage
 
-| task / command | skills | agents | rules | `AGENTS.md` | commands | 役割 |
-| --- | --- | --- | --- | --- | --- | --- |
-| `mise run apply` | ○ | ○ | ○ | ○ | ○ | global install 実行後に tracked `AGENTS.md` / `agents/` / `commands/` / `rules/` を runtime sync |
-| `mise run update` | ○ | ○ | ○ | ○ | ○ | checkout 更新 + deps update + apply 相当 |
-| `mise run doctor` | 状態確認 | 状態確認 | 状態確認 | 状態確認 | 状態確認 | target presence, overlap, catalog health を確認 |
-| `mise run format` | 間接 | 間接 | 間接 | 間接 | 間接 | workspace の Markdown / TOML / YAML を整形 |
-| `mise run ci:check` | ○ | ○ | ○ | ○ | ○ | format check + validate + validate-catalog + smoke-catalog |
-| `mise run ci` | ○ | ○ | ○ | ○ | ○ | format → validation → apply → doctor でローカル配布まで実行 |
-| `mise run stage-catalog` | ○ | ○ | ○ | ○ | ○ | `catalog/` を正規化して tracked package を整える |
-| `mise run catalog:tidy` | ○ | ○ | ○ | ○ | ○ | stage-catalog → validate-catalog → doctor の整理導線 |
-| `mise run register-catalog` | ○ | ○ | ○ | ○ | ○ | push 済みの `catalog` ref を install |
-| `mise run smoke-catalog` | ○ | ○ | ○ | ○ | ○ | temp install による smoke test |
-| `mise run migrate-external` | external skillsのみ | × | × | × | × | `nix/agent-skills-sources.nix` から external ref を manifest へ登録 |
-| `mise run list` | 依存一覧 | 依存一覧 | 依存一覧 | 依存一覧 | 依存一覧 | global dependency list を表示 |
-| `mise run validate-catalog` | ○ | ○ | ○ | ○ | ○ | drift check 用の公開 task |
+| task / command              | skills              | agents   | rules    | `AGENTS.md` | commands | 役割                                                                                             |
+| --------------------------- | ------------------- | -------- | -------- | ----------- | -------- | ------------------------------------------------------------------------------------------------ |
+| `mise run apply`            | ○                   | ○        | ○        | ○           | ○        | global install 実行後に managed `AGENTS.md` / `agents/` / `commands/` / `rules/` を runtime sync |
+| `mise run update`           | ○                   | ○        | ○        | ○           | ○        | checkout 更新 + deps update + apply 相当                                                         |
+| `mise run doctor`           | 状態確認            | 状態確認 | 状態確認 | 状態確認    | 状態確認 | target presence, overlap, catalog health を確認                                                  |
+| `mise run format`           | 間接                | 間接     | 間接     | 間接        | 間接     | workspace の Markdown / TOML / YAML を整形                                                       |
+| `mise run ci:check`         | ○                   | ○        | ○        | ○           | ○        | format check + validate + validate-catalog + smoke-catalog                                       |
+| `mise run ci`               | ○                   | ○        | ○        | ○           | ○        | format → validation → apply → doctor でローカル配布まで実行                                      |
+| `mise run stage-catalog`    | ○                   | ○        | ○        | ○           | ○        | `catalog/` を正規化して managed catalog package を整える                                         |
+| `mise run catalog:tidy`     | ○                   | ○        | ○        | ○           | ○        | stage-catalog → validate-catalog → doctor の整理導線                                             |
+| `mise run register-catalog` | ○                   | ○        | ○        | ○           | ○        | push 済みの `catalog` ref を install                                                             |
+| `mise run smoke-catalog`    | ○                   | ○        | ○        | ○           | ○        | temp install による smoke test                                                                   |
+| `mise run migrate-external` | external skillsのみ | ×        | ×        | ×           | ×        | `nix/agent-skills-sources.nix` から external ref を manifest へ登録                              |
+| `mise run list`             | 依存一覧            | 依存一覧 | 依存一覧 | 依存一覧    | 依存一覧 | global dependency list を表示                                                                    |
+| `mise run validate-catalog` | ○                   | ○        | ○        | ○           | ○        | drift check 用の公開 task                                                                        |
 
 ## Notes
 

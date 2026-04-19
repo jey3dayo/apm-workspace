@@ -2,7 +2,7 @@
 
 APM-based global skill workspace for `jey3dayo`.
 
-This repository is the day-to-day working copy of `~/.apm`. It owns the global APM manifest, the lockfile, the downloaded dependency cache, and the tracked managed catalog package that is published as `jey3dayo/apm-workspace/catalog#main`.
+This repository is the day-to-day working copy of `~/.apm`. It owns the global APM manifest, the lockfile, the downloaded dependency cache, and the managed catalog package published as `jey3dayo/apm-workspace/catalog#main`.
 
 ## What Lives Here
 
@@ -13,7 +13,7 @@ This repository is the day-to-day working copy of `~/.apm`. It owns the global A
 - `mise.toml`: workspace-local tasks for install, migration, verification, and repair
 - `tests/`: Pester coverage for the workspace helpers
 
-## Source Of Truth
+## Managed Catalog Layout
 
 Managed catalog assets are edited directly in `~/.apm/catalog/`.
 
@@ -26,7 +26,7 @@ The layout difference between `catalog/.apm/skills/` and `catalog/commands/` is 
 - `catalog/commands/**` is not a skill package subtree. It is shared runtime guidance that is synced into target roots as `commands/**` alongside `AGENTS.md`, `agents/**`, and `rules/**`.
 - Keep this split unless the runtime sync contract itself changes.
 
-`mise run stage-catalog` now normalizes the tracked package in place. Global install still happens through a single upstream ref in `apm.yml`:
+`mise run stage-catalog` now normalizes `catalog/` in place. Global install still happens through a single upstream ref in `apm.yml`:
 
 ```text
 jey3dayo/apm-workspace/catalog#main
