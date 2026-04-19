@@ -1,0 +1,40 @@
+# apm-workspace
+
+> `C:\Users\j138c\.apm` is the working copy of the global APM skill workspace. It manages user-scope skill rollout through `apm.yml`, keeps downloaded upstream sources in `apm_modules/`, and publishes one tracked managed-skill package from `catalog/` as `jey3dayo/apm-workspace/catalog#main`.
+
+Read `README.md` first for the operational model. Read `C:\Users\j138c\.config\docs\tools\apm-workspace.md` for the full contract. Managed skill authoring happens in `C:\Users\j138c\.config\agents\src\skills\`, not in `apm_modules/`.
+
+## Start Here
+
+- [README](README.md): Human-facing overview, source-of-truth model, daily flow, and maintenance commands.
+- [apm.yml](apm.yml): Global dependency manifest. External skills stay here as upstream refs.
+- [apm.lock.yaml](apm.lock.yaml): Resolved dependency commits and install state.
+- [mise.toml](mise.toml): Workspace task entrypoint.
+- [catalog](catalog/): Tracked managed-skill package published as `jey3dayo/apm-workspace/catalog#main`.
+- [tests](tests/): Pester regression coverage for helper behavior.
+
+## Important Constraints
+
+- Managed skills use a two-layer model: author in `C:\Users\j138c\.config\agents\src\skills\<id>\`, publish from `C:\Users\j138c\.apm\catalog\.apm\skills\<id>\`.
+- Do not treat `apm_modules/` as editable source.
+- Do not reintroduce `./packages/*` or `~/.apm/skills/` as the global source of truth.
+- After moving a skill into the managed catalog, remove the overlapping external selection from `C:\Users\j138c\.config\nix\agent-skills-sources.nix`.
+
+## Default Commands
+
+- `mise run apply`: validate the tracked catalog, install global dependencies, and compile Codex output.
+- `mise run doctor`: show target presence, external pin state, overlap count, and catalog health.
+- `mise run stage-catalog`: regenerate `catalog/` from the authoring source tree.
+- `mise run register-catalog`: install the pushed catalog ref into the global workspace state.
+- `mise run validate-catalog`: fail fast when authoring source, tracked catalog, and manifest ref drift.
+
+## Verification
+
+Prefer this sequence after managed-skill changes:
+
+1. `mise run stage-catalog`
+2. Commit and push `catalog/`
+3. `mise run register-catalog`
+4. `mise run doctor`
+
+Healthy output includes `external selection overlap: count=0` and `catalog: ... status=ok`.
