@@ -1,8 +1,8 @@
 # apm-workspace
 
-> `C:\Users\j138c\.apm` is the working copy of the global APM skill workspace. It manages user-scope skill rollout through `apm.yml`, keeps downloaded upstream sources in `apm_modules/`, and publishes one tracked managed catalog package from `catalog/` as `jey3dayo/apm-workspace/catalog#main`.
+> `~/.apm` is the working copy of the global APM skill workspace. It manages user-scope skill rollout through `apm.yml`, keeps downloaded upstream sources in `apm_modules/`, and publishes one tracked managed catalog package from `catalog/` as `jey3dayo/apm-workspace/catalog#main`.
 
-Read `README.md` first for the operational model. Read `C:\Users\j138c\.config\docs\tools\apm-workspace.md` for the full contract. Managed authoring happens in `C:\Users\j138c\.config\agents\src\`, not in `apm_modules/`.
+Read `README.md` first for the operational model. Read `~/.config/docs/tools/apm-workspace.md` for the full contract. Managed authoring happens in `~/.config/agents/src/`, not in `apm_modules/`.
 
 ## Start Here
 
@@ -15,11 +15,11 @@ Read `README.md` first for the operational model. Read `C:\Users\j138c\.config\d
 
 ## Important Constraints
 
-- Managed skills use a two-layer model: author in `C:\Users\j138c\.config\agents\src\skills\<id>\`, publish from `C:\Users\j138c\.apm\catalog\.apm\skills\<id>\`.
-- Managed shared guidance uses the same model: author in `C:\Users\j138c\.config\agents\src\AGENTS.md`, `agents\**`, `rules\**`, publish from `C:\Users\j138c\.apm\catalog\AGENTS.md`, `agents\**`, `rules\**`.
+- Managed skills use a two-layer model: author in `~/.config/agents/src/skills/<id>/`, publish from `~/.apm/catalog/.apm/skills/<id>/`.
+- Managed shared guidance uses the same model: author in `~/.config/agents/src/AGENTS.md`, `agents/**`, `rules/**`, publish from `~/.apm/catalog/AGENTS.md`, `agents/**`, `rules/**`.
 - Do not treat `apm_modules/` as editable source.
 - Do not reintroduce `./packages/*` or `~/.apm/skills/` as the global source of truth.
-- After moving a skill into the managed catalog, remove the overlapping external selection from `C:\Users\j138c\.config\nix\agent-skills-sources.nix`.
+- After moving a skill into the managed catalog, remove the overlapping external selection from `~/.config/nix/agent-skills-sources.nix`.
 - Top-level managed `commands/` are intentionally out of scope until `agents/src` gets an authoritative `commands/` tree.
 
 ## Default Commands

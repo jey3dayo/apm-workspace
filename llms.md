@@ -1,6 +1,6 @@
 # apm-workspace
 
-`C:\Users\j138c\.apm` is the working copy of the global APM workspace for `jey3dayo`.
+`~/.apm` is the working copy of the global APM workspace for `jey3dayo`.
 
 ## What This Workspace Owns
 
@@ -13,18 +13,18 @@
 
 ## Source Of Truth Model
 
-Managed catalog assets are authored in `C:\Users\j138c\.config\agents\src\` and staged into `catalog/`.
+Managed catalog assets are authored in `~/.config/agents/src/` and staged into `catalog/`.
 
 - Skills:
-  - source: `C:\Users\j138c\.config\agents\src\skills\<id>\`
-  - tracked: `C:\Users\j138c\.apm\catalog\.apm\skills\<id>\`
+  - source: `~/.config/agents/src/skills/<id>/`
+  - tracked: `~/.apm/catalog/.apm/skills/<id>/`
 - Shared guidance:
-  - source: `C:\Users\j138c\.config\agents\src\AGENTS.md`
-  - source: `C:\Users\j138c\.config\agents\src\agents\**`
-  - source: `C:\Users\j138c\.config\agents\src\rules\**`
-  - tracked: `C:\Users\j138c\.apm\catalog\AGENTS.md`
-  - tracked: `C:\Users\j138c\.apm\catalog\agents\**`
-  - tracked: `C:\Users\j138c\.apm\catalog\rules\**`
+  - source: `~/.config/agents/src/AGENTS.md`
+  - source: `~/.config/agents/src/agents/**`
+  - source: `~/.config/agents/src/rules/**`
+  - tracked: `~/.apm/catalog/AGENTS.md`
+  - tracked: `~/.apm/catalog/agents/**`
+  - tracked: `~/.apm/catalog/rules/**`
 
 Top-level managed `commands/` are not migrated yet because `agents/src` has no authoritative `commands/` tree.
 
@@ -33,12 +33,12 @@ Top-level managed `commands/` are not migrated yet because `agents/src` has no a
 - Do not edit `apm_modules/`.
 - Do not reintroduce `./packages/*` or `~/.apm/skills/` as the global source of truth.
 - Keep `apm.yml` on upstream refs, especially `jey3dayo/apm-workspace/catalog#main`.
-- After moving a skill into the managed catalog, remove overlapping entries from `C:\Users\j138c\.config\nix\agent-skills-sources.nix`.
+- After moving a skill into the managed catalog, remove overlapping entries from `~/.config/nix/agent-skills-sources.nix`.
 
 ## Default Flow
 
 ```powershell
-cd C:\Users\j138c\.apm
+cd ~/.apm
 mise install
 mise run migrate-external
 mise run apply
@@ -48,7 +48,7 @@ mise run doctor
 ## Managed Catalog Update Flow
 
 ```powershell
-cd C:\Users\j138c\.apm
+cd ~/.apm
 mise run stage-catalog
 # commit and push catalog/
 mise run register-catalog
@@ -63,6 +63,6 @@ Healthy output includes:
 
 ## References
 
-- Human overview: `C:\Users\j138c\.apm\README.md`
-- Full contract: `C:\Users\j138c\.config\docs\tools\apm-workspace.md`
-- Skill guidance: `C:\Users\j138c\.config\agents\src\skills\apm-usage\SKILL.md`
+- Human overview: `~/.apm/README.md`
+- Full contract: `~/.config/docs/tools/apm-workspace.md`
+- Skill guidance: `~/.config/agents/src/skills/apm-usage/SKILL.md`

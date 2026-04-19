@@ -17,10 +17,10 @@ This repository is the day-to-day working copy of `~/.apm`. It owns the global A
 
 Managed catalog assets use a two-layer model:
 
-- Authoring source: `C:\Users\j138c\.config\agents\src\skills\<id>\`
-- Authoring source: `C:\Users\j138c\.config\agents\src\AGENTS.md`, `agents\**`, `rules\**`
-- Tracked package: `C:\Users\j138c\.apm\catalog\.apm\skills\<id>\`
-- Tracked package: `C:\Users\j138c\.apm\catalog\AGENTS.md`, `agents\**`, `rules\**`
+- Authoring source: `~/.config/agents/src/skills/<id>/`
+- Authoring source: `~/.config/agents/src/AGENTS.md`, `agents/**`, `rules/**`
+- Tracked package: `~/.apm/catalog/.apm/skills/<id>/`
+- Tracked package: `~/.apm/catalog/AGENTS.md`, `agents/**`, `rules/**`
 
 The tracked package is generated from the authoring source and then installed through a single upstream ref in `apm.yml`:
 
@@ -33,7 +33,7 @@ External skills stay in `apm.yml` as upstream refs and are downloaded into `apm_
 ## Daily Flow
 
 ```powershell
-cd C:\Users\j138c\.apm
+cd ~/.apm
 mise install
 mise run migrate-external
 mise run apply
@@ -51,7 +51,7 @@ mise run smoke-catalog
 
 ## Managed Skill Updates
 
-When a managed catalog asset changes under `C:\Users\j138c\.config\agents\src\`:
+When a managed catalog asset changes under `~/.config/agents/src/`:
 
 1. Update the authoring source.
 2. Run `mise run stage-catalog`.
@@ -66,6 +66,8 @@ If old package ownership from a previous install state is still hanging around, 
 
 ## More Context
 
-- Operational reference: `C:\Users\j138c\.config\docs\tools\apm-workspace.md`
-- Task catalog: `C:\Users\j138c\.config\docs\tools\mise-tasks.md`
-- Managed-skill usage guidance: `C:\Users\j138c\.config\agents\src\skills\apm-usage\SKILL.md`
+- Operational reference: `~/.config/docs/tools/apm-workspace.md`
+- Task catalog: `~/.config/docs/tools/mise-tasks.md`
+- Managed-skill usage guidance: `~/.config/agents/src/skills/apm-usage/SKILL.md`
+- Task coverage memo: `docs/apm-task-coverage.md`
+- Remaining work: `TODO.md`
