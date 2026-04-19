@@ -128,7 +128,7 @@ run = """
 mise run ci
 sh "${APM_BOOTSTRAP_REPO:-$HOME/.config}/scripts/apm-workspace.sh" release-catalog
 """
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"mise run ci; powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\\.config\\scripts\\apm-workspace.ps1 release-catalog\""
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"& mise run ci; if (-not $?) { exit $LASTEXITCODE }; & powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\\.config\\scripts\\apm-workspace.ps1 release-catalog; exit $LASTEXITCODE\""
 
 [tasks."catalog:tidy"]
 description = "Refresh, validate, and inspect the managed catalog package"
