@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-04-19T13:56:16.804355+00:00'
+generated_at: '2026-04-19T15:30:16.848332+00:00'
 apm_version: 0.8.11
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -160,7 +160,7 @@ dependencies:
   content_hash: sha256:405cf94e4df9b048ab42e51f26ad971dc6b986167b74eb46393abd6f1f5b5f88
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: f3f5e279d9c603fcf5944ea067770427dafb0c66
+  resolved_commit: 173628411d6f930f8b3d41b4930d18599466406d
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
@@ -390,7 +390,7 @@ dependencies:
   - .cursor/skills/typescript
   - .cursor/skills/wezterm
   - .cursor/skills/zsh
-  content_hash: sha256:c7e4844f383484c87b68f12cebd250af35d7da99046b7a2db531ce97ff4c557e
+  content_hash: sha256:2534a5526a33b5d17c8e48bafc5dbbca991eb00d6b18e5b414eb04e8e387f392
 - repo_url: millionco/react-doctor
   host: github.com
   resolved_commit: b5519b60465905e8c7eb0b8a9294924bf3736158
