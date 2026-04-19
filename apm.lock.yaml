@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-04-18T20:47:22.311851+00:00'
+generated_at: '2026-04-19T04:00:28.941937+00:00'
 apm_version: 0.8.11
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -160,98 +160,22 @@ dependencies:
   content_hash: sha256:405cf94e4df9b048ab42e51f26ad971dc6b986167b74eb46393abd6f1f5b5f88
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: 7b62b2128a9875d94c931b8d6d3826d1683d7997
+  resolved_commit: 0dcf5ac6cf2c471ecd5de22771df189a1152a0f8
   resolved_ref: main
-  virtual_path: internal-bundles/internal-first-batch
-  is_virtual: true
-  package_type: apm_package
-  deployed_files:
-  - .claude/skills/apm-usage
-  - .claude/skills/atomic-commit
-  - .claude/skills/greptileai
-  - .config/opencode/skills/apm-usage
-  - .config/opencode/skills/atomic-commit
-  - .config/opencode/skills/greptileai
-  - .copilot/skills/apm-usage
-  - .copilot/skills/atomic-commit
-  - .copilot/skills/greptileai
-  - .cursor/skills/apm-usage
-  - .cursor/skills/atomic-commit
-  - .cursor/skills/greptileai
-  content_hash: sha256:f824ed052a302a43bdb7843154044ecc8f030c173059bd9c6730b0cfe2ea8507
-- repo_url: jey3dayo/apm-workspace
-  host: github.com
-  resolved_commit: d22ce47a12798a3d27fb9715f5608541a6131014
-  resolved_ref: main
-  virtual_path: internal-bundles/internal-heavy
-  is_virtual: true
-  package_type: apm_package
-  deployed_files:
-  - .claude/skills/implementation-engine
-  - .claude/skills/task-router
-  - .config/opencode/skills/implementation-engine
-  - .config/opencode/skills/task-router
-  - .copilot/skills/implementation-engine
-  - .copilot/skills/task-router
-  - .cursor/skills/implementation-engine
-  - .cursor/skills/task-router
-  content_hash: sha256:d1068a2716a06b4f57793ede8456fc6c232b0d15ad1e93bffeb23f89b0a8b865
-- repo_url: jey3dayo/apm-workspace
-  host: github.com
-  resolved_commit: 091eb44c656599cf35e1f5aa2507931381c88526
-  resolved_ref: main
-  virtual_path: internal-bundles/internal-medium
-  is_virtual: true
-  package_type: apm_package
-  deployed_files:
-  - .claude/skills/rtk
-  - .claude/skills/tauri-dev-screenshot
-  - .claude/skills/tauri-webview-geometry
-  - .config/opencode/skills/rtk
-  - .config/opencode/skills/tauri-dev-screenshot
-  - .config/opencode/skills/tauri-webview-geometry
-  - .copilot/skills/rtk
-  - .copilot/skills/tauri-dev-screenshot
-  - .copilot/skills/tauri-webview-geometry
-  - .cursor/skills/rtk
-  - .cursor/skills/tauri-dev-screenshot
-  - .cursor/skills/tauri-webview-geometry
-  content_hash: sha256:805601ebe429ad53377d4e91a849357ed58b70f5307bdf47def6db5999138664
-- repo_url: jey3dayo/apm-workspace
-  host: github.com
-  resolved_commit: 1a620ff3cf6cd90cba8151d5b502a72cf34e6afc
-  resolved_ref: main
-  virtual_path: internal-bundles/internal-next-simple
-  is_virtual: true
-  package_type: apm_package
-  deployed_files:
-  - .claude/skills/codex-code-review
-  - .claude/skills/codex-plan-review
-  - .claude/skills/generate-svg
-  - .config/opencode/skills/codex-code-review
-  - .config/opencode/skills/codex-plan-review
-  - .config/opencode/skills/generate-svg
-  - .copilot/skills/codex-code-review
-  - .copilot/skills/codex-plan-review
-  - .copilot/skills/generate-svg
-  - .cursor/skills/codex-code-review
-  - .cursor/skills/codex-plan-review
-  - .cursor/skills/generate-svg
-  content_hash: sha256:165f7033b7b9bb10472eb7436212ce7433abff011dd6763dfd24066ead7c1abd
-- repo_url: jey3dayo/apm-workspace
-  host: github.com
-  resolved_commit: df67c5d78cf79eaf85bc2ed8a76879cd3cd76ed1
-  resolved_ref: main
-  virtual_path: internal-bundles/internal-remaining
+  virtual_path: catalog
   is_virtual: true
   package_type: apm_package
   deployed_files:
   - .claude/skills/agent-creator
+  - .claude/skills/apm-usage
+  - .claude/skills/atomic-commit
   - .claude/skills/cc-sdd
   - .claude/skills/chrome-debug
   - .claude/skills/claude-system
   - .claude/skills/code-quality-improvement
   - .claude/skills/code-review
+  - .claude/skills/codex-code-review
+  - .claude/skills/codex-plan-review
   - .claude/skills/codex-system
   - .claude/skills/command-creator
   - .claude/skills/dev-browser
@@ -262,10 +186,13 @@ dependencies:
   - .claude/skills/dotfiles-integration
   - .claude/skills/drawio
   - .claude/skills/gemini-system
+  - .claude/skills/generate-svg
   - .claude/skills/gh-create-pr
   - .claude/skills/git-automation
   - .claude/skills/git-worktree
   - .claude/skills/golang
+  - .claude/skills/greptileai
+  - .claude/skills/implementation-engine
   - .claude/skills/integration-framework
   - .claude/skills/knowledge-creator
   - .claude/skills/learnings-knowledge
@@ -282,21 +209,29 @@ dependencies:
   - .claude/skills/react
   - .claude/skills/react-grid-layout
   - .claude/skills/refactoring
+  - .claude/skills/rtk
   - .claude/skills/rules-creator
   - .claude/skills/similarity
   - .claude/skills/slide-docs
+  - .claude/skills/task-router
   - .claude/skills/task-to-pr
+  - .claude/skills/tauri-dev-screenshot
   - .claude/skills/tauri-icon-gen
+  - .claude/skills/tauri-webview-geometry
   - .claude/skills/tsr
   - .claude/skills/typescript
   - .claude/skills/wezterm
   - .claude/skills/zsh
   - .config/opencode/skills/agent-creator
+  - .config/opencode/skills/apm-usage
+  - .config/opencode/skills/atomic-commit
   - .config/opencode/skills/cc-sdd
   - .config/opencode/skills/chrome-debug
   - .config/opencode/skills/claude-system
   - .config/opencode/skills/code-quality-improvement
   - .config/opencode/skills/code-review
+  - .config/opencode/skills/codex-code-review
+  - .config/opencode/skills/codex-plan-review
   - .config/opencode/skills/codex-system
   - .config/opencode/skills/command-creator
   - .config/opencode/skills/dev-browser
@@ -307,10 +242,13 @@ dependencies:
   - .config/opencode/skills/dotfiles-integration
   - .config/opencode/skills/drawio
   - .config/opencode/skills/gemini-system
+  - .config/opencode/skills/generate-svg
   - .config/opencode/skills/gh-create-pr
   - .config/opencode/skills/git-automation
   - .config/opencode/skills/git-worktree
   - .config/opencode/skills/golang
+  - .config/opencode/skills/greptileai
+  - .config/opencode/skills/implementation-engine
   - .config/opencode/skills/integration-framework
   - .config/opencode/skills/knowledge-creator
   - .config/opencode/skills/learnings-knowledge
@@ -327,21 +265,29 @@ dependencies:
   - .config/opencode/skills/react
   - .config/opencode/skills/react-grid-layout
   - .config/opencode/skills/refactoring
+  - .config/opencode/skills/rtk
   - .config/opencode/skills/rules-creator
   - .config/opencode/skills/similarity
   - .config/opencode/skills/slide-docs
+  - .config/opencode/skills/task-router
   - .config/opencode/skills/task-to-pr
+  - .config/opencode/skills/tauri-dev-screenshot
   - .config/opencode/skills/tauri-icon-gen
+  - .config/opencode/skills/tauri-webview-geometry
   - .config/opencode/skills/tsr
   - .config/opencode/skills/typescript
   - .config/opencode/skills/wezterm
   - .config/opencode/skills/zsh
   - .copilot/skills/agent-creator
+  - .copilot/skills/apm-usage
+  - .copilot/skills/atomic-commit
   - .copilot/skills/cc-sdd
   - .copilot/skills/chrome-debug
   - .copilot/skills/claude-system
   - .copilot/skills/code-quality-improvement
   - .copilot/skills/code-review
+  - .copilot/skills/codex-code-review
+  - .copilot/skills/codex-plan-review
   - .copilot/skills/codex-system
   - .copilot/skills/command-creator
   - .copilot/skills/dev-browser
@@ -352,10 +298,13 @@ dependencies:
   - .copilot/skills/dotfiles-integration
   - .copilot/skills/drawio
   - .copilot/skills/gemini-system
+  - .copilot/skills/generate-svg
   - .copilot/skills/gh-create-pr
   - .copilot/skills/git-automation
   - .copilot/skills/git-worktree
   - .copilot/skills/golang
+  - .copilot/skills/greptileai
+  - .copilot/skills/implementation-engine
   - .copilot/skills/integration-framework
   - .copilot/skills/knowledge-creator
   - .copilot/skills/learnings-knowledge
@@ -372,21 +321,29 @@ dependencies:
   - .copilot/skills/react
   - .copilot/skills/react-grid-layout
   - .copilot/skills/refactoring
+  - .copilot/skills/rtk
   - .copilot/skills/rules-creator
   - .copilot/skills/similarity
   - .copilot/skills/slide-docs
+  - .copilot/skills/task-router
   - .copilot/skills/task-to-pr
+  - .copilot/skills/tauri-dev-screenshot
   - .copilot/skills/tauri-icon-gen
+  - .copilot/skills/tauri-webview-geometry
   - .copilot/skills/tsr
   - .copilot/skills/typescript
   - .copilot/skills/wezterm
   - .copilot/skills/zsh
   - .cursor/skills/agent-creator
+  - .cursor/skills/apm-usage
+  - .cursor/skills/atomic-commit
   - .cursor/skills/cc-sdd
   - .cursor/skills/chrome-debug
   - .cursor/skills/claude-system
   - .cursor/skills/code-quality-improvement
   - .cursor/skills/code-review
+  - .cursor/skills/codex-code-review
+  - .cursor/skills/codex-plan-review
   - .cursor/skills/codex-system
   - .cursor/skills/command-creator
   - .cursor/skills/dev-browser
@@ -397,10 +354,13 @@ dependencies:
   - .cursor/skills/dotfiles-integration
   - .cursor/skills/drawio
   - .cursor/skills/gemini-system
+  - .cursor/skills/generate-svg
   - .cursor/skills/gh-create-pr
   - .cursor/skills/git-automation
   - .cursor/skills/git-worktree
   - .cursor/skills/golang
+  - .cursor/skills/greptileai
+  - .cursor/skills/implementation-engine
   - .cursor/skills/integration-framework
   - .cursor/skills/knowledge-creator
   - .cursor/skills/learnings-knowledge
@@ -417,16 +377,20 @@ dependencies:
   - .cursor/skills/react
   - .cursor/skills/react-grid-layout
   - .cursor/skills/refactoring
+  - .cursor/skills/rtk
   - .cursor/skills/rules-creator
   - .cursor/skills/similarity
   - .cursor/skills/slide-docs
+  - .cursor/skills/task-router
   - .cursor/skills/task-to-pr
+  - .cursor/skills/tauri-dev-screenshot
   - .cursor/skills/tauri-icon-gen
+  - .cursor/skills/tauri-webview-geometry
   - .cursor/skills/tsr
   - .cursor/skills/typescript
   - .cursor/skills/wezterm
   - .cursor/skills/zsh
-  content_hash: sha256:8df13528f8addfa8294e54a405490f6be8880d7131ca9808a58ad20dc9266e15
+  content_hash: sha256:20141a8cc09ff17de0adc6d4478899c07dfa33969ed5facc612f68489f64dee6
 - repo_url: millionco/react-doctor
   host: github.com
   resolved_commit: b5519b60465905e8c7eb0b8a9294924bf3736158
