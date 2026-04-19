@@ -2,19 +2,6 @@ lockfile_version: '1'
 generated_at: '2026-04-19T16:12:00.800941+00:00'
 apm_version: 0.8.11
 dependencies:
-- repo_url: EpicenterHQ/epicenter
-  host: github.com
-  resolved_commit: 59c0daf70082fefaf670a8fe1b825ab7a28fbb92
-  resolved_ref: 59c0daf70082fefaf670a8fe1b825ab7a28fbb92
-  virtual_path: .agents/skills/tauri
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/tauri
-  - .config/opencode/skills/tauri
-  - .copilot/skills/tauri
-  - .cursor/skills/tauri
-  content_hash: sha256:e9ad9f9304bdeaab54cfff99a5ab47b8215cc8043ef686ff9036e86572f36f1b
 - repo_url: Heyvhuang/ship-faster
   host: github.com
   resolved_commit: 64047d24e0ecb513a5aa879767d95ec7e0e44462
@@ -119,19 +106,6 @@ dependencies:
   - .copilot/skills/understand-onboard
   - .cursor/skills/understand-onboard
   content_hash: sha256:2b3faf132aafb668ccc57fd743aac0584e7ec6966402c4693b9e7c180db34cce
-- repo_url: anthropics/claude-code
-  host: github.com
-  resolved_commit: 0385848b4e737831fc3b973d9a78d31950a87d9d
-  resolved_ref: 0385848b4e737831fc3b973d9a78d31950a87d9d
-  virtual_path: plugins/frontend-design/skills/frontend-design
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/frontend-design
-  - .config/opencode/skills/frontend-design
-  - .copilot/skills/frontend-design
-  - .cursor/skills/frontend-design
-  content_hash: sha256:e8118284a6365753790d44bb2758a6032b3af27fa84696428d9233f2be0f4e78
 - repo_url: benjitaylor/agentation
   host: github.com
   resolved_commit: 7dc5d65378fa901e6eead81d4e2bb62950d49f0b
@@ -160,7 +134,7 @@ dependencies:
   content_hash: sha256:405cf94e4df9b048ab42e51f26ad971dc6b986167b74eb46393abd6f1f5b5f88
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: 40e1285acbc70dc1b2e6e09975a4cc33fe4040f8
+  resolved_commit: 909dc9aba63dd4402de7c8e647c13dfb83da8687
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
@@ -185,6 +159,7 @@ dependencies:
   - .claude/skills/documentation-management
   - .claude/skills/dotfiles-integration
   - .claude/skills/drawio
+  - .claude/skills/frontend-design
   - .claude/skills/gemini-system
   - .claude/skills/generate-svg
   - .claude/skills/gh-create-pr
@@ -207,14 +182,17 @@ dependencies:
   - .claude/skills/premortem
   - .claude/skills/project-maintenance
   - .claude/skills/react
+  - .claude/skills/react-doctor
   - .claude/skills/react-grid-layout
   - .claude/skills/refactoring
   - .claude/skills/rtk
   - .claude/skills/rules-creator
   - .claude/skills/similarity
+  - .claude/skills/skill-creator
   - .claude/skills/slide-docs
   - .claude/skills/task-router
   - .claude/skills/task-to-pr
+  - .claude/skills/tauri
   - .claude/skills/tauri-dev-screenshot
   - .claude/skills/tauri-icon-gen
   - .claude/skills/tauri-webview-geometry
@@ -241,6 +219,7 @@ dependencies:
   - .config/opencode/skills/documentation-management
   - .config/opencode/skills/dotfiles-integration
   - .config/opencode/skills/drawio
+  - .config/opencode/skills/frontend-design
   - .config/opencode/skills/gemini-system
   - .config/opencode/skills/generate-svg
   - .config/opencode/skills/gh-create-pr
@@ -263,14 +242,17 @@ dependencies:
   - .config/opencode/skills/premortem
   - .config/opencode/skills/project-maintenance
   - .config/opencode/skills/react
+  - .config/opencode/skills/react-doctor
   - .config/opencode/skills/react-grid-layout
   - .config/opencode/skills/refactoring
   - .config/opencode/skills/rtk
   - .config/opencode/skills/rules-creator
   - .config/opencode/skills/similarity
+  - .config/opencode/skills/skill-creator
   - .config/opencode/skills/slide-docs
   - .config/opencode/skills/task-router
   - .config/opencode/skills/task-to-pr
+  - .config/opencode/skills/tauri
   - .config/opencode/skills/tauri-dev-screenshot
   - .config/opencode/skills/tauri-icon-gen
   - .config/opencode/skills/tauri-webview-geometry
@@ -297,6 +279,7 @@ dependencies:
   - .copilot/skills/documentation-management
   - .copilot/skills/dotfiles-integration
   - .copilot/skills/drawio
+  - .copilot/skills/frontend-design
   - .copilot/skills/gemini-system
   - .copilot/skills/generate-svg
   - .copilot/skills/gh-create-pr
@@ -319,14 +302,17 @@ dependencies:
   - .copilot/skills/premortem
   - .copilot/skills/project-maintenance
   - .copilot/skills/react
+  - .copilot/skills/react-doctor
   - .copilot/skills/react-grid-layout
   - .copilot/skills/refactoring
   - .copilot/skills/rtk
   - .copilot/skills/rules-creator
   - .copilot/skills/similarity
+  - .copilot/skills/skill-creator
   - .copilot/skills/slide-docs
   - .copilot/skills/task-router
   - .copilot/skills/task-to-pr
+  - .copilot/skills/tauri
   - .copilot/skills/tauri-dev-screenshot
   - .copilot/skills/tauri-icon-gen
   - .copilot/skills/tauri-webview-geometry
@@ -353,6 +339,7 @@ dependencies:
   - .cursor/skills/documentation-management
   - .cursor/skills/dotfiles-integration
   - .cursor/skills/drawio
+  - .cursor/skills/frontend-design
   - .cursor/skills/gemini-system
   - .cursor/skills/generate-svg
   - .cursor/skills/gh-create-pr
@@ -375,14 +362,17 @@ dependencies:
   - .cursor/skills/premortem
   - .cursor/skills/project-maintenance
   - .cursor/skills/react
+  - .cursor/skills/react-doctor
   - .cursor/skills/react-grid-layout
   - .cursor/skills/refactoring
   - .cursor/skills/rtk
   - .cursor/skills/rules-creator
   - .cursor/skills/similarity
+  - .cursor/skills/skill-creator
   - .cursor/skills/slide-docs
   - .cursor/skills/task-router
   - .cursor/skills/task-to-pr
+  - .cursor/skills/tauri
   - .cursor/skills/tauri-dev-screenshot
   - .cursor/skills/tauri-icon-gen
   - .cursor/skills/tauri-webview-geometry
@@ -390,20 +380,7 @@ dependencies:
   - .cursor/skills/typescript
   - .cursor/skills/wezterm
   - .cursor/skills/zsh
-  content_hash: sha256:d880cfd8d8acd8dc0bb45826f799da8e5fc1815f2ad412547e8e78c365429382
-- repo_url: millionco/react-doctor
-  host: github.com
-  resolved_commit: b5519b60465905e8c7eb0b8a9294924bf3736158
-  resolved_ref: b5519b60465905e8c7eb0b8a9294924bf3736158
-  virtual_path: skills/react-doctor
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/react-doctor
-  - .config/opencode/skills/react-doctor
-  - .copilot/skills/react-doctor
-  - .cursor/skills/react-doctor
-  content_hash: sha256:b8f396bd6db7404a899af03e649f2cf12f4c846ee7d85b6b9a475cb8175abb49
+  content_hash: sha256:22ee6252d8e235f55084c91906d0dd09e71b8a8570a165614644496fa39c5f10
 - repo_url: mizchi/chezmoi-dotfiles
   host: github.com
   resolved_commit: 8899529bac3bfcccb9fd0f90a19fd46c61768533

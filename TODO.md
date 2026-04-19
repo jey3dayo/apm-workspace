@@ -3,8 +3,10 @@
 ## Open Tasks
 
 - [x] Remove stale external sources with no current manifest/runtime usage: `gonta223-humanizer-ja`, `obra-episodic-memory`, `sawyerhood-dev-browser`
+- [x] Migrate first managed skill-only batch and remove their source/input/lock entries:
+  `millionco-react-doctor`, `anthropics-claude-code`, `epicenterhq-epicenter`
 - [ ] Migrate or retire remaining skill-only external repos, then remove their source/input/lock entries:
-  `benjitaylor-agentation`, `openai-skills`, `vercel-agent-skills`, `vercel-agent-browser`, `ui-ux-pro-max`, `heyvhuang-ship-faster`, `millionco-react-doctor`, `tokoroten-prompt-review`, `nyosegawa-skills`, `anthropics-claude-code`, `trailofbits-agentic-actions-auditor`, `trailofbits-sharp-edges`, `trailofbits-supply-chain-risk-auditor`, `epicenterhq-epicenter`, `mizchi-chezmoi-dotfiles`
+  `benjitaylor-agentation`, `openai-skills`, `vercel-agent-skills`, `vercel-agent-browser`, `ui-ux-pro-max`, `heyvhuang-ship-faster`, `tokoroten-prompt-review`, `nyosegawa-skills`, `trailofbits-agentic-actions-auditor`, `trailofbits-sharp-edges`, `trailofbits-supply-chain-risk-auditor`, `mizchi-chezmoi-dotfiles`
 - [ ] Migrate or retire remaining external repos that also carry non-skill assets before removal:
   `obra-superpowers`, `openai-codex-plugin-cc`, `lum1104-understand-anything`, `trailofbits-audit-context-building`, `trailofbits-static-analysis`
 - [ ] After each removal batch, reconcile `~/.apm/apm.yml` with `mise run migrate-external` and `mise run apply`
