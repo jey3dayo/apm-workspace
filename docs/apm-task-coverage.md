@@ -23,7 +23,7 @@
 | `mise run format` | 間接 | 間接 | 間接 | 間接 | 間接 | workspace の Markdown / TOML / YAML を整形 |
 | `mise run ci:check` | ○ | ○ | ○ | ○ | ○ | format check + validate + validate-catalog + smoke-catalog |
 | `mise run ci` | ○ | ○ | ○ | ○ | ○ | format → validation → apply → doctor でローカル配布まで実行 |
-| `mise run stage-catalog` | ○ | ○ | ○ | ○ | ○ | `catalog/` を正規化し、`~/.config/agents/src/**` mirror を更新 |
+| `mise run stage-catalog` | ○ | ○ | ○ | ○ | ○ | `catalog/` を正規化して tracked package を整える |
 | `mise run catalog:tidy` | ○ | ○ | ○ | ○ | ○ | stage-catalog → validate-catalog → doctor の整理導線 |
 | `mise run register-catalog` | ○ | ○ | ○ | ○ | ○ | push 済みの `catalog` ref を install |
 | `mise run smoke-catalog` | ○ | ○ | ○ | ○ | ○ | temp install による smoke test |
@@ -35,12 +35,11 @@
 
 - `register-catalog` は local diff をそのまま配る command ではなく、commit / push 済みの `catalog` を install する flow。
 - `validate-catalog` は `mise.toml` からも叩けるが、実体は workspace script 側の validation command。
-- `~/.config/agents/src/**` は transitional mirror。編集の起点は `~/.apm/catalog/**`。
+- 新しい managed skill は `~/.apm/catalog/.apm/skills/<id>/` に作る。runtime targets や `~/.config/agents` を起点にしない。
+- 新しい skill の作成や移管は `skill-creator` を使い、manifest や配布モデル全体の判断は `apm-usage` で補う。
 
 ## Current Remaining Tasks
 
-2026-04-20 時点の残件は follow-up だけです。
+2026-04-20 時点で、この migration slice の必須残件はありません。
 
-- PowerShell / POSIX の新しい `catalog` 正本フローを継続確認する
-- `~/.config/agents/src/**` mirror をいつ外すか決める
-- helper docs や prompts に残る旧 authoring 指示を掃除する
+- follow-up として、helper docs や prompts に残る旧 authoring 指示の掃除は継続候補

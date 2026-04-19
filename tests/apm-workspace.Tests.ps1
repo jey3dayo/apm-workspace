@@ -64,6 +64,7 @@ Describe "public command surface" {
     $help | Should Match "validate-catalog"
     $help | Should Match "stage-catalog"
     $help | Should Match "register-catalog"
+    $help | Should Not Match "transitional mirror"
     $help | Should Not Match "validate-internal"
     $help | Should Not Match "stage-internal"
     $help | Should Not Match "register-internal"
@@ -92,6 +93,13 @@ Describe "public command surface" {
     $miseToml | Should Match '\[tasks\."ci:check"\]'
     $miseToml | Should Match '\[tasks\.ci\]'
     $miseToml | Should Match '\[tasks\."catalog:tidy"\]'
+  }
+
+  It "describes the catalog readme without requiring ~/.config/agents" {
+    $readme = Get-CatalogReadmeContent
+
+    $readme | Should Match '~/.apm/catalog/.apm/skills/<id>/'
+    $readme | Should Not Match '\.config/agents'
   }
 }
 

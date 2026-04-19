@@ -19,7 +19,6 @@ Managed catalog assets are edited directly in `~/.apm/catalog/`.
 
 - Skills: `~/.apm/catalog/.apm/skills/<id>/`
 - Shared guidance: `~/.apm/catalog/AGENTS.md`, `agents/**`, `commands/**`, `rules/**`
-- Transitional mirror: `~/.config/agents/src/**`
 
 The layout difference between `catalog/.apm/skills/` and `catalog/commands/` is intentional.
 
@@ -27,7 +26,7 @@ The layout difference between `catalog/.apm/skills/` and `catalog/commands/` is 
 - `catalog/commands/**` is not a skill package subtree. It is shared runtime guidance that is synced into target roots as `commands/**` alongside `AGENTS.md`, `agents/**`, and `rules/**`.
 - Keep this split unless the runtime sync contract itself changes.
 
-`mise run stage-catalog` now normalizes the tracked package and refreshes the transitional mirror. Global install still happens through a single upstream ref in `apm.yml`:
+`mise run stage-catalog` now normalizes the tracked package in place. Global install still happens through a single upstream ref in `apm.yml`:
 
 ```text
 jey3dayo/apm-workspace/catalog#main
@@ -63,7 +62,7 @@ When a managed catalog asset changes under `~/.apm/catalog/`:
 
 1. Update `catalog/` directly.
 2. Run `mise run stage-catalog`.
-3. Review the normalized `catalog/` diff and the refreshed mirror under `~/.config/agents/src/`.
+3. Review the normalized `catalog/` diff.
 4. Commit and push the updated `catalog/`.
 5. Run `mise run register-catalog`.
 6. Run `mise run doctor` and confirm:

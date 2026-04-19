@@ -24,9 +24,6 @@ Managed catalog assets live directly in `~/.apm/catalog/`.
   - source: `~/.apm/catalog/agents/**`
   - source: `~/.apm/catalog/commands/**`
   - source: `~/.apm/catalog/rules/**`
-- Transitional mirror
-  - `~/.config/agents/src/**`
-  - refreshed by `mise run stage-catalog`
 
 The tracked layout is intentionally asymmetric:
 
@@ -65,7 +62,7 @@ When a managed catalog asset changes under `~/.apm/catalog/`:
 
 1. Edit `catalog/` directly.
 2. Run `mise run stage-catalog`.
-3. Review the normalized `catalog/` diff and refreshed `~/.config/agents/src/` mirror.
+3. Review the normalized `catalog/` diff.
 4. Commit and push the updated `catalog/`.
 5. Run `mise run register-catalog`.
 6. Run `mise run doctor` and confirm:

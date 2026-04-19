@@ -24,6 +24,7 @@ Do not treat `packages/`, `~/.apm/skills/`, or workspace-root `.apm/` as the sou
 - Refreshing the tracked managed-skill catalog in `~/.apm/catalog/`
 - Explaining the difference between upstream refs, `apm_modules/`, and deployed targets
 - Checking whether a skill should stay source-only instead of entering the global manifest
+- Deciding whether a new skill belongs in the managed catalog or only as an external dependency
 
 ## Quick Routing
 
@@ -31,6 +32,7 @@ Start by routing the request into one of these lanes:
 
 - managed catalog content:
   - edit `~/.apm/catalog/.apm/skills/**`, `AGENTS.md`, `agents/**`, `commands/**`, or `rules/**`
+  - when the task is "create or migrate a managed skill", use `skill-creator`
   - then run `mise run stage-catalog`
 - workspace-owned files:
   - edit `~/.apm/README.md`, `llms.md`, `apm.yml`, `apm.lock.yaml`, or `docs/**` directly
@@ -51,10 +53,10 @@ When a user says "fix what is in `~/.apm`", first decide which layer actually ow
 
 - edit `~/.apm/catalog/**` for managed catalog content
 - edit `~/.apm/README.md`, `llms.md`, `apm.yml`, or `apm.lock.yaml` for workspace-owned files that live only in the `~/.apm` repo
-- treat `~/.config/agents/src/**` as a transitional mirror, not the starting point
 
 Treat `~/.apm/catalog/` as the **authoring source of truth** for managed skills and shared guidance.
-Treat `~/.config/agents/src/**` as the **transitional mirror** refreshed by `mise run stage-catalog`.
+Treat `~/.config/agents/**` as deprecated and optional; do not depend on it being present.
+For new managed skill authoring, prefer `skill-creator`; use `apm-usage` for broader catalog and manifest routing.
 
 For external skills, the source of truth is the upstream ref in `~/.apm/apm.yml`.  
 For installed sources, the on-disk cache is `~/.apm/apm_modules/`.
@@ -90,14 +92,6 @@ Managed skills and shared guidance now follow a direct-authoring model:
   - `~/.apm/catalog/agents/**`
   - `~/.apm/catalog/commands/**`
   - `~/.apm/catalog/rules/**`
-- transitional mirror:
-  - `~/.config/agents/src/skills/<id>/`
-  - `~/.config/agents/src/AGENTS.md`
-  - `~/.config/agents/src/agents/**`
-  - `~/.config/agents/src/commands/**`
-  - `~/.config/agents/src/rules/**`
-
-`stage-catalog` normalizes the tracked package and refreshes the mirror so older entry points keep working during the transition.
 
 Runtime targets are a third layer, not an editing surface:
 
@@ -112,7 +106,6 @@ Runtime targets are a third layer, not an editing surface:
 In short:
 
 - authoring change: `~/.apm/catalog/**`
-- mirror refresh: `~/.config/agents/src/**` via `stage-catalog`
 - runtime change: produced by install/sync, not hand-edited
 
 ## Fast Paths
@@ -122,7 +115,7 @@ Use these short flows for the common request shapes:
 1. Managed skill or guidance changed
    - edit `~/.apm/catalog/**`
    - run `mise run stage-catalog`
-   - review the normalized `catalog/**` diff and refreshed mirror
+   - review the normalized `catalog/**` diff
    - commit/push `~/.apm`
    - run `mise run register-catalog`
    - run `mise run doctor`
@@ -163,7 +156,7 @@ mise run doctor
 
 ## Managed Catalog Workflow
 
-Use the workspace script when you need to normalize the tracked catalog package and refresh the mirror.
+Use the workspace script when you need to normalize the tracked catalog package before commit/push.
 
 ```bash
 # Refresh the tracked catalog artifact
@@ -178,14 +171,13 @@ That flow:
 
 - rebuilds `~/.apm/.catalog-build/catalog/` as a temporary package artifact
 - copies the normalized result back into `~/.apm/catalog/`
-- refreshes `~/.config/agents/src/skills/`, `AGENTS.md`, `agents/`, `commands/`, and `rules/` as a transitional mirror
 - lets `~/.apm/apm.yml` keep a single upstream ref: `jey3dayo/apm-workspace/catalog#main`
 
 For a full managed-content rollout, the normal sequence is:
 
 1. edit `~/.apm/catalog/`
 2. run `mise run stage-catalog` from `~/.apm`
-3. review the normalized `catalog/` diff and the refreshed mirror
+3. review the normalized `catalog/` diff
 4. commit and push `~/.apm`
 5. run `mise run register-catalog`
 6. run `mise run doctor`
@@ -249,7 +241,7 @@ When the change is only for workspace-owned docs such as `~/.apm/README.md` or `
 
 ## Legacy Notes
 
-- `validate-catalog` now validates the tracked `catalog/` package itself plus the refreshed `~/.config/agents/src/**` mirror
+- `validate-catalog` now validates the tracked `catalog/` package itself and its required assets
 - `validate-catalog` is available both as `mise run validate-catalog` and as a workspace script command
 - `format` formats Markdown / TOML / YAML inside `~/.apm`
 - `ci:check` runs format checks plus validation and smoke checks
