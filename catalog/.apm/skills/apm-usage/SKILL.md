@@ -33,6 +33,12 @@ Prefer `~/.apm` when:
 - You want the manifest to preserve the upstream repository reference
 - The skill already comes from `nix/agent-skills-sources.nix`
 
+When a user says "fix what is in `~/.apm`", first decide which layer actually owns the change:
+
+- edit `~/.config/agents/src/**` for managed catalog content that is redistributed into `catalog/`
+- edit `~/.apm/README.md`, `llms.txt`, `llms.md`, `apm.yml`, or `apm.lock.yaml` for workspace-owned files that live only in the `~/.apm` repo
+- do not edit `~/.apm/catalog/**` first unless you are doing emergency repair and will immediately restage from the authoring source
+
 Treat `~/.config/agents/src/skills/<name>/` as the **authoring source of truth** for managed skills.
 Treat `~/.apm/catalog/` as the **tracked APM package artifact** that is generated from that source tree.
 Treat `~/.config/agents/src/AGENTS.md`, `agents/`, and `rules/` as additional managed authoring sources that are staged into the same catalog.
@@ -82,6 +88,22 @@ Managed shared guidance follows the same pattern:
 
 The tracked package exists so APM can install one flat, repo-tracked catalog instead of many local-path entries.
 
+Runtime targets are a third layer, not an editing surface:
+
+- deployed user targets:
+  - `~/.claude/`
+  - `~/.codex/`
+  - other detected runtime targets
+- refresh path:
+  - `stage-catalog` updates the tracked package in `~/.apm/catalog/`
+  - `register-catalog`, `apply`, or `update` installs that tracked package and syncs runtime guidance files
+
+In short:
+
+- authoring change: `~/.config/agents/src/**`
+- tracked package change: `~/.apm/catalog/**` via staging
+- runtime change: produced by install/sync, not hand-edited
+
 Not allowed:
 
 - treating `~/.apm/skills/` as the global source of truth
@@ -122,6 +144,15 @@ That flow:
 - copies the result into `~/.apm/catalog/`
 - keeps `~/.config/agents/src/skills/`, `AGENTS.md`, `agents/`, and `rules/` as the authoring source
 - lets `~/.apm/apm.yml` keep a single upstream ref: `jey3dayo/apm-workspace/catalog#main`
+
+For a full managed-content rollout, the normal sequence is:
+
+1. edit the authoring source under `~/.config/agents/src/`
+2. run `mise run stage-catalog` from `~/.apm`
+3. review the generated diff in `~/.apm/catalog/`
+4. commit and push `~/.apm`
+5. run `mise run register-catalog`
+6. run `mise run doctor`
 
 ## Important Global Model
 
@@ -170,9 +201,15 @@ When a skill is moved into the managed catalog:
 When shared guidance changes under `agents/src`:
 
 - run `mise run stage-catalog`
-- commit and push the updated `catalog/`
+- review, commit, and push the updated `catalog/`
 - run `mise run register-catalog`
 - run `mise run doctor` and confirm target `config/agents/rules` are present
+
+When the change is only for workspace-owned docs such as `~/.apm/README.md` or `llms.md`:
+
+- edit those files directly in `~/.apm`
+- do not run `stage-catalog` unless managed catalog content also changed
+- push `~/.apm`, then use `register-catalog` only if the tracked package changed
 
 ## Legacy Notes
 
