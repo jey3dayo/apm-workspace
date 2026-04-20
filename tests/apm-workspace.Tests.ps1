@@ -136,7 +136,7 @@ Describe "external overlap reporting" {
     };
     selection.enable = [
       "dev-browser"
-      "gh-fix-ci"
+      "totally-external"
     ];
   };
 }

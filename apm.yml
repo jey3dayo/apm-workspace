@@ -4,42 +4,6 @@ description: APM project for apm-workspace
 author: jey3dayo
 dependencies:
   apm:
-  - openai/skills/skills/.curated/gh-address-comments#e940b8a86138adf03972802b990a1dfc57fcbf09
-  - openai/skills/skills/.curated/gh-fix-ci#e940b8a86138adf03972802b990a1dfc57fcbf09
-  - vercel-labs/agent-skills/skills/composition-patterns#ce3e64e468f8fa09a2d075d102771838061fdac0
-  - vercel-labs/agent-skills/skills/react-best-practices#ce3e64e468f8fa09a2d075d102771838061fdac0
-  - vercel-labs/agent-skills/skills/web-design-guidelines#ce3e64e468f8fa09a2d075d102771838061fdac0
-  - vercel-labs/agent-browser/skills/agent-browser#717d1b09e1c841a4c0206033886a1a861e3ca5d9
-  - Heyvhuang/ship-faster/skills/cloudflare#64047d24e0ecb513a5aa879767d95ec7e0e44462
-  - Heyvhuang/ship-faster/skills/tool-openclaw#64047d24e0ecb513a5aa879767d95ec7e0e44462
-  - obra/superpowers/skills/brainstorming#b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  - obra/superpowers/skills/dispatching-parallel-agents#b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  - obra/superpowers/skills/executing-plans#b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  - obra/superpowers/skills/finishing-a-development-branch#b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  - obra/superpowers/skills/receiving-code-review#b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  - obra/superpowers/skills/requesting-code-review#b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  - obra/superpowers/skills/subagent-driven-development#b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  - obra/superpowers/skills/systematic-debugging#b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  - obra/superpowers/skills/test-driven-development#b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  - obra/superpowers/skills/using-git-worktrees#b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  - obra/superpowers/skills/using-superpowers#b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  - obra/superpowers/skills/verification-before-completion#b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  - obra/superpowers/skills/writing-plans#b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  - obra/superpowers/skills/writing-skills#b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  - openai/codex-plugin-cc/plugins/codex/skills/codex-cli-runtime#6a5c2ba53b734f3cdd8daacbd49f68f3e6c8c167
-  - openai/codex-plugin-cc/plugins/codex/skills/codex-result-handling#6a5c2ba53b734f3cdd8daacbd49f68f3e6c8c167
-  - openai/codex-plugin-cc/plugins/codex/skills/gpt-5-4-prompting#6a5c2ba53b734f3cdd8daacbd49f68f3e6c8c167
-  - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand#716c3d60881b89bba2cfb4e713491f73471d880a
-  - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-chat#716c3d60881b89bba2cfb4e713491f73471d880a
-  - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-dashboard#716c3d60881b89bba2cfb4e713491f73471d880a
-  - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-diff#716c3d60881b89bba2cfb4e713491f73471d880a
-  - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-explain#716c3d60881b89bba2cfb4e713491f73471d880a
-  - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-onboard#716c3d60881b89bba2cfb4e713491f73471d880a
-  - trailofbits/skills/plugins/audit-context-building/skills/audit-context-building#e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  - trailofbits/skills/plugins/sharp-edges/skills/sharp-edges#e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  - trailofbits/skills/plugins/static-analysis/skills/codeql#e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  - trailofbits/skills/plugins/static-analysis/skills/sarif-parsing#e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  - trailofbits/skills/plugins/static-analysis/skills/semgrep#e8cc5baf9329ccb491bfa200e82eacbac83b1ead
   - jey3dayo/apm-workspace/catalog#main
   mcp: []
 scripts: {}

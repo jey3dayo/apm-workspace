@@ -2,134 +2,39 @@ lockfile_version: '1'
 generated_at: '2026-04-19T16:12:00.800941+00:00'
 apm_version: 0.8.11
 dependencies:
-- repo_url: Heyvhuang/ship-faster
-  host: github.com
-  resolved_commit: 64047d24e0ecb513a5aa879767d95ec7e0e44462
-  resolved_ref: 64047d24e0ecb513a5aa879767d95ec7e0e44462
-  virtual_path: skills/cloudflare
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/cloudflare
-  - .config/opencode/skills/cloudflare
-  - .copilot/skills/cloudflare
-  - .cursor/skills/cloudflare
-  content_hash: sha256:03937061c79fe7e9e989cd054bf3adff6123fa58fe3ba63ed984358854d94bb0
-- repo_url: Heyvhuang/ship-faster
-  host: github.com
-  resolved_commit: 64047d24e0ecb513a5aa879767d95ec7e0e44462
-  resolved_ref: 64047d24e0ecb513a5aa879767d95ec7e0e44462
-  virtual_path: skills/tool-openclaw
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/tool-openclaw
-  - .config/opencode/skills/tool-openclaw
-  - .copilot/skills/tool-openclaw
-  - .cursor/skills/tool-openclaw
-  content_hash: sha256:1b9cee49d17e42ed30aa3f429102ef2b9b7fddd94e705138dce852994cdbe447
-- repo_url: Lum1104/Understand-Anything
-  host: github.com
-  resolved_commit: 716c3d60881b89bba2cfb4e713491f73471d880a
-  resolved_ref: 716c3d60881b89bba2cfb4e713491f73471d880a
-  virtual_path: understand-anything-plugin/skills/understand
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/understand
-  - .config/opencode/skills/understand
-  - .copilot/skills/understand
-  - .cursor/skills/understand
-  content_hash: sha256:3ef3b426fc18bdb6434627f915f0cdad36bd4b64dfc723e9432fb7a17275046e
-- repo_url: Lum1104/Understand-Anything
-  host: github.com
-  resolved_commit: 716c3d60881b89bba2cfb4e713491f73471d880a
-  resolved_ref: 716c3d60881b89bba2cfb4e713491f73471d880a
-  virtual_path: understand-anything-plugin/skills/understand-chat
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/understand-chat
-  - .config/opencode/skills/understand-chat
-  - .copilot/skills/understand-chat
-  - .cursor/skills/understand-chat
-  content_hash: sha256:99246057d1e523d0e5eed42e68083f978656661e53d73cac5e92983ccf1518ea
-- repo_url: Lum1104/Understand-Anything
-  host: github.com
-  resolved_commit: 716c3d60881b89bba2cfb4e713491f73471d880a
-  resolved_ref: 716c3d60881b89bba2cfb4e713491f73471d880a
-  virtual_path: understand-anything-plugin/skills/understand-dashboard
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/understand-dashboard
-  - .config/opencode/skills/understand-dashboard
-  - .copilot/skills/understand-dashboard
-  - .cursor/skills/understand-dashboard
-  content_hash: sha256:38d236f95e3484352bc4dd48d72577562695bc11d4e1b376c30a2409b7692eb5
-- repo_url: Lum1104/Understand-Anything
-  host: github.com
-  resolved_commit: 716c3d60881b89bba2cfb4e713491f73471d880a
-  resolved_ref: 716c3d60881b89bba2cfb4e713491f73471d880a
-  virtual_path: understand-anything-plugin/skills/understand-diff
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/understand-diff
-  - .config/opencode/skills/understand-diff
-  - .copilot/skills/understand-diff
-  - .cursor/skills/understand-diff
-  content_hash: sha256:3ffd99e2f225db4dbab3ace73d37bedd7f7f670d3fbaa5a6fff0b6654a593820
-- repo_url: Lum1104/Understand-Anything
-  host: github.com
-  resolved_commit: 716c3d60881b89bba2cfb4e713491f73471d880a
-  resolved_ref: 716c3d60881b89bba2cfb4e713491f73471d880a
-  virtual_path: understand-anything-plugin/skills/understand-explain
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/understand-explain
-  - .config/opencode/skills/understand-explain
-  - .copilot/skills/understand-explain
-  - .cursor/skills/understand-explain
-  content_hash: sha256:3040f5a43b8cea6eba16117a863f171791863b9c00116e6eb96cc5f482e9cba2
-- repo_url: Lum1104/Understand-Anything
-  host: github.com
-  resolved_commit: 716c3d60881b89bba2cfb4e713491f73471d880a
-  resolved_ref: 716c3d60881b89bba2cfb4e713491f73471d880a
-  virtual_path: understand-anything-plugin/skills/understand-onboard
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/understand-onboard
-  - .config/opencode/skills/understand-onboard
-  - .copilot/skills/understand-onboard
-  - .cursor/skills/understand-onboard
-  content_hash: sha256:2b3faf132aafb668ccc57fd743aac0584e7ec6966402c4693b9e7c180db34cce
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: eb4a8115f9f3a22f35f1d00c351b7d0a6ec23e1f
+  resolved_commit: 6b0ee05722beab73cde82ad130752996c54c75a5
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
   package_type: apm_package
   deployed_files:
+  - .claude/skills/agent-browser
   - .claude/skills/agent-creator
   - .claude/skills/agentation
   - .claude/skills/agentation-self-driving
   - .claude/skills/agentic-actions-auditor
   - .claude/skills/apm-usage
   - .claude/skills/atomic-commit
+  - .claude/skills/audit-context-building
+  - .claude/skills/brainstorming
   - .claude/skills/cc-sdd
   - .claude/skills/chrome-debug
   - .claude/skills/claude-system
+  - .claude/skills/cloudflare
   - .claude/skills/code-quality-improvement
   - .claude/skills/code-review
+  - .claude/skills/codeql
+  - .claude/skills/codex-cli-runtime
   - .claude/skills/codex-code-review
   - .claude/skills/codex-plan-review
+  - .claude/skills/codex-result-handling
   - .claude/skills/codex-system
   - .claude/skills/command-creator
+  - .claude/skills/composition-patterns
   - .claude/skills/dev-browser
+  - .claude/skills/dispatching-parallel-agents
   - .claude/skills/distributions-manager
   - .claude/skills/docs-index
   - .claude/skills/docs-manager
@@ -137,13 +42,18 @@ dependencies:
   - .claude/skills/dotfiles-integration
   - .claude/skills/drawio
   - .claude/skills/empirical-prompt-tuning
+  - .claude/skills/executing-plans
+  - .claude/skills/finishing-a-development-branch
   - .claude/skills/frontend-design
   - .claude/skills/gemini-system
   - .claude/skills/generate-svg
+  - .claude/skills/gh-address-comments
   - .claude/skills/gh-create-pr
+  - .claude/skills/gh-fix-ci
   - .claude/skills/git-automation
   - .claude/skills/git-worktree
   - .claude/skills/golang
+  - .claude/skills/gpt-5-4-prompting
   - .claude/skills/greptileai
   - .claude/skills/implementation-engine
   - .claude/skills/integration-framework
@@ -161,43 +71,74 @@ dependencies:
   - .claude/skills/project-maintenance
   - .claude/skills/prompt-review
   - .claude/skills/react
+  - .claude/skills/react-best-practices
   - .claude/skills/react-doctor
   - .claude/skills/react-grid-layout
+  - .claude/skills/receiving-code-review
   - .claude/skills/refactoring
+  - .claude/skills/requesting-code-review
   - .claude/skills/rtk
   - .claude/skills/rules-creator
+  - .claude/skills/sarif-parsing
+  - .claude/skills/semgrep
+  - .claude/skills/sharp-edges
   - .claude/skills/similarity
   - .claude/skills/skill-auditor
   - .claude/skills/skill-creator
   - .claude/skills/slide-docs
+  - .claude/skills/subagent-driven-development
   - .claude/skills/supply-chain-risk-auditor
+  - .claude/skills/systematic-debugging
   - .claude/skills/task-router
   - .claude/skills/task-to-pr
   - .claude/skills/tauri
   - .claude/skills/tauri-dev-screenshot
   - .claude/skills/tauri-icon-gen
   - .claude/skills/tauri-webview-geometry
+  - .claude/skills/test-driven-development
+  - .claude/skills/tool-openclaw
   - .claude/skills/tsr
   - .claude/skills/typescript
   - .claude/skills/ui-ux-pro-max
+  - .claude/skills/understand
+  - .claude/skills/understand-chat
+  - .claude/skills/understand-dashboard
+  - .claude/skills/understand-diff
+  - .claude/skills/understand-explain
+  - .claude/skills/understand-onboard
+  - .claude/skills/using-git-worktrees
+  - .claude/skills/using-superpowers
+  - .claude/skills/verification-before-completion
+  - .claude/skills/web-design-guidelines
   - .claude/skills/wezterm
+  - .claude/skills/writing-plans
+  - .claude/skills/writing-skills
   - .claude/skills/zsh
+  - .config/opencode/skills/agent-browser
   - .config/opencode/skills/agent-creator
   - .config/opencode/skills/agentation
   - .config/opencode/skills/agentation-self-driving
   - .config/opencode/skills/agentic-actions-auditor
   - .config/opencode/skills/apm-usage
   - .config/opencode/skills/atomic-commit
+  - .config/opencode/skills/audit-context-building
+  - .config/opencode/skills/brainstorming
   - .config/opencode/skills/cc-sdd
   - .config/opencode/skills/chrome-debug
   - .config/opencode/skills/claude-system
+  - .config/opencode/skills/cloudflare
   - .config/opencode/skills/code-quality-improvement
   - .config/opencode/skills/code-review
+  - .config/opencode/skills/codeql
+  - .config/opencode/skills/codex-cli-runtime
   - .config/opencode/skills/codex-code-review
   - .config/opencode/skills/codex-plan-review
+  - .config/opencode/skills/codex-result-handling
   - .config/opencode/skills/codex-system
   - .config/opencode/skills/command-creator
+  - .config/opencode/skills/composition-patterns
   - .config/opencode/skills/dev-browser
+  - .config/opencode/skills/dispatching-parallel-agents
   - .config/opencode/skills/distributions-manager
   - .config/opencode/skills/docs-index
   - .config/opencode/skills/docs-manager
@@ -205,13 +146,18 @@ dependencies:
   - .config/opencode/skills/dotfiles-integration
   - .config/opencode/skills/drawio
   - .config/opencode/skills/empirical-prompt-tuning
+  - .config/opencode/skills/executing-plans
+  - .config/opencode/skills/finishing-a-development-branch
   - .config/opencode/skills/frontend-design
   - .config/opencode/skills/gemini-system
   - .config/opencode/skills/generate-svg
+  - .config/opencode/skills/gh-address-comments
   - .config/opencode/skills/gh-create-pr
+  - .config/opencode/skills/gh-fix-ci
   - .config/opencode/skills/git-automation
   - .config/opencode/skills/git-worktree
   - .config/opencode/skills/golang
+  - .config/opencode/skills/gpt-5-4-prompting
   - .config/opencode/skills/greptileai
   - .config/opencode/skills/implementation-engine
   - .config/opencode/skills/integration-framework
@@ -229,43 +175,74 @@ dependencies:
   - .config/opencode/skills/project-maintenance
   - .config/opencode/skills/prompt-review
   - .config/opencode/skills/react
+  - .config/opencode/skills/react-best-practices
   - .config/opencode/skills/react-doctor
   - .config/opencode/skills/react-grid-layout
+  - .config/opencode/skills/receiving-code-review
   - .config/opencode/skills/refactoring
+  - .config/opencode/skills/requesting-code-review
   - .config/opencode/skills/rtk
   - .config/opencode/skills/rules-creator
+  - .config/opencode/skills/sarif-parsing
+  - .config/opencode/skills/semgrep
+  - .config/opencode/skills/sharp-edges
   - .config/opencode/skills/similarity
   - .config/opencode/skills/skill-auditor
   - .config/opencode/skills/skill-creator
   - .config/opencode/skills/slide-docs
+  - .config/opencode/skills/subagent-driven-development
   - .config/opencode/skills/supply-chain-risk-auditor
+  - .config/opencode/skills/systematic-debugging
   - .config/opencode/skills/task-router
   - .config/opencode/skills/task-to-pr
   - .config/opencode/skills/tauri
   - .config/opencode/skills/tauri-dev-screenshot
   - .config/opencode/skills/tauri-icon-gen
   - .config/opencode/skills/tauri-webview-geometry
+  - .config/opencode/skills/test-driven-development
+  - .config/opencode/skills/tool-openclaw
   - .config/opencode/skills/tsr
   - .config/opencode/skills/typescript
   - .config/opencode/skills/ui-ux-pro-max
+  - .config/opencode/skills/understand
+  - .config/opencode/skills/understand-chat
+  - .config/opencode/skills/understand-dashboard
+  - .config/opencode/skills/understand-diff
+  - .config/opencode/skills/understand-explain
+  - .config/opencode/skills/understand-onboard
+  - .config/opencode/skills/using-git-worktrees
+  - .config/opencode/skills/using-superpowers
+  - .config/opencode/skills/verification-before-completion
+  - .config/opencode/skills/web-design-guidelines
   - .config/opencode/skills/wezterm
+  - .config/opencode/skills/writing-plans
+  - .config/opencode/skills/writing-skills
   - .config/opencode/skills/zsh
+  - .copilot/skills/agent-browser
   - .copilot/skills/agent-creator
   - .copilot/skills/agentation
   - .copilot/skills/agentation-self-driving
   - .copilot/skills/agentic-actions-auditor
   - .copilot/skills/apm-usage
   - .copilot/skills/atomic-commit
+  - .copilot/skills/audit-context-building
+  - .copilot/skills/brainstorming
   - .copilot/skills/cc-sdd
   - .copilot/skills/chrome-debug
   - .copilot/skills/claude-system
+  - .copilot/skills/cloudflare
   - .copilot/skills/code-quality-improvement
   - .copilot/skills/code-review
+  - .copilot/skills/codeql
+  - .copilot/skills/codex-cli-runtime
   - .copilot/skills/codex-code-review
   - .copilot/skills/codex-plan-review
+  - .copilot/skills/codex-result-handling
   - .copilot/skills/codex-system
   - .copilot/skills/command-creator
+  - .copilot/skills/composition-patterns
   - .copilot/skills/dev-browser
+  - .copilot/skills/dispatching-parallel-agents
   - .copilot/skills/distributions-manager
   - .copilot/skills/docs-index
   - .copilot/skills/docs-manager
@@ -273,13 +250,18 @@ dependencies:
   - .copilot/skills/dotfiles-integration
   - .copilot/skills/drawio
   - .copilot/skills/empirical-prompt-tuning
+  - .copilot/skills/executing-plans
+  - .copilot/skills/finishing-a-development-branch
   - .copilot/skills/frontend-design
   - .copilot/skills/gemini-system
   - .copilot/skills/generate-svg
+  - .copilot/skills/gh-address-comments
   - .copilot/skills/gh-create-pr
+  - .copilot/skills/gh-fix-ci
   - .copilot/skills/git-automation
   - .copilot/skills/git-worktree
   - .copilot/skills/golang
+  - .copilot/skills/gpt-5-4-prompting
   - .copilot/skills/greptileai
   - .copilot/skills/implementation-engine
   - .copilot/skills/integration-framework
@@ -297,43 +279,74 @@ dependencies:
   - .copilot/skills/project-maintenance
   - .copilot/skills/prompt-review
   - .copilot/skills/react
+  - .copilot/skills/react-best-practices
   - .copilot/skills/react-doctor
   - .copilot/skills/react-grid-layout
+  - .copilot/skills/receiving-code-review
   - .copilot/skills/refactoring
+  - .copilot/skills/requesting-code-review
   - .copilot/skills/rtk
   - .copilot/skills/rules-creator
+  - .copilot/skills/sarif-parsing
+  - .copilot/skills/semgrep
+  - .copilot/skills/sharp-edges
   - .copilot/skills/similarity
   - .copilot/skills/skill-auditor
   - .copilot/skills/skill-creator
   - .copilot/skills/slide-docs
+  - .copilot/skills/subagent-driven-development
   - .copilot/skills/supply-chain-risk-auditor
+  - .copilot/skills/systematic-debugging
   - .copilot/skills/task-router
   - .copilot/skills/task-to-pr
   - .copilot/skills/tauri
   - .copilot/skills/tauri-dev-screenshot
   - .copilot/skills/tauri-icon-gen
   - .copilot/skills/tauri-webview-geometry
+  - .copilot/skills/test-driven-development
+  - .copilot/skills/tool-openclaw
   - .copilot/skills/tsr
   - .copilot/skills/typescript
   - .copilot/skills/ui-ux-pro-max
+  - .copilot/skills/understand
+  - .copilot/skills/understand-chat
+  - .copilot/skills/understand-dashboard
+  - .copilot/skills/understand-diff
+  - .copilot/skills/understand-explain
+  - .copilot/skills/understand-onboard
+  - .copilot/skills/using-git-worktrees
+  - .copilot/skills/using-superpowers
+  - .copilot/skills/verification-before-completion
+  - .copilot/skills/web-design-guidelines
   - .copilot/skills/wezterm
+  - .copilot/skills/writing-plans
+  - .copilot/skills/writing-skills
   - .copilot/skills/zsh
+  - .cursor/skills/agent-browser
   - .cursor/skills/agent-creator
   - .cursor/skills/agentation
   - .cursor/skills/agentation-self-driving
   - .cursor/skills/agentic-actions-auditor
   - .cursor/skills/apm-usage
   - .cursor/skills/atomic-commit
+  - .cursor/skills/audit-context-building
+  - .cursor/skills/brainstorming
   - .cursor/skills/cc-sdd
   - .cursor/skills/chrome-debug
   - .cursor/skills/claude-system
+  - .cursor/skills/cloudflare
   - .cursor/skills/code-quality-improvement
   - .cursor/skills/code-review
+  - .cursor/skills/codeql
+  - .cursor/skills/codex-cli-runtime
   - .cursor/skills/codex-code-review
   - .cursor/skills/codex-plan-review
+  - .cursor/skills/codex-result-handling
   - .cursor/skills/codex-system
   - .cursor/skills/command-creator
+  - .cursor/skills/composition-patterns
   - .cursor/skills/dev-browser
+  - .cursor/skills/dispatching-parallel-agents
   - .cursor/skills/distributions-manager
   - .cursor/skills/docs-index
   - .cursor/skills/docs-manager
@@ -341,13 +354,18 @@ dependencies:
   - .cursor/skills/dotfiles-integration
   - .cursor/skills/drawio
   - .cursor/skills/empirical-prompt-tuning
+  - .cursor/skills/executing-plans
+  - .cursor/skills/finishing-a-development-branch
   - .cursor/skills/frontend-design
   - .cursor/skills/gemini-system
   - .cursor/skills/generate-svg
+  - .cursor/skills/gh-address-comments
   - .cursor/skills/gh-create-pr
+  - .cursor/skills/gh-fix-ci
   - .cursor/skills/git-automation
   - .cursor/skills/git-worktree
   - .cursor/skills/golang
+  - .cursor/skills/gpt-5-4-prompting
   - .cursor/skills/greptileai
   - .cursor/skills/implementation-engine
   - .cursor/skills/integration-framework
@@ -365,389 +383,47 @@ dependencies:
   - .cursor/skills/project-maintenance
   - .cursor/skills/prompt-review
   - .cursor/skills/react
+  - .cursor/skills/react-best-practices
   - .cursor/skills/react-doctor
   - .cursor/skills/react-grid-layout
+  - .cursor/skills/receiving-code-review
   - .cursor/skills/refactoring
+  - .cursor/skills/requesting-code-review
   - .cursor/skills/rtk
   - .cursor/skills/rules-creator
+  - .cursor/skills/sarif-parsing
+  - .cursor/skills/semgrep
+  - .cursor/skills/sharp-edges
   - .cursor/skills/similarity
   - .cursor/skills/skill-auditor
   - .cursor/skills/skill-creator
   - .cursor/skills/slide-docs
+  - .cursor/skills/subagent-driven-development
   - .cursor/skills/supply-chain-risk-auditor
+  - .cursor/skills/systematic-debugging
   - .cursor/skills/task-router
   - .cursor/skills/task-to-pr
   - .cursor/skills/tauri
   - .cursor/skills/tauri-dev-screenshot
   - .cursor/skills/tauri-icon-gen
   - .cursor/skills/tauri-webview-geometry
+  - .cursor/skills/test-driven-development
+  - .cursor/skills/tool-openclaw
   - .cursor/skills/tsr
   - .cursor/skills/typescript
   - .cursor/skills/ui-ux-pro-max
-  - .cursor/skills/wezterm
-  - .cursor/skills/zsh
-  content_hash: sha256:a45dd8fc780edebca20df887b0c5bd40b1cabad0acf3ee18d757207b323d36e2
-- repo_url: obra/superpowers
-  host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  virtual_path: skills/brainstorming
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/brainstorming
-  - .config/opencode/skills/brainstorming
-  - .copilot/skills/brainstorming
-  - .cursor/skills/brainstorming
-  content_hash: sha256:1518efecf35139a9a5b9e60906b71de874af08322200fab18a54848cea8c15fe
-- repo_url: obra/superpowers
-  host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  virtual_path: skills/dispatching-parallel-agents
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/dispatching-parallel-agents
-  - .config/opencode/skills/dispatching-parallel-agents
-  - .copilot/skills/dispatching-parallel-agents
-  - .cursor/skills/dispatching-parallel-agents
-  content_hash: sha256:e21044ae7496fc285f1df9ff3fb518a3a20bea6f5216c1f59f4987e12c769a0a
-- repo_url: obra/superpowers
-  host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  virtual_path: skills/executing-plans
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/executing-plans
-  - .config/opencode/skills/executing-plans
-  - .copilot/skills/executing-plans
-  - .cursor/skills/executing-plans
-  content_hash: sha256:2f709d1a2c7564f8ce6a9bb707e7f5451117ba80f8e8e2302662c29bc61246a6
-- repo_url: obra/superpowers
-  host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  virtual_path: skills/finishing-a-development-branch
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/finishing-a-development-branch
-  - .config/opencode/skills/finishing-a-development-branch
-  - .copilot/skills/finishing-a-development-branch
-  - .cursor/skills/finishing-a-development-branch
-  content_hash: sha256:9edba9a38684c060fdc38290f640e1dc0c37de286723ac9be73bacacf7cd6f3d
-- repo_url: obra/superpowers
-  host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  virtual_path: skills/receiving-code-review
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/receiving-code-review
-  - .config/opencode/skills/receiving-code-review
-  - .copilot/skills/receiving-code-review
-  - .cursor/skills/receiving-code-review
-  content_hash: sha256:2760c85d4f4117b0006e7ba755f4bbd61f8f4c185f347999763c97f507274e30
-- repo_url: obra/superpowers
-  host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  virtual_path: skills/requesting-code-review
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/requesting-code-review
-  - .config/opencode/skills/requesting-code-review
-  - .copilot/skills/requesting-code-review
-  - .cursor/skills/requesting-code-review
-  content_hash: sha256:046180bd8519589b176d575e32a720c43cf6834f2e4d182277faf8943fe03564
-- repo_url: obra/superpowers
-  host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  virtual_path: skills/subagent-driven-development
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/subagent-driven-development
-  - .config/opencode/skills/subagent-driven-development
-  - .copilot/skills/subagent-driven-development
-  - .cursor/skills/subagent-driven-development
-  content_hash: sha256:96697eb8dde8631ee7cd5e1cb29c6d7c0b8ef2869c0875dd2eedf07762e5feae
-- repo_url: obra/superpowers
-  host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  virtual_path: skills/systematic-debugging
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/systematic-debugging
-  - .config/opencode/skills/systematic-debugging
-  - .copilot/skills/systematic-debugging
-  - .cursor/skills/systematic-debugging
-  content_hash: sha256:6fddb1f3952f65f1f3a2ef267ae4ab6919ff70a8b36672ea908640ae21a34ea0
-- repo_url: obra/superpowers
-  host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  virtual_path: skills/test-driven-development
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/test-driven-development
-  - .config/opencode/skills/test-driven-development
-  - .copilot/skills/test-driven-development
-  - .cursor/skills/test-driven-development
-  content_hash: sha256:126f1ebf6ccd414f42544f6e83d8cc5adb089e1108eaffb7c400701e37eecd9f
-- repo_url: obra/superpowers
-  host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  virtual_path: skills/using-git-worktrees
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/using-git-worktrees
-  - .config/opencode/skills/using-git-worktrees
-  - .copilot/skills/using-git-worktrees
+  - .cursor/skills/understand
+  - .cursor/skills/understand-chat
+  - .cursor/skills/understand-dashboard
+  - .cursor/skills/understand-diff
+  - .cursor/skills/understand-explain
+  - .cursor/skills/understand-onboard
   - .cursor/skills/using-git-worktrees
-  content_hash: sha256:52bbb4b6e80918e83e92a1514f3b3757712154c2a8a42de24919e48a794c54fc
-- repo_url: obra/superpowers
-  host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  virtual_path: skills/using-superpowers
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/using-superpowers
-  - .config/opencode/skills/using-superpowers
-  - .copilot/skills/using-superpowers
   - .cursor/skills/using-superpowers
-  content_hash: sha256:8ae2ec915dd4b5e4b758ee8110190fd792e85eb05d670fece942a76603e31cb8
-- repo_url: obra/superpowers
-  host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  virtual_path: skills/verification-before-completion
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/verification-before-completion
-  - .config/opencode/skills/verification-before-completion
-  - .copilot/skills/verification-before-completion
   - .cursor/skills/verification-before-completion
-  content_hash: sha256:9b446f0c7fe1cfb560b1d34439523b1a76d5f177290007b2c053a1c749a4a8ba
-- repo_url: obra/superpowers
-  host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  virtual_path: skills/writing-plans
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/writing-plans
-  - .config/opencode/skills/writing-plans
-  - .copilot/skills/writing-plans
-  - .cursor/skills/writing-plans
-  content_hash: sha256:90185bbb1bd9d4959826104c1c1900424180b8a4011f4432da886df599922788
-- repo_url: obra/superpowers
-  host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  resolved_ref: b55764852ac78870e65c6565fb585b6cd8b3c5c9
-  virtual_path: skills/writing-skills
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/writing-skills
-  - .config/opencode/skills/writing-skills
-  - .copilot/skills/writing-skills
-  - .cursor/skills/writing-skills
-  content_hash: sha256:272ccd701f41b94e1119aaa99455a52cdb8e07283cb6a6aab32a7722d96bef45
-- repo_url: openai/codex-plugin-cc
-  host: github.com
-  resolved_commit: 6a5c2ba53b734f3cdd8daacbd49f68f3e6c8c167
-  resolved_ref: 6a5c2ba53b734f3cdd8daacbd49f68f3e6c8c167
-  virtual_path: plugins/codex/skills/codex-cli-runtime
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/codex-cli-runtime
-  - .config/opencode/skills/codex-cli-runtime
-  - .copilot/skills/codex-cli-runtime
-  - .cursor/skills/codex-cli-runtime
-  content_hash: sha256:03b09f8ad5721f1d33d830cff54637656c58920befcb32835c6f003e625a7a54
-- repo_url: openai/codex-plugin-cc
-  host: github.com
-  resolved_commit: 6a5c2ba53b734f3cdd8daacbd49f68f3e6c8c167
-  resolved_ref: 6a5c2ba53b734f3cdd8daacbd49f68f3e6c8c167
-  virtual_path: plugins/codex/skills/codex-result-handling
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/codex-result-handling
-  - .config/opencode/skills/codex-result-handling
-  - .copilot/skills/codex-result-handling
-  - .cursor/skills/codex-result-handling
-  content_hash: sha256:1ca05b8eb3e45816b428dc71e24355a89a8f997502ade309e0c53a06adb1b1e7
-- repo_url: openai/codex-plugin-cc
-  host: github.com
-  resolved_commit: 6a5c2ba53b734f3cdd8daacbd49f68f3e6c8c167
-  resolved_ref: 6a5c2ba53b734f3cdd8daacbd49f68f3e6c8c167
-  virtual_path: plugins/codex/skills/gpt-5-4-prompting
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/gpt-5-4-prompting
-  - .config/opencode/skills/gpt-5-4-prompting
-  - .copilot/skills/gpt-5-4-prompting
-  - .cursor/skills/gpt-5-4-prompting
-  content_hash: sha256:8e00d64a5cd9b4477e55c4a7ad0f02328ff1991ea93e2ac1fb7839b3891d3f2d
-- repo_url: openai/skills
-  host: github.com
-  resolved_commit: e940b8a86138adf03972802b990a1dfc57fcbf09
-  resolved_ref: e940b8a86138adf03972802b990a1dfc57fcbf09
-  virtual_path: skills/.curated/gh-address-comments
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/gh-address-comments
-  - .config/opencode/skills/gh-address-comments
-  - .copilot/skills/gh-address-comments
-  - .cursor/skills/gh-address-comments
-  content_hash: sha256:068d34fb59cb97a39aea3de1708877b6a01210d02fa7eda5e74fc8277ed52916
-- repo_url: openai/skills
-  host: github.com
-  resolved_commit: e940b8a86138adf03972802b990a1dfc57fcbf09
-  resolved_ref: e940b8a86138adf03972802b990a1dfc57fcbf09
-  virtual_path: skills/.curated/gh-fix-ci
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/gh-fix-ci
-  - .config/opencode/skills/gh-fix-ci
-  - .copilot/skills/gh-fix-ci
-  - .cursor/skills/gh-fix-ci
-  content_hash: sha256:02b4d97e4bd91e342e3ec3efa06b7871097d6a64e8398f4ed5b69c64d8d902fb
-- repo_url: trailofbits/skills
-  host: github.com
-  resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  resolved_ref: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  virtual_path: plugins/audit-context-building/skills/audit-context-building
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/audit-context-building
-  - .config/opencode/skills/audit-context-building
-  - .copilot/skills/audit-context-building
-  - .cursor/skills/audit-context-building
-  content_hash: sha256:a0abaac9302501e02ba868d34d1457a817a6267ae235ef95afa098d3cf03f338
-- repo_url: trailofbits/skills
-  host: github.com
-  resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  resolved_ref: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  virtual_path: plugins/sharp-edges/skills/sharp-edges
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/sharp-edges
-  - .config/opencode/skills/sharp-edges
-  - .copilot/skills/sharp-edges
-  - .cursor/skills/sharp-edges
-  content_hash: sha256:a50fe3462153575d90b7774662c1852188524b4b07bd73815c1db39f486b01f2
-- repo_url: trailofbits/skills
-  host: github.com
-  resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  resolved_ref: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  virtual_path: plugins/static-analysis/skills/codeql
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/codeql
-  - .config/opencode/skills/codeql
-  - .copilot/skills/codeql
-  - .cursor/skills/codeql
-  content_hash: sha256:77b1731a16efb8b1d130bcfc529ff974779fbd836d0d9054f8dc82ba8d17193c
-- repo_url: trailofbits/skills
-  host: github.com
-  resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  resolved_ref: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  virtual_path: plugins/static-analysis/skills/sarif-parsing
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/sarif-parsing
-  - .config/opencode/skills/sarif-parsing
-  - .copilot/skills/sarif-parsing
-  - .cursor/skills/sarif-parsing
-  content_hash: sha256:f2672460cdd069dcc416930f6b1495dd504da7aff485da2df4861935ac4ad458
-- repo_url: trailofbits/skills
-  host: github.com
-  resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  resolved_ref: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  virtual_path: plugins/static-analysis/skills/semgrep
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/semgrep
-  - .config/opencode/skills/semgrep
-  - .copilot/skills/semgrep
-  - .cursor/skills/semgrep
-  content_hash: sha256:739945d5fdd22520a093010a9e9a2e5568a6f541f74604e4328c0ade79cda81e
-- repo_url: vercel-labs/agent-browser
-  host: github.com
-  resolved_commit: 717d1b09e1c841a4c0206033886a1a861e3ca5d9
-  resolved_ref: 717d1b09e1c841a4c0206033886a1a861e3ca5d9
-  virtual_path: skills/agent-browser
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/agent-browser
-  - .config/opencode/skills/agent-browser
-  - .copilot/skills/agent-browser
-  - .cursor/skills/agent-browser
-  content_hash: sha256:6f68d01b14796e410746fab39c2d6b36dcfa030dd59eb772f6418e2db949a16c
-- repo_url: vercel-labs/agent-skills
-  host: github.com
-  resolved_commit: ce3e64e468f8fa09a2d075d102771838061fdac0
-  resolved_ref: ce3e64e468f8fa09a2d075d102771838061fdac0
-  virtual_path: skills/composition-patterns
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/composition-patterns
-  - .config/opencode/skills/composition-patterns
-  - .copilot/skills/composition-patterns
-  - .cursor/skills/composition-patterns
-  content_hash: sha256:5b3564ca435f4714d5e65023351e1999e4744818603a9cfb6a6f6a61b7d84918
-- repo_url: vercel-labs/agent-skills
-  host: github.com
-  resolved_commit: ce3e64e468f8fa09a2d075d102771838061fdac0
-  resolved_ref: ce3e64e468f8fa09a2d075d102771838061fdac0
-  virtual_path: skills/react-best-practices
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/react-best-practices
-  - .config/opencode/skills/react-best-practices
-  - .copilot/skills/react-best-practices
-  - .cursor/skills/react-best-practices
-  content_hash: sha256:74f142d28d360d78e8bac4f239a84c87f0ced9015729bc72b5458d82ff45b015
-- repo_url: vercel-labs/agent-skills
-  host: github.com
-  resolved_commit: ce3e64e468f8fa09a2d075d102771838061fdac0
-  resolved_ref: ce3e64e468f8fa09a2d075d102771838061fdac0
-  virtual_path: skills/web-design-guidelines
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/web-design-guidelines
-  - .config/opencode/skills/web-design-guidelines
-  - .copilot/skills/web-design-guidelines
   - .cursor/skills/web-design-guidelines
-  content_hash: sha256:a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a
+  - .cursor/skills/wezterm
+  - .cursor/skills/writing-plans
+  - .cursor/skills/writing-skills
+  - .cursor/skills/zsh
+  content_hash: sha256:ddcff62612c4aa115c8182f10446832e790a8f6c255c6bfd8ecd1b08d57f4a03
