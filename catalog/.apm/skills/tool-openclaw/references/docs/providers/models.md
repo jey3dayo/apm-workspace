@@ -1,0 +1,52 @@
+<!-- SNAPSHOT: source_url=https://docs.openclaw.ai/providers/models.md; fetched_at=2026-02-20T10:29:25.860Z; sha256=e80f6c30e5eb889a923043e1095759c6e23a5af3dc3c3dec35e36f0f9bf0f690; content_type=text/markdown; charset=utf-8; status=ok -->
+
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.openclaw.ai/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Model Provider Quickstart
+
+# Model Providers
+
+OpenClaw can use many LLM providers. Pick one, authenticate, then set the default
+model as `provider/model`.
+
+## Highlight: Venice (Venice AI)
+
+Venice is our recommended Venice AI setup for privacy-first inference with an option to use Opus for the hardest tasks.
+
+* Default: `venice/llama-3.3-70b`
+* Best overall: `venice/claude-opus-45` (Opus remains the strongest)
+
+See [Venice AI](/providers/venice).
+
+## Quick start (two steps)
+
+1. Authenticate with the provider (usually via `openclaw onboard`).
+2. Set the default model:
+
+```json5  theme={"theme":{"light":"min-light","dark":"min-dark"}}
+{
+  agents: { defaults: { model: { primary: "anthropic/claude-opus-4-6" } } },
+}
+```
+
+## Supported providers (starter set)
+
+* [OpenAI (API + Codex)](/providers/openai)
+* [Anthropic (API + Claude Code CLI)](/providers/anthropic)
+* [OpenRouter](/providers/openrouter)
+* [Vercel AI Gateway](/providers/vercel-ai-gateway)
+* [Cloudflare AI Gateway](/providers/cloudflare-ai-gateway)
+* [Moonshot AI (Kimi + Kimi Coding)](/providers/moonshot)
+* [Synthetic](/providers/synthetic)
+* [OpenCode Zen](/providers/opencode)
+* [Z.AI](/providers/zai)
+* [GLM models](/providers/glm)
+* [MiniMax](/providers/minimax)
+* [Venice (Venice AI)](/providers/venice)
+* [Amazon Bedrock](/providers/bedrock)
+* [Qianfan](/providers/qianfan)
+
+For the full provider catalog (xAI, Groq, Mistral, etc.) and advanced configuration,
+see [Model providers](/concepts/model-providers).
