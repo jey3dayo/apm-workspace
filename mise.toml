@@ -3,7 +3,7 @@
 # Generated from ~/.config/templates/apm-workspace/mise.toml
 
 [tools]
-"github:microsoft/apm" = "0.8.11"
+"github:microsoft/apm" = "0.8.12"
 
 [tasks.apply]
 description = "Deploy user-scope-compatible APM dependencies and refresh Codex output"
