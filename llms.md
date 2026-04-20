@@ -4,6 +4,8 @@
 
 This workspace owns the global APM manifest, the lockfile, the downloaded dependency cache, and the managed catalog package published as `jey3dayo/apm-workspace/catalog#main`.
 
+The current manifest is catalog-only: `apm.yml` tracks a single dependency, `jey3dayo/apm-workspace/catalog#main`.
+
 ## What This Workspace Owns
 
 - `apm.yml`: global dependency manifest for user-scope rollout
@@ -37,7 +39,7 @@ The managed catalog is published through the single upstream ref in `apm.yml`:
 jey3dayo/apm-workspace/catalog#main
 ```
 
-External skills remain upstream refs in `apm.yml` and are downloaded into `apm_modules/`.
+There are no active external skill refs in the current manifest. If external dependencies are reintroduced later, they are still downloaded into `apm_modules/`, which remains a cache-only layer.
 
 ## Operational Guardrails
 
@@ -51,7 +53,6 @@ External skills remain upstream refs in `apm.yml` and are downloaded into `apm_m
 ```powershell
 cd ~/.apm
 mise install
-mise run migrate-external
 mise run apply
 mise run doctor
 ```
