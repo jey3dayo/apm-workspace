@@ -1,10 +1,10 @@
 lockfile_version: "1"
-generated_at: "2026-04-20T04:09:32.508081+00:00"
-apm_version: 0.8.11
+generated_at: "2026-04-20T08:38:54.565598+00:00"
+apm_version: 0.8.12
 dependencies:
   - repo_url: jey3dayo/apm-workspace
     host: github.com
-    resolved_commit: 153b4c0b41c5d76b96fc0117e684f8bb307826a4
+    resolved_commit: c4ea3b7751d8423515c9f8bc5e8f728f9fbb660f
     resolved_ref: main
     virtual_path: catalog
     is_virtual: true
@@ -322,4 +322,4 @@ dependencies:
       - .cursor/skills/writing-plans
       - .cursor/skills/writing-skills
       - .cursor/skills/zsh
-    content_hash: sha256:79d96fba347e6fc71e2ec43f07d3fe4a6a18b9e7087524ed21f117afb69ed305
+    content_hash: sha256:dfbe94b82049d410ccdd8c7e98da565b56592dca1a0bebfa2fe3cab352288706

@@ -54,6 +54,16 @@ description = "Register enabled external skills by upstream ref in ~/.apm/apm.ym
 run = "bash \"${APM_BOOTSTRAP_REPO:-$HOME/.config}/scripts/apm-workspace.sh\" migrate-external"
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\\.config\\scripts\\apm-workspace-migrate-external.ps1"
 
+[tasks."apm:install"]
+description = "Run user-scope APM install from ~/.apm"
+run = "apm install -g"
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"apm install -g\""
+
+[tasks."apm:update"]
+description = "Run user-scope APM dependency update from ~/.apm"
+run = "apm deps update -g"
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"apm deps update -g\""
+
 [tasks."format:markdown"]
 description = "Format Markdown files in the ~/.apm workspace"
 run = "fd -e md -X prettier --write --log-level error >/dev/null"

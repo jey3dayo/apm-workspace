@@ -91,6 +91,8 @@ Describe "public command surface" {
     $miseToml = Get-Content -LiteralPath C:\Users\j138c\.apm\mise.toml -Raw
 
     $miseToml | Should Match '\[tasks\.validate-catalog\]'
+    $miseToml | Should Match '\[tasks\."apm:install"\]'
+    $miseToml | Should Match '\[tasks\."apm:update"\]'
     $miseToml | Should Match '\[tasks\.format\]'
     $miseToml | Should Match '\[tasks\."ci:check"\]'
     $miseToml | Should Match '\[tasks\.ci\]'
