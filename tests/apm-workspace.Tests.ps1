@@ -182,3 +182,22 @@ Describe "external overlap reporting" {
     }
   }
 }
+
+Describe "internal cleanup skill ids" {
+  BeforeEach {
+    $WorkspaceDir = Join-Path $TestDrive "workspace"
+    New-Item -ItemType Directory -Path $WorkspaceDir -Force | Out-Null
+  }
+
+  It "includes legacy superpowers aliases for renamed managed skills" {
+    $skillsRoot = Join-Path $WorkspaceDir "catalog\.apm\skills"
+    New-Item -ItemType Directory -Path (Join-Path $skillsRoot "brainstorming") -Force | Out-Null
+    New-Item -ItemType Directory -Path (Join-Path $skillsRoot "code-review") -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $skillsRoot "brainstorming\SKILL.md") -Value "# brainstorming"
+    Set-Content -LiteralPath (Join-Path $skillsRoot "code-review\SKILL.md") -Value "# code-review"
+
+    $cleanupSkillIds = @(Get-InternalCleanupSkillIds)
+
+    $cleanupSkillIds | Should Be @("brainstorming", "code-review", "superpowers:brainstorming")
+  }
+}
