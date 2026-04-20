@@ -2,44 +2,50 @@
 
 APM-based global skill workspace for `jey3dayo`.
 
-This repository is the day-to-day working copy of `~/.apm`. It owns the global APM manifest, the lockfile, the downloaded dependency cache, and the managed catalog package published as `jey3dayo/apm-workspace/catalog#main`.
+This repository is the day-to-day working copy of `~/.apm`. It owns the global APM manifest, the lockfile, the downloaded dependency cache, your personal skill sources, and the shared runtime guidance published from this repo.
 
 ## What Lives Here
 
 - `apm.yml`: global dependency manifest for user-scope skill rollout
 - `apm.lock.yaml`: resolved commits and install state captured by APM
 - `apm_modules/`: downloaded dependency sources; cache only, not an editing surface
-- `catalog/`: tracked APM package for managed skills plus shared guidance assets (`AGENTS.md`, `agents/`, `commands/`, `rules/`)
+- `catalog/`: tracked runtime guidance package for shared assets (`AGENTS.md`, `agents/`, `commands/`, `rules/`)
+- `src/`: authoring source for your personal assets
 - `mise.toml`: workspace-local tasks for install, migration, verification, and repair
 - `tests/`: Pester coverage for the workspace helpers
 
-## Managed Catalog Layout
+## Workspace Layout
 
-Managed catalog assets are edited directly in `~/.apm/catalog/`.
+Authoring and deployment are split:
 
-- Skills: `~/.apm/catalog/.apm/skills/<id>/`
+- Personal skills: `~/.apm/catalog/skills/<id>/`
 - Shared guidance: `~/.apm/catalog/AGENTS.md`, `agents/**`, `commands/**`, `rules/**`
 
-The layout difference between `catalog/.apm/skills/` and `catalog/commands/` is intentional.
+The layout difference between `src/` and `catalog/` is intentional.
 
-- `catalog/.apm/skills/<id>/` is the APM package namespace for installable skills.
-- `catalog/commands/**` is not a skill package subtree. It is shared runtime guidance that is synced into target roots as `commands/**` alongside `AGENTS.md`, `agents/**`, and `rules/**`.
-- Keep this split unless the runtime sync contract itself changes.
+- `catalog/skills/**` is the authoring surface for your personal assets.
+- external skills are tracked in `apm.yml` by upstream ref.
+- `catalog/**` remains the tracked runtime guidance package for shared assets synced into target roots.
 
-`mise run stage-catalog` now normalizes `catalog/` in place. Global install still happens through a single upstream ref in `apm.yml`:
+Current APM limitation:
+
+- user-scope install (`apm install -g`) does not yet support local package refs such as `./packages/...`
+- keep `apm.yml` on remote refs for global install
+- do not switch `apm.yml` to local `./packages/*` refs until user-scope local package support lands in APM
+
+The formatter for bold headings only rewrites personal skills:
 
 ```text
-jey3dayo/apm-workspace/catalog#main
+tsx ~/.config/scripts/replace-bold-headings.ts ./catalog/skills
 ```
 
-External skills stay in `apm.yml` as upstream refs and are downloaded into `apm_modules/`.
+External skills can still live as upstream refs in `apm.yml` and are downloaded into `apm_modules/`.
 
 ## Daily Flow
 
 ```powershell
 cd ~/.apm
 mise install
-mise run migrate-external
 mise run apply
 mise run doctor
 ```
@@ -58,15 +64,17 @@ mise run smoke-catalog
 
 ## Managed Skill Updates
 
-When a managed catalog asset changes under `~/.apm/catalog/`:
+When a personal skill changes under `~/.apm/catalog/skills/`:
+
+1. Update `catalog/skills/<id>/`.
+2. Run `mise run format:markdown:bold-headings` if you want heading normalization.
+
+When shared runtime guidance changes under `~/.apm/catalog/`:
 
 1. Update `catalog/` directly.
 2. Run `mise run stage-catalog`.
 3. Review the normalized `catalog/` diff.
-4. Commit and push the updated `catalog/`.
-5. Run `mise run register-catalog`.
-6. Run `mise run doctor` and confirm:
-   - `external selection overlap: count=0`
+4. Run `mise run doctor` and confirm:
    - `catalog: ... status=ok`
    - target lines show `config=present agents=present commands=present rules=present`
 
@@ -76,6 +84,6 @@ If old package ownership from a previous install state is still hanging around, 
 
 - Operational reference: `~/.config/docs/tools/apm-workspace.md`
 - Task catalog: `~/.config/docs/tools/mise-tasks.md`
-- Managed-skill usage guidance: `~/.apm/catalog/.apm/skills/apm-usage/SKILL.md`
+- Managed-skill usage guidance: `~/.apm/catalog/skills/apm-usage/SKILL.md`
 - Task coverage memo: `docs/apm-task-coverage.md`
 - Remaining work: `TODO.md`

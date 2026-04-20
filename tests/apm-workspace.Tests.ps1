@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $env:APM_WORKSPACE_LIB_ONLY = "1"
-. "C:\Users\j138c\.config\scripts\apm-workspace.ps1"
+. "C:\Users\j138c\.apm\scripts\apm-workspace.ps1"
 Remove-Item Env:APM_WORKSPACE_LIB_ONLY -ErrorAction SilentlyContinue
 
 Describe "catalog helpers" {
@@ -60,7 +60,7 @@ scripts: {}
 Describe "public command surface" {
   It "shows only catalog commands in help output" {
     $legacyMirrorPattern = 'transitional' + ' mirror'
-    $help = & powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\j138c\.config\scripts\apm-workspace.ps1 help | Out-String
+    $help = & powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\j138c\.apm\scripts\apm-workspace.ps1 help | Out-String
 
     $help | Should Match "validate-catalog"
     $help | Should Match "stage-catalog"
@@ -74,9 +74,19 @@ Describe "public command surface" {
   }
 
   It "does not reference removed install helpers" {
-    $script = Get-Content -LiteralPath C:\Users\j138c\.config\scripts\apm-workspace.ps1 -Raw
+    $script = Get-Content -LiteralPath C:\Users\j138c\.apm\scripts\apm-workspace.ps1 -Raw
 
     $script | Should Not Match 'Invoke-InstallReference\b'
+  }
+
+  It "keeps local workspace scripts self-contained" {
+    $shellScript = Get-Content -LiteralPath /Users/t00114/.apm/scripts/apm-workspace.sh -Raw
+    $powerShellScript = Get-Content -LiteralPath C:\Users\j138c\.apm\scripts\apm-workspace.ps1 -Raw
+
+    $shellScript | Should Not Match 'APM_BOOTSTRAP_REPO'
+    $shellScript | Should Not Match '~/.config'
+    $powerShellScript | Should Not Match 'APM_BOOTSTRAP_REPO'
+    $powerShellScript | Should Not Match '\\.config\\scripts\\apm-workspace'
   }
 
   It "maps runtime config filenames per target" {
@@ -91,6 +101,7 @@ Describe "public command surface" {
     $miseToml = Get-Content -LiteralPath C:\Users\j138c\.apm\mise.toml -Raw
 
     $miseToml | Should Match '\[tasks\.validate-catalog\]'
+    $miseToml | Should Match '\[tasks\."format:markdown:bold-headings"\]'
     $miseToml | Should Match '\[tasks\."apm:install"\]'
     $miseToml | Should Match '\[tasks\."apm:update"\]'
     $miseToml | Should Match '\[tasks\.format\]'
@@ -98,16 +109,17 @@ Describe "public command surface" {
     $miseToml | Should Match '\[tasks\.ci\]'
     $miseToml | Should Match '\[tasks\."catalog:release"\]'
     $miseToml | Should Match '\[tasks\."catalog:tidy"\]'
-    $miseToml | Should Match 'run_windows = "& \\"\$env:USERPROFILE\\\\\.config\\\\scripts\\\\apm-workspace\.ps1\\" apply"'
-    $miseToml | Should Match 'run_windows = "@\(fd -e md --exclude catalog\) \| ForEach-Object \{ prettier --write --log-level error \$_ \*> \$null \}"'
-    $miseToml | Should Not Match '%USERPROFILE%'
+    $miseToml | Should Match 'run = "bash ./scripts/apm-workspace.sh apply"'
+    $miseToml | Should Match 'run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 apply"'
+    $miseToml | Should Match 'replace-bold-headings\.ts" ./catalog/skills'
+    $miseToml | Should Not Match 'APM_BOOTSTRAP_REPO'
   }
 
   It "describes the catalog readme without legacy mirror wording" {
     $legacyMirrorPattern = 'transitional' + ' mirror'
     $readme = Get-CatalogReadmeContent
 
-    $readme | Should Match '~/.apm/catalog/.apm/skills/<id>/'
+    $readme | Should Match '~/.apm/catalog/skills/<id>/'
     $readme | Should Not Match $legacyMirrorPattern
   }
 
@@ -145,43 +157,6 @@ Describe "public command surface" {
     Assert-MockCalled Invoke-StageCatalog -Times 1 -Exactly
     Assert-MockCalled Assert-CatalogReleaseReady -Times 1 -Exactly
     Assert-MockCalled Invoke-RegisterCatalog -Times 1 -Exactly
-  }
-}
-
-Describe "external overlap reporting" {
-  It "finds skills selected both externally and by the managed catalog" {
-    $previousExternalSourcesFile = $ExternalSourcesFile
-
-    try {
-      $ExternalSourcesFile = Join-Path $TestDrive "agent-skills-sources.nix"
-
-      $skillsRoot = Join-Path $WorkspaceDir "catalog\.apm\skills"
-      New-Item -ItemType Directory -Path (Join-Path $skillsRoot "dev-browser") -Force | Out-Null
-      Set-Content -LiteralPath (Join-Path $skillsRoot "dev-browser\SKILL.md") -Value "# dev-browser"
-      @"
-{
-  sawyerhood-dev-browser = {
-    url = "github:sawyerhood/skills";
-    catalogs = {
-      default = "skills";
-    };
-    selection.enable = [
-      "dev-browser"
-      "totally-external"
-    ];
-  };
-}
-"@ | Set-Content -LiteralPath $ExternalSourcesFile
-
-      $overlaps = @(Get-ManagedExternalOverlapEntries)
-
-      $overlaps.Count | Should Be 1
-      $overlaps[0].SourceName | Should Be "sawyerhood-dev-browser"
-      $overlaps[0].SkillId | Should Be "dev-browser"
-    }
-    finally {
-      $ExternalSourcesFile = $previousExternalSourcesFile
-    }
   }
 }
 

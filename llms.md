@@ -2,25 +2,24 @@
 
 `~/.apm` is the working copy of the global APM workspace for `jey3dayo`.
 
-This workspace owns the global APM manifest, the lockfile, the downloaded dependency cache, and the managed catalog package published as `jey3dayo/apm-workspace/catalog#main`.
-
-The current manifest is catalog-only: `apm.yml` tracks a single dependency, `jey3dayo/apm-workspace/catalog#main`.
+This workspace owns the global APM manifest, the lockfile, the downloaded dependency cache, your personal skill sources, and the shared runtime guidance package.
 
 ## What This Workspace Owns
 
 - `apm.yml`: global dependency manifest for user-scope rollout
 - `apm.lock.yaml`: resolved commits and install state captured by APM
 - `apm_modules/`: downloaded upstream sources; cache only, not an editing surface
-- `catalog/`: managed catalog package for skills and shared guidance assets
+- `catalog/`: shared runtime guidance package for AGENTS, agents, commands, and rules
+- `src/`: personal authoring source
 - `mise.toml`: workspace-local tasks for install, migration, validation, and repair
 - `tests/`: Pester coverage for workspace helpers
 
 ## Managed Catalog Layout
 
-Managed catalog assets live directly in `~/.apm/catalog/`.
+Workspace assets are split by role.
 
-- Skills
-  - source: `~/.apm/catalog/.apm/skills/<id>/`
+- Personal skills
+  - source: `~/.apm/catalog/skills/<id>/`
 - Shared guidance
   - source: `~/.apm/catalog/AGENTS.md`
   - source: `~/.apm/catalog/agents/**`
@@ -29,24 +28,24 @@ Managed catalog assets live directly in `~/.apm/catalog/`.
 
 The tracked layout is intentionally asymmetric:
 
-- `skills` live under `.apm/skills/**` because they are packaged as installable APM skill content.
-- `commands` stay at top-level `commands/**` because they are synced into runtime targets as shared guidance, not installed as nested skill packages.
-- Do not move `commands/**` under `.apm/**` unless you are deliberately redesigning the runtime asset contract.
+- `catalog/skills/**` is the authoring layer for personal assets.
+- external skills stay visible in `apm.yml` as upstream refs.
+- `commands/**` stay top-level inside `catalog/**` because they are synced into runtime targets as shared guidance, not installed as nested skill packages.
 
-The managed catalog is published through the single upstream ref in `apm.yml`:
+Shared runtime guidance is published through the catalog ref in `apm.yml`:
 
 ```text
 jey3dayo/apm-workspace/catalog#main
 ```
 
-There are no active external skill refs in the current manifest. If external dependencies are reintroduced later, they are still downloaded into `apm_modules/`, which remains a cache-only layer.
+`apm_modules/` remains a cache-only layer, not an editing surface.
 
 ## Operational Guardrails
 
 - Do not edit `apm_modules/`.
 - Do not reintroduce `./packages/*` or `~/.apm/skills/` as alternate editing surfaces for managed global skills.
 - Keep `apm.yml` on upstream refs, especially `jey3dayo/apm-workspace/catalog#main`.
-- After moving a skill into the managed catalog, remove overlapping entries from `~/.config/nix/agent-skills-sources.nix`.
+- Keep personal source in `~/.apm/src/**` and runtime guidance in `~/.apm/catalog/**`.
 
 ## Default Flow
 
@@ -59,7 +58,12 @@ mise run doctor
 
 ## Managed Catalog Update Flow
 
-When a managed catalog asset changes under `~/.apm/catalog/`:
+When a personal skill changes under `~/.apm/catalog/skills/`:
+
+1. Edit `catalog/skills/<id>/` directly.
+2. Run `mise run format:markdown:bold-headings` when you want heading normalization.
+
+When shared runtime guidance changes under `~/.apm/catalog/`:
 
 1. Edit `catalog/` directly.
 2. Run `mise run stage-catalog`.
@@ -67,7 +71,6 @@ When a managed catalog asset changes under `~/.apm/catalog/`:
 4. Commit and push the updated `catalog/`.
 5. Run `mise run register-catalog`.
 6. Run `mise run doctor` and confirm:
-   - `external selection overlap: count=0`
    - `catalog: ... status=ok`
    - target lines show `config=present agents=present commands=present rules=present`
 
@@ -76,6 +79,7 @@ If old package ownership from a previous install state is still hanging around, 
 ## Useful Maintenance Commands
 
 - `mise run format`: format Markdown, TOML, and YAML in the workspace
+- `mise run format:markdown:bold-headings`: rewrite bold headings only inside personal skills
 - `mise run ci:check`: run formatting checks plus validation smoke checks
 - `mise run ci`: format, validate, apply, and verify the local workspace rollout
 - `mise run stage-catalog`: normalize `catalog/` in place before commit and push
@@ -87,6 +91,6 @@ If old package ownership from a previous install state is still hanging around, 
 - Human overview: `~/.apm/README.md`
 - Full contract: `~/.config/docs/tools/apm-workspace.md`
 - Task catalog: `~/.config/docs/tools/mise-tasks.md`
-- Skill guidance: `~/.apm/catalog/.apm/skills/apm-usage/SKILL.md`
+- Skill guidance: `~/.apm/catalog/skills/apm-usage/SKILL.md`
 - Task coverage memo: `docs/apm-task-coverage.md`
 - Remaining work: `TODO.md`
