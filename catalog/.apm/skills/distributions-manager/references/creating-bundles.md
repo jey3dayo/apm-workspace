@@ -18,7 +18,7 @@ Top-level bundled commands are not part of the active Home Manager deployment pa
 ## Step 1: Create Bundle Structure
 
 ```bash
-cd ~/.config/agents/bundles
+cd /path/to/bundles
 mkdir -p my-bundle/{skills,rules,agents,config}
 tree my-bundle
 ```
@@ -34,7 +34,7 @@ Recommended naming:
 
 You can either symlink to existing bundled source directories or create bundle-specific skill directories directly.
 
-### Reuse a skill from `agents/src/`
+### Reuse a skill from `<distribution-root>/`
 
 ```bash
 cd my-bundle/skills
@@ -139,6 +139,6 @@ Expected behavior:
 ## Notes
 
 - Prefer relative symlinks over absolute paths
-- Prefer `agents/src/` as the base when reusing bundled assets
+- Prefer `<distribution-root>/` as the base when reusing bundled assets
 - Do not point bundle entries at generated directories such as `~/.claude/skills/`
 - Do not rely on bundled `commands/` for current Home Manager deployment

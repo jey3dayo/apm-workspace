@@ -33,23 +33,23 @@ For the newer `~/.apm` global workflow, use `apm-usage` instead.
 
 ## What Is A Distribution?
 
-Distributions are bundled assets scanned from `distributionsPath`, typically `agents/src/`.
+Distributions are bundled assets scanned from `distributionsPath`, typically a dedicated bundle root such as `<distribution-root>/`.
 
 Current bundled asset types:
 
-- Skills: directories under `agents/src/skills/`
-- Rules: markdown files under `agents/src/rules/`
-- Agents: markdown files under `agents/src/agents/`
+- Skills: directories under `<distribution-root>/skills/`
+- Rules: markdown files under `<distribution-root>/rules/`
+- Agents: markdown files under `<distribution-root>/agents/`
 - Config: optional files under `config/`
 
 Current command behavior:
 
 - Top-level commands are deployed from external `commandsPath` sources
-- Bundled `agents/src/commands/` is not part of the active Home Manager deployment path
+- Bundled `<distribution-root>/commands/` is not part of the active Home Manager deployment path
 
 ### Current implementation
 
-- Source of truth: `agents/src/`
+- Source of truth: `<distribution-root>/`
 - Skill priority: `Distribution > External`
 - `skills.enable = null`: all discovered bundled and external skills
 - Shared selection logic in `agents/nix/lib.nix`
@@ -61,7 +61,7 @@ Current command behavior:
 
 Use this skill when:
 
-- Adding bundled skills, agents, or rules to `agents/src/`
+- Adding bundled skills, agents, or rules to a bundle root such as `<distribution-root>/`
 - Creating a custom distribution root for `distributionsPath`
 - Debugging Nix deployment issues related to bundled assets
 - Understanding selection and priority behavior
@@ -85,7 +85,7 @@ Use this skill when:
 
 - `resources/templates/bundle-structure.txt`: starter bundle layout
 - `resources/templates/README.template.md`: bundle README template
-- `resources/examples/default-bundle.md`: analysis of the current `agents/src/` distribution
+- `resources/examples/default-bundle.md`: analysis of a representative bundled distribution root
 - `resources/checklist.md`: QA checklist for bundle creation and maintenance
 
 ---
@@ -95,7 +95,7 @@ Use this skill when:
 ### View Current Distribution
 
 ```bash
-tree agents/src/
+tree <distribution-root>/
 ```
 
 ### Create A Custom Bundle

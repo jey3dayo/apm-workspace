@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: Use when creating, migrating, or updating a managed skill for this `~/.apm` workspace, or when deciding where a new skill should live. Create skills in `~/.apm/catalog/.apm/skills/<id>/`, treat `~/.config/agents/src/**` as a mirror, and finish with `mise run stage-catalog`.
+description: Use when creating, migrating, or updating a managed skill for this `~/.apm` workspace, or when deciding where a new skill should live. Create skills in `~/.apm/catalog/.apm/skills/<id>/` and finish with `mise run stage-catalog`.
 ---
 
 # Skill Creator
@@ -14,16 +14,15 @@ Use it to create or update skills that belong to the managed catalog in this rep
 ## Use This Skill When
 
 - A user asks to create a new skill in this repository
-- A user wants to migrate a skill from runtime or mirror paths into the managed catalog
+- A user wants to migrate a skill from runtime paths into the managed catalog
 - A user wants to rename, split, or replace a managed skill
-- A user is unsure whether to work in `catalog/.apm/skills/`, `~/.config/agents/src/skills/`, or `~/.codex/skills/`
+- A user is unsure whether to work in `catalog/.apm/skills/` or `~/.codex/skills/`
 
 If the user is not yet sure whether the right artifact is a skill, agent, command, or rules file, use `knowledge-creator` first.
 
 ## Hard Rules
 
 - Author managed skills only in `~/.apm/catalog/.apm/skills/<id>/`
-- Treat `~/.config/agents/src/**` as a transitional mirror refreshed by `mise run stage-catalog`
 - Treat runtime targets such as `~/.codex/skills/**` and `~/.claude/skills/**` as deploy outputs, not editing surfaces
 - Keep the skill concise and focused on repeatable workflow guidance
 - Prefer editing an existing managed skill when the scope overlaps

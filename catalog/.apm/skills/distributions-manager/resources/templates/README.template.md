@@ -86,7 +86,7 @@ ln -s ../../../src/agents/[agent-name].md ./
 
 ## Notes
 
-- Use `agents/src/` as the base when reusing bundled assets
+- Use `<distribution-root>/` as the base when reusing bundled assets
 - Prefer relative symlinks
 - Do not reference removed legacy layer paths
 - Bundled `commands/` is not part of the active Home Manager deployment path

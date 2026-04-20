@@ -6,9 +6,9 @@ Custom distribution roots can use symlinks to reuse bundled source files without
 
 The safe current targets are:
 
-- `agents/src/skills/...`
-- `agents/src/rules/...`
-- `agents/src/agents/...`
+- `<distribution-root>/skills/...`
+- `<distribution-root>/rules/...`
+- `<distribution-root>/agents/...`
 
 Do not point symlinks at removed legacy layers.
 
@@ -23,7 +23,7 @@ Do not point symlinks at removed legacy layers.
 ln -s ../../../src/skills/react ./
 
 # Bad
-ln -s /home/j138/.config/agents/src/skills/react ./
+ln -s /absolute/path/to/distribution-root/skills/react ./
 ```
 
 Why:
@@ -96,7 +96,7 @@ find bundles/my-bundle -type l -exec test ! -e {} \; -print
 ### Absolute Paths
 
 ```bash
-ln -s /home/j138/.config/agents/src/skills/react ./
+ln -s /absolute/path/to/distribution-root/skills/react ./
 ```
 
 ### Generated Deployment Paths

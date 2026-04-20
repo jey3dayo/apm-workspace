@@ -8,7 +8,7 @@ The current distributions runtime uses a two-tier priority model for skill resol
 Distribution > External
 ```
 
-- Distribution: bundled assets under `agents/src/`, discovered via `distributionsPath`
+- Distribution: bundled assets under `<distribution-root>/`, discovered via `distributionsPath`
 - External: flake-input sources configured in `programs.agent-skills.sources`
 
 `skills.enable = null` means "all discovered skills". In that mode, the Home Manager module keeps the full merged catalog instead of narrowing to bundled skills only, so discovered external skills and their source-scoped top-level assets remain deployable.
@@ -19,7 +19,7 @@ Distribution > External
 
 ### Meaning
 
-- Distribution (`agents/src/skills/`): highest priority, wins on duplicate skill IDs
+- Distribution (`<distribution-root>/skills/`): highest priority, wins on duplicate skill IDs
 - External (`sources.<name>.path`): lower priority, used when no bundled skill with the same ID exists
 
 ### Nix Implementation
@@ -46,7 +46,7 @@ discoverCatalog =
   externalSkills // distributionResult.skills;
 ```
 
-Because `//` is right-biased, bundled skills from `agents/src/skills/` override external skills with the same ID.
+Because `//` is right-biased, bundled skills from `<distribution-root>/skills/` override external skills with the same ID.
 
 ### Selection Behavior
 
@@ -78,7 +78,7 @@ selectedSkills =
 ### Scenario 1: Same Skill in Distribution and External
 
 ```text
-agents/src/skills/react/            (Distribution)
+<distribution-root>/skills/react/   (Distribution)
 <flake-input>/skills/react/         (External)
 ```
 
@@ -88,7 +88,7 @@ agents/src/skills/react/            (Distribution)
 {
   react = {
     id = "react";
-    path = /path/to/agents/src/skills/react;
+    path = /path/to/<distribution-root>/skills/react;
     source = "distribution";
   };
 }
@@ -127,7 +127,7 @@ External source is used because there is no bundled skill with the same ID.
 ### Scenario 3: Skill in Distribution Only
 
 ```text
-agents/src/skills/custom-skill/  (Distribution)
+<distribution-root>/skills/custom-skill/  (Distribution)
 ```
 
 ### Resolution
@@ -136,7 +136,7 @@ agents/src/skills/custom-skill/  (Distribution)
 {
   custom-skill = {
     id = "custom-skill";
-    path = /path/to/agents/src/skills/custom-skill;
+    path = /path/to/<distribution-root>/skills/custom-skill;
     source = "distribution";
   };
 }
@@ -153,11 +153,11 @@ Distribution is used.
 ### Use Case 1: Ship a Bundled Default
 
 ```text
-agents/src/skills/react/
+<distribution-root>/skills/react/
 <flake-input>/skills/react/
 ```
 
-Result: the bundled `agents/src/skills/react/` version is selected.
+Result: the bundled `<distribution-root>/skills/react/` version is selected.
 
 ---
 
@@ -188,12 +188,12 @@ Result: all discovered bundled and external skills are selected.
 If a bundled entry points back into generated deployment output, you can create confusing self-references:
 
 ```text
-agents/src/skills/... -> ~/.claude/skills/...
+<distribution-root>/skills/... -> ~/.claude/skills/...
 ```
 
 ### Solution
 
-Keep bundled entries rooted in real source paths under `agents/src/` or in external source trees. `scanDistribution` reads static filesystem paths before deployment output exists.
+Keep bundled entries rooted in real source paths under `<distribution-root>/` or in external source trees. `scanDistribution` reads static filesystem paths before deployment output exists.
 
 ### Scan Order
 
@@ -206,7 +206,7 @@ Keep bundled entries rooted in real source paths under `agents/src/` or in exter
 ### Path Resolution
 
 ```text
-agents/src/skills/my-skill -> ../../some-real-source/my-skill
+<distribution-root>/skills/my-skill -> ../../some-real-source/my-skill
 ```
 
 `readDir` and `pathExists` resolve the symlink target at the filesystem layer. Broken links are skipped because `pathExists (entryPath + "/SKILL.md")` evaluates to `false`.
@@ -246,12 +246,12 @@ If external sources are configured and discovered, their source names should sti
 nix eval --show-trace --json --impure --expr '
   let
     pkgs = import <nixpkgs> {};
-    agentLib = import ~/.config/agents/nix/lib.nix {
+    agentLib = import /path/to/agents/nix/lib.nix {
       inherit pkgs;
       nixlib = pkgs.lib;
     };
     catalog = agentLib.discoverCatalog {
-      distributionsPath = ~/.config/agents/src;
+      distributionsPath = /path/to/<distribution-root>;
       sources = {};
     };
   in
@@ -263,7 +263,7 @@ nix eval --show-trace --json --impure --expr '
 
 ## Best Practices
 
-1. Treat `agents/src/` as the bundled source of truth.
+1. Treat `<distribution-root>/` as the bundled source of truth.
 2. Use external sources for additive skills or upstream imports.
 3. Expect `skills.enable = null` to keep all discovered skills, not just bundled ones.
 4. Use real current paths in docs and symlinks; do not reference removed legacy layers.
@@ -273,10 +273,10 @@ nix eval --show-trace --json --impure --expr '
 
 ## Priority Matrix
 
-| Skill Location        | Priority | Source Tag Example    | Overwrites |
-| --------------------- | -------- | --------------------- | ---------- |
-| `agents/src/skills/`  | Highest  | `distribution`        | External   |
-| `sources.<name>.path` | Lower    | `vercel-agent-skills` | None       |
+| Skill Location                | Priority | Source Tag Example    | Overwrites |
+| ----------------------------- | -------- | --------------------- | ---------- |
+| `<distribution-root>/skills/` | Highest  | `distribution`        | External   |
+| `sources.<name>.path`         | Lower    | `vercel-agent-skills` | None       |
 
 ---
 
@@ -285,8 +285,8 @@ nix eval --show-trace --json --impure --expr '
 ### Edge Case 1: Two Bundled Entries Point to the Same Target
 
 ```text
-agents/src/skills/react -> ../../shared/react
-agents/src/skills/react-copy -> ../../shared/react
+<distribution-root>/skills/react -> ../../shared/react
+<distribution-root>/skills/react-copy -> ../../shared/react
 ```
 
 Result: both IDs are scanned because IDs come from directory names, not resolved target paths.
@@ -296,17 +296,17 @@ Result: both IDs are scanned because IDs come from directory names, not resolved
 ### Edge Case 2: Bundled Entry Points into an External Checkout
 
 ```text
-agents/src/skills/my-skill -> ../../vendor/my-skill
+<distribution-root>/skills/my-skill -> ../../vendor/my-skill
 ```
 
-Result: the entry is still tagged as `distribution`, because it was discovered from `agents/src/skills/`, and it wins over an external skill with the same ID.
+Result: the entry is still tagged as `distribution`, because it was discovered from `<distribution-root>/skills/`, and it wins over an external skill with the same ID.
 
 ---
 
 ### Edge Case 3: Broken Bundled Symlink
 
 ```text
-agents/src/skills/broken -> ../../missing-skill
+<distribution-root>/skills/broken -> ../../missing-skill
 ```
 
 `pathExists (entryPath + "/SKILL.md")` returns `false`, so the broken entry is ignored and not added to the catalog.

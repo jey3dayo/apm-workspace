@@ -55,7 +55,7 @@ When a user says "fix what is in `~/.apm`", first decide which layer actually ow
 - edit `~/.apm/README.md`, `llms.md`, `apm.yml`, or `apm.lock.yaml` for workspace-owned files that live only in the `~/.apm` repo
 
 Treat `~/.apm/catalog/` as the **authoring source of truth** for managed skills and shared guidance.
-Treat `~/.config/agents/**` as deprecated and optional; do not depend on it being present.
+Do not reference removed legacy agent directories; the active managed workflow no longer depends on them.
 For new managed skill authoring, prefer `skill-creator`; use `apm-usage` for broader catalog and manifest routing.
 
 For external skills, the source of truth is the upstream ref in `~/.apm/apm.yml`.  

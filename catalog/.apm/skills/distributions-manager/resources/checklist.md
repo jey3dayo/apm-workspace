@@ -44,7 +44,7 @@ find bundles/<bundle-name>/skills -type l -exec sh -c '
 ## Rules
 
 - [ ] Every bundled rule is a valid markdown file
-- [ ] Reused rules point to `agents/src/rules/...` or another real source path
+- [ ] Reused rules point to `<distribution-root>/rules/...` or another real source path
 - [ ] Nested rule paths are intentional
 
 ---
@@ -52,7 +52,7 @@ find bundles/<bundle-name>/skills -type l -exec sh -c '
 ## Agents
 
 - [ ] Every bundled agent is a valid markdown file or directory of markdown files
-- [ ] Reused agents point to `agents/src/agents/...` or another real source path
+- [ ] Reused agents point to `<distribution-root>/agents/...` or another real source path
 - [ ] Nested agent paths are intentional
 
 ---
@@ -78,7 +78,7 @@ find bundles/<bundle-name>/skills -type l -exec sh -c '
 ## Documentation
 
 - [ ] README reflects the current contents
-- [ ] Examples use `agents/src/` when referring to bundled source paths
+- [ ] Examples use `<distribution-root>/` when referring to bundled source paths
 - [ ] Templates do not mention removed layers
 - [ ] Limitations are documented when a feature is not active in the runtime
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-`agents/src/` is the current bundled distribution root used by this repository.
+`<distribution-root>/` is a representative bundled distribution root for the legacy Home Manager flow.
 
 It is the source of truth for:
 
@@ -10,14 +10,14 @@ It is the source of truth for:
 - bundled rules
 - bundled agents
 
-The current Home Manager module does not deploy bundled `agents/src/commands/`.
+The current Home Manager module does not deploy bundled `<distribution-root>/commands/`.
 
 ---
 
 ## Structure
 
 ```text
-agents/src/
+<distribution-root>/
 ├── skills/   (48 directories)
 ├── rules/    (2 markdown files, including nested paths)
 ├── agents/   (23 markdown files, including nested agent files)
@@ -42,7 +42,7 @@ agents/src/
 
 ### Runtime Behavior
 
-- scanned from `agents/src/skills/`
+- scanned from `<distribution-root>/skills/`
 - tagged as `source = "distribution"`
 - override external skills with the same ID
 
@@ -61,7 +61,7 @@ agents/src/
 
 ### Runtime Behavior
 
-- scanned from `agents/src/rules/`
+- scanned from `<distribution-root>/rules/`
 - linked directly into target rules directories
 
 ---
@@ -81,7 +81,7 @@ agents/src/
 
 ### Runtime Behavior
 
-- scanned from `agents/src/agents/`
+- scanned from `<distribution-root>/agents/`
 - merged as `externalAgents // distributionAgents`
 - bundled agents win on duplicate IDs
 
@@ -91,11 +91,11 @@ agents/src/
 
 ### Current State
 
-- `agents/src/commands/` still exists in the tree
+- `<distribution-root>/commands/` may still exist in the tree
 - the active Home Manager module does not link bundled commands from `distributionResult.commands`
 - top-level commands currently come from external `commandsPath` sources
 
-That means `agents/src/commands/` should not be documented as an active bundled deployment layer.
+That means `<distribution-root>/commands/` should not be documented as an active bundled deployment layer.
 
 ---
 
@@ -116,6 +116,6 @@ Expected observations:
 
 ## Notes
 
-- Treat `agents/src/` as the canonical bundled source tree
+- Treat `<distribution-root>/` as the canonical bundled source tree
 - Do not reintroduce removed legacy layer names into active docs
 - If you need bundled command support again, it requires runtime changes, not just documentation changes

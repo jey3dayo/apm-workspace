@@ -4,7 +4,7 @@
 
 The current distributions runtime is implemented across `agents/nix/lib.nix` and `agents/nix/module.nix`.
 
-- Bundled assets live under `agents/src/`
+- Bundled assets live under a bundle root such as `<distribution-root>/`
 - External assets come from flake-input `sources`
 - Skill precedence is `Distribution > External`
 - `skills.enable = null` means "select all discovered skills"
@@ -16,7 +16,7 @@ The active deployment paths are:
 - Agents: merged as `externalAgents // distributionAgents`, so bundled agents win on conflicts
 - Commands: linked only from external top-level command sources selected through skill ownership
 
-`agents/src/commands/` is not part of the active Home Manager deployment path.
+`<distribution-root>/commands/` is not part of the active Home Manager deployment path.
 
 ---
 
@@ -24,7 +24,7 @@ The active deployment paths are:
 
 ### `scanDistribution`
 
-`scanDistribution` reads the bundled source tree under `agents/src/` and returns:
+`scanDistribution` reads the bundled source tree under `<distribution-root>/` and returns:
 
 ```nix
 {
@@ -38,15 +38,15 @@ The active deployment paths are:
 
 The active bundled assets are discovered from:
 
-- `agents/src/skills/`
-- `agents/src/rules/`
-- `agents/src/agents/`
+- `<distribution-root>/skills/`
+- `<distribution-root>/rules/`
+- `<distribution-root>/agents/`
 
 Skill entries are accepted when either of these layouts exists:
 
 ```text
-agents/src/skills/<skill-id>/SKILL.md
-agents/src/skills/<skill-id>/skills/SKILL.md
+<distribution-root>/skills/<skill-id>/SKILL.md
+<distribution-root>/skills/<skill-id>/skills/SKILL.md
 ```
 
 This lets the runtime handle both direct skill directories and nested source layouts.
@@ -81,7 +81,7 @@ discoverCatalog =
   externalSkills // distributionResult.skills;
 ```
 
-Because `//` is right-biased, bundled skills from `agents/src/skills/` override external skills with the same ID.
+Because `//` is right-biased, bundled skills from `<distribution-root>/skills/` override external skills with the same ID.
 
 ### `resolveSelectedSkills`
 
@@ -162,7 +162,7 @@ externalCommands = agentLib.discoverExternalAssets {
 That means:
 
 - command deployment is gated by which skill sources are selected
-- bundled `agents/src/commands/` entries are not linked by the Home Manager module
+- bundled `<distribution-root>/commands/` entries are not linked by the Home Manager module
 
 ---
 
@@ -171,7 +171,7 @@ That means:
 ### Bundled Source of Truth
 
 ```text
-agents/src/
+<distribution-root>/
 ├── skills/
 ├── rules/
 └── agents/
@@ -202,7 +202,7 @@ Distributions are scanned from static filesystem paths before Home Manager link 
 5. home.file links are generated
 ```
 
-Because Nix reads source paths first and deployment output later, bundled entries should point to real source paths under `agents/src/` or external checkouts, not to generated directories such as `~/.claude/skills/`.
+Because Nix reads source paths first and deployment output later, bundled entries should point to real source paths under `<distribution-root>/` or external checkouts, not to generated directories such as `~/.claude/skills/`.
 
 Broken symlinks are ignored because `pathExists` fails during scanning.
 
