@@ -7,8 +7,10 @@
   `millionco-react-doctor`, `anthropics-claude-code`, `epicenterhq-epicenter`
 - [x] Migrate second managed skill-only batch and remove their source/input/lock entries:
   `benjitaylor-agentation`, `tokoroten-prompt-review`, `trailofbits-supply-chain-risk-auditor`, `mizchi-chezmoi-dotfiles`
+- [x] Migrate third managed skill-only batch and remove their source/input/lock entries:
+  `nyosegawa-skills`, `trailofbits-agentic-actions-auditor`, `ui-ux-pro-max`
 - [ ] Migrate or retire remaining skill-only external repos, then remove their source/input/lock entries:
-  `openai-skills`, `vercel-agent-skills`, `vercel-agent-browser`, `ui-ux-pro-max`, `heyvhuang-ship-faster`, `nyosegawa-skills`, `trailofbits-agentic-actions-auditor`, `trailofbits-sharp-edges`
+  `openai-skills`, `vercel-agent-skills`, `vercel-agent-browser`, `heyvhuang-ship-faster`, `trailofbits-sharp-edges`
 - [ ] Migrate or retire remaining external repos that also carry non-skill assets before removal:
   `obra-superpowers`, `openai-codex-plugin-cc`, `lum1104-understand-anything`, `trailofbits-audit-context-building`, `trailofbits-static-analysis`
 - [ ] After each removal batch, reconcile `~/.apm/apm.yml` with `mise run migrate-external` and `mise run apply`

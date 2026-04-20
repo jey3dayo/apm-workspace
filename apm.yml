@@ -12,7 +12,6 @@ dependencies:
   - vercel-labs/agent-browser/skills/agent-browser#717d1b09e1c841a4c0206033886a1a861e3ca5d9
   - Heyvhuang/ship-faster/skills/cloudflare#64047d24e0ecb513a5aa879767d95ec7e0e44462
   - Heyvhuang/ship-faster/skills/tool-openclaw#64047d24e0ecb513a5aa879767d95ec7e0e44462
-  - nyosegawa/skills/skills/skill-auditor#c1048fe35403a3f273132306a4d49278f189c64b
   - obra/superpowers/skills/brainstorming#b55764852ac78870e65c6565fb585b6cd8b3c5c9
   - obra/superpowers/skills/dispatching-parallel-agents#b55764852ac78870e65c6565fb585b6cd8b3c5c9
   - obra/superpowers/skills/executing-plans#b55764852ac78870e65c6565fb585b6cd8b3c5c9
@@ -36,13 +35,11 @@ dependencies:
   - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-diff#716c3d60881b89bba2cfb4e713491f73471d880a
   - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-explain#716c3d60881b89bba2cfb4e713491f73471d880a
   - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-onboard#716c3d60881b89bba2cfb4e713491f73471d880a
-  - trailofbits/skills/plugins/agentic-actions-auditor/skills/agentic-actions-auditor#e8cc5baf9329ccb491bfa200e82eacbac83b1ead
   - trailofbits/skills/plugins/audit-context-building/skills/audit-context-building#e8cc5baf9329ccb491bfa200e82eacbac83b1ead
   - trailofbits/skills/plugins/sharp-edges/skills/sharp-edges#e8cc5baf9329ccb491bfa200e82eacbac83b1ead
   - trailofbits/skills/plugins/static-analysis/skills/codeql#e8cc5baf9329ccb491bfa200e82eacbac83b1ead
   - trailofbits/skills/plugins/static-analysis/skills/sarif-parsing#e8cc5baf9329ccb491bfa200e82eacbac83b1ead
   - trailofbits/skills/plugins/static-analysis/skills/semgrep#e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  - nextlevelbuilder/ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-max#b7e3af80f6e331f6fb456667b82b12cade7c9d35
   - jey3dayo/apm-workspace/catalog#main
   mcp: []
 scripts: {}

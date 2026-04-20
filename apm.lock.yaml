@@ -108,7 +108,7 @@ dependencies:
   content_hash: sha256:2b3faf132aafb668ccc57fd743aac0584e7ec6966402c4693b9e7c180db34cce
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: dc7b7aad27d4e43fb1eac1a2024cf41d785e1cfb
+  resolved_commit: eb4a8115f9f3a22f35f1d00c351b7d0a6ec23e1f
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
@@ -117,6 +117,7 @@ dependencies:
   - .claude/skills/agent-creator
   - .claude/skills/agentation
   - .claude/skills/agentation-self-driving
+  - .claude/skills/agentic-actions-auditor
   - .claude/skills/apm-usage
   - .claude/skills/atomic-commit
   - .claude/skills/cc-sdd
@@ -166,6 +167,7 @@ dependencies:
   - .claude/skills/rtk
   - .claude/skills/rules-creator
   - .claude/skills/similarity
+  - .claude/skills/skill-auditor
   - .claude/skills/skill-creator
   - .claude/skills/slide-docs
   - .claude/skills/supply-chain-risk-auditor
@@ -177,11 +179,13 @@ dependencies:
   - .claude/skills/tauri-webview-geometry
   - .claude/skills/tsr
   - .claude/skills/typescript
+  - .claude/skills/ui-ux-pro-max
   - .claude/skills/wezterm
   - .claude/skills/zsh
   - .config/opencode/skills/agent-creator
   - .config/opencode/skills/agentation
   - .config/opencode/skills/agentation-self-driving
+  - .config/opencode/skills/agentic-actions-auditor
   - .config/opencode/skills/apm-usage
   - .config/opencode/skills/atomic-commit
   - .config/opencode/skills/cc-sdd
@@ -231,6 +235,7 @@ dependencies:
   - .config/opencode/skills/rtk
   - .config/opencode/skills/rules-creator
   - .config/opencode/skills/similarity
+  - .config/opencode/skills/skill-auditor
   - .config/opencode/skills/skill-creator
   - .config/opencode/skills/slide-docs
   - .config/opencode/skills/supply-chain-risk-auditor
@@ -242,11 +247,13 @@ dependencies:
   - .config/opencode/skills/tauri-webview-geometry
   - .config/opencode/skills/tsr
   - .config/opencode/skills/typescript
+  - .config/opencode/skills/ui-ux-pro-max
   - .config/opencode/skills/wezterm
   - .config/opencode/skills/zsh
   - .copilot/skills/agent-creator
   - .copilot/skills/agentation
   - .copilot/skills/agentation-self-driving
+  - .copilot/skills/agentic-actions-auditor
   - .copilot/skills/apm-usage
   - .copilot/skills/atomic-commit
   - .copilot/skills/cc-sdd
@@ -296,6 +303,7 @@ dependencies:
   - .copilot/skills/rtk
   - .copilot/skills/rules-creator
   - .copilot/skills/similarity
+  - .copilot/skills/skill-auditor
   - .copilot/skills/skill-creator
   - .copilot/skills/slide-docs
   - .copilot/skills/supply-chain-risk-auditor
@@ -307,11 +315,13 @@ dependencies:
   - .copilot/skills/tauri-webview-geometry
   - .copilot/skills/tsr
   - .copilot/skills/typescript
+  - .copilot/skills/ui-ux-pro-max
   - .copilot/skills/wezterm
   - .copilot/skills/zsh
   - .cursor/skills/agent-creator
   - .cursor/skills/agentation
   - .cursor/skills/agentation-self-driving
+  - .cursor/skills/agentic-actions-auditor
   - .cursor/skills/apm-usage
   - .cursor/skills/atomic-commit
   - .cursor/skills/cc-sdd
@@ -361,6 +371,7 @@ dependencies:
   - .cursor/skills/rtk
   - .cursor/skills/rules-creator
   - .cursor/skills/similarity
+  - .cursor/skills/skill-auditor
   - .cursor/skills/skill-creator
   - .cursor/skills/slide-docs
   - .cursor/skills/supply-chain-risk-auditor
@@ -372,35 +383,10 @@ dependencies:
   - .cursor/skills/tauri-webview-geometry
   - .cursor/skills/tsr
   - .cursor/skills/typescript
+  - .cursor/skills/ui-ux-pro-max
   - .cursor/skills/wezterm
   - .cursor/skills/zsh
-  content_hash: sha256:df3b4b211338cd92d59562c56d8aa7cf1dd2895a5354a93b33af025c436b3ae4
-- repo_url: nextlevelbuilder/ui-ux-pro-max-skill
-  host: github.com
-  resolved_commit: b7e3af80f6e331f6fb456667b82b12cade7c9d35
-  resolved_ref: b7e3af80f6e331f6fb456667b82b12cade7c9d35
-  virtual_path: .claude/skills/ui-ux-pro-max
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/ui-ux-pro-max
-  - .config/opencode/skills/ui-ux-pro-max
-  - .copilot/skills/ui-ux-pro-max
-  - .cursor/skills/ui-ux-pro-max
-  content_hash: sha256:2628d41a146370363876f36f4af3a76abc342a31bb373fb3890817ea9f7ba9aa
-- repo_url: nyosegawa/skills
-  host: github.com
-  resolved_commit: c1048fe35403a3f273132306a4d49278f189c64b
-  resolved_ref: c1048fe35403a3f273132306a4d49278f189c64b
-  virtual_path: skills/skill-auditor
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/skill-auditor
-  - .config/opencode/skills/skill-auditor
-  - .copilot/skills/skill-auditor
-  - .cursor/skills/skill-auditor
-  content_hash: sha256:65a6f52fd391671fe6f334130290fd9c6787d2daeb22cdff55fa727977876e04
+  content_hash: sha256:a45dd8fc780edebca20df887b0c5bd40b1cabad0acf3ee18d757207b323d36e2
 - repo_url: obra/superpowers
   host: github.com
   resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
@@ -648,19 +634,6 @@ dependencies:
   - .copilot/skills/gh-fix-ci
   - .cursor/skills/gh-fix-ci
   content_hash: sha256:02b4d97e4bd91e342e3ec3efa06b7871097d6a64e8398f4ed5b69c64d8d902fb
-- repo_url: trailofbits/skills
-  host: github.com
-  resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  resolved_ref: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  virtual_path: plugins/agentic-actions-auditor/skills/agentic-actions-auditor
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/agentic-actions-auditor
-  - .config/opencode/skills/agentic-actions-auditor
-  - .copilot/skills/agentic-actions-auditor
-  - .cursor/skills/agentic-actions-auditor
-  content_hash: sha256:ab0e11b1379d38cee1284bbd88aae15acbfde04999dc4775d27fedfa612bdf7e
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
