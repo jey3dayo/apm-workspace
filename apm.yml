@@ -4,6 +4,6 @@ description: APM project for apm-workspace
 author: jey3dayo
 dependencies:
   apm:
-  - jey3dayo/apm-workspace/catalog#main
+    - jey3dayo/apm-workspace/catalog#main
   mcp: []
 scripts: {}

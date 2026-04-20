@@ -96,6 +96,9 @@ Describe "public command surface" {
     $miseToml | Should Match '\[tasks\.ci\]'
     $miseToml | Should Match '\[tasks\."catalog:release"\]'
     $miseToml | Should Match '\[tasks\."catalog:tidy"\]'
+    $miseToml | Should Match 'run_windows = "& \\"\$env:USERPROFILE\\\\\.config\\\\scripts\\\\apm-workspace\.ps1\\" apply"'
+    $miseToml | Should Match 'run_windows = "@\(fd -e md --exclude catalog\) \| ForEach-Object \{ prettier --write --log-level error \$_ \*> \$null \}"'
+    $miseToml | Should Not Match '%USERPROFILE%'
   }
 
   It "describes the catalog readme without legacy mirror wording" {
@@ -130,6 +133,7 @@ Describe "public command surface" {
   }
 
   It "runs catalog release as stage, release gate, and register flow" {
+    Mock Ensure-WorkspaceMiseFile {}
     Mock Invoke-StageCatalog {}
     Mock Assert-CatalogReleaseReady {}
     Mock Invoke-RegisterCatalog {}
