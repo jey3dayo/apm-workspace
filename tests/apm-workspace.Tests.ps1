@@ -59,13 +59,14 @@ scripts: {}
 
 Describe "public command surface" {
   It "shows only catalog commands in help output" {
+    $legacyMirrorPattern = 'transitional' + ' mirror'
     $help = & powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\j138c\.config\scripts\apm-workspace.ps1 help | Out-String
 
     $help | Should Match "validate-catalog"
     $help | Should Match "stage-catalog"
     $help | Should Match "register-catalog"
     $help | Should Match "release-catalog"
-    $help | Should Not Match "transitional mirror"
+    $help | Should Not Match $legacyMirrorPattern
     $help | Should Not Match "validate-internal"
     $help | Should Not Match "stage-internal"
     $help | Should Not Match "register-internal"
@@ -98,10 +99,34 @@ Describe "public command surface" {
   }
 
   It "describes the catalog readme without legacy mirror wording" {
+    $legacyMirrorPattern = 'transitional' + ' mirror'
     $readme = Get-CatalogReadmeContent
 
     $readme | Should Match '~/.apm/catalog/.apm/skills/<id>/'
-    $readme | Should Not Match 'transitional mirror'
+    $readme | Should Not Match $legacyMirrorPattern
+  }
+
+  It "does not reference removed agents src paths in agent-facing docs" {
+    $removedAgentsRoot = '~/.config/' + 'agents'
+    $removedAgentsSrcPattern = [regex]::Escape($removedAgentsRoot) + '/src'
+    $legacyMirrorPattern = 'transitional\s+' + 'mirror'
+    $files = @(
+      'C:\Users\j138c\.apm\catalog\.apm\skills\apm-usage\SKILL.md'
+      'C:\Users\j138c\.apm\catalog\.apm\skills\skill-creator\SKILL.md'
+      'C:\Users\j138c\.apm\catalog\.apm\skills\docs-index\indexes\agents-index.md'
+      'C:\Users\j138c\.apm\catalog\.apm\skills\nix-dotfiles\SKILL.md'
+      'C:\Users\j138c\.apm\catalog\.apm\skills\nix-dotfiles\README.md'
+      'C:\Users\j138c\.apm\catalog\.apm\skills\nix-dotfiles\references\commands.md'
+      'C:\Users\j138c\.apm\catalog\.apm\skills\nix-dotfiles\references\troubleshooting.md'
+      'C:\Users\j138c\.apm\catalog\.apm\skills\rtk\SKILL.md'
+      'C:\Users\j138c\.apm\catalog\.apm\skills\rtk\references\command-reference.md'
+    )
+
+    foreach ($file in $files) {
+      $content = Get-Content -LiteralPath $file -Raw
+      $content | Should Not Match $removedAgentsSrcPattern
+      $content | Should Not Match $legacyMirrorPattern
+    }
   }
 
   It "runs catalog release as stage, release gate, and register flow" {
