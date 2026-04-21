@@ -4,5 +4,7 @@
 /.tmp-review-workspace*/
 /testResults.xml
 /config.json
-/catalog/.apm/
+!/catalog/.apm/
+/catalog/.apm/*
+!/catalog/.apm/.gitkeep
 /.github/skills/
