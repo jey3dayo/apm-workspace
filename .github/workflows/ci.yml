@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    paths:
+      - ".github/workflows/ci.yml"
+      - "README.md"
+      - "llms.md"
+      - "apm.yml"
+      - "apm.lock.yaml"
+      - "mise.toml"
+      - "docs/**"
+      - "scripts/**"
+      - "tests/**"
+      - "catalog/**"
+  pull_request:
+    paths:
+      - ".github/workflows/ci.yml"
+      - "README.md"
+      - "llms.md"
+      - "apm.yml"
+      - "apm.lock.yaml"
+      - "mise.toml"
+      - "docs/**"
+      - "scripts/**"
+      - "tests/**"
+      - "catalog/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up mise
+        uses: jdx/mise-action@v4
+        with:
+          cache: true
+
+      - name: Install workspace tools
+        run: mise install
+
+      - name: Validate local scripts
+        shell: bash
+        run: |
+          bash -n ./scripts/apm-workspace.sh
+          pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 help >/dev/null
+
+      - name: Run workspace checks
+        run: mise run ci:check
