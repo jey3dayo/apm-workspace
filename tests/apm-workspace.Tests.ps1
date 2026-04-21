@@ -134,7 +134,7 @@ Describe "public command surface" {
     ($targets | Where-Object Name -eq "cursor").ConfigName | Should Be "AGENTS.md"
   }
 
-  It "normalizes codex skill names without creating duplicate aliases" {
+  It "normalizes codex skill names from superpowers aliases" {
     Format-SkillName -Target "claude" -SourceSkillId "superpowers:brainstorming" | Should Be "superpowers:brainstorming"
     Format-SkillName -Target "codex" -SourceSkillId "superpowers:brainstorming" | Should Be "brainstorming"
   }
@@ -159,7 +159,7 @@ Describe "public command surface" {
     $miseToml | Should Match 'run = "bash ./scripts/apm-workspace.sh apply"'
     $miseToml | Should Match 'run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 apply"'
     $miseToml | Should Match 'replace-bold-headings\.ts" ./catalog/skills'
-    $miseToml | Should Not Match 'Format, validate, and distribute the ~/.apm workspace locally'
+    $miseToml | Should Match '(?s)\[tasks\.ci\].*?\{ task = "apply" \}.*?\{ task = "doctor" \}'
     $miseToml | Should Not Match 'APM_BOOTSTRAP_REPO'
   }
 
@@ -193,13 +193,16 @@ Describe "public command surface" {
       $content | Should Not Match $legacyMirrorPattern
     }
 
+  }
+
+  It "documents external skill workflow references in README and TODO" {
     $readme = Get-Content -LiteralPath C:\Users\j138c\.apm\README.md -Raw
     $todo = Get-Content -LiteralPath C:\Users\j138c\.apm\TODO.md -Raw
 
     $readme | Should Match 'apm add'
     $readme | Should Match 'mise run apply'
     $readme | Should Match 'mise run sync'
-    $todo | Should Match 'formatSkillName'
+    $todo | Should Match 'target normalization'
   }
 
   It "runs catalog release as stage, release gate, and register flow" {
