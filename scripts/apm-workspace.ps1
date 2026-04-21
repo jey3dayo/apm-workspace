@@ -652,6 +652,17 @@ function Format-SkillName {
 }
 
 function Get-UnpinnedExternalReferences {
+  $result = New-Object System.Collections.Generic.List[string]
+  foreach ($reference in (Get-ManifestApmDependencyReferences)) {
+    if ($reference -notmatch '#') {
+      $result.Add($reference)
+    }
+  }
+
+  return $result.ToArray()
+}
+
+function Get-ManifestApmDependencyReferences {
   $manifestPath = Join-Path $WorkspaceDir "apm.yml"
   if (-not (Test-Path -LiteralPath $manifestPath)) {
     return @()
@@ -719,7 +730,7 @@ function Get-UnpinnedExternalReferences {
       if ($reference -match '^\.\/') {
         continue
       }
-      if ($reference -notmatch '#') {
+      if (-not $result.Contains($reference)) {
         $result.Add($reference)
       }
     }
@@ -749,22 +760,338 @@ function Get-ManagedCatalogSkillInventory {
 }
 
 function Get-ManifestReferenceKeys {
-  $manifestPath = Join-Path $WorkspaceDir "apm.yml"
   $keys = New-Object 'System.Collections.Generic.HashSet[string]'
-  if (-not (Test-Path -LiteralPath $manifestPath)) {
-    return $keys
-  }
-
-  foreach ($line in (Get-Content -LiteralPath $manifestPath)) {
-    if ($line -match '^\s*-\s+(\S+)\s*$') {
-      $reference = $Matches[1]
-      $null = $keys.Add($reference)
-      $baseReference = ($reference -replace '#.*$', '')
-      $null = $keys.Add($baseReference)
-    }
+  foreach ($reference in (Get-ManifestApmDependencyReferences)) {
+    $null = $keys.Add($reference)
+    $baseReference = ($reference -replace '#.*$', '')
+    $null = $keys.Add($baseReference)
   }
 
   return $keys
+}
+
+function New-TemporaryDirectory {
+  param(
+    [string]$Prefix = "apm-temp"
+  )
+
+  $path = Join-Path ([System.IO.Path]::GetTempPath()) ("{0}-{1}" -f $Prefix, ([guid]::NewGuid().ToString("N")))
+  New-Item -ItemType Directory -Path $path -Force | Out-Null
+  return $path
+}
+
+function Get-ApmModulesRoot {
+  return (Join-Path $WorkspaceDir "apm_modules")
+}
+
+function Convert-ReferencePathToSegments {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Value
+  )
+
+  $segments = @($Value -split '/')
+  if (-not $segments -or $segments.Count -eq 0) {
+    throw "Invalid dependency path: $Value"
+  }
+
+  foreach ($segment in $segments) {
+    if ([string]::IsNullOrWhiteSpace($segment) -or $segment -in @(".", "..")) {
+      throw "Invalid dependency path: $Value"
+    }
+
+    if ($segment -notmatch '^[A-Za-z0-9._-]+$') {
+      throw "Invalid dependency path: $Value"
+    }
+  }
+
+  return $segments
+}
+
+function Get-CanonicalLockRecordReference {
+  param(
+    [Parameter(Mandatory = $true)]
+    [pscustomobject]$Record
+  )
+
+  if ([string]::IsNullOrWhiteSpace($Record.Path)) {
+    return $Record.Repo
+  }
+
+  return "{0}/{1}" -f $Record.Repo, $Record.Path
+}
+
+function Get-ExternalSkillInstallPath {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$RepoUrl,
+
+    [string]$VirtualPath
+  )
+
+  $installPath = Get-ApmModulesRoot
+  foreach ($segment in (Convert-ReferencePathToSegments -Value $RepoUrl)) {
+    $installPath = Join-Path $installPath $segment
+  }
+
+  if (-not [string]::IsNullOrWhiteSpace($VirtualPath)) {
+    foreach ($segment in (Convert-ReferencePathToSegments -Value $VirtualPath)) {
+      $installPath = Join-Path $installPath $segment
+    }
+  }
+
+  return $installPath
+}
+
+function Get-ExternalSkillId {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$RepoUrl,
+
+    [string]$VirtualPath
+  )
+
+  $sourceValue = if ([string]::IsNullOrWhiteSpace($VirtualPath)) { $RepoUrl } else { $VirtualPath }
+  $trimmedValue = $sourceValue.TrimEnd('\', '/')
+  $skillId = Split-Path -Leaf $trimmedValue
+  Test-SkillId -SkillId $skillId
+  return $skillId
+}
+
+function Get-PersonalSkillRecords {
+  $result = New-Object System.Collections.Generic.List[object]
+  foreach ($skillId in (Get-ManagedSkillIds)) {
+    $result.Add([pscustomobject]@{
+        SourceKind = "personal"
+        SourceSkillId = $skillId
+        SourcePath = Get-ManagedSkillContentDir -SkillId $skillId
+      })
+  }
+
+  return $result.ToArray()
+}
+
+function Get-ExternalSkillRecords {
+  $manifestReferences = @(Get-ManifestApmDependencyReferences)
+  if ($manifestReferences.Count -eq 0) {
+    return @()
+  }
+
+  $manifestReferenceKeys = Get-ManifestReferenceKeys
+  $matchedReferences = New-Object 'System.Collections.Generic.HashSet[string]'
+  $seenCanonical = New-Object 'System.Collections.Generic.HashSet[string]'
+  $result = New-Object System.Collections.Generic.List[object]
+
+  foreach ($record in (Get-LockedExternalSkillRecords)) {
+    $canonicalReference = Get-CanonicalLockRecordReference -Record $record
+    if (-not ($manifestReferenceKeys.Contains($canonicalReference) -or $manifestReferenceKeys.Contains($record.Repo))) {
+      continue
+    }
+
+    $null = $matchedReferences.Add($canonicalReference)
+    $null = $matchedReferences.Add($record.Repo)
+    if (-not $seenCanonical.Add($canonicalReference)) {
+      continue
+    }
+
+    $sourcePath = Get-ExternalSkillInstallPath -RepoUrl $record.Repo -VirtualPath $record.Path
+    if (-not (Test-Path -LiteralPath $sourcePath)) {
+      throw "External dependency is not available in local apm_modules: $canonicalReference ($sourcePath). Run 'mise run update' first."
+    }
+
+    $skillFile = Join-Path $sourcePath "SKILL.md"
+    if (-not (Test-Path -LiteralPath $skillFile)) {
+      continue
+    }
+
+    $result.Add([pscustomobject]@{
+        SourceKind = "external"
+        SourceSkillId = Get-ExternalSkillId -RepoUrl $record.Repo -VirtualPath $record.Path
+        SourcePath = $sourcePath
+        CanonicalReference = $canonicalReference
+      })
+  }
+
+  foreach ($reference in $manifestReferences) {
+    $baseReference = ($reference -replace '#.*$', '')
+    if (-not $matchedReferences.Contains($reference) -and -not $matchedReferences.Contains($baseReference)) {
+      throw "Manifest dependency is missing from apm.lock.yaml: $reference"
+    }
+  }
+
+  return $result.ToArray()
+}
+
+function Build-DeploymentPlanEntries {
+  param(
+    [Parameter(Mandatory = $true)]
+    [object[]]$SkillRecords,
+
+    [object[]]$Targets = @(Get-ManagedCatalogRuntimeTargets)
+  )
+
+  $result = New-Object System.Collections.Generic.List[object]
+  foreach ($target in $Targets) {
+    foreach ($skillRecord in $SkillRecords) {
+      $result.Add([pscustomobject]@{
+          Target = $target.Name
+          TargetRoot = $target.Root
+          SourceKind = $skillRecord.SourceKind
+          SourceSkillId = $skillRecord.SourceSkillId
+          SourcePath = $skillRecord.SourcePath
+          DeployedSkillName = Format-SkillName -Target $target.Name -SourceSkillId $skillRecord.SourceSkillId
+        })
+    }
+  }
+
+  return $result.ToArray()
+}
+
+function Validate-DeploymentCollisions {
+  param(
+    [Parameter(Mandatory = $true)]
+    [object[]]$SkillRecords,
+
+    [object[]]$Targets = @(Get-ManagedCatalogRuntimeTargets)
+  )
+
+  $sourceOwners = @{}
+  foreach ($skillRecord in $SkillRecords) {
+    if ($sourceOwners.ContainsKey($skillRecord.SourceSkillId)) {
+      $existing = $sourceOwners[$skillRecord.SourceSkillId]
+      throw "Duplicate source skill id '$($skillRecord.SourceSkillId)' from $($existing.SourceKind) ($($existing.SourcePath)) and $($skillRecord.SourceKind) ($($skillRecord.SourcePath))."
+    }
+
+    $sourceOwners[$skillRecord.SourceSkillId] = $skillRecord
+  }
+
+  $plannedNames = @{}
+  foreach ($entry in (Build-DeploymentPlanEntries -SkillRecords $SkillRecords -Targets $Targets)) {
+    $collisionKey = "{0}|{1}" -f $entry.Target, $entry.DeployedSkillName
+    if ($plannedNames.ContainsKey($collisionKey)) {
+      $existing = $plannedNames[$collisionKey]
+      throw "Deployment collision for target '$($entry.Target)': '$($existing.SourceSkillId)' and '$($entry.SourceSkillId)' both deploy as '$($entry.DeployedSkillName)'."
+    }
+
+    $plannedNames[$collisionKey] = $entry
+  }
+}
+
+function Get-StagedTargetSkillsRoot {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$StageRoot,
+
+    [Parameter(Mandatory = $true)]
+    [string]$TargetName
+  )
+
+  return (Join-Path (Join-Path $StageRoot $TargetName) "skills")
+}
+
+function Get-StagedSkillDestinationPath {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$StageRoot,
+
+    [Parameter(Mandatory = $true)]
+    [string]$TargetName,
+
+    [Parameter(Mandatory = $true)]
+    [string]$DeployedSkillName
+  )
+
+  $destination = Get-StagedTargetSkillsRoot -StageRoot $StageRoot -TargetName $TargetName
+  foreach ($segment in (Convert-SkillIdToPathSegments -SkillId $DeployedSkillName)) {
+    $destination = Join-Path $destination $segment
+  }
+
+  return $destination
+}
+
+function Stage-TargetSkillRecords {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$StageRoot,
+
+    [Parameter(Mandatory = $true)]
+    [object[]]$SkillRecords,
+
+    [object[]]$Targets = @(Get-ManagedCatalogRuntimeTargets)
+  )
+
+  New-Item -ItemType Directory -Path $StageRoot -Force | Out-Null
+  foreach ($target in $Targets) {
+    New-Item -ItemType Directory -Path (Get-StagedTargetSkillsRoot -StageRoot $StageRoot -TargetName $target.Name) -Force | Out-Null
+  }
+
+  $planEntries = @(Build-DeploymentPlanEntries -SkillRecords $SkillRecords -Targets $Targets)
+  foreach ($entry in $planEntries) {
+    $destinationPath = Get-StagedSkillDestinationPath -StageRoot $StageRoot -TargetName $entry.Target -DeployedSkillName $entry.DeployedSkillName
+    Copy-DirectoryContents -SourceDir $entry.SourcePath -DestinationDir $destinationPath
+  }
+
+  return $planEntries
+}
+
+function Build-TargetSkillTrees {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$StageRoot,
+
+    [object[]]$Targets = @(Get-ManagedCatalogRuntimeTargets)
+  )
+
+  $personalSkillRecords = @(Get-PersonalSkillRecords)
+  $externalSkillRecords = @(Get-ExternalSkillRecords)
+  $skillRecords = @($personalSkillRecords + $externalSkillRecords)
+
+  Validate-DeploymentCollisions -SkillRecords $skillRecords -Targets $Targets
+  return @(Stage-TargetSkillRecords -StageRoot $StageRoot -SkillRecords $skillRecords -Targets $Targets)
+}
+
+function Replace-SkillTargetsFromStage {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$StageRoot,
+
+    [object[]]$Targets = @(Get-ManagedCatalogRuntimeTargets)
+  )
+
+  foreach ($target in $Targets) {
+    New-Item -ItemType Directory -Path $target.Root -Force | Out-Null
+
+    $stagedSkillsRoot = Get-StagedTargetSkillsRoot -StageRoot $StageRoot -TargetName $target.Name
+    if (-not (Test-Path -LiteralPath $stagedSkillsRoot)) {
+      New-Item -ItemType Directory -Path $stagedSkillsRoot -Force | Out-Null
+    }
+
+    $destinationSkillsRoot = Join-Path $target.Root "skills"
+    $backupSkillsRoot = Join-Path $target.Root (".skills.apm-backup-{0}" -f ([guid]::NewGuid().ToString("N")))
+
+    if (Test-Path -LiteralPath $backupSkillsRoot) {
+      Remove-Item -LiteralPath $backupSkillsRoot -Recurse -Force
+    }
+
+    if (Test-Path -LiteralPath $destinationSkillsRoot) {
+      Move-Item -LiteralPath $destinationSkillsRoot -Destination $backupSkillsRoot
+    }
+
+    try {
+      Move-Item -LiteralPath $stagedSkillsRoot -Destination $destinationSkillsRoot
+    }
+    catch {
+      if ((-not (Test-Path -LiteralPath $destinationSkillsRoot)) -and (Test-Path -LiteralPath $backupSkillsRoot)) {
+        Move-Item -LiteralPath $backupSkillsRoot -Destination $destinationSkillsRoot
+      }
+      throw
+    }
+    finally {
+      if (Test-Path -LiteralPath $backupSkillsRoot) {
+        Remove-Item -LiteralPath $backupSkillsRoot -Recurse -Force
+      }
+    }
+  }
 }
 
 function Invoke-PinExternal {
@@ -809,16 +1136,26 @@ function Invoke-Apply {
   Ensure-WorkspaceRepo
   Ensure-WorkspaceScaffold
   Invoke-ValidateCatalog
+  Ensure-WorkspaceMiseFile
 
   if (Test-ManifestHasLocalPackages) {
     throw "apm 0.8.11 cannot deploy ./packages/* dependencies at user scope yet. Remove local package refs from ~/.apm/apm.yml and keep the global manifest on upstream refs such as jey3dayo/apm-workspace/catalog#main."
   }
 
-  Remove-InternalTargetReparsePoints -SkillIds @(Get-InternalCleanupSkillIds)
-  Invoke-WorkspaceInstallCommand -InstallArgs @("-g")
+  $stageDir = New-TemporaryDirectory -Prefix "apm-apply"
+  try {
+    $null = Build-TargetSkillTrees -StageRoot $stageDir
+    Sync-ManagedCatalogRuntimeAssets
+    Replace-SkillTargetsFromStage -StageRoot $stageDir
+  }
+  finally {
+    if (Test-Path -LiteralPath $stageDir) {
+      Remove-Item -LiteralPath $stageDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+  }
+
   Normalize-WorkspaceGitignore
   Invoke-CodexCompile
-  Sync-ManagedCatalogRuntimeAssets
 }
 
 function Invoke-Update {
