@@ -1,7 +1,9 @@
 $ErrorActionPreference = "Stop"
 
 $env:APM_WORKSPACE_LIB_ONLY = "1"
-. "C:\Users\j138c\.apm\scripts\apm-workspace.ps1"
+$scriptPath = Join-Path $PSScriptRoot ".."
+$scriptPath = Join-Path $scriptPath "scripts/apm-workspace.ps1"
+. (Resolve-Path -LiteralPath $scriptPath).Path
 Remove-Item Env:APM_WORKSPACE_LIB_ONLY -ErrorAction SilentlyContinue
 
 Describe "catalog helpers" {
@@ -191,6 +193,45 @@ scripts:
 
     ($inventory | Where-Object Target -eq "claude").DeployedSkillName | Should Be "superpowers:brainstorming"
     ($inventory | Where-Object Target -eq "codex").DeployedSkillName | Should Be "brainstorming"
+  }
+
+  It "builds target-aware deployment plan entries from personal and external skills" {
+    $targets = @(
+      [pscustomobject]@{ Name = "claude"; Root = "/tmp/.claude"; ConfigName = "CLAUDE.md" }
+      [pscustomobject]@{ Name = "codex"; Root = "/tmp/.codex"; ConfigName = "AGENTS.md" }
+    )
+    $skillRecords = @(
+      [pscustomobject]@{ SourceKind = "personal"; SourceSkillId = "superpowers:brainstorming"; SourcePath = "/tmp/personal/brainstorming" }
+      [pscustomobject]@{ SourceKind = "external"; SourceSkillId = "gh-address-comments"; SourcePath = "/tmp/external/gh-address-comments" }
+    )
+
+    $plan = @(Build-DeploymentPlanEntries -SkillRecords $skillRecords -Targets $targets)
+
+    $plan.Count | Should Be 4
+    ($plan | Where-Object { $_.Target -eq "claude" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should Be "superpowers:brainstorming"
+    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should Be "brainstorming"
+    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "gh-address-comments" }).DeployedSkillName | Should Be "gh-address-comments"
+  }
+
+  It "keeps source kind in the combined deployment plan while normalizing codex skills" {
+    $targets = @(
+      [pscustomobject]@{ Name = "claude"; Root = "/tmp/.claude"; ConfigName = "CLAUDE.md" }
+      [pscustomobject]@{ Name = "codex"; Root = "/tmp/.codex"; ConfigName = "AGENTS.md" }
+    )
+    $skillRecords = @(
+      [pscustomobject]@{ SourceKind = "personal"; SourceSkillId = "superpowers:brainstorming"; SourcePath = "/tmp/personal/brainstorming" }
+      [pscustomobject]@{ SourceKind = "external"; SourceSkillId = "gh-address-comments"; SourcePath = "/tmp/external/gh-address-comments" }
+    )
+
+    $plan = @(Build-DeploymentPlanEntries -SkillRecords $skillRecords -Targets $targets)
+
+    $plan.Count | Should Be 4
+    ($plan | Where-Object { $_.Target -eq "claude" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).SourceKind | Should Be "personal"
+    ($plan | Where-Object { $_.Target -eq "claude" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should Be "superpowers:brainstorming"
+    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).SourceKind | Should Be "personal"
+    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should Be "brainstorming"
+    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "gh-address-comments" }).SourceKind | Should Be "external"
+    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "gh-address-comments" }).DeployedSkillName | Should Be "gh-address-comments"
   }
 
   It "publishes workspace mise tasks for formatting and ci flow" {
