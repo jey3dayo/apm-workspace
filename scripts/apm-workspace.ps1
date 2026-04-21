@@ -64,13 +64,38 @@ function Test-SkillId {
     [string]$SkillId
   )
 
-  if ($SkillId -notmatch '^[A-Za-z0-9][A-Za-z0-9._-]*$') {
+  if ([string]::IsNullOrWhiteSpace($SkillId)) {
     throw "Invalid skill id: $SkillId"
   }
 
   if ($SkillId.Contains("/") -or $SkillId.Contains("\") -or $SkillId -in @(".", "..")) {
     throw "Invalid skill id: $SkillId"
   }
+
+  $segments = @($SkillId -split ':')
+  Test-SkillPathSegments -Segments $segments -OriginalValue $SkillId
+}
+
+function Get-ExternalSkillRelativePath {
+  param(
+    [string]$VirtualPath
+  )
+
+  if ([string]::IsNullOrWhiteSpace($VirtualPath) -or -not $VirtualPath.StartsWith("skills/")) {
+    throw "Invalid external skill virtual path: $VirtualPath"
+  }
+
+  $relativePath = $VirtualPath.Substring("skills/".Length)
+  if ($relativePath.StartsWith(".curated/")) {
+    $relativePath = $relativePath.Substring(".curated/".Length)
+  }
+
+  if ([string]::IsNullOrWhiteSpace($relativePath)) {
+    throw "Invalid external skill virtual path: $VirtualPath"
+  }
+
+  $segments = Convert-ReferencePathToSegments -Value $relativePath
+  return ($segments -join '/')
 }
 
 function Test-SkillPathSegments {
@@ -826,21 +851,116 @@ function Get-ExternalSkillInstallPath {
     [Parameter(Mandatory = $true)]
     [string]$RepoUrl,
 
-    [string]$VirtualPath
+    [string]$VirtualPath,
+
+    [string]$ResolvedCommit
   )
 
-  $installPath = Get-ApmModulesRoot
-  foreach ($segment in (Convert-ReferencePathToSegments -Value $RepoUrl)) {
-    $installPath = Join-Path $installPath $segment
+  $apmModulesRoot = Get-ApmModulesRoot
+  if (-not (Test-Path -LiteralPath $apmModulesRoot)) {
+    throw "External skill cache missing: $apmModulesRoot"
   }
 
-  if (-not [string]::IsNullOrWhiteSpace($VirtualPath)) {
-    foreach ($segment in (Convert-ReferencePathToSegments -Value $VirtualPath)) {
-      $installPath = Join-Path $installPath $segment
+  $repoSegments = @(Convert-ReferencePathToSegments -Value $RepoUrl)
+  $virtualSegments = if ([string]::IsNullOrWhiteSpace($VirtualPath)) { @() } else { @(Convert-ReferencePathToSegments -Value $VirtualPath) }
+  $strippedVirtualPath = if ([string]::IsNullOrWhiteSpace($VirtualPath)) { $null } else { Get-ExternalSkillRelativePath -VirtualPath $VirtualPath }
+  $strippedVirtualSegments = if ([string]::IsNullOrWhiteSpace($strippedVirtualPath)) { @() } else { @(Convert-ReferencePathToSegments -Value $strippedVirtualPath) }
+
+  $candidatePaths = New-Object System.Collections.Generic.List[string]
+  $seenCandidates = New-Object 'System.Collections.Generic.HashSet[string]'
+
+  function Add-ExternalSkillCandidatePath {
+    param(
+      [Parameter(Mandatory = $true)]
+      [string[]]$Segments
+    )
+
+    $candidatePath = $apmModulesRoot
+    foreach ($segment in $Segments) {
+      $candidatePath = Join-Path $candidatePath $segment
+    }
+
+    if ($seenCandidates.Add($candidatePath)) {
+      $candidatePaths.Add($candidatePath)
     }
   }
 
-  return $installPath
+  if ($virtualSegments.Count -gt 0) {
+    Add-ExternalSkillCandidatePath -Segments @($repoSegments + $virtualSegments)
+    if (-not [string]::IsNullOrWhiteSpace($ResolvedCommit)) {
+      Add-ExternalSkillCandidatePath -Segments @($repoSegments + @($ResolvedCommit) + $virtualSegments)
+    }
+  }
+
+  if ($strippedVirtualSegments.Count -gt 0) {
+    Add-ExternalSkillCandidatePath -Segments @($repoSegments + $strippedVirtualSegments)
+    if (-not [string]::IsNullOrWhiteSpace($ResolvedCommit)) {
+      Add-ExternalSkillCandidatePath -Segments @($repoSegments + @($ResolvedCommit) + $strippedVirtualSegments)
+    }
+  }
+
+  if (-not [string]::IsNullOrWhiteSpace($ResolvedCommit) -and $virtualSegments.Count -gt 0) {
+    Add-ExternalSkillCandidatePath -Segments @(@($ResolvedCommit) + $repoSegments + $virtualSegments)
+  }
+  if (-not [string]::IsNullOrWhiteSpace($ResolvedCommit) -and $strippedVirtualSegments.Count -gt 0) {
+    Add-ExternalSkillCandidatePath -Segments @(@($ResolvedCommit) + $repoSegments + $strippedVirtualSegments)
+  }
+
+  $foundPath = $null
+  foreach ($candidatePath in $candidatePaths) {
+    if (-not (Test-Path -LiteralPath (Join-Path $candidatePath "SKILL.md"))) {
+      continue
+    }
+
+    if ($null -ne $foundPath -and $foundPath -ne $candidatePath) {
+      throw "Ambiguous external skill cache paths for $RepoUrl/$VirtualPath"
+    }
+
+    $foundPath = $candidatePath
+  }
+
+  if ($null -ne $foundPath) {
+    return $foundPath
+  }
+
+  if ([string]::IsNullOrWhiteSpace($VirtualPath)) {
+    throw "Missing external skill cache for $RepoUrl@$ResolvedCommit"
+  }
+
+  $relativeSuffix = ((Convert-ReferencePathToSegments -Value $VirtualPath) -join [System.IO.Path]::DirectorySeparatorChar)
+  $skillFiles = @(Get-ChildItem -LiteralPath $apmModulesRoot -Recurse -Force -Filter "SKILL.md" -File -ErrorAction SilentlyContinue)
+  $matches = New-Object System.Collections.Generic.List[object]
+  foreach ($skillFile in $skillFiles) {
+    $candidateDir = Split-Path -Parent $skillFile.FullName
+    $expectedSuffix = [System.IO.Path]::DirectorySeparatorChar + $relativeSuffix
+    if (-not $candidateDir.EndsWith($expectedSuffix)) {
+      continue
+    }
+
+    $score = 0
+    if ($candidateDir.Contains($RepoUrl)) {
+      $score += 10
+    }
+    if (-not [string]::IsNullOrWhiteSpace($ResolvedCommit) -and $candidateDir.Contains($ResolvedCommit)) {
+      $score += 1
+    }
+
+    $matches.Add([pscustomobject]@{
+        Score = $score
+        Path = $candidateDir
+      })
+  }
+
+  if ($matches.Count -eq 0) {
+    throw "Missing external skill cache for $RepoUrl/$VirtualPath@$ResolvedCommit"
+  }
+
+  $bestMatches = @($matches | Sort-Object @{ Expression = 'Score'; Descending = $true }, @{ Expression = 'Path'; Descending = $false })
+  if ($bestMatches.Count -gt 1 -and $bestMatches[0].Score -eq $bestMatches[1].Score) {
+    throw "Ambiguous external skill cache for $RepoUrl/$VirtualPath@$ResolvedCommit"
+  }
+
+  return $bestMatches[0].Path
 }
 
 function Get-ExternalSkillId {
@@ -851,9 +971,15 @@ function Get-ExternalSkillId {
     [string]$VirtualPath
   )
 
-  $sourceValue = if ([string]::IsNullOrWhiteSpace($VirtualPath)) { $RepoUrl } else { $VirtualPath }
-  $trimmedValue = $sourceValue.TrimEnd('\', '/')
-  $skillId = Split-Path -Leaf $trimmedValue
+  if ([string]::IsNullOrWhiteSpace($VirtualPath)) {
+    $segments = Convert-ReferencePathToSegments -Value $RepoUrl
+    $skillId = $segments[-1]
+    Test-SkillId -SkillId $skillId
+    return $skillId
+  }
+
+  $relativePath = Get-ExternalSkillRelativePath -VirtualPath $VirtualPath
+  $skillId = ((Convert-ReferencePathToSegments -Value $relativePath) -join ':')
   Test-SkillId -SkillId $skillId
   return $skillId
 }
@@ -894,7 +1020,7 @@ function Get-ExternalSkillRecords {
       continue
     }
 
-    $sourcePath = Get-ExternalSkillInstallPath -RepoUrl $record.Repo -VirtualPath $record.Path
+    $sourcePath = Get-ExternalSkillInstallPath -RepoUrl $record.Repo -VirtualPath $record.Path -ResolvedCommit $record.Commit
     if (-not (Test-Path -LiteralPath $sourcePath)) {
       throw "External dependency is not available in local apm_modules: $canonicalReference ($sourcePath). Run 'mise run update' first."
     }
