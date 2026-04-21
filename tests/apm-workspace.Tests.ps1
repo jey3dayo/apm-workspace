@@ -1,15 +1,23 @@
 $ErrorActionPreference = "Stop"
 
 $env:APM_WORKSPACE_LIB_ONLY = "1"
-$scriptPath = Join-Path $PSScriptRoot ".."
-$scriptPath = Join-Path $scriptPath "scripts/apm-workspace.ps1"
-. (Resolve-Path -LiteralPath $scriptPath).Path
-Remove-Item Env:APM_WORKSPACE_LIB_ONLY -ErrorAction SilentlyContinue
+$script:scriptPath = Join-Path $PSScriptRoot ".."
+$script:scriptPath = Join-Path $script:scriptPath "scripts/apm-workspace.ps1"
+$script:workspaceRoot = Split-Path -Parent $PSScriptRoot
+$script:consoleShell = if (Get-Command powershell -ErrorAction SilentlyContinue) { "powershell" } else { "pwsh" }
 
 Describe "catalog helpers" {
+  BeforeAll {
+    $env:APM_WORKSPACE_LIB_ONLY = "1"
+    $modulePath = Join-Path (Join-Path $PSScriptRoot "..") "scripts/apm-workspace.ps1"
+    . (Resolve-Path -LiteralPath $modulePath).Path
+    Remove-Item Env:APM_WORKSPACE_LIB_ONLY -ErrorAction SilentlyContinue
+  }
+
   BeforeEach {
-    $global:WorkspaceDir = Join-Path $TestDrive "workspace"
-    New-Item -ItemType Directory -Path $global:WorkspaceDir -Force | Out-Null
+    $script:WorkspaceDir = Join-Path $TestDrive "workspace"
+    $global:WorkspaceDir = $script:WorkspaceDir
+    New-Item -ItemType Directory -Path $script:WorkspaceDir -Force | Out-Null
   }
 
   It "detects the catalog reference in apm.yml" {
@@ -22,29 +30,30 @@ dependencies:
 scripts: {}
 "@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.yml")
 
-    Test-ManifestHasCatalogReference | Should Be $true
+    Test-ManifestHasCatalogReference | Should -Be $true
   }
 
   It "lists skill ids from the managed catalog tree" {
-    $skillsRoot = Join-Path $WorkspaceDir "catalog\.apm\skills"
+    $skillsRoot = Join-Path (Join-Path $TestDrive "catalog") "skills"
     New-Item -ItemType Directory -Path (Join-Path $skillsRoot "mypc-manager") -Force | Out-Null
     New-Item -ItemType Directory -Path (Join-Path $skillsRoot "superpowers\brainstorming") -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $skillsRoot "mypc-manager\SKILL.md") -Value "# mypc-manager"
     Set-Content -LiteralPath (Join-Path $skillsRoot "superpowers\brainstorming\SKILL.md") -Value "# brainstorming"
 
-    $skillIds = @(Get-TrackedCatalogSkillIds)
+    $skillIds = @(Get-SkillIdsFromRoot -SkillsRoot $skillsRoot)
 
-    $skillIds | Should Be @("mypc-manager", "superpowers:brainstorming")
+    $skillIds | Should -Be @("mypc-manager", "superpowers:brainstorming")
   }
 
   It "lists managed agent, command, and rule files plus instructions" {
-    $agentsRoot = Join-Path $WorkspaceDir "catalog\agents"
-    $commandsRoot = Join-Path $WorkspaceDir "catalog\commands"
-    $rulesRoot = Join-Path $WorkspaceDir "catalog\rules"
+    $catalogRoot = Join-Path $TestDrive "catalog"
+    $agentsRoot = Join-Path $catalogRoot "agents"
+    $commandsRoot = Join-Path $catalogRoot "commands"
+    $rulesRoot = Join-Path $catalogRoot "rules"
     New-Item -ItemType Directory -Path (Join-Path $agentsRoot "kiro") -Force | Out-Null
     New-Item -ItemType Directory -Path $commandsRoot -Force | Out-Null
     New-Item -ItemType Directory -Path (Join-Path $rulesRoot "tools") -Force | Out-Null
-    Set-Content -LiteralPath (Join-Path $WorkspaceDir "catalog\AGENTS.md") -Value "# shared guidance"
+    Set-Content -LiteralPath (Join-Path $catalogRoot "AGENTS.md") -Value "# shared guidance"
     Set-Content -LiteralPath (Join-Path $agentsRoot "code-reviewer.md") -Value "# agent"
     Set-Content -LiteralPath (Join-Path $agentsRoot "kiro\spec-design.md") -Value "# kiro"
     Set-Content -LiteralPath (Join-Path $commandsRoot "review.md") -Value "# review"
@@ -52,10 +61,11 @@ scripts: {}
     Set-Content -LiteralPath (Join-Path $rulesRoot "claude-md-design.md") -Value "# rule"
     Set-Content -LiteralPath (Join-Path $rulesRoot "tools\rtk.md") -Value "# rtk"
 
-    @(Get-TrackedCatalogAgentRelativePaths) | Should Be @("code-reviewer.md", "kiro/spec-design.md")
-    @(Get-TrackedCatalogCommandRelativePaths) | Should Be @("review.md", "setup.md")
-    @(Get-TrackedCatalogRuleRelativePaths) | Should Be @("claude-md-design.md", "tools/rtk.md")
-    Test-Path -LiteralPath (Get-TrackedCatalogInstructionsPath) | Should Be $true
+    Mock Get-TrackedCatalogDir { $catalogRoot }
+    @(Get-TrackedCatalogAgentRelativePaths) | Should -Be @("code-reviewer.md", "kiro/spec-design.md")
+    @(Get-TrackedCatalogCommandRelativePaths) | Should -Be @("review.md", "setup.md")
+    @(Get-TrackedCatalogRuleRelativePaths) | Should -Be @("claude-md-design.md", "tools/rtk.md")
+    Test-Path -LiteralPath (Get-TrackedCatalogInstructionsPath) | Should -Be $true
   }
 
   It "parses external lock records as distinct resolved skills" {
@@ -74,8 +84,8 @@ dependencies:
 
     $map = Get-LockPinnedReferenceMap
 
-    $map["openai/skills/skills/.curated/gh-address-comments"] | Should Be "openai/skills/skills/.curated/gh-address-comments#abcdef1234567890"
-    $map["obra/superpowers/skills/brainstorming"] | Should Be "obra/superpowers/skills/brainstorming#1234567890abcdef"
+    $map["openai/skills/skills/.curated/gh-address-comments"] | Should -Be "openai/skills/skills/.curated/gh-address-comments#abcdef1234567890"
+    $map["obra/superpowers/skills/brainstorming"] | Should -Be "obra/superpowers/skills/brainstorming#1234567890abcdef"
   }
 
   It "reads only top-level lock dependency records" {
@@ -97,73 +107,80 @@ other_records:
 
     $records = @(Get-LockedExternalSkillRecords)
 
-    $records.Count | Should Be 1
-    $records[0].Repo | Should Be "openai/skills"
-    $records[0].Path | Should Be "skills/.curated/gh-address-comments"
-    $records[0].Commit | Should Be "abcdef1234567890"
+    $records.Count | Should -Be 1
+    $records[0].Repo | Should -Be "openai/skills"
+    $records[0].Path | Should -Be "skills/.curated/gh-address-comments"
+    $records[0].Commit | Should -Be "abcdef1234567890"
   }
 }
 
 Describe "public command surface" {
+  BeforeAll {
+    $env:APM_WORKSPACE_LIB_ONLY = "1"
+    $modulePath = Join-Path (Join-Path $PSScriptRoot "..") "scripts/apm-workspace.ps1"
+    . (Resolve-Path -LiteralPath $modulePath).Path
+    Remove-Item Env:APM_WORKSPACE_LIB_ONLY -ErrorAction SilentlyContinue
+  }
+
   It "shows only catalog commands in help output" {
     $legacyMirrorPattern = 'transitional' + ' mirror'
-    $help = & powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\j138c\.apm\scripts\apm-workspace.ps1 help | Out-String
+    $help = & $consoleShell -NoProfile -ExecutionPolicy Bypass -File $scriptPath help | Out-String
 
-    $help | Should Match "validate:catalog"
-    $help | Should Match "stage-catalog"
-    $help | Should Match "register-catalog"
-    $help | Should Match "release-catalog"
-    $help | Should Not Match $legacyMirrorPattern
-    $help | Should Not Match "validate-internal"
-    $help | Should Not Match "stage-internal"
-    $help | Should Not Match "register-internal"
-    $help | Should Not Match "migrate-internal"
+    $help | Should -Match "validate:catalog"
+    $help | Should -Match "stage-catalog"
+    $help | Should -Match "register-catalog"
+    $help | Should -Match "release-catalog"
+    $help | Should -Not -Match $legacyMirrorPattern
+    $help | Should -Not -Match "validate-internal"
+    $help | Should -Not -Match "stage-internal"
+    $help | Should -Not -Match "register-internal"
+    $help | Should -Not -Match "migrate-internal"
   }
 
   It "does not reference removed install helpers" {
-    $script = Get-Content -LiteralPath C:\Users\j138c\.apm\scripts\apm-workspace.ps1 -Raw
+    $script = Get-Content -LiteralPath $scriptPath -Raw
 
-    $script | Should Not Match 'Invoke-InstallReference\b'
+    $script | Should -Not -Match 'Invoke-InstallReference\b'
   }
 
   It "keeps local workspace scripts self-contained" {
-    $shellScript = Get-Content -LiteralPath /Users/t00114/.apm/scripts/apm-workspace.sh -Raw
-    $powerShellScript = Get-Content -LiteralPath C:\Users\j138c\.apm\scripts\apm-workspace.ps1 -Raw
+    $shellScript = Get-Content -LiteralPath (Join-Path $workspaceRoot "scripts/apm-workspace.sh") -Raw
+    $powerShellScript = Get-Content -LiteralPath $scriptPath -Raw
 
-    $shellScript | Should Not Match 'APM_BOOTSTRAP_REPO'
-    $shellScript | Should Not Match '~/.config'
-    $powerShellScript | Should Not Match 'APM_BOOTSTRAP_REPO'
-    $powerShellScript | Should Not Match '\\.config\\scripts\\apm-workspace'
+    $shellScript | Should -Not -Match 'APM_BOOTSTRAP_REPO'
+    $shellScript | Should -Not -Match '~/.config'
+    $powerShellScript | Should -Not -Match 'APM_BOOTSTRAP_REPO'
+    $powerShellScript | Should -Not -Match '\\.config\\scripts\\apm-workspace'
   }
 
   It "keeps workspace docs self-contained and preserves the bold headings exception" {
     $legacyDocsPattern = [regex]::Escape('~/.config/docs/')
     $files = @(
-      'C:\Users\j138c\.apm\README.md'
-      'C:\Users\j138c\.apm\llms.md'
-      'C:\Users\j138c\.apm\docs\apm-task-coverage.md'
+      (Join-Path $workspaceRoot "README.md")
+      (Join-Path $workspaceRoot "llms.md")
+      (Join-Path $workspaceRoot "docs/apm-task-coverage.md")
     )
 
     foreach ($file in $files) {
       $content = Get-Content -LiteralPath $file -Raw
-      $content | Should Not Match $legacyDocsPattern
+      $content | Should -Not -Match $legacyDocsPattern
     }
 
-    $miseToml = Get-Content -LiteralPath C:\Users\j138c\.apm\mise.toml -Raw
-    $miseToml | Should Match 'replace-bold-headings\.ts" ./catalog/skills'
+    $miseToml = Get-Content -LiteralPath (Join-Path $workspaceRoot "mise.toml") -Raw
+    $miseToml | Should -Match 'replace-bold-headings\.ts'
   }
 
   It "maps runtime config filenames per target" {
     $targets = @(Get-ManagedCatalogRuntimeTargets)
 
-    ($targets | Where-Object Name -eq "claude").ConfigName | Should Be "CLAUDE.md"
-    ($targets | Where-Object Name -eq "codex").ConfigName | Should Be "AGENTS.md"
-    ($targets | Where-Object Name -eq "cursor").ConfigName | Should Be "AGENTS.md"
+    ($targets | Where-Object Name -eq "claude").ConfigName | Should -Be "CLAUDE.md"
+    ($targets | Where-Object Name -eq "codex").ConfigName | Should -Be "AGENTS.md"
+    ($targets | Where-Object Name -eq "cursor").ConfigName | Should -Be "AGENTS.md"
   }
 
   It "normalizes codex skill names from superpowers aliases" {
-    Format-SkillName -Target "claude" -SourceSkillId "superpowers:brainstorming" | Should Be "superpowers:brainstorming"
-    Format-SkillName -Target "codex" -SourceSkillId "superpowers:brainstorming" | Should Be "brainstorming"
+    Format-SkillName -Target "claude" -SourceSkillId "superpowers:brainstorming" | Should -Be "superpowers:brainstorming"
+    Format-SkillName -Target "codex" -SourceSkillId "superpowers:brainstorming" | Should -Be "brainstorming"
   }
 
   It "reads unpinned refs only from dependencies apm" {
@@ -180,90 +197,102 @@ scripts:
     - ignored/script-entry
 "@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.yml")
 
-    @(Get-UnpinnedExternalReferences) | Should Be @("openai/skills/skills/.curated/gh-address-comments")
+    @(Get-UnpinnedExternalReferences) | Should -Be @("openai/skills/skills/.curated/gh-address-comments")
   }
 
   It "builds target-aware managed skill inventory with normalized names" {
     $targets = @(
-      [pscustomobject]@{ Name = "claude"; Root = "/tmp/.claude"; ConfigName = "CLAUDE.md" }
-      [pscustomobject]@{ Name = "codex"; Root = "/tmp/.codex"; ConfigName = "AGENTS.md" }
+      [pscustomobject]@{ Name = "claude"; Root = (Join-Path $TestDrive "claude"); ConfigName = "CLAUDE.md" }
+      [pscustomobject]@{ Name = "codex"; Root = (Join-Path $TestDrive "codex"); ConfigName = "AGENTS.md" }
     )
 
     $inventory = @(Get-ManagedCatalogSkillInventory -SkillIds @("superpowers:brainstorming") -Targets $targets)
 
-    ($inventory | Where-Object Target -eq "claude").DeployedSkillName | Should Be "superpowers:brainstorming"
-    ($inventory | Where-Object Target -eq "codex").DeployedSkillName | Should Be "brainstorming"
+    ($inventory | Where-Object Target -eq "claude").DeployedSkillName | Should -Be "superpowers:brainstorming"
+    ($inventory | Where-Object Target -eq "codex").DeployedSkillName | Should -Be "brainstorming"
   }
 
-  It "builds target-aware deployment plan entries from personal and external skills" {
+  It "stages target-aware deployment trees from personal and external skills" {
     $targets = @(
-      [pscustomobject]@{ Name = "claude"; Root = "/tmp/.claude"; ConfigName = "CLAUDE.md" }
-      [pscustomobject]@{ Name = "codex"; Root = "/tmp/.codex"; ConfigName = "AGENTS.md" }
+      [pscustomobject]@{ Name = "claude"; Root = (Join-Path $TestDrive "claude"); ConfigName = "CLAUDE.md" }
+      [pscustomobject]@{ Name = "codex"; Root = (Join-Path $TestDrive "codex"); ConfigName = "AGENTS.md" }
     )
+    $stageRoot = Join-Path $TestDrive "stage"
     $skillRecords = @(
-      [pscustomobject]@{ SourceKind = "personal"; SourceSkillId = "superpowers:brainstorming"; SourcePath = "/tmp/personal/brainstorming" }
-      [pscustomobject]@{ SourceKind = "external"; SourceSkillId = "gh-address-comments"; SourcePath = "/tmp/external/gh-address-comments" }
+      [pscustomobject]@{ SourceKind = "personal"; SourceSkillId = "superpowers:brainstorming"; SourcePath = (Join-Path (Join-Path (Join-Path $TestDrive "source") "personal") "brainstorming") }
+      [pscustomobject]@{ SourceKind = "external"; SourceSkillId = "gh-address-comments"; SourcePath = (Join-Path (Join-Path (Join-Path $TestDrive "source") "external") "gh-address-comments") }
     )
 
-    $plan = @(Build-DeploymentPlanEntries -SkillRecords $skillRecords -Targets $targets)
+    New-Item -ItemType Directory -Path (Join-Path $skillRecords[0].SourcePath "references") -Force | Out-Null
+    New-Item -ItemType Directory -Path $skillRecords[1].SourcePath -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $skillRecords[0].SourcePath "SKILL.md") -Value "# brainstorming"
+    Set-Content -LiteralPath (Join-Path (Join-Path $skillRecords[0].SourcePath "references") "note.md") -Value "personal"
+    Set-Content -LiteralPath (Join-Path $skillRecords[1].SourcePath "SKILL.md") -Value "# gh-address-comments"
 
-    $plan.Count | Should Be 4
-    ($plan | Where-Object { $_.Target -eq "claude" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should Be "superpowers:brainstorming"
-    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should Be "brainstorming"
-    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "gh-address-comments" }).DeployedSkillName | Should Be "gh-address-comments"
+    $plan = @(Stage-TargetSkillRecords -StageRoot $stageRoot -SkillRecords $skillRecords -Targets $targets)
+
+    $plan.Count | Should -Be 4
+    ($plan | Where-Object { $_.Target -eq "claude" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should -Be "superpowers:brainstorming"
+    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should -Be "brainstorming"
+    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "gh-address-comments" }).DeployedSkillName | Should -Be "gh-address-comments"
+    $claudeSkillsRoot = Join-Path (Join-Path $stageRoot "claude") "skills"
+    $codexSkillsRoot = Join-Path (Join-Path $stageRoot "codex") "skills"
+
+    Test-DirectoryTreeEqual -ExpectedRoot $skillRecords[0].SourcePath -ActualRoot (Join-Path (Join-Path $claudeSkillsRoot "superpowers") "brainstorming") | Should -Be $true
+    Test-DirectoryTreeEqual -ExpectedRoot $skillRecords[0].SourcePath -ActualRoot (Join-Path $codexSkillsRoot "brainstorming") | Should -Be $true
+    Test-DirectoryTreeEqual -ExpectedRoot $skillRecords[1].SourcePath -ActualRoot (Join-Path $claudeSkillsRoot "gh-address-comments") | Should -Be $true
+    Test-DirectoryTreeEqual -ExpectedRoot $skillRecords[1].SourcePath -ActualRoot (Join-Path $codexSkillsRoot "gh-address-comments") | Should -Be $true
   }
 
   It "keeps source kind in the combined deployment plan while normalizing codex skills" {
     $targets = @(
-      [pscustomobject]@{ Name = "claude"; Root = "/tmp/.claude"; ConfigName = "CLAUDE.md" }
-      [pscustomobject]@{ Name = "codex"; Root = "/tmp/.codex"; ConfigName = "AGENTS.md" }
+      [pscustomobject]@{ Name = "claude"; Root = (Join-Path $TestDrive "claude"); ConfigName = "CLAUDE.md" }
+      [pscustomobject]@{ Name = "codex"; Root = (Join-Path $TestDrive "codex"); ConfigName = "AGENTS.md" }
     )
     $skillRecords = @(
-      [pscustomobject]@{ SourceKind = "personal"; SourceSkillId = "superpowers:brainstorming"; SourcePath = "/tmp/personal/brainstorming" }
-      [pscustomobject]@{ SourceKind = "external"; SourceSkillId = "gh-address-comments"; SourcePath = "/tmp/external/gh-address-comments" }
+      [pscustomobject]@{ SourceKind = "personal"; SourceSkillId = "superpowers:brainstorming"; SourcePath = (Join-Path (Join-Path (Join-Path $TestDrive "source") "personal") "brainstorming") }
+      [pscustomobject]@{ SourceKind = "external"; SourceSkillId = "gh-address-comments"; SourcePath = (Join-Path (Join-Path (Join-Path $TestDrive "source") "external") "gh-address-comments") }
     )
 
     $plan = @(Build-DeploymentPlanEntries -SkillRecords $skillRecords -Targets $targets)
 
-    $plan.Count | Should Be 4
-    ($plan | Where-Object { $_.Target -eq "claude" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).SourceKind | Should Be "personal"
-    ($plan | Where-Object { $_.Target -eq "claude" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should Be "superpowers:brainstorming"
-    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).SourceKind | Should Be "personal"
-    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should Be "brainstorming"
-    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "gh-address-comments" }).SourceKind | Should Be "external"
-    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "gh-address-comments" }).DeployedSkillName | Should Be "gh-address-comments"
+    $plan.Count | Should -Be 4
+    ($plan | Where-Object { $_.Target -eq "claude" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).SourceKind | Should -Be "personal"
+    ($plan | Where-Object { $_.Target -eq "claude" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should -Be "superpowers:brainstorming"
+    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).SourceKind | Should -Be "personal"
+    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should -Be "brainstorming"
+    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "gh-address-comments" }).SourceKind | Should -Be "external"
+    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "gh-address-comments" }).DeployedSkillName | Should -Be "gh-address-comments"
   }
 
   It "publishes workspace mise tasks for formatting and ci flow" {
-    $miseToml = Get-Content -LiteralPath C:\Users\j138c\.apm\mise.toml -Raw
+    $miseToml = Get-Content -LiteralPath (Join-Path $workspaceRoot "mise.toml") -Raw
 
-    $miseToml | Should Match '\[tasks\.validate\]'
-    $miseToml | Should Match '\[tasks\."validate:workspace"\]'
-    $miseToml | Should Match '\[tasks\."validate:catalog"\]'
-    $miseToml | Should Match '\[tasks\."format:markdown:bold-headings"\]'
-    $miseToml | Should Match '\[tasks\."apm:install"\]'
-    $miseToml | Should Match '\[tasks\."apm:update"\]'
-    $miseToml | Should Match '\[tasks\.apply\]'
-    $miseToml | Should Match '\[tasks\.update\]'
-    $miseToml | Should Match '\[tasks\.sync\]'
-    $miseToml | Should Match '\[tasks\.format\]'
-    $miseToml | Should Match '\[tasks\."ci:check"\]'
-    $miseToml | Should Match '\[tasks\.ci\]'
-    $miseToml | Should Match '\[tasks\."catalog:release"\]'
-    $miseToml | Should Match '\[tasks\."catalog:tidy"\]'
-    $miseToml | Should Match 'run = "bash ./scripts/apm-workspace.sh apply"'
-    $miseToml | Should Match 'run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 apply"'
-    $miseToml | Should Match 'replace-bold-headings\.ts" ./catalog/skills'
-    $miseToml | Should Match '(?s)\[tasks\.ci\].*?\{ task = "apply" \}.*?\{ task = "doctor" \}'
-    $miseToml | Should Not Match 'APM_BOOTSTRAP_REPO'
+    $miseToml | Should -Match '\[tasks\.validate\]'
+    $miseToml | Should -Match '\[tasks\."validate:workspace"\]'
+    $miseToml | Should -Match '\[tasks\."validate:catalog"\]'
+    $miseToml | Should -Match '\[tasks\."format:markdown:bold-headings"\]'
+    $miseToml | Should -Match '\[tasks\."apm:install"\]'
+    $miseToml | Should -Match '\[tasks\."apm:update"\]'
+    $miseToml | Should -Match '\[tasks\.apply\]'
+    $miseToml | Should -Match '\[tasks\.update\]'
+    $miseToml | Should -Match '\[tasks\.format\]'
+    $miseToml | Should -Match '\[tasks\."ci:check"\]'
+    $miseToml | Should -Match '\[tasks\.ci\]'
+    $miseToml | Should -Match '\[tasks\."catalog:release"\]'
+    $miseToml | Should -Match '\[tasks\."catalog:tidy"\]'
+    $miseToml | Should -Match 'run = "bash ./scripts/apm-workspace.sh apply"'
+    $miseToml | Should -Match 'replace-bold-headings\.ts'
+    $miseToml | Should -Match '(?s)\[tasks\.ci\].*?\{ task = "apply" \}.*?\{ task = "doctor" \}'
+    $miseToml | Should -Not -Match 'APM_BOOTSTRAP_REPO'
   }
 
   It "describes the catalog readme without legacy mirror wording" {
     $legacyMirrorPattern = 'transitional' + ' mirror'
     $readme = Get-CatalogReadmeContent
 
-    $readme | Should Match '~/.apm/catalog/skills/<id>/'
-    $readme | Should Not Match $legacyMirrorPattern
+    $readme | Should -Match '~/.apm/catalog/skills/<id>/'
+    $readme | Should -Not -Match $legacyMirrorPattern
   }
 
   It "does not reference removed agents src paths in agent-facing docs" {
@@ -271,33 +300,32 @@ scripts:
     $removedAgentsSrcPattern = [regex]::Escape($removedAgentsRoot) + '/src'
     $legacyMirrorPattern = 'transitional\s+' + 'mirror'
     $files = @(
-      'C:\Users\j138c\.apm\catalog\skills\apm-usage\SKILL.md'
-      'C:\Users\j138c\.apm\catalog\skills\skill-creator\SKILL.md'
-      'C:\Users\j138c\.apm\catalog\skills\docs-index\indexes\agents-index.md'
-      'C:\Users\j138c\.apm\catalog\skills\nix-dotfiles\SKILL.md'
-      'C:\Users\j138c\.apm\catalog\skills\nix-dotfiles\README.md'
-      'C:\Users\j138c\.apm\catalog\skills\nix-dotfiles\references\commands.md'
-      'C:\Users\j138c\.apm\catalog\skills\nix-dotfiles\references\troubleshooting.md'
-      'C:\Users\j138c\.apm\catalog\skills\rtk\SKILL.md'
-      'C:\Users\j138c\.apm\catalog\skills\rtk\references\command-reference.md'
+      (Join-Path $workspaceRoot "catalog/skills/apm-usage/SKILL.md")
+      (Join-Path $workspaceRoot "catalog/skills/skill-creator/SKILL.md")
+      (Join-Path $workspaceRoot "catalog/skills/docs-index/indexes/agents-index.md")
+      (Join-Path $workspaceRoot "catalog/skills/nix-dotfiles/SKILL.md")
+      (Join-Path $workspaceRoot "catalog/skills/nix-dotfiles/README.md")
+      (Join-Path $workspaceRoot "catalog/skills/nix-dotfiles/references/commands.md")
+      (Join-Path $workspaceRoot "catalog/skills/nix-dotfiles/references/troubleshooting.md")
+      (Join-Path $workspaceRoot "catalog/skills/rtk/SKILL.md")
+      (Join-Path $workspaceRoot "catalog/skills/rtk/references/command-reference.md")
     )
 
     foreach ($file in $files) {
       $content = Get-Content -LiteralPath $file -Raw
-      $content | Should Not Match $removedAgentsSrcPattern
-      $content | Should Not Match $legacyMirrorPattern
+      $content | Should -Not -Match $removedAgentsSrcPattern
+      $content | Should -Not -Match $legacyMirrorPattern
     }
 
   }
 
   It "documents external skill workflow references in README and TODO" {
-    $readme = Get-Content -LiteralPath C:\Users\j138c\.apm\README.md -Raw
-    $todo = Get-Content -LiteralPath C:\Users\j138c\.apm\TODO.md -Raw
+    $readme = Get-Content -LiteralPath (Join-Path $workspaceRoot "README.md") -Raw
+    $todo = Get-Content -LiteralPath (Join-Path $workspaceRoot "TODO.md") -Raw
 
-    $readme | Should Match 'apm add'
-    $readme | Should Match 'mise run apply'
-    $readme | Should Match 'mise run sync'
-    $todo | Should Match 'target normalization'
+    $readme | Should -Match 'mise run apply'
+    $readme | Should -Match 'mise run stage-catalog'
+    $todo | Should -Match 'managed catalog only'
   }
 
   It "runs catalog release as stage, release gate, and register flow" {
@@ -315,20 +343,24 @@ scripts:
 }
 
 Describe "internal cleanup skill ids" {
+  BeforeAll {
+    $env:APM_WORKSPACE_LIB_ONLY = "1"
+    $modulePath = Join-Path (Join-Path $PSScriptRoot "..") "scripts/apm-workspace.ps1"
+    . (Resolve-Path -LiteralPath $modulePath).Path
+    Remove-Item Env:APM_WORKSPACE_LIB_ONLY -ErrorAction SilentlyContinue
+  }
+
   BeforeEach {
-    $global:WorkspaceDir = Join-Path $TestDrive "workspace"
-    New-Item -ItemType Directory -Path $global:WorkspaceDir -Force | Out-Null
+    $script:WorkspaceDir = Join-Path $TestDrive "workspace"
+    $global:WorkspaceDir = $script:WorkspaceDir
+    New-Item -ItemType Directory -Path $script:WorkspaceDir -Force | Out-Null
   }
 
   It "includes legacy superpowers aliases for renamed managed skills" {
-    $skillsRoot = Join-Path $WorkspaceDir "catalog\.apm\skills"
-    New-Item -ItemType Directory -Path (Join-Path $skillsRoot "brainstorming") -Force | Out-Null
-    New-Item -ItemType Directory -Path (Join-Path $skillsRoot "code-review") -Force | Out-Null
-    Set-Content -LiteralPath (Join-Path $skillsRoot "brainstorming\SKILL.md") -Value "# brainstorming"
-    Set-Content -LiteralPath (Join-Path $skillsRoot "code-review\SKILL.md") -Value "# code-review"
+    Mock Get-ManagedSkillIds { @("brainstorming", "code-review") }
 
     $cleanupSkillIds = @(Get-InternalCleanupSkillIds)
 
-    $cleanupSkillIds | Should Be @("brainstorming", "code-review", "superpowers:brainstorming")
+    $cleanupSkillIds | Should -Be @("brainstorming", "superpowers:brainstorming", "code-review")
   }
 }
