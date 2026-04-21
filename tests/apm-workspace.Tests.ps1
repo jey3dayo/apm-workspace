@@ -88,6 +88,79 @@ dependencies:
     $map["obra/superpowers/skills/brainstorming"] | Should -Be "obra/superpowers/skills/brainstorming#1234567890abcdef"
   }
 
+  It "parses repo-root external lock records as distinct resolved skills" {
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+    - openai/skills
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.yml")
+    @"
+lockfile_version: "1"
+dependencies:
+  - repo_url: openai/skills
+    host: github.com
+    resolved_commit: abcdef1234567890
+    virtual_path:
+"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.lock.yaml")
+
+    $repoRootSkillPath = Join-Path (Join-Path $WorkspaceDir "apm_modules") "openai"
+    $repoRootSkillPath = Join-Path $repoRootSkillPath "skills"
+    New-Item -ItemType Directory -Path $repoRootSkillPath -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $repoRootSkillPath "SKILL.md") -Value "# openai skills"
+
+    $lockedRecords = @(Get-LockedExternalSkillRecords)
+    $skillId = Get-ExternalSkillId -RepoUrl $lockedRecords[0].Repo -VirtualPath $lockedRecords[0].Path
+    $sourcePath = Get-ExternalSkillInstallPath -RepoUrl $lockedRecords[0].Repo -VirtualPath $lockedRecords[0].Path -ResolvedCommit $lockedRecords[0].Commit
+    $map = Get-LockPinnedReferenceMap
+
+    $lockedRecords.Count | Should -Be 1
+    $lockedRecords[0].Repo | Should -Be "openai/skills"
+    $lockedRecords[0].Path | Should -Be ""
+    $lockedRecords[0].Commit | Should -Be "abcdef1234567890"
+    $skillId | Should -Be "skills"
+    $sourcePath | Should -Be $repoRootSkillPath
+    $map["openai/skills"] | Should -Be "openai/skills#abcdef1234567890"
+  }
+
+  It "retains top-level lock records when apm.yml omits them" {
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+    - openai/skills
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.yml")
+    @"
+lockfile_version: "1"
+dependencies:
+  - repo_url: openai/skills
+    host: github.com
+    resolved_commit: abcdef1234567890
+    virtual_path:
+  - repo_url: github.com/extra-skill
+    host: github.com
+    resolved_commit: 1234567890abcdef
+    virtual_path:
+"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.lock.yaml")
+
+    $extraSkillPath = Join-Path (Join-Path $WorkspaceDir "apm_modules") "github.com"
+    $extraSkillPath = Join-Path $extraSkillPath "extra-skill"
+    New-Item -ItemType Directory -Path $extraSkillPath -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $extraSkillPath "SKILL.md") -Value "# extra skill"
+
+    $lockedRecords = @(Get-LockedExternalSkillRecords)
+    $manifestReferences = @(Get-ManifestApmDependencyReferences)
+
+    $lockedRecords.Count | Should -Be 2
+    $lockedRecords | Where-Object Repo -eq "github.com/extra-skill" | Should -Not -BeNullOrEmpty
+    $manifestReferences | Should -Contain "openai/skills"
+    $manifestReferences | Should -Not -Contain "github.com/extra-skill"
+  }
+
   It "reads only top-level lock dependency records" {
     @"
 lockfile_version: "1"
