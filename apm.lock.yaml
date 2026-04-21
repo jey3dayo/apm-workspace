@@ -4001,6 +4001,37 @@ dependencies:
     .copilot/skills/wrangler/SKILL.md: sha256:f691b6c1e6aeeb1419972806f7000a47b4d7414764cbf0cf898bc08bb4746f09
     .cursor/skills/wrangler/SKILL.md: sha256:f691b6c1e6aeeb1419972806f7000a47b4d7414764cbf0cf898bc08bb4746f09
   content_hash: sha256:a27fded44ce73b7ef69b1b52fcdf0cdde9c2b17f345b761bf11ca32d37da2220
+- repo_url: gonta223/humanizer-ja
+  host: github.com
+  resolved_commit: a1e343696e43aa50e7218891f3319ab22cde3464
+  package_type: claude_skill
+  deployed_files:
+  - .claude/skills/humanizer-ja/LICENSE
+  - .claude/skills/humanizer-ja/README.md
+  - .claude/skills/humanizer-ja/SKILL.md
+  - .config/opencode/skills/humanizer-ja/LICENSE
+  - .config/opencode/skills/humanizer-ja/README.md
+  - .config/opencode/skills/humanizer-ja/SKILL.md
+  - .copilot/skills/humanizer-ja/LICENSE
+  - .copilot/skills/humanizer-ja/README.md
+  - .copilot/skills/humanizer-ja/SKILL.md
+  - .cursor/skills/humanizer-ja/LICENSE
+  - .cursor/skills/humanizer-ja/README.md
+  - .cursor/skills/humanizer-ja/SKILL.md
+  deployed_file_hashes:
+    .claude/skills/humanizer-ja/LICENSE: sha256:f75eb14ec27966cd36603902343e942aa1d125e7ef78cfb786ba71b29938b7dc
+    .claude/skills/humanizer-ja/README.md: sha256:657ca8e0e1750c2eb025e6e61fe229bc9eafcea3ac53694a12f69399a1a29872
+    .claude/skills/humanizer-ja/SKILL.md: sha256:3fe07f06a179801d7445eff19ed40f1681ef9860665c50c1e9a032f6dffead89
+    .config/opencode/skills/humanizer-ja/LICENSE: sha256:f75eb14ec27966cd36603902343e942aa1d125e7ef78cfb786ba71b29938b7dc
+    .config/opencode/skills/humanizer-ja/README.md: sha256:657ca8e0e1750c2eb025e6e61fe229bc9eafcea3ac53694a12f69399a1a29872
+    .config/opencode/skills/humanizer-ja/SKILL.md: sha256:3fe07f06a179801d7445eff19ed40f1681ef9860665c50c1e9a032f6dffead89
+    .copilot/skills/humanizer-ja/LICENSE: sha256:f75eb14ec27966cd36603902343e942aa1d125e7ef78cfb786ba71b29938b7dc
+    .copilot/skills/humanizer-ja/README.md: sha256:657ca8e0e1750c2eb025e6e61fe229bc9eafcea3ac53694a12f69399a1a29872
+    .copilot/skills/humanizer-ja/SKILL.md: sha256:3fe07f06a179801d7445eff19ed40f1681ef9860665c50c1e9a032f6dffead89
+    .cursor/skills/humanizer-ja/LICENSE: sha256:f75eb14ec27966cd36603902343e942aa1d125e7ef78cfb786ba71b29938b7dc
+    .cursor/skills/humanizer-ja/README.md: sha256:657ca8e0e1750c2eb025e6e61fe229bc9eafcea3ac53694a12f69399a1a29872
+    .cursor/skills/humanizer-ja/SKILL.md: sha256:3fe07f06a179801d7445eff19ed40f1681ef9860665c50c1e9a032f6dffead89
+  content_hash: sha256:b6da4ef92a941ab364ab1ddf259d9e511e098a0719f7ee2202847351c34a8194
 - repo_url: ibelick/ui-skills
   host: github.com
   resolved_commit: 95d0e08524b9f287c32696760725ae32c0f59791
@@ -5005,6 +5036,31 @@ dependencies:
     .cursor/skills/skill-creator/scripts/init_skill.py: sha256:bcb8982d3f033a094f2f1be43123ac8537e2562d25d8ba4d8ef2196ae514d96d
     .cursor/skills/skill-creator/scripts/quick_validate.py: sha256:6cc9dc3199c935916cf6f73fcbbbb0e3bb1b58c8f5109fefa499978908164f51
   content_hash: sha256:d354f0a7ccb564cfa8f84818703b3cc03eae7005aeb3c107e6c8a4f2eb70f595
+- repo_url: softaworks/agent-toolkit
+  host: github.com
+  resolved_commit: 3027f20f3181758385a1bb8c022d4041dfb4de84
+  virtual_path: skills/humanizer
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .claude/skills/humanizer/README.md
+  - .claude/skills/humanizer/SKILL.md
+  - .config/opencode/skills/humanizer/README.md
+  - .config/opencode/skills/humanizer/SKILL.md
+  - .copilot/skills/humanizer/README.md
+  - .copilot/skills/humanizer/SKILL.md
+  - .cursor/skills/humanizer/README.md
+  - .cursor/skills/humanizer/SKILL.md
+  deployed_file_hashes:
+    .claude/skills/humanizer/README.md: sha256:3ddb1450e1f81964c23ff14ffa5c400ec7a43e3eea406bcca2262e2f2ac9d4a6
+    .claude/skills/humanizer/SKILL.md: sha256:6688e4e292ab4f235e2a27f5193a7d048657c74b26ed6000398ee3371c9c3a4b
+    .config/opencode/skills/humanizer/README.md: sha256:3ddb1450e1f81964c23ff14ffa5c400ec7a43e3eea406bcca2262e2f2ac9d4a6
+    .config/opencode/skills/humanizer/SKILL.md: sha256:6688e4e292ab4f235e2a27f5193a7d048657c74b26ed6000398ee3371c9c3a4b
+    .copilot/skills/humanizer/README.md: sha256:3ddb1450e1f81964c23ff14ffa5c400ec7a43e3eea406bcca2262e2f2ac9d4a6
+    .copilot/skills/humanizer/SKILL.md: sha256:6688e4e292ab4f235e2a27f5193a7d048657c74b26ed6000398ee3371c9c3a4b
+    .cursor/skills/humanizer/README.md: sha256:3ddb1450e1f81964c23ff14ffa5c400ec7a43e3eea406bcca2262e2f2ac9d4a6
+    .cursor/skills/humanizer/SKILL.md: sha256:6688e4e292ab4f235e2a27f5193a7d048657c74b26ed6000398ee3371c9c3a4b
+  content_hash: sha256:34a38e6acc60d4529612d41ffe740bca0060d3c5e89e2a0d24ae795f67157fbb
 - repo_url: tokoroten/prompt-review
   host: github.com
   resolved_commit: 0a83fd9eeead58fe92d0b04522da9e6840a71940
