@@ -1,4 +1,10 @@
 # ========================================
+# Environment
+# ========================================
+[env]
+TASK_EXCLUDES = "--exclude apm.lock.yaml"
+
+# ========================================
 # Tools
 # ========================================
 [tools]
@@ -98,13 +104,17 @@ run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"@(fd -e 
 
 [tasks."format:yaml"]
 description = "Format YAML files in the ~/.apm workspace"
-run = "fd -e yml -e yaml -X prettier --write --log-level error >/dev/null"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"@(fd -e yml -e yaml) | ForEach-Object { prettier --write --log-level error $_ *> $null }\""
+run = "fd -e yml -e yaml ${TASK_EXCLUDES} -X prettier --write --log-level error >/dev/null"
+run_windows = """
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$taskExcludes = @(); if ($env:TASK_EXCLUDES) { $taskExcludes = @($env:TASK_EXCLUDES -split ' ' | Where-Object { $_ -ne '' }) }; $yamlFiles = @(fd -e yml -e yaml @taskExcludes); if ($yamlFiles.Count -gt 0) { prettier --write --log-level error $yamlFiles *> $null }"
+"""
 
 [tasks."format:yaml:check"]
 description = "Check YAML formatting in the ~/.apm workspace"
-run = "fd -e yml -e yaml -X prettier --check --log-level error"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"@(fd -e yml -e yaml) | ForEach-Object { prettier --check --log-level error $_ }\""
+run = "fd -e yml -e yaml ${TASK_EXCLUDES} -X prettier --check --log-level error"
+run_windows = """
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$taskExcludes = @(); if ($env:TASK_EXCLUDES) { $taskExcludes = @($env:TASK_EXCLUDES -split ' ' | Where-Object { $_ -ne '' }) }; $yamlFiles = @(fd -e yml -e yaml @taskExcludes); if ($yamlFiles.Count -gt 0) { prettier --check --log-level error $yamlFiles }"
+"""
 
 [tasks."format:catalog-metadata"]
 description = "Normalize tracked catalog metadata files"
