@@ -37,6 +37,8 @@ concurrency:
 jobs:
   ci-check:
     runs-on: ubuntu-latest
+    env:
+      APM_WORKSPACE_DIR: ${{ github.workspace }}
 
     steps:
       - name: Checkout repository
@@ -57,4 +59,9 @@ jobs:
           pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 help >/dev/null
 
       - name: Run workspace checks
-        run: mise run ci:check
+        run: |
+          mise run format:markdown:check
+          mise run format:toml:check
+          mise run format:yaml:check
+          mise run validate:catalog
+          mise run smoke-catalog
