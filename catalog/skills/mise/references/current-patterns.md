@@ -165,8 +165,8 @@ prettier = 'latest' # コードフォーマッター
 
 ```toml
 [tools]
-node = "22.0.0"     # Pin exact version
-node = "22"         # Latest in v22
+node = "24.0.0"     # Pin exact version
+node = "24"         # Track the current LTS major
 node = "latest"     # Always latest (not recommended for reproducibility)
 ```
 

@@ -8,9 +8,19 @@ This document contains comprehensive best practices for mise (mise-en-place) tas
 
 - Single mise.toml at project root
   - Only introduce per-package mise.toml files in a monorepo when those packages can be built/tested in isolation
-- Deterministic ordering: Place `[settings]`, `[env]`, `[tools]` first, then `[tasks]` in alphabetical order
+- Deterministic ordering: Place `[settings]`, `[env]`, `[tools]` first, then `[tasks]` grouped as individual commands → aggregation tasks → aliases/meta-tasks
 - External scripts: Put long scripts in `mise-tasks/` or `scripts/` and call them from tasks rather than embedding >3 lines of shell in the run array
 - Lockfile: Check in `mise.lock` if you enable the experimental lockfile feature so CI matches local dev
+
+### Exception: User-Global Dotfiles Layout
+
+For `~/.config/mise` or similar personal environments, a split layout is often better than a monolithic file:
+
+- `config.toml` for shared settings only
+- `config.default.toml`, `config.ci.toml`, `config.windows.toml`, etc. for environment-specific toolsets
+- `.mise.toml` with `[task_config].includes = ["~/.config/mise/tasks/*.toml"]` style task loading
+
+Use this when one person maintains multiple environments. For normal repositories, prefer a single project-local `mise.toml`.
 
 ### Typical Skeleton
 
@@ -24,7 +34,7 @@ paranoid = true
 RUST_BACKTRACE = "1"
 
 [tools]              # tool versions
-node = "22"
+node = "24"
 rust = "stable"
 
 [tasks]              # everything below here are tasks
@@ -82,6 +92,7 @@ run = "cargo test"
 
 - Use `depends` for _ordering/parallelism_
 - Use `run` for _the actual commands_ that constitute the task
+- Use `[task_config].includes` only when you intentionally split large user-global task collections across files
 
 The official docs describe this separation under Task Configuration → run/depends
 
@@ -134,10 +145,15 @@ timeout     = "10m"
    - Short aliases (`b` for build, `t` for test) speed up CLI use
 2. Always give description
    - It feeds `mise tasks` and shell completions
-3. Group meta-tasks under a "+" prefix
+3. Separate aggregation from aliasing
+   - `format`, `lint`, `check:format`, `ci:check` can be ordinary task names even when they have no `alias = [...]`
+   - Use `alias` only for genuine shortcuts such as `alias = ["f"]`
+4. Group optional meta-task aliases under a "+" prefix
    - `+ci`, `+all` so they sort to the top and are obviously not leaf commands
-4. Keep shell in check
+5. Keep shell in check
    - If the run array grows past ~5 lines, move it to a standalone script or a file task
+6. Wire tools to tasks
+   - If you add `shellcheck`, `shfmt`, `taplo`, or similar tools under `[tools]`, connect them to `lint:*`, `format:*`, or documented setup tasks; otherwise omit them
 
 ## 5. Organising Aliases
 
@@ -151,6 +167,7 @@ timeout     = "10m"
 ### Best Practice
 
 - Always call them with `mise run` (or your own shell alias like `mr`) inside docs and CI scripts to avoid ambiguity
+- Do not describe ordinary task names like `ci` or `format` as aliases unless they explicitly set `alias = [...]`
 
 ## 6. Command-Composition Patterns
 
@@ -170,6 +187,16 @@ run     = "cargo test"
 
 - `build` & `lint` run in parallel
 - `test` waits for both
+
+### Pattern A2 – Aggregation-Only Check Task
+
+```toml
+[tasks."format:check"]
+depends = ["format:md:check", "format:toml:check", "format:yaml:check"]
+```
+
+- Prefer this shape when the task exists only to aggregate independent checks
+- Add a `run` body only when the task has its own command to execute after prerequisites finish
 
 ### Pattern B – Meta-Task That Orchestrates Fine-Grained Order
 
@@ -205,7 +232,13 @@ prisma migrate deploy
 - In GitHub Actions, `mise ci bootstrap` (or your own task) should be the _only_ shell block in the workflow
 - Let mise orchestrate the rest
 - Pin mise version (`mise use -g mise@2025.10`) so new releases don't surprise your build
+- Prefer concrete LTS/runtime versions in `[tools]` for shared repos when reproducibility matters
 - Export `MISE_JOBS=$(nproc)` to fully exploit depends-based parallelism
+
+### Runtime Version Policy
+
+- Shared repos / CI-sensitive codebases: `node = "24"` or exact patch pins
+- Personal workstation configs: `node = "lts"` is acceptable if automatic LTS tracking is the goal
 
 ### Example GitHub Actions
 

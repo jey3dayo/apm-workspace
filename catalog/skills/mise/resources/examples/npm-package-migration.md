@@ -67,7 +67,7 @@ Real-world example of migrating from `global-package.json` to mise-managed npm p
 
 ```toml
 [tools]
-node = "latest"
+node = "24"
 python = "3.12"
 
 # No npm packages yet
@@ -151,7 +151,7 @@ echo "   Please review and add to mise/config.toml"
 # ========================================
 # Runtimes
 # ========================================
-node = "latest"
+node = "24"
 python = "3.12"
 go = "latest"
 rust = "latest"

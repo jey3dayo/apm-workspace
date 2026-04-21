@@ -7,8 +7,9 @@ This document provides ready-to-use mise.toml templates for common project patte
 1. [Minimal Template](#minimal-template)
 2. [Full-Featured Template](#full-featured-template)
 3. [Language-Specific Templates](#language-specific-templates)
-4. [Common Task Patterns](#common-task-patterns)
-5. [CI/CD Templates](#cicd-templates)
+4. [User-Global Dotfiles Template](#user-global-dotfiles-template)
+5. [Common Task Patterns](#common-task-patterns)
+6. [CI/CD Templates](#cicd-templates)
 
 ## Minimal Template
 
@@ -17,7 +18,7 @@ A basic mise.toml to get started quickly.
 ```toml
 # mise.toml
 [tools]
-node = "22"
+node = "24"
 
 [tasks.build]
 description = "Build the project"
@@ -56,7 +57,7 @@ LOG_LEVEL = "info"
 
 # === Tools ===
 [tools]
-node = "22"              # LTS version
+node = "24"              # Current LTS major
 rust = "1.75"
 python = "3.12"
 go = "1.21"
@@ -129,6 +130,47 @@ description = "Auto-fix all issues"
 depends = ["format", "lint"]
 ```
 
+## User-Global Dotfiles Template
+
+Use this for `~/.config/mise` style personal setups with environment-specific tool files and shared task includes.
+
+```toml
+# ~/.config/mise/config.toml
+[settings]
+experimental = true
+jobs = 8
+
+[settings.npm]
+package_manager = "pnpm"
+```
+
+```toml
+# ~/.config/mise/config.default.toml
+[tools]
+node = "lts"
+python = "3.12"
+shellcheck = "latest"
+shfmt = "latest"
+taplo = "latest"
+"npm:prettier" = "latest"
+"npm:tsx" = "latest"
+```
+
+```toml
+# ~/.config/.mise.toml
+[task_config]
+includes = [
+  ".config/mise/tasks/format.toml",
+  ".config/mise/tasks/lint.toml",
+  ".config/mise/tasks/ci.toml",
+]
+```
+
+Notes:
+- Prefer this split layout only for personal global environments
+- In project repos, keep a single `mise.toml` unless there is a strong reason to split
+- If you add tools like `shellcheck` or `shfmt`, wire them into `lint:*` / `format:*` tasks
+
 ## Language-Specific Templates
 
 ### Node.js / TypeScript
@@ -139,7 +181,7 @@ _.path = ['./node_modules/.bin']
 NODE_ENV = "development"
 
 [tools]
-node = "22"
+node = "24"
 
 [tasks.install]
 description = "Install dependencies"

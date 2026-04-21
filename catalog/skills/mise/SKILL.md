@@ -77,9 +77,21 @@ run = "cargo test"
 - `run`: WHAT this task does (imperative)
 - `depends`: WHAT must finish BEFORE (declarative)
 
-### 2. Alias Management
+### 2. Aggregation vs Alias
 
-Design effective task shortcuts for developer productivity.
+Treat aggregation tasks and aliases as separate concerns.
+
+#### Aggregation Tasks
+
+- Purpose: Coordinate related checks or workflows
+- Preferred shape: Use `depends` when the task mainly aggregates independent prerequisites
+- Examples: `format`, `check:format`, `lint`, `ci`
+
+#### Alias Property
+
+- Purpose: Provide shorter CLI shortcuts for frequently used tasks
+- Usage: Optional `alias = ["b"]` or `alias = ["fmt"]`
+- Rule: Do not confuse a task named `ci` or `format` with an actual alias unless it declares `alias = [...]`
 
 ### Alias Strategy
 
@@ -157,6 +169,17 @@ Organize mise.toml for maintainability and clarity.
 3. `[tools]` - Tool versions
 4. `[tasks]` - Task definitions (see internal structure below)
 
+### Exception: User-Global Dotfiles Configuration
+
+For personal `~/.config/mise` setups, a split layout can be better than a single large file:
+
+- Keep `config.toml` settings-only
+- Put environment-specific tool definitions in files such as `config.default.toml`, `config.ci.toml`, or `config.windows.toml`
+- Load shared task files via `[task_config].includes` from a local `.mise.toml`
+
+Use this pattern for user-global dotfiles or environment-switched setups, not for ordinary project repos.
+For concrete examples, split-file structure, and do/don't guidance, see `references/task-config-includes.md`.
+
 ### Task Section Internal Structure
 
 Within the `[tasks]` section, organize tasks logically by responsibility:
@@ -167,11 +190,11 @@ Within the `[tasks]` section, organize tasks logically by responsibility:
 
 2. Aggregation Tasks - Tasks that orchestrate multiple related commands
    - Example: `format`, `lint`, `test`
-   - Characteristics: Uses `depends` to coordinate related tasks
+   - Characteristics: Prefer `depends` when coordinating independent checks or prerequisites
 
 3. Aliases/Meta-Tasks - Top-level orchestration for common workflows
-   - Example: `ci`, `+all`, `release`
-   - Characteristics: High-level coordination, often used in CI/CD
+   - Example: `+ci`, `+all`, `release`
+   - Characteristics: High-level coordination, often used in CI/CD; may also declare `alias = [...]`
 
 ### Recommended Comment Structure
 
@@ -195,7 +218,13 @@ Within the `[tasks]` section, organize tasks logically by responsibility:
 ...
 
 # ========================================
-# エイリアス（まとめ実行のショートカット）
+# 集約タスク
+# ========================================
+[tasks.format]
+depends = ["format:terraform", "format:docs"]
+
+# ========================================
+# エイリアス / メタタスク
 # ========================================
 [tasks.ci]
 depends = ["format", "lint", "test", "build"]
@@ -214,7 +243,7 @@ RUST_BACKTRACE = "1"
 NODE_ENV = "development"
 
 [tools]
-node = "22"
+node = "24" # Prefer current LTS major; pin patch versions when reproducibility matters
 rust = "stable"
 
 [tasks.build]
@@ -236,7 +265,7 @@ Manage language runtimes and global packages in a unified, version-controlled ma
 ```toml
 [tools]
 # Runtimes
-node = "22"
+node = "24" # Shared repos: prefer concrete LTS major or patch
 python = "3.12"
 rust = "stable"
 
@@ -267,6 +296,11 @@ shellcheck = "latest"
 - Version control and team consistency
 - Cross-platform reproducibility
 - No global npm/pip pollution
+
+### Versioning Guidance
+
+- Shared repositories: prefer concrete LTS majors or exact patches (`node = "24"` or `node = "24.15.0"`)
+- Personal global configs: symbolic channels such as `node = "lts"` can be acceptable when you intentionally want rolling local upgrades
 
 ### Reference
 
@@ -311,6 +345,8 @@ run = "pytest tests/integration"
 - Within tasks section: individual commands → aggregation tasks → aliases/meta-tasks
 - Use section separator comments for readability (`# === Commands ===`)
 - Use descriptive task names and always include `description`
+- Prefer `depends` for aggregation-only tasks such as `check`, `lint`, or `ci:check`
+- Add tools to `[tools]` only when they are used directly by tasks or documented setup flows
 
 ❌ **DON'T:**
 
@@ -318,6 +354,7 @@ run = "pytest tests/integration"
 - Call `mise <task>` inside run strings (use `{ task = "x" }`)
 - Create circular dependencies
 - Use conflicting alias names
+- Add unused tools that are not wired into tasks, checks, or documented developer workflows
 
 ### Task Design
 
@@ -327,6 +364,7 @@ run = "pytest tests/integration"
 - Use `run` for core task logic
 - Keep tasks focused on single responsibility
 - Group related tasks with common prefixes
+- Treat `alias = [...]` as optional UX sugar, not as a substitute for well-named aggregation tasks
 
 ❌ **DON'T:**
 
@@ -443,6 +481,7 @@ Detailed documentation loaded as needed:
 - `best-practices.md` - 2025 field-tested best practices, comprehensive guide on run vs depends, command composition patterns
 - `current-patterns.md` - Real-world examples from dotfiles project, practical task patterns
 - `config-templates.md` - Common mise.toml templates and patterns
+- `task-config-includes.md` - When and how to split user-global task files with `[task_config].includes`
 - `tool-management.md` - Tool version management, Centralized Package Management, npm/Python migration guides, troubleshooting
 
 ### Usage

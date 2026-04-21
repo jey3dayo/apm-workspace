@@ -52,7 +52,7 @@ RUST_BACKTRACE = "1"
 # ========================================
 
 # Node.js - JavaScript/TypeScript runtime
-node = "latest" # Or pin: "22.0.0" for reproducibility
+node = "24" # Prefer current LTS major; pin a patch version for strict reproducibility
 
 # Python - Python interpreter
 python = "latest" # Or pin: "3.12.0"
@@ -214,13 +214,9 @@ github-cli = "latest" # gh command
 # "cargo:cargo-edit" = "latest"
 
 # ========================================
-# Task Definitions
+# Individual Commands
 # ========================================
 [tasks]
-
-# ----------------------------------------
-# Development Tasks
-# ----------------------------------------
 
 [tasks.install]
 description = "Install all dependencies"
@@ -234,9 +230,25 @@ run = "mise upgrade"
 description = "Check mise installation and configuration"
 run = "mise doctor"
 
-# ----------------------------------------
-# Build Tasks
-# ----------------------------------------
+# ========================================
+# Aggregation Tasks
+# ========================================
+
+# [tasks."check:format"]
+# description = "Check formatting"
+# depends = ["format:toml:check", "format:yaml:check"]
+
+# ========================================
+# Aliases / Meta Tasks
+# ========================================
+
+# [tasks."+ci"]
+# description = "Run shared CI checks"
+# depends = ["check", "test", "build"]
+
+# ========================================
+# Additional Examples
+# ========================================
 
 # [tasks.build]
 # description = "Build project"

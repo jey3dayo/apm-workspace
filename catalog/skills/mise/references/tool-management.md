@@ -610,7 +610,7 @@ Combine tool management with task automation:
 # ~/.config/mise/config.toml
 
 [tools]
-node = "22"
+node = "24"
 "npm:prettier" = "latest"
 "npm:eslint" = "latest"
 
