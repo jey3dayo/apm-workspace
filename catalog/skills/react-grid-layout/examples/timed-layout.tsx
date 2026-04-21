@@ -76,6 +76,18 @@ export const createTimedSpanLayout = ({
   };
 };
 
+function calculateGridMetrics(layout: Layout[]): {
+  cols: number;
+  gridWidth: number;
+} {
+  const pointsX = layout.map(({ x, w }) => x + w);
+  const cols = Math.max(...pointsX, 12);
+  return {
+    cols,
+    gridWidth: cols * 24,
+  };
+}
+
 /**
  * Simple calendar example
  */
@@ -168,13 +180,10 @@ export function SimpleCalendarExample() {
     return allLayouts;
   }, []);
 
-  // Calculate cols and width
-  const cols = React.useMemo(() => {
-    const pointsX = layout.map(({ x, w }) => x + w);
-    return Math.max(...pointsX, 12);
-  }, [layout]);
-
-  const gridWidth = cols * 24;
+  const { cols, gridWidth } = React.useMemo(
+    () => calculateGridMetrics(layout),
+    [layout],
+  );
 
   return (
     <div style={{ padding: "20px" }}>
@@ -211,7 +220,10 @@ export function SimpleCalendarExample() {
           const isEvent = item.i.startsWith("event-");
 
           return (
-            <div key={item.i} className={`grid-item ${isTimeSlot ? "time-slot" : isRoom ? "room" : "event"}`}>
+            <div
+              key={item.i}
+              className={`grid-item ${isTimeSlot ? "time-slot" : isRoom ? "room" : "event"}`}
+            >
               {isTimeSlot && item.i.replace("time-", "")}
               {isRoom && item.i.replace("room-", "Room ")}
               {isEvent && item.i.replace("event-", "Event ")}
@@ -282,7 +294,15 @@ export function AdvancedCalendarExample() {
     const layoutsById: LayoutsById = {};
 
     // Register time grid (30-minute intervals)
-    const times = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00"];
+    const times = [
+      "09:00",
+      "09:30",
+      "10:00",
+      "10:30",
+      "11:00",
+      "11:30",
+      "12:00",
+    ];
     times.forEach((time, index) => {
       layoutsById[`time-${time}`] = {
         i: `time-${time}`,
@@ -371,12 +391,10 @@ export function AdvancedCalendarExample() {
     ];
   }, []);
 
-  const cols = React.useMemo(() => {
-    const pointsX = layout.map(({ x, w }) => x + w);
-    return Math.max(...pointsX, 12);
-  }, [layout]);
-
-  const gridWidth = cols * 24;
+  const { cols, gridWidth } = React.useMemo(
+    () => calculateGridMetrics(layout),
+    [layout],
+  );
 
   return (
     <div style={{ padding: "20px" }}>
