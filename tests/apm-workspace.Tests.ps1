@@ -195,10 +195,11 @@ Describe "public command surface" {
     Remove-Item Env:APM_WORKSPACE_LIB_ONLY -ErrorAction SilentlyContinue
   }
 
-  It "shows only catalog commands in help output" {
+  It "shows shell help wording for update and catalog commands" {
     $legacyMirrorPattern = 'transitional' + ' mirror'
-    $help = & $consoleShell -NoProfile -ExecutionPolicy Bypass -File $scriptPath help | Out-String
+    $help = & /bin/bash (Join-Path $workspaceRoot "scripts/apm-workspace.sh") help | Out-String
 
+    $help | Should -Match '(?m)^  update\s+Refresh the workspace checkout and deps only$'
     $help | Should -Match "validate:catalog"
     $help | Should -Match "stage-catalog"
     $help | Should -Match "register-catalog"
@@ -208,6 +209,65 @@ Describe "public command surface" {
     $help | Should -Not -Match "stage-internal"
     $help | Should -Not -Match "register-internal"
     $help | Should -Not -Match "migrate-internal"
+  }
+
+  It "shows PowerShell help wording for update and catalog commands" {
+    $legacyMirrorPattern = 'transitional' + ' mirror'
+    $help = & $consoleShell -NoProfile -ExecutionPolicy Bypass -File $scriptPath help | Out-String
+
+    $help | Should -Match '(?m)^  update\s+Refresh the checkout and dependencies only; does not deploy$'
+    $help | Should -Match "validate:catalog"
+    $help | Should -Match "stage-catalog"
+    $help | Should -Match "register-catalog"
+    $help | Should -Match "release-catalog"
+    $help | Should -Not -Match $legacyMirrorPattern
+    $help | Should -Not -Match "validate-internal"
+    $help | Should -Not -Match "stage-internal"
+    $help | Should -Not -Match "register-internal"
+    $help | Should -Not -Match "migrate-internal"
+  }
+
+  It "keeps update on the non-deploy path" {
+    $apmCalls = New-Object System.Collections.Generic.List[string]
+
+    function global:apm {
+      $argsText = @($args)
+
+      $apmCalls.Add(($argsText -join ' '))
+      $global:LASTEXITCODE = 0
+    }
+
+    try {
+      Mock Require-Apm {}
+      Mock Ensure-WorkspaceRepo {}
+      Mock Refresh-WorkspaceCheckout {}
+      Mock Ensure-WorkspaceScaffold {}
+      Mock Invoke-ValidateCatalog {}
+      Mock Test-ManifestHasLocalPackages { $false }
+      Mock Remove-InternalTargetReparsePoints {}
+      Mock Get-InternalCleanupSkillIds { @() }
+      Mock Invoke-WorkspaceInstallCommand {}
+      Mock Normalize-WorkspaceGitignore {}
+      Mock Invoke-CodexCompile {}
+      Mock Invoke-Apply {}
+      Mock Build-TargetSkillTrees {}
+      Mock Replace-SkillTargetsFromStage {}
+      Mock Sync-ManagedCatalogRuntimeAssets {}
+      Mock Invoke-StageCatalog {}
+
+      Invoke-Update
+
+      $apmCalls | Should -Be @("deps update -g")
+      Assert-MockCalled Invoke-WorkspaceInstallCommand -Times 0 -Exactly
+      Assert-MockCalled Invoke-Apply -Times 0 -Exactly
+      Assert-MockCalled Build-TargetSkillTrees -Times 0 -Exactly
+      Assert-MockCalled Replace-SkillTargetsFromStage -Times 0 -Exactly
+      Assert-MockCalled Sync-ManagedCatalogRuntimeAssets -Times 0 -Exactly
+      Assert-MockCalled Invoke-StageCatalog -Times 0 -Exactly
+    }
+    finally {
+      Remove-Item Function:\apm -ErrorAction SilentlyContinue
+    }
   }
 
   It "does not reference removed install helpers" {
