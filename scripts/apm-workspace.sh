@@ -51,7 +51,7 @@ validate_skill_id() {
   skill_id="$1"
 
   case "$skill_id" in
-    "" | . | .. | */* | *\\*)
+    "" | . | .. | */* | *\\* | :* | *: | *::*)
       fail "Invalid skill id: $skill_id"
       ;;
   esac
@@ -65,7 +65,7 @@ validate_skill_id() {
   esac
 
   case "$skill_id" in
-    *[!A-Za-z0-9._-]*)
+    *[!A-Za-z0-9._:-]*)
       fail "Invalid skill id: $skill_id"
       ;;
   esac
@@ -809,18 +809,23 @@ cmd_apply() {
   ensure_workspace_repo
   ensure_workspace_scaffold
   cmd_validate_catalog
-  skill_ids=$(managed_skill_ids)
-  cleanup_skill_ids=$(internal_cleanup_skill_ids "$skill_ids")
+  ensure_workspace_mise_file
 
   if manifest_has_local_packages; then
     fail "apm 0.8.11 cannot deploy ./packages/* dependencies at user scope yet. Remove local package refs from ~/.apm/apm.yml and keep the global manifest on upstream refs such as jey3dayo/apm-workspace/catalog#main."
   fi
 
-  remove_internal_target_links "$cleanup_skill_ids"
-  run_workspace_install_command -g
+  apply_stage_root=$(mktemp -d "${TMPDIR:-/tmp}/apm-apply.XXXXXX")
+  trap 'rm -rf "$apply_stage_root"' RETURN
+
+  build_target_skill_trees "$apply_stage_root"
+  sync_managed_catalog_runtime_assets
+  replace_skill_targets_from_stage "$apply_stage_root"
   normalize_workspace_gitignore
   compile_codex
-  sync_managed_catalog_runtime_assets
+
+  trap - RETURN
+  rm -rf "$apply_stage_root"
 }
 
 cmd_update() {
@@ -1089,6 +1094,404 @@ managed_catalog_skill_inventory() {
       [ -n "$skill_id" ] || continue
       printf '%s|%s|%s\n' "$target_name" "$skill_id" "$(format_skill_name "$target_name" "$skill_id")"
     done
+  done
+}
+
+manifest_external_references() {
+  manifest_path="$WORKSPACE_DIR/apm.yml"
+  [ -f "$manifest_path" ] || return 0
+
+  awk '
+    function indent_level(line, trimmed) {
+      trimmed = line
+      sub(/^[[:space:]]+/, "", trimmed)
+      return length(line) - length(trimmed)
+    }
+    /^[^[:space:]#][^:]*:/ {
+      split($0, parts, ":")
+      key = parts[1]
+      in_dependencies = (key == "dependencies")
+      dependencies_indent = in_dependencies ? 0 : -1
+      in_apm = 0
+      apm_indent = -1
+      next
+    }
+    !in_dependencies {
+      next
+    }
+    /^[[:space:]]+[^:#][^:]*:/ {
+      current_indent = indent_level($0)
+      line = $0
+      sub(/^[[:space:]]+/, "", line)
+      split(line, parts, ":")
+      key = parts[1]
+
+      if (current_indent <= dependencies_indent) {
+        in_dependencies = 0
+        dependencies_indent = -1
+        in_apm = 0
+        apm_indent = -1
+        next
+      }
+
+      if (current_indent == dependencies_indent + 2 && key == "apm") {
+        in_apm = 1
+        apm_indent = current_indent
+        next
+      }
+
+      if (in_apm && current_indent <= apm_indent) {
+        in_apm = 0
+        apm_indent = -1
+      }
+      next
+    }
+    !in_apm {
+      next
+    }
+    /^[[:space:]]*-[[:space:]]+/ {
+      if (indent_level($0) <= apm_indent) {
+        next
+      }
+      ref = $2
+      if (ref ~ /^jey3dayo\/apm-workspace\/catalog(#|$)/) {
+        next
+      }
+      if (ref ~ /^\.\//) {
+        next
+      }
+      print ref
+    }
+  ' "$manifest_path"
+}
+
+manifest_external_reference_keys() {
+  manifest_external_references | awk '
+    NF {
+      print $0
+      base = $0
+      sub(/#.*/, "", base)
+      print base
+    }
+  ' | awk 'NF && !seen[$0]++'
+}
+
+external_skill_id_from_virtual_path() {
+  virtual_path="$1"
+
+  case "$virtual_path" in
+    skills/*)
+      relative_path=${virtual_path#skills/}
+      ;;
+    *)
+      fail "Invalid external skill virtual path: $virtual_path"
+      ;;
+  esac
+
+  case "$relative_path" in
+    .curated/*)
+      relative_path=${relative_path#.curated/}
+      ;;
+  esac
+
+  [ -n "$relative_path" ] || fail "Invalid external skill virtual path: $virtual_path"
+
+  old_ifs=$IFS
+  IFS='/'
+  # shellcheck disable=SC2086
+  set -- $relative_path
+  IFS=$old_ifs
+  validate_skill_path_segments "$virtual_path" "$@"
+
+  skill_id="$1"
+  shift
+  for segment in "$@"; do
+    skill_id="$skill_id:$segment"
+  done
+  validate_skill_id "$skill_id"
+  printf '%s\n' "$skill_id"
+}
+
+external_skill_content_dir() {
+  repo_url="$1"
+  virtual_path="$2"
+  resolved_commit="$3"
+  apm_modules_root="$WORKSPACE_DIR/apm_modules"
+
+  [ -d "$apm_modules_root" ] || fail "External skill cache missing: $apm_modules_root"
+
+  found_path=""
+  for candidate_path in \
+    "$apm_modules_root/$repo_url/$virtual_path" \
+    "$apm_modules_root/$repo_url/$resolved_commit/$virtual_path" \
+    "$apm_modules_root/$repo_url/${virtual_path#skills/}" \
+    "$apm_modules_root/$repo_url/$resolved_commit/${virtual_path#skills/}" \
+    "$apm_modules_root/$resolved_commit/$repo_url/$virtual_path" \
+    "$apm_modules_root/$resolved_commit/$repo_url/${virtual_path#skills/}"; do
+    [ -f "$candidate_path/SKILL.md" ] || continue
+    if [ -n "$found_path" ] && [ "$found_path" != "$candidate_path" ]; then
+      fail "Ambiguous external skill cache paths for $repo_url/$virtual_path"
+    fi
+    found_path="$candidate_path"
+  done
+
+  if [ -n "$found_path" ]; then
+    printf '%s\n' "$found_path"
+    return 0
+  fi
+
+  search_matches=$(
+    rg --files -uu "$apm_modules_root" -g 'SKILL.md' 2>/dev/null | awk -v root="$apm_modules_root/" -v suffix="/$virtual_path/SKILL.md" -v repo="$repo_url" -v commit="$resolved_commit" '
+      {
+        rel = $0
+        if (index(rel, root) == 1) {
+          rel = substr(rel, length(root) + 1)
+        }
+        if (length(rel) < length(suffix) || substr(rel, length(rel) - length(suffix) + 1) != suffix) {
+          next
+        }
+
+        score = 0
+        if (index(rel, repo) > 0) {
+          score += 10
+        }
+        if (commit != "" && index(rel, commit) > 0) {
+          score += 1
+        }
+        print score "\t" root rel
+      }
+    ' | sort -t "$(printf '\t')" -k1,1nr -k2,2
+  ) || true
+
+  best_match=$(printf '%s\n' "$search_matches" | awk -F '\t' '
+    NR == 1 {
+      best_score = $1
+      best_path = $2
+      top_count = 1
+      next
+    }
+    $1 == best_score {
+      top_count++
+    }
+    END {
+      if (best_path == "") {
+        exit 1
+      }
+      if (top_count != 1) {
+        exit 2
+      }
+      print best_path
+    }
+  ')
+  best_status=$?
+  case "$best_status" in
+    0)
+      printf '%s\n' "$best_match"
+      ;;
+    1)
+      fail "Missing external skill cache for $repo_url/$virtual_path@$resolved_commit"
+      ;;
+    *)
+      fail "Ambiguous external skill cache for $repo_url/$virtual_path@$resolved_commit"
+      ;;
+  esac
+}
+
+collect_personal_skill_records() {
+  managed_skill_ids | while IFS= read -r skill_id; do
+    [ -n "$skill_id" ] || continue
+    source_path=$(managed_skill_content_dir "$skill_id")
+    printf 'personal\t%s\t%s\tcatalog\n' "$skill_id" "$source_path"
+  done
+}
+
+collect_external_skill_records() {
+  manifest_refs_file=$(mktemp "${TMPDIR:-/tmp}/apm-manifest-refs.XXXXXX")
+  manifest_keys_file=$(mktemp "${TMPDIR:-/tmp}/apm-manifest-keys.XXXXXX")
+  lock_records_file=$(mktemp "${TMPDIR:-/tmp}/apm-lock-records.XXXXXX")
+  matched_keys_file=$(mktemp "${TMPDIR:-/tmp}/apm-lock-matches.XXXXXX")
+  : >"$matched_keys_file"
+
+  manifest_external_references >"$manifest_refs_file"
+  manifest_external_reference_keys >"$manifest_keys_file"
+  locked_external_skill_records >"$lock_records_file"
+
+  if [ ! -s "$manifest_refs_file" ] && [ ! -s "$lock_records_file" ]; then
+    rm -f "$manifest_refs_file" "$manifest_keys_file" "$lock_records_file" "$matched_keys_file"
+    return 0
+  fi
+
+  has_failure=0
+  while IFS='|' read -r repo_url virtual_path resolved_commit; do
+    [ -n "$repo_url" ] || continue
+    canonical_ref="$repo_url"
+    if [ -n "$virtual_path" ]; then
+      canonical_ref="$canonical_ref/$virtual_path"
+    fi
+
+    if ! awk -v key="$canonical_ref" '$0 == key { found = 1; exit } END { exit(found ? 0 : 1) }' "$manifest_keys_file"; then
+      error "External lock record is not declared in apm.yml: $canonical_ref"
+      has_failure=1
+      continue
+    fi
+
+    printf '%s\n' "$canonical_ref" >>"$matched_keys_file"
+    printf '%s#%s\n' "$canonical_ref" "$resolved_commit" >>"$matched_keys_file"
+
+    source_skill_id=$(external_skill_id_from_virtual_path "$virtual_path")
+    source_path=$(external_skill_content_dir "$repo_url" "$virtual_path" "$resolved_commit")
+    printf 'external\t%s\t%s\t%s\n' "$source_skill_id" "$source_path" "$canonical_ref"
+  done <"$lock_records_file"
+
+  while IFS= read -r manifest_ref; do
+    [ -n "$manifest_ref" ] || continue
+    required_key="$manifest_ref"
+    case "$required_key" in
+      *#*)
+        ;;
+      *)
+        required_key=${required_key%%#*}
+        ;;
+    esac
+
+    if ! awk -v key="$required_key" '$0 == key { found = 1; exit } END { exit(found ? 0 : 1) }' "$matched_keys_file"; then
+      error "External manifest ref is missing from apm.lock.yaml: $manifest_ref"
+      has_failure=1
+    fi
+  done <"$manifest_refs_file"
+
+  rm -f "$manifest_refs_file" "$manifest_keys_file" "$lock_records_file" "$matched_keys_file"
+  [ "$has_failure" -eq 0 ] || fail "External skill state is inconsistent"
+}
+
+build_deployment_plan_entries() {
+  skill_records="$1"
+
+  printf '%s\n' "$skill_records" | while IFS=$'\t' read -r source_kind source_skill_id source_path source_ref; do
+    [ -n "$source_skill_id" ] || continue
+    managed_catalog_runtime_targets | while IFS='|' read -r target_name target_dir _config_name; do
+      deployed_skill_name=$(format_skill_name "$target_name" "$source_skill_id")
+      validate_skill_id "$deployed_skill_name"
+      printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+        "$target_name" \
+        "$target_dir" \
+        "$source_kind" \
+        "$source_skill_id" \
+        "$deployed_skill_name" \
+        "$source_path" \
+        "$source_ref"
+    done
+  done
+}
+
+validate_deployment_collisions() {
+  skill_records="$1"
+  deployment_plan="$2"
+
+  printf '%s\n' "$skill_records" | awk -F '\t' '
+    NF < 4 {
+      next
+    }
+    {
+      if ($2 in seen) {
+        printf "error: duplicate source skill id detected: %s\n", $2 > "/dev/stderr"
+        status = 1
+      }
+      seen[$2] = $1
+    }
+    END {
+      exit status
+    }
+  ' || fail "Deployment source records collided"
+
+  printf '%s\n' "$deployment_plan" | awk -F '\t' '
+    NF < 7 {
+      next
+    }
+    {
+      if ($5 == "") {
+        printf "error: invalid deployed skill name for %s (%s)\n", $4, $1 > "/dev/stderr"
+        status = 1
+        next
+      }
+
+      key = $1 "\t" $5
+      owner = $3 ":" $4
+      if (key in seen) {
+        printf "error: target skill collision for %s/%s (%s vs %s)\n", $1, $5, seen[key], owner > "/dev/stderr"
+        status = 1
+      }
+      seen[key] = owner
+    }
+    END {
+      exit status
+    }
+  ' || fail "Deployment target records collided"
+}
+
+stage_target_skill_records() {
+  deployment_plan="$1"
+  stage_root="$2"
+
+  managed_catalog_runtime_targets | while IFS='|' read -r target_name _target_dir _config_name; do
+    mkdir -p "$stage_root/$target_name/skills"
+  done
+
+  printf '%s\n' "$deployment_plan" | while IFS=$'\t' read -r target_name _target_dir _source_kind _source_skill_id deployed_skill_name source_path _source_ref; do
+    [ -n "$target_name" ] || continue
+    stage_skills_root="$stage_root/$target_name/skills"
+    staged_skill_path=$(internal_target_skill_path "$stage_skills_root" "$deployed_skill_name")
+    mkdir -p "$staged_skill_path"
+    cp -R "$source_path"/. "$staged_skill_path"
+  done
+}
+
+build_target_skill_trees() {
+  stage_root="$1"
+  personal_skill_records=$(collect_personal_skill_records)
+  external_skill_records=$(collect_external_skill_records)
+  skill_records=$(printf '%s\n%s\n' "$personal_skill_records" "$external_skill_records" | awk 'NF')
+  deployment_plan=$(build_deployment_plan_entries "$skill_records")
+
+  validate_deployment_collisions "$skill_records" "$deployment_plan"
+  stage_target_skill_records "$deployment_plan" "$stage_root"
+}
+
+swap_staged_skill_tree_into_place() {
+  staged_skills_root="$1"
+  target_skills_root="$2"
+  target_parent_dir=$(dirname "$target_skills_root")
+  staging_copy_root="$target_parent_dir/.apm-skills-next.$$"
+  backup_root="$target_parent_dir/.apm-skills-backup.$$"
+
+  mkdir -p "$target_parent_dir"
+  rm -rf "$staging_copy_root" "$backup_root"
+  cp -R "$staged_skills_root" "$staging_copy_root"
+
+  if [ -e "$target_skills_root" ] || [ -L "$target_skills_root" ]; then
+    mv "$target_skills_root" "$backup_root"
+  fi
+
+  if mv "$staging_copy_root" "$target_skills_root"; then
+    rm -rf "$backup_root"
+    return 0
+  fi
+
+  rm -rf "$staging_copy_root"
+  if [ -e "$backup_root" ] || [ -L "$backup_root" ]; then
+    mv "$backup_root" "$target_skills_root" || true
+  fi
+  fail "Failed to replace skill target: $target_skills_root"
+}
+
+replace_skill_targets_from_stage() {
+  stage_root="$1"
+
+  managed_catalog_runtime_targets | while IFS='|' read -r target_name target_dir _config_name; do
+    target_root="$HOME/$target_dir"
+    staged_skills_root="$stage_root/$target_name/skills"
+    [ -d "$staged_skills_root" ] || mkdir -p "$staged_skills_root"
+    swap_staged_skill_tree_into_place "$staged_skills_root" "$target_root/skills"
   done
 }
 
