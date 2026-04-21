@@ -55,6 +55,26 @@ scripts: {}
     @(Get-TrackedCatalogRuleRelativePaths) | Should Be @("claude-md-design.md", "tools/rtk.md")
     Test-Path -LiteralPath (Get-TrackedCatalogInstructionsPath) | Should Be $true
   }
+
+  It "parses external lock records as distinct resolved skills" {
+    @"
+lockfile_version: "1"
+dependencies:
+  - repo_url: openai/skills
+    host: github.com
+    resolved_commit: abcdef1234567890
+    virtual_path: skills/.curated/gh-address-comments
+  - repo_url: obra/superpowers
+    host: github.com
+    resolved_commit: 1234567890abcdef
+    virtual_path: skills/brainstorming
+"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.lock.yaml")
+
+    $map = Get-LockPinnedReferenceMap
+
+    $map["openai/skills/skills/.curated/gh-address-comments"] | Should Be "openai/skills/skills/.curated/gh-address-comments#abcdef1234567890"
+    $map["obra/superpowers/skills/brainstorming"] | Should Be "obra/superpowers/skills/brainstorming#1234567890abcdef"
+  }
 }
 
 Describe "public command surface" {
@@ -114,6 +134,11 @@ Describe "public command surface" {
     ($targets | Where-Object Name -eq "cursor").ConfigName | Should Be "AGENTS.md"
   }
 
+  It "normalizes codex skill names without creating duplicate aliases" {
+    Format-SkillName -Target "claude" -SourceSkillId "superpowers:brainstorming" | Should Be "superpowers:brainstorming"
+    Format-SkillName -Target "codex" -SourceSkillId "superpowers:brainstorming" | Should Be "brainstorming"
+  }
+
   It "publishes workspace mise tasks for formatting and ci flow" {
     $miseToml = Get-Content -LiteralPath C:\Users\j138c\.apm\mise.toml -Raw
 
@@ -123,6 +148,9 @@ Describe "public command surface" {
     $miseToml | Should Match '\[tasks\."format:markdown:bold-headings"\]'
     $miseToml | Should Match '\[tasks\."apm:install"\]'
     $miseToml | Should Match '\[tasks\."apm:update"\]'
+    $miseToml | Should Match '\[tasks\.apply\]'
+    $miseToml | Should Match '\[tasks\.update\]'
+    $miseToml | Should Match '\[tasks\.sync\]'
     $miseToml | Should Match '\[tasks\.format\]'
     $miseToml | Should Match '\[tasks\."ci:check"\]'
     $miseToml | Should Match '\[tasks\.ci\]'
@@ -131,6 +159,7 @@ Describe "public command surface" {
     $miseToml | Should Match 'run = "bash ./scripts/apm-workspace.sh apply"'
     $miseToml | Should Match 'run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 apply"'
     $miseToml | Should Match 'replace-bold-headings\.ts" ./catalog/skills'
+    $miseToml | Should Not Match 'Format, validate, and distribute the ~/.apm workspace locally'
     $miseToml | Should Not Match 'APM_BOOTSTRAP_REPO'
   }
 
@@ -163,6 +192,14 @@ Describe "public command surface" {
       $content | Should Not Match $removedAgentsSrcPattern
       $content | Should Not Match $legacyMirrorPattern
     }
+
+    $readme = Get-Content -LiteralPath C:\Users\j138c\.apm\README.md -Raw
+    $todo = Get-Content -LiteralPath C:\Users\j138c\.apm\TODO.md -Raw
+
+    $readme | Should Match 'apm add'
+    $readme | Should Match 'mise run apply'
+    $readme | Should Match 'mise run sync'
+    $todo | Should Match 'formatSkillName'
   }
 
   It "runs catalog release as stage, release gate, and register flow" {
