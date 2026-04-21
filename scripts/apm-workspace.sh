@@ -740,11 +740,6 @@ cmd_update() {
   sync_managed_catalog_runtime_assets
 }
 
-cmd_list() {
-  require_apm
-  apm deps list -g
-}
-
 lock_pinned_reference_map() {
   lock_path="$WORKSPACE_DIR/apm.lock.yaml"
   [ -f "$lock_path" ] || fail "Lock file not found: $lock_path"
@@ -853,6 +848,10 @@ EOF
   log "Pinned $updated_count external dependency references in apm.yml"
 }
 
+managed_skill_ids() {
+  skill_ids_from_root "$(tracked_catalog_skills_root)"
+}
+
 cmd_validate() {
   require_apm
   ensure_workspace_repo
@@ -861,10 +860,6 @@ cmd_validate() {
     cd "$WORKSPACE_DIR"
     apm compile --validate
   )
-}
-
-managed_skill_ids() {
-  skill_ids_from_root "$(tracked_catalog_skills_root)"
 }
 
 managed_agent_relative_paths() {
@@ -1231,7 +1226,6 @@ Commands:
   bootstrap          Ensure ~/.apm checkout + apm.yml + mise.toml are ready
   apply              Deploy user-scope-compatible dependencies and compile Codex output
   update             Pull clean checkout, update deps, then apply
-  list               Show APM global dependencies
   pin-external       Pin external manifest refs to lockfile commits
   validate           Validate the ~/.apm workspace
   validate-catalog   Fail when ~/.apm/catalog is not normalized or missing required assets
@@ -1254,7 +1248,6 @@ case "$COMMAND" in
   bootstrap) cmd_bootstrap "$@" ;;
   apply) cmd_apply ;;
   update) cmd_update ;;
-  list) cmd_list ;;
   pin-external) cmd_pin_external ;;
   validate) cmd_validate ;;
   validate-catalog) cmd_validate_catalog ;;

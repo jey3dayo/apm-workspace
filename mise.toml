@@ -29,8 +29,8 @@ run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\a
 
 [tasks.list]
 description = "Show APM global dependencies"
-run = "bash ./scripts/apm-workspace.sh list"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 list"
+run = "apm deps list -g"
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"apm deps list -g\""
 
 [tasks.doctor]
 description = "Inspect ~/.apm workspace state and deployed targets"

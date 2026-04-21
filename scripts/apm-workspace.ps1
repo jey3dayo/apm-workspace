@@ -694,12 +694,8 @@ function Invoke-Update {
   Sync-ManagedCatalogRuntimeAssets
 }
 
-function Invoke-List {
-  Require-Apm
-  & apm deps list -g
-  if ($LASTEXITCODE -ne 0) {
-    throw "apm deps list -g failed."
-  }
+function Get-CatalogBuildDir {
+  return (Join-Path $CatalogBuildRootDir $CatalogDirName)
 }
 
 function Invoke-Validate {
@@ -707,10 +703,6 @@ function Invoke-Validate {
   Ensure-WorkspaceRepo
   Ensure-WorkspaceScaffold
   Invoke-WorkspaceCommand -CommandArgs @("compile", "--validate")
-}
-
-function Get-CatalogBuildDir {
-  return (Join-Path $CatalogBuildRootDir $CatalogDirName)
 }
 
 function Get-CatalogBuildSkillsRoot {
@@ -1106,7 +1098,10 @@ function Invoke-Doctor {
   }
   Write-Host ("external pins: unpinned={0}" -f (@(Get-UnpinnedExternalReferences)).Count)
   Write-CatalogSummary
-  Invoke-List
+  & apm deps list -g
+  if ($LASTEXITCODE -ne 0) {
+    throw "apm deps list -g failed."
+  }
 }
 
 function Get-InternalDeployTargetRoots {
@@ -1581,10 +1576,6 @@ switch ($Command) {
     Invoke-Update
   }
 
-  "list" {
-    Invoke-List
-  }
-
   "pin-external" {
     Invoke-PinExternal
   }
@@ -1629,7 +1620,6 @@ Commands:
   bootstrap          Ensure ~/.apm checkout + apm.yml + mise.toml are ready
   apply              Deploy user-scope-compatible dependencies and compile Codex output
   update             Pull clean checkout, update deps, then apply
-  list               Show APM global dependencies
   pin-external       Pin external manifest refs to lockfile commits
   validate           Validate the ~/.apm workspace
   validate-catalog   Fail when ~/.apm/catalog is not normalized or missing required assets
