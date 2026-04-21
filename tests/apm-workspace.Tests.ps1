@@ -100,6 +100,8 @@ Describe "public command surface" {
   It "publishes workspace mise tasks for formatting and ci flow" {
     $miseToml = Get-Content -LiteralPath C:\Users\j138c\.apm\mise.toml -Raw
 
+    $miseToml | Should Match '\[tasks\.validate\]'
+    $miseToml | Should Match '\[tasks\."validate:workspace"\]'
     $miseToml | Should Match '\[tasks\."validate:catalog"\]'
     $miseToml | Should Match '\[tasks\."format:markdown:bold-headings"\]'
     $miseToml | Should Match '\[tasks\."apm:install"\]'

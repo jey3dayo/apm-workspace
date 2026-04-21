@@ -32,8 +32,8 @@ description = "Inspect ~/.apm workspace state and deployed targets"
 run = "bash ./scripts/apm-workspace.sh doctor"
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 doctor"
 
-[tasks.validate]
-description = "Validate the ~/.apm workspace and managed catalog wiring"
+[tasks."validate:workspace"]
+description = "Validate the ~/.apm workspace wiring"
 run = "bash ./scripts/apm-workspace.sh validate"
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 validate"
 
@@ -41,6 +41,10 @@ run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\a
 description = "Fail when the managed catalog package is not normalized or missing required assets"
 run = "bash ./scripts/apm-workspace.sh validate:catalog"
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 validate:catalog"
+
+[tasks.validate]
+description = "Validate the ~/.apm workspace and managed catalog wiring"
+depends = ["validate:workspace", "validate:catalog"]
 
 [tasks.stage-catalog]
 description = "Normalize `catalog/` in place inside ~/.apm"
@@ -142,7 +146,7 @@ depends = [
 
 [tasks."ci:check"]
 description = "Run validation-only checks for the ~/.apm workspace"
-depends = ["check:format", "validate", "validate:catalog", "smoke-catalog"]
+depends = ["check:format", "validate", "smoke-catalog"]
 
 # ========================================
 # Meta Tasks

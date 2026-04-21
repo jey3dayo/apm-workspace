@@ -20,7 +20,9 @@
 | `mise run update`           | ○        | ○        | ○        | ○           | ○        | checkout 更新 + deps update + apply 相当                                                         |
 | `mise run doctor`           | 状態確認 | 状態確認 | 状態確認 | 状態確認    | 状態確認 | target presence, overlap, catalog health を確認                                                  |
 | `mise run format`           | 間接     | 間接     | 間接     | 間接        | 間接     | workspace の Markdown / TOML / YAML を整形                                                       |
-| `mise run ci:check`         | ○        | ○        | ○        | ○           | ○        | format check + validate + validate:catalog + smoke-catalog                                       |
+| `mise run ci:check`         | ○        | ○        | ○        | ○           | ○        | format check + validate + smoke-catalog                                                          |
+| `mise run validate`         | ○        | ○        | ○        | ○           | ○        | validate:workspace と validate:catalog をまとめて実行                                            |
+| `mise run validate:workspace` | ○      | ○        | ○        | ○           | ○        | `APM_WORKSPACE_DIR` を尊重した workspace validation                                              |
 | `mise run ci`               | ○        | ○        | ○        | ○           | ○        | format → validation → apply → doctor でローカル配布まで実行                                      |
 | `mise run stage-catalog`    | ○        | ○        | ○        | ○           | ○        | `catalog/` を正規化して managed catalog package を整える                                         |
 | `mise run catalog:tidy`     | ○        | ○        | ○        | ○           | ○        | stage-catalog → validate:catalog → doctor の整理導線                                             |
@@ -31,7 +33,8 @@
 ## Notes
 
 - `register-catalog` は local diff をそのまま配る command ではなく、commit / push 済みの `catalog` を install する flow。
-- `validate:catalog` は `mise.toml` からも叩けるが、実体は workspace script 側の validation command。
+- `validate` は総称 task で、`validate:workspace` と `validate:catalog` を束ねる。
+- `validate:workspace` と `validate:catalog` は `mise.toml` からも叩けるが、実体は workspace script 側の validation command。
 - 新しい personal skill は `~/.apm/catalog/skills/<id>/` に作る。runtime targets を起点にしない。
 - 新しい skill の作成や移管は `skill-creator` を使い、manifest や配布モデル全体の判断は `apm-usage` で補う。
 
