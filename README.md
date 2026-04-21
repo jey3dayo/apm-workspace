@@ -33,6 +33,7 @@ Current APM limitation:
 - user-scope install (`apm install -g`) does not yet support local package refs such as `./packages/...`
 - keep `apm.yml` on remote refs for global install
 - do not switch `apm.yml` to local `./packages/*` refs until user-scope local package support lands in APM
+- Codex is handled separately via `apm compile --target codex --output ~/.codex/AGENTS.md`; this workspace does not treat `~/.codex/skills` as its deployment contract
 
 The formatter for bold headings only rewrites personal skills:
 

@@ -49,6 +49,8 @@ jey3dayo/apm-workspace/catalog#main
 - Keep `~/.config/scripts/replace-bold-headings.ts` available as the one allowed script exception.
 - Keep `apm.yml` on upstream refs, especially `jey3dayo/apm-workspace/catalog#main`.
 - Keep personal source in `~/.apm/src/**` and runtime guidance in `~/.apm/catalog/**`.
+- Treat Codex as a compile target, not a direct user-scope skill target. The current script path is `apm compile --target codex --output ~/.codex/AGENTS.md`.
+- Do not use `~/.codex/skills` as the verification source of truth for this workspace. Verify Codex rollout through compile success and `~/.codex/AGENTS.md`.
 
 ## Default Flow
 

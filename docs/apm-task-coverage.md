@@ -6,6 +6,7 @@
 - `~/.config` is bootstrap-only. It may be used to start or maintain the local APM environment, but it is not the operational source of truth.
 - The only allowed operational exception under `~/.config` is `~/.config/scripts/replace-bold-headings.ts`, which exists as a formatter helper for heading normalization.
 - `~/.config/nix/agent-skills-sources.nix` is retired and intentionally empty because external skill sources were removed.
+- Codex is currently handled as a compile target via `apm compile --target codex --output ~/.codex/AGENTS.md`, not as a user-scope skill install target.
 
 ## Where Content Lives
 
@@ -18,6 +19,7 @@
 | `AGENTS.md`            | `~/.apm/catalog/AGENTS.md`                   | Managed catalog instructions           |
 | formatter helper       | `~/.config/scripts/replace-bold-headings.ts` | Allowed bootstrap/helper exception     |
 | retired skills sources | `~/.config/nix/agent-skills-sources.nix`     | Intentionally empty; do not repopulate |
+| Codex compiled output  | `~/.codex/AGENTS.md`                         | Produced by `apm compile --target codex` |
 
 ## Task Coverage
 
@@ -36,6 +38,7 @@
 | `mise run register-catalog`   | ○        | ○        | ○        | ○           | ○        | Installs a pushed `catalog` ref                                                    |
 | `mise run smoke-catalog`      | ○        | ○        | ○        | ○           | ○        | Performs a temporary-install smoke test                                            |
 | `mise run validate:catalog`   | ○        | ○        | ○        | ○           | ○        | Public task for drift checks                                                       |
+| `mise run apply` for Codex    | n/a      | ○        | ○        | ○           | n/a      | Runs `apm compile --target codex --output ~/.codex/AGENTS.md` instead of treating `~/.codex/skills` as the rollout contract |
 
 ## Acceptance Criteria
 
@@ -46,6 +49,7 @@ This migration slice is complete only when all of the following are true:
 3. The only allowed operational exception under `~/.config` is `~/.config/scripts/replace-bold-headings.ts`, and this document names it explicitly.
 4. `~/.config/nix/agent-skills-sources.nix` remains retired and intentionally empty, with no external skill source definitions restored there.
 5. The task coverage above continues to map operational work to `~/.apm` as the source of truth.
+6. Codex verification is based on compile success and `~/.codex/AGENTS.md`, not on the contents of `~/.codex/skills`.
 
 ## Notes
 
