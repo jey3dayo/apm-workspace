@@ -2227,8 +2227,11 @@ function Invoke-SmokeCatalog {
     foreach ($skillId in $skillIds) {
       $bundleSkillDir = Get-CatalogBuildSkillsRoot
       $installedSkillDir = Join-Path $tempDir ".agents/skills"
+      $installedSkillName = Format-SkillName -Target "codex" -SourceSkillId $skillId
       foreach ($segment in (Convert-SkillIdToPathSegments -SkillId $skillId)) {
         $bundleSkillDir = Join-Path $bundleSkillDir $segment
+      }
+      foreach ($segment in (Convert-SkillIdToPathSegments -SkillId $installedSkillName)) {
         $installedSkillDir = Join-Path $installedSkillDir $segment
       }
       $skillPath = Join-Path $installedSkillDir "SKILL.md"
