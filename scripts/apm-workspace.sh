@@ -221,7 +221,8 @@ version: 1.0.0
 description: APM project for $project_name
 author: $author_name
 dependencies:
-  apm: []
+  apm:
+    - jey3dayo/apm-workspace/catalog#main
   mcp: []
 scripts: {}
 EOF
@@ -301,6 +302,27 @@ skill_ids_from_root() {
   )
 }
 
+format_skill_name() {
+  target="$1"
+  source_skill_id="$2"
+
+  case "$target" in
+    codex)
+      case "$source_skill_id" in
+        superpowers:*)
+          printf '%s\n' "${source_skill_id#superpowers:}"
+          ;;
+        *)
+          printf '%s\n' "$source_skill_id"
+          ;;
+      esac
+      ;;
+    *)
+      printf '%s\n' "$source_skill_id"
+      ;;
+  esac
+}
+
 write_catalog_manifest_template() {
   destination_dir="$1"
   cat >"$destination_dir/apm.yml" <<EOF
@@ -312,6 +334,40 @@ dependencies:
   mcp: []
 scripts: {}
 EOF
+}
+
+locked_external_skill_records() {
+  lock_path="$WORKSPACE_DIR/apm.lock.yaml"
+  [ -f "$lock_path" ] || fail "Lock file not found: $lock_path"
+
+  awk '
+    function flush_record() {
+      if (repo_url != "" && resolved_commit != "") {
+        printf "%s|%s|%s\n", repo_url, virtual_path, resolved_commit
+      }
+    }
+    /^[[:space:]]*-[[:space:]]+repo_url:[[:space:]]+/ {
+      flush_record()
+      repo_url = substr($0, index($0, ":") + 1)
+      sub(/^[[:space:]]+/, "", repo_url)
+      resolved_commit = ""
+      virtual_path = ""
+      next
+    }
+    /^[[:space:]]+resolved_commit:[[:space:]]+/ {
+      resolved_commit = substr($0, index($0, ":") + 1)
+      sub(/^[[:space:]]+/, "", resolved_commit)
+      next
+    }
+    /^[[:space:]]+virtual_path:[[:space:]]+/ {
+      virtual_path = substr($0, index($0, ":") + 1)
+      sub(/^[[:space:]]+/, "", virtual_path)
+      next
+    }
+    END {
+      flush_record()
+    }
+  ' "$lock_path"
 }
 
 write_catalog_readme() {
@@ -770,41 +826,15 @@ cmd_check_catalog_metadata() {
 }
 
 lock_pinned_reference_map() {
-  lock_path="$WORKSPACE_DIR/apm.lock.yaml"
-  [ -f "$lock_path" ] || fail "Lock file not found: $lock_path"
-
-  awk '
-    /^- repo_url: / {
-      if (repo_url != "" && resolved_commit != "") {
-        canonical = repo_url
-        if (virtual_path != "") {
-          canonical = canonical "/" virtual_path
-        }
-        printf "%s\t%s#%s\n", canonical, canonical, resolved_commit
+  locked_external_skill_records | awk -F '|' '
+    {
+      canonical = $1
+      if ($2 != "") {
+        canonical = canonical "/" $2
       }
-      repo_url = substr($0, index($0, ": ") + 2)
-      resolved_commit = ""
-      virtual_path = ""
-      next
+      printf "%s\t%s#%s\n", canonical, canonical, $3
     }
-    /^[[:space:]]+resolved_commit: / {
-      resolved_commit = substr($0, index($0, ": ") + 2)
-      next
-    }
-    /^[[:space:]]+virtual_path: / {
-      virtual_path = substr($0, index($0, ": ") + 2)
-      next
-    }
-    END {
-      if (repo_url != "" && resolved_commit != "") {
-        canonical = repo_url
-        if (virtual_path != "") {
-          canonical = canonical "/" virtual_path
-        }
-        printf "%s\t%s#%s\n", canonical, canonical, resolved_commit
-      }
-    }
-  ' "$lock_path"
+  '
 }
 
 unpinned_external_references() {

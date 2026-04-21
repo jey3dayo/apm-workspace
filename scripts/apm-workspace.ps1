@@ -262,7 +262,8 @@ function Write-WorkspaceManifestTemplate {
     "description: APM project for $projectName",
     "author: $authorName",
     "dependencies:",
-    "  apm: []",
+    "  apm:",
+    "    - jey3dayo/apm-workspace/catalog#main",
     "  mcp: []",
     "scripts: {}"
   ) -join [Environment]::NewLine
@@ -521,6 +522,21 @@ function Test-ManifestHasLocalPackages {
 }
 
 function Get-LockPinnedReferenceMap {
+  $map = @{}
+  foreach ($record in (Get-LockedExternalSkillRecords)) {
+    $canonical = if ([string]::IsNullOrWhiteSpace($record.Path)) {
+      $record.Repo
+    } else {
+      "$($record.Repo)/$($record.Path)"
+    }
+
+    $map[$canonical] = "$canonical#$($record.Commit)"
+  }
+
+  return $map
+}
+
+function Get-LockedExternalSkillRecords {
   $lockPath = Join-Path $WorkspaceDir "apm.lock.yaml"
   if (-not (Test-Path -LiteralPath $lockPath)) {
     throw "Lock file not found: $lockPath"
@@ -529,7 +545,7 @@ function Get-LockPinnedReferenceMap {
   $records = @()
   $current = @{}
   foreach ($line in (Get-Content -LiteralPath $lockPath)) {
-    if ($line -match '^- repo_url:\s+(.+)$') {
+    if ($line -match '^\s*-\s+repo_url:\s+(.+)$') {
       if ($current.ContainsKey('repo_url')) {
         $records += [pscustomobject]$current
       }
@@ -556,22 +572,36 @@ function Get-LockPinnedReferenceMap {
     $records += [pscustomobject]$current
   }
 
-  $map = @{}
+  $result = New-Object System.Collections.Generic.List[object]
   foreach ($record in $records) {
     if (-not $record.PSObject.Properties.Name.Contains('resolved_commit')) {
       continue
     }
 
-    $canonical = if ($record.PSObject.Properties.Name.Contains('virtual_path') -and -not [string]::IsNullOrWhiteSpace($record.virtual_path)) {
-      "$($record.repo_url)/$($record.virtual_path)"
-    } else {
-      $record.repo_url
-    }
-
-    $map[$canonical] = "$canonical#$($record.resolved_commit)"
+    $result.Add([pscustomobject]@{
+      Repo = $record.repo_url
+      Path = if ($record.PSObject.Properties.Name.Contains('virtual_path') -and -not [string]::IsNullOrWhiteSpace($record.virtual_path)) { $record.virtual_path } else { "" }
+      Commit = $record.resolved_commit
+    })
   }
 
-  return $map
+  return $result.ToArray()
+}
+
+function Format-SkillName {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Target,
+
+    [Parameter(Mandatory = $true)]
+    [string]$SourceSkillId
+  )
+
+  if ($Target -eq "codex" -and $SourceSkillId.StartsWith("superpowers:")) {
+    return $SourceSkillId.Substring("superpowers:".Length)
+  }
+
+  return $SourceSkillId
 }
 
 function Get-UnpinnedExternalReferences {
