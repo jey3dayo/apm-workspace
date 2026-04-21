@@ -833,6 +833,29 @@ function Convert-ReferencePathToSegments {
   return $segments
 }
 
+function Test-PathEndsWithSegments {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string[]]$PathSegments,
+
+    [Parameter(Mandatory = $true)]
+    [string[]]$SuffixSegments
+  )
+
+  if ($SuffixSegments.Count -eq 0 -or $PathSegments.Count -lt $SuffixSegments.Count) {
+    return $false
+  }
+
+  $offset = $PathSegments.Count - $SuffixSegments.Count
+  for ($index = 0; $index -lt $SuffixSegments.Count; $index++) {
+    if ($PathSegments[$offset + $index] -ne $SuffixSegments[$index]) {
+      return $false
+    }
+  }
+
+  return $true
+}
+
 function Get-CanonicalLockRecordReference {
   param(
     [Parameter(Mandatory = $true)]
@@ -927,21 +950,45 @@ function Get-ExternalSkillInstallPath {
     throw "Missing external skill cache for $RepoUrl@$ResolvedCommit"
   }
 
-  $relativeSuffix = ((Convert-ReferencePathToSegments -Value $VirtualPath) -join [System.IO.Path]::DirectorySeparatorChar)
+  $fallbackSuffixes = New-Object System.Collections.Generic.List[object]
+  $seenSuffixes = New-Object 'System.Collections.Generic.HashSet[string]'
+  foreach ($suffixSegments in @($virtualSegments, $strippedVirtualSegments)) {
+    if (-not $suffixSegments -or $suffixSegments.Count -eq 0) {
+      continue
+    }
+
+    $suffixKey = ($suffixSegments -join '/')
+    if ($seenSuffixes.Add($suffixKey)) {
+      $fallbackSuffixes.Add($suffixSegments)
+    }
+  }
+
+  $resolvedModulesRoot = (Resolve-Path -LiteralPath $apmModulesRoot).Path
   $skillFiles = @(Get-ChildItem -LiteralPath $apmModulesRoot -Recurse -Force -Filter "SKILL.md" -File -ErrorAction SilentlyContinue)
   $matches = New-Object System.Collections.Generic.List[object]
+  $seenMatches = New-Object 'System.Collections.Generic.HashSet[string]'
   foreach ($skillFile in $skillFiles) {
     $candidateDir = Split-Path -Parent $skillFile.FullName
-    $expectedSuffix = [System.IO.Path]::DirectorySeparatorChar + $relativeSuffix
-    if (-not $candidateDir.EndsWith($expectedSuffix)) {
+    $candidateRelativePath = $candidateDir.Substring($resolvedModulesRoot.Length).TrimStart('\', '/')
+    if ([string]::IsNullOrWhiteSpace($candidateRelativePath)) {
+      continue
+    }
+
+    $candidateRelativeSegments = @($candidateRelativePath -split '[\\/]')
+    if (-not ($fallbackSuffixes | Where-Object { Test-PathEndsWithSegments -PathSegments $candidateRelativeSegments -SuffixSegments $_ })) {
+      continue
+    }
+
+    $normalizedCandidateRelativePath = $candidateRelativeSegments -join '/'
+    if (-not $seenMatches.Add($candidateDir)) {
       continue
     }
 
     $score = 0
-    if ($candidateDir.Contains($RepoUrl)) {
+    if ($normalizedCandidateRelativePath.Contains($RepoUrl)) {
       $score += 10
     }
-    if (-not [string]::IsNullOrWhiteSpace($ResolvedCommit) -and $candidateDir.Contains($ResolvedCommit)) {
+    if (-not [string]::IsNullOrWhiteSpace($ResolvedCommit) -and $normalizedCandidateRelativePath.Contains($ResolvedCommit)) {
       $score += 1
     }
 
