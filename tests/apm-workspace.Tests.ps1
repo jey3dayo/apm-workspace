@@ -176,15 +176,15 @@ Describe "public command surface" {
     $removedAgentsSrcPattern = [regex]::Escape($removedAgentsRoot) + '/src'
     $legacyMirrorPattern = 'transitional\s+' + 'mirror'
     $files = @(
-      'C:\Users\j138c\.apm\catalog\.apm\skills\apm-usage\SKILL.md'
-      'C:\Users\j138c\.apm\catalog\.apm\skills\skill-creator\SKILL.md'
-      'C:\Users\j138c\.apm\catalog\.apm\skills\docs-index\indexes\agents-index.md'
-      'C:\Users\j138c\.apm\catalog\.apm\skills\nix-dotfiles\SKILL.md'
-      'C:\Users\j138c\.apm\catalog\.apm\skills\nix-dotfiles\README.md'
-      'C:\Users\j138c\.apm\catalog\.apm\skills\nix-dotfiles\references\commands.md'
-      'C:\Users\j138c\.apm\catalog\.apm\skills\nix-dotfiles\references\troubleshooting.md'
-      'C:\Users\j138c\.apm\catalog\.apm\skills\rtk\SKILL.md'
-      'C:\Users\j138c\.apm\catalog\.apm\skills\rtk\references\command-reference.md'
+      'C:\Users\j138c\.apm\catalog\skills\apm-usage\SKILL.md'
+      'C:\Users\j138c\.apm\catalog\skills\skill-creator\SKILL.md'
+      'C:\Users\j138c\.apm\catalog\skills\docs-index\indexes\agents-index.md'
+      'C:\Users\j138c\.apm\catalog\skills\nix-dotfiles\SKILL.md'
+      'C:\Users\j138c\.apm\catalog\skills\nix-dotfiles\README.md'
+      'C:\Users\j138c\.apm\catalog\skills\nix-dotfiles\references\commands.md'
+      'C:\Users\j138c\.apm\catalog\skills\nix-dotfiles\references\troubleshooting.md'
+      'C:\Users\j138c\.apm\catalog\skills\rtk\SKILL.md'
+      'C:\Users\j138c\.apm\catalog\skills\rtk\references\command-reference.md'
     )
 
     foreach ($file in $files) {
