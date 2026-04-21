@@ -4,12 +4,12 @@ User allowlist fields are set to wildcard values (`"*"`) that permit ANY GitHub 
 
 ## Applicable Actions
 
-| Action | Applicable | Notes |
-|--------|-----------|-------|
-| Claude Code Action | Yes | `allowed_non_write_users: "*"` and `allowed_bots: "*"` confirmed in many PoCs |
-| OpenAI Codex | Yes | `allow-users: "*"` and `allow-bots: "*"` confirmed in PoCs |
-| Gemini CLI | No | No equivalent user allowlist field -- any user who can trigger the workflow event can interact |
-| GitHub AI Inference | No | No equivalent user allowlist field -- access controlled by workflow trigger permissions only |
+| Action              | Applicable | Notes                                                                                          |
+| ------------------- | ---------- | ---------------------------------------------------------------------------------------------- |
+| Claude Code Action  | Yes        | `allowed_non_write_users: "*"` and `allowed_bots: "*"` confirmed in many PoCs                  |
+| OpenAI Codex        | Yes        | `allow-users: "*"` and `allow-bots: "*"` confirmed in PoCs                                     |
+| Gemini CLI          | No         | No equivalent user allowlist field -- any user who can trigger the workflow event can interact |
+| GitHub AI Inference | No         | No equivalent user allowlist field -- access controlled by workflow trigger permissions only   |
 
 ## Trigger Events
 

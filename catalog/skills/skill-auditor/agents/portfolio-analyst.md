@@ -46,10 +46,11 @@ other skills in its own project context, not with local skills from unrelated
 projects.
 
 For each skill, evaluate:
+
 - Directive density: How many distinct instructions/triggers does the
   description contain? A skill with 8 overlapping trigger phrases competes
   more aggressively than one with 2 clear triggers, regardless of token count.
-- Budget share: What percentage of the *effective* budget (global-only for
+- Budget share: What percentage of the _effective_ budget (global-only for
   global skills, global+local for project-local skills) does this skill consume?
   Report this for context but do not use it alone to label skills as "bloated".
 - Attention-heavy candidates: Skills whose descriptions contain many
@@ -67,6 +68,7 @@ incidents (from the audit), classify the relationship:
 - nested: One skill's scope is a proper subset of another's.
 
 For each non-orthogonal pair, specify:
+
 - Which intents belong to which skill
 - Where the boundary should be drawn
 - Whether coordinated description edits are needed
@@ -74,6 +76,7 @@ For each non-orthogonal pair, specify:
 ### 3. Portfolio Health Score
 
 An overall assessment considering:
+
 - Routing accuracy across all skills
 - Description token efficiency
 - Number of competition conflicts

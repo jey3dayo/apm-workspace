@@ -4,12 +4,12 @@ Direct `${{ github.event.* }}` expressions embedded in AI prompt fields. The YAM
 
 ## Applicable Actions
 
-| Action | Applicable | Notes |
-|--------|-----------|-------|
-| Claude Code Action | Yes | Check `with.prompt` and `with.claude_args` for embedded expressions |
-| Gemini CLI | Yes | Check `with.prompt` for direct expressions |
-| OpenAI Codex | Yes | Check `with.prompt`, `with.prompt-file` (if resolving to attacker-controlled path), `with.codex-args` |
-| GitHub AI Inference | Yes | Check `with.prompt`, `with.system-prompt`, `with.system-prompt-file` |
+| Action              | Applicable | Notes                                                                                                 |
+| ------------------- | ---------- | ----------------------------------------------------------------------------------------------------- |
+| Claude Code Action  | Yes        | Check `with.prompt` and `with.claude_args` for embedded expressions                                   |
+| Gemini CLI          | Yes        | Check `with.prompt` for direct expressions                                                            |
+| OpenAI Codex        | Yes        | Check `with.prompt`, `with.prompt-file` (if resolving to attacker-controlled path), `with.codex-args` |
+| GitHub AI Inference | Yes        | Check `with.prompt`, `with.system-prompt`, `with.system-prompt-file`                                  |
 
 Check ALL `with:` fields that accept text content, not just `prompt:`. Each action has multiple fields that are injection surfaces.
 

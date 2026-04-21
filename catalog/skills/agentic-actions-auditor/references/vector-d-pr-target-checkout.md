@@ -4,12 +4,12 @@ An attacker opens a fork pull request against a repository that uses `pull_reque
 
 ## Applicable Actions
 
-| Action | Applicable | Notes |
-|--------|-----------|-------|
-| Claude Code Action | Yes | Confirmed -- PoC 18. Reads files from checked-out working directory. |
-| Gemini CLI | Yes | Applicable if used with `pull_request_target`. Same filesystem read behavior. |
-| OpenAI Codex | Yes | Applicable. Reads files from working directory for code analysis. |
-| GitHub AI Inference | Possible | Less common, but applicable if the prompt instructs the model to read file contents from disk. |
+| Action              | Applicable | Notes                                                                                          |
+| ------------------- | ---------- | ---------------------------------------------------------------------------------------------- |
+| Claude Code Action  | Yes        | Confirmed -- PoC 18. Reads files from checked-out working directory.                           |
+| Gemini CLI          | Yes        | Applicable if used with `pull_request_target`. Same filesystem read behavior.                  |
+| OpenAI Codex        | Yes        | Applicable. Reads files from working directory for code analysis.                              |
+| GitHub AI Inference | Possible   | Less common, but applicable if the prompt instructs the model to read file contents from disk. |
 
 The key requirement is any AI action that reads files from the checked-out working directory. The attacker embeds prompt injection payloads in code comments, README files, configuration files, or any file the AI is likely to read during review.
 
@@ -62,7 +62,7 @@ From PoC 18 (frankbria/ralph-claude-code):
 
 ```yaml
 on:
-  pull_request_target:                              # Step 1: Runs in base branch context
+  pull_request_target: # Step 1: Runs in base branch context
     types: [opened, synchronize]
 
 jobs:
@@ -71,7 +71,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}  # Step 2: Checks out ATTACKER's code
+          ref: ${{ github.event.pull_request.head.sha }} # Step 2: Checks out ATTACKER's code
       - uses: anthropics/claude-code-action@v1
         with:
           prompt: |

@@ -17,18 +17,18 @@
 ### Counts by Risk Factor
 
 | Risk Factor | Dependencies | Total |
-|-------------|--------------|-------|
+| ----------- | ------------ | ----- |
 | X           | X, Y, Z...   | #     |
 | X           | X, Y, Z...   | #     |
 | X           | X, Y, Z...   | #     |
-| Total   | —            | # |
+| Total       | —            | #     |
 
 ### High-Risk Dependencies
 
 The following dependencies have two or more risk factors.
 
-| Dependency Name | Risk Factors | Notes | Suggested Alternative |
-|-----------------|--------------|-------|-----------------------|
+| Dependency Name | Risk Factors | Notes                               | Suggested Alternative   |
+| --------------- | ------------ | ----------------------------------- | ----------------------- |
 | X               | X, Y, Z      | a short summary of the risk factors | X - short justification |
 | X               | X, Y, Z      | a short summary of the risk factors | X - short justification |
 | X               | X, Y, Z      | a short summary of the risk factors | X - short justification |

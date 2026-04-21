@@ -6,12 +6,12 @@ AI agent response is consumed by a subsequent workflow step that passes it throu
 
 This vector applies to any AI action whose output is consumed by subsequent `run:` steps. The detection target is the CONSUMING step, not the AI action.
 
-| Action | Applicable | Notes |
-|--------|-----------|-------|
-| GitHub AI Inference | Primary concern | Most commonly used with structured output parsing in subsequent steps; outputs via `steps.<id>.outputs.response` |
-| Claude Code Action | Applicable if output captured | Primarily operates on codebase directly, but output can be captured in subsequent steps |
-| Gemini CLI | Applicable if output captured | Primarily operates on codebase directly, but output can be captured in subsequent steps |
-| OpenAI Codex | Applicable if output captured | Primarily operates on codebase directly, but output can be captured in subsequent steps |
+| Action              | Applicable                    | Notes                                                                                                            |
+| ------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| GitHub AI Inference | Primary concern               | Most commonly used with structured output parsing in subsequent steps; outputs via `steps.<id>.outputs.response` |
+| Claude Code Action  | Applicable if output captured | Primarily operates on codebase directly, but output can be captured in subsequent steps                          |
+| Gemini CLI          | Applicable if output captured | Primarily operates on codebase directly, but output can be captured in subsequent steps                          |
+| OpenAI Codex        | Applicable if output captured | Primarily operates on codebase directly, but output can be captured in subsequent steps                          |
 
 ## Trigger Events
 
@@ -42,6 +42,7 @@ The AI output crosses a trust boundary: it is treated as trusted data by the sub
 ## Where to Look
 
 Steps FOLLOWING the AI action step in the same job. Check:
+
 - `run:` blocks for `eval`, `exec`, unquoted variable expansion, `$()`, backtick expansion
 - Step-level `env:` blocks for `${{ steps.<ai-step-id>.outputs.* }}` from the AI step
 - Python/Node inline scripts that combine `json.loads()` with shell command construction

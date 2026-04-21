@@ -4,12 +4,12 @@ The prompt instructs the AI agent to fetch attacker-controlled content at runtim
 
 ## Applicable Actions
 
-| Action | Applicable | Notes |
-|--------|-----------|-------|
-| Claude Code Action | Yes | Confirmed -- uses `gh` CLI via Bash tool to fetch issue/PR content |
-| Gemini CLI | Yes | Can execute `gh` commands if shell tools are enabled |
-| OpenAI Codex | Yes | Can execute `gh` commands if sandbox allows shell access |
-| GitHub AI Inference | No | No shell access -- cannot execute CLI commands at runtime |
+| Action              | Applicable | Notes                                                              |
+| ------------------- | ---------- | ------------------------------------------------------------------ |
+| Claude Code Action  | Yes        | Confirmed -- uses `gh` CLI via Bash tool to fetch issue/PR content |
+| Gemini CLI          | Yes        | Can execute `gh` commands if shell tools are enabled               |
+| OpenAI Codex        | Yes        | Can execute `gh` commands if sandbox allows shell access           |
+| GitHub AI Inference | No         | No shell access -- cannot execute CLI commands at runtime          |
 
 Applicability depends on the action having shell/CLI tool access. Actions without shell capabilities cannot fetch data at runtime.
 

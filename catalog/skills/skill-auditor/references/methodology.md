@@ -19,6 +19,7 @@ and no explicit feedback. The system is flying blind.
 ### Why This Matters
 
 When a wrong skill is loaded:
+
 - The user gets suboptimal output (wrong template, wrong approach)
 - Downstream optimization is wasted — you're optimizing the wrong skill
 - The user may not even realize a better skill existed
@@ -35,6 +36,7 @@ Skills don't exist in isolation. They compete for the router's attention.
 
 Improving Skill A's description (adding keywords, broadening scope) can
 degrade Skill B's routing accuracy if:
+
 - The new keywords overlap with Skill B's domain
 - The broader scope now covers cases that should go to Skill B
 - Skill A's description becomes "louder" relative to Skill B
@@ -64,7 +66,7 @@ When Claude Code loads a skill, it reads the skill's SKILL.md file. This
 appears in the transcript as a Read/view tool call:
 
 ```json
-{"type": "tool_use", "name": "Read", "input": {"file_path": "...SKILL.md"}}
+{ "type": "tool_use", "name": "Read", "input": { "file_path": "...SKILL.md" } }
 ```
 
 This is a reliable signal because it happens for every skill load and the
@@ -106,13 +108,13 @@ LLM judges can be inconsistent. We mitigate this by:
 
 ## Relationship to skill-creator
 
-| Aspect | skill-creator | skill-auditor |
-|--------|--------------|---------------|
-| Timing | Pre-deployment | Post-deployment |
-| Scope | Individual skill | Full portfolio |
-| Data | Synthetic test queries | Real session transcripts |
-| Optimization | Single description in isolation | Set-level with cascade checking |
-| Key problem | "Is this skill good?" | "Are skills working well together?" |
+| Aspect       | skill-creator                   | skill-auditor                       |
+| ------------ | ------------------------------- | ----------------------------------- |
+| Timing       | Pre-deployment                  | Post-deployment                     |
+| Scope        | Individual skill                | Full portfolio                      |
+| Data         | Synthetic test queries          | Real session transcripts            |
+| Optimization | Single description in isolation | Set-level with cascade checking     |
+| Key problem  | "Is this skill good?"           | "Are skills working well together?" |
 
 skill-creator's biggest limitation: it optimizes descriptions by testing with
 `claude -p` and only the target skill installed. This misses attention

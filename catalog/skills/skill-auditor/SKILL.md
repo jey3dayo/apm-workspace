@@ -47,12 +47,14 @@ For current-project mode, use `--cwd "$(pwd)"`.
 ### Step 1: Detect Project
 
 If cross-project mode was selected:
+
 ```bash
 python3 scripts/collect_transcripts.py all --days 14 \
   --output <workspace>/transcripts.json --verbose
 ```
 
 If current-project mode:
+
 ```bash
 python3 scripts/collect_transcripts.py --cwd "$(pwd)" --days 14 \
   --output <workspace>/transcripts.json --verbose
@@ -94,6 +96,7 @@ Report the collection summary to the user:
 ### Step 4: Routing Audit (Sub-agents)
 
 Spawn one or more routing-analyst sub-agents. Each sub-agent:
+
 1. Reads `agents/routing-analyst.md` for its analysis rubric
 2. Reads a **filtered** skill manifest (only skills visible to that batch)
 3. Reads a batch of transcripts
@@ -233,6 +236,7 @@ For each batch i:
 ```
 
 After all sub-agents complete, merge batch results:
+
 - Union all `skill_reports` (combine incidents, recalculate stats per skill)
 - Union all `competition_pairs` and `coverage_gaps`
 - Recalculate `meta` totals (sum sessions_analyzed, turns_analyzed, etc.)
@@ -320,6 +324,7 @@ python3 scripts/apply_patches.py \
 ### Step 10: Summary
 
 Report what was done:
+
 - How many sessions analyzed
 - How many routing issues found
 - Portfolio health score
@@ -330,34 +335,38 @@ Report what was done:
 ## Analysis Capabilities
 
 ### Routing Accuracy
+
 Per-skill fire count, accuracy, false positives/negatives, specific incidents
 with root cause analysis. See `agents/routing-analyst.md` for the rubric.
 
 ### Attention Budget
+
 Total description tokens across all skills. Per-skill token cost and efficiency
 rating. Identifies bloated descriptions that waste attention budget.
 See `agents/portfolio-analyst.md`.
 
 ### Competition Matrix
+
 Classifies skill-pair relationships: orthogonal / adjacent / overlapping / nested.
 Based on real transcript evidence, not just keyword overlap.
 
 ### Portfolio-Aware Optimization
+
 Patches consider the full skill set. Cascade checking is mandatory — each patch
 states what it fixes, what it might break, and the token budget impact.
 See `agents/improvement-planner.md`.
 
 ## Error Taxonomy
 
-| Verdict | Description |
-|---------|-------------|
-| correct | Right skill loaded for the intent |
-| false_negative | Skill should have loaded but didn't. High bar: task must be meaningfully worse without it |
-| false_positive | Skill loaded but was irrelevant |
-| confused | Wrong skill loaded instead of the correct one |
-| no_skill_needed | No skill was needed for this turn (most common) |
-| explicit_invocation | User explicitly called `/skill-name` — not a routing event, skip from accuracy calc |
-| coverage_gap | User intent not covered by any existing skill |
+| Verdict             | Description                                                                               |
+| ------------------- | ----------------------------------------------------------------------------------------- |
+| correct             | Right skill loaded for the intent                                                         |
+| false_negative      | Skill should have loaded but didn't. High bar: task must be meaningfully worse without it |
+| false_positive      | Skill loaded but was irrelevant                                                           |
+| confused            | Wrong skill loaded instead of the correct one                                             |
+| no_skill_needed     | No skill was needed for this turn (most common)                                           |
+| explicit_invocation | User explicitly called `/skill-name` — not a routing event, skip from accuracy calc       |
+| coverage_gap        | User intent not covered by any existing skill                                             |
 
 Note on `disable-model-invocation: true`: Skills with this flag never
 auto-fire by design. They are excluded from false_negative analysis and

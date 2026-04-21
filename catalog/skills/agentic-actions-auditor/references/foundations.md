@@ -47,14 +47,14 @@ env:
 
 These `on:` events expose workflows to external attacker-controlled input:
 
-| Trigger | Attacker-Controlled Data | Risk Level |
-|---------|-------------------------|------------|
-| `issues` (opened, edited) | Issue title, body | External users can create issues |
-| `issue_comment` (created) | Comment body | External users can comment |
-| `pull_request_target` | PR title, body, head ref, head SHA | Runs in base branch context WITH secrets |
-| `pull_request` | Head ref, head SHA | Typically no secrets from forks, but ref is controlled |
-| `discussion` / `discussion_comment` | Discussion title, body, comment body | External users can create discussions |
-| `workflow_dispatch` | Input values | Triggering user controls all inputs |
+| Trigger                             | Attacker-Controlled Data             | Risk Level                                             |
+| ----------------------------------- | ------------------------------------ | ------------------------------------------------------ |
+| `issues` (opened, edited)           | Issue title, body                    | External users can create issues                       |
+| `issue_comment` (created)           | Comment body                         | External users can comment                             |
+| `pull_request_target`               | PR title, body, head ref, head SHA   | Runs in base branch context WITH secrets               |
+| `pull_request`                      | Head ref, head SHA                   | Typically no secrets from forks, but ref is controlled |
+| `discussion` / `discussion_comment` | Discussion title, body, comment body | External users can create discussions                  |
+| `workflow_dispatch`                 | Input values                         | Triggering user controls all inputs                    |
 
 Note: `push` events from the default branch and `pull_request` events that do not grant secrets to forks are generally lower risk for prompt injection because the attacker cannot influence the content that reaches the AI agent without already having write access.
 
@@ -63,16 +63,19 @@ Note: `push` events from the default branch and `pull_request` events that do no
 Attacker input reaches AI agents through three distinct paths:
 
 ### Path 1 -- Direct expression interpolation:
+
 ```
 github.event.*.body  ->  ${{ }} in prompt field  ->  AI processes attacker text
 ```
 
 ### Path 2 -- Env var intermediary:
+
 ```
 github.event.*.body  ->  env: VAR: ${{ }}  ->  prompt reads $VAR  ->  AI processes attacker text
 ```
 
 ### Path 3 -- Runtime fetch:
+
 ```
 github.event.*.number  ->  gh issue view N  ->  API returns attacker body  ->  AI processes attacker text
 ```
@@ -83,12 +86,12 @@ Path 2 requires extra attention because the prompt field contains zero `${{ }}` 
 
 Where each supported action receives prompt content that could carry attacker input:
 
-| Action | Prompt Fields | Notes |
-|--------|--------------|-------|
-| `anthropics/claude-code-action` | `with.prompt` | Also check `with.claude_args` for embedded instructions |
-| `google-github-actions/run-gemini-cli` | `with.prompt` | Shell-style env var interpolation in prompt text |
-| `google-gemini/gemini-cli-action` | `with.prompt` | Legacy/archived Gemini action reference |
-| `openai/codex-action` | `with.prompt`, `with.prompt-file` | `prompt-file` may point to attacker-controlled file |
-| `actions/ai-inference` | `with.prompt`, `with.system-prompt`, `with.system-prompt-file` | System prompt is also an injection surface |
+| Action                                 | Prompt Fields                                                  | Notes                                                   |
+| -------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------- |
+| `anthropics/claude-code-action`        | `with.prompt`                                                  | Also check `with.claude_args` for embedded instructions |
+| `google-github-actions/run-gemini-cli` | `with.prompt`                                                  | Shell-style env var interpolation in prompt text        |
+| `google-gemini/gemini-cli-action`      | `with.prompt`                                                  | Legacy/archived Gemini action reference                 |
+| `openai/codex-action`                  | `with.prompt`, `with.prompt-file`                              | `prompt-file` may point to attacker-controlled file     |
+| `actions/ai-inference`                 | `with.prompt`, `with.system-prompt`, `with.system-prompt-file` | System prompt is also an injection surface              |
 
 When checking for attacker-controlled content in prompts, examine ALL fields listed for the relevant action, not just the primary `prompt` field.

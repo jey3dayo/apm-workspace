@@ -4,12 +4,12 @@ CI error output, build logs, or test failure messages are fed to an AI agent as 
 
 ## Applicable Actions
 
-| Action | Applicable | Notes |
-|--------|-----------|-------|
-| Claude Code Action | Yes | Confirmed -- PoC 23. Receives CI logs via workflow inputs or step outputs. |
-| Gemini CLI | Yes | Applicable if workflow passes build output to prompt. |
-| OpenAI Codex | Yes | Applicable if workflow passes error logs to prompt. |
-| GitHub AI Inference | Yes | Applicable if captured CI output is included in the prompt. |
+| Action              | Applicable | Notes                                                                      |
+| ------------------- | ---------- | -------------------------------------------------------------------------- |
+| Claude Code Action  | Yes        | Confirmed -- PoC 23. Receives CI logs via workflow inputs or step outputs. |
+| Gemini CLI          | Yes        | Applicable if workflow passes build output to prompt.                      |
+| OpenAI Codex        | Yes        | Applicable if workflow passes error logs to prompt.                        |
+| GitHub AI Inference | Yes        | Applicable if captured CI output is included in the prompt.                |
 
 Any AI action that receives CI output in its prompt is vulnerable. The attacker does not need direct access to the prompt field -- they control what the CI system outputs by crafting code that produces specific error messages.
 
@@ -65,7 +65,7 @@ on:
   workflow_dispatch:
     inputs:
       error_logs:
-        type: string                                # CI logs passed as workflow input
+        type: string # CI logs passed as workflow input
 
 jobs:
   auto-fix:

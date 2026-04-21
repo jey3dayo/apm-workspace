@@ -10,13 +10,14 @@ The analysis uses Claude sub-agents spawned via the Agent tool.
 
 ### Why Sub-Agents
 
-| Approach | Pros | Cons |
-|----------|------|------|
-| Inline (coordinator does analysis) | Simple | Context compaction destroys data mid-analysis |
-| External API (Gemini etc.) | Large context | Requires API key, additional cost, vendor dependency |
-| Sub-agent (chosen) | No external deps, Claude analyzes own behavior | Need careful batching |
+| Approach                           | Pros                                           | Cons                                                 |
+| ---------------------------------- | ---------------------------------------------- | ---------------------------------------------------- |
+| Inline (coordinator does analysis) | Simple                                         | Context compaction destroys data mid-analysis        |
+| External API (Gemini etc.)         | Large context                                  | Requires API key, additional cost, vendor dependency |
+| Sub-agent (chosen)                 | No external deps, Claude analyzes own behavior | Need careful batching                                |
 
 Sub-agents are the right fit because:
+
 - No external dependency: No API keys, no additional cost beyond Claude Code usage
 - Self-analysis advantage: Claude analyzing its own skill routing behavior has
   natural domain understanding
@@ -69,12 +70,14 @@ SKILL.md (Coordinator)
 ### Sub-Agent Prompt Delivery
 
 Each sub-agent is spawned with:
+
 1. A task description referencing the agent prompt file (e.g., agents/routing-analyst.md)
 2. Instructions to read that file for detailed rubric
 3. Paths to input data files
 4. Path for output JSON file
 
 The coordinator instructs the sub-agent to:
+
 ```
 Read agents/routing-analyst.md for your analysis rubric.
 Read <workspace>/skill-manifest.json for skill definitions.

@@ -3,10 +3,11 @@ name: tauri
 description: Tauri path handling, cross-platform file operations, and API usage. Use when the user mentions Tauri, desktop app, or when working with file paths in Tauri frontend code, accessing native filesystem APIs, invoking Tauri commands, or handling platform differences.
 metadata:
   author: epicenter
-  version: '1.0'
+  version: "1.0"
 ---
 
 # Tauri Path Handling
+
 ## Reference Repositories
 
 - [Tauri](https://github.com/tauri-apps/tauri) — Desktop app framework with Rust backend and web frontend
@@ -25,8 +26,8 @@ Use this pattern when you need to:
 
 Before choosing a path API, determine your execution context:
 
-| Context                 | Location                                       | Correct API            |
-| ----------------------- | ---------------------------------------------- | ---------------------- |
+| Context             | Location                                       | Correct API            |
+| ------------------- | ---------------------------------------------- | ---------------------- |
 | Tauri frontend      | `apps/*/src/**/*.ts`, `apps/*/src/**/*.svelte` | `@tauri-apps/api/path` |
 | Node.js/Bun backend | `packages/**/*.ts`, CLI tools                  | Node.js `path` module  |
 
@@ -71,11 +72,11 @@ Rule: If the code runs in the browser (Tauri webview), use Tauri's path APIs. If
 ### Constructing Paths (Correct)
 
 ```typescript
-import { appLocalDataDir, dirname, join } from '@tauri-apps/api/path';
+import { appLocalDataDir, dirname, join } from "@tauri-apps/api/path";
 
 // Join path segments - handles platform separators automatically
 const baseDir = await appLocalDataDir();
-const filePath = await join(baseDir, 'workspaces', workspaceId, 'data.json');
+const filePath = await join(baseDir, "workspaces", workspaceId, "data.json");
 
 // Get parent directory - cleaner than manual slicing
 const parentDir = await dirname(filePath);
@@ -88,7 +89,7 @@ For human-readable log output, hardcoded `/` is acceptable since it's not used f
 
 ```typescript
 // OK for logging - consistent cross-platform log output
-const logPath = pathSegments.join('/');
+const logPath = pathSegments.join("/");
 console.log(`[Persistence] Loading from ${logPath}`);
 ```
 
@@ -98,13 +99,13 @@ console.log(`[Persistence] Loading from ${logPath}`);
 
 ```typescript
 // BAD: Hardcoded separator breaks on Windows
-const filePath = baseDir + '/' + 'workspaces' + '/' + id;
+const filePath = baseDir + "/" + "workspaces" + "/" + id;
 
 // BAD: Template literal with hardcoded separator
 const filePath = `${baseDir}/workspaces/${id}`;
 
 // GOOD: Use join()
-const filePath = await join(baseDir, 'workspaces', id);
+const filePath = await join(baseDir, "workspaces", id);
 ```
 
 ### Never: Manual Parent Directory Extraction
@@ -122,17 +123,17 @@ const parentDir = await dirname(filePath);
 
 ```typescript
 // BAD: Windows uses backslashes
-const configPath = appDir + '/config.json';
+const configPath = appDir + "/config.json";
 
 // GOOD: Platform-agnostic
-const configPath = await join(appDir, 'config.json');
+const configPath = await join(appDir, "config.json");
 ```
 
 ### Never: Assuming Path Format
 
 ```typescript
 // BAD: Splitting on '/' fails on Windows paths
-const parts = filePath.split('/');
+const parts = filePath.split("/");
 
 // GOOD: Use dirname/basename for extraction
 const dir = await dirname(filePath);
@@ -145,15 +146,15 @@ Always import from `@tauri-apps/api/path`:
 
 ```typescript
 import {
-	appLocalDataDir,
-	dirname,
-	join,
-	basename,
-	extname,
-	normalize,
-	resolve,
-	sep,
-} from '@tauri-apps/api/path';
+  appLocalDataDir,
+  dirname,
+  join,
+  basename,
+  extname,
+  normalize,
+  resolve,
+  sep,
+} from "@tauri-apps/api/path";
 ```
 
 ## Note on Async
@@ -163,7 +164,7 @@ All Tauri path functions are **async** because they communicate with the Rust ba
 ```typescript
 // All path operations return Promises
 const baseDir = await appLocalDataDir();
-const filePath = await join(baseDir, 'file.txt');
+const filePath = await join(baseDir, "file.txt");
 const parent = await dirname(filePath);
 const separator = await sep();
 ```
@@ -173,17 +174,17 @@ const separator = await sep();
 Use `@tauri-apps/plugin-fs` for file operations, combined with Tauri path APIs:
 
 ```typescript
-import { appLocalDataDir, dirname, join } from '@tauri-apps/api/path';
-import { mkdir, readFile, writeFile } from '@tauri-apps/plugin-fs';
+import { appLocalDataDir, dirname, join } from "@tauri-apps/api/path";
+import { mkdir, readFile, writeFile } from "@tauri-apps/plugin-fs";
 
 async function saveData(segments: string[], data: Uint8Array) {
-	const baseDir = await appLocalDataDir();
-	const filePath = await join(baseDir, ...segments);
+  const baseDir = await appLocalDataDir();
+  const filePath = await join(baseDir, ...segments);
 
-	// Ensure parent directory exists
-	const parentDir = await dirname(filePath);
-	await mkdir(parentDir, { recursive: true });
+  // Ensure parent directory exists
+  const parentDir = await dirname(filePath);
+  await mkdir(parentDir, { recursive: true });
 
-	await writeFile(filePath, data);
+  await writeFile(filePath, data);
 }
 ```

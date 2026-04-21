@@ -4,12 +4,12 @@ AI action sandbox or safety configurations are set to values that disable protec
 
 ## Applicable Actions
 
-| Action | Applicable | Notes |
-|--------|-----------|-------|
-| Claude Code Action | Yes | `claude_args` with `--allowedTools Bash(*)` disables tool restrictions |
-| OpenAI Codex | Yes | `sandbox: danger-full-access` and `safety-strategy: unsafe` disable protections |
-| Gemini CLI | Yes | `"sandbox": false` in settings JSON and `--yolo`/`--approval-mode=yolo` disable sandbox and approval |
-| GitHub AI Inference | No | Inference-only API with no sandbox/tool configuration -- no shell access to restrict |
+| Action              | Applicable | Notes                                                                                                |
+| ------------------- | ---------- | ---------------------------------------------------------------------------------------------------- |
+| Claude Code Action  | Yes        | `claude_args` with `--allowedTools Bash(*)` disables tool restrictions                               |
+| OpenAI Codex        | Yes        | `sandbox: danger-full-access` and `safety-strategy: unsafe` disable protections                      |
+| Gemini CLI          | Yes        | `"sandbox": false` in settings JSON and `--yolo`/`--approval-mode=yolo` disable sandbox and approval |
+| GitHub AI Inference | No         | Inference-only API with no sandbox/tool configuration -- no shell access to restrict                 |
 
 ## Trigger Events
 

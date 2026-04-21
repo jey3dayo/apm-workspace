@@ -15,13 +15,13 @@ Security-relevant configuration fields, default behaviors, dangerous configurati
 
 ### Dangerous Configurations
 
-| Configuration | Risk |
-|--------------|------|
-| `claude_args: "--allowedTools Bash(*)"` | Unrestricted shell access; any prompt injection achieves full RCE |
-| `allowed_non_write_users: "*"` | Any GitHub user can trigger the action, including external contributors and attackers |
-| `allowed_bots: "*"` | Any bot can trigger, enables automated attack chains via bot-to-bot escalation |
-| `show_full_output: true` (in public repos) | Exposes full conversation including potential secrets in workflow logs |
-| `prompt` containing `${{ github.event.* }}` | Direct expression injection of attacker-controlled content into AI prompt |
+| Configuration                               | Risk                                                                                  |
+| ------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `claude_args: "--allowedTools Bash(*)"`     | Unrestricted shell access; any prompt injection achieves full RCE                     |
+| `allowed_non_write_users: "*"`              | Any GitHub user can trigger the action, including external contributors and attackers |
+| `allowed_bots: "*"`                         | Any bot can trigger, enables automated attack chains via bot-to-bot escalation        |
+| `show_full_output: true` (in public repos)  | Exposes full conversation including potential secrets in workflow logs                |
+| `prompt` containing `${{ github.event.* }}` | Direct expression injection of attacker-controlled content into AI prompt             |
 
 ### Remediation Patterns
 
@@ -60,13 +60,13 @@ Protect log output: Keep `show_full_output: false` (default) in public repositor
 
 ### Dangerous Configurations
 
-| Configuration | Risk |
-|--------------|------|
-| `sandbox: danger-full-access` | No sandbox, no approvals, unrestricted filesystem and network access |
-| `safety-strategy: unsafe` | Disables all safety enforcement including sudo restrictions |
-| `allow-users: "*"` | Any GitHub user can trigger the action |
-| `allow-bots: true` | Any bot can trigger, enables automated attack chains |
-| `danger-full-access` + `unsafe` combined | Maximum exposure: no sandbox, no safety, full system access |
+| Configuration                            | Risk                                                                 |
+| ---------------------------------------- | -------------------------------------------------------------------- |
+| `sandbox: danger-full-access`            | No sandbox, no approvals, unrestricted filesystem and network access |
+| `safety-strategy: unsafe`                | Disables all safety enforcement including sudo restrictions          |
+| `allow-users: "*"`                       | Any GitHub user can trigger the action                               |
+| `allow-bots: true`                       | Any bot can trigger, enables automated attack chains                 |
+| `danger-full-access` + `unsafe` combined | Maximum exposure: no sandbox, no safety, full system access          |
 
 ### Remediation Patterns
 
@@ -107,12 +107,12 @@ Organization-level enforcement: Use `requirements.toml` to block `danger-full-ac
 
 ### Dangerous Configurations
 
-| Configuration | Risk |
-|--------------|------|
-| `settings: '{"sandbox": false}'` | Explicitly disables sandbox (note: JSON inside YAML string) |
-| `--yolo` or `--approval-mode=yolo` in CLI args | Disables approval prompts for all tool calls |
+| Configuration                                     | Risk                                                                 |
+| ------------------------------------------------- | -------------------------------------------------------------------- |
+| `settings: '{"sandbox": false}'`                  | Explicitly disables sandbox (note: JSON inside YAML string)          |
+| `--yolo` or `--approval-mode=yolo` in CLI args    | Disables approval prompts for all tool calls                         |
 | `tools.core` containing `run_shell_command(echo)` | Enables subshell expansion bypass -- confirmed RCE vector (Vector F) |
-| `tools.allowed: ["*"]` | Bypasses confirmation for all tools |
+| `tools.allowed: ["*"]`                            | Bypasses confirmation for all tools                                  |
 
 ### Remediation Patterns
 
@@ -148,11 +148,11 @@ Container-based sandboxing: If shell access is required, use container-based san
 
 ### Dangerous Configurations
 
-| Configuration | Risk |
-|--------------|------|
-| `prompt` containing `${{ github.event.* }}` | Attacker-controlled event contexts injected directly into AI prompt (Vector B) |
-| Overly scoped `token` parameter | Grants more permissions than needed, expanding blast radius of any exploitation |
-| AI output consumed by `eval`/`exec` in subsequent steps | Converts inference-only action into code execution vector (Vector G) |
+| Configuration                                           | Risk                                                                            |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `prompt` containing `${{ github.event.* }}`             | Attacker-controlled event contexts injected directly into AI prompt (Vector B)  |
+| Overly scoped `token` parameter                         | Grants more permissions than needed, expanding blast radius of any exploitation |
+| AI output consumed by `eval`/`exec` in subsequent steps | Converts inference-only action into code execution vector (Vector G)            |
 
 ### Remediation Patterns
 
@@ -176,11 +176,11 @@ Validate structured output: If structured output (JSON) is needed from the AI, v
 
 ## Per-Action Remediation Quick Reference
 
-| Remediation Need | Claude Code Action | OpenAI Codex | Gemini CLI | GitHub AI Inference |
-|-----------------|-------------------|--------------|------------|-------------------|
-| Restrict shell access | `--allowedTools "Bash(specific:*)"` | `sandbox: workspace-write` | Remove expandable commands from `tools.core` | N/A (no shell) |
-| Restrict user access | `allowed_non_write_users: "user1,user2"` | `allow-users: "user1,user2"` | Control via workflow trigger permissions | Control via token scope |
-| Disable dangerous mode | Remove `Bash(*)` from `claude_args` | Remove `danger-full-access` from `sandbox` | Remove `--yolo` from CLI args | N/A |
-| Sandbox enforcement | N/A (tool-level restriction) | `sandbox: read-only` | `"sandbox": true` in settings JSON | N/A (no execution) |
-| Block bot triggers | Remove `allowed_bots: "*"` | Set `allow-bots: false` | Control via workflow trigger conditions | Control via token scope |
-| Protect output/logs | Keep `show_full_output: false` | N/A | N/A | Never `eval` AI output |
+| Remediation Need       | Claude Code Action                       | OpenAI Codex                               | Gemini CLI                                   | GitHub AI Inference     |
+| ---------------------- | ---------------------------------------- | ------------------------------------------ | -------------------------------------------- | ----------------------- |
+| Restrict shell access  | `--allowedTools "Bash(specific:*)"`      | `sandbox: workspace-write`                 | Remove expandable commands from `tools.core` | N/A (no shell)          |
+| Restrict user access   | `allowed_non_write_users: "user1,user2"` | `allow-users: "user1,user2"`               | Control via workflow trigger permissions     | Control via token scope |
+| Disable dangerous mode | Remove `Bash(*)` from `claude_args`      | Remove `danger-full-access` from `sandbox` | Remove `--yolo` from CLI args                | N/A                     |
+| Sandbox enforcement    | N/A (tool-level restriction)             | `sandbox: read-only`                       | `"sandbox": true` in settings JSON           | N/A (no execution)      |
+| Block bot triggers     | Remove `allowed_bots: "*"`               | Set `allow-bots: false`                    | Control via workflow trigger conditions      | Control via token scope |
+| Protect output/logs    | Keep `show_full_output: false`           | N/A                                        | N/A                                          | Never `eval` AI output  |

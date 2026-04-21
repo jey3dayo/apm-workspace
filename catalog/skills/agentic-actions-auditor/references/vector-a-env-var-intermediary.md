@@ -4,12 +4,12 @@ Attacker data flows from GitHub event context into `env:` blocks, and the AI pro
 
 ## Applicable Actions
 
-| Action | Applicable | Notes |
-|--------|-----------|-------|
-| Claude Code Action | Yes | Prompt instructs AI to read env vars via `echo "$VAR"` |
-| Gemini CLI | Yes | Shell-style `"${VAR}"` interpolation in prompt text |
-| OpenAI Codex | Yes | Similar env var reference pattern in prompt instructions |
-| GitHub AI Inference | Yes | Prompt text can reference env var names for the runner to resolve |
+| Action              | Applicable | Notes                                                             |
+| ------------------- | ---------- | ----------------------------------------------------------------- |
+| Claude Code Action  | Yes        | Prompt instructs AI to read env vars via `echo "$VAR"`            |
+| Gemini CLI          | Yes        | Shell-style `"${VAR}"` interpolation in prompt text               |
+| OpenAI Codex        | Yes        | Similar env var reference pattern in prompt instructions          |
+| GitHub AI Inference | Yes        | Prompt text can reference env var names for the runner to resolve |
 
 ## Trigger Events
 
@@ -59,8 +59,8 @@ jobs:
     steps:
       - uses: google-github-actions/run-gemini-cli@v0
         env:
-          ISSUE_TITLE: '${{ github.event.issue.title }}'   # attacker-controlled
-          ISSUE_BODY: '${{ github.event.issue.body }}'      # attacker-controlled
+          ISSUE_TITLE: "${{ github.event.issue.title }}" # attacker-controlled
+          ISSUE_BODY: "${{ github.event.issue.body }}" # attacker-controlled
         with:
           prompt: |
             Review the issue title and body provided in the environment

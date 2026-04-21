@@ -8,13 +8,13 @@ Resolution is limited to one level deep (fixed). If a resolved file contains its
 
 Parse each `uses:` value to determine its type and resolution strategy.
 
-| `uses:` Pattern | Reference Type | Resolution | In Scope? |
-|----------------|---------------|------------|-----------|
-| `./path/to/action` | Local composite action | Read `{path}/action.yml` from filesystem | YES |
-| `./.github/workflows/called.yml` | Local reusable workflow | Read file from filesystem | YES |
-| `owner/repo/.github/workflows/file.yml@ref` | Remote reusable workflow | Fetch via `gh api` Contents API | YES |
-| `docker://image:tag` | Docker image | N/A -- no steps to analyze | NO (skip) |
-| `owner/repo@ref` (without `.github/workflows/`) | Remote action | Would require remote action.yml fetch | NO (skip silently) |
+| `uses:` Pattern                                 | Reference Type           | Resolution                               | In Scope?          |
+| ----------------------------------------------- | ------------------------ | ---------------------------------------- | ------------------ |
+| `./path/to/action`                              | Local composite action   | Read `{path}/action.yml` from filesystem | YES                |
+| `./.github/workflows/called.yml`                | Local reusable workflow  | Read file from filesystem                | YES                |
+| `owner/repo/.github/workflows/file.yml@ref`     | Remote reusable workflow | Fetch via `gh api` Contents API          | YES                |
+| `docker://image:tag`                            | Docker image             | N/A -- no steps to analyze               | NO (skip)          |
+| `owner/repo@ref` (without `.github/workflows/`) | Remote action            | Would require remote action.yml fetch    | NO (skip silently) |
 
 ### Classification algorithm:
 
@@ -36,26 +36,29 @@ Context distinction: Step-level `uses:` (inside `steps:` array) references actio
 Given: `uses: ./path/to/action` at the step level.
 
 ### Local analysis mode:
+
 1. Read `{path}/action.yml` from the filesystem using the Read tool
 2. If not found, try `{path}/action.yaml` (GitHub supports both, prefers `.yml`)
 3. If neither exists, log as unresolved with reason "File not found"
 
 ### Remote analysis mode:
+
 1. Fetch via Contents API: `gh api repos/{owner}/{repo}/contents/{path}/action.yml?ref={ref} --jq '.content | @base64d'`
 2. On 404, try `action.yaml`: `gh api repos/{owner}/{repo}/contents/{path}/action.yaml?ref={ref} --jq '.content | @base64d'`
 3. If both 404, log as unresolved with reason "File not found"
 
 ### Type discrimination -- check `runs.using`:
 
-| `runs.using` Value | Action Type | Analyze? |
-|-------------------|-------------|----------|
-| `composite` | Composite action | YES -- scan `runs.steps[]` |
-| `node12`, `node16`, `node20`, `node24` | JavaScript action | NO -- skip silently |
-| `docker` | Docker action | NO -- skip silently |
+| `runs.using` Value                     | Action Type       | Analyze?                   |
+| -------------------------------------- | ----------------- | -------------------------- |
+| `composite`                            | Composite action  | YES -- scan `runs.steps[]` |
+| `node12`, `node16`, `node20`, `node24` | JavaScript action | NO -- skip silently        |
+| `docker`                               | Docker action     | NO -- skip silently        |
 
 Only composite actions have `runs.steps[]` containing workflow-style steps. If `runs.using` is not `composite`, skip silently -- do NOT log as unresolved.
 
 ### Analysis of composite action steps:
+
 1. For each step in `runs.steps[]`, check `uses:` against the known AI action references (SKILL.md Step 2)
 2. If an AI action is found, capture its `with:` fields for security context (SKILL.md Step 3)
 3. Run the same attack vector detection (SKILL.md Step 4) on each AI action step found
@@ -66,9 +69,11 @@ Only composite actions have `runs.steps[]` containing workflow-style steps. If `
 Given: Job-level `uses: ./.github/workflows/called.yml`.
 
 ### Local analysis mode:
+
 1. Read the file from the filesystem using the Read tool
 
 ### Remote analysis mode:
+
 1. Fetch via Contents API using the same repo context: `gh api repos/{owner}/{repo}/contents/.github/workflows/{filename}?ref={ref} --jq '.content | @base64d'`
 
 The resolved file is a complete workflow YAML with `on: workflow_call`. Analyze it through the existing Steps 2-4 detection pipeline -- identify AI action steps, capture security context, and detect attack vectors.
@@ -80,10 +85,12 @@ Input mapping: The caller passes values via job-level `with:`, and the called wo
 Given: Job-level `uses: owner/repo/.github/workflows/file.yml@ref`.
 
 ### Parse the reference:
+
 - Extract: `owner`, `repo`, file path (everything after `repo/` and before `@`), and `ref` (everything after `@`)
 - Example: `org/shared/.github/workflows/review.yml@main` -> owner=`org`, repo=`shared`, path=`.github/workflows/review.yml`, ref=`main`
 
 ### Fetch:
+
 ```
 gh api repos/{owner}/{repo}/contents/.github/workflows/{filename}?ref={ref} --jq '.content | @base64d'
 ```
@@ -91,6 +98,7 @@ gh api repos/{owner}/{repo}/contents/.github/workflows/{filename}?ref={ref} --jq
 This is the same Contents API pattern established in Step 0 (Phase 5).
 
 ### Error handling:
+
 - 404: Log as unresolved with reason "404 Not Found (repository may be private)"
 - Auth error (401/403): Log as unresolved with reason "Authentication required"
 
@@ -122,6 +130,7 @@ Composite action (actions/issue-triage/action.yml):
 ```
 
 ### Data flow trace:
+
 ```
 1. Attacker creates issue with malicious content in body
 2. Caller: with.issue_body = ${{ github.event.issue.body }}
@@ -159,6 +168,7 @@ Called workflow (org/shared/.github/workflows/ai-review.yml):
 ```
 
 ### Data flow trace:
+
 ```
 1. Attacker opens PR with malicious content in body
 2. Caller: with.pr_body = ${{ github.event.pull_request.body }}
@@ -185,10 +195,10 @@ When any references could not be resolved, add an "Unresolved References" sectio
 ```markdown
 ## Unresolved References
 
-| Reference | Source | Reason |
-|-----------|--------|--------|
-| `org/private/.github/workflows/scan.yml@v2` | `.github/workflows/ci.yml` jobs.scan | 404 Not Found (repository may be private) |
-| `./actions/deep-nested` | `actions/wrapper/action.yml` runs.steps[2] | Depth limit exceeded (max 1 level) |
+| Reference                                   | Source                                     | Reason                                    |
+| ------------------------------------------- | ------------------------------------------ | ----------------------------------------- |
+| `org/private/.github/workflows/scan.yml@v2` | `.github/workflows/ci.yml` jobs.scan       | 404 Not Found (repository may be private) |
+| `./actions/deep-nested`                     | `actions/wrapper/action.yml` runs.steps[2] | Depth limit exceeded (max 1 level)        |
 ```
 
 - Omit this section entirely when all references resolve successfully

@@ -272,7 +272,7 @@ Output of improvement-planner sub-agent.
 
 ---
 
-## Patch Files (patches/*.patch.json)
+## Patch Files (patches/\*.patch.json)
 
 Each file defines a proposed change to one skill's description.
 

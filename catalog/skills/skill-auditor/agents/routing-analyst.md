@@ -21,6 +21,7 @@ skill was chosen. You are creating that feedback loop now.
 4. Produce a report **organized by skill**, not by session
 
 For each skill, report:
+
 - How many times it fired (was loaded)
 - How many times it fired correctly
 - False positives (loaded when not needed)

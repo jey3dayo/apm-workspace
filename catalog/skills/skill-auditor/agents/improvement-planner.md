@@ -15,6 +15,7 @@ description optimization, which tests in isolation.
 - Adding keywords to Skill A that already appear in Skill B increases confusion
 
 For each proposed change, you MUST state:
+
 1. What it fixes (the specific routing error from the audit)
 2. What it might break (potential side effects on other skills)
 3. Why the net effect is positive
