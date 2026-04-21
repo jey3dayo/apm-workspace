@@ -913,6 +913,12 @@ function Get-ExternalSkillInstallPath {
     if (-not [string]::IsNullOrWhiteSpace($ResolvedCommit)) {
       Add-ExternalSkillCandidatePath -Segments @($repoSegments + @($ResolvedCommit) + $virtualSegments)
     }
+  } else {
+    Add-ExternalSkillCandidatePath -Segments $repoSegments
+    if (-not [string]::IsNullOrWhiteSpace($ResolvedCommit)) {
+      Add-ExternalSkillCandidatePath -Segments @($repoSegments + @($ResolvedCommit))
+      Add-ExternalSkillCandidatePath -Segments @(@($ResolvedCommit) + $repoSegments)
+    }
   }
 
   if ($strippedVirtualSegments.Count -gt 0) {
@@ -1046,7 +1052,8 @@ function Get-PersonalSkillRecords {
 
 function Get-ExternalSkillRecords {
   $manifestReferences = @(Get-ManifestApmDependencyReferences)
-  if ($manifestReferences.Count -eq 0) {
+  $lockRecords = @(Get-LockedExternalSkillRecords)
+  if ($manifestReferences.Count -eq 0 -and $lockRecords.Count -eq 0) {
     return @()
   }
 
@@ -1055,14 +1062,16 @@ function Get-ExternalSkillRecords {
   $seenCanonical = New-Object 'System.Collections.Generic.HashSet[string]'
   $result = New-Object System.Collections.Generic.List[object]
 
-  foreach ($record in (Get-LockedExternalSkillRecords)) {
+  foreach ($record in $lockRecords) {
     $canonicalReference = Get-CanonicalLockRecordReference -Record $record
-    if (-not ($manifestReferenceKeys.Contains($canonicalReference) -or $manifestReferenceKeys.Contains($record.Repo))) {
-      continue
+    if (-not $manifestReferenceKeys.Contains($canonicalReference)) {
+      throw "External lock record is not declared in apm.yml: $canonicalReference"
     }
 
     $null = $matchedReferences.Add($canonicalReference)
-    $null = $matchedReferences.Add($record.Repo)
+    if (-not [string]::IsNullOrWhiteSpace($record.Commit)) {
+      $null = $matchedReferences.Add(("{0}#{1}" -f $canonicalReference, $record.Commit))
+    }
     if (-not $seenCanonical.Add($canonicalReference)) {
       continue
     }
@@ -1086,8 +1095,7 @@ function Get-ExternalSkillRecords {
   }
 
   foreach ($reference in $manifestReferences) {
-    $baseReference = ($reference -replace '#.*$', '')
-    if (-not $matchedReferences.Contains($reference) -and -not $matchedReferences.Contains($baseReference)) {
+    if (-not $matchedReferences.Contains($reference)) {
       throw "Manifest dependency is missing from apm.lock.yaml: $reference"
     }
   }
