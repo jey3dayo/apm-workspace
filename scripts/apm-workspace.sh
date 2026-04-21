@@ -330,6 +330,40 @@ This directory contains the managed catalog for the global APM workspace.
 EOF
 }
 
+normalize_tracked_catalog_metadata() {
+  ensure_workspace_repo
+  ensure_workspace_scaffold
+
+  tracked_dir=$(tracked_catalog_dir)
+  mkdir -p "$tracked_dir"
+  write_catalog_manifest_template "$tracked_dir"
+  write_catalog_readme "$tracked_dir"
+}
+
+check_tracked_catalog_metadata() {
+  ensure_workspace_repo
+  ensure_workspace_scaffold
+
+  tracked_dir=$(tracked_catalog_dir)
+  expected_dir=$(mktemp -d "${TMPDIR:-/tmp}/apm-catalog-metadata.XXXXXX")
+  write_catalog_manifest_template "$expected_dir"
+  write_catalog_readme "$expected_dir"
+
+  has_failure=0
+  if [ ! -f "$tracked_dir/apm.yml" ] || ! cmp -s "$tracked_dir/apm.yml" "$expected_dir/apm.yml"; then
+    error "Tracked catalog manifest is not normalized"
+    has_failure=1
+  fi
+
+  if [ ! -f "$tracked_dir/README.md" ] || ! cmp -s "$tracked_dir/README.md" "$expected_dir/README.md"; then
+    error "Tracked catalog README is not normalized"
+    has_failure=1
+  fi
+
+  rm -rf "$expected_dir"
+  [ "$has_failure" -eq 0 ] || fail "Catalog metadata check failed"
+}
+
 reset_catalog_build_dir() {
   destination_dir=$(catalog_build_dir)
   rm -rf "$destination_dir"
@@ -655,19 +689,6 @@ migrate_package() {
   )
 }
 
-cmd_bootstrap() {
-  ensure_workspace_repo
-  refresh_workspace_checkout
-  ensure_workspace_scaffold
-  ensure_workspace_mise_file
-  log "APM workspace ready: $WORKSPACE_DIR"
-  log ""
-  log "Next:"
-  log "  cd $WORKSPACE_DIR"
-  log "  mise install"
-  log "  mise run apply"
-}
-
 apm_install_has_diagnostics_failure() {
   output_file="$1"
   grep -Eq '\[[xX]\][[:space:]]+[1-9][0-9]* packages failed:' "$output_file" \
@@ -738,6 +759,14 @@ cmd_update() {
   normalize_workspace_gitignore
   compile_codex
   sync_managed_catalog_runtime_assets
+}
+
+cmd_format_catalog_metadata() {
+  normalize_tracked_catalog_metadata
+}
+
+cmd_check_catalog_metadata() {
+  check_tracked_catalog_metadata
 }
 
 lock_pinned_reference_map() {
@@ -1223,12 +1252,13 @@ cmd_help() {
 Usage: scripts/apm-workspace.sh <command> [args...]
 
 Commands:
-  bootstrap          Ensure ~/.apm checkout + apm.yml + mise.toml are ready
   apply              Deploy user-scope-compatible dependencies and compile Codex output
   update             Pull clean checkout, update deps, then apply
+  format-catalog-metadata  Normalize tracked catalog apm.yml and README.md
+  check-catalog-metadata   Check tracked catalog apm.yml and README.md normalization
   pin-external       Pin external manifest refs to lockfile commits
   validate           Validate the ~/.apm workspace
-  validate-catalog   Fail when ~/.apm/catalog is not normalized or missing required assets
+  validate:catalog   Fail when ~/.apm/catalog is not normalized or missing required assets
   doctor             Print workspace and target state
   bundle-catalog     Build ~/.apm/.catalog-build/catalog as the catalog package artifact
   stage-catalog      Rewrite ~/.apm/catalog into its normalized publishable layout and print its upstream ref
@@ -1245,12 +1275,13 @@ EOF
 }
 
 case "$COMMAND" in
-  bootstrap) cmd_bootstrap "$@" ;;
   apply) cmd_apply ;;
   update) cmd_update ;;
+  format-catalog-metadata) cmd_format_catalog_metadata ;;
+  check-catalog-metadata) cmd_check_catalog_metadata ;;
   pin-external) cmd_pin_external ;;
   validate) cmd_validate ;;
-  validate-catalog) cmd_validate_catalog ;;
+  validate:catalog) cmd_validate_catalog ;;
   doctor) cmd_doctor ;;
   bundle-catalog) cmd_bundle_catalog "$@" ;;
   stage-catalog) cmd_stage_catalog "$@" ;;

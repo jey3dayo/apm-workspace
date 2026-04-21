@@ -83,7 +83,7 @@ If old package ownership from a previous install state is still hanging around, 
 - `mise run ci:check`: run formatting checks plus validation smoke checks
 - `mise run ci`: format, validate, apply, and verify the local workspace rollout
 - `mise run stage-catalog`: normalize `catalog/` in place before commit and push
-- `mise run validate-catalog`: verify managed catalog package integrity
+- `mise run validate:catalog`: verify managed catalog package integrity
 - `mise run catalog:tidy`: normalize the managed catalog, validate it, and print workspace health
 
 ## References

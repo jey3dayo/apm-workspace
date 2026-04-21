@@ -69,6 +69,6 @@ In this repository:
 
 Useful commands here:
 
-- `mise run validate-catalog`
+- `mise run validate:catalog`
 - `mise run stage-catalog`
 - `mise run apply`

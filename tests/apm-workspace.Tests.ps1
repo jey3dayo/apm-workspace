@@ -62,7 +62,7 @@ Describe "public command surface" {
     $legacyMirrorPattern = 'transitional' + ' mirror'
     $help = & powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\j138c\.apm\scripts\apm-workspace.ps1 help | Out-String
 
-    $help | Should Match "validate-catalog"
+    $help | Should Match "validate:catalog"
     $help | Should Match "stage-catalog"
     $help | Should Match "register-catalog"
     $help | Should Match "release-catalog"
@@ -100,7 +100,7 @@ Describe "public command surface" {
   It "publishes workspace mise tasks for formatting and ci flow" {
     $miseToml = Get-Content -LiteralPath C:\Users\j138c\.apm\mise.toml -Raw
 
-    $miseToml | Should Match '\[tasks\.validate-catalog\]'
+    $miseToml | Should Match '\[tasks\."validate:catalog"\]'
     $miseToml | Should Match '\[tasks\."format:markdown:bold-headings"\]'
     $miseToml | Should Match '\[tasks\."apm:install"\]'
     $miseToml | Should Match '\[tasks\."apm:update"\]'

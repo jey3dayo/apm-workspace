@@ -131,10 +131,6 @@ Not allowed:
 ## Core Commands
 
 ```bash
-# Bootstrap once from ~/.config
-cd ~/.config
-mise run apm:bootstrap
-
 # Day-to-day global flow from ~/.apm
 cd ~/.apm
 mise install
@@ -216,8 +212,8 @@ When the change is only for workspace-owned docs such as `~/.apm/README.md` or `
 
 ## Workspace Notes
 
-- `validate-catalog` now validates the tracked `catalog/` package itself and its required assets
-- `validate-catalog` is available both as `mise run validate-catalog` and as a workspace script command
+- `validate:catalog` now validates the tracked `catalog/` package itself and its required assets
+- `validate:catalog` is available both as `mise run validate:catalog` and as a workspace script command
 - `format` formats Markdown / TOML / YAML inside `~/.apm`
 - `ci:check` runs format checks plus validation and smoke checks
 - `ci` formats, validates, applies, and verifies the local workspace rollout

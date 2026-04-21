@@ -86,7 +86,7 @@ In this repository:
 
 For this repo, validate and roll out RTK catalog changes with the current workspace tasks:
 
-- `mise run validate-catalog`
+- `mise run validate:catalog`
 - `mise run stage-catalog`
 - `mise run apply`
 

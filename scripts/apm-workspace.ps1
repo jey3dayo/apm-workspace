@@ -705,6 +705,14 @@ function Invoke-Validate {
   Invoke-WorkspaceCommand -CommandArgs @("compile", "--validate")
 }
 
+function Invoke-FormatCatalogMetadata {
+  Normalize-TrackedCatalogMetadata
+}
+
+function Invoke-CheckCatalogMetadata {
+  Assert-TrackedCatalogMetadataNormalized
+}
+
 function Get-CatalogBuildSkillsRoot {
   return (Join-Path (Get-CatalogBuildDir) ".apm\skills")
 }
@@ -916,6 +924,40 @@ function Get-CatalogReadmeContent {
     '- Edit this directory directly, then run `mise run stage-catalog` before commit/push',
     '- Install ref: `jey3dayo/apm-workspace/catalog#main`'
   ) -join [Environment]::NewLine
+}
+
+function Normalize-TrackedCatalogMetadata {
+  Ensure-WorkspaceRepo
+  Ensure-WorkspaceScaffold
+
+  $trackedDir = Get-TrackedCatalogDir
+  New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
+  [System.IO.File]::WriteAllText((Join-Path $trackedDir "apm.yml"), ((Get-CatalogManifestContent) + [Environment]::NewLine))
+  [System.IO.File]::WriteAllText((Join-Path $trackedDir "README.md"), ((Get-CatalogReadmeContent) + [Environment]::NewLine))
+}
+
+function Assert-TrackedCatalogMetadataNormalized {
+  Ensure-WorkspaceRepo
+  Ensure-WorkspaceScaffold
+
+  $trackedDir = Get-TrackedCatalogDir
+  $manifestPath = Join-Path $trackedDir "apm.yml"
+  $readmePath = Join-Path $trackedDir "README.md"
+  $hasFailure = $false
+
+  if (-not (Test-Path -LiteralPath $manifestPath) -or (Get-Content -LiteralPath $manifestPath -Raw) -ne ((Get-CatalogManifestContent) + [Environment]::NewLine)) {
+    Write-ErrorLine "Tracked catalog manifest is not normalized"
+    $hasFailure = $true
+  }
+
+  if (-not (Test-Path -LiteralPath $readmePath) -or (Get-Content -LiteralPath $readmePath -Raw) -ne ((Get-CatalogReadmeContent) + [Environment]::NewLine)) {
+    Write-ErrorLine "Tracked catalog README is not normalized"
+    $hasFailure = $true
+  }
+
+  if ($hasFailure) {
+    throw "Catalog metadata check failed"
+  }
 }
 
 function Get-TrackedCatalogSkillIds {
@@ -1555,25 +1597,20 @@ if ($env:APM_WORKSPACE_LIB_ONLY -eq "1") {
 }
 
 switch ($Command) {
-  "bootstrap" {
-    Ensure-WorkspaceRepo
-    Refresh-WorkspaceCheckout
-    Ensure-WorkspaceScaffold
-    Ensure-WorkspaceMiseFile
-    Write-Host "APM workspace ready: $WorkspaceDir"
-    Write-Host ""
-    Write-Host "Next:"
-    Write-Host "  cd $WorkspaceDir"
-    Write-Host "  mise install"
-    Write-Host "  mise run apply"
-  }
-
   "apply" {
     Invoke-Apply
   }
 
   "update" {
     Invoke-Update
+  }
+
+  "format-catalog-metadata" {
+    Invoke-FormatCatalogMetadata
+  }
+
+  "check-catalog-metadata" {
+    Invoke-CheckCatalogMetadata
   }
 
   "pin-external" {
@@ -1584,7 +1621,7 @@ switch ($Command) {
     Invoke-Validate
   }
 
-  "validate-catalog" {
+  "validate:catalog" {
     Invoke-ValidateCatalog
   }
 
@@ -1617,12 +1654,13 @@ switch ($Command) {
 Usage: scripts/apm-workspace.ps1 <command> [args...]
 
 Commands:
-  bootstrap          Ensure ~/.apm checkout + apm.yml + mise.toml are ready
   apply              Deploy user-scope-compatible dependencies and compile Codex output
   update             Pull clean checkout, update deps, then apply
+  format-catalog-metadata  Normalize tracked catalog apm.yml and README.md
+  check-catalog-metadata   Check tracked catalog apm.yml and README.md normalization
   pin-external       Pin external manifest refs to lockfile commits
   validate           Validate the ~/.apm workspace
-  validate-catalog   Fail when ~/.apm/catalog is not normalized or missing required assets
+  validate:catalog   Fail when ~/.apm/catalog is not normalized or missing required assets
   doctor             Print workspace and target state
   bundle-catalog     Build ~/.apm/.catalog-build/catalog as the catalog package artifact
   stage-catalog      Rewrite ~/.apm/catalog into its normalized publishable layout and print its upstream ref

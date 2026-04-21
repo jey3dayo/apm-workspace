@@ -167,6 +167,7 @@ includes = [
 ```
 
 Notes:
+
 - Prefer this split layout only for personal global environments
 - In project repos, keep a single `mise.toml` unless there is a strong reason to split
 - If you add tools like `shellcheck` or `shfmt`, wire them into `lint:*` / `format:*` tasks

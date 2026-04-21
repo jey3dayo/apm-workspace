@@ -55,7 +55,7 @@ Useful maintenance commands:
 ```powershell
 mise run format
 mise run ci
-mise run validate-catalog
+mise run validate:catalog
 mise run stage-catalog
 mise run catalog:tidy
 mise run register-catalog

@@ -27,11 +27,6 @@ description = "Update the ~/.apm checkout when clean, then refresh APM dependenc
 run = "bash ./scripts/apm-workspace.sh update"
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 update"
 
-[tasks.list]
-description = "Show APM global dependencies"
-run = "apm deps list -g"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"apm deps list -g\""
-
 [tasks.doctor]
 description = "Inspect ~/.apm workspace state and deployed targets"
 run = "bash ./scripts/apm-workspace.sh doctor"
@@ -42,10 +37,10 @@ description = "Validate the ~/.apm workspace and managed catalog wiring"
 run = "bash ./scripts/apm-workspace.sh validate"
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 validate"
 
-[tasks.validate-catalog]
+[tasks."validate:catalog"]
 description = "Fail when the managed catalog package is not normalized or missing required assets"
-run = "bash ./scripts/apm-workspace.sh validate-catalog"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 validate-catalog"
+run = "bash ./scripts/apm-workspace.sh validate:catalog"
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 validate:catalog"
 
 [tasks.stage-catalog]
 description = "Normalize `catalog/` in place inside ~/.apm"
@@ -112,12 +107,23 @@ description = "Check YAML formatting in the ~/.apm workspace"
 run = "fd -e yml -e yaml -X prettier --check --log-level error"
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"@(fd -e yml -e yaml) | ForEach-Object { prettier --check --log-level error $_ }\""
 
+[tasks."format:catalog-metadata"]
+description = "Normalize tracked catalog metadata files"
+run = "bash ./scripts/apm-workspace.sh format-catalog-metadata"
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 format-catalog-metadata"
+
+[tasks."format:catalog-metadata:check"]
+description = "Check tracked catalog metadata normalization"
+run = "bash ./scripts/apm-workspace.sh check-catalog-metadata"
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 check-catalog-metadata"
+
 # ========================================
 # Aliases / Aggregation Tasks
 # ========================================
 [tasks.format]
 description = "Format workspace docs and manifests"
 run = [
+  { task = "format:catalog-metadata" },
   { task = "format:markdown:bold-headings" },
   { task = "format:markdown" },
   { task = "format:toml" },
@@ -127,6 +133,7 @@ run = [
 [tasks."check:format"]
 description = "Check workspace docs and manifest formatting"
 depends = [
+  "format:catalog-metadata:check",
   "format:markdown:bold-headings:check",
   "format:markdown:check",
   "format:toml:check",
@@ -135,7 +142,7 @@ depends = [
 
 [tasks."ci:check"]
 description = "Run validation-only checks for the ~/.apm workspace"
-depends = ["check:format", "validate", "validate-catalog", "smoke-catalog"]
+depends = ["check:format", "validate", "validate:catalog", "smoke-catalog"]
 
 # ========================================
 # Meta Tasks
@@ -153,7 +160,7 @@ run = [
 description = "Refresh, validate, and inspect the managed catalog package"
 run = [
   { task = "stage-catalog" },
-  { task = "validate-catalog" },
+  { task = "validate:catalog" },
   { task = "doctor" },
 ]
 
