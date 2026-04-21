@@ -418,6 +418,55 @@ scripts:
     ($inventory | Where-Object Target -eq "codex").DeployedSkillName | Should -Be "brainstorming"
   }
 
+  It "smoke-catalog normalizes Codex-installed skill paths for superpowers aliases" {
+    $buildDir = Join-Path $TestDrive "catalog-build"
+    $buildSkillsRoot = Join-Path $buildDir ".apm/skills"
+    $bundleSkillRoot = Join-Path (Join-Path $buildSkillsRoot "superpowers") "brainstorming"
+    $bundleRequestedSkillIds = New-Object System.Collections.Generic.List[string]
+    $installCalls = New-Object System.Collections.Generic.List[string]
+    $previousTemp = $env:TEMP
+    $env:TEMP = $TestDrive
+
+    function global:apm {
+      $installCalls.Add(($args -join ' '))
+
+      if ($args[0] -eq "install") {
+        $installedSkillRoot = Join-Path (Join-Path $PWD ".agents/skills") "brainstorming"
+        New-Item -ItemType Directory -Path (Join-Path $installedSkillRoot "references") -Force | Out-Null
+        Set-Content -LiteralPath (Join-Path $installedSkillRoot "SKILL.md") -Value "# brainstorming"
+        Set-Content -LiteralPath (Join-Path $installedSkillRoot "references/note.md") -Value "codex"
+      }
+
+      $global:LASTEXITCODE = 0
+    }
+
+    try {
+      Mock Require-Apm {}
+      Mock Get-RequestedManagedSkillIds { @("superpowers:brainstorming") }
+      Mock Get-CatalogBuildDir { $buildDir }
+      Mock Invoke-BundleCatalog {
+        param([string[]]$RequestedSkillIds)
+
+        foreach ($skillId in $RequestedSkillIds) {
+          $bundleRequestedSkillIds.Add($skillId)
+        }
+
+        New-Item -ItemType Directory -Path (Join-Path $bundleSkillRoot "references") -Force | Out-Null
+        Set-Content -LiteralPath (Join-Path $bundleSkillRoot "SKILL.md") -Value "# brainstorming"
+        Set-Content -LiteralPath (Join-Path $bundleSkillRoot "references/note.md") -Value "catalog"
+      }
+
+      Invoke-SmokeCatalog -RequestedSkillIds @("superpowers:brainstorming")
+
+      $bundleRequestedSkillIds | Should -Be @("superpowers:brainstorming")
+      $installCalls | Should -Contain ("install {0} --target codex" -f $buildDir)
+    }
+    finally {
+      Remove-Item Function:\apm -ErrorAction SilentlyContinue
+      $env:TEMP = $previousTemp
+    }
+  }
+
   It "stages target-aware deployment trees from personal and external skills" {
     $targets = @(
       [pscustomobject]@{ Name = "claude"; Root = (Join-Path $TestDrive "claude"); ConfigName = "CLAUDE.md" }
