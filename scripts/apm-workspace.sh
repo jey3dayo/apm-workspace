@@ -834,22 +834,15 @@ cmd_update() {
   refresh_workspace_checkout
   ensure_workspace_scaffold
   cmd_validate_catalog
-  skill_ids=$(managed_skill_ids)
-  cleanup_skill_ids=$(internal_cleanup_skill_ids "$skill_ids")
 
   if manifest_has_local_packages; then
-    fail "apm 0.8.11 cannot deploy ./packages/* dependencies at user scope yet. Update stopped before refresh/install; remove local package refs from ~/.apm/apm.yml first."
+    fail "apm 0.8.11 cannot update ./packages/* dependencies at user scope yet. Refresh stopped before deps update; remove local package refs from ~/.apm/apm.yml first."
   fi
 
-  remove_internal_target_links "$cleanup_skill_ids"
   (
     cd "$WORKSPACE_DIR"
     apm deps update -g
   )
-  run_workspace_install_command -g
-  normalize_workspace_gitignore
-  compile_codex
-  sync_managed_catalog_runtime_assets
 }
 
 cmd_format_catalog_metadata() {
