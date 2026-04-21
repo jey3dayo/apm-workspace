@@ -1,45 +1,53 @@
 # APM Task Coverage
 
-現状の `~/.config/nix` 由来の配布から `~/.apm` ベース運用へ移した範囲を、task 観点で整理したメモです。
+## Operational Contract
 
-## Migration Status
+- `~/.apm` is the day-to-day source of truth for APM catalog content, task wiring, and supporting docs.
+- `~/.config` is bootstrap-only. It may be used to start or maintain the local APM environment, but it is not the operational source of truth.
+- The only allowed operational exception under `~/.config` is `~/.config/scripts/replace-bold-headings.ts`, which exists as a formatter helper for heading normalization.
+- `~/.config/nix/agent-skills-sources.nix` is retired and intentionally empty because external skill sources were removed.
 
-| 対象                  | 今の正本                     | APM task で配布できるか | 補足                                       |
-| --------------------- | ---------------------------- | ----------------------- | ------------------------------------------ |
-| `skills`              | `~/.apm/catalog/skills/**`   | できる                  | personal skills の authoring source        |
-| `agents`              | `~/.apm/catalog/agents/**`   | できる                  | runtime sync 対象                          |
-| top-level `commands/` | `~/.apm/catalog/commands/**` | できる                  | runtime sync 対象                          |
-| `rules`               | `~/.apm/catalog/rules/**`    | できる                  | runtime sync 対象                          |
-| `AGENTS.md`           | `~/.apm/catalog/AGENTS.md`   | できる                  | managed catalog の instructions として配布 |
+## Where Content Lives
+
+| Content area           | Current source of truth                      | Notes                                  |
+| ---------------------- | -------------------------------------------- | -------------------------------------- |
+| `skills`               | `~/.apm/catalog/skills/**`                   | Personal skill authoring source        |
+| `agents`               | `~/.apm/catalog/agents/**`                   | Runtime sync target                    |
+| top-level `commands/`  | `~/.apm/catalog/commands/**`                 | Runtime sync target                    |
+| `rules`                | `~/.apm/catalog/rules/**`                    | Runtime sync target                    |
+| `AGENTS.md`            | `~/.apm/catalog/AGENTS.md`                   | Managed catalog instructions           |
+| formatter helper       | `~/.config/scripts/replace-bold-headings.ts` | Allowed bootstrap/helper exception     |
+| retired skills sources | `~/.config/nix/agent-skills-sources.nix`     | Intentionally empty; do not repopulate |
 
 ## Task Coverage
 
-| task / command                | skills   | agents   | rules    | `AGENTS.md` | commands | 役割                                                                                             |
-| ----------------------------- | -------- | -------- | -------- | ----------- | -------- | ------------------------------------------------------------------------------------------------ |
-| `mise run apply`              | ○        | ○        | ○        | ○           | ○        | global install 実行後に managed `AGENTS.md` / `agents/` / `commands/` / `rules/` を runtime sync |
-| `mise run update`             | ○        | ○        | ○        | ○           | ○        | checkout 更新 + deps update + apply 相当                                                         |
-| `mise run doctor`             | 状態確認 | 状態確認 | 状態確認 | 状態確認    | 状態確認 | target presence, overlap, catalog health を確認                                                  |
-| `mise run format`             | 間接     | 間接     | 間接     | 間接        | 間接     | workspace の Markdown / TOML / YAML を整形                                                       |
-| `mise run ci:check`           | ○        | ○        | ○        | ○           | ○        | format check + validate + smoke-catalog                                                          |
-| `mise run validate`           | ○        | ○        | ○        | ○           | ○        | validate:workspace と validate:catalog をまとめて実行                                            |
-| `mise run validate:workspace` | ○        | ○        | ○        | ○           | ○        | `APM_WORKSPACE_DIR` を尊重した workspace validation                                              |
-| `mise run ci`                 | ○        | ○        | ○        | ○           | ○        | format → validation → apply → doctor でローカル配布まで実行                                      |
-| `mise run stage-catalog`      | ○        | ○        | ○        | ○           | ○        | `catalog/` を正規化して managed catalog package を整える                                         |
-| `mise run catalog:tidy`       | ○        | ○        | ○        | ○           | ○        | stage-catalog → validate:catalog → doctor の整理導線                                             |
-| `mise run register-catalog`   | ○        | ○        | ○        | ○           | ○        | push 済みの `catalog` ref を install                                                             |
-| `mise run smoke-catalog`      | ○        | ○        | ○        | ○           | ○        | temp install による smoke test                                                                   |
-| `mise run validate:catalog`   | ○        | ○        | ○        | ○           | ○        | drift check 用の公開 task                                                                        |
+| task / command                | skills   | agents   | rules    | `AGENTS.md` | commands | Coverage summary                                                                   |
+| ----------------------------- | -------- | -------- | -------- | ----------- | -------- | ---------------------------------------------------------------------------------- |
+| `mise run apply`              | ○        | ○        | ○        | ○           | ○        | Installs and syncs the managed catalog from `~/.apm`                               |
+| `mise run update`             | ○        | ○        | ○        | ○           | ○        | Updates the checkout, refreshes dependencies, then applies the managed catalog     |
+| `mise run doctor`             | 状態確認 | 状態確認 | 状態確認 | 状態確認    | 状態確認 | Verifies target presence, overlap, and catalog health                              |
+| `mise run format`             | 間接     | 間接     | 間接     | 間接        | 間接     | Formats workspace Markdown / TOML / YAML and may use the documented heading helper |
+| `mise run ci:check`           | ○        | ○        | ○        | ○           | ○        | Runs format check, validation, and smoke-catalog                                   |
+| `mise run validate`           | ○        | ○        | ○        | ○           | ○        | Bundles `validate:workspace` and `validate:catalog`                                |
+| `mise run validate:workspace` | ○        | ○        | ○        | ○           | ○        | Respects `APM_WORKSPACE_DIR` for workspace validation                              |
+| `mise run ci`                 | ○        | ○        | ○        | ○           | ○        | Runs format, validation, apply, and doctor for local delivery                      |
+| `mise run stage-catalog`      | ○        | ○        | ○        | ○           | ○        | Normalizes `catalog/` into the managed catalog package                             |
+| `mise run catalog:tidy`       | ○        | ○        | ○        | ○           | ○        | Runs stage-catalog, validate:catalog, and doctor                                   |
+| `mise run register-catalog`   | ○        | ○        | ○        | ○           | ○        | Installs a pushed `catalog` ref                                                    |
+| `mise run smoke-catalog`      | ○        | ○        | ○        | ○           | ○        | Performs a temporary-install smoke test                                            |
+| `mise run validate:catalog`   | ○        | ○        | ○        | ○           | ○        | Public task for drift checks                                                       |
+
+## Acceptance Criteria
+
+This migration slice is complete only when all of the following are true:
+
+1. `mise.toml` task entries do not call `~/.config/scripts/apm-workspace` or any equivalent bootstrap script path.
+2. `README.md`, `llms.md`, and `docs/apm-task-coverage.md` do not reference the retired bootstrap docs subtree.
+3. The only allowed operational exception under `~/.config` is `~/.config/scripts/replace-bold-headings.ts`, and this document names it explicitly.
+4. `~/.config/nix/agent-skills-sources.nix` remains retired and intentionally empty, with no external skill source definitions restored there.
+5. The task coverage above continues to map operational work to `~/.apm` as the source of truth.
 
 ## Notes
 
-- `register-catalog` は local diff をそのまま配る command ではなく、commit / push 済みの `catalog` を install する flow。
-- `validate` は総称 task で、`validate:workspace` と `validate:catalog` を束ねる。
-- `validate:workspace` と `validate:catalog` は `mise.toml` からも叩けるが、実体は workspace script 側の validation command。
-- 新しい personal skill は `~/.apm/catalog/skills/<id>/` に作る。runtime targets を起点にしない。
-- 新しい skill の作成や移管は `skill-creator` を使い、manifest や配布モデル全体の判断は `apm-usage` で補う。
-
-## Current Remaining Tasks
-
-2026-04-20 時点で、この migration slice の必須残件はありません。
-
-- follow-up として、helper docs や prompts に残る旧 authoring 指示の掃除は継続候補
+- This document is a current operating contract, not a migration log.
+- Existing coverage remains useful only insofar as it explains how the `mise` tasks operate from `~/.apm`.

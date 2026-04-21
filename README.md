@@ -2,7 +2,7 @@
 
 APM-based global skill workspace for `jey3dayo`.
 
-This repository is the day-to-day working copy of `~/.apm`. It owns the global APM manifest, the lockfile, the downloaded dependency cache, your personal skill sources, and the shared runtime guidance published from this repo.
+This repository is the day-to-day working copy of `~/.apm`. `~/.apm` is the source of truth for daily authoring and operation. `~/.config` is bootstrap-only and is not the authoring surface.
 
 ## What Lives Here
 
@@ -24,7 +24,8 @@ Authoring and deployment are split:
 The layout difference between `src/` and `catalog/` is intentional.
 
 - `catalog/skills/**` is the authoring surface for your personal assets.
-- external skills are tracked in `apm.yml` by upstream ref.
+- external skills are declared in `apm.yml` and resolved into `apm_modules/`.
+- `~/.config/nix/agent-skills-sources.nix` is retired and intentionally empty; it is not an active source of truth.
 - `catalog/**` remains the tracked runtime guidance package for shared assets synced into target roots.
 
 Current APM limitation:
@@ -39,7 +40,7 @@ The formatter for bold headings only rewrites personal skills:
 tsx ~/.config/scripts/replace-bold-headings.ts ./catalog/skills
 ```
 
-External skills can still live as upstream refs in `apm.yml` and are downloaded into `apm_modules/`.
+This is the only documented exception that reaches into `~/.config`. All other day-to-day references should point to this repository, especially the sections below and `docs/apm-task-coverage.md`.
 
 ## Daily Flow
 
@@ -82,8 +83,7 @@ If old package ownership from a previous install state is still hanging around, 
 
 ## More Context
 
-- Operational reference: `~/.config/docs/tools/apm-workspace.md`
-- Task catalog: `~/.config/docs/tools/mise-tasks.md`
-- Managed-skill usage guidance: `~/.apm/catalog/skills/apm-usage/SKILL.md`
 - Task coverage memo: `docs/apm-task-coverage.md`
+- Managed-skill usage guidance: `~/.apm/catalog/skills/apm-usage/SKILL.md`
+- This README: `What Lives Here`, `Workspace Layout`, `Daily Flow`, `Managed Skill Updates`
 - Remaining work: `TODO.md`

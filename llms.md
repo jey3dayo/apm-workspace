@@ -1,6 +1,8 @@
 # apm-workspace
 
-`~/.apm` is the working copy of the global APM workspace for `jey3dayo`.
+`~/.apm` is the working copy and operational source of truth for the global APM workspace for `jey3dayo`.
+
+`~/.config` is bootstrap-only for this workspace model. The external source mapping at `~/.config/nix/agent-skills-sources.nix` is retired and intentionally empty, so it is not an active editing target.
 
 This workspace owns the global APM manifest, the lockfile, the downloaded dependency cache, your personal skill sources, and the shared runtime guidance package.
 
@@ -44,6 +46,7 @@ jey3dayo/apm-workspace/catalog#main
 
 - Do not edit `apm_modules/`.
 - Do not reintroduce `./packages/*` or `~/.apm/skills/` as alternate editing surfaces for managed global skills.
+- Keep `~/.config/scripts/replace-bold-headings.ts` available as the one allowed script exception.
 - Keep `apm.yml` on upstream refs, especially `jey3dayo/apm-workspace/catalog#main`.
 - Keep personal source in `~/.apm/src/**` and runtime guidance in `~/.apm/catalog/**`.
 
@@ -91,8 +94,8 @@ If old package ownership from a previous install state is still hanging around, 
 ## References
 
 - Human overview: `~/.apm/README.md`
-- Full contract: `~/.config/docs/tools/apm-workspace.md`
-- Task catalog: `~/.config/docs/tools/mise-tasks.md`
+- Full contract: `~/.apm/README.md`
+- Task catalog: `docs/apm-task-coverage.md`
 - Skill guidance: `~/.apm/catalog/skills/apm-usage/SKILL.md`
 - Task coverage memo: `docs/apm-task-coverage.md`
 - Remaining work: `TODO.md`
