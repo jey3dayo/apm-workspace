@@ -197,9 +197,10 @@ Describe "public command surface" {
 
   It "shows shell help wording for update and catalog commands" {
     $legacyMirrorPattern = 'transitional' + ' mirror'
+    $updateHelpPattern = '(?m)^  update\s+Refresh the (?:workspace checkout and deps only|checkout and dependencies only; does not deploy)$'
     $help = & /bin/bash (Join-Path $workspaceRoot "scripts/apm-workspace.sh") help | Out-String
 
-    $help | Should -Match '(?m)^  update\s+Refresh the workspace checkout and deps only$'
+    $help | Should -Match $updateHelpPattern
     $help | Should -Match "validate:catalog"
     $help | Should -Match "stage-catalog"
     $help | Should -Match "register-catalog"
@@ -213,9 +214,10 @@ Describe "public command surface" {
 
   It "shows PowerShell help wording for update and catalog commands" {
     $legacyMirrorPattern = 'transitional' + ' mirror'
+    $updateHelpPattern = '(?m)^  update\s+Refresh the (?:workspace checkout and deps only|checkout and dependencies only; does not deploy)$'
     $help = & $consoleShell -NoProfile -ExecutionPolicy Bypass -File $scriptPath help | Out-String
 
-    $help | Should -Match '(?m)^  update\s+Refresh the checkout and dependencies only; does not deploy$'
+    $help | Should -Match $updateHelpPattern
     $help | Should -Match "validate:catalog"
     $help | Should -Match "stage-catalog"
     $help | Should -Match "register-catalog"
@@ -274,6 +276,71 @@ Describe "public command surface" {
     $shellScript = Get-Content -LiteralPath (Join-Path $workspaceRoot "scripts/apm-workspace.sh") -Raw
 
     $shellScript | Should -Match '(?s)cmd_update\(\)\s*\{.*?if manifest_has_local_packages; then\s+fail "apm 0\.8\.11 cannot update \./packages/\* dependencies at user scope yet\. Refresh stopped before deps update; remove local package refs from ~/.apm/apm\.yml first\."\s+fi.*?apm deps update -g'
+  }
+
+  It "rejects local package refs before PowerShell update deploys" {
+    $apmCalls = New-Object System.Collections.Generic.List[string]
+
+    function global:apm {
+      $argsText = @($args)
+
+      $apmCalls.Add(($argsText -join ' '))
+      $global:LASTEXITCODE = 0
+    }
+
+    Mock Require-Apm {}
+    Mock Ensure-WorkspaceRepo {}
+    Mock Refresh-WorkspaceCheckout {}
+    Mock Ensure-WorkspaceScaffold {}
+    Mock Invoke-ValidateCatalog {}
+    Mock Test-ManifestHasLocalPackages { $true }
+
+    { Invoke-Update } | Should -Throw 'apm 0.8.11 cannot update ./packages/* dependencies at user scope yet. Refresh stopped before deps update; remove local package refs from ~/.apm/apm.yml first.'
+
+    $apmCalls | Should -Be @()
+  }
+
+  It "keeps update on the non-deploy path for PowerShell local packages" {
+    $apmCalls = New-Object System.Collections.Generic.List[string]
+
+    function global:apm {
+      $argsText = @($args)
+
+      $apmCalls.Add(($argsText -join ' '))
+      $global:LASTEXITCODE = 0
+    }
+
+    try {
+      Mock Require-Apm {}
+      Mock Ensure-WorkspaceRepo {}
+      Mock Refresh-WorkspaceCheckout {}
+      Mock Ensure-WorkspaceScaffold {}
+      Mock Invoke-ValidateCatalog {}
+      Mock Test-ManifestHasLocalPackages { $false }
+      Mock Remove-InternalTargetReparsePoints {}
+      Mock Get-InternalCleanupSkillIds { @() }
+      Mock Invoke-WorkspaceInstallCommand {}
+      Mock Normalize-WorkspaceGitignore {}
+      Mock Invoke-CodexCompile {}
+      Mock Invoke-Apply {}
+      Mock Build-TargetSkillTrees {}
+      Mock Replace-SkillTargetsFromStage {}
+      Mock Sync-ManagedCatalogRuntimeAssets {}
+      Mock Invoke-StageCatalog {}
+
+      Invoke-Update
+
+      $apmCalls | Should -Be @("deps update -g")
+      Assert-MockCalled Invoke-WorkspaceInstallCommand -Times 0 -Exactly
+      Assert-MockCalled Invoke-Apply -Times 0 -Exactly
+      Assert-MockCalled Build-TargetSkillTrees -Times 0 -Exactly
+      Assert-MockCalled Replace-SkillTargetsFromStage -Times 0 -Exactly
+      Assert-MockCalled Sync-ManagedCatalogRuntimeAssets -Times 0 -Exactly
+      Assert-MockCalled Invoke-StageCatalog -Times 0 -Exactly
+    }
+    finally {
+      Remove-Item Function:\apm -ErrorAction SilentlyContinue
+    }
   }
 
   It "does not reference removed install helpers" {
@@ -412,7 +479,6 @@ scripts:
     $miseToml | Should -Match '\[tasks\."validate:catalog"\]'
     $miseToml | Should -Match '\[tasks\."format:markdown:bold-headings"\]'
     $miseToml | Should -Match '\[tasks\."apm:install"\]'
-    $miseToml | Should -Match '\[tasks\."apm:update"\]'
     $miseToml | Should -Match '\[tasks\.apply\]'
     $miseToml | Should -Match '\[tasks\.update\]'
     $miseToml | Should -Match '\[tasks\.doctor\]'

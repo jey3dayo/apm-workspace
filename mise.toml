@@ -66,11 +66,6 @@ description = "Run user-scope APM install from ~/.apm"
 run = "apm install -g"
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"apm install -g\""
 
-[tasks."apm:update"]
-description = "Run user-scope APM dependency update from ~/.apm"
-run = "apm deps update -g"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"apm deps update -g\""
-
 [tasks."format:markdown"]
 description = "Format Markdown files in the ~/.apm workspace"
 run = "fd -e md -X prettier --write --log-level error >/dev/null"
