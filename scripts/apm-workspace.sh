@@ -838,7 +838,7 @@ cmd_update() {
   cleanup_skill_ids=$(internal_cleanup_skill_ids "$skill_ids")
 
   if manifest_has_local_packages; then
-    fail "apm 0.8.11 cannot deploy ./packages/* dependencies at user scope yet. Update stopped before user-scope install; remove local package refs from ~/.apm/apm.yml first."
+    fail "apm 0.8.11 cannot deploy ./packages/* dependencies at user scope yet. Update stopped before refresh/install; remove local package refs from ~/.apm/apm.yml first."
   fi
 
   remove_internal_target_links "$cleanup_skill_ids"
@@ -1884,14 +1884,14 @@ cmd_help() {
 Usage: scripts/apm-workspace.sh <command> [args...]
 
 Commands:
-  apply              Deploy user-scope-compatible dependencies and compile Codex output
-  update             Pull clean checkout, update deps, then apply
+  apply              Offline deploy user-scope-compatible dependencies and compile Codex output
+  update             Refresh the workspace checkout and deps only
   format-catalog-metadata  Normalize tracked catalog apm.yml and README.md
   check-catalog-metadata   Check tracked catalog apm.yml and README.md normalization
   pin-external       Pin external manifest refs to lockfile commits
   validate           Validate the ~/.apm workspace
   validate:catalog   Fail when ~/.apm/catalog is not normalized or missing required assets
-  doctor             Print workspace and target state
+  doctor             Inspect workspace and target state
   bundle-catalog     Build ~/.apm/.catalog-build/catalog as the catalog package artifact
   stage-catalog      Rewrite ~/.apm/catalog into its normalized publishable layout and print its upstream ref
   register-catalog   Install the catalog ref after commit/push
