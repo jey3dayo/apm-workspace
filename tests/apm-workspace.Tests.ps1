@@ -6,8 +6,8 @@ Remove-Item Env:APM_WORKSPACE_LIB_ONLY -ErrorAction SilentlyContinue
 
 Describe "catalog helpers" {
   BeforeEach {
-    $WorkspaceDir = Join-Path $TestDrive "workspace"
-    New-Item -ItemType Directory -Path $WorkspaceDir -Force | Out-Null
+    $global:WorkspaceDir = Join-Path $TestDrive "workspace"
+    New-Item -ItemType Directory -Path $global:WorkspaceDir -Force | Out-Null
   }
 
   It "detects the catalog reference in apm.yml" {
@@ -218,8 +218,8 @@ Describe "public command surface" {
 
 Describe "internal cleanup skill ids" {
   BeforeEach {
-    $WorkspaceDir = Join-Path $TestDrive "workspace"
-    New-Item -ItemType Directory -Path $WorkspaceDir -Force | Out-Null
+    $global:WorkspaceDir = Join-Path $TestDrive "workspace"
+    New-Item -ItemType Directory -Path $global:WorkspaceDir -Force | Out-Null
   }
 
   It "includes legacy superpowers aliases for renamed managed skills" {
