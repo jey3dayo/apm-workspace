@@ -1856,13 +1856,16 @@ cmd_smoke_catalog() {
 
   printf '%s\n' "$skill_ids" | while IFS= read -r skill_id; do
     [ -n "$skill_id" ] || continue
-    relative_path=$(skill_id_to_manifest_path "$skill_id")
-    if [ ! -f "$temp_dir/.agents/skills/$relative_path/SKILL.md" ]; then
-      fail "Smoke test failed: expected installed skill file missing: $temp_dir/.agents/skills/$relative_path/SKILL.md"
+    source_relative_path=$(skill_id_to_manifest_path "$skill_id")
+    installed_skill_name=$(format_skill_name codex "$skill_id")
+    installed_relative_path=$(skill_id_to_manifest_path "$installed_skill_name")
+
+    if [ ! -f "$temp_dir/.agents/skills/$installed_relative_path/SKILL.md" ]; then
+      fail "Smoke test failed: expected installed skill file missing: $temp_dir/.agents/skills/$installed_relative_path/SKILL.md"
     fi
 
-    expected_files=$(relative_file_list "$(catalog_build_skills_root)/$relative_path")
-    actual_files=$(relative_file_list "$temp_dir/.agents/skills/$relative_path")
+    expected_files=$(relative_file_list "$(catalog_build_skills_root)/$source_relative_path")
+    actual_files=$(relative_file_list "$temp_dir/.agents/skills/$installed_relative_path")
     if [ "$expected_files" != "$actual_files" ]; then
       fail "Smoke test failed: installed skill tree for $skill_id differed from catalog."
     fi
