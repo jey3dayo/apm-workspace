@@ -81,13 +81,20 @@ function Get-ExternalSkillRelativePath {
     [string]$VirtualPath
   )
 
-  if ([string]::IsNullOrWhiteSpace($VirtualPath) -or -not $VirtualPath.StartsWith("skills/")) {
+  if ([string]::IsNullOrWhiteSpace($VirtualPath)) {
     throw "Invalid external skill virtual path: $VirtualPath"
   }
 
-  $relativePath = $VirtualPath.Substring("skills/".Length)
-  if ($relativePath.StartsWith(".curated/")) {
-    $relativePath = $relativePath.Substring(".curated/".Length)
+  if ($VirtualPath.StartsWith("skills/")) {
+    $relativePath = $VirtualPath.Substring("skills/".Length)
+  } elseif ($VirtualPath -match '.*/skills/(?<relative>.+)$') {
+    $relativePath = $Matches['relative']
+  } else {
+    throw "Invalid external skill virtual path: $VirtualPath"
+  }
+
+  if ($relativePath -match '^\.[^/]+/(?<rest>.+)$') {
+    $relativePath = $Matches['rest']
   }
 
   if ([string]::IsNullOrWhiteSpace($relativePath)) {
@@ -534,6 +541,10 @@ function Invoke-WorkspaceInstallCommand {
   finally {
     Pop-Location
   }
+}
+
+function Install-WorkspaceMcpDependencies {
+  Invoke-WorkspaceInstallCommand -InstallArgs @("-g", "--only", "mcp")
 }
 
 function Test-ManifestHasLocalPackages {
@@ -1064,6 +1075,9 @@ function Get-ExternalSkillRecords {
 
   foreach ($record in $lockRecords) {
     $canonicalReference = Get-CanonicalLockRecordReference -Record $record
+    if ($canonicalReference -eq 'jey3dayo/apm-workspace/catalog') {
+      continue
+    }
     if (-not $manifestReferenceKeys.Contains($canonicalReference)) {
       throw "External lock record is not declared in apm.yml: $canonicalReference"
     }
@@ -1328,6 +1342,7 @@ function Invoke-Apply {
     $null = Build-TargetSkillTrees -StageRoot $stageDir
     Sync-ManagedCatalogRuntimeAssets
     Replace-SkillTargetsFromStage -StageRoot $stageDir
+    Install-WorkspaceMcpDependencies
   }
   finally {
     if (Test-Path -LiteralPath $stageDir) {
@@ -1793,6 +1808,7 @@ function Invoke-Doctor {
   & git -C $WorkspaceDir remote -v
   Write-Host "targets:"
   $skillInventory = @(Get-ManagedCatalogSkillInventory)
+  $codexMcpConfigPath = Join-Path (Join-Path $HOME ".codex") "config.toml"
   foreach ($target in (Get-ManagedCatalogRuntimeTargets)) {
     $skillsPath = Join-Path $target.Root "skills"
     $configPath = Join-Path $target.Root $target.ConfigName
@@ -1801,6 +1817,7 @@ function Invoke-Doctor {
     $rulesPath = Join-Path $target.Root "rules"
     Write-Host ("  {0}: config={1} agents={2} commands={3} rules={4} skills={5}" -f $target.Name, $(if (Test-Path $configPath) { "present" } else { "missing" }), $(if (Test-Path $agentsPath) { "present" } else { "missing" }), $(if (Test-Path $commandsPath) { "present" } else { "missing" }), $(if (Test-Path $rulesPath) { "present" } else { "missing" }), $(if (Test-Path $skillsPath) { "present" } else { "missing" }))
   }
+  Write-Host ("codex mcp config: {0}" -f $(if (Test-Path $codexMcpConfigPath) { "present" } else { "missing" }))
   Write-Host ("target skill inventory: entries={0}" -f $skillInventory.Count)
   Write-Host ("external pins: unpinned={0}" -f (@(Get-UnpinnedExternalReferences)).Count)
   Write-CatalogSummary

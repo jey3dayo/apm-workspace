@@ -31,7 +31,7 @@ Workspace assets are split by role.
 The tracked layout is intentionally asymmetric:
 
 - `catalog/skills/**` is the authoring layer for personal assets.
-- external skills stay visible in `apm.yml` as upstream refs.
+- external skills stay visible in `apm.yml` / `apm.lock.yaml` as command-managed upstream refs.
 - `commands/**` stay top-level inside `catalog/**` because they are synced into runtime targets as shared guidance, not installed as nested skill packages.
 
 Shared runtime guidance is published through the catalog ref in `apm.yml`:
@@ -52,13 +52,25 @@ jey3dayo/apm-workspace/catalog#main
 - Treat Codex as a compile target, not a direct user-scope skill target. The current script path is `apm compile --target codex --output ~/.codex/AGENTS.md`.
 - Do not use `~/.codex/skills` as the verification source of truth for this workspace. Verify Codex rollout through compile success and `~/.codex/AGENTS.md`.
 
+## Source Of Truth
+
+- Personal skills
+  - edit `catalog/skills/**`
+- External skills
+  - use `apm install <package-ref>` to add
+  - use `apm uninstall <package-ref>` to remove
+  - treat `apm.yml` and `apm.lock.yaml` as command-managed state
+- Shared guidance
+  - edit `catalog/AGENTS.md`, `catalog/agents/**`, `catalog/commands/**`, `catalog/rules/**`
+
 ## Default Flow
 
 ```powershell
 cd ~/.apm
 mise install
-mise run apply
-mise run doctor
+mise run sync
+# or
+mise run sync:stable
 ```
 
 ## Managed Catalog Update Flow
@@ -84,9 +96,13 @@ If old package ownership from a previous install state is still hanging around, 
 ## Useful Maintenance Commands
 
 - `mise run format`: format Markdown, TOML, and YAML in the workspace
-- `mise run format:markdown:bold-headings`: rewrite bold headings only inside personal skills
+- `mise run format:markdown:bold-headings`: rewrite bold headings across Markdown in `catalog/`
 - `mise run ci:check`: run formatting checks plus validation smoke checks
-- `mise run ci`: format, validate, apply, and verify the local workspace rollout
+- `mise run ci`: run verification-only checks for the current workspace state
+- `mise run sync`: accept upstream dependency updates with `apm install -g --update`, then verify and inspect the workspace
+- `mise run sync:stable`: update, verify, and deploy the current manifest and lock locally
+- `mise run apply`: deploy the current manifest and lock without changing upstream refs
+- `mise run update`: refresh the checkout and dependency state without deploying
 - `mise run validate`: run both workspace and catalog validation
 - `mise run validate:workspace`: verify workspace wiring with workspace overrides
 - `mise run stage-catalog`: normalize `catalog/` in place before commit and push

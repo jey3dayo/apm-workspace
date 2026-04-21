@@ -7,13 +7,13 @@ This design restores an `apm -g` centered global skill workflow while keeping pe
 The key change is to treat two sources as first-class inputs:
 
 - Personal skills: `catalog/skills/**`
-- External skills: `apm add/remove` managed entries in `apm.yml` and `apm.lock.yaml`
+- External skills: `apm install/uninstall` managed entries in `apm.yml` and `apm.lock.yaml`
 
 `catalog#main` remains the shared guidance package for `AGENTS.md`, `agents/**`, `commands/**`, and `rules/**`, but it is no longer the only source of deployed skills. The lockfile must keep resolved external skills visible instead of collapsing everything into a single catalog package entry.
 
 ## Goals
 
-- Restore external skill resolution through `apm add/remove`
+- Restore external skill resolution through `apm install/uninstall`
 - Keep `apm.lock.yaml` populated with individual external skill entries
 - Avoid manual editing of `apm.yml` during normal operation
 - Keep personal skills owned in this repository under `catalog/skills/**`
@@ -43,8 +43,8 @@ These files remain tracked in git and are distributed locally by workspace comma
 
 External skills are managed by APM commands, not by hand-editing the manifest:
 
-- Add: `apm add ...`
-- Remove: `apm remove ...`
+- Add: `apm install <package-ref>`
+- Remove: `apm uninstall <package-ref>`
 
 The authoritative files are:
 
@@ -68,7 +68,7 @@ Shared runtime guidance continues to live in:
 
 APM commands are the canonical entry point for external dependency changes.
 
-- `apm add/remove`
+- `apm install/uninstall`
   - updates manifest intent
   - updates the lockfile
   - does not require users to edit `apm.yml` directly
@@ -100,7 +100,7 @@ Workspace `mise` tasks are responsible for orchestration and local deployment.
 ### High-level flow
 
 1. Personal skills are authored in `catalog/skills/**`
-2. External skills are registered with `apm add/remove`
+2. External skills are registered with `apm install/uninstall`
 3. `update` refreshes the repository checkout and dependency resolution
 4. `apply` combines personal and external skills into per-target deployment plans
 5. Shared guidance is synced separately from skill deployment
@@ -229,8 +229,9 @@ Tasks whose naming or semantics are rooted in the catalog-only migration should 
 
 Update the README to describe the new stable workflow:
 
+- add an explicit `Source Of Truth` section for personal skills and external skills
 - personal skills live in `catalog/skills/**`
-- external skills are managed with `apm add/remove`
+- external skills are managed with `apm install/uninstall`
 - `update` refreshes dependency state
 - `apply` deploys locally from lockfile-backed local state
 - `ci` verifies only
@@ -241,15 +242,24 @@ Remove wording that implies:
 - intentionally small lockfiles
 - Codex not using deployed skills
 
-### `llms.txt`
+### `llms.md`
 
-Update `llms.txt` to reflect the same operational model in concise agent-facing terms:
+Update `llms.md` to reflect the same operational model in concise agent-facing terms:
 
+- include the same `Source Of Truth` summary as README in shorter form
 - do not hand-edit `apm.yml` during normal use
-- use `apm add/remove` for external skills
+- use `apm install/uninstall` for external skills
 - use `mise run update` for refresh
 - use `mise run apply` for offline local deployment
 - personal skills remain in `catalog/skills/**`
+
+### Repo `AGENTS.md`
+
+Do not add a repo-root `AGENTS.md` in this implementation slice.
+
+- the repository does not currently have a stable local `AGENTS.md`
+- the Source Of Truth rules should live in `README.md` and `llms.md` first
+- a repo-root `AGENTS.md` can be added later once the workflow and naming behavior settle
 
 ### `TODO.md`
 
@@ -324,7 +334,7 @@ Validate:
 2. Redesign deployment planning around combined personal and external inventories
 3. Make `apply` consume lock-backed local state only
 4. Rework `mise.toml` task semantics
-5. Update `README.md`, `llms.txt`, and `TODO.md`
+5. Update `README.md`, `llms.md`, and `TODO.md`
 6. Verify shell, PowerShell, and task behavior
 
 ## Open Questions
@@ -338,6 +348,6 @@ Validate:
 Proceed with the dual-source model:
 
 - personal skills from `catalog/skills/**`
-- external skills from `apm add/remove` managed `apm.yml` and `apm.lock.yaml`
+- external skills from `apm install/uninstall` managed `apm.yml` and `apm.lock.yaml`
 
 This best matches the intended operator workflow, preserves explicit ownership of external skills, and avoids returning to Nix-based distribution.

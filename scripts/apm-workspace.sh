@@ -804,6 +804,10 @@ run_workspace_install_command() {
   rm -f "$output_file"
 }
 
+install_workspace_mcp_dependencies() {
+  run_workspace_install_command -g --only mcp
+}
+
 cmd_apply() {
   require_apm
   ensure_workspace_repo
@@ -821,6 +825,7 @@ cmd_apply() {
   build_target_skill_trees "$apply_stage_root"
   sync_managed_catalog_runtime_assets
   replace_skill_targets_from_stage "$apply_stage_root"
+  install_workspace_mcp_dependencies
   normalize_workspace_gitignore
   compile_codex
 
@@ -1181,14 +1186,17 @@ external_skill_relative_path() {
     skills/*)
       relative_path=${virtual_path#skills/}
       ;;
+    */skills/*)
+      relative_path=${virtual_path#*/skills/}
+      ;;
     *)
       fail "Invalid external skill virtual path: $virtual_path"
       ;;
   esac
 
   case "$relative_path" in
-    .curated/*)
-      relative_path=${relative_path#.curated/}
+    .*/*)
+      relative_path=${relative_path#*/}
       ;;
   esac
 
@@ -1316,7 +1324,9 @@ EOF
         if (commit != "" && index(rel, commit) > 0) {
           score += 1
         }
-        print score "\t" root rel
+        directory = rel
+        sub(/\/SKILL\.md$/, "", directory)
+        print score "\t" root directory
       }
     ' | sort -t "$(printf '\t')" -k1,1nr -k2,2
   ) || true
@@ -1385,6 +1395,10 @@ collect_external_skill_records() {
     canonical_ref="$repo_url"
     if [ -n "$virtual_path" ]; then
       canonical_ref="$canonical_ref/$virtual_path"
+    fi
+
+    if [ "$canonical_ref" = "jey3dayo/apm-workspace/catalog" ]; then
+      continue
     fi
 
     if ! awk -v key="$canonical_ref" '$0 == key { found = 1; exit } END { exit(found ? 0 : 1) }' "$manifest_keys_file"; then
@@ -1733,6 +1747,7 @@ cmd_doctor() {
     git remote -v || true
     printf 'targets:\n'
     inventory_file=$(mktemp "${TMPDIR:-/tmp}/apm-skill-inventory.XXXXXX")
+    codex_mcp_config="$HOME/.codex/config.toml"
     managed_catalog_skill_inventory >"$inventory_file"
     managed_catalog_runtime_targets | while IFS='|' read -r target_name target_dir config_name; do
       target_root="$HOME/$target_dir"
@@ -1743,6 +1758,7 @@ cmd_doctor() {
       if [ -e "$target_root/skills" ]; then skills_state=present; else skills_state=missing; fi
       printf '  %s: config=%s agents=%s commands=%s rules=%s skills=%s\n' "$target_name" "$config_state" "$agents_state" "$commands_state" "$rules_state" "$skills_state"
     done
+    printf 'codex mcp config: %s\n' "$(test -f "$codex_mcp_config" && printf present || printf missing)"
     printf 'target skill inventory: entries=%s\n' "$(awk 'NF { count++ } END { print count + 0 }' "$inventory_file")"
     rm -f "$inventory_file"
     printf 'external pins: unpinned=%s\n' "$(unpinned_external_references | awk 'NF { count++ } END { print count + 0 }')"

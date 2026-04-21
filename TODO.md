@@ -2,15 +2,18 @@
 
 ## Open Tasks
 
+- [ ] codex の mcpも管理できるかチェック
+- [x] 追記: https://github.com/jakubkrehel/make-interfaces-feel-better/tree/main/skills/make-interfaces-feel-better
+- [x] 追加と追記: https://github.com/mizchi/chezmoi-dotfiles/blob/main/dot_claude/skills/empirical-prompt-tuning/SKILL.md
 - [x] Remove stale external sources with no current manifest/runtime usage: `gonta223-humanizer-ja`, `obra-episodic-memory`, `sawyerhood-dev-browser`
 - [x] Migrate first managed skill-only batch and remove their source/input/lock entries:
-  `millionco-react-doctor`, `anthropics-claude-code`, `epicenterhq-epicenter`
+      `millionco-react-doctor`, `anthropics-claude-code`, `epicenterhq-epicenter`
 - [x] Migrate second managed skill-only batch and remove their source/input/lock entries:
-  `benjitaylor-agentation`, `tokoroten-prompt-review`, `trailofbits-supply-chain-risk-auditor`, `mizchi-chezmoi-dotfiles`
+      `benjitaylor-agentation`, `tokoroten-prompt-review`, `trailofbits-supply-chain-risk-auditor`, `mizchi-chezmoi-dotfiles`
 - [x] Migrate third managed skill-only batch and remove their source/input/lock entries:
-  `nyosegawa-skills`, `trailofbits-agentic-actions-auditor`, `ui-ux-pro-max`
+      `nyosegawa-skills`, `trailofbits-agentic-actions-auditor`, `ui-ux-pro-max`
 - [x] Migrate final external skill batch and remove all remaining source/input/lock entries:
-  `openai-skills`, `vercel-agent-skills`, `vercel-agent-browser`, `heyvhuang-ship-faster`, `trailofbits-sharp-edges`, `obra-superpowers`, `openai-codex-plugin-cc`, `lum1104-understand-anything`, `trailofbits-audit-context-building`, `trailofbits-static-analysis`
+      `openai-skills`, `vercel-agent-skills`, `vercel-agent-browser`, `heyvhuang-ship-faster`, `trailofbits-sharp-edges`, `obra-superpowers`, `openai-codex-plugin-cc`, `lum1104-understand-anything`, `trailofbits-audit-context-building`, `trailofbits-static-analysis`
 - [x] Reconcile `~/.apm/apm.yml` to managed catalog only and rerun `apply`
 - [x] Refresh `flake.lock` after external source/input entries are gone
 

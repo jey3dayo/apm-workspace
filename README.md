@@ -19,12 +19,13 @@ This repository is the day-to-day working copy of `~/.apm`. `~/.apm` is the sour
 Authoring and deployment are split:
 
 - Personal skills: `~/.apm/catalog/skills/<id>/`
+- External skills: command-managed entries in `~/.apm/apm.yml` and `~/.apm/apm.lock.yaml`
 - Shared guidance: `~/.apm/catalog/AGENTS.md`, `agents/**`, `commands/**`, `rules/**`
 
 The layout difference between `src/` and `catalog/` is intentional.
 
 - `catalog/skills/**` is the authoring surface for your personal assets.
-- external skills are declared in `apm.yml` and resolved into `apm_modules/`.
+- external skills are managed with `apm install` / `apm uninstall`, recorded in `apm.yml` / `apm.lock.yaml`, and resolved into `apm_modules/`.
 - `~/.config/nix/agent-skills-sources.nix` is retired and intentionally empty; it is not an active source of truth.
 - `catalog/**` remains the tracked runtime guidance package for shared assets synced into target roots.
 
@@ -35,28 +36,42 @@ Current APM limitation:
 - do not switch `apm.yml` to local `./packages/*` refs until user-scope local package support lands in APM
 - Codex is handled separately via `apm compile --target codex --output ~/.codex/AGENTS.md`; this workspace does not treat `~/.codex/skills` as its deployment contract
 
-The formatter for bold headings only rewrites personal skills:
+The formatter for bold headings rewrites Markdown under `catalog/`:
 
 ```text
-tsx ~/.config/scripts/replace-bold-headings.ts ./catalog/skills
+tsx ~/.config/scripts/replace-bold-headings.ts ./catalog
 ```
 
 This is the only documented exception that reaches into `~/.config`. All other day-to-day references should point to this repository, especially the sections below and `docs/apm-task-coverage.md`.
+
+## Source Of Truth
+
+- Personal skills
+  - edit `~/.apm/catalog/skills/<id>/`
+- External skills
+  - add with `apm install <package-ref>`
+  - remove with `apm uninstall <package-ref>`
+  - treat `apm.yml` and `apm.lock.yaml` as command-managed state during normal operation
+- Shared guidance
+  - edit `~/.apm/catalog/AGENTS.md`, `agents/**`, `commands/**`, `rules/**`
 
 ## Daily Flow
 
 ```powershell
 cd ~/.apm
 mise install
-mise run apply
-mise run doctor
+mise run sync         # accept newer upstream package content
+# or
+mise run sync:stable  # deploy the current manifest and lock
 ```
 
 Useful maintenance commands:
 
 ```powershell
 mise run format
-mise run ci
+mise run ci           # verification only
+mise run sync         # upstream refresh
+mise run sync:stable  # stable rollout from current manifest + lock
 mise run validate:catalog
 mise run stage-catalog
 mise run catalog:tidy
@@ -70,6 +85,19 @@ When a personal skill changes under `~/.apm/catalog/skills/`:
 
 1. Update `catalog/skills/<id>/`.
 2. Run `mise run format:markdown:bold-headings` if you want heading normalization.
+
+When external skills change:
+
+1. Use `apm install <package-ref>` or `apm uninstall <package-ref>`.
+2. Review `apm.yml` and `apm.lock.yaml`.
+3. Run `mise run sync` when you want to accept newer upstream package content with `apm install -g --update`.
+4. Run `mise run sync:stable` when you want to deploy the current manifest and lock without accepting new upstream content.
+
+Task semantics:
+
+- `mise run ci` verifies formatting, validation, and smoke checks only. It does not deploy.
+- `mise run sync` is the upstream-acceptance flow and is centered on `apm install -g --update`.
+- `mise run sync:stable` preserves the older update -> verify -> apply -> doctor flow for the current manifest and lock.
 
 When shared runtime guidance changes under `~/.apm/catalog/`:
 

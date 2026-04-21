@@ -10,34 +10,36 @@
 
 ## Where Content Lives
 
-| Content area           | Current source of truth                      | Notes                                  |
-| ---------------------- | -------------------------------------------- | -------------------------------------- |
-| `skills`               | `~/.apm/catalog/skills/**`                   | Personal skill authoring source        |
-| `agents`               | `~/.apm/catalog/agents/**`                   | Runtime sync target                    |
-| top-level `commands/`  | `~/.apm/catalog/commands/**`                 | Runtime sync target                    |
-| `rules`                | `~/.apm/catalog/rules/**`                    | Runtime sync target                    |
-| `AGENTS.md`            | `~/.apm/catalog/AGENTS.md`                   | Managed catalog instructions           |
-| formatter helper       | `~/.config/scripts/replace-bold-headings.ts` | Allowed bootstrap/helper exception     |
-| retired skills sources | `~/.config/nix/agent-skills-sources.nix`     | Intentionally empty; do not repopulate |
+| Content area           | Current source of truth                      | Notes                                    |
+| ---------------------- | -------------------------------------------- | ---------------------------------------- |
+| `skills`               | `~/.apm/catalog/skills/**`                   | Personal skill authoring source          |
+| `agents`               | `~/.apm/catalog/agents/**`                   | Runtime sync target                      |
+| top-level `commands/`  | `~/.apm/catalog/commands/**`                 | Runtime sync target                      |
+| `rules`                | `~/.apm/catalog/rules/**`                    | Runtime sync target                      |
+| `AGENTS.md`            | `~/.apm/catalog/AGENTS.md`                   | Managed catalog instructions             |
+| formatter helper       | `~/.config/scripts/replace-bold-headings.ts` | Allowed bootstrap/helper exception       |
+| retired skills sources | `~/.config/nix/agent-skills-sources.nix`     | Intentionally empty; do not repopulate   |
 | Codex compiled output  | `~/.codex/AGENTS.md`                         | Produced by `apm compile --target codex` |
 
 ## Task Coverage
 
-| task / command                | skills   | agents   | rules    | `AGENTS.md` | commands | Coverage summary                                                                   |
-| ----------------------------- | -------- | -------- | -------- | ----------- | -------- | ---------------------------------------------------------------------------------- |
-| `mise run apply`              | ○        | ○        | ○        | ○           | ○        | Installs and syncs the managed catalog from `~/.apm`                               |
-| `mise run update`             | ○        | ○        | ○        | ○           | ○        | Updates the checkout, refreshes dependencies, then applies the managed catalog     |
-| `mise run doctor`             | 状態確認 | 状態確認 | 状態確認 | 状態確認    | 状態確認 | Verifies target presence, overlap, and catalog health                              |
-| `mise run format`             | 間接     | 間接     | 間接     | 間接        | 間接     | Formats workspace Markdown / TOML / YAML and may use the documented heading helper |
-| `mise run ci:check`           | ○        | ○        | ○        | ○           | ○        | Runs format check, validation, and smoke-catalog                                   |
-| `mise run validate`           | ○        | ○        | ○        | ○           | ○        | Bundles `validate:workspace` and `validate:catalog`                                |
-| `mise run validate:workspace` | ○        | ○        | ○        | ○           | ○        | Respects `APM_WORKSPACE_DIR` for workspace validation                              |
-| `mise run ci`                 | ○        | ○        | ○        | ○           | ○        | Runs format, validation, apply, and doctor for local delivery                      |
-| `mise run stage-catalog`      | ○        | ○        | ○        | ○           | ○        | Normalizes `catalog/` into the managed catalog package                             |
-| `mise run catalog:tidy`       | ○        | ○        | ○        | ○           | ○        | Runs stage-catalog, validate:catalog, and doctor                                   |
-| `mise run register-catalog`   | ○        | ○        | ○        | ○           | ○        | Installs a pushed `catalog` ref                                                    |
-| `mise run smoke-catalog`      | ○        | ○        | ○        | ○           | ○        | Performs a temporary-install smoke test                                            |
-| `mise run validate:catalog`   | ○        | ○        | ○        | ○           | ○        | Public task for drift checks                                                       |
+| task / command                | skills   | agents   | rules    | `AGENTS.md` | commands | Coverage summary                                                                                                            |
+| ----------------------------- | -------- | -------- | -------- | ----------- | -------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `mise run apply`              | ○        | ○        | ○        | ○           | ○        | Installs and syncs the managed catalog from `~/.apm`                                                                        |
+| `mise run update`             | ○        | ○        | ○        | ○           | ○        | Updates the checkout, refreshes dependencies, then applies the managed catalog                                              |
+| `mise run sync`               | ○        | ○        | ○        | ○           | ○        | Accepts newer upstream package content with `apm install -g --update`, then runs verification and doctor                    |
+| `mise run sync:stable`        | ○        | ○        | ○        | ○           | ○        | Updates, verifies, and deploys the current manifest plus lock locally without forcing upstream refresh                      |
+| `mise run doctor`             | 状態確認 | 状態確認 | 状態確認 | 状態確認    | 状態確認 | Verifies target presence, overlap, and catalog health                                                                       |
+| `mise run format`             | 間接     | 間接     | 間接     | 間接        | 間接     | Formats workspace Markdown / TOML / YAML and may use the documented heading helper                                          |
+| `mise run ci:check`           | ○        | ○        | ○        | ○           | ○        | Runs format check, validation, and smoke-catalog                                                                            |
+| `mise run validate`           | ○        | ○        | ○        | ○           | ○        | Bundles `validate:workspace` and `validate:catalog`                                                                         |
+| `mise run validate:workspace` | ○        | ○        | ○        | ○           | ○        | Respects `APM_WORKSPACE_DIR` for workspace validation                                                                       |
+| `mise run ci`                 | ○        | ○        | ○        | ○           | ○        | Runs format, validation, apply, and doctor for local delivery                                                               |
+| `mise run stage-catalog`      | ○        | ○        | ○        | ○           | ○        | Normalizes `catalog/` into the managed catalog package                                                                      |
+| `mise run catalog:tidy`       | ○        | ○        | ○        | ○           | ○        | Runs stage-catalog, validate:catalog, and doctor                                                                            |
+| `mise run register-catalog`   | ○        | ○        | ○        | ○           | ○        | Installs a pushed `catalog` ref                                                                                             |
+| `mise run smoke-catalog`      | ○        | ○        | ○        | ○           | ○        | Performs a temporary-install smoke test                                                                                     |
+| `mise run validate:catalog`   | ○        | ○        | ○        | ○           | ○        | Public task for drift checks                                                                                                |
 | `mise run apply` for Codex    | n/a      | ○        | ○        | ○           | n/a      | Runs `apm compile --target codex --output ~/.codex/AGENTS.md` instead of treating `~/.codex/skills` as the rollout contract |
 
 ## Acceptance Criteria

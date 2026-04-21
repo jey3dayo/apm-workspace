@@ -88,6 +88,13 @@ dependencies:
     $map["obra/superpowers/skills/brainstorming"] | Should -Be "obra/superpowers/skills/brainstorming#1234567890abcdef"
   }
 
+  It "normalizes external virtual paths beyond direct skills roots" {
+    Get-ExternalSkillRelativePath -VirtualPath "understand-anything-plugin/skills/understand" | Should -Be "understand"
+    Get-ExternalSkillRelativePath -VirtualPath "plugins/static-analysis/skills/codeql" | Should -Be "codeql"
+    Get-ExternalSkillRelativePath -VirtualPath ".agents/skills/tauri" | Should -Be "tauri"
+    Get-ExternalSkillRelativePath -VirtualPath "skills/.system/skill-creator" | Should -Be "skill-creator"
+  }
+
   It "parses repo-root external lock records as distinct resolved skills" {
     @"
 name: apm-workspace
@@ -159,6 +166,44 @@ dependencies:
     $lockedRecords | Where-Object Repo -eq "github.com/extra-skill" | Should -Not -BeNullOrEmpty
     $manifestReferences | Should -Contain "openai/skills"
     $manifestReferences | Should -Not -Contain "github.com/extra-skill"
+  }
+
+  It "ignores the managed catalog lock record when collecting external skills" {
+    @"
+name: apm-workspace
+version: 1.0.0
+description: test
+author: test
+dependencies:
+  apm:
+    - jey3dayo/apm-workspace/catalog#main
+    - benjitaylor/agentation/skills/agentation
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.yml")
+    @"
+lockfile_version: "1"
+dependencies:
+  - repo_url: jey3dayo/apm-workspace
+    host: github.com
+    resolved_commit: 1111111111111111
+    virtual_path: catalog
+  - repo_url: benjitaylor/agentation
+    host: github.com
+    resolved_commit: 2222222222222222
+    virtual_path: skills/agentation
+"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.lock.yaml")
+
+    $agentationPath = Join-Path (Join-Path (Join-Path $WorkspaceDir "apm_modules") "benjitaylor") "agentation"
+    $agentationPath = Join-Path $agentationPath "skills/agentation"
+    New-Item -ItemType Directory -Path $agentationPath -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $agentationPath "SKILL.md") -Value "# agentation"
+
+    $records = @(Get-ExternalSkillRecords)
+
+    $records.Count | Should -Be 1
+    $records[0].SourceSkillId | Should -Be "agentation"
+    $records[0].CanonicalReference | Should -Be "benjitaylor/agentation/skills/agentation"
   }
 
   It "reads only top-level lock dependency records" {
@@ -272,10 +317,58 @@ Describe "public command surface" {
     }
   }
 
+  It "applies managed MCP dependencies during PowerShell deploy" {
+    Mock Require-Apm {}
+    Mock Ensure-WorkspaceRepo {}
+    Mock Ensure-WorkspaceScaffold {}
+    Mock Invoke-ValidateCatalog {}
+    Mock Ensure-WorkspaceMiseFile {}
+    Mock Test-ManifestHasLocalPackages { $false }
+    Mock New-TemporaryDirectory { Join-Path $TestDrive "apm-apply" }
+    Mock Build-TargetSkillTrees {}
+    Mock Sync-ManagedCatalogRuntimeAssets {}
+    Mock Replace-SkillTargetsFromStage {}
+    Mock Install-WorkspaceMcpDependencies {}
+    Mock Normalize-WorkspaceGitignore {}
+    Mock Invoke-CodexCompile {}
+
+    Invoke-Apply
+
+    Assert-MockCalled Install-WorkspaceMcpDependencies -Times 1 -Exactly
+  }
+
+  It "installs MCP dependencies with apm install only mcp" {
+    $apmCalls = New-Object System.Collections.Generic.List[string]
+
+    function global:apm {
+      $argsText = @($args)
+      $apmCalls.Add(($argsText -join ' '))
+      $global:LASTEXITCODE = 0
+    }
+
+    try {
+      Mock Test-ApmInstallDiagnosticsFailure { $false }
+
+      Install-WorkspaceMcpDependencies
+
+      $apmCalls | Should -Be @("install -g --only mcp")
+    }
+    finally {
+      Remove-Item Function:\apm -ErrorAction SilentlyContinue
+    }
+  }
+
   It "rejects local package refs before update deploys" {
     $shellScript = Get-Content -LiteralPath (Join-Path $workspaceRoot "scripts/apm-workspace.sh") -Raw
 
     $shellScript | Should -Match '(?s)cmd_update\(\)\s*\{.*?if manifest_has_local_packages; then\s+fail "apm 0\.8\.11 cannot update \./packages/\* dependencies at user scope yet\. Refresh stopped before deps update; remove local package refs from ~/.apm/apm\.yml first\."\s+fi.*?apm deps update -g'
+  }
+
+  It "deploys managed MCP dependencies during shell apply" {
+    $shellScript = Get-Content -LiteralPath (Join-Path $workspaceRoot "scripts/apm-workspace.sh") -Raw
+
+    $shellScript | Should -Match '(?s)install_workspace_mcp_dependencies\(\)\s*\{\s*run_workspace_install_command -g --only mcp\s*\}'
+    $shellScript | Should -Match '(?s)cmd_apply\(\)\s*\{.*?replace_skill_targets_from_stage "\$apply_stage_root".*?install_workspace_mcp_dependencies.*?compile_codex'
   }
 
   It "rejects local package refs before PowerShell update deploys" {
@@ -535,13 +628,17 @@ scripts:
     $miseToml | Should -Match '\[tasks\.format\]'
     $miseToml | Should -Match '\[tasks\.ci\]'
     $miseToml | Should -Match '\[tasks\.sync\]'
+    $miseToml | Should -Match '\[tasks\."sync:stable"\]'
     $miseToml | Should -Match '\[tasks\."catalog:release"\]'
     $miseToml | Should -Match '\[tasks\."catalog:tidy"\]'
     $miseToml | Should -Match 'run = "bash ./scripts/apm-workspace.sh apply"'
     $miseToml | Should -Match 'replace-bold-headings\.ts'
+    $miseToml | Should -Match 'replace-bold-headings\.ts.*\./catalog"'
+    $miseToml | Should -Match 'replace-bold-headings\.ts.*\./catalog --dry-run'
     $miseToml | Should -Match '(?s)\[tasks\.ci\]\s*description = "Run verification-only checks for the ~/.apm workspace"\s*depends = \["check:format", "validate", "smoke-catalog"\]'
-    $miseToml | Should -Match '(?s)\[tasks\.sync\].*?\{ task = "update" \}.*?\{ task = "ci" \}.*?\{ task = "apply" \}.*?\{ task = "doctor" \}'
-    $miseToml | Should -Match '(?s)\[tasks\."catalog:release"\].*?\{ task = "sync" \}.*?release-catalog'
+    $miseToml | Should -Match '(?s)\[tasks\.sync\].*?apm install -g --update.*?\{ task = "ci" \}.*?\{ task = "doctor" \}'
+    $miseToml | Should -Match '(?s)\[tasks\."sync:stable"\].*?\{ task = "update" \}.*?\{ task = "ci" \}.*?\{ task = "apply" \}.*?\{ task = "doctor" \}'
+    $miseToml | Should -Match '(?s)\[tasks\."catalog:release"\].*?\{ task = "sync:stable" \}.*?release-catalog'
     $miseToml | Should -Not -Match 'APM_BOOTSTRAP_REPO'
   }
 
@@ -559,7 +656,6 @@ scripts:
     $legacyMirrorPattern = 'transitional\s+' + 'mirror'
     $files = @(
       (Join-Path $workspaceRoot "catalog/skills/apm-usage/SKILL.md")
-      (Join-Path $workspaceRoot "catalog/skills/skill-creator/SKILL.md")
       (Join-Path $workspaceRoot "catalog/skills/docs-index/indexes/agents-index.md")
       (Join-Path $workspaceRoot "catalog/skills/nix-dotfiles/SKILL.md")
       (Join-Path $workspaceRoot "catalog/skills/nix-dotfiles/README.md")
@@ -581,7 +677,8 @@ scripts:
     $readme = Get-Content -LiteralPath (Join-Path $workspaceRoot "README.md") -Raw
     $todo = Get-Content -LiteralPath (Join-Path $workspaceRoot "TODO.md") -Raw
 
-    $readme | Should -Match 'mise run apply'
+    $readme | Should -Match 'mise run sync'
+    $readme | Should -Match 'mise run sync:stable'
     $readme | Should -Match 'mise run stage-catalog'
     $todo | Should -Match 'managed catalog only'
   }

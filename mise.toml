@@ -7,7 +7,7 @@ node = "24"
 
 # CLI tools
 fd = "latest"
-"github:microsoft/apm" = "0.8.11"
+"github:microsoft/apm" = "latest"
 taplo = "latest"
 
 # npm packages
@@ -77,14 +77,14 @@ run = "fd -e md -X prettier --check --log-level error"
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"@(fd -e md) | ForEach-Object { prettier --check --log-level error $_ }\""
 
 [tasks."format:markdown:bold-headings"]
-description = "Rewrite bold headings only inside personal skill sources"
-run = "tsx \"$HOME/.config/scripts/replace-bold-headings.ts\" ./catalog/skills"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"tsx \\\"$HOME/.config/scripts/replace-bold-headings.ts\\\" ./catalog/skills\""
+description = "Rewrite bold headings inside catalog skill and shared guidance sources"
+run = "tsx \"$HOME/.config/scripts/replace-bold-headings.ts\" ./catalog"
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"tsx \\\"$HOME/.config/scripts/replace-bold-headings.ts\\\" ./catalog\""
 
 [tasks."format:markdown:bold-headings:check"]
-description = "Check bold heading rewrites only inside personal skill sources"
-run = "tsx \"$HOME/.config/scripts/replace-bold-headings.ts\" ./catalog/skills --dry-run"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"tsx \\\"$HOME/.config/scripts/replace-bold-headings.ts\\\" ./catalog/skills --dry-run\""
+description = "Check bold heading rewrites inside catalog skill and shared guidance sources"
+run = "tsx \"$HOME/.config/scripts/replace-bold-headings.ts\" ./catalog --dry-run"
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"tsx \\\"$HOME/.config/scripts/replace-bold-headings.ts\\\" ./catalog --dry-run\""
 
 [tasks."format:toml"]
 description = "Format TOML files in the ~/.apm workspace"
@@ -147,7 +147,11 @@ depends = ["check:format", "validate", "smoke-catalog"]
 # Meta Tasks
 # ========================================
 [tasks.sync]
-description = "Update, verify, and deploy the ~/.apm workspace locally"
+description = "Refresh upstream APM dependencies, verify, and inspect the ~/.apm workspace"
+run = ["apm install -g --update", { task = "ci" }, { task = "doctor" }]
+
+[tasks."sync:stable"]
+description = "Update, verify, and deploy the ~/.apm workspace locally from the current manifest and lock"
 run = [
   { task = "update" },
   { task = "ci" },
@@ -165,8 +169,11 @@ run = [
 
 [tasks."catalog:release"]
 description = "Run local sync, require a clean pushed branch, then register the managed catalog"
-run = [{ task = "sync" }, "bash ./scripts/apm-workspace.sh release-catalog"]
+run = [
+  { task = "sync:stable" },
+  "bash ./scripts/apm-workspace.sh release-catalog",
+]
 run_windows = [
-  { task = "sync" },
+  { task = "sync:stable" },
   "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 release-catalog",
 ]
