@@ -2323,14 +2323,14 @@ switch ($Command) {
 Usage: scripts/apm-workspace.ps1 <command> [args...]
 
 Commands:
-  apply              Deploy user-scope-compatible dependencies and compile Codex output
-  update             Pull clean checkout, update deps, then apply
+  apply              Offline deploy user-scope-compatible dependencies and compile Codex output
+  update             Refresh the checkout and dependencies only; does not deploy
   format-catalog-metadata  Normalize tracked catalog apm.yml and README.md
   check-catalog-metadata   Check tracked catalog apm.yml and README.md normalization
   pin-external       Pin external manifest refs to lockfile commits
   validate           Validate the ~/.apm workspace
   validate:catalog   Fail when ~/.apm/catalog is not normalized or missing required assets
-  doctor             Print workspace and target state
+  doctor             Inspect workspace and target state
   bundle-catalog     Build ~/.apm/.catalog-build/catalog as the catalog package artifact
   stage-catalog      Rewrite ~/.apm/catalog into its normalized publishable layout and print its upstream ref
   register-catalog   Install the catalog ref after commit/push
