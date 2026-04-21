@@ -1176,8 +1176,13 @@ manifest_external_reference_keys() {
   ' | awk 'NF && !seen[$0]++'
 }
 
-external_skill_id_from_virtual_path() {
+external_skill_relative_path() {
   virtual_path="$1"
+
+  if [ -z "$virtual_path" ]; then
+    printf '\n'
+    return 0
+  fi
 
   case "$virtual_path" in
     skills/*)
@@ -1193,6 +1198,15 @@ external_skill_id_from_virtual_path() {
       relative_path=${relative_path#.curated/}
       ;;
   esac
+
+  [ -n "$relative_path" ] || fail "Invalid external skill virtual path: $virtual_path"
+
+  printf '%s\n' "$relative_path"
+}
+
+external_skill_id_from_virtual_path() {
+  virtual_path="$1"
+  relative_path=$(external_skill_relative_path "$virtual_path")
 
   [ -n "$relative_path" ] || fail "Invalid external skill virtual path: $virtual_path"
 
@@ -1212,42 +1226,93 @@ external_skill_id_from_virtual_path() {
   printf '%s\n' "$skill_id"
 }
 
+external_skill_id_from_record() {
+  repo_url="$1"
+  virtual_path="$2"
+
+  if [ -z "$virtual_path" ]; then
+    old_ifs=$IFS
+    IFS='/'
+    # shellcheck disable=SC2086
+    set -- $repo_url
+    IFS=$old_ifs
+    validate_skill_path_segments "$repo_url" "$@"
+    skill_id="${!#}"
+    validate_skill_id "$skill_id"
+    printf '%s\n' "$skill_id"
+    return 0
+  fi
+
+  external_skill_id_from_virtual_path "$virtual_path"
+}
+
 external_skill_content_dir() {
   repo_url="$1"
   virtual_path="$2"
   resolved_commit="$3"
   apm_modules_root="$WORKSPACE_DIR/apm_modules"
+  relative_path=$(external_skill_relative_path "$virtual_path")
 
   [ -d "$apm_modules_root" ] || fail "External skill cache missing: $apm_modules_root"
 
   found_path=""
-  for candidate_path in \
-    "$apm_modules_root/$repo_url/$virtual_path" \
-    "$apm_modules_root/$repo_url/$resolved_commit/$virtual_path" \
-    "$apm_modules_root/$repo_url/${virtual_path#skills/}" \
-    "$apm_modules_root/$repo_url/$resolved_commit/${virtual_path#skills/}" \
-    "$apm_modules_root/$resolved_commit/$repo_url/$virtual_path" \
-    "$apm_modules_root/$resolved_commit/$repo_url/${virtual_path#skills/}"; do
+  candidate_paths=""
+  if [ -n "$virtual_path" ]; then
+    candidate_paths=$(printf '%s\n%s\n%s\n' \
+      "$apm_modules_root/$repo_url/$virtual_path" \
+      "$apm_modules_root/$repo_url/$resolved_commit/$virtual_path" \
+      "$apm_modules_root/$resolved_commit/$repo_url/$virtual_path")
+  else
+    candidate_paths=$(printf '%s\n%s\n%s\n' \
+      "$apm_modules_root/$repo_url" \
+      "$apm_modules_root/$repo_url/$resolved_commit" \
+      "$apm_modules_root/$resolved_commit/$repo_url")
+  fi
+
+  if [ -n "$relative_path" ] && [ "$relative_path" != "$virtual_path" ]; then
+    candidate_paths=$(printf '%s\n%s\n%s\n%s\n' \
+      "$candidate_paths" \
+      "$apm_modules_root/$repo_url/$relative_path" \
+      "$apm_modules_root/$repo_url/$resolved_commit/$relative_path" \
+      "$apm_modules_root/$resolved_commit/$repo_url/$relative_path")
+  fi
+
+  while IFS= read -r candidate_path; do
+    [ -n "$candidate_path" ] || continue
     [ -f "$candidate_path/SKILL.md" ] || continue
     if [ -n "$found_path" ] && [ "$found_path" != "$candidate_path" ]; then
       fail "Ambiguous external skill cache paths for $repo_url/$virtual_path"
     fi
     found_path="$candidate_path"
-  done
+  done <<EOF
+$candidate_paths
+EOF
 
   if [ -n "$found_path" ]; then
     printf '%s\n' "$found_path"
     return 0
   fi
 
+  if [ -z "$virtual_path" ]; then
+    fail "Missing external skill cache for $repo_url@$resolved_commit"
+  fi
+
   search_matches=$(
-    rg --files -uu "$apm_modules_root" -g 'SKILL.md' 2>/dev/null | awk -v root="$apm_modules_root/" -v suffix="/$virtual_path/SKILL.md" -v repo="$repo_url" -v commit="$resolved_commit" '
+    rg --files -uu "$apm_modules_root" -g 'SKILL.md' 2>/dev/null | awk -v root="$apm_modules_root/" -v suffix1="$virtual_path" -v suffix2="$relative_path" -v repo="$repo_url" -v commit="$resolved_commit" '
+      function matches_suffix(rel, suffix, expected) {
+        if (suffix == "") {
+          return 0
+        }
+
+        expected = "/" suffix "/SKILL.md"
+        return length(rel) >= length(expected) && substr(rel, length(rel) - length(expected) + 1) == expected
+      }
       {
         rel = $0
         if (index(rel, root) == 1) {
           rel = substr(rel, length(root) + 1)
         }
-        if (length(rel) < length(suffix) || substr(rel, length(rel) - length(suffix) + 1) != suffix) {
+        if (!matches_suffix(rel, suffix1) && !matches_suffix(rel, suffix2)) {
           next
         }
 
@@ -1338,7 +1403,7 @@ collect_external_skill_records() {
     printf '%s\n' "$canonical_ref" >>"$matched_keys_file"
     printf '%s#%s\n' "$canonical_ref" "$resolved_commit" >>"$matched_keys_file"
 
-    source_skill_id=$(external_skill_id_from_virtual_path "$virtual_path")
+    source_skill_id=$(external_skill_id_from_record "$repo_url" "$virtual_path")
     source_path=$(external_skill_content_dir "$repo_url" "$virtual_path" "$resolved_commit")
     printf 'external\t%s\t%s\t%s\n' "$source_skill_id" "$source_path" "$canonical_ref"
   done <"$lock_records_file"
@@ -1364,6 +1429,28 @@ collect_external_skill_records() {
   [ "$has_failure" -eq 0 ] || fail "External skill state is inconsistent"
 }
 
+deployment_plan_record() {
+  printf 'target_name=%s\ttarget_dir=%s\tsource_kind=%s\tsource_skill_id=%s\tdeployed_skill_name=%s\tsource_path=%s\tsource_ref=%s\n' \
+    "$1" "$2" "$3" "$4" "$5" "$6" "$7"
+}
+
+deployment_plan_record_field() {
+  record="$1"
+  field_name="$2"
+
+  printf '%s\n' "$record" | awk -F '\t' -v key="$field_name" '
+    {
+      prefix = key "="
+      for (i = 1; i <= NF; i++) {
+        if (index($i, prefix) == 1) {
+          print substr($i, length(prefix) + 1)
+          exit
+        }
+      }
+    }
+  '
+}
+
 build_deployment_plan_entries() {
   skill_records="$1"
 
@@ -1372,7 +1459,7 @@ build_deployment_plan_entries() {
     managed_catalog_runtime_targets | while IFS='|' read -r target_name target_dir _config_name; do
       deployed_skill_name=$(format_skill_name "$target_name" "$source_skill_id")
       validate_skill_id "$deployed_skill_name"
-      printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+      deployment_plan_record \
         "$target_name" \
         "$target_dir" \
         "$source_kind" \
@@ -1405,20 +1492,34 @@ validate_deployment_collisions() {
   ' || fail "Deployment source records collided"
 
   printf '%s\n' "$deployment_plan" | awk -F '\t' '
-    NF < 7 {
+    function field_value(name, i, prefix) {
+      prefix = name "="
+      for (i = 1; i <= NF; i++) {
+        if (index($i, prefix) == 1) {
+          return substr($i, length(prefix) + 1)
+        }
+      }
+      return ""
+    }
+    NF == 0 {
       next
     }
     {
-      if ($5 == "") {
-        printf "error: invalid deployed skill name for %s (%s)\n", $4, $1 > "/dev/stderr"
+      target_name = field_value("target_name")
+      source_kind = field_value("source_kind")
+      source_skill_id = field_value("source_skill_id")
+      deployed_skill_name = field_value("deployed_skill_name")
+
+      if (deployed_skill_name == "") {
+        printf "error: invalid deployed skill name for %s (%s)\n", source_skill_id, target_name > "/dev/stderr"
         status = 1
         next
       }
 
-      key = $1 "\t" $5
-      owner = $3 ":" $4
+      key = target_name "\t" deployed_skill_name
+      owner = source_kind ":" source_skill_id
       if (key in seen) {
-        printf "error: target skill collision for %s/%s (%s vs %s)\n", $1, $5, seen[key], owner > "/dev/stderr"
+        printf "error: target skill collision for %s/%s (%s vs %s)\n", target_name, deployed_skill_name, seen[key], owner > "/dev/stderr"
         status = 1
       }
       seen[key] = owner
@@ -1437,7 +1538,11 @@ stage_target_skill_records() {
     mkdir -p "$stage_root/$target_name/skills"
   done
 
-  printf '%s\n' "$deployment_plan" | while IFS=$'\t' read -r target_name _target_dir _source_kind _source_skill_id deployed_skill_name source_path _source_ref; do
+  printf '%s\n' "$deployment_plan" | while IFS= read -r plan_record; do
+    [ -n "$plan_record" ] || continue
+    target_name=$(deployment_plan_record_field "$plan_record" target_name)
+    deployed_skill_name=$(deployment_plan_record_field "$plan_record" deployed_skill_name)
+    source_path=$(deployment_plan_record_field "$plan_record" source_path)
     [ -n "$target_name" ] || continue
     stage_skills_root="$stage_root/$target_name/skills"
     staged_skill_path=$(internal_target_skill_path "$stage_skills_root" "$deployed_skill_name")
