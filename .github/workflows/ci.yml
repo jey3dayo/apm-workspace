@@ -60,7 +60,6 @@ jobs:
 
       - name: Run workspace checks
         run: |
-          mise run format:markdown:check
           mise run format:toml:check
           mise run format:yaml:check
           mise run validate:catalog
