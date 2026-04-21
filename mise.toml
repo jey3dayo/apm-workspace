@@ -18,12 +18,12 @@ taplo = "latest"
 # Commands
 # ========================================
 [tasks.apply]
-description = "Deploy user-scope-compatible APM dependencies and refresh Codex output"
+description = "Deploy user-scope-compatible APM dependencies and compile Codex output"
 run = "bash ./scripts/apm-workspace.sh apply"
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 apply"
 
 [tasks.update]
-description = "Update the ~/.apm checkout when clean, then refresh APM dependencies and deploy"
+description = "Refresh the ~/.apm checkout and dependencies without deploying"
 run = "bash ./scripts/apm-workspace.sh update"
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 update"
 
@@ -144,18 +144,18 @@ depends = [
   "format:yaml:check",
 ]
 
-[tasks."ci:check"]
-description = "Run validation-only checks for the ~/.apm workspace"
+[tasks.ci]
+description = "Run verification-only checks for the ~/.apm workspace"
 depends = ["check:format", "validate", "smoke-catalog"]
 
 # ========================================
 # Meta Tasks
 # ========================================
-[tasks.ci]
-description = "Format, validate, and distribute the ~/.apm workspace locally"
+[tasks.sync]
+description = "Format, verify, and deploy the ~/.apm workspace locally"
 run = [
   { task = "format" },
-  { task = "ci:check" },
+  { task = "ci" },
   { task = "apply" },
   { task = "doctor" },
 ]
@@ -169,9 +169,9 @@ run = [
 ]
 
 [tasks."catalog:release"]
-description = "Run local CI, require a clean pushed branch, then register the managed catalog"
-run = [{ task = "ci" }, "bash ./scripts/apm-workspace.sh release-catalog"]
+description = "Run local sync, require a clean pushed branch, then register the managed catalog"
+run = [{ task = "sync" }, "bash ./scripts/apm-workspace.sh release-catalog"]
 run_windows = [
-  { task = "ci" },
+  { task = "sync" },
   "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 release-catalog",
 ]

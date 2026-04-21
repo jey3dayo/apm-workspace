@@ -338,7 +338,7 @@ scripts:
     ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "gh-address-comments" }).DeployedSkillName | Should -Be "gh-address-comments"
   }
 
-  It "publishes workspace mise tasks for formatting and ci flow" {
+  It "publishes workspace mise tasks for formatting, verification, and sync flow" {
     $miseToml = Get-Content -LiteralPath (Join-Path $workspaceRoot "mise.toml") -Raw
 
     $miseToml | Should -Match '\[tasks\.validate\]'
@@ -349,14 +349,17 @@ scripts:
     $miseToml | Should -Match '\[tasks\."apm:update"\]'
     $miseToml | Should -Match '\[tasks\.apply\]'
     $miseToml | Should -Match '\[tasks\.update\]'
+    $miseToml | Should -Match '\[tasks\.doctor\]'
     $miseToml | Should -Match '\[tasks\.format\]'
-    $miseToml | Should -Match '\[tasks\."ci:check"\]'
     $miseToml | Should -Match '\[tasks\.ci\]'
+    $miseToml | Should -Match '\[tasks\.sync\]'
     $miseToml | Should -Match '\[tasks\."catalog:release"\]'
     $miseToml | Should -Match '\[tasks\."catalog:tidy"\]'
     $miseToml | Should -Match 'run = "bash ./scripts/apm-workspace.sh apply"'
     $miseToml | Should -Match 'replace-bold-headings\.ts'
-    $miseToml | Should -Match '(?s)\[tasks\.ci\].*?\{ task = "apply" \}.*?\{ task = "doctor" \}'
+    $miseToml | Should -Match '(?s)\[tasks\.ci\]\s*description = "Run verification-only checks for the ~/.apm workspace"\s*depends = \["check:format", "validate", "smoke-catalog"\]'
+    $miseToml | Should -Match '(?s)\[tasks\.sync\].*?\{ task = "format" \}.*?\{ task = "ci" \}.*?\{ task = "apply" \}.*?\{ task = "doctor" \}'
+    $miseToml | Should -Match '(?s)\[tasks\."catalog:release"\].*?\{ task = "sync" \}.*?release-catalog'
     $miseToml | Should -Not -Match 'APM_BOOTSTRAP_REPO'
   }
 
