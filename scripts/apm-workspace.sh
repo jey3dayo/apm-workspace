@@ -1878,7 +1878,7 @@ Usage: scripts/apm-workspace.sh <command> [args...]
 
 Commands:
   apply              Offline deploy user-scope-compatible dependencies and compile Codex output
-  update             Refresh the workspace checkout and deps only
+  update             Refresh the checkout and dependencies only; does not deploy
   format-catalog-metadata  Normalize tracked catalog apm.yml and README.md
   check-catalog-metadata   Check tracked catalog apm.yml and README.md normalization
   pin-external       Pin external manifest refs to lockfile commits
