@@ -89,6 +89,23 @@ Describe "public command surface" {
     $powerShellScript | Should Not Match '\\.config\\scripts\\apm-workspace'
   }
 
+  It "keeps workspace docs self-contained and preserves the bold headings exception" {
+    $legacyDocsPattern = [regex]::Escape('~/.config/docs/')
+    $files = @(
+      'C:\Users\j138c\.apm\README.md'
+      'C:\Users\j138c\.apm\llms.md'
+      'C:\Users\j138c\.apm\docs\apm-task-coverage.md'
+    )
+
+    foreach ($file in $files) {
+      $content = Get-Content -LiteralPath $file -Raw
+      $content | Should Not Match $legacyDocsPattern
+    }
+
+    $miseToml = Get-Content -LiteralPath C:\Users\j138c\.apm\mise.toml -Raw
+    $miseToml | Should Match 'replace-bold-headings\.ts" ./catalog/skills'
+  }
+
   It "maps runtime config filenames per target" {
     $targets = @(Get-ManagedCatalogRuntimeTargets)
 
