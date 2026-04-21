@@ -1346,6 +1346,10 @@ function Invoke-Update {
   Ensure-WorkspaceScaffold
   Invoke-ValidateCatalog
 
+  if (Test-ManifestHasLocalPackages) {
+    throw "apm 0.8.11 cannot update ./packages/* dependencies at user scope yet. Refresh stopped before deps update; remove local package refs from ~/.apm/apm.yml first."
+  }
+
   & apm deps update -g
   if ($LASTEXITCODE -ne 0) {
     throw "apm deps update -g failed."
