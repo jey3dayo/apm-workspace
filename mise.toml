@@ -152,9 +152,9 @@ depends = ["check:format", "validate", "smoke-catalog"]
 # Meta Tasks
 # ========================================
 [tasks.sync]
-description = "Format, verify, and deploy the ~/.apm workspace locally"
+description = "Update, verify, and deploy the ~/.apm workspace locally"
 run = [
-  { task = "format" },
+  { task = "update" },
   { task = "ci" },
   { task = "apply" },
   { task = "doctor" },

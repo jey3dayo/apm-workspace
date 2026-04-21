@@ -270,6 +270,12 @@ Describe "public command surface" {
     }
   }
 
+  It "rejects local package refs before update deploys" {
+    $shellScript = Get-Content -LiteralPath (Join-Path $workspaceRoot "scripts/apm-workspace.sh") -Raw
+
+    $shellScript | Should -Match '(?s)cmd_update\(\)\s*\{.*?if manifest_has_local_packages; then\s+fail "apm 0\.8\.11 cannot update \./packages/\* dependencies at user scope yet\. Refresh stopped before deps update; remove local package refs from ~/.apm/apm\.yml first\."\s+fi.*?apm deps update -g'
+  }
+
   It "does not reference removed install helpers" {
     $script = Get-Content -LiteralPath $scriptPath -Raw
 
@@ -418,7 +424,7 @@ scripts:
     $miseToml | Should -Match 'run = "bash ./scripts/apm-workspace.sh apply"'
     $miseToml | Should -Match 'replace-bold-headings\.ts'
     $miseToml | Should -Match '(?s)\[tasks\.ci\]\s*description = "Run verification-only checks for the ~/.apm workspace"\s*depends = \["check:format", "validate", "smoke-catalog"\]'
-    $miseToml | Should -Match '(?s)\[tasks\.sync\].*?\{ task = "format" \}.*?\{ task = "ci" \}.*?\{ task = "apply" \}.*?\{ task = "doctor" \}'
+    $miseToml | Should -Match '(?s)\[tasks\.sync\].*?\{ task = "update" \}.*?\{ task = "ci" \}.*?\{ task = "apply" \}.*?\{ task = "doctor" \}'
     $miseToml | Should -Match '(?s)\[tasks\."catalog:release"\].*?\{ task = "sync" \}.*?release-catalog'
     $miseToml | Should -Not -Match 'APM_BOOTSTRAP_REPO'
   }
