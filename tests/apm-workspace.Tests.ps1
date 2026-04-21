@@ -197,7 +197,7 @@ Describe "public command surface" {
 
   It "shows shell help wording for update and catalog commands" {
     $legacyMirrorPattern = 'transitional' + ' mirror'
-    $updateHelpPattern = '(?m)^  update\s+Refresh the (?:workspace checkout and deps only|checkout and dependencies only; does not deploy)$'
+    $updateHelpPattern = '(?m)^  update\s+Refresh the checkout and dependencies only; does not deploy$'
     $help = & /bin/bash (Join-Path $workspaceRoot "scripts/apm-workspace.sh") help | Out-String
 
     $help | Should -Match $updateHelpPattern
@@ -214,7 +214,7 @@ Describe "public command surface" {
 
   It "shows PowerShell help wording for update and catalog commands" {
     $legacyMirrorPattern = 'transitional' + ' mirror'
-    $updateHelpPattern = '(?m)^  update\s+Refresh the (?:workspace checkout and deps only|checkout and dependencies only; does not deploy)$'
+    $updateHelpPattern = '(?m)^  update\s+Refresh the checkout and dependencies only; does not deploy$'
     $help = & $consoleShell -NoProfile -ExecutionPolicy Bypass -File $scriptPath help | Out-String
 
     $help | Should -Match $updateHelpPattern
@@ -481,6 +481,7 @@ scripts:
     $miseToml | Should -Match '\[tasks\."apm:install"\]'
     $miseToml | Should -Match '\[tasks\.apply\]'
     $miseToml | Should -Match '\[tasks\.update\]'
+    $miseToml | Should -Not -Match '\[tasks\."apm:update"\]'
     $miseToml | Should -Match '\[tasks\.doctor\]'
     $miseToml | Should -Match '\[tasks\.format\]'
     $miseToml | Should -Match '\[tasks\.ci\]'
