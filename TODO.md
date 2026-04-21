@@ -3,6 +3,7 @@
 ## Open Tasks
 
 - [ ] codex の mcpも管理できるかチェック
+- [ ] 追加: https://github.com/gonta223/humanizer-ja
 - [x] 追記: https://github.com/jakubkrehel/make-interfaces-feel-better/tree/main/skills/make-interfaces-feel-better
 - [x] 追加と追記: https://github.com/mizchi/chezmoi-dotfiles/blob/main/dot_claude/skills/empirical-prompt-tuning/SKILL.md
 - [x] Remove stale external sources with no current manifest/runtime usage: `gonta223-humanizer-ja`, `obra-episodic-memory`, `sawyerhood-dev-browser`
