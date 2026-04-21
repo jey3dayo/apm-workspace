@@ -1346,19 +1346,10 @@ function Invoke-Update {
   Ensure-WorkspaceScaffold
   Invoke-ValidateCatalog
 
-  if (Test-ManifestHasLocalPackages) {
-    throw "apm 0.8.11 cannot deploy ./packages/* dependencies at user scope yet. Update stopped before user-scope install; remove local package refs from ~/.apm/apm.yml first."
-  }
-
-  Remove-InternalTargetReparsePoints -SkillIds @(Get-InternalCleanupSkillIds)
   & apm deps update -g
   if ($LASTEXITCODE -ne 0) {
     throw "apm deps update -g failed."
   }
-  Invoke-WorkspaceInstallCommand -InstallArgs @("-g")
-  Normalize-WorkspaceGitignore
-  Invoke-CodexCompile
-  Sync-ManagedCatalogRuntimeAssets
 }
 
 function Get-CatalogBuildDir {
