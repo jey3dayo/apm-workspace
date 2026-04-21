@@ -1,6 +1,22 @@
+# ========================================
+# Tools
+# ========================================
 [tools]
-"github:microsoft/apm" = "0.8.11"
+# Runtimes
+node = "24"
 
+# CLI tools
+fd = "latest"
+"github:microsoft/apm" = "0.8.11"
+taplo = "latest"
+
+# npm packages
+"npm:prettier" = "latest"
+"npm:tsx" = "latest"
+
+# ========================================
+# Commands
+# ========================================
 [tasks.apply]
 description = "Deploy user-scope-compatible APM dependencies and refresh Codex output"
 run = "bash ./scripts/apm-workspace.sh apply"
@@ -61,15 +77,15 @@ description = "Format Markdown files in the ~/.apm workspace"
 run = "fd -e md -X prettier --write --log-level error >/dev/null"
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"@(fd -e md) | ForEach-Object { prettier --write --log-level error $_ *> $null }\""
 
-[tasks."format:markdown:bold-headings"]
-description = "Rewrite bold headings only inside personal skill sources"
-run = "tsx \"$HOME/.config/scripts/replace-bold-headings.ts\" ./catalog/skills"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"tsx \\\"$HOME/.config/scripts/replace-bold-headings.ts\\\" ./catalog/skills\""
-
 [tasks."format:markdown:check"]
 description = "Check Markdown formatting in the ~/.apm workspace"
 run = "fd -e md -X prettier --check --log-level error"
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"@(fd -e md) | ForEach-Object { prettier --check --log-level error $_ }\""
+
+[tasks."format:markdown:bold-headings"]
+description = "Rewrite bold headings only inside personal skill sources"
+run = "tsx \"$HOME/.config/scripts/replace-bold-headings.ts\" ./catalog/skills"
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"tsx \\\"$HOME/.config/scripts/replace-bold-headings.ts\\\" ./catalog/skills\""
 
 [tasks."format:markdown:bold-headings:check"]
 description = "Check bold heading rewrites only inside personal skill sources"
@@ -96,59 +112,55 @@ description = "Check YAML formatting in the ~/.apm workspace"
 run = "fd -e yml -e yaml -X prettier --check --log-level error"
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"@(fd -e yml -e yaml) | ForEach-Object { prettier --check --log-level error $_ }\""
 
+# ========================================
+# Aliases / Aggregation Tasks
+# ========================================
 [tasks.format]
 description = "Format workspace docs and manifests"
-run = """
-mise run format:markdown:bold-headings
-mise run format:markdown
-mise run format:toml
-mise run format:yaml
-"""
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"mise run format:markdown:bold-headings; mise run format:markdown; mise run format:toml; mise run format:yaml\""
+run = [
+  { task = "format:markdown:bold-headings" },
+  { task = "format:markdown" },
+  { task = "format:toml" },
+  { task = "format:yaml" },
+]
 
 [tasks."check:format"]
 description = "Check workspace docs and manifest formatting"
-run = """
-mise run format:markdown:bold-headings:check
-mise run format:markdown:check
-mise run format:toml:check
-mise run format:yaml:check
-"""
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"mise run format:markdown:bold-headings:check; mise run format:markdown:check; mise run format:toml:check; mise run format:yaml:check\""
+depends = [
+  "format:markdown:bold-headings:check",
+  "format:markdown:check",
+  "format:toml:check",
+  "format:yaml:check",
+]
 
 [tasks."ci:check"]
 description = "Run validation-only checks for the ~/.apm workspace"
-run = """
-mise run check:format
-mise run validate
-mise run validate-catalog
-mise run smoke-catalog
-"""
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"mise run check:format; mise run validate; mise run validate-catalog; mise run smoke-catalog\""
+depends = ["check:format", "validate", "validate-catalog", "smoke-catalog"]
 
+# ========================================
+# Meta Tasks
+# ========================================
 [tasks.ci]
 description = "Format, validate, and distribute the ~/.apm workspace locally"
-run = """
-mise run format
-mise run ci:check
-mise run apply
-mise run doctor
-"""
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"mise run format; mise run ci:check; mise run apply; mise run doctor\""
-
-[tasks."catalog:release"]
-description = "Run local CI, require a clean pushed branch, then register the managed catalog"
-run = """
-mise run ci
-bash "./scripts/apm-workspace.sh" release-catalog
-"""
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"& mise run ci; if (-not $?) { exit $LASTEXITCODE }; & .\\scripts\\apm-workspace.ps1 release-catalog; exit $LASTEXITCODE\""
+run = [
+  { task = "format" },
+  { task = "ci:check" },
+  { task = "apply" },
+  { task = "doctor" },
+]
 
 [tasks."catalog:tidy"]
 description = "Refresh, validate, and inspect the managed catalog package"
-run = """
-mise run stage-catalog
-mise run validate-catalog
-mise run doctor
-"""
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"mise run stage-catalog; mise run validate-catalog; mise run doctor\""
+run = [
+  { task = "stage-catalog" },
+  { task = "validate-catalog" },
+  { task = "doctor" },
+]
+
+[tasks."catalog:release"]
+description = "Run local CI, require a clean pushed branch, then register the managed catalog"
+run = [{ task = "ci" }, "bash ./scripts/apm-workspace.sh release-catalog"]
+run_windows = [
+  { task = "ci" },
+  "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 release-catalog",
+]
