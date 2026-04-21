@@ -75,6 +75,31 @@ dependencies:
     $map["openai/skills/skills/.curated/gh-address-comments"] | Should Be "openai/skills/skills/.curated/gh-address-comments#abcdef1234567890"
     $map["obra/superpowers/skills/brainstorming"] | Should Be "obra/superpowers/skills/brainstorming#1234567890abcdef"
   }
+
+  It "reads only top-level lock dependency records" {
+    @"
+lockfile_version: "1"
+metadata:
+  dependencies:
+    - repo_url: ignored/nested
+      resolved_commit: 0000000000000000
+dependencies:
+  - repo_url: openai/skills
+    host: github.com
+    resolved_commit: abcdef1234567890
+    virtual_path: skills/.curated/gh-address-comments
+other_records:
+  - repo_url: ignored/top-level
+    resolved_commit: ffffffffffffffff
+"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.lock.yaml")
+
+    $records = @(Get-LockedExternalSkillRecords)
+
+    $records.Count | Should Be 1
+    $records[0].Repo | Should Be "openai/skills"
+    $records[0].Path | Should Be "skills/.curated/gh-address-comments"
+    $records[0].Commit | Should Be "abcdef1234567890"
+  }
 }
 
 Describe "public command surface" {
@@ -137,6 +162,35 @@ Describe "public command surface" {
   It "normalizes codex skill names from superpowers aliases" {
     Format-SkillName -Target "claude" -SourceSkillId "superpowers:brainstorming" | Should Be "superpowers:brainstorming"
     Format-SkillName -Target "codex" -SourceSkillId "superpowers:brainstorming" | Should Be "brainstorming"
+  }
+
+  It "reads unpinned refs only from dependencies apm" {
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+    - jey3dayo/apm-workspace/catalog#main
+    - openai/skills/skills/.curated/gh-address-comments
+  mcp:
+    - ignored/mcp-entry
+scripts:
+  sync:
+    - ignored/script-entry
+"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.yml")
+
+    @(Get-UnpinnedExternalReferences) | Should Be @("openai/skills/skills/.curated/gh-address-comments")
+  }
+
+  It "builds target-aware managed skill inventory with normalized names" {
+    $targets = @(
+      [pscustomobject]@{ Name = "claude"; Root = "/tmp/.claude"; ConfigName = "CLAUDE.md" }
+      [pscustomobject]@{ Name = "codex"; Root = "/tmp/.codex"; ConfigName = "AGENTS.md" }
+    )
+
+    $inventory = @(Get-ManagedCatalogSkillInventory -SkillIds @("superpowers:brainstorming") -Targets $targets)
+
+    ($inventory | Where-Object Target -eq "claude").DeployedSkillName | Should Be "superpowers:brainstorming"
+    ($inventory | Where-Object Target -eq "codex").DeployedSkillName | Should Be "brainstorming"
   }
 
   It "publishes workspace mise tasks for formatting and ci flow" {

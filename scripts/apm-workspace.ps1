@@ -542,18 +542,65 @@ function Get-LockedExternalSkillRecords {
     throw "Lock file not found: $lockPath"
   }
 
+  function Get-YamlIndentLevel {
+    param([string]$Line)
+
+    return ($Line.Length - $Line.TrimStart(' ').Length)
+  }
+
   $records = @()
   $current = @{}
+  $inDependencies = $false
+  $dependenciesIndent = -1
+  $currentRecordIndent = -1
   foreach ($line in (Get-Content -LiteralPath $lockPath)) {
-    if ($line -match '^\s*-\s+repo_url:\s+(.+)$') {
+    if ($line -match '^(?<indent>\s*)(?<key>[^:#][^:]*):(?:\s*(?<value>.*))?$') {
+      $indentLevel = $Matches['indent'].Length
+      $key = $Matches['key'].Trim()
+
+      if ($indentLevel -eq 0) {
+        if ($inDependencies -and $current.ContainsKey('repo_url')) {
+          $records += [pscustomobject]$current
+          $current = @{}
+          $currentRecordIndent = -1
+        }
+
+        $inDependencies = ($key -eq 'dependencies')
+        $dependenciesIndent = if ($inDependencies) { 0 } else { -1 }
+        continue
+      }
+
+      if ($inDependencies -and $indentLevel -le $dependenciesIndent) {
+        if ($current.ContainsKey('repo_url')) {
+          $records += [pscustomobject]$current
+        }
+        $current = @{}
+        $currentRecordIndent = -1
+        $inDependencies = $false
+        $dependenciesIndent = -1
+        continue
+      }
+    }
+
+    if (-not $inDependencies) {
+      continue
+    }
+
+    if ($line -match '^(?<indent>\s*)-\s+repo_url:\s+(?<repo>.+)$') {
       if ($current.ContainsKey('repo_url')) {
         $records += [pscustomobject]$current
       }
-      $current = @{ repo_url = $Matches[1].Trim() }
+      $current = @{ repo_url = $Matches['repo'].Trim() }
+      $currentRecordIndent = $Matches['indent'].Length
       continue
     }
 
     if (-not $current.ContainsKey('repo_url')) {
+      continue
+    }
+
+    $indentLevel = Get-YamlIndentLevel -Line $line
+    if ($indentLevel -le $currentRecordIndent) {
       continue
     }
 
@@ -610,9 +657,61 @@ function Get-UnpinnedExternalReferences {
     return @()
   }
 
+  function Get-YamlIndentLevel {
+    param([string]$Line)
+
+    return ($Line.Length - $Line.TrimStart(' ').Length)
+  }
+
   $result = New-Object System.Collections.Generic.List[string]
+  $inDependencies = $false
+  $dependenciesIndent = -1
+  $inApm = $false
+  $apmIndent = -1
   foreach ($line in (Get-Content -LiteralPath $manifestPath)) {
+    if ($line -match '^(?<indent>\s*)(?<key>[^:#][^:]*):(?:\s*(?<value>.*))?$') {
+      $indentLevel = $Matches['indent'].Length
+      $key = $Matches['key'].Trim()
+
+      if ($indentLevel -eq 0) {
+        $inDependencies = ($key -eq 'dependencies')
+        $dependenciesIndent = if ($inDependencies) { 0 } else { -1 }
+        $inApm = $false
+        $apmIndent = -1
+        continue
+      }
+
+      if ($inDependencies -and $indentLevel -le $dependenciesIndent) {
+        $inDependencies = $false
+        $dependenciesIndent = -1
+        $inApm = $false
+        $apmIndent = -1
+        continue
+      }
+
+      if ($inDependencies) {
+        if ($indentLevel -eq ($dependenciesIndent + 2) -and $key -eq 'apm') {
+          $inApm = $true
+          $apmIndent = $indentLevel
+          continue
+        }
+
+        if ($inApm -and $indentLevel -le $apmIndent) {
+          $inApm = $false
+          $apmIndent = -1
+        }
+      }
+    }
+
+    if (-not $inDependencies -or -not $inApm) {
+      continue
+    }
+
     if ($line -match '^\s*-\s+(\S+)\s*$') {
+      if ((Get-YamlIndentLevel -Line $line) -le $apmIndent) {
+        continue
+      }
+
       $reference = $Matches[1]
       if ($reference -match '^jey3dayo/apm-workspace/catalog(?:#|$)') {
         continue
@@ -623,6 +722,26 @@ function Get-UnpinnedExternalReferences {
       if ($reference -notmatch '#') {
         $result.Add($reference)
       }
+    }
+  }
+
+  return $result.ToArray()
+}
+
+function Get-ManagedCatalogSkillInventory {
+  param(
+    [string[]]$SkillIds = @(Get-ManagedSkillIds),
+    [object[]]$Targets = @(Get-ManagedCatalogRuntimeTargets)
+  )
+
+  $result = New-Object System.Collections.Generic.List[object]
+  foreach ($target in $Targets) {
+    foreach ($skillId in $SkillIds) {
+      $result.Add([pscustomobject]@{
+        Target = $target.Name
+        SourceSkillId = $skillId
+        DeployedSkillName = Format-SkillName -Target $target.Name -SourceSkillId $skillId
+      })
     }
   }
 
@@ -1160,6 +1279,7 @@ function Invoke-Doctor {
   Write-Host "remote:"
   & git -C $WorkspaceDir remote -v
   Write-Host "targets:"
+  $skillInventory = @(Get-ManagedCatalogSkillInventory)
   foreach ($target in (Get-ManagedCatalogRuntimeTargets)) {
     $skillsPath = Join-Path $target.Root "skills"
     $configPath = Join-Path $target.Root $target.ConfigName
@@ -1168,6 +1288,7 @@ function Invoke-Doctor {
     $rulesPath = Join-Path $target.Root "rules"
     Write-Host ("  {0}: config={1} agents={2} commands={3} rules={4} skills={5}" -f $target.Name, $(if (Test-Path $configPath) { "present" } else { "missing" }), $(if (Test-Path $agentsPath) { "present" } else { "missing" }), $(if (Test-Path $commandsPath) { "present" } else { "missing" }), $(if (Test-Path $rulesPath) { "present" } else { "missing" }), $(if (Test-Path $skillsPath) { "present" } else { "missing" }))
   }
+  Write-Host ("target skill inventory: entries={0}" -f $skillInventory.Count)
   Write-Host ("external pins: unpinned={0}" -f (@(Get-UnpinnedExternalReferences)).Count)
   Write-CatalogSummary
   & apm deps list -g

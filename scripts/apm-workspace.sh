@@ -341,10 +341,33 @@ locked_external_skill_records() {
   [ -f "$lock_path" ] || fail "Lock file not found: $lock_path"
 
   awk '
+    function indent_level(line, trimmed) {
+      trimmed = line
+      sub(/^[[:space:]]+/, "", trimmed)
+      return length(line) - length(trimmed)
+    }
     function flush_record() {
       if (repo_url != "" && resolved_commit != "") {
         printf "%s|%s|%s\n", repo_url, virtual_path, resolved_commit
       }
+    }
+    /^[^[:space:]#][^:]*:/ {
+      if (in_dependencies && repo_url != "") {
+        flush_record()
+        repo_url = ""
+        resolved_commit = ""
+        virtual_path = ""
+        record_indent = -1
+      }
+
+      split($0, parts, ":")
+      key = parts[1]
+      in_dependencies = (key == "dependencies")
+      dependencies_indent = in_dependencies ? 0 : -1
+      next
+    }
+    !in_dependencies {
+      next
     }
     /^[[:space:]]*-[[:space:]]+repo_url:[[:space:]]+/ {
       flush_record()
@@ -352,14 +375,21 @@ locked_external_skill_records() {
       sub(/^[[:space:]]+/, "", repo_url)
       resolved_commit = ""
       virtual_path = ""
+      record_indent = indent_level($0)
       next
     }
     /^[[:space:]]+resolved_commit:[[:space:]]+/ {
+      if (repo_url == "" || indent_level($0) <= record_indent) {
+        next
+      }
       resolved_commit = substr($0, index($0, ":") + 1)
       sub(/^[[:space:]]+/, "", resolved_commit)
       next
     }
     /^[[:space:]]+virtual_path:[[:space:]]+/ {
+      if (repo_url == "" || indent_level($0) <= record_indent) {
+        next
+      }
       virtual_path = substr($0, index($0, ":") + 1)
       sub(/^[[:space:]]+/, "", virtual_path)
       next
@@ -842,7 +872,57 @@ unpinned_external_references() {
   [ -f "$manifest_path" ] || return 0
 
   awk '
+    function indent_level(line, trimmed) {
+      trimmed = line
+      sub(/^[[:space:]]+/, "", trimmed)
+      return length(line) - length(trimmed)
+    }
+    /^[^[:space:]#][^:]*:/ {
+      split($0, parts, ":")
+      key = parts[1]
+      in_dependencies = (key == "dependencies")
+      dependencies_indent = in_dependencies ? 0 : -1
+      in_apm = 0
+      apm_indent = -1
+      next
+    }
+    !in_dependencies {
+      next
+    }
+    /^[[:space:]]+[^:#][^:]*:/ {
+      current_indent = indent_level($0)
+      line = $0
+      sub(/^[[:space:]]+/, "", line)
+      split(line, parts, ":")
+      key = parts[1]
+
+      if (current_indent <= dependencies_indent) {
+        in_dependencies = 0
+        dependencies_indent = -1
+        in_apm = 0
+        apm_indent = -1
+        next
+      }
+
+      if (current_indent == dependencies_indent + 2 && key == "apm") {
+        in_apm = 1
+        apm_indent = current_indent
+        next
+      }
+
+      if (in_apm && current_indent <= apm_indent) {
+        in_apm = 0
+        apm_indent = -1
+      }
+      next
+    }
+    !in_apm {
+      next
+    }
     /^[[:space:]]*-[[:space:]]+/ {
+      if (indent_level($0) <= apm_indent) {
+        next
+      }
       ref = $2
       if (ref ~ /^jey3dayo\/apm-workspace\/catalog(#|$)/) {
         next
@@ -1002,6 +1082,16 @@ openclaw|.openclaw|CLAUDE.md
 EOF
 }
 
+managed_catalog_skill_inventory() {
+  skill_ids=$(managed_skill_ids)
+  managed_catalog_runtime_targets | while IFS='|' read -r target_name _target_dir _config_name; do
+    printf '%s\n' "$skill_ids" | while IFS= read -r skill_id; do
+      [ -n "$skill_id" ] || continue
+      printf '%s|%s|%s\n' "$target_name" "$skill_id" "$(format_skill_name "$target_name" "$skill_id")"
+    done
+  done
+}
+
 copy_managed_catalog_file() {
   source_path="$1"
   destination_path="$2"
@@ -1141,6 +1231,8 @@ cmd_doctor() {
     printf 'remote:\n'
     git remote -v || true
     printf 'targets:\n'
+    inventory_file=$(mktemp "${TMPDIR:-/tmp}/apm-skill-inventory.XXXXXX")
+    managed_catalog_skill_inventory >"$inventory_file"
     managed_catalog_runtime_targets | while IFS='|' read -r target_name target_dir config_name; do
       target_root="$HOME/$target_dir"
       if [ -e "$target_root/$config_name" ]; then config_state=present; else config_state=missing; fi
@@ -1150,6 +1242,8 @@ cmd_doctor() {
       if [ -e "$target_root/skills" ]; then skills_state=present; else skills_state=missing; fi
       printf '  %s: config=%s agents=%s commands=%s rules=%s skills=%s\n' "$target_name" "$config_state" "$agents_state" "$commands_state" "$rules_state" "$skills_state"
     done
+    printf 'target skill inventory: entries=%s\n' "$(awk 'NF { count++ } END { print count + 0 }' "$inventory_file")"
+    rm -f "$inventory_file"
     printf 'external pins: unpinned=%s\n' "$(unpinned_external_references | awk 'NF { count++ } END { print count + 0 }')"
     print_catalog_summary
     apm deps list -g
