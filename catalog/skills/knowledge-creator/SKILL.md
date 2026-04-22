@@ -30,7 +30,7 @@ When this skill activates, do the following in order:
    - Rules -> `rules-creator`
 5. If confidence is 70-89%, present the top 2 options with trade-offs, ask 1-3 short clarifying questions, and defer final routing until the user answers.
 6. If confidence is below 70%, do not force a recommendation. Ask clarifying questions before routing.
-7. If the request is really about distributions, bundles, deployment, symlinks, or rollout architecture, route to `distributions-manager` instead of forcing one of the four formats.
+7. If the request is really about distributions, bundles, deployment, symlinks, or rollout architecture, route to a distribution/deployment specialist instead of forcing one of the four formats.
 
 ## Output Contract
 
@@ -129,9 +129,9 @@ Guide through creation process
 
 ### Additional Knowledge Domains
 
-| Domain                  | Skill Reference       | Purpose                                                   | Keywords                                   |
-| ----------------------- | --------------------- | --------------------------------------------------------- | ------------------------------------------ |
-| Distribution Management | distributions-manager | Bundle creation, deployment architecture, Nix integration | distributions, bundle, symlink, deployment |
+| Domain                  | Skill Reference                               | Purpose                                             | Keywords                                   |
+| ----------------------- | --------------------------------------------- | --------------------------------------------------- | ------------------------------------------ |
+| Distribution Management | Distribution/deployment specialist if present | Bundle creation, deployment architecture, packaging | distributions, bundle, symlink, deployment |
 
 ### Agent Skills Standard Structure
 
@@ -149,7 +149,7 @@ skill-name/
 
 ### Best For
 
-- Capability extension for agents (e.g., mise tool management, React patterns)
+- Capability extension for agents (e.g., package-manager migration guidance, React patterns)
 - Technology-specific best practices with executable workflows
 - Cross-platform, repeatable knowledge
 - Knowledge requiring Progressive Disclosure (overview + detailed references)
@@ -164,7 +164,7 @@ skill-name/
 
 ### Examples
 
-- Tool ecosystem knowledge (mise, Docker, Kubernetes) + setup scripts
+- Tool ecosystem knowledge (uv, Docker, Kubernetes) + setup scripts
 - Framework patterns (React hooks, Vue composition API) + code generators
 - Language conventions (TypeScript best practices) + linting automation
 
@@ -251,14 +251,14 @@ skill-name/
 
 User provides natural language description:
 
-> "I want to document how to migrate npm packages to mise configuration"
+> "I want to document how to migrate Python projects from pip-tools to uv"
 
 ### Step 2: Analysis
 
 System analyzes:
 
-- Keywords: "migrate", "npm packages", "mise"
-- Context: Tool management, configuration
+- Keywords: "migrate", "pip-tools", "uv"
+- Context: Package-manager migration, configuration
 - Reusability: High (applicable to any mise project)
 - Execution: Reference material, not automated
 
@@ -271,7 +271,7 @@ Format: Skill
 Confidence: 95%
 
 Reasoning:
-- Repeatable knowledge about mise tool management
+- Repeatable knowledge about package-manager migration
 - Applicable across multiple projects
 - Technical best practices
 - Requires detailed reference documentation
@@ -283,8 +283,8 @@ Next Steps:
 4. Provide templates and examples
 
 Integration:
-- Will be triggered by keywords: "mise", "npm migration", "tool management"
-- Compatible with existing mise skill
+- Will be triggered by keywords: "uv", "pip-tools", "migration"
+- Compatible with relevant existing tooling skills
 - Can be referenced by agents and commands
 ```
 
@@ -303,11 +303,11 @@ Based on classification, route to:
 
 For questions about distributions, bundles, or deployment:
 
-- Bundle management → `distributions-manager` skill
-- Nix deployment issues → `distributions-manager` skill (architecture reference)
-- Symlink patterns → `distributions-manager` skill
-- Priority conflicts → `distributions-manager` skill (priority-mechanism reference)
-- Custom bundle creation → `distributions-manager` skill (creating-bundles reference)
+- Bundle management → route to a distribution/deployment specialist
+- Deployment architecture issues → route to a distribution/deployment specialist
+- Symlink patterns → route to a distribution/deployment specialist
+- Priority or rollout conflicts → route to a distribution/deployment specialist
+- Custom bundle creation → route to a distribution/deployment specialist
 
 ## Quick Start Examples
 
@@ -315,7 +315,7 @@ For questions about distributions, bundles, or deployment:
 
 ### Input
 
-> "mise設定のベストプラクティスをまとめたい"
+> "uv への移行手順を複数プロジェクトで再利用したい"
 
 ### Analysis
 
@@ -384,7 +384,7 @@ Some knowledge may fit multiple categories:
 
 ### Recommendation
 
-1. Create Skill for mise configuration
+1. Create Skill for reusable migration guidance
 2. Create Agent that references the Skill
 3. Link them via Agent Integration section
 
@@ -421,7 +421,7 @@ Based on your answers, I'll recommend the best format.
 
 1. Activate `skill-creator` skill
 2. Provide analyzed context
-3. Guide managed catalog structure and concise skill layout
+3. Guide target repository structure and concise skill layout
 4. Ensure YAML frontmatter completeness
 
 ### Agent Creator Integration
@@ -533,7 +533,7 @@ Activate this skill when:
 
 ## See Also
 
-- skill-creator - Create managed skills for this `~/.apm` workspace
+- skill-creator - Create reusable skills
 - agent-creator - Create autonomous task agents
 - command-creator - Create interactive user commands
 - rules-creator - Create project rules and steering documents

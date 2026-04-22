@@ -29,7 +29,7 @@ related_skills:
 # Distributions Manager
 
 This skill describes the **legacy Nix / Home Manager distribution path**.
-For the newer `~/.apm` global workflow, use `apm-usage` instead.
+For newer workspace-managed rollout workflows, use the appropriate workspace rollout skill instead, such as `apm-usage` when available.
 
 ## What Is A Distribution?
 
@@ -120,7 +120,7 @@ ls -la ~/.claude/skills/
 
 ## Related Skills
 
-- `skill-creator`: managed skill creation in the `~/.apm` workflow
+- `skill-creator`: bundled or reusable skill creation in the current workspace-managed flow
 - `command-creator`: command authoring guidance
 - `rules-creator`: bundled rule creation
 - `knowledge-creator`: routing related knowledge questions
