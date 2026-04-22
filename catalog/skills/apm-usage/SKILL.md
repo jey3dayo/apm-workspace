@@ -13,6 +13,7 @@ In this repository, APM is used primarily for **global skill management**.
 - `~/.apm/apm_modules/` stores downloaded dependency sources
 - `~/.apm/catalog/` is the repo-tracked package for shared runtime guidance
 - `~/.apm/catalog/skills/` is the authoring source for personal skills
+- `mise run apply` is the routine local rollout path for the current manifest and lock
 - `mise run sync` is the upstream-refresh path
 - `mise run sync:stable` is the stable rollout path for the current manifest and lock
 
@@ -36,7 +37,12 @@ Start by routing the request into one of these lanes:
   - edit `~/.apm/catalog/skills/**` for personal skills
   - edit `~/.apm/catalog/AGENTS.md`, `agents/**`, `commands/**`, or `rules/**` for shared runtime guidance
   - when the task is "create or migrate a managed skill", use `skill-creator`
-  - then run `mise run stage-catalog`
+- local rollout from the current manifest and lock:
+  - use `mise run apply` when you want to deploy the current tracked state without taking new upstream refs
+  - follow with `mise run doctor` when you want to verify deployed targets
+- managed catalog registration:
+  - run `mise run stage-catalog` before commit/push when shared guidance changed
+  - run `mise run register-catalog` after commit/push when you want to install the tracked catalog package by upstream ref
 - upstream dependency refresh:
   - use `mise run sync` to accept newer upstream package content with `apm install -g --update`
   - review `apm.lock.yaml` carefully before commit
@@ -115,21 +121,26 @@ In short:
 
 Use these short flows for the common request shapes:
 
-1. Managed skill or guidance changed
-   - edit `~/.apm/catalog/skills/**` for personal skills or `~/.apm/catalog/**` for shared guidance
+1. Personal skill changed and you want a local rollout
+   - edit `~/.apm/catalog/skills/**`
    - run `mise run format:markdown:bold-headings` when you want heading normalization for Markdown in `catalog/`
-   - run `mise run stage-catalog` for shared guidance
-   - review the `src/**` or normalized `catalog/**` diff
+   - run `mise run apply`
+   - run `mise run doctor`
+
+2. Shared guidance changed and you want to publish the tracked catalog update
+   - edit `~/.apm/catalog/**`
+   - run `mise run stage-catalog`
+   - review the normalized `catalog/**` diff
    - commit/push `~/.apm`
    - run `mise run register-catalog`
    - run `mise run doctor`
 
-2. Only `~/.apm` docs or manifest files changed
+3. Only `~/.apm` docs or manifest files changed
    - edit the workspace-owned files directly
    - commit/push `~/.apm`
    - run `mise run register-catalog` only if `catalog/` changed too
 
-3. Upstream dependency refresh
+4. Upstream dependency refresh
    - run `mise run sync` when you want to accept new upstream package content with `apm install -g --update`
    - run `mise run sync:stable` when you want to deploy the current manifest and lock without taking new upstream refs
 
@@ -145,6 +156,10 @@ Not allowed:
 # Day-to-day global flow from ~/.apm
 cd ~/.apm
 mise install
+mise run apply
+mise run doctor
+
+# when you intentionally want newer upstream content
 mise run sync
 # or
 mise run sync:stable
@@ -188,14 +203,13 @@ APM global skill management in this setup is centered on:
   apm.lock.yaml
   apm_modules/
   catalog/
-  src/
   mise.toml
 ```
 
 - `apm.yml` tracks dependencies by upstream ref
 - `apm_modules/` holds downloaded sources
-- `src/` holds personal skill sources
 - `catalog/` holds the tracked shared guidance package
+- `catalog/skills/` holds the authoring source for personal skills
 - `catalog/AGENTS.md`, `catalog/agents/`, `catalog/commands/`, and `catalog/rules/` hold tracked shared guidance assets
 - `apm install -g` deploys the current global dependency set to user targets
 
@@ -212,7 +226,8 @@ When personal skill content changes:
 
 - edit `~/.apm/catalog/skills/**`
 - run `mise run format:markdown:bold-headings`
-- review, commit, and push the updated `src/`
+- run `mise run apply` when you want the current tracked state deployed locally
+- run `mise run doctor` to verify the deployed targets
 
 When the change is only for workspace-owned docs such as `~/.apm/README.md` or `llms.md`:
 
