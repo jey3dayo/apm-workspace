@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-04-21T17:03:12.383521+00:00'
+generated_at: '2026-04-21T17:37:31.115703+00:00'
 apm_version: 0.8.12
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -4149,6 +4149,14 @@ dependencies:
     .cursor/skills/make-interfaces-feel-better/surfaces.md: sha256:0564c57a29adf1be67f99c6ed227921265ce075c77f15e35c8a797761c65b74b
     .cursor/skills/make-interfaces-feel-better/typography.md: sha256:960cfa67b05109aeb08b219fa6e6cc3207a13c7bec60106ce4f44ce91dbaa4fd
   content_hash: sha256:99aaea521aa0f1c7d041d70bb6b75581c1a50ec6ac59ceaaa923b6339ffa417b
+- repo_url: jey3dayo/apm-workspace
+  host: github.com
+  resolved_commit: fe7f55ab9fd030ba974324bfedac12c3a7951f79
+  resolved_ref: main
+  virtual_path: catalog
+  is_virtual: true
+  package_type: apm_package
+  content_hash: sha256:31ff73e9cd8ae0f275e7d004bbfb59aa19edcae9e399962cfa27fc9b57ed13a3
 - repo_url: millionco/react-doctor
   host: github.com
   resolved_commit: b5519b60465905e8c7eb0b8a9294924bf3736158

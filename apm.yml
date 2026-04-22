@@ -4,7 +4,7 @@ description: APM project for apm-workspace
 author: jey3dayo
 dependencies:
   apm:
-  - jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/catalog#main
   - EpicenterHQ/epicenter/.agents/skills/tauri
   - Heyvhuang/ship-faster/skills/cloudflare
   - Heyvhuang/ship-faster/skills/tool-openclaw
@@ -26,7 +26,6 @@ dependencies:
   - jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
   - millionco/react-doctor/skills/react-doctor
   - mizchi/chezmoi-dotfiles/dot_claude/skills/empirical-prompt-tuning
-  - nextlevelbuilder/ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-max
   - nyosegawa/skills/skills/skill-auditor
   - obra/superpowers/skills/brainstorming
   - obra/superpowers/skills/dispatching-parallel-agents
