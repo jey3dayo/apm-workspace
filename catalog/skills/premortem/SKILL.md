@@ -115,6 +115,12 @@ Premortem can be run in 3 modes:
 - Between auto mode and interactive mode
 - You want to see all questions before answering
 
+### Initial Response Template
+
+On the first batch-mode response, present all 3-5 questions at once.
+For each question, include a one-line "Why it matters".
+Do not switch into auto-analysis or GitHub Issue confirmation yet.
+
 ### Basic Invocation
 
 #### Auto Inference (No Project Description)
@@ -359,6 +365,16 @@ The workflow varies depending on the selected mode.
 - [ ] Select manually
 - [ ] Do not register (report only)"
 ```
+
+### Initial Response Template
+
+In auto mode, the first user-facing response should contain:
+
+1. a short inferred project context summary
+2. 3-5 findings or blind spots with status (`Covered`, `Needs Clarification`, `Missing`, or `Not Applicable`)
+3. recommended next actions
+
+Only after the report is complete should you ask once whether to register GitHub Issues.
 
 ### Interactive Mode (--mode=interactive)
 
