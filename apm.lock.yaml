@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-04-21T17:37:31.115703+00:00'
+generated_at: '2026-04-22T02:16:02.687111+00:00'
 apm_version: 0.8.12
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -3805,7 +3805,7 @@ dependencies:
   content_hash: sha256:2b3faf132aafb668ccc57fd743aac0584e7ec6966402c4693b9e7c180db34cce
 - repo_url: anthropics/claude-code
   host: github.com
-  resolved_commit: fe53778ed90fd971bf4ec78fa1f65ccf0536352f
+  resolved_commit: 2fa67717b8046c253cfa55fd84002e3501f1eca6
   virtual_path: plugins/frontend-design/skills/frontend-design
   is_virtual: true
   package_type: claude_skill
@@ -6435,7 +6435,7 @@ dependencies:
   content_hash: sha256:a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a
 - repo_url: vercel-labs/skills
   host: github.com
-  resolved_commit: bc21a37a12b90fcb5aec051c91baf5b227b704b1
+  resolved_commit: 5516b8ad07393f35af4b50238b9d3f7cceca5f1e
   virtual_path: skills/find-skills
   is_virtual: true
   package_type: claude_skill
@@ -6496,6 +6496,7 @@ mcp_configs:
     args:
     - -y
     - '@steipete/peekaboo'
+    - mcp
     registry: false
     command: npx
   tauri-mcp-server:

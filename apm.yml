@@ -113,4 +113,5 @@ dependencies:
     args:
     - -y
     - '@steipete/peekaboo'
+    - mcp
 scripts: {}
