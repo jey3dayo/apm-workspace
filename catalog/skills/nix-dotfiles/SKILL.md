@@ -31,6 +31,7 @@ An integrated skill for dotfiles management using Home Manager and Nix Flake. Co
 - Generation management (generations, rollback)
 - Diagnostics (skill distribution, Flake inputs, Worktree detection, .gitignore)
 - Agent Skills addition (flake inputs sync)
+- Migration of legacy home-dotfiles such as `~/.opencommit` / `~/.opencommitrc`
 
 ## Quick Start
 
@@ -66,7 +67,7 @@ readlink ~/.config/nvim
 
 ```bash
 # List generations (latest 5)
-home-manager generations | head -5
+home-manager generations | sed -n '1,5p'
 
 # Roll back to a specific generation
 home-manager switch --generation <N>
@@ -81,7 +82,7 @@ home-manager switch --generation <N>
 # Individual checks
 readlink ~/.claude/skills
 nix flake metadata ~/.config
-home-manager generations | head -3
+home-manager generations | sed -n '1,3p'
 ```
 
 ### Basic Configuration Change Flow
@@ -196,6 +197,30 @@ xdgConfigDirs = [
 ];
 ```
 
+### Migrating `~/.opencommit` / `~/.opencommitrc`
+
+Use this when a legacy home-dotfile should move into an XDG or Nix-managed layout.
+
+1. Check whether the tool supports `~/.config/<tool>/...`
+2. If it does, migrate the static config into `xdgConfigFiles`
+3. Keep secrets, caches, and generated state out of the tracked repo
+4. If the tool only reads a home-dotfile path, keep the source under `~/.config` and add a small compatibility link via Home Manager
+5. Confirm the actual legacy path first because some tool versions document `~/.opencommit` while others may still mention `~/.opencommitrc`
+
+Example shape:
+
+```nix
+# nix/dotfiles-files.nix
+xdgConfigFiles = [
+  "opencommit/config.json"
+];
+
+home.file.".opencommitrc".source =
+  config.lib.file.mkOutOfStoreSymlink "${config.xdg.configHome}/opencommit/config.json";
+```
+
+If the tool generates runtime state beside the config, manage only the static config file and exclude the generated directory from git.
+
 ### Agent Skills Addition Flow
 
 Steps to add a new Agent Skill source:
@@ -240,7 +265,7 @@ Steps to add a new Agent Skill source:
 nix flake show ~/.config
 
 # Check if new input is recognized
-nix flake metadata ~/.config | grep new-skill-source
+nix flake metadata ~/.config | rg 'new-skill-source'
 
 # Home Manager build
 home-manager build --flake ~/.config --impure --dry-run
@@ -253,7 +278,7 @@ home-manager build --flake ~/.config --impure --dry-run
 home-manager switch --flake ~/.config --impure
 
 # Confirm skill was distributed
-ls -la ~/.claude/skills/ | grep <skill-name>
+ls -la ~/.claude/skills/ | rg '<skill-name>'
 ```
 
 ## Diagnostic Commands
@@ -286,13 +311,13 @@ ls -la ~/.claude/skills/ | grep <skill-name>
 
 ```bash
 # Check latest generation
-home-manager generations | head -3
+home-manager generations | sed -n '1,3p'
 
 # Check if .claude is included in generation
-find /nix/store/<hash>-home-manager-generation/home-files/ -path "*claude*"
+rg '\.claude' /nix/store/<hash>-home-manager-generation/home-files
 
 # Verify link generation with dry-run
-home-manager switch --flake ~/.config --impure --dry-run 2>&1 | grep claude
+home-manager switch --flake ~/.config --impure --dry-run 2>&1 | rg 'claude'
 ```
 
 #### Symlink Validation
@@ -318,7 +343,7 @@ nix flake metadata ~/.config
 nix flake show ~/.config
 
 # Check URL of specific input
-nix flake metadata ~/.config | grep -E "(openai-skills|vercel)"
+nix flake metadata ~/.config | rg '(openai-skills|vercel)'
 ```
 
 ### Tool Selection Guide
