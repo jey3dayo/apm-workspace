@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Bash
 
 # Generate SVG Skill
 
-Generates SVG diagrams for technical blog articles and logos. Supports transparent background, dark mode compatibility, accessibility compliance, Material Icons integration, and 6 design patterns.
+Generates SVG diagrams and logos for docs, apps, and articles. Supports transparent background, dark mode compatibility, accessibility compliance, Material Icons integration, and 6 design patterns.
 
 ## When to Use
 
@@ -61,12 +61,13 @@ Use this skill in the following cases:
 - Recommended size: 1280 x 720 px (16:9)
 - viewBox: `0 0 1280 720`
 - Format: SVG 1.1
-- Save location: `docs/article/[feature-name]/images/`
+- Default save location: choose a workspace-local path that fits the task, such as `docs/images/`, `docs/<topic>/images/`, or `assets/`
 
 ### Save Location Examples
 
-- `docs/article/tmp-driven-development/images/architecture-diagram.svg`
-- `docs/article/uv-workspace/images/flow-diagram.svg`
+- `docs/images/architecture-diagram.svg`
+- `docs/apm/images/flow-diagram.svg`
+- `assets/logo-mark.svg`
 
 ### Accessibility Requirements
 
@@ -129,12 +130,8 @@ Check whether the user has provided the following information:
 
 ### 2. Clarify Missing Information
 
-Ask the following as needed:
-
-- Title of the diagram
-- Main elements and their relationships
-- Points to emphasize
-- Color preferences (if any)
+Only ask follow-up questions when you are blocked from producing a useful first draft.
+If the request is incomplete but still actionable, make reasonable assumptions, state them briefly, and continue.
 
 ### 3. SVG Generation
 
@@ -176,28 +173,29 @@ BG:        #FFFFFF (white)
 Border:    #BDBDBD (gray)
 ```
 
-### 4. Confirm Save Location
+### 4. Choose Output Mode
 
-Ask the user for the article directory:
+Use this priority order:
 
-```
-Which article is this diagram for?
-Example: tmp-driven-development, uv-workspace, etc.
-```
+1. If the user gave an explicit path, use it.
+2. If the user asked for code only or a draft first, return inline SVG and do not save a file yet.
+3. If the workspace has an obvious docs/assets location, choose a reasonable workspace-local path and state the assumption.
+   Prefer `docs/images/` for diagrams and `assets/` for logos/icons.
+4. Ask for a save path only when none of the above is workable.
 
 ### 5. Save File
 
-Save to the `images/` folder in the confirmed article directory:
+When saving a file, prefer a workspace-local path that matches the task context:
 
 ```
-docs/article/[feature-name]/images/[descriptive-filename].svg
+docs/images/[descriptive-filename].svg
 ```
 
 ### Save Path Examples
 
-- `docs/article/tmp-driven-development/images/architecture-diagram.svg`
-- `docs/article/uv-workspace/images/workflow-flow.svg`
-- `docs/article/html-to-markdown-converter/images/before-after-comparison.svg`
+- `docs/images/architecture-diagram.svg`
+- `docs/apm/images/workflow-flow.svg`
+- `assets/before-after-comparison.svg`
 
 ### File Naming Conventions
 
@@ -210,7 +208,7 @@ docs/article/[feature-name]/images/[descriptive-filename].svg
 Report the following information to the user:
 
 - Type of diagram generated
-- Save path
+- Save path, or note that the SVG is returned inline
 - Main elements included
 - Accessibility compliance status
 - Next steps (suggestion for PNG conversion)
@@ -226,7 +224,7 @@ SVG diagram has been generated.
 - Type: [pattern name]
 - Title: [title]
 - Size: 1280 x 720 px (16:9)
-- Save location: docs/article/[feature-name]/images/[filename].svg
+- Save location: [workspace-local path or "inline only"]
 
 [Accessibility]
 - Contrast ratio: WCAG Level AA compliant
@@ -236,7 +234,7 @@ SVG diagram has been generated.
 [Next Steps]
 To convert to PNG format, use the svg-to-png Skill or run the following command:
 ```bash
-uv run --package sios-tech-lab-analytics-ga4-tools svg2png docs/article/[feature-name]/images/[filename].svg
+uv run --package sios-tech-lab-analytics-ga4-tools svg2png [path-to-svg]
 ````
 
 ```
@@ -245,13 +243,11 @@ uv run --package sios-tech-lab-analytics-ga4-tools svg2png docs/article/[feature
 
 ```
 
-Additional details needed for the diagram.
+Need one blocking detail before I can place the SVG output.
 
-Please provide the following information:
+Please provide:
 
-- [Question 1]
-- [Question 2]
-- [Question 3]
+- [missing path or blocking detail]
 
 ```````
 
