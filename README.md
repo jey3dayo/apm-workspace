@@ -4,6 +4,8 @@ APM-based global skill workspace for `jey3dayo`.
 
 This repository is the day-to-day working copy of `~/.apm`. `~/.apm` is the source of truth for daily authoring and operation. `~/.config` is bootstrap-only and is not the authoring surface.
 
+Current `apm` CLI source is pinned through `mise` to `github:jey3dayo/apm@v0.8.12.post1`. The previous `github:microsoft/apm` source is intentionally kept as a commented rollback target in tracked config.
+
 ## What Lives Here
 
 - `apm.yml`: global dependency manifest for user-scope skill rollout
@@ -37,6 +39,7 @@ Current APM limitation:
 - Codex is handled separately via `apm compile --target codex --output ~/.codex/AGENTS.md`
 - Codex skills are deployed to `~/.agents/skills`, not `~/.codex/skills`
 - `~/.codex/skills` should be treated as legacy/cleanup-only; this workspace removes it during `mise run apply` to avoid duplicate skill listings
+- if `apm` is defined in both `~/.apm/mise.toml` and `~/.config/mise/config.default.toml`, both entries must point to the same source to avoid command-resolution collisions
 
 The formatter for bold headings rewrites Markdown under `catalog/`:
 
@@ -62,9 +65,8 @@ This is the only documented exception that reaches into `~/.config`. All other d
 ```powershell
 cd ~/.apm
 mise install
-mise run sync         # accept newer upstream package content
-# or
-mise run sync:stable  # deploy the current manifest and lock
+mise run apply
+mise run doctor
 ```
 
 Useful maintenance commands:
@@ -92,15 +94,17 @@ When external skills change:
 
 1. Use `apm install <package-ref>` or `apm uninstall <package-ref>`.
 2. Review `apm.yml` and `apm.lock.yaml`.
-3. Run `mise run sync` when you want to accept newer upstream package content with `apm install -g --update`.
-4. Run `mise run sync:stable` when you want to deploy the current manifest and lock without accepting new upstream content.
+3. Run `mise run apply` when you want to deploy the current manifest and lock without accepting new upstream content.
+4. Run `mise run doctor` to verify the deployed state.
+5. Use `mise run sync` only when you intentionally want to refresh upstream dependency content.
 
 Task semantics:
 
 - `mise run ci` verifies formatting, validation, and smoke checks only. It does not deploy.
 - `mise run sync` is the upstream-acceptance flow and is centered on `apm install -g --update`.
-- `mise run sync:stable` preserves the older update -> verify -> apply -> doctor flow for the current manifest and lock.
+- `mise run sync:stable` preserves the broader update -> verify -> apply -> doctor flow for the current manifest and lock.
 - `mise run apply` publishes Codex skills into `~/.agents/skills` and keeps `~/.codex/skills` out of the active deployment path.
+- direct `apm` invocations should go through `mise`; when exact binary selection matters, use `mise exec github:jey3dayo/apm@v0.8.12.post1 -- apm ...`.
 
 When shared runtime guidance changes under `~/.apm/catalog/`:
 

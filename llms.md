@@ -2,7 +2,7 @@
 
 `~/.apm` is the working copy and operational source of truth for the global APM workspace for `jey3dayo`.
 
-`~/.config` is bootstrap-only for this workspace model. The external source mapping at `~/.config/nix/agent-skills-sources.nix` is retired and intentionally empty, so it is not an active editing target.
+`~/.config` is bootstrap-only for authoring in this workspace model. The external source mapping at `~/.config/nix/agent-skills-sources.nix` is retired and intentionally empty, so it is not an active editing target. The exception is global `mise` tool resolution for `apm`, which must stay aligned with this workspace when the active `apm` source changes.
 
 This workspace owns the global APM manifest, the lockfile, the downloaded dependency cache, your personal skill sources, and the shared runtime guidance package.
 
@@ -53,6 +53,13 @@ jey3dayo/apm-workspace/catalog#main
 - The current script path is `apm compile --target codex --output ~/.codex/AGENTS.md`.
 - Codex skills are deployed through `~/.agents/skills`.
 - Do not use `~/.codex/skills` as the verification source of truth for this workspace. Verify Codex rollout through compile success, `~/.codex/AGENTS.md`, and the deployed tree in `~/.agents/skills`.
+- Current `apm` source is the pinned fork release `github:jey3dayo/apm@v0.8.12.post1`.
+- Keep the previous `github:microsoft/apm` entry commented in tracked config for rollback.
+- If both `~/.apm/mise.toml` and `~/.config/mise/config.default.toml` define `apm`, keep them aligned to the same source.
+- Prefer `mise run apply` and `mise run doctor` for routine local rollout.
+- Reserve `mise run sync` for intentional upstream refresh, not for normal deployment.
+- When direct binary selection matters, prefer `mise exec github:jey3dayo/apm@v0.8.12.post1 -- apm ...`.
+- If a Codex-targeted external skill is still missing after rollout, verify `~/.agents/skills` directly and treat it as a temporary Codex-specific delivery gap.
 
 ## Source Of Truth
 
@@ -70,9 +77,8 @@ jey3dayo/apm-workspace/catalog#main
 ```powershell
 cd ~/.apm
 mise install
-mise run sync
-# or
-mise run sync:stable
+mise run apply
+mise run doctor
 ```
 
 ## Managed Catalog Update Flow

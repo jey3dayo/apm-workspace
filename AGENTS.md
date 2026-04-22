@@ -45,6 +45,11 @@ In practice:
 - For Codex, separate compiled guidance from skills
   - `~/.codex/AGENTS.md` is the compiled output
   - `~/.agents/skills` is the deployed skill tree
+- Treat the current `apm` source as a pinned runtime dependency managed by `mise`
+  - current source: `github:jey3dayo/apm@v0.8.12.post1`
+  - keep the previous `github:microsoft/apm` entry commented in tracked config for rollback
+  - if both the workspace and global `mise` config define `apm`, keep them aligned to the same source to avoid command-resolution collisions
+  - prefer `mise exec github:jey3dayo/apm@v0.8.12.post1 -- apm ...` when you need to force the exact binary explicitly
 
 ## Task Selection
 
@@ -52,10 +57,12 @@ Choose the command based on intent:
 
 - `mise run sync`
   - Accept newer upstream package content with `apm install -g --update`
+  - Avoid for routine rollout; reserve it for intentional upstream refresh of workspace dependencies
   - Use for weekly refreshes, dependency drift acceptance, and content-hash mismatch resolution
 - `mise run sync:stable`
   - Preserve the current manifest and lock
   - Runs `update -> ci -> apply -> doctor`
+  - Use cautiously; it is broader than the normal day-to-day rollout path
   - Use when you want a stable rollout without taking new upstream refs
 - `mise run ci`
   - Verification only
@@ -64,6 +71,7 @@ Choose the command based on intent:
 - `mise run apply`
   - Deploy the current manifest and lock to user targets
   - Also sync Codex-targeted skills into `~/.agents/skills`
+  - Prefer for routine local rollout
   - Use when deployment is needed without a broader maintenance flow
 - `mise run stage-catalog`
   - Normalize tracked shared guidance under `catalog/`
@@ -93,7 +101,8 @@ Use when you want to deploy the current manifest and lock as-is.
 ```bash
 cd ~/.apm
 mise install
-mise run sync:stable
+mise run apply
+mise run doctor
 ```
 
 ### Shared Guidance Update
@@ -125,6 +134,11 @@ Then review and commit the skill changes.
 - Do not treat deployed targets such as `~/.claude/` or `~/.codex/` as source of truth
 - Do not reintroduce local `./packages/*` refs into the global manifest
 - Do not hand-edit runtime outputs when the tracked workspace can regenerate them
+- When changing the active `apm` source, update both tracked `mise` config locations that define `apm`
+  - `~/.apm/mise.toml`
+  - `~/.config/mise/config.default.toml`
+- When verifying Codex skill rollout, check `~/.agents/skills`
+  - if an external skill is still missing there after deployment, treat it as a temporary Codex-specific delivery gap and resolve it separately from the tracked workspace state
 
 ## Review Focus
 
