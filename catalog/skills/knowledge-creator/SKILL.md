@@ -12,9 +12,63 @@ description: |
 
 This skill provides intelligent classification of knowledge and automatic routing to the appropriate creation tool. Following the [Agent Skills standard](https://agentskills.io), this skill helps create **agent capability extensions** that are portable, executable, and follow progressive disclosure principles.
 
-### Core Capability
+## Core Capability
 
-### Standards Compliance
+When this skill activates, do the following in order:
+
+1. Read the user's knowledge description and identify the dominant intent.
+2. Classify it as **Skill**, **Agent**, **Command**, or **Rules** using the framework below.
+3. Return a recommendation with:
+   - selected format
+   - confidence score
+   - short reasoning
+   - next action
+4. Route to the corresponding creator skill:
+   - Skill -> `skill-creator`
+   - Agent -> `agent-creator`
+   - Command -> `command-creator`
+   - Rules -> `rules-creator`
+5. If confidence is 70-89%, present the top 2 options with trade-offs, ask 1-3 short clarifying questions, and defer final routing until the user answers.
+6. If confidence is below 70%, do not force a recommendation. Ask clarifying questions before routing.
+7. If the request is really about distributions, bundles, deployment, symlinks, or rollout architecture, route to `distributions-manager` instead of forcing one of the four formats.
+
+## Output Contract
+
+Use this response shape unless the user asks for a different format:
+
+```markdown
+Classification: <Skill | Agent | Command | Rules>
+Confidence: <NN>%
+
+Reasoning:
+
+- <why this format fits>
+- <why alternatives fit less well>
+
+Next step:
+
+- Use `<creator-skill>` for creation
+```
+
+If the corresponding creator skill is unavailable, still give the classification, confidence, and the concrete next step the user should take.
+
+When the result is still ambiguous after the first pass, use this shape instead:
+
+```markdown
+Top options:
+
+1. <format> - <why>
+2. <format> - <why>
+
+Need clarification:
+
+- <short question 1>
+- <short question 2>
+
+Next step:
+
+- Answer the questions, then route to the matching creator skill
+```
 
 ## Agent Skills Philosophy
 
@@ -24,8 +78,6 @@ Agent Skills are **lightweight, open format extensions** that package:
 - Scripts (executable components)
 - References (supporting materials)
 - Assets (templates, resources)
-
-### Key Principle
 
 ### Progressive Disclosure Architecture
 
@@ -124,8 +176,6 @@ skill-name/
 - "ベストプラクティス" (best practices)
 - Technology/framework names in description
 
-### Cross-Platform Benefit
-
 #### Agent 🤖
 
 ### Best For
@@ -212,8 +262,6 @@ System analyzes:
 - Reusability: High (applicable to any mise project)
 - Execution: Reference material, not automated
 
-### Classification Confidence
-
 ### Step 3: Recommendation
 
 ```
@@ -276,7 +324,7 @@ For questions about distributions, bundles, or deployment:
 - Technical best practices ✓
 - → **Skill** (90% confidence)
 
-### Action
+- Route to `skill-creator`
 
 ### Example 2: Automation Task
 
@@ -291,7 +339,7 @@ For questions about distributions, bundles, or deployment:
 - Decision-making required ✓
 - → **Agent** (95% confidence)
 
-### Action
+- Route to `agent-creator`
 
 ### Example 3: User Operation
 
@@ -306,7 +354,7 @@ For questions about distributions, bundles, or deployment:
 - Project-specific ✓
 - → **Command** (90% confidence)
 
-### Action
+- Route to `command-creator`
 
 ### Example 4: Project Constraints
 
@@ -321,7 +369,7 @@ For questions about distributions, bundles, or deployment:
 - Always enforced ✓
 - → **Rules** (85% confidence)
 
-### Action
+- Route to `rules-creator`
 
 ## Advanced Features
 
@@ -343,7 +391,7 @@ Some knowledge may fit multiple categories:
 ### Confidence Thresholds
 
 - ≥ 90%: Direct recommendation
-- 70-89%: Present top 2 options with trade-offs
+- 70-89%: Present top 2 options with trade-offs, ask clarifying questions, and defer final routing
 - < 70%: Ask clarifying questions
 
 ### Clarifying Questions
@@ -369,8 +417,6 @@ Based on your answers, I'll recommend the best format.
 
 ### Skill Creator Integration
 
-### When
-
 ### Actions
 
 1. Activate `skill-creator` skill
@@ -379,8 +425,6 @@ Based on your answers, I'll recommend the best format.
 4. Ensure YAML frontmatter completeness
 
 ### Agent Creator Integration
-
-### When
 
 ### Actions
 
@@ -391,8 +435,6 @@ Based on your answers, I'll recommend the best format.
 
 ### Command Creator Integration
 
-### When
-
 ### Actions
 
 1. Activate `command-creator` skill
@@ -401,8 +443,6 @@ Based on your answers, I'll recommend the best format.
 4. Integrate with shared libraries
 
 ### Rules Creator Integration
-
-### When
 
 ### Actions
 
@@ -447,20 +487,9 @@ Based on your answers, I'll recommend the best format.
 
 ## References
 
-### Detailed Documentation
+For additional background, see:
 
-For in-depth classification logic and Agent Skills standards, see:
-
-- `references/agent-skills-standard.md` - **Agent Skills specification deep dive**, Progressive Disclosure, cross-platform portability, scripts/ best practices
-- `references/decision-logic.md` - Complete decision tree, confidence calculation, edge cases
-- `references/format-comparison.md` - Detailed comparison of all four formats with pros/cons
-
-### Templates & Examples
-
-- `resources/decision-trees/intent-analysis.md` - Intent classification patterns
-- `resources/decision-trees/format-selection.md` - Visual decision flowcharts
-- `resources/templates/` - Scaffolds for each format (Agent Skills compliant)
-- `resources/examples/` - Real-world classification examples
+- `references/agent-skills-standard.md` - Agent Skills specification, progressive disclosure, and packaging guidance
 
 ### External Resources
 
