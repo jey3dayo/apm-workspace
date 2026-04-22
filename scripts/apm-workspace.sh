@@ -310,7 +310,7 @@ format_skill_name() {
     codex)
       case "$source_skill_id" in
         superpowers:*)
-          printf '%s\n' "${source_skill_id#superpowers:}"
+          printf 'superpowers-%s\n' "${source_skill_id#superpowers:}"
           ;;
         *)
           printf '%s\n' "$source_skill_id"
@@ -1230,6 +1230,12 @@ external_skill_id_from_virtual_path() {
 external_skill_id_from_record() {
   repo_url="$1"
   virtual_path="$2"
+
+  if [ "$repo_url" = "obra/superpowers" ] && [ -n "$virtual_path" ]; then
+    skill_id=$(external_skill_id_from_virtual_path "$virtual_path")
+    printf 'superpowers:%s\n' "$skill_id"
+    return 0
+  fi
 
   if [ -z "$virtual_path" ]; then
     old_ifs=$IFS

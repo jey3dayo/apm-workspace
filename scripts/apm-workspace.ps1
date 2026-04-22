@@ -681,7 +681,7 @@ function Format-SkillName {
   )
 
   if ($Target -eq "codex" -and $SourceSkillId.StartsWith("superpowers:")) {
-    return $SourceSkillId.Substring("superpowers:".Length)
+    return ("superpowers-" + $SourceSkillId.Substring("superpowers:".Length))
   }
 
   return $SourceSkillId
@@ -1034,6 +1034,13 @@ function Get-ExternalSkillId {
 
     [string]$VirtualPath
   )
+
+  if ($RepoUrl -eq "obra/superpowers" -and -not [string]::IsNullOrWhiteSpace($VirtualPath)) {
+    $relativePath = Get-ExternalSkillRelativePath -VirtualPath $VirtualPath
+    $skillId = ((Convert-ReferencePathToSegments -Value $relativePath) -join ':')
+    Test-SkillId -SkillId $skillId
+    return ("superpowers:{0}" -f $skillId)
+  }
 
   if ([string]::IsNullOrWhiteSpace($VirtualPath)) {
     $segments = Convert-ReferencePathToSegments -Value $RepoUrl
