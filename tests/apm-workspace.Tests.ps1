@@ -726,6 +726,37 @@ dependencies:
     Test-Path (Join-Path $TestDrive ".codex/skills") | Should -Be $false
   }
 
+  It "quick-syncs requested local managed skills into the codex target only" {
+    Mock Ensure-WorkspaceRepo {}
+    Mock Ensure-WorkspaceScaffold {}
+    Mock New-TemporaryDirectory { Join-Path $TestDrive "apm-sync-local" }
+    Mock Get-RequestedCatalogSkillIds { @("superpowers:brainstorming") }
+    Mock Get-ManagedSkillContentDir { Join-Path $TestDrive "catalog/skills/superpowers/brainstorming" }
+    Mock Get-LocalCodexSyncTarget {
+      [pscustomobject]@{ Name = "codex"; Root = (Join-Path $TestDrive ".codex"); SkillsRoot = (Join-Path $TestDrive ".agents"); ConfigName = "AGENTS.md" }
+    }
+
+    $sourcePath = Join-Path $TestDrive "catalog/skills/superpowers/brainstorming"
+    New-Item -ItemType Directory -Path (Join-Path $sourcePath "references") -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $sourcePath "SKILL.md") -Value "# brainstorming"
+    Set-Content -LiteralPath (Join-Path $sourcePath "references/note.md") -Value "local"
+    New-Item -ItemType Directory -Path (Join-Path $TestDrive ".codex/skills/superpowers-brainstorming") -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $TestDrive ".codex/skills/superpowers-brainstorming/SKILL.md") -Value "# legacy"
+    New-Item -ItemType Directory -Path (Join-Path $TestDrive ".agents/skills/existing-skill") -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $TestDrive ".agents/skills/existing-skill/SKILL.md") -Value "# existing"
+    New-Item -ItemType Directory -Path (Join-Path $TestDrive ".agents/skills/superpowers-brainstorming") -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $TestDrive ".agents/skills/superpowers-brainstorming/old.md") -Value "old"
+
+    Invoke-SyncLocalSkills -RequestedSkillIds @("superpowers:brainstorming")
+
+    Test-Path (Join-Path $TestDrive ".agents/skills/superpowers-brainstorming/SKILL.md") | Should -Be $true
+    ((Get-Content -LiteralPath (Join-Path $TestDrive ".agents/skills/superpowers-brainstorming/SKILL.md") -Raw) -replace '\r?\n$', '') | Should -Be "# brainstorming"
+    ((Get-Content -LiteralPath (Join-Path $TestDrive ".agents/skills/superpowers-brainstorming/references/note.md") -Raw) -replace '\r?\n$', '') | Should -Be "local"
+    Test-Path (Join-Path $TestDrive ".agents/skills/existing-skill/SKILL.md") | Should -Be $true
+    Test-Path (Join-Path $TestDrive ".agents/skills/superpowers-brainstorming/old.md") | Should -Be $true
+    Test-Path (Join-Path $TestDrive ".codex/skills/superpowers-brainstorming/SKILL.md") | Should -Be $true
+  }
+
   It "publishes workspace mise tasks for formatting, verification, and sync flow" {
     $miseToml = Get-Content -LiteralPath (Join-Path $workspaceRoot "mise.toml") -Raw
 
@@ -735,6 +766,7 @@ dependencies:
     $miseToml | Should -Match '\[tasks\."format:markdown:bold-headings"\]'
     $miseToml | Should -Match '\[tasks\."apm:install"\]'
     $miseToml | Should -Match '\[tasks\.apply\]'
+    $miseToml | Should -Match '\[tasks\."sync-skills:local"\]'
     $miseToml | Should -Match '\[tasks\.update\]'
     $miseToml | Should -Not -Match '\[tasks\."apm:update"\]'
     $miseToml | Should -Match '\[tasks\.doctor\]'
@@ -745,6 +777,7 @@ dependencies:
     $miseToml | Should -Match '\[tasks\."catalog:release"\]'
     $miseToml | Should -Match '\[tasks\."catalog:tidy"\]'
     $miseToml | Should -Match 'run = "bash ./scripts/apm-workspace.sh apply"'
+    $miseToml | Should -Match 'run = "bash ./scripts/apm-workspace.sh sync-skills:local"'
     $miseToml | Should -Match 'replace-bold-headings\.ts'
     $miseToml | Should -Match 'replace-bold-headings\.ts.*\./catalog"'
     $miseToml | Should -Match 'replace-bold-headings\.ts.*\./catalog --dry-run'

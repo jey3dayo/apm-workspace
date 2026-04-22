@@ -87,6 +87,7 @@ mise run format
 mise run ci           # verification only
 mise run sync         # upstream refresh
 mise run sync:stable  # stable rollout from current manifest + lock
+mise run sync-skills:local  # quick local Codex skill sync only
 mise run validate:catalog
 mise run stage-catalog
 mise run catalog:tidy
@@ -100,6 +101,7 @@ When a personal skill changes under `~/.apm/catalog/skills/`:
 
 1. Update `catalog/skills/<id>/`.
 2. Run `mise run format:markdown:bold-headings` if you want heading normalization.
+3. Run `mise run sync-skills:local` when you want a fast local-only refresh into `~/.agents/skills`.
 
 When external skills change:
 

@@ -840,6 +840,68 @@ cmd_apply() {
   rm -rf "$apply_stage_root"
 }
 
+requested_personal_skill_records() {
+  skill_ids=$(requested_catalog_skill_ids "$@")
+
+  printf '%s\n' "$skill_ids" | while IFS= read -r skill_id; do
+    [ -n "$skill_id" ] || continue
+    source_path=$(managed_skill_content_dir "$skill_id")
+    printf 'personal\t%s\t%s\tcatalog\n' "$skill_id" "$source_path"
+  done
+}
+
+stage_codex_skill_records() {
+  skill_records="$1"
+  stage_root="$2"
+  stage_skills_root="$stage_root/codex/skills"
+
+  mkdir -p "$stage_skills_root"
+  printf '%s\n' "$skill_records" | while IFS=$'\t' read -r _source_kind source_skill_id source_path _source_ref; do
+    [ -n "$source_skill_id" ] || continue
+    deployed_skill_name=$(format_skill_name codex "$source_skill_id")
+    staged_skill_path=$(internal_target_skill_path "$stage_skills_root" "$deployed_skill_name")
+    mkdir -p "$staged_skill_path"
+    cp -R "$source_path"/. "$staged_skill_path"
+  done
+}
+
+replace_codex_skill_target_from_stage() {
+  stage_root="$1"
+  skill_records="$2"
+  target_skills_root="$HOME/.agents/skills"
+  staged_skills_root="$stage_root/codex/skills"
+
+  mkdir -p "$target_skills_root"
+  [ -d "$staged_skills_root" ] || mkdir -p "$staged_skills_root"
+
+  printf '%s\n' "$skill_records" | while IFS=$'\t' read -r _source_kind source_skill_id _source_path _source_ref; do
+    [ -n "$source_skill_id" ] || continue
+    deployed_skill_name=$(format_skill_name codex "$source_skill_id")
+    staged_skill_path=$(internal_target_skill_path "$staged_skills_root" "$deployed_skill_name")
+    target_skill_path=$(internal_target_skill_path "$target_skills_root" "$deployed_skill_name")
+
+    mkdir -p "$(dirname "$target_skill_path")"
+    mkdir -p "$target_skill_path"
+    cp -R "$staged_skill_path"/. "$target_skill_path"
+  done
+}
+
+cmd_sync_local_skills() {
+  ensure_workspace_repo
+  ensure_workspace_scaffold
+
+  skill_records=$(requested_personal_skill_records "$@")
+  stage_root=$(mktemp -d "${TMPDIR:-/tmp}/apm-sync-local.XXXXXX")
+  trap 'rm -rf "$stage_root"' RETURN
+
+  stage_codex_skill_records "$skill_records" "$stage_root"
+  replace_codex_skill_target_from_stage "$stage_root" "$skill_records"
+
+  trap - RETURN
+  rm -rf "$stage_root"
+  log "Synced local managed skills to Codex target: $(printf '%s\n' "$skill_records" | awk -F '\t' 'NF >= 2 { print $2 }' | tr '\n' ',' | sed 's/,$//; s/,/, /g')"
+}
+
 cmd_update() {
   require_apm
   ensure_workspace_repo
@@ -1935,6 +1997,7 @@ Usage: scripts/apm-workspace.sh <command> [args...]
 
 Commands:
   apply              Offline deploy user-scope-compatible dependencies and compile Codex output
+  sync-skills:local  Quick-sync managed catalog skills into ~/.agents/skills only
   update             Refresh the checkout and dependencies only; does not deploy
   format-catalog-metadata  Normalize tracked catalog apm.yml and README.md
   check-catalog-metadata   Check tracked catalog apm.yml and README.md normalization
@@ -1958,6 +2021,7 @@ EOF
 
 case "$COMMAND" in
   apply) cmd_apply ;;
+  sync-skills:local) cmd_sync_local_skills "$@" ;;
   update) cmd_update ;;
   format-catalog-metadata) cmd_format_catalog_metadata ;;
   check-catalog-metadata) cmd_check_catalog_metadata ;;

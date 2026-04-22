@@ -28,6 +28,11 @@ description = "Deploy user-scope-compatible APM dependencies and compile Codex o
 run = "bash ./scripts/apm-workspace.sh apply"
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 apply"
 
+[tasks."sync-skills:local"]
+description = "Quick-sync managed catalog skills into the local Codex target only"
+run = "bash ./scripts/apm-workspace.sh sync-skills:local"
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 sync-skills:local"
+
 [tasks.update]
 description = "Refresh the ~/.apm checkout and dependencies without deploying"
 run = "bash ./scripts/apm-workspace.sh update"

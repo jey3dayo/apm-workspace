@@ -1368,6 +1368,69 @@ function Invoke-Apply {
   Invoke-CodexCompile
 }
 
+function Get-RequestedPersonalSkillRecords {
+  param(
+    [string[]]$RequestedSkillIds
+  )
+
+  $result = New-Object System.Collections.Generic.List[object]
+  foreach ($skillId in (Get-RequestedCatalogSkillIds -RequestedSkillIds $RequestedSkillIds)) {
+    $result.Add([pscustomobject]@{
+        SourceKind = "personal"
+        SourceSkillId = $skillId
+        SourcePath = Get-ManagedSkillContentDir -SkillId $skillId
+      })
+  }
+
+  return $result.ToArray()
+}
+
+function Get-LocalCodexSyncTarget {
+  return [pscustomobject]@{
+    Name = "codex"
+    Root = (Join-Path $HOME ".codex")
+    SkillsRoot = (Join-Path $HOME ".agents")
+    ConfigName = "AGENTS.md"
+  }
+}
+
+function Invoke-SyncLocalSkills {
+  param(
+    [string[]]$RequestedSkillIds
+  )
+
+  Ensure-WorkspaceRepo
+  Ensure-WorkspaceScaffold
+
+  $targets = @(Get-LocalCodexSyncTarget)
+  $stageDir = New-TemporaryDirectory -Prefix "apm-sync-local"
+
+  try {
+    $skillRecords = @(Get-RequestedPersonalSkillRecords -RequestedSkillIds $RequestedSkillIds)
+    Validate-DeploymentCollisions -SkillRecords $skillRecords -Targets $targets
+    $null = Stage-TargetSkillRecords -StageRoot $stageDir -SkillRecords $skillRecords -Targets $targets
+    $target = $targets[0]
+    $stagedSkillsRoot = Get-StagedTargetSkillsRoot -StageRoot $stageDir -TargetName $target.Name
+    $destinationSkillsRoot = Join-Path $target.SkillsRoot "skills"
+
+    New-Item -ItemType Directory -Path $destinationSkillsRoot -Force | Out-Null
+
+    foreach ($skillRecord in $skillRecords) {
+      $deployedSkillName = Format-SkillName -Target $target.Name -SourceSkillId $skillRecord.SourceSkillId
+      $stagedSkillPath = Get-InternalTargetSkillPath -TargetRoot $stagedSkillsRoot -SkillId $deployedSkillName
+      $destinationSkillPath = Get-InternalTargetSkillPath -TargetRoot $destinationSkillsRoot -SkillId $deployedSkillName
+      Copy-DirectoryContents -SourceDir $stagedSkillPath -DestinationDir $destinationSkillPath
+    }
+  }
+  finally {
+    if (Test-Path -LiteralPath $stageDir) {
+      Remove-Item -LiteralPath $stageDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+  }
+
+  Write-Host ("Synced local managed skills to Codex target: {0}" -f ((@($skillRecords | ForEach-Object SourceSkillId)) -join ", "))
+}
+
 function Invoke-Update {
   Require-Apm
   Ensure-WorkspaceRepo
@@ -2323,6 +2386,10 @@ switch ($Command) {
     Invoke-Apply
   }
 
+  "sync-skills:local" {
+    Invoke-SyncLocalSkills -RequestedSkillIds $CommandArgs
+  }
+
   "update" {
     Invoke-Update
   }
@@ -2377,6 +2444,7 @@ Usage: scripts/apm-workspace.ps1 <command> [args...]
 
 Commands:
   apply              Offline deploy user-scope-compatible dependencies and compile Codex output
+  sync-skills:local  Quick-sync managed catalog skills into ~/.agents/skills only
   update             Refresh the checkout and dependencies only; does not deploy
   format-catalog-metadata  Normalize tracked catalog apm.yml and README.md
   check-catalog-metadata   Check tracked catalog apm.yml and README.md normalization
