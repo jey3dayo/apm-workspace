@@ -4,6 +4,11 @@
 
 `~/.config` is bootstrap-only for authoring in this workspace model. The external source mapping at `~/.config/nix/agent-skills-sources.nix` is retired and intentionally empty, so it is not an active editing target. The exception is global `mise` tool resolution for `apm`, which must stay aligned with this workspace when the active `apm` source changes.
 
+Important compatibility note:
+
+- When validating whether `obra/superpowers` can stay on the normal APM-managed lane, use `apm >= 0.9.1`.
+- Older 0.8.x builds may mis-classify that package layout and drop skills during install.
+
 This workspace owns the global APM manifest, the lockfile, the downloaded dependency cache, your personal skill sources, and the shared runtime guidance package.
 
 ## What This Workspace Owns
@@ -114,6 +119,12 @@ When a copied skill lives under `~/.apm/manual-skills/`:
 2. Do not add it to the root `apm.yml`.
 3. Keep provenance in the copied source README.
 4. Distribute it explicitly, for example with the standalone package ref `jey3dayo/apm-workspace/manual-skills`.
+
+When checking whether an upstream skill can move out of `manual-skills/` and back into the normal managed lane:
+
+1. Test with `apm >= 0.9.1`.
+2. Re-run install in an isolated workspace before changing the root `apm.yml`.
+3. Only move it back after confirming the deployed tree under `~/.agents/skills` is complete.
 
 ## Useful Maintenance Commands
 

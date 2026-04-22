@@ -6,6 +6,11 @@ This repository is the day-to-day working copy of `~/.apm`. `~/.apm` is the sour
 
 Current `apm` CLI source is pinned through `mise` to `github:jey3dayo/apm@v0.8.12.post1`. The previous `github:microsoft/apm` source is intentionally kept as a commented rollback target in tracked config.
 
+Important compatibility note:
+
+- When validating whether `obra/superpowers` can stay on the normal APM-managed lane, use `apm >= 0.9.1`.
+- Older 0.8.x builds may mis-classify that package layout and drop skills during install.
+
 ## What Lives Here
 
 - `apm.yml`: global dependency manifest for user-scope skill rollout
@@ -103,6 +108,12 @@ When external skills change:
 3. Run `mise run apply` when you want to deploy the current manifest and lock without accepting new upstream content.
 4. Run `mise run doctor` to verify the deployed state.
 5. Use `mise run sync` only when you intentionally want to refresh upstream dependency content.
+
+When checking whether an upstream skill can move out of `manual-skills/` and back into the normal managed lane:
+
+1. Test with `apm >= 0.9.1`.
+2. Re-run install in an isolated workspace before changing the root `apm.yml`.
+3. Only move it back after confirming the deployed tree under `~/.agents/skills` is complete.
 
 When a copied skill lives under `~/.apm/manual-skills/`:
 
