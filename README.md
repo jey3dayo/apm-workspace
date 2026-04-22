@@ -34,7 +34,9 @@ Current APM limitation:
 - user-scope install (`apm install -g`) does not yet support local package refs such as `./packages/...`
 - keep `apm.yml` on remote refs for global install
 - do not switch `apm.yml` to local `./packages/*` refs until user-scope local package support lands in APM
-- Codex is handled separately via `apm compile --target codex --output ~/.codex/AGENTS.md`; this workspace does not treat `~/.codex/skills` as its deployment contract
+- Codex is handled separately via `apm compile --target codex --output ~/.codex/AGENTS.md`
+- Codex skills are deployed to `~/.agents/skills`, not `~/.codex/skills`
+- `~/.codex/skills` should be treated as legacy/cleanup-only; this workspace removes it during `mise run apply` to avoid duplicate skill listings
 
 The formatter for bold headings rewrites Markdown under `catalog/`:
 
@@ -98,6 +100,7 @@ Task semantics:
 - `mise run ci` verifies formatting, validation, and smoke checks only. It does not deploy.
 - `mise run sync` is the upstream-acceptance flow and is centered on `apm install -g --update`.
 - `mise run sync:stable` preserves the older update -> verify -> apply -> doctor flow for the current manifest and lock.
+- `mise run apply` publishes Codex skills into `~/.agents/skills` and keeps `~/.codex/skills` out of the active deployment path.
 
 When shared runtime guidance changes under `~/.apm/catalog/`:
 

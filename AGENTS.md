@@ -23,6 +23,8 @@ Treat source of truth as a split model by asset type, not as "whatever is curren
   - the accepted resolved state is captured in `apm.lock.yaml`
 - deployed targets such as `~/.claude/`, `~/.codex/`, and other runtime roots are generated outputs
   - they are verification and delivery surfaces, not editing surfaces
+- Codex skill delivery uses `~/.agents/skills`
+  - `~/.codex/skills` is legacy and should not be used as the active deployment root
 - `apm_modules/` is cache state only
   - do not treat downloaded contents there as the place to edit or define truth
 
@@ -31,6 +33,7 @@ In practice:
 - if the change is to a personal skill or shared guidance asset, edit `./catalog`
 - if the change is to external dependency selection or accepted upstream state, edit or review `apm.yml` and `apm.lock.yaml`
 - if the change only exists in a deployed target or cache, regenerate from the tracked workspace instead of editing it in place
+- if the question is specifically about Codex skills, treat `~/.agents/skills` as the deployed output and `~/.codex/AGENTS.md` as the compiled guidance output
 
 ## Operating Philosophy
 
@@ -39,6 +42,9 @@ In practice:
 - Review lockfile changes intentionally; do not normalize unexpected dependency drift into routine edits
 - Keep runtime targets reproducible from committed workspace state
 - Use tracked catalog workflows for shared guidance, not ad hoc edits under deployed targets
+- For Codex, separate compiled guidance from skills
+  - `~/.codex/AGENTS.md` is the compiled output
+  - `~/.agents/skills` is the deployed skill tree
 
 ## Task Selection
 
@@ -57,6 +63,7 @@ Choose the command based on intent:
   - Does not deploy
 - `mise run apply`
   - Deploy the current manifest and lock to user targets
+  - Also sync Codex-targeted skills into `~/.agents/skills`
   - Use when deployment is needed without a broader maintenance flow
 - `mise run stage-catalog`
   - Normalize tracked shared guidance under `catalog/`
