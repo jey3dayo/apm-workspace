@@ -46,10 +46,9 @@ In practice:
   - `~/.codex/AGENTS.md` is the compiled output
   - `~/.agents/skills` is the deployed skill tree
 - Treat the current `apm` source as a pinned runtime dependency managed by `mise`
-  - current source: `github:jey3dayo/apm@v0.8.12.post1`
-  - keep the previous `github:microsoft/apm` entry commented in tracked config for rollback
+  - current source: `github:microsoft/apm@v0.9.1`
   - if both the workspace and global `mise` config define `apm`, keep them aligned to the same source to avoid command-resolution collisions
-  - prefer `mise exec github:jey3dayo/apm@v0.8.12.post1 -- apm ...` when you need to force the exact binary explicitly
+  - prefer `mise exec github:microsoft/apm@v0.9.1 -- apm ...` when you need to force the exact binary explicitly
 
 ## Task Selection
 

@@ -4,7 +4,7 @@ APM-based global skill workspace for `jey3dayo`.
 
 This repository is the day-to-day working copy of `~/.apm`. `~/.apm` is the source of truth for daily authoring and operation. `~/.config` is bootstrap-only and is not the authoring surface.
 
-Current `apm` CLI source is pinned through `mise` to `github:microsoft/apm@v0.9.1`. The previous `github:jey3dayo/apm@v0.8.12.post1` source is intentionally kept as a commented rollback target in tracked config.
+Current `apm` CLI source is pinned through `mise` to `github:microsoft/apm@v0.9.1`.
 
 Important compatibility note:
 

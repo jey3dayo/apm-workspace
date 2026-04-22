@@ -13,8 +13,6 @@ node = "24"
 
 # CLI tools
 fd = "latest"
-# previous source for rollback:
-# "github:jey3dayo/apm" = "v0.8.12.post1"
 "github:microsoft/apm" = "v0.9.1"
 taplo = "latest"
 

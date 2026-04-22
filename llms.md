@@ -63,7 +63,6 @@ jey3dayo/apm-workspace/catalog#main
 - Codex skills are deployed through `~/.agents/skills`.
 - Do not use `~/.codex/skills` as the verification source of truth for this workspace. Verify Codex rollout through compile success, `~/.codex/AGENTS.md`, and the deployed tree in `~/.agents/skills`.
 - Current `apm` source is `github:microsoft/apm@v0.9.1`.
-- Keep the previous `github:jey3dayo/apm@v0.8.12.post1` entry commented in tracked config for rollback.
 - If both `~/.apm/mise.toml` and `~/.config/mise/config.default.toml` define `apm`, keep them aligned to the same source.
 - Prefer `mise run apply` and `mise run doctor` for routine local rollout.
 - Reserve `mise run sync` for intentional upstream refresh, not for normal deployment.
