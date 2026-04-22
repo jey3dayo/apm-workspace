@@ -170,7 +170,7 @@ pnpm build         # Build succeeds (if applicable)
 
 ### Dangerous Patterns — Fixes to Absolutely Avoid
 
-#### 1. Claude Code Mis-fix Pattern
+#### 1. Auto-Fix Mis-fix Pattern
 
 ```typescript
 // ❌ 危険: アンダースコアだけ追加して使用箇所は未修正
@@ -298,7 +298,7 @@ function transformData(raw: unknown): Result<User, Error> {
 
 ### Project-Specific Guides
 
-- Result<T,E> pattern: `.claude/essential/result-pattern.md`
+- Result<T,E> pattern guide from your repository, if one exists
 - Layer overview: `docs/layers/layer-overview.md`
 - Type safety guide: `docs/development/type-safety-comprehensive-guide.md`
 
