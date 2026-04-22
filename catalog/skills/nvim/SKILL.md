@@ -10,7 +10,7 @@ description: |
 
 ## Overview
 
-Reviews Neovim configurations focusing on startup performance, LSP integration, plugin management, and modern Lua patterns. For **generic Neovim/LSP/lazy.nvim documentation**, use **Context7 MCP**:
+Reviews Neovim configurations focusing on startup performance, LSP integration, plugin management, and modern Lua patterns. For **generic Neovim/LSP/lazy.nvim documentation**, use **Context7 MCP** when available, and fall back to the official Neovim docs plus `references/nvim.md` when it is not:
 
 - `/websites/neovim_io_doc` (11,916 snippets, score 81.3) - Official docs, API reference
 - `/folke/lazy.nvim` (53 snippets, score 85.9) - Plugin manager usage
@@ -105,7 +105,7 @@ This skill focuses on **dotfiles-specific patterns and review criteria**.
 4. LSP: `lua/plugins/lsp.lua` mason setup, 15+ languages
 5. Keybindings: Space leader, no conflicts
 6. AI: `lua/plugins/ai.lua`, <50ms latency
-7. Performance: `docs/performance.md` targets
+7. Performance: `references/nvim.md` benchmarks and targets
 8. Health: `:checkhealth` for providers/LSP
 9. Standards: Lua-only, lazy.nvim, LSP-native, AI integration
 
@@ -147,7 +147,7 @@ Check consistency with:
 - Zsh: Shared FZF keybindings, environment variables
 - Git: Editor integration (git commit, git rebase)
 
-Refer to `.claude/rules/tools/` for cross-tool patterns.
+If the current repository has tool-specific rules or docs, compare against them. Otherwise use `references/nvim.md` as the local baseline.
 
 ## Common Issues & Quick Fixes
 
@@ -211,7 +211,6 @@ vim.keymap.set('n', '<leader>ff', '<cmd>Telescope find_files<cr>', { desc = 'Fin
 
 - code-review: 全体的な品質評価フレームワーク
 - typescript: TypeScript LSP設定レビュー
-- semantic-analysis: プラグイン依存関係分析
 - dotfiles-integration: クロスツール連携（Gruvbox、ターミナル統合）
 
 ## Reference Material
@@ -224,6 +223,5 @@ vim.keymap.set('n', '<leader>ff', '<cmd>Telescope find_files<cr>', { desc = 'Fin
 
 ### Dotfiles Docs
 
-- `.claude/rules/tools/nvim.md` - Neovim-specific rules
-- `docs/performance.md` - Performance benchmarks
-- `docs/tools/nvim.md` - Setup and maintenance
+- `references/nvim.md` - Skill-local baseline, benchmarks, and maintenance notes
+- Repository-local Neovim docs or rules if the target repo provides them
