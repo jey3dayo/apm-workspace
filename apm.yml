@@ -4,114 +4,114 @@ description: APM project for apm-workspace
 author: jey3dayo
 dependencies:
   apm:
-  - jey3dayo/apm-workspace/catalog#main
-  - EpicenterHQ/epicenter/.agents/skills/tauri
-  - Heyvhuang/ship-faster/skills/cloudflare
-  - Heyvhuang/ship-faster/skills/tool-openclaw
-  - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand
-  - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-chat
-  - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-dashboard
-  - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-diff
-  - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-explain
-  - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-onboard
-  - anthropics/claude-code/plugins/frontend-design/skills/frontend-design
-  - benjitaylor/agentation/skills/agentation
-  - benjitaylor/agentation/skills/agentation-self-driving
-  - cloudflare/skills/skills/workers-best-practices
-  - cloudflare/skills/skills/wrangler
-  - ibelick/ui-skills/skills/baseline-ui
-  - ibelick/ui-skills/skills/fixing-accessibility
-  - ibelick/ui-skills/skills/fixing-metadata
-  - ibelick/ui-skills/skills/fixing-motion-performance
-  - jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  - millionco/react-doctor/skills/react-doctor
-  - mizchi/chezmoi-dotfiles/dot_claude/skills/empirical-prompt-tuning
-  - nyosegawa/skills/skills/skill-auditor
-  - obra/superpowers/skills/brainstorming
-  - obra/superpowers/skills/dispatching-parallel-agents
-  - obra/superpowers/skills/executing-plans
-  - obra/superpowers/skills/finishing-a-development-branch
-  - obra/superpowers/skills/receiving-code-review
-  - obra/superpowers/skills/requesting-code-review
-  - obra/superpowers/skills/subagent-driven-development
-  - obra/superpowers/skills/systematic-debugging
-  - obra/superpowers/skills/test-driven-development
-  - obra/superpowers/skills/using-git-worktrees
-  - obra/superpowers/skills/using-superpowers
-  - obra/superpowers/skills/verification-before-completion
-  - obra/superpowers/skills/writing-plans
-  - obra/superpowers/skills/writing-skills
-  - openai/codex-plugin-cc/plugins/codex/skills/codex-cli-runtime
-  - openai/codex-plugin-cc/plugins/codex/skills/codex-result-handling
-  - openai/codex-plugin-cc/plugins/codex/skills/gpt-5-4-prompting
-  - openai/skills/skills/.curated/gh-address-comments
-  - openai/skills/skills/.curated/gh-fix-ci
-  - openai/skills/skills/.system/skill-creator
-  - tokoroten/prompt-review/.claude/skills/prompt-review
-  - trailofbits/skills/plugins/agentic-actions-auditor/skills/agentic-actions-auditor
-  - trailofbits/skills/plugins/audit-context-building/skills/audit-context-building
-  - trailofbits/skills/plugins/sharp-edges/skills/sharp-edges
-  - trailofbits/skills/plugins/static-analysis/skills/codeql
-  - trailofbits/skills/plugins/static-analysis/skills/sarif-parsing
-  - trailofbits/skills/plugins/static-analysis/skills/semgrep
-  - trailofbits/skills/plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor
-  - vercel-labs/agent-browser/skills/agent-browser
-  - vercel-labs/agent-skills/skills/composition-patterns
-  - vercel-labs/agent-skills/skills/react-best-practices
-  - vercel-labs/agent-skills/skills/web-design-guidelines
-  - vercel-labs/skills/skills/find-skills
-  - apollographql/skills/skills/rust-best-practices
-  - gonta223/humanizer-ja
-  - softaworks/agent-toolkit/skills/humanizer
+    - jey3dayo/apm-workspace/catalog#main
+    - EpicenterHQ/epicenter/.agents/skills/tauri
+    - Heyvhuang/ship-faster/skills/cloudflare
+    - Heyvhuang/ship-faster/skills/tool-openclaw
+    - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand
+    - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-chat
+    - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-dashboard
+    - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-diff
+    - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-explain
+    - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-onboard
+    - anthropics/claude-code/plugins/frontend-design/skills/frontend-design
+    - benjitaylor/agentation/skills/agentation
+    - benjitaylor/agentation/skills/agentation-self-driving
+    - cloudflare/skills/skills/workers-best-practices
+    - cloudflare/skills/skills/wrangler
+    - ibelick/ui-skills/skills/baseline-ui
+    - ibelick/ui-skills/skills/fixing-accessibility
+    - ibelick/ui-skills/skills/fixing-metadata
+    - ibelick/ui-skills/skills/fixing-motion-performance
+    - jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
+    - millionco/react-doctor/skills/react-doctor
+    - mizchi/chezmoi-dotfiles/dot_claude/skills/empirical-prompt-tuning
+    - nyosegawa/skills/skills/skill-auditor
+    - obra/superpowers/skills/brainstorming
+    - obra/superpowers/skills/dispatching-parallel-agents
+    - obra/superpowers/skills/executing-plans
+    - obra/superpowers/skills/finishing-a-development-branch
+    - obra/superpowers/skills/receiving-code-review
+    - obra/superpowers/skills/requesting-code-review
+    - obra/superpowers/skills/subagent-driven-development
+    - obra/superpowers/skills/systematic-debugging
+    - obra/superpowers/skills/test-driven-development
+    - obra/superpowers/skills/using-git-worktrees
+    - obra/superpowers/skills/using-superpowers
+    - obra/superpowers/skills/verification-before-completion
+    - obra/superpowers/skills/writing-plans
+    - obra/superpowers/skills/writing-skills
+    - openai/codex-plugin-cc/plugins/codex/skills/codex-cli-runtime
+    - openai/codex-plugin-cc/plugins/codex/skills/codex-result-handling
+    - openai/codex-plugin-cc/plugins/codex/skills/gpt-5-4-prompting
+    - openai/skills/skills/.curated/gh-address-comments
+    - openai/skills/skills/.curated/gh-fix-ci
+    - openai/skills/skills/.system/skill-creator
+    - tokoroten/prompt-review/.claude/skills/prompt-review
+    - trailofbits/skills/plugins/agentic-actions-auditor/skills/agentic-actions-auditor
+    - trailofbits/skills/plugins/audit-context-building/skills/audit-context-building
+    - trailofbits/skills/plugins/sharp-edges/skills/sharp-edges
+    - trailofbits/skills/plugins/static-analysis/skills/codeql
+    - trailofbits/skills/plugins/static-analysis/skills/sarif-parsing
+    - trailofbits/skills/plugins/static-analysis/skills/semgrep
+    - trailofbits/skills/plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor
+    - vercel-labs/agent-browser/skills/agent-browser
+    - vercel-labs/agent-skills/skills/composition-patterns
+    - vercel-labs/agent-skills/skills/react-best-practices
+    - vercel-labs/agent-skills/skills/web-design-guidelines
+    - vercel-labs/skills/skills/find-skills
+    - apollographql/skills/skills/rust-best-practices
+    - gonta223/humanizer-ja
+    - softaworks/agent-toolkit/skills/humanizer
   mcp:
-  - name: context7
-    registry: false
-    transport: stdio
-    command: npx
-    args:
-    - -y
-    - '@upstash/context7-mcp@latest'
-  - name: chrome-devtools
-    registry: false
-    transport: stdio
-    command: npx
-    args:
-    - -y
-    - chrome-devtools-mcp@latest
-    - --browserUrl
-    - http://127.0.0.1:9222
-  - name: ultracite
-    registry: false
-    transport: stdio
-    command: npx
-    args:
-    - -y
-    - mcp-remote
-    - https://docs.ultracite.ai/mcp
-  - name: linear
-    registry: false
-    transport: http
-    url: https://mcp.linear.app/mcp
-  - name: mcp-simple-voicevox
-    registry: false
-    transport: stdio
-    command: npx
-    args:
-    - -y
-    - '@t09tanaka/mcp-simple-voicevox'
-  - name: tauri-mcp-server
-    registry: false
-    transport: stdio
-    command: npx
-    args:
-    - -y
-    - '@hypothesi/tauri-mcp-server'
-  - name: peekaboo
-    registry: false
-    transport: stdio
-    command: npx
-    args:
-    - -y
-    - '@steipete/peekaboo'
-    - mcp
+    - name: context7
+      registry: false
+      transport: stdio
+      command: npx
+      args:
+        - -y
+        - "@upstash/context7-mcp@latest"
+    - name: chrome-devtools
+      registry: false
+      transport: stdio
+      command: npx
+      args:
+        - -y
+        - chrome-devtools-mcp@latest
+        - --browserUrl
+        - http://127.0.0.1:9222
+    - name: ultracite
+      registry: false
+      transport: stdio
+      command: npx
+      args:
+        - -y
+        - mcp-remote
+        - https://docs.ultracite.ai/mcp
+    - name: linear
+      registry: false
+      transport: http
+      url: https://mcp.linear.app/mcp
+    - name: mcp-simple-voicevox
+      registry: false
+      transport: stdio
+      command: npx
+      args:
+        - -y
+        - "@t09tanaka/mcp-simple-voicevox"
+    - name: tauri-mcp-server
+      registry: false
+      transport: stdio
+      command: npx
+      args:
+        - -y
+        - "@hypothesi/tauri-mcp-server"
+    - name: peekaboo
+      registry: false
+      transport: stdio
+      command: npx
+      args:
+        - -y
+        - "@steipete/peekaboo"
+        - mcp
 scripts: {}
