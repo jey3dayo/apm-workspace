@@ -12,9 +12,9 @@ metadata:
 
 # Gemini System — Research & Multimodal Specialist
 
-## Gemini CLI (latest: Gemini 3 Pro/Flash, stable: Gemini 2.5 series) is your research specialist with 1M token context
+## Gemini CLI is your research specialist with large-context, grounded search, and multimodal support
 
-> **Detailed rules**: `.claude/rules/gemini-delegation.md`
+Model names move quickly. Prefer the configured default unless the task explicitly needs a specific model, and check official Gemini docs when exact model selection matters.
 
 ## Context Management (CRITICAL)
 
@@ -59,20 +59,37 @@ metadata:
 
 ### Recommended: Subagent Pattern
 
-### Use Task tool with `subagent_type='general-purpose'` to preserve main context
+### Use your platform's subagent mechanism to preserve main context
 
 ```
-Task tool parameters:
-- subagent_type: "general-purpose"
-- run_in_background: true (optional, for parallel work)
-- prompt: |
-    Research: {topic}
-
-    gemini -p "{research question}" 2>/dev/null
-
-    Save full output to: .claude/docs/research/{topic}.md
-    Return CONCISE summary (5-7 bullet points).
+Subagent prompt shape:
+- Research: {topic}
+- Run Gemini in non-interactive mode with an English prompt
+- Save reusable findings to a workspace-local path when persistence is useful
+- Return a concise summary (5-7 bullets) in the main assistant's language
 ```
+
+Codex:
+
+```text
+Use `spawn_agent` for the research worker, and have the worker run:
+gemini -p "{research question in English}" 2>/dev/null
+If the findings should be reusable, save them under `docs/research/{topic}.md`.
+In Codex workflows, do not use `.claude/...` as the default persistence path.
+```
+
+Claude Code:
+
+```text
+Use the Task tool for the research worker, and have the worker run:
+gemini -p "{research question in English}" 2>/dev/null
+```
+
+### Operational Readiness
+
+- If you plan to run Gemini locally, confirm the CLI is available and authenticated before promising Gemini-based research.
+- If Gemini is unavailable, report the blocker clearly instead of silently switching to a different research path.
+- When saving findings, use a short kebab-case topic slug such as `tanstack-query-best-practices`.
 
 ### Direct Call (Short Questions Only)
 
@@ -100,7 +117,7 @@ gemini -p "{question}" --output-format json 2>/dev/null
 1. Spawn subagent with Gemini research prompt
 2. Continue your work → Subagent runs in parallel
 3. Receive summary → Subagent returns key findings
-4. Full output saved → `.claude/docs/research/{topic}.md`
+4. Save full output only when later reuse is useful → prefer `docs/research/{topic}.md`
 
 ## Language Protocol
 
@@ -111,13 +128,19 @@ gemini -p "{question}" --output-format json 2>/dev/null
 
 ## Output Location
 
-Save Gemini research results to:
+When the research should be reusable, save Gemini results to a workspace-local path such as:
 
 ```
-.claude/docs/research/{topic}.md
+docs/research/{topic}.md
 ```
 
-This allows Claude and Codex to reference the research later.
+Codex default:
+
+- use `docs/research/{topic}.md`
+- keep the path inside the current workspace when possible
+- do not default to `.claude/...`
+
+If persistence is unnecessary, return the summary only.
 
 ## Task Templates
 
