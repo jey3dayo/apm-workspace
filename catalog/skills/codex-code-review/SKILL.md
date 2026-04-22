@@ -31,12 +31,17 @@ git status --porcelain
 >
 > **Resume 制約**: resume 時は `--sandbox` 指定不可（セッション元から継承）。`--full-auto`, `--all` 等は指定可能。プロンプトは stdin 経由で渡す。
 >
+> **When to skip resume**: このレビュー対象と同じ CWD / 同じ作業について Codex セッションを開始していない場合は、
+> `resume --last` を使わず fresh read-only exec から始める。
+>
 > **Error handling**: codex が非ゼロで終了した場合（resume / fresh exec 両方失敗）、
 > エラーを報告し、手動レビューにフォールバックする。
 
 #### Uncommitted Changes Mode
 
 ```bash
+UNSTAGED_DIFF=$(git diff)
+STAGED_DIFF=$(git diff --cached)
 REVIEW_PROMPT="
 Review the following uncommitted changes. Identify:
 1. Bugs or logic errors
@@ -49,18 +54,39 @@ Be specific and concise. Reference file paths and line numbers.
 Output JSON: {\"issues\": [{\"file\": \"...\", \"line\": N, \"severity\": \"critical|warning|info\", \"message\": \"...\"}], \"summary\": \"...\"}
 
 ---
-$(git diff HEAD)
-$(git diff --cached)
+## Unstaged changes
+${UNSTAGED_DIFF}
+
+## Staged changes
+${STAGED_DIFF}
 "
 
-echo "$REVIEW_PROMPT" | codex exec resume --last 2>/dev/null || \
-codex exec --sandbox read-only "$REVIEW_PROMPT" 2>/dev/null
+RAW_OUTPUT=$(echo "$REVIEW_PROMPT" | codex exec resume --last 2>/dev/null)
+RESUME_STATUS=$?
+
+# resume --last can pick up stale context. If output is empty or clearly unrelated,
+# retry once with a fresh read-only exec before evaluating the result.
+if [ $RESUME_STATUS -ne 0 ] || [ -z "$RAW_OUTPUT" ]; then
+  RAW_OUTPUT=$(codex exec --sandbox read-only "$REVIEW_PROMPT" 2>/dev/null)
+fi
+
+echo "$RAW_OUTPUT"
 ```
 
 #### Branch Diff Mode
 
 ```bash
-BASE=$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|^origin/||'); BASE=${BASE:-main}
+BASE=$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|^origin/||')
+if [ -z "$BASE" ]; then
+  if git rev-parse --verify main >/dev/null 2>&1; then
+    BASE=main
+  elif git rev-parse --verify master >/dev/null 2>&1; then
+    BASE=master
+  else
+    echo "Could not determine base branch" >&2
+    exit 1
+  fi
+fi
 
 REVIEW_PROMPT="
 Review the following branch changes against ${BASE}. Identify:
@@ -77,19 +103,34 @@ Output JSON: {\"issues\": [{\"file\": \"...\", \"line\": N, \"severity\": \"crit
 $(git diff ${BASE}...HEAD)
 "
 
-echo "$REVIEW_PROMPT" | codex exec resume --last 2>/dev/null || \
-codex exec --sandbox read-only "$REVIEW_PROMPT" 2>/dev/null
+RAW_OUTPUT=$(echo "$REVIEW_PROMPT" | codex exec resume --last 2>/dev/null)
+RESUME_STATUS=$?
+
+if [ $RESUME_STATUS -ne 0 ] || [ -z "$RAW_OUTPUT" ]; then
+  RAW_OUTPUT=$(codex exec --sandbox read-only "$REVIEW_PROMPT" 2>/dev/null)
+fi
+
+echo "$RAW_OUTPUT"
 ```
 
 ### 3. Extract Results
 
 ```bash
-# Extract issues from JSON output
-echo '<codex output>' | jq '.issues'
+RAW_OUTPUT='<codex output>'
+
+if ! echo "$RAW_OUTPUT" | jq -e '.issues and .summary' >/dev/null 2>&1; then
+  echo "Codex output was not valid JSON; switch to manual review." >&2
+  echo "$RAW_OUTPUT"
+  exit 1
+fi
+
+echo "$RAW_OUTPUT" | jq '.issues'
 ```
 
 ### 4. Evaluate and Respond
 
+- `resume --last` was skipped, failed, or returned empty output → rerun once with a fresh read-only exec
+- JSON parse failed / output clearly unrelated to current diff → report the raw output and fall back to manual review
 - Critical issues found → Read the affected file and apply fixes with Edit
 - Warnings only → Share with user and confirm whether to fix
 - Info only / no issues → Report review complete

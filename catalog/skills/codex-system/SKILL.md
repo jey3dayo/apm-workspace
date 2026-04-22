@@ -1,11 +1,10 @@
 ---
 name: codex-system
 description: |
-  PROACTIVELY consult Codex CLI, your highly capable supporter with exceptional
-  reasoning and task completion abilities. Codex is a trusted expert you should
-  ALWAYS consult BEFORE making decisions on: design choices, implementation
-  approaches, debugging strategies, refactoring plans, or any non-trivial problem.
-  When uncertain, consult Codex. Don't hesitate - Codex provides better analysis.
+  Consult Codex CLI for non-trivial decisions when the local answer is uncertain,
+  trade-off heavy, or worth a second opinion. Use it for design choices,
+  implementation approaches, debugging strategies, refactoring plans, and code review.
+  Do not consult for obvious single-step edits or rote execution.
   Explicit triggers: "think deeper", "analyze", "second opinion", "consult codex".
 metadata:
   short-description: Claude Code ↔ Codex CLI collaboration
@@ -13,21 +12,22 @@ metadata:
 
 # Codex System — Deep Reasoning Partner
 
-## Codex CLI is your highly capable supporter for deep reasoning tasks
+## Codex CLI is your deep-reasoning fallback for non-trivial decisions
 
-> **Detailed rules**: `.claude/rules/codex-delegation.md`
+This skill is self-contained. If an external delegation rule file is missing,
+follow the guidance in this file and the local `references/` templates only.
 
 ## Context Management (CRITICAL)
 
-### Prefer Subagent Pattern
+### Prefer a Fresh Subagent When the Runtime Supports It
 
-| Situation                              | Method                     |
-| -------------------------------------- | -------------------------- |
-| Detailed design consultation           | Via subagent (recommended) |
-| Debug analysis                         | Via subagent (recommended) |
-| Short questions (1-2 sentence answers) | Direct call OK             |
+| Situation                              | Method                       |
+| -------------------------------------- | ---------------------------- |
+| Detailed design consultation           | Fresh subagent (recommended) |
+| Debug analysis                         | Fresh subagent (recommended) |
+| Short questions (1-2 sentence answers) | Direct call OK               |
 
-## When to Consult (MUST)
+## When to Consult
 
 | Situation              | Trigger Examples                       |
 | ---------------------- | -------------------------------------- |
@@ -47,23 +47,31 @@ metadata:
 
 ## How to Consult
 
-### Recommended: Subagent Pattern
+### Recommended: Fresh Subagent Pattern
 
-### Use Task tool with `subagent_type='general-purpose'` to preserve main context
+Use a fresh subagent when your runtime provides one. Keep the main thread focused
+on the current task and let the subagent return a concise recommendation.
 
 ```
-Task tool parameters:
-- subagent_type: "general-purpose"
-- run_in_background: true (optional, for parallel work)
-- prompt: |
-    Consult Codex about: {topic}
+Subagent prompt:
+Consult Codex about: {topic}
 
-    codex exec --sandbox read-only "
-    {question for Codex}
-    " 2>/dev/null
+Run:
+codex exec --sandbox read-only "
+{question for Codex}
+" 2>/dev/null
 
-    Return CONCISE summary (key recommendation + rationale).
+Return a concise summary:
+- recommendation
+- rationale
+- risks / alternatives
 ```
+
+Runtime note:
+
+- Claude Code: use its Task/subagent facility if available
+- Codex desktop/app runtimes: use the runtime's fresh agent / `spawn_agent` equivalent if available
+- If no subagent facility exists, use the direct-call path below
 
 ### Direct Call (Short Questions Only)
 
@@ -75,17 +83,18 @@ codex exec --sandbox read-only "Brief question" 2>/dev/null
 
 ### Workflow (Subagent)
 
-1. Spawn subagent with Codex consultation prompt
+1. Start a fresh subagent for this consultation
 2. Continue your work → Subagent runs in parallel
 3. Receive summary → Subagent returns concise insights
 
 ### Session Continuity
 
-Codex セッションは CWD 単位で保存される。
-review スキル（`codex-code-review`, `codex-plan-review`）は自動的に
-`resume --last` を試み、先行する相談セッションのコンテキストを引き継ぐ。
+Codex sessions are stored per CWD.
+The review skills (`codex-code-review`, `codex-plan-review`) can use
+`resume --last` to inherit context from a prior Codex consultation in the same CWD.
 
-手動操作は不要。codex-system で設計相談 → review スキル起動で自動的に文脈が接続される。
+If there was no prior consultation for the same task in the same CWD,
+start fresh instead of resuming.
 
 ### Quick Reference
 
@@ -101,7 +110,7 @@ review スキル（`codex-code-review`, `codex-plan-review`）は自動的に
 
 1. Ask Codex in **English**
 2. Receive response in **English**
-3. Execute based on advice (or let Codex execute)
+3. Execute based on advice (or let Codex execute if that path was chosen intentionally)
 4. Report to user in **their preferred language**
 
 ## Task Templates
@@ -139,11 +148,11 @@ Analyze root cause and suggest fixes.
 
 ### Code Review
 
-See: `references/code-review-task.md`
+Use `references/code-review-task.md` if it exists; otherwise use the inline review framing above.
 
 ### Refactoring
 
-See: `references/refactoring-task.md`
+Use `references/refactoring-task.md` if it exists; otherwise adapt the direct-call template above.
 
 ## Integration with Gemini
 
@@ -153,9 +162,8 @@ See: `references/refactoring-task.md`
 | Design decision     | Codex directly                   |
 | Library comparison  | Gemini research → Codex decision |
 
-## Why Codex?
+## Selection Rule
 
-- Deep reasoning: Complex analysis and problem-solving
-- Code expertise: Implementation strategies and patterns
-- Consistency: Same project context via `context-loader` skill
-- Parallel work: Background execution keeps you productive
+- Fresh subagent: choose for design, debugging, trade-off analysis, and other consultations where you want a concise sidecar answer
+- Direct call: choose for short questions expecting a 1-2 sentence answer
+- No consultation: choose for typo fixes, rote edits, explicit user instructions with an obvious path, and routine git/test/lint work
