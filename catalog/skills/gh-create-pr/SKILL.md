@@ -19,16 +19,20 @@ PRテンプレートを読んでプルリクエストを作成するスキル。
 以下の順序でPRテンプレートを検索する:
 
 1. `.github/PULL_REQUEST_TEMPLATE.md`
-2. `.github/PULL_REQUEST_TEMPLATE/*.md`（複数ある場合はユーザーに選択を求める）
+2. `.github/PULL_REQUEST_TEMPLATE/*.md`
+   - 複数ある場合は、まず `default.md` を優先する
+   - `default.md` が無ければ、ユーザー指定テンプレートを使う
+   - ユーザー指定が無ければ、最初の汎用テンプレートを選び、その選択を短く報告する
 3. `PULL_REQUEST_TEMPLATE.md`
 4. テンプレートが見つからない場合は最小限のデフォルト構造を使用
 
 ### Step 2: 変更内容の把握
 
 ```bash
-# ベースブランチとの差分を確認
-git log main..HEAD --oneline
-git diff main..HEAD --stat
+# ベースブランチを解決して差分を確認
+BASE_BRANCH="$(gh repo view --json defaultBranchRef -q .defaultBranchRef.name 2>/dev/null || git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')"
+git log "${BASE_BRANCH}"..HEAD --oneline
+git diff "${BASE_BRANCH}"..HEAD --stat
 ```
 
 - コミット一覧とファイル変更の概要を把握する
@@ -48,12 +52,10 @@ git diff main..HEAD --stat
 
 ```bash
 # タイトルは最初のコミットメッセージまたは変更内容から生成
+# 本文は一時ファイルに書いて --body-file で渡す
 gh pr create \
   --title "<生成したタイトル>" \
-  --body "$(cat <<'EOF'
-<記入済みテンプレート>
-EOF
-)"
+  --body-file "<記入済みテンプレートファイル>"
 ```
 
 - `--draft` は明示的に指定された場合のみ付与
@@ -68,4 +70,4 @@ EOF
 
 - 既存PRが存在する場合は警告してユーザーに確認を求める（`gh pr list --head <branch>` で確認）
 - `gh` CLIが未認証の場合は `gh auth login` を案内する
-- テンプレートが複数ある場合はユーザーに選択を求める
+- テンプレートが複数ある場合は `default.md` を優先し、既定選択を短く報告する
