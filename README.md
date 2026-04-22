@@ -11,8 +11,8 @@ Current `apm` CLI source is pinned through `mise` to `github:jey3dayo/apm@v0.8.1
 - `apm.yml`: global dependency manifest for user-scope skill rollout
 - `apm.lock.yaml`: resolved commits and install state captured by APM
 - `apm_modules/`: downloaded dependency sources; cache only, not an editing surface
-- `catalog/`: tracked runtime guidance package for shared assets (`AGENTS.md`, `agents/`, `commands/`, `rules/`)
-- `src/`: authoring source for your personal assets
+- `catalog/`: tracked runtime guidance package for shared assets (`AGENTS.md`, `agents/`, `commands/`, `rules/`) plus managed personal skills under `catalog/skills/`
+- `manual-skills/`: copied skills that are kept outside the managed APM lane and distributed separately when needed
 - `mise.toml`: workspace-local tasks for install, migration, verification, and repair
 - `tests/`: Pester coverage for the workspace helpers
 
@@ -23,11 +23,13 @@ Authoring and deployment are split:
 - Personal skills: `~/.apm/catalog/skills/<id>/`
 - External skills: command-managed entries in `~/.apm/apm.yml` and `~/.apm/apm.lock.yaml`
 - Shared guidance: `~/.apm/catalog/AGENTS.md`, `agents/**`, `commands/**`, `rules/**`
-
-The layout difference between `src/` and `catalog/` is intentional.
+- Manual-only copied skills:
+  - content: `~/.apm/manual-skills/.apm/skills/<skill-id>/`
+  - provenance notes: `~/.apm/manual-skills/upstreams/**`
 
 - `catalog/skills/**` is the authoring surface for your personal assets.
 - external skills are managed with `apm install` / `apm uninstall`, recorded in `apm.yml` / `apm.lock.yaml`, and resolved into `apm_modules/`.
+- `manual-skills/**` is for copied skills that APM cannot manage cleanly. They are not part of the default `apply` / `doctor` managed lane.
 - `~/.config/nix/agent-skills-sources.nix` is retired and intentionally empty; it is not an active source of truth.
 - `catalog/**` remains the tracked runtime guidance package for shared assets synced into target roots.
 
@@ -53,6 +55,10 @@ This is the only documented exception that reaches into `~/.config`. All other d
 
 - Personal skills
   - edit `~/.apm/catalog/skills/<id>/`
+- Manual-only copied skills
+  - edit `~/.apm/manual-skills/.apm/skills/<skill-id>/`
+  - keep them out of `apm.yml`
+  - distribute them separately from the default managed rollout
 - External skills
   - add with `apm install <package-ref>`
   - remove with `apm uninstall <package-ref>`
@@ -97,6 +103,13 @@ When external skills change:
 3. Run `mise run apply` when you want to deploy the current manifest and lock without accepting new upstream content.
 4. Run `mise run doctor` to verify the deployed state.
 5. Use `mise run sync` only when you intentionally want to refresh upstream dependency content.
+
+When a copied skill lives under `~/.apm/manual-skills/`:
+
+1. Treat it as a manually curated copy from upstream.
+2. Do not add it to the root `apm.yml`.
+3. Keep provenance in the repo-local README for that copied source.
+4. Distribute it explicitly, for example with the standalone package ref `jey3dayo/apm-workspace/manual-skills`.
 
 Task semantics:
 

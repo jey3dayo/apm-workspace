@@ -11,8 +11,8 @@ This workspace owns the global APM manifest, the lockfile, the downloaded depend
 - `apm.yml`: global dependency manifest for user-scope rollout
 - `apm.lock.yaml`: resolved commits and install state captured by APM
 - `apm_modules/`: downloaded upstream sources; cache only, not an editing surface
-- `catalog/`: shared runtime guidance package for AGENTS, agents, commands, and rules
-- `src/`: personal authoring source
+- `catalog/`: shared runtime guidance package for AGENTS, agents, commands, rules, and managed personal skills under `catalog/skills/`
+- `manual-skills/`: copied skills kept outside the managed APM lane and distributed separately when needed
 - `mise.toml`: workspace-local tasks for install, migration, validation, and repair
 - `tests/`: Pester coverage for workspace helpers
 
@@ -22,6 +22,9 @@ Workspace assets are split by role.
 
 - Personal skills
   - source: `~/.apm/catalog/skills/<id>/`
+- Manual-only copied skills
+  - source: `~/.apm/manual-skills/.apm/skills/<skill-id>/`
+  - provenance: `~/.apm/manual-skills/upstreams/**`
 - Shared guidance
   - source: `~/.apm/catalog/AGENTS.md`
   - source: `~/.apm/catalog/agents/**`
@@ -32,6 +35,7 @@ The tracked layout is intentionally asymmetric:
 
 - `catalog/skills/**` is the authoring layer for personal assets.
 - external skills stay visible in `apm.yml` / `apm.lock.yaml` as command-managed upstream refs.
+- `manual-skills/**` is for copied skills that are not part of the default `apply` / `doctor` managed lane.
 - `commands/**` stay top-level inside `catalog/**` because they are synced into runtime targets as shared guidance, not installed as nested skill packages.
 
 Shared runtime guidance is published through the catalog ref in `apm.yml`:
@@ -48,7 +52,7 @@ jey3dayo/apm-workspace/catalog#main
 - Do not reintroduce `./packages/*` or `~/.apm/skills/` as alternate editing surfaces for managed global skills.
 - Keep `~/.config/scripts/replace-bold-headings.ts` available as the one allowed script exception.
 - Keep `apm.yml` on upstream refs, especially `jey3dayo/apm-workspace/catalog#main`.
-- Keep personal source in `~/.apm/src/**` and runtime guidance in `~/.apm/catalog/**`.
+- Keep managed personal source in `~/.apm/catalog/skills/**`, manual copied skills in `~/.apm/manual-skills/**`, and runtime guidance in `~/.apm/catalog/**`.
 - Treat Codex as split output: compile target plus separate skill deployment.
 - The current script path is `apm compile --target codex --output ~/.codex/AGENTS.md`.
 - Codex skills are deployed through `~/.agents/skills`.
@@ -65,6 +69,9 @@ jey3dayo/apm-workspace/catalog#main
 
 - Personal skills
   - edit `catalog/skills/**`
+- Manual-only copied skills
+  - edit `manual-skills/**`
+  - keep them out of the root `apm.yml`
 - External skills
   - use `apm install <package-ref>` to add
   - use `apm uninstall <package-ref>` to remove
@@ -100,6 +107,13 @@ When shared runtime guidance changes under `~/.apm/catalog/`:
    - target lines show `config=present agents=present commands=present rules=present`
 
 If old package ownership from a previous install state is still hanging around, run `apm prune` once before re-applying.
+
+When a copied skill lives under `~/.apm/manual-skills/`:
+
+1. Treat it as a manually curated copy from upstream.
+2. Do not add it to the root `apm.yml`.
+3. Keep provenance in the copied source README.
+4. Distribute it explicitly, for example with the standalone package ref `jey3dayo/apm-workspace/manual-skills`.
 
 ## Useful Maintenance Commands
 
