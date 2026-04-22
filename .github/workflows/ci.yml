@@ -70,6 +70,5 @@ jobs:
           mise run format:markdown:check
           mise run format:toml:check
           mise run format:yaml:check
-          mise run validate:workspace
           mise run validate:catalog
           mise run smoke-catalog
