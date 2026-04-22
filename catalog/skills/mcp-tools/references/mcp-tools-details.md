@@ -238,7 +238,7 @@ security add-generic-password -a $USER -s mysql_password -w "melody"
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "/Users/username/projects"
+        "<home-dir>/projects"
       ]
     },
     "github": {

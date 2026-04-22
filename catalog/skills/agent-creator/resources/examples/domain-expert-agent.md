@@ -4,7 +4,7 @@
 
 ## 参照元
 
-`/Users/t00114/.claude/agents/code-reviewer.md`
+`~/.claude/agents/code-reviewer.md`
 
 ## パターン特徴
 

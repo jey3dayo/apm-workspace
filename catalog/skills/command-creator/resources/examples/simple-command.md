@@ -4,7 +4,7 @@
 
 ## 参照元
 
-`/Users/t00114/.claude/commands/find-todos.md`
+`~/.claude/commands/find-todos.md`
 
 ## パターン特徴
 

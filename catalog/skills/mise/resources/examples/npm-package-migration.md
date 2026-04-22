@@ -233,7 +233,7 @@ npm:textlint    14.3.0
 ...
 
 $ which prettier
-/Users/username/.local/share/mise/installs/npm-prettierd/0.25.0/bin/prettier
+<home-dir>/.local/share/mise/installs/npm-prettierd/0.25.0/bin/prettier
 ```
 
 ### Step 5: Update Documentation

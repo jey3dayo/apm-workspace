@@ -313,7 +313,7 @@ op item create \
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "/Users/username" // ホームディレクトリ全体
+        "<home-dir>" // ホームディレクトリ全体
       ]
     }
   }
@@ -329,14 +329,14 @@ op item create \
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "/Users/username/projects" // プロジェクトディレクトリのみ
+        "<home-dir>/projects" // プロジェクトディレクトリのみ
       ]
     },
     "filesystem-docs": {
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "/Users/username/documents" // ドキュメントディレクトリのみ
+        "<home-dir>/documents" // ドキュメントディレクトリのみ
       ]
     }
   }

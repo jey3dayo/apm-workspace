@@ -4,7 +4,7 @@
 
 ## 参照元
 
-`/Users/t00114/.claude/commands/refactor.md`
+`~/.claude/commands/refactor.md`
 
 ## パターン特徴
 

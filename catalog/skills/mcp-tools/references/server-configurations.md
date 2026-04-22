@@ -116,7 +116,7 @@ Claude: 「Reactを使用しています」
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "/Users/username/projects"
+        "<home-dir>/projects"
       ]
     },
     "filesystem-docs": {
@@ -124,7 +124,7 @@ Claude: 「Reactを使用しています」
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "/Users/username/documents"
+        "<home-dir>/documents"
       ]
     }
   }
@@ -789,7 +789,7 @@ uv pip install wcgw
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "/Users/username/projects"
+        "<home-dir>/projects"
       ]
     },
     "git": {
@@ -828,7 +828,7 @@ uv pip install wcgw
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "/Users/username/web-projects"
+        "<home-dir>/web-projects"
       ]
     },
     "github": {

@@ -4,7 +4,7 @@
 
 ## 参照元
 
-`/Users/t00114/.claude/skills/cygate-api/SKILL.md`
+`~/.claude/skills/cygate-api/SKILL.md`
 
 ## パターン特徴
 

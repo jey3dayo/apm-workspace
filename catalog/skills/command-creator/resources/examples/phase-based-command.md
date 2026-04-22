@@ -4,7 +4,7 @@
 
 ## 参照元
 
-`/Users/t00114/.claude/commands/review.md`
+`~/.claude/commands/review.md`
 
 ## パターン特徴
 

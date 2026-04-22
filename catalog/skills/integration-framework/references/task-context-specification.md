@@ -252,7 +252,7 @@ const context: TaskContext = {
   source: "agent-delegation",
 
   project: {
-    root: "/Users/username/project",
+    root: "<project-root>",
     type: ProjectType.TypeScriptReact,
     stack: [
       { name: "TypeScript", version: "5.0.0", category: TechCategory.Language },
@@ -284,7 +284,7 @@ const context: TaskContext = {
   },
 
   execution: {
-    workingDirectory: "/Users/username/project",
+    workingDirectory: "<project-root>",
     targetFiles: ["src/components/Header.tsx"],
     gitStatus: {
       branch: "main",
@@ -300,7 +300,7 @@ const context: TaskContext = {
       nodeVersion: "20.0.0",
       npmVersion: "10.0.0",
       shell: "zsh",
-      cwd: "/Users/username/project",
+      cwd: "<project-root>",
       env: process.env,
     },
   },

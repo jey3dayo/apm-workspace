@@ -4,7 +4,7 @@
 
 ## 参照元
 
-`/Users/t00114/.claude/agents/kiro/validate-design.md`
+`~/.claude/agents/kiro/validate-design.md`
 
 ## パターン特徴
 
