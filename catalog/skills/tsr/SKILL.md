@@ -34,8 +34,10 @@ Detailed config, examples, and migration notes already live in `examples/`, `REA
 
 ## Minimal Workflow
 
+Run the skill-local config loader first. Resolve `config-loader.ts` from the installed `tsr` skill directory instead of hard-coding a user-specific home path.
+
 ```bash
-node /Users/t00114/.apm/catalog/skills/tsr/config-loader.ts
+node <installed-tsr-skill-dir>/config-loader.ts
 pnpm tsr:check > /tmp/tsr-report.txt
 pnpm tsr:fix
 ```

@@ -11,7 +11,7 @@ Use RTK to compress noisy CLI output before it reaches the model context window.
 
 Rule of thumb: external commands are `rtk` by default; shell builtins and session-state changes stay raw.
 
-Read `references/command-reference.md` when you need the detailed command families, install options, or this repository's integration points.
+Read `references/command-reference.md` when you need the detailed command families, install options, or repository-specific override patterns.
 
 ## Quick Workflow
 
@@ -78,22 +78,14 @@ Project-local filters live in `.rtk/filters.toml`. Update filters when:
 
 Keep filters conservative. Remove repeated noise, not real errors.
 
-## This Repository
+## Repository Overrides
 
-In this repository:
+When the current repository already documents RTK usage, treat that local guidance as authoritative for rollout and maintenance details.
 
-- RTK itself is already declared in `mise/config.default.toml` and `mise/config.windows.toml`
-- Project-local RTK filters live in `.rtk/filters.toml`
-- The personal RTK skill for this workspace lives under `~/.apm/catalog/skills/rtk/`
-- Start by checking `.rtk/filters.toml` before adding new filter behavior
-
-For this repo, validate and roll out RTK catalog changes with the current workspace tasks:
-
-- `mise run validate:catalog`
-- `mise run stage-catalog`
-- `mise run apply`
-
-Do not add a new `mise` task unless the existing distribution flow cannot pick the skill up.
+- Check `.rtk/filters.toml` before adding new filter behavior
+- If the repository already declares RTK in its toolchain, install or update it through that existing path instead of inventing a new one
+- If the repository has task docs or rollout commands for RTK-related changes, follow those local instructions rather than hardcoding one workspace's maintenance flow here
+- Do not add a new task runner command unless the existing repository workflow cannot pick the change up
 
 ## Example
 

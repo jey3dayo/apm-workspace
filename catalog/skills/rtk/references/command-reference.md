@@ -61,14 +61,8 @@ Bad filter candidates:
 
 ## Repository Notes
 
-In this repository:
+Repository-specific rollout should come from the current repository's own docs and task definitions.
 
-- `mise/config.default.toml` and `mise/config.windows.toml` already declare `rtk = "latest"`
 - `.rtk/filters.toml` is the project-local override point
-- The personal RTK skill for this workspace lives under `~/.apm/catalog/skills/rtk/`
-
-Useful commands here:
-
-- `mise run validate:catalog`
-- `mise run stage-catalog`
-- `mise run apply`
+- If RTK is already declared in the repository's toolchain, prefer that existing install path
+- If the repository has dedicated RTK rollout or validation tasks, follow those local commands instead of assuming one global maintenance workflow

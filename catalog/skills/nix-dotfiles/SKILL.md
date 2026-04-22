@@ -77,7 +77,7 @@ home-manager switch --generation <N>
 
 ```bash
 # Integrated diagnostic script
-~/.apm/catalog/skills/nix-dotfiles/scripts/diagnose.sh
+<installed-nix-dotfiles-skill-dir>/scripts/diagnose.sh
 
 # Individual checks
 readlink ~/.claude/skills
@@ -286,7 +286,7 @@ ls -la ~/.claude/skills/ | rg '<skill-name>'
 ### Integrated Diagnostic Script
 
 ```bash
-~/.apm/catalog/skills/nix-dotfiles/scripts/diagnose.sh
+<installed-nix-dotfiles-skill-dir>/scripts/diagnose.sh
 ```
 
 ### Check Items
@@ -364,7 +364,7 @@ nix flake metadata ~/.config | rg '(openai-skills|vercel)'
 ### Quick Diagnostics
 
 ```bash
-~/.apm/catalog/skills/nix-dotfiles/scripts/diagnose.sh
+<installed-nix-dotfiles-skill-dir>/scripts/diagnose.sh
 ```
 
 ### Causes and Fixes
@@ -564,7 +564,7 @@ Integrated diagnostic script. Performs 4 checks:
 ### Run
 
 ```bash
-~/.apm/catalog/skills/nix-dotfiles/scripts/diagnose.sh
+<installed-nix-dotfiles-skill-dir>/scripts/diagnose.sh
 ```
 
 ### Output Format
