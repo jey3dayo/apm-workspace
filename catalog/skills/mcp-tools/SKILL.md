@@ -1,88 +1,74 @@
 ---
 name: mcp-tools
-description: |
-  [What] MCP (Model Context Protocol) server setup and security guide. Provides configuration file locations, major server installation, environment variable management, troubleshooting, and security best practices. Activates when configuring MCP servers, integrating external tools, or addressing security concerns.
-  [When] Use when: setting up MCP servers for the first time, adding new MCP servers, locating configuration files, managing environment variables and tokens securely, troubleshooting MCP server startup issues, or reviewing security best practices.
-  [Keywords] mcp tools, MCP, Model, Context, Protocol
+description: Use when setting up, reviewing, or troubleshooting MCP servers, especially for config file locations, transport choices, credential handling, or startup failures.
 ---
 
 # MCP Tools
 
-MCP (Model Context Protocol) server setup and security guide. Enables secure integration with external tools.
-
 ## Overview
 
-MCP (Model Context Protocol) is the protocol Claude Code uses to integrate with external tools and services. This skill provides guidance on configuring MCP servers, using major servers, and securely managing sensitive information.
+This skill is for MCP server wiring, not for using a specific downstream tool. Start by locating the real config file and deciding whether the task is setup, diagnosis, or credential review.
+
+Read `references/mcp-tools-details.md` for fuller setup examples, `references/server-configurations.md` for server patterns, and `references/security-and-credentials.md` when secrets or token handling are in scope.
 
 ## When to Use
 
-This skill is activated in the following cases:
+- MCP server を初回セットアップしたい
+- 設定ファイルの場所を確認したい
+- transport や command / args の書き方を見直したい
+- MCP server が起動しない原因を切り分けたい
+- API key や token の安全な置き場所を確認したい
 
-- Setting up an MCP server for the first time
-- Adding a new MCP server
-- Not sure where the configuration file is located
-- Wanting to know how to securely manage environment variables and tokens
-- MCP server won't start (troubleshooting)
-- Reviewing security best practices
+使わない場面:
 
-## Trigger Keywords
+- 特定アプリの使い方そのものだけを知りたい
+- MCP ではない一般的な CLI 導入だけをしたい
 
-### Japanese
+## First Pass
 
-- "MCP", "MCPサーバー", "MCP設定"
-- "claude_desktop_config.json", "設定ファイル"
-- "外部ツール統合", "GitHub統合", "データベース統合"
-- "環境変数", "APIキー", "トークン管理"
+1. 対象が `Claude Desktop` `Codex` `他のクライアント` のどれか確定する
+2. 実際に読まれる config file の場所を確認する
+3. server ごとに `transport` `command/url` `args/env` を分けて確認する
+4. secret を config 直書きせず、環境変数や安全な注入方法に寄せる
+5. 起動失敗なら config 構文、実行コマンド、権限、依存バイナリの順で切り分ける
 
-### English
+## Common Tasks
 
-- "MCP", "MCP server", "MCP setup", "MCP configuration"
-- "claude_desktop_config.json", "config file"
-- "external tool integration", "GitHub integration"
-- "environment variables", "API key", "token management"
+### Add A Server
 
-## Quick Start
+- config file に server entry を追加する
+- `stdio` なら `command` と `args` を、`http` なら `url` を確認する
+- 再起動後にクライアント側の MCP server 一覧で認識を確認する
 
-### Configuration File Locations
+### Diagnose Startup Failure
 
-```bash
-# macOS
-~/Library/Application Support/Claude/claude_desktop_config.json
+- 実行ファイルが見つかるか
+- `args` がその server に合っているか
+- 必須 env が欠けていないか
+- config JSON/TOML の構文が壊れていないか
 
-# Windows
-%APPDATA%\Claude\claude_desktop_config.json
+### Review Credentials
 
-# Linux
-~/.config/Claude/claude_desktop_config.json
-```
+- token を repo や共有 config に直書きしない
+- スコープを最小にする
+- 不要になった credential を放置しない
 
-### Basic Setup Steps
+## Security Rules
 
-```bash
-# 1. Quit Claude Desktop
-osascript -e 'quit app "Claude"'
+- secret は最初から「漏れる前提」で最小権限にする
+- ローカル開発用 token と本番用 token を分ける
+- third-party server は install 前に配布元と実行コマンドを確認する
+- troubleshooting 中でも秘密情報をログに出さない
 
-# 2. Edit the configuration file
-code ~/Library/Application\ Support/Claude/claude_desktop_config.json
+## Common Mistakes
 
-# 3. Add MCP server (see below)
+- 実際には別クライアントの config を編集している
+- `stdio` server の失敗を network 問題だと誤認する
+- `command` は正しいが依存 runtime が未インストール
+- 設定確認より先に token 再発行を繰り返す
 
-# 4. Restart Claude Desktop
-open -a Claude
-
-# 5. Verify in Settings → Developer → MCP Servers
-```
-
-## Detailed Reference
-
-- For major servers, security, integration examples, troubleshooting, and usage examples, see `references/mcp-tools-details.md`
-
-## Next Steps
-
-1. Run through the quick start
-2. Select and install the necessary servers
-3. Review security settings
-
-## Related Resources
+## References
 
 - `references/mcp-tools-details.md`
+- `references/server-configurations.md`
+- `references/security-and-credentials.md`

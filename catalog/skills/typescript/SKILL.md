@@ -1,188 +1,77 @@
 ---
 name: typescript
-description: |
-  [What] Specialized skill for reviewing TypeScript projects. Evaluates type safety, TypeScript best practices, type definitions, and compiler options. Provides detailed assessment of any type usage, type assertions, strict mode compliance, and performance considerations
-  [When] Use when: users mention "TypeScript", "TS", "type checking", "type safety", "type error", work with .ts/.tsx files or tsconfig.json, or discuss TypeScript compilation issues
-  [Keywords] TypeScript, TS, type checking, type safety, type error
+description: Use when reviewing or improving TypeScript code or configuration, especially for strict mode, `any` removal, type assertions, narrowing, or tsconfig-based diagnosis.
 ---
 
 # TypeScript Project Review
 
 ## Overview
 
-This skill provides specialized review guidance for TypeScript projects, focusing on type safety, best practices, and effective use of TypeScript's type system. It orchestrates Context7 MCP for generic TypeScript documentation while enforcing project-specific type safety policies.
+Start from compiler settings, then move to `any`, assertions, and narrowing. This skill is for project-specific review and repair decisions, not for re-explaining the TypeScript handbook.
 
-## Context7 Integration
+Use `references/type-safety-patterns.md` when you need concrete replacement patterns after finding an unsafe area.
 
-### Generic TypeScript Documentation
+## When to Use
 
-Delegate generic TypeScript questions to Context7 MCP with library ID `/websites/typescriptlang` or `/microsoft/typescript`:
+- TypeScript の型安全性をレビューしたい
+- `any` や unsafe assertion を減らしたい
+- `tsconfig.json` の strictness を見直したい
+- 型エラーの原因が設計か narrow 不足かを切り分けたい
+- TypeScript 前提の review 基準をそろえたい
 
-### Type Guards and Unknown
+使わない場面:
 
-```
-Query: "TypeScript type guards unknown types implementation"
-Result: typeof, instanceof, user-defined type predicates
-```
+- JavaScript 一般論だけで足りる
+- 特定ライブラリの API 仕様だけを調べたい
 
-### Generics and Constraints
+## First Pass
 
-```
-Query: "TypeScript generics type constraints examples"
-Result: Generic type parameters, extends keyword, default types
-```
+1. `tsconfig.json` で strict 系オプションを確認する
+2. `any` と type assertion を横断で洗う
+3. `unknown` からの narrowing と user-defined guards を確認する
+4. エラー処理が型で表現されているかを見る
+5. 型の重複や surface 設計の崩れを最後に見る
 
-### Union and Intersection Types
+## Review Areas
 
-```
-Query: "TypeScript discriminated unions intersection types"
-Result: Union type narrowing, tagged unions, type composition
-```
+### 1. Compiler Configuration
 
-### Utility Types
+- `strict` 系が有効か
+- lint と compiler のルールが矛盾していないか
+- type-only import や build 設定に無駄がないか
 
-```
-Query: "TypeScript utility types Partial Pick Omit Record"
-Result: Built-in utility types for type transformations
-```
+### 2. Unsafe Types
 
-### tsconfig.json Options
+- `any` が本当に必要か
+- assertion で問題を隠していないか
+- `unknown` と narrow で代替できないか
 
-```
-Query: "TypeScript strict mode compiler options configuration"
-Result: strict, noImplicitAny, strictNullChecks, etc.
-```
+### 3. Type Surfaces
 
-### Performance Optimization
+- interface / type alias の責務が明確か
+- generic 制約が緩すぎないか
+- union が discriminated になっているか
 
-```
-Query: "TypeScript compilation performance bundle size optimization"
-Result: type-only imports, tree shaking, build performance
-```
+### 4. Error Handling
 
-### When to Use Context7
+- 失敗状態が型に出ているか
+- optional / nullable の扱いが曖昧でないか
+- guard なしで危険なプロパティアクセスをしていないか
 
-- ✅ Generic TypeScript syntax and features
-- ✅ Compiler options explanations
-- ✅ Built-in utility types
-- ✅ Standard type patterns
-- ❌ Project-specific type safety policies (see below)
-- ❌ Code review criteria (see below)
+## Rules Of Thumb
 
-## Project-Specific Type Safety Policy
+- `any` は導入より削除を優先する
+- assertion は「証明済み」箇所に閉じ込める
+- `unknown` を受けて narrow する流れを基本にする
+- `Result` 風パターンや判別可能 union で失敗を表現する
 
-### Zero-Any Policy
+## Common Mistakes
 
-### Goal
+- `strict` 未確認のまま individual error だけ潰す
+- assertion でコンパイラを黙らせて review を通す
+- `any` を境界だけでなく内部ロジックまで広げる
+- runtime validation が必要な入力を型だけで信じる
 
-### Strategies
+## References
 
-### Justification Required
-
-### Result Type Pattern (Recommended)
-
-### Pattern
-
-### Benefits
-
-### Type Assertion Guidelines
-
-### Minimize
-
-### Prefer
-
-### Strict Mode Compliance
-
-### Required
-
-### Verification
-
-## ⭐️ 5-Star Evaluation Criteria
-
-### Type Safety Assessment
-
-### ⭐⭐⭐⭐⭐ (5/5) Excellent
-
-### ⭐⭐⭐⭐☆ (4/5) Good
-
-### ⭐⭐⭐☆☆ (3/5) Standard
-
-### ⭐⭐☆☆☆ (2/5) Needs Improvement
-
-### ⭐☆☆☆☆ (1/5) Requires Overhaul
-
-### Type Definition Quality
-
-Interface design clarity, generic usage appropriateness, type reusability, documentation completeness, discriminated union patterns
-
-### Compiler Utilization
-
-Strict mode configuration, compiler options, build configuration, ESLint + TypeScript integration
-
-## Review Workflow
-
-When reviewing TypeScript code:
-
-1. Check tsconfig.json: Verify strict mode and compiler options
-2. Scan for `any`: Identify and eliminate `any` type usage
-3. Review type assertions: Minimize and justify all assertions
-4. Evaluate type definitions: Assess interfaces, types, and generics
-5. Check error handling: Verify Result<T,E> pattern or type-safe alternatives
-6. Test type narrowing: Ensure proper type guards
-7. Verify tool integration: Check ESLint and TypeScript alignment
-8. Assess performance: Consider compilation and bundle impact
-
-## 🤖 Agent Integration
-
-このスキルはTypeScriptプロジェクトを扱うエージェントに専門知識を提供します:
-
-### Error-Fixer Agent
-
-- 提供内容: TypeScript型エラー修正、any型排除戦略、strictモード対応
-- タイミング: TypeScriptエラー修正・型安全性向上時
-- コンテキスト: 型エラー自動修正、any→unknown変換、型ガード実装、tsconfig.json最適化
-
-### Code-Reviewer Agent
-
-- 提供内容: TypeScript型安全性評価基準、ベストプラクティス
-- タイミング: TypeScriptコードレビュー時
-- コンテキスト: ⭐️5段階評価、型アサーション評価、Result<T,E>パターン、パフォーマンス影響
-
-### Orchestrator Agent
-
-- 提供内容: TypeScriptプロジェクト構成、アーキテクチャパターン
-- タイミング: TypeScript機能実装・リファクタリング時
-- コンテキスト: モジュール構成、型定義ファイル管理、コンパイラオプション設定
-
-### 自動ロード条件
-
-- "TypeScript"、"TS"、"型エラー"、"型安全性"に言及
-- .ts、.tsx、tsconfig.jsonファイル操作時
-- TypeScriptコンパイルエラー対応時
-- プロジェクト検出: TypeScriptプロジェクト
-
-### 統合例
-
-```
-ユーザー: "TypeScriptの型エラーを修正してany型を排除"
-    ↓
-TaskContext作成
-    ↓
-プロジェクト検出: TypeScript + React
-    ↓
-スキル自動ロード: typescript, react
-    ↓
-Context7クエリ: 型ガード実装パターン
-    ↓
-エージェント選択: error-fixer
-    ↓ (スキルコンテキスト提供)
-TypeScript型エラー修正パターン + any型排除戦略
-    ↓
-実行完了（型安全性向上、strictモード準拠）
-```
-
-## Integration with Related Skills
-
-- react skill: For React + TypeScript projects
-- clean-architecture skill: For TypeScript architecture patterns
-- security skill: For type-safe security implementations
+- `references/type-safety-patterns.md`

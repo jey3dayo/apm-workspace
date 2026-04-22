@@ -83,3 +83,7 @@ entry point
 ```
 
 必要になった時だけ `references/wezterm.md` を開き、API 名や実装例を確認する。
+
+## References
+
+- `references/wezterm.md`
