@@ -325,10 +325,12 @@ format_skill_name() {
 
 write_catalog_manifest_template() {
   destination_dir="$1"
+  package_name="${2:-$CATALOG_DIR_NAME}"
+  package_description="${3:-Managed catalog package for global APM rollout}"
   cat >"$destination_dir/apm.yml" <<EOF
-name: $CATALOG_DIR_NAME
+name: $package_name
 version: 1.0.0
-description: Managed catalog package for global APM rollout
+description: $package_description
 dependencies:
   apm: []
   mcp: []
@@ -402,17 +404,20 @@ locked_external_skill_records() {
 
 write_catalog_readme() {
   destination_dir="$1"
+  package_name="${2:-$CATALOG_DIR_NAME}"
+  install_ref_path="${3:-$CATALOG_DIR_NAME}"
+  body="${4:-This directory contains the managed catalog for the global APM workspace.}"
   cat >"$destination_dir/README.md" <<EOF
-# $CATALOG_DIR_NAME
+# $package_name
 
-This directory contains the managed catalog for the global APM workspace.
+$body
 
 - Edit personal skills in \`~/.apm/catalog/skills/<id>/\`
 - Edit shared guidance in \`~/.apm/catalog/AGENTS.md\`, \`agents/**\`, \`commands/**\`, and \`rules/**\`
 - \`skills\` are authored under \`catalog/skills/**\` and staged into the published package
 - \`commands/**\` stays top-level because it is runtime-synced shared guidance, not nested skill package content
 - Edit this directory directly, then run \`mise run stage-catalog\` before commit/push
-- Install ref: \`jey3dayo/apm-workspace/catalog#main\`
+- Install ref: \`jey3dayo/apm-workspace/$install_ref_path#main\`
 EOF
 }
 
@@ -424,6 +429,7 @@ normalize_tracked_catalog_metadata() {
   mkdir -p "$tracked_dir"
   write_catalog_manifest_template "$tracked_dir"
   write_catalog_readme "$tracked_dir"
+
 }
 
 check_tracked_catalog_metadata() {
@@ -447,6 +453,7 @@ check_tracked_catalog_metadata() {
   fi
 
   rm -rf "$expected_dir"
+
   [ "$has_failure" -eq 0 ] || fail "Catalog metadata check failed"
 }
 
@@ -994,6 +1001,21 @@ managed_skill_ids() {
   skill_ids_from_root "$(tracked_catalog_skills_root)"
 }
 
+requested_catalog_skill_ids() {
+  if [ "$#" -gt 0 ]; then
+    for skill_id in "$@"; do
+      validate_skill_id "$skill_id"
+      if ! tracked_catalog_skill_ids | awk -v target="$skill_id" '$0 == target { found = 1; exit } END { exit(found ? 0 : 1) }'; then
+        fail "Requested catalog skill is not tracked in catalog/skills: $skill_id"
+      fi
+      printf '%s\n' "$skill_id"
+    done
+    return 0
+  fi
+
+  tracked_catalog_skill_ids
+}
+
 cmd_validate() {
   require_apm
   ensure_workspace_repo
@@ -1052,7 +1074,7 @@ manifest_has_catalog_reference() {
 }
 
 print_catalog_summary() {
-  source_skill_count=$(managed_skill_ids | awk 'NF { count++ } END { print count + 0 }')
+  source_skill_count=$(tracked_catalog_skill_ids | awk 'NF { count++ } END { print count + 0 }')
   source_agent_count=$(managed_agent_relative_paths | awk 'NF { count++ } END { print count + 0 }')
   source_command_count=$(managed_command_relative_paths | awk 'NF { count++ } END { print count + 0 }')
   source_rule_count=$(managed_rule_relative_paths | awk 'NF { count++ } END { print count + 0 }')
@@ -1683,7 +1705,7 @@ cmd_validate_catalog() {
   ensure_workspace_scaffold
 
   has_failure=0
-  source_skill_ids=$(managed_skill_ids)
+  source_skill_ids=$(tracked_catalog_skill_ids)
   source_agent_paths=$(managed_agent_relative_paths)
   source_command_paths=$(managed_command_relative_paths)
   source_rule_paths=$(managed_rule_relative_paths)
@@ -1717,6 +1739,7 @@ cmd_validate_catalog() {
     error "Global apm.yml is missing the managed catalog ref"
     has_failure=1
   fi
+
 
   if [ ! -f "$tracked_instructions" ]; then
     error "Tracked catalog is missing instructions: $tracked_instructions"
@@ -1782,7 +1805,7 @@ cmd_doctor() {
 }
 
 cmd_seed_catalog_build() {
-  skill_ids=$(managed_skill_ids)
+  skill_ids=$(requested_catalog_skill_ids "$@")
   ensure_workspace_repo
   ensure_workspace_scaffold
   ensure_workspace_mise_file
@@ -1823,6 +1846,7 @@ cmd_stage_catalog() {
 
 cmd_register_catalog() {
   require_apm
+  local tracking_info remote_name branch_name
   skill_ids=$(managed_skill_ids)
   cleanup_skill_ids=$(internal_cleanup_skill_ids "$skill_ids")
   ensure_workspace_repo
@@ -1874,7 +1898,7 @@ cmd_release_catalog() {
 
 cmd_smoke_catalog() {
   require_apm
-  skill_ids=$(managed_skill_ids)
+  skill_ids=$(requested_catalog_skill_ids "$@")
 
   cmd_bundle_catalog "$@"
 

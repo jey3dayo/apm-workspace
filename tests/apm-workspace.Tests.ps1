@@ -45,6 +45,14 @@ scripts: {}
     $skillIds | Should -Be @("mypc-manager", "superpowers:brainstorming")
   }
 
+  It "defaults catalog build requests to tracked catalog skills only" {
+    Mock Get-TrackedCatalogSkillIds { @("codex-system", "gh-create-pr") }
+
+    $skillIds = @(Get-RequestedCatalogSkillIds)
+
+    $skillIds | Should -Be @("codex-system", "gh-create-pr")
+  }
+
   It "lists managed agent, command, and rule files plus instructions" {
     $catalogRoot = Join-Path $TestDrive "catalog"
     $agentsRoot = Join-Path $catalogRoot "agents"
@@ -621,7 +629,7 @@ dependencies:
 
     try {
       Mock Require-Apm {}
-      Mock Get-RequestedManagedSkillIds { @("superpowers:brainstorming") }
+      Mock Get-RequestedCatalogSkillIds { @("superpowers:brainstorming") }
       Mock Get-CatalogBuildDir { $buildDir }
       Mock Invoke-BundleCatalog {
         param([string[]]$RequestedSkillIds)

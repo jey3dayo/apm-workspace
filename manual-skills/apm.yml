@@ -1,0 +1,7 @@
+name: manual-skills
+version: 1.0.0
+description: Manual copied skills package for explicit distribution
+dependencies:
+  apm: []
+  mcp: []
+scripts: {}

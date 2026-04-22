@@ -1498,6 +1498,25 @@ function Get-RequestedManagedSkillIds {
   return @(Get-ManagedSkillIds)
 }
 
+function Get-RequestedCatalogSkillIds {
+  param(
+    [string[]]$RequestedSkillIds
+  )
+
+  $trackedSkillIds = @(Get-TrackedCatalogSkillIds)
+  if ($RequestedSkillIds -and $RequestedSkillIds.Count -gt 0) {
+    foreach ($skillId in $RequestedSkillIds) {
+      Test-SkillId -SkillId $skillId
+      if ($skillId -notin $trackedSkillIds) {
+        throw "Requested catalog skill is not tracked in catalog/skills: $skillId"
+      }
+    }
+    return $RequestedSkillIds
+  }
+
+  return $trackedSkillIds
+}
+
 function Get-TrackedCatalogAgentRelativePaths {
   return @(Get-RelativeFilePaths -RootDir (Get-TrackedCatalogAgentsRoot))
 }
@@ -1602,6 +1621,7 @@ function Get-CatalogManifestContent {
   ) -join [Environment]::NewLine
 }
 
+
 function Get-CatalogReadmeContent {
   return @(
     '# catalog',
@@ -1617,6 +1637,7 @@ function Get-CatalogReadmeContent {
   ) -join [Environment]::NewLine
 }
 
+
 function Normalize-TrackedCatalogMetadata {
   Ensure-WorkspaceRepo
   Ensure-WorkspaceScaffold
@@ -1625,6 +1646,7 @@ function Normalize-TrackedCatalogMetadata {
   New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
   [System.IO.File]::WriteAllText((Join-Path $trackedDir "apm.yml"), ((Get-CatalogManifestContent) + [Environment]::NewLine))
   [System.IO.File]::WriteAllText((Join-Path $trackedDir "README.md"), ((Get-CatalogReadmeContent) + [Environment]::NewLine))
+
 }
 
 function Assert-TrackedCatalogMetadataNormalized {
@@ -1667,7 +1689,7 @@ function Test-ManifestHasCatalogReference {
 }
 
 function Write-CatalogSummary {
-  $sourceSkillIds = @(Get-ManagedSkillIds)
+  $sourceSkillIds = @(Get-TrackedCatalogSkillIds)
   $sourceAgentPaths = @(Get-ManagedAgentRelativePaths)
   $sourceCommandPaths = @(Get-ManagedCommandRelativePaths)
   $sourceRulePaths = @(Get-ManagedRuleRelativePaths)
@@ -1681,6 +1703,7 @@ function Write-CatalogSummary {
 
   Write-Host ("catalog: skills={0} agents={1} commands={2} rules={3} instructions={4} tracked-manifest={5} global-ref={6} status={7}" -f $sourceSkillIds.Count, $sourceAgentPaths.Count, $sourceCommandPaths.Count, $sourceRulePaths.Count, $instructionsState, $trackedState, $manifestState, $coverageState)
 }
+
 
 function Get-ManagedCatalogRuntimeTargets {
   return @(
@@ -1746,7 +1769,7 @@ function Invoke-ValidateCatalog {
   Ensure-WorkspaceScaffold
 
   $hasFailure = $false
-  $sourceSkillIds = @(Get-ManagedSkillIds)
+  $sourceSkillIds = @(Get-TrackedCatalogSkillIds)
   $sourceAgentPaths = @(Get-ManagedAgentRelativePaths)
   $sourceCommandPaths = @(Get-ManagedCommandRelativePaths)
   $sourceRulePaths = @(Get-ManagedRuleRelativePaths)
@@ -2123,7 +2146,7 @@ function Invoke-SeedCatalogBuild {
   Ensure-WorkspaceScaffold
   Ensure-WorkspaceMiseFile
 
-  $skillIds = @(Get-RequestedManagedSkillIds -RequestedSkillIds $RequestedSkillIds)
+  $skillIds = @(Get-RequestedCatalogSkillIds -RequestedSkillIds $RequestedSkillIds)
   if ($LegacyAlias) {
     Write-WarnLine "migrate is now a compatibility alias. Prefer 'stage-catalog' for the catalog flow."
   }
@@ -2237,7 +2260,7 @@ function Invoke-SmokeCatalog {
 
   Require-Apm
 
-  $skillIds = @(Get-RequestedManagedSkillIds -RequestedSkillIds $RequestedSkillIds)
+  $skillIds = @(Get-RequestedCatalogSkillIds -RequestedSkillIds $RequestedSkillIds)
   Invoke-BundleCatalog -RequestedSkillIds $skillIds
 
   $tempDir = Join-Path $env:TEMP ("apm-catalog-smoke-{0}" -f ([guid]::NewGuid().ToString("N")))
