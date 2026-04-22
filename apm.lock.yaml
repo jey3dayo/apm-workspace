@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-04-22T02:16:02.687111+00:00'
+generated_at: '2026-04-22T07:38:11.015126+00:00'
 apm_version: 0.8.12
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -3803,6 +3803,23 @@ dependencies:
     .copilot/skills/understand-onboard/SKILL.md: sha256:d3edb056a94bcf1f8b69952cf09be592905c7f65b72479cfb82ae84d88cf4237
     .cursor/skills/understand-onboard/SKILL.md: sha256:d3edb056a94bcf1f8b69952cf09be592905c7f65b72479cfb82ae84d88cf4237
   content_hash: sha256:2b3faf132aafb668ccc57fd743aac0584e7ec6966402c4693b9e7c180db34cce
+- repo_url: SawyerHood/dev-browser
+  host: github.com
+  resolved_commit: 9c85e469e213badb5c5ff96987553e6ff05df9f4
+  virtual_path: skills/dev-browser
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .claude/skills/dev-browser/SKILL.md
+  - .config/opencode/skills/dev-browser/SKILL.md
+  - .copilot/skills/dev-browser/SKILL.md
+  - .cursor/skills/dev-browser/SKILL.md
+  deployed_file_hashes:
+    .claude/skills/dev-browser/SKILL.md: sha256:6fbb5c703f59ff01b63b41e3059ef33717e058bbbf636f4d8c659f86281409d7
+    .config/opencode/skills/dev-browser/SKILL.md: sha256:6fbb5c703f59ff01b63b41e3059ef33717e058bbbf636f4d8c659f86281409d7
+    .copilot/skills/dev-browser/SKILL.md: sha256:6fbb5c703f59ff01b63b41e3059ef33717e058bbbf636f4d8c659f86281409d7
+    .cursor/skills/dev-browser/SKILL.md: sha256:6fbb5c703f59ff01b63b41e3059ef33717e058bbbf636f4d8c659f86281409d7
+  content_hash: sha256:d50d11bbefdc1599d78900828dcb69d48e5091769d3f5ce10e06a60efe2405bf
 - repo_url: anthropics/claude-code
   host: github.com
   resolved_commit: 2fa67717b8046c253cfa55fd84002e3501f1eca6
