@@ -4,24 +4,30 @@ on:
   push:
     paths:
       - ".github/workflows/ci.yml"
+      - "AGENTS.md"
       - "README.md"
+      - "TODO.md"
       - "llms.md"
       - "apm.yml"
       - "apm.lock.yaml"
       - "mise.toml"
       - "docs/**"
+      - "manual-skills/**"
       - "scripts/**"
       - "tests/**"
       - "catalog/**"
   pull_request:
     paths:
       - ".github/workflows/ci.yml"
+      - "AGENTS.md"
       - "README.md"
+      - "TODO.md"
       - "llms.md"
       - "apm.yml"
       - "apm.lock.yaml"
       - "mise.toml"
       - "docs/**"
+      - "manual-skills/**"
       - "scripts/**"
       - "tests/**"
       - "catalog/**"
@@ -60,7 +66,10 @@ jobs:
 
       - name: Run workspace checks
         run: |
+          mise run format:catalog-metadata:check
+          mise run format:markdown:check
           mise run format:toml:check
           mise run format:yaml:check
+          mise run validate:workspace
           mise run validate:catalog
           mise run smoke-catalog
