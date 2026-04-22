@@ -1,162 +1,83 @@
 ---
 name: slide-docs
-description: |
-  [What] Specialized skill for reviewing and creating presentation slides. Evaluates slide structure, storytelling, visual design, and presentation effectiveness. Provides 5-level quality assessment and improvement suggestions. Leverages Context7 MCP for Marp, Deckset, and reveal.js syntax references
-  [When] Use when: users mention "slide", "presentation", "deck", "Marp", "Deckset", "reveal.js", work with .slides.md files, request slide quality evaluation, or need help creating presentation content
-  [Keywords] slide, presentation, deck, Marp, Deckset, reveal.js
+description: Use when reviewing or creating Markdown-based presentation slides such as Marp, Deckset, reveal.js, or `.slides.md` decks. Do not use for general document summarization or non-presentation prose review.
 ---
 
-# Slide Docs - Presentation Review and Creation
+# Slide Docs
 
 ## Overview
 
-Comprehensive review and creation support for Markdown-based presentation slides. Evaluate slide quality across storytelling, visual design, message clarity, and presentation effectiveness. Apply industry best practices with actionable improvements.
+This skill is for presentation decks, not generic documents. First decide whether the user needs slide review, slide creation, or tool-specific syntax help. Only pull in syntax references when the deck framework actually matters.
 
-### Tool-Specific Syntax
+## When to Use
 
-- Marp: `/marp-team/marp-cli` (64 snippets, score 82.6)
-- reveal.js: `/hakimel/reveal.js` (131 snippets, score 94.5)
-- Deckset: `/websites/deckset_english_lproj` (96 snippets, score 71.1)
+- Marp / Deckset / reveal.js / `.slides.md` をレビューしたい
+- スライドの構成、メッセージ、見た目を改善したい
+- 新しい発表資料のアウトラインや本文を作りたい
+- tool-specific syntax や機能差分を確認したい
 
-## 5-Level Quality Assessment
+使わない場面:
 
-### ⭐⭐⭐⭐⭐ (5/5) Excellent
+- 一般文書の要約や校正だけをしたい
+- プレゼンとは無関係な Markdown 文書を見たい
+- syntax 確認の必要がない一般論だけの相談
 
-- Perfect storytelling with compelling narrative
-- Visually stunning and professional
-- Clear, memorable messaging
-- Professional-grade quality
+## First Decision
 
-### ⭐⭐⭐⭐☆ (4/5) Good
+最初に次のどれかを決める。
 
-- Strong narrative structure
-- Visually well-organized
-- Clear messaging
-- Minor improvements only
+1. レビュー
+2. 作成支援
+3. ツール固有構文の確認
 
-### ⭐⭐⭐☆☆ (3/5) Standard
-
-- Basic structure present
-- Visually acceptable
-- Message communicated
-- Several improvements needed
-
-### ⭐⭐☆☆☆ (2/5) Needs Improvement
-
-- Structural issues present
-- Visual improvements needed
-- Unclear messaging
-- Significant revisions required
-
-### ⭐☆☆☆☆ (1/5) Requires Reconstruction
-
-- Broken narrative flow
-- Multiple visual problems
-- Message unclear
-- Complete overhaul needed
-
-## Evaluation Criteria
-
-### 1. Slide Structure
-
-- Clear narrative arc: Introduction → body → conclusion
-- Logical flow: Ideas progress naturally
-- One message per slide: Each slide communicates single concept
-- Appropriate slide count: Total number relative to presentation length
-- Section clarity: Clear delineation of major sections
-
-### 2. Content and Messaging
-
-- Conciseness: Short, impactful statements (6×6 rule: max 6 lines, 6 words/line)
-- Impact: Memorable phrases, effective data presentation
-- Readability: Adequate font size (minimum 24pt body), color contrast, whitespace
-- Key point emphasis: Important information stands out
-- Clear call-to-action: Explicit next steps
-
-### 3. Visual Design
-
-- Visual hierarchy: Clear title/body distinction, consistent layout
-- Image quality: High-resolution, professional images with proper attribution
-- Color design: Limited palette (3-4 colors), brand consistency, accessibility
-- Balance and alignment: Proper positioning, embrace whitespace
-
-### 4. Technical Elements
-
-- Code display: Syntax highlighting, readable font size, key section emphasis
-- Data visualization: Appropriate chart selection, clear labeling, purposeful animation
-- Asset management: Verified paths, consistent encoding (UTF-8)
-
-### 5. Presentation Utility
-
-- Speaker support: Comprehensive notes, timing indicators, Q&A preparation
-- Audience consideration: Technical term definitions, cultural awareness, accessibility
+この切り分けをしないまま評価尺度や構文詳細に入らない。
 
 ## Review Workflow
 
-1. Assess overall structure: Evaluate narrative flow and organization
-2. Review each slide: Check individual slide quality
-3. Evaluate visual design: Assess consistency and aesthetics
-4. Check technical elements: Verify code, data, media
-5. Test presentation utility: Review speaker notes and audience considerations
-6. Provide rating: Assign 5-level quality score per category
-7. Suggest improvements: Offer specific, actionable recommendations
-8. Prioritize changes: Identify critical vs. optional improvements
+1. deck の目的と対象 audience を確認する
+2. 全体の流れを見て、1スライド1メッセージになっているか確認する
+3. タイトル、本文、図表、コードの読みやすさを確認する
+4. 結論と call-to-action が明確か確認する
 
 ## Creation Workflow
 
-1. Understand objectives: Clarify purpose and audience
-2. Outline structure: Plan narrative arc (Rule of three: focus on 3 main points)
-3. Draft content: Create slide content following best practices
-4. Design visuals: Apply consistent, professional design
-5. Add speaker notes: Provide comprehensive presenter guidance
-6. Review and iterate: Evaluate against quality criteria
-7. Prepare for delivery: Finalize timing and transitions
+1. 発表目的と audience を確認する
+2. 3つ前後の主要メッセージに絞る
+3. スライド順を決めてから本文を書く
+4. 図表や speaker notes が必要か決める
 
-## Common Issues and Quick Fixes
+## Review Criteria
 
-### Structural Problems
+### 1. Structure
 
-- Issue: Lack of clear narrative, illogical flow
-- Fix: Establish clear beginning/middle/end, add transition slides
+- 導入 -> 本論 -> 結論の流れがあるか
+- 話のジャンプが大きすぎないか
+- スライド数が時間に対して多すぎないか
 
-### Visual Problems
+### 2. Messaging
 
-- Issue: Text too small, information overload, inconsistent design
-- Fix: Increase font sizes (≥24pt), one-message-per-slide, consistent template
+- 各スライドの主張が1つに絞れているか
+- text が多すぎないか
+- 聴衆が覚えるべき点が見えるか
 
-### Message Problems
+### 3. Visuals
 
-- Issue: Unclear main points, excessive jargon, no call-to-action
-- Fix: Emphasize key messages, define technical terms, include explicit next steps
+- タイトルと本文の hierarchy があるか
+- 図、画像、コードが読みやすいか
+- 配色や余白が一貫しているか
 
-### Technical Problems
+### 4. Delivery
 
-- Issue: Broken layouts, missing images, encoding errors
-- Fix: Test on target platform, verify asset paths, use UTF-8 consistently
+- 発表者ノートが必要か
+- デモ、Q&A、次のアクションが整理されているか
 
-## Best Practices Summary
+## Context7
 
-- Start with "why": Begin with problem statement
-- Rule of three: Focus on three main points
-- Story arc: Follow clear narrative structure
-- End with action: Conclude with specific next steps
-- High-resolution assets: Use quality images
-- Embrace whitespace: Avoid cluttered slides
-- Minimal animation: Use sparingly and purposefully
-- Rehearse thoroughly: Practice delivery multiple times
+Context7 は Marp / Deckset / reveal.js の構文や機能確認が必要なときだけ使う。レビューや構成改善だけなら、まず本文と流れを見る。
 
-## Integration with Context7 MCP
+## Common Mistakes
 
-For tool-specific syntax and features, query Context7 directly:
-
-```markdown
-Example queries:
-
-- "Marp markdown syntax for slides, themes, and directives"
-- "reveal.js markdown syntax and configuration"
-- "Deckset markdown syntax and slide customization"
-- "Code highlighting in [tool-name]"
-- "Custom backgrounds and transitions in [tool-name]"
-```
-
-### Always verify syntax with Context7
+- 一般文書レビューと同じ感覚で長文化する
+- 構成確認より先に配色やアニメーションをいじる
+- syntax 確認が不要なのに Context7 へ飛ぶ
+- レビューと作成支援の出力形式を混ぜる

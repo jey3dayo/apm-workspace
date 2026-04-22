@@ -1,6 +1,6 @@
 ---
 name: rtk
-description: Use when Codex should reduce CLI context noise with RTK, decide whether to prefix commands with `rtk`, set up `rtk init`, inspect `rtk gain`, or maintain `.rtk/filters.toml` in repositories that use RTK.
+description: Use when a repository uses RTK and Codex needs to decide when to prefix commands with `rtk`, when to keep raw shell behavior, or how to maintain `.rtk/filters.toml`.
 ---
 
 # RTK
@@ -8,6 +8,8 @@ description: Use when Codex should reduce CLI context noise with RTK, decide whe
 ## Overview
 
 Use RTK to compress noisy CLI output before it reaches the model context window. Prefer it for token-heavy external commands such as test runners, build tools, git, GitHub CLI, package managers, and file/search commands.
+
+Rule of thumb: external commands are `rtk` by default; shell builtins and session-state changes stay raw.
 
 Read `references/command-reference.md` when you need the detailed command families, install options, or this repository's integration points.
 
@@ -83,6 +85,7 @@ In this repository:
 - RTK itself is already declared in `mise/config.default.toml` and `mise/config.windows.toml`
 - Project-local RTK filters live in `.rtk/filters.toml`
 - The personal RTK skill for this workspace lives under `~/.apm/catalog/skills/rtk/`
+- Start by checking `.rtk/filters.toml` before adding new filter behavior
 
 For this repo, validate and roll out RTK catalog changes with the current workspace tasks:
 
