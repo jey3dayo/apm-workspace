@@ -230,6 +230,24 @@ other_records:
     $records[0].Path | Should -Be "skills/.curated/gh-address-comments"
     $records[0].Commit | Should -Be "abcdef1234567890"
   }
+
+  It "reads top-level lock dependency records from same-indent YAML lists" {
+    @"
+lockfile_version: "1"
+dependencies:
+- repo_url: openai/skills
+  host: github.com
+  resolved_commit: abcdef1234567890
+  virtual_path: skills/.curated/gh-address-comments
+"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.lock.yaml")
+
+    $records = @(Get-LockedExternalSkillRecords)
+
+    $records.Count | Should -Be 1
+    $records[0].Repo | Should -Be "openai/skills"
+    $records[0].Path | Should -Be "skills/.curated/gh-address-comments"
+    $records[0].Commit | Should -Be "abcdef1234567890"
+  }
 }
 
 Describe "public command surface" {
@@ -238,6 +256,12 @@ Describe "public command surface" {
     $modulePath = Join-Path (Join-Path $PSScriptRoot "..") "scripts/apm-workspace.ps1"
     . (Resolve-Path -LiteralPath $modulePath).Path
     Remove-Item Env:APM_WORKSPACE_LIB_ONLY -ErrorAction SilentlyContinue
+  }
+
+  BeforeEach {
+    $script:WorkspaceDir = Join-Path $TestDrive "workspace"
+    $global:WorkspaceDir = $script:WorkspaceDir
+    New-Item -ItemType Directory -Path $script:WorkspaceDir -Force | Out-Null
   }
 
   It "shows shell help wording for update and catalog commands" {
@@ -505,6 +529,20 @@ scripts:
 "@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.yml")
 
     @(Get-UnpinnedExternalReferences) | Should -Be @("openai/skills/skills/.curated/gh-address-comments")
+  }
+
+  It "reads unpinned refs from same-indent YAML lists under dependencies apm" {
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+  - jey3dayo/apm-workspace/catalog#main
+  - obra/superpowers/skills/using-superpowers
+  mcp:
+  - ignored/mcp-entry
+"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.yml")
+
+    @(Get-UnpinnedExternalReferences) | Should -Be @("obra/superpowers/skills/using-superpowers")
   }
 
   It "builds target-aware managed skill inventory with normalized names" {

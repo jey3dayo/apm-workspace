@@ -590,7 +590,7 @@ function Get-LockedExternalSkillRecords {
   $dependenciesIndent = -1
   $currentRecordIndent = -1
   foreach ($line in (Get-Content -LiteralPath $lockPath)) {
-    if ($line -match '^(?<indent>\s*)(?<key>[^:#][^:]*):(?:\s*(?<value>.*))?$') {
+    if ($line -match '^(?<indent>\s*)(?<key>[^:#-][^:]*):(?:\s*(?<value>.*))?$') {
       $indentLevel = $Matches['indent'].Length
       $key = $Matches['key'].Trim()
 
@@ -755,7 +755,7 @@ function Get-ManifestApmDependencyReferences {
     }
 
     if ($line -match '^\s*-\s+(\S+)\s*$') {
-      if ((Get-YamlIndentLevel -Line $line) -le $apmIndent) {
+      if ((Get-YamlIndentLevel -Line $line) -lt $apmIndent) {
         continue
       }
 

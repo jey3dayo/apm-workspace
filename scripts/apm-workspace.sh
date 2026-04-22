@@ -351,7 +351,7 @@ locked_external_skill_records() {
         printf "%s|%s|%s\n", repo_url, virtual_path, resolved_commit
       }
     }
-    /^[^[:space:]#][^:]*:/ {
+    /^[^[:space:]#-][^:]*:/ {
       if (in_dependencies && repo_url != "") {
         flush_record()
         repo_url = ""
@@ -923,7 +923,7 @@ unpinned_external_references() {
       next
     }
     /^[[:space:]]*-[[:space:]]+/ {
-      if (indent_level($0) <= apm_indent) {
+      if (indent_level($0) < apm_indent) {
         next
       }
       ref = $2
