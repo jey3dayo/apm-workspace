@@ -1,0 +1,4 @@
+interface:
+  display_name: "DESIGN.md Workflow"
+  short_description: "Author and route DESIGN.md and DESIGN_REVIEW.md pairs"
+  default_prompt: "Use $design-md-workflow to draft, split, or review DESIGN.md and DESIGN_REVIEW.md for this project."
