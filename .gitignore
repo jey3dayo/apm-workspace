@@ -1,9 +1,13 @@
 /.tmp-review-workspace*/
 /testResults.xml
 /config.json
-/.catalog-build/
-/apm_modules/
 !/catalog/.apm/
 /catalog/.apm/*
 !/catalog/.apm/.gitkeep
 /.github/skills/
+
+/.apm/
+
+/apm_modules/
+
+/.catalog-build/
