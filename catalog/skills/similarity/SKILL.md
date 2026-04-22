@@ -1,27 +1,55 @@
 ---
 name: similarity
-description: |
-  [What] Specialized skill for detecting code duplication and analyzing code similarity in TypeScript/JavaScript projects. Leverages similarity-ts tool to find duplicate code patterns (>87% similarity), assist refactoring decisions, and identify common patterns for extraction
-  [When] Use when: users mention "duplicate code", "similar functions", "code similarity", or need refactoring analysis for TypeScript/JavaScript codebases
-  [Keywords] duplicate code, similar functions, code similarity
+description: Use when a TypeScript or JavaScript codebase needs duplicate-code detection, similar-function analysis, or refactoring candidates based on `similarity-ts`. Do not use for Python, Go, Rust, or general multi-language clone detection.
 ---
 
-# Similarity - TypeScript/JavaScriptコード類似度検索
+# Similarity
 
-TypeScript/JavaScriptコードの類似度を検出し、重複コードの発見とリファクタリング支援を行う専門スキル。
+TypeScript/JavaScript コードの類似度を検出し、重複コードの発見とリファクタリング候補の絞り込みを支援する。
 
-## 🎯 Core Mission
+## Overview
 
-`similarity-ts`ツールを活用し、プロジェクト内の重複コード検出、類似パターンの発見、リファクタリング機会の特定を行う。
+まず `similarity-ts` を対象パスに対して実行し、重複候補をレポート化する。その後に、結果を読んで「即共通化するか」「保留するか」を判断する。
 
-## 🛠️ ツール情報
+## When to Use
+
+- TypeScript / JavaScript で duplicate code を探したい
+- 類似した関数や型定義をまとめられるか見たい
+- リファクタリング前に、どこから着手すべきか優先度付けしたい
+
+使わない場面:
+
+- Python / Go / Rust など、`similarity-ts` の対象外言語を見たい
+- 単なるコードレビューや設計相談で、重複検出ツールを回す必要がない
+- 依存関係や影響範囲の追跡が主目的で、重複検出自体は不要
+
+## First Step
+
+最初の一手は、対象ディレクトリに対して `similarity-ts` を走らせること。
+
+```bash
+similarity-ts src/ > /tmp/similarity-report.md
+```
+
+閾値や絞り込みは、初回結果を見てから足す。最初からオプションを盛りすぎない。
+
+## Tool Summary
 
 - コマンド: `similarity-ts` (v0.4.1)
 - パス: `~/.cargo/bin/similarity-ts`
 - 対応言語: TypeScript, JavaScript
 - 解析手法: APTED（Tree Edit Distance）アルゴリズム
 
-## 📋 主要機能
+## Quick Workflow
+
+1. `similarity-ts <path>` でレポートを出す
+2. 類似度 90% 以上から優先的に確認する
+3. ビジネスロジック差分を見て、共通化するか保留するか決める
+4. 影響範囲が大きい場合は別ツールで参照関係を確認する
+
+詳細なレポート読みは `references/report-analysis.md` を参照する。
+
+## 主要機能
 
 ### 1. 関数の類似度検出
 

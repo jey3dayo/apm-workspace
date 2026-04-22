@@ -5,7 +5,13 @@ description: Debug and design Tauri child webview bounds, overlay shells, and na
 
 # Tauri Webview Geometry
 
-Use this skill when an embedded Tauri webview looks shifted, clipped, too small, or visually disconnected from the surrounding overlay.
+Use this skill when an embedded Tauri webview looks shifted, clipped, too small, or visually disconnected from the surrounding overlay. This skill is for **Tauri native child webview and DOM alignment problems**, not for generic CSS layout issues that do not involve a native child surface.
+
+## When Not to Use
+
+- Pure CSS layout bugs with no Tauri child webview involved
+- General responsive design tuning
+- Browser-only iframe sizing problems outside Tauri
 
 ## Quick model
 
