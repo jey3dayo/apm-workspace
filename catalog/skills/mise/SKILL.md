@@ -30,6 +30,31 @@ mise combines:
 - Tool Version Manager: Manage language runtimes and tools
 - Environment Manager: Handle project-specific environment variables
 
+## First Response Checklist
+
+Before giving advice, classify the request into one of these two modes and answer from that mode only:
+
+1. Project-local repository mode
+   - The user is editing a repository-owned `mise.toml`
+   - Prefer a single root `mise.toml` unless the repo clearly uses another structure
+   - Use the repo's existing task names, workflow semantics, and source-of-truth rules as authoritative
+2. User-global / dotfiles mode
+   - The user is managing `~/.config/mise`, personal toolchains, or `mise skills add`
+   - `~/.config/.mise.toml` and `[task_config].includes` are valid only when the setup is intentionally user-global or multi-environment
+
+Do not mix the two modes in one answer. If the request mentions `mise skills add`, personal/global setup, or `~/.config/mise`, treat it as user-global. Otherwise default to project-local.
+
+## Repository Overrides
+
+When the request is about a specific repository, read that repository's local guidance and the actual `mise.toml` before falling back to generic mise advice.
+
+- Prefer repo-local `AGENTS.md`, task docs, and current task names as authoritative
+- Derive task meaning from the real `run` / `depends` graph, not from naming alone
+- Treat repo-documented source-of-truth and generated-output rules as stronger than this skill's generic defaults
+- If the repository already has a dedicated workflow skill for its rollout model, use that skill for repo-specific routing instead of hardcoding those conventions here
+
+If a task description is shorter or slightly ambiguous, classify the operational intent from the implementation first, then report wording clarity as a secondary issue.
+
 ## Core Capabilities
 
 ### 1. Task Definition Design
@@ -319,7 +344,7 @@ When the user asks about `mise skills add`, treat it as a user-global workflow r
 
 1. Confirm the user is working in a personal/global mise setup
 2. Use `mise skills add <skill>` for installation
-3. Follow with `mise install` if the skill also introduces tool dependencies
+3. If that skill also adds tool or package dependencies, follow with `mise install`
 4. Keep reusable automation in shared task files or `.mise.toml`, not in ad hoc shell aliases
 
 ### Reference
@@ -405,6 +430,7 @@ run = "pytest tests/integration"
 
 When reviewing existing mise.toml:
 
+0. Classify the request first: project-local vs user-global / dotfiles
 1. Check Structure: Verify section ordering and organization
 2. Analyze Dependencies: Review `depends` vs `run` usage
 3. Evaluate Parallelism: Identify opportunities for parallel execution
@@ -412,6 +438,13 @@ When reviewing existing mise.toml:
 5. Test DAG: Run `mise task deps <task>` to visualize
 6. Check Best Practices: Verify against reference guidelines
 7. Performance: Consider compilation time and execution efficiency
+
+For repository-specific reviews, add these checks before proposing changes:
+
+- Does the answer preserve the repo's documented verification-only tasks?
+- Does it keep refresh, rollout, and deploy semantics distinct where the repo does?
+- Does it avoid treating generated outputs as editing surfaces if the repo separates them from authoring surfaces?
+- Does it separate "task behavior as implemented" from "description wording that could be clearer"?
 
 ### Reference
 
@@ -480,7 +513,7 @@ depends = ["lint", "test", "build"]  # ✅ Parallel execution
 
 ### With CI Systems
 
-- Use `mise ci bootstrap` as single entry point
+- Expose a single CI entry task such as `mise run ci`
 - Pin mise version: `mise use -g mise@2025.10`
 - Set `MISE_JOBS=$(nproc)` for parallel execution
 - Let mise orchestrate entire build pipeline
