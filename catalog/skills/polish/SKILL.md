@@ -27,8 +27,10 @@ Automatically polish code by executing lint/format/test and fixing errors iterat
 ## Workflow
 
 1. Detect Configuration
-   - Check for mise.toml tasks (format, lint, lint-fix)
+   - Check for mise.toml tasks (format, lint, lint-fix, test, ci)
    - Check for package.json scripts (format, lint, lint:fix, test)
+   - Prefer explicit `format` / `lint` / `test` tasks when they exist
+   - If a repo has no standalone `lint` or `test` task but has `ci`, use `ci` as the verification fallback instead of failing immediately
 
 2. Execute Format
    - Run `mise run format` or `npm run format`
@@ -38,11 +40,13 @@ Automatically polish code by executing lint/format/test and fixing errors iterat
    - Run lint command
    - If errors found, run lint-fix command
    - If errors remain, attempt manual fixes
+   - If no standalone lint command exists, use the lint-equivalent checks bundled in `mise run ci`
    - Repeat until clean or max attempts reached
 
 4. Execute Tests
    - Run test command if available
    - Fix test failures if detected
+   - If no standalone test command exists, use the test-equivalent verification bundled in `mise run ci`
    - Repeat until passing or max attempts reached
 
 5. Report Results
@@ -112,7 +116,8 @@ test = ["jest"]
 
 ## Notes
 
-- Maximum 3 iteration attempts to prevent infinite loops
+- Maximum 3 iteration attempts for the overall polish run, not 3 attempts per sub-step
 - Each step's success/failure is clearly reported
 - If test command is not found, that step is skipped
-- All output is in English
+- If only `ci` exists, use `format` first and then `ci` as the verification pass
+- Default to English output unless the user or repository instructions require another language
