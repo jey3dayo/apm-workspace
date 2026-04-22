@@ -27,6 +27,7 @@ dependencies:
     - mizchi/chezmoi-dotfiles/dot_claude/skills/empirical-prompt-tuning
     - nyosegawa/skills/skills/skill-auditor
     - obra/superpowers/skills/dispatching-parallel-agents
+    - obra/superpowers/skills/brainstorming
     - obra/superpowers/skills/executing-plans
     - obra/superpowers/skills/finishing-a-development-branch
     - obra/superpowers/skills/receiving-code-review

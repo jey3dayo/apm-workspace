@@ -4,11 +4,11 @@ APM-based global skill workspace for `jey3dayo`.
 
 This repository is the day-to-day working copy of `~/.apm`. `~/.apm` is the source of truth for daily authoring and operation. `~/.config` is bootstrap-only and is not the authoring surface.
 
-Current `apm` CLI source is pinned through `mise` to `github:jey3dayo/apm@v0.8.12.post1`. The previous `github:microsoft/apm` source is intentionally kept as a commented rollback target in tracked config.
+Current `apm` CLI source is pinned through `mise` to `github:microsoft/apm@v0.9.1`. The previous `github:jey3dayo/apm@v0.8.12.post1` source is intentionally kept as a commented rollback target in tracked config.
 
 Important compatibility note:
 
-- When validating whether `obra/superpowers` can stay on the normal APM-managed lane, use `apm >= 0.9.1`.
+- `obra/superpowers` stays on the normal APM-managed lane with `apm >= 0.9.1`.
 - Older 0.8.x builds may mis-classify that package layout and drop skills during install.
 
 ## What Lives Here
@@ -109,12 +109,6 @@ When external skills change:
 4. Run `mise run doctor` to verify the deployed state.
 5. Use `mise run sync` only when you intentionally want to refresh upstream dependency content.
 
-When checking whether an upstream skill can move out of `manual-skills/` and back into the normal managed lane:
-
-1. Test with `apm >= 0.9.1`.
-2. Re-run install in an isolated workspace before changing the root `apm.yml`.
-3. Only move it back after confirming the deployed tree under `~/.agents/skills` is complete.
-
 When a copied skill lives under `~/.apm/manual-skills/`:
 
 1. Treat it as a manually curated copy from upstream.
@@ -128,7 +122,7 @@ Task semantics:
 - `mise run sync` is the upstream-acceptance flow and is centered on `apm install -g --update`.
 - `mise run sync:stable` preserves the broader update -> verify -> apply -> doctor flow for the current manifest and lock.
 - `mise run apply` publishes Codex skills into `~/.agents/skills` and keeps `~/.codex/skills` out of the active deployment path.
-- direct `apm` invocations should go through `mise`; when exact binary selection matters, use `mise exec github:jey3dayo/apm@v0.8.12.post1 -- apm ...`.
+- direct `apm` invocations should go through `mise`; when exact binary selection matters, use `mise exec github:microsoft/apm@v0.9.1 -- apm ...`.
 
 When shared runtime guidance changes under `~/.apm/catalog/`:
 

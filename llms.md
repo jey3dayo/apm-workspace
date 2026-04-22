@@ -6,7 +6,7 @@
 
 Important compatibility note:
 
-- When validating whether `obra/superpowers` can stay on the normal APM-managed lane, use `apm >= 0.9.1`.
+- `obra/superpowers` stays on the normal APM-managed lane with `apm >= 0.9.1`.
 - Older 0.8.x builds may mis-classify that package layout and drop skills during install.
 
 This workspace owns the global APM manifest, the lockfile, the downloaded dependency cache, your personal skill sources, and the shared runtime guidance package.
@@ -62,12 +62,12 @@ jey3dayo/apm-workspace/catalog#main
 - The current script path is `apm compile --target codex --output ~/.codex/AGENTS.md`.
 - Codex skills are deployed through `~/.agents/skills`.
 - Do not use `~/.codex/skills` as the verification source of truth for this workspace. Verify Codex rollout through compile success, `~/.codex/AGENTS.md`, and the deployed tree in `~/.agents/skills`.
-- Current `apm` source is the pinned fork release `github:jey3dayo/apm@v0.8.12.post1`.
-- Keep the previous `github:microsoft/apm` entry commented in tracked config for rollback.
+- Current `apm` source is `github:microsoft/apm@v0.9.1`.
+- Keep the previous `github:jey3dayo/apm@v0.8.12.post1` entry commented in tracked config for rollback.
 - If both `~/.apm/mise.toml` and `~/.config/mise/config.default.toml` define `apm`, keep them aligned to the same source.
 - Prefer `mise run apply` and `mise run doctor` for routine local rollout.
 - Reserve `mise run sync` for intentional upstream refresh, not for normal deployment.
-- When direct binary selection matters, prefer `mise exec github:jey3dayo/apm@v0.8.12.post1 -- apm ...`.
+- When direct binary selection matters, prefer `mise exec github:microsoft/apm@v0.9.1 -- apm ...`.
 - If a Codex-targeted external skill is still missing after rollout, verify `~/.agents/skills` directly and treat it as a temporary Codex-specific delivery gap.
 
 ## Source Of Truth
@@ -119,12 +119,6 @@ When a copied skill lives under `~/.apm/manual-skills/`:
 2. Do not add it to the root `apm.yml`.
 3. Keep provenance in the copied source README.
 4. Distribute it explicitly, for example with the standalone package ref `jey3dayo/apm-workspace/manual-skills`.
-
-When checking whether an upstream skill can move out of `manual-skills/` and back into the normal managed lane:
-
-1. Test with `apm >= 0.9.1`.
-2. Re-run install in an isolated workspace before changing the root `apm.yml`.
-3. Only move it back after confirming the deployed tree under `~/.agents/skills` is complete.
 
 ## Useful Maintenance Commands
 
