@@ -19,6 +19,29 @@ Comprehensive code review framework with dual-mode operation. Automatically dete
 - This skill performs **local reviews** and optionally addresses open PR review comments
 - All review results are output in **Japanese**
 
+## Execution Contract
+
+- Review target selection:
+  - Respect explicit target flags first: `--staged`, `--recent`, `--branch <name>`
+  - If no target flag is given, use this fallback order: staged changes -> previous commit diff -> diff against the primary development branch -> recently modified reviewable files
+  - Resolve the primary development branch in this order: explicit `--branch` target -> repo default branch from remote -> `main` -> `master`
+  - Treat reviewable files as human-authored source, config, test, and narrowly relevant documentation; exclude generated artifacts, caches, vendor trees, and lockfiles unless the user explicitly asks for them
+- Safety:
+  - Do **not** create automatic git checkpoints, staging operations, or review-only commits
+  - Do **not** discard changes or propose destructive rollback commands as part of normal review flow
+  - Dirty worktrees are valid review targets; review must adapt to the current state without mutating unrelated files
+- Optional tooling:
+  - `--with-impact`, `--deep-analysis`, and `--verify-spec` are best-effort options
+  - If semantic tooling such as Serena is unavailable, continue with the standard detailed review and state that the optional analysis was skipped
+  - If a referenced stack-specific skill is unavailable, keep the same review lens and continue with generic criteria instead of blocking
+- Simple mode execution:
+  - Prefer parallel specialist passes when the environment supports them
+  - If parallel subagents are unavailable, review the same four lenses sequentially: security, performance, code quality, architecture
+  - Keep simple mode output severity-based; the star rating system belongs to detailed mode
+- PR comment handling:
+  - Review the code first, then optionally check open PR comments
+  - If there is no PR, `gh` is unavailable, or authentication fails, skip comment handling silently unless the user asked for it explicitly
+
 ### No-Signature Policy (CRITICAL)
 
 - NEVER add `Co-authored-by: Claude` to commits
@@ -154,12 +177,13 @@ Automatically invoke relevant technology-specific skills based on project detect
 All reviews must:
 
 - Respond in Japanese
+- Present findings first, ordered by severity
 - Provide specific file:line references
 - Include concrete code examples
 - Offer actionable remediation steps
 - Prioritize by severity and impact
 - Respect no-signature policy
-- Create checkpoints before analysis
+- State explicitly when no findings were found
 
 ## References
 
