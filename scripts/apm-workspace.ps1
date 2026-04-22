@@ -1261,8 +1261,15 @@ function Replace-SkillTargetsFromStage {
       New-Item -ItemType Directory -Path $stagedSkillsRoot -Force | Out-Null
     }
 
-    $destinationSkillsRoot = Join-Path $target.Root "skills"
+    $skillsRoot = if ($target.PSObject.Properties.Name -contains "SkillsRoot" -and $target.SkillsRoot) { $target.SkillsRoot } else { $target.Root }
+    New-Item -ItemType Directory -Path $skillsRoot -Force | Out-Null
+    $legacySkillsRoot = Join-Path $target.Root "skills"
+    $destinationSkillsRoot = Join-Path $skillsRoot "skills"
     $backupSkillsRoot = Join-Path $target.Root (".skills.apm-backup-{0}" -f ([guid]::NewGuid().ToString("N")))
+
+    if (($legacySkillsRoot -ne $destinationSkillsRoot) -and (Test-Path -LiteralPath $legacySkillsRoot)) {
+      Remove-Item -LiteralPath $legacySkillsRoot -Recurse -Force
+    }
 
     if (Test-Path -LiteralPath $backupSkillsRoot) {
       Remove-Item -LiteralPath $backupSkillsRoot -Recurse -Force
@@ -1670,11 +1677,11 @@ function Write-CatalogSummary {
 
 function Get-ManagedCatalogRuntimeTargets {
   return @(
-    [pscustomobject]@{ Name = "claude"; Root = (Join-Path $HOME ".claude"); ConfigName = "CLAUDE.md" },
-    [pscustomobject]@{ Name = "codex"; Root = (Join-Path $HOME ".codex"); ConfigName = "AGENTS.md" },
-    [pscustomobject]@{ Name = "cursor"; Root = (Join-Path $HOME ".cursor"); ConfigName = "AGENTS.md" },
-    [pscustomobject]@{ Name = "opencode"; Root = (Join-Path $HOME ".opencode"); ConfigName = "CLAUDE.md" },
-    [pscustomobject]@{ Name = "openclaw"; Root = (Join-Path $HOME ".openclaw"); ConfigName = "CLAUDE.md" }
+    [pscustomobject]@{ Name = "claude"; Root = (Join-Path $HOME ".claude"); SkillsRoot = (Join-Path $HOME ".claude"); ConfigName = "CLAUDE.md" },
+    [pscustomobject]@{ Name = "codex"; Root = (Join-Path $HOME ".codex"); SkillsRoot = (Join-Path $HOME ".agents"); ConfigName = "AGENTS.md" },
+    [pscustomobject]@{ Name = "cursor"; Root = (Join-Path $HOME ".cursor"); SkillsRoot = (Join-Path $HOME ".cursor"); ConfigName = "AGENTS.md" },
+    [pscustomobject]@{ Name = "opencode"; Root = (Join-Path $HOME ".opencode"); SkillsRoot = (Join-Path $HOME ".opencode"); ConfigName = "CLAUDE.md" },
+    [pscustomobject]@{ Name = "openclaw"; Root = (Join-Path $HOME ".openclaw"); SkillsRoot = (Join-Path $HOME ".openclaw"); ConfigName = "CLAUDE.md" }
   )
 }
 
@@ -1810,7 +1817,8 @@ function Invoke-Doctor {
   $skillInventory = @(Get-ManagedCatalogSkillInventory)
   $codexMcpConfigPath = Join-Path (Join-Path $HOME ".codex") "config.toml"
   foreach ($target in (Get-ManagedCatalogRuntimeTargets)) {
-    $skillsPath = Join-Path $target.Root "skills"
+    $skillsRoot = if ($target.PSObject.Properties.Name -contains "SkillsRoot" -and $target.SkillsRoot) { $target.SkillsRoot } else { $target.Root }
+    $skillsPath = Join-Path $skillsRoot "skills"
     $configPath = Join-Path $target.Root $target.ConfigName
     $agentsPath = Join-Path $target.Root "agents"
     $commandsPath = Join-Path $target.Root "commands"

@@ -477,6 +477,14 @@ Describe "public command surface" {
     ($targets | Where-Object Name -eq "cursor").ConfigName | Should -Be "AGENTS.md"
   }
 
+  It "maps codex skills to ~/.agents while keeping config under ~/.codex" {
+    $targets = @(Get-ManagedCatalogRuntimeTargets)
+    $codex = $targets | Where-Object Name -eq "codex"
+
+    $codex.Root | Should -Be (Join-Path $HOME ".codex")
+    $codex.SkillsRoot | Should -Be (Join-Path $HOME ".agents")
+  }
+
   It "normalizes codex skill names from superpowers aliases" {
     Format-SkillName -Target "claude" -SourceSkillId "superpowers:brainstorming" | Should -Be "superpowers:brainstorming"
     Format-SkillName -Target "codex" -SourceSkillId "superpowers:brainstorming" | Should -Be "brainstorming"
@@ -562,8 +570,8 @@ scripts:
 
   It "stages target-aware deployment trees from personal and external skills" {
     $targets = @(
-      [pscustomobject]@{ Name = "claude"; Root = (Join-Path $TestDrive "claude"); ConfigName = "CLAUDE.md" }
-      [pscustomobject]@{ Name = "codex"; Root = (Join-Path $TestDrive "codex"); ConfigName = "AGENTS.md" }
+      [pscustomobject]@{ Name = "claude"; Root = (Join-Path $TestDrive "claude"); SkillsRoot = (Join-Path $TestDrive "claude"); ConfigName = "CLAUDE.md" }
+      [pscustomobject]@{ Name = "codex"; Root = (Join-Path $TestDrive "codex"); SkillsRoot = (Join-Path $TestDrive ".agents"); ConfigName = "AGENTS.md" }
     )
     $stageRoot = Join-Path $TestDrive "stage"
     $skillRecords = @(
@@ -594,8 +602,8 @@ scripts:
 
   It "keeps source kind in the combined deployment plan while normalizing codex skills" {
     $targets = @(
-      [pscustomobject]@{ Name = "claude"; Root = (Join-Path $TestDrive "claude"); ConfigName = "CLAUDE.md" }
-      [pscustomobject]@{ Name = "codex"; Root = (Join-Path $TestDrive "codex"); ConfigName = "AGENTS.md" }
+      [pscustomobject]@{ Name = "claude"; Root = (Join-Path $TestDrive "claude"); SkillsRoot = (Join-Path $TestDrive "claude"); ConfigName = "CLAUDE.md" }
+      [pscustomobject]@{ Name = "codex"; Root = (Join-Path $TestDrive "codex"); SkillsRoot = (Join-Path $TestDrive ".agents"); ConfigName = "AGENTS.md" }
     )
     $skillRecords = @(
       [pscustomobject]@{ SourceKind = "personal"; SourceSkillId = "superpowers:brainstorming"; SourcePath = (Join-Path (Join-Path (Join-Path $TestDrive "source") "personal") "brainstorming") }
@@ -611,6 +619,25 @@ scripts:
     ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should -Be "brainstorming"
     ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "gh-address-comments" }).SourceKind | Should -Be "external"
     ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "gh-address-comments" }).DeployedSkillName | Should -Be "gh-address-comments"
+  }
+
+  It "replaces codex staged skills into ~/.agents/skills and removes legacy ~/.codex/skills" {
+    $targets = @(
+      [pscustomobject]@{ Name = "codex"; Root = (Join-Path $TestDrive ".codex"); SkillsRoot = (Join-Path $TestDrive ".agents"); ConfigName = "AGENTS.md" }
+    )
+    $stageRoot = Join-Path $TestDrive "stage"
+    $codexStageSkill = Join-Path (Join-Path (Join-Path $stageRoot "codex") "skills") "brainstorming"
+    $legacyCodexSkill = Join-Path $TestDrive ".codex/skills/brainstorming"
+
+    New-Item -ItemType Directory -Path $codexStageSkill -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $codexStageSkill "SKILL.md") -Value "# staged"
+    New-Item -ItemType Directory -Path $legacyCodexSkill -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $legacyCodexSkill "SKILL.md") -Value "# legacy"
+
+    Replace-SkillTargetsFromStage -StageRoot $stageRoot -Targets $targets
+
+    Test-Path (Join-Path $TestDrive ".agents/skills/brainstorming/SKILL.md") | Should -Be $true
+    Test-Path (Join-Path $TestDrive ".codex/skills") | Should -Be $false
   }
 
   It "publishes workspace mise tasks for formatting, verification, and sync flow" {
@@ -680,7 +707,7 @@ scripts:
     $readme | Should -Match 'mise run sync'
     $readme | Should -Match 'mise run sync:stable'
     $readme | Should -Match 'mise run stage-catalog'
-    $todo | Should -Match 'managed catalog only'
+    $todo | Should -Match 'managed source of truth'
   }
 
   It "runs catalog release as stage, release gate, and register flow" {

@@ -1077,11 +1077,11 @@ print_catalog_summary() {
 
 managed_catalog_runtime_targets() {
   cat <<'EOF'
-claude|.claude|CLAUDE.md
-codex|.codex|AGENTS.md
-cursor|.cursor|AGENTS.md
-opencode|.opencode|CLAUDE.md
-openclaw|.openclaw|CLAUDE.md
+claude|.claude|CLAUDE.md|
+codex|.codex|AGENTS.md|.agents
+cursor|.cursor|AGENTS.md|
+opencode|.opencode|CLAUDE.md|
+openclaw|.openclaw|CLAUDE.md|
 EOF
 }
 
@@ -1599,11 +1599,17 @@ swap_staged_skill_tree_into_place() {
 replace_skill_targets_from_stage() {
   stage_root="$1"
 
-  managed_catalog_runtime_targets | while IFS='|' read -r target_name target_dir _config_name; do
+  managed_catalog_runtime_targets | while IFS='|' read -r target_name target_dir _config_name skills_dir; do
     target_root="$HOME/$target_dir"
+    skills_root_dir="${skills_dir:-$target_dir}"
+    legacy_skills_root="$target_root/skills"
+    target_skills_root="$HOME/$skills_root_dir/skills"
     staged_skills_root="$stage_root/$target_name/skills"
     [ -d "$staged_skills_root" ] || mkdir -p "$staged_skills_root"
-    swap_staged_skill_tree_into_place "$staged_skills_root" "$target_root/skills"
+    if [ "$legacy_skills_root" != "$target_skills_root" ] && { [ -e "$legacy_skills_root" ] || [ -L "$legacy_skills_root" ]; }; then
+      rm -rf "$legacy_skills_root"
+    fi
+    swap_staged_skill_tree_into_place "$staged_skills_root" "$target_skills_root"
   done
 }
 
@@ -1749,13 +1755,15 @@ cmd_doctor() {
     inventory_file=$(mktemp "${TMPDIR:-/tmp}/apm-skill-inventory.XXXXXX")
     codex_mcp_config="$HOME/.codex/config.toml"
     managed_catalog_skill_inventory >"$inventory_file"
-    managed_catalog_runtime_targets | while IFS='|' read -r target_name target_dir config_name; do
+    managed_catalog_runtime_targets | while IFS='|' read -r target_name target_dir config_name skills_dir; do
       target_root="$HOME/$target_dir"
+      skills_root_dir="${skills_dir:-$target_dir}"
+      target_skills_root="$HOME/$skills_root_dir/skills"
       if [ -e "$target_root/$config_name" ]; then config_state=present; else config_state=missing; fi
       if [ -e "$target_root/agents" ]; then agents_state=present; else agents_state=missing; fi
       if [ -e "$target_root/commands" ]; then commands_state=present; else commands_state=missing; fi
       if [ -e "$target_root/rules" ]; then rules_state=present; else rules_state=missing; fi
-      if [ -e "$target_root/skills" ]; then skills_state=present; else skills_state=missing; fi
+      if [ -e "$target_skills_root" ]; then skills_state=present; else skills_state=missing; fi
       printf '  %s: config=%s agents=%s commands=%s rules=%s skills=%s\n' "$target_name" "$config_state" "$agents_state" "$commands_state" "$rules_state" "$skills_state"
     done
     printf 'codex mcp config: %s\n' "$(test -f "$codex_mcp_config" && printf present || printf missing)"
