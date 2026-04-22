@@ -175,7 +175,7 @@ For personal `~/.config/mise` setups, a split layout can be better than a single
 
 - Keep `config.toml` settings-only
 - Put environment-specific tool definitions in files such as `config.default.toml`, `config.ci.toml`, or `config.windows.toml`
-- Load shared task files via `[task_config].includes` from a local `.mise.toml`
+- Load shared task files via `[task_config].includes` from a local `~/.config/.mise.toml`
 
 Use this pattern for user-global dotfiles or environment-switched setups, not for ordinary project repos.
 For concrete examples, split-file structure, and do/don't guidance, see `references/task-config-includes.md`.
@@ -301,6 +301,26 @@ shellcheck = "latest"
 
 - Shared repositories: prefer concrete LTS majors or exact patches (`node = "24"` or `node = "24.15.0"`)
 - Personal global configs: symbolic channels such as `node = "lts"` can be acceptable when you intentionally want rolling local upgrades
+
+### Formatter Wiring and `mise skills add`
+
+Use `[tools]` for commands that tasks or setup docs actually invoke, including formatters such as `nixpkgs-fmt`.
+
+```toml
+[tools]
+nixpkgs-fmt = "latest"
+
+[tasks."format:nix"]
+description = "Format Nix files"
+run = "nixpkgs-fmt nix/**/*.nix"
+```
+
+When the user asks about `mise skills add`, treat it as a user-global workflow rather than a project-local task design question:
+
+1. Confirm the user is working in a personal/global mise setup
+2. Use `mise skills add <skill>` for installation
+3. Follow with `mise install` if the skill also introduces tool dependencies
+4. Keep reusable automation in shared task files or `.mise.toml`, not in ad hoc shell aliases
 
 ### Reference
 
