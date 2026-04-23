@@ -66,9 +66,6 @@ jobs:
 
       - name: Run workspace checks
         run: |
-          mise run format:catalog-metadata:check
-          mise run format:markdown:check
-          mise run format:toml:check
-          mise run format:yaml:check
+          mise run format:check
           mise run validate:catalog
           mise run smoke:catalog
