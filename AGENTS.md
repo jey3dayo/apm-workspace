@@ -60,21 +60,28 @@ Choose the command based on intent:
   - Use for weekly refreshes, dependency drift acceptance, and content-hash mismatch resolution
 - `mise run sync:stable`
   - Preserve the current manifest and lock
-  - Runs `update -> ci -> apply -> doctor`
+  - Runs `update -> ci`
   - Use cautiously; it is broader than the normal day-to-day rollout path
   - Use when you want a stable rollout without taking new upstream refs
-- `mise run ci`
+- `mise run check`
   - Verification only
-  - Runs formatting checks, validation, and smoke checks
+  - Runs formatting checks and validation only
   - Does not deploy
+- `mise run check:deep`
+  - Deep verification
+  - Runs `check` plus catalog smoke verification
+  - Use when you want stronger confidence before or apart from deployment
+- `mise run ci`
+  - End-to-end local rollout
+  - Runs checks, deploys the current manifest and lock, then inspects targets
+  - Prefer when you want `mise run ci` to finish the whole local workflow
 - `mise run apply`
   - Deploy the current manifest and lock to user targets
   - Also sync Codex-targeted skills into `~/.agents/skills`
-  - Prefer for routine local rollout
-  - Use when deployment is needed without a broader maintenance flow
-- `mise run stage-catalog`
+  - Use when deployment is needed without the bundled `check -> doctor` flow
+- `mise run catalog:stage`
   - Normalize tracked shared guidance under `catalog/`
-- `mise run register-catalog`
+- `mise run catalog:register`
   - Install the tracked catalog ref after commit and push
 - `mise run doctor`
   - Inspect rollout state and target coverage after deployment or refresh
@@ -100,8 +107,7 @@ Use when you want to deploy the current manifest and lock as-is.
 ```bash
 cd ~/.apm
 mise install
-mise run apply
-mise run doctor
+mise run ci
 ```
 
 ### Shared Guidance Update
@@ -110,8 +116,8 @@ Use when changing `catalog/AGENTS.md`, `catalog/agents/**`, `catalog/commands/**
 
 ```bash
 cd ~/.apm
-mise run stage-catalog
-mise run register-catalog
+mise run catalog:stage
+mise run catalog:register
 mise run doctor
 ```
 
@@ -145,6 +151,7 @@ When changing workspace mechanics, verify:
 
 - task semantics still match documentation
 - `sync` and `sync:stable` remain clearly differentiated
-- `ci` stays verification-only
+- `check` stays verification-only
+- `ci` remains the one-command local rollout entrypoint
 - catalog normalization and registration flows remain reproducible
 - lockfile changes are intentional and scoped

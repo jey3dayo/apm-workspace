@@ -1,6 +1,6 @@
 ---
 name: apm-usage
-description: Use when editing the `~/.apm` global APM workspace, deciding whether a change belongs in `~/.apm/catalog/` or workspace-owned files, choosing between `mise run sync`, `mise run sync:stable`, `apply`, and `register-catalog`, or rolling out managed catalog updates.
+description: Use when editing the `~/.apm` global APM workspace, deciding whether a change belongs in `~/.apm/catalog/` or workspace-owned files, choosing between `mise run check`, `mise run check:deep`, `mise run ci`, `mise run sync`, `mise run sync:stable`, `apply`, and `catalog:register`, or rolling out managed catalog updates.
 ---
 
 # APM Usage
@@ -13,7 +13,9 @@ In this repository, APM is used primarily for **global skill management**.
 - `~/.apm/apm_modules/` stores downloaded dependency sources
 - `~/.apm/catalog/` is the repo-tracked package for shared runtime guidance
 - `~/.apm/catalog/skills/` is the authoring source for personal skills
-- `mise run apply` is the routine local rollout path for the current manifest and lock
+- `mise run check` is the lightweight verification path for the current workspace state
+- `mise run check:deep` is the deep-verification path for the current workspace state
+- `mise run ci` is the routine local rollout path for the current manifest and lock
 - `mise run sync` is the upstream-refresh path
 - `mise run sync:stable` is the stable rollout path for the current manifest and lock
 
@@ -25,7 +27,7 @@ The current day-to-day model is `catalog/skills/` authoring for personal skills,
 
 - Editing or reviewing `~/.apm/apm.yml`
 - Installing or updating global skills with `apm install -g`
-- Choosing between `mise run sync`, `mise run sync:stable`, `apply`, and `register-catalog`
+- Choosing between `mise run check`, `mise run check:deep`, `mise run ci`, `mise run sync`, `mise run sync:stable`, `apply`, and `catalog:register`
 - Refreshing the tracked managed-skill catalog in `~/.apm/catalog/`
 - Explaining the difference between upstream refs, `apm_modules/`, and deployed targets
 
@@ -38,16 +40,18 @@ Start by routing the request into one of these lanes:
   - edit `~/.apm/catalog/AGENTS.md`, `agents/**`, `commands/**`, or `rules/**` for shared runtime guidance
   - when the task is "create or migrate a managed skill", use `skill-creator`
 - local rollout from the current manifest and lock:
-  - use `mise run apply` when you want to deploy the current tracked state without taking new upstream refs
-  - follow with `mise run doctor` when you want to verify deployed targets
+  - use `mise run check` when you want a lightweight pre-deploy gate
+  - use `mise run check:deep` when you want smoke verification without deploying
+  - use `mise run ci` when you want checks plus deployment from the current tracked state without taking new upstream refs
+  - use `mise run apply` only when you need deployment without the bundled check flow
 - managed catalog registration:
-  - run `mise run stage-catalog` before commit/push when shared guidance changed
-  - run `mise run register-catalog` after commit/push when you want to install the tracked catalog package by upstream ref
+  - run `mise run catalog:stage` before commit/push when shared guidance changed
+  - run `mise run catalog:register` after commit/push when you want to install the tracked catalog package by upstream ref
 - upstream dependency refresh:
   - use `mise run sync` to accept newer upstream package content with `apm install -g --update`
   - review `apm.lock.yaml` carefully before commit
 - stable local rollout:
-  - use `mise run sync:stable` to keep the current manifest and lock while still running update -> verify -> apply -> doctor
+  - use `mise run sync:stable` to keep the current manifest and lock while still running `update -> ci`
 - workspace-owned files:
   - edit `~/.apm/README.md`, `llms.md`, `apm.yml`, `apm.lock.yaml`, or `docs/**` directly
   - do not restage the catalog unless managed content changed too
@@ -109,8 +113,8 @@ Runtime targets are a third layer, not an editing surface:
   - `~/.codex/`
   - other detected runtime targets
 - refresh path:
-  - `stage-catalog` updates the tracked package in `~/.apm/catalog/`
-  - `register-catalog`, `apply`, and `sync:stable` install tracked runtime guidance into user targets
+  - `catalog:stage` updates the tracked package in `~/.apm/catalog/`
+  - `catalog:register`, `ci`, `apply`, and `sync:stable` install tracked runtime guidance into user targets
 
 In short:
 
@@ -124,25 +128,24 @@ Use these short flows for the common request shapes:
 1. Personal skill changed and you want a local rollout
    - edit `~/.apm/catalog/skills/**`
    - run `mise run format:markdown:bold-headings` when you want heading normalization for Markdown in `catalog/`
-   - run `mise run apply`
-   - run `mise run doctor`
+   - run `mise run ci`
 
 2. Shared guidance changed and you want to publish the tracked catalog update
    - edit `~/.apm/catalog/**`
-   - run `mise run stage-catalog`
+   - run `mise run catalog:stage`
    - review the normalized `catalog/**` diff
    - commit/push `~/.apm`
-   - run `mise run register-catalog`
+   - run `mise run catalog:register`
    - run `mise run doctor`
 
 3. Only `~/.apm` docs or manifest files changed
    - edit the workspace-owned files directly
    - commit/push `~/.apm`
-   - run `mise run register-catalog` only if `catalog/` changed too
+   - run `mise run catalog:register` only if `catalog/` changed too
 
 4. Upstream dependency refresh
    - run `mise run sync` when you want to accept new upstream package content with `apm install -g --update`
-   - run `mise run sync:stable` when you want to deploy the current manifest and lock without taking new upstream refs
+   - run `mise run sync:stable` when you want to update first and then run the full local rollout without taking new upstream refs
 
 Not allowed:
 
@@ -156,8 +159,7 @@ Not allowed:
 # Day-to-day global flow from ~/.apm
 cd ~/.apm
 mise install
-mise run apply
-mise run doctor
+mise run ci
 
 # when you intentionally want newer upstream content
 mise run sync
@@ -187,10 +189,10 @@ That flow:
 For a full managed-content rollout, the normal sequence is:
 
 1. edit `~/.apm/catalog/`
-2. run `mise run stage-catalog` from `~/.apm`
+2. run `mise run catalog:stage` from `~/.apm`
 3. review the normalized `catalog/` diff
 4. commit and push `~/.apm`
-5. run `mise run register-catalog`
+5. run `mise run catalog:register`
 6. run `mise run doctor`
 
 ## Important Global Model
@@ -217,38 +219,38 @@ If you see `./packages/...` in `apm.yml`, that is legacy migration residue and s
 
 When shared guidance content changes:
 
-- run `mise run stage-catalog`
+- run `mise run catalog:stage`
 - review, commit, and push the updated `catalog/`
-- run `mise run register-catalog`
+- run `mise run catalog:register`
 - run `mise run doctor` and confirm target `config/agents/commands/rules` are present
 
 When personal skill content changes:
 
 - edit `~/.apm/catalog/skills/**`
 - run `mise run format:markdown:bold-headings`
-- run `mise run apply` when you want the current tracked state deployed locally
-- run `mise run doctor` to verify the deployed targets
+- run `mise run ci` when you want the current tracked state checked and deployed locally
 
 When the change is only for workspace-owned docs such as `~/.apm/README.md` or `llms.md`:
 
 - edit those files directly in `~/.apm`
-- do not run `stage-catalog` unless managed catalog content also changed
-- push `~/.apm`, then use `register-catalog` only if the tracked package changed
+- do not run `catalog:stage` unless managed catalog content also changed
+- push `~/.apm`, then use `catalog:register` only if the tracked package changed
 
 ## Workspace Notes
 
 - `validate:catalog` now validates the tracked `catalog/` package itself and its required assets
 - `validate:catalog` is available both as `mise run validate:catalog` and as a workspace script command
 - `format` formats Markdown / TOML / YAML inside `~/.apm`
-- `ci:check` runs format checks plus validation and smoke checks
-- `ci` is verification-only and does not deploy
+- `check` runs format checks plus validation
+- `check:deep` runs `check` plus catalog smoke verification
+- `ci` runs `check -> apply -> doctor`
 - `catalog:tidy` restages the tracked catalog, validates it, and prints workspace health
-- public maintenance commands should use `bundle-catalog`, `stage-catalog`, `register-catalog`, and `smoke-catalog`
+- public maintenance commands should use `bundle-catalog`, `catalog:stage`, `catalog:register`, and `catalog:smoke`
 - `doctor` shows catalog coverage plus target `config/agents/commands/rules/skills` presence
 - `apply` / `update` validate the tracked catalog before global install
 - `apply` / `update` sync tracked `AGENTS.md`, `agents/`, `commands/`, and `rules/` into user runtime targets after install
 - `sync` is the upstream-acceptance flow centered on `apm install -g --update`
-- `sync:stable` preserves the older update -> verify -> apply -> doctor flow for current manifest plus lock rollout
+- `sync:stable` preserves the older `update -> ci` flow for current manifest plus lock rollout
 - `apply` / `update` should fail fast if `./packages/*` entries still remain in the global manifest
 - install helpers also fail when APM prints diagnostics such as `packages failed` or `error(s)` even if exit code is 0
 - install the APM CLI through `mise` in this repository unless you are doing manual recovery

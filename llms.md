@@ -102,10 +102,10 @@ When a personal skill changes under `~/.apm/catalog/skills/`:
 When shared runtime guidance changes under `~/.apm/catalog/`:
 
 1. Edit `catalog/` directly.
-2. Run `mise run stage-catalog`.
+2. Run `mise run catalog:stage`.
 3. Review the normalized `catalog/` diff.
 4. Commit and push the updated `catalog/`.
-5. Run `mise run register-catalog`.
+5. Run `mise run catalog:register`.
 6. Run `mise run doctor` and confirm:
    - `catalog: ... status=ok`
    - target lines show `config=present agents=present commands=present rules=present`
@@ -123,15 +123,16 @@ When a copied skill lives under `~/.apm/manual-skills/`:
 
 - `mise run format`: format Markdown, TOML, and YAML in the workspace
 - `mise run format:markdown:bold-headings`: rewrite bold headings across Markdown in `catalog/`
-- `mise run ci:check`: run formatting checks plus validation smoke checks
-- `mise run ci`: run verification-only checks for the current workspace state
-- `mise run sync`: accept upstream dependency updates with `apm install -g --update`, then verify and inspect the workspace
-- `mise run sync:stable`: update, verify, and deploy the current manifest and lock locally
+- `mise run check`: run formatting checks plus validation only
+- `mise run check:deep`: run `check` plus catalog smoke verification
+- `mise run ci`: run `check -> apply -> doctor` for the current workspace state
+- `mise run sync`: accept upstream dependency updates with `apm install -g --update`, then run the local rollout
+- `mise run sync:stable`: update, then run the full local rollout from the current manifest and lock
 - `mise run apply`: deploy the current manifest and lock without changing upstream refs
 - `mise run update`: refresh the checkout and dependency state without deploying
 - `mise run validate`: run both workspace and catalog validation
 - `mise run validate:workspace`: verify workspace wiring with workspace overrides
-- `mise run stage-catalog`: normalize `catalog/` in place before commit and push
+- `mise run catalog:stage`: normalize `catalog/` in place before commit and push
 - `mise run validate:catalog`: verify managed catalog package integrity
 - `mise run catalog:tidy`: normalize the managed catalog, validate it, and print workspace health
 
