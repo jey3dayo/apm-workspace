@@ -51,6 +51,7 @@ dependencies:
     - trailofbits/skills/plugins/static-analysis/skills/semgrep
     - trailofbits/skills/plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor
     - SawyerHood/dev-browser/skills/dev-browser
+    - browser-use/browser-harness
     - vercel-labs/agent-browser/skills/agent-browser
     - vercel-labs/agent-skills/skills/composition-patterns
     - vercel-labs/agent-skills/skills/react-best-practices

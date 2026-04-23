@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-04-22T16:42:45.120407+00:00'
+generated_at: '2026-04-23T14:15:14.000000+00:00'
 apm_version: 0.9.1
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -132,6 +132,14 @@ dependencies:
   - .agents/skills/agentation-self-driving
   - .github/skills/agentation-self-driving
   content_hash: sha256:405cf94e4df9b048ab42e51f26ad971dc6b986167b74eb46393abd6f1f5b5f88
+- repo_url: browser-use/browser-harness
+  host: github.com
+  resolved_commit: ba8b22f1ff3db93546b5a194a1978914c8ceb0f2
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/browser-harness
+  - .github/skills/browser-harness
+  content_hash: sha256:b45719f8eb7481de086ca9cf1e58fc5d971bd0d7ae5bff11d047cb4dfd8d2f96
 - repo_url: cloudflare/skills
   host: github.com
   resolved_commit: 0397d7d88fa6ac7517a88389622eb0799e86ded2
