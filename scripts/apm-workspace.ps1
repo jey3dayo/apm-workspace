@@ -1099,7 +1099,7 @@ function Get-ExternalSkillRecords {
 
     $sourcePath = Get-ExternalSkillInstallPath -RepoUrl $record.Repo -VirtualPath $record.Path -ResolvedCommit $record.Commit
     if (-not (Test-Path -LiteralPath $sourcePath)) {
-      throw "External dependency is not available in local apm_modules: $canonicalReference ($sourcePath). Run 'mise run update' first."
+      throw "External dependency is not available in local apm_modules: $canonicalReference ($sourcePath). Run 'mise run refresh' first."
     }
 
     $skillFile = Join-Path $sourcePath "SKILL.md"
