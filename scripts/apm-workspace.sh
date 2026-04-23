@@ -416,7 +416,7 @@ $body
 - Edit shared guidance in \`~/.apm/catalog/AGENTS.md\`, \`agents/**\`, \`commands/**\`, and \`rules/**\`
 - \`skills\` are authored under \`catalog/skills/**\` and staged into the published package
 - \`commands/**\` stays top-level because it is runtime-synced shared guidance, not nested skill package content
-- Edit this directory directly, then run \`mise run stage-catalog\` before commit/push
+- Edit this directory directly, then run \`mise run prepare:catalog\` before commit/push
 - Install ref: \`jey3dayo/apm-workspace/$install_ref_path#main\`
 EOF
 }
@@ -536,7 +536,7 @@ assert_tracked_catalog_published() {
   tracked_relative_path=$(tracked_catalog_relative_path)
   tracked_dir=$(tracked_catalog_dir)
 
-  [ -d "$tracked_dir" ] || fail "Tracked catalog missing: $tracked_dir. Run 'mise run stage-catalog' first."
+  [ -d "$tracked_dir" ] || fail "Tracked catalog missing: $tracked_dir. Run 'mise run prepare:catalog' first."
 
   dirty=$(git -C "$WORKSPACE_DIR" status --porcelain -- "$tracked_relative_path" 2>/dev/null || true)
   [ -z "$dirty" ] || fail "Tracked catalog has uncommitted changes. Commit and push $tracked_relative_path before registering it."
@@ -1727,7 +1727,7 @@ remove_symlink_entries() {
 
 sync_managed_catalog_runtime_assets() {
   tracked_dir=$(tracked_catalog_dir)
-  [ -d "$tracked_dir" ] || fail "Tracked catalog missing: $tracked_dir. Run 'mise run stage-catalog' first."
+  [ -d "$tracked_dir" ] || fail "Tracked catalog missing: $tracked_dir. Run 'mise run prepare:catalog' first."
 
   instructions_source=$(tracked_catalog_instructions_path)
   agents_source=$(tracked_catalog_agents_root)
@@ -1933,7 +1933,7 @@ assert_catalog_release_ready() {
 
   dirty=$(git -C "$WORKSPACE_DIR" status --porcelain 2>/dev/null) || fail "Failed to inspect git status for $WORKSPACE_DIR"
   if [[ -n "${dirty//$'\n'/}" ]]; then
-    fail "Working tree is dirty after stage-catalog. Commit or stash changes, push the branch, then rerun catalog:release."
+    fail "Working tree is dirty after prepare:catalog. Commit or stash changes, push the branch, then rerun release:catalog."
   fi
 
   tracking_info=$(workspace_tracking_info)
@@ -1943,7 +1943,7 @@ assert_catalog_release_ready() {
 
   unpushed=$(git -C "$WORKSPACE_DIR" rev-list "$upstream..HEAD" 2>/dev/null) || fail "Failed to compare HEAD against $upstream"
   if [[ -n "${unpushed//$'\n'/}" ]]; then
-    fail "Branch has commits not on $upstream. Push before running catalog:release."
+    fail "Branch has commits not on $upstream. Push before running release:catalog."
   fi
 }
 
@@ -1997,8 +1997,8 @@ Usage: scripts/apm-workspace.sh <command> [args...]
 
 Commands:
   apply              Offline deploy user-scope-compatible dependencies and compile Codex output
-  sync-skills:local  Quick-sync managed catalog skills into ~/.agents/skills only
-  update             Refresh the checkout and dependencies only; does not deploy
+  apply:skills:local Quick-sync managed catalog skills into ~/.agents/skills only
+  refresh            Refresh the checkout and dependencies only; does not deploy
   format-catalog-metadata  Normalize tracked catalog apm.yml and README.md
   check-catalog-metadata   Check tracked catalog apm.yml and README.md normalization
   pin-external       Pin external manifest refs to lockfile commits
@@ -2006,10 +2006,10 @@ Commands:
   validate:catalog   Fail when ~/.apm/catalog is not normalized or missing required assets
   doctor             Inspect workspace and target state
   bundle-catalog     Build ~/.apm/.catalog-build/catalog as the catalog package artifact
-  stage-catalog      Rewrite ~/.apm/catalog into its normalized publishable layout and print its upstream ref
-  register-catalog   Install the catalog ref after commit/push
-  release-catalog    Stage, require a clean pushed branch, then install the catalog ref
-  smoke-catalog      Smoke-test the generated catalog package via temp project install
+  prepare:catalog    Rewrite ~/.apm/catalog into its normalized publishable layout and print its upstream ref
+  install:catalog    Install the catalog ref after commit/push
+  release:catalog    Prepare, require a clean pushed branch, then install the catalog ref
+  smoke:catalog      Smoke-test the generated catalog package via temp project install
 
 Environment overrides:
   APM_WORKSPACE_DIR
@@ -2021,8 +2021,8 @@ EOF
 
 case "$COMMAND" in
   apply) cmd_apply ;;
-  sync-skills:local) cmd_sync_local_skills "$@" ;;
-  update) cmd_update ;;
+  apply:skills:local) cmd_sync_local_skills "$@" ;;
+  refresh) cmd_update ;;
   format-catalog-metadata) cmd_format_catalog_metadata ;;
   check-catalog-metadata) cmd_check_catalog_metadata ;;
   pin-external) cmd_pin_external ;;
@@ -2030,10 +2030,10 @@ case "$COMMAND" in
   validate:catalog) cmd_validate_catalog ;;
   doctor) cmd_doctor ;;
   bundle-catalog) cmd_bundle_catalog "$@" ;;
-  stage-catalog) cmd_stage_catalog "$@" ;;
-  register-catalog) cmd_register_catalog "$@" ;;
-  release-catalog) cmd_release_catalog "$@" ;;
-  smoke-catalog) cmd_smoke_catalog "$@" ;;
+  prepare:catalog) cmd_stage_catalog "$@" ;;
+  install:catalog) cmd_register_catalog "$@" ;;
+  release:catalog) cmd_release_catalog "$@" ;;
+  smoke:catalog) cmd_smoke_catalog "$@" ;;
   help | -h | --help) cmd_help ;;
   *)
     fail "unknown command: $COMMAND"

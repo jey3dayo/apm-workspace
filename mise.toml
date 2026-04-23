@@ -30,9 +30,8 @@ run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\a
 
 [tasks.refresh]
 description = "Refresh the ~/.apm checkout and dependencies without deploying"
-alias = ["update"]
-run = "bash ./scripts/apm-workspace.sh update"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 update"
+run = "bash ./scripts/apm-workspace.sh refresh"
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 refresh"
 
 [tasks.doctor]
 description = "Inspect ~/.apm workspace state and deployed targets"
@@ -44,27 +43,23 @@ run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\a
 # ========================================
 [tasks."apply:skills:local"]
 description = "Quick-apply managed catalog skills into the local Codex target only"
-alias = ["skills:sync:local", "sync-skills:local"]
-run = "bash ./scripts/apm-workspace.sh sync-skills:local"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 sync-skills:local"
+run = "bash ./scripts/apm-workspace.sh apply:skills:local"
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 apply:skills:local"
 
 [tasks."prepare:catalog"]
 description = "Normalize `catalog/` in place inside ~/.apm"
-alias = ["catalog:stage", "stage-catalog"]
-run = "bash ./scripts/apm-workspace.sh stage-catalog"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 stage-catalog"
+run = "bash ./scripts/apm-workspace.sh prepare:catalog"
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 prepare:catalog"
 
 [tasks."install:catalog"]
 description = "Install the managed catalog package by upstream ref"
-alias = ["catalog:register", "register-catalog"]
-run = "bash ./scripts/apm-workspace.sh register-catalog"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 register-catalog"
+run = "bash ./scripts/apm-workspace.sh install:catalog"
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 install:catalog"
 
 [tasks."smoke:catalog"]
 description = "Smoke-test the generated managed catalog package via a temp install"
-alias = ["catalog:smoke", "smoke-catalog"]
-run = "bash ./scripts/apm-workspace.sh smoke-catalog"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 smoke-catalog"
+run = "bash ./scripts/apm-workspace.sh smoke:catalog"
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 smoke:catalog"
 
 # ========================================
 # Validation Commands
@@ -157,7 +152,6 @@ run = [
 
 [tasks."format:check"]
 description = "Check workspace docs and manifest formatting"
-alias = ["check:format"]
 depends = [
   "format:catalog-metadata:check",
   "format:markdown:bold-headings:check",
@@ -172,12 +166,10 @@ depends = ["format:check", "validate"]
 
 [tasks.verify]
 description = "Run deep verification for the ~/.apm workspace"
-alias = ["check:deep"]
 run = [{ task = "check" }, { task = "smoke:catalog" }]
 
 [tasks.deploy]
 description = "Run checks, deploy the current workspace state, and inspect targets"
-alias = ["ci"]
 run = [{ task = "check" }, { task = "apply" }, { task = "doctor" }]
 
 # ========================================
@@ -185,17 +177,14 @@ run = [{ task = "check" }, { task = "apply" }, { task = "doctor" }]
 # ========================================
 [tasks.upgrade]
 description = "Refresh upstream APM dependencies, verify, and inspect the ~/.apm workspace"
-alias = ["sync"]
 run = ["apm install -g --update", { task = "deploy" }]
 
 [tasks."refresh:deploy"]
 description = "Update, verify, and deploy the ~/.apm workspace locally from the current manifest and lock"
-alias = ["sync:stable"]
 run = [{ task = "refresh" }, { task = "deploy" }]
 
 [tasks."verify:catalog"]
 description = "Refresh, validate, and inspect the managed catalog package"
-alias = ["catalog:tidy"]
 run = [
   { task = "prepare:catalog" },
   { task = "validate:catalog" },
@@ -204,12 +193,11 @@ run = [
 
 [tasks."release:catalog"]
 description = "Run local sync, require a clean pushed branch, then register the managed catalog"
-alias = ["catalog:release"]
 run = [
   { task = "refresh:deploy" },
-  "bash ./scripts/apm-workspace.sh release-catalog",
+  "bash ./scripts/apm-workspace.sh release:catalog",
 ]
 run_windows = [
   { task = "refresh:deploy" },
-  "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 release-catalog",
+  "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 release:catalog",
 ]

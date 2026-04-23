@@ -71,4 +71,4 @@ jobs:
           mise run format:toml:check
           mise run format:yaml:check
           mise run validate:catalog
-          mise run smoke-catalog
+          mise run smoke:catalog

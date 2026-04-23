@@ -312,16 +312,16 @@ Describe "public command surface" {
     New-Item -ItemType Directory -Path $script:WorkspaceDir -Force | Out-Null
   }
 
-  It "shows shell help wording for update and catalog commands" {
+  It "shows shell help wording for refresh and catalog commands" {
     $legacyMirrorPattern = 'transitional' + ' mirror'
-    $updateHelpPattern = '(?m)^  update\s+Refresh the checkout and dependencies only; does not deploy$'
+    $updateHelpPattern = '(?m)^  refresh\s+Refresh the checkout and dependencies only; does not deploy$'
     $help = & /bin/bash (Join-Path $workspaceRoot "scripts/apm-workspace.sh") help | Out-String
 
     $help | Should -Match $updateHelpPattern
     $help | Should -Match "validate:catalog"
-    $help | Should -Match "stage-catalog"
-    $help | Should -Match "register-catalog"
-    $help | Should -Match "release-catalog"
+    $help | Should -Match "prepare:catalog"
+    $help | Should -Match "install:catalog"
+    $help | Should -Match "release:catalog"
     $help | Should -Not -Match $legacyMirrorPattern
     $help | Should -Not -Match "validate-internal"
     $help | Should -Not -Match "stage-internal"
@@ -329,16 +329,16 @@ Describe "public command surface" {
     $help | Should -Not -Match "migrate-internal"
   }
 
-  It "shows PowerShell help wording for update and catalog commands" {
+  It "shows PowerShell help wording for refresh and catalog commands" {
     $legacyMirrorPattern = 'transitional' + ' mirror'
-    $updateHelpPattern = '(?m)^  update\s+Refresh the checkout and dependencies only; does not deploy$'
+    $updateHelpPattern = '(?m)^  refresh\s+Refresh the checkout and dependencies only; does not deploy$'
     $help = & $consoleShell -NoProfile -ExecutionPolicy Bypass -File $scriptPath help | Out-String
 
     $help | Should -Match $updateHelpPattern
     $help | Should -Match "validate:catalog"
-    $help | Should -Match "stage-catalog"
-    $help | Should -Match "register-catalog"
-    $help | Should -Match "release-catalog"
+    $help | Should -Match "prepare:catalog"
+    $help | Should -Match "install:catalog"
+    $help | Should -Match "release:catalog"
     $help | Should -Not -Match $legacyMirrorPattern
     $help | Should -Not -Match "validate-internal"
     $help | Should -Not -Match "stage-internal"
@@ -605,7 +605,7 @@ dependencies:
     ($inventory | Where-Object Target -eq "codex").DeployedSkillName | Should -Be "superpowers-brainstorming"
   }
 
-  It "smoke-catalog normalizes Codex-installed skill paths for superpowers aliases" {
+  It "smoke:catalog normalizes Codex-installed skill paths for superpowers aliases" {
     $buildDir = Join-Path $TestDrive "catalog-build"
     $buildSkillsRoot = Join-Path $buildDir ".apm/skills"
     $bundleSkillRoot = Join-Path (Join-Path $buildSkillsRoot "superpowers") "brainstorming"
@@ -767,7 +767,6 @@ dependencies:
     $miseToml | Should -Match '\[tasks\."apm:install"\]'
     $miseToml | Should -Match '\[tasks\.apply\]'
     $miseToml | Should -Match '\[tasks\."apply:skills:local"\]'
-    $miseToml | Should -Match 'alias = \["skills:sync:local", "sync-skills:local"\]'
     $miseToml | Should -Match '\[tasks\.refresh\]'
     $miseToml | Should -Not -Match '\[tasks\."apm:update"\]'
     $miseToml | Should -Match '\[tasks\.doctor\]'
@@ -784,17 +783,17 @@ dependencies:
     $miseToml | Should -Match '\[tasks\."release:catalog"\]'
     $miseToml | Should -Match '\[tasks\."verify:catalog"\]'
     $miseToml | Should -Match 'run = "bash ./scripts/apm-workspace.sh apply"'
-    $miseToml | Should -Match 'run = "bash ./scripts/apm-workspace.sh sync-skills:local"'
+    $miseToml | Should -Match 'run = "bash ./scripts/apm-workspace.sh apply:skills:local"'
     $miseToml | Should -Match 'replace-bold-headings\.ts'
     $miseToml | Should -Match 'replace-bold-headings\.ts.*\./catalog"'
     $miseToml | Should -Match 'replace-bold-headings\.ts.*\./catalog --dry-run'
-    $miseToml | Should -Match '(?s)\[tasks\."format:check"\]\s*description = "Check workspace docs and manifest formatting"\s*alias = \["check:format"\]'
+    $miseToml | Should -Match '(?s)\[tasks\."format:check"\]\s*description = "Check workspace docs and manifest formatting"\s*depends = \['
     $miseToml | Should -Match '(?s)\[tasks\.check\]\s*description = "Run lightweight pre-deploy checks for the ~/.apm workspace"\s*depends = \["format:check", "validate"\]'
-    $miseToml | Should -Match '(?s)\[tasks\.verify\]\s*description = "Run deep verification for the ~/.apm workspace"\s*alias = \["check:deep"\]\s*run = \[\{ task = "check" \}, \{ task = "smoke:catalog" \}\]'
-    $miseToml | Should -Match '(?s)\[tasks\.deploy\]\s*description = "Run checks, deploy the current workspace state, and inspect targets"\s*alias = \["ci"\]\s*run = \[\{ task = "check" \}, \{ task = "apply" \}, \{ task = "doctor" \}\]'
-    $miseToml | Should -Match '(?s)\[tasks\.upgrade\].*?alias = \["sync"\].*?apm install -g --update.*?\{ task = "deploy" \}'
-    $miseToml | Should -Match '(?s)\[tasks\."refresh:deploy"\].*?alias = \["sync:stable"\].*?\{ task = "refresh" \}.*?\{ task = "deploy" \}'
-    $miseToml | Should -Match '(?s)\[tasks\."release:catalog"\].*?alias = \["catalog:release"\].*?\{ task = "refresh:deploy" \}.*?release-catalog'
+    $miseToml | Should -Match '(?s)\[tasks\.verify\]\s*description = "Run deep verification for the ~/.apm workspace"\s*run = \[\{ task = "check" \}, \{ task = "smoke:catalog" \}\]'
+    $miseToml | Should -Match '(?s)\[tasks\.deploy\]\s*description = "Run checks, deploy the current workspace state, and inspect targets"\s*run = \[\{ task = "check" \}, \{ task = "apply" \}, \{ task = "doctor" \}\]'
+    $miseToml | Should -Match '(?s)\[tasks\.upgrade\].*?apm install -g --update.*?\{ task = "deploy" \}'
+    $miseToml | Should -Match '(?s)\[tasks\."refresh:deploy"\].*?\{ task = "refresh" \}.*?\{ task = "deploy" \}'
+    $miseToml | Should -Match '(?s)\[tasks\."release:catalog"\].*?\{ task = "refresh:deploy" \}.*?release:catalog'
     $miseToml | Should -Not -Match 'APM_BOOTSTRAP_REPO'
   }
 

@@ -1695,7 +1695,7 @@ function Get-CatalogReadmeContent {
     '- Edit shared guidance in `~/.apm/catalog/AGENTS.md`, `agents/**`, `commands/**`, and `rules/**`',
     '- `skills` are authored under `catalog/skills/**` and staged into the published package',
     '- `commands/**` stays top-level because it is runtime-synced shared guidance, not nested skill package content',
-    '- Edit this directory directly, then run `mise run stage-catalog` before commit/push',
+    '- Edit this directory directly, then run `mise run prepare:catalog` before commit/push',
     '- Install ref: `jey3dayo/apm-workspace/catalog#main`'
   ) -join [Environment]::NewLine
 }
@@ -1798,7 +1798,7 @@ function Copy-ManagedCatalogFile {
 function Sync-ManagedCatalogRuntimeAssets {
   $trackedDir = Get-TrackedCatalogDir
   if (-not (Test-Path -LiteralPath $trackedDir)) {
-    throw "Tracked catalog missing: $trackedDir. Run 'mise run stage-catalog' first."
+    throw "Tracked catalog missing: $trackedDir. Run 'mise run prepare:catalog' first."
   }
 
   $instructionsSource = Get-TrackedCatalogInstructionsPath
@@ -2177,7 +2177,7 @@ function Assert-TrackedCatalogPublished {
   $trackedDir = Get-TrackedCatalogDir
 
   if (-not (Test-Path -LiteralPath $trackedDir)) {
-    throw "Tracked catalog missing: $trackedDir. Run 'mise run stage-catalog' first."
+    throw "Tracked catalog missing: $trackedDir. Run 'mise run prepare:catalog' first."
   }
 
   $dirty = & git -C $WorkspaceDir status --porcelain -- $trackedRelativePath 2>$null
@@ -2211,7 +2211,7 @@ function Invoke-SeedCatalogBuild {
 
   $skillIds = @(Get-RequestedCatalogSkillIds -RequestedSkillIds $RequestedSkillIds)
   if ($LegacyAlias) {
-    Write-WarnLine "migrate is now a compatibility alias. Prefer 'stage-catalog' for the catalog flow."
+    Write-WarnLine "migrate is now a compatibility alias. Prefer 'prepare:catalog' for the catalog flow."
   }
 
   Reset-CatalogBuildDir
@@ -2287,7 +2287,7 @@ function Assert-CatalogReleaseReady {
     throw "Failed to inspect git status for $WorkspaceDir"
   }
   if (-not [string]::IsNullOrWhiteSpace(($dirty | Out-String))) {
-    throw "Working tree is dirty after stage-catalog. Commit or stash changes, push the branch, then rerun catalog:release."
+    throw "Working tree is dirty after prepare:catalog. Commit or stash changes, push the branch, then rerun release:catalog."
   }
 
   $tracking = Get-WorkspaceTrackingInfo
@@ -2297,7 +2297,7 @@ function Assert-CatalogReleaseReady {
     throw "Failed to compare HEAD against $upstream"
   }
   if (-not [string]::IsNullOrWhiteSpace(($unpushed | Out-String))) {
-    throw "Branch has commits not on $upstream. Push before running catalog:release."
+    throw "Branch has commits not on $upstream. Push before running release:catalog."
   }
 }
 
@@ -2386,11 +2386,11 @@ switch ($Command) {
     Invoke-Apply
   }
 
-  "sync-skills:local" {
+  "apply:skills:local" {
     Invoke-SyncLocalSkills -RequestedSkillIds $CommandArgs
   }
 
-  "update" {
+  "refresh" {
     Invoke-Update
   }
 
@@ -2422,19 +2422,19 @@ switch ($Command) {
     Invoke-BundleCatalog -RequestedSkillIds $CommandArgs
   }
 
-  "stage-catalog" {
+  "prepare:catalog" {
     Invoke-StageCatalog -RequestedSkillIds $CommandArgs
   }
 
-  "register-catalog" {
+  "install:catalog" {
     Invoke-RegisterCatalog -RequestedSkillIds $CommandArgs
   }
 
-  "release-catalog" {
+  "release:catalog" {
     Invoke-ReleaseCatalog -RequestedSkillIds $CommandArgs
   }
 
-  "smoke-catalog" {
+  "smoke:catalog" {
     Invoke-SmokeCatalog -RequestedSkillIds $CommandArgs
   }
 
@@ -2444,8 +2444,8 @@ Usage: scripts/apm-workspace.ps1 <command> [args...]
 
 Commands:
   apply              Offline deploy user-scope-compatible dependencies and compile Codex output
-  sync-skills:local  Quick-sync managed catalog skills into ~/.agents/skills only
-  update             Refresh the checkout and dependencies only; does not deploy
+  apply:skills:local Quick-sync managed catalog skills into ~/.agents/skills only
+  refresh            Refresh the checkout and dependencies only; does not deploy
   format-catalog-metadata  Normalize tracked catalog apm.yml and README.md
   check-catalog-metadata   Check tracked catalog apm.yml and README.md normalization
   pin-external       Pin external manifest refs to lockfile commits
@@ -2453,10 +2453,10 @@ Commands:
   validate:catalog   Fail when ~/.apm/catalog is not normalized or missing required assets
   doctor             Inspect workspace and target state
   bundle-catalog     Build ~/.apm/.catalog-build/catalog as the catalog package artifact
-  stage-catalog      Rewrite ~/.apm/catalog into its normalized publishable layout and print its upstream ref
-  register-catalog   Install the catalog ref after commit/push
-  release-catalog    Stage, require a clean pushed branch, then install the catalog ref
-  smoke-catalog      Smoke-test the generated catalog package via temp project install
+  prepare:catalog    Rewrite ~/.apm/catalog into its normalized publishable layout and print its upstream ref
+  install:catalog    Install the catalog ref after commit/push
+  release:catalog    Prepare, require a clean pushed branch, then install the catalog ref
+  smoke:catalog      Smoke-test the generated catalog package via temp project install
 
 Environment overrides:
   APM_WORKSPACE_DIR
