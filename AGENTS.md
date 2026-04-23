@@ -54,34 +54,34 @@ In practice:
 
 Choose the command based on intent:
 
-- `mise run sync`
+- `mise run upgrade`
   - Accept newer upstream package content with `apm install -g --update`
   - Avoid for routine rollout; reserve it for intentional upstream refresh of workspace dependencies
   - Use for weekly refreshes, dependency drift acceptance, and content-hash mismatch resolution
-- `mise run sync:stable`
+- `mise run refresh:deploy`
   - Preserve the current manifest and lock
-  - Runs `update -> ci`
+  - Runs `refresh -> deploy`
   - Use cautiously; it is broader than the normal day-to-day rollout path
   - Use when you want a stable rollout without taking new upstream refs
 - `mise run check`
   - Verification only
   - Runs formatting checks and validation only
   - Does not deploy
-- `mise run check:deep`
+- `mise run verify`
   - Deep verification
   - Runs `check` plus catalog smoke verification
   - Use when you want stronger confidence before or apart from deployment
-- `mise run ci`
+- `mise run deploy`
   - End-to-end local rollout
   - Runs checks, deploys the current manifest and lock, then inspects targets
-  - Prefer when you want `mise run ci` to finish the whole local workflow
+  - Prefer when you want `mise run deploy` to finish the whole local workflow
 - `mise run apply`
   - Deploy the current manifest and lock to user targets
   - Also sync Codex-targeted skills into `~/.agents/skills`
   - Use when deployment is needed without the bundled `check -> doctor` flow
-- `mise run catalog:stage`
+- `mise run prepare:catalog`
   - Normalize tracked shared guidance under `catalog/`
-- `mise run catalog:register`
+- `mise run install:catalog`
   - Install the tracked catalog ref after commit and push
 - `mise run doctor`
   - Inspect rollout state and target coverage after deployment or refresh
@@ -95,7 +95,7 @@ Use when you want newer external content.
 ```bash
 cd ~/.apm
 mise install
-mise run sync
+mise run upgrade
 ```
 
 Review `apm.lock.yaml` carefully before commit.
@@ -107,7 +107,7 @@ Use when you want to deploy the current manifest and lock as-is.
 ```bash
 cd ~/.apm
 mise install
-mise run ci
+mise run deploy
 ```
 
 ### Shared Guidance Update
@@ -116,8 +116,8 @@ Use when changing `catalog/AGENTS.md`, `catalog/agents/**`, `catalog/commands/**
 
 ```bash
 cd ~/.apm
-mise run catalog:stage
-mise run catalog:register
+mise run prepare:catalog
+mise run install:catalog
 mise run doctor
 ```
 
@@ -128,7 +128,7 @@ Use when changing `catalog/skills/**`.
 ```bash
 cd ~/.apm
 mise run format:markdown:bold-headings
-mise run ci
+mise run deploy
 ```
 
 Then review and commit the skill changes.
@@ -150,8 +150,8 @@ Then review and commit the skill changes.
 When changing workspace mechanics, verify:
 
 - task semantics still match documentation
-- `sync` and `sync:stable` remain clearly differentiated
+- `upgrade` and `refresh:deploy` remain clearly differentiated
 - `check` stays verification-only
-- `ci` remains the one-command local rollout entrypoint
+- `deploy` remains the one-command local rollout entrypoint
 - catalog normalization and registration flows remain reproducible
 - lockfile changes are intentional and scoped

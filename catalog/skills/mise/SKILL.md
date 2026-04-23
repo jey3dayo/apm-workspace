@@ -7,13 +7,13 @@ description: |
   centralization, workflow automation, and skill installation via
   `mise skills add`.
   [When] Use when: users mention "mise", "mise-en-place", "mise.toml",
-  `mise run`, `mise format`, `mise ci`, `mise skills add`, task definitions,
+  `mise run`, `mise format`, `mise check`, `mise deploy`, `mise skills add`, task definitions,
   tool version management, formatter wiring such as `nixpkgs-fmt`, or ask
   whether a formatter / command is 組み込まれている. Do not use for dotfile
   migration, Home Manager, Nix Flake, or `~/.opencommit` / `~/.config`
   management; use `nix-dotfiles` instead.
   [Keywords] mise, mise-en-place, mise.toml, tool management, package
-  management, npm global, python packages, task runner, run, format, ci,
+  management, npm global, python packages, task runner, run, format, check, deploy,
   skills add, formatter, fmt, nixpkgs-fmt, config.ci.toml,
   config.default.toml
 ---
@@ -110,19 +110,19 @@ Treat aggregation tasks and aliases as separate concerns.
 
 - Purpose: Coordinate related checks or workflows
 - Preferred shape: Use `depends` when the task mainly aggregates independent prerequisites
-- Examples: `format`, `check:format`, `lint`, `ci`
+- Examples: `format`, `format:check`, `lint`, `check`, `deploy`
 
 #### Alias Property
 
 - Purpose: Provide shorter CLI shortcuts for frequently used tasks
 - Usage: Optional `alias = ["b"]` or `alias = ["fmt"]`
-- Rule: Do not confuse a task named `ci` or `format` with an actual alias unless it declares `alias = [...]`
+- Rule: Do not confuse a workflow task named `deploy` or `format` with an actual alias unless it declares `alias = [...]`
 
 ### Alias Strategy
 
 - Single character (`b`, `t`, `l`): Daily-use tasks (build, test, lint)
-- Two characters (`cb`, `fmt`, `ci`): Common operations
-- Prefix with `+` (`+ci`, `+all`): Meta-tasks that orchestrate others
+- Two characters (`cb`, `fmt`, `qa`): Common operations
+- Prefix with `+` (`+deploy`, `+all`): Meta-tasks that orchestrate others
 
 ### Example
 
@@ -138,9 +138,9 @@ alias = ["t"]
 depends = ["build"]
 run = "cargo test"
 
-[tasks."+ci"]
-description = "Full CI pipeline"
-depends = ["lint", "test", "build"]
+[tasks."+deploy"]
+description = "Full delivery pipeline"
+depends = ["check", "test", "build"]
 ```
 
 ### 3. Dependency Management
@@ -218,8 +218,21 @@ Within the `[tasks]` section, organize tasks logically by responsibility:
    - Characteristics: Prefer `depends` when coordinating independent checks or prerequisites
 
 3. Aliases/Meta-Tasks - Top-level orchestration for common workflows
-   - Example: `+ci`, `+all`, `release`
+   - Example: `deploy`, `verify`, `upgrade`, `+all`, `release`
    - Characteristics: High-level coordination, often used in CI/CD; may also declare `alias = [...]`
+
+### Naming Model
+
+Prefer one naming model consistently inside a repository:
+
+1. Single-task commands: action-first names
+   - Examples: `format`, `validate`, `smoke:catalog`, `prepare:catalog`, `install:catalog`
+   - Rule: A reader should infer the immediate action without reading the implementation
+2. Orchestration workflows: workflow names
+   - Examples: `check`, `verify`, `deploy`, `upgrade`
+   - Rule: A reader should infer that the task coordinates multiple lower-level tasks
+
+Avoid mixing these styles arbitrarily. If a task both performs work and orchestrates other tasks, choose the name based on the primary user intent.
 
 ### Recommended Comment Structure
 
@@ -251,8 +264,8 @@ depends = ["format:terraform", "format:docs"]
 # ========================================
 # エイリアス / メタタスク
 # ========================================
-[tasks.ci]
-depends = ["format", "lint", "test", "build"]
+[tasks.deploy]
+depends = ["check", "test", "build"]
 ```
 
 ### Example
@@ -390,7 +403,8 @@ run = "pytest tests/integration"
 - Within tasks section: individual commands → aggregation tasks → aliases/meta-tasks
 - Use section separator comments for readability (`# === Commands ===`)
 - Use descriptive task names and always include `description`
-- Prefer `depends` for aggregation-only tasks such as `check`, `lint`, or `ci:check`
+- Prefer `depends` for aggregation-only tasks such as `check`, `verify`, or `lint`
+- Use action-first names for single-task commands and workflow names for orchestration tasks
 - Add tools to `[tools]` only when they are used directly by tasks or documented setup flows
 
 ❌ **DON'T:**
@@ -422,7 +436,9 @@ run = "pytest tests/integration"
 ✅ **DO:**
 
 - Use lowercase-kebab-case for task names
-- Prefix meta-tasks with `+`
+- Use action-first names for single-task commands (`format`, `validate`, `prepare:catalog`)
+- Use workflow names for orchestration tasks (`check`, `verify`, `deploy`, `upgrade`)
+- Prefix meta-tasks with `+` only when the repository already uses that convention
 - Choose intuitive short aliases
 - Document complex task dependencies
 
@@ -441,7 +457,7 @@ When reviewing existing mise.toml:
 
 For repository-specific reviews, add these checks before proposing changes:
 
-- Does the answer preserve the repo's documented verification-only tasks?
+- Does the answer preserve the repo's documented lightweight-check, deep-verify, and deploy semantics where they differ?
 - Does it keep refresh, rollout, and deploy semantics distinct where the repo does?
 - Does it avoid treating generated outputs as editing surfaces if the repo separates them from authoring surfaces?
 - Does it separate "task behavior as implemented" from "description wording that could be clearer"?
@@ -494,7 +510,7 @@ run = "cargo test"
 ### Problem
 
 ```toml
-[tasks.ci]
+[tasks.verify]
 run = [
   { task = "lint" },
   { task = "test" },
@@ -505,7 +521,7 @@ run = [
 ### Solution
 
 ```toml
-[tasks.ci]
+[tasks.deploy]
 depends = ["lint", "test", "build"]  # ✅ Parallel execution
 ```
 
@@ -513,7 +529,7 @@ depends = ["lint", "test", "build"]  # ✅ Parallel execution
 
 ### With CI Systems
 
-- Expose a single CI entry task such as `mise run ci`
+- Expose a single delivery entry task such as `mise run deploy`
 - Pin mise version: `mise use -g mise@2025.10`
 - Set `MISE_JOBS=$(nproc)` for parallel execution
 - Let mise orchestrate entire build pipeline

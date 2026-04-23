@@ -76,7 +76,7 @@ This is the only documented exception that reaches into `~/.config`. All other d
 ```powershell
 cd ~/.apm
 mise install
-mise run ci
+mise run deploy
 ```
 
 Useful maintenance commands:
@@ -84,16 +84,16 @@ Useful maintenance commands:
 ```powershell
 mise run format
 mise run check        # lightweight pre-deploy checks
-mise run check:deep   # includes catalog smoke verification
-mise run ci           # check + deploy + doctor
-mise run sync         # upstream refresh
-mise run sync:stable  # update, then run the full local rollout
-mise run skills:sync:local  # quick local Codex skill sync only
+mise run verify       # includes catalog smoke verification
+mise run deploy       # check + apply + doctor
+mise run upgrade      # upstream refresh
+mise run refresh:deploy  # refresh, then run the full local rollout
+mise run apply:skills:local  # quick local Codex skill sync only
 mise run validate:catalog
-mise run catalog:stage
-mise run catalog:tidy
-mise run catalog:register
-mise run catalog:smoke
+mise run prepare:catalog
+mise run verify:catalog
+mise run install:catalog
+mise run smoke:catalog
 ```
 
 ## Managed Skill Updates
@@ -102,14 +102,14 @@ When a personal skill changes under `~/.apm/catalog/skills/`:
 
 1. Update `catalog/skills/<id>/`.
 2. Run `mise run format:markdown:bold-headings` if you want heading normalization.
-3. Run `mise run skills:sync:local` when you want a fast local-only refresh into `~/.agents/skills`.
+3. Run `mise run apply:skills:local` when you want a fast local-only refresh into `~/.agents/skills`.
 
 When external skills change:
 
 1. Use `apm install <package-ref>` or `apm uninstall <package-ref>`.
 2. Review `apm.yml` and `apm.lock.yaml`.
-3. Run `mise run ci` when you want checks plus local deployment from the current manifest and lock.
-4. Use `mise run sync` only when you intentionally want to refresh upstream dependency content.
+3. Run `mise run deploy` when you want checks plus local deployment from the current manifest and lock.
+4. Use `mise run upgrade` only when you intentionally want to refresh upstream dependency content.
 
 When a copied skill lives under `~/.apm/manual-skills/`:
 
@@ -121,17 +121,17 @@ When a copied skill lives under `~/.apm/manual-skills/`:
 Task semantics:
 
 - `mise run check` verifies formatting and validation only. It does not deploy.
-- `mise run check:deep` runs `check` plus catalog smoke verification.
-- `mise run ci` runs `check -> apply -> doctor` so the local rollout finishes in one command.
-- `mise run sync` is the upstream-acceptance flow and is centered on `apm install -g --update`.
-- `mise run sync:stable` preserves the broader `update -> ci` flow for the current manifest and lock.
+- `mise run verify` runs `check` plus catalog smoke verification.
+- `mise run deploy` runs `check -> apply -> doctor` so the local rollout finishes in one command.
+- `mise run upgrade` is the upstream-acceptance flow and is centered on `apm install -g --update`.
+- `mise run refresh:deploy` preserves the broader `refresh -> deploy` flow for the current manifest and lock.
 - `mise run apply` publishes Codex skills into `~/.agents/skills` and keeps `~/.codex/skills` out of the active deployment path.
 - direct `apm` invocations should go through `mise`; when exact binary selection matters, use `mise exec github:microsoft/apm@v0.9.1 -- apm ...`.
 
 When shared runtime guidance changes under `~/.apm/catalog/`:
 
 1. Update `catalog/` directly.
-2. Run `mise run catalog:stage`.
+2. Run `mise run prepare:catalog`.
 3. Review the normalized `catalog/` diff.
 4. Run `mise run doctor` and confirm:
    - `catalog: ... status=ok`

@@ -64,8 +64,8 @@ jey3dayo/apm-workspace/catalog#main
 - Do not use `~/.codex/skills` as the verification source of truth for this workspace. Verify Codex rollout through compile success, `~/.codex/AGENTS.md`, and the deployed tree in `~/.agents/skills`.
 - Current `apm` source is `github:microsoft/apm@v0.9.1`.
 - If both `~/.apm/mise.toml` and `~/.config/mise/config.default.toml` define `apm`, keep them aligned to the same source.
-- Prefer `mise run apply` and `mise run doctor` for routine local rollout.
-- Reserve `mise run sync` for intentional upstream refresh, not for normal deployment.
+- Prefer `mise run deploy` for routine local rollout and `mise run apply` only when you need deploy-only behavior.
+- Reserve `mise run upgrade` for intentional upstream refresh, not for normal deployment.
 - When direct binary selection matters, prefer `mise exec github:microsoft/apm@v0.9.1 -- apm ...`.
 - If a Codex-targeted external skill is still missing after rollout, verify `~/.agents/skills` directly and treat it as a temporary Codex-specific delivery gap.
 
@@ -88,8 +88,7 @@ jey3dayo/apm-workspace/catalog#main
 ```powershell
 cd ~/.apm
 mise install
-mise run apply
-mise run doctor
+mise run deploy
 ```
 
 ## Managed Catalog Update Flow
@@ -102,10 +101,10 @@ When a personal skill changes under `~/.apm/catalog/skills/`:
 When shared runtime guidance changes under `~/.apm/catalog/`:
 
 1. Edit `catalog/` directly.
-2. Run `mise run catalog:stage`.
+2. Run `mise run prepare:catalog`.
 3. Review the normalized `catalog/` diff.
 4. Commit and push the updated `catalog/`.
-5. Run `mise run catalog:register`.
+5. Run `mise run install:catalog`.
 6. Run `mise run doctor` and confirm:
    - `catalog: ... status=ok`
    - target lines show `config=present agents=present commands=present rules=present`
@@ -124,17 +123,17 @@ When a copied skill lives under `~/.apm/manual-skills/`:
 - `mise run format`: format Markdown, TOML, and YAML in the workspace
 - `mise run format:markdown:bold-headings`: rewrite bold headings across Markdown in `catalog/`
 - `mise run check`: run formatting checks plus validation only
-- `mise run check:deep`: run `check` plus catalog smoke verification
-- `mise run ci`: run `check -> apply -> doctor` for the current workspace state
-- `mise run sync`: accept upstream dependency updates with `apm install -g --update`, then run the local rollout
-- `mise run sync:stable`: update, then run the full local rollout from the current manifest and lock
+- `mise run verify`: run `check` plus catalog smoke verification
+- `mise run deploy`: run `check -> apply -> doctor` for the current workspace state
+- `mise run upgrade`: accept upstream dependency updates with `apm install -g --update`, then run the local rollout
+- `mise run refresh:deploy`: refresh first, then run the full local rollout from the current manifest and lock
 - `mise run apply`: deploy the current manifest and lock without changing upstream refs
-- `mise run update`: refresh the checkout and dependency state without deploying
+- `mise run refresh`: refresh the checkout and dependency state without deploying
 - `mise run validate`: run both workspace and catalog validation
 - `mise run validate:workspace`: verify workspace wiring with workspace overrides
-- `mise run catalog:stage`: normalize `catalog/` in place before commit and push
+- `mise run prepare:catalog`: normalize `catalog/` in place before commit and push
 - `mise run validate:catalog`: verify managed catalog package integrity
-- `mise run catalog:tidy`: normalize the managed catalog, validate it, and print workspace health
+- `mise run verify:catalog`: normalize the managed catalog, validate it, and print workspace health
 
 ## References
 
