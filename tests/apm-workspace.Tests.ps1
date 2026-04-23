@@ -323,6 +323,8 @@ Describe "public command surface" {
     $help | Should -Match "prepare:catalog"
     $help | Should -Match "install:catalog"
     $help | Should -Match "release:catalog"
+    $help | Should -Not -Match "format-catalog-metadata"
+    $help | Should -Not -Match "check-catalog-metadata"
     $help | Should -Not -Match $legacyMirrorPattern
     $help | Should -Not -Match "validate-internal"
     $help | Should -Not -Match "stage-internal"
@@ -340,6 +342,8 @@ Describe "public command surface" {
     $help | Should -Match "prepare:catalog"
     $help | Should -Match "install:catalog"
     $help | Should -Match "release:catalog"
+    $help | Should -Not -Match "format-catalog-metadata"
+    $help | Should -Not -Match "check-catalog-metadata"
     $help | Should -Not -Match $legacyMirrorPattern
     $help | Should -Not -Match "validate-internal"
     $help | Should -Not -Match "stage-internal"
@@ -770,6 +774,8 @@ dependencies:
     $miseToml | Should -Match '\[tasks\.doctor\]'
     $miseToml | Should -Match '\[tasks\.format\]'
     $miseToml | Should -Match '\[tasks\."format:check"\]'
+    $miseToml | Should -Not -Match '\[tasks\."format:catalog-metadata"\]'
+    $miseToml | Should -Not -Match '\[tasks\."format:catalog-metadata:check"\]'
     $miseToml | Should -Match '\[tasks\.check\]'
     $miseToml | Should -Match '\[tasks\.verify\]'
     $miseToml | Should -Match '\[tasks\.deploy\]'
@@ -797,7 +803,7 @@ dependencies:
 
   It "describes the catalog readme without legacy mirror wording" {
     $legacyMirrorPattern = 'transitional' + ' mirror'
-    $readme = Get-CatalogReadmeContent
+    $readme = Get-Content -LiteralPath (Join-Path $workspaceRoot "catalog/README.md") -Raw
 
     $readme | Should -Match '~/.apm/catalog/skills/<id>/'
     $readme | Should -Not -Match $legacyMirrorPattern

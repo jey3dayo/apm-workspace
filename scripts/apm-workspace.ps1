@@ -158,36 +158,6 @@ function Convert-SkillIdToManifestRelativePath {
   return ((Convert-SkillIdToPathSegments -SkillId $SkillId) -join "/")
 }
 
-function Get-WorkspaceProjectName {
-  if ($env:APM_WORKSPACE_NAME) {
-    return $env:APM_WORKSPACE_NAME
-  }
-
-  $repoName = Split-Path -Leaf $WorkspaceRepo
-  if ($repoName.EndsWith(".git")) {
-    return $repoName.Substring(0, $repoName.Length - 4)
-  }
-
-  return $repoName
-}
-
-function Get-WorkspaceAuthorName {
-  $gitUser = & git config user.name 2>$null
-  if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace(($gitUser | Out-String))) {
-    return $gitUser.Trim()
-  }
-
-  if ($env:USER) {
-    return $env:USER
-  }
-
-  if ($env:USERNAME) {
-    return $env:USERNAME
-  }
-
-  return "unknown"
-}
-
 function Ensure-WorkspaceRepo {
   Require-Command -Name "git"
 
@@ -224,33 +194,12 @@ function Ensure-WorkspaceRepo {
 
 }
 
-function Write-WorkspaceManifestTemplate {
-  $manifestPath = Join-Path $WorkspaceDir "apm.yml"
-  $projectName = Get-WorkspaceProjectName
-  $authorName = Get-WorkspaceAuthorName
-
-  $manifestContent = @(
-    "name: $projectName",
-    "version: 1.0.0",
-    "description: APM project for $projectName",
-    "author: $authorName",
-    "dependencies:",
-    "  apm:",
-    "    - jey3dayo/apm-workspace/catalog#main",
-    "  mcp: []",
-    "scripts: {}"
-  ) -join [Environment]::NewLine
-
-  [System.IO.File]::WriteAllText($manifestPath, $manifestContent)
-}
-
 function Ensure-WorkspaceScaffold {
   Ensure-WorkspaceRepo
 
   $manifestPath = Join-Path $WorkspaceDir "apm.yml"
   if (-not (Test-Path -LiteralPath $manifestPath)) {
-    Write-Host "Writing bootstrap apm.yml in $WorkspaceDir"
-    Write-WorkspaceManifestTemplate
+    throw "Missing workspace apm.yml: $manifestPath"
   }
 }
 
@@ -1396,14 +1345,6 @@ function Invoke-Validate {
   Invoke-WorkspaceCommand -CommandArgs @("compile", "--validate")
 }
 
-function Invoke-FormatCatalogMetadata {
-  Normalize-TrackedCatalogMetadata
-}
-
-function Invoke-CheckCatalogMetadata {
-  Assert-TrackedCatalogMetadataNormalized
-}
-
 function Get-CatalogBuildSkillsRoot {
   return (Join-Path (Get-CatalogBuildDir) ".apm\skills")
 }
@@ -1609,70 +1550,6 @@ function Test-DirectoryTreeEqual {
   return $true
 }
 
-function Get-CatalogManifestContent {
-  return @(
-    "name: $CatalogDirName",
-    "version: 1.0.0",
-    "description: Managed catalog package for global APM rollout",
-    "dependencies:",
-    "  apm: []",
-    "  mcp: []",
-    "scripts: {}"
-  ) -join [Environment]::NewLine
-}
-
-
-function Get-CatalogReadmeContent {
-  return @(
-    '# catalog',
-    '',
-    'This directory contains the managed catalog for the global APM workspace.',
-    '',
-    '- Edit personal skills in `~/.apm/catalog/skills/<id>/`',
-    '- Edit shared guidance in `~/.apm/catalog/AGENTS.md`, `agents/**`, `commands/**`, and `rules/**`',
-    '- `skills` are authored under `catalog/skills/**` and staged into the published package',
-    '- `commands/**` stays top-level because it is runtime-synced shared guidance, not nested skill package content',
-    '- Edit this directory directly, then run `mise run prepare:catalog` before commit/push',
-    '- Install ref: `jey3dayo/apm-workspace/catalog#main`'
-  ) -join [Environment]::NewLine
-}
-
-
-function Normalize-TrackedCatalogMetadata {
-  Ensure-WorkspaceRepo
-  Ensure-WorkspaceScaffold
-
-  $trackedDir = Get-TrackedCatalogDir
-  New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
-  [System.IO.File]::WriteAllText((Join-Path $trackedDir "apm.yml"), ((Get-CatalogManifestContent) + [Environment]::NewLine))
-  [System.IO.File]::WriteAllText((Join-Path $trackedDir "README.md"), ((Get-CatalogReadmeContent) + [Environment]::NewLine))
-
-}
-
-function Assert-TrackedCatalogMetadataNormalized {
-  Ensure-WorkspaceRepo
-  Ensure-WorkspaceScaffold
-
-  $trackedDir = Get-TrackedCatalogDir
-  $manifestPath = Join-Path $trackedDir "apm.yml"
-  $readmePath = Join-Path $trackedDir "README.md"
-  $hasFailure = $false
-
-  if (-not (Test-Path -LiteralPath $manifestPath) -or (Get-Content -LiteralPath $manifestPath -Raw) -ne ((Get-CatalogManifestContent) + [Environment]::NewLine)) {
-    Write-ErrorLine "Tracked catalog manifest is not normalized"
-    $hasFailure = $true
-  }
-
-  if (-not (Test-Path -LiteralPath $readmePath) -or (Get-Content -LiteralPath $readmePath -Raw) -ne ((Get-CatalogReadmeContent) + [Environment]::NewLine)) {
-    Write-ErrorLine "Tracked catalog README is not normalized"
-    $hasFailure = $true
-  }
-
-  if ($hasFailure) {
-    throw "Catalog metadata check failed"
-  }
-}
-
 function Get-TrackedCatalogSkillIds {
   return @(Get-SkillIdsFromRoot -SkillsRoot (Get-TrackedCatalogSkillsRoot))
 }
@@ -1780,16 +1657,10 @@ function Invoke-ValidateCatalog {
   if (-not (Test-Path -LiteralPath $trackedManifest)) {
     Write-ErrorLine ("Tracked catalog manifest is missing: {0}" -f $trackedManifest)
     $hasFailure = $true
-  } elseif ((Get-Content -LiteralPath $trackedManifest -Raw) -ne (Get-CatalogManifestContent)) {
-    Write-ErrorLine "Tracked catalog manifest is not normalized"
-    $hasFailure = $true
   }
 
   if (-not (Test-Path -LiteralPath $trackedReadme)) {
     Write-ErrorLine ("Tracked catalog README is missing: {0}" -f $trackedReadme)
-    $hasFailure = $true
-  } elseif ((Get-Content -LiteralPath $trackedReadme -Raw) -ne (Get-CatalogReadmeContent)) {
-    Write-ErrorLine "Tracked catalog README is not normalized"
     $hasFailure = $true
   }
 
@@ -1972,26 +1843,6 @@ function Remove-InternalTargetReparsePoints {
   }
 }
 
-function Write-CatalogManifestTemplate {
-  param(
-    [Parameter(Mandatory = $true)]
-    [string]$DestinationDir
-  )
-
-  $manifestPath = Join-Path $DestinationDir "apm.yml"
-  [System.IO.File]::WriteAllText($manifestPath, (Get-CatalogManifestContent))
-}
-
-function Write-CatalogReadme {
-  param(
-    [Parameter(Mandatory = $true)]
-    [string]$DestinationDir
-  )
-
-  $readmePath = Join-Path $DestinationDir "README.md"
-  [System.IO.File]::WriteAllText($readmePath, (Get-CatalogReadmeContent))
-}
-
 function Reset-CatalogBuildDir {
   $buildDir = Get-CatalogBuildDir
   if (Test-Path -LiteralPath $buildDir) {
@@ -2152,8 +2003,16 @@ function Invoke-SeedCatalogBuild {
   }
 
   Reset-CatalogBuildDir
-  Write-CatalogManifestTemplate -DestinationDir (Get-CatalogBuildDir)
-  Write-CatalogReadme -DestinationDir (Get-CatalogBuildDir)
+  $trackedManifest = Join-Path (Get-TrackedCatalogDir) "apm.yml"
+  $trackedReadme = Join-Path (Get-TrackedCatalogDir) "README.md"
+  if (-not (Test-Path -LiteralPath $trackedManifest)) {
+    throw "Tracked catalog manifest is missing: $trackedManifest"
+  }
+  if (-not (Test-Path -LiteralPath $trackedReadme)) {
+    throw "Tracked catalog README is missing: $trackedReadme"
+  }
+  Copy-Item -LiteralPath $trackedManifest -Destination (Join-Path (Get-CatalogBuildDir) "apm.yml") -Force
+  Copy-Item -LiteralPath $trackedReadme -Destination (Join-Path (Get-CatalogBuildDir) "README.md") -Force
   Copy-ManagedInstructionsIntoCatalog -DestinationPath (Get-CatalogBuildInstructionsPath)
   Copy-ManagedAgentAssetsIntoCatalog -DestinationDir (Get-CatalogBuildAgentsRoot)
   Copy-ManagedCommandAssetsIntoCatalog -DestinationDir (Get-CatalogBuildCommandsRoot)
@@ -2330,14 +2189,6 @@ switch ($Command) {
     Invoke-Update
   }
 
-  "format-catalog-metadata" {
-    Invoke-FormatCatalogMetadata
-  }
-
-  "check-catalog-metadata" {
-    Invoke-CheckCatalogMetadata
-  }
-
   "pin-external" {
     Invoke-PinExternal
   }
@@ -2382,8 +2233,6 @@ Commands:
   apply              Offline deploy user-scope-compatible dependencies and compile Codex output
   apply:skills:local Quick-sync managed catalog skills into ~/.agents/skills only
   refresh            Refresh the checkout and dependencies only; does not deploy
-  format-catalog-metadata  Normalize tracked catalog apm.yml and README.md
-  check-catalog-metadata   Check tracked catalog apm.yml and README.md normalization
   pin-external       Pin external manifest refs to lockfile commits
   validate           Validate the ~/.apm workspace
   validate:catalog   Fail when ~/.apm/catalog is not normalized or missing required assets

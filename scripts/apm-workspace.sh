@@ -115,19 +115,6 @@ skill_id_to_manifest_path() {
   printf '\n'
 }
 
-workspace_project_name() {
-  if [ -n "${APM_WORKSPACE_NAME:-}" ]; then
-    printf '%s\n' "$APM_WORKSPACE_NAME"
-    return 0
-  fi
-
-  basename "${WORKSPACE_REPO%.git}"
-}
-
-workspace_author_name() {
-  git config user.name 2>/dev/null || printf '%s\n' "${USER:-${USERNAME:-unknown}}"
-}
-
 ensure_workspace_repo() {
   require_command git
 
@@ -153,31 +140,11 @@ ensure_workspace_repo() {
   fi
 
 }
-
-write_workspace_manifest_template() {
-  manifest_path="$WORKSPACE_DIR/apm.yml"
-  project_name=$(workspace_project_name)
-  author_name=$(workspace_author_name)
-
-  cat >"$manifest_path" <<EOF
-name: $project_name
-version: 1.0.0
-description: APM project for $project_name
-author: $author_name
-dependencies:
-  apm:
-    - jey3dayo/apm-workspace/catalog#main
-  mcp: []
-scripts: {}
-EOF
-}
-
 ensure_workspace_scaffold() {
   ensure_workspace_repo
 
   if [ ! -f "$WORKSPACE_DIR/apm.yml" ]; then
-    log "Writing bootstrap apm.yml in $WORKSPACE_DIR"
-    write_workspace_manifest_template
+    fail "Missing workspace apm.yml: $WORKSPACE_DIR/apm.yml"
   fi
 }
 
@@ -264,21 +231,6 @@ format_skill_name() {
   esac
 }
 
-write_catalog_manifest_template() {
-  destination_dir="$1"
-  package_name="${2:-$CATALOG_DIR_NAME}"
-  package_description="${3:-Managed catalog package for global APM rollout}"
-  cat >"$destination_dir/apm.yml" <<EOF
-name: $package_name
-version: 1.0.0
-description: $package_description
-dependencies:
-  apm: []
-  mcp: []
-scripts: {}
-EOF
-}
-
 locked_external_skill_records() {
   lock_path="$WORKSPACE_DIR/apm.lock.yaml"
   [ -f "$lock_path" ] || fail "Lock file not found: $lock_path"
@@ -341,61 +293,6 @@ locked_external_skill_records() {
       flush_record()
     }
   ' "$lock_path"
-}
-
-write_catalog_readme() {
-  destination_dir="$1"
-  package_name="${2:-$CATALOG_DIR_NAME}"
-  install_ref_path="${3:-$CATALOG_DIR_NAME}"
-  body="${4:-This directory contains the managed catalog for the global APM workspace.}"
-  cat >"$destination_dir/README.md" <<EOF
-# $package_name
-
-$body
-
-- Edit personal skills in \`~/.apm/catalog/skills/<id>/\`
-- Edit shared guidance in \`~/.apm/catalog/AGENTS.md\`, \`agents/**\`, \`commands/**\`, and \`rules/**\`
-- \`skills\` are authored under \`catalog/skills/**\` and staged into the published package
-- \`commands/**\` stays top-level because it is runtime-synced shared guidance, not nested skill package content
-- Edit this directory directly, then run \`mise run prepare:catalog\` before commit/push
-- Install ref: \`jey3dayo/apm-workspace/$install_ref_path#main\`
-EOF
-}
-
-normalize_tracked_catalog_metadata() {
-  ensure_workspace_repo
-  ensure_workspace_scaffold
-
-  tracked_dir=$(tracked_catalog_dir)
-  mkdir -p "$tracked_dir"
-  write_catalog_manifest_template "$tracked_dir"
-  write_catalog_readme "$tracked_dir"
-
-}
-
-check_tracked_catalog_metadata() {
-  ensure_workspace_repo
-  ensure_workspace_scaffold
-
-  tracked_dir=$(tracked_catalog_dir)
-  expected_dir=$(mktemp -d "${TMPDIR:-/tmp}/apm-catalog-metadata.XXXXXX")
-  write_catalog_manifest_template "$expected_dir"
-  write_catalog_readme "$expected_dir"
-
-  has_failure=0
-  if [ ! -f "$tracked_dir/apm.yml" ] || ! cmp -s "$tracked_dir/apm.yml" "$expected_dir/apm.yml"; then
-    error "Tracked catalog manifest is not normalized"
-    has_failure=1
-  fi
-
-  if [ ! -f "$tracked_dir/README.md" ] || ! cmp -s "$tracked_dir/README.md" "$expected_dir/README.md"; then
-    error "Tracked catalog README is not normalized"
-    has_failure=1
-  fi
-
-  rm -rf "$expected_dir"
-
-  [ "$has_failure" -eq 0 ] || fail "Catalog metadata check failed"
 }
 
 reset_catalog_build_dir() {
@@ -857,14 +754,6 @@ cmd_update() {
     cd "$WORKSPACE_DIR"
     apm deps update -g
   )
-}
-
-cmd_format_catalog_metadata() {
-  normalize_tracked_catalog_metadata
-}
-
-cmd_check_catalog_metadata() {
-  check_tracked_catalog_metadata
 }
 
 lock_pinned_reference_map() {
@@ -1715,27 +1604,15 @@ cmd_validate_catalog() {
   tracked_readme="$(tracked_catalog_dir)/README.md"
   tracked_instructions="$(tracked_catalog_instructions_path)"
 
-  expected_dir=$(mktemp -d "${TMPDIR:-/tmp}/apm-catalog-expected.XXXXXX")
-  write_catalog_manifest_template "$expected_dir"
-  write_catalog_readme "$expected_dir"
-
   if [ ! -f "$tracked_manifest" ]; then
     error "Tracked catalog manifest is missing: $tracked_manifest"
-    has_failure=1
-  elif ! cmp -s "$tracked_manifest" "$expected_dir/apm.yml"; then
-    error "Tracked catalog manifest is not normalized"
     has_failure=1
   fi
 
   if [ ! -f "$tracked_readme" ]; then
     error "Tracked catalog README is missing: $tracked_readme"
     has_failure=1
-  elif ! cmp -s "$tracked_readme" "$expected_dir/README.md"; then
-    error "Tracked catalog README is not normalized"
-    has_failure=1
   fi
-
-  rm -rf "$expected_dir"
 
   if ! manifest_has_catalog_reference; then
     error "Global apm.yml is missing the managed catalog ref"
@@ -1813,8 +1690,12 @@ cmd_seed_catalog_build() {
   ensure_workspace_mise_file
 
   reset_catalog_build_dir
-  write_catalog_manifest_template "$(catalog_build_dir)"
-  write_catalog_readme "$(catalog_build_dir)"
+  tracked_manifest="$(tracked_catalog_dir)/apm.yml"
+  tracked_readme="$(tracked_catalog_dir)/README.md"
+  [ -f "$tracked_manifest" ] || fail "Tracked catalog manifest is missing: $tracked_manifest"
+  [ -f "$tracked_readme" ] || fail "Tracked catalog README is missing: $tracked_readme"
+  cp "$tracked_manifest" "$(catalog_build_dir)/apm.yml"
+  cp "$tracked_readme" "$(catalog_build_dir)/README.md"
   copy_managed_instructions_into_catalog "$(catalog_build_instructions_path)"
   copy_managed_agent_assets_into_catalog "$(catalog_build_agents_root)"
   copy_managed_command_assets_into_catalog "$(catalog_build_commands_root)"
@@ -1938,8 +1819,6 @@ Commands:
   apply              Offline deploy user-scope-compatible dependencies and compile Codex output
   apply:skills:local Quick-sync managed catalog skills into ~/.agents/skills only
   refresh            Refresh the checkout and dependencies only; does not deploy
-  format-catalog-metadata  Normalize tracked catalog apm.yml and README.md
-  check-catalog-metadata   Check tracked catalog apm.yml and README.md normalization
   pin-external       Pin external manifest refs to lockfile commits
   validate           Validate the ~/.apm workspace
   validate:catalog   Fail when ~/.apm/catalog is not normalized or missing required assets
@@ -1962,8 +1841,6 @@ case "$COMMAND" in
   apply) cmd_apply ;;
   apply:skills:local) cmd_sync_local_skills "$@" ;;
   refresh) cmd_update ;;
-  format-catalog-metadata) cmd_format_catalog_metadata ;;
-  check-catalog-metadata) cmd_check_catalog_metadata ;;
   pin-external) cmd_pin_external ;;
   validate) cmd_validate ;;
   validate:catalog) cmd_validate_catalog ;;

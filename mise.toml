@@ -127,23 +127,12 @@ run_windows = """
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$taskExcludes = @(); if ($env:TASK_EXCLUDES) { $taskExcludes = @($env:TASK_EXCLUDES -split ' ' | Where-Object { $_ -ne '' }) }; $yamlFiles = @(fd -e yml -e yaml @taskExcludes); if ($yamlFiles.Count -gt 0) { prettier --check --log-level error $yamlFiles }"
 """
 
-[tasks."format:catalog-metadata"]
-description = "Normalize tracked catalog metadata files"
-run = "bash ./scripts/apm-workspace.sh format-catalog-metadata"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 format-catalog-metadata"
-
-[tasks."format:catalog-metadata:check"]
-description = "Check tracked catalog metadata normalization"
-run = "bash ./scripts/apm-workspace.sh check-catalog-metadata"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 check-catalog-metadata"
-
 # ========================================
 # Aggregation Tasks
 # ========================================
 [tasks.format]
 description = "Format workspace docs and manifests"
 run = [
-  { task = "format:catalog-metadata" },
   { task = "format:markdown:bold-headings" },
   { task = "format:markdown" },
   { task = "format:toml" },
@@ -153,7 +142,6 @@ run = [
 [tasks."format:check"]
 description = "Check workspace docs and manifest formatting"
 depends = [
-  "format:catalog-metadata:check",
   "format:markdown:bold-headings:check",
   "format:markdown:check",
   "format:toml:check",
