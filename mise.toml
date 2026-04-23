@@ -21,17 +21,12 @@ taplo = "latest"
 "npm:tsx" = "latest"
 
 # ========================================
-# Commands
+# Workspace Commands
 # ========================================
 [tasks.apply]
 description = "Deploy user-scope-compatible APM dependencies and compile Codex output"
 run = "bash ./scripts/apm-workspace.sh apply"
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 apply"
-
-[tasks."sync-skills:local"]
-description = "Quick-sync managed catalog skills into the local Codex target only"
-run = "bash ./scripts/apm-workspace.sh sync-skills:local"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 sync-skills:local"
 
 [tasks.update]
 description = "Refresh the ~/.apm checkout and dependencies without deploying"
@@ -43,6 +38,36 @@ description = "Inspect ~/.apm workspace state and deployed targets"
 run = "bash ./scripts/apm-workspace.sh doctor"
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 doctor"
 
+# ========================================
+# Catalog / Skill Commands
+# ========================================
+[tasks."skills:sync:local"]
+description = "Quick-sync managed catalog skills into the local Codex target only"
+alias = ["sync-skills:local"]
+run = "bash ./scripts/apm-workspace.sh sync-skills:local"
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 sync-skills:local"
+
+[tasks."catalog:stage"]
+description = "Normalize `catalog/` in place inside ~/.apm"
+alias = ["stage-catalog"]
+run = "bash ./scripts/apm-workspace.sh stage-catalog"
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 stage-catalog"
+
+[tasks."catalog:register"]
+description = "Install the managed catalog package by upstream ref"
+alias = ["register-catalog"]
+run = "bash ./scripts/apm-workspace.sh register-catalog"
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 register-catalog"
+
+[tasks."catalog:smoke"]
+description = "Smoke-test the generated managed catalog package via a temp install"
+alias = ["smoke-catalog"]
+run = "bash ./scripts/apm-workspace.sh smoke-catalog"
+run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 smoke-catalog"
+
+# ========================================
+# Validation Commands
+# ========================================
 [tasks."validate:workspace"]
 description = "Validate the ~/.apm workspace wiring"
 run = "bash ./scripts/apm-workspace.sh validate"
@@ -56,21 +81,6 @@ run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\a
 [tasks.validate]
 description = "Validate the ~/.apm workspace and managed catalog wiring"
 depends = ["validate:workspace", "validate:catalog"]
-
-[tasks.stage-catalog]
-description = "Normalize `catalog/` in place inside ~/.apm"
-run = "bash ./scripts/apm-workspace.sh stage-catalog"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 stage-catalog"
-
-[tasks.register-catalog]
-description = "Install the managed catalog package by upstream ref"
-run = "bash ./scripts/apm-workspace.sh register-catalog"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 register-catalog"
-
-[tasks.smoke-catalog]
-description = "Smoke-test the generated managed catalog package via a temp install"
-run = "bash ./scripts/apm-workspace.sh smoke-catalog"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 smoke-catalog"
 
 [tasks."apm:install"]
 description = "Run user-scope APM install from ~/.apm"
@@ -132,7 +142,7 @@ run = "bash ./scripts/apm-workspace.sh check-catalog-metadata"
 run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 check-catalog-metadata"
 
 # ========================================
-# Aliases / Aggregation Tasks
+# Aggregation Tasks
 # ========================================
 [tasks.format]
 description = "Format workspace docs and manifests"
@@ -144,8 +154,9 @@ run = [
   { task = "format:yaml" },
 ]
 
-[tasks."check:format"]
+[tasks."format:check"]
 description = "Check workspace docs and manifest formatting"
+alias = ["check:format"]
 depends = [
   "format:catalog-metadata:check",
   "format:markdown:bold-headings:check",
@@ -154,30 +165,33 @@ depends = [
   "format:yaml:check",
 ]
 
+[tasks.check]
+description = "Run lightweight pre-deploy checks for the ~/.apm workspace"
+depends = ["format:check", "validate"]
+
+[tasks."check:deep"]
+description = "Run deep verification for the ~/.apm workspace"
+run = [{ task = "check" }, { task = "catalog:smoke" }]
+
 [tasks.ci]
-description = "Run verification-only checks for the ~/.apm workspace"
-depends = ["check:format", "validate", "smoke-catalog"]
+description = "Run checks, deploy the current workspace state, and inspect targets"
+run = [{ task = "check" }, { task = "apply" }, { task = "doctor" }]
 
 # ========================================
 # Meta Tasks
 # ========================================
 [tasks.sync]
 description = "Refresh upstream APM dependencies, verify, and inspect the ~/.apm workspace"
-run = ["apm install -g --update", { task = "ci" }, { task = "doctor" }]
+run = ["apm install -g --update", { task = "ci" }]
 
 [tasks."sync:stable"]
 description = "Update, verify, and deploy the ~/.apm workspace locally from the current manifest and lock"
-run = [
-  { task = "update" },
-  { task = "ci" },
-  { task = "apply" },
-  { task = "doctor" },
-]
+run = [{ task = "update" }, { task = "ci" }]
 
 [tasks."catalog:tidy"]
 description = "Refresh, validate, and inspect the managed catalog package"
 run = [
-  { task = "stage-catalog" },
+  { task = "catalog:stage" },
   { task = "validate:catalog" },
   { task = "doctor" },
 ]
