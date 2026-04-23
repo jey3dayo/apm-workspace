@@ -154,62 +154,6 @@ ensure_workspace_repo() {
 
 }
 
-ensure_gitignore_entry() {
-  entry="$1"
-  gitignore_path="$WORKSPACE_DIR/.gitignore"
-  touch "$gitignore_path"
-
-  if ! grep -qxF "$entry" "$gitignore_path"; then
-    printf '\n%s\n' "$entry" >>"$gitignore_path"
-  fi
-}
-
-normalize_workspace_gitignore() {
-  gitignore_path="$WORKSPACE_DIR/.gitignore"
-  [ -f "$gitignore_path" ] || return 0
-
-  tmp_file=$(mktemp "${TMPDIR:-/tmp}/apm-gitignore.XXXXXX")
-  awk '
-    BEGIN {
-      entries[1] = "/.apm/"
-      entries[2] = "/apm_modules/"
-      entries[3] = "/.catalog-build/"
-    }
-    function append(line) {
-      lines[++line_count] = line
-    }
-    {
-      if ($0 == "# APM dependencies" || $0 == "apm_modules/") {
-        next
-      }
-      for (i = 1; i <= 3; i++) {
-        if ($0 == entries[i]) {
-          seen[entries[i]] = 1
-          next
-        }
-      }
-      append($0)
-    }
-    END {
-      for (i = 1; i <= 3; i++) {
-        if (!seen[entries[i]]) {
-          if (line_count > 0 && lines[line_count] != "") {
-            append("")
-          }
-          append(entries[i])
-        }
-      }
-      while (line_count > 0 && lines[line_count] == "") {
-        line_count--
-      }
-      for (i = 1; i <= line_count; i++) {
-        print lines[i]
-      }
-    }
-  ' "$gitignore_path" >"$tmp_file"
-  mv "$tmp_file" "$gitignore_path"
-}
-
 write_workspace_manifest_template() {
   manifest_path="$WORKSPACE_DIR/apm.yml"
   project_name=$(workspace_project_name)
@@ -230,9 +174,6 @@ EOF
 
 ensure_workspace_scaffold() {
   ensure_workspace_repo
-  ensure_gitignore_entry '/.apm/'
-  ensure_gitignore_entry '/apm_modules/'
-  ensure_gitignore_entry '/.catalog-build/'
 
   if [ ! -f "$WORKSPACE_DIR/apm.yml" ]; then
     log "Writing bootstrap apm.yml in $WORKSPACE_DIR"
@@ -833,7 +774,6 @@ cmd_apply() {
   sync_managed_catalog_runtime_assets
   replace_skill_targets_from_stage "$apply_stage_root"
   install_workspace_mcp_dependencies
-  normalize_workspace_gitignore
   compile_codex
 
   trap - RETURN
@@ -1921,7 +1861,6 @@ cmd_register_catalog() {
 
   reference=$(tracked_catalog_reference)
   run_workspace_install_command -g "$reference"
-  normalize_workspace_gitignore
   sync_managed_catalog_runtime_assets
   log "Registered catalog from upstream ref: $reference"
 }

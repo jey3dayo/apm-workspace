@@ -296,6 +296,7 @@ dependencies:
     $records[0].Path | Should -Be "skills/.curated/gh-address-comments"
     $records[0].Commit | Should -Be "abcdef1234567890"
   }
+
 }
 
 Describe "public command surface" {
@@ -366,7 +367,6 @@ Describe "public command surface" {
       Mock Remove-InternalTargetReparsePoints {}
       Mock Get-InternalCleanupSkillIds { @() }
       Mock Invoke-WorkspaceInstallCommand {}
-      Mock Normalize-WorkspaceGitignore {}
       Mock Invoke-CodexCompile {}
       Mock Invoke-Apply {}
       Mock Build-TargetSkillTrees {}
@@ -401,7 +401,6 @@ Describe "public command surface" {
     Mock Sync-ManagedCatalogRuntimeAssets {}
     Mock Replace-SkillTargetsFromStage {}
     Mock Install-WorkspaceMcpDependencies {}
-    Mock Normalize-WorkspaceGitignore {}
     Mock Invoke-CodexCompile {}
 
     Invoke-Apply
@@ -485,7 +484,6 @@ Describe "public command surface" {
       Mock Remove-InternalTargetReparsePoints {}
       Mock Get-InternalCleanupSkillIds { @() }
       Mock Invoke-WorkspaceInstallCommand {}
-      Mock Normalize-WorkspaceGitignore {}
       Mock Invoke-CodexCompile {}
       Mock Invoke-Apply {}
       Mock Build-TargetSkillTrees {}

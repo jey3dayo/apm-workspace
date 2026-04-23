@@ -224,65 +224,6 @@ function Ensure-WorkspaceRepo {
 
 }
 
-function Ensure-GitignoreEntry {
-  param(
-    [Parameter(Mandatory = $true)]
-    [string]$Entry
-  )
-
-  $gitignorePath = Join-Path $WorkspaceDir ".gitignore"
-  if (-not (Test-Path -LiteralPath $gitignorePath)) {
-    New-Item -ItemType File -Path $gitignorePath -Force | Out-Null
-  }
-
-  $content = Get-Content -LiteralPath $gitignorePath -ErrorAction SilentlyContinue
-  if ($content -notcontains $Entry) {
-    Add-Content -LiteralPath $gitignorePath -Value ""
-    Add-Content -LiteralPath $gitignorePath -Value $Entry
-  }
-}
-
-function Normalize-WorkspaceGitignore {
-  $gitignorePath = Join-Path $WorkspaceDir ".gitignore"
-  if (-not (Test-Path -LiteralPath $gitignorePath)) {
-    return
-  }
-
-  $canonicalEntries = @("/.apm/", "/apm_modules/", "/.catalog-build/")
-  $normalized = New-Object System.Collections.Generic.List[string]
-  $seen = New-Object System.Collections.Generic.HashSet[string]
-
-  foreach ($line in (Get-Content -LiteralPath $gitignorePath -ErrorAction SilentlyContinue)) {
-    if ($line -in @("# APM dependencies", "apm_modules/")) {
-      continue
-    }
-
-    if ($canonicalEntries -contains $line) {
-      if ($seen.Add($line)) {
-        $normalized.Add($line)
-      }
-      continue
-    }
-
-    $normalized.Add($line)
-  }
-
-  foreach ($entry in $canonicalEntries) {
-    if ($seen.Add($entry)) {
-      if ($normalized.Count -gt 0 -and $normalized[$normalized.Count - 1] -ne "") {
-        $normalized.Add("")
-      }
-      $normalized.Add($entry)
-    }
-  }
-
-  while ($normalized.Count -gt 0 -and $normalized[$normalized.Count - 1] -eq "") {
-    $normalized.RemoveAt($normalized.Count - 1)
-  }
-
-  [System.IO.File]::WriteAllText($gitignorePath, (($normalized -join [Environment]::NewLine) + [Environment]::NewLine))
-}
-
 function Write-WorkspaceManifestTemplate {
   $manifestPath = Join-Path $WorkspaceDir "apm.yml"
   $projectName = Get-WorkspaceProjectName
@@ -305,9 +246,6 @@ function Write-WorkspaceManifestTemplate {
 
 function Ensure-WorkspaceScaffold {
   Ensure-WorkspaceRepo
-  Ensure-GitignoreEntry -Entry "/.apm/"
-  Ensure-GitignoreEntry -Entry "/apm_modules/"
-  Ensure-GitignoreEntry -Entry "/.catalog-build/"
 
   $manifestPath = Join-Path $WorkspaceDir "apm.yml"
   if (-not (Test-Path -LiteralPath $manifestPath)) {
@@ -1364,7 +1302,6 @@ function Invoke-Apply {
     }
   }
 
-  Normalize-WorkspaceGitignore
   Invoke-CodexCompile
 }
 
@@ -2274,7 +2211,6 @@ function Invoke-RegisterCatalog {
 
   $reference = Get-TrackedCatalogReference
   Invoke-WorkspaceInstallCommand -InstallArgs @("-g", $reference)
-  Normalize-WorkspaceGitignore
   Sync-ManagedCatalogRuntimeAssets
   Write-Host "Registered catalog from upstream ref: $reference"
 }
