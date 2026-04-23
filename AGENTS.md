@@ -32,6 +32,7 @@ In practice:
 
 - if the change is to a personal skill or shared guidance asset, edit `./catalog`
 - if the change is to external dependency selection or accepted upstream state, edit or review `apm.yml` and `apm.lock.yaml`
+- if an upstream skill does not install or deploy cleanly through the normal managed lane, copy it under `./manual-skills/.apm/skills/<id>/`, record provenance under `./manual-skills/upstreams/**`, and distribute it through the `jey3dayo/apm-workspace/manual-skills` package ref in root `apm.yml`
 - if the change only exists in a deployed target or cache, regenerate from the tracked workspace instead of editing it in place
 - if the question is specifically about Codex skills, treat `~/.agents/skills` as the deployed output and `~/.codex/AGENTS.md` as the compiled guidance output
 
@@ -143,7 +144,8 @@ Then review and commit the skill changes.
   - `~/.apm/mise.toml`
   - `~/.config/mise/config.default.toml`
 - When verifying Codex skill rollout, check `~/.agents/skills`
-  - if an external skill is still missing there after deployment, treat it as a temporary Codex-specific delivery gap and resolve it separately from the tracked workspace state
+- if an external skill is still missing there after deployment, treat it as a temporary Codex-specific delivery gap and resolve it separately from the tracked workspace state
+- if a skill repeatedly fails the normal upstream-managed lane because of packaging or rollout issues, move it onto the `manual-skills` package flow rather than patching deployed targets by hand
 
 ## Review Focus
 

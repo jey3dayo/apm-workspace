@@ -17,7 +17,7 @@ This workspace owns the global APM manifest, the lockfile, the downloaded depend
 - `apm.lock.yaml`: resolved commits and install state captured by APM
 - `apm_modules/`: downloaded upstream sources; cache only, not an editing surface
 - `catalog/`: shared runtime guidance package for AGENTS, agents, commands, rules, and managed personal skills under `catalog/skills/`
-- `manual-skills/`: copied skills kept outside the managed APM lane and distributed separately when needed
+- `manual-skills/`: copied skills kept outside the normal upstream-managed lane and published as a separate package when needed
 - `mise.toml`: workspace-local tasks for install, migration, validation, and repair
 - `tests/`: Pester coverage for workspace helpers
 
@@ -40,7 +40,7 @@ The tracked layout is intentionally asymmetric:
 
 - `catalog/skills/**` is the authoring layer for personal assets.
 - external skills stay visible in `apm.yml` / `apm.lock.yaml` as command-managed upstream refs.
-- `manual-skills/**` is for copied skills that are not part of the default `apply` / `doctor` managed lane.
+- `manual-skills/**` is for copied skills that cannot stay on the normal upstream-managed lane.
 - `commands/**` stay top-level inside `catalog/**` because they are synced into runtime targets as shared guidance, not installed as nested skill packages.
 
 Shared runtime guidance is published through the catalog ref in `apm.yml`:
@@ -114,9 +114,9 @@ If old package ownership from a previous install state is still hanging around, 
 When a copied skill lives under `~/.apm/manual-skills/`:
 
 1. Treat it as a manually curated copy from upstream.
-2. Do not add it to the root `apm.yml`.
-3. Keep provenance in the copied source README.
-4. Distribute it explicitly, for example with the standalone package ref `jey3dayo/apm-workspace/manual-skills`.
+2. Keep provenance in the copied source README under `manual-skills/upstreams/**`.
+3. If the skill should ship in the default global rollout, add the package ref `jey3dayo/apm-workspace/manual-skills` to the root `apm.yml`.
+4. If the normal upstream-managed lane starts working again, prefer moving the skill back out of `manual-skills/`.
 
 ## Useful Maintenance Commands
 
