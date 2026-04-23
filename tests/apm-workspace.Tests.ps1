@@ -254,6 +254,45 @@ dependencies:
     $records[0].CanonicalReference | Should -Be "obra/superpowers/skills/brainstorming"
   }
 
+  It "expands manual-skills package roots into copied skills" {
+    @"
+name: apm-workspace
+version: 1.0.0
+description: test
+author: test
+dependencies:
+  apm:
+    - jey3dayo/apm-workspace/catalog#main
+    - jey3dayo/apm-workspace/manual-skills
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.yml")
+    @"
+lockfile_version: "1"
+dependencies:
+  - repo_url: jey3dayo/apm-workspace
+    host: github.com
+    resolved_commit: 3333333333333333
+    virtual_path: manual-skills
+"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.lock.yaml")
+
+    $manualSkillsRoot = Join-Path (Join-Path (Join-Path $WorkspaceDir "apm_modules") "jey3dayo") "apm-workspace"
+    $manualSkillsRoot = Join-Path $manualSkillsRoot "manual-skills/.apm/skills"
+    New-Item -ItemType Directory -Path (Join-Path $manualSkillsRoot "ui-ux-pro-max") -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $manualSkillsRoot "ui-ux-pro-max/SKILL.md") -Value "# ui-ux-pro-max"
+    New-Item -ItemType Directory -Path (Join-Path $manualSkillsRoot "sharp-edges") -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $manualSkillsRoot "sharp-edges/SKILL.md") -Value "# sharp-edges"
+
+    $records = @(Get-ExternalSkillRecords)
+
+    $records.Count | Should -Be 2
+    ($records | ForEach-Object SourceSkillId | Sort-Object) | Should -Be @("sharp-edges", "ui-ux-pro-max")
+    ($records | ForEach-Object CanonicalReference | Sort-Object) | Should -Be @(
+      "jey3dayo/apm-workspace/manual-skills#sharp-edges",
+      "jey3dayo/apm-workspace/manual-skills#ui-ux-pro-max"
+    )
+  }
+
   It "reads only top-level lock dependency records" {
     @"
 lockfile_version: "1"

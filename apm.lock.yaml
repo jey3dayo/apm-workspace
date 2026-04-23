@@ -226,6 +226,21 @@ dependencies:
   is_virtual: true
   package_type: apm_package
   content_hash: sha256:31ff73e9cd8ae0f275e7d004bbfb59aa19edcae9e399962cfa27fc9b57ed13a3
+- repo_url: jey3dayo/apm-workspace
+  host: github.com
+  resolved_commit: 328cab947d43ab03e448361fc2606c1997dc15f2
+  resolved_ref: main
+  virtual_path: manual-skills
+  is_virtual: true
+  package_type: apm_package
+  deployed_files:
+  - .agents/skills/agentation
+  - .agents/skills/agentic-actions-auditor
+  - .agents/skills/sarif-parsing
+  - .agents/skills/sharp-edges
+  - .agents/skills/skill-creator
+  - .agents/skills/ui-ux-pro-max
+  content_hash: sha256:9414b85729ae68629c8e971480f1b735aa7e3acd1dd1e33a92080de8f636de66
 - repo_url: millionco/react-doctor
   host: github.com
   resolved_commit: b5519b60465905e8c7eb0b8a9294924bf3736158
@@ -559,7 +574,6 @@ dependencies:
 mcp_servers:
 - chrome-devtools
 - context7
-- linear
 - mcp-simple-voicevox
 - peekaboo
 - tauri-mcp-server
@@ -583,11 +597,6 @@ mcp_configs:
     - '@upstash/context7-mcp@latest'
     registry: false
     command: npx
-  linear:
-    name: linear
-    transport: http
-    registry: false
-    url: https://mcp.linear.app/mcp
   mcp-simple-voicevox:
     name: mcp-simple-voicevox
     transport: stdio

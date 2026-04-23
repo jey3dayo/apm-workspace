@@ -914,6 +914,69 @@ function Get-ExternalSkillInstallPath {
   return $bestMatches[0].Path
 }
 
+function Get-ExternalPackageSkillsRoot {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$RepoUrl,
+
+    [string]$VirtualPath,
+
+    [string]$ResolvedCommit
+  )
+
+  if ([string]::IsNullOrWhiteSpace($VirtualPath)) {
+    return $null
+  }
+
+  $apmModulesRoot = Get-ApmModulesRoot
+  if (-not (Test-Path -LiteralPath $apmModulesRoot)) {
+    return $null
+  }
+
+  $repoSegments = @(Convert-ReferencePathToSegments -Value $RepoUrl)
+  $virtualSegments = @(Convert-ReferencePathToSegments -Value $VirtualPath)
+  $candidatePaths = New-Object System.Collections.Generic.List[string]
+  $seenCandidates = New-Object 'System.Collections.Generic.HashSet[string]'
+
+  function Add-ExternalPackageCandidatePath {
+    param(
+      [Parameter(Mandatory = $true)]
+      [string[]]$Segments
+    )
+
+    $candidatePath = $apmModulesRoot
+    foreach ($segment in $Segments) {
+      $candidatePath = Join-Path $candidatePath $segment
+    }
+
+    if ($seenCandidates.Add($candidatePath)) {
+      $candidatePaths.Add($candidatePath)
+    }
+  }
+
+  Add-ExternalPackageCandidatePath -Segments @($repoSegments + $virtualSegments)
+  if (-not [string]::IsNullOrWhiteSpace($ResolvedCommit)) {
+    Add-ExternalPackageCandidatePath -Segments @($repoSegments + @($ResolvedCommit) + $virtualSegments)
+    Add-ExternalPackageCandidatePath -Segments @(@($ResolvedCommit) + $repoSegments + $virtualSegments)
+  }
+
+  $foundPath = $null
+  foreach ($candidatePath in $candidatePaths) {
+    $skillsRoot = Join-Path $candidatePath ".apm/skills"
+    if (-not (Test-Path -LiteralPath $skillsRoot -PathType Container)) {
+      continue
+    }
+
+    if ($null -ne $foundPath -and $foundPath -ne $skillsRoot) {
+      throw "Ambiguous external package cache paths for $RepoUrl/$VirtualPath"
+    }
+
+    $foundPath = $skillsRoot
+  }
+
+  return $foundPath
+}
+
 function Get-ExternalSkillId {
   param(
     [Parameter(Mandatory = $true)]
@@ -981,6 +1044,24 @@ function Get-ExternalSkillRecords {
       $null = $matchedReferences.Add(("{0}#{1}" -f $canonicalReference, $record.Commit))
     }
     if (-not $seenCanonical.Add($canonicalReference)) {
+      continue
+    }
+
+    $packageSkillsRoot = Get-ExternalPackageSkillsRoot -RepoUrl $record.Repo -VirtualPath $record.Path -ResolvedCommit $record.Commit
+    if ($null -ne $packageSkillsRoot) {
+      foreach ($skillId in (Get-SkillIdsFromRoot -SkillsRoot $packageSkillsRoot)) {
+        $sourcePath = $packageSkillsRoot
+        foreach ($segment in (Convert-SkillIdToPathSegments -SkillId $skillId)) {
+          $sourcePath = Join-Path $sourcePath $segment
+        }
+
+        $result.Add([pscustomobject]@{
+            SourceKind = "external"
+            SourceSkillId = $skillId
+            SourcePath = $sourcePath
+            CanonicalReference = ("{0}#{1}" -f $canonicalReference, $skillId)
+          })
+      }
       continue
     }
 

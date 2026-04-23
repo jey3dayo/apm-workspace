@@ -5,6 +5,7 @@ author: jey3dayo
 dependencies:
   apm:
     - jey3dayo/apm-workspace/catalog#main
+    - jey3dayo/apm-workspace/manual-skills
     - EpicenterHQ/epicenter/.agents/skills/tauri
     - Heyvhuang/ship-faster/skills/cloudflare
     - Heyvhuang/ship-faster/skills/tool-openclaw
@@ -85,10 +86,6 @@ dependencies:
         - -y
         - mcp-remote
         - https://docs.ultracite.ai/mcp
-    - name: linear
-      registry: false
-      transport: http
-      url: https://mcp.linear.app/mcp
     - name: mcp-simple-voicevox
       registry: false
       transport: stdio

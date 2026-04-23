@@ -1284,6 +1284,37 @@ EOF
   esac
 }
 
+external_package_skills_root() {
+  repo_url="$1"
+  virtual_path="$2"
+  resolved_commit="$3"
+  apm_modules_root="$WORKSPACE_DIR/apm_modules"
+
+  [ -n "$virtual_path" ] || return 1
+  [ -d "$apm_modules_root" ] || return 1
+
+  candidate_paths=$(printf '%s\n%s\n%s\n' \
+    "$apm_modules_root/$repo_url/$virtual_path" \
+    "$apm_modules_root/$repo_url/$resolved_commit/$virtual_path" \
+    "$apm_modules_root/$resolved_commit/$repo_url/$virtual_path")
+
+  found_root=""
+  while IFS= read -r candidate_path; do
+    [ -n "$candidate_path" ] || continue
+    skills_root="$candidate_path/.apm/skills"
+    [ -d "$skills_root" ] || continue
+    if [ -n "$found_root" ] && [ "$found_root" != "$skills_root" ]; then
+      fail "Ambiguous external package cache paths for $repo_url/$virtual_path"
+    fi
+    found_root="$skills_root"
+  done <<EOF
+$candidate_paths
+EOF
+
+  [ -n "$found_root" ] || return 1
+  printf '%s\n' "$found_root"
+}
+
 collect_personal_skill_records() {
   managed_skill_ids | while IFS= read -r skill_id; do
     [ -n "$skill_id" ] || continue
@@ -1328,6 +1359,16 @@ collect_external_skill_records() {
 
     printf '%s\n' "$canonical_ref" >>"$matched_keys_file"
     printf '%s#%s\n' "$canonical_ref" "$resolved_commit" >>"$matched_keys_file"
+
+    package_skills_root=$(external_package_skills_root "$repo_url" "$virtual_path" "$resolved_commit" 2>/dev/null || true)
+    if [ -n "$package_skills_root" ]; then
+      skill_ids_from_root "$package_skills_root" | while IFS= read -r source_skill_id; do
+        [ -n "$source_skill_id" ] || continue
+        source_path="$package_skills_root/$(skill_id_to_manifest_path "$source_skill_id")"
+        printf 'external\t%s\t%s\t%s#%s\n' "$source_skill_id" "$source_path" "$canonical_ref" "$source_skill_id"
+      done
+      continue
+    fi
 
     source_skill_id=$(external_skill_id_from_record "$repo_url" "$virtual_path")
     source_path=$(external_skill_content_dir "$repo_url" "$virtual_path" "$resolved_commit")
