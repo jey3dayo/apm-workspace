@@ -757,7 +757,7 @@ dependencies:
     Test-Path (Join-Path $TestDrive ".codex/skills/superpowers-brainstorming/SKILL.md") | Should -Be $true
   }
 
-  It "publishes workspace mise tasks for formatting, verification, and sync flow" {
+  It "publishes workspace mise tasks for formatting, verification, and workflow orchestration" {
     $miseToml = Get-Content -LiteralPath (Join-Path $workspaceRoot "mise.toml") -Raw
 
     $miseToml | Should -Match '\[tasks\.validate\]'
@@ -766,23 +766,23 @@ dependencies:
     $miseToml | Should -Match '\[tasks\."format:markdown:bold-headings"\]'
     $miseToml | Should -Match '\[tasks\."apm:install"\]'
     $miseToml | Should -Match '\[tasks\.apply\]'
-    $miseToml | Should -Match '\[tasks\."skills:sync:local"\]'
-    $miseToml | Should -Match 'alias = \["sync-skills:local"\]'
-    $miseToml | Should -Match '\[tasks\.update\]'
+    $miseToml | Should -Match '\[tasks\."apply:skills:local"\]'
+    $miseToml | Should -Match 'alias = \["skills:sync:local", "sync-skills:local"\]'
+    $miseToml | Should -Match '\[tasks\.refresh\]'
     $miseToml | Should -Not -Match '\[tasks\."apm:update"\]'
     $miseToml | Should -Match '\[tasks\.doctor\]'
     $miseToml | Should -Match '\[tasks\.format\]'
     $miseToml | Should -Match '\[tasks\."format:check"\]'
     $miseToml | Should -Match '\[tasks\.check\]'
-    $miseToml | Should -Match '\[tasks\."check:deep"\]'
-    $miseToml | Should -Match '\[tasks\.ci\]'
-    $miseToml | Should -Match '\[tasks\.sync\]'
-    $miseToml | Should -Match '\[tasks\."sync:stable"\]'
-    $miseToml | Should -Match '\[tasks\."catalog:stage"\]'
-    $miseToml | Should -Match '\[tasks\."catalog:register"\]'
-    $miseToml | Should -Match '\[tasks\."catalog:smoke"\]'
-    $miseToml | Should -Match '\[tasks\."catalog:release"\]'
-    $miseToml | Should -Match '\[tasks\."catalog:tidy"\]'
+    $miseToml | Should -Match '\[tasks\.verify\]'
+    $miseToml | Should -Match '\[tasks\.deploy\]'
+    $miseToml | Should -Match '\[tasks\.upgrade\]'
+    $miseToml | Should -Match '\[tasks\."refresh:deploy"\]'
+    $miseToml | Should -Match '\[tasks\."prepare:catalog"\]'
+    $miseToml | Should -Match '\[tasks\."install:catalog"\]'
+    $miseToml | Should -Match '\[tasks\."smoke:catalog"\]'
+    $miseToml | Should -Match '\[tasks\."release:catalog"\]'
+    $miseToml | Should -Match '\[tasks\."verify:catalog"\]'
     $miseToml | Should -Match 'run = "bash ./scripts/apm-workspace.sh apply"'
     $miseToml | Should -Match 'run = "bash ./scripts/apm-workspace.sh sync-skills:local"'
     $miseToml | Should -Match 'replace-bold-headings\.ts'
@@ -790,11 +790,11 @@ dependencies:
     $miseToml | Should -Match 'replace-bold-headings\.ts.*\./catalog --dry-run'
     $miseToml | Should -Match '(?s)\[tasks\."format:check"\]\s*description = "Check workspace docs and manifest formatting"\s*alias = \["check:format"\]'
     $miseToml | Should -Match '(?s)\[tasks\.check\]\s*description = "Run lightweight pre-deploy checks for the ~/.apm workspace"\s*depends = \["format:check", "validate"\]'
-    $miseToml | Should -Match '(?s)\[tasks\."check:deep"\]\s*description = "Run deep verification for the ~/.apm workspace"\s*run = \[\{ task = "check" \}, \{ task = "catalog:smoke" \}\]'
-    $miseToml | Should -Match '(?s)\[tasks\.ci\]\s*description = "Run checks, deploy the current workspace state, and inspect targets"\s*run = \[\{ task = "check" \}, \{ task = "apply" \}, \{ task = "doctor" \}\]'
-    $miseToml | Should -Match '(?s)\[tasks\.sync\].*?apm install -g --update.*?\{ task = "ci" \}'
-    $miseToml | Should -Match '(?s)\[tasks\."sync:stable"\].*?\{ task = "update" \}.*?\{ task = "ci" \}'
-    $miseToml | Should -Match '(?s)\[tasks\."catalog:release"\].*?\{ task = "sync:stable" \}.*?release-catalog'
+    $miseToml | Should -Match '(?s)\[tasks\.verify\]\s*description = "Run deep verification for the ~/.apm workspace"\s*alias = \["check:deep"\]\s*run = \[\{ task = "check" \}, \{ task = "smoke:catalog" \}\]'
+    $miseToml | Should -Match '(?s)\[tasks\.deploy\]\s*description = "Run checks, deploy the current workspace state, and inspect targets"\s*alias = \["ci"\]\s*run = \[\{ task = "check" \}, \{ task = "apply" \}, \{ task = "doctor" \}\]'
+    $miseToml | Should -Match '(?s)\[tasks\.upgrade\].*?alias = \["sync"\].*?apm install -g --update.*?\{ task = "deploy" \}'
+    $miseToml | Should -Match '(?s)\[tasks\."refresh:deploy"\].*?alias = \["sync:stable"\].*?\{ task = "refresh" \}.*?\{ task = "deploy" \}'
+    $miseToml | Should -Match '(?s)\[tasks\."release:catalog"\].*?alias = \["catalog:release"\].*?\{ task = "refresh:deploy" \}.*?release-catalog'
     $miseToml | Should -Not -Match 'APM_BOOTSTRAP_REPO'
   }
 
@@ -833,11 +833,11 @@ dependencies:
     $readme = Get-Content -LiteralPath (Join-Path $workspaceRoot "README.md") -Raw
     $todo = Get-Content -LiteralPath (Join-Path $workspaceRoot "TODO.md") -Raw
 
-    $readme | Should -Match 'mise run sync'
-    $readme | Should -Match 'mise run sync:stable'
+    $readme | Should -Match 'mise run upgrade'
+    $readme | Should -Match 'mise run refresh:deploy'
     $readme | Should -Match 'mise run check'
-    $readme | Should -Match 'mise run check:deep'
-    $readme | Should -Match 'mise run catalog:stage'
+    $readme | Should -Match 'mise run verify'
+    $readme | Should -Match 'mise run prepare:catalog'
     $todo | Should -Match 'managed source of truth'
   }
 
