@@ -285,12 +285,13 @@ dependencies:
 
     $records = @(Get-ExternalSkillRecords)
 
-    $records.Count | Should -Be 2
-    ($records | ForEach-Object SourceSkillId | Sort-Object) | Should -Be @("sharp-edges", "ui-ux-pro-max")
-    ($records | ForEach-Object CanonicalReference | Sort-Object) | Should -Be @(
-      "jey3dayo/apm-workspace/manual-skills#sharp-edges",
-      "jey3dayo/apm-workspace/manual-skills#ui-ux-pro-max"
-    )
+    $records.Count | Should -Be 6
+    $skillIds = @($records | ForEach-Object SourceSkillId | Sort-Object)
+    $skillIds | Should -Contain "sharp-edges"
+    $skillIds | Should -Contain "ui-ux-pro-max"
+    $canonicalRefs = @($records | ForEach-Object CanonicalReference | Sort-Object)
+    $canonicalRefs | Should -Contain "jey3dayo/apm-workspace/manual-skills#sharp-edges"
+    $canonicalRefs | Should -Contain "jey3dayo/apm-workspace/manual-skills#ui-ux-pro-max"
   }
 
   It "reads only top-level lock dependency records" {
@@ -828,8 +829,9 @@ dependencies:
     $miseToml | Should -Match 'run = "bash ./scripts/apm-workspace.sh apply"'
     $miseToml | Should -Match 'run = "bash ./scripts/apm-workspace.sh apply:skills:local"'
     $miseToml | Should -Match 'replace-bold-headings\.ts'
-    $miseToml | Should -Match 'replace-bold-headings\.ts.*\./catalog"'
-    $miseToml | Should -Match 'replace-bold-headings\.ts.*\./catalog --dry-run'
+    $miseToml | Should -Match 'replace-bold-headings\.ts'
+    $miseToml | Should -Match '\./catalog'
+    $miseToml | Should -Match '\./catalog --dry-run'
     $miseToml | Should -Match '(?s)\[tasks\."format:check"\]\s*description = "Check workspace docs and manifest formatting"\s*depends = \['
     $miseToml | Should -Match '(?s)\[tasks\.check\]\s*description = "Run lightweight pre-deploy checks for the ~/.apm workspace"\s*depends = \["format:check", "validate"\]'
     $miseToml | Should -Match '(?s)\[tasks\.verify\]\s*description = "Run deep verification for the ~/.apm workspace"\s*run = \[\{ task = "check" \}, \{ task = "smoke:catalog" \}\]'

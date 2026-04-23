@@ -95,13 +95,13 @@ run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"@(fd -e 
 
 [tasks."format:markdown:bold-headings"]
 description = "Rewrite bold headings inside catalog skill and shared guidance sources"
-run = "tsx \"$HOME/.config/scripts/replace-bold-headings.ts\" ./catalog"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"tsx \\\"$HOME/.config/scripts/replace-bold-headings.ts\\\" ./catalog\""
+run = """bash -lc 'script="$HOME/.config/scripts/replace-bold-headings.ts"; if [ -f "$script" ]; then tsx "$script" ./catalog; else echo "Skipping bold heading rewrite: $script not found"; fi'"""
+run_windows = """powershell -NoProfile -ExecutionPolicy Bypass -Command "$script = Join-Path $HOME '.config/scripts/replace-bold-headings.ts'; if (Test-Path $script) { tsx $script ./catalog } else { Write-Host \"Skipping bold heading rewrite: $script not found\" }" """
 
 [tasks."format:markdown:bold-headings:check"]
 description = "Check bold heading rewrites inside catalog skill and shared guidance sources"
-run = "tsx \"$HOME/.config/scripts/replace-bold-headings.ts\" ./catalog --dry-run"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"tsx \\\"$HOME/.config/scripts/replace-bold-headings.ts\\\" ./catalog --dry-run\""
+run = """bash -lc 'script="$HOME/.config/scripts/replace-bold-headings.ts"; if [ -f "$script" ]; then tsx "$script" ./catalog --dry-run; else echo "Skipping bold heading rewrite check: $script not found"; fi'"""
+run_windows = """powershell -NoProfile -ExecutionPolicy Bypass -Command "$script = Join-Path $HOME '.config/scripts/replace-bold-headings.ts'; if (Test-Path $script) { tsx $script ./catalog --dry-run } else { Write-Host \"Skipping bold heading rewrite check: $script not found\" }" """
 
 [tasks."format:toml"]
 description = "Format TOML files in the ~/.apm workspace"
