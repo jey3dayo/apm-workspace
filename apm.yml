@@ -25,7 +25,7 @@ dependencies:
     - ibelick/ui-skills/skills/fixing-motion-performance
     - jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
     - millionco/react-doctor/skills/react-doctor
-    - mizchi/chezmoi-dotfiles/dot_claude/skills/empirical-prompt-tuning
+    - mizchi/skills/empirical-prompt-tuning
     - nyosegawa/skills/skills/skill-auditor
     - obra/superpowers/skills/dispatching-parallel-agents
     - obra/superpowers/skills/brainstorming

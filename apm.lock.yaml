@@ -251,16 +251,16 @@ dependencies:
   - .agents/skills/react-doctor
   - .github/skills/react-doctor
   content_hash: sha256:b8f396bd6db7404a899af03e649f2cf12f4c846ee7d85b6b9a475cb8175abb49
-- repo_url: mizchi/chezmoi-dotfiles
+- repo_url: mizchi/skills
   host: github.com
-  resolved_commit: c7845a843b54f349113435e8f5f48705ce59acf2
-  virtual_path: dot_claude/skills/empirical-prompt-tuning
+  resolved_commit: a2b5a796a5f22fc05fb515cef106993b84cf08cc
+  virtual_path: empirical-prompt-tuning
   is_virtual: true
   package_type: claude_skill
   deployed_files:
   - .agents/skills/empirical-prompt-tuning
   - .github/skills/empirical-prompt-tuning
-  content_hash: sha256:70e5a20153bc46d173d91ef0f5786972427afb85c971329731711c814b9c9911
+  content_hash: sha256:18bcf9be6245f765cbb6c51ba4d988991a647139c1513094d6c116c15f7ed058
 - repo_url: nyosegawa/skills
   host: github.com
   resolved_commit: c1048fe35403a3f273132306a4d49278f189c64b

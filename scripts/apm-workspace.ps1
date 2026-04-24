@@ -89,6 +89,8 @@ function Get-ExternalSkillRelativePath {
     $relativePath = $VirtualPath.Substring("skills/".Length)
   } elseif ($VirtualPath -match '.*/skills/(?<relative>.+)$') {
     $relativePath = $Matches['relative']
+  } elseif ($VirtualPath -match '^[A-Za-z0-9][A-Za-z0-9._/-]*$') {
+    $relativePath = $VirtualPath
   } else {
     throw "Invalid external skill virtual path: $VirtualPath"
   }

@@ -101,6 +101,7 @@ dependencies:
     Get-ExternalSkillRelativePath -VirtualPath "plugins/static-analysis/skills/codeql" | Should -Be "codeql"
     Get-ExternalSkillRelativePath -VirtualPath ".agents/skills/tauri" | Should -Be "tauri"
     Get-ExternalSkillRelativePath -VirtualPath "skills/.system/skill-creator" | Should -Be "skill-creator"
+    Get-ExternalSkillRelativePath -VirtualPath "empirical-prompt-tuning" | Should -Be "empirical-prompt-tuning"
   }
 
   It "maps obra superpowers external skills to superpowers aliases" {
@@ -772,8 +773,8 @@ dependencies:
     Mock Ensure-WorkspaceRepo {}
     Mock Ensure-WorkspaceScaffold {}
     Mock New-TemporaryDirectory { Join-Path $TestDrive "apm-sync-local" }
-    Mock Get-RequestedCatalogSkillIds { @("superpowers:brainstorming") }
-    Mock Get-ManagedSkillContentDir { Join-Path $TestDrive "catalog/skills/superpowers/brainstorming" }
+    Mock Get-RequestedLocalSkillIds { @("superpowers:brainstorming") }
+    Mock Get-LocalSkillContentDir { Join-Path $TestDrive "catalog/skills/superpowers/brainstorming" }
     Mock Get-LocalCodexSyncTarget {
       [pscustomobject]@{ Name = "codex"; Root = (Join-Path $TestDrive ".codex"); SkillsRoot = (Join-Path $TestDrive ".agents"); ConfigName = "AGENTS.md" }
     }

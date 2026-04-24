@@ -9,6 +9,6 @@
 /.apm/
 /private-skills/
 
-/apm_modules/
+apm_modules/
 
 /.catalog-build/

@@ -1163,6 +1163,12 @@ external_skill_relative_path() {
     */skills/*)
       relative_path=${virtual_path#*/skills/}
       ;;
+    */*)
+      relative_path=$virtual_path
+      ;;
+    [A-Za-z0-9]*)
+      relative_path=$virtual_path
+      ;;
     *)
       fail "Invalid external skill virtual path: $virtual_path"
       ;;
