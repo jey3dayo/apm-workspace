@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-04-23T14:15:14.000000+00:00'
+generated_at: '2026-04-24T18:07:28.049358+00:00'
 apm_version: 0.9.1
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -220,7 +220,7 @@ dependencies:
   content_hash: sha256:99aaea521aa0f1c7d041d70bb6b75581c1a50ec6ac59ceaaa923b6339ffa417b
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: fe7f55ab9fd030ba974324bfedac12c3a7951f79
+  resolved_commit: 837019ccdf227ffbe1aafdf4c8f7537baf96126e
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
@@ -229,7 +229,6 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   host: github.com
   resolved_commit: 328cab947d43ab03e448361fc2606c1997dc15f2
-  resolved_ref: main
   virtual_path: manual-skills
   is_virtual: true
   package_type: apm_package
@@ -240,6 +239,12 @@ dependencies:
   - .agents/skills/sharp-edges
   - .agents/skills/skill-creator
   - .agents/skills/ui-ux-pro-max
+  - .github/skills/agentation
+  - .github/skills/agentic-actions-auditor
+  - .github/skills/sarif-parsing
+  - .github/skills/sharp-edges
+  - .github/skills/skill-creator
+  - .github/skills/ui-ux-pro-max
   content_hash: sha256:9414b85729ae68629c8e971480f1b735aa7e3acd1dd1e33a92080de8f636de66
 - repo_url: millionco/react-doctor
   host: github.com
