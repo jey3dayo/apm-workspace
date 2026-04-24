@@ -33,6 +33,7 @@ In practice:
 - if the change is to a personal skill or shared guidance asset, edit `./catalog`
 - if the change is to external dependency selection or accepted upstream state, edit or review `apm.yml` and `apm.lock.yaml`
 - if an upstream skill does not install or deploy cleanly through the normal managed lane, copy it under `./manual-skills/.apm/skills/<id>/`, record provenance under `./manual-skills/upstreams/**`, and distribute it through the `jey3dayo/apm-workspace/manual-skills` package ref in root `apm.yml`
+- if a skill should stay machine-local and untracked, place it under `./private-skills/.apm/skills/<id>/`; this gitignored lane is only used by the local Codex skill sync flow
 - if the change only exists in a deployed target or cache, regenerate from the tracked workspace instead of editing it in place
 - if the question is specifically about Codex skills, treat `~/.agents/skills` as the deployed output and `~/.codex/AGENTS.md` as the compiled guidance output
 
@@ -140,6 +141,7 @@ Then review and commit the skill changes.
 - Do not treat deployed targets such as `~/.claude/` or `~/.codex/` as source of truth
 - Do not reintroduce local `./packages/*` refs into the global manifest
 - Do not hand-edit runtime outputs when the tracked workspace can regenerate them
+- Do not commit `private-skills/`; it is a gitignored local-only overlay for `mise run apply:skills:local`
 - When changing the active `apm` source, update both tracked `mise` config locations that define `apm`
   - `~/.apm/mise.toml`
   - `~/.config/mise/config.default.toml`

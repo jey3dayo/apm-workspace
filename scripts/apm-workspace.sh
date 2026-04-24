@@ -180,6 +180,10 @@ tracked_catalog_skills_root() {
   printf '%s/catalog/skills\n' "$WORKSPACE_DIR"
 }
 
+private_skills_root() {
+  printf '%s/private-skills/.apm/skills\n' "$WORKSPACE_DIR"
+}
+
 tracked_catalog_agents_root() {
   printf '%s/agents\n' "$(tracked_catalog_dir)"
 }
@@ -403,6 +407,36 @@ managed_skill_content_dir() {
 
   [ -f "$source_dir/SKILL.md" ] || fail "Managed catalog skill missing SKILL.md: $source_dir"
   printf '%s\n' "$source_dir"
+}
+
+private_skill_content_dir() {
+  skill_id="$1"
+  validate_skill_id "$skill_id"
+  source_dir="$(private_skills_root)"
+  old_ifs=$IFS
+  IFS=':'
+  # shellcheck disable=SC2086
+  set -- $skill_id
+  IFS=$old_ifs
+  validate_skill_path_segments "$skill_id" "$@"
+  for segment in "$@"; do
+    source_dir="$source_dir/$segment"
+  done
+
+  [ -f "$source_dir/SKILL.md" ] || fail "Private skill missing SKILL.md: $source_dir"
+  printf '%s\n' "$source_dir"
+}
+
+local_skill_content_dir() {
+  skill_id="$1"
+  validate_skill_id "$skill_id"
+
+  if private_skill_content_dir "$skill_id" >/dev/null 2>&1; then
+    private_skill_content_dir "$skill_id"
+    return 0
+  fi
+
+  managed_skill_content_dir "$skill_id"
 }
 
 copy_managed_skill_into_catalog() {
@@ -678,11 +712,11 @@ cmd_apply() {
 }
 
 requested_personal_skill_records() {
-  skill_ids=$(requested_catalog_skill_ids "$@")
+  skill_ids=$(requested_local_skill_ids "$@")
 
   printf '%s\n' "$skill_ids" | while IFS= read -r skill_id; do
     [ -n "$skill_id" ] || continue
-    source_path=$(managed_skill_content_dir "$skill_id")
+    source_path=$(local_skill_content_dir "$skill_id")
     printf 'personal\t%s\t%s\tcatalog\n' "$skill_id" "$source_path"
   done
 }
@@ -736,7 +770,7 @@ cmd_sync_local_skills() {
 
   trap - RETURN
   rm -rf "$stage_root"
-  log "Synced local managed skills to Codex target: $(printf '%s\n' "$skill_records" | awk -F '\t' 'NF >= 2 { print $2 }' | tr '\n' ',' | sed 's/,$//; s/,/, /g')"
+  log "Synced local catalog/private skills to Codex target: $(printf '%s\n' "$skill_records" | awk -F '\t' 'NF >= 2 { print $2 }' | tr '\n' ',' | sed 's/,$//; s/,/, /g')"
 }
 
 cmd_update() {
@@ -892,6 +926,17 @@ managed_skill_ids() {
   skill_ids_from_root "$(tracked_catalog_skills_root)"
 }
 
+private_skill_ids() {
+  skill_ids_from_root "$(private_skills_root)"
+}
+
+local_skill_ids() {
+  {
+    private_skill_ids
+    managed_skill_ids
+  } | awk 'NF > 0 && !seen[$0]++'
+}
+
 requested_catalog_skill_ids() {
   if [ "$#" -gt 0 ]; then
     for skill_id in "$@"; do
@@ -905,6 +950,22 @@ requested_catalog_skill_ids() {
   fi
 
   tracked_catalog_skill_ids
+}
+
+requested_local_skill_ids() {
+  if [ "$#" -gt 0 ]; then
+    available_skill_ids=$(local_skill_ids)
+    for skill_id in "$@"; do
+      validate_skill_id "$skill_id"
+      if ! printf '%s\n' "$available_skill_ids" | awk -v target="$skill_id" '$0 == target { found = 1; exit } END { exit(found ? 0 : 1) }'; then
+        fail "Requested local skill is not available in catalog/skills or private-skills: $skill_id"
+      fi
+      printf '%s\n' "$skill_id"
+    done
+    return 0
+  fi
+
+  local_skill_ids
 }
 
 cmd_validate() {
@@ -1858,7 +1919,7 @@ Usage: scripts/apm-workspace.sh <command> [args...]
 
 Commands:
   apply              Offline deploy user-scope-compatible dependencies and compile Codex output
-  apply:skills:local Quick-sync managed catalog skills into ~/.agents/skills only
+  apply:skills:local Quick-sync local catalog and private skills into ~/.agents/skills only
   refresh            Refresh the checkout and dependencies only; does not deploy
   pin-external       Pin external manifest refs to lockfile commits
   validate           Validate the ~/.apm workspace

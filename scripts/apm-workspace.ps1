@@ -1341,11 +1341,11 @@ function Get-RequestedPersonalSkillRecords {
   )
 
   $result = New-Object System.Collections.Generic.List[object]
-  foreach ($skillId in (Get-RequestedCatalogSkillIds -RequestedSkillIds $RequestedSkillIds)) {
+  foreach ($skillId in (Get-RequestedLocalSkillIds -RequestedSkillIds $RequestedSkillIds)) {
     $result.Add([pscustomobject]@{
         SourceKind = "personal"
         SourceSkillId = $skillId
-        SourcePath = Get-ManagedSkillContentDir -SkillId $skillId
+        SourcePath = Get-LocalSkillContentDir -SkillId $skillId
       })
   }
 
@@ -1395,7 +1395,7 @@ function Invoke-SyncLocalSkills {
     }
   }
 
-  Write-Host ("Synced local managed skills to Codex target: {0}" -f ((@($skillRecords | ForEach-Object SourceSkillId)) -join ", "))
+  Write-Host ("Synced local catalog/private skills to Codex target: {0}" -f ((@($skillRecords | ForEach-Object SourceSkillId)) -join ", "))
 }
 
 function Invoke-Update {
@@ -1454,6 +1454,10 @@ function Get-TrackedCatalogSkillsRoot {
   return (Join-Path $WorkspaceDir "catalog\skills")
 }
 
+function Get-PrivateSkillsRoot {
+  return (Join-Path $WorkspaceDir "private-skills\.apm\skills")
+}
+
 function Get-TrackedCatalogAgentsRoot {
   return (Join-Path (Get-TrackedCatalogDir) "agents")
 }
@@ -1505,6 +1509,21 @@ function Get-ManagedSkillIds {
   return @(Get-SkillIdsFromRoot -SkillsRoot (Get-TrackedCatalogSkillsRoot))
 }
 
+function Get-PrivateSkillIds {
+  return @(Get-SkillIdsFromRoot -SkillsRoot (Get-PrivateSkillsRoot))
+}
+
+function Get-LocalSkillIds {
+  $result = New-Object System.Collections.Generic.List[string]
+  foreach ($skillId in (@(Get-PrivateSkillIds) + @(Get-ManagedSkillIds))) {
+    if (-not [string]::IsNullOrWhiteSpace($skillId) -and -not $result.Contains($skillId)) {
+      $result.Add($skillId)
+    }
+  }
+
+  return $result.ToArray()
+}
+
 function Get-RequestedManagedSkillIds {
   param(
     [string[]]$RequestedSkillIds
@@ -1537,6 +1556,25 @@ function Get-RequestedCatalogSkillIds {
   }
 
   return $trackedSkillIds
+}
+
+function Get-RequestedLocalSkillIds {
+  param(
+    [string[]]$RequestedSkillIds
+  )
+
+  $availableSkillIds = @(Get-LocalSkillIds)
+  if ($RequestedSkillIds -and $RequestedSkillIds.Count -gt 0) {
+    foreach ($skillId in $RequestedSkillIds) {
+      Test-SkillId -SkillId $skillId
+      if ($skillId -notin $availableSkillIds) {
+        throw "Requested local skill is not available in catalog/skills or private-skills: $skillId"
+      }
+    }
+    return $RequestedSkillIds
+  }
+
+  return $availableSkillIds
 }
 
 function Get-TrackedCatalogAgentRelativePaths {
@@ -1961,6 +1999,42 @@ function Get-ManagedSkillContentDir {
   return $skillRoot
 }
 
+function Get-PrivateSkillContentDir {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$SkillId
+  )
+
+  $skillRoot = Get-PrivateSkillsRoot
+  foreach ($segment in (Convert-SkillIdToPathSegments -SkillId $SkillId)) {
+    $skillRoot = Join-Path $skillRoot $segment
+  }
+
+  if (-not (Test-Path -LiteralPath (Join-Path $skillRoot "SKILL.md"))) {
+    throw "Private skill missing SKILL.md: $skillRoot"
+  }
+
+  return $skillRoot
+}
+
+function Get-LocalSkillContentDir {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$SkillId
+  )
+
+  $privateSkillRoot = Get-PrivateSkillsRoot
+  foreach ($segment in (Convert-SkillIdToPathSegments -SkillId $SkillId)) {
+    $privateSkillRoot = Join-Path $privateSkillRoot $segment
+  }
+
+  if (Test-Path -LiteralPath (Join-Path $privateSkillRoot "SKILL.md")) {
+    return $privateSkillRoot
+  }
+
+  return (Get-ManagedSkillContentDir -SkillId $SkillId)
+}
+
 function Copy-ManagedSkillIntoCatalog {
   param(
     [Parameter(Mandatory = $true)]
@@ -2312,7 +2386,7 @@ Usage: scripts/apm-workspace.ps1 <command> [args...]
 
 Commands:
   apply              Offline deploy user-scope-compatible dependencies and compile Codex output
-  apply:skills:local Quick-sync managed catalog skills into ~/.agents/skills only
+  apply:skills:local Quick-sync local catalog and private skills into ~/.agents/skills only
   refresh            Refresh the checkout and dependencies only; does not deploy
   pin-external       Pin external manifest refs to lockfile commits
   validate           Validate the ~/.apm workspace

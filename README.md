@@ -9,6 +9,7 @@ Current `apm` CLI source is pinned through `mise` to `github:microsoft/apm@v0.9.
 ## Source Of Truth
 
 - Personal skills: `~/.apm/catalog/skills/<id>/`
+- Local-only private skills: `~/.apm/private-skills/.apm/skills/<id>/`
 - Shared guidance: `~/.apm/catalog/{AGENTS.md,agents/**,commands/**,rules/**}`
 - Dependency selection and accepted upstream state: `~/.apm/apm.yml`, `~/.apm/apm.lock.yaml`
 - Downloaded sources: `~/.apm/apm_modules/` is cache only, not an editing surface
@@ -40,6 +41,7 @@ mise run deploy
 - Use `mise` tasks rather than `.config` wrapper scripts for normal operation.
 - Keep `apm.yml` on remote refs for global install; do not switch it back to many local `./packages/*` refs.
 - When an upstream skill cannot stay on the normal managed lane, keep its copied source under `manual-skills/.apm/skills/**` and distribute it through `jey3dayo/apm-workspace/manual-skills`.
+- Keep machine-local skills under `private-skills/.apm/skills/**`; this directory is gitignored and only participates in `mise run apply:skills:local`.
 - Codex is handled via `apm compile --target codex --output ~/.codex/AGENTS.md`, and skills deploy to `~/.agents/skills`.
 - `tsx ~/.config/scripts/replace-bold-headings.ts ./catalog` is the only documented exception that reaches into `~/.config`.
 
