@@ -34,6 +34,7 @@ In practice:
 - if the change is to external dependency selection or accepted upstream state, edit or review `apm.yml` and `apm.lock.yaml`
 - if an upstream skill does not install or deploy cleanly through the normal managed lane, copy it under `./manual-skills/.apm/skills/<id>/`, record provenance under `./manual-skills/upstreams/**`, and distribute it through the `jey3dayo/apm-workspace/manual-skills` package ref in root `apm.yml`
 - if a skill should stay machine-local and untracked, place it under `./private-skills/.apm/skills/<id>/`; this gitignored lane is only used by the local Codex skill sync flow
+- if both `catalog/skills/<id>/` and `private-skills/.apm/skills/<id>/` exist, the private copy overrides the tracked copy for `mise run apply:skills:local`
 - if the change only exists in a deployed target or cache, regenerate from the tracked workspace instead of editing it in place
 - if the question is specifically about Codex skills, treat `~/.agents/skills` as the deployed output and `~/.codex/AGENTS.md` as the compiled guidance output
 

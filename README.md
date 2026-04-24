@@ -42,6 +42,7 @@ mise run deploy
 - Keep `apm.yml` on remote refs for global install; do not switch it back to many local `./packages/*` refs.
 - When an upstream skill cannot stay on the normal managed lane, keep its copied source under `manual-skills/.apm/skills/**` and distribute it through `jey3dayo/apm-workspace/manual-skills`.
 - Keep machine-local skills under `private-skills/.apm/skills/**`; this directory is gitignored and only participates in `mise run apply:skills:local`.
+- If a skill id exists in both `catalog/skills/**` and `private-skills/.apm/skills/**`, the local private copy wins during `mise run apply:skills:local`.
 - Codex is handled via `apm compile --target codex --output ~/.codex/AGENTS.md`, and skills deploy to `~/.agents/skills`.
 - `tsx ~/.config/scripts/replace-bold-headings.ts ./catalog` is the only documented exception that reaches into `~/.config`.
 

@@ -18,6 +18,7 @@ This workspace owns the global APM manifest, the lockfile, the downloaded depend
 - `apm_modules/`: downloaded upstream sources; cache only, not an editing surface
 - `catalog/`: shared runtime guidance package for AGENTS, agents, commands, rules, and managed personal skills under `catalog/skills/`
 - `manual-skills/`: copied skills kept outside the normal upstream-managed lane and published as a separate package when needed
+- `private-skills/`: gitignored machine-local skills used only for local Codex skill sync
 - `mise.toml`: workspace-local tasks for install, migration, validation, and repair
 - `tests/`: Pester coverage for workspace helpers
 
@@ -30,6 +31,9 @@ Workspace assets are split by role.
 - Manual-only copied skills
   - source: `~/.apm/manual-skills/.apm/skills/<skill-id>/`
   - provenance: `~/.apm/manual-skills/upstreams/**`
+- Local-only private skills
+  - source: `~/.apm/private-skills/.apm/skills/<skill-id>/`
+  - rollout: `mise run apply:skills:local` only
 - Shared guidance
   - source: `~/.apm/catalog/AGENTS.md`
   - source: `~/.apm/catalog/agents/**`
@@ -41,6 +45,7 @@ The tracked layout is intentionally asymmetric:
 - `catalog/skills/**` is the authoring layer for personal assets.
 - external skills stay visible in `apm.yml` / `apm.lock.yaml` as command-managed upstream refs.
 - `manual-skills/**` is for copied skills that cannot stay on the normal upstream-managed lane.
+- `private-skills/**` is for untracked local-only overrides or additions that should not enter the shared rollout.
 - `commands/**` stay top-level inside `catalog/**` because they are synced into runtime targets as shared guidance, not installed as nested skill packages.
 
 Shared runtime guidance is published through the catalog ref in `apm.yml`:
@@ -58,6 +63,7 @@ jey3dayo/apm-workspace/catalog#main
 - Keep `~/.config/scripts/replace-bold-headings.ts` available as the one allowed script exception.
 - Keep `apm.yml` on upstream refs, especially `jey3dayo/apm-workspace/catalog#main`.
 - Keep managed personal source in `~/.apm/catalog/skills/**`, manual copied skills in `~/.apm/manual-skills/**`, and runtime guidance in `~/.apm/catalog/**`.
+- Keep machine-local untracked skills in `~/.apm/private-skills/.apm/skills/**`.
 - Treat Codex as split output: compile target plus separate skill deployment.
 - The current script path is `apm compile --target codex --output ~/.codex/AGENTS.md`.
 - Codex skills are deployed through `~/.agents/skills`.
@@ -76,6 +82,10 @@ jey3dayo/apm-workspace/catalog#main
 - Manual-only copied skills
   - edit `manual-skills/**`
   - keep them out of the root `apm.yml`
+- Local-only private skills
+  - edit `private-skills/.apm/skills/**`
+  - keep them untracked and out of `apm.yml` / `apm.lock.yaml`
+  - if the same skill id exists in `catalog/skills/**`, the private copy wins for `mise run apply:skills:local`
 - External skills
   - use `apm install <package-ref>` to add
   - use `apm uninstall <package-ref>` to remove
@@ -118,6 +128,13 @@ When a copied skill lives under `~/.apm/manual-skills/`:
 3. If the skill should ship in the default global rollout, add the package ref `jey3dayo/apm-workspace/manual-skills` to the root `apm.yml`.
 4. If the normal upstream-managed lane starts working again, prefer moving the skill back out of `manual-skills/`.
 
+When a machine-local skill lives under `~/.apm/private-skills/`:
+
+1. Treat it as an untracked local-only asset.
+2. Keep it out of commits, `apm.yml`, and `apm.lock.yaml`.
+3. Use `mise run apply:skills:local` to sync it into `~/.agents/skills`.
+4. If the same skill id exists under `catalog/skills/`, expect the private copy to override it in the local Codex sync.
+
 ## Useful Maintenance Commands
 
 - `mise run format`: format Markdown, TOML, and YAML in the workspace
@@ -128,6 +145,7 @@ When a copied skill lives under `~/.apm/manual-skills/`:
 - `mise run upgrade`: accept upstream dependency updates with `apm install -g --update`, then run the local rollout
 - `mise run refresh:deploy`: refresh first, then run the full local rollout from the current manifest and lock
 - `mise run apply`: deploy the current manifest and lock without changing upstream refs
+- `mise run apply:skills:local`: sync tracked catalog skills plus local `private-skills` into `~/.agents/skills`
 - `mise run refresh`: refresh the checkout and dependency state without deploying
 - `mise run validate`: run both workspace and catalog validation
 - `mise run validate:workspace`: verify workspace wiring with workspace overrides
