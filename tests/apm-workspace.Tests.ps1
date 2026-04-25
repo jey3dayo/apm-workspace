@@ -355,9 +355,20 @@ Describe "public command surface" {
   }
 
   It "shows shell help wording for refresh and catalog commands" {
+    $bashShell = @(
+      "D:\Programs\Git\bin\bash.exe"
+      "C:\Program Files\Git\bin\bash.exe"
+      (Get-Command bash -ErrorAction SilentlyContinue).Path
+    ) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) -and (Test-Path -LiteralPath $_) } | Select-Object -First 1
+
+    if ([string]::IsNullOrWhiteSpace($bashShell)) {
+      Set-ItResult -Skipped -Because "bash is not available on this host"
+      return
+    }
+
     $legacyMirrorPattern = 'transitional' + ' mirror'
     $updateHelpPattern = '(?m)^  refresh\s+Refresh the checkout and dependencies only; does not deploy$'
-    $help = & /bin/bash (Join-Path $workspaceRoot "scripts/apm-workspace.sh") help | Out-String
+    $help = (& $bashShell (Join-Path $workspaceRoot "scripts/apm-workspace.sh") help | Out-String) -replace "`r`n", "`n" -replace "`r", "`n"
 
     $help | Should -Match $updateHelpPattern
     $help | Should -Match "validate:catalog"
@@ -376,7 +387,7 @@ Describe "public command surface" {
   It "shows PowerShell help wording for refresh and catalog commands" {
     $legacyMirrorPattern = 'transitional' + ' mirror'
     $updateHelpPattern = '(?m)^  refresh\s+Refresh the checkout and dependencies only; does not deploy$'
-    $help = & $consoleShell -NoProfile -ExecutionPolicy Bypass -File $scriptPath help | Out-String
+    $help = (& $consoleShell -NoProfile -ExecutionPolicy Bypass -File $scriptPath help | Out-String) -replace "`r`n", "`n" -replace "`r", "`n"
 
     $help | Should -Match $updateHelpPattern
     $help | Should -Match "validate:catalog"
