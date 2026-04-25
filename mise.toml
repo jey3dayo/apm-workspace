@@ -160,6 +160,21 @@ run = [{ task = "check" }, { task = "smoke:catalog" }]
 description = "Run checks, deploy the current workspace state, and inspect targets"
 run = [{ task = "check" }, { task = "apply" }, { task = "doctor" }]
 
+[tasks."repair:local-package-cache"]
+description = "Rebuild workspace-owned APM package cache entries from tracked sources"
+run = "bash ./scripts/apm-workspace.sh repair:local-package-cache"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 repair:local-package-cache"
+
+[tasks."deploy:fresh"]
+description = "Rebuild APM dependency cache, deploy, and verify when normal deploy output looks stale"
+run = [
+  "apm prune --dry-run",
+  "apm prune",
+  { task = "repair:local-package-cache" },
+  { task = "deploy" },
+  { task = "check" },
+]
+
 # ========================================
 # Meta Tasks
 # ========================================

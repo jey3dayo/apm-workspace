@@ -1400,6 +1400,45 @@ function Invoke-SyncLocalSkills {
   Write-Host ("Synced local catalog/private skills to Codex target: {0}" -f ((@($skillRecords | ForEach-Object SourceSkillId)) -join ", "))
 }
 
+function Repair-LocalPackageCacheEntry {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$PackageName,
+
+    [Parameter(Mandatory = $true)]
+    [string]$SourceDir
+  )
+
+  if (-not (Test-Path -LiteralPath $SourceDir -PathType Container)) {
+    throw "Local package source missing: $SourceDir"
+  }
+
+  $cacheRoot = Get-WorkspacePackageCacheRoot
+  $destinationDir = Join-Path $cacheRoot $PackageName
+  $expectedRoot = [System.IO.Path]::GetFullPath((Join-Path $WorkspaceDir "apm_modules\jey3dayo\apm-workspace"))
+  $destinationFullPath = [System.IO.Path]::GetFullPath($destinationDir)
+
+  if (-not $destinationFullPath.StartsWith(($expectedRoot + [System.IO.Path]::DirectorySeparatorChar), [System.StringComparison]::OrdinalIgnoreCase)) {
+    throw "Refusing to rebuild cache outside apm_modules: $destinationFullPath"
+  }
+
+  New-Item -ItemType Directory -Path $cacheRoot -Force | Out-Null
+  if (Test-Path -LiteralPath $destinationDir) {
+    Remove-Item -LiteralPath $destinationDir -Recurse -Force
+  }
+
+  Copy-DirectoryContents -SourceDir $SourceDir -DestinationDir $destinationDir
+  Write-Host "Rebuilt APM package cache: $destinationDir"
+}
+
+function Invoke-RepairLocalPackageCache {
+  Ensure-WorkspaceRepo
+  Ensure-WorkspaceScaffold
+
+  Repair-LocalPackageCacheEntry -PackageName "catalog" -SourceDir (Get-TrackedCatalogDir)
+  Repair-LocalPackageCacheEntry -PackageName "manual-skills" -SourceDir (Join-Path $WorkspaceDir "manual-skills")
+}
+
 function Invoke-Update {
   Require-Apm
   Ensure-WorkspaceRepo
@@ -1450,6 +1489,10 @@ function Get-CatalogBuildInstructionsPath {
 
 function Get-TrackedCatalogDir {
   return (Join-Path $WorkspaceDir $CatalogDirName)
+}
+
+function Get-WorkspacePackageCacheRoot {
+  return (Join-Path $WorkspaceDir "apm_modules\jey3dayo\apm-workspace")
 }
 
 function Get-TrackedCatalogSkillsRoot {
@@ -2346,6 +2389,10 @@ switch ($Command) {
     Invoke-Update
   }
 
+  "repair:local-package-cache" {
+    Invoke-RepairLocalPackageCache
+  }
+
   "pin-external" {
     Invoke-PinExternal
   }
@@ -2390,6 +2437,7 @@ Commands:
   apply              Offline deploy user-scope-compatible dependencies and compile Codex output
   apply:skills:local Quick-sync local catalog and private skills into ~/.agents/skills only
   refresh            Refresh the checkout and dependencies only; does not deploy
+  repair:local-package-cache Rebuild workspace-owned package cache from tracked sources
   pin-external       Pin external manifest refs to lockfile commits
   validate           Validate the ~/.apm workspace
   validate:catalog   Fail when ~/.apm/catalog is not normalized or missing required assets

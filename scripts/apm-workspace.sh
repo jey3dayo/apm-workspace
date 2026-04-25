@@ -176,6 +176,10 @@ tracked_catalog_dir() {
   printf '%s/%s\n' "$WORKSPACE_DIR" "$CATALOG_DIR_NAME"
 }
 
+workspace_package_cache_root() {
+  printf '%s/apm_modules/jey3dayo/apm-workspace\n' "$WORKSPACE_DIR"
+}
+
 tracked_catalog_skills_root() {
   printf '%s/catalog/skills\n' "$WORKSPACE_DIR"
 }
@@ -771,6 +775,37 @@ cmd_sync_local_skills() {
   trap - RETURN
   rm -rf "$stage_root"
   log "Synced local catalog/private skills to Codex target: $(printf '%s\n' "$skill_records" | awk -F '\t' 'NF >= 2 { print $2 }' | tr '\n' ',' | sed 's/,$//; s/,/, /g')"
+}
+
+repair_local_package_cache_entry() {
+  package_name="$1"
+  source_dir="$2"
+  cache_root=$(workspace_package_cache_root)
+  destination_dir="$cache_root/$package_name"
+
+  [ -d "$source_dir" ] || fail "Local package source missing: $source_dir"
+
+  case "$destination_dir" in
+    "$WORKSPACE_DIR"/apm_modules/jey3dayo/apm-workspace/*)
+      ;;
+    *)
+      fail "Refusing to rebuild cache outside apm_modules: $destination_dir"
+      ;;
+  esac
+
+  mkdir -p "$cache_root"
+  rm -rf "$destination_dir"
+  mkdir -p "$destination_dir"
+  cp -R "$source_dir"/. "$destination_dir"
+  log "Rebuilt APM package cache: $destination_dir"
+}
+
+cmd_repair_local_package_cache() {
+  ensure_workspace_repo
+  ensure_workspace_scaffold
+
+  repair_local_package_cache_entry "catalog" "$(tracked_catalog_dir)"
+  repair_local_package_cache_entry "manual-skills" "$WORKSPACE_DIR/manual-skills"
 }
 
 cmd_update() {
@@ -1927,6 +1962,7 @@ Commands:
   apply              Offline deploy user-scope-compatible dependencies and compile Codex output
   apply:skills:local Quick-sync local catalog and private skills into ~/.agents/skills only
   refresh            Refresh the checkout and dependencies only; does not deploy
+  repair:local-package-cache Rebuild workspace-owned package cache from tracked sources
   pin-external       Pin external manifest refs to lockfile commits
   validate           Validate the ~/.apm workspace
   validate:catalog   Fail when ~/.apm/catalog is not normalized or missing required assets
@@ -1949,6 +1985,7 @@ case "$COMMAND" in
   apply) cmd_apply ;;
   apply:skills:local) cmd_sync_local_skills "$@" ;;
   refresh) cmd_update ;;
+  repair:local-package-cache) cmd_repair_local_package_cache ;;
   pin-external) cmd_pin_external ;;
   validate) cmd_validate ;;
   validate:catalog) cmd_validate_catalog ;;
