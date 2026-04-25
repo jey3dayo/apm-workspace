@@ -1,16 +1,18 @@
 lockfile_version: '1'
-generated_at: '2026-04-24T18:07:28.049358+00:00'
-apm_version: 0.9.1
+generated_at: '2026-04-25T03:48:36.696481+00:00'
+apm_version: 0.8.11
 dependencies:
 - repo_url: EpicenterHQ/epicenter
   host: github.com
-  resolved_commit: c6575235ba536e190dc42a907925b5577e163033
+  resolved_commit: bd310613c2c1842e6300eb85e258097ee37f8851
   virtual_path: .agents/skills/tauri
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/tauri
-  - .github/skills/tauri
+  - .claude/skills/tauri
+  - .config/opencode/skills/tauri
+  - .copilot/skills/tauri
+  - .cursor/skills/tauri
   content_hash: sha256:e9ad9f9304bdeaab54cfff99a5ab47b8215cc8043ef686ff9036e86572f36f1b
 - repo_url: Heyvhuang/ship-faster
   host: github.com
@@ -19,8 +21,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/cloudflare
-  - .github/skills/cloudflare
+  - .claude/skills/cloudflare
+  - .config/opencode/skills/cloudflare
+  - .copilot/skills/cloudflare
+  - .cursor/skills/cloudflare
   content_hash: sha256:03937061c79fe7e9e989cd054bf3adff6123fa58fe3ba63ed984358854d94bb0
 - repo_url: Heyvhuang/ship-faster
   host: github.com
@@ -29,68 +33,82 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/tool-openclaw
-  - .github/skills/tool-openclaw
+  - .claude/skills/tool-openclaw
+  - .config/opencode/skills/tool-openclaw
+  - .copilot/skills/tool-openclaw
+  - .cursor/skills/tool-openclaw
   content_hash: sha256:1b9cee49d17e42ed30aa3f429102ef2b9b7fddd94e705138dce852994cdbe447
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 822b20d9bf1d499234ff8584b427028cadff523b
+  resolved_commit: 2eb109d0f3c908cbc8a24e1278fb8c362d19186e
   virtual_path: understand-anything-plugin/skills/understand
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/understand
-  - .github/skills/understand
-  content_hash: sha256:3ef3b426fc18bdb6434627f915f0cdad36bd4b64dfc723e9432fb7a17275046e
+  - .claude/skills/understand
+  - .config/opencode/skills/understand
+  - .copilot/skills/understand
+  - .cursor/skills/understand
+  content_hash: sha256:2f46743e0816fd8cacbaaf8603e94bef7a5871287f67cc7805550c45f0cbae4c
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 822b20d9bf1d499234ff8584b427028cadff523b
+  resolved_commit: 2eb109d0f3c908cbc8a24e1278fb8c362d19186e
   virtual_path: understand-anything-plugin/skills/understand-chat
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/understand-chat
-  - .github/skills/understand-chat
+  - .claude/skills/understand-chat
+  - .config/opencode/skills/understand-chat
+  - .copilot/skills/understand-chat
+  - .cursor/skills/understand-chat
   content_hash: sha256:99246057d1e523d0e5eed42e68083f978656661e53d73cac5e92983ccf1518ea
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 822b20d9bf1d499234ff8584b427028cadff523b
+  resolved_commit: 2eb109d0f3c908cbc8a24e1278fb8c362d19186e
   virtual_path: understand-anything-plugin/skills/understand-dashboard
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/understand-dashboard
-  - .github/skills/understand-dashboard
-  content_hash: sha256:38d236f95e3484352bc4dd48d72577562695bc11d4e1b376c30a2409b7692eb5
+  - .claude/skills/understand-dashboard
+  - .config/opencode/skills/understand-dashboard
+  - .copilot/skills/understand-dashboard
+  - .cursor/skills/understand-dashboard
+  content_hash: sha256:32771fb738e732febba2c780df113354fdc08085aee73e6531ded3e0ad17ee29
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 822b20d9bf1d499234ff8584b427028cadff523b
+  resolved_commit: 2eb109d0f3c908cbc8a24e1278fb8c362d19186e
   virtual_path: understand-anything-plugin/skills/understand-diff
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/understand-diff
-  - .github/skills/understand-diff
+  - .claude/skills/understand-diff
+  - .config/opencode/skills/understand-diff
+  - .copilot/skills/understand-diff
+  - .cursor/skills/understand-diff
   content_hash: sha256:3ffd99e2f225db4dbab3ace73d37bedd7f7f670d3fbaa5a6fff0b6654a593820
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 822b20d9bf1d499234ff8584b427028cadff523b
+  resolved_commit: 2eb109d0f3c908cbc8a24e1278fb8c362d19186e
   virtual_path: understand-anything-plugin/skills/understand-explain
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/understand-explain
-  - .github/skills/understand-explain
+  - .claude/skills/understand-explain
+  - .config/opencode/skills/understand-explain
+  - .copilot/skills/understand-explain
+  - .cursor/skills/understand-explain
   content_hash: sha256:3040f5a43b8cea6eba16117a863f171791863b9c00116e6eb96cc5f482e9cba2
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 822b20d9bf1d499234ff8584b427028cadff523b
+  resolved_commit: 2eb109d0f3c908cbc8a24e1278fb8c362d19186e
   virtual_path: understand-anything-plugin/skills/understand-onboard
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/understand-onboard
-  - .github/skills/understand-onboard
+  - .claude/skills/understand-onboard
+  - .config/opencode/skills/understand-onboard
+  - .copilot/skills/understand-onboard
+  - .cursor/skills/understand-onboard
   content_hash: sha256:2b3faf132aafb668ccc57fd743aac0584e7ec6966402c4693b9e7c180db34cce
 - repo_url: SawyerHood/dev-browser
   host: github.com
@@ -99,28 +117,34 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/dev-browser
-  - .github/skills/dev-browser
+  - .claude/skills/dev-browser
+  - .config/opencode/skills/dev-browser
+  - .copilot/skills/dev-browser
+  - .cursor/skills/dev-browser
   content_hash: sha256:d50d11bbefdc1599d78900828dcb69d48e5091769d3f5ce10e06a60efe2405bf
 - repo_url: anthropics/claude-code
   host: github.com
-  resolved_commit: 2fa67717b8046c253cfa55fd84002e3501f1eca6
+  resolved_commit: 7e936457e4e3899460b2be2f2b9b9f0b0174e859
   virtual_path: plugins/frontend-design/skills/frontend-design
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/frontend-design
-  - .github/skills/frontend-design
+  - .claude/skills/frontend-design
+  - .config/opencode/skills/frontend-design
+  - .copilot/skills/frontend-design
+  - .cursor/skills/frontend-design
   content_hash: sha256:e8118284a6365753790d44bb2758a6032b3af27fa84696428d9233f2be0f4e78
 - repo_url: apollographql/skills
   host: github.com
-  resolved_commit: ad83e824c65465b81898622f5f33c0aa1c1b187a
+  resolved_commit: 7944dc91084f3d3ed7345abea7aa633227b3ede6
   virtual_path: skills/rust-best-practices
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/rust-best-practices
-  - .github/skills/rust-best-practices
+  - .claude/skills/rust-best-practices
+  - .config/opencode/skills/rust-best-practices
+  - .copilot/skills/rust-best-practices
+  - .cursor/skills/rust-best-practices
   content_hash: sha256:62f6902bb48e44f2cc6d4ccb85d7162eb3752e7a3970a735435df6a4b5913ad4
 - repo_url: benjitaylor/agentation
   host: github.com
@@ -129,44 +153,44 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/agentation-self-driving
-  - .github/skills/agentation-self-driving
+  - .claude/skills/agentation-self-driving
+  - .config/opencode/skills/agentation-self-driving
+  - .copilot/skills/agentation-self-driving
+  - .cursor/skills/agentation-self-driving
   content_hash: sha256:405cf94e4df9b048ab42e51f26ad971dc6b986167b74eb46393abd6f1f5b5f88
 - repo_url: browser-use/browser-harness
   host: github.com
-  resolved_commit: ba8b22f1ff3db93546b5a194a1978914c8ceb0f2
+  resolved_commit: f8adad28e02dafd2172bbd702f6fcd4631ec5677
   package_type: claude_skill
-  deployed_files:
-  - .agents/skills/browser-harness
-  - .github/skills/browser-harness
-  content_hash: sha256:b45719f8eb7481de086ca9cf1e58fc5d971bd0d7ae5bff11d047cb4dfd8d2f96
+  content_hash: sha256:d7bce440c5d75a506d20b115788a40dd1f5fb7efd63888ea71349f2132096ea5
 - repo_url: cloudflare/skills
   host: github.com
-  resolved_commit: 0397d7d88fa6ac7517a88389622eb0799e86ded2
+  resolved_commit: 0438a075b419f737eb091d1c91800b7387e3a75f
   virtual_path: skills/workers-best-practices
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/workers-best-practices
-  - .github/skills/workers-best-practices
+  - .claude/skills/workers-best-practices
+  - .config/opencode/skills/workers-best-practices
+  - .copilot/skills/workers-best-practices
+  - .cursor/skills/workers-best-practices
   content_hash: sha256:ebd71bed0ade41e2d4839b0d280ec6d93dced0d19f568d27b92da00e4aa9943c
 - repo_url: cloudflare/skills
   host: github.com
-  resolved_commit: 0397d7d88fa6ac7517a88389622eb0799e86ded2
+  resolved_commit: 0438a075b419f737eb091d1c91800b7387e3a75f
   virtual_path: skills/wrangler
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/wrangler
-  - .github/skills/wrangler
-  content_hash: sha256:a27fded44ce73b7ef69b1b52fcdf0cdde9c2b17f345b761bf11ca32d37da2220
+  - .claude/skills/wrangler
+  - .config/opencode/skills/wrangler
+  - .copilot/skills/wrangler
+  - .cursor/skills/wrangler
+  content_hash: sha256:11edeb37eedb91deedde694b2bb1cc4ff4e8b5a8f1836c217a8c871fe39abcb5
 - repo_url: gonta223/humanizer-ja
   host: github.com
   resolved_commit: a1e343696e43aa50e7218891f3319ab22cde3464
   package_type: claude_skill
-  deployed_files:
-  - .agents/skills/humanizer-ja
-  - .github/skills/humanizer-ja
   content_hash: sha256:b6da4ef92a941ab364ab1ddf259d9e511e098a0719f7ee2202847351c34a8194
 - repo_url: ibelick/ui-skills
   host: github.com
@@ -175,8 +199,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/baseline-ui
-  - .github/skills/baseline-ui
+  - .claude/skills/baseline-ui
+  - .config/opencode/skills/baseline-ui
+  - .copilot/skills/baseline-ui
+  - .cursor/skills/baseline-ui
   content_hash: sha256:49817c981208de2f412719f7814d31eba2b2096462edc048a279d93f522cab0f
 - repo_url: ibelick/ui-skills
   host: github.com
@@ -185,8 +211,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/fixing-accessibility
-  - .github/skills/fixing-accessibility
+  - .claude/skills/fixing-accessibility
+  - .config/opencode/skills/fixing-accessibility
+  - .copilot/skills/fixing-accessibility
+  - .cursor/skills/fixing-accessibility
   content_hash: sha256:4fa8f5a772b4eef3d28a54c136b507d070e54e2c326578f65eaf5e5a0118b38a
 - repo_url: ibelick/ui-skills
   host: github.com
@@ -195,8 +223,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/fixing-metadata
-  - .github/skills/fixing-metadata
+  - .claude/skills/fixing-metadata
+  - .config/opencode/skills/fixing-metadata
+  - .copilot/skills/fixing-metadata
+  - .cursor/skills/fixing-metadata
   content_hash: sha256:699e13890fb50acffa02dfd2d5b0e719bd916a9e2b7e6035bdc4513fc73d9174
 - repo_url: ibelick/ui-skills
   host: github.com
@@ -205,8 +235,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/fixing-motion-performance
-  - .github/skills/fixing-motion-performance
+  - .claude/skills/fixing-motion-performance
+  - .config/opencode/skills/fixing-motion-performance
+  - .copilot/skills/fixing-motion-performance
+  - .cursor/skills/fixing-motion-performance
   content_hash: sha256:426dcf33f23419643f2aab71e2253e1a5b5684a808fabb8a4ad135e489ed7a0f
 - repo_url: jakubkrehel/make-interfaces-feel-better
   host: github.com
@@ -215,46 +247,56 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/make-interfaces-feel-better
-  - .github/skills/make-interfaces-feel-better
+  - .claude/skills/make-interfaces-feel-better
+  - .config/opencode/skills/make-interfaces-feel-better
+  - .copilot/skills/make-interfaces-feel-better
+  - .cursor/skills/make-interfaces-feel-better
   content_hash: sha256:99aaea521aa0f1c7d041d70bb6b75581c1a50ec6ac59ceaaa923b6339ffa417b
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: 837019ccdf227ffbe1aafdf4c8f7537baf96126e
+  resolved_commit: 5478d3546d34f2074db666d72cdde2d068fd2c56
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
   package_type: apm_package
-  content_hash: sha256:31ff73e9cd8ae0f275e7d004bbfb59aa19edcae9e399962cfa27fc9b57ed13a3
+  content_hash: sha256:2fce0d74ccf3666a418e67fb5a9e697395c32e1bfe487f6a0b2a13280a6a049c
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: 328cab947d43ab03e448361fc2606c1997dc15f2
+  resolved_commit: 5478d3546d34f2074db666d72cdde2d068fd2c56
   virtual_path: manual-skills
   is_virtual: true
   package_type: apm_package
   deployed_files:
-  - .agents/skills/agentation
-  - .agents/skills/agentic-actions-auditor
-  - .agents/skills/sarif-parsing
-  - .agents/skills/sharp-edges
-  - .agents/skills/skill-creator
-  - .agents/skills/ui-ux-pro-max
-  - .github/skills/agentation
-  - .github/skills/agentic-actions-auditor
-  - .github/skills/sarif-parsing
-  - .github/skills/sharp-edges
-  - .github/skills/skill-creator
-  - .github/skills/ui-ux-pro-max
-  content_hash: sha256:9414b85729ae68629c8e971480f1b735aa7e3acd1dd1e33a92080de8f636de66
+  - .claude/skills/agentation
+  - .claude/skills/agentic-actions-auditor
+  - .claude/skills/sarif-parsing
+  - .claude/skills/sharp-edges
+  - .claude/skills/skill-creator
+  - .claude/skills/ui-ux-pro-max
+  - .config/opencode/skills/agentation
+  - .config/opencode/skills/agentic-actions-auditor
+  - .config/opencode/skills/sarif-parsing
+  - .config/opencode/skills/sharp-edges
+  - .config/opencode/skills/skill-creator
+  - .config/opencode/skills/ui-ux-pro-max
+  - .cursor/skills/agentation
+  - .cursor/skills/agentic-actions-auditor
+  - .cursor/skills/sarif-parsing
+  - .cursor/skills/sharp-edges
+  - .cursor/skills/skill-creator
+  - .cursor/skills/ui-ux-pro-max
+  content_hash: sha256:05ea699de53e8e0b3a87b33af19c3ead434954dc16989a5a72680a1cf7fdf539
 - repo_url: millionco/react-doctor
   host: github.com
-  resolved_commit: b5519b60465905e8c7eb0b8a9294924bf3736158
+  resolved_commit: 7da4ce4e27cb5208ed52ad9d01cae32f96ac177f
   virtual_path: skills/react-doctor
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/react-doctor
-  - .github/skills/react-doctor
+  - .claude/skills/react-doctor
+  - .config/opencode/skills/react-doctor
+  - .copilot/skills/react-doctor
+  - .cursor/skills/react-doctor
   content_hash: sha256:b8f396bd6db7404a899af03e649f2cf12f4c846ee7d85b6b9a475cb8175abb49
 - repo_url: mizchi/skills
   host: github.com
@@ -263,8 +305,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/empirical-prompt-tuning
-  - .github/skills/empirical-prompt-tuning
+  - .claude/skills/empirical-prompt-tuning
+  - .config/opencode/skills/empirical-prompt-tuning
+  - .copilot/skills/empirical-prompt-tuning
+  - .cursor/skills/empirical-prompt-tuning
   content_hash: sha256:18bcf9be6245f765cbb6c51ba4d988991a647139c1513094d6c116c15f7ed058
 - repo_url: nyosegawa/skills
   host: github.com
@@ -273,148 +317,178 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/skill-auditor
-  - .github/skills/skill-auditor
+  - .claude/skills/skill-auditor
+  - .config/opencode/skills/skill-auditor
+  - .copilot/skills/skill-auditor
+  - .cursor/skills/skill-auditor
   content_hash: sha256:65a6f52fd391671fe6f334130290fd9c6787d2daeb22cdff55fa727977876e04
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_commit: 6efe32c9e2dd002d0c394e861e0529675d1ab32e
   virtual_path: skills/brainstorming
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/brainstorming
-  - .github/skills/brainstorming
+  - .claude/skills/brainstorming
+  - .config/opencode/skills/brainstorming
+  - .copilot/skills/brainstorming
+  - .cursor/skills/brainstorming
   content_hash: sha256:1518efecf35139a9a5b9e60906b71de874af08322200fab18a54848cea8c15fe
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_commit: 6efe32c9e2dd002d0c394e861e0529675d1ab32e
   virtual_path: skills/dispatching-parallel-agents
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/dispatching-parallel-agents
-  - .github/skills/dispatching-parallel-agents
+  - .claude/skills/dispatching-parallel-agents
+  - .config/opencode/skills/dispatching-parallel-agents
+  - .copilot/skills/dispatching-parallel-agents
+  - .cursor/skills/dispatching-parallel-agents
   content_hash: sha256:e21044ae7496fc285f1df9ff3fb518a3a20bea6f5216c1f59f4987e12c769a0a
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_commit: 6efe32c9e2dd002d0c394e861e0529675d1ab32e
   virtual_path: skills/executing-plans
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/executing-plans
-  - .github/skills/executing-plans
+  - .claude/skills/executing-plans
+  - .config/opencode/skills/executing-plans
+  - .copilot/skills/executing-plans
+  - .cursor/skills/executing-plans
   content_hash: sha256:2f709d1a2c7564f8ce6a9bb707e7f5451117ba80f8e8e2302662c29bc61246a6
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_commit: 6efe32c9e2dd002d0c394e861e0529675d1ab32e
   virtual_path: skills/finishing-a-development-branch
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/finishing-a-development-branch
-  - .github/skills/finishing-a-development-branch
+  - .claude/skills/finishing-a-development-branch
+  - .config/opencode/skills/finishing-a-development-branch
+  - .copilot/skills/finishing-a-development-branch
+  - .cursor/skills/finishing-a-development-branch
   content_hash: sha256:9edba9a38684c060fdc38290f640e1dc0c37de286723ac9be73bacacf7cd6f3d
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_commit: 6efe32c9e2dd002d0c394e861e0529675d1ab32e
   virtual_path: skills/receiving-code-review
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/receiving-code-review
-  - .github/skills/receiving-code-review
+  - .claude/skills/receiving-code-review
+  - .config/opencode/skills/receiving-code-review
+  - .copilot/skills/receiving-code-review
+  - .cursor/skills/receiving-code-review
   content_hash: sha256:2760c85d4f4117b0006e7ba755f4bbd61f8f4c185f347999763c97f507274e30
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_commit: 6efe32c9e2dd002d0c394e861e0529675d1ab32e
   virtual_path: skills/requesting-code-review
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/requesting-code-review
-  - .github/skills/requesting-code-review
+  - .claude/skills/requesting-code-review
+  - .config/opencode/skills/requesting-code-review
+  - .copilot/skills/requesting-code-review
+  - .cursor/skills/requesting-code-review
   content_hash: sha256:046180bd8519589b176d575e32a720c43cf6834f2e4d182277faf8943fe03564
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_commit: 6efe32c9e2dd002d0c394e861e0529675d1ab32e
   virtual_path: skills/subagent-driven-development
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/subagent-driven-development
-  - .github/skills/subagent-driven-development
+  - .claude/skills/subagent-driven-development
+  - .config/opencode/skills/subagent-driven-development
+  - .copilot/skills/subagent-driven-development
+  - .cursor/skills/subagent-driven-development
   content_hash: sha256:96697eb8dde8631ee7cd5e1cb29c6d7c0b8ef2869c0875dd2eedf07762e5feae
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_commit: 6efe32c9e2dd002d0c394e861e0529675d1ab32e
   virtual_path: skills/systematic-debugging
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/systematic-debugging
-  - .github/skills/systematic-debugging
+  - .claude/skills/systematic-debugging
+  - .config/opencode/skills/systematic-debugging
+  - .copilot/skills/systematic-debugging
+  - .cursor/skills/systematic-debugging
   content_hash: sha256:6fddb1f3952f65f1f3a2ef267ae4ab6919ff70a8b36672ea908640ae21a34ea0
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_commit: 6efe32c9e2dd002d0c394e861e0529675d1ab32e
   virtual_path: skills/test-driven-development
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/test-driven-development
-  - .github/skills/test-driven-development
+  - .claude/skills/test-driven-development
+  - .config/opencode/skills/test-driven-development
+  - .copilot/skills/test-driven-development
+  - .cursor/skills/test-driven-development
   content_hash: sha256:126f1ebf6ccd414f42544f6e83d8cc5adb089e1108eaffb7c400701e37eecd9f
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_commit: 6efe32c9e2dd002d0c394e861e0529675d1ab32e
   virtual_path: skills/using-git-worktrees
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/using-git-worktrees
-  - .github/skills/using-git-worktrees
+  - .claude/skills/using-git-worktrees
+  - .config/opencode/skills/using-git-worktrees
+  - .copilot/skills/using-git-worktrees
+  - .cursor/skills/using-git-worktrees
   content_hash: sha256:52bbb4b6e80918e83e92a1514f3b3757712154c2a8a42de24919e48a794c54fc
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_commit: 6efe32c9e2dd002d0c394e861e0529675d1ab32e
   virtual_path: skills/using-superpowers
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/using-superpowers
-  - .github/skills/using-superpowers
+  - .claude/skills/using-superpowers
+  - .config/opencode/skills/using-superpowers
+  - .copilot/skills/using-superpowers
+  - .cursor/skills/using-superpowers
   content_hash: sha256:8ae2ec915dd4b5e4b758ee8110190fd792e85eb05d670fece942a76603e31cb8
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_commit: 6efe32c9e2dd002d0c394e861e0529675d1ab32e
   virtual_path: skills/verification-before-completion
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/verification-before-completion
-  - .github/skills/verification-before-completion
+  - .claude/skills/verification-before-completion
+  - .config/opencode/skills/verification-before-completion
+  - .copilot/skills/verification-before-completion
+  - .cursor/skills/verification-before-completion
   content_hash: sha256:9b446f0c7fe1cfb560b1d34439523b1a76d5f177290007b2c053a1c749a4a8ba
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_commit: 6efe32c9e2dd002d0c394e861e0529675d1ab32e
   virtual_path: skills/writing-plans
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/writing-plans
-  - .github/skills/writing-plans
+  - .claude/skills/writing-plans
+  - .config/opencode/skills/writing-plans
+  - .copilot/skills/writing-plans
+  - .cursor/skills/writing-plans
   content_hash: sha256:90185bbb1bd9d4959826104c1c1900424180b8a4011f4432da886df599922788
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: b55764852ac78870e65c6565fb585b6cd8b3c5c9
+  resolved_commit: 6efe32c9e2dd002d0c394e861e0529675d1ab32e
   virtual_path: skills/writing-skills
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/writing-skills
-  - .github/skills/writing-skills
+  - .claude/skills/writing-skills
+  - .config/opencode/skills/writing-skills
+  - .copilot/skills/writing-skills
+  - .cursor/skills/writing-skills
   content_hash: sha256:272ccd701f41b94e1119aaa99455a52cdb8e07283cb6a6aab32a7722d96bef45
 - repo_url: openai/codex-plugin-cc
   host: github.com
@@ -423,8 +497,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/codex-cli-runtime
-  - .github/skills/codex-cli-runtime
+  - .claude/skills/codex-cli-runtime
+  - .config/opencode/skills/codex-cli-runtime
+  - .copilot/skills/codex-cli-runtime
+  - .cursor/skills/codex-cli-runtime
   content_hash: sha256:03b09f8ad5721f1d33d830cff54637656c58920befcb32835c6f003e625a7a54
 - repo_url: openai/codex-plugin-cc
   host: github.com
@@ -433,8 +509,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/codex-result-handling
-  - .github/skills/codex-result-handling
+  - .claude/skills/codex-result-handling
+  - .config/opencode/skills/codex-result-handling
+  - .copilot/skills/codex-result-handling
+  - .cursor/skills/codex-result-handling
   content_hash: sha256:1ca05b8eb3e45816b428dc71e24355a89a8f997502ade309e0c53a06adb1b1e7
 - repo_url: openai/codex-plugin-cc
   host: github.com
@@ -443,28 +521,34 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/gpt-5-4-prompting
-  - .github/skills/gpt-5-4-prompting
+  - .claude/skills/gpt-5-4-prompting
+  - .config/opencode/skills/gpt-5-4-prompting
+  - .copilot/skills/gpt-5-4-prompting
+  - .cursor/skills/gpt-5-4-prompting
   content_hash: sha256:8e00d64a5cd9b4477e55c4a7ad0f02328ff1991ea93e2ac1fb7839b3891d3f2d
 - repo_url: openai/skills
   host: github.com
-  resolved_commit: e940b8a86138adf03972802b990a1dfc57fcbf09
+  resolved_commit: 724cd511c96593f642bddf13187217aa155d2554
   virtual_path: skills/.curated/gh-address-comments
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/gh-address-comments
-  - .github/skills/gh-address-comments
+  - .claude/skills/gh-address-comments
+  - .config/opencode/skills/gh-address-comments
+  - .copilot/skills/gh-address-comments
+  - .cursor/skills/gh-address-comments
   content_hash: sha256:068d34fb59cb97a39aea3de1708877b6a01210d02fa7eda5e74fc8277ed52916
 - repo_url: openai/skills
   host: github.com
-  resolved_commit: e940b8a86138adf03972802b990a1dfc57fcbf09
+  resolved_commit: 724cd511c96593f642bddf13187217aa155d2554
   virtual_path: skills/.curated/gh-fix-ci
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/gh-fix-ci
-  - .github/skills/gh-fix-ci
+  - .claude/skills/gh-fix-ci
+  - .config/opencode/skills/gh-fix-ci
+  - .copilot/skills/gh-fix-ci
+  - .cursor/skills/gh-fix-ci
   content_hash: sha256:02b4d97e4bd91e342e3ec3efa06b7871097d6a64e8398f4ed5b69c64d8d902fb
 - repo_url: softaworks/agent-toolkit
   host: github.com
@@ -473,8 +557,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/humanizer
-  - .github/skills/humanizer
+  - .claude/skills/humanizer
+  - .config/opencode/skills/humanizer
+  - .copilot/skills/humanizer
+  - .cursor/skills/humanizer
   content_hash: sha256:34a38e6acc60d4529612d41ffe740bca0060d3c5e89e2a0d24ae795f67157fbb
 - repo_url: tokoroten/prompt-review
   host: github.com
@@ -483,8 +569,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/prompt-review
-  - .github/skills/prompt-review
+  - .claude/skills/prompt-review
+  - .config/opencode/skills/prompt-review
+  - .copilot/skills/prompt-review
+  - .cursor/skills/prompt-review
   content_hash: sha256:8280504199d448d61d54028fc25f491378172d40e801c356eb9126c37a831a66
 - repo_url: trailofbits/skills
   host: github.com
@@ -493,8 +581,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/audit-context-building
-  - .github/skills/audit-context-building
+  - .claude/skills/audit-context-building
+  - .config/opencode/skills/audit-context-building
+  - .copilot/skills/audit-context-building
+  - .cursor/skills/audit-context-building
   content_hash: sha256:a0abaac9302501e02ba868d34d1457a817a6267ae235ef95afa098d3cf03f338
 - repo_url: trailofbits/skills
   host: github.com
@@ -503,8 +593,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/codeql
-  - .github/skills/codeql
+  - .claude/skills/codeql
+  - .config/opencode/skills/codeql
+  - .copilot/skills/codeql
+  - .cursor/skills/codeql
   content_hash: sha256:77b1731a16efb8b1d130bcfc529ff974779fbd836d0d9054f8dc82ba8d17193c
 - repo_url: trailofbits/skills
   host: github.com
@@ -513,8 +605,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/semgrep
-  - .github/skills/semgrep
+  - .claude/skills/semgrep
+  - .config/opencode/skills/semgrep
+  - .copilot/skills/semgrep
+  - .cursor/skills/semgrep
   content_hash: sha256:739945d5fdd22520a093010a9e9a2e5568a6f541f74604e4328c0ade79cda81e
 - repo_url: trailofbits/skills
   host: github.com
@@ -523,8 +617,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/supply-chain-risk-auditor
-  - .github/skills/supply-chain-risk-auditor
+  - .claude/skills/supply-chain-risk-auditor
+  - .config/opencode/skills/supply-chain-risk-auditor
+  - .copilot/skills/supply-chain-risk-auditor
+  - .cursor/skills/supply-chain-risk-auditor
   content_hash: sha256:1b986d50308c2fbb2a77d5a10b71747c692ce1b7a8a8718eefc3b4c6e460cb0e
 - repo_url: vercel-labs/agent-browser
   host: github.com
@@ -533,8 +629,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/agent-browser
-  - .github/skills/agent-browser
+  - .claude/skills/agent-browser
+  - .config/opencode/skills/agent-browser
+  - .copilot/skills/agent-browser
+  - .cursor/skills/agent-browser
   content_hash: sha256:6f68d01b14796e410746fab39c2d6b36dcfa030dd59eb772f6418e2db949a16c
 - repo_url: vercel-labs/agent-skills
   host: github.com
@@ -543,8 +641,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/composition-patterns
-  - .github/skills/composition-patterns
+  - .claude/skills/composition-patterns
+  - .config/opencode/skills/composition-patterns
+  - .copilot/skills/composition-patterns
+  - .cursor/skills/composition-patterns
   content_hash: sha256:5b3564ca435f4714d5e65023351e1999e4744818603a9cfb6a6f6a61b7d84918
 - repo_url: vercel-labs/agent-skills
   host: github.com
@@ -553,8 +653,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/react-best-practices
-  - .github/skills/react-best-practices
+  - .claude/skills/react-best-practices
+  - .config/opencode/skills/react-best-practices
+  - .copilot/skills/react-best-practices
+  - .cursor/skills/react-best-practices
   content_hash: sha256:74f142d28d360d78e8bac4f239a84c87f0ced9015729bc72b5458d82ff45b015
 - repo_url: vercel-labs/agent-skills
   host: github.com
@@ -563,8 +665,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/web-design-guidelines
-  - .github/skills/web-design-guidelines
+  - .claude/skills/web-design-guidelines
+  - .config/opencode/skills/web-design-guidelines
+  - .copilot/skills/web-design-guidelines
+  - .cursor/skills/web-design-guidelines
   content_hash: sha256:a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a
 - repo_url: vercel-labs/skills
   host: github.com
@@ -573,8 +677,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/find-skills
-  - .github/skills/find-skills
+  - .claude/skills/find-skills
+  - .config/opencode/skills/find-skills
+  - .copilot/skills/find-skills
+  - .cursor/skills/find-skills
   content_hash: sha256:d31e234f0c90694a670222cdd1dafa853e051d7066beda389f1097c22dadd461
 mcp_servers:
 - chrome-devtools
