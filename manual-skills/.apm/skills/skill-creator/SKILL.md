@@ -45,6 +45,12 @@ Match the level of specificity to the task's fragility and variability:
 
 Think of Codex as exploring a path: a narrow bridge with cliffs needs specific guardrails (low freedom), while an open field allows many routes (high freedom).
 
+### Prefer Relative Skill Paths
+
+When writing skill instructions, examples, or troubleshooting steps, solve path problems relative to the skill folder whenever possible. Prefer paths such as `SKILL.md`, `references/foo.md`, `scripts/foo.py`, `assets/template/`, and `agents/openai.yaml`.
+
+Avoid OS-specific absolute paths in skill content. Use an absolute path only when the user explicitly provides a concrete local file or when a local verification step cannot be described safely without it. If a path must be absolute in conversation, keep the skill itself portable by documenting the reusable pattern with a relative path.
+
 ### Anatomy of a Skill
 
 Every skill consists of a required SKILL.md file and optional bundled resources:
