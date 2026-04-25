@@ -118,7 +118,25 @@ When updating an existing pair:
 - remove off-topic content from the wrong file
 - rewrite for clarity instead of appending contradictory notes
 
-### 6. Review the Result
+### 6. Validate `DESIGN.md` with the Official CLI
+
+After creating or updating `DESIGN.md`, run the official linter when the project environment can execute `npx`:
+
+```bash
+rtk npx @google/design.md lint DESIGN.md
+```
+
+Use the JSON findings to check structure, broken token references, contrast ratios, missing token groups, orphaned tokens, and section order. Treat lint findings as evidence for the visual source of truth; keep review operations and routing decisions in `DESIGN_REVIEW.md`.
+
+When comparing an existing design system against a revised one, run:
+
+```bash
+rtk npx @google/design.md diff <before> DESIGN.md
+```
+
+Use the diff output to catch token-level regressions before finalizing the pair. Do not add `@google/design.md` as a dependency unless the target project already manages it that way.
+
+### 7. Review the Result
 
 Before finishing, check:
 
