@@ -150,6 +150,22 @@ Then review and commit the skill changes.
 - if an external skill is still missing there after deployment, treat it as a temporary Codex-specific delivery gap and resolve it separately from the tracked workspace state
 - if a skill repeatedly fails the normal upstream-managed lane because of packaging or rollout issues, move it onto the `manual-skills` package flow rather than patching deployed targets by hand
 
+## Cache Integrity Recovery
+
+If a deployed skill exists but its `SKILL.md` is clearly wrong, tiny, or a placeholder while the tracked source is complete, suspect a stale or corrupted `apm_modules/` cache before changing source files.
+
+- Prefer `mise run deploy:fresh` when normal `mise run deploy` succeeds but deployed output still looks stale or corrupted
+- Compare the tracked source, cache, and deployed target first
+  - source example: `manual-skills/.apm/skills/<id>/SKILL.md`
+  - cache example: `apm_modules/<owner>/<repo>/<virtual-path>/.apm/skills/<id>/SKILL.md`
+  - Codex target example: `~/.agents/skills/<id>/SKILL.md`
+- Do not fix this by editing `apm_modules/` contents or deployed targets in place
+- `deploy:fresh` runs `apm prune --dry-run`, `apm prune`, rebuilds workspace-owned `catalog` and `manual-skills` cache entries from tracked sources, runs `deploy`, then `check`
+- If a targeted manual repair is still needed, delete only the bad package cache directory after resolving and verifying the absolute path stays under `./apm_modules/`
+- Recreate the cache with `mise run deploy:fresh` or the smallest equivalent dependency-refresh command
+- If refresh times out, check whether the target cache was restored; stop only leftover refresh/update processes before retrying deploy
+- Verify the repaired skill in deployed targets by checking the real `SKILL.md` size/content, then run `mise run check`
+
 ## Review Focus
 
 When changing workspace mechanics, verify:

@@ -147,11 +147,25 @@ When a machine-local skill lives under `~/.apm/private-skills/`:
 - `mise run apply`: deploy the current manifest and lock without changing upstream refs
 - `mise run apply:skills:local`: sync tracked catalog skills plus local `private-skills` into `~/.agents/skills`
 - `mise run refresh`: refresh the checkout and dependency state without deploying
+- `mise run deploy:fresh`: recover from stale or corrupted `apm_modules/` cache before redeploying
 - `mise run validate`: run both workspace and catalog validation
 - `mise run validate:workspace`: verify workspace wiring with workspace overrides
 - `mise run prepare:catalog`: normalize `catalog/` in place before commit and push
 - `mise run validate:catalog`: verify managed catalog package integrity
 - `mise run verify:catalog`: normalize the managed catalog, validate it, and print workspace health
+
+## Cache Integrity Recovery
+
+If a deployed skill exists but its `SKILL.md` is clearly wrong, tiny, or a placeholder while the tracked source is complete, suspect stale or corrupted cache under `apm_modules/` before changing source files.
+
+- Prefer `mise run deploy:fresh` when normal `mise run deploy` succeeds but deployed output still looks stale or corrupted.
+- Compare tracked source, cache, and deployed target first:
+  - source example: `manual-skills/.apm/skills/<id>/SKILL.md`
+  - cache example: `apm_modules/<owner>/<repo>/<virtual-path>/.apm/skills/<id>/SKILL.md`
+  - Codex target example: `~/.agents/skills/<id>/SKILL.md`
+- Do not edit `apm_modules/` contents or deployed targets in place.
+- If targeted manual repair is still needed, delete only the bad package cache directory after verifying the resolved absolute path stays under `./apm_modules/`.
+- After repair, recreate cache with `mise run deploy:fresh` or the smallest equivalent dependency-refresh command, then run `mise run check`.
 
 ## References
 
