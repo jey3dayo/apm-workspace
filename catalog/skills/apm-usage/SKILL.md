@@ -17,6 +17,12 @@ Route `~/.apm` work by ownership first, then choose the smallest task that match
 
 There is no active `~/.apm/skills/` editing surface in this model.
 
+Use `catalog/skills/<id>/` for skills that are personally optimized, curated, or expected to keep evolving in this workspace.
+
+Use `manual-skills/.apm/skills/<id>/` only for upstream skills that do not install or deploy cleanly through the normal managed lane because of symlinks, packaging quirks, missing bundled files, or incompatible upstream layout. Record the reason and provenance under `manual-skills/upstreams/**`.
+
+If a manual skill becomes a workspace-owned skill that will be tuned over time, migrate it into `catalog/skills/<id>/`.
+
 ## Task Selection
 
 - Run `mise run check` for a lightweight pre-deploy gate.
@@ -34,6 +40,8 @@ There is no active `~/.apm/skills/` editing surface in this model.
 ## Routing
 
 - If the request is "change a personal skill", edit `catalog/skills/**`; use `skill-creator` for new or migrated managed skills.
+- If the request is "optimize" or "customize" a skill for this workspace, treat it as personal skill work and prefer `catalog/skills/<id>/`.
+- If the skill currently lives in `manual-skills/.apm/skills/<id>/`, first decide whether it is still an upstream packaging workaround. If it is becoming workspace-owned, plan a catalog migration instead of continuing to tune it in the manual lane.
 - If the request is "change shared guidance", edit `catalog/**`; use `prepare:catalog` before publish/install.
 - If the request is "change dependency selection", edit or review `apm.yml` / `apm.lock.yaml`.
 - If the request is "change only workspace docs or notes", edit the workspace files directly and do not restage the catalog unless `catalog/**` changed too.
@@ -41,6 +49,8 @@ There is no active `~/.apm/skills/` editing surface in this model.
 ## Guardrails
 
 - Do not treat `~/.apm/apm_modules/` as the place to edit managed skills.
+- Do not manage the same skill in both `catalog/skills/**` and `manual-skills/.apm/skills/**`.
+- Do not keep accumulating workspace-specific optimizations in `manual-skills`; migrate to `catalog/skills/**` once the skill is no longer just an upstream delivery workaround.
 - Do not reintroduce many local `./packages/*` refs into `~/.apm/apm.yml`.
 - Do not hand-edit deployed targets such as `~/.claude/`, `~/.codex/`, or `~/.agents/skills`.
 - Prefer `mise` tasks over ad hoc script entrypoints for normal operation.
@@ -60,3 +70,9 @@ There is no active `~/.apm/skills/` editing surface in this model.
 3. Upstream refresh:
    - run `mise run upgrade`
    - review `apm.lock.yaml` before commit
+
+4. Manual skill promoted to workspace-owned:
+   - move the skill from `manual-skills/.apm/skills/<id>/` to `catalog/skills/<id>/`
+   - update `manual-skills/upstreams/**` to note the migration
+   - run `mise run check`, then `mise run deploy` or `mise run apply:skills:local`
+   - verify the deployed target contains one copy of the skill
