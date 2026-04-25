@@ -26,17 +26,17 @@ taplo = "latest"
 [tasks.apply]
 description = "Deploy user-scope-compatible APM dependencies and compile Codex output"
 run = "bash ./scripts/apm-workspace.sh apply"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 apply"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 apply"
 
 [tasks.refresh]
 description = "Refresh the ~/.apm checkout and dependencies without deploying"
 run = "bash ./scripts/apm-workspace.sh refresh"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 refresh"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 refresh"
 
 [tasks.doctor]
 description = "Inspect ~/.apm workspace state and deployed targets"
 run = "bash ./scripts/apm-workspace.sh doctor"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 doctor"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 doctor"
 
 # ========================================
 # Catalog / Skill Commands
@@ -44,22 +44,22 @@ run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\a
 [tasks."apply:skills:local"]
 description = "Quick-apply managed catalog skills into the local Codex target only"
 run = "bash ./scripts/apm-workspace.sh apply:skills:local"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 apply:skills:local"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 apply:skills:local"
 
 [tasks."prepare:catalog"]
 description = "Normalize `catalog/` in place inside ~/.apm"
 run = "bash ./scripts/apm-workspace.sh prepare:catalog"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 prepare:catalog"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 prepare:catalog"
 
 [tasks."install:catalog"]
 description = "Install the managed catalog package by upstream ref"
 run = "bash ./scripts/apm-workspace.sh install:catalog"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 install:catalog"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 install:catalog"
 
 [tasks."smoke:catalog"]
 description = "Smoke-test the generated managed catalog package via a temp install"
 run = "bash ./scripts/apm-workspace.sh smoke:catalog"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 smoke:catalog"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 smoke:catalog"
 
 # ========================================
 # Validation Commands
@@ -67,12 +67,12 @@ run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\a
 [tasks."validate:workspace"]
 description = "Validate the ~/.apm workspace wiring"
 run = "bash ./scripts/apm-workspace.sh validate"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 validate"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 validate"
 
 [tasks."validate:catalog"]
 description = "Fail when the managed catalog package is not normalized or missing required assets"
 run = "bash ./scripts/apm-workspace.sh validate:catalog"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 validate:catalog"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 validate:catalog"
 
 [tasks.validate]
 description = "Validate the ~/.apm workspace and managed catalog wiring"
@@ -81,50 +81,50 @@ depends = ["validate:workspace", "validate:catalog"]
 [tasks."apm:install"]
 description = "Run user-scope APM install from ~/.apm"
 run = "apm install -g"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"apm install -g\""
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"apm install -g\""
 
 [tasks."format:markdown"]
 description = "Format Markdown files in the ~/.apm workspace"
 run = "fd -e md -X prettier --write --log-level error >/dev/null"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"@(fd -e md) | ForEach-Object { prettier --write --log-level error $_ *> $null }\""
+run_windows = "bash -lc 'fd -e md -X prettier --write --log-level error >/dev/null'"
 
 [tasks."format:markdown:check"]
 description = "Check Markdown formatting in the ~/.apm workspace"
 run = "fd -e md -X prettier --check --log-level error"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"@(fd -e md) | ForEach-Object { prettier --check --log-level error $_ }\""
+run_windows = "bash -lc 'fd -e md -X prettier --check --log-level error'"
 
 [tasks."format:markdown:bold-headings"]
 description = "Rewrite bold headings inside catalog skill and shared guidance sources"
 run = """bash -lc 'script="$HOME/.config/scripts/replace-bold-headings.ts"; if [ -f "$script" ]; then tsx "$script" ./catalog; else echo "Skipping bold heading rewrite: $script not found"; fi'"""
-run_windows = """powershell -NoProfile -ExecutionPolicy Bypass -Command "$script = Join-Path $HOME '.config/scripts/replace-bold-headings.ts'; if (Test-Path $script) { tsx $script ./catalog } else { Write-Host \"Skipping bold heading rewrite: $script not found\" }" """
+run_windows = """bash -lc 'if [ -f "${HOME}/.config/scripts/replace-bold-headings.ts" ]; then tsx "${HOME}/.config/scripts/replace-bold-headings.ts" ./catalog; else echo "Skipping bold heading rewrite script: ${HOME}/.config/scripts/replace-bold-headings.ts not found"; fi'"""
 
 [tasks."format:markdown:bold-headings:check"]
 description = "Check bold heading rewrites inside catalog skill and shared guidance sources"
 run = """bash -lc 'script="$HOME/.config/scripts/replace-bold-headings.ts"; if [ -f "$script" ]; then tsx "$script" ./catalog --dry-run; else echo "Skipping bold heading rewrite check: $script not found"; fi'"""
-run_windows = """powershell -NoProfile -ExecutionPolicy Bypass -Command "$script = Join-Path $HOME '.config/scripts/replace-bold-headings.ts'; if (Test-Path $script) { tsx $script ./catalog --dry-run } else { Write-Host \"Skipping bold heading rewrite check: $script not found\" }" """
+run_windows = """bash -lc 'if [ -f "${HOME}/.config/scripts/replace-bold-headings.ts" ]; then tsx "${HOME}/.config/scripts/replace-bold-headings.ts" ./catalog --dry-run; else echo "Skipping bold heading rewrite check: ${HOME}/.config/scripts/replace-bold-headings.ts not found"; fi'"""
 
 [tasks."format:toml"]
 description = "Format TOML files in the ~/.apm workspace"
 run = "fd -e toml -X env RUST_LOG=taplo=warn taplo format"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"@(fd -e toml) | ForEach-Object { $env:RUST_LOG='taplo=warn'; taplo format $_ }\""
+run_windows = "bash -lc 'fd -e toml -X env RUST_LOG=taplo=warn taplo format'"
 
 [tasks."format:toml:check"]
 description = "Check TOML formatting in the ~/.apm workspace"
 run = "fd -e toml -X env RUST_LOG=taplo=warn taplo format --check"
-run_windows = "powershell -NoProfile -ExecutionPolicy Bypass -Command \"@(fd -e toml) | ForEach-Object { $env:RUST_LOG='taplo=warn'; taplo format --check $_ }\""
+run_windows = "bash -lc 'fd -e toml -X env RUST_LOG=taplo=warn taplo format --check'"
 
 [tasks."format:yaml"]
 description = "Format YAML files in the ~/.apm workspace"
 run = "fd -e yml -e yaml ${TASK_EXCLUDES} -X prettier --write --log-level error >/dev/null"
 run_windows = """
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$taskExcludes = @(); if ($env:TASK_EXCLUDES) { $taskExcludes = @($env:TASK_EXCLUDES -split ' ' | Where-Object { $_ -ne '' }) }; $yamlFiles = @(fd -e yml -e yaml @taskExcludes); if ($yamlFiles.Count -gt 0) { prettier --write --log-level error $yamlFiles *> $null }"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "fd -e yml -e yaml --exclude apm.lock.yaml -X prettier --write --log-level error"
 """
 
 [tasks."format:yaml:check"]
 description = "Check YAML formatting in the ~/.apm workspace"
 run = "fd -e yml -e yaml ${TASK_EXCLUDES} -X prettier --check --log-level error"
 run_windows = """
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$taskExcludes = @(); if ($env:TASK_EXCLUDES) { $taskExcludes = @($env:TASK_EXCLUDES -split ' ' | Where-Object { $_ -ne '' }) }; $yamlFiles = @(fd -e yml -e yaml @taskExcludes); if ($yamlFiles.Count -gt 0) { prettier --check --log-level error $yamlFiles }"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "fd -e yml -e yaml --exclude apm.lock.yaml -X prettier --check --log-level error"
 """
 
 # ========================================
@@ -187,5 +187,5 @@ run = [
 ]
 run_windows = [
   { task = "refresh:deploy" },
-  "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\apm-workspace.ps1 release:catalog",
+  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 release:catalog",
 ]
