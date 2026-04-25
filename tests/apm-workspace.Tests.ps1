@@ -582,7 +582,7 @@ Describe "public command surface" {
     $legacyDocsPattern = [regex]::Escape('~/.config/docs/')
     $files = @(
       (Join-Path $workspaceRoot "README.md")
-      (Join-Path $workspaceRoot "llms.md")
+      (Join-Path $workspaceRoot "llms.txt")
       (Join-Path $workspaceRoot "docs/apm-task-coverage.md")
     )
 

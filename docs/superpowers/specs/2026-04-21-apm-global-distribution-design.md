@@ -242,9 +242,9 @@ Remove wording that implies:
 - intentionally small lockfiles
 - Codex not using deployed skills
 
-### `llms.md`
+### `llms.txt`
 
-Update `llms.md` to reflect the same operational model in concise agent-facing terms:
+Update `llms.txt` to reflect the same operational model in concise agent-facing terms:
 
 - include the same `Source Of Truth` summary as README in shorter form
 - do not hand-edit `apm.yml` during normal use
@@ -258,7 +258,7 @@ Update `llms.md` to reflect the same operational model in concise agent-facing t
 Do not add a repo-root `AGENTS.md` in this implementation slice.
 
 - the repository does not currently have a stable local `AGENTS.md`
-- the Source Of Truth rules should live in `README.md` and `llms.md` first
+- the Source Of Truth rules should live in `README.md` and `llms.txt` first
 - a repo-root `AGENTS.md` can be added later once the workflow and naming behavior settle
 
 ### `TODO.md`
@@ -334,7 +334,7 @@ Validate:
 2. Redesign deployment planning around combined personal and external inventories
 3. Make `apply` consume lock-backed local state only
 4. Rework `mise.toml` task semantics
-5. Update `README.md`, `llms.md`, and `TODO.md`
+5. Update `README.md`, `llms.txt`, and `TODO.md`
 6. Verify shell, PowerShell, and task behavior
 
 ## Open Questions

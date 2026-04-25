@@ -12,7 +12,7 @@ Route `~/.apm` work by ownership first, then choose the smallest task that match
 - Edit `~/.apm/catalog/skills/**` for personal skills.
 - Edit `~/.apm/catalog/{AGENTS.md,agents/**,commands/**,rules/**}` for shared guidance.
 - Edit `~/.apm/apm.yml` and `~/.apm/apm.lock.yaml` for dependency selection and accepted upstream state.
-- Edit `~/.apm/README.md`, `llms.md`, and `docs/**` only for workspace-owned prose.
+- Edit `~/.apm/README.md`, `llms.txt`, and `docs/**` only for workspace-owned prose.
 - Treat `~/.apm/apm_modules/` and deployed targets as generated state, not editing surfaces.
 
 There is no active `~/.apm/skills/` editing surface in this model.

@@ -27,7 +27,7 @@
   - Add regression coverage for external lock parsing, target name normalization, new task semantics, and doc references
 - Modify: `/Users/t00114/.apm/README.md`
   - Update day-to-day workflow and source-of-truth guidance
-- Create: `/Users/t00114/.apm/llms.md`
+- Create: `/Users/t00114/.apm/llms.txt`
   - Add concise LLM/operator instructions for the new workflow
 - Modify: `/Users/t00114/.apm/TODO.md`
   - Record the open concern around target name normalization
@@ -416,7 +416,7 @@ git commit -m "refactor: separate update apply and ci workflows"
 **Files:**
 
 - Modify: `/Users/t00114/.apm/README.md`
-- Create: `/Users/t00114/.apm/llms.md`
+- Create: `/Users/t00114/.apm/llms.txt`
 - Modify: `/Users/t00114/.apm/TODO.md`
 - Test: `/Users/t00114/.apm/tests/apm-workspace.Tests.ps1`
 
@@ -444,9 +444,9 @@ mise run apply
 
 ````
 
-- [ ] **Step 2: Create `llms.md` with concise workflow guidance**
+- [ ] **Step 2: Create `llms.txt` with concise workflow guidance**
 
-Create `/Users/t00114/.apm/llms.md` with:
+Create `/Users/t00114/.apm/llms.txt` with:
 
 ```text
 APM workspace operating model
@@ -463,7 +463,7 @@ APM workspace operating model
 
 - [ ] **Step 3: Explicitly defer repo-root `AGENTS.md` in this slice**
 
-Do not create `/Users/t00114/.apm/AGENTS.md` in this implementation. Keep the source-of-truth guidance in `README.md` and `llms.md`, and leave repo-root agent guidance for a later task once the workflow stabilizes.
+Do not create `/Users/t00114/.apm/AGENTS.md` in this implementation. Keep the source-of-truth guidance in `README.md` and `llms.txt`, and leave repo-root agent guidance for a later task once the workflow stabilizes.
 
 - [ ] **Step 4: Add the open normalization concern to `TODO.md`**
 
@@ -496,7 +496,7 @@ Expected:
 - [ ] **Step 6: Commit the documentation updates**
 
 ```bash
-git add /Users/t00114/.apm/README.md /Users/t00114/.apm/llms.md /Users/t00114/.apm/TODO.md /Users/t00114/.apm/tests/apm-workspace.Tests.ps1
+git add /Users/t00114/.apm/README.md /Users/t00114/.apm/llms.txt /Users/t00114/.apm/TODO.md /Users/t00114/.apm/tests/apm-workspace.Tests.ps1
 git commit -m "docs: describe the new apm distribution workflow"
 ```
 
@@ -509,7 +509,7 @@ git commit -m "docs: describe the new apm distribution workflow"
 - Modify: `/Users/t00114/.apm/mise.toml`
 - Modify: `/Users/t00114/.apm/tests/apm-workspace.Tests.ps1`
 - Modify: `/Users/t00114/.apm/README.md`
-- Create: `/Users/t00114/.apm/llms.md`
+- Create: `/Users/t00114/.apm/llms.txt`
 - Modify: `/Users/t00114/.apm/TODO.md`
 
 - [ ] **Step 1: Run the verification suite in the final intended order**
@@ -575,7 +575,7 @@ git commit -m "test: verify apm global distribution redesign"
 - `apm.lock.yaml` keeping individual external entries: covered by Tasks 1 and 2
 - Offline `apply`: covered by Task 3
 - `mise.toml` redesign: covered by Task 4
-- `README.md`, `llms.md`, and `TODO.md` updates: covered by Task 5
+- `README.md`, `llms.txt`, and `TODO.md` updates: covered by Task 5
 - Verification-only `ci`: covered by Tasks 4 and 6
 
 ### Placeholder scan
