@@ -48,9 +48,10 @@ dependencies:
     - openai/skills/skills/.curated/gh-address-comments
     - openai/skills/skills/.curated/gh-fix-ci
     - tokoroten/prompt-review/.claude/skills/prompt-review
+    - trailofbits/skills/plugins/agentic-actions-auditor
     - trailofbits/skills/plugins/audit-context-building/skills/audit-context-building
-    - trailofbits/skills/plugins/static-analysis/skills/codeql
-    - trailofbits/skills/plugins/static-analysis/skills/semgrep
+    - trailofbits/skills/plugins/sharp-edges
+    - trailofbits/skills/plugins/static-analysis
     - trailofbits/skills/plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor
     - SawyerHood/dev-browser/skills/dev-browser
     - browser-use/browser-harness
