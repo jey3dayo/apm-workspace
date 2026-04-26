@@ -49,9 +49,9 @@ In practice:
   - `~/.codex/AGENTS.md` is the compiled output
   - `~/.agents/skills` is the deployed skill tree
 - Treat the current `apm` source as a pinned runtime dependency managed by `mise`
-  - current source: `github:microsoft/apm@v0.9.1`
+  - current source: `pipx:apm-cli@0.9.3`
   - if both the workspace and global `mise` config define `apm`, keep them aligned to the same source to avoid command-resolution collisions
-  - prefer `mise exec github:microsoft/apm@v0.9.1 -- apm ...` when you need to force the exact binary explicitly
+  - prefer `mise exec pipx:apm-cli@0.9.3 -- apm ...` when you need to force the exact binary explicitly
 
 ## Task Selection
 
@@ -145,7 +145,7 @@ Then review and commit the skill changes.
 - Do not commit `private-skills/`; it is a gitignored local-only overlay for `mise run apply:skills:local`
 - When changing the active `apm` source, update both tracked `mise` config locations that define `apm`
   - `~/.apm/mise.toml`
-  - `~/.config/mise/config.default.toml`
+  - `~/.config/mise/config.windows.toml`
 - When verifying Codex skill rollout, check `~/.agents/skills`
 - if an external skill is still missing there after deployment, treat it as a temporary Codex-specific delivery gap and resolve it separately from the tracked workspace state
 - if a skill repeatedly fails the normal upstream-managed lane because of packaging or rollout issues, move it onto the `manual-skills` package flow rather than patching deployed targets by hand

@@ -68,11 +68,11 @@ jey3dayo/apm-workspace/catalog#main
 - The current script path is `apm compile --target codex --output ~/.codex/AGENTS.md`.
 - Codex skills are deployed through `~/.agents/skills`.
 - Do not use `~/.codex/skills` as the verification source of truth for this workspace. Verify Codex rollout through compile success, `~/.codex/AGENTS.md`, and the deployed tree in `~/.agents/skills`.
-- Current `apm` source is `github:microsoft/apm@v0.9.1`.
-- If both `~/.apm/mise.toml` and `~/.config/mise/config.default.toml` define `apm`, keep them aligned to the same source.
+- Current `apm` source is `pipx:apm-cli@0.9.3`.
+- If both `~/.apm/mise.toml` and `~/.config/mise/config.windows.toml` define `apm`, keep them aligned to the same source.
 - Prefer `mise run deploy` for routine local rollout and `mise run apply` only when you need deploy-only behavior.
 - Reserve `mise run upgrade` for intentional upstream refresh, not for normal deployment.
-- When direct binary selection matters, prefer `mise exec github:microsoft/apm@v0.9.1 -- apm ...`.
+- When direct binary selection matters, prefer `mise exec pipx:apm-cli@0.9.3 -- apm ...`.
 - If a Codex-targeted external skill is still missing after rollout, verify `~/.agents/skills` directly and treat it as a temporary Codex-specific delivery gap.
 
 ## Source Of Truth
