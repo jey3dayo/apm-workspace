@@ -16,6 +16,7 @@ dependencies:
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-explain
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-onboard
     - anthropics/claude-code/plugins/frontend-design/skills/frontend-design
+    - benjitaylor/agentation/skills/agentation
     - benjitaylor/agentation/skills/agentation-self-driving
     - cloudflare/skills/skills/workers-best-practices
     - cloudflare/skills/skills/wrangler
