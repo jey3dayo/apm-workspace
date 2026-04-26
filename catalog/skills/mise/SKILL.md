@@ -1,17 +1,18 @@
 ---
 name: mise
 description: |
-  [What] Specialized skill for mise (mise-en-place) task runner, tool version
-  manager, and package manager. Provides best practices for `mise.toml`
-  structure, task definitions, dependency management, tool/package
-  centralization, workflow automation, and skill installation via
-  `mise skills add`.
+  [What] Skill for mise (mise-en-place) task runner, tool version manager, and
+  package manager. Covers `mise.toml` structure, task definitions, dependency
+  management, tool/package centralization, workflow automation, and skill
+  installation via `mise skills add`.
   [When] Use when: users mention "mise", "mise-en-place", "mise.toml",
-  `mise run`, `mise format`, `mise check`, `mise deploy`, `mise skills add`, task definitions,
-  tool version management, formatter wiring such as `nixpkgs-fmt`, or ask
-  whether a formatter / command is 組み込まれている. Do not use for dotfile
-  migration, Home Manager, Nix Flake, or `~/.opencommit` / `~/.config`
-  management; use `nix-dotfiles` instead.
+  `mise run`, `mise format`, `mise check`, `mise deploy`, `mise skills add`,
+  task definitions, tool version management, formatter wiring such as
+  `nixpkgs-fmt`, or Windows-specific mise settings such as `run_windows`,
+  `config.windows.toml`, and `windows_default_*_shell_args`. Also use when
+  asked whether a formatter or command is built in. Do not use for dotfile
+  migration, Home Manager, Nix Flake, or non-mise `~/.config` management; use
+  `nix-dotfiles` instead.
   [Keywords] mise, mise-en-place, mise.toml, tool management, package
   management, npm global, python packages, task runner, run, format, check, deploy,
   skills add, formatter, fmt, nixpkgs-fmt, config.ci.toml,
@@ -41,6 +42,7 @@ Before giving advice, classify the request into one of these two modes and answe
 2. User-global / dotfiles mode
    - The user is managing `~/.config/mise`, personal toolchains, or `mise skills add`
    - `~/.config/.mise.toml` and `[task_config].includes` are valid only when the setup is intentionally user-global or multi-environment
+   - `config.windows.toml` and `windows_default_*_shell_args` usually belong here unless the repository explicitly vendors its own Windows shell policy
 
 Do not mix the two modes in one answer. If the request mentions `mise skills add`, personal/global setup, or `~/.config/mise`, treat it as user-global. Otherwise default to project-local.
 
@@ -204,6 +206,7 @@ For personal `~/.config/mise` setups, a split layout can be better than a single
 
 Use this pattern for user-global dotfiles or environment-switched setups, not for ordinary project repos.
 For concrete examples, split-file structure, and do/don't guidance, see `references/task-config-includes.md`.
+For Windows shell selection, quoting, `run_windows`, and generated-file pitfalls, see `references/windows-shells.md`.
 
 ### Task Section Internal Structure
 
@@ -525,6 +528,23 @@ run = [
 depends = ["lint", "test", "build"]  # ✅ Parallel execution
 ```
 
+### Issue: Windows Shell Mismatch
+
+### Problem
+
+- `run_windows` uses PowerShell syntax, but mise is actually executing tasks through `bash -lc`
+- `%USERPROFILE%` is written inside a PowerShell-oriented task body
+- Generated files are reformatted by broad formatter tasks and then rejected by exact validation
+
+### Solution
+
+- Inspect which shell mise actually uses on Windows before changing task strings
+- Match `run_windows` syntax to that shell, especially env vars, quoting, and script invocation
+- If `mise.toml` is generated from a template, update the template or generator instead of only patching the generated file
+- Exclude exact generated outputs from generic formatter tasks when the repository validates byte-for-byte serialization
+
+See `references/windows-shells.md` for concrete patterns.
+
 ## Integration
 
 ### With CI Systems
@@ -551,6 +571,7 @@ Detailed documentation loaded as needed:
 - `current-patterns.md` - Real-world examples from dotfiles project, practical task patterns
 - `config-templates.md` - Common mise.toml templates and patterns
 - `task-config-includes.md` - When and how to split user-global task files with `[task_config].includes`
+- `windows-shells.md` - Windows shell selection, `run_windows` syntax, env var expansion, and generated-file pitfalls
 - `tool-management.md` - Tool version management, Centralized Package Management, npm/Python migration guides, troubleshooting
 
 ### Usage
