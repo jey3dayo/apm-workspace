@@ -141,6 +141,7 @@ When a machine-local skill lives under `~/.apm/private-skills/`:
 - `mise run format:markdown:bold-headings`: rewrite bold headings across Markdown in `catalog/`
 - `mise run check`: run formatting checks plus validation only
 - `mise run verify`: run `check` plus catalog smoke verification
+- `mise run audit:ci:smoke`: temp-install the current manifest and lock, then run `apm audit --ci`
 - `mise run deploy`: run `check -> apply -> doctor` for the current workspace state
 - `mise run upgrade`: accept upstream dependency updates with `apm install -g --update`, then run the local rollout
 - `mise run refresh:deploy`: refresh first, then run the full local rollout from the current manifest and lock

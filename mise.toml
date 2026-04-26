@@ -61,6 +61,11 @@ description = "Smoke-test the generated managed catalog package via a temp insta
 run = "bash ./scripts/apm-workspace.sh smoke:catalog"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 smoke:catalog"
 
+[tasks."audit:ci:smoke"]
+description = "Temp-install the workspace manifest and run `apm audit --ci`"
+run = "bash ./scripts/apm-workspace.sh audit:ci:smoke"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 audit:ci:smoke"
+
 # ========================================
 # Validation Commands
 # ========================================

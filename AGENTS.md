@@ -74,6 +74,9 @@ Choose the command based on intent:
   - Deep verification
   - Runs `check` plus catalog smoke verification
   - Use when you want stronger confidence before or apart from deployment
+- `mise run audit:ci:smoke`
+  - Temp-install the current manifest and lock into an isolated project, then run `apm audit --ci`
+  - Use when you want APM's lockfile/deployed-file integrity checks without depending on the current user-scope targets
 - `mise run deploy`
   - End-to-end local rollout
   - Runs checks, deploys the current manifest and lock, then inspects targets

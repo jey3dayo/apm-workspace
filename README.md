@@ -27,6 +27,7 @@ mise run deploy
 
 - `mise run check`: lightweight validation only
 - `mise run verify`: `check` plus catalog smoke verification
+- `mise run audit:ci:smoke`: temp-install the workspace manifest and run `apm audit --ci`
 - `mise run deploy`: normal local rollout
 - `mise run refresh`: refresh checkout and dependency state without deploying
 - `mise run upgrade`: accept newer upstream package content

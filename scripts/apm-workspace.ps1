@@ -2372,6 +2372,56 @@ function Invoke-SmokeCatalog {
   }
 }
 
+function Invoke-AuditCiSmoke {
+  Require-Apm
+  Ensure-WorkspaceRepo
+  Ensure-WorkspaceScaffold
+
+  $tempDir = New-TemporaryDirectory -Prefix "apm-audit-ci-smoke"
+  $success = $false
+
+  try {
+    foreach ($filename in @("apm.yml", "apm.lock.yaml", "apm-policy.yml")) {
+      $sourcePath = Join-Path $WorkspaceDir $filename
+      if (Test-Path -LiteralPath $sourcePath) {
+        Copy-Item -LiteralPath $sourcePath -Destination (Join-Path $tempDir $filename) -Force
+      }
+    }
+
+    Push-Location $tempDir
+    try {
+      $installOutput = @(& apm install --only apm 2>&1)
+      foreach ($line in $installOutput) {
+        Write-Host $line
+      }
+      if ($LASTEXITCODE -ne 0) {
+        throw "apm install failed for audit smoke test."
+      }
+      if (Test-ApmInstallDiagnosticsFailure -OutputLines $installOutput) {
+        throw "apm install reported integration diagnostics during audit smoke test."
+      }
+
+      & apm audit --ci
+      if ($LASTEXITCODE -ne 0) {
+        throw "apm audit --ci failed for audit smoke test."
+      }
+    }
+    finally {
+      Pop-Location
+    }
+
+    $success = $true
+    Write-Host "Smoke verified workspace manifest via temp install + apm audit --ci"
+  }
+  finally {
+    if ($success) {
+      Remove-Item -LiteralPath $tempDir -Recurse -Force -ErrorAction SilentlyContinue
+    } elseif (Test-Path -LiteralPath $tempDir) {
+      Write-WarnLine "APM audit smoke workspace left at $tempDir for inspection."
+    }
+  }
+}
+
 if ($env:APM_WORKSPACE_LIB_ONLY -eq "1") {
   return
 }
@@ -2429,6 +2479,10 @@ switch ($Command) {
     Invoke-SmokeCatalog -RequestedSkillIds $CommandArgs
   }
 
+  "audit:ci:smoke" {
+    Invoke-AuditCiSmoke
+  }
+
   "help" {
     @"
 Usage: scripts/apm-workspace.ps1 <command> [args...]
@@ -2447,6 +2501,7 @@ Commands:
   install:catalog    Install the catalog ref after commit/push
   release:catalog    Prepare, require a clean pushed branch, then install the catalog ref
   smoke:catalog      Smoke-test the generated catalog package via temp project install
+  audit:ci:smoke     Temp-install the workspace manifest and run 'apm audit --ci'
 
 Environment overrides:
   APM_WORKSPACE_DIR

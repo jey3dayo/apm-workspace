@@ -16,7 +16,9 @@ Describe "catalog helpers" {
 
   BeforeEach {
     $script:WorkspaceDir = Join-Path $TestDrive "workspace"
+    $WorkspaceDir = $script:WorkspaceDir
     $global:WorkspaceDir = $script:WorkspaceDir
+    $workspaceDir = $script:WorkspaceDir
     New-Item -ItemType Directory -Path $script:WorkspaceDir -Force | Out-Null
   }
 
@@ -28,7 +30,7 @@ dependencies:
   - jey3dayo/apm-workspace/catalog#main
   mcp: []
 scripts: {}
-"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.yml")
+"@ | Set-Content -LiteralPath (Join-Path $workspaceDir "apm.yml")
 
     Test-ManifestHasCatalogReference | Should -Be $true
   }
@@ -88,7 +90,7 @@ dependencies:
     host: github.com
     resolved_commit: 1234567890abcdef
     virtual_path: skills/brainstorming
-"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.lock.yaml")
+"@ | Set-Content -LiteralPath (Join-Path $workspaceDir "apm.lock.yaml")
 
     $map = Get-LockPinnedReferenceMap
 
@@ -118,7 +120,7 @@ dependencies:
     - openai/skills
   mcp: []
 scripts: {}
-"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.yml")
+"@ | Set-Content -LiteralPath (Join-Path $workspaceDir "apm.yml")
     @"
 lockfile_version: "1"
 dependencies:
@@ -126,9 +128,9 @@ dependencies:
     host: github.com
     resolved_commit: abcdef1234567890
     virtual_path:
-"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.lock.yaml")
+"@ | Set-Content -LiteralPath (Join-Path $workspaceDir "apm.lock.yaml")
 
-    $repoRootSkillPath = Join-Path (Join-Path $WorkspaceDir "apm_modules") "openai"
+    $repoRootSkillPath = Join-Path (Join-Path $script:WorkspaceDir "apm_modules") "openai"
     $repoRootSkillPath = Join-Path $repoRootSkillPath "skills"
     New-Item -ItemType Directory -Path $repoRootSkillPath -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $repoRootSkillPath "SKILL.md") -Value "# openai skills"
@@ -155,7 +157,7 @@ dependencies:
     - openai/skills
   mcp: []
 scripts: {}
-"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.yml")
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
     @"
 lockfile_version: "1"
 dependencies:
@@ -167,9 +169,9 @@ dependencies:
     host: github.com
     resolved_commit: 1234567890abcdef
     virtual_path:
-"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.lock.yaml")
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
 
-    $extraSkillPath = Join-Path (Join-Path $WorkspaceDir "apm_modules") "github.com"
+    $extraSkillPath = Join-Path (Join-Path $script:WorkspaceDir "apm_modules") "github.com"
     $extraSkillPath = Join-Path $extraSkillPath "extra-skill"
     New-Item -ItemType Directory -Path $extraSkillPath -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $extraSkillPath "SKILL.md") -Value "# extra skill"
@@ -195,7 +197,7 @@ dependencies:
     - benjitaylor/agentation/skills/agentation
   mcp: []
 scripts: {}
-"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.yml")
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
     @"
 lockfile_version: "1"
 dependencies:
@@ -207,9 +209,9 @@ dependencies:
     host: github.com
     resolved_commit: 2222222222222222
     virtual_path: skills/agentation
-"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.lock.yaml")
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
 
-    $agentationPath = Join-Path (Join-Path (Join-Path $WorkspaceDir "apm_modules") "benjitaylor") "agentation"
+    $agentationPath = Join-Path (Join-Path (Join-Path $script:WorkspaceDir "apm_modules") "benjitaylor") "agentation"
     $agentationPath = Join-Path $agentationPath "skills/agentation"
     New-Item -ItemType Directory -Path $agentationPath -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $agentationPath "SKILL.md") -Value "# agentation"
@@ -233,7 +235,7 @@ dependencies:
     - obra/superpowers/skills/brainstorming
   mcp: []
 scripts: {}
-"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.yml")
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
     @"
 lockfile_version: "1"
 dependencies:
@@ -241,9 +243,9 @@ dependencies:
     host: github.com
     resolved_commit: 2222222222222222
     virtual_path: skills/brainstorming
-"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.lock.yaml")
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
 
-    $skillPath = Join-Path (Join-Path (Join-Path $WorkspaceDir "apm_modules") "obra") "superpowers"
+    $skillPath = Join-Path (Join-Path (Join-Path $script:WorkspaceDir "apm_modules") "obra") "superpowers"
     $skillPath = Join-Path $skillPath "skills/brainstorming"
     New-Item -ItemType Directory -Path $skillPath -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $skillPath "SKILL.md") -Value "# brainstorming"
@@ -256,6 +258,14 @@ dependencies:
   }
 
   It "expands manual-skills package roots into copied skills" {
+    $previousWorkspaceDir = $script:WorkspaceDir
+    $previousGlobalWorkspaceDir = $global:WorkspaceDir
+    $workspaceDir = Join-Path $TestDrive "workspace-manual-skills"
+    $script:WorkspaceDir = $workspaceDir
+    $WorkspaceDir = $workspaceDir
+    $global:WorkspaceDir = $workspaceDir
+    New-Item -ItemType Directory -Path $workspaceDir -Force | Out-Null
+
     @"
 name: apm-workspace
 version: 1.0.0
@@ -267,7 +277,7 @@ dependencies:
     - jey3dayo/apm-workspace/manual-skills
   mcp: []
 scripts: {}
-"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.yml")
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
     @"
 lockfile_version: "1"
 dependencies:
@@ -275,24 +285,30 @@ dependencies:
     host: github.com
     resolved_commit: 3333333333333333
     virtual_path: manual-skills
-"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.lock.yaml")
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
 
-    $manualSkillsRoot = Join-Path (Join-Path (Join-Path $WorkspaceDir "apm_modules") "jey3dayo") "apm-workspace"
+    $manualSkillsRoot = Join-Path (Join-Path (Join-Path $script:WorkspaceDir "apm_modules") "jey3dayo") "apm-workspace"
     $manualSkillsRoot = Join-Path $manualSkillsRoot "manual-skills/.apm/skills"
     New-Item -ItemType Directory -Path (Join-Path $manualSkillsRoot "ui-ux-pro-max") -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $manualSkillsRoot "ui-ux-pro-max/SKILL.md") -Value "# ui-ux-pro-max"
     New-Item -ItemType Directory -Path (Join-Path $manualSkillsRoot "sharp-edges") -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $manualSkillsRoot "sharp-edges/SKILL.md") -Value "# sharp-edges"
 
-    $records = @(Get-ExternalSkillRecords)
+    try {
+      $records = @(Get-ExternalSkillRecords)
 
-    $records.Count | Should -Be 6
-    $skillIds = @($records | ForEach-Object SourceSkillId | Sort-Object)
-    $skillIds | Should -Contain "sharp-edges"
-    $skillIds | Should -Contain "ui-ux-pro-max"
-    $canonicalRefs = @($records | ForEach-Object CanonicalReference | Sort-Object)
-    $canonicalRefs | Should -Contain "jey3dayo/apm-workspace/manual-skills#sharp-edges"
-    $canonicalRefs | Should -Contain "jey3dayo/apm-workspace/manual-skills#ui-ux-pro-max"
+      $records.Count | Should -Be 2
+      $skillIds = @($records | ForEach-Object SourceSkillId | Sort-Object)
+      $skillIds | Should -Contain "sharp-edges"
+      $skillIds | Should -Contain "ui-ux-pro-max"
+      $canonicalRefs = @($records | ForEach-Object CanonicalReference | Sort-Object)
+      $canonicalRefs | Should -Contain "jey3dayo/apm-workspace/manual-skills#sharp-edges"
+      $canonicalRefs | Should -Contain "jey3dayo/apm-workspace/manual-skills#ui-ux-pro-max"
+    }
+    finally {
+      $script:WorkspaceDir = $previousWorkspaceDir
+      $global:WorkspaceDir = $previousGlobalWorkspaceDir
+    }
   }
 
   It "reads only top-level lock dependency records" {
@@ -310,7 +326,7 @@ dependencies:
 other_records:
   - repo_url: ignored/top-level
     resolved_commit: ffffffffffffffff
-"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.lock.yaml")
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
 
     $records = @(Get-LockedExternalSkillRecords)
 
@@ -328,7 +344,7 @@ dependencies:
   host: github.com
   resolved_commit: abcdef1234567890
   virtual_path: skills/.curated/gh-address-comments
-"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.lock.yaml")
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
 
     $records = @(Get-LockedExternalSkillRecords)
 
@@ -350,6 +366,7 @@ Describe "public command surface" {
 
   BeforeEach {
     $script:WorkspaceDir = Join-Path $TestDrive "workspace"
+    $WorkspaceDir = $script:WorkspaceDir
     $global:WorkspaceDir = $script:WorkspaceDir
     New-Item -ItemType Directory -Path $script:WorkspaceDir -Force | Out-Null
   }
@@ -628,7 +645,7 @@ dependencies:
 scripts:
   sync:
     - ignored/script-entry
-"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.yml")
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
 
     @(Get-UnpinnedExternalReferences) | Should -Be @("openai/skills/skills/.curated/gh-address-comments")
   }
@@ -642,7 +659,7 @@ dependencies:
   - obra/superpowers/skills/using-superpowers
   mcp:
   - ignored/mcp-entry
-"@ | Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.yml")
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
 
     @(Get-UnpinnedExternalReferences) | Should -Be @("obra/superpowers/skills/using-superpowers")
   }
@@ -811,6 +828,73 @@ dependencies:
     Test-Path (Join-Path $TestDrive ".codex/skills/superpowers-brainstorming/SKILL.md") | Should -Be $true
   }
 
+  It "smoke-audits the workspace manifest via temp install" {
+    Mock Ensure-WorkspaceRepo {}
+    Mock Ensure-WorkspaceScaffold {}
+    Mock New-TemporaryDirectory {
+      $path = Join-Path $TestDrive "apm-audit-ci-smoke"
+      New-Item -ItemType Directory -Path $path -Force | Out-Null
+      $path
+    }
+
+    $previousWorkspaceDir = $script:WorkspaceDir
+    $previousGlobalWorkspaceDir = $global:WorkspaceDir
+    $workspaceDir = Join-Path $TestDrive "workspace-audit-ci-smoke"
+    $script:WorkspaceDir = $workspaceDir
+    $WorkspaceDir = $workspaceDir
+    $global:WorkspaceDir = $workspaceDir
+    New-Item -ItemType Directory -Path $workspaceDir -Force | Out-Null
+
+    @"
+name: apm-workspace
+version: 1.0.0
+dependencies:
+  apm: []
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+    @"
+lockfile_version: "1"
+dependencies: []
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
+
+    $apmCalls = New-Object System.Collections.Generic.List[string]
+    $script:installSawManifest = $false
+    $script:auditSawManifest = $false
+
+    function global:apm {
+      $apmCalls.Add(($args -join ' '))
+
+      if ($args[0] -eq "install" -and $args[1] -eq "--only" -and $args[2] -eq "apm") {
+        if ((Test-Path -LiteralPath (Join-Path $PWD "apm.yml")) -and (Test-Path -LiteralPath (Join-Path $PWD "apm.lock.yaml"))) {
+          $script:installSawManifest = $true
+        }
+      }
+
+      if ($args[0] -eq "audit" -and $args[1] -eq "--ci") {
+        if ((Test-Path -LiteralPath (Join-Path $PWD "apm.yml")) -and (Test-Path -LiteralPath (Join-Path $PWD "apm.lock.yaml"))) {
+          $script:auditSawManifest = $true
+        }
+      }
+
+      $global:LASTEXITCODE = 0
+    }
+
+    try {
+      Invoke-AuditCiSmoke
+
+      $apmCalls | Should -Be @("install --only apm", "audit --ci")
+      $script:installSawManifest | Should -Be $true
+      $script:auditSawManifest | Should -Be $true
+      Test-Path (Join-Path $TestDrive "apm-audit-ci-smoke") | Should -Be $false
+    }
+    finally {
+      Remove-Item Function:\apm -ErrorAction SilentlyContinue
+      $script:WorkspaceDir = $previousWorkspaceDir
+      $global:WorkspaceDir = $previousGlobalWorkspaceDir
+    }
+  }
+
   It "publishes workspace mise tasks for formatting, verification, and workflow orchestration" {
     $miseToml = Get-Content -LiteralPath (Join-Path $workspaceRoot "mise.toml") -Raw
 
@@ -836,6 +920,7 @@ dependencies:
     $miseToml | Should -Match '\[tasks\."prepare:catalog"\]'
     $miseToml | Should -Match '\[tasks\."install:catalog"\]'
     $miseToml | Should -Match '\[tasks\."smoke:catalog"\]'
+    $miseToml | Should -Match '\[tasks\."audit:ci:smoke"\]'
     $miseToml | Should -Match '\[tasks\."release:catalog"\]'
     $miseToml | Should -Match '\[tasks\."verify:catalog"\]'
     $miseToml | Should -Match 'run = "bash ./scripts/apm-workspace.sh apply"'
@@ -898,6 +983,7 @@ dependencies:
   }
 
   It "runs catalog release as stage, release gate, and register flow" {
+    Mock Ensure-WorkspaceRepo {}
     Mock Ensure-WorkspaceMiseFile {}
     Mock Invoke-StageCatalog {}
     Mock Assert-CatalogReleaseReady {}
@@ -921,6 +1007,7 @@ Describe "internal cleanup skill ids" {
 
   BeforeEach {
     $script:WorkspaceDir = Join-Path $TestDrive "workspace"
+    $WorkspaceDir = $script:WorkspaceDir
     $global:WorkspaceDir = $script:WorkspaceDir
     New-Item -ItemType Directory -Path $script:WorkspaceDir -Force | Out-Null
   }

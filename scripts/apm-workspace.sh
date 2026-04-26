@@ -1954,6 +1954,32 @@ cmd_smoke_catalog() {
   log "Smoke verified catalog via temp project install: $(printf '%s' "$skill_ids" | tr '\n' ',' | sed 's/,$//; s/,/, /g')"
 }
 
+cmd_audit_ci_smoke() {
+  require_apm
+  ensure_workspace_repo
+  ensure_workspace_scaffold
+
+  temp_dir=$(mktemp -d "${TMPDIR:-/tmp}/apm-audit-ci-smoke.XXXXXX")
+
+  for filename in apm.yml apm.lock.yaml apm-policy.yml; do
+    if [ -f "$WORKSPACE_DIR/$filename" ]; then
+      cp "$WORKSPACE_DIR/$filename" "$temp_dir/$filename"
+    fi
+  done
+
+  if ! (
+    cd "$temp_dir" &&
+      apm install --only apm &&
+      apm audit --ci
+  ); then
+    warn "APM audit smoke workspace left at $temp_dir for inspection."
+    fail "Temp install + apm audit --ci failed."
+  fi
+
+  rm -rf "$temp_dir"
+  log "Smoke verified workspace manifest via temp install + apm audit --ci"
+}
+
 cmd_help() {
   cat <<EOF
 Usage: scripts/apm-workspace.sh <command> [args...]
@@ -1972,6 +1998,7 @@ Commands:
   install:catalog    Install the catalog ref after commit/push
   release:catalog    Prepare, require a clean pushed branch, then install the catalog ref
   smoke:catalog      Smoke-test the generated catalog package via temp project install
+  audit:ci:smoke     Temp-install the workspace manifest and run 'apm audit --ci'
 
 Environment overrides:
   APM_WORKSPACE_DIR
@@ -1995,6 +2022,7 @@ case "$COMMAND" in
   install:catalog) cmd_register_catalog "$@" ;;
   release:catalog) cmd_release_catalog "$@" ;;
   smoke:catalog) cmd_smoke_catalog "$@" ;;
+  audit:ci:smoke) cmd_audit_ci_smoke ;;
   help | -h | --help) cmd_help ;;
   *)
     fail "unknown command: $COMMAND"
