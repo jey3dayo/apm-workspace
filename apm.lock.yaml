@@ -275,28 +275,16 @@ dependencies:
   content_hash: sha256:2fce0d74ccf3666a418e67fb5a9e697395c32e1bfe487f6a0b2a13280a6a049c
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: d3e5fe29f35d00219ceb7cc0f9ce64b95e751a24
+  resolved_commit: f2b9b65aec4a88c3b302432d3b0789c67a4ed83f
   virtual_path: manual-skills
   is_virtual: true
   package_type: apm_package
   deployed_files:
-  - .claude/skills/agentic-actions-auditor
-  - .claude/skills/sarif-parsing
-  - .claude/skills/sharp-edges
   - .claude/skills/ui-ux-pro-max
-  - .config/opencode/skills/agentic-actions-auditor
-  - .config/opencode/skills/sarif-parsing
-  - .config/opencode/skills/sharp-edges
   - .config/opencode/skills/ui-ux-pro-max
-  - .cursor/skills/agentic-actions-auditor
-  - .cursor/skills/sarif-parsing
-  - .cursor/skills/sharp-edges
   - .cursor/skills/ui-ux-pro-max
-  - .gemini/skills/agentic-actions-auditor
-  - .gemini/skills/sarif-parsing
-  - .gemini/skills/sharp-edges
   - .gemini/skills/ui-ux-pro-max
-  content_hash: sha256:587b77fcb632c6800fa177ff86319da304794aa1dbaef7605cc9bb50f6052ab2
+  content_hash: sha256:001dfaaa7785379b2f376ad3aedc4738ca6aa1c2fbe653dabb2276aedc0d7081
 - repo_url: millionco/react-doctor
   host: github.com
   resolved_commit: 7da4ce4e27cb5208ed52ad9d01cae32f96ac177f
@@ -600,30 +588,6 @@ dependencies:
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  virtual_path: plugins/static-analysis/skills/codeql
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/codeql
-  - .config/opencode/skills/codeql
-  - .copilot/skills/codeql
-  - .cursor/skills/codeql
-  content_hash: sha256:77b1731a16efb8b1d130bcfc529ff974779fbd836d0d9054f8dc82ba8d17193c
-- repo_url: trailofbits/skills
-  host: github.com
-  resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  virtual_path: plugins/static-analysis/skills/semgrep
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/semgrep
-  - .config/opencode/skills/semgrep
-  - .copilot/skills/semgrep
-  - .cursor/skills/semgrep
-  content_hash: sha256:739945d5fdd22520a093010a9e9a2e5568a6f541f74604e4328c0ade79cda81e
-- repo_url: trailofbits/skills
-  host: github.com
-  resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
   virtual_path: plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor
   is_virtual: true
   package_type: claude_skill
@@ -633,6 +597,64 @@ dependencies:
   - .copilot/skills/supply-chain-risk-auditor
   - .cursor/skills/supply-chain-risk-auditor
   content_hash: sha256:1b986d50308c2fbb2a77d5a10b71747c692ce1b7a8a8718eefc3b4c6e460cb0e
+- repo_url: trailofbits/skills
+  host: github.com
+  resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
+  virtual_path: plugins/agentic-actions-auditor
+  is_virtual: true
+  package_type: marketplace_plugin
+  deployed_files:
+  - .claude/skills/agentic-actions-auditor
+  - .config/opencode/skills/agentic-actions-auditor
+  - .copilot/skills/agentic-actions-auditor
+  - .cursor/skills/agentic-actions-auditor
+  - .gemini/skills/agentic-actions-auditor
+  content_hash: sha256:c436180b1976ac20c3c9cc340fa2d9e32a89b48d449a0db3f3ca519f3dac3d96
+- repo_url: trailofbits/skills
+  host: github.com
+  resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
+  virtual_path: plugins/sharp-edges
+  is_virtual: true
+  package_type: marketplace_plugin
+  deployed_files:
+  - .claude/skills/sharp-edges
+  - .config/opencode/skills/sharp-edges
+  - .copilot/skills/sharp-edges
+  - .cursor/skills/sharp-edges
+  - .gemini/skills/sharp-edges
+  content_hash: sha256:a5e18b724edef5e9839d0d45ca54f54c2c7ead2320ae93a177aabaafd6cc3e00
+- repo_url: trailofbits/skills
+  host: github.com
+  resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
+  virtual_path: plugins/static-analysis
+  is_virtual: true
+  package_type: marketplace_plugin
+  deployed_files:
+  - .claude/agents/semgrep-scanner.md
+  - .claude/skills/codeql
+  - .claude/skills/sarif-parsing
+  - .claude/skills/semgrep
+  - .config/opencode/agents/semgrep-scanner.md
+  - .config/opencode/skills/codeql
+  - .config/opencode/skills/sarif-parsing
+  - .config/opencode/skills/semgrep
+  - .copilot/agents/semgrep-scanner.agent.md
+  - .copilot/skills/codeql
+  - .copilot/skills/sarif-parsing
+  - .copilot/skills/semgrep
+  - .cursor/agents/semgrep-scanner.md
+  - .cursor/skills/codeql
+  - .cursor/skills/sarif-parsing
+  - .cursor/skills/semgrep
+  - .gemini/skills/codeql
+  - .gemini/skills/sarif-parsing
+  - .gemini/skills/semgrep
+  deployed_file_hashes:
+    .claude/agents/semgrep-scanner.md: sha256:7cfc591279139489dddcc86133b630dc860c0038680470c08afb6ea1ecde20a3
+    .config/opencode/agents/semgrep-scanner.md: sha256:7cfc591279139489dddcc86133b630dc860c0038680470c08afb6ea1ecde20a3
+    .copilot/agents/semgrep-scanner.agent.md: sha256:7cfc591279139489dddcc86133b630dc860c0038680470c08afb6ea1ecde20a3
+    .cursor/agents/semgrep-scanner.md: sha256:7cfc591279139489dddcc86133b630dc860c0038680470c08afb6ea1ecde20a3
+  content_hash: sha256:7aba4c93d6742995ae0d37fad01fc3fb31d704bba6b1cb364904f09a5cfebec4
 - repo_url: vercel-labs/agent-browser
   host: github.com
   resolved_commit: 57405f93614fae46e5c955ce662b4785283e1301
