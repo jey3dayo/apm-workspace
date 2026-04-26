@@ -158,6 +158,19 @@ dependencies:
   - .copilot/skills/agentation-self-driving
   - .cursor/skills/agentation-self-driving
   content_hash: sha256:405cf94e4df9b048ab42e51f26ad971dc6b986167b74eb46393abd6f1f5b5f88
+- repo_url: benjitaylor/agentation
+  host: github.com
+  resolved_commit: 7dc5d65378fa901e6eead81d4e2bb62950d49f0b
+  virtual_path: skills/agentation
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .claude/skills/agentation
+  - .config/opencode/skills/agentation
+  - .copilot/skills/agentation
+  - .cursor/skills/agentation
+  - .gemini/skills/agentation
+  content_hash: sha256:6ba2c955bee6ab3e9c7781b2553e3574b4c9ec35e539437d0831bfe368de8550
 - repo_url: browser-use/browser-harness
   host: github.com
   resolved_commit: f8adad28e02dafd2172bbd702f6fcd4631ec5677
@@ -262,30 +275,28 @@ dependencies:
   content_hash: sha256:2fce0d74ccf3666a418e67fb5a9e697395c32e1bfe487f6a0b2a13280a6a049c
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: 5478d3546d34f2074db666d72cdde2d068fd2c56
+  resolved_commit: d3e5fe29f35d00219ceb7cc0f9ce64b95e751a24
   virtual_path: manual-skills
   is_virtual: true
   package_type: apm_package
   deployed_files:
-  - .claude/skills/agentation
   - .claude/skills/agentic-actions-auditor
   - .claude/skills/sarif-parsing
   - .claude/skills/sharp-edges
-  - .claude/skills/skill-creator
   - .claude/skills/ui-ux-pro-max
-  - .config/opencode/skills/agentation
   - .config/opencode/skills/agentic-actions-auditor
   - .config/opencode/skills/sarif-parsing
   - .config/opencode/skills/sharp-edges
-  - .config/opencode/skills/skill-creator
   - .config/opencode/skills/ui-ux-pro-max
-  - .cursor/skills/agentation
   - .cursor/skills/agentic-actions-auditor
   - .cursor/skills/sarif-parsing
   - .cursor/skills/sharp-edges
-  - .cursor/skills/skill-creator
   - .cursor/skills/ui-ux-pro-max
-  content_hash: sha256:05ea699de53e8e0b3a87b33af19c3ead434954dc16989a5a72680a1cf7fdf539
+  - .gemini/skills/agentic-actions-auditor
+  - .gemini/skills/sarif-parsing
+  - .gemini/skills/sharp-edges
+  - .gemini/skills/ui-ux-pro-max
+  content_hash: sha256:587b77fcb632c6800fa177ff86319da304794aa1dbaef7605cc9bb50f6052ab2
 - repo_url: millionco/react-doctor
   host: github.com
   resolved_commit: 7da4ce4e27cb5208ed52ad9d01cae32f96ac177f
