@@ -110,4 +110,12 @@ dependencies:
         - -y
         - "@steipete/peekaboo"
         - mcp
+    - name: telegram-mcp
+      registry: false
+      transport: stdio
+      command: uvx
+      args:
+        - --from
+        - git+https://github.com/chigwell/telegram-mcp.git
+        - telegram-mcp
 scripts: {}
