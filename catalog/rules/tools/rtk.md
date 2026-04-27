@@ -1,7 +1,7 @@
 # RTK (Rust Token Killer)
 
 Purpose: RTK コマンドリファレンス。コマンドに常に `rtk` プレフィックスを付けること。
-Source: <https://github.com/jey3dayo/rtk>
+Source: <https://github.com/rtk-ai/rtk>
 
 ## ゴールデンルール
 
