@@ -1,10 +1,10 @@
 lockfile_version: '1'
-generated_at: '2026-04-25T03:48:36.696481+00:00'
-apm_version: 0.8.11
+generated_at: '2026-04-27T03:41:31.078211+00:00'
+apm_version: 0.9.3
 dependencies:
 - repo_url: EpicenterHQ/epicenter
   host: github.com
-  resolved_commit: bd310613c2c1842e6300eb85e258097ee37f8851
+  resolved_commit: 252dced4722af75a43ae220309a23fd47e6bbe94
   virtual_path: .agents/skills/tauri
   is_virtual: true
   package_type: claude_skill
@@ -13,6 +13,7 @@ dependencies:
   - .config/opencode/skills/tauri
   - .copilot/skills/tauri
   - .cursor/skills/tauri
+  - .gemini/skills/tauri
   content_hash: sha256:e9ad9f9304bdeaab54cfff99a5ab47b8215cc8043ef686ff9036e86572f36f1b
 - repo_url: Heyvhuang/ship-faster
   host: github.com
@@ -25,6 +26,7 @@ dependencies:
   - .config/opencode/skills/cloudflare
   - .copilot/skills/cloudflare
   - .cursor/skills/cloudflare
+  - .gemini/skills/cloudflare
   content_hash: sha256:03937061c79fe7e9e989cd054bf3adff6123fa58fe3ba63ed984358854d94bb0
 - repo_url: Heyvhuang/ship-faster
   host: github.com
@@ -37,10 +39,11 @@ dependencies:
   - .config/opencode/skills/tool-openclaw
   - .copilot/skills/tool-openclaw
   - .cursor/skills/tool-openclaw
+  - .gemini/skills/tool-openclaw
   content_hash: sha256:1b9cee49d17e42ed30aa3f429102ef2b9b7fddd94e705138dce852994cdbe447
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 2eb109d0f3c908cbc8a24e1278fb8c362d19186e
+  resolved_commit: d3c2c65b86097ccf7451a22b516eef1184724eee
   virtual_path: understand-anything-plugin/skills/understand
   is_virtual: true
   package_type: claude_skill
@@ -49,10 +52,11 @@ dependencies:
   - .config/opencode/skills/understand
   - .copilot/skills/understand
   - .cursor/skills/understand
+  - .gemini/skills/understand
   content_hash: sha256:2f46743e0816fd8cacbaaf8603e94bef7a5871287f67cc7805550c45f0cbae4c
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 2eb109d0f3c908cbc8a24e1278fb8c362d19186e
+  resolved_commit: d3c2c65b86097ccf7451a22b516eef1184724eee
   virtual_path: understand-anything-plugin/skills/understand-chat
   is_virtual: true
   package_type: claude_skill
@@ -61,10 +65,11 @@ dependencies:
   - .config/opencode/skills/understand-chat
   - .copilot/skills/understand-chat
   - .cursor/skills/understand-chat
+  - .gemini/skills/understand-chat
   content_hash: sha256:99246057d1e523d0e5eed42e68083f978656661e53d73cac5e92983ccf1518ea
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 2eb109d0f3c908cbc8a24e1278fb8c362d19186e
+  resolved_commit: d3c2c65b86097ccf7451a22b516eef1184724eee
   virtual_path: understand-anything-plugin/skills/understand-dashboard
   is_virtual: true
   package_type: claude_skill
@@ -73,10 +78,11 @@ dependencies:
   - .config/opencode/skills/understand-dashboard
   - .copilot/skills/understand-dashboard
   - .cursor/skills/understand-dashboard
+  - .gemini/skills/understand-dashboard
   content_hash: sha256:32771fb738e732febba2c780df113354fdc08085aee73e6531ded3e0ad17ee29
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 2eb109d0f3c908cbc8a24e1278fb8c362d19186e
+  resolved_commit: d3c2c65b86097ccf7451a22b516eef1184724eee
   virtual_path: understand-anything-plugin/skills/understand-diff
   is_virtual: true
   package_type: claude_skill
@@ -85,10 +91,11 @@ dependencies:
   - .config/opencode/skills/understand-diff
   - .copilot/skills/understand-diff
   - .cursor/skills/understand-diff
+  - .gemini/skills/understand-diff
   content_hash: sha256:3ffd99e2f225db4dbab3ace73d37bedd7f7f670d3fbaa5a6fff0b6654a593820
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 2eb109d0f3c908cbc8a24e1278fb8c362d19186e
+  resolved_commit: d3c2c65b86097ccf7451a22b516eef1184724eee
   virtual_path: understand-anything-plugin/skills/understand-explain
   is_virtual: true
   package_type: claude_skill
@@ -97,10 +104,11 @@ dependencies:
   - .config/opencode/skills/understand-explain
   - .copilot/skills/understand-explain
   - .cursor/skills/understand-explain
+  - .gemini/skills/understand-explain
   content_hash: sha256:3040f5a43b8cea6eba16117a863f171791863b9c00116e6eb96cc5f482e9cba2
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 2eb109d0f3c908cbc8a24e1278fb8c362d19186e
+  resolved_commit: d3c2c65b86097ccf7451a22b516eef1184724eee
   virtual_path: understand-anything-plugin/skills/understand-onboard
   is_virtual: true
   package_type: claude_skill
@@ -109,6 +117,7 @@ dependencies:
   - .config/opencode/skills/understand-onboard
   - .copilot/skills/understand-onboard
   - .cursor/skills/understand-onboard
+  - .gemini/skills/understand-onboard
   content_hash: sha256:2b3faf132aafb668ccc57fd743aac0584e7ec6966402c4693b9e7c180db34cce
 - repo_url: SawyerHood/dev-browser
   host: github.com
@@ -121,6 +130,7 @@ dependencies:
   - .config/opencode/skills/dev-browser
   - .copilot/skills/dev-browser
   - .cursor/skills/dev-browser
+  - .gemini/skills/dev-browser
   content_hash: sha256:d50d11bbefdc1599d78900828dcb69d48e5091769d3f5ce10e06a60efe2405bf
 - repo_url: anthropics/claude-code
   host: github.com
@@ -133,6 +143,7 @@ dependencies:
   - .config/opencode/skills/frontend-design
   - .copilot/skills/frontend-design
   - .cursor/skills/frontend-design
+  - .gemini/skills/frontend-design
   content_hash: sha256:e8118284a6365753790d44bb2758a6032b3af27fa84696428d9233f2be0f4e78
 - repo_url: apollographql/skills
   host: github.com
@@ -145,19 +156,8 @@ dependencies:
   - .config/opencode/skills/rust-best-practices
   - .copilot/skills/rust-best-practices
   - .cursor/skills/rust-best-practices
+  - .gemini/skills/rust-best-practices
   content_hash: sha256:62f6902bb48e44f2cc6d4ccb85d7162eb3752e7a3970a735435df6a4b5913ad4
-- repo_url: benjitaylor/agentation
-  host: github.com
-  resolved_commit: 7dc5d65378fa901e6eead81d4e2bb62950d49f0b
-  virtual_path: skills/agentation-self-driving
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/agentation-self-driving
-  - .config/opencode/skills/agentation-self-driving
-  - .copilot/skills/agentation-self-driving
-  - .cursor/skills/agentation-self-driving
-  content_hash: sha256:405cf94e4df9b048ab42e51f26ad971dc6b986167b74eb46393abd6f1f5b5f88
 - repo_url: benjitaylor/agentation
   host: github.com
   resolved_commit: 7dc5d65378fa901e6eead81d4e2bb62950d49f0b
@@ -171,11 +171,30 @@ dependencies:
   - .cursor/skills/agentation
   - .gemini/skills/agentation
   content_hash: sha256:6ba2c955bee6ab3e9c7781b2553e3574b4c9ec35e539437d0831bfe368de8550
+- repo_url: benjitaylor/agentation
+  host: github.com
+  resolved_commit: 7dc5d65378fa901e6eead81d4e2bb62950d49f0b
+  virtual_path: skills/agentation-self-driving
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .claude/skills/agentation-self-driving
+  - .config/opencode/skills/agentation-self-driving
+  - .copilot/skills/agentation-self-driving
+  - .cursor/skills/agentation-self-driving
+  - .gemini/skills/agentation-self-driving
+  content_hash: sha256:405cf94e4df9b048ab42e51f26ad971dc6b986167b74eb46393abd6f1f5b5f88
 - repo_url: browser-use/browser-harness
   host: github.com
-  resolved_commit: f8adad28e02dafd2172bbd702f6fcd4631ec5677
+  resolved_commit: 142e4265683b67c5c0eb0de72d6d21667207fa59
   package_type: claude_skill
-  content_hash: sha256:d7bce440c5d75a506d20b115788a40dd1f5fb7efd63888ea71349f2132096ea5
+  deployed_files:
+  - .claude/skills/browser-harness
+  - .config/opencode/skills/browser-harness
+  - .copilot/skills/browser-harness
+  - .cursor/skills/browser-harness
+  - .gemini/skills/browser-harness
+  content_hash: sha256:aa3ebf6da59bb5e75f1485c3d97aab33d372e815d684834ec902b614a1cd33ad
 - repo_url: cloudflare/skills
   host: github.com
   resolved_commit: 0438a075b419f737eb091d1c91800b7387e3a75f
@@ -187,6 +206,7 @@ dependencies:
   - .config/opencode/skills/workers-best-practices
   - .copilot/skills/workers-best-practices
   - .cursor/skills/workers-best-practices
+  - .gemini/skills/workers-best-practices
   content_hash: sha256:ebd71bed0ade41e2d4839b0d280ec6d93dced0d19f568d27b92da00e4aa9943c
 - repo_url: cloudflare/skills
   host: github.com
@@ -199,11 +219,18 @@ dependencies:
   - .config/opencode/skills/wrangler
   - .copilot/skills/wrangler
   - .cursor/skills/wrangler
+  - .gemini/skills/wrangler
   content_hash: sha256:11edeb37eedb91deedde694b2bb1cc4ff4e8b5a8f1836c217a8c871fe39abcb5
 - repo_url: gonta223/humanizer-ja
   host: github.com
   resolved_commit: a1e343696e43aa50e7218891f3319ab22cde3464
   package_type: claude_skill
+  deployed_files:
+  - .claude/skills/humanizer-ja
+  - .config/opencode/skills/humanizer-ja
+  - .copilot/skills/humanizer-ja
+  - .cursor/skills/humanizer-ja
+  - .gemini/skills/humanizer-ja
   content_hash: sha256:b6da4ef92a941ab364ab1ddf259d9e511e098a0719f7ee2202847351c34a8194
 - repo_url: ibelick/ui-skills
   host: github.com
@@ -216,6 +243,7 @@ dependencies:
   - .config/opencode/skills/baseline-ui
   - .copilot/skills/baseline-ui
   - .cursor/skills/baseline-ui
+  - .gemini/skills/baseline-ui
   content_hash: sha256:49817c981208de2f412719f7814d31eba2b2096462edc048a279d93f522cab0f
 - repo_url: ibelick/ui-skills
   host: github.com
@@ -228,6 +256,7 @@ dependencies:
   - .config/opencode/skills/fixing-accessibility
   - .copilot/skills/fixing-accessibility
   - .cursor/skills/fixing-accessibility
+  - .gemini/skills/fixing-accessibility
   content_hash: sha256:4fa8f5a772b4eef3d28a54c136b507d070e54e2c326578f65eaf5e5a0118b38a
 - repo_url: ibelick/ui-skills
   host: github.com
@@ -240,6 +269,7 @@ dependencies:
   - .config/opencode/skills/fixing-metadata
   - .copilot/skills/fixing-metadata
   - .cursor/skills/fixing-metadata
+  - .gemini/skills/fixing-metadata
   content_hash: sha256:699e13890fb50acffa02dfd2d5b0e719bd916a9e2b7e6035bdc4513fc73d9174
 - repo_url: ibelick/ui-skills
   host: github.com
@@ -252,6 +282,7 @@ dependencies:
   - .config/opencode/skills/fixing-motion-performance
   - .copilot/skills/fixing-motion-performance
   - .cursor/skills/fixing-motion-performance
+  - .gemini/skills/fixing-motion-performance
   content_hash: sha256:426dcf33f23419643f2aab71e2253e1a5b5684a808fabb8a4ad135e489ed7a0f
 - repo_url: jakubkrehel/make-interfaces-feel-better
   host: github.com
@@ -264,18 +295,19 @@ dependencies:
   - .config/opencode/skills/make-interfaces-feel-better
   - .copilot/skills/make-interfaces-feel-better
   - .cursor/skills/make-interfaces-feel-better
+  - .gemini/skills/make-interfaces-feel-better
   content_hash: sha256:99aaea521aa0f1c7d041d70bb6b75581c1a50ec6ac59ceaaa923b6339ffa417b
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: 5478d3546d34f2074db666d72cdde2d068fd2c56
+  resolved_commit: 496f1c19d01e142656b246e291cdd9394a1ba630
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
   package_type: apm_package
-  content_hash: sha256:2fce0d74ccf3666a418e67fb5a9e697395c32e1bfe487f6a0b2a13280a6a049c
+  content_hash: sha256:1cea920e677d2e32df71a806509a3da85e29969714a9cf3b186c68d5e1b3bd24
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: f2b9b65aec4a88c3b302432d3b0789c67a4ed83f
+  resolved_commit: 496f1c19d01e142656b246e291cdd9394a1ba630
   virtual_path: manual-skills
   is_virtual: true
   package_type: apm_package
@@ -296,10 +328,11 @@ dependencies:
   - .config/opencode/skills/react-doctor
   - .copilot/skills/react-doctor
   - .cursor/skills/react-doctor
+  - .gemini/skills/react-doctor
   content_hash: sha256:b8f396bd6db7404a899af03e649f2cf12f4c846ee7d85b6b9a475cb8175abb49
 - repo_url: mizchi/skills
   host: github.com
-  resolved_commit: a2b5a796a5f22fc05fb515cef106993b84cf08cc
+  resolved_commit: a0ebf680f62836f64d7e9b741ee212f55b108f88
   virtual_path: empirical-prompt-tuning
   is_virtual: true
   package_type: claude_skill
@@ -308,7 +341,8 @@ dependencies:
   - .config/opencode/skills/empirical-prompt-tuning
   - .copilot/skills/empirical-prompt-tuning
   - .cursor/skills/empirical-prompt-tuning
-  content_hash: sha256:18bcf9be6245f765cbb6c51ba4d988991a647139c1513094d6c116c15f7ed058
+  - .gemini/skills/empirical-prompt-tuning
+  content_hash: sha256:9c64f10bca463d3ea059d1659d4dd9fddfd90239825c44f1be20c18a2e15b69a
 - repo_url: nyosegawa/skills
   host: github.com
   resolved_commit: c1048fe35403a3f273132306a4d49278f189c64b
@@ -320,6 +354,7 @@ dependencies:
   - .config/opencode/skills/skill-auditor
   - .copilot/skills/skill-auditor
   - .cursor/skills/skill-auditor
+  - .gemini/skills/skill-auditor
   content_hash: sha256:65a6f52fd391671fe6f334130290fd9c6787d2daeb22cdff55fa727977876e04
 - repo_url: obra/superpowers
   host: github.com
@@ -332,6 +367,7 @@ dependencies:
   - .config/opencode/skills/brainstorming
   - .copilot/skills/brainstorming
   - .cursor/skills/brainstorming
+  - .gemini/skills/brainstorming
   content_hash: sha256:1518efecf35139a9a5b9e60906b71de874af08322200fab18a54848cea8c15fe
 - repo_url: obra/superpowers
   host: github.com
@@ -344,6 +380,7 @@ dependencies:
   - .config/opencode/skills/dispatching-parallel-agents
   - .copilot/skills/dispatching-parallel-agents
   - .cursor/skills/dispatching-parallel-agents
+  - .gemini/skills/dispatching-parallel-agents
   content_hash: sha256:e21044ae7496fc285f1df9ff3fb518a3a20bea6f5216c1f59f4987e12c769a0a
 - repo_url: obra/superpowers
   host: github.com
@@ -356,6 +393,7 @@ dependencies:
   - .config/opencode/skills/executing-plans
   - .copilot/skills/executing-plans
   - .cursor/skills/executing-plans
+  - .gemini/skills/executing-plans
   content_hash: sha256:2f709d1a2c7564f8ce6a9bb707e7f5451117ba80f8e8e2302662c29bc61246a6
 - repo_url: obra/superpowers
   host: github.com
@@ -368,6 +406,7 @@ dependencies:
   - .config/opencode/skills/finishing-a-development-branch
   - .copilot/skills/finishing-a-development-branch
   - .cursor/skills/finishing-a-development-branch
+  - .gemini/skills/finishing-a-development-branch
   content_hash: sha256:9edba9a38684c060fdc38290f640e1dc0c37de286723ac9be73bacacf7cd6f3d
 - repo_url: obra/superpowers
   host: github.com
@@ -380,6 +419,7 @@ dependencies:
   - .config/opencode/skills/receiving-code-review
   - .copilot/skills/receiving-code-review
   - .cursor/skills/receiving-code-review
+  - .gemini/skills/receiving-code-review
   content_hash: sha256:2760c85d4f4117b0006e7ba755f4bbd61f8f4c185f347999763c97f507274e30
 - repo_url: obra/superpowers
   host: github.com
@@ -392,6 +432,7 @@ dependencies:
   - .config/opencode/skills/requesting-code-review
   - .copilot/skills/requesting-code-review
   - .cursor/skills/requesting-code-review
+  - .gemini/skills/requesting-code-review
   content_hash: sha256:046180bd8519589b176d575e32a720c43cf6834f2e4d182277faf8943fe03564
 - repo_url: obra/superpowers
   host: github.com
@@ -404,6 +445,7 @@ dependencies:
   - .config/opencode/skills/subagent-driven-development
   - .copilot/skills/subagent-driven-development
   - .cursor/skills/subagent-driven-development
+  - .gemini/skills/subagent-driven-development
   content_hash: sha256:96697eb8dde8631ee7cd5e1cb29c6d7c0b8ef2869c0875dd2eedf07762e5feae
 - repo_url: obra/superpowers
   host: github.com
@@ -416,6 +458,7 @@ dependencies:
   - .config/opencode/skills/systematic-debugging
   - .copilot/skills/systematic-debugging
   - .cursor/skills/systematic-debugging
+  - .gemini/skills/systematic-debugging
   content_hash: sha256:6fddb1f3952f65f1f3a2ef267ae4ab6919ff70a8b36672ea908640ae21a34ea0
 - repo_url: obra/superpowers
   host: github.com
@@ -428,6 +471,7 @@ dependencies:
   - .config/opencode/skills/test-driven-development
   - .copilot/skills/test-driven-development
   - .cursor/skills/test-driven-development
+  - .gemini/skills/test-driven-development
   content_hash: sha256:126f1ebf6ccd414f42544f6e83d8cc5adb089e1108eaffb7c400701e37eecd9f
 - repo_url: obra/superpowers
   host: github.com
@@ -440,6 +484,7 @@ dependencies:
   - .config/opencode/skills/using-git-worktrees
   - .copilot/skills/using-git-worktrees
   - .cursor/skills/using-git-worktrees
+  - .gemini/skills/using-git-worktrees
   content_hash: sha256:52bbb4b6e80918e83e92a1514f3b3757712154c2a8a42de24919e48a794c54fc
 - repo_url: obra/superpowers
   host: github.com
@@ -452,6 +497,7 @@ dependencies:
   - .config/opencode/skills/using-superpowers
   - .copilot/skills/using-superpowers
   - .cursor/skills/using-superpowers
+  - .gemini/skills/using-superpowers
   content_hash: sha256:8ae2ec915dd4b5e4b758ee8110190fd792e85eb05d670fece942a76603e31cb8
 - repo_url: obra/superpowers
   host: github.com
@@ -464,6 +510,7 @@ dependencies:
   - .config/opencode/skills/verification-before-completion
   - .copilot/skills/verification-before-completion
   - .cursor/skills/verification-before-completion
+  - .gemini/skills/verification-before-completion
   content_hash: sha256:9b446f0c7fe1cfb560b1d34439523b1a76d5f177290007b2c053a1c749a4a8ba
 - repo_url: obra/superpowers
   host: github.com
@@ -476,6 +523,7 @@ dependencies:
   - .config/opencode/skills/writing-plans
   - .copilot/skills/writing-plans
   - .cursor/skills/writing-plans
+  - .gemini/skills/writing-plans
   content_hash: sha256:90185bbb1bd9d4959826104c1c1900424180b8a4011f4432da886df599922788
 - repo_url: obra/superpowers
   host: github.com
@@ -488,6 +536,7 @@ dependencies:
   - .config/opencode/skills/writing-skills
   - .copilot/skills/writing-skills
   - .cursor/skills/writing-skills
+  - .gemini/skills/writing-skills
   content_hash: sha256:272ccd701f41b94e1119aaa99455a52cdb8e07283cb6a6aab32a7722d96bef45
 - repo_url: openai/codex-plugin-cc
   host: github.com
@@ -500,6 +549,7 @@ dependencies:
   - .config/opencode/skills/codex-cli-runtime
   - .copilot/skills/codex-cli-runtime
   - .cursor/skills/codex-cli-runtime
+  - .gemini/skills/codex-cli-runtime
   content_hash: sha256:03b09f8ad5721f1d33d830cff54637656c58920befcb32835c6f003e625a7a54
 - repo_url: openai/codex-plugin-cc
   host: github.com
@@ -512,6 +562,7 @@ dependencies:
   - .config/opencode/skills/codex-result-handling
   - .copilot/skills/codex-result-handling
   - .cursor/skills/codex-result-handling
+  - .gemini/skills/codex-result-handling
   content_hash: sha256:1ca05b8eb3e45816b428dc71e24355a89a8f997502ade309e0c53a06adb1b1e7
 - repo_url: openai/codex-plugin-cc
   host: github.com
@@ -524,6 +575,7 @@ dependencies:
   - .config/opencode/skills/gpt-5-4-prompting
   - .copilot/skills/gpt-5-4-prompting
   - .cursor/skills/gpt-5-4-prompting
+  - .gemini/skills/gpt-5-4-prompting
   content_hash: sha256:8e00d64a5cd9b4477e55c4a7ad0f02328ff1991ea93e2ac1fb7839b3891d3f2d
 - repo_url: openai/skills
   host: github.com
@@ -536,6 +588,7 @@ dependencies:
   - .config/opencode/skills/gh-address-comments
   - .copilot/skills/gh-address-comments
   - .cursor/skills/gh-address-comments
+  - .gemini/skills/gh-address-comments
   content_hash: sha256:068d34fb59cb97a39aea3de1708877b6a01210d02fa7eda5e74fc8277ed52916
 - repo_url: openai/skills
   host: github.com
@@ -548,6 +601,7 @@ dependencies:
   - .config/opencode/skills/gh-fix-ci
   - .copilot/skills/gh-fix-ci
   - .cursor/skills/gh-fix-ci
+  - .gemini/skills/gh-fix-ci
   content_hash: sha256:02b4d97e4bd91e342e3ec3efa06b7871097d6a64e8398f4ed5b69c64d8d902fb
 - repo_url: softaworks/agent-toolkit
   host: github.com
@@ -560,6 +614,7 @@ dependencies:
   - .config/opencode/skills/humanizer
   - .copilot/skills/humanizer
   - .cursor/skills/humanizer
+  - .gemini/skills/humanizer
   content_hash: sha256:34a38e6acc60d4529612d41ffe740bca0060d3c5e89e2a0d24ae795f67157fbb
 - repo_url: tokoroten/prompt-review
   host: github.com
@@ -572,31 +627,8 @@ dependencies:
   - .config/opencode/skills/prompt-review
   - .copilot/skills/prompt-review
   - .cursor/skills/prompt-review
+  - .gemini/skills/prompt-review
   content_hash: sha256:8280504199d448d61d54028fc25f491378172d40e801c356eb9126c37a831a66
-- repo_url: trailofbits/skills
-  host: github.com
-  resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  virtual_path: plugins/audit-context-building/skills/audit-context-building
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/audit-context-building
-  - .config/opencode/skills/audit-context-building
-  - .copilot/skills/audit-context-building
-  - .cursor/skills/audit-context-building
-  content_hash: sha256:a0abaac9302501e02ba868d34d1457a817a6267ae235ef95afa098d3cf03f338
-- repo_url: trailofbits/skills
-  host: github.com
-  resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
-  virtual_path: plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/supply-chain-risk-auditor
-  - .config/opencode/skills/supply-chain-risk-auditor
-  - .copilot/skills/supply-chain-risk-auditor
-  - .cursor/skills/supply-chain-risk-auditor
-  content_hash: sha256:1b986d50308c2fbb2a77d5a10b71747c692ce1b7a8a8718eefc3b4c6e460cb0e
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
@@ -609,7 +641,20 @@ dependencies:
   - .copilot/skills/agentic-actions-auditor
   - .cursor/skills/agentic-actions-auditor
   - .gemini/skills/agentic-actions-auditor
-  content_hash: sha256:c436180b1976ac20c3c9cc340fa2d9e32a89b48d449a0db3f3ca519f3dac3d96
+  content_hash: sha256:2d541ed8c7fd6167c9b69fdb5192c26eb9da466b4cf873d7642b9f2365f64734
+- repo_url: trailofbits/skills
+  host: github.com
+  resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
+  virtual_path: plugins/audit-context-building/skills/audit-context-building
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .claude/skills/audit-context-building
+  - .config/opencode/skills/audit-context-building
+  - .copilot/skills/audit-context-building
+  - .cursor/skills/audit-context-building
+  - .gemini/skills/audit-context-building
+  content_hash: sha256:a0abaac9302501e02ba868d34d1457a817a6267ae235ef95afa098d3cf03f338
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
@@ -622,7 +667,7 @@ dependencies:
   - .copilot/skills/sharp-edges
   - .cursor/skills/sharp-edges
   - .gemini/skills/sharp-edges
-  content_hash: sha256:a5e18b724edef5e9839d0d45ca54f54c2c7ead2320ae93a177aabaafd6cc3e00
+  content_hash: sha256:2ff8d63f5e43401001b2714595fb046a1b7792eca74e5cf0d83d24c96e23580e
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
@@ -650,11 +695,24 @@ dependencies:
   - .gemini/skills/sarif-parsing
   - .gemini/skills/semgrep
   deployed_file_hashes:
-    .claude/agents/semgrep-scanner.md: sha256:7cfc591279139489dddcc86133b630dc860c0038680470c08afb6ea1ecde20a3
-    .config/opencode/agents/semgrep-scanner.md: sha256:7cfc591279139489dddcc86133b630dc860c0038680470c08afb6ea1ecde20a3
-    .copilot/agents/semgrep-scanner.agent.md: sha256:7cfc591279139489dddcc86133b630dc860c0038680470c08afb6ea1ecde20a3
-    .cursor/agents/semgrep-scanner.md: sha256:7cfc591279139489dddcc86133b630dc860c0038680470c08afb6ea1ecde20a3
-  content_hash: sha256:7aba4c93d6742995ae0d37fad01fc3fb31d704bba6b1cb364904f09a5cfebec4
+    .claude/agents/semgrep-scanner.md: sha256:26d412799ad8e549ca2fbe1f93536e66f222feb6a0ae78e0a286947ba5e3f416
+    .config/opencode/agents/semgrep-scanner.md: sha256:26d412799ad8e549ca2fbe1f93536e66f222feb6a0ae78e0a286947ba5e3f416
+    .copilot/agents/semgrep-scanner.agent.md: sha256:26d412799ad8e549ca2fbe1f93536e66f222feb6a0ae78e0a286947ba5e3f416
+    .cursor/agents/semgrep-scanner.md: sha256:26d412799ad8e549ca2fbe1f93536e66f222feb6a0ae78e0a286947ba5e3f416
+  content_hash: sha256:a38d608d4ea4aeec94a0f05da0a3b1bcd934534669f8d738a79091616f192a8f
+- repo_url: trailofbits/skills
+  host: github.com
+  resolved_commit: e8cc5baf9329ccb491bfa200e82eacbac83b1ead
+  virtual_path: plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .claude/skills/supply-chain-risk-auditor
+  - .config/opencode/skills/supply-chain-risk-auditor
+  - .copilot/skills/supply-chain-risk-auditor
+  - .cursor/skills/supply-chain-risk-auditor
+  - .gemini/skills/supply-chain-risk-auditor
+  content_hash: sha256:1b986d50308c2fbb2a77d5a10b71747c692ce1b7a8a8718eefc3b4c6e460cb0e
 - repo_url: vercel-labs/agent-browser
   host: github.com
   resolved_commit: 57405f93614fae46e5c955ce662b4785283e1301
@@ -666,6 +724,7 @@ dependencies:
   - .config/opencode/skills/agent-browser
   - .copilot/skills/agent-browser
   - .cursor/skills/agent-browser
+  - .gemini/skills/agent-browser
   content_hash: sha256:6f68d01b14796e410746fab39c2d6b36dcfa030dd59eb772f6418e2db949a16c
 - repo_url: vercel-labs/agent-skills
   host: github.com
@@ -678,6 +737,7 @@ dependencies:
   - .config/opencode/skills/composition-patterns
   - .copilot/skills/composition-patterns
   - .cursor/skills/composition-patterns
+  - .gemini/skills/composition-patterns
   content_hash: sha256:5b3564ca435f4714d5e65023351e1999e4744818603a9cfb6a6f6a61b7d84918
 - repo_url: vercel-labs/agent-skills
   host: github.com
@@ -690,6 +750,7 @@ dependencies:
   - .config/opencode/skills/react-best-practices
   - .copilot/skills/react-best-practices
   - .cursor/skills/react-best-practices
+  - .gemini/skills/react-best-practices
   content_hash: sha256:74f142d28d360d78e8bac4f239a84c87f0ced9015729bc72b5458d82ff45b015
 - repo_url: vercel-labs/agent-skills
   host: github.com
@@ -702,6 +763,7 @@ dependencies:
   - .config/opencode/skills/web-design-guidelines
   - .copilot/skills/web-design-guidelines
   - .cursor/skills/web-design-guidelines
+  - .gemini/skills/web-design-guidelines
   content_hash: sha256:a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a
 - repo_url: vercel-labs/skills
   host: github.com
@@ -714,6 +776,7 @@ dependencies:
   - .config/opencode/skills/find-skills
   - .copilot/skills/find-skills
   - .cursor/skills/find-skills
+  - .gemini/skills/find-skills
   content_hash: sha256:d31e234f0c90694a670222cdd1dafa853e051d7066beda389f1097c22dadd461
 mcp_servers:
 - chrome-devtools
@@ -721,7 +784,6 @@ mcp_servers:
 - mcp-simple-voicevox
 - peekaboo
 - tauri-mcp-server
-- telegram-mcp
 - ultracite
 mcp_configs:
   chrome-devtools:
@@ -767,15 +829,6 @@ mcp_configs:
     - '@hypothesi/tauri-mcp-server'
     registry: false
     command: npx
-  telegram-mcp:
-    name: telegram-mcp
-    transport: stdio
-    args:
-    - --from
-    - git+https://github.com/chigwell/telegram-mcp.git
-    - telegram-mcp
-    registry: false
-    command: uvx
   ultracite:
     name: ultracite
     transport: stdio
