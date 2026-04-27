@@ -707,9 +707,9 @@ cmd_apply() {
 
   build_target_skill_trees "$apply_stage_root"
   sync_managed_catalog_runtime_assets
-  replace_skill_targets_from_stage "$apply_stage_root"
   install_workspace_mcp_dependencies
   compile_codex
+  replace_skill_targets_from_stage "$apply_stage_root"
 
   trap - RETURN
   rm -rf "$apply_stage_root"
@@ -736,7 +736,7 @@ stage_codex_skill_records() {
     deployed_skill_name=$(format_skill_name codex "$source_skill_id")
     staged_skill_path=$(internal_target_skill_path "$stage_skills_root" "$deployed_skill_name")
     mkdir -p "$staged_skill_path"
-    cp -R "$source_path"/. "$staged_skill_path"
+    cp -RL "$source_path"/. "$staged_skill_path"
   done
 }
 
@@ -1392,13 +1392,19 @@ external_package_skills_root() {
   resolved_commit="$3"
   apm_modules_root="$WORKSPACE_DIR/apm_modules"
 
-  [ -n "$virtual_path" ] || return 1
   [ -d "$apm_modules_root" ] || return 1
 
-  candidate_paths=$(printf '%s\n%s\n%s\n' \
-    "$apm_modules_root/$repo_url/$virtual_path" \
-    "$apm_modules_root/$repo_url/$resolved_commit/$virtual_path" \
-    "$apm_modules_root/$resolved_commit/$repo_url/$virtual_path")
+  if [ -n "$virtual_path" ]; then
+    candidate_paths=$(printf '%s\n%s\n%s\n' \
+      "$apm_modules_root/$repo_url/$virtual_path" \
+      "$apm_modules_root/$repo_url/$resolved_commit/$virtual_path" \
+      "$apm_modules_root/$resolved_commit/$repo_url/$virtual_path")
+  else
+    candidate_paths=$(printf '%s\n%s\n%s\n' \
+      "$apm_modules_root/$repo_url" \
+      "$apm_modules_root/$repo_url/$resolved_commit" \
+      "$apm_modules_root/$resolved_commit/$repo_url")
+  fi
 
   found_root=""
   while IFS= read -r candidate_path; do
@@ -1415,6 +1421,21 @@ EOF
 
   [ -n "$found_root" ] || return 1
   printf '%s\n' "$found_root"
+}
+
+external_package_skill_source_path() {
+  package_skills_root="$1"
+  skill_id="$2"
+  relative_skill_path=$(skill_id_to_manifest_path "$skill_id")
+  package_root=${package_skills_root%/.apm/skills}
+  claude_skill_path="$package_root/.claude/skills/$relative_skill_path"
+
+  if [ -f "$claude_skill_path/SKILL.md" ]; then
+    printf '%s\n' "$claude_skill_path"
+    return 0
+  fi
+
+  printf '%s\n' "$package_skills_root/$relative_skill_path"
 }
 
 collect_personal_skill_records() {
@@ -1466,7 +1487,7 @@ collect_external_skill_records() {
     if [ -n "$package_skills_root" ]; then
       skill_ids_from_root "$package_skills_root" | while IFS= read -r source_skill_id; do
         [ -n "$source_skill_id" ] || continue
-        source_path="$package_skills_root/$(skill_id_to_manifest_path "$source_skill_id")"
+        source_path=$(external_package_skill_source_path "$package_skills_root" "$source_skill_id")
         printf 'external\t%s\t%s\t%s#%s\n' "$source_skill_id" "$source_path" "$canonical_ref" "$source_skill_id"
       done
       continue
@@ -1615,8 +1636,9 @@ stage_target_skill_records() {
     [ -n "$target_name" ] || continue
     stage_skills_root="$stage_root/$target_name/skills"
     staged_skill_path=$(internal_target_skill_path "$stage_skills_root" "$deployed_skill_name")
+    rm -rf "$staged_skill_path"
     mkdir -p "$staged_skill_path"
-    cp -R "$source_path"/. "$staged_skill_path"
+    cp -RL "$source_path"/. "$staged_skill_path"
   done
 }
 

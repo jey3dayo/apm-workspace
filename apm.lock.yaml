@@ -1,6 +1,6 @@
 lockfile_version: '1'
-generated_at: '2026-04-27T03:41:31.078211+00:00'
-apm_version: 0.9.3
+generated_at: '2026-04-27T11:44:23.169007+00:00'
+apm_version: 0.9.4
 dependencies:
 - repo_url: EpicenterHQ/epicenter
   host: github.com
@@ -299,24 +299,292 @@ dependencies:
   content_hash: sha256:99aaea521aa0f1c7d041d70bb6b75581c1a50ec6ac59ceaaa923b6339ffa417b
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: 496f1c19d01e142656b246e291cdd9394a1ba630
+  resolved_commit: 71379376eced9674c036ff0550329b987d44a9cb
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
-  package_type: apm_package
-  content_hash: sha256:1cea920e677d2e32df71a806509a3da85e29969714a9cf3b186c68d5e1b3bd24
-- repo_url: jey3dayo/apm-workspace
-  host: github.com
-  resolved_commit: 496f1c19d01e142656b246e291cdd9394a1ba630
-  virtual_path: manual-skills
-  is_virtual: true
-  package_type: apm_package
+  package_type: skill_bundle
   deployed_files:
-  - .claude/skills/ui-ux-pro-max
-  - .config/opencode/skills/ui-ux-pro-max
-  - .cursor/skills/ui-ux-pro-max
-  - .gemini/skills/ui-ux-pro-max
-  content_hash: sha256:001dfaaa7785379b2f376ad3aedc4738ca6aa1c2fbe653dabb2276aedc0d7081
+  - .claude/skills/agent-creator
+  - .claude/skills/apm-usage
+  - .claude/skills/atomic-commit
+  - .claude/skills/chrome-debug
+  - .claude/skills/claude-system
+  - .claude/skills/code-quality-improvement
+  - .claude/skills/code-review
+  - .claude/skills/codex-code-review
+  - .claude/skills/codex-plan-review
+  - .claude/skills/codex-system
+  - .claude/skills/command-creator
+  - .claude/skills/design-md-workflow
+  - .claude/skills/distributions-manager
+  - .claude/skills/docs-index
+  - .claude/skills/docs-manager
+  - .claude/skills/documentation-management
+  - .claude/skills/dotfiles-integration
+  - .claude/skills/drawio
+  - .claude/skills/gemini-system
+  - .claude/skills/generate-svg
+  - .claude/skills/gh-create-pr
+  - .claude/skills/git-automation
+  - .claude/skills/git-worktree
+  - .claude/skills/golang
+  - .claude/skills/greptileai
+  - .claude/skills/implementation-engine
+  - .claude/skills/integration-framework
+  - .claude/skills/knowledge-creator
+  - .claude/skills/learnings-knowledge
+  - .claude/skills/linear-task-ops
+  - .claude/skills/mcp-tools
+  - .claude/skills/mise
+  - .claude/skills/nix-dotfiles
+  - .claude/skills/nvim
+  - .claude/skills/polish
+  - .claude/skills/pr-feedback-orchestrator
+  - .claude/skills/predictive-analysis
+  - .claude/skills/premortem
+  - .claude/skills/project-maintenance
+  - .claude/skills/react
+  - .claude/skills/react-grid-layout
+  - .claude/skills/refactoring
+  - .claude/skills/rtk
+  - .claude/skills/rules-creator
+  - .claude/skills/similarity
+  - .claude/skills/skill-creator
+  - .claude/skills/slide-docs
+  - .claude/skills/task-router
+  - .claude/skills/task-to-pr
+  - .claude/skills/tauri-dev-screenshot
+  - .claude/skills/tauri-icon-gen
+  - .claude/skills/tauri-webview-geometry
+  - .claude/skills/tsr
+  - .claude/skills/typescript
+  - .claude/skills/wezterm
+  - .claude/skills/zsh
+  - .config/opencode/skills/agent-creator
+  - .config/opencode/skills/apm-usage
+  - .config/opencode/skills/atomic-commit
+  - .config/opencode/skills/chrome-debug
+  - .config/opencode/skills/claude-system
+  - .config/opencode/skills/code-quality-improvement
+  - .config/opencode/skills/code-review
+  - .config/opencode/skills/codex-code-review
+  - .config/opencode/skills/codex-plan-review
+  - .config/opencode/skills/codex-system
+  - .config/opencode/skills/command-creator
+  - .config/opencode/skills/design-md-workflow
+  - .config/opencode/skills/distributions-manager
+  - .config/opencode/skills/docs-index
+  - .config/opencode/skills/docs-manager
+  - .config/opencode/skills/documentation-management
+  - .config/opencode/skills/dotfiles-integration
+  - .config/opencode/skills/drawio
+  - .config/opencode/skills/gemini-system
+  - .config/opencode/skills/generate-svg
+  - .config/opencode/skills/gh-create-pr
+  - .config/opencode/skills/git-automation
+  - .config/opencode/skills/git-worktree
+  - .config/opencode/skills/golang
+  - .config/opencode/skills/greptileai
+  - .config/opencode/skills/implementation-engine
+  - .config/opencode/skills/integration-framework
+  - .config/opencode/skills/knowledge-creator
+  - .config/opencode/skills/learnings-knowledge
+  - .config/opencode/skills/linear-task-ops
+  - .config/opencode/skills/mcp-tools
+  - .config/opencode/skills/mise
+  - .config/opencode/skills/nix-dotfiles
+  - .config/opencode/skills/nvim
+  - .config/opencode/skills/polish
+  - .config/opencode/skills/pr-feedback-orchestrator
+  - .config/opencode/skills/predictive-analysis
+  - .config/opencode/skills/premortem
+  - .config/opencode/skills/project-maintenance
+  - .config/opencode/skills/react
+  - .config/opencode/skills/react-grid-layout
+  - .config/opencode/skills/refactoring
+  - .config/opencode/skills/rtk
+  - .config/opencode/skills/rules-creator
+  - .config/opencode/skills/similarity
+  - .config/opencode/skills/skill-creator
+  - .config/opencode/skills/slide-docs
+  - .config/opencode/skills/task-router
+  - .config/opencode/skills/task-to-pr
+  - .config/opencode/skills/tauri-dev-screenshot
+  - .config/opencode/skills/tauri-icon-gen
+  - .config/opencode/skills/tauri-webview-geometry
+  - .config/opencode/skills/tsr
+  - .config/opencode/skills/typescript
+  - .config/opencode/skills/wezterm
+  - .config/opencode/skills/zsh
+  - .copilot/skills/agent-creator
+  - .copilot/skills/apm-usage
+  - .copilot/skills/atomic-commit
+  - .copilot/skills/chrome-debug
+  - .copilot/skills/claude-system
+  - .copilot/skills/code-quality-improvement
+  - .copilot/skills/code-review
+  - .copilot/skills/codex-code-review
+  - .copilot/skills/codex-plan-review
+  - .copilot/skills/codex-system
+  - .copilot/skills/command-creator
+  - .copilot/skills/design-md-workflow
+  - .copilot/skills/distributions-manager
+  - .copilot/skills/docs-index
+  - .copilot/skills/docs-manager
+  - .copilot/skills/documentation-management
+  - .copilot/skills/dotfiles-integration
+  - .copilot/skills/drawio
+  - .copilot/skills/gemini-system
+  - .copilot/skills/generate-svg
+  - .copilot/skills/gh-create-pr
+  - .copilot/skills/git-automation
+  - .copilot/skills/git-worktree
+  - .copilot/skills/golang
+  - .copilot/skills/greptileai
+  - .copilot/skills/implementation-engine
+  - .copilot/skills/integration-framework
+  - .copilot/skills/knowledge-creator
+  - .copilot/skills/learnings-knowledge
+  - .copilot/skills/linear-task-ops
+  - .copilot/skills/mcp-tools
+  - .copilot/skills/mise
+  - .copilot/skills/nix-dotfiles
+  - .copilot/skills/nvim
+  - .copilot/skills/polish
+  - .copilot/skills/pr-feedback-orchestrator
+  - .copilot/skills/predictive-analysis
+  - .copilot/skills/premortem
+  - .copilot/skills/project-maintenance
+  - .copilot/skills/react
+  - .copilot/skills/react-grid-layout
+  - .copilot/skills/refactoring
+  - .copilot/skills/rtk
+  - .copilot/skills/rules-creator
+  - .copilot/skills/similarity
+  - .copilot/skills/slide-docs
+  - .copilot/skills/task-router
+  - .copilot/skills/task-to-pr
+  - .copilot/skills/tauri-dev-screenshot
+  - .copilot/skills/tauri-icon-gen
+  - .copilot/skills/tauri-webview-geometry
+  - .copilot/skills/tsr
+  - .copilot/skills/typescript
+  - .copilot/skills/wezterm
+  - .copilot/skills/zsh
+  - .cursor/skills/agent-creator
+  - .cursor/skills/apm-usage
+  - .cursor/skills/atomic-commit
+  - .cursor/skills/chrome-debug
+  - .cursor/skills/claude-system
+  - .cursor/skills/code-quality-improvement
+  - .cursor/skills/code-review
+  - .cursor/skills/codex-code-review
+  - .cursor/skills/codex-plan-review
+  - .cursor/skills/codex-system
+  - .cursor/skills/command-creator
+  - .cursor/skills/design-md-workflow
+  - .cursor/skills/distributions-manager
+  - .cursor/skills/docs-index
+  - .cursor/skills/docs-manager
+  - .cursor/skills/documentation-management
+  - .cursor/skills/dotfiles-integration
+  - .cursor/skills/drawio
+  - .cursor/skills/gemini-system
+  - .cursor/skills/generate-svg
+  - .cursor/skills/gh-create-pr
+  - .cursor/skills/git-automation
+  - .cursor/skills/git-worktree
+  - .cursor/skills/golang
+  - .cursor/skills/greptileai
+  - .cursor/skills/implementation-engine
+  - .cursor/skills/integration-framework
+  - .cursor/skills/knowledge-creator
+  - .cursor/skills/learnings-knowledge
+  - .cursor/skills/linear-task-ops
+  - .cursor/skills/mcp-tools
+  - .cursor/skills/mise
+  - .cursor/skills/nix-dotfiles
+  - .cursor/skills/nvim
+  - .cursor/skills/polish
+  - .cursor/skills/pr-feedback-orchestrator
+  - .cursor/skills/predictive-analysis
+  - .cursor/skills/premortem
+  - .cursor/skills/project-maintenance
+  - .cursor/skills/react
+  - .cursor/skills/react-grid-layout
+  - .cursor/skills/refactoring
+  - .cursor/skills/rtk
+  - .cursor/skills/rules-creator
+  - .cursor/skills/similarity
+  - .cursor/skills/skill-creator
+  - .cursor/skills/slide-docs
+  - .cursor/skills/task-router
+  - .cursor/skills/task-to-pr
+  - .cursor/skills/tauri-dev-screenshot
+  - .cursor/skills/tauri-icon-gen
+  - .cursor/skills/tauri-webview-geometry
+  - .cursor/skills/tsr
+  - .cursor/skills/typescript
+  - .cursor/skills/wezterm
+  - .cursor/skills/zsh
+  - .gemini/skills/agent-creator
+  - .gemini/skills/apm-usage
+  - .gemini/skills/atomic-commit
+  - .gemini/skills/chrome-debug
+  - .gemini/skills/claude-system
+  - .gemini/skills/code-quality-improvement
+  - .gemini/skills/code-review
+  - .gemini/skills/codex-code-review
+  - .gemini/skills/codex-plan-review
+  - .gemini/skills/codex-system
+  - .gemini/skills/command-creator
+  - .gemini/skills/design-md-workflow
+  - .gemini/skills/distributions-manager
+  - .gemini/skills/docs-index
+  - .gemini/skills/docs-manager
+  - .gemini/skills/documentation-management
+  - .gemini/skills/dotfiles-integration
+  - .gemini/skills/drawio
+  - .gemini/skills/gemini-system
+  - .gemini/skills/generate-svg
+  - .gemini/skills/gh-create-pr
+  - .gemini/skills/git-automation
+  - .gemini/skills/git-worktree
+  - .gemini/skills/golang
+  - .gemini/skills/greptileai
+  - .gemini/skills/implementation-engine
+  - .gemini/skills/integration-framework
+  - .gemini/skills/knowledge-creator
+  - .gemini/skills/learnings-knowledge
+  - .gemini/skills/linear-task-ops
+  - .gemini/skills/mcp-tools
+  - .gemini/skills/mise
+  - .gemini/skills/nix-dotfiles
+  - .gemini/skills/nvim
+  - .gemini/skills/polish
+  - .gemini/skills/pr-feedback-orchestrator
+  - .gemini/skills/predictive-analysis
+  - .gemini/skills/premortem
+  - .gemini/skills/project-maintenance
+  - .gemini/skills/react
+  - .gemini/skills/react-grid-layout
+  - .gemini/skills/refactoring
+  - .gemini/skills/rtk
+  - .gemini/skills/rules-creator
+  - .gemini/skills/similarity
+  - .gemini/skills/skill-creator
+  - .gemini/skills/slide-docs
+  - .gemini/skills/task-router
+  - .gemini/skills/task-to-pr
+  - .gemini/skills/tauri-dev-screenshot
+  - .gemini/skills/tauri-icon-gen
+  - .gemini/skills/tauri-webview-geometry
+  - .gemini/skills/tsr
+  - .gemini/skills/typescript
+  - .gemini/skills/wezterm
+  - .gemini/skills/zsh
+  content_hash: sha256:7ce805958cf1cc4c4dfd71efd845ddec31141f6d5297dd8169e38a6e928ac0ae
 - repo_url: millionco/react-doctor
   host: github.com
   resolved_commit: 7da4ce4e27cb5208ed52ad9d01cae32f96ac177f
@@ -343,6 +611,17 @@ dependencies:
   - .cursor/skills/empirical-prompt-tuning
   - .gemini/skills/empirical-prompt-tuning
   content_hash: sha256:9c64f10bca463d3ea059d1659d4dd9fddfd90239825c44f1be20c18a2e15b69a
+- repo_url: nextlevelbuilder/ui-ux-pro-max-skill
+  host: github.com
+  resolved_commit: b7e3af80f6e331f6fb456667b82b12cade7c9d35
+  package_type: marketplace_plugin
+  deployed_files:
+  - .claude/skills/ui-ux-pro-max
+  - .config/opencode/skills/ui-ux-pro-max
+  - .copilot/skills/ui-ux-pro-max
+  - .cursor/skills/ui-ux-pro-max
+  - .gemini/skills/ui-ux-pro-max
+  content_hash: sha256:f967740cfa8aced3860967f06558f8b3df7d843b325b104284201d7e645d17d4
 - repo_url: nyosegawa/skills
   host: github.com
   resolved_commit: c1048fe35403a3f273132306a4d49278f189c64b
@@ -784,6 +1063,7 @@ mcp_servers:
 - mcp-simple-voicevox
 - peekaboo
 - tauri-mcp-server
+- telegram-mcp
 - ultracite
 mcp_configs:
   chrome-devtools:
@@ -829,6 +1109,15 @@ mcp_configs:
     - '@hypothesi/tauri-mcp-server'
     registry: false
     command: npx
+  telegram-mcp:
+    name: telegram-mcp
+    transport: stdio
+    args:
+    - --from
+    - git+https://github.com/chigwell/telegram-mcp.git
+    - telegram-mcp
+    registry: false
+    command: uvx
   ultracite:
     name: ultracite
     transport: stdio

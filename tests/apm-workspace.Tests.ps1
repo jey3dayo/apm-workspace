@@ -311,6 +311,103 @@ dependencies:
     }
   }
 
+  It "expands repo-root package skills into copied skills" {
+    $previousWorkspaceDir = $script:WorkspaceDir
+    $previousGlobalWorkspaceDir = $global:WorkspaceDir
+    $workspaceDir = Join-Path $TestDrive "workspace-root-package-skills"
+    $script:WorkspaceDir = $workspaceDir
+    $WorkspaceDir = $workspaceDir
+    $global:WorkspaceDir = $workspaceDir
+    New-Item -ItemType Directory -Path $workspaceDir -Force | Out-Null
+
+    @"
+name: apm-workspace
+version: 1.0.0
+description: test
+author: test
+dependencies:
+  apm:
+    - nextlevelbuilder/ui-ux-pro-max-skill
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+    @"
+lockfile_version: "1"
+dependencies:
+  - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
+    host: github.com
+    resolved_commit: 4444444444444444
+    package_type: marketplace_plugin
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
+
+    $skillsRoot = Join-Path (Join-Path (Join-Path $script:WorkspaceDir "apm_modules") "nextlevelbuilder") "ui-ux-pro-max-skill"
+    $skillsRoot = Join-Path $skillsRoot ".apm/skills"
+    New-Item -ItemType Directory -Path (Join-Path $skillsRoot "ui-ux-pro-max") -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $skillsRoot "ui-ux-pro-max/SKILL.md") -Value "# ui-ux-pro-max"
+
+    try {
+      $records = @(Get-ExternalSkillRecords)
+
+      $records.Count | Should -Be 1
+      $records[0].SourceSkillId | Should -Be "ui-ux-pro-max"
+      $records[0].CanonicalReference | Should -Be "nextlevelbuilder/ui-ux-pro-max-skill#ui-ux-pro-max"
+    }
+    finally {
+      $script:WorkspaceDir = $previousWorkspaceDir
+      $global:WorkspaceDir = $previousGlobalWorkspaceDir
+    }
+  }
+
+  It "prefers repo-root claude skills when a package also has apm skills" {
+    $previousWorkspaceDir = $script:WorkspaceDir
+    $previousGlobalWorkspaceDir = $global:WorkspaceDir
+    $workspaceDir = Join-Path $TestDrive "workspace-root-package-claude-skills"
+    $script:WorkspaceDir = $workspaceDir
+    $WorkspaceDir = $workspaceDir
+    $global:WorkspaceDir = $workspaceDir
+    New-Item -ItemType Directory -Path $workspaceDir -Force | Out-Null
+
+    @"
+name: apm-workspace
+version: 1.0.0
+description: test
+author: test
+dependencies:
+  apm:
+    - nextlevelbuilder/ui-ux-pro-max-skill
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+    @"
+lockfile_version: "1"
+dependencies:
+  - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
+    host: github.com
+    resolved_commit: 4444444444444444
+    package_type: marketplace_plugin
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
+
+    $packageRoot = Join-Path (Join-Path (Join-Path $script:WorkspaceDir "apm_modules") "nextlevelbuilder") "ui-ux-pro-max-skill"
+    $apmSkillRoot = Join-Path $packageRoot ".apm/skills/ui-ux-pro-max"
+    $claudeSkillRoot = Join-Path $packageRoot ".claude/skills/ui-ux-pro-max"
+    New-Item -ItemType Directory -Path $apmSkillRoot -Force | Out-Null
+    New-Item -ItemType Directory -Path $claudeSkillRoot -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $apmSkillRoot "SKILL.md") -Value "# thin ui-ux-pro-max"
+    Set-Content -LiteralPath (Join-Path $claudeSkillRoot "SKILL.md") -Value "# full ui-ux-pro-max"
+
+    try {
+      $records = @(Get-ExternalSkillRecords)
+
+      $records.Count | Should -Be 1
+      $records[0].SourceSkillId | Should -Be "ui-ux-pro-max"
+      $records[0].SourcePath | Should -Be $claudeSkillRoot
+    }
+    finally {
+      $script:WorkspaceDir = $previousWorkspaceDir
+      $global:WorkspaceDir = $previousGlobalWorkspaceDir
+    }
+  }
+
   It "reads only top-level lock dependency records" {
     @"
 lockfile_version: "1"
@@ -512,7 +609,7 @@ Describe "public command surface" {
     $shellScript = Get-Content -LiteralPath (Join-Path $workspaceRoot "scripts/apm-workspace.sh") -Raw
 
     $shellScript | Should -Match '(?s)install_workspace_mcp_dependencies\(\)\s*\{\s*run_workspace_install_command -g --only mcp\s*\}'
-    $shellScript | Should -Match '(?s)cmd_apply\(\)\s*\{.*?replace_skill_targets_from_stage "\$apply_stage_root".*?install_workspace_mcp_dependencies.*?compile_codex'
+    $shellScript | Should -Match '(?s)cmd_apply\(\)\s*\{.*?install_workspace_mcp_dependencies.*?compile_codex.*?replace_skill_targets_from_stage "\$apply_stage_root"'
   }
 
   It "rejects local package refs before PowerShell update deploys" {

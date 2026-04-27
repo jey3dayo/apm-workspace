@@ -219,7 +219,15 @@ function Copy-DirectoryContents {
 
   New-Item -ItemType Directory -Path $DestinationDir -Force | Out-Null
   foreach ($entry in Get-ChildItem -LiteralPath $SourceDir -Force) {
-    Copy-Item -LiteralPath $entry.FullName -Destination $DestinationDir -Recurse -Force
+    $sourcePath = $entry.FullName
+    $destinationPath = Join-Path $DestinationDir $entry.Name
+    if ($null -ne $entry.LinkType -and $entry.LinkType -eq "SymbolicLink") {
+      $sourcePath = (Resolve-Path -LiteralPath $entry.FullName).Path
+    }
+    if (Test-Path -LiteralPath $destinationPath) {
+      Remove-Item -LiteralPath $destinationPath -Recurse -Force
+    }
+    Copy-Item -LiteralPath $sourcePath -Destination $destinationPath -Recurse -Force
   }
 }
 
@@ -926,17 +934,13 @@ function Get-ExternalPackageSkillsRoot {
     [string]$ResolvedCommit
   )
 
-  if ([string]::IsNullOrWhiteSpace($VirtualPath)) {
-    return $null
-  }
-
   $apmModulesRoot = Get-ApmModulesRoot
   if (-not (Test-Path -LiteralPath $apmModulesRoot)) {
     return $null
   }
 
   $repoSegments = @(Convert-ReferencePathToSegments -Value $RepoUrl)
-  $virtualSegments = @(Convert-ReferencePathToSegments -Value $VirtualPath)
+  $virtualSegments = if ([string]::IsNullOrWhiteSpace($VirtualPath)) { @() } else { @(Convert-ReferencePathToSegments -Value $VirtualPath) }
   $candidatePaths = New-Object System.Collections.Generic.List[string]
   $seenCandidates = New-Object 'System.Collections.Generic.HashSet[string]'
 
@@ -956,10 +960,18 @@ function Get-ExternalPackageSkillsRoot {
     }
   }
 
-  Add-ExternalPackageCandidatePath -Segments @($repoSegments + $virtualSegments)
-  if (-not [string]::IsNullOrWhiteSpace($ResolvedCommit)) {
-    Add-ExternalPackageCandidatePath -Segments @($repoSegments + @($ResolvedCommit) + $virtualSegments)
-    Add-ExternalPackageCandidatePath -Segments @(@($ResolvedCommit) + $repoSegments + $virtualSegments)
+  if ($virtualSegments.Count -gt 0) {
+    Add-ExternalPackageCandidatePath -Segments @($repoSegments + $virtualSegments)
+    if (-not [string]::IsNullOrWhiteSpace($ResolvedCommit)) {
+      Add-ExternalPackageCandidatePath -Segments @($repoSegments + @($ResolvedCommit) + $virtualSegments)
+      Add-ExternalPackageCandidatePath -Segments @(@($ResolvedCommit) + $repoSegments + $virtualSegments)
+    }
+  } else {
+    Add-ExternalPackageCandidatePath -Segments $repoSegments
+    if (-not [string]::IsNullOrWhiteSpace($ResolvedCommit)) {
+      Add-ExternalPackageCandidatePath -Segments @($repoSegments + @($ResolvedCommit))
+      Add-ExternalPackageCandidatePath -Segments @(@($ResolvedCommit) + $repoSegments)
+    }
   }
 
   $foundPath = $null
@@ -977,6 +989,26 @@ function Get-ExternalPackageSkillsRoot {
   }
 
   return $foundPath
+}
+
+function Get-ExternalPackageSkillSourcePath {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$PackageSkillsRoot,
+
+    [Parameter(Mandatory = $true)]
+    [string]$SkillId
+  )
+
+  $relativeSkillPath = (Convert-SkillIdToPathSegments -SkillId $SkillId) -join [System.IO.Path]::DirectorySeparatorChar
+  $packageRoot = Split-Path -Parent (Split-Path -Parent $PackageSkillsRoot)
+  $claudeSkillPath = Join-Path $packageRoot ".claude/skills/$relativeSkillPath"
+
+  if (Test-Path -LiteralPath (Join-Path $claudeSkillPath "SKILL.md") -PathType Leaf) {
+    return $claudeSkillPath
+  }
+
+  return (Join-Path $PackageSkillsRoot $relativeSkillPath)
 }
 
 function Get-ExternalSkillId {
@@ -1052,10 +1084,7 @@ function Get-ExternalSkillRecords {
     $packageSkillsRoot = Get-ExternalPackageSkillsRoot -RepoUrl $record.Repo -VirtualPath $record.Path -ResolvedCommit $record.Commit
     if ($null -ne $packageSkillsRoot) {
       foreach ($skillId in (Get-SkillIdsFromRoot -SkillsRoot $packageSkillsRoot)) {
-        $sourcePath = $packageSkillsRoot
-        foreach ($segment in (Convert-SkillIdToPathSegments -SkillId $skillId)) {
-          $sourcePath = Join-Path $sourcePath $segment
-        }
+        $sourcePath = Get-ExternalPackageSkillSourcePath -PackageSkillsRoot $packageSkillsRoot -SkillId $skillId
 
         $result.Add([pscustomobject]@{
             SourceKind = "external"
@@ -1200,6 +1229,9 @@ function Stage-TargetSkillRecords {
   $planEntries = @(Build-DeploymentPlanEntries -SkillRecords $SkillRecords -Targets $Targets)
   foreach ($entry in $planEntries) {
     $destinationPath = Get-StagedSkillDestinationPath -StageRoot $StageRoot -TargetName $entry.Target -DeployedSkillName $entry.DeployedSkillName
+    if (Test-Path -LiteralPath $destinationPath) {
+      Remove-Item -LiteralPath $destinationPath -Recurse -Force
+    }
     Copy-DirectoryContents -SourceDir $entry.SourcePath -DestinationDir $destinationPath
   }
 
@@ -1325,8 +1357,8 @@ function Invoke-Apply {
   try {
     $null = Build-TargetSkillTrees -StageRoot $stageDir
     Sync-ManagedCatalogRuntimeAssets
-    Replace-SkillTargetsFromStage -StageRoot $stageDir
     Install-WorkspaceMcpDependencies
+    Replace-SkillTargetsFromStage -StageRoot $stageDir
   }
   finally {
     if (Test-Path -LiteralPath $stageDir) {
