@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-04-27T11:44:23.169007+00:00'
+generated_at: '2026-04-28T07:22:26.634359+00:00'
 apm_version: 0.9.4
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -134,7 +134,7 @@ dependencies:
   content_hash: sha256:d50d11bbefdc1599d78900828dcb69d48e5091769d3f5ce10e06a60efe2405bf
 - repo_url: anthropics/claude-code
   host: github.com
-  resolved_commit: 7e936457e4e3899460b2be2f2b9b9f0b0174e859
+  resolved_commit: 158620419486e3d2d696351d5a71fbd6b8f58653
   virtual_path: plugins/frontend-design/skills/frontend-design
   is_virtual: true
   package_type: claude_skill
@@ -186,7 +186,7 @@ dependencies:
   content_hash: sha256:405cf94e4df9b048ab42e51f26ad971dc6b986167b74eb46393abd6f1f5b5f88
 - repo_url: browser-use/browser-harness
   host: github.com
-  resolved_commit: 142e4265683b67c5c0eb0de72d6d21667207fa59
+  resolved_commit: a5c973f3339e023e5373bed76c33623d848244c6
   package_type: claude_skill
   deployed_files:
   - .claude/skills/browser-harness
@@ -194,10 +194,49 @@ dependencies:
   - .copilot/skills/browser-harness
   - .cursor/skills/browser-harness
   - .gemini/skills/browser-harness
-  content_hash: sha256:aa3ebf6da59bb5e75f1485c3d97aab33d372e815d684834ec902b614a1cd33ad
+  content_hash: sha256:05fef24dbcbab2f26f0708c08d545a2ae67673d1644975ee78c287f63164c094
+- repo_url: caad-develop/claude-code-marketplace
+  host: github.com
+  resolved_commit: 2db6a01c3128061bb412c1429aa2386ac1a0c507
+  virtual_path: plugins/infra/ca-pass
+  is_virtual: true
+  package_type: marketplace_plugin
+  deployed_files:
+  - .claude/skills/ca-pass
+  - .config/opencode/skills/ca-pass
+  - .copilot/skills/ca-pass
+  - .cursor/skills/ca-pass
+  - .gemini/skills/ca-pass
+  content_hash: sha256:51221f2fbcb7a85aa77e66c5f5a3d1d748b3b8f626d861a88195e66aa2fd0c27
+- repo_url: caad-develop/claude-code-marketplace
+  host: github.com
+  resolved_commit: 2db6a01c3128061bb412c1429aa2386ac1a0c507
+  virtual_path: plugins/infra/mdb
+  is_virtual: true
+  package_type: marketplace_plugin
+  deployed_files:
+  - .claude/skills/mdb
+  - .config/opencode/skills/mdb
+  - .copilot/skills/mdb
+  - .cursor/skills/mdb
+  - .gemini/skills/mdb
+  content_hash: sha256:3c7d57154c87020d236168529a418265389098f6d60aaa62c5bde31248e55ac0
+- repo_url: caad-develop/claude-code-marketplace
+  host: github.com
+  resolved_commit: 2db6a01c3128061bb412c1429aa2386ac1a0c507
+  virtual_path: plugins/infra/perman-aws-vault
+  is_virtual: true
+  package_type: marketplace_plugin
+  deployed_files:
+  - .claude/skills/perman-aws-vault
+  - .config/opencode/skills/perman-aws-vault
+  - .copilot/skills/perman-aws-vault
+  - .cursor/skills/perman-aws-vault
+  - .gemini/skills/perman-aws-vault
+  content_hash: sha256:ef78161e2eec3e05d6141cf7a818bab7fdaef8b24205d9e118d2081e3747c9f6
 - repo_url: cloudflare/skills
   host: github.com
-  resolved_commit: 0438a075b419f737eb091d1c91800b7387e3a75f
+  resolved_commit: 7c449def4e0c63daa27212d853094e4c8e37bbe8
   virtual_path: skills/workers-best-practices
   is_virtual: true
   package_type: claude_skill
@@ -210,7 +249,7 @@ dependencies:
   content_hash: sha256:ebd71bed0ade41e2d4839b0d280ec6d93dced0d19f568d27b92da00e4aa9943c
 - repo_url: cloudflare/skills
   host: github.com
-  resolved_commit: 0438a075b419f737eb091d1c91800b7387e3a75f
+  resolved_commit: 7c449def4e0c63daa27212d853094e4c8e37bbe8
   virtual_path: skills/wrangler
   is_virtual: true
   package_type: claude_skill
@@ -299,7 +338,7 @@ dependencies:
   content_hash: sha256:99aaea521aa0f1c7d041d70bb6b75581c1a50ec6ac59ceaaa923b6339ffa417b
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: 71379376eced9674c036ff0550329b987d44a9cb
+  resolved_commit: a30a2c50f04ec3ca689aa21b516a755f6f74a265
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
@@ -858,7 +897,7 @@ dependencies:
   content_hash: sha256:8e00d64a5cd9b4477e55c4a7ad0f02328ff1991ea93e2ac1fb7839b3891d3f2d
 - repo_url: openai/skills
   host: github.com
-  resolved_commit: 724cd511c96593f642bddf13187217aa155d2554
+  resolved_commit: 728a3e9ba7240b7dfdda961b67775ec324fd639a
   virtual_path: skills/.curated/gh-address-comments
   is_virtual: true
   package_type: claude_skill
@@ -871,7 +910,7 @@ dependencies:
   content_hash: sha256:068d34fb59cb97a39aea3de1708877b6a01210d02fa7eda5e74fc8277ed52916
 - repo_url: openai/skills
   host: github.com
-  resolved_commit: 724cd511c96593f642bddf13187217aa155d2554
+  resolved_commit: 728a3e9ba7240b7dfdda961b67775ec324fd639a
   virtual_path: skills/.curated/gh-fix-ci
   is_virtual: true
   package_type: claude_skill
@@ -954,30 +993,21 @@ dependencies:
   is_virtual: true
   package_type: marketplace_plugin
   deployed_files:
-  - .claude/agents/semgrep-scanner.md
   - .claude/skills/codeql
   - .claude/skills/sarif-parsing
   - .claude/skills/semgrep
-  - .config/opencode/agents/semgrep-scanner.md
   - .config/opencode/skills/codeql
   - .config/opencode/skills/sarif-parsing
   - .config/opencode/skills/semgrep
-  - .copilot/agents/semgrep-scanner.agent.md
   - .copilot/skills/codeql
   - .copilot/skills/sarif-parsing
   - .copilot/skills/semgrep
-  - .cursor/agents/semgrep-scanner.md
   - .cursor/skills/codeql
   - .cursor/skills/sarif-parsing
   - .cursor/skills/semgrep
   - .gemini/skills/codeql
   - .gemini/skills/sarif-parsing
   - .gemini/skills/semgrep
-  deployed_file_hashes:
-    .claude/agents/semgrep-scanner.md: sha256:26d412799ad8e549ca2fbe1f93536e66f222feb6a0ae78e0a286947ba5e3f416
-    .config/opencode/agents/semgrep-scanner.md: sha256:26d412799ad8e549ca2fbe1f93536e66f222feb6a0ae78e0a286947ba5e3f416
-    .copilot/agents/semgrep-scanner.agent.md: sha256:26d412799ad8e549ca2fbe1f93536e66f222feb6a0ae78e0a286947ba5e3f416
-    .cursor/agents/semgrep-scanner.md: sha256:26d412799ad8e549ca2fbe1f93536e66f222feb6a0ae78e0a286947ba5e3f416
   content_hash: sha256:a38d608d4ea4aeec94a0f05da0a3b1bcd934534669f8d738a79091616f192a8f
 - repo_url: trailofbits/skills
   host: github.com
@@ -1046,7 +1076,7 @@ dependencies:
   content_hash: sha256:a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a
 - repo_url: vercel-labs/skills
   host: github.com
-  resolved_commit: 5516b8ad07393f35af4b50238b9d3f7cceca5f1e
+  resolved_commit: 57f3351d91095f68dafd57d024ef4004bce5bd23
   virtual_path: skills/find-skills
   is_virtual: true
   package_type: claude_skill
