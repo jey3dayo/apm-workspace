@@ -20,12 +20,24 @@ The git-automation skill provides the following two main features:
 
 Both features adopt common quality gates and a no-signature policy, providing a consistent development experience.
 
+## Safety Contract
+
+Git automation must preserve user work before optimizing speed.
+
+- Inspect `git status`, relevant diffs, and recent commit history before staging or generating messages.
+- Stage only files that belong to the requested logical change. Do not stage unrelated user edits, scratch files, local logs, or generated artifacts unless the user explicitly includes them.
+- If the intended scope is ambiguous, stop and ask before staging or committing.
+- Do not commit directly on protected or shared base branches such as `main`; create or switch to a feature branch first.
+- If lint, test, or build fails, stop before commit, push, or PR creation unless the user explicitly requested the corresponding skip option.
+- Never use destructive git commands, change git config, or change credentials.
+- When updating PRs, prefer argument arrays and `--body-file` / temporary files over shell string interpolation.
+
 ## Basic Usage
 
 ### Smart Commit
 
 ```bash
-# Basic usage (auto-staging + quality check)
+# Basic usage (scoped staging + quality check)
 /git-automation commit
 
 # Specify message
@@ -94,11 +106,11 @@ Both features adopt common quality gates and a no-signature policy, providing a 
 /git-automation commit
 
 # What it does:
-# 1. Auto-stage changed files
+# 1. Inspect and stage only the intended files
 # 2. Run Lint (auto-detected by project-detector)
 # 3. Run Tests (based on project configuration)
 # 4. Run Build (when necessary)
-# 5. Generate AI-driven message
+# 5. Check recent commits and generate a message
 # 6. Create commit (no signature)
 ```
 
@@ -124,7 +136,7 @@ Both features adopt common quality gates and a no-signature policy, providing a 
 
 # What it does:
 # 1. Run formatting
-# 2. Create commit
+# 2. Create a scoped commit after quality gates pass
 # 3. Detect existing PR (gh pr list --head)
 # 4. Auto-update PR (update title and body to latest)
 ```
@@ -185,6 +197,8 @@ project = detect_project_type()
 3. Check recent commit history (detect conventions)
 4. Generate Conventional Commits-compliant message
 
+Do not finalize the commit message until the relevant diff and recent commit conventions have been inspected. If this information is unavailable, present a candidate message and state what must be checked before committing.
+
 ### PR Title and Body
 
 ### Title
@@ -194,7 +208,7 @@ project = detect_project_type()
 ```markdown
 ## Overview
 
-- Change summary (with emoji)
+- Change summary (no emoji)
 
 ## Changes
 
@@ -244,16 +258,22 @@ def check_existing_pr(branch_name):
 ### PR Update
 
 ```python
+import os
+import tempfile
+
 def update_pull_request(pr_number, pr_title, pr_body):
     """Update the title and body of an existing PR"""
-    update_command = f"""gh pr edit {pr_number} \
-        --title "{pr_title}" \
-        --body "$(cat <<'EOF'
-{pr_body}
-EOF
-)""""
+    with tempfile.NamedTemporaryFile("w", delete=False) as body_file:
+        body_file.write(pr_body)
+        body_path = body_file.name
 
-    subprocess.run(update_command, shell=True)
+    try:
+        subprocess.run(
+            ["gh", "pr", "edit", str(pr_number), "--title", pr_title, "--body-file", body_path],
+            check=True
+        )
+    finally:
+        os.unlink(body_path)
 ```
 
 ## Important Design Principles
