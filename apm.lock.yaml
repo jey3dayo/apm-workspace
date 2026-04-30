@@ -41,6 +41,19 @@ dependencies:
   - .cursor/skills/tool-openclaw
   - .gemini/skills/tool-openclaw
   content_hash: sha256:1b9cee49d17e42ed30aa3f429102ef2b9b7fddd94e705138dce852994cdbe447
+- repo_url: Jakubantalik/transitions-dev
+  host: github.com
+  resolved_commit: 39f02b65f821383dc905a585172cbfd14e20b7f4
+  virtual_path: skills/transitions-dev
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .claude/skills/transitions-dev
+  - .config/opencode/skills/transitions-dev
+  - .copilot/skills/transitions-dev
+  - .cursor/skills/transitions-dev
+  - .gemini/skills/transitions-dev
+  content_hash: sha256:08253db207976bc5aa30bbe550ca1fc5c598caedf8251f75471a3e6ab42f9ac7
 - repo_url: Lum1104/Understand-Anything
   host: github.com
   resolved_commit: d3c2c65b86097ccf7451a22b516eef1184724eee

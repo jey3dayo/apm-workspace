@@ -66,6 +66,7 @@ dependencies:
     - apollographql/skills/skills/rust-best-practices
     - gonta223/humanizer-ja
     - softaworks/agent-toolkit/skills/humanizer
+    - Jakubantalik/transitions-dev/skills/transitions-dev
   mcp:
     - name: context7
       registry: false
