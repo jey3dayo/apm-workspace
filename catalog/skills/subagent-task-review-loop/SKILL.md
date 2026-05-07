@@ -22,6 +22,10 @@ integration, quality gates, and final judgment.
    - If the request names a broad or ambiguous area, first lock the
      user-visible action, likely code path, evidence source, and reproduction
      signal. Do not widen the scope until evidence connects the wider area.
+   - Identify the behavioral contract that must stay coherent across layers
+     such as UI state, DOM geometry, native bounds, API payloads, diagnostics,
+     and tests. Name the coordinate space or state machine explicitly when the
+     bug involves layout, native shells, overlays, IPC, or cross-process data.
    - Identify the current owner task: the next task the main session should do
      locally because it is on the critical path or requires integration judgment.
    - Create or update the local task list before dispatching agents.
@@ -40,10 +44,15 @@ integration, quality gates, and final judgment.
    - Convert subagent results into Codex task-list entries.
    - Mark each entry as one of:
      - `do-now`: blocks the owner task or quality gate
+     - `accept`: evidence-backed improvement already integrated or scheduled in
+       the current slice
      - `next`: likely useful after current work
      - `park`: valid follow-up, but outside the current request or review loop
      - `reject`: not actionable, duplicated, contradicted by evidence, or being
        presented as required despite being outside the current scope
+   - For each `do-now` or `accept` entry, record the evidence that will prove it:
+     a focused test, type/lint/build gate, runtime log line, screenshot, manual
+     reproduction step, or diff inspection.
    - Keep the owner task updated as new facts arrive.
 
 4. **Execute the owner task**
@@ -63,14 +72,41 @@ integration, quality gates, and final judgment.
    - Fix actionable findings and re-review until the score is at least 95, or
      until further improvement is blocked by scope, missing input, or diminishing
      returns that should be reported.
+   - When reviewers find a contract mismatch, update both the implementation and
+     its observability surface. Examples: keep debug HUD values in the same
+     coordinate space as native payloads, update shared type comments and Rust
+     DTO comments together, and add tests for the exact conversion boundary.
    - Maximum repeated attempts for the same failed approach: 3. After that,
      report attempts, errors, and alternatives.
 
 6. **Quality gates**
    - Run the project-appropriate checks before claiming completion.
    - If a gate cannot run, record why and what risk remains.
+   - Prefer a layered gate set when the work crosses layers: focused unit tests
+     for pure helpers, component tests for UI behavior, type checks, relevant
+     backend tests, and the repo-level check when feasible.
+   - If the issue is visual, native, or integration-heavy, pair automated gates
+     with one runtime signal such as an app log, debug HUD row, screenshot, or
+     manual interaction result. State whether the runtime signal was captured
+     before or after a fresh restart.
    - Do a final diff review against the original request and reject unrelated
      changes.
+
+## Evidence Discipline
+
+Use evidence to keep the loop from drifting:
+
+- Separate test evidence from runtime evidence. A passing unit test proves the
+  helper contract, while a screenshot or native log proves integration behavior.
+- For bugs involving multiple coordinate spaces or state machines, ask each
+  subagent to state the expected source of truth and the actual source of truth.
+- Treat stale comments, stale function names, debug displays, and telemetry as
+  part of the contract when they are used to debug the behavior.
+- If a generated or reference artifact defines the target experience, record the
+  artifact path and the concrete behavior it represents. Do not use it as vague
+  taste input.
+- When hot reload or partial state could contaminate evidence, prefer a fresh
+  restart for final runtime verification.
 
 ## Review Rubric
 
@@ -111,6 +147,8 @@ Context:
 - User-visible goal: <goal>
 - Current owner task: <what the main session is doing locally>
 - Scope limits: <files/modules/behaviors that are in scope>
+- Evidence source: <tests/logs/screenshots/docs/runtime signal to inspect>
+- Contract assumptions: <coordinate space/state machine/API contract, if relevant>
 
 Your task:
 <specific research, implementation, or review task>
@@ -118,6 +156,7 @@ Your task:
 Return:
 - Findings: evidence-backed bullets with file paths when applicable
 - Recommended backlog entries: do-now / next / park / reject
+- Evidence needed to prove each do-now finding is fixed
 - Risks or unknowns
 - Files changed, if any
 ```
@@ -139,5 +178,6 @@ Final reports should include:
 
 - owner task completed
 - subagent-derived tasks accepted, parked, or rejected
+- key evidence used for accepted findings
 - review-loop score and remaining risk
 - quality gates run and their result
