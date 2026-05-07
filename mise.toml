@@ -91,32 +91,36 @@ run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"apm 
 [tasks."format:markdown"]
 description = "Format Markdown files in the ~/.apm workspace"
 run = "fd -e md -X prettier --write --log-level error >/dev/null"
-run_windows = "bash -lc 'fd -e md -X prettier --write --log-level error >/dev/null'"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e md -X prettier --write --log-level error | Out-Null\""
 
 [tasks."format:markdown:check"]
 description = "Check Markdown formatting in the ~/.apm workspace"
 run = "fd -e md -X prettier --check --log-level error"
-run_windows = "bash -lc 'fd -e md -X prettier --check --log-level error'"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e md -X prettier --check --log-level error\""
 
 [tasks."format:markdown:bold-headings"]
 description = "Rewrite bold headings inside catalog skill and shared guidance sources"
 run = """bash -lc 'script="$HOME/.config/scripts/replace-bold-headings.ts"; if [ -f "$script" ]; then tsx "$script" ./catalog; else echo "Skipping bold heading rewrite: $script not found"; fi'"""
-run_windows = """bash -lc 'if [ -f "${HOME}/.config/scripts/replace-bold-headings.ts" ]; then tsx "${HOME}/.config/scripts/replace-bold-headings.ts" ./catalog; else echo "Skipping bold heading rewrite script: ${HOME}/.config/scripts/replace-bold-headings.ts not found"; fi'"""
+run_windows = """
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "if (Test-Path -LiteralPath ([IO.Path]::Combine([Environment]::GetFolderPath('UserProfile'), '.config/scripts/replace-bold-headings.ts'))) { tsx ([IO.Path]::Combine([Environment]::GetFolderPath('UserProfile'), '.config/scripts/replace-bold-headings.ts')) ./catalog } else { Write-Host \"Skipping bold heading rewrite script not found\" }"
+"""
 
 [tasks."format:markdown:bold-headings:check"]
 description = "Check bold heading rewrites inside catalog skill and shared guidance sources"
 run = """bash -lc 'script="$HOME/.config/scripts/replace-bold-headings.ts"; if [ -f "$script" ]; then tsx "$script" ./catalog --dry-run; else echo "Skipping bold heading rewrite check: $script not found"; fi'"""
-run_windows = """bash -lc 'if [ -f "${HOME}/.config/scripts/replace-bold-headings.ts" ]; then tsx "${HOME}/.config/scripts/replace-bold-headings.ts" ./catalog --dry-run; else echo "Skipping bold heading rewrite check: ${HOME}/.config/scripts/replace-bold-headings.ts not found"; fi'"""
+run_windows = """
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "if (Test-Path -LiteralPath ([IO.Path]::Combine([Environment]::GetFolderPath('UserProfile'), '.config/scripts/replace-bold-headings.ts'))) { tsx ([IO.Path]::Combine([Environment]::GetFolderPath('UserProfile'), '.config/scripts/replace-bold-headings.ts')) ./catalog --dry-run } else { Write-Host \"Skipping bold heading rewrite check script not found\" }"
+"""
 
 [tasks."format:toml"]
 description = "Format TOML files in the ~/.apm workspace"
 run = "fd -e toml -X env RUST_LOG=taplo=warn taplo format"
-run_windows = "bash -lc 'fd -e toml -X env RUST_LOG=taplo=warn taplo format'"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e toml -X taplo format\""
 
 [tasks."format:toml:check"]
 description = "Check TOML formatting in the ~/.apm workspace"
 run = "fd -e toml -X env RUST_LOG=taplo=warn taplo format --check"
-run_windows = "bash -lc 'fd -e toml -X env RUST_LOG=taplo=warn taplo format --check'"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e toml -X taplo format --check\""
 
 [tasks."format:yaml"]
 description = "Format YAML files in the ~/.apm workspace"

@@ -49,9 +49,14 @@ Use bash syntax consistently:
 
 If you must call PowerShell from bash, treat it as a separate process boundary and quote accordingly.
 
-### Calling PowerShell from a bash-configured Windows task
+### Exception: calling PowerShell from a bash-configured Windows task
 
-When `windows_default_inline_shell_args = "bash -lc"` and a Windows task must still run a `.ps1` script, do not put raw PowerShell syntax directly in `run_windows`. Keep `run_windows` as bash syntax and cross the process boundary explicitly:
+Prefer running Windows tasks in the configured native shell for that repository. Use a bash-to-PowerShell wrapper only when both of these are true:
+
+- the repository intentionally keeps `windows_default_inline_shell_args = "bash -lc"`
+- the specific task genuinely needs an existing `.ps1` implementation, for example a Windows or WSL bridge script
+
+In that exception case, do not put raw PowerShell syntax directly in `run_windows`. Keep `run_windows` as bash syntax and cross the process boundary explicitly:
 
 ```toml
 run_windows = "sh ./scripts/run-windows-powershell.sh ./scripts/task.ps1 -Flag value"
@@ -59,7 +64,7 @@ run_windows = "sh ./scripts/run-windows-powershell.sh ./scripts/task.ps1 -Flag v
 
 The wrapper should resolve `powershell.exe` through `command -v` first, then fall back to stable Windows paths exposed to the active bash environment, such as `/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/powershell.exe` for WSL-style bash or `/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe` for Git Bash/MSYS-style bash.
 
-This preserves the `.ps1` implementation for tasks that genuinely need Windows or WSL bridge behavior, while avoiding fragile `powershell.exe` PATH lookup during hooks such as `enter = "mise run --quiet setup-env"`.
+Do not use this pattern for lightweight hooks or formatting tasks if a direct shell implementation exists. It preserves necessary `.ps1` bridge behavior, but it can add avoidable process and WSL/Windows boundary overhead.
 
 ## Prefer Relative Repository Paths in Project-Local Tasks
 
