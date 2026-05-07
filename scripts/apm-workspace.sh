@@ -153,7 +153,7 @@ catalog_build_dir() {
 }
 
 catalog_build_skills_root() {
-  printf '%s/.apm/skills\n' "$(catalog_build_dir)"
+  printf '%s/skills\n' "$(catalog_build_dir)"
 }
 
 catalog_build_agents_root() {
@@ -308,12 +308,74 @@ reset_catalog_build_dir() {
   rm -rf "$destination_dir"
   mkdir -p "$destination_dir"
   mkdir -p "$(catalog_build_skills_root)"
+  mkdir -p "$destination_dir/.apm"
+  printf '\n' >"$destination_dir/.apm/.gitkeep"
 }
 
 reset_tracked_catalog_dir() {
   destination_dir=$(tracked_catalog_dir)
   rm -rf "$destination_dir"
   mkdir -p "$destination_dir"
+}
+
+assert_catalog_stage_safety() {
+  requested_count="$1"
+  tracked_dir=$(tracked_catalog_dir)
+  build_dir=$(catalog_build_dir)
+  tracked_skills_root=$(tracked_catalog_skills_root)
+  build_skills_root=$(catalog_build_skills_root)
+  allow_shrink="${APM_ALLOW_CATALOG_SHRINK:-}"
+
+  if ! is_path_under_dir "$tracked_dir" "$WORKSPACE_DIR"; then
+    fail "Refusing to reset catalog outside workspace: $tracked_dir"
+  fi
+
+  if ! is_path_under_dir "$build_dir" "$CATALOG_BUILD_ROOT"; then
+    fail "Refusing to stage catalog from unexpected build directory: $build_dir"
+  fi
+
+  if [ "$(canonical_path "$tracked_dir")" = "$(canonical_path "$build_dir")" ]; then
+    fail "Refusing to stage catalog because source and destination are the same path: $tracked_dir"
+  fi
+
+  for required_path in \
+    "$build_dir/apm.yml" \
+    "$build_dir/README.md" \
+    "$(catalog_build_instructions_path)" \
+    "$build_skills_root" \
+    "$(catalog_build_agents_root)" \
+    "$(catalog_build_commands_root)" \
+    "$(catalog_build_rules_root)"; do
+    [ -e "$required_path" ] || fail "Refusing to reset tracked catalog; catalog build is incomplete: $required_path"
+  done
+
+  tracked_skill_count=$(tracked_catalog_skill_ids | awk 'NF { count++ } END { print count + 0 }')
+  build_skill_count=$(skill_ids_from_root "$build_skills_root" | awk 'NF { count++ } END { print count + 0 }')
+  [ "$tracked_skill_count" -gt 0 ] || fail "Refusing to reset tracked catalog; source catalog has no skills: $tracked_skills_root"
+  [ "$build_skill_count" -gt 0 ] || fail "Refusing to reset tracked catalog; catalog build has no skills: $build_skills_root"
+
+  if [ "$requested_count" -gt 0 ] && [ "$allow_shrink" != "1" ]; then
+    fail "Refusing to prepare a partial catalog because it would remove unrequested tracked skills. Set APM_ALLOW_CATALOG_SHRINK=1 only for an intentional shrink."
+  fi
+
+  if [ "$build_skill_count" -lt "$tracked_skill_count" ] && [ "$allow_shrink" != "1" ]; then
+    fail "Refusing to reset tracked catalog; catalog build would shrink skills from $tracked_skill_count to $build_skill_count. Set APM_ALLOW_CATALOG_SHRINK=1 only for an intentional shrink."
+  fi
+
+  for asset_spec in \
+    "agents|$(tracked_catalog_agents_root)|$(catalog_build_agents_root)" \
+    "commands|$(tracked_catalog_commands_root)|$(catalog_build_commands_root)" \
+    "rules|$(tracked_catalog_rules_root)|$(catalog_build_rules_root)"; do
+    asset_label=${asset_spec%%|*}
+    rest=${asset_spec#*|}
+    current_root=${rest%%|*}
+    build_root=${rest#*|}
+    current_count=$(relative_file_list "$current_root" | awk 'NF { count++ } END { print count + 0 }')
+    build_count=$(relative_file_list "$build_root" | awk 'NF { count++ } END { print count + 0 }')
+    if [ "$current_count" -gt 0 ] && [ "$build_count" -eq 0 ] && [ "$allow_shrink" != "1" ]; then
+      fail "Refusing to reset tracked catalog; catalog build would empty $asset_label. Set APM_ALLOW_CATALOG_SHRINK=1 only for an intentional shrink."
+    fi
+  done
 }
 
 workspace_remote_to_repo_reference() {
@@ -648,6 +710,29 @@ relative_file_list() {
     cd "$root_dir"
     find . -type f | sed 's#^\./##' | sort
   )
+}
+
+canonical_path() {
+  path="$1"
+  if [ -d "$path" ]; then
+    (cd "$path" && pwd -P)
+    return 0
+  fi
+
+  parent_dir=$(dirname "$path")
+  base_name=$(basename "$path")
+  (cd "$parent_dir" && printf '%s/%s\n' "$(pwd -P)" "$base_name")
+}
+
+is_path_under_dir() {
+  path=$(canonical_path "$1")
+  directory=$(canonical_path "$2")
+
+  [ "$path" = "$directory" ] && return 0
+  case "$path" in
+    "$directory"/*) return 0 ;;
+    *) return 1 ;;
+  esac
 }
 
 migrate_package() {
@@ -1880,9 +1965,11 @@ cmd_bundle_catalog() {
 }
 
 cmd_stage_catalog() {
+  requested_count=$#
   cmd_bundle_catalog "$@"
 
   tracked_dir=$(tracked_catalog_dir)
+  assert_catalog_stage_safety "$requested_count"
   reset_tracked_catalog_dir
   cp -R "$(catalog_build_dir)"/. "$tracked_dir"
 

@@ -253,6 +253,20 @@ function Get-RelativeFilePaths {
   return $array
 }
 
+function Test-IsPathUnderDirectory {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Path,
+
+    [Parameter(Mandatory = $true)]
+    [string]$Directory
+  )
+
+  $fullPath = [System.IO.Path]::GetFullPath($Path).TrimEnd('\', '/')
+  $fullDirectory = [System.IO.Path]::GetFullPath($Directory).TrimEnd('\', '/')
+  return $fullPath.Equals($fullDirectory, [System.StringComparison]::OrdinalIgnoreCase) -or $fullPath.StartsWith($fullDirectory + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)
+}
+
 function Convert-WorkspaceRemoteToRepoReference {
   param(
     [Parameter(Mandatory = $true)]
@@ -1500,7 +1514,7 @@ function Invoke-Validate {
 }
 
 function Get-CatalogBuildSkillsRoot {
-  return (Join-Path (Get-CatalogBuildDir) ".apm\skills")
+  return (Join-Path (Get-CatalogBuildDir) "skills")
 }
 
 function Get-CatalogBuildAgentsRoot {
@@ -2047,6 +2061,8 @@ function Reset-CatalogBuildDir {
 
   New-Item -ItemType Directory -Path $buildDir -Force | Out-Null
   New-Item -ItemType Directory -Path (Get-CatalogBuildSkillsRoot) -Force | Out-Null
+  New-Item -ItemType Directory -Path (Join-Path $buildDir ".apm") -Force | Out-Null
+  [System.IO.File]::WriteAllText((Join-Path $buildDir ".apm\.gitkeep"), "`n", [System.Text.UTF8Encoding]::new($false))
 }
 
 function Reset-TrackedCatalogDir {
@@ -2056,6 +2072,73 @@ function Reset-TrackedCatalogDir {
   }
 
   New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
+}
+
+function Assert-CatalogStageSafety {
+  param(
+    [string[]]$RequestedSkillIds
+  )
+
+  $trackedDir = Get-TrackedCatalogDir
+  $buildDir = Get-CatalogBuildDir
+  $trackedSkillsRoot = Get-TrackedCatalogSkillsRoot
+  $buildSkillsRoot = Get-CatalogBuildSkillsRoot
+  $allowShrink = $env:APM_ALLOW_CATALOG_SHRINK -eq "1"
+
+  if (-not (Test-IsPathUnderDirectory -Path $trackedDir -Directory $WorkspaceDir)) {
+    throw "Refusing to reset catalog outside workspace: $trackedDir"
+  }
+
+  if (-not (Test-IsPathUnderDirectory -Path $buildDir -Directory $CatalogBuildRootDir)) {
+    throw "Refusing to stage catalog from unexpected build directory: $buildDir"
+  }
+
+  if (([System.IO.Path]::GetFullPath($trackedDir).TrimEnd('\', '/')).Equals(([System.IO.Path]::GetFullPath($buildDir).TrimEnd('\', '/')), [System.StringComparison]::OrdinalIgnoreCase)) {
+    throw "Refusing to stage catalog because source and destination are the same path: $trackedDir"
+  }
+
+  foreach ($requiredPath in @(
+      (Join-Path $buildDir "apm.yml"),
+      (Join-Path $buildDir "README.md"),
+      (Get-CatalogBuildInstructionsPath),
+      $buildSkillsRoot,
+      (Get-CatalogBuildAgentsRoot),
+      (Get-CatalogBuildCommandsRoot),
+      (Get-CatalogBuildRulesRoot)
+    )) {
+    if (-not (Test-Path -LiteralPath $requiredPath)) {
+      throw "Refusing to reset tracked catalog; catalog build is incomplete: $requiredPath"
+    }
+  }
+
+  $trackedSkillIds = @(Get-SkillIdsFromRoot -SkillsRoot $trackedSkillsRoot)
+  $buildSkillIds = @(Get-SkillIdsFromRoot -SkillsRoot $buildSkillsRoot)
+  if ($trackedSkillIds.Count -eq 0) {
+    throw "Refusing to reset tracked catalog; source catalog has no skills: $trackedSkillsRoot"
+  }
+  if ($buildSkillIds.Count -eq 0) {
+    throw "Refusing to reset tracked catalog; catalog build has no skills: $buildSkillsRoot"
+  }
+
+  if ($RequestedSkillIds -and $RequestedSkillIds.Count -gt 0 -and -not $allowShrink) {
+    throw "Refusing to prepare a partial catalog because it would remove unrequested tracked skills. Set APM_ALLOW_CATALOG_SHRINK=1 only for an intentional shrink."
+  }
+
+  if ($buildSkillIds.Count -lt $trackedSkillIds.Count -and -not $allowShrink) {
+    throw "Refusing to reset tracked catalog; catalog build would shrink skills from $($trackedSkillIds.Count) to $($buildSkillIds.Count). Set APM_ALLOW_CATALOG_SHRINK=1 only for an intentional shrink."
+  }
+
+  foreach ($assetRoot in @(
+      @{ Label = "agents"; Current = (Get-TrackedCatalogAgentsRoot); Build = (Get-CatalogBuildAgentsRoot) },
+      @{ Label = "commands"; Current = (Get-TrackedCatalogCommandsRoot); Build = (Get-CatalogBuildCommandsRoot) },
+      @{ Label = "rules"; Current = (Get-TrackedCatalogRulesRoot); Build = (Get-CatalogBuildRulesRoot) }
+    )) {
+    $currentFiles = @(Get-RelativeFilePaths -RootDir $assetRoot.Current)
+    $buildFiles = @(Get-RelativeFilePaths -RootDir $assetRoot.Build)
+    if ($currentFiles.Count -gt 0 -and $buildFiles.Count -eq 0 -and -not $allowShrink) {
+      throw "Refusing to reset tracked catalog; catalog build would empty $($assetRoot.Label). Set APM_ALLOW_CATALOG_SHRINK=1 only for an intentional shrink."
+    }
+  }
 }
 
 function Get-ManagedSkillContentDir {
@@ -2276,6 +2359,7 @@ function Invoke-StageCatalog {
 
   Invoke-BundleCatalog -RequestedSkillIds $RequestedSkillIds
   $trackedDir = Get-TrackedCatalogDir
+  Assert-CatalogStageSafety -RequestedSkillIds $RequestedSkillIds
   Reset-TrackedCatalogDir
   Copy-DirectoryContents -SourceDir (Get-CatalogBuildDir) -DestinationDir $trackedDir
 
