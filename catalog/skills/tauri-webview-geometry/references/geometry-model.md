@@ -30,6 +30,12 @@ Recommended invariants:
 
 Only `stageRect` should express layout intent.
 
+Choose the root deliberately. The coordinate root should be the viewer client
+area used by the native child webview, not necessarily the outer portal node. In
+macOS overlay-titlebar layouts, an outer DOM node can include a shell/titlebar
+offset while the native child webview expects coordinates relative to an inner
+overlay shell.
+
 ## Suggested formulas
 
 ```text
@@ -47,6 +53,13 @@ hostRect = stageRect
 nativeRect = hostRect
 ```
 
+If the native API expects root-relative bounds and `getBoundingClientRect()`
+returns viewport-relative values, convert once at the boundary:
+
+```text
+nativeRect = hostRect - clientRootRect.origin
+```
+
 For floating viewer chrome:
 
 - place close / external buttons independently
@@ -59,6 +72,8 @@ For floating viewer chrome:
 - `stage` small, `host == native`: layout model bug
 - `host` differs from `native`: Tauri/native application bug or wrong rect conversion
 - `stage` correct but page still narrow: website layout is the limiting factor
+- `native` and `host` look mismatched only in the debug HUD: diagnostics may be
+  using viewport coordinates while native bounds use client-root coordinates
 
 ## Recommended implementation pattern
 
@@ -82,3 +97,11 @@ Then make:
 - Rust/native bounds use the measured host rect produced from that helper
 
 That keeps “what should be visible” and “what is sent to native” aligned.
+
+When a coordinate contract changes, update:
+
+- frontend bounds type comments
+- backend DTO comments and helper names
+- debug HUD labels/rows
+- unit tests for `top`, `left`, logical units, and physical/DPR units
+- one fresh runtime signal such as a native bounds log or window screenshot

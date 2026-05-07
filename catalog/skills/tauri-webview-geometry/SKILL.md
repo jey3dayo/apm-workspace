@@ -28,6 +28,8 @@ Only derive downward:
 - `stage` is the intended visible surface inside that root.
 - `host` should normally equal `stage`.
 - `native` must be set from `host`, not recomputed independently.
+- Keep one explicit client root for the coordinate contract. In overlay-titlebar
+  apps this may be an inner overlay shell rather than the outer portal element.
 
 If the picture is wrong, first ask **which layer is wrong**, not "which offset should I tweak?"
 
@@ -38,6 +40,11 @@ If the picture is wrong, first ask **which layer is wrong**, not "which offset s
 - Pass the same logical rect to Tauri child webview APIs.
 - Do not add title bar, menu bar, or border offsets when the measured DOM rect already lives inside the client area.
 - When checking native diagnostics, compare `native` to `host` first. If they match, the bug is usually in `overlay -> stage -> host`.
+- Make diagnostics use the same coordinate space as native bounds. A HUD that
+  compares viewport-relative DOM rects with client-root-relative native rects
+  will report false deltas and send the investigation in the wrong direction.
+- Update type comments, DTO comments, debug labels, and helper names when the
+  coordinate contract changes. Stale observability text is part of the bug.
 
 The official references that matter most are:
 
@@ -53,12 +60,19 @@ Read `references/geometry-model.md` before changing bounds logic.
 - Find the DOM element that represents the real viewer root.
 - Confirm whether it fills the whole app client area or only a sub-pane.
 - If the user expects an immersive overlay, the root should usually be app-shell scoped, not list-pane scoped.
+- If an outer portal root is shifted by a titlebar, padding helper, or native
+  shell quirk, identify the inner client root that should be native coordinate
+  zero. Native bounds should be relative to that root, not blindly to
+  `window.innerWidth` or `getBoundingClientRect().top`.
 
 ### 2. Separate chrome from safe insets
 
 - Floating controls like `x` or `external-link` should not automatically shrink the stage.
 - Only reserve space that must remain unobstructed, such as a required HUD lane.
 - Prefer a small explicit `safeInsets` object over ad hoc Tailwind classes spread across multiple elements.
+- Remember that native child webviews can paint above DOM chrome. A visually
+  ideal full-bleed mock may be impossible if it would cover close/back/share
+  controls. Preserve interaction first, then remove only proven unintended gaps.
 
 ### 3. Compute a single stage rect
 
@@ -67,6 +81,11 @@ Read `references/geometry-model.md` before changing bounds logic.
   - DOM styling
   - diagnostics
   - native webview bounds
+- If native APIs need root-relative coordinates, convert the measured `hostRect`
+  once at the boundary. Do not duplicate `top`/`left` formulas in React, Rust,
+  and diagnostics.
+- Cover the conversion with tests for non-zero `top`, non-zero `left`, and
+  logical-to-physical scaling before trusting a visual screenshot.
 
 If styling and native bounds come from different formulas, the bug will come back.
 
@@ -76,6 +95,7 @@ If styling and native bounds come from different formulas, the bug will come bac
 2. `stage` visually matches the intended visible surface.
 3. `host` equals `stage`.
 4. `native` equals `host`.
+5. debug/diagnostic rows use the same coordinate space as `native`.
 
 If `native == host` but the page still looks "too small," the issue is usually:
 
@@ -89,11 +109,18 @@ If `native == host` but the page still looks "too small," the issue is usually:
 - Check whether `HUD` or floating chrome is forcing extra top inset.
 - Check whether the overlay root is attached to the whole app shell or only to `main-stage`.
 - Check whether `window.innerWidth/innerHeight` and measured DOM rects are describing the same visible space.
+- Check whether hot reload left stale child webviews or callbacks alive. Prefer
+  a fresh app restart before treating native logs or screenshots as final.
+- Capture at least one runtime signal after a fresh restart: native bounds log,
+  debug HUD row, window-specific screenshot, or manual click result.
 
 ## Anti-patterns
 
 - Measuring one DOM rect and styling a different one.
 - Using Tailwind `top-* left-* right-* bottom-*` as the only definition of geometry.
 - Letting HUD placement and native bounds use separate calculations.
+- Letting diagnostics and native bounds use different coordinate spaces.
 - Compensating for title bars twice.
+- Moving the native child webview to full bleed before confirming DOM controls
+  remain above it and clickable.
 - Debugging `native` first when `host` is already visibly too small.
