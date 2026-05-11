@@ -497,8 +497,12 @@ local_skill_content_dir() {
   skill_id="$1"
   validate_skill_id "$skill_id"
 
-  if private_skill_content_dir "$skill_id" >/dev/null 2>&1; then
-    private_skill_content_dir "$skill_id"
+  set +e
+  private_source=$(private_skill_content_dir "$skill_id" 2>/dev/null)
+  private_status=$?
+  set -e
+  if [ "$private_status" -eq 0 ] && [ -n "$private_source" ]; then
+    printf '%s\n' "$private_source"
     return 0
   fi
 
@@ -630,6 +634,21 @@ compile_codex() {
     cd "$WORKSPACE_DIR"
     apm compile --target codex --output "$CODEX_OUTPUT"
   )
+}
+
+validate_codex_skill_target_tree() {
+  target_skills_root="$HOME/.agents/skills"
+  [ -d "$target_skills_root" ] || return 0
+
+  nested_skills=$(
+    cd "$target_skills_root"
+    find . -mindepth 4 -type f -name SKILL.md \( -path './*/skills/*/SKILL.md' -o -path './*/.apm/skills/*/SKILL.md' \) | sort
+  )
+
+  if [ -n "$nested_skills" ]; then
+    printf '%s\n' "$nested_skills" | sed "s#^\./#$target_skills_root/#" >&2
+    fail "Nested Codex skill files found under $target_skills_root. Run 'mise run apply:skills:local' to refresh the target."
+  fi
 }
 
 internal_deploy_target_roots() {
@@ -841,6 +860,7 @@ replace_codex_skill_target_from_stage() {
     target_skill_path=$(internal_target_skill_path "$target_skills_root" "$deployed_skill_name")
 
     mkdir -p "$(dirname "$target_skill_path")"
+    rm -rf "$target_skill_path"
     mkdir -p "$target_skill_path"
     cp -R "$staged_skill_path"/. "$target_skill_path"
   done
@@ -1096,6 +1116,7 @@ cmd_validate() {
     cd "$WORKSPACE_DIR"
     apm compile --validate
   )
+  validate_codex_skill_target_tree
 }
 
 managed_agent_relative_paths() {
