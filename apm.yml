@@ -85,14 +85,6 @@ dependencies:
         - chrome-devtools-mcp@latest
         - --browserUrl
         - http://127.0.0.1:9222
-    - name: ultracite
-      registry: false
-      transport: stdio
-      command: npx
-      args:
-        - -y
-        - mcp-remote
-        - https://docs.ultracite.ai/mcp
     - name: mcp-simple-voicevox
       registry: false
       transport: stdio
@@ -115,12 +107,4 @@ dependencies:
         - -y
         - "@steipete/peekaboo"
         - mcp
-    - name: telegram-mcp
-      registry: false
-      transport: stdio
-      command: uvx
-      args:
-        - --from
-        - git+https://github.com/chigwell/telegram-mcp.git
-        - telegram-mcp
 scripts: {}

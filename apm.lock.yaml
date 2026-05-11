@@ -896,8 +896,6 @@ mcp_servers:
 - mcp-simple-voicevox
 - peekaboo
 - tauri-mcp-server
-- telegram-mcp
-- ultracite
 mcp_configs:
   chrome-devtools:
     name: chrome-devtools
@@ -940,23 +938,5 @@ mcp_configs:
     args:
     - -y
     - '@hypothesi/tauri-mcp-server'
-    registry: false
-    command: npx
-  telegram-mcp:
-    name: telegram-mcp
-    transport: stdio
-    args:
-    - --from
-    - git+https://github.com/chigwell/telegram-mcp.git
-    - telegram-mcp
-    registry: false
-    command: uvx
-  ultracite:
-    name: ultracite
-    transport: stdio
-    args:
-    - -y
-    - mcp-remote
-    - https://docs.ultracite.ai/mcp
     registry: false
     command: npx
