@@ -1,0 +1,5 @@
+name: mole-management
+version: 1.0.0
+display_name: Mole Management
+short_description: Safely review Mole cleanup candidates and manage disk cleanup whitelist rules.
+default_prompt: Review Mole dry-run cleanup candidates, keep protected caches safe, and recommend the next cleanup action.
