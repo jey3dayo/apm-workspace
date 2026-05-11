@@ -478,6 +478,19 @@ dependencies:
   - .codeium/windsurf/skills/wezterm
   - .codeium/windsurf/skills/zsh
   content_hash: sha256:79514124d594243d8b9bd3ee2e4fd0e154294ad9118da0809241500054719a72
+- repo_url: langchain-ai/deepagents
+  host: github.com
+  resolved_commit: 94628fef98aefb5389ab56c8acee31726d6385dc
+  virtual_path: libs/cli/examples/skills/web-research
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .claude/skills/web-research
+  - .config/opencode/skills/web-research
+  - .copilot/skills/web-research
+  - .cursor/skills/web-research
+  - .gemini/skills/web-research
+  content_hash: sha256:2b66d5db8c8d70474e70638f437f324fb3af3724b71bf8501e48c8004e70e677
 - repo_url: millionco/react-doctor
   host: github.com
   resolved_commit: 0053faa0a85dda7d57bc09764ab600655829a4c0

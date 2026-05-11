@@ -67,6 +67,7 @@ dependencies:
     - gonta223/humanizer-ja
     - softaworks/agent-toolkit/skills/humanizer
     - Jakubantalik/transitions-dev/skills/transitions-dev
+    - langchain-ai/deepagents/libs/cli/examples/skills/web-research
   mcp:
     - name: context7
       registry: false
