@@ -1,6 +1,6 @@
 lockfile_version: '1'
-generated_at: '2026-05-07T03:53:05.851488+00:00'
-apm_version: 0.12.2
+generated_at: '2026-05-11T17:48:12.136321+00:00'
+apm_version: 0.13.0
 dependencies:
 - repo_url: EpicenterHQ/epicenter
   host: github.com
@@ -297,7 +297,7 @@ dependencies:
   content_hash: sha256:99aaea521aa0f1c7d041d70bb6b75581c1a50ec6ac59ceaaa923b6339ffa417b
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: 24ff1997a1c1710b26f467466fa5d821f35e40ca
+  resolved_commit: 8ec4086a913df638f04ec4160342e4e8dc8a4421
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
@@ -336,6 +336,7 @@ dependencies:
   - .agents/skills/linear-task-ops
   - .agents/skills/mcp-tools
   - .agents/skills/mise
+  - .agents/skills/mole-management
   - .agents/skills/nix-dotfiles
   - .agents/skills/nvim
   - .agents/skills/polish
@@ -394,6 +395,7 @@ dependencies:
   - .claude/skills/linear-task-ops
   - .claude/skills/mcp-tools
   - .claude/skills/mise
+  - .claude/skills/mole-management
   - .claude/skills/nix-dotfiles
   - .claude/skills/nvim
   - .claude/skills/polish
@@ -452,6 +454,7 @@ dependencies:
   - .codeium/windsurf/skills/linear-task-ops
   - .codeium/windsurf/skills/mcp-tools
   - .codeium/windsurf/skills/mise
+  - .codeium/windsurf/skills/mole-management
   - .codeium/windsurf/skills/nix-dotfiles
   - .codeium/windsurf/skills/nvim
   - .codeium/windsurf/skills/polish
@@ -477,7 +480,7 @@ dependencies:
   - .codeium/windsurf/skills/typescript
   - .codeium/windsurf/skills/wezterm
   - .codeium/windsurf/skills/zsh
-  content_hash: sha256:79514124d594243d8b9bd3ee2e4fd0e154294ad9118da0809241500054719a72
+  content_hash: sha256:21c547faa7254faa2dfb192b45656194b6e88e82cad62ff46efb08b4db43f67a
 - repo_url: langchain-ai/deepagents
   host: github.com
   resolved_commit: 94628fef98aefb5389ab56c8acee31726d6385dc
@@ -485,11 +488,9 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
+  - .agents/skills/web-research
   - .claude/skills/web-research
-  - .config/opencode/skills/web-research
-  - .copilot/skills/web-research
-  - .cursor/skills/web-research
-  - .gemini/skills/web-research
+  - .codeium/windsurf/skills/web-research
   content_hash: sha256:2b66d5db8c8d70474e70638f437f324fb3af3724b71bf8501e48c8004e70e677
 - repo_url: millionco/react-doctor
   host: github.com
