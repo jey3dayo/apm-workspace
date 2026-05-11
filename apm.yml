@@ -77,7 +77,6 @@ dependencies:
         - -y
         - "@upstash/context7-mcp@latest"
     - name: chrome-devtools
-      enabled: false
       registry: false
       transport: stdio
       command: npx
