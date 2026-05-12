@@ -2,14 +2,14 @@
 
 ## Definition of Done (DoD)
 
-すべてのタスク完了時に以下を満たすこと。
+すべてのタスク完了時に、作業内容に該当する以下の確認を満たすこと。リポジトリで定義された check / test / format タスクがある場合はそれを優先する。
 
-### 1. 品質チェック（必須）
+### 1. 品質チェック（該当時必須）
 
-- 型エラー 0 件
-- リント違反 0 件
-- 全テスト成功
-- フォーマッター適用済み
+- 型チェック対象の変更: 型エラー 0 件
+- リント対象の変更: リント違反 0 件
+- テスト対象の変更: 関連テスト成功
+- フォーマット対象の変更: フォーマッター適用済み、または format check 成功
 
 ### 2. スコープ遵守
 
@@ -35,8 +35,8 @@
 1. 計画 - 大規模変更時は事前に変更概要を共有し承認を得る
 2. コード理解 - ツール優先順位に従い効率的に探索
 3. 実装 - 型安全・影響範囲確認
-4. 品質保証 - DoD の全項目を実行
-5. Codex レビュー - 変更を独立観点でレビューする。Codex 外部から実行する場合は `/codex-code-review` を使い、Codex セッション内では手動差分確認または別プロセスの `codex exec` で代替可。指摘があれば修正を適用。最大3回繰り返し
+4. 品質保証 - DoD の該当項目を実行
+5. 独立レビュー - 変更を通常のコードレビュー観点で確認する。Codex セッション内では手動差分確認を基本とし、必要に応じて別プロセスの `codex exec` で代替してもよい。Codex 外部から実行する場合は `/codex-code-review` を使える。指摘があれば修正を適用し、最大3回繰り返す
 6. 報告 - 完了報告、問題があれば早期相談
 
 ## 重要な開発原則
@@ -49,9 +49,8 @@
 
 **優先順位**（トークン効率重視）:
 
-1. MCP Serena - シンボル解析・依存関係追跡
-2. Grep - パターン検索・横断的調査
-3. Read - 設定ファイル・小規模ファイル・最終手段
+1. Grep / `rg` / `rtk grep` - パターン検索・横断的調査
+2. Read / `rtk read` - 設定ファイル・小規模ファイルの確認
 
 ## ファイル操作原則
 
@@ -67,7 +66,8 @@
 2. Agent - 自動実行すべきタスク
 3. Command - ユーザーが手動実行する操作
 4. Rules/Steering - プロジェクト固有のルール
-5. Docs - 上記で表現できない場合のみ、最小限
+5. llms.txt - agent 向けの短い入口・索引
+6. Docs - 上記で表現できない場合のみ、最小限
 
 ## Git コミット規約
 
@@ -89,14 +89,25 @@
 
 ### Voice Notification Rules
 
+設定:
+
+- 音声通知の設定は `speaker=1` `speedScale=1.3` `async=true` を使う
 - すべてのタスク完了時には必ず `mcp-simple-voicevox` で音声通知を行う
 - 重要なお知らせやエラー発生時にも `mcp-simple-voicevox` で音声通知を行う
-- 音声通知の設定は `speaker=1` `speedScale=1.3` `async=true` を使う
+
+文面:
+
 - 英単語は適切にカタカナへ変換してから `VOICEVOX` に送る
 - `VOICEVOX` に送るテキストは不要なスペースを削除する
 - 1回の音声通知は 100 文字以内で、結果だけをシンプルに伝える
 - 詳しい技術的説明は音声通知に含めず、結果のみを簡潔に報告する
+
+タイミング:
+
 - 音声通知のタイミングは、命令受領時、作業開始時、作業中、進捗報告時、完了時を基本とする
+
+例:
+
 - 命令受領時の例は「了解です」「承知しました」
 - 作業開始時の例は「〜を開始します」
 - 作業中の例は「調査中です」「修正中です」
@@ -105,7 +116,7 @@
 
 ## 禁止事項
 
-- `find`, `grep`, `cat`, `head`, `tail` の直接使用（専用ツールを使うこと）
+- `find`, `grep`, `cat`, `head`, `tail` の直接使用は原則避け、`rg`、専用ツール、`rtk` を優先する
 - 要求されていない機能追加・リファクタリング
 - 既存テスト・重要ファイルの無断削除
 - any 型の導入
@@ -116,7 +127,8 @@
 
 - 基準ディレクトリ:
   - Claude Code: `~/.claude/skills/<skill-name>/`
-  - Codex: `~/.codex/skills/<skill-name>/`
+  - Codex: `~/.agents/skills/<skill-name>/`
+- `~/.codex/skills` は legacy であり、Codex の active deployment root として扱わない
 - 解決方法: 相対パス `scripts/foo.py` → 絶対パス `<基準ディレクトリ>/scripts/foo.py`
 
 #### 実行例 (gh-address-comments)
@@ -126,7 +138,7 @@
 python3 ~/.claude/skills/gh-address-comments/scripts/fetch_comments.py
 
 # Codex
-python3 ~/.codex/skills/gh-address-comments/scripts/fetch_comments.py
+python3 ~/.agents/skills/gh-address-comments/scripts/fetch_comments.py
 ```
 
 @rules/tools/rtk.md
