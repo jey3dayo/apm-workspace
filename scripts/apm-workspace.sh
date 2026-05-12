@@ -810,9 +810,9 @@ cmd_apply() {
   trap 'rm -rf "$apply_stage_root"' RETURN
 
   build_target_skill_trees "$apply_stage_root"
-  sync_managed_catalog_runtime_assets
   install_workspace_mcp_dependencies
   compile_codex
+  sync_managed_catalog_runtime_assets
   replace_skill_targets_from_stage "$apply_stage_root"
 
   trap - RETURN
@@ -1202,7 +1202,7 @@ EOF
 
 managed_catalog_skill_inventory() {
   skill_ids=$(managed_skill_ids)
-  managed_catalog_runtime_targets | while IFS='|' read -r target_name _target_dir _config_name; do
+  managed_catalog_runtime_targets | while IFS='|' read -r target_name _target_dir _config_name _skills_dir; do
     printf '%s\n' "$skill_ids" | while IFS= read -r skill_id; do
       [ -n "$skill_id" ] || continue
       printf '%s|%s|%s\n' "$target_name" "$skill_id" "$(format_skill_name "$target_name" "$skill_id")"
@@ -1652,7 +1652,7 @@ build_deployment_plan_entries() {
 
   printf '%s\n' "$skill_records" | while IFS=$'\t' read -r source_kind source_skill_id source_path source_ref; do
     [ -n "$source_skill_id" ] || continue
-    managed_catalog_runtime_targets | while IFS='|' read -r target_name target_dir _config_name; do
+    managed_catalog_runtime_targets | while IFS='|' read -r target_name target_dir _config_name _skills_dir; do
       deployed_skill_name=$(format_skill_name "$target_name" "$source_skill_id")
       validate_skill_id "$deployed_skill_name"
       deployment_plan_record \
@@ -1730,7 +1730,7 @@ stage_target_skill_records() {
   deployment_plan="$1"
   stage_root="$2"
 
-  managed_catalog_runtime_targets | while IFS='|' read -r target_name _target_dir _config_name; do
+  managed_catalog_runtime_targets | while IFS='|' read -r target_name _target_dir _config_name _skills_dir; do
     mkdir -p "$stage_root/$target_name/skills"
   done
 
@@ -1834,7 +1834,7 @@ sync_managed_catalog_runtime_assets() {
   commands_source=$(tracked_catalog_commands_root)
   rules_source=$(tracked_catalog_rules_root)
 
-  managed_catalog_runtime_targets | while IFS='|' read -r _target_name target_dir config_name; do
+  managed_catalog_runtime_targets | while IFS='|' read -r _target_name target_dir config_name _skills_dir; do
     target_root="$HOME/$target_dir"
     mkdir -p "$target_root"
 
