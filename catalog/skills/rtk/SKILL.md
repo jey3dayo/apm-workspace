@@ -18,9 +18,11 @@ Read `references/command-reference.md` when you need the detailed command famili
 1. Confirm whether the repository already uses RTK.
    - Look for `.rtk/filters.toml`, `rtk` in tool configs, or existing RTK-specific rules.
 2. Prefer `rtk <command>` for external commands that emit large or repetitive output.
-3. If RTK is installed globally, run `rtk init --global` so the hook can transparently rewrite supported Bash commands.
-4. Run `rtk gain` or `rtk gain --history` to verify the benefit and identify the noisiest commands.
-5. If RTK filtering hides information you need for debugging, switch that command to `rtk proxy <command>`.
+3. Keep shell builtins and session-state changes raw.
+   - Examples: `cd`, `export`, `alias`, shell option changes, and other operations whose effect must stay in the current shell.
+4. If RTK is installed globally, use the setup command for the current agent so startup guidance and hooks are placed in the right location.
+5. Run `rtk gain` or `rtk gain --history` to verify the benefit and identify the noisiest commands.
+6. If RTK filtering hides information you need for debugging, switch that command to `rtk proxy <command>`.
 
 ## Prefer RTK For
 
@@ -59,6 +61,14 @@ rtk init --global
 
 This installs the PreToolUse hook so supported Bash commands are automatically rewritten to RTK equivalents.
 
+For Codex, use the Codex-specific global setup:
+
+```bash
+rtk init -g --codex
+```
+
+Codex integration writes RTK guidance into the Codex instruction path instead of relying on Claude-specific `@rules/...` expansion. In this APM workspace, the durable source still lives under `catalog/**`; do not hand-edit deployed `~/.codex/AGENTS.md` or `~/.agents/skills/**`.
+
 ### Verify Savings
 
 ```bash
@@ -86,6 +96,7 @@ When the current repository already documents RTK usage, treat that local guidan
 - If the repository already declares RTK in its toolchain, install or update it through that existing path instead of inventing a new one
 - If the repository has task docs or rollout commands for RTK-related changes, follow those local instructions rather than hardcoding one workspace's maintenance flow here
 - Do not add a new task runner command unless the existing repository workflow cannot pick the change up
+- In Codex, put only minimal always-on RTK rules in `AGENTS.md`; keep detailed operational guidance in this skill and its references
 
 ## Example
 

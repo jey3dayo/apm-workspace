@@ -52,6 +52,12 @@
 1. Grep / `rg` / `rtk grep` - パターン検索・横断的調査
 2. Read / `rtk read` - 設定ファイル・小規模ファイルの確認
 
+### RTK 利用方針
+
+- 外部コマンドは原則 `rtk <command>` を使い、テスト・ビルド・Git・GitHub CLI・package manager・探索系の出力を圧縮する
+- shell builtin、`cd`、環境変数変更など shell session state に関わる操作は raw command のまま扱う
+- RTK のフィルターで必要な情報が足りない場合は `rtk proxy <command>` で同じ入口から raw output を確認する
+
 ## ファイル操作原則
 
 - 既存ファイル編集を優先、新規作成は必要最小限
@@ -140,5 +146,3 @@ python3 ~/.claude/skills/gh-address-comments/scripts/fetch_comments.py
 # Codex
 python3 ~/.agents/skills/gh-address-comments/scripts/fetch_comments.py
 ```
-
-@rules/tools/rtk.md
