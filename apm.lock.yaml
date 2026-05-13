@@ -731,6 +731,17 @@ dependencies:
   - .claude/skills/humanizer
   - .codeium/windsurf/skills/humanizer
   content_hash: sha256:34a38e6acc60d4529612d41ffe740bca0060d3c5e89e2a0d24ae795f67157fbb
+- repo_url: softaworks/agent-toolkit
+  host: github.com
+  resolved_commit: 3027f20f3181758385a1bb8c022d4041dfb4de84
+  virtual_path: skills/mermaid-diagrams
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/mermaid-diagrams
+  - .claude/skills/mermaid-diagrams
+  - .codeium/windsurf/skills/mermaid-diagrams
+  content_hash: sha256:451b0f53d9fe30c19eea0102c8da8c3ec56cf5cce63b97f3d9d9dbf34e1088aa
 - repo_url: tokoroten/prompt-review
   host: github.com
   resolved_commit: 0a83fd9eeead58fe92d0b04522da9e6840a71940

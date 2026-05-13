@@ -66,6 +66,7 @@ dependencies:
     - softaworks/agent-toolkit/skills/humanizer
     - Jakubantalik/transitions-dev/skills/transitions-dev
     - langchain-ai/deepagents/libs/cli/examples/skills/web-research
+    - softaworks/agent-toolkit/skills/mermaid-diagrams
   mcp:
     - name: context7
       registry: false
