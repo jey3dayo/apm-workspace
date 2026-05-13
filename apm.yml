@@ -10,8 +10,6 @@ dependencies:
     - caad-develop/claude-code-marketplace/plugins/infra/mdb
     - nextlevelbuilder/ui-ux-pro-max-skill
     - EpicenterHQ/epicenter/.agents/skills/tauri
-    - Heyvhuang/ship-faster/skills/cloudflare
-    - Heyvhuang/ship-faster/skills/tool-openclaw
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-chat
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-dashboard

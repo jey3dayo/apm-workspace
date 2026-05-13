@@ -13,28 +13,6 @@ dependencies:
   - .claude/skills/tauri
   - .codeium/windsurf/skills/tauri
   content_hash: sha256:e9ad9f9304bdeaab54cfff99a5ab47b8215cc8043ef686ff9036e86572f36f1b
-- repo_url: Heyvhuang/ship-faster
-  host: github.com
-  resolved_commit: 64047d24e0ecb513a5aa879767d95ec7e0e44462
-  virtual_path: skills/cloudflare
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/cloudflare
-  - .claude/skills/cloudflare
-  - .codeium/windsurf/skills/cloudflare
-  content_hash: sha256:03937061c79fe7e9e989cd054bf3adff6123fa58fe3ba63ed984358854d94bb0
-- repo_url: Heyvhuang/ship-faster
-  host: github.com
-  resolved_commit: 64047d24e0ecb513a5aa879767d95ec7e0e44462
-  virtual_path: skills/tool-openclaw
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/tool-openclaw
-  - .claude/skills/tool-openclaw
-  - .codeium/windsurf/skills/tool-openclaw
-  content_hash: sha256:1b9cee49d17e42ed30aa3f429102ef2b9b7fddd94e705138dce852994cdbe447
 - repo_url: Jakubantalik/transitions-dev
   host: github.com
   resolved_commit: 39f02b65f821383dc905a585172cbfd14e20b7f4
@@ -178,7 +156,7 @@ dependencies:
   content_hash: sha256:1c499d1c289cf6b2b358b966e67f0700ffa8889d488bb16d97e50cf24e08cf8b
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: 2db6a01c3128061bb412c1429aa2386ac1a0c507
+  resolved_commit: 4ffca3500f112e7c93f63436d634d2aadc93c725
   virtual_path: plugins/infra/ca-pass
   is_virtual: true
   package_type: marketplace_plugin
@@ -189,7 +167,7 @@ dependencies:
   content_hash: sha256:51221f2fbcb7a85aa77e66c5f5a3d1d748b3b8f626d861a88195e66aa2fd0c27
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: 2db6a01c3128061bb412c1429aa2386ac1a0c507
+  resolved_commit: 4ffca3500f112e7c93f63436d634d2aadc93c725
   virtual_path: plugins/infra/mdb
   is_virtual: true
   package_type: marketplace_plugin
@@ -200,7 +178,7 @@ dependencies:
   content_hash: sha256:3c7d57154c87020d236168529a418265389098f6d60aaa62c5bde31248e55ac0
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: 2db6a01c3128061bb412c1429aa2386ac1a0c507
+  resolved_commit: 4ffca3500f112e7c93f63436d634d2aadc93c725
   virtual_path: plugins/infra/perman-aws-vault
   is_virtual: true
   package_type: marketplace_plugin
@@ -208,7 +186,7 @@ dependencies:
   - .agents/skills/perman-aws-vault
   - .claude/skills/perman-aws-vault
   - .codeium/windsurf/skills/perman-aws-vault
-  content_hash: sha256:ef78161e2eec3e05d6141cf7a818bab7fdaef8b24205d9e118d2081e3747c9f6
+  content_hash: sha256:59a6603fb601988fd743f7fe481a108153cb1fb8f1f2477b6aae9c14d1704a3a
 - repo_url: cloudflare/skills
   host: github.com
   resolved_commit: 60147cbb773649eadca89cee92b4e0caf02234b4
