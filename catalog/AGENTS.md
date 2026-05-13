@@ -58,6 +58,15 @@
 - shell builtin、`cd`、環境変数変更など shell session state に関わる操作は raw command のまま扱う
 - RTK のフィルターで必要な情報が足りない場合は `rtk proxy <command>` で同じ入口から raw output を確認する
 
+### CLI が見つからない場合
+
+- まず `command -v <tool>` または `which <tool>` で PATH 上の存在を確認する
+- リポジトリの `mise.toml`、`mise.lock`、task 定義でその tool が mise 管理か確認する
+- mise 管理なら `mise which <tool>` で解決先を確認し、未導入なら `mise install` を検討する
+- それでも使えない場合のみ、理由を報告して raw command や代替コマンドに fallback する
+- RTK の Git 利用は `rtk git status --short` のように `rtk <command>` で包む。`rtk status --short` は誤り
+- この環境では `~/.mise/shims/rtk` のように mise shim 配下に tool がある場合がある
+
 ## ファイル操作原則
 
 - 既存ファイル編集を優先、新規作成は必要最小限
