@@ -1,13 +1,13 @@
 ---
 name: docs-manager
-description: Use when reviewing, validating, or creating project documentation with metadata, tag, link, and size rules, especially in repositories that use `.docs-manager-config.json`.
+description: Use when reviewing, validating, creating, updating, or fixing project documentation, especially docs directories and Markdown files governed by metadata, tag, link, and size rules such as `.docs-manager-config.json`.
 ---
 
 # Docs Manager
 
 ## Overview
 
-This skill is for documentation quality control, not generic prose editing. Start from project configuration, then validate metadata, tags, size, and links in that order.
+This skill is for project documentation maintenance, not generic prose editing. Start from project configuration, then review, create, update, fix, or validate documentation against metadata, tags, size, and links in that order.
 
 The detailed schemas and examples already live in `templates/`, `examples/`, and `references/`.
 
@@ -16,6 +16,7 @@ The detailed schemas and examples already live in `templates/`, `examples/`, and
 - docs directory や `.md` 群の品質をレビューしたい
 - metadata, tags, size limit, link validity を確認したい
 - 新しいドキュメントを既存ルールに合わせて作りたい
+- 既存ドキュメントを実装や運用変更に合わせて更新・修復したい
 - project-specific documentation rules を適用したい
 
 使わない場面:
@@ -101,6 +102,17 @@ config がない場合は default behavior として扱う:
 5. 既存ファイルへの link は存在確認できる path / anchor だけを使う
 6. concise な runbook / reference / guide shape に収め、project-specific 情報がない場合は断定しない
 7. 作成後に metadata / tags / size / links の検証結果を添える
+
+## Updating or Fixing Documents
+
+既存 document を更新・修復するときは、先に実態との差分と対象読者を確認する。
+
+1. 変更元を確認する: `git diff`、実装ファイル、設定、運用手順、ユーザー指定のどれが根拠かを明示する
+2. 既存 document の該当 section を探し、新しい重複 section を作らず in-place で直す
+3. stale な記述、壊れた link、不足 metadata、tag/size 違反を分けて扱う
+4. 手動で書かれた判断や project-specific な文体を保ち、汎用テンプレートで上書きしない
+5. 大きな再構成が必要な場合は、編集前に affected files と最小変更案を提示する
+6. 更新後に metadata / tags / size / links の確認結果を添える
 
 ## Config Examples
 

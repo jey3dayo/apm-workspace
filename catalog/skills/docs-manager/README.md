@@ -337,7 +337,7 @@ Add custom validation via configuration:
 
 The docs-manager skill automatically integrates with:
 
-- docs-index: Documentation discovery and navigation
+- skill discovery: Documentation discovery and navigation
 - code-review: Documentation review in code review workflow
 
 ### With External Tools

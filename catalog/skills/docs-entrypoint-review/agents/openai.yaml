@@ -1,0 +1,4 @@
+interface:
+  display_name: "Docs Entrypoint Review"
+  short_description: "Review whether project entrypoint docs need updates"
+  default_prompt: "Use $docs-entrypoint-review to review my recent changes and tell me which entrypoint docs should be updated before editing them."
