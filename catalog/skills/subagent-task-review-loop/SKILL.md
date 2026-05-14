@@ -17,7 +17,7 @@ integration, quality gates, and final judgment.
 
 ## Workflow
 
-1. **Frame the target**
+1. Frame the target
    - Restate the user-visible outcome, constraints, and hard stop conditions.
    - If the request names a broad or ambiguous area, first lock the
      user-visible action, likely code path, evidence source, and reproduction
@@ -30,7 +30,7 @@ integration, quality gates, and final judgment.
      locally because it is on the critical path or requires integration judgment.
    - Create or update the local task list before dispatching agents.
 
-2. **Split subagent work**
+2. Split subagent work
    - Delegate only bounded tasks that can run in parallel without blocking the
      owner task.
    - Prefer subagent work for codebase scouting, option comparison, test
@@ -40,7 +40,7 @@ integration, quality gates, and final judgment.
    - Do not ask multiple subagents to solve the same question unless comparing
      variants intentionally.
 
-3. **Backlog the findings**
+3. Backlog the findings
    - Convert subagent results into Codex task-list entries.
    - Mark each entry as one of:
      - `do-now`: blocks the owner task or quality gate
@@ -55,13 +55,13 @@ integration, quality gates, and final judgment.
      reproduction step, or diff inspection.
    - Keep the owner task updated as new facts arrive.
 
-4. **Execute the owner task**
+4. Execute the owner task
    - Work locally on the current owner task while subagents run.
    - Integrate only evidence-backed findings.
    - Keep edits scoped to the user request and existing project patterns.
    - When a subagent changed files, review its diff before building on it.
 
-5. **Review loop**
+5. Review loop
    - Run a review pass after each meaningful integration slice.
    - Triage every review comment into `actionable`, `park`, or `reject` before
      spending fix time.
@@ -79,7 +79,7 @@ integration, quality gates, and final judgment.
    - Maximum repeated attempts for the same failed approach: 3. After that,
      report attempts, errors, and alternatives.
 
-6. **Quality gates**
+6. Quality gates
    - Run the project-appropriate checks before claiming completion.
    - If a gate cannot run, record why and what risk remains.
    - Prefer a layered gate set when the work crosses layers: focused unit tests

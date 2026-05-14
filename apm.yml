@@ -62,6 +62,8 @@ dependencies:
     - vercel-labs/agent-skills/skills/web-design-guidelines
     - vercel-labs/skills/skills/find-skills
     - apollographql/skills/skills/rust-best-practices
+    - hashicorp/agent-skills/terraform/code-generation/skills/terraform-style-guide
+    - hashicorp/agent-skills/terraform/code-generation/skills/terraform-test
     - gonta223/humanizer-ja
     - softaworks/agent-toolkit/skills/humanizer
     - Jakubantalik/transitions-dev/skills/transitions-dev

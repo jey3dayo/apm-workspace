@@ -36,6 +36,7 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 - Run `mise run install:catalog` after commit/push when you want to install the tracked catalog ref.
 - Run `mise run smoke:catalog` to smoke-test the generated catalog package.
 - Run `mise run apply:skills:local` for a fast local Codex skill refresh only.
+- For skill creation, updates, installs, or migrations in this workspace, include `mise run deploy` and a deployed target check in the plan unless the user explicitly asks for local-only refresh.
 
 ## Routing
 
@@ -54,13 +55,18 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 - Do not reintroduce many local `./packages/*` refs into `~/.apm/apm.yml`.
 - Do not hand-edit deployed targets such as `~/.claude/`, `~/.codex/`, or `~/.agents/skills`.
 - Prefer `mise` tasks over ad hoc script entrypoints for normal operation.
+- If an upstream skill path is wrong, correct it to the real upstream path and treat the corrected successful install as the main result.
+- Treat known orphaned guidance or unrelated `manual-skills` deploy warnings as residual noise. Do not mention them in the final report when the command exits zero and the target skill source path, manifest or lock entry, and deployed target are correct.
+- Report deploy warnings only when they directly affect the skill changed in this task, its manifest entry, its `manual-skills` provenance, or the deploy exit code.
 
 ## Fast Paths
 
 1. Personal skill changed:
    - edit `~/.apm/catalog/skills/**`
    - optionally run `mise run format:markdown:bold-headings`
-   - run `mise run deploy` or `mise run apply:skills:local`
+   - run `mise run deploy`
+   - verify `~/.agents/skills/<id>/` contains the deployed skill
+   - use `mise run apply:skills:local` only when the user explicitly wants a fast local Codex skill refresh
 
 2. Shared guidance changed:
    - edit `~/.apm/catalog/**`
@@ -74,5 +80,5 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 4. Manual skill promoted to workspace-owned:
    - move the skill from `manual-skills/.apm/skills/<id>/` to `catalog/skills/<id>/`
    - update `manual-skills/upstreams/**` to note the migration
-   - run `mise run check`, then `mise run deploy` or `mise run apply:skills:local`
+   - run `mise run check`, then `mise run deploy`
    - verify the deployed target contains one copy of the skill

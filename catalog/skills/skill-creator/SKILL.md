@@ -362,6 +362,8 @@ scripts/quick_validate.py <path/to/skill-folder>
 
 The validation script checks YAML frontmatter format, required fields, and naming rules. If validation fails, fix the reported issues and run the command again.
 
+For skills managed in the `~/.apm` workspace, do not stop at `quick_validate.py`. Use `apm-usage` to include the rollout path in the plan: run `mise run check`, run `mise run deploy`, then verify `~/.agents/skills/<skill-name>/` contains the deployed skill. Use `mise run apply:skills:local` only when the user explicitly asks for a fast local-only Codex skill refresh.
+
 ### Step 6: Iterate
 
 After testing the skill, users may request improvements. Often this happens right after using the skill, with fresh context of how the skill performed.

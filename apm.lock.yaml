@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-05-11T17:48:12.136321+00:00'
+generated_at: '2026-05-14T08:34:55.794665+00:00'
 apm_version: 0.13.0
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -218,6 +218,28 @@ dependencies:
   - .claude/skills/humanizer-ja
   - .codeium/windsurf/skills/humanizer-ja
   content_hash: sha256:b6da4ef92a941ab364ab1ddf259d9e511e098a0719f7ee2202847351c34a8194
+- repo_url: hashicorp/agent-skills
+  host: github.com
+  resolved_commit: 43ca9b0cde131e20a129c106bc9f6b6f9f1e5c9a
+  virtual_path: terraform/code-generation/skills/terraform-style-guide
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/terraform-style-guide
+  - .claude/skills/terraform-style-guide
+  - .codeium/windsurf/skills/terraform-style-guide
+  content_hash: sha256:fd301fe5bfb41764acac67c25244cc5650b5dd0a5d8d037414449a2d3adecbbf
+- repo_url: hashicorp/agent-skills
+  host: github.com
+  resolved_commit: 43ca9b0cde131e20a129c106bc9f6b6f9f1e5c9a
+  virtual_path: terraform/code-generation/skills/terraform-test
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/terraform-test
+  - .claude/skills/terraform-test
+  - .codeium/windsurf/skills/terraform-test
+  content_hash: sha256:124fdde03e38d9942810e65e762eaf95f8680a1f1f6fdae3ecda16d86b10620b
 - repo_url: ibelick/ui-skills
   host: github.com
   resolved_commit: dbf83e8869f75e196e3b1ad6e3be17fad152e1b5
@@ -275,12 +297,13 @@ dependencies:
   content_hash: sha256:99aaea521aa0f1c7d041d70bb6b75581c1a50ec6ac59ceaaa923b6339ffa417b
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: 8ec4086a913df638f04ec4160342e4e8dc8a4421
+  resolved_commit: a0f57a35165e457cd5460a497bf03b22de80ab8f
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
   package_type: skill_bundle
   deployed_files:
+  - .agents/skills/1password-item-ops
   - .agents/skills/agent-creator
   - .agents/skills/apm-usage
   - .agents/skills/atomic-commit
@@ -294,9 +317,8 @@ dependencies:
   - .agents/skills/command-creator
   - .agents/skills/design-md-workflow
   - .agents/skills/distributions-manager
-  - .agents/skills/docs-index
+  - .agents/skills/docs-entrypoint-review
   - .agents/skills/docs-manager
-  - .agents/skills/documentation-management
   - .agents/skills/dotenvx-env-ops
   - .agents/skills/dotfiles-integration
   - .agents/skills/drawio
@@ -340,6 +362,7 @@ dependencies:
   - .agents/skills/typescript
   - .agents/skills/wezterm
   - .agents/skills/zsh
+  - .claude/skills/1password-item-ops
   - .claude/skills/agent-creator
   - .claude/skills/apm-usage
   - .claude/skills/atomic-commit
@@ -353,9 +376,8 @@ dependencies:
   - .claude/skills/command-creator
   - .claude/skills/design-md-workflow
   - .claude/skills/distributions-manager
-  - .claude/skills/docs-index
+  - .claude/skills/docs-entrypoint-review
   - .claude/skills/docs-manager
-  - .claude/skills/documentation-management
   - .claude/skills/dotenvx-env-ops
   - .claude/skills/dotfiles-integration
   - .claude/skills/drawio
@@ -399,6 +421,7 @@ dependencies:
   - .claude/skills/typescript
   - .claude/skills/wezterm
   - .claude/skills/zsh
+  - .codeium/windsurf/skills/1password-item-ops
   - .codeium/windsurf/skills/agent-creator
   - .codeium/windsurf/skills/apm-usage
   - .codeium/windsurf/skills/atomic-commit
@@ -412,9 +435,8 @@ dependencies:
   - .codeium/windsurf/skills/command-creator
   - .codeium/windsurf/skills/design-md-workflow
   - .codeium/windsurf/skills/distributions-manager
-  - .codeium/windsurf/skills/docs-index
+  - .codeium/windsurf/skills/docs-entrypoint-review
   - .codeium/windsurf/skills/docs-manager
-  - .codeium/windsurf/skills/documentation-management
   - .codeium/windsurf/skills/dotenvx-env-ops
   - .codeium/windsurf/skills/dotfiles-integration
   - .codeium/windsurf/skills/drawio
@@ -458,7 +480,7 @@ dependencies:
   - .codeium/windsurf/skills/typescript
   - .codeium/windsurf/skills/wezterm
   - .codeium/windsurf/skills/zsh
-  content_hash: sha256:21c547faa7254faa2dfb192b45656194b6e88e82cad62ff46efb08b4db43f67a
+  content_hash: sha256:677ddd0393d6118109f6a7e9ccd5f09d06e73f381d52e9cd0fecaaf35920fa09
 - repo_url: langchain-ai/deepagents
   host: github.com
   resolved_commit: 94628fef98aefb5389ab56c8acee31726d6385dc
