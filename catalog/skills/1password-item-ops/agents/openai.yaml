@@ -1,0 +1,4 @@
+interface:
+  display_name: "1Password Item Ops"
+  short_description: "Find and manage 1Password items safely"
+  default_prompt: "Use $1password-item-ops to find or update this 1Password item safely."
