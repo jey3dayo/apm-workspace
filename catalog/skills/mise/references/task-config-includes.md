@@ -1,20 +1,21 @@
 # task_config.includes
 
-Use `[task_config].includes` when you intentionally split a large user-global mise setup across multiple task files.
+Use `[task_config].includes` when you intentionally split a large mise setup across multiple task files.
 
 ## When to Use
 
 - Personal `~/.config/mise` or dotfiles environments
 - One maintainer supports multiple environments such as default, CI, Windows, or Raspberry Pi
 - Shared task families are easier to manage as separate files like `tasks/format.toml` and `tasks/lint.toml`
+- Large project-local repositories with clear task-family ownership, such as DB, env/dotenvx, secrets, infra, deploy, or tools
 
 ## When Not to Use
 
-- Ordinary project repositories
+- Ordinary small to medium project repositories
 - Small to medium `mise.toml` files that still fit comfortably in one file
 - Cases where splitting would make onboarding or CI harder to understand
 
-For normal repositories, prefer a single project-local `mise.toml`.
+For normal repositories, prefer a single project-local `mise.toml`. For project-local task-family split rules, see `task-family-splitting.md`.
 
 ## Recommended Layout
 
@@ -107,6 +108,7 @@ depends = ["lint:shell", "lint:yaml"]
 - Wire added tools into real tasks
   - If `shellcheck` or `shfmt` is added under `[tools]`, expose `lint:shell` or `format:shell`
 - Keep project-local examples separate from user-global examples
+- In project-local repos, keep the root `mise.toml` as the entrypoint and split only responsibility-bound task families
 - Prefer `depends` for aggregation-only tasks inside included task files
 
 ## Tradeoffs
@@ -126,6 +128,7 @@ depends = ["lint:shell", "lint:yaml"]
 ## Review Checklist
 
 - Is this a user-global or multi-environment setup?
+- If this is a project-local setup, is the split justified by clear task-family ownership?
 - Would a single `mise.toml` be simpler?
 - Are includes grouped by responsibility?
 - Are tools defined in environment config files instead of task files?

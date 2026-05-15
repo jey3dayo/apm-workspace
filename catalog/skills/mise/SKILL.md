@@ -1,22 +1,15 @@
 ---
 name: mise
 description: |
-  [What] Skill for mise (mise-en-place) task runner, tool version manager, and
-  package manager. Covers `mise.toml` structure, task definitions, dependency
-  management, tool/package centralization, workflow automation, and skill
-  installation via `mise skills add`.
-  [When] Use when: users mention "mise", "mise-en-place", "mise.toml",
-  `mise run`, `mise format`, `mise check`, `mise deploy`, `mise skills add`,
-  task definitions, tool version management, formatter wiring such as
-  `nixpkgs-fmt`, or Windows-specific mise settings such as `run_windows`,
-  `config.windows.toml`, and `windows_default_*_shell_args`. Also use when
-  asked whether a formatter or command is built in. Do not use for dotfile
-  migration, Home Manager, Nix Flake, or non-mise `~/.config` management; use
-  `nix-dotfiles` instead.
-  [Keywords] mise, mise-en-place, mise.toml, tool management, package
-  management, npm global, python packages, task runner, run, format, check, deploy,
-  skills add, formatter, fmt, nixpkgs-fmt, config.ci.toml,
-  config.default.toml
+  [What] Expert guidance for mise (mise-en-place) as task runner, tool version
+  manager, and package manager. Covers `mise.toml`, task definitions, dependency
+  graphs, `[task_config].includes`, DB/env/dotenvx/secrets/tools task-family
+  splitting, tool/package centralization, workflow automation, and `mise skills add`.
+  [When] Use when users mention mise, mise.toml, `mise run`, `mise check`,
+  `mise deploy`, task definitions, tool management, npm/pipx global packages,
+  formatters such as `nixpkgs-fmt`, dotenvx/env tasks, DB/secrets task groups,
+  or Windows settings such as `run_windows` and `config.windows.toml`. Do not use
+  for non-mise dotfile, Home Manager, or Nix Flake work; use `nix-dotfiles`.
 ---
 
 # mise - Task Runner Configuration Expert
@@ -37,7 +30,8 @@ Before giving advice, classify the request into one of these two modes and answe
 
 1. Project-local repository mode
    - The user is editing a repository-owned `mise.toml`
-   - Prefer a single root `mise.toml` unless the repo clearly uses another structure
+   - Prefer a single root `mise.toml` for small or medium task sets
+   - For large repos, consider `[task_config].includes` when task families have clear owners such as DB, env/dotenvx, secrets, infra, deploy, or tools
    - Use the repo's existing task names, workflow semantics, and source-of-truth rules as authoritative
 2. User-global / dotfiles mode
    - The user is managing `~/.config/mise`, personal toolchains, or `mise skills add`
@@ -204,8 +198,9 @@ For personal `~/.config/mise` setups, a split layout can be better than a single
 - Put environment-specific tool definitions in files such as `config.default.toml`, `config.ci.toml`, or `config.windows.toml`
 - Load shared task files via `[task_config].includes` from a local `~/.config/.mise.toml`
 
-Use this pattern for user-global dotfiles or environment-switched setups, not for ordinary project repos.
-For concrete examples, split-file structure, and do/don't guidance, see `references/task-config-includes.md`.
+Use this pattern for user-global dotfiles, environment-switched setups, or project-local task families that are large enough and responsibility-bound enough to make the root `mise.toml` hard to review.
+For project-local task-family splitting rules, see `references/task-family-splitting.md`.
+For concrete include-file examples, split-file structure, and do/don't guidance, see `references/task-config-includes.md`.
 For Windows shell selection, quoting, `run_windows`, and generated-file pitfalls, see `references/windows-shells.md`.
 
 ### Task Section Internal Structure
@@ -400,7 +395,8 @@ run = "pytest tests/integration"
 
 ✅ **DO:**
 
-- Keep single mise.toml at project root
+- Keep a single root `mise.toml` when the repo is small or medium
+- Split large task families with `[task_config].includes` only when responsibility boundaries are clear
 - Place long scripts in `mise-tasks/` or `scripts/`
 - Order sections: settings → env → tools → tasks
 - Within tasks section: individual commands → aggregation tasks → aliases/meta-tasks
@@ -456,7 +452,8 @@ When reviewing existing mise.toml:
 4. Validate Aliases: Check for conflicts and intuitive naming
 5. Test DAG: Run `mise task deps <task>` to visualize
 6. Check Best Practices: Verify against reference guidelines
-7. Performance: Consider compilation time and execution efficiency
+7. Identify domain task families that may deserve include files
+8. Performance: Consider compilation time and execution efficiency
 
 For repository-specific reviews, add these checks before proposing changes:
 
@@ -464,6 +461,7 @@ For repository-specific reviews, add these checks before proposing changes:
 - Does it keep refresh, rollout, and deploy semantics distinct where the repo does?
 - Does it avoid treating generated outputs as editing surfaces if the repo separates them from authoring surfaces?
 - Does it separate "task behavior as implemented" from "description wording that could be clearer"?
+- If `mise.toml` has many DB, env/dotenvx, secrets, infra, deploy, or tools tasks, would a responsibility-based include file reduce review risk without hiding the primary workflows?
 
 ### Reference
 
@@ -570,6 +568,7 @@ Detailed documentation loaded as needed:
 - `best-practices.md` - 2025 field-tested best practices, comprehensive guide on run vs depends, command composition patterns
 - `current-patterns.md` - Real-world examples from dotfiles project, practical task patterns
 - `config-templates.md` - Common mise.toml templates and patterns
+- `task-family-splitting.md` - Project-local task-family split rules for DB, env/dotenvx, secrets, infra, deploy, and tools tasks
 - `task-config-includes.md` - When and how to split user-global task files with `[task_config].includes`
 - `windows-shells.md` - Windows shell selection, `run_windows` syntax, env var expansion, and generated-file pitfalls
 - `tool-management.md` - Tool version management, Centralized Package Management, npm/Python migration guides, troubleshooting
