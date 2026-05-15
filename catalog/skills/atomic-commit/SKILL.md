@@ -16,8 +16,12 @@ description: |
 
 ```bash
 rtk git status
-rtk git diff
+rtk git diff --name-only
+rtk git diff -- <non-env paths>
 ```
+
+`.env`, `.env.*`, 認証情報, secret が含まれる疑いのあるファイルは、この時点で差分本文を表示しない。
+dotenvx-managed `.env.*` が dirty の場合は、値を見せずにファイル名・dotenvx 管理であること・dirty であることだけを伝え、コミットに含めるかユーザーに確認する。
 
 ### 2. コミットスタイルの確認
 
@@ -39,6 +43,8 @@ Conventional Commits 形式（`feat:`, `fix:`, `chore:`, `docs:`, `build:`, `tes
 | 低     | ファイルタイプ           | 同種ファイルのまとめ（最終手段）           |
 
 **1グループ = 1コミット**。関係のないファイルは別グループにする。
+
+dotenvx-managed `.env.*` は、ユーザーが含めると明示した場合だけ該当グループに入れる。raw `.env`、認証情報、secret が含まれる疑いのあるファイルはコミット対象にしない。
 
 ### 4. コミットタイプの選択
 
@@ -73,6 +79,9 @@ EOF
 
 ## 注意事項
 
-- `.env` や認証情報を含むファイルはコミットしない
+- raw `.env`、認証情報、secret が含まれる疑いのあるファイルはコミットしない
+- dotenvx-managed `.env.*` は repo の source of truth になり得るため、自動除外せず、値や secret 断片を表示しないままユーザーに確認する
+- dotenvx-managed `.env.*` を確認するときは、ファイル名・管理方式・差分の有無だけを伝える
+- ユーザーが含めると明示した場合だけ、dotenvx-managed `.env.*` を対象コミットに stage する
 - 未完成の変更は別グループとして扱い、ユーザーに確認する
 - `rtk` プレフィックスを全 git コマンドに付ける
