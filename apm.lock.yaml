@@ -1,10 +1,10 @@
 lockfile_version: '1'
-generated_at: '2026-05-14T17:39:23.634288+00:00'
+generated_at: '2026-05-15T06:00:51.505353+00:00'
 apm_version: 0.13.0
 dependencies:
 - repo_url: EpicenterHQ/epicenter
   host: github.com
-  resolved_commit: c4f1f4ff622d1d5fdafee9a79f5d4d869bc1c719
+  resolved_commit: 632dac435f4dcabe55cbb813cc1f4f9f234f426e
   virtual_path: .agents/skills/tauri
   is_virtual: true
   package_type: claude_skill
@@ -15,7 +15,7 @@ dependencies:
   content_hash: sha256:e9ad9f9304bdeaab54cfff99a5ab47b8215cc8043ef686ff9036e86572f36f1b
 - repo_url: Jakubantalik/transitions-dev
   host: github.com
-  resolved_commit: 39f02b65f821383dc905a585172cbfd14e20b7f4
+  resolved_commit: c4ec6094402361e49a3b5010ce75736c8db4c93b
   virtual_path: skills/transitions-dev
   is_virtual: true
   package_type: claude_skill
@@ -23,7 +23,7 @@ dependencies:
   - .agents/skills/transitions-dev
   - .claude/skills/transitions-dev
   - .codeium/windsurf/skills/transitions-dev
-  content_hash: sha256:08253db207976bc5aa30bbe550ca1fc5c598caedf8251f75471a3e6ab42f9ac7
+  content_hash: sha256:8cf9ba1ed0d52741e4ed1dafc6ee4543e32f1e516f958d750e81412bfc36dd13
 - repo_url: Lum1104/Understand-Anything
   host: github.com
   resolved_commit: cde871990c4f40a4f44726a29d93e4f34e626e12
@@ -103,7 +103,7 @@ dependencies:
   content_hash: sha256:d50d11bbefdc1599d78900828dcb69d48e5091769d3f5ce10e06a60efe2405bf
 - repo_url: anthropics/claude-code
   host: github.com
-  resolved_commit: c5712671c87f8ec283ecf1c5024a4952ba5bfbcd
+  resolved_commit: d61bfb5b562eea5091b11ad1858a9ae429b6bd23
   virtual_path: plugins/frontend-design/skills/frontend-design
   is_virtual: true
   package_type: claude_skill
@@ -147,12 +147,16 @@ dependencies:
   content_hash: sha256:405cf94e4df9b048ab42e51f26ad971dc6b986167b74eb46393abd6f1f5b5f88
 - repo_url: browser-use/browser-harness
   host: github.com
-  resolved_commit: 2f22ed6709748edc5eab733eae099802640a78e2
+  resolved_commit: d0cef34b4220036d580fbc24822865991a09aa9b
   package_type: claude_skill
-  content_hash: sha256:7148c207ef5a65c51c8e9f55ebf6be9b40c2ec2445c74094b3ec17c70ac60617
+  deployed_files:
+  - .agents/skills/browser-harness
+  - .claude/skills/browser-harness
+  - .codeium/windsurf/skills/browser-harness
+  content_hash: sha256:fd85ddb81d8150406645f398e16f5af27fe6d5fcc40f1782406e8b8895e2d0f1
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: 4ffca3500f112e7c93f63436d634d2aadc93c725
+  resolved_commit: 94fa4fc1f37bc72e0694368a53bd78b54698524b
   virtual_path: plugins/infra/ca-pass
   is_virtual: true
   package_type: marketplace_plugin
@@ -160,10 +164,10 @@ dependencies:
   - .agents/skills/ca-pass
   - .claude/skills/ca-pass
   - .codeium/windsurf/skills/ca-pass
-  content_hash: sha256:d216a40c0a9bcc72c5df552522b427248e984fab4b0d232784ad4b9bcf6d904b
+  content_hash: sha256:51221f2fbcb7a85aa77e66c5f5a3d1d748b3b8f626d861a88195e66aa2fd0c27
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: 4ffca3500f112e7c93f63436d634d2aadc93c725
+  resolved_commit: 94fa4fc1f37bc72e0694368a53bd78b54698524b
   virtual_path: plugins/infra/mdb
   is_virtual: true
   package_type: marketplace_plugin
@@ -171,10 +175,10 @@ dependencies:
   - .agents/skills/mdb
   - .claude/skills/mdb
   - .codeium/windsurf/skills/mdb
-  content_hash: sha256:53632204cf6b7aeb8a56cbf9ec72653b3b96e7e6afb495ee479f3d62a213485d
+  content_hash: sha256:3c7d57154c87020d236168529a418265389098f6d60aaa62c5bde31248e55ac0
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: 4ffca3500f112e7c93f63436d634d2aadc93c725
+  resolved_commit: 94fa4fc1f37bc72e0694368a53bd78b54698524b
   virtual_path: plugins/infra/perman-aws-vault
   is_virtual: true
   package_type: marketplace_plugin
@@ -182,7 +186,7 @@ dependencies:
   - .agents/skills/perman-aws-vault
   - .claude/skills/perman-aws-vault
   - .codeium/windsurf/skills/perman-aws-vault
-  content_hash: sha256:93f788ed47c587ca39439d132fd4cfed63c35d404b341173de242ea73c61f847
+  content_hash: sha256:f436902904778be56607219840a08912502562260c14a371aad250311ac14445
 - repo_url: cloudflare/skills
   host: github.com
   resolved_commit: 60147cbb773649eadca89cee92b4e0caf02234b4
@@ -209,6 +213,10 @@ dependencies:
   host: github.com
   resolved_commit: a1e343696e43aa50e7218891f3319ab22cde3464
   package_type: claude_skill
+  deployed_files:
+  - .agents/skills/humanizer-ja
+  - .claude/skills/humanizer-ja
+  - .codeium/windsurf/skills/humanizer-ja
   content_hash: sha256:b6da4ef92a941ab364ab1ddf259d9e511e098a0719f7ee2202847351c34a8194
 - repo_url: hashicorp/agent-skills
   host: github.com
@@ -289,7 +297,7 @@ dependencies:
   content_hash: sha256:99aaea521aa0f1c7d041d70bb6b75581c1a50ec6ac59ceaaa923b6339ffa417b
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: 42160b900cbd903528471c97effa5282806652aa
+  resolved_commit: 91fe07f0d1130a6f6ff6f0c15a4f26aff77894de
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
@@ -475,7 +483,7 @@ dependencies:
   content_hash: sha256:4cb0989f03356a3cbb61c0eba80721e0c9a7c77da0bfda533b338ddbd6e5fc1b
 - repo_url: langchain-ai/deepagents
   host: github.com
-  resolved_commit: ec0bf0c663a974cc732df474258e9f5dbadeb7df
+  resolved_commit: 85d93015dd812ae56bc29b9fc3cac92cf72ee61c
   virtual_path: libs/cli/examples/skills/web-research
   is_virtual: true
   package_type: claude_skill
@@ -486,7 +494,7 @@ dependencies:
   content_hash: sha256:2b66d5db8c8d70474e70638f437f324fb3af3724b71bf8501e48c8004e70e677
 - repo_url: millionco/react-doctor
   host: github.com
-  resolved_commit: b71a492481dadb241b4bba8d0ee291948fb94771
+  resolved_commit: f0198e2f2d9560a15bdb4a78f4a378ca2ac5fcdd
   virtual_path: skills/react-doctor
   is_virtual: true
   package_type: claude_skill
@@ -511,10 +519,9 @@ dependencies:
   resolved_commit: b7e3af80f6e331f6fb456667b82b12cade7c9d35
   package_type: marketplace_plugin
   deployed_files:
-  - .agents/skills/ui-ux-pro-max
   - .claude/skills/ui-ux-pro-max
   - .codeium/windsurf/skills/ui-ux-pro-max
-  content_hash: sha256:496fe13cca94d56c9cf98899801fd117813fbcbd135ae660fb481d1c4c0e1abb
+  content_hash: sha256:f967740cfa8aced3860967f06558f8b3df7d843b325b104284201d7e645d17d4
 - repo_url: nyosegawa/skills
   host: github.com
   resolved_commit: c1048fe35403a3f273132306a4d49278f189c64b
@@ -778,7 +785,7 @@ dependencies:
   - .agents/skills/agentic-actions-auditor
   - .claude/skills/agentic-actions-auditor
   - .codeium/windsurf/skills/agentic-actions-auditor
-  content_hash: sha256:db01db6ccc56b0fc2a37ca947653b6039e7655fac938e40f3de48a3fbb27ef18
+  content_hash: sha256:2803b2bf55ab6afb78262ef116f44f095ae6173d81e27d140e51a634ef4d5990
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: a56045e9ae00b3506cacefea0f672aab0a1a6e3c
@@ -803,9 +810,9 @@ dependencies:
   - .codeium/windsurf/skills/sharp-edges-analyzer/SKILL.md
   - .codex/agents/sharp-edges-analyzer.toml
   deployed_file_hashes:
-    .codeium/windsurf/skills/sharp-edges-analyzer/SKILL.md: sha256:b8aa55bda284c326fd19a56dd2fc295ed095467b364646c2cb5e6e3722bd93cd
-    .codex/agents/sharp-edges-analyzer.toml: sha256:a9720eb47562115c38dd75c069e8e02b8fdffceecd0ba7e75d43f4dd618079a9
-  content_hash: sha256:62c1a21c1a9352941b73af22f15d18c27880116f01929158a6a27b15f532dd88
+    .codeium/windsurf/skills/sharp-edges-analyzer/SKILL.md: sha256:c0663d7534da442b7a3f9829e9d36854067be3814cfada7f507908a076489ca9
+    .codex/agents/sharp-edges-analyzer.toml: sha256:e4acab6229d633e03f6e1621e2051cbb3b081052541d26d28cf0e1b91e3d165c
+  content_hash: sha256:0a7945aa202c4a525cf47928540e4cf76a5644cd2db6f3486282b285c8f735d9
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: a56045e9ae00b3506cacefea0f672aab0a1a6e3c
@@ -825,9 +832,9 @@ dependencies:
   - .codeium/windsurf/skills/semgrep-scanner/SKILL.md
   - .codex/agents/semgrep-scanner.toml
   deployed_file_hashes:
-    .codeium/windsurf/skills/semgrep-scanner/SKILL.md: sha256:55d20d1318864588ba94cfeeb4a9164dfdf86aa2be56e5c82d36ab04203810f7
-    .codex/agents/semgrep-scanner.toml: sha256:e6a71153cdb7a0fd83232ec2c62c9871889cace047ee8ffcfe1d6f084f3d162e
-  content_hash: sha256:58df3abbee403c717b720588bd6c25566b09798fece8cf2bf75d33843d41f562
+    .codeium/windsurf/skills/semgrep-scanner/SKILL.md: sha256:ec8f42da4a67bc4cc25de85891b8cf4fdfdd80c849d174d09cc216c8ab37e05c
+    .codex/agents/semgrep-scanner.toml: sha256:2d00271838d665aa25d5c96e141812aed82be9497b0b716c47d376ea4ef33954
+  content_hash: sha256:c0a9571c4d943b4a77c3192557c27a990914c57d09d92966c9f795164dd3b647
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: a56045e9ae00b3506cacefea0f672aab0a1a6e3c
