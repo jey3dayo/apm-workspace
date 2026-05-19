@@ -4,7 +4,7 @@
 Usage examples:
   python3 scripts/linear_task.py teams
   python3 scripts/linear_task.py list --team KEY --limit 20
-  python3 scripts/linear_task.py create --team KEY --title "Task title" --description "details" --due-date 2026-03-20
+  python3 scripts/linear_task.py create --team KEY --project PROJECT --title "Task title" --description "details" --due-date 2026-03-20
   python3 scripts/linear_task.py update --issue <UUID> --title "new title" --state "Done"
   python3 scripts/linear_task.py comment --issue <UUID> --body "追加メモ"
 """
@@ -195,6 +195,36 @@ def get_state_id_by_name(team_key: str, state_name: str) -> Optional[str]:
     return None
 
 
+def get_project_id(team_id: str, project: str) -> str:
+    needle = project.strip()
+    if not needle:
+        raise SystemExit("--project must not be empty")
+
+    q = """
+    query($teamId: String!, $first: Int!) {
+      team(id: $teamId) {
+        projects(first: $first) {
+          nodes {
+            id
+            name
+          }
+        }
+      }
+    }
+    """
+    data = gql(q, {"teamId": team_id, "first": 250})
+    team = data.get("team")
+    if not team:
+        raise SystemExit(f"Team not found for project lookup: {team_id}")
+
+    needle_lower = needle.lower()
+    for candidate in team["projects"]["nodes"]:
+        if candidate["id"] == needle or candidate["name"].strip().lower() == needle_lower:
+            return candidate["id"]
+
+    raise SystemExit(f"Project not found in team: {project}")
+
+
 def cmd_create(args: argparse.Namespace) -> None:
     team_id = get_team_id_by_key(args.team)
     q = """
@@ -215,6 +245,8 @@ def cmd_create(args: argparse.Namespace) -> None:
         input_obj["dueDate"] = args.due_date
     if args.priority is not None:
         input_obj["priority"] = args.priority
+    if args.project:
+        input_obj["projectId"] = get_project_id(team_id, args.project)
 
     data = gql(q, {"input": input_obj})
     result = data["issueCreate"]
@@ -301,6 +333,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     s = sub.add_parser("create", help="Create issue")
     s.add_argument("--team", required=True, help="Team key")
+    s.add_argument("--project", help="Project name or ID")
     s.add_argument("--title", required=True)
     s.add_argument("--description")
     s.add_argument("--due-date", type=valid_date, help="YYYY-MM-DD")
