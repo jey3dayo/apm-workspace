@@ -1,505 +1,216 @@
 ---
 name: premortem
-description: |
-  Proactively predicts project failure causes during planning/requirements/design phases.
-  Uses the Premortem technique to dynamically generate 3-5 questions based on project characteristics,
-  and uncovers overlooked industry standards, technical risks, and architectural flaws.
-  Use when: "premortem", "what could go wrong", "what am I missing", "failure prediction",
-  "planning review", "design validation" are requested. Supports integration with cc-sdd and task-router.
+description: Use when planning, requirements, design, estimation, or task decomposition needs pre-implementation failure prediction, blind-spot discovery, planning review, design validation, or answers to "what could go wrong" / "what am I missing". Use before implementation begins.
 ---
 
 # Premortem Analysis
 
-## Overview
+Premortem analysis assumes the project has failed and works backward to identify the likely causes before implementation starts. The output is a short set of high-signal risks, evidence from the repository, and concrete decisions or follow-up work.
 
-Premortem Analysis is a skill based on the project management technique "Premortem" that predicts failure causes at the planning stage.
+## Use This Skill When
 
-### Core Value
+- A user asks for `premortem`, planning review, design validation, "what could go wrong", or "what am I missing".
+- A plan, spec, task decomposition, architecture proposal, or release strategy exists but implementation has not started.
+- The risk is cross-cutting: security, reliability, migration, operations, compliance, cost, data integrity, or reversibility.
+- A team is about to commit to technology selection or scope estimates.
 
-- Early discovery of blind spots at the planning stage (identify issues before implementation)
-- Prevention of overlooked industry standard best practices
-- Visualization of expert tacit knowledge in question form
-- Prevention of downstream troubles (failures, cost overruns)
+Do not use it as a post-implementation code review. Use `predictive-analysis`, `code-review`, or project-specific review skills after code exists.
 
-### Differentiation from Existing Skills
+## Output Contract
 
-| Skill                    | Timing               | Focus                                                      |
-| ------------------------ | -------------------- | ---------------------------------------------------------- |
-| predictive-analysis      | After implementation | Future risk prediction from code patterns                  |
-| pr-feedback-orchestrator | After implementation | PR feedback orchestration (CI diagnosis, comment handling) |
-| cc-sdd validation        | End of each phase    | Formal validity verification                               |
-| premortem                | Planning phase       | Elicit "expert tacit knowledge" via questions              |
+For auto mode, return this shape:
 
-## Quick Start
+```markdown
+## Premortem
 
-### Execution Modes
+### Context
 
-Premortem can be run in 3 modes:
+- Domain:
+- Maturity:
+- Tech stack:
+- Scale:
+- Evidence:
 
-#### Auto Mode (Recommended)
+### Findings
 
-```bash
-/premortem --mode=auto "project description"
-# or simply
-/premortem "project description"
+| Risk            | Status                                                   | Severity                       | Evidence             | Recommended next action |
+| --------------- | -------------------------------------------------------- | ------------------------------ | -------------------- | ----------------------- |
+| <failure cause> | Covered / Needs Clarification / Missing / Not Applicable | Critical / High / Medium / Low | <file or user input> | <small next action>     |
+
+### Questions
+
+1. <question> - Why it matters: <one line>
+
+### Next Actions
+
+1. <highest-priority action>
 ```
 
-### Behavior
+Ask about GitHub Issue creation only after the report is complete, and never create issues without explicit user approval.
 
-1. Automatically analyzes project files (README.md, CLAUDE.md, .kiro/steering/\*.md, etc.)
-2. Automatically answers questions (infers from project context)
-3. Runs gap analysis (classifies into Covered/Needs Clarification/Missing)
-4. Generates a comprehensive report
-5. Only 1 confirmation: "Register to GitHub Issues?"
+## Modes
 
-### Features
+Choose the mode from the user's request. If no mode is specified, use auto mode.
 
-- Fastest (completes in 3-5 minutes)
-- No interaction needed (only final confirmation)
-- Automatic gap analysis
-- Full utilization of project context
+| Mode        | Use when                                                        | First response                                            |
+| ----------- | --------------------------------------------------------------- | --------------------------------------------------------- |
+| Auto        | Repo context is available or the user wants fast risk discovery | Run analysis and return the report                        |
+| Batch       | The user wants to answer questions before analysis              | Present all 3-5 questions with "Why it matters"           |
+| Interactive | The user wants a discussion                                     | Ask one question at a time, max 2 follow-ups per question |
 
-### Recommended When
+### Auto Mode
 
-- You are short on time
-- Project documentation is well developed
-- You want to quickly discover blind spots
+1. Infer context from user input and repository files.
+2. Select 3-5 premortem questions.
+3. Answer each question from available evidence.
+4. Classify gaps.
+5. Return prioritized risks and next actions.
 
-#### Interactive Mode (Traditional)
+Auto mode is report-only by default. GitHub Issue registration is an optional follow-up that requires explicit confirmation.
 
-```bash
-/premortem --mode=interactive "project description"
-```
+### Batch Mode
 
-### Behavior
+First response must only present all questions.
 
-1. Presents questions one by one
-2. User answers each question
-3. Follow-up questions (max 2 times)
-4. Moves to next question
-5. Generates report after all questions are answered
+For each question include:
 
-### Features
+- question title
+- concrete question text
+- one-line "Why it matters"
 
-- Can discuss in detail
-- Leverages human insights
-- Carefully considers each question
+Do not auto-answer, run gap analysis, or ask about GitHub Issues until the user has answered.
 
-### Recommended When
+### Interactive Mode
 
-- Documentation is insufficient
-- You want to discuss in detail within the team
-- You want to dig deeply into each question
+Ask one question at a time. For each answer:
 
-#### Batch Mode (Balanced)
+- detect missing concepts
+- ask at most 2 follow-ups
+- then move to the next question
 
-```bash
-/premortem --mode=batch "project description"
-```
+Generate the report after all questions have been answered or the user asks to stop.
 
-### Behavior
+## Context Gathering
 
-1. Presents all questions at once
-2. User answers all at once
-3. Follow-up questions if needed (1-2 times)
-4. Generates report
+Use cheap local evidence first.
 
-### Features
+Priority:
 
-- Balance between speed and interaction
-- Grasp the full picture before answering
-- Completes in 2-3 interactions
+1. user-provided project description, plan, spec, issue, or design document
+2. `README.md`, `AGENTS.md`, `CLAUDE.md`
+3. `.kiro/steering/*.md`, `.kiro/specs/**`, `docs/**`
+4. dependency manifests such as `package.json`, `requirements.txt`, `pyproject.toml`, `Cargo.toml`, `go.mod`
+5. code search for implementations relevant to selected questions
 
-### Recommended When
+Use `rg` or the repository's preferred search wrapper. Load reference files only when the selected domain needs them.
 
-- Between auto mode and interactive mode
-- You want to see all questions before answering
+If no repository path or project files are available, use the user input as the only evidence. Do not imply that workflows, manifests, or implementation files exist; classify those details as `Missing` or `Needs Clarification`.
 
-### Initial Response Template
+## Context Model
 
-On the first batch-mode response, present all 3-5 questions at once.
-For each question, include a one-line "Why it matters".
-Do not switch into auto-analysis or GitHub Issue confirmation yet.
-
-### Basic Invocation
-
-#### Auto Inference (No Project Description)
-
-```bash
-/premortem
-# or
-/premortem --mode=auto
-```
-
-### Behavior
-
-- Automatically loads README.md, CLAUDE.md, AGENTS.md, etc.
-- Infers project nature (domain, tech stack, maturity)
-- Generates 3-5 relevant questions based on inferences
-- Runs automatic analysis
-
-#### Explicit Project Description
-
-```bash
-/premortem "Planning to build a blog platform with Next.js + PostgreSQL"
-```
-
-### Expected Behavior
-
-1. Context analysis (domain: web-development, maturity: mvp)
-2. 3-5 questions are generated (authentication architecture, DB design, API rate limiting, etc.)
-3. Auto mode: Auto-answers from project files → gap analysis → report
-4. Interactive mode: Interactively answer each question → report
-5. Batch mode: All questions presented at once → answer → report
-
-### Typical Usage Patterns
-
-#### Pattern 1: Standalone (Planning Review)
-
-```bash
-/premortem "Building an EC site with microservices.
-Planning to split into 3 services: orders, inventory, payments.
-Tech stack: Node.js, MongoDB, RabbitMQ"
-```
-
-→ Questions about distributed transactions, inter-service communication, failure recovery strategy, etc. are presented
-
-#### Pattern 2: Integration with cc-sdd (Design Validation)
-
-```bash
-/spec-design user-authentication
-→ design.md generated
-/premortem "Check for design blind spots"
-```
-
-→ Loads `.kiro/design/user-authentication.md` and asks questions about authentication flow vulnerabilities
-
-#### Pattern 3: Integration with task-router (Complex Task Analysis)
-
-```bash
-/task "Implement real-time chat feature"
-→ task-router analyzes requirements
-→ premortem validates technology selection
-→ Questions about WebSocket vs SSE, scaling strategy, etc.
-```
-
-## 3-Layer Question Generation Logic
-
-### Layer 1: Context Analysis
-
-Generates `ProjectContext` from user input and project files:
+Summarize the project as:
 
 ```python
 @dataclass
 class ProjectContext:
-    domain: str              # "web-development", "mobile-apps", etc.
-    maturity: str            # "poc", "mvp", "production"
-    tech_stack: List[str]    # ["React", "Node.js", "PostgreSQL"]
-    scale: str               # "small", "medium", "large"
-    description: str         # project description
+    domain: str
+    maturity: str
+    tech_stack: list[str]
+    scale: str
+    description: str
+    evidence: list[str]
 ```
 
-### Analysis Elements
+### Inference Hints
 
-1. Domain determination: Estimated from tech stack and keywords
-   - "React", "API" → web-development
-   - "Swift", "iOS" → mobile-apps
-   - "Spark", "ETL" → data-systems
-2. Maturity estimation: Determined from scope and timeline
-   - "POC", "prototype" → poc
-   - "MVP", "beta" → mvp
-   - "production", "enterprise" → production
-3. Scale determination: From user count and data volume estimates
-   - ~1K users → small
-   - 1K-100K users → medium
-   - 100K+ users → large
+- Domain: infer from stack and keywords (`React` / `API` -> web-development, `Swift` / `iOS` -> mobile-apps, `Spark` / `ETL` -> data-systems).
+- Maturity: `poc`, `prototype`, `MVP`, `beta`, `production`, `enterprise`.
+- Scale: use explicit user counts/data volume when available; otherwise mark unknown.
+- Evidence: cite file paths or "user input"; do not invent evidence.
+- Unknowns: write `unknown` or a bounded phrase such as `release planning, production readiness unknown`; set severity from blast radius, not from guessed maturity.
 
-Details: `references/frameworks/domain-detection.md`
+## Question Selection
 
-### Layer 2: Question Selection
+Select 3-5 questions from:
 
-### Question Pool Composition
+- `references/questions/generic.yaml`
+- `references/questions/web-development.yaml`
+- `references/questions/mobile-apps.yaml`
+- `references/questions/data-systems.yaml`
+- `references/questions/infrastructure.yaml`
+- `references/questions/security.yaml`
 
-- `references/questions/generic.yaml` (35 questions) - Common across all domains
-- `references/questions/web-development.yaml` (20 questions)
-- `references/questions/mobile-apps.yaml` (18 questions)
-- `references/questions/data-systems.yaml` (22 questions)
-- `references/questions/infrastructure.yaml` (19 questions)
-- `references/questions/security.yaml` (25 questions)
+Prefer questions with:
 
-### Scoring Logic
+- direct trigger keyword match
+- domain relevance
+- maturity relevance
+- tech-stack relevance
+- high blast radius if missed
 
-```python
-def score_question(question: Dict, context: ProjectContext) -> float:
-    score = 0.0
+Avoid overloading one category. As a default, use no more than 2 questions from the same category unless the project is clearly dominated by that area.
 
-    # Trigger keyword match: +0.3
-    if any(t in context.description.lower() for t in question["triggers"]):
-        score += 0.3
+### Context-Specific Risk Lenses
 
-    # Domain relevance: +0.2
-    if context.domain in question.get("relevance_boost", {}).get("domains", []):
-        score += 0.2
+After selecting general questions, add or swap in risks that match the project shape.
 
-    # Maturity relevance: +0.2
-    if context.maturity in question.get("relevance_boost", {}).get("maturity", []):
-        score += 0.2
+| Signal                                                 | Premortem lens                                                                                 |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| Desktop, Tauri, Electron, installer, release artifacts | platform matrix, signing/notarization, install-and-launch smoke tests, rollback/unpublish path |
+| Local-first data, sync, cache, import/export           | invariants, partial writes, idempotency, corruption recovery, backup/restore                   |
+| Auth, sessions, permissions, identity                  | authorization boundary, expiry/revocation, privilege changes, audit trail                      |
+| Data import, migration, ETL                            | validation boundary, partial failure policy, lineage, replay, rollback                         |
+| CI/CD, release flow, deployment                        | gates, secrets, artifact provenance, environment drift, observability                          |
 
-    # Tech stack match: +0.3
-    if any(tech.lower() in question["text"].lower() for tech in context.tech_stack):
-        score += 0.3
+Use these as prompts for question selection, not as a fixed checklist. Only include a lens when the user input or repository evidence supports it.
 
-    return min(score, 1.0)
-```
+## Gap Classification
 
-### Selection Criteria
+Classify each selected question with this rubric:
 
-- Only questions with score >= 0.5 are selected
-- Top 3-5 questions extracted (sorted by priority)
-- Duplicate categories are excluded (max 2 from Architecture, etc.)
+| Status              | Meaning                                                                                        |
+| ------------------- | ---------------------------------------------------------------------------------------------- |
+| Covered             | Evidence clearly answers the question and includes operational detail                          |
+| Needs Clarification | Evidence partially answers it but leaves a decision, owner, threshold, or failure mode unclear |
+| Missing             | No useful evidence found                                                                       |
+| Not Applicable      | The project context makes the question irrelevant                                              |
 
-Details: `references/frameworks/analysis-flow.md`
+Severity:
 
-### Layer 3: Interactive Review
+- **Critical**: likely security incident, data loss, irreversible migration failure, compliance breach, or production outage.
+- **High**: likely major rework, customer-visible failure, operational blind spot, or launch blocker.
+- **Medium**: meaningful cost, maintainability, or delivery risk.
+- **Low**: useful improvement with limited blast radius.
 
-Presents each question one by one and analyzes user answers:
-
-### Question Format
+## Question Format
 
 ```markdown
-## Q1: Authentication/Authorization Architecture (Priority: Critical)
+## Q1: Authentication and authorization boundary
 
-Is the authentication and authorization strategy for this system clear?
+Is the authentication and authorization strategy explicit enough to implement safely?
 
-- OAuth2.0 / JWT / Session-based - which approach will you choose?
-- What is the refresh token rotation strategy?
-- Which password hashing algorithm (bcrypt, argon2) will be selected?
-- What is the plan for multi-factor authentication (MFA)?
+- Which identity provider or session model is used?
+- Where is authorization enforced?
+- How are token/session expiry and revocation handled?
+- What audit trail is required?
 
-**Why it matters**: Authentication vulnerabilities are difficult to fix later and directly lead to security incidents.
+Why it matters: Auth decisions are expensive to retrofit and failures create direct security exposure.
 ```
 
-### Answer Analysis
+Keep questions concrete enough that an answer can be classified as Covered / Needs Clarification / Missing.
 
-- Detection of missing concepts (e.g., "Using JWT" → follow-up "What about refresh tokens?")
-- Max 2 follow-up questions (to prevent context overload)
-- Transition to next question
+## Recommended Action Rules
 
-## Workflow
+Good recommendations are small and assignable.
 
-The workflow varies depending on the selected mode.
-
-### Auto Mode (--mode=auto, Default)
-
-### Most Recommended Mode
-
-#### Phase 1: Context Gathering
-
-```markdown
-1. Analyze user input
-   - If project description is provided: use that description
-   - If project description is not provided: auto-inference mode
-
-2. Auto-inference mode (when description not provided)
-   Load project documents in priority order:
-   - README.md - project overview
-   - CLAUDE.md - project policy and tech stack
-   - AGENTS.md - agent configuration and development policy
-   - .kiro/steering/\*.md - project knowledge base
-   - package.json, requirements.txt, Cargo.toml - dependencies
-
-3. Generate ProjectContext
-   Run scripts/analyze_context.py
-```
-
-#### Phase 2: Question Generation & Auto-Analysis (Parallel Execution)
-
-```markdown
-1. Load & select question pool
-   - Load from generic.yaml + {domain}.yaml
-   - Select top 3-5 questions by scoring
-
-2. For each question, run auto-analysis in parallel:
-   a. Project file analysis
-   - Extract relevant information from README.md, CLAUDE.md, steering/\*.md
-   - Calculate confidence score
-
-   b. Codebase search (optional)
-   - Search related implementations using MCP Serena or fallback grep
-
-   c. Gap analysis
-   - Calculate coverage (0.0-1.0)
-   - Classify status:
-     ✅ Covered (>0.8)
-     ⚠️ Needs Clarification (0.5-0.8)
-     🔴 Missing (<0.5)
-
-   d. Generate recommended actions
-```
-
-#### Phase 3: Report Generation
-
-```markdown
-1. Executive Summary
-   - Total count and breakdown of blind spots found
-   - Coverage statistics
-   - Highlight of critical issues
-
-2. Detailed Findings (per question)
-   - Question text
-   - Auto-inferred answer (with confidence)
-   - Gap details
-   - Recommended actions
-   - Reference sources (file paths)
-
-3. Prioritized Action Items
-```
-
-#### Phase 4: User Confirmation (Once Only)
-
-```markdown
-"Would you like to automatically register the found blind spots to GitHub Issues?
-
-- [ ] Register all
-- [ ] Register Critical/High only
-- [ ] Select manually
-- [ ] Do not register (report only)"
-```
-
-### Initial Response Template
-
-In auto mode, the first user-facing response should contain:
-
-1. a short inferred project context summary
-2. 3-5 findings or blind spots with status (`Covered`, `Needs Clarification`, `Missing`, or `Not Applicable`)
-3. recommended next actions
-
-Only after the report is complete should you ask once whether to register GitHub Issues.
-
-### Interactive Mode (--mode=interactive)
-
-### Traditional Approach
-
-#### Phase 1-2: Context & Questions
-
-(Same as auto mode)
-
-#### Phase 3: Interactive Review
-
-```markdown
-1. Present questions one by one (in markdown format)
-
-2. Analyze user answers
-   - Detect missing concepts from answer content
-   - Follow-up questions if necessary (max 2 times)
-
-3. Move to next question (repeat for all 5 questions)
-```
-
-#### Phase 4: Report Generation
-
-```markdown
-1. Classify found blind spots by risk level
-   🔴 Critical / 🟡 Medium / 🟢 Low / ✅ Covered
-
-2. Present recommended actions
-
-3. Save session (optional)
-```
-
-### Batch Mode (--mode=batch)
-
-### Balanced Approach
-
-#### Phase 1-2: Context & Questions
-
-(Same as auto mode)
-
-#### Phase 3: Batch Review
-
-```markdown
-1. Present all questions at once
-
-2. User answers all at once
-
-3. Follow-up questions if necessary (1-2 times)
-```
-
-#### Phase 4: Report Generation
-
-(Same as interactive mode)
-
-## Domain Coverage
-
-| Domain          | Questions | Focus Areas                                   |
-| --------------- | --------- | --------------------------------------------- |
-| Generic         | 35        | Architecture, Security, Reliability, Cost     |
-| Web Development | 20        | API Design, Security, Performance, Data       |
-| Mobile Apps     | 18        | Platform, Performance, Offline, Push          |
-| Data Systems    | 22        | Schema, ETL, Scaling, Consistency             |
-| Infrastructure  | 19        | Deployment, Monitoring, Disaster Recovery     |
-| Security        | 25        | Authentication, Encryption, Compliance, OWASP |
-
-See corresponding `references/questions/{domain}.yaml` for each domain's details.
-
-## Integration Points
-
-### Integration with cc-sdd
-
-Automatically run premortem after design is complete:
-
-```bash
-# Design phase
-/spec-design feature-name
-→ .kiro/design/feature-name.md generated
-
-# Auto trigger (can be enabled in cc-sdd settings)
-→ premortem analyzes design content
-→ Discovers blind spots
-→ Results reflected in /validate-design
-```
-
-### Integration Benefits
-
-- Check both formal validity (validate-design) and conceptual completeness (premortem) of the design
-- Minimize design rework
-
-### Integration with task-router
-
-Automatically run blind spot analysis when receiving complex tasks:
-
-```bash
-/task "Complex request (e.g., implement authentication system)"
-
-→ task-router analyzes requirements
-→ premortem validates technology selection
-→ Resolve blind spots before generating subtasks
-```
-
-### Integration Benefits
-
-- Prevent overlooked items before task decomposition
-- Reduce rework in the implementation phase
-
-### Standalone Usage Scenario
-
-Early validation at the project planning stage:
-
-```bash
-/premortem "New project planning overview"
-```
-
-### When to Use
-
-- After creating a project plan
-- Risk identification before technology selection
-- Issue identification before estimation
+- Prefer "document the decision in `<path>`" over "think about architecture".
+- Prefer "add rollback criteria before migration" over "ensure safety".
+- Include the missing decision, owner, threshold, or artifact.
+- Do not recommend broad rewrites unless the risk is structural.
 
 ## Scripts
 
-### analyze_context.py
-
-Analyzes project context and selects appropriate questions:
+Use scripts when available and helpful; otherwise perform the workflow manually with repository search.
 
 ```bash
 python3 scripts/analyze_context.py \
@@ -507,229 +218,56 @@ python3 scripts/analyze_context.py \
   --files "package.json,README.md" \
   --output context.json \
   --questions-dir references/questions/
-```
 
-### Output Example
-
-```json
-{
-  "domain": "web-development",
-  "maturity": "mvp",
-  "tech_stack": ["React", "Node.js", "PostgreSQL"],
-  "scale": "medium",
-  "selected_questions": [
-    { "id": "WEB-001", "score": 0.92, "text": "..." },
-    { "id": "GEN-003", "score": 0.88, "text": "..." }
-  ]
-}
-```
-
-### gap_analyzer.py (New)
-
-Automatically infers answers from project files and analyzes gaps:
-
-```bash
 python3 scripts/gap_analyzer.py \
   --questions context.json \
   --output gaps.json \
   --project-root .
-```
 
-### Features
-
-- Automatically infers answers from project files (README.md, CLAUDE.md, steering/\*.md)
-- Calculates confidence score (0.0-1.0)
-- Classifies gaps into 4 states:
-  - ✅ Covered: Sufficiently covered (coverage > 0.8)
-  - ⚠️ Needs Clarification: Partial (0.5-0.8)
-  - 🔴 Missing: Not addressed (< 0.5)
-  - ℹ️ Not Applicable: Does not apply
-
-### Output Example
-
-```json
-{
-  "gaps": [
-    {
-      "question_id": "WEB-001",
-      "status": "needs_clarification",
-      "coverage": 0.65,
-      "auto_answer": {
-        "text": "From README.md: Using JWT authentication...",
-        "confidence": 0.7,
-        "sources": ["README.md", ".kiro/steering/tech.md"]
-      },
-      "recommendation": "⚠️ Partial coverage found. Consider:..."
-    }
-  ],
-  "summary": {
-    "total": 5,
-    "covered": 2,
-    "needs_clarification": 2,
-    "missing": 1
-  }
-}
-```
-
-### serena_integration.py (New)
-
-Searches the codebase with MCP Serena integration (optional):
-
-```bash
-python3 scripts/serena_integration.py
-```
-
-### Features
-
-- Semantic code analysis using MCP Serena
-- Falls back to ripgrep when Serena is unavailable
-- Automatically detects implementations relevant to questions
-
-### format_report.py (Extended)
-
-Generates a report integrating gap analysis results:
-
-```bash
 python3 scripts/format_report.py \
   --session gaps.json \
   --output report.md
 ```
 
-### New Features
-
-- Executive Summary (overall statistics, coverage rate)
-- Display of auto-inferred answers (with confidence)
-- Explicit reference sources (file paths)
-- Prioritized action items
-
-### Output Example
-
-```markdown
-# Premortem Analysis Report
-
-## Executive Summary
-
-**Total Questions Analyzed**: 5
-
-- ✅ Already Covered: 2
-- ⚠️ Needs Clarification: 2
-- 🔴 Missing/Not Addressed: 1
-
-**Overall Coverage**: 65.0%
-
-## Critical Issues (🔴)
-
-### 1. Undefined Authentication Architecture
-
-**Auto Answer** (Confidence: 30%):
-From README.md: "Planning to use JWT authentication"
-
-**Recommendation**:
-🔴 CRITICAL: Address immediately before implementation:
-
-1. Research best practices for: OAuth2.0/JWT selection, refresh token strategy
-2. Document decisions in .kiro/steering/ or design files
-
-**Sources**: README.md
-```
-
-### github_integration.py (New)
-
-Automatically creates GitHub Issues from discovered gaps:
+GitHub Issue creation is optional and must be approved:
 
 ```bash
-# Dry-run (does not actually create)
 python3 scripts/github_integration.py \
   --gaps gaps.json \
   --mode critical_high \
   --dry-run
-
-# Actually create issues
-python3 scripts/github_integration.py \
-  --gaps gaps.json \
-  --mode all
 ```
 
-### Modes
+Run a dry run first. Only create issues when the user explicitly approves the exact mode.
 
-- `all`: Create issues from all gaps
-- `critical_high`: Critical/High priority only
-- `selective`: Interactive selection (to be implemented)
-- `none`: Do not create (dry-run only)
+## Integration Notes
 
-### Features
+- With spec/design workflows: run premortem after design is drafted and before task breakdown.
+- With task-router workflows: use premortem before assigning implementation subtasks for complex or high-risk work.
+- With CI/release workflows: focus questions on rollback, observability, secrets, migration, and owner handoff.
 
-- Automatic appropriate label assignment (`premortem`, `priority:critical`, `needs-investigation`, etc.)
-- Issue duplicate check (skip if an issue with the same name already exists)
-- Rich issue body (question, auto answer, recommended actions, sources)
+## Common Failure Modes
 
-### Issue Example
+| Failure                                               | Correction                                                        |
+| ----------------------------------------------------- | ----------------------------------------------------------------- |
+| Asking generic questions                              | Tie each question to domain, maturity, stack, and evidence.       |
+| Treating absence of docs as absence of implementation | Search code when the selected risk could be implemented silently. |
+| Creating issues too early                             | Report first; ask once after the report.                          |
+| Over-indexing on scripts                              | Use scripts as helpers, not as a reason to skip judgment.         |
+| Skipping Not Applicable                               | Mark irrelevant risks explicitly so the report stays focused.     |
 
-```markdown
-🔴 [Premortem] Detailed Design of Authentication Architecture
+## Progressive Disclosure
 
-## Question
+Keep the initial read small:
 
-OAuth2.0 / JWT / Session-based - which approach will you choose?
-
-## Analysis
-
-- **Status**: missing
-- **Coverage**: 30.0%
-- **Priority**: critical
-
-## Current State (Auto-detected)
-
-From README.md: Planning to use JWT authentication
-
-_Confidence: 30.0%_
-
-**Sources:**
-
-- `README.md`
-
-## Recommended Actions
-
-🔴 CRITICAL: Address immediately before implementation...
-
----
-
-_This issue was automatically generated by Premortem Analysis_
-```
-
-## Examples
-
-Real session examples:
-
-- `references/examples/session-web-api.yaml` - Premortem for Web API design
-- `references/examples/session-ml-pipeline.yaml` - Premortem for ML pipeline
-
-Each example includes context, questions presented, user answers, and discovered blind spots.
-
-## Best Practices
-
-1. Run early: Execute immediately at the start of the design phase
-2. Honest answers: "I don't know" is important information
-3. Don't fear follow-up: Additional questions are opportunities to discover blind spots
-4. Record results: Integrate session results into design documents
-5. Re-run periodically: Re-run when project scope changes
-
-## Limitations
-
-- Question pool requires periodic updates (new technologies, new best practices)
-- Coverage is limited for out-of-domain projects (embedded systems, game development, etc.)
-- Question relevance is heuristic (not perfect)
-
-## Progressive Disclosure Efficiency
-
-- Initial load: metadata + SKILL.md = 15.5KB
-- During question generation: + questions/\*.yaml = 13KB
-- Full load: + scripts/ + frameworks/ = 49.5KB
-- Reduction rate: 15.5KB / 49.5KB = **31.3%**
+- Load `SKILL.md` first.
+- Load question YAML only for the selected domain plus `generic`.
+- Load framework references only when domain inference or scoring is unclear.
+- Load scripts only when executing the scripted workflow.
 
 ## References
 
-- `references/frameworks/analysis-flow.md` - Question generation flow details
-- `references/frameworks/domain-detection.md` - Domain detection logic details
-- `references/questions/*.yaml` - Full question pool
-- `references/examples/*.yaml` - Practical examples
+- `references/frameworks/analysis-flow.md` for question generation details.
+- `references/frameworks/domain-detection.md` for domain detection details.
+- `references/questions/*.yaml` for the question pool.
+- `references/examples/*.yaml` for example sessions.
