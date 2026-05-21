@@ -66,6 +66,7 @@ dependencies:
     - hashicorp/agent-skills/terraform/code-generation/skills/terraform-test
     - gonta223/humanizer-ja
     - softaworks/agent-toolkit/skills/humanizer
+    - softaworks/agent-toolkit/skills/marp-slide
     - Jakubantalik/transitions-dev/skills/transitions-dev
     - langchain-ai/deepagents/libs/cli/examples/skills/web-research
     - softaworks/agent-toolkit/skills/mermaid-diagrams

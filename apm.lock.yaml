@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-05-19T12:54:24.322710+00:00'
+generated_at: '2026-05-21T15:59:46.366445+00:00'
 apm_version: 0.13.0
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -755,6 +755,17 @@ dependencies:
   - .claude/skills/humanizer
   - .codeium/windsurf/skills/humanizer
   content_hash: sha256:34a38e6acc60d4529612d41ffe740bca0060d3c5e89e2a0d24ae795f67157fbb
+- repo_url: softaworks/agent-toolkit
+  host: github.com
+  resolved_commit: 3027f20f3181758385a1bb8c022d4041dfb4de84
+  virtual_path: skills/marp-slide
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/marp-slide
+  - .claude/skills/marp-slide
+  - .codeium/windsurf/skills/marp-slide
+  content_hash: sha256:eec63ab3e8a2e5a06603146e7b7ef14ce1108a30571d719b85109b1a9b5e8118
 - repo_url: softaworks/agent-toolkit
   host: github.com
   resolved_commit: 3027f20f3181758385a1bb8c022d4041dfb4de84
