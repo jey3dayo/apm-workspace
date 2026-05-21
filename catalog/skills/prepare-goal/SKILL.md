@@ -9,6 +9,8 @@ Prepare a clear, verifiable goal before starting a long-running agent loop.
 
 Use this skill to convert messy intent into a contract the agent and evaluator can audit. Do not treat `/goal` as a place for discovery-only work or a loose backlog. A good goal has one objective, bounded scope, explicit constraints, observable evidence, and a stop rule.
 
+This skill is output-only. Draft the `/goal` command and stop. After drafting it, do not execute the generated `/goal`, continue repository searches, edit files, run tests, or start implementation unless the user separately sends that `/goal` as a new instruction.
+
 ## Workflow
 
 1. Read the current context
@@ -41,6 +43,8 @@ Use this skill to convert messy intent into a contract the agent and evaluator c
 ## Output Format
 
 Always finish with a copy-paste-ready goal block when readiness is `ready`. Put the final `/goal` on one continuous command block so the user can paste it directly. Do not bury the final command inside analysis prose.
+
+When readiness is `ready`, stop immediately after the final `/goal` command block. Do not add follow-up implementation narration, do not announce that work is starting, and do not enter a task loop until the user separately invokes the generated `/goal`.
 
 Return this structure:
 

@@ -1,4 +1,4 @@
 interface:
   display_name: "Prepare Goal"
   short_description: "Turn rough intent into an audit-friendly /goal contract."
-  default_prompt: "Help me turn this rough task into a clear /goal with scope, constraints, verification, and stop conditions."
+  default_prompt: "Use $prepare-goal to produce a paste-ready /goal with scope, constraints, verification, and stop there."
