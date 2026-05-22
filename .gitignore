@@ -1,4 +1,4 @@
-/.tmp-review-workspace*/
+/tmp/review-workspace*/
 /testResults.xml
 /config.json
 !/catalog/.apm/
