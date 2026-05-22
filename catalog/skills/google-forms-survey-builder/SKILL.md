@@ -9,7 +9,7 @@ description: Use when creating, rebuilding, or updating a Google Forms survey fr
 
 Build the form from the Markdown spec, not from memory. Keep `SURVEY_QUESTIONS.md` and the Google Form synchronized, then verify the live form structure after every rebuild.
 
-Use `references/survey-questions-format.md` when the Markdown spec is missing fields, uses an unfamiliar shape, or needs a new question type.
+Use `references/SURVEY_QUESTIONS.md` as the initialization sample when creating a new spec from scratch. Use `references/survey-questions-format.md` when the Markdown spec is missing fields, uses an unfamiliar shape, or needs a new question type.
 
 Before editing scripts or forms, check whether the required inputs are available. If they are not, ask for the missing input explicitly and stop at the highest safe preparation step.
 
@@ -29,6 +29,7 @@ If the Google Forms edit URL or form id is missing, do not claim the form was cr
 
 1. Confirm the local workspace contains the requested survey spec. Normalize obvious filename typos in the user's request, such as `SURVER_QUESTIONS.md`, by looking for `SURVEY_QUESTIONS.md` in the current workspace.
 2. If no survey spec exists, stop before Apps Script work and ask the user for one of:
+   - initialize `SURVEY_QUESTIONS.md` from `references/SURVEY_QUESTIONS.md` after they confirm the survey purpose
    - add `SURVEY_QUESTIONS.md` to the workspace
    - paste the survey Markdown content
    - provide the correct path if the file is elsewhere
@@ -44,8 +45,9 @@ If the Google Forms edit URL or form id is missing, do not claim the form was cr
    - all questions, in order
    - each question's format, required flag, help text, choices, and scale labels
    - deleted-question notes and judgment notes
-2. Update the Markdown spec first when the requested change affects survey design. Treat the spec as the source of truth.
-3. If the spec is missing fields, uses an unfamiliar shape, or needs a new question type, read `references/survey-questions-format.md`.
+2. When creating a new survey spec, start from `references/SURVEY_QUESTIONS.md` and replace the event-specific title, assumptions, description, questions, removed-question notes, and judgment notes.
+3. Update the Markdown spec first when the requested change affects survey design. Treat the spec as the source of truth.
+4. If the spec is missing fields, uses an unfamiliar shape, or needs a new question type, read `references/survey-questions-format.md`.
 
 ### Phase 2: Apps Script Rebuild
 
@@ -79,8 +81,9 @@ Map the spec to Google Forms as follows:
 For scale questions:
 
 - Use `目盛: 1 から N` as `setBounds(1, N)`.
+- Use `目盛: 0 から N` as `setBounds(0, N)` only when the scale represents a ratio, share, or "0 means none" measurement.
 - Use `左ラベル` and `右ラベル` as `setLabels(left, right)`.
-- Do not invent a 0-based scale for Google Forms; Google Forms scale starts at 1.
+- Do not invent a 0-based scale for sentiment, difficulty, satisfaction, confidence, or similar ratings.
 - Prefer 1-5 for sentiment, difficulty, satisfaction, confidence, and similar ratings unless the spec explicitly asks for 1-10.
 - Use 1-10 only when the user is asking for a ratio-like or high-resolution comparison and the labels make the endpoints clear.
 
@@ -117,11 +120,11 @@ function rebuildSurveyForm() {
     if (h) i.setHelpText(h);
     return i;
   };
-  const S = (t, n, l, rr, r = true, h = "") => {
+  const S = (t, low, high, l, rr, r = true, h = "") => {
     const i = f
       .addScaleItem()
       .setTitle(t)
-      .setBounds(1, n)
+      .setBounds(low, high)
       .setLabels(l, rr)
       .setRequired(r);
     if (h) i.setHelpText(h);
@@ -156,7 +159,7 @@ After running the rebuild function:
    - item count
    - item-type counts
    - question titles
-   - scale bounds and labels
+   - scale lower and upper bounds and labels
    - required vs optional status when accessible
 4. If using `FB_LOAD_DATA_`, type values commonly include:
    - `1`: paragraph text

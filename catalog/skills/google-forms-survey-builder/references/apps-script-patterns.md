@@ -15,11 +15,11 @@ function rebuildSurveyForm() {
     .reverse()
     .forEach((item) => f.deleteItem(item));
 
-  const S = (title, max, left, right, required = true, help = "") => {
+  const S = (title, low, high, left, right, required = true, help = "") => {
     const item = f
       .addScaleItem()
       .setTitle(title)
-      .setBounds(1, max)
+      .setBounds(low, high)
       .setLabels(left, right)
       .setRequired(required);
     if (help) item.setHelpText(help);
@@ -37,14 +37,15 @@ function rebuildSurveyForm() {
   };
 
   S(
-    "直近1ヶ月の開発で、Claude Code と Codex の利用割合はどれくらいですか",
+    "直近1ヶ月の作業で、既存ツールと新しいツールの利用割合はどれくらいですか",
+    0,
     10,
-    "Claude Code 10割",
-    "Codex 10割",
+    "既存ツール 10割",
+    "新しいツール 10割",
     true,
-    "1 は Claude Code 寄り、10 は Codex 寄りとして答えてください。",
+    "0 は既存ツール寄り、10 は新しいツール寄りとして答えてください。",
   );
-  S("今日のハンズオンの難易度はどうでしたか", 5, "難しすぎた", "簡単すぎた");
+  S("今日のハンズオンの難易度はどうでしたか", 1, 5, "難しすぎた", "簡単すぎた");
   P("特によかったところがあれば教えてください");
 }
 ```
@@ -79,11 +80,11 @@ const C = (title, choices, required = false, help = "") => {
   if (help) item.setHelpText(help);
   return item;
 };
-const S = (title, max, left, right, required = true, help = "") => {
+const S = (title, low, high, left, right, required = true, help = "") => {
   const item = f
     .addScaleItem()
     .setTitle(title)
-    .setBounds(1, max)
+    .setBounds(low, high)
     .setLabels(left, right)
     .setRequired(required);
   if (help) item.setHelpText(help);

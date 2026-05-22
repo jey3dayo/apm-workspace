@@ -1,6 +1,6 @@
 # Survey Questions Markdown Format
 
-Use this format when creating or repairing a `SURVEY_QUESTIONS.md` source file.
+Use this format when creating or repairing a `SURVEY_QUESTIONS.md` source file. Use `references/SURVEY_QUESTIONS.md` as the copyable initialization sample.
 
 ## Required Sections
 
@@ -35,7 +35,7 @@ Google Forms 反映用の設問メモ。
 - 必須: <はい | いいえ>
 - 補足:
   - <help text when needed>
-- 目盛: 1 から <N>
+- 目盛: <0 または 1> から <N>
 - 左ラベル: <left endpoint>
 - 右ラベル: <right endpoint>
 
@@ -63,6 +63,8 @@ Scale:
 - 左ラベル: <low endpoint>
 - 右ラベル: <high endpoint>
 ```
+
+Use `目盛: 0 から 10` only for ratio/share questions where 0 is a meaningful answer. Use `目盛: 1 から 5` for sentiment, satisfaction, difficulty, confidence, and similar ratings.
 
 Multiple choice:
 
