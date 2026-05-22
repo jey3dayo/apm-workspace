@@ -177,10 +177,10 @@ Classify each selected question with this rubric:
 
 Severity:
 
-- **Critical**: likely security incident, data loss, irreversible migration failure, compliance breach, or production outage.
-- **High**: likely major rework, customer-visible failure, operational blind spot, or launch blocker.
-- **Medium**: meaningful cost, maintainability, or delivery risk.
-- **Low**: useful improvement with limited blast radius.
+- Critical: likely security incident, data loss, irreversible migration failure, compliance breach, or production outage.
+- High: likely major rework, customer-visible failure, operational blind spot, or launch blocker.
+- Medium: meaningful cost, maintainability, or delivery risk.
+- Low: useful improvement with limited blast radius.
 
 ## Question Format
 
