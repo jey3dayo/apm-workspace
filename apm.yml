@@ -8,6 +8,7 @@ dependencies:
     - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
     - caad-develop/claude-code-marketplace/plugins/infra/ca-pass
     - caad-develop/claude-code-marketplace/plugins/infra/mdb
+    - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
     - nextlevelbuilder/ui-ux-pro-max-skill
     - EpicenterHQ/epicenter/.agents/skills/tauri
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand

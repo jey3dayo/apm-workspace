@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-05-21T15:59:46.366445+00:00'
+generated_at: '2026-05-22T07:17:15.236629+00:00'
 apm_version: 0.13.0
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -187,6 +187,17 @@ dependencies:
   - .claude/skills/perman-aws-vault
   - .codeium/windsurf/skills/perman-aws-vault
   content_hash: sha256:f436902904778be56607219840a08912502562260c14a371aad250311ac14445
+- repo_url: caad-develop/claude-code-marketplace
+  host: github.com
+  resolved_commit: 8dcea2d854ba5030d4b09717ef66e829efa73884
+  virtual_path: plugins/utils/caad-skill-deployer
+  is_virtual: true
+  package_type: marketplace_plugin
+  deployed_files:
+  - .agents/skills/caad-skill-deployer
+  - .claude/skills/caad-skill-deployer
+  - .codeium/windsurf/skills/caad-skill-deployer
+  content_hash: sha256:cb32203710a69564002d0f812dc2e0673a91490ef407e90a13382e1cd48c9306
 - repo_url: cloudflare/skills
   host: github.com
   resolved_commit: 60147cbb773649eadca89cee92b4e0caf02234b4
