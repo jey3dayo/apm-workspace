@@ -11,23 +11,45 @@ Build the form from the Markdown spec, not from memory. Keep `SURVEY_QUESTIONS.m
 
 Use `references/survey-questions-format.md` when the Markdown spec is missing fields, uses an unfamiliar shape, or needs a new question type.
 
+Before editing scripts or forms, check whether the required inputs are available. If they are not, ask for the missing input explicitly and stop at the highest safe preparation step.
+
+Required inputs:
+
+- A local Markdown survey spec, normally `SURVEY_QUESTIONS.md`.
+- A Google Forms edit URL or form id when rebuilding an existing form.
+- Authorization to run Apps Script when the current account has not granted it yet.
+
+If the survey spec is missing, do not invent questions. Tell the user that the spec is required, mention the expected local filename, and ask them to add or provide the Markdown content.
+
+If the Google Forms edit URL or form id is missing, do not claim the form was created or updated. You may inspect or improve the Markdown spec and prepare a rebuild script template, then ask the user for the edit URL or form id before live rebuild and verification.
+
 ## Workflow
+
+### Phase 0: Readiness Check
+
+1. Confirm the local workspace contains the requested survey spec. Normalize obvious filename typos in the user's request, such as `SURVER_QUESTIONS.md`, by looking for `SURVEY_QUESTIONS.md` in the current workspace.
+2. If no survey spec exists, stop before Apps Script work and ask the user for one of:
+   - add `SURVEY_QUESTIONS.md` to the workspace
+   - paste the survey Markdown content
+   - provide the correct path if the file is elsewhere
+3. Confirm whether the user provided a Google Forms edit URL or form id.
+4. If the form URL or id is missing, explain that live form rebuild and verification require it. Continue only with spec review or script preparation if useful.
+5. If both the spec and the form target are available, proceed through the full rebuild workflow.
 
 ### Phase 1: Markdown Spec
 
-1. Find the survey spec. Normalize obvious filename typos in the user's request, such as `SURVER_QUESTIONS.md`, by looking for `SURVEY_QUESTIONS.md` in the current workspace.
-2. Read the survey spec and identify:
+1. Read the survey spec found in Phase 0 and identify:
    - form title and description
    - assumptions / target audience
    - all questions, in order
    - each question's format, required flag, help text, choices, and scale labels
    - deleted-question notes and judgment notes
-3. Update the Markdown spec first when the requested change affects survey design. Treat the spec as the source of truth.
-4. If the spec is missing fields, uses an unfamiliar shape, or needs a new question type, read `references/survey-questions-format.md`.
+2. Update the Markdown spec first when the requested change affects survey design. Treat the spec as the source of truth.
+3. If the spec is missing fields, uses an unfamiliar shape, or needs a new question type, read `references/survey-questions-format.md`.
 
 ### Phase 2: Apps Script Rebuild
 
-1. Use the Google Forms edit URL to identify the form id.
+1. Use the Google Forms edit URL or form id confirmed in Phase 0 to identify the form id.
 2. Generate or update an idempotent `rebuildSurveyForm()` Apps Script from the Markdown spec.
 3. Keep the Apps Script question calls in the exact Markdown order.
 4. For small surveys, read `references/apps-script-patterns.md` and use the compact helper pattern.
@@ -155,6 +177,8 @@ Before updating the form, sanity-check the survey:
 
 ## Failure Handling
 
+- If `SURVEY_QUESTIONS.md` or an equivalent local spec is missing, stop before script or form changes and ask the user to provide the spec path or content.
+- If no Google Forms edit URL or form id is available, stop before live rebuild. Ask the user for the edit URL or form id, and clearly state that only local spec review or script preparation can happen until then.
 - If the Google Form is not editable, update only the Markdown spec and report that the live form was not changed.
 - If Apps Script authorization is required, stop after preparing the script and ask the user to authorize before running it.
 - If the UI and script disagree, trust the live form verification and rerun the rebuild after fixing the script.

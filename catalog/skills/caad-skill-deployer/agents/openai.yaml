@@ -1,0 +1,4 @@
+interface:
+  display_name: "CAAD Skill Deployer"
+  short_description: "Import personal skills into the CAAD Claude Code marketplace."
+  default_prompt: "Deploy a named personal skill into this repository marketplace."
