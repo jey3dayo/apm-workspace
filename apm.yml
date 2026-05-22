@@ -5,6 +5,7 @@ author: jey3dayo
 dependencies:
   apm:
     - jey3dayo/apm-workspace/catalog#main
+    - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
     - caad-develop/claude-code-marketplace/plugins/infra/ca-pass
     - caad-develop/claude-code-marketplace/plugins/infra/mdb
     - nextlevelbuilder/ui-ux-pro-max-skill

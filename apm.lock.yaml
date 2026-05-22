@@ -176,6 +176,17 @@ dependencies:
   - .claude/skills/mdb
   - .codeium/windsurf/skills/mdb
   content_hash: sha256:3c7d57154c87020d236168529a418265389098f6d60aaa62c5bde31248e55ac0
+- repo_url: caad-develop/claude-code-marketplace
+  host: github.com
+  resolved_commit: 040b465ffb5bc16b74c92da6955879edccd9aa20
+  virtual_path: plugins/infra/perman-aws-vault
+  is_virtual: true
+  package_type: marketplace_plugin
+  deployed_files:
+  - .agents/skills/perman-aws-vault
+  - .claude/skills/perman-aws-vault
+  - .codeium/windsurf/skills/perman-aws-vault
+  content_hash: sha256:f436902904778be56607219840a08912502562260c14a371aad250311ac14445
 - repo_url: cloudflare/skills
   host: github.com
   resolved_commit: 60147cbb773649eadca89cee92b4e0caf02234b4
