@@ -1,0 +1,4 @@
+interface:
+  display_name: "macOS Troubleshooting"
+  short_description: "Safely diagnose and repair local macOS issues."
+  default_prompt: "Use $macos-troubleshooting to diagnose this macOS problem and try safe process or service restarts first."
