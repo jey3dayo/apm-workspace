@@ -9,14 +9,15 @@ Prepare a clear, verifiable goal before starting a long-running agent loop.
 
 Use this skill to convert messy intent into a contract the agent and evaluator can audit. Do not treat `/goal` as a place for discovery-only work or a loose backlog. A good goal has one objective, bounded scope, explicit constraints, observable evidence, and a stop rule.
 
-This skill is output-only. Draft the `/goal` command and stop. After drafting it, do not execute the generated `/goal`, continue repository searches, edit files, run tests, or start implementation unless the user separately sends that `/goal` as a new instruction.
+This skill is output-only and overrides the normal implementation default while it is active. Draft the `/goal` command and stop. You may do minimal read-only context inspection for goal drafting, but do not edit files, run validation commands, execute the generated `/goal`, or start implementation unless the user separately sends that `/goal` as a new instruction.
 
 ## Workflow
 
 1. Read the current context
    - Use the conversation, referenced issue, plan, TODO, logs, or repo guidance already available.
    - If repo context matters, inspect the smallest relevant files first: `AGENTS.md`, task files, package scripts, CI definitions, or the named module.
-   - Do not invent validation commands if the repo exposes better commands.
+   - Do not invent validation commands. Use only commands already known from the context or discovered in repo scripts/docs; otherwise use artifact/manual evidence or mark the missing command as an open question.
+   - When the request comes from external source material such as PR comments, issue text, CI logs, or review threads, preserve the source constraints in the final goal. Carry over known review comment IDs, failing job/check names, failing commands, explicit non-goals, and requested retry limits instead of generalizing the task.
 
 2. Classify goal readiness
    - `ready`: one objective, known scope, and clear validation evidence are available.
@@ -32,7 +33,7 @@ This skill is output-only. Draft the `/goal` command and stop. After drafting it
    - Scope: files, modules, commands, issues, or queues that are in bounds.
    - Constraints: files, behavior, APIs, secrets, generated outputs, or workflows that must not change.
    - Done when: functional requirements and observable completion evidence.
-   - Verification: commands or artifacts that prove completion.
+   - Verification: known commands, if available, and artifacts or reports that prove completion. Keep commands separate from artifacts/reports.
    - Stop if: repeated failure, missing permission, high-risk action, unclear requirement, time/turn/token limit.
 
 5. Check auditability
@@ -46,16 +47,16 @@ Always finish with a copy-paste-ready goal block when readiness is `ready`. Put 
 
 When readiness is `ready`, stop immediately after the final `/goal` command block. Do not add follow-up implementation narration, do not announce that work is starting, and do not enter a task loop until the user separately invokes the generated `/goal`.
 
-Return this structure:
+When readiness is `ready`, return this structure:
 
 ```text
-Goal readiness: ready | needs-clarification | not-goal-ready
+Goal readiness: ready
 
 Why:
 - <short reason>
 
 Paste-ready /goal:
-/goal <one objective>. Done means <observable end state>. Scope: <allowed scope>. Constraints: <non-goals and forbidden changes>. Verification: run <commands or checks> and report <evidence>. Stop if <blockers, repeated failures, risky actions, or budget>.
+/goal <one objective>. Done means <observable end state>. Scope: <allowed scope>. Constraints: <non-goals and forbidden changes, including source constraints from PR/issue/CI/review context>. Verification commands: <known commands only, or "none known">. Verification artifacts/reports: <evidence the agent must surface>. Stop if <same root cause fails 3 times, requested retry limit is reached, blockers, risky actions, or budget>.
 
 Audit checklist:
 - Objective is singular: yes/no
@@ -79,6 +80,23 @@ Final /goal command:
 ````
 
 If the goal is not ready, do not force a `/goal`. Recommend the next best step instead: plan, research, clarification, task split, or a smaller first goal.
+
+When readiness is `needs-clarification` or `not-goal-ready`, do not include `Paste-ready /goal` or `Final /goal command` blocks. Ask at most two blocking questions, or recommend the next best step when questions would not make the work goal-ready.
+
+Use this not-ready structure:
+
+```text
+Goal readiness: <needs-clarification or not-goal-ready>
+
+Why:
+- <short reason>
+
+Next step:
+- <clarification question, task split, research step, or smaller first goal>
+
+Open questions:
+- <only blocking questions, maximum two; omit if none>
+```
 
 ## Goal Contract Template
 
