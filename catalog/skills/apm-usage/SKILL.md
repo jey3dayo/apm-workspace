@@ -42,6 +42,8 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 
 - If the request is "change a personal skill", edit `catalog/skills/**`; use `skill-creator` for new or migrated managed skills.
 - If the request is "optimize" or "customize" a skill for this workspace, treat it as personal skill work and prefer `catalog/skills/<id>/`.
+- If the request is to preserve a reusable implementation judgment from real work, such as "Valibot belongs in schemas", "Result conversion belongs at a boundary", or "DB access belongs in repositories", encode it as owner-folder/import-boundary guidance in the relevant personal skill under `catalog/skills/<id>/`.
+- If the user does not specify the target skill id for that reusable judgment, inspect named skills, catalog triggers, and existing examples first; update the closest existing personal skill instead of creating a new skill by default.
 - If the skill currently lives in `manual-skills/.apm/skills/<id>/`, first decide whether it is still an upstream packaging workaround. If it is becoming workspace-owned, plan a catalog migration instead of continuing to tune it in the manual lane.
 - If the request is "change shared guidance", edit `catalog/**`; use `prepare:catalog` before publish/install.
 - If the request is "change dependency selection", edit or review `apm.yml` / `apm.lock.yaml`.

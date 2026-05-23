@@ -168,6 +168,29 @@ pnpm build         # Build succeeds (if applicable)
 
 ## Important Notes
 
+### Owner Folder and Import Boundary Guidance
+
+Before fixing validation, Result, or data-access quality issues, discover the
+repository's owner folder for that concern and move implementation there. Other
+layers should import the owner's public API instead of re-implementing the
+concern locally.
+
+- Schema validation: keep Valibot, Zod, or other validation schemas/parsers in
+  the discovered `schemas/**`, `schema/**`, or validation owner folder. Route,
+  action, component, and feature code should import the schema/parser/helper.
+- Result conversion: keep neverthrow or `Result` conversion at the boundary that
+  already owns error translation, such as repository, service, action, or
+  adapter boundaries. Do not scatter equivalent wrapping/unwrapping across UI
+  and low-level helpers.
+- Data access: keep DB access, Drizzle, SQL, query builders, and transaction
+  ownership in `db/**`, `repository/**`, or `repositories/**`. UI, route, and
+  feature code should call repository or service APIs rather than constructing
+  queries directly.
+
+Treat tests, mocks, seeds, migrations, fixtures, and thin wrappers as exception
+candidates. Confirm with imports, exports, tests, docs, or repeated call
+patterns before declaring a production boundary violation.
+
 ### Dangerous Patterns — Fixes to Absolutely Avoid
 
 #### 1. Auto-Fix Mis-fix Pattern

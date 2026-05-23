@@ -45,6 +45,32 @@ Low freedom (specific scripts, few parameters): Use when operations are fragile 
 
 Think of Codex as exploring a path: a narrow bridge with cliffs needs specific guardrails (low freedom), while an open field allows many routes (high freedom).
 
+### Abstract Reusable Implementation Boundaries
+
+When turning a real task lesson into skill guidance, abstract the lesson into an
+owner folder and import boundary rule instead of hard-coding only the library
+name. Write "discover the repository's owner folder, implement the concern
+there, and import the owner's public API elsewhere" rather than "never call this
+library directly" unless direct use is always wrong.
+
+If the user does not name the target skill, first locate the existing personal
+skill whose trigger, scope, or examples already own that lesson. Update that
+skill rather than creating a new one unless no reasonable owner exists.
+
+Use concrete examples sparingly:
+
+- `valibot` or schema validation -> define schemas/parsers in the discovered
+  `schemas/**`, `schema/**`, or validation owner folder.
+- `neverthrow` or `Result` conversion -> keep error/result conversion at the
+  repository, service, action, or adapter boundary that already owns it.
+- DB access, Drizzle, SQL, query builders, or transactions -> keep data access
+  in `db/**`, `repository/**`, or `repositories/**`, not scattered through UI,
+  route, or feature code.
+
+For broad validation work, describe how to split investigation across subagents
+by concern, but keep detailed review-loop mechanics in the dedicated
+`subagent-task-review-loop` skill.
+
 ### Prefer Relative Skill Paths
 
 When writing skill instructions, examples, or troubleshooting steps, solve path problems relative to the skill folder whenever possible. Prefer paths such as `SKILL.md`, `references/foo.md`, `scripts/foo.py`, `assets/template/`, and `agents/openai.yaml`.
