@@ -168,28 +168,44 @@ pnpm build         # Build succeeds (if applicable)
 
 ## Important Notes
 
-### Owner Folder and Import Boundary Guidance
+### Boundary Owner Mapping
 
-Before fixing validation, Result, or data-access quality issues, discover the
-repository's owner folder for that concern and move implementation there. Other
-layers should import the owner's public API instead of re-implementing the
-concern locally.
+Before fixing validation, type-safety, Result, or data-access issues, identify
+the repository's existing owner folder for each concern. Prefer the owner proven
+by imports, exports, tests, docs, or repeated call patterns. Do not infer owner
+folders from technology names alone, and do not invent a new owner folder from
+this table alone.
 
-- Schema validation: keep Valibot, Zod, or other validation schemas/parsers in
-  the discovered `schemas/**`, `schema/**`, or validation owner folder. Route,
-  action, component, and feature code should import the schema/parser/helper.
-- Result conversion: keep neverthrow or `Result` conversion at the boundary that
-  already owns error translation, such as repository, service, action, or
-  adapter boundaries. Do not scatter equivalent wrapping/unwrapping across UI
-  and low-level helpers.
-- Data access: keep DB access, Drizzle, SQL, query builders, and transaction
-  ownership in `db/**`, `repository/**`, or `repositories/**`. UI, route, and
-  feature code should call repository or service APIs rather than constructing
-  queries directly.
+| Technology / concern signals                                                                              | Expected owner pattern                                                                          | Move / centralize here                                                | Non-owner layers should do                                    | Common exceptions                                                         |
+| --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Valibot, Zod, ArkType, Yup, schema objects, parser helpers, `safeParse`, `parse`                          | `schemas/...`, `schema/...`, `validation/...`, or validation owner                              | Schema definitions, parser helpers, typed validation results          | Import exported schema/parser/helper                          | Test fixtures, mocks, route-local thin wrappers when supported            |
+| FormData parsing, server action input validation, request body validation                                 | action-specific schema owner, `schemas/...`, action validation helper                           | Reusable form/request parsers and validation error shaping            | Call parser before service/repository logic                   | One-off tiny action parser if the repo already keeps action-local schemas |
+| `unknown` to domain type conversion, type guards, assertion replacement                                   | `schemas/...`, `guards/...`, `mappers/...`, or transform owner                                  | Type guards, decode/parse functions, assertion-free conversion        | Call guard/parser, avoid `as`                                 | Framework-required casts with documented narrow scope                     |
+| neverthrow, byethrow, `Result`, `ResultAsync`, error wrapping/unwrapping                                  | repository, service, action, or adapter boundary that already translates errors                 | Conversion between thrown errors, infra errors, and domain/app errors | Consume the boundary result; do not re-wrap equivalent errors | Tests, adapter-specific normalization, framework response adapters        |
+| DB access, Drizzle, Prisma, Kysely, SQL, query builder, `.select`, `.insert`, `.update`, transaction `tx` | `db/...`, `repository/...`, `repositories/...`, or data-access owner                            | Queries, transactions, persistence mapping                            | Call repository/service API                                   | Migrations, seeds, test setup, generated ORM artifacts                    |
+| External API SDK/client, `fetch` to third-party services, webhook signature verification                  | `clients/...`, `adapters/...`, `integrations/...`, `services/...` when established              | HTTP client setup, retries, response parsing, external error mapping  | Call adapter/client function                                  | Mock clients, local test stubs                                            |
+| Environment variables, feature flags, runtime config                                                      | `config/...`, `env/...`, `settings/...`, or config module                                       | Env parsing, defaults, required variable validation                   | Import typed config values                                    | Test env setup, build-tool config files                                   |
+| Auth/session/permission checks                                                                            | `auth/...`, `session/...`, `permissions/...`, middleware/service owner                          | Session lookup, permission predicates, auth error normalization       | Call auth helper/policy                                       | Route-level guard composition, tests                                      |
+| Cache/Redis/storage concerns                                                                              | `cache/...`, `storage/...`, `repositories/...`, adapter owner                                   | Key construction, TTL policy, cache serialization                     | Call cache/storage helper                                     | Test fakes, one-off migration scripts                                     |
+| Queue/job/scheduler concerns                                                                              | `jobs/...`, `queue/...`, `workers/...`, adapter owner                                           | Enqueue/dequeue payload schema, retry/error policy                    | Call job/queue API                                            | Worker entrypoints, test helpers                                          |
+| Logging, metrics, tracing, telemetry                                                                      | `logger/...`, `observability/...`, `telemetry/...`, infra helper                                | Logger construction, metric names, span helpers                       | Call shared logger/metric helper                              | Local debug logs during development should not be committed               |
+| DTO/domain mapping, API response shaping, presenter mapping                                               | `mappers/...`, `transformers/...`, `presenters/...`, or established service/repository boundary | Conversion between persistence/API/domain/view shapes                 | Import mapper, avoid duplicate object reshaping               | Trivial inline projection if local and not repeated                       |
 
-Treat tests, mocks, seeds, migrations, fixtures, and thin wrappers as exception
-candidates. Confirm with imports, exports, tests, docs, or repeated call
-patterns before declaring a production boundary violation.
+Treat tests, mocks, fixtures, seeds, migrations, generated code, and thin
+framework/library wrappers as exception candidates. Keep them explicit instead
+of forcing every matching technology signal into an owner move.
+
+Operational rules:
+
+1. Search first with `rg --files` and import-pattern scans.
+2. Treat a folder as owner only with repository evidence.
+3. Move implementation to the owner and export a public API.
+4. Preserve the destination owner's existing public API style instead of introducing a new abstraction shape.
+5. Update callers to import the owner API.
+6. Add focused tests only for the changed boundary contract.
+7. Keep exception candidates explicit instead of forcing moves.
+8. If the work reveals a reusable boundary concern not covered here, call it
+   out in the final response and ask whether to add it to this mapping.
 
 ### Dangerous Patterns — Fixes to Absolutely Avoid
 

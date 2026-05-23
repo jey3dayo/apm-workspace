@@ -8,6 +8,7 @@ description: |
   removal).
   [When] Use when: "リファクタ", "refactor", "重複コード", "コード整理",
   "clean up", "duplicate code", "react-doctor", "similarity",
+  "共通関数", "helper extraction", "共通 helper",
   "コードの品質を改善", "コードを綺麗に", "リファクタリング計画",
   "デッドコード削除", "未使用ファイル", "未使用 export",
   "validation boundary", "Result boundary", "repository boundary",
@@ -83,16 +84,31 @@ folders are plausible, keep the plan conditional until the boundary is confirmed
 
 Use confirmed owner folders as the default destination for refactoring:
 
-| Technology concern                      | Expected owner pattern                                                                             |
-| --------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Schema validation, e.g. Valibot         | Define schemas/parsers in `schemas/...`, `schema/...`, or the repository's validation owner folder |
-| Result/error flow, e.g. neverthrow      | Keep Result conversion at the existing repository, service, action, or adapter boundary            |
-| DB, Drizzle, SQL, query builder, tx use | Keep queries and transactions in `db/...`, `repository/...`, or `repositories/...`                 |
+- Load `references/boundary_ownership.md` when validation, Result/error,
+  DB/query, config/env, or external IO drift is part of the refactoring scope.
+- Other layers should usually import the owner folder's exported schema, parser,
+  repository, helper, or adapter instead of re-implementing the concern locally.
+- For detailed fix-time mapping, use `code-quality-improvement`.
 
-Other layers should usually import the owner folder's exported schema, parser,
-repository, helper, or adapter instead of re-implementing the concern locally.
-Valid exceptions include test fixtures, mocks, migrations, seeds, and thin
-schema/parser wrappers when repository evidence supports them.
+#### 1-D: Common Helper Extraction Judgment
+
+When duplicate code appears inside components, pages, actions, or repositories,
+do not extract only because the text is similar. First classify the duplicated
+operation by concern, owner candidates, and caller rule:
+
+| Concern                                                                 | Owner candidates                                   | Caller rule                                                                | Do not extract when                                                                       |
+| ----------------------------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Cross-cutting contract guard, e.g. `ServerActionResult` shape narrowing | shared `lib/...` boundary owner                    | Callers import the guard instead of re-declaring object-shape checks       | The check is tied to one component's local UI state or one-off framework callback         |
+| Feature-specific pure transform, e.g. repository row -> table row       | `features/<feature>/...`                           | Pages/components import the feature helper; keep feature terminology local | The transform is a render fragment, hook-dependent, or uses component-local translations  |
+| Feature-specific classification, e.g. profile `role:` or entry type     | feature repository/helper or schema-adjacent file  | Repository, page, export, and tests use one exported predicate/normalizer  | The duplicate appears only in test mocks or fixture setup and mirrors a mocked dependency |
+| Schema/list-backed option conversion                                    | existing schema/constants owner plus feature API   | Reuse exported lists/schemas and expose narrow UI/export helpers as needed | A new helper would fork message ownership or duplicate i18n keys                          |
+| Date/filter display conversion                                          | shared component helper when UI contract is shared | Toolbar, chip, and filter consumers share parse/format helpers             | The format belongs to a domain table or timestamp display with different semantics        |
+
+Extraction is usually worthwhile when the helper is small, pure, used by
+multiple production callers, and represents a stable boundary contract or
+feature concept. Keep it local when it closes over hooks/state, render shape,
+component translations, or screen-specific copy. Test-only duplication can stay
+inside mocks when importing the real helper would make the test less isolated.
 
 ---
 
