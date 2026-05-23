@@ -35,7 +35,6 @@ The current Home Manager module does not deploy bundled `<distribution-root>/com
 ### Examples
 
 - `agent-creator`
-- `codex-code-review`
 - `distributions-manager`
 - `nix-dotfiles`
 - `task-to-pr`

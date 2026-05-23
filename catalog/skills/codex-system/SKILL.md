@@ -90,8 +90,8 @@ codex exec --sandbox read-only "Brief question" 2>/dev/null
 ### Session Continuity
 
 Codex sessions are stored per CWD.
-The review skills (`codex-code-review`, `codex-plan-review`) can use
-`resume --last` to inherit context from a prior Codex consultation in the same CWD.
+Use `resume --last` only when the user explicitly asks to continue a prior
+Codex consultation in the same CWD.
 
 If there was no prior consultation for the same task in the same CWD,
 start fresh instead of resuming.
