@@ -57,6 +57,8 @@
 - 外部コマンドは原則 `rtk <command>` を使い、テスト・ビルド・Git・GitHub CLI・package manager・探索系の出力を圧縮する
 - shell builtin、`cd`、環境変数変更など shell session state に関わる操作は raw command のまま扱う
 - RTK のフィルターで必要な情報が足りない場合は `rtk proxy <command>` で同じ入口から raw output を確認する
+- `rtk` 自体が使えるかは初回のみ `command -v rtk` または `mise which rtk` で確認し、使えない場合はそのタスク中は再確認せず `rg` / `sed` / raw command へ fallback する
+- `rtk` のインストールや修復は、ユーザーが明示的に依頼した場合のみ行う
 
 ### CLI が見つからない場合
 
