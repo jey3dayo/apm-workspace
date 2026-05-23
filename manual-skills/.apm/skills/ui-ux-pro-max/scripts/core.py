@@ -13,6 +13,13 @@ from collections import defaultdict
 # ============ CONFIGURATION ============
 DATA_DIR = Path(__file__).parent.parent / "data"
 MAX_RESULTS = 3
+PRIORITY_SCORE_WEIGHT = 0.75
+PRIORITY_SCORES = {
+    "critical": 4,
+    "high": 3,
+    "medium": 2,
+    "low": 1,
+}
 
 CSV_CONFIG = {
     "style": {
@@ -170,6 +177,13 @@ def _load_csv(filepath):
         return list(csv.DictReader(f))
 
 
+def _priority_score(row):
+    """Return a small ranking boost from explicit priority/severity columns."""
+    raw_value = str(row.get("Severity") or row.get("Priority") or row.get("Impact") or "")
+    normalized = raw_value.strip().lower()
+    return PRIORITY_SCORES.get(normalized, 0)
+
+
 def _search_csv(filepath, search_cols, output_cols, query, max_results):
     """Core search function using BM25"""
     if not filepath.exists():
@@ -185,12 +199,22 @@ def _search_csv(filepath, search_cols, output_cols, query, max_results):
     bm25.fit(documents)
     ranked = bm25.score(query)
 
-    # Get top results with score > 0
-    results = []
-    for idx, score in ranked[:max_results]:
+    # Get top results with score > 0. Explicit severity/priority is a
+    # secondary relevance signal, so critical UI guidance does not sit behind a
+    # lower-priority row with a nearly identical text score.
+    ranked_rows = []
+    for idx, score in ranked:
         if score > 0:
-            row = data[idx]
-            results.append({col: row.get(col, "") for col in output_cols if col in row})
+            priority_score = _priority_score(data[idx])
+            adjusted_score = score + (priority_score * PRIORITY_SCORE_WEIGHT)
+            ranked_rows.append((adjusted_score, score, priority_score, idx))
+
+    ranked_rows.sort(key=lambda row_score: (-row_score[0], -row_score[1], -row_score[2], row_score[3]))
+
+    results = []
+    for _, _, _, idx in ranked_rows[:max_results]:
+        row = data[idx]
+        results.append({col: row.get(col, "") for col in output_cols if col in row})
 
     return results
 
