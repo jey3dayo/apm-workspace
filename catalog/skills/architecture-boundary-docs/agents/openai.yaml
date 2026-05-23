@@ -1,0 +1,4 @@
+interface:
+  display_name: "Architecture Boundary Docs"
+  short_description: "Map codebase layers, types, flows, and ownership."
+  default_prompt: "Use $architecture-boundary-docs to document this codebase's architecture boundaries and produce an audit-friendly boundary map."
