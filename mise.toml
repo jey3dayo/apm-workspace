@@ -102,14 +102,14 @@ run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -
 description = "Rewrite bold headings inside catalog skill and shared guidance sources"
 run = """bash -lc 'script="$HOME/.config/scripts/replace-bold-headings.ts"; if [ -f "$script" ]; then tsx "$script" ./catalog; else echo "Skipping bold heading rewrite: $script not found"; fi'"""
 run_windows = """
-powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "if (Test-Path -LiteralPath ([IO.Path]::Combine([Environment]::GetFolderPath('UserProfile'), '.config/scripts/replace-bold-headings.ts'))) { tsx ([IO.Path]::Combine([Environment]::GetFolderPath('UserProfile'), '.config/scripts/replace-bold-headings.ts')) ./catalog } else { Write-Host \"Skipping bold heading rewrite script not found\" }"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "if (Test-Path -LiteralPath ([IO.Path]::Combine([Environment]::GetFolderPath('UserProfile'), '.config/scripts/replace-bold-headings.ts'))) { tsx ([IO.Path]::Combine([Environment]::GetFolderPath('UserProfile'), '.config/scripts/replace-bold-headings.ts')) ./catalog } else { Write-Host 'Skipping bold heading rewrite script not found' }"
 """
 
 [tasks."format:markdown:bold-headings:check"]
 description = "Check bold heading rewrites inside catalog skill and shared guidance sources"
 run = """bash -lc 'script="$HOME/.config/scripts/replace-bold-headings.ts"; if [ -f "$script" ]; then tsx "$script" ./catalog --dry-run; else echo "Skipping bold heading rewrite check: $script not found"; fi'"""
 run_windows = """
-powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "if (Test-Path -LiteralPath ([IO.Path]::Combine([Environment]::GetFolderPath('UserProfile'), '.config/scripts/replace-bold-headings.ts'))) { tsx ([IO.Path]::Combine([Environment]::GetFolderPath('UserProfile'), '.config/scripts/replace-bold-headings.ts')) ./catalog --dry-run } else { Write-Host \"Skipping bold heading rewrite check script not found\" }"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "if (Test-Path -LiteralPath ([IO.Path]::Combine([Environment]::GetFolderPath('UserProfile'), '.config/scripts/replace-bold-headings.ts'))) { tsx ([IO.Path]::Combine([Environment]::GetFolderPath('UserProfile'), '.config/scripts/replace-bold-headings.ts')) ./catalog --dry-run } else { Write-Host 'Skipping bold heading rewrite check script not found' }"
 """
 
 [tasks."format:toml"]

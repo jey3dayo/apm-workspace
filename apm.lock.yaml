@@ -1,10 +1,10 @@
 lockfile_version: '1'
-generated_at: '2026-05-22T07:17:15.236629+00:00'
+generated_at: '2026-05-24T13:01:06.028600+00:00'
 apm_version: 0.13.0
 dependencies:
 - repo_url: EpicenterHQ/epicenter
   host: github.com
-  resolved_commit: bcb0a67c9bec4a68b4d0107a1b58ba22773b8da9
+  resolved_commit: e7f8c7fec35199370903aef3b149f30f34a0c601
   virtual_path: .agents/skills/tauri
   is_virtual: true
   package_type: claude_skill
@@ -15,7 +15,7 @@ dependencies:
   content_hash: sha256:bc74e7716b189a74251833f8018ba2e13d7ec25cf77c5214ce6ff1673a193188
 - repo_url: Jakubantalik/transitions-dev
   host: github.com
-  resolved_commit: c4ec6094402361e49a3b5010ce75736c8db4c93b
+  resolved_commit: 038b0bdc75375c2beed51d1e824c98cdc7b86f8c
   virtual_path: skills/transitions-dev
   is_virtual: true
   package_type: claude_skill
@@ -26,7 +26,7 @@ dependencies:
   content_hash: sha256:8cf9ba1ed0d52741e4ed1dafc6ee4543e32f1e516f958d750e81412bfc36dd13
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 9d1318a0e700cb8242be5046b8ca90f95167e4d7
+  resolved_commit: 35699dd82bdaa29f56c9e09aa2878a7254d1a512
   virtual_path: understand-anything-plugin/skills/understand
   is_virtual: true
   package_type: claude_skill
@@ -34,10 +34,10 @@ dependencies:
   - .agents/skills/understand
   - .claude/skills/understand
   - .codeium/windsurf/skills/understand
-  content_hash: sha256:6a62a588546da483d0f7c08b014a11eb6e0da51c6ab10c8dcffdf7eb96bc26a1
+  content_hash: sha256:114f0884f1d6f3f5e638eab1702b4306d04b8966a359189525fc86a0ebf73112
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 9d1318a0e700cb8242be5046b8ca90f95167e4d7
+  resolved_commit: 35699dd82bdaa29f56c9e09aa2878a7254d1a512
   virtual_path: understand-anything-plugin/skills/understand-chat
   is_virtual: true
   package_type: claude_skill
@@ -45,10 +45,10 @@ dependencies:
   - .agents/skills/understand-chat
   - .claude/skills/understand-chat
   - .codeium/windsurf/skills/understand-chat
-  content_hash: sha256:99246057d1e523d0e5eed42e68083f978656661e53d73cac5e92983ccf1518ea
+  content_hash: sha256:3cec7cc6b02177b29d359c3889e311a3985314c61ef7a654ed6c22d43e44b080
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 9d1318a0e700cb8242be5046b8ca90f95167e4d7
+  resolved_commit: 35699dd82bdaa29f56c9e09aa2878a7254d1a512
   virtual_path: understand-anything-plugin/skills/understand-dashboard
   is_virtual: true
   package_type: claude_skill
@@ -59,7 +59,7 @@ dependencies:
   content_hash: sha256:32771fb738e732febba2c780df113354fdc08085aee73e6531ded3e0ad17ee29
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 9d1318a0e700cb8242be5046b8ca90f95167e4d7
+  resolved_commit: 35699dd82bdaa29f56c9e09aa2878a7254d1a512
   virtual_path: understand-anything-plugin/skills/understand-diff
   is_virtual: true
   package_type: claude_skill
@@ -67,10 +67,10 @@ dependencies:
   - .agents/skills/understand-diff
   - .claude/skills/understand-diff
   - .codeium/windsurf/skills/understand-diff
-  content_hash: sha256:3ffd99e2f225db4dbab3ace73d37bedd7f7f670d3fbaa5a6fff0b6654a593820
+  content_hash: sha256:e258781324eaab144a9340c32ea2a49f7584ec7b5984121e11dcffe16fbee03c
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 9d1318a0e700cb8242be5046b8ca90f95167e4d7
+  resolved_commit: 35699dd82bdaa29f56c9e09aa2878a7254d1a512
   virtual_path: understand-anything-plugin/skills/understand-explain
   is_virtual: true
   package_type: claude_skill
@@ -78,10 +78,10 @@ dependencies:
   - .agents/skills/understand-explain
   - .claude/skills/understand-explain
   - .codeium/windsurf/skills/understand-explain
-  content_hash: sha256:3040f5a43b8cea6eba16117a863f171791863b9c00116e6eb96cc5f482e9cba2
+  content_hash: sha256:8f6ef8bc8d4be5e0e8dd764c0d4c5a42b95fa47191e22edbb5ccc351828af7b6
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 9d1318a0e700cb8242be5046b8ca90f95167e4d7
+  resolved_commit: 35699dd82bdaa29f56c9e09aa2878a7254d1a512
   virtual_path: understand-anything-plugin/skills/understand-onboard
   is_virtual: true
   package_type: claude_skill
@@ -89,7 +89,7 @@ dependencies:
   - .agents/skills/understand-onboard
   - .claude/skills/understand-onboard
   - .codeium/windsurf/skills/understand-onboard
-  content_hash: sha256:2b3faf132aafb668ccc57fd743aac0584e7ec6966402c4693b9e7c180db34cce
+  content_hash: sha256:f486302a95dd1e871c5f1ac1dba1d87b8b40e61802fffedead5d203676fdc771
 - repo_url: SawyerHood/dev-browser
   host: github.com
   resolved_commit: 9c85e469e213badb5c5ff96987553e6ff05df9f4
@@ -103,7 +103,7 @@ dependencies:
   content_hash: sha256:d50d11bbefdc1599d78900828dcb69d48e5091769d3f5ce10e06a60efe2405bf
 - repo_url: anthropics/claude-code
   host: github.com
-  resolved_commit: 69d707009ec5a9362ea3552b0580d0f658428f0a
+  resolved_commit: 39e853e4074d90f27afdfb7ea601e0fc378bd0c5
   virtual_path: plugins/frontend-design/skills/frontend-design
   is_virtual: true
   package_type: claude_skill
@@ -147,16 +147,16 @@ dependencies:
   content_hash: sha256:405cf94e4df9b048ab42e51f26ad971dc6b986167b74eb46393abd6f1f5b5f88
 - repo_url: browser-use/browser-harness
   host: github.com
-  resolved_commit: 9e47d2b7775404094e977d3297d8a41e09f73a81
+  resolved_commit: 6d20866664ea3d9691b27bbf64f42ae097437dc3
   package_type: claude_skill
   deployed_files:
   - .agents/skills/browser-harness
   - .claude/skills/browser-harness
   - .codeium/windsurf/skills/browser-harness
-  content_hash: sha256:7148c207ef5a65c51c8e9f55ebf6be9b40c2ec2445c74094b3ec17c70ac60617
+  content_hash: sha256:aff0ee1de9c886ea33b078b6b29e5556f1268bb9331edcd4cbc5f17771f2949c
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: 040b465ffb5bc16b74c92da6955879edccd9aa20
+  resolved_commit: e0284b2f496e2440d308e36aaebb8d421cac7c3f
   virtual_path: plugins/infra/ca-pass
   is_virtual: true
   package_type: marketplace_plugin
@@ -164,10 +164,10 @@ dependencies:
   - .agents/skills/ca-pass
   - .claude/skills/ca-pass
   - .codeium/windsurf/skills/ca-pass
-  content_hash: sha256:7d65f6a5ddc64d232e327d551fc71c7d737e7f9519c4e8810b305cec0499dd0d
+  content_hash: sha256:52314576a364baa9d69edbdc6e9bb915e98bfc885e37fa2d61dd8ff15f6c01a9
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: 040b465ffb5bc16b74c92da6955879edccd9aa20
+  resolved_commit: e0284b2f496e2440d308e36aaebb8d421cac7c3f
   virtual_path: plugins/infra/mdb
   is_virtual: true
   package_type: marketplace_plugin
@@ -175,10 +175,10 @@ dependencies:
   - .agents/skills/mdb
   - .claude/skills/mdb
   - .codeium/windsurf/skills/mdb
-  content_hash: sha256:3c7d57154c87020d236168529a418265389098f6d60aaa62c5bde31248e55ac0
+  content_hash: sha256:53632204cf6b7aeb8a56cbf9ec72653b3b96e7e6afb495ee479f3d62a213485d
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: 040b465ffb5bc16b74c92da6955879edccd9aa20
+  resolved_commit: e0284b2f496e2440d308e36aaebb8d421cac7c3f
   virtual_path: plugins/infra/perman-aws-vault
   is_virtual: true
   package_type: marketplace_plugin
@@ -186,10 +186,10 @@ dependencies:
   - .agents/skills/perman-aws-vault
   - .claude/skills/perman-aws-vault
   - .codeium/windsurf/skills/perman-aws-vault
-  content_hash: sha256:f436902904778be56607219840a08912502562260c14a371aad250311ac14445
+  content_hash: sha256:74a8aa98f478688aca8ec8a208ce59df8aded27cea88d7ce61262b6d6fab4c85
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: 8dcea2d854ba5030d4b09717ef66e829efa73884
+  resolved_commit: e0284b2f496e2440d308e36aaebb8d421cac7c3f
   virtual_path: plugins/utils/caad-skill-deployer
   is_virtual: true
   package_type: marketplace_plugin
@@ -197,7 +197,7 @@ dependencies:
   - .agents/skills/caad-skill-deployer
   - .claude/skills/caad-skill-deployer
   - .codeium/windsurf/skills/caad-skill-deployer
-  content_hash: sha256:cb32203710a69564002d0f812dc2e0673a91490ef407e90a13382e1cd48c9306
+  content_hash: sha256:f418acc2aa28499661d9ff5a25afdca7432c36b07930613e4d43bfb6fb5ebbe7
 - repo_url: cloudflare/skills
   host: github.com
   resolved_commit: 60147cbb773649eadca89cee92b4e0caf02234b4
@@ -220,14 +220,22 @@ dependencies:
   - .claude/skills/wrangler
   - .codeium/windsurf/skills/wrangler
   content_hash: sha256:11edeb37eedb91deedde694b2bb1cc4ff4e8b5a8f1836c217a8c871fe39abcb5
+- repo_url: cursor/plugins
+  host: github.com
+  resolved_commit: b8f2564c2e8da66b331c1dd63c2a2925d6739961
+  resolved_ref: b8f2564c2e8da66b331c1dd63c2a2925d6739961
+  virtual_path: cursor-team-kit/skills/thermo-nuclear-code-quality-review
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/thermo-nuclear-code-quality-review
+  - .claude/skills/thermo-nuclear-code-quality-review
+  - .codeium/windsurf/skills/thermo-nuclear-code-quality-review
+  content_hash: sha256:9052b01b46b1d8dbf94c45f9313ec1983443f9a460e83d49cdc7fe0f640ca476
 - repo_url: gonta223/humanizer-ja
   host: github.com
   resolved_commit: a1e343696e43aa50e7218891f3319ab22cde3464
   package_type: claude_skill
-  deployed_files:
-  - .agents/skills/humanizer-ja
-  - .claude/skills/humanizer-ja
-  - .codeium/windsurf/skills/humanizer-ja
   content_hash: sha256:b6da4ef92a941ab364ab1ddf259d9e511e098a0719f7ee2202847351c34a8194
 - repo_url: hashicorp/agent-skills
   host: github.com
@@ -308,7 +316,7 @@ dependencies:
   content_hash: sha256:99aaea521aa0f1c7d041d70bb6b75581c1a50ec6ac59ceaaa923b6339ffa417b
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: 28caf28b3ef925f66a7624e0c8d45451bf58308f
+  resolved_commit: b11e193fb70a064c6cdb3332d7d9d58d01a0a256
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
@@ -317,15 +325,15 @@ dependencies:
   - .agents/skills/1password-item-ops
   - .agents/skills/agent-creator
   - .agents/skills/apm-usage
+  - .agents/skills/architecture-boundary-docs
   - .agents/skills/atomic-commit
   - .agents/skills/chrome-debug
   - .agents/skills/claude-system
   - .agents/skills/code-quality-improvement
   - .agents/skills/code-review
-  - .agents/skills/codex-code-review
-  - .agents/skills/codex-plan-review
   - .agents/skills/codex-system
   - .agents/skills/command-creator
+  - .agents/skills/design-check
   - .agents/skills/design-md-workflow
   - .agents/skills/distributions-manager
   - .agents/skills/docs-entrypoint-review
@@ -339,12 +347,14 @@ dependencies:
   - .agents/skills/git-automation
   - .agents/skills/git-worktree
   - .agents/skills/golang
+  - .agents/skills/google-forms-survey-builder
   - .agents/skills/greptileai
   - .agents/skills/implementation-engine
   - .agents/skills/integration-framework
   - .agents/skills/knowledge-creator
   - .agents/skills/learnings-knowledge
   - .agents/skills/linear-task-ops
+  - .agents/skills/macos-troubleshooting
   - .agents/skills/mcp-tools
   - .agents/skills/mise
   - .agents/skills/mole-management
@@ -354,6 +364,7 @@ dependencies:
   - .agents/skills/pr-feedback-orchestrator
   - .agents/skills/predictive-analysis
   - .agents/skills/premortem
+  - .agents/skills/prepare-goal
   - .agents/skills/project-maintenance
   - .agents/skills/react
   - .agents/skills/react-grid-layout
@@ -376,15 +387,15 @@ dependencies:
   - .claude/skills/1password-item-ops
   - .claude/skills/agent-creator
   - .claude/skills/apm-usage
+  - .claude/skills/architecture-boundary-docs
   - .claude/skills/atomic-commit
   - .claude/skills/chrome-debug
   - .claude/skills/claude-system
   - .claude/skills/code-quality-improvement
   - .claude/skills/code-review
-  - .claude/skills/codex-code-review
-  - .claude/skills/codex-plan-review
   - .claude/skills/codex-system
   - .claude/skills/command-creator
+  - .claude/skills/design-check
   - .claude/skills/design-md-workflow
   - .claude/skills/distributions-manager
   - .claude/skills/docs-entrypoint-review
@@ -398,12 +409,14 @@ dependencies:
   - .claude/skills/git-automation
   - .claude/skills/git-worktree
   - .claude/skills/golang
+  - .claude/skills/google-forms-survey-builder
   - .claude/skills/greptileai
   - .claude/skills/implementation-engine
   - .claude/skills/integration-framework
   - .claude/skills/knowledge-creator
   - .claude/skills/learnings-knowledge
   - .claude/skills/linear-task-ops
+  - .claude/skills/macos-troubleshooting
   - .claude/skills/mcp-tools
   - .claude/skills/mise
   - .claude/skills/mole-management
@@ -436,15 +449,15 @@ dependencies:
   - .codeium/windsurf/skills/1password-item-ops
   - .codeium/windsurf/skills/agent-creator
   - .codeium/windsurf/skills/apm-usage
+  - .codeium/windsurf/skills/architecture-boundary-docs
   - .codeium/windsurf/skills/atomic-commit
   - .codeium/windsurf/skills/chrome-debug
   - .codeium/windsurf/skills/claude-system
   - .codeium/windsurf/skills/code-quality-improvement
   - .codeium/windsurf/skills/code-review
-  - .codeium/windsurf/skills/codex-code-review
-  - .codeium/windsurf/skills/codex-plan-review
   - .codeium/windsurf/skills/codex-system
   - .codeium/windsurf/skills/command-creator
+  - .codeium/windsurf/skills/design-check
   - .codeium/windsurf/skills/design-md-workflow
   - .codeium/windsurf/skills/distributions-manager
   - .codeium/windsurf/skills/docs-entrypoint-review
@@ -458,12 +471,14 @@ dependencies:
   - .codeium/windsurf/skills/git-automation
   - .codeium/windsurf/skills/git-worktree
   - .codeium/windsurf/skills/golang
+  - .codeium/windsurf/skills/google-forms-survey-builder
   - .codeium/windsurf/skills/greptileai
   - .codeium/windsurf/skills/implementation-engine
   - .codeium/windsurf/skills/integration-framework
   - .codeium/windsurf/skills/knowledge-creator
   - .codeium/windsurf/skills/learnings-knowledge
   - .codeium/windsurf/skills/linear-task-ops
+  - .codeium/windsurf/skills/macos-troubleshooting
   - .codeium/windsurf/skills/mcp-tools
   - .codeium/windsurf/skills/mise
   - .codeium/windsurf/skills/mole-management
@@ -493,10 +508,10 @@ dependencies:
   - .codeium/windsurf/skills/typescript
   - .codeium/windsurf/skills/wezterm
   - .codeium/windsurf/skills/zsh
-  content_hash: sha256:649141c5e23412df1b67b08627e199e8ddd89fe9f5462a4e7cfaa3d2ea9469c2
+  content_hash: sha256:aa7f2dada8753b58c2e2799477f13288a8ae7c60a62c771dc886276e68e884b1
 - repo_url: langchain-ai/deepagents
   host: github.com
-  resolved_commit: aa7fc2c79ddf3ec0dee3c3c3196f301b4105dc8a
+  resolved_commit: 0bd35b26f4d5a8a2bce8a5375910a8914f0d4790
   virtual_path: libs/cli/examples/skills/web-research
   is_virtual: true
   package_type: claude_skill
@@ -507,7 +522,7 @@ dependencies:
   content_hash: sha256:2b66d5db8c8d70474e70638f437f324fb3af3724b71bf8501e48c8004e70e677
 - repo_url: millionco/react-doctor
   host: github.com
-  resolved_commit: 19afa9ba3ba673e3df682ee919423a21cdf14313
+  resolved_commit: 241444d35287f1b4551cca921a65fb2fa67949b6
   virtual_path: skills/react-doctor
   is_virtual: true
   package_type: claude_skill
@@ -518,7 +533,7 @@ dependencies:
   content_hash: sha256:26b327a7146dfd129f51b409ed5a22f0801b735da25001b5c42b718ecc0822ac
 - repo_url: mizchi/skills
   host: github.com
-  resolved_commit: ccd344dd3c02db5f28f5f9d06ee5c669231de417
+  resolved_commit: f74212c0e3c2e1cf420d27c6418af1a10f697f4b
   virtual_path: empirical-prompt-tuning
   is_virtual: true
   package_type: claude_skill
@@ -532,9 +547,10 @@ dependencies:
   resolved_commit: b7e3af80f6e331f6fb456667b82b12cade7c9d35
   package_type: marketplace_plugin
   deployed_files:
+  - .agents/skills/ui-ux-pro-max
   - .claude/skills/ui-ux-pro-max
   - .codeium/windsurf/skills/ui-ux-pro-max
-  content_hash: sha256:f967740cfa8aced3860967f06558f8b3df7d843b325b104284201d7e645d17d4
+  content_hash: sha256:496fe13cca94d56c9cf98899801fd117813fbcbd135ae660fb481d1c4c0e1abb
 - repo_url: nyosegawa/skills
   host: github.com
   resolved_commit: c1048fe35403a3f273132306a4d49278f189c64b
@@ -735,7 +751,7 @@ dependencies:
   content_hash: sha256:8e00d64a5cd9b4477e55c4a7ad0f02328ff1991ea93e2ac1fb7839b3891d3f2d
 - repo_url: openai/skills
   host: github.com
-  resolved_commit: 590b49edc158611a2b2ed715ae73f27eb70d251a
+  resolved_commit: b0401f07213a66414d84a65cb50c1d226f99485a
   virtual_path: skills/.curated/gh-address-comments
   is_virtual: true
   package_type: claude_skill
@@ -746,7 +762,7 @@ dependencies:
   content_hash: sha256:068d34fb59cb97a39aea3de1708877b6a01210d02fa7eda5e74fc8277ed52916
 - repo_url: openai/skills
   host: github.com
-  resolved_commit: 590b49edc158611a2b2ed715ae73f27eb70d251a
+  resolved_commit: b0401f07213a66414d84a65cb50c1d226f99485a
   virtual_path: skills/.curated/gh-fix-ci
   is_virtual: true
   package_type: claude_skill
@@ -809,7 +825,7 @@ dependencies:
   - .agents/skills/agentic-actions-auditor
   - .claude/skills/agentic-actions-auditor
   - .codeium/windsurf/skills/agentic-actions-auditor
-  content_hash: sha256:2803b2bf55ab6afb78262ef116f44f095ae6173d81e27d140e51a634ef4d5990
+  content_hash: sha256:db01db6ccc56b0fc2a37ca947653b6039e7655fac938e40f3de48a3fbb27ef18
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: a56045e9ae00b3506cacefea0f672aab0a1a6e3c
@@ -834,9 +850,9 @@ dependencies:
   - .codeium/windsurf/skills/sharp-edges-analyzer/SKILL.md
   - .codex/agents/sharp-edges-analyzer.toml
   deployed_file_hashes:
-    .codeium/windsurf/skills/sharp-edges-analyzer/SKILL.md: sha256:c0663d7534da442b7a3f9829e9d36854067be3814cfada7f507908a076489ca9
-    .codex/agents/sharp-edges-analyzer.toml: sha256:e4acab6229d633e03f6e1621e2051cbb3b081052541d26d28cf0e1b91e3d165c
-  content_hash: sha256:0a7945aa202c4a525cf47928540e4cf76a5644cd2db6f3486282b285c8f735d9
+    .codeium/windsurf/skills/sharp-edges-analyzer/SKILL.md: sha256:b8aa55bda284c326fd19a56dd2fc295ed095467b364646c2cb5e6e3722bd93cd
+    .codex/agents/sharp-edges-analyzer.toml: sha256:a9720eb47562115c38dd75c069e8e02b8fdffceecd0ba7e75d43f4dd618079a9
+  content_hash: sha256:62c1a21c1a9352941b73af22f15d18c27880116f01929158a6a27b15f532dd88
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: a56045e9ae00b3506cacefea0f672aab0a1a6e3c
@@ -856,9 +872,9 @@ dependencies:
   - .codeium/windsurf/skills/semgrep-scanner/SKILL.md
   - .codex/agents/semgrep-scanner.toml
   deployed_file_hashes:
-    .codeium/windsurf/skills/semgrep-scanner/SKILL.md: sha256:ec8f42da4a67bc4cc25de85891b8cf4fdfdd80c849d174d09cc216c8ab37e05c
-    .codex/agents/semgrep-scanner.toml: sha256:2d00271838d665aa25d5c96e141812aed82be9497b0b716c47d376ea4ef33954
-  content_hash: sha256:c0a9571c4d943b4a77c3192557c27a990914c57d09d92966c9f795164dd3b647
+    .codeium/windsurf/skills/semgrep-scanner/SKILL.md: sha256:55d20d1318864588ba94cfeeb4a9164dfdf86aa2be56e5c82d36ab04203810f7
+    .codex/agents/semgrep-scanner.toml: sha256:e6a71153cdb7a0fd83232ec2c62c9871889cace047ee8ffcfe1d6f084f3d162e
+  content_hash: sha256:58df3abbee403c717b720588bd6c25566b09798fece8cf2bf75d33843d41f562
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: a56045e9ae00b3506cacefea0f672aab0a1a6e3c
@@ -872,7 +888,7 @@ dependencies:
   content_hash: sha256:a1ad4b676f0870bf2c8844876dee06feeb9127a3e7499683bac3727f6a3839cf
 - repo_url: vercel-labs/agent-browser
   host: github.com
-  resolved_commit: 55f38f4d81981f0191c730005c419958c7d20605
+  resolved_commit: 4ad284890cb59564af603e6de403dd75dd19e832
   virtual_path: skills/agent-browser
   is_virtual: true
   package_type: claude_skill
@@ -883,7 +899,7 @@ dependencies:
   content_hash: sha256:edad4d958bc4baf821e3391bb9889a03a8bbc0e4d7f54ee4a5f30837654fed83
 - repo_url: vercel-labs/agent-skills
   host: github.com
-  resolved_commit: b9c8ee0643d87d3c5a953d1e22382ff2ead39229
+  resolved_commit: 18a24346600009dc3fcb99e4b2cd83b301601775
   virtual_path: skills/composition-patterns
   is_virtual: true
   package_type: claude_skill
@@ -894,7 +910,7 @@ dependencies:
   content_hash: sha256:5b3564ca435f4714d5e65023351e1999e4744818603a9cfb6a6f6a61b7d84918
 - repo_url: vercel-labs/agent-skills
   host: github.com
-  resolved_commit: b9c8ee0643d87d3c5a953d1e22382ff2ead39229
+  resolved_commit: 18a24346600009dc3fcb99e4b2cd83b301601775
   virtual_path: skills/react-best-practices
   is_virtual: true
   package_type: claude_skill
@@ -905,7 +921,7 @@ dependencies:
   content_hash: sha256:74f142d28d360d78e8bac4f239a84c87f0ced9015729bc72b5458d82ff45b015
 - repo_url: vercel-labs/agent-skills
   host: github.com
-  resolved_commit: b9c8ee0643d87d3c5a953d1e22382ff2ead39229
+  resolved_commit: 18a24346600009dc3fcb99e4b2cd83b301601775
   virtual_path: skills/web-design-guidelines
   is_virtual: true
   package_type: claude_skill
@@ -916,7 +932,7 @@ dependencies:
   content_hash: sha256:a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a
 - repo_url: vercel-labs/skills
   host: github.com
-  resolved_commit: c5ad3a85b4d16666974b161131413d08bfef3f7e
+  resolved_commit: d23509536baf5adadd53f707cd8d6fd287dea581
   virtual_path: skills/find-skills
   is_virtual: true
   package_type: claude_skill
