@@ -5,7 +5,8 @@ description: |
   Combines similarity-ts (duplicate detection) and react-doctor (React
   diagnostics) for incremental quality improvement. Orchestrator that works
   with code-quality-improvement (ESLint/type safety fixes) and tsr (dead code
-  removal).
+  removal). Coordinates independent diagnostics and bounded refactor slices
+  when broad cleanup can run in parallel.
   [When] Use when: "リファクタ", "refactor", "重複コード", "コード整理",
   "clean up", "duplicate code", "react-doctor", "similarity",
   "共通関数", "helper extraction", "共通 helper",
@@ -36,7 +37,7 @@ cat package.json | grep '"react"'
 ls tsconfig.json 2>/dev/null && echo "TypeScript project"
 ```
 
-| Project Type              | Tools to Run                       |
+| Project Type              | Parallel diagnostic tracks         |
 | ------------------------- | ---------------------------------- |
 | React + TypeScript/JS     | react-doctor + similarity-ts + tsr |
 | TypeScript/JS (non-React) | similarity-ts + tsr                |
@@ -46,6 +47,12 @@ ls tsconfig.json 2>/dev/null && echo "TypeScript project"
 ## 📋 3-Phase Workflow
 
 ### Phase 1: Diagnose
+
+For broad cleanup requests, default to parallel diagnosis and evidence
+gathering before planning. Run or delegate independent tracks for React
+diagnostics, duplicate/similarity analysis, boundary ownership, and dead-code
+surface mapping. Keep the main session responsible for the immediate blocking
+task, priority decisions, and integration judgment.
 
 #### 1-A: React Project Diagnostics
 
@@ -110,6 +117,47 @@ feature concept. Keep it local when it closes over hooks/state, render shape,
 component translations, or screen-specific copy. Test-only duplication can stay
 inside mocks when importing the real helper would make the test less isolated.
 
+#### 1-E: Parallel Diagnostic Dispatch
+
+Use `subagent-task-review-loop` when the diagnostic surface is broad enough to
+split safely. Prefer parallel workers for read-heavy or bounded tasks:
+
+- React diagnostics: inspect `react-doctor` findings and likely component risk.
+- Duplicate/similarity: classify 95%+ and 90-95% candidates by extraction value.
+- Boundary ownership: map validation, Result/error, DB/repository, config/env,
+  and external IO drift to evidence-backed owner folders.
+- Dead-code surface: identify unused exports/files and note dependencies that
+  may change after extraction or ownership moves.
+
+Do not ask multiple workers to make overlapping edits. For implementation work,
+dispatch only disjoint bounded slices, and keep the main session responsible for
+diff review, final integration, and quality gates.
+
+Ask each worker to return the following compact contract:
+
+```markdown
+## Subagent Result
+
+- Task: <assigned bounded task>
+- Mode: diagnostic | bounded-slice | review
+- Scope: <files/modules/concern inspected>
+- Files inspected: <paths>
+- Files changed: <paths or none>
+- Findings:
+  - <evidence-backed finding with file path/line when applicable>
+- Recommended backlog entries:
+  - do-now | accept | next | park | reject: <reason>
+- Proposed refactor slice:
+  - Goal:
+  - Files:
+  - Behavior expected to remain unchanged:
+  - Acceptance evidence:
+- Verification:
+  - <command/check run or not run, with reason>
+- Risks / unknowns:
+  - <remaining uncertainty>
+```
+
 ---
 
 ### Phase 2: Analyze & Plan
@@ -142,6 +190,14 @@ on file/import evidence already collected.
 - Duplicate code pairs: XX (95%+: X pairs, 90-95%: X pairs)
 - Boundary ownership findings: XX (schema/validation: X, Result/error: X, DB/repository: X)
 
+### Subagent Findings Summary
+
+- do-now: <blocking findings accepted into this session>
+- accept: <evidence-backed improvements scheduled in this slice>
+- next: <useful follow-up after the current slice>
+- park: <valid but outside current scope>
+- reject: <duplicated, contradicted, or unsupported findings>
+
 ### Priority Actions
 
 1. 🔴 [Critical] react-doctor error: <description> → <fix approach>
@@ -160,6 +216,10 @@ on file/import evidence already collected.
 ---
 
 ### Phase 3: Execute
+
+Parallelize implementation only when slices have disjoint write scopes and clear
+acceptance evidence. The main session owns sequencing, diff review, integration,
+and quality gates even when a worker prepares a bounded slice.
 
 #### 3-1: Fix react-doctor Errors
 
@@ -214,7 +274,15 @@ technology concern: schema/validation, Result/error boundary, and DB/repository
 boundary. Keep the main session responsible for deciding which findings are
 real boundary violations and integrating the final diff.
 
-#### 3-4: Fix ESLint/Type Safety Issues
+#### 3-4: Execute Bounded Refactor Slices
+
+Use workers only for small implementation slices when the files/modules do not
+overlap with other active edits. Each slice must name the behavior that should
+remain unchanged and the evidence that proves it. Review every worker diff
+before building on it, then run the relevant focused check before moving to the
+next slice.
+
+#### 3-5: Fix ESLint/Type Safety Issues
 
 Fix remaining code quality issues after deduplication.
 
@@ -228,7 +296,7 @@ pnpm lint 2>&1 | tail -20
 
 For complex type safety issues (any-type elimination, Result<T,E> patterns), delegate to `../code-quality-improvement/SKILL.md`.
 
-#### 3-5: Remove Dead Code
+#### 3-6: Remove Dead Code
 
 Remove code that becomes unused after refactoring.
 
@@ -242,7 +310,7 @@ pnpm tsr:fix
 
 For tsr skill details, refer to `../tsr/SKILL.md`.
 
-#### 3-6: Verification (Required)
+#### 3-7: Verification (Required)
 
 ### Run after every fix step
 
@@ -256,14 +324,14 @@ Do not proceed to the next phase until all pass.
 
 ## 🔄 Skill Delegation
 
-| Problem Area                      | Delegated Skill                         |
-| --------------------------------- | --------------------------------------- |
-| Detailed duplicate code analysis  | `../similarity/skills/SKILL.md`         |
-| ESLint errors / type safety       | `../code-quality-improvement/SKILL.md`  |
-| Dead code removal                 | `../tsr/SKILL.md`                       |
-| React-specific pattern diagnosis  | `../react-doctor/SKILL.md` (if exists)  |
-| Broad boundary ownership scan     | `../subagent-task-review-loop/SKILL.md` |
-| Impact scope / reference tracking | MCP Serena: `find_referencing_symbols`  |
+| Problem Area                                       | Delegated Skill                         |
+| -------------------------------------------------- | --------------------------------------- |
+| Detailed duplicate code analysis                   | `../similarity/skills/SKILL.md`         |
+| ESLint errors / type safety                        | `../code-quality-improvement/SKILL.md`  |
+| Dead code removal                                  | `../tsr/SKILL.md`                       |
+| React-specific pattern diagnosis                   | `../react-doctor/SKILL.md` (if exists)  |
+| Parallel diagnostics / bounded slice review loop   | `../subagent-task-review-loop/SKILL.md` |
+| Impact scope / reference tracking                  | MCP Serena: `find_referencing_symbols`  |
 
 ---
 
