@@ -324,14 +324,14 @@ Do not proceed to the next phase until all pass.
 
 ## 🔄 Skill Delegation
 
-| Problem Area                                       | Delegated Skill                         |
-| -------------------------------------------------- | --------------------------------------- |
-| Detailed duplicate code analysis                   | `../similarity/skills/SKILL.md`         |
-| ESLint errors / type safety                        | `../code-quality-improvement/SKILL.md`  |
-| Dead code removal                                  | `../tsr/SKILL.md`                       |
-| React-specific pattern diagnosis                   | `../react-doctor/SKILL.md` (if exists)  |
-| Parallel diagnostics / bounded slice review loop   | `../subagent-task-review-loop/SKILL.md` |
-| Impact scope / reference tracking                  | MCP Serena: `find_referencing_symbols`  |
+| Problem Area                                     | Delegated Skill                         |
+| ------------------------------------------------ | --------------------------------------- |
+| Detailed duplicate code analysis                 | `../similarity/skills/SKILL.md`         |
+| ESLint errors / type safety                      | `../code-quality-improvement/SKILL.md`  |
+| Dead code removal                                | `../tsr/SKILL.md`                       |
+| React-specific pattern diagnosis                 | `../react-doctor/SKILL.md` (if exists)  |
+| Parallel diagnostics / bounded slice review loop | `../subagent-task-review-loop/SKILL.md` |
+| Impact scope / reference tracking                | MCP Serena: `find_referencing_symbols`  |
 
 ---
 
