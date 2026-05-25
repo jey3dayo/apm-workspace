@@ -1,10 +1,10 @@
 lockfile_version: '1'
-generated_at: '2026-05-24T14:29:56.607872+00:00'
-apm_version: 0.13.0
+generated_at: '2026-05-25T06:39:01.238241+00:00'
+apm_version: 0.14.2
 dependencies:
 - repo_url: EpicenterHQ/epicenter
   host: github.com
-  resolved_commit: c9b7efc2a50a4019cbbaec500cc198f3ab5c6d70
+  resolved_commit: cd564989ba168e5e548403902b68225199d8fa1f
   virtual_path: .agents/skills/tauri
   is_virtual: true
   package_type: claude_skill
@@ -156,7 +156,7 @@ dependencies:
   content_hash: sha256:aff0ee1de9c886ea33b078b6b29e5556f1268bb9331edcd4cbc5f17771f2949c
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: e0284b2f496e2440d308e36aaebb8d421cac7c3f
+  resolved_commit: b89ca61dd247aef78e89990a45ca77f955f2234f
   virtual_path: plugins/infra/ca-pass
   is_virtual: true
   package_type: marketplace_plugin
@@ -167,7 +167,7 @@ dependencies:
   content_hash: sha256:7d65f6a5ddc64d232e327d551fc71c7d737e7f9519c4e8810b305cec0499dd0d
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: e0284b2f496e2440d308e36aaebb8d421cac7c3f
+  resolved_commit: b89ca61dd247aef78e89990a45ca77f955f2234f
   virtual_path: plugins/infra/mdb
   is_virtual: true
   package_type: marketplace_plugin
@@ -178,7 +178,18 @@ dependencies:
   content_hash: sha256:3c7d57154c87020d236168529a418265389098f6d60aaa62c5bde31248e55ac0
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: e0284b2f496e2440d308e36aaebb8d421cac7c3f
+  resolved_commit: b89ca61dd247aef78e89990a45ca77f955f2234f
+  virtual_path: plugins/infra/notica-notification-api
+  is_virtual: true
+  package_type: marketplace_plugin
+  deployed_files:
+  - .agents/skills/notica-notification-api
+  - .claude/skills/notica-notification-api
+  - .codeium/windsurf/skills/notica-notification-api
+  content_hash: sha256:ec0dc6d70fe1a95d6b0ec6f65afc0da8c644372aeba351729571f7fb221a0377
+- repo_url: caad-develop/claude-code-marketplace
+  host: github.com
+  resolved_commit: b89ca61dd247aef78e89990a45ca77f955f2234f
   virtual_path: plugins/infra/perman-aws-vault
   is_virtual: true
   package_type: marketplace_plugin
@@ -189,7 +200,7 @@ dependencies:
   content_hash: sha256:3d760f5f0f512eeae40bc433a2b6d384fedecb63bb239d16bf2712b509ed2f55
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: e0284b2f496e2440d308e36aaebb8d421cac7c3f
+  resolved_commit: b89ca61dd247aef78e89990a45ca77f955f2234f
   virtual_path: plugins/utils/caad-skill-deployer
   is_virtual: true
   package_type: marketplace_plugin
@@ -320,7 +331,7 @@ dependencies:
   content_hash: sha256:99aaea521aa0f1c7d041d70bb6b75581c1a50ec6ac59ceaaa923b6339ffa417b
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: 394683c3a88b6ac6f1c6920de713b94f247c7258
+  resolved_commit: 6ca55d1f702ec75f834c7ceca1844dd1c25e5845
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
@@ -368,7 +379,6 @@ dependencies:
   - .agents/skills/pr-feedback-orchestrator
   - .agents/skills/predictive-analysis
   - .agents/skills/premortem
-  - .agents/skills/prepare-goal
   - .agents/skills/project-maintenance
   - .agents/skills/react
   - .agents/skills/react-grid-layout
@@ -512,7 +522,7 @@ dependencies:
   - .codeium/windsurf/skills/typescript
   - .codeium/windsurf/skills/wezterm
   - .codeium/windsurf/skills/zsh
-  content_hash: sha256:7f3683fe0cd790bf080a1a02948d96112181955d798ff53e107586b58f0ab6f3
+  content_hash: sha256:ae3451cdb0508b127f3ca4b289957d290408749a8959b3cabd54e1b9e31acb06
 - repo_url: langchain-ai/deepagents
   host: github.com
   resolved_commit: 0bd35b26f4d5a8a2bce8a5375910a8914f0d4790
@@ -526,7 +536,7 @@ dependencies:
   content_hash: sha256:2b66d5db8c8d70474e70638f437f324fb3af3724b71bf8501e48c8004e70e677
 - repo_url: millionco/react-doctor
   host: github.com
-  resolved_commit: 26b66b45d59f4ac53cf3302b9b82dc0b931eef71
+  resolved_commit: 3bde0309e8e2aa51404ba6e4993f5af41ad80eaf
   virtual_path: skills/react-doctor
   is_virtual: true
   package_type: claude_skill
@@ -551,10 +561,9 @@ dependencies:
   resolved_commit: b7e3af80f6e331f6fb456667b82b12cade7c9d35
   package_type: marketplace_plugin
   deployed_files:
-  - .agents/skills/ui-ux-pro-max
   - .claude/skills/ui-ux-pro-max
   - .codeium/windsurf/skills/ui-ux-pro-max
-  content_hash: sha256:08432204d056fb901311755380851874591114300ca6e4e20aa094937821faac
+  content_hash: sha256:f967740cfa8aced3860967f06558f8b3df7d843b325b104284201d7e645d17d4
 - repo_url: nyosegawa/skills
   host: github.com
   resolved_commit: c1048fe35403a3f273132306a4d49278f189c64b
@@ -849,13 +858,15 @@ dependencies:
   package_type: marketplace_plugin
   deployed_files:
   - .agents/skills/sharp-edges
+  - .claude/agents/sharp-edges-analyzer.md
   - .claude/skills/sharp-edges
   - .codeium/windsurf/skills/sharp-edges
-  - .codeium/windsurf/skills/sharp-edges-analyzer/SKILL.md
-  - .codex/agents/sharp-edges-analyzer.toml
+  - .copilot/agents/sharp-edges-analyzer.agent.md
+  - .cursor/agents/sharp-edges-analyzer.md
   deployed_file_hashes:
-    .codeium/windsurf/skills/sharp-edges-analyzer/SKILL.md: sha256:c0663d7534da442b7a3f9829e9d36854067be3814cfada7f507908a076489ca9
-    .codex/agents/sharp-edges-analyzer.toml: sha256:e4acab6229d633e03f6e1621e2051cbb3b081052541d26d28cf0e1b91e3d165c
+    .claude/agents/sharp-edges-analyzer.md: sha256:c9df773b4a8a56ed88179ef46b8b4eada44092fe4227a683d37bd5219bcbbdae
+    .copilot/agents/sharp-edges-analyzer.agent.md: sha256:c9df773b4a8a56ed88179ef46b8b4eada44092fe4227a683d37bd5219bcbbdae
+    .cursor/agents/sharp-edges-analyzer.md: sha256:c9df773b4a8a56ed88179ef46b8b4eada44092fe4227a683d37bd5219bcbbdae
   content_hash: sha256:0a7945aa202c4a525cf47928540e4cf76a5644cd2db6f3486282b285c8f735d9
 - repo_url: trailofbits/skills
   host: github.com
@@ -867,17 +878,19 @@ dependencies:
   - .agents/skills/codeql
   - .agents/skills/sarif-parsing
   - .agents/skills/semgrep
+  - .claude/agents/semgrep-scanner.md
   - .claude/skills/codeql
   - .claude/skills/sarif-parsing
   - .claude/skills/semgrep
   - .codeium/windsurf/skills/codeql
   - .codeium/windsurf/skills/sarif-parsing
   - .codeium/windsurf/skills/semgrep
-  - .codeium/windsurf/skills/semgrep-scanner/SKILL.md
-  - .codex/agents/semgrep-scanner.toml
+  - .copilot/agents/semgrep-scanner.agent.md
+  - .cursor/agents/semgrep-scanner.md
   deployed_file_hashes:
-    .codeium/windsurf/skills/semgrep-scanner/SKILL.md: sha256:ec8f42da4a67bc4cc25de85891b8cf4fdfdd80c849d174d09cc216c8ab37e05c
-    .codex/agents/semgrep-scanner.toml: sha256:2d00271838d665aa25d5c96e141812aed82be9497b0b716c47d376ea4ef33954
+    .claude/agents/semgrep-scanner.md: sha256:26d412799ad8e549ca2fbe1f93536e66f222feb6a0ae78e0a286947ba5e3f416
+    .copilot/agents/semgrep-scanner.agent.md: sha256:26d412799ad8e549ca2fbe1f93536e66f222feb6a0ae78e0a286947ba5e3f416
+    .cursor/agents/semgrep-scanner.md: sha256:26d412799ad8e549ca2fbe1f93536e66f222feb6a0ae78e0a286947ba5e3f416
   content_hash: sha256:c0a9571c4d943b4a77c3192557c27a990914c57d09d92966c9f795164dd3b647
 - repo_url: trailofbits/skills
   host: github.com
