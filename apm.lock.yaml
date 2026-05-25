@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-05-25T08:44:11.528710+00:00'
+generated_at: '2026-05-25T10:02:05.617231+00:00'
 apm_version: 0.14.2
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -156,7 +156,7 @@ dependencies:
   content_hash: sha256:aff0ee1de9c886ea33b078b6b29e5556f1268bb9331edcd4cbc5f17771f2949c
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: 9a6c89e646bb66d679820885a13a624bd75bc97f
+  resolved_commit: f403238f3f39cc263dbe14692356e05ead8dc853
   virtual_path: plugins/infra/ca-pass
   is_virtual: true
   package_type: marketplace_plugin
@@ -167,7 +167,7 @@ dependencies:
   content_hash: sha256:7d65f6a5ddc64d232e327d551fc71c7d737e7f9519c4e8810b305cec0499dd0d
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: 9a6c89e646bb66d679820885a13a624bd75bc97f
+  resolved_commit: f403238f3f39cc263dbe14692356e05ead8dc853
   virtual_path: plugins/infra/mdb
   is_virtual: true
   package_type: marketplace_plugin
@@ -178,7 +178,7 @@ dependencies:
   content_hash: sha256:3c7d57154c87020d236168529a418265389098f6d60aaa62c5bde31248e55ac0
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: 9a6c89e646bb66d679820885a13a624bd75bc97f
+  resolved_commit: f403238f3f39cc263dbe14692356e05ead8dc853
   virtual_path: plugins/infra/notica-notification-api
   is_virtual: true
   package_type: marketplace_plugin
@@ -186,10 +186,10 @@ dependencies:
   - .agents/skills/notica-notification-api
   - .claude/skills/notica-notification-api
   - .codeium/windsurf/skills/notica-notification-api
-  content_hash: sha256:ba4700f9dbb69691ca6afa3d53cb688e88defe76b0fef025f5fcc09dfc68aeb8
+  content_hash: sha256:5464530ef889d3c8665febb14a26b72f04e88760ae5c61caeb51744252d2a550
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: 9a6c89e646bb66d679820885a13a624bd75bc97f
+  resolved_commit: f403238f3f39cc263dbe14692356e05ead8dc853
   virtual_path: plugins/infra/perman-aws-vault
   is_virtual: true
   package_type: marketplace_plugin
@@ -200,7 +200,7 @@ dependencies:
   content_hash: sha256:77bf802ac96173ef83cb67ac83bb2b50736f7aeeaa19f024bc46fd2a005d7c72
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: 9a6c89e646bb66d679820885a13a624bd75bc97f
+  resolved_commit: f403238f3f39cc263dbe14692356e05ead8dc853
   virtual_path: plugins/utils/caad-skill-deployer
   is_virtual: true
   package_type: marketplace_plugin
@@ -331,7 +331,7 @@ dependencies:
   content_hash: sha256:99aaea521aa0f1c7d041d70bb6b75581c1a50ec6ac59ceaaa923b6339ffa417b
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: c62b2fb9f27b2b5dab0b53b60ccfc04840425784
+  resolved_commit: ca029c616a5a1472d1035f9423cc11d9d838588d
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
