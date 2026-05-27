@@ -1,0 +1,4 @@
+interface:
+  display_name: "Slack App Management"
+  short_description: "Slack app settings, installs, and bot users"
+  default_prompt: "Use $slack-app-management to diagnose a Slack app setting, install, scope, or bot user issue."
