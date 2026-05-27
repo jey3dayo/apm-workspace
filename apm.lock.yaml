@@ -1,10 +1,10 @@
 lockfile_version: '1'
-generated_at: '2026-05-26T10:08:51.992099+00:00'
+generated_at: '2026-05-27T16:44:12.827128+00:00'
 apm_version: 0.14.2
 dependencies:
 - repo_url: EpicenterHQ/epicenter
   host: github.com
-  resolved_commit: cd564989ba168e5e548403902b68225199d8fa1f
+  resolved_commit: 7eeb234f2bd0aed1b5e777f226df26b5fa09a6ac
   virtual_path: .agents/skills/tauri
   is_virtual: true
   package_type: claude_skill
@@ -26,7 +26,7 @@ dependencies:
   content_hash: sha256:8cf9ba1ed0d52741e4ed1dafc6ee4543e32f1e516f958d750e81412bfc36dd13
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 470cc01dc5f9236a93eb704afdd479cd5db79710
+  resolved_commit: 26edf61856fa476e466bda1814819a266a293c47
   virtual_path: understand-anything-plugin/skills/understand
   is_virtual: true
   package_type: claude_skill
@@ -34,10 +34,10 @@ dependencies:
   - .agents/skills/understand
   - .claude/skills/understand
   - .codeium/windsurf/skills/understand
-  content_hash: sha256:c0a2988471f970691f9c8f1a67e96d4cdd97b6702e9186a9f8af6482c22bbec3
+  content_hash: sha256:331e897a73d8332f7a1b4cb58f58c5e53bf06910aa6657d8fed055ad2392d83c
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 470cc01dc5f9236a93eb704afdd479cd5db79710
+  resolved_commit: 26edf61856fa476e466bda1814819a266a293c47
   virtual_path: understand-anything-plugin/skills/understand-chat
   is_virtual: true
   package_type: claude_skill
@@ -48,7 +48,7 @@ dependencies:
   content_hash: sha256:3cec7cc6b02177b29d359c3889e311a3985314c61ef7a654ed6c22d43e44b080
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 470cc01dc5f9236a93eb704afdd479cd5db79710
+  resolved_commit: 26edf61856fa476e466bda1814819a266a293c47
   virtual_path: understand-anything-plugin/skills/understand-dashboard
   is_virtual: true
   package_type: claude_skill
@@ -59,7 +59,7 @@ dependencies:
   content_hash: sha256:32771fb738e732febba2c780df113354fdc08085aee73e6531ded3e0ad17ee29
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 470cc01dc5f9236a93eb704afdd479cd5db79710
+  resolved_commit: 26edf61856fa476e466bda1814819a266a293c47
   virtual_path: understand-anything-plugin/skills/understand-diff
   is_virtual: true
   package_type: claude_skill
@@ -70,7 +70,7 @@ dependencies:
   content_hash: sha256:e258781324eaab144a9340c32ea2a49f7584ec7b5984121e11dcffe16fbee03c
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 470cc01dc5f9236a93eb704afdd479cd5db79710
+  resolved_commit: 26edf61856fa476e466bda1814819a266a293c47
   virtual_path: understand-anything-plugin/skills/understand-explain
   is_virtual: true
   package_type: claude_skill
@@ -81,7 +81,7 @@ dependencies:
   content_hash: sha256:8f6ef8bc8d4be5e0e8dd764c0d4c5a42b95fa47191e22edbb5ccc351828af7b6
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 470cc01dc5f9236a93eb704afdd479cd5db79710
+  resolved_commit: 26edf61856fa476e466bda1814819a266a293c47
   virtual_path: understand-anything-plugin/skills/understand-onboard
   is_virtual: true
   package_type: claude_skill
@@ -103,7 +103,7 @@ dependencies:
   content_hash: sha256:d50d11bbefdc1599d78900828dcb69d48e5091769d3f5ce10e06a60efe2405bf
 - repo_url: anthropics/claude-code
   host: github.com
-  resolved_commit: 39e853e4074d90f27afdfb7ea601e0fc378bd0c5
+  resolved_commit: b7339920b69f4a395c28727a1e2305dc5b122cb2
   virtual_path: plugins/frontend-design/skills/frontend-design
   is_virtual: true
   package_type: claude_skill
@@ -114,7 +114,7 @@ dependencies:
   content_hash: sha256:e8118284a6365753790d44bb2758a6032b3af27fa84696428d9233f2be0f4e78
 - repo_url: apollographql/skills
   host: github.com
-  resolved_commit: 64d4087d629e413da1bac780abeaefd653847440
+  resolved_commit: e1d07720e9bcfbf867fa2907192c94ec2ed421e1
   virtual_path: skills/rust-best-practices
   is_virtual: true
   package_type: claude_skill
@@ -231,6 +231,17 @@ dependencies:
   - .claude/skills/wrangler
   - .codeium/windsurf/skills/wrangler
   content_hash: sha256:11edeb37eedb91deedde694b2bb1cc4ff4e8b5a8f1836c217a8c871fe39abcb5
+- repo_url: coreyhaines31/marketingskills
+  host: github.com
+  resolved_commit: 692b76118c6b379f89c0fba987a228a40f58b418
+  virtual_path: skills/analytics
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/analytics
+  - .claude/skills/analytics
+  - .codeium/windsurf/skills/analytics
+  content_hash: sha256:e4f2ee22ac9f1a5d5ef30968b752ba10bc05b3b44d055bf26fbb7159f7a7de1d
 - repo_url: cursor/plugins
   host: github.com
   resolved_commit: b8f2564c2e8da66b331c1dd63c2a2925d6739961
@@ -331,7 +342,7 @@ dependencies:
   content_hash: sha256:99aaea521aa0f1c7d041d70bb6b75581c1a50ec6ac59ceaaa923b6339ffa417b
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: ca029c616a5a1472d1035f9423cc11d9d838588d
+  resolved_commit: fde44a690a04d57d0b5e22d0096310d936d7c314
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
@@ -525,7 +536,7 @@ dependencies:
   content_hash: sha256:ae3451cdb0508b127f3ca4b289957d290408749a8959b3cabd54e1b9e31acb06
 - repo_url: langchain-ai/deepagents
   host: github.com
-  resolved_commit: 0bd35b26f4d5a8a2bce8a5375910a8914f0d4790
+  resolved_commit: 97946ee09eb167c63d8c07f8bb116f40cfc9603f
   virtual_path: libs/cli/examples/skills/web-research
   is_virtual: true
   package_type: claude_skill
@@ -536,7 +547,7 @@ dependencies:
   content_hash: sha256:2b66d5db8c8d70474e70638f437f324fb3af3724b71bf8501e48c8004e70e677
 - repo_url: millionco/react-doctor
   host: github.com
-  resolved_commit: 08b8514d1807f1d2477749704a066f76652e827c
+  resolved_commit: 8244f1f28fd405d5a3d192887df3790d7b3f9179
   virtual_path: skills/react-doctor
   is_virtual: true
   package_type: claude_skill
@@ -544,10 +555,10 @@ dependencies:
   - .agents/skills/react-doctor
   - .claude/skills/react-doctor
   - .codeium/windsurf/skills/react-doctor
-  content_hash: sha256:26b327a7146dfd129f51b409ed5a22f0801b735da25001b5c42b718ecc0822ac
+  content_hash: sha256:be7a62af30bedd58cacaf1fb23dd565121d4da73280ceb39833ab885a8101cb6
 - repo_url: mizchi/skills
   host: github.com
-  resolved_commit: f48b1d07ddac1021f74d782fdb514a146d7e22d0
+  resolved_commit: 2de9c04734c79574d5ebcc64be5b3685f575af59
   virtual_path: meta/empirical-prompt-tuning
   is_virtual: true
   package_type: claude_skill
@@ -916,7 +927,7 @@ dependencies:
   content_hash: sha256:edad4d958bc4baf821e3391bb9889a03a8bbc0e4d7f54ee4a5f30837654fed83
 - repo_url: vercel-labs/agent-skills
   host: github.com
-  resolved_commit: 18a24346600009dc3fcb99e4b2cd83b301601775
+  resolved_commit: 180115660cfb8a86b808f117475a01f54caf3bc5
   virtual_path: skills/composition-patterns
   is_virtual: true
   package_type: claude_skill
@@ -927,7 +938,7 @@ dependencies:
   content_hash: sha256:5b3564ca435f4714d5e65023351e1999e4744818603a9cfb6a6f6a61b7d84918
 - repo_url: vercel-labs/agent-skills
   host: github.com
-  resolved_commit: 18a24346600009dc3fcb99e4b2cd83b301601775
+  resolved_commit: 180115660cfb8a86b808f117475a01f54caf3bc5
   virtual_path: skills/react-best-practices
   is_virtual: true
   package_type: claude_skill
@@ -938,7 +949,7 @@ dependencies:
   content_hash: sha256:74f142d28d360d78e8bac4f239a84c87f0ced9015729bc72b5458d82ff45b015
 - repo_url: vercel-labs/agent-skills
   host: github.com
-  resolved_commit: 18a24346600009dc3fcb99e4b2cd83b301601775
+  resolved_commit: 180115660cfb8a86b808f117475a01f54caf3bc5
   virtual_path: skills/web-design-guidelines
   is_virtual: true
   package_type: claude_skill
