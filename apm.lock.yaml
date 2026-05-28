@@ -1,10 +1,10 @@
 lockfile_version: '1'
-generated_at: '2026-05-27T16:44:12.827128+00:00'
+generated_at: '2026-05-28T02:57:03.647435+00:00'
 apm_version: 0.14.2
 dependencies:
 - repo_url: EpicenterHQ/epicenter
   host: github.com
-  resolved_commit: 7eeb234f2bd0aed1b5e777f226df26b5fa09a6ac
+  resolved_commit: ffe0f85b1bb42060159f274740084d622535536b
   virtual_path: .agents/skills/tauri
   is_virtual: true
   package_type: claude_skill
@@ -12,7 +12,7 @@ dependencies:
   - .agents/skills/tauri
   - .claude/skills/tauri
   - .codeium/windsurf/skills/tauri
-  content_hash: sha256:bc74e7716b189a74251833f8018ba2e13d7ec25cf77c5214ce6ff1673a193188
+  content_hash: sha256:f60fbbb1877134f3ba2c586ad89e26ffe4c3e954e5c88226b3bc2ac77a05e95f
 - repo_url: Jakubantalik/transitions-dev
   host: github.com
   resolved_commit: 038b0bdc75375c2beed51d1e824c98cdc7b86f8c
@@ -103,7 +103,7 @@ dependencies:
   content_hash: sha256:d50d11bbefdc1599d78900828dcb69d48e5091769d3f5ce10e06a60efe2405bf
 - repo_url: anthropics/claude-code
   host: github.com
-  resolved_commit: b7339920b69f4a395c28727a1e2305dc5b122cb2
+  resolved_commit: 3bb44552af73d65ae4afd663823bef05227d9769
   virtual_path: plugins/frontend-design/skills/frontend-design
   is_virtual: true
   package_type: claude_skill
@@ -156,7 +156,7 @@ dependencies:
   content_hash: sha256:aff0ee1de9c886ea33b078b6b29e5556f1268bb9331edcd4cbc5f17771f2949c
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: c79b975d8ad9d8ff0fa00752e74cc327a7e8edc3
+  resolved_commit: 34436fc478b93c4d0cf055b3eef8a12483d7f39d
   virtual_path: plugins/infra/ca-pass
   is_virtual: true
   package_type: marketplace_plugin
@@ -164,10 +164,10 @@ dependencies:
   - .agents/skills/ca-pass
   - .claude/skills/ca-pass
   - .codeium/windsurf/skills/ca-pass
-  content_hash: sha256:7d65f6a5ddc64d232e327d551fc71c7d737e7f9519c4e8810b305cec0499dd0d
+  content_hash: sha256:c4bef839f9cb0ae4917ecce0bb1f4134cf8f3664e1d902a1099241a0589e1c93
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: c79b975d8ad9d8ff0fa00752e74cc327a7e8edc3
+  resolved_commit: 34436fc478b93c4d0cf055b3eef8a12483d7f39d
   virtual_path: plugins/infra/mdb
   is_virtual: true
   package_type: marketplace_plugin
@@ -178,7 +178,7 @@ dependencies:
   content_hash: sha256:3c7d57154c87020d236168529a418265389098f6d60aaa62c5bde31248e55ac0
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: c79b975d8ad9d8ff0fa00752e74cc327a7e8edc3
+  resolved_commit: 34436fc478b93c4d0cf055b3eef8a12483d7f39d
   virtual_path: plugins/infra/notica-notification-api
   is_virtual: true
   package_type: marketplace_plugin
@@ -189,7 +189,7 @@ dependencies:
   content_hash: sha256:7d9ede99c4674a34f1cb89ea634f7585785b5d9ece77c19d419fb5e659d05341
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: c79b975d8ad9d8ff0fa00752e74cc327a7e8edc3
+  resolved_commit: 34436fc478b93c4d0cf055b3eef8a12483d7f39d
   virtual_path: plugins/infra/perman-aws-vault
   is_virtual: true
   package_type: marketplace_plugin
@@ -200,7 +200,7 @@ dependencies:
   content_hash: sha256:77bf802ac96173ef83cb67ac83bb2b50736f7aeeaa19f024bc46fd2a005d7c72
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: c79b975d8ad9d8ff0fa00752e74cc327a7e8edc3
+  resolved_commit: 34436fc478b93c4d0cf055b3eef8a12483d7f39d
   virtual_path: plugins/utils/caad-skill-deployer
   is_virtual: true
   package_type: marketplace_plugin
@@ -342,7 +342,7 @@ dependencies:
   content_hash: sha256:99aaea521aa0f1c7d041d70bb6b75581c1a50ec6ac59ceaaa923b6339ffa417b
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: fde44a690a04d57d0b5e22d0096310d936d7c314
+  resolved_commit: 3d08319cb7f0b39e207c0782a2106705c763cc47
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
@@ -460,6 +460,7 @@ dependencies:
   - .claude/skills/rules-creator
   - .claude/skills/similarity
   - .claude/skills/skill-creator
+  - .claude/skills/slack-app-management
   - .claude/skills/slide-docs
   - .claude/skills/subagent-task-review-loop
   - .claude/skills/task-router
@@ -522,6 +523,7 @@ dependencies:
   - .codeium/windsurf/skills/rules-creator
   - .codeium/windsurf/skills/similarity
   - .codeium/windsurf/skills/skill-creator
+  - .codeium/windsurf/skills/slack-app-management
   - .codeium/windsurf/skills/slide-docs
   - .codeium/windsurf/skills/subagent-task-review-loop
   - .codeium/windsurf/skills/task-router
@@ -533,10 +535,10 @@ dependencies:
   - .codeium/windsurf/skills/typescript
   - .codeium/windsurf/skills/wezterm
   - .codeium/windsurf/skills/zsh
-  content_hash: sha256:ae3451cdb0508b127f3ca4b289957d290408749a8959b3cabd54e1b9e31acb06
+  content_hash: sha256:4db4487e5bce56d09b13e2daf2eef54b17b46c8ad451274e4ea7b9d035d5a889
 - repo_url: langchain-ai/deepagents
   host: github.com
-  resolved_commit: 97946ee09eb167c63d8c07f8bb116f40cfc9603f
+  resolved_commit: 390551d61d57ce68c2a80ed78c07eaa8e985908b
   virtual_path: libs/cli/examples/skills/web-research
   is_virtual: true
   package_type: claude_skill
@@ -547,7 +549,7 @@ dependencies:
   content_hash: sha256:2b66d5db8c8d70474e70638f437f324fb3af3724b71bf8501e48c8004e70e677
 - repo_url: millionco/react-doctor
   host: github.com
-  resolved_commit: 8244f1f28fd405d5a3d192887df3790d7b3f9179
+  resolved_commit: 928f21cd686cede395a87159d51dec0016124458
   virtual_path: skills/react-doctor
   is_virtual: true
   package_type: claude_skill
@@ -841,7 +843,7 @@ dependencies:
   content_hash: sha256:8280504199d448d61d54028fc25f491378172d40e801c356eb9126c37a831a66
 - repo_url: trailofbits/skills
   host: github.com
-  resolved_commit: a56045e9ae00b3506cacefea0f672aab0a1a6e3c
+  resolved_commit: c94841be3deae8a880fa1a9078979adac7ca3dbc
   virtual_path: plugins/agentic-actions-auditor
   is_virtual: true
   package_type: marketplace_plugin
@@ -852,7 +854,7 @@ dependencies:
   content_hash: sha256:2803b2bf55ab6afb78262ef116f44f095ae6173d81e27d140e51a634ef4d5990
 - repo_url: trailofbits/skills
   host: github.com
-  resolved_commit: a56045e9ae00b3506cacefea0f672aab0a1a6e3c
+  resolved_commit: c94841be3deae8a880fa1a9078979adac7ca3dbc
   virtual_path: plugins/audit-context-building/skills/audit-context-building
   is_virtual: true
   package_type: claude_skill
@@ -863,7 +865,7 @@ dependencies:
   content_hash: sha256:a0abaac9302501e02ba868d34d1457a817a6267ae235ef95afa098d3cf03f338
 - repo_url: trailofbits/skills
   host: github.com
-  resolved_commit: a56045e9ae00b3506cacefea0f672aab0a1a6e3c
+  resolved_commit: c94841be3deae8a880fa1a9078979adac7ca3dbc
   virtual_path: plugins/sharp-edges
   is_virtual: true
   package_type: marketplace_plugin
@@ -881,7 +883,7 @@ dependencies:
   content_hash: sha256:0a7945aa202c4a525cf47928540e4cf76a5644cd2db6f3486282b285c8f735d9
 - repo_url: trailofbits/skills
   host: github.com
-  resolved_commit: a56045e9ae00b3506cacefea0f672aab0a1a6e3c
+  resolved_commit: c94841be3deae8a880fa1a9078979adac7ca3dbc
   virtual_path: plugins/static-analysis
   is_virtual: true
   package_type: marketplace_plugin
@@ -905,7 +907,7 @@ dependencies:
   content_hash: sha256:c0a9571c4d943b4a77c3192557c27a990914c57d09d92966c9f795164dd3b647
 - repo_url: trailofbits/skills
   host: github.com
-  resolved_commit: a56045e9ae00b3506cacefea0f672aab0a1a6e3c
+  resolved_commit: c94841be3deae8a880fa1a9078979adac7ca3dbc
   virtual_path: plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor
   is_virtual: true
   package_type: claude_skill
@@ -916,7 +918,7 @@ dependencies:
   content_hash: sha256:a1ad4b676f0870bf2c8844876dee06feeb9127a3e7499683bac3727f6a3839cf
 - repo_url: vercel-labs/agent-browser
   host: github.com
-  resolved_commit: 4ad284890cb59564af603e6de403dd75dd19e832
+  resolved_commit: b4f2f37d7b4f954022bc77f8d6dce70e07072b00
   virtual_path: skills/agent-browser
   is_virtual: true
   package_type: claude_skill
@@ -960,7 +962,7 @@ dependencies:
   content_hash: sha256:a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a
 - repo_url: vercel-labs/skills
   host: github.com
-  resolved_commit: e4243fbf7d9398722024f62850ece90fa0d5c693
+  resolved_commit: b469d6954dd10be20d3e8d9bb59463584d42efbb
   virtual_path: skills/find-skills
   is_virtual: true
   package_type: claude_skill
