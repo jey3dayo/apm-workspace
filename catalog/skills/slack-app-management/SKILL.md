@@ -1,6 +1,6 @@
 ---
 name: slack-app-management
-description: Slack app management knowledge for app settings, manifests, OAuth installs, scopes, bot users, Marketplace settings, App Home, display names, sender names, and safe workspace-visible changes. Use when diagnosing or changing a Slack app, installed app, bot user, app label, DM header, chat sender, app approval/install state, token impact, Slack API app settings, Slack Marketplace settings, or stale Slack app name propagation.
+description: Slack app management knowledge for app settings, manifests, OAuth installs, scopes, bot users, Marketplace settings, App Home, display names, sender names, mrkdwn message formatting, and safe workspace-visible changes. Use when diagnosing or changing a Slack app, installed app, bot user, app label, DM header, chat sender, message text decoration, Slack links, block quotes, app approval/install state, token impact, Slack API app settings, Slack Marketplace settings, or stale Slack app name propagation.
 ---
 
 # Slack App Management
@@ -24,7 +24,28 @@ Map the user's symptom to the likely Slack owner before acting.
 | Scopes, approvals, or permissions look wrong  | Slack API `OAuth & Permissions` and workspace admin |
 | Token may rotate or install state may change  | `Install App`, reinstall, uninstall, OAuth flow     |
 | Message identity needs a one-off override     | `chat.postMessage` plus `chat:write.customize`      |
+| Message text has bold, link, or quote styling | Slack `mrkdwn` message formatting                   |
 | Slack UI and API settings disagree            | Verify both Slack Web message UI and API settings   |
+
+## Message Formatting
+
+Slack message text decoration is usually `mrkdwn`, not generic Markdown. Use
+this when the visible Slack message has inline styling such as bold labels,
+links, inline code, or a left vertical quote bar.
+
+Common `mrkdwn` patterns:
+
+- Bold label or heading: `*申請者*`
+- Clickable text link: `<https://example.com|申請詳細>`
+- Inline code or literal value: `` `production` ``
+- Quote block with vertical bar: `> 申請内容を確認...`
+
+For compact notification text, prefer `mrkdwn` in the message body. Use plain
+line breaks and spacing for label/value rows, but do not rely on Slack to align
+columns perfectly across clients or fonts.
+
+`mrkdwn` is only text formatting. Use Block Kit when the request needs
+structured sections, fields, buttons, dividers, or other interactive Slack UI.
 
 ## Name Surfaces
 
