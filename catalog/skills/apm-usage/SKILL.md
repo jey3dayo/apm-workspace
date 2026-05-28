@@ -1,6 +1,6 @@
 ---
 name: apm-usage
-description: Use when working in the `~/.apm` global APM workspace and you need to decide what owns a change, which path is the source of truth, or which `mise` task to run. Trigger for tasks involving `~/.apm/catalog/skills/**` vs `~/.apm/catalog/**`, `apm.yml` / `apm.lock.yaml`, managed catalog rollout, or choosing between `mise run check`, `verify`, `deploy`, `refresh`, `upgrade`, `refresh:deploy`, `prepare:catalog`, `install:catalog`, `smoke:catalog`, and `apply:skills:local`.
+description: Use when working in the `~/.apm` global APM workspace and you need to decide what owns a change, which path is the source of truth, or which `mise` task to run. Trigger for tasks involving `~/.apm/catalog/skills/**` vs `~/.apm/catalog/**`, checked-out external dependency repositories recorded in `apm.yml` / `apm.lock.yaml`, managed catalog rollout, or choosing between `mise run check`, `verify`, `deploy`, `refresh`, `upgrade`, `refresh:deploy`, `prepare:catalog`, `install:catalog`, `smoke:catalog`, and `apply:skills:local`.
 ---
 
 # APM Usage
@@ -14,6 +14,7 @@ Route `~/.apm` work by ownership first, then choose the smallest task that match
 - Edit `~/.apm/apm.yml` and `~/.apm/apm.lock.yaml` for dependency selection and accepted upstream state.
 - Edit `~/.apm/README.md`, `llms.txt`, and `docs/**` only for workspace-owned prose.
 - Treat `~/.apm/apm_modules/` and deployed targets as generated state, not editing surfaces.
+- For an external dependency listed in `apm.yml` / `apm.lock.yaml`, edit the upstream repository checkout when that checkout is the user-specified source of truth. Commit and push there first, then accept the new resolved commit through `~/.apm`.
 
 There is no active `~/.apm/skills/` editing surface in this model.
 
@@ -37,6 +38,7 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 - Run `mise run smoke:catalog` to smoke-test the generated catalog package.
 - Run `mise run apply:skills:local` for a fast local Codex skill refresh only.
 - For skill creation, updates, installs, or migrations in this workspace, include `mise run deploy` and a deployed target check in the plan unless the user explicitly asks for local-only refresh.
+- After pushing a checked-out external dependency repository, run `mise run upgrade` in `~/.apm` to update `apm.lock.yaml`, deploy, and inspect targets. Review lock drift before treating the rollout as complete.
 
 ## Routing
 
@@ -47,16 +49,19 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 - If the skill currently lives in `manual-skills/.apm/skills/<id>/`, first decide whether it is still an upstream packaging workaround. If it is becoming workspace-owned, plan a catalog migration instead of continuing to tune it in the manual lane.
 - If the request is "change shared guidance", edit `catalog/**`; use `prepare:catalog` before publish/install.
 - If the request is "change dependency selection", edit or review `apm.yml` / `apm.lock.yaml`.
+- If the request names an external dependency that is already checked out locally and present in `apm.yml`, treat that checkout as the authoring surface when the user identifies it as the source of truth. Do not copy the change into `catalog/skills/**` unless the user is migrating ownership.
 - If the request is "change only workspace docs or notes", edit the workspace files directly and do not restage the catalog unless `catalog/**` changed too.
 
 ## Guardrails
 
 - Do not treat `~/.apm/apm_modules/` as the place to edit managed skills.
 - Do not manage the same skill in both `catalog/skills/**` and `manual-skills/.apm/skills/**`.
+- Do not duplicate an external dependency into `catalog/skills/**` just because a local checkout exists. Keep one source of truth: upstream checkout, managed catalog, manual copy, or private overlay.
 - Do not keep accumulating workspace-specific optimizations in `manual-skills`; migrate to `catalog/skills/**` once the skill is no longer just an upstream delivery workaround.
 - Do not reintroduce many local `./packages/*` refs into `~/.apm/apm.yml`.
 - Do not hand-edit deployed targets such as `~/.claude/`, `~/.codex/`, or `~/.agents/skills`.
 - Prefer `mise` tasks over ad hoc script entrypoints for normal operation.
+- Before committing `apm.lock.yaml` after `mise run upgrade`, separate the intended dependency update from unrelated unpinned dependency drift. Report unrelated drift instead of hiding it inside the target dependency change.
 - If an upstream skill path is wrong, correct it to the real upstream path and treat the corrected successful install as the main result.
 - Treat known orphaned guidance or unrelated `manual-skills` deploy warnings as residual noise. Do not mention them in the final report when the command exits zero and the target skill source path, manifest or lock entry, and deployed target are correct.
 - Report deploy warnings only when they directly affect the skill changed in this task, its manifest entry, its `manual-skills` provenance, or the deploy exit code.
@@ -79,7 +84,17 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
    - run `mise run upgrade`
    - review `apm.lock.yaml` before commit
 
-4. Manual skill promoted to workspace-owned:
+4. Checked-out external dependency changed:
+   - edit the external repository checkout that is the source of truth
+   - run that repository's relevant checks
+   - commit and push the external repository
+   - in `~/.apm`, run `mise run upgrade`
+   - verify `apm.lock.yaml` points the target dependency at the pushed commit
+   - check whether `apm.lock.yaml` also changed unrelated unpinned dependencies
+   - verify the deployed target such as `~/.agents/skills/<id>` contains the updated content
+   - keep unrelated dirty files in `~/.apm` unstaged unless the user explicitly includes them
+
+5. Manual skill promoted to workspace-owned:
    - move the skill from `manual-skills/.apm/skills/<id>/` to `catalog/skills/<id>/`
    - update `manual-skills/upstreams/**` to note the migration
    - run `mise run check`, then `mise run deploy`

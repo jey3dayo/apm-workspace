@@ -12,6 +12,7 @@ Current `apm` CLI source is pinned through `mise` to `pipx:apm-cli@0.13.0`.
 - Local-only private skills: `~/.apm/private-skills/.apm/skills/<id>/`
 - Shared guidance: `~/.apm/catalog/{AGENTS.md,agents/**,commands/**,rules/**}`
 - Dependency selection and accepted upstream state: `~/.apm/apm.yml`, `~/.apm/apm.lock.yaml`
+- Checked-out external dependencies: edit and push the upstream checkout, then accept the pushed commit through `~/.apm`
 - Downloaded sources: `~/.apm/apm_modules/` is cache only, not an editing surface
 - Manual copied skills: `~/.apm/manual-skills/.apm/skills/<skill-id>/`
 
@@ -36,6 +37,16 @@ mise run deploy
 - `mise run install:catalog`: install the pushed catalog ref
 - `mise run smoke:catalog`: smoke-test the generated catalog package
 - `mise run apply:skills:local`: quick local Codex skill refresh only
+
+## External Checkout Flow
+
+Use this when a dependency in `apm.yml` is also checked out locally and that checkout is the source of truth for the change.
+
+1. Edit, verify, commit, and push the external repository.
+2. Run `mise run upgrade` in `~/.apm`.
+3. Confirm `apm.lock.yaml` points the dependency at the pushed commit.
+4. Verify the deployed target, such as `~/.agents/skills/<id>`, contains the updated content.
+5. Review unrelated lock drift separately before committing `apm.lock.yaml`.
 
 ## Notes
 
