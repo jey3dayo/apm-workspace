@@ -1,0 +1,4 @@
+interface:
+  display_name: "Quiet Command Auditor"
+  short_description: "Audit noisy commands before quieting them"
+  default_prompt: "Use $quiet-command-auditor to inspect this noisy test command and propose safe quiet options before changing files."
