@@ -1,10 +1,10 @@
 lockfile_version: '1'
-generated_at: '2026-05-28T02:57:03.647435+00:00'
-apm_version: 0.14.2
+generated_at: '2026-06-02T11:18:06.511890+00:00'
+apm_version: 0.16.1
 dependencies:
 - repo_url: EpicenterHQ/epicenter
   host: github.com
-  resolved_commit: ffe0f85b1bb42060159f274740084d622535536b
+  resolved_commit: cf823fc544a9aed093aae5d27ba71e015c8668be
   virtual_path: .agents/skills/tauri
   is_virtual: true
   package_type: claude_skill
@@ -12,7 +12,7 @@ dependencies:
   - .agents/skills/tauri
   - .claude/skills/tauri
   - .codeium/windsurf/skills/tauri
-  content_hash: sha256:f60fbbb1877134f3ba2c586ad89e26ffe4c3e954e5c88226b3bc2ac77a05e95f
+  content_hash: sha256:edd47ce3ae17db90a25c61657b512d1e009a61b8be63a7a888549d20745790da
 - repo_url: Jakubantalik/transitions-dev
   host: github.com
   resolved_commit: 038b0bdc75375c2beed51d1e824c98cdc7b86f8c
@@ -26,7 +26,7 @@ dependencies:
   content_hash: sha256:8cf9ba1ed0d52741e4ed1dafc6ee4543e32f1e516f958d750e81412bfc36dd13
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 26edf61856fa476e466bda1814819a266a293c47
+  resolved_commit: 025b884935a12b11e422d9b7338ca54e368dcbe5
   virtual_path: understand-anything-plugin/skills/understand
   is_virtual: true
   package_type: claude_skill
@@ -34,10 +34,10 @@ dependencies:
   - .agents/skills/understand
   - .claude/skills/understand
   - .codeium/windsurf/skills/understand
-  content_hash: sha256:331e897a73d8332f7a1b4cb58f58c5e53bf06910aa6657d8fed055ad2392d83c
+  content_hash: sha256:62db8ef0cd00c3b13685c3e66989b23256ebe4930f7846df33c8a398ef5254bd
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 26edf61856fa476e466bda1814819a266a293c47
+  resolved_commit: 025b884935a12b11e422d9b7338ca54e368dcbe5
   virtual_path: understand-anything-plugin/skills/understand-chat
   is_virtual: true
   package_type: claude_skill
@@ -48,7 +48,7 @@ dependencies:
   content_hash: sha256:3cec7cc6b02177b29d359c3889e311a3985314c61ef7a654ed6c22d43e44b080
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 26edf61856fa476e466bda1814819a266a293c47
+  resolved_commit: 025b884935a12b11e422d9b7338ca54e368dcbe5
   virtual_path: understand-anything-plugin/skills/understand-dashboard
   is_virtual: true
   package_type: claude_skill
@@ -59,7 +59,7 @@ dependencies:
   content_hash: sha256:32771fb738e732febba2c780df113354fdc08085aee73e6531ded3e0ad17ee29
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 26edf61856fa476e466bda1814819a266a293c47
+  resolved_commit: 025b884935a12b11e422d9b7338ca54e368dcbe5
   virtual_path: understand-anything-plugin/skills/understand-diff
   is_virtual: true
   package_type: claude_skill
@@ -70,7 +70,7 @@ dependencies:
   content_hash: sha256:e258781324eaab144a9340c32ea2a49f7584ec7b5984121e11dcffe16fbee03c
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 26edf61856fa476e466bda1814819a266a293c47
+  resolved_commit: 025b884935a12b11e422d9b7338ca54e368dcbe5
   virtual_path: understand-anything-plugin/skills/understand-explain
   is_virtual: true
   package_type: claude_skill
@@ -81,7 +81,7 @@ dependencies:
   content_hash: sha256:8f6ef8bc8d4be5e0e8dd764c0d4c5a42b95fa47191e22edbb5ccc351828af7b6
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: 26edf61856fa476e466bda1814819a266a293c47
+  resolved_commit: 025b884935a12b11e422d9b7338ca54e368dcbe5
   virtual_path: understand-anything-plugin/skills/understand-onboard
   is_virtual: true
   package_type: claude_skill
@@ -103,7 +103,7 @@ dependencies:
   content_hash: sha256:d50d11bbefdc1599d78900828dcb69d48e5091769d3f5ce10e06a60efe2405bf
 - repo_url: anthropics/claude-code
   host: github.com
-  resolved_commit: 3bb44552af73d65ae4afd663823bef05227d9769
+  resolved_commit: bdb04fc52421537f63bbcb9685e1c0905689f8f7
   virtual_path: plugins/frontend-design/skills/frontend-design
   is_virtual: true
   package_type: claude_skill
@@ -233,7 +233,7 @@ dependencies:
   content_hash: sha256:11edeb37eedb91deedde694b2bb1cc4ff4e8b5a8f1836c217a8c871fe39abcb5
 - repo_url: coreyhaines31/marketingskills
   host: github.com
-  resolved_commit: 692b76118c6b379f89c0fba987a228a40f58b418
+  resolved_commit: 7f4af1ea8e7809e0142c55bf19243a706f539c25
   virtual_path: skills/analytics
   is_virtual: true
   package_type: claude_skill
@@ -265,7 +265,7 @@ dependencies:
   content_hash: sha256:b6da4ef92a941ab364ab1ddf259d9e511e098a0719f7ee2202847351c34a8194
 - repo_url: hashicorp/agent-skills
   host: github.com
-  resolved_commit: 43ca9b0cde131e20a129c106bc9f6b6f9f1e5c9a
+  resolved_commit: 339a113935812ad75c6ff90d418b739a021826d1
   virtual_path: terraform/code-generation/skills/terraform-style-guide
   is_virtual: true
   package_type: claude_skill
@@ -276,7 +276,7 @@ dependencies:
   content_hash: sha256:fd301fe5bfb41764acac67c25244cc5650b5dd0a5d8d037414449a2d3adecbbf
 - repo_url: hashicorp/agent-skills
   host: github.com
-  resolved_commit: 43ca9b0cde131e20a129c106bc9f6b6f9f1e5c9a
+  resolved_commit: 339a113935812ad75c6ff90d418b739a021826d1
   virtual_path: terraform/code-generation/skills/terraform-test
   is_virtual: true
   package_type: claude_skill
@@ -287,7 +287,7 @@ dependencies:
   content_hash: sha256:124fdde03e38d9942810e65e762eaf95f8680a1f1f6fdae3ecda16d86b10620b
 - repo_url: ibelick/ui-skills
   host: github.com
-  resolved_commit: 4fa3901211bd1a11e858141c1afee22ad77b737b
+  resolved_commit: 23f2034ff1a8681fe23a678e4ef5fb82d586c878
   virtual_path: skills/baseline-ui
   is_virtual: true
   package_type: claude_skill
@@ -298,7 +298,7 @@ dependencies:
   content_hash: sha256:49817c981208de2f412719f7814d31eba2b2096462edc048a279d93f522cab0f
 - repo_url: ibelick/ui-skills
   host: github.com
-  resolved_commit: 4fa3901211bd1a11e858141c1afee22ad77b737b
+  resolved_commit: 23f2034ff1a8681fe23a678e4ef5fb82d586c878
   virtual_path: skills/fixing-accessibility
   is_virtual: true
   package_type: claude_skill
@@ -309,7 +309,7 @@ dependencies:
   content_hash: sha256:4fa8f5a772b4eef3d28a54c136b507d070e54e2c326578f65eaf5e5a0118b38a
 - repo_url: ibelick/ui-skills
   host: github.com
-  resolved_commit: 4fa3901211bd1a11e858141c1afee22ad77b737b
+  resolved_commit: 23f2034ff1a8681fe23a678e4ef5fb82d586c878
   virtual_path: skills/fixing-metadata
   is_virtual: true
   package_type: claude_skill
@@ -320,7 +320,7 @@ dependencies:
   content_hash: sha256:699e13890fb50acffa02dfd2d5b0e719bd916a9e2b7e6035bdc4513fc73d9174
 - repo_url: ibelick/ui-skills
   host: github.com
-  resolved_commit: 4fa3901211bd1a11e858141c1afee22ad77b737b
+  resolved_commit: 23f2034ff1a8681fe23a678e4ef5fb82d586c878
   virtual_path: skills/fixing-motion-performance
   is_virtual: true
   package_type: claude_skill
@@ -342,7 +342,7 @@ dependencies:
   content_hash: sha256:99aaea521aa0f1c7d041d70bb6b75581c1a50ec6ac59ceaaa923b6339ffa417b
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: 3d08319cb7f0b39e207c0782a2106705c763cc47
+  resolved_commit: 8109cb7ca7c644fcca16dc28f58ca71109e0b11d
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
@@ -391,6 +391,7 @@ dependencies:
   - .agents/skills/predictive-analysis
   - .agents/skills/premortem
   - .agents/skills/project-maintenance
+  - .agents/skills/quiet-command-auditor
   - .agents/skills/react
   - .agents/skills/react-grid-layout
   - .agents/skills/refactoring
@@ -398,6 +399,7 @@ dependencies:
   - .agents/skills/rules-creator
   - .agents/skills/similarity
   - .agents/skills/skill-creator
+  - .agents/skills/slack-app-management
   - .agents/skills/slide-docs
   - .agents/skills/subagent-task-review-loop
   - .agents/skills/task-router
@@ -453,6 +455,7 @@ dependencies:
   - .claude/skills/premortem
   - .claude/skills/prepare-goal
   - .claude/skills/project-maintenance
+  - .claude/skills/quiet-command-auditor
   - .claude/skills/react
   - .claude/skills/react-grid-layout
   - .claude/skills/refactoring
@@ -516,6 +519,7 @@ dependencies:
   - .codeium/windsurf/skills/premortem
   - .codeium/windsurf/skills/prepare-goal
   - .codeium/windsurf/skills/project-maintenance
+  - .codeium/windsurf/skills/quiet-command-auditor
   - .codeium/windsurf/skills/react
   - .codeium/windsurf/skills/react-grid-layout
   - .codeium/windsurf/skills/refactoring
@@ -535,10 +539,10 @@ dependencies:
   - .codeium/windsurf/skills/typescript
   - .codeium/windsurf/skills/wezterm
   - .codeium/windsurf/skills/zsh
-  content_hash: sha256:4db4487e5bce56d09b13e2daf2eef54b17b46c8ad451274e4ea7b9d035d5a889
+  content_hash: sha256:233459993156651a34b04d7270c7eb90a0d16ea257f4b18d2205b69e1328bea6
 - repo_url: langchain-ai/deepagents
   host: github.com
-  resolved_commit: 390551d61d57ce68c2a80ed78c07eaa8e985908b
+  resolved_commit: b66748bd5a7441dbda84111e37510a6689aa23da
   virtual_path: libs/cli/examples/skills/web-research
   is_virtual: true
   package_type: claude_skill
@@ -549,7 +553,7 @@ dependencies:
   content_hash: sha256:2b66d5db8c8d70474e70638f437f324fb3af3724b71bf8501e48c8004e70e677
 - repo_url: millionco/react-doctor
   host: github.com
-  resolved_commit: 928f21cd686cede395a87159d51dec0016124458
+  resolved_commit: 8d13ba3f84d0a41d3fed2af1e5a82d9c14de5b67
   virtual_path: skills/react-doctor
   is_virtual: true
   package_type: claude_skill
@@ -557,10 +561,10 @@ dependencies:
   - .agents/skills/react-doctor
   - .claude/skills/react-doctor
   - .codeium/windsurf/skills/react-doctor
-  content_hash: sha256:be7a62af30bedd58cacaf1fb23dd565121d4da73280ceb39833ab885a8101cb6
+  content_hash: sha256:da508782de483fa70f8108ff28568f9fadb355050d2b9bf59aa51dcf72c65f77
 - repo_url: mizchi/skills
   host: github.com
-  resolved_commit: 2de9c04734c79574d5ebcc64be5b3685f575af59
+  resolved_commit: 89c1b34018ba0d85a770c065ba22f83a8d004d34
   virtual_path: meta/empirical-prompt-tuning
   is_virtual: true
   package_type: claude_skill
@@ -590,7 +594,7 @@ dependencies:
   content_hash: sha256:65a6f52fd391671fe6f334130290fd9c6787d2daeb22cdff55fa727977876e04
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: f2cbfbefebbfef77321e4c9abc9e949826bea9d7
+  resolved_commit: 6fd4507659784c351abbd2bc264c7162cfd386dc
   virtual_path: skills/brainstorming
   is_virtual: true
   package_type: claude_skill
@@ -601,7 +605,7 @@ dependencies:
   content_hash: sha256:1518efecf35139a9a5b9e60906b71de874af08322200fab18a54848cea8c15fe
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: f2cbfbefebbfef77321e4c9abc9e949826bea9d7
+  resolved_commit: 6fd4507659784c351abbd2bc264c7162cfd386dc
   virtual_path: skills/dispatching-parallel-agents
   is_virtual: true
   package_type: claude_skill
@@ -612,7 +616,7 @@ dependencies:
   content_hash: sha256:e21044ae7496fc285f1df9ff3fb518a3a20bea6f5216c1f59f4987e12c769a0a
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: f2cbfbefebbfef77321e4c9abc9e949826bea9d7
+  resolved_commit: 6fd4507659784c351abbd2bc264c7162cfd386dc
   virtual_path: skills/executing-plans
   is_virtual: true
   package_type: claude_skill
@@ -623,7 +627,7 @@ dependencies:
   content_hash: sha256:b41c919caf1bb07fbacb0e29899ac513f9eb11cd4dd695975ad352c2c03cc4d7
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: f2cbfbefebbfef77321e4c9abc9e949826bea9d7
+  resolved_commit: 6fd4507659784c351abbd2bc264c7162cfd386dc
   virtual_path: skills/finishing-a-development-branch
   is_virtual: true
   package_type: claude_skill
@@ -634,7 +638,7 @@ dependencies:
   content_hash: sha256:932d23af11a3eb2b758f5b1d9aec7b6d28ddd26658328414f87f34dff7179d19
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: f2cbfbefebbfef77321e4c9abc9e949826bea9d7
+  resolved_commit: 6fd4507659784c351abbd2bc264c7162cfd386dc
   virtual_path: skills/receiving-code-review
   is_virtual: true
   package_type: claude_skill
@@ -645,7 +649,7 @@ dependencies:
   content_hash: sha256:2760c85d4f4117b0006e7ba755f4bbd61f8f4c185f347999763c97f507274e30
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: f2cbfbefebbfef77321e4c9abc9e949826bea9d7
+  resolved_commit: 6fd4507659784c351abbd2bc264c7162cfd386dc
   virtual_path: skills/requesting-code-review
   is_virtual: true
   package_type: claude_skill
@@ -656,7 +660,7 @@ dependencies:
   content_hash: sha256:5a53d1f7f4cee4dee017a50d735335c7aae1874b2746207e076b5d9035315599
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: f2cbfbefebbfef77321e4c9abc9e949826bea9d7
+  resolved_commit: 6fd4507659784c351abbd2bc264c7162cfd386dc
   virtual_path: skills/subagent-driven-development
   is_virtual: true
   package_type: claude_skill
@@ -667,7 +671,7 @@ dependencies:
   content_hash: sha256:22847d331db0aaedde0738d794896658020d25b703136d64f6690ee944688b7c
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: f2cbfbefebbfef77321e4c9abc9e949826bea9d7
+  resolved_commit: 6fd4507659784c351abbd2bc264c7162cfd386dc
   virtual_path: skills/systematic-debugging
   is_virtual: true
   package_type: claude_skill
@@ -678,7 +682,7 @@ dependencies:
   content_hash: sha256:ebdc9e15e5745a87d6342b6ebbc90d1ac2766b95f2334a9450fc696842815e4d
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: f2cbfbefebbfef77321e4c9abc9e949826bea9d7
+  resolved_commit: 6fd4507659784c351abbd2bc264c7162cfd386dc
   virtual_path: skills/test-driven-development
   is_virtual: true
   package_type: claude_skill
@@ -689,7 +693,7 @@ dependencies:
   content_hash: sha256:126f1ebf6ccd414f42544f6e83d8cc5adb089e1108eaffb7c400701e37eecd9f
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: f2cbfbefebbfef77321e4c9abc9e949826bea9d7
+  resolved_commit: 6fd4507659784c351abbd2bc264c7162cfd386dc
   virtual_path: skills/using-git-worktrees
   is_virtual: true
   package_type: claude_skill
@@ -700,7 +704,7 @@ dependencies:
   content_hash: sha256:bd10bc57c23040630b17c877a9bc7b4be40c35161a2e2f110d770d78e3b0a4ff
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: f2cbfbefebbfef77321e4c9abc9e949826bea9d7
+  resolved_commit: 6fd4507659784c351abbd2bc264c7162cfd386dc
   virtual_path: skills/using-superpowers
   is_virtual: true
   package_type: claude_skill
@@ -711,7 +715,7 @@ dependencies:
   content_hash: sha256:114207d2bda1336e283288aed358f51e1a78bbcd42e7d4e3e16a89095a89b006
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: f2cbfbefebbfef77321e4c9abc9e949826bea9d7
+  resolved_commit: 6fd4507659784c351abbd2bc264c7162cfd386dc
   virtual_path: skills/verification-before-completion
   is_virtual: true
   package_type: claude_skill
@@ -722,7 +726,7 @@ dependencies:
   content_hash: sha256:9b446f0c7fe1cfb560b1d34439523b1a76d5f177290007b2c053a1c749a4a8ba
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: f2cbfbefebbfef77321e4c9abc9e949826bea9d7
+  resolved_commit: 6fd4507659784c351abbd2bc264c7162cfd386dc
   virtual_path: skills/writing-plans
   is_virtual: true
   package_type: claude_skill
@@ -733,7 +737,7 @@ dependencies:
   content_hash: sha256:6525448d840035c66700b81fbbfeb77431df04316615869569393f62af6a5616
 - repo_url: obra/superpowers
   host: github.com
-  resolved_commit: f2cbfbefebbfef77321e4c9abc9e949826bea9d7
+  resolved_commit: 6fd4507659784c351abbd2bc264c7162cfd386dc
   virtual_path: skills/writing-skills
   is_virtual: true
   package_type: claude_skill
@@ -777,7 +781,7 @@ dependencies:
   content_hash: sha256:8e00d64a5cd9b4477e55c4a7ad0f02328ff1991ea93e2ac1fb7839b3891d3f2d
 - repo_url: openai/skills
   host: github.com
-  resolved_commit: b0401f07213a66414d84a65cb50c1d226f99485a
+  resolved_commit: a8924c2a35cfa290458852c4fad17c9133054c2e
   virtual_path: skills/.curated/gh-address-comments
   is_virtual: true
   package_type: claude_skill
@@ -788,7 +792,7 @@ dependencies:
   content_hash: sha256:068d34fb59cb97a39aea3de1708877b6a01210d02fa7eda5e74fc8277ed52916
 - repo_url: openai/skills
   host: github.com
-  resolved_commit: b0401f07213a66414d84a65cb50c1d226f99485a
+  resolved_commit: a8924c2a35cfa290458852c4fad17c9133054c2e
   virtual_path: skills/.curated/gh-fix-ci
   is_virtual: true
   package_type: claude_skill
@@ -918,7 +922,7 @@ dependencies:
   content_hash: sha256:a1ad4b676f0870bf2c8844876dee06feeb9127a3e7499683bac3727f6a3839cf
 - repo_url: vercel-labs/agent-browser
   host: github.com
-  resolved_commit: b4f2f37d7b4f954022bc77f8d6dce70e07072b00
+  resolved_commit: 90050f2913159875e2c3719e424746396ccb3cbf
   virtual_path: skills/agent-browser
   is_virtual: true
   package_type: claude_skill
@@ -929,7 +933,7 @@ dependencies:
   content_hash: sha256:edad4d958bc4baf821e3391bb9889a03a8bbc0e4d7f54ee4a5f30837654fed83
 - repo_url: vercel-labs/agent-skills
   host: github.com
-  resolved_commit: 180115660cfb8a86b808f117475a01f54caf3bc5
+  resolved_commit: 4ec6f84b61cd3c931046c3e6e398f3ae7de372f7
   virtual_path: skills/composition-patterns
   is_virtual: true
   package_type: claude_skill
@@ -940,7 +944,7 @@ dependencies:
   content_hash: sha256:5b3564ca435f4714d5e65023351e1999e4744818603a9cfb6a6f6a61b7d84918
 - repo_url: vercel-labs/agent-skills
   host: github.com
-  resolved_commit: 180115660cfb8a86b808f117475a01f54caf3bc5
+  resolved_commit: 4ec6f84b61cd3c931046c3e6e398f3ae7de372f7
   virtual_path: skills/react-best-practices
   is_virtual: true
   package_type: claude_skill
@@ -951,7 +955,7 @@ dependencies:
   content_hash: sha256:74f142d28d360d78e8bac4f239a84c87f0ced9015729bc72b5458d82ff45b015
 - repo_url: vercel-labs/agent-skills
   host: github.com
-  resolved_commit: 180115660cfb8a86b808f117475a01f54caf3bc5
+  resolved_commit: 4ec6f84b61cd3c931046c3e6e398f3ae7de372f7
   virtual_path: skills/web-design-guidelines
   is_virtual: true
   package_type: claude_skill
