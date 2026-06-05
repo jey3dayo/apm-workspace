@@ -15,17 +15,18 @@ narrowest safe setting.
 
 Map the user's symptom to the likely Slack owner before acting.
 
-| Symptom or task                               | First place to inspect                              |
-| --------------------------------------------- | --------------------------------------------------- |
-| App card/title/description is wrong           | Slack API `Basic Information` or app manifest       |
-| App Home title or bot display name is wrong   | Slack API `App Home` / manifest `features.bot_user` |
-| DM header or message sender shows an old name | Slack Marketplace app page `Settings` -> Bot User   |
-| App is installed in the wrong workspace       | Slack API app selector and `Install App` page       |
-| Scopes, approvals, or permissions look wrong  | Slack API `OAuth & Permissions` and workspace admin |
-| Token may rotate or install state may change  | `Install App`, reinstall, uninstall, OAuth flow     |
-| Message identity needs a one-off override     | `chat.postMessage` plus `chat:write.customize`      |
-| Message text has bold, link, or quote styling | Slack `mrkdwn` message formatting                   |
-| Slack UI and API settings disagree            | Verify both Slack Web message UI and API settings   |
+| Symptom or task                               | First place to inspect                                |
+| --------------------------------------------- | ----------------------------------------------------- |
+| App card/title/description is wrong           | Slack API `Basic Information` or app manifest         |
+| Message sender icon / app avatar is wrong     | Slack API `Basic Information` -> `App icon & Preview` |
+| App Home title or bot display name is wrong   | Slack API `App Home` / manifest `features.bot_user`   |
+| DM header or message sender shows an old name | Slack Marketplace app page `Settings` -> Bot User     |
+| App is installed in the wrong workspace       | Slack API app selector and `Install App` page         |
+| Scopes, approvals, or permissions look wrong  | Slack API `OAuth & Permissions` and workspace admin   |
+| Token may rotate or install state may change  | `Install App`, reinstall, uninstall, OAuth flow       |
+| Message identity needs a one-off override     | `chat.postMessage` plus `chat:write.customize`        |
+| Message text has bold, link, or quote styling | Slack `mrkdwn` message formatting                     |
+| Slack UI and API settings disagree            | Verify both Slack Web message UI and API settings     |
 
 ## Message Formatting
 
@@ -59,6 +60,31 @@ Slack exposes several related names. Identify which one is wrong before editing.
 | `@handle` is wrong                      | Bot username/handle; may be separate from display name           |
 | One message needs a temporary name      | `chat.postMessage` `username` override, not the app profile name |
 
+## Display Surface Checklist
+
+Slack app identity commonly has three separate admin surfaces. Check all three
+before concluding a change did not propagate.
+
+1. Slack API `Basic Information`
+   - URL pattern: `https://api.slack.com/apps/<APP_ID>/general`.
+   - `Display Information` owns the app card name, short description,
+     background color, and `App icon & Preview`.
+   - The small icon shown beside app/bot messages can come from this app icon.
+2. Slack API `App Home`
+   - URL pattern: `https://api.slack.com/apps/<APP_ID>/app-home`.
+   - `Edit` owns the app home display name and username/handle fields.
+   - This surface does not expose the app icon upload field.
+3. Slack Marketplace app page `Settings`
+   - URL pattern:
+     `https://<workspace>.slack.com/marketplace/<APP_ID>-<slug>?tab=settings`.
+   - `Settings` -> `Edit` may expose the installed workspace bot user name.
+   - This can control the sender name visible to workspace members even when
+     the Slack API app name already looks correct.
+
+For a message like `CA Connect` with an app badge and a stale sender icon, open
+`Basic Information` first and inspect `App icon & Preview`. If the name is the
+problem, also inspect `App Home` and the Marketplace `Settings` tab.
+
 ## Rename Workflow
 
 1. Confirm the symptom in Slack:
@@ -68,6 +94,8 @@ Slack exposes several related names. Identify which one is wrong before editing.
      name, treat it as an installed bot user name problem.
 2. Verify app-level settings before changing the workspace bot user:
    - In Slack API app settings, check `Basic Information` -> app name.
+   - If the message icon/avatar is wrong, check `Basic Information` ->
+     `Display Information` -> `App icon & Preview`.
    - Check `App Home` -> Display Name / Bot Name.
    - If using a manifest, check `display_information.name` and
      `features.bot_user.display_name`.
