@@ -22,6 +22,23 @@ Do not assume that `run_windows` means "this runs in PowerShell". It only means 
 
 ## Match Task Syntax to the Configured Shell
 
+## Keep `run_windows` Thin Before Adding Bootstrap Wrappers
+
+If a Windows task cannot resolve a mise-provided tool such as `node` or `pnpm` under the default `cmd /c`, do not immediately add a thick PowerShell path or repo-local PATH bootstrap script to every `run_windows` command.
+
+First test whether the task works with a task-local shell override:
+
+```toml
+[tasks."app:dev:vite-check"]
+run = "node ./scripts/tauri-dev-vite-manager.ts --check"
+run_windows = "node ./scripts/tauri-dev-vite-manager.ts --check"
+shell = "powershell.exe -NoProfile -Command"
+```
+
+This keeps the task body portable and readable while changing only the command interpreter. It is often better than embedding `%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe ...` in `run_windows` or adding a separate bootstrap file whose only job is to reconstruct PATH.
+
+Use this pattern only after verifying the real task, not just `mise env`: `mise env` may show the expected `Path`, while the default Windows task shell still fails to resolve the command. Confirm with `mise run <task>` and, when useful, `mise run --dry-run <task>`.
+
 ### If the task shell is PowerShell
 
 Use PowerShell syntax consistently:
