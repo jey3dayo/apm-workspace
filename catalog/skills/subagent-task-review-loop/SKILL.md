@@ -1,6 +1,6 @@
 ---
 name: subagent-task-review-loop
-description: Use when coordinating parallel subagent investigation with a main-session task backlog and repeated quality review for complex implementation work.
+description: Use when coordinating parallel subagent investigation with a main-session task backlog and repeated quality review for complex implementation work, including compact invocations where conditions should be recovered from prior conversation and nearby repository context.
 ---
 
 # Subagent Task Review Loop
@@ -15,10 +15,32 @@ Treat subagents as discovery and sidecar execution capacity, not as a substitute
 for owning the outcome. The main session remains responsible for task selection,
 integration, quality gates, and final judgment.
 
+## Context Recovery
+
+When the user invokes this skill with a short prompt such as "fix and review
+loop", recover the missing conditions before asking follow-up questions.
+
+Look for the target, constraints, scope, evidence, and stop conditions in this
+order:
+
+1. the current user message and earlier messages in the same conversation
+2. visible task state, plans, review comments, error output, and tool results
+3. repository guidance such as `AGENTS.md`, task definitions, tests, and docs
+4. the current diff, nearby code, failing checks, logs, screenshots, or runtime
+   signals
+
+State the recovered frame briefly before dispatching subagents or editing code.
+Ask the user only when the missing condition changes user-visible behavior,
+compatibility, data shape, security boundaries, cost, external publication, or
+other high-impact choices. If a condition is useful but not required, make a
+conservative assumption, mark it as an assumption, and proceed.
+
 ## Workflow
 
 1. Frame the target
    - Restate the user-visible outcome, constraints, and hard stop conditions.
+   - If the prompt omits these fields, recover them from prior conversation and
+     nearby repository context before asking the user.
    - If the request names a broad or ambiguous area, first lock the
      user-visible action, likely code path, evidence source, and reproduction
      signal. Do not widen the scope until evidence connects the wider area.
@@ -139,6 +161,18 @@ When filtering a comment, record the reason briefly as `rejected: <reason>` if i
 could otherwise resurface later.
 
 ## Subagent Prompt Template
+
+For compact invocations, use this short frame in the main session before
+creating subagent prompts:
+
+```text
+Recovered frame:
+- User-visible goal: <from conversation/repo evidence>
+- Current owner task: <main-session critical path>
+- Scope limits: <files/modules/behaviors inferred from context>
+- Evidence source: <checks/logs/screenshots/docs/runtime signal>
+- Stop conditions: <hard blockers or 3 failed attempts>
+```
 
 ```text
 You are helping with a bounded side task. The main session owns integration.
