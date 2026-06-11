@@ -67,7 +67,13 @@ For Codex, use the Codex-specific global setup:
 rtk init -g --codex
 ```
 
-Codex integration writes RTK guidance into the Codex instruction path instead of relying on Claude-specific `@rules/...` expansion. In this APM workspace, the durable source still lives under `catalog/**`; do not hand-edit deployed `~/.codex/AGENTS.md` or `~/.agents/skills/**`.
+Codex integration upstream writes RTK guidance into `~/.codex/AGENTS.md` and `~/.codex/RTK.md`. In this APM workspace, do not adopt that generated `RTK.md` layout as the source of truth:
+
+- Keep the minimal always-on Codex RTK rule directly in `catalog/AGENTS.md`
+- Keep detailed operational guidance in this skill and its references
+- Use `rtk init -g --codex --dry-run` only as a diagnostic/reference command
+- Do not create `RTK.md` under `~/.config`, `~/.apm/catalog`, or `~/.codex` unless the catalog deployment model is intentionally changed
+- Do not hand-edit deployed targets such as `~/.codex/AGENTS.md`, `~/.codex/RTK.md`, or `~/.agents/skills/**`
 
 ### Verify Savings
 
@@ -96,7 +102,7 @@ When the current repository already documents RTK usage, treat that local guidan
 - If the repository already declares RTK in its toolchain, install or update it through that existing path instead of inventing a new one
 - If the repository has task docs or rollout commands for RTK-related changes, follow those local instructions rather than hardcoding one workspace's maintenance flow here
 - Do not add a new task runner command unless the existing repository workflow cannot pick the change up
-- In Codex, put only minimal always-on RTK rules in `AGENTS.md`; keep detailed operational guidance in this skill and its references
+- In Codex, put only minimal always-on RTK rules in `catalog/AGENTS.md`; do not split RTK guidance into `RTK.md` in this workspace
 
 ## Example
 
