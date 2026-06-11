@@ -20,11 +20,11 @@ Use this skill as a practical design and CSS review pass. Prefer concrete findin
 
 State the evidence mode when it affects confidence:
 
-- **Diff review**: inspect the actual diff. If no diff exists, say the review is of current files, not changed lines.
-- **Code review**: ground findings in file/line references and separate confirmed issues from visual or behavior hypotheses.
-- **Screenshot-only review**: produce visual observations, then list implementation hypotheses separately. Ask for the route, component, story, or CSS file needed for code-level findings.
-- **External material review**: inspect the provided URL or excerpt before attributing claims to it. If only technique names are provided, treat them as a candidate list, not as source-backed slide claims.
-- **Live/browser review**: report viewport, theme, and route/story checked. If browser verification was not performed, list it as a verification gap.
+- Diff review: inspect the actual diff. If no diff exists, say the review is of current files, not changed lines.
+- Code review: ground findings in file/line references and separate confirmed issues from visual or behavior hypotheses.
+- Screenshot-only review: produce visual observations, then list implementation hypotheses separately. Ask for the route, component, story, or CSS file needed for code-level findings.
+- External material review: inspect the provided URL or excerpt before attributing claims to it. If only technique names are provided, treat them as a candidate list, not as source-backed slide claims.
+- Live/browser review: report viewport, theme, and route/story checked. If browser verification was not performed, list it as a verification gap.
 
 Only report commands, browser checks, screenshots, notifications, or tests that were actually performed in the current task.
 
