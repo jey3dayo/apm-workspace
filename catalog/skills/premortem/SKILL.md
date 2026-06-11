@@ -123,7 +123,7 @@ class ProjectContext:
 
 ### Inference Hints
 
-- Domain: infer from stack and keywords (`React` / `API` -> web-development, `Swift` / `iOS` -> mobile-apps, `Spark` / `ETL` -> data-systems).
+- Domain: infer from stack and keywords (`React` / `API` -> web-development, `Swift` / `iOS` -> mobile-apps, `Spark` / `ETL` -> data-systems, `LLM` / `RAG` / `ML` -> ai-ml).
 - Maturity: `poc`, `prototype`, `MVP`, `beta`, `production`, `enterprise`.
 - Scale: use explicit user counts/data volume when available; otherwise mark unknown.
 - Evidence: cite file paths or "user input"; do not invent evidence.
@@ -133,12 +133,15 @@ class ProjectContext:
 
 Select 3-5 questions from:
 
-- `references/questions/generic.yaml`
+- `references/questions/generic.yaml` (architecture, security, reliability, cost, monitoring, testing, delivery, reversibility, dependencies)
 - `references/questions/web-development.yaml`
 - `references/questions/mobile-apps.yaml`
 - `references/questions/data-systems.yaml`
 - `references/questions/infrastructure.yaml`
 - `references/questions/security.yaml`
+- `references/questions/ai-ml.yaml`
+
+Technical risk is not the only failure mode. When the plan involves deadlines, multiple teams, or unsettled scope, include at least one `delivery` question from `generic.yaml`.
 
 Prefer questions with:
 
@@ -161,6 +164,8 @@ After selecting general questions, add or swap in risks that match the project s
 | Auth, sessions, permissions, identity                  | authorization boundary, expiry/revocation, privilege changes, audit trail                      |
 | Data import, migration, ETL                            | validation boundary, partial failure policy, lineage, replay, rollback                         |
 | CI/CD, release flow, deployment                        | gates, secrets, artifact provenance, environment drift, observability                          |
+| LLM features, RAG, agents, ML models                   | output quality evaluation, hallucination handling, prompt injection, provider fallback, cost   |
+| Hard deadline, multi-team, unsettled scope             | scope cut line, estimation basis, external-team waits, key-person risk, change process         |
 
 Use these as prompts for question selection, not as a fixed checklist. Only include a lens when the user input or repository evidence supports it.
 

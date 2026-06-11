@@ -1,0 +1,241 @@
+# AI/ML Questions - AI・機械学習・LLM統合固有の14問
+# カテゴリ: Evaluation, LLM Integration, Data, Operations, Cost
+
+questions:
+  # Evaluation (3問)
+  - id: AIM-001
+    category: evaluation
+    priority: critical
+    text: |
+      出力品質の評価基準と評価データセットは定義されていますか？
+      - 「良い出力」の判定基準（正確性、形式、トーン等）は明文化されていますか？
+      - リリース判定に使う評価データセット（golden set）はありますか？
+      - 自動評価（LLM-as-judge、ルールベース）と人手評価の役割分担は？
+    triggers:
+      - evaluation
+      - quality
+      - benchmark
+      - golden-set
+    relevance_boost:
+      domains: [ai-ml]
+      maturity: [poc, mvp, production]
+
+  - id: AIM-002
+    category: evaluation
+    priority: critical
+    text: |
+      プロンプト・モデル変更時の品質リグレッションを検出できますか？
+      - プロンプト変更前後で評価セットを再実行する仕組みはありますか？
+      - モデルのバージョンアップ・廃止時の移行検証手順は？
+      - 品質低下を検出した場合のロールバック手段は？
+    triggers:
+      - regression
+      - prompt
+      - model-update
+      - deprecation
+    relevance_boost:
+      domains: [ai-ml]
+      maturity: [mvp, production]
+
+  - id: AIM-003
+    category: evaluation
+    priority: high
+    text: |
+      ユーザーフィードバックと人手レビューのループは設計されていますか？
+      - 出力への評価（good/bad、修正内容）を収集する仕組みは？
+      - 高リスクな出力に対する人間の承認フロー（human-in-the-loop）は必要ですか？
+      - フィードバックを評価データセットや改善に反映するプロセスは？
+    triggers:
+      - feedback
+      - human-in-the-loop
+      - review
+    relevance_boost:
+      domains: [ai-ml]
+      maturity: [mvp, production]
+
+  # LLM Integration (4問)
+  - id: AIM-004
+    category: llm-integration
+    priority: critical
+    text: |
+      ハルシネーション・誤出力への対策は設計されていますか？
+      - 出力の構造検証（スキーマ、型）と内容検証（根拠提示、引用）は？
+      - 誤出力がユーザーに与える被害の最大値（blast radius）は評価しましたか？
+      - 確信度が低い場合の挙動（拒否、人間へのエスカレーション）は定義されていますか？
+    triggers:
+      - hallucination
+      - grounding
+      - rag
+      - accuracy
+    relevance_boost:
+      domains: [ai-ml]
+      maturity: [poc, mvp, production]
+
+  - id: AIM-005
+    category: llm-integration
+    priority: critical
+    text: |
+      プロンプトインジェクションと情報漏洩への対策はありますか？
+      - ユーザー入力や外部コンテンツが指示として解釈される経路は特定されていますか？
+      - システムプロンプトや他ユーザーのデータが出力に漏れる経路は？
+      - ツール実行・外部送信を伴う場合の権限境界と確認フローは？
+    triggers:
+      - prompt-injection
+      - jailbreak
+      - data-leakage
+      - agent
+    relevance_boost:
+      domains: [ai-ml, security]
+      maturity: [mvp, production]
+
+  - id: AIM-006
+    category: llm-integration
+    priority: high
+    text: |
+      モデルプロバイダ障害・性能劣化時のフォールバックはありますか？
+      - プロバイダのAPI障害時にサービスをどう縮退させますか？
+      - 代替モデルへの切り替えは可能ですか？切り替え時の品質差は許容範囲ですか？
+      - タイムアウトとリトライの方針（コスト二重課金の防止含む）は？
+    triggers:
+      - fallback
+      - outage
+      - provider
+      - availability
+    relevance_boost:
+      domains: [ai-ml]
+      maturity: [production]
+
+  - id: AIM-007
+    category: llm-integration
+    priority: medium
+    text: |
+      特定モデル・プロバイダへのロックインは管理されていますか？
+      - プロンプトやツール定義はプロバイダ固有形式に深く依存していますか？
+      - モデル廃止（deprecation）スケジュールの追跡と移行計画は？
+      - 抽象化レイヤーを入れる場合の複雑性コストと天秤にかけましたか？
+    triggers:
+      - vendor-lock-in
+      - model-migration
+      - abstraction
+    relevance_boost:
+      domains: [ai-ml]
+      maturity: [production]
+
+  # Data (3問)
+  - id: AIM-008
+    category: data
+    priority: critical
+    text: |
+      学習・コンテキストに使うデータの権利とプライバシーは確認されていますか？
+      - ユーザーデータをプロンプトに含める場合の同意と利用規約上の根拠は？
+      - 外部プロバイダへ送信されるデータの範囲と、プロバイダ側の学習利用設定は？
+      - PII・機密情報のマスキングやフィルタリングは必要ですか？
+    triggers:
+      - privacy
+      - pii
+      - training-data
+      - consent
+    relevance_boost:
+      domains: [ai-ml, security]
+      maturity: [mvp, production]
+
+  - id: AIM-009
+    category: data
+    priority: high
+    text: |
+      データドリフト・分布変化の監視は計画されていますか？
+      - 入力データの分布が学習時・設計時の想定から外れたことを検知できますか？
+      - RAGの参照ドキュメントの鮮度と更新フローは定義されていますか？
+      - ドリフト検知時の対応（再学習、インデックス更新、アラート）は？
+    triggers:
+      - drift
+      - retraining
+      - freshness
+      - embedding
+    relevance_boost:
+      domains: [ai-ml, data-systems]
+      maturity: [production]
+
+  - id: AIM-010
+    category: data
+    priority: medium
+    text: |
+      評価・改善用データの収集とラベリング体制はありますか？
+      - 本番の入出力ログを評価に使える形で保存していますか（プライバシー配慮込み）？
+      - ラベリングの担当者と品質基準は決まっていますか？
+      - エッジケース・失敗事例を評価セットに追加するプロセスは？
+    triggers:
+      - labeling
+      - dataset
+      - logging
+    relevance_boost:
+      domains: [ai-ml]
+      maturity: [mvp, production]
+
+  # Operations (2問)
+  - id: AIM-011
+    category: operations
+    priority: high
+    text: |
+      推論レイテンシとUXの設計は整合していますか？
+      - 想定レイテンシ（p50/p99）はユースケースの許容範囲ですか？
+      - ストリーミング表示、プログレス表示、キャッシュ等の体感改善策は？
+      - 長時間処理の中断・再開・タイムアウトの挙動は定義されていますか？
+    triggers:
+      - latency
+      - streaming
+      - inference
+      - ux
+    relevance_boost:
+      domains: [ai-ml]
+      maturity: [mvp, production]
+
+  - id: AIM-012
+    category: operations
+    priority: high
+    text: |
+      非決定的な出力に対する可観測性は確保されていますか？
+      - プロンプト・出力・モデルバージョン・パラメータをトレースできますか？
+      - 品質指標（拒否率、再生成率、フィードバック率）をダッシュボード化していますか？
+      - 障害調査時に特定リクエストの再現が可能ですか？
+    triggers:
+      - observability
+      - tracing
+      - monitoring
+    relevance_boost:
+      domains: [ai-ml]
+      maturity: [production]
+
+  # Cost (2問)
+  - id: AIM-013
+    category: cost
+    priority: high
+    text: |
+      トークン・推論コストの予測と制御はできていますか？
+      - 1リクエストあたりの平均・最大コストは試算しましたか？
+      - ユーザー数・利用頻度の増加に対するコスト曲線は？
+      - プロンプトキャッシュ、コンテキスト削減、小型モデルへの振り分け等の最適化は？
+    triggers:
+      - token
+      - cost
+      - caching
+      - pricing
+    relevance_boost:
+      domains: [ai-ml]
+      maturity: [mvp, production]
+
+  - id: AIM-014
+    category: cost
+    priority: medium
+    text: |
+      レート制限・クォータと悪用対策は設計されていますか？
+      - プロバイダ側のレート制限はピークトラフィックに耐えますか？
+      - ユーザー単位の利用上限と、悪用（大量リクエスト、転売）の防止策は？
+      - 上限到達時のユーザー体験（エラー、待機、課金案内）は定義されていますか？
+    triggers:
+      - rate-limit
+      - quota
+      - abuse
+    relevance_boost:
+      domains: [ai-ml]
+      maturity: [production]

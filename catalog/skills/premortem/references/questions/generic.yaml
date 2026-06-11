@@ -1,5 +1,6 @@
-# Generic Questions - 全ドメイン共通の35問
-# カテゴリ: Architecture, Security, Reliability, Cost, Monitoring, Testing
+# Generic Questions - 全ドメイン共通の46問
+# カテゴリ: Architecture, Security, Reliability, Cost, Monitoring, Testing,
+#           Delivery, Reversibility, Dependencies
 
 questions:
   # Architecture (8問)
@@ -578,4 +579,193 @@ questions:
       - ci-cd
     relevance_boost:
       domains: [web-development, mobile-apps]
+      maturity: [production]
+
+  # Delivery (4問)
+  - id: GEN-036
+    category: delivery
+    priority: critical
+    text: |
+      スコープと完了定義（DoD）は合意されていますか？
+      - 今回のリリースに含むもの・含まないものは明文化されていますか？
+      - 「完了」の判定基準（受け入れ条件、品質基準）は誰が承認しますか？
+      - スコープを削る場合の優先順位（MVPの切り捨てライン）は決まっていますか？
+    triggers:
+      - scope
+      - mvp
+      - definition-of-done
+      - requirement
+    relevance_boost:
+      domains: [web-development, mobile-apps, data-systems, ai-ml]
+      maturity: [poc, mvp, production]
+
+  - id: GEN-037
+    category: delivery
+    priority: high
+    text: |
+      見積もりの根拠とバッファは明確ですか？
+      - 見積もりは類似実績・分解されたタスクのどちらに基づいていますか？
+      - クリティカルパス上の不確実な作業（未経験技術、外部待ち）は特定されていますか？
+      - 遅延が判明したときのエスカレーション基準とスコープ調整の手順は？
+    triggers:
+      - estimation
+      - schedule
+      - deadline
+      - milestone
+    relevance_boost:
+      domains: [web-development, mobile-apps, data-systems, infrastructure]
+      maturity: [mvp, production]
+
+  - id: GEN-038
+    category: delivery
+    priority: high
+    text: |
+      外部チーム・キーパーソンへの依存は管理されていますか？
+      - 他チームの承認・レビュー・API提供などの待ちが発生する箇所は？
+      - 特定の1人しか知らない領域（キーパーソンリスク）はありますか？
+      - 引き継ぎ資料やペア作業など、知識の単一障害点への対策は？
+    triggers:
+      - dependency
+      - team
+      - handoff
+      - approval
+    relevance_boost:
+      domains: [web-development, infrastructure, data-systems]
+      maturity: [mvp, production]
+
+  - id: GEN-039
+    category: delivery
+    priority: medium
+    text: |
+      要求の曖昧さと変更プロセスは管理されていますか？
+      - 仕様の最終決定者は明確ですか？
+      - 実装中に仕様変更が来た場合の受け入れ・延期の判断基準は？
+      - 暗黙の期待（性能、デザイン品質等）が文書化されないまま残っていませんか？
+    triggers:
+      - requirement
+      - specification
+      - change-request
+      - stakeholder
+    relevance_boost:
+      domains: [web-development, mobile-apps]
+      maturity: [poc, mvp]
+
+  # Reversibility (4問)
+  - id: GEN-040
+    category: reversibility
+    priority: critical
+    text: |
+      移行・マイグレーションのロールバック計画はありますか？
+      - データ移行は元に戻せますか？戻せない場合、ポイントオブノーリターンはどこですか？
+      - ロールバックを発動する判断基準（エラー率、データ不整合等）と判断者は？
+      - 移行前のバックアップ取得とリストア手順の検証は計画されていますか？
+    triggers:
+      - migration
+      - rollback
+      - cutover
+      - irreversible
+    relevance_boost:
+      domains: [web-development, data-systems, infrastructure]
+      maturity: [mvp, production]
+
+  - id: GEN-041
+    category: reversibility
+    priority: critical
+    text: |
+      リリースは段階的に展開・停止できますか？
+      - フィーチャーフラグやカナリアリリースで影響範囲を限定できますか？
+      - 問題発生時に即座に無効化できるキルスイッチはありますか？
+      - 全量公開の判断基準（メトリクス、観察期間）は定義されていますか？
+    triggers:
+      - release
+      - feature-flag
+      - canary
+      - deployment
+    relevance_boost:
+      domains: [web-development, mobile-apps, infrastructure]
+      maturity: [production]
+
+  - id: GEN-042
+    category: reversibility
+    priority: high
+    text: |
+      データの不変条件と部分失敗からの回復は定義されていますか？
+      - 壊れてはいけないデータ整合性の条件（残高合計、参照整合性等）は明文化されていますか？
+      - 処理が途中で失敗した場合、再実行は安全ですか（冪等性）？
+      - 不整合を検出する仕組みと修復手順はありますか？
+    triggers:
+      - idempotency
+      - consistency
+      - invariant
+      - partial-failure
+    relevance_boost:
+      domains: [web-development, data-systems]
+      maturity: [mvp, production]
+
+  - id: GEN-043
+    category: reversibility
+    priority: medium
+    text: |
+      スキーマ・APIの後方互換性は計画されていますか？
+      - 新旧バージョンが共存する期間の互換性戦略（dual-write、expand-contract等）は？
+      - 破壊的変更を入れる場合の移行期間と通知方法は？
+      - クライアント側の更新が遅れた場合の挙動は定義されていますか？
+    triggers:
+      - compatibility
+      - schema-change
+      - versioning
+      - breaking-change
+    relevance_boost:
+      domains: [web-development, mobile-apps, data-systems]
+      maturity: [production]
+
+  # Dependencies (3問)
+  - id: GEN-044
+    category: dependencies
+    priority: high
+    text: |
+      サードパーティAPI・SaaSへの依存リスクは評価されていますか？
+      - 外部APIのレート制限・クォータは想定トラフィックに対して十分ですか？
+      - 外部サービス障害時のフォールバック（キャッシュ、縮退、代替）は？
+      - 提供元のAPI廃止・仕様変更の通知をどう検知しますか？
+    triggers:
+      - third-party
+      - saas
+      - external-api
+      - rate-limit
+    relevance_boost:
+      domains: [web-development, mobile-apps, ai-ml]
+      maturity: [mvp, production]
+
+  - id: GEN-045
+    category: dependencies
+    priority: medium
+    text: |
+      ライブラリ依存とサプライチェーンのリスクは管理されていますか？
+      - 中核ライブラリのメンテナンス状況（最終更新、メンテナ数）は確認しましたか？
+      - ライセンスはプロダクトの配布形態と整合していますか？
+      - 依存の固定（lockfile、バージョンピン）と更新方針は決まっていますか？
+    triggers:
+      - library
+      - license
+      - supply-chain
+      - lockfile
+    relevance_boost:
+      domains: [web-development, mobile-apps]
+      maturity: [mvp, production]
+
+  - id: GEN-046
+    category: dependencies
+    priority: medium
+    text: |
+      ベンダーロックインと撤退コストは検討されていますか？
+      - 特定ベンダー固有機能への依存箇所は特定されていますか？
+      - データのエクスポート手段と移行先の選択肢はありますか？
+      - 価格改定・サービス終了が起きた場合の影響範囲は？
+    triggers:
+      - vendor-lock-in
+      - exit-strategy
+      - pricing
+    relevance_boost:
+      domains: [infrastructure, data-systems]
       maturity: [production]
