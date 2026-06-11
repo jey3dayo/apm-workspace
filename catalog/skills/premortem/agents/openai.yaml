@@ -1,0 +1,4 @@
+interface:
+  display_name: "Premortem Analysis"
+  short_description: "実装前に計画・設計の失敗要因と盲点を洗い出すプリモーテム分析"
+  default_prompt: "Use $premortem to run a premortem analysis on this plan and surface risks and blind spots."
