@@ -1,132 +1,37 @@
-# Domain Detection Logic
+# Domain Detection
 
-## Overview
+プロジェクトのドメインを判定するためのキーワード対応表。判定の実装は `scripts/analyze_context.py` の `DOMAIN_PATTERNS` が正となる。
 
-プロジェクトのドメイン（Web開発、モバイルアプリ、データシステム等）を自動判定するロジック。
+## Detection Keywords
 
-## Detection Patterns
+| Domain          | Keywords                                                                                                        |
+| --------------- | --------------------------------------------------------------------------------------------------------------- |
+| web-development | `react`, `vue`, `angular`, `svelte`, `node.js`, `express`, `django`, `flask`, `rails`, `api`, `rest`, `graphql` |
+| mobile-apps     | `ios`, `swift`, `swiftui`, `android`, `kotlin`, `react-native`, `flutter`, `mobile`, `app`                      |
+| data-systems    | `spark`, `hadoop`, `flink`, `kafka`, `etl`, `pipeline`, `warehouse`, `bigquery`, `redshift`, `snowflake`        |
+| infrastructure  | `kubernetes`, `docker`, `terraform`, `ansible`, `aws`, `gcp`, `azure`, `devops`, `deployment`                   |
+| security        | `security`, `encryption`, `oauth`, `jwt`, `iam`, `rbac`, `penetration`, `vulnerability`, `compliance`           |
+| ai-ml           | `llm`, `gpt`, `claude`, `rag`, `embedding`, `prompt`, `fine-tuning`, `pytorch`, `machine learning`, `inference` |
 
-### Web Development
+## Examples
 
-### キーワード
-
-- フロントエンド: `react`, `vue`, `angular`, `svelte`
-- バックエンド: `node.js`, `express`, `django`, `flask`, `rails`, `spring`
-- API: `api`, `rest`, `graphql`, `http`
-- 一般: `web`, `frontend`, `backend`, `fullstack`
-
-### 例
-
-- "Next.js + PostgreSQLでブログプラットフォームを構築" → `web-development`
-- "RESTful APIを使ったECサイト" → `web-development`
-
-### Mobile Apps
-
-### キーワード
-
-- iOS: `ios`, `swift`, `swiftui`, `uikit`
-- Android: `android`, `kotlin`, `jetpack`
-- クロスプラットフォーム: `react-native`, `flutter`, `xamarin`
-- 一般: `mobile`, `app`
-
-### 例
-
-- "SwiftUIでiOSアプリを開発" → `mobile-apps`
-- "FlutterでクロスプラットフォームアプリをQ開発" → `mobile-apps`
-
-### Data Systems
-
-### キーワード
-
-- ビッグデータ: `spark`, `hadoop`, `flink`, `kafka`
-- パイプライン: `etl`, `pipeline`, `warehouse`, `lakehouse`
-- データプラットフォーム: `bigquery`, `redshift`, `snowflake`
-- 一般: `data-engineering`, `analytics`
-
-### 例
-
-- "Sparkを使ったETLパイプライン構築" → `data-systems`
-- "BigQueryでデータウェアハウスを設計" → `data-systems`
-
-### Infrastructure
-
-### キーワード
-
-- コンテナ: `kubernetes`, `k8s`, `docker`, `container`
-- IaC: `terraform`, `ansible`, `cloudformation`
-- クラウド: `aws`, `gcp`, `azure`, `cloud`
-- 一般: `devops`, `infrastructure`, `deployment`
-
-### 例
-
-- "TerraformでAWSインフラを構築" → `infrastructure`
-- "Kubernetesクラスタの設計" → `infrastructure`
-
-### Security
-
-### キーワード
-
-- セキュリティ: `security`, `encryption`, `authentication`
-- 認証: `oauth`, `jwt`, `iam`, `rbac`
-- 脆弱性: `penetration`, `vulnerability`, `compliance`
-
-### 例
-
-- "OAuth2.0を使った認証基盤" → `security`
-- "脆弱性診断システムの構築" → `security`
-
-## Scoring Algorithm
-
-各ドメインに対してパターンマッチングを実施し、スコアを計算：
-
-```python
-def detect_domain(text: str) -> str:
-    text_lower = text.lower()
-    scores = {}
-
-    for domain, patterns in DOMAIN_PATTERNS.items():
-        score = sum(1 for pattern in patterns if re.search(pattern, text_lower))
-        scores[domain] = score
-
-    # スコアが最も高いドメインを返す（同点の場合はweb-developmentを優先）
-    if max(scores.values()) == 0:
-        return "web-development"
-    return max(scores, key=scores.get)
-```
+- "Next.js + PostgreSQL でブログプラットフォームを構築" → `web-development`
+- "Flutter でクロスプラットフォームアプリを開発" → `mobile-apps`
+- "Spark を使った ETL パイプライン構築" → `data-systems`
+- "Terraform で AWS インフラを構築" → `infrastructure`
+- "OAuth2.0 を使った認証基盤" → `security`
+- "RAG を使った社内ドキュメント検索チャットボット" → `ai-ml`
 
 ## Fallback Strategy
 
-- 複数ドメインに該当: スコアが最も高いドメインを選択
-- どのドメインにも該当しない: デフォルトで`web-development`を返す
-  - 理由: Web開発が最も一般的なユースケース
-
-## Multi-Domain Projects
-
-プロジェクトが複数のドメインにまたがる場合（例: Web + インフラ）、スコアの高い方を優先します。
-
-### 例
-
-- "Next.jsアプリをKubernetesにデプロイ"
-  - Web: 2ポイント（next.js、アプリ）
-  - Infrastructure: 1ポイント（kubernetes）
-  - → `web-development`
-
-必要に応じて、ユーザーに複数ドメインの質問を提示することも可能（将来の拡張）。
+- 複数ドメインに該当: キーワードマッチ数が最も多いドメインを選択
+- どのドメインにも該当しない: `web-development` を既定値とする（最も一般的なユースケースのため）
+- 複数ドメインが拮抗する場合は、ユーザー入力やリポジトリの主目的に近い方を選び、もう一方は `generic.yaml` の質問や Context-Specific Risk Lenses で補う
 
 ## Extension
 
 新しいドメインを追加する場合:
 
-1. `DOMAIN_PATTERNS`に新しいドメインのパターンを追加
-2. 対応する質問ファイル（`references/questions/{domain}.yaml`）を作成
-3. テストケースを追加
-
-```python
-DOMAIN_PATTERNS = {
-    # ...既存のドメイン
-    "machine-learning": [
-        r"\b(tensorflow|pytorch|scikit[-\s]learn)\b",
-        r"\b(neural[-\s]network|deep[-\s]learning|ml)\b",
-    ],
-}
-```
+1. `scripts/analyze_context.py` の `DOMAIN_PATTERNS` にパターンを追加
+2. 対応する質問ファイル `references/questions/{domain}.yaml` を作成
+3. `SKILL.md` の Question Selection 一覧と Inference Hints に追記
