@@ -354,10 +354,15 @@ def main():
 
     args = parser.parse_args()
 
-    # Load questions
+    # Load questions and carry over project context for the report
     with open(args.questions) as f:
         data = json.load(f)
         questions = data.get("selected_questions", [])
+        context = {
+            key: data[key]
+            for key in ("domain", "maturity", "tech_stack", "scale", "description")
+            if key in data
+        }
 
     # Perform gap analysis
     analyzer = GapAnalyzer()
@@ -365,6 +370,7 @@ def main():
 
     # Convert to dict for JSON serialization
     result = {
+        "context": context,
         "gaps": [
             {
                 **asdict(gap),

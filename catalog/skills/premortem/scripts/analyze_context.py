@@ -8,6 +8,7 @@ Analyzes project context and generates relevant premortem questions.
 import argparse
 import json
 import re
+import unicodedata
 from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import List, Dict, Optional
@@ -64,6 +65,13 @@ DOMAIN_PATTERNS = {
         r"\b(oauth|jwt|iam|rbac)\b",
         r"\b(penetration|vulnerability|compliance)\b",
     ],
+    "ai-ml": [
+        r"\b(llm|gpt|claude|gemini|openai|anthropic)\b",
+        r"\b(rag|embedding|vector\s?(db|search|store)|prompt|fine[-\s]?tun\w*)\b",
+        r"\b(tensorflow|pytorch|scikit[-\s]?learn|hugging\s?face)\b",
+        r"\b(machine[-\s]learning|deep[-\s]learning|neural[-\s]network)\b",
+        r"\b(ai|ml|chatbot|inference|copilot)\b",
+    ],
 }
 
 # Maturity detection patterns
@@ -71,6 +79,15 @@ MATURITY_PATTERNS = {
     "poc": [r"\b(poc|proof[-\s]of[-\s]concept|prototype|experiment)\b"],
     "mvp": [r"\b(mvp|minimum[-\s]viable|beta|alpha)\b"],
     "production": [r"\b(production|enterprise|scale|mission[-\s]critical)\b"],
+}
+
+# Japanese maturity keywords (checked against raw text before ASCII
+# normalization strips them). Production is checked first because words
+# like 動作検証/実験 often appear inside production-stage plans.
+MATURITY_KEYWORDS_JA = {
+    "production": ["本番", "商用", "プロダクション"],
+    "mvp": ["ベータ", "α版", "β版"],
+    "poc": ["実験", "試作", "プロトタイプ"],
 }
 
 # Scale detection patterns
@@ -81,9 +98,20 @@ SCALE_PATTERNS = {
 }
 
 
+def normalize_for_matching(text: str) -> str:
+    """Lowercase and replace non-ASCII chars with spaces.
+
+    CJK characters count as word characters in Python's re module, so
+    `\\b(rag)\\b` never matches inside Japanese text like "RAGを使った".
+    Replacing non-ASCII chars with spaces restores the word boundaries.
+    """
+    text = unicodedata.normalize("NFKC", text)
+    return re.sub(r"[^\x00-\x7f]", " ", text.lower())
+
+
 def detect_domain(text: str) -> str:
     """Detect project domain from text"""
-    text_lower = text.lower()
+    text_lower = normalize_for_matching(text)
     scores = {}
 
     for domain, patterns in DOMAIN_PATTERNS.items():
@@ -92,18 +120,33 @@ def detect_domain(text: str) -> str:
         )
         scores[domain] = score
 
-    # Return domain with highest score, default to web-development
+    # Return domain with highest score, default to web-development.
+    # Ties prefer more specific domains; web-development keywords (api,
+    # web, backend) are generic and would otherwise mask ai-ml/security.
     if max(scores.values()) == 0:
         return "web-development"
-    return max(scores, key=scores.get)
+    tiebreak = [
+        "ai-ml",
+        "security",
+        "data-systems",
+        "infrastructure",
+        "mobile-apps",
+        "web-development",
+    ]
+    best = max(scores.values())
+    return next(d for d in tiebreak if scores.get(d) == best)
 
 
 def detect_maturity(text: str) -> str:
     """Detect project maturity from text"""
-    text_lower = text.lower()
+    text_lower = normalize_for_matching(text)
 
     for maturity, patterns in MATURITY_PATTERNS.items():
         if any(re.search(pattern, text_lower, re.IGNORECASE) for pattern in patterns):
+            return maturity
+
+    for maturity, keywords in MATURITY_KEYWORDS_JA.items():
+        if any(keyword in text for keyword in keywords):
             return maturity
 
     # Default to mvp if no match
@@ -112,7 +155,7 @@ def detect_maturity(text: str) -> str:
 
 def detect_scale(text: str) -> str:
     """Detect project scale from text"""
-    text_lower = text.lower()
+    text_lower = normalize_for_matching(text)
 
     for scale, patterns in SCALE_PATTERNS.items():
         if any(re.search(pattern, text_lower, re.IGNORECASE) for pattern in patterns):
@@ -145,7 +188,7 @@ def extract_tech_stack(text: str, files: List[Path]) -> List[str]:
         "Kubernetes": r"\b(kubernetes|k8s)\b",
     }
 
-    text_lower = text.lower()
+    text_lower = normalize_for_matching(text)
     for tech, pattern in tech_patterns.items():
         if re.search(pattern, text_lower, re.IGNORECASE):
             tech_stack.add(tech)
@@ -311,11 +354,15 @@ def score_question(question: Dict, context: ProjectContext) -> float:
     - Tech stack match: +0.3
     """
     score = 0.0
-    description_lower = context.description.lower()
+    description_lower = normalize_for_matching(context.description)
 
-    # Trigger keyword check
+    # Trigger keyword check (word-bounded so short triggers like "rag"
+    # don't match inside "storage")
     triggers = question.get("triggers", [])
-    if any(trigger.lower() in description_lower for trigger in triggers):
+    if any(
+        re.search(rf"\b{re.escape(trigger.lower())}\b", description_lower)
+        for trigger in triggers
+    ):
         score += 0.3
 
     # Domain fit

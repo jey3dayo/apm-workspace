@@ -45,7 +45,7 @@ def format_report(session_data: Dict, output_format: str = "markdown") -> str:
     report_lines.append("")
 
     # Executive Summary (if gap analysis available)
-    gap_summary = session_data.get("gap_summary", {})
+    gap_summary = session_data.get("summary", session_data.get("gap_summary", {}))
     if gap_summary:
         report_lines.append("## Executive Summary")
         report_lines.append("")
