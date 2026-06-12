@@ -200,6 +200,8 @@ Start with the reusable resources (`scripts/`, `references/`, `assets/`); this m
 
 Writing guidelines: use imperative/infinitive form throughout.
 
+Never write literal slash-command placeholders in the body — a `$` immediately followed by a digit or by the word ARGUMENTS. When the skill is invoked as a slash command, those tokens are replaced with command arguments and silently corrupt code examples (e.g. an `rg --replace` capture reference). Reword such examples to avoid the token, for instance with `rg -o`.
+
 Frontmatter rule: keep frontmatter minimal. `name` and `description` are required; `license`, `allowed-tools`, and `metadata` are the only other fields `quick_validate.py` accepts (`metadata` holds harness-specific extras such as `short-description`). Put all when-to-use triggers in `description` — the body loads only after triggering, so a "When to Use" section in the body cannot help trigger the skill. Quote the `description` value when it contains YAML-special characters such as colons. Example `description` for a `docx` skill: "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. Use when working with professional documents (.docx files) for: (1) creating new documents, (2) modifying or editing content, (3) working with tracked changes, (4) adding comments, or any other document tasks."
 
 ### Step 5: Validate the Skill
