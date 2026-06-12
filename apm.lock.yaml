@@ -342,7 +342,7 @@ dependencies:
   content_hash: sha256:99aaea521aa0f1c7d041d70bb6b75581c1a50ec6ac59ceaaa923b6339ffa417b
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: 72162ca4f6e700673157744441dd31d4d1767cb7
+  resolved_commit: a3bc1320d90d53b52ae4ceb07552649fe0e10435
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
