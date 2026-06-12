@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-06-12T04:11:05.717005+00:00'
+generated_at: '2026-06-12T04:33:43.110376+00:00'
 apm_version: 0.14.2
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -981,6 +981,7 @@ dependencies:
 mcp_servers:
 - chrome-devtools
 - context7
+- jina-reader
 - mcp-simple-voicevox
 - peekaboo
 - tauri-mcp-server
@@ -1001,6 +1002,17 @@ mcp_configs:
     args:
     - -y
     - '@upstash/context7-mcp@latest'
+    registry: false
+    command: npx
+  jina-reader:
+    name: jina-reader
+    transport: stdio
+    args:
+    - -y
+    - mcp-remote
+    - https://mcp.jina.ai/v1?include_tags=read
+    - --header
+    - 'Authorization: Bearer ${JINA_API_KEY}'
     registry: false
     command: npx
   mcp-simple-voicevox:

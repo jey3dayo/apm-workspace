@@ -113,4 +113,14 @@ dependencies:
         - -y
         - "@steipete/peekaboo"
         - mcp
+    - name: jina-reader
+      registry: false
+      transport: stdio
+      command: npx
+      args:
+        - -y
+        - mcp-remote
+        - "https://mcp.jina.ai/v1?include_tags=read"
+        - --header
+        - "Authorization: Bearer ${JINA_API_KEY}"
 scripts: {}
