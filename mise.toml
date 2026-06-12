@@ -13,7 +13,7 @@ node = "24"
 
 # CLI tools
 fd = "latest"
-"pipx:apm-cli" = "0.16.1"
+"pipx:apm-cli" = "latest"
 taplo = "latest"
 
 # npm packages

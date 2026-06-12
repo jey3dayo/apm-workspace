@@ -48,10 +48,8 @@ In practice:
 - For Codex, separate compiled guidance from skills
   - `~/.codex/AGENTS.md` is the compiled output
   - `~/.agents/skills` is the deployed skill tree
-- Treat the current `apm` source as a pinned runtime dependency managed by `mise`
-  - current source: `pipx:apm-cli@0.13.0`
+- Treat the current `apm` source as a pinned runtime dependency managed by `mise` (see `mise.toml`)
   - if both the workspace and global `mise` config define `apm`, keep them aligned to the same source to avoid command-resolution collisions
-  - prefer `mise exec pipx:apm-cli@0.13.0 -- apm ...` when you need to force the exact binary explicitly
 
 ## Task Selection
 
