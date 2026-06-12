@@ -10,6 +10,8 @@ description: |
 
 変更ファイルを論理的な最小単位に分割し、グループごとに順番にコミットする。
 
+全 git コマンドに `rtk` プレフィックスを付ける。`rtk` が使えない環境では、そのタスク中は raw `git` に fallback する。
+
 ## ワークフロー
 
 ### 1. 変更状況の把握
@@ -17,31 +19,12 @@ description: |
 ```bash
 rtk git status
 rtk git diff --name-only
+rtk git diff --cached --name-only
 rtk git diff -- <non-env paths>
 ```
 
-`.env`, `.env.*`, 認証情報, secret が含まれる疑いのあるファイルは、この時点で差分本文を表示しない。
-
-dirty な `.env.*` を見つけたら、自動除外せず dotenvx-managed か安全に検査する。値や差分本文は表示しない。
-
-```bash
-# dotenvx 管理ファイルかを値なしで判定する
-rtk proxy rg -n '^(DOTENV_PUBLIC_KEY=.*|[A-Z0-9_]+=encrypted:.*)' --replace '<dotenvx-managed>' .env.* 2>/dev/null
-```
-
-`DOTENV_PUBLIC_KEY` または `encrypted:` 値が見つかる `.env.*` は dotenvx-managed とみなす。該当する場合は、ファイル名・dotenvx 管理であること・dirty であることだけを伝え、通常の変更ファイルとしてコミット計画に入れる。
-
-dotenvx-managed と判定できても、追加差分に平文 secret 候補が混入していないか値を出さずに検査する。検出したらコミット計画へ入れず、ファイル名と key 名だけを報告して停止する。
-
-```bash
-# 追加された平文 secret 候補を key 名だけで検出する
-rtk proxy git diff -U0 -- .env.* \
-  | rtk proxy rg '^\+[A-Z0-9_]*(SECRET|TOKEN|PASSWORD|PRIVATE|CREDENTIAL|DATABASE_URL|AUTH)[A-Z0-9_]*=' \
-  | rtk proxy rg -v '^\+[A-Z0-9_]+=encrypted:' \
-  | rtk proxy rg -n '^\+([^=]+)=.*' --replace '$1=<plain-secret-candidate>'
-```
-
-この検査は `encrypted:` の値がある行を許可し、誤って平文 secret っぽい値が混入した行を止めるためのもの。出力が 1 行でもあれば、その `.env.*` は stage しない。
+- staged 済みの変更と untracked ファイルも計画対象に含める。staged 済みでも論理グループと一致しない場合はグループを組み直す
+- `.env`, `.env.*`, 認証情報, secret が含まれる疑いのあるファイルは差分本文を表示せず、「環境ファイルの安全検査」セクションに従って扱いを決める
 
 ### 2. コミットスタイルの確認
 
@@ -49,7 +32,7 @@ rtk proxy git diff -U0 -- .env.* \
 rtk git log --oneline -10
 ```
 
-Conventional Commits 形式（`feat:`, `fix:`, `chore:`, `docs:`, `build:`, `test:` 等）を確認する。
+直近ログから Conventional Commits（`feat:`, `fix:`, `chore:`, `docs:`, `build:`, `test:` 等）の type / scope / 言語の傾向を確認し、メッセージをそのスタイルに合わせる。
 
 ### 3. ファイルのグループ化
 
@@ -62,9 +45,11 @@ Conventional Commits 形式（`feat:`, `fix:`, `chore:`, `docs:`, `build:`, `tes
 | 中     | ディレクトリ・モジュール | 同じモジュール配下のファイル               |
 | 低     | ファイルタイプ           | 同種ファイルのまとめ（最終手段）           |
 
-**1グループ = 1コミット**。関係のないファイルは別グループにする。
-
-dotenvx-managed `.env.*` は、repo の source of truth になり得るため自動除外しない。安全な検査で dotenvx-managed と判定でき、平文 secret 候補が検出されないものだけ、値や secret 断片を表示しないまま該当する論理グループに入れる。raw `.env`、dotenvx-managed と判定できない `.env.*`、平文 secret 候補を含む `.env.*`、認証情報、secret が含まれる疑いのあるファイルはコミット対象にしない。
+- 1グループ = 1コミット。関係のないファイルは別グループにする
+- 1ファイルに無関係な論理変更が混在する場合は hunk 単位に分割して別グループに割り当てる。対話入力が使える環境では `rtk git add -p`、使えない環境では対象 hunk だけの patch（標準の `a/` `b/` ヘッダー形式）を作り `git apply --cached <patch>` で stage する
+- グループ間に依存がある場合は、依存される側（設定・型定義・ユーティリティなど）を先にコミットする
+- 未完成・意図が判断できない変更は別グループとして保留し、ユーザーに確認する
+- `.env.*` は「環境ファイルの安全検査」を通過したものだけ、該当する論理グループに入れる
 
 ### 4. コミットタイプの選択
 
@@ -95,16 +80,43 @@ EOF
 )"
 ```
 
-全グループのコミット完了後、`rtk git log --oneline -5` で結果を確認する。
+- メッセージは変更内容の簡潔な記述のみ。署名・フッターは付けない
+- commit hook が失敗した、またはファイルを書き換えた場合は停止して報告する。`--no-verify` でのバイパスはユーザーの明示指示がない限り行わない
 
-## 注意事項
+### 6. 完了確認
 
-- raw `.env`、認証情報、secret が含まれる疑いのあるファイルはコミットしない
-- dirty な `.env.*` を見つけたら dotenvx-managed か検査してからコミット計画を作る
-- dotenvx-managed `.env.*` は repo の source of truth になり得るため、自動除外しない
-- `encrypted:` 値の行は dotenvx 管理として扱ってよい
-- dotenvx-managed `.env.*` でも、追加差分に平文 secret 候補があれば stage せず停止する
-- dotenvx-managed `.env.*` を確認するときは、ファイル名・管理方式・差分の有無だけを伝える
-- dotenvx-managed と判定できない `.env.*` は raw secret の可能性があるため stage しない
-- 未完成の変更は別グループとして扱い、ユーザーに確認する
-- `rtk` プレフィックスを全 git コマンドに付ける
+```bash
+rtk git status
+rtk git log --oneline -<グループ数>
+```
+
+意図したコミットがすべて揃い、残っている dirty ファイルが「意図的に除外したもの」だけであることを確認して報告する。除外したファイルがあれば、ファイル名と除外理由を併記する。
+
+## 環境ファイルの安全検査
+
+dirty な `.env.*` は自動除外せず、dotenvx-managed かを値を表示せずに判定する。repo の source of truth になり得るためである。
+
+```bash
+# dotenvx 管理ファイルかを値なしで判定する
+rtk proxy rg -n '^(DOTENV_PUBLIC_KEY=.*|[A-Z0-9_]+=encrypted:.*)' --replace '<dotenvx-managed>' .env.* 2>/dev/null
+```
+
+| 判定結果                                       | 扱い                                                                  |
+| ---------------------------------------------- | --------------------------------------------------------------------- |
+| `DOTENV_PUBLIC_KEY` または `encrypted:` 値あり | dotenvx-managed。下の平文 secret 検査を通過すればコミット対象に入れる |
+| raw `.env` / dotenvx-managed と判定できない    | raw secret の可能性があるため stage しない                            |
+| 平文 secret 候補を含む（下の検査で検出）       | stage せず、ファイル名と key 名だけを報告して停止する                 |
+
+dotenvx-managed と判定できても、追加差分に平文 secret 候補が混入していないか値を出さずに検査する：
+
+```bash
+# 追加された平文 secret 候補を key 名だけで検出する
+rtk proxy git diff -U0 -- .env.* \
+  | rtk proxy rg '^\+[A-Z0-9_]*(SECRET|TOKEN|PASSWORD|PRIVATE|CREDENTIAL|DATABASE_URL|AUTH)[A-Z0-9_]*=' \
+  | rtk proxy rg -v '^\+[A-Z0-9_]+=encrypted:' \
+  | rtk proxy rg -n '^\+([^=]+)=.*' --replace '$1=<plain-secret-candidate>'
+```
+
+この検査は `encrypted:` 値の行を許可し、平文 secret らしき値が混入した行だけを止める。出力が 1 行でもあれば、その `.env.*` は stage しない。
+
+報告時は、どの段階でも secret の値・差分本文を表示せず、ファイル名・管理方式・差分の有無だけを伝える。

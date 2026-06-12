@@ -4,10 +4,8 @@ Use this reference during Phase 1-C when refactoring involves validation,
 Result/error flow, data access, runtime configuration, or external IO. This is a
 diagnostic aid, not a source of new folder conventions.
 
-Treat a folder as an owner only when repository evidence supports it: existing
-imports, exports, tests, docs, or repeated call patterns. If multiple owner
-folders are plausible, keep the plan conditional until the boundary is
-confirmed.
+Apply the owner-evidence rule defined in SKILL.md Phase 1-C before treating
+any folder below as an owner.
 
 | Technology concern                                                          | Expected owner pattern                                                     | Drift signal                                                                      |
 | --------------------------------------------------------------------------- | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |

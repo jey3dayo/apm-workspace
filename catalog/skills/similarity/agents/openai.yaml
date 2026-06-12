@@ -1,0 +1,4 @@
+interface:
+  display_name: "Similarity Detector"
+  short_description: "Find duplicate TS/JS code with similarity-ts"
+  default_prompt: "Use $similarity to run similarity-ts on this repository, triage duplicate functions or types by similarity, and plan safe consolidation."
