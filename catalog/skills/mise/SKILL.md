@@ -306,22 +306,22 @@ python = "3.12"
 rust = "stable"
 
 # CLI Tools
-github-cli = "latest"
-shellcheck = "latest"
+github-cli = "2.83.1"
+shellcheck = "0.11.0"
 
 # NPM Global Packages
-"npm:prettier" = "latest"
-"npm:typescript" = "latest"
-"npm:@fsouza/prettierd" = "latest"
+"npm:prettier" = "3.8.4"
+"npm:typescript" = "5.9.3"
+"npm:@fsouza/prettierd" = "0.26.2"
 
 # Python Global Packages
-"pipx:black" = "latest"
-"pipx:ruff" = "latest"
+"pipx:black" = "26.1.1"
+"pipx:ruff" = "0.14.9"
 ```
 
 ### Migration from global-package.json
 
-1. Convert each dependency to `"npm:<package-name>" = "latest"`
+1. Convert each dependency to `"npm:<package-name>" = "<verified-version>"`
 2. Remove `global-package.json` and update docs
 3. Run `mise install` to install all tools
 4. Verify with `mise ls` and `which <command>`
@@ -337,6 +337,8 @@ shellcheck = "latest"
 
 - Shared repositories: prefer concrete LTS majors or exact patches (`node = "24"` or `node = "24.15.0"`)
 - Personal global configs: symbolic channels such as `node = "lts"` can be acceptable when you intentionally want rolling local upgrades
+- Avoid floating tool-package channels in committed repository configs and CI. For npm, pipx, and other package-backed tools, resolve the newest acceptable version first, then record that concrete version in `[tools]`.
+- For pipx-backed tools, be especially careful in CI: mise can forward dependency age controls to pip as `--uploaded-prior-to`, which requires pip support in the installer environment. Pinning the verified package version avoids a moving install target while keeping the tool current.
 
 ### Formatter Wiring and `mise skills add`
 
@@ -344,7 +346,7 @@ Use `[tools]` for commands that tasks or setup docs actually invoke, including f
 
 ```toml
 [tools]
-nixpkgs-fmt = "latest"
+nixpkgs-fmt = "1.3.0"
 
 [tasks."format:nix"]
 description = "Format Nix files"

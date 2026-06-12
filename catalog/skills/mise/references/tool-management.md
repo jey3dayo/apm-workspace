@@ -14,6 +14,13 @@ This document provides detailed guidance on managing language runtimes, CLI tool
 4. Cross-Platform: Works identically on macOS, Linux, Windows (WSL)
 5. No Global Pollution: No accidental drift from `npm i -g` or `pip install --user`
 
+## Version Pinning Policy
+
+- For committed repository configs and CI, do not record floating package channels. Resolve the newest acceptable version first, then write the concrete version into `[tools]`.
+- For npm and pipx tools, treat the version as part of the repository contract. A moving package channel can change CI behavior without a code diff.
+- For pipx-backed tools, mise may route installs through uv or pipx. When dependency age controls are active, the pip fallback can pass pip's `--uploaded-prior-to`; that requires a new enough pip. Pinning the verified package version keeps installs current without making CI depend on a moving resolver target.
+- For personal global configs, rolling channels are a local preference, but do not copy them into shared repository examples.
+
 ## Configuration Structure
 
 ### Standard Layout
@@ -24,47 +31,47 @@ This document provides detailed guidance on managing language runtimes, CLI tool
 # ========================================
 # Runtimes (Language Implementations)
 # ========================================
-node = "latest"          # Node.js runtime
+node = "24.16.0"         # Node.js runtime
 python = "3.12"          # Python with specific version
-ruby = "latest"
-go = "latest"
-rust = "latest"
+ruby = "3.4.7"
+go = "1.25.5"
+rust = "1.91.1"
 lua = "5.1.5"            # Specific version for compatibility (e.g., LuaRocks/Neovim)
-luajit = "latest"
+luajit = "2.1.0"
 
 # ========================================
 # CLI Tools (Standalone Binaries)
 # ========================================
-ghq = "latest"           # Repository manager
-github-cli = "latest"    # gh command
-shellcheck = "latest"    # Shell script linter
-yamllint = "latest"      # YAML linter
-taplo = "latest"         # TOML formatter/linter
+ghq = "1.8.0"            # Repository manager
+github-cli = "2.83.1"    # gh command
+shellcheck = "0.11.0"    # Shell script linter
+yamllint = "1.37.1"      # YAML linter
+taplo = "0.10.0"         # TOML formatter/linter
 
 # ========================================
 # NPM Global Packages
 # ========================================
-"npm:@bufbuild/protoc-gen-es" = "latest"
-"npm:@connectrpc/protoc-gen-connect-es" = "latest"
-"npm:@fsouza/prettierd" = "latest"
-"npm:@openai/codex" = "latest"
-"npm:aicommits" = "latest"
-"npm:corepack" = "latest"
-"npm:husky" = "latest"
-"npm:markdown-link-check" = "latest"
-"npm:markdownlint-cli2" = "latest"
-"npm:neovim" = "latest"
-"npm:npm" = "latest"
-"npm:npm-check-updates" = "latest"
-"npm:textlint" = "latest"
-"npm:textlint-rule-preset-ja-technical-writing" = "latest"
+"npm:@bufbuild/protoc-gen-es" = "2.11.0"
+"npm:@connectrpc/protoc-gen-connect-es" = "1.7.0"
+"npm:@fsouza/prettierd" = "0.26.2"
+"npm:@openai/codex" = "0.73.0"
+"npm:aicommits" = "1.11.0"
+"npm:corepack" = "0.34.4"
+"npm:husky" = "9.1.7"
+"npm:markdown-link-check" = "3.14.7"
+"npm:markdownlint-cli2" = "0.19.1"
+"npm:neovim" = "5.3.0"
+"npm:npm" = "11.7.0"
+"npm:npm-check-updates" = "19.2.0"
+"npm:textlint" = "15.2.2"
+"npm:textlint-rule-preset-ja-technical-writing" = "12.0.2"
 
 # ========================================
 # Python Global Packages (via pipx)
 # ========================================
-"pipx:black" = "latest"
-"pipx:ruff" = "latest"
-"pipx:poetry" = "latest"
+"pipx:black" = "26.1.1"
+"pipx:ruff" = "0.14.9"
+"pipx:poetry" = "2.2.1"
 ```
 
 ### Config Hierarchy
@@ -100,9 +107,9 @@ mise supports multiple config locations with clear precedence:
 ```toml
 # mise/config.toml
 [tools]
-"npm:neovim" = "latest"      # or specific version "5.3.0"
-"npm:prettier" = "latest"
-"npm:typescript" = "latest"
+"npm:neovim" = "5.3.0"
+"npm:prettier" = "3.8.4"
+"npm:typescript" = "5.9.3"
 ```
 
 #### Migration Commands
@@ -113,7 +120,7 @@ npm list -g --depth=0 > npm-global-backup.txt
 
 # 2. Convert to mise.toml format (manual or scripted)
 # For each package in global-package.json:
-#   "package-name" → "npm:package-name" = "latest"
+#   "package-name" → "npm:package-name" = "<verified-version>"
 
 # 3. Add to mise/config.toml
 
@@ -158,7 +165,7 @@ echo "📝 Generated mise.toml entries:"
 echo ""
 echo "# NPM Global Packages"
 while IFS= read -r pkg; do
-    echo "\"npm:${pkg}\" = \"latest\""
+    echo "\"npm:${pkg}\" = \"<verified-version>\""
 done <<< "${PACKAGES}"
 
 echo ""
@@ -184,18 +191,18 @@ echo "Then run: mise install"
 node = "18.20.0"          # LTS version
 python = "3.11.5"         # Specific patch version
 
-# Latest stable
-node = "latest"
-ruby = "latest"
+# Concrete current stable versions
+node = "24.16.0"
+ruby = "3.4.7"
 
 # Version ranges (if supported)
-go = "1.21"               # Latest 1.21.x
+go = "1.25"               # 1.25.x line
 ```
 
 ### Version Selection Strategy
 
 - Project-local: Pin specific versions for reproducibility
-- User global: Use `"latest"` for personal tools
+- User global: Prefer concrete versions when documenting reusable setup; local rolling channels are a personal opt-in
 - CI/CD: Always pin specific versions
 
 ### 2. CLI Tools (Standalone Binaries)
@@ -204,17 +211,17 @@ go = "1.21"               # Latest 1.21.x
 
 - Self-contained executables
 - No runtime dependencies (or bundled)
-- Generally safe to use `"latest"`
+- Pin concrete versions in shared configs; standalone binaries can still break scripts when their CLI changes
 
 ### Examples
 
 ```toml
 [tools]
-github-cli = "latest"     # Safe to auto-update
-jq = "latest"             # JSON processor
-ripgrep = "latest"        # Fast grep alternative
-fd = "latest"             # Fast find alternative
-bat = "latest"            # Cat with syntax highlighting
+github-cli = "2.83.1"     # gh command
+jq = "1.8.1"              # JSON processor
+ripgrep = "15.1.0"        # Fast grep alternative
+fd = "10.4.2"             # Fast find alternative
+bat = "0.26.0"            # Cat with syntax highlighting
 ```
 
 ### Best Practice
@@ -234,30 +241,30 @@ bat = "latest"            # Cat with syntax highlighting
 ```toml
 [tools]
 # Formatters/Linters
-"npm:prettier" = "latest"
-"npm:eslint" = "latest"
-"npm:@biomejs/biome" = "latest"
+"npm:prettier" = "3.8.4"
+"npm:eslint" = "9.39.1"
+"npm:@biomejs/biome" = "2.3.7"
 
 # Build Tools
-"npm:typescript" = "latest"
-"npm:vite" = "latest"
-"npm:webpack" = "latest"
+"npm:typescript" = "5.9.3"
+"npm:vite" = "7.2.7"
+"npm:webpack" = "5.103.0"
 
 # Development Tools
-"npm:nodemon" = "latest"
-"npm:pm2" = "latest"
-"npm:http-server" = "latest"
+"npm:nodemon" = "3.1.11"
+"npm:pm2" = "6.0.14"
+"npm:http-server" = "14.1.1"
 
 # Scoped Packages
-"npm:@angular/cli" = "latest"
-"npm:@vue/cli" = "latest"
+"npm:@angular/cli" = "21.0.5"
+"npm:@vue/cli" = "5.0.8"
 ```
 
 ### Important Notes
 
 - Scoped packages (starting with `@`) must include the full scope
 - Package names must match npm registry exactly
-- Version can be specific (`"3.0.0"`), range (`"^3.0.0"`), or `"latest"`
+- Version can be specific (`"3.0.0"`) or a controlled range (`"^3.0.0"`); prefer exact versions in shared configs and CI
 
 ### 4. Python Global Packages (via pipx)
 
@@ -274,21 +281,21 @@ bat = "latest"            # Cat with syntax highlighting
 ```toml
 [tools]
 # Formatters/Linters
-"pipx:black" = "latest"
-"pipx:ruff" = "latest"
-"pipx:pylint" = "latest"
+"pipx:black" = "26.1.1"
+"pipx:ruff" = "0.14.9"
+"pipx:pylint" = "4.0.4"
 
 # Package Management
-"pipx:poetry" = "latest"
-"pipx:pipenv" = "latest"
+"pipx:poetry" = "2.2.1"
+"pipx:pipenv" = "2025.0.4"
 
 # Development Tools
-"pipx:ipython" = "latest"
-"pipx:jupyter" = "latest"
+"pipx:ipython" = "9.8.0"
+"pipx:jupyter" = "1.1.1"
 
 # Documentation
-"pipx:mkdocs" = "latest"
-"pipx:sphinx" = "latest"
+"pipx:mkdocs" = "1.6.1"
+"pipx:sphinx" = "9.0.4"
 ```
 
 ### Advantages of pipx
@@ -328,13 +335,13 @@ export MISE_CONFIG_DIR="${HOME}/.config/mise"
 ```toml
 [tools]
 # Language servers and formatters Neovim needs
-"npm:typescript-language-server" = "latest"
-"npm:vscode-langservers-extracted" = "latest"  # HTML/CSS/JSON LSP
-"npm:@fsouza/prettierd" = "latest"
-"npm:neovim" = "latest"                        # Node.js client
+"npm:typescript-language-server" = "5.1.3"
+"npm:vscode-langservers-extracted" = "4.10.0"  # HTML/CSS/JSON LSP
+"npm:@fsouza/prettierd" = "0.26.2"
+"npm:neovim" = "5.3.0"                         # Node.js client
 
-"pipx:python-lsp-server" = "latest"
-"pipx:black" = "latest"
+"pipx:python-lsp-server" = "1.14.0"
+"pipx:black" = "26.1.1"
 ```
 
 ### Neovim Lua Config
@@ -367,7 +374,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -393,7 +400,7 @@ jobs:
 
 ```yaml
 default:
-  image: ubuntu:latest
+  image: ubuntu:24.04
   before_script:
     - curl https://mise.run | sh
     - export PATH="${HOME}/.local/bin:${PATH}"
@@ -498,7 +505,7 @@ mise exec -- prettier --version
 
 # 4. Reinstall with correct package name
 mise uninstall "npm:prettier"
-mise install "npm:prettier@latest"
+mise install "npm:prettier@3.8.4"
 
 # 5. For scoped packages, ensure @ is included
 mise install "npm:@angular/cli"
@@ -567,7 +574,7 @@ source "${MISE_CACHE}"
 
 - [ ] Use `~/.config/mise/config.toml` for personal global tools
 - [ ] Use project `./mise.toml` for project-specific versions
-- [ ] Pin versions in projects, use `"latest"` for personal tools
+- [ ] Pin versions in projects and document any personal rolling-channel exceptions outside shared repo examples
 - [ ] Group tools by category with comments
 - [ ] Alphabetize within categories for maintainability
 
@@ -611,8 +618,8 @@ Combine tool management with task automation:
 
 [tools]
 node = "24"
-"npm:prettier" = "latest"
-"npm:eslint" = "latest"
+"npm:prettier" = "3.8.4"
+"npm:eslint" = "9.39.1"
 
 [tasks.format]
 description = "Format code"
@@ -659,8 +666,8 @@ Use mise hooks for conditional tool loading:
 ```toml
 # mise.toml
 [tools]
-node = "latest"
-"npm:aws-cdk" = "latest"  # Only needed for AWS projects
+node = "24.16.0"
+"npm:aws-cdk" = "2.1034.0"  # Only needed for AWS projects
 
 [hooks]
 # Custom hook to warn if AWS tools missing

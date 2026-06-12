@@ -149,11 +149,11 @@ package_manager = "pnpm"
 [tools]
 node = "lts"
 python = "3.12"
-shellcheck = "latest"
-shfmt = "latest"
-taplo = "latest"
-"npm:prettier" = "latest"
-"npm:tsx" = "latest"
+shellcheck = "<verified-version>"
+shfmt = "<verified-version>"
+taplo = "<verified-version>"
+"npm:prettier" = "<verified-version>"
+"npm:tsx" = "<verified-version>"
 ```
 
 ```toml
@@ -439,17 +439,17 @@ run = "prisma studio"
 ```toml
 [tasks."docker:build"]
 description = "Build Docker image"
-run = "docker build -t myapp:latest ."
+run = "docker build -t myapp:v1.0.0 ."
 
 [tasks."docker:run"]
 description = "Run Docker container"
 depends = ["docker:build"]
-run = "docker run -p 3000:3000 myapp:latest"
+run = "docker run -p 3000:3000 myapp:v1.0.0"
 
 [tasks."docker:push"]
 description = "Push to registry"
 depends = ["docker:build"]
-run = "docker push myapp:latest"
+run = "docker push myapp:v1.0.0"
 
 [tasks."compose:up"]
 description = "Start services"
@@ -532,7 +532,7 @@ on: [push, pull_request]
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: jdx/mise-action@v2

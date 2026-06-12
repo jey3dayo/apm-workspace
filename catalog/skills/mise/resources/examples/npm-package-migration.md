@@ -80,8 +80,8 @@ python = "3.12"
 
 \`\`\`bash
 brew bundle --force
-mise install node@latest && npm install -g @fsouza/prettierd
-mise install python@latest && pip install -r requirements.txt
+mise install node@24.16.0 && npm install -g @fsouza/prettierd
+mise install python@3.12.12 && pip install -r requirements.txt
 \`\`\`
 ```
 
@@ -118,7 +118,7 @@ echo "# NPM Global Packages" > "${OUTPUT}"
 
 # Extract package names from global-package.json
 jq -r '.dependencies | keys[]' "${INPUT}" | sort | while IFS= read -r pkg; do
-    echo "\"npm:${pkg}\" = \"latest\"" >> "${OUTPUT}"
+    echo "\"npm:${pkg}\" = \"<verified-version>\"" >> "${OUTPUT}"
 done
 
 echo ""
@@ -130,16 +130,16 @@ echo "   Please review and add to mise/config.toml"
 
 ```toml
 # NPM Global Packages
-"npm:@bufbuild/protoc-gen-es" = "latest"
-"npm:@connectrpc/protoc-gen-connect-es" = "latest"
-"npm:aicommits" = "latest"
-"npm:corepack" = "latest"
-"npm:husky" = "latest"
-"npm:neovim" = "latest"
-"npm:npm-check-updates" = "latest"
-"npm:npm" = "latest"
-"npm:textlint-rule-preset-ja-technical-writing" = "latest"
-"npm:textlint" = "latest"
+"npm:@bufbuild/protoc-gen-es" = "<verified-version>"
+"npm:@connectrpc/protoc-gen-connect-es" = "<verified-version>"
+"npm:aicommits" = "<verified-version>"
+"npm:corepack" = "<verified-version>"
+"npm:husky" = "<verified-version>"
+"npm:neovim" = "<verified-version>"
+"npm:npm-check-updates" = "<verified-version>"
+"npm:npm" = "<verified-version>"
+"npm:textlint-rule-preset-ja-technical-writing" = "<verified-version>"
+"npm:textlint" = "<verified-version>"
 ```
 
 ### Step 3: Update mise/config.toml
@@ -153,43 +153,43 @@ echo "   Please review and add to mise/config.toml"
 # ========================================
 node = "24"
 python = "3.12"
-go = "latest"
-rust = "latest"
+go = "<verified-version>"
+rust = "<verified-version>"
 lua = "5.1.5"
-luajit = "latest"
+luajit = "<verified-version>"
 
 # ========================================
 # CLI Tools
 # ========================================
-ghq = "latest"
-github-cli = "latest"
-shellcheck = "latest"
-yamllint = "latest"
-taplo = "latest"
+ghq = "<verified-version>"
+github-cli = "<verified-version>"
+shellcheck = "<verified-version>"
+yamllint = "<verified-version>"
+taplo = "<verified-version>"
 
 # ========================================
 # NPM Global Packages (migrated from global-package.json)
 # ========================================
-"npm:@bufbuild/protoc-gen-es" = "latest"
-"npm:@connectrpc/protoc-gen-connect-es" = "latest"
-"npm:@fsouza/prettierd" = "latest"  # Added (was in docs but not in global-package.json)
-"npm:@openai/codex" = "latest"
-"npm:aicommits" = "latest"
-"npm:corepack" = "latest"
-"npm:husky" = "latest"
-"npm:markdown-link-check" = "latest"
-"npm:markdownlint-cli2" = "latest"
-"npm:neovim" = "latest"
-"npm:npm" = "latest"
-"npm:npm-check-updates" = "latest"
-"npm:textlint" = "latest"
-"npm:textlint-rule-preset-ja-technical-writing" = "latest"
+"npm:@bufbuild/protoc-gen-es" = "<verified-version>"
+"npm:@connectrpc/protoc-gen-connect-es" = "<verified-version>"
+"npm:@fsouza/prettierd" = "<verified-version>"  # Added (was in docs but not in global-package.json)
+"npm:@openai/codex" = "<verified-version>"
+"npm:aicommits" = "<verified-version>"
+"npm:corepack" = "<verified-version>"
+"npm:husky" = "<verified-version>"
+"npm:markdown-link-check" = "<verified-version>"
+"npm:markdownlint-cli2" = "<verified-version>"
+"npm:neovim" = "<verified-version>"
+"npm:npm" = "<verified-version>"
+"npm:npm-check-updates" = "<verified-version>"
+"npm:textlint" = "<verified-version>"
+"npm:textlint-rule-preset-ja-technical-writing" = "<verified-version>"
 
 # ========================================
 # Python Global Packages
 # ========================================
-"pipx:black" = "latest"
-"pipx:ruff" = "latest"
+"pipx:black" = "<verified-version>"
+"pipx:ruff" = "<verified-version>"
 
 [tasks]
 # (existing tasks)
@@ -417,7 +417,7 @@ mise ls | grep neovim
 mise exec -- node -e "require('neovim')"
 
 # In Neovim, use mise-managed node
-vim.g.node_host_prog = vim.fn.expand("~/.local/share/mise/installs/node/latest/bin/node")
+vim.g.node_host_prog = vim.fn.expand("~/.local/share/mise/installs/node/24.16.0/bin/node")
 ```
 
 ## Related Documents

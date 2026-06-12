@@ -62,11 +62,11 @@ package_manager = "pnpm"
 [tools]
 node = "lts"
 python = "3.12"
-shellcheck = "latest"
-shfmt = "latest"
-taplo = "latest"
-"npm:prettier" = "latest"
-"npm:tsx" = "latest"
+shellcheck = "<verified-version>"
+shfmt = "<verified-version>"
+taplo = "<verified-version>"
+"npm:prettier" = "<verified-version>"
+"npm:tsx" = "<verified-version>"
 ```
 
 ```toml

@@ -55,13 +55,13 @@ RUST_BACKTRACE = "1"
 node = "24" # Prefer current LTS major; pin a patch version for strict reproducibility
 
 # Python - Python interpreter
-python = "latest" # Or pin: "3.12.0"
+python = "<verified-version>" # Or pin: "3.12.0"
 
 # Ruby - Ruby interpreter
-# ruby = "latest"
+# ruby = "<verified-version>"
 
 # Go - Go language
-# go = "latest"
+# go = "<verified-version>"
 
 # Rust - Rust toolchain
 # rust = "stable"         # Or "nightly", "1.75.0"
@@ -70,39 +70,39 @@ python = "latest" # Or pin: "3.12.0"
 # lua = "5.1.5"           # Lua 5.1 for LuaRocks compatibility
 
 # LuaJIT - High-performance Lua
-# luajit = "latest"
+# luajit = "<verified-version>"
 
 # ========================================
 # CLI Tools (Standalone Binaries)
 # ========================================
 
 # Version Control
-github-cli = "latest" # gh command
-# gitlab-cli = "latest"   # glab command
+github-cli = "<verified-version>" # gh command
+# gitlab-cli = "<verified-version>"   # glab command
 
 # Development Tools
-# ghq = "latest"          # Repository manager
-# direnv = "latest"       # Directory-based environment switcher
+# ghq = "<verified-version>"          # Repository manager
+# direnv = "<verified-version>"       # Directory-based environment switcher
 
 # Shell/Script Tools
-# shellcheck = "latest"   # Shell script linter
-# shfmt = "latest"        # Shell script formatter
+# shellcheck = "<verified-version>"   # Shell script linter
+# shfmt = "<verified-version>"        # Shell script formatter
 
 # File/Text Processing
-# jq = "latest"           # JSON processor
-# yq = "latest"           # YAML processor
-# ripgrep = "latest"      # Fast grep (rg)
-# fd = "latest"           # Fast find
-# bat = "latest"          # Cat with syntax highlighting
+# jq = "<verified-version>"           # JSON processor
+# yq = "<verified-version>"           # YAML processor
+# ripgrep = "<verified-version>"      # Fast grep (rg)
+# fd = "<verified-version>"           # Fast find
+# bat = "<verified-version>"          # Cat with syntax highlighting
 
 # Linters/Formatters
-# yamllint = "latest"     # YAML linter
-# taplo = "latest"        # TOML formatter/linter
+# yamllint = "<verified-version>"     # YAML linter
+# taplo = "<verified-version>"        # TOML formatter/linter
 
 # Container/Cloud Tools
-# docker = "latest"
-# kubectl = "latest"
-# terraform = "latest"
+# docker = "<verified-version>"
+# kubectl = "<verified-version>"
+# terraform = "<verified-version>"
 
 # ========================================
 # NPM Global Packages
@@ -111,57 +111,57 @@ github-cli = "latest" # gh command
 # These packages are installed in isolated environments per version
 
 # Formatters/Linters
-"npm:prettier" = "latest"
-# "npm:eslint" = "latest"
-# "npm:@biomejs/biome" = "latest"
+"npm:prettier" = "<verified-version>"
+# "npm:eslint" = "<verified-version>"
+# "npm:@biomejs/biome" = "<verified-version>"
 
 # Build Tools
-# "npm:typescript" = "latest"
-# "npm:vite" = "latest"
-# "npm:webpack" = "latest"
-# "npm:esbuild" = "latest"
+# "npm:typescript" = "<verified-version>"
+# "npm:vite" = "<verified-version>"
+# "npm:webpack" = "<verified-version>"
+# "npm:esbuild" = "<verified-version>"
 
 # Development Servers
-# "npm:http-server" = "latest"
-# "npm:serve" = "latest"
+# "npm:http-server" = "<verified-version>"
+# "npm:serve" = "<verified-version>"
 
 # Process Managers
-# "npm:pm2" = "latest"
-# "npm:nodemon" = "latest"
+# "npm:pm2" = "<verified-version>"
+# "npm:nodemon" = "<verified-version>"
 
 # Testing
-# "npm:jest" = "latest"
-# "npm:vitest" = "latest"
+# "npm:jest" = "<verified-version>"
+# "npm:vitest" = "<verified-version>"
 
 # Package Management
-"npm:npm" = "latest"
-# "npm:pnpm" = "latest"
-# "npm:yarn" = "latest"
+"npm:npm" = "<verified-version>"
+# "npm:pnpm" = "<verified-version>"
+# "npm:yarn" = "<verified-version>"
 
 # Neovim Integration
-# "npm:neovim" = "latest"                # Node.js client for Neovim
-# "npm:@fsouza/prettierd" = "latest"     # Prettier daemon for faster formatting
+# "npm:neovim" = "<verified-version>"                # Node.js client for Neovim
+# "npm:@fsouza/prettierd" = "<verified-version>"     # Prettier daemon for faster formatting
 
 # Framework CLIs
-# "npm:@angular/cli" = "latest"
-# "npm:@vue/cli" = "latest"
-# "npm:create-react-app" = "latest"
+# "npm:@angular/cli" = "<verified-version>"
+# "npm:@vue/cli" = "<verified-version>"
+# "npm:create-react-app" = "<verified-version>"
 
 # Utility Tools
-# "npm:npm-check-updates" = "latest"     # Update package.json dependencies
-# "npm:tldr" = "latest"                  # Simplified man pages
+# "npm:npm-check-updates" = "<verified-version>"     # Update package.json dependencies
+# "npm:tldr" = "<verified-version>"                  # Simplified man pages
 
 # Protocol Buffers
-# "npm:@bufbuild/protoc-gen-es" = "latest"
-# "npm:@connectrpc/protoc-gen-connect-es" = "latest"
+# "npm:@bufbuild/protoc-gen-es" = "<verified-version>"
+# "npm:@connectrpc/protoc-gen-connect-es" = "<verified-version>"
 
 # Documentation
-# "npm:markdownlint-cli2" = "latest"
-# "npm:markdown-link-check" = "latest"
+# "npm:markdownlint-cli2" = "<verified-version>"
+# "npm:markdown-link-check" = "<verified-version>"
 
 # AI/Automation
-# "npm:aicommits" = "latest"             # AI-powered commit messages
-# "npm:@openai/codex" = "latest"
+# "npm:aicommits" = "<verified-version>"             # AI-powered commit messages
+# "npm:@openai/codex" = "<verified-version>"
 
 # ========================================
 # Python Global Packages (via pipx)
@@ -170,48 +170,48 @@ github-cli = "latest" # gh command
 # Each package runs in its own virtual environment
 
 # Formatters/Linters
-# "pipx:black" = "latest"        # Python code formatter
-# "pipx:ruff" = "latest"         # Fast Python linter
-# "pipx:pylint" = "latest"       # Python code analyzer
-# "pipx:mypy" = "latest"         # Static type checker
+# "pipx:black" = "<verified-version>"        # Python code formatter
+# "pipx:ruff" = "<verified-version>"         # Fast Python linter
+# "pipx:pylint" = "<verified-version>"       # Python code analyzer
+# "pipx:mypy" = "<verified-version>"         # Static type checker
 
 # Package Management
-# "pipx:poetry" = "latest"       # Python dependency management
-# "pipx:pipenv" = "latest"       # Python virtualenv manager
-# "pipx:hatch" = "latest"        # Modern Python project manager
+# "pipx:poetry" = "<verified-version>"       # Python dependency management
+# "pipx:pipenv" = "<verified-version>"       # Python virtualenv manager
+# "pipx:hatch" = "<verified-version>"        # Modern Python project manager
 
 # Development Tools
-# "pipx:ipython" = "latest"      # Enhanced Python shell
-# "pipx:jupyter" = "latest"      # Jupyter notebooks
+# "pipx:ipython" = "<verified-version>"      # Enhanced Python shell
+# "pipx:jupyter" = "<verified-version>"      # Jupyter notebooks
 
 # Documentation
-# "pipx:mkdocs" = "latest"       # Static site generator for docs
-# "pipx:sphinx" = "latest"       # Python documentation generator
+# "pipx:mkdocs" = "<verified-version>"       # Static site generator for docs
+# "pipx:sphinx" = "<verified-version>"       # Python documentation generator
 
 # Testing
-# "pipx:pytest" = "latest"       # Python testing framework
-# "pipx:tox" = "latest"          # Test automation tool
+# "pipx:pytest" = "<verified-version>"       # Python testing framework
+# "pipx:tox" = "<verified-version>"          # Test automation tool
 
 # HTTP/API Tools
-# "pipx:httpie" = "latest"       # User-friendly HTTP client
+# "pipx:httpie" = "<verified-version>"       # User-friendly HTTP client
 
 # ========================================
 # Ruby Gems (if using Ruby)
 # ========================================
-# "gem:bundler" = "latest"
-# "gem:rails" = "latest"
+# "gem:bundler" = "<verified-version>"
+# "gem:rails" = "<verified-version>"
 
 # ========================================
 # Go Tools (if using Go)
 # ========================================
-# "go:github.com/golangci/golangci-lint/cmd/golangci-lint" = "latest"
-# "go:golang.org/x/tools/cmd/goimports" = "latest"
+# "go:github.com/golangci/golangci-lint/cmd/golangci-lint" = "<verified-version>"
+# "go:golang.org/x/tools/cmd/goimports" = "<verified-version>"
 
 # ========================================
 # Cargo Packages (if using Rust)
 # ========================================
-# "cargo:cargo-watch" = "latest"
-# "cargo:cargo-edit" = "latest"
+# "cargo:cargo-watch" = "<verified-version>"
+# "cargo:cargo-edit" = "<verified-version>"
 
 # ========================================
 # Individual Commands
@@ -223,7 +223,7 @@ description = "Install all dependencies"
 run = "mise install"
 
 [tasks.update]
-description = "Update all tools to latest versions"
+description = "Update all tools to pinned versions"
 run = "mise upgrade"
 
 [tasks.check]
@@ -345,8 +345,8 @@ run = "mise doctor"
 #   mise install
 
 # Install specific tool:
-#   mise install node@22
-#   mise install "npm:prettier@latest"
+#   mise install node@24.16.0
+#   mise install "npm:prettier@3.8.4"
 
 # List installed tools:
 #   mise ls
@@ -379,7 +379,7 @@ run = "mise doctor"
 
 # 2. Version Pinning
 #    - Project-local: Pin specific versions for reproducibility
-#    - User global: Use "latest" for flexibility
+#    - User global: Use concrete versions for reproducibility
 #    - CI/CD: Always pin versions
 
 # 3. Task Organization

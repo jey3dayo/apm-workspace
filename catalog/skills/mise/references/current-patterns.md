@@ -18,8 +18,8 @@ _.path = ['./node_modules/.bin']
 
 [tools]
 node = '22'         # 最新LTS
-fd = 'latest'       # ファイル検索用
-prettier = 'latest' # コードフォーマッター
+fd = '<verified-version>'       # ファイル検索用
+prettier = '<verified-version>' # コードフォーマッター
 
 # === ドキュメント管理 ===
 [tasks."docs:lint"]
@@ -151,8 +151,8 @@ mise lint
 ```toml
 [tools]
 node = '22'         # 最新LTS
-fd = 'latest'       # ファイル検索用
-prettier = 'latest' # コードフォーマッター
+fd = '<verified-version>'       # ファイル検索用
+prettier = '<verified-version>' # コードフォーマッター
 ```
 
 ### Benefits
@@ -167,7 +167,7 @@ prettier = 'latest' # コードフォーマッター
 [tools]
 node = "24.0.0"     # Pin exact version
 node = "24"         # Track the current LTS major
-node = "latest"     # Always latest (not recommended for reproducibility)
+node = "<verified-version>"     # Always pinned (not recommended for reproducibility)
 ```
 
 ### Pattern 5: Environment Path Extension
