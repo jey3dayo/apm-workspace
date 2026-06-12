@@ -219,24 +219,10 @@ skill_ids_from_root() {
 }
 
 format_skill_name() {
-  target="$1"
-  source_skill_id="$2"
-
-  case "$target" in
-    codex)
-      case "$source_skill_id" in
-        superpowers:*)
-          printf 'superpowers-%s\n' "${source_skill_id#superpowers:}"
-          ;;
-        *)
-          printf '%s\n' "$source_skill_id"
-          ;;
-      esac
-      ;;
-    *)
-      printf '%s\n' "$source_skill_id"
-      ;;
-  esac
+  # Flatten a namespaced skill id "<ns>:<id>" to "<ns>-<id>". Every deploy target
+  # discovers skills only one level deep, so nested "<ns>/<id>" dirs are invisible;
+  # the hyphen-flattened form works uniformly across all targets and namespaces.
+  printf '%s\n' "$1" | tr ':' '-'
 }
 
 locked_external_skill_records() {
@@ -837,7 +823,7 @@ stage_codex_skill_records() {
   mkdir -p "$stage_skills_root"
   printf '%s\n' "$skill_records" | while IFS=$'\t' read -r _source_kind source_skill_id source_path _source_ref; do
     [ -n "$source_skill_id" ] || continue
-    deployed_skill_name=$(format_skill_name codex "$source_skill_id")
+    deployed_skill_name=$(format_skill_name "$source_skill_id")
     staged_skill_path=$(internal_target_skill_path "$stage_skills_root" "$deployed_skill_name")
     mkdir -p "$staged_skill_path"
     cp -RL "$source_path"/. "$staged_skill_path"
@@ -855,7 +841,7 @@ replace_codex_skill_target_from_stage() {
 
   printf '%s\n' "$skill_records" | while IFS=$'\t' read -r _source_kind source_skill_id _source_path _source_ref; do
     [ -n "$source_skill_id" ] || continue
-    deployed_skill_name=$(format_skill_name codex "$source_skill_id")
+    deployed_skill_name=$(format_skill_name "$source_skill_id")
     staged_skill_path=$(internal_target_skill_path "$staged_skills_root" "$deployed_skill_name")
     target_skill_path=$(internal_target_skill_path "$target_skills_root" "$deployed_skill_name")
 
@@ -1205,7 +1191,7 @@ managed_catalog_skill_inventory() {
   managed_catalog_runtime_targets | while IFS='|' read -r target_name _target_dir _config_name _skills_dir; do
     printf '%s\n' "$skill_ids" | while IFS= read -r skill_id; do
       [ -n "$skill_id" ] || continue
-      printf '%s|%s|%s\n' "$target_name" "$skill_id" "$(format_skill_name "$target_name" "$skill_id")"
+      printf '%s|%s|%s\n' "$target_name" "$skill_id" "$(format_skill_name "$skill_id")"
     done
   done
 }
@@ -1653,7 +1639,7 @@ build_deployment_plan_entries() {
   printf '%s\n' "$skill_records" | while IFS=$'\t' read -r source_kind source_skill_id source_path source_ref; do
     [ -n "$source_skill_id" ] || continue
     managed_catalog_runtime_targets | while IFS='|' read -r target_name target_dir _config_name _skills_dir; do
-      deployed_skill_name=$(format_skill_name "$target_name" "$source_skill_id")
+      deployed_skill_name=$(format_skill_name "$source_skill_id")
       validate_skill_id "$deployed_skill_name"
       deployment_plan_record \
         "$target_name" \
@@ -2066,7 +2052,7 @@ cmd_smoke_catalog() {
   printf '%s\n' "$skill_ids" | while IFS= read -r skill_id; do
     [ -n "$skill_id" ] || continue
     source_relative_path=$(skill_id_to_manifest_path "$skill_id")
-    installed_skill_name=$(format_skill_name codex "$skill_id")
+    installed_skill_name=$(format_skill_name "$skill_id")
     installed_relative_path=$(skill_id_to_manifest_path "$installed_skill_name")
 
     if [ ! -f "$temp_dir/.agents/skills/$installed_relative_path/SKILL.md" ]; then
