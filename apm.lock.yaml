@@ -1,10 +1,10 @@
 lockfile_version: '1'
-generated_at: '2026-06-12T05:16:56.324624+00:00'
+generated_at: '2026-06-12T17:33:49.139298+00:00'
 apm_version: 0.14.2
 dependencies:
 - repo_url: EpicenterHQ/epicenter
   host: github.com
-  resolved_commit: 526008ac591708ca733ca0a3160c711765433d60
+  resolved_commit: 7fbf353f489782c49bbcca4cbec4822c851a3a7f
   virtual_path: .agents/skills/tauri
   is_virtual: true
   package_type: claude_skill
@@ -103,7 +103,7 @@ dependencies:
   content_hash: sha256:d50d11bbefdc1599d78900828dcb69d48e5091769d3f5ce10e06a60efe2405bf
 - repo_url: anthropics/claude-code
   host: github.com
-  resolved_commit: 5754a8bd4fd286e798d9d29658b10f29832ad177
+  resolved_commit: ee81682a72b07705672332d1dc963927a998c177
   virtual_path: plugins/frontend-design/skills/frontend-design
   is_virtual: true
   package_type: claude_skill
@@ -156,7 +156,7 @@ dependencies:
   content_hash: sha256:aff0ee1de9c886ea33b078b6b29e5556f1268bb9331edcd4cbc5f17771f2949c
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: 8df05019446294b83a2279a097ce39cb5635d742
+  resolved_commit: 87ae0cb3b30be011541e06623b9e3b1cf414cc4f
   virtual_path: plugins/infra/ca-pass
   is_virtual: true
   package_type: marketplace_plugin
@@ -167,7 +167,7 @@ dependencies:
   content_hash: sha256:85213916d8b9a106d3267029225eaa149fe59e150b389a372f710f425b1a1525
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: 8df05019446294b83a2279a097ce39cb5635d742
+  resolved_commit: 87ae0cb3b30be011541e06623b9e3b1cf414cc4f
   virtual_path: plugins/infra/mdb
   is_virtual: true
   package_type: marketplace_plugin
@@ -178,7 +178,7 @@ dependencies:
   content_hash: sha256:3c7d57154c87020d236168529a418265389098f6d60aaa62c5bde31248e55ac0
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: 8df05019446294b83a2279a097ce39cb5635d742
+  resolved_commit: 87ae0cb3b30be011541e06623b9e3b1cf414cc4f
   virtual_path: plugins/infra/notica-notification-api
   is_virtual: true
   package_type: marketplace_plugin
@@ -189,7 +189,7 @@ dependencies:
   content_hash: sha256:7d9ede99c4674a34f1cb89ea634f7585785b5d9ece77c19d419fb5e659d05341
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: 8df05019446294b83a2279a097ce39cb5635d742
+  resolved_commit: 87ae0cb3b30be011541e06623b9e3b1cf414cc4f
   virtual_path: plugins/infra/perman-aws-vault
   is_virtual: true
   package_type: marketplace_plugin
@@ -197,10 +197,10 @@ dependencies:
   - .agents/skills/perman-aws-vault
   - .claude/skills/perman-aws-vault
   - .codeium/windsurf/skills/perman-aws-vault
-  content_hash: sha256:d569f19859422fbe38672ec5e7ac16d723cbd15866cb77add03cc6997a6c8d8b
+  content_hash: sha256:5b2cb50f80bc45c60fe441edd0b867633f7e05d89dcef4bf5c6c30b80fd6493b
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
-  resolved_commit: 8df05019446294b83a2279a097ce39cb5635d742
+  resolved_commit: 87ae0cb3b30be011541e06623b9e3b1cf414cc4f
   virtual_path: plugins/utils/caad-skill-deployer
   is_virtual: true
   package_type: marketplace_plugin
@@ -542,10 +542,10 @@ dependencies:
   - .codeium/windsurf/skills/typescript
   - .codeium/windsurf/skills/wezterm
   - .codeium/windsurf/skills/zsh
-  content_hash: sha256:3587379b82b95c9b354f919c045f2d4d3220e24b9963f1613c605bb43c85ff6b
+  content_hash: sha256:60fffef8d92e1ccbd03a9964b68a31bbea77136c7983e0fe57d9eebf6681cd2b
 - repo_url: langchain-ai/deepagents
   host: github.com
-  resolved_commit: ac94dd6b139211187cad8685c1152f02c51ba086
+  resolved_commit: 9dbf1d25d63cd539921b33bac9270234614c6fff
   virtual_path: libs/cli/examples/skills/web-research
   is_virtual: true
   package_type: claude_skill
@@ -556,7 +556,7 @@ dependencies:
   content_hash: sha256:2b66d5db8c8d70474e70638f437f324fb3af3724b71bf8501e48c8004e70e677
 - repo_url: millionco/react-doctor
   host: github.com
-  resolved_commit: f52bd0737527df9ab81f3746e64bdb5ac1defbc7
+  resolved_commit: 04e72a4d563b792af09c15f069ce9d523a9c538c
   virtual_path: skills/react-doctor
   is_virtual: true
   package_type: claude_skill
