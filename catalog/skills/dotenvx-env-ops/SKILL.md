@@ -40,19 +40,20 @@ Before AWS execution, inspect these names without printing secrets:
 printenv AWS_PROFILE AWS_DEFAULT_PROFILE AWS_REGION AWS_DEFAULT_REGION 2>/dev/null
 ```
 
-If any selected value is encrypted or inherited from app dotenvx config, run AWS from a clean environment:
+If any selected value is encrypted or inherited from app dotenvx config, run AWS from a clean environment with the profile/region chosen for the task:
 
 ```bash
+AWS_BIN="$(mise which aws 2>/dev/null || command -v aws)"
 env -u AWS_PROFILE -u AWS_DEFAULT_PROFILE \
   -u AWS_REGION -u AWS_DEFAULT_REGION \
   -u AWS_ACCESS_KEY_ID -u AWS_SECRET_ACCESS_KEY -u AWS_SESSION_TOKEN \
-  AWS_PROFILE=aws-caad-ndev-admin \
-  AWS_REGION=ap-northeast-1 \
-  AWS_DEFAULT_REGION=ap-northeast-1 \
-  /usr/local/bin/aws sts get-caller-identity
+  AWS_PROFILE=<profile> \
+  AWS_REGION=<region> \
+  AWS_DEFAULT_REGION=<region> \
+  "$AWS_BIN" sts get-caller-identity
 ```
 
-Use the real profile/region chosen for the task. Prefer the non-shim AWS binary when a `mise` shim or repo task is injecting dotenvx values.
+Prefer the non-shim AWS binary when a `mise` shim or repo task is injecting dotenvx values; `mise which aws` resolves the real binary behind the shim. A concrete worked example (profile, region, incident) is in `references/asta-dotenvx.md`.
 
 ## dotenvx Recipes
 
@@ -63,16 +64,16 @@ dotenvx run -f .env.development -- pnpm dev
 dotenvx run -f .env.staging -- pnpm test
 ```
 
-Check which keys exist without exposing values:
+Check which keys exist without exposing values (`-o` prints only the matched key, never the value):
 
 ```bash
-rg -n '^([A-Z0-9_]+)=' --replace '$1' .env .env.* 2>/dev/null
+rg -n -o '^[A-Z0-9_]+=' .env .env.* 2>/dev/null
 ```
 
-Search for encrypted keys without exposing values:
+List encrypted keys without exposing values:
 
 ```bash
-rg -n '^([A-Z0-9_]+)=encrypted:' --replace '$1=encrypted:<redacted>' .env .env.* 2>/dev/null
+rg -n -o '^[A-Z0-9_]+=encrypted:' .env .env.* 2>/dev/null
 ```
 
 ## Project References
