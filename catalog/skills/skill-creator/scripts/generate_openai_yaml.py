@@ -19,12 +19,18 @@ ACRONYMS = {
     "API",
     "CI",
     "CLI",
+    "CSS",
+    "CSV",
+    "HTML",
+    "JSON",
     "LLM",
     "PDF",
     "PR",
     "UI",
     "URL",
     "SQL",
+    "XML",
+    "YAML",
 }
 
 BRANDS = {

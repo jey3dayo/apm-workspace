@@ -81,7 +81,7 @@ skill-name/
 ### Agents metadata (recommended)
 
 - `agents/openai.yaml` holds UI-facing metadata for skill lists and chips.
-- Generate `display_name`, `short_description`, and `default_prompt` deterministically by reading the skill and passing values to `scripts/generate_openai_yaml.py <skill-folder> --interface key=value` (or at init time via `init_skill.py`). Include other optional interface fields (icons, brand color) only when the user provides them.
+- Compose `display_name`, `short_description`, and `default_prompt` yourself by reading the skill (the user does not supply them), then write the file by running `scripts/generate_openai_yaml.py <skill-folder> --interface key=value` (repeatable flag; also accepted by `init_skill.py` at init time). Do not hand-write the YAML. Include other optional interface fields (icons, brand color) only when the user provides them.
 - On updates, verify `agents/openai.yaml` still matches SKILL.md and regenerate if stale.
 - Read `references/openai_yaml.md` for field definitions and constraints before generating.
 
@@ -200,7 +200,7 @@ Start with the reusable resources (`scripts/`, `references/`, `assets/`); this m
 
 Writing guidelines: use imperative/infinitive form throughout.
 
-Frontmatter rule: keep frontmatter minimal. `name` and `description` are required; `license`, `allowed-tools`, and `metadata` are the only other fields `quick_validate.py` accepts (`metadata` holds harness-specific extras such as `short-description`). Put all when-to-use triggers in `description` — the body loads only after triggering, so a "When to Use" section in the body cannot help trigger the skill. Example `description` for a `docx` skill: "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. Use when working with professional documents (.docx files) for: (1) creating new documents, (2) modifying or editing content, (3) working with tracked changes, (4) adding comments, or any other document tasks."
+Frontmatter rule: keep frontmatter minimal. `name` and `description` are required; `license`, `allowed-tools`, and `metadata` are the only other fields `quick_validate.py` accepts (`metadata` holds harness-specific extras such as `short-description`). Put all when-to-use triggers in `description` — the body loads only after triggering, so a "When to Use" section in the body cannot help trigger the skill. Quote the `description` value when it contains YAML-special characters such as colons. Example `description` for a `docx` skill: "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. Use when working with professional documents (.docx files) for: (1) creating new documents, (2) modifying or editing content, (3) working with tracked changes, (4) adding comments, or any other document tasks."
 
 ### Step 5: Validate the Skill
 
