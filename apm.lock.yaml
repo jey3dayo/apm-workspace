@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-06-12T04:33:43.110376+00:00'
+generated_at: '2026-06-12T05:16:56.324624+00:00'
 apm_version: 0.14.2
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -342,7 +342,7 @@ dependencies:
   content_hash: sha256:99aaea521aa0f1c7d041d70bb6b75581c1a50ec6ac59ceaaa923b6339ffa417b
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: 475bd98c051388e4d34ba9d824a7965f08d2cddb
+  resolved_commit: 72162ca4f6e700673157744441dd31d4d1767cb7
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
@@ -542,7 +542,7 @@ dependencies:
   - .codeium/windsurf/skills/typescript
   - .codeium/windsurf/skills/wezterm
   - .codeium/windsurf/skills/zsh
-  content_hash: sha256:bdf51344eea1382d305ff5a0fd640ebf0eabd01fb23348c6688d85c86f902ce5
+  content_hash: sha256:3587379b82b95c9b354f919c045f2d4d3220e24b9963f1613c605bb43c85ff6b
 - repo_url: langchain-ai/deepagents
   host: github.com
   resolved_commit: ac94dd6b139211187cad8685c1152f02c51ba086
@@ -980,6 +980,7 @@ dependencies:
   content_hash: sha256:d31e234f0c90694a670222cdd1dafa853e051d7066beda389f1097c22dadd461
 mcp_servers:
 - chrome-devtools
+- codex
 - context7
 - jina-reader
 - mcp-simple-voicevox
@@ -996,6 +997,13 @@ mcp_configs:
     - http://127.0.0.1:9222
     registry: false
     command: npx
+  codex:
+    name: codex
+    transport: stdio
+    args:
+    - mcp-server
+    registry: false
+    command: codex
   context7:
     name: context7
     transport: stdio

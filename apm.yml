@@ -123,4 +123,10 @@ dependencies:
         - "https://mcp.jina.ai/v1?include_tags=read"
         - --header
         - "Authorization: Bearer ${JINA_API_KEY}"
+    - name: codex
+      registry: false
+      transport: stdio
+      command: codex
+      args:
+        - mcp-server
 scripts: {}
