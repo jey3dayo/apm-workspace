@@ -778,7 +778,7 @@ run_workspace_install_command() {
 }
 
 install_workspace_mcp_dependencies() {
-  run_workspace_install_command -g --only mcp
+  run_workspace_install_command -g --only mcp --exclude kiro
 }
 
 cmd_apply() {
@@ -2000,7 +2000,7 @@ cmd_register_catalog() {
   remove_internal_target_links "$cleanup_skill_ids"
 
   reference=$(tracked_catalog_reference)
-  run_workspace_install_command -g "$reference"
+  run_workspace_install_command -g --exclude kiro "$reference"
   sync_managed_catalog_runtime_assets
   log "Registered catalog from upstream ref: $reference"
 }

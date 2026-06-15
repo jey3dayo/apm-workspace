@@ -189,7 +189,7 @@ run = [
 # ========================================
 [tasks.upgrade]
 description = "Refresh upstream APM dependencies, verify, and inspect the ~/.apm workspace"
-run = ["apm install -g --update", { task = "deploy" }]
+run = ["apm install -g --update --exclude kiro", { task = "deploy" }]
 
 [tasks."refresh:deploy"]
 description = "Update, verify, and deploy the ~/.apm workspace locally from the current manifest and lock"
