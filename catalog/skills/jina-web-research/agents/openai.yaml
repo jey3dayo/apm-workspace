@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jina Web Research"
+  short_description: "Jina-first public web research"
+  default_prompt: "Use $jina-web-research to research current public web and X signals for a topic."
