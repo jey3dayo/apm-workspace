@@ -43,8 +43,12 @@ If the Jina MCP server exposes a direct search tool in the current environment, 
 - Always search both `site:x.com` and `site:twitter.com` when X signal matters.
 - Record search terms and date searched.
 - Treat indexed X results as partial evidence because login walls, deletion, ranking, and indexing gaps can hide relevant posts.
+- Treat deleted, protected, suspended, login-blocked, or incomplete posts as unavailable and say so.
+- Do not present search snippets as full post contents.
+- Do not infer identity from a handle alone when attribution matters.
 - Do not infer frequency from a few loud posts. Mark these as anecdotal unless corroborated.
 - Prefer direct post URLs when available; otherwise cite the Jina search result URL and explain the limitation.
+- Do not use a logged-in browser session just to bypass protected or deleted X content unless the user explicitly asks.
 
 ## Evidence Rules
 
@@ -53,6 +57,7 @@ If the Jina MCP server exposes a direct search tool in the current environment, 
 - Distinguish official sources, journalism/blogs, forums, GitHub, Reddit/HN, and X/Twitter.
 - Call out missing or weak source access.
 - Do not overclaim recency; include concrete dates when dates matter.
+- Do not store API keys, cookies, bearer tokens, or other secrets in research files or repository artifacts.
 
 ## Output
 
