@@ -462,6 +462,7 @@ For repository-specific reviews, add these checks before proposing changes:
 - Does the answer preserve the repo's documented lightweight-check, deep-verify, and deploy semantics where they differ?
 - Does it keep refresh, rollout, and deploy semantics distinct where the repo does?
 - Does it avoid treating generated outputs as editing surfaces if the repo separates them from authoring surfaces?
+- Does it avoid baking local Windows workstation PATH or shell failures into a mac/Linux-first repository task contract?
 - Does it separate "task behavior as implemented" from "description wording that could be clearer"?
 - If `mise.toml` has many DB, env/dotenvx, secrets, infra, deploy, or tools tasks, would a responsibility-based include file reduce review risk without hiding the primary workflows?
 
