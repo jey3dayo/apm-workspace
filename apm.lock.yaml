@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-06-17T18:40:27.598271+00:00'
+generated_at: '2026-06-17T18:49:34.471449+00:00'
 apm_version: 0.20.0
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -965,6 +965,29 @@ dependencies:
   host: github.com
   resolved_commit: a1e343696e43aa50e7218891f3319ab22cde3464
   package_type: claude_skill
+  deployed_files:
+  - .agents/skills/humanizer-ja
+  - .agents/skills/humanizer-ja/LICENSE
+  - .agents/skills/humanizer-ja/README.md
+  - .agents/skills/humanizer-ja/SKILL.md
+  - .claude/skills/humanizer-ja
+  - .claude/skills/humanizer-ja/LICENSE
+  - .claude/skills/humanizer-ja/README.md
+  - .claude/skills/humanizer-ja/SKILL.md
+  - .codeium/windsurf/skills/humanizer-ja
+  - .codeium/windsurf/skills/humanizer-ja/LICENSE
+  - .codeium/windsurf/skills/humanizer-ja/README.md
+  - .codeium/windsurf/skills/humanizer-ja/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/humanizer-ja/LICENSE: sha256:f75eb14ec27966cd36603902343e942aa1d125e7ef78cfb786ba71b29938b7dc
+    .agents/skills/humanizer-ja/README.md: sha256:657ca8e0e1750c2eb025e6e61fe229bc9eafcea3ac53694a12f69399a1a29872
+    .agents/skills/humanizer-ja/SKILL.md: sha256:3fe07f06a179801d7445eff19ed40f1681ef9860665c50c1e9a032f6dffead89
+    .claude/skills/humanizer-ja/LICENSE: sha256:f75eb14ec27966cd36603902343e942aa1d125e7ef78cfb786ba71b29938b7dc
+    .claude/skills/humanizer-ja/README.md: sha256:657ca8e0e1750c2eb025e6e61fe229bc9eafcea3ac53694a12f69399a1a29872
+    .claude/skills/humanizer-ja/SKILL.md: sha256:3fe07f06a179801d7445eff19ed40f1681ef9860665c50c1e9a032f6dffead89
+    .codeium/windsurf/skills/humanizer-ja/LICENSE: sha256:f75eb14ec27966cd36603902343e942aa1d125e7ef78cfb786ba71b29938b7dc
+    .codeium/windsurf/skills/humanizer-ja/README.md: sha256:657ca8e0e1750c2eb025e6e61fe229bc9eafcea3ac53694a12f69399a1a29872
+    .codeium/windsurf/skills/humanizer-ja/SKILL.md: sha256:3fe07f06a179801d7445eff19ed40f1681ef9860665c50c1e9a032f6dffead89
   content_hash: sha256:b6da4ef92a941ab364ab1ddf259d9e511e098a0719f7ee2202847351c34a8194
 - repo_url: hashicorp/agent-skills
   host: github.com
