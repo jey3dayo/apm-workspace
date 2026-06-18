@@ -1,6 +1,6 @@
 ---
 name: 1password-item-ops
-description: Use when working with 1Password CLI (`op`) to find, inspect, create, edit, or update 1Password items such as logins, software licenses, secure notes, API credentials, and related secrets. Default to the Personal vault, search before changing items, avoid exposing secret values, require user confirmation for ambiguous vaults, multiple candidates, bulk changes, renames, deletes, vault moves, or destructive operations, and use dotenvx-managed service-account token injection on the homelab.
+description: Use when working with 1Password CLI (`op`) to find, inspect, create, edit, or update 1Password items such as logins, software licenses, secure notes, API credentials, and related secrets. Default to the Personal vault, search before changing items, avoid exposing secret values, require user confirmation for ambiguous vaults, multiple candidates, bulk changes, renames, deletes, vault moves, or destructive operations, and prefer an available 1Password account before falling back to dotenvx-managed service-account token injection on the homelab.
 ---
 
 # 1Password Item Ops
@@ -12,14 +12,16 @@ Use this skill to manage 1Password items through `op` while keeping secrets out 
 - Default vault: `Personal`.
 - Legacy macOS token file: `/Users/t00114/.config/op/service-account-token`.
 - Homelab default dotenvx env file: `/home/pi/.config/.env`.
+- Prefer the signed-in 1Password account or app integration when available.
+  Use `--account <account-id-or-shorthand>` when the account is known.
 - Legacy macOS commands may be shaped as:
 
 ```bash
 OP_SERVICE_ACCOUNT_TOKEN_FILE=/Users/t00114/.config/op/service-account-token op <command>
 ```
 
-- If the installed `op` reports that `OP_SERVICE_ACCOUNT_TOKEN` is required,
-  prefer dotenvx-managed injection on the homelab:
+- If no signed-in account or app integration is available on the homelab,
+  fall back to dotenvx-managed service-account token injection:
 
 ```bash
 dotenvx run -f /home/pi/.config/.env -- op <command>
@@ -60,8 +62,20 @@ dotenvx run -f /home/pi/.config/.env -- op <command>
 Create a software license when a user provides product/license metadata:
 
 ```bash
-dotenvx run -f /home/pi/.config/.env -- \
-  op item create --vault <vault-id> --category "Software License" \
+op item create --account <account-id-or-shorthand> \
+  --vault <vault-id> --category "Software License" \
+  --title "<Product Name>" \
+  reg_code="<masked-or-secret-license-id>" \
+  "Customer.registered email[email]=<email>" \
+  "Order.purchase date[date]=YYYY-MM-DD"
+```
+
+If only the homelab service account is available, run the same command through
+dotenvx instead of using `--account`:
+
+```bash
+dotenvx run -f /home/pi/.config/.env -- op item create \
+  --vault <vault-id> --category "Software License" \
   --title "<Product Name>" \
   reg_code="<masked-or-secret-license-id>" \
   "Customer.registered email[email]=<email>" \
