@@ -1,0 +1,4 @@
+interface:
+  display_name: "Work Log Maintenance"
+  short_description: "Prepare manager-facing work logs and business-day Slack reports"
+  default_prompt: "Update the work log and produce a business-day Slack report."
