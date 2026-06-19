@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-06-17T18:49:34.471449+00:00'
+generated_at: '2026-06-18T03:37:20.979987+00:00'
 apm_version: 0.20.0
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -118,7 +118,7 @@ dependencies:
   content_hash: sha256:8cf9ba1ed0d52741e4ed1dafc6ee4543e32f1e516f958d750e81412bfc36dd13
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: ba9ba1f73ce4f2ce35aeaaa55b01c9f8d4279bfe
+  resolved_commit: f6a4fa36ccaf5b7edbc50d2006ee07beaf488c5e
   virtual_path: understand-anything-plugin/skills/understand
   is_virtual: true
   package_type: claude_skill
@@ -139,6 +139,7 @@ dependencies:
   - .agents/skills/understand/frameworks/react.md
   - .agents/skills/understand/frameworks/spring.md
   - .agents/skills/understand/frameworks/vue.md
+  - .agents/skills/understand/generate-ignore.mjs
   - .agents/skills/understand/languages/cpp.md
   - .agents/skills/understand/languages/csharp.md
   - .agents/skills/understand/languages/css.md
@@ -187,6 +188,7 @@ dependencies:
   - .claude/skills/understand/frameworks/react.md
   - .claude/skills/understand/frameworks/spring.md
   - .claude/skills/understand/frameworks/vue.md
+  - .claude/skills/understand/generate-ignore.mjs
   - .claude/skills/understand/languages/cpp.md
   - .claude/skills/understand/languages/csharp.md
   - .claude/skills/understand/languages/css.md
@@ -268,7 +270,7 @@ dependencies:
   - .codeium/windsurf/skills/understand/merge-subdomain-graphs.py
   - .codeium/windsurf/skills/understand/scan-project.mjs
   deployed_file_hashes:
-    .agents/skills/understand/SKILL.md: sha256:e82730b349a1a6a51dab7f3e9b8e19a47da3d46682c122999d3392a905c3a28a
+    .agents/skills/understand/SKILL.md: sha256:88ecde51339428a705816481163f68eb300795820cd22e0f036c04220298cf62
     .agents/skills/understand/build-fingerprints.mjs: sha256:2ed228677bbf1bda3fba00d4662c8e542caa3d69c5fed911c4878e6382767881
     .agents/skills/understand/compute-batches.mjs: sha256:2c35a73fbeec6bba90fe07e51dc60f35f4899be53c660c4fa4ae7e4209a39554
     .agents/skills/understand/extract-import-map.mjs: sha256:ec0dff3313ce192d7e90eabca5b905ad73c997ef5152c562a852af9c0268e526
@@ -283,6 +285,7 @@ dependencies:
     .agents/skills/understand/frameworks/react.md: sha256:eaaf30363244b89a6bad91971f3d476ec809a8892f387a8bf33c04638a04af20
     .agents/skills/understand/frameworks/spring.md: sha256:296c10395b794c8c0741cd2faaa61f9e171933003f39cbe45f462237ed1066c6
     .agents/skills/understand/frameworks/vue.md: sha256:49a432fe59c8b0759632bd1745b4acc7ddcaef4343a270d97698d9bede69e5db
+    .agents/skills/understand/generate-ignore.mjs: sha256:38227d8e3175c16f0c18e2d232ee642958132a0756b53224ef66cec3c47ff421
     .agents/skills/understand/languages/cpp.md: sha256:2a658bb677944fa58e6a244430d120cb0657d09e4e50fe28a9cdfbdd554f46f9
     .agents/skills/understand/languages/csharp.md: sha256:507cb86fb5c494d9d5e8ab947015ac6f4e7a2c280c0509ffdbab812a0472c467
     .agents/skills/understand/languages/css.md: sha256:ed3a8dcd96e9921d8d85cfcf0ea07d7a15838cd076180017a80162b1b7166131
@@ -315,7 +318,7 @@ dependencies:
     .agents/skills/understand/merge-batch-graphs.py: sha256:aec850cb49b091d54045f660733e2e5b644b73c012ba9fd15a8c1caae56dbd9f
     .agents/skills/understand/merge-subdomain-graphs.py: sha256:75aa0967ea8f93ba2538b1f2fcc0a48e6b38f7bcf12de3b42f9733d5dddf0d28
     .agents/skills/understand/scan-project.mjs: sha256:d9673ab2b37eaad4df7d5e419d04b95077045d0b09cf4e5d4e330951df62de9b
-    .claude/skills/understand/SKILL.md: sha256:e82730b349a1a6a51dab7f3e9b8e19a47da3d46682c122999d3392a905c3a28a
+    .claude/skills/understand/SKILL.md: sha256:88ecde51339428a705816481163f68eb300795820cd22e0f036c04220298cf62
     .claude/skills/understand/build-fingerprints.mjs: sha256:2ed228677bbf1bda3fba00d4662c8e542caa3d69c5fed911c4878e6382767881
     .claude/skills/understand/compute-batches.mjs: sha256:2c35a73fbeec6bba90fe07e51dc60f35f4899be53c660c4fa4ae7e4209a39554
     .claude/skills/understand/extract-import-map.mjs: sha256:ec0dff3313ce192d7e90eabca5b905ad73c997ef5152c562a852af9c0268e526
@@ -330,6 +333,7 @@ dependencies:
     .claude/skills/understand/frameworks/react.md: sha256:eaaf30363244b89a6bad91971f3d476ec809a8892f387a8bf33c04638a04af20
     .claude/skills/understand/frameworks/spring.md: sha256:296c10395b794c8c0741cd2faaa61f9e171933003f39cbe45f462237ed1066c6
     .claude/skills/understand/frameworks/vue.md: sha256:49a432fe59c8b0759632bd1745b4acc7ddcaef4343a270d97698d9bede69e5db
+    .claude/skills/understand/generate-ignore.mjs: sha256:38227d8e3175c16f0c18e2d232ee642958132a0756b53224ef66cec3c47ff421
     .claude/skills/understand/languages/cpp.md: sha256:2a658bb677944fa58e6a244430d120cb0657d09e4e50fe28a9cdfbdd554f46f9
     .claude/skills/understand/languages/csharp.md: sha256:507cb86fb5c494d9d5e8ab947015ac6f4e7a2c280c0509ffdbab812a0472c467
     .claude/skills/understand/languages/css.md: sha256:ed3a8dcd96e9921d8d85cfcf0ea07d7a15838cd076180017a80162b1b7166131
@@ -409,10 +413,10 @@ dependencies:
     .codeium/windsurf/skills/understand/merge-batch-graphs.py: sha256:aec850cb49b091d54045f660733e2e5b644b73c012ba9fd15a8c1caae56dbd9f
     .codeium/windsurf/skills/understand/merge-subdomain-graphs.py: sha256:75aa0967ea8f93ba2538b1f2fcc0a48e6b38f7bcf12de3b42f9733d5dddf0d28
     .codeium/windsurf/skills/understand/scan-project.mjs: sha256:d9673ab2b37eaad4df7d5e419d04b95077045d0b09cf4e5d4e330951df62de9b
-  content_hash: sha256:50e425dcac901ad6054fd32d671e35f00fbdd85e5bc844147dccd233aab72135
+  content_hash: sha256:cdff72b1fc536a971cd3bc8d7f6daad0e39dab1f23e909bdbf4158e022bc96ea
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: ba9ba1f73ce4f2ce35aeaaa55b01c9f8d4279bfe
+  resolved_commit: f6a4fa36ccaf5b7edbc50d2006ee07beaf488c5e
   virtual_path: understand-anything-plugin/skills/understand-chat
   is_virtual: true
   package_type: claude_skill
@@ -430,7 +434,7 @@ dependencies:
   content_hash: sha256:3cec7cc6b02177b29d359c3889e311a3985314c61ef7a654ed6c22d43e44b080
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: ba9ba1f73ce4f2ce35aeaaa55b01c9f8d4279bfe
+  resolved_commit: f6a4fa36ccaf5b7edbc50d2006ee07beaf488c5e
   virtual_path: understand-anything-plugin/skills/understand-dashboard
   is_virtual: true
   package_type: claude_skill
@@ -448,7 +452,7 @@ dependencies:
   content_hash: sha256:32771fb738e732febba2c780df113354fdc08085aee73e6531ded3e0ad17ee29
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: ba9ba1f73ce4f2ce35aeaaa55b01c9f8d4279bfe
+  resolved_commit: f6a4fa36ccaf5b7edbc50d2006ee07beaf488c5e
   virtual_path: understand-anything-plugin/skills/understand-diff
   is_virtual: true
   package_type: claude_skill
@@ -466,7 +470,7 @@ dependencies:
   content_hash: sha256:e258781324eaab144a9340c32ea2a49f7584ec7b5984121e11dcffe16fbee03c
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: ba9ba1f73ce4f2ce35aeaaa55b01c9f8d4279bfe
+  resolved_commit: f6a4fa36ccaf5b7edbc50d2006ee07beaf488c5e
   virtual_path: understand-anything-plugin/skills/understand-explain
   is_virtual: true
   package_type: claude_skill
@@ -484,7 +488,7 @@ dependencies:
   content_hash: sha256:8f6ef8bc8d4be5e0e8dd764c0d4c5a42b95fa47191e22edbb5ccc351828af7b6
 - repo_url: Lum1104/Understand-Anything
   host: github.com
-  resolved_commit: ba9ba1f73ce4f2ce35aeaaa55b01c9f8d4279bfe
+  resolved_commit: f6a4fa36ccaf5b7edbc50d2006ee07beaf488c5e
   virtual_path: understand-anything-plugin/skills/understand-onboard
   is_virtual: true
   package_type: claude_skill
@@ -520,7 +524,7 @@ dependencies:
   content_hash: sha256:d50d11bbefdc1599d78900828dcb69d48e5091769d3f5ce10e06a60efe2405bf
 - repo_url: anthropics/claude-code
   host: github.com
-  resolved_commit: 843959fad9c3e5977c6295397da88df81604c94c
+  resolved_commit: 423563cfe38c90fdf3b428cff0ee7f51cfec3ca7
   virtual_path: plugins/frontend-design/skills/frontend-design
   is_virtual: true
   package_type: claude_skill
@@ -532,10 +536,10 @@ dependencies:
   - .codeium/windsurf/skills/frontend-design
   - .codeium/windsurf/skills/frontend-design/SKILL.md
   deployed_file_hashes:
-    .agents/skills/frontend-design/SKILL.md: sha256:d39adf3a983de7dafc75991590d54f091755f7e4163d5a5ed085ecd719157184
-    .claude/skills/frontend-design/SKILL.md: sha256:d39adf3a983de7dafc75991590d54f091755f7e4163d5a5ed085ecd719157184
+    .agents/skills/frontend-design/SKILL.md: sha256:1608ea77fbb6fc30d13a97d12cfa8ebf31358d40f0dd97beed24829d6b3f45dd
+    .claude/skills/frontend-design/SKILL.md: sha256:1608ea77fbb6fc30d13a97d12cfa8ebf31358d40f0dd97beed24829d6b3f45dd
     .codeium/windsurf/skills/frontend-design/SKILL.md: sha256:d39adf3a983de7dafc75991590d54f091755f7e4163d5a5ed085ecd719157184
-  content_hash: sha256:e8118284a6365753790d44bb2758a6032b3af27fa84696428d9233f2be0f4e78
+  content_hash: sha256:3e0be122a3db8206b6d0d6b07cca898b5c75fb9b7b2101abe143fb2851734d2e
 - repo_url: apollographql/skills
   host: github.com
   resolved_commit: 605089108a198e412f7f0c1926c91eb94a6d1727
@@ -671,7 +675,7 @@ dependencies:
     .claude/skills/browser-harness/references/install.md: sha256:f86fe06be058828edd4f36a3765803a1b61d7c7feb7fd91db917ba7a8cbb5c19
     .codeium/windsurf/skills/browser-harness/SKILL.md: sha256:186a0059861254cf6de2c52149ba52c34611d733fb2ceaad9030bc6e1e40109b
     .codeium/windsurf/skills/browser-harness/references/install.md: sha256:f86fe06be058828edd4f36a3765803a1b61d7c7feb7fd91db917ba7a8cbb5c19
-  content_hash: sha256:0dc8d32a1ffb3383275b9d370de0892632fc224a7480f3de032980b7033deb60
+  content_hash: sha256:31a5f95a8efeaacebae641b0e72f789c06ff48a19366d1c4bcbfeaf293bab73a
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
   resolved_commit: 8624cc8ac6b22f4cab408c07d0cc1545e53f334d
@@ -701,7 +705,7 @@ dependencies:
     .codeium/windsurf/skills/ca-pass/SKILL.md: sha256:d8e626ad6e553d7d0e0de579049fdc53acd2f61f22284a0bd3bf23ff8fb12c22
     .codeium/windsurf/skills/ca-pass/references/ca-pass-spec.md: sha256:7b04975aac27a753c216e0bac31114f2dbf1b73fd85f0074b275e66d180c694c
     .codeium/windsurf/skills/ca-pass/references/review-checklist.md: sha256:a9870d591470b161820fb112bab8d53595e9c387958709c011905be070b7d01e
-  content_hash: sha256:eae78e6a3d0bd692d93bdd84b28caec2e45f6712b3441eb65fb92b1a23bda0d4
+  content_hash: sha256:2a3345aa4afcaac2d89c8a754f5c5492e0f9cc56edcdbfa988afe76dbd3ec038
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
   resolved_commit: 8624cc8ac6b22f4cab408c07d0cc1545e53f334d
@@ -731,7 +735,7 @@ dependencies:
     .codeium/windsurf/skills/mdb/SKILL.md: sha256:355a1a681745abdbec3b1e52b81828849608160421787a12574170aaea9f0200
     .codeium/windsurf/skills/mdb/references/api-reference.md: sha256:429205ad91ac78f4820563f7a245e6b0bf62ebd3fed67b3a1ebf77bd85d1ce11
     .codeium/windsurf/skills/mdb/references/employee-schema.md: sha256:30ea251b6bab13b365bbbaeb943d9f875848fff17895cd389eb1a6072afe85ab
-  content_hash: sha256:53632204cf6b7aeb8a56cbf9ec72653b3b96e7e6afb495ee479f3d62a213485d
+  content_hash: sha256:3c7d57154c87020d236168529a418265389098f6d60aaa62c5bde31248e55ac0
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
   resolved_commit: 8624cc8ac6b22f4cab408c07d0cc1545e53f334d
@@ -761,7 +765,7 @@ dependencies:
     .codeium/windsurf/skills/notica-notification-api/SKILL.md: sha256:9e4bc20c9d697cc9a31d343965422c792b75c9fdedab587a122fc8ada7c6ec28
     .codeium/windsurf/skills/notica-notification-api/agents/openai.yaml: sha256:f7fa2bc304f7bd1cd8f0b4b24a2f6ee5d51eff5f30c1306cfa46dca14669b002
     .codeium/windsurf/skills/notica-notification-api/references/notica-api-user-doc.md: sha256:2d6ee1aea02338012f3b61c3d82f930421cd7a1723126fa50ba3740a828ad316
-  content_hash: sha256:9f08a06f88b54ec70fda90300e99cfbeab2da9062c4d11e59d3a319542bb5c3d
+  content_hash: sha256:137fb45d578f04f364dbc11247a15301513f097138c69a3b2e5f5bf8c206299f
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
   resolved_commit: 8624cc8ac6b22f4cab408c07d0cc1545e53f334d
@@ -815,7 +819,7 @@ dependencies:
     .codeium/windsurf/skills/perman-aws-vault/references/aws-profiles.md: sha256:21140dbe617f1db5aa094a0112ec356481aa582ad3aa62efbaccb8dbe748536d
     .codeium/windsurf/skills/perman-aws-vault/references/profile-catalog.md: sha256:6eed982d8f2f4ae14957e402eaa09042ab3370507b87a759f92ff7f37e47b472
     .codeium/windsurf/skills/perman-aws-vault/references/setup-guide.md: sha256:e4d2c9c4ac0e146e9a9ae45933bc1cf5fbcbd940cf8fa3587cfb1ffa64436704
-  content_hash: sha256:f54447511603f924f4f5fc70f7397934640840dc7e7b9c7faa342e71fa5abe41
+  content_hash: sha256:b9520ae353543b37d2c88a9374aa0b5b6cd41c646a19a261759b561ef1dcb2fd
 - repo_url: caad-develop/claude-code-marketplace
   host: github.com
   resolved_commit: 8624cc8ac6b22f4cab408c07d0cc1545e53f334d
@@ -851,10 +855,10 @@ dependencies:
     .codeium/windsurf/skills/caad-skill-deployer/agents/openai.yaml: sha256:37ef1416cc3c498f66cafe12850d63e6fef7fc7758e4770c44c16e1b844dab58
     .codeium/windsurf/skills/caad-skill-deployer/references/folder-policy.md: sha256:b70b055285d4372ed91a6d93c95aa454785eb31fbe1e6cd5248499cc69e3be2e
     .codeium/windsurf/skills/caad-skill-deployer/scripts/inspect_skill_source.py: sha256:6a2215b28f2738b0827c5680ee20a4e822e3457b9b620c397c21136c88a9ee9c
-  content_hash: sha256:f418acc2aa28499661d9ff5a25afdca7432c36b07930613e4d43bfb6fb5ebbe7
+  content_hash: sha256:cb32203710a69564002d0f812dc2e0673a91490ef407e90a13382e1cd48c9306
 - repo_url: cloudflare/skills
   host: github.com
-  resolved_commit: 8ff55f2a574f498bbf89675279d92b7a61f4d521
+  resolved_commit: ffcc622bf112eccc49c4b433faa5dd28e9ede2ea
   virtual_path: skills/workers-best-practices
   is_virtual: true
   package_type: claude_skill
@@ -884,7 +888,7 @@ dependencies:
   content_hash: sha256:ebd71bed0ade41e2d4839b0d280ec6d93dced0d19f568d27b92da00e4aa9943c
 - repo_url: cloudflare/skills
   host: github.com
-  resolved_commit: 8ff55f2a574f498bbf89675279d92b7a61f4d521
+  resolved_commit: ffcc622bf112eccc49c4b433faa5dd28e9ede2ea
   virtual_path: skills/wrangler
   is_virtual: true
   package_type: claude_skill
@@ -1421,6 +1425,9 @@ dependencies:
   - .agents/skills/premortem/scripts/format_report.py
   - .agents/skills/premortem/scripts/gap_analyzer.py
   - .agents/skills/premortem/scripts/github_integration.py
+  - .agents/skills/prepare-goal
+  - .agents/skills/prepare-goal/SKILL.md
+  - .agents/skills/prepare-goal/agents/openai.yaml
   - .agents/skills/project-maintenance
   - .agents/skills/project-maintenance/SKILL.md
   - .agents/skills/project-maintenance/examples/cleanup-workflows.md
@@ -2065,9 +2072,6 @@ dependencies:
   - .codeium/windsurf/skills/integration-framework/references/framework-api-reference.md
   - .codeium/windsurf/skills/integration-framework/references/integration-framework-details.md
   - .codeium/windsurf/skills/integration-framework/references/task-context-specification.md
-  - .codeium/windsurf/skills/jina-web-research
-  - .codeium/windsurf/skills/jina-web-research/SKILL.md
-  - .codeium/windsurf/skills/jina-web-research/agents/openai.yaml
   - .codeium/windsurf/skills/knowledge-creator
   - .codeium/windsurf/skills/knowledge-creator/SKILL.md
   - .codeium/windsurf/skills/knowledge-creator/references/agent-skills-standard.md
@@ -2477,6 +2481,8 @@ dependencies:
     .agents/skills/premortem/scripts/format_report.py: sha256:7450cbddd3478d66421c9e9d90a8dbfe0ddf38647ec5e12b806227f270be70e9
     .agents/skills/premortem/scripts/gap_analyzer.py: sha256:b0bee34a3d8dc955277c0f3050ecaf6e756dea50683d4d00838b5372d1902ce0
     .agents/skills/premortem/scripts/github_integration.py: sha256:113a55435ff150ec9940b0f5d4cff3e9fd24d9429cbc7ab2dc30e96e223b640b
+    .agents/skills/prepare-goal/SKILL.md: sha256:70c1dda1ad2870a1b0761fa63a903f5aeb36e4c820c367bd5a4812963f25723d
+    .agents/skills/prepare-goal/agents/openai.yaml: sha256:870d31c398ceb1c485a64b3a5e694942f055e85983718a61434b117bca5cefbc
     .agents/skills/project-maintenance/SKILL.md: sha256:9bf1433a660d52cbdfcd29d6c563acfec33f7f5f1c61ba7d84dd504ec4bc3806
     .agents/skills/project-maintenance/examples/cleanup-workflows.md: sha256:b7d185658372aaf708f4cf1a1673fd5067f7d998628c6db7990880efce1f1cf7
     .agents/skills/project-maintenance/examples/rollback-strategies.md: sha256:4ff6a6dd614a9d2390fd688058369ad0e5a3b3e9f3943fb5bea9e46735036007
@@ -3004,8 +3010,6 @@ dependencies:
     .codeium/windsurf/skills/integration-framework/references/framework-api-reference.md: sha256:2c2a1150d1c082a194a17cf8b6b1ad6f5a55728c989e27542a59e4afeb49c22f
     .codeium/windsurf/skills/integration-framework/references/integration-framework-details.md: sha256:b9f13b44f165c78b6213183fa3dc06c438c145893739fd1aa8fdf8135448d75a
     .codeium/windsurf/skills/integration-framework/references/task-context-specification.md: sha256:0ad099194b1da2dc29f988aef269b6419f0e8889dd74134bcf5efe92a24216b7
-    .codeium/windsurf/skills/jina-web-research/SKILL.md: sha256:6e95d7ab44b5c7fa326a94099845985c207a1ce398ab847cd933d2b552be1f66
-    .codeium/windsurf/skills/jina-web-research/agents/openai.yaml: sha256:31aa67ba8347ed691d7fe4f14034a4b5f23b698640d50c8aeb60831534423a4d
     .codeium/windsurf/skills/knowledge-creator/SKILL.md: sha256:a255daf2cd377b5b09263425ec958133cefc57c73ff9a250d0dff1f38da829fc
     .codeium/windsurf/skills/knowledge-creator/references/agent-skills-standard.md: sha256:fb63e010a9fb8a7c3d02e9b1787fd2143a5f53a1c526d1cc180f5aee4d2762de
     .codeium/windsurf/skills/learnings-knowledge/SKILL.md: sha256:2b7fc13842302c6eb74342465ee6a093523f9a8b21df1aaed31ef759749f7c69
@@ -3133,11 +3137,11 @@ dependencies:
     .codeium/windsurf/skills/task-router/references/agent-profiles.md: sha256:9bce91335048cb1eedb0e4927b7367663f803f875ab59defcdcab6c5ddab2cc0
     .codeium/windsurf/skills/task-router/references/agent-selection-logic.md: sha256:2189a258684cf3dfe7dc4d7f15a44629ef993258647547dba44cabcd3fecbda9
     .codeium/windsurf/skills/task-router/references/processing-architecture.md: sha256:d6b5e6f559a25d1ee3dd0dd322f10936c31f029838f0853ece673552879eaf17
-    .codeium/windsurf/skills/task-router/references/skill-integration-guide.md: sha256:061e9d32fb95bc2b728b81005f7c7ebb327049048fca7987122a58f5b86bd372
+    .codeium/windsurf/skills/task-router/references/skill-integration-guide.md: sha256:e318f43d9686b92bd495c51b6959f3d4a83d41f922b8f1d02e08b635a2ddd6a5
     .codeium/windsurf/skills/task-to-pr/SKILL-v1-original.md: sha256:b28430c79cfa831c58346a9f128e29399071049cd1e33ed0da674e2ef230b062
     .codeium/windsurf/skills/task-to-pr/SKILL.md: sha256:f8f92b222db09954e29cb8ea1fc4d4a79b46daeb0ea0f71d5f13a6329e208d9b
     .codeium/windsurf/skills/task-to-pr/references/ci-fix-patterns.md: sha256:a54dbe28f59603dce3b57295df4b59aa85069a36a68615d9531afeb815305ec1
-    .codeium/windsurf/skills/task-to-pr/references/git-wt.md: sha256:83919579a21a544875f24fe9a7361d0bec41abe72a91100441d8230dc5cda707
+    .codeium/windsurf/skills/task-to-pr/references/git-wt.md: sha256:b4ae0abd77b045edd9c895b1d3f1186214a5ab223649f515db223dbdbe9d4048
     .codeium/windsurf/skills/task-to-pr/references/task-decomposition.md: sha256:d96998a4dac9b37c67cbb22bc79b76ed80a640b315a768e336773494f177c970
     .codeium/windsurf/skills/task-to-pr/scripts/inspect_pr_checks.py: sha256:b916c7835f76a2975fc5a89501e23c603d62eb966154df0e68588d4aedab16be
     .codeium/windsurf/skills/tauri-dev-screenshot/SKILL.md: sha256:b459e78f784f71fc663975c96474fe4200c9a87d8f570693f6f8c2f7268166c7
@@ -3174,7 +3178,7 @@ dependencies:
   content_hash: sha256:776e173b4a22bcf499b1ef8e56087c2c761d9c5d917d17073424001d7cf5d7b5
 - repo_url: langchain-ai/deepagents
   host: github.com
-  resolved_commit: c499634c530dcab9b18e3126b4573ff0d36c3efa
+  resolved_commit: b7eed01facbe1d66f69da974ae115d078ce42065
   virtual_path: libs/cli/examples/skills/web-research
   is_virtual: true
   package_type: claude_skill
@@ -3192,7 +3196,7 @@ dependencies:
   content_hash: sha256:2b66d5db8c8d70474e70638f437f324fb3af3724b71bf8501e48c8004e70e677
 - repo_url: millionco/react-doctor
   host: github.com
-  resolved_commit: 1e260c5d219391dbdf18e1cfd729dbc97b3806fb
+  resolved_commit: 93b796d4161d96dcfbcbefa2b76d4921f6034aa3
   virtual_path: skills/react-doctor
   is_virtual: true
   package_type: claude_skill
@@ -3245,27 +3249,151 @@ dependencies:
   deployed_files:
   - .agents/skills/ui-ux-pro-max
   - .agents/skills/ui-ux-pro-max/SKILL.md
-  - .agents/skills/ui-ux-pro-max/data
-  - .agents/skills/ui-ux-pro-max/scripts
+  - .agents/skills/ui-ux-pro-max/data/_sync_all.py
+  - .agents/skills/ui-ux-pro-max/data/app-interface.csv
+  - .agents/skills/ui-ux-pro-max/data/charts.csv
+  - .agents/skills/ui-ux-pro-max/data/colors.csv
+  - .agents/skills/ui-ux-pro-max/data/design.csv
+  - .agents/skills/ui-ux-pro-max/data/draft.csv
+  - .agents/skills/ui-ux-pro-max/data/google-fonts.csv
+  - .agents/skills/ui-ux-pro-max/data/icons.csv
+  - .agents/skills/ui-ux-pro-max/data/landing.csv
+  - .agents/skills/ui-ux-pro-max/data/products.csv
+  - .agents/skills/ui-ux-pro-max/data/react-performance.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/angular.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/astro.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/flutter.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/laravel.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/nextjs.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/react-native.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/react.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/shadcn.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/svelte.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/swiftui.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/threejs.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/vue.csv
+  - .agents/skills/ui-ux-pro-max/data/styles.csv
+  - .agents/skills/ui-ux-pro-max/data/typography.csv
+  - .agents/skills/ui-ux-pro-max/data/ui-reasoning.csv
+  - .agents/skills/ui-ux-pro-max/data/ux-guidelines.csv
+  - .agents/skills/ui-ux-pro-max/scripts/core.py
+  - .agents/skills/ui-ux-pro-max/scripts/design_system.py
+  - .agents/skills/ui-ux-pro-max/scripts/search.py
   - .claude/skills/ui-ux-pro-max
   - .claude/skills/ui-ux-pro-max/SKILL.md
-  - .claude/skills/ui-ux-pro-max/data
-  - .claude/skills/ui-ux-pro-max/scripts
+  - .claude/skills/ui-ux-pro-max/data/_sync_all.py
+  - .claude/skills/ui-ux-pro-max/data/app-interface.csv
+  - .claude/skills/ui-ux-pro-max/data/charts.csv
+  - .claude/skills/ui-ux-pro-max/data/colors.csv
+  - .claude/skills/ui-ux-pro-max/data/design.csv
+  - .claude/skills/ui-ux-pro-max/data/draft.csv
+  - .claude/skills/ui-ux-pro-max/data/google-fonts.csv
+  - .claude/skills/ui-ux-pro-max/data/icons.csv
+  - .claude/skills/ui-ux-pro-max/data/landing.csv
+  - .claude/skills/ui-ux-pro-max/data/products.csv
+  - .claude/skills/ui-ux-pro-max/data/react-performance.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/angular.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/astro.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/flutter.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/laravel.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/nextjs.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/react-native.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/react.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/shadcn.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/svelte.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/swiftui.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/threejs.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/vue.csv
+  - .claude/skills/ui-ux-pro-max/data/styles.csv
+  - .claude/skills/ui-ux-pro-max/data/typography.csv
+  - .claude/skills/ui-ux-pro-max/data/ui-reasoning.csv
+  - .claude/skills/ui-ux-pro-max/data/ux-guidelines.csv
+  - .claude/skills/ui-ux-pro-max/scripts/core.py
+  - .claude/skills/ui-ux-pro-max/scripts/design_system.py
+  - .claude/skills/ui-ux-pro-max/scripts/search.py
   - .codeium/windsurf/skills/ui-ux-pro-max
   - .codeium/windsurf/skills/ui-ux-pro-max/SKILL.md
-  - .codeium/windsurf/skills/ui-ux-pro-max/data
-  - .codeium/windsurf/skills/ui-ux-pro-max/scripts
   deployed_file_hashes:
     .agents/skills/ui-ux-pro-max/SKILL.md: sha256:9bd26c52dfd10dfd613dd3cc85df217dc25a172e380bde41fdfa6fedda288b2a
-    .agents/skills/ui-ux-pro-max/data: sha256:8c30a85b7b44b164b0932a9ceb1b9920a6bf461caa0d712c5f1d8e49ca07c36f
-    .agents/skills/ui-ux-pro-max/scripts: sha256:1f80a44a7c81b3d286013ba1e133581ff5966544496a9caa758291dba3e5a4f2
+    .agents/skills/ui-ux-pro-max/data/_sync_all.py: sha256:b540b3a4f87598ae29048b3cceae1fc17b39b629aee2cbe5c802ffc7b48abf6d
+    .agents/skills/ui-ux-pro-max/data/app-interface.csv: sha256:2a17ef810dab715ce1f339861817a8fbe3ccc38142b70517301e874803e838ac
+    .agents/skills/ui-ux-pro-max/data/charts.csv: sha256:ebb565308115f955791b0431797a89d9b3587c25d5babb9428d10712c4924817
+    .agents/skills/ui-ux-pro-max/data/colors.csv: sha256:69ee8c1147b269599d20ca418bdd6f32563a9aa2d962fb9a9b8dec66bf7b1ba4
+    .agents/skills/ui-ux-pro-max/data/design.csv: sha256:6f0ae42f16b3cbfa3f07050268387557859ff666e2651b1b82763f099d724b3f
+    .agents/skills/ui-ux-pro-max/data/draft.csv: sha256:e190c796b707858a5436dc4c27f9ee9bb6618014ca73f533e423abe5ce9e4d06
+    .agents/skills/ui-ux-pro-max/data/google-fonts.csv: sha256:2c03a3cd134d126bd9d6a7dc2a6360dc5272219ad6df3eb9315b031f806e1487
+    .agents/skills/ui-ux-pro-max/data/icons.csv: sha256:f376c29fb4df37b4bdb366a5aa70cb211ba3dd8b435390aaa03152a64b07d2e8
+    .agents/skills/ui-ux-pro-max/data/landing.csv: sha256:080cedbcd61ff8ec9520f33929baa76bee9589e783f83b2f8d824a466b6a46d7
+    .agents/skills/ui-ux-pro-max/data/products.csv: sha256:9fd9e776ba847cf44c1ea78f95fe5e33b2c56bb7e186e3cfff9c49bc7fcb691b
+    .agents/skills/ui-ux-pro-max/data/react-performance.csv: sha256:904c8afcda229629545912dde0e8ac37503757131f0169f80b016f1f58c4fd3f
+    .agents/skills/ui-ux-pro-max/data/stacks/angular.csv: sha256:dd7cc2a2b34cd8f0508bd05b067545e7a44f7724440c432d491d92a61a8fb6c1
+    .agents/skills/ui-ux-pro-max/data/stacks/astro.csv: sha256:ad18dae3ab6d148d37d144592df80dc1825b6c9e86d9d2d68fdda77434206a37
+    .agents/skills/ui-ux-pro-max/data/stacks/flutter.csv: sha256:fe36d404c799781e8ba6e9a8179b45799ed5126a545528550cd2eb0f2346e8c5
+    .agents/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv: sha256:7aef38e75c53559470afcfa91580a9917ca8b7dbf8b92110389e23e93703ac52
+    .agents/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv: sha256:6c8fd4b0391c342c12b0af15610cd5becbeccaef0bbe8dcfc01d928c3195d93e
+    .agents/skills/ui-ux-pro-max/data/stacks/laravel.csv: sha256:50e11e60a64b30f329af25ae71f4b8bbdb43bafc1865451b74f9f540a88964d5
+    .agents/skills/ui-ux-pro-max/data/stacks/nextjs.csv: sha256:e828ccc04843742f52f545a068e8a9ab0d2b97c0e771f7e93bf0cef74da05554
+    .agents/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv: sha256:05d6e74501b2b6a636faed32450622759f49a5bcafad971f5f4e7eba0eb7be71
+    .agents/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv: sha256:f7a3f2d9542856d00199f85c6c023b7c284cc698e2e6e12d61afce2edacb24d6
+    .agents/skills/ui-ux-pro-max/data/stacks/react-native.csv: sha256:a08ca77fcf6b6d9531982dce465366296013bfcf12d2938ac72ad57cf0c4f085
+    .agents/skills/ui-ux-pro-max/data/stacks/react.csv: sha256:e5624ab41d33427d88e41d07581ce4eca59b37b36ab72a6ad43a9c8e2d0a1c72
+    .agents/skills/ui-ux-pro-max/data/stacks/shadcn.csv: sha256:395c2e415ef6f48a474acccdc8eb2c7258a6ed751a5037ba171a2d8823e02ded
+    .agents/skills/ui-ux-pro-max/data/stacks/svelte.csv: sha256:71af52d64f266c88070b91dbbaa900c2f8074b6baae9f35eaea6ba9cec6fd803
+    .agents/skills/ui-ux-pro-max/data/stacks/swiftui.csv: sha256:c9c2d2510f8e66281a2514e8dd0125a6b653b9ef53a71281b5e7dfe003d5b569
+    .agents/skills/ui-ux-pro-max/data/stacks/threejs.csv: sha256:f1c05f8f269fc4784170c837f4ff43b50042f00bbd6ba7dbef2896081a052544
+    .agents/skills/ui-ux-pro-max/data/stacks/vue.csv: sha256:c2724915d3c11cd67263f25896cff721f787a0fdd8326002d31e9f5806dfd8f8
+    .agents/skills/ui-ux-pro-max/data/styles.csv: sha256:9b5089dcde8999333b36878252a255cc3bacbb2fe7b836c76cc7f7aa2abb643d
+    .agents/skills/ui-ux-pro-max/data/typography.csv: sha256:dbea262a54e3bfa2e6c3b15989a365d5ef4c43349316aff46635e82ca825adce
+    .agents/skills/ui-ux-pro-max/data/ui-reasoning.csv: sha256:41976082ecae1100da937c949215dc6694393e03f3c2a7444dd92a9edb43cb11
+    .agents/skills/ui-ux-pro-max/data/ux-guidelines.csv: sha256:1870ee048f2a2bdd60709f8f7adf7f3b6dcad560bc005c8b2915a8ac8639820d
+    .agents/skills/ui-ux-pro-max/scripts/core.py: sha256:772b4d567c7a948c5d4a10343473b4123fec04238d250c9ffce31d0733f752c0
+    .agents/skills/ui-ux-pro-max/scripts/design_system.py: sha256:f7a21e83739c5ac6ca3738846220f6a9eb7f3c1ae7a44989c5aaa2061ca60310
+    .agents/skills/ui-ux-pro-max/scripts/search.py: sha256:6a565f960a672e16dd064ccadd3406db999bfd1a4bff4d609b36a8d4c6450b86
     .claude/skills/ui-ux-pro-max/SKILL.md: sha256:9bd26c52dfd10dfd613dd3cc85df217dc25a172e380bde41fdfa6fedda288b2a
-    .claude/skills/ui-ux-pro-max/data: sha256:8c30a85b7b44b164b0932a9ceb1b9920a6bf461caa0d712c5f1d8e49ca07c36f
-    .claude/skills/ui-ux-pro-max/scripts: sha256:1f80a44a7c81b3d286013ba1e133581ff5966544496a9caa758291dba3e5a4f2
+    .claude/skills/ui-ux-pro-max/data/_sync_all.py: sha256:b540b3a4f87598ae29048b3cceae1fc17b39b629aee2cbe5c802ffc7b48abf6d
+    .claude/skills/ui-ux-pro-max/data/app-interface.csv: sha256:2a17ef810dab715ce1f339861817a8fbe3ccc38142b70517301e874803e838ac
+    .claude/skills/ui-ux-pro-max/data/charts.csv: sha256:ebb565308115f955791b0431797a89d9b3587c25d5babb9428d10712c4924817
+    .claude/skills/ui-ux-pro-max/data/colors.csv: sha256:69ee8c1147b269599d20ca418bdd6f32563a9aa2d962fb9a9b8dec66bf7b1ba4
+    .claude/skills/ui-ux-pro-max/data/design.csv: sha256:6f0ae42f16b3cbfa3f07050268387557859ff666e2651b1b82763f099d724b3f
+    .claude/skills/ui-ux-pro-max/data/draft.csv: sha256:e190c796b707858a5436dc4c27f9ee9bb6618014ca73f533e423abe5ce9e4d06
+    .claude/skills/ui-ux-pro-max/data/google-fonts.csv: sha256:2c03a3cd134d126bd9d6a7dc2a6360dc5272219ad6df3eb9315b031f806e1487
+    .claude/skills/ui-ux-pro-max/data/icons.csv: sha256:f376c29fb4df37b4bdb366a5aa70cb211ba3dd8b435390aaa03152a64b07d2e8
+    .claude/skills/ui-ux-pro-max/data/landing.csv: sha256:080cedbcd61ff8ec9520f33929baa76bee9589e783f83b2f8d824a466b6a46d7
+    .claude/skills/ui-ux-pro-max/data/products.csv: sha256:9fd9e776ba847cf44c1ea78f95fe5e33b2c56bb7e186e3cfff9c49bc7fcb691b
+    .claude/skills/ui-ux-pro-max/data/react-performance.csv: sha256:904c8afcda229629545912dde0e8ac37503757131f0169f80b016f1f58c4fd3f
+    .claude/skills/ui-ux-pro-max/data/stacks/angular.csv: sha256:dd7cc2a2b34cd8f0508bd05b067545e7a44f7724440c432d491d92a61a8fb6c1
+    .claude/skills/ui-ux-pro-max/data/stacks/astro.csv: sha256:ad18dae3ab6d148d37d144592df80dc1825b6c9e86d9d2d68fdda77434206a37
+    .claude/skills/ui-ux-pro-max/data/stacks/flutter.csv: sha256:fe36d404c799781e8ba6e9a8179b45799ed5126a545528550cd2eb0f2346e8c5
+    .claude/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv: sha256:7aef38e75c53559470afcfa91580a9917ca8b7dbf8b92110389e23e93703ac52
+    .claude/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv: sha256:6c8fd4b0391c342c12b0af15610cd5becbeccaef0bbe8dcfc01d928c3195d93e
+    .claude/skills/ui-ux-pro-max/data/stacks/laravel.csv: sha256:50e11e60a64b30f329af25ae71f4b8bbdb43bafc1865451b74f9f540a88964d5
+    .claude/skills/ui-ux-pro-max/data/stacks/nextjs.csv: sha256:e828ccc04843742f52f545a068e8a9ab0d2b97c0e771f7e93bf0cef74da05554
+    .claude/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv: sha256:05d6e74501b2b6a636faed32450622759f49a5bcafad971f5f4e7eba0eb7be71
+    .claude/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv: sha256:f7a3f2d9542856d00199f85c6c023b7c284cc698e2e6e12d61afce2edacb24d6
+    .claude/skills/ui-ux-pro-max/data/stacks/react-native.csv: sha256:a08ca77fcf6b6d9531982dce465366296013bfcf12d2938ac72ad57cf0c4f085
+    .claude/skills/ui-ux-pro-max/data/stacks/react.csv: sha256:e5624ab41d33427d88e41d07581ce4eca59b37b36ab72a6ad43a9c8e2d0a1c72
+    .claude/skills/ui-ux-pro-max/data/stacks/shadcn.csv: sha256:395c2e415ef6f48a474acccdc8eb2c7258a6ed751a5037ba171a2d8823e02ded
+    .claude/skills/ui-ux-pro-max/data/stacks/svelte.csv: sha256:71af52d64f266c88070b91dbbaa900c2f8074b6baae9f35eaea6ba9cec6fd803
+    .claude/skills/ui-ux-pro-max/data/stacks/swiftui.csv: sha256:c9c2d2510f8e66281a2514e8dd0125a6b653b9ef53a71281b5e7dfe003d5b569
+    .claude/skills/ui-ux-pro-max/data/stacks/threejs.csv: sha256:f1c05f8f269fc4784170c837f4ff43b50042f00bbd6ba7dbef2896081a052544
+    .claude/skills/ui-ux-pro-max/data/stacks/vue.csv: sha256:c2724915d3c11cd67263f25896cff721f787a0fdd8326002d31e9f5806dfd8f8
+    .claude/skills/ui-ux-pro-max/data/styles.csv: sha256:9b5089dcde8999333b36878252a255cc3bacbb2fe7b836c76cc7f7aa2abb643d
+    .claude/skills/ui-ux-pro-max/data/typography.csv: sha256:dbea262a54e3bfa2e6c3b15989a365d5ef4c43349316aff46635e82ca825adce
+    .claude/skills/ui-ux-pro-max/data/ui-reasoning.csv: sha256:41976082ecae1100da937c949215dc6694393e03f3c2a7444dd92a9edb43cb11
+    .claude/skills/ui-ux-pro-max/data/ux-guidelines.csv: sha256:1870ee048f2a2bdd60709f8f7adf7f3b6dcad560bc005c8b2915a8ac8639820d
+    .claude/skills/ui-ux-pro-max/scripts/core.py: sha256:772b4d567c7a948c5d4a10343473b4123fec04238d250c9ffce31d0733f752c0
+    .claude/skills/ui-ux-pro-max/scripts/design_system.py: sha256:f7a21e83739c5ac6ca3738846220f6a9eb7f3c1ae7a44989c5aaa2061ca60310
+    .claude/skills/ui-ux-pro-max/scripts/search.py: sha256:6a565f960a672e16dd064ccadd3406db999bfd1a4bff4d609b36a8d4c6450b86
     .codeium/windsurf/skills/ui-ux-pro-max/SKILL.md: sha256:9bd26c52dfd10dfd613dd3cc85df217dc25a172e380bde41fdfa6fedda288b2a
-    .codeium/windsurf/skills/ui-ux-pro-max/data: sha256:8c30a85b7b44b164b0932a9ceb1b9920a6bf461caa0d712c5f1d8e49ca07c36f
-    .codeium/windsurf/skills/ui-ux-pro-max/scripts: sha256:1f80a44a7c81b3d286013ba1e133581ff5966544496a9caa758291dba3e5a4f2
-  content_hash: sha256:496fe13cca94d56c9cf98899801fd117813fbcbd135ae660fb481d1c4c0e1abb
+  content_hash: sha256:08432204d056fb901311755380851874591114300ca6e4e20aa094937821faac
 - repo_url: nyosegawa/skills
   host: github.com
   resolved_commit: d03723b708e1de279e7d44fb5f4650ab32e67324
@@ -3401,14 +3529,14 @@ dependencies:
     .claude/skills/brainstorming/scripts/stop-server.sh: sha256:0b5ccbbd57f62d3ed88993f7940b5ee0e5c0fc9b21c550c623da4f6292e47daf
     .claude/skills/brainstorming/spec-document-reviewer-prompt.md: sha256:95a0a195de9d984be2fffa95bab16fc8c563bc296a9cfc5e9c29cb3ece0d7457
     .claude/skills/brainstorming/visual-companion.md: sha256:60cbad29b9dd7eaf08da020e301c498a72230b2e13c1813fa967a135ffcc1d71
-    .codeium/windsurf/skills/brainstorming/SKILL.md: sha256:e14914605f640e0841758e45d0ab2a53243b59b921f929e47921c99668f2e61d
-    .codeium/windsurf/skills/brainstorming/scripts/frame-template.html: sha256:6a8a4e58bd6a44b904e2e3c57de774481d909204597e1498de53f1b2fecc4c4e
-    .codeium/windsurf/skills/brainstorming/scripts/helper.js: sha256:43c6d69954a46ec34a2a262bcc62a9a7e83e839c739f199cb72646d397c686e3
-    .codeium/windsurf/skills/brainstorming/scripts/server.cjs: sha256:2d2961ea8d11f56c5f4c3a1a68d22709efa5d7601a2246d8c880774e7e9e8412
-    .codeium/windsurf/skills/brainstorming/scripts/start-server.sh: sha256:a4e5ae84275bcaacd2f84345afeabe59cf7b00ba080e123da7cc1fb226f12847
-    .codeium/windsurf/skills/brainstorming/scripts/stop-server.sh: sha256:0b5ccbbd57f62d3ed88993f7940b5ee0e5c0fc9b21c550c623da4f6292e47daf
-    .codeium/windsurf/skills/brainstorming/spec-document-reviewer-prompt.md: sha256:95a0a195de9d984be2fffa95bab16fc8c563bc296a9cfc5e9c29cb3ece0d7457
-    .codeium/windsurf/skills/brainstorming/visual-companion.md: sha256:60cbad29b9dd7eaf08da020e301c498a72230b2e13c1813fa967a135ffcc1d71
+    .codeium/windsurf/skills/brainstorming/SKILL.md: sha256:bba47904a7f6bbee3bf8a107ebbe84e65d392be683bbb898ded736b29e415f90
+    .codeium/windsurf/skills/brainstorming/scripts/frame-template.html: sha256:fb22ba9d47f3b83b56e0a95d52a3c2727db03b0d4365078d92c850293a62457b
+    .codeium/windsurf/skills/brainstorming/scripts/helper.js: sha256:e763d82f32b4ebb320be2f0d08449d3e5a0585778edf5c407c1fdab3f39976a5
+    .codeium/windsurf/skills/brainstorming/scripts/server.cjs: sha256:ea81185f581897c67d4b417eeb9bc7a158c50e0932c73047054fe53efc2683ef
+    .codeium/windsurf/skills/brainstorming/scripts/start-server.sh: sha256:3442a54b5ee5511637d27bf696e092b72f94c2324f40b5ba4410da4dd0c23bc8
+    .codeium/windsurf/skills/brainstorming/scripts/stop-server.sh: sha256:f65b7634a27343eab2086bdb6c59ba78695685f471b5a577b08a8817f7c50600
+    .codeium/windsurf/skills/brainstorming/spec-document-reviewer-prompt.md: sha256:12cb5ed58aef41b8da6fbb505547c71ca3f5658c83b66ca6e556c936308b3189
+    .codeium/windsurf/skills/brainstorming/visual-companion.md: sha256:a2bc6fc47d0df1df981d02f707a16225b147f462e7059175ad2bc5e6dd29fcae
   content_hash: sha256:023a0d70eaee0e69a68cb867f2028cf1a7679001f5bd432b7e81aa330a44f06c
 - repo_url: obra/superpowers
   host: github.com
@@ -3426,7 +3554,7 @@ dependencies:
   deployed_file_hashes:
     .agents/skills/dispatching-parallel-agents/SKILL.md: sha256:f0df13f584049059cc5619f90061405b89dcc6e28ab3f2a8517d27d99c7a46a6
     .claude/skills/dispatching-parallel-agents/SKILL.md: sha256:f0df13f584049059cc5619f90061405b89dcc6e28ab3f2a8517d27d99c7a46a6
-    .codeium/windsurf/skills/dispatching-parallel-agents/SKILL.md: sha256:f0df13f584049059cc5619f90061405b89dcc6e28ab3f2a8517d27d99c7a46a6
+    .codeium/windsurf/skills/dispatching-parallel-agents/SKILL.md: sha256:76806091c7f923ba2596546b19cccd98a08e57a68745df77c3a7b998fe838e2b
   content_hash: sha256:85df55d2235a7623b315dac4bc340c14a37dcdc57c869c80a829e1a53a174689
 - repo_url: obra/superpowers
   host: github.com
@@ -3444,7 +3572,7 @@ dependencies:
   deployed_file_hashes:
     .agents/skills/executing-plans/SKILL.md: sha256:b357c2a2e5bf24adf237b5d4a83cacd828f07b886d0873ad91546aa3c99905c9
     .claude/skills/executing-plans/SKILL.md: sha256:b357c2a2e5bf24adf237b5d4a83cacd828f07b886d0873ad91546aa3c99905c9
-    .codeium/windsurf/skills/executing-plans/SKILL.md: sha256:b357c2a2e5bf24adf237b5d4a83cacd828f07b886d0873ad91546aa3c99905c9
+    .codeium/windsurf/skills/executing-plans/SKILL.md: sha256:e2102f11631433939f162d383d769f8257d859d6639e0e14969cda3ef0a95eca
   content_hash: sha256:d3e5b64b97d4713e3a7f33625cae12ed9305898d85a1c6309f46765c39a9d789
 - repo_url: obra/superpowers
   host: github.com
@@ -3462,7 +3590,7 @@ dependencies:
   deployed_file_hashes:
     .agents/skills/finishing-a-development-branch/SKILL.md: sha256:e6d4a812de900d33c6eacfb40747f99427f25c304a7b7099120f9373b115a47f
     .claude/skills/finishing-a-development-branch/SKILL.md: sha256:e6d4a812de900d33c6eacfb40747f99427f25c304a7b7099120f9373b115a47f
-    .codeium/windsurf/skills/finishing-a-development-branch/SKILL.md: sha256:e6d4a812de900d33c6eacfb40747f99427f25c304a7b7099120f9373b115a47f
+    .codeium/windsurf/skills/finishing-a-development-branch/SKILL.md: sha256:5c8d4b59aedb14c94e2f5d787a3265e858e8f53d4ceffe7ff1c15878a52b0e91
   content_hash: sha256:aa2632ed96df59c36348bd8f8ec1ff0fb0c5cc68b60691834687bf4cedc6be3f
 - repo_url: obra/superpowers
   host: github.com
@@ -3480,7 +3608,7 @@ dependencies:
   deployed_file_hashes:
     .agents/skills/receiving-code-review/SKILL.md: sha256:647036bbdab7bf2317e14e079595e984c9030f64295e2b4c0fb57dbeb48f25dd
     .claude/skills/receiving-code-review/SKILL.md: sha256:647036bbdab7bf2317e14e079595e984c9030f64295e2b4c0fb57dbeb48f25dd
-    .codeium/windsurf/skills/receiving-code-review/SKILL.md: sha256:647036bbdab7bf2317e14e079595e984c9030f64295e2b4c0fb57dbeb48f25dd
+    .codeium/windsurf/skills/receiving-code-review/SKILL.md: sha256:c9382e92b8f32363566068ecfed19d3b2651eaf40d3942b24840f839dedfc406
   content_hash: sha256:3f56080356c62e4f74a183d7371686babc661e41a952dc67a97c2c76fe8a9329
 - repo_url: obra/superpowers
   host: github.com
@@ -3503,8 +3631,8 @@ dependencies:
     .agents/skills/requesting-code-review/code-reviewer.md: sha256:b2f2ec7596925fe52dac158fdfbca19b3a7d779d619c481e6706a6c0001662d3
     .claude/skills/requesting-code-review/SKILL.md: sha256:1017ccdd5bc61fab67c654cf118cbdb520464b313073a0a6b9a6b9aa647a3ad6
     .claude/skills/requesting-code-review/code-reviewer.md: sha256:b2f2ec7596925fe52dac158fdfbca19b3a7d779d619c481e6706a6c0001662d3
-    .codeium/windsurf/skills/requesting-code-review/SKILL.md: sha256:1017ccdd5bc61fab67c654cf118cbdb520464b313073a0a6b9a6b9aa647a3ad6
-    .codeium/windsurf/skills/requesting-code-review/code-reviewer.md: sha256:b2f2ec7596925fe52dac158fdfbca19b3a7d779d619c481e6706a6c0001662d3
+    .codeium/windsurf/skills/requesting-code-review/SKILL.md: sha256:5a3a44a3667800e2dc836829c6b92fada51e6dc58ac144ec05fe59f47d6bcd84
+    .codeium/windsurf/skills/requesting-code-review/code-reviewer.md: sha256:595d91d05d5ecba530bd52e1e53c5173d820ab5d4bc223eb7820d69a9ab1c403
   content_hash: sha256:c9c9a81cdba20d04d29acdd6d456ab309e2db776e547b4008c459983e5fd7f83
 - repo_url: obra/superpowers
   host: github.com
@@ -3527,10 +3655,9 @@ dependencies:
   - .claude/skills/subagent-driven-development/task-reviewer-prompt.md
   - .codeium/windsurf/skills/subagent-driven-development
   - .codeium/windsurf/skills/subagent-driven-development/SKILL.md
+  - .codeium/windsurf/skills/subagent-driven-development/code-quality-reviewer-prompt.md
   - .codeium/windsurf/skills/subagent-driven-development/implementer-prompt.md
-  - .codeium/windsurf/skills/subagent-driven-development/scripts/review-package
-  - .codeium/windsurf/skills/subagent-driven-development/scripts/task-brief
-  - .codeium/windsurf/skills/subagent-driven-development/task-reviewer-prompt.md
+  - .codeium/windsurf/skills/subagent-driven-development/spec-reviewer-prompt.md
   deployed_file_hashes:
     .agents/skills/subagent-driven-development/SKILL.md: sha256:d6b0873771ea957f36ad43faaa936301b83b1788b3ee790b1ce39bf389bce386
     .agents/skills/subagent-driven-development/implementer-prompt.md: sha256:49018b28dc11bc9f3d13a28959bb10ae1a96eabc5d8f19f4079d901f9ff2bf64
@@ -3542,11 +3669,10 @@ dependencies:
     .claude/skills/subagent-driven-development/scripts/review-package: sha256:74d14b38a5bae7e52c2ce930e02140d8dfc6f77417ce76bc3857892c4fe833b9
     .claude/skills/subagent-driven-development/scripts/task-brief: sha256:c4b830094d64bb512ffde664fba57bbdd642632a09b7df75481f00005d2e7440
     .claude/skills/subagent-driven-development/task-reviewer-prompt.md: sha256:2eb9d54373420de25bc0bd00635d3a3123a6c0eb30c881168e6f3348e2387331
-    .codeium/windsurf/skills/subagent-driven-development/SKILL.md: sha256:d6b0873771ea957f36ad43faaa936301b83b1788b3ee790b1ce39bf389bce386
-    .codeium/windsurf/skills/subagent-driven-development/implementer-prompt.md: sha256:49018b28dc11bc9f3d13a28959bb10ae1a96eabc5d8f19f4079d901f9ff2bf64
-    .codeium/windsurf/skills/subagent-driven-development/scripts/review-package: sha256:74d14b38a5bae7e52c2ce930e02140d8dfc6f77417ce76bc3857892c4fe833b9
-    .codeium/windsurf/skills/subagent-driven-development/scripts/task-brief: sha256:c4b830094d64bb512ffde664fba57bbdd642632a09b7df75481f00005d2e7440
-    .codeium/windsurf/skills/subagent-driven-development/task-reviewer-prompt.md: sha256:2eb9d54373420de25bc0bd00635d3a3123a6c0eb30c881168e6f3348e2387331
+    .codeium/windsurf/skills/subagent-driven-development/SKILL.md: sha256:905a2b9be59b734dbe166525ad31dcaaf712a75926135adee1f554557aba5744
+    .codeium/windsurf/skills/subagent-driven-development/code-quality-reviewer-prompt.md: sha256:2eeb3bf63fccfbee042812dc94e7032048603f0f8c3827b4b53af9e4cef19b30
+    .codeium/windsurf/skills/subagent-driven-development/implementer-prompt.md: sha256:a416193f881e5a712c988fffabfe1d5a97bffcd091eb95577c84fe2136588617
+    .codeium/windsurf/skills/subagent-driven-development/spec-reviewer-prompt.md: sha256:631980e472eec5394de8b89b69d432e54fd3f7f523ecf9afa7eb4cda0c9b2baf
   content_hash: sha256:b48887969991dd0fd485acb7f6cfd9a279d7ec4c9bccf57e697cca798967a145
 - repo_url: obra/superpowers
   host: github.com
@@ -3615,7 +3741,7 @@ dependencies:
     .claude/skills/systematic-debugging/test-pressure-2.md: sha256:b2030aeffba07050e8ad573ddf87486457c4a016a786bb326235bebd856f2016
     .claude/skills/systematic-debugging/test-pressure-3.md: sha256:96b50a52e2c7989c9cf20fb752c47c1e9a3a70dc362f8f7989f8f5b64dac7708
     .codeium/windsurf/skills/systematic-debugging/CREATION-LOG.md: sha256:c24733a5b1821bd6bed1fc950261f0b9f4e90097e0bbb96459d8179713730789
-    .codeium/windsurf/skills/systematic-debugging/SKILL.md: sha256:3b20719eca4f0461cb51a195221320d775dcf03b6859271066a03a5132a6ce7a
+    .codeium/windsurf/skills/systematic-debugging/SKILL.md: sha256:4999cb851360485eca5074e727bbdd62ef20549c5d5b01216fcbf5831badb473
     .codeium/windsurf/skills/systematic-debugging/condition-based-waiting-example.ts: sha256:40ae5ebe497fdf310200e43fe986552546d0a22837c0d39e855db1cfd33eb88e
     .codeium/windsurf/skills/systematic-debugging/condition-based-waiting.md: sha256:e89fec8400d6cd50f43407cec9fab50976ba4d55d0ec2eb51c0bd68036b54c26
     .codeium/windsurf/skills/systematic-debugging/defense-in-depth.md: sha256:1e175fb86fc357e58c6aebf5441e481e1b7868b4380c0456b63a17eefbd18ba7
@@ -3647,7 +3773,7 @@ dependencies:
     .agents/skills/test-driven-development/testing-anti-patterns.md: sha256:bde453bc258f06543987477c837939afaa774ea2acbd9f308d702fc452bc4283
     .claude/skills/test-driven-development/SKILL.md: sha256:b5b4717b8b761cce15a6cfe9022e33fd959e0894c0c39d72c9cb49c23486c10e
     .claude/skills/test-driven-development/testing-anti-patterns.md: sha256:bde453bc258f06543987477c837939afaa774ea2acbd9f308d702fc452bc4283
-    .codeium/windsurf/skills/test-driven-development/SKILL.md: sha256:b5b4717b8b761cce15a6cfe9022e33fd959e0894c0c39d72c9cb49c23486c10e
+    .codeium/windsurf/skills/test-driven-development/SKILL.md: sha256:7dee67b4af6bdccc7a914ca34533184d64592d0f5b23aeae631538168db14994
     .codeium/windsurf/skills/test-driven-development/testing-anti-patterns.md: sha256:bde453bc258f06543987477c837939afaa774ea2acbd9f308d702fc452bc4283
   content_hash: sha256:eee144aea35d783296d178017e9fe843c6d16cc8b240e106f5e50910f6caf329
 - repo_url: obra/superpowers
@@ -3666,7 +3792,7 @@ dependencies:
   deployed_file_hashes:
     .agents/skills/using-git-worktrees/SKILL.md: sha256:e2c3ec142e52868a51af246c620cd76ab648dcf27d6900d47e6ffd07159a9794
     .claude/skills/using-git-worktrees/SKILL.md: sha256:e2c3ec142e52868a51af246c620cd76ab648dcf27d6900d47e6ffd07159a9794
-    .codeium/windsurf/skills/using-git-worktrees/SKILL.md: sha256:e2c3ec142e52868a51af246c620cd76ab648dcf27d6900d47e6ffd07159a9794
+    .codeium/windsurf/skills/using-git-worktrees/SKILL.md: sha256:085a45ee3de432bdb2768011591d9a882cb6c759e2317f379226451c5618fe8e
   content_hash: sha256:212ad917e5543e84ea3adf4e3fab537675db976fdab05d4de432870e38b49e80
 - repo_url: obra/superpowers
   host: github.com
@@ -3693,12 +3819,9 @@ dependencies:
   - .claude/skills/using-superpowers/references/pi-tools.md
   - .codeium/windsurf/skills/using-superpowers
   - .codeium/windsurf/skills/using-superpowers/SKILL.md
-  - .codeium/windsurf/skills/using-superpowers/references/antigravity-tools.md
-  - .codeium/windsurf/skills/using-superpowers/references/claude-code-tools.md
   - .codeium/windsurf/skills/using-superpowers/references/codex-tools.md
   - .codeium/windsurf/skills/using-superpowers/references/copilot-tools.md
   - .codeium/windsurf/skills/using-superpowers/references/gemini-tools.md
-  - .codeium/windsurf/skills/using-superpowers/references/pi-tools.md
   deployed_file_hashes:
     .agents/skills/using-superpowers/SKILL.md: sha256:918562bbba1c73d1407c50de77a92eeaa6930508bdb57a64324d7d508a9069e1
     .agents/skills/using-superpowers/references/antigravity-tools.md: sha256:00b16e8e8166d972766613c4244a7901d0413af37944741a8b8f40105f9f7f05
@@ -3714,13 +3837,10 @@ dependencies:
     .claude/skills/using-superpowers/references/copilot-tools.md: sha256:9627943f22c8db64ac7fbac3b6e399f73650a5cf3618f7966e802e7fa58d4595
     .claude/skills/using-superpowers/references/gemini-tools.md: sha256:62b9157bcb0ee3c6784e3d0da0798ddfa5872f9e0c34bea48f3079dabea71965
     .claude/skills/using-superpowers/references/pi-tools.md: sha256:e89e2d5c7b89cdd2a511aa7ad3c191290baaaed8913006c30f283ac7c4b091fb
-    .codeium/windsurf/skills/using-superpowers/SKILL.md: sha256:918562bbba1c73d1407c50de77a92eeaa6930508bdb57a64324d7d508a9069e1
-    .codeium/windsurf/skills/using-superpowers/references/antigravity-tools.md: sha256:00b16e8e8166d972766613c4244a7901d0413af37944741a8b8f40105f9f7f05
-    .codeium/windsurf/skills/using-superpowers/references/claude-code-tools.md: sha256:7d9244dd278db15caa8f9f86bda0546c91fc65163f94b2499999fc72b69c3666
-    .codeium/windsurf/skills/using-superpowers/references/codex-tools.md: sha256:cbce77a3a430688ef0cc3c8f03d17d2df1a2c78603e8b138cec522b74d75e4ab
-    .codeium/windsurf/skills/using-superpowers/references/copilot-tools.md: sha256:9627943f22c8db64ac7fbac3b6e399f73650a5cf3618f7966e802e7fa58d4595
-    .codeium/windsurf/skills/using-superpowers/references/gemini-tools.md: sha256:62b9157bcb0ee3c6784e3d0da0798ddfa5872f9e0c34bea48f3079dabea71965
-    .codeium/windsurf/skills/using-superpowers/references/pi-tools.md: sha256:e89e2d5c7b89cdd2a511aa7ad3c191290baaaed8913006c30f283ac7c4b091fb
+    .codeium/windsurf/skills/using-superpowers/SKILL.md: sha256:316e29381219adf0cac62190c67aeabf427d6e6e5f2735541d502b3d339be7aa
+    .codeium/windsurf/skills/using-superpowers/references/codex-tools.md: sha256:37e06103a352516dcec2eb326f990d50c6728b571135cc7b54cbbb8902c451e0
+    .codeium/windsurf/skills/using-superpowers/references/copilot-tools.md: sha256:9fb400a432d31494c6d764506f04227c4b8d89e27a09f84da9cc2b75998f2db6
+    .codeium/windsurf/skills/using-superpowers/references/gemini-tools.md: sha256:a66092fb2dd2c69b6b6d1098feaf456614521fd7b887cf7cb4160c8040ed1d62
   content_hash: sha256:706d18ac7fb547253d6aad918542eb1e225d72f3cd83497508f39f51aeea701b
 - repo_url: obra/superpowers
   host: github.com
@@ -3761,8 +3881,8 @@ dependencies:
     .agents/skills/writing-plans/plan-document-reviewer-prompt.md: sha256:aa728b96aad603c8be28875a4305637f6c984aa81ffcadcb13e743202fa2a0c7
     .claude/skills/writing-plans/SKILL.md: sha256:272e1af349f5062c28dc282b3e21b220d58d683a7314a10c455b7432ec91d845
     .claude/skills/writing-plans/plan-document-reviewer-prompt.md: sha256:aa728b96aad603c8be28875a4305637f6c984aa81ffcadcb13e743202fa2a0c7
-    .codeium/windsurf/skills/writing-plans/SKILL.md: sha256:272e1af349f5062c28dc282b3e21b220d58d683a7314a10c455b7432ec91d845
-    .codeium/windsurf/skills/writing-plans/plan-document-reviewer-prompt.md: sha256:aa728b96aad603c8be28875a4305637f6c984aa81ffcadcb13e743202fa2a0c7
+    .codeium/windsurf/skills/writing-plans/SKILL.md: sha256:4fd4627d2c02367879c0307d7249270bed633317ff9be82e926a6d57bf5d331b
+    .codeium/windsurf/skills/writing-plans/plan-document-reviewer-prompt.md: sha256:6fce2aa83c63715697e9dd86050c820716100b91efbd9f12bab8477ecc060256
   content_hash: sha256:56ce74d3f05986ea81295d3789adb71bf03845d05d182883fc5e56bf367c6af7
 - repo_url: obra/superpowers
   host: github.com
@@ -3810,11 +3930,11 @@ dependencies:
     .claude/skills/writing-skills/persuasion-principles.md: sha256:a51bc9bf75189ea73a27b3fb504a2fdfdb966fb1f7f1cdf03203230a216ccc03
     .claude/skills/writing-skills/render-graphs.js: sha256:ccda971a87bb185f8febf81c56b556a20d026fa980c17b35fa3e8824fbb37852
     .claude/skills/writing-skills/testing-skills-with-subagents.md: sha256:c711346852c911b24a84aa161e0cff06a4cd7f4e2fa9e9c0a266cead5afcbade
-    .codeium/windsurf/skills/writing-skills/SKILL.md: sha256:f01f666a4426ce800d40649704104c252e6607c196656e5ce6a28e9f51650f3a
-    .codeium/windsurf/skills/writing-skills/anthropic-best-practices.md: sha256:217629b356c09c9bd11017c9788e8fc654ca1b32c92d4a51cd490e16dd65e59a
+    .codeium/windsurf/skills/writing-skills/SKILL.md: sha256:38ba648975ae6ba512d6695676f146163db61a496b867f716f4bdfb0ee3aca3e
+    .codeium/windsurf/skills/writing-skills/anthropic-best-practices.md: sha256:20914c2fda31670c75fe91710e18a53d413ce0d00b5102acfa251d75c9226e3f
     .codeium/windsurf/skills/writing-skills/examples/CLAUDE_MD_TESTING.md: sha256:0b379a3415e185d3c434b3ad283d8aa132f3022c2a4f210f168865b5986bcef0
     .codeium/windsurf/skills/writing-skills/graphviz-conventions.dot: sha256:e2890a593c91370e384b42f2f67b1a6232c9e69dddea7891a0c1c46d7b20b694
-    .codeium/windsurf/skills/writing-skills/persuasion-principles.md: sha256:a51bc9bf75189ea73a27b3fb504a2fdfdb966fb1f7f1cdf03203230a216ccc03
+    .codeium/windsurf/skills/writing-skills/persuasion-principles.md: sha256:c3c84f572a51dd8b6d4fc6e5cbdc2bc3b9e07ba381a45bdabfce7ad2894dd828
     .codeium/windsurf/skills/writing-skills/render-graphs.js: sha256:ccda971a87bb185f8febf81c56b556a20d026fa980c17b35fa3e8824fbb37852
     .codeium/windsurf/skills/writing-skills/testing-skills-with-subagents.md: sha256:c711346852c911b24a84aa161e0cff06a4cd7f4e2fa9e9c0a266cead5afcbade
   content_hash: sha256:a8e875abe97597fc217da7de313a8751a26109bf74f579d3de9389af6a0bef03
@@ -3892,7 +4012,7 @@ dependencies:
   content_hash: sha256:8e00d64a5cd9b4477e55c4a7ad0f02328ff1991ea93e2ac1fb7839b3891d3f2d
 - repo_url: openai/skills
   host: github.com
-  resolved_commit: a8924c2a35cfa290458852c4fad17c9133054c2e
+  resolved_commit: 972cb867affac58fda9afa76bb1a19b399a278cf
   virtual_path: skills/.curated/gh-address-comments
   is_virtual: true
   package_type: claude_skill
@@ -3940,7 +4060,7 @@ dependencies:
   content_hash: sha256:068d34fb59cb97a39aea3de1708877b6a01210d02fa7eda5e74fc8277ed52916
 - repo_url: openai/skills
   host: github.com
-  resolved_commit: a8924c2a35cfa290458852c4fad17c9133054c2e
+  resolved_commit: 972cb867affac58fda9afa76bb1a19b399a278cf
   virtual_path: skills/.curated/gh-fix-ci
   is_virtual: true
   package_type: claude_skill
@@ -4363,7 +4483,7 @@ dependencies:
     .codeium/windsurf/skills/agentic-actions-auditor/references/vector-g-eval-of-ai-output.md: sha256:b9a47a41dd1470cc469cc030cd6cd6059b35741c78ba9f494c1d18b2fd65b686
     .codeium/windsurf/skills/agentic-actions-auditor/references/vector-h-dangerous-sandbox-configs.md: sha256:278df9befc36f231dea2e4d2bf00311657056fa7b87a1a49b0e0e23a141d5935
     .codeium/windsurf/skills/agentic-actions-auditor/references/vector-i-wildcard-allowlists.md: sha256:68a4cd774ad829e535a8ec15ee492caefbae8e46f115f345b7f2bf2fecf88f86
-  content_hash: sha256:35bf879ba070ac4220027e3d1fcb13a816a56fa5919e8854bcc01bc2493f85c5
+  content_hash: sha256:68dfe0a1986f7a0a6cc55935bc0d6392b36b137c28f20280fead610e361e55b8
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: c070b9b5881183ea5f6e320ff06c46688becb13e
@@ -4503,7 +4623,7 @@ dependencies:
     .agents/skills/sharp-edges/references/lang-rust.md: sha256:3d14993ea70b2b2df3fc0f388cbd1631470895c27ccbd9d764296d1da8f5b6ee
     .agents/skills/sharp-edges/references/lang-swift.md: sha256:a64ab8692db0f3e43526088c63c7fdcb7354d1b24e6fe7ca759aea3260890e04
     .agents/skills/sharp-edges/references/language-specific.md: sha256:4522b4a37cfd7d3aa689209dfd4569f3b39074bd1f5987a36a6e819f501141b6
-    .claude/agents/sharp-edges-analyzer.md: sha256:0e2c575c16fbb4976abf7e6efadf03bfd5da2cb71df292f9e4bac9adb1333a43
+    .claude/agents/sharp-edges-analyzer.md: sha256:c9df773b4a8a56ed88179ef46b8b4eada44092fe4227a683d37bd5219bcbbdae
     .claude/skills/sharp-edges/SKILL.md: sha256:3b69a709c2f8f0cfcf57d40a3186e166f307865cc8ed924be4098e549a121e9c
     .claude/skills/sharp-edges/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
     .claude/skills/sharp-edges/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
@@ -4543,9 +4663,9 @@ dependencies:
     .codeium/windsurf/skills/sharp-edges/references/lang-swift.md: sha256:a64ab8692db0f3e43526088c63c7fdcb7354d1b24e6fe7ca759aea3260890e04
     .codeium/windsurf/skills/sharp-edges/references/language-specific.md: sha256:4522b4a37cfd7d3aa689209dfd4569f3b39074bd1f5987a36a6e819f501141b6
     .config/opencode/agents/sharp-edges-analyzer.md: sha256:c9df773b4a8a56ed88179ef46b8b4eada44092fe4227a683d37bd5219bcbbdae
-    .copilot/agents/sharp-edges-analyzer.agent.md: sha256:0e2c575c16fbb4976abf7e6efadf03bfd5da2cb71df292f9e4bac9adb1333a43
-    .cursor/agents/sharp-edges-analyzer.md: sha256:0e2c575c16fbb4976abf7e6efadf03bfd5da2cb71df292f9e4bac9adb1333a43
-  content_hash: sha256:045175d20165a9f00c35d12682ad06da8ed03b3de4a18b1f3ce5aca7f1987bb7
+    .copilot/agents/sharp-edges-analyzer.agent.md: sha256:c9df773b4a8a56ed88179ef46b8b4eada44092fe4227a683d37bd5219bcbbdae
+    .cursor/agents/sharp-edges-analyzer.md: sha256:c9df773b4a8a56ed88179ef46b8b4eada44092fe4227a683d37bd5219bcbbdae
+  content_hash: sha256:ba2f9f5f56543e1a970a63711c03c077bd776db90aa37caa5e6d119fc365f1a6
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: c070b9b5881183ea5f6e320ff06c46688becb13e
@@ -4691,7 +4811,7 @@ dependencies:
     .agents/skills/semgrep/references/scanner-task-prompt.md: sha256:67ae9626627ce3ea995638b9bfe02838dde817c7d446e1a97f04db60c66dc04a
     .agents/skills/semgrep/scripts/merge_sarif.py: sha256:3a1ceeaf0ce12279e159424eaebeec8c5020f9b8031d87c0759b5d53f2ff0070
     .agents/skills/semgrep/workflows/scan-workflow.md: sha256:de63106a525417b13b180891bbf817d23e616682175767cb833ff70c81bfaa8e
-    .claude/agents/semgrep-scanner.md: sha256:7cfc591279139489dddcc86133b630dc860c0038680470c08afb6ea1ecde20a3
+    .claude/agents/semgrep-scanner.md: sha256:26d412799ad8e549ca2fbe1f93536e66f222feb6a0ae78e0a286947ba5e3f416
     .claude/skills/codeql/SKILL.md: sha256:b88b4f0b2044ed9abb7c42e6c2a0413ac66e5eb1a3a02fefe5c32725851fcd16
     .claude/skills/codeql/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
     .claude/skills/codeql/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
@@ -4755,9 +4875,9 @@ dependencies:
     .codeium/windsurf/skills/semgrep/scripts/merge_sarif.py: sha256:3a1ceeaf0ce12279e159424eaebeec8c5020f9b8031d87c0759b5d53f2ff0070
     .codeium/windsurf/skills/semgrep/workflows/scan-workflow.md: sha256:de63106a525417b13b180891bbf817d23e616682175767cb833ff70c81bfaa8e
     .config/opencode/agents/semgrep-scanner.md: sha256:26d412799ad8e549ca2fbe1f93536e66f222feb6a0ae78e0a286947ba5e3f416
-    .copilot/agents/semgrep-scanner.agent.md: sha256:7cfc591279139489dddcc86133b630dc860c0038680470c08afb6ea1ecde20a3
-    .cursor/agents/semgrep-scanner.md: sha256:7cfc591279139489dddcc86133b630dc860c0038680470c08afb6ea1ecde20a3
-  content_hash: sha256:8dc951df0750173dce842d94908683fa2b9a37625ac17a0cf38140ea48f818c5
+    .copilot/agents/semgrep-scanner.agent.md: sha256:26d412799ad8e549ca2fbe1f93536e66f222feb6a0ae78e0a286947ba5e3f416
+    .cursor/agents/semgrep-scanner.md: sha256:26d412799ad8e549ca2fbe1f93536e66f222feb6a0ae78e0a286947ba5e3f416
+  content_hash: sha256:277d6297889fb95764c30a3e5abdb15746d8539216454064d69b74a0f204eff3
 - repo_url: trailofbits/skills
   host: github.com
   resolved_commit: c070b9b5881183ea5f6e320ff06c46688becb13e

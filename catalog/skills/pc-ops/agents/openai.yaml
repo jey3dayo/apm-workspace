@@ -1,0 +1,4 @@
+interface:
+  display_name: "PC Ops"
+  short_description: "Diagnose and stabilize local PC slowdowns."
+  default_prompt: "Use $pc-ops to investigate this local PC slowdown and propose safe fixes first."

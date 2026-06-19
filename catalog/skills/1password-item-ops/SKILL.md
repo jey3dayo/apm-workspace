@@ -11,16 +11,19 @@ Use this skill to manage 1Password items through `op` while keeping secrets out 
 
 - Default vault: `Personal`.
 - If the user names a vault, use that vault exactly. For automation-only tasks, `Automation` is a common explicit vault.
-- Prefer an existing authenticated `op` session. If none exists, prefer these authentication sources in order:
+- Prefer the signed-in 1Password account or app integration when available. Use `--account <account-id-or-shorthand>` when the account is known.
+- If no signed-in account or app integration is available, prefer these authentication sources in order:
   1. A dotenvx-managed `OP_SERVICE_ACCOUNT_TOKEN` when the repo or user points to `.env` / `.env.keys`.
   2. `OP_SERVICE_ACCOUNT_TOKEN_FILE` when the user provides a token file path.
   3. Manual sign-in only when the user explicitly asks.
+- Homelab default dotenvx env file: `/home/pi/.config/.env`.
 - For dotenvx-managed service accounts, shape commands as:
 
 ```bash
 dotenvx run -f <env-file> -fk <env-keys-file> -- op <command>
 ```
 
+- Do not create or rely on a plaintext homelab token cache under `/home/pi/.config/op/`; the bootstrap token belongs in `/home/pi/.config/.env` as an encrypted dotenvx value.
 - If `Personal` matches multiple vaults, run `op vault list --format json`, identify the likely personal vault ID, and confirm before changing anything when ambiguity remains.
 - Do not install public 1Password skills or new credential tooling unless the user explicitly asks.
 - For service accounts, verify create/edit permission before changing items; successful list/read commands only prove read access.
@@ -92,8 +95,115 @@ For license or credential values, do not pass the real secret as an assignment a
 
 Use `Login` for sign-in credentials, `Secure Note` for free-form recovery or setup notes, and `API Credential` for service tokens or API keys unless existing 1Password categories in the vault suggest a better match.
 
+## Hermes Codex App Token Rotation
+
+Use this when rotating the homelab Hermes Agent Codex app token from 1Password into the Kubernetes Pod. The current source item is:
+
+- Vault: `Automation` (`6jathgtxvuygms2t4xt4pjgooe`)
+- Item: `Codex Access Token` (`c76zdom3zpwl2l6fnc72oyc7ey`)
+- Secret field: `Access Token`
+- Hermes profile: `/opt/data/profiles/codex`
+
+Rules:
+
+- Treat 1Password as the source of truth.
+- Treat `/home/pi/.config/.env` as the source for the 1Password service-account bootstrap token. `OP_SERVICE_ACCOUNT_TOKEN` should be `encrypted:` there.
+- Never write the token to the repository, shell history, or logs.
+- Prefer item and vault IDs over names for automation.
+- Pipe the secret through stdin directly into the Pod.
+- Back up `/opt/data/profiles/codex/auth.json` before replacing the `openai-codex` credential.
+- Verify only non-secret metadata: credential label, auth type, model count, and model names.
+- The app token is not a refresh-token OAuth session. If it expires, update the 1Password item and run the rotation again.
+
+Safe read pattern:
+
+```bash
+dotenvx run -f /home/pi/.config/.env -- \
+  op read "op://6jathgtxvuygms2t4xt4pjgooe/c76zdom3zpwl2l6fnc72oyc7ey/Access Token"
+```
+
+Rotation command pattern:
+
+```bash
+dotenvx run -f /home/pi/.config/.env -- \
+  op read "op://6jathgtxvuygms2t4xt4pjgooe/c76zdom3zpwl2l6fnc72oyc7ey/Access Token" | \
+python3 -c 'import sys
+for line in sys.stdin.read().splitlines():
+    if line.startswith("[dotenvx]") or line.startswith("⟐"):
+        continue
+    print(line)' | \
+kubectl -n hermes-agent exec -i deployment/hermes-agent -c hermes-agent -- \
+  sh -lc 'umask 077; token=/tmp/hermes-codex-app-token; cat > "$token"; \
+  HERMES_HOME=/opt/data/profiles/codex /opt/hermes/.venv/bin/python - "$token" <<'"'"'PY'"'"'
+from pathlib import Path
+from datetime import datetime, timezone
+import shutil, sys, uuid
+
+from agent.credential_pool import (
+    AUTH_TYPE_API_KEY,
+    SOURCE_MANUAL,
+    PooledCredential,
+    load_pool,
+)
+from hermes_cli.auth import DEFAULT_CODEX_BASE_URL
+
+profile = Path("/opt/data/profiles/codex")
+backup_dir = (
+    Path("/opt/data/backups/codex-token-import")
+    / datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+)
+backup_dir.mkdir(parents=True, exist_ok=True)
+auth_path = profile / "auth.json"
+if auth_path.exists():
+    shutil.copy2(auth_path, backup_dir / "auth.json")
+
+token_path = Path(sys.argv[1])
+token = token_path.read_text(encoding="utf-8").strip()
+if not token or not token.startswith("at-"):
+    raise SystemExit("token_invalid")
+
+pool = load_pool("openai-codex")
+pool._entries = [
+    e for e in pool.entries()
+    if not (e.provider == "openai-codex" and e.label == "codex-app-token")
+]
+pool.add_entry(PooledCredential(
+    provider="openai-codex",
+    id=uuid.uuid4().hex[:6],
+    label="codex-app-token",
+    auth_type=AUTH_TYPE_API_KEY,
+    priority=0,
+    source=f"{SOURCE_MANUAL}:dotenvx-1password",
+    access_token=token,
+    base_url=DEFAULT_CODEX_BASE_URL,
+))
+token_path.unlink(missing_ok=True)
+print("backup_dir=" + str(backup_dir))
+print("credential_label=codex-app-token")
+PY'
+```
+
+Verification pattern:
+
+```bash
+kubectl -n hermes-agent exec deployment/hermes-agent -c hermes-agent -- \
+  sh -lc 'HERMES_HOME=/opt/data/profiles/codex /opt/hermes/.venv/bin/python - <<'"'"'PY'"'"'
+from agent.credential_pool import load_pool
+from hermes_cli.models import provider_model_ids
+
+pool = load_pool("openai-codex")
+entries = pool.entries()
+print("credential_count=" + str(len(entries)))
+print("labels=" + ",".join(e.label for e in entries))
+print("auth_types=" + ",".join(e.auth_type for e in entries))
+models = provider_model_ids("openai-codex", force_refresh=True)
+print("model_count=" + str(len(models)))
+print("models_head=" + ",".join(models[:8]))
+PY'
+```
+
 ## Failure Handling
 
 - If `op item edit` fails with `unsupported field type: ssoLogin`, stop retrying that approach and report that the item needs UI editing or a narrower CLI-safe update.
-- If authentication fails, check only whether the token file exists and whether `OP_SERVICE_ACCOUNT_TOKEN_FILE` is set. Do not print token contents.
+- If authentication fails, check only whether `/home/pi/.config/.env` contains the `OP_SERVICE_ACCOUNT_TOKEN` key and whether dotenvx can inject it. Do not print token contents.
 - After three failures with the same approach, stop and report the attempts, concrete errors, and a different next approach.
