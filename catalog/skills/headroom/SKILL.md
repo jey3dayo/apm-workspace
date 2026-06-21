@@ -34,7 +34,7 @@ Preferred package:
 
 ```toml
 [tools]
-"pipx:headroom-ai[mcp,proxy]" = "0.26.0"
+"pipx:headroom-ai" = { version = "0.26.0", extras = "mcp,proxy" }
 ```
 
 Place that tool only in OS-specific mise config files that target Windows, WSL, or macOS. Keep it out of `config.pi.toml`.
