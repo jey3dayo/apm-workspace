@@ -116,6 +116,20 @@ dependencies:
     .codeium/windsurf/skills/transitions-dev/SKILL.md: sha256:a62129f3a894a79678f60276ca34838b46357820639d5755cf932e390d1bb735
     .codeium/windsurf/skills/transitions-dev/_root.css: sha256:6ed248a269da79f623729708dabcc3719485d400615a0d91b9f5e9fd307aa33f
   content_hash: sha256:8cf9ba1ed0d52741e4ed1dafc6ee4543e32f1e516f958d750e81412bfc36dd13
+- repo_url: k16shikano/fd287c3133457c4fd8f5601d34aa817d
+  host: gist.github.com
+  resolved_commit: 5ed08e4475365fd233aa0d3ab71c19b87e1a5732
+  resolved_ref: 5ed08e4475365fd233aa0d3ab71c19b87e1a5732
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/fd287c3133457c4fd8f5601d34aa817d
+  - .agents/skills/fd287c3133457c4fd8f5601d34aa817d/SKILL.md
+  - .claude/skills/fd287c3133457c4fd8f5601d34aa817d
+  - .claude/skills/fd287c3133457c4fd8f5601d34aa817d/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/fd287c3133457c4fd8f5601d34aa817d/SKILL.md: sha256:e05525f4b78eedbe41a62b3078c408d7a2fbc96386be8af893b6b7d58e6941c0
+    .claude/skills/fd287c3133457c4fd8f5601d34aa817d/SKILL.md: sha256:e05525f4b78eedbe41a62b3078c408d7a2fbc96386be8af893b6b7d58e6941c0
+  content_hash: sha256:bc7c0b812df34be051a7887ee008f941f336c91fab5876ff0d11f8373c9366ad
 - repo_url: Lum1104/Understand-Anything
   host: github.com
   resolved_commit: f6a4fa36ccaf5b7edbc50d2006ee07beaf488c5e
