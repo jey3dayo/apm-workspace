@@ -1,6 +1,6 @@
 ---
 name: manga-feed-ops
-description: Use when adding, verifying, or troubleshooting manga chapter feeds for FreshRSS through the homelab `manga-feeds` service, especially Gangan ONLINE title IDs and routes such as `gangan-online/2619.xml`. Covers OPML generation/import, K3s service checks, FreshRSS registration checks, and avoiding changedetection.io for chapter-level manga feeds.
+description: Use when adding, verifying, quarantining, or troubleshooting manga chapter feeds for FreshRSS through the homelab `manga-feeds` service, especially Gangan ONLINE title IDs, ヤンマガWeb slugs, and routes such as `gangan-online/2619.xml` or `yanmaga/<slug>.xml`. Covers OPML generation/import, K3s service checks, FreshRSS registration checks, the temporary `changedetection.io` quarantine category, and avoiding changedetection.io RSS for chapter-level manga feeds.
 ---
 
 # Manga Feed Ops
@@ -9,22 +9,33 @@ description: Use when adding, verifying, or troubleshooting manga chapter feeds 
 
 Use this skill to add manga chapter feeds to FreshRSS via the homelab `manga-feeds` service. The expected outcome is one FreshRSS feed per manga title, where each chapter appears as a separate RSS item.
 
-Do not use changedetection.io RSS for this workflow; changedetection.io is only for coarse page-change alerts.
+Do not use changedetection.io RSS for this workflow; changedetection.io is only for coarse page-change alerts. While manga-feeds is still stabilizing, keep new manga-feeds subscriptions in the FreshRSS `changedetection.io` category as a quarantine area instead of the normal `Comic` category.
 
 ## Inputs
 
 Required:
 
 - FreshRSS user, usually `jey3dayo`.
-- FreshRSS category, usually `Comic`.
+- FreshRSS category. Use `changedetection.io` while the feed is still under observation; move stable feeds to `Comic` later.
 - Manga title for the FreshRSS feed name.
-- Gangan ONLINE title ID from a URL like `https://www.ganganonline.com/title/2619`.
+- Provider identifier: Gangan ONLINE title ID from `https://www.ganganonline.com/title/2619`, or ヤンマガWeb slug from `https://yanmaga.jp/comics/<slug>`.
 
 For Gangan ONLINE, the FreshRSS subscription URL is:
 
 ```text
 http://manga-feeds.freshrss.svc.cluster.local:8080/gangan-online/<title-id>.xml
 ```
+
+For ヤンマガWeb, the FreshRSS subscription URL is:
+
+```text
+http://manga-feeds.freshrss.svc.cluster.local:8080/yanmaga/<slug>.xml
+```
+
+Provider rule notes:
+
+- Gangan ONLINE: fetch the title page, read `__NEXT_DATA__.buildId`, fetch `/_next/data/<buildId>/title/<title-id>.json`, and emit `chapters[]`.
+- ヤンマガWeb: fetch `/comics/<slug>?sort=older`, parse `.mod-episode-item` entries, follow the page's `/episodes` XHR endpoint with `X-Requested-With: XMLHttpRequest` when a `mod-episode-more-button` is present, dedupe by episode URL, then sort by episode date.
 
 ## Workflow
 
@@ -34,23 +45,24 @@ http://manga-feeds.freshrss.svc.cluster.local:8080/gangan-online/<title-id>.xml
    kubectl -n freshrss get deployment,svc,pod -l app=manga-feeds
    kubectl -n freshrss run manga-feeds-check --rm -i --restart=Never \
      --image=curlimages/curl:8.11.1 -- \
-     curl -fsS http://manga-feeds:8080/gangan-online/<title-id>.xml
+     curl -fsS http://manga-feeds:8080/<provider>/<identifier>.xml
    ```
 
-2. Check whether the feed is already registered. Show only the matching line and do not dump the full OPML because existing feeds may contain private tokens:
+2. Check whether the feed is already registered and which category it is in. Show only the matching line and do not dump the full OPML because existing feeds may contain private tokens:
 
    ```bash
    kubectl -n freshrss exec deployment/freshrss -- sh -lc \
-     'php /var/www/FreshRSS/cli/export-opml-for-user.php --user <user> | grep -F "manga-feeds.freshrss.svc.cluster.local:8080/gangan-online/<title-id>.xml"'
+     'php /var/www/FreshRSS/cli/export-opml-for-user.php --user <user> | grep -F "manga-feeds.freshrss.svc.cluster.local:8080/<provider>/<identifier>.xml"'
    ```
 
 3. Generate an OPML import file with `scripts/generate_opml.py`:
 
    ```bash
    python3 scripts/generate_opml.py \
-     --title-id <title-id> \
+     --provider <gangan-online|yanmaga> \
+     --slug <title-id-or-slug> \
      --feed-title "<manga-title>" \
-     --category Comic \
+     --category changedetection.io \
      --output /tmp/manga-feed.opml
    ```
 
@@ -77,14 +89,20 @@ http://manga-feeds.freshrss.svc.cluster.local:8080/gangan-online/<title-id>.xml
    Look for a log line like:
 
    ```text
-   FreshRSS SimplePie GET 200 http://manga-feeds.freshrss.svc.cluster.local:8080/gangan-online/<title-id>.xml
+   FreshRSS SimplePie GET 200 http://manga-feeds.freshrss.svc.cluster.local:8080/<provider>/<identifier>.xml
    ```
 
 6. Verify registration and article creation with non-secret metadata only. FreshRSS containers may not have `sqlite3`, so use PHP PDO:
 
    ```bash
-   kubectl -n freshrss exec "$pod" -- php -r '$db=new PDO("sqlite:/var/www/FreshRSS/data/users/<user>/db.sqlite"); foreach($db->query("select name,url from feed where url like \"%manga-feeds.freshrss.svc.cluster.local%<title-id>.xml%\"") as $r){echo $r["name"]."|".$r["url"]."\n";}'
+   kubectl -n freshrss exec "$pod" -- php -r '$db=new PDO("sqlite:/var/www/FreshRSS/data/users/<user>/db.sqlite"); foreach($db->query("select name,url from feed where url like \"%manga-feeds.freshrss.svc.cluster.local%<identifier>.xml%\"") as $r){echo $r["name"]."|".$r["url"]."\n";}'
    ```
+
+## Category Policy
+
+- Default new or experimental manga-feeds subscriptions to `changedetection.io` as a quarantine category.
+- After the feed has stayed stable, the user can move it to `Comic` from the FreshRSS UI.
+- Do not automatically move categories in the database unless the user explicitly asks. Category moves are user-facing organization changes.
 
 ## Scripts
 
