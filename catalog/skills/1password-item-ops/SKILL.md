@@ -27,6 +27,7 @@ dotenvx run -f <env-file> -fk <env-keys-file> -- op <command>
 - If `Personal` matches multiple vaults, run `op vault list --format json`, identify the likely personal vault ID, and confirm before changing anything when ambiguity remains.
 - Do not install public 1Password skills or new credential tooling unless the user explicitly asks.
 - For service accounts, verify create/edit permission before changing items; successful list/read commands only prove read access.
+- When a vault contains a service-account token item such as `Service Account Auth Token: <name>`, distinguish the bootstrap token used to read that item from the token stored in the item. If create/edit returns `(101) You do not have permission to perform this action`, read the token item into process memory with `op item get <item-id> --fields <concealed-field-id> --reveal`, verify only its prefix/length, and retry with that token as `OP_SERVICE_ACCOUNT_TOKEN`.
 
 ## Workflow
 
@@ -63,6 +64,17 @@ dotenvx run -f .env -fk .env.keys -- op vault list
 ```
 
 Repo-specific policy: dotenvx-encrypted `.env` files may be intentionally committed when that repository follows that practice; `.env.keys` must remain ignored and should be stored as a 1Password file attachment.
+
+On Windows/PowerShell, dotenvx's PowerShell shim can misparse command options after `--`, especially when the target executable path contains spaces. If `op` options are reported as dotenvx options, use a process-local env injection instead of printing secrets:
+
+```powershell
+$env:OP_SERVICE_ACCOUNT_TOKEN = (dotenvx get OP_SERVICE_ACCOUNT_TOKEN -f .env --quiet)
+try {
+  & "$env:LOCALAPPDATA\Programs\1Password CLI\op.exe" vault list --format json
+} finally {
+  Remove-Item Env:OP_SERVICE_ACCOUNT_TOKEN -ErrorAction SilentlyContinue
+}
+```
 
 For `op item create` / `op item edit` with assignment arguments, protect against accidental JSON stdin parsing:
 
