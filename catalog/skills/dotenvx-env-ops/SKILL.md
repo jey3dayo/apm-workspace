@@ -64,6 +64,33 @@ dotenvx run -f .env.development -- pnpm dev
 dotenvx run -f .env.staging -- pnpm test
 ```
 
+When an encrypted `.env` has a separate `.env.keys` file, pass the key file before
+the env file for mutation and verification commands:
+
+```bash
+dotenvx set SLACK_BOT_TOKEN "$slack_token" -fk .env.keys -f .env
+dotenvx get SLACK_BOT_TOKEN -fk .env.keys -f .env >/dev/null
+```
+
+If `dotenvx set` fails with `MISPAIRED_PRIVATE_KEY`, do not assume the stored
+secrets are corrupt. First verify whether `.env`'s `DOTENV_PUBLIC_KEY` matches
+the public key derived from `.env.keys`, while printing only short prefixes:
+
+```bash
+env_public_prefix=$(
+  sed -n 's/^DOTENV_PUBLIC_KEY="\{0,1\}\([0-9a-f]\{8\}\).*/\1/p' .env
+)
+derived_public_prefix=$(
+  dotenvx keypair -fk .env.keys --format json |
+    python3 -c 'import json,sys; print(json.load(sys.stdin).get("DOTENV_PUBLIC_KEY","")[:8])'
+)
+printf 'env_public_prefix=%s\n' "$env_public_prefix"
+printf 'derived_public_prefix=%s\n' "$derived_public_prefix"
+```
+
+If the prefixes match, retry with `-fk .env.keys -f .env` ordering before
+rotating keys or replacing `.env.keys`.
+
 Check which keys exist without exposing values (`-o` prints only the matched key, never the value):
 
 ```bash
