@@ -57,7 +57,7 @@ Comprehensive quality assessment with structured evaluation:
 
 - ⭐️ 5-level evaluation system across multiple dimensions
 - Project type auto-detection (Go API, React SPA, Next.js fullstack, etc.)
-- Technology stack-specific skill integration (typescript, react, golang, security, etc.)
+- Technology stack-specific skill integration (typescript, golang, security, etc.)
 - Detailed improvement proposals with action plans
 - Impact analysis with Serena integration (optional)
 

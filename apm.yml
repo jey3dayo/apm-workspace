@@ -36,8 +36,6 @@ dependencies:
     - obra/superpowers/skills/brainstorming
     - obra/superpowers/skills/executing-plans
     - obra/superpowers/skills/finishing-a-development-branch
-    - obra/superpowers/skills/receiving-code-review
-    - obra/superpowers/skills/requesting-code-review
     - obra/superpowers/skills/subagent-driven-development
     - obra/superpowers/skills/systematic-debugging
     - obra/superpowers/skills/test-driven-development
@@ -57,7 +55,6 @@ dependencies:
     - trailofbits/skills/plugins/sharp-edges
     - trailofbits/skills/plugins/static-analysis
     - trailofbits/skills/plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor
-    - SawyerHood/dev-browser/skills/dev-browser
     - browser-use/browser-harness
     - vercel-labs/agent-browser/skills/agent-browser
     - vercel-labs/agent-skills/skills/composition-patterns

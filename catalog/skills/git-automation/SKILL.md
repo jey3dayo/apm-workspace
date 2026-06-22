@@ -299,7 +299,6 @@ def update_pull_request(pr_number, pr_title, pr_body):
 
 ### Dependent Skills
 
-- integration-framework (required): TaskContext standardization
 - code-quality-automation (recommended): Quality check integration
 - project-detector (required): Automatic project detection
 

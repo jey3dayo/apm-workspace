@@ -39,8 +39,8 @@ def detect_project_type():
 
 | プロジェクトタイプ | 判定基準                                       | 統合スキル                           |
 | ------------------ | ---------------------------------------------- | ------------------------------------ |
-| Next.js            | `next.config.js/mjs/ts` が存在                 | typescript, react, security          |
-| React SPA          | `package.json` に react、next なし             | typescript, react                    |
+| Next.js            | `next.config.js/mjs/ts` が存在                 | typescript, security                 |
+| React SPA          | `package.json` に react、next なし             | typescript                           |
 | Node.js API        | `package.json` に express/fastify/@nestjs/core | typescript, security                 |
 | Go API             | `go.mod` が存在                                | golang, security, clean-architecture |
 | Generic            | 上記のいずれにも該当しない                     | （基本スキルのみ）                   |
@@ -433,8 +433,8 @@ def load_skills_for_project(project_type):
     """Load tech-specific skills based on project type"""
 
     skills_map = {
-        "nextjs": ["typescript", "react", "security"],
-        "react-spa": ["typescript", "react"],
+        "nextjs": ["typescript", "security"],
+        "react-spa": ["typescript"],
         "nodejs-api": ["typescript", "security"],
         "go-api": ["golang", "security", "clean-architecture"]
     }

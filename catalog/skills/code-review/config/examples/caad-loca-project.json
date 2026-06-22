@@ -38,11 +38,6 @@
       "focus": ["type_safety", "any_elimination", "type_guards", "result_pattern"]
     },
     {
-      "name": "react",
-      "priority": "high",
-      "focus": ["hooks", "performance", "component_design"]
-    },
-    {
       "name": "clean-architecture",
       "priority": "high",
       "focus": ["layer_separation", "repository_pattern", "service_layer", "action_layer"]
@@ -65,7 +60,6 @@
     "guidelines": [
       "evaluation-guidelines.md",
       "typescript/guidelines.md",
-      "react/guidelines.md",
       "clean-architecture/guidelines.md",
       "security/guidelines.md",
       "caad-loca/patterns.md"

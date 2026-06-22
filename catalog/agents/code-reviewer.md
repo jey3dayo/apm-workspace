@@ -127,7 +127,7 @@ Provide comprehensive, actionable code reviews that elevate code quality through
 
 1. Check CLAUDE.md: Load project-specific conventions and requirements
 2. Review Guidelines: Apply project-specific review guidelines from `./.claude/review-guidelines.md` if exists
-3. Skills Integration: Automatically load technology-specific skills (typescript, golang, react, etc.)
+3. Skills Integration: Automatically load technology-specific skills (typescript, golang, security, etc.)
 4. History Analysis: Consider recent commits and review patterns
 5. Tech Stack Detection: Auto-detect and apply language/framework specifics
 
@@ -144,10 +144,8 @@ def select_review_guidelines():
     elif detect_language() == "go":
         guidelines.extend(load_skill("golang"))
 
-    # Framework-specific (via Skills system)
-    if uses_framework("react"):
-        guidelines.extend(load_skill("react"))
-    elif uses_framework("nextjs"):
+    # Framework-specific guidance
+    if uses_framework("nextjs"):
         guidelines.extend(["nextjs", "ssr-considerations"])
 
     # Project-specific review guidelines
