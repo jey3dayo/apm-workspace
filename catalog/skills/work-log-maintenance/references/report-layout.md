@@ -2,6 +2,8 @@
 
 Use these files under `tmp/work-log/` by default. Create only the files needed for the task, but prefer this naming when splitting an existing report.
 
+When reorganizing an existing all-in-one report, migrate its content into the standard files and remove or replace the old duplicate file. Do not leave two files that both look like the primary report.
+
 ## `report.md`
 
 Purpose: final manager-facing report.

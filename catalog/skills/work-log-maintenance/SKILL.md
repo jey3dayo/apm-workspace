@@ -61,6 +61,7 @@ Use compact month/day notation when the year is obvious from context. Include th
 ## Update Rules
 
 - Update existing dates, themes, and periods in place. Avoid duplicate rows.
+- When splitting a legacy all-in-one report, replace it with the standard files instead of leaving a second source of truth behind. Keep a legacy file only when the user explicitly asks to preserve it.
 - If a theme name changes but evidence points to the same work, rename the existing period instead of adding a near-duplicate.
 - Keep `report.md` concise: no commit hashes, long bullet lists, raw logs, or methodology paragraphs.
 - Keep uncertainty in support files, not in the Slack-ready message, unless the uncertainty changes what should be reported.
