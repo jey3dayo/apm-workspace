@@ -1,0 +1,4 @@
+interface:
+  display_name: "Manga RSS Bridge"
+  short_description: "Use and maintain Manga RSS Bridge feeds"
+  default_prompt: "Use $manga-rss-bridge to add or verify a Manga RSS Bridge provider."
