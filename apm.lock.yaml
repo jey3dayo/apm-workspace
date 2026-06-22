@@ -116,7 +116,7 @@ dependencies:
     .codeium/windsurf/skills/transitions-dev/SKILL.md: sha256:a62129f3a894a79678f60276ca34838b46357820639d5755cf932e390d1bb735
     .codeium/windsurf/skills/transitions-dev/_root.css: sha256:6ed248a269da79f623729708dabcc3719485d400615a0d91b9f5e9fd307aa33f
   content_hash: sha256:8cf9ba1ed0d52741e4ed1dafc6ee4543e32f1e516f958d750e81412bfc36dd13
-- repo_url: k16shikano/fd287c3133457c4fd8f5601d34aa817d
+- repo_url: gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
   host: gist.github.com
   resolved_commit: 5ed08e4475365fd233aa0d3ab71c19b87e1a5732
   resolved_ref: 5ed08e4475365fd233aa0d3ab71c19b87e1a5732
