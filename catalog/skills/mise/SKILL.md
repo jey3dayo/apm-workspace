@@ -9,9 +9,10 @@ description: |
   `mise deploy`, task definitions, tool management, npm/pipx global packages,
   formatters such as `nixpkgs-fmt`, dotenvx/env tasks, DB/secrets task groups,
   or Windows settings such as `run_windows` and `config.windows.toml`. For
-  `~/.apm` work about the pinned `apm` source, `apm.yml`/lock state, or which APM
-  rollout task to run, coordinate with `apm-usage`. Do not use for non-mise dotfile,
-  Home Manager, or Nix Flake work; use `nix-dotfiles`.
+  `~/.apm` work about the pinned `apm` source, `apm.yml`/lock state,
+  manual-skills package state, orphaned APM packages, skill redistribution, or
+  which APM rollout task to run, coordinate with `apm-usage`. Do not use for
+  non-mise dotfile, Home Manager, or Nix Flake work; use `nix-dotfiles`.
 ---
 
 # mise - Task Runner Configuration Expert

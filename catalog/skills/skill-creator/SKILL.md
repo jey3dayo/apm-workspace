@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: Guide for creating and refactoring effective agent skills. Use when the user wants to create a new skill, `skillアップデート`, update or refactor an existing skill, or improve a skill's structure, triggering description, or bundled resources such as scripts, references, and assets. When the work is specifically in `~/.apm` and mainly about source-of-truth paths, `apm.yml`, lockfiles, deployment, redistribution, or which `mise` task to run, coordinate with `apm-usage`.
+description: Guide for creating and refactoring effective agent skills. Use when the user wants to create a new skill, update or refactor an existing skill, run `skillアップデート`, improve a skill's structure, triggering description, or bundled resources such as scripts, references, and assets. For requests like `skillアップデートして再配布して`, use this for the skill content/design portion and coordinate with `apm-usage` when the work is in `~/.apm` or involves source-of-truth paths, `apm.yml`, lockfiles, deployment, redistribution, or which `mise` task to run.
 metadata:
   short-description: Create or update an agent skill
 ---

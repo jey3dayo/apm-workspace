@@ -1,6 +1,6 @@
 ---
 name: macos-troubleshooting
-description: Diagnose and repair local macOS problems with safe, reversible steps first. Use when the user says Mac, macOS, Finder, Dock, Spotlight, IME, input source, Japanese input, notifications, Bluetooth, audio, permissions, or another local system feature is broken, stuck, behaving oddly, or may be fixable by restarting a process or service.
+description: Diagnose and repair local macOS problems with safe, reversible steps first. Use when the user says Mac, macOS, Finder, Dock, Spotlight, IME, input source, Japanese input, notifications, Bluetooth, audio, permissions, app launch failure, `.appが起動できない`, `Codex.appが起動できない`, CLIで権限や許可を与える相談, or another local system feature is broken, stuck, behaving oddly, or may be fixable by restarting a process or service.
 ---
 
 # macOS Troubleshooting
