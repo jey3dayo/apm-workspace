@@ -22,16 +22,16 @@ This skill should stay thin. Do not duplicate the full instructions from the und
 
 ## Source Routing Matrix
 
-| Research need | Primary route | Add Agent Reach when |
-| --- | --- | --- |
-| Official docs, vendor pages, public articles, blog posts | `jina-web-research` | Search results are incomplete, blocked, or require alternate fetch diagnostics |
-| Current public web signals with citations | `jina-web-research` | Multiple source classes must be normalized through one reach layer |
-| Large comparison or report with independent subtopics | `web-research` | Subtopics include social, video, feed, or repository-specific collection |
-| GitHub repositories, issues, pull requests, releases | GitHub tools or public web search | The task needs GitHub CLI-backed reach checks or repository signals alongside other platforms |
-| X/Twitter, Reddit, forums, community chatter | `jina-web-research` for indexed public search | The user asks for platform-native reach, broader social scan, or diagnostic coverage gaps |
-| YouTube videos, captions, channels, or transcripts | Public web search for basic metadata | Captions/transcripts or yt-dlp-style extraction are required |
-| RSS or recurring source monitoring | Public web search for ad hoc lookup | Feed discovery, feed parsing, or repeated source polling is required |
-| Authenticated, private, paid, or internal sources | Relevant connector or explicit user-provided access | Agent Reach is configured for the specific authorized source and the user explicitly permits use |
+| Research need                                            | Primary route                                       | Add Agent Reach when                                                                             |
+| -------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Official docs, vendor pages, public articles, blog posts | `jina-web-research`                                 | Search results are incomplete, blocked, or require alternate fetch diagnostics                   |
+| Current public web signals with citations                | `jina-web-research`                                 | Multiple source classes must be normalized through one reach layer                               |
+| Large comparison or report with independent subtopics    | `web-research`                                      | Subtopics include social, video, feed, or repository-specific collection                         |
+| GitHub repositories, issues, pull requests, releases     | GitHub tools or public web search                   | The task needs GitHub CLI-backed reach checks or repository signals alongside other platforms    |
+| X/Twitter, Reddit, forums, community chatter             | `jina-web-research` for indexed public search       | The user asks for platform-native reach, broader social scan, or diagnostic coverage gaps        |
+| YouTube videos, captions, channels, or transcripts       | Public web search for basic metadata                | Captions/transcripts or yt-dlp-style extraction are required                                     |
+| RSS or recurring source monitoring                       | Public web search for ad hoc lookup                 | Feed discovery, feed parsing, or repeated source polling is required                             |
+| Authenticated, private, paid, or internal sources        | Relevant connector or explicit user-provided access | Agent Reach is configured for the specific authorized source and the user explicitly permits use |
 
 ## Route Selection Rules
 
