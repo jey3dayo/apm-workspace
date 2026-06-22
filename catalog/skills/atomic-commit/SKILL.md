@@ -1,9 +1,11 @@
 ---
 name: atomic-commit
 description: |
+  ユーザーが `commit and push`, `commit push`, `fix and commit and push`,
+  「commit pushしたら終わり」、「コミットして push」、「コミット push」、または修正後の commit / push 実行を依頼したときに使用する。
   変更ファイルを論理的な最小単位でグループ化し、グループごとに個別コミットする。
   git log のスタイルを参照して Conventional Commits 形式でメッセージを自動生成する。
-  ユーザーが `commit and push`, `commit push`, `fix and commit and push`, 「コミットして push」、「コミット push」、「最小単位でコミット」、「触ったファイルをまとめてコミット」、`atomic commit` と依頼したときや、dotenvx-managed `.env.*` を含むコミット計画で使用する。push 単独、PR 作成、ブランチ作成、GitHub 公開まで含む作業は git automation 系 skill と競合しないよう、コミット分割とメッセージ作成に範囲を絞る。
+  「最小単位でコミット」、「触ったファイルをまとめてコミット」、`atomic commit`、dotenvx-managed `.env.*` を含むコミット計画でも使用する。push 単独、PR 作成、ブランチ作成、GitHub 公開まで含む作業は git automation 系 skill と競合しないよう、コミット分割とメッセージ作成に範囲を絞る。
 ---
 
 # Atomic Commit
