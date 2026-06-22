@@ -8,6 +8,8 @@
 
 /.apm/
 /private-skills/
+/.claude/settings.local.json
+/.claude/skill-report/
 
 apm_modules/
 
