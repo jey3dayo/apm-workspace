@@ -1,11 +1,11 @@
 ---
 name: design-system-review
-description: Review Ultra RSS Reader UI changes for design-system compliance, reusable component routing, token usage, and interaction consistency.
+description: Review UI changes for design-system compliance, reusable component routing, token usage, and interaction consistency.
 ---
 
 # Design System Review
 
-Use this skill after UI or component changes in Ultra RSS Reader.
+Use this skill after UI or component changes in projects with a shared design system.
 
 ## Review Inputs
 

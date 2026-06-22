@@ -1,4 +1,4 @@
 interface:
   display_name: "Design System Review"
-  short_description: "Review Ultra RSS Reader UI system boundaries"
-  default_prompt: "Use $design-system-review to review this Ultra RSS Reader UI change for design-system routing and interaction consistency."
+  short_description: "Review UI design-system boundaries"
+  default_prompt: "Use $design-system-review to review this UI change for design-system routing and interaction consistency."
