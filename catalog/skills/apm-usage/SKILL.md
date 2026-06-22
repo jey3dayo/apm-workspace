@@ -1,6 +1,6 @@
 ---
 name: apm-usage
-description: Use when working in the `~/.apm` global APM workspace and you need to decide what owns a change, which path is the source of truth, or which `mise` task to run. Trigger for tasks involving `~/.apm/catalog/skills/**` vs `~/.apm/catalog/**`, checked-out external dependency repositories recorded in `apm.yml` / `apm.lock.yaml`, managed catalog rollout, or choosing between `mise run check`, `verify`, `deploy`, `refresh`, `upgrade`, `refresh:deploy`, `prepare:catalog`, `install:catalog`, `smoke:catalog`, and `apply:skills:local`.
+description: Use when working in the `~/.apm` global APM workspace and you need to decide what owns a change, which path is the source of truth, or which `mise` task to run. Trigger for tasks involving skill update/re-distribution in `~/.apm`, `skillアップデート`, `再配布`, `apm.yml` path adjustments, `apm.lock.yaml`, managed catalog rollout, checked-out external dependency repositories, `apm` version/source alignment with `mise.toml`, or choosing between `mise run check`, `verify`, `deploy`, `refresh`, `upgrade`, `refresh:deploy`, `prepare:catalog`, `install:catalog`, `smoke:catalog`, and `apply:skills:local`. For skill body, description, script, reference, or asset design itself, coordinate with `skill-creator`; for general mise usage outside the APM workspace, use `mise`.
 ---
 
 # APM Usage

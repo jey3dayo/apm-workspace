@@ -8,8 +8,10 @@ description: |
   [When] Use when users mention mise, mise.toml, `mise run`, `mise check`,
   `mise deploy`, task definitions, tool management, npm/pipx global packages,
   formatters such as `nixpkgs-fmt`, dotenvx/env tasks, DB/secrets task groups,
-  or Windows settings such as `run_windows` and `config.windows.toml`. Do not use
-  for non-mise dotfile, Home Manager, or Nix Flake work; use `nix-dotfiles`.
+  or Windows settings such as `run_windows` and `config.windows.toml`. For
+  `~/.apm` work about the pinned `apm` source, `apm.yml`/lock state, or which APM
+  rollout task to run, coordinate with `apm-usage`. Do not use for non-mise dotfile,
+  Home Manager, or Nix Flake work; use `nix-dotfiles`.
 ---
 
 # mise - Task Runner Configuration Expert
