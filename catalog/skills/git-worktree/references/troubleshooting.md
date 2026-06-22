@@ -20,10 +20,10 @@ fatal: 'feature/user-auth' is already checked out at '/path/to/repo/.worktrees/u
 
 ```bash
 # List worktrees to find the existing one
-git wt list
+git wt
 
 # Switch to existing worktree
-git wt switch feature/user-auth
+git wt feature/user-auth
 # or
 cd .worktrees/user-auth
 ```
@@ -32,17 +32,17 @@ cd .worktrees/user-auth
 
 ```bash
 # Remove the existing worktree
-git wt remove feature/user-auth
+git wt -d feature/user-auth
 
 # Create new worktree
-git wt create feature/user-auth
+git wt feature/user-auth
 ```
 
 #### Option 3: Use different branch name
 
 ```bash
 # Create with a different branch name
-git wt create feature/user-auth-v2
+git wt feature/user-auth-v2
 ```
 
 ### Prevention
@@ -52,7 +52,7 @@ git wt create feature/user-auth-v2
 ### Symptom
 
 ```
-# git wt list shows worktree, but directory doesn't exist
+# git wt shows worktree, but directory doesn't exist
 fatal: '/path/to/repo/.worktrees/deleted' does not exist
 ```
 
@@ -65,17 +65,19 @@ fatal: '/path/to/repo/.worktrees/deleted' does not exist
 git worktree prune -v
 
 # Verify cleanup
-git wt list
+git wt
 ```
 
 ### If prune doesn't work
+
+Manual metadata deletion is destructive. Confirm the exact path and get explicit user approval before running it.
 
 ```bash
 # Manual cleanup
 rm -rf .git/worktrees/deleted
 
 # Verify
-git wt list
+git wt
 ```
 
 ### Prevention
@@ -97,17 +99,19 @@ fatal: 'feature/locked' is locked; reason: Long-running build
 git worktree unlock .worktrees/locked
 
 # Remove worktree
-git wt remove feature/locked
+git wt -d feature/locked
 ```
 
 ### Force removal
+
+Manual lock deletion is destructive. Confirm the exact path and get explicit user approval before running it.
 
 ```bash
 # Remove lock file manually
 rm .git/worktrees/locked/locked
 
 # Remove worktree
-git wt remove feature/locked
+git wt -d feature/locked
 ```
 
 ### Prevention
@@ -132,7 +136,7 @@ cd .worktrees/work-in-progress
 git add .
 git commit -m "save work in progress"
 cd /path/to/repo
-git wt remove work-in-progress
+git wt -d work-in-progress
 ```
 
 #### Option 2: Stash changes
@@ -141,7 +145,7 @@ git wt remove work-in-progress
 cd .worktrees/work-in-progress
 git stash push -m "WIP changes"
 cd /path/to/repo
-git wt remove work-in-progress
+git wt -d work-in-progress
 
 # Later, restore stash
 git stash pop
@@ -150,7 +154,7 @@ git stash pop
 #### Option 3: Force removal
 
 ```bash
-git wt remove -f work-in-progress
+git wt -D work-in-progress
 ```
 
 ### Warning
@@ -219,7 +223,7 @@ scripts/check-worktree-config.sh
 
 ```bash
 # Command not found
-git wt switch
+git wt
 # → bash: git-wt: command not found
 
 # Or switch doesn't change directory
@@ -279,7 +283,7 @@ exec zsh
 ### Symptom
 
 ```bash
-git wt create feature/test --copy .env
+git wt feature/test --copy .env
 # → .env file not copied to worktree
 ```
 
@@ -304,28 +308,29 @@ git wt --version
 
 ```bash
 # Use absolute path
-git wt create feature/test --copy /path/to/repo/.env
+git wt feature/test --copy /path/to/repo/.env
 
 # Or use relative path from main repo
 cd /path/to/repo
-git wt create feature/test --copy .env
+git wt feature/test --copy .env
 ```
 
 ### Use configuration
 
 ```bash
 # Set permanent copy files
-git config wt.copyFiles ".env,.env.local"
+git config --add wt.copy ".env"
+git config --add wt.copy ".env.local"
 
 # Create worktree (files copied automatically)
-git wt create feature/test
+git wt feature/test
 ```
 
 ### Manual copy as fallback
 
 ```bash
 # Create worktree
-git wt create feature/test
+git wt feature/test
 
 # Copy files manually
 cp .env .worktrees/test/.env
@@ -336,9 +341,8 @@ cp .env .worktrees/test/.env
 ### Symptom
 
 ```bash
-# Hook exists but doesn't execute
-ls -la .git/hooks/post-worktree-add
-# → -rw-r--r-- (not executable)
+git config --get-all wt.hook
+# expected setup command is missing
 ```
 
 ### Cause
@@ -346,47 +350,24 @@ ls -la .git/hooks/post-worktree-add
 ### Diagnosis
 
 ```bash
-# Check executable bit
-ls -la .git/hooks/post-worktree-add
-
-# Check if hooks are enabled
-git config wt.hooks.enabled
+git config --get-all wt.hook
+git config --get-all wt.deletehook
 ```
 
 ### Solutions
 
-### Fix permissions
+### Add the hook command
 
 ```bash
-# Make hook executable
-chmod +x .git/hooks/post-worktree-add
-chmod +x .git/hooks/post-worktree-remove
-
-# Verify
-ls -la .git/hooks/post-worktree-*
-```
-
-### Enable hooks
-
-```bash
-# Check if disabled
-git config wt.hooks.enabled
-
-# Enable if disabled
-git config wt.hooks.enabled true
+git config --add wt.hook "npm install"
 ```
 
 ### Verify hook execution
 
 ```bash
-# Add debug output to hook
-#!/bin/bash
-echo "Hook executed: $0 $@" >> /tmp/worktree-hook.log
-# ... rest of hook ...
-
-# Create worktree and check log
-git wt create test
-cat /tmp/worktree-hook.log
+git config --add wt.hook "printf hook-ran > .git-wt-hook-check"
+git wt test
+rg -n "hook-ran" .git-wt-hook-check
 ```
 
 ### Issue: Worktree Path Conflicts
@@ -405,27 +386,26 @@ fatal: '/path/to/repo/.worktrees/feature' already exists
 
 ```bash
 # Check if directory is a worktree
-git wt list | grep feature
+git wt | grep feature
 
 # If not a worktree, safe to remove
 rm -rf .worktrees/feature
 
 # Create worktree
-git wt create feature/new-feature
+git wt feature/new-feature
 ```
 
-#### Option 2: Use different path
+#### Option 2: Use a different worktree name
 
 ```bash
-# Specify custom path
-git wt create feature/new-feature --path .worktrees/feature-v2
+# Keep the branch name but choose a different worktree directory name
+git wt -b feature/new-feature feature-v2
 ```
 
-#### Option 3: Force creation
+#### Option 3: Use a different base directory
 
 ```bash
-# Force overwrite (dangerous)
-git wt create -f feature/new-feature
+git wt -b feature/new-feature feature-v2 --basedir .worktrees
 ```
 
 ### Warning
@@ -440,16 +420,16 @@ git wt create -f feature/new-feature
 
 - Large repository
 - Slow disk I/O
-- Post-add hook running heavy operations
+- `wt.hook` running heavy operations
 
 ### Diagnosis
 
 ```bash
 # Time the operation
-time git wt create test
+time git wt test
 
-# Check hook execution time
-time .git/hooks/post-worktree-add .worktrees/test test
+# Check configured hooks
+git config --get-all wt.hook
 ```
 
 ### Solutions
@@ -462,35 +442,19 @@ time .git/hooks/post-worktree-add .worktrees/test test
 # - Skip unnecessary operations
 # - Cache dependencies
 
-# Example optimized hook
-#!/bin/bash
-WORKTREE_PATH=$1
-
-cd "$WORKTREE_PATH"
-
-# Run in background
-(npm install > /dev/null 2>&1) &
-
-# Don't wait for completion
+git config --unset-all wt.hook
+git config --add wt.hook "npm install --prefer-offline"
 ```
 
-### Use `--no-checkout`
+### Use `--nocd`
 
 ```bash
 # Skip checkout for faster creation
-git wt create --no-checkout feature/test
+git wt feature/test --nocd
 
 # Checkout later
 cd .worktrees/test
 git checkout feature/test
-```
-
-### Disable hooks temporarily
-
-```bash
-git config wt.hooks.enabled false
-git wt create feature/test
-git config wt.hooks.enabled true
 ```
 
 ### Issue: Excessive Disk Usage
@@ -518,14 +482,7 @@ ln -s ../../.cache/node_modules node_modules
 ### Clean up build artifacts
 
 ```bash
-# Add to post-remove hook
-#!/bin/bash
-WORKTREE_PATH=$1
-
-# Clean build artifacts
-rm -rf "$WORKTREE_PATH/dist"
-rm -rf "$WORKTREE_PATH/.next"
-rm -rf "$WORKTREE_PATH/build"
+git config --add wt.deletehook "rm -rf dist .next build"
 ```
 
 ### Use workspace feature
@@ -555,14 +512,14 @@ fatal: not a git repository: '/path/to/repo/.git/worktrees/broken'
 
 ```bash
 # Repair worktree
-git wt repair broken
+git worktree repair .worktrees/broken
 
 # If repair fails, manual cleanup
 rm -rf .git/worktrees/broken
 rm -rf .worktrees/broken
 
 # Recreate if needed
-git wt create -b existing-branch
+git wt existing-branch
 ```
 
 ### Issue: Detached HEAD in Worktree
@@ -606,7 +563,7 @@ git push -u origin feature/feature-a
 ### Prevention
 
 ```bash
-git config wt.autoSetupRemote true
+git config worktree.guessRemote true
 ```
 
 ## Diagnostic Tools
@@ -626,7 +583,7 @@ git config --show-origin wt.basedir
 
 ```bash
 # Simple list
-git wt list
+git wt
 
 # Detailed list
 git worktree list -v
@@ -662,7 +619,7 @@ git worktree prune -v
 # Remove orphaned directories
 find .worktrees -maxdepth 1 -type d | while read dir; do
   name=$(basename "$dir")
-  if ! git wt list | grep -q "$name"; then
+  if ! git wt | grep -q "$name"; then
     echo "Orphaned directory: $dir"
     # rm -rf "$dir"  # Uncomment to remove
   fi
@@ -675,8 +632,8 @@ done
 
 ```bash
 # ✅ Correct
-git wt create feature/test
-git wt remove feature/test
+git wt feature/test
+git wt -d feature/test
 
 # ❌ Incorrect
 mkdir .worktrees/test
@@ -694,7 +651,7 @@ echo "Pruning stale worktrees..."
 git worktree prune -v
 
 echo "Listing remaining worktrees..."
-git wt list
+git wt
 
 echo "Cleanup completed"
 ```
@@ -714,7 +671,7 @@ cat > docs/worktree-setup.md <<EOF
 
 \`\`\`bash
 git config wt.basedir ".worktrees"
-git config wt.autoSetupRemote true
+git config worktree.guessRemote true
 \`\`\`
 EOF
 ```
@@ -740,6 +697,8 @@ EOF
 ### Nuclear Option: Reset Everything
 
 ### Warning
+
+This recovery path removes worktrees forcefully. Back up the list, inspect each target path, and get explicit user approval before running the removal loop.
 
 ```bash
 # Backup first

@@ -3,7 +3,7 @@ name: atomic-commit
 description: |
   変更ファイルを論理的な最小単位でグループ化し、グループごとに個別コミットする。
   git log のスタイルを参照して Conventional Commits 形式でメッセージを自動生成する。
-  「最小単位でコミット」「触ったファイルをまとめてコミット」「atomic commit」「commit and push」「commit push」や dotenvx-managed `.env.*` を含むコミット計画で使用する。push 単独や PR 作成まで含む GitHub 公開作業は git automation 系 skill と競合しないよう注意する。
+  ユーザーが `commit and push`, `commit push`, `fix and commit and push`, 「コミットして push」、「コミット push」、「最小単位でコミット」、「触ったファイルをまとめてコミット」、`atomic commit` と依頼したときや、dotenvx-managed `.env.*` を含むコミット計画で使用する。push 単独、PR 作成、ブランチ作成、GitHub 公開まで含む作業は git automation 系 skill と競合しないよう、コミット分割とメッセージ作成に範囲を絞る。
 ---
 
 # Atomic Commit
@@ -11,6 +11,8 @@ description: |
 変更ファイルを論理的な最小単位に分割し、グループごとに順番にコミットする。
 
 全 git コマンドに `rtk` プレフィックスを付ける。`rtk` が使えない環境では、そのタスク中は raw `git` に fallback する。
+
+このスキルはコミット分割とメッセージ作成だけを担当する。worktree の作成・切替・削除や、隔離 workspace が必要かの判断は `using-git-worktrees` / `git-worktree` に委ねる。
 
 ## ワークフロー
 

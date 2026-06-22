@@ -16,7 +16,7 @@ cd /path/to/repo
 git status  # Should be clean
 
 # Create worktree for new feature
-git wt create feature/user-authentication
+git wt feature/user-authentication
 cd .worktrees/user-authentication
 ```
 
@@ -39,7 +39,7 @@ git commit -m "test: add authentication tests"
 ```bash
 # After PR is merged
 cd /path/to/repo
-git wt remove feature/user-authentication
+git wt -d feature/user-authentication
 git branch -d feature/user-authentication
 ```
 
@@ -51,19 +51,19 @@ Working on multiple features simultaneously.
 
 ```bash
 # Feature A: Primary work
-git wt create feature/api-endpoints
+git wt feature/api-endpoints
 cd .worktrees/api-endpoints
 # ... work on Feature A ...
 
 # Feature B: Secondary work (while Feature A's tests run)
 cd /path/to/repo
-git wt create feature/ui-components
+git wt feature/ui-components
 cd .worktrees/ui-components
 # ... work on Feature B ...
 
 # Switch between features easily
 cd /path/to/repo
-git wt switch feature/api-endpoints
+git wt feature/api-endpoints
 # or
 gwts  # Interactive selection (with Zsh integration)
 ```
@@ -87,7 +87,7 @@ git status  # Shows uncommitted changes
 
 # Create hotfix worktree from production branch
 cd /path/to/repo
-git wt create hotfix/critical-bug --start-point origin/production
+git wt hotfix/critical-bug origin/production
 
 # Work on hotfix
 cd .worktrees/critical-bug
@@ -100,7 +100,7 @@ git push origin hotfix/critical-bug
 
 # Clean up
 cd /path/to/repo
-git wt remove hotfix/critical-bug
+git wt -d hotfix/critical-bug
 
 # Resume original work (no stash/unstash needed)
 cd .worktrees/feature-in-progress
@@ -116,7 +116,7 @@ Review and test PRs without affecting your current work.
 git fetch origin pull/123/head:pr-123
 
 # Create worktree for PR review
-git wt create -b pr-123
+git wt pr-123
 
 # Test PR
 cd .worktrees/pr-123
@@ -126,15 +126,8 @@ npm run build
 
 # Leave review comments, then clean up
 cd /path/to/repo
-git wt remove pr-123
+git wt -d pr-123
 git branch -d pr-123
-```
-
-### Tip
-
-```bash
-# Fetch and create worktree in one command
-gh pr checkout 123 && git wt create -b pr-123
 ```
 
 ## Advanced Workflows
@@ -165,7 +158,7 @@ for i in "${!TASKS[@]}"; do
   AGENT_ID=$((i + 1))
 
   # Create worktree for each agent
-  git wt create "agent-${AGENT_ID}-${TASK}"
+  git wt "agent-${AGENT_ID}-${TASK}"
 
   # Copy necessary files
   cp .env ".worktrees/${TASK}/.env"
@@ -203,7 +196,7 @@ for i in "${!TASKS[@]}"; do
   AGENT_ID=$((i + 1))
 
   # Remove worktree
-  git wt remove "agent-${AGENT_ID}-${TASK}"
+  git wt -d "agent-${AGENT_ID}-${TASK}"
 
   # Delete branch (if merged)
   git branch -d "agent-${AGENT_ID}-${TASK}"
@@ -224,7 +217,7 @@ BRANCHES=("main" "develop" "feature/new-api")
 
 for branch in "${BRANCHES[@]}"; do
   # Create worktree for each branch
-  git wt create -b "$branch" --path "ci-builds/${branch//\//-}"
+  git wt -b "$branch" "${branch//\//-}" --basedir ci-builds
 
   # Run tests in background
   (
@@ -255,9 +248,9 @@ Maintain multiple release branches simultaneously.
 
 ```bash
 # Create worktrees for each release branch
-git wt create -b release/v1.x --path releases/v1
-git wt create -b release/v2.x --path releases/v2
-git wt create -b release/v3.x --path releases/v3
+git wt -b release/v1.x v1 --basedir releases
+git wt -b release/v2.x v2 --basedir releases
+git wt -b release/v3.x v3 --basedir releases
 
 # Backport fix to all versions
 cd releases/v1
@@ -279,7 +272,7 @@ Use worktrees for git bisect without interrupting current work.
 
 ```bash
 # Create worktree for bisect
-git wt create bisect-session --detach
+git worktree add --detach .worktrees/bisect-session HEAD
 
 cd .worktrees/bisect-session
 
@@ -303,108 +296,47 @@ git bisect log
 
 # Clean up
 cd /path/to/repo
-git wt remove bisect-session
+git wt -d bisect-session
 ```
 
 ## Hooks
 
-### Post-Add Hook: Dependency Installation
+`git-wt` 0.29.0 uses Git config entries for hooks.
 
-Automatically install dependencies when creating worktree.
+### Post-Create Hook: Dependency Installation
+
+Run setup commands after creating a new worktree. Hooks run in the new worktree directory.
 
 ```bash
-#!/bin/bash
-# .git/hooks/post-worktree-add
-
-WORKTREE_PATH=$1
-BRANCH=$2
-
-echo "Installing dependencies in $WORKTREE_PATH..."
-
-cd "$WORKTREE_PATH"
-
-# Node.js project
-if [ -f "package.json" ]; then
-  npm install
-fi
-
-# Python project
-if [ -f "requirements.txt" ]; then
-  pip install -r requirements.txt
-fi
-
-# Ruby project
-if [ -f "Gemfile" ]; then
-  bundle install
-fi
-
-echo "Dependencies installed for $BRANCH"
+git config --add wt.hook "npm install"
+git config --add wt.hook "go generate ./..."
 ```
 
-### Post-Add Hook: Environment Setup
+Hooks do not run when switching to an existing worktree.
 
-Copy configuration files and set up environment.
+### Copy Local Files
+
+Use `wt.copy` for local files that should follow new worktrees.
 
 ```bash
-#!/bin/bash
-# .git/hooks/post-worktree-add
-
-WORKTREE_PATH=$1
-BRANCH=$2
-MAIN_REPO=$(git rev-parse --show-toplevel)
-
-echo "Setting up environment in $WORKTREE_PATH..."
-
-cd "$WORKTREE_PATH"
-
-# Copy environment files
-if [ -f "$MAIN_REPO/.env.example" ]; then
-  cp "$MAIN_REPO/.env.example" .env
-  echo ".env file created from .env.example"
-fi
-
-# Copy local configuration
-if [ -f "$MAIN_REPO/config.local.json" ]; then
-  cp "$MAIN_REPO/config.local.json" config.local.json
-  echo "config.local.json copied"
-fi
-
-# Copy IDE settings
-if [ -d "$MAIN_REPO/.vscode" ]; then
-  cp -r "$MAIN_REPO/.vscode" .vscode
-  echo ".vscode settings copied"
-fi
-
-echo "Environment setup completed for $BRANCH"
+git config --add wt.copy ".env.local"
+git config --add wt.copy ".vscode/"
 ```
 
-### Post-Remove Hook: Cleanup
-
-Clean up build artifacts and caches.
+For broader copying, enable ignored, untracked, or modified file copying intentionally.
 
 ```bash
-#!/bin/bash
-# .git/hooks/post-worktree-remove
+git config wt.copyignored true
+git config wt.copyuntracked true
+git config wt.copymodified true
+```
 
-WORKTREE_PATH=$1
-BRANCH=$2
+### Pre-Delete Hook
 
-echo "Cleaning up $WORKTREE_PATH..."
+Run cleanup or safety checks before deleting a worktree.
 
-# Remove build artifacts
-rm -rf "$WORKTREE_PATH/dist"
-rm -rf "$WORKTREE_PATH/build"
-rm -rf "$WORKTREE_PATH/.next"
-
-# Remove caches
-rm -rf "$WORKTREE_PATH/node_modules/.cache"
-rm -rf "$WORKTREE_PATH/.cache"
-
-# Remove temporary files
-rm -rf "$WORKTREE_PATH/tmp"
-rm -rf "$WORKTREE_PATH/*.log"
-
-echo "Cleanup completed for $BRANCH"
+```bash
+git config --add wt.deletehook "git status --short"
 ```
 
 ## Team Collaboration
@@ -439,10 +371,10 @@ Establish team conventions for worktree usage.
 ```toml
 # mise.toml
 [tasks.worktree-create]
-run = "git wt create $1"
+run = "git wt $1"
 
 [tasks.worktree-cleanup]
-run = "git wt list | grep -v main | xargs -I {} git wt remove {}"
+run = "git wt --json"
 ```
 
 ### Code Review with Worktrees
@@ -452,11 +384,11 @@ Efficient code review workflow for teams.
 ### Reviewer Workflow
 
 ```bash
-# Reviewer fetches PR
-gh pr checkout 456
+# Reviewer fetches PR into a local branch without switching the main checkout
+git fetch origin pull/456/head:pr-456-review
 
 # Create worktree for review
-git wt create -b pr-456-review
+git wt pr-456-review
 
 cd .worktrees/pr-456-review
 
@@ -471,14 +403,14 @@ gh pr review 456 --comment -b "LGTM! Tests pass."
 
 # Clean up
 cd /path/to/repo
-git wt remove pr-456-review
+git wt -d pr-456-review
 ```
 
 ### Author Workflow
 
 ```bash
 # Create worktree for PR fixes
-git wt create -b pr-456-fixes
+git wt pr-456-fixes
 
 cd .worktrees/pr-456-fixes
 
@@ -490,7 +422,7 @@ git push origin pr-456-fixes
 
 # Clean up after merge
 cd /path/to/repo
-git wt remove pr-456-fixes
+git wt -d pr-456-fixes
 ```
 
 ## Performance Optimization
@@ -525,11 +457,11 @@ BRANCHES=("main" "develop" "feature/new-feature")
 
 for branch in "${BRANCHES[@]}"; do
   (
-    git wt create -b "$branch" --path "test-${branch//\//-}"
+    git wt -b "$branch" "test-${branch//\//-}"
     cd "test-${branch//\//-}"
     npm test
     cd ..
-    git wt remove "test-${branch//\//-}"
+    git wt -d "test-${branch//\//-}"
   ) &
 done
 
@@ -552,16 +484,7 @@ NODE_MODULES_CACHE=/path/to/repo/.cache/node_modules
 ### Hook Integration
 
 ```bash
-#!/bin/bash
-# .git/hooks/post-worktree-add
-
-CACHE_DIR="/path/to/repo/.cache"
-WORKTREE_PATH=$1
-
-# Link shared cache
-ln -s "$CACHE_DIR" "$WORKTREE_PATH/.cache"
-
-echo "Shared cache linked"
+git config --add wt.symlink ".cache/"
 ```
 
 ## Troubleshooting Workflows
@@ -578,7 +501,7 @@ git worktree list
 git worktree prune -v
 
 # Recreate if needed
-git wt create -b existing-branch
+git wt existing-branch
 ```
 
 ### Locked Worktree Resolution
@@ -593,7 +516,7 @@ git worktree list
 git worktree unlock .worktrees/locked-worktree
 
 # Remove worktree
-git wt remove locked-worktree
+git wt -d locked-worktree
 ```
 
 ## See Also

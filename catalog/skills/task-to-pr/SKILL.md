@@ -35,8 +35,11 @@ Verify the task/request (or GitHub Issue) and execute E2E: worktree creation, im
 current_branch=$(git branch --show-current)
 default_branch=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
 
-# 2. Check if we're in a worktree
-is_worktree=$([ $(git worktree list | wc -l) -gt 1 ] && echo "yes" || echo "no")
+# 2. Check if the current checkout is a linked worktree
+git_dir=$(cd "$(git rev-parse --git-dir)" 2>/dev/null && pwd -P)
+git_common=$(cd "$(git rev-parse --git-common-dir)" 2>/dev/null && pwd -P)
+superproject=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+is_worktree=$([ "$git_dir" != "$git_common" ] && [ -z "$superproject" ] && echo "yes" || echo "no")
 
 # 3. Check if PR exists for current branch
 # Note: gh pr view without arguments checks the current branch's PR
@@ -203,13 +206,10 @@ start_phase = Phase 1 (full workflow)
 
 #### Step 3: Worktree Creation
 
-- Check if `git wt` is available (`command -v git-wt` or `git wt --help`).
-  - If available: use `git wt` (see `references/git-wt.md`).
-  - If not: fall back to `git worktree`.
+- This step is part of the Task-to-PR E2E flow. For standalone "should I create an isolated workspace?" decisions, use `using-git-worktrees`; for `git wt` syntax details, use `git-worktree`.
+- Follow `git-worktree` for the exact `git wt` / native `git worktree` command shape and fallback behavior.
 - Choose a branch name (recommended: `feat/<short-slug>` in kebab-case).
-- Create the worktree:
-  - With `git wt` (preferred): `git wt create <branch> --start-point <base>`
-  - With `git worktree` (fallback): `git worktree add -b <branch> <path> <base>`
+- Create the worktree using the current `git-worktree` guidance.
 - `cd` into the worktree and verify with `git status`.
 
 #### Step 4: Worktree Initialization
@@ -227,8 +227,7 @@ start_phase = Phase 1 (full workflow)
 
 ### Environment files (.env / .env.keys)
 
-- If `.env` exists in the parent repo but not in the worktree → copy to worktree root
-- If `.env.keys` exists in the parent repo → copy to worktree root (even if `.env` is committed)
+- Follow `git-worktree` guidance for local file copy behavior (`wt.copy`, `--copy`, or manual copy fallback).
 - Do not commit secrets
 
 ### Phase 3: Implementation

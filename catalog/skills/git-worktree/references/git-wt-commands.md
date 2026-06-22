@@ -1,396 +1,256 @@
 # git-wt Command Reference
 
-Complete reference for all `git-wt` commands and options.
+Command reference for `git-wt` 0.29.0.
 
 ## Overview
 
-`git-wt` is a wrapper around `git worktree` that provides additional features like hooks, file copying, and shell integration. This reference covers version 0.15.0+.
+`git-wt` is a Git subcommand that makes `git worktree` operations shorter. Use it for day-to-day local worktree operations, and use native `git worktree` for low-level Git cleanup, locked worktrees, or portable automation.
 
-## Global Options
-
-Available for all commands:
+## Usage
 
 ```bash
---help, -h        # Show help
---version, -v     # Show version
---config, -c      # Specify config file
+git wt [branch|worktree|path] [start-point] [flags]
 ```
 
-## Commands
+## Common Operations
 
-### list
-
-List all worktrees.
+### List Worktrees
 
 ```bash
-git wt list [options]
+git wt
+git wt --json
 ```
 
-### Options
+With no arguments, `git wt` lists worktrees.
 
-- `--verbose`: Show detailed information (branch, commit, status)
-- `--porcelain`: Machine-readable output
-
-### Examples
+### Switch or Create
 
 ```bash
-# Simple list
-git wt list
-
-# Detailed information
-git wt list --verbose
-
-# Machine-readable format
-git wt list --porcelain
+git wt feature/user-auth
+git wt feature/user-auth origin/main
 ```
 
-### Output Format
+If the named worktree already exists, `git wt` switches to it when shell integration is enabled. Otherwise it creates a worktree and branch. The optional second argument is the start point.
 
-```
-feature-a    .worktrees/feature-a    [feature/a 1a2b3c4] WIP: implement auth
-feature-b    .worktrees/feature-b    [feature/b 5d6e7f8] fix: resolve conflicts
-```
-
-### create
-
-Create a new worktree.
+### Create With a Different Branch Name
 
 ```bash
-git wt create <branch> [options]
+git wt -b feature/user-auth user-auth
 ```
 
-### Arguments
+`-b, --branch <branch>` creates or uses a branch name that differs from the worktree directory name.
 
-- `<branch>`: Branch name for the new worktree
-
-### Options
-
-- `--path <path>`: Custom worktree path (default: auto-generated from branch name)
-- `--start-point <ref>`: Start point (commit, tag, branch)
-- `-b, --branch`: Use existing branch instead of creating new one
-- `--copy <file>`: Copy file(s) to new worktree (can be repeated)
-- `--force, -f`: Force creation even if branch exists
-- `--detach`: Create detached HEAD
-- `--checkout`: Checkout after creation (default: true)
-- `--no-checkout`: Don't checkout after creation
-
-### Examples
+### Delete
 
 ```bash
-# Create new branch and worktree
-git wt create feature/user-auth
-
-# Custom path
-git wt create feature/api --path .worktrees/api-feature
-
-# From existing branch
-git wt create -b origin/feature/existing
-
-# From specific commit
-git wt create feature/hotfix --start-point v1.2.3
-
-# Copy files to new worktree
-git wt create feature/test --copy .env --copy config.json
-
-# Detached HEAD (for testing commits)
-git wt create --detach abc123def
+git wt -d feature/user-auth
+git wt -D feature/user-auth
 ```
 
-### Auto-generated Path
+`-d, --delete` safely deletes worktrees and branches only when the branch is merged. `-D, --force-delete` forces deletion.
 
-Branch name `feature/user-auth` → Worktree path `.worktrees/user-auth`
+The default branch, such as `main` or `master`, is protected from accidental deletion. Use `--allow-delete-default` only when that is intentional.
 
-Customizable via `wt.nameTemplate` config.
-
-### switch
-
-Switch to a worktree (requires shell integration).
+### Rename or Move
 
 ```bash
-git wt switch [worktree]
+git wt -m old-name new-name
+git wt -M old-name new-name
 ```
 
-### Arguments
+`-m, --move` safely renames the worktree directory and branch. `-M, --force-move` allows overwriting an existing branch and moving dirty or locked worktrees.
 
-- `[worktree]`: Worktree name or path (optional for interactive mode)
+## Flags
 
-### Options
+| Flag                     | Meaning                                                             |
+| ------------------------ | ------------------------------------------------------------------- |
+| `--allow-delete-default` | Allow deletion of the default branch                                |
+| `--basedir <dir>`        | Override `wt.basedir` for one invocation                            |
+| `-b, --branch <branch>`  | Use a branch name different from the worktree directory name        |
+| `--copy <pattern>`       | Always copy files matching a gitignore-style pattern; repeatable    |
+| `--copyignored`          | Copy ignored files                                                  |
+| `--copymodified`         | Copy modified files                                                 |
+| `--copyuntracked`        | Copy untracked files                                                |
+| `-d, --delete`           | Safe-delete worktree and branch                                     |
+| `--deletehook <command>` | Run a command before deleting a worktree; repeatable                |
+| `-D, --force-delete`     | Force-delete worktree and branch                                    |
+| `-M, --force-move`       | Force-rename worktree directory and branch                          |
+| `--hook <command>`       | Run a command after creating a worktree; repeatable                 |
+| `--init <shell>`         | Output shell integration for `bash`, `zsh`, `fish`, or `powershell` |
+| `--json`                 | Output JSON                                                         |
+| `-m, --move`             | Safe-rename worktree directory and branch                           |
+| `--nocd`                 | Print the worktree path without changing directory                  |
+| `--nocopy <pattern>`     | Exclude files matching a gitignore-style pattern; repeatable        |
+| `--relative`             | Append the current subdirectory path to the output path             |
+| `--remover <command>`    | Use a custom remover for the worktree directory                     |
+| `--symlink <pattern>`    | Symlink matching top-level directories instead of copying           |
+| `-v, --version`          | Show version                                                        |
 
-- `--interactive, -i`: Interactive selection (fuzzy finder)
+## Configuration
 
-### Examples
+`git-wt` uses Git config. Flags override config values for a single invocation.
+
+### wt.basedir
+
+Worktree base directory.
 
 ```bash
-# Switch by branch name
-git wt switch feature/user-auth
-
-# Switch by path
-git wt switch .worktrees/user-auth
-
-# Interactive selection
-git wt switch
-git wt switch -i
+git config wt.basedir ".worktrees"
+git config wt.basedir "../{gitroot}-wt"
 ```
 
-### Note
+Default: `.wt`. The `{gitroot}` template variable expands to the repository root directory name.
 
-### remove
+### wt.copyignored
 
-Remove a worktree.
+Copy ignored files, such as `.env`, to new worktrees.
 
 ```bash
-git wt remove <worktree> [options]
+git config wt.copyignored true
 ```
 
-### Arguments
+Default: `false`.
 
-- `<worktree>`: Worktree name or path
+### wt.copyuntracked
 
-### Options
-
-- `--force, -f`: Force removal (ignore uncommitted changes)
-
-### Examples
+Copy untracked files to new worktrees.
 
 ```bash
-# Safe removal (checks for uncommitted changes)
-git wt remove feature/user-auth
-
-# Force removal
-git wt remove -f feature/old-experiment
-
-# By path
-git wt remove .worktrees/temporary
+git config wt.copyuntracked true
 ```
 
-### Safety Check
+Default: `false`.
 
-Without `--force`, `git wt remove` will fail if:
+### wt.copymodified
 
-- Uncommitted changes exist
-- Untracked files exist (configurable)
-
-### prune
-
-Clean up worktree information.
+Copy modified files to new worktrees.
 
 ```bash
-git wt prune [options]
+git config wt.copymodified true
 ```
 
-### Options
+Default: `false`.
 
-- `--dry-run, -n`: Show what would be pruned
-- `--verbose, -v`: Show detailed information
+### wt.copy
 
-### Examples
+Patterns for files to always copy, even if ignored.
 
 ```bash
-# Prune stale worktree information
-git wt prune
-
-# Dry run
-git wt prune --dry-run
-
-# Verbose output
-git wt prune -v
+git config --add wt.copy "*.code-workspace"
+git config --add wt.copy ".vscode/"
 ```
 
-### Use Cases
+Patterns use gitignore syntax and can be repeated.
 
-- Worktree directory deleted manually
-- Corrupted worktree metadata
-- After moving worktree directories
+### wt.nocopy
 
-### lock / unlock
-
-Lock/unlock a worktree to prevent removal.
+Patterns for files to exclude from copying.
 
 ```bash
-git wt lock <worktree> [options]
-git wt unlock <worktree>
+git config --add wt.nocopy "*.log"
+git config --add wt.nocopy "vendor/"
 ```
 
-### Arguments
+When a file matches both `wt.copy` and `wt.nocopy`, `wt.nocopy` wins.
 
-- `<worktree>`: Worktree name or path
+### wt.symlink
 
-### Options
-
-- `--reason <reason>`: Reason for locking
-
-### Examples
+Patterns for top-level directories to symlink instead of copy.
 
 ```bash
-# Lock worktree
-git wt lock feature/important --reason "Long-running build"
-
-# Unlock worktree
-git wt unlock feature/important
+git config --add wt.symlink "node_modules/"
 ```
 
-### Use Cases
+Symlinking is faster, but changes affect all worktrees sharing that directory.
 
-- Prevent accidental removal during long-running operations
-- Mark worktrees as critical
+### wt.hook
 
-### move
-
-Move a worktree to a new location.
+Commands to run after creating a new worktree.
 
 ```bash
-git wt move <worktree> <new-path>
+git config --add wt.hook "npm install"
+git config --add wt.hook "go generate ./..."
 ```
 
-### Arguments
+Hooks run in the new worktree directory. They do not run when switching to an existing worktree.
 
-- `<worktree>`: Current worktree name or path
-- `<new-path>`: New path for worktree
+### wt.deletehook
 
-### Examples
+Commands to run before deleting a worktree.
 
 ```bash
-# Move worktree
-git wt move feature/test .worktrees/test-new-location
-
-# Reorganize worktrees
-git wt move old-path/.worktrees/feature .worktrees/feature
+git config --add wt.deletehook "git push origin --delete $(git branch --show-current)"
 ```
 
-### Note
+Hooks run in the worktree directory before removal. They do not run when deleting a branch without a worktree.
 
-### repair
+### wt.remover
 
-Repair worktree metadata.
+Custom command for removing the worktree directory.
 
 ```bash
-git wt repair [worktree]
+git config wt.remover "trash-put"
 ```
 
-### Arguments
+The worktree path is passed as an argument. After the command completes, `git worktree prune` runs automatically.
 
-- `[worktree]`: Specific worktree to repair (optional, repairs all if omitted)
+### wt.nocd
 
-### Examples
+Controls whether `git wt` changes directory to the worktree.
 
 ```bash
-# Repair all worktrees
-git wt repair
-
-# Repair specific worktree
-git wt repair feature/broken
+git config wt.nocd create
 ```
 
-### Use Cases
+Supported values:
 
-- Corrupted worktree metadata
-- After manual directory moves
-- After repository migration
+- `true` or `all`: never change directory
+- `create`: do not change directory only when creating worktrees
+- `false`: always change directory
 
-## Hook System
+Default: `false`.
 
-### Post-Add Hook
+### wt.relative
 
-Executed after worktree creation.
-
-### Location
-
-### Arguments
-
-1. Worktree path
-2. Branch name
-
-### Example
+Append the current subdirectory path to the output path.
 
 ```bash
-#!/bin/bash
-# .git/hooks/post-worktree-add
-
-WORKTREE_PATH=$1
-BRANCH=$2
-
-# Install dependencies
-cd "$WORKTREE_PATH"
-npm install
-
-# Copy config files
-cp ../config.local.json ./config.local.json
-
-echo "Worktree $BRANCH initialized at $WORKTREE_PATH"
+git config wt.relative true
 ```
 
-### Post-Remove Hook
+Default: `false`.
 
-Executed after worktree removal.
+## Shell Integration
 
-### Location
-
-### Arguments
-
-1. Worktree path
-2. Branch name
-
-### Example
+Shell integration enables worktree switching and completion.
 
 ```bash
-#!/bin/bash
-# .git/hooks/post-worktree-remove
+# bash
+eval "$(git-wt --init bash)"
 
-WORKTREE_PATH=$1
-BRANCH=$2
+# zsh
+eval "$(git-wt --init zsh)"
 
-# Clean up build artifacts
-rm -rf "$WORKTREE_PATH/dist"
+# fish
+git-wt --init fish | source
 
-echo "Worktree $BRANCH removed from $WORKTREE_PATH"
+# powershell
+Invoke-Expression (git-wt --init powershell | Out-String)
 ```
 
-## Exit Codes
+## Comparison With Native git worktree
 
-| Code | Meaning                               |
-| ---- | ------------------------------------- |
-| 0    | Success                               |
-| 1    | General error                         |
-| 2    | Misuse (invalid arguments)            |
-| 3    | Worktree already exists               |
-| 4    | Worktree not found                    |
-| 5    | Uncommitted changes (without --force) |
-| 128  | Git internal error                    |
-
-## Environment Variables
-
-| Variable          | Description                       | Default                        |
-| ----------------- | --------------------------------- | ------------------------------ |
-| `GIT_WT_CONFIG`   | Config file path                  | `~/.config/git-wt/config.yaml` |
-| `GIT_WT_BASE_DIR` | Base directory for worktrees      | From config or `.worktrees`    |
-| `GIT_WT_EDITOR`   | Editor for interactive operations | `$EDITOR` or `vim`             |
-
-## Comparison with git worktree
-
-| Feature              | git wt | git worktree |
-| -------------------- | ------ | ------------ |
-| Basic operations     | ✅     | ✅           |
-| Hooks                | ✅     | ❌           |
-| File copying         | ✅     | ❌           |
-| Shell integration    | ✅     | ❌           |
-| Interactive mode     | ✅     | ❌           |
-| Auto-generated paths | ✅     | ❌           |
-| Config file          | ✅     | ❌           |
-| Script-friendly      | ✅     | ✅           |
-
-### Recommendation
-
-- Development: Use `git wt` for enhanced features
-- Automation/CI: Use `git worktree` for portability
+| Use case                                           | Prefer               |
+| -------------------------------------------------- | -------------------- |
+| Local development worktree creation and switching  | `git wt`             |
+| Copying ignored or local files into a new worktree | `git wt`             |
+| Running setup hooks after creating a worktree      | `git wt`             |
+| Portable automation and CI scripts                 | `git worktree`       |
+| Pruning stale Git metadata                         | `git worktree prune` |
+| Locked worktree diagnosis or repair                | `git worktree`       |
 
 ## See Also
 
 - [Configuration Options](configuration.md)
 - [Workflow Patterns](workflows.md)
 - [Troubleshooting](troubleshooting.md)
-
----
-
-### Version
-
-### Last Updated
