@@ -163,9 +163,7 @@ Task(subagent_type="quality", ...)
 
 共有ロジックは Skills として提供されます:
 
-- `integration-framework` スキル - エージェント選択、統合パターン
 - `code-quality-automation` スキル - lint/format/test 自動実行
-- `task-router` スキル - タスク分析とエージェント選択
 
 ### 再利用可能なパターンを作成すべき時
 
@@ -394,7 +392,6 @@ cp my-command.md .claude/commands/
 - rules-creator skill: コマンドが強制するルールの作成方法
 - skill-creator skill: この workspace で managed skill を作る場合
 - agents-and-commands skill: エージェントとコマンドの違い
-- integration-framework skill: 統合パターン
 
 ---
 

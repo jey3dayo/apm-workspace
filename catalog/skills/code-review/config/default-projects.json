@@ -25,11 +25,6 @@
           "focus": ["type_safety", "strict_mode", "type_guards"]
         },
         {
-          "name": "react",
-          "priority": "high",
-          "focus": ["hooks", "performance", "component_design"]
-        },
-        {
           "name": "security",
           "priority": "high",
           "focus": ["input_validation", "auth", "data_protection"]
@@ -47,7 +42,6 @@
         "guidelines": [
           "evaluation-guidelines.md",
           "typescript/guidelines.md",
-          "react/guidelines.md",
           "security/guidelines.md"
         ]
       }
@@ -76,11 +70,6 @@
           "focus": ["type_safety", "strict_mode"]
         },
         {
-          "name": "react",
-          "priority": "high",
-          "focus": ["hooks", "performance", "component_design", "a11y"]
-        },
-        {
           "name": "security",
           "priority": "medium",
           "focus": ["xss_prevention", "secure_storage"]
@@ -95,7 +84,7 @@
           "error_handling": 0.1,
           "architecture": 0.15
         },
-        "guidelines": ["evaluation-guidelines.md", "typescript/guidelines.md", "react/guidelines.md"]
+        "guidelines": ["evaluation-guidelines.md", "typescript/guidelines.md"]
       }
     },
     {

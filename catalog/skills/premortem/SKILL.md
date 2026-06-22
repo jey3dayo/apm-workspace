@@ -248,7 +248,6 @@ Run a dry run first. Only create issues when the user explicitly approves the ex
 ## Integration Notes
 
 - With spec/design workflows: run premortem after design is drafted and before task breakdown.
-- With task-router workflows: use premortem before assigning implementation subtasks for complex or high-risk work.
 - With CI/release workflows: focus questions on rollback, observability, secrets, migration, and owner handoff.
 
 ## Common Failure Modes

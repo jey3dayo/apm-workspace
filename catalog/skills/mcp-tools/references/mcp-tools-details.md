@@ -517,7 +517,6 @@ GitHub MCP設定パターン + セキュリティベストプラクティス
 
 ## 関連スキル
 
-- integration-framework: TaskContext、Communication Bus統合
 - agents-and-commands: エージェント/コマンドとMCPツールの統合
 
 ## 参考リンク

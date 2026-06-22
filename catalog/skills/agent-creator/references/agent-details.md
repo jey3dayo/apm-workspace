@@ -540,7 +540,6 @@ After creating an agent:
 - rules-creator skill: How to create rules that agents validate
 - skill-creator skill: For managed skills in this `~/.apm` workspace
 - agents-and-commands skill: Differences between agents and commands
-- integration-framework skill: Integration patterns
 
 ---
 

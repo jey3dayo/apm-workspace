@@ -3,7 +3,7 @@ name: atomic-commit
 description: |
   変更ファイルを論理的な最小単位でグループ化し、グループごとに個別コミットする。
   git log のスタイルを参照して Conventional Commits 形式でメッセージを自動生成する。
-  「最小単位でコミット」「触ったファイルをまとめてコミット」「atomic commit」や dotenvx-managed `.env.*` を含むコミット計画で使用する。
+  「最小単位でコミット」「触ったファイルをまとめてコミット」「atomic commit」「commit and push」「commit push」や dotenvx-managed `.env.*` を含むコミット計画で使用する。push 単独や PR 作成まで含む GitHub 公開作業は git automation 系 skill と競合しないよう注意する。
 ---
 
 # Atomic Commit

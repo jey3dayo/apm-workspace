@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-06-22T03:09:52.894489+00:00'
+generated_at: '2026-06-22T04:08:58.704896+00:00'
 apm_version: 0.20.0
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -506,24 +506,6 @@ dependencies:
     .claude/skills/understand-onboard/SKILL.md: sha256:fad391a6526aeeb90ae8686e071ebe2d29700ebb4ea975e47a1c6da8b66171c3
     .codeium/windsurf/skills/understand-onboard/SKILL.md: sha256:fad391a6526aeeb90ae8686e071ebe2d29700ebb4ea975e47a1c6da8b66171c3
   content_hash: sha256:f486302a95dd1e871c5f1ac1dba1d87b8b40e61802fffedead5d203676fdc771
-- repo_url: SawyerHood/dev-browser
-  host: github.com
-  resolved_commit: 5736fc28f4dd588c0a8cd354839cda3e1c14c0fb
-  virtual_path: skills/dev-browser
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/dev-browser
-  - .agents/skills/dev-browser/SKILL.md
-  - .claude/skills/dev-browser
-  - .claude/skills/dev-browser/SKILL.md
-  - .codeium/windsurf/skills/dev-browser
-  - .codeium/windsurf/skills/dev-browser/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/dev-browser/SKILL.md: sha256:6fbb5c703f59ff01b63b41e3059ef33717e058bbbf636f4d8c659f86281409d7
-    .claude/skills/dev-browser/SKILL.md: sha256:6fbb5c703f59ff01b63b41e3059ef33717e058bbbf636f4d8c659f86281409d7
-    .codeium/windsurf/skills/dev-browser/SKILL.md: sha256:6fbb5c703f59ff01b63b41e3059ef33717e058bbbf636f4d8c659f86281409d7
-  content_hash: sha256:d50d11bbefdc1599d78900828dcb69d48e5091769d3f5ce10e06a60efe2405bf
 - repo_url: anthropics/claude-code
   host: github.com
   resolved_commit: b4073894cdef365c6061f036098ce0875bbdbc86
@@ -1171,7 +1153,7 @@ dependencies:
   content_hash: sha256:99aaea521aa0f1c7d041d70bb6b75581c1a50ec6ac59ceaaa923b6339ffa417b
 - repo_url: jey3dayo/apm-workspace
   host: github.com
-  resolved_commit: 50f41ec5c4a44b23561ee8d79c8ef520d080c178
+  resolved_commit: 1e4cb2e0570d97567b3fab4182babed496e63aac
   resolved_ref: main
   virtual_path: catalog
   is_virtual: true
@@ -1501,7 +1483,6 @@ dependencies:
   - .agents/skills/skill-creator/SKILL.md
   - .agents/skills/skill-creator/agents/openai.yaml
   - .agents/skills/skill-creator/references/openai_yaml.md
-  - .agents/skills/skill-creator/scripts/__pycache__/generate_openai_yaml.cpython-314.pyc
   - .agents/skills/skill-creator/scripts/generate_openai_yaml.py
   - .agents/skills/skill-creator/scripts/init_skill.py
   - .agents/skills/skill-creator/scripts/quick_validate.py
@@ -1894,7 +1875,6 @@ dependencies:
   - .claude/skills/skill-creator/SKILL.md
   - .claude/skills/skill-creator/agents/openai.yaml
   - .claude/skills/skill-creator/references/openai_yaml.md
-  - .claude/skills/skill-creator/scripts/__pycache__/generate_openai_yaml.cpython-314.pyc
   - .claude/skills/skill-creator/scripts/generate_openai_yaml.py
   - .claude/skills/skill-creator/scripts/init_skill.py
   - .claude/skills/skill-creator/scripts/quick_validate.py
@@ -2616,7 +2596,6 @@ dependencies:
     .agents/skills/skill-creator/SKILL.md: sha256:1b1aeeea039a9110b95a85f4e2bdc742d2af7f585bb648f721f6e058b32ddb9e
     .agents/skills/skill-creator/agents/openai.yaml: sha256:b6c49ad8c5d225212c3d44ea4ed7bd11bb33d54fadc876296d67b865aca3cd2c
     .agents/skills/skill-creator/references/openai_yaml.md: sha256:9fb5928b7f4a746fdb39df503ebbd7a659d5e64b47f85a60626aa1a03fd76b17
-    .agents/skills/skill-creator/scripts/__pycache__/generate_openai_yaml.cpython-314.pyc: sha256:cb555e3a7ddea28bca59a0e27da7f0eecfc86602c4d364e8eca2b73257af7619
     .agents/skills/skill-creator/scripts/generate_openai_yaml.py: sha256:10e93ef5537e55abba5e3aac905c4aa5f5b377a586c0cf45d156c772505f0d65
     .agents/skills/skill-creator/scripts/init_skill.py: sha256:bcb8982d3f033a094f2f1be43123ac8537e2562d25d8ba4d8ef2196ae514d96d
     .agents/skills/skill-creator/scripts/quick_validate.py: sha256:6cc9dc3199c935916cf6f73fcbbbb0e3bb1b58c8f5109fefa499978908164f51
@@ -2937,7 +2916,6 @@ dependencies:
     .claude/skills/skill-creator/SKILL.md: sha256:1b1aeeea039a9110b95a85f4e2bdc742d2af7f585bb648f721f6e058b32ddb9e
     .claude/skills/skill-creator/agents/openai.yaml: sha256:b6c49ad8c5d225212c3d44ea4ed7bd11bb33d54fadc876296d67b865aca3cd2c
     .claude/skills/skill-creator/references/openai_yaml.md: sha256:9fb5928b7f4a746fdb39df503ebbd7a659d5e64b47f85a60626aa1a03fd76b17
-    .claude/skills/skill-creator/scripts/__pycache__/generate_openai_yaml.cpython-314.pyc: sha256:cb555e3a7ddea28bca59a0e27da7f0eecfc86602c4d364e8eca2b73257af7619
     .claude/skills/skill-creator/scripts/generate_openai_yaml.py: sha256:10e93ef5537e55abba5e3aac905c4aa5f5b377a586c0cf45d156c772505f0d65
     .claude/skills/skill-creator/scripts/init_skill.py: sha256:bcb8982d3f033a094f2f1be43123ac8537e2562d25d8ba4d8ef2196ae514d96d
     .claude/skills/skill-creator/scripts/quick_validate.py: sha256:6cc9dc3199c935916cf6f73fcbbbb0e3bb1b58c8f5109fefa499978908164f51
@@ -3383,6 +3361,10 @@ dependencies:
   - .codeium/windsurf/skills/empirical-prompt-tuning/SKILL-ja.md
   - .codeium/windsurf/skills/empirical-prompt-tuning/SKILL.md
   deployed_file_hashes:
+    .agents/skills/empirical-prompt-tuning/SKILL-ja.md: sha256:0a38d830802c2e08a7faca13928fedf6911e00b896946b4b03910d662de6dea5
+    .agents/skills/empirical-prompt-tuning/SKILL.md: sha256:252418e7ef022981d2dda2e3ec57fa1c786d30af68c50b7e062edf1d7361b0cb
+    .claude/skills/empirical-prompt-tuning/SKILL-ja.md: sha256:0a38d830802c2e08a7faca13928fedf6911e00b896946b4b03910d662de6dea5
+    .claude/skills/empirical-prompt-tuning/SKILL.md: sha256:252418e7ef022981d2dda2e3ec57fa1c786d30af68c50b7e062edf1d7361b0cb
     .codeium/windsurf/skills/empirical-prompt-tuning/SKILL-ja.md: sha256:0a38d830802c2e08a7faca13928fedf6911e00b896946b4b03910d662de6dea5
     .codeium/windsurf/skills/empirical-prompt-tuning/SKILL.md: sha256:252418e7ef022981d2dda2e3ec57fa1c786d30af68c50b7e062edf1d7361b0cb
   content_hash: sha256:0caa36857ba4e1f7193fa9ee3e22cac38d7e9787eda95e1726d4a39e40fb9479
@@ -3725,6 +3707,22 @@ dependencies:
   - .codeium/windsurf/skills/brainstorming/spec-document-reviewer-prompt.md
   - .codeium/windsurf/skills/brainstorming/visual-companion.md
   deployed_file_hashes:
+    .agents/skills/brainstorming/SKILL.md: sha256:e14914605f640e0841758e45d0ab2a53243b59b921f929e47921c99668f2e61d
+    .agents/skills/brainstorming/scripts/frame-template.html: sha256:6a8a4e58bd6a44b904e2e3c57de774481d909204597e1498de53f1b2fecc4c4e
+    .agents/skills/brainstorming/scripts/helper.js: sha256:43c6d69954a46ec34a2a262bcc62a9a7e83e839c739f199cb72646d397c686e3
+    .agents/skills/brainstorming/scripts/server.cjs: sha256:2d2961ea8d11f56c5f4c3a1a68d22709efa5d7601a2246d8c880774e7e9e8412
+    .agents/skills/brainstorming/scripts/start-server.sh: sha256:a4e5ae84275bcaacd2f84345afeabe59cf7b00ba080e123da7cc1fb226f12847
+    .agents/skills/brainstorming/scripts/stop-server.sh: sha256:0b5ccbbd57f62d3ed88993f7940b5ee0e5c0fc9b21c550c623da4f6292e47daf
+    .agents/skills/brainstorming/spec-document-reviewer-prompt.md: sha256:95a0a195de9d984be2fffa95bab16fc8c563bc296a9cfc5e9c29cb3ece0d7457
+    .agents/skills/brainstorming/visual-companion.md: sha256:60cbad29b9dd7eaf08da020e301c498a72230b2e13c1813fa967a135ffcc1d71
+    .claude/skills/brainstorming/SKILL.md: sha256:e14914605f640e0841758e45d0ab2a53243b59b921f929e47921c99668f2e61d
+    .claude/skills/brainstorming/scripts/frame-template.html: sha256:6a8a4e58bd6a44b904e2e3c57de774481d909204597e1498de53f1b2fecc4c4e
+    .claude/skills/brainstorming/scripts/helper.js: sha256:43c6d69954a46ec34a2a262bcc62a9a7e83e839c739f199cb72646d397c686e3
+    .claude/skills/brainstorming/scripts/server.cjs: sha256:2d2961ea8d11f56c5f4c3a1a68d22709efa5d7601a2246d8c880774e7e9e8412
+    .claude/skills/brainstorming/scripts/start-server.sh: sha256:a4e5ae84275bcaacd2f84345afeabe59cf7b00ba080e123da7cc1fb226f12847
+    .claude/skills/brainstorming/scripts/stop-server.sh: sha256:0b5ccbbd57f62d3ed88993f7940b5ee0e5c0fc9b21c550c623da4f6292e47daf
+    .claude/skills/brainstorming/spec-document-reviewer-prompt.md: sha256:95a0a195de9d984be2fffa95bab16fc8c563bc296a9cfc5e9c29cb3ece0d7457
+    .claude/skills/brainstorming/visual-companion.md: sha256:60cbad29b9dd7eaf08da020e301c498a72230b2e13c1813fa967a135ffcc1d71
     .codeium/windsurf/skills/brainstorming/SKILL.md: sha256:e14914605f640e0841758e45d0ab2a53243b59b921f929e47921c99668f2e61d
     .codeium/windsurf/skills/brainstorming/scripts/frame-template.html: sha256:6a8a4e58bd6a44b904e2e3c57de774481d909204597e1498de53f1b2fecc4c4e
     .codeium/windsurf/skills/brainstorming/scripts/helper.js: sha256:43c6d69954a46ec34a2a262bcc62a9a7e83e839c739f199cb72646d397c686e3
@@ -3748,6 +3746,8 @@ dependencies:
   - .codeium/windsurf/skills/dispatching-parallel-agents
   - .codeium/windsurf/skills/dispatching-parallel-agents/SKILL.md
   deployed_file_hashes:
+    .agents/skills/dispatching-parallel-agents/SKILL.md: sha256:f0df13f584049059cc5619f90061405b89dcc6e28ab3f2a8517d27d99c7a46a6
+    .claude/skills/dispatching-parallel-agents/SKILL.md: sha256:f0df13f584049059cc5619f90061405b89dcc6e28ab3f2a8517d27d99c7a46a6
     .codeium/windsurf/skills/dispatching-parallel-agents/SKILL.md: sha256:f0df13f584049059cc5619f90061405b89dcc6e28ab3f2a8517d27d99c7a46a6
   content_hash: sha256:85df55d2235a7623b315dac4bc340c14a37dcdc57c869c80a829e1a53a174689
 - repo_url: obra/superpowers
@@ -3764,6 +3764,8 @@ dependencies:
   - .codeium/windsurf/skills/executing-plans
   - .codeium/windsurf/skills/executing-plans/SKILL.md
   deployed_file_hashes:
+    .agents/skills/executing-plans/SKILL.md: sha256:b357c2a2e5bf24adf237b5d4a83cacd828f07b886d0873ad91546aa3c99905c9
+    .claude/skills/executing-plans/SKILL.md: sha256:b357c2a2e5bf24adf237b5d4a83cacd828f07b886d0873ad91546aa3c99905c9
     .codeium/windsurf/skills/executing-plans/SKILL.md: sha256:b357c2a2e5bf24adf237b5d4a83cacd828f07b886d0873ad91546aa3c99905c9
   content_hash: sha256:d3e5b64b97d4713e3a7f33625cae12ed9305898d85a1c6309f46765c39a9d789
 - repo_url: obra/superpowers
@@ -3780,44 +3782,10 @@ dependencies:
   - .codeium/windsurf/skills/finishing-a-development-branch
   - .codeium/windsurf/skills/finishing-a-development-branch/SKILL.md
   deployed_file_hashes:
+    .agents/skills/finishing-a-development-branch/SKILL.md: sha256:e6d4a812de900d33c6eacfb40747f99427f25c304a7b7099120f9373b115a47f
+    .claude/skills/finishing-a-development-branch/SKILL.md: sha256:e6d4a812de900d33c6eacfb40747f99427f25c304a7b7099120f9373b115a47f
     .codeium/windsurf/skills/finishing-a-development-branch/SKILL.md: sha256:e6d4a812de900d33c6eacfb40747f99427f25c304a7b7099120f9373b115a47f
   content_hash: sha256:aa2632ed96df59c36348bd8f8ec1ff0fb0c5cc68b60691834687bf4cedc6be3f
-- repo_url: obra/superpowers
-  host: github.com
-  resolved_commit: 896224c4b1879920ab573417e68fd51d2ccc9072
-  virtual_path: skills/receiving-code-review
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/receiving-code-review
-  - .agents/skills/receiving-code-review/SKILL.md
-  - .claude/skills/receiving-code-review
-  - .claude/skills/receiving-code-review/SKILL.md
-  - .codeium/windsurf/skills/receiving-code-review
-  - .codeium/windsurf/skills/receiving-code-review/SKILL.md
-  deployed_file_hashes:
-    .codeium/windsurf/skills/receiving-code-review/SKILL.md: sha256:647036bbdab7bf2317e14e079595e984c9030f64295e2b4c0fb57dbeb48f25dd
-  content_hash: sha256:3f56080356c62e4f74a183d7371686babc661e41a952dc67a97c2c76fe8a9329
-- repo_url: obra/superpowers
-  host: github.com
-  resolved_commit: 896224c4b1879920ab573417e68fd51d2ccc9072
-  virtual_path: skills/requesting-code-review
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/requesting-code-review
-  - .agents/skills/requesting-code-review/SKILL.md
-  - .agents/skills/requesting-code-review/code-reviewer.md
-  - .claude/skills/requesting-code-review
-  - .claude/skills/requesting-code-review/SKILL.md
-  - .claude/skills/requesting-code-review/code-reviewer.md
-  - .codeium/windsurf/skills/requesting-code-review
-  - .codeium/windsurf/skills/requesting-code-review/SKILL.md
-  - .codeium/windsurf/skills/requesting-code-review/code-reviewer.md
-  deployed_file_hashes:
-    .codeium/windsurf/skills/requesting-code-review/SKILL.md: sha256:1017ccdd5bc61fab67c654cf118cbdb520464b313073a0a6b9a6b9aa647a3ad6
-    .codeium/windsurf/skills/requesting-code-review/code-reviewer.md: sha256:b2f2ec7596925fe52dac158fdfbca19b3a7d779d619c481e6706a6c0001662d3
-  content_hash: sha256:c9c9a81cdba20d04d29acdd6d456ab309e2db776e547b4008c459983e5fd7f83
 - repo_url: obra/superpowers
   host: github.com
   resolved_commit: 896224c4b1879920ab573417e68fd51d2ccc9072
@@ -3847,6 +3815,18 @@ dependencies:
   - .codeium/windsurf/skills/subagent-driven-development/scripts/task-brief
   - .codeium/windsurf/skills/subagent-driven-development/task-reviewer-prompt.md
   deployed_file_hashes:
+    .agents/skills/subagent-driven-development/SKILL.md: sha256:41ab239a6ad1c487cd839fdac972a8c9cf0f5e90efa59a63f963767864f0df4c
+    .agents/skills/subagent-driven-development/implementer-prompt.md: sha256:49018b28dc11bc9f3d13a28959bb10ae1a96eabc5d8f19f4079d901f9ff2bf64
+    .agents/skills/subagent-driven-development/scripts/review-package: sha256:0c0629f6e2c46fc8bf68dcfb8a247ab24eb548b7004fe494035e6fcba9b5cdfb
+    .agents/skills/subagent-driven-development/scripts/sdd-workspace: sha256:9430befaff459ed862415b700c1a9efe45fd34838a684802a1d8320de0c3a007
+    .agents/skills/subagent-driven-development/scripts/task-brief: sha256:5380283f00bffa99ab82ae78482b7d248abe10655129c72ca7050bdc0b6a85e1
+    .agents/skills/subagent-driven-development/task-reviewer-prompt.md: sha256:2eb9d54373420de25bc0bd00635d3a3123a6c0eb30c881168e6f3348e2387331
+    .claude/skills/subagent-driven-development/SKILL.md: sha256:41ab239a6ad1c487cd839fdac972a8c9cf0f5e90efa59a63f963767864f0df4c
+    .claude/skills/subagent-driven-development/implementer-prompt.md: sha256:49018b28dc11bc9f3d13a28959bb10ae1a96eabc5d8f19f4079d901f9ff2bf64
+    .claude/skills/subagent-driven-development/scripts/review-package: sha256:0c0629f6e2c46fc8bf68dcfb8a247ab24eb548b7004fe494035e6fcba9b5cdfb
+    .claude/skills/subagent-driven-development/scripts/sdd-workspace: sha256:9430befaff459ed862415b700c1a9efe45fd34838a684802a1d8320de0c3a007
+    .claude/skills/subagent-driven-development/scripts/task-brief: sha256:5380283f00bffa99ab82ae78482b7d248abe10655129c72ca7050bdc0b6a85e1
+    .claude/skills/subagent-driven-development/task-reviewer-prompt.md: sha256:2eb9d54373420de25bc0bd00635d3a3123a6c0eb30c881168e6f3348e2387331
     .codeium/windsurf/skills/subagent-driven-development/SKILL.md: sha256:41ab239a6ad1c487cd839fdac972a8c9cf0f5e90efa59a63f963767864f0df4c
     .codeium/windsurf/skills/subagent-driven-development/implementer-prompt.md: sha256:49018b28dc11bc9f3d13a28959bb10ae1a96eabc5d8f19f4079d901f9ff2bf64
     .codeium/windsurf/skills/subagent-driven-development/scripts/review-package: sha256:0c0629f6e2c46fc8bf68dcfb8a247ab24eb548b7004fe494035e6fcba9b5cdfb
@@ -3898,6 +3878,28 @@ dependencies:
   - .codeium/windsurf/skills/systematic-debugging/test-pressure-2.md
   - .codeium/windsurf/skills/systematic-debugging/test-pressure-3.md
   deployed_file_hashes:
+    .agents/skills/systematic-debugging/CREATION-LOG.md: sha256:c24733a5b1821bd6bed1fc950261f0b9f4e90097e0bbb96459d8179713730789
+    .agents/skills/systematic-debugging/SKILL.md: sha256:3b20719eca4f0461cb51a195221320d775dcf03b6859271066a03a5132a6ce7a
+    .agents/skills/systematic-debugging/condition-based-waiting-example.ts: sha256:40ae5ebe497fdf310200e43fe986552546d0a22837c0d39e855db1cfd33eb88e
+    .agents/skills/systematic-debugging/condition-based-waiting.md: sha256:e89fec8400d6cd50f43407cec9fab50976ba4d55d0ec2eb51c0bd68036b54c26
+    .agents/skills/systematic-debugging/defense-in-depth.md: sha256:1e175fb86fc357e58c6aebf5441e481e1b7868b4380c0456b63a17eefbd18ba7
+    .agents/skills/systematic-debugging/find-polluter.sh: sha256:6462747eae9b175ac145b78bcfaeab755654a75e32637f08eb633f065a9e1d7c
+    .agents/skills/systematic-debugging/root-cause-tracing.md: sha256:6b0622269e098ca1399e123e553fd385f0b6412d88ef0e9c4f5a8ea9cf1cec7b
+    .agents/skills/systematic-debugging/test-academic.md: sha256:fe2ba480d78ac0d686dc025f41c2a32a43d642bf533f91b0c6053a04d35d6486
+    .agents/skills/systematic-debugging/test-pressure-1.md: sha256:0b6a915db0054577819834c79be9eb614e97bddba10d73768e1fbe91cfed048a
+    .agents/skills/systematic-debugging/test-pressure-2.md: sha256:b2030aeffba07050e8ad573ddf87486457c4a016a786bb326235bebd856f2016
+    .agents/skills/systematic-debugging/test-pressure-3.md: sha256:96b50a52e2c7989c9cf20fb752c47c1e9a3a70dc362f8f7989f8f5b64dac7708
+    .claude/skills/systematic-debugging/CREATION-LOG.md: sha256:c24733a5b1821bd6bed1fc950261f0b9f4e90097e0bbb96459d8179713730789
+    .claude/skills/systematic-debugging/SKILL.md: sha256:3b20719eca4f0461cb51a195221320d775dcf03b6859271066a03a5132a6ce7a
+    .claude/skills/systematic-debugging/condition-based-waiting-example.ts: sha256:40ae5ebe497fdf310200e43fe986552546d0a22837c0d39e855db1cfd33eb88e
+    .claude/skills/systematic-debugging/condition-based-waiting.md: sha256:e89fec8400d6cd50f43407cec9fab50976ba4d55d0ec2eb51c0bd68036b54c26
+    .claude/skills/systematic-debugging/defense-in-depth.md: sha256:1e175fb86fc357e58c6aebf5441e481e1b7868b4380c0456b63a17eefbd18ba7
+    .claude/skills/systematic-debugging/find-polluter.sh: sha256:6462747eae9b175ac145b78bcfaeab755654a75e32637f08eb633f065a9e1d7c
+    .claude/skills/systematic-debugging/root-cause-tracing.md: sha256:6b0622269e098ca1399e123e553fd385f0b6412d88ef0e9c4f5a8ea9cf1cec7b
+    .claude/skills/systematic-debugging/test-academic.md: sha256:fe2ba480d78ac0d686dc025f41c2a32a43d642bf533f91b0c6053a04d35d6486
+    .claude/skills/systematic-debugging/test-pressure-1.md: sha256:0b6a915db0054577819834c79be9eb614e97bddba10d73768e1fbe91cfed048a
+    .claude/skills/systematic-debugging/test-pressure-2.md: sha256:b2030aeffba07050e8ad573ddf87486457c4a016a786bb326235bebd856f2016
+    .claude/skills/systematic-debugging/test-pressure-3.md: sha256:96b50a52e2c7989c9cf20fb752c47c1e9a3a70dc362f8f7989f8f5b64dac7708
     .codeium/windsurf/skills/systematic-debugging/CREATION-LOG.md: sha256:c24733a5b1821bd6bed1fc950261f0b9f4e90097e0bbb96459d8179713730789
     .codeium/windsurf/skills/systematic-debugging/SKILL.md: sha256:3b20719eca4f0461cb51a195221320d775dcf03b6859271066a03a5132a6ce7a
     .codeium/windsurf/skills/systematic-debugging/condition-based-waiting-example.ts: sha256:40ae5ebe497fdf310200e43fe986552546d0a22837c0d39e855db1cfd33eb88e
@@ -3927,6 +3929,10 @@ dependencies:
   - .codeium/windsurf/skills/test-driven-development/SKILL.md
   - .codeium/windsurf/skills/test-driven-development/testing-anti-patterns.md
   deployed_file_hashes:
+    .agents/skills/test-driven-development/SKILL.md: sha256:b5b4717b8b761cce15a6cfe9022e33fd959e0894c0c39d72c9cb49c23486c10e
+    .agents/skills/test-driven-development/testing-anti-patterns.md: sha256:bde453bc258f06543987477c837939afaa774ea2acbd9f308d702fc452bc4283
+    .claude/skills/test-driven-development/SKILL.md: sha256:b5b4717b8b761cce15a6cfe9022e33fd959e0894c0c39d72c9cb49c23486c10e
+    .claude/skills/test-driven-development/testing-anti-patterns.md: sha256:bde453bc258f06543987477c837939afaa774ea2acbd9f308d702fc452bc4283
     .codeium/windsurf/skills/test-driven-development/SKILL.md: sha256:b5b4717b8b761cce15a6cfe9022e33fd959e0894c0c39d72c9cb49c23486c10e
     .codeium/windsurf/skills/test-driven-development/testing-anti-patterns.md: sha256:bde453bc258f06543987477c837939afaa774ea2acbd9f308d702fc452bc4283
   content_hash: sha256:eee144aea35d783296d178017e9fe843c6d16cc8b240e106f5e50910f6caf329
@@ -3944,6 +3950,8 @@ dependencies:
   - .codeium/windsurf/skills/using-git-worktrees
   - .codeium/windsurf/skills/using-git-worktrees/SKILL.md
   deployed_file_hashes:
+    .agents/skills/using-git-worktrees/SKILL.md: sha256:e2c3ec142e52868a51af246c620cd76ab648dcf27d6900d47e6ffd07159a9794
+    .claude/skills/using-git-worktrees/SKILL.md: sha256:e2c3ec142e52868a51af246c620cd76ab648dcf27d6900d47e6ffd07159a9794
     .codeium/windsurf/skills/using-git-worktrees/SKILL.md: sha256:e2c3ec142e52868a51af246c620cd76ab648dcf27d6900d47e6ffd07159a9794
   content_hash: sha256:212ad917e5543e84ea3adf4e3fab537675db976fdab05d4de432870e38b49e80
 - repo_url: obra/superpowers
@@ -3978,6 +3986,20 @@ dependencies:
   - .codeium/windsurf/skills/using-superpowers/references/gemini-tools.md
   - .codeium/windsurf/skills/using-superpowers/references/pi-tools.md
   deployed_file_hashes:
+    .agents/skills/using-superpowers/SKILL.md: sha256:918562bbba1c73d1407c50de77a92eeaa6930508bdb57a64324d7d508a9069e1
+    .agents/skills/using-superpowers/references/antigravity-tools.md: sha256:00b16e8e8166d972766613c4244a7901d0413af37944741a8b8f40105f9f7f05
+    .agents/skills/using-superpowers/references/claude-code-tools.md: sha256:7d9244dd278db15caa8f9f86bda0546c91fc65163f94b2499999fc72b69c3666
+    .agents/skills/using-superpowers/references/codex-tools.md: sha256:cbce77a3a430688ef0cc3c8f03d17d2df1a2c78603e8b138cec522b74d75e4ab
+    .agents/skills/using-superpowers/references/copilot-tools.md: sha256:9627943f22c8db64ac7fbac3b6e399f73650a5cf3618f7966e802e7fa58d4595
+    .agents/skills/using-superpowers/references/gemini-tools.md: sha256:62b9157bcb0ee3c6784e3d0da0798ddfa5872f9e0c34bea48f3079dabea71965
+    .agents/skills/using-superpowers/references/pi-tools.md: sha256:e89e2d5c7b89cdd2a511aa7ad3c191290baaaed8913006c30f283ac7c4b091fb
+    .claude/skills/using-superpowers/SKILL.md: sha256:918562bbba1c73d1407c50de77a92eeaa6930508bdb57a64324d7d508a9069e1
+    .claude/skills/using-superpowers/references/antigravity-tools.md: sha256:00b16e8e8166d972766613c4244a7901d0413af37944741a8b8f40105f9f7f05
+    .claude/skills/using-superpowers/references/claude-code-tools.md: sha256:7d9244dd278db15caa8f9f86bda0546c91fc65163f94b2499999fc72b69c3666
+    .claude/skills/using-superpowers/references/codex-tools.md: sha256:cbce77a3a430688ef0cc3c8f03d17d2df1a2c78603e8b138cec522b74d75e4ab
+    .claude/skills/using-superpowers/references/copilot-tools.md: sha256:9627943f22c8db64ac7fbac3b6e399f73650a5cf3618f7966e802e7fa58d4595
+    .claude/skills/using-superpowers/references/gemini-tools.md: sha256:62b9157bcb0ee3c6784e3d0da0798ddfa5872f9e0c34bea48f3079dabea71965
+    .claude/skills/using-superpowers/references/pi-tools.md: sha256:e89e2d5c7b89cdd2a511aa7ad3c191290baaaed8913006c30f283ac7c4b091fb
     .codeium/windsurf/skills/using-superpowers/SKILL.md: sha256:918562bbba1c73d1407c50de77a92eeaa6930508bdb57a64324d7d508a9069e1
     .codeium/windsurf/skills/using-superpowers/references/antigravity-tools.md: sha256:00b16e8e8166d972766613c4244a7901d0413af37944741a8b8f40105f9f7f05
     .codeium/windsurf/skills/using-superpowers/references/claude-code-tools.md: sha256:7d9244dd278db15caa8f9f86bda0546c91fc65163f94b2499999fc72b69c3666
@@ -4000,6 +4022,8 @@ dependencies:
   - .codeium/windsurf/skills/verification-before-completion
   - .codeium/windsurf/skills/verification-before-completion/SKILL.md
   deployed_file_hashes:
+    .agents/skills/verification-before-completion/SKILL.md: sha256:ea52d15aabaf72bc6b558efe2c126f161b53961090ddcd712000273bfe8c7b6c
+    .claude/skills/verification-before-completion/SKILL.md: sha256:ea52d15aabaf72bc6b558efe2c126f161b53961090ddcd712000273bfe8c7b6c
     .codeium/windsurf/skills/verification-before-completion/SKILL.md: sha256:ea52d15aabaf72bc6b558efe2c126f161b53961090ddcd712000273bfe8c7b6c
   content_hash: sha256:9b446f0c7fe1cfb560b1d34439523b1a76d5f177290007b2c053a1c749a4a8ba
 - repo_url: obra/superpowers
@@ -4019,6 +4043,10 @@ dependencies:
   - .codeium/windsurf/skills/writing-plans/SKILL.md
   - .codeium/windsurf/skills/writing-plans/plan-document-reviewer-prompt.md
   deployed_file_hashes:
+    .agents/skills/writing-plans/SKILL.md: sha256:272e1af349f5062c28dc282b3e21b220d58d683a7314a10c455b7432ec91d845
+    .agents/skills/writing-plans/plan-document-reviewer-prompt.md: sha256:aa728b96aad603c8be28875a4305637f6c984aa81ffcadcb13e743202fa2a0c7
+    .claude/skills/writing-plans/SKILL.md: sha256:272e1af349f5062c28dc282b3e21b220d58d683a7314a10c455b7432ec91d845
+    .claude/skills/writing-plans/plan-document-reviewer-prompt.md: sha256:aa728b96aad603c8be28875a4305637f6c984aa81ffcadcb13e743202fa2a0c7
     .codeium/windsurf/skills/writing-plans/SKILL.md: sha256:272e1af349f5062c28dc282b3e21b220d58d683a7314a10c455b7432ec91d845
     .codeium/windsurf/skills/writing-plans/plan-document-reviewer-prompt.md: sha256:aa728b96aad603c8be28875a4305637f6c984aa81ffcadcb13e743202fa2a0c7
   content_hash: sha256:56ce74d3f05986ea81295d3789adb71bf03845d05d182883fc5e56bf367c6af7
@@ -4054,6 +4082,20 @@ dependencies:
   - .codeium/windsurf/skills/writing-skills/render-graphs.js
   - .codeium/windsurf/skills/writing-skills/testing-skills-with-subagents.md
   deployed_file_hashes:
+    .agents/skills/writing-skills/SKILL.md: sha256:f01f666a4426ce800d40649704104c252e6607c196656e5ce6a28e9f51650f3a
+    .agents/skills/writing-skills/anthropic-best-practices.md: sha256:217629b356c09c9bd11017c9788e8fc654ca1b32c92d4a51cd490e16dd65e59a
+    .agents/skills/writing-skills/examples/CLAUDE_MD_TESTING.md: sha256:0b379a3415e185d3c434b3ad283d8aa132f3022c2a4f210f168865b5986bcef0
+    .agents/skills/writing-skills/graphviz-conventions.dot: sha256:e2890a593c91370e384b42f2f67b1a6232c9e69dddea7891a0c1c46d7b20b694
+    .agents/skills/writing-skills/persuasion-principles.md: sha256:a51bc9bf75189ea73a27b3fb504a2fdfdb966fb1f7f1cdf03203230a216ccc03
+    .agents/skills/writing-skills/render-graphs.js: sha256:ccda971a87bb185f8febf81c56b556a20d026fa980c17b35fa3e8824fbb37852
+    .agents/skills/writing-skills/testing-skills-with-subagents.md: sha256:c711346852c911b24a84aa161e0cff06a4cd7f4e2fa9e9c0a266cead5afcbade
+    .claude/skills/writing-skills/SKILL.md: sha256:f01f666a4426ce800d40649704104c252e6607c196656e5ce6a28e9f51650f3a
+    .claude/skills/writing-skills/anthropic-best-practices.md: sha256:217629b356c09c9bd11017c9788e8fc654ca1b32c92d4a51cd490e16dd65e59a
+    .claude/skills/writing-skills/examples/CLAUDE_MD_TESTING.md: sha256:0b379a3415e185d3c434b3ad283d8aa132f3022c2a4f210f168865b5986bcef0
+    .claude/skills/writing-skills/graphviz-conventions.dot: sha256:e2890a593c91370e384b42f2f67b1a6232c9e69dddea7891a0c1c46d7b20b694
+    .claude/skills/writing-skills/persuasion-principles.md: sha256:a51bc9bf75189ea73a27b3fb504a2fdfdb966fb1f7f1cdf03203230a216ccc03
+    .claude/skills/writing-skills/render-graphs.js: sha256:ccda971a87bb185f8febf81c56b556a20d026fa980c17b35fa3e8824fbb37852
+    .claude/skills/writing-skills/testing-skills-with-subagents.md: sha256:c711346852c911b24a84aa161e0cff06a4cd7f4e2fa9e9c0a266cead5afcbade
     .codeium/windsurf/skills/writing-skills/SKILL.md: sha256:f01f666a4426ce800d40649704104c252e6607c196656e5ce6a28e9f51650f3a
     .codeium/windsurf/skills/writing-skills/anthropic-best-practices.md: sha256:217629b356c09c9bd11017c9788e8fc654ca1b32c92d4a51cd490e16dd65e59a
     .codeium/windsurf/skills/writing-skills/examples/CLAUDE_MD_TESTING.md: sha256:0b379a3415e185d3c434b3ad283d8aa132f3022c2a4f210f168865b5986bcef0
