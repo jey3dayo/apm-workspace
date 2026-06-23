@@ -1,11 +1,22 @@
 ---
 name: review-plan
-description: Review a pasted implementation, operation, research, or rollout plan without executing it; return a concise human summary, prioritized plan-review findings, and a copy-ready prompt for another agent, with conditional routing for UI/frontend, superpowers, and subagent-suitable work.
+description: Review a pasted or freshly generated implementation, operation, research, or rollout plan as a pre-execution gate without executing it; return a concise human summary, prioritized plan-review findings, and a copy-ready prompt for another agent, with conditional routing for UI/frontend, superpowers, and subagent-suitable work.
 ---
 
 # Review Plan
 
-Review the user's pasted plan and produce a human-readable review plus a prompt they can paste into a fresh agent. Do not implement the plan, edit files, run deployment, or create follow-up artifacts unless the user explicitly asks for a separate implementation task after the review.
+Review the user's pasted or freshly generated plan and produce a human-readable review plus a prompt they can paste into a fresh agent. Treat this as a pre-execution gate: review happens after planning and before implementation, ECS operations, deployment, migration, or other irreversible work. Do not implement the plan, edit files, run deployment, or create follow-up artifacts unless the user explicitly asks for a separate implementation task after the review.
+
+## Intended Placement
+
+Use this skill when the user pastes a plan or a UI exposes a "Review Plan" action immediately below a generated plan. The normal sequence is:
+
+1. Generate or paste the plan.
+2. Run `review-plan`.
+3. Revise the plan if the verdict is `ready with fixes`, `blocked`, or `unclear`.
+4. Execute only after the user explicitly asks for execution after review.
+
+If the user mentions deployment, ECS, production, data migration, destructive actions, or external side effects, call that out as a reason to keep the review strictly before execution. Do not treat post-execution validation as this skill's main purpose.
 
 ## Workflow
 
@@ -14,18 +25,20 @@ Review the user's pasted plan and produce a human-readable review plus a prompt 
 3. Review the plan for blockers, risk, ambiguity, missing verification, sequencing problems, scope creep, and handoff gaps.
 4. Apply conditional skill routing rules.
 5. Generate a copy-ready prompt that a fresh agent can use with no surrounding conversation.
+6. Keep the copy prompt in revise-only mode unless the verdict is `ready` and the user's latest request explicitly asks for execution after review.
 
 ## Conditional Skill Routing
 
 Include these recommendations in both the review findings and the copy prompt when they apply.
 
-| Condition                                                                                                                                           | Required handling                                                                                                                                                   |
-| --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| UI/UX, visual design, frontend pages/components, responsive behavior, interaction states, accessibility, or visual QA                               | Require `ui-ux-pro-max` and `frontend-design`. Review UI/UX, accessibility, responsive behavior, interaction states, visual consistency, and verification coverage. |
-| Three or more mostly independent implementation tasks with low shared-file or shared-boundary conflict, and each task has a clear verification path | Recommend `subagent-driven-development` for same-session execution.                                                                                                 |
-| Tightly coupled implementation, unclear architecture, one large shared file, or unresolved requirements                                             | Do not recommend `subagent-driven-development`; ask for decomposition or clarification first.                                                                       |
-| Existing superpowers plan                                                                                                                           | Preserve the superpowers execution order, checklist style, and handoff conventions. Do not replace the plan's workflow; provide delta-style revision instructions.  |
-| Plan creation or major redesign is still needed                                                                                                     | Recommend revising the plan before execution. Do not tell the next agent to execute immediately.                                                                    |
+| Condition                                                                                                                                           | Required handling                                                                                                                                                    |
+| --------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| UI/UX, visual design, frontend pages/components, responsive behavior, interaction states, accessibility, or visual QA                               | Require `ui-ux-pro-max` and `frontend-design`. Review UI/UX, accessibility, responsive behavior, interaction states, visual consistency, and verification coverage.  |
+| Three or more mostly independent implementation tasks with low shared-file or shared-boundary conflict, and each task has a clear verification path | Recommend `subagent-driven-development` for same-session execution.                                                                                                  |
+| Tightly coupled implementation, unclear architecture, one large shared file, or unresolved requirements                                             | Do not recommend `subagent-driven-development`; ask for decomposition or clarification first.                                                                        |
+| Existing superpowers plan                                                                                                                           | Preserve the superpowers execution order, checklist style, and handoff conventions. Do not replace the plan's workflow; provide delta-style revision instructions.   |
+| Plan creation or major redesign is still needed                                                                                                     | Recommend revising the plan before execution. Do not tell the next agent to execute immediately.                                                                     |
+| Deployment, ECS, production, migration, destructive operation, cost-incurring operation, or external side effect is present                         | Treat review as a pre-execution safety gate. Require explicit user approval before execution and include rollback/verification gaps as review findings when missing. |
 
 ## Review Standards
 
@@ -112,6 +125,7 @@ If a category has no findings, write `- None found.` under that category. Keep t
 
 - Make the copy prompt self-contained: include the original plan content or a faithful compact restatement with all important commands, file paths, constraints, and acceptance criteria.
 - Use `Mode: Revise only` by default. Use `Mode: Revise, then execute only if explicitly requested` only when the user's latest request clearly wants execution after revision.
+- For generated-plan UI actions such as "Review Plan", assume the user asked for review only. Do not infer permission to execute from the presence of an implementation, deployment, or ECS plan.
 - Do not claim that named skills can be forcibly activated in another runtime. Instead, instruct the next agent to use them.
 - Keep the next-agent instructions imperative and testable.
 - Do not include private chain-of-thought or hidden reasoning.

@@ -1,4 +1,4 @@
 interface:
   display_name: "Review Plan"
-  short_description: "Review a pasted plan and generate an agent-ready prompt."
-  default_prompt: "Use $review-plan to review this plan. Put a human summary first, then findings, then a copy-ready prompt for another agent."
+  short_description: "Review plans before execution"
+  default_prompt: "Use $review-plan to review this plan before execution. Return the verdict, risks, missing verification, and a copy-ready revise-only prompt."
