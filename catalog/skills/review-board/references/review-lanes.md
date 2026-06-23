@@ -2,6 +2,20 @@
 
 Add new lanes by appending the next numbered section with the same fields. `SKILL.md` should stay focused on routing and execution rules.
 
+## Lane Authoring Rules
+
+- `Trigger` must distinguish the lane from nearby lanes and name the artifact or request shape that should select it.
+- `Prompt` should define the expert stance without hiding the need for evidence.
+- `Cover` should list evidence-checkable review criteria, not taste-only preferences.
+- `Deliver` must state whether the lane is review-only, implementation-capable, or a wrapper for another lane.
+
+## Routing Notes
+
+- For form-heavy artifacts, prefer lane 8. Add lane 2 when accessibility or viewport behavior is the main concern, and lane 6 when state coverage is the main concern.
+- For broad product flows, prefer lane 4 before judging individual pages or controls.
+- For vague visual dissatisfaction, prefer lane 3 first when design instructions may be missing; use lane 1 when a design system exists and should be enforced.
+- Use lane 9 as a wrapper with another lane when the user asks to review, fix, and re-review until the result is strong enough to ship.
+
 ## 1. Design System Review
 
 Trigger:
@@ -104,7 +118,7 @@ Cover:
 - preservation of usability, accessibility, and product constraints
 
 Deliver:
-Recommend or implement a full-page redesign. Explain the design direction, the concrete system changes, and the before/after behavioral risks to verify.
+When reviewing only, identify the smallest design-system or page-composition changes before proposing a rebuild. When implementation is requested, recommend or implement a full-page redesign. Explain the design direction, the concrete system changes, and the before/after behavioral risks to verify.
 
 ## 6. Interaction And State Perfection Review
 
@@ -169,3 +183,26 @@ Cover:
 
 Deliver:
 If the user requested implementation, deliver the full implementation and verification. Otherwise, group findings by severity and recommend fixes that improve completion rate, error recovery, and confidence before submit.
+
+## 9. Review And Fix Loop
+
+Trigger:
+Use as a wrapper with another review lane when the user asks for a review-and-fix loop, repeated review after implementation, subagent-backed investigation, or complex implementation work where ordinary one-pass review is not enough.
+
+Prompt:
+Act as the main owner of a review-and-fix loop using the selected subject-matter lane as the rubric. Recover the target, constraints, evidence, and stop conditions from the conversation and repository context. Use subagents for bounded discovery or independent review when parallel investigation improves coverage, but keep integration and final judgment in the main session.
+
+Cover:
+
+- recovered frame: user-visible goal, owner task, scope limits, evidence source, and stop conditions
+- selected subject-matter lane, such as design system, accessibility, interaction states, form usability, or another review rubric
+- parallelizable research, test inventory, option comparison, or independent review tasks
+- backlog triage for findings: do-now, accept, next, park, or reject
+- implementation of the owner task with evidence-backed findings only
+- repeated review passes after meaningful integration slices
+- review score from 0 to 100, with fixes continuing until at least 95 or until blocked
+- quality gates appropriate to the touched behavior
+- final diff review to reject unrelated changes
+
+Deliver:
+Run the loop rather than stopping at review. Report the owner task completed, accepted/parked/rejected review findings, key evidence, review-loop score, quality gates run, and remaining risk. Stop and report attempts, errors, and alternatives if the same approach fails 3 times or the score cannot reach 95 within scope.
