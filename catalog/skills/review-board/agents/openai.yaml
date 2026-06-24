@@ -1,4 +1,4 @@
 interface:
   display_name: "Review Board"
-  short_description: "Choose expert review lanes for UI quality"
-  default_prompt: "Use $review-board to select the right expert review lane for this UI and report findings."
+  short_description: "Route expert reviews with fix loops"
+  default_prompt: "Use $review-board to choose an execution mode and expert review lane, then report or fix with evidence."
