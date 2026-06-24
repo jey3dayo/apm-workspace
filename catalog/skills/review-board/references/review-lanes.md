@@ -11,10 +11,13 @@ Add new lanes by appending the next numbered section with the same fields. `SKIL
 
 ## Routing Notes
 
+- Choose one primary lane. Use secondary checks only for specific risks that the primary lane does not cover.
+- When a routing note explicitly matches the request, select that primary lane instead of offering a menu. Offer candidates only when multiple triggers are equally strong and the choice would change the review.
+- For overlapping UI concerns, choose the lane by the user's main complaint: system consistency → lane 1; accessibility, viewport, or input method behavior → lane 2; missing or vague design direction → lane 3; end-to-end completion → lane 4; one-page visual quality → lane 5; component state behavior → lane 6; conversion → lane 7; entered data and submission → lane 8.
 - For form-heavy artifacts, prefer lane 8. Add lane 2 when accessibility or viewport behavior is the main concern, and lane 6 when state coverage is the main concern.
 - For broad product flows, prefer lane 4 before judging individual pages or controls.
 - For vague visual dissatisfaction, prefer lane 3 first when design instructions may be missing; use lane 1 when a design system exists and should be enforced.
-- Use lane 9 as a wrapper with another lane when the user asks to review, fix, and re-review until the result is strong enough to ship.
+- Use lane 9 as a wrapper with one primary lane and optional secondary checks when the user asks to review, fix, and re-review until the result is strong enough to ship.
 
 ## 1. Design System Review
 
@@ -35,7 +38,7 @@ Cover:
 - brand, mood, and product-context alignment
 
 Deliver:
-Group findings by severity. For each finding, name the violated design-system criterion, point to evidence, and recommend the smallest fix. If the project lacks tokens, type scale, spacing rules, or component-state guidance, mark that as a design-input gap.
+Group findings by severity. For each finding, name the violated design-system criterion, point to evidence, and recommend the smallest fix. If the project lacks tokens, type scale, spacing rules, or component-state guidance, mark that as a design-input gap. If implementation is requested, verify the changed surface against the relevant tokens, component states, and at least one representative viewport or screenshot.
 
 ## 2. Accessibility + Multi-Device Review
 
@@ -57,7 +60,7 @@ Cover:
 - overflow, clipping, zoom, and long-content behavior
 
 Deliver:
-Group findings by severity. Include browser or screenshot evidence when available. Recommend concrete fixes and the minimum verification pass: keyboard flow, representative mobile and desktop viewports, and any relevant accessibility checks.
+Group findings by severity. Include browser or screenshot evidence when available. Recommend concrete fixes and the minimum verification pass: keyboard flow, representative mobile and desktop viewports, and any relevant accessibility checks. If implementation is requested, rerun the affected keyboard, viewport, and accessibility checks after the change.
 
 ## 3. DESIGN.md First Review
 
@@ -77,7 +80,7 @@ Cover:
 - mismatch between requested output and provided design inputs
 
 Deliver:
-If design guidance is missing or too vague, state that the primary issue is input-specification debt. Recommend the design brief, tokens, typography, spacing, and component rules to create before implementation changes. If guidance exists, use it to review the artifact against the stated criteria.
+If design guidance is missing or too vague, state that the primary issue is input-specification debt. Recommend the design brief, tokens, typography, spacing, and component rules to create before implementation changes. If guidance exists, use it to review the artifact against the stated criteria. If implementation is requested, first decide whether the fix belongs in the design guidance or the UI implementation, then verify the changed artifact against the updated or existing guidance.
 
 ## 4. UX Audit
 
@@ -98,7 +101,7 @@ Cover:
 - evidence gathered from screenshots, browser state, test data, or the live UI
 
 Deliver:
-Group findings by flow-breaking severity. Include the exact step where each issue appears and recommend fixes that improve task completion, not just visual polish.
+Group findings by flow-breaking severity. Include the exact step where each issue appears and recommend fixes that improve task completion, not just visual polish. If implementation is requested, re-walk the affected flow through the entry point, completion state, and recovery path.
 
 ## 5. Rebuild One Page With Real Taste
 
@@ -118,7 +121,7 @@ Cover:
 - preservation of usability, accessibility, and product constraints
 
 Deliver:
-When reviewing only, identify the smallest design-system or page-composition changes before proposing a rebuild. When implementation is requested, recommend or implement a full-page redesign. Explain the design direction, the concrete system changes, and the before/after behavioral risks to verify.
+When reviewing only, identify the smallest design-system or page-composition changes before proposing a rebuild. When implementation is requested, recommend or implement a full-page redesign. Explain the design direction, the concrete system changes, and the before/after behavioral risks to verify. Verify the redesign with at least one desktop and one mobile check, and confirm core actions remain reachable.
 
 ## 6. Interaction And State Perfection Review
 
@@ -139,7 +142,7 @@ Cover:
 - motion timing, reduced motion, and layout stability during state changes
 
 Deliver:
-List missing or inconsistent states with evidence. If implementation is requested, add the full state model and verify it with relevant tests or browser interaction.
+List missing or inconsistent states with evidence. If implementation is requested, add the full state model and verify it with relevant tests or browser interaction, including keyboard and pointer parity for the affected controls.
 
 ## 7. Landing Page Conversion Review
 
@@ -159,7 +162,7 @@ Cover:
 - performance, mobile conversion, accessibility, and analytics hooks
 
 Deliver:
-Group findings by conversion impact. Recommend or implement changes that make the page more credible, specific, and action-oriented without turning it into generic marketing filler.
+Group findings by conversion impact. Recommend or implement changes that make the page more credible, specific, and action-oriented without turning it into generic marketing filler. If implementation is requested, verify first-viewport clarity, CTA reachability, mobile layout, accessibility basics, and any analytics hook touched by the change.
 
 ## 8. Form Usability Review
 
@@ -182,7 +185,7 @@ Cover:
 - disabled states, retry paths, and recovery from server errors
 
 Deliver:
-If the user requested implementation, deliver the full implementation and verification. Otherwise, group findings by severity and recommend fixes that improve completion rate, error recovery, and confidence before submit.
+If the user requested implementation, deliver the full implementation and verification. Otherwise, group findings by severity and recommend fixes that improve completion rate, error recovery, and confidence before submit. Verification should cover keyboard and autofill behavior, validation and inline errors, submit/loading/success/failure states, and mobile input ergonomics when applicable.
 
 ## 9. Review And Fix Loop
 
@@ -190,12 +193,13 @@ Trigger:
 Use as a wrapper with another review lane when the user asks for a review-and-fix loop, repeated review after implementation, subagent-backed investigation, or complex implementation work where ordinary one-pass review is not enough.
 
 Prompt:
-Act as the main owner of a review-and-fix loop using the selected subject-matter lane as the rubric. Recover the target, constraints, evidence, and stop conditions from the conversation and repository context. Use subagents for bounded discovery or independent review when parallel investigation improves coverage, but keep integration and final judgment in the main session.
+Act as the main owner of a review-and-fix loop using the selected primary lane as the rubric and any secondary checks as bounded supporting rubrics. Recover the target, constraints, evidence, and stop conditions from the conversation and repository context. Use subagents for bounded discovery or independent review when parallel investigation improves coverage, but keep integration and final judgment in the main session.
 
 Cover:
 
 - recovered frame: user-visible goal, owner task, scope limits, evidence source, and stop conditions
-- selected subject-matter lane, such as design system, accessibility, interaction states, form usability, or another review rubric
+- selected primary lane, such as design system, accessibility, interaction states, form usability, or another review rubric
+- secondary checks that cover concrete risks outside the primary lane
 - parallelizable research, test inventory, option comparison, or independent review tasks
 - backlog triage for findings: do-now, accept, next, park, or reject
 - implementation of the owner task with evidence-backed findings only
@@ -205,4 +209,4 @@ Cover:
 - final diff review to reject unrelated changes
 
 Deliver:
-Run the loop rather than stopping at review. Report the owner task completed, accepted/parked/rejected review findings, key evidence, review-loop score, quality gates run, and remaining risk. Stop and report attempts, errors, and alternatives if the same approach fails 3 times or the score cannot reach 95 within scope.
+Run the loop rather than stopping at review. Continue until the primary lane and secondary checks score at least 95, or until a blocker or scope boundary prevents further improvement. Report the owner task completed, accepted/parked/rejected review findings, key evidence, review-loop score, quality gates run, and remaining risk. Stop and report attempts, errors, and alternatives if the same approach fails 3 times or the score cannot reach 95 within scope.
