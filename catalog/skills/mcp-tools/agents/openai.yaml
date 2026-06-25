@@ -1,0 +1,4 @@
+interface:
+  display_name: "MCP Tools"
+  short_description: "Choose, place, and troubleshoot MCP servers"
+  default_prompt: "Use $mcp-tools to decide whether this MCP server belongs in global, repo-local, on-demand, or should not be installed."
