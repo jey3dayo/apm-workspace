@@ -1,6 +1,6 @@
 ---
 name: prepare-goal
-description: Use when the user wants help deciding, writing, or automatically starting a `/goal`; gives rough intent, implementation/fix/proceed instructions, incremental next-step instructions, issue text, plans, TODOs, review notes, or asks what the practical landing point should be.
+description: Use when the user wants help deciding, writing, or automatically starting a `/goal`; gives rough intent, implementation/fix/proceed instructions, incremental next-step instructions, issue text, plans, TODOs, review notes, or asks what the practical landing point should be. Helps keep one durable objective while splitting execution into the smallest useful task units with step-by-step evidence.
 ---
 
 # Prepare Goal
@@ -46,16 +46,29 @@ Use output-only behavior only when the user explicitly asks to draft, write, rev
    - Split unrelated objectives instead of packing them into one `/goal`.
    - Prefer outcome wording over activity wording: "auth migration is complete" rather than "work on auth migration."
 
-6. Define the contract
+6. Split the execution into minimal useful task units
+   - Keep the `/goal` objective singular, then define the smallest ordered task units that can be completed, verified, and reported independently inside that objective.
+   - A task unit should have one owner, one local outcome, and one evidence point. Examples: inspect context, update one skill section, adjust one test, run one validation command, review the diff.
+   - Split when items have different user-visible outcomes, different validation evidence, different source constraints, or can complete independently without making the next item clearer.
+   - Do not split related micro-fixes that share the same evidence point just to create more steps. Bundle 2-3 tightly related edits when they are one semantic fix.
+   - Bundle when items share the same failing behavior, validation command, review thread, module, or user-visible outcome.
+   - Do not merge unrelated backlog items, modules, issues, or review comments into one step just because they appeared in the same source material.
+   - Order units so each step produces evidence that can guide the next step. Require the future agent to report progress step by step instead of only reporting at the end when the work is long-running.
+   - If the first unit is discovery, bound it to the named files, issue, diff, logs, or scripts needed to choose the next implementation unit. Do not make open-ended discovery the whole goal.
+
+7. Define the contract
    - Scope: files, modules, commands, issues, or queues that are in bounds.
    - Constraints: files, behavior, APIs, secrets, generated outputs, or workflows that must not change.
+   - Task sequence: ordered minimal units, each with a local outcome and evidence point.
    - Done when: functional requirements and observable completion evidence.
    - Verification: known commands, if available, and artifacts or reports that prove completion. Keep commands separate from artifacts/reports, and make optional deployment, push, or remote checks conditional unless the user or repo guidance requires them.
    - Stop if: repeated failure, missing permission, high-risk action, unclear requirement, time/turn/token limit.
 
-7. Check auditability
+8. Check auditability
    - The completion judge must be able to decide from evidence the agent reports in the conversation.
    - Require the agent to report command names, exit status, changed files, and remaining risks.
+   - Require the agent to report which task units were completed, skipped, or blocked, with evidence for each completed unit.
+   - For long-running work, require progress reports in this shape: `Step N: <unit> -> completed/skipped/blocked; evidence: <command, file, artifact, or observation>; next: <next unit or stop reason>`.
    - If evidence depends on a file or command, tell the agent to surface the relevant result before claiming completion.
 
 ## Output Format
@@ -79,7 +92,7 @@ Why:
 - Key assumptions: <scope or validation assumptions, or "none">
 
 Starting goal:
-<one objective>. Done means <observable end state>. Scope: <allowed scope>. Constraints: <non-goals and forbidden changes, including source constraints from PR/issue/CI/review context>. Verification commands: <known commands only, or "none known">. Verification artifacts/reports: <evidence the agent must surface>. Stop if <same root cause fails 3 times, requested retry limit is reached, blockers, risky actions, or budget>.
+<one objective>. Done means <observable end state>. Scope: <allowed scope>. Task sequence: <ordered minimal task units, each with a local outcome and evidence point>. Constraints: <non-goals and forbidden changes, including source constraints from PR/issue/CI/review context>. Verification commands: <known commands only, or "none known">. Verification artifacts/reports: <evidence the agent must surface, including completed/skipped/blocked task units>. Stop if <same root cause fails 3 times, requested retry limit is reached, blockers, risky actions, or budget>.
 ```
 
 After the goal is created, start execution in the same turn unless a stop condition is already true.
@@ -103,11 +116,12 @@ Why:
 - Key assumptions: <scope or validation assumptions, or "none">
 
 Paste-ready /goal:
-/goal <one objective>. Done means <observable end state>. Scope: <allowed scope>. Constraints: <non-goals and forbidden changes, including source constraints from PR/issue/CI/review context>. Verification commands: <known commands only, or "none known">. Verification artifacts/reports: <evidence the agent must surface>. Stop if <same root cause fails 3 times, requested retry limit is reached, blockers, risky actions, or budget>.
+/goal <one objective>. Done means <observable end state>. Scope: <allowed scope>. Task sequence: <ordered minimal task units, each with a local outcome and evidence point>. Constraints: <non-goals and forbidden changes, including source constraints from PR/issue/CI/review context>. Verification commands: <known commands only, or "none known">. Verification artifacts/reports: <evidence the agent must surface, including completed/skipped/blocked task units>. Stop if <same root cause fails 3 times, requested retry limit is reached, blockers, risky actions, or budget>.
 
 Audit checklist:
 - Objective is singular: yes/no
 - Scope is bounded: yes/no
+- Task sequence is minimal and ordered: yes/no
 - Done state is observable: yes/no
 - Verification is explicit: yes/no
 - Stop conditions are explicit: yes/no
@@ -169,6 +183,9 @@ Scope:
 - Allowed:
 - Forbidden:
 
+Task sequence:
+- <minimal unit, local outcome, evidence point>
+
 Done when:
 - Functional:
 - Observable evidence:
@@ -196,7 +213,7 @@ Fix auth all the way through.
 Prepared goal:
 
 ```text
-/goal Auth module repair is complete. Done means the failing auth behavior is fixed, all call sites in scope still use the intended public API, `npm test -- test/auth` exits 0, `npm run lint` exits 0, and the final report lists changed files plus verification output. Scope: auth module and directly related tests only. Constraints: do not change public route behavior, do not modify unrelated snapshots, and do not edit secret or environment files. Stop if the same command fails 3 times with the same root cause, required product behavior is unclear, or a destructive action is needed.
+/goal Auth module repair is complete. Done means the failing auth behavior is fixed, all call sites in scope still use the intended public API, `npm test -- test/auth` exits 0, `npm run lint` exits 0, and the final report lists changed files plus verification output. Scope: auth module and directly related tests only. Task sequence: inspect the failing auth behavior and relevant tests; apply the smallest auth-module fix with direct test coverage; run the named auth test and lint commands; review the diff for unrelated route, snapshot, secret, or environment changes. Constraints: do not change public route behavior, do not modify unrelated snapshots, and do not edit secret or environment files. Stop if the same command fails 3 times with the same root cause, required product behavior is unclear, or a destructive action is needed.
 ```
 
 Rough request:
