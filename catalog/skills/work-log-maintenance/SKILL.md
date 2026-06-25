@@ -53,6 +53,13 @@ If `leave-days.md` includes public holidays or company holidays, name those excl
 <theme>: <date range or date list> <N営業日>（公休日・有休等除外後 <M日>）
 ```
 
+When overtime is optional or unusual for the submission, keep the standard submitted number as the scheduled-working-hours count and put overtime-included effort in a separate conversion line. Use natural labels such as `提出工数（所定労働時間）`, `工数換算（残業含む）`, and `残業時間`. Do not write unnatural labels such as `参考残業`.
+
+```text
+提出工数（所定労働時間）: <M日>
+工数換算（残業含む）: <K日>
+```
+
 Examples:
 
 ```text
@@ -72,6 +79,7 @@ Use compact month/day notation when the year is obvious from context. Include th
 - Exclude public holidays or company holidays only when the user provides a holiday calendar, attendance/calendar screenshot, or a repository-local holiday source. Otherwise state or record that holidays were not excluded.
 - Keep paid leave, half-day leave, public holidays, company holidays, and other user-provided exclusion days in `leave-days.md`. Use explicit `区分` values such as `有休`, `AM有休`, `PM有休`, `公休日`, or `会社休日`. When reporting actual work-day counts, subtract those exclusions from the business-day count and show both numbers when useful.
 - Do not double-count holidays that fall on Saturdays or Sundays. Weekend holidays are already excluded by the Saturday/Sunday rule, so add them to `leave-days.md` only as a zero-day note when the distinction matters for auditability.
+- If overtime is included, record it as hours first, then show the day conversion formula, such as `<overtime hours> / 8 = <overtime days>`. Treat overtime-included effort as `工数換算（残業含む）` unless the user explicitly says it is the submitted value.
 - Treat attendance screenshots as evidence for `leave-days.md` first, not as prose-only notes in `work-history.md` or `report.md`.
 - For separated ranges or dates, count unique weekdays only once.
 - Normalize continuous weekdays into a range and non-contiguous dates into comma-separated segments.

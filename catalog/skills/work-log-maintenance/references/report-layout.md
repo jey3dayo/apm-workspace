@@ -17,6 +17,7 @@ Rules:
 - Use `<theme>: <date range or date list> <N営業日>`.
 - If `leave-days.md` exists and the submitted number must exclude leave, use `<theme>: <date range or date list> <N営業日>（有休等除外後 <M日>）`.
 - If `leave-days.md` includes public holidays or company holidays, use an explicit label such as `<theme>: <date range or date list> <N営業日>（公休日・有休等除外後 <M日>）`.
+- If overtime-included effort is optional, put the scheduled-working-hours submitted effort first and the overtime-included conversion second. Use `提出工数（所定労働時間）`, `工数換算（残業含む）`, and `残業時間`; do not use awkward labels such as `参考残業`.
 - Do not include commit hashes, raw log excerpts, or long explanations.
 - Include a short note only when it affects interpretation, such as "祝日は未除外".
 
@@ -26,6 +27,21 @@ Example:
 CA Connect Site 初期構築: 4/25-5/16 14営業日
 CA Connect Site 本番・認証・リリース準備: 5/13-6/14 23営業日
 CA Connect Site FAQ・通知・運用調整: 6/18-6/19 2営業日
+```
+
+Overtime-optional example:
+
+```markdown
+提出工数（所定労働時間）: 35.5日
+工数換算（残業含む）: 47.47日
+
+計算:
+提出工数: 45.0営業日 - 公休日4.0日 - 有休等5.5日 = 35.5日
+工数換算: 35.5日 + 残業換算11.97日 = 47.47日
+
+内訳:
+
+- 残業時間: 95.76時間（8時間=1日換算で11.97日）
 ```
 
 ## `work-history.md`
