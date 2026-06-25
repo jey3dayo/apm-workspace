@@ -4,11 +4,11 @@
 
 RTK is a CLI proxy that compresses command output before it reaches the model context window. The official site highlights average noise reduction around 89 percent and shows a typical 2-hour AI coding session dropping from roughly 210K CLI noise tokens to about 23K after RTK filtering.
 
-Use that framing when you need to justify RTK adoption: it protects context budget, stretches session length, and lowers token cost on CLI-heavy workflows.
+Use that framing only when the user is explicitly evaluating RTK adoption or manual RTK use.
 
-## High-Value Commands
+## Manual-Mode Candidate Commands
 
-Prefer these command families first because they usually produce the most repeated boilerplate:
+When the user explicitly chooses RTK for a task, these command families usually produce the most repeated boilerplate:
 
 - Build and checks: `rtk cargo build`, `rtk cargo check`, `rtk cargo clippy`, `rtk tsc`, `rtk lint`, `rtk prettier --check`, `rtk next build`
 - Tests: `rtk cargo test`, `rtk vitest run`, `rtk playwright test`, `rtk test "<raw test command>"`
@@ -36,7 +36,7 @@ Choose one install path based on the environment:
 - Official install script on Linux or macOS
 - Pre-built release binaries on macOS, Linux, or Windows
 
-After installation, run:
+After installation, run only when the user asks to enable or evaluate RTK:
 
 ```bash
 rtk init --global
