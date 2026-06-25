@@ -14,6 +14,7 @@ Route `~/.apm` work by ownership first, then choose the smallest task that match
 - Edit `~/.apm/apm.yml` and `~/.apm/apm.lock.yaml` for dependency selection and accepted upstream state.
 - Edit `~/.apm/README.md`, `llms.txt`, and `docs/**` only for workspace-owned prose.
 - Treat `~/.apm/apm_modules/` and deployed targets as generated state, not editing surfaces.
+- Treat Headroom as user-global machine configuration, not an APM package dependency. Keep Headroom install pins in OS-specific `~/.config/mise` config and route detailed operation through the `headroom` skill.
 - For an external dependency listed in `apm.yml` / `apm.lock.yaml`, edit the upstream repository checkout when that checkout is the user-specified source of truth. Commit and push there first, then accept the new resolved commit through `~/.apm`.
 
 There is no active `~/.apm/skills/` editing surface in this model.
@@ -50,6 +51,7 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 - If the request is "change shared guidance", edit `catalog/**`; use `prepare:catalog` before publish/install.
 - If the request is "change dependency selection", edit or review `apm.yml` / `apm.lock.yaml`.
 - If the request names an external dependency that is already checked out locally and present in `apm.yml`, treat that checkout as the authoring surface when the user identifies it as the source of truth. Do not copy the change into `catalog/skills/**` unless the user is migrating ownership.
+- If the request is "enable Headroom MCP" or "compare Headroom with RTK", keep APM changes to ownership / rollout guidance. Do not add Headroom to `apm.yml`, `apm.lock.yaml`, or repo-local `mise.toml`; use user-global `~/.config/mise` plus the `headroom` skill instead.
 - If the request is "change only workspace docs or notes", edit the workspace files directly and do not restage the catalog unless `catalog/**` changed too.
 
 ## Guardrails
@@ -60,6 +62,7 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 - Do not keep accumulating workspace-specific optimizations in `manual-skills`; migrate to `catalog/skills/**` once the skill is no longer just an upstream delivery workaround.
 - Do not reintroduce many local `./packages/*` refs into `~/.apm/apm.yml`.
 - Do not hand-edit deployed targets such as `~/.claude/`, `~/.codex/`, or `~/.agents/skills`.
+- Do not persist Headroom MCP/proxy/wrap configuration through APM package manifests. Headroom MCP registration may touch agent runtime config, so treat it as a local machine setup step unless the user explicitly asks to manage that runtime state.
 - Prefer `mise` tasks over ad hoc script entrypoints for normal operation.
 - Before committing `apm.lock.yaml` after `mise run upgrade`, separate the intended dependency update from unrelated unpinned dependency drift. Report unrelated drift instead of hiding it inside the target dependency change.
 - If an upstream skill path is wrong, correct it to the real upstream path and treat the corrected successful install as the main result.
