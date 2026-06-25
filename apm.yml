@@ -80,15 +80,6 @@ dependencies:
       args:
         - -y
         - "@upstash/context7-mcp@latest"
-    - name: chrome-devtools
-      registry: false
-      transport: stdio
-      command: npx
-      args:
-        - -y
-        - chrome-devtools-mcp@latest
-        - --browserUrl
-        - http://127.0.0.1:9222
     - name: mcp-simple-voicevox
       registry: false
       transport: stdio
@@ -96,21 +87,6 @@ dependencies:
       args:
         - -y
         - "@t09tanaka/mcp-simple-voicevox"
-    - name: tauri-mcp-server
-      registry: false
-      transport: stdio
-      command: npx
-      args:
-        - -y
-        - "@hypothesi/tauri-mcp-server"
-    - name: peekaboo
-      registry: false
-      transport: stdio
-      command: npx
-      args:
-        - -y
-        - "@steipete/peekaboo"
-        - mcp
     - name: jina-reader
       registry: false
       transport: stdio

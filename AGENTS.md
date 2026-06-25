@@ -51,6 +51,25 @@ In practice:
 - Treat the current `apm` source as a pinned runtime dependency managed by `mise` (see `mise.toml`)
   - if both the workspace and global `mise` config define `apm`, keep them aligned to the same source to avoid command-resolution collisions
 
+## MCP Placement
+
+Keep Codex global MCP registration limited to cross-repo foundations.
+
+- Keep `mcp-simple-voicevox`, `codex`, `jina-reader`, and `context7` in the global APM manifest
+  - `jina-reader` and `context7` are research and documentation lookup foundations used across repositories
+- Do not keep project-specific or UI-heavy MCP servers in the global manifest
+  - `tauri-mcp-server` belongs only in Tauri repositories
+  - `chrome-devtools` belongs only in repositories with a running frontend such as Next.js, React, or Vite
+  - `peekaboo` should be enabled only when visual inspection or screen automation is needed
+- When moving MCP servers, edit the tracked APM source first and regenerate deployed targets
+  - do not hand-edit deployed Codex MCP config such as `~/.codex/config.toml`
+- Current repo-local MCP candidates:
+  - `/Users/t00114/src/github.com/jey3dayo/ultra-rss-reader`: `tauri-mcp-server`, `chrome-devtools`
+  - `/Users/t00114/src/github.com/CyberAgent-Infosys/ca-connect-site`: `chrome-devtools`
+  - `/Users/t00114/src/github.com/CyberAgent-Infosys/caad-loca-bff`: `chrome-devtools`
+  - `/Users/t00114/src/github.com/CyberAgent-Infosys/caad-asta`: `chrome-devtools`
+- If the APM workspace has no repo-local MCP deployment lane for a target, keep the global manifest lightweight and treat repo-local MCP distribution as a separate workspace-mechanics task
+
 ## Task Selection
 
 Choose the command based on intent:

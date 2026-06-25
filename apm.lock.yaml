@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-06-22T04:08:58.704896+00:00'
+generated_at: '2026-06-25T11:09:36.664308+00:00'
 apm_version: 0.20.0
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -949,6 +949,21 @@ dependencies:
     .claude/skills/thermo-nuclear-code-quality-review/SKILL.md: sha256:7faca08b51b643b2ddd0836f92af15574444024685dcc1e677dbbb39ae8c9e8f
     .codeium/windsurf/skills/thermo-nuclear-code-quality-review/SKILL.md: sha256:7faca08b51b643b2ddd0836f92af15574444024685dcc1e677dbbb39ae8c9e8f
   content_hash: sha256:9052b01b46b1d8dbf94c45f9313ec1983443f9a460e83d49cdc7fe0f640ca476
+- repo_url: gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
+  host: gist.github.com
+  resolved_commit: 5ed08e4475365fd233aa0d3ab71c19b87e1a5732
+  resolved_ref: 5ed08e4475365fd233aa0d3ab71c19b87e1a5732
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/fd287c3133457c4fd8f5601d34aa817d
+  - .agents/skills/fd287c3133457c4fd8f5601d34aa817d/SKILL.md
+  - .claude/skills/fd287c3133457c4fd8f5601d34aa817d
+  - .claude/skills/fd287c3133457c4fd8f5601d34aa817d/SKILL.md
+  - .codeium/windsurf/skills/fd287c3133457c4fd8f5601d34aa817d
+  - .codeium/windsurf/skills/fd287c3133457c4fd8f5601d34aa817d/SKILL.md
+  deployed_file_hashes:
+    .codeium/windsurf/skills/fd287c3133457c4fd8f5601d34aa817d/SKILL.md: sha256:e05525f4b78eedbe41a62b3078c408d7a2fbc96386be8af893b6b7d58e6941c0
+  content_hash: sha256:bc7c0b812df34be051a7887ee008f941f336c91fab5876ff0d11f8373c9366ad
 - repo_url: gonta223/humanizer-ja
   host: github.com
   resolved_commit: a1e343696e43aa50e7218891f3319ab22cde3464
@@ -3287,21 +3302,6 @@ dependencies:
     .codeium/windsurf/skills/work-log-maintenance/references/report-layout.md: sha256:fd097dc9445c781d5af1dfa47a04eadc7d4c08de77ca7f818a5b1f1f0cf03705
     .codeium/windsurf/skills/zsh/SKILL.md: sha256:42a47db6cbc7f8a3b1b0f1b65cee6c13115264231f1a60c54dbf2823c13b15ad
   content_hash: sha256:f94bba4920f1cafa8ee42ad7437de2eb35e1320b0fcdde640ccc1972b289575c
-- repo_url: gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
-  host: gist.github.com
-  resolved_commit: 5ed08e4475365fd233aa0d3ab71c19b87e1a5732
-  resolved_ref: 5ed08e4475365fd233aa0d3ab71c19b87e1a5732
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/fd287c3133457c4fd8f5601d34aa817d
-  - .agents/skills/fd287c3133457c4fd8f5601d34aa817d/SKILL.md
-  - .claude/skills/fd287c3133457c4fd8f5601d34aa817d
-  - .claude/skills/fd287c3133457c4fd8f5601d34aa817d/SKILL.md
-  - .codeium/windsurf/skills/fd287c3133457c4fd8f5601d34aa817d
-  - .codeium/windsurf/skills/fd287c3133457c4fd8f5601d34aa817d/SKILL.md
-  deployed_file_hashes:
-    .codeium/windsurf/skills/fd287c3133457c4fd8f5601d34aa817d/SKILL.md: sha256:e05525f4b78eedbe41a62b3078c408d7a2fbc96386be8af893b6b7d58e6941c0
-  content_hash: sha256:bc7c0b812df34be051a7887ee008f941f336c91fab5876ff0d11f8373c9366ad
 - repo_url: langchain-ai/deepagents
   host: github.com
   resolved_commit: df8db8af6a7cbfc2ab535020b951d73759da73dd
@@ -5699,24 +5699,11 @@ dependencies:
     .codeium/windsurf/skills/find-skills/SKILL.md: sha256:1e85f6f9686e145aca4a124e3b704b9bbea9aa87e08515c1e352eee70f6e6e7a
   content_hash: sha256:d31e234f0c90694a670222cdd1dafa853e051d7066beda389f1097c22dadd461
 mcp_servers:
-- chrome-devtools
 - codex
 - context7
 - jina-reader
 - mcp-simple-voicevox
-- peekaboo
-- tauri-mcp-server
 mcp_configs:
-  chrome-devtools:
-    name: chrome-devtools
-    transport: stdio
-    args:
-    - -y
-    - chrome-devtools-mcp@latest
-    - --browserUrl
-    - http://127.0.0.1:9222
-    registry: false
-    command: npx
   codex:
     name: codex
     transport: stdio
@@ -5749,22 +5736,5 @@ mcp_configs:
     args:
     - -y
     - '@t09tanaka/mcp-simple-voicevox'
-    registry: false
-    command: npx
-  peekaboo:
-    name: peekaboo
-    transport: stdio
-    args:
-    - -y
-    - '@steipete/peekaboo'
-    - mcp
-    registry: false
-    command: npx
-  tauri-mcp-server:
-    name: tauri-mcp-server
-    transport: stdio
-    args:
-    - -y
-    - '@hypothesi/tauri-mcp-server'
     registry: false
     command: npx
