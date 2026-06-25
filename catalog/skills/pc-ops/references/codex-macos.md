@@ -35,6 +35,40 @@ Interpretation:
 - `invalid signature`, `code or signature have been modified`, or `internal error in Code Signing subsystem`: the app bundle is not trustworthy as installed. Reinstall or replace the app bundle; quarantine or LaunchServices fixes are insufficient.
 - High `syspolicyd`, `trustd`, or `launchservicesd` together with invalid signature strongly suggests launch/signature evaluation churn.
 
+## Gatekeeper `Too many open files`
+
+When Codex launch or signature checks show `Too many open files`, test an unrelated executable and evaluator limits before blaming the app bundle:
+
+```bash
+spctl --assess --type execute --verbose=4 /bin/ls
+sysctl kern.num_files kern.maxfiles kern.maxfilesperproc
+launchctl limit maxfiles
+log show --style compact --last 30m --predicate 'process == "syspolicyd" AND (eventMessage CONTAINS "100024" OR eventMessage CONTAINS "UNIX error exception" OR eventMessage CONTAINS "Too many open files")'
+log show --style compact --last 30m --predicate 'eventMessage CONTAINS "would not allow" AND (eventMessage CONTAINS "MacOS/Codex" OR eventMessage CONTAINS "Resources/codex")'
+```
+
+Interpretation:
+
+- `/bin/ls: Too many open files`: `spctl`/`syspolicyd` is failing globally. Do not report this as Codex.app signature proof.
+- `/bin/ls: rejected (the code is valid but does not seem to be an app)`: `spctl` is functioning again; this is expected for a non-app executable under this assessment mode.
+- `codesign` passes while `spctl` returns `Too many open files`: prioritize SystemPolicy state and leftover Codex helpers over reinstall.
+- Low `kern.num_files` relative to `kern.maxfiles` plus `launchctl limit maxfiles` soft limit around 256 points to a per-process evaluator limit, not system-wide file table exhaustion.
+
+Codex Desktop restarts can leave helpers behind. For a clean recovery test, quit Codex, remove Codex helper families, restart `syspolicyd`, then re-measure:
+
+```bash
+osascript -e 'quit app "Codex"'
+pkill -f '/Applications/Codex.app'
+pkill -f 'Codex Computer Use.app'
+pkill -f 'codex app-server'
+pkill -f 'cua_node/bin/node_repl'
+ps -axo pid,ppid,stat,command | rg 'Codex.app|Codex Computer Use|codex app-server|node_repl'
+sudo killall syspolicyd
+spctl --assess --type execute --verbose=4 /bin/ls
+```
+
+Use `sudo killall syspolicyd` only after the Codex process family is stopped; otherwise immediate re-pollution can make the result ambiguous. If this changes `/bin/ls` from `Too many open files` to the expected non-app rejection, treat stale Codex helpers plus wedged `syspolicyd` as the primary finding. Security tools such as Falcon can still be an amplifier, but do not blame them without Endpoint Security pressure, blocked launch/signature logs, or correlation that remains after Codex helpers are gone.
+
 ## Diff UI Or Command Startup Hangs
 
 Look for stuck pagers and child chains:
