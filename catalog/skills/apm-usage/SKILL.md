@@ -50,9 +50,26 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 - If the skill currently lives in `manual-skills/.apm/skills/<id>/`, first decide whether it is still an upstream packaging workaround. If it is becoming workspace-owned, plan a catalog migration instead of continuing to tune it in the manual lane.
 - If the request is "change shared guidance", edit `catalog/**`; use `prepare:catalog` before publish/install.
 - If the request is "change dependency selection", edit or review `apm.yml` / `apm.lock.yaml`.
+- If the request is to add an individual APM package, decide scope before running `apm install`: use `apm install -g <package-ref>` only for user-global dependencies that belong in `~/.apm`; use `apm install <package-ref>` from the target repository for repo-local dependencies.
+- If the request is to add an MCP server through APM, apply the same scope rule: use `apm install -g --mcp <name> ...` only for cross-repo foundation MCPs; use repo-local `apm install --mcp <name> ...` for project, framework, UI, database, browser, or app-runtime-specific MCPs.
+- If MCP placement, server selection, credentials, transport, or startup behavior is the main question, coordinate with `mcp-tools`; keep this skill focused on APM ownership, source of truth, and rollout commands.
 - If the request names an external dependency that is already checked out locally and present in `apm.yml`, treat that checkout as the authoring surface when the user identifies it as the source of truth. Do not copy the change into `catalog/skills/**` unless the user is migrating ownership.
 - If the request is "enable Headroom MCP" or "compare Headroom with RTK", keep APM changes to ownership / rollout guidance. Do not add Headroom to `apm.yml`, `apm.lock.yaml`, or repo-local `mise.toml`; use user-global `~/.config/mise` plus the `headroom` skill instead.
 - If the request is "change only workspace docs or notes", edit the workspace files directly and do not restage the catalog unless `catalog/**` changed too.
+
+## Repo-Local MCP Recommendations
+
+When moving tools out of global APM, prefer project-local APM installs for MCPs that depend on a specific app runtime, browser session, UI workflow, or repository credential context.
+
+Good repo-local candidates:
+
+- `chrome-devtools`: install only in frontend repositories with Next.js, React, Vite, or another browser-served app.
+- `tauri-mcp-server`: install only in repositories that own a Tauri runtime such as `src-tauri`.
+- `agentation-mcp`: install only in projects that use the Agentation toolbar and need annotation sync with agents.
+- `peekaboo` or other screen automation MCPs: keep repo-local or on-demand for visual inspection; avoid global startup fan-out.
+- database, SaaS observability, or project API MCPs: keep repo-local so credentials and environment loading stay scoped to the project.
+
+Use global APM only for cross-repo foundations such as lightweight notifications, current docs lookup, public research/readers, or core agent bridges.
 
 ## Guardrails
 
@@ -87,7 +104,14 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
    - run `mise run upgrade`
    - review `apm.lock.yaml` before commit
 
-4. Checked-out external dependency changed:
+4. Individual package or MCP added:
+   - choose global vs repo-local before installing
+   - for global dependencies, work in `~/.apm` and use `apm install -g <package-ref>` or `apm install -g --mcp <name> ...`
+   - for repo-local dependencies, work in the target repository and use `apm install <package-ref>` or `apm install --mcp <name> ...`
+   - for global changes, run `mise run check`, then `mise run deploy`; for repo-local changes, run that repository's defined APM or project checks
+   - verify the intended `apm.yml`, `apm.lock.yaml`, and deployed target changed, and no unrelated workspace dependencies drifted
+
+5. Checked-out external dependency changed:
    - edit the external repository checkout that is the source of truth
    - run that repository's relevant checks
    - commit and push the external repository
@@ -97,7 +121,7 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
    - verify the deployed target such as `~/.agents/skills/<id>` contains the updated content
    - keep unrelated dirty files in `~/.apm` unstaged unless the user explicitly includes them
 
-5. Manual skill promoted to workspace-owned:
+6. Manual skill promoted to workspace-owned:
    - move the skill from `manual-skills/.apm/skills/<id>/` to `catalog/skills/<id>/`
    - update `manual-skills/upstreams/**` to note the migration
    - run `mise run check`, then `mise run deploy`

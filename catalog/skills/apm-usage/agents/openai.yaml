@@ -1,0 +1,4 @@
+interface:
+  display_name: "APM Usage"
+  short_description: "Route APM ownership and rollout tasks"
+  default_prompt: "Use $apm-usage to decide APM source of truth, install scope, and rollout checks."
