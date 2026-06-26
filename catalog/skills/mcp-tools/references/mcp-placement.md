@@ -40,17 +40,22 @@ Use this reference when deciding whether an MCP server should be global, repo-lo
 - Put credentialed SaaS MCPs in the narrowest scope possible and prefer existing authenticated connectors when available.
 - Do not install filesystem MCPs just to access local files when the agent runtime already has local filesystem tools.
 
-## Common Current Categories
+## Category Placement Table
 
-| Category                                         | Default                              | Notes                                                                                            |
-| ------------------------------------------------ | ------------------------------------ | ------------------------------------------------------------------------------------------------ |
-| Current docs lookup (`context7`-style)           | `global` or `on-demand`              | Global is reasonable when library/SDK work is frequent; otherwise use on demand or web research. |
-| Web research/readers (`jina-reader`-style)       | `global` or `on-demand`              | Global is reasonable for repeated public research; verify auth/search reliability.               |
-| Browser/devtools (`chrome-devtools`, Playwright) | `repo-local`                         | Useful for frontend work but often noisy/heavy globally.                                         |
-| Tauri tools                                      | `repo-local`                         | Only install where `src-tauri`/Tauri runtime exists.                                             |
-| Screen automation (`peekaboo`-style)             | `on-demand`                          | Visual access is situational and can add process/status overhead.                                |
-| GitHub/project management                        | `global` only if no connector exists | Avoid duplicating Codex/GitHub/Linear/Gmail/Calendar connectors.                                 |
-| Database/SaaS observability                      | `repo-local` or `on-demand`          | Scope credentials narrowly; prefer project-owned env loading.                                    |
+| Placement                            | Domain                          | Typical MCPs                                     | Rule                                                                                 |
+| ------------------------------------ | ------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| `global`                             | Search, research, and readers   | `jina-reader`, web readers                       | Keep global when public research is frequent across repos; otherwise use on demand.  |
+| `global`                             | Current docs lookup             | `context7`, vendor docs MCPs                     | Keep global when library, SDK, and API docs are used across many repos.              |
+| `global`                             | Notifications and local signals | `mcp-simple-voicevox`, lightweight notifier MCPs | Keep global when low-cost and useful in most sessions.                               |
+| `global`                             | Core agent bridges              | `codex` bridge MCPs                              | Keep global when they support cross-repo agent coordination with low noise.          |
+| `global` only if no connector exists | GitHub and project management   | GitHub, Linear, issue-tracker MCPs               | Avoid duplicating built-in or installed connectors.                                  |
+| `repo-local`                         | Frontend and React browser work | `chrome-devtools`, Playwright MCPs               | Install only in repos with a running frontend such as Next.js, React, or Vite.       |
+| `repo-local`                         | Infra and Terraform             | `terraform-mcp-server`                           | Install only in repos that own Terraform or IaC workflows.                           |
+| `repo-local`                         | App runtime tools               | `tauri-mcp-server`, app-specific runtime MCPs    | Install only where the corresponding runtime exists, such as `src-tauri`.            |
+| `repo-local` or `on-demand`          | Database and project APIs       | database MCPs, internal API MCPs                 | Scope credentials and env loading to the project that owns the data/API.             |
+| `repo-local` or `on-demand`          | SaaS observability              | Sentry-like, Datadog-like, Statsig-like MCPs     | Prefer narrow scope and existing authenticated connectors when available.            |
+| `on-demand`                          | Visual and screen automation    | `peekaboo`, screen automation MCPs               | Keep off global startup; enable only when visual inspection or screen control helps. |
+| `do-not-install` by default          | Filesystem access               | filesystem MCPs                                  | Do not install just to read local files when the agent runtime already has FS tools. |
 
 ## APM-Managed Runtimes
 
