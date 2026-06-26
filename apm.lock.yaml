@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-06-25T11:09:36.664308+00:00'
+generated_at: '2026-06-26T08:45:57.755690+00:00'
 apm_version: 0.20.0
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -5721,15 +5721,11 @@ mcp_configs:
     command: npx
   jina-reader:
     name: jina-reader
-    transport: stdio
-    args:
-    - -y
-    - mcp-remote
-    - https://mcp.jina.ai/v1?include_tags=read
-    - --header
-    - 'Authorization: Bearer ${JINA_API_KEY}'
+    transport: streamable-http
+    url: https://mcp.jina.ai/v1?include_tags=search,read
+    headers:
+      Authorization: Bearer ${JINA_API_KEY}
     registry: false
-    command: npx
   mcp-simple-voicevox:
     name: mcp-simple-voicevox
     transport: stdio
