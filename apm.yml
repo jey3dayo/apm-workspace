@@ -49,6 +49,10 @@ dependencies:
     - openai/codex-plugin-cc/plugins/codex/skills/gpt-5-4-prompting
     - openai/skills/skills/.curated/gh-address-comments
     - openai/skills/skills/.curated/gh-fix-ci
+    - openai/skills/skills/.curated/chatgpt-apps
+    - openai/skills/skills/.curated/linear
+    - openai/skills/skills/.curated/screenshot
+    - openai/skills/skills/.curated/sentry
     - tokoroten/prompt-review/.claude/skills/prompt-review
     - trailofbits/skills/plugins/agentic-actions-auditor
     - trailofbits/skills/plugins/audit-context-building/skills/audit-context-building
