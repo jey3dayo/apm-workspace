@@ -650,6 +650,27 @@ dependencies:
     .codeium/windsurf/skills/understand-onboard/SKILL.md: sha256:fad391a6526aeeb90ae8686e071ebe2d29700ebb4ea975e47a1c6da8b66171c3
     .kiro/skills/understand-onboard/SKILL.md: sha256:fad391a6526aeeb90ae8686e071ebe2d29700ebb4ea975e47a1c6da8b66171c3
   content_hash: sha256:f486302a95dd1e871c5f1ac1dba1d87b8b40e61802fffedead5d203676fdc771
+- repo_url: affaan-m/everything-claude-code
+  name: everything-claude-code
+  host: github.com
+  resolved_commit: 2bc924faf2f8e893bfe0af86b1931283693c30ae
+  resolved_ref: 2bc924faf2f8e893bfe0af86b1931283693c30ae
+  version: unknown
+  virtual_path: skills/mcp-server-patterns
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/mcp-server-patterns
+  - .agents/skills/mcp-server-patterns/SKILL.md
+  - .claude/skills/mcp-server-patterns
+  - .claude/skills/mcp-server-patterns/SKILL.md
+  - .kiro/skills/mcp-server-patterns
+  - .kiro/skills/mcp-server-patterns/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/mcp-server-patterns/SKILL.md: sha256:0d2d77ff4cffabd26a8db9a54fd16ae29063519fc2d7d2da3539c5e391a3973a
+    .claude/skills/mcp-server-patterns/SKILL.md: sha256:0d2d77ff4cffabd26a8db9a54fd16ae29063519fc2d7d2da3539c5e391a3973a
+    .kiro/skills/mcp-server-patterns/SKILL.md: sha256:0d2d77ff4cffabd26a8db9a54fd16ae29063519fc2d7d2da3539c5e391a3973a
+  content_hash: sha256:55425683e7c75a1e9cc39ea3d016fe66f23e9a6921e0203487e325f1f7a28439
 - repo_url: anthropics/claude-code
   host: github.com
   resolved_commit: 01f1617f14452ac78bf319cef2236d87c0fe05cb
