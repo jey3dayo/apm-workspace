@@ -14,7 +14,8 @@ description: |
   "デッドコード削除", "未使用ファイル", "未使用 export",
   "validation boundary", "Result boundary", "repository boundary",
   "folder ownership", or cleanup-only plans are mentioned. Do not use for
-  feature implementation or task execution; use implementation-engine instead.
+  feature implementation or task execution; use the normal implementation flow
+  or executing-plans instead.
   [Keywords] refactor, cleanup, dead code, unused files, unused exports,
   similarity, react-doctor, tsr, code quality, boundary ownership
 ---

@@ -490,7 +490,7 @@ Available skills:
   - openai-skills:
     - gh-fix-ci
     - gh-address-comments
-    - task-to-pr
+    - gh-create-pr
   - vercel-skills:
     - app-router
     - api-routes

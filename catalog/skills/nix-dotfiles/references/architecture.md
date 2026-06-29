@@ -335,7 +335,7 @@ in {
     selection.enable = [
       "gh-fix-ci"
       "gh-address-comments"
-      "task-to-pr"
+      "gh-create-pr"
     ];
   };
 

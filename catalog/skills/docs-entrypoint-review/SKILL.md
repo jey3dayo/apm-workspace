@@ -56,7 +56,7 @@ Use this routing table:
 
 When `DESIGN.md` or `DESIGN_REVIEW.md` is involved, use `design-md-workflow` for the detailed design-document split. Keep durable visual rules in `DESIGN.md`; keep review flow, routing decisions, exceptions, and escalation in `DESIGN_REVIEW.md`; keep backlog or task notes in `TODO.md` or another task tracker.
 
-When the task is broad documentation creation, update, or repair, hand off to `docs-manager`. Also use `docs-manager` when the task is metadata, tags, size, or link quality.
+When the task is broad documentation creation, update, or repair, first identify the repository's local docs rules and source-of-truth documents. For metadata, tags, size, or link quality, inspect the applicable config and existing docs conventions directly.
 
 ### 4. Recommend Before Editing
 

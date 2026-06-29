@@ -203,7 +203,6 @@ Progressive disclosure — loaded as needed:
 
 ## Related
 
-- `pr-feedback-orchestrator` — PR workflow (CI diagnosis, comment handling, auto-fix)
 - `gh-fix-ci` — GitHub Actions CI failure diagnosis
 - `gh-address-comments` — PR review comment handling
 

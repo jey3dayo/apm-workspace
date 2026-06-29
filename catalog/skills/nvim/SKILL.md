@@ -211,7 +211,7 @@ vim.keymap.set('n', '<leader>ff', '<cmd>Telescope find_files<cr>', { desc = 'Fin
 
 - code-review: 全体的な品質評価フレームワーク
 - typescript: TypeScript LSP設定レビュー
-- dotfiles-integration: クロスツール連携（Gruvbox、ターミナル統合）
+- nix-dotfiles: Nix / Home Manager 管理下の dotfiles 配布・適用
 
 ## Reference Material
 

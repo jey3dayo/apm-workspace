@@ -82,19 +82,17 @@ argument-hint: [required-arg] [--optional-flag]
 1. Define the purpose and inputs/outputs
 2. Create using the template
 3. Review testing and migration procedures
-4. Consider distribution method - see the distributions-manager skill
+4. Consider the distribution method for the target runtime
 
 ## Distribution
 
-For distributing commands after creation, see the `distributions-manager` skill:
+For commands managed in `~/.apm`, follow the current APM catalog flow:
 
-- Adding to a custom bundle: Create bundles for specific workflows
-- Integration into the default bundle: Add to standard distribution
-- Maintaining subdirectory structure: Preserve consistency of command groups
-
-Details: `references/creating-bundles.md` in the `distributions-manager` skill
+- Edit `catalog/commands/**` as the source of truth.
+- Run `mise run prepare:catalog` before publishing catalog changes.
+- Use `apm-usage` for source-of-truth, rollout, and deploy task selection.
 
 ## Related Resources
 
 - `references/command-details.md`
-- distributions-manager skill - Command distribution and bundle management
+- `apm-usage` skill - APM source-of-truth and rollout task selection
