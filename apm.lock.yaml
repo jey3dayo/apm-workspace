@@ -1,12 +1,12 @@
 lockfile_version: '1'
-generated_at: '2026-06-29T01:11:57.281179+00:00'
+generated_at: '2026-06-29T03:48:17.545583+00:00'
 apm_version: 0.22.0
 dependencies:
 - repo_url: EpicenterHQ/epicenter
-  name: tauri
+  name: epicenter
   host: github.com
   resolved_commit: aa3ff89dd82c659d020375ffa0172439d26c4d78
-  version: 1.0.0
+  version: unknown
   virtual_path: .agents/skills/tauri
   is_virtual: true
   package_type: claude_skill
@@ -950,50 +950,6 @@ dependencies:
     .claude/skills/wrangler/SKILL.md: sha256:42abe11ba6c0cb0c135deed1d591d844838fe0b61fc8c6d675a832435508a61b
     .kiro/skills/wrangler/SKILL.md: sha256:42abe11ba6c0cb0c135deed1d591d844838fe0b61fc8c6d675a832435508a61b
   content_hash: sha256:11edeb37eedb91deedde694b2bb1cc4ff4e8b5a8f1836c217a8c871fe39abcb5
-- repo_url: coreyhaines31/marketingskills
-  name: marketingskills
-  host: github.com
-  resolved_commit: 8bfcdffb655f16e713940cd04fb08891899c47db
-  version: unknown
-  virtual_path: skills/analytics
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/analytics
-  - .agents/skills/analytics/SKILL.md
-  - .agents/skills/analytics/evals/evals.json
-  - .agents/skills/analytics/references/event-library.md
-  - .agents/skills/analytics/references/ga4-implementation.md
-  - .agents/skills/analytics/references/gtm-implementation.md
-  - .claude/skills/analytics
-  - .claude/skills/analytics/SKILL.md
-  - .claude/skills/analytics/evals/evals.json
-  - .claude/skills/analytics/references/event-library.md
-  - .claude/skills/analytics/references/ga4-implementation.md
-  - .claude/skills/analytics/references/gtm-implementation.md
-  - .kiro/skills/analytics
-  - .kiro/skills/analytics/SKILL.md
-  - .kiro/skills/analytics/evals/evals.json
-  - .kiro/skills/analytics/references/event-library.md
-  - .kiro/skills/analytics/references/ga4-implementation.md
-  - .kiro/skills/analytics/references/gtm-implementation.md
-  deployed_file_hashes:
-    .agents/skills/analytics/SKILL.md: sha256:16aab197f87bf6e2599d179061f1947d96acafe0a340837432d8ab96d2f8c55a
-    .agents/skills/analytics/evals/evals.json: sha256:56932e864114d69a61b6b55e639d207329c0a8b7df8b61a0e1188b249cbef1e8
-    .agents/skills/analytics/references/event-library.md: sha256:efc7bdb0a7b3efdea9e67ff0d1bc894dcf89ec9b9b8f3414f123d12bee109412
-    .agents/skills/analytics/references/ga4-implementation.md: sha256:f33fd6db0cbdb1bdc183af5f52bedd956d14680e54bca2e2c3917de29698636e
-    .agents/skills/analytics/references/gtm-implementation.md: sha256:112da33832439d2ae0b2729e5031fc927df444cd1ae8eb20542d45c1b5690f52
-    .claude/skills/analytics/SKILL.md: sha256:16aab197f87bf6e2599d179061f1947d96acafe0a340837432d8ab96d2f8c55a
-    .claude/skills/analytics/evals/evals.json: sha256:56932e864114d69a61b6b55e639d207329c0a8b7df8b61a0e1188b249cbef1e8
-    .claude/skills/analytics/references/event-library.md: sha256:efc7bdb0a7b3efdea9e67ff0d1bc894dcf89ec9b9b8f3414f123d12bee109412
-    .claude/skills/analytics/references/ga4-implementation.md: sha256:f33fd6db0cbdb1bdc183af5f52bedd956d14680e54bca2e2c3917de29698636e
-    .claude/skills/analytics/references/gtm-implementation.md: sha256:112da33832439d2ae0b2729e5031fc927df444cd1ae8eb20542d45c1b5690f52
-    .kiro/skills/analytics/SKILL.md: sha256:16aab197f87bf6e2599d179061f1947d96acafe0a340837432d8ab96d2f8c55a
-    .kiro/skills/analytics/evals/evals.json: sha256:56932e864114d69a61b6b55e639d207329c0a8b7df8b61a0e1188b249cbef1e8
-    .kiro/skills/analytics/references/event-library.md: sha256:efc7bdb0a7b3efdea9e67ff0d1bc894dcf89ec9b9b8f3414f123d12bee109412
-    .kiro/skills/analytics/references/ga4-implementation.md: sha256:f33fd6db0cbdb1bdc183af5f52bedd956d14680e54bca2e2c3917de29698636e
-    .kiro/skills/analytics/references/gtm-implementation.md: sha256:112da33832439d2ae0b2729e5031fc927df444cd1ae8eb20542d45c1b5690f52
-  content_hash: sha256:e4f2ee22ac9f1a5d5ef30968b752ba10bc05b3b44d055bf26fbb7159f7a7de1d
 - repo_url: cursor/plugins
   name: plugins
   host: github.com
@@ -1236,7 +1192,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: 8dd520fd6e9f1a54a30d89808d3c70cb6514e431
+  resolved_commit: 08b1be173c26280441aed2af3ebeb6604cde6f43
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -2521,7 +2477,7 @@ dependencies:
     .agents/skills/premortem/scripts/format_report.py: sha256:7450cbddd3478d66421c9e9d90a8dbfe0ddf38647ec5e12b806227f270be70e9
     .agents/skills/premortem/scripts/gap_analyzer.py: sha256:b0bee34a3d8dc955277c0f3050ecaf6e756dea50683d4d00838b5372d1902ce0
     .agents/skills/premortem/scripts/github_integration.py: sha256:113a55435ff150ec9940b0f5d4cff3e9fd24d9429cbc7ab2dc30e96e223b640b
-    .agents/skills/prepare-goal/SKILL.md: sha256:7adab464e280586f6b989658fb8f8dba19644e1867b0851da90a11c0e7a4695f
+    .agents/skills/prepare-goal/SKILL.md: sha256:30ddf176d77cd2b297b0bff083b4bdcfb4990fb8a4319792adbe0caed290d4c2
     .agents/skills/prepare-goal/agents/openai.yaml: sha256:870d31c398ceb1c485a64b3a5e694942f055e85983718a61434b117bca5cefbc
     .agents/skills/quiet-command-auditor/SKILL.md: sha256:f6277836e6e6abf911131228442cbd6aad32d7b9f95ab5796e54d0667956e9cf
     .agents/skills/quiet-command-auditor/agents/openai.yaml: sha256:f291311cccf3c7de9195eaf3c032a88a2a9fc2cc13ab5296731316febadc755e
@@ -2568,7 +2524,7 @@ dependencies:
     .agents/skills/tauri-dev-screenshot/SKILL.md: sha256:b459e78f784f71fc663975c96474fe4200c9a87d8f570693f6f8c2f7268166c7
     .agents/skills/tauri-dev-screenshot/agents/openai.yaml: sha256:ebc13a58abf6b69c57a69fce2f6741a2f12d68752fd069f7a91b3efdbc154888
     .agents/skills/tauri-dev-screenshot/scripts/capture-tauri-window.ps1: sha256:08122773223be39540de577039a51af9e630d60442d1ce9403a4451ce3cb3405
-    .agents/skills/tauri-icon-gen/SKILL.md: sha256:fd4226ccdcc670fda7f21e7a12457e25f03688805554246c77bd1ace41473858
+    .agents/skills/tauri-icon-gen/SKILL.md: sha256:cb238a15ba006f4f1e4000e8ac93cac49c56c82eddb3c29eb2051c645b0dbe17
     .agents/skills/tauri-icon-gen/scripts/remove_white_bg.py: sha256:3f4e6fc1ff8ae0f9ef6aa4c465dc02209cd27ea0627f4c4d38698c889be6e480
     .agents/skills/tauri-webview-geometry/SKILL.md: sha256:093bcb662564fd89fa59219e4796ed8ff478108ffa980289a47fdea3fe44a648
     .agents/skills/tauri-webview-geometry/agents/openai.yaml: sha256:5efd1747a8ba2bb6223bee1a579f3712972828a9aa90e4c40bd341f8fd6846ba
@@ -2811,7 +2767,7 @@ dependencies:
     .claude/skills/premortem/scripts/format_report.py: sha256:7450cbddd3478d66421c9e9d90a8dbfe0ddf38647ec5e12b806227f270be70e9
     .claude/skills/premortem/scripts/gap_analyzer.py: sha256:b0bee34a3d8dc955277c0f3050ecaf6e756dea50683d4d00838b5372d1902ce0
     .claude/skills/premortem/scripts/github_integration.py: sha256:113a55435ff150ec9940b0f5d4cff3e9fd24d9429cbc7ab2dc30e96e223b640b
-    .claude/skills/prepare-goal/SKILL.md: sha256:7adab464e280586f6b989658fb8f8dba19644e1867b0851da90a11c0e7a4695f
+    .claude/skills/prepare-goal/SKILL.md: sha256:30ddf176d77cd2b297b0bff083b4bdcfb4990fb8a4319792adbe0caed290d4c2
     .claude/skills/prepare-goal/agents/openai.yaml: sha256:870d31c398ceb1c485a64b3a5e694942f055e85983718a61434b117bca5cefbc
     .claude/skills/quiet-command-auditor/SKILL.md: sha256:f6277836e6e6abf911131228442cbd6aad32d7b9f95ab5796e54d0667956e9cf
     .claude/skills/quiet-command-auditor/agents/openai.yaml: sha256:f291311cccf3c7de9195eaf3c032a88a2a9fc2cc13ab5296731316febadc755e
@@ -2858,7 +2814,7 @@ dependencies:
     .claude/skills/tauri-dev-screenshot/SKILL.md: sha256:b459e78f784f71fc663975c96474fe4200c9a87d8f570693f6f8c2f7268166c7
     .claude/skills/tauri-dev-screenshot/agents/openai.yaml: sha256:ebc13a58abf6b69c57a69fce2f6741a2f12d68752fd069f7a91b3efdbc154888
     .claude/skills/tauri-dev-screenshot/scripts/capture-tauri-window.ps1: sha256:08122773223be39540de577039a51af9e630d60442d1ce9403a4451ce3cb3405
-    .claude/skills/tauri-icon-gen/SKILL.md: sha256:fd4226ccdcc670fda7f21e7a12457e25f03688805554246c77bd1ace41473858
+    .claude/skills/tauri-icon-gen/SKILL.md: sha256:cb238a15ba006f4f1e4000e8ac93cac49c56c82eddb3c29eb2051c645b0dbe17
     .claude/skills/tauri-icon-gen/scripts/remove_white_bg.py: sha256:3f4e6fc1ff8ae0f9ef6aa4c465dc02209cd27ea0627f4c4d38698c889be6e480
     .claude/skills/tauri-webview-geometry/SKILL.md: sha256:093bcb662564fd89fa59219e4796ed8ff478108ffa980289a47fdea3fe44a648
     .claude/skills/tauri-webview-geometry/agents/openai.yaml: sha256:5efd1747a8ba2bb6223bee1a579f3712972828a9aa90e4c40bd341f8fd6846ba
@@ -3096,7 +3052,7 @@ dependencies:
     .kiro/skills/premortem/scripts/format_report.py: sha256:7450cbddd3478d66421c9e9d90a8dbfe0ddf38647ec5e12b806227f270be70e9
     .kiro/skills/premortem/scripts/gap_analyzer.py: sha256:b0bee34a3d8dc955277c0f3050ecaf6e756dea50683d4d00838b5372d1902ce0
     .kiro/skills/premortem/scripts/github_integration.py: sha256:113a55435ff150ec9940b0f5d4cff3e9fd24d9429cbc7ab2dc30e96e223b640b
-    .kiro/skills/prepare-goal/SKILL.md: sha256:7adab464e280586f6b989658fb8f8dba19644e1867b0851da90a11c0e7a4695f
+    .kiro/skills/prepare-goal/SKILL.md: sha256:30ddf176d77cd2b297b0bff083b4bdcfb4990fb8a4319792adbe0caed290d4c2
     .kiro/skills/prepare-goal/agents/openai.yaml: sha256:870d31c398ceb1c485a64b3a5e694942f055e85983718a61434b117bca5cefbc
     .kiro/skills/quiet-command-auditor/SKILL.md: sha256:f6277836e6e6abf911131228442cbd6aad32d7b9f95ab5796e54d0667956e9cf
     .kiro/skills/quiet-command-auditor/agents/openai.yaml: sha256:f291311cccf3c7de9195eaf3c032a88a2a9fc2cc13ab5296731316febadc755e
@@ -3142,7 +3098,7 @@ dependencies:
     .kiro/skills/tauri-dev-screenshot/SKILL.md: sha256:b459e78f784f71fc663975c96474fe4200c9a87d8f570693f6f8c2f7268166c7
     .kiro/skills/tauri-dev-screenshot/agents/openai.yaml: sha256:ebc13a58abf6b69c57a69fce2f6741a2f12d68752fd069f7a91b3efdbc154888
     .kiro/skills/tauri-dev-screenshot/scripts/capture-tauri-window.ps1: sha256:08122773223be39540de577039a51af9e630d60442d1ce9403a4451ce3cb3405
-    .kiro/skills/tauri-icon-gen/SKILL.md: sha256:fd4226ccdcc670fda7f21e7a12457e25f03688805554246c77bd1ace41473858
+    .kiro/skills/tauri-icon-gen/SKILL.md: sha256:cb238a15ba006f4f1e4000e8ac93cac49c56c82eddb3c29eb2051c645b0dbe17
     .kiro/skills/tauri-icon-gen/scripts/remove_white_bg.py: sha256:3f4e6fc1ff8ae0f9ef6aa4c465dc02209cd27ea0627f4c4d38698c889be6e480
     .kiro/skills/tauri-webview-geometry/SKILL.md: sha256:093bcb662564fd89fa59219e4796ed8ff478108ffa980289a47fdea3fe44a648
     .kiro/skills/tauri-webview-geometry/agents/openai.yaml: sha256:5efd1747a8ba2bb6223bee1a579f3712972828a9aa90e4c40bd341f8fd6846ba
@@ -3173,8 +3129,8 @@ dependencies:
     .kiro/skills/work-log-maintenance/agents/openai.yaml: sha256:e951b8256a5a1b032bcca3c7105230f5041467594434ca23b562b8ec5ec4abc8
     .kiro/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
     .kiro/skills/zsh/SKILL.md: sha256:42a47db6cbc7f8a3b1b0f1b65cee6c13115264231f1a60c54dbf2823c13b15ad
-  content_hash: sha256:a0e5d7eae77a61ec53520fb61e0ba992292fbb11e413f36761f389ae0938d353
-- repo_url: gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
+  content_hash: sha256:200c2d0d451b73b11e503ff5f273e0c81016f0fc69385a95baccf407712d3673
+- repo_url: k16shikano/fd287c3133457c4fd8f5601d34aa817d
   name: japanese-tech-writing
   host: gist.github.com
   resolved_commit: 5ed08e4475365fd233aa0d3ab71c19b87e1a5732
@@ -3190,10 +3146,10 @@ dependencies:
   - .kiro/skills/fd287c3133457c4fd8f5601d34aa817d/SKILL.md
   content_hash: sha256:bc7c0b812df34be051a7887ee008f941f336c91fab5876ff0d11f8373c9366ad
 - repo_url: langchain-ai/deepagents
-  name: web-research
+  name: deepagents
   host: github.com
   resolved_commit: db441ed306a8e03fb68f2ae6a2c08523e248976d
-  version: 1.0.0
+  version: unknown
   virtual_path: libs/cli/examples/skills/web-research
   is_virtual: true
   package_type: claude_skill
@@ -5601,32 +5557,6 @@ dependencies:
   host: github.com
   resolved_commit: 3027f20f3181758385a1bb8c022d4041dfb4de84
   version: unknown
-  virtual_path: skills/humanizer
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/humanizer
-  - .agents/skills/humanizer/README.md
-  - .agents/skills/humanizer/SKILL.md
-  - .claude/skills/humanizer
-  - .claude/skills/humanizer/README.md
-  - .claude/skills/humanizer/SKILL.md
-  - .kiro/skills/humanizer
-  - .kiro/skills/humanizer/README.md
-  - .kiro/skills/humanizer/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/humanizer/README.md: sha256:3ddb1450e1f81964c23ff14ffa5c400ec7a43e3eea406bcca2262e2f2ac9d4a6
-    .agents/skills/humanizer/SKILL.md: sha256:6688e4e292ab4f235e2a27f5193a7d048657c74b26ed6000398ee3371c9c3a4b
-    .claude/skills/humanizer/README.md: sha256:3ddb1450e1f81964c23ff14ffa5c400ec7a43e3eea406bcca2262e2f2ac9d4a6
-    .claude/skills/humanizer/SKILL.md: sha256:6688e4e292ab4f235e2a27f5193a7d048657c74b26ed6000398ee3371c9c3a4b
-    .kiro/skills/humanizer/README.md: sha256:3ddb1450e1f81964c23ff14ffa5c400ec7a43e3eea406bcca2262e2f2ac9d4a6
-    .kiro/skills/humanizer/SKILL.md: sha256:6688e4e292ab4f235e2a27f5193a7d048657c74b26ed6000398ee3371c9c3a4b
-  content_hash: sha256:34a38e6acc60d4529612d41ffe740bca0060d3c5e89e2a0d24ae795f67157fbb
-- repo_url: softaworks/agent-toolkit
-  name: agent-toolkit
-  host: github.com
-  resolved_commit: 3027f20f3181758385a1bb8c022d4041dfb4de84
-  version: unknown
   virtual_path: skills/marp-slide
   is_virtual: true
   package_type: claude_skill
@@ -5984,56 +5914,6 @@ dependencies:
     .kiro/skills/agentic-actions-auditor/references/vector-h-dangerous-sandbox-configs.md: sha256:278df9befc36f231dea2e4d2bf00311657056fa7b87a1a49b0e0e23a141d5935
     .kiro/skills/agentic-actions-auditor/references/vector-i-wildcard-allowlists.md: sha256:68a4cd774ad829e535a8ec15ee492caefbae8e46f115f345b7f2bf2fecf88f86
   content_hash: sha256:68dfe0a1986f7a0a6cc55935bc0d6392b36b137c28f20280fead610e361e55b8
-- repo_url: trailofbits/skills
-  name: skills
-  host: github.com
-  resolved_commit: 39e10bd31e808e4dbf50588dd023fa6197b6b0cc
-  version: unknown
-  virtual_path: plugins/audit-context-building/skills/audit-context-building
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/audit-context-building
-  - .agents/skills/audit-context-building/SKILL.md
-  - .agents/skills/audit-context-building/agents/openai.yaml
-  - .agents/skills/audit-context-building/assets/trail-of-bits-mark.svg
-  - .agents/skills/audit-context-building/resources/COMPLETENESS_CHECKLIST.md
-  - .agents/skills/audit-context-building/resources/FUNCTION_MICRO_ANALYSIS_EXAMPLE.md
-  - .agents/skills/audit-context-building/resources/OUTPUT_REQUIREMENTS.md
-  - .claude/skills/audit-context-building
-  - .claude/skills/audit-context-building/SKILL.md
-  - .claude/skills/audit-context-building/agents/openai.yaml
-  - .claude/skills/audit-context-building/assets/trail-of-bits-mark.svg
-  - .claude/skills/audit-context-building/resources/COMPLETENESS_CHECKLIST.md
-  - .claude/skills/audit-context-building/resources/FUNCTION_MICRO_ANALYSIS_EXAMPLE.md
-  - .claude/skills/audit-context-building/resources/OUTPUT_REQUIREMENTS.md
-  - .kiro/skills/audit-context-building
-  - .kiro/skills/audit-context-building/SKILL.md
-  - .kiro/skills/audit-context-building/agents/openai.yaml
-  - .kiro/skills/audit-context-building/assets/trail-of-bits-mark.svg
-  - .kiro/skills/audit-context-building/resources/COMPLETENESS_CHECKLIST.md
-  - .kiro/skills/audit-context-building/resources/FUNCTION_MICRO_ANALYSIS_EXAMPLE.md
-  - .kiro/skills/audit-context-building/resources/OUTPUT_REQUIREMENTS.md
-  deployed_file_hashes:
-    .agents/skills/audit-context-building/SKILL.md: sha256:98e8d493f75456b7c7a5b6a4ad0b383e266ca5e550d3c627f5a4357fd1bf1cd2
-    .agents/skills/audit-context-building/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .agents/skills/audit-context-building/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .agents/skills/audit-context-building/resources/COMPLETENESS_CHECKLIST.md: sha256:b0acac41b4a1b77836400e66018914e939724b22d84f39bbb882b8cef9fb09f2
-    .agents/skills/audit-context-building/resources/FUNCTION_MICRO_ANALYSIS_EXAMPLE.md: sha256:49024fff7893c383618ae71e969a6ac1b9d96f672348e1810383b04f8b265d7c
-    .agents/skills/audit-context-building/resources/OUTPUT_REQUIREMENTS.md: sha256:ee50a4f690fc94e017260613cb6e837fc1b3399b7cb617b4ce54ef02c912ae8f
-    .claude/skills/audit-context-building/SKILL.md: sha256:98e8d493f75456b7c7a5b6a4ad0b383e266ca5e550d3c627f5a4357fd1bf1cd2
-    .claude/skills/audit-context-building/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .claude/skills/audit-context-building/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .claude/skills/audit-context-building/resources/COMPLETENESS_CHECKLIST.md: sha256:b0acac41b4a1b77836400e66018914e939724b22d84f39bbb882b8cef9fb09f2
-    .claude/skills/audit-context-building/resources/FUNCTION_MICRO_ANALYSIS_EXAMPLE.md: sha256:49024fff7893c383618ae71e969a6ac1b9d96f672348e1810383b04f8b265d7c
-    .claude/skills/audit-context-building/resources/OUTPUT_REQUIREMENTS.md: sha256:ee50a4f690fc94e017260613cb6e837fc1b3399b7cb617b4ce54ef02c912ae8f
-    .kiro/skills/audit-context-building/SKILL.md: sha256:98e8d493f75456b7c7a5b6a4ad0b383e266ca5e550d3c627f5a4357fd1bf1cd2
-    .kiro/skills/audit-context-building/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .kiro/skills/audit-context-building/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .kiro/skills/audit-context-building/resources/COMPLETENESS_CHECKLIST.md: sha256:b0acac41b4a1b77836400e66018914e939724b22d84f39bbb882b8cef9fb09f2
-    .kiro/skills/audit-context-building/resources/FUNCTION_MICRO_ANALYSIS_EXAMPLE.md: sha256:49024fff7893c383618ae71e969a6ac1b9d96f672348e1810383b04f8b265d7c
-    .kiro/skills/audit-context-building/resources/OUTPUT_REQUIREMENTS.md: sha256:ee50a4f690fc94e017260613cb6e837fc1b3399b7cb617b4ce54ef02c912ae8f
-  content_hash: sha256:0b638343d23c5d93623d02a599d5cb032ac4ee45d6a0cff8e4e97ee36e618ff8
 - repo_url: trailofbits/skills
   name: sharp-edges
   host: github.com
