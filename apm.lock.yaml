@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-06-29T03:48:17.545583+00:00'
+generated_at: '2026-06-29T03:50:07.659773+00:00'
 apm_version: 0.22.0
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -1369,7 +1369,6 @@ dependencies:
   - .agents/skills/linear-task-ops/references/asana-to-linear-mapping.md
   - .agents/skills/linear-task-ops/references/linear-labels-jey.md
   - .agents/skills/linear-task-ops/references/linear-projects-jey.md
-  - .agents/skills/linear-task-ops/scripts/__pycache__/linear_task.cpython-314.pyc
   - .agents/skills/linear-task-ops/scripts/linear_task.py
   - .agents/skills/macos-troubleshooting
   - .agents/skills/macos-troubleshooting/SKILL.md
@@ -1726,7 +1725,6 @@ dependencies:
   - .claude/skills/linear-task-ops/references/asana-to-linear-mapping.md
   - .claude/skills/linear-task-ops/references/linear-labels-jey.md
   - .claude/skills/linear-task-ops/references/linear-projects-jey.md
-  - .claude/skills/linear-task-ops/scripts/__pycache__/linear_task.cpython-314.pyc
   - .claude/skills/linear-task-ops/scripts/linear_task.py
   - .claude/skills/macos-troubleshooting
   - .claude/skills/macos-troubleshooting/SKILL.md
@@ -2402,7 +2400,6 @@ dependencies:
     .agents/skills/linear-task-ops/references/asana-to-linear-mapping.md: sha256:1834da757bf10fe142c5279fb187ef3c566d7e9a6a2c11b9c7fa7d87f5d2daf4
     .agents/skills/linear-task-ops/references/linear-labels-jey.md: sha256:66feaab114f4c56c0cd80c688c8ea428d89293ec0b1574bad4ac93de3ea5c63e
     .agents/skills/linear-task-ops/references/linear-projects-jey.md: sha256:80799869719ac3ff368ebc2ca564187843ea93890a063ddaa00b4fc06792edcb
-    .agents/skills/linear-task-ops/scripts/__pycache__/linear_task.cpython-314.pyc: sha256:f6ade55c79f9c737dbc26e5431d88fcaf03afbb5c5d6e52b90c30dae3ad362a0
     .agents/skills/linear-task-ops/scripts/linear_task.py: sha256:5b849a6f3d625de438c5ae0d58008b736e317c91dc15f803795206724e282dc2
     .agents/skills/macos-troubleshooting/SKILL.md: sha256:3efb1911efc881aad24d3706479f2c78952bb8491973f8ec01256d774b434f72
     .agents/skills/macos-troubleshooting/agents/openai.yaml: sha256:e0c22f96dba94a75c9689b34dd10c1ce965bfa9bbe8b613e586e72a87bf6f69a
@@ -2692,7 +2689,6 @@ dependencies:
     .claude/skills/linear-task-ops/references/asana-to-linear-mapping.md: sha256:1834da757bf10fe142c5279fb187ef3c566d7e9a6a2c11b9c7fa7d87f5d2daf4
     .claude/skills/linear-task-ops/references/linear-labels-jey.md: sha256:66feaab114f4c56c0cd80c688c8ea428d89293ec0b1574bad4ac93de3ea5c63e
     .claude/skills/linear-task-ops/references/linear-projects-jey.md: sha256:80799869719ac3ff368ebc2ca564187843ea93890a063ddaa00b4fc06792edcb
-    .claude/skills/linear-task-ops/scripts/__pycache__/linear_task.cpython-314.pyc: sha256:f6ade55c79f9c737dbc26e5431d88fcaf03afbb5c5d6e52b90c30dae3ad362a0
     .claude/skills/linear-task-ops/scripts/linear_task.py: sha256:5b849a6f3d625de438c5ae0d58008b736e317c91dc15f803795206724e282dc2
     .claude/skills/macos-troubleshooting/SKILL.md: sha256:3efb1911efc881aad24d3706479f2c78952bb8491973f8ec01256d774b434f72
     .claude/skills/macos-troubleshooting/agents/openai.yaml: sha256:e0c22f96dba94a75c9689b34dd10c1ce965bfa9bbe8b613e586e72a87bf6f69a
@@ -3131,11 +3127,11 @@ dependencies:
     .kiro/skills/zsh/SKILL.md: sha256:42a47db6cbc7f8a3b1b0f1b65cee6c13115264231f1a60c54dbf2823c13b15ad
   content_hash: sha256:200c2d0d451b73b11e503ff5f273e0c81016f0fc69385a95baccf407712d3673
 - repo_url: k16shikano/fd287c3133457c4fd8f5601d34aa817d
-  name: japanese-tech-writing
+  name: fd287c3133457c4fd8f5601d34aa817d
   host: gist.github.com
   resolved_commit: 5ed08e4475365fd233aa0d3ab71c19b87e1a5732
   resolved_ref: 5ed08e4475365fd233aa0d3ab71c19b87e1a5732
-  version: 1.0.0
+  version: unknown
   package_type: claude_skill
   deployed_files:
   - .agents/skills/fd287c3133457c4fd8f5601d34aa817d
@@ -3144,6 +3140,10 @@ dependencies:
   - .claude/skills/fd287c3133457c4fd8f5601d34aa817d/SKILL.md
   - .kiro/skills/fd287c3133457c4fd8f5601d34aa817d
   - .kiro/skills/fd287c3133457c4fd8f5601d34aa817d/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/fd287c3133457c4fd8f5601d34aa817d/SKILL.md: sha256:e05525f4b78eedbe41a62b3078c408d7a2fbc96386be8af893b6b7d58e6941c0
+    .claude/skills/fd287c3133457c4fd8f5601d34aa817d/SKILL.md: sha256:e05525f4b78eedbe41a62b3078c408d7a2fbc96386be8af893b6b7d58e6941c0
+    .kiro/skills/fd287c3133457c4fd8f5601d34aa817d/SKILL.md: sha256:e05525f4b78eedbe41a62b3078c408d7a2fbc96386be8af893b6b7d58e6941c0
   content_hash: sha256:bc7c0b812df34be051a7887ee008f941f336c91fab5876ff0d11f8373c9366ad
 - repo_url: langchain-ai/deepagents
   name: deepagents
