@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-06-29T03:50:07.659773+00:00'
+generated_at: '2026-06-29T15:51:54.574822+00:00'
 apm_version: 0.22.0
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -6933,6 +6933,7 @@ dependencies:
 mcp_servers:
 - codex
 - context7
+- headroom
 - jina-reader
 - mcp-simple-voicevox
 mcp_configs:
@@ -6951,13 +6952,21 @@ mcp_configs:
     - '@upstash/context7-mcp@latest'
     registry: false
     command: npx
+  headroom:
+    name: headroom
+    transport: stdio
+    args:
+    - mcp
+    - serve
+    registry: false
+    command: headroom
   jina-reader:
     name: jina-reader
     transport: streamable-http
-    url: https://mcp.jina.ai/v1?include_tags=search,read
+    registry: false
     headers:
       Authorization: Bearer ${JINA_API_KEY}
-    registry: false
+    url: https://mcp.jina.ai/v1?include_tags=search,read
   mcp-simple-voicevox:
     name: mcp-simple-voicevox
     transport: stdio
