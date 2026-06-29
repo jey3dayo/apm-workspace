@@ -1,6 +1,6 @@
 ---
 name: docs-manager
-description: Use when reviewing, validating, creating, updating, or fixing project documentation, especially docs directories and Markdown files governed by metadata, OKF / YAML frontmatter, tag, link, and size rules such as `.docs-manager-config.json`.
+description: Use when reviewing, validating, creating, updating, or fixing project documentation, especially docs directories and Markdown files governed by metadata, OKF / YAML frontmatter, tag, link, and size rules such as `.docs-manager-config.json`. Also use when a user asks to make docs OKF-compatible or says to use OKF docs, even if they do not spell out the frontmatter fields.
 ---
 
 # Docs Manager
@@ -47,6 +47,8 @@ config がない場合は default behavior として扱う:
 - tag separator: `, `
 - size limits: ideal 300 lines, acceptable 500 lines, warning 1000 lines, maximum 2000 lines
 - link validation: enabled unless the project clearly disables it
+
+ただし、ユーザーが OKF / Open Knowledge Format / YAML frontmatter 対応を求めた場合は、config がなくても `metadata_profile: okf` 相当として扱う。`type` を required、`title`, `description`, `resource`, `tags`, `timestamp`, `audience`, `owner` を recommended とし、既存 docs への最小 frontmatter 追加を第一候補にする。OKF 化のためだけに本文を大きく再構成したり、新規説明 docs を増やしたりしない。
 
 ## Validation Order
 
@@ -96,6 +98,7 @@ config がない場合は default behavior として扱う:
 - image path
 - link validation が disabled の場合は実行も要求もしない
 - section anchor は markdown heading から解決する。入力や実ファイル確認で anchor がないと分かっている場合は、追加推測せず missing anchor として扱う
+- external URL は redirect 先も確認する。厳格な validator で落ちそうな 301/302 がある場合は、本文意図を変えずに canonical URL へ寄せる
 
 ### 6. Project-Specific Rules
 
@@ -125,6 +128,14 @@ config がない場合は default behavior として扱う:
 4. 手動で書かれた判断や project-specific な文体を保ち、汎用テンプレートで上書きしない
 5. 大きな再構成が必要な場合は、編集前に affected files と最小変更案を提示する
 6. 更新後に metadata / tags / size / links の確認結果を添える
+
+OKF 対応として既存 docs を直す場合:
+
+1. まず既存 Markdown の本文を保ち、YAML frontmatter を追加または修正する
+2. config がない repo でも、OKF 指定があれば frontmatter を canonical metadata として扱う
+3. `tags` には project rule の required prefix を満たす値を入れる
+4. 既存の dirty diff がある場合は、OKF metadata hunk と本文 hunk を分けて扱う。stage / review / commit では OKF hunk だけを混ぜずに確認する
+5. 調査メモや一時 report は repo guidance が指定する一時ディレクトリに置く。指定がなければ repo root を汚さず、必要最小限にする
 
 ## Config Examples
 
