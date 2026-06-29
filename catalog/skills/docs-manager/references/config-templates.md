@@ -176,6 +176,29 @@ Link validation configuration for markdown-link-check tool.
 
 ## Metadata Templates
 
+### OKF-Compatible Frontmatter
+
+Use this when `.docs-manager-config.json` sets `metadata_profile` to `okf`.
+
+```markdown
+---
+type: guide
+title: [Document Title]
+description: One-sentence purpose and scope for search and agent context.
+resource: urn:docs:[document-slug]
+tags: [category/value, audience/value]
+timestamp: YYYY-MM-DD
+audience: agent
+owner: docs
+---
+
+# [Document Title]
+
+## Overview
+
+Brief description of the document's purpose and scope.
+```
+
 ### Standard Metadata Block
 
 ```markdown

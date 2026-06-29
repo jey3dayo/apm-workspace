@@ -1,13 +1,13 @@
 ---
 name: docs-manager
-description: Use when reviewing, validating, creating, updating, or fixing project documentation, especially docs directories and Markdown files governed by metadata, tag, link, and size rules such as `.docs-manager-config.json`.
+description: Use when reviewing, validating, creating, updating, or fixing project documentation, especially docs directories and Markdown files governed by metadata, OKF / YAML frontmatter, tag, link, and size rules such as `.docs-manager-config.json`.
 ---
 
 # Docs Manager
 
 ## Overview
 
-This skill is for project documentation maintenance, not generic prose editing. Start from project configuration, then review, create, update, fix, or validate documentation against metadata, tags, size, and links in that order.
+This skill is for project documentation maintenance, not generic prose editing. Start from project configuration, then review, create, update, fix, or validate documentation against metadata, OKF compatibility, tags, size, and links in that order.
 
 The detailed schemas and examples already live in `templates/`, `examples/`, and `references/`.
 
@@ -15,6 +15,7 @@ The detailed schemas and examples already live in `templates/`, `examples/`, and
 
 - docs directory や `.md` 群の品質をレビューしたい
 - metadata, tags, size limit, link validity を確認したい
+- OKF / Open Knowledge Format 互換の YAML frontmatter を段階導入したい
 - 新しいドキュメントを既存ルールに合わせて作りたい
 - 既存ドキュメントを実装や運用変更に合わせて更新・修復したい
 - project-specific documentation rules を適用したい
@@ -29,16 +30,17 @@ The detailed schemas and examples already live in `templates/`, `examples/`, and
 
 1. `.docs-manager-config.json` があるか確認する
 2. `docs_root` と project type を確認する
-3. metadata rule を確認する
+3. metadata profile と metadata rule を確認する
 4. tag / size / link rule を順に見る
 5. project-specific rule があれば最後に適用する
 
-最初に effective rules を短く確定してから作業する。最低限、`docs_root`、`project_type`、metadata fields、required tags、tag separator、size limits、link validation の有効/無効を明示する。
+最初に effective rules を短く確定してから作業する。最低限、`docs_root`、`project_type`、metadata profile、metadata fields、required tags、tag separator、size limits、link validation の有効/無効を明示する。
 
 config がない場合は default behavior として扱う:
 
 - `docs_root`: `./docs`
 - `project_type`: `generic`
+- `metadata_profile`: `legacy`
 - metadata fields: `最終更新`, `対象`, `タグ`
 - date format: `YYYY-MM-DD`
 - required tags: `category/`, `audience/`
@@ -60,6 +62,16 @@ config がない場合は default behavior として扱う:
 - audience
 - tags
 - format が project rule に合っているか
+
+`metadata_profile` が `okf` の場合:
+
+- YAML frontmatter を canonical metadata として扱う
+- `type` を required field として見る
+- `title`, `description`, `resource`, `tags`, `timestamp`, `audience`, `owner` を recommended fields として見る
+- `timestamp` は `最終更新` / date field の canonical alias として扱う
+- `tags` は `タグ` / tags field の canonical alias として扱う
+- 既存の body metadata block がある場合は legacy alias として許容し、frontmatter と矛盾する場合だけ warning にする
+- OKF field 以外の project governance、size limits、required tag prefixes、link validation は `.docs-manager-config.json` 側の rule を優先する
 
 ### 3. Tag System
 
@@ -123,6 +135,7 @@ config がない場合は default behavior として扱う:
   - `examples/generic-config.json`
   - `examples/dotfiles-config.json`
   - `examples/custom-project-config.json`
+  - `examples/okf-config.json`
 
 ## Common Mistakes
 

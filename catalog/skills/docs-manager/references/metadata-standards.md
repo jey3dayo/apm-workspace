@@ -35,6 +35,63 @@ Common variations:
 - Japanese: `最終更新`, `対象`, `タグ`
 - Custom: Any field names matching your project conventions
 
+## OKF-Compatible Metadata Profile
+
+Use `metadata_profile: "okf"` when project documentation should be consumable as Open Knowledge Format-style Markdown: YAML frontmatter first, body content second. Keep existing body metadata blocks as legacy aliases during migration.
+
+```json
+{
+  "metadata_profile": "okf",
+  "metadata_format": {
+    "frontmatter": true,
+    "required_fields": ["type"],
+    "recommended_fields": [
+      "title",
+      "description",
+      "resource",
+      "tags",
+      "timestamp",
+      "audience",
+      "owner"
+    ],
+    "date_field": "timestamp",
+    "date_format": "YYYY-MM-DD",
+    "audience_field": "audience",
+    "tags_field": "tags"
+  }
+}
+```
+
+Recommended frontmatter:
+
+```yaml
+---
+type: guide
+title: Documentation Guide
+description: Project documentation governance and operating rules.
+resource: urn:docs:documentation-guide
+tags: [category/docs, audience/agent]
+timestamp: 2026-06-29
+audience: agent
+owner: docs
+---
+```
+
+Field mapping:
+
+| OKF field     | Legacy alias           | Validation                                       |
+| ------------- | ---------------------- | ------------------------------------------------ |
+| `type`        | category tag           | Required in OKF profile                          |
+| `title`       | H1 heading             | Recommended; warn if it conflicts with H1        |
+| `description` | Lead paragraph         | Recommended for search and agent context         |
+| `resource`    | Canonical link in body | Recommended stable identifier                    |
+| `tags`        | `タグ`                 | Recommended; still apply required tag prefixes   |
+| `timestamp`   | `最終更新`             | Recommended; canonical date field in OKF profile |
+| `audience`    | `対象`                 | Recommended project governance field             |
+| `owner`       | none                   | Recommended stewardship field                    |
+
+Do not force-convert existing repositories unless their config opts into the OKF profile. In legacy profile, accept body metadata blocks as the canonical format.
+
 ## Date Field
 
 ### Format

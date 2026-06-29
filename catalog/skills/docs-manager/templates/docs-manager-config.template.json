@@ -14,6 +14,12 @@
       "enum": ["generic", "dotfiles", "pr-labeler", "terraform-infra", "custom"],
       "default": "generic"
     },
+    "metadata_profile": {
+      "type": "string",
+      "description": "Metadata profile: legacy body metadata block or OKF-compatible YAML frontmatter",
+      "enum": ["legacy", "okf"],
+      "default": "legacy"
+    },
     "required_tags": {
       "type": "array",
       "description": "Required tag prefixes (e.g., category/, audience/)",
@@ -72,6 +78,27 @@
       "type": "object",
       "description": "Metadata field configuration",
       "properties": {
+        "frontmatter": {
+          "type": "boolean",
+          "description": "Use YAML frontmatter as the canonical metadata block",
+          "default": false
+        },
+        "required_fields": {
+          "type": "array",
+          "description": "Required metadata fields for the active metadata profile",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "recommended_fields": {
+          "type": "array",
+          "description": "Recommended metadata fields for search, RAG, and agent context",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
         "date_field": {
           "type": "string",
           "description": "Name of the date field",
@@ -94,6 +121,9 @@
         }
       },
       "default": {
+        "frontmatter": false,
+        "required_fields": [],
+        "recommended_fields": [],
         "date_field": "最終更新",
         "date_format": "YYYY-MM-DD",
         "audience_field": "対象",
@@ -213,6 +243,7 @@
   "default": {
     "docs_root": "./docs",
     "project_type": "generic",
+    "metadata_profile": "legacy",
     "required_tags": ["category/", "audience/"],
     "tag_separator": ", ",
     "size_limits": {

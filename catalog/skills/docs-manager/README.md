@@ -10,6 +10,7 @@ Docs Manager provides systematic documentation quality assurance through configu
 
 - Configurable Paths: Set documentation root directory via configuration
 - Metadata Validation: Verify required metadata fields and formats
+- OKF-Compatible Metadata: Support YAML frontmatter profiles for agent-readable docs
 - Tag System Compliance: Validate tags against project-specific vocabulary
 - Size Management: Monitor document size and suggest splits
 - Link Validation: Check internal and external links
