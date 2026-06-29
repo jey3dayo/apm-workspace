@@ -9,9 +9,9 @@ Prepare a clear, verifiable goal before starting a long-running agent loop.
 
 Use this skill to convert messy intent into a contract the agent and evaluator can audit. Do not treat `/goal` as a place for discovery-only work or a loose backlog. A good goal has one objective, bounded scope, explicit constraints, observable evidence, and a stop rule.
 
-This skill is a goal-start gate. By default, when readiness is `ready` and the user is asking the agent to implement, fix, proceed, continue, or otherwise do the work, create the goal and start work instead of only printing a paste-ready `/goal`.
+This skill is a goal-start gate. By default, when readiness is `ready` and the user is asking the agent to implement, fix, proceed, continue, run a goal command, or otherwise do the work, create the goal and start work instead of only printing a paste-ready `/goal`.
 
-Use output-only behavior only when the user explicitly asks to draft, write, review, prepare, or copy a goal without starting work. In output-only mode, draft the `/goal` command and stop. You may do minimal read-only context inspection for goal drafting, but do not edit files, run validation commands, create the goal, or start implementation.
+Use output-only behavior only when the user explicitly asks to draft, write, review, prepare, or copy a goal without starting work. Requests to "set a goal", "run the goal command", "goal and proceed", "start a goal", or "use /goal for this" are action-oriented unless the user explicitly says draft-only, copy-only, do not start, or review wording only. In output-only mode, draft the `/goal` command and stop. You may do minimal read-only context inspection for goal drafting, but do not edit files, run validation commands, create the goal, or start implementation.
 
 ## Workflow
 
@@ -39,6 +39,7 @@ Use output-only behavior only when the user explicitly asks to draft, write, rev
 4. Choose execution mode
    - `auto-start`: the default when readiness is `ready` and the user's message asks to do work, such as "implement", "fix", "continue", "next", "proceed", "do this", or a similarly action-oriented instruction.
    - `draft-only`: use only when the user explicitly asks for a goal draft, review, wording, planning output, paste-ready `/goal`, or otherwise indicates they do not want execution to start yet.
+   - If the user invokes or asks to run a goal command for ready action work, choose `auto-start`. Do not stop after printing goal text unless the same message explicitly asks for draft-only, copy-only, or review-only output.
    - If the message is ambiguous between "review the goal wording" and "start the work", prefer `draft-only` for review-like requests and `auto-start` for action-like requests.
 
 5. Normalize the objective
@@ -77,7 +78,7 @@ When readiness is `ready`, use the selected execution mode.
 
 ### Auto-start mode
 
-When execution mode is `auto-start`, do not print a paste-ready `/goal` block and do not ask the user to paste anything. Briefly state the inferred goal, create the goal through the active goal mechanism when available, then continue with normal implementation behavior. If no explicit goal-creation tool is available in the environment, treat the `Starting goal` text as the active contract for the current turn and start work under it.
+When execution mode is `auto-start`, do not print a paste-ready `/goal` block and do not ask the user to paste anything. Briefly state the inferred goal, create the goal through the active goal mechanism when available, then continue with normal implementation behavior. If a goal-creation tool is available, calling it is part of the expected behavior, not optional. If no explicit goal-creation tool is available in the environment, treat the `Starting goal` text as the active contract for the current turn and start work under it.
 
 Use this structure before starting work:
 
