@@ -2085,7 +2085,7 @@ cmd_audit_ci_smoke() {
 
   if ! (
     cd "$temp_dir" &&
-      apm install --only apm &&
+      apm install --only apm --target all &&
       apm audit --ci
   ); then
     warn "APM audit smoke workspace left at $temp_dir for inspection."
