@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from argparse import ArgumentParser
-from urllib.parse import quote
 from pathlib import Path
+from urllib.parse import quote
 from xml.sax.saxutils import escape
 
 
@@ -48,7 +48,12 @@ def build_opml(provider: str, identifier: str, feed_title: str, category: str) -
 
 def main() -> None:
     parser = ArgumentParser(description="Generate FreshRSS OPML for manga-feeds.")
-    parser.add_argument("--provider", choices=["gangan-online", "yanmaga"], default="gangan-online", help="manga-feeds provider route")
+    parser.add_argument(
+        "--provider",
+        choices=["gangan-online", "yanmaga"],
+        default="gangan-online",
+        help="manga-feeds provider route",
+    )
     parser.add_argument("--title-id", help="Gangan ONLINE title ID; kept for backward compatibility")
     parser.add_argument("--slug", help="Provider slug, such as a URL-encoded yanmaga comics slug")
     parser.add_argument("--feed-title", required=True, help="FreshRSS feed title")

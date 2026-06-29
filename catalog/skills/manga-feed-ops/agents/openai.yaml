@@ -1,4 +1,0 @@
-interface:
-  display_name: "Manga Feed Ops"
-  short_description: "Register manga chapter feeds in FreshRSS"
-  default_prompt: "Use $manga-feed-ops to add a Gangan ONLINE manga feed to FreshRSS."

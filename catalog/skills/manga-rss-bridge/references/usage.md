@@ -66,3 +66,77 @@ mise run ci
 ## Policy
 
 This is an unofficial bridge for personal self-hosted use. It must not bypass authentication, paid content, DRM, or access controls. It should only read publicly available work or chapter metadata, and users should set reasonable fetch intervals.
+
+## FreshRSS Homelab Operations
+
+Use this section when adding, verifying, quarantining, or troubleshooting manga chapter feeds for FreshRSS through the homelab `manga-feeds` service.
+
+Expected outcome: one FreshRSS feed per manga title, where each chapter appears as a separate RSS item. Do not use changedetection.io RSS for chapter-level manga feeds; changedetection.io is only for coarse page-change alerts.
+
+Default new or experimental `manga-feeds` subscriptions to the FreshRSS `changedetection.io` category as a quarantine area. Move stable feeds to `Comic` later from the UI. Do not move categories in the database unless explicitly asked.
+
+FreshRSS subscription URLs:
+
+```text
+http://manga-feeds.freshrss.svc.cluster.local:8080/gangan-online/<title-id>.xml
+http://manga-feeds.freshrss.svc.cluster.local:8080/yanmaga/<slug>.xml
+```
+
+Provider notes:
+
+- Gangan ONLINE: title ID comes from `https://www.ganganonline.com/title/<title-id>`.
+- ヤンマガWeb: slug comes from `https://yanmaga.jp/comics/<slug>`.
+
+Check service reachability:
+
+```bash
+kubectl -n freshrss get deployment,svc,pod -l app=manga-feeds
+kubectl -n freshrss run manga-feeds-check --rm -i --restart=Never \
+  --image=curlimages/curl:8.11.1 -- \
+  curl -fsS http://manga-feeds:8080/<provider>/<identifier>.xml
+```
+
+Check whether a feed is already registered. Show only the matching line and do not dump full OPML because existing feeds may contain private tokens:
+
+```bash
+kubectl -n freshrss exec deployment/freshrss -- sh -lc \
+  'php /var/www/FreshRSS/cli/export-opml-for-user.php --user <user> | grep -F "manga-feeds.freshrss.svc.cluster.local:8080/<provider>/<identifier>.xml"'
+```
+
+Generate OPML with the bundled script:
+
+```bash
+python3 scripts/generate_freshrss_opml.py \
+  --provider <gangan-online|yanmaga> \
+  --slug <title-id-or-slug> \
+  --feed-title "<manga-title>" \
+  --category changedetection.io \
+  --output /tmp/manga-feed.opml
+```
+
+Import into FreshRSS:
+
+```bash
+pod=$(kubectl -n freshrss get pod -l app=freshrss \
+  --field-selector=status.phase=Running \
+  -o jsonpath='{.items[0].metadata.name}')
+kubectl -n freshrss cp /tmp/manga-feed.opml "$pod:/tmp/manga-feed.opml"
+kubectl -n freshrss exec "$pod" -- \
+  php /var/www/FreshRSS/cli/import-for-user.php \
+    --user=<user> \
+    --filename=/tmp/manga-feed.opml
+```
+
+Refresh and verify:
+
+```bash
+kubectl -n freshrss exec "$pod" -- \
+  php /var/www/FreshRSS/cli/actualize-user.php --user=<user>
+kubectl -n freshrss exec "$pod" -- php -r '$db=new PDO("sqlite:/var/www/FreshRSS/data/users/<user>/db.sqlite"); foreach($db->query("select name,url from feed where url like \"%manga-feeds.freshrss.svc.cluster.local%<identifier>.xml%\"") as $r){echo $r["name"]."|".$r["url"]."\n";}'
+```
+
+Safety notes:
+
+- Do not print full FreshRSS OPML exports.
+- Do not commit generated OPML files.
+- Do not delete existing changedetection.io feeds automatically.

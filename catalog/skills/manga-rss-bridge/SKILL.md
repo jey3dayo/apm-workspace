@@ -1,13 +1,13 @@
 ---
 name: manga-rss-bridge
-description: "Use when working on the manga-rss-bridge repository: summarizing how to use the self-hosted manga RSS bridge, adding or verifying providers, checking route examples, running local development commands, or applying the repository's TypeScript quality gates."
+description: "Use when working on the manga-rss-bridge repository or its self-hosted FreshRSS feed operations: summarizing usage, adding or verifying providers, checking route examples, generating FreshRSS OPML, checking homelab manga-feeds subscriptions, running local development commands, or applying the repository's TypeScript quality gates."
 ---
 
 # Manga RSS Bridge
 
 ## Overview
 
-Use this skill for the `manga-rss-bridge` repository. It captures the practical usage of the tool and the repository workflow needed to modify it safely.
+Use this skill for the `manga-rss-bridge` repository and the related self-hosted FreshRSS feed workflow. It captures the practical usage of the tool, repository workflow, and minimal homelab subscription checks needed to modify or operate it safely.
 
 Source order:
 
@@ -115,3 +115,5 @@ pnpm run lint
 ## Reference
 
 Read `references/usage.md` when the task is primarily about explaining current tool usage, route examples, Docker usage, or policy to a user. Do not read it for provider implementation workflow unless the user also asks for current route examples.
+
+For FreshRSS OPML import or homelab `manga-feeds` subscription checks, read `references/usage.md` and use `scripts/generate_freshrss_opml.py` instead of hand-writing OPML.
