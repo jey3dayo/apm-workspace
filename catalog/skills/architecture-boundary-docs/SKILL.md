@@ -15,7 +15,7 @@ If the target repository, requested path, or evidence pack is unavailable or too
    - Read repo guidance first: `AGENTS.md`, `CLAUDE.md`, linked docs, package scripts, and existing architecture docs when present.
    - Use `rg --files`, `rg`, package manifests, route/action files, schema/type files, and repository entrypoints to ground the map.
    - When running shell commands, quote every path that contains shell metacharacters such as parentheses, spaces, brackets, `*`, `?`, or `!`; this especially applies to framework route groups like `src/app/(admin)/...`.
-   - If docs governance matters, inspect the repository's local docs rules, metadata conventions, tags, size limits, and link checks directly.
+   - If docs governance matters, use `docs-manager` for metadata, tag, size, and link validation.
 
 2. Inventory boundaries:
    - Folders and ownership: app routes/actions, features, repositories, schemas, shared components, shared lib, scripts, infra, and generated docs.
