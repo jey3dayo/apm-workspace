@@ -4,7 +4,7 @@ APM-based global skill workspace for `jey3dayo`.
 
 This repository is the day-to-day working copy of `~/.apm`. `~/.apm` is the source of truth for daily authoring and operation. `~/.config` is not the authoring or operational surface.
 
-Current `apm` CLI source is pinned through `mise` to `pipx:apm-cli@0.20.0`.
+Current `apm` CLI source is pinned through `mise` to `pipx:apm-cli@0.22.0`.
 
 ## Source Of Truth
 
@@ -23,6 +23,14 @@ cd ~/.apm
 mise install
 mise run deploy
 ```
+
+Before changing workspace mechanics, classify the work as one of:
+
+- Stable rollout: keep `apm.yml` and `apm.lock.yaml` as-is, then use `mise run deploy`.
+- Upstream refresh: intentionally accept newer dependency content, then use `mise run upgrade` and review `apm.lock.yaml`.
+- Local-only skill sync: refresh local Codex skills only, then use `mise run apply:skills:local`.
+
+For Codex skill changes, verification is not complete until the deployed `~/.agents/skills/<id>/SKILL.md` contains the expected content.
 
 ## Core Tasks
 

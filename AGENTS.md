@@ -74,6 +74,11 @@ Keep Codex global MCP registration limited to cross-repo foundations.
 
 Choose the command based on intent:
 
+- Before running a rollout command, classify the work as `stable rollout`, `upstream refresh`, or `local-only skill sync`
+  - `stable rollout`: preserve the current manifest and lock, then use `mise run deploy`
+  - `upstream refresh`: intentionally accept newer dependency content, then use `mise run upgrade` and review `apm.lock.yaml`
+  - `local-only skill sync`: refresh local Codex skills only, then use `mise run apply:skills:local`
+
 - `mise run upgrade`
   - Accept newer upstream package content with `apm install -g --update`
   - Avoid for routine rollout; reserve it for intentional upstream refresh of workspace dependencies
@@ -167,8 +172,11 @@ Then review and commit the skill changes.
   - `~/.apm/mise.toml`
   - `~/.config/mise/config.windows.toml`
 - When verifying Codex skill rollout, check `~/.agents/skills`
+- Codex skill verification is complete only when the deployed `~/.agents/skills/<id>/SKILL.md` contains the expected content
 - if an external skill is still missing there after deployment, treat it as a temporary Codex-specific delivery gap and resolve it separately from the tracked workspace state
 - if a skill repeatedly fails the normal upstream-managed lane because of packaging or rollout issues, move it onto the `manual-skills` package flow rather than patching deployed targets by hand
+- When updating user-global tools through `mise`, verify the actual install tree and resolved binary path before declaring success
+  - `mise latest` can be affected by release-age policy; compare with the upstream registry when the exact latest version matters
 
 ## Cache Integrity Recovery
 
