@@ -6,7 +6,8 @@ description: |
   graphs, `[task_config].includes`, DB/env/dotenvx/secrets/tools task-family
   splitting, tool/package centralization, workflow automation, and `mise skills add`.
   [When] Use when users mention mise, mise.toml, `mise run`, `mise check`,
-  `mise deploy`, task definitions, tool management, npm/pipx global packages,
+  `mise deploy`, `mise upgrade <tool>`, `minimum_release_age`, latest eligible
+  release, task definitions, tool management, npm/pipx global packages,
   formatters such as `nixpkgs-fmt`, dotenvx/env tasks, DB/secrets task groups,
   or Windows settings such as `run_windows` and `config.windows.toml`. For
   `~/.apm` work about the pinned `apm` source, `apm.yml`/lock state,

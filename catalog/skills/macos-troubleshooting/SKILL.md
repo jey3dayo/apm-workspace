@@ -1,6 +1,6 @@
 ---
 name: macos-troubleshooting
-description: Diagnose and repair local macOS problems with safe, reversible steps first. Use when the user says Mac, macOS, Finder, Dock, Spotlight, IME, input source, Japanese input, notifications, Bluetooth, audio, permissions, app launch failure, `.appが起動できない`, `Codex.appが起動できない`, CLIで権限や許可を与える相談, or another local system feature is broken, stuck, behaving oddly, or may be fixable by restarting a process or service.
+description: Diagnose and repair local macOS problems with safe, reversible steps first. Use when the user says Mac, macOS, Finder, Dock, Spotlight, IME, input source, Japanese input, notifications, Bluetooth, audio, permissions, app launch failure, `.appが起動できない`, `Codex.appが起動できない`, `~/.codex`, `logs_2.sqlite`, local SQLite/config/state file recovery, `ファイルを戻して`, CLIで権限や許可を与える相談, or another local system feature is broken, stuck, behaving oddly, or may be fixable by restarting a process or service. For slow, frozen, CPU-heavy, file-descriptor, or process-pressure symptoms, use `pc-ops` instead.
 ---
 
 # macOS Troubleshooting
@@ -14,6 +14,7 @@ Use this skill to turn vague macOS symptoms into a short, safe repair sequence. 
    - User agent: menu extras, input, Dock, Finder, Spotlight, notifications.
    - System service: Bluetooth, audio, network, permissions, login items.
    - Data/config: learned dictionaries, caches, preferences, indexes.
+   - Local app state: SQLite databases, local config, logs, and restorable state files such as `~/.codex/logs_2.sqlite`.
    - If the symptom is broad, first narrow what fails: one app vs every app, UI search vs file search, input conversion vs input switching, or device connection vs system settings.
 2. Inspect before changing:
    - Use `ps`, `launchctl`, `log`, `defaults`, or app-specific checks when they are relevant.

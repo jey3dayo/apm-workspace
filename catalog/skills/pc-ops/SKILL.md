@@ -1,6 +1,6 @@
 ---
 name: pc-ops
-description: Diagnose local PC slowdowns, command-launch delays, stuck developer tools, excessive helper processes, file descriptor pressure, macOS signature evaluation problems, LaunchServices issues, or security-agent interference. Use when the user says the machine, terminal, Codex, IDE, browser, diff UI, MCP servers, or app launch is slow, frozen, unusually CPU-heavy, or needs safe investigation and repair.
+description: Diagnose local PC slowdowns, command-launch delays, stuck developer tools, excessive helper processes, file descriptor pressure, macOS signature evaluation problems, LaunchServices issues, or security-agent interference. Use when the user says the machine, terminal, Codex, IDE, browser, diff UI, MCP servers, or app launch is slow, frozen, unusually CPU-heavy, or needs safe investigation and repair. Do not use for local SQLite/config/state file recovery such as `~/.codex/logs_2.sqlite` or backup restore requests; use `macos-troubleshooting` for reversible local state repair.
 ---
 
 # PC Ops
@@ -33,6 +33,12 @@ Use this skill to turn a vague "the PC is slow or broken" report into a measured
 5. Re-measure after every material change and compare against the prior snapshot.
 6. Report with evidence: top offenders, commands run, what changed, remaining risk, and the next single action.
 7. If the issue is resolved and the finding is likely reusable, ask a short follow-up such as: "この原因と対処を `pc-ops` に追記しますか？" Do not edit the skill or memory unless the user agrees.
+
+## Boundary With macOS Troubleshooting
+
+Use `pc-ops` for performance and execution-environment symptoms: slow commands, freezes, CPU or memory pressure, file descriptor pressure, excessive helper processes, app launch latency, Gatekeeper/signature evaluation delays, and security-agent interference.
+
+Use `macos-troubleshooting` instead for app launch failure without a performance angle, local database/config/state file recovery, `~/.codex` SQLite recovery, or "restore this file" requests.
 
 ## Snapshot And Re-Measure
 

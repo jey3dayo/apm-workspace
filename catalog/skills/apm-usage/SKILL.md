@@ -1,6 +1,6 @@
 ---
 name: apm-usage
-description: Use when working in the `~/.apm` global APM workspace, especially for `skillアップデートして再配布して`, `skillアップデート`, `再配布`, `apmのバージョンあげて`, or checking whether the `apm` source/version is recorded in `mise.toml`. Use when you need to decide what owns a change, which path is the source of truth, or which APM rollout / `mise` task to run. Also trigger for `manual-skillsはやらないとダメ`, `orphaned package`, `apm.ymlのパス調整`, `apm.yml`, `apm.lock.yaml`, managed catalog rollout, checked-out external dependency repositories, and choosing between `mise run check`, `verify`, `deploy`, `refresh`, `upgrade`, `refresh:deploy`, `prepare:catalog`, `install:catalog`, `smoke:catalog`, and `apply:skills:local` inside `~/.apm`. For skill body, description, script, reference, or asset design itself, coordinate with `skill-creator`; for general mise usage outside the APM workspace, use `mise`.
+description: Use when working in the `~/.apm` global APM workspace, especially for `skillアップデートして再配布して`, `skillアップデート`, `再配布`, `apmのバージョンあげて`, or checking whether the `apm` source/version is recorded in `mise.toml`. Use when you need to decide what owns a change, which path is the source of truth, or which APM rollout / `mise` task to run. Also trigger for `manual-skillsはやらないとダメ`, `orphaned package`, `apm.ymlのパス調整`, `apm.yml`, `apm.lock.yaml`, managed catalog rollout, checked-out external dependency repositories, and choosing between `mise run check`, `verify`, `deploy`, `refresh`, `upgrade`, `refresh:deploy`, `prepare:catalog`, `install:catalog`, `smoke:catalog`, and `apply:skills:local` inside `~/.apm`. For skill body, description, script, reference, or asset design itself, coordinate with `skill-creator`; for general mise usage outside the APM workspace, including `mise upgrade <tool>` or `minimum_release_age`, use `mise`.
 ---
 
 # APM Usage
@@ -50,6 +50,7 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 - If the skill currently lives in `manual-skills/.apm/skills/<id>/`, first decide whether it is still an upstream packaging workaround. If it is becoming workspace-owned, plan a catalog migration instead of continuing to tune it in the manual lane.
 - If the request is "change shared guidance", edit `catalog/**`; use `prepare:catalog` before publish/install.
 - If the request is "change dependency selection", edit or review `apm.yml` / `apm.lock.yaml`.
+- If the request is about `mise upgrade <tool>`, `minimum_release_age`, latest eligible release selection, or why a non-APM tool version did not update, use the `mise` skill unless the pinned `apm` source, APM manifest, lockfile, or rollout task selection is the actual subject.
 - If the request is to add an individual APM package, decide scope before running `apm install`: use `apm install -g <package-ref>` only for user-global dependencies that belong in `~/.apm`; use `apm install <package-ref>` from the target repository for repo-local dependencies.
 - If the request is to add an MCP server through APM, apply the same scope rule: use `apm install -g --mcp <name> ...` only for cross-repo foundation MCPs; use repo-local `apm install --mcp <name> ...` for project, framework, UI, database, browser, or app-runtime-specific MCPs.
 - If MCP placement, server selection, credentials, transport, or startup behavior is the main question, coordinate with `mcp-tools`; keep this skill focused on APM ownership, source of truth, and rollout commands.
@@ -82,6 +83,7 @@ Use global APM only for cross-repo foundations such as lightweight notifications
 - Do not persist Headroom MCP/proxy/wrap configuration through APM package manifests. Headroom MCP registration may touch agent runtime config, so treat it as a local machine setup step unless the user explicitly asks to manage that runtime state.
 - Prefer `mise` tasks over ad hoc script entrypoints for normal operation.
 - Before committing `apm.lock.yaml` after `mise run upgrade`, separate the intended dependency update from unrelated unpinned dependency drift. Report unrelated drift instead of hiding it inside the target dependency change.
+- When `apm.yml` includes a `gist.github.com/...#<sha>` dependency, treat APM 0.22.0 lock output as suspect until verified. After `mise run upgrade` or any lock refresh, check whether the matching `apm.lock.yaml` record kept `repo_url: gist.github.com/...`; if it was rewritten to `owner/<gist-id>`, expect manifest-lock mismatch on later `apply` or `--frozen` runs and correct or report it before declaring the rollout complete.
 - If an upstream skill path is wrong, correct it to the real upstream path and treat the corrected successful install as the main result.
 - Treat known orphaned guidance or unrelated `manual-skills` deploy warnings as residual noise. Do not mention them in the final report when the command exits zero and the target skill source path, manifest or lock entry, and deployed target are correct.
 - Report deploy warnings only when they directly affect the skill changed in this task, its manifest entry, its `manual-skills` provenance, or the deploy exit code.
@@ -102,6 +104,7 @@ Use global APM only for cross-repo foundations such as lightweight notifications
 
 3. Upstream refresh:
    - run `mise run upgrade`
+   - if the manifest contains `gist.github.com/...#<sha>`, verify the regenerated `apm.lock.yaml` kept the same `repo_url` spelling before deploy
    - review `apm.lock.yaml` before commit
 
 4. Individual package or MCP added:
