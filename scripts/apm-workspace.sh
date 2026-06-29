@@ -950,7 +950,7 @@ unpinned_external_references() {
     !in_dependencies {
       next
     }
-    /^[[:space:]]+[^:#][^:]*:/ {
+    /^[[:space:]]+[^-[:space:]#][^:]*:/ {
       current_indent = indent_level($0)
       line = $0
       sub(/^[[:space:]]+/, "", line)
@@ -1218,7 +1218,7 @@ manifest_external_references() {
     !in_dependencies {
       next
     }
-    /^[[:space:]]+[^:#][^:]*:/ {
+    /^[[:space:]]+[^-[:space:]#][^:]*:/ {
       current_indent = indent_level($0)
       line = $0
       sub(/^[[:space:]]+/, "", line)
@@ -1271,6 +1271,14 @@ manifest_external_reference_keys() {
       base = $0
       sub(/#.*/, "", base)
       print base
+      if (index(base, "https://gist.github.com/") == 1) {
+        gist_key = base
+        sub("^https://gist[.]github[.]com/", "", gist_key)
+        sub("[.]git$", "", gist_key)
+        if (split(gist_key, gist_parts, "/") == 2) {
+          print gist_key
+        }
+      }
     }
   ' | awk 'NF && !seen[$0]++'
 }
@@ -1592,19 +1600,35 @@ collect_external_skill_records() {
 
   while IFS= read -r manifest_ref; do
     [ -n "$manifest_ref" ] || continue
-    required_key="$manifest_ref"
-    case "$required_key" in
+    required_keys=$(printf '%s\n' "$manifest_ref")
+    case "$manifest_ref" in
+      https://gist.github.com/*/*.git#*)
+        manifest_base=${manifest_ref%%#*}
+        manifest_ref_suffix=${manifest_ref#*#}
+        gist_key=${manifest_base#https://gist.github.com/}
+        gist_key=${gist_key%.git}
+        required_keys=$(printf '%s\n%s#%s\n%s\n' "$required_keys" "$gist_key" "$manifest_ref_suffix" "$gist_key")
+        ;;
+      https://gist.github.com/*/*.git)
+        gist_key=${manifest_ref#https://gist.github.com/}
+        gist_key=${gist_key%.git}
+        required_keys=$(printf '%s\n%s\n' "$required_keys" "$gist_key")
+        ;;
       *#*)
         ;;
       *)
-        required_key=${required_key%%#*}
+        required_keys=$(printf '%s\n%s\n' "$required_keys" "${manifest_ref%%#*}")
         ;;
     esac
 
-    if ! awk -v key="$required_key" '$0 == key { found = 1; exit } END { exit(found ? 0 : 1) }' "$matched_keys_file"; then
+    required_keys_file=$(mktemp "${TMPDIR:-/tmp}/apm-required-keys.XXXXXX")
+    printf '%s\n' "$required_keys" | awk 'NF && !seen[$0]++' >"$required_keys_file"
+    if ! awk 'NR == FNR { required[$0] = 1; next } ($0 in required) { found = 1; exit } END { exit(found ? 0 : 1) }' \
+      "$required_keys_file" "$matched_keys_file"; then
       error "External manifest ref is missing from apm.lock.yaml: $manifest_ref"
       has_failure=1
     fi
+    rm -f "$required_keys_file"
   done <"$manifest_refs_file"
 
   rm -f "$manifest_refs_file" "$manifest_keys_file" "$lock_records_file" "$matched_keys_file"
