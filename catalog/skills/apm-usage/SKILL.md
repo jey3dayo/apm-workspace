@@ -1,6 +1,6 @@
 ---
 name: apm-usage
-description: Use when working in the `~/.apm` global APM workspace, especially for `skillアップデートして再配布して`, `skillアップデート`, `再配布`, `apmのバージョンあげて`, or checking whether the `apm` source/version is recorded in `mise.toml`. Use when you need to decide what owns a change, which path is the source of truth, or which APM rollout / `mise` task to run. Also trigger for `manual-skillsはやらないとダメ`, `orphaned package`, `apm.ymlのパス調整`, `apm.yml`, `apm.lock.yaml`, managed catalog rollout, checked-out external dependency repositories, and choosing between `mise run check`, `verify`, `deploy`, `refresh`, `upgrade`, `refresh:deploy`, `prepare:catalog`, `install:catalog`, `smoke:catalog`, and `apply:skills:local` inside `~/.apm`. For skill body, description, script, reference, or asset design itself, coordinate with `skill-creator`; for general mise usage outside the APM workspace, including `mise upgrade <tool>` or `minimum_release_age`, use `mise`.
+description: Use when working in the `~/.apm` global APM workspace, especially for `skillアップデートして再配布して`, `skillアップデート`, `再配布`, `apmのバージョンあげて`, or checking whether the `apm` source/version is recorded in `mise.toml`. Use when you need to decide what owns a change, which path is the source of truth, or which APM rollout / `mise` task to run. Also trigger for `manual-skillsはやらないとダメ`, `orphaned package`, `apm.ymlのパス調整`, `apm.yml`, `apm.lock.yaml`, managed catalog rollout, checked-out external dependency repositories, and choosing between `mise run check`, `verify`, `deploy`, `refresh`, `upgrade`, `refresh:deploy`, `prepare:catalog`, `install:catalog`, `smoke:catalog`, and `apply:skills:local` inside `~/.apm`. For skill body, description, script, reference, or asset design itself, coordinate with `skill-creator`; for general mise usage outside the APM workspace, including `mise upgrade TOOL` or `minimum_release_age`, use `mise`.
 ---
 
 # APM Usage
@@ -52,6 +52,7 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 - If the request is "change dependency selection", edit or review `apm.yml` / `apm.lock.yaml`.
 - If the request is about `mise upgrade <tool>`, `minimum_release_age`, latest eligible release selection, or why a non-APM tool version did not update, use the `mise` skill unless the pinned `apm` source, APM manifest, lockfile, or rollout task selection is the actual subject.
 - If the request is to add an individual APM package, decide scope before running `apm install`: use `apm install -g <package-ref>` only for user-global dependencies that belong in `~/.apm`; use `apm install <package-ref>` from the target repository for repo-local dependencies.
+- If the request is to scan an arbitrary repository and create, update, or clean up its repo-local `apm.yml`, use `apm-repo-bootstrap`; keep this skill focused on global APM ownership and rollout decisions.
 - If the request is to add an MCP server through APM, apply the same scope rule: use `apm install -g --mcp <name> ...` only for cross-repo foundation MCPs; use repo-local `apm install --mcp <name> ...` for project, framework, UI, database, browser, or app-runtime-specific MCPs.
 - If MCP placement, server selection, credentials, transport, or startup behavior is the main question, coordinate with `mcp-tools`; keep this skill focused on APM ownership, source of truth, and rollout commands.
 - If the APM workspace has no repo-local MCP distribution lane for a target repository, record the intended placement as guidance and keep the global manifest lightweight. Treat implementing repo-local MCP distribution as a separate workspace-mechanics task.
@@ -65,13 +66,15 @@ When moving tools out of global APM, prefer project-local APM installs for MCPs 
 
 Good repo-local candidates:
 
-- `chrome-devtools`: install only in frontend repositories with Next.js, React, Vite, or another browser-served app.
+- `chrome-devtools`: treat as a browser MCP, not as a lightweight web skill. Prefer Codex bundled Chrome/browser operation when sufficient; add `chrome-devtools` repo-local or on-demand for DevTools-specific inspection, project login/session state, local runtime coupling, or repeatable browser verification.
 - `tauri-mcp-server`: install only in repositories that own a Tauri runtime such as `src-tauri`.
 - `agentation-mcp`: install only in projects that use the Agentation toolbar and need annotation sync with agents.
 - `peekaboo` or other screen automation MCPs: keep repo-local or on-demand for visual inspection; avoid global startup fan-out.
 - database, SaaS observability, or project API MCPs: keep repo-local so credentials and environment loading stay scoped to the project.
 
 Use global APM only for cross-repo foundations such as lightweight notifications, current docs lookup, public research/readers, or core agent bridges.
+
+When deciding repo-local MCP placement by repository type, runtime, or workflow, read `references/repo-local-mcp.md`.
 
 ## Guardrails
 

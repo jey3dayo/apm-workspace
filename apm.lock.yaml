@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-06-29T15:51:54.574822+00:00'
+generated_at: '2026-06-30T02:02:13.360202+00:00'
 apm_version: 0.22.0
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -427,26 +427,6 @@ dependencies:
   host: github.com
   resolved_commit: 54754a6f97051d1d76c8758353d8ea41afe502a6
   version: unknown
-  virtual_path: understand-anything-plugin/skills/understand-chat
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/understand-chat
-  - .agents/skills/understand-chat/SKILL.md
-  - .claude/skills/understand-chat
-  - .claude/skills/understand-chat/SKILL.md
-  - .kiro/skills/understand-chat
-  - .kiro/skills/understand-chat/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/understand-chat/SKILL.md: sha256:d8234baaabcee97c2e4be8204a58123de592164e8d7502398caeddf1223b2e17
-    .claude/skills/understand-chat/SKILL.md: sha256:d8234baaabcee97c2e4be8204a58123de592164e8d7502398caeddf1223b2e17
-    .kiro/skills/understand-chat/SKILL.md: sha256:d8234baaabcee97c2e4be8204a58123de592164e8d7502398caeddf1223b2e17
-  content_hash: sha256:3cec7cc6b02177b29d359c3889e311a3985314c61ef7a654ed6c22d43e44b080
-- repo_url: Lum1104/Understand-Anything
-  name: Understand-Anything
-  host: github.com
-  resolved_commit: 54754a6f97051d1d76c8758353d8ea41afe502a6
-  version: unknown
   virtual_path: understand-anything-plugin/skills/understand-dashboard
   is_virtual: true
   package_type: claude_skill
@@ -502,26 +482,6 @@ dependencies:
     .claude/skills/understand-explain/SKILL.md: sha256:5a057cf9ce6717eb2d3ecbb8dd6a68647a41b901ebc1fc0b9439ca186f1b0739
     .kiro/skills/understand-explain/SKILL.md: sha256:5a057cf9ce6717eb2d3ecbb8dd6a68647a41b901ebc1fc0b9439ca186f1b0739
   content_hash: sha256:8f6ef8bc8d4be5e0e8dd764c0d4c5a42b95fa47191e22edbb5ccc351828af7b6
-- repo_url: Lum1104/Understand-Anything
-  name: Understand-Anything
-  host: github.com
-  resolved_commit: 54754a6f97051d1d76c8758353d8ea41afe502a6
-  version: unknown
-  virtual_path: understand-anything-plugin/skills/understand-onboard
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/understand-onboard
-  - .agents/skills/understand-onboard/SKILL.md
-  - .claude/skills/understand-onboard
-  - .claude/skills/understand-onboard/SKILL.md
-  - .kiro/skills/understand-onboard
-  - .kiro/skills/understand-onboard/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/understand-onboard/SKILL.md: sha256:fad391a6526aeeb90ae8686e071ebe2d29700ebb4ea975e47a1c6da8b66171c3
-    .claude/skills/understand-onboard/SKILL.md: sha256:fad391a6526aeeb90ae8686e071ebe2d29700ebb4ea975e47a1c6da8b66171c3
-    .kiro/skills/understand-onboard/SKILL.md: sha256:fad391a6526aeeb90ae8686e071ebe2d29700ebb4ea975e47a1c6da8b66171c3
-  content_hash: sha256:f486302a95dd1e871c5f1ac1dba1d87b8b40e61802fffedead5d203676fdc771
 - repo_url: affaan-m/everything-claude-code
   name: everything-claude-code
   host: github.com
@@ -1001,70 +961,6 @@ dependencies:
     .kiro/skills/humanizer-ja/README.md: sha256:657ca8e0e1750c2eb025e6e61fe229bc9eafcea3ac53694a12f69399a1a29872
     .kiro/skills/humanizer-ja/SKILL.md: sha256:3fe07f06a179801d7445eff19ed40f1681ef9860665c50c1e9a032f6dffead89
   content_hash: sha256:b6da4ef92a941ab364ab1ddf259d9e511e098a0719f7ee2202847351c34a8194
-- repo_url: hashicorp/agent-skills
-  name: agent-skills
-  host: github.com
-  resolved_commit: 339a113935812ad75c6ff90d418b739a021826d1
-  version: unknown
-  virtual_path: terraform/code-generation/skills/terraform-style-guide
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/terraform-style-guide
-  - .agents/skills/terraform-style-guide/SECURITY.md
-  - .agents/skills/terraform-style-guide/SKILL.md
-  - .claude/skills/terraform-style-guide
-  - .claude/skills/terraform-style-guide/SECURITY.md
-  - .claude/skills/terraform-style-guide/SKILL.md
-  - .kiro/skills/terraform-style-guide
-  - .kiro/skills/terraform-style-guide/SECURITY.md
-  - .kiro/skills/terraform-style-guide/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/terraform-style-guide/SECURITY.md: sha256:85b5784b87b00a7ee477145c744e4287d1b6e574a1966c6c94e8d5529c4ee8dc
-    .agents/skills/terraform-style-guide/SKILL.md: sha256:fea8a0eadf68f1ac45cae3b1d6dc4c66b489fb6e40a3d41762120059c49540c2
-    .claude/skills/terraform-style-guide/SECURITY.md: sha256:85b5784b87b00a7ee477145c744e4287d1b6e574a1966c6c94e8d5529c4ee8dc
-    .claude/skills/terraform-style-guide/SKILL.md: sha256:fea8a0eadf68f1ac45cae3b1d6dc4c66b489fb6e40a3d41762120059c49540c2
-    .kiro/skills/terraform-style-guide/SECURITY.md: sha256:85b5784b87b00a7ee477145c744e4287d1b6e574a1966c6c94e8d5529c4ee8dc
-    .kiro/skills/terraform-style-guide/SKILL.md: sha256:fea8a0eadf68f1ac45cae3b1d6dc4c66b489fb6e40a3d41762120059c49540c2
-  content_hash: sha256:fd301fe5bfb41764acac67c25244cc5650b5dd0a5d8d037414449a2d3adecbbf
-- repo_url: hashicorp/agent-skills
-  name: agent-skills
-  host: github.com
-  resolved_commit: 339a113935812ad75c6ff90d418b739a021826d1
-  version: unknown
-  virtual_path: terraform/code-generation/skills/terraform-test
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/terraform-test
-  - .agents/skills/terraform-test/SKILL.md
-  - .agents/skills/terraform-test/references/CI_CD.md
-  - .agents/skills/terraform-test/references/EXAMPLES.md
-  - .agents/skills/terraform-test/references/MOCK_PROVIDERS.md
-  - .claude/skills/terraform-test
-  - .claude/skills/terraform-test/SKILL.md
-  - .claude/skills/terraform-test/references/CI_CD.md
-  - .claude/skills/terraform-test/references/EXAMPLES.md
-  - .claude/skills/terraform-test/references/MOCK_PROVIDERS.md
-  - .kiro/skills/terraform-test
-  - .kiro/skills/terraform-test/SKILL.md
-  - .kiro/skills/terraform-test/references/CI_CD.md
-  - .kiro/skills/terraform-test/references/EXAMPLES.md
-  - .kiro/skills/terraform-test/references/MOCK_PROVIDERS.md
-  deployed_file_hashes:
-    .agents/skills/terraform-test/SKILL.md: sha256:f7b0c4d1e1381751f75c4a07b7a97d8c011f741723aea1cca7f73e54af27b138
-    .agents/skills/terraform-test/references/CI_CD.md: sha256:88fdffa4d3b8f361c570cb7c0df90a44380c70eb4471b3e27d552f32820179c8
-    .agents/skills/terraform-test/references/EXAMPLES.md: sha256:e57ef65b6c6545e00f7dc6106c71d44d29e819923ea8e0040efb38fbfbc60f50
-    .agents/skills/terraform-test/references/MOCK_PROVIDERS.md: sha256:788a9fcb988df8a207c1251fd971a11d1cd59b6b8e4023907b00a0fee976c001
-    .claude/skills/terraform-test/SKILL.md: sha256:f7b0c4d1e1381751f75c4a07b7a97d8c011f741723aea1cca7f73e54af27b138
-    .claude/skills/terraform-test/references/CI_CD.md: sha256:88fdffa4d3b8f361c570cb7c0df90a44380c70eb4471b3e27d552f32820179c8
-    .claude/skills/terraform-test/references/EXAMPLES.md: sha256:e57ef65b6c6545e00f7dc6106c71d44d29e819923ea8e0040efb38fbfbc60f50
-    .claude/skills/terraform-test/references/MOCK_PROVIDERS.md: sha256:788a9fcb988df8a207c1251fd971a11d1cd59b6b8e4023907b00a0fee976c001
-    .kiro/skills/terraform-test/SKILL.md: sha256:f7b0c4d1e1381751f75c4a07b7a97d8c011f741723aea1cca7f73e54af27b138
-    .kiro/skills/terraform-test/references/CI_CD.md: sha256:88fdffa4d3b8f361c570cb7c0df90a44380c70eb4471b3e27d552f32820179c8
-    .kiro/skills/terraform-test/references/EXAMPLES.md: sha256:e57ef65b6c6545e00f7dc6106c71d44d29e819923ea8e0040efb38fbfbc60f50
-    .kiro/skills/terraform-test/references/MOCK_PROVIDERS.md: sha256:788a9fcb988df8a207c1251fd971a11d1cd59b6b8e4023907b00a0fee976c001
-  content_hash: sha256:124fdde03e38d9942810e65e762eaf95f8680a1f1f6fdae3ecda16d86b10620b
 - repo_url: ibelick/ui-skills
   name: ui-skills
   host: github.com

@@ -1,0 +1,15 @@
+# Repo-Local APM Recommendations
+
+Use this table as a default policy, not a complete inventory. Inspect the repository and existing `apm.yml` before editing.
+
+| Repository signal                                                                             | Default placement       | Package refs or MCPs                                                                                               |
+| --------------------------------------------------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Next.js, React, Vite, TypeScript, UI review, or general frontend work                         | global                  | Keep common web skills global by default. Do not add `react-best-practices`, `typescript`, or UI skills here.      |
+| Frontend browser debugging when bundled Chrome control is sufficient                          | on-demand               | Use Codex bundled Chrome/browser operation first. Do not add `chrome-devtools` just because this is a web repo.    |
+| DevTools-specific inspection, project login/session state, or repeatable browser verification | repo-local or on-demand | Add `chrome-devtools` only when the repository needs DevTools-specific runtime inspection or scoped browser state. |
+| Terraform modules, environments, or `.tftest.hcl` tests                                       | repo-local              | `hashicorp/agent-skills/terraform/code-generation/skills/terraform-style-guide`                                    |
+| Terraform modules, environments, or `.tftest.hcl` tests                                       | repo-local              | `hashicorp/agent-skills/terraform/code-generation/skills/terraform-test`                                           |
+| Tauri app with `src-tauri`                                                                    | repo-local              | `tauri-mcp-server`; add browser tooling only when the repository's workflow requires it locally.                   |
+| Marp, slide decks, or presentation authoring sources                                          | repo-local              | presentation or Marp skills used by that repository.                                                               |
+| Project-specific database, SaaS, observability, or private API workflows                      | repo-local              | project-specific MCPs scoped to the repository credentials and environment.                                        |
+| One-off visual inspection or desktop automation                                               | on-demand               | `peekaboo` or equivalent screen automation MCPs only when needed.                                                  |

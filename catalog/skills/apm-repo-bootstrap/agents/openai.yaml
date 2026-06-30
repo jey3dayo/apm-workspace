@@ -1,0 +1,4 @@
+interface:
+  display_name: "APM Repo Bootstrap"
+  short_description: "Scan a repository and bootstrap repo-local APM dependencies."
+  default_prompt: "Scan this repository and prepare a minimal repo-local apm.yml using the APM repo bootstrap policy."
