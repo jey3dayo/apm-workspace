@@ -101,4 +101,11 @@ dependencies:
       command: codex
       args:
         - mcp-server
+    - name: headroom
+      registry: false
+      transport: stdio
+      command: headroom
+      args:
+        - mcp
+        - serve
 scripts: {}
