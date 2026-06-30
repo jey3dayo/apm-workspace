@@ -32,7 +32,6 @@
 | `mise run validate:workspace` | ○        | ○        | ○        | ○           | ○        | Respects `APM_WORKSPACE_DIR` for workspace validation                                                                        |
 | `mise run deploy`             | ○        | ○        | ○        | ○           | ○        | Runs `check -> apply -> doctor` for local delivery                                                                           |
 | `mise run prepare:catalog`    | ○        | ○        | ○        | ○           | ○        | Normalizes `catalog/` into the managed catalog package                                                                       |
-| `mise run verify:catalog`     | ○        | ○        | ○        | ○           | ○        | Runs `prepare:catalog`, `validate:catalog`, and `doctor`                                                                     |
 | `mise run install:catalog`    | ○        | ○        | ○        | ○           | ○        | Installs a pushed `catalog` ref                                                                                              |
 | `mise run smoke:catalog`      | ○        | ○        | ○        | ○           | ○        | Performs a temporary-install smoke test                                                                                      |
 | `mise run validate:catalog`   | ○        | ○        | ○        | ○           | ○        | Public task for drift checks                                                                                                 |

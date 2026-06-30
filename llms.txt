@@ -153,7 +153,6 @@ When a machine-local skill lives under `~/.apm/private-skills/`:
 - `mise run validate:workspace`: verify workspace wiring with workspace overrides
 - `mise run prepare:catalog`: normalize `catalog/` in place before commit and push
 - `mise run validate:catalog`: verify managed catalog package integrity
-- `mise run verify:catalog`: normalize the managed catalog, validate it, and print workspace health
 
 ## Cache Integrity Recovery
 

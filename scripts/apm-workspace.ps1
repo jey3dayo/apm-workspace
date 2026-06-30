@@ -2390,43 +2390,6 @@ function Invoke-RegisterCatalog {
   Write-Host "Registered catalog from upstream ref: $reference"
 }
 
-function Assert-CatalogReleaseReady {
-  Ensure-WorkspaceRepo
-
-  $dirty = & git -C $WorkspaceDir status --porcelain 2>$null
-  if ($LASTEXITCODE -ne 0) {
-    throw "Failed to inspect git status for $WorkspaceDir"
-  }
-  if (-not [string]::IsNullOrWhiteSpace(($dirty | Out-String))) {
-    throw "Working tree is dirty after prepare:catalog. Commit or stash changes, push the branch, then rerun release:catalog."
-  }
-
-  $tracking = Get-WorkspaceTrackingInfo
-  $upstream = "{0}/{1}" -f $tracking.RemoteName, $tracking.BranchName
-  $unpushed = & git -C $WorkspaceDir rev-list "$upstream..HEAD" 2>$null
-  if ($LASTEXITCODE -ne 0) {
-    throw "Failed to compare HEAD against $upstream"
-  }
-  if (-not [string]::IsNullOrWhiteSpace(($unpushed | Out-String))) {
-    throw "Branch has commits not on $upstream. Push before running release:catalog."
-  }
-}
-
-function Invoke-ReleaseCatalog {
-  param(
-    [string[]]$RequestedSkillIds
-  )
-
-  Require-Apm
-  Ensure-WorkspaceRepo
-  Ensure-WorkspaceScaffold
-  Ensure-WorkspaceMiseFile
-
-  Invoke-StageCatalog -RequestedSkillIds $RequestedSkillIds
-  Assert-CatalogReleaseReady
-  Invoke-RegisterCatalog -RequestedSkillIds $RequestedSkillIds
-}
-
 function Invoke-SmokeCatalog {
   param(
     [string[]]$RequestedSkillIds
@@ -2587,10 +2550,6 @@ switch ($Command) {
     Invoke-RegisterCatalog -RequestedSkillIds $CommandArgs
   }
 
-  "release:catalog" {
-    Invoke-ReleaseCatalog -RequestedSkillIds $CommandArgs
-  }
-
   "smoke:catalog" {
     Invoke-SmokeCatalog -RequestedSkillIds $CommandArgs
   }
@@ -2615,7 +2574,6 @@ Commands:
   bundle-catalog     Build ~/.apm/.catalog-build/catalog as the catalog package artifact
   prepare:catalog    Rewrite ~/.apm/catalog into its normalized publishable layout and print its upstream ref
   install:catalog    Install the catalog ref after commit/push
-  release:catalog    Prepare, require a clean pushed branch, then install the catalog ref
   smoke:catalog      Smoke-test the generated catalog package via temp project install
   audit:ci:smoke     Temp-install the workspace manifest and run 'apm audit --ci'
 

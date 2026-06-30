@@ -83,11 +83,6 @@ run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts
 description = "Validate the ~/.apm workspace and managed catalog wiring"
 depends = ["validate:workspace", "validate:catalog"]
 
-[tasks."apm:install"]
-description = "Run user-scope APM install from ~/.apm"
-run = "apm install -g"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"apm install -g\""
-
 [tasks."format:markdown"]
 description = "Format Markdown files in the ~/.apm workspace"
 run = "fd -e md -X prettier --write --log-level error >/dev/null"
@@ -194,22 +189,3 @@ run = ["apm install -g --update --exclude kiro", { task = "deploy" }]
 [tasks."refresh:deploy"]
 description = "Update, verify, and deploy the ~/.apm workspace locally from the current manifest and lock"
 run = [{ task = "refresh" }, { task = "deploy" }]
-
-[tasks."verify:catalog"]
-description = "Refresh, validate, and inspect the managed catalog package"
-run = [
-  { task = "prepare:catalog" },
-  { task = "validate:catalog" },
-  { task = "doctor" },
-]
-
-[tasks."release:catalog"]
-description = "Run local sync, require a clean pushed branch, then register the managed catalog"
-run = [
-  { task = "refresh:deploy" },
-  "bash ./scripts/apm-workspace.sh release:catalog",
-]
-run_windows = [
-  { task = "refresh:deploy" },
-  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 release:catalog",
-]

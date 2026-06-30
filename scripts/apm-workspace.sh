@@ -2029,38 +2029,6 @@ cmd_register_catalog() {
   log "Registered catalog from upstream ref: $reference"
 }
 
-assert_catalog_release_ready() {
-  local dirty tracking_info remote_name branch_name upstream unpushed
-
-  ensure_workspace_repo
-
-  dirty=$(git -C "$WORKSPACE_DIR" status --porcelain 2>/dev/null) || fail "Failed to inspect git status for $WORKSPACE_DIR"
-  if [[ -n "${dirty//$'\n'/}" ]]; then
-    fail "Working tree is dirty after prepare:catalog. Commit or stash changes, push the branch, then rerun release:catalog."
-  fi
-
-  tracking_info=$(workspace_tracking_info)
-  remote_name=${tracking_info%%"$(printf '\036')"*}
-  branch_name=${tracking_info#*"$(printf '\036')"}
-  upstream="$remote_name/$branch_name"
-
-  unpushed=$(git -C "$WORKSPACE_DIR" rev-list "$upstream..HEAD" 2>/dev/null) || fail "Failed to compare HEAD against $upstream"
-  if [[ -n "${unpushed//$'\n'/}" ]]; then
-    fail "Branch has commits not on $upstream. Push before running release:catalog."
-  fi
-}
-
-cmd_release_catalog() {
-  require_apm
-  ensure_workspace_repo
-  ensure_workspace_scaffold
-  ensure_workspace_mise_file
-
-  cmd_stage_catalog "$@"
-  assert_catalog_release_ready
-  cmd_register_catalog "$@"
-}
-
 cmd_smoke_catalog() {
   require_apm
   skill_ids=$(requested_catalog_skill_ids "$@")
@@ -2136,7 +2104,6 @@ Commands:
   bundle-catalog     Build ~/.apm/.catalog-build/catalog as the catalog package artifact
   prepare:catalog    Rewrite ~/.apm/catalog into its normalized publishable layout and print its upstream ref
   install:catalog    Install the catalog ref after commit/push
-  release:catalog    Prepare, require a clean pushed branch, then install the catalog ref
   smoke:catalog      Smoke-test the generated catalog package via temp project install
   audit:ci:smoke     Temp-install the workspace manifest and run 'apm audit --ci'
 
@@ -2160,7 +2127,6 @@ case "$COMMAND" in
   bundle-catalog) cmd_bundle_catalog "$@" ;;
   prepare:catalog) cmd_stage_catalog "$@" ;;
   install:catalog) cmd_register_catalog "$@" ;;
-  release:catalog) cmd_release_catalog "$@" ;;
   smoke:catalog) cmd_smoke_catalog "$@" ;;
   audit:ci:smoke) cmd_audit_ci_smoke ;;
   help | -h | --help) cmd_help ;;

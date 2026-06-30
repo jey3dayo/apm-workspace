@@ -488,7 +488,7 @@ Describe "public command surface" {
     $help | Should -Match "validate:catalog"
     $help | Should -Match "prepare:catalog"
     $help | Should -Match "install:catalog"
-    $help | Should -Match "release:catalog"
+    $help | Should -Not -Match "release:catalog"
     $help | Should -Not -Match "format-catalog-metadata"
     $help | Should -Not -Match "check-catalog-metadata"
     $help | Should -Not -Match $legacyMirrorPattern
@@ -507,7 +507,7 @@ Describe "public command surface" {
     $help | Should -Match "validate:catalog"
     $help | Should -Match "prepare:catalog"
     $help | Should -Match "install:catalog"
-    $help | Should -Match "release:catalog"
+    $help | Should -Not -Match "release:catalog"
     $help | Should -Not -Match "format-catalog-metadata"
     $help | Should -Not -Match "check-catalog-metadata"
     $help | Should -Not -Match $legacyMirrorPattern
@@ -999,7 +999,7 @@ dependencies: []
     $miseToml | Should -Match '\[tasks\."validate:workspace"\]'
     $miseToml | Should -Match '\[tasks\."validate:catalog"\]'
     $miseToml | Should -Match '\[tasks\."format:markdown:bold-headings"\]'
-    $miseToml | Should -Match '\[tasks\."apm:install"\]'
+    $miseToml | Should -Not -Match '\[tasks\."apm:install"\]'
     $miseToml | Should -Match '\[tasks\.apply\]'
     $miseToml | Should -Match '\[tasks\."apply:skills:local"\]'
     $miseToml | Should -Match '\[tasks\.refresh\]'
@@ -1018,8 +1018,8 @@ dependencies: []
     $miseToml | Should -Match '\[tasks\."install:catalog"\]'
     $miseToml | Should -Match '\[tasks\."smoke:catalog"\]'
     $miseToml | Should -Match '\[tasks\."audit:ci:smoke"\]'
-    $miseToml | Should -Match '\[tasks\."release:catalog"\]'
-    $miseToml | Should -Match '\[tasks\."verify:catalog"\]'
+    $miseToml | Should -Not -Match '\[tasks\."release:catalog"\]'
+    $miseToml | Should -Not -Match '\[tasks\."verify:catalog"\]'
     $miseToml | Should -Match 'run = "bash ./scripts/apm-workspace.sh apply"'
     $miseToml | Should -Match 'run = "bash ./scripts/apm-workspace.sh apply:skills:local"'
     $miseToml | Should -Match 'replace-bold-headings\.ts'
@@ -1032,7 +1032,6 @@ dependencies: []
     $miseToml | Should -Match '(?s)\[tasks\.deploy\]\s*description = "Run checks, deploy the current workspace state, and inspect targets"\s*run = \[\{ task = "check" \}, \{ task = "apply" \}, \{ task = "doctor" \}\]'
     $miseToml | Should -Match '(?s)\[tasks\.upgrade\].*?apm install -g --update.*?\{ task = "deploy" \}'
     $miseToml | Should -Match '(?s)\[tasks\."refresh:deploy"\].*?\{ task = "refresh" \}.*?\{ task = "deploy" \}'
-    $miseToml | Should -Match '(?s)\[tasks\."release:catalog"\].*?\{ task = "refresh:deploy" \}.*?release:catalog'
     $miseToml | Should -Not -Match 'APM_BOOTSTRAP_REPO'
   }
 
@@ -1079,19 +1078,6 @@ dependencies: []
     $todo | Should -Match 'managed source of truth'
   }
 
-  It "runs catalog release as stage, release gate, and register flow" {
-    Mock Ensure-WorkspaceRepo {}
-    Mock Ensure-WorkspaceMiseFile {}
-    Mock Invoke-StageCatalog {}
-    Mock Assert-CatalogReleaseReady {}
-    Mock Invoke-RegisterCatalog {}
-
-    Invoke-ReleaseCatalog
-
-    Assert-MockCalled Invoke-StageCatalog -Times 1 -Exactly
-    Assert-MockCalled Assert-CatalogReleaseReady -Times 1 -Exactly
-    Assert-MockCalled Invoke-RegisterCatalog -Times 1 -Exactly
-  }
 }
 
 Describe "internal cleanup skill ids" {
