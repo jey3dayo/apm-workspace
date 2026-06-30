@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agent Curation"
+  short_description: "Curate external agents into APM"
+  default_prompt: "Use $agent-curation to evaluate an external agent repository and curate selected agents into catalog/agents."
