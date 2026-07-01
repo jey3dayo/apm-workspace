@@ -72,6 +72,7 @@ jey3dayo/apm-workspace/catalog#main
 - If both `~/.apm/mise.toml` and `~/.config/mise/config.windows.toml` define `apm`, keep them aligned to the same source.
 - Prefer `mise run deploy` for routine local rollout and `mise run apply` only when you need deploy-only behavior.
 - Reserve `mise run upgrade` for intentional upstream refresh, not for normal deployment.
+- `kiro` is excluded from rollout; `mise run deploy` and `mise run upgrade` both pass `--exclude kiro`. Avoid bare `apm install -g`, which would repopulate the unused `~/.kiro` runtime.
 - When direct binary selection matters, prefer `mise exec pipx:apm-cli@0.22.0 -- apm ...`.
 - If a Codex-targeted external skill is still missing after rollout, verify `~/.agents/skills` directly and treat it as a temporary Codex-specific delivery gap.
 

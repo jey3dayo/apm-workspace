@@ -2,13 +2,8 @@
 
 ## Open Tasks
 
-- Reconcile the `kiro` target: routine rollout runs with `--exclude kiro`, so `.kiro/**` (including the previously deployed caad agents/skills) is not refreshed. Decide whether to deploy once without `--exclude kiro` or keep kiro intentionally excluded, and document the rationale.
-- Fix pre-existing Pester failures unrelated to gist work (5 failing as of 2026-07-02):
-  - `installs MCP dependencies with apm install only mcp` / `deploys managed MCP dependencies during shell apply`: source now emits `--only mcp --exclude kiro`; update the expected strings (or the source) to match intended behavior.
-  - `smoke:catalog normalizes Codex-installed skill paths ...` / `smoke-audits the workspace manifest via temp install`: environment-sensitive smoke tests; confirm whether they need a guard or a fixture.
-  - `does not reference removed agents src paths in agent-facing docs`: check which listed doc still references `~/.config/agents/src` or a transitional mirror.
-- Document the `--exclude kiro` behavior in the `mise run upgrade` descriptions (`llms.txt`, `AGENTS.md`) so the documented command matches actual behavior.
-- Optional: run `apm prune` to drop the 14 orphaned package cache entries not declared in `apm.yml`.
+- Investigate the remaining Pester failure `does not reference removed agents src paths in agent-facing docs`: check which of the listed docs still references `~/.config/agents/src` or a transitional mirror, then fix the doc.
+- Optional: run `apm prune` to drop the ~14 orphaned package cache entries not declared in `apm.yml`.
 
 ## Notes
 
