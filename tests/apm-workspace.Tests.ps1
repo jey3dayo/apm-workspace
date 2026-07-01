@@ -640,7 +640,7 @@ Describe "public command surface" {
 
       Install-WorkspaceMcpDependencies
 
-      $apmCalls | Should -Be @("install -g --only mcp")
+      $apmCalls | Should -Be @("install -g --only mcp --exclude kiro")
     }
     finally {
       Remove-Item Function:\apm -ErrorAction SilentlyContinue
@@ -656,7 +656,7 @@ Describe "public command surface" {
   It "deploys managed MCP dependencies during shell apply" {
     $shellScript = Get-Content -LiteralPath (Join-Path $workspaceRoot "scripts/apm-workspace.sh") -Raw
 
-    $shellScript | Should -Match '(?s)install_workspace_mcp_dependencies\(\)\s*\{\s*run_workspace_install_command -g --only mcp\s*\}'
+    $shellScript | Should -Match '(?s)install_workspace_mcp_dependencies\(\)\s*\{\s*run_workspace_install_command -g --only mcp --exclude kiro\s*\}'
     $shellScript | Should -Match '(?s)cmd_apply\(\)\s*\{.*?install_workspace_mcp_dependencies.*?compile_codex.*?replace_skill_targets_from_stage "\$apply_stage_root"'
   }
 
@@ -823,7 +823,7 @@ dependencies:
 
   It "smoke:catalog normalizes Codex-installed skill paths for superpowers aliases" {
     $buildDir = Join-Path $TestDrive "catalog-build"
-    $buildSkillsRoot = Join-Path $buildDir ".apm/skills"
+    $buildSkillsRoot = Join-Path $buildDir "skills"
     $bundleSkillRoot = Join-Path (Join-Path $buildSkillsRoot "superpowers") "brainstorming"
     $bundleRequestedSkillIds = New-Object System.Collections.Generic.List[string]
     $installCalls = New-Object System.Collections.Generic.List[string]
@@ -1028,7 +1028,7 @@ dependencies: []
     try {
       Invoke-AuditCiSmoke
 
-      $apmCalls | Should -Be @("install --only apm", "audit --ci")
+      $apmCalls | Should -Be @("install --only apm --target all", "audit --ci")
       $script:installSawManifest | Should -Be $true
       $script:auditSawManifest | Should -Be $true
       Test-Path (Join-Path $TestDrive "apm-audit-ci-smoke") | Should -Be $false
