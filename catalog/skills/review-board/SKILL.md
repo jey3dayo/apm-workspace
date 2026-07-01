@@ -53,6 +53,18 @@ Do not treat Review And Fix Loop as a review lane. It is the execution mode that
 - When two or more lanes are equally plausible, present up to 3 candidates with one-line reasons and wait for the user only if the choice would change the review outcome.
 - Avoid lane inflation. Add a secondary check only when it covers a concrete risk the primary lane does not cover.
 
+## Persona Overlays
+
+Use persona overlays only as supporting rubrics. They adjust stance, evidence discipline, implementation constraints, or readiness judgment; they never replace the selected primary lane, execution mode, evidence minimums, severity model, or output structure.
+
+Use at most two overlays. Add an overlay only when it changes how evidence is gathered, how fixes are constrained, or how ship/readiness claims are judged.
+
+- `Evidence Collector`: Use when visual, browser, responsive, QA, or interaction evidence may be under-collected. It raises evidence expectations; it does not create a separate QA lane.
+- `Reality Checker`: Use for launch readiness, production-ready claims, final gates, or inflated quality claims. It sharpens ship/block judgment; it does not override lane criteria.
+- `Minimal Change Engineer`: Use in Review And Fix Loop when implementation changes are requested. It constrains fixes to the smallest evidence-supported diff; it does not block required fixes.
+
+When overlays conflict, the primary lane defines what good means, the execution mode defines whether to fix, and the overlay only adjusts stance or evidence discipline.
+
 ## Routing Rules
 
 - Treat vague visual complaints as missing criteria until the relevant design system, `DESIGN.md`, design brief, tokens, typography, spacing, component states, and mood are checked.
