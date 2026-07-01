@@ -2,7 +2,6 @@
 
 ## Open Tasks
 
-- Investigate the remaining Pester failure `does not reference removed agents src paths in agent-facing docs`: check which of the listed docs still references `~/.config/agents/src` or a transitional mirror, then fix the doc.
 - Optional: run `apm prune` to drop the ~14 orphaned package cache entries not declared in `apm.yml`.
 
 ## Notes
