@@ -185,6 +185,54 @@ dependencies:
     $manifestReferences | Should -Not -Contain "github.com/extra-skill"
   }
 
+  It "canonicalizes gist manifest references to owner/id aliases" {
+    $gistUrl = "https://gist.github.com/octocat/5a123456.git"
+    $keys = @(Get-ManifestReferenceCandidateKeys -Reference $gistUrl)
+    $keys | Should -Contain $gistUrl
+    $keys | Should -Contain "octocat/5a123456"
+
+    $gistUrlWithSha = "https://gist.github.com/octocat/5a123456.git#abc123def456"
+    $keys = @(Get-ManifestReferenceCandidateKeys -Reference $gistUrlWithSha)
+    $keys | Should -Contain $gistUrlWithSha
+    $keys | Should -Contain "https://gist.github.com/octocat/5a123456.git"
+    $keys | Should -Contain "octocat/5a123456"
+    $keys | Should -Contain "octocat/5a123456#abc123def456"
+  }
+
+  It "keeps non-gist references to the ref and its base form only" {
+    $ref = "openai/skills/skills/.curated/gh-address-comments"
+    $keys = @(Get-ManifestReferenceCandidateKeys -Reference "$ref#deadbeef")
+    $keys | Should -Contain "$ref#deadbeef"
+    $keys | Should -Contain $ref
+    $keys | Should -Not -Contain "octocat/5a123456"
+  }
+
+  It "builds the manifest reference key set with gist aliases" {
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+    - jey3dayo/apm-workspace/catalog#main
+    - https://gist.github.com/alice/abc123.git
+    - https://gist.github.com/bob/def456.git#deadbeef
+    - openai/skills/skills/.curated/gh-address-comments
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+
+    $keys = Get-ManifestReferenceKeys
+
+    $keys | Should -Contain "https://gist.github.com/alice/abc123.git"
+    $keys | Should -Contain "alice/abc123"
+    $keys | Should -Contain "https://gist.github.com/bob/def456.git#deadbeef"
+    $keys | Should -Contain "https://gist.github.com/bob/def456.git"
+    $keys | Should -Contain "bob/def456"
+    $keys | Should -Contain "bob/def456#deadbeef"
+    $keys | Should -Contain "openai/skills/skills/.curated/gh-address-comments"
+    # The managed catalog ref is intentionally filtered out of manifest keys.
+    $keys | Should -Not -Contain "jey3dayo/apm-workspace/catalog#main"
+  }
+
   It "ignores the managed catalog lock record when collecting external skills" {
     @"
 name: apm-workspace
