@@ -1,0 +1,7 @@
+# Vendored agents adapted from upstream (see docs/agents-provenance.md).
+# Keep them out of our formatter so their upstream-derived shape is preserved;
+# only our own generated artifacts should be reformatted.
+catalog/agents/
+
+# Generated / accepted-upstream state, not ours to reformat.
+apm.lock.yaml
