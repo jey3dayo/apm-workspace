@@ -70,6 +70,7 @@ dependencies:
     - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review#b8f2564c2e8da66b331c1dd63c2a2925d6739961
     - https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git#5ed08e4475365fd233aa0d3ab71c19b87e1a5732
     - affaan-m/everything-claude-code/skills/mcp-server-patterns#2bc924faf2f8e893bfe0af86b1931283693c30ae
+    - mattpocock/skills/skills/productivity/writing-great-skills
   mcp:
     - name: context7
       registry: false
@@ -88,9 +89,9 @@ dependencies:
     - name: jina-reader
       registry: false
       transport: streamable-http
-      url: "https://mcp.jina.ai/v1?include_tags=search,read"
+      url: https://mcp.jina.ai/v1?include_tags=search,read
       headers:
-        Authorization: "Bearer ${JINA_API_KEY}"
+        Authorization: Bearer ${JINA_API_KEY}
     - name: codex
       registry: false
       transport: stdio
