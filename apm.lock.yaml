@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-07-02T15:22:44.724304+00:00'
+generated_at: '2026-07-02T16:41:06.276210+00:00'
 apm_version: 0.22.0
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -6348,12 +6348,18 @@ dependencies:
     .kiro/skills/find-skills/SKILL.md: sha256:deddc03b4b5f50755b97fcdb737a786676992ef7e9be614d2cd2c71e0320bebf
   content_hash: sha256:1c27b1774a4ec17ad4556a72e3c0168beab3af0183b2c1b8aa9e320af3ff41ce
 mcp_servers:
+- 1password
 - codex
 - context7
 - headroom
 - jina-reader
 - mcp-simple-voicevox
 mcp_configs:
+  1password:
+    name: 1password
+    transport: stdio
+    registry: false
+    command: /Applications/1Password.app/Contents/MacOS/onepassword-mcp
   codex:
     name: codex
     transport: stdio
