@@ -185,6 +185,54 @@ dependencies:
     $manifestReferences | Should -Not -Contain "github.com/extra-skill"
   }
 
+  It "canonicalizes gist manifest references to owner/id aliases" {
+    $gistUrl = "https://gist.github.com/octocat/5a123456.git"
+    $keys = @(Get-ManifestReferenceCandidateKeys -Reference $gistUrl)
+    $keys | Should -Contain $gistUrl
+    $keys | Should -Contain "octocat/5a123456"
+
+    $gistUrlWithSha = "https://gist.github.com/octocat/5a123456.git#abc123def456"
+    $keys = @(Get-ManifestReferenceCandidateKeys -Reference $gistUrlWithSha)
+    $keys | Should -Contain $gistUrlWithSha
+    $keys | Should -Contain "https://gist.github.com/octocat/5a123456.git"
+    $keys | Should -Contain "octocat/5a123456"
+    $keys | Should -Contain "octocat/5a123456#abc123def456"
+  }
+
+  It "keeps non-gist references to the ref and its base form only" {
+    $ref = "openai/skills/skills/.curated/gh-address-comments"
+    $keys = @(Get-ManifestReferenceCandidateKeys -Reference "$ref#deadbeef")
+    $keys | Should -Contain "$ref#deadbeef"
+    $keys | Should -Contain $ref
+    $keys | Should -Not -Contain "octocat/5a123456"
+  }
+
+  It "builds the manifest reference key set with gist aliases" {
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+    - jey3dayo/apm-workspace/catalog#main
+    - https://gist.github.com/alice/abc123.git
+    - https://gist.github.com/bob/def456.git#deadbeef
+    - openai/skills/skills/.curated/gh-address-comments
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+
+    $keys = Get-ManifestReferenceKeys
+
+    $keys | Should -Contain "https://gist.github.com/alice/abc123.git"
+    $keys | Should -Contain "alice/abc123"
+    $keys | Should -Contain "https://gist.github.com/bob/def456.git#deadbeef"
+    $keys | Should -Contain "https://gist.github.com/bob/def456.git"
+    $keys | Should -Contain "bob/def456"
+    $keys | Should -Contain "bob/def456#deadbeef"
+    $keys | Should -Contain "openai/skills/skills/.curated/gh-address-comments"
+    # The managed catalog ref is intentionally filtered out of manifest keys.
+    $keys | Should -Not -Contain "jey3dayo/apm-workspace/catalog#main"
+  }
+
   It "ignores the managed catalog lock record when collecting external skills" {
     @"
 name: apm-workspace
@@ -592,7 +640,7 @@ Describe "public command surface" {
 
       Install-WorkspaceMcpDependencies
 
-      $apmCalls | Should -Be @("install -g --only mcp")
+      $apmCalls | Should -Be @("install -g --only mcp --exclude kiro")
     }
     finally {
       Remove-Item Function:\apm -ErrorAction SilentlyContinue
@@ -608,7 +656,7 @@ Describe "public command surface" {
   It "deploys managed MCP dependencies during shell apply" {
     $shellScript = Get-Content -LiteralPath (Join-Path $workspaceRoot "scripts/apm-workspace.sh") -Raw
 
-    $shellScript | Should -Match '(?s)install_workspace_mcp_dependencies\(\)\s*\{\s*run_workspace_install_command -g --only mcp\s*\}'
+    $shellScript | Should -Match '(?s)install_workspace_mcp_dependencies\(\)\s*\{\s*run_workspace_install_command -g --only mcp --exclude kiro\s*\}'
     $shellScript | Should -Match '(?s)cmd_apply\(\)\s*\{.*?install_workspace_mcp_dependencies.*?compile_codex.*?replace_skill_targets_from_stage "\$apply_stage_root"'
   }
 
@@ -775,7 +823,7 @@ dependencies:
 
   It "smoke:catalog normalizes Codex-installed skill paths for superpowers aliases" {
     $buildDir = Join-Path $TestDrive "catalog-build"
-    $buildSkillsRoot = Join-Path $buildDir ".apm/skills"
+    $buildSkillsRoot = Join-Path $buildDir "skills"
     $bundleSkillRoot = Join-Path (Join-Path $buildSkillsRoot "superpowers") "brainstorming"
     $bundleRequestedSkillIds = New-Object System.Collections.Generic.List[string]
     $installCalls = New-Object System.Collections.Generic.List[string]
@@ -980,7 +1028,7 @@ dependencies: []
     try {
       Invoke-AuditCiSmoke
 
-      $apmCalls | Should -Be @("install --only apm", "audit --ci")
+      $apmCalls | Should -Be @("install --only apm --target all", "audit --ci")
       $script:installSawManifest | Should -Be $true
       $script:auditSawManifest | Should -Be $true
       Test-Path (Join-Path $TestDrive "apm-audit-ci-smoke") | Should -Be $false
@@ -1049,7 +1097,6 @@ dependencies: []
     $legacyMirrorPattern = 'transitional\s+' + 'mirror'
     $files = @(
       (Join-Path $workspaceRoot "catalog/skills/apm-usage/SKILL.md")
-      (Join-Path $workspaceRoot "catalog/skills/docs-index/indexes/agents-index.md")
       (Join-Path $workspaceRoot "catalog/skills/nix-dotfiles/SKILL.md")
       (Join-Path $workspaceRoot "catalog/skills/nix-dotfiles/README.md")
       (Join-Path $workspaceRoot "catalog/skills/nix-dotfiles/references/commands.md")

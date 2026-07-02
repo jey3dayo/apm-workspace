@@ -2,6 +2,8 @@
 
 ## Open Tasks
 
+- Optional: run `apm prune` to drop the ~14 orphaned package cache entries not declared in `apm.yml`.
+
 ## Notes
 
 - `skills`, `agents`, `commands`, `rules`, and `AGENTS.md` now use `~/.apm/catalog/**` as the managed source of truth.

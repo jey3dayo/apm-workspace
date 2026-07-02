@@ -706,12 +706,38 @@ function Get-ManagedCatalogSkillInventory {
   return $result.ToArray()
 }
 
+function Get-ManifestReferenceCandidateKeys {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Reference
+  )
+
+  $keys = New-Object System.Collections.Generic.List[string]
+  $null = $keys.Add($Reference)
+  $baseReference = ($Reference -replace '#.*$', '')
+  $null = $keys.Add($baseReference)
+
+  # Gist references are declared in apm.yml as full clone URLs
+  # (https://gist.github.com/<owner>/<id>.git[#<sha>]) but the lockfile
+  # canonicalizes them to <owner>/<id>. Add the canonical aliases so the
+  # manifest<->lock checks match either form. Mirrors apm-workspace.sh.
+  if ($baseReference -match '^https://gist\.github\.com/(.+?)\.git$') {
+    $gistKey = $Matches[1]
+    $null = $keys.Add($gistKey)
+    if ($Reference -match '#(.+)$') {
+      $null = $keys.Add(("{0}#{1}" -f $gistKey, $Matches[1]))
+    }
+  }
+
+  return $keys.ToArray()
+}
+
 function Get-ManifestReferenceKeys {
   $keys = New-Object 'System.Collections.Generic.HashSet[string]'
   foreach ($reference in (Get-ManifestApmDependencyReferences)) {
-    $null = $keys.Add($reference)
-    $baseReference = ($reference -replace '#.*$', '')
-    $null = $keys.Add($baseReference)
+    foreach ($candidate in (Get-ManifestReferenceCandidateKeys -Reference $reference)) {
+      $null = $keys.Add($candidate)
+    }
   }
 
   return $keys
@@ -1129,7 +1155,14 @@ function Get-ExternalSkillRecords {
   }
 
   foreach ($reference in $manifestReferences) {
-    if (-not $matchedReferences.Contains($reference)) {
+    $isMatched = $false
+    foreach ($candidate in (Get-ManifestReferenceCandidateKeys -Reference $reference)) {
+      if ($matchedReferences.Contains($candidate)) {
+        $isMatched = $true
+        break
+      }
+    }
+    if (-not $isMatched) {
       throw "Manifest dependency is missing from apm.lock.yaml: $reference"
     }
   }

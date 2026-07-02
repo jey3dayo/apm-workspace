@@ -18,6 +18,7 @@ Add new lanes by appending the next numbered section with the same fields. `SKIL
 - For broad product flows, prefer lane 4 before judging individual pages or controls.
 - For vague visual dissatisfaction, prefer lane 3 first when design instructions may be missing; use lane 1 when a design system exists and should be enforced.
 - When the user asks to review, fix, and re-review until the result is strong enough to ship, use Review And Fix Loop mode from `SKILL.md`, then still choose one primary lane from this catalog.
+- Use persona overlays from `SKILL.md` only as secondary stance modifiers. Common matches: Evidence Collector for lanes 2 and 6 when visual or browser evidence is thin; Reality Checker for lane 4 or final readiness reviews; Minimal Change Engineer for Review And Fix Loop implementation.
 
 ## 1. Design System Review
 
