@@ -525,9 +525,7 @@ const entries = Object.entries(fieldExtractors) as Array<
 type FieldExtractor = (formData: FormData) => unknown;
 type FieldExtractors = Record<string, FieldExtractor>;
 
-const fieldExtractors: FieldExtractors = {
-  /* ... */
-};
+const fieldExtractors: FieldExtractors = {/* ... */};
 const entries = Object.entries(fieldExtractors); // 型推論が働く
 ```
 
