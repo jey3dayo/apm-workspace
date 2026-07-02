@@ -14,8 +14,6 @@ dependencies:
     - EpicenterHQ/epicenter/.agents/skills/tauri
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-dashboard
-    - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-diff
-    - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-explain
     - anthropics/claude-code/plugins/frontend-design/skills/frontend-design
     - benjitaylor/agentation/skills/agentation
     - benjitaylor/agentation/skills/agentation-self-driving
@@ -25,7 +23,6 @@ dependencies:
     - ibelick/ui-skills/skills/fixing-accessibility
     - ibelick/ui-skills/skills/fixing-metadata
     - ibelick/ui-skills/skills/fixing-motion-performance
-    - jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
     - millionco/react-doctor/skills/react-doctor
     - mizchi/skills/meta/empirical-prompt-tuning
     - nyosegawa/skills/skills/skill-auditor
@@ -40,7 +37,6 @@ dependencies:
     - obra/superpowers/skills/using-superpowers
     - obra/superpowers/skills/verification-before-completion
     - obra/superpowers/skills/writing-plans
-    - obra/superpowers/skills/writing-skills
     - openai/codex-plugin-cc/plugins/codex/skills/codex-cli-runtime
     - openai/codex-plugin-cc/plugins/codex/skills/codex-result-handling
     - openai/codex-plugin-cc/plugins/codex/skills/gpt-5-4-prompting
@@ -68,7 +64,6 @@ dependencies:
     - langchain-ai/deepagents/libs/cli/examples/skills/web-research
     - softaworks/agent-toolkit/skills/mermaid-diagrams
     - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review#b8f2564c2e8da66b331c1dd63c2a2925d6739961
-    - https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git#5ed08e4475365fd233aa0d3ab71c19b87e1a5732
     - affaan-m/everything-claude-code/skills/mcp-server-patterns#2bc924faf2f8e893bfe0af86b1931283693c30ae
     - mattpocock/skills/skills/productivity/writing-great-skills
   mcp:
