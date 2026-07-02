@@ -91,7 +91,7 @@ Represent variants such as hover, active, or pressed as separate related compone
 Run the official linter from the target project when possible:
 
 ```bash
-rtk npx @google/design.md lint DESIGN.md
+npx @google/design.md lint DESIGN.md
 ```
 
 Use findings from these rule families:

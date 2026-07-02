@@ -12,7 +12,7 @@ description: |
 
 変更ファイルを論理的な最小単位に分割し、グループごとに順番にコミットする。
 
-git コマンドは raw `git` を基本にする。`rtk` はユーザーが明示した場合、または出力が極端に大きく raw output が不要だと判断できる場合だけ使う。
+git コマンドは raw `git` を基本にする。
 
 このスキルはコミット分割とメッセージ作成だけを担当する。worktree の作成・切替・削除や、隔離 workspace が必要かの判断は `using-git-worktrees` / `git-worktree` に委ねる。
 
