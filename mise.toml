@@ -12,13 +12,13 @@ TASK_EXCLUDES = "--exclude apm.lock.yaml"
 node = "24"
 
 # CLI tools
-fd = "latest"
+fd = "10.4.2"
 "pipx:apm-cli" = "0.22.0"
-taplo = "latest"
+taplo = "0.10.0"
 
 # npm packages
-"npm:prettier" = "latest"
-"npm:tsx" = "latest"
+"npm:prettier" = "3.9.4"
+"npm:tsx" = "4.22.5"
 
 # ========================================
 # Workspace Commands
