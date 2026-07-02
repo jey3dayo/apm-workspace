@@ -15,8 +15,8 @@ Scan the current repository, choose repo-local APM dependencies from concrete so
   - Do not add React, Next.js, TypeScript, UI review, or general frontend best-practice skills to repo-local `apm.yml` by default.
 - Treat browser MCPs separately from web skills.
   - Do not add `chrome-devtools` just because the repository is a web app.
-  - Prefer Codex bundled Chrome/browser operation first when it is available and sufficient.
-  - Add `chrome-devtools` repo-local or on-demand when the repository needs DevTools-specific inspection, project login/session state, local runtime coupling, or repeatable browser verification.
+  - Prefer `claude-in-chrome` or the Codex Chrome addon first for ordinary browser operation (click, form input, screenshot, console check) when available and sufficient.
+  - Add `chrome-devtools` repo-local or on-demand only when the repository needs DevTools-specific depth (Lighthouse audit, performance trace, heap snapshot), project login/session state, local runtime coupling, or repeatable browser verification beyond what `claude-in-chrome`/Codex addon covers.
 - Prefer repo-local dependencies for narrower, runtime-specific, infra-specific, presentation-specific, or credential-scoped tools.
   - Terraform skills belong near repositories that actually own Terraform modules, environments, or `.tftest.hcl` tests.
   - Tauri tools belong near repositories that actually own `src-tauri`.

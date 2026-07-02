@@ -59,15 +59,13 @@ Keep Codex global MCP registration limited to cross-repo foundations.
   - `jina-reader` and `context7` are research and documentation lookup foundations used across repositories
 - Do not keep project-specific or UI-heavy MCP servers in the global manifest
   - `tauri-mcp-server` belongs only in Tauri repositories
-  - `chrome-devtools` belongs only in repositories with a running frontend such as Next.js, React, or Vite
   - `peekaboo` should be enabled only when visual inspection or screen automation is needed
+- Default browser operation to `claude-in-chrome` (Chrome extension bridge) or the Codex Chrome addon
+  - use these for ordinary browser tasks: clicking, form input, screenshots, console checks
+  - reserve `chrome-devtools` (CDP-based) as a repo-local addition only when a repository needs DevTools-specific depth: Lighthouse audits, performance tracing, heap snapshots
 - When moving MCP servers, edit the tracked APM source first and regenerate deployed targets
   - do not hand-edit deployed Codex MCP config such as `~/.codex/config.toml`
-- Current repo-local MCP candidates:
-  - `/Users/t00114/src/github.com/jey3dayo/ultra-rss-reader`: `tauri-mcp-server`, `chrome-devtools`
-  - `/Users/t00114/src/github.com/CyberAgent-Infosys/ca-connect-site`: `chrome-devtools`
-  - `/Users/t00114/src/github.com/CyberAgent-Infosys/caad-loca-bff`: `chrome-devtools`
-  - `/Users/t00114/src/github.com/CyberAgent-Infosys/caad-asta`: `chrome-devtools`
+- Do not maintain a hardcoded list of repo-local MCP candidates here; it goes stale. Use `ghq list -p` as the SSoT for known repositories, then check each repository's own `apm.yml` for its actual repo-local MCP set
 - If the APM workspace has no repo-local MCP deployment lane for a target, keep the global manifest lightweight and treat repo-local MCP distribution as a separate workspace-mechanics task
 
 ## Task Selection
