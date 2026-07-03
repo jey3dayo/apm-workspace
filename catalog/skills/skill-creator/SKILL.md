@@ -198,11 +198,11 @@ The skill is written for another agent instance to use, so include procedural kn
 
 Start with the reusable resources (`scripts/`, `references/`, `assets/`); this may need user input, such as brand assets for a `brand-guidelines` skill. Test added scripts by actually running them and confirming the output; for many similar scripts, a representative sample is enough. Delete any unused `--examples` placeholder files.
 
-Writing guidelines: use imperative/infinitive form throughout.
+Writing guidelines: use imperative/infinitive form throughout. Before writing or refining the `description` and body, read the `productivity-writing-great-skills` skill deployed under the same skills root (e.g. `~/.claude/skills/` or `~/.agents/skills/`) and apply its rubric: invocation choice, one trigger per branch, leading words, the no-op test, and pruning. That skill is the source of truth for skill prose quality; do not restate its rules here.
 
 Never write literal slash-command placeholders in the body — a `$` immediately followed by a digit or by the word ARGUMENTS. When the skill is invoked as a slash command, those tokens are replaced with command arguments and silently corrupt code examples (e.g. an `rg --replace` capture reference). Reword such examples to avoid the token, for instance with `rg -o`.
 
-Frontmatter rule: keep frontmatter minimal. `name` and `description` are required; `license`, `allowed-tools`, and `metadata` are the only other fields `quick_validate.py` accepts (`metadata` holds harness-specific extras such as `short-description`). Put all when-to-use triggers in `description` — the body loads only after triggering, so a "When to Use" section in the body cannot help trigger the skill. Quote the `description` value when it contains YAML-special characters such as colons. Example `description` for a `docx` skill: "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. Use when working with professional documents (.docx files) for: (1) creating new documents, (2) modifying or editing content, (3) working with tracked changes, (4) adding comments, or any other document tasks."
+Frontmatter rule: keep frontmatter minimal. `name` and `description` are required; `license`, `allowed-tools`, `disable-model-invocation`, and `metadata` are the only other fields `quick_validate.py` accepts (`metadata` holds harness-specific extras such as `short-description`). Put all when-to-use triggers in `description` — the body loads only after triggering, so a "When to Use" section in the body cannot help trigger the skill. Write one trigger per distinct branch of use and collapse synonyms that restate the same branch. Quote the `description` value when it contains YAML-special characters such as colons. For a skill that should fire only when the user types its name, set `disable-model-invocation: true`; it pays no context load, and its `description` becomes a human-facing one-liner with trigger lists stripped.
 
 ### Step 5: Validate the Skill
 
@@ -212,7 +212,7 @@ scripts/quick_validate.py <path/to/skill-folder>
 
 This checks YAML frontmatter format, required fields, and naming rules. Fix any reported issues and run it again.
 
-Also run a static consistency check before shipping: verify the `description`'s claimed triggers and scope match what the body actually covers. A description/body gap makes the skill trigger on tasks the body cannot guide (this is the same check as `empirical-prompt-tuning` Iteration 0).
+Also run a static consistency check before shipping: verify the `description`'s claimed triggers and scope match what the body actually covers. A description/body gap makes the skill trigger on tasks the body cannot guide (this is the same check as `empirical-prompt-tuning` Iteration 0). When refactoring an existing skill, also diagnose it against the failure modes in `productivity-writing-great-skills` (duplication, sediment, sprawl, no-ops, premature completion).
 
 For skills managed in `~/.apm`, do not stop at `quick_validate.py`. Use `apm-usage`: run `mise run check`, run `mise run deploy`, then verify `~/.agents/skills/<skill-name>/` contains the deployed skill. Use `mise run apply:skills:local` only when the user explicitly asks for a fast local-only refresh.
 
