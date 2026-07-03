@@ -1,11 +1,105 @@
 lockfile_version: '1'
-generated_at: '2026-07-02T16:41:06.276210+00:00'
+generated_at: '2026-07-03T03:49:38.998358+00:00'
 apm_version: 0.22.0
 dependencies:
+- repo_url: DietrichGebert/ponytail
+  name: ponytail
+  host: github.com
+  resolved_commit: 40e50d9e03242aa5dd53ac771950f9127362b25f
+  version: 4.8.4
+  package_type: marketplace_plugin
+  deployed_files:
+  - .agents/skills/ponytail
+  - .agents/skills/ponytail-audit
+  - .agents/skills/ponytail-audit/SKILL.md
+  - .agents/skills/ponytail-debt
+  - .agents/skills/ponytail-debt/SKILL.md
+  - .agents/skills/ponytail-gain
+  - .agents/skills/ponytail-gain/SKILL.md
+  - .agents/skills/ponytail-help
+  - .agents/skills/ponytail-help/SKILL.md
+  - .agents/skills/ponytail-review
+  - .agents/skills/ponytail-review/SKILL.md
+  - .agents/skills/ponytail/SKILL.md
+  - .claude/hooks/ponytail/hooks/ponytail-activate.js
+  - .claude/hooks/ponytail/hooks/ponytail-mode-tracker.js
+  - .claude/skills/ponytail
+  - .claude/skills/ponytail-audit
+  - .claude/skills/ponytail-audit/SKILL.md
+  - .claude/skills/ponytail-debt
+  - .claude/skills/ponytail-debt/SKILL.md
+  - .claude/skills/ponytail-gain
+  - .claude/skills/ponytail-gain/SKILL.md
+  - .claude/skills/ponytail-help
+  - .claude/skills/ponytail-help/SKILL.md
+  - .claude/skills/ponytail-review
+  - .claude/skills/ponytail-review/SKILL.md
+  - .claude/skills/ponytail/SKILL.md
+  - .codeium/windsurf/hooks/ponytail/hooks/ponytail-activate.js
+  - .codeium/windsurf/hooks/ponytail/hooks/ponytail-mode-tracker.js
+  - .codex/hooks/ponytail/hooks/ponytail-activate.js
+  - .codex/hooks/ponytail/hooks/ponytail-mode-tracker.js
+  - .codex/hooks/ponytail/hooks/ponytail-subagent.js
+  - .cursor/hooks/ponytail/hooks/ponytail-activate.js
+  - .cursor/hooks/ponytail/hooks/ponytail-mode-tracker.js
+  - .gemini/hooks/ponytail/hooks/ponytail-activate.js
+  - .gemini/hooks/ponytail/hooks/ponytail-mode-tracker.js
+  - .kiro/hooks/ponytail-hooks-sessionstart-1.json
+  - .kiro/hooks/ponytail-hooks-userpromptsubmitted-1.json
+  - .kiro/hooks/ponytail/hooks/ponytail-activate.js
+  - .kiro/hooks/ponytail/hooks/ponytail-mode-tracker.js
+  - .kiro/skills/ponytail
+  - .kiro/skills/ponytail-audit
+  - .kiro/skills/ponytail-audit/SKILL.md
+  - .kiro/skills/ponytail-debt
+  - .kiro/skills/ponytail-debt/SKILL.md
+  - .kiro/skills/ponytail-gain
+  - .kiro/skills/ponytail-gain/SKILL.md
+  - .kiro/skills/ponytail-help
+  - .kiro/skills/ponytail-help/SKILL.md
+  - .kiro/skills/ponytail-review
+  - .kiro/skills/ponytail-review/SKILL.md
+  - .kiro/skills/ponytail/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/ponytail-audit/SKILL.md: sha256:5560b8e383dbe2ddfddc873a1e2bf2e586e23e0cd7d995537482b2315331f6d1
+    .agents/skills/ponytail-debt/SKILL.md: sha256:c84fba75f0ca12bfe83f9a78ea02fd125c5dd3f1fbb18124105a489937f284e6
+    .agents/skills/ponytail-gain/SKILL.md: sha256:24e01d1c9715cb136ba1c4f1e52a95940c0193558b876828e537736480d6408b
+    .agents/skills/ponytail-help/SKILL.md: sha256:2264d1615117b02b0fd5a69ec84cd2757006471a78e4d6c22eed6d581c1d37a4
+    .agents/skills/ponytail-review/SKILL.md: sha256:40df33b58fc6ef889b93585733feb9566b76e9586efa7f376785c1e995197ac0
+    .agents/skills/ponytail/SKILL.md: sha256:d1ffcddbc486ab787d5797441e8b6e4717da3249c6786b83fc2abd2f12803c29
+    .claude/hooks/ponytail/hooks/ponytail-activate.js: sha256:ff7c15a7f7a8c0fdb8c0a12654fb4d5d33ee745e1e8d37afae074eebef93085a
+    .claude/hooks/ponytail/hooks/ponytail-mode-tracker.js: sha256:14896042d2cd560026080815cb22bed7529d3d0dcbd42960681c4d8144796c7a
+    .claude/skills/ponytail-audit/SKILL.md: sha256:5560b8e383dbe2ddfddc873a1e2bf2e586e23e0cd7d995537482b2315331f6d1
+    .claude/skills/ponytail-debt/SKILL.md: sha256:c84fba75f0ca12bfe83f9a78ea02fd125c5dd3f1fbb18124105a489937f284e6
+    .claude/skills/ponytail-gain/SKILL.md: sha256:24e01d1c9715cb136ba1c4f1e52a95940c0193558b876828e537736480d6408b
+    .claude/skills/ponytail-help/SKILL.md: sha256:2264d1615117b02b0fd5a69ec84cd2757006471a78e4d6c22eed6d581c1d37a4
+    .claude/skills/ponytail-review/SKILL.md: sha256:40df33b58fc6ef889b93585733feb9566b76e9586efa7f376785c1e995197ac0
+    .claude/skills/ponytail/SKILL.md: sha256:d1ffcddbc486ab787d5797441e8b6e4717da3249c6786b83fc2abd2f12803c29
+    .codeium/windsurf/hooks/ponytail/hooks/ponytail-activate.js: sha256:ff7c15a7f7a8c0fdb8c0a12654fb4d5d33ee745e1e8d37afae074eebef93085a
+    .codeium/windsurf/hooks/ponytail/hooks/ponytail-mode-tracker.js: sha256:14896042d2cd560026080815cb22bed7529d3d0dcbd42960681c4d8144796c7a
+    .codex/hooks/ponytail/hooks/ponytail-activate.js: sha256:ff7c15a7f7a8c0fdb8c0a12654fb4d5d33ee745e1e8d37afae074eebef93085a
+    .codex/hooks/ponytail/hooks/ponytail-mode-tracker.js: sha256:14896042d2cd560026080815cb22bed7529d3d0dcbd42960681c4d8144796c7a
+    .codex/hooks/ponytail/hooks/ponytail-subagent.js: sha256:eb67677ca3c447a34cd01927534ef2c139fd7749264d745f035f43c1787ca8c3
+    .cursor/hooks/ponytail/hooks/ponytail-activate.js: sha256:ff7c15a7f7a8c0fdb8c0a12654fb4d5d33ee745e1e8d37afae074eebef93085a
+    .cursor/hooks/ponytail/hooks/ponytail-mode-tracker.js: sha256:14896042d2cd560026080815cb22bed7529d3d0dcbd42960681c4d8144796c7a
+    .gemini/hooks/ponytail/hooks/ponytail-activate.js: sha256:ff7c15a7f7a8c0fdb8c0a12654fb4d5d33ee745e1e8d37afae074eebef93085a
+    .gemini/hooks/ponytail/hooks/ponytail-mode-tracker.js: sha256:14896042d2cd560026080815cb22bed7529d3d0dcbd42960681c4d8144796c7a
+    .kiro/hooks/ponytail-hooks-sessionstart-1.json: sha256:b58a3e8f16c64e2cb1bf44705e2ea3e6df85fe50495bd2abe5848160e48dcaf7
+    .kiro/hooks/ponytail-hooks-userpromptsubmitted-1.json: sha256:3dc3813c3edac811568d63b5ce1f7943b39a125f35d12c07328f74210696ec28
+    .kiro/hooks/ponytail/hooks/ponytail-activate.js: sha256:ff7c15a7f7a8c0fdb8c0a12654fb4d5d33ee745e1e8d37afae074eebef93085a
+    .kiro/hooks/ponytail/hooks/ponytail-mode-tracker.js: sha256:14896042d2cd560026080815cb22bed7529d3d0dcbd42960681c4d8144796c7a
+    .kiro/skills/ponytail-audit/SKILL.md: sha256:5560b8e383dbe2ddfddc873a1e2bf2e586e23e0cd7d995537482b2315331f6d1
+    .kiro/skills/ponytail-debt/SKILL.md: sha256:c84fba75f0ca12bfe83f9a78ea02fd125c5dd3f1fbb18124105a489937f284e6
+    .kiro/skills/ponytail-gain/SKILL.md: sha256:24e01d1c9715cb136ba1c4f1e52a95940c0193558b876828e537736480d6408b
+    .kiro/skills/ponytail-help/SKILL.md: sha256:2264d1615117b02b0fd5a69ec84cd2757006471a78e4d6c22eed6d581c1d37a4
+    .kiro/skills/ponytail-review/SKILL.md: sha256:40df33b58fc6ef889b93585733feb9566b76e9586efa7f376785c1e995197ac0
+    .kiro/skills/ponytail/SKILL.md: sha256:d1ffcddbc486ab787d5797441e8b6e4717da3249c6786b83fc2abd2f12803c29
+  content_hash: sha256:aecb972db1660651a701ff256f03dcadbfb31313cbd49d664e5870dccdca1504
+  declared_license: MIT
 - repo_url: EpicenterHQ/epicenter
   name: tauri
   host: github.com
-  resolved_commit: 84f2b2a7f698685800b732249238090fbf47aa92
+  resolved_commit: f37756824e75d95452f4d1f181dc5a1ba9a67bcf
   version: 1.0.0
   virtual_path: .agents/skills/tauri
   is_virtual: true
@@ -123,7 +217,7 @@ dependencies:
 - repo_url: Lum1104/Understand-Anything
   name: Understand-Anything
   host: github.com
-  resolved_commit: 54754a6f97051d1d76c8758353d8ea41afe502a6
+  resolved_commit: 2a44296cfa8612c74813f572003ba7a9abbbf8e6
   version: unknown
   virtual_path: understand-anything-plugin/skills/understand
   is_virtual: true
@@ -425,7 +519,7 @@ dependencies:
 - repo_url: Lum1104/Understand-Anything
   name: Understand-Anything
   host: github.com
-  resolved_commit: 54754a6f97051d1d76c8758353d8ea41afe502a6
+  resolved_commit: 2a44296cfa8612c74813f572003ba7a9abbbf8e6
   version: unknown
   virtual_path: understand-anything-plugin/skills/understand-dashboard
   is_virtual: true
@@ -464,10 +558,10 @@ dependencies:
     .kiro/skills/mcp-server-patterns/SKILL.md: sha256:0d2d77ff4cffabd26a8db9a54fd16ae29063519fc2d7d2da3539c5e391a3973a
   content_hash: sha256:55425683e7c75a1e9cc39ea3d016fe66f23e9a6921e0203487e325f1f7a28439
 - repo_url: anthropics/claude-code
-  name: frontend-design
+  name: claude-code
   host: github.com
-  resolved_commit: 75709eacf1334051ea293fb87a0e88a1e6812f94
-  version: 1.0.0
+  resolved_commit: 125d63feaec6e89708d95bbb4ed7dae0f62eb39f
+  version: unknown
   virtual_path: plugins/frontend-design/skills/frontend-design
   is_virtual: true
   package_type: claude_skill
@@ -629,105 +723,9 @@ dependencies:
   content_hash: sha256:778a392274e55b096529e792c62aaa5725c3be6a1b8e55bd0947ae78d19481ac
   declared_license: MIT
 - repo_url: caad-develop/claude-code-marketplace
-  name: ca-pass
-  host: github.com
-  resolved_commit: 4d4a3d962b2a929b2aec67a5bf23d905b0ed0551
-  version: 1.0.0
-  virtual_path: plugins/infra/ca-pass
-  is_virtual: true
-  package_type: marketplace_plugin
-  deployed_files:
-  - .agents/skills/ca-pass
-  - .agents/skills/ca-pass/SKILL.md
-  - .agents/skills/ca-pass/references/ca-pass-spec.md
-  - .agents/skills/ca-pass/references/review-checklist.md
-  - .claude/skills/ca-pass
-  - .claude/skills/ca-pass/SKILL.md
-  - .claude/skills/ca-pass/references/ca-pass-spec.md
-  - .claude/skills/ca-pass/references/review-checklist.md
-  - .kiro/skills/ca-pass
-  - .kiro/skills/ca-pass/SKILL.md
-  - .kiro/skills/ca-pass/references/ca-pass-spec.md
-  - .kiro/skills/ca-pass/references/review-checklist.md
-  deployed_file_hashes:
-    .agents/skills/ca-pass/SKILL.md: sha256:d8e626ad6e553d7d0e0de579049fdc53acd2f61f22284a0bd3bf23ff8fb12c22
-    .agents/skills/ca-pass/references/ca-pass-spec.md: sha256:7b04975aac27a753c216e0bac31114f2dbf1b73fd85f0074b275e66d180c694c
-    .agents/skills/ca-pass/references/review-checklist.md: sha256:a9870d591470b161820fb112bab8d53595e9c387958709c011905be070b7d01e
-    .claude/skills/ca-pass/SKILL.md: sha256:d8e626ad6e553d7d0e0de579049fdc53acd2f61f22284a0bd3bf23ff8fb12c22
-    .claude/skills/ca-pass/references/ca-pass-spec.md: sha256:7b04975aac27a753c216e0bac31114f2dbf1b73fd85f0074b275e66d180c694c
-    .claude/skills/ca-pass/references/review-checklist.md: sha256:a9870d591470b161820fb112bab8d53595e9c387958709c011905be070b7d01e
-    .kiro/skills/ca-pass/SKILL.md: sha256:d8e626ad6e553d7d0e0de579049fdc53acd2f61f22284a0bd3bf23ff8fb12c22
-    .kiro/skills/ca-pass/references/ca-pass-spec.md: sha256:7b04975aac27a753c216e0bac31114f2dbf1b73fd85f0074b275e66d180c694c
-    .kiro/skills/ca-pass/references/review-checklist.md: sha256:a9870d591470b161820fb112bab8d53595e9c387958709c011905be070b7d01e
-  content_hash: sha256:2a3345aa4afcaac2d89c8a754f5c5492e0f9cc56edcdbfa988afe76dbd3ec038
-- repo_url: caad-develop/claude-code-marketplace
-  name: mdb
-  host: github.com
-  resolved_commit: 4d4a3d962b2a929b2aec67a5bf23d905b0ed0551
-  version: 1.0.0
-  virtual_path: plugins/infra/mdb
-  is_virtual: true
-  package_type: marketplace_plugin
-  deployed_files:
-  - .agents/skills/mdb
-  - .agents/skills/mdb/SKILL.md
-  - .agents/skills/mdb/references/api-reference.md
-  - .agents/skills/mdb/references/employee-schema.md
-  - .claude/skills/mdb
-  - .claude/skills/mdb/SKILL.md
-  - .claude/skills/mdb/references/api-reference.md
-  - .claude/skills/mdb/references/employee-schema.md
-  - .kiro/skills/mdb
-  - .kiro/skills/mdb/SKILL.md
-  - .kiro/skills/mdb/references/api-reference.md
-  - .kiro/skills/mdb/references/employee-schema.md
-  deployed_file_hashes:
-    .agents/skills/mdb/SKILL.md: sha256:355a1a681745abdbec3b1e52b81828849608160421787a12574170aaea9f0200
-    .agents/skills/mdb/references/api-reference.md: sha256:429205ad91ac78f4820563f7a245e6b0bf62ebd3fed67b3a1ebf77bd85d1ce11
-    .agents/skills/mdb/references/employee-schema.md: sha256:30ea251b6bab13b365bbbaeb943d9f875848fff17895cd389eb1a6072afe85ab
-    .claude/skills/mdb/SKILL.md: sha256:355a1a681745abdbec3b1e52b81828849608160421787a12574170aaea9f0200
-    .claude/skills/mdb/references/api-reference.md: sha256:429205ad91ac78f4820563f7a245e6b0bf62ebd3fed67b3a1ebf77bd85d1ce11
-    .claude/skills/mdb/references/employee-schema.md: sha256:30ea251b6bab13b365bbbaeb943d9f875848fff17895cd389eb1a6072afe85ab
-    .kiro/skills/mdb/SKILL.md: sha256:355a1a681745abdbec3b1e52b81828849608160421787a12574170aaea9f0200
-    .kiro/skills/mdb/references/api-reference.md: sha256:429205ad91ac78f4820563f7a245e6b0bf62ebd3fed67b3a1ebf77bd85d1ce11
-    .kiro/skills/mdb/references/employee-schema.md: sha256:30ea251b6bab13b365bbbaeb943d9f875848fff17895cd389eb1a6072afe85ab
-  content_hash: sha256:3c7d57154c87020d236168529a418265389098f6d60aaa62c5bde31248e55ac0
-- repo_url: caad-develop/claude-code-marketplace
-  name: notica-notification-api
-  host: github.com
-  resolved_commit: 4d4a3d962b2a929b2aec67a5bf23d905b0ed0551
-  version: 1.1.0
-  virtual_path: plugins/infra/notica-notification-api
-  is_virtual: true
-  package_type: marketplace_plugin
-  deployed_files:
-  - .agents/skills/notica-notification-api
-  - .agents/skills/notica-notification-api/SKILL.md
-  - .agents/skills/notica-notification-api/agents/openai.yaml
-  - .agents/skills/notica-notification-api/references/notica-api-user-doc.md
-  - .claude/skills/notica-notification-api
-  - .claude/skills/notica-notification-api/SKILL.md
-  - .claude/skills/notica-notification-api/agents/openai.yaml
-  - .claude/skills/notica-notification-api/references/notica-api-user-doc.md
-  - .kiro/skills/notica-notification-api
-  - .kiro/skills/notica-notification-api/SKILL.md
-  - .kiro/skills/notica-notification-api/agents/openai.yaml
-  - .kiro/skills/notica-notification-api/references/notica-api-user-doc.md
-  deployed_file_hashes:
-    .agents/skills/notica-notification-api/SKILL.md: sha256:9e4bc20c9d697cc9a31d343965422c792b75c9fdedab587a122fc8ada7c6ec28
-    .agents/skills/notica-notification-api/agents/openai.yaml: sha256:f7fa2bc304f7bd1cd8f0b4b24a2f6ee5d51eff5f30c1306cfa46dca14669b002
-    .agents/skills/notica-notification-api/references/notica-api-user-doc.md: sha256:2d6ee1aea02338012f3b61c3d82f930421cd7a1723126fa50ba3740a828ad316
-    .claude/skills/notica-notification-api/SKILL.md: sha256:9e4bc20c9d697cc9a31d343965422c792b75c9fdedab587a122fc8ada7c6ec28
-    .claude/skills/notica-notification-api/agents/openai.yaml: sha256:f7fa2bc304f7bd1cd8f0b4b24a2f6ee5d51eff5f30c1306cfa46dca14669b002
-    .claude/skills/notica-notification-api/references/notica-api-user-doc.md: sha256:2d6ee1aea02338012f3b61c3d82f930421cd7a1723126fa50ba3740a828ad316
-    .kiro/skills/notica-notification-api/SKILL.md: sha256:9e4bc20c9d697cc9a31d343965422c792b75c9fdedab587a122fc8ada7c6ec28
-    .kiro/skills/notica-notification-api/agents/openai.yaml: sha256:f7fa2bc304f7bd1cd8f0b4b24a2f6ee5d51eff5f30c1306cfa46dca14669b002
-    .kiro/skills/notica-notification-api/references/notica-api-user-doc.md: sha256:2d6ee1aea02338012f3b61c3d82f930421cd7a1723126fa50ba3740a828ad316
-  content_hash: sha256:137fb45d578f04f364dbc11247a15301513f097138c69a3b2e5f5bf8c206299f
-- repo_url: caad-develop/claude-code-marketplace
   name: perman-aws-vault
   host: github.com
-  resolved_commit: 4d4a3d962b2a929b2aec67a5bf23d905b0ed0551
+  resolved_commit: cf4c719c7b9cd1d4e0c5a3d3153bda31d2700497
   version: 1.0.0
   virtual_path: plugins/infra/perman-aws-vault
   is_virtual: true
@@ -781,9 +779,131 @@ dependencies:
     .kiro/skills/perman-aws-vault/references/setup-guide.md: sha256:e4d2c9c4ac0e146e9a9ae45933bc1cf5fbcbd940cf8fa3587cfb1ffa64436704
   content_hash: sha256:b9520ae353543b37d2c88a9374aa0b5b6cd41c646a19a261759b561ef1dcb2fd
 - repo_url: caad-develop/claude-code-marketplace
+  name: ca-pass
+  host: github.com
+  resolved_commit: cf4c719c7b9cd1d4e0c5a3d3153bda31d2700497
+  version: 1.0.0
+  virtual_path: plugins/service-integrations/ca-pass
+  is_virtual: true
+  package_type: marketplace_plugin
+  deployed_files:
+  - .agents/skills/ca-pass
+  - .agents/skills/ca-pass/SKILL.md
+  - .agents/skills/ca-pass/references/ca-pass-spec.md
+  - .agents/skills/ca-pass/references/review-checklist.md
+  - .claude/skills/ca-pass
+  - .claude/skills/ca-pass/SKILL.md
+  - .claude/skills/ca-pass/references/ca-pass-spec.md
+  - .claude/skills/ca-pass/references/review-checklist.md
+  - .kiro/skills/ca-pass
+  - .kiro/skills/ca-pass/SKILL.md
+  - .kiro/skills/ca-pass/references/ca-pass-spec.md
+  - .kiro/skills/ca-pass/references/review-checklist.md
+  deployed_file_hashes:
+    .agents/skills/ca-pass/SKILL.md: sha256:d8e626ad6e553d7d0e0de579049fdc53acd2f61f22284a0bd3bf23ff8fb12c22
+    .agents/skills/ca-pass/references/ca-pass-spec.md: sha256:7b04975aac27a753c216e0bac31114f2dbf1b73fd85f0074b275e66d180c694c
+    .agents/skills/ca-pass/references/review-checklist.md: sha256:a9870d591470b161820fb112bab8d53595e9c387958709c011905be070b7d01e
+    .claude/skills/ca-pass/SKILL.md: sha256:d8e626ad6e553d7d0e0de579049fdc53acd2f61f22284a0bd3bf23ff8fb12c22
+    .claude/skills/ca-pass/references/ca-pass-spec.md: sha256:7b04975aac27a753c216e0bac31114f2dbf1b73fd85f0074b275e66d180c694c
+    .claude/skills/ca-pass/references/review-checklist.md: sha256:a9870d591470b161820fb112bab8d53595e9c387958709c011905be070b7d01e
+    .kiro/skills/ca-pass/SKILL.md: sha256:d8e626ad6e553d7d0e0de579049fdc53acd2f61f22284a0bd3bf23ff8fb12c22
+    .kiro/skills/ca-pass/references/ca-pass-spec.md: sha256:7b04975aac27a753c216e0bac31114f2dbf1b73fd85f0074b275e66d180c694c
+    .kiro/skills/ca-pass/references/review-checklist.md: sha256:a9870d591470b161820fb112bab8d53595e9c387958709c011905be070b7d01e
+  content_hash: sha256:2a3345aa4afcaac2d89c8a754f5c5492e0f9cc56edcdbfa988afe76dbd3ec038
+- repo_url: caad-develop/claude-code-marketplace
+  name: mdb-api
+  host: github.com
+  resolved_commit: cf4c719c7b9cd1d4e0c5a3d3153bda31d2700497
+  version: 1.0.0
+  virtual_path: plugins/service-integrations/mdb-api
+  is_virtual: true
+  package_type: marketplace_plugin
+  deployed_files:
+  - .agents/skills/mdb-api
+  - .agents/skills/mdb-api/SKILL.md
+  - .agents/skills/mdb-api/references/api-reference.md
+  - .agents/skills/mdb-api/references/employee-schema.md
+  - .claude/skills/mdb-api
+  - .claude/skills/mdb-api/SKILL.md
+  - .claude/skills/mdb-api/references/api-reference.md
+  - .claude/skills/mdb-api/references/employee-schema.md
+  - .kiro/skills/mdb-api
+  - .kiro/skills/mdb-api/SKILL.md
+  - .kiro/skills/mdb-api/references/api-reference.md
+  - .kiro/skills/mdb-api/references/employee-schema.md
+  deployed_file_hashes:
+    .agents/skills/mdb-api/SKILL.md: sha256:4647c94f5ffb1d308d8ab0bcc79baa60f788108853626ac8b9fc2d1b0db97ca4
+    .agents/skills/mdb-api/references/api-reference.md: sha256:429205ad91ac78f4820563f7a245e6b0bf62ebd3fed67b3a1ebf77bd85d1ce11
+    .agents/skills/mdb-api/references/employee-schema.md: sha256:30ea251b6bab13b365bbbaeb943d9f875848fff17895cd389eb1a6072afe85ab
+    .claude/skills/mdb-api/SKILL.md: sha256:4647c94f5ffb1d308d8ab0bcc79baa60f788108853626ac8b9fc2d1b0db97ca4
+    .claude/skills/mdb-api/references/api-reference.md: sha256:429205ad91ac78f4820563f7a245e6b0bf62ebd3fed67b3a1ebf77bd85d1ce11
+    .claude/skills/mdb-api/references/employee-schema.md: sha256:30ea251b6bab13b365bbbaeb943d9f875848fff17895cd389eb1a6072afe85ab
+    .kiro/skills/mdb-api/SKILL.md: sha256:4647c94f5ffb1d308d8ab0bcc79baa60f788108853626ac8b9fc2d1b0db97ca4
+    .kiro/skills/mdb-api/references/api-reference.md: sha256:429205ad91ac78f4820563f7a245e6b0bf62ebd3fed67b3a1ebf77bd85d1ce11
+    .kiro/skills/mdb-api/references/employee-schema.md: sha256:30ea251b6bab13b365bbbaeb943d9f875848fff17895cd389eb1a6072afe85ab
+  content_hash: sha256:32e149f03e5d6000e26f871de886da973b9b6a63041f0527c48a573e513dbac9
+- repo_url: caad-develop/claude-code-marketplace
+  name: notica-api
+  host: github.com
+  resolved_commit: cf4c719c7b9cd1d4e0c5a3d3153bda31d2700497
+  version: 1.1.0
+  virtual_path: plugins/service-integrations/notica-api
+  is_virtual: true
+  package_type: marketplace_plugin
+  deployed_files:
+  - .agents/skills/notica-api
+  - .agents/skills/notica-api/SKILL.md
+  - .agents/skills/notica-api/agents/openai.yaml
+  - .agents/skills/notica-api/references/notica-api-user-doc.md
+  - .claude/skills/notica-api
+  - .claude/skills/notica-api/SKILL.md
+  - .claude/skills/notica-api/agents/openai.yaml
+  - .claude/skills/notica-api/references/notica-api-user-doc.md
+  - .kiro/skills/notica-api
+  - .kiro/skills/notica-api/SKILL.md
+  - .kiro/skills/notica-api/agents/openai.yaml
+  - .kiro/skills/notica-api/references/notica-api-user-doc.md
+  deployed_file_hashes:
+    .agents/skills/notica-api/SKILL.md: sha256:dd603652e4aee70fc6cee12c0327d3a50a3c8c16a6caeab0354803b958dd84aa
+    .agents/skills/notica-api/agents/openai.yaml: sha256:8ffc7677919942eb4affca68d5c27c3cf66d1894b99e10bcab963f2a33cabbca
+    .agents/skills/notica-api/references/notica-api-user-doc.md: sha256:2d6ee1aea02338012f3b61c3d82f930421cd7a1723126fa50ba3740a828ad316
+    .claude/skills/notica-api/SKILL.md: sha256:dd603652e4aee70fc6cee12c0327d3a50a3c8c16a6caeab0354803b958dd84aa
+    .claude/skills/notica-api/agents/openai.yaml: sha256:8ffc7677919942eb4affca68d5c27c3cf66d1894b99e10bcab963f2a33cabbca
+    .claude/skills/notica-api/references/notica-api-user-doc.md: sha256:2d6ee1aea02338012f3b61c3d82f930421cd7a1723126fa50ba3740a828ad316
+    .kiro/skills/notica-api/SKILL.md: sha256:dd603652e4aee70fc6cee12c0327d3a50a3c8c16a6caeab0354803b958dd84aa
+    .kiro/skills/notica-api/agents/openai.yaml: sha256:8ffc7677919942eb4affca68d5c27c3cf66d1894b99e10bcab963f2a33cabbca
+    .kiro/skills/notica-api/references/notica-api-user-doc.md: sha256:2d6ee1aea02338012f3b61c3d82f930421cd7a1723126fa50ba3740a828ad316
+  content_hash: sha256:a02886d0d9f952547442bff6aea3bbadd91bec07068fa288244e958ff9307c3a
+- repo_url: caad-develop/claude-code-marketplace
+  name: telma-api
+  host: github.com
+  resolved_commit: cf4c719c7b9cd1d4e0c5a3d3153bda31d2700497
+  version: 1.0.0
+  virtual_path: plugins/service-integrations/telma-api
+  is_virtual: true
+  package_type: marketplace_plugin
+  deployed_files:
+  - .agents/skills/telma-api
+  - .agents/skills/telma-api/SKILL.md
+  - .agents/skills/telma-api/agents/openai.yaml
+  - .claude/skills/telma-api
+  - .claude/skills/telma-api/SKILL.md
+  - .claude/skills/telma-api/agents/openai.yaml
+  - .kiro/skills/telma-api
+  - .kiro/skills/telma-api/SKILL.md
+  - .kiro/skills/telma-api/agents/openai.yaml
+  deployed_file_hashes:
+    .agents/skills/telma-api/SKILL.md: sha256:47364c9727c36c99f1b8c9b587d61e4fe541b2e131ee1f29b137d66b54660c93
+    .agents/skills/telma-api/agents/openai.yaml: sha256:dee31bad38fa4a840a8f6a5be40a43b47770e1e8315a1d33d8b924546309d26a
+    .claude/skills/telma-api/SKILL.md: sha256:47364c9727c36c99f1b8c9b587d61e4fe541b2e131ee1f29b137d66b54660c93
+    .claude/skills/telma-api/agents/openai.yaml: sha256:dee31bad38fa4a840a8f6a5be40a43b47770e1e8315a1d33d8b924546309d26a
+    .kiro/skills/telma-api/SKILL.md: sha256:47364c9727c36c99f1b8c9b587d61e4fe541b2e131ee1f29b137d66b54660c93
+    .kiro/skills/telma-api/agents/openai.yaml: sha256:dee31bad38fa4a840a8f6a5be40a43b47770e1e8315a1d33d8b924546309d26a
+  content_hash: sha256:69b7d9fc0da45982fb290223ab2f5a3cc81d8a2e8e5af69a923c6d0424f96ce8
+- repo_url: caad-develop/claude-code-marketplace
   name: caad-skill-deployer
   host: github.com
-  resolved_commit: 4d4a3d962b2a929b2aec67a5bf23d905b0ed0551
+  resolved_commit: cf4c719c7b9cd1d4e0c5a3d3153bda31d2700497
   version: 1.0.0
   virtual_path: plugins/utils/caad-skill-deployer
   is_virtual: true
@@ -922,10 +1042,10 @@ dependencies:
     .kiro/skills/humanizer-ja/SKILL.md: sha256:3fe07f06a179801d7445eff19ed40f1681ef9860665c50c1e9a032f6dffead89
   content_hash: sha256:b6da4ef92a941ab364ab1ddf259d9e511e098a0719f7ee2202847351c34a8194
 - repo_url: ibelick/ui-skills
-  name: baseline-ui
+  name: ui-skills
   host: github.com
   resolved_commit: 46ef54de56db504c7a568ccddb6acd6ef8dc8815
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/baseline-ui
   is_virtual: true
   package_type: claude_skill
@@ -942,10 +1062,10 @@ dependencies:
     .kiro/skills/baseline-ui/SKILL.md: sha256:fea3322f36d58fdafafce2aef56e4556dd2ac7b20876b7dff7d8be7f25fa597f
   content_hash: sha256:dfcb3e778b57ad1cba92375689bb8265fa5aef78fba523a744f5220b3c619901
 - repo_url: ibelick/ui-skills
-  name: fixing-accessibility
+  name: ui-skills
   host: github.com
   resolved_commit: 46ef54de56db504c7a568ccddb6acd6ef8dc8815
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/fixing-accessibility
   is_virtual: true
   package_type: claude_skill
@@ -962,10 +1082,10 @@ dependencies:
     .kiro/skills/fixing-accessibility/SKILL.md: sha256:549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf
   content_hash: sha256:4fa8f5a772b4eef3d28a54c136b507d070e54e2c326578f65eaf5e5a0118b38a
 - repo_url: ibelick/ui-skills
-  name: fixing-metadata
+  name: ui-skills
   host: github.com
   resolved_commit: 46ef54de56db504c7a568ccddb6acd6ef8dc8815
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/fixing-metadata
   is_virtual: true
   package_type: claude_skill
@@ -982,10 +1102,10 @@ dependencies:
     .kiro/skills/fixing-metadata/SKILL.md: sha256:b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547
   content_hash: sha256:699e13890fb50acffa02dfd2d5b0e719bd916a9e2b7e6035bdc4513fc73d9174
 - repo_url: ibelick/ui-skills
-  name: fixing-motion-performance
+  name: ui-skills
   host: github.com
   resolved_commit: 46ef54de56db504c7a568ccddb6acd6ef8dc8815
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/fixing-motion-performance
   is_virtual: true
   package_type: claude_skill
@@ -1004,7 +1124,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: fe41317fdc63083bb8ceae5bdc0fbaa8a6033174
+  resolved_commit: bda7234e0b0442429e7425468492df02271de6c5
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -1138,6 +1258,8 @@ dependencies:
   - .agents/skills/google-forms-survey-builder/references/survey-questions-format.md
   - .agents/skills/headroom
   - .agents/skills/headroom/SKILL.md
+  - .agents/skills/japanese-tech-writing
+  - .agents/skills/japanese-tech-writing/SKILL.md
   - .agents/skills/jina-web-research
   - .agents/skills/jina-web-research/SKILL.md
   - .agents/skills/jina-web-research/agents/openai.yaml
@@ -1257,7 +1379,6 @@ dependencies:
   - .agents/skills/skill-creator/SKILL.md
   - .agents/skills/skill-creator/agents/openai.yaml
   - .agents/skills/skill-creator/references/openai_yaml.md
-  - .agents/skills/skill-creator/scripts/__pycache__/generate_openai_yaml.cpython-314.pyc
   - .agents/skills/skill-creator/scripts/generate_openai_yaml.py
   - .agents/skills/skill-creator/scripts/init_skill.py
   - .agents/skills/skill-creator/scripts/quick_validate.py
@@ -1435,6 +1556,8 @@ dependencies:
   - .claude/skills/google-forms-survey-builder/references/survey-questions-format.md
   - .claude/skills/headroom
   - .claude/skills/headroom/SKILL.md
+  - .claude/skills/japanese-tech-writing
+  - .claude/skills/japanese-tech-writing/SKILL.md
   - .claude/skills/jina-web-research
   - .claude/skills/jina-web-research/SKILL.md
   - .claude/skills/jina-web-research/agents/openai.yaml
@@ -1554,7 +1677,6 @@ dependencies:
   - .claude/skills/skill-creator/SKILL.md
   - .claude/skills/skill-creator/agents/openai.yaml
   - .claude/skills/skill-creator/references/openai_yaml.md
-  - .claude/skills/skill-creator/scripts/__pycache__/generate_openai_yaml.cpython-314.pyc
   - .claude/skills/skill-creator/scripts/generate_openai_yaml.py
   - .claude/skills/skill-creator/scripts/init_skill.py
   - .claude/skills/skill-creator/scripts/quick_validate.py
@@ -1732,6 +1854,8 @@ dependencies:
   - .kiro/skills/google-forms-survey-builder/references/survey-questions-format.md
   - .kiro/skills/headroom
   - .kiro/skills/headroom/SKILL.md
+  - .kiro/skills/japanese-tech-writing
+  - .kiro/skills/japanese-tech-writing/SKILL.md
   - .kiro/skills/jina-web-research
   - .kiro/skills/jina-web-research/SKILL.md
   - .kiro/skills/jina-web-research/agents/openai.yaml
@@ -1910,21 +2034,21 @@ dependencies:
     .agents/skills/agent-curation/SKILL.md: sha256:cf46408cdb91fd87a0985ccec8a1bc0f77501d521320f88a36a52e9fd9cc3900
     .agents/skills/agent-curation/agents/openai.yaml: sha256:f7395c9113eaefcfc27c4b697b0d7c253cb7a67a88c84f038098e0ff06ba8694
     .agents/skills/agent-curation/references/hired-agents-registry.md: sha256:8686ea777ab6c8eec3a0fd92f4ce9bbefe4ec5b76f409885c99f6e431f62237e
-    .agents/skills/apm-repo-bootstrap/SKILL.md: sha256:8913a5f278de0fc7644e4b191fc5c698587cedc741962aa7f9c5dc6665330289
+    .agents/skills/apm-repo-bootstrap/SKILL.md: sha256:c340f3997daf9ece1d6a0b6d02770948171549d69ccceebafd0f5cc68f995248
     .agents/skills/apm-repo-bootstrap/agents/openai.yaml: sha256:faed36da8f7980b88e395eb9aae322a9fc608e0c555ba93f843f6007ab50da19
-    .agents/skills/apm-repo-bootstrap/references/recommendations.md: sha256:7e08ea3b207072aef67921b51a83a197ff6d896417cde95132e889d1e275e9ee
-    .agents/skills/apm-usage/SKILL.md: sha256:d942354bc449d8aefec67f905e17e263add25dc007710fbd8fa2a06831c58aeb
+    .agents/skills/apm-repo-bootstrap/references/recommendations.md: sha256:0fbd9a6d9656f05438834d6224a79a819bbc6933af7dc90835858263175b9c23
+    .agents/skills/apm-usage/SKILL.md: sha256:eba84197a104f8945e73e7bc513b4db60f9eaf32d7d3b7357e78f16578ed0dd0
     .agents/skills/apm-usage/agents/openai.yaml: sha256:b3743dad4fcd9f3c209210c40df277e75d949ac7ce1713a61d497cc1e7e3ba83
-    .agents/skills/apm-usage/references/repo-local-mcp.md: sha256:192fbf5433423244d5f5ddbdf7a163b430471d698d48341343aac675493612e0
+    .agents/skills/apm-usage/references/repo-local-mcp.md: sha256:adac5e0d08543b1dd95b5e7fefd113cd537be290146d9f367cafb51cac89ee41
     .agents/skills/architecture-boundary-docs/SKILL.md: sha256:a1ff83850e0cf330529b2f94436714692d933b80b780a08a21263679fe393d2e
     .agents/skills/architecture-boundary-docs/agents/openai.yaml: sha256:492ca681ead790cbd1a8ae4c25543b31d5412e2a227c9f501f400ebf2c053370
     .agents/skills/architecture-boundary-docs/references/document-shape.md: sha256:1c0fedacef544a36804c64cc58cf159a4c7a2dcc25dbc05ef88f571b3ce425fa
-    .agents/skills/atomic-commit/SKILL.md: sha256:5329dc7830596db21d8ccf4102dcdde8aafed631b871a2955b2b729af57b5c17
+    .agents/skills/atomic-commit/SKILL.md: sha256:25493e69a2d0fbba8f22eb6504b30edd08c7cd58c53097b06936a70f6e3186c9
     .agents/skills/claude-system/SKILL.md: sha256:d8bc5e7391d3f24b53a13a4cd6dc6d3f0ebd01e5b821164fbf6ee1e5aa0fb161
     .agents/skills/claude-system/references/integration-patterns.md: sha256:d42e77098df7f180d9a9c52f1088d183419a9e95d2e443d3b6916fa84450268e
     .agents/skills/claude-system/references/use-cases.md: sha256:ca0db8284fdd920b8879e12c9dc8578800a58631561f6d538e67b54d7df8b3e4
     .agents/skills/code-quality-improvement/SKILL.md: sha256:6dca795076916795f024071f81a8f9f194c93a3818bfb842dde2ee67537d3a80
-    .agents/skills/code-quality-improvement/references/patterns.md: sha256:a42ee3ea4fbb4303f5260ebe151767c85de9a4cff19831501a1f22362804e69c
+    .agents/skills/code-quality-improvement/references/patterns.md: sha256:d371fb616f8c56d9aff936ce9518619856d66d3ad6968108945526882e032d69
     .agents/skills/code-review/SKILL.md: sha256:d1f9cbba1836f7e53e2dae8c8a04bf3bea52d34be4057636f39be2566e3d45b5
     .agents/skills/code-review/config/default-projects.json: sha256:49f745428c8b22b22d66290b78fbf3de94d6ab79b02426162ed3ce61c7e28f07
     .agents/skills/code-review/config/examples/.code-review-config.json: sha256:7c660582d3330d6730fddca0574e6c8387c30742a02f162213cc4c9e66940bfe
@@ -1950,9 +2074,9 @@ dependencies:
     .agents/skills/design-check/SKILL.md: sha256:e94fe4644706f79d42988ead9bf6aecf7086257f55f76d990f4afeb400bb8559
     .agents/skills/design-check/agents/openai.yaml: sha256:f70fe2a21eab6da5580b596a99ee69d746eadaed4f0d8312fafcb568d274ba36
     .agents/skills/design-check/references/checklist.md: sha256:809c98d5a6b4f30392297639d18dfcce707e477111383c76cf0bb57a4395186d
-    .agents/skills/design-md-workflow/SKILL.md: sha256:fc79ddf65a5581d7d92660360af11eed5d4779b89fe1327536ed8e371c3a2a3b
+    .agents/skills/design-md-workflow/SKILL.md: sha256:86a8393eb989689539eff10574e3102ccbfbd9afad9a03d7de8533286fb9e31a
     .agents/skills/design-md-workflow/agents/openai.yaml: sha256:9c0affb53d0d0703bf7e8d8199ec81dde316b76a71151c3839c8c021056ef10b
-    .agents/skills/design-md-workflow/references/design-md-structure.md: sha256:783e7c37746741f2f46935509e51581e8083388b5492d7468170e795b98e62a4
+    .agents/skills/design-md-workflow/references/design-md-structure.md: sha256:2a273b9805b2476961ee0852bcdb7905778ad3c25260ed03082681323059c569
     .agents/skills/design-md-workflow/references/design-review-structure.md: sha256:446dc1fcda31bb29a1b9387601176f4bba97c20c43db9532bedf0e586e56b05f
     .agents/skills/design-md-workflow/references/input-modes.md: sha256:e451f000f63e10583b99257a5102cf64582323f358c575c278658286c27bf343
     .agents/skills/design-md-workflow/references/routing-examples.md: sha256:83014cfd675639ed7bacffdb2fd4312e8d982936cff0b2a5551cea54fb24ce6e
@@ -1999,6 +2123,7 @@ dependencies:
     .agents/skills/google-forms-survey-builder/references/apps-script-patterns.md: sha256:57269f30cc830a74ae1d9ddf1b885939ca8e0303a6c08ee66320849f59b13ecc
     .agents/skills/google-forms-survey-builder/references/survey-questions-format.md: sha256:96accdafa50bb9d828c148ffeb2bd3c1bc59b123b30c6e80fbdd7449092782d7
     .agents/skills/headroom/SKILL.md: sha256:b544af6e415c7724e96dac30f39b6c532d4928b9521031b96e1e723f11af7123
+    .agents/skills/japanese-tech-writing/SKILL.md: sha256:6d8da2f159b632b264985b7872b75e2813e597b04bd4853d11f720c548f0cdbb
     .agents/skills/jina-web-research/SKILL.md: sha256:6ebe308b8769697a8b2ddbc5d8d93d239ed572adae84325bc7e09b5533209c75
     .agents/skills/jina-web-research/agents/openai.yaml: sha256:31aa67ba8347ed691d7fe4f14034a4b5f23b698640d50c8aeb60831534423a4d
     .agents/skills/macos-troubleshooting/SKILL.md: sha256:5dbfb6b138966632e483ed30dff2b777b2e0842e457033d910f579a00618009c
@@ -2010,7 +2135,7 @@ dependencies:
     .agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.py: sha256:a37200bcb2bd120687d3855196bba7ffd7fbdc6653c2c9eb8fc7a240e1cb1b61
     .agents/skills/mcp-tools/SKILL.md: sha256:bd74f85bae6f8b0b29d875a4c4c89fee69de798c9c262244d2d7c01447beece4
     .agents/skills/mcp-tools/agents/openai.yaml: sha256:f2251a17f3ee854c9aa28c0ef7645c279b2dcd81afc53e65a102eff7c35101af
-    .agents/skills/mcp-tools/references/mcp-placement.md: sha256:bf2b8f6a28e1310ce8f32ffc5aa2a27f0f52c6554952736a00ff8970f71e9010
+    .agents/skills/mcp-tools/references/mcp-placement.md: sha256:fb1c67b1b36376a24daf56f1348a8c439adbbc252a93f82c1ddd0b97f8c96452
     .agents/skills/mcp-tools/references/mcp-tools-details.md: sha256:c0af3d9e3ff7006bc5953f295824f31cb22d606fb93da7a07e2a94c7550af3ea
     .agents/skills/mcp-tools/references/security-and-credentials.md: sha256:789724e286ed619bea3e8b23f97ac84156886d78b9ae8b2bf028291919be02a2
     .agents/skills/mcp-tools/references/server-configurations.md: sha256:14c2a50593bf13eb148781a4a03eb9d9a536e14a6d69ac9d814729e5df60cc0d
@@ -2097,7 +2222,6 @@ dependencies:
     .agents/skills/skill-creator/SKILL.md: sha256:54a06371e71850e6e19474babce7754e807583e477daa028ecdacad24cde717b
     .agents/skills/skill-creator/agents/openai.yaml: sha256:b6c49ad8c5d225212c3d44ea4ed7bd11bb33d54fadc876296d67b865aca3cd2c
     .agents/skills/skill-creator/references/openai_yaml.md: sha256:9fb5928b7f4a746fdb39df503ebbd7a659d5e64b47f85a60626aa1a03fd76b17
-    .agents/skills/skill-creator/scripts/__pycache__/generate_openai_yaml.cpython-314.pyc: sha256:73cc00f33335a40ced12f777dc11ad94cfc234dd5f24d722ac0bb50a47d92dc1
     .agents/skills/skill-creator/scripts/generate_openai_yaml.py: sha256:10e93ef5537e55abba5e3aac905c4aa5f5b377a586c0cf45d156c772505f0d65
     .agents/skills/skill-creator/scripts/init_skill.py: sha256:bcb8982d3f033a094f2f1be43123ac8537e2562d25d8ba4d8ef2196ae514d96d
     .agents/skills/skill-creator/scripts/quick_validate.py: sha256:6cc9dc3199c935916cf6f73fcbbbb0e3bb1b58c8f5109fefa499978908164f51
@@ -2150,21 +2274,21 @@ dependencies:
     .claude/skills/agent-curation/SKILL.md: sha256:cf46408cdb91fd87a0985ccec8a1bc0f77501d521320f88a36a52e9fd9cc3900
     .claude/skills/agent-curation/agents/openai.yaml: sha256:f7395c9113eaefcfc27c4b697b0d7c253cb7a67a88c84f038098e0ff06ba8694
     .claude/skills/agent-curation/references/hired-agents-registry.md: sha256:8686ea777ab6c8eec3a0fd92f4ce9bbefe4ec5b76f409885c99f6e431f62237e
-    .claude/skills/apm-repo-bootstrap/SKILL.md: sha256:8913a5f278de0fc7644e4b191fc5c698587cedc741962aa7f9c5dc6665330289
+    .claude/skills/apm-repo-bootstrap/SKILL.md: sha256:c340f3997daf9ece1d6a0b6d02770948171549d69ccceebafd0f5cc68f995248
     .claude/skills/apm-repo-bootstrap/agents/openai.yaml: sha256:faed36da8f7980b88e395eb9aae322a9fc608e0c555ba93f843f6007ab50da19
-    .claude/skills/apm-repo-bootstrap/references/recommendations.md: sha256:7e08ea3b207072aef67921b51a83a197ff6d896417cde95132e889d1e275e9ee
-    .claude/skills/apm-usage/SKILL.md: sha256:d942354bc449d8aefec67f905e17e263add25dc007710fbd8fa2a06831c58aeb
+    .claude/skills/apm-repo-bootstrap/references/recommendations.md: sha256:0fbd9a6d9656f05438834d6224a79a819bbc6933af7dc90835858263175b9c23
+    .claude/skills/apm-usage/SKILL.md: sha256:eba84197a104f8945e73e7bc513b4db60f9eaf32d7d3b7357e78f16578ed0dd0
     .claude/skills/apm-usage/agents/openai.yaml: sha256:b3743dad4fcd9f3c209210c40df277e75d949ac7ce1713a61d497cc1e7e3ba83
-    .claude/skills/apm-usage/references/repo-local-mcp.md: sha256:192fbf5433423244d5f5ddbdf7a163b430471d698d48341343aac675493612e0
+    .claude/skills/apm-usage/references/repo-local-mcp.md: sha256:adac5e0d08543b1dd95b5e7fefd113cd537be290146d9f367cafb51cac89ee41
     .claude/skills/architecture-boundary-docs/SKILL.md: sha256:a1ff83850e0cf330529b2f94436714692d933b80b780a08a21263679fe393d2e
     .claude/skills/architecture-boundary-docs/agents/openai.yaml: sha256:492ca681ead790cbd1a8ae4c25543b31d5412e2a227c9f501f400ebf2c053370
     .claude/skills/architecture-boundary-docs/references/document-shape.md: sha256:1c0fedacef544a36804c64cc58cf159a4c7a2dcc25dbc05ef88f571b3ce425fa
-    .claude/skills/atomic-commit/SKILL.md: sha256:5329dc7830596db21d8ccf4102dcdde8aafed631b871a2955b2b729af57b5c17
+    .claude/skills/atomic-commit/SKILL.md: sha256:25493e69a2d0fbba8f22eb6504b30edd08c7cd58c53097b06936a70f6e3186c9
     .claude/skills/claude-system/SKILL.md: sha256:d8bc5e7391d3f24b53a13a4cd6dc6d3f0ebd01e5b821164fbf6ee1e5aa0fb161
     .claude/skills/claude-system/references/integration-patterns.md: sha256:d42e77098df7f180d9a9c52f1088d183419a9e95d2e443d3b6916fa84450268e
     .claude/skills/claude-system/references/use-cases.md: sha256:ca0db8284fdd920b8879e12c9dc8578800a58631561f6d538e67b54d7df8b3e4
     .claude/skills/code-quality-improvement/SKILL.md: sha256:6dca795076916795f024071f81a8f9f194c93a3818bfb842dde2ee67537d3a80
-    .claude/skills/code-quality-improvement/references/patterns.md: sha256:a42ee3ea4fbb4303f5260ebe151767c85de9a4cff19831501a1f22362804e69c
+    .claude/skills/code-quality-improvement/references/patterns.md: sha256:d371fb616f8c56d9aff936ce9518619856d66d3ad6968108945526882e032d69
     .claude/skills/code-review/SKILL.md: sha256:d1f9cbba1836f7e53e2dae8c8a04bf3bea52d34be4057636f39be2566e3d45b5
     .claude/skills/code-review/config/default-projects.json: sha256:49f745428c8b22b22d66290b78fbf3de94d6ab79b02426162ed3ce61c7e28f07
     .claude/skills/code-review/config/examples/.code-review-config.json: sha256:7c660582d3330d6730fddca0574e6c8387c30742a02f162213cc4c9e66940bfe
@@ -2190,9 +2314,9 @@ dependencies:
     .claude/skills/design-check/SKILL.md: sha256:e94fe4644706f79d42988ead9bf6aecf7086257f55f76d990f4afeb400bb8559
     .claude/skills/design-check/agents/openai.yaml: sha256:f70fe2a21eab6da5580b596a99ee69d746eadaed4f0d8312fafcb568d274ba36
     .claude/skills/design-check/references/checklist.md: sha256:809c98d5a6b4f30392297639d18dfcce707e477111383c76cf0bb57a4395186d
-    .claude/skills/design-md-workflow/SKILL.md: sha256:fc79ddf65a5581d7d92660360af11eed5d4779b89fe1327536ed8e371c3a2a3b
+    .claude/skills/design-md-workflow/SKILL.md: sha256:86a8393eb989689539eff10574e3102ccbfbd9afad9a03d7de8533286fb9e31a
     .claude/skills/design-md-workflow/agents/openai.yaml: sha256:9c0affb53d0d0703bf7e8d8199ec81dde316b76a71151c3839c8c021056ef10b
-    .claude/skills/design-md-workflow/references/design-md-structure.md: sha256:783e7c37746741f2f46935509e51581e8083388b5492d7468170e795b98e62a4
+    .claude/skills/design-md-workflow/references/design-md-structure.md: sha256:2a273b9805b2476961ee0852bcdb7905778ad3c25260ed03082681323059c569
     .claude/skills/design-md-workflow/references/design-review-structure.md: sha256:446dc1fcda31bb29a1b9387601176f4bba97c20c43db9532bedf0e586e56b05f
     .claude/skills/design-md-workflow/references/input-modes.md: sha256:e451f000f63e10583b99257a5102cf64582323f358c575c278658286c27bf343
     .claude/skills/design-md-workflow/references/routing-examples.md: sha256:83014cfd675639ed7bacffdb2fd4312e8d982936cff0b2a5551cea54fb24ce6e
@@ -2239,6 +2363,7 @@ dependencies:
     .claude/skills/google-forms-survey-builder/references/apps-script-patterns.md: sha256:57269f30cc830a74ae1d9ddf1b885939ca8e0303a6c08ee66320849f59b13ecc
     .claude/skills/google-forms-survey-builder/references/survey-questions-format.md: sha256:96accdafa50bb9d828c148ffeb2bd3c1bc59b123b30c6e80fbdd7449092782d7
     .claude/skills/headroom/SKILL.md: sha256:b544af6e415c7724e96dac30f39b6c532d4928b9521031b96e1e723f11af7123
+    .claude/skills/japanese-tech-writing/SKILL.md: sha256:6d8da2f159b632b264985b7872b75e2813e597b04bd4853d11f720c548f0cdbb
     .claude/skills/jina-web-research/SKILL.md: sha256:6ebe308b8769697a8b2ddbc5d8d93d239ed572adae84325bc7e09b5533209c75
     .claude/skills/jina-web-research/agents/openai.yaml: sha256:31aa67ba8347ed691d7fe4f14034a4b5f23b698640d50c8aeb60831534423a4d
     .claude/skills/macos-troubleshooting/SKILL.md: sha256:5dbfb6b138966632e483ed30dff2b777b2e0842e457033d910f579a00618009c
@@ -2250,7 +2375,7 @@ dependencies:
     .claude/skills/manga-rss-bridge/scripts/generate_freshrss_opml.py: sha256:a37200bcb2bd120687d3855196bba7ffd7fbdc6653c2c9eb8fc7a240e1cb1b61
     .claude/skills/mcp-tools/SKILL.md: sha256:bd74f85bae6f8b0b29d875a4c4c89fee69de798c9c262244d2d7c01447beece4
     .claude/skills/mcp-tools/agents/openai.yaml: sha256:f2251a17f3ee854c9aa28c0ef7645c279b2dcd81afc53e65a102eff7c35101af
-    .claude/skills/mcp-tools/references/mcp-placement.md: sha256:bf2b8f6a28e1310ce8f32ffc5aa2a27f0f52c6554952736a00ff8970f71e9010
+    .claude/skills/mcp-tools/references/mcp-placement.md: sha256:fb1c67b1b36376a24daf56f1348a8c439adbbc252a93f82c1ddd0b97f8c96452
     .claude/skills/mcp-tools/references/mcp-tools-details.md: sha256:c0af3d9e3ff7006bc5953f295824f31cb22d606fb93da7a07e2a94c7550af3ea
     .claude/skills/mcp-tools/references/security-and-credentials.md: sha256:789724e286ed619bea3e8b23f97ac84156886d78b9ae8b2bf028291919be02a2
     .claude/skills/mcp-tools/references/server-configurations.md: sha256:14c2a50593bf13eb148781a4a03eb9d9a536e14a6d69ac9d814729e5df60cc0d
@@ -2337,7 +2462,6 @@ dependencies:
     .claude/skills/skill-creator/SKILL.md: sha256:54a06371e71850e6e19474babce7754e807583e477daa028ecdacad24cde717b
     .claude/skills/skill-creator/agents/openai.yaml: sha256:b6c49ad8c5d225212c3d44ea4ed7bd11bb33d54fadc876296d67b865aca3cd2c
     .claude/skills/skill-creator/references/openai_yaml.md: sha256:9fb5928b7f4a746fdb39df503ebbd7a659d5e64b47f85a60626aa1a03fd76b17
-    .claude/skills/skill-creator/scripts/__pycache__/generate_openai_yaml.cpython-314.pyc: sha256:73cc00f33335a40ced12f777dc11ad94cfc234dd5f24d722ac0bb50a47d92dc1
     .claude/skills/skill-creator/scripts/generate_openai_yaml.py: sha256:10e93ef5537e55abba5e3aac905c4aa5f5b377a586c0cf45d156c772505f0d65
     .claude/skills/skill-creator/scripts/init_skill.py: sha256:bcb8982d3f033a094f2f1be43123ac8537e2562d25d8ba4d8ef2196ae514d96d
     .claude/skills/skill-creator/scripts/quick_validate.py: sha256:6cc9dc3199c935916cf6f73fcbbbb0e3bb1b58c8f5109fefa499978908164f51
@@ -2390,21 +2514,21 @@ dependencies:
     .kiro/skills/agent-curation/SKILL.md: sha256:cf46408cdb91fd87a0985ccec8a1bc0f77501d521320f88a36a52e9fd9cc3900
     .kiro/skills/agent-curation/agents/openai.yaml: sha256:f7395c9113eaefcfc27c4b697b0d7c253cb7a67a88c84f038098e0ff06ba8694
     .kiro/skills/agent-curation/references/hired-agents-registry.md: sha256:8686ea777ab6c8eec3a0fd92f4ce9bbefe4ec5b76f409885c99f6e431f62237e
-    .kiro/skills/apm-repo-bootstrap/SKILL.md: sha256:8913a5f278de0fc7644e4b191fc5c698587cedc741962aa7f9c5dc6665330289
+    .kiro/skills/apm-repo-bootstrap/SKILL.md: sha256:c340f3997daf9ece1d6a0b6d02770948171549d69ccceebafd0f5cc68f995248
     .kiro/skills/apm-repo-bootstrap/agents/openai.yaml: sha256:faed36da8f7980b88e395eb9aae322a9fc608e0c555ba93f843f6007ab50da19
-    .kiro/skills/apm-repo-bootstrap/references/recommendations.md: sha256:7e08ea3b207072aef67921b51a83a197ff6d896417cde95132e889d1e275e9ee
-    .kiro/skills/apm-usage/SKILL.md: sha256:d942354bc449d8aefec67f905e17e263add25dc007710fbd8fa2a06831c58aeb
+    .kiro/skills/apm-repo-bootstrap/references/recommendations.md: sha256:0fbd9a6d9656f05438834d6224a79a819bbc6933af7dc90835858263175b9c23
+    .kiro/skills/apm-usage/SKILL.md: sha256:eba84197a104f8945e73e7bc513b4db60f9eaf32d7d3b7357e78f16578ed0dd0
     .kiro/skills/apm-usage/agents/openai.yaml: sha256:b3743dad4fcd9f3c209210c40df277e75d949ac7ce1713a61d497cc1e7e3ba83
-    .kiro/skills/apm-usage/references/repo-local-mcp.md: sha256:192fbf5433423244d5f5ddbdf7a163b430471d698d48341343aac675493612e0
+    .kiro/skills/apm-usage/references/repo-local-mcp.md: sha256:adac5e0d08543b1dd95b5e7fefd113cd537be290146d9f367cafb51cac89ee41
     .kiro/skills/architecture-boundary-docs/SKILL.md: sha256:a1ff83850e0cf330529b2f94436714692d933b80b780a08a21263679fe393d2e
     .kiro/skills/architecture-boundary-docs/agents/openai.yaml: sha256:492ca681ead790cbd1a8ae4c25543b31d5412e2a227c9f501f400ebf2c053370
     .kiro/skills/architecture-boundary-docs/references/document-shape.md: sha256:1c0fedacef544a36804c64cc58cf159a4c7a2dcc25dbc05ef88f571b3ce425fa
-    .kiro/skills/atomic-commit/SKILL.md: sha256:5329dc7830596db21d8ccf4102dcdde8aafed631b871a2955b2b729af57b5c17
+    .kiro/skills/atomic-commit/SKILL.md: sha256:25493e69a2d0fbba8f22eb6504b30edd08c7cd58c53097b06936a70f6e3186c9
     .kiro/skills/claude-system/SKILL.md: sha256:d8bc5e7391d3f24b53a13a4cd6dc6d3f0ebd01e5b821164fbf6ee1e5aa0fb161
     .kiro/skills/claude-system/references/integration-patterns.md: sha256:d42e77098df7f180d9a9c52f1088d183419a9e95d2e443d3b6916fa84450268e
     .kiro/skills/claude-system/references/use-cases.md: sha256:ca0db8284fdd920b8879e12c9dc8578800a58631561f6d538e67b54d7df8b3e4
     .kiro/skills/code-quality-improvement/SKILL.md: sha256:6dca795076916795f024071f81a8f9f194c93a3818bfb842dde2ee67537d3a80
-    .kiro/skills/code-quality-improvement/references/patterns.md: sha256:a42ee3ea4fbb4303f5260ebe151767c85de9a4cff19831501a1f22362804e69c
+    .kiro/skills/code-quality-improvement/references/patterns.md: sha256:d371fb616f8c56d9aff936ce9518619856d66d3ad6968108945526882e032d69
     .kiro/skills/code-review/SKILL.md: sha256:d1f9cbba1836f7e53e2dae8c8a04bf3bea52d34be4057636f39be2566e3d45b5
     .kiro/skills/code-review/config/default-projects.json: sha256:49f745428c8b22b22d66290b78fbf3de94d6ab79b02426162ed3ce61c7e28f07
     .kiro/skills/code-review/config/examples/.code-review-config.json: sha256:7c660582d3330d6730fddca0574e6c8387c30742a02f162213cc4c9e66940bfe
@@ -2430,9 +2554,9 @@ dependencies:
     .kiro/skills/design-check/SKILL.md: sha256:e94fe4644706f79d42988ead9bf6aecf7086257f55f76d990f4afeb400bb8559
     .kiro/skills/design-check/agents/openai.yaml: sha256:f70fe2a21eab6da5580b596a99ee69d746eadaed4f0d8312fafcb568d274ba36
     .kiro/skills/design-check/references/checklist.md: sha256:809c98d5a6b4f30392297639d18dfcce707e477111383c76cf0bb57a4395186d
-    .kiro/skills/design-md-workflow/SKILL.md: sha256:fc79ddf65a5581d7d92660360af11eed5d4779b89fe1327536ed8e371c3a2a3b
+    .kiro/skills/design-md-workflow/SKILL.md: sha256:86a8393eb989689539eff10574e3102ccbfbd9afad9a03d7de8533286fb9e31a
     .kiro/skills/design-md-workflow/agents/openai.yaml: sha256:9c0affb53d0d0703bf7e8d8199ec81dde316b76a71151c3839c8c021056ef10b
-    .kiro/skills/design-md-workflow/references/design-md-structure.md: sha256:783e7c37746741f2f46935509e51581e8083388b5492d7468170e795b98e62a4
+    .kiro/skills/design-md-workflow/references/design-md-structure.md: sha256:2a273b9805b2476961ee0852bcdb7905778ad3c25260ed03082681323059c569
     .kiro/skills/design-md-workflow/references/design-review-structure.md: sha256:446dc1fcda31bb29a1b9387601176f4bba97c20c43db9532bedf0e586e56b05f
     .kiro/skills/design-md-workflow/references/input-modes.md: sha256:e451f000f63e10583b99257a5102cf64582323f358c575c278658286c27bf343
     .kiro/skills/design-md-workflow/references/routing-examples.md: sha256:83014cfd675639ed7bacffdb2fd4312e8d982936cff0b2a5551cea54fb24ce6e
@@ -2479,6 +2603,7 @@ dependencies:
     .kiro/skills/google-forms-survey-builder/references/apps-script-patterns.md: sha256:57269f30cc830a74ae1d9ddf1b885939ca8e0303a6c08ee66320849f59b13ecc
     .kiro/skills/google-forms-survey-builder/references/survey-questions-format.md: sha256:96accdafa50bb9d828c148ffeb2bd3c1bc59b123b30c6e80fbdd7449092782d7
     .kiro/skills/headroom/SKILL.md: sha256:b544af6e415c7724e96dac30f39b6c532d4928b9521031b96e1e723f11af7123
+    .kiro/skills/japanese-tech-writing/SKILL.md: sha256:6d8da2f159b632b264985b7872b75e2813e597b04bd4853d11f720c548f0cdbb
     .kiro/skills/jina-web-research/SKILL.md: sha256:6ebe308b8769697a8b2ddbc5d8d93d239ed572adae84325bc7e09b5533209c75
     .kiro/skills/jina-web-research/agents/openai.yaml: sha256:31aa67ba8347ed691d7fe4f14034a4b5f23b698640d50c8aeb60831534423a4d
     .kiro/skills/macos-troubleshooting/SKILL.md: sha256:5dbfb6b138966632e483ed30dff2b777b2e0842e457033d910f579a00618009c
@@ -2490,7 +2615,7 @@ dependencies:
     .kiro/skills/manga-rss-bridge/scripts/generate_freshrss_opml.py: sha256:a37200bcb2bd120687d3855196bba7ffd7fbdc6653c2c9eb8fc7a240e1cb1b61
     .kiro/skills/mcp-tools/SKILL.md: sha256:bd74f85bae6f8b0b29d875a4c4c89fee69de798c9c262244d2d7c01447beece4
     .kiro/skills/mcp-tools/agents/openai.yaml: sha256:f2251a17f3ee854c9aa28c0ef7645c279b2dcd81afc53e65a102eff7c35101af
-    .kiro/skills/mcp-tools/references/mcp-placement.md: sha256:bf2b8f6a28e1310ce8f32ffc5aa2a27f0f52c6554952736a00ff8970f71e9010
+    .kiro/skills/mcp-tools/references/mcp-placement.md: sha256:fb1c67b1b36376a24daf56f1348a8c439adbbc252a93f82c1ddd0b97f8c96452
     .kiro/skills/mcp-tools/references/mcp-tools-details.md: sha256:c0af3d9e3ff7006bc5953f295824f31cb22d606fb93da7a07e2a94c7550af3ea
     .kiro/skills/mcp-tools/references/security-and-credentials.md: sha256:789724e286ed619bea3e8b23f97ac84156886d78b9ae8b2bf028291919be02a2
     .kiro/skills/mcp-tools/references/server-configurations.md: sha256:14c2a50593bf13eb148781a4a03eb9d9a536e14a6d69ac9d814729e5df60cc0d
@@ -2613,11 +2738,11 @@ dependencies:
     .kiro/skills/work-log-maintenance/agents/openai.yaml: sha256:e951b8256a5a1b032bcca3c7105230f5041467594434ca23b562b8ec5ec4abc8
     .kiro/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
     .kiro/skills/zsh/SKILL.md: sha256:42a47db6cbc7f8a3b1b0f1b65cee6c13115264231f1a60c54dbf2823c13b15ad
-  content_hash: sha256:072df248be8be6a10a04184b66b4faaf82d85d628327a28ab371e85aaa0c1479
+  content_hash: sha256:79e592ee579fe3c60f8ed5636354d3ec0eb03ff6e36874896693b8762cab6ae5
 - repo_url: langchain-ai/deepagents
   name: web-research
   host: github.com
-  resolved_commit: 9eb736b074a2698ea5c8be4d07aef5a7cf02107c
+  resolved_commit: b74c18591a8ce9a49a5fee43b07e602ca9fbf68a
   version: 1.0.0
   virtual_path: libs/cli/examples/skills/web-research
   is_virtual: true
@@ -2635,10 +2760,10 @@ dependencies:
     .kiro/skills/web-research/SKILL.md: sha256:7c2b1f1990370f7ce176fe3608a67028c72db11e337b4ba83b8fce6d927dfde3
   content_hash: sha256:2b66d5db8c8d70474e70638f437f324fb3af3724b71bf8501e48c8004e70e677
 - repo_url: mattpocock/skills
-  name: writing-great-skills
+  name: skills
   host: github.com
   resolved_commit: 1445797da5ee4e4054233878c0029e9276f9986a
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/productivity/writing-great-skills
   is_virtual: true
   package_type: claude_skill
@@ -2663,8 +2788,8 @@ dependencies:
 - repo_url: millionco/react-doctor
   name: react-doctor
   host: github.com
-  resolved_commit: 113637e9bfac7cfc2e5ce5e39826b99dfb88e37b
-  version: 1.0.0
+  resolved_commit: b4faf74744c730d0836235854b0233ce59a42566
+  version: unknown
   virtual_path: skills/react-doctor
   is_virtual: true
   package_type: claude_skill
@@ -2721,7 +2846,7 @@ dependencies:
 - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
   name: ui-ux-pro-max
   host: github.com
-  resolved_commit: 247bf48d0245a2bfb252ac6f3b4b434bfc9a6281
+  resolved_commit: 9ceab49a1c6e9bf23fa9ebc49ca7d4f0c6303a99
   version: 2.6.2
   package_type: marketplace_plugin
   deployed_files:
@@ -2928,6 +3053,7 @@ dependencies:
   - .agents/skills/ui-ux-pro-max/data/google-fonts.csv
   - .agents/skills/ui-ux-pro-max/data/icons.csv
   - .agents/skills/ui-ux-pro-max/data/landing.csv
+  - .agents/skills/ui-ux-pro-max/data/motion.csv
   - .agents/skills/ui-ux-pro-max/data/products.csv
   - .agents/skills/ui-ux-pro-max/data/react-performance.csv
   - .agents/skills/ui-ux-pro-max/data/stacks/angular.csv
@@ -3156,6 +3282,7 @@ dependencies:
   - .claude/skills/ui-ux-pro-max/data/google-fonts.csv
   - .claude/skills/ui-ux-pro-max/data/icons.csv
   - .claude/skills/ui-ux-pro-max/data/landing.csv
+  - .claude/skills/ui-ux-pro-max/data/motion.csv
   - .claude/skills/ui-ux-pro-max/data/products.csv
   - .claude/skills/ui-ux-pro-max/data/react-performance.csv
   - .claude/skills/ui-ux-pro-max/data/stacks/angular.csv
@@ -3384,6 +3511,7 @@ dependencies:
   - .kiro/skills/ui-ux-pro-max/data/google-fonts.csv
   - .kiro/skills/ui-ux-pro-max/data/icons.csv
   - .kiro/skills/ui-ux-pro-max/data/landing.csv
+  - .kiro/skills/ui-ux-pro-max/data/motion.csv
   - .kiro/skills/ui-ux-pro-max/data/products.csv
   - .kiro/skills/ui-ux-pro-max/data/react-performance.csv
   - .kiro/skills/ui-ux-pro-max/data/stacks/angular.csv
@@ -3596,7 +3724,7 @@ dependencies:
     .agents/skills/ui-styling/scripts/tests/requirements.txt: sha256:80846c98ee02a7e9651ec4eee6709f840b785646b469aad5284ab7ab9b344f17
     .agents/skills/ui-styling/scripts/tests/test_shadcn_add.py: sha256:4012b1efe1e51a5dcf31078b0d9069f92cfe2045e9a35dd52fdd4631b1815150
     .agents/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py: sha256:4efa59fdbe318d55e6a452d85401db5d1aa4504f93739878bb40d8bb504af585
-    .agents/skills/ui-ux-pro-max/SKILL.md: sha256:58fe081898866a04a578e7947faae083c1a18ffad502c3486f633c25aa69c7a3
+    .agents/skills/ui-ux-pro-max/SKILL.md: sha256:37d02a2cd7caef3512152733c3ad33107554ca22c27db2cddc306322d05c08b8
     .agents/skills/ui-ux-pro-max/data/_sync_all.py: sha256:b540b3a4f87598ae29048b3cceae1fc17b39b629aee2cbe5c802ffc7b48abf6d
     .agents/skills/ui-ux-pro-max/data/app-interface.csv: sha256:2a17ef810dab715ce1f339861817a8fbe3ccc38142b70517301e874803e838ac
     .agents/skills/ui-ux-pro-max/data/charts.csv: sha256:a70ef7460b0eaaea8614f86a0d09a4bc38b467804179762464b5ca45b491baac
@@ -3606,6 +3734,7 @@ dependencies:
     .agents/skills/ui-ux-pro-max/data/google-fonts.csv: sha256:3fd2898fb0fdd31ba758bf05cfcd2b58cd0f038a20cf08e417d09e5a8a4a509e
     .agents/skills/ui-ux-pro-max/data/icons.csv: sha256:f376c29fb4df37b4bdb366a5aa70cb211ba3dd8b435390aaa03152a64b07d2e8
     .agents/skills/ui-ux-pro-max/data/landing.csv: sha256:121a2cac7cf21050234b5f80e7b4e182f10123536032e0f9ad862ad3aec9677d
+    .agents/skills/ui-ux-pro-max/data/motion.csv: sha256:528be03324785eb568c9570f5d60fc1644d5bc7ce2cbdd21b648cb90ce74e76e
     .agents/skills/ui-ux-pro-max/data/products.csv: sha256:9fd9e776ba847cf44c1ea78f95fe5e33b2c56bb7e186e3cfff9c49bc7fcb691b
     .agents/skills/ui-ux-pro-max/data/react-performance.csv: sha256:904c8afcda229629545912dde0e8ac37503757131f0169f80b016f1f58c4fd3f
     .agents/skills/ui-ux-pro-max/data/stacks/angular.csv: sha256:dd7cc2a2b34cd8f0508bd05b067545e7a44f7724440c432d491d92a61a8fb6c1
@@ -3628,9 +3757,9 @@ dependencies:
     .agents/skills/ui-ux-pro-max/data/typography.csv: sha256:dbea262a54e3bfa2e6c3b15989a365d5ef4c43349316aff46635e82ca825adce
     .agents/skills/ui-ux-pro-max/data/ui-reasoning.csv: sha256:06e4369445388ba9b7a57347510b125b7a2145bbf8546a327ba50292503b204a
     .agents/skills/ui-ux-pro-max/data/ux-guidelines.csv: sha256:e01943c433b2cad3040f19389b3b0455673758a569b7a927b5bedf65c989cb96
-    .agents/skills/ui-ux-pro-max/scripts/core.py: sha256:772b4d567c7a948c5d4a10343473b4123fec04238d250c9ffce31d0733f752c0
-    .agents/skills/ui-ux-pro-max/scripts/design_system.py: sha256:f7a21e83739c5ac6ca3738846220f6a9eb7f3c1ae7a44989c5aaa2061ca60310
-    .agents/skills/ui-ux-pro-max/scripts/search.py: sha256:211546b262fb14d397228dbf982e32254c938d364b6386da69b62e7c3805b319
+    .agents/skills/ui-ux-pro-max/scripts/core.py: sha256:ab9f398b493e34404448cefc766239ee86119c7a21d8581ba965cabdc698b0a8
+    .agents/skills/ui-ux-pro-max/scripts/design_system.py: sha256:9de2d4547e1e336d50939fe6ff0910f327d50dc069f1c30e929d64e3a47e87bf
+    .agents/skills/ui-ux-pro-max/scripts/search.py: sha256:84d2605d86ff2c69f6313730a0ff8cc91ba834c2ff47e1d730215f943ca5a38e
     .claude/skills/banner-design/SKILL.md: sha256:913d9c4b2a3b405d638d50131e0dd3fe2787c839423d79287b7858ac29255acc
     .claude/skills/banner-design/references/banner-sizes-and-styles.md: sha256:c8906fb1073a576ee8c680d9bc8586249cbc4ed36690da960d65a1c9c37143b7
     .claude/skills/brand/SKILL.md: sha256:6a450ee1a83a403d47cec2ede9030feb60a67a81fc425d2406e975339313bd44
@@ -3817,7 +3946,7 @@ dependencies:
     .claude/skills/ui-styling/scripts/tests/requirements.txt: sha256:80846c98ee02a7e9651ec4eee6709f840b785646b469aad5284ab7ab9b344f17
     .claude/skills/ui-styling/scripts/tests/test_shadcn_add.py: sha256:4012b1efe1e51a5dcf31078b0d9069f92cfe2045e9a35dd52fdd4631b1815150
     .claude/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py: sha256:4efa59fdbe318d55e6a452d85401db5d1aa4504f93739878bb40d8bb504af585
-    .claude/skills/ui-ux-pro-max/SKILL.md: sha256:58fe081898866a04a578e7947faae083c1a18ffad502c3486f633c25aa69c7a3
+    .claude/skills/ui-ux-pro-max/SKILL.md: sha256:37d02a2cd7caef3512152733c3ad33107554ca22c27db2cddc306322d05c08b8
     .claude/skills/ui-ux-pro-max/data/_sync_all.py: sha256:b540b3a4f87598ae29048b3cceae1fc17b39b629aee2cbe5c802ffc7b48abf6d
     .claude/skills/ui-ux-pro-max/data/app-interface.csv: sha256:2a17ef810dab715ce1f339861817a8fbe3ccc38142b70517301e874803e838ac
     .claude/skills/ui-ux-pro-max/data/charts.csv: sha256:a70ef7460b0eaaea8614f86a0d09a4bc38b467804179762464b5ca45b491baac
@@ -3827,6 +3956,7 @@ dependencies:
     .claude/skills/ui-ux-pro-max/data/google-fonts.csv: sha256:3fd2898fb0fdd31ba758bf05cfcd2b58cd0f038a20cf08e417d09e5a8a4a509e
     .claude/skills/ui-ux-pro-max/data/icons.csv: sha256:f376c29fb4df37b4bdb366a5aa70cb211ba3dd8b435390aaa03152a64b07d2e8
     .claude/skills/ui-ux-pro-max/data/landing.csv: sha256:121a2cac7cf21050234b5f80e7b4e182f10123536032e0f9ad862ad3aec9677d
+    .claude/skills/ui-ux-pro-max/data/motion.csv: sha256:528be03324785eb568c9570f5d60fc1644d5bc7ce2cbdd21b648cb90ce74e76e
     .claude/skills/ui-ux-pro-max/data/products.csv: sha256:9fd9e776ba847cf44c1ea78f95fe5e33b2c56bb7e186e3cfff9c49bc7fcb691b
     .claude/skills/ui-ux-pro-max/data/react-performance.csv: sha256:904c8afcda229629545912dde0e8ac37503757131f0169f80b016f1f58c4fd3f
     .claude/skills/ui-ux-pro-max/data/stacks/angular.csv: sha256:dd7cc2a2b34cd8f0508bd05b067545e7a44f7724440c432d491d92a61a8fb6c1
@@ -3849,9 +3979,9 @@ dependencies:
     .claude/skills/ui-ux-pro-max/data/typography.csv: sha256:dbea262a54e3bfa2e6c3b15989a365d5ef4c43349316aff46635e82ca825adce
     .claude/skills/ui-ux-pro-max/data/ui-reasoning.csv: sha256:06e4369445388ba9b7a57347510b125b7a2145bbf8546a327ba50292503b204a
     .claude/skills/ui-ux-pro-max/data/ux-guidelines.csv: sha256:e01943c433b2cad3040f19389b3b0455673758a569b7a927b5bedf65c989cb96
-    .claude/skills/ui-ux-pro-max/scripts/core.py: sha256:772b4d567c7a948c5d4a10343473b4123fec04238d250c9ffce31d0733f752c0
-    .claude/skills/ui-ux-pro-max/scripts/design_system.py: sha256:f7a21e83739c5ac6ca3738846220f6a9eb7f3c1ae7a44989c5aaa2061ca60310
-    .claude/skills/ui-ux-pro-max/scripts/search.py: sha256:211546b262fb14d397228dbf982e32254c938d364b6386da69b62e7c3805b319
+    .claude/skills/ui-ux-pro-max/scripts/core.py: sha256:ab9f398b493e34404448cefc766239ee86119c7a21d8581ba965cabdc698b0a8
+    .claude/skills/ui-ux-pro-max/scripts/design_system.py: sha256:9de2d4547e1e336d50939fe6ff0910f327d50dc069f1c30e929d64e3a47e87bf
+    .claude/skills/ui-ux-pro-max/scripts/search.py: sha256:84d2605d86ff2c69f6313730a0ff8cc91ba834c2ff47e1d730215f943ca5a38e
     .kiro/skills/banner-design/SKILL.md: sha256:913d9c4b2a3b405d638d50131e0dd3fe2787c839423d79287b7858ac29255acc
     .kiro/skills/banner-design/references/banner-sizes-and-styles.md: sha256:c8906fb1073a576ee8c680d9bc8586249cbc4ed36690da960d65a1c9c37143b7
     .kiro/skills/brand/SKILL.md: sha256:6a450ee1a83a403d47cec2ede9030feb60a67a81fc425d2406e975339313bd44
@@ -4038,7 +4168,7 @@ dependencies:
     .kiro/skills/ui-styling/scripts/tests/requirements.txt: sha256:80846c98ee02a7e9651ec4eee6709f840b785646b469aad5284ab7ab9b344f17
     .kiro/skills/ui-styling/scripts/tests/test_shadcn_add.py: sha256:4012b1efe1e51a5dcf31078b0d9069f92cfe2045e9a35dd52fdd4631b1815150
     .kiro/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py: sha256:4efa59fdbe318d55e6a452d85401db5d1aa4504f93739878bb40d8bb504af585
-    .kiro/skills/ui-ux-pro-max/SKILL.md: sha256:58fe081898866a04a578e7947faae083c1a18ffad502c3486f633c25aa69c7a3
+    .kiro/skills/ui-ux-pro-max/SKILL.md: sha256:37d02a2cd7caef3512152733c3ad33107554ca22c27db2cddc306322d05c08b8
     .kiro/skills/ui-ux-pro-max/data/_sync_all.py: sha256:b540b3a4f87598ae29048b3cceae1fc17b39b629aee2cbe5c802ffc7b48abf6d
     .kiro/skills/ui-ux-pro-max/data/app-interface.csv: sha256:2a17ef810dab715ce1f339861817a8fbe3ccc38142b70517301e874803e838ac
     .kiro/skills/ui-ux-pro-max/data/charts.csv: sha256:a70ef7460b0eaaea8614f86a0d09a4bc38b467804179762464b5ca45b491baac
@@ -4048,6 +4178,7 @@ dependencies:
     .kiro/skills/ui-ux-pro-max/data/google-fonts.csv: sha256:3fd2898fb0fdd31ba758bf05cfcd2b58cd0f038a20cf08e417d09e5a8a4a509e
     .kiro/skills/ui-ux-pro-max/data/icons.csv: sha256:f376c29fb4df37b4bdb366a5aa70cb211ba3dd8b435390aaa03152a64b07d2e8
     .kiro/skills/ui-ux-pro-max/data/landing.csv: sha256:121a2cac7cf21050234b5f80e7b4e182f10123536032e0f9ad862ad3aec9677d
+    .kiro/skills/ui-ux-pro-max/data/motion.csv: sha256:528be03324785eb568c9570f5d60fc1644d5bc7ce2cbdd21b648cb90ce74e76e
     .kiro/skills/ui-ux-pro-max/data/products.csv: sha256:9fd9e776ba847cf44c1ea78f95fe5e33b2c56bb7e186e3cfff9c49bc7fcb691b
     .kiro/skills/ui-ux-pro-max/data/react-performance.csv: sha256:904c8afcda229629545912dde0e8ac37503757131f0169f80b016f1f58c4fd3f
     .kiro/skills/ui-ux-pro-max/data/stacks/angular.csv: sha256:dd7cc2a2b34cd8f0508bd05b067545e7a44f7724440c432d491d92a61a8fb6c1
@@ -4070,10 +4201,10 @@ dependencies:
     .kiro/skills/ui-ux-pro-max/data/typography.csv: sha256:dbea262a54e3bfa2e6c3b15989a365d5ef4c43349316aff46635e82ca825adce
     .kiro/skills/ui-ux-pro-max/data/ui-reasoning.csv: sha256:06e4369445388ba9b7a57347510b125b7a2145bbf8546a327ba50292503b204a
     .kiro/skills/ui-ux-pro-max/data/ux-guidelines.csv: sha256:e01943c433b2cad3040f19389b3b0455673758a569b7a927b5bedf65c989cb96
-    .kiro/skills/ui-ux-pro-max/scripts/core.py: sha256:772b4d567c7a948c5d4a10343473b4123fec04238d250c9ffce31d0733f752c0
-    .kiro/skills/ui-ux-pro-max/scripts/design_system.py: sha256:f7a21e83739c5ac6ca3738846220f6a9eb7f3c1ae7a44989c5aaa2061ca60310
-    .kiro/skills/ui-ux-pro-max/scripts/search.py: sha256:211546b262fb14d397228dbf982e32254c938d364b6386da69b62e7c3805b319
-  content_hash: sha256:109c5a60e99b63fb7b15b9f144cbed7bafb1117ebb0fd7d595d88ad185f1a14a
+    .kiro/skills/ui-ux-pro-max/scripts/core.py: sha256:ab9f398b493e34404448cefc766239ee86119c7a21d8581ba965cabdc698b0a8
+    .kiro/skills/ui-ux-pro-max/scripts/design_system.py: sha256:9de2d4547e1e336d50939fe6ff0910f327d50dc069f1c30e929d64e3a47e87bf
+    .kiro/skills/ui-ux-pro-max/scripts/search.py: sha256:84d2605d86ff2c69f6313730a0ff8cc91ba834c2ff47e1d730215f943ca5a38e
+  content_hash: sha256:84bafbfacd54f81398fbac244ed6c6a117204a3489789558c6fc7f2c3349fa0f
   declared_license: MIT
 - repo_url: nyosegawa/skills
   name: skills
@@ -4162,10 +4293,10 @@ dependencies:
     .kiro/skills/skill-auditor/scripts/generate_report.py: sha256:42d0ac6684d38a20b85f886943d72f9e541de0fca0f499199a9ff13e60a676b3
   content_hash: sha256:65a6f52fd391671fe6f334130290fd9c6787d2daeb22cdff55fa727977876e04
 - repo_url: obra/superpowers
-  name: brainstorming
+  name: superpowers
   host: github.com
-  resolved_commit: f268f7c953744036f0fa7e9d4b73535c04e57cb8
-  version: 1.0.0
+  resolved_commit: d884ae04edebef577e82ff7c4e143debd0bbec99
+  version: unknown
   virtual_path: skills/brainstorming
   is_virtual: true
   package_type: claude_skill
@@ -4226,7 +4357,7 @@ dependencies:
 - repo_url: obra/superpowers
   name: superpowers
   host: github.com
-  resolved_commit: f268f7c953744036f0fa7e9d4b73535c04e57cb8
+  resolved_commit: d884ae04edebef577e82ff7c4e143debd0bbec99
   version: unknown
   virtual_path: skills/dispatching-parallel-agents
   is_virtual: true
@@ -4244,10 +4375,10 @@ dependencies:
     .kiro/skills/dispatching-parallel-agents/SKILL.md: sha256:f0df13f584049059cc5619f90061405b89dcc6e28ab3f2a8517d27d99c7a46a6
   content_hash: sha256:85df55d2235a7623b315dac4bc340c14a37dcdc57c869c80a829e1a53a174689
 - repo_url: obra/superpowers
-  name: executing-plans
+  name: superpowers
   host: github.com
-  resolved_commit: f268f7c953744036f0fa7e9d4b73535c04e57cb8
-  version: 1.0.0
+  resolved_commit: d884ae04edebef577e82ff7c4e143debd0bbec99
+  version: unknown
   virtual_path: skills/executing-plans
   is_virtual: true
   package_type: claude_skill
@@ -4266,7 +4397,7 @@ dependencies:
 - repo_url: obra/superpowers
   name: superpowers
   host: github.com
-  resolved_commit: f268f7c953744036f0fa7e9d4b73535c04e57cb8
+  resolved_commit: d884ae04edebef577e82ff7c4e143debd0bbec99
   version: unknown
   virtual_path: skills/finishing-a-development-branch
   is_virtual: true
@@ -4286,7 +4417,7 @@ dependencies:
 - repo_url: obra/superpowers
   name: superpowers
   host: github.com
-  resolved_commit: f268f7c953744036f0fa7e9d4b73535c04e57cb8
+  resolved_commit: d884ae04edebef577e82ff7c4e143debd0bbec99
   version: unknown
   virtual_path: skills/subagent-driven-development
   is_virtual: true
@@ -4336,7 +4467,7 @@ dependencies:
 - repo_url: obra/superpowers
   name: superpowers
   host: github.com
-  resolved_commit: f268f7c953744036f0fa7e9d4b73535c04e57cb8
+  resolved_commit: d884ae04edebef577e82ff7c4e143debd0bbec99
   version: unknown
   virtual_path: skills/systematic-debugging
   is_virtual: true
@@ -4416,7 +4547,7 @@ dependencies:
 - repo_url: obra/superpowers
   name: superpowers
   host: github.com
-  resolved_commit: f268f7c953744036f0fa7e9d4b73535c04e57cb8
+  resolved_commit: d884ae04edebef577e82ff7c4e143debd0bbec99
   version: unknown
   virtual_path: skills/test-driven-development
   is_virtual: true
@@ -4442,7 +4573,7 @@ dependencies:
 - repo_url: obra/superpowers
   name: superpowers
   host: github.com
-  resolved_commit: f268f7c953744036f0fa7e9d4b73535c04e57cb8
+  resolved_commit: d884ae04edebef577e82ff7c4e143debd0bbec99
   version: unknown
   virtual_path: skills/using-git-worktrees
   is_virtual: true
@@ -4460,10 +4591,10 @@ dependencies:
     .kiro/skills/using-git-worktrees/SKILL.md: sha256:e2c3ec142e52868a51af246c620cd76ab648dcf27d6900d47e6ffd07159a9794
   content_hash: sha256:212ad917e5543e84ea3adf4e3fab537675db976fdab05d4de432870e38b49e80
 - repo_url: obra/superpowers
-  name: using-superpowers
+  name: superpowers
   host: github.com
-  resolved_commit: f268f7c953744036f0fa7e9d4b73535c04e57cb8
-  version: 1.0.0
+  resolved_commit: d884ae04edebef577e82ff7c4e143debd0bbec99
+  version: unknown
   virtual_path: skills/using-superpowers
   is_virtual: true
   package_type: claude_skill
@@ -4500,7 +4631,7 @@ dependencies:
 - repo_url: obra/superpowers
   name: superpowers
   host: github.com
-  resolved_commit: f268f7c953744036f0fa7e9d4b73535c04e57cb8
+  resolved_commit: d884ae04edebef577e82ff7c4e143debd0bbec99
   version: unknown
   virtual_path: skills/verification-before-completion
   is_virtual: true
@@ -4520,7 +4651,7 @@ dependencies:
 - repo_url: obra/superpowers
   name: superpowers
   host: github.com
-  resolved_commit: f268f7c953744036f0fa7e9d4b73535c04e57cb8
+  resolved_commit: d884ae04edebef577e82ff7c4e143debd0bbec99
   version: unknown
   virtual_path: skills/writing-plans
   is_virtual: true

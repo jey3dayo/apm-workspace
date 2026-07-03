@@ -6,9 +6,10 @@ dependencies:
   apm:
     - jey3dayo/apm-workspace/catalog#main
     - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
-    - caad-develop/claude-code-marketplace/plugins/infra/ca-pass
-    - caad-develop/claude-code-marketplace/plugins/infra/notica-notification-api
-    - caad-develop/claude-code-marketplace/plugins/infra/mdb
+    - caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass
+    - caad-develop/claude-code-marketplace/plugins/service-integrations/notica-api
+    - caad-develop/claude-code-marketplace/plugins/service-integrations/mdb-api
+    - caad-develop/claude-code-marketplace/plugins/service-integrations/telma-api
     - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
     - nextlevelbuilder/ui-ux-pro-max-skill
     - EpicenterHQ/epicenter/.agents/skills/tauri
@@ -66,6 +67,7 @@ dependencies:
     - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review#b8f2564c2e8da66b331c1dd63c2a2925d6739961
     - affaan-m/everything-claude-code/skills/mcp-server-patterns#2bc924faf2f8e893bfe0af86b1931283693c30ae
     - mattpocock/skills/skills/productivity/writing-great-skills
+    - DietrichGebert/ponytail
   mcp:
     - name: context7
       registry: false
