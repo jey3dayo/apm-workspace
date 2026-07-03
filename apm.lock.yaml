@@ -1,106 +1,12 @@
 lockfile_version: '1'
-generated_at: '2026-07-03T03:49:38.998358+00:00'
+generated_at: '2026-07-03T10:10:53.291653+00:00'
 apm_version: 0.22.0
 dependencies:
-- repo_url: DietrichGebert/ponytail
-  name: ponytail
-  host: github.com
-  resolved_commit: 40e50d9e03242aa5dd53ac771950f9127362b25f
-  version: 4.8.4
-  package_type: marketplace_plugin
-  deployed_files:
-  - .agents/skills/ponytail
-  - .agents/skills/ponytail-audit
-  - .agents/skills/ponytail-audit/SKILL.md
-  - .agents/skills/ponytail-debt
-  - .agents/skills/ponytail-debt/SKILL.md
-  - .agents/skills/ponytail-gain
-  - .agents/skills/ponytail-gain/SKILL.md
-  - .agents/skills/ponytail-help
-  - .agents/skills/ponytail-help/SKILL.md
-  - .agents/skills/ponytail-review
-  - .agents/skills/ponytail-review/SKILL.md
-  - .agents/skills/ponytail/SKILL.md
-  - .claude/hooks/ponytail/hooks/ponytail-activate.js
-  - .claude/hooks/ponytail/hooks/ponytail-mode-tracker.js
-  - .claude/skills/ponytail
-  - .claude/skills/ponytail-audit
-  - .claude/skills/ponytail-audit/SKILL.md
-  - .claude/skills/ponytail-debt
-  - .claude/skills/ponytail-debt/SKILL.md
-  - .claude/skills/ponytail-gain
-  - .claude/skills/ponytail-gain/SKILL.md
-  - .claude/skills/ponytail-help
-  - .claude/skills/ponytail-help/SKILL.md
-  - .claude/skills/ponytail-review
-  - .claude/skills/ponytail-review/SKILL.md
-  - .claude/skills/ponytail/SKILL.md
-  - .codeium/windsurf/hooks/ponytail/hooks/ponytail-activate.js
-  - .codeium/windsurf/hooks/ponytail/hooks/ponytail-mode-tracker.js
-  - .codex/hooks/ponytail/hooks/ponytail-activate.js
-  - .codex/hooks/ponytail/hooks/ponytail-mode-tracker.js
-  - .codex/hooks/ponytail/hooks/ponytail-subagent.js
-  - .cursor/hooks/ponytail/hooks/ponytail-activate.js
-  - .cursor/hooks/ponytail/hooks/ponytail-mode-tracker.js
-  - .gemini/hooks/ponytail/hooks/ponytail-activate.js
-  - .gemini/hooks/ponytail/hooks/ponytail-mode-tracker.js
-  - .kiro/hooks/ponytail-hooks-sessionstart-1.json
-  - .kiro/hooks/ponytail-hooks-userpromptsubmitted-1.json
-  - .kiro/hooks/ponytail/hooks/ponytail-activate.js
-  - .kiro/hooks/ponytail/hooks/ponytail-mode-tracker.js
-  - .kiro/skills/ponytail
-  - .kiro/skills/ponytail-audit
-  - .kiro/skills/ponytail-audit/SKILL.md
-  - .kiro/skills/ponytail-debt
-  - .kiro/skills/ponytail-debt/SKILL.md
-  - .kiro/skills/ponytail-gain
-  - .kiro/skills/ponytail-gain/SKILL.md
-  - .kiro/skills/ponytail-help
-  - .kiro/skills/ponytail-help/SKILL.md
-  - .kiro/skills/ponytail-review
-  - .kiro/skills/ponytail-review/SKILL.md
-  - .kiro/skills/ponytail/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/ponytail-audit/SKILL.md: sha256:5560b8e383dbe2ddfddc873a1e2bf2e586e23e0cd7d995537482b2315331f6d1
-    .agents/skills/ponytail-debt/SKILL.md: sha256:c84fba75f0ca12bfe83f9a78ea02fd125c5dd3f1fbb18124105a489937f284e6
-    .agents/skills/ponytail-gain/SKILL.md: sha256:24e01d1c9715cb136ba1c4f1e52a95940c0193558b876828e537736480d6408b
-    .agents/skills/ponytail-help/SKILL.md: sha256:2264d1615117b02b0fd5a69ec84cd2757006471a78e4d6c22eed6d581c1d37a4
-    .agents/skills/ponytail-review/SKILL.md: sha256:40df33b58fc6ef889b93585733feb9566b76e9586efa7f376785c1e995197ac0
-    .agents/skills/ponytail/SKILL.md: sha256:d1ffcddbc486ab787d5797441e8b6e4717da3249c6786b83fc2abd2f12803c29
-    .claude/hooks/ponytail/hooks/ponytail-activate.js: sha256:ff7c15a7f7a8c0fdb8c0a12654fb4d5d33ee745e1e8d37afae074eebef93085a
-    .claude/hooks/ponytail/hooks/ponytail-mode-tracker.js: sha256:14896042d2cd560026080815cb22bed7529d3d0dcbd42960681c4d8144796c7a
-    .claude/skills/ponytail-audit/SKILL.md: sha256:5560b8e383dbe2ddfddc873a1e2bf2e586e23e0cd7d995537482b2315331f6d1
-    .claude/skills/ponytail-debt/SKILL.md: sha256:c84fba75f0ca12bfe83f9a78ea02fd125c5dd3f1fbb18124105a489937f284e6
-    .claude/skills/ponytail-gain/SKILL.md: sha256:24e01d1c9715cb136ba1c4f1e52a95940c0193558b876828e537736480d6408b
-    .claude/skills/ponytail-help/SKILL.md: sha256:2264d1615117b02b0fd5a69ec84cd2757006471a78e4d6c22eed6d581c1d37a4
-    .claude/skills/ponytail-review/SKILL.md: sha256:40df33b58fc6ef889b93585733feb9566b76e9586efa7f376785c1e995197ac0
-    .claude/skills/ponytail/SKILL.md: sha256:d1ffcddbc486ab787d5797441e8b6e4717da3249c6786b83fc2abd2f12803c29
-    .codeium/windsurf/hooks/ponytail/hooks/ponytail-activate.js: sha256:ff7c15a7f7a8c0fdb8c0a12654fb4d5d33ee745e1e8d37afae074eebef93085a
-    .codeium/windsurf/hooks/ponytail/hooks/ponytail-mode-tracker.js: sha256:14896042d2cd560026080815cb22bed7529d3d0dcbd42960681c4d8144796c7a
-    .codex/hooks/ponytail/hooks/ponytail-activate.js: sha256:ff7c15a7f7a8c0fdb8c0a12654fb4d5d33ee745e1e8d37afae074eebef93085a
-    .codex/hooks/ponytail/hooks/ponytail-mode-tracker.js: sha256:14896042d2cd560026080815cb22bed7529d3d0dcbd42960681c4d8144796c7a
-    .codex/hooks/ponytail/hooks/ponytail-subagent.js: sha256:eb67677ca3c447a34cd01927534ef2c139fd7749264d745f035f43c1787ca8c3
-    .cursor/hooks/ponytail/hooks/ponytail-activate.js: sha256:ff7c15a7f7a8c0fdb8c0a12654fb4d5d33ee745e1e8d37afae074eebef93085a
-    .cursor/hooks/ponytail/hooks/ponytail-mode-tracker.js: sha256:14896042d2cd560026080815cb22bed7529d3d0dcbd42960681c4d8144796c7a
-    .gemini/hooks/ponytail/hooks/ponytail-activate.js: sha256:ff7c15a7f7a8c0fdb8c0a12654fb4d5d33ee745e1e8d37afae074eebef93085a
-    .gemini/hooks/ponytail/hooks/ponytail-mode-tracker.js: sha256:14896042d2cd560026080815cb22bed7529d3d0dcbd42960681c4d8144796c7a
-    .kiro/hooks/ponytail-hooks-sessionstart-1.json: sha256:b58a3e8f16c64e2cb1bf44705e2ea3e6df85fe50495bd2abe5848160e48dcaf7
-    .kiro/hooks/ponytail-hooks-userpromptsubmitted-1.json: sha256:3dc3813c3edac811568d63b5ce1f7943b39a125f35d12c07328f74210696ec28
-    .kiro/hooks/ponytail/hooks/ponytail-activate.js: sha256:ff7c15a7f7a8c0fdb8c0a12654fb4d5d33ee745e1e8d37afae074eebef93085a
-    .kiro/hooks/ponytail/hooks/ponytail-mode-tracker.js: sha256:14896042d2cd560026080815cb22bed7529d3d0dcbd42960681c4d8144796c7a
-    .kiro/skills/ponytail-audit/SKILL.md: sha256:5560b8e383dbe2ddfddc873a1e2bf2e586e23e0cd7d995537482b2315331f6d1
-    .kiro/skills/ponytail-debt/SKILL.md: sha256:c84fba75f0ca12bfe83f9a78ea02fd125c5dd3f1fbb18124105a489937f284e6
-    .kiro/skills/ponytail-gain/SKILL.md: sha256:24e01d1c9715cb136ba1c4f1e52a95940c0193558b876828e537736480d6408b
-    .kiro/skills/ponytail-help/SKILL.md: sha256:2264d1615117b02b0fd5a69ec84cd2757006471a78e4d6c22eed6d581c1d37a4
-    .kiro/skills/ponytail-review/SKILL.md: sha256:40df33b58fc6ef889b93585733feb9566b76e9586efa7f376785c1e995197ac0
-    .kiro/skills/ponytail/SKILL.md: sha256:d1ffcddbc486ab787d5797441e8b6e4717da3249c6786b83fc2abd2f12803c29
-  content_hash: sha256:aecb972db1660651a701ff256f03dcadbfb31313cbd49d664e5870dccdca1504
-  declared_license: MIT
 - repo_url: EpicenterHQ/epicenter
-  name: tauri
+  name: epicenter
   host: github.com
-  resolved_commit: f37756824e75d95452f4d1f181dc5a1ba9a67bcf
-  version: 1.0.0
+  resolved_commit: 51c6b6d2b8361b3bc4b0ce0a21247794aea32d95
+  version: unknown
   virtual_path: .agents/skills/tauri
   is_virtual: true
   package_type: claude_skill
@@ -1124,7 +1030,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: bda7234e0b0442429e7425468492df02271de6c5
+  resolved_commit: 808299e5c662a136f1dc26a0bea54272b6a4677d
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -1379,6 +1285,7 @@ dependencies:
   - .agents/skills/skill-creator/SKILL.md
   - .agents/skills/skill-creator/agents/openai.yaml
   - .agents/skills/skill-creator/references/openai_yaml.md
+  - .agents/skills/skill-creator/scripts/__pycache__/generate_openai_yaml.cpython-314.pyc
   - .agents/skills/skill-creator/scripts/generate_openai_yaml.py
   - .agents/skills/skill-creator/scripts/init_skill.py
   - .agents/skills/skill-creator/scripts/quick_validate.py
@@ -1677,6 +1584,7 @@ dependencies:
   - .claude/skills/skill-creator/SKILL.md
   - .claude/skills/skill-creator/agents/openai.yaml
   - .claude/skills/skill-creator/references/openai_yaml.md
+  - .claude/skills/skill-creator/scripts/__pycache__/generate_openai_yaml.cpython-314.pyc
   - .claude/skills/skill-creator/scripts/generate_openai_yaml.py
   - .claude/skills/skill-creator/scripts/init_skill.py
   - .claude/skills/skill-creator/scripts/quick_validate.py
@@ -2219,12 +2127,13 @@ dependencies:
     .agents/skills/similarity/agents/openai.yaml: sha256:256ce2d2a4a3f6ac024a9a08b2665de766232278500894c27c2c83569b778598
     .agents/skills/similarity/references/report-analysis.md: sha256:dad82829abba9e606035d045973cfc9a6f2b20ca359a79c3175dadcbbcb2edbe
     .agents/skills/skill-creator/LICENSE.txt: sha256:cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30
-    .agents/skills/skill-creator/SKILL.md: sha256:54a06371e71850e6e19474babce7754e807583e477daa028ecdacad24cde717b
+    .agents/skills/skill-creator/SKILL.md: sha256:572d951c2f730b40d89e956ff42aaf5963a7f4215443be6bac0adab0b6f0c1a9
     .agents/skills/skill-creator/agents/openai.yaml: sha256:b6c49ad8c5d225212c3d44ea4ed7bd11bb33d54fadc876296d67b865aca3cd2c
     .agents/skills/skill-creator/references/openai_yaml.md: sha256:9fb5928b7f4a746fdb39df503ebbd7a659d5e64b47f85a60626aa1a03fd76b17
+    .agents/skills/skill-creator/scripts/__pycache__/generate_openai_yaml.cpython-314.pyc: sha256:73cc00f33335a40ced12f777dc11ad94cfc234dd5f24d722ac0bb50a47d92dc1
     .agents/skills/skill-creator/scripts/generate_openai_yaml.py: sha256:10e93ef5537e55abba5e3aac905c4aa5f5b377a586c0cf45d156c772505f0d65
     .agents/skills/skill-creator/scripts/init_skill.py: sha256:bcb8982d3f033a094f2f1be43123ac8537e2562d25d8ba4d8ef2196ae514d96d
-    .agents/skills/skill-creator/scripts/quick_validate.py: sha256:6cc9dc3199c935916cf6f73fcbbbb0e3bb1b58c8f5109fefa499978908164f51
+    .agents/skills/skill-creator/scripts/quick_validate.py: sha256:1fe7b5eb4474cae8b175187508107dcdd3e294eca584f3c7b811e59d27623380
     .agents/skills/slack-app-management/SKILL.md: sha256:6b20765d9ba0fd5757323c91c027dc62c92497c9f1dfca439b84d171c111768b
     .agents/skills/slack-app-management/agents/openai.yaml: sha256:9a2c6ca4d634aa549dd13bc35f924e13d48996714e6788cb5d97765e3d9d644c
     .agents/skills/slide-docs/SKILL.md: sha256:5d0cae1d6b55c74ab96b69a1de60d91830c754adcdadb4efb55015aa972e841e
@@ -2459,12 +2368,13 @@ dependencies:
     .claude/skills/similarity/agents/openai.yaml: sha256:256ce2d2a4a3f6ac024a9a08b2665de766232278500894c27c2c83569b778598
     .claude/skills/similarity/references/report-analysis.md: sha256:dad82829abba9e606035d045973cfc9a6f2b20ca359a79c3175dadcbbcb2edbe
     .claude/skills/skill-creator/LICENSE.txt: sha256:cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30
-    .claude/skills/skill-creator/SKILL.md: sha256:54a06371e71850e6e19474babce7754e807583e477daa028ecdacad24cde717b
+    .claude/skills/skill-creator/SKILL.md: sha256:572d951c2f730b40d89e956ff42aaf5963a7f4215443be6bac0adab0b6f0c1a9
     .claude/skills/skill-creator/agents/openai.yaml: sha256:b6c49ad8c5d225212c3d44ea4ed7bd11bb33d54fadc876296d67b865aca3cd2c
     .claude/skills/skill-creator/references/openai_yaml.md: sha256:9fb5928b7f4a746fdb39df503ebbd7a659d5e64b47f85a60626aa1a03fd76b17
+    .claude/skills/skill-creator/scripts/__pycache__/generate_openai_yaml.cpython-314.pyc: sha256:73cc00f33335a40ced12f777dc11ad94cfc234dd5f24d722ac0bb50a47d92dc1
     .claude/skills/skill-creator/scripts/generate_openai_yaml.py: sha256:10e93ef5537e55abba5e3aac905c4aa5f5b377a586c0cf45d156c772505f0d65
     .claude/skills/skill-creator/scripts/init_skill.py: sha256:bcb8982d3f033a094f2f1be43123ac8537e2562d25d8ba4d8ef2196ae514d96d
-    .claude/skills/skill-creator/scripts/quick_validate.py: sha256:6cc9dc3199c935916cf6f73fcbbbb0e3bb1b58c8f5109fefa499978908164f51
+    .claude/skills/skill-creator/scripts/quick_validate.py: sha256:1fe7b5eb4474cae8b175187508107dcdd3e294eca584f3c7b811e59d27623380
     .claude/skills/slack-app-management/SKILL.md: sha256:6b20765d9ba0fd5757323c91c027dc62c92497c9f1dfca439b84d171c111768b
     .claude/skills/slack-app-management/agents/openai.yaml: sha256:9a2c6ca4d634aa549dd13bc35f924e13d48996714e6788cb5d97765e3d9d644c
     .claude/skills/slide-docs/SKILL.md: sha256:5d0cae1d6b55c74ab96b69a1de60d91830c754adcdadb4efb55015aa972e841e
@@ -2695,12 +2605,12 @@ dependencies:
     .kiro/skills/similarity/agents/openai.yaml: sha256:256ce2d2a4a3f6ac024a9a08b2665de766232278500894c27c2c83569b778598
     .kiro/skills/similarity/references/report-analysis.md: sha256:dad82829abba9e606035d045973cfc9a6f2b20ca359a79c3175dadcbbcb2edbe
     .kiro/skills/skill-creator/LICENSE.txt: sha256:cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30
-    .kiro/skills/skill-creator/SKILL.md: sha256:54a06371e71850e6e19474babce7754e807583e477daa028ecdacad24cde717b
+    .kiro/skills/skill-creator/SKILL.md: sha256:572d951c2f730b40d89e956ff42aaf5963a7f4215443be6bac0adab0b6f0c1a9
     .kiro/skills/skill-creator/agents/openai.yaml: sha256:b6c49ad8c5d225212c3d44ea4ed7bd11bb33d54fadc876296d67b865aca3cd2c
     .kiro/skills/skill-creator/references/openai_yaml.md: sha256:9fb5928b7f4a746fdb39df503ebbd7a659d5e64b47f85a60626aa1a03fd76b17
     .kiro/skills/skill-creator/scripts/generate_openai_yaml.py: sha256:10e93ef5537e55abba5e3aac905c4aa5f5b377a586c0cf45d156c772505f0d65
     .kiro/skills/skill-creator/scripts/init_skill.py: sha256:bcb8982d3f033a094f2f1be43123ac8537e2562d25d8ba4d8ef2196ae514d96d
-    .kiro/skills/skill-creator/scripts/quick_validate.py: sha256:6cc9dc3199c935916cf6f73fcbbbb0e3bb1b58c8f5109fefa499978908164f51
+    .kiro/skills/skill-creator/scripts/quick_validate.py: sha256:1fe7b5eb4474cae8b175187508107dcdd3e294eca584f3c7b811e59d27623380
     .kiro/skills/slack-app-management/SKILL.md: sha256:6b20765d9ba0fd5757323c91c027dc62c92497c9f1dfca439b84d171c111768b
     .kiro/skills/slack-app-management/agents/openai.yaml: sha256:9a2c6ca4d634aa549dd13bc35f924e13d48996714e6788cb5d97765e3d9d644c
     .kiro/skills/slide-docs/SKILL.md: sha256:5d0cae1d6b55c74ab96b69a1de60d91830c754adcdadb4efb55015aa972e841e
@@ -2738,12 +2648,21 @@ dependencies:
     .kiro/skills/work-log-maintenance/agents/openai.yaml: sha256:e951b8256a5a1b032bcca3c7105230f5041467594434ca23b562b8ec5ec4abc8
     .kiro/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
     .kiro/skills/zsh/SKILL.md: sha256:42a47db6cbc7f8a3b1b0f1b65cee6c13115264231f1a60c54dbf2823c13b15ad
-  content_hash: sha256:79e592ee579fe3c60f8ed5636354d3ec0eb03ff6e36874896693b8762cab6ae5
+  content_hash: sha256:f0aff374c089c5be95775f8c0ebe15073beb8b0c8b189a7b9aad3c1473e58398
+- repo_url: jey3dayo/apm-workspace
+  name: manual-skills
+  host: github.com
+  resolved_commit: 808299e5c662a136f1dc26a0bea54272b6a4677d
+  version: 1.0.0
+  virtual_path: manual-skills
+  is_virtual: true
+  package_type: apm_package
+  content_hash: sha256:c9adaaf42924bc9edc428c03d4ed3465bdd46305c3437d5f4b1d1ee4346c69fe
 - repo_url: langchain-ai/deepagents
-  name: web-research
+  name: deepagents
   host: github.com
   resolved_commit: b74c18591a8ce9a49a5fee43b07e602ca9fbf68a
-  version: 1.0.0
+  version: unknown
   virtual_path: libs/cli/examples/skills/web-research
   is_virtual: true
   package_type: claude_skill
@@ -2759,6 +2678,26 @@ dependencies:
     .claude/skills/web-research/SKILL.md: sha256:7c2b1f1990370f7ce176fe3608a67028c72db11e337b4ba83b8fce6d927dfde3
     .kiro/skills/web-research/SKILL.md: sha256:7c2b1f1990370f7ce176fe3608a67028c72db11e337b4ba83b8fce6d927dfde3
   content_hash: sha256:2b66d5db8c8d70474e70638f437f324fb3af3724b71bf8501e48c8004e70e677
+- repo_url: mattpocock/skills
+  name: skills
+  host: github.com
+  resolved_commit: 1445797da5ee4e4054233878c0029e9276f9986a
+  version: unknown
+  virtual_path: skills/engineering/grill-with-docs
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/grill-with-docs
+  - .agents/skills/grill-with-docs/SKILL.md
+  - .claude/skills/grill-with-docs
+  - .claude/skills/grill-with-docs/SKILL.md
+  - .kiro/skills/grill-with-docs
+  - .kiro/skills/grill-with-docs/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/grill-with-docs/SKILL.md: sha256:610d091047bcfb9db0f75c057d15538481a721111579fc5ec7f83ad9131a2165
+    .claude/skills/grill-with-docs/SKILL.md: sha256:610d091047bcfb9db0f75c057d15538481a721111579fc5ec7f83ad9131a2165
+    .kiro/skills/grill-with-docs/SKILL.md: sha256:610d091047bcfb9db0f75c057d15538481a721111579fc5ec7f83ad9131a2165
+  content_hash: sha256:e7ef25bbee50cda2eb7b3a8ef541db0a0396dad7d369f7d14fb610671dd1864b
 - repo_url: mattpocock/skills
   name: skills
   host: github.com
@@ -2814,7 +2753,7 @@ dependencies:
 - repo_url: mizchi/skills
   name: skills
   host: github.com
-  resolved_commit: d7999453cdb4e0e09df1c7f82fd23752539c546c
+  resolved_commit: 01cd5b12270c6228a8664cc41e975bb846c83c61
   version: unknown
   virtual_path: meta/empirical-prompt-tuning
   is_virtual: true
