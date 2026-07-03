@@ -1,9 +1,9 @@
 ---
-name: subagent-task-review-loop
+name: review-fix-loop
 description: Use when coordinating parallel subagent investigation with a main-session task backlog and repeated quality review for complex implementation work, including compact invocations where conditions should be recovered from prior conversation and nearby repository context.
 ---
 
-# Subagent Task Review Loop
+# Review Fix Loop
 
 Use this skill to turn a broad request into a managed execution loop: discover
 parallelizable work with subagents, keep the main Codex task list current, do the

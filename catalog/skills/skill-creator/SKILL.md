@@ -48,7 +48,7 @@ Concrete examples:
 - `neverthrow` / `Result` conversion -> keep error/result conversion at the repository, service, action, or adapter boundary that owns it.
 - DB access, Drizzle, SQL, query builders, transactions -> keep data access in `db/**`, `repository/**`, or `repositories/**`, not scattered through UI, route, or feature code.
 
-For broad validation work, split investigation across subagents by concern, but keep detailed review-loop mechanics in the dedicated `subagent-task-review-loop` skill.
+For broad validation work, split investigation across subagents by concern, but keep detailed review-loop mechanics in the dedicated `review-fix-loop` skill.
 
 ### Prefer Relative Skill Paths
 

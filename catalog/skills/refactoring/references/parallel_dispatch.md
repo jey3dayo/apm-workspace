@@ -3,7 +3,7 @@
 Use this reference during Phase 1-E and Phase 3-4 when the diagnostic surface
 or execution scope is broad enough to split safely across subagents. For the
 review-loop mechanics themselves (worker prompts, review rubric, stop
-conditions), use the `subagent-task-review-loop` skill; this reference only
+conditions), use the `review-fix-loop` skill; this reference only
 defines the refactoring-specific tracks and result contract.
 
 ## Diagnostic Tracks

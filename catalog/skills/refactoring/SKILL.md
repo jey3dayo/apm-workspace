@@ -115,7 +115,7 @@ When the diagnostic surface is broad enough to split safely, dispatch parallel
 workers per track (React diagnostics, duplicate/similarity, boundary
 ownership, dead-code surface). Load `references/parallel_dispatch.md` for the
 track definitions and the subagent result contract, and use the
-`subagent-task-review-loop` skill for review-loop mechanics.
+`review-fix-loop` skill for review-loop mechanics.
 
 ## Phase 2: Analyze & Plan
 
@@ -249,14 +249,14 @@ Do not proceed to the next step until all pass.
 
 ## Skill Delegation
 
-| Problem Area                                     | Delegated Skill                         |
-| ------------------------------------------------ | --------------------------------------- |
-| Detailed duplicate code analysis                 | `../similarity/SKILL.md`                |
-| ESLint errors / type safety                      | `../code-quality-improvement/SKILL.md`  |
-| Dead code removal                                | `../tsr/SKILL.md`                       |
-| React-specific pattern diagnosis                 | `../react-doctor/SKILL.md` (if exists)  |
-| Parallel diagnostics / bounded slice review loop | `../subagent-task-review-loop/SKILL.md` |
-| Impact scope / reference tracking                | MCP Serena: `find_referencing_symbols`  |
+| Problem Area                                     | Delegated Skill                        |
+| ------------------------------------------------ | -------------------------------------- |
+| Detailed duplicate code analysis                 | `../similarity/SKILL.md`               |
+| ESLint errors / type safety                      | `../code-quality-improvement/SKILL.md` |
+| Dead code removal                                | `../tsr/SKILL.md`                      |
+| React-specific pattern diagnosis                 | `../react-doctor/SKILL.md` (if exists) |
+| Parallel diagnostics / bounded slice review loop | `../review-fix-loop/SKILL.md`          |
+| Impact scope / reference tracking                | MCP Serena: `find_referencing_symbols` |
 
 ## Principle of Incremental Execution
 
