@@ -68,7 +68,7 @@ dependencies:
     - affaan-m/everything-claude-code/skills/mcp-server-patterns#2bc924faf2f8e893bfe0af86b1931283693c30ae
     - mattpocock/skills/skills/productivity/writing-great-skills
     - mattpocock/skills/skills/engineering/grill-with-docs
-    - jey3dayo/apm-workspace/manual-skills
+    - jey3dayo/apm-workspace/manual-skills#4547ad96e141766896a1bf3a07063e28982c1107
   mcp:
     - name: context7
       registry: false

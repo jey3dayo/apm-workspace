@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-07-03T10:10:53.291653+00:00'
+generated_at: '2026-07-03T10:20:04.146319+00:00'
 apm_version: 0.22.0
 dependencies:
 - repo_url: EpicenterHQ/epicenter
@@ -1030,7 +1030,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: 808299e5c662a136f1dc26a0bea54272b6a4677d
+  resolved_commit: 4547ad96e141766896a1bf3a07063e28982c1107
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -2652,12 +2652,13 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
-  resolved_commit: 808299e5c662a136f1dc26a0bea54272b6a4677d
+  resolved_commit: 4547ad96e141766896a1bf3a07063e28982c1107
+  resolved_ref: 4547ad96e141766896a1bf3a07063e28982c1107
   version: 1.0.0
   virtual_path: manual-skills
   is_virtual: true
   package_type: apm_package
-  content_hash: sha256:c9adaaf42924bc9edc428c03d4ed3465bdd46305c3437d5f4b1d1ee4346c69fe
+  content_hash: sha256:22aa691d6919c529bf2e201632c82e39793db3e79e0d1a373c4cf277d4e4b647
 - repo_url: langchain-ai/deepagents
   name: deepagents
   host: github.com
