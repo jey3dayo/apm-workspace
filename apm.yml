@@ -5,30 +5,41 @@ author: jey3dayo
 dependencies:
   apm:
     - jey3dayo/apm-workspace/catalog#main
+    - jey3dayo/apm-workspace/manual-skills#main
     - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
     - caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass
     - caad-develop/claude-code-marketplace/plugins/service-integrations/notica-api
     - caad-develop/claude-code-marketplace/plugins/service-integrations/mdb-api
     - caad-develop/claude-code-marketplace/plugins/service-integrations/telma-api
     - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-    - nextlevelbuilder/ui-ux-pro-max-skill
     - EpicenterHQ/epicenter/.agents/skills/tauri
+    - Jakubantalik/transitions-dev/skills/transitions-dev
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-dashboard
+    - affaan-m/everything-claude-code/skills/mcp-server-patterns#2bc924faf2f8e893bfe0af86b1931283693c30ae
     - anthropics/claude-code/plugins/frontend-design/skills/frontend-design
+    - apollographql/skills/skills/rust-best-practices
     - benjitaylor/agentation/skills/agentation
     - benjitaylor/agentation/skills/agentation-self-driving
+    - browser-use/browser-harness
     - cloudflare/skills/skills/workers-best-practices
     - cloudflare/skills/skills/wrangler
+    - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review#b8f2564c2e8da66b331c1dd63c2a2925d6739961
+    - gonta223/humanizer-ja
     - ibelick/ui-skills/skills/baseline-ui
     - ibelick/ui-skills/skills/fixing-accessibility
     - ibelick/ui-skills/skills/fixing-metadata
     - ibelick/ui-skills/skills/fixing-motion-performance
+    - langchain-ai/deepagents/libs/cli/examples/skills/web-research
+    - mattpocock/skills/skills/engineering/grill-with-docs
+    - mattpocock/skills/skills/productivity/handoff
+    - mattpocock/skills/skills/productivity/writing-great-skills
     - millionco/react-doctor/skills/react-doctor
     - mizchi/skills/meta/empirical-prompt-tuning
+    - nextlevelbuilder/ui-ux-pro-max-skill
     - nyosegawa/skills/skills/skill-auditor
-    - obra/superpowers/skills/dispatching-parallel-agents
     - obra/superpowers/skills/brainstorming
+    - obra/superpowers/skills/dispatching-parallel-agents
     - obra/superpowers/skills/executing-plans
     - obra/superpowers/skills/finishing-a-development-branch
     - obra/superpowers/skills/subagent-driven-development
@@ -41,34 +52,24 @@ dependencies:
     - openai/codex-plugin-cc/plugins/codex/skills/codex-cli-runtime
     - openai/codex-plugin-cc/plugins/codex/skills/codex-result-handling
     - openai/codex-plugin-cc/plugins/codex/skills/gpt-5-4-prompting
+    - openai/skills/skills/.curated/chatgpt-apps
     - openai/skills/skills/.curated/gh-address-comments
     - openai/skills/skills/.curated/gh-fix-ci
-    - openai/skills/skills/.curated/chatgpt-apps
     - openai/skills/skills/.curated/linear
     - openai/skills/skills/.curated/screenshot
     - openai/skills/skills/.curated/sentry
+    - softaworks/agent-toolkit/skills/marp-slide
+    - softaworks/agent-toolkit/skills/mermaid-diagrams
     - tokoroten/prompt-review/.claude/skills/prompt-review
     - trailofbits/skills/plugins/agentic-actions-auditor
     - trailofbits/skills/plugins/sharp-edges
     - trailofbits/skills/plugins/static-analysis
     - trailofbits/skills/plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor
-    - browser-use/browser-harness
     - vercel-labs/agent-browser/skills/agent-browser
     - vercel-labs/agent-skills/skills/composition-patterns
     - vercel-labs/agent-skills/skills/react-best-practices
     - vercel-labs/agent-skills/skills/web-design-guidelines
     - vercel-labs/skills/skills/find-skills
-    - apollographql/skills/skills/rust-best-practices
-    - gonta223/humanizer-ja
-    - softaworks/agent-toolkit/skills/marp-slide
-    - Jakubantalik/transitions-dev/skills/transitions-dev
-    - langchain-ai/deepagents/libs/cli/examples/skills/web-research
-    - softaworks/agent-toolkit/skills/mermaid-diagrams
-    - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review#b8f2564c2e8da66b331c1dd63c2a2925d6739961
-    - affaan-m/everything-claude-code/skills/mcp-server-patterns#2bc924faf2f8e893bfe0af86b1931283693c30ae
-    - mattpocock/skills/skills/productivity/writing-great-skills
-    - mattpocock/skills/skills/engineering/grill-with-docs
-    - jey3dayo/apm-workspace/manual-skills#4547ad96e141766896a1bf3a07063e28982c1107
   mcp:
     - name: context7
       registry: false
