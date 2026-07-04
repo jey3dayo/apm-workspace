@@ -42,7 +42,7 @@ Workspace assets are split by role.
 
 The tracked layout is intentionally asymmetric:
 
-- `catalog/skills/**` is the authoring layer for personal assets.
+- `catalog/skills/**` is the authoring layer for personal assets, plus vendored runtime-support skills for `catalog/commands/**` (for example `codex-companion-scripts`) whose provenance lives in their own `SKILL.md` instead of `manual-skills/upstreams/**`.
 - external skills stay visible in `apm.yml` / `apm.lock.yaml` as command-managed upstream refs.
 - `manual-skills/**` is for copied skills that cannot stay on the normal upstream-managed lane.
 - `private-skills/**` is for untracked local-only overrides or additions that should not enter the shared rollout.
