@@ -237,7 +237,7 @@ locked_external_skill_records() {
     }
     function flush_record() {
       if (repo_url != "" && resolved_commit != "") {
-        printf "%s|%s|%s\n", repo_url, virtual_path, resolved_commit
+        printf "%s|%s|%s|%s\n", repo_url, virtual_path, resolved_commit, resolved_ref
       }
     }
     /^[^[:space:]#-][^:]*:/ {
@@ -245,6 +245,7 @@ locked_external_skill_records() {
         flush_record()
         repo_url = ""
         resolved_commit = ""
+        resolved_ref = ""
         virtual_path = ""
         record_indent = -1
       }
@@ -263,6 +264,7 @@ locked_external_skill_records() {
       repo_url = substr($0, index($0, ":") + 1)
       sub(/^[[:space:]]+/, "", repo_url)
       resolved_commit = ""
+      resolved_ref = ""
       virtual_path = ""
       record_indent = indent_level($0)
       next
@@ -273,6 +275,14 @@ locked_external_skill_records() {
       }
       resolved_commit = substr($0, index($0, ":") + 1)
       sub(/^[[:space:]]+/, "", resolved_commit)
+      next
+    }
+    /^[[:space:]]+resolved_ref:[[:space:]]+/ {
+      if (repo_url == "" || indent_level($0) <= record_indent) {
+        next
+      }
+      resolved_ref = substr($0, index($0, ":") + 1)
+      sub(/^[[:space:]]+/, "", resolved_ref)
       next
     }
     /^[[:space:]]+virtual_path:[[:space:]]+/ {
@@ -1563,7 +1573,7 @@ collect_external_skill_records() {
   fi
 
   has_failure=0
-  while IFS='|' read -r repo_url virtual_path resolved_commit; do
+  while IFS='|' read -r repo_url virtual_path resolved_commit resolved_ref; do
     [ -n "$repo_url" ] || continue
     canonical_ref="$repo_url"
     if [ -n "$virtual_path" ]; then
@@ -1582,6 +1592,9 @@ collect_external_skill_records() {
 
     printf '%s\n' "$canonical_ref" >>"$matched_keys_file"
     printf '%s#%s\n' "$canonical_ref" "$resolved_commit" >>"$matched_keys_file"
+    if [ -n "$resolved_ref" ]; then
+      printf '%s#%s\n' "$canonical_ref" "$resolved_ref" >>"$matched_keys_file"
+    fi
 
     package_skills_root=$(external_package_skills_root "$repo_url" "$virtual_path" "$resolved_commit" 2>/dev/null || true)
     if [ -n "$package_skills_root" ]; then
