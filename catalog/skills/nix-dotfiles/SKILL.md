@@ -2,22 +2,15 @@
 name: nix-dotfiles
 description: |
   [What] Dotfiles management and troubleshooting using Home Manager and Nix
-  Flake. Supports configuration apply, generation management, diagnostics,
-  Agent Skills addition, and migrating dotfiles such as `~/.opencommit` or
-  `~/.opencommitrc` into `~/.config` / Nix-managed layouts.
-  [When] Use when: users say `nixで配布`, `~/.configがnix管理`,
-  `このディレクトリで実装した方がいいかな`, "skills not distributed",
-  "~/.claude/skills/ is empty", "deploy dotfiles", "apply configuration",
-  "test Nix flake", "home-manager", "generations", "rollback",
-  "worktree not found", "スキルが配布されない", "~/.claude/skills/ が空",
-  "dotfiles をデプロイ", "設定を適用", "Nix flake をテスト", `~/.opencommit`,
-  `~/.opencommitrc`, `~/.config 管理`, `nix に組み込む`, or opencommit /
-  config のベストプラクティス相談. Do not use for `mise skills add`, mise
-  task definitions, `mise run`, `mise format`, or `mise ci`; use `mise`
-  instead.
-  [Keywords] home-manager, nix flake, dotfiles, agent skills, generations,
-  rollback, worktree, flake inputs, diagnosis, skill distribution, opencommit,
-  opencommitrc, config migration, refactor
+  Flake: configuration apply, generation management, diagnostics, Agent
+  Skills distribution, and migrating legacy dotfiles (`~/.opencommit`,
+  `~/.opencommitrc`) into Nix-managed `~/.config`.
+  [When] Use when users mention home-manager, Nix flake, `nixで配布`,
+  `~/.configがnix管理`, `nixに組み込む`, deploying dotfiles or applying
+  configuration (`設定を適用`), generations or rollback, skills not
+  distributed (`~/.claude/skills/` が空), worktree not found, or opencommit
+  config migration. Do not use for `mise skills add`, mise task definitions,
+  or `mise run`; use `mise` instead.
 ---
 
 # nix-dotfiles - Home Manager Dotfiles Management
