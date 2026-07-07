@@ -32,6 +32,7 @@ dependencies:
     - ibelick/ui-skills/skills/fixing-motion-performance
     - langchain-ai/deepagents/libs/cli/examples/skills/web-research
     - mattpocock/skills/skills/engineering/grill-with-docs
+    - mattpocock/skills/skills/in-progress/wayfinder
     - mattpocock/skills/skills/productivity/handoff
     - mattpocock/skills/skills/productivity/writing-great-skills
     - millionco/react-doctor/skills/react-doctor

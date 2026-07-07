@@ -2951,6 +2951,26 @@ dependencies:
     .kiro/skills/writing-great-skills/GLOSSARY.md: sha256:eaab3564313cec3d35209bb42b05c797dcb350c075a079936c4dd173f9d8e8d8
     .kiro/skills/writing-great-skills/SKILL.md: sha256:7c6ba7ec25bb2c0e173c52cdc2da878aef0b083ec19a9c1799934e480c8833cc
   content_hash: sha256:dd555ce552f82784c3d2b8d13a8e26a6677a07ddc00032e142dec33bfd5438c6
+- repo_url: mattpocock/skills
+  name: skills
+  host: github.com
+  resolved_commit: 16a2a5cd00b4416f673f4ff38c7971a04dd708e7
+  version: unknown
+  virtual_path: skills/in-progress/wayfinder
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/wayfinder
+  - .agents/skills/wayfinder/SKILL.md
+  - .claude/skills/wayfinder
+  - .claude/skills/wayfinder/SKILL.md
+  - .kiro/skills/wayfinder
+  - .kiro/skills/wayfinder/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/wayfinder/SKILL.md: sha256:5fcfb0b51b07315b2a635ae2dbad72be2168507153b10582b915ed1a13ccdad7
+    .claude/skills/wayfinder/SKILL.md: sha256:5fcfb0b51b07315b2a635ae2dbad72be2168507153b10582b915ed1a13ccdad7
+    .kiro/skills/wayfinder/SKILL.md: sha256:5fcfb0b51b07315b2a635ae2dbad72be2168507153b10582b915ed1a13ccdad7
+  content_hash: sha256:c4718b3a19aef81696c449a0b950335fca13fb74b5afc6588d1ae0785a42d898
 - repo_url: millionco/react-doctor
   name: react-doctor
   host: github.com
