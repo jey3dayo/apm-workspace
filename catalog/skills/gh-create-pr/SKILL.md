@@ -1,5 +1,6 @@
 ---
 name: gh-create-pr
+model: sonnet
 description: |
   PRテンプレートを読んでGitHub プルリクエストを作成する。
   Use when: creating a PR, making a pull request, プルリクエスト作成, PR作成, PRを出す, PRテンプレ, プルリク,
