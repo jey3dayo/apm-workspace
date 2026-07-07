@@ -71,6 +71,7 @@ dependencies:
     - vercel-labs/agent-skills/skills/react-best-practices
     - vercel-labs/agent-skills/skills/web-design-guidelines
     - vercel-labs/skills/skills/find-skills
+    - modem-dev/hunk/skills/hunk-review
   mcp:
     - name: context7
       registry: false

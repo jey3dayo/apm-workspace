@@ -3029,6 +3029,26 @@ dependencies:
     .kiro/skills/empirical-prompt-tuning/SKILL-ja.md: sha256:0a38d830802c2e08a7faca13928fedf6911e00b896946b4b03910d662de6dea5
     .kiro/skills/empirical-prompt-tuning/SKILL.md: sha256:252418e7ef022981d2dda2e3ec57fa1c786d30af68c50b7e062edf1d7361b0cb
   content_hash: sha256:20e7fba93c7267ba6e3a7b27787ca49191b762dffcfb804b01da9183b1b0c891
+- repo_url: modem-dev/hunk
+  name: hunk
+  host: github.com
+  resolved_commit: 9ef9b2e7cad455056cfe1c10757815cb80c7d716
+  version: unknown
+  virtual_path: skills/hunk-review
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/hunk-review
+  - .agents/skills/hunk-review/SKILL.md
+  - .claude/skills/hunk-review
+  - .claude/skills/hunk-review/SKILL.md
+  - .kiro/skills/hunk-review
+  - .kiro/skills/hunk-review/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/hunk-review/SKILL.md: sha256:22ba96f09771f74ad4db81873b4174f38edcd86a53b7af5f90a0359612a0b33c
+    .claude/skills/hunk-review/SKILL.md: sha256:22ba96f09771f74ad4db81873b4174f38edcd86a53b7af5f90a0359612a0b33c
+    .kiro/skills/hunk-review/SKILL.md: sha256:22ba96f09771f74ad4db81873b4174f38edcd86a53b7af5f90a0359612a0b33c
+  content_hash: sha256:1ceb9a909ce1b50e0d84cc584e74ba2af7e65717c6394285c2dc7db16019fa62
 - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
   name: ui-ux-pro-max
   host: github.com
