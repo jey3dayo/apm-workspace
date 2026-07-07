@@ -1,0 +1,4 @@
+interface:
+  display_name: "mise"
+  short_description: "Design and review mise.toml tasks and tools"
+  default_prompt: "Use $mise to design or review mise.toml task graphs and tool management."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Worktree"
+  short_description: "git wt と git worktree の操作・診断ガイド"
+  default_prompt: "Use $git-worktree to manage worktrees with git wt and diagnose worktree issues."

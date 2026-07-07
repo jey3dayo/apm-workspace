@@ -1,0 +1,4 @@
+interface:
+  display_name: "Atomic Commit"
+  short_description: "Split changes into atomic Conventional Commits"
+  default_prompt: "Use $atomic-commit to group my changes into minimal logical commits and commit each group."

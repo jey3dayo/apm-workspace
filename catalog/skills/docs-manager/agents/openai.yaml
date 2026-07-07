@@ -1,0 +1,4 @@
+interface:
+  display_name: "Docs Manager"
+  short_description: "Validate and maintain project documentation rules"
+  default_prompt: "Use $docs-manager to review this docs directory against metadata, tag, size, and link rules."

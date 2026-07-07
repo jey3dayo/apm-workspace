@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Fix Loop"
+  short_description: "Managed fix-and-review loop with subagent backlog"
+  default_prompt: "Use $review-fix-loop to run a fix-and-review loop with subagent investigation and scored reviews."

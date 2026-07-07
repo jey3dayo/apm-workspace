@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Review"
+  short_description: "Local code review with project detection"
+  default_prompt: "Use $code-review to review local changes with project-type detection and star-rated evaluation."
