@@ -1,5 +1,6 @@
 ---
 name: atomic-commit
+model: sonnet
 description: 変更ファイルを論理的な最小単位でグループ化し、git log のスタイルに合わせた Conventional Commits 形式でグループごとに個別コミットする。ユーザーが commit / push の実行（「コミットして push」`commit and push` など）を依頼したとき、「最小単位でコミット」`atomic commit` を求めたとき、または dotenvx-managed `.env.*` を含むコミット計画で使用する。push 単独、PR 作成、ブランチ作成、GitHub 公開は扱わず、コミット分割とメッセージ作成に範囲を絞る。
 ---
 
