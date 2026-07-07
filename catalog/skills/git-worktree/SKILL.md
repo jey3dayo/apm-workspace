@@ -9,22 +9,7 @@ description: Use when managing Git worktrees with `git wt` or `git worktree`, es
 
 Use `git wt` for normal list, switch/create, rename, and delete flows. Drop to native `git worktree` only when you need low-level cleanup or diagnosis.
 
-This skill owns command syntax and troubleshooting. It does not decide whether a new isolated workspace should be created for feature work; use `using-git-worktrees` for that workflow decision.
-
-Read the reference files only when you need exact flags, repo-specific configuration details, or troubleshooting steps.
-
-## When to Use
-
-- 複数ブランチを別ディレクトリで同時に触りたい
-- `git wt` や `git worktree add` の使い分けを確認したい
-- `.worktrees/` 運用にそろえたい
-- AI agent や並列作業用に checkout を分離したい
-- `fatal: invalid reference` など worktree まわりのエラーを調べたい
-
-使わない場面:
-
-- PR 作成から統合までの一連フローを進めたい
-- 追加ディレクトリ不要の通常ブランチ運用だけで足りる
+This skill owns command syntax and troubleshooting. It does not decide whether a new isolated workspace should be created for feature work; use `using-git-worktrees` for that workflow decision. PR 作成から統合までの一連フローや、追加ディレクトリ不要の通常ブランチ運用はこのスキルの対象外。
 
 ## First Pass
 
@@ -92,7 +77,7 @@ git worktree list
 
 ## References
 
-- `references/git-wt-commands.md`
-- `references/configuration.md`
-- `references/workflows.md`
-- `references/troubleshooting.md`
+- `references/git-wt-commands.md` — `git wt` の正確なフラグ・全コマンドが必要な時に読む
+- `references/configuration.md` — `wt.basedir` / `wt.copy` など repo 設定の詳細が必要な時に読む
+- `references/workflows.md` — feature 開発・並列作業などの手順パターンが必要な時に読む
+- `references/troubleshooting.md` — エラー診断・復旧手順が必要な時に読む

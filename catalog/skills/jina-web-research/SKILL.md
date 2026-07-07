@@ -29,14 +29,12 @@ Use this skill for current public web research that should prefer Jina Reader. I
 
 ## Jina Search
 
-Use `mcp__jina_reader.read_url` with Jina search URLs. URL-encode the full query after `q=`:
+Prefer the Jina MCP server's direct search tool (e.g. `search_web`) when it is exposed. Otherwise use the Jina `read_url` tool with Jina search URLs, URL-encoding the full query after `q=`:
 
 - General search: `https://s.jina.ai/?q=<url-encoded query>`
 - X search: `https://s.jina.ai/?q=site%3Ax.com%20<url-encoded query terms>`
 - Twitter fallback: `https://s.jina.ai/?q=site%3Atwitter.com%20<url-encoded query terms>`
 - Source-specific search: add `site:<domain>` to the query.
-
-If the Jina MCP server exposes a direct search tool in the current environment, prefer it for search. If it only exposes URL reading, use the `s.jina.ai` URL pattern above.
 
 ## X/Twitter Handling
 

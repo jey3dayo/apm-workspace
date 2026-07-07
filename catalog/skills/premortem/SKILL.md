@@ -7,13 +7,6 @@ description: Use when planning, requirements, design, estimation, or task decomp
 
 Premortem analysis assumes the project has failed and works backward to identify the likely causes before implementation starts. The output is a short set of high-signal risks, evidence from the repository, and concrete decisions or follow-up work.
 
-## Use This Skill When
-
-- A user asks for `premortem`, planning review, design validation, "what could go wrong", or "what am I missing".
-- A plan, spec, task decomposition, architecture proposal, or release strategy exists but implementation has not started.
-- The risk is cross-cutting: security, reliability, migration, operations, compliance, cost, data integrity, or reversibility.
-- A team is about to commit to technology selection or scope estimates.
-
 Do not use it as a post-implementation code review. Use `predictive-analysis`, `code-review`, or project-specific review skills after code exists.
 
 ## Output Contract
@@ -260,18 +253,12 @@ Run a dry run first. Only create issues when the user explicitly approves the ex
 | Over-indexing on scripts                              | Use scripts as helpers, not as a reason to skip judgment.         |
 | Skipping Not Applicable                               | Mark irrelevant risks explicitly so the report stays focused.     |
 
-## Progressive Disclosure
-
-Keep the initial read small:
-
-- Load `SKILL.md` first.
-- Load question YAML only for the selected domain plus `generic`.
-- Load framework references only when domain inference or scoring is unclear.
-- Load scripts only when executing the scripted workflow.
-
 ## References
 
-- `references/frameworks/analysis-flow.md` for question generation details.
-- `references/frameworks/domain-detection.md` for domain detection details.
-- `references/questions/*.yaml` for the question pool.
-- `references/examples/*.yaml` for example sessions.
+Keep the initial read small; load each file only when its condition applies.
+
+- `references/questions/*.yaml` — load only the selected domain plus `generic` when selecting questions.
+- `references/frameworks/analysis-flow.md` — load when question generation or scoring is unclear.
+- `references/frameworks/domain-detection.md` — load when domain inference is unclear.
+- `references/examples/*.yaml` — load when an example session shape is needed.
+- `scripts/` — load only when executing the scripted workflow.

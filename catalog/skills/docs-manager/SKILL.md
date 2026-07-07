@@ -11,20 +11,7 @@ This skill is for project documentation maintenance, not generic prose editing. 
 
 The detailed schemas and examples already live in `templates/`, `examples/`, and `references/`.
 
-## When to Use
-
-- docs directory や `.md` 群の品質をレビューしたい
-- metadata, tags, size limit, link validity を確認したい
-- OKF / Open Knowledge Format 互換の YAML frontmatter を段階導入したい
-- 新しいドキュメントを既存ルールに合わせて作りたい
-- 既存ドキュメントを実装や運用変更に合わせて更新・修復したい
-- project-specific documentation rules を適用したい
-
-使わない場面:
-
-- 文章の言い回しだけ直したい
-- 1ファイルの内容要約だけが目的
-- docs rule より設計内容そのもののレビューが主目的
+Out of scope: 文章の言い回しだけの修正、1ファイルの内容要約、docs rule より設計内容そのもののレビューが主目的の作業。
 
 ## First Pass
 
@@ -137,17 +124,6 @@ OKF 対応として既存 docs を直す場合:
 4. 既存の dirty diff がある場合は、OKF metadata hunk と本文 hunk を分けて扱う。stage / review / commit では OKF hunk だけを混ぜずに確認する
 5. 調査メモや一時 report は repo guidance が指定する一時ディレクトリに置く。指定がなければ repo root を汚さず、必要最小限にする
 
-## Config Examples
-
-設定例は既存ファイルを使う。
-
-- template: `templates/docs-manager-config.template.json`
-- examples:
-  - `examples/generic-config.json`
-  - `examples/dotfiles-config.json`
-  - `examples/custom-project-config.json`
-  - `examples/okf-config.json`
-
 ## Common Mistakes
 
 - config を見ずに generic rule を押し付ける
@@ -158,7 +134,8 @@ OKF 対応として既存 docs を直す場合:
 
 ## Resources
 
-- Template: `templates/docs-manager-config.template.json`
+- Config template: `templates/docs-manager-config.template.json`
+- Config examples: `examples/generic-config.json`, `examples/dotfiles-config.json`, `examples/custom-project-config.json`, `examples/okf-config.json`
 - Metadata reference: `references/metadata-standards.md`
 - Tag reference: `references/tag-systems.md`
 - Size reference: `references/size-management.md`

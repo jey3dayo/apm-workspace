@@ -1,6 +1,16 @@
 ---
 name: apm-usage
-description: Use when working in the `~/.apm` global APM workspace, especially for `skillアップデートして再配布して`, `skillアップデート`, `再配布`, `apmのバージョンあげて`, or checking whether the `apm` source/version is recorded in `mise.toml`. Use when you need to decide what owns a change, which path is the source of truth, or which APM rollout / `mise` task to run. Also trigger for `manual-skillsはやらないとダメ`, `orphaned package`, `apm.ymlのパス調整`, `apm.yml`, `apm.lock.yaml`, managed catalog rollout, checked-out external dependency repositories, and choosing between `mise run check`, `verify`, `deploy`, `refresh`, `upgrade`, `refresh:deploy`, `prepare:catalog`, `install:catalog`, `smoke:catalog`, and `apply:skills:local` inside `~/.apm`. For skill body, description, script, reference, or asset design itself, coordinate with `skill-creator`; for general mise usage outside the APM workspace, including `mise upgrade TOOL` or `minimum_release_age`, use `mise`.
+description: >-
+  Route work in the `~/.apm` global APM workspace: decide what owns a change,
+  which path is the source of truth, and which APM rollout / `mise` task to
+  run. Use for skill update and redistribution requests
+  (`skillアップデートして再配布して`, `再配布`), `apm.yml` / `apm.lock.yaml` and managed catalog
+  rollout, manual-skills package state, orphaned APM packages, checked-out
+  external dependency repositories, and `apmのバージョンあげて` / pinned `apm`
+  source checks. For skill body, description, script, reference, or asset
+  design itself, coordinate with `skill-creator`; for general mise usage
+  outside the APM workspace (including `mise upgrade TOOL` and
+  `minimum_release_age`), use `mise`.
 ---
 
 # APM Usage
@@ -14,7 +24,6 @@ Route `~/.apm` work by ownership first, then choose the smallest task that match
 - Edit `~/.apm/apm.yml` and `~/.apm/apm.lock.yaml` for dependency selection and accepted upstream state.
 - Edit `~/.apm/README.md`, `llms.txt`, and `docs/**` only for workspace-owned prose.
 - Treat `~/.apm/apm_modules/` and deployed targets as generated state, not editing surfaces.
-- Treat Headroom as user-global machine configuration, not an APM package dependency. Keep Headroom install pins in OS-specific `~/.config/mise` config and route detailed operation through the `headroom` skill.
 - For an external dependency listed in `apm.yml` / `apm.lock.yaml`, edit the upstream repository checkout when that checkout is the user-specified source of truth. Commit and push there first, then accept the new resolved commit through `~/.apm`.
 
 There is no active `~/.apm/skills/` editing surface in this model.
@@ -39,7 +48,6 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 - Run `mise run smoke:catalog` to smoke-test the generated catalog package.
 - Run `mise run apply:skills:local` for a fast local Codex skill refresh only.
 - For skill creation, updates, installs, or migrations in this workspace, include `mise run deploy` and a deployed target check in the plan unless the user explicitly asks for local-only refresh.
-- After pushing a checked-out external dependency repository, run `mise run upgrade` in `~/.apm` to update `apm.lock.yaml`, deploy, and inspect targets. Review lock drift before treating the rollout as complete.
 
 ## Routing
 
@@ -47,7 +55,6 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 - If the request is "optimize" or "customize" a skill for this workspace, treat it as personal skill work and prefer `catalog/skills/<id>/`.
 - If the request is to preserve a reusable implementation judgment from real work, such as "Valibot belongs in schemas", "Result conversion belongs at a boundary", or "DB access belongs in repositories", encode it as a concern -> owner candidates -> caller rule table in the relevant personal skill under `catalog/skills/<id>/`.
 - If the user does not specify the target skill id for that reusable judgment, inspect named skills, catalog triggers, and existing examples first; update the closest existing personal skill instead of creating a new skill by default.
-- If the skill currently lives in `manual-skills/.apm/skills/<id>/`, first decide whether it is still an upstream packaging workaround. If it is becoming workspace-owned, plan a catalog migration instead of continuing to tune it in the manual lane.
 - If the request is "change shared guidance", edit `catalog/**`; use `prepare:catalog` before publish/install.
 - If the request is "change dependency selection", edit or review `apm.yml` / `apm.lock.yaml`.
 - If the request is about `mise upgrade <tool>`, `minimum_release_age`, latest eligible release selection, or why a non-APM tool version did not update, use the `mise` skill unless the pinned `apm` source, APM manifest, lockfile, or rollout task selection is the actual subject.
@@ -56,7 +63,6 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 - If the request is to add an MCP server through APM, apply the same scope rule: use `apm install -g --mcp <name> ...` only for cross-repo foundation MCPs; use repo-local `apm install --mcp <name> ...` for project, framework, UI, database, browser, or app-runtime-specific MCPs.
 - If MCP placement, server selection, credentials, transport, or startup behavior is the main question, coordinate with `mcp-tools`; keep this skill focused on APM ownership, source of truth, and rollout commands.
 - If the APM workspace has no repo-local MCP distribution lane for a target repository, record the intended placement as guidance and keep the global manifest lightweight. Treat implementing repo-local MCP distribution as a separate workspace-mechanics task.
-- If the request names an external dependency that is already checked out locally and present in `apm.yml`, treat that checkout as the authoring surface when the user identifies it as the source of truth. Do not copy the change into `catalog/skills/**` unless the user is migrating ownership.
 - If the request is "enable Headroom MCP" or "compare Headroom with RTK", keep APM changes to ownership / rollout guidance. Do not add Headroom to `apm.yml`, `apm.lock.yaml`, or repo-local `mise.toml`; use user-global `~/.config/mise` plus the `headroom` skill instead.
 - If the request is "change only workspace docs or notes", edit the workspace files directly and do not restage the catalog unless `catalog/**` changed too.
 
@@ -82,7 +88,6 @@ When deciding repo-local MCP placement by repository type, runtime, or workflow,
 - Do not treat `~/.apm/apm_modules/` as the place to edit managed skills.
 - Do not manage the same skill in both `catalog/skills/**` and `manual-skills/.apm/skills/**`.
 - Do not duplicate an external dependency into `catalog/skills/**` just because a local checkout exists. Keep one source of truth: upstream checkout, managed catalog, manual copy, or private overlay.
-- Do not keep accumulating workspace-specific optimizations in `manual-skills`; migrate to `catalog/skills/**` once the skill is no longer just an upstream delivery workaround.
 - Do not reintroduce many local `./packages/*` refs into `~/.apm/apm.yml`.
 - Do not hand-edit deployed targets such as `~/.claude/`, `~/.codex/`, or `~/.agents/skills`.
 - Do not persist Headroom MCP/proxy/wrap configuration through APM package manifests. Headroom MCP registration may touch agent runtime config, so treat it as a local machine setup step unless the user explicitly asks to manage that runtime state.

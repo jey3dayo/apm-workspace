@@ -1,645 +1,131 @@
 ---
 name: mise
-description: |
-  [What] Expert guidance for mise (mise-en-place) as task runner, tool version
-  manager, and package manager. Covers `mise.toml`, task definitions, dependency
-  graphs, `[task_config].includes`, DB/env/dotenvx/secrets/tools task-family
-  splitting, tool/package centralization, workflow automation, and `mise skills add`.
-  [When] Use when users mention mise, mise.toml, `mise run`, `mise check`,
-  `mise deploy`, `mise upgrade <tool>`, `minimum_release_age`, latest eligible
-  release, task definitions, tool management, npm/pipx global packages,
-  formatters such as `nixpkgs-fmt`, dotenvx/env tasks, DB/secrets task groups,
-  or Windows settings such as `run_windows` and `config.windows.toml`. For
-  `~/.apm` work about the pinned `apm` source, `apm.yml`/lock state,
-  manual-skills package state, orphaned APM packages, skill redistribution, or
-  which APM rollout task to run, coordinate with `apm-usage`. Do not use for
-  non-mise dotfile, Home Manager, or Nix Flake work; use `nix-dotfiles`.
+description: >-
+  Guidance for mise (mise-en-place) as task runner, tool version manager, and
+  package manager. Use when working with mise.toml, task definitions and
+  dependency graphs (`mise run`, depends/run), `[task_config].includes` and
+  DB/env/dotenvx/secrets/tools task-family splitting, tool/package
+  centralization (npm:/pipx:), `mise upgrade` and `minimum_release_age`,
+  Windows settings (`run_windows`, `config.windows.toml`), or `mise skills add`.
+  For `~/.apm` rollout work (apm.yml, lockfile, which APM task to run),
+  coordinate with `apm-usage`. For Home Manager / Nix Flake dotfiles, use
+  `nix-dotfiles`.
 ---
 
-# mise - Task Runner Configuration Expert
+# mise - Task Runner Configuration
 
-## Overview
-
-This skill provides specialized guidance for working with mise (mise-en-place), a modern task runner and development environment manager. Evaluate and create mise.toml configurations following 2025 best practices, focusing on task dependencies, parallel execution, and maintainable workflows.
-
-mise combines:
-
-- Task Runner: Execute development workflows with dependency management
-- Tool Version Manager: Manage language runtimes and tools
-- Environment Manager: Handle project-specific environment variables
+Design, review, and fix `mise.toml` configurations: task dependency graphs, tool/package management, and workflow automation.
 
 ## First Response Checklist
 
-Before giving advice, classify the request into one of these two modes and answer from that mode only:
+Classify the request into one mode and answer from that mode only:
 
-1. Project-local repository mode
-   - The user is editing a repository-owned `mise.toml`
+1. Project-local repository mode — the user is editing a repository-owned `mise.toml`.
    - Prefer a single root `mise.toml` for small or medium task sets
-   - For large repos, consider `[task_config].includes` when task families have clear owners such as DB, env/dotenvx, secrets, infra, deploy, or tools
-   - Use the repo's existing task names, workflow semantics, and source-of-truth rules as authoritative
-2. User-global / dotfiles mode
-   - The user is managing `~/.config/mise`, personal toolchains, or `mise skills add`
-   - `~/.config/.mise.toml` and `[task_config].includes` are valid only when the setup is intentionally user-global or multi-environment
+   - For large repos, use `[task_config].includes` only when task families have clear owners (DB, env/dotenvx, secrets, infra, deploy, tools) — see `references/task-family-splitting.md`
+   - Treat the repo's existing task names, workflow semantics, and source-of-truth rules as authoritative
+2. User-global / dotfiles mode — the user is managing `~/.config/mise`, personal toolchains, or `mise skills add`.
+   - Split layouts are valid here: settings-only `config.toml`, environment files such as `config.default.toml` / `config.ci.toml` / `config.windows.toml`, shared task files via `[task_config].includes` — see `references/task-config-includes.md`
    - `config.windows.toml` and `windows_default_*_shell_args` usually belong here unless the repository explicitly vendors its own Windows shell policy
 
-Do not mix the two modes in one answer. If the request mentions `mise skills add`, personal/global setup, or `~/.config/mise`, treat it as user-global. Otherwise default to project-local.
+If the request mentions `mise skills add`, personal/global setup, or `~/.config/mise`, treat it as user-global. Otherwise default to project-local.
 
 ## Repository Overrides
 
-When the request is about a specific repository, read that repository's local guidance and the actual `mise.toml` before falling back to generic mise advice.
+When the request targets a specific repository, read its local guidance and the actual `mise.toml` before falling back to generic advice:
 
 - Prefer repo-local `AGENTS.md`, task docs, and current task names as authoritative
 - Derive task meaning from the real `run` / `depends` graph, not from naming alone
-- Treat repo-documented source-of-truth and generated-output rules as stronger than this skill's generic defaults
-- If the repository already has a dedicated workflow skill for its rollout model, use that skill for repo-specific routing instead of hardcoding those conventions here
+- Repo-documented source-of-truth and generated-output rules override this skill's generic defaults
+- If the repository has a dedicated workflow skill for its rollout model, use that skill for repo-specific routing
 
-If a task description is shorter or slightly ambiguous, classify the operational intent from the implementation first, then report wording clarity as a secondary issue.
+## Core Rules
 
-## Core Capabilities
+### run vs depends
 
-### 1. Task Definition Design
-
-Create well-structured task definitions with proper separation of concerns.
-
-#### run - Task Implementation
-
-Define what the task actually does:
-
-- Purpose: Contains the actual commands to execute
-- Execution: Runs serially inside the task's shell
-- Usage: Core logic, command sequences, inline sub-tasks
-
-### Example
+- `run`: WHAT this task does (imperative, executes serially)
+- `depends`: WHAT must finish BEFORE (declarative, builds global DAG, enables parallelism)
 
 ```toml
 [tasks.test]
 description = "Run test suite"
-run = [
-  "cargo test --all-features",
-  { task = "post-test-metrics" }  # Inline sub-task
-]
-```
-
-#### depends - Prerequisites
-
-Declare what must complete before this task starts:
-
-- Purpose: Pure declarative prerequisites
-- Execution: Builds global DAG, runs once, enables parallelism
-- Usage: Ordering constraints, shared setup tasks, fan-out patterns
-
-### Example
-
-```toml
-[tasks.test]
-description = "Run test suite"
-depends = ["build", "lint"]  # Parallel execution
-run = "cargo test"
-```
-
-### Key Distinction
-
-- `run`: WHAT this task does (imperative)
-- `depends`: WHAT must finish BEFORE (declarative)
-
-### 2. Aggregation vs Alias
-
-Treat aggregation tasks and aliases as separate concerns.
-
-#### Aggregation Tasks
-
-- Purpose: Coordinate related checks or workflows
-- Preferred shape: Use `depends` when the task mainly aggregates independent prerequisites
-- Examples: `format`, `format:check`, `lint`, `check`, `deploy`
-
-#### Alias Property
-
-- Purpose: Provide shorter CLI shortcuts for frequently used tasks
-- Usage: Optional `alias = ["b"]` or `alias = ["fmt"]`
-- Rule: Do not confuse a workflow task named `deploy` or `format` with an actual alias unless it declares `alias = [...]`
-
-### Alias Strategy
-
-- Single character (`b`, `t`, `l`): Daily-use tasks (build, test, lint)
-- Two characters (`cb`, `fmt`, `qa`): Common operations
-- Prefix with `+` (`+deploy`, `+all`): Meta-tasks that orchestrate others
-
-### Example
-
-```toml
-[tasks.build]
-description = "Build project"
-alias = ["b"]
-run = "cargo build --release"
-
-[tasks.test]
-description = "Run tests"
-alias = ["t"]
-depends = ["build"]
-run = "cargo test"
-
-[tasks."+deploy"]
-description = "Full delivery pipeline"
-depends = ["check", "test", "build"]
-```
-
-### 3. Dependency Management
-
-Structure task dependencies for optimal parallelism and correctness.
-
-#### Pattern A: Parallel Fan-Out, Serial Fan-In
-
-```toml
-[tasks.build]
-run = "cargo build --release"
-
-[tasks.lint]
-run = "eslint ."
-
-[tasks.test]
 depends = ["build", "lint"]  # build & lint run in parallel
 run = "cargo test"
 ```
 
-#### Pattern B: Meta-Task Orchestration
+- Never call `mise <task>` inside run strings — use `{ task = "x" }`
+- Never put ordering logic in `run` that belongs in `depends`
+- Keep >3 lines of shell out of `run` arrays; place long scripts in `mise-tasks/` or `scripts/`
 
-```toml
-[tasks.release]
-description = "Build, sign and publish"
-run = [
-  { task = "build" },
-  { task = "sign" },
-  { tasks = ["publish-github", "publish-s3"] },  # Parallel
-]
-```
+### Aggregation vs alias
 
-#### Pattern C: File Task Integration
+- Aggregation tasks (`check`, `lint`, `format`) coordinate independent prerequisites — prefer `depends`-only
+- `alias = ["b"]` is optional CLI sugar; a task named `deploy` or `format` is not an alias unless it declares `alias = [...]`
 
-```bash
-#!/usr/bin/env bash
-#MISE description="Apply database migrations"
-#MISE alias=["dbm"]
-#MISE depends=["setup-db"]
-prisma migrate deploy
-```
+### Configuration structure
 
-### 4. Configuration Structure
+Section order: `[settings]` → `[env]` → `[tools]` → `[tasks]`.
+Within `[tasks]`: individual commands → aggregation tasks → aliases/meta-tasks, with separator comments (`# === Commands ===`).
 
-Organize mise.toml for maintainability and clarity.
+### Naming
 
-### Recommended Order
+- Single-task commands: action-first names (`format`, `validate`, `prepare:catalog`)
+- Orchestration workflows: workflow names (`check`, `verify`, `deploy`, `upgrade`)
+- lowercase-kebab-case, always include `description`, group related tasks with common prefixes
+- Prefix meta-tasks with `+` only when the repository already uses that convention
 
-1. `[settings]` - Global mise settings
-2. `[env]` - Project-wide environment variables
-3. `[tools]` - Tool versions
-4. `[tasks]` - Task definitions (see internal structure below)
+### Tool and package management
 
-### Exception: User-Global Dotfiles Configuration
+- Declare ALL npm/Python packages in `[tools]` as `"npm:<pkg>"` / `"pipx:<pkg>"`; never `npm install -g` or `pip install --user`
+- Shared repositories: pin concrete LTS majors or exact patches (`node = "24"` or `node = "24.15.0"`); personal global configs may use symbolic channels (`node = "lts"`)
+- Resolve the newest acceptable version first, then record the concrete version — no floating channels in committed configs or CI
+- Add tools to `[tools]` only when tasks or documented setup flows actually invoke them
+- Migration from `global-package.json`, pinning policy, pipx/CI caveats: `references/tool-management.md`
 
-For personal `~/.config/mise` setups, a split layout can be better than a single large file:
+### mise skills add
 
-- Keep `config.toml` settings-only
-- Put environment-specific tool definitions in files such as `config.default.toml`, `config.ci.toml`, or `config.windows.toml`
-- Load shared task files via `[task_config].includes` from a local `~/.config/.mise.toml`
-
-Use this pattern for user-global dotfiles, environment-switched setups, or project-local task families that are large enough and responsibility-bound enough to make the root `mise.toml` hard to review.
-For project-local task-family splitting rules, see `references/task-family-splitting.md`.
-For concrete include-file examples, split-file structure, and do/don't guidance, see `references/task-config-includes.md`.
-For Windows shell selection, quoting, `run_windows`, and generated-file pitfalls, see `references/windows-shells.md`.
-
-### Task Section Internal Structure
-
-Within the `[tasks]` section, organize tasks logically by responsibility:
-
-1. Individual Commands - Concrete tasks that perform actual work
-   - Example: `format:terraform`, `lint:app`, `build:frontend`
-   - Characteristics: Contains `run` with actual commands
-
-2. Aggregation Tasks - Tasks that orchestrate multiple related commands
-   - Example: `format`, `lint`, `test`
-   - Characteristics: Prefer `depends` when coordinating independent checks or prerequisites
-
-3. Aliases/Meta-Tasks - Top-level orchestration for common workflows
-   - Example: `deploy`, `verify`, `upgrade`, `+all`, `release`
-   - Characteristics: High-level coordination, often used in CI/CD; may also declare `alias = [...]`
-
-### Naming Model
-
-Prefer one naming model consistently inside a repository:
-
-1. Single-task commands: action-first names
-   - Examples: `format`, `validate`, `smoke:catalog`, `prepare:catalog`, `install:catalog`
-   - Rule: A reader should infer the immediate action without reading the implementation
-2. Orchestration workflows: workflow names
-   - Examples: `check`, `verify`, `deploy`, `upgrade`
-   - Rule: A reader should infer that the task coordinates multiple lower-level tasks
-
-Avoid mixing these styles arbitrarily. If a task both performs work and orchestrates other tasks, choose the name based on the primary user intent.
-
-### Recommended Comment Structure
-
-```toml
-# ========================================
-# グローバル設定
-# ========================================
-[env]
-...
-
-[tools]
-...
-
-# ========================================
-# コマンド（実際の処理を行うタスク）
-# ========================================
-[tasks."format:terraform"]
-...
-
-[tasks."lint:app"]
-...
-
-# ========================================
-# 集約タスク
-# ========================================
-[tasks.format]
-depends = ["format:terraform", "format:docs"]
-
-# ========================================
-# エイリアス / メタタスク
-# ========================================
-[tasks.deploy]
-depends = ["check", "test", "build"]
-```
-
-### Example
-
-```toml
-# mise.toml
-[settings]
-jobs = 8
-paranoid = true
-
-[env]
-RUST_BACKTRACE = "1"
-NODE_ENV = "development"
-
-[tools]
-node = "24" # Prefer current LTS major; pin patch versions when reproducibility matters
-rust = "stable"
-
-[tasks.build]
-description = "Build project"
-run = "cargo build"
-```
-
-### 5. Tool Version Management
-
-Manage language runtimes and global packages in a unified, version-controlled manner.
-
-#### Core Principle: Centralized Package Management
-
-- ✅ DO: Declare ALL npm and Python packages in `mise.toml` using `"npm:<package>"` or `"pipx:<package>"`
-- ❌ DON'T: Use `npm install -g` or `pip install --user` - leads to drift and reproducibility issues
-
-### Tool Categories
-
-```toml
-[tools]
-# Runtimes
-node = "24" # Shared repos: prefer concrete LTS major or patch
-python = "3.12"
-rust = "stable"
-
-# CLI Tools
-github-cli = "2.83.1"
-shellcheck = "0.11.0"
-
-# NPM Global Packages
-"npm:prettier" = "3.8.4"
-"npm:typescript" = "5.9.3"
-"npm:@fsouza/prettierd" = "0.26.2"
-
-# Python Global Packages
-"pipx:black" = "26.1.1"
-"pipx:ruff" = "0.14.9"
-```
-
-### Migration from global-package.json
-
-1. Convert each dependency to `"npm:<package-name>" = "<verified-version>"`
-2. Remove `global-package.json` and update docs
-3. Run `mise install` to install all tools
-4. Verify with `mise ls` and `which <command>`
-
-### Benefits
-
-- Single source of truth for all tools and packages
-- Version control and team consistency
-- Cross-platform reproducibility
-- No global npm/pip pollution
-
-### Versioning Guidance
-
-- Shared repositories: prefer concrete LTS majors or exact patches (`node = "24"` or `node = "24.15.0"`)
-- Personal global configs: symbolic channels such as `node = "lts"` can be acceptable when you intentionally want rolling local upgrades
-- Avoid floating tool-package channels in committed repository configs and CI. For npm, pipx, and other package-backed tools, resolve the newest acceptable version first, then record that concrete version in `[tools]`.
-- For pipx-backed tools, be especially careful in CI: mise can forward dependency age controls to pip as `--uploaded-prior-to`, which requires pip support in the installer environment. Pinning the verified package version avoids a moving install target while keeping the tool current.
-
-### Formatter Wiring and `mise skills add`
-
-Use `[tools]` for commands that tasks or setup docs actually invoke, including formatters such as `nixpkgs-fmt`.
-
-```toml
-[tools]
-nixpkgs-fmt = "1.3.0"
-
-[tasks."format:nix"]
-description = "Format Nix files"
-run = "nixpkgs-fmt nix/**/*.nix"
-```
-
-When the user asks about `mise skills add`, treat it as a user-global workflow rather than a project-local task design question:
+Treat as a user-global workflow, not project-local task design:
 
 1. Confirm the user is working in a personal/global mise setup
-2. Use `mise skills add <skill>` for installation
-3. If that skill also adds tool or package dependencies, follow with `mise install`
-4. Keep reusable automation in shared task files or `.mise.toml`, not in ad hoc shell aliases
-
-### Reference
-
-### 6. Advanced Features
-
-Leverage mise's advanced capabilities for complex workflows.
-
-### Additional Dependencies
-
-- `depends_post`: Tasks that run after this task completes
-- `wait_for`: Soft dependency (only waits if already running)
-
-### Task Properties
-
-- `retry`: Number of retries on failure
-- `timeout`: Maximum execution time
-- `dir`: Working directory override
-- `env`: Task-specific environment variables
-
-### Example
-
-```toml
-[tasks.integration-test]
-description = "Integration tests with retry"
-depends = ["build", "setup-db"]
-depends_post = ["cleanup"]
-retry = 2
-timeout = "10m"
-env = { DATABASE_URL = "postgresql://localhost/test" }
-run = "pytest tests/integration"
-```
-
-## Best Practices Summary
-
-### File Organization
-
-✅ **DO:**
-
-- Keep a single root `mise.toml` when the repo is small or medium
-- Split large task families with `[task_config].includes` only when responsibility boundaries are clear
-- Place long scripts in `mise-tasks/` or `scripts/`
-- Order sections: settings → env → tools → tasks
-- Within tasks section: individual commands → aggregation tasks → aliases/meta-tasks
-- Use section separator comments for readability (`# === Commands ===`)
-- Use descriptive task names and always include `description`
-- Prefer `depends` for aggregation-only tasks such as `check`, `verify`, or `lint`
-- Use action-first names for single-task commands and workflow names for orchestration tasks
-- Add tools to `[tools]` only when they are used directly by tasks or documented setup flows
-
-❌ **DON'T:**
-
-- Embed >3 lines of shell in `run` arrays
-- Call `mise <task>` inside run strings (use `{ task = "x" }`)
-- Create circular dependencies
-- Use conflicting alias names
-- Add unused tools that are not wired into tasks, checks, or documented developer workflows
-
-### Task Design
-
-✅ **DO:**
-
-- Use `depends` for prerequisites and parallelism
-- Use `run` for core task logic
-- Keep tasks focused on single responsibility
-- Group related tasks with common prefixes
-- Treat `alias = [...]` as optional UX sugar, not as a substitute for well-named aggregation tasks
-
-❌ **DON'T:**
-
-- Mix ordering logic in `run` that belongs in `depends`
-- Create deeply nested inline tasks
-- Duplicate common setup across tasks (extract to shared task)
-
-### Naming Conventions
-
-✅ **DO:**
-
-- Use lowercase-kebab-case for task names
-- Use action-first names for single-task commands (`format`, `validate`, `prepare:catalog`)
-- Use workflow names for orchestration tasks (`check`, `verify`, `deploy`, `upgrade`)
-- Prefix meta-tasks with `+` only when the repository already uses that convention
-- Choose intuitive short aliases
-- Document complex task dependencies
+2. Run `mise skills add <skill>`, then `mise install` if it adds tool dependencies
+3. Keep reusable automation in shared task files or `.mise.toml`, not ad hoc shell aliases
 
 ## Review Workflow
 
-When reviewing existing mise.toml:
+0. Classify the request: project-local vs user-global / dotfiles
+1. Structure: section ordering and task organization
+2. Dependencies: `depends` vs `run` usage; run `mise task deps <task>` to visualize the DAG
+3. Parallelism: aggregation tasks that serialize independent work
+4. Aliases: conflicts and intuitive naming
+5. Task families: many DB/env/dotenvx/secrets/infra/deploy/tools tasks → consider responsibility-based include files
 
-0. Classify the request first: project-local vs user-global / dotfiles
-1. Check Structure: Verify section ordering and organization
-2. Analyze Dependencies: Review `depends` vs `run` usage
-3. Evaluate Parallelism: Identify opportunities for parallel execution
-4. Validate Aliases: Check for conflicts and intuitive naming
-5. Test DAG: Run `mise task deps <task>` to visualize
-6. Check Best Practices: Verify against reference guidelines
-7. Identify domain task families that may deserve include files
-8. Performance: Consider compilation time and execution efficiency
+For repository-specific reviews, additionally verify the answer:
 
-For repository-specific reviews, add these checks before proposing changes:
-
-- Does the answer preserve the repo's documented lightweight-check, deep-verify, and deploy semantics where they differ?
-- Does it keep refresh, rollout, and deploy semantics distinct where the repo does?
-- Does it avoid treating generated outputs as editing surfaces if the repo separates them from authoring surfaces?
-- Does it avoid baking local Windows workstation PATH or shell failures into a mac/Linux-first repository task contract?
-- Does it separate "task behavior as implemented" from "description wording that could be clearer"?
-- If `mise.toml` has many DB, env/dotenvx, secrets, infra, deploy, or tools tasks, would a responsibility-based include file reduce review risk without hiding the primary workflows?
-
-### Reference
+- Preserves the repo's documented lightweight-check, deep-verify, refresh, and deploy semantics where they differ
+- Does not treat generated outputs as editing surfaces when the repo separates them from authoring surfaces
+- Does not bake local Windows workstation PATH/shell failures into a mac/Linux-first task contract
+- Separates task behavior as implemented from description wording that could be clearer
 
 ## Common Issues
 
-### Issue: Nested mise Calls
+| Issue                                                | Fix                                                                        |
+| ---------------------------------------------------- | -------------------------------------------------------------------------- |
+| `run = "mise build && mise test"` (nested processes) | `run = [{ task = "build" }, { task = "test" }]`                            |
+| `{ task = "build" }` at the head of `run`            | Move to `depends = ["build"]`                                              |
+| Serial `{ task = ... }` list of independent tasks    | Aggregate with `depends` for parallel execution                            |
+| `run_windows` syntax mismatched with actual shell    | Inspect the real shell first; see `references/windows-shells.md`           |
+| Generated `mise.toml` rejected after formatting      | Fix the template/generator; exclude generated outputs from formatter tasks |
 
-### Problem
+## References
 
-```toml
-[tasks.bad]
-run = "mise build && mise test"  # ❌ Creates nested processes
-```
+Load as needed:
 
-### Solution
-
-```toml
-[tasks.good]
-run = [
-  { task = "build" },
-  { task = "test" }
-]
-```
-
-### Issue: Wrong Dependency Type
-
-### Problem
-
-```toml
-[tasks.test]
-run = [
-  { task = "build" },  # ❌ Should be depends
-  "cargo test"
-]
-```
-
-### Solution
-
-```toml
-[tasks.test]
-depends = ["build"]  # ✅ Proper prerequisite
-run = "cargo test"
-```
-
-### Issue: Missing Parallelism
-
-### Problem
-
-```toml
-[tasks.verify]
-run = [
-  { task = "lint" },
-  { task = "test" },
-  { task = "build" }
-]  # ❌ All serial
-```
-
-### Solution
-
-```toml
-[tasks.deploy]
-depends = ["lint", "test", "build"]  # ✅ Parallel execution
-```
-
-### Issue: Windows Shell Mismatch
-
-### Problem
-
-- `run_windows` uses PowerShell syntax, but mise is actually executing tasks through `bash -lc`
-- `%USERPROFILE%` is written inside a PowerShell-oriented task body
-- Generated files are reformatted by broad formatter tasks and then rejected by exact validation
-
-### Solution
-
-- Inspect which shell mise actually uses on Windows before changing task strings
-- Match `run_windows` syntax to that shell, especially env vars, quoting, and script invocation
-- If `mise.toml` is generated from a template, update the template or generator instead of only patching the generated file
-- Exclude exact generated outputs from generic formatter tasks when the repository validates byte-for-byte serialization
-
-See `references/windows-shells.md` for concrete patterns.
-
-## Integration
-
-### With CI Systems
-
-- Expose a single delivery entry task such as `mise run deploy`
-- Pin mise version: `mise use -g mise@2025.10`
-- Set `MISE_JOBS=$(nproc)` for parallel execution
-- Let mise orchestrate entire build pipeline
-
-### With Development Tools
-
-- Linters: Integrate via tasks with proper dependencies
-- Formatters: Create format/format:check task pairs
-- Test Runners: Use `depends` for setup tasks
-- Build Systems: Coordinate with mise's DAG
-
-## Resources
-
-### references/
-
-Detailed documentation loaded as needed:
-
-- `best-practices.md` - 2025 field-tested best practices, comprehensive guide on run vs depends, command composition patterns
-- `current-patterns.md` - Real-world examples from dotfiles project, practical task patterns
-- `config-templates.md` - Common mise.toml templates and patterns
-- `task-family-splitting.md` - Project-local task-family split rules for DB, env/dotenvx, secrets, infra, deploy, and tools tasks
-- `task-config-includes.md` - When and how to split user-global task files with `[task_config].includes`
-- `windows-shells.md` - Windows shell selection, `run_windows` syntax, env var expansion, and generated-file pitfalls
-- `tool-management.md` - Tool version management, Centralized Package Management, npm/Python migration guides, troubleshooting
-
-### Usage
-
-## 🤖 Agent Integration
-
-このスキルはmiseタスクランナー設定タスクを実行するエージェントに専門知識を提供します:
-
-### Orchestrator Agent
-
-- 提供内容: mise.toml設計、タスク依存関係管理、ワークフロー最適化
-- タイミング: miseタスクランナー設定・最適化時
-- コンテキスト:
-  - タスク定義ベストプラクティス
-  - 依存関係管理（depends, run連鎖）
-  - コマンド構成パターン
-  - 並列実行とDAG構造
-
-### Code-Reviewer Agent
-
-- 提供内容: mise.toml品質評価、設定レビュー
-- タイミング: mise設定レビュー時
-- コンテキスト: タスク構造評価、依存関係検証、ベストプラクティス準拠
-
-### Error-Fixer Agent
-
-- 提供内容: mise設定エラー修正、タスク依存関係修正
-- タイミング: mise実行エラー対応時
-- コンテキスト: 設定エラー診断、依存関係ループ検出、タスク修正
-
-### 自動ロード条件
-
-- "mise"、"mise-en-place"、"mise.toml"に言及
-- mise.tomlファイル操作時
-- タスク依存関係、エイリアスについて質問
-- ワークフロー自動化の最適化要求
-
-### 統合例
-
-```
-ユーザー: "mise.tomlのタスク依存関係を最適化"
-    ↓
-TaskContext作成
-    ↓
-プロジェクト検出: mise設定
-    ↓
-スキル自動ロード: mise
-    ↓
-エージェント選択: orchestrator
-    ↓ (スキルコンテキスト提供)
-mise依存関係管理パターン + DAG構造最適化
-    ↓
-実行完了（並列実行可能化、依存関係明確化）
-```
-
-## Trigger Conditions
-
-Activate this skill when:
-
-- User mentions "mise", "mise-en-place", "mise.toml"
-- Working with task runner configurations
-- Questions about task dependencies or aliases
-- Need to optimize workflow automation
-- Reviewing or creating mise configurations
-- Discussion of parallel execution or DAG structures
+- `references/best-practices.md` — full run-vs-depends mental model, command composition patterns, advanced features (`depends_post`, `wait_for`, `retry`, `timeout`), CI integration, performance
+- `references/config-templates.md` — common mise.toml templates
+- `references/current-patterns.md` — real-world dotfiles task patterns
+- `references/task-family-splitting.md` — project-local split rules for DB/env/secrets/infra/deploy/tools families
+- `references/task-config-includes.md` — user-global `[task_config].includes` split guidance
+- `references/windows-shells.md` — Windows shell selection, `run_windows` syntax, quoting, generated-file pitfalls
+- `references/tool-management.md` — version pinning policy, npm/pipx migration, troubleshooting
+- `resources/examples/npm-package-migration.md` — worked npm migration example
+- `resources/templates/mise-config-template.toml` — starter template

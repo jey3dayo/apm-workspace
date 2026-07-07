@@ -1,6 +1,6 @@
 ---
 name: docs-entrypoint-review
-description: Review whether project entrypoint documentation needs updates before editing it. Use when the user asks to update docs, check related docs drift, review documentation update needs, or mentions CLAUDE.md, AGENTS.md, llms.txt, TODO.md, DESIGN.md, DESIGN_REVIEW.md, README.md, CHANGELOG.md, or docs/** after implementation, refactoring, configuration changes, operational workflow changes, UI rule changes, or design-system changes. Default to proposing update candidates first instead of editing immediately.
+description: Review whether project entrypoint documentation needs updates before editing it. Use when the user asks to check docs drift or update docs after implementation, refactoring, configuration, operational workflow, UI rule, or design-system changes, or mentions CLAUDE.md, AGENTS.md, llms.txt, TODO.md, DESIGN.md, DESIGN_REVIEW.md, README.md, CHANGELOG.md, or docs/**. Default to proposing update candidates first instead of editing immediately.
 ---
 
 # Docs Entrypoint Review

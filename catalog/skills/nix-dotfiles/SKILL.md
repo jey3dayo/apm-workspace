@@ -1,140 +1,53 @@
 ---
 name: nix-dotfiles
-description: |
-  [What] Dotfiles management and troubleshooting using Home Manager and Nix
-  Flake: configuration apply, generation management, diagnostics, Agent
-  Skills distribution, and migrating legacy dotfiles (`~/.opencommit`,
-  `~/.opencommitrc`) into Nix-managed `~/.config`.
-  [When] Use when users mention home-manager, Nix flake, `nixで配布`,
-  `~/.configがnix管理`, `nixに組み込む`, deploying dotfiles or applying
-  configuration (`設定を適用`), generations or rollback, skills not
-  distributed (`~/.claude/skills/` が空), worktree not found, or opencommit
-  config migration. Do not use for `mise skills add`, mise task definitions,
-  or `mise run`; use `mise` instead.
+description: "Manage and troubleshoot dotfiles with Home Manager and Nix Flake. Use when users mention home-manager, Nix flake, `nixで配布`, `~/.configがnix管理`, applying configuration (`設定を適用`), generations or rollback, Agent Skills not distributed (`~/.claude/skills/` が空), worktree not found, or migrating legacy home-dotfiles such as `~/.opencommit` into `~/.config`. For `mise skills add`, mise task definitions, or `mise run`, use `mise` instead."
 ---
 
-# nix-dotfiles - Home Manager Dotfiles Management
+# Nix Dotfiles
 
-## Overview
-
-An integrated skill for dotfiles management using Home Manager and Nix Flake. Covers everything from configuration apply to troubleshooting.
-
-### Key Features
-
-- Configuration apply (home-manager switch)
-- Generation management (generations, rollback)
-- Diagnostics (skill distribution, Flake inputs, Worktree detection, .gitignore)
-- Agent Skills addition (flake inputs sync)
-- Migration of legacy home-dotfiles such as `~/.opencommit` / `~/.opencommitrc`
+Home Manager + Nix Flake による dotfiles 運用。設定適用、世代管理、診断、Agent Skills ソース管理、legacy dotfile 移行をカバーする。Flake は `~/.config` にある。
 
 ## Quick Start
 
-### Most Common Operations
-
-#### Apply Configuration
-
 ```bash
-# Basic form (auto environment detection: CI/Pi/Default)
+# 適用（環境自動判定: CI は mise.ci.toml / Pi は mise.pi.toml / それ以外は mise.toml）
 home-manager switch --flake ~/.config --impure
 
-# Verify with dry-run
+# 事前確認
 home-manager switch --flake ~/.config --impure --dry-run
-```
 
-### Verify Success
-
-```bash
-# Check if Agent Skills are distributed
+# 適用結果の確認
 ls -la ~/.claude/skills/
-
-# Check symlinks for configuration files
 readlink ~/.config/nvim
-```
 
-### Environment Detection
-
-- CI: `mise.ci.toml`
-- Pi: `mise.pi.toml`
-- Default: `mise.toml`
-
-#### Check and Rollback Generations
-
-```bash
-# List generations (latest 5)
+# 世代の確認とロールバック
 home-manager generations | sed -n '1,5p'
-
-# Roll back to a specific generation
 home-manager switch --generation <N>
 ```
 
-#### Run Diagnostics
+設定変更の基本フロー: 編集 → `home-manager build --flake ~/.config --impure` で検証 → `switch` で適用 → symlink とツール動作を確認。
 
-```bash
-# Integrated diagnostic script
-<installed-nix-dotfiles-skill-dir>/scripts/diagnose.sh
-
-# Individual checks
-readlink ~/.claude/skills
-nix flake metadata ~/.config
-home-manager generations | sed -n '1,3p'
-```
-
-### Basic Configuration Change Flow
+## 新規ツール追加の判断
 
 ```
-Edit → Build Verify → Apply → Confirm
-  ↓         ↓          ↓       ↓
- edit    build       switch  verify
+[Q1] 実行時にファイルを生成・更新するか?
+├─ Yes → [Q2] 生成物は .gitignore で除外済みか?
+│          ├─ Yes → Action A: 静的ファイルのみ管理
+│          └─ No  → Action B: ディレクトリごと除外
+└─ No  → Action C: ディレクトリごと管理
 ```
 
-### Example
-
-```bash
-# 1. Edit configuration file
-nvim ~/.config/nix/dotfiles-module.nix
-
-# 2. Build verification (without applying)
-home-manager build --flake ~/.config --impure
-
-# 3. Apply
-home-manager switch --flake ~/.config --impure
-
-# 4. Verify
-ls -la ~/.config/<tool-name>
-<tool> --version
-```
-
-## Core Workflows
-
-### Decision Flow for Adding New Tools
-
-Decision tree when adding a new tool:
-
-```
-[Q1] Does it generate or update files at runtime?
-├─ Yes → [Q2] Are generated files excluded by .gitignore?
-│          ├─ Yes → [Action A] Manage static files only
-│          └─ No  → [Action B] Exclude entire directory
-└─ No  → [Action C] Manage entire directory
-```
-
-#### Action A: Manage Static Files Only
-
-### Examples
-
-### Implementation
+### Action A: 静的ファイルのみ管理
 
 ```nix
 # nix/dotfiles-files.nix
 xdgConfigFiles = [
   "mise/config.toml"
-  "mise/mise.toml"
   "tmux/tmux.conf"
-  "tmux/copy-paste.conf"
 ];
 ```
 
-### Copy dynamic content via activation script
+動的コンテンツが必要なら activation script でコピーする:
 
 ```nix
 home.activation.dotfiles-mise = lib.hm.dag.entryAfter ["writeBoundary"] ''
@@ -146,44 +59,23 @@ home.activation.dotfiles-mise = lib.hm.dag.entryAfter ["writeBoundary"] ''
 '';
 ```
 
-#### Action B: Exclude Entire Directory
+### Action B: ディレクトリごと除外
 
-### Examples
-
-### Reasons
-
-- `gh/hosts.yml` (OAuth credentials)
-- `karabiner/automatic_backups/` (automatic backups)
-- `zed/cache/`, `zed/logs/` (cache and logs)
-
-### Implementation
+credential・キャッシュ・自動バックアップを含むディレクトリが対象（例: `gh/hosts.yml`, `karabiner/automatic_backups/`, `zed/cache/`）。
 
 ```gitignore
-# .gitignore
 gh/hosts.yml
 karabiner/automatic_backups/
 zed/cache/
-zed/logs/
 ```
 
-### Combine with Action A when static files are needed
+静的ファイルが必要な場合は Action A と併用する（`gh/config.yml` のみ `xdgConfigFiles` へ）。
+
+### Action C: ディレクトリごと管理
+
+生成物を持たない静的設定ディレクトリ（例: `alacritty`, `wezterm`, `nvim`）。
 
 ```nix
-xdgConfigFiles = [
-  "gh/config.yml"  # static config only
-];
-```
-
-#### Action C: Manage Entire Directory
-
-### Examples
-
-### Reasons
-
-### Implementation
-
-```nix
-# nix/dotfiles-files.nix
 xdgConfigDirs = [
   "alacritty"
   "wezterm"
@@ -191,20 +83,15 @@ xdgConfigDirs = [
 ];
 ```
 
-### Migrating `~/.opencommit` / `~/.opencommitrc`
+## Legacy home-dotfile の移行（`~/.opencommit` など）
 
-Use this when a legacy home-dotfile should move into an XDG or Nix-managed layout.
-
-1. Check whether the tool supports `~/.config/<tool>/...`
-2. If it does, migrate the static config into `xdgConfigFiles`
-3. Keep secrets, caches, and generated state out of the tracked repo
-4. If the tool only reads a home-dotfile path, keep the source under `~/.config` and add a small compatibility link via Home Manager
-5. Confirm the actual legacy path first because some tool versions document `~/.opencommit` while others may still mention `~/.opencommitrc`
-
-Example shape:
+1. ツールが `~/.config/<tool>/...` を読めるか確認する
+2. 読めるなら静的設定を `xdgConfigFiles` へ移す
+3. secret・キャッシュ・生成物は tracked repo に入れない
+4. home-dotfile パスしか読まないツールは、実体を `~/.config` に置き互換 symlink を張る
+5. 実際の legacy パスを先に確認する（バージョンにより `~/.opencommit` / `~/.opencommitrc` が混在）
 
 ```nix
-# nix/dotfiles-files.nix
 xdgConfigFiles = [
   "opencommit/config.json"
 ];
@@ -213,234 +100,68 @@ home.file.".opencommitrc".source =
   config.lib.file.mkOutOfStoreSymlink "${config.xdg.configHome}/opencommit/config.json";
 ```
 
-If the tool generates runtime state beside the config, manage only the static config file and exclude the generated directory from git.
+## Agent Skill ソースの追加
 
-### Agent Skills Addition Flow
-
-Steps to add a new Agent Skill source:
-
-#### 1. Update agent-skills-sources.nix
+`nix/agent-skills-sources.nix` と `flake.nix` の inputs は手動同期が必要。URL・flake 属性を必ず一致させる。
 
 ```nix
 # nix/agent-skills-sources.nix
-{
-  # existing skills...
-
-  new-skill-source = {
-    url = "github:org/repo";
-    flake = false;
-    baseDir = "skills";  # or repository root "."
-    selection.enable = [ "skill-name" ];
-  };
-}
+new-skill-source = {
+  url = "github:org/repo";
+  flake = false;
+  baseDir = "skills";  # または repository root "."
+  selection.enable = [ "skill-name" ];
+};
 ```
-
-#### 2. Add to inputs in flake.nix (manual sync required)
 
 ```nix
-# flake.nix
-{
-  inputs = {
-    # ... existing inputs
-    new-skill-source = {
-      url = "github:org/repo";  # must match agent-skills-sources.nix
-      flake = false;
-    };
-  };
-}
+# flake.nix inputs（静的リテラルで定義。let-in や import は使わない）
+new-skill-source = {
+  url = "github:org/repo";
+  flake = false;
+};
 ```
 
-### Important
-
-#### 3. Verify
+検証と配布確認:
 
 ```bash
-# Confirm Flake evaluation succeeds
 nix flake show ~/.config
-
-# Check if new input is recognized
 nix flake metadata ~/.config | rg 'new-skill-source'
-
-# Home Manager build
-home-manager build --flake ~/.config --impure --dry-run
-```
-
-#### 4. Verify Skill Distribution
-
-```bash
-# Apply
 home-manager switch --flake ~/.config --impure
-
-# Confirm skill was distributed
 ls -la ~/.claude/skills/ | rg '<skill-name>'
 ```
 
-## Diagnostic Commands
+## 診断
 
-### Integrated Diagnostic Script
-
-```bash
-<installed-nix-dotfiles-skill-dir>/scripts/diagnose.sh
-```
-
-### Check Items
-
-1. Generation validation: Confirm existence of latest generation and presence of `.claude`
-2. Symlink validation: Verify link targets of `~/.config/result` and `~/.claude/skills/`
-3. Flake Inputs consistency: Confirm URL match between `flake.nix` and `agent-skills-sources.nix`
-4. Worktree detection: Validate `DOTFILES_WORKTREE` and candidate paths
-
-### Output Format
-
-```
-[✓] Generation check: Latest generation found
-[✓] Symlink check: All symlinks valid
-[✗] Flake inputs check: URL mismatch found
-[✓] Worktree check: ~/.config detected
-```
-
-### Manual Diagnostic Commands
-
-#### Check Generations
-
-```bash
-# Check latest generation
-home-manager generations | sed -n '1,3p'
-
-# Check if .claude is included in generation
-rg '\.claude' /nix/store/<hash>-home-manager-generation/home-files
-
-# Verify link generation with dry-run
-home-manager switch --flake ~/.config --impure --dry-run 2>&1 | rg 'claude'
-```
-
-#### Symlink Validation
-
-```bash
-# Check ~/.config/result
-readlink ~/.config/result
-
-# Link target of ~/.claude/skills/
-readlink ~/.claude/skills
-
-# List skills in Nix store
-ls -la $(readlink ~/.claude/skills)
-```
-
-#### Flake metadata
-
-```bash
-# Check Flake information
-nix flake metadata ~/.config
-
-# List inputs
-nix flake show ~/.config
-
-# Check URL of specific input
-nix flake metadata ~/.config | rg '(openai-skills|vercel)'
-```
-
-### Tool Selection Guide
-
-| Tool                 | Purpose                           | When to Run             |
-| -------------------- | --------------------------------- | ----------------------- |
-| `diagnose.sh`        | Diagnose Home Manager integration | On trouble              |
-| `nix run .#validate` | Validate skill structure          | After adding skill      |
-| `nix flake check`    | Validate Flake syntax             | After editing flake.nix |
-| `mise run ci`        | Full CI checks                    | Before creating PR      |
-
-## Common Issues & Quick Fixes
-
-### Skill Distribution Issues
-
-### Symptoms
-
-### Quick Diagnostics
+トラブル時はまず統合診断スクリプトを実行する:
 
 ```bash
 <installed-nix-dotfiles-skill-dir>/scripts/diagnose.sh
 ```
 
-### Causes and Fixes
+4項目（世代の妥当性、symlink、flake.nix と agent-skills-sources.nix の URL 整合、worktree 検出）を `[✓]` / `[✗]` で報告する。
 
-1. Ran switch from a different flake
-   - Generation was overwritten
-   - Fix: Run switch again from `~/.config`
+| ツール               | 用途                    | 実行タイミング   |
+| -------------------- | ----------------------- | ---------------- |
+| `diagnose.sh`        | Home Manager 統合の診断 | トラブル時       |
+| `nix run .#validate` | スキル構造の検証        | スキル追加後     |
+| `nix flake check`    | Flake 構文検証          | flake.nix 編集後 |
+| `mise run ci`        | フル CI チェック        | PR 作成前        |
 
-     home-manager switch --flake ~/.config --impure
+個別コマンド（世代・symlink・flake metadata の手動確認）は `references/commands.md` を参照。
 
-     ```
+## よくある問題
 
-     ```
+| 症状                                          | 原因                                                    | 対処                                                                                                                 |
+| --------------------------------------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| スキルが配布されない                          | 別 flake から switch して世代が後勝ちで上書きされた     | `~/.config` から `home-manager switch --flake ~/.config --impure`                                                    |
+| スキルが配布されない                          | `flake.nix` と `agent-skills-sources.nix` の URL 不一致 | `rg 'url = '` で両方を比較し、sources → flake.nix の向きで手動同期                                                   |
+| スキルが配布されない                          | `selection.enable` の typo / カタログに存在しない名前   | `mise run agents:report` で確認し `selection.enable` を修正                                                          |
+| Flake inputs エラー                           | inputs に let-in / import を使っている                  | 静的リテラル定義へ変更し `nix flake show ~/.config` で検証                                                           |
+| `Dotfiles repository not found`               | worktree 検出失敗                                       | `DOTFILES_WORKTREE=/path/to/dotfiles home-manager switch ...` で一時回避、恒久対応は `repoWorktreeCandidates` を設定 |
+| `Permission denied` / `Read-only file system` | 実行時書き込みが必要なディレクトリを Nix 管理にした     | 対象を `xdgConfigDirs` から外して switch し、静的ファイルのみ `xdgConfigFiles` で管理                                |
 
-2. Inconsistency between flake.nix and agent-skills-sources.nix
-   - URL/flake attributes do not match
-   - Check:
-
-     ```bash
-     # URL list in agent-skills-sources.nix
-     rg 'url = ' ~/.config/nix/agent-skills-sources.nix
-
-     # URL list of inputs in flake.nix
-     rg 'url = "github:.*skills' ~/.config/flake.nix
-     ```
-
-   - Fix: Manually sync mismatched entries (agent-skills-sources.nix → flake.nix)
-
-3. Misconfigured selection.enable
-   - Skill name does not exist in catalog, or typo
-
-   - Check:
-
-     ```bash
-
-     mise run agents:report
-     ```
-
-   - Fix: Correct `selection.enable` in `nix/agent-skills-sources.nix`
-
-### Details
-
-### Flake inputs Error
-
-### Symptoms
-
-### Cause
-
-### Diagnostic Steps
-
-```bash
-# Check inputs section
-rg "inputs\s*=" ~/.config/flake.nix -A 10
-
-# Check usage of let-in or import
-rg "(let|import).*agent-skills" ~/.config/flake.nix
-```
-
-### Fix
-
-1. Change inputs to static literal definitions (remove `let-in`)
-2. Sync URL/flake between agent-skills-sources.nix and flake.nix
-3. Verify with `nix flake show ~/.config`
-
-### Details
-
-### Worktree Detection Failure
-
-### Symptoms
-
-```
-Error: Dotfiles repository not found
-```
-
-### Resolution
-
-```bash
-# Temporary override
-DOTFILES_WORKTREE=/path/to/dotfiles home-manager switch --flake ~/.config --impure
-```
-
-### Permanent Configuration
+worktree の恒久設定:
 
 ```nix
 # nix/dotfiles-module.nix
@@ -454,124 +175,8 @@ programs.dotfiles = {
 };
 ```
 
-### Details
+## References
 
-### Write Errors
-
-### Symptoms
-
-```
-Error: Permission denied
-Error: Read-only file system
-```
-
-### Cause
-
-### Fix
-
-1. Remove the affected directory from `xdg.dirs` in `nix/dotfiles-files.nix`
-2. Run `home-manager switch --flake ~/.config --impure`
-3. It will be restored as a real directory
-4. Manage only necessary static files individually via `xdg.files`
-
-### Example
-
-```nix
-# Remove from xdg.dirs
-# xdgConfigDirs = [ "gh" ];  # ← delete
-
-# Manage only static files individually
-xdgConfigFiles = [
-  "gh/config.yml"  # static config only
-];
-```
-
-## References Navigation
-
-Detailed documentation is located in references/.
-
-### references/troubleshooting.md
-
-Detailed diagnostic procedures (symptoms → cause → check → fix)
-
-### Main Sections
-
-- Agent Skills not being distributed
-- Flake inputs error
-- Worktree detection failure
-- .gitignore filtering issues
-- Write errors
-
-### references/commands.md
-
-Full command reference (home-manager, nix flake, nix run)
-
-### Coverage
-
-- `home-manager switch`, `build`, `generations`, `switch --generation`
-- `nix flake show`, `metadata`, `check`
-- `nix run .#validate`
-- Diagnostic commands (generation check, symlink validation, flake inputs check)
-
-### references/architecture.md
-
-Flake structure, Worktree SSoT, gitignore filtering, glossary
-
-### Main Sections
-
-- Glossary (Worktree, Activation Script, DAG, SSoT, cleanedRepo)
-- Flake structure
-- Flake Inputs and Agent Skills management
-- Worktree detection logic
-- .gitignore-aware filtering
-- Static vs dynamic file management
-- Activation Scripts
-
-## Scripts Usage
-
-### diagnose.sh
-
-Integrated diagnostic script. Performs 4 checks:
-
-### Check Items
-
-1. Generation validation
-   - Confirm latest generation exists
-   - Confirm `~/.claude/skills/` is included
-   - Within 24 hours check (warning)
-
-2. Symlink validation
-   - `~/.config/result` is a valid symlink
-   - Link target matches latest generation
-   - Link target of `~/.claude/skills/`
-
-3. Flake Inputs consistency
-   - Number of inputs in `flake.nix`
-   - Number of sources in `nix/agent-skills-sources.nix`
-   - URL diff detection
-
-4. Worktree detection
-   - `DOTFILES_WORKTREE` environment variable
-   - Check existence of default candidate paths
-   - Confirm `flake.nix`, `home.nix`, `nix/dotfiles-module.nix` for each candidate
-
-### Run
-
-```bash
-<installed-nix-dotfiles-skill-dir>/scripts/diagnose.sh
-```
-
-### Output Format
-
-```
-[✓] Check name: message
-[✗] Check name: message
-
-All checks passed ✓
-```
-
-or
-
-```
-Some checks failed. See details above.
-```
+- `references/troubleshooting.md` — 上の表で解決しない時に読む。症状 → 原因 → 確認 → 修正の詳細手順（配布問題、flake inputs、worktree、.gitignore フィルタ、書き込みエラー）
+- `references/commands.md` — 正確なフラグや個別診断コマンドが必要な時に読む。home-manager / nix flake / nix run の全コマンド
+- `references/architecture.md` — Flake 構造、worktree SSoT、gitignore フィルタリング、activation script の仕組みを理解したい時に読む
