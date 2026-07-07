@@ -80,6 +80,8 @@ EOF
 )"
 ```
 
+- stage は対象ファイルの明示指定のみ。`git add -A`, `git add .`, `git add -u`, `git commit -a` は使わない
+- commit 直前に `git diff --cached --name-only` の一覧がグループと完全一致することを確認する。グループ外の staged ファイルが混ざっていたら `git restore --staged <file>` で外してからコミットする
 - メッセージは変更内容の簡潔な記述のみ。署名・フッターは付けない
 - commit hook が失敗した、またはファイルを書き換えた場合は停止して報告する。`--no-verify` でのバイパスはユーザーの明示指示がない限り行わない
 
