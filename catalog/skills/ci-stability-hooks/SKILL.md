@@ -44,8 +44,8 @@ Use this split unless the repo contract says otherwise:
 - Put staged-file formatters and very fast linters in `pre-commit`.
 - Keep test suites, builds, slow typechecks, network access, and full aggregate commands out of `pre-commit`; a commit gate that runs full CI pushes developers toward bypassing hooks.
 - Put the repository CI-equivalent gate in `pre-push`.
-- Prefer `mise run ci` for `pre-push` when it exists.
-- Fall back in this order: `mise run check`, `pnpm run ci`, `pnpm run check`, or an explicit sequence matching GitHub Actions.
+- Prefer registering `mise run ci`'s constituent sub-tasks as separate `pre-push` jobs over one aggregate `run: mise run ci` job. An aggregate job only reports pass/fail for the whole gate; separate jobs show which stage failed and let Lefthook's per-job summary track progress. Inspect the aggregate task definition (e.g. `mise run ci`'s `run` block or `depends`) to enumerate its stages, and mirror that same order as one `pre-push` job per stage.
+- Fall back to one aggregate `run: mise run ci` (or `mise run check`, `pnpm run ci`, `pnpm run check`) only when the aggregate task has no discoverable sub-tasks to split, or when the repo contract explicitly asks for a single gate.
 
 For `pre-commit`, prefer named jobs per tool instead of one aggregate `mise run format`: a failed aggregate hides which formatter failed, while separate jobs make failures diagnosable. `mise run format` remains useful as a full auto-format pass before push or PR.
 
@@ -83,9 +83,19 @@ pre-commit:
 
 pre-push:
   jobs:
-    - name: ci
-      run: mise run ci
+    - name: format:check
+      run: mise run format:check
+    - name: test:unit:ci
+      run: mise run test:unit:ci
+    - name: lint
+      run: mise run lint
+    - name: test:rust
+      run: mise run test:rust
+    - name: build
+      run: mise run build
 ```
+
+Lefthook runs a job list's entries sequentially by default (no `parallel: true`), so ordering the split jobs to match the aggregate task's own stage order preserves fail-fast behavior while naming which stage failed.
 
 Completion condition: hooks are installable through repo tooling and each job's failure points to a specific tool or gate.
 
