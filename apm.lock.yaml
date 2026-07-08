@@ -1036,7 +1036,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: 3e4d7d9e8beb6e3e7668a63334b1d267dc69bed2
+  resolved_commit: 484c5ada32cfd8bb8ffafbee6b63565994844628
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -1073,6 +1073,9 @@ dependencies:
   - .agents/skills/atomic-commit
   - .agents/skills/atomic-commit/SKILL.md
   - .agents/skills/atomic-commit/agents/openai.yaml
+  - .agents/skills/ci-stability-hooks
+  - .agents/skills/ci-stability-hooks/SKILL.md
+  - .agents/skills/ci-stability-hooks/agents/openai.yaml
   - .agents/skills/claude-system
   - .agents/skills/claude-system/SKILL.md
   - .agents/skills/claude-system/references/integration-patterns.md
@@ -1399,6 +1402,9 @@ dependencies:
   - .claude/skills/atomic-commit
   - .claude/skills/atomic-commit/SKILL.md
   - .claude/skills/atomic-commit/agents/openai.yaml
+  - .claude/skills/ci-stability-hooks
+  - .claude/skills/ci-stability-hooks/SKILL.md
+  - .claude/skills/ci-stability-hooks/agents/openai.yaml
   - .claude/skills/claude-system
   - .claude/skills/claude-system/SKILL.md
   - .claude/skills/claude-system/references/integration-patterns.md
@@ -1725,6 +1731,9 @@ dependencies:
   - .kiro/skills/atomic-commit
   - .kiro/skills/atomic-commit/SKILL.md
   - .kiro/skills/atomic-commit/agents/openai.yaml
+  - .kiro/skills/ci-stability-hooks
+  - .kiro/skills/ci-stability-hooks/SKILL.md
+  - .kiro/skills/ci-stability-hooks/agents/openai.yaml
   - .kiro/skills/claude-system
   - .kiro/skills/claude-system/SKILL.md
   - .kiro/skills/claude-system/references/integration-patterns.md
@@ -2044,6 +2053,8 @@ dependencies:
     .agents/skills/architecture-boundary-docs/references/document-shape.md: sha256:1c0fedacef544a36804c64cc58cf159a4c7a2dcc25dbc05ef88f571b3ce425fa
     .agents/skills/atomic-commit/SKILL.md: sha256:e9a29b13aef5bf70c5f2c9955b5ccd912e52886440672e5428f86ab8dd371c25
     .agents/skills/atomic-commit/agents/openai.yaml: sha256:8486b70455d5ec0241bc7bf64bf52d806084132b2c4fcea7dcfd79ed7aec497f
+    .agents/skills/ci-stability-hooks/SKILL.md: sha256:2eb85b96927729a1b181f389d74f4d6965895d5d616936477e3955d3e37de479
+    .agents/skills/ci-stability-hooks/agents/openai.yaml: sha256:60a9e8633c5933d8663858f15d71831b0af1c5265accf6f5e2ebba0916373cc2
     .agents/skills/claude-system/SKILL.md: sha256:d8bc5e7391d3f24b53a13a4cd6dc6d3f0ebd01e5b821164fbf6ee1e5aa0fb161
     .agents/skills/claude-system/references/integration-patterns.md: sha256:d42e77098df7f180d9a9c52f1088d183419a9e95d2e443d3b6916fa84450268e
     .agents/skills/claude-system/references/use-cases.md: sha256:ca0db8284fdd920b8879e12c9dc8578800a58631561f6d538e67b54d7df8b3e4
@@ -2247,7 +2258,7 @@ dependencies:
     .agents/skills/skill-creator/SKILL.md: sha256:ab45d4d2eb8aabfc050c9dfe15ec19c8f3bf6f1093404418be7413467c297e78
     .agents/skills/skill-creator/agents/openai.yaml: sha256:b6c49ad8c5d225212c3d44ea4ed7bd11bb33d54fadc876296d67b865aca3cd2c
     .agents/skills/skill-creator/references/openai_yaml.md: sha256:9fb5928b7f4a746fdb39df503ebbd7a659d5e64b47f85a60626aa1a03fd76b17
-    .agents/skills/skill-creator/scripts/__pycache__/generate_openai_yaml.cpython-314.pyc: sha256:73cc00f33335a40ced12f777dc11ad94cfc234dd5f24d722ac0bb50a47d92dc1
+    .agents/skills/skill-creator/scripts/__pycache__/generate_openai_yaml.cpython-314.pyc: sha256:5e1296fd431ccea6aa366c51abbc71408305e9e4aa50393412bc9cc36d468962
     .agents/skills/skill-creator/scripts/generate_openai_yaml.py: sha256:10e93ef5537e55abba5e3aac905c4aa5f5b377a586c0cf45d156c772505f0d65
     .agents/skills/skill-creator/scripts/init_skill.py: sha256:bcb8982d3f033a094f2f1be43123ac8537e2562d25d8ba4d8ef2196ae514d96d
     .agents/skills/skill-creator/scripts/quick_validate.py: sha256:1fe7b5eb4474cae8b175187508107dcdd3e294eca584f3c7b811e59d27623380
@@ -2310,6 +2321,8 @@ dependencies:
     .claude/skills/architecture-boundary-docs/references/document-shape.md: sha256:1c0fedacef544a36804c64cc58cf159a4c7a2dcc25dbc05ef88f571b3ce425fa
     .claude/skills/atomic-commit/SKILL.md: sha256:e9a29b13aef5bf70c5f2c9955b5ccd912e52886440672e5428f86ab8dd371c25
     .claude/skills/atomic-commit/agents/openai.yaml: sha256:8486b70455d5ec0241bc7bf64bf52d806084132b2c4fcea7dcfd79ed7aec497f
+    .claude/skills/ci-stability-hooks/SKILL.md: sha256:2eb85b96927729a1b181f389d74f4d6965895d5d616936477e3955d3e37de479
+    .claude/skills/ci-stability-hooks/agents/openai.yaml: sha256:60a9e8633c5933d8663858f15d71831b0af1c5265accf6f5e2ebba0916373cc2
     .claude/skills/claude-system/SKILL.md: sha256:d8bc5e7391d3f24b53a13a4cd6dc6d3f0ebd01e5b821164fbf6ee1e5aa0fb161
     .claude/skills/claude-system/references/integration-patterns.md: sha256:d42e77098df7f180d9a9c52f1088d183419a9e95d2e443d3b6916fa84450268e
     .claude/skills/claude-system/references/use-cases.md: sha256:ca0db8284fdd920b8879e12c9dc8578800a58631561f6d538e67b54d7df8b3e4
@@ -2513,7 +2526,7 @@ dependencies:
     .claude/skills/skill-creator/SKILL.md: sha256:ab45d4d2eb8aabfc050c9dfe15ec19c8f3bf6f1093404418be7413467c297e78
     .claude/skills/skill-creator/agents/openai.yaml: sha256:b6c49ad8c5d225212c3d44ea4ed7bd11bb33d54fadc876296d67b865aca3cd2c
     .claude/skills/skill-creator/references/openai_yaml.md: sha256:9fb5928b7f4a746fdb39df503ebbd7a659d5e64b47f85a60626aa1a03fd76b17
-    .claude/skills/skill-creator/scripts/__pycache__/generate_openai_yaml.cpython-314.pyc: sha256:73cc00f33335a40ced12f777dc11ad94cfc234dd5f24d722ac0bb50a47d92dc1
+    .claude/skills/skill-creator/scripts/__pycache__/generate_openai_yaml.cpython-314.pyc: sha256:5e1296fd431ccea6aa366c51abbc71408305e9e4aa50393412bc9cc36d468962
     .claude/skills/skill-creator/scripts/generate_openai_yaml.py: sha256:10e93ef5537e55abba5e3aac905c4aa5f5b377a586c0cf45d156c772505f0d65
     .claude/skills/skill-creator/scripts/init_skill.py: sha256:bcb8982d3f033a094f2f1be43123ac8537e2562d25d8ba4d8ef2196ae514d96d
     .claude/skills/skill-creator/scripts/quick_validate.py: sha256:1fe7b5eb4474cae8b175187508107dcdd3e294eca584f3c7b811e59d27623380
@@ -2576,6 +2589,8 @@ dependencies:
     .kiro/skills/architecture-boundary-docs/references/document-shape.md: sha256:1c0fedacef544a36804c64cc58cf159a4c7a2dcc25dbc05ef88f571b3ce425fa
     .kiro/skills/atomic-commit/SKILL.md: sha256:e9a29b13aef5bf70c5f2c9955b5ccd912e52886440672e5428f86ab8dd371c25
     .kiro/skills/atomic-commit/agents/openai.yaml: sha256:8486b70455d5ec0241bc7bf64bf52d806084132b2c4fcea7dcfd79ed7aec497f
+    .kiro/skills/ci-stability-hooks/SKILL.md: sha256:2eb85b96927729a1b181f389d74f4d6965895d5d616936477e3955d3e37de479
+    .kiro/skills/ci-stability-hooks/agents/openai.yaml: sha256:60a9e8633c5933d8663858f15d71831b0af1c5265accf6f5e2ebba0916373cc2
     .kiro/skills/claude-system/SKILL.md: sha256:d8bc5e7391d3f24b53a13a4cd6dc6d3f0ebd01e5b821164fbf6ee1e5aa0fb161
     .kiro/skills/claude-system/references/integration-patterns.md: sha256:d42e77098df7f180d9a9c52f1088d183419a9e95d2e443d3b6916fa84450268e
     .kiro/skills/claude-system/references/use-cases.md: sha256:ca0db8284fdd920b8879e12c9dc8578800a58631561f6d538e67b54d7df8b3e4
@@ -2818,7 +2833,7 @@ dependencies:
     .kiro/skills/work-log-maintenance/agents/openai.yaml: sha256:e951b8256a5a1b032bcca3c7105230f5041467594434ca23b562b8ec5ec4abc8
     .kiro/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
     .kiro/skills/zsh/SKILL.md: sha256:42a47db6cbc7f8a3b1b0f1b65cee6c13115264231f1a60c54dbf2823c13b15ad
-  content_hash: sha256:3b3d90104a284ff375397f774d7b5c7835878cafbf55aa682a9365bb13ec225b
+  content_hash: sha256:913cf121fdd9a922a6357b02551f13cdd3d270f72a8b25f3c02f6393be58c5de
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
