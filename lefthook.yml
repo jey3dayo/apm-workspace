@@ -1,0 +1,40 @@
+pre-commit:
+  parallel: true
+  jobs:
+    - name: prettier-markdown
+      glob: "*.md"
+      run: mise exec -- prettier --write --log-level error {staged_files}
+      stage_fixed: true
+
+    - name: prettier-yaml
+      glob: "*.{yml,yaml}"
+      exclude:
+        - "apm.lock.yaml"
+      run: mise exec -- prettier --write --log-level error {staged_files}
+      stage_fixed: true
+
+    - name: taplo-toml
+      glob: "*.toml"
+      run: mise exec -- taplo format {staged_files}
+      stage_fixed: true
+
+    - name: bold-headings
+      glob: "catalog/**/*.md"
+      run: mise run format:markdown:bold-headings
+      stage_fixed: true
+
+    - name: workspace-scripts
+      glob: "scripts/apm-workspace.{sh,ps1}"
+      run: |
+        bash -n scripts/apm-workspace.sh
+        pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 help >/dev/null
+
+pre-push:
+  jobs:
+    - name: workspace-scripts
+      run: |
+        bash -n scripts/apm-workspace.sh
+        pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 help >/dev/null
+
+    - name: ci
+      run: mise run verify

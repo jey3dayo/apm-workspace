@@ -13,6 +13,7 @@ node = "24"
 
 # CLI tools
 fd = "10.4.2"
+lefthook = "2.1.9"
 "pipx:apm-cli" = "0.22.0"
 taplo = "0.10.0"
 
@@ -37,6 +38,10 @@ run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts
 description = "Inspect ~/.apm workspace state and deployed targets"
 run = "bash ./scripts/apm-workspace.sh doctor"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 doctor"
+
+[tasks."hooks:install"]
+description = "Install Lefthook git hooks for this workspace"
+run = "lefthook install"
 
 # ========================================
 # Catalog / Skill Commands
