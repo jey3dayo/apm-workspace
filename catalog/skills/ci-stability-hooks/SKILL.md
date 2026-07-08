@@ -31,6 +31,7 @@ Build a small map of available commands:
 - Fast checks: lint, shellcheck, yaml lint, markdown lint, type-only checks if cheap.
 - Heavy checks: typecheck, test, build, `mise run check`, `mise run ci`, `pnpm run check`, `pnpm run ci`.
 - Workflow checks: ordinary CI jobs for format, lint, typecheck, test, build, and generated-file validation.
+- File classes covered by CI format/lint tasks: at minimum JS/TS, JSON, CSS, Markdown, YAML, TOML, shell, Python, Dockerfile, Rust, Nix, and repo-specific config files when those tasks exist.
 
 Prefer repository-defined tasks over inventing commands. If both `mise` and package scripts exist, treat `mise` as the orchestration layer when the repo already uses it for CI.
 
@@ -48,6 +49,8 @@ Use this split unless the repo contract says otherwise:
 
 For `pre-commit`, prefer named jobs per tool instead of one aggregate `mise run format`: a failed aggregate hides which formatter failed, while separate jobs make failures diagnosable. `mise run format` remains useful as a full auto-format pass before push or PR.
 
+Before accepting the split, compare the CI/task inventory from step 2 with the hook file globs. If CI has a fast format or lint gate for a file class, add an equivalent staged-file job unless it is too slow, unsafe, or impossible to run on filenames. Do not forget non-code config surfaces such as `*.yml`, `*.yaml`, `*.toml`, workflow files, root package manager config, and repo-local tool config.
+
 Completion condition: commit hooks stay fast and push hooks block the failures most likely to break CI.
 
 ### 4. Implement Lefthook
@@ -55,6 +58,7 @@ Completion condition: commit hooks stay fast and push hooks block the failures m
 When adding or updating Lefthook:
 
 - Use `glob`, `{staged_files}`, and `stage_fixed: true` for staged-file formatters when supported.
+- Add separate jobs for fast non-code CI checks when the repo has them, such as YAML lint (`yamllint`), TOML format (`taplo`), Markdown lint, workflow lint, or lock/config validation.
 - Use package-manager prefixes that match the repo: `pnpm exec`, `mise exec --`, or direct commands managed by the repo.
 - Add Lefthook through the existing tool source: package dependency for package-managed repos, `mise` tool config for mise-managed dotfiles or tool repos.
 - Add an install helper only when the repo already has a scripts/tasks pattern for setup.
