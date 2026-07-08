@@ -1,0 +1,4 @@
+interface:
+  display_name: "CI Stability Hooks"
+  short_description: "CI-aligned hooks and workflow gates"
+  default_prompt: "Use $ci-stability-hooks to add or review lightweight pre-commit hooks and CI-aligned pre-push gates for this repository."
