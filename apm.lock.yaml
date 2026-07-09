@@ -1,27 +1,7 @@
 lockfile_version: '1'
-generated_at: '2026-07-09T04:10:18.160854+00:00'
+generated_at: '2026-07-09T17:05:27.529440+00:00'
 apm_version: 0.22.0
 dependencies:
-- repo_url: EpicenterHQ/epicenter
-  name: tauri
-  host: github.com
-  resolved_commit: c05c0711f80f4d710513b2c1aaac4bfb7bf6d459
-  version: 1.0.0
-  virtual_path: .agents/skills/tauri
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/tauri
-  - .agents/skills/tauri/SKILL.md
-  - .claude/skills/tauri
-  - .claude/skills/tauri/SKILL.md
-  - .kiro/skills/tauri
-  - .kiro/skills/tauri/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/tauri/SKILL.md: sha256:823e1fc91afa885a25c60696c9eaaa49da69d0fbce37f3f46542c8d4fd531fb9
-    .claude/skills/tauri/SKILL.md: sha256:823e1fc91afa885a25c60696c9eaaa49da69d0fbce37f3f46542c8d4fd531fb9
-    .kiro/skills/tauri/SKILL.md: sha256:823e1fc91afa885a25c60696c9eaaa49da69d0fbce37f3f46542c8d4fd531fb9
-  content_hash: sha256:1e4ae283d9d0afa6f7afe5598c5525e465735dbd245704000088239100752a86
 - repo_url: Jakubantalik/transitions-dev
   name: transitions-dev
   host: github.com
@@ -123,7 +103,7 @@ dependencies:
 - repo_url: Lum1104/Understand-Anything
   name: understand
   host: github.com
-  resolved_commit: 9545eb5a433cd97d4a7e2d650aa1ad05886d64ff
+  resolved_commit: 83c331b9a3e5065135d00c9c89ea6a43b655026c
   version: 1.0.0
   virtual_path: understand-anything-plugin/skills/understand
   is_virtual: true
@@ -431,7 +411,7 @@ dependencies:
 - repo_url: Lum1104/Understand-Anything
   name: understand-dashboard
   host: github.com
-  resolved_commit: 9545eb5a433cd97d4a7e2d650aa1ad05886d64ff
+  resolved_commit: 83c331b9a3e5065135d00c9c89ea6a43b655026c
   version: 1.0.0
   virtual_path: understand-anything-plugin/skills/understand-dashboard
   is_virtual: true
@@ -448,32 +428,11 @@ dependencies:
     .claude/skills/understand-dashboard/SKILL.md: sha256:b69f457d3e453efa0e396f9757edab423998d632729361a9e145da6e79774026
     .kiro/skills/understand-dashboard/SKILL.md: sha256:b69f457d3e453efa0e396f9757edab423998d632729361a9e145da6e79774026
   content_hash: sha256:2964b46dd4dfe983cd542c81519eae0440be758ce542c02977b6d03ecac65b3c
-- repo_url: affaan-m/everything-claude-code
-  name: everything-claude-code
-  host: github.com
-  resolved_commit: 2bc924faf2f8e893bfe0af86b1931283693c30ae
-  resolved_ref: 2bc924faf2f8e893bfe0af86b1931283693c30ae
-  version: unknown
-  virtual_path: skills/mcp-server-patterns
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/mcp-server-patterns
-  - .agents/skills/mcp-server-patterns/SKILL.md
-  - .claude/skills/mcp-server-patterns
-  - .claude/skills/mcp-server-patterns/SKILL.md
-  - .kiro/skills/mcp-server-patterns
-  - .kiro/skills/mcp-server-patterns/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/mcp-server-patterns/SKILL.md: sha256:0d2d77ff4cffabd26a8db9a54fd16ae29063519fc2d7d2da3539c5e391a3973a
-    .claude/skills/mcp-server-patterns/SKILL.md: sha256:0d2d77ff4cffabd26a8db9a54fd16ae29063519fc2d7d2da3539c5e391a3973a
-    .kiro/skills/mcp-server-patterns/SKILL.md: sha256:0d2d77ff4cffabd26a8db9a54fd16ae29063519fc2d7d2da3539c5e391a3973a
-  content_hash: sha256:55425683e7c75a1e9cc39ea3d016fe66f23e9a6921e0203487e325f1f7a28439
 - repo_url: anthropics/claude-code
-  name: frontend-design
+  name: claude-code
   host: github.com
   resolved_commit: be02c39841a59e2ac1f35ac12285def02acdbb5a
-  version: 1.0.0
+  version: unknown
   virtual_path: plugins/frontend-design/skills/frontend-design
   is_virtual: true
   package_type: claude_skill
@@ -904,7 +863,7 @@ dependencies:
 - repo_url: ibelick/ui-skills
   name: baseline-ui
   host: github.com
-  resolved_commit: 4f3fd3255ebd9163c5ba46b0a6eeafbef5b64ede
+  resolved_commit: 5c5c1ac06503b2807d84067e379c28a75b7b3a44
   version: 1.0.0
   virtual_path: skills/baseline-ui
   is_virtual: true
@@ -924,7 +883,7 @@ dependencies:
 - repo_url: ibelick/ui-skills
   name: fixing-accessibility
   host: github.com
-  resolved_commit: 4f3fd3255ebd9163c5ba46b0a6eeafbef5b64ede
+  resolved_commit: 5c5c1ac06503b2807d84067e379c28a75b7b3a44
   version: 1.0.0
   virtual_path: skills/fixing-accessibility
   is_virtual: true
@@ -944,7 +903,7 @@ dependencies:
 - repo_url: ibelick/ui-skills
   name: fixing-metadata
   host: github.com
-  resolved_commit: 4f3fd3255ebd9163c5ba46b0a6eeafbef5b64ede
+  resolved_commit: 5c5c1ac06503b2807d84067e379c28a75b7b3a44
   version: 1.0.0
   virtual_path: skills/fixing-metadata
   is_virtual: true
@@ -964,7 +923,7 @@ dependencies:
 - repo_url: ibelick/ui-skills
   name: fixing-motion-performance
   host: github.com
-  resolved_commit: 4f3fd3255ebd9163c5ba46b0a6eeafbef5b64ede
+  resolved_commit: 5c5c1ac06503b2807d84067e379c28a75b7b3a44
   version: 1.0.0
   virtual_path: skills/fixing-motion-performance
   is_virtual: true
@@ -984,7 +943,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: 484c5ada32cfd8bb8ffafbee6b63565994844628
+  resolved_commit: ed9ebb924019e3d7dfd32df6f52c7156ec1aef93
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -2785,7 +2744,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
-  resolved_commit: 484c5ada32cfd8bb8ffafbee6b63565994844628
+  resolved_commit: ed9ebb924019e3d7dfd32df6f52c7156ec1aef93
   resolved_ref: main
   version: 1.0.0
   virtual_path: manual-skills
@@ -2795,7 +2754,7 @@ dependencies:
 - repo_url: langchain-ai/deepagents
   name: web-research
   host: github.com
-  resolved_commit: 38446fda649b891dd8604e788701eabe739c1dd0
+  resolved_commit: b0a209da3a8c9f80e2e3d5e199340736c854c567
   version: 1.0.0
   virtual_path: libs/cli/examples/skills/web-research
   is_virtual: true
@@ -2813,10 +2772,10 @@ dependencies:
     .kiro/skills/web-research/SKILL.md: sha256:7c2b1f1990370f7ce176fe3608a67028c72db11e337b4ba83b8fce6d927dfde3
   content_hash: sha256:2b66d5db8c8d70474e70638f437f324fb3af3724b71bf8501e48c8004e70e677
 - repo_url: mattpocock/skills
-  name: grill-with-docs
+  name: skills
   host: github.com
   resolved_commit: d574778f94cf620fcc8ce741584093bc650a61d3
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/engineering/grill-with-docs
   is_virtual: true
   package_type: claude_skill
@@ -2833,10 +2792,10 @@ dependencies:
     .kiro/skills/grill-with-docs/SKILL.md: sha256:610d091047bcfb9db0f75c057d15538481a721111579fc5ec7f83ad9131a2165
   content_hash: sha256:e7ef25bbee50cda2eb7b3a8ef541db0a0396dad7d369f7d14fb610671dd1864b
 - repo_url: mattpocock/skills
-  name: wayfinder
+  name: skills
   host: github.com
   resolved_commit: d574778f94cf620fcc8ce741584093bc650a61d3
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/engineering/wayfinder
   is_virtual: true
   package_type: claude_skill
@@ -2853,10 +2812,10 @@ dependencies:
     .kiro/skills/wayfinder/SKILL.md: sha256:bef437de697fb6984a8a90b7fd82f128609148d6e02f635ce419d03555b351e1
   content_hash: sha256:3eb72cd9abdfaa00e10fa69f0b4410ff8639a6cf4eb9e5d187b289c3aa9be2fc
 - repo_url: mattpocock/skills
-  name: grilling
+  name: skills
   host: github.com
   resolved_commit: d574778f94cf620fcc8ce741584093bc650a61d3
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/productivity/grilling
   is_virtual: true
   package_type: claude_skill
@@ -2873,10 +2832,10 @@ dependencies:
     .kiro/skills/grilling/SKILL.md: sha256:5a35925d03a391bcfa46940868b649b72dba89ec9c19525e785bbb6bd3a7f478
   content_hash: sha256:1de9e777a60b184b29412fadacb7bbde8c14bb7037e5c4d9d086c941281d1742
 - repo_url: mattpocock/skills
-  name: handoff
+  name: skills
   host: github.com
   resolved_commit: d574778f94cf620fcc8ce741584093bc650a61d3
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/productivity/handoff
   is_virtual: true
   package_type: claude_skill
@@ -2893,10 +2852,10 @@ dependencies:
     .kiro/skills/handoff/SKILL.md: sha256:57c9f1f392d7352cdc85b1e39ca49eddc70ce1dc278bd9653fb4f23dfc2560fc
   content_hash: sha256:87e353708ab36062eac54ddb593a97ca553c0cb4bfa1ed1fdaf68520700723f1
 - repo_url: mattpocock/skills
-  name: writing-great-skills
+  name: skills
   host: github.com
   resolved_commit: d574778f94cf620fcc8ce741584093bc650a61d3
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/productivity/writing-great-skills
   is_virtual: true
   package_type: claude_skill
@@ -2921,7 +2880,7 @@ dependencies:
 - repo_url: millionco/react-doctor
   name: react-doctor
   host: github.com
-  resolved_commit: 0eb5293c1d4f99b4945512827b98a7affee1c66c
+  resolved_commit: fd2db30f6ebe0be116d1e028904813c900d3b16f
   version: 1.0.0
   virtual_path: skills/react-doctor
   is_virtual: true
@@ -2977,10 +2936,10 @@ dependencies:
     .kiro/skills/empirical-prompt-tuning/SKILL.md: sha256:252418e7ef022981d2dda2e3ec57fa1c786d30af68c50b7e062edf1d7361b0cb
   content_hash: sha256:20e7fba93c7267ba6e3a7b27787ca49191b762dffcfb804b01da9183b1b0c891
 - repo_url: modem-dev/hunk
-  name: hunk-review
+  name: hunk
   host: github.com
   resolved_commit: 059dd13c8bd27fe503ef59652077edf0041034c8
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/hunk-review
   is_virtual: true
   package_type: claude_skill
@@ -3229,8 +3188,6 @@ dependencies:
   - .agents/skills/ui-ux-pro-max/data/typography.csv
   - .agents/skills/ui-ux-pro-max/data/ui-reasoning.csv
   - .agents/skills/ui-ux-pro-max/data/ux-guidelines.csv
-  - .agents/skills/ui-ux-pro-max/scripts/__pycache__/core.cpython-314.pyc
-  - .agents/skills/ui-ux-pro-max/scripts/__pycache__/design_system.cpython-314.pyc
   - .agents/skills/ui-ux-pro-max/scripts/core.py
   - .agents/skills/ui-ux-pro-max/scripts/design_system.py
   - .agents/skills/ui-ux-pro-max/scripts/search.py
@@ -3912,8 +3869,6 @@ dependencies:
     .agents/skills/ui-ux-pro-max/data/typography.csv: sha256:dbea262a54e3bfa2e6c3b15989a365d5ef4c43349316aff46635e82ca825adce
     .agents/skills/ui-ux-pro-max/data/ui-reasoning.csv: sha256:06e4369445388ba9b7a57347510b125b7a2145bbf8546a327ba50292503b204a
     .agents/skills/ui-ux-pro-max/data/ux-guidelines.csv: sha256:e01943c433b2cad3040f19389b3b0455673758a569b7a927b5bedf65c989cb96
-    .agents/skills/ui-ux-pro-max/scripts/__pycache__/core.cpython-314.pyc: sha256:b45de79d33201444aaf9d73bc6d1321de6e7827025e5093f41cfc6a27265a83b
-    .agents/skills/ui-ux-pro-max/scripts/__pycache__/design_system.cpython-314.pyc: sha256:59ee2cddee90f9c3e2c444477bab0332ab05a1061eda71701d51b516a446c8b5
     .agents/skills/ui-ux-pro-max/scripts/core.py: sha256:ab9f398b493e34404448cefc766239ee86119c7a21d8581ba965cabdc698b0a8
     .agents/skills/ui-ux-pro-max/scripts/design_system.py: sha256:9de2d4547e1e336d50939fe6ff0910f327d50dc069f1c30e929d64e3a47e87bf
     .agents/skills/ui-ux-pro-max/scripts/search.py: sha256:84d2605d86ff2c69f6313730a0ff8cc91ba834c2ff47e1d730215f943ca5a38e
@@ -4832,10 +4787,10 @@ dependencies:
     .kiro/skills/writing-plans/plan-document-reviewer-prompt.md: sha256:aa728b96aad603c8be28875a4305637f6c984aa81ffcadcb13e743202fa2a0c7
   content_hash: sha256:56ce74d3f05986ea81295d3789adb71bf03845d05d182883fc5e56bf367c6af7
 - repo_url: openai/codex-plugin-cc
-  name: codex-cli-runtime
+  name: codex-plugin-cc
   host: github.com
   resolved_commit: db52e28f4d9ded852ab3942cea316258ae4ef346
-  version: 1.0.0
+  version: unknown
   virtual_path: plugins/codex/skills/codex-cli-runtime
   is_virtual: true
   package_type: claude_skill
@@ -4852,10 +4807,10 @@ dependencies:
     .kiro/skills/codex-cli-runtime/SKILL.md: sha256:cce11c3bd6d7b5ec6277b3527e65ff38c5bd16084b436bf2870fabb30414359c
   content_hash: sha256:03b09f8ad5721f1d33d830cff54637656c58920befcb32835c6f003e625a7a54
 - repo_url: openai/codex-plugin-cc
-  name: codex-result-handling
+  name: codex-plugin-cc
   host: github.com
   resolved_commit: db52e28f4d9ded852ab3942cea316258ae4ef346
-  version: 1.0.0
+  version: unknown
   virtual_path: plugins/codex/skills/codex-result-handling
   is_virtual: true
   package_type: claude_skill
@@ -4872,10 +4827,10 @@ dependencies:
     .kiro/skills/codex-result-handling/SKILL.md: sha256:99fcbbebaeac1e1504b8adfba513bd5964e171414f6709034f3f980a1f2385a8
   content_hash: sha256:1ca05b8eb3e45816b428dc71e24355a89a8f997502ade309e0c53a06adb1b1e7
 - repo_url: openai/codex-plugin-cc
-  name: gpt-5-4-prompting
+  name: codex-plugin-cc
   host: github.com
   resolved_commit: db52e28f4d9ded852ab3942cea316258ae4ef346
-  version: 1.0.0
+  version: unknown
   virtual_path: plugins/codex/skills/gpt-5-4-prompting
   is_virtual: true
   package_type: claude_skill
@@ -4909,86 +4864,6 @@ dependencies:
     .kiro/skills/gpt-5-4-prompting/references/codex-prompt-recipes.md: sha256:fcc000e51cb967731c1b667fe27d024b0c51158a0d5d692792b23e6b46172331
     .kiro/skills/gpt-5-4-prompting/references/prompt-blocks.md: sha256:9df47d9ac08c28c6ae302febc2b788cf6105ca18998a9649d7c8ccd816a047e9
   content_hash: sha256:8e00d64a5cd9b4477e55c4a7ad0f02328ff1991ea93e2ac1fb7839b3891d3f2d
-- repo_url: openai/skills
-  name: skills
-  host: github.com
-  resolved_commit: 49f948faa9258a0c61caceaf225e179651397431
-  version: unknown
-  virtual_path: skills/.curated/chatgpt-apps
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/chatgpt-apps
-  - .agents/skills/chatgpt-apps/LICENSE.txt
-  - .agents/skills/chatgpt-apps/SKILL.md
-  - .agents/skills/chatgpt-apps/agents/openai.yaml
-  - .agents/skills/chatgpt-apps/references/app-archetypes.md
-  - .agents/skills/chatgpt-apps/references/apps-sdk-docs-workflow.md
-  - .agents/skills/chatgpt-apps/references/interactive-state-sync-patterns.md
-  - .agents/skills/chatgpt-apps/references/repo-contract-and-validation.md
-  - .agents/skills/chatgpt-apps/references/search-fetch-standard.md
-  - .agents/skills/chatgpt-apps/references/upstream-example-workflow.md
-  - .agents/skills/chatgpt-apps/references/window-openai-patterns.md
-  - .agents/skills/chatgpt-apps/scripts/scaffold_node_ext_apps.mjs
-  - .claude/skills/chatgpt-apps
-  - .claude/skills/chatgpt-apps/LICENSE.txt
-  - .claude/skills/chatgpt-apps/SKILL.md
-  - .claude/skills/chatgpt-apps/agents/openai.yaml
-  - .claude/skills/chatgpt-apps/references/app-archetypes.md
-  - .claude/skills/chatgpt-apps/references/apps-sdk-docs-workflow.md
-  - .claude/skills/chatgpt-apps/references/interactive-state-sync-patterns.md
-  - .claude/skills/chatgpt-apps/references/repo-contract-and-validation.md
-  - .claude/skills/chatgpt-apps/references/search-fetch-standard.md
-  - .claude/skills/chatgpt-apps/references/upstream-example-workflow.md
-  - .claude/skills/chatgpt-apps/references/window-openai-patterns.md
-  - .claude/skills/chatgpt-apps/scripts/scaffold_node_ext_apps.mjs
-  - .kiro/skills/chatgpt-apps
-  - .kiro/skills/chatgpt-apps/LICENSE.txt
-  - .kiro/skills/chatgpt-apps/SKILL.md
-  - .kiro/skills/chatgpt-apps/agents/openai.yaml
-  - .kiro/skills/chatgpt-apps/references/app-archetypes.md
-  - .kiro/skills/chatgpt-apps/references/apps-sdk-docs-workflow.md
-  - .kiro/skills/chatgpt-apps/references/interactive-state-sync-patterns.md
-  - .kiro/skills/chatgpt-apps/references/repo-contract-and-validation.md
-  - .kiro/skills/chatgpt-apps/references/search-fetch-standard.md
-  - .kiro/skills/chatgpt-apps/references/upstream-example-workflow.md
-  - .kiro/skills/chatgpt-apps/references/window-openai-patterns.md
-  - .kiro/skills/chatgpt-apps/scripts/scaffold_node_ext_apps.mjs
-  deployed_file_hashes:
-    .agents/skills/chatgpt-apps/LICENSE.txt: sha256:a7f55b2cb68997f729e6199720d4d3cae47633aba0254a84b2d36ab284be9d45
-    .agents/skills/chatgpt-apps/SKILL.md: sha256:c3a13a659ce26e9d067b5a97c321e8abec6d8e878afce31b7e841dfcf2635c3a
-    .agents/skills/chatgpt-apps/agents/openai.yaml: sha256:ebd723c60efd5242c628da61c0f1a91edd3dc106860573ba8f2f96dcdd224fcb
-    .agents/skills/chatgpt-apps/references/app-archetypes.md: sha256:ae3bb232c201541303264653518eca8bc59832bc73e511835d66ebd0a3c04f87
-    .agents/skills/chatgpt-apps/references/apps-sdk-docs-workflow.md: sha256:41f0ec23b35c6a66de59de80c13b9be59002a371c8a36d23f96f20e19c656b49
-    .agents/skills/chatgpt-apps/references/interactive-state-sync-patterns.md: sha256:5ca632712be3d75f63a405292184a7867cfc0fa3803b53b2063a94318a8c1278
-    .agents/skills/chatgpt-apps/references/repo-contract-and-validation.md: sha256:28fb7093b67e29d05322e3fd38cb7ad182e92913aa45051d97dbddca8a627cd6
-    .agents/skills/chatgpt-apps/references/search-fetch-standard.md: sha256:32c706205035007d1b616bf3eeb6c6c9ce69f6c56493bf0ea942a20abe8b39e6
-    .agents/skills/chatgpt-apps/references/upstream-example-workflow.md: sha256:241f2fc58ff6c3b276325bef70254d8e1a18ec9e7633bd3bd03ef45ff478f727
-    .agents/skills/chatgpt-apps/references/window-openai-patterns.md: sha256:1718848c5c903368fb536ee4be405e54a0fe3a91ef13986f5780735b04ca3cb3
-    .agents/skills/chatgpt-apps/scripts/scaffold_node_ext_apps.mjs: sha256:fb12086ca7e37ab7d1fb02418b11623f207b8726aabfcbfb3d5634539479807a
-    .claude/skills/chatgpt-apps/LICENSE.txt: sha256:a7f55b2cb68997f729e6199720d4d3cae47633aba0254a84b2d36ab284be9d45
-    .claude/skills/chatgpt-apps/SKILL.md: sha256:c3a13a659ce26e9d067b5a97c321e8abec6d8e878afce31b7e841dfcf2635c3a
-    .claude/skills/chatgpt-apps/agents/openai.yaml: sha256:ebd723c60efd5242c628da61c0f1a91edd3dc106860573ba8f2f96dcdd224fcb
-    .claude/skills/chatgpt-apps/references/app-archetypes.md: sha256:ae3bb232c201541303264653518eca8bc59832bc73e511835d66ebd0a3c04f87
-    .claude/skills/chatgpt-apps/references/apps-sdk-docs-workflow.md: sha256:41f0ec23b35c6a66de59de80c13b9be59002a371c8a36d23f96f20e19c656b49
-    .claude/skills/chatgpt-apps/references/interactive-state-sync-patterns.md: sha256:5ca632712be3d75f63a405292184a7867cfc0fa3803b53b2063a94318a8c1278
-    .claude/skills/chatgpt-apps/references/repo-contract-and-validation.md: sha256:28fb7093b67e29d05322e3fd38cb7ad182e92913aa45051d97dbddca8a627cd6
-    .claude/skills/chatgpt-apps/references/search-fetch-standard.md: sha256:32c706205035007d1b616bf3eeb6c6c9ce69f6c56493bf0ea942a20abe8b39e6
-    .claude/skills/chatgpt-apps/references/upstream-example-workflow.md: sha256:241f2fc58ff6c3b276325bef70254d8e1a18ec9e7633bd3bd03ef45ff478f727
-    .claude/skills/chatgpt-apps/references/window-openai-patterns.md: sha256:1718848c5c903368fb536ee4be405e54a0fe3a91ef13986f5780735b04ca3cb3
-    .claude/skills/chatgpt-apps/scripts/scaffold_node_ext_apps.mjs: sha256:fb12086ca7e37ab7d1fb02418b11623f207b8726aabfcbfb3d5634539479807a
-    .kiro/skills/chatgpt-apps/LICENSE.txt: sha256:a7f55b2cb68997f729e6199720d4d3cae47633aba0254a84b2d36ab284be9d45
-    .kiro/skills/chatgpt-apps/SKILL.md: sha256:c3a13a659ce26e9d067b5a97c321e8abec6d8e878afce31b7e841dfcf2635c3a
-    .kiro/skills/chatgpt-apps/agents/openai.yaml: sha256:ebd723c60efd5242c628da61c0f1a91edd3dc106860573ba8f2f96dcdd224fcb
-    .kiro/skills/chatgpt-apps/references/app-archetypes.md: sha256:ae3bb232c201541303264653518eca8bc59832bc73e511835d66ebd0a3c04f87
-    .kiro/skills/chatgpt-apps/references/apps-sdk-docs-workflow.md: sha256:41f0ec23b35c6a66de59de80c13b9be59002a371c8a36d23f96f20e19c656b49
-    .kiro/skills/chatgpt-apps/references/interactive-state-sync-patterns.md: sha256:5ca632712be3d75f63a405292184a7867cfc0fa3803b53b2063a94318a8c1278
-    .kiro/skills/chatgpt-apps/references/repo-contract-and-validation.md: sha256:28fb7093b67e29d05322e3fd38cb7ad182e92913aa45051d97dbddca8a627cd6
-    .kiro/skills/chatgpt-apps/references/search-fetch-standard.md: sha256:32c706205035007d1b616bf3eeb6c6c9ce69f6c56493bf0ea942a20abe8b39e6
-    .kiro/skills/chatgpt-apps/references/upstream-example-workflow.md: sha256:241f2fc58ff6c3b276325bef70254d8e1a18ec9e7633bd3bd03ef45ff478f727
-    .kiro/skills/chatgpt-apps/references/window-openai-patterns.md: sha256:1718848c5c903368fb536ee4be405e54a0fe3a91ef13986f5780735b04ca3cb3
-    .kiro/skills/chatgpt-apps/scripts/scaffold_node_ext_apps.mjs: sha256:fb12086ca7e37ab7d1fb02418b11623f207b8726aabfcbfb3d5634539479807a
-  content_hash: sha256:c6eee311c28aa89e60daa5479ce811feb4ca702311717f88ba31f768e5f9a765
 - repo_url: openai/skills
   name: skills
   host: github.com
@@ -5262,158 +5137,6 @@ dependencies:
   host: github.com
   resolved_commit: 3027f20f3181758385a1bb8c022d4041dfb4de84
   version: unknown
-  virtual_path: skills/marp-slide
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/marp-slide
-  - .agents/skills/marp-slide/README.md
-  - .agents/skills/marp-slide/SKILL.md
-  - .agents/skills/marp-slide/assets/template-basic.md
-  - .agents/skills/marp-slide/assets/template-business.md
-  - .agents/skills/marp-slide/assets/template-colorful.md
-  - .agents/skills/marp-slide/assets/template-dark.md
-  - .agents/skills/marp-slide/assets/template-gradient.md
-  - .agents/skills/marp-slide/assets/template-minimal.md
-  - .agents/skills/marp-slide/assets/template-tech.md
-  - .agents/skills/marp-slide/assets/theme-business.css
-  - .agents/skills/marp-slide/assets/theme-colorful.css
-  - .agents/skills/marp-slide/assets/theme-dark.css
-  - .agents/skills/marp-slide/assets/theme-default.css
-  - .agents/skills/marp-slide/assets/theme-gradient.css
-  - .agents/skills/marp-slide/assets/theme-minimal.css
-  - .agents/skills/marp-slide/assets/theme-tech.css
-  - .agents/skills/marp-slide/references/advanced-features.md
-  - .agents/skills/marp-slide/references/best-practices.md
-  - .agents/skills/marp-slide/references/image-patterns.md
-  - .agents/skills/marp-slide/references/marp-syntax.md
-  - .agents/skills/marp-slide/references/official-themes.md
-  - .agents/skills/marp-slide/references/theme-css-guide.md
-  - .agents/skills/marp-slide/references/theme-selection.md
-  - .claude/skills/marp-slide
-  - .claude/skills/marp-slide/README.md
-  - .claude/skills/marp-slide/SKILL.md
-  - .claude/skills/marp-slide/assets/template-basic.md
-  - .claude/skills/marp-slide/assets/template-business.md
-  - .claude/skills/marp-slide/assets/template-colorful.md
-  - .claude/skills/marp-slide/assets/template-dark.md
-  - .claude/skills/marp-slide/assets/template-gradient.md
-  - .claude/skills/marp-slide/assets/template-minimal.md
-  - .claude/skills/marp-slide/assets/template-tech.md
-  - .claude/skills/marp-slide/assets/theme-business.css
-  - .claude/skills/marp-slide/assets/theme-colorful.css
-  - .claude/skills/marp-slide/assets/theme-dark.css
-  - .claude/skills/marp-slide/assets/theme-default.css
-  - .claude/skills/marp-slide/assets/theme-gradient.css
-  - .claude/skills/marp-slide/assets/theme-minimal.css
-  - .claude/skills/marp-slide/assets/theme-tech.css
-  - .claude/skills/marp-slide/references/advanced-features.md
-  - .claude/skills/marp-slide/references/best-practices.md
-  - .claude/skills/marp-slide/references/image-patterns.md
-  - .claude/skills/marp-slide/references/marp-syntax.md
-  - .claude/skills/marp-slide/references/official-themes.md
-  - .claude/skills/marp-slide/references/theme-css-guide.md
-  - .claude/skills/marp-slide/references/theme-selection.md
-  - .kiro/skills/marp-slide
-  - .kiro/skills/marp-slide/README.md
-  - .kiro/skills/marp-slide/SKILL.md
-  - .kiro/skills/marp-slide/assets/template-basic.md
-  - .kiro/skills/marp-slide/assets/template-business.md
-  - .kiro/skills/marp-slide/assets/template-colorful.md
-  - .kiro/skills/marp-slide/assets/template-dark.md
-  - .kiro/skills/marp-slide/assets/template-gradient.md
-  - .kiro/skills/marp-slide/assets/template-minimal.md
-  - .kiro/skills/marp-slide/assets/template-tech.md
-  - .kiro/skills/marp-slide/assets/theme-business.css
-  - .kiro/skills/marp-slide/assets/theme-colorful.css
-  - .kiro/skills/marp-slide/assets/theme-dark.css
-  - .kiro/skills/marp-slide/assets/theme-default.css
-  - .kiro/skills/marp-slide/assets/theme-gradient.css
-  - .kiro/skills/marp-slide/assets/theme-minimal.css
-  - .kiro/skills/marp-slide/assets/theme-tech.css
-  - .kiro/skills/marp-slide/references/advanced-features.md
-  - .kiro/skills/marp-slide/references/best-practices.md
-  - .kiro/skills/marp-slide/references/image-patterns.md
-  - .kiro/skills/marp-slide/references/marp-syntax.md
-  - .kiro/skills/marp-slide/references/official-themes.md
-  - .kiro/skills/marp-slide/references/theme-css-guide.md
-  - .kiro/skills/marp-slide/references/theme-selection.md
-  deployed_file_hashes:
-    .agents/skills/marp-slide/README.md: sha256:0ae1c6b584b4f12ae2c2010f1a703b8a8c8119d4432b0aae2bd3de8ab9efc716
-    .agents/skills/marp-slide/SKILL.md: sha256:4244be1fd746625cca59d9d04736357c587b270d8840f750b6ac9894886cf2aa
-    .agents/skills/marp-slide/assets/template-basic.md: sha256:0c656adc843f8df8cc395fb605670859a38d3d3abf209aa577f25ea349bd5479
-    .agents/skills/marp-slide/assets/template-business.md: sha256:2e08480b416a28a3de55c5b86cb194d6d8b1d097158e76728e2092b5e736809b
-    .agents/skills/marp-slide/assets/template-colorful.md: sha256:efaf844952d271184cfb0c895fc2e638b48c94ca19b11accf8cce6457563e53f
-    .agents/skills/marp-slide/assets/template-dark.md: sha256:a31a393aeb025a7a55fc3c1bd6d8a094321c39d5337d1b956c652635b74650a3
-    .agents/skills/marp-slide/assets/template-gradient.md: sha256:dedb860f2e30ca62e51a1d2b49c0b51159dd10695b7c58deb3513210349a4dce
-    .agents/skills/marp-slide/assets/template-minimal.md: sha256:fd398a9cd3afbe30d1c061fc5e0ca1a22272f54eba2fdbfa27872e542e1385d6
-    .agents/skills/marp-slide/assets/template-tech.md: sha256:2b9f51b06e39f63f0aa64a4eb41167e7adf31bad1a249f85c311ea271fa340ab
-    .agents/skills/marp-slide/assets/theme-business.css: sha256:0266dc73c523cb50b5a4007f9bf9873180d771c18d44adbade7894f2926ed162
-    .agents/skills/marp-slide/assets/theme-colorful.css: sha256:ac11be3e812c2e937d6de8df8e8529c67b9ea87c4e708926af7d2a586b43f9cb
-    .agents/skills/marp-slide/assets/theme-dark.css: sha256:3619caf6e4bb49bd57cdd2a05d0de1938d2c08d11efda0f758d1ad98dec61fea
-    .agents/skills/marp-slide/assets/theme-default.css: sha256:591cc218c971aca36cffd13274acd1262c25b40a919057db481657afd90b2de3
-    .agents/skills/marp-slide/assets/theme-gradient.css: sha256:729fb211d1dd84b0bee45477d933ebafa2da1ca16e3c438596dbc235b34123e2
-    .agents/skills/marp-slide/assets/theme-minimal.css: sha256:327d0035d7472a5506619e5fd83bbbfbec70350e5cbd2456fb09ba04fe75f473
-    .agents/skills/marp-slide/assets/theme-tech.css: sha256:4a83b08fa36f9b85fc4a6231be4660ca6d29d648dc550d4296e132a3082eaad7
-    .agents/skills/marp-slide/references/advanced-features.md: sha256:ca2e1cfd81c7459b22615131ce1cd8fb49cfa1176f426dd63092101445f9cba4
-    .agents/skills/marp-slide/references/best-practices.md: sha256:651662ce71673edaa7e0282bf392e5f741b7653dd789d8db08291b18cfe6626c
-    .agents/skills/marp-slide/references/image-patterns.md: sha256:4fef8ba8d316cee09eabb133352a4895a84725b0bba33eac0d6c2f32e21d4fd9
-    .agents/skills/marp-slide/references/marp-syntax.md: sha256:6fff73be3fc1d498f7a3691018354db8f4cb276c676909901cc67d7eac5f8f83
-    .agents/skills/marp-slide/references/official-themes.md: sha256:ada377579fa97c87c5b4dfa40ee728a598d4bd6b13460ca572003be3afc5a9ab
-    .agents/skills/marp-slide/references/theme-css-guide.md: sha256:e0c14377b89d473d933d48631ff056a486fe8e56af843ce739cfac23df9f0a13
-    .agents/skills/marp-slide/references/theme-selection.md: sha256:ca4a6704c549944185e2943801d6f79b537902ae6bd7587fe8c3384e7c2334f7
-    .claude/skills/marp-slide/README.md: sha256:0ae1c6b584b4f12ae2c2010f1a703b8a8c8119d4432b0aae2bd3de8ab9efc716
-    .claude/skills/marp-slide/SKILL.md: sha256:4244be1fd746625cca59d9d04736357c587b270d8840f750b6ac9894886cf2aa
-    .claude/skills/marp-slide/assets/template-basic.md: sha256:0c656adc843f8df8cc395fb605670859a38d3d3abf209aa577f25ea349bd5479
-    .claude/skills/marp-slide/assets/template-business.md: sha256:2e08480b416a28a3de55c5b86cb194d6d8b1d097158e76728e2092b5e736809b
-    .claude/skills/marp-slide/assets/template-colorful.md: sha256:efaf844952d271184cfb0c895fc2e638b48c94ca19b11accf8cce6457563e53f
-    .claude/skills/marp-slide/assets/template-dark.md: sha256:a31a393aeb025a7a55fc3c1bd6d8a094321c39d5337d1b956c652635b74650a3
-    .claude/skills/marp-slide/assets/template-gradient.md: sha256:dedb860f2e30ca62e51a1d2b49c0b51159dd10695b7c58deb3513210349a4dce
-    .claude/skills/marp-slide/assets/template-minimal.md: sha256:fd398a9cd3afbe30d1c061fc5e0ca1a22272f54eba2fdbfa27872e542e1385d6
-    .claude/skills/marp-slide/assets/template-tech.md: sha256:2b9f51b06e39f63f0aa64a4eb41167e7adf31bad1a249f85c311ea271fa340ab
-    .claude/skills/marp-slide/assets/theme-business.css: sha256:0266dc73c523cb50b5a4007f9bf9873180d771c18d44adbade7894f2926ed162
-    .claude/skills/marp-slide/assets/theme-colorful.css: sha256:ac11be3e812c2e937d6de8df8e8529c67b9ea87c4e708926af7d2a586b43f9cb
-    .claude/skills/marp-slide/assets/theme-dark.css: sha256:3619caf6e4bb49bd57cdd2a05d0de1938d2c08d11efda0f758d1ad98dec61fea
-    .claude/skills/marp-slide/assets/theme-default.css: sha256:591cc218c971aca36cffd13274acd1262c25b40a919057db481657afd90b2de3
-    .claude/skills/marp-slide/assets/theme-gradient.css: sha256:729fb211d1dd84b0bee45477d933ebafa2da1ca16e3c438596dbc235b34123e2
-    .claude/skills/marp-slide/assets/theme-minimal.css: sha256:327d0035d7472a5506619e5fd83bbbfbec70350e5cbd2456fb09ba04fe75f473
-    .claude/skills/marp-slide/assets/theme-tech.css: sha256:4a83b08fa36f9b85fc4a6231be4660ca6d29d648dc550d4296e132a3082eaad7
-    .claude/skills/marp-slide/references/advanced-features.md: sha256:ca2e1cfd81c7459b22615131ce1cd8fb49cfa1176f426dd63092101445f9cba4
-    .claude/skills/marp-slide/references/best-practices.md: sha256:651662ce71673edaa7e0282bf392e5f741b7653dd789d8db08291b18cfe6626c
-    .claude/skills/marp-slide/references/image-patterns.md: sha256:4fef8ba8d316cee09eabb133352a4895a84725b0bba33eac0d6c2f32e21d4fd9
-    .claude/skills/marp-slide/references/marp-syntax.md: sha256:6fff73be3fc1d498f7a3691018354db8f4cb276c676909901cc67d7eac5f8f83
-    .claude/skills/marp-slide/references/official-themes.md: sha256:ada377579fa97c87c5b4dfa40ee728a598d4bd6b13460ca572003be3afc5a9ab
-    .claude/skills/marp-slide/references/theme-css-guide.md: sha256:e0c14377b89d473d933d48631ff056a486fe8e56af843ce739cfac23df9f0a13
-    .claude/skills/marp-slide/references/theme-selection.md: sha256:ca4a6704c549944185e2943801d6f79b537902ae6bd7587fe8c3384e7c2334f7
-    .kiro/skills/marp-slide/README.md: sha256:0ae1c6b584b4f12ae2c2010f1a703b8a8c8119d4432b0aae2bd3de8ab9efc716
-    .kiro/skills/marp-slide/SKILL.md: sha256:4244be1fd746625cca59d9d04736357c587b270d8840f750b6ac9894886cf2aa
-    .kiro/skills/marp-slide/assets/template-basic.md: sha256:0c656adc843f8df8cc395fb605670859a38d3d3abf209aa577f25ea349bd5479
-    .kiro/skills/marp-slide/assets/template-business.md: sha256:2e08480b416a28a3de55c5b86cb194d6d8b1d097158e76728e2092b5e736809b
-    .kiro/skills/marp-slide/assets/template-colorful.md: sha256:efaf844952d271184cfb0c895fc2e638b48c94ca19b11accf8cce6457563e53f
-    .kiro/skills/marp-slide/assets/template-dark.md: sha256:a31a393aeb025a7a55fc3c1bd6d8a094321c39d5337d1b956c652635b74650a3
-    .kiro/skills/marp-slide/assets/template-gradient.md: sha256:dedb860f2e30ca62e51a1d2b49c0b51159dd10695b7c58deb3513210349a4dce
-    .kiro/skills/marp-slide/assets/template-minimal.md: sha256:fd398a9cd3afbe30d1c061fc5e0ca1a22272f54eba2fdbfa27872e542e1385d6
-    .kiro/skills/marp-slide/assets/template-tech.md: sha256:2b9f51b06e39f63f0aa64a4eb41167e7adf31bad1a249f85c311ea271fa340ab
-    .kiro/skills/marp-slide/assets/theme-business.css: sha256:0266dc73c523cb50b5a4007f9bf9873180d771c18d44adbade7894f2926ed162
-    .kiro/skills/marp-slide/assets/theme-colorful.css: sha256:ac11be3e812c2e937d6de8df8e8529c67b9ea87c4e708926af7d2a586b43f9cb
-    .kiro/skills/marp-slide/assets/theme-dark.css: sha256:3619caf6e4bb49bd57cdd2a05d0de1938d2c08d11efda0f758d1ad98dec61fea
-    .kiro/skills/marp-slide/assets/theme-default.css: sha256:591cc218c971aca36cffd13274acd1262c25b40a919057db481657afd90b2de3
-    .kiro/skills/marp-slide/assets/theme-gradient.css: sha256:729fb211d1dd84b0bee45477d933ebafa2da1ca16e3c438596dbc235b34123e2
-    .kiro/skills/marp-slide/assets/theme-minimal.css: sha256:327d0035d7472a5506619e5fd83bbbfbec70350e5cbd2456fb09ba04fe75f473
-    .kiro/skills/marp-slide/assets/theme-tech.css: sha256:4a83b08fa36f9b85fc4a6231be4660ca6d29d648dc550d4296e132a3082eaad7
-    .kiro/skills/marp-slide/references/advanced-features.md: sha256:ca2e1cfd81c7459b22615131ce1cd8fb49cfa1176f426dd63092101445f9cba4
-    .kiro/skills/marp-slide/references/best-practices.md: sha256:651662ce71673edaa7e0282bf392e5f741b7653dd789d8db08291b18cfe6626c
-    .kiro/skills/marp-slide/references/image-patterns.md: sha256:4fef8ba8d316cee09eabb133352a4895a84725b0bba33eac0d6c2f32e21d4fd9
-    .kiro/skills/marp-slide/references/marp-syntax.md: sha256:6fff73be3fc1d498f7a3691018354db8f4cb276c676909901cc67d7eac5f8f83
-    .kiro/skills/marp-slide/references/official-themes.md: sha256:ada377579fa97c87c5b4dfa40ee728a598d4bd6b13460ca572003be3afc5a9ab
-    .kiro/skills/marp-slide/references/theme-css-guide.md: sha256:e0c14377b89d473d933d48631ff056a486fe8e56af843ce739cfac23df9f0a13
-    .kiro/skills/marp-slide/references/theme-selection.md: sha256:ca4a6704c549944185e2943801d6f79b537902ae6bd7587fe8c3384e7c2334f7
-  content_hash: sha256:eec63ab3e8a2e5a06603146e7b7ef14ce1108a30571d719b85109b1a9b5e8118
-- repo_url: softaworks/agent-toolkit
-  name: agent-toolkit
-  host: github.com
-  resolved_commit: 3027f20f3181758385a1bb8c022d4041dfb4de84
-  version: unknown
   virtual_path: skills/mermaid-diagrams
   is_virtual: true
   package_type: claude_skill
@@ -5477,49 +5200,11 @@ dependencies:
     .kiro/skills/mermaid-diagrams/references/flowcharts.md: sha256:73b599797659ced9211ab947e3d4aee4f3ef2bfb4c1aefcfd6537276d2a21f96
     .kiro/skills/mermaid-diagrams/references/sequence-diagrams.md: sha256:11900f082d21c7e3fc0addcd2bf50689a1c36a5af806207942a2f772cb5e2b3b
   content_hash: sha256:451b0f53d9fe30c19eea0102c8da8c3ec56cf5cce63b97f3d9d9dbf34e1088aa
-- repo_url: tokoroten/prompt-review
-  name: prompt-review
-  host: github.com
-  resolved_commit: 0a83fd9eeead58fe92d0b04522da9e6840a71940
-  version: unknown
-  virtual_path: .claude/skills/prompt-review
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/prompt-review
-  - .agents/skills/prompt-review/SKILL.md
-  - .agents/skills/prompt-review/references/data-sources.md
-  - .agents/skills/prompt-review/references/report-template.md
-  - .agents/skills/prompt-review/scripts/collect.py
-  - .claude/skills/prompt-review
-  - .claude/skills/prompt-review/SKILL.md
-  - .claude/skills/prompt-review/references/data-sources.md
-  - .claude/skills/prompt-review/references/report-template.md
-  - .claude/skills/prompt-review/scripts/collect.py
-  - .kiro/skills/prompt-review
-  - .kiro/skills/prompt-review/SKILL.md
-  - .kiro/skills/prompt-review/references/data-sources.md
-  - .kiro/skills/prompt-review/references/report-template.md
-  - .kiro/skills/prompt-review/scripts/collect.py
-  deployed_file_hashes:
-    .agents/skills/prompt-review/SKILL.md: sha256:7f941ed444c000419751a44ab23961674572f66145c6f6c769d440bf37925960
-    .agents/skills/prompt-review/references/data-sources.md: sha256:b1ab04299f3f97b377a8873a42149f6df8578fea966a7287b72bef8efef94240
-    .agents/skills/prompt-review/references/report-template.md: sha256:e694bb7a6a523a91fac06322445448938869007a8bf52db228962e0ffa89e904
-    .agents/skills/prompt-review/scripts/collect.py: sha256:2ea219d9e04d76d152f42348e2a5743d1c9a7f48168946d52ddd462e2f75cebc
-    .claude/skills/prompt-review/SKILL.md: sha256:7f941ed444c000419751a44ab23961674572f66145c6f6c769d440bf37925960
-    .claude/skills/prompt-review/references/data-sources.md: sha256:b1ab04299f3f97b377a8873a42149f6df8578fea966a7287b72bef8efef94240
-    .claude/skills/prompt-review/references/report-template.md: sha256:e694bb7a6a523a91fac06322445448938869007a8bf52db228962e0ffa89e904
-    .claude/skills/prompt-review/scripts/collect.py: sha256:2ea219d9e04d76d152f42348e2a5743d1c9a7f48168946d52ddd462e2f75cebc
-    .kiro/skills/prompt-review/SKILL.md: sha256:7f941ed444c000419751a44ab23961674572f66145c6f6c769d440bf37925960
-    .kiro/skills/prompt-review/references/data-sources.md: sha256:b1ab04299f3f97b377a8873a42149f6df8578fea966a7287b72bef8efef94240
-    .kiro/skills/prompt-review/references/report-template.md: sha256:e694bb7a6a523a91fac06322445448938869007a8bf52db228962e0ffa89e904
-    .kiro/skills/prompt-review/scripts/collect.py: sha256:2ea219d9e04d76d152f42348e2a5743d1c9a7f48168946d52ddd462e2f75cebc
-  content_hash: sha256:8280504199d448d61d54028fc25f491378172d40e801c356eb9126c37a831a66
 - repo_url: vercel-labs/agent-browser
   name: agent-browser
   host: github.com
   resolved_commit: afae698a51242166170b6fe4809dd57fe9f75798
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/agent-browser
   is_virtual: true
   package_type: claude_skill

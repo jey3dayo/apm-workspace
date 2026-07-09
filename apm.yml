@@ -12,11 +12,9 @@ dependencies:
     - caad-develop/claude-code-marketplace/plugins/service-integrations/mdb-api
     - caad-develop/claude-code-marketplace/plugins/service-integrations/telma-api
     - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-    - EpicenterHQ/epicenter/.agents/skills/tauri
     - Jakubantalik/transitions-dev/skills/transitions-dev
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-dashboard
-    - affaan-m/everything-claude-code/skills/mcp-server-patterns#2bc924faf2f8e893bfe0af86b1931283693c30ae
     - anthropics/claude-code/plugins/frontend-design/skills/frontend-design
     - apollographql/skills/skills/rust-best-practices
     - benjitaylor/agentation/skills/agentation
@@ -29,13 +27,14 @@ dependencies:
     - ibelick/ui-skills/skills/fixing-metadata
     - ibelick/ui-skills/skills/fixing-motion-performance
     - langchain-ai/deepagents/libs/cli/examples/skills/web-research
-    - mattpocock/skills/skills/productivity/grilling
     - mattpocock/skills/skills/engineering/grill-with-docs
     - mattpocock/skills/skills/engineering/wayfinder
+    - mattpocock/skills/skills/productivity/grilling
     - mattpocock/skills/skills/productivity/handoff
     - mattpocock/skills/skills/productivity/writing-great-skills
     - millionco/react-doctor/skills/react-doctor
     - mizchi/skills/meta/empirical-prompt-tuning
+    - modem-dev/hunk/skills/hunk-review
     - nextlevelbuilder/ui-ux-pro-max-skill
     - nyosegawa/skills/skills/skill-auditor
     - obra/superpowers/skills/brainstorming
@@ -52,21 +51,17 @@ dependencies:
     - openai/codex-plugin-cc/plugins/codex/skills/codex-cli-runtime
     - openai/codex-plugin-cc/plugins/codex/skills/codex-result-handling
     - openai/codex-plugin-cc/plugins/codex/skills/gpt-5-4-prompting
-    - openai/skills/skills/.curated/chatgpt-apps
     - openai/skills/skills/.curated/gh-address-comments
     - openai/skills/skills/.curated/gh-fix-ci
     - openai/skills/skills/.curated/linear
     - openai/skills/skills/.curated/screenshot
     - openai/skills/skills/.curated/sentry
-    - softaworks/agent-toolkit/skills/marp-slide
     - softaworks/agent-toolkit/skills/mermaid-diagrams
-    - tokoroten/prompt-review/.claude/skills/prompt-review
     - vercel-labs/agent-browser/skills/agent-browser
     - vercel-labs/agent-skills/skills/composition-patterns
     - vercel-labs/agent-skills/skills/react-best-practices
     - vercel-labs/agent-skills/skills/web-design-guidelines
     - vercel-labs/skills/skills/find-skills
-    - modem-dev/hunk/skills/hunk-review
   mcp:
     - name: context7
       registry: false
