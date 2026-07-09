@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-07-09T17:05:27.529440+00:00'
+generated_at: '2026-07-09T17:22:15.428519+00:00'
 apm_version: 0.22.0
 dependencies:
 - repo_url: Jakubantalik/transitions-dev
@@ -101,10 +101,10 @@ dependencies:
     .kiro/skills/transitions-dev/_root.css: sha256:6ed248a269da79f623729708dabcc3719485d400615a0d91b9f5e9fd307aa33f
   content_hash: sha256:8cf9ba1ed0d52741e4ed1dafc6ee4543e32f1e516f958d750e81412bfc36dd13
 - repo_url: Lum1104/Understand-Anything
-  name: understand
+  name: Understand-Anything
   host: github.com
   resolved_commit: 83c331b9a3e5065135d00c9c89ea6a43b655026c
-  version: 1.0.0
+  version: unknown
   virtual_path: understand-anything-plugin/skills/understand
   is_virtual: true
   package_type: claude_skill
@@ -409,10 +409,10 @@ dependencies:
     .kiro/skills/understand/scan-project.mjs: sha256:d9673ab2b37eaad4df7d5e419d04b95077045d0b09cf4e5d4e330951df62de9b
   content_hash: sha256:192b91ea365e4d4ec8018ac721a9c27a22b081f26d6911388d4ce794bbb435e2
 - repo_url: Lum1104/Understand-Anything
-  name: understand-dashboard
+  name: Understand-Anything
   host: github.com
   resolved_commit: 83c331b9a3e5065135d00c9c89ea6a43b655026c
-  version: 1.0.0
+  version: unknown
   virtual_path: understand-anything-plugin/skills/understand-dashboard
   is_virtual: true
   package_type: claude_skill
@@ -448,80 +448,6 @@ dependencies:
     .claude/skills/frontend-design/SKILL.md: sha256:1608ea77fbb6fc30d13a97d12cfa8ebf31358d40f0dd97beed24829d6b3f45dd
     .kiro/skills/frontend-design/SKILL.md: sha256:1608ea77fbb6fc30d13a97d12cfa8ebf31358d40f0dd97beed24829d6b3f45dd
   content_hash: sha256:3e0be122a3db8206b6d0d6b07cca898b5c75fb9b7b2101abe143fb2851734d2e
-- repo_url: apollographql/skills
-  name: skills
-  host: github.com
-  resolved_commit: 7df6a608dd71f937e664b19183fb60d101bb13a1
-  version: unknown
-  virtual_path: skills/rust-best-practices
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/rust-best-practices
-  - .agents/skills/rust-best-practices/SKILL.md
-  - .agents/skills/rust-best-practices/references/chapter_01.md
-  - .agents/skills/rust-best-practices/references/chapter_02.md
-  - .agents/skills/rust-best-practices/references/chapter_03.md
-  - .agents/skills/rust-best-practices/references/chapter_04.md
-  - .agents/skills/rust-best-practices/references/chapter_05.md
-  - .agents/skills/rust-best-practices/references/chapter_06.md
-  - .agents/skills/rust-best-practices/references/chapter_07.md
-  - .agents/skills/rust-best-practices/references/chapter_08.md
-  - .agents/skills/rust-best-practices/references/chapter_09.md
-  - .claude/skills/rust-best-practices
-  - .claude/skills/rust-best-practices/SKILL.md
-  - .claude/skills/rust-best-practices/references/chapter_01.md
-  - .claude/skills/rust-best-practices/references/chapter_02.md
-  - .claude/skills/rust-best-practices/references/chapter_03.md
-  - .claude/skills/rust-best-practices/references/chapter_04.md
-  - .claude/skills/rust-best-practices/references/chapter_05.md
-  - .claude/skills/rust-best-practices/references/chapter_06.md
-  - .claude/skills/rust-best-practices/references/chapter_07.md
-  - .claude/skills/rust-best-practices/references/chapter_08.md
-  - .claude/skills/rust-best-practices/references/chapter_09.md
-  - .kiro/skills/rust-best-practices
-  - .kiro/skills/rust-best-practices/SKILL.md
-  - .kiro/skills/rust-best-practices/references/chapter_01.md
-  - .kiro/skills/rust-best-practices/references/chapter_02.md
-  - .kiro/skills/rust-best-practices/references/chapter_03.md
-  - .kiro/skills/rust-best-practices/references/chapter_04.md
-  - .kiro/skills/rust-best-practices/references/chapter_05.md
-  - .kiro/skills/rust-best-practices/references/chapter_06.md
-  - .kiro/skills/rust-best-practices/references/chapter_07.md
-  - .kiro/skills/rust-best-practices/references/chapter_08.md
-  - .kiro/skills/rust-best-practices/references/chapter_09.md
-  deployed_file_hashes:
-    .agents/skills/rust-best-practices/SKILL.md: sha256:80eeb8ab3da0c889eaaacf1963e8c6126d02e22fae2d4abd9056b4c16c7cc083
-    .agents/skills/rust-best-practices/references/chapter_01.md: sha256:96130f7b81a525f16824b0fc319d9e7ad3e913e8dcd75cc03e85d3ae83947df4
-    .agents/skills/rust-best-practices/references/chapter_02.md: sha256:05c6495150ea1b3a038555231e1965b75dc4c2499e4c7a784a0a35640eaee579
-    .agents/skills/rust-best-practices/references/chapter_03.md: sha256:160883f80db912c748cb73884942b6824be0599c98b8f16e9256f27fb9a44c6a
-    .agents/skills/rust-best-practices/references/chapter_04.md: sha256:3257b7dfa06698bd59fe2d315b33b22181926d30cda3776bc16c792b51eeb239
-    .agents/skills/rust-best-practices/references/chapter_05.md: sha256:0f976571e145f12c2435de60ec7a8791d9618917ee84fef9c90c0e5e6fe3a198
-    .agents/skills/rust-best-practices/references/chapter_06.md: sha256:c001d3dbffe3e403cfc52ad81e4fe0468416f61add2e140d0f442fee1812049c
-    .agents/skills/rust-best-practices/references/chapter_07.md: sha256:a3c989e1aff99c6de53123ce97f3cf9496e0d68fe4099faabe436758ac1a5475
-    .agents/skills/rust-best-practices/references/chapter_08.md: sha256:c546b765720e9bdd98af1f4ca0818ae1703d0552531d18776b0ce56487cb93cf
-    .agents/skills/rust-best-practices/references/chapter_09.md: sha256:6edd831122b04ee9f11c0a529a9ebddf2d34b5d1d8edef9bd6929d41693ad262
-    .claude/skills/rust-best-practices/SKILL.md: sha256:80eeb8ab3da0c889eaaacf1963e8c6126d02e22fae2d4abd9056b4c16c7cc083
-    .claude/skills/rust-best-practices/references/chapter_01.md: sha256:96130f7b81a525f16824b0fc319d9e7ad3e913e8dcd75cc03e85d3ae83947df4
-    .claude/skills/rust-best-practices/references/chapter_02.md: sha256:05c6495150ea1b3a038555231e1965b75dc4c2499e4c7a784a0a35640eaee579
-    .claude/skills/rust-best-practices/references/chapter_03.md: sha256:160883f80db912c748cb73884942b6824be0599c98b8f16e9256f27fb9a44c6a
-    .claude/skills/rust-best-practices/references/chapter_04.md: sha256:3257b7dfa06698bd59fe2d315b33b22181926d30cda3776bc16c792b51eeb239
-    .claude/skills/rust-best-practices/references/chapter_05.md: sha256:0f976571e145f12c2435de60ec7a8791d9618917ee84fef9c90c0e5e6fe3a198
-    .claude/skills/rust-best-practices/references/chapter_06.md: sha256:c001d3dbffe3e403cfc52ad81e4fe0468416f61add2e140d0f442fee1812049c
-    .claude/skills/rust-best-practices/references/chapter_07.md: sha256:a3c989e1aff99c6de53123ce97f3cf9496e0d68fe4099faabe436758ac1a5475
-    .claude/skills/rust-best-practices/references/chapter_08.md: sha256:c546b765720e9bdd98af1f4ca0818ae1703d0552531d18776b0ce56487cb93cf
-    .claude/skills/rust-best-practices/references/chapter_09.md: sha256:6edd831122b04ee9f11c0a529a9ebddf2d34b5d1d8edef9bd6929d41693ad262
-    .kiro/skills/rust-best-practices/SKILL.md: sha256:80eeb8ab3da0c889eaaacf1963e8c6126d02e22fae2d4abd9056b4c16c7cc083
-    .kiro/skills/rust-best-practices/references/chapter_01.md: sha256:96130f7b81a525f16824b0fc319d9e7ad3e913e8dcd75cc03e85d3ae83947df4
-    .kiro/skills/rust-best-practices/references/chapter_02.md: sha256:05c6495150ea1b3a038555231e1965b75dc4c2499e4c7a784a0a35640eaee579
-    .kiro/skills/rust-best-practices/references/chapter_03.md: sha256:160883f80db912c748cb73884942b6824be0599c98b8f16e9256f27fb9a44c6a
-    .kiro/skills/rust-best-practices/references/chapter_04.md: sha256:3257b7dfa06698bd59fe2d315b33b22181926d30cda3776bc16c792b51eeb239
-    .kiro/skills/rust-best-practices/references/chapter_05.md: sha256:0f976571e145f12c2435de60ec7a8791d9618917ee84fef9c90c0e5e6fe3a198
-    .kiro/skills/rust-best-practices/references/chapter_06.md: sha256:c001d3dbffe3e403cfc52ad81e4fe0468416f61add2e140d0f442fee1812049c
-    .kiro/skills/rust-best-practices/references/chapter_07.md: sha256:a3c989e1aff99c6de53123ce97f3cf9496e0d68fe4099faabe436758ac1a5475
-    .kiro/skills/rust-best-practices/references/chapter_08.md: sha256:c546b765720e9bdd98af1f4ca0818ae1703d0552531d18776b0ce56487cb93cf
-    .kiro/skills/rust-best-practices/references/chapter_09.md: sha256:6edd831122b04ee9f11c0a529a9ebddf2d34b5d1d8edef9bd6929d41693ad262
-  content_hash: sha256:62f6902bb48e44f2cc6d4ccb85d7162eb3752e7a3970a735435df6a4b5913ad4
 - repo_url: benjitaylor/agentation
   name: agentation
   host: github.com
@@ -861,10 +787,10 @@ dependencies:
     .kiro/skills/humanizer-ja/SKILL.md: sha256:3fe07f06a179801d7445eff19ed40f1681ef9860665c50c1e9a032f6dffead89
   content_hash: sha256:b6da4ef92a941ab364ab1ddf259d9e511e098a0719f7ee2202847351c34a8194
 - repo_url: ibelick/ui-skills
-  name: baseline-ui
+  name: ui-skills
   host: github.com
   resolved_commit: 5c5c1ac06503b2807d84067e379c28a75b7b3a44
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/baseline-ui
   is_virtual: true
   package_type: claude_skill
@@ -881,10 +807,10 @@ dependencies:
     .kiro/skills/baseline-ui/SKILL.md: sha256:fea3322f36d58fdafafce2aef56e4556dd2ac7b20876b7dff7d8be7f25fa597f
   content_hash: sha256:dfcb3e778b57ad1cba92375689bb8265fa5aef78fba523a744f5220b3c619901
 - repo_url: ibelick/ui-skills
-  name: fixing-accessibility
+  name: ui-skills
   host: github.com
   resolved_commit: 5c5c1ac06503b2807d84067e379c28a75b7b3a44
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/fixing-accessibility
   is_virtual: true
   package_type: claude_skill
@@ -901,10 +827,10 @@ dependencies:
     .kiro/skills/fixing-accessibility/SKILL.md: sha256:549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf
   content_hash: sha256:4fa8f5a772b4eef3d28a54c136b507d070e54e2c326578f65eaf5e5a0118b38a
 - repo_url: ibelick/ui-skills
-  name: fixing-metadata
+  name: ui-skills
   host: github.com
   resolved_commit: 5c5c1ac06503b2807d84067e379c28a75b7b3a44
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/fixing-metadata
   is_virtual: true
   package_type: claude_skill
@@ -921,10 +847,10 @@ dependencies:
     .kiro/skills/fixing-metadata/SKILL.md: sha256:b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547
   content_hash: sha256:699e13890fb50acffa02dfd2d5b0e719bd916a9e2b7e6035bdc4513fc73d9174
 - repo_url: ibelick/ui-skills
-  name: fixing-motion-performance
+  name: ui-skills
   host: github.com
   resolved_commit: 5c5c1ac06503b2807d84067e379c28a75b7b3a44
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/fixing-motion-performance
   is_virtual: true
   package_type: claude_skill
@@ -2752,10 +2678,10 @@ dependencies:
   package_type: apm_package
   content_hash: sha256:c9adaaf42924bc9edc428c03d4ed3465bdd46305c3437d5f4b1d1ee4346c69fe
 - repo_url: langchain-ai/deepagents
-  name: web-research
+  name: deepagents
   host: github.com
   resolved_commit: b0a209da3a8c9f80e2e3d5e199340736c854c567
-  version: 1.0.0
+  version: unknown
   virtual_path: libs/cli/examples/skills/web-research
   is_virtual: true
   package_type: claude_skill
@@ -2881,7 +2807,7 @@ dependencies:
   name: react-doctor
   host: github.com
   resolved_commit: fd2db30f6ebe0be116d1e028904813c900d3b16f
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/react-doctor
   is_virtual: true
   package_type: claude_skill

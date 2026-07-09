@@ -16,7 +16,6 @@ dependencies:
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-dashboard
     - anthropics/claude-code/plugins/frontend-design/skills/frontend-design
-    - apollographql/skills/skills/rust-best-practices
     - benjitaylor/agentation/skills/agentation
     - benjitaylor/agentation/skills/agentation-self-driving
     - browser-use/browser-harness
