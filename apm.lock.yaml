@@ -1,11 +1,11 @@
 lockfile_version: '1'
-generated_at: '2026-07-07T07:17:35.798995+00:00'
+generated_at: '2026-07-09T04:10:18.160854+00:00'
 apm_version: 0.22.0
 dependencies:
 - repo_url: EpicenterHQ/epicenter
   name: tauri
   host: github.com
-  resolved_commit: b616305c17b5bb93b8c5e0d39c6b7ecd906ee444
+  resolved_commit: c05c0711f80f4d710513b2c1aaac4bfb7bf6d459
   version: 1.0.0
   virtual_path: .agents/skills/tauri
   is_virtual: true
@@ -18,10 +18,10 @@ dependencies:
   - .kiro/skills/tauri
   - .kiro/skills/tauri/SKILL.md
   deployed_file_hashes:
-    .agents/skills/tauri/SKILL.md: sha256:5d472179663c108fd94eaba7d829afae36798a64d5a423b98b862e065a942434
-    .claude/skills/tauri/SKILL.md: sha256:5d472179663c108fd94eaba7d829afae36798a64d5a423b98b862e065a942434
-    .kiro/skills/tauri/SKILL.md: sha256:5d472179663c108fd94eaba7d829afae36798a64d5a423b98b862e065a942434
-  content_hash: sha256:cff69965224c4db6f45a08a20d3a3a90dfc4b9e426cba5dc19e1bc9b9a22bd5b
+    .agents/skills/tauri/SKILL.md: sha256:823e1fc91afa885a25c60696c9eaaa49da69d0fbce37f3f46542c8d4fd531fb9
+    .claude/skills/tauri/SKILL.md: sha256:823e1fc91afa885a25c60696c9eaaa49da69d0fbce37f3f46542c8d4fd531fb9
+    .kiro/skills/tauri/SKILL.md: sha256:823e1fc91afa885a25c60696c9eaaa49da69d0fbce37f3f46542c8d4fd531fb9
+  content_hash: sha256:1e4ae283d9d0afa6f7afe5598c5525e465735dbd245704000088239100752a86
 - repo_url: Jakubantalik/transitions-dev
   name: transitions-dev
   host: github.com
@@ -123,7 +123,7 @@ dependencies:
 - repo_url: Lum1104/Understand-Anything
   name: understand
   host: github.com
-  resolved_commit: 73559a160645359c57be44c174935899dec9f9f2
+  resolved_commit: 9545eb5a433cd97d4a7e2d650aa1ad05886d64ff
   version: 1.0.0
   virtual_path: understand-anything-plugin/skills/understand
   is_virtual: true
@@ -282,7 +282,7 @@ dependencies:
   deployed_file_hashes:
     .agents/skills/understand/SKILL.md: sha256:5733630e48dac1b4449158cf76e06633288182fd1dd943d7da2ed9fc6eac8f73
     .agents/skills/understand/build-fingerprints.mjs: sha256:2ed228677bbf1bda3fba00d4662c8e542caa3d69c5fed911c4878e6382767881
-    .agents/skills/understand/compute-batches.mjs: sha256:2c35a73fbeec6bba90fe07e51dc60f35f4899be53c660c4fa4ae7e4209a39554
+    .agents/skills/understand/compute-batches.mjs: sha256:bf46aad17058e5b6dddac27059ec99df2dadb2f9dceddc5d8e12b9c8a7754c5f
     .agents/skills/understand/extract-import-map.mjs: sha256:5609ab5b8f5ae27c0c4f76610e5008471f9457cf917677a0ff50e41d6b38bc69
     .agents/skills/understand/extract-structure-result.mjs: sha256:1607c3ba45a120db413d724c28d25b28fed8dcefa28ea82cfa1345f180e662a8
     .agents/skills/understand/extract-structure.mjs: sha256:cb078fdb5b3909cf154fe4946f29e9b5efda9b906442b30a14d86130fbc1b383
@@ -331,7 +331,7 @@ dependencies:
     .agents/skills/understand/scan-project.mjs: sha256:d9673ab2b37eaad4df7d5e419d04b95077045d0b09cf4e5d4e330951df62de9b
     .claude/skills/understand/SKILL.md: sha256:5733630e48dac1b4449158cf76e06633288182fd1dd943d7da2ed9fc6eac8f73
     .claude/skills/understand/build-fingerprints.mjs: sha256:2ed228677bbf1bda3fba00d4662c8e542caa3d69c5fed911c4878e6382767881
-    .claude/skills/understand/compute-batches.mjs: sha256:2c35a73fbeec6bba90fe07e51dc60f35f4899be53c660c4fa4ae7e4209a39554
+    .claude/skills/understand/compute-batches.mjs: sha256:bf46aad17058e5b6dddac27059ec99df2dadb2f9dceddc5d8e12b9c8a7754c5f
     .claude/skills/understand/extract-import-map.mjs: sha256:5609ab5b8f5ae27c0c4f76610e5008471f9457cf917677a0ff50e41d6b38bc69
     .claude/skills/understand/extract-structure-result.mjs: sha256:1607c3ba45a120db413d724c28d25b28fed8dcefa28ea82cfa1345f180e662a8
     .claude/skills/understand/extract-structure.mjs: sha256:cb078fdb5b3909cf154fe4946f29e9b5efda9b906442b30a14d86130fbc1b383
@@ -380,7 +380,7 @@ dependencies:
     .claude/skills/understand/scan-project.mjs: sha256:d9673ab2b37eaad4df7d5e419d04b95077045d0b09cf4e5d4e330951df62de9b
     .kiro/skills/understand/SKILL.md: sha256:5733630e48dac1b4449158cf76e06633288182fd1dd943d7da2ed9fc6eac8f73
     .kiro/skills/understand/build-fingerprints.mjs: sha256:2ed228677bbf1bda3fba00d4662c8e542caa3d69c5fed911c4878e6382767881
-    .kiro/skills/understand/compute-batches.mjs: sha256:2c35a73fbeec6bba90fe07e51dc60f35f4899be53c660c4fa4ae7e4209a39554
+    .kiro/skills/understand/compute-batches.mjs: sha256:bf46aad17058e5b6dddac27059ec99df2dadb2f9dceddc5d8e12b9c8a7754c5f
     .kiro/skills/understand/extract-import-map.mjs: sha256:5609ab5b8f5ae27c0c4f76610e5008471f9457cf917677a0ff50e41d6b38bc69
     .kiro/skills/understand/extract-structure-result.mjs: sha256:1607c3ba45a120db413d724c28d25b28fed8dcefa28ea82cfa1345f180e662a8
     .kiro/skills/understand/extract-structure.mjs: sha256:cb078fdb5b3909cf154fe4946f29e9b5efda9b906442b30a14d86130fbc1b383
@@ -427,11 +427,11 @@ dependencies:
     .kiro/skills/understand/merge-batch-graphs.py: sha256:aec850cb49b091d54045f660733e2e5b644b73c012ba9fd15a8c1caae56dbd9f
     .kiro/skills/understand/merge-subdomain-graphs.py: sha256:75aa0967ea8f93ba2538b1f2fcc0a48e6b38f7bcf12de3b42f9733d5dddf0d28
     .kiro/skills/understand/scan-project.mjs: sha256:d9673ab2b37eaad4df7d5e419d04b95077045d0b09cf4e5d4e330951df62de9b
-  content_hash: sha256:d615d48b73814d5b8c9941a3ca5d2bed4956a0a944565973797a5fa3627545b0
+  content_hash: sha256:192b91ea365e4d4ec8018ac721a9c27a22b081f26d6911388d4ce794bbb435e2
 - repo_url: Lum1104/Understand-Anything
   name: understand-dashboard
   host: github.com
-  resolved_commit: 73559a160645359c57be44c174935899dec9f9f2
+  resolved_commit: 9545eb5a433cd97d4a7e2d650aa1ad05886d64ff
   version: 1.0.0
   virtual_path: understand-anything-plugin/skills/understand-dashboard
   is_virtual: true
@@ -472,7 +472,7 @@ dependencies:
 - repo_url: anthropics/claude-code
   name: frontend-design
   host: github.com
-  resolved_commit: 7930e1c82d997b013af28673501f3b95569a71cb
+  resolved_commit: be02c39841a59e2ac1f35ac12285def02acdbb5a
   version: 1.0.0
   virtual_path: plugins/frontend-design/skills/frontend-design
   is_virtual: true
@@ -612,7 +612,7 @@ dependencies:
 - repo_url: browser-use/browser-harness
   name: browser-harness
   host: github.com
-  resolved_commit: 4d75f115c039bf769d614fbd8d996a961e143567
+  resolved_commit: 0846918624ef195df8039af626e65617de3d5711
   version: 0.1.0
   package_type: marketplace_plugin
   deployed_files:
@@ -626,13 +626,13 @@ dependencies:
   - .kiro/skills/browser-harness/SKILL.md
   - .kiro/skills/browser-harness/references/install.md
   deployed_file_hashes:
-    .agents/skills/browser-harness/SKILL.md: sha256:8fc17db5ad566f1f49414dbe3f7bf7bca89ce416146cd3843bfada9f1846380c
+    .agents/skills/browser-harness/SKILL.md: sha256:b329880a7a5ced1c929b306e456dda14f6369ad23435e24dc84dfde0871ece33
     .agents/skills/browser-harness/references/install.md: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
-    .claude/skills/browser-harness/SKILL.md: sha256:8fc17db5ad566f1f49414dbe3f7bf7bca89ce416146cd3843bfada9f1846380c
+    .claude/skills/browser-harness/SKILL.md: sha256:b329880a7a5ced1c929b306e456dda14f6369ad23435e24dc84dfde0871ece33
     .claude/skills/browser-harness/references/install.md: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
-    .kiro/skills/browser-harness/SKILL.md: sha256:8fc17db5ad566f1f49414dbe3f7bf7bca89ce416146cd3843bfada9f1846380c
+    .kiro/skills/browser-harness/SKILL.md: sha256:b329880a7a5ced1c929b306e456dda14f6369ad23435e24dc84dfde0871ece33
     .kiro/skills/browser-harness/references/install.md: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
-  content_hash: sha256:778a392274e55b096529e792c62aaa5725c3be6a1b8e55bd0947ae78d19481ac
+  content_hash: sha256:cb6227aa487205aa4ead9bdc441574130e69fe83a364336544e749d4eb630814
   declared_license: MIT
 - repo_url: caad-develop/claude-code-marketplace
   name: perman-aws-vault
@@ -850,58 +850,6 @@ dependencies:
     .kiro/skills/caad-skill-deployer/references/folder-policy.md: sha256:b70b055285d4372ed91a6d93c95aa454785eb31fbe1e6cd5248499cc69e3be2e
     .kiro/skills/caad-skill-deployer/scripts/inspect_skill_source.py: sha256:6a2215b28f2738b0827c5680ee20a4e822e3457b9b620c397c21136c88a9ee9c
   content_hash: sha256:cb32203710a69564002d0f812dc2e0673a91490ef407e90a13382e1cd48c9306
-- repo_url: cloudflare/skills
-  name: skills
-  host: github.com
-  resolved_commit: 27ce0c0e159225caa7ed30ebefd4107aa6c52497
-  version: unknown
-  virtual_path: skills/workers-best-practices
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/workers-best-practices
-  - .agents/skills/workers-best-practices/SKILL.md
-  - .agents/skills/workers-best-practices/references/review.md
-  - .agents/skills/workers-best-practices/references/rules.md
-  - .claude/skills/workers-best-practices
-  - .claude/skills/workers-best-practices/SKILL.md
-  - .claude/skills/workers-best-practices/references/review.md
-  - .claude/skills/workers-best-practices/references/rules.md
-  - .kiro/skills/workers-best-practices
-  - .kiro/skills/workers-best-practices/SKILL.md
-  - .kiro/skills/workers-best-practices/references/review.md
-  - .kiro/skills/workers-best-practices/references/rules.md
-  deployed_file_hashes:
-    .agents/skills/workers-best-practices/SKILL.md: sha256:099432ff265ff6080327ef0b392c118b835d2a5bda98a7de07e1afd115ed6458
-    .agents/skills/workers-best-practices/references/review.md: sha256:3e32da345be0906d020e5235d01f2b6398a41216900b5370a267e3f17757ade0
-    .agents/skills/workers-best-practices/references/rules.md: sha256:b0273b18c7fa40fadf33262e7da7c8f2a52f2f1240ce66d590e4c31663261380
-    .claude/skills/workers-best-practices/SKILL.md: sha256:099432ff265ff6080327ef0b392c118b835d2a5bda98a7de07e1afd115ed6458
-    .claude/skills/workers-best-practices/references/review.md: sha256:3e32da345be0906d020e5235d01f2b6398a41216900b5370a267e3f17757ade0
-    .claude/skills/workers-best-practices/references/rules.md: sha256:b0273b18c7fa40fadf33262e7da7c8f2a52f2f1240ce66d590e4c31663261380
-    .kiro/skills/workers-best-practices/SKILL.md: sha256:099432ff265ff6080327ef0b392c118b835d2a5bda98a7de07e1afd115ed6458
-    .kiro/skills/workers-best-practices/references/review.md: sha256:3e32da345be0906d020e5235d01f2b6398a41216900b5370a267e3f17757ade0
-    .kiro/skills/workers-best-practices/references/rules.md: sha256:b0273b18c7fa40fadf33262e7da7c8f2a52f2f1240ce66d590e4c31663261380
-  content_hash: sha256:ebd71bed0ade41e2d4839b0d280ec6d93dced0d19f568d27b92da00e4aa9943c
-- repo_url: cloudflare/skills
-  name: skills
-  host: github.com
-  resolved_commit: 27ce0c0e159225caa7ed30ebefd4107aa6c52497
-  version: unknown
-  virtual_path: skills/wrangler
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/wrangler
-  - .agents/skills/wrangler/SKILL.md
-  - .claude/skills/wrangler
-  - .claude/skills/wrangler/SKILL.md
-  - .kiro/skills/wrangler
-  - .kiro/skills/wrangler/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/wrangler/SKILL.md: sha256:42abe11ba6c0cb0c135deed1d591d844838fe0b61fc8c6d675a832435508a61b
-    .claude/skills/wrangler/SKILL.md: sha256:42abe11ba6c0cb0c135deed1d591d844838fe0b61fc8c6d675a832435508a61b
-    .kiro/skills/wrangler/SKILL.md: sha256:42abe11ba6c0cb0c135deed1d591d844838fe0b61fc8c6d675a832435508a61b
-  content_hash: sha256:11edeb37eedb91deedde694b2bb1cc4ff4e8b5a8f1836c217a8c871fe39abcb5
 - repo_url: cursor/plugins
   name: plugins
   host: github.com
@@ -954,10 +902,10 @@ dependencies:
     .kiro/skills/humanizer-ja/SKILL.md: sha256:3fe07f06a179801d7445eff19ed40f1681ef9860665c50c1e9a032f6dffead89
   content_hash: sha256:b6da4ef92a941ab364ab1ddf259d9e511e098a0719f7ee2202847351c34a8194
 - repo_url: ibelick/ui-skills
-  name: ui-skills
+  name: baseline-ui
   host: github.com
-  resolved_commit: 46ef54de56db504c7a568ccddb6acd6ef8dc8815
-  version: unknown
+  resolved_commit: 4f3fd3255ebd9163c5ba46b0a6eeafbef5b64ede
+  version: 1.0.0
   virtual_path: skills/baseline-ui
   is_virtual: true
   package_type: claude_skill
@@ -974,10 +922,10 @@ dependencies:
     .kiro/skills/baseline-ui/SKILL.md: sha256:fea3322f36d58fdafafce2aef56e4556dd2ac7b20876b7dff7d8be7f25fa597f
   content_hash: sha256:dfcb3e778b57ad1cba92375689bb8265fa5aef78fba523a744f5220b3c619901
 - repo_url: ibelick/ui-skills
-  name: ui-skills
+  name: fixing-accessibility
   host: github.com
-  resolved_commit: 46ef54de56db504c7a568ccddb6acd6ef8dc8815
-  version: unknown
+  resolved_commit: 4f3fd3255ebd9163c5ba46b0a6eeafbef5b64ede
+  version: 1.0.0
   virtual_path: skills/fixing-accessibility
   is_virtual: true
   package_type: claude_skill
@@ -994,10 +942,10 @@ dependencies:
     .kiro/skills/fixing-accessibility/SKILL.md: sha256:549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf
   content_hash: sha256:4fa8f5a772b4eef3d28a54c136b507d070e54e2c326578f65eaf5e5a0118b38a
 - repo_url: ibelick/ui-skills
-  name: ui-skills
+  name: fixing-metadata
   host: github.com
-  resolved_commit: 46ef54de56db504c7a568ccddb6acd6ef8dc8815
-  version: unknown
+  resolved_commit: 4f3fd3255ebd9163c5ba46b0a6eeafbef5b64ede
+  version: 1.0.0
   virtual_path: skills/fixing-metadata
   is_virtual: true
   package_type: claude_skill
@@ -1014,10 +962,10 @@ dependencies:
     .kiro/skills/fixing-metadata/SKILL.md: sha256:b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547
   content_hash: sha256:699e13890fb50acffa02dfd2d5b0e719bd916a9e2b7e6035bdc4513fc73d9174
 - repo_url: ibelick/ui-skills
-  name: ui-skills
+  name: fixing-motion-performance
   host: github.com
-  resolved_commit: 46ef54de56db504c7a568ccddb6acd6ef8dc8815
-  version: unknown
+  resolved_commit: 4f3fd3255ebd9163c5ba46b0a6eeafbef5b64ede
+  version: 1.0.0
   virtual_path: skills/fixing-motion-performance
   is_virtual: true
   package_type: claude_skill
@@ -2837,7 +2785,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
-  resolved_commit: 3e4d7d9e8beb6e3e7668a63334b1d267dc69bed2
+  resolved_commit: 484c5ada32cfd8bb8ffafbee6b63565994844628
   resolved_ref: main
   version: 1.0.0
   virtual_path: manual-skills
@@ -2847,7 +2795,7 @@ dependencies:
 - repo_url: langchain-ai/deepagents
   name: web-research
   host: github.com
-  resolved_commit: 7be76c752117e6e61dcdc931ea5147261fad6768
+  resolved_commit: 38446fda649b891dd8604e788701eabe739c1dd0
   version: 1.0.0
   virtual_path: libs/cli/examples/skills/web-research
   is_virtual: true
@@ -2867,7 +2815,7 @@ dependencies:
 - repo_url: mattpocock/skills
   name: grill-with-docs
   host: github.com
-  resolved_commit: 16a2a5cd00b4416f673f4ff38c7971a04dd708e7
+  resolved_commit: d574778f94cf620fcc8ce741584093bc650a61d3
   version: 1.0.0
   virtual_path: skills/engineering/grill-with-docs
   is_virtual: true
@@ -2885,11 +2833,11 @@ dependencies:
     .kiro/skills/grill-with-docs/SKILL.md: sha256:610d091047bcfb9db0f75c057d15538481a721111579fc5ec7f83ad9131a2165
   content_hash: sha256:e7ef25bbee50cda2eb7b3a8ef541db0a0396dad7d369f7d14fb610671dd1864b
 - repo_url: mattpocock/skills
-  name: skills
+  name: wayfinder
   host: github.com
-  resolved_commit: 16a2a5cd00b4416f673f4ff38c7971a04dd708e7
-  version: unknown
-  virtual_path: skills/in-progress/wayfinder
+  resolved_commit: d574778f94cf620fcc8ce741584093bc650a61d3
+  version: 1.0.0
+  virtual_path: skills/engineering/wayfinder
   is_virtual: true
   package_type: claude_skill
   deployed_files:
@@ -2900,14 +2848,34 @@ dependencies:
   - .kiro/skills/wayfinder
   - .kiro/skills/wayfinder/SKILL.md
   deployed_file_hashes:
-    .agents/skills/wayfinder/SKILL.md: sha256:5fcfb0b51b07315b2a635ae2dbad72be2168507153b10582b915ed1a13ccdad7
-    .claude/skills/wayfinder/SKILL.md: sha256:5fcfb0b51b07315b2a635ae2dbad72be2168507153b10582b915ed1a13ccdad7
-    .kiro/skills/wayfinder/SKILL.md: sha256:5fcfb0b51b07315b2a635ae2dbad72be2168507153b10582b915ed1a13ccdad7
-  content_hash: sha256:c4718b3a19aef81696c449a0b950335fca13fb74b5afc6588d1ae0785a42d898
+    .agents/skills/wayfinder/SKILL.md: sha256:bef437de697fb6984a8a90b7fd82f128609148d6e02f635ce419d03555b351e1
+    .claude/skills/wayfinder/SKILL.md: sha256:bef437de697fb6984a8a90b7fd82f128609148d6e02f635ce419d03555b351e1
+    .kiro/skills/wayfinder/SKILL.md: sha256:bef437de697fb6984a8a90b7fd82f128609148d6e02f635ce419d03555b351e1
+  content_hash: sha256:3eb72cd9abdfaa00e10fa69f0b4410ff8639a6cf4eb9e5d187b289c3aa9be2fc
+- repo_url: mattpocock/skills
+  name: grilling
+  host: github.com
+  resolved_commit: d574778f94cf620fcc8ce741584093bc650a61d3
+  version: 1.0.0
+  virtual_path: skills/productivity/grilling
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/grilling
+  - .agents/skills/grilling/SKILL.md
+  - .claude/skills/grilling
+  - .claude/skills/grilling/SKILL.md
+  - .kiro/skills/grilling
+  - .kiro/skills/grilling/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/grilling/SKILL.md: sha256:5a35925d03a391bcfa46940868b649b72dba89ec9c19525e785bbb6bd3a7f478
+    .claude/skills/grilling/SKILL.md: sha256:5a35925d03a391bcfa46940868b649b72dba89ec9c19525e785bbb6bd3a7f478
+    .kiro/skills/grilling/SKILL.md: sha256:5a35925d03a391bcfa46940868b649b72dba89ec9c19525e785bbb6bd3a7f478
+  content_hash: sha256:1de9e777a60b184b29412fadacb7bbde8c14bb7037e5c4d9d086c941281d1742
 - repo_url: mattpocock/skills
   name: handoff
   host: github.com
-  resolved_commit: 16a2a5cd00b4416f673f4ff38c7971a04dd708e7
+  resolved_commit: d574778f94cf620fcc8ce741584093bc650a61d3
   version: 1.0.0
   virtual_path: skills/productivity/handoff
   is_virtual: true
@@ -2920,14 +2888,14 @@ dependencies:
   - .kiro/skills/handoff
   - .kiro/skills/handoff/SKILL.md
   deployed_file_hashes:
-    .agents/skills/handoff/SKILL.md: sha256:94bee8c16cbfcf9f1e15187f7e5d0d5a93c4adb7c512feceecaab80c8ff7c059
-    .claude/skills/handoff/SKILL.md: sha256:94bee8c16cbfcf9f1e15187f7e5d0d5a93c4adb7c512feceecaab80c8ff7c059
-    .kiro/skills/handoff/SKILL.md: sha256:94bee8c16cbfcf9f1e15187f7e5d0d5a93c4adb7c512feceecaab80c8ff7c059
-  content_hash: sha256:5d0f81e38abe6b984e1feaa731927de5291d040982106ac513cf54ec240e00ec
+    .agents/skills/handoff/SKILL.md: sha256:57c9f1f392d7352cdc85b1e39ca49eddc70ce1dc278bd9653fb4f23dfc2560fc
+    .claude/skills/handoff/SKILL.md: sha256:57c9f1f392d7352cdc85b1e39ca49eddc70ce1dc278bd9653fb4f23dfc2560fc
+    .kiro/skills/handoff/SKILL.md: sha256:57c9f1f392d7352cdc85b1e39ca49eddc70ce1dc278bd9653fb4f23dfc2560fc
+  content_hash: sha256:87e353708ab36062eac54ddb593a97ca553c0cb4bfa1ed1fdaf68520700723f1
 - repo_url: mattpocock/skills
   name: writing-great-skills
   host: github.com
-  resolved_commit: 16a2a5cd00b4416f673f4ff38c7971a04dd708e7
+  resolved_commit: d574778f94cf620fcc8ce741584093bc650a61d3
   version: 1.0.0
   virtual_path: skills/productivity/writing-great-skills
   is_virtual: true
@@ -2953,8 +2921,8 @@ dependencies:
 - repo_url: millionco/react-doctor
   name: react-doctor
   host: github.com
-  resolved_commit: 1880b152e4d6aedd5c06cf2ca51783e53cfb4004
-  version: unknown
+  resolved_commit: 0eb5293c1d4f99b4945512827b98a7affee1c66c
+  version: 1.0.0
   virtual_path: skills/react-doctor
   is_virtual: true
   package_type: claude_skill
@@ -3009,10 +2977,10 @@ dependencies:
     .kiro/skills/empirical-prompt-tuning/SKILL.md: sha256:252418e7ef022981d2dda2e3ec57fa1c786d30af68c50b7e062edf1d7361b0cb
   content_hash: sha256:20e7fba93c7267ba6e3a7b27787ca49191b762dffcfb804b01da9183b1b0c891
 - repo_url: modem-dev/hunk
-  name: hunk
+  name: hunk-review
   host: github.com
-  resolved_commit: 9ef9b2e7cad455056cfe1c10757815cb80c7d716
-  version: unknown
+  resolved_commit: 059dd13c8bd27fe503ef59652077edf0041034c8
+  version: 1.0.0
   virtual_path: skills/hunk-review
   is_virtual: true
   package_type: claude_skill
@@ -3261,6 +3229,8 @@ dependencies:
   - .agents/skills/ui-ux-pro-max/data/typography.csv
   - .agents/skills/ui-ux-pro-max/data/ui-reasoning.csv
   - .agents/skills/ui-ux-pro-max/data/ux-guidelines.csv
+  - .agents/skills/ui-ux-pro-max/scripts/__pycache__/core.cpython-314.pyc
+  - .agents/skills/ui-ux-pro-max/scripts/__pycache__/design_system.cpython-314.pyc
   - .agents/skills/ui-ux-pro-max/scripts/core.py
   - .agents/skills/ui-ux-pro-max/scripts/design_system.py
   - .agents/skills/ui-ux-pro-max/scripts/search.py
@@ -3942,6 +3912,8 @@ dependencies:
     .agents/skills/ui-ux-pro-max/data/typography.csv: sha256:dbea262a54e3bfa2e6c3b15989a365d5ef4c43349316aff46635e82ca825adce
     .agents/skills/ui-ux-pro-max/data/ui-reasoning.csv: sha256:06e4369445388ba9b7a57347510b125b7a2145bbf8546a327ba50292503b204a
     .agents/skills/ui-ux-pro-max/data/ux-guidelines.csv: sha256:e01943c433b2cad3040f19389b3b0455673758a569b7a927b5bedf65c989cb96
+    .agents/skills/ui-ux-pro-max/scripts/__pycache__/core.cpython-314.pyc: sha256:b45de79d33201444aaf9d73bc6d1321de6e7827025e5093f41cfc6a27265a83b
+    .agents/skills/ui-ux-pro-max/scripts/__pycache__/design_system.cpython-314.pyc: sha256:59ee2cddee90f9c3e2c444477bab0332ab05a1061eda71701d51b516a446c8b5
     .agents/skills/ui-ux-pro-max/scripts/core.py: sha256:ab9f398b493e34404448cefc766239ee86119c7a21d8581ba965cabdc698b0a8
     .agents/skills/ui-ux-pro-max/scripts/design_system.py: sha256:9de2d4547e1e336d50939fe6ff0910f327d50dc069f1c30e929d64e3a47e87bf
     .agents/skills/ui-ux-pro-max/scripts/search.py: sha256:84d2605d86ff2c69f6313730a0ff8cc91ba834c2ff47e1d730215f943ca5a38e
@@ -4860,10 +4832,10 @@ dependencies:
     .kiro/skills/writing-plans/plan-document-reviewer-prompt.md: sha256:aa728b96aad603c8be28875a4305637f6c984aa81ffcadcb13e743202fa2a0c7
   content_hash: sha256:56ce74d3f05986ea81295d3789adb71bf03845d05d182883fc5e56bf367c6af7
 - repo_url: openai/codex-plugin-cc
-  name: codex-plugin-cc
+  name: codex-cli-runtime
   host: github.com
-  resolved_commit: 80c31f99570876c3ef40327838b0a2ca1ae2cd9c
-  version: unknown
+  resolved_commit: db52e28f4d9ded852ab3942cea316258ae4ef346
+  version: 1.0.0
   virtual_path: plugins/codex/skills/codex-cli-runtime
   is_virtual: true
   package_type: claude_skill
@@ -4880,10 +4852,10 @@ dependencies:
     .kiro/skills/codex-cli-runtime/SKILL.md: sha256:cce11c3bd6d7b5ec6277b3527e65ff38c5bd16084b436bf2870fabb30414359c
   content_hash: sha256:03b09f8ad5721f1d33d830cff54637656c58920befcb32835c6f003e625a7a54
 - repo_url: openai/codex-plugin-cc
-  name: codex-plugin-cc
+  name: codex-result-handling
   host: github.com
-  resolved_commit: 80c31f99570876c3ef40327838b0a2ca1ae2cd9c
-  version: unknown
+  resolved_commit: db52e28f4d9ded852ab3942cea316258ae4ef346
+  version: 1.0.0
   virtual_path: plugins/codex/skills/codex-result-handling
   is_virtual: true
   package_type: claude_skill
@@ -4900,10 +4872,10 @@ dependencies:
     .kiro/skills/codex-result-handling/SKILL.md: sha256:99fcbbebaeac1e1504b8adfba513bd5964e171414f6709034f3f980a1f2385a8
   content_hash: sha256:1ca05b8eb3e45816b428dc71e24355a89a8f997502ade309e0c53a06adb1b1e7
 - repo_url: openai/codex-plugin-cc
-  name: codex-plugin-cc
+  name: gpt-5-4-prompting
   host: github.com
-  resolved_commit: 80c31f99570876c3ef40327838b0a2ca1ae2cd9c
-  version: unknown
+  resolved_commit: db52e28f4d9ded852ab3942cea316258ae4ef346
+  version: 1.0.0
   virtual_path: plugins/codex/skills/gpt-5-4-prompting
   is_virtual: true
   package_type: claude_skill
@@ -5543,503 +5515,11 @@ dependencies:
     .kiro/skills/prompt-review/references/report-template.md: sha256:e694bb7a6a523a91fac06322445448938869007a8bf52db228962e0ffa89e904
     .kiro/skills/prompt-review/scripts/collect.py: sha256:2ea219d9e04d76d152f42348e2a5743d1c9a7f48168946d52ddd462e2f75cebc
   content_hash: sha256:8280504199d448d61d54028fc25f491378172d40e801c356eb9126c37a831a66
-- repo_url: trailofbits/skills
-  name: agentic-actions-auditor
-  host: github.com
-  resolved_commit: cfe5d7b1619e47fb5b38b7e2561dad7e5f1e89af
-  version: 1.2.1
-  virtual_path: plugins/agentic-actions-auditor
-  is_virtual: true
-  package_type: marketplace_plugin
-  deployed_files:
-  - .agents/skills/agentic-actions-auditor
-  - .agents/skills/agentic-actions-auditor/SKILL.md
-  - .agents/skills/agentic-actions-auditor/agents/openai.yaml
-  - .agents/skills/agentic-actions-auditor/assets/trail-of-bits-mark.svg
-  - .agents/skills/agentic-actions-auditor/references/action-profiles.md
-  - .agents/skills/agentic-actions-auditor/references/cross-file-resolution.md
-  - .agents/skills/agentic-actions-auditor/references/foundations.md
-  - .agents/skills/agentic-actions-auditor/references/vector-a-env-var-intermediary.md
-  - .agents/skills/agentic-actions-auditor/references/vector-b-direct-expression-injection.md
-  - .agents/skills/agentic-actions-auditor/references/vector-c-cli-data-fetch.md
-  - .agents/skills/agentic-actions-auditor/references/vector-d-pr-target-checkout.md
-  - .agents/skills/agentic-actions-auditor/references/vector-e-error-log-injection.md
-  - .agents/skills/agentic-actions-auditor/references/vector-f-subshell-expansion.md
-  - .agents/skills/agentic-actions-auditor/references/vector-g-eval-of-ai-output.md
-  - .agents/skills/agentic-actions-auditor/references/vector-h-dangerous-sandbox-configs.md
-  - .agents/skills/agentic-actions-auditor/references/vector-i-wildcard-allowlists.md
-  - .claude/skills/agentic-actions-auditor
-  - .claude/skills/agentic-actions-auditor/SKILL.md
-  - .claude/skills/agentic-actions-auditor/agents/openai.yaml
-  - .claude/skills/agentic-actions-auditor/assets/trail-of-bits-mark.svg
-  - .claude/skills/agentic-actions-auditor/references/action-profiles.md
-  - .claude/skills/agentic-actions-auditor/references/cross-file-resolution.md
-  - .claude/skills/agentic-actions-auditor/references/foundations.md
-  - .claude/skills/agentic-actions-auditor/references/vector-a-env-var-intermediary.md
-  - .claude/skills/agentic-actions-auditor/references/vector-b-direct-expression-injection.md
-  - .claude/skills/agentic-actions-auditor/references/vector-c-cli-data-fetch.md
-  - .claude/skills/agentic-actions-auditor/references/vector-d-pr-target-checkout.md
-  - .claude/skills/agentic-actions-auditor/references/vector-e-error-log-injection.md
-  - .claude/skills/agentic-actions-auditor/references/vector-f-subshell-expansion.md
-  - .claude/skills/agentic-actions-auditor/references/vector-g-eval-of-ai-output.md
-  - .claude/skills/agentic-actions-auditor/references/vector-h-dangerous-sandbox-configs.md
-  - .claude/skills/agentic-actions-auditor/references/vector-i-wildcard-allowlists.md
-  - .kiro/skills/agentic-actions-auditor
-  - .kiro/skills/agentic-actions-auditor/SKILL.md
-  - .kiro/skills/agentic-actions-auditor/agents/openai.yaml
-  - .kiro/skills/agentic-actions-auditor/assets/trail-of-bits-mark.svg
-  - .kiro/skills/agentic-actions-auditor/references/action-profiles.md
-  - .kiro/skills/agentic-actions-auditor/references/cross-file-resolution.md
-  - .kiro/skills/agentic-actions-auditor/references/foundations.md
-  - .kiro/skills/agentic-actions-auditor/references/vector-a-env-var-intermediary.md
-  - .kiro/skills/agentic-actions-auditor/references/vector-b-direct-expression-injection.md
-  - .kiro/skills/agentic-actions-auditor/references/vector-c-cli-data-fetch.md
-  - .kiro/skills/agentic-actions-auditor/references/vector-d-pr-target-checkout.md
-  - .kiro/skills/agentic-actions-auditor/references/vector-e-error-log-injection.md
-  - .kiro/skills/agentic-actions-auditor/references/vector-f-subshell-expansion.md
-  - .kiro/skills/agentic-actions-auditor/references/vector-g-eval-of-ai-output.md
-  - .kiro/skills/agentic-actions-auditor/references/vector-h-dangerous-sandbox-configs.md
-  - .kiro/skills/agentic-actions-auditor/references/vector-i-wildcard-allowlists.md
-  deployed_file_hashes:
-    .agents/skills/agentic-actions-auditor/SKILL.md: sha256:80e36ab06e3ee667ac45bab036ed395fc425c4d54fa72c4b4981a5b982a389aa
-    .agents/skills/agentic-actions-auditor/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .agents/skills/agentic-actions-auditor/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .agents/skills/agentic-actions-auditor/references/action-profiles.md: sha256:ea75573060fe7e7a4e06d39c45487609d2ff5b583159a2b0d073d244ff5f81cb
-    .agents/skills/agentic-actions-auditor/references/cross-file-resolution.md: sha256:c15a46bb0695ecc07512ac4007231169301001e5733a720c6ad75606ae5bee95
-    .agents/skills/agentic-actions-auditor/references/foundations.md: sha256:9e0eb90b3bfb53e195251685b1291bdd1d75e07d6c60e634ecb28f72b1723bf3
-    .agents/skills/agentic-actions-auditor/references/vector-a-env-var-intermediary.md: sha256:7903992f54409760aae64ddb45bb3c26032223443f746ac6e3d8fd281bda877d
-    .agents/skills/agentic-actions-auditor/references/vector-b-direct-expression-injection.md: sha256:d074c95ee282d56e0174beae3d109ce088f6a8f032d9bd16e523ec2d1d7d94c7
-    .agents/skills/agentic-actions-auditor/references/vector-c-cli-data-fetch.md: sha256:f11d2333f2b3800215311047c0b0ad35a1020c79dbb77614ff66a8c1fef16252
-    .agents/skills/agentic-actions-auditor/references/vector-d-pr-target-checkout.md: sha256:fc029037bb219aed5e130708eb4911ad235e47f1394e2155b5e40175ddb2d187
-    .agents/skills/agentic-actions-auditor/references/vector-e-error-log-injection.md: sha256:2c93623d96f49c4ab70bc2dd92e111b2cfca68ff70aaf579efd86812b0df15a9
-    .agents/skills/agentic-actions-auditor/references/vector-f-subshell-expansion.md: sha256:a9345ace4af2dd167b4bcbeb1864c5883e6186752ded08bcefa9c0182f514dc3
-    .agents/skills/agentic-actions-auditor/references/vector-g-eval-of-ai-output.md: sha256:b9a47a41dd1470cc469cc030cd6cd6059b35741c78ba9f494c1d18b2fd65b686
-    .agents/skills/agentic-actions-auditor/references/vector-h-dangerous-sandbox-configs.md: sha256:278df9befc36f231dea2e4d2bf00311657056fa7b87a1a49b0e0e23a141d5935
-    .agents/skills/agentic-actions-auditor/references/vector-i-wildcard-allowlists.md: sha256:68a4cd774ad829e535a8ec15ee492caefbae8e46f115f345b7f2bf2fecf88f86
-    .claude/skills/agentic-actions-auditor/SKILL.md: sha256:80e36ab06e3ee667ac45bab036ed395fc425c4d54fa72c4b4981a5b982a389aa
-    .claude/skills/agentic-actions-auditor/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .claude/skills/agentic-actions-auditor/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .claude/skills/agentic-actions-auditor/references/action-profiles.md: sha256:ea75573060fe7e7a4e06d39c45487609d2ff5b583159a2b0d073d244ff5f81cb
-    .claude/skills/agentic-actions-auditor/references/cross-file-resolution.md: sha256:c15a46bb0695ecc07512ac4007231169301001e5733a720c6ad75606ae5bee95
-    .claude/skills/agentic-actions-auditor/references/foundations.md: sha256:9e0eb90b3bfb53e195251685b1291bdd1d75e07d6c60e634ecb28f72b1723bf3
-    .claude/skills/agentic-actions-auditor/references/vector-a-env-var-intermediary.md: sha256:7903992f54409760aae64ddb45bb3c26032223443f746ac6e3d8fd281bda877d
-    .claude/skills/agentic-actions-auditor/references/vector-b-direct-expression-injection.md: sha256:d074c95ee282d56e0174beae3d109ce088f6a8f032d9bd16e523ec2d1d7d94c7
-    .claude/skills/agentic-actions-auditor/references/vector-c-cli-data-fetch.md: sha256:f11d2333f2b3800215311047c0b0ad35a1020c79dbb77614ff66a8c1fef16252
-    .claude/skills/agentic-actions-auditor/references/vector-d-pr-target-checkout.md: sha256:fc029037bb219aed5e130708eb4911ad235e47f1394e2155b5e40175ddb2d187
-    .claude/skills/agentic-actions-auditor/references/vector-e-error-log-injection.md: sha256:2c93623d96f49c4ab70bc2dd92e111b2cfca68ff70aaf579efd86812b0df15a9
-    .claude/skills/agentic-actions-auditor/references/vector-f-subshell-expansion.md: sha256:a9345ace4af2dd167b4bcbeb1864c5883e6186752ded08bcefa9c0182f514dc3
-    .claude/skills/agentic-actions-auditor/references/vector-g-eval-of-ai-output.md: sha256:b9a47a41dd1470cc469cc030cd6cd6059b35741c78ba9f494c1d18b2fd65b686
-    .claude/skills/agentic-actions-auditor/references/vector-h-dangerous-sandbox-configs.md: sha256:278df9befc36f231dea2e4d2bf00311657056fa7b87a1a49b0e0e23a141d5935
-    .claude/skills/agentic-actions-auditor/references/vector-i-wildcard-allowlists.md: sha256:68a4cd774ad829e535a8ec15ee492caefbae8e46f115f345b7f2bf2fecf88f86
-    .kiro/skills/agentic-actions-auditor/SKILL.md: sha256:80e36ab06e3ee667ac45bab036ed395fc425c4d54fa72c4b4981a5b982a389aa
-    .kiro/skills/agentic-actions-auditor/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .kiro/skills/agentic-actions-auditor/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .kiro/skills/agentic-actions-auditor/references/action-profiles.md: sha256:ea75573060fe7e7a4e06d39c45487609d2ff5b583159a2b0d073d244ff5f81cb
-    .kiro/skills/agentic-actions-auditor/references/cross-file-resolution.md: sha256:c15a46bb0695ecc07512ac4007231169301001e5733a720c6ad75606ae5bee95
-    .kiro/skills/agentic-actions-auditor/references/foundations.md: sha256:9e0eb90b3bfb53e195251685b1291bdd1d75e07d6c60e634ecb28f72b1723bf3
-    .kiro/skills/agentic-actions-auditor/references/vector-a-env-var-intermediary.md: sha256:7903992f54409760aae64ddb45bb3c26032223443f746ac6e3d8fd281bda877d
-    .kiro/skills/agentic-actions-auditor/references/vector-b-direct-expression-injection.md: sha256:d074c95ee282d56e0174beae3d109ce088f6a8f032d9bd16e523ec2d1d7d94c7
-    .kiro/skills/agentic-actions-auditor/references/vector-c-cli-data-fetch.md: sha256:f11d2333f2b3800215311047c0b0ad35a1020c79dbb77614ff66a8c1fef16252
-    .kiro/skills/agentic-actions-auditor/references/vector-d-pr-target-checkout.md: sha256:fc029037bb219aed5e130708eb4911ad235e47f1394e2155b5e40175ddb2d187
-    .kiro/skills/agentic-actions-auditor/references/vector-e-error-log-injection.md: sha256:2c93623d96f49c4ab70bc2dd92e111b2cfca68ff70aaf579efd86812b0df15a9
-    .kiro/skills/agentic-actions-auditor/references/vector-f-subshell-expansion.md: sha256:a9345ace4af2dd167b4bcbeb1864c5883e6186752ded08bcefa9c0182f514dc3
-    .kiro/skills/agentic-actions-auditor/references/vector-g-eval-of-ai-output.md: sha256:b9a47a41dd1470cc469cc030cd6cd6059b35741c78ba9f494c1d18b2fd65b686
-    .kiro/skills/agentic-actions-auditor/references/vector-h-dangerous-sandbox-configs.md: sha256:278df9befc36f231dea2e4d2bf00311657056fa7b87a1a49b0e0e23a141d5935
-    .kiro/skills/agentic-actions-auditor/references/vector-i-wildcard-allowlists.md: sha256:68a4cd774ad829e535a8ec15ee492caefbae8e46f115f345b7f2bf2fecf88f86
-  content_hash: sha256:68dfe0a1986f7a0a6cc55935bc0d6392b36b137c28f20280fead610e361e55b8
-- repo_url: trailofbits/skills
-  name: sharp-edges
-  host: github.com
-  resolved_commit: cfe5d7b1619e47fb5b38b7e2561dad7e5f1e89af
-  version: 1.1.1
-  virtual_path: plugins/sharp-edges
-  is_virtual: true
-  package_type: marketplace_plugin
-  deployed_files:
-  - .agents/skills/sharp-edges
-  - .agents/skills/sharp-edges/SKILL.md
-  - .agents/skills/sharp-edges/agents/openai.yaml
-  - .agents/skills/sharp-edges/assets/trail-of-bits-mark.svg
-  - .agents/skills/sharp-edges/references/auth-patterns.md
-  - .agents/skills/sharp-edges/references/case-studies.md
-  - .agents/skills/sharp-edges/references/config-patterns.md
-  - .agents/skills/sharp-edges/references/crypto-apis.md
-  - .agents/skills/sharp-edges/references/lang-c.md
-  - .agents/skills/sharp-edges/references/lang-csharp.md
-  - .agents/skills/sharp-edges/references/lang-go.md
-  - .agents/skills/sharp-edges/references/lang-java.md
-  - .agents/skills/sharp-edges/references/lang-javascript.md
-  - .agents/skills/sharp-edges/references/lang-kotlin.md
-  - .agents/skills/sharp-edges/references/lang-php.md
-  - .agents/skills/sharp-edges/references/lang-python.md
-  - .agents/skills/sharp-edges/references/lang-ruby.md
-  - .agents/skills/sharp-edges/references/lang-rust.md
-  - .agents/skills/sharp-edges/references/lang-swift.md
-  - .agents/skills/sharp-edges/references/language-specific.md
-  - .claude/agents/sharp-edges-analyzer.md
-  - .claude/skills/sharp-edges
-  - .claude/skills/sharp-edges/SKILL.md
-  - .claude/skills/sharp-edges/agents/openai.yaml
-  - .claude/skills/sharp-edges/assets/trail-of-bits-mark.svg
-  - .claude/skills/sharp-edges/references/auth-patterns.md
-  - .claude/skills/sharp-edges/references/case-studies.md
-  - .claude/skills/sharp-edges/references/config-patterns.md
-  - .claude/skills/sharp-edges/references/crypto-apis.md
-  - .claude/skills/sharp-edges/references/lang-c.md
-  - .claude/skills/sharp-edges/references/lang-csharp.md
-  - .claude/skills/sharp-edges/references/lang-go.md
-  - .claude/skills/sharp-edges/references/lang-java.md
-  - .claude/skills/sharp-edges/references/lang-javascript.md
-  - .claude/skills/sharp-edges/references/lang-kotlin.md
-  - .claude/skills/sharp-edges/references/lang-php.md
-  - .claude/skills/sharp-edges/references/lang-python.md
-  - .claude/skills/sharp-edges/references/lang-ruby.md
-  - .claude/skills/sharp-edges/references/lang-rust.md
-  - .claude/skills/sharp-edges/references/lang-swift.md
-  - .claude/skills/sharp-edges/references/language-specific.md
-  - .config/opencode/agents/sharp-edges-analyzer.md
-  - .copilot/agents/sharp-edges-analyzer.agent.md
-  - .cursor/agents/sharp-edges-analyzer.md
-  - .kiro/skills/sharp-edges
-  - .kiro/skills/sharp-edges/SKILL.md
-  - .kiro/skills/sharp-edges/agents/openai.yaml
-  - .kiro/skills/sharp-edges/assets/trail-of-bits-mark.svg
-  - .kiro/skills/sharp-edges/references/auth-patterns.md
-  - .kiro/skills/sharp-edges/references/case-studies.md
-  - .kiro/skills/sharp-edges/references/config-patterns.md
-  - .kiro/skills/sharp-edges/references/crypto-apis.md
-  - .kiro/skills/sharp-edges/references/lang-c.md
-  - .kiro/skills/sharp-edges/references/lang-csharp.md
-  - .kiro/skills/sharp-edges/references/lang-go.md
-  - .kiro/skills/sharp-edges/references/lang-java.md
-  - .kiro/skills/sharp-edges/references/lang-javascript.md
-  - .kiro/skills/sharp-edges/references/lang-kotlin.md
-  - .kiro/skills/sharp-edges/references/lang-php.md
-  - .kiro/skills/sharp-edges/references/lang-python.md
-  - .kiro/skills/sharp-edges/references/lang-ruby.md
-  - .kiro/skills/sharp-edges/references/lang-rust.md
-  - .kiro/skills/sharp-edges/references/lang-swift.md
-  - .kiro/skills/sharp-edges/references/language-specific.md
-  deployed_file_hashes:
-    .agents/skills/sharp-edges/SKILL.md: sha256:3b69a709c2f8f0cfcf57d40a3186e166f307865cc8ed924be4098e549a121e9c
-    .agents/skills/sharp-edges/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .agents/skills/sharp-edges/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .agents/skills/sharp-edges/references/auth-patterns.md: sha256:1fbf526ca1db7204f9ebb1bf4eb3c48c544676623d23e5d28e01f6f63c355be2
-    .agents/skills/sharp-edges/references/case-studies.md: sha256:2e81a320728b4597bf84c490176d5bf212f1e6ba6f87aafba61ad1734de35332
-    .agents/skills/sharp-edges/references/config-patterns.md: sha256:1d99f2716f7bef18efe71015ce0c56e0f4961c042faa503d796d6d4d1626fdc6
-    .agents/skills/sharp-edges/references/crypto-apis.md: sha256:8baddc83a1f964d6d8b15678d60a37c93029c18dc162bd7c00895e585ff1a825
-    .agents/skills/sharp-edges/references/lang-c.md: sha256:d077d711c73749c924eae81c06018b14bbf1ec9b93d71723c472b43df5d7d5ae
-    .agents/skills/sharp-edges/references/lang-csharp.md: sha256:8fa9e93d36c0e1397b7ca81307163370fc43cf700215b7c6d7aa1b09fdb91fb4
-    .agents/skills/sharp-edges/references/lang-go.md: sha256:839c0e7b4e3fa2f3b37c651e926aa59d69d20bfef5e67f569eedacf11354844d
-    .agents/skills/sharp-edges/references/lang-java.md: sha256:3b93b6049f7e0e356a1ffebc0b4642f3cef315d90be45b63e15c8c4814f9ebeb
-    .agents/skills/sharp-edges/references/lang-javascript.md: sha256:cf72f55d31318666942a8d1d64340befc3c4e7223afc2ca196e6a776ffa4c895
-    .agents/skills/sharp-edges/references/lang-kotlin.md: sha256:c891148c10a4941c3396416a10ac64512eb3a9e13ea5eeaec3902da4b51501dd
-    .agents/skills/sharp-edges/references/lang-php.md: sha256:7960d9773874cf06c5b470a5ca3ab406d896e66b71e713d809bc1ecfcab63485
-    .agents/skills/sharp-edges/references/lang-python.md: sha256:36543becc25b4e3f41eaedcab62e9b204657e6742b8ac95e405bcd040d33bf03
-    .agents/skills/sharp-edges/references/lang-ruby.md: sha256:d9ba749caaccb8a3bb39e2199b2062c0957cf48739218ba8022d49be5cba2088
-    .agents/skills/sharp-edges/references/lang-rust.md: sha256:3d14993ea70b2b2df3fc0f388cbd1631470895c27ccbd9d764296d1da8f5b6ee
-    .agents/skills/sharp-edges/references/lang-swift.md: sha256:a64ab8692db0f3e43526088c63c7fdcb7354d1b24e6fe7ca759aea3260890e04
-    .agents/skills/sharp-edges/references/language-specific.md: sha256:4522b4a37cfd7d3aa689209dfd4569f3b39074bd1f5987a36a6e819f501141b6
-    .claude/agents/sharp-edges-analyzer.md: sha256:c9df773b4a8a56ed88179ef46b8b4eada44092fe4227a683d37bd5219bcbbdae
-    .claude/skills/sharp-edges/SKILL.md: sha256:3b69a709c2f8f0cfcf57d40a3186e166f307865cc8ed924be4098e549a121e9c
-    .claude/skills/sharp-edges/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .claude/skills/sharp-edges/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .claude/skills/sharp-edges/references/auth-patterns.md: sha256:1fbf526ca1db7204f9ebb1bf4eb3c48c544676623d23e5d28e01f6f63c355be2
-    .claude/skills/sharp-edges/references/case-studies.md: sha256:2e81a320728b4597bf84c490176d5bf212f1e6ba6f87aafba61ad1734de35332
-    .claude/skills/sharp-edges/references/config-patterns.md: sha256:1d99f2716f7bef18efe71015ce0c56e0f4961c042faa503d796d6d4d1626fdc6
-    .claude/skills/sharp-edges/references/crypto-apis.md: sha256:8baddc83a1f964d6d8b15678d60a37c93029c18dc162bd7c00895e585ff1a825
-    .claude/skills/sharp-edges/references/lang-c.md: sha256:d077d711c73749c924eae81c06018b14bbf1ec9b93d71723c472b43df5d7d5ae
-    .claude/skills/sharp-edges/references/lang-csharp.md: sha256:8fa9e93d36c0e1397b7ca81307163370fc43cf700215b7c6d7aa1b09fdb91fb4
-    .claude/skills/sharp-edges/references/lang-go.md: sha256:839c0e7b4e3fa2f3b37c651e926aa59d69d20bfef5e67f569eedacf11354844d
-    .claude/skills/sharp-edges/references/lang-java.md: sha256:3b93b6049f7e0e356a1ffebc0b4642f3cef315d90be45b63e15c8c4814f9ebeb
-    .claude/skills/sharp-edges/references/lang-javascript.md: sha256:cf72f55d31318666942a8d1d64340befc3c4e7223afc2ca196e6a776ffa4c895
-    .claude/skills/sharp-edges/references/lang-kotlin.md: sha256:c891148c10a4941c3396416a10ac64512eb3a9e13ea5eeaec3902da4b51501dd
-    .claude/skills/sharp-edges/references/lang-php.md: sha256:7960d9773874cf06c5b470a5ca3ab406d896e66b71e713d809bc1ecfcab63485
-    .claude/skills/sharp-edges/references/lang-python.md: sha256:36543becc25b4e3f41eaedcab62e9b204657e6742b8ac95e405bcd040d33bf03
-    .claude/skills/sharp-edges/references/lang-ruby.md: sha256:d9ba749caaccb8a3bb39e2199b2062c0957cf48739218ba8022d49be5cba2088
-    .claude/skills/sharp-edges/references/lang-rust.md: sha256:3d14993ea70b2b2df3fc0f388cbd1631470895c27ccbd9d764296d1da8f5b6ee
-    .claude/skills/sharp-edges/references/lang-swift.md: sha256:a64ab8692db0f3e43526088c63c7fdcb7354d1b24e6fe7ca759aea3260890e04
-    .claude/skills/sharp-edges/references/language-specific.md: sha256:4522b4a37cfd7d3aa689209dfd4569f3b39074bd1f5987a36a6e819f501141b6
-    .config/opencode/agents/sharp-edges-analyzer.md: sha256:c9df773b4a8a56ed88179ef46b8b4eada44092fe4227a683d37bd5219bcbbdae
-    .copilot/agents/sharp-edges-analyzer.agent.md: sha256:c9df773b4a8a56ed88179ef46b8b4eada44092fe4227a683d37bd5219bcbbdae
-    .cursor/agents/sharp-edges-analyzer.md: sha256:c9df773b4a8a56ed88179ef46b8b4eada44092fe4227a683d37bd5219bcbbdae
-    .kiro/skills/sharp-edges/SKILL.md: sha256:3b69a709c2f8f0cfcf57d40a3186e166f307865cc8ed924be4098e549a121e9c
-    .kiro/skills/sharp-edges/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .kiro/skills/sharp-edges/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .kiro/skills/sharp-edges/references/auth-patterns.md: sha256:1fbf526ca1db7204f9ebb1bf4eb3c48c544676623d23e5d28e01f6f63c355be2
-    .kiro/skills/sharp-edges/references/case-studies.md: sha256:2e81a320728b4597bf84c490176d5bf212f1e6ba6f87aafba61ad1734de35332
-    .kiro/skills/sharp-edges/references/config-patterns.md: sha256:1d99f2716f7bef18efe71015ce0c56e0f4961c042faa503d796d6d4d1626fdc6
-    .kiro/skills/sharp-edges/references/crypto-apis.md: sha256:8baddc83a1f964d6d8b15678d60a37c93029c18dc162bd7c00895e585ff1a825
-    .kiro/skills/sharp-edges/references/lang-c.md: sha256:d077d711c73749c924eae81c06018b14bbf1ec9b93d71723c472b43df5d7d5ae
-    .kiro/skills/sharp-edges/references/lang-csharp.md: sha256:8fa9e93d36c0e1397b7ca81307163370fc43cf700215b7c6d7aa1b09fdb91fb4
-    .kiro/skills/sharp-edges/references/lang-go.md: sha256:839c0e7b4e3fa2f3b37c651e926aa59d69d20bfef5e67f569eedacf11354844d
-    .kiro/skills/sharp-edges/references/lang-java.md: sha256:3b93b6049f7e0e356a1ffebc0b4642f3cef315d90be45b63e15c8c4814f9ebeb
-    .kiro/skills/sharp-edges/references/lang-javascript.md: sha256:cf72f55d31318666942a8d1d64340befc3c4e7223afc2ca196e6a776ffa4c895
-    .kiro/skills/sharp-edges/references/lang-kotlin.md: sha256:c891148c10a4941c3396416a10ac64512eb3a9e13ea5eeaec3902da4b51501dd
-    .kiro/skills/sharp-edges/references/lang-php.md: sha256:7960d9773874cf06c5b470a5ca3ab406d896e66b71e713d809bc1ecfcab63485
-    .kiro/skills/sharp-edges/references/lang-python.md: sha256:36543becc25b4e3f41eaedcab62e9b204657e6742b8ac95e405bcd040d33bf03
-    .kiro/skills/sharp-edges/references/lang-ruby.md: sha256:d9ba749caaccb8a3bb39e2199b2062c0957cf48739218ba8022d49be5cba2088
-    .kiro/skills/sharp-edges/references/lang-rust.md: sha256:3d14993ea70b2b2df3fc0f388cbd1631470895c27ccbd9d764296d1da8f5b6ee
-    .kiro/skills/sharp-edges/references/lang-swift.md: sha256:a64ab8692db0f3e43526088c63c7fdcb7354d1b24e6fe7ca759aea3260890e04
-    .kiro/skills/sharp-edges/references/language-specific.md: sha256:4522b4a37cfd7d3aa689209dfd4569f3b39074bd1f5987a36a6e819f501141b6
-  content_hash: sha256:ba2f9f5f56543e1a970a63711c03c077bd776db90aa37caa5e6d119fc365f1a6
-- repo_url: trailofbits/skills
-  name: static-analysis
-  host: github.com
-  resolved_commit: cfe5d7b1619e47fb5b38b7e2561dad7e5f1e89af
-  version: 1.2.2
-  virtual_path: plugins/static-analysis
-  is_virtual: true
-  package_type: marketplace_plugin
-  deployed_files:
-  - .agents/skills/codeql
-  - .agents/skills/codeql/SKILL.md
-  - .agents/skills/codeql/agents/openai.yaml
-  - .agents/skills/codeql/assets/trail-of-bits-mark.svg
-  - .agents/skills/codeql/references/build-fixes.md
-  - .agents/skills/codeql/references/diagnostic-query-templates.md
-  - .agents/skills/codeql/references/extension-yaml-format.md
-  - .agents/skills/codeql/references/important-only-suite.md
-  - .agents/skills/codeql/references/language-details.md
-  - .agents/skills/codeql/references/macos-arm64e-workaround.md
-  - .agents/skills/codeql/references/performance-tuning.md
-  - .agents/skills/codeql/references/quality-assessment.md
-  - .agents/skills/codeql/references/ruleset-catalog.md
-  - .agents/skills/codeql/references/run-all-suite.md
-  - .agents/skills/codeql/references/sarif-processing.md
-  - .agents/skills/codeql/references/threat-models.md
-  - .agents/skills/codeql/workflows/build-database.md
-  - .agents/skills/codeql/workflows/create-data-extensions.md
-  - .agents/skills/codeql/workflows/run-analysis.md
-  - .agents/skills/sarif-parsing
-  - .agents/skills/sarif-parsing/SKILL.md
-  - .agents/skills/sarif-parsing/agents/openai.yaml
-  - .agents/skills/sarif-parsing/assets/trail-of-bits-mark.svg
-  - .agents/skills/sarif-parsing/resources/jq-queries.md
-  - .agents/skills/sarif-parsing/resources/sarif_helpers.py
-  - .agents/skills/semgrep
-  - .agents/skills/semgrep/SKILL.md
-  - .agents/skills/semgrep/agents/openai.yaml
-  - .agents/skills/semgrep/assets/trail-of-bits-mark.svg
-  - .agents/skills/semgrep/references/rulesets.md
-  - .agents/skills/semgrep/references/scan-modes.md
-  - .agents/skills/semgrep/references/scanner-task-prompt.md
-  - .agents/skills/semgrep/scripts/merge_sarif.py
-  - .agents/skills/semgrep/workflows/scan-workflow.md
-  - .claude/agents/semgrep-scanner.md
-  - .claude/skills/codeql
-  - .claude/skills/codeql/SKILL.md
-  - .claude/skills/codeql/agents/openai.yaml
-  - .claude/skills/codeql/assets/trail-of-bits-mark.svg
-  - .claude/skills/codeql/references/build-fixes.md
-  - .claude/skills/codeql/references/diagnostic-query-templates.md
-  - .claude/skills/codeql/references/extension-yaml-format.md
-  - .claude/skills/codeql/references/important-only-suite.md
-  - .claude/skills/codeql/references/language-details.md
-  - .claude/skills/codeql/references/macos-arm64e-workaround.md
-  - .claude/skills/codeql/references/performance-tuning.md
-  - .claude/skills/codeql/references/quality-assessment.md
-  - .claude/skills/codeql/references/ruleset-catalog.md
-  - .claude/skills/codeql/references/run-all-suite.md
-  - .claude/skills/codeql/references/sarif-processing.md
-  - .claude/skills/codeql/references/threat-models.md
-  - .claude/skills/codeql/workflows/build-database.md
-  - .claude/skills/codeql/workflows/create-data-extensions.md
-  - .claude/skills/codeql/workflows/run-analysis.md
-  - .claude/skills/sarif-parsing
-  - .claude/skills/sarif-parsing/SKILL.md
-  - .claude/skills/sarif-parsing/agents/openai.yaml
-  - .claude/skills/sarif-parsing/assets/trail-of-bits-mark.svg
-  - .claude/skills/sarif-parsing/resources/jq-queries.md
-  - .claude/skills/sarif-parsing/resources/sarif_helpers.py
-  - .claude/skills/semgrep
-  - .claude/skills/semgrep/SKILL.md
-  - .claude/skills/semgrep/agents/openai.yaml
-  - .claude/skills/semgrep/assets/trail-of-bits-mark.svg
-  - .claude/skills/semgrep/references/rulesets.md
-  - .claude/skills/semgrep/references/scan-modes.md
-  - .claude/skills/semgrep/references/scanner-task-prompt.md
-  - .claude/skills/semgrep/scripts/merge_sarif.py
-  - .claude/skills/semgrep/workflows/scan-workflow.md
-  - .config/opencode/agents/semgrep-scanner.md
-  - .copilot/agents/semgrep-scanner.agent.md
-  - .cursor/agents/semgrep-scanner.md
-  - .kiro/skills/codeql
-  - .kiro/skills/codeql/SKILL.md
-  - .kiro/skills/codeql/agents/openai.yaml
-  - .kiro/skills/codeql/assets/trail-of-bits-mark.svg
-  - .kiro/skills/codeql/references/build-fixes.md
-  - .kiro/skills/codeql/references/diagnostic-query-templates.md
-  - .kiro/skills/codeql/references/extension-yaml-format.md
-  - .kiro/skills/codeql/references/important-only-suite.md
-  - .kiro/skills/codeql/references/language-details.md
-  - .kiro/skills/codeql/references/macos-arm64e-workaround.md
-  - .kiro/skills/codeql/references/performance-tuning.md
-  - .kiro/skills/codeql/references/quality-assessment.md
-  - .kiro/skills/codeql/references/ruleset-catalog.md
-  - .kiro/skills/codeql/references/run-all-suite.md
-  - .kiro/skills/codeql/references/sarif-processing.md
-  - .kiro/skills/codeql/references/threat-models.md
-  - .kiro/skills/codeql/workflows/build-database.md
-  - .kiro/skills/codeql/workflows/create-data-extensions.md
-  - .kiro/skills/codeql/workflows/run-analysis.md
-  - .kiro/skills/sarif-parsing
-  - .kiro/skills/sarif-parsing/SKILL.md
-  - .kiro/skills/sarif-parsing/agents/openai.yaml
-  - .kiro/skills/sarif-parsing/assets/trail-of-bits-mark.svg
-  - .kiro/skills/sarif-parsing/resources/jq-queries.md
-  - .kiro/skills/sarif-parsing/resources/sarif_helpers.py
-  - .kiro/skills/semgrep
-  - .kiro/skills/semgrep/SKILL.md
-  - .kiro/skills/semgrep/agents/openai.yaml
-  - .kiro/skills/semgrep/assets/trail-of-bits-mark.svg
-  - .kiro/skills/semgrep/references/rulesets.md
-  - .kiro/skills/semgrep/references/scan-modes.md
-  - .kiro/skills/semgrep/references/scanner-task-prompt.md
-  - .kiro/skills/semgrep/scripts/merge_sarif.py
-  - .kiro/skills/semgrep/workflows/scan-workflow.md
-  deployed_file_hashes:
-    .agents/skills/codeql/SKILL.md: sha256:b88b4f0b2044ed9abb7c42e6c2a0413ac66e5eb1a3a02fefe5c32725851fcd16
-    .agents/skills/codeql/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .agents/skills/codeql/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .agents/skills/codeql/references/build-fixes.md: sha256:9d74eaef2a75c1e99bacd66c2b874b8a2bd88480a88f4d9e42790eb2c72c7e08
-    .agents/skills/codeql/references/diagnostic-query-templates.md: sha256:d9f72ace8865a5b80e04de76f9f5db56e4a0c49d3946f32cd1d6a006eceacbaa
-    .agents/skills/codeql/references/extension-yaml-format.md: sha256:a263fa41dc78dd1e2884cc7567d4db110cb86fc1fd222cc66629b6191abe41f1
-    .agents/skills/codeql/references/important-only-suite.md: sha256:27823a2553db154849e8e4b979d1d3d625fa46ab8ed122dec385b12df1454780
-    .agents/skills/codeql/references/language-details.md: sha256:1d6db4a45a8858fb0fb2a580a386bc7912697a90b22816b17f22bf0eaf1afce0
-    .agents/skills/codeql/references/macos-arm64e-workaround.md: sha256:2b4e18ae0924f18edf5918ac237a13f268edc6fca802ecb4d55113c372711088
-    .agents/skills/codeql/references/performance-tuning.md: sha256:d725aef573fd7fcf59ad495890f1ab40e4b202ad6692ea798fea94655fb2ae93
-    .agents/skills/codeql/references/quality-assessment.md: sha256:1dabaec584cc3ba0d2e2e09559f7da6b279ef7ab88caf641a066ea5b644295b0
-    .agents/skills/codeql/references/ruleset-catalog.md: sha256:2b139ae593865548a596fb5b78694cb09d4a1959beb5225a5d8a914155a72165
-    .agents/skills/codeql/references/run-all-suite.md: sha256:cde0d37d23f400dde567d631196dfbc8787fd4a6cc4e4a469bba103127c09ccb
-    .agents/skills/codeql/references/sarif-processing.md: sha256:abde04ca479a372ed134150cd9cd1fd2b45cd7b4b45386034a2b3f4d415f6f9b
-    .agents/skills/codeql/references/threat-models.md: sha256:8855d4907b390f04149cc8064a1ea61ee95e802b25da2d2880604a493b477854
-    .agents/skills/codeql/workflows/build-database.md: sha256:7fb24c47ffe46a0d6c99b59eadbfd3159017703e77ef799bb1d8e1e7095518f1
-    .agents/skills/codeql/workflows/create-data-extensions.md: sha256:2210ce1466a8269c115776f501343d6c1dc5b45ca315493932dfcd033a6e3ea0
-    .agents/skills/codeql/workflows/run-analysis.md: sha256:6a489cfc57eb76db029ec8cad9bc32eb64a98ce99db85a5914ac4e32d3895a58
-    .agents/skills/sarif-parsing/SKILL.md: sha256:e3faaa40304dd8477d58793a9c8d34e63ec04c2dea5e13b0a26e48b0cdbbb3d1
-    .agents/skills/sarif-parsing/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .agents/skills/sarif-parsing/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .agents/skills/sarif-parsing/resources/jq-queries.md: sha256:d7fb98ee8859f37a2b2bddd56cef6e8f165409472a14e56631454ed2348c55cd
-    .agents/skills/sarif-parsing/resources/sarif_helpers.py: sha256:8f8b1c3a9f1d19dd8bed5c1440c192e79d7d5cb8b9e1b334b0bec5ecf2581a79
-    .agents/skills/semgrep/SKILL.md: sha256:092472caba4d39701c3871418871b462098aa7d49c9c92ebdc8006b0d40fe548
-    .agents/skills/semgrep/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .agents/skills/semgrep/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .agents/skills/semgrep/references/rulesets.md: sha256:e641bf7b2f32cd81b2623759f72a560dd96f6747f1295157f2984fe8ebac3f74
-    .agents/skills/semgrep/references/scan-modes.md: sha256:76c8d41c8fc2c36daa44171db345373e169da46a69387378a31ef26061102c97
-    .agents/skills/semgrep/references/scanner-task-prompt.md: sha256:67ae9626627ce3ea995638b9bfe02838dde817c7d446e1a97f04db60c66dc04a
-    .agents/skills/semgrep/scripts/merge_sarif.py: sha256:3a1ceeaf0ce12279e159424eaebeec8c5020f9b8031d87c0759b5d53f2ff0070
-    .agents/skills/semgrep/workflows/scan-workflow.md: sha256:de63106a525417b13b180891bbf817d23e616682175767cb833ff70c81bfaa8e
-    .claude/agents/semgrep-scanner.md: sha256:26d412799ad8e549ca2fbe1f93536e66f222feb6a0ae78e0a286947ba5e3f416
-    .claude/skills/codeql/SKILL.md: sha256:b88b4f0b2044ed9abb7c42e6c2a0413ac66e5eb1a3a02fefe5c32725851fcd16
-    .claude/skills/codeql/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .claude/skills/codeql/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .claude/skills/codeql/references/build-fixes.md: sha256:9d74eaef2a75c1e99bacd66c2b874b8a2bd88480a88f4d9e42790eb2c72c7e08
-    .claude/skills/codeql/references/diagnostic-query-templates.md: sha256:d9f72ace8865a5b80e04de76f9f5db56e4a0c49d3946f32cd1d6a006eceacbaa
-    .claude/skills/codeql/references/extension-yaml-format.md: sha256:a263fa41dc78dd1e2884cc7567d4db110cb86fc1fd222cc66629b6191abe41f1
-    .claude/skills/codeql/references/important-only-suite.md: sha256:27823a2553db154849e8e4b979d1d3d625fa46ab8ed122dec385b12df1454780
-    .claude/skills/codeql/references/language-details.md: sha256:1d6db4a45a8858fb0fb2a580a386bc7912697a90b22816b17f22bf0eaf1afce0
-    .claude/skills/codeql/references/macos-arm64e-workaround.md: sha256:2b4e18ae0924f18edf5918ac237a13f268edc6fca802ecb4d55113c372711088
-    .claude/skills/codeql/references/performance-tuning.md: sha256:d725aef573fd7fcf59ad495890f1ab40e4b202ad6692ea798fea94655fb2ae93
-    .claude/skills/codeql/references/quality-assessment.md: sha256:1dabaec584cc3ba0d2e2e09559f7da6b279ef7ab88caf641a066ea5b644295b0
-    .claude/skills/codeql/references/ruleset-catalog.md: sha256:2b139ae593865548a596fb5b78694cb09d4a1959beb5225a5d8a914155a72165
-    .claude/skills/codeql/references/run-all-suite.md: sha256:cde0d37d23f400dde567d631196dfbc8787fd4a6cc4e4a469bba103127c09ccb
-    .claude/skills/codeql/references/sarif-processing.md: sha256:abde04ca479a372ed134150cd9cd1fd2b45cd7b4b45386034a2b3f4d415f6f9b
-    .claude/skills/codeql/references/threat-models.md: sha256:8855d4907b390f04149cc8064a1ea61ee95e802b25da2d2880604a493b477854
-    .claude/skills/codeql/workflows/build-database.md: sha256:7fb24c47ffe46a0d6c99b59eadbfd3159017703e77ef799bb1d8e1e7095518f1
-    .claude/skills/codeql/workflows/create-data-extensions.md: sha256:2210ce1466a8269c115776f501343d6c1dc5b45ca315493932dfcd033a6e3ea0
-    .claude/skills/codeql/workflows/run-analysis.md: sha256:6a489cfc57eb76db029ec8cad9bc32eb64a98ce99db85a5914ac4e32d3895a58
-    .claude/skills/sarif-parsing/SKILL.md: sha256:e3faaa40304dd8477d58793a9c8d34e63ec04c2dea5e13b0a26e48b0cdbbb3d1
-    .claude/skills/sarif-parsing/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .claude/skills/sarif-parsing/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .claude/skills/sarif-parsing/resources/jq-queries.md: sha256:d7fb98ee8859f37a2b2bddd56cef6e8f165409472a14e56631454ed2348c55cd
-    .claude/skills/sarif-parsing/resources/sarif_helpers.py: sha256:8f8b1c3a9f1d19dd8bed5c1440c192e79d7d5cb8b9e1b334b0bec5ecf2581a79
-    .claude/skills/semgrep/SKILL.md: sha256:092472caba4d39701c3871418871b462098aa7d49c9c92ebdc8006b0d40fe548
-    .claude/skills/semgrep/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .claude/skills/semgrep/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .claude/skills/semgrep/references/rulesets.md: sha256:e641bf7b2f32cd81b2623759f72a560dd96f6747f1295157f2984fe8ebac3f74
-    .claude/skills/semgrep/references/scan-modes.md: sha256:76c8d41c8fc2c36daa44171db345373e169da46a69387378a31ef26061102c97
-    .claude/skills/semgrep/references/scanner-task-prompt.md: sha256:67ae9626627ce3ea995638b9bfe02838dde817c7d446e1a97f04db60c66dc04a
-    .claude/skills/semgrep/scripts/merge_sarif.py: sha256:3a1ceeaf0ce12279e159424eaebeec8c5020f9b8031d87c0759b5d53f2ff0070
-    .claude/skills/semgrep/workflows/scan-workflow.md: sha256:de63106a525417b13b180891bbf817d23e616682175767cb833ff70c81bfaa8e
-    .config/opencode/agents/semgrep-scanner.md: sha256:26d412799ad8e549ca2fbe1f93536e66f222feb6a0ae78e0a286947ba5e3f416
-    .copilot/agents/semgrep-scanner.agent.md: sha256:26d412799ad8e549ca2fbe1f93536e66f222feb6a0ae78e0a286947ba5e3f416
-    .cursor/agents/semgrep-scanner.md: sha256:26d412799ad8e549ca2fbe1f93536e66f222feb6a0ae78e0a286947ba5e3f416
-    .kiro/skills/codeql/SKILL.md: sha256:b88b4f0b2044ed9abb7c42e6c2a0413ac66e5eb1a3a02fefe5c32725851fcd16
-    .kiro/skills/codeql/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .kiro/skills/codeql/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .kiro/skills/codeql/references/build-fixes.md: sha256:9d74eaef2a75c1e99bacd66c2b874b8a2bd88480a88f4d9e42790eb2c72c7e08
-    .kiro/skills/codeql/references/diagnostic-query-templates.md: sha256:d9f72ace8865a5b80e04de76f9f5db56e4a0c49d3946f32cd1d6a006eceacbaa
-    .kiro/skills/codeql/references/extension-yaml-format.md: sha256:a263fa41dc78dd1e2884cc7567d4db110cb86fc1fd222cc66629b6191abe41f1
-    .kiro/skills/codeql/references/important-only-suite.md: sha256:27823a2553db154849e8e4b979d1d3d625fa46ab8ed122dec385b12df1454780
-    .kiro/skills/codeql/references/language-details.md: sha256:1d6db4a45a8858fb0fb2a580a386bc7912697a90b22816b17f22bf0eaf1afce0
-    .kiro/skills/codeql/references/macos-arm64e-workaround.md: sha256:2b4e18ae0924f18edf5918ac237a13f268edc6fca802ecb4d55113c372711088
-    .kiro/skills/codeql/references/performance-tuning.md: sha256:d725aef573fd7fcf59ad495890f1ab40e4b202ad6692ea798fea94655fb2ae93
-    .kiro/skills/codeql/references/quality-assessment.md: sha256:1dabaec584cc3ba0d2e2e09559f7da6b279ef7ab88caf641a066ea5b644295b0
-    .kiro/skills/codeql/references/ruleset-catalog.md: sha256:2b139ae593865548a596fb5b78694cb09d4a1959beb5225a5d8a914155a72165
-    .kiro/skills/codeql/references/run-all-suite.md: sha256:cde0d37d23f400dde567d631196dfbc8787fd4a6cc4e4a469bba103127c09ccb
-    .kiro/skills/codeql/references/sarif-processing.md: sha256:abde04ca479a372ed134150cd9cd1fd2b45cd7b4b45386034a2b3f4d415f6f9b
-    .kiro/skills/codeql/references/threat-models.md: sha256:8855d4907b390f04149cc8064a1ea61ee95e802b25da2d2880604a493b477854
-    .kiro/skills/codeql/workflows/build-database.md: sha256:7fb24c47ffe46a0d6c99b59eadbfd3159017703e77ef799bb1d8e1e7095518f1
-    .kiro/skills/codeql/workflows/create-data-extensions.md: sha256:2210ce1466a8269c115776f501343d6c1dc5b45ca315493932dfcd033a6e3ea0
-    .kiro/skills/codeql/workflows/run-analysis.md: sha256:6a489cfc57eb76db029ec8cad9bc32eb64a98ce99db85a5914ac4e32d3895a58
-    .kiro/skills/sarif-parsing/SKILL.md: sha256:e3faaa40304dd8477d58793a9c8d34e63ec04c2dea5e13b0a26e48b0cdbbb3d1
-    .kiro/skills/sarif-parsing/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .kiro/skills/sarif-parsing/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .kiro/skills/sarif-parsing/resources/jq-queries.md: sha256:d7fb98ee8859f37a2b2bddd56cef6e8f165409472a14e56631454ed2348c55cd
-    .kiro/skills/sarif-parsing/resources/sarif_helpers.py: sha256:8f8b1c3a9f1d19dd8bed5c1440c192e79d7d5cb8b9e1b334b0bec5ecf2581a79
-    .kiro/skills/semgrep/SKILL.md: sha256:092472caba4d39701c3871418871b462098aa7d49c9c92ebdc8006b0d40fe548
-    .kiro/skills/semgrep/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .kiro/skills/semgrep/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .kiro/skills/semgrep/references/rulesets.md: sha256:e641bf7b2f32cd81b2623759f72a560dd96f6747f1295157f2984fe8ebac3f74
-    .kiro/skills/semgrep/references/scan-modes.md: sha256:76c8d41c8fc2c36daa44171db345373e169da46a69387378a31ef26061102c97
-    .kiro/skills/semgrep/references/scanner-task-prompt.md: sha256:67ae9626627ce3ea995638b9bfe02838dde817c7d446e1a97f04db60c66dc04a
-    .kiro/skills/semgrep/scripts/merge_sarif.py: sha256:3a1ceeaf0ce12279e159424eaebeec8c5020f9b8031d87c0759b5d53f2ff0070
-    .kiro/skills/semgrep/workflows/scan-workflow.md: sha256:de63106a525417b13b180891bbf817d23e616682175767cb833ff70c81bfaa8e
-  content_hash: sha256:277d6297889fb95764c30a3e5abdb15746d8539216454064d69b74a0f204eff3
-- repo_url: trailofbits/skills
-  name: skills
-  host: github.com
-  resolved_commit: cfe5d7b1619e47fb5b38b7e2561dad7e5f1e89af
-  version: unknown
-  virtual_path: plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/supply-chain-risk-auditor
-  - .agents/skills/supply-chain-risk-auditor/SKILL.md
-  - .agents/skills/supply-chain-risk-auditor/agents/openai.yaml
-  - .agents/skills/supply-chain-risk-auditor/assets/trail-of-bits-mark.svg
-  - .agents/skills/supply-chain-risk-auditor/resources/results-template.md
-  - .claude/skills/supply-chain-risk-auditor
-  - .claude/skills/supply-chain-risk-auditor/SKILL.md
-  - .claude/skills/supply-chain-risk-auditor/agents/openai.yaml
-  - .claude/skills/supply-chain-risk-auditor/assets/trail-of-bits-mark.svg
-  - .claude/skills/supply-chain-risk-auditor/resources/results-template.md
-  - .kiro/skills/supply-chain-risk-auditor
-  - .kiro/skills/supply-chain-risk-auditor/SKILL.md
-  - .kiro/skills/supply-chain-risk-auditor/agents/openai.yaml
-  - .kiro/skills/supply-chain-risk-auditor/assets/trail-of-bits-mark.svg
-  - .kiro/skills/supply-chain-risk-auditor/resources/results-template.md
-  deployed_file_hashes:
-    .agents/skills/supply-chain-risk-auditor/SKILL.md: sha256:9f978cffec0a13596e7047d80a7890d44457048be0700b44016b020a0980051f
-    .agents/skills/supply-chain-risk-auditor/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .agents/skills/supply-chain-risk-auditor/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .agents/skills/supply-chain-risk-auditor/resources/results-template.md: sha256:39ae26b3d55fc51d1837b252c5e5b2410ce7a35cfc21bc005b80cf4f18d79c01
-    .claude/skills/supply-chain-risk-auditor/SKILL.md: sha256:9f978cffec0a13596e7047d80a7890d44457048be0700b44016b020a0980051f
-    .claude/skills/supply-chain-risk-auditor/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .claude/skills/supply-chain-risk-auditor/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .claude/skills/supply-chain-risk-auditor/resources/results-template.md: sha256:39ae26b3d55fc51d1837b252c5e5b2410ce7a35cfc21bc005b80cf4f18d79c01
-    .kiro/skills/supply-chain-risk-auditor/SKILL.md: sha256:9f978cffec0a13596e7047d80a7890d44457048be0700b44016b020a0980051f
-    .kiro/skills/supply-chain-risk-auditor/agents/openai.yaml: sha256:11a851b1841f3e828e7609045d91e0632cac07dfc008b2740f487cee83a5efd1
-    .kiro/skills/supply-chain-risk-auditor/assets/trail-of-bits-mark.svg: sha256:4bf74c789b38dcf6ad762c136b6832363d27ae19fbaa9a18ec18d66ecce6ca05
-    .kiro/skills/supply-chain-risk-auditor/resources/results-template.md: sha256:39ae26b3d55fc51d1837b252c5e5b2410ce7a35cfc21bc005b80cf4f18d79c01
-  content_hash: sha256:cf9787a32a1fe71439fb275385e63958f0fde86a645863f0cb7198122201b7f5
 - repo_url: vercel-labs/agent-browser
   name: agent-browser
   host: github.com
-  resolved_commit: ed2e10598c9064aecfaeb7cf21b540684db4be2c
-  version: unknown
+  resolved_commit: afae698a51242166170b6fe4809dd57fe9f75798
+  version: 1.0.0
   virtual_path: skills/agent-browser
   is_virtual: true
   package_type: claude_skill
@@ -6644,10 +6124,10 @@ dependencies:
     .kiro/skills/web-design-guidelines/SKILL.md: sha256:f4647ca866a3accf763777f83e7682954f0187cd6bea7eea0399796652414e8f
   content_hash: sha256:a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a
 - repo_url: vercel-labs/skills
-  name: find-skills
+  name: skills
   host: github.com
   resolved_commit: 4ce6d48ac44c8b637db87b2102fea3baca719df1
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/find-skills
   is_virtual: true
   package_type: claude_skill
