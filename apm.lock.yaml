@@ -869,7 +869,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: eca3e41fc96daa3c8d5f021c9127b88d5a6a1bf6
+  resolved_commit: 445e68522888682403012174b3454344e00d14c3
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -1138,14 +1138,6 @@ dependencies:
   - .agents/skills/slide-docs
   - .agents/skills/slide-docs/SKILL.md
   - .agents/skills/slide-docs/references/index.md
-  - .agents/skills/tauri-icon-gen
-  - .agents/skills/tauri-icon-gen/SKILL.md
-  - .agents/skills/tauri-icon-gen/scripts/remove_white_bg.py
-  - .agents/skills/tauri-webview-geometry
-  - .agents/skills/tauri-webview-geometry/SKILL.md
-  - .agents/skills/tauri-webview-geometry/agents/openai.yaml
-  - .agents/skills/tauri-webview-geometry/references/geometry-model.md
-  - .agents/skills/tauri-webview-geometry/references/lifecycle-contracts.md
   - .agents/skills/tsr
   - .agents/skills/tsr/MIGRATION.md
   - .agents/skills/tsr/README.md
@@ -1434,14 +1426,6 @@ dependencies:
   - .claude/skills/slide-docs
   - .claude/skills/slide-docs/SKILL.md
   - .claude/skills/slide-docs/references/index.md
-  - .claude/skills/tauri-icon-gen
-  - .claude/skills/tauri-icon-gen/SKILL.md
-  - .claude/skills/tauri-icon-gen/scripts/remove_white_bg.py
-  - .claude/skills/tauri-webview-geometry
-  - .claude/skills/tauri-webview-geometry/SKILL.md
-  - .claude/skills/tauri-webview-geometry/agents/openai.yaml
-  - .claude/skills/tauri-webview-geometry/references/geometry-model.md
-  - .claude/skills/tauri-webview-geometry/references/lifecycle-contracts.md
   - .claude/skills/tsr
   - .claude/skills/tsr/MIGRATION.md
   - .claude/skills/tsr/README.md
@@ -1729,14 +1713,6 @@ dependencies:
   - .kiro/skills/slide-docs
   - .kiro/skills/slide-docs/SKILL.md
   - .kiro/skills/slide-docs/references/index.md
-  - .kiro/skills/tauri-icon-gen
-  - .kiro/skills/tauri-icon-gen/SKILL.md
-  - .kiro/skills/tauri-icon-gen/scripts/remove_white_bg.py
-  - .kiro/skills/tauri-webview-geometry
-  - .kiro/skills/tauri-webview-geometry/SKILL.md
-  - .kiro/skills/tauri-webview-geometry/agents/openai.yaml
-  - .kiro/skills/tauri-webview-geometry/references/geometry-model.md
-  - .kiro/skills/tauri-webview-geometry/references/lifecycle-contracts.md
   - .kiro/skills/tsr
   - .kiro/skills/tsr/MIGRATION.md
   - .kiro/skills/tsr/README.md
@@ -1977,12 +1953,6 @@ dependencies:
     .agents/skills/slack-app-management/agents/openai.yaml: sha256:9a2c6ca4d634aa549dd13bc35f924e13d48996714e6788cb5d97765e3d9d644c
     .agents/skills/slide-docs/SKILL.md: sha256:5d0cae1d6b55c74ab96b69a1de60d91830c754adcdadb4efb55015aa972e841e
     .agents/skills/slide-docs/references/index.md: sha256:aa1e424c72724ca280157a3f1beebfad877cb7f4b4ab465b8f49681c8c78b714
-    .agents/skills/tauri-icon-gen/SKILL.md: sha256:cb238a15ba006f4f1e4000e8ac93cac49c56c82eddb3c29eb2051c645b0dbe17
-    .agents/skills/tauri-icon-gen/scripts/remove_white_bg.py: sha256:3f4e6fc1ff8ae0f9ef6aa4c465dc02209cd27ea0627f4c4d38698c889be6e480
-    .agents/skills/tauri-webview-geometry/SKILL.md: sha256:a207ea36720f5f1a3cedff710ca36bf7f32411b9f3dd1485aa3a0266b20ce768
-    .agents/skills/tauri-webview-geometry/agents/openai.yaml: sha256:4ed20d4f9141cf4909a2c34fb6226c738f38021887b3dc6b16922709527ebfa7
-    .agents/skills/tauri-webview-geometry/references/geometry-model.md: sha256:3d31e2c9075415414b1acb1939329b51cce92a3cfe6d44f25b5c826c275c58b4
-    .agents/skills/tauri-webview-geometry/references/lifecycle-contracts.md: sha256:65bf7daba079327f1e28eea8781798260d083fe16ec8ccf234d99262c6302ac2
     .agents/skills/tsr/MIGRATION.md: sha256:4cfc6d22fe0569e71b50d106f2beb48a27bcc9ab9bc353c5974b3a1f9757a879
     .agents/skills/tsr/README.md: sha256:baf1c761bcb44bf47c76b1fc762f1ad290bda38a59d1ccd70245f7fc455f59b9
     .agents/skills/tsr/SKILL.md: sha256:1e61f765717fbf34e4c37b525264170440910a50b4ba07f5423412cb760d8fb7
@@ -2219,12 +2189,6 @@ dependencies:
     .claude/skills/slack-app-management/agents/openai.yaml: sha256:9a2c6ca4d634aa549dd13bc35f924e13d48996714e6788cb5d97765e3d9d644c
     .claude/skills/slide-docs/SKILL.md: sha256:5d0cae1d6b55c74ab96b69a1de60d91830c754adcdadb4efb55015aa972e841e
     .claude/skills/slide-docs/references/index.md: sha256:aa1e424c72724ca280157a3f1beebfad877cb7f4b4ab465b8f49681c8c78b714
-    .claude/skills/tauri-icon-gen/SKILL.md: sha256:cb238a15ba006f4f1e4000e8ac93cac49c56c82eddb3c29eb2051c645b0dbe17
-    .claude/skills/tauri-icon-gen/scripts/remove_white_bg.py: sha256:3f4e6fc1ff8ae0f9ef6aa4c465dc02209cd27ea0627f4c4d38698c889be6e480
-    .claude/skills/tauri-webview-geometry/SKILL.md: sha256:a207ea36720f5f1a3cedff710ca36bf7f32411b9f3dd1485aa3a0266b20ce768
-    .claude/skills/tauri-webview-geometry/agents/openai.yaml: sha256:4ed20d4f9141cf4909a2c34fb6226c738f38021887b3dc6b16922709527ebfa7
-    .claude/skills/tauri-webview-geometry/references/geometry-model.md: sha256:3d31e2c9075415414b1acb1939329b51cce92a3cfe6d44f25b5c826c275c58b4
-    .claude/skills/tauri-webview-geometry/references/lifecycle-contracts.md: sha256:65bf7daba079327f1e28eea8781798260d083fe16ec8ccf234d99262c6302ac2
     .claude/skills/tsr/MIGRATION.md: sha256:4cfc6d22fe0569e71b50d106f2beb48a27bcc9ab9bc353c5974b3a1f9757a879
     .claude/skills/tsr/README.md: sha256:baf1c761bcb44bf47c76b1fc762f1ad290bda38a59d1ccd70245f7fc455f59b9
     .claude/skills/tsr/SKILL.md: sha256:1e61f765717fbf34e4c37b525264170440910a50b4ba07f5423412cb760d8fb7
@@ -2460,12 +2424,6 @@ dependencies:
     .kiro/skills/slack-app-management/agents/openai.yaml: sha256:9a2c6ca4d634aa549dd13bc35f924e13d48996714e6788cb5d97765e3d9d644c
     .kiro/skills/slide-docs/SKILL.md: sha256:5d0cae1d6b55c74ab96b69a1de60d91830c754adcdadb4efb55015aa972e841e
     .kiro/skills/slide-docs/references/index.md: sha256:aa1e424c72724ca280157a3f1beebfad877cb7f4b4ab465b8f49681c8c78b714
-    .kiro/skills/tauri-icon-gen/SKILL.md: sha256:cb238a15ba006f4f1e4000e8ac93cac49c56c82eddb3c29eb2051c645b0dbe17
-    .kiro/skills/tauri-icon-gen/scripts/remove_white_bg.py: sha256:3f4e6fc1ff8ae0f9ef6aa4c465dc02209cd27ea0627f4c4d38698c889be6e480
-    .kiro/skills/tauri-webview-geometry/SKILL.md: sha256:a207ea36720f5f1a3cedff710ca36bf7f32411b9f3dd1485aa3a0266b20ce768
-    .kiro/skills/tauri-webview-geometry/agents/openai.yaml: sha256:4ed20d4f9141cf4909a2c34fb6226c738f38021887b3dc6b16922709527ebfa7
-    .kiro/skills/tauri-webview-geometry/references/geometry-model.md: sha256:3d31e2c9075415414b1acb1939329b51cce92a3cfe6d44f25b5c826c275c58b4
-    .kiro/skills/tauri-webview-geometry/references/lifecycle-contracts.md: sha256:65bf7daba079327f1e28eea8781798260d083fe16ec8ccf234d99262c6302ac2
     .kiro/skills/tsr/MIGRATION.md: sha256:4cfc6d22fe0569e71b50d106f2beb48a27bcc9ab9bc353c5974b3a1f9757a879
     .kiro/skills/tsr/README.md: sha256:baf1c761bcb44bf47c76b1fc762f1ad290bda38a59d1ccd70245f7fc455f59b9
     .kiro/skills/tsr/SKILL.md: sha256:1e61f765717fbf34e4c37b525264170440910a50b4ba07f5423412cb760d8fb7
@@ -2489,7 +2447,7 @@ dependencies:
     .kiro/skills/work-log-maintenance/SKILL.md: sha256:26f4064ff1c0e757e415121675d6caaecd30040f95304e6ed4cd4c73e022f3f9
     .kiro/skills/work-log-maintenance/agents/openai.yaml: sha256:e951b8256a5a1b032bcca3c7105230f5041467594434ca23b562b8ec5ec4abc8
     .kiro/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
-  content_hash: sha256:1b0c8e76850dc220fe95aa1c96e9b906908001258e3547357cdc6159719a8f84
+  content_hash: sha256:f65e4e9e9799a07bba8456ea42351b62ec24d690d6b7b75f4fecfc6b95f2ea39
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
