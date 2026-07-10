@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-07-10T03:27:02.110142+00:00'
+generated_at: '2026-07-10T10:01:38.713735+00:00'
 apm_version: 0.22.0
 dependencies:
 - repo_url: Jakubantalik/transitions-dev
@@ -101,10 +101,10 @@ dependencies:
     .kiro/skills/transitions-dev/_root.css: sha256:6ed248a269da79f623729708dabcc3719485d400615a0d91b9f5e9fd307aa33f
   content_hash: sha256:8cf9ba1ed0d52741e4ed1dafc6ee4543e32f1e516f958d750e81412bfc36dd13
 - repo_url: Lum1104/Understand-Anything
-  name: Understand-Anything
+  name: understand
   host: github.com
-  resolved_commit: 83c331b9a3e5065135d00c9c89ea6a43b655026c
-  version: unknown
+  resolved_commit: f08763d11d0202a8a8f52b5dedda6d1b2e2ebac8
+  version: 1.0.0
   virtual_path: understand-anything-plugin/skills/understand
   is_virtual: true
   package_type: claude_skill
@@ -144,6 +144,7 @@ dependencies:
   - .agents/skills/understand/languages/python.md
   - .agents/skills/understand/languages/ruby.md
   - .agents/skills/understand/languages/rust.md
+  - .agents/skills/understand/languages/scala.md
   - .agents/skills/understand/languages/shell.md
   - .agents/skills/understand/languages/sql.md
   - .agents/skills/understand/languages/swift.md
@@ -194,6 +195,7 @@ dependencies:
   - .claude/skills/understand/languages/python.md
   - .claude/skills/understand/languages/ruby.md
   - .claude/skills/understand/languages/rust.md
+  - .claude/skills/understand/languages/scala.md
   - .claude/skills/understand/languages/shell.md
   - .claude/skills/understand/languages/sql.md
   - .claude/skills/understand/languages/swift.md
@@ -244,6 +246,7 @@ dependencies:
   - .kiro/skills/understand/languages/python.md
   - .kiro/skills/understand/languages/ruby.md
   - .kiro/skills/understand/languages/rust.md
+  - .kiro/skills/understand/languages/scala.md
   - .kiro/skills/understand/languages/shell.md
   - .kiro/skills/understand/languages/sql.md
   - .kiro/skills/understand/languages/swift.md
@@ -260,10 +263,10 @@ dependencies:
   - .kiro/skills/understand/merge-subdomain-graphs.py
   - .kiro/skills/understand/scan-project.mjs
   deployed_file_hashes:
-    .agents/skills/understand/SKILL.md: sha256:5733630e48dac1b4449158cf76e06633288182fd1dd943d7da2ed9fc6eac8f73
-    .agents/skills/understand/build-fingerprints.mjs: sha256:2ed228677bbf1bda3fba00d4662c8e542caa3d69c5fed911c4878e6382767881
-    .agents/skills/understand/compute-batches.mjs: sha256:bf46aad17058e5b6dddac27059ec99df2dadb2f9dceddc5d8e12b9c8a7754c5f
-    .agents/skills/understand/extract-import-map.mjs: sha256:5609ab5b8f5ae27c0c4f76610e5008471f9457cf917677a0ff50e41d6b38bc69
+    .agents/skills/understand/SKILL.md: sha256:378406b4fe10a5fb626216a7e45c75eb5c0a9fd33334c4fc96272554afcade4c
+    .agents/skills/understand/build-fingerprints.mjs: sha256:9b1d0589f0ed1827301edd3585fc7da0340dd29434a5ab3ab54aed1a0a6baca3
+    .agents/skills/understand/compute-batches.mjs: sha256:fbd7a6e413615fde627ed1cca938455d61e3928b86d41fa3f15a292dd7d1837d
+    .agents/skills/understand/extract-import-map.mjs: sha256:5044daadea18bef6f3b6016d653ec220b692d2ff67bc311d4f12d94905fa09be
     .agents/skills/understand/extract-structure-result.mjs: sha256:1607c3ba45a120db413d724c28d25b28fed8dcefa28ea82cfa1345f180e662a8
     .agents/skills/understand/extract-structure.mjs: sha256:cb078fdb5b3909cf154fe4946f29e9b5efda9b906442b30a14d86130fbc1b383
     .agents/skills/understand/frameworks/django.md: sha256:a2257a849cf64d09cf2869a3106991264d7f50acd03c93e76284ed288cba7051
@@ -276,7 +279,7 @@ dependencies:
     .agents/skills/understand/frameworks/react.md: sha256:eaaf30363244b89a6bad91971f3d476ec809a8892f387a8bf33c04638a04af20
     .agents/skills/understand/frameworks/spring.md: sha256:296c10395b794c8c0741cd2faaa61f9e171933003f39cbe45f462237ed1066c6
     .agents/skills/understand/frameworks/vue.md: sha256:49a432fe59c8b0759632bd1745b4acc7ddcaef4343a270d97698d9bede69e5db
-    .agents/skills/understand/generate-ignore.mjs: sha256:38227d8e3175c16f0c18e2d232ee642958132a0756b53224ef66cec3c47ff421
+    .agents/skills/understand/generate-ignore.mjs: sha256:253bb28abb00dfdd2e40d3e816a200a576c7419ef90b700e267e27890dcb0a8c
     .agents/skills/understand/languages/cpp.md: sha256:2a658bb677944fa58e6a244430d120cb0657d09e4e50fe28a9cdfbdd554f46f9
     .agents/skills/understand/languages/csharp.md: sha256:507cb86fb5c494d9d5e8ab947015ac6f4e7a2c280c0509ffdbab812a0472c467
     .agents/skills/understand/languages/css.md: sha256:ed3a8dcd96e9921d8d85cfcf0ea07d7a15838cd076180017a80162b1b7166131
@@ -294,6 +297,7 @@ dependencies:
     .agents/skills/understand/languages/python.md: sha256:bb6553846c7ddb63ab4c156caf183fa64f59c63a56c3b0aaa42f764f9332ba94
     .agents/skills/understand/languages/ruby.md: sha256:f5942f0e7136e48723c7d70ef49358cc9d12d4e3b3144e65607c947137382788
     .agents/skills/understand/languages/rust.md: sha256:32cb3c3fcd1a560821ed09dd9a0da184dfa5c79c85f1e03034945ef4d14208d4
+    .agents/skills/understand/languages/scala.md: sha256:95b9f2c45f473e02226031b6998f2a2c6201d33304d0d885f5cc578ca3e3855c
     .agents/skills/understand/languages/shell.md: sha256:f9992d17799065cef318c6906ad6cdad646cb3bbbe9ff1d07234a0634f587bd9
     .agents/skills/understand/languages/sql.md: sha256:d0345797e637e91ae8e98f1f9fc37b62b881a6691e2801a60139fc422341c4a4
     .agents/skills/understand/languages/swift.md: sha256:4c866204fffe114a4e27f11b162829257cd687020cb69b30bce88dbfff334775
@@ -306,13 +310,13 @@ dependencies:
     .agents/skills/understand/locales/ru.md: sha256:02a9cfb7894ffd6e68a24d1dfd050ccc06bd66cac10b0b35d75acf72cedf12de
     .agents/skills/understand/locales/zh-TW.md: sha256:727f14f80a4edb73dfe53025686d5d3afe865eaa554ec1c6c787f3a9a070621f
     .agents/skills/understand/locales/zh.md: sha256:06cbd26979a3383f6177b3d37995bef44f104ebe2de43704b8b1d1b5031ad98b
-    .agents/skills/understand/merge-batch-graphs.py: sha256:aec850cb49b091d54045f660733e2e5b644b73c012ba9fd15a8c1caae56dbd9f
-    .agents/skills/understand/merge-subdomain-graphs.py: sha256:75aa0967ea8f93ba2538b1f2fcc0a48e6b38f7bcf12de3b42f9733d5dddf0d28
-    .agents/skills/understand/scan-project.mjs: sha256:d9673ab2b37eaad4df7d5e419d04b95077045d0b09cf4e5d4e330951df62de9b
-    .claude/skills/understand/SKILL.md: sha256:5733630e48dac1b4449158cf76e06633288182fd1dd943d7da2ed9fc6eac8f73
-    .claude/skills/understand/build-fingerprints.mjs: sha256:2ed228677bbf1bda3fba00d4662c8e542caa3d69c5fed911c4878e6382767881
-    .claude/skills/understand/compute-batches.mjs: sha256:bf46aad17058e5b6dddac27059ec99df2dadb2f9dceddc5d8e12b9c8a7754c5f
-    .claude/skills/understand/extract-import-map.mjs: sha256:5609ab5b8f5ae27c0c4f76610e5008471f9457cf917677a0ff50e41d6b38bc69
+    .agents/skills/understand/merge-batch-graphs.py: sha256:b487d94f16e625215024115ff80f6a8c9279468540af59d986416893e7facc1e
+    .agents/skills/understand/merge-subdomain-graphs.py: sha256:b984a478a18eb7a0186f5374dd733fc001bc77806215bd067f404107911fa059
+    .agents/skills/understand/scan-project.mjs: sha256:10bd886733a6f5e91c3698ccba9997d71115367ceb3ba628d233b46493ba7a4a
+    .claude/skills/understand/SKILL.md: sha256:378406b4fe10a5fb626216a7e45c75eb5c0a9fd33334c4fc96272554afcade4c
+    .claude/skills/understand/build-fingerprints.mjs: sha256:9b1d0589f0ed1827301edd3585fc7da0340dd29434a5ab3ab54aed1a0a6baca3
+    .claude/skills/understand/compute-batches.mjs: sha256:fbd7a6e413615fde627ed1cca938455d61e3928b86d41fa3f15a292dd7d1837d
+    .claude/skills/understand/extract-import-map.mjs: sha256:5044daadea18bef6f3b6016d653ec220b692d2ff67bc311d4f12d94905fa09be
     .claude/skills/understand/extract-structure-result.mjs: sha256:1607c3ba45a120db413d724c28d25b28fed8dcefa28ea82cfa1345f180e662a8
     .claude/skills/understand/extract-structure.mjs: sha256:cb078fdb5b3909cf154fe4946f29e9b5efda9b906442b30a14d86130fbc1b383
     .claude/skills/understand/frameworks/django.md: sha256:a2257a849cf64d09cf2869a3106991264d7f50acd03c93e76284ed288cba7051
@@ -325,7 +329,7 @@ dependencies:
     .claude/skills/understand/frameworks/react.md: sha256:eaaf30363244b89a6bad91971f3d476ec809a8892f387a8bf33c04638a04af20
     .claude/skills/understand/frameworks/spring.md: sha256:296c10395b794c8c0741cd2faaa61f9e171933003f39cbe45f462237ed1066c6
     .claude/skills/understand/frameworks/vue.md: sha256:49a432fe59c8b0759632bd1745b4acc7ddcaef4343a270d97698d9bede69e5db
-    .claude/skills/understand/generate-ignore.mjs: sha256:38227d8e3175c16f0c18e2d232ee642958132a0756b53224ef66cec3c47ff421
+    .claude/skills/understand/generate-ignore.mjs: sha256:253bb28abb00dfdd2e40d3e816a200a576c7419ef90b700e267e27890dcb0a8c
     .claude/skills/understand/languages/cpp.md: sha256:2a658bb677944fa58e6a244430d120cb0657d09e4e50fe28a9cdfbdd554f46f9
     .claude/skills/understand/languages/csharp.md: sha256:507cb86fb5c494d9d5e8ab947015ac6f4e7a2c280c0509ffdbab812a0472c467
     .claude/skills/understand/languages/css.md: sha256:ed3a8dcd96e9921d8d85cfcf0ea07d7a15838cd076180017a80162b1b7166131
@@ -343,6 +347,7 @@ dependencies:
     .claude/skills/understand/languages/python.md: sha256:bb6553846c7ddb63ab4c156caf183fa64f59c63a56c3b0aaa42f764f9332ba94
     .claude/skills/understand/languages/ruby.md: sha256:f5942f0e7136e48723c7d70ef49358cc9d12d4e3b3144e65607c947137382788
     .claude/skills/understand/languages/rust.md: sha256:32cb3c3fcd1a560821ed09dd9a0da184dfa5c79c85f1e03034945ef4d14208d4
+    .claude/skills/understand/languages/scala.md: sha256:95b9f2c45f473e02226031b6998f2a2c6201d33304d0d885f5cc578ca3e3855c
     .claude/skills/understand/languages/shell.md: sha256:f9992d17799065cef318c6906ad6cdad646cb3bbbe9ff1d07234a0634f587bd9
     .claude/skills/understand/languages/sql.md: sha256:d0345797e637e91ae8e98f1f9fc37b62b881a6691e2801a60139fc422341c4a4
     .claude/skills/understand/languages/swift.md: sha256:4c866204fffe114a4e27f11b162829257cd687020cb69b30bce88dbfff334775
@@ -355,13 +360,13 @@ dependencies:
     .claude/skills/understand/locales/ru.md: sha256:02a9cfb7894ffd6e68a24d1dfd050ccc06bd66cac10b0b35d75acf72cedf12de
     .claude/skills/understand/locales/zh-TW.md: sha256:727f14f80a4edb73dfe53025686d5d3afe865eaa554ec1c6c787f3a9a070621f
     .claude/skills/understand/locales/zh.md: sha256:06cbd26979a3383f6177b3d37995bef44f104ebe2de43704b8b1d1b5031ad98b
-    .claude/skills/understand/merge-batch-graphs.py: sha256:aec850cb49b091d54045f660733e2e5b644b73c012ba9fd15a8c1caae56dbd9f
-    .claude/skills/understand/merge-subdomain-graphs.py: sha256:75aa0967ea8f93ba2538b1f2fcc0a48e6b38f7bcf12de3b42f9733d5dddf0d28
-    .claude/skills/understand/scan-project.mjs: sha256:d9673ab2b37eaad4df7d5e419d04b95077045d0b09cf4e5d4e330951df62de9b
-    .kiro/skills/understand/SKILL.md: sha256:5733630e48dac1b4449158cf76e06633288182fd1dd943d7da2ed9fc6eac8f73
-    .kiro/skills/understand/build-fingerprints.mjs: sha256:2ed228677bbf1bda3fba00d4662c8e542caa3d69c5fed911c4878e6382767881
-    .kiro/skills/understand/compute-batches.mjs: sha256:bf46aad17058e5b6dddac27059ec99df2dadb2f9dceddc5d8e12b9c8a7754c5f
-    .kiro/skills/understand/extract-import-map.mjs: sha256:5609ab5b8f5ae27c0c4f76610e5008471f9457cf917677a0ff50e41d6b38bc69
+    .claude/skills/understand/merge-batch-graphs.py: sha256:b487d94f16e625215024115ff80f6a8c9279468540af59d986416893e7facc1e
+    .claude/skills/understand/merge-subdomain-graphs.py: sha256:b984a478a18eb7a0186f5374dd733fc001bc77806215bd067f404107911fa059
+    .claude/skills/understand/scan-project.mjs: sha256:10bd886733a6f5e91c3698ccba9997d71115367ceb3ba628d233b46493ba7a4a
+    .kiro/skills/understand/SKILL.md: sha256:378406b4fe10a5fb626216a7e45c75eb5c0a9fd33334c4fc96272554afcade4c
+    .kiro/skills/understand/build-fingerprints.mjs: sha256:9b1d0589f0ed1827301edd3585fc7da0340dd29434a5ab3ab54aed1a0a6baca3
+    .kiro/skills/understand/compute-batches.mjs: sha256:fbd7a6e413615fde627ed1cca938455d61e3928b86d41fa3f15a292dd7d1837d
+    .kiro/skills/understand/extract-import-map.mjs: sha256:5044daadea18bef6f3b6016d653ec220b692d2ff67bc311d4f12d94905fa09be
     .kiro/skills/understand/extract-structure-result.mjs: sha256:1607c3ba45a120db413d724c28d25b28fed8dcefa28ea82cfa1345f180e662a8
     .kiro/skills/understand/extract-structure.mjs: sha256:cb078fdb5b3909cf154fe4946f29e9b5efda9b906442b30a14d86130fbc1b383
     .kiro/skills/understand/frameworks/django.md: sha256:a2257a849cf64d09cf2869a3106991264d7f50acd03c93e76284ed288cba7051
@@ -374,7 +379,7 @@ dependencies:
     .kiro/skills/understand/frameworks/react.md: sha256:eaaf30363244b89a6bad91971f3d476ec809a8892f387a8bf33c04638a04af20
     .kiro/skills/understand/frameworks/spring.md: sha256:296c10395b794c8c0741cd2faaa61f9e171933003f39cbe45f462237ed1066c6
     .kiro/skills/understand/frameworks/vue.md: sha256:49a432fe59c8b0759632bd1745b4acc7ddcaef4343a270d97698d9bede69e5db
-    .kiro/skills/understand/generate-ignore.mjs: sha256:38227d8e3175c16f0c18e2d232ee642958132a0756b53224ef66cec3c47ff421
+    .kiro/skills/understand/generate-ignore.mjs: sha256:253bb28abb00dfdd2e40d3e816a200a576c7419ef90b700e267e27890dcb0a8c
     .kiro/skills/understand/languages/cpp.md: sha256:2a658bb677944fa58e6a244430d120cb0657d09e4e50fe28a9cdfbdd554f46f9
     .kiro/skills/understand/languages/csharp.md: sha256:507cb86fb5c494d9d5e8ab947015ac6f4e7a2c280c0509ffdbab812a0472c467
     .kiro/skills/understand/languages/css.md: sha256:ed3a8dcd96e9921d8d85cfcf0ea07d7a15838cd076180017a80162b1b7166131
@@ -392,6 +397,7 @@ dependencies:
     .kiro/skills/understand/languages/python.md: sha256:bb6553846c7ddb63ab4c156caf183fa64f59c63a56c3b0aaa42f764f9332ba94
     .kiro/skills/understand/languages/ruby.md: sha256:f5942f0e7136e48723c7d70ef49358cc9d12d4e3b3144e65607c947137382788
     .kiro/skills/understand/languages/rust.md: sha256:32cb3c3fcd1a560821ed09dd9a0da184dfa5c79c85f1e03034945ef4d14208d4
+    .kiro/skills/understand/languages/scala.md: sha256:95b9f2c45f473e02226031b6998f2a2c6201d33304d0d885f5cc578ca3e3855c
     .kiro/skills/understand/languages/shell.md: sha256:f9992d17799065cef318c6906ad6cdad646cb3bbbe9ff1d07234a0634f587bd9
     .kiro/skills/understand/languages/sql.md: sha256:d0345797e637e91ae8e98f1f9fc37b62b881a6691e2801a60139fc422341c4a4
     .kiro/skills/understand/languages/swift.md: sha256:4c866204fffe114a4e27f11b162829257cd687020cb69b30bce88dbfff334775
@@ -404,15 +410,15 @@ dependencies:
     .kiro/skills/understand/locales/ru.md: sha256:02a9cfb7894ffd6e68a24d1dfd050ccc06bd66cac10b0b35d75acf72cedf12de
     .kiro/skills/understand/locales/zh-TW.md: sha256:727f14f80a4edb73dfe53025686d5d3afe865eaa554ec1c6c787f3a9a070621f
     .kiro/skills/understand/locales/zh.md: sha256:06cbd26979a3383f6177b3d37995bef44f104ebe2de43704b8b1d1b5031ad98b
-    .kiro/skills/understand/merge-batch-graphs.py: sha256:aec850cb49b091d54045f660733e2e5b644b73c012ba9fd15a8c1caae56dbd9f
-    .kiro/skills/understand/merge-subdomain-graphs.py: sha256:75aa0967ea8f93ba2538b1f2fcc0a48e6b38f7bcf12de3b42f9733d5dddf0d28
-    .kiro/skills/understand/scan-project.mjs: sha256:d9673ab2b37eaad4df7d5e419d04b95077045d0b09cf4e5d4e330951df62de9b
-  content_hash: sha256:192b91ea365e4d4ec8018ac721a9c27a22b081f26d6911388d4ce794bbb435e2
+    .kiro/skills/understand/merge-batch-graphs.py: sha256:b487d94f16e625215024115ff80f6a8c9279468540af59d986416893e7facc1e
+    .kiro/skills/understand/merge-subdomain-graphs.py: sha256:b984a478a18eb7a0186f5374dd733fc001bc77806215bd067f404107911fa059
+    .kiro/skills/understand/scan-project.mjs: sha256:10bd886733a6f5e91c3698ccba9997d71115367ceb3ba628d233b46493ba7a4a
+  content_hash: sha256:e6294eb05257194b84c13f60379605c1a70204e7c8dc1022d0ee7e1629c5e7bb
 - repo_url: Lum1104/Understand-Anything
-  name: Understand-Anything
+  name: understand-dashboard
   host: github.com
-  resolved_commit: 83c331b9a3e5065135d00c9c89ea6a43b655026c
-  version: unknown
+  resolved_commit: f08763d11d0202a8a8f52b5dedda6d1b2e2ebac8
+  version: 1.0.0
   virtual_path: understand-anything-plugin/skills/understand-dashboard
   is_virtual: true
   package_type: claude_skill
@@ -424,10 +430,10 @@ dependencies:
   - .kiro/skills/understand-dashboard
   - .kiro/skills/understand-dashboard/SKILL.md
   deployed_file_hashes:
-    .agents/skills/understand-dashboard/SKILL.md: sha256:b69f457d3e453efa0e396f9757edab423998d632729361a9e145da6e79774026
-    .claude/skills/understand-dashboard/SKILL.md: sha256:b69f457d3e453efa0e396f9757edab423998d632729361a9e145da6e79774026
-    .kiro/skills/understand-dashboard/SKILL.md: sha256:b69f457d3e453efa0e396f9757edab423998d632729361a9e145da6e79774026
-  content_hash: sha256:2964b46dd4dfe983cd542c81519eae0440be758ce542c02977b6d03ecac65b3c
+    .agents/skills/understand-dashboard/SKILL.md: sha256:d309a58180343713e1e6b429af02059bd0786d8f36e72effbf709b1462792c39
+    .claude/skills/understand-dashboard/SKILL.md: sha256:d309a58180343713e1e6b429af02059bd0786d8f36e72effbf709b1462792c39
+    .kiro/skills/understand-dashboard/SKILL.md: sha256:d309a58180343713e1e6b429af02059bd0786d8f36e72effbf709b1462792c39
+  content_hash: sha256:807f8a74f3a49ac65202286f1906b6318d009a5d3af3eb78663d77d002dab912
 - repo_url: anthropics/claude-code
   name: claude-code
   host: github.com
@@ -869,7 +875,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: 5af50e783dda5d61f8ae037cf0ba6437b7fe4396
+  resolved_commit: 0ea964be08beca0f95221815335d55ae053b3fdd
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -2388,7 +2394,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
-  resolved_commit: ecbbbb59332d641f85458fd0a177c53db2fabeea
+  resolved_commit: 0ea964be08beca0f95221815335d55ae053b3fdd
   resolved_ref: main
   version: 1.0.0
   virtual_path: manual-skills
@@ -2416,10 +2422,10 @@ dependencies:
     .kiro/skills/web-research/SKILL.md: sha256:7c2b1f1990370f7ce176fe3608a67028c72db11e337b4ba83b8fce6d927dfde3
   content_hash: sha256:2b66d5db8c8d70474e70638f437f324fb3af3724b71bf8501e48c8004e70e677
 - repo_url: mattpocock/skills
-  name: skills
+  name: grill-with-docs
   host: github.com
-  resolved_commit: d574778f94cf620fcc8ce741584093bc650a61d3
-  version: unknown
+  resolved_commit: 89d370d181e7397c1cf4e9da47391dd26cd416b1
+  version: 1.0.0
   virtual_path: skills/engineering/grill-with-docs
   is_virtual: true
   package_type: claude_skill
@@ -2436,10 +2442,10 @@ dependencies:
     .kiro/skills/grill-with-docs/SKILL.md: sha256:610d091047bcfb9db0f75c057d15538481a721111579fc5ec7f83ad9131a2165
   content_hash: sha256:e7ef25bbee50cda2eb7b3a8ef541db0a0396dad7d369f7d14fb610671dd1864b
 - repo_url: mattpocock/skills
-  name: skills
+  name: wayfinder
   host: github.com
-  resolved_commit: d574778f94cf620fcc8ce741584093bc650a61d3
-  version: unknown
+  resolved_commit: 89d370d181e7397c1cf4e9da47391dd26cd416b1
+  version: 1.0.0
   virtual_path: skills/engineering/wayfinder
   is_virtual: true
   package_type: claude_skill
@@ -2456,10 +2462,10 @@ dependencies:
     .kiro/skills/wayfinder/SKILL.md: sha256:bef437de697fb6984a8a90b7fd82f128609148d6e02f635ce419d03555b351e1
   content_hash: sha256:3eb72cd9abdfaa00e10fa69f0b4410ff8639a6cf4eb9e5d187b289c3aa9be2fc
 - repo_url: mattpocock/skills
-  name: skills
+  name: grilling
   host: github.com
-  resolved_commit: d574778f94cf620fcc8ce741584093bc650a61d3
-  version: unknown
+  resolved_commit: 89d370d181e7397c1cf4e9da47391dd26cd416b1
+  version: 1.0.0
   virtual_path: skills/productivity/grilling
   is_virtual: true
   package_type: claude_skill
@@ -2476,10 +2482,10 @@ dependencies:
     .kiro/skills/grilling/SKILL.md: sha256:5a35925d03a391bcfa46940868b649b72dba89ec9c19525e785bbb6bd3a7f478
   content_hash: sha256:1de9e777a60b184b29412fadacb7bbde8c14bb7037e5c4d9d086c941281d1742
 - repo_url: mattpocock/skills
-  name: skills
+  name: handoff
   host: github.com
-  resolved_commit: d574778f94cf620fcc8ce741584093bc650a61d3
-  version: unknown
+  resolved_commit: 89d370d181e7397c1cf4e9da47391dd26cd416b1
+  version: 1.0.0
   virtual_path: skills/productivity/handoff
   is_virtual: true
   package_type: claude_skill
@@ -2496,10 +2502,10 @@ dependencies:
     .kiro/skills/handoff/SKILL.md: sha256:57c9f1f392d7352cdc85b1e39ca49eddc70ce1dc278bd9653fb4f23dfc2560fc
   content_hash: sha256:87e353708ab36062eac54ddb593a97ca553c0cb4bfa1ed1fdaf68520700723f1
 - repo_url: mattpocock/skills
-  name: skills
+  name: writing-great-skills
   host: github.com
-  resolved_commit: d574778f94cf620fcc8ce741584093bc650a61d3
-  version: unknown
+  resolved_commit: 89d370d181e7397c1cf4e9da47391dd26cd416b1
+  version: 1.0.0
   virtual_path: skills/productivity/writing-great-skills
   is_virtual: true
   package_type: claude_skill
@@ -2524,8 +2530,8 @@ dependencies:
 - repo_url: millionco/react-doctor
   name: react-doctor
   host: github.com
-  resolved_commit: fd2db30f6ebe0be116d1e028904813c900d3b16f
-  version: unknown
+  resolved_commit: dfccac44e4468dd971e2a4fe8e44a49ba91f498a
+  version: 1.0.0
   virtual_path: skills/react-doctor
   is_virtual: true
   package_type: claude_skill
@@ -4613,50 +4619,6 @@ dependencies:
   host: github.com
   resolved_commit: 49f948faa9258a0c61caceaf225e179651397431
   version: unknown
-  virtual_path: skills/.curated/linear
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/linear
-  - .agents/skills/linear/LICENSE.txt
-  - .agents/skills/linear/SKILL.md
-  - .agents/skills/linear/agents/openai.yaml
-  - .agents/skills/linear/assets/linear-small.svg
-  - .agents/skills/linear/assets/linear.png
-  - .claude/skills/linear
-  - .claude/skills/linear/LICENSE.txt
-  - .claude/skills/linear/SKILL.md
-  - .claude/skills/linear/agents/openai.yaml
-  - .claude/skills/linear/assets/linear-small.svg
-  - .claude/skills/linear/assets/linear.png
-  - .kiro/skills/linear
-  - .kiro/skills/linear/LICENSE.txt
-  - .kiro/skills/linear/SKILL.md
-  - .kiro/skills/linear/agents/openai.yaml
-  - .kiro/skills/linear/assets/linear-small.svg
-  - .kiro/skills/linear/assets/linear.png
-  deployed_file_hashes:
-    .agents/skills/linear/LICENSE.txt: sha256:58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd
-    .agents/skills/linear/SKILL.md: sha256:ce0f39c95b6c9190f8ea33614393cdb556b2684dd8388ded394e9cb915f42601
-    .agents/skills/linear/agents/openai.yaml: sha256:9e6f164960e3dd0bc56456538abdf196d9e4fd8b4273be06fe1ef0110fbab9cb
-    .agents/skills/linear/assets/linear-small.svg: sha256:6af9dbc5e58a51e80fcbcee47e5f9bd196a997cc5985c2147a89c908831d327f
-    .agents/skills/linear/assets/linear.png: sha256:be13bf3f97e4437e67cda80979759998fb4f4dcace3cdd6a220ba6a75e1c2a82
-    .claude/skills/linear/LICENSE.txt: sha256:58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd
-    .claude/skills/linear/SKILL.md: sha256:ce0f39c95b6c9190f8ea33614393cdb556b2684dd8388ded394e9cb915f42601
-    .claude/skills/linear/agents/openai.yaml: sha256:9e6f164960e3dd0bc56456538abdf196d9e4fd8b4273be06fe1ef0110fbab9cb
-    .claude/skills/linear/assets/linear-small.svg: sha256:6af9dbc5e58a51e80fcbcee47e5f9bd196a997cc5985c2147a89c908831d327f
-    .claude/skills/linear/assets/linear.png: sha256:be13bf3f97e4437e67cda80979759998fb4f4dcace3cdd6a220ba6a75e1c2a82
-    .kiro/skills/linear/LICENSE.txt: sha256:58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd
-    .kiro/skills/linear/SKILL.md: sha256:ce0f39c95b6c9190f8ea33614393cdb556b2684dd8388ded394e9cb915f42601
-    .kiro/skills/linear/agents/openai.yaml: sha256:9e6f164960e3dd0bc56456538abdf196d9e4fd8b4273be06fe1ef0110fbab9cb
-    .kiro/skills/linear/assets/linear-small.svg: sha256:6af9dbc5e58a51e80fcbcee47e5f9bd196a997cc5985c2147a89c908831d327f
-    .kiro/skills/linear/assets/linear.png: sha256:be13bf3f97e4437e67cda80979759998fb4f4dcace3cdd6a220ba6a75e1c2a82
-  content_hash: sha256:9d8b9a97a200f0980d89ffad869f2f9c4e24b7a0dbcabe0ed97a0d32a03c18fc
-- repo_url: openai/skills
-  name: skills
-  host: github.com
-  resolved_commit: 49f948faa9258a0c61caceaf225e179651397431
-  version: unknown
   virtual_path: skills/.curated/screenshot
   is_virtual: true
   package_type: claude_skill
@@ -4732,50 +4694,6 @@ dependencies:
     .kiro/skills/screenshot/scripts/take_screenshot.ps1: sha256:a31a2242e41fd1c5471651afbcced660f98fbc884f11e531218348f700a3f826
     .kiro/skills/screenshot/scripts/take_screenshot.py: sha256:56eeabe2dac5d23915b9a0fb57a07431fad2d310c5444f60f71f09299899232b
   content_hash: sha256:59bd54a88ecfb293a88187164e8bdf9f27f8f28eb746a4cefcdb8f6084fde99e
-- repo_url: openai/skills
-  name: skills
-  host: github.com
-  resolved_commit: 49f948faa9258a0c61caceaf225e179651397431
-  version: unknown
-  virtual_path: skills/.curated/sentry
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/sentry
-  - .agents/skills/sentry/LICENSE.txt
-  - .agents/skills/sentry/SKILL.md
-  - .agents/skills/sentry/agents/openai.yaml
-  - .agents/skills/sentry/assets/sentry-small.svg
-  - .agents/skills/sentry/assets/sentry.png
-  - .claude/skills/sentry
-  - .claude/skills/sentry/LICENSE.txt
-  - .claude/skills/sentry/SKILL.md
-  - .claude/skills/sentry/agents/openai.yaml
-  - .claude/skills/sentry/assets/sentry-small.svg
-  - .claude/skills/sentry/assets/sentry.png
-  - .kiro/skills/sentry
-  - .kiro/skills/sentry/LICENSE.txt
-  - .kiro/skills/sentry/SKILL.md
-  - .kiro/skills/sentry/agents/openai.yaml
-  - .kiro/skills/sentry/assets/sentry-small.svg
-  - .kiro/skills/sentry/assets/sentry.png
-  deployed_file_hashes:
-    .agents/skills/sentry/LICENSE.txt: sha256:4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9
-    .agents/skills/sentry/SKILL.md: sha256:508c6f5c100586c81a34397d30f00f4b8771b66d698a7ac1836998df925dd007
-    .agents/skills/sentry/agents/openai.yaml: sha256:c7ed57441b9a1e3f4caa19da4d90d432a65cd398c4f361b47dbf9408be0e065f
-    .agents/skills/sentry/assets/sentry-small.svg: sha256:f1de8efc906c03b583b4d74560b003175c8a3d9ea5950d891ce3142fec11ca99
-    .agents/skills/sentry/assets/sentry.png: sha256:b61e0534635a275cf56f7dad26ac7cc36504b7bd9a60c95791d6e72634129fb1
-    .claude/skills/sentry/LICENSE.txt: sha256:4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9
-    .claude/skills/sentry/SKILL.md: sha256:508c6f5c100586c81a34397d30f00f4b8771b66d698a7ac1836998df925dd007
-    .claude/skills/sentry/agents/openai.yaml: sha256:c7ed57441b9a1e3f4caa19da4d90d432a65cd398c4f361b47dbf9408be0e065f
-    .claude/skills/sentry/assets/sentry-small.svg: sha256:f1de8efc906c03b583b4d74560b003175c8a3d9ea5950d891ce3142fec11ca99
-    .claude/skills/sentry/assets/sentry.png: sha256:b61e0534635a275cf56f7dad26ac7cc36504b7bd9a60c95791d6e72634129fb1
-    .kiro/skills/sentry/LICENSE.txt: sha256:4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9
-    .kiro/skills/sentry/SKILL.md: sha256:508c6f5c100586c81a34397d30f00f4b8771b66d698a7ac1836998df925dd007
-    .kiro/skills/sentry/agents/openai.yaml: sha256:c7ed57441b9a1e3f4caa19da4d90d432a65cd398c4f361b47dbf9408be0e065f
-    .kiro/skills/sentry/assets/sentry-small.svg: sha256:f1de8efc906c03b583b4d74560b003175c8a3d9ea5950d891ce3142fec11ca99
-    .kiro/skills/sentry/assets/sentry.png: sha256:b61e0534635a275cf56f7dad26ac7cc36504b7bd9a60c95791d6e72634129fb1
-  content_hash: sha256:ee9bf4029079e696d9b757b2ab83fd0d2f5597aaf54df4a5fe524ec08d02e6bd
 - repo_url: softaworks/agent-toolkit
   name: agent-toolkit
   host: github.com

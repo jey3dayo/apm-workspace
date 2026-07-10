@@ -52,9 +52,7 @@ dependencies:
     - openai/codex-plugin-cc/plugins/codex/skills/gpt-5-4-prompting
     - openai/skills/skills/.curated/gh-address-comments
     - openai/skills/skills/.curated/gh-fix-ci
-    - openai/skills/skills/.curated/linear
     - openai/skills/skills/.curated/screenshot
-    - openai/skills/skills/.curated/sentry
     - softaworks/agent-toolkit/skills/mermaid-diagrams
     - vercel-labs/agent-browser/skills/agent-browser
     - vercel-labs/agent-skills/skills/composition-patterns
