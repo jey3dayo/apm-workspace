@@ -14,17 +14,17 @@
 - リント対象の変更: リント違反 0 件
 - テスト対象の変更: 関連テスト成功
 - フォーマット対象の変更: フォーマッター適用済み、または format check 成功
-- push / PR 作成前: リポジトリ定義の format タスクで auto-format を実行する。auto-format が存在しない場合のみ format check 成功で代替する
+- push / PR 作成前: lefthook が設定されているリポジトリでは pre-commit / pre-push フックに検証を委ね、フックが通ればそれを full gate とみなす。lefthook がない場合のみ、リポジトリ定義の format タスクで auto-format を実行する（auto-format が存在しない場合は format check 成功で代替する）
 
 ### 検証粒度
 
-| タイミング                                           | 実行する確認                 | 例                                                               |
-| ---------------------------------------------------- | ---------------------------- | ---------------------------------------------------------------- |
-| 実装中・小さな修正後                                 | 変更範囲に直結する軽い確認   | touched file の formatter、変更箇所の関連テスト                  |
-| 型・lint・テストに影響する変更後                     | 該当領域の focused check     | 対象 package の typecheck / lint / unit test                     |
-| 共通基盤・依存・設定・生成物・永続データ構造の変更後 | 早めに full gate へ昇格      | repo 定義の `check` / `test` / `ci` / `verify`                   |
-| commit 前                                            | 差分が壊れていないことの確認 | `git diff --check`、staged/touched files の format / lint        |
-| push / PR / deploy 前                                | full gate                    | repo 定義の auto-format、format check、lint、test、build、verify |
+| タイミング                                           | 実行する確認                 | 例                                                                                   |
+| ---------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------ |
+| 実装中・小さな修正後                                 | 変更範囲に直結する軽い確認   | touched file の formatter、変更箇所の関連テスト                                      |
+| 型・lint・テストに影響する変更後                     | 該当領域の focused check     | 対象 package の typecheck / lint / unit test                                         |
+| 共通基盤・依存・設定・生成物・永続データ構造の変更後 | 早めに full gate へ昇格      | repo 定義の `check` / `test` / `ci` / `verify`                                       |
+| commit 前                                            | 差分が壊れていないことの確認 | `git diff --check`、staged/touched files の format / lint                            |
+| push / PR / deploy 前                                | full gate                    | lefthook pre-push / repo 定義の auto-format、format check、lint、test、build、verify |
 
 full gate を実行しない場合は、報告時に実行した軽い確認と、full gate を省略した理由を短く明示する。
 
