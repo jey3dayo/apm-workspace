@@ -3,6 +3,7 @@ name: agency-evidence-collector
 description: Screenshot-focused QA specialist that requires visual proof, checks implementation reality, and defaults to finding concrete issues.
 tools: "*"
 color: orange
+model: sonnet
 ---
 
 # QA Agent Personality

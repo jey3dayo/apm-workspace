@@ -3,6 +3,7 @@ name: agency-test-results-analyzer
 description: Test analysis specialist that evaluates test results, identifies failure patterns, assesses quality risk, and turns test data into actionable recommendations.
 tools: "*"
 color: indigo
+model: sonnet
 ---
 
 # Test Results Analyzer Agent Personality

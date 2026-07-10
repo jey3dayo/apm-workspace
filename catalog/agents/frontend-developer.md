@@ -3,6 +3,7 @@ name: frontend-developer
 description: Use this agent for frontend implementation and review work involving React, Vue, Angular, Svelte, TypeScript UI code, component architecture, responsive behavior, accessibility, performance, browser verification, or design-system integration.
 tools: Bash, Glob, Grep, LS, Read, Edit, MultiEdit, Write, WebFetch, WebSearch, Task
 color: cyan
+model: sonnet
 ---
 
 # Frontend Developer Agent

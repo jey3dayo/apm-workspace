@@ -3,6 +3,7 @@ name: aws-operations
 description: Specialized agent for AWS operational tasks including ECS service management, ECR image operations, CloudWatch logs/metrics monitoring, and ALB health checks. Automates daily AWS operations through natural language requests. Trigger when users mention "ECS", "ECR", "CloudWatch", "logs", "metrics", "ALB", "target group", "service restart", or need AWS resource management for ASTA project.
 tools: "*"
 color: orange
+model: sonnet
 ---
 
 # AWS Operations Agent

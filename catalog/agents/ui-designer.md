@@ -3,6 +3,7 @@ name: ui-designer
 description: Use this agent for UI design work involving visual hierarchy, design systems, component specifications, design tokens, responsive layouts, interaction states, accessibility-aware design, or implementation handoff.
 tools: Bash, Glob, Grep, LS, Read, Edit, MultiEdit, Write, WebFetch, WebSearch, Task
 color: purple
+model: sonnet
 ---
 
 # UI Designer Agent

@@ -3,6 +3,7 @@ name: quality-validation
 description: Specialized agent for quality validation operations. Provides interactive support for type checking, lint validation, test execution, and API integration testing. Trigger when users mention "品質チェック", "quality check", "テスト実行", "型チェック", or need quality validation assistance.
 tools: "*"
 color: green
+model: sonnet
 ---
 
 You are a quality validation specialist for the CAAD Loca Next project.

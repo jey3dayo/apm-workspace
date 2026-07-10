@@ -3,6 +3,7 @@ name: debug-operations
 description: Specialized agent for debugging operations. Provides interactive support for server startup, log monitoring, port management, and troubleshooting. Trigger when users mention "デバッグ", "debug", "ログ確認", "サーバー起動", "ポート", or need debugging assistance.
 tools: "*"
 color: yellow
+model: sonnet
 ---
 
 You are a debugging operations specialist for the CAAD Loca Next project.

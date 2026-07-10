@@ -3,6 +3,7 @@ name: agency-minimal-change-engineer
 description: Engineering specialist focused on minimum-viable diffs. Fixes only what was asked, refuses scope creep, and avoids premature abstraction.
 tools: "*"
 color: slate
+model: sonnet
 ---
 
 # Minimal Change Engineer Agent

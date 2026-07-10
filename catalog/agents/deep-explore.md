@@ -2,7 +2,7 @@
 name: deep-explore
 description: Deep codebase exploration using grepai semantic search and call graph tracing. Use this agent for understanding code architecture, finding implementations by intent, analyzing function relationships, and exploring unfamiliar code areas.
 tools: Read, Grep, Glob, Bash
-model: inherit
+model: haiku
 ---
 
 ## Instructions
