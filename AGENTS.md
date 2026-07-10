@@ -15,6 +15,19 @@ Keep the split between authoring, tracked package content, and deployed runtime 
 
 Treat source of truth as a split model by asset type, not as "whatever is currently deployed".
 
+Use this table as the Source of Truth Table (SoTT) when deciding where to read or update durable workspace knowledge.
+
+| 対象                                                              | 正本                                                          | 用途                                                                                           |
+| ----------------------------------------------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Personal skills / shared guidance                                 | `catalog/**`                                                  | skills、AGENTS.md、agents、commands、rules の authoring surface                                |
+| External skills / global MCP                                      | `apm.yml` + `apm.lock.yaml`                                   | 外部依存の宣言と accepted resolved state。global MCP は `apm.yml` の `mcp:`                    |
+| SaaS 連携（コネクタ / プラグイン）                                | `docs/saas-connectors.md`                                     | claude.ai / ChatGPT アプリ側コネクタの接続状況と配置優先度（plugin > apm.yml > catalog skill） |
+| Repo-local MCP                                                    | 各リポジトリの `apm.yml`（一覧は `ghq list -p`）              | リポジトリ固有の MCP セット                                                                    |
+| パッケージ採用・撤去の意思決定                                    | `docs/package-decisions.md`                                   | なぜ入れた / 消したかのログ                                                                    |
+| APM タスクの使い分け                                              | `docs/apm-task-coverage.md`                                   | rollout / verify などのタスク責務                                                              |
+| Manual-lane skills                                                | `manual-skills/.apm/skills/**` + `manual-skills/upstreams/**` | managed lane で壊れる外部スキルの手動管理と provenance                                         |
+| Deployed targets（`~/.claude/`, `~/.codex/`, `~/.agents/skills`） | 生成物（SSoT ではない）                                       | 検証・配布面。直接編集しない                                                                   |
+
 - `./catalog` is the tracked source of truth for managed content in this repository
   - `catalog/skills/**` for personal skills
   - `catalog/AGENTS.md`, `catalog/agents/**`, `catalog/commands/**`, and `catalog/rules/**` for shared guidance
