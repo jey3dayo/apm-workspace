@@ -6,7 +6,10 @@ description: >-
   dependency graphs (`mise run`, depends/run), `[task_config].includes` and
   DB/env/dotenvx/secrets/tools task-family splitting, tool/package
   centralization (npm:/pipx:), `mise upgrade` and `minimum_release_age`,
-  Windows settings (`run_windows`, `config.windows.toml`), or `mise skills add`.
+  Windows settings (`run_windows`, `config.windows.toml`), `mise skills add`,
+  `mise bootstrap` and its config sections (`[bootstrap.packages]`,
+  `[dotfiles]`, launchd/systemd units), `mise dotfiles apply`, or migrating a
+  Brewfile to mise bootstrap.
   For `~/.apm` rollout work (apm.yml, lockfile, which APM task to run),
   coordinate with `apm-usage`. For Home Manager / Nix Flake dotfiles, use
   `nix-dotfiles`.
@@ -28,7 +31,7 @@ Classify the request into one mode and answer from that mode only:
    - Split layouts are valid here: settings-only `config.toml`, environment files such as `config.default.toml` / `config.ci.toml` / `config.windows.toml`, shared task files via `[task_config].includes` — see `references/task-config-includes.md`
    - `config.windows.toml` and `windows_default_*_shell_args` usually belong here unless the repository explicitly vendors its own Windows shell policy
 
-If the request mentions `mise skills add`, personal/global setup, or `~/.config/mise`, treat it as user-global. Otherwise default to project-local.
+If the request mentions `mise skills add`, `mise bootstrap`, `[dotfiles]`, personal/global setup, or `~/.config/mise`, treat it as user-global. Otherwise default to project-local.
 
 ## Repository Overrides
 
@@ -90,6 +93,17 @@ Treat as a user-global workflow, not project-local task design:
 2. Run `mise skills add <skill>`, then `mise install` if it adds tool dependencies
 3. Keep reusable automation in shared task files or `.mise.toml`, not ad hoc shell aliases
 
+## mise bootstrap (user-global / dotfiles mode)
+
+`mise bootstrap` (v2026.6.6+, completed v2026.6.14) is declarative machine setup: OS packages, repos, dotfiles, macOS defaults, launchd/systemd units, login shell, tools, and a final `[tasks.bootstrap]`. Classify these requests as user-global / dotfiles mode.
+
+- Config keys must be nested tables (`[bootstrap.packages]`, not flat `bootstrap = ...`)
+- Package backends: apk/apt/dnf/pacman/brew/brew-cask/mas; cask support is native (no Homebrew required); pin versions via name suffix (`brew:postgresql@17`), values are `"latest"`
+- `packages import` is brew-formulae-only; `packages prune` is opt-in and prefix-inventory based — always `--dry-run` first
+- Declarative sections converge idempotently; the custom `[tasks.bootstrap]` hook must be kept idempotent by the user
+
+Sections, subcommands, prune safety, and Brewfile migration: `references/bootstrap.md`.
+
 ## Review Workflow
 
 0. Classify the request: project-local vs user-global / dotfiles
@@ -121,6 +135,7 @@ For repository-specific reviews, additionally verify the answer:
 Load as needed:
 
 - `references/best-practices.md` — full run-vs-depends mental model, command composition patterns, advanced features (`depends_post`, `wait_for`, `retry`, `timeout`), CI integration, performance
+- `references/bootstrap.md` — mise bootstrap sections, packages subcommands/backends, prune safety, Brewfile migration
 - `references/config-templates.md` — common mise.toml templates
 - `references/current-patterns.md` — real-world dotfiles task patterns
 - `references/task-family-splitting.md` — project-local split rules for DB/env/secrets/infra/deploy/tools families
