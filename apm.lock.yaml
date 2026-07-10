@@ -869,7 +869,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: ecbbbb59332d641f85458fd0a177c53db2fabeea
+  resolved_commit: 5af50e783dda5d61f8ae037cf0ba6437b7fe4396
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -1729,7 +1729,7 @@ dependencies:
     .agents/skills/atomic-commit/agents/openai.yaml: sha256:8486b70455d5ec0241bc7bf64bf52d806084132b2c4fcea7dcfd79ed7aec497f
     .agents/skills/ci-stability-hooks/SKILL.md: sha256:2eb85b96927729a1b181f389d74f4d6965895d5d616936477e3955d3e37de479
     .agents/skills/ci-stability-hooks/agents/openai.yaml: sha256:60a9e8633c5933d8663858f15d71831b0af1c5265accf6f5e2ebba0916373cc2
-    .agents/skills/code-quality-improvement/SKILL.md: sha256:6dca795076916795f024071f81a8f9f194c93a3818bfb842dde2ee67537d3a80
+    .agents/skills/code-quality-improvement/SKILL.md: sha256:13e0d11f43b1578bcf34c498b19e4d02b2acd674bf9312b123e13e2cc2ff37aa
     .agents/skills/code-quality-improvement/references/patterns.md: sha256:d371fb616f8c56d9aff936ce9518619856d66d3ad6968108945526882e032d69
     .agents/skills/code-review/SKILL.md: sha256:0645e0b0aa0b563ed61c5cbba0e927b77f3466d402e204a1aa762b70770f3116
     .agents/skills/code-review/agents/openai.yaml: sha256:4a105fb0747ac36ba050c012709c60c59b256eee9544dbe997d1f266075ce8db
@@ -1956,7 +1956,7 @@ dependencies:
     .claude/skills/atomic-commit/agents/openai.yaml: sha256:8486b70455d5ec0241bc7bf64bf52d806084132b2c4fcea7dcfd79ed7aec497f
     .claude/skills/ci-stability-hooks/SKILL.md: sha256:2eb85b96927729a1b181f389d74f4d6965895d5d616936477e3955d3e37de479
     .claude/skills/ci-stability-hooks/agents/openai.yaml: sha256:60a9e8633c5933d8663858f15d71831b0af1c5265accf6f5e2ebba0916373cc2
-    .claude/skills/code-quality-improvement/SKILL.md: sha256:6dca795076916795f024071f81a8f9f194c93a3818bfb842dde2ee67537d3a80
+    .claude/skills/code-quality-improvement/SKILL.md: sha256:13e0d11f43b1578bcf34c498b19e4d02b2acd674bf9312b123e13e2cc2ff37aa
     .claude/skills/code-quality-improvement/references/patterns.md: sha256:d371fb616f8c56d9aff936ce9518619856d66d3ad6968108945526882e032d69
     .claude/skills/code-review/SKILL.md: sha256:0645e0b0aa0b563ed61c5cbba0e927b77f3466d402e204a1aa762b70770f3116
     .claude/skills/code-review/agents/openai.yaml: sha256:4a105fb0747ac36ba050c012709c60c59b256eee9544dbe997d1f266075ce8db
@@ -2183,7 +2183,7 @@ dependencies:
     .kiro/skills/atomic-commit/agents/openai.yaml: sha256:8486b70455d5ec0241bc7bf64bf52d806084132b2c4fcea7dcfd79ed7aec497f
     .kiro/skills/ci-stability-hooks/SKILL.md: sha256:2eb85b96927729a1b181f389d74f4d6965895d5d616936477e3955d3e37de479
     .kiro/skills/ci-stability-hooks/agents/openai.yaml: sha256:60a9e8633c5933d8663858f15d71831b0af1c5265accf6f5e2ebba0916373cc2
-    .kiro/skills/code-quality-improvement/SKILL.md: sha256:6dca795076916795f024071f81a8f9f194c93a3818bfb842dde2ee67537d3a80
+    .kiro/skills/code-quality-improvement/SKILL.md: sha256:13e0d11f43b1578bcf34c498b19e4d02b2acd674bf9312b123e13e2cc2ff37aa
     .kiro/skills/code-quality-improvement/references/patterns.md: sha256:d371fb616f8c56d9aff936ce9518619856d66d3ad6968108945526882e032d69
     .kiro/skills/code-review/SKILL.md: sha256:0645e0b0aa0b563ed61c5cbba0e927b77f3466d402e204a1aa762b70770f3116
     .kiro/skills/code-review/agents/openai.yaml: sha256:4a105fb0747ac36ba050c012709c60c59b256eee9544dbe997d1f266075ce8db
@@ -2384,7 +2384,7 @@ dependencies:
     .kiro/skills/work-log-maintenance/SKILL.md: sha256:26f4064ff1c0e757e415121675d6caaecd30040f95304e6ed4cd4c73e022f3f9
     .kiro/skills/work-log-maintenance/agents/openai.yaml: sha256:e951b8256a5a1b032bcca3c7105230f5041467594434ca23b562b8ec5ec4abc8
     .kiro/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
-  content_hash: sha256:c20a008cccb0e11ff279165b16d0a276f7a378cb17ffb3db37fc11a91add5324
+  content_hash: sha256:1bf58b729946684bd719651609ed139f4bd559b464d59f4df32c43e1be0c0771
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
