@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-07-09T18:15:07.331680+00:00'
+generated_at: '2026-07-10T03:27:02.110142+00:00'
 apm_version: 0.22.0
 dependencies:
 - repo_url: Jakubantalik/transitions-dev
@@ -431,7 +431,7 @@ dependencies:
 - repo_url: anthropics/claude-code
   name: claude-code
   host: github.com
-  resolved_commit: be02c39841a59e2ac1f35ac12285def02acdbb5a
+  resolved_commit: 15a21e1b4e240e2da6a4953d5f148a806c9c9bb2
   version: unknown
   virtual_path: plugins/frontend-design/skills/frontend-design
   is_virtual: true
@@ -869,7 +869,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: 445e68522888682403012174b3454344e00d14c3
+  resolved_commit: ecbbbb59332d641f85458fd0a177c53db2fabeea
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -1026,11 +1026,6 @@ dependencies:
   - .agents/skills/macos-troubleshooting/SKILL.md
   - .agents/skills/macos-troubleshooting/agents/openai.yaml
   - .agents/skills/macos-troubleshooting/references/cases.md
-  - .agents/skills/manga-rss-bridge
-  - .agents/skills/manga-rss-bridge/SKILL.md
-  - .agents/skills/manga-rss-bridge/agents/openai.yaml
-  - .agents/skills/manga-rss-bridge/references/usage.md
-  - .agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.py
   - .agents/skills/mcp-tools
   - .agents/skills/mcp-tools/SKILL.md
   - .agents/skills/mcp-tools/agents/openai.yaml
@@ -1050,10 +1045,6 @@ dependencies:
   - .agents/skills/mise/references/windows-shells.md
   - .agents/skills/mise/resources/examples/npm-package-migration.md
   - .agents/skills/mise/resources/templates/mise-config-template.toml
-  - .agents/skills/mole-management
-  - .agents/skills/mole-management/SKILL.md
-  - .agents/skills/mole-management/agents/openai.yaml
-  - .agents/skills/mole-management/references/mole-cleanup.md
   - .agents/skills/pc-ops
   - .agents/skills/pc-ops/SKILL.md
   - .agents/skills/pc-ops/agents/openai.yaml
@@ -1135,9 +1126,6 @@ dependencies:
   - .agents/skills/slack-app-management
   - .agents/skills/slack-app-management/SKILL.md
   - .agents/skills/slack-app-management/agents/openai.yaml
-  - .agents/skills/slide-docs
-  - .agents/skills/slide-docs/SKILL.md
-  - .agents/skills/slide-docs/references/index.md
   - .agents/skills/tsr
   - .agents/skills/tsr/MIGRATION.md
   - .agents/skills/tsr/README.md
@@ -1314,11 +1302,6 @@ dependencies:
   - .claude/skills/macos-troubleshooting/SKILL.md
   - .claude/skills/macos-troubleshooting/agents/openai.yaml
   - .claude/skills/macos-troubleshooting/references/cases.md
-  - .claude/skills/manga-rss-bridge
-  - .claude/skills/manga-rss-bridge/SKILL.md
-  - .claude/skills/manga-rss-bridge/agents/openai.yaml
-  - .claude/skills/manga-rss-bridge/references/usage.md
-  - .claude/skills/manga-rss-bridge/scripts/generate_freshrss_opml.py
   - .claude/skills/mcp-tools
   - .claude/skills/mcp-tools/SKILL.md
   - .claude/skills/mcp-tools/agents/openai.yaml
@@ -1338,10 +1321,6 @@ dependencies:
   - .claude/skills/mise/references/windows-shells.md
   - .claude/skills/mise/resources/examples/npm-package-migration.md
   - .claude/skills/mise/resources/templates/mise-config-template.toml
-  - .claude/skills/mole-management
-  - .claude/skills/mole-management/SKILL.md
-  - .claude/skills/mole-management/agents/openai.yaml
-  - .claude/skills/mole-management/references/mole-cleanup.md
   - .claude/skills/pc-ops
   - .claude/skills/pc-ops/SKILL.md
   - .claude/skills/pc-ops/agents/openai.yaml
@@ -1423,9 +1402,6 @@ dependencies:
   - .claude/skills/slack-app-management
   - .claude/skills/slack-app-management/SKILL.md
   - .claude/skills/slack-app-management/agents/openai.yaml
-  - .claude/skills/slide-docs
-  - .claude/skills/slide-docs/SKILL.md
-  - .claude/skills/slide-docs/references/index.md
   - .claude/skills/tsr
   - .claude/skills/tsr/MIGRATION.md
   - .claude/skills/tsr/README.md
@@ -1602,11 +1578,6 @@ dependencies:
   - .kiro/skills/macos-troubleshooting/SKILL.md
   - .kiro/skills/macos-troubleshooting/agents/openai.yaml
   - .kiro/skills/macos-troubleshooting/references/cases.md
-  - .kiro/skills/manga-rss-bridge
-  - .kiro/skills/manga-rss-bridge/SKILL.md
-  - .kiro/skills/manga-rss-bridge/agents/openai.yaml
-  - .kiro/skills/manga-rss-bridge/references/usage.md
-  - .kiro/skills/manga-rss-bridge/scripts/generate_freshrss_opml.py
   - .kiro/skills/mcp-tools
   - .kiro/skills/mcp-tools/SKILL.md
   - .kiro/skills/mcp-tools/agents/openai.yaml
@@ -1626,10 +1597,6 @@ dependencies:
   - .kiro/skills/mise/references/windows-shells.md
   - .kiro/skills/mise/resources/examples/npm-package-migration.md
   - .kiro/skills/mise/resources/templates/mise-config-template.toml
-  - .kiro/skills/mole-management
-  - .kiro/skills/mole-management/SKILL.md
-  - .kiro/skills/mole-management/agents/openai.yaml
-  - .kiro/skills/mole-management/references/mole-cleanup.md
   - .kiro/skills/pc-ops
   - .kiro/skills/pc-ops/SKILL.md
   - .kiro/skills/pc-ops/agents/openai.yaml
@@ -1710,9 +1677,6 @@ dependencies:
   - .kiro/skills/slack-app-management
   - .kiro/skills/slack-app-management/SKILL.md
   - .kiro/skills/slack-app-management/agents/openai.yaml
-  - .kiro/skills/slide-docs
-  - .kiro/skills/slide-docs/SKILL.md
-  - .kiro/skills/slide-docs/references/index.md
   - .kiro/skills/tsr
   - .kiro/skills/tsr/MIGRATION.md
   - .kiro/skills/tsr/README.md
@@ -1861,10 +1825,6 @@ dependencies:
     .agents/skills/macos-troubleshooting/SKILL.md: sha256:5dbfb6b138966632e483ed30dff2b777b2e0842e457033d910f579a00618009c
     .agents/skills/macos-troubleshooting/agents/openai.yaml: sha256:e0c22f96dba94a75c9689b34dd10c1ce965bfa9bbe8b613e586e72a87bf6f69a
     .agents/skills/macos-troubleshooting/references/cases.md: sha256:331c8dafd6cf8f749d5565c77831c51a25cdee7b039caa2b2d7dc683cf2999bd
-    .agents/skills/manga-rss-bridge/SKILL.md: sha256:6ff43f861842631f239f9c87be0a643a6f96140a355b52640f75790bb8bae43b
-    .agents/skills/manga-rss-bridge/agents/openai.yaml: sha256:3eea5be52a31f87486d5079f543c9aba0fbae0c5451b9abc7ed9eec9a3985059
-    .agents/skills/manga-rss-bridge/references/usage.md: sha256:388507bb88468ea3e45e54107a973cb9edae8d6069d08aa1959d983cb90a1dac
-    .agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.py: sha256:a37200bcb2bd120687d3855196bba7ffd7fbdc6653c2c9eb8fc7a240e1cb1b61
     .agents/skills/mcp-tools/SKILL.md: sha256:bd74f85bae6f8b0b29d875a4c4c89fee69de798c9c262244d2d7c01447beece4
     .agents/skills/mcp-tools/agents/openai.yaml: sha256:f2251a17f3ee854c9aa28c0ef7645c279b2dcd81afc53e65a102eff7c35101af
     .agents/skills/mcp-tools/references/mcp-placement.md: sha256:fb1c67b1b36376a24daf56f1348a8c439adbbc252a93f82c1ddd0b97f8c96452
@@ -1882,9 +1842,6 @@ dependencies:
     .agents/skills/mise/references/windows-shells.md: sha256:12b6015cec11e12745e9be6dc448a10c15ed49772954f960aa322eb69a96c6ec
     .agents/skills/mise/resources/examples/npm-package-migration.md: sha256:dd9c35732be0a4cb0dbd231bfaa16024c082d9bf0be61c66b6e531085b8bdfde
     .agents/skills/mise/resources/templates/mise-config-template.toml: sha256:7c0f5e891d7f3ae501287dcc849ad16251cb24beb2e699e435ad398bba954af0
-    .agents/skills/mole-management/SKILL.md: sha256:f917e38aa98caf51d15133a788cbd42fb926d1513fb0495f2d339f9e9143d080
-    .agents/skills/mole-management/agents/openai.yaml: sha256:578ee41558167b72c6103239087f200181a4590153639e52509ab0fae67c367e
-    .agents/skills/mole-management/references/mole-cleanup.md: sha256:16b041ea1b022763080654241bf615744234f4ec3e5051ef84e26d7f956ff7ee
     .agents/skills/pc-ops/SKILL.md: sha256:3553f39a05498f040b5f6b7fdba9da1379f0afcee79469c9427cc54f14195b47
     .agents/skills/pc-ops/agents/openai.yaml: sha256:15f300474d6ae5e83fc70c3ca350c753713fffb9dfd7e10c9fea888677d40fe0
     .agents/skills/pc-ops/references/codex-macos.md: sha256:2298bc1f2586b817ce620e2904bc98423516c829a5f01269a8d9defe10931d4e
@@ -1951,8 +1908,6 @@ dependencies:
     .agents/skills/skill-creator/scripts/quick_validate.py: sha256:1fe7b5eb4474cae8b175187508107dcdd3e294eca584f3c7b811e59d27623380
     .agents/skills/slack-app-management/SKILL.md: sha256:6b20765d9ba0fd5757323c91c027dc62c92497c9f1dfca439b84d171c111768b
     .agents/skills/slack-app-management/agents/openai.yaml: sha256:9a2c6ca4d634aa549dd13bc35f924e13d48996714e6788cb5d97765e3d9d644c
-    .agents/skills/slide-docs/SKILL.md: sha256:5d0cae1d6b55c74ab96b69a1de60d91830c754adcdadb4efb55015aa972e841e
-    .agents/skills/slide-docs/references/index.md: sha256:aa1e424c72724ca280157a3f1beebfad877cb7f4b4ab465b8f49681c8c78b714
     .agents/skills/tsr/MIGRATION.md: sha256:4cfc6d22fe0569e71b50d106f2beb48a27bcc9ab9bc353c5974b3a1f9757a879
     .agents/skills/tsr/README.md: sha256:baf1c761bcb44bf47c76b1fc762f1ad290bda38a59d1ccd70245f7fc455f59b9
     .agents/skills/tsr/SKILL.md: sha256:1e61f765717fbf34e4c37b525264170440910a50b4ba07f5423412cb760d8fb7
@@ -2097,10 +2052,6 @@ dependencies:
     .claude/skills/macos-troubleshooting/SKILL.md: sha256:5dbfb6b138966632e483ed30dff2b777b2e0842e457033d910f579a00618009c
     .claude/skills/macos-troubleshooting/agents/openai.yaml: sha256:e0c22f96dba94a75c9689b34dd10c1ce965bfa9bbe8b613e586e72a87bf6f69a
     .claude/skills/macos-troubleshooting/references/cases.md: sha256:331c8dafd6cf8f749d5565c77831c51a25cdee7b039caa2b2d7dc683cf2999bd
-    .claude/skills/manga-rss-bridge/SKILL.md: sha256:6ff43f861842631f239f9c87be0a643a6f96140a355b52640f75790bb8bae43b
-    .claude/skills/manga-rss-bridge/agents/openai.yaml: sha256:3eea5be52a31f87486d5079f543c9aba0fbae0c5451b9abc7ed9eec9a3985059
-    .claude/skills/manga-rss-bridge/references/usage.md: sha256:388507bb88468ea3e45e54107a973cb9edae8d6069d08aa1959d983cb90a1dac
-    .claude/skills/manga-rss-bridge/scripts/generate_freshrss_opml.py: sha256:a37200bcb2bd120687d3855196bba7ffd7fbdc6653c2c9eb8fc7a240e1cb1b61
     .claude/skills/mcp-tools/SKILL.md: sha256:bd74f85bae6f8b0b29d875a4c4c89fee69de798c9c262244d2d7c01447beece4
     .claude/skills/mcp-tools/agents/openai.yaml: sha256:f2251a17f3ee854c9aa28c0ef7645c279b2dcd81afc53e65a102eff7c35101af
     .claude/skills/mcp-tools/references/mcp-placement.md: sha256:fb1c67b1b36376a24daf56f1348a8c439adbbc252a93f82c1ddd0b97f8c96452
@@ -2118,9 +2069,6 @@ dependencies:
     .claude/skills/mise/references/windows-shells.md: sha256:12b6015cec11e12745e9be6dc448a10c15ed49772954f960aa322eb69a96c6ec
     .claude/skills/mise/resources/examples/npm-package-migration.md: sha256:dd9c35732be0a4cb0dbd231bfaa16024c082d9bf0be61c66b6e531085b8bdfde
     .claude/skills/mise/resources/templates/mise-config-template.toml: sha256:7c0f5e891d7f3ae501287dcc849ad16251cb24beb2e699e435ad398bba954af0
-    .claude/skills/mole-management/SKILL.md: sha256:f917e38aa98caf51d15133a788cbd42fb926d1513fb0495f2d339f9e9143d080
-    .claude/skills/mole-management/agents/openai.yaml: sha256:578ee41558167b72c6103239087f200181a4590153639e52509ab0fae67c367e
-    .claude/skills/mole-management/references/mole-cleanup.md: sha256:16b041ea1b022763080654241bf615744234f4ec3e5051ef84e26d7f956ff7ee
     .claude/skills/pc-ops/SKILL.md: sha256:3553f39a05498f040b5f6b7fdba9da1379f0afcee79469c9427cc54f14195b47
     .claude/skills/pc-ops/agents/openai.yaml: sha256:15f300474d6ae5e83fc70c3ca350c753713fffb9dfd7e10c9fea888677d40fe0
     .claude/skills/pc-ops/references/codex-macos.md: sha256:2298bc1f2586b817ce620e2904bc98423516c829a5f01269a8d9defe10931d4e
@@ -2187,8 +2135,6 @@ dependencies:
     .claude/skills/skill-creator/scripts/quick_validate.py: sha256:1fe7b5eb4474cae8b175187508107dcdd3e294eca584f3c7b811e59d27623380
     .claude/skills/slack-app-management/SKILL.md: sha256:6b20765d9ba0fd5757323c91c027dc62c92497c9f1dfca439b84d171c111768b
     .claude/skills/slack-app-management/agents/openai.yaml: sha256:9a2c6ca4d634aa549dd13bc35f924e13d48996714e6788cb5d97765e3d9d644c
-    .claude/skills/slide-docs/SKILL.md: sha256:5d0cae1d6b55c74ab96b69a1de60d91830c754adcdadb4efb55015aa972e841e
-    .claude/skills/slide-docs/references/index.md: sha256:aa1e424c72724ca280157a3f1beebfad877cb7f4b4ab465b8f49681c8c78b714
     .claude/skills/tsr/MIGRATION.md: sha256:4cfc6d22fe0569e71b50d106f2beb48a27bcc9ab9bc353c5974b3a1f9757a879
     .claude/skills/tsr/README.md: sha256:baf1c761bcb44bf47c76b1fc762f1ad290bda38a59d1ccd70245f7fc455f59b9
     .claude/skills/tsr/SKILL.md: sha256:1e61f765717fbf34e4c37b525264170440910a50b4ba07f5423412cb760d8fb7
@@ -2333,10 +2279,6 @@ dependencies:
     .kiro/skills/macos-troubleshooting/SKILL.md: sha256:5dbfb6b138966632e483ed30dff2b777b2e0842e457033d910f579a00618009c
     .kiro/skills/macos-troubleshooting/agents/openai.yaml: sha256:e0c22f96dba94a75c9689b34dd10c1ce965bfa9bbe8b613e586e72a87bf6f69a
     .kiro/skills/macos-troubleshooting/references/cases.md: sha256:331c8dafd6cf8f749d5565c77831c51a25cdee7b039caa2b2d7dc683cf2999bd
-    .kiro/skills/manga-rss-bridge/SKILL.md: sha256:6ff43f861842631f239f9c87be0a643a6f96140a355b52640f75790bb8bae43b
-    .kiro/skills/manga-rss-bridge/agents/openai.yaml: sha256:3eea5be52a31f87486d5079f543c9aba0fbae0c5451b9abc7ed9eec9a3985059
-    .kiro/skills/manga-rss-bridge/references/usage.md: sha256:388507bb88468ea3e45e54107a973cb9edae8d6069d08aa1959d983cb90a1dac
-    .kiro/skills/manga-rss-bridge/scripts/generate_freshrss_opml.py: sha256:a37200bcb2bd120687d3855196bba7ffd7fbdc6653c2c9eb8fc7a240e1cb1b61
     .kiro/skills/mcp-tools/SKILL.md: sha256:bd74f85bae6f8b0b29d875a4c4c89fee69de798c9c262244d2d7c01447beece4
     .kiro/skills/mcp-tools/agents/openai.yaml: sha256:f2251a17f3ee854c9aa28c0ef7645c279b2dcd81afc53e65a102eff7c35101af
     .kiro/skills/mcp-tools/references/mcp-placement.md: sha256:fb1c67b1b36376a24daf56f1348a8c439adbbc252a93f82c1ddd0b97f8c96452
@@ -2354,9 +2296,6 @@ dependencies:
     .kiro/skills/mise/references/windows-shells.md: sha256:12b6015cec11e12745e9be6dc448a10c15ed49772954f960aa322eb69a96c6ec
     .kiro/skills/mise/resources/examples/npm-package-migration.md: sha256:dd9c35732be0a4cb0dbd231bfaa16024c082d9bf0be61c66b6e531085b8bdfde
     .kiro/skills/mise/resources/templates/mise-config-template.toml: sha256:7c0f5e891d7f3ae501287dcc849ad16251cb24beb2e699e435ad398bba954af0
-    .kiro/skills/mole-management/SKILL.md: sha256:f917e38aa98caf51d15133a788cbd42fb926d1513fb0495f2d339f9e9143d080
-    .kiro/skills/mole-management/agents/openai.yaml: sha256:578ee41558167b72c6103239087f200181a4590153639e52509ab0fae67c367e
-    .kiro/skills/mole-management/references/mole-cleanup.md: sha256:16b041ea1b022763080654241bf615744234f4ec3e5051ef84e26d7f956ff7ee
     .kiro/skills/pc-ops/SKILL.md: sha256:3553f39a05498f040b5f6b7fdba9da1379f0afcee79469c9427cc54f14195b47
     .kiro/skills/pc-ops/agents/openai.yaml: sha256:15f300474d6ae5e83fc70c3ca350c753713fffb9dfd7e10c9fea888677d40fe0
     .kiro/skills/pc-ops/references/codex-macos.md: sha256:2298bc1f2586b817ce620e2904bc98423516c829a5f01269a8d9defe10931d4e
@@ -2422,8 +2361,6 @@ dependencies:
     .kiro/skills/skill-creator/scripts/quick_validate.py: sha256:1fe7b5eb4474cae8b175187508107dcdd3e294eca584f3c7b811e59d27623380
     .kiro/skills/slack-app-management/SKILL.md: sha256:6b20765d9ba0fd5757323c91c027dc62c92497c9f1dfca439b84d171c111768b
     .kiro/skills/slack-app-management/agents/openai.yaml: sha256:9a2c6ca4d634aa549dd13bc35f924e13d48996714e6788cb5d97765e3d9d644c
-    .kiro/skills/slide-docs/SKILL.md: sha256:5d0cae1d6b55c74ab96b69a1de60d91830c754adcdadb4efb55015aa972e841e
-    .kiro/skills/slide-docs/references/index.md: sha256:aa1e424c72724ca280157a3f1beebfad877cb7f4b4ab465b8f49681c8c78b714
     .kiro/skills/tsr/MIGRATION.md: sha256:4cfc6d22fe0569e71b50d106f2beb48a27bcc9ab9bc353c5974b3a1f9757a879
     .kiro/skills/tsr/README.md: sha256:baf1c761bcb44bf47c76b1fc762f1ad290bda38a59d1ccd70245f7fc455f59b9
     .kiro/skills/tsr/SKILL.md: sha256:1e61f765717fbf34e4c37b525264170440910a50b4ba07f5423412cb760d8fb7
@@ -2447,11 +2384,11 @@ dependencies:
     .kiro/skills/work-log-maintenance/SKILL.md: sha256:26f4064ff1c0e757e415121675d6caaecd30040f95304e6ed4cd4c73e022f3f9
     .kiro/skills/work-log-maintenance/agents/openai.yaml: sha256:e951b8256a5a1b032bcca3c7105230f5041467594434ca23b562b8ec5ec4abc8
     .kiro/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
-  content_hash: sha256:f65e4e9e9799a07bba8456ea42351b62ec24d690d6b7b75f4fecfc6b95f2ea39
+  content_hash: sha256:c20a008cccb0e11ff279165b16d0a276f7a378cb17ffb3db37fc11a91add5324
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
-  resolved_commit: eca3e41fc96daa3c8d5f021c9127b88d5a6a1bf6
+  resolved_commit: ecbbbb59332d641f85458fd0a177c53db2fabeea
   resolved_ref: main
   version: 1.0.0
   virtual_path: manual-skills
@@ -2461,7 +2398,7 @@ dependencies:
 - repo_url: langchain-ai/deepagents
   name: deepagents
   host: github.com
-  resolved_commit: b0a209da3a8c9f80e2e3d5e199340736c854c567
+  resolved_commit: ddce7c3f524109b10ea13ef56afbd1ac99f9e300
   version: unknown
   virtual_path: libs/cli/examples/skills/web-research
   is_virtual: true
