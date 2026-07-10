@@ -419,12 +419,6 @@ This skill provides expertise to agents executing phased code quality improvemen
   - Incremental fix strategy (50-100 at a time)
   - Impact measurement and quantitative evaluation
 
-### Orchestrator Agent
-
-- Provides: Quality improvement planning, multi-phase coordination
-- When: Large-scale quality improvement projects
-- Context: Phase progress management, session management, impact measurement, risk management
-
 ### Code-Reviewer Agent
 
 - Provides: Quality improvement impact evaluation, continuous quality checks
