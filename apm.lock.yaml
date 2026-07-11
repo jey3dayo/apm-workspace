@@ -4700,6 +4700,43 @@ dependencies:
     .kiro/skills/screenshot/scripts/take_screenshot.ps1: sha256:a31a2242e41fd1c5471651afbcced660f98fbc884f11e531218348f700a3f826
     .kiro/skills/screenshot/scripts/take_screenshot.py: sha256:56eeabe2dac5d23915b9a0fb57a07431fad2d310c5444f60f71f09299899232b
   content_hash: sha256:59bd54a88ecfb293a88187164e8bdf9f27f8f28eb746a4cefcdb8f6084fde99e
+- repo_url: shadcn/improve
+  name: improve
+  host: github.com
+  resolved_commit: 03369ee6d7cafbfcecc4346539b05b3dc0a603bb
+  version: 1.0.0
+  package_type: marketplace_plugin
+  deployed_files:
+  - .agents/skills/improve
+  - .agents/skills/improve/SKILL.md
+  - .agents/skills/improve/references/audit-playbook.md
+  - .agents/skills/improve/references/closing-the-loop.md
+  - .agents/skills/improve/references/plan-template.md
+  - .claude/skills/improve
+  - .claude/skills/improve/SKILL.md
+  - .claude/skills/improve/references/audit-playbook.md
+  - .claude/skills/improve/references/closing-the-loop.md
+  - .claude/skills/improve/references/plan-template.md
+  - .kiro/skills/improve
+  - .kiro/skills/improve/SKILL.md
+  - .kiro/skills/improve/references/audit-playbook.md
+  - .kiro/skills/improve/references/closing-the-loop.md
+  - .kiro/skills/improve/references/plan-template.md
+  deployed_file_hashes:
+    .agents/skills/improve/SKILL.md: sha256:1599aa29e9b16424cb767779efac53fa56e3f38be92dff4ac587393a1ad5070a
+    .agents/skills/improve/references/audit-playbook.md: sha256:587c1b927070f3c28139ad95ac34cc21a7da32618cfeb966cb774e58a865d4c8
+    .agents/skills/improve/references/closing-the-loop.md: sha256:5d526bb378e1783bbeb68d7af527776cbe98cde27a1aeccbd13e818e5b73b454
+    .agents/skills/improve/references/plan-template.md: sha256:7be76dd3c29442288fa7cee4432fc6e95c2fdbf748c9b356344bf647c5f8722e
+    .claude/skills/improve/SKILL.md: sha256:1599aa29e9b16424cb767779efac53fa56e3f38be92dff4ac587393a1ad5070a
+    .claude/skills/improve/references/audit-playbook.md: sha256:587c1b927070f3c28139ad95ac34cc21a7da32618cfeb966cb774e58a865d4c8
+    .claude/skills/improve/references/closing-the-loop.md: sha256:5d526bb378e1783bbeb68d7af527776cbe98cde27a1aeccbd13e818e5b73b454
+    .claude/skills/improve/references/plan-template.md: sha256:7be76dd3c29442288fa7cee4432fc6e95c2fdbf748c9b356344bf647c5f8722e
+    .kiro/skills/improve/SKILL.md: sha256:1599aa29e9b16424cb767779efac53fa56e3f38be92dff4ac587393a1ad5070a
+    .kiro/skills/improve/references/audit-playbook.md: sha256:587c1b927070f3c28139ad95ac34cc21a7da32618cfeb966cb774e58a865d4c8
+    .kiro/skills/improve/references/closing-the-loop.md: sha256:5d526bb378e1783bbeb68d7af527776cbe98cde27a1aeccbd13e818e5b73b454
+    .kiro/skills/improve/references/plan-template.md: sha256:7be76dd3c29442288fa7cee4432fc6e95c2fdbf748c9b356344bf647c5f8722e
+  content_hash: sha256:4cd40e13503aac88bb60c202dc6a62977b290dbdc973d8cad0556ac46de6042d
+  declared_license: MIT
 - repo_url: softaworks/agent-toolkit
   name: agent-toolkit
   host: github.com

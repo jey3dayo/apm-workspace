@@ -59,6 +59,7 @@ dependencies:
     - vercel-labs/agent-skills/skills/react-best-practices
     - vercel-labs/agent-skills/skills/web-design-guidelines
     - vercel-labs/skills/skills/find-skills
+    - shadcn/improve
   mcp:
     - name: context7
       registry: false
