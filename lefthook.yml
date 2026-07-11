@@ -36,5 +36,23 @@ pre-push:
         bash -n scripts/apm-workspace.sh
         pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 help >/dev/null
 
-    - name: ci
-      run: mise run verify
+    - name: format:markdown:bold-headings:check
+      run: mise run format:markdown:bold-headings:check
+
+    - name: format:markdown:check
+      run: mise run format:markdown:check
+
+    - name: format:toml:check
+      run: mise run format:toml:check
+
+    - name: format:yaml:check
+      run: mise run format:yaml:check
+
+    - name: validate:workspace
+      run: mise run validate:workspace
+
+    - name: validate:catalog
+      run: mise run validate:catalog
+
+    - name: smoke:catalog
+      run: mise run smoke:catalog
