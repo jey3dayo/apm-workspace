@@ -875,7 +875,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: 0ea964be08beca0f95221815335d55ae053b3fdd
+  resolved_commit: f4d8eb10638daf29857bd146c7dff8776f65d340
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -1043,6 +1043,7 @@ dependencies:
   - .agents/skills/mise/SKILL.md
   - .agents/skills/mise/agents/openai.yaml
   - .agents/skills/mise/references/best-practices.md
+  - .agents/skills/mise/references/bootstrap.md
   - .agents/skills/mise/references/config-templates.md
   - .agents/skills/mise/references/current-patterns.md
   - .agents/skills/mise/references/task-config-includes.md
@@ -1319,6 +1320,7 @@ dependencies:
   - .claude/skills/mise/SKILL.md
   - .claude/skills/mise/agents/openai.yaml
   - .claude/skills/mise/references/best-practices.md
+  - .claude/skills/mise/references/bootstrap.md
   - .claude/skills/mise/references/config-templates.md
   - .claude/skills/mise/references/current-patterns.md
   - .claude/skills/mise/references/task-config-includes.md
@@ -1595,6 +1597,7 @@ dependencies:
   - .kiro/skills/mise/SKILL.md
   - .kiro/skills/mise/agents/openai.yaml
   - .kiro/skills/mise/references/best-practices.md
+  - .kiro/skills/mise/references/bootstrap.md
   - .kiro/skills/mise/references/config-templates.md
   - .kiro/skills/mise/references/current-patterns.md
   - .kiro/skills/mise/references/task-config-includes.md
@@ -1725,7 +1728,7 @@ dependencies:
     .agents/skills/apm-repo-bootstrap/SKILL.md: sha256:c340f3997daf9ece1d6a0b6d02770948171549d69ccceebafd0f5cc68f995248
     .agents/skills/apm-repo-bootstrap/agents/openai.yaml: sha256:faed36da8f7980b88e395eb9aae322a9fc608e0c555ba93f843f6007ab50da19
     .agents/skills/apm-repo-bootstrap/references/recommendations.md: sha256:0fbd9a6d9656f05438834d6224a79a819bbc6933af7dc90835858263175b9c23
-    .agents/skills/apm-usage/SKILL.md: sha256:3211139ef415ce82e41c389aa51381a3040d5a6e8cab8bc96121d6bee8376414
+    .agents/skills/apm-usage/SKILL.md: sha256:99e58c79398f8a0776c2f546e01acc1e0a4f6b9f6fbdbbb3ca1c17f9cc19b245
     .agents/skills/apm-usage/agents/openai.yaml: sha256:b3743dad4fcd9f3c209210c40df277e75d949ac7ce1713a61d497cc1e7e3ba83
     .agents/skills/apm-usage/references/repo-local-mcp.md: sha256:adac5e0d08543b1dd95b5e7fefd113cd537be290146d9f367cafb51cac89ee41
     .agents/skills/architecture-boundary-docs/SKILL.md: sha256:a1ff83850e0cf330529b2f94436714692d933b80b780a08a21263679fe393d2e
@@ -1837,9 +1840,10 @@ dependencies:
     .agents/skills/mcp-tools/references/mcp-tools-details.md: sha256:c0af3d9e3ff7006bc5953f295824f31cb22d606fb93da7a07e2a94c7550af3ea
     .agents/skills/mcp-tools/references/security-and-credentials.md: sha256:789724e286ed619bea3e8b23f97ac84156886d78b9ae8b2bf028291919be02a2
     .agents/skills/mcp-tools/references/server-configurations.md: sha256:14c2a50593bf13eb148781a4a03eb9d9a536e14a6d69ac9d814729e5df60cc0d
-    .agents/skills/mise/SKILL.md: sha256:5d2500c9b5d7379937e2603c74f5ca40827ccd1367868c6eb0453d931c505211
+    .agents/skills/mise/SKILL.md: sha256:1d432460189fe421faba8aeaa01f9e7e6c86584a80fe457482261ed173acc6d2
     .agents/skills/mise/agents/openai.yaml: sha256:5032c53d31fa12d2b209f729ae559a941d0ca68a2494101f952eba0b87cff7ef
     .agents/skills/mise/references/best-practices.md: sha256:e4210cbe2376d81ecb6aff4c4603cb6570454a6465276b3b88d48737b0ba5ce4
+    .agents/skills/mise/references/bootstrap.md: sha256:d83f24479a7ace86b47d863b41f8042ce363b9fe3817b104c6eb8035d67fe90e
     .agents/skills/mise/references/config-templates.md: sha256:1bcfc920cb580a9d1afed21517ba842dd7f17b8a1283a2ebeb9dbade66808598
     .agents/skills/mise/references/current-patterns.md: sha256:144f193fb643d9042b2532a5ad86d6942b3433c01c1e4d877610e89e480c8293
     .agents/skills/mise/references/task-config-includes.md: sha256:e5a8916d08c976183273b79c49bff08be16e03fff7adf3ce624de5d098334998
@@ -1952,7 +1956,7 @@ dependencies:
     .claude/skills/apm-repo-bootstrap/SKILL.md: sha256:c340f3997daf9ece1d6a0b6d02770948171549d69ccceebafd0f5cc68f995248
     .claude/skills/apm-repo-bootstrap/agents/openai.yaml: sha256:faed36da8f7980b88e395eb9aae322a9fc608e0c555ba93f843f6007ab50da19
     .claude/skills/apm-repo-bootstrap/references/recommendations.md: sha256:0fbd9a6d9656f05438834d6224a79a819bbc6933af7dc90835858263175b9c23
-    .claude/skills/apm-usage/SKILL.md: sha256:3211139ef415ce82e41c389aa51381a3040d5a6e8cab8bc96121d6bee8376414
+    .claude/skills/apm-usage/SKILL.md: sha256:99e58c79398f8a0776c2f546e01acc1e0a4f6b9f6fbdbbb3ca1c17f9cc19b245
     .claude/skills/apm-usage/agents/openai.yaml: sha256:b3743dad4fcd9f3c209210c40df277e75d949ac7ce1713a61d497cc1e7e3ba83
     .claude/skills/apm-usage/references/repo-local-mcp.md: sha256:adac5e0d08543b1dd95b5e7fefd113cd537be290146d9f367cafb51cac89ee41
     .claude/skills/architecture-boundary-docs/SKILL.md: sha256:a1ff83850e0cf330529b2f94436714692d933b80b780a08a21263679fe393d2e
@@ -2064,9 +2068,10 @@ dependencies:
     .claude/skills/mcp-tools/references/mcp-tools-details.md: sha256:c0af3d9e3ff7006bc5953f295824f31cb22d606fb93da7a07e2a94c7550af3ea
     .claude/skills/mcp-tools/references/security-and-credentials.md: sha256:789724e286ed619bea3e8b23f97ac84156886d78b9ae8b2bf028291919be02a2
     .claude/skills/mcp-tools/references/server-configurations.md: sha256:14c2a50593bf13eb148781a4a03eb9d9a536e14a6d69ac9d814729e5df60cc0d
-    .claude/skills/mise/SKILL.md: sha256:5d2500c9b5d7379937e2603c74f5ca40827ccd1367868c6eb0453d931c505211
+    .claude/skills/mise/SKILL.md: sha256:1d432460189fe421faba8aeaa01f9e7e6c86584a80fe457482261ed173acc6d2
     .claude/skills/mise/agents/openai.yaml: sha256:5032c53d31fa12d2b209f729ae559a941d0ca68a2494101f952eba0b87cff7ef
     .claude/skills/mise/references/best-practices.md: sha256:e4210cbe2376d81ecb6aff4c4603cb6570454a6465276b3b88d48737b0ba5ce4
+    .claude/skills/mise/references/bootstrap.md: sha256:d83f24479a7ace86b47d863b41f8042ce363b9fe3817b104c6eb8035d67fe90e
     .claude/skills/mise/references/config-templates.md: sha256:1bcfc920cb580a9d1afed21517ba842dd7f17b8a1283a2ebeb9dbade66808598
     .claude/skills/mise/references/current-patterns.md: sha256:144f193fb643d9042b2532a5ad86d6942b3433c01c1e4d877610e89e480c8293
     .claude/skills/mise/references/task-config-includes.md: sha256:e5a8916d08c976183273b79c49bff08be16e03fff7adf3ce624de5d098334998
@@ -2179,7 +2184,7 @@ dependencies:
     .kiro/skills/apm-repo-bootstrap/SKILL.md: sha256:c340f3997daf9ece1d6a0b6d02770948171549d69ccceebafd0f5cc68f995248
     .kiro/skills/apm-repo-bootstrap/agents/openai.yaml: sha256:faed36da8f7980b88e395eb9aae322a9fc608e0c555ba93f843f6007ab50da19
     .kiro/skills/apm-repo-bootstrap/references/recommendations.md: sha256:0fbd9a6d9656f05438834d6224a79a819bbc6933af7dc90835858263175b9c23
-    .kiro/skills/apm-usage/SKILL.md: sha256:3211139ef415ce82e41c389aa51381a3040d5a6e8cab8bc96121d6bee8376414
+    .kiro/skills/apm-usage/SKILL.md: sha256:99e58c79398f8a0776c2f546e01acc1e0a4f6b9f6fbdbbb3ca1c17f9cc19b245
     .kiro/skills/apm-usage/agents/openai.yaml: sha256:b3743dad4fcd9f3c209210c40df277e75d949ac7ce1713a61d497cc1e7e3ba83
     .kiro/skills/apm-usage/references/repo-local-mcp.md: sha256:adac5e0d08543b1dd95b5e7fefd113cd537be290146d9f367cafb51cac89ee41
     .kiro/skills/architecture-boundary-docs/SKILL.md: sha256:a1ff83850e0cf330529b2f94436714692d933b80b780a08a21263679fe393d2e
@@ -2291,9 +2296,10 @@ dependencies:
     .kiro/skills/mcp-tools/references/mcp-tools-details.md: sha256:c0af3d9e3ff7006bc5953f295824f31cb22d606fb93da7a07e2a94c7550af3ea
     .kiro/skills/mcp-tools/references/security-and-credentials.md: sha256:789724e286ed619bea3e8b23f97ac84156886d78b9ae8b2bf028291919be02a2
     .kiro/skills/mcp-tools/references/server-configurations.md: sha256:14c2a50593bf13eb148781a4a03eb9d9a536e14a6d69ac9d814729e5df60cc0d
-    .kiro/skills/mise/SKILL.md: sha256:5d2500c9b5d7379937e2603c74f5ca40827ccd1367868c6eb0453d931c505211
+    .kiro/skills/mise/SKILL.md: sha256:1d432460189fe421faba8aeaa01f9e7e6c86584a80fe457482261ed173acc6d2
     .kiro/skills/mise/agents/openai.yaml: sha256:5032c53d31fa12d2b209f729ae559a941d0ca68a2494101f952eba0b87cff7ef
     .kiro/skills/mise/references/best-practices.md: sha256:e4210cbe2376d81ecb6aff4c4603cb6570454a6465276b3b88d48737b0ba5ce4
+    .kiro/skills/mise/references/bootstrap.md: sha256:d83f24479a7ace86b47d863b41f8042ce363b9fe3817b104c6eb8035d67fe90e
     .kiro/skills/mise/references/config-templates.md: sha256:1bcfc920cb580a9d1afed21517ba842dd7f17b8a1283a2ebeb9dbade66808598
     .kiro/skills/mise/references/current-patterns.md: sha256:144f193fb643d9042b2532a5ad86d6942b3433c01c1e4d877610e89e480c8293
     .kiro/skills/mise/references/task-config-includes.md: sha256:e5a8916d08c976183273b79c49bff08be16e03fff7adf3ce624de5d098334998
@@ -2390,7 +2396,7 @@ dependencies:
     .kiro/skills/work-log-maintenance/SKILL.md: sha256:26f4064ff1c0e757e415121675d6caaecd30040f95304e6ed4cd4c73e022f3f9
     .kiro/skills/work-log-maintenance/agents/openai.yaml: sha256:e951b8256a5a1b032bcca3c7105230f5041467594434ca23b562b8ec5ec4abc8
     .kiro/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
-  content_hash: sha256:1bf58b729946684bd719651609ed139f4bd559b464d59f4df32c43e1be0c0771
+  content_hash: sha256:462584b5365b0c7dd0fe30368eec1ca50b6a46c9ee45d137b4df63e36e283bcb
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
