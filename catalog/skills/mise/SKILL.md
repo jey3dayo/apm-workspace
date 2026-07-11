@@ -59,6 +59,8 @@ run = "cargo test"
 - Never call `mise <task>` inside run strings — use `{ task = "x" }`
 - Never put ordering logic in `run` that belongs in `depends`
 - Keep >3 lines of shell out of `run` arrays; place long scripts in `mise-tasks/` or `scripts/`
+- Treat task TOML as an interface: keep its description, working directory, environment, dependencies, platform route, and one runner; move branching, cleanup, and command sequences into a named helper.
+- Keep routine aggregate tasks non-destructive. Put reset, clean, prune, deploy, and in-place restore behind explicitly named tasks rather than including them in a generic `update`, `check`, or `ci` task.
 
 ### Aggregation vs alias
 
