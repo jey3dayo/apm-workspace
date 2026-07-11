@@ -1,4 +1,0 @@
-interface:
-  display_name: "Design & CSS Check"
-  short_description: "Review UI design and CSS choices"
-  default_prompt: "Use $design-check to review this UI and CSS for visual quality, accessibility, and modern CSS opportunities."
