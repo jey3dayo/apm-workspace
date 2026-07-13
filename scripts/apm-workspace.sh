@@ -1031,10 +1031,13 @@ EOF
       updated = 0
     }
     {
-      if (match($0, /^([[:space:]]*-[[:space:]]+)([^[:space:]]+)[[:space:]]*$/, m)) {
-        ref = m[2]
+      if ($0 ~ /^[[:space:]]*-[[:space:]]+[^[:space:]]+[[:space:]]*$/) {
+        prefix_len = match($0, /-[[:space:]]+/) + RLENGTH - 1
+        prefix = substr($0, 1, prefix_len)
+        ref = substr($0, prefix_len + 1)
+        sub(/[[:space:]]+$/, "", ref)
         if (index(ref, "#") == 0 && (ref in pinned)) {
-          print m[1] pinned[ref]
+          print prefix pinned[ref]
           updated++
           next
         }
