@@ -65,7 +65,8 @@ jobs:
           pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 help >/dev/null
 
       - name: Run workspace checks
-        run: |
-          mise run format:check
-          mise run validate:catalog
-          mise run smoke:catalog
+        run: mise run verify
+
+      - name: Run Pester tests
+        shell: bash
+        run: mise run test

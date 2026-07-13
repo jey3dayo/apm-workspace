@@ -1097,10 +1097,6 @@ dependencies: []
     $legacyMirrorPattern = 'transitional\s+' + 'mirror'
     $files = @(
       (Join-Path $workspaceRoot "catalog/skills/apm-usage/SKILL.md")
-      (Join-Path $workspaceRoot "catalog/skills/nix-dotfiles/SKILL.md")
-      (Join-Path $workspaceRoot "catalog/skills/nix-dotfiles/README.md")
-      (Join-Path $workspaceRoot "catalog/skills/nix-dotfiles/references/commands.md")
-      (Join-Path $workspaceRoot "catalog/skills/nix-dotfiles/references/troubleshooting.md")
       (Join-Path $workspaceRoot "catalog/skills/rtk/SKILL.md")
       (Join-Path $workspaceRoot "catalog/skills/rtk/references/command-reference.md")
     )

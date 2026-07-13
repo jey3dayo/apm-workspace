@@ -165,6 +165,10 @@ depends = ["format:check", "validate"]
 description = "Run deep verification for the ~/.apm workspace"
 run = [{ task = "check" }, { task = "smoke:catalog" }]
 
+[tasks.test]
+description = "Run the Pester behavioral suite for apm-workspace.ps1"
+run = "pwsh -NoProfile -Command \"Invoke-Pester -Path tests -CI -Output Detailed\""
+
 [tasks.deploy]
 description = "Run checks, deploy the current workspace state, and inspect targets"
 run = [{ task = "check" }, { task = "apply" }, { task = "doctor" }]
