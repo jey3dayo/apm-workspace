@@ -68,16 +68,18 @@ class ProjectFileAnalyzer:
             print(f"Warning: Failed to read {file_path}: {e}")
             return None
 
-    def find_relevant_files(self, question: Dict) -> List[Path]:
+    def find_relevant_files(
+        self, question: Dict, project_root: Path = Path(".")
+    ) -> List[Path]:
         """Find project files relevant to the question"""
         relevant_files = []
 
         # Always check these files
         priority_files = [
-            Path("README.md"),
-            Path("CLAUDE.md"),
-            Path(".claude/CLAUDE.md"),
-            Path("AGENTS.md"),
+            project_root / "README.md",
+            project_root / "CLAUDE.md",
+            project_root / ".claude/CLAUDE.md",
+            project_root / "AGENTS.md",
         ]
 
         for file_path in priority_files:
@@ -85,23 +87,23 @@ class ProjectFileAnalyzer:
                 relevant_files.append(file_path)
 
         # Check .kiro/steering/ files
-        kiro_steering = Path(".kiro/steering")
+        kiro_steering = project_root / ".kiro/steering"
         if kiro_steering.exists():
             for md_file in kiro_steering.glob("*.md"):
                 relevant_files.append(md_file)
 
         # Check design files if question relates to architecture
-        kiro_design = Path(".kiro/specs")
+        kiro_design = project_root / ".kiro/specs"
         if kiro_design.exists():
             for md_file in kiro_design.glob("**/design.md"):
                 relevant_files.append(md_file)
 
         # Check package files for tech stack info
         package_files = [
-            Path("package.json"),
-            Path("requirements.txt"),
-            Path("Cargo.toml"),
-            Path("go.mod"),
+            project_root / "package.json",
+            project_root / "requirements.txt",
+            project_root / "Cargo.toml",
+            project_root / "go.mod",
         ]
         for file_path in package_files:
             if file_path.exists():
@@ -333,7 +335,9 @@ class GapAnalyzer:
 
         for question in questions:
             # Find relevant files for this question
-            relevant_files = self.file_analyzer.find_relevant_files(question)
+            relevant_files = self.file_analyzer.find_relevant_files(
+                question, project_root
+            )
 
             # Perform gap analysis
             gap = self.analyze_gap(question, relevant_files)

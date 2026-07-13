@@ -87,6 +87,7 @@ def format_report(session_data: Dict, output_format: str = "markdown") -> str:
         findings = convert_gaps_to_findings(gaps)
 
     critical = [f for f in findings if f.get("risk_level") == "critical"]
+    high = [f for f in findings if f.get("risk_level") == "high"]
     medium = [f for f in findings if f.get("risk_level") == "medium"]
     low = [f for f in findings if f.get("risk_level") == "low"]
     covered = [f for f in findings if f.get("risk_level") == "covered"]
@@ -96,6 +97,19 @@ def format_report(session_data: Dict, output_format: str = "markdown") -> str:
         report_lines.append("## Critical Issues (🔴)")
         report_lines.append("")
         for i, finding in enumerate(critical, 1):
+            report_lines.append(f"### {i}. {finding.get('title', 'Untitled')}")
+            report_lines.append("")
+            report_lines.append(finding.get("description", ""))
+            report_lines.append("")
+            if finding.get("recommendation"):
+                report_lines.append(f"**推奨対応**: {finding['recommendation']}")
+                report_lines.append("")
+
+    # High Priority Issues
+    if high:
+        report_lines.append("## High Priority Issues")
+        report_lines.append("")
+        for i, finding in enumerate(high, 1):
             report_lines.append(f"### {i}. {finding.get('title', 'Untitled')}")
             report_lines.append("")
             report_lines.append(finding.get("description", ""))
