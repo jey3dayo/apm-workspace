@@ -2028,7 +2028,6 @@ cmd_stage_catalog() {
 
 cmd_register_catalog() {
   require_apm
-  local tracking_info remote_name branch_name
   skill_ids=$(managed_skill_ids)
   cleanup_skill_ids=$(internal_cleanup_skill_ids "$skill_ids")
   ensure_workspace_repo
