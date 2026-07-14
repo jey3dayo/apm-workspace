@@ -13,6 +13,7 @@ node = "24"
 
 # CLI tools
 "aqua:BurntSushi/ripgrep" = "15.1.0"
+"aqua:bats-core/bats-core" = "1.11.1"
 fd = "10.4.2"
 lefthook = "2.1.9"
 "pipx:apm-cli" = "0.22.0"
@@ -169,6 +170,10 @@ run = [{ task = "check" }, { task = "smoke:catalog" }]
 [tasks.test]
 description = "Run the Pester behavioral suite for apm-workspace.ps1"
 run = "pwsh -NoProfile -Command \"Invoke-Pester -Path tests -CI -Output Detailed\""
+
+[tasks."test:sh"]
+description = "Run bats unit tests for scripts/apm-workspace.sh"
+run = "bats tests/apm-workspace.sh.bats"
 
 [tasks.deploy]
 description = "Run checks, deploy the current workspace state, and inspect targets"

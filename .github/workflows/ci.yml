@@ -70,3 +70,6 @@ jobs:
       - name: Run Pester tests
         shell: bash
         run: mise run test
+
+      - name: Run bash unit tests
+        run: mise run test:sh

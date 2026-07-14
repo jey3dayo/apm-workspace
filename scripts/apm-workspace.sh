@@ -2130,22 +2130,24 @@ Environment overrides:
 EOF
 }
 
-case "$COMMAND" in
-  apply) cmd_apply ;;
-  apply:skills:local) cmd_sync_local_skills "$@" ;;
-  refresh) cmd_update ;;
-  repair:local-package-cache) cmd_repair_local_package_cache ;;
-  pin-external) cmd_pin_external ;;
-  validate) cmd_validate ;;
-  validate:catalog) cmd_validate_catalog ;;
-  doctor) cmd_doctor ;;
-  bundle-catalog) cmd_bundle_catalog "$@" ;;
-  prepare:catalog) cmd_stage_catalog "$@" ;;
-  install:catalog) cmd_register_catalog "$@" ;;
-  smoke:catalog) cmd_smoke_catalog "$@" ;;
-  audit:ci:smoke) cmd_audit_ci_smoke ;;
-  help | -h | --help) cmd_help ;;
-  *)
-    fail "unknown command: $COMMAND"
-    ;;
-esac
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+  case "$COMMAND" in
+    apply) cmd_apply ;;
+    apply:skills:local) cmd_sync_local_skills "$@" ;;
+    refresh) cmd_update ;;
+    repair:local-package-cache) cmd_repair_local_package_cache ;;
+    pin-external) cmd_pin_external ;;
+    validate) cmd_validate ;;
+    validate:catalog) cmd_validate_catalog ;;
+    doctor) cmd_doctor ;;
+    bundle-catalog) cmd_bundle_catalog "$@" ;;
+    prepare:catalog) cmd_stage_catalog "$@" ;;
+    install:catalog) cmd_register_catalog "$@" ;;
+    smoke:catalog) cmd_smoke_catalog "$@" ;;
+    audit:ci:smoke) cmd_audit_ci_smoke ;;
+    help | -h | --help) cmd_help ;;
+    *)
+      fail "unknown command: $COMMAND"
+      ;;
+  esac
+fi
