@@ -591,11 +591,10 @@ function Format-SkillName {
     [string]$SourceSkillId
   )
 
-  if ($Target -eq "codex" -and $SourceSkillId.StartsWith("superpowers:")) {
-    return ("superpowers-" + $SourceSkillId.Substring("superpowers:".Length))
-  }
-
-  return $SourceSkillId
+  # Mirror bash format_skill_name: flatten every "<ns>:<id>" to "<ns>-<id>" so
+  # namespaced skills deploy as a single flat directory (targets discover skills
+  # only one level deep). $Target is retained for call-site compatibility.
+  return ($SourceSkillId -replace ':', '-')
 }
 
 function Get-UnpinnedExternalReferences {

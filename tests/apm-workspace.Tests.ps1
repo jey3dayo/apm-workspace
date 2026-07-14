@@ -774,8 +774,13 @@ Describe "public command surface" {
   }
 
   It "normalizes codex skill names from superpowers aliases" {
-    Format-SkillName -Target "claude" -SourceSkillId "superpowers:brainstorming" | Should -Be "superpowers:brainstorming"
     Format-SkillName -Target "codex" -SourceSkillId "superpowers:brainstorming" | Should -Be "superpowers-brainstorming"
+  }
+
+  It "flattens namespaced skill names for all targets to match bash" {
+    Format-SkillName -Target "claude" -SourceSkillId "kiro:spec-init" | Should -Be "kiro-spec-init"
+    Format-SkillName -Target "codex" -SourceSkillId "superpowers:brainstorming" | Should -Be "superpowers-brainstorming"
+    Format-SkillName -Target "claude" -SourceSkillId "plain" | Should -Be "plain"
   }
 
   It "reads unpinned refs only from dependencies apm" {
@@ -817,7 +822,7 @@ dependencies:
 
     $inventory = @(Get-ManagedCatalogSkillInventory -SkillIds @("superpowers:brainstorming") -Targets $targets)
 
-    ($inventory | Where-Object Target -eq "claude").DeployedSkillName | Should -Be "superpowers:brainstorming"
+    ($inventory | Where-Object Target -eq "claude").DeployedSkillName | Should -Be "superpowers-brainstorming"
     ($inventory | Where-Object Target -eq "codex").DeployedSkillName | Should -Be "superpowers-brainstorming"
   }
 
@@ -890,13 +895,13 @@ dependencies:
     $plan = @(Stage-TargetSkillRecords -StageRoot $stageRoot -SkillRecords $skillRecords -Targets $targets)
 
     $plan.Count | Should -Be 4
-    ($plan | Where-Object { $_.Target -eq "claude" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should -Be "superpowers:brainstorming"
+    ($plan | Where-Object { $_.Target -eq "claude" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should -Be "superpowers-brainstorming"
     ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should -Be "superpowers-brainstorming"
     ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "gh-address-comments" }).DeployedSkillName | Should -Be "gh-address-comments"
     $claudeSkillsRoot = Join-Path (Join-Path $stageRoot "claude") "skills"
     $codexSkillsRoot = Join-Path (Join-Path $stageRoot "codex") "skills"
 
-    Test-DirectoryTreeEqual -ExpectedRoot $skillRecords[0].SourcePath -ActualRoot (Join-Path (Join-Path $claudeSkillsRoot "superpowers") "brainstorming") | Should -Be $true
+    Test-DirectoryTreeEqual -ExpectedRoot $skillRecords[0].SourcePath -ActualRoot (Join-Path $claudeSkillsRoot "superpowers-brainstorming") | Should -Be $true
     Test-DirectoryTreeEqual -ExpectedRoot $skillRecords[0].SourcePath -ActualRoot (Join-Path $codexSkillsRoot "superpowers-brainstorming") | Should -Be $true
     Test-DirectoryTreeEqual -ExpectedRoot $skillRecords[1].SourcePath -ActualRoot (Join-Path $claudeSkillsRoot "gh-address-comments") | Should -Be $true
     Test-DirectoryTreeEqual -ExpectedRoot $skillRecords[1].SourcePath -ActualRoot (Join-Path $codexSkillsRoot "gh-address-comments") | Should -Be $true
@@ -916,7 +921,7 @@ dependencies:
 
     $plan.Count | Should -Be 4
     ($plan | Where-Object { $_.Target -eq "claude" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).SourceKind | Should -Be "personal"
-    ($plan | Where-Object { $_.Target -eq "claude" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should -Be "superpowers:brainstorming"
+    ($plan | Where-Object { $_.Target -eq "claude" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should -Be "superpowers-brainstorming"
     ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).SourceKind | Should -Be "personal"
     ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should -Be "superpowers-brainstorming"
     ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "gh-address-comments" }).SourceKind | Should -Be "external"
