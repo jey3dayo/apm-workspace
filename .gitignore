@@ -6,7 +6,9 @@
 !/catalog/.apm/.gitkeep
 /.github/skills/
 
-/.apm/
+/.apm/*
+!/.apm/skills/
+!/.apm/skills/**
 /private-skills/
 /.claude/settings.local.json
 /.claude/skill-report/

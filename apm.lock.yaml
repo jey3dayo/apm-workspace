@@ -875,7 +875,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: f4d8eb10638daf29857bd146c7dff8776f65d340
+  resolved_commit: d83bf12b9b9bdc2d4f240811a8e50d93b4a9b6a5
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -885,14 +885,6 @@ dependencies:
   - .agents/skills/1password-item-ops
   - .agents/skills/1password-item-ops/SKILL.md
   - .agents/skills/1password-item-ops/agents/openai.yaml
-  - .agents/skills/agent-creator
-  - .agents/skills/agent-creator/SKILL.md
-  - .agents/skills/agent-creator/references/agent-details.md
-  - .agents/skills/agent-creator/resources/checklist.md
-  - .agents/skills/agent-creator/resources/examples/domain-expert-agent.md
-  - .agents/skills/agent-creator/resources/examples/project-specific-agent.md
-  - .agents/skills/agent-creator/resources/examples/validator-agent.md
-  - .agents/skills/agent-creator/resources/templates/agent-template.md
   - .agents/skills/agent-curation
   - .agents/skills/agent-curation/SKILL.md
   - .agents/skills/agent-curation/agents/openai.yaml
@@ -957,10 +949,6 @@ dependencies:
   - .agents/skills/cross-research
   - .agents/skills/cross-research/SKILL.md
   - .agents/skills/cross-research/agents/openai.yaml
-  - .agents/skills/design-check
-  - .agents/skills/design-check/SKILL.md
-  - .agents/skills/design-check/agents/openai.yaml
-  - .agents/skills/design-check/references/checklist.md
   - .agents/skills/design-md-workflow
   - .agents/skills/design-md-workflow/SKILL.md
   - .agents/skills/design-md-workflow/agents/openai.yaml
@@ -991,16 +979,6 @@ dependencies:
   - .agents/skills/dotenvx-env-ops/SKILL.md
   - .agents/skills/dotenvx-env-ops/agents/openai.yaml
   - .agents/skills/dotenvx-env-ops/references/asta-dotenvx.md
-  - .agents/skills/drawio
-  - .agents/skills/drawio/SKILL.md
-  - .agents/skills/drawio/resources/assets/templates/aws-basic.drawio.xml
-  - .agents/skills/drawio/resources/references/font-config.md
-  - .agents/skills/drawio/resources/references/xml-structure.md
-  - .agents/skills/generate-svg
-  - .agents/skills/generate-svg/SKILL.md
-  - .agents/skills/gh-create-pr
-  - .agents/skills/gh-create-pr/SKILL.md
-  - .agents/skills/gh-create-pr/agents/openai.yaml
   - .agents/skills/git-worktree
   - .agents/skills/git-worktree/SKILL.md
   - .agents/skills/git-worktree/agents/openai.yaml
@@ -1009,9 +987,6 @@ dependencies:
   - .agents/skills/git-worktree/references/troubleshooting.md
   - .agents/skills/git-worktree/references/workflows.md
   - .agents/skills/git-worktree/scripts/check-worktree-config.sh
-  - .agents/skills/golang
-  - .agents/skills/golang/SKILL.md
-  - .agents/skills/golang/references/golang-details.md
   - .agents/skills/google-forms-survey-builder
   - .agents/skills/google-forms-survey-builder/SKILL.md
   - .agents/skills/google-forms-survey-builder/agents/openai.yaml
@@ -1121,15 +1096,6 @@ dependencies:
   - .agents/skills/similarity/SKILL.md
   - .agents/skills/similarity/agents/openai.yaml
   - .agents/skills/similarity/references/report-analysis.md
-  - .agents/skills/skill-creator
-  - .agents/skills/skill-creator/LICENSE.txt
-  - .agents/skills/skill-creator/SKILL.md
-  - .agents/skills/skill-creator/agents/openai.yaml
-  - .agents/skills/skill-creator/references/openai_yaml.md
-  - .agents/skills/skill-creator/scripts/__pycache__/generate_openai_yaml.cpython-314.pyc
-  - .agents/skills/skill-creator/scripts/generate_openai_yaml.py
-  - .agents/skills/skill-creator/scripts/init_skill.py
-  - .agents/skills/skill-creator/scripts/quick_validate.py
   - .agents/skills/slack-app-management
   - .agents/skills/slack-app-management/SKILL.md
   - .agents/skills/slack-app-management/agents/openai.yaml
@@ -1152,9 +1118,6 @@ dependencies:
   - .agents/skills/tsr/tsconfig.json
   - .agents/skills/tsr/tsr-config.default.json
   - .agents/skills/tsr/tsr-config.schema.json
-  - .agents/skills/typescript
-  - .agents/skills/typescript/SKILL.md
-  - .agents/skills/typescript/references/type-safety-patterns.md
   - .agents/skills/work-log-maintenance
   - .agents/skills/work-log-maintenance/SKILL.md
   - .agents/skills/work-log-maintenance/agents/openai.yaml
@@ -1162,14 +1125,6 @@ dependencies:
   - .claude/skills/1password-item-ops
   - .claude/skills/1password-item-ops/SKILL.md
   - .claude/skills/1password-item-ops/agents/openai.yaml
-  - .claude/skills/agent-creator
-  - .claude/skills/agent-creator/SKILL.md
-  - .claude/skills/agent-creator/references/agent-details.md
-  - .claude/skills/agent-creator/resources/checklist.md
-  - .claude/skills/agent-creator/resources/examples/domain-expert-agent.md
-  - .claude/skills/agent-creator/resources/examples/project-specific-agent.md
-  - .claude/skills/agent-creator/resources/examples/validator-agent.md
-  - .claude/skills/agent-creator/resources/templates/agent-template.md
   - .claude/skills/agent-curation
   - .claude/skills/agent-curation/SKILL.md
   - .claude/skills/agent-curation/agents/openai.yaml
@@ -1234,10 +1189,6 @@ dependencies:
   - .claude/skills/cross-research
   - .claude/skills/cross-research/SKILL.md
   - .claude/skills/cross-research/agents/openai.yaml
-  - .claude/skills/design-check
-  - .claude/skills/design-check/SKILL.md
-  - .claude/skills/design-check/agents/openai.yaml
-  - .claude/skills/design-check/references/checklist.md
   - .claude/skills/design-md-workflow
   - .claude/skills/design-md-workflow/SKILL.md
   - .claude/skills/design-md-workflow/agents/openai.yaml
@@ -1268,16 +1219,6 @@ dependencies:
   - .claude/skills/dotenvx-env-ops/SKILL.md
   - .claude/skills/dotenvx-env-ops/agents/openai.yaml
   - .claude/skills/dotenvx-env-ops/references/asta-dotenvx.md
-  - .claude/skills/drawio
-  - .claude/skills/drawio/SKILL.md
-  - .claude/skills/drawio/resources/assets/templates/aws-basic.drawio.xml
-  - .claude/skills/drawio/resources/references/font-config.md
-  - .claude/skills/drawio/resources/references/xml-structure.md
-  - .claude/skills/generate-svg
-  - .claude/skills/generate-svg/SKILL.md
-  - .claude/skills/gh-create-pr
-  - .claude/skills/gh-create-pr/SKILL.md
-  - .claude/skills/gh-create-pr/agents/openai.yaml
   - .claude/skills/git-worktree
   - .claude/skills/git-worktree/SKILL.md
   - .claude/skills/git-worktree/agents/openai.yaml
@@ -1286,9 +1227,6 @@ dependencies:
   - .claude/skills/git-worktree/references/troubleshooting.md
   - .claude/skills/git-worktree/references/workflows.md
   - .claude/skills/git-worktree/scripts/check-worktree-config.sh
-  - .claude/skills/golang
-  - .claude/skills/golang/SKILL.md
-  - .claude/skills/golang/references/golang-details.md
   - .claude/skills/google-forms-survey-builder
   - .claude/skills/google-forms-survey-builder/SKILL.md
   - .claude/skills/google-forms-survey-builder/agents/openai.yaml
@@ -1398,15 +1336,6 @@ dependencies:
   - .claude/skills/similarity/SKILL.md
   - .claude/skills/similarity/agents/openai.yaml
   - .claude/skills/similarity/references/report-analysis.md
-  - .claude/skills/skill-creator
-  - .claude/skills/skill-creator/LICENSE.txt
-  - .claude/skills/skill-creator/SKILL.md
-  - .claude/skills/skill-creator/agents/openai.yaml
-  - .claude/skills/skill-creator/references/openai_yaml.md
-  - .claude/skills/skill-creator/scripts/__pycache__/generate_openai_yaml.cpython-314.pyc
-  - .claude/skills/skill-creator/scripts/generate_openai_yaml.py
-  - .claude/skills/skill-creator/scripts/init_skill.py
-  - .claude/skills/skill-creator/scripts/quick_validate.py
   - .claude/skills/slack-app-management
   - .claude/skills/slack-app-management/SKILL.md
   - .claude/skills/slack-app-management/agents/openai.yaml
@@ -1429,9 +1358,6 @@ dependencies:
   - .claude/skills/tsr/tsconfig.json
   - .claude/skills/tsr/tsr-config.default.json
   - .claude/skills/tsr/tsr-config.schema.json
-  - .claude/skills/typescript
-  - .claude/skills/typescript/SKILL.md
-  - .claude/skills/typescript/references/type-safety-patterns.md
   - .claude/skills/work-log-maintenance
   - .claude/skills/work-log-maintenance/SKILL.md
   - .claude/skills/work-log-maintenance/agents/openai.yaml
@@ -1439,14 +1365,6 @@ dependencies:
   - .kiro/skills/1password-item-ops
   - .kiro/skills/1password-item-ops/SKILL.md
   - .kiro/skills/1password-item-ops/agents/openai.yaml
-  - .kiro/skills/agent-creator
-  - .kiro/skills/agent-creator/SKILL.md
-  - .kiro/skills/agent-creator/references/agent-details.md
-  - .kiro/skills/agent-creator/resources/checklist.md
-  - .kiro/skills/agent-creator/resources/examples/domain-expert-agent.md
-  - .kiro/skills/agent-creator/resources/examples/project-specific-agent.md
-  - .kiro/skills/agent-creator/resources/examples/validator-agent.md
-  - .kiro/skills/agent-creator/resources/templates/agent-template.md
   - .kiro/skills/agent-curation
   - .kiro/skills/agent-curation/SKILL.md
   - .kiro/skills/agent-curation/agents/openai.yaml
@@ -1511,10 +1429,6 @@ dependencies:
   - .kiro/skills/cross-research
   - .kiro/skills/cross-research/SKILL.md
   - .kiro/skills/cross-research/agents/openai.yaml
-  - .kiro/skills/design-check
-  - .kiro/skills/design-check/SKILL.md
-  - .kiro/skills/design-check/agents/openai.yaml
-  - .kiro/skills/design-check/references/checklist.md
   - .kiro/skills/design-md-workflow
   - .kiro/skills/design-md-workflow/SKILL.md
   - .kiro/skills/design-md-workflow/agents/openai.yaml
@@ -1545,16 +1459,6 @@ dependencies:
   - .kiro/skills/dotenvx-env-ops/SKILL.md
   - .kiro/skills/dotenvx-env-ops/agents/openai.yaml
   - .kiro/skills/dotenvx-env-ops/references/asta-dotenvx.md
-  - .kiro/skills/drawio
-  - .kiro/skills/drawio/SKILL.md
-  - .kiro/skills/drawio/resources/assets/templates/aws-basic.drawio.xml
-  - .kiro/skills/drawio/resources/references/font-config.md
-  - .kiro/skills/drawio/resources/references/xml-structure.md
-  - .kiro/skills/generate-svg
-  - .kiro/skills/generate-svg/SKILL.md
-  - .kiro/skills/gh-create-pr
-  - .kiro/skills/gh-create-pr/SKILL.md
-  - .kiro/skills/gh-create-pr/agents/openai.yaml
   - .kiro/skills/git-worktree
   - .kiro/skills/git-worktree/SKILL.md
   - .kiro/skills/git-worktree/agents/openai.yaml
@@ -1563,9 +1467,6 @@ dependencies:
   - .kiro/skills/git-worktree/references/troubleshooting.md
   - .kiro/skills/git-worktree/references/workflows.md
   - .kiro/skills/git-worktree/scripts/check-worktree-config.sh
-  - .kiro/skills/golang
-  - .kiro/skills/golang/SKILL.md
-  - .kiro/skills/golang/references/golang-details.md
   - .kiro/skills/google-forms-survey-builder
   - .kiro/skills/google-forms-survey-builder/SKILL.md
   - .kiro/skills/google-forms-survey-builder/agents/openai.yaml
@@ -1675,14 +1576,6 @@ dependencies:
   - .kiro/skills/similarity/SKILL.md
   - .kiro/skills/similarity/agents/openai.yaml
   - .kiro/skills/similarity/references/report-analysis.md
-  - .kiro/skills/skill-creator
-  - .kiro/skills/skill-creator/LICENSE.txt
-  - .kiro/skills/skill-creator/SKILL.md
-  - .kiro/skills/skill-creator/agents/openai.yaml
-  - .kiro/skills/skill-creator/references/openai_yaml.md
-  - .kiro/skills/skill-creator/scripts/generate_openai_yaml.py
-  - .kiro/skills/skill-creator/scripts/init_skill.py
-  - .kiro/skills/skill-creator/scripts/quick_validate.py
   - .kiro/skills/slack-app-management
   - .kiro/skills/slack-app-management/SKILL.md
   - .kiro/skills/slack-app-management/agents/openai.yaml
@@ -1705,9 +1598,6 @@ dependencies:
   - .kiro/skills/tsr/tsconfig.json
   - .kiro/skills/tsr/tsr-config.default.json
   - .kiro/skills/tsr/tsr-config.schema.json
-  - .kiro/skills/typescript
-  - .kiro/skills/typescript/SKILL.md
-  - .kiro/skills/typescript/references/type-safety-patterns.md
   - .kiro/skills/work-log-maintenance
   - .kiro/skills/work-log-maintenance/SKILL.md
   - .kiro/skills/work-log-maintenance/agents/openai.yaml
@@ -1715,13 +1605,6 @@ dependencies:
   deployed_file_hashes:
     .agents/skills/1password-item-ops/SKILL.md: sha256:b7fba64c86660630cbde7cf45b9228a45a921ef5836745a0025797debae6c212
     .agents/skills/1password-item-ops/agents/openai.yaml: sha256:7e861a0611c042f922c97096ec7ef4906d27b94f2b5d52d67638bce72c23ca6b
-    .agents/skills/agent-creator/SKILL.md: sha256:b9c5e8d06ac5830e90882da24b95a497ef907fec568a16a991963af1018bb069
-    .agents/skills/agent-creator/references/agent-details.md: sha256:2e8c2778f63cd759e85eea2325efb0d4169284075eae943f91e38d9d4fb69c10
-    .agents/skills/agent-creator/resources/checklist.md: sha256:db06938f8ccef2aad9ee20fdb4231ffeddb5cda846f27614b1ac573258d857c7
-    .agents/skills/agent-creator/resources/examples/domain-expert-agent.md: sha256:c2ff7213116a64d49f5ea86c7ae25f449b504fa49077e57194d1891136cb3612
-    .agents/skills/agent-creator/resources/examples/project-specific-agent.md: sha256:add44109b4c5d97f9e305ac4b8a8a242e8032ae7b76b7d3db560b81eb22ddd62
-    .agents/skills/agent-creator/resources/examples/validator-agent.md: sha256:f124b1b0de31e445171f9f1c50668cd14a3a77d77df98e5a1a0ec92f0ec46fa8
-    .agents/skills/agent-creator/resources/templates/agent-template.md: sha256:a14b7410dd5daaec37f30f7156869c7887de0cbee30397da1bac9d09524887a8
     .agents/skills/agent-curation/SKILL.md: sha256:cf46408cdb91fd87a0985ccec8a1bc0f77501d521320f88a36a52e9fd9cc3900
     .agents/skills/agent-curation/agents/openai.yaml: sha256:f7395c9113eaefcfc27c4b697b0d7c253cb7a67a88c84f038098e0ff06ba8694
     .agents/skills/agent-curation/references/hired-agents-registry.md: sha256:8686ea777ab6c8eec3a0fd92f4ce9bbefe4ec5b76f409885c99f6e431f62237e
@@ -1776,9 +1659,6 @@ dependencies:
     .agents/skills/codex-companion-scripts/scripts/lib/workspace.mjs: sha256:7dbdcb927818da4105f65dd0c826caa4dd1781b8050905f8f83f472ce4201e2e
     .agents/skills/cross-research/SKILL.md: sha256:a4c913e6833ae897ea7d22632b305b09e3071e46ccc0d5141bdb22263ce851bd
     .agents/skills/cross-research/agents/openai.yaml: sha256:065f3e6000229b79c3a17b598471def5743af09baa183920f99edafb1fb9aaeb
-    .agents/skills/design-check/SKILL.md: sha256:e94fe4644706f79d42988ead9bf6aecf7086257f55f76d990f4afeb400bb8559
-    .agents/skills/design-check/agents/openai.yaml: sha256:f70fe2a21eab6da5580b596a99ee69d746eadaed4f0d8312fafcb568d274ba36
-    .agents/skills/design-check/references/checklist.md: sha256:809c98d5a6b4f30392297639d18dfcce707e477111383c76cf0bb57a4395186d
     .agents/skills/design-md-workflow/SKILL.md: sha256:86a8393eb989689539eff10574e3102ccbfbd9afad9a03d7de8533286fb9e31a
     .agents/skills/design-md-workflow/agents/openai.yaml: sha256:9c0affb53d0d0703bf7e8d8199ec81dde316b76a71151c3839c8c021056ef10b
     .agents/skills/design-md-workflow/references/design-md-structure.md: sha256:2a273b9805b2476961ee0852bcdb7905778ad3c25260ed03082681323059c569
@@ -1804,13 +1684,6 @@ dependencies:
     .agents/skills/dotenvx-env-ops/SKILL.md: sha256:637f58a4fd5f891b9fb0969c29b81c17ca55d2839f75a4b4fb88c923b5892d0c
     .agents/skills/dotenvx-env-ops/agents/openai.yaml: sha256:b66aba227981fab6c851d3935074df54cf71b9cd69b162e8072684075b48ec77
     .agents/skills/dotenvx-env-ops/references/asta-dotenvx.md: sha256:7d40a7f448f3464de894cedd9daa68082f8bfebbf870e77d41bffaf96bf85cf2
-    .agents/skills/drawio/SKILL.md: sha256:993ccce5a8d3de5f4efd93da32cbec6230d397b6a6f4ac34f5f1ae3064de839e
-    .agents/skills/drawio/resources/assets/templates/aws-basic.drawio.xml: sha256:7e776678b177c80f9feb6a1ae360a96a1aafaa8f2c8661f656442223dc2a1791
-    .agents/skills/drawio/resources/references/font-config.md: sha256:8c6faf88316caff8f960d0fbd0baddc6b99abe8f37525d9e0e0f47901a616fae
-    .agents/skills/drawio/resources/references/xml-structure.md: sha256:6453281eaa8f39db774a69b3d0c3b9b8008842dc240eeb1b21bfd8402cbf582d
-    .agents/skills/generate-svg/SKILL.md: sha256:8da0c16c4c07a472e7f80d16a5d9a7d4ed790d48e961de102750eca2be9a7eb0
-    .agents/skills/gh-create-pr/SKILL.md: sha256:62f115aaafba9d7f248fb19a8c7de6a6d37f820e16cc3af4babb32320f3d383e
-    .agents/skills/gh-create-pr/agents/openai.yaml: sha256:11d4853e379ea90a8ac2207bce60b752850f6bf7fca7501057cbb52bc62172fa
     .agents/skills/git-worktree/SKILL.md: sha256:ed1f87fce585b57bc991e08275b9aeac331633f1d6a3b754c89c4a3f4949e8d6
     .agents/skills/git-worktree/agents/openai.yaml: sha256:13edbe566f94c15bcb553a532b392da27bbe1c81e71b0f229af6b161ac30bc88
     .agents/skills/git-worktree/references/configuration.md: sha256:e0ce9f609332022a539b590d7723219211637fd27512293235d47ab6814d5fdf
@@ -1818,8 +1691,6 @@ dependencies:
     .agents/skills/git-worktree/references/troubleshooting.md: sha256:370d8df007792954eb7a8795b068f2487a46284489f908e76864242b01be4d77
     .agents/skills/git-worktree/references/workflows.md: sha256:f70bfe1b8c5a7db86e10ae211dbc7188a1ccbd583795dee0633b3896da9ef1fc
     .agents/skills/git-worktree/scripts/check-worktree-config.sh: sha256:5582d5f0b45395f7a077ea3e3cbb3266138053166950ff7df274957833e3ffdf
-    .agents/skills/golang/SKILL.md: sha256:5dbbc37d00ff87fa09174123fdddf5414c285b2c2e8110e0de17de6e10412fbd
-    .agents/skills/golang/references/golang-details.md: sha256:948d3ef5a80d17a282366c2a3008c03d88427d82404df6d11d9d54ead7665988
     .agents/skills/google-forms-survey-builder/SKILL.md: sha256:3a80ed6d3cce833ce1c12837ee906346a0a0c437a4f5f748ef1ad46c3e5f0746
     .agents/skills/google-forms-survey-builder/agents/openai.yaml: sha256:08912f2b673c84dde9af3b91006973ec6f5f6551fa559c1cdbf9056b1ee03b90
     .agents/skills/google-forms-survey-builder/references/SURVEY_QUESTIONS.md: sha256:7571484856e9031030b87121b19351c14e3fc5fc0b63a235f9cc94dca5beb0f3
@@ -1840,7 +1711,7 @@ dependencies:
     .agents/skills/mcp-tools/references/mcp-tools-details.md: sha256:c0af3d9e3ff7006bc5953f295824f31cb22d606fb93da7a07e2a94c7550af3ea
     .agents/skills/mcp-tools/references/security-and-credentials.md: sha256:789724e286ed619bea3e8b23f97ac84156886d78b9ae8b2bf028291919be02a2
     .agents/skills/mcp-tools/references/server-configurations.md: sha256:14c2a50593bf13eb148781a4a03eb9d9a536e14a6d69ac9d814729e5df60cc0d
-    .agents/skills/mise/SKILL.md: sha256:1d432460189fe421faba8aeaa01f9e7e6c86584a80fe457482261ed173acc6d2
+    .agents/skills/mise/SKILL.md: sha256:feef876253688077c3f38f579ff12e6656eca8a37d43a50c1458d3a15de323c5
     .agents/skills/mise/agents/openai.yaml: sha256:5032c53d31fa12d2b209f729ae559a941d0ca68a2494101f952eba0b87cff7ef
     .agents/skills/mise/references/best-practices.md: sha256:e4210cbe2376d81ecb6aff4c4603cb6570454a6465276b3b88d48737b0ba5ce4
     .agents/skills/mise/references/bootstrap.md: sha256:d83f24479a7ace86b47d863b41f8042ce363b9fe3817b104c6eb8035d67fe90e
@@ -1908,14 +1779,6 @@ dependencies:
     .agents/skills/similarity/SKILL.md: sha256:9996c551ae8c69eddb2637e0cc0644f985f77911e7d94474167c6659e202e8fc
     .agents/skills/similarity/agents/openai.yaml: sha256:256ce2d2a4a3f6ac024a9a08b2665de766232278500894c27c2c83569b778598
     .agents/skills/similarity/references/report-analysis.md: sha256:dad82829abba9e606035d045973cfc9a6f2b20ca359a79c3175dadcbbcb2edbe
-    .agents/skills/skill-creator/LICENSE.txt: sha256:cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30
-    .agents/skills/skill-creator/SKILL.md: sha256:ab45d4d2eb8aabfc050c9dfe15ec19c8f3bf6f1093404418be7413467c297e78
-    .agents/skills/skill-creator/agents/openai.yaml: sha256:b6c49ad8c5d225212c3d44ea4ed7bd11bb33d54fadc876296d67b865aca3cd2c
-    .agents/skills/skill-creator/references/openai_yaml.md: sha256:9fb5928b7f4a746fdb39df503ebbd7a659d5e64b47f85a60626aa1a03fd76b17
-    .agents/skills/skill-creator/scripts/__pycache__/generate_openai_yaml.cpython-314.pyc: sha256:5e1296fd431ccea6aa366c51abbc71408305e9e4aa50393412bc9cc36d468962
-    .agents/skills/skill-creator/scripts/generate_openai_yaml.py: sha256:10e93ef5537e55abba5e3aac905c4aa5f5b377a586c0cf45d156c772505f0d65
-    .agents/skills/skill-creator/scripts/init_skill.py: sha256:bcb8982d3f033a094f2f1be43123ac8537e2562d25d8ba4d8ef2196ae514d96d
-    .agents/skills/skill-creator/scripts/quick_validate.py: sha256:1fe7b5eb4474cae8b175187508107dcdd3e294eca584f3c7b811e59d27623380
     .agents/skills/slack-app-management/SKILL.md: sha256:6b20765d9ba0fd5757323c91c027dc62c92497c9f1dfca439b84d171c111768b
     .agents/skills/slack-app-management/agents/openai.yaml: sha256:9a2c6ca4d634aa549dd13bc35f924e13d48996714e6788cb5d97765e3d9d644c
     .agents/skills/tsr/MIGRATION.md: sha256:4cfc6d22fe0569e71b50d106f2beb48a27bcc9ab9bc353c5974b3a1f9757a879
@@ -1936,20 +1799,11 @@ dependencies:
     .agents/skills/tsr/tsconfig.json: sha256:7281659cf7d82c20093062d11b652d07c66f81f0938b76894f5a1a708730cfc8
     .agents/skills/tsr/tsr-config.default.json: sha256:4a27845863e7648c90b898b2771b5390d6a26bcbcb4d9fccb120d15ae8479746
     .agents/skills/tsr/tsr-config.schema.json: sha256:002f66fc8a6d432bd0909bfa9719939203bb687e50baa4425ee2f5150b0c714d
-    .agents/skills/typescript/SKILL.md: sha256:c7c2502c416ca89b31f08c1d95c64fdf081655b5b58ed8a68b3684950a91dd07
-    .agents/skills/typescript/references/type-safety-patterns.md: sha256:870af4028f5ace853d45192ac6f82d96f2bc01aaf4759738db8c28a403cb9bed
     .agents/skills/work-log-maintenance/SKILL.md: sha256:26f4064ff1c0e757e415121675d6caaecd30040f95304e6ed4cd4c73e022f3f9
     .agents/skills/work-log-maintenance/agents/openai.yaml: sha256:e951b8256a5a1b032bcca3c7105230f5041467594434ca23b562b8ec5ec4abc8
     .agents/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
     .claude/skills/1password-item-ops/SKILL.md: sha256:b7fba64c86660630cbde7cf45b9228a45a921ef5836745a0025797debae6c212
     .claude/skills/1password-item-ops/agents/openai.yaml: sha256:7e861a0611c042f922c97096ec7ef4906d27b94f2b5d52d67638bce72c23ca6b
-    .claude/skills/agent-creator/SKILL.md: sha256:b9c5e8d06ac5830e90882da24b95a497ef907fec568a16a991963af1018bb069
-    .claude/skills/agent-creator/references/agent-details.md: sha256:2e8c2778f63cd759e85eea2325efb0d4169284075eae943f91e38d9d4fb69c10
-    .claude/skills/agent-creator/resources/checklist.md: sha256:db06938f8ccef2aad9ee20fdb4231ffeddb5cda846f27614b1ac573258d857c7
-    .claude/skills/agent-creator/resources/examples/domain-expert-agent.md: sha256:c2ff7213116a64d49f5ea86c7ae25f449b504fa49077e57194d1891136cb3612
-    .claude/skills/agent-creator/resources/examples/project-specific-agent.md: sha256:add44109b4c5d97f9e305ac4b8a8a242e8032ae7b76b7d3db560b81eb22ddd62
-    .claude/skills/agent-creator/resources/examples/validator-agent.md: sha256:f124b1b0de31e445171f9f1c50668cd14a3a77d77df98e5a1a0ec92f0ec46fa8
-    .claude/skills/agent-creator/resources/templates/agent-template.md: sha256:a14b7410dd5daaec37f30f7156869c7887de0cbee30397da1bac9d09524887a8
     .claude/skills/agent-curation/SKILL.md: sha256:cf46408cdb91fd87a0985ccec8a1bc0f77501d521320f88a36a52e9fd9cc3900
     .claude/skills/agent-curation/agents/openai.yaml: sha256:f7395c9113eaefcfc27c4b697b0d7c253cb7a67a88c84f038098e0ff06ba8694
     .claude/skills/agent-curation/references/hired-agents-registry.md: sha256:8686ea777ab6c8eec3a0fd92f4ce9bbefe4ec5b76f409885c99f6e431f62237e
@@ -2004,9 +1858,6 @@ dependencies:
     .claude/skills/codex-companion-scripts/scripts/lib/workspace.mjs: sha256:7dbdcb927818da4105f65dd0c826caa4dd1781b8050905f8f83f472ce4201e2e
     .claude/skills/cross-research/SKILL.md: sha256:a4c913e6833ae897ea7d22632b305b09e3071e46ccc0d5141bdb22263ce851bd
     .claude/skills/cross-research/agents/openai.yaml: sha256:065f3e6000229b79c3a17b598471def5743af09baa183920f99edafb1fb9aaeb
-    .claude/skills/design-check/SKILL.md: sha256:e94fe4644706f79d42988ead9bf6aecf7086257f55f76d990f4afeb400bb8559
-    .claude/skills/design-check/agents/openai.yaml: sha256:f70fe2a21eab6da5580b596a99ee69d746eadaed4f0d8312fafcb568d274ba36
-    .claude/skills/design-check/references/checklist.md: sha256:809c98d5a6b4f30392297639d18dfcce707e477111383c76cf0bb57a4395186d
     .claude/skills/design-md-workflow/SKILL.md: sha256:86a8393eb989689539eff10574e3102ccbfbd9afad9a03d7de8533286fb9e31a
     .claude/skills/design-md-workflow/agents/openai.yaml: sha256:9c0affb53d0d0703bf7e8d8199ec81dde316b76a71151c3839c8c021056ef10b
     .claude/skills/design-md-workflow/references/design-md-structure.md: sha256:2a273b9805b2476961ee0852bcdb7905778ad3c25260ed03082681323059c569
@@ -2032,13 +1883,6 @@ dependencies:
     .claude/skills/dotenvx-env-ops/SKILL.md: sha256:637f58a4fd5f891b9fb0969c29b81c17ca55d2839f75a4b4fb88c923b5892d0c
     .claude/skills/dotenvx-env-ops/agents/openai.yaml: sha256:b66aba227981fab6c851d3935074df54cf71b9cd69b162e8072684075b48ec77
     .claude/skills/dotenvx-env-ops/references/asta-dotenvx.md: sha256:7d40a7f448f3464de894cedd9daa68082f8bfebbf870e77d41bffaf96bf85cf2
-    .claude/skills/drawio/SKILL.md: sha256:993ccce5a8d3de5f4efd93da32cbec6230d397b6a6f4ac34f5f1ae3064de839e
-    .claude/skills/drawio/resources/assets/templates/aws-basic.drawio.xml: sha256:7e776678b177c80f9feb6a1ae360a96a1aafaa8f2c8661f656442223dc2a1791
-    .claude/skills/drawio/resources/references/font-config.md: sha256:8c6faf88316caff8f960d0fbd0baddc6b99abe8f37525d9e0e0f47901a616fae
-    .claude/skills/drawio/resources/references/xml-structure.md: sha256:6453281eaa8f39db774a69b3d0c3b9b8008842dc240eeb1b21bfd8402cbf582d
-    .claude/skills/generate-svg/SKILL.md: sha256:8da0c16c4c07a472e7f80d16a5d9a7d4ed790d48e961de102750eca2be9a7eb0
-    .claude/skills/gh-create-pr/SKILL.md: sha256:62f115aaafba9d7f248fb19a8c7de6a6d37f820e16cc3af4babb32320f3d383e
-    .claude/skills/gh-create-pr/agents/openai.yaml: sha256:11d4853e379ea90a8ac2207bce60b752850f6bf7fca7501057cbb52bc62172fa
     .claude/skills/git-worktree/SKILL.md: sha256:ed1f87fce585b57bc991e08275b9aeac331633f1d6a3b754c89c4a3f4949e8d6
     .claude/skills/git-worktree/agents/openai.yaml: sha256:13edbe566f94c15bcb553a532b392da27bbe1c81e71b0f229af6b161ac30bc88
     .claude/skills/git-worktree/references/configuration.md: sha256:e0ce9f609332022a539b590d7723219211637fd27512293235d47ab6814d5fdf
@@ -2046,8 +1890,6 @@ dependencies:
     .claude/skills/git-worktree/references/troubleshooting.md: sha256:370d8df007792954eb7a8795b068f2487a46284489f908e76864242b01be4d77
     .claude/skills/git-worktree/references/workflows.md: sha256:f70bfe1b8c5a7db86e10ae211dbc7188a1ccbd583795dee0633b3896da9ef1fc
     .claude/skills/git-worktree/scripts/check-worktree-config.sh: sha256:5582d5f0b45395f7a077ea3e3cbb3266138053166950ff7df274957833e3ffdf
-    .claude/skills/golang/SKILL.md: sha256:5dbbc37d00ff87fa09174123fdddf5414c285b2c2e8110e0de17de6e10412fbd
-    .claude/skills/golang/references/golang-details.md: sha256:948d3ef5a80d17a282366c2a3008c03d88427d82404df6d11d9d54ead7665988
     .claude/skills/google-forms-survey-builder/SKILL.md: sha256:3a80ed6d3cce833ce1c12837ee906346a0a0c437a4f5f748ef1ad46c3e5f0746
     .claude/skills/google-forms-survey-builder/agents/openai.yaml: sha256:08912f2b673c84dde9af3b91006973ec6f5f6551fa559c1cdbf9056b1ee03b90
     .claude/skills/google-forms-survey-builder/references/SURVEY_QUESTIONS.md: sha256:7571484856e9031030b87121b19351c14e3fc5fc0b63a235f9cc94dca5beb0f3
@@ -2068,7 +1910,7 @@ dependencies:
     .claude/skills/mcp-tools/references/mcp-tools-details.md: sha256:c0af3d9e3ff7006bc5953f295824f31cb22d606fb93da7a07e2a94c7550af3ea
     .claude/skills/mcp-tools/references/security-and-credentials.md: sha256:789724e286ed619bea3e8b23f97ac84156886d78b9ae8b2bf028291919be02a2
     .claude/skills/mcp-tools/references/server-configurations.md: sha256:14c2a50593bf13eb148781a4a03eb9d9a536e14a6d69ac9d814729e5df60cc0d
-    .claude/skills/mise/SKILL.md: sha256:1d432460189fe421faba8aeaa01f9e7e6c86584a80fe457482261ed173acc6d2
+    .claude/skills/mise/SKILL.md: sha256:feef876253688077c3f38f579ff12e6656eca8a37d43a50c1458d3a15de323c5
     .claude/skills/mise/agents/openai.yaml: sha256:5032c53d31fa12d2b209f729ae559a941d0ca68a2494101f952eba0b87cff7ef
     .claude/skills/mise/references/best-practices.md: sha256:e4210cbe2376d81ecb6aff4c4603cb6570454a6465276b3b88d48737b0ba5ce4
     .claude/skills/mise/references/bootstrap.md: sha256:d83f24479a7ace86b47d863b41f8042ce363b9fe3817b104c6eb8035d67fe90e
@@ -2136,14 +1978,6 @@ dependencies:
     .claude/skills/similarity/SKILL.md: sha256:9996c551ae8c69eddb2637e0cc0644f985f77911e7d94474167c6659e202e8fc
     .claude/skills/similarity/agents/openai.yaml: sha256:256ce2d2a4a3f6ac024a9a08b2665de766232278500894c27c2c83569b778598
     .claude/skills/similarity/references/report-analysis.md: sha256:dad82829abba9e606035d045973cfc9a6f2b20ca359a79c3175dadcbbcb2edbe
-    .claude/skills/skill-creator/LICENSE.txt: sha256:cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30
-    .claude/skills/skill-creator/SKILL.md: sha256:ab45d4d2eb8aabfc050c9dfe15ec19c8f3bf6f1093404418be7413467c297e78
-    .claude/skills/skill-creator/agents/openai.yaml: sha256:b6c49ad8c5d225212c3d44ea4ed7bd11bb33d54fadc876296d67b865aca3cd2c
-    .claude/skills/skill-creator/references/openai_yaml.md: sha256:9fb5928b7f4a746fdb39df503ebbd7a659d5e64b47f85a60626aa1a03fd76b17
-    .claude/skills/skill-creator/scripts/__pycache__/generate_openai_yaml.cpython-314.pyc: sha256:5e1296fd431ccea6aa366c51abbc71408305e9e4aa50393412bc9cc36d468962
-    .claude/skills/skill-creator/scripts/generate_openai_yaml.py: sha256:10e93ef5537e55abba5e3aac905c4aa5f5b377a586c0cf45d156c772505f0d65
-    .claude/skills/skill-creator/scripts/init_skill.py: sha256:bcb8982d3f033a094f2f1be43123ac8537e2562d25d8ba4d8ef2196ae514d96d
-    .claude/skills/skill-creator/scripts/quick_validate.py: sha256:1fe7b5eb4474cae8b175187508107dcdd3e294eca584f3c7b811e59d27623380
     .claude/skills/slack-app-management/SKILL.md: sha256:6b20765d9ba0fd5757323c91c027dc62c92497c9f1dfca439b84d171c111768b
     .claude/skills/slack-app-management/agents/openai.yaml: sha256:9a2c6ca4d634aa549dd13bc35f924e13d48996714e6788cb5d97765e3d9d644c
     .claude/skills/tsr/MIGRATION.md: sha256:4cfc6d22fe0569e71b50d106f2beb48a27bcc9ab9bc353c5974b3a1f9757a879
@@ -2164,20 +1998,11 @@ dependencies:
     .claude/skills/tsr/tsconfig.json: sha256:7281659cf7d82c20093062d11b652d07c66f81f0938b76894f5a1a708730cfc8
     .claude/skills/tsr/tsr-config.default.json: sha256:4a27845863e7648c90b898b2771b5390d6a26bcbcb4d9fccb120d15ae8479746
     .claude/skills/tsr/tsr-config.schema.json: sha256:002f66fc8a6d432bd0909bfa9719939203bb687e50baa4425ee2f5150b0c714d
-    .claude/skills/typescript/SKILL.md: sha256:c7c2502c416ca89b31f08c1d95c64fdf081655b5b58ed8a68b3684950a91dd07
-    .claude/skills/typescript/references/type-safety-patterns.md: sha256:870af4028f5ace853d45192ac6f82d96f2bc01aaf4759738db8c28a403cb9bed
     .claude/skills/work-log-maintenance/SKILL.md: sha256:26f4064ff1c0e757e415121675d6caaecd30040f95304e6ed4cd4c73e022f3f9
     .claude/skills/work-log-maintenance/agents/openai.yaml: sha256:e951b8256a5a1b032bcca3c7105230f5041467594434ca23b562b8ec5ec4abc8
     .claude/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
     .kiro/skills/1password-item-ops/SKILL.md: sha256:b7fba64c86660630cbde7cf45b9228a45a921ef5836745a0025797debae6c212
     .kiro/skills/1password-item-ops/agents/openai.yaml: sha256:7e861a0611c042f922c97096ec7ef4906d27b94f2b5d52d67638bce72c23ca6b
-    .kiro/skills/agent-creator/SKILL.md: sha256:b9c5e8d06ac5830e90882da24b95a497ef907fec568a16a991963af1018bb069
-    .kiro/skills/agent-creator/references/agent-details.md: sha256:2e8c2778f63cd759e85eea2325efb0d4169284075eae943f91e38d9d4fb69c10
-    .kiro/skills/agent-creator/resources/checklist.md: sha256:db06938f8ccef2aad9ee20fdb4231ffeddb5cda846f27614b1ac573258d857c7
-    .kiro/skills/agent-creator/resources/examples/domain-expert-agent.md: sha256:c2ff7213116a64d49f5ea86c7ae25f449b504fa49077e57194d1891136cb3612
-    .kiro/skills/agent-creator/resources/examples/project-specific-agent.md: sha256:add44109b4c5d97f9e305ac4b8a8a242e8032ae7b76b7d3db560b81eb22ddd62
-    .kiro/skills/agent-creator/resources/examples/validator-agent.md: sha256:f124b1b0de31e445171f9f1c50668cd14a3a77d77df98e5a1a0ec92f0ec46fa8
-    .kiro/skills/agent-creator/resources/templates/agent-template.md: sha256:a14b7410dd5daaec37f30f7156869c7887de0cbee30397da1bac9d09524887a8
     .kiro/skills/agent-curation/SKILL.md: sha256:cf46408cdb91fd87a0985ccec8a1bc0f77501d521320f88a36a52e9fd9cc3900
     .kiro/skills/agent-curation/agents/openai.yaml: sha256:f7395c9113eaefcfc27c4b697b0d7c253cb7a67a88c84f038098e0ff06ba8694
     .kiro/skills/agent-curation/references/hired-agents-registry.md: sha256:8686ea777ab6c8eec3a0fd92f4ce9bbefe4ec5b76f409885c99f6e431f62237e
@@ -2232,9 +2057,6 @@ dependencies:
     .kiro/skills/codex-companion-scripts/scripts/lib/workspace.mjs: sha256:7dbdcb927818da4105f65dd0c826caa4dd1781b8050905f8f83f472ce4201e2e
     .kiro/skills/cross-research/SKILL.md: sha256:a4c913e6833ae897ea7d22632b305b09e3071e46ccc0d5141bdb22263ce851bd
     .kiro/skills/cross-research/agents/openai.yaml: sha256:065f3e6000229b79c3a17b598471def5743af09baa183920f99edafb1fb9aaeb
-    .kiro/skills/design-check/SKILL.md: sha256:e94fe4644706f79d42988ead9bf6aecf7086257f55f76d990f4afeb400bb8559
-    .kiro/skills/design-check/agents/openai.yaml: sha256:f70fe2a21eab6da5580b596a99ee69d746eadaed4f0d8312fafcb568d274ba36
-    .kiro/skills/design-check/references/checklist.md: sha256:809c98d5a6b4f30392297639d18dfcce707e477111383c76cf0bb57a4395186d
     .kiro/skills/design-md-workflow/SKILL.md: sha256:86a8393eb989689539eff10574e3102ccbfbd9afad9a03d7de8533286fb9e31a
     .kiro/skills/design-md-workflow/agents/openai.yaml: sha256:9c0affb53d0d0703bf7e8d8199ec81dde316b76a71151c3839c8c021056ef10b
     .kiro/skills/design-md-workflow/references/design-md-structure.md: sha256:2a273b9805b2476961ee0852bcdb7905778ad3c25260ed03082681323059c569
@@ -2260,13 +2082,6 @@ dependencies:
     .kiro/skills/dotenvx-env-ops/SKILL.md: sha256:637f58a4fd5f891b9fb0969c29b81c17ca55d2839f75a4b4fb88c923b5892d0c
     .kiro/skills/dotenvx-env-ops/agents/openai.yaml: sha256:b66aba227981fab6c851d3935074df54cf71b9cd69b162e8072684075b48ec77
     .kiro/skills/dotenvx-env-ops/references/asta-dotenvx.md: sha256:7d40a7f448f3464de894cedd9daa68082f8bfebbf870e77d41bffaf96bf85cf2
-    .kiro/skills/drawio/SKILL.md: sha256:993ccce5a8d3de5f4efd93da32cbec6230d397b6a6f4ac34f5f1ae3064de839e
-    .kiro/skills/drawio/resources/assets/templates/aws-basic.drawio.xml: sha256:7e776678b177c80f9feb6a1ae360a96a1aafaa8f2c8661f656442223dc2a1791
-    .kiro/skills/drawio/resources/references/font-config.md: sha256:8c6faf88316caff8f960d0fbd0baddc6b99abe8f37525d9e0e0f47901a616fae
-    .kiro/skills/drawio/resources/references/xml-structure.md: sha256:6453281eaa8f39db774a69b3d0c3b9b8008842dc240eeb1b21bfd8402cbf582d
-    .kiro/skills/generate-svg/SKILL.md: sha256:8da0c16c4c07a472e7f80d16a5d9a7d4ed790d48e961de102750eca2be9a7eb0
-    .kiro/skills/gh-create-pr/SKILL.md: sha256:62f115aaafba9d7f248fb19a8c7de6a6d37f820e16cc3af4babb32320f3d383e
-    .kiro/skills/gh-create-pr/agents/openai.yaml: sha256:11d4853e379ea90a8ac2207bce60b752850f6bf7fca7501057cbb52bc62172fa
     .kiro/skills/git-worktree/SKILL.md: sha256:ed1f87fce585b57bc991e08275b9aeac331633f1d6a3b754c89c4a3f4949e8d6
     .kiro/skills/git-worktree/agents/openai.yaml: sha256:13edbe566f94c15bcb553a532b392da27bbe1c81e71b0f229af6b161ac30bc88
     .kiro/skills/git-worktree/references/configuration.md: sha256:e0ce9f609332022a539b590d7723219211637fd27512293235d47ab6814d5fdf
@@ -2274,8 +2089,6 @@ dependencies:
     .kiro/skills/git-worktree/references/troubleshooting.md: sha256:370d8df007792954eb7a8795b068f2487a46284489f908e76864242b01be4d77
     .kiro/skills/git-worktree/references/workflows.md: sha256:f70bfe1b8c5a7db86e10ae211dbc7188a1ccbd583795dee0633b3896da9ef1fc
     .kiro/skills/git-worktree/scripts/check-worktree-config.sh: sha256:5582d5f0b45395f7a077ea3e3cbb3266138053166950ff7df274957833e3ffdf
-    .kiro/skills/golang/SKILL.md: sha256:5dbbc37d00ff87fa09174123fdddf5414c285b2c2e8110e0de17de6e10412fbd
-    .kiro/skills/golang/references/golang-details.md: sha256:948d3ef5a80d17a282366c2a3008c03d88427d82404df6d11d9d54ead7665988
     .kiro/skills/google-forms-survey-builder/SKILL.md: sha256:3a80ed6d3cce833ce1c12837ee906346a0a0c437a4f5f748ef1ad46c3e5f0746
     .kiro/skills/google-forms-survey-builder/agents/openai.yaml: sha256:08912f2b673c84dde9af3b91006973ec6f5f6551fa559c1cdbf9056b1ee03b90
     .kiro/skills/google-forms-survey-builder/references/SURVEY_QUESTIONS.md: sha256:7571484856e9031030b87121b19351c14e3fc5fc0b63a235f9cc94dca5beb0f3
@@ -2296,7 +2109,7 @@ dependencies:
     .kiro/skills/mcp-tools/references/mcp-tools-details.md: sha256:c0af3d9e3ff7006bc5953f295824f31cb22d606fb93da7a07e2a94c7550af3ea
     .kiro/skills/mcp-tools/references/security-and-credentials.md: sha256:789724e286ed619bea3e8b23f97ac84156886d78b9ae8b2bf028291919be02a2
     .kiro/skills/mcp-tools/references/server-configurations.md: sha256:14c2a50593bf13eb148781a4a03eb9d9a536e14a6d69ac9d814729e5df60cc0d
-    .kiro/skills/mise/SKILL.md: sha256:1d432460189fe421faba8aeaa01f9e7e6c86584a80fe457482261ed173acc6d2
+    .kiro/skills/mise/SKILL.md: sha256:feef876253688077c3f38f579ff12e6656eca8a37d43a50c1458d3a15de323c5
     .kiro/skills/mise/agents/openai.yaml: sha256:5032c53d31fa12d2b209f729ae559a941d0ca68a2494101f952eba0b87cff7ef
     .kiro/skills/mise/references/best-practices.md: sha256:e4210cbe2376d81ecb6aff4c4603cb6570454a6465276b3b88d48737b0ba5ce4
     .kiro/skills/mise/references/bootstrap.md: sha256:d83f24479a7ace86b47d863b41f8042ce363b9fe3817b104c6eb8035d67fe90e
@@ -2364,13 +2177,6 @@ dependencies:
     .kiro/skills/similarity/SKILL.md: sha256:9996c551ae8c69eddb2637e0cc0644f985f77911e7d94474167c6659e202e8fc
     .kiro/skills/similarity/agents/openai.yaml: sha256:256ce2d2a4a3f6ac024a9a08b2665de766232278500894c27c2c83569b778598
     .kiro/skills/similarity/references/report-analysis.md: sha256:dad82829abba9e606035d045973cfc9a6f2b20ca359a79c3175dadcbbcb2edbe
-    .kiro/skills/skill-creator/LICENSE.txt: sha256:cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30
-    .kiro/skills/skill-creator/SKILL.md: sha256:ab45d4d2eb8aabfc050c9dfe15ec19c8f3bf6f1093404418be7413467c297e78
-    .kiro/skills/skill-creator/agents/openai.yaml: sha256:b6c49ad8c5d225212c3d44ea4ed7bd11bb33d54fadc876296d67b865aca3cd2c
-    .kiro/skills/skill-creator/references/openai_yaml.md: sha256:9fb5928b7f4a746fdb39df503ebbd7a659d5e64b47f85a60626aa1a03fd76b17
-    .kiro/skills/skill-creator/scripts/generate_openai_yaml.py: sha256:10e93ef5537e55abba5e3aac905c4aa5f5b377a586c0cf45d156c772505f0d65
-    .kiro/skills/skill-creator/scripts/init_skill.py: sha256:bcb8982d3f033a094f2f1be43123ac8537e2562d25d8ba4d8ef2196ae514d96d
-    .kiro/skills/skill-creator/scripts/quick_validate.py: sha256:1fe7b5eb4474cae8b175187508107dcdd3e294eca584f3c7b811e59d27623380
     .kiro/skills/slack-app-management/SKILL.md: sha256:6b20765d9ba0fd5757323c91c027dc62c92497c9f1dfca439b84d171c111768b
     .kiro/skills/slack-app-management/agents/openai.yaml: sha256:9a2c6ca4d634aa549dd13bc35f924e13d48996714e6788cb5d97765e3d9d644c
     .kiro/skills/tsr/MIGRATION.md: sha256:4cfc6d22fe0569e71b50d106f2beb48a27bcc9ab9bc353c5974b3a1f9757a879
@@ -2391,12 +2197,10 @@ dependencies:
     .kiro/skills/tsr/tsconfig.json: sha256:7281659cf7d82c20093062d11b652d07c66f81f0938b76894f5a1a708730cfc8
     .kiro/skills/tsr/tsr-config.default.json: sha256:4a27845863e7648c90b898b2771b5390d6a26bcbcb4d9fccb120d15ae8479746
     .kiro/skills/tsr/tsr-config.schema.json: sha256:002f66fc8a6d432bd0909bfa9719939203bb687e50baa4425ee2f5150b0c714d
-    .kiro/skills/typescript/SKILL.md: sha256:c7c2502c416ca89b31f08c1d95c64fdf081655b5b58ed8a68b3684950a91dd07
-    .kiro/skills/typescript/references/type-safety-patterns.md: sha256:870af4028f5ace853d45192ac6f82d96f2bc01aaf4759738db8c28a403cb9bed
     .kiro/skills/work-log-maintenance/SKILL.md: sha256:26f4064ff1c0e757e415121675d6caaecd30040f95304e6ed4cd4c73e022f3f9
     .kiro/skills/work-log-maintenance/agents/openai.yaml: sha256:e951b8256a5a1b032bcca3c7105230f5041467594434ca23b562b8ec5ec4abc8
     .kiro/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
-  content_hash: sha256:462584b5365b0c7dd0fe30368eec1ca50b6a46c9ee45d137b4df63e36e283bcb
+  content_hash: sha256:bc2f4d8fd9369665585a5ca9503e1d03ad839c138785dbb336dd25f0240144d1
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
@@ -3974,92 +3778,6 @@ dependencies:
     .kiro/skills/ui-ux-pro-max/scripts/search.py: sha256:84d2605d86ff2c69f6313730a0ff8cc91ba834c2ff47e1d730215f943ca5a38e
   content_hash: sha256:685bb286607f15ad436a333dea955f992403e0615f6b55855c48ac363dab06e2
   declared_license: MIT
-- repo_url: nyosegawa/skills
-  name: skills
-  host: github.com
-  resolved_commit: d03723b708e1de279e7d44fb5f4650ab32e67324
-  version: unknown
-  virtual_path: skills/skill-auditor
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/skill-auditor
-  - .agents/skills/skill-auditor/SKILL.md
-  - .agents/skills/skill-auditor/agents/improvement-planner.md
-  - .agents/skills/skill-auditor/agents/portfolio-analyst.md
-  - .agents/skills/skill-auditor/agents/routing-analyst.md
-  - .agents/skills/skill-auditor/assets/report_template.html
-  - .agents/skills/skill-auditor/references/architecture.md
-  - .agents/skills/skill-auditor/references/methodology.md
-  - .agents/skills/skill-auditor/schemas/schemas.md
-  - .agents/skills/skill-auditor/scripts/apply_patches.py
-  - .agents/skills/skill-auditor/scripts/collect_skills.py
-  - .agents/skills/skill-auditor/scripts/collect_transcripts.py
-  - .agents/skills/skill-auditor/scripts/generate_report.py
-  - .claude/skills/skill-auditor
-  - .claude/skills/skill-auditor/SKILL.md
-  - .claude/skills/skill-auditor/agents/improvement-planner.md
-  - .claude/skills/skill-auditor/agents/portfolio-analyst.md
-  - .claude/skills/skill-auditor/agents/routing-analyst.md
-  - .claude/skills/skill-auditor/assets/report_template.html
-  - .claude/skills/skill-auditor/references/architecture.md
-  - .claude/skills/skill-auditor/references/methodology.md
-  - .claude/skills/skill-auditor/schemas/schemas.md
-  - .claude/skills/skill-auditor/scripts/apply_patches.py
-  - .claude/skills/skill-auditor/scripts/collect_skills.py
-  - .claude/skills/skill-auditor/scripts/collect_transcripts.py
-  - .claude/skills/skill-auditor/scripts/generate_report.py
-  - .kiro/skills/skill-auditor
-  - .kiro/skills/skill-auditor/SKILL.md
-  - .kiro/skills/skill-auditor/agents/improvement-planner.md
-  - .kiro/skills/skill-auditor/agents/portfolio-analyst.md
-  - .kiro/skills/skill-auditor/agents/routing-analyst.md
-  - .kiro/skills/skill-auditor/assets/report_template.html
-  - .kiro/skills/skill-auditor/references/architecture.md
-  - .kiro/skills/skill-auditor/references/methodology.md
-  - .kiro/skills/skill-auditor/schemas/schemas.md
-  - .kiro/skills/skill-auditor/scripts/apply_patches.py
-  - .kiro/skills/skill-auditor/scripts/collect_skills.py
-  - .kiro/skills/skill-auditor/scripts/collect_transcripts.py
-  - .kiro/skills/skill-auditor/scripts/generate_report.py
-  deployed_file_hashes:
-    .agents/skills/skill-auditor/SKILL.md: sha256:e53731f122e45d704f93ecb39e62d7554ab38f8fc95475533a90ebbed7615060
-    .agents/skills/skill-auditor/agents/improvement-planner.md: sha256:ebb29f02e9c63867849d60fe5b0fd5dc920cbafaa24f9e4f8f4ba10ce3e9588c
-    .agents/skills/skill-auditor/agents/portfolio-analyst.md: sha256:8232d23949c344190bc3173dbea0b60a0b015ff5429c14b061221f3f4b402d68
-    .agents/skills/skill-auditor/agents/routing-analyst.md: sha256:dc613a7c5c3f0bf9aabdceb2c1202e06c0a550a27b2e269e50d8d43f1b3a7dd4
-    .agents/skills/skill-auditor/assets/report_template.html: sha256:134c6a05b565b852de487695194d396e2f343eeaa6800e2bb7a7836dab9fd1bd
-    .agents/skills/skill-auditor/references/architecture.md: sha256:4d826590397d3542f35060b902495848a84afcf19ea365f1b9c4c14ccf68db46
-    .agents/skills/skill-auditor/references/methodology.md: sha256:f56d07f65db0a73bfc08acdc33aaf29583eeb80adbce16e919544476776afd45
-    .agents/skills/skill-auditor/schemas/schemas.md: sha256:cabdbbe3ac26d485f58a641904112b0d0360fe955846f362d5fb995aec3574c3
-    .agents/skills/skill-auditor/scripts/apply_patches.py: sha256:479296c62372755fe6e7565100cd4eee080db1b4be70702e20df6c87fa62a2e8
-    .agents/skills/skill-auditor/scripts/collect_skills.py: sha256:7240a0b32bb5273216454fff3b5e23b90f823428be2cb63f6f4f0fdba9e1a3d8
-    .agents/skills/skill-auditor/scripts/collect_transcripts.py: sha256:2f7aec942ea39aa81c86de18a145d7d88b9e8074f019faef5b1ab2097cef975e
-    .agents/skills/skill-auditor/scripts/generate_report.py: sha256:42d0ac6684d38a20b85f886943d72f9e541de0fca0f499199a9ff13e60a676b3
-    .claude/skills/skill-auditor/SKILL.md: sha256:e53731f122e45d704f93ecb39e62d7554ab38f8fc95475533a90ebbed7615060
-    .claude/skills/skill-auditor/agents/improvement-planner.md: sha256:ebb29f02e9c63867849d60fe5b0fd5dc920cbafaa24f9e4f8f4ba10ce3e9588c
-    .claude/skills/skill-auditor/agents/portfolio-analyst.md: sha256:8232d23949c344190bc3173dbea0b60a0b015ff5429c14b061221f3f4b402d68
-    .claude/skills/skill-auditor/agents/routing-analyst.md: sha256:dc613a7c5c3f0bf9aabdceb2c1202e06c0a550a27b2e269e50d8d43f1b3a7dd4
-    .claude/skills/skill-auditor/assets/report_template.html: sha256:134c6a05b565b852de487695194d396e2f343eeaa6800e2bb7a7836dab9fd1bd
-    .claude/skills/skill-auditor/references/architecture.md: sha256:4d826590397d3542f35060b902495848a84afcf19ea365f1b9c4c14ccf68db46
-    .claude/skills/skill-auditor/references/methodology.md: sha256:f56d07f65db0a73bfc08acdc33aaf29583eeb80adbce16e919544476776afd45
-    .claude/skills/skill-auditor/schemas/schemas.md: sha256:cabdbbe3ac26d485f58a641904112b0d0360fe955846f362d5fb995aec3574c3
-    .claude/skills/skill-auditor/scripts/apply_patches.py: sha256:479296c62372755fe6e7565100cd4eee080db1b4be70702e20df6c87fa62a2e8
-    .claude/skills/skill-auditor/scripts/collect_skills.py: sha256:7240a0b32bb5273216454fff3b5e23b90f823428be2cb63f6f4f0fdba9e1a3d8
-    .claude/skills/skill-auditor/scripts/collect_transcripts.py: sha256:2f7aec942ea39aa81c86de18a145d7d88b9e8074f019faef5b1ab2097cef975e
-    .claude/skills/skill-auditor/scripts/generate_report.py: sha256:42d0ac6684d38a20b85f886943d72f9e541de0fca0f499199a9ff13e60a676b3
-    .kiro/skills/skill-auditor/SKILL.md: sha256:e53731f122e45d704f93ecb39e62d7554ab38f8fc95475533a90ebbed7615060
-    .kiro/skills/skill-auditor/agents/improvement-planner.md: sha256:ebb29f02e9c63867849d60fe5b0fd5dc920cbafaa24f9e4f8f4ba10ce3e9588c
-    .kiro/skills/skill-auditor/agents/portfolio-analyst.md: sha256:8232d23949c344190bc3173dbea0b60a0b015ff5429c14b061221f3f4b402d68
-    .kiro/skills/skill-auditor/agents/routing-analyst.md: sha256:dc613a7c5c3f0bf9aabdceb2c1202e06c0a550a27b2e269e50d8d43f1b3a7dd4
-    .kiro/skills/skill-auditor/assets/report_template.html: sha256:134c6a05b565b852de487695194d396e2f343eeaa6800e2bb7a7836dab9fd1bd
-    .kiro/skills/skill-auditor/references/architecture.md: sha256:4d826590397d3542f35060b902495848a84afcf19ea365f1b9c4c14ccf68db46
-    .kiro/skills/skill-auditor/references/methodology.md: sha256:f56d07f65db0a73bfc08acdc33aaf29583eeb80adbce16e919544476776afd45
-    .kiro/skills/skill-auditor/schemas/schemas.md: sha256:cabdbbe3ac26d485f58a641904112b0d0360fe955846f362d5fb995aec3574c3
-    .kiro/skills/skill-auditor/scripts/apply_patches.py: sha256:479296c62372755fe6e7565100cd4eee080db1b4be70702e20df6c87fa62a2e8
-    .kiro/skills/skill-auditor/scripts/collect_skills.py: sha256:7240a0b32bb5273216454fff3b5e23b90f823428be2cb63f6f4f0fdba9e1a3d8
-    .kiro/skills/skill-auditor/scripts/collect_transcripts.py: sha256:2f7aec942ea39aa81c86de18a145d7d88b9e8074f019faef5b1ab2097cef975e
-    .kiro/skills/skill-auditor/scripts/generate_report.py: sha256:42d0ac6684d38a20b85f886943d72f9e541de0fca0f499199a9ff13e60a676b3
-  content_hash: sha256:65a6f52fd391671fe6f334130290fd9c6787d2daeb22cdff55fa727977876e04
 - repo_url: obra/superpowers
   name: superpowers
   host: github.com
@@ -4737,74 +4455,6 @@ dependencies:
     .kiro/skills/improve/references/plan-template.md: sha256:7be76dd3c29442288fa7cee4432fc6e95c2fdbf748c9b356344bf647c5f8722e
   content_hash: sha256:4cd40e13503aac88bb60c202dc6a62977b290dbdc973d8cad0556ac46de6042d
   declared_license: MIT
-- repo_url: softaworks/agent-toolkit
-  name: agent-toolkit
-  host: github.com
-  resolved_commit: 3027f20f3181758385a1bb8c022d4041dfb4de84
-  version: unknown
-  virtual_path: skills/mermaid-diagrams
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/mermaid-diagrams
-  - .agents/skills/mermaid-diagrams/README.md
-  - .agents/skills/mermaid-diagrams/SKILL.md
-  - .agents/skills/mermaid-diagrams/references/advanced-features.md
-  - .agents/skills/mermaid-diagrams/references/architecture-diagrams.md
-  - .agents/skills/mermaid-diagrams/references/c4-diagrams.md
-  - .agents/skills/mermaid-diagrams/references/class-diagrams.md
-  - .agents/skills/mermaid-diagrams/references/erd-diagrams.md
-  - .agents/skills/mermaid-diagrams/references/flowcharts.md
-  - .agents/skills/mermaid-diagrams/references/sequence-diagrams.md
-  - .claude/skills/mermaid-diagrams
-  - .claude/skills/mermaid-diagrams/README.md
-  - .claude/skills/mermaid-diagrams/SKILL.md
-  - .claude/skills/mermaid-diagrams/references/advanced-features.md
-  - .claude/skills/mermaid-diagrams/references/architecture-diagrams.md
-  - .claude/skills/mermaid-diagrams/references/c4-diagrams.md
-  - .claude/skills/mermaid-diagrams/references/class-diagrams.md
-  - .claude/skills/mermaid-diagrams/references/erd-diagrams.md
-  - .claude/skills/mermaid-diagrams/references/flowcharts.md
-  - .claude/skills/mermaid-diagrams/references/sequence-diagrams.md
-  - .kiro/skills/mermaid-diagrams
-  - .kiro/skills/mermaid-diagrams/README.md
-  - .kiro/skills/mermaid-diagrams/SKILL.md
-  - .kiro/skills/mermaid-diagrams/references/advanced-features.md
-  - .kiro/skills/mermaid-diagrams/references/architecture-diagrams.md
-  - .kiro/skills/mermaid-diagrams/references/c4-diagrams.md
-  - .kiro/skills/mermaid-diagrams/references/class-diagrams.md
-  - .kiro/skills/mermaid-diagrams/references/erd-diagrams.md
-  - .kiro/skills/mermaid-diagrams/references/flowcharts.md
-  - .kiro/skills/mermaid-diagrams/references/sequence-diagrams.md
-  deployed_file_hashes:
-    .agents/skills/mermaid-diagrams/README.md: sha256:e2f7f6e8d4415c57368cf0492eb98b12be18526f963383a9e64dcb741eb602de
-    .agents/skills/mermaid-diagrams/SKILL.md: sha256:79bca3c767a821a28aa7d83a9673010b2066afa4889923ea5946153c8967e824
-    .agents/skills/mermaid-diagrams/references/advanced-features.md: sha256:5b816a153915de49ccae229a70103e724f68c3fc8b7a5b38f67a59f973af37bc
-    .agents/skills/mermaid-diagrams/references/architecture-diagrams.md: sha256:117bc72208e20dacb355d007b444dce7433f174a0ba9b76ab0a3361b8d580706
-    .agents/skills/mermaid-diagrams/references/c4-diagrams.md: sha256:28e73813c730721995aab4084b913459687a8065f28e2a5e8ef7a94cd8116fd9
-    .agents/skills/mermaid-diagrams/references/class-diagrams.md: sha256:5eba3606f37be8409843826901f0c846a1bd4796e2e9145c787d4e5ba1646ce3
-    .agents/skills/mermaid-diagrams/references/erd-diagrams.md: sha256:639ee58f4925e0721fc3a2c70fd083ec256fe861baa62a56d039c01315fc58ff
-    .agents/skills/mermaid-diagrams/references/flowcharts.md: sha256:73b599797659ced9211ab947e3d4aee4f3ef2bfb4c1aefcfd6537276d2a21f96
-    .agents/skills/mermaid-diagrams/references/sequence-diagrams.md: sha256:11900f082d21c7e3fc0addcd2bf50689a1c36a5af806207942a2f772cb5e2b3b
-    .claude/skills/mermaid-diagrams/README.md: sha256:e2f7f6e8d4415c57368cf0492eb98b12be18526f963383a9e64dcb741eb602de
-    .claude/skills/mermaid-diagrams/SKILL.md: sha256:79bca3c767a821a28aa7d83a9673010b2066afa4889923ea5946153c8967e824
-    .claude/skills/mermaid-diagrams/references/advanced-features.md: sha256:5b816a153915de49ccae229a70103e724f68c3fc8b7a5b38f67a59f973af37bc
-    .claude/skills/mermaid-diagrams/references/architecture-diagrams.md: sha256:117bc72208e20dacb355d007b444dce7433f174a0ba9b76ab0a3361b8d580706
-    .claude/skills/mermaid-diagrams/references/c4-diagrams.md: sha256:28e73813c730721995aab4084b913459687a8065f28e2a5e8ef7a94cd8116fd9
-    .claude/skills/mermaid-diagrams/references/class-diagrams.md: sha256:5eba3606f37be8409843826901f0c846a1bd4796e2e9145c787d4e5ba1646ce3
-    .claude/skills/mermaid-diagrams/references/erd-diagrams.md: sha256:639ee58f4925e0721fc3a2c70fd083ec256fe861baa62a56d039c01315fc58ff
-    .claude/skills/mermaid-diagrams/references/flowcharts.md: sha256:73b599797659ced9211ab947e3d4aee4f3ef2bfb4c1aefcfd6537276d2a21f96
-    .claude/skills/mermaid-diagrams/references/sequence-diagrams.md: sha256:11900f082d21c7e3fc0addcd2bf50689a1c36a5af806207942a2f772cb5e2b3b
-    .kiro/skills/mermaid-diagrams/README.md: sha256:e2f7f6e8d4415c57368cf0492eb98b12be18526f963383a9e64dcb741eb602de
-    .kiro/skills/mermaid-diagrams/SKILL.md: sha256:79bca3c767a821a28aa7d83a9673010b2066afa4889923ea5946153c8967e824
-    .kiro/skills/mermaid-diagrams/references/advanced-features.md: sha256:5b816a153915de49ccae229a70103e724f68c3fc8b7a5b38f67a59f973af37bc
-    .kiro/skills/mermaid-diagrams/references/architecture-diagrams.md: sha256:117bc72208e20dacb355d007b444dce7433f174a0ba9b76ab0a3361b8d580706
-    .kiro/skills/mermaid-diagrams/references/c4-diagrams.md: sha256:28e73813c730721995aab4084b913459687a8065f28e2a5e8ef7a94cd8116fd9
-    .kiro/skills/mermaid-diagrams/references/class-diagrams.md: sha256:5eba3606f37be8409843826901f0c846a1bd4796e2e9145c787d4e5ba1646ce3
-    .kiro/skills/mermaid-diagrams/references/erd-diagrams.md: sha256:639ee58f4925e0721fc3a2c70fd083ec256fe861baa62a56d039c01315fc58ff
-    .kiro/skills/mermaid-diagrams/references/flowcharts.md: sha256:73b599797659ced9211ab947e3d4aee4f3ef2bfb4c1aefcfd6537276d2a21f96
-    .kiro/skills/mermaid-diagrams/references/sequence-diagrams.md: sha256:11900f082d21c7e3fc0addcd2bf50689a1c36a5af806207942a2f772cb5e2b3b
-  content_hash: sha256:451b0f53d9fe30c19eea0102c8da8c3ec56cf5cce63b97f3d9d9dbf34e1088aa
 - repo_url: vercel-labs/agent-browser
   name: agent-browser
   host: github.com
@@ -5413,26 +5063,6 @@ dependencies:
     .claude/skills/web-design-guidelines/SKILL.md: sha256:f4647ca866a3accf763777f83e7682954f0187cd6bea7eea0399796652414e8f
     .kiro/skills/web-design-guidelines/SKILL.md: sha256:f4647ca866a3accf763777f83e7682954f0187cd6bea7eea0399796652414e8f
   content_hash: sha256:a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a
-- repo_url: vercel-labs/skills
-  name: skills
-  host: github.com
-  resolved_commit: 4ce6d48ac44c8b637db87b2102fea3baca719df1
-  version: unknown
-  virtual_path: skills/find-skills
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/find-skills
-  - .agents/skills/find-skills/SKILL.md
-  - .claude/skills/find-skills
-  - .claude/skills/find-skills/SKILL.md
-  - .kiro/skills/find-skills
-  - .kiro/skills/find-skills/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/find-skills/SKILL.md: sha256:deddc03b4b5f50755b97fcdb737a786676992ef7e9be614d2cd2c71e0320bebf
-    .claude/skills/find-skills/SKILL.md: sha256:deddc03b4b5f50755b97fcdb737a786676992ef7e9be614d2cd2c71e0320bebf
-    .kiro/skills/find-skills/SKILL.md: sha256:deddc03b4b5f50755b97fcdb737a786676992ef7e9be614d2cd2c71e0320bebf
-  content_hash: sha256:1c27b1774a4ec17ad4556a72e3c0168beab3af0183b2c1b8aa9e320af3ff41ce
 mcp_servers:
 - 1password
 - codex

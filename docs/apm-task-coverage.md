@@ -13,7 +13,17 @@
 - `~/.apm/catalog/skills/**`: personal skills
 - `~/.apm/catalog/{AGENTS.md,agents/**,commands/**,rules/**}`: shared guidance
 - `~/.apm/apm.yml`, `~/.apm/apm.lock.yaml`: dependency selection and accepted upstream state
+- `~/.apm/.apm/skills/**`: APM workspace-only skill source for skills intentionally excluded from global rollout
+- `~/.apm/.claude/skills/**`, `~/.apm/.agents/skills/**`: project runtime bridges; child skill directories symlink to the workspace-only source
 - `~/.apm/apm_modules/`: cache only
+
+## APM Workspace-only Skill Contract
+
+- Keep workspace-only skill content under `.apm/skills/<id>/`.
+- Do not add workspace-only skills to root `apm.yml` or `apm.lock.yaml`; they must not be included in the global APM rollout.
+- Keep `.claude/skills/` and `.agents/skills/` as real directories and symlink each skill directory to `.apm/skills/<id>/`.
+- Do not symlink the entire `.agents/skills` root or only `SKILL.md`; the skill directory is the unit of distribution.
+- Runtime checks must verify both symlink targets and the source `SKILL.md`.
 
 ## Task Contract
 

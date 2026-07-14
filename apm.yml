@@ -35,7 +35,6 @@ dependencies:
     - mizchi/skills/meta/empirical-prompt-tuning
     - modem-dev/hunk/skills/hunk-review
     - nextlevelbuilder/ui-ux-pro-max-skill
-    - nyosegawa/skills/skills/skill-auditor
     - obra/superpowers/skills/brainstorming
     - obra/superpowers/skills/dispatching-parallel-agents
     - obra/superpowers/skills/executing-plans
@@ -53,12 +52,10 @@ dependencies:
     - openai/skills/skills/.curated/gh-address-comments
     - openai/skills/skills/.curated/gh-fix-ci
     - openai/skills/skills/.curated/screenshot
-    - softaworks/agent-toolkit/skills/mermaid-diagrams
     - vercel-labs/agent-browser/skills/agent-browser
     - vercel-labs/agent-skills/skills/composition-patterns
     - vercel-labs/agent-skills/skills/react-best-practices
     - vercel-labs/agent-skills/skills/web-design-guidelines
-    - vercel-labs/skills/skills/find-skills
     - shadcn/improve
   mcp:
     - name: context7

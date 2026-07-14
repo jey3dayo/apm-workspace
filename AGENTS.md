@@ -26,6 +26,8 @@ Use this table as the Source of Truth Table (SoTT) when deciding where to read o
 | パッケージ採用・撤去の意思決定                                    | `docs/package-decisions.md`                                   | なぜ入れた / 消したかのログ                                                                    |
 | APM タスクの使い分け                                              | `docs/apm-task-coverage.md`                                   | rollout / verify などのタスク責務                                                              |
 | Manual-lane skills                                                | `manual-skills/.apm/skills/**` + `manual-skills/upstreams/**` | managed lane で壊れる外部スキルの手動管理と provenance                                         |
+| APM workspace-only skills                                         | `.apm/skills/**`                                              | この APM リポジトリだけで使うスキルの正本。root `apm.yml` には登録しない                       |
+| APM workspace skill bridges                                       | `.claude/skills/**`, `.agents/skills/**`                      | 正本のスキルディレクトリを runtime ごとに参照する symlink。直接編集しない                      |
 | Deployed targets（`~/.claude/`, `~/.codex/`, `~/.agents/skills`） | 生成物（SSoT ではない）                                       | 検証・配布面。直接編集しない                                                                   |
 
 - `./catalog` is the tracked source of truth for managed content in this repository
@@ -49,6 +51,9 @@ In practice:
 - exception: a skill that exists only to carry runtime assets for `catalog/commands/**` (for example `codex-companion-scripts`) stays under `catalog/skills/<id>/` with provenance recorded in its own `SKILL.md`; do not move it onto the `manual-skills` lane, because deployed wiring (such as the `CLAUDE_PLUGIN_ROOT` default in `~/.claude/settings.json`) points at its catalog-deployed path
 - if a skill should stay machine-local and untracked, place it under `./private-skills/.apm/skills/<id>/`; this gitignored lane is only used by the local Codex skill sync flow
 - if both `catalog/skills/<id>/` and `private-skills/.apm/skills/<id>/` exist, the private copy overrides the tracked copy for `mise run apply:skills:local`
+- if a skill is intentionally scoped only to this APM workspace, keep its source under `./.apm/skills/<id>/`; do not add it to root `apm.yml` or `apm.lock.yaml`
+- expose an APM workspace-only skill to both runtimes through `./.claude/skills/<id>` and `./.agents/skills/<id>` symlinks to the source directory
+- keep `./.claude/skills/` and `./.agents/skills/` as real directories; symlink the child skill directories, not the roots or `SKILL.md` files
 - if the change only exists in a deployed target or cache, regenerate from the tracked workspace instead of editing it in place
 - if the question is specifically about Codex skills, treat `~/.agents/skills` as the deployed output and `~/.codex/AGENTS.md` as the compiled guidance output
 
@@ -178,6 +183,7 @@ Then review and commit the skill changes.
 - `kiro` is intentionally excluded from rollout; use `mise run deploy` / `mise run upgrade` (both exclude kiro) and avoid bare `apm install -g`, which would deploy to the unused `~/.kiro` runtime
 - Do not edit `apm_modules/`
 - Do not treat deployed targets such as `~/.claude/` or `~/.codex/` as source of truth
+- For APM workspace-only skills, edit `.apm/skills/**`; do not edit the symlinked bridge entries under `.claude/skills/**` or `.agents/skills/**`
 - Do not reintroduce local `./packages/*` refs into the global manifest
 - Do not hand-edit runtime outputs when the tracked workspace can regenerate them
 - Do not commit `private-skills/`; it is a gitignored local-only overlay for `mise run apply:skills:local`
@@ -186,6 +192,7 @@ Then review and commit the skill changes.
   - `~/.config/mise/config.windows.toml`
 - When verifying Codex skill rollout, check `~/.agents/skills`
 - Codex skill verification is complete only when the deployed `~/.agents/skills/<id>/SKILL.md` contains the expected content
+- When verifying APM workspace-only skills, check that both bridge entries are symlinks and resolve to `.apm/skills/<id>/SKILL.md`
 - if an external skill is still missing there after deployment, treat it as a temporary Codex-specific delivery gap and resolve it separately from the tracked workspace state
 - if a skill repeatedly fails the normal upstream-managed lane because of packaging or rollout issues, move it onto the `manual-skills` package flow rather than patching deployed targets by hand
 - When updating user-global tools through `mise`, verify the actual install tree and resolved binary path before declaring success
