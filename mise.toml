@@ -12,6 +12,7 @@ TASK_EXCLUDES = "--exclude apm.lock.yaml"
 node = "24"
 
 # CLI tools
+"aqua:BurntSushi/ripgrep" = "15.1.0"
 fd = "10.4.2"
 lefthook = "2.1.9"
 "pipx:apm-cli" = "0.22.0"
