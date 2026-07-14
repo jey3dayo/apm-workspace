@@ -2590,7 +2590,7 @@ switch ($Command) {
     Invoke-AuditCiSmoke
   }
 
-  "help" {
+  { $_ -in "help", "-h", "--help" } {
     @"
 Usage: scripts/apm-workspace.ps1 <command> [args...]
 
