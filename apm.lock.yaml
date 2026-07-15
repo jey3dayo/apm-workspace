@@ -875,7 +875,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: 7faa40d3c64566aff0d5b3a5f478ffc14b7730ff
+  resolved_commit: a924570a03525275f150cc7d388c3dec4ca24a7d
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -2208,7 +2208,7 @@ dependencies:
     .kiro/skills/work-log-maintenance/SKILL.md: sha256:26f4064ff1c0e757e415121675d6caaecd30040f95304e6ed4cd4c73e022f3f9
     .kiro/skills/work-log-maintenance/agents/openai.yaml: sha256:e951b8256a5a1b032bcca3c7105230f5041467594434ca23b562b8ec5ec4abc8
     .kiro/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
-  content_hash: sha256:56e3a4062438f1c910a7feffd3ee5c9f0cf8497c0b35de9d542af8d3dde588dd
+  content_hash: sha256:e1bece01af4bddacd3b53b36616db63b2edf2722dbc18203260856e1e0631978
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
