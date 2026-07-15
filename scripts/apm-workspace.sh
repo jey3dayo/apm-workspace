@@ -10,6 +10,7 @@ REPO_ROOT=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 WORKSPACE_DIR="${APM_WORKSPACE_DIR:-$HOME/.apm}"
 WORKSPACE_REPO="${APM_WORKSPACE_REPO:-https://github.com/jey3dayo/apm-workspace.git}"
 CODEX_OUTPUT="${APM_CODEX_OUTPUT:-$HOME/.codex/AGENTS.md}"
+PI_OUTPUT="${APM_PI_OUTPUT:-$HOME/AGENTS.md}"
 MISE_DESTINATION="$WORKSPACE_DIR/mise.toml"
 CATALOG_BUILD_ROOT="$WORKSPACE_DIR/.catalog-build"
 CATALOG_DIR_NAME="catalog"
@@ -632,6 +633,12 @@ compile_codex() {
   )
 }
 
+sync_pi_instructions() {
+  instructions_source=$(tracked_catalog_instructions_path)
+  [ -f "$instructions_source" ] || return 0
+  copy_managed_catalog_file "$instructions_source" "$PI_OUTPUT"
+}
+
 validate_codex_skill_target_tree() {
   target_skills_root="$HOME/.agents/skills"
   [ -d "$target_skills_root" ] || return 0
@@ -809,6 +816,7 @@ cmd_apply() {
   install_workspace_mcp_dependencies
   compile_codex
   sync_managed_catalog_runtime_assets
+  sync_pi_instructions
   replace_skill_targets_from_stage "$apply_stage_root"
 
   trap - RETURN
@@ -2127,6 +2135,7 @@ Environment overrides:
   APM_WORKSPACE_REPO
   APM_WORKSPACE_NAME
   APM_CODEX_OUTPUT
+  APM_PI_OUTPUT
 EOF
 }
 

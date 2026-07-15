@@ -13,6 +13,7 @@ $RepoRoot = Split-Path -Parent $PSScriptRoot
 $WorkspaceDir = if ($env:APM_WORKSPACE_DIR) { $env:APM_WORKSPACE_DIR } else { Join-Path $HOME ".apm" }
 $WorkspaceRepo = if ($env:APM_WORKSPACE_REPO) { $env:APM_WORKSPACE_REPO } else { "https://github.com/jey3dayo/apm-workspace.git" }
 $CodexOutput = if ($env:APM_CODEX_OUTPUT) { $env:APM_CODEX_OUTPUT } else { Join-Path $HOME ".codex\AGENTS.md" }
+$PiOutput = if ($env:APM_PI_OUTPUT) { $env:APM_PI_OUTPUT } else { Join-Path $HOME "AGENTS.md" }
 $MiseDestination = Join-Path $WorkspaceDir "mise.toml"
 $CatalogBuildRootDir = Join-Path $WorkspaceDir ".catalog-build"
 $CatalogDirName = "catalog"
@@ -400,6 +401,14 @@ function Invoke-CodexCompile {
   finally {
     Pop-Location
   }
+}
+
+function Sync-PiInstructions {
+  $instructionsSource = Get-TrackedCatalogInstructionsPath
+  if (-not (Test-Path -LiteralPath $instructionsSource -PathType Leaf)) {
+    return
+  }
+  Copy-ManagedCatalogFile -SourcePath $instructionsSource -DestinationPath $PiOutput
 }
 
 function Invoke-WorkspaceCommand {
@@ -1413,6 +1422,7 @@ function Invoke-Apply {
   }
 
   Invoke-CodexCompile
+  Sync-PiInstructions
 }
 
 function Get-RequestedPersonalSkillRecords {
