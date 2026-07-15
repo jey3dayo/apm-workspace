@@ -6,7 +6,8 @@ description: >-
   run. Use for skill update and redistribution requests
   (`skillアップデートして再配布して`, `再配布`), `apm.yml` / `apm.lock.yaml` and managed catalog
   rollout, manual-skills package state, orphaned APM packages, checked-out
-  external dependency repositories, and `apmのバージョンあげて` / pinned `apm`
+  external dependency repositories, optional repository-scoped skill packages,
+  and `apmのバージョンあげて` / pinned `apm`
   source checks. For skill body, description, script, reference, or asset
   design itself, coordinate with `skill-creator`; for general mise usage
   outside the APM workspace (including `mise upgrade TOOL` and
@@ -21,6 +22,10 @@ Route `~/.apm` work by ownership first, then choose the smallest task that match
 
 - Edit `~/.apm/catalog/skills/**` for personal skills.
 - Edit `~/.apm/catalog/{AGENTS.md,agents/**,commands/**,rules/**}` for shared guidance.
+- Edit `~/.apm/optional-skills/.apm/skills/**` for skills that should be tracked
+  here but installed only by selected repositories.
+- Edit `~/.apm/optional-skills/apm.yml` for the standalone optional package
+  manifest.
 - Edit `~/.apm/apm.yml` and `~/.apm/apm.lock.yaml` for dependency selection and accepted upstream state.
 - Edit `~/.apm/README.md`, `llms.txt`, and `docs/**` only for workspace-owned prose.
 - Treat `~/.apm/apm_modules/` and deployed targets as generated state, not editing surfaces.
@@ -29,6 +34,10 @@ Route `~/.apm` work by ownership first, then choose the smallest task that match
 There is no active `~/.apm/skills/` editing surface in this model.
 
 Use `catalog/skills/<id>/` for skills that are personally optimized, curated, or expected to keep evolving in this workspace.
+
+Use `optional-skills/.apm/skills/<id>/` for workspace-owned skills that should
+not be included in the global automatic rollout. The package is consumed from a
+repository-local `apm.yml` with `--skill <id>`.
 
 Use `manual-skills/.apm/skills/<id>/` only for upstream skills that do not install or deploy cleanly through the normal managed lane because of symlinks, packaging quirks, missing bundled files, or incompatible upstream layout. Record the reason and provenance under `manual-skills/upstreams/**`.
 
@@ -52,6 +61,9 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 ## Routing
 
 - If the request is "change a personal skill", edit `catalog/skills/**`; use `skill-creator` for new or migrated managed skills.
+- If the request is "make a skill repository-specific", edit
+  `optional-skills/.apm/skills/**` and keep `optional-skills` out of the root
+  `apm.yml`.
 - If the request is "optimize" or "customize" a skill for this workspace, treat it as personal skill work and prefer `catalog/skills/<id>/`.
 - If the request is to preserve a reusable implementation judgment from real work, such as "Valibot belongs in schemas", "Result conversion belongs at a boundary", or "DB access belongs in repositories", encode it as a concern -> owner candidates -> caller rule table in the relevant personal skill under `catalog/skills/<id>/`.
 - If the user does not specify the target skill id for that reusable judgment, inspect named skills, catalog triggers, and existing examples first; update the closest existing personal skill instead of creating a new skill by default.
@@ -59,6 +71,12 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 - If the request is "change dependency selection", edit or review `apm.yml` / `apm.lock.yaml`.
 - If the request is about `mise upgrade <tool>`, `minimum_release_age`, latest eligible release selection, or why a non-APM tool version did not update, use the `mise` skill unless the pinned `apm` source, APM manifest, lockfile, or rollout task selection is the actual subject.
 - If the request is to add an individual APM package, decide scope before running `apm install`: use `apm install -g <package-ref>` only for user-global dependencies that belong in `~/.apm`; use `apm install <package-ref>` from the target repository for repo-local dependencies.
+- For an optional skill from this workspace, add
+  `jey3dayo/apm-workspace/optional-skills#main` to the consuming repository and
+  select it with `apm install --skill <id>`.
+- For an optional skill embedded in an external bundle, keep the external
+  package as the source of truth and select it in the consuming repository with
+  `apm install <package-ref> --skill <id>`.
 - If the request is to scan an arbitrary repository and create, update, or clean up its repo-local `apm.yml`, use `apm-repo-bootstrap`; keep this skill focused on global APM ownership and rollout decisions.
 - If the request is to add an MCP server through APM, apply the same scope rule: use `apm install -g --mcp <name> ...` only for cross-repo foundation MCPs; use repo-local `apm install --mcp <name> ...` for project, framework, UI, database, browser, or app-runtime-specific MCPs.
 - If MCP placement, server selection, credentials, transport, or startup behavior is the main question, coordinate with `mcp-tools`; keep this skill focused on APM ownership, source of truth, and rollout commands.
@@ -87,6 +105,8 @@ When deciding repo-local MCP placement by repository type, runtime, or workflow,
 
 - Do not treat `~/.apm/apm_modules/` as the place to edit managed skills.
 - Do not manage the same skill in both `catalog/skills/**` and `manual-skills/.apm/skills/**`.
+- Do not manage the same skill in both `catalog/skills/**` and `optional-skills/.apm/skills/**`.
+- Do not add `optional-skills` to the root `apm.yml`; its purpose is explicit repository-scoped installation.
 - Do not duplicate an external dependency into `catalog/skills/**` just because a local checkout exists. Keep one source of truth: upstream checkout, managed catalog, manual copy, or private overlay.
 - Do not reintroduce many local `./packages/*` refs into `~/.apm/apm.yml`.
 - Do not hand-edit deployed targets such as `~/.claude/`, `~/.codex/`, or `~/.agents/skills`.
@@ -108,24 +128,30 @@ When deciding repo-local MCP placement by repository type, runtime, or workflow,
    - verify `~/.agents/skills/<id>/` contains the deployed skill
    - use `mise run apply:skills:local` only when the user explicitly wants a fast local Codex skill refresh
 
-2. Shared guidance changed:
+2. Optional repository skill changed:
+   - edit `optional-skills/.apm/skills/**`
+   - run the optional package smoke check or a temporary `apm install --skill <id>` from a fixture repository
+   - do not run the global deployment as the delivery mechanism
+   - verify the consuming repository's selected skill is present after installation
+
+3. Shared guidance changed:
    - edit `~/.apm/catalog/**`
    - run `mise run prepare:catalog`
    - review the diff, commit/push, then run `mise run install:catalog`
 
-3. Upstream refresh:
+4. Upstream refresh:
    - run `mise run upgrade`
    - if the manifest contains `gist.github.com/...#<sha>`, verify the regenerated `apm.lock.yaml` kept the same `repo_url` spelling before deploy
    - review `apm.lock.yaml` before commit
 
-4. Individual package or MCP added:
+5. Individual package or MCP added:
    - choose global vs repo-local before installing
    - for global dependencies, work in `~/.apm` and use `apm install -g <package-ref>` or `apm install -g --mcp <name> ...`
    - for repo-local dependencies, work in the target repository and use `apm install <package-ref>` or `apm install --mcp <name> ...`
    - for global changes, run `mise run check`, then `mise run deploy`; for repo-local changes, run that repository's defined APM or project checks
    - verify the intended `apm.yml`, `apm.lock.yaml`, and deployed target changed, and no unrelated workspace dependencies drifted
 
-5. Checked-out external dependency changed:
+6. Checked-out external dependency changed:
    - edit the external repository checkout that is the source of truth
    - run that repository's relevant checks
    - commit and push the external repository
@@ -135,7 +161,7 @@ When deciding repo-local MCP placement by repository type, runtime, or workflow,
    - verify the deployed target such as `~/.agents/skills/<id>` contains the updated content
    - keep unrelated dirty files in `~/.apm` unstaged unless the user explicitly includes them
 
-6. Manual skill promoted to workspace-owned:
+7. Manual skill promoted to workspace-owned:
    - move the skill from `manual-skills/.apm/skills/<id>/` to `catalog/skills/<id>/`
    - update `manual-skills/upstreams/**` to note the migration
    - run `mise run check`, then `mise run deploy`

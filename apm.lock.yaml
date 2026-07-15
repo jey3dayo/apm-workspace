@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-07-15T09:13:02.546119+00:00'
+generated_at: '2026-07-15T11:07:52.015729+00:00'
 apm_version: 0.22.0
 dependencies:
 - repo_url: Jakubantalik/transitions-dev
@@ -654,7 +654,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: 43896f1d040549b933065e210df3cf51caded325
+  resolved_commit: 65f4ef28279caaddbedca02272da317a6ece804f
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -766,12 +766,6 @@ dependencies:
   - .agents/skills/git-worktree/references/troubleshooting.md
   - .agents/skills/git-worktree/references/workflows.md
   - .agents/skills/git-worktree/scripts/check-worktree-config.sh
-  - .agents/skills/google-forms-survey-builder
-  - .agents/skills/google-forms-survey-builder/SKILL.md
-  - .agents/skills/google-forms-survey-builder/agents/openai.yaml
-  - .agents/skills/google-forms-survey-builder/references/SURVEY_QUESTIONS.md
-  - .agents/skills/google-forms-survey-builder/references/apps-script-patterns.md
-  - .agents/skills/google-forms-survey-builder/references/survey-questions-format.md
   - .agents/skills/headroom
   - .agents/skills/headroom/SKILL.md
   - .agents/skills/herdr
@@ -835,6 +829,7 @@ dependencies:
   - .agents/skills/premortem/references/questions/mobile-apps.yaml
   - .agents/skills/premortem/references/questions/security.yaml
   - .agents/skills/premortem/references/questions/web-development.yaml
+  - .agents/skills/premortem/scripts/__pycache__/analyze_context.cpython-314.pyc
   - .agents/skills/premortem/scripts/__pycache__/format_report.cpython-314.pyc
   - .agents/skills/premortem/scripts/__pycache__/gap_analyzer.cpython-314.pyc
   - .agents/skills/premortem/scripts/analyze_context.py
@@ -877,9 +872,6 @@ dependencies:
   - .agents/skills/similarity/SKILL.md
   - .agents/skills/similarity/agents/openai.yaml
   - .agents/skills/similarity/references/report-analysis.md
-  - .agents/skills/slack-app-management
-  - .agents/skills/slack-app-management/SKILL.md
-  - .agents/skills/slack-app-management/agents/openai.yaml
   - .agents/skills/tsr
   - .agents/skills/tsr/MIGRATION.md
   - .agents/skills/tsr/README.md
@@ -1008,12 +1000,6 @@ dependencies:
   - .claude/skills/git-worktree/references/troubleshooting.md
   - .claude/skills/git-worktree/references/workflows.md
   - .claude/skills/git-worktree/scripts/check-worktree-config.sh
-  - .claude/skills/google-forms-survey-builder
-  - .claude/skills/google-forms-survey-builder/SKILL.md
-  - .claude/skills/google-forms-survey-builder/agents/openai.yaml
-  - .claude/skills/google-forms-survey-builder/references/SURVEY_QUESTIONS.md
-  - .claude/skills/google-forms-survey-builder/references/apps-script-patterns.md
-  - .claude/skills/google-forms-survey-builder/references/survey-questions-format.md
   - .claude/skills/headroom
   - .claude/skills/headroom/SKILL.md
   - .claude/skills/herdr
@@ -1077,6 +1063,7 @@ dependencies:
   - .claude/skills/premortem/references/questions/mobile-apps.yaml
   - .claude/skills/premortem/references/questions/security.yaml
   - .claude/skills/premortem/references/questions/web-development.yaml
+  - .claude/skills/premortem/scripts/__pycache__/analyze_context.cpython-314.pyc
   - .claude/skills/premortem/scripts/__pycache__/format_report.cpython-314.pyc
   - .claude/skills/premortem/scripts/__pycache__/gap_analyzer.cpython-314.pyc
   - .claude/skills/premortem/scripts/analyze_context.py
@@ -1119,9 +1106,6 @@ dependencies:
   - .claude/skills/similarity/SKILL.md
   - .claude/skills/similarity/agents/openai.yaml
   - .claude/skills/similarity/references/report-analysis.md
-  - .claude/skills/slack-app-management
-  - .claude/skills/slack-app-management/SKILL.md
-  - .claude/skills/slack-app-management/agents/openai.yaml
   - .claude/skills/tsr
   - .claude/skills/tsr/MIGRATION.md
   - .claude/skills/tsr/README.md
@@ -1234,11 +1218,6 @@ dependencies:
     .agents/skills/git-worktree/references/troubleshooting.md: sha256:370d8df007792954eb7a8795b068f2487a46284489f908e76864242b01be4d77
     .agents/skills/git-worktree/references/workflows.md: sha256:f70bfe1b8c5a7db86e10ae211dbc7188a1ccbd583795dee0633b3896da9ef1fc
     .agents/skills/git-worktree/scripts/check-worktree-config.sh: sha256:5582d5f0b45395f7a077ea3e3cbb3266138053166950ff7df274957833e3ffdf
-    .agents/skills/google-forms-survey-builder/SKILL.md: sha256:3a80ed6d3cce833ce1c12837ee906346a0a0c437a4f5f748ef1ad46c3e5f0746
-    .agents/skills/google-forms-survey-builder/agents/openai.yaml: sha256:08912f2b673c84dde9af3b91006973ec6f5f6551fa559c1cdbf9056b1ee03b90
-    .agents/skills/google-forms-survey-builder/references/SURVEY_QUESTIONS.md: sha256:7571484856e9031030b87121b19351c14e3fc5fc0b63a235f9cc94dca5beb0f3
-    .agents/skills/google-forms-survey-builder/references/apps-script-patterns.md: sha256:57269f30cc830a74ae1d9ddf1b885939ca8e0303a6c08ee66320849f59b13ecc
-    .agents/skills/google-forms-survey-builder/references/survey-questions-format.md: sha256:96accdafa50bb9d828c148ffeb2bd3c1bc59b123b30c6e80fbdd7449092782d7
     .agents/skills/headroom/SKILL.md: sha256:b544af6e415c7724e96dac30f39b6c532d4928b9521031b96e1e723f11af7123
     .agents/skills/herdr/SKILL.md: sha256:3f55ca29d8b593ed33130904ae63d5137e0fc35d6cab69832fa23c61e2e725ff
     .agents/skills/herdr/references/configuration.md: sha256:92a35f5472ad0056cf9199ee7c0af5237d646cb7af15606e906da3fbf336a732
@@ -1278,7 +1257,7 @@ dependencies:
     .agents/skills/predictive-analysis/references/issue-categorization.md: sha256:99195f4aa92abfabc8fc2952da22db9f631399490859b0c607da6e8417ecf8e0
     .agents/skills/predictive-analysis/references/mitigation-strategies.md: sha256:5312962dd75510fee9b27a0efce318e11b7df5d10860ef13480a524ea0463dbd
     .agents/skills/predictive-analysis/references/risk-assessment-framework.md: sha256:743fac08f0860a79d250ab7556b977c3de991f1abd220898f886d9e843c374ff
-    .agents/skills/premortem/SKILL.md: sha256:01a0969b739db38becf83d37790e611c995ccf80248a73bd141982f0601910e9
+    .agents/skills/premortem/SKILL.md: sha256:92f25034f9b1b06c2ae6610802a29cefc935dde6e204721363ae338b70538498
     .agents/skills/premortem/agents/openai.yaml: sha256:7364d27247d484f71f6aeb4757c605753d89bc1c6bd6c30dca141e8836976004
     .agents/skills/premortem/references/examples/session-ml-pipeline.yaml: sha256:22c41196860675fd6bdfa99720fcf93a932e50948f746f114f707e3ca0206a72
     .agents/skills/premortem/references/examples/session-web-api.yaml: sha256:15ffd2f7c5742c70e3c82b7d49c46e6fcbd54f3fd67ff6a7117f39af5924c636
@@ -1291,11 +1270,12 @@ dependencies:
     .agents/skills/premortem/references/questions/mobile-apps.yaml: sha256:78b0606ba01938720e5466eaa683da259223fe74ba3995b6cb550cdc47864121
     .agents/skills/premortem/references/questions/security.yaml: sha256:7de25c36e2f33e513ecbbebb538f7cc7a024d9913ac407c68aab513ba413c58d
     .agents/skills/premortem/references/questions/web-development.yaml: sha256:0f2afdccd59616bef6d2b022e48675126639fcf67e5d772b2d531d68f526cca5
+    .agents/skills/premortem/scripts/__pycache__/analyze_context.cpython-314.pyc: sha256:e220123cf747d83a7c5cd862d65e932da837b1186ac77ee374da62341be8f264
     .agents/skills/premortem/scripts/__pycache__/format_report.cpython-314.pyc: sha256:ec4fe08f925f361867b282870f93846768d173a06d4e594e5a9eac0911435408
-    .agents/skills/premortem/scripts/__pycache__/gap_analyzer.cpython-314.pyc: sha256:146435d98b7df7947e5560d2239badcc6a1de70f4ae62e619bb9c75b5f3a9e71
-    .agents/skills/premortem/scripts/analyze_context.py: sha256:048001e637790e6285ce4949568b514e5dcd2eded541014a7553bb4266a0c224
+    .agents/skills/premortem/scripts/__pycache__/gap_analyzer.cpython-314.pyc: sha256:4251faa4e94cea5374e42e0b130aa177adc2ad0452cc09f2aec6bdd9d38da1ba
+    .agents/skills/premortem/scripts/analyze_context.py: sha256:7ccf6b7e10c92bf023be3c0d3b519006b1d8e3d79394073f3efd3f50c2044ca4
     .agents/skills/premortem/scripts/format_report.py: sha256:ac75112f90d656df516f58171d216fa624d9d7a36f2206a360cc6e521eff50ea
-    .agents/skills/premortem/scripts/gap_analyzer.py: sha256:fe0051f60d1745f02ed193a8b06cef5ec733fcaa9082b9cbbf29fb582f79b6aa
+    .agents/skills/premortem/scripts/gap_analyzer.py: sha256:a4ead85f0401e6017478686af99f8d1b76a42ce6ef0efa4e261da21112c065d6
     .agents/skills/premortem/scripts/github_integration.py: sha256:113a55435ff150ec9940b0f5d4cff3e9fd24d9429cbc7ab2dc30e96e223b640b
     .agents/skills/prepare-goal/SKILL.md: sha256:792827300e8fa75400f2bc50d7d27c5a5a3f3b0a6c0859861d6c3566a1e88a35
     .agents/skills/prepare-goal/agents/openai.yaml: sha256:870d31c398ceb1c485a64b3a5e694942f055e85983718a61434b117bca5cefbc
@@ -1315,7 +1295,7 @@ dependencies:
     .agents/skills/rtk/SKILL.md: sha256:c6840ba09b97ca3c0826553ed9a22405af1fab3dd789621ba14c5bee8d6a2318
     .agents/skills/rtk/agents/openai.yaml: sha256:5a21360717bfc36ec38ef12f17f45849c496fd002300a9fd7a6badb60d0e4647
     .agents/skills/rtk/references/command-reference.md: sha256:1b8437c2ad69891a7229b7887e518b11082448ffd75e6e964416124596263477
-    .agents/skills/rules-creator/SKILL.md: sha256:05850ef1230b28dc79f1f2a1a787b25d7f816efe8a7ed90982ce8e1a1b4e6136
+    .agents/skills/rules-creator/SKILL.md: sha256:b9617252cf4f5ae8bf53bbb0a0616a4f6e09ba81533411eb51d82715ce970717
     .agents/skills/rules-creator/references/rules-system.md: sha256:d238b9765103e3edca2645e38aebdf424da1890ca12a420a7dc523333be36308
     .agents/skills/rules-creator/resources/checklist.md: sha256:275dca37210bf1d3c79c361fa60ce575ef4fe771d44690aa95a8615d053541a7
     .agents/skills/rules-creator/resources/examples/scoped-api-rule.md: sha256:4e2b713c335101969cb0cc5a9fa0b0d388c93bb82e7fbe3bd779e250b8a32da2
@@ -1324,8 +1304,6 @@ dependencies:
     .agents/skills/similarity/SKILL.md: sha256:9996c551ae8c69eddb2637e0cc0644f985f77911e7d94474167c6659e202e8fc
     .agents/skills/similarity/agents/openai.yaml: sha256:256ce2d2a4a3f6ac024a9a08b2665de766232278500894c27c2c83569b778598
     .agents/skills/similarity/references/report-analysis.md: sha256:dad82829abba9e606035d045973cfc9a6f2b20ca359a79c3175dadcbbcb2edbe
-    .agents/skills/slack-app-management/SKILL.md: sha256:6b20765d9ba0fd5757323c91c027dc62c92497c9f1dfca439b84d171c111768b
-    .agents/skills/slack-app-management/agents/openai.yaml: sha256:9a2c6ca4d634aa549dd13bc35f924e13d48996714e6788cb5d97765e3d9d644c
     .agents/skills/tsr/MIGRATION.md: sha256:4cfc6d22fe0569e71b50d106f2beb48a27bcc9ab9bc353c5974b3a1f9757a879
     .agents/skills/tsr/README.md: sha256:baf1c761bcb44bf47c76b1fc762f1ad290bda38a59d1ccd70245f7fc455f59b9
     .agents/skills/tsr/SKILL.md: sha256:1e61f765717fbf34e4c37b525264170440910a50b4ba07f5423412cb760d8fb7
@@ -1435,11 +1413,6 @@ dependencies:
     .claude/skills/git-worktree/references/troubleshooting.md: sha256:370d8df007792954eb7a8795b068f2487a46284489f908e76864242b01be4d77
     .claude/skills/git-worktree/references/workflows.md: sha256:f70bfe1b8c5a7db86e10ae211dbc7188a1ccbd583795dee0633b3896da9ef1fc
     .claude/skills/git-worktree/scripts/check-worktree-config.sh: sha256:5582d5f0b45395f7a077ea3e3cbb3266138053166950ff7df274957833e3ffdf
-    .claude/skills/google-forms-survey-builder/SKILL.md: sha256:3a80ed6d3cce833ce1c12837ee906346a0a0c437a4f5f748ef1ad46c3e5f0746
-    .claude/skills/google-forms-survey-builder/agents/openai.yaml: sha256:08912f2b673c84dde9af3b91006973ec6f5f6551fa559c1cdbf9056b1ee03b90
-    .claude/skills/google-forms-survey-builder/references/SURVEY_QUESTIONS.md: sha256:7571484856e9031030b87121b19351c14e3fc5fc0b63a235f9cc94dca5beb0f3
-    .claude/skills/google-forms-survey-builder/references/apps-script-patterns.md: sha256:57269f30cc830a74ae1d9ddf1b885939ca8e0303a6c08ee66320849f59b13ecc
-    .claude/skills/google-forms-survey-builder/references/survey-questions-format.md: sha256:96accdafa50bb9d828c148ffeb2bd3c1bc59b123b30c6e80fbdd7449092782d7
     .claude/skills/headroom/SKILL.md: sha256:b544af6e415c7724e96dac30f39b6c532d4928b9521031b96e1e723f11af7123
     .claude/skills/herdr/SKILL.md: sha256:3f55ca29d8b593ed33130904ae63d5137e0fc35d6cab69832fa23c61e2e725ff
     .claude/skills/herdr/references/configuration.md: sha256:92a35f5472ad0056cf9199ee7c0af5237d646cb7af15606e906da3fbf336a732
@@ -1479,7 +1452,7 @@ dependencies:
     .claude/skills/predictive-analysis/references/issue-categorization.md: sha256:99195f4aa92abfabc8fc2952da22db9f631399490859b0c607da6e8417ecf8e0
     .claude/skills/predictive-analysis/references/mitigation-strategies.md: sha256:5312962dd75510fee9b27a0efce318e11b7df5d10860ef13480a524ea0463dbd
     .claude/skills/predictive-analysis/references/risk-assessment-framework.md: sha256:743fac08f0860a79d250ab7556b977c3de991f1abd220898f886d9e843c374ff
-    .claude/skills/premortem/SKILL.md: sha256:01a0969b739db38becf83d37790e611c995ccf80248a73bd141982f0601910e9
+    .claude/skills/premortem/SKILL.md: sha256:92f25034f9b1b06c2ae6610802a29cefc935dde6e204721363ae338b70538498
     .claude/skills/premortem/agents/openai.yaml: sha256:7364d27247d484f71f6aeb4757c605753d89bc1c6bd6c30dca141e8836976004
     .claude/skills/premortem/references/examples/session-ml-pipeline.yaml: sha256:22c41196860675fd6bdfa99720fcf93a932e50948f746f114f707e3ca0206a72
     .claude/skills/premortem/references/examples/session-web-api.yaml: sha256:15ffd2f7c5742c70e3c82b7d49c46e6fcbd54f3fd67ff6a7117f39af5924c636
@@ -1492,11 +1465,12 @@ dependencies:
     .claude/skills/premortem/references/questions/mobile-apps.yaml: sha256:78b0606ba01938720e5466eaa683da259223fe74ba3995b6cb550cdc47864121
     .claude/skills/premortem/references/questions/security.yaml: sha256:7de25c36e2f33e513ecbbebb538f7cc7a024d9913ac407c68aab513ba413c58d
     .claude/skills/premortem/references/questions/web-development.yaml: sha256:0f2afdccd59616bef6d2b022e48675126639fcf67e5d772b2d531d68f526cca5
+    .claude/skills/premortem/scripts/__pycache__/analyze_context.cpython-314.pyc: sha256:e220123cf747d83a7c5cd862d65e932da837b1186ac77ee374da62341be8f264
     .claude/skills/premortem/scripts/__pycache__/format_report.cpython-314.pyc: sha256:ec4fe08f925f361867b282870f93846768d173a06d4e594e5a9eac0911435408
-    .claude/skills/premortem/scripts/__pycache__/gap_analyzer.cpython-314.pyc: sha256:146435d98b7df7947e5560d2239badcc6a1de70f4ae62e619bb9c75b5f3a9e71
-    .claude/skills/premortem/scripts/analyze_context.py: sha256:048001e637790e6285ce4949568b514e5dcd2eded541014a7553bb4266a0c224
+    .claude/skills/premortem/scripts/__pycache__/gap_analyzer.cpython-314.pyc: sha256:4251faa4e94cea5374e42e0b130aa177adc2ad0452cc09f2aec6bdd9d38da1ba
+    .claude/skills/premortem/scripts/analyze_context.py: sha256:7ccf6b7e10c92bf023be3c0d3b519006b1d8e3d79394073f3efd3f50c2044ca4
     .claude/skills/premortem/scripts/format_report.py: sha256:ac75112f90d656df516f58171d216fa624d9d7a36f2206a360cc6e521eff50ea
-    .claude/skills/premortem/scripts/gap_analyzer.py: sha256:fe0051f60d1745f02ed193a8b06cef5ec733fcaa9082b9cbbf29fb582f79b6aa
+    .claude/skills/premortem/scripts/gap_analyzer.py: sha256:a4ead85f0401e6017478686af99f8d1b76a42ce6ef0efa4e261da21112c065d6
     .claude/skills/premortem/scripts/github_integration.py: sha256:113a55435ff150ec9940b0f5d4cff3e9fd24d9429cbc7ab2dc30e96e223b640b
     .claude/skills/prepare-goal/SKILL.md: sha256:792827300e8fa75400f2bc50d7d27c5a5a3f3b0a6c0859861d6c3566a1e88a35
     .claude/skills/prepare-goal/agents/openai.yaml: sha256:870d31c398ceb1c485a64b3a5e694942f055e85983718a61434b117bca5cefbc
@@ -1516,7 +1490,7 @@ dependencies:
     .claude/skills/rtk/SKILL.md: sha256:c6840ba09b97ca3c0826553ed9a22405af1fab3dd789621ba14c5bee8d6a2318
     .claude/skills/rtk/agents/openai.yaml: sha256:5a21360717bfc36ec38ef12f17f45849c496fd002300a9fd7a6badb60d0e4647
     .claude/skills/rtk/references/command-reference.md: sha256:1b8437c2ad69891a7229b7887e518b11082448ffd75e6e964416124596263477
-    .claude/skills/rules-creator/SKILL.md: sha256:05850ef1230b28dc79f1f2a1a787b25d7f816efe8a7ed90982ce8e1a1b4e6136
+    .claude/skills/rules-creator/SKILL.md: sha256:b9617252cf4f5ae8bf53bbb0a0616a4f6e09ba81533411eb51d82715ce970717
     .claude/skills/rules-creator/references/rules-system.md: sha256:d238b9765103e3edca2645e38aebdf424da1890ca12a420a7dc523333be36308
     .claude/skills/rules-creator/resources/checklist.md: sha256:275dca37210bf1d3c79c361fa60ce575ef4fe771d44690aa95a8615d053541a7
     .claude/skills/rules-creator/resources/examples/scoped-api-rule.md: sha256:4e2b713c335101969cb0cc5a9fa0b0d388c93bb82e7fbe3bd779e250b8a32da2
@@ -1525,8 +1499,6 @@ dependencies:
     .claude/skills/similarity/SKILL.md: sha256:9996c551ae8c69eddb2637e0cc0644f985f77911e7d94474167c6659e202e8fc
     .claude/skills/similarity/agents/openai.yaml: sha256:256ce2d2a4a3f6ac024a9a08b2665de766232278500894c27c2c83569b778598
     .claude/skills/similarity/references/report-analysis.md: sha256:dad82829abba9e606035d045973cfc9a6f2b20ca359a79c3175dadcbbcb2edbe
-    .claude/skills/slack-app-management/SKILL.md: sha256:6b20765d9ba0fd5757323c91c027dc62c92497c9f1dfca439b84d171c111768b
-    .claude/skills/slack-app-management/agents/openai.yaml: sha256:9a2c6ca4d634aa549dd13bc35f924e13d48996714e6788cb5d97765e3d9d644c
     .claude/skills/tsr/MIGRATION.md: sha256:4cfc6d22fe0569e71b50d106f2beb48a27bcc9ab9bc353c5974b3a1f9757a879
     .claude/skills/tsr/README.md: sha256:baf1c761bcb44bf47c76b1fc762f1ad290bda38a59d1ccd70245f7fc455f59b9
     .claude/skills/tsr/SKILL.md: sha256:1e61f765717fbf34e4c37b525264170440910a50b4ba07f5423412cb760d8fb7
@@ -1548,11 +1520,11 @@ dependencies:
     .claude/skills/work-log-maintenance/SKILL.md: sha256:26f4064ff1c0e757e415121675d6caaecd30040f95304e6ed4cd4c73e022f3f9
     .claude/skills/work-log-maintenance/agents/openai.yaml: sha256:e951b8256a5a1b032bcca3c7105230f5041467594434ca23b562b8ec5ec4abc8
     .claude/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
-  content_hash: sha256:0b67110b5b635dff496526a1acf5a8c0ad5e7e0f046c79fb93ab2af81c660486
+  content_hash: sha256:625acee378aa055c5cc56af78faff995997766af8359ef5130b8733f32313393
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
-  resolved_commit: 43896f1d040549b933065e210df3cf51caded325
+  resolved_commit: 65f4ef28279caaddbedca02272da317a6ece804f
   resolved_ref: main
   version: 1.0.0
   virtual_path: manual-skills
@@ -1755,9 +1727,6 @@ dependencies:
   version: 2.6.2
   package_type: marketplace_plugin
   deployed_files:
-  - .agents/skills/banner-design
-  - .agents/skills/banner-design/SKILL.md
-  - .agents/skills/banner-design/references/banner-sizes-and-styles.md
   - .agents/skills/brand
   - .agents/skills/brand/SKILL.md
   - .agents/skills/brand/references/approval-checklist.md
@@ -1981,9 +1950,6 @@ dependencies:
   - .agents/skills/ui-ux-pro-max/scripts/core.py
   - .agents/skills/ui-ux-pro-max/scripts/design_system.py
   - .agents/skills/ui-ux-pro-max/scripts/search.py
-  - .claude/skills/banner-design
-  - .claude/skills/banner-design/SKILL.md
-  - .claude/skills/banner-design/references/banner-sizes-and-styles.md
   - .claude/skills/brand
   - .claude/skills/brand/SKILL.md
   - .claude/skills/brand/references/approval-checklist.md
@@ -2208,8 +2174,6 @@ dependencies:
   - .claude/skills/ui-ux-pro-max/scripts/design_system.py
   - .claude/skills/ui-ux-pro-max/scripts/search.py
   deployed_file_hashes:
-    .agents/skills/banner-design/SKILL.md: sha256:913d9c4b2a3b405d638d50131e0dd3fe2787c839423d79287b7858ac29255acc
-    .agents/skills/banner-design/references/banner-sizes-and-styles.md: sha256:c8906fb1073a576ee8c680d9bc8586249cbc4ed36690da960d65a1c9c37143b7
     .agents/skills/brand/SKILL.md: sha256:6a450ee1a83a403d47cec2ede9030feb60a67a81fc425d2406e975339313bd44
     .agents/skills/brand/references/approval-checklist.md: sha256:4bf8549687f53a7b9684005b4b87de93c26f018e00609b4c506a5812abd13d20
     .agents/skills/brand/references/asset-organization.md: sha256:de98123417e9c5a1cc71a78131bba979c4c8ed2e5289e6c7a7f166576e488101
@@ -2427,8 +2391,6 @@ dependencies:
     .agents/skills/ui-ux-pro-max/scripts/core.py: sha256:ab9f398b493e34404448cefc766239ee86119c7a21d8581ba965cabdc698b0a8
     .agents/skills/ui-ux-pro-max/scripts/design_system.py: sha256:db272c6649322e383714c73305705101fe1d44c15bd64556d5a515b1c419c2d2
     .agents/skills/ui-ux-pro-max/scripts/search.py: sha256:d9983d2a21d330b6b696480940fd78029f7b34027814f2ac1cf17c5d0b042407
-    .claude/skills/banner-design/SKILL.md: sha256:913d9c4b2a3b405d638d50131e0dd3fe2787c839423d79287b7858ac29255acc
-    .claude/skills/banner-design/references/banner-sizes-and-styles.md: sha256:c8906fb1073a576ee8c680d9bc8586249cbc4ed36690da960d65a1c9c37143b7
     .claude/skills/brand/SKILL.md: sha256:6a450ee1a83a403d47cec2ede9030feb60a67a81fc425d2406e975339313bd44
     .claude/skills/brand/references/approval-checklist.md: sha256:4bf8549687f53a7b9684005b4b87de93c26f018e00609b4c506a5812abd13d20
     .claude/skills/brand/references/asset-organization.md: sha256:de98123417e9c5a1cc71a78131bba979c4c8ed2e5289e6c7a7f166576e488101
@@ -2647,6 +2609,13 @@ dependencies:
     .claude/skills/ui-ux-pro-max/scripts/design_system.py: sha256:db272c6649322e383714c73305705101fe1d44c15bd64556d5a515b1c419c2d2
     .claude/skills/ui-ux-pro-max/scripts/search.py: sha256:d9983d2a21d330b6b696480940fd78029f7b34027814f2ac1cf17c5d0b042407
   content_hash: sha256:8704c750e400802bd67bf4f4c9187923267229ac91c8cec6bd32e92c35907449
+  skill_subset:
+  - brand
+  - design
+  - design-system
+  - slides
+  - ui-styling
+  - ui-ux-pro-max
   declared_license: MIT
 - repo_url: obra/superpowers
   name: superpowers

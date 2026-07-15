@@ -9,6 +9,7 @@ Current `apm` CLI source is pinned through `mise` to `pipx:apm-cli@0.22.0`.
 ## Source Of Truth
 
 - Personal skills: `~/.apm/catalog/skills/<id>/`
+- Optional repository-scoped skills: `~/.apm/optional-skills/.apm/skills/<id>/`
 - Local-only private skills: `~/.apm/private-skills/.apm/skills/<id>/`
 - Shared guidance: `~/.apm/catalog/{AGENTS.md,agents/**,commands/**,rules/**}`
 - Dependency selection and accepted upstream state: `~/.apm/apm.yml`, `~/.apm/apm.lock.yaml`
@@ -60,6 +61,8 @@ Use this when a dependency in `apm.yml` is also checked out locally and that che
 
 - Use `mise` tasks rather than `.config` wrapper scripts for normal operation.
 - Keep `apm.yml` on remote refs for global install; do not switch it back to many local `./packages/*` refs.
+- Keep repository-scoped skills out of the root `apm.yml`; add `jey3dayo/apm-workspace/optional-skills#main` to the consuming repository and select the required skill with `--skill <id>`.
+- For an upstream bundle with optional sub-skills, keep the upstream reference and select the sub-skill in the consuming repository, for example `apm install nextlevelbuilder/ui-ux-pro-max-skill --skill banner-design`.
 - When an upstream skill cannot stay on the normal managed lane, keep its copied source under `manual-skills/.apm/skills/**` and distribute it through `jey3dayo/apm-workspace/manual-skills`.
 - Exception: skills that only carry runtime assets for `catalog/commands/**` (for example `codex-companion-scripts`) stay under `catalog/skills/<id>/` with provenance recorded in their own `SKILL.md`.
 - Keep machine-local skills under `private-skills/.apm/skills/**`; this directory is gitignored and only participates in `mise run apply:skills:local`.

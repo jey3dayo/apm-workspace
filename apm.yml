@@ -2,7 +2,10 @@ name: apm-workspace
 version: 1.0.0
 description: APM project for apm-workspace
 author: jey3dayo
-targets: [claude, codex, agent-skills]
+targets:
+  - claude
+  - codex
+  - agent-skills
 dependencies:
   apm:
     - jey3dayo/apm-workspace/catalog#main
@@ -35,7 +38,14 @@ dependencies:
     - millionco/react-doctor/skills/react-doctor
     - mizchi/skills/meta/empirical-prompt-tuning
     - modem-dev/hunk/skills/hunk-review
-    - nextlevelbuilder/ui-ux-pro-max-skill
+    - git: nextlevelbuilder/ui-ux-pro-max-skill
+      skills:
+        - brand
+        - design
+        - design-system
+        - slides
+        - ui-styling
+        - ui-ux-pro-max
     - obra/superpowers/skills/brainstorming
     - obra/superpowers/skills/dispatching-parallel-agents
     - obra/superpowers/skills/executing-plans

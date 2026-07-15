@@ -11,11 +11,19 @@
 ## Source Of Truth
 
 - `~/.apm/catalog/skills/**`: personal skills
+- `~/.apm/optional-skills/.apm/skills/**`: repository-scoped optional skills; tracked here but not included in the global rollout
+- `~/.apm/optional-skills/apm.yml`: standalone optional package manifest
 - `~/.apm/catalog/{AGENTS.md,agents/**,commands/**,rules/**}`: shared guidance
 - `~/.apm/apm.yml`, `~/.apm/apm.lock.yaml`: dependency selection and accepted upstream state
 - `~/.apm/.apm/skills/**`: APM workspace-only skill source for skills intentionally excluded from global rollout
 - `~/.apm/.claude/skills/**`, `~/.apm/.agents/skills/**`: project runtime bridges; child skill directories symlink to the workspace-only source
 - `~/.apm/apm_modules/`: cache only
+
+## Optional Skill Contract
+
+- `optional-skills` is not listed in the root `apm.yml` and is never installed by the global `mise run deploy` flow.
+- A consuming repository adds `jey3dayo/apm-workspace/optional-skills#main` to its own `apm.yml` and selects the required skill with `apm install --skill <id>`.
+- An optional skill that is already part of an upstream bundle remains owned by that upstream package. Select it in the consuming repository with the upstream package ref and `--skill <id>` rather than copying it into this workspace.
 
 ## APM Workspace-only Skill Contract
 

@@ -3,6 +3,40 @@
 採用・撤去・見送りにした APM パッケージの意思決定ログ。1 パッケージ 1 セクション。
 「なぜ入れたか / なぜ消したか / 再検討するなら何を見るか」を残す。
 
+## 移管候補の提案（2026-07-15）
+
+- **Status: 提案中**
+- 詳細: [`docs/skill-scope-proposals.md`](skill-scope-proposals.md)
+- 最初の検討対象: `agentation` 系、`browser-harness` / `agent-browser`、React/UI 検証系
+- 次の検討対象: UI デザインバンドルの必要サブセット、`understand` 系、社内 API 系
+- 維持方針: APM 所有権、検証、安全性、横断的な環境運用スキルは global を維持
+- 判断方法: 対象リポジトリで repo-local install と実作業を検証してから global 依存を外す
+
+### google-forms-survey-builder
+
+- **Status: 個別プロジェクト向けへ移管（2026-07-15）**
+- 正本: `optional-skills/.apm/skills/google-forms-survey-builder/`
+- 理由: Google Forms 案件に限定され、global rollout に含める必要がないため。
+- 再導入: 利用リポジトリで `jey3dayo/apm-workspace/optional-skills#main` を追加し、
+  `--skill google-forms-survey-builder` を選択する。
+
+### slack-app-management
+
+- **Status: 個別プロジェクト向けへ移管（2026-07-15）**
+- 正本: `optional-skills/.apm/skills/slack-app-management/`
+- 理由: Slack App を実装・運用するリポジトリに限定され、通常のリポジトリへ global
+  rollout する必要がないため。
+- 再導入: 利用リポジトリで `jey3dayo/apm-workspace/optional-skills#main` を追加し、
+  `--skill slack-app-management` を選択する。
+
+### banner-design
+
+- **Status: global の skill subset から除外（2026-07-15）**
+- 正本: `nextlevelbuilder/ui-ux-pro-max-skill` の upstream bundle
+- 理由: embedded skill のため workspace から個別削除できないが、global manifest の
+  `skills:` サブセットからは外せるため。
+- 再導入: banner を使うリポジトリだけで upstream package を `--skill banner-design` 付きで導入する。
+
 ## ponytail (DietrichGebert/ponytail)
 
 - **Status: 撤去（2026-07-07）**

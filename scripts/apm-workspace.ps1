@@ -673,6 +673,18 @@ function Get-ManifestApmDependencyReferences {
       continue
     }
 
+    if ($line -match '^\s*-\s+git:\s+(\S+)\s*$') {
+      if ((Get-YamlIndentLevel -Line $line) -lt $apmIndent) {
+        continue
+      }
+
+      $reference = $Matches[1]
+      if ($reference -notmatch '^jey3dayo/apm-workspace/catalog(?:#|$)' -and $reference -notmatch '^\./' -and -not $result.Contains($reference)) {
+        $result.Add($reference)
+      }
+      continue
+    }
+
     if ($line -match '^\s*-\s+(\S+)\s*$') {
       if ((Get-YamlIndentLevel -Line $line) -lt $apmIndent) {
         continue
@@ -688,6 +700,65 @@ function Get-ManifestApmDependencyReferences {
       if (-not $result.Contains($reference)) {
         $result.Add($reference)
       }
+    }
+  }
+
+  return $result.ToArray()
+}
+
+function Get-ManifestExternalSkillSubset {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Reference
+  )
+
+  $manifestPath = Join-Path $WorkspaceDir "apm.yml"
+  if (-not (Test-Path -LiteralPath $manifestPath)) {
+    return @()
+  }
+
+  function Get-YamlIndentLevel {
+    param([string]$Line)
+
+    return ($Line.Length - $Line.TrimStart(' ').Length)
+  }
+
+  $result = New-Object System.Collections.Generic.List[string]
+  $currentReference = $null
+  $inSkills = $false
+  $skillsIndent = -1
+  foreach ($line in (Get-Content -LiteralPath $manifestPath)) {
+    if ($line -match '^\s*-\s+git:\s+(\S+)\s*$') {
+      $currentReference = $Matches[1]
+      $inSkills = $false
+      $skillsIndent = -1
+      continue
+    }
+
+    if ($line -match '^\s*-\s+\S+') {
+      $currentReference = $null
+      $inSkills = $false
+      $skillsIndent = -1
+      continue
+    }
+
+    if ($currentReference -ne $Reference) {
+      continue
+    }
+
+    if ($line -match '^\s+skills:\s*$') {
+      $inSkills = $true
+      $skillsIndent = Get-YamlIndentLevel -Line $line
+      continue
+    }
+
+    if ($inSkills -and (Get-YamlIndentLevel -Line $line) -le $skillsIndent) {
+      $inSkills = $false
+      continue
+    }
+
+    if ($inSkills -and $line -match '^\s*-\s+(\S+)\s*$') {
+      $result.Add($Matches[1].Trim('"'))
     }
   }
 
@@ -1131,7 +1202,11 @@ function Get-ExternalSkillRecords {
 
     $packageSkillsRoot = Get-ExternalPackageSkillsRoot -RepoUrl $record.Repo -VirtualPath $record.Path -ResolvedCommit $record.Commit
     if ($null -ne $packageSkillsRoot) {
+      $skillSubset = @(Get-ManifestExternalSkillSubset -Reference $record.Repo)
       foreach ($skillId in (Get-SkillIdsFromRoot -SkillsRoot $packageSkillsRoot)) {
+        if ($skillSubset.Count -gt 0 -and $skillSubset -notcontains $skillId) {
+          continue
+        }
         $sourcePath = Get-ExternalPackageSkillSourcePath -PackageSkillsRoot $packageSkillsRoot -SkillId $skillId
 
         $result.Add([pscustomobject]@{

@@ -129,6 +129,29 @@ setup() {
 
 # --- workspace_remote_to_repo_reference -------------------------------------
 
+@test "manifest helpers read git dependency subsets" {
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: nextlevelbuilder/ui-ux-pro-max-skill
+      skills:
+        - design
+        - ui-ux-pro-max
+    - modem-dev/hunk/skills/hunk-review
+EOF
+  WORKSPACE_DIR="$workspace_dir"
+
+  run manifest_external_references
+  [ "$status" -eq 0 ]
+  [ "$output" = $'nextlevelbuilder/ui-ux-pro-max-skill\nmodem-dev/hunk/skills/hunk-review' ]
+
+  subset_output="$(manifest_external_skill_subset "nextlevelbuilder/ui-ux-pro-max-skill")"
+  [ "$subset_output" = $'design\nui-ux-pro-max' ]
+
+  rm -rf "$workspace_dir"
+}
+
 @test "workspace_remote_to_repo_reference parses an https remote" {
   run workspace_remote_to_repo_reference "https://github.com/owner/repo.git"
   [ "$status" -eq 0 ]

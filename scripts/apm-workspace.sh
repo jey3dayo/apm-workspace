@@ -1269,10 +1269,16 @@ manifest_external_references() {
       next
     }
     /^[[:space:]]*-[[:space:]]+/ {
-      if (indent_level($0) <= apm_indent) {
+      if (indent_level($0) != apm_indent + 2) {
         next
       }
       ref = $2
+      if (ref == "git:") {
+        ref = $3
+      }
+      if (ref == "") {
+        next
+      }
       if (ref ~ /^jey3dayo\/apm-workspace\/catalog(#|$)/) {
         next
       }
@@ -1280,6 +1286,49 @@ manifest_external_references() {
         next
       }
       print ref
+    }
+  ' "$manifest_path"
+}
+
+manifest_external_skill_subset() {
+  target_ref="$1"
+  manifest_path="$WORKSPACE_DIR/apm.yml"
+  [ -f "$manifest_path" ] || return 0
+
+  awk -v wanted="$target_ref" '
+    function indent_level(line, trimmed) {
+      trimmed = line
+      sub(/^[[:space:]]+/, "", trimmed)
+      return length(line) - length(trimmed)
+    }
+    /^    - git:[[:space:]]*/ {
+      current_ref = $3
+      in_skills = 0
+      skills_indent = -1
+      next
+    }
+    /^    - [^[:space:]]/ {
+      current_ref = ""
+      in_skills = 0
+      skills_indent = -1
+      next
+    }
+    current_ref != wanted {
+      next
+    }
+    /^      skills:[[:space:]]*$/ {
+      in_skills = 1
+      skills_indent = indent_level($0)
+      next
+    }
+    in_skills && indent_level($0) <= skills_indent {
+      in_skills = 0
+      next
+    }
+    in_skills && /^[[:space:]]*-[[:space:]]+/ {
+      value = $2
+      gsub(/\"/, "", value)
+      print value
     }
   ' "$manifest_path"
 }
@@ -1608,8 +1657,12 @@ collect_external_skill_records() {
 
     package_skills_root=$(external_package_skills_root "$repo_url" "$virtual_path" "$resolved_commit" 2>/dev/null || true)
     if [ -n "$package_skills_root" ]; then
+      skill_subset=$(manifest_external_skill_subset "$repo_url")
       skill_ids_from_root "$package_skills_root" | while IFS= read -r source_skill_id; do
         [ -n "$source_skill_id" ] || continue
+        if [ -n "$skill_subset" ] && ! printf '%s\n' "$skill_subset" | awk -v skill_id="$source_skill_id" '$0 == skill_id { found = 1; exit } END { exit(found ? 0 : 1) }'; then
+          continue
+        fi
         source_path=$(external_package_skill_source_path "$package_skills_root" "$source_skill_id")
         printf 'external\t%s\t%s\t%s#%s\n' "$source_skill_id" "$source_path" "$canonical_ref" "$source_skill_id"
       done
