@@ -115,16 +115,16 @@ setup() {
 
 # --- format_skill_name ------------------------------------------------------
 
-@test "format_skill_name flattens a namespaced id with a hyphen" {
+@test "format_skill_name uses the logical leaf of a namespaced id" {
   run format_skill_name "kiro:spec-init"
   [ "$status" -eq 0 ]
-  [ "$output" = "kiro-spec-init" ]
+  [ "$output" = "spec-init" ]
 }
 
-@test "format_skill_name leaves a plain id unchanged" {
-  run format_skill_name "plain"
+@test "format_skill_name uses the final segment of a nested namespaced id" {
+  run format_skill_name "superpowers:using-superpowers"
   [ "$status" -eq 0 ]
-  [ "$output" = "plain" ]
+  [ "$output" = "using-superpowers" ]
 }
 
 # --- workspace_remote_to_repo_reference -------------------------------------

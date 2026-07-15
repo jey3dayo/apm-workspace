@@ -220,10 +220,9 @@ skill_ids_from_root() {
 }
 
 format_skill_name() {
-  # Flatten a namespaced skill id "<ns>:<id>" to "<ns>-<id>". Every deploy target
-  # discovers skills only one level deep, so nested "<ns>/<id>" dirs are invisible;
-  # the hyphen-flattened form works uniformly across all targets and namespaces.
-  printf '%s\n' "$1" | tr ':' '-'
+  # Deploy using the logical skill name (the final namespace segment). Target
+  # collision validation prevents two sources from claiming the same path.
+  printf '%s\n' "$1" | awk -F ':' '{ print $NF }'
 }
 
 locked_external_skill_records() {

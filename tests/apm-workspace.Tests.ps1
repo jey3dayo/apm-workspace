@@ -773,13 +773,13 @@ Describe "public command surface" {
     $codex.SkillsRoot | Should -Be (Join-Path $HOME ".agents")
   }
 
-  It "normalizes codex skill names from superpowers aliases" {
-    Format-SkillName -Target "codex" -SourceSkillId "superpowers:brainstorming" | Should -Be "superpowers-brainstorming"
+  It "uses the logical leaf for superpowers skill names" {
+    Format-SkillName -Target "codex" -SourceSkillId "superpowers:brainstorming" | Should -Be "brainstorming"
   }
 
-  It "flattens namespaced skill names for all targets to match bash" {
-    Format-SkillName -Target "claude" -SourceSkillId "kiro:spec-init" | Should -Be "kiro-spec-init"
-    Format-SkillName -Target "codex" -SourceSkillId "superpowers:brainstorming" | Should -Be "superpowers-brainstorming"
+  It "uses the final segment of namespaced skill names for all targets" {
+    Format-SkillName -Target "claude" -SourceSkillId "kiro:spec-init" | Should -Be "spec-init"
+    Format-SkillName -Target "codex" -SourceSkillId "superpowers:brainstorming" | Should -Be "brainstorming"
     Format-SkillName -Target "claude" -SourceSkillId "plain" | Should -Be "plain"
   }
 
@@ -814,7 +814,7 @@ dependencies:
     @(Get-UnpinnedExternalReferences) | Should -Be @("obra/superpowers/skills/using-superpowers")
   }
 
-  It "builds target-aware managed skill inventory with normalized names" {
+  It "builds target-aware managed skill inventory with logical names" {
     $targets = @(
       [pscustomobject]@{ Name = "claude"; Root = (Join-Path $TestDrive "claude"); ConfigName = "CLAUDE.md" }
       [pscustomobject]@{ Name = "codex"; Root = (Join-Path $TestDrive "codex"); ConfigName = "AGENTS.md" }
@@ -822,8 +822,8 @@ dependencies:
 
     $inventory = @(Get-ManagedCatalogSkillInventory -SkillIds @("superpowers:brainstorming") -Targets $targets)
 
-    ($inventory | Where-Object Target -eq "claude").DeployedSkillName | Should -Be "superpowers-brainstorming"
-    ($inventory | Where-Object Target -eq "codex").DeployedSkillName | Should -Be "superpowers-brainstorming"
+    ($inventory | Where-Object Target -eq "claude").DeployedSkillName | Should -Be "brainstorming"
+    ($inventory | Where-Object Target -eq "codex").DeployedSkillName | Should -Be "brainstorming"
   }
 
   It "smoke:catalog normalizes Codex-installed skill paths for superpowers aliases" {
@@ -839,7 +839,7 @@ dependencies:
       $installCalls.Add(($args -join ' '))
 
       if ($args[0] -eq "install") {
-        $installedSkillRoot = Join-Path (Join-Path $PWD ".agents/skills") "superpowers-brainstorming"
+        $installedSkillRoot = Join-Path (Join-Path $PWD ".agents/skills") "brainstorming"
         New-Item -ItemType Directory -Path (Join-Path $installedSkillRoot "references") -Force | Out-Null
         Set-Content -LiteralPath (Join-Path $installedSkillRoot "SKILL.md") -Value "# brainstorming"
         Set-Content -LiteralPath (Join-Path $installedSkillRoot "references/note.md") -Value "codex"
@@ -895,14 +895,14 @@ dependencies:
     $plan = @(Stage-TargetSkillRecords -StageRoot $stageRoot -SkillRecords $skillRecords -Targets $targets)
 
     $plan.Count | Should -Be 4
-    ($plan | Where-Object { $_.Target -eq "claude" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should -Be "superpowers-brainstorming"
-    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should -Be "superpowers-brainstorming"
+    ($plan | Where-Object { $_.Target -eq "claude" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should -Be "brainstorming"
+    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should -Be "brainstorming"
     ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "gh-address-comments" }).DeployedSkillName | Should -Be "gh-address-comments"
     $claudeSkillsRoot = Join-Path (Join-Path $stageRoot "claude") "skills"
     $codexSkillsRoot = Join-Path (Join-Path $stageRoot "codex") "skills"
 
-    Test-DirectoryTreeEqual -ExpectedRoot $skillRecords[0].SourcePath -ActualRoot (Join-Path $claudeSkillsRoot "superpowers-brainstorming") | Should -Be $true
-    Test-DirectoryTreeEqual -ExpectedRoot $skillRecords[0].SourcePath -ActualRoot (Join-Path $codexSkillsRoot "superpowers-brainstorming") | Should -Be $true
+    Test-DirectoryTreeEqual -ExpectedRoot $skillRecords[0].SourcePath -ActualRoot (Join-Path $claudeSkillsRoot "brainstorming") | Should -Be $true
+    Test-DirectoryTreeEqual -ExpectedRoot $skillRecords[0].SourcePath -ActualRoot (Join-Path $codexSkillsRoot "brainstorming") | Should -Be $true
     Test-DirectoryTreeEqual -ExpectedRoot $skillRecords[1].SourcePath -ActualRoot (Join-Path $claudeSkillsRoot "gh-address-comments") | Should -Be $true
     Test-DirectoryTreeEqual -ExpectedRoot $skillRecords[1].SourcePath -ActualRoot (Join-Path $codexSkillsRoot "gh-address-comments") | Should -Be $true
   }
@@ -921,9 +921,9 @@ dependencies:
 
     $plan.Count | Should -Be 4
     ($plan | Where-Object { $_.Target -eq "claude" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).SourceKind | Should -Be "personal"
-    ($plan | Where-Object { $_.Target -eq "claude" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should -Be "superpowers-brainstorming"
+    ($plan | Where-Object { $_.Target -eq "claude" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should -Be "brainstorming"
     ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).SourceKind | Should -Be "personal"
-    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should -Be "superpowers-brainstorming"
+    ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "superpowers:brainstorming" }).DeployedSkillName | Should -Be "brainstorming"
     ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "gh-address-comments" }).SourceKind | Should -Be "external"
     ($plan | Where-Object { $_.Target -eq "codex" -and $_.SourceSkillId -eq "gh-address-comments" }).DeployedSkillName | Should -Be "gh-address-comments"
   }
@@ -933,8 +933,8 @@ dependencies:
       [pscustomobject]@{ Name = "codex"; Root = (Join-Path $TestDrive ".codex"); SkillsRoot = (Join-Path $TestDrive ".agents"); ConfigName = "AGENTS.md" }
     )
     $stageRoot = Join-Path $TestDrive "stage"
-    $codexStageSkill = Join-Path (Join-Path (Join-Path $stageRoot "codex") "skills") "superpowers-brainstorming"
-    $legacyCodexSkill = Join-Path $TestDrive ".codex/skills/superpowers-brainstorming"
+    $codexStageSkill = Join-Path (Join-Path (Join-Path $stageRoot "codex") "skills") "brainstorming"
+    $legacyCodexSkill = Join-Path $TestDrive ".codex/skills/brainstorming"
 
     New-Item -ItemType Directory -Path $codexStageSkill -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $codexStageSkill "SKILL.md") -Value "# staged"
@@ -943,7 +943,7 @@ dependencies:
 
     Replace-SkillTargetsFromStage -StageRoot $stageRoot -Targets $targets
 
-    Test-Path (Join-Path $TestDrive ".agents/skills/superpowers-brainstorming/SKILL.md") | Should -Be $true
+    Test-Path (Join-Path $TestDrive ".agents/skills/brainstorming/SKILL.md") | Should -Be $true
     Test-Path (Join-Path $TestDrive ".codex/skills") | Should -Be $false
   }
 
@@ -961,21 +961,21 @@ dependencies:
     New-Item -ItemType Directory -Path (Join-Path $sourcePath "references") -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $sourcePath "SKILL.md") -Value "# brainstorming"
     Set-Content -LiteralPath (Join-Path $sourcePath "references/note.md") -Value "local"
-    New-Item -ItemType Directory -Path (Join-Path $TestDrive ".codex/skills/superpowers-brainstorming") -Force | Out-Null
-    Set-Content -LiteralPath (Join-Path $TestDrive ".codex/skills/superpowers-brainstorming/SKILL.md") -Value "# legacy"
+    New-Item -ItemType Directory -Path (Join-Path $TestDrive ".codex/skills/brainstorming") -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $TestDrive ".codex/skills/brainstorming/SKILL.md") -Value "# legacy"
     New-Item -ItemType Directory -Path (Join-Path $TestDrive ".agents/skills/existing-skill") -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $TestDrive ".agents/skills/existing-skill/SKILL.md") -Value "# existing"
-    New-Item -ItemType Directory -Path (Join-Path $TestDrive ".agents/skills/superpowers-brainstorming") -Force | Out-Null
-    Set-Content -LiteralPath (Join-Path $TestDrive ".agents/skills/superpowers-brainstorming/old.md") -Value "old"
+    New-Item -ItemType Directory -Path (Join-Path $TestDrive ".agents/skills/brainstorming") -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $TestDrive ".agents/skills/brainstorming/old.md") -Value "old"
 
     Invoke-SyncLocalSkills -RequestedSkillIds @("superpowers:brainstorming")
 
-    Test-Path (Join-Path $TestDrive ".agents/skills/superpowers-brainstorming/SKILL.md") | Should -Be $true
-    ((Get-Content -LiteralPath (Join-Path $TestDrive ".agents/skills/superpowers-brainstorming/SKILL.md") -Raw) -replace '\r?\n$', '') | Should -Be "# brainstorming"
-    ((Get-Content -LiteralPath (Join-Path $TestDrive ".agents/skills/superpowers-brainstorming/references/note.md") -Raw) -replace '\r?\n$', '') | Should -Be "local"
+    Test-Path (Join-Path $TestDrive ".agents/skills/brainstorming/SKILL.md") | Should -Be $true
+    ((Get-Content -LiteralPath (Join-Path $TestDrive ".agents/skills/brainstorming/SKILL.md") -Raw) -replace '\r?\n$', '') | Should -Be "# brainstorming"
+    ((Get-Content -LiteralPath (Join-Path $TestDrive ".agents/skills/brainstorming/references/note.md") -Raw) -replace '\r?\n$', '') | Should -Be "local"
     Test-Path (Join-Path $TestDrive ".agents/skills/existing-skill/SKILL.md") | Should -Be $true
-    Test-Path (Join-Path $TestDrive ".agents/skills/superpowers-brainstorming/old.md") | Should -Be $true
-    Test-Path (Join-Path $TestDrive ".codex/skills/superpowers-brainstorming/SKILL.md") | Should -Be $true
+    Test-Path (Join-Path $TestDrive ".agents/skills/brainstorming/old.md") | Should -Be $true
+    Test-Path (Join-Path $TestDrive ".codex/skills/brainstorming/SKILL.md") | Should -Be $true
   }
 
   It "smoke-audits the workspace manifest via temp install" {
