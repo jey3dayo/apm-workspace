@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-07-15T11:07:52.015729+00:00'
+generated_at: '2026-07-15T15:51:36.791790+00:00'
 apm_version: 0.22.0
 dependencies:
 - repo_url: Jakubantalik/transitions-dev
@@ -72,10 +72,10 @@ dependencies:
     .claude/skills/transitions-dev/_root.css: sha256:6ed248a269da79f623729708dabcc3719485d400615a0d91b9f5e9fd307aa33f
   content_hash: sha256:8cf9ba1ed0d52741e4ed1dafc6ee4543e32f1e516f958d750e81412bfc36dd13
 - repo_url: Lum1104/Understand-Anything
-  name: Understand-Anything
+  name: understand
   host: github.com
-  resolved_commit: fbc1b8208adb0b3aa331183a05ec02f115f586ef
-  version: unknown
+  resolved_commit: 83a9b288b96046fdade7b11301424ba08a5def6a
+  version: 1.0.0
   virtual_path: understand-anything-plugin/skills/understand
   is_virtual: true
   package_type: claude_skill
@@ -285,10 +285,10 @@ dependencies:
     .claude/skills/understand/scan-project.mjs: sha256:10bd886733a6f5e91c3698ccba9997d71115367ceb3ba628d233b46493ba7a4a
   content_hash: sha256:4f892bda3867af034ef21e464487f32bb1537fcd02981c0a196c690a937351c3
 - repo_url: Lum1104/Understand-Anything
-  name: Understand-Anything
+  name: understand-dashboard
   host: github.com
-  resolved_commit: fbc1b8208adb0b3aa331183a05ec02f115f586ef
-  version: unknown
+  resolved_commit: 83a9b288b96046fdade7b11301424ba08a5def6a
+  version: 1.0.0
   virtual_path: understand-anything-plugin/skills/understand-dashboard
   is_virtual: true
   package_type: claude_skill
@@ -302,10 +302,10 @@ dependencies:
     .claude/skills/understand-dashboard/SKILL.md: sha256:d12cb059d8e6139873542111ccec691b0603496675182f5ac826d5b65273331a
   content_hash: sha256:5e3ac7994d20f16f8232164dbec7998b62073a5547fcfc0b0baba82cb48bed0a
 - repo_url: anthropics/claude-code
-  name: claude-code
+  name: frontend-design
   host: github.com
-  resolved_commit: 1fb278b85d4546c7c04db3b3590e031b5a8a7571
-  version: unknown
+  resolved_commit: b7784f2c63ed4585c32bc20b94d3b64cf4fe6df3
+  version: 1.0.0
   virtual_path: plugins/frontend-design/skills/frontend-design
   is_virtual: true
   package_type: claude_skill
@@ -584,10 +584,10 @@ dependencies:
     .claude/skills/humanizer-ja/SKILL.md: sha256:3fe07f06a179801d7445eff19ed40f1681ef9860665c50c1e9a032f6dffead89
   content_hash: sha256:b6da4ef92a941ab364ab1ddf259d9e511e098a0719f7ee2202847351c34a8194
 - repo_url: ibelick/ui-skills
-  name: ui-skills
+  name: baseline-ui
   host: github.com
-  resolved_commit: 173c01add287eee975c40cb0e7f6d85a48c9ed75
-  version: unknown
+  resolved_commit: 75e6ffc712a553ae1ce647d7c677f24e2ceeeda9
+  version: 1.0.0
   virtual_path: skills/baseline-ui
   is_virtual: true
   package_type: claude_skill
@@ -601,10 +601,10 @@ dependencies:
     .claude/skills/baseline-ui/SKILL.md: sha256:fea3322f36d58fdafafce2aef56e4556dd2ac7b20876b7dff7d8be7f25fa597f
   content_hash: sha256:dfcb3e778b57ad1cba92375689bb8265fa5aef78fba523a744f5220b3c619901
 - repo_url: ibelick/ui-skills
-  name: ui-skills
+  name: fixing-accessibility
   host: github.com
-  resolved_commit: 173c01add287eee975c40cb0e7f6d85a48c9ed75
-  version: unknown
+  resolved_commit: 75e6ffc712a553ae1ce647d7c677f24e2ceeeda9
+  version: 1.0.0
   virtual_path: skills/fixing-accessibility
   is_virtual: true
   package_type: claude_skill
@@ -618,10 +618,10 @@ dependencies:
     .claude/skills/fixing-accessibility/SKILL.md: sha256:549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf
   content_hash: sha256:4fa8f5a772b4eef3d28a54c136b507d070e54e2c326578f65eaf5e5a0118b38a
 - repo_url: ibelick/ui-skills
-  name: ui-skills
+  name: fixing-metadata
   host: github.com
-  resolved_commit: 173c01add287eee975c40cb0e7f6d85a48c9ed75
-  version: unknown
+  resolved_commit: 75e6ffc712a553ae1ce647d7c677f24e2ceeeda9
+  version: 1.0.0
   virtual_path: skills/fixing-metadata
   is_virtual: true
   package_type: claude_skill
@@ -635,10 +635,10 @@ dependencies:
     .claude/skills/fixing-metadata/SKILL.md: sha256:b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547
   content_hash: sha256:699e13890fb50acffa02dfd2d5b0e719bd916a9e2b7e6035bdc4513fc73d9174
 - repo_url: ibelick/ui-skills
-  name: ui-skills
+  name: fixing-motion-performance
   host: github.com
-  resolved_commit: 173c01add287eee975c40cb0e7f6d85a48c9ed75
-  version: unknown
+  resolved_commit: 75e6ffc712a553ae1ce647d7c677f24e2ceeeda9
+  version: 1.0.0
   virtual_path: skills/fixing-motion-performance
   is_virtual: true
   package_type: claude_skill
@@ -654,7 +654,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: 65f4ef28279caaddbedca02272da317a6ece804f
+  resolved_commit: 94e32bfea1455c826220b16f7203a5196565fde2
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -1138,7 +1138,7 @@ dependencies:
     .agents/skills/apm-repo-bootstrap/SKILL.md: sha256:c340f3997daf9ece1d6a0b6d02770948171549d69ccceebafd0f5cc68f995248
     .agents/skills/apm-repo-bootstrap/agents/openai.yaml: sha256:faed36da8f7980b88e395eb9aae322a9fc608e0c555ba93f843f6007ab50da19
     .agents/skills/apm-repo-bootstrap/references/recommendations.md: sha256:0fbd9a6d9656f05438834d6224a79a819bbc6933af7dc90835858263175b9c23
-    .agents/skills/apm-usage/SKILL.md: sha256:99e58c79398f8a0776c2f546e01acc1e0a4f6b9f6fbdbbb3ca1c17f9cc19b245
+    .agents/skills/apm-usage/SKILL.md: sha256:ba40469d268e3062d44452fe0318c258d59f87866f08a772a1361ff76134af88
     .agents/skills/apm-usage/agents/openai.yaml: sha256:b3743dad4fcd9f3c209210c40df277e75d949ac7ce1713a61d497cc1e7e3ba83
     .agents/skills/apm-usage/references/repo-local-mcp.md: sha256:adac5e0d08543b1dd95b5e7fefd113cd537be290146d9f367cafb51cac89ee41
     .agents/skills/architecture-boundary-docs/SKILL.md: sha256:a1ff83850e0cf330529b2f94436714692d933b80b780a08a21263679fe393d2e
@@ -1333,7 +1333,7 @@ dependencies:
     .claude/skills/apm-repo-bootstrap/SKILL.md: sha256:c340f3997daf9ece1d6a0b6d02770948171549d69ccceebafd0f5cc68f995248
     .claude/skills/apm-repo-bootstrap/agents/openai.yaml: sha256:faed36da8f7980b88e395eb9aae322a9fc608e0c555ba93f843f6007ab50da19
     .claude/skills/apm-repo-bootstrap/references/recommendations.md: sha256:0fbd9a6d9656f05438834d6224a79a819bbc6933af7dc90835858263175b9c23
-    .claude/skills/apm-usage/SKILL.md: sha256:99e58c79398f8a0776c2f546e01acc1e0a4f6b9f6fbdbbb3ca1c17f9cc19b245
+    .claude/skills/apm-usage/SKILL.md: sha256:ba40469d268e3062d44452fe0318c258d59f87866f08a772a1361ff76134af88
     .claude/skills/apm-usage/agents/openai.yaml: sha256:b3743dad4fcd9f3c209210c40df277e75d949ac7ce1713a61d497cc1e7e3ba83
     .claude/skills/apm-usage/references/repo-local-mcp.md: sha256:adac5e0d08543b1dd95b5e7fefd113cd537be290146d9f367cafb51cac89ee41
     .claude/skills/architecture-boundary-docs/SKILL.md: sha256:a1ff83850e0cf330529b2f94436714692d933b80b780a08a21263679fe393d2e
@@ -1520,11 +1520,11 @@ dependencies:
     .claude/skills/work-log-maintenance/SKILL.md: sha256:26f4064ff1c0e757e415121675d6caaecd30040f95304e6ed4cd4c73e022f3f9
     .claude/skills/work-log-maintenance/agents/openai.yaml: sha256:e951b8256a5a1b032bcca3c7105230f5041467594434ca23b562b8ec5ec4abc8
     .claude/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
-  content_hash: sha256:625acee378aa055c5cc56af78faff995997766af8359ef5130b8733f32313393
+  content_hash: sha256:80f4c8fe6a4787dbacb62bee0a25e90451720c4764a1a70a5407435a11086543
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
-  resolved_commit: 65f4ef28279caaddbedca02272da317a6ece804f
+  resolved_commit: 94e32bfea1455c826220b16f7203a5196565fde2
   resolved_ref: main
   version: 1.0.0
   virtual_path: manual-skills
@@ -1532,10 +1532,10 @@ dependencies:
   package_type: apm_package
   content_hash: sha256:c9adaaf42924bc9edc428c03d4ed3465bdd46305c3437d5f4b1d1ee4346c69fe
 - repo_url: langchain-ai/deepagents
-  name: deepagents
+  name: web-research
   host: github.com
-  resolved_commit: 22d50456324e9b8c0121a3a06787e19c1b88e1aa
-  version: unknown
+  resolved_commit: dacc8b0eadb504a6ddb0d61f84d598a06b45e3a1
+  version: 1.0.0
   virtual_path: libs/cli/examples/skills/web-research
   is_virtual: true
   package_type: claude_skill
@@ -1549,10 +1549,10 @@ dependencies:
     .claude/skills/web-research/SKILL.md: sha256:7c2b1f1990370f7ce176fe3608a67028c72db11e337b4ba83b8fce6d927dfde3
   content_hash: sha256:2b66d5db8c8d70474e70638f437f324fb3af3724b71bf8501e48c8004e70e677
 - repo_url: mattpocock/skills
-  name: skills
+  name: grill-with-docs
   host: github.com
-  resolved_commit: 66898f60e8c744e269f8ce06c2b2b99ce7660d5f
-  version: unknown
+  resolved_commit: e9fcdf95b402d360f90f1db8d776d5dd450f9234
+  version: 1.0.0
   virtual_path: skills/engineering/grill-with-docs
   is_virtual: true
   package_type: claude_skill
@@ -1570,10 +1570,10 @@ dependencies:
     .claude/skills/grill-with-docs/agents/openai.yaml: sha256:94cd0ab161fb468a836349f5ed482ba58ce8e709a05c57ce533d739dbd35cca9
   content_hash: sha256:c3a266bcc09eab29358eaae6e288f9a2cd492fd0af2bcaeeec55fd6207da9a89
 - repo_url: mattpocock/skills
-  name: skills
+  name: wayfinder
   host: github.com
-  resolved_commit: 66898f60e8c744e269f8ce06c2b2b99ce7660d5f
-  version: unknown
+  resolved_commit: e9fcdf95b402d360f90f1db8d776d5dd450f9234
+  version: 1.0.0
   virtual_path: skills/engineering/wayfinder
   is_virtual: true
   package_type: claude_skill
@@ -1591,10 +1591,10 @@ dependencies:
     .claude/skills/wayfinder/agents/openai.yaml: sha256:88bc81a11a6d52ac67aeaa76b8b619e387020d47c5133a4dd4927fd15c4ad073
   content_hash: sha256:d4e1b0fa933e7377d97193e52626b880a8c1b441894fbec03f3ff0cb939e70c7
 - repo_url: mattpocock/skills
-  name: skills
+  name: grilling
   host: github.com
-  resolved_commit: 66898f60e8c744e269f8ce06c2b2b99ce7660d5f
-  version: unknown
+  resolved_commit: e9fcdf95b402d360f90f1db8d776d5dd450f9234
+  version: 1.0.0
   virtual_path: skills/productivity/grilling
   is_virtual: true
   package_type: claude_skill
@@ -1612,10 +1612,10 @@ dependencies:
     .claude/skills/grilling/agents/openai.yaml: sha256:cf29b9a8dbf35a58a908a6ca4f64dcd86c2b2130291eee0a78b9f706b138825b
   content_hash: sha256:1f05b0ffe26fb4d4457e3e40b41ec2f3e379ae2d6877613240bc6ffef5f7f338
 - repo_url: mattpocock/skills
-  name: skills
+  name: handoff
   host: github.com
-  resolved_commit: 66898f60e8c744e269f8ce06c2b2b99ce7660d5f
-  version: unknown
+  resolved_commit: e9fcdf95b402d360f90f1db8d776d5dd450f9234
+  version: 1.0.0
   virtual_path: skills/productivity/handoff
   is_virtual: true
   package_type: claude_skill
@@ -1633,10 +1633,10 @@ dependencies:
     .claude/skills/handoff/agents/openai.yaml: sha256:5c479fd562c691851690e8b18c8501045bef0943c10743d636b2fae26add1d28
   content_hash: sha256:89e3d3e72b94973b557120eee18232218691989f53564f9e163467e6d377d5a8
 - repo_url: mattpocock/skills
-  name: skills
+  name: writing-great-skills
   host: github.com
-  resolved_commit: 66898f60e8c744e269f8ce06c2b2b99ce7660d5f
-  version: unknown
+  resolved_commit: e9fcdf95b402d360f90f1db8d776d5dd450f9234
+  version: 1.0.0
   virtual_path: skills/productivity/writing-great-skills
   is_virtual: true
   package_type: claude_skill
@@ -1660,8 +1660,8 @@ dependencies:
 - repo_url: millionco/react-doctor
   name: react-doctor
   host: github.com
-  resolved_commit: 71e6da6897e47a99329c7477a05b1562e023f1d6
-  version: unknown
+  resolved_commit: 3e6dcfc21712a8cdb7a43ac63c0ed466039852e1
+  version: 1.0.0
   virtual_path: skills/react-doctor
   is_virtual: true
   package_type: claude_skill
@@ -1679,10 +1679,10 @@ dependencies:
     .claude/skills/react-doctor/references/explain.md: sha256:2382ea820f203d7e16e8102a7fa55c5ce315fdd4591a0638e95d863166834ef2
   content_hash: sha256:cdb0f2247aa09a5d8e2816b12a12582dd3775734923eee1284fe31fd44670fd4
 - repo_url: mizchi/skills
-  name: skills
+  name: empirical-prompt-tuning
   host: github.com
-  resolved_commit: 5aaf2d126a04a8b079fd5184eb1860f232afffd3
-  version: unknown
+  resolved_commit: 7a0d72866a0bb3e9ac3e2768c328b09ba2bc40c4
+  version: 1.0.0
   virtual_path: meta/empirical-prompt-tuning
   is_virtual: true
   package_type: claude_skill
@@ -1704,10 +1704,10 @@ dependencies:
     .claude/skills/empirical-prompt-tuning/SKILL.md: sha256:252418e7ef022981d2dda2e3ec57fa1c786d30af68c50b7e062edf1d7361b0cb
   content_hash: sha256:20e7fba93c7267ba6e3a7b27787ca49191b762dffcfb804b01da9183b1b0c891
 - repo_url: modem-dev/hunk
-  name: hunk
+  name: hunk-review
   host: github.com
-  resolved_commit: 4fdf4bc1e26f6fdceeced81bf7bae8f9bcb8588a
-  version: unknown
+  resolved_commit: e098b3a3dc12143aafad3582ac9096b5c8db646b
+  version: 1.0.0
   virtual_path: skills/hunk-review
   is_virtual: true
   package_type: claude_skill
@@ -1717,14 +1717,14 @@ dependencies:
   - .claude/skills/hunk-review
   - .claude/skills/hunk-review/SKILL.md
   deployed_file_hashes:
-    .agents/skills/hunk-review/SKILL.md: sha256:22ba96f09771f74ad4db81873b4174f38edcd86a53b7af5f90a0359612a0b33c
-    .claude/skills/hunk-review/SKILL.md: sha256:22ba96f09771f74ad4db81873b4174f38edcd86a53b7af5f90a0359612a0b33c
-  content_hash: sha256:1ceb9a909ce1b50e0d84cc584e74ba2af7e65717c6394285c2dc7db16019fa62
+    .agents/skills/hunk-review/SKILL.md: sha256:2480c62d4c1caad05e6a039d6ead77e5dd05a671d63674049878bc953d4f259f
+    .claude/skills/hunk-review/SKILL.md: sha256:2480c62d4c1caad05e6a039d6ead77e5dd05a671d63674049878bc953d4f259f
+  content_hash: sha256:ee2110b33c1d0f208e8635c7848ca715373bfc62b105cc90c93d1d849c1ca2ef
 - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
   name: ui-ux-pro-max
   host: github.com
-  resolved_commit: e2964b533eb35f532072732731dbe8075d09b069
-  version: 2.6.2
+  resolved_commit: f8ac5e1266dba8354ea96e19994d9f4345e7ec31
+  version: 2.11.0
   package_type: marketplace_plugin
   deployed_files:
   - .agents/skills/brand
@@ -1929,8 +1929,10 @@ dependencies:
   - .agents/skills/ui-ux-pro-max/data/react-performance.csv
   - .agents/skills/ui-ux-pro-max/data/stacks/angular.csv
   - .agents/skills/ui-ux-pro-max/data/stacks/astro.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/avalonia.csv
   - .agents/skills/ui-ux-pro-max/data/stacks/flutter.csv
   - .agents/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/javafx.csv
   - .agents/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv
   - .agents/skills/ui-ux-pro-max/data/stacks/laravel.csv
   - .agents/skills/ui-ux-pro-max/data/stacks/nextjs.csv
@@ -1942,14 +1944,22 @@ dependencies:
   - .agents/skills/ui-ux-pro-max/data/stacks/svelte.csv
   - .agents/skills/ui-ux-pro-max/data/stacks/swiftui.csv
   - .agents/skills/ui-ux-pro-max/data/stacks/threejs.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/uno.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/uwp.csv
   - .agents/skills/ui-ux-pro-max/data/stacks/vue.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/winui.csv
+  - .agents/skills/ui-ux-pro-max/data/stacks/wpf.csv
   - .agents/skills/ui-ux-pro-max/data/styles.csv
   - .agents/skills/ui-ux-pro-max/data/typography.csv
   - .agents/skills/ui-ux-pro-max/data/ui-reasoning.csv
   - .agents/skills/ui-ux-pro-max/data/ux-guidelines.csv
+  - .agents/skills/ui-ux-pro-max/references/pro-rules.md
+  - .agents/skills/ui-ux-pro-max/references/quick-reference.md
   - .agents/skills/ui-ux-pro-max/scripts/core.py
   - .agents/skills/ui-ux-pro-max/scripts/design_system.py
   - .agents/skills/ui-ux-pro-max/scripts/search.py
+  - .agents/skills/ui-ux-pro-max/scripts/tests/test_core.py
+  - .agents/skills/ui-ux-pro-max/scripts/validate_data.py
   - .claude/skills/brand
   - .claude/skills/brand/SKILL.md
   - .claude/skills/brand/references/approval-checklist.md
@@ -2152,8 +2162,10 @@ dependencies:
   - .claude/skills/ui-ux-pro-max/data/react-performance.csv
   - .claude/skills/ui-ux-pro-max/data/stacks/angular.csv
   - .claude/skills/ui-ux-pro-max/data/stacks/astro.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/avalonia.csv
   - .claude/skills/ui-ux-pro-max/data/stacks/flutter.csv
   - .claude/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/javafx.csv
   - .claude/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv
   - .claude/skills/ui-ux-pro-max/data/stacks/laravel.csv
   - .claude/skills/ui-ux-pro-max/data/stacks/nextjs.csv
@@ -2165,14 +2177,22 @@ dependencies:
   - .claude/skills/ui-ux-pro-max/data/stacks/svelte.csv
   - .claude/skills/ui-ux-pro-max/data/stacks/swiftui.csv
   - .claude/skills/ui-ux-pro-max/data/stacks/threejs.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/uno.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/uwp.csv
   - .claude/skills/ui-ux-pro-max/data/stacks/vue.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/winui.csv
+  - .claude/skills/ui-ux-pro-max/data/stacks/wpf.csv
   - .claude/skills/ui-ux-pro-max/data/styles.csv
   - .claude/skills/ui-ux-pro-max/data/typography.csv
   - .claude/skills/ui-ux-pro-max/data/ui-reasoning.csv
   - .claude/skills/ui-ux-pro-max/data/ux-guidelines.csv
+  - .claude/skills/ui-ux-pro-max/references/pro-rules.md
+  - .claude/skills/ui-ux-pro-max/references/quick-reference.md
   - .claude/skills/ui-ux-pro-max/scripts/core.py
   - .claude/skills/ui-ux-pro-max/scripts/design_system.py
   - .claude/skills/ui-ux-pro-max/scripts/search.py
+  - .claude/skills/ui-ux-pro-max/scripts/tests/test_core.py
+  - .claude/skills/ui-ux-pro-max/scripts/validate_data.py
   deployed_file_hashes:
     .agents/skills/brand/SKILL.md: sha256:6a450ee1a83a403d47cec2ede9030feb60a67a81fc425d2406e975339313bd44
     .agents/skills/brand/references/approval-checklist.md: sha256:4bf8549687f53a7b9684005b4b87de93c26f018e00609b4c506a5812abd13d20
@@ -2358,39 +2378,49 @@ dependencies:
     .agents/skills/ui-styling/scripts/tests/requirements.txt: sha256:80846c98ee02a7e9651ec4eee6709f840b785646b469aad5284ab7ab9b344f17
     .agents/skills/ui-styling/scripts/tests/test_shadcn_add.py: sha256:4012b1efe1e51a5dcf31078b0d9069f92cfe2045e9a35dd52fdd4631b1815150
     .agents/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py: sha256:4efa59fdbe318d55e6a452d85401db5d1aa4504f93739878bb40d8bb504af585
-    .agents/skills/ui-ux-pro-max/SKILL.md: sha256:360d09d9a3099c5e94fc725e8cb85753d210162e4c7822c9003d8c5f38899d15
+    .agents/skills/ui-ux-pro-max/SKILL.md: sha256:305a7527fcb2f5b6e4129ab22cd839b5172d26df7f14d3324bfdec8fc1763560
     .agents/skills/ui-ux-pro-max/data/app-interface.csv: sha256:2a17ef810dab715ce1f339861817a8fbe3ccc38142b70517301e874803e838ac
     .agents/skills/ui-ux-pro-max/data/charts.csv: sha256:a70ef7460b0eaaea8614f86a0d09a4bc38b467804179762464b5ca45b491baac
-    .agents/skills/ui-ux-pro-max/data/colors.csv: sha256:5a6cb6c5d6f19b5f5e51865ae1e643e4baa05d04304d0bab976f064632149a6a
+    .agents/skills/ui-ux-pro-max/data/colors.csv: sha256:cb26759805217edaaa31b09836aec09eab0fe245c58f5884e9a16ef802c6e26a
     .agents/skills/ui-ux-pro-max/data/google-fonts.csv: sha256:3fd2898fb0fdd31ba758bf05cfcd2b58cd0f038a20cf08e417d09e5a8a4a509e
     .agents/skills/ui-ux-pro-max/data/icons.csv: sha256:f376c29fb4df37b4bdb366a5aa70cb211ba3dd8b435390aaa03152a64b07d2e8
     .agents/skills/ui-ux-pro-max/data/landing.csv: sha256:121a2cac7cf21050234b5f80e7b4e182f10123536032e0f9ad862ad3aec9677d
-    .agents/skills/ui-ux-pro-max/data/motion.csv: sha256:528be03324785eb568c9570f5d60fc1644d5bc7ce2cbdd21b648cb90ce74e76e
-    .agents/skills/ui-ux-pro-max/data/products.csv: sha256:9fd9e776ba847cf44c1ea78f95fe5e33b2c56bb7e186e3cfff9c49bc7fcb691b
+    .agents/skills/ui-ux-pro-max/data/motion.csv: sha256:6452fbd8028ab71d52993775340e1bc40a150d92be8d4b4cb8710620fd1a7512
+    .agents/skills/ui-ux-pro-max/data/products.csv: sha256:e9749e4fd8f7d4c94919c25ebd347a4adaddb671e7b01d33fbc2c87d447e6667
     .agents/skills/ui-ux-pro-max/data/react-performance.csv: sha256:904c8afcda229629545912dde0e8ac37503757131f0169f80b016f1f58c4fd3f
-    .agents/skills/ui-ux-pro-max/data/stacks/angular.csv: sha256:dd7cc2a2b34cd8f0508bd05b067545e7a44f7724440c432d491d92a61a8fb6c1
-    .agents/skills/ui-ux-pro-max/data/stacks/astro.csv: sha256:ad18dae3ab6d148d37d144592df80dc1825b6c9e86d9d2d68fdda77434206a37
+    .agents/skills/ui-ux-pro-max/data/stacks/angular.csv: sha256:9de35bbda536ced9af7642d88b7675cefa3e18c370ab40c0875f75ab473f0fd6
+    .agents/skills/ui-ux-pro-max/data/stacks/astro.csv: sha256:6b587e32df201b6e5e7b2ed187b65eee8e6d55dcd6cc16bde29fc25e0f911dae
+    .agents/skills/ui-ux-pro-max/data/stacks/avalonia.csv: sha256:6bfa40ec6609fcb59e52a38281edcc3a3e5b5e56341304fe5628b32cb9b1f875
     .agents/skills/ui-ux-pro-max/data/stacks/flutter.csv: sha256:fe36d404c799781e8ba6e9a8179b45799ed5126a545528550cd2eb0f2346e8c5
     .agents/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv: sha256:7aef38e75c53559470afcfa91580a9917ca8b7dbf8b92110389e23e93703ac52
+    .agents/skills/ui-ux-pro-max/data/stacks/javafx.csv: sha256:5545e331b2479eb431ca45203799ce1b0ab1e369045ab7735d5a9f85ec78f956
     .agents/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv: sha256:6c8fd4b0391c342c12b0af15610cd5becbeccaef0bbe8dcfc01d928c3195d93e
-    .agents/skills/ui-ux-pro-max/data/stacks/laravel.csv: sha256:50e11e60a64b30f329af25ae71f4b8bbdb43bafc1865451b74f9f540a88964d5
+    .agents/skills/ui-ux-pro-max/data/stacks/laravel.csv: sha256:3e9f551b5232136f7b5ce1304c5e1bf5a83bd63c0dc02afb37502b238772d145
     .agents/skills/ui-ux-pro-max/data/stacks/nextjs.csv: sha256:e828ccc04843742f52f545a068e8a9ab0d2b97c0e771f7e93bf0cef74da05554
-    .agents/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv: sha256:05d6e74501b2b6a636faed32450622759f49a5bcafad971f5f4e7eba0eb7be71
+    .agents/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv: sha256:b9972b31e721faabc667ee2b4e93ba2af29e1df86f186c2ff608b68370f0e3a5
     .agents/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv: sha256:f7a3f2d9542856d00199f85c6c023b7c284cc698e2e6e12d61afce2edacb24d6
     .agents/skills/ui-ux-pro-max/data/stacks/react-native.csv: sha256:077aefc81d194895ecf7936b3ed298b978e36961f183e3a275f8acda19b5f621
     .agents/skills/ui-ux-pro-max/data/stacks/react.csv: sha256:e5624ab41d33427d88e41d07581ce4eca59b37b36ab72a6ad43a9c8e2d0a1c72
     .agents/skills/ui-ux-pro-max/data/stacks/shadcn.csv: sha256:395c2e415ef6f48a474acccdc8eb2c7258a6ed751a5037ba171a2d8823e02ded
     .agents/skills/ui-ux-pro-max/data/stacks/svelte.csv: sha256:71af52d64f266c88070b91dbbaa900c2f8074b6baae9f35eaea6ba9cec6fd803
     .agents/skills/ui-ux-pro-max/data/stacks/swiftui.csv: sha256:c9c2d2510f8e66281a2514e8dd0125a6b653b9ef53a71281b5e7dfe003d5b569
-    .agents/skills/ui-ux-pro-max/data/stacks/threejs.csv: sha256:f1c05f8f269fc4784170c837f4ff43b50042f00bbd6ba7dbef2896081a052544
+    .agents/skills/ui-ux-pro-max/data/stacks/threejs.csv: sha256:c74d6ba76021f8d72c0ed12c559caecfeb6961829242acf6bcb9e99926b1a396
+    .agents/skills/ui-ux-pro-max/data/stacks/uno.csv: sha256:5d2e0f396bb9dc5a2661204264cc0eda7cc4fa3d78152dec89d668704a41b8fc
+    .agents/skills/ui-ux-pro-max/data/stacks/uwp.csv: sha256:debf669928871261ced9333788d5afd5784377ea1fa1b4f53993dd8f1574c0fc
     .agents/skills/ui-ux-pro-max/data/stacks/vue.csv: sha256:c2724915d3c11cd67263f25896cff721f787a0fdd8326002d31e9f5806dfd8f8
-    .agents/skills/ui-ux-pro-max/data/styles.csv: sha256:f37eb20e7403a715d440efd45ce6952ea6a445d6143fd130c52e219a4bec9911
-    .agents/skills/ui-ux-pro-max/data/typography.csv: sha256:dbea262a54e3bfa2e6c3b15989a365d5ef4c43349316aff46635e82ca825adce
+    .agents/skills/ui-ux-pro-max/data/stacks/winui.csv: sha256:2d970b08e44509d7afa53ce7feb446930b2d5e0667fa637df9aeeed65c42bbbe
+    .agents/skills/ui-ux-pro-max/data/stacks/wpf.csv: sha256:ca78b5f28dc50d66900548d602d74856400097284c73e076fcfbb5a38ae5083c
+    .agents/skills/ui-ux-pro-max/data/styles.csv: sha256:1bf9c1d8484a0a7a54fb67555902380446865b604c8449e47a449cb3d9c1ef88
+    .agents/skills/ui-ux-pro-max/data/typography.csv: sha256:7abead73de0e43e09544f164cb60cd431674e411f1e063e555a8b44d51273328
     .agents/skills/ui-ux-pro-max/data/ui-reasoning.csv: sha256:06e4369445388ba9b7a57347510b125b7a2145bbf8546a327ba50292503b204a
     .agents/skills/ui-ux-pro-max/data/ux-guidelines.csv: sha256:e01943c433b2cad3040f19389b3b0455673758a569b7a927b5bedf65c989cb96
-    .agents/skills/ui-ux-pro-max/scripts/core.py: sha256:ab9f398b493e34404448cefc766239ee86119c7a21d8581ba965cabdc698b0a8
-    .agents/skills/ui-ux-pro-max/scripts/design_system.py: sha256:db272c6649322e383714c73305705101fe1d44c15bd64556d5a515b1c419c2d2
-    .agents/skills/ui-ux-pro-max/scripts/search.py: sha256:d9983d2a21d330b6b696480940fd78029f7b34027814f2ac1cf17c5d0b042407
+    .agents/skills/ui-ux-pro-max/references/pro-rules.md: sha256:bc56db7cb40c5f4d8d4f6229f5c7072865278488fe5b97c76d3a38eb596da4fc
+    .agents/skills/ui-ux-pro-max/references/quick-reference.md: sha256:b01ad594cc069d18786d5e8865356cc511226ba6f48d328fd975d31aae8e5781
+    .agents/skills/ui-ux-pro-max/scripts/core.py: sha256:64c149019196ee24647464a27278eb96d3b4638ded73ebfc35ccd2bc99c083a9
+    .agents/skills/ui-ux-pro-max/scripts/design_system.py: sha256:fcdb279eb9691dffd6c80c333d29a4e5567368e38d724520c60013c8b1aaf242
+    .agents/skills/ui-ux-pro-max/scripts/search.py: sha256:69a349d69543f35f45a12c0c82922c550d1b0a16a2b37f6b1406afb2ad2919c8
+    .agents/skills/ui-ux-pro-max/scripts/tests/test_core.py: sha256:ce60ac571164cf35e8c866550ad989fa686706a56fa48df4fdf76444b94fdd8d
+    .agents/skills/ui-ux-pro-max/scripts/validate_data.py: sha256:f1b5e0916f3c2f8271416f93f6ff9ebf3311a68a943a19c1b83f16823cbb05a7
     .claude/skills/brand/SKILL.md: sha256:6a450ee1a83a403d47cec2ede9030feb60a67a81fc425d2406e975339313bd44
     .claude/skills/brand/references/approval-checklist.md: sha256:4bf8549687f53a7b9684005b4b87de93c26f018e00609b4c506a5812abd13d20
     .claude/skills/brand/references/asset-organization.md: sha256:de98123417e9c5a1cc71a78131bba979c4c8ed2e5289e6c7a7f166576e488101
@@ -2575,40 +2605,50 @@ dependencies:
     .claude/skills/ui-styling/scripts/tests/requirements.txt: sha256:80846c98ee02a7e9651ec4eee6709f840b785646b469aad5284ab7ab9b344f17
     .claude/skills/ui-styling/scripts/tests/test_shadcn_add.py: sha256:4012b1efe1e51a5dcf31078b0d9069f92cfe2045e9a35dd52fdd4631b1815150
     .claude/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py: sha256:4efa59fdbe318d55e6a452d85401db5d1aa4504f93739878bb40d8bb504af585
-    .claude/skills/ui-ux-pro-max/SKILL.md: sha256:360d09d9a3099c5e94fc725e8cb85753d210162e4c7822c9003d8c5f38899d15
+    .claude/skills/ui-ux-pro-max/SKILL.md: sha256:305a7527fcb2f5b6e4129ab22cd839b5172d26df7f14d3324bfdec8fc1763560
     .claude/skills/ui-ux-pro-max/data/app-interface.csv: sha256:2a17ef810dab715ce1f339861817a8fbe3ccc38142b70517301e874803e838ac
     .claude/skills/ui-ux-pro-max/data/charts.csv: sha256:a70ef7460b0eaaea8614f86a0d09a4bc38b467804179762464b5ca45b491baac
-    .claude/skills/ui-ux-pro-max/data/colors.csv: sha256:5a6cb6c5d6f19b5f5e51865ae1e643e4baa05d04304d0bab976f064632149a6a
+    .claude/skills/ui-ux-pro-max/data/colors.csv: sha256:cb26759805217edaaa31b09836aec09eab0fe245c58f5884e9a16ef802c6e26a
     .claude/skills/ui-ux-pro-max/data/google-fonts.csv: sha256:3fd2898fb0fdd31ba758bf05cfcd2b58cd0f038a20cf08e417d09e5a8a4a509e
     .claude/skills/ui-ux-pro-max/data/icons.csv: sha256:f376c29fb4df37b4bdb366a5aa70cb211ba3dd8b435390aaa03152a64b07d2e8
     .claude/skills/ui-ux-pro-max/data/landing.csv: sha256:121a2cac7cf21050234b5f80e7b4e182f10123536032e0f9ad862ad3aec9677d
-    .claude/skills/ui-ux-pro-max/data/motion.csv: sha256:528be03324785eb568c9570f5d60fc1644d5bc7ce2cbdd21b648cb90ce74e76e
-    .claude/skills/ui-ux-pro-max/data/products.csv: sha256:9fd9e776ba847cf44c1ea78f95fe5e33b2c56bb7e186e3cfff9c49bc7fcb691b
+    .claude/skills/ui-ux-pro-max/data/motion.csv: sha256:6452fbd8028ab71d52993775340e1bc40a150d92be8d4b4cb8710620fd1a7512
+    .claude/skills/ui-ux-pro-max/data/products.csv: sha256:e9749e4fd8f7d4c94919c25ebd347a4adaddb671e7b01d33fbc2c87d447e6667
     .claude/skills/ui-ux-pro-max/data/react-performance.csv: sha256:904c8afcda229629545912dde0e8ac37503757131f0169f80b016f1f58c4fd3f
-    .claude/skills/ui-ux-pro-max/data/stacks/angular.csv: sha256:dd7cc2a2b34cd8f0508bd05b067545e7a44f7724440c432d491d92a61a8fb6c1
-    .claude/skills/ui-ux-pro-max/data/stacks/astro.csv: sha256:ad18dae3ab6d148d37d144592df80dc1825b6c9e86d9d2d68fdda77434206a37
+    .claude/skills/ui-ux-pro-max/data/stacks/angular.csv: sha256:9de35bbda536ced9af7642d88b7675cefa3e18c370ab40c0875f75ab473f0fd6
+    .claude/skills/ui-ux-pro-max/data/stacks/astro.csv: sha256:6b587e32df201b6e5e7b2ed187b65eee8e6d55dcd6cc16bde29fc25e0f911dae
+    .claude/skills/ui-ux-pro-max/data/stacks/avalonia.csv: sha256:6bfa40ec6609fcb59e52a38281edcc3a3e5b5e56341304fe5628b32cb9b1f875
     .claude/skills/ui-ux-pro-max/data/stacks/flutter.csv: sha256:fe36d404c799781e8ba6e9a8179b45799ed5126a545528550cd2eb0f2346e8c5
     .claude/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv: sha256:7aef38e75c53559470afcfa91580a9917ca8b7dbf8b92110389e23e93703ac52
+    .claude/skills/ui-ux-pro-max/data/stacks/javafx.csv: sha256:5545e331b2479eb431ca45203799ce1b0ab1e369045ab7735d5a9f85ec78f956
     .claude/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv: sha256:6c8fd4b0391c342c12b0af15610cd5becbeccaef0bbe8dcfc01d928c3195d93e
-    .claude/skills/ui-ux-pro-max/data/stacks/laravel.csv: sha256:50e11e60a64b30f329af25ae71f4b8bbdb43bafc1865451b74f9f540a88964d5
+    .claude/skills/ui-ux-pro-max/data/stacks/laravel.csv: sha256:3e9f551b5232136f7b5ce1304c5e1bf5a83bd63c0dc02afb37502b238772d145
     .claude/skills/ui-ux-pro-max/data/stacks/nextjs.csv: sha256:e828ccc04843742f52f545a068e8a9ab0d2b97c0e771f7e93bf0cef74da05554
-    .claude/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv: sha256:05d6e74501b2b6a636faed32450622759f49a5bcafad971f5f4e7eba0eb7be71
+    .claude/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv: sha256:b9972b31e721faabc667ee2b4e93ba2af29e1df86f186c2ff608b68370f0e3a5
     .claude/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv: sha256:f7a3f2d9542856d00199f85c6c023b7c284cc698e2e6e12d61afce2edacb24d6
     .claude/skills/ui-ux-pro-max/data/stacks/react-native.csv: sha256:077aefc81d194895ecf7936b3ed298b978e36961f183e3a275f8acda19b5f621
     .claude/skills/ui-ux-pro-max/data/stacks/react.csv: sha256:e5624ab41d33427d88e41d07581ce4eca59b37b36ab72a6ad43a9c8e2d0a1c72
     .claude/skills/ui-ux-pro-max/data/stacks/shadcn.csv: sha256:395c2e415ef6f48a474acccdc8eb2c7258a6ed751a5037ba171a2d8823e02ded
     .claude/skills/ui-ux-pro-max/data/stacks/svelte.csv: sha256:71af52d64f266c88070b91dbbaa900c2f8074b6baae9f35eaea6ba9cec6fd803
     .claude/skills/ui-ux-pro-max/data/stacks/swiftui.csv: sha256:c9c2d2510f8e66281a2514e8dd0125a6b653b9ef53a71281b5e7dfe003d5b569
-    .claude/skills/ui-ux-pro-max/data/stacks/threejs.csv: sha256:f1c05f8f269fc4784170c837f4ff43b50042f00bbd6ba7dbef2896081a052544
+    .claude/skills/ui-ux-pro-max/data/stacks/threejs.csv: sha256:c74d6ba76021f8d72c0ed12c559caecfeb6961829242acf6bcb9e99926b1a396
+    .claude/skills/ui-ux-pro-max/data/stacks/uno.csv: sha256:5d2e0f396bb9dc5a2661204264cc0eda7cc4fa3d78152dec89d668704a41b8fc
+    .claude/skills/ui-ux-pro-max/data/stacks/uwp.csv: sha256:debf669928871261ced9333788d5afd5784377ea1fa1b4f53993dd8f1574c0fc
     .claude/skills/ui-ux-pro-max/data/stacks/vue.csv: sha256:c2724915d3c11cd67263f25896cff721f787a0fdd8326002d31e9f5806dfd8f8
-    .claude/skills/ui-ux-pro-max/data/styles.csv: sha256:f37eb20e7403a715d440efd45ce6952ea6a445d6143fd130c52e219a4bec9911
-    .claude/skills/ui-ux-pro-max/data/typography.csv: sha256:dbea262a54e3bfa2e6c3b15989a365d5ef4c43349316aff46635e82ca825adce
+    .claude/skills/ui-ux-pro-max/data/stacks/winui.csv: sha256:2d970b08e44509d7afa53ce7feb446930b2d5e0667fa637df9aeeed65c42bbbe
+    .claude/skills/ui-ux-pro-max/data/stacks/wpf.csv: sha256:ca78b5f28dc50d66900548d602d74856400097284c73e076fcfbb5a38ae5083c
+    .claude/skills/ui-ux-pro-max/data/styles.csv: sha256:1bf9c1d8484a0a7a54fb67555902380446865b604c8449e47a449cb3d9c1ef88
+    .claude/skills/ui-ux-pro-max/data/typography.csv: sha256:7abead73de0e43e09544f164cb60cd431674e411f1e063e555a8b44d51273328
     .claude/skills/ui-ux-pro-max/data/ui-reasoning.csv: sha256:06e4369445388ba9b7a57347510b125b7a2145bbf8546a327ba50292503b204a
     .claude/skills/ui-ux-pro-max/data/ux-guidelines.csv: sha256:e01943c433b2cad3040f19389b3b0455673758a569b7a927b5bedf65c989cb96
-    .claude/skills/ui-ux-pro-max/scripts/core.py: sha256:ab9f398b493e34404448cefc766239ee86119c7a21d8581ba965cabdc698b0a8
-    .claude/skills/ui-ux-pro-max/scripts/design_system.py: sha256:db272c6649322e383714c73305705101fe1d44c15bd64556d5a515b1c419c2d2
-    .claude/skills/ui-ux-pro-max/scripts/search.py: sha256:d9983d2a21d330b6b696480940fd78029f7b34027814f2ac1cf17c5d0b042407
-  content_hash: sha256:8704c750e400802bd67bf4f4c9187923267229ac91c8cec6bd32e92c35907449
+    .claude/skills/ui-ux-pro-max/references/pro-rules.md: sha256:bc56db7cb40c5f4d8d4f6229f5c7072865278488fe5b97c76d3a38eb596da4fc
+    .claude/skills/ui-ux-pro-max/references/quick-reference.md: sha256:b01ad594cc069d18786d5e8865356cc511226ba6f48d328fd975d31aae8e5781
+    .claude/skills/ui-ux-pro-max/scripts/core.py: sha256:64c149019196ee24647464a27278eb96d3b4638ded73ebfc35ccd2bc99c083a9
+    .claude/skills/ui-ux-pro-max/scripts/design_system.py: sha256:fcdb279eb9691dffd6c80c333d29a4e5567368e38d724520c60013c8b1aaf242
+    .claude/skills/ui-ux-pro-max/scripts/search.py: sha256:69a349d69543f35f45a12c0c82922c550d1b0a16a2b37f6b1406afb2ad2919c8
+    .claude/skills/ui-ux-pro-max/scripts/tests/test_core.py: sha256:ce60ac571164cf35e8c866550ad989fa686706a56fa48df4fdf76444b94fdd8d
+    .claude/skills/ui-ux-pro-max/scripts/validate_data.py: sha256:f1b5e0916f3c2f8271416f93f6ff9ebf3311a68a943a19c1b83f16823cbb05a7
+  content_hash: sha256:365ed3a4db62464f2f359c60cac89b7bfdb87128ad5bd07ed69f8c7ba8969b49
   skill_subset:
   - brand
   - design
@@ -3137,8 +3177,8 @@ dependencies:
 - repo_url: vercel-labs/agent-browser
   name: agent-browser
   host: github.com
-  resolved_commit: dcbe3522f931d24f85a786ba6ba7f343d86f7294
-  version: unknown
+  resolved_commit: 3591f0f4b719c94bcb9aec83ebe811c5dd7f587a
+  version: 1.0.0
   virtual_path: skills/agent-browser
   is_virtual: true
   package_type: claude_skill
