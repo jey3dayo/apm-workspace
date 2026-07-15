@@ -86,18 +86,6 @@ class ProjectFileAnalyzer:
             if file_path.exists():
                 relevant_files.append(file_path)
 
-        # Check .kiro/steering/ files
-        kiro_steering = project_root / ".kiro/steering"
-        if kiro_steering.exists():
-            for md_file in kiro_steering.glob("*.md"):
-                relevant_files.append(md_file)
-
-        # Check design files if question relates to architecture
-        kiro_design = project_root / ".kiro/specs"
-        if kiro_design.exists():
-            for md_file in kiro_design.glob("**/design.md"):
-                relevant_files.append(md_file)
-
         # Check package files for tech stack info
         package_files = [
             project_root / "package.json",
@@ -269,14 +257,14 @@ class GapAnalyzer:
                 return (
                     f"🔴 CRITICAL: Address immediately before implementation:\n"
                     f"1. Research best practices for: {question_text}\n"
-                    f"2. Document decisions in .kiro/steering/ or design files\n"
+                    f"2. Document decisions in steering or design files\n"
                     f"3. Consider creating a GitHub Issue to track"
                 )
             else:
                 return (
                     f"📝 TODO: Document this in planning phase:\n"
                     f"1. {question_text}\n"
-                    f"2. Add to .kiro/steering/ or create Issue"
+                    f"2. Add to steering or design files, or create an Issue"
                 )
 
         else:  # NOT_APPLICABLE

@@ -180,7 +180,6 @@ Then review and commit the skill changes.
 
 ## Editing Rules
 
-- `kiro` is intentionally excluded from rollout; use `mise run deploy` / `mise run upgrade` (both exclude kiro) and avoid bare `apm install -g`, which would deploy to the unused `~/.kiro` runtime
 - Do not edit `apm_modules/`
 - Do not treat deployed targets such as `~/.claude/` or `~/.codex/` as source of truth
 - For APM workspace-only skills, edit `.apm/skills/**`; do not edit the symlinked bridge entries under `.claude/skills/**` or `.agents/skills/**`

@@ -47,8 +47,6 @@
 
 ## Project Context
 
-プロジェクトに `.kiro/steering/` がある場合は読み込んで参照すること。
-
 ## Development Rules
 
 - ユーザーの指示に従い、その範囲内で自律的に行動する

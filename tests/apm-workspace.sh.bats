@@ -116,7 +116,7 @@ setup() {
 # --- format_skill_name ------------------------------------------------------
 
 @test "format_skill_name uses the logical leaf of a namespaced id" {
-  run format_skill_name "kiro:spec-init"
+  run format_skill_name "sample:spec-init"
   [ "$status" -eq 0 ]
   [ "$output" = "spec-init" ]
 }

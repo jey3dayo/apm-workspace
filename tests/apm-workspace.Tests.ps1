@@ -60,19 +60,18 @@ scripts: {}
     $agentsRoot = Join-Path $catalogRoot "agents"
     $commandsRoot = Join-Path $catalogRoot "commands"
     $rulesRoot = Join-Path $catalogRoot "rules"
-    New-Item -ItemType Directory -Path (Join-Path $agentsRoot "kiro") -Force | Out-Null
+    New-Item -ItemType Directory -Path $agentsRoot -Force | Out-Null
     New-Item -ItemType Directory -Path $commandsRoot -Force | Out-Null
     New-Item -ItemType Directory -Path (Join-Path $rulesRoot "tools") -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $catalogRoot "AGENTS.md") -Value "# shared guidance"
     Set-Content -LiteralPath (Join-Path $agentsRoot "code-reviewer.md") -Value "# agent"
-    Set-Content -LiteralPath (Join-Path $agentsRoot "kiro\spec-design.md") -Value "# kiro"
     Set-Content -LiteralPath (Join-Path $commandsRoot "review.md") -Value "# review"
     Set-Content -LiteralPath (Join-Path $commandsRoot "setup.md") -Value "# setup"
     Set-Content -LiteralPath (Join-Path $rulesRoot "claude-md-design.md") -Value "# rule"
     Set-Content -LiteralPath (Join-Path $rulesRoot "tools\rtk.md") -Value "# rtk"
 
     Mock Get-TrackedCatalogDir { $catalogRoot }
-    @(Get-TrackedCatalogAgentRelativePaths) | Should -Be @("code-reviewer.md", "kiro/spec-design.md")
+    @(Get-TrackedCatalogAgentRelativePaths) | Should -Be @("code-reviewer.md")
     @(Get-TrackedCatalogCommandRelativePaths) | Should -Be @("review.md", "setup.md")
     @(Get-TrackedCatalogRuleRelativePaths) | Should -Be @("claude-md-design.md", "tools/rtk.md")
     Test-Path -LiteralPath (Get-TrackedCatalogInstructionsPath) | Should -Be $true
@@ -640,7 +639,7 @@ Describe "public command surface" {
 
       Install-WorkspaceMcpDependencies
 
-      $apmCalls | Should -Be @("install -g --only mcp --exclude kiro")
+      $apmCalls | Should -Be @("install -g --only mcp")
     }
     finally {
       Remove-Item Function:\apm -ErrorAction SilentlyContinue
@@ -656,7 +655,7 @@ Describe "public command surface" {
   It "deploys managed MCP dependencies during shell apply" {
     $shellScript = Get-Content -LiteralPath (Join-Path $workspaceRoot "scripts/apm-workspace.sh") -Raw
 
-    $shellScript | Should -Match '(?s)install_workspace_mcp_dependencies\(\)\s*\{\s*run_workspace_install_command -g --only mcp --exclude kiro\s*\}'
+    $shellScript | Should -Match '(?s)install_workspace_mcp_dependencies\(\)\s*\{\s*run_workspace_install_command -g --only mcp\s*\}'
     $shellScript | Should -Match '(?s)cmd_apply\(\)\s*\{.*?install_workspace_mcp_dependencies.*?compile_codex.*?replace_skill_targets_from_stage "\$apply_stage_root"'
   }
 
@@ -778,7 +777,7 @@ Describe "public command surface" {
   }
 
   It "uses the final segment of namespaced skill names for all targets" {
-    Format-SkillName -Target "claude" -SourceSkillId "kiro:spec-init" | Should -Be "spec-init"
+    Format-SkillName -Target "claude" -SourceSkillId "sample:spec-init" | Should -Be "spec-init"
     Format-SkillName -Target "codex" -SourceSkillId "superpowers:brainstorming" | Should -Be "brainstorming"
     Format-SkillName -Target "claude" -SourceSkillId "plain" | Should -Be "plain"
   }

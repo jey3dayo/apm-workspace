@@ -91,7 +91,7 @@ Priority:
 
 1. user-provided project description, plan, spec, issue, or design document
 2. `README.md`, `AGENTS.md`, `CLAUDE.md`
-3. `.kiro/steering/*.md`, `.kiro/specs/**`, `docs/**`
+3. steering/design documents and `docs/**`
 4. dependency manifests such as `package.json`, `requirements.txt`, `pyproject.toml`, `Cargo.toml`, `go.mod`
 5. code search for implementations relevant to selected questions
 

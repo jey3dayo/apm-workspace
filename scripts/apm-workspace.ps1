@@ -464,7 +464,7 @@ function Invoke-WorkspaceInstallCommand {
 }
 
 function Install-WorkspaceMcpDependencies {
-  Invoke-WorkspaceInstallCommand -InstallArgs @("-g", "--only", "mcp", "--exclude", "kiro")
+  Invoke-WorkspaceInstallCommand -InstallArgs @("-g", "--only", "mcp")
 }
 
 function Test-ManifestHasLocalPackages {
@@ -2427,7 +2427,7 @@ function Invoke-RegisterCatalog {
   Remove-InternalTargetReparsePoints -SkillIds $skillIds
 
   $reference = Get-TrackedCatalogReference
-  Invoke-WorkspaceInstallCommand -InstallArgs @("-g", "--exclude", "kiro", $reference)
+  Invoke-WorkspaceInstallCommand -InstallArgs @("-g", $reference)
   Sync-ManagedCatalogRuntimeAssets
   Write-Host "Registered catalog from upstream ref: $reference"
 }

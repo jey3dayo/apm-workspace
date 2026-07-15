@@ -224,7 +224,6 @@ def infer_project_from_files() -> str:
     - README.md
     - CLAUDE.md
     - AGENTS.md
-    - .kiro/steering/*.md
     - package.json, requirements.txt, Cargo.toml
 
     Returns:
@@ -265,17 +264,6 @@ def infer_project_from_files() -> str:
                 description_parts.append(f"AGENTS.md: {content}")
         except Exception:
             pass
-
-    # Priority 4: .kiro/steering/*.md
-    kiro_steering = Path(".kiro/steering")
-    if kiro_steering.exists():
-        for md_file in kiro_steering.glob("*.md"):
-            try:
-                with open(md_file) as f:
-                    content = f.read(1000)
-                    description_parts.append(f"{md_file.name}: {content}")
-            except Exception:
-                pass
 
     if description_parts:
         return "\n\n".join(description_parts)

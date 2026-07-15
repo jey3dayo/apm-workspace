@@ -98,5 +98,4 @@ When `paths` is omitted, the rule applies to all files.
 
 ## Related Skills
 
-- cc-sdd: Project memory and pattern management via `.kiro/steering/`
 - hookify plugin: Event-driven automatic actions (pre-commit hooks, etc.)

@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-07-14T01:46:42.283642+00:00'
+generated_at: '2026-07-15T09:13:02.546119+00:00'
 apm_version: 0.22.0
 dependencies:
 - repo_url: Jakubantalik/transitions-dev
@@ -41,21 +41,6 @@ dependencies:
   - .claude/skills/transitions-dev/12-error-state-shake.md
   - .claude/skills/transitions-dev/SKILL.md
   - .claude/skills/transitions-dev/_root.css
-  - .kiro/skills/transitions-dev
-  - .kiro/skills/transitions-dev/01-card-resize.md
-  - .kiro/skills/transitions-dev/02-number-pop-in.md
-  - .kiro/skills/transitions-dev/03-notification-badge.md
-  - .kiro/skills/transitions-dev/04-text-states-swap.md
-  - .kiro/skills/transitions-dev/05-menu-dropdown.md
-  - .kiro/skills/transitions-dev/06-modal.md
-  - .kiro/skills/transitions-dev/07-panel-reveal.md
-  - .kiro/skills/transitions-dev/08-page-side-by-side.md
-  - .kiro/skills/transitions-dev/09-icon-swap.md
-  - .kiro/skills/transitions-dev/10-success-check.md
-  - .kiro/skills/transitions-dev/11-avatar-group-hover.md
-  - .kiro/skills/transitions-dev/12-error-state-shake.md
-  - .kiro/skills/transitions-dev/SKILL.md
-  - .kiro/skills/transitions-dev/_root.css
   deployed_file_hashes:
     .agents/skills/transitions-dev/01-card-resize.md: sha256:e464e54fd9bc855c96d1dc3a570227fbe9e97857626fd9ba85035d927a918157
     .agents/skills/transitions-dev/02-number-pop-in.md: sha256:723c6318d4c785febeb998326651cbbd04294d7712f8d32dfac85fef9e8bf5d1
@@ -85,26 +70,12 @@ dependencies:
     .claude/skills/transitions-dev/12-error-state-shake.md: sha256:063429750d2b5d6510890ff98dba2f13eaf9bf5c2f3b648fa17c8498d0bf92bc
     .claude/skills/transitions-dev/SKILL.md: sha256:a62129f3a894a79678f60276ca34838b46357820639d5755cf932e390d1bb735
     .claude/skills/transitions-dev/_root.css: sha256:6ed248a269da79f623729708dabcc3719485d400615a0d91b9f5e9fd307aa33f
-    .kiro/skills/transitions-dev/01-card-resize.md: sha256:e464e54fd9bc855c96d1dc3a570227fbe9e97857626fd9ba85035d927a918157
-    .kiro/skills/transitions-dev/02-number-pop-in.md: sha256:723c6318d4c785febeb998326651cbbd04294d7712f8d32dfac85fef9e8bf5d1
-    .kiro/skills/transitions-dev/03-notification-badge.md: sha256:f8f58844de1acf988f9437e4e1957478c48c6392939ac161ae3b9f6b55ea02f9
-    .kiro/skills/transitions-dev/04-text-states-swap.md: sha256:009cd172b725e2352859f27eb36ec2da5fa0a37990dc817e6e2f6ffee57fcac0
-    .kiro/skills/transitions-dev/05-menu-dropdown.md: sha256:70048541fd6389cfee736bf15a2bb21b062bc59c022562dc8d19773499630243
-    .kiro/skills/transitions-dev/06-modal.md: sha256:55638bf7e92d54d54cd09ad360442d7433e5b7a4b34bea24138643c76c03339a
-    .kiro/skills/transitions-dev/07-panel-reveal.md: sha256:1e6e726ccbbf44a5122200096f9bae7f1484be55fd17c102bfee870fd1a7418f
-    .kiro/skills/transitions-dev/08-page-side-by-side.md: sha256:f0c036a4e88cf76cf29959034fc7bc9083fbc52202c8ce81dec6d98dc5f6c226
-    .kiro/skills/transitions-dev/09-icon-swap.md: sha256:a0e51feb26af16b254d9eec18baf47d36cea7e539e035b68ad026c85ef7e259b
-    .kiro/skills/transitions-dev/10-success-check.md: sha256:41cf869bd2a08e73019f6ed6d13728ef7b5ad624d053c2be23db96378cd26dba
-    .kiro/skills/transitions-dev/11-avatar-group-hover.md: sha256:4f440f0f6e3e2c99631d6cd168e326ea7c41052bedea71331b0db1fc67e82a84
-    .kiro/skills/transitions-dev/12-error-state-shake.md: sha256:063429750d2b5d6510890ff98dba2f13eaf9bf5c2f3b648fa17c8498d0bf92bc
-    .kiro/skills/transitions-dev/SKILL.md: sha256:a62129f3a894a79678f60276ca34838b46357820639d5755cf932e390d1bb735
-    .kiro/skills/transitions-dev/_root.css: sha256:6ed248a269da79f623729708dabcc3719485d400615a0d91b9f5e9fd307aa33f
   content_hash: sha256:8cf9ba1ed0d52741e4ed1dafc6ee4543e32f1e516f958d750e81412bfc36dd13
 - repo_url: Lum1104/Understand-Anything
-  name: understand
+  name: Understand-Anything
   host: github.com
   resolved_commit: fbc1b8208adb0b3aa331183a05ec02f115f586ef
-  version: 1.0.0
+  version: unknown
   virtual_path: understand-anything-plugin/skills/understand
   is_virtual: true
   package_type: claude_skill
@@ -211,57 +182,6 @@ dependencies:
   - .claude/skills/understand/merge-batch-graphs.py
   - .claude/skills/understand/merge-subdomain-graphs.py
   - .claude/skills/understand/scan-project.mjs
-  - .kiro/skills/understand
-  - .kiro/skills/understand/SKILL.md
-  - .kiro/skills/understand/build-fingerprints.mjs
-  - .kiro/skills/understand/compute-batches.mjs
-  - .kiro/skills/understand/extract-import-map.mjs
-  - .kiro/skills/understand/extract-structure-result.mjs
-  - .kiro/skills/understand/extract-structure.mjs
-  - .kiro/skills/understand/frameworks/django.md
-  - .kiro/skills/understand/frameworks/express.md
-  - .kiro/skills/understand/frameworks/fastapi.md
-  - .kiro/skills/understand/frameworks/flask.md
-  - .kiro/skills/understand/frameworks/gin.md
-  - .kiro/skills/understand/frameworks/nextjs.md
-  - .kiro/skills/understand/frameworks/rails.md
-  - .kiro/skills/understand/frameworks/react.md
-  - .kiro/skills/understand/frameworks/spring.md
-  - .kiro/skills/understand/frameworks/vue.md
-  - .kiro/skills/understand/generate-ignore.mjs
-  - .kiro/skills/understand/languages/cpp.md
-  - .kiro/skills/understand/languages/csharp.md
-  - .kiro/skills/understand/languages/css.md
-  - .kiro/skills/understand/languages/dockerfile.md
-  - .kiro/skills/understand/languages/go.md
-  - .kiro/skills/understand/languages/graphql.md
-  - .kiro/skills/understand/languages/html.md
-  - .kiro/skills/understand/languages/java.md
-  - .kiro/skills/understand/languages/javascript.md
-  - .kiro/skills/understand/languages/json.md
-  - .kiro/skills/understand/languages/kotlin.md
-  - .kiro/skills/understand/languages/markdown.md
-  - .kiro/skills/understand/languages/php.md
-  - .kiro/skills/understand/languages/protobuf.md
-  - .kiro/skills/understand/languages/python.md
-  - .kiro/skills/understand/languages/ruby.md
-  - .kiro/skills/understand/languages/rust.md
-  - .kiro/skills/understand/languages/scala.md
-  - .kiro/skills/understand/languages/shell.md
-  - .kiro/skills/understand/languages/sql.md
-  - .kiro/skills/understand/languages/swift.md
-  - .kiro/skills/understand/languages/terraform.md
-  - .kiro/skills/understand/languages/typescript.md
-  - .kiro/skills/understand/languages/yaml.md
-  - .kiro/skills/understand/locales/en.md
-  - .kiro/skills/understand/locales/ja.md
-  - .kiro/skills/understand/locales/ko.md
-  - .kiro/skills/understand/locales/ru.md
-  - .kiro/skills/understand/locales/zh-TW.md
-  - .kiro/skills/understand/locales/zh.md
-  - .kiro/skills/understand/merge-batch-graphs.py
-  - .kiro/skills/understand/merge-subdomain-graphs.py
-  - .kiro/skills/understand/scan-project.mjs
   deployed_file_hashes:
     .agents/skills/understand/SKILL.md: sha256:378406b4fe10a5fb626216a7e45c75eb5c0a9fd33334c4fc96272554afcade4c
     .agents/skills/understand/build-fingerprints.mjs: sha256:9b1d0589f0ed1827301edd3585fc7da0340dd29434a5ab3ab54aed1a0a6baca3
@@ -363,62 +283,12 @@ dependencies:
     .claude/skills/understand/merge-batch-graphs.py: sha256:1e7b6612f09d8e440f1aa3b9fd97bb7bd4c557f39e1e3cf33d116e66cdfaae94
     .claude/skills/understand/merge-subdomain-graphs.py: sha256:b984a478a18eb7a0186f5374dd733fc001bc77806215bd067f404107911fa059
     .claude/skills/understand/scan-project.mjs: sha256:10bd886733a6f5e91c3698ccba9997d71115367ceb3ba628d233b46493ba7a4a
-    .kiro/skills/understand/SKILL.md: sha256:378406b4fe10a5fb626216a7e45c75eb5c0a9fd33334c4fc96272554afcade4c
-    .kiro/skills/understand/build-fingerprints.mjs: sha256:9b1d0589f0ed1827301edd3585fc7da0340dd29434a5ab3ab54aed1a0a6baca3
-    .kiro/skills/understand/compute-batches.mjs: sha256:1a005437fde165c712494ca7ada26dbfc22cbcba3c0534908823276cf16482de
-    .kiro/skills/understand/extract-import-map.mjs: sha256:5044daadea18bef6f3b6016d653ec220b692d2ff67bc311d4f12d94905fa09be
-    .kiro/skills/understand/extract-structure-result.mjs: sha256:1607c3ba45a120db413d724c28d25b28fed8dcefa28ea82cfa1345f180e662a8
-    .kiro/skills/understand/extract-structure.mjs: sha256:ae95d991ba9cca1e7dfb8e2ef61558ed0188fd9a26d9805554de04ff1eb988ff
-    .kiro/skills/understand/frameworks/django.md: sha256:a2257a849cf64d09cf2869a3106991264d7f50acd03c93e76284ed288cba7051
-    .kiro/skills/understand/frameworks/express.md: sha256:0a7b0d4ddc72fca3d1cbf5d7c63739f4cbbb924b86625907df03656b6734898c
-    .kiro/skills/understand/frameworks/fastapi.md: sha256:54f971f48dd74a6138d9cd03a3c4e7f4b06ab803403a663ebcc4a6422c0671b1
-    .kiro/skills/understand/frameworks/flask.md: sha256:645844e41c9a09ab47233c4ed68febfb7e15d8cc6bb354bb029b4218b0d6141c
-    .kiro/skills/understand/frameworks/gin.md: sha256:6621187a9fe0023d7d36ffe51680571ee58a7a77ebe915db4d35b6fb26eadb77
-    .kiro/skills/understand/frameworks/nextjs.md: sha256:99ae673ecaf27381e18483b12a6dc66ce7bbc37f3bf8f2f66344a160a882f2ea
-    .kiro/skills/understand/frameworks/rails.md: sha256:f5fb1fb05a32c9e71ba44e93d205252fd4e58b71a6cce9d62cd4ee20d14adc36
-    .kiro/skills/understand/frameworks/react.md: sha256:eaaf30363244b89a6bad91971f3d476ec809a8892f387a8bf33c04638a04af20
-    .kiro/skills/understand/frameworks/spring.md: sha256:296c10395b794c8c0741cd2faaa61f9e171933003f39cbe45f462237ed1066c6
-    .kiro/skills/understand/frameworks/vue.md: sha256:49a432fe59c8b0759632bd1745b4acc7ddcaef4343a270d97698d9bede69e5db
-    .kiro/skills/understand/generate-ignore.mjs: sha256:253bb28abb00dfdd2e40d3e816a200a576c7419ef90b700e267e27890dcb0a8c
-    .kiro/skills/understand/languages/cpp.md: sha256:2a658bb677944fa58e6a244430d120cb0657d09e4e50fe28a9cdfbdd554f46f9
-    .kiro/skills/understand/languages/csharp.md: sha256:507cb86fb5c494d9d5e8ab947015ac6f4e7a2c280c0509ffdbab812a0472c467
-    .kiro/skills/understand/languages/css.md: sha256:ed3a8dcd96e9921d8d85cfcf0ea07d7a15838cd076180017a80162b1b7166131
-    .kiro/skills/understand/languages/dockerfile.md: sha256:bb548a778970cb234ea805ee35dde488274eb077d2b671aa4b55297985f88bb6
-    .kiro/skills/understand/languages/go.md: sha256:359f808ba97c79726598fe92478ee5680c1bd22a6065db9d374e403f5e19f0e1
-    .kiro/skills/understand/languages/graphql.md: sha256:735b28063ee40ad7b07fc76a4268f96fa59f9fd5d38f185f4914275a1fa430e3
-    .kiro/skills/understand/languages/html.md: sha256:059b74d8ca82efa09c273afc00aa96796202f637f147242990ebe2c90897ce3f
-    .kiro/skills/understand/languages/java.md: sha256:fd8584d68da5d11e2b8b4e1c8a3d737175bfe77abe55ba49ca5750359571f55d
-    .kiro/skills/understand/languages/javascript.md: sha256:4e2bc5e4c4139c86baf2a0e48587a4130d337d06929a323d8b2ab302c3355352
-    .kiro/skills/understand/languages/json.md: sha256:6a420be6610ed2c5f2950f72b1e3f9c6c15a2377f23d70e066a9bd4ae860cf4a
-    .kiro/skills/understand/languages/kotlin.md: sha256:fe3d5eff0f190027ce6e9686bc80e7dce4313aced194a014febb3e93cd091977
-    .kiro/skills/understand/languages/markdown.md: sha256:32203c73af64c9f38768199887a25f5e58c166957b82b8b8934fb926d614f944
-    .kiro/skills/understand/languages/php.md: sha256:043635d64c89b6293936085f2cd341f055d61b71132b0d09ed599e608023c772
-    .kiro/skills/understand/languages/protobuf.md: sha256:7db34b5f2085ab14ac888c4c817caa6f1045a7405e14f7c30000bec93139b3dd
-    .kiro/skills/understand/languages/python.md: sha256:bb6553846c7ddb63ab4c156caf183fa64f59c63a56c3b0aaa42f764f9332ba94
-    .kiro/skills/understand/languages/ruby.md: sha256:f5942f0e7136e48723c7d70ef49358cc9d12d4e3b3144e65607c947137382788
-    .kiro/skills/understand/languages/rust.md: sha256:32cb3c3fcd1a560821ed09dd9a0da184dfa5c79c85f1e03034945ef4d14208d4
-    .kiro/skills/understand/languages/scala.md: sha256:95b9f2c45f473e02226031b6998f2a2c6201d33304d0d885f5cc578ca3e3855c
-    .kiro/skills/understand/languages/shell.md: sha256:f9992d17799065cef318c6906ad6cdad646cb3bbbe9ff1d07234a0634f587bd9
-    .kiro/skills/understand/languages/sql.md: sha256:d0345797e637e91ae8e98f1f9fc37b62b881a6691e2801a60139fc422341c4a4
-    .kiro/skills/understand/languages/swift.md: sha256:4c866204fffe114a4e27f11b162829257cd687020cb69b30bce88dbfff334775
-    .kiro/skills/understand/languages/terraform.md: sha256:862d02b31ebc9de6d03d2112cf17084fcc15b4952bed08fa39e69260d642748e
-    .kiro/skills/understand/languages/typescript.md: sha256:20d6d1ae757d806b8a4aeb0aa6e9fb5c3307ad4e3c83715d2e8532924e8afda6
-    .kiro/skills/understand/languages/yaml.md: sha256:0cda6694a866ca53715a23cafcc00d5e8995437916a49e40eb77a50114e55d7f
-    .kiro/skills/understand/locales/en.md: sha256:bfbecb6e2e902bf92ee0476a35ea8c267fd7040ba8ffa2621da183fe767dc3b2
-    .kiro/skills/understand/locales/ja.md: sha256:97c8462f64dd6fd8400861eb49871b27640b144d532e4be7f866689eefc7b7c6
-    .kiro/skills/understand/locales/ko.md: sha256:2a7cbed153d563221516858160b073e33b1080881b13a652f60667e98f0a3e6f
-    .kiro/skills/understand/locales/ru.md: sha256:02a9cfb7894ffd6e68a24d1dfd050ccc06bd66cac10b0b35d75acf72cedf12de
-    .kiro/skills/understand/locales/zh-TW.md: sha256:727f14f80a4edb73dfe53025686d5d3afe865eaa554ec1c6c787f3a9a070621f
-    .kiro/skills/understand/locales/zh.md: sha256:06cbd26979a3383f6177b3d37995bef44f104ebe2de43704b8b1d1b5031ad98b
-    .kiro/skills/understand/merge-batch-graphs.py: sha256:1e7b6612f09d8e440f1aa3b9fd97bb7bd4c557f39e1e3cf33d116e66cdfaae94
-    .kiro/skills/understand/merge-subdomain-graphs.py: sha256:b984a478a18eb7a0186f5374dd733fc001bc77806215bd067f404107911fa059
-    .kiro/skills/understand/scan-project.mjs: sha256:10bd886733a6f5e91c3698ccba9997d71115367ceb3ba628d233b46493ba7a4a
   content_hash: sha256:4f892bda3867af034ef21e464487f32bb1537fcd02981c0a196c690a937351c3
 - repo_url: Lum1104/Understand-Anything
-  name: understand-dashboard
+  name: Understand-Anything
   host: github.com
   resolved_commit: fbc1b8208adb0b3aa331183a05ec02f115f586ef
-  version: 1.0.0
+  version: unknown
   virtual_path: understand-anything-plugin/skills/understand-dashboard
   is_virtual: true
   package_type: claude_skill
@@ -427,18 +297,15 @@ dependencies:
   - .agents/skills/understand-dashboard/SKILL.md
   - .claude/skills/understand-dashboard
   - .claude/skills/understand-dashboard/SKILL.md
-  - .kiro/skills/understand-dashboard
-  - .kiro/skills/understand-dashboard/SKILL.md
   deployed_file_hashes:
     .agents/skills/understand-dashboard/SKILL.md: sha256:d12cb059d8e6139873542111ccec691b0603496675182f5ac826d5b65273331a
     .claude/skills/understand-dashboard/SKILL.md: sha256:d12cb059d8e6139873542111ccec691b0603496675182f5ac826d5b65273331a
-    .kiro/skills/understand-dashboard/SKILL.md: sha256:d12cb059d8e6139873542111ccec691b0603496675182f5ac826d5b65273331a
   content_hash: sha256:5e3ac7994d20f16f8232164dbec7998b62073a5547fcfc0b0baba82cb48bed0a
 - repo_url: anthropics/claude-code
-  name: frontend-design
+  name: claude-code
   host: github.com
   resolved_commit: 1fb278b85d4546c7c04db3b3590e031b5a8a7571
-  version: 1.0.0
+  version: unknown
   virtual_path: plugins/frontend-design/skills/frontend-design
   is_virtual: true
   package_type: claude_skill
@@ -447,12 +314,9 @@ dependencies:
   - .agents/skills/frontend-design/SKILL.md
   - .claude/skills/frontend-design
   - .claude/skills/frontend-design/SKILL.md
-  - .kiro/skills/frontend-design
-  - .kiro/skills/frontend-design/SKILL.md
   deployed_file_hashes:
     .agents/skills/frontend-design/SKILL.md: sha256:1608ea77fbb6fc30d13a97d12cfa8ebf31358d40f0dd97beed24829d6b3f45dd
     .claude/skills/frontend-design/SKILL.md: sha256:1608ea77fbb6fc30d13a97d12cfa8ebf31358d40f0dd97beed24829d6b3f45dd
-    .kiro/skills/frontend-design/SKILL.md: sha256:1608ea77fbb6fc30d13a97d12cfa8ebf31358d40f0dd97beed24829d6b3f45dd
   content_hash: sha256:3e0be122a3db8206b6d0d6b07cca898b5c75fb9b7b2101abe143fb2851734d2e
 - repo_url: benjitaylor/agentation
   name: agentation
@@ -467,12 +331,9 @@ dependencies:
   - .agents/skills/agentation/SKILL.md
   - .claude/skills/agentation
   - .claude/skills/agentation/SKILL.md
-  - .kiro/skills/agentation
-  - .kiro/skills/agentation/SKILL.md
   deployed_file_hashes:
     .agents/skills/agentation/SKILL.md: sha256:0b66fa852d1dfcd5de86e71970e6f484bcd44b991265f95034365c38ed1ad3a8
     .claude/skills/agentation/SKILL.md: sha256:0b66fa852d1dfcd5de86e71970e6f484bcd44b991265f95034365c38ed1ad3a8
-    .kiro/skills/agentation/SKILL.md: sha256:0b66fa852d1dfcd5de86e71970e6f484bcd44b991265f95034365c38ed1ad3a8
   content_hash: sha256:6ba2c955bee6ab3e9c7781b2553e3574b4c9ec35e539437d0831bfe368de8550
 - repo_url: benjitaylor/agentation
   name: agentation
@@ -489,16 +350,11 @@ dependencies:
   - .claude/skills/agentation-self-driving
   - .claude/skills/agentation-self-driving/SKILL.md
   - .claude/skills/agentation-self-driving/references/two-session-workflow.md
-  - .kiro/skills/agentation-self-driving
-  - .kiro/skills/agentation-self-driving/SKILL.md
-  - .kiro/skills/agentation-self-driving/references/two-session-workflow.md
   deployed_file_hashes:
     .agents/skills/agentation-self-driving/SKILL.md: sha256:3a9d99a656ea7e9ff907c0b2a9a6a2a6a18bd285bd6ad4b5d9dc55b27233e08a
     .agents/skills/agentation-self-driving/references/two-session-workflow.md: sha256:3bff820a202d607cbf72a4b30ed9af28afa3b64ab83f63c3469b2f96a564f746
     .claude/skills/agentation-self-driving/SKILL.md: sha256:3a9d99a656ea7e9ff907c0b2a9a6a2a6a18bd285bd6ad4b5d9dc55b27233e08a
     .claude/skills/agentation-self-driving/references/two-session-workflow.md: sha256:3bff820a202d607cbf72a4b30ed9af28afa3b64ab83f63c3469b2f96a564f746
-    .kiro/skills/agentation-self-driving/SKILL.md: sha256:3a9d99a656ea7e9ff907c0b2a9a6a2a6a18bd285bd6ad4b5d9dc55b27233e08a
-    .kiro/skills/agentation-self-driving/references/two-session-workflow.md: sha256:3bff820a202d607cbf72a4b30ed9af28afa3b64ab83f63c3469b2f96a564f746
   content_hash: sha256:405cf94e4df9b048ab42e51f26ad971dc6b986167b74eb46393abd6f1f5b5f88
 - repo_url: browser-use/browser-harness
   name: browser-harness
@@ -513,16 +369,11 @@ dependencies:
   - .claude/skills/browser-harness
   - .claude/skills/browser-harness/SKILL.md
   - .claude/skills/browser-harness/references/install.md
-  - .kiro/skills/browser-harness
-  - .kiro/skills/browser-harness/SKILL.md
-  - .kiro/skills/browser-harness/references/install.md
   deployed_file_hashes:
     .agents/skills/browser-harness/SKILL.md: sha256:de1a97055f55e60495174468c87feeadb06ab9fe76b43c5cf7b4800387aed18f
     .agents/skills/browser-harness/references/install.md: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
     .claude/skills/browser-harness/SKILL.md: sha256:de1a97055f55e60495174468c87feeadb06ab9fe76b43c5cf7b4800387aed18f
     .claude/skills/browser-harness/references/install.md: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
-    .kiro/skills/browser-harness/SKILL.md: sha256:de1a97055f55e60495174468c87feeadb06ab9fe76b43c5cf7b4800387aed18f
-    .kiro/skills/browser-harness/references/install.md: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
   content_hash: sha256:737b50df41b2d93ac27e754108ffa7485a8c6d379baac69bde2ed2cef0cd05c5
   declared_license: MIT
 - repo_url: caad-develop/claude-code-marketplace
@@ -550,14 +401,6 @@ dependencies:
   - .claude/skills/perman-aws-vault/references/aws-profiles.md
   - .claude/skills/perman-aws-vault/references/profile-catalog.md
   - .claude/skills/perman-aws-vault/references/setup-guide.md
-  - .kiro/skills/perman-aws-vault
-  - .kiro/skills/perman-aws-vault/SKILL.md
-  - .kiro/skills/perman-aws-vault/agents/openai.yaml
-  - .kiro/skills/perman-aws-vault/references/advanced-usage.md
-  - .kiro/skills/perman-aws-vault/references/authentication-flow.md
-  - .kiro/skills/perman-aws-vault/references/aws-profiles.md
-  - .kiro/skills/perman-aws-vault/references/profile-catalog.md
-  - .kiro/skills/perman-aws-vault/references/setup-guide.md
   deployed_file_hashes:
     .agents/skills/perman-aws-vault/SKILL.md: sha256:4671b4b1eb3cd1a8ca30524ed3c994080ca839f9de317eb654358b511843091b
     .agents/skills/perman-aws-vault/agents/openai.yaml: sha256:b80eeacb8b6c3d97383fc8966b3bbdf18b152851767b76998a88da8c604c458a
@@ -573,13 +416,6 @@ dependencies:
     .claude/skills/perman-aws-vault/references/aws-profiles.md: sha256:21140dbe617f1db5aa094a0112ec356481aa582ad3aa62efbaccb8dbe748536d
     .claude/skills/perman-aws-vault/references/profile-catalog.md: sha256:6eed982d8f2f4ae14957e402eaa09042ab3370507b87a759f92ff7f37e47b472
     .claude/skills/perman-aws-vault/references/setup-guide.md: sha256:e4d2c9c4ac0e146e9a9ae45933bc1cf5fbcbd940cf8fa3587cfb1ffa64436704
-    .kiro/skills/perman-aws-vault/SKILL.md: sha256:4671b4b1eb3cd1a8ca30524ed3c994080ca839f9de317eb654358b511843091b
-    .kiro/skills/perman-aws-vault/agents/openai.yaml: sha256:b80eeacb8b6c3d97383fc8966b3bbdf18b152851767b76998a88da8c604c458a
-    .kiro/skills/perman-aws-vault/references/advanced-usage.md: sha256:2698f047706da49e5417a2ab3256ebcda668c3c35a42c80f79146961d88e53f2
-    .kiro/skills/perman-aws-vault/references/authentication-flow.md: sha256:e5d4cf4dc64baf326d60f029dd4b09364c07ee5677444a3bfc34923d18f34ec3
-    .kiro/skills/perman-aws-vault/references/aws-profiles.md: sha256:21140dbe617f1db5aa094a0112ec356481aa582ad3aa62efbaccb8dbe748536d
-    .kiro/skills/perman-aws-vault/references/profile-catalog.md: sha256:6eed982d8f2f4ae14957e402eaa09042ab3370507b87a759f92ff7f37e47b472
-    .kiro/skills/perman-aws-vault/references/setup-guide.md: sha256:e4d2c9c4ac0e146e9a9ae45933bc1cf5fbcbd940cf8fa3587cfb1ffa64436704
   content_hash: sha256:d71e880080e421fe0554bafbf71b04f4a9fd02e57f043a1454a8bea28eb7f588
 - repo_url: caad-develop/claude-code-marketplace
   name: ca-pass
@@ -598,10 +434,6 @@ dependencies:
   - .claude/skills/ca-pass/SKILL.md
   - .claude/skills/ca-pass/references/ca-pass-spec.md
   - .claude/skills/ca-pass/references/review-checklist.md
-  - .kiro/skills/ca-pass
-  - .kiro/skills/ca-pass/SKILL.md
-  - .kiro/skills/ca-pass/references/ca-pass-spec.md
-  - .kiro/skills/ca-pass/references/review-checklist.md
   deployed_file_hashes:
     .agents/skills/ca-pass/SKILL.md: sha256:d8e626ad6e553d7d0e0de579049fdc53acd2f61f22284a0bd3bf23ff8fb12c22
     .agents/skills/ca-pass/references/ca-pass-spec.md: sha256:7b04975aac27a753c216e0bac31114f2dbf1b73fd85f0074b275e66d180c694c
@@ -609,9 +441,6 @@ dependencies:
     .claude/skills/ca-pass/SKILL.md: sha256:d8e626ad6e553d7d0e0de579049fdc53acd2f61f22284a0bd3bf23ff8fb12c22
     .claude/skills/ca-pass/references/ca-pass-spec.md: sha256:7b04975aac27a753c216e0bac31114f2dbf1b73fd85f0074b275e66d180c694c
     .claude/skills/ca-pass/references/review-checklist.md: sha256:a9870d591470b161820fb112bab8d53595e9c387958709c011905be070b7d01e
-    .kiro/skills/ca-pass/SKILL.md: sha256:d8e626ad6e553d7d0e0de579049fdc53acd2f61f22284a0bd3bf23ff8fb12c22
-    .kiro/skills/ca-pass/references/ca-pass-spec.md: sha256:7b04975aac27a753c216e0bac31114f2dbf1b73fd85f0074b275e66d180c694c
-    .kiro/skills/ca-pass/references/review-checklist.md: sha256:a9870d591470b161820fb112bab8d53595e9c387958709c011905be070b7d01e
   content_hash: sha256:2a3345aa4afcaac2d89c8a754f5c5492e0f9cc56edcdbfa988afe76dbd3ec038
 - repo_url: caad-develop/claude-code-marketplace
   name: mdb-api
@@ -630,10 +459,6 @@ dependencies:
   - .claude/skills/mdb-api/SKILL.md
   - .claude/skills/mdb-api/references/api-reference.md
   - .claude/skills/mdb-api/references/employee-schema.md
-  - .kiro/skills/mdb-api
-  - .kiro/skills/mdb-api/SKILL.md
-  - .kiro/skills/mdb-api/references/api-reference.md
-  - .kiro/skills/mdb-api/references/employee-schema.md
   deployed_file_hashes:
     .agents/skills/mdb-api/SKILL.md: sha256:4647c94f5ffb1d308d8ab0bcc79baa60f788108853626ac8b9fc2d1b0db97ca4
     .agents/skills/mdb-api/references/api-reference.md: sha256:429205ad91ac78f4820563f7a245e6b0bf62ebd3fed67b3a1ebf77bd85d1ce11
@@ -641,9 +466,6 @@ dependencies:
     .claude/skills/mdb-api/SKILL.md: sha256:4647c94f5ffb1d308d8ab0bcc79baa60f788108853626ac8b9fc2d1b0db97ca4
     .claude/skills/mdb-api/references/api-reference.md: sha256:429205ad91ac78f4820563f7a245e6b0bf62ebd3fed67b3a1ebf77bd85d1ce11
     .claude/skills/mdb-api/references/employee-schema.md: sha256:30ea251b6bab13b365bbbaeb943d9f875848fff17895cd389eb1a6072afe85ab
-    .kiro/skills/mdb-api/SKILL.md: sha256:4647c94f5ffb1d308d8ab0bcc79baa60f788108853626ac8b9fc2d1b0db97ca4
-    .kiro/skills/mdb-api/references/api-reference.md: sha256:429205ad91ac78f4820563f7a245e6b0bf62ebd3fed67b3a1ebf77bd85d1ce11
-    .kiro/skills/mdb-api/references/employee-schema.md: sha256:30ea251b6bab13b365bbbaeb943d9f875848fff17895cd389eb1a6072afe85ab
   content_hash: sha256:32e149f03e5d6000e26f871de886da973b9b6a63041f0527c48a573e513dbac9
 - repo_url: caad-develop/claude-code-marketplace
   name: notica-api
@@ -662,10 +484,6 @@ dependencies:
   - .claude/skills/notica-api/SKILL.md
   - .claude/skills/notica-api/agents/openai.yaml
   - .claude/skills/notica-api/references/notica-api-user-doc.md
-  - .kiro/skills/notica-api
-  - .kiro/skills/notica-api/SKILL.md
-  - .kiro/skills/notica-api/agents/openai.yaml
-  - .kiro/skills/notica-api/references/notica-api-user-doc.md
   deployed_file_hashes:
     .agents/skills/notica-api/SKILL.md: sha256:dd603652e4aee70fc6cee12c0327d3a50a3c8c16a6caeab0354803b958dd84aa
     .agents/skills/notica-api/agents/openai.yaml: sha256:8ffc7677919942eb4affca68d5c27c3cf66d1894b99e10bcab963f2a33cabbca
@@ -673,9 +491,6 @@ dependencies:
     .claude/skills/notica-api/SKILL.md: sha256:dd603652e4aee70fc6cee12c0327d3a50a3c8c16a6caeab0354803b958dd84aa
     .claude/skills/notica-api/agents/openai.yaml: sha256:8ffc7677919942eb4affca68d5c27c3cf66d1894b99e10bcab963f2a33cabbca
     .claude/skills/notica-api/references/notica-api-user-doc.md: sha256:2d6ee1aea02338012f3b61c3d82f930421cd7a1723126fa50ba3740a828ad316
-    .kiro/skills/notica-api/SKILL.md: sha256:dd603652e4aee70fc6cee12c0327d3a50a3c8c16a6caeab0354803b958dd84aa
-    .kiro/skills/notica-api/agents/openai.yaml: sha256:8ffc7677919942eb4affca68d5c27c3cf66d1894b99e10bcab963f2a33cabbca
-    .kiro/skills/notica-api/references/notica-api-user-doc.md: sha256:2d6ee1aea02338012f3b61c3d82f930421cd7a1723126fa50ba3740a828ad316
   content_hash: sha256:a02886d0d9f952547442bff6aea3bbadd91bec07068fa288244e958ff9307c3a
 - repo_url: caad-develop/claude-code-marketplace
   name: telma-api
@@ -692,16 +507,11 @@ dependencies:
   - .claude/skills/telma-api
   - .claude/skills/telma-api/SKILL.md
   - .claude/skills/telma-api/agents/openai.yaml
-  - .kiro/skills/telma-api
-  - .kiro/skills/telma-api/SKILL.md
-  - .kiro/skills/telma-api/agents/openai.yaml
   deployed_file_hashes:
     .agents/skills/telma-api/SKILL.md: sha256:47364c9727c36c99f1b8c9b587d61e4fe541b2e131ee1f29b137d66b54660c93
     .agents/skills/telma-api/agents/openai.yaml: sha256:dee31bad38fa4a840a8f6a5be40a43b47770e1e8315a1d33d8b924546309d26a
     .claude/skills/telma-api/SKILL.md: sha256:47364c9727c36c99f1b8c9b587d61e4fe541b2e131ee1f29b137d66b54660c93
     .claude/skills/telma-api/agents/openai.yaml: sha256:dee31bad38fa4a840a8f6a5be40a43b47770e1e8315a1d33d8b924546309d26a
-    .kiro/skills/telma-api/SKILL.md: sha256:47364c9727c36c99f1b8c9b587d61e4fe541b2e131ee1f29b137d66b54660c93
-    .kiro/skills/telma-api/agents/openai.yaml: sha256:dee31bad38fa4a840a8f6a5be40a43b47770e1e8315a1d33d8b924546309d26a
   content_hash: sha256:69b7d9fc0da45982fb290223ab2f5a3cc81d8a2e8e5af69a923c6d0424f96ce8
 - repo_url: caad-develop/claude-code-marketplace
   name: caad-skill-deployer
@@ -722,11 +532,6 @@ dependencies:
   - .claude/skills/caad-skill-deployer/agents/openai.yaml
   - .claude/skills/caad-skill-deployer/references/folder-policy.md
   - .claude/skills/caad-skill-deployer/scripts/inspect_skill_source.py
-  - .kiro/skills/caad-skill-deployer
-  - .kiro/skills/caad-skill-deployer/SKILL.md
-  - .kiro/skills/caad-skill-deployer/agents/openai.yaml
-  - .kiro/skills/caad-skill-deployer/references/folder-policy.md
-  - .kiro/skills/caad-skill-deployer/scripts/inspect_skill_source.py
   deployed_file_hashes:
     .agents/skills/caad-skill-deployer/SKILL.md: sha256:61ebd3060e671c05495bcec6bbb09b6cea9eb4947dae51898bc01ae480564f82
     .agents/skills/caad-skill-deployer/agents/openai.yaml: sha256:37ef1416cc3c498f66cafe12850d63e6fef7fc7758e4770c44c16e1b844dab58
@@ -736,10 +541,6 @@ dependencies:
     .claude/skills/caad-skill-deployer/agents/openai.yaml: sha256:37ef1416cc3c498f66cafe12850d63e6fef7fc7758e4770c44c16e1b844dab58
     .claude/skills/caad-skill-deployer/references/folder-policy.md: sha256:b70b055285d4372ed91a6d93c95aa454785eb31fbe1e6cd5248499cc69e3be2e
     .claude/skills/caad-skill-deployer/scripts/inspect_skill_source.py: sha256:6a2215b28f2738b0827c5680ee20a4e822e3457b9b620c397c21136c88a9ee9c
-    .kiro/skills/caad-skill-deployer/SKILL.md: sha256:61ebd3060e671c05495bcec6bbb09b6cea9eb4947dae51898bc01ae480564f82
-    .kiro/skills/caad-skill-deployer/agents/openai.yaml: sha256:37ef1416cc3c498f66cafe12850d63e6fef7fc7758e4770c44c16e1b844dab58
-    .kiro/skills/caad-skill-deployer/references/folder-policy.md: sha256:b70b055285d4372ed91a6d93c95aa454785eb31fbe1e6cd5248499cc69e3be2e
-    .kiro/skills/caad-skill-deployer/scripts/inspect_skill_source.py: sha256:6a2215b28f2738b0827c5680ee20a4e822e3457b9b620c397c21136c88a9ee9c
   content_hash: sha256:cb32203710a69564002d0f812dc2e0673a91490ef407e90a13382e1cd48c9306
 - repo_url: cursor/plugins
   name: plugins
@@ -755,12 +556,9 @@ dependencies:
   - .agents/skills/thermo-nuclear-code-quality-review/SKILL.md
   - .claude/skills/thermo-nuclear-code-quality-review
   - .claude/skills/thermo-nuclear-code-quality-review/SKILL.md
-  - .kiro/skills/thermo-nuclear-code-quality-review
-  - .kiro/skills/thermo-nuclear-code-quality-review/SKILL.md
   deployed_file_hashes:
     .agents/skills/thermo-nuclear-code-quality-review/SKILL.md: sha256:7faca08b51b643b2ddd0836f92af15574444024685dcc1e677dbbb39ae8c9e8f
     .claude/skills/thermo-nuclear-code-quality-review/SKILL.md: sha256:7faca08b51b643b2ddd0836f92af15574444024685dcc1e677dbbb39ae8c9e8f
-    .kiro/skills/thermo-nuclear-code-quality-review/SKILL.md: sha256:7faca08b51b643b2ddd0836f92af15574444024685dcc1e677dbbb39ae8c9e8f
   content_hash: sha256:9052b01b46b1d8dbf94c45f9313ec1983443f9a460e83d49cdc7fe0f640ca476
 - repo_url: gonta223/humanizer-ja
   name: humanizer-ja
@@ -777,10 +575,6 @@ dependencies:
   - .claude/skills/humanizer-ja/LICENSE
   - .claude/skills/humanizer-ja/README.md
   - .claude/skills/humanizer-ja/SKILL.md
-  - .kiro/skills/humanizer-ja
-  - .kiro/skills/humanizer-ja/LICENSE
-  - .kiro/skills/humanizer-ja/README.md
-  - .kiro/skills/humanizer-ja/SKILL.md
   deployed_file_hashes:
     .agents/skills/humanizer-ja/LICENSE: sha256:f75eb14ec27966cd36603902343e942aa1d125e7ef78cfb786ba71b29938b7dc
     .agents/skills/humanizer-ja/README.md: sha256:657ca8e0e1750c2eb025e6e61fe229bc9eafcea3ac53694a12f69399a1a29872
@@ -788,15 +582,12 @@ dependencies:
     .claude/skills/humanizer-ja/LICENSE: sha256:f75eb14ec27966cd36603902343e942aa1d125e7ef78cfb786ba71b29938b7dc
     .claude/skills/humanizer-ja/README.md: sha256:657ca8e0e1750c2eb025e6e61fe229bc9eafcea3ac53694a12f69399a1a29872
     .claude/skills/humanizer-ja/SKILL.md: sha256:3fe07f06a179801d7445eff19ed40f1681ef9860665c50c1e9a032f6dffead89
-    .kiro/skills/humanizer-ja/LICENSE: sha256:f75eb14ec27966cd36603902343e942aa1d125e7ef78cfb786ba71b29938b7dc
-    .kiro/skills/humanizer-ja/README.md: sha256:657ca8e0e1750c2eb025e6e61fe229bc9eafcea3ac53694a12f69399a1a29872
-    .kiro/skills/humanizer-ja/SKILL.md: sha256:3fe07f06a179801d7445eff19ed40f1681ef9860665c50c1e9a032f6dffead89
   content_hash: sha256:b6da4ef92a941ab364ab1ddf259d9e511e098a0719f7ee2202847351c34a8194
 - repo_url: ibelick/ui-skills
-  name: baseline-ui
+  name: ui-skills
   host: github.com
   resolved_commit: 173c01add287eee975c40cb0e7f6d85a48c9ed75
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/baseline-ui
   is_virtual: true
   package_type: claude_skill
@@ -805,18 +596,15 @@ dependencies:
   - .agents/skills/baseline-ui/SKILL.md
   - .claude/skills/baseline-ui
   - .claude/skills/baseline-ui/SKILL.md
-  - .kiro/skills/baseline-ui
-  - .kiro/skills/baseline-ui/SKILL.md
   deployed_file_hashes:
     .agents/skills/baseline-ui/SKILL.md: sha256:fea3322f36d58fdafafce2aef56e4556dd2ac7b20876b7dff7d8be7f25fa597f
     .claude/skills/baseline-ui/SKILL.md: sha256:fea3322f36d58fdafafce2aef56e4556dd2ac7b20876b7dff7d8be7f25fa597f
-    .kiro/skills/baseline-ui/SKILL.md: sha256:fea3322f36d58fdafafce2aef56e4556dd2ac7b20876b7dff7d8be7f25fa597f
   content_hash: sha256:dfcb3e778b57ad1cba92375689bb8265fa5aef78fba523a744f5220b3c619901
 - repo_url: ibelick/ui-skills
-  name: fixing-accessibility
+  name: ui-skills
   host: github.com
   resolved_commit: 173c01add287eee975c40cb0e7f6d85a48c9ed75
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/fixing-accessibility
   is_virtual: true
   package_type: claude_skill
@@ -825,18 +613,15 @@ dependencies:
   - .agents/skills/fixing-accessibility/SKILL.md
   - .claude/skills/fixing-accessibility
   - .claude/skills/fixing-accessibility/SKILL.md
-  - .kiro/skills/fixing-accessibility
-  - .kiro/skills/fixing-accessibility/SKILL.md
   deployed_file_hashes:
     .agents/skills/fixing-accessibility/SKILL.md: sha256:549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf
     .claude/skills/fixing-accessibility/SKILL.md: sha256:549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf
-    .kiro/skills/fixing-accessibility/SKILL.md: sha256:549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf
   content_hash: sha256:4fa8f5a772b4eef3d28a54c136b507d070e54e2c326578f65eaf5e5a0118b38a
 - repo_url: ibelick/ui-skills
-  name: fixing-metadata
+  name: ui-skills
   host: github.com
   resolved_commit: 173c01add287eee975c40cb0e7f6d85a48c9ed75
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/fixing-metadata
   is_virtual: true
   package_type: claude_skill
@@ -845,18 +630,15 @@ dependencies:
   - .agents/skills/fixing-metadata/SKILL.md
   - .claude/skills/fixing-metadata
   - .claude/skills/fixing-metadata/SKILL.md
-  - .kiro/skills/fixing-metadata
-  - .kiro/skills/fixing-metadata/SKILL.md
   deployed_file_hashes:
     .agents/skills/fixing-metadata/SKILL.md: sha256:b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547
     .claude/skills/fixing-metadata/SKILL.md: sha256:b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547
-    .kiro/skills/fixing-metadata/SKILL.md: sha256:b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547
   content_hash: sha256:699e13890fb50acffa02dfd2d5b0e719bd916a9e2b7e6035bdc4513fc73d9174
 - repo_url: ibelick/ui-skills
-  name: fixing-motion-performance
+  name: ui-skills
   host: github.com
   resolved_commit: 173c01add287eee975c40cb0e7f6d85a48c9ed75
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/fixing-motion-performance
   is_virtual: true
   package_type: claude_skill
@@ -865,17 +647,14 @@ dependencies:
   - .agents/skills/fixing-motion-performance/SKILL.md
   - .claude/skills/fixing-motion-performance
   - .claude/skills/fixing-motion-performance/SKILL.md
-  - .kiro/skills/fixing-motion-performance
-  - .kiro/skills/fixing-motion-performance/SKILL.md
   deployed_file_hashes:
     .agents/skills/fixing-motion-performance/SKILL.md: sha256:0a2d654902bc04263ce68c8c02967ef03f17b482e855360a5463211d99d7baa9
     .claude/skills/fixing-motion-performance/SKILL.md: sha256:0a2d654902bc04263ce68c8c02967ef03f17b482e855360a5463211d99d7baa9
-    .kiro/skills/fixing-motion-performance/SKILL.md: sha256:0a2d654902bc04263ce68c8c02967ef03f17b482e855360a5463211d99d7baa9
   content_hash: sha256:426dcf33f23419643f2aab71e2253e1a5b5684a808fabb8a4ad135e489ed7a0f
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: a924570a03525275f150cc7d388c3dec4ca24a7d
+  resolved_commit: 43896f1d040549b933065e210df3cf51caded325
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -1366,246 +1145,6 @@ dependencies:
   - .claude/skills/work-log-maintenance/SKILL.md
   - .claude/skills/work-log-maintenance/agents/openai.yaml
   - .claude/skills/work-log-maintenance/references/report-layout.md
-  - .kiro/skills/1password-item-ops
-  - .kiro/skills/1password-item-ops/SKILL.md
-  - .kiro/skills/1password-item-ops/agents/openai.yaml
-  - .kiro/skills/agent-curation
-  - .kiro/skills/agent-curation/SKILL.md
-  - .kiro/skills/agent-curation/agents/openai.yaml
-  - .kiro/skills/agent-curation/references/hired-agents-registry.md
-  - .kiro/skills/apm-repo-bootstrap
-  - .kiro/skills/apm-repo-bootstrap/SKILL.md
-  - .kiro/skills/apm-repo-bootstrap/agents/openai.yaml
-  - .kiro/skills/apm-repo-bootstrap/references/recommendations.md
-  - .kiro/skills/apm-usage
-  - .kiro/skills/apm-usage/SKILL.md
-  - .kiro/skills/apm-usage/agents/openai.yaml
-  - .kiro/skills/apm-usage/references/repo-local-mcp.md
-  - .kiro/skills/architecture-boundary-docs
-  - .kiro/skills/architecture-boundary-docs/SKILL.md
-  - .kiro/skills/architecture-boundary-docs/agents/openai.yaml
-  - .kiro/skills/architecture-boundary-docs/references/document-shape.md
-  - .kiro/skills/atomic-commit
-  - .kiro/skills/atomic-commit/SKILL.md
-  - .kiro/skills/atomic-commit/agents/openai.yaml
-  - .kiro/skills/ci-stability-hooks
-  - .kiro/skills/ci-stability-hooks/SKILL.md
-  - .kiro/skills/ci-stability-hooks/agents/openai.yaml
-  - .kiro/skills/code-quality-improvement
-  - .kiro/skills/code-quality-improvement/SKILL.md
-  - .kiro/skills/code-quality-improvement/references/patterns.md
-  - .kiro/skills/code-review
-  - .kiro/skills/code-review/SKILL.md
-  - .kiro/skills/code-review/agents/openai.yaml
-  - .kiro/skills/code-review/config/default-projects.json
-  - .kiro/skills/code-review/config/examples/.code-review-config.json
-  - .kiro/skills/code-review/config/examples/caad-loca-project.json
-  - .kiro/skills/code-review/examples/review-workflows.md
-  - .kiro/skills/code-review/examples/troubleshooting-solutions.md
-  - .kiro/skills/code-review/references/detailed-mode.md
-  - .kiro/skills/code-review/references/evaluation-framework.md
-  - .kiro/skills/code-review/references/pr-comment-integration.md
-  - .kiro/skills/code-review/references/project-customization.md
-  - .kiro/skills/code-review/references/simple-mode.md
-  - .kiro/skills/code-review/references/tech-stack-skills.md
-  - .kiro/skills/codex-companion-scripts
-  - .kiro/skills/codex-companion-scripts/.claude-plugin/plugin.json
-  - .kiro/skills/codex-companion-scripts/SKILL.md
-  - .kiro/skills/codex-companion-scripts/prompts/adversarial-review.md
-  - .kiro/skills/codex-companion-scripts/prompts/stop-review-gate.md
-  - .kiro/skills/codex-companion-scripts/schemas/review-output.schema.json
-  - .kiro/skills/codex-companion-scripts/scripts/app-server-broker.mjs
-  - .kiro/skills/codex-companion-scripts/scripts/codex-companion.mjs
-  - .kiro/skills/codex-companion-scripts/scripts/lib/app-server.mjs
-  - .kiro/skills/codex-companion-scripts/scripts/lib/args.mjs
-  - .kiro/skills/codex-companion-scripts/scripts/lib/broker-endpoint.mjs
-  - .kiro/skills/codex-companion-scripts/scripts/lib/broker-lifecycle.mjs
-  - .kiro/skills/codex-companion-scripts/scripts/lib/codex.mjs
-  - .kiro/skills/codex-companion-scripts/scripts/lib/fs.mjs
-  - .kiro/skills/codex-companion-scripts/scripts/lib/git.mjs
-  - .kiro/skills/codex-companion-scripts/scripts/lib/job-control.mjs
-  - .kiro/skills/codex-companion-scripts/scripts/lib/process.mjs
-  - .kiro/skills/codex-companion-scripts/scripts/lib/prompts.mjs
-  - .kiro/skills/codex-companion-scripts/scripts/lib/render.mjs
-  - .kiro/skills/codex-companion-scripts/scripts/lib/state.mjs
-  - .kiro/skills/codex-companion-scripts/scripts/lib/tracked-jobs.mjs
-  - .kiro/skills/codex-companion-scripts/scripts/lib/workspace.mjs
-  - .kiro/skills/cross-research
-  - .kiro/skills/cross-research/SKILL.md
-  - .kiro/skills/cross-research/agents/openai.yaml
-  - .kiro/skills/design-md-workflow
-  - .kiro/skills/design-md-workflow/SKILL.md
-  - .kiro/skills/design-md-workflow/agents/openai.yaml
-  - .kiro/skills/design-md-workflow/references/design-md-structure.md
-  - .kiro/skills/design-md-workflow/references/design-review-structure.md
-  - .kiro/skills/design-md-workflow/references/input-modes.md
-  - .kiro/skills/design-md-workflow/references/routing-examples.md
-  - .kiro/skills/design-system-review
-  - .kiro/skills/design-system-review/SKILL.md
-  - .kiro/skills/design-system-review/agents/openai.yaml
-  - .kiro/skills/docs-entrypoint-review
-  - .kiro/skills/docs-entrypoint-review/SKILL.md
-  - .kiro/skills/docs-entrypoint-review/agents/openai.yaml
-  - .kiro/skills/docs-manager
-  - .kiro/skills/docs-manager/SKILL.md
-  - .kiro/skills/docs-manager/agents/openai.yaml
-  - .kiro/skills/docs-manager/examples/.docs-manager-config.example.json
-  - .kiro/skills/docs-manager/examples/custom-project-config.json
-  - .kiro/skills/docs-manager/examples/dotfiles-config.json
-  - .kiro/skills/docs-manager/examples/generic-config.json
-  - .kiro/skills/docs-manager/examples/okf-config.json
-  - .kiro/skills/docs-manager/references/config-templates.md
-  - .kiro/skills/docs-manager/references/metadata-standards.md
-  - .kiro/skills/docs-manager/references/size-management.md
-  - .kiro/skills/docs-manager/references/tag-systems.md
-  - .kiro/skills/docs-manager/templates/docs-manager-config.template.json
-  - .kiro/skills/dotenvx-env-ops
-  - .kiro/skills/dotenvx-env-ops/SKILL.md
-  - .kiro/skills/dotenvx-env-ops/agents/openai.yaml
-  - .kiro/skills/dotenvx-env-ops/references/asta-dotenvx.md
-  - .kiro/skills/git-worktree
-  - .kiro/skills/git-worktree/SKILL.md
-  - .kiro/skills/git-worktree/agents/openai.yaml
-  - .kiro/skills/git-worktree/references/configuration.md
-  - .kiro/skills/git-worktree/references/git-wt-commands.md
-  - .kiro/skills/git-worktree/references/troubleshooting.md
-  - .kiro/skills/git-worktree/references/workflows.md
-  - .kiro/skills/git-worktree/scripts/check-worktree-config.sh
-  - .kiro/skills/google-forms-survey-builder
-  - .kiro/skills/google-forms-survey-builder/SKILL.md
-  - .kiro/skills/google-forms-survey-builder/agents/openai.yaml
-  - .kiro/skills/google-forms-survey-builder/references/SURVEY_QUESTIONS.md
-  - .kiro/skills/google-forms-survey-builder/references/apps-script-patterns.md
-  - .kiro/skills/google-forms-survey-builder/references/survey-questions-format.md
-  - .kiro/skills/headroom
-  - .kiro/skills/headroom/SKILL.md
-  - .kiro/skills/herdr
-  - .kiro/skills/herdr/SKILL.md
-  - .kiro/skills/herdr/references/configuration.md
-  - .kiro/skills/japanese-tech-writing
-  - .kiro/skills/japanese-tech-writing/SKILL.md
-  - .kiro/skills/jina-web-research
-  - .kiro/skills/jina-web-research/SKILL.md
-  - .kiro/skills/jina-web-research/agents/openai.yaml
-  - .kiro/skills/macos-troubleshooting
-  - .kiro/skills/macos-troubleshooting/SKILL.md
-  - .kiro/skills/macos-troubleshooting/agents/openai.yaml
-  - .kiro/skills/macos-troubleshooting/references/cases.md
-  - .kiro/skills/mcp-tools
-  - .kiro/skills/mcp-tools/SKILL.md
-  - .kiro/skills/mcp-tools/agents/openai.yaml
-  - .kiro/skills/mcp-tools/references/mcp-placement.md
-  - .kiro/skills/mcp-tools/references/mcp-tools-details.md
-  - .kiro/skills/mcp-tools/references/security-and-credentials.md
-  - .kiro/skills/mcp-tools/references/server-configurations.md
-  - .kiro/skills/mise
-  - .kiro/skills/mise/SKILL.md
-  - .kiro/skills/mise/agents/openai.yaml
-  - .kiro/skills/mise/references/best-practices.md
-  - .kiro/skills/mise/references/bootstrap.md
-  - .kiro/skills/mise/references/config-templates.md
-  - .kiro/skills/mise/references/current-patterns.md
-  - .kiro/skills/mise/references/task-config-includes.md
-  - .kiro/skills/mise/references/task-family-splitting.md
-  - .kiro/skills/mise/references/tool-management.md
-  - .kiro/skills/mise/references/windows-shells.md
-  - .kiro/skills/mise/resources/examples/npm-package-migration.md
-  - .kiro/skills/mise/resources/templates/mise-config-template.toml
-  - .kiro/skills/pc-ops
-  - .kiro/skills/pc-ops/SKILL.md
-  - .kiro/skills/pc-ops/agents/openai.yaml
-  - .kiro/skills/pc-ops/references/codex-macos.md
-  - .kiro/skills/polish
-  - .kiro/skills/polish/SKILL.md
-  - .kiro/skills/predictive-analysis
-  - .kiro/skills/predictive-analysis/SKILL.md
-  - .kiro/skills/predictive-analysis/examples/preventive-measures.md
-  - .kiro/skills/predictive-analysis/examples/project-specific-analysis.md
-  - .kiro/skills/predictive-analysis/examples/risk-report-examples.md
-  - .kiro/skills/predictive-analysis/references/analysis-methodology.md
-  - .kiro/skills/predictive-analysis/references/issue-categorization.md
-  - .kiro/skills/predictive-analysis/references/mitigation-strategies.md
-  - .kiro/skills/predictive-analysis/references/risk-assessment-framework.md
-  - .kiro/skills/premortem
-  - .kiro/skills/premortem/SKILL.md
-  - .kiro/skills/premortem/agents/openai.yaml
-  - .kiro/skills/premortem/references/examples/session-ml-pipeline.yaml
-  - .kiro/skills/premortem/references/examples/session-web-api.yaml
-  - .kiro/skills/premortem/references/frameworks/analysis-flow.md
-  - .kiro/skills/premortem/references/frameworks/domain-detection.md
-  - .kiro/skills/premortem/references/questions/ai-ml.yaml
-  - .kiro/skills/premortem/references/questions/data-systems.yaml
-  - .kiro/skills/premortem/references/questions/generic.yaml
-  - .kiro/skills/premortem/references/questions/infrastructure.yaml
-  - .kiro/skills/premortem/references/questions/mobile-apps.yaml
-  - .kiro/skills/premortem/references/questions/security.yaml
-  - .kiro/skills/premortem/references/questions/web-development.yaml
-  - .kiro/skills/premortem/scripts/analyze_context.py
-  - .kiro/skills/premortem/scripts/format_report.py
-  - .kiro/skills/premortem/scripts/gap_analyzer.py
-  - .kiro/skills/premortem/scripts/github_integration.py
-  - .kiro/skills/prepare-goal
-  - .kiro/skills/prepare-goal/SKILL.md
-  - .kiro/skills/prepare-goal/agents/openai.yaml
-  - .kiro/skills/quiet-command-auditor
-  - .kiro/skills/quiet-command-auditor/SKILL.md
-  - .kiro/skills/quiet-command-auditor/agents/openai.yaml
-  - .kiro/skills/refactoring
-  - .kiro/skills/refactoring/SKILL.md
-  - .kiro/skills/refactoring/references/boundary_ownership.md
-  - .kiro/skills/refactoring/references/helper_extraction.md
-  - .kiro/skills/refactoring/references/parallel_dispatch.md
-  - .kiro/skills/review-board
-  - .kiro/skills/review-board/SKILL.md
-  - .kiro/skills/review-board/agents/openai.yaml
-  - .kiro/skills/review-board/references/review-lanes.md
-  - .kiro/skills/review-fix-loop
-  - .kiro/skills/review-fix-loop/SKILL.md
-  - .kiro/skills/review-fix-loop/agents/openai.yaml
-  - .kiro/skills/review-plan
-  - .kiro/skills/review-plan/SKILL.md
-  - .kiro/skills/review-plan/agents/openai.yaml
-  - .kiro/skills/rtk
-  - .kiro/skills/rtk/SKILL.md
-  - .kiro/skills/rtk/agents/openai.yaml
-  - .kiro/skills/rtk/references/command-reference.md
-  - .kiro/skills/rules-creator
-  - .kiro/skills/rules-creator/SKILL.md
-  - .kiro/skills/rules-creator/references/rules-system.md
-  - .kiro/skills/rules-creator/resources/checklist.md
-  - .kiro/skills/rules-creator/resources/examples/scoped-api-rule.md
-  - .kiro/skills/rules-creator/resources/examples/type-safety-rule.md
-  - .kiro/skills/rules-creator/resources/templates/rule-template.md
-  - .kiro/skills/similarity
-  - .kiro/skills/similarity/SKILL.md
-  - .kiro/skills/similarity/agents/openai.yaml
-  - .kiro/skills/similarity/references/report-analysis.md
-  - .kiro/skills/slack-app-management
-  - .kiro/skills/slack-app-management/SKILL.md
-  - .kiro/skills/slack-app-management/agents/openai.yaml
-  - .kiro/skills/tsr
-  - .kiro/skills/tsr/MIGRATION.md
-  - .kiro/skills/tsr/README.md
-  - .kiro/skills/tsr/SKILL.md
-  - .kiro/skills/tsr/config-loader.ts
-  - .kiro/skills/tsr/examples/README.md
-  - .kiro/skills/tsr/examples/home-config.json
-  - .kiro/skills/tsr/examples/nextjs-app-router.json
-  - .kiro/skills/tsr/examples/nextjs-pages-router.json
-  - .kiro/skills/tsr/examples/nodejs-app.json
-  - .kiro/skills/tsr/examples/react-app.json
-  - .kiro/skills/tsr/package-lock.json
-  - .kiro/skills/tsr/package.json
-  - .kiro/skills/tsr/references/examples.md
-  - .kiro/skills/tsr/references/tsrignore.md
-  - .kiro/skills/tsr/references/workflow.md
-  - .kiro/skills/tsr/tsconfig.json
-  - .kiro/skills/tsr/tsr-config.default.json
-  - .kiro/skills/tsr/tsr-config.schema.json
-  - .kiro/skills/work-log-maintenance
-  - .kiro/skills/work-log-maintenance/SKILL.md
-  - .kiro/skills/work-log-maintenance/agents/openai.yaml
-  - .kiro/skills/work-log-maintenance/references/report-layout.md
   deployed_file_hashes:
     .agents/skills/1password-item-ops/SKILL.md: sha256:b7fba64c86660630cbde7cf45b9228a45a921ef5836745a0025797debae6c212
     .agents/skills/1password-item-ops/agents/openai.yaml: sha256:7e861a0611c042f922c97096ec7ef4906d27b94f2b5d52d67638bce72c23ca6b
@@ -2009,210 +1548,11 @@ dependencies:
     .claude/skills/work-log-maintenance/SKILL.md: sha256:26f4064ff1c0e757e415121675d6caaecd30040f95304e6ed4cd4c73e022f3f9
     .claude/skills/work-log-maintenance/agents/openai.yaml: sha256:e951b8256a5a1b032bcca3c7105230f5041467594434ca23b562b8ec5ec4abc8
     .claude/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
-    .kiro/skills/1password-item-ops/SKILL.md: sha256:b7fba64c86660630cbde7cf45b9228a45a921ef5836745a0025797debae6c212
-    .kiro/skills/1password-item-ops/agents/openai.yaml: sha256:7e861a0611c042f922c97096ec7ef4906d27b94f2b5d52d67638bce72c23ca6b
-    .kiro/skills/agent-curation/SKILL.md: sha256:cf46408cdb91fd87a0985ccec8a1bc0f77501d521320f88a36a52e9fd9cc3900
-    .kiro/skills/agent-curation/agents/openai.yaml: sha256:f7395c9113eaefcfc27c4b697b0d7c253cb7a67a88c84f038098e0ff06ba8694
-    .kiro/skills/agent-curation/references/hired-agents-registry.md: sha256:8686ea777ab6c8eec3a0fd92f4ce9bbefe4ec5b76f409885c99f6e431f62237e
-    .kiro/skills/apm-repo-bootstrap/SKILL.md: sha256:c340f3997daf9ece1d6a0b6d02770948171549d69ccceebafd0f5cc68f995248
-    .kiro/skills/apm-repo-bootstrap/agents/openai.yaml: sha256:faed36da8f7980b88e395eb9aae322a9fc608e0c555ba93f843f6007ab50da19
-    .kiro/skills/apm-repo-bootstrap/references/recommendations.md: sha256:0fbd9a6d9656f05438834d6224a79a819bbc6933af7dc90835858263175b9c23
-    .kiro/skills/apm-usage/SKILL.md: sha256:99e58c79398f8a0776c2f546e01acc1e0a4f6b9f6fbdbbb3ca1c17f9cc19b245
-    .kiro/skills/apm-usage/agents/openai.yaml: sha256:b3743dad4fcd9f3c209210c40df277e75d949ac7ce1713a61d497cc1e7e3ba83
-    .kiro/skills/apm-usage/references/repo-local-mcp.md: sha256:adac5e0d08543b1dd95b5e7fefd113cd537be290146d9f367cafb51cac89ee41
-    .kiro/skills/architecture-boundary-docs/SKILL.md: sha256:a1ff83850e0cf330529b2f94436714692d933b80b780a08a21263679fe393d2e
-    .kiro/skills/architecture-boundary-docs/agents/openai.yaml: sha256:492ca681ead790cbd1a8ae4c25543b31d5412e2a227c9f501f400ebf2c053370
-    .kiro/skills/architecture-boundary-docs/references/document-shape.md: sha256:1c0fedacef544a36804c64cc58cf159a4c7a2dcc25dbc05ef88f571b3ce425fa
-    .kiro/skills/atomic-commit/SKILL.md: sha256:e9a29b13aef5bf70c5f2c9955b5ccd912e52886440672e5428f86ab8dd371c25
-    .kiro/skills/atomic-commit/agents/openai.yaml: sha256:8486b70455d5ec0241bc7bf64bf52d806084132b2c4fcea7dcfd79ed7aec497f
-    .kiro/skills/ci-stability-hooks/SKILL.md: sha256:2eb85b96927729a1b181f389d74f4d6965895d5d616936477e3955d3e37de479
-    .kiro/skills/ci-stability-hooks/agents/openai.yaml: sha256:60a9e8633c5933d8663858f15d71831b0af1c5265accf6f5e2ebba0916373cc2
-    .kiro/skills/code-quality-improvement/SKILL.md: sha256:13e0d11f43b1578bcf34c498b19e4d02b2acd674bf9312b123e13e2cc2ff37aa
-    .kiro/skills/code-quality-improvement/references/patterns.md: sha256:d371fb616f8c56d9aff936ce9518619856d66d3ad6968108945526882e032d69
-    .kiro/skills/code-review/SKILL.md: sha256:0645e0b0aa0b563ed61c5cbba0e927b77f3466d402e204a1aa762b70770f3116
-    .kiro/skills/code-review/agents/openai.yaml: sha256:4a105fb0747ac36ba050c012709c60c59b256eee9544dbe997d1f266075ce8db
-    .kiro/skills/code-review/config/default-projects.json: sha256:49f745428c8b22b22d66290b78fbf3de94d6ab79b02426162ed3ce61c7e28f07
-    .kiro/skills/code-review/config/examples/.code-review-config.json: sha256:7c660582d3330d6730fddca0574e6c8387c30742a02f162213cc4c9e66940bfe
-    .kiro/skills/code-review/config/examples/caad-loca-project.json: sha256:f7540a62bcdbc7573826bb00d86c2307a8bc94226acdc43b3177e940ec74570b
-    .kiro/skills/code-review/examples/review-workflows.md: sha256:797c1deff75c9aa0a3c6022d9aee7a894571e077fe5ee2b9d84376d3a7dd4e0f
-    .kiro/skills/code-review/examples/troubleshooting-solutions.md: sha256:6c0d1bde596d93424f865d85dfe10ccddef8fb1422ebce6c31f039b01e16bd64
-    .kiro/skills/code-review/references/detailed-mode.md: sha256:c9b10fa65a5286f2dd8bdda4520170b81544eed42a284aedc2aa3431f6fa7c75
-    .kiro/skills/code-review/references/evaluation-framework.md: sha256:d7dcd2d5a3330d03bef338a6562291bd6f08b35f1b8fcf7b6b78dfa11fc0c761
-    .kiro/skills/code-review/references/pr-comment-integration.md: sha256:975874b7e4a1cad2fd0436ab5ca84531378cdb5ecf03d214a7294eeb1d57f6e1
-    .kiro/skills/code-review/references/project-customization.md: sha256:4e3db160b755dac451d9c39d0b6df48bb75728cea38005553df118825d6c3671
-    .kiro/skills/code-review/references/simple-mode.md: sha256:a94a5fc948aabd9005fde00b3ca24551f00501db285c2a942bdd634dbe12c1b6
-    .kiro/skills/code-review/references/tech-stack-skills.md: sha256:436e51071f08fc6961202255d2eae1ad919f9fc867367be52f06f82a7a992813
-    .kiro/skills/codex-companion-scripts/.claude-plugin/plugin.json: sha256:017c48aeedfdb587ef4b9040f86c5db2aeb1eba74e2de6189443ef463634d070
-    .kiro/skills/codex-companion-scripts/SKILL.md: sha256:61c01460abf195565926574e16aa73e57a4a8a26ef2b6d97465217d819b340f3
-    .kiro/skills/codex-companion-scripts/prompts/adversarial-review.md: sha256:640ae6954960ee24317398cde4ddaf926cb91f0886f9c575216b046f5d8d4b2a
-    .kiro/skills/codex-companion-scripts/prompts/stop-review-gate.md: sha256:ee2304153f982bab65df33faa5e8c3093f57d46f7aa70da1e36af3fd791e8017
-    .kiro/skills/codex-companion-scripts/schemas/review-output.schema.json: sha256:7acea366c7ca8deb86c6f3106676fe2a83bbc30840e9e8c0110cccb85bfdf476
-    .kiro/skills/codex-companion-scripts/scripts/app-server-broker.mjs: sha256:08c88af645a853c862c761d594267c227f62e543153d36d0d6a6912f9a843721
-    .kiro/skills/codex-companion-scripts/scripts/codex-companion.mjs: sha256:1d276a66df69d305892713ac5a623e3f5aa90ea17fbd8054ef7553c0ac1f0820
-    .kiro/skills/codex-companion-scripts/scripts/lib/app-server.mjs: sha256:0d0275c6e17d21aadbdf1fb716acf88d84ae37d8e55677baece44e6a51cc9c9c
-    .kiro/skills/codex-companion-scripts/scripts/lib/args.mjs: sha256:5b252c0805d52ef65e6df3b25cbca79033238e50fe5e4011c445ab905204d5d4
-    .kiro/skills/codex-companion-scripts/scripts/lib/broker-endpoint.mjs: sha256:1b08324b6690241eb50411145d914aa4305e31265a82a7e065508933bc1eacb5
-    .kiro/skills/codex-companion-scripts/scripts/lib/broker-lifecycle.mjs: sha256:de1aec1b0699036aee0ffd5cf4cff4907c6677746c7fd1209ba064125985fa07
-    .kiro/skills/codex-companion-scripts/scripts/lib/codex.mjs: sha256:815ca1089c21dd1bde6d9262a54b1ba2b14e5fd012c0b29d486d7efb7cf78f87
-    .kiro/skills/codex-companion-scripts/scripts/lib/fs.mjs: sha256:921cdff3269e1dae9b620c72d8c6959742d46048baba3a83fc6636d1de675dc7
-    .kiro/skills/codex-companion-scripts/scripts/lib/git.mjs: sha256:d703b1aeb7aae53b336ef6dd107af86c2009feaee0bb972e18efc0fed085844d
-    .kiro/skills/codex-companion-scripts/scripts/lib/job-control.mjs: sha256:3b425063420aa6f7a7f39f65fc6c78a9ab356151117f749cc0e380d44ed764d8
-    .kiro/skills/codex-companion-scripts/scripts/lib/process.mjs: sha256:10b0f216211258eefca55923422a102612c3391944aa234c52d353edcd33c4d2
-    .kiro/skills/codex-companion-scripts/scripts/lib/prompts.mjs: sha256:9b97876584a5e62b88a1761a8733160b79c19be21fbb39df88ff183c4785abad
-    .kiro/skills/codex-companion-scripts/scripts/lib/render.mjs: sha256:189e2e9a2179a40a35596629e4fff4ff2aed63db0ee2d7349e3d4c0b953ffb92
-    .kiro/skills/codex-companion-scripts/scripts/lib/state.mjs: sha256:eabfb53f0226791560cc9eb0dfc598e888107187dee64fef79ab3b2c6104faa0
-    .kiro/skills/codex-companion-scripts/scripts/lib/tracked-jobs.mjs: sha256:e2ce2a2b32c9315665300c8d10279073e3268ce3b149320b2a9d90aef53a6e43
-    .kiro/skills/codex-companion-scripts/scripts/lib/workspace.mjs: sha256:7dbdcb927818da4105f65dd0c826caa4dd1781b8050905f8f83f472ce4201e2e
-    .kiro/skills/cross-research/SKILL.md: sha256:a4c913e6833ae897ea7d22632b305b09e3071e46ccc0d5141bdb22263ce851bd
-    .kiro/skills/cross-research/agents/openai.yaml: sha256:065f3e6000229b79c3a17b598471def5743af09baa183920f99edafb1fb9aaeb
-    .kiro/skills/design-md-workflow/SKILL.md: sha256:86a8393eb989689539eff10574e3102ccbfbd9afad9a03d7de8533286fb9e31a
-    .kiro/skills/design-md-workflow/agents/openai.yaml: sha256:9c0affb53d0d0703bf7e8d8199ec81dde316b76a71151c3839c8c021056ef10b
-    .kiro/skills/design-md-workflow/references/design-md-structure.md: sha256:2a273b9805b2476961ee0852bcdb7905778ad3c25260ed03082681323059c569
-    .kiro/skills/design-md-workflow/references/design-review-structure.md: sha256:446dc1fcda31bb29a1b9387601176f4bba97c20c43db9532bedf0e586e56b05f
-    .kiro/skills/design-md-workflow/references/input-modes.md: sha256:e451f000f63e10583b99257a5102cf64582323f358c575c278658286c27bf343
-    .kiro/skills/design-md-workflow/references/routing-examples.md: sha256:83014cfd675639ed7bacffdb2fd4312e8d982936cff0b2a5551cea54fb24ce6e
-    .kiro/skills/design-system-review/SKILL.md: sha256:0645a067178c1a25f192d044febf61022926febf2030a4179a0779f0819cb3e9
-    .kiro/skills/design-system-review/agents/openai.yaml: sha256:1ec6cb197376c3221f77b1f1e4625bbeb71b7ff730f97c4b30bc22ac6bb0a93a
-    .kiro/skills/docs-entrypoint-review/SKILL.md: sha256:dafbdd72b7f6add8a3932876d2eef2f83ad012e7cd323792d755681a5753f02c
-    .kiro/skills/docs-entrypoint-review/agents/openai.yaml: sha256:be759bf855dbbd6cf3251c32d752eb0471fc58c56a7de0cefa8f622a68fc7b75
-    .kiro/skills/docs-manager/SKILL.md: sha256:1afb58574b915412325072b4e65baf8a19a7d115529d547e2174f17338027b53
-    .kiro/skills/docs-manager/agents/openai.yaml: sha256:82518b06e1ec3c0ff6a5c86d5718791ba4c0a077d680ca60ca1745887f315977
-    .kiro/skills/docs-manager/examples/.docs-manager-config.example.json: sha256:e560bdc83be580828502155168300a5ee64cfef47b2420bbec177bf8494d3a54
-    .kiro/skills/docs-manager/examples/custom-project-config.json: sha256:bb49877f1356562166dee7f57eed2a467da8ee178529e372e973602f59f17bbc
-    .kiro/skills/docs-manager/examples/dotfiles-config.json: sha256:5ff986677d974597f64125281e7b296df76cefdbf1250289989f39ba97fdde01
-    .kiro/skills/docs-manager/examples/generic-config.json: sha256:1427598bd4c71dfced87d47a71c87c9d23be20e3fc2be3bfa600232c264a653d
-    .kiro/skills/docs-manager/examples/okf-config.json: sha256:2f5d4b204a37d2fbdff41764298820aa3dae123a08c7e01385101cbd9e6e9942
-    .kiro/skills/docs-manager/references/config-templates.md: sha256:c7a7deb860ee5d5929ae269e92302be334a95f3b02f4341dc54ee81e88dd9e8a
-    .kiro/skills/docs-manager/references/metadata-standards.md: sha256:10352751626312a49311ecd27bb81ba786cc5d0d9e2a9d3411b8ab0945038521
-    .kiro/skills/docs-manager/references/size-management.md: sha256:2eef08e6240774840f6c9b85952960d0b5c827d754b7fe8d075ce676c42e6158
-    .kiro/skills/docs-manager/references/tag-systems.md: sha256:c30e543726ef8e01c4a440fa3fc10d99fd8e326450bdfa2e54d668be941bcc61
-    .kiro/skills/docs-manager/templates/docs-manager-config.template.json: sha256:4c67e95d3203123749bfc206f8ab70b98d8107c45ddf0b637533ed157692cf5c
-    .kiro/skills/dotenvx-env-ops/SKILL.md: sha256:637f58a4fd5f891b9fb0969c29b81c17ca55d2839f75a4b4fb88c923b5892d0c
-    .kiro/skills/dotenvx-env-ops/agents/openai.yaml: sha256:b66aba227981fab6c851d3935074df54cf71b9cd69b162e8072684075b48ec77
-    .kiro/skills/dotenvx-env-ops/references/asta-dotenvx.md: sha256:7d40a7f448f3464de894cedd9daa68082f8bfebbf870e77d41bffaf96bf85cf2
-    .kiro/skills/git-worktree/SKILL.md: sha256:ed1f87fce585b57bc991e08275b9aeac331633f1d6a3b754c89c4a3f4949e8d6
-    .kiro/skills/git-worktree/agents/openai.yaml: sha256:13edbe566f94c15bcb553a532b392da27bbe1c81e71b0f229af6b161ac30bc88
-    .kiro/skills/git-worktree/references/configuration.md: sha256:e0ce9f609332022a539b590d7723219211637fd27512293235d47ab6814d5fdf
-    .kiro/skills/git-worktree/references/git-wt-commands.md: sha256:a67b32ada104c983c1c1f98a055f76bf9d164c9cc64d35cd54acf5e54cf75fd8
-    .kiro/skills/git-worktree/references/troubleshooting.md: sha256:370d8df007792954eb7a8795b068f2487a46284489f908e76864242b01be4d77
-    .kiro/skills/git-worktree/references/workflows.md: sha256:f70bfe1b8c5a7db86e10ae211dbc7188a1ccbd583795dee0633b3896da9ef1fc
-    .kiro/skills/git-worktree/scripts/check-worktree-config.sh: sha256:5582d5f0b45395f7a077ea3e3cbb3266138053166950ff7df274957833e3ffdf
-    .kiro/skills/google-forms-survey-builder/SKILL.md: sha256:3a80ed6d3cce833ce1c12837ee906346a0a0c437a4f5f748ef1ad46c3e5f0746
-    .kiro/skills/google-forms-survey-builder/agents/openai.yaml: sha256:08912f2b673c84dde9af3b91006973ec6f5f6551fa559c1cdbf9056b1ee03b90
-    .kiro/skills/google-forms-survey-builder/references/SURVEY_QUESTIONS.md: sha256:7571484856e9031030b87121b19351c14e3fc5fc0b63a235f9cc94dca5beb0f3
-    .kiro/skills/google-forms-survey-builder/references/apps-script-patterns.md: sha256:57269f30cc830a74ae1d9ddf1b885939ca8e0303a6c08ee66320849f59b13ecc
-    .kiro/skills/google-forms-survey-builder/references/survey-questions-format.md: sha256:96accdafa50bb9d828c148ffeb2bd3c1bc59b123b30c6e80fbdd7449092782d7
-    .kiro/skills/headroom/SKILL.md: sha256:b544af6e415c7724e96dac30f39b6c532d4928b9521031b96e1e723f11af7123
-    .kiro/skills/herdr/SKILL.md: sha256:3f55ca29d8b593ed33130904ae63d5137e0fc35d6cab69832fa23c61e2e725ff
-    .kiro/skills/herdr/references/configuration.md: sha256:92a35f5472ad0056cf9199ee7c0af5237d646cb7af15606e906da3fbf336a732
-    .kiro/skills/japanese-tech-writing/SKILL.md: sha256:6d8da2f159b632b264985b7872b75e2813e597b04bd4853d11f720c548f0cdbb
-    .kiro/skills/jina-web-research/SKILL.md: sha256:3efcadae75ccddb7612d313e5896dc27d2cbddef4a4f013a70be8c75165283bb
-    .kiro/skills/jina-web-research/agents/openai.yaml: sha256:31aa67ba8347ed691d7fe4f14034a4b5f23b698640d50c8aeb60831534423a4d
-    .kiro/skills/macos-troubleshooting/SKILL.md: sha256:5dbfb6b138966632e483ed30dff2b777b2e0842e457033d910f579a00618009c
-    .kiro/skills/macos-troubleshooting/agents/openai.yaml: sha256:e0c22f96dba94a75c9689b34dd10c1ce965bfa9bbe8b613e586e72a87bf6f69a
-    .kiro/skills/macos-troubleshooting/references/cases.md: sha256:331c8dafd6cf8f749d5565c77831c51a25cdee7b039caa2b2d7dc683cf2999bd
-    .kiro/skills/mcp-tools/SKILL.md: sha256:bd74f85bae6f8b0b29d875a4c4c89fee69de798c9c262244d2d7c01447beece4
-    .kiro/skills/mcp-tools/agents/openai.yaml: sha256:f2251a17f3ee854c9aa28c0ef7645c279b2dcd81afc53e65a102eff7c35101af
-    .kiro/skills/mcp-tools/references/mcp-placement.md: sha256:fb1c67b1b36376a24daf56f1348a8c439adbbc252a93f82c1ddd0b97f8c96452
-    .kiro/skills/mcp-tools/references/mcp-tools-details.md: sha256:c0af3d9e3ff7006bc5953f295824f31cb22d606fb93da7a07e2a94c7550af3ea
-    .kiro/skills/mcp-tools/references/security-and-credentials.md: sha256:789724e286ed619bea3e8b23f97ac84156886d78b9ae8b2bf028291919be02a2
-    .kiro/skills/mcp-tools/references/server-configurations.md: sha256:14c2a50593bf13eb148781a4a03eb9d9a536e14a6d69ac9d814729e5df60cc0d
-    .kiro/skills/mise/SKILL.md: sha256:feef876253688077c3f38f579ff12e6656eca8a37d43a50c1458d3a15de323c5
-    .kiro/skills/mise/agents/openai.yaml: sha256:5032c53d31fa12d2b209f729ae559a941d0ca68a2494101f952eba0b87cff7ef
-    .kiro/skills/mise/references/best-practices.md: sha256:e4210cbe2376d81ecb6aff4c4603cb6570454a6465276b3b88d48737b0ba5ce4
-    .kiro/skills/mise/references/bootstrap.md: sha256:d83f24479a7ace86b47d863b41f8042ce363b9fe3817b104c6eb8035d67fe90e
-    .kiro/skills/mise/references/config-templates.md: sha256:1bcfc920cb580a9d1afed21517ba842dd7f17b8a1283a2ebeb9dbade66808598
-    .kiro/skills/mise/references/current-patterns.md: sha256:144f193fb643d9042b2532a5ad86d6942b3433c01c1e4d877610e89e480c8293
-    .kiro/skills/mise/references/task-config-includes.md: sha256:e5a8916d08c976183273b79c49bff08be16e03fff7adf3ce624de5d098334998
-    .kiro/skills/mise/references/task-family-splitting.md: sha256:43022a96ae2bbbc7c00179b4d6fd91787e2e573a3b7a2682b18bab2ad230f26a
-    .kiro/skills/mise/references/tool-management.md: sha256:bd56c398dafb681855afd951d645d21814bb1083c62b9cb506ea383b5b48df6b
-    .kiro/skills/mise/references/windows-shells.md: sha256:12b6015cec11e12745e9be6dc448a10c15ed49772954f960aa322eb69a96c6ec
-    .kiro/skills/mise/resources/examples/npm-package-migration.md: sha256:dd9c35732be0a4cb0dbd231bfaa16024c082d9bf0be61c66b6e531085b8bdfde
-    .kiro/skills/mise/resources/templates/mise-config-template.toml: sha256:7c0f5e891d7f3ae501287dcc849ad16251cb24beb2e699e435ad398bba954af0
-    .kiro/skills/pc-ops/SKILL.md: sha256:3553f39a05498f040b5f6b7fdba9da1379f0afcee79469c9427cc54f14195b47
-    .kiro/skills/pc-ops/agents/openai.yaml: sha256:15f300474d6ae5e83fc70c3ca350c753713fffb9dfd7e10c9fea888677d40fe0
-    .kiro/skills/pc-ops/references/codex-macos.md: sha256:2298bc1f2586b817ce620e2904bc98423516c829a5f01269a8d9defe10931d4e
-    .kiro/skills/polish/SKILL.md: sha256:f584c16f0754c71b80b323f25e33172ab39efd655afa1081c72c0a07824a59a7
-    .kiro/skills/predictive-analysis/SKILL.md: sha256:eaf8fea7373abba60aa12872f5719d9b083d2b926ee7b24fbfad4fccc8226071
-    .kiro/skills/predictive-analysis/examples/preventive-measures.md: sha256:dc8ed47b58448932b8c0157c45d0d483a49c8f445aa1e601515c779de53217c3
-    .kiro/skills/predictive-analysis/examples/project-specific-analysis.md: sha256:999a24d8762cee62f8363c7cdd1a2708558d2e565315f4747e12cdf0ade2a41a
-    .kiro/skills/predictive-analysis/examples/risk-report-examples.md: sha256:503799b04565cad0307ae2bc50f3f4aba29dba724ed4f9d3605dd564751766ad
-    .kiro/skills/predictive-analysis/references/analysis-methodology.md: sha256:c92c6ebadaf01c9e6831e834ea926a19fa554f85d6e073ad2d6230f5bf33bc7b
-    .kiro/skills/predictive-analysis/references/issue-categorization.md: sha256:99195f4aa92abfabc8fc2952da22db9f631399490859b0c607da6e8417ecf8e0
-    .kiro/skills/predictive-analysis/references/mitigation-strategies.md: sha256:5312962dd75510fee9b27a0efce318e11b7df5d10860ef13480a524ea0463dbd
-    .kiro/skills/predictive-analysis/references/risk-assessment-framework.md: sha256:743fac08f0860a79d250ab7556b977c3de991f1abd220898f886d9e843c374ff
-    .kiro/skills/premortem/SKILL.md: sha256:01a0969b739db38becf83d37790e611c995ccf80248a73bd141982f0601910e9
-    .kiro/skills/premortem/agents/openai.yaml: sha256:7364d27247d484f71f6aeb4757c605753d89bc1c6bd6c30dca141e8836976004
-    .kiro/skills/premortem/references/examples/session-ml-pipeline.yaml: sha256:22c41196860675fd6bdfa99720fcf93a932e50948f746f114f707e3ca0206a72
-    .kiro/skills/premortem/references/examples/session-web-api.yaml: sha256:15ffd2f7c5742c70e3c82b7d49c46e6fcbd54f3fd67ff6a7117f39af5924c636
-    .kiro/skills/premortem/references/frameworks/analysis-flow.md: sha256:a16b59b79847e3512dd075eba27e787d8610523aa7215b7ecf43bd1e1c56f652
-    .kiro/skills/premortem/references/frameworks/domain-detection.md: sha256:4b1ed92c895c2748820518f65c6cd51e2f98e54b391887f79dd5bb7cb6b2e2b6
-    .kiro/skills/premortem/references/questions/ai-ml.yaml: sha256:08ae5b58ae172901bf769bd3c9e2355def3c8514bb4235e74b4b91844932c652
-    .kiro/skills/premortem/references/questions/data-systems.yaml: sha256:a913ca971dc8caaf3809a412464dca3c485f5010cdc7e2a543ebcc5a510f58d3
-    .kiro/skills/premortem/references/questions/generic.yaml: sha256:c2ede23724698cd5b0515bc13540f74fbc150a0c6cce9caedaffcd1cf9825e66
-    .kiro/skills/premortem/references/questions/infrastructure.yaml: sha256:029e6b053c20bd0aac143c87f609f69724592c0cc4d529c2634950716c2bdd17
-    .kiro/skills/premortem/references/questions/mobile-apps.yaml: sha256:78b0606ba01938720e5466eaa683da259223fe74ba3995b6cb550cdc47864121
-    .kiro/skills/premortem/references/questions/security.yaml: sha256:7de25c36e2f33e513ecbbebb538f7cc7a024d9913ac407c68aab513ba413c58d
-    .kiro/skills/premortem/references/questions/web-development.yaml: sha256:0f2afdccd59616bef6d2b022e48675126639fcf67e5d772b2d531d68f526cca5
-    .kiro/skills/premortem/scripts/analyze_context.py: sha256:048001e637790e6285ce4949568b514e5dcd2eded541014a7553bb4266a0c224
-    .kiro/skills/premortem/scripts/format_report.py: sha256:ac75112f90d656df516f58171d216fa624d9d7a36f2206a360cc6e521eff50ea
-    .kiro/skills/premortem/scripts/gap_analyzer.py: sha256:fe0051f60d1745f02ed193a8b06cef5ec733fcaa9082b9cbbf29fb582f79b6aa
-    .kiro/skills/premortem/scripts/github_integration.py: sha256:113a55435ff150ec9940b0f5d4cff3e9fd24d9429cbc7ab2dc30e96e223b640b
-    .kiro/skills/prepare-goal/SKILL.md: sha256:792827300e8fa75400f2bc50d7d27c5a5a3f3b0a6c0859861d6c3566a1e88a35
-    .kiro/skills/prepare-goal/agents/openai.yaml: sha256:870d31c398ceb1c485a64b3a5e694942f055e85983718a61434b117bca5cefbc
-    .kiro/skills/quiet-command-auditor/SKILL.md: sha256:f6277836e6e6abf911131228442cbd6aad32d7b9f95ab5796e54d0667956e9cf
-    .kiro/skills/quiet-command-auditor/agents/openai.yaml: sha256:f291311cccf3c7de9195eaf3c032a88a2a9fc2cc13ab5296731316febadc755e
-    .kiro/skills/refactoring/SKILL.md: sha256:55148c02acd04a8419d7a96e2f67a05bacff087c5ca6bf1cf57b4c5df7649a12
-    .kiro/skills/refactoring/references/boundary_ownership.md: sha256:e1453ec7788d1f013a356982568c7a5cbd727be72907b721ab8443040cc91058
-    .kiro/skills/refactoring/references/helper_extraction.md: sha256:041609dbbd6d27e004e80bc0590c3c1a1482267306570fe07f12e6f338311930
-    .kiro/skills/refactoring/references/parallel_dispatch.md: sha256:4588d7ac3e700bc72f0b54a78537a0d248684e5924f3b9aa45f0e573a8adab49
-    .kiro/skills/review-board/SKILL.md: sha256:872c5b15040a14c75f689ae72d6ca0bbc81c17341207671c8420c7d155af3593
-    .kiro/skills/review-board/agents/openai.yaml: sha256:8c1d411f471af1fe0d17e913777512c0266b8c89e08909ffe61aa4b6ab19ab1f
-    .kiro/skills/review-board/references/review-lanes.md: sha256:58d4fbfe5974dcc07a7915a9d08b1d0972901722a981269df96c1ae72d1ee411
-    .kiro/skills/review-fix-loop/SKILL.md: sha256:d4d1a35255e544468e6a28c52cf8983e87b2ece18b665b07005f2684306a80b4
-    .kiro/skills/review-fix-loop/agents/openai.yaml: sha256:2ebea0b8282c864b31d92a942df6e46c9b6ab54a2bd51e38878c7f732ec3004d
-    .kiro/skills/review-plan/SKILL.md: sha256:52546313f3e4df277e2e1739a29b051ccb2466d4693ace191c09aa69aa58214f
-    .kiro/skills/review-plan/agents/openai.yaml: sha256:c8262db2188dc19436254c472b3fa8666beacde78db684eff4852c2089c9b995
-    .kiro/skills/rtk/SKILL.md: sha256:c6840ba09b97ca3c0826553ed9a22405af1fab3dd789621ba14c5bee8d6a2318
-    .kiro/skills/rtk/agents/openai.yaml: sha256:5a21360717bfc36ec38ef12f17f45849c496fd002300a9fd7a6badb60d0e4647
-    .kiro/skills/rtk/references/command-reference.md: sha256:1b8437c2ad69891a7229b7887e518b11082448ffd75e6e964416124596263477
-    .kiro/skills/rules-creator/SKILL.md: sha256:05850ef1230b28dc79f1f2a1a787b25d7f816efe8a7ed90982ce8e1a1b4e6136
-    .kiro/skills/rules-creator/references/rules-system.md: sha256:d238b9765103e3edca2645e38aebdf424da1890ca12a420a7dc523333be36308
-    .kiro/skills/rules-creator/resources/checklist.md: sha256:275dca37210bf1d3c79c361fa60ce575ef4fe771d44690aa95a8615d053541a7
-    .kiro/skills/rules-creator/resources/examples/scoped-api-rule.md: sha256:4e2b713c335101969cb0cc5a9fa0b0d388c93bb82e7fbe3bd779e250b8a32da2
-    .kiro/skills/rules-creator/resources/examples/type-safety-rule.md: sha256:6328d3f9dc4226bd6432d43cf2e54012f8e232e796f82ba67c695000096f81bc
-    .kiro/skills/rules-creator/resources/templates/rule-template.md: sha256:eb9951d03ede7c9fbdb7b01b8b01ea7cbb2b58751b79e3c32493f7deaca1e9e3
-    .kiro/skills/similarity/SKILL.md: sha256:9996c551ae8c69eddb2637e0cc0644f985f77911e7d94474167c6659e202e8fc
-    .kiro/skills/similarity/agents/openai.yaml: sha256:256ce2d2a4a3f6ac024a9a08b2665de766232278500894c27c2c83569b778598
-    .kiro/skills/similarity/references/report-analysis.md: sha256:dad82829abba9e606035d045973cfc9a6f2b20ca359a79c3175dadcbbcb2edbe
-    .kiro/skills/slack-app-management/SKILL.md: sha256:6b20765d9ba0fd5757323c91c027dc62c92497c9f1dfca439b84d171c111768b
-    .kiro/skills/slack-app-management/agents/openai.yaml: sha256:9a2c6ca4d634aa549dd13bc35f924e13d48996714e6788cb5d97765e3d9d644c
-    .kiro/skills/tsr/MIGRATION.md: sha256:4cfc6d22fe0569e71b50d106f2beb48a27bcc9ab9bc353c5974b3a1f9757a879
-    .kiro/skills/tsr/README.md: sha256:baf1c761bcb44bf47c76b1fc762f1ad290bda38a59d1ccd70245f7fc455f59b9
-    .kiro/skills/tsr/SKILL.md: sha256:1e61f765717fbf34e4c37b525264170440910a50b4ba07f5423412cb760d8fb7
-    .kiro/skills/tsr/config-loader.ts: sha256:1cd498d2f8fadd2a4e1817b27a066f7cf019e77af9ec8e2faabcb4765550e946
-    .kiro/skills/tsr/examples/README.md: sha256:3dee47bfa47ce09ff6ceb44fcaf8cf3c798227a0caad036c5cbe9a018ad88b1b
-    .kiro/skills/tsr/examples/home-config.json: sha256:2459a9c3fcf6544bc27575f60be53dae212d26a158704ae4e3fa0dac439213db
-    .kiro/skills/tsr/examples/nextjs-app-router.json: sha256:335470b3b381645fb4cfc084552a1573d388ce270ea552b8ee8998f90186a14c
-    .kiro/skills/tsr/examples/nextjs-pages-router.json: sha256:48760e285e92ae55234819c91b702717ce1218577e9d686dae57a28723100170
-    .kiro/skills/tsr/examples/nodejs-app.json: sha256:1ffdf6d51895c2d322f47784d75d0f702ffb31168f57c8afc9f708a66e4bcc64
-    .kiro/skills/tsr/examples/react-app.json: sha256:128162b97b2677b2d3c0ef9e0ca1b2aee2c964aeadfd0cd9a7297a1d55a17139
-    .kiro/skills/tsr/package-lock.json: sha256:60b33e523057cafe0db42d25c452a1d6d63036c2ebf2184e0abb4472cf76f248
-    .kiro/skills/tsr/package.json: sha256:ac0fe02edaf53bb14443ec1c0246d23be705ca35b1b13c774a78f609a9b74297
-    .kiro/skills/tsr/references/examples.md: sha256:4c6b467ad339480e03083106a74f592ed10c50963615433abb9b96a18f9c77b4
-    .kiro/skills/tsr/references/tsrignore.md: sha256:e8e0f6e5aad20890526ecfd3ec2eac3d709db149e7e333e8b6787019604c34b6
-    .kiro/skills/tsr/references/workflow.md: sha256:f8e12d2c1bf738b70ca736f492b18fb4d63edc9b6d16d6885ee19329193c8ce0
-    .kiro/skills/tsr/tsconfig.json: sha256:7281659cf7d82c20093062d11b652d07c66f81f0938b76894f5a1a708730cfc8
-    .kiro/skills/tsr/tsr-config.default.json: sha256:4a27845863e7648c90b898b2771b5390d6a26bcbcb4d9fccb120d15ae8479746
-    .kiro/skills/tsr/tsr-config.schema.json: sha256:002f66fc8a6d432bd0909bfa9719939203bb687e50baa4425ee2f5150b0c714d
-    .kiro/skills/work-log-maintenance/SKILL.md: sha256:26f4064ff1c0e757e415121675d6caaecd30040f95304e6ed4cd4c73e022f3f9
-    .kiro/skills/work-log-maintenance/agents/openai.yaml: sha256:e951b8256a5a1b032bcca3c7105230f5041467594434ca23b562b8ec5ec4abc8
-    .kiro/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
-  content_hash: sha256:e1bece01af4bddacd3b53b36616db63b2edf2722dbc18203260856e1e0631978
+  content_hash: sha256:0b67110b5b635dff496526a1acf5a8c0ad5e7e0f046c79fb93ab2af81c660486
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
-  resolved_commit: 7faa40d3c64566aff0d5b3a5f478ffc14b7730ff
+  resolved_commit: 43896f1d040549b933065e210df3cf51caded325
   resolved_ref: main
   version: 1.0.0
   virtual_path: manual-skills
@@ -2220,10 +1560,10 @@ dependencies:
   package_type: apm_package
   content_hash: sha256:c9adaaf42924bc9edc428c03d4ed3465bdd46305c3437d5f4b1d1ee4346c69fe
 - repo_url: langchain-ai/deepagents
-  name: web-research
+  name: deepagents
   host: github.com
   resolved_commit: 22d50456324e9b8c0121a3a06787e19c1b88e1aa
-  version: 1.0.0
+  version: unknown
   virtual_path: libs/cli/examples/skills/web-research
   is_virtual: true
   package_type: claude_skill
@@ -2232,18 +1572,15 @@ dependencies:
   - .agents/skills/web-research/SKILL.md
   - .claude/skills/web-research
   - .claude/skills/web-research/SKILL.md
-  - .kiro/skills/web-research
-  - .kiro/skills/web-research/SKILL.md
   deployed_file_hashes:
     .agents/skills/web-research/SKILL.md: sha256:7c2b1f1990370f7ce176fe3608a67028c72db11e337b4ba83b8fce6d927dfde3
     .claude/skills/web-research/SKILL.md: sha256:7c2b1f1990370f7ce176fe3608a67028c72db11e337b4ba83b8fce6d927dfde3
-    .kiro/skills/web-research/SKILL.md: sha256:7c2b1f1990370f7ce176fe3608a67028c72db11e337b4ba83b8fce6d927dfde3
   content_hash: sha256:2b66d5db8c8d70474e70638f437f324fb3af3724b71bf8501e48c8004e70e677
 - repo_url: mattpocock/skills
-  name: grill-with-docs
+  name: skills
   host: github.com
   resolved_commit: 66898f60e8c744e269f8ce06c2b2b99ce7660d5f
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/engineering/grill-with-docs
   is_virtual: true
   package_type: claude_skill
@@ -2254,22 +1591,17 @@ dependencies:
   - .claude/skills/grill-with-docs
   - .claude/skills/grill-with-docs/SKILL.md
   - .claude/skills/grill-with-docs/agents/openai.yaml
-  - .kiro/skills/grill-with-docs
-  - .kiro/skills/grill-with-docs/SKILL.md
-  - .kiro/skills/grill-with-docs/agents/openai.yaml
   deployed_file_hashes:
     .agents/skills/grill-with-docs/SKILL.md: sha256:610d091047bcfb9db0f75c057d15538481a721111579fc5ec7f83ad9131a2165
     .agents/skills/grill-with-docs/agents/openai.yaml: sha256:94cd0ab161fb468a836349f5ed482ba58ce8e709a05c57ce533d739dbd35cca9
     .claude/skills/grill-with-docs/SKILL.md: sha256:610d091047bcfb9db0f75c057d15538481a721111579fc5ec7f83ad9131a2165
     .claude/skills/grill-with-docs/agents/openai.yaml: sha256:94cd0ab161fb468a836349f5ed482ba58ce8e709a05c57ce533d739dbd35cca9
-    .kiro/skills/grill-with-docs/SKILL.md: sha256:610d091047bcfb9db0f75c057d15538481a721111579fc5ec7f83ad9131a2165
-    .kiro/skills/grill-with-docs/agents/openai.yaml: sha256:94cd0ab161fb468a836349f5ed482ba58ce8e709a05c57ce533d739dbd35cca9
   content_hash: sha256:c3a266bcc09eab29358eaae6e288f9a2cd492fd0af2bcaeeec55fd6207da9a89
 - repo_url: mattpocock/skills
-  name: wayfinder
+  name: skills
   host: github.com
   resolved_commit: 66898f60e8c744e269f8ce06c2b2b99ce7660d5f
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/engineering/wayfinder
   is_virtual: true
   package_type: claude_skill
@@ -2280,22 +1612,17 @@ dependencies:
   - .claude/skills/wayfinder
   - .claude/skills/wayfinder/SKILL.md
   - .claude/skills/wayfinder/agents/openai.yaml
-  - .kiro/skills/wayfinder
-  - .kiro/skills/wayfinder/SKILL.md
-  - .kiro/skills/wayfinder/agents/openai.yaml
   deployed_file_hashes:
     .agents/skills/wayfinder/SKILL.md: sha256:257e40665b28ae959ffdcb97d7a72b074360f4a3d201bd84786505308546e434
     .agents/skills/wayfinder/agents/openai.yaml: sha256:88bc81a11a6d52ac67aeaa76b8b619e387020d47c5133a4dd4927fd15c4ad073
     .claude/skills/wayfinder/SKILL.md: sha256:257e40665b28ae959ffdcb97d7a72b074360f4a3d201bd84786505308546e434
     .claude/skills/wayfinder/agents/openai.yaml: sha256:88bc81a11a6d52ac67aeaa76b8b619e387020d47c5133a4dd4927fd15c4ad073
-    .kiro/skills/wayfinder/SKILL.md: sha256:257e40665b28ae959ffdcb97d7a72b074360f4a3d201bd84786505308546e434
-    .kiro/skills/wayfinder/agents/openai.yaml: sha256:88bc81a11a6d52ac67aeaa76b8b619e387020d47c5133a4dd4927fd15c4ad073
   content_hash: sha256:d4e1b0fa933e7377d97193e52626b880a8c1b441894fbec03f3ff0cb939e70c7
 - repo_url: mattpocock/skills
-  name: grilling
+  name: skills
   host: github.com
   resolved_commit: 66898f60e8c744e269f8ce06c2b2b99ce7660d5f
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/productivity/grilling
   is_virtual: true
   package_type: claude_skill
@@ -2306,22 +1633,17 @@ dependencies:
   - .claude/skills/grilling
   - .claude/skills/grilling/SKILL.md
   - .claude/skills/grilling/agents/openai.yaml
-  - .kiro/skills/grilling
-  - .kiro/skills/grilling/SKILL.md
-  - .kiro/skills/grilling/agents/openai.yaml
   deployed_file_hashes:
     .agents/skills/grilling/SKILL.md: sha256:44331dda57f461db4fec3f2efb6ddabe7aaaa0a57ae0f88a883bc61aed8a0587
     .agents/skills/grilling/agents/openai.yaml: sha256:cf29b9a8dbf35a58a908a6ca4f64dcd86c2b2130291eee0a78b9f706b138825b
     .claude/skills/grilling/SKILL.md: sha256:44331dda57f461db4fec3f2efb6ddabe7aaaa0a57ae0f88a883bc61aed8a0587
     .claude/skills/grilling/agents/openai.yaml: sha256:cf29b9a8dbf35a58a908a6ca4f64dcd86c2b2130291eee0a78b9f706b138825b
-    .kiro/skills/grilling/SKILL.md: sha256:44331dda57f461db4fec3f2efb6ddabe7aaaa0a57ae0f88a883bc61aed8a0587
-    .kiro/skills/grilling/agents/openai.yaml: sha256:cf29b9a8dbf35a58a908a6ca4f64dcd86c2b2130291eee0a78b9f706b138825b
   content_hash: sha256:1f05b0ffe26fb4d4457e3e40b41ec2f3e379ae2d6877613240bc6ffef5f7f338
 - repo_url: mattpocock/skills
-  name: handoff
+  name: skills
   host: github.com
   resolved_commit: 66898f60e8c744e269f8ce06c2b2b99ce7660d5f
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/productivity/handoff
   is_virtual: true
   package_type: claude_skill
@@ -2332,22 +1654,17 @@ dependencies:
   - .claude/skills/handoff
   - .claude/skills/handoff/SKILL.md
   - .claude/skills/handoff/agents/openai.yaml
-  - .kiro/skills/handoff
-  - .kiro/skills/handoff/SKILL.md
-  - .kiro/skills/handoff/agents/openai.yaml
   deployed_file_hashes:
     .agents/skills/handoff/SKILL.md: sha256:57c9f1f392d7352cdc85b1e39ca49eddc70ce1dc278bd9653fb4f23dfc2560fc
     .agents/skills/handoff/agents/openai.yaml: sha256:5c479fd562c691851690e8b18c8501045bef0943c10743d636b2fae26add1d28
     .claude/skills/handoff/SKILL.md: sha256:57c9f1f392d7352cdc85b1e39ca49eddc70ce1dc278bd9653fb4f23dfc2560fc
     .claude/skills/handoff/agents/openai.yaml: sha256:5c479fd562c691851690e8b18c8501045bef0943c10743d636b2fae26add1d28
-    .kiro/skills/handoff/SKILL.md: sha256:57c9f1f392d7352cdc85b1e39ca49eddc70ce1dc278bd9653fb4f23dfc2560fc
-    .kiro/skills/handoff/agents/openai.yaml: sha256:5c479fd562c691851690e8b18c8501045bef0943c10743d636b2fae26add1d28
   content_hash: sha256:89e3d3e72b94973b557120eee18232218691989f53564f9e163467e6d377d5a8
 - repo_url: mattpocock/skills
-  name: writing-great-skills
+  name: skills
   host: github.com
   resolved_commit: 66898f60e8c744e269f8ce06c2b2b99ce7660d5f
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/productivity/writing-great-skills
   is_virtual: true
   package_type: claude_skill
@@ -2360,10 +1677,6 @@ dependencies:
   - .claude/skills/writing-great-skills/GLOSSARY.md
   - .claude/skills/writing-great-skills/SKILL.md
   - .claude/skills/writing-great-skills/agents/openai.yaml
-  - .kiro/skills/writing-great-skills
-  - .kiro/skills/writing-great-skills/GLOSSARY.md
-  - .kiro/skills/writing-great-skills/SKILL.md
-  - .kiro/skills/writing-great-skills/agents/openai.yaml
   deployed_file_hashes:
     .agents/skills/writing-great-skills/GLOSSARY.md: sha256:cccd684c73fb7a06f523497b0121765f92d2b33d6ef9c51602294849233451d6
     .agents/skills/writing-great-skills/SKILL.md: sha256:4d6ccbc3760b1bd4107c495a79872286ea69494003f3b0a719fc95b147457061
@@ -2371,15 +1684,12 @@ dependencies:
     .claude/skills/writing-great-skills/GLOSSARY.md: sha256:cccd684c73fb7a06f523497b0121765f92d2b33d6ef9c51602294849233451d6
     .claude/skills/writing-great-skills/SKILL.md: sha256:4d6ccbc3760b1bd4107c495a79872286ea69494003f3b0a719fc95b147457061
     .claude/skills/writing-great-skills/agents/openai.yaml: sha256:b3c555d2654ec61aed78f8435f583c6a0cd6bf980d71317724682ad20075c33d
-    .kiro/skills/writing-great-skills/GLOSSARY.md: sha256:cccd684c73fb7a06f523497b0121765f92d2b33d6ef9c51602294849233451d6
-    .kiro/skills/writing-great-skills/SKILL.md: sha256:4d6ccbc3760b1bd4107c495a79872286ea69494003f3b0a719fc95b147457061
-    .kiro/skills/writing-great-skills/agents/openai.yaml: sha256:b3c555d2654ec61aed78f8435f583c6a0cd6bf980d71317724682ad20075c33d
   content_hash: sha256:83d8ec1619c1794cb8fcb1a325a74f5ff06b350df8099f70fc25818a743ad72e
 - repo_url: millionco/react-doctor
   name: react-doctor
   host: github.com
   resolved_commit: 71e6da6897e47a99329c7477a05b1562e023f1d6
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/react-doctor
   is_virtual: true
   package_type: claude_skill
@@ -2390,16 +1700,11 @@ dependencies:
   - .claude/skills/react-doctor
   - .claude/skills/react-doctor/SKILL.md
   - .claude/skills/react-doctor/references/explain.md
-  - .kiro/skills/react-doctor
-  - .kiro/skills/react-doctor/SKILL.md
-  - .kiro/skills/react-doctor/references/explain.md
   deployed_file_hashes:
     .agents/skills/react-doctor/SKILL.md: sha256:df58b3490543b5f3bfc2bc78ba7da0ae697cfc88ee228e9044323636fe68f28c
     .agents/skills/react-doctor/references/explain.md: sha256:2382ea820f203d7e16e8102a7fa55c5ce315fdd4591a0638e95d863166834ef2
     .claude/skills/react-doctor/SKILL.md: sha256:df58b3490543b5f3bfc2bc78ba7da0ae697cfc88ee228e9044323636fe68f28c
     .claude/skills/react-doctor/references/explain.md: sha256:2382ea820f203d7e16e8102a7fa55c5ce315fdd4591a0638e95d863166834ef2
-    .kiro/skills/react-doctor/SKILL.md: sha256:df58b3490543b5f3bfc2bc78ba7da0ae697cfc88ee228e9044323636fe68f28c
-    .kiro/skills/react-doctor/references/explain.md: sha256:2382ea820f203d7e16e8102a7fa55c5ce315fdd4591a0638e95d863166834ef2
   content_hash: sha256:cdb0f2247aa09a5d8e2816b12a12582dd3775734923eee1284fe31fd44670fd4
 - repo_url: mizchi/skills
   name: skills
@@ -2418,10 +1723,6 @@ dependencies:
   - .claude/skills/empirical-prompt-tuning/README.md
   - .claude/skills/empirical-prompt-tuning/SKILL-ja.md
   - .claude/skills/empirical-prompt-tuning/SKILL.md
-  - .kiro/skills/empirical-prompt-tuning
-  - .kiro/skills/empirical-prompt-tuning/README.md
-  - .kiro/skills/empirical-prompt-tuning/SKILL-ja.md
-  - .kiro/skills/empirical-prompt-tuning/SKILL.md
   deployed_file_hashes:
     .agents/skills/empirical-prompt-tuning/README.md: sha256:c7db7d27122bcffe416e5607700a7cd1778cad260d3e104c5bb6da7b7f976b3d
     .agents/skills/empirical-prompt-tuning/SKILL-ja.md: sha256:0a38d830802c2e08a7faca13928fedf6911e00b896946b4b03910d662de6dea5
@@ -2429,15 +1730,12 @@ dependencies:
     .claude/skills/empirical-prompt-tuning/README.md: sha256:c7db7d27122bcffe416e5607700a7cd1778cad260d3e104c5bb6da7b7f976b3d
     .claude/skills/empirical-prompt-tuning/SKILL-ja.md: sha256:0a38d830802c2e08a7faca13928fedf6911e00b896946b4b03910d662de6dea5
     .claude/skills/empirical-prompt-tuning/SKILL.md: sha256:252418e7ef022981d2dda2e3ec57fa1c786d30af68c50b7e062edf1d7361b0cb
-    .kiro/skills/empirical-prompt-tuning/README.md: sha256:c7db7d27122bcffe416e5607700a7cd1778cad260d3e104c5bb6da7b7f976b3d
-    .kiro/skills/empirical-prompt-tuning/SKILL-ja.md: sha256:0a38d830802c2e08a7faca13928fedf6911e00b896946b4b03910d662de6dea5
-    .kiro/skills/empirical-prompt-tuning/SKILL.md: sha256:252418e7ef022981d2dda2e3ec57fa1c786d30af68c50b7e062edf1d7361b0cb
   content_hash: sha256:20e7fba93c7267ba6e3a7b27787ca49191b762dffcfb804b01da9183b1b0c891
 - repo_url: modem-dev/hunk
-  name: hunk-review
+  name: hunk
   host: github.com
   resolved_commit: 4fdf4bc1e26f6fdceeced81bf7bae8f9bcb8588a
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/hunk-review
   is_virtual: true
   package_type: claude_skill
@@ -2446,12 +1744,9 @@ dependencies:
   - .agents/skills/hunk-review/SKILL.md
   - .claude/skills/hunk-review
   - .claude/skills/hunk-review/SKILL.md
-  - .kiro/skills/hunk-review
-  - .kiro/skills/hunk-review/SKILL.md
   deployed_file_hashes:
     .agents/skills/hunk-review/SKILL.md: sha256:22ba96f09771f74ad4db81873b4174f38edcd86a53b7af5f90a0359612a0b33c
     .claude/skills/hunk-review/SKILL.md: sha256:22ba96f09771f74ad4db81873b4174f38edcd86a53b7af5f90a0359612a0b33c
-    .kiro/skills/hunk-review/SKILL.md: sha256:22ba96f09771f74ad4db81873b4174f38edcd86a53b7af5f90a0359612a0b33c
   content_hash: sha256:1ceb9a909ce1b50e0d84cc584e74ba2af7e65717c6394285c2dc7db16019fa62
 - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
   name: ui-ux-pro-max
@@ -2912,232 +2207,6 @@ dependencies:
   - .claude/skills/ui-ux-pro-max/scripts/core.py
   - .claude/skills/ui-ux-pro-max/scripts/design_system.py
   - .claude/skills/ui-ux-pro-max/scripts/search.py
-  - .kiro/skills/banner-design
-  - .kiro/skills/banner-design/SKILL.md
-  - .kiro/skills/banner-design/references/banner-sizes-and-styles.md
-  - .kiro/skills/brand
-  - .kiro/skills/brand/SKILL.md
-  - .kiro/skills/brand/references/approval-checklist.md
-  - .kiro/skills/brand/references/asset-organization.md
-  - .kiro/skills/brand/references/brand-guideline-template.md
-  - .kiro/skills/brand/references/color-palette-management.md
-  - .kiro/skills/brand/references/consistency-checklist.md
-  - .kiro/skills/brand/references/logo-usage-rules.md
-  - .kiro/skills/brand/references/messaging-framework.md
-  - .kiro/skills/brand/references/typography-specifications.md
-  - .kiro/skills/brand/references/update.md
-  - .kiro/skills/brand/references/visual-identity.md
-  - .kiro/skills/brand/references/voice-framework.md
-  - .kiro/skills/brand/scripts/extract-colors.cjs
-  - .kiro/skills/brand/scripts/inject-brand-context.cjs
-  - .kiro/skills/brand/scripts/sync-brand-to-tokens.cjs
-  - .kiro/skills/brand/scripts/tests/test_sync_brand_to_tokens.py
-  - .kiro/skills/brand/scripts/validate-asset.cjs
-  - .kiro/skills/brand/templates/brand-guidelines-starter.md
-  - .kiro/skills/design
-  - .kiro/skills/design-system
-  - .kiro/skills/design-system/SKILL.md
-  - .kiro/skills/design-system/data/slide-backgrounds.csv
-  - .kiro/skills/design-system/data/slide-charts.csv
-  - .kiro/skills/design-system/data/slide-color-logic.csv
-  - .kiro/skills/design-system/data/slide-copy.csv
-  - .kiro/skills/design-system/data/slide-layout-logic.csv
-  - .kiro/skills/design-system/data/slide-layouts.csv
-  - .kiro/skills/design-system/data/slide-strategies.csv
-  - .kiro/skills/design-system/data/slide-typography.csv
-  - .kiro/skills/design-system/references/component-specs.md
-  - .kiro/skills/design-system/references/component-tokens.md
-  - .kiro/skills/design-system/references/primitive-tokens.md
-  - .kiro/skills/design-system/references/semantic-tokens.md
-  - .kiro/skills/design-system/references/states-and-variants.md
-  - .kiro/skills/design-system/references/tailwind-integration.md
-  - .kiro/skills/design-system/references/token-architecture.md
-  - .kiro/skills/design-system/scripts/embed-tokens.cjs
-  - .kiro/skills/design-system/scripts/fetch-background.py
-  - .kiro/skills/design-system/scripts/generate-slide.py
-  - .kiro/skills/design-system/scripts/generate-tokens.cjs
-  - .kiro/skills/design-system/scripts/html-token-validator.py
-  - .kiro/skills/design-system/scripts/search-slides.py
-  - .kiro/skills/design-system/scripts/slide-token-validator.py
-  - .kiro/skills/design-system/scripts/slide_search_core.py
-  - .kiro/skills/design-system/scripts/tests/test_validate_tokens.py
-  - .kiro/skills/design-system/scripts/validate-tokens.cjs
-  - .kiro/skills/design-system/templates/design-tokens-starter.json
-  - .kiro/skills/design/SKILL.md
-  - .kiro/skills/design/data/cip/deliverables.csv
-  - .kiro/skills/design/data/cip/industries.csv
-  - .kiro/skills/design/data/cip/mockup-contexts.csv
-  - .kiro/skills/design/data/cip/styles.csv
-  - .kiro/skills/design/data/icon/styles.csv
-  - .kiro/skills/design/data/logo/colors.csv
-  - .kiro/skills/design/data/logo/industries.csv
-  - .kiro/skills/design/data/logo/styles.csv
-  - .kiro/skills/design/references/banner-sizes-and-styles.md
-  - .kiro/skills/design/references/cip-deliverable-guide.md
-  - .kiro/skills/design/references/cip-design.md
-  - .kiro/skills/design/references/cip-prompt-engineering.md
-  - .kiro/skills/design/references/cip-style-guide.md
-  - .kiro/skills/design/references/design-routing.md
-  - .kiro/skills/design/references/icon-design.md
-  - .kiro/skills/design/references/logo-color-psychology.md
-  - .kiro/skills/design/references/logo-design.md
-  - .kiro/skills/design/references/logo-prompt-engineering.md
-  - .kiro/skills/design/references/logo-style-guide.md
-  - .kiro/skills/design/references/slides-copywriting-formulas.md
-  - .kiro/skills/design/references/slides-create.md
-  - .kiro/skills/design/references/slides-html-template.md
-  - .kiro/skills/design/references/slides-layout-patterns.md
-  - .kiro/skills/design/references/slides-strategies.md
-  - .kiro/skills/design/references/slides.md
-  - .kiro/skills/design/references/social-photos-design.md
-  - .kiro/skills/design/scripts/cip/core.py
-  - .kiro/skills/design/scripts/cip/generate.py
-  - .kiro/skills/design/scripts/cip/render-html.py
-  - .kiro/skills/design/scripts/cip/search.py
-  - .kiro/skills/design/scripts/icon/generate.py
-  - .kiro/skills/design/scripts/logo/core.py
-  - .kiro/skills/design/scripts/logo/generate.py
-  - .kiro/skills/design/scripts/logo/search.py
-  - .kiro/skills/slides
-  - .kiro/skills/slides/SKILL.md
-  - .kiro/skills/slides/references/copywriting-formulas.md
-  - .kiro/skills/slides/references/create.md
-  - .kiro/skills/slides/references/html-template.md
-  - .kiro/skills/slides/references/layout-patterns.md
-  - .kiro/skills/slides/references/slide-strategies.md
-  - .kiro/skills/ui-styling
-  - .kiro/skills/ui-styling/LICENSE.txt
-  - .kiro/skills/ui-styling/SKILL.md
-  - .kiro/skills/ui-styling/canvas-fonts/ArsenalSC-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/ArsenalSC-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/BigShoulders-Bold.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/BigShoulders-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/BigShoulders-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/Boldonse-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/Boldonse-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/BricolageGrotesque-Bold.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/BricolageGrotesque-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/BricolageGrotesque-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/CrimsonPro-Bold.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/CrimsonPro-Italic.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/CrimsonPro-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/CrimsonPro-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/DMMono-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/DMMono-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/EricaOne-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/EricaOne-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/GeistMono-Bold.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/GeistMono-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/GeistMono-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/Gloock-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/Gloock-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/IBMPlexMono-Bold.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/IBMPlexMono-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/IBMPlexMono-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/IBMPlexSerif-Bold.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/IBMPlexSerif-BoldItalic.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/IBMPlexSerif-Italic.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/IBMPlexSerif-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/InstrumentSans-Bold.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/InstrumentSans-BoldItalic.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/InstrumentSans-Italic.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/InstrumentSans-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/InstrumentSans-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/InstrumentSerif-Italic.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/InstrumentSerif-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/Italiana-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/Italiana-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/JetBrainsMono-Bold.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/JetBrainsMono-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/JetBrainsMono-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/Jura-Light.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/Jura-Medium.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/Jura-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/LibreBaskerville-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/LibreBaskerville-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/Lora-Bold.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/Lora-BoldItalic.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/Lora-Italic.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/Lora-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/Lora-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/NationalPark-Bold.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/NationalPark-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/NationalPark-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/NothingYouCouldDo-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/NothingYouCouldDo-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/Outfit-Bold.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/Outfit-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/Outfit-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/PixelifySans-Medium.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/PixelifySans-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/PoiretOne-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/PoiretOne-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/RedHatMono-Bold.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/RedHatMono-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/RedHatMono-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/Silkscreen-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/Silkscreen-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/SmoochSans-Medium.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/SmoochSans-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/Tektur-Medium.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/Tektur-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/Tektur-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/WorkSans-Bold.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/WorkSans-BoldItalic.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/WorkSans-Italic.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/WorkSans-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/WorkSans-Regular.ttf
-  - .kiro/skills/ui-styling/canvas-fonts/YoungSerif-OFL.txt
-  - .kiro/skills/ui-styling/canvas-fonts/YoungSerif-Regular.ttf
-  - .kiro/skills/ui-styling/references/canvas-design-system.md
-  - .kiro/skills/ui-styling/references/shadcn-accessibility.md
-  - .kiro/skills/ui-styling/references/shadcn-components.md
-  - .kiro/skills/ui-styling/references/shadcn-theming.md
-  - .kiro/skills/ui-styling/references/tailwind-customization.md
-  - .kiro/skills/ui-styling/references/tailwind-responsive.md
-  - .kiro/skills/ui-styling/references/tailwind-utilities.md
-  - .kiro/skills/ui-styling/scripts/.coverage
-  - .kiro/skills/ui-styling/scripts/requirements.txt
-  - .kiro/skills/ui-styling/scripts/shadcn_add.py
-  - .kiro/skills/ui-styling/scripts/tailwind_config_gen.py
-  - .kiro/skills/ui-styling/scripts/tests/coverage-ui.json
-  - .kiro/skills/ui-styling/scripts/tests/requirements.txt
-  - .kiro/skills/ui-styling/scripts/tests/test_shadcn_add.py
-  - .kiro/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py
-  - .kiro/skills/ui-ux-pro-max
-  - .kiro/skills/ui-ux-pro-max/SKILL.md
-  - .kiro/skills/ui-ux-pro-max/data/app-interface.csv
-  - .kiro/skills/ui-ux-pro-max/data/charts.csv
-  - .kiro/skills/ui-ux-pro-max/data/colors.csv
-  - .kiro/skills/ui-ux-pro-max/data/google-fonts.csv
-  - .kiro/skills/ui-ux-pro-max/data/icons.csv
-  - .kiro/skills/ui-ux-pro-max/data/landing.csv
-  - .kiro/skills/ui-ux-pro-max/data/motion.csv
-  - .kiro/skills/ui-ux-pro-max/data/products.csv
-  - .kiro/skills/ui-ux-pro-max/data/react-performance.csv
-  - .kiro/skills/ui-ux-pro-max/data/stacks/angular.csv
-  - .kiro/skills/ui-ux-pro-max/data/stacks/astro.csv
-  - .kiro/skills/ui-ux-pro-max/data/stacks/flutter.csv
-  - .kiro/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv
-  - .kiro/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv
-  - .kiro/skills/ui-ux-pro-max/data/stacks/laravel.csv
-  - .kiro/skills/ui-ux-pro-max/data/stacks/nextjs.csv
-  - .kiro/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv
-  - .kiro/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv
-  - .kiro/skills/ui-ux-pro-max/data/stacks/react-native.csv
-  - .kiro/skills/ui-ux-pro-max/data/stacks/react.csv
-  - .kiro/skills/ui-ux-pro-max/data/stacks/shadcn.csv
-  - .kiro/skills/ui-ux-pro-max/data/stacks/svelte.csv
-  - .kiro/skills/ui-ux-pro-max/data/stacks/swiftui.csv
-  - .kiro/skills/ui-ux-pro-max/data/stacks/threejs.csv
-  - .kiro/skills/ui-ux-pro-max/data/stacks/vue.csv
-  - .kiro/skills/ui-ux-pro-max/data/styles.csv
-  - .kiro/skills/ui-ux-pro-max/data/typography.csv
-  - .kiro/skills/ui-ux-pro-max/data/ui-reasoning.csv
-  - .kiro/skills/ui-ux-pro-max/data/ux-guidelines.csv
-  - .kiro/skills/ui-ux-pro-max/scripts/core.py
-  - .kiro/skills/ui-ux-pro-max/scripts/design_system.py
-  - .kiro/skills/ui-ux-pro-max/scripts/search.py
   deployed_file_hashes:
     .agents/skills/banner-design/SKILL.md: sha256:913d9c4b2a3b405d638d50131e0dd3fe2787c839423d79287b7858ac29255acc
     .agents/skills/banner-design/references/banner-sizes-and-styles.md: sha256:c8906fb1073a576ee8c680d9bc8586249cbc4ed36690da960d65a1c9c37143b7
@@ -3577,225 +2646,6 @@ dependencies:
     .claude/skills/ui-ux-pro-max/scripts/core.py: sha256:ab9f398b493e34404448cefc766239ee86119c7a21d8581ba965cabdc698b0a8
     .claude/skills/ui-ux-pro-max/scripts/design_system.py: sha256:db272c6649322e383714c73305705101fe1d44c15bd64556d5a515b1c419c2d2
     .claude/skills/ui-ux-pro-max/scripts/search.py: sha256:d9983d2a21d330b6b696480940fd78029f7b34027814f2ac1cf17c5d0b042407
-    .kiro/skills/banner-design/SKILL.md: sha256:913d9c4b2a3b405d638d50131e0dd3fe2787c839423d79287b7858ac29255acc
-    .kiro/skills/banner-design/references/banner-sizes-and-styles.md: sha256:c8906fb1073a576ee8c680d9bc8586249cbc4ed36690da960d65a1c9c37143b7
-    .kiro/skills/brand/SKILL.md: sha256:6a450ee1a83a403d47cec2ede9030feb60a67a81fc425d2406e975339313bd44
-    .kiro/skills/brand/references/approval-checklist.md: sha256:4bf8549687f53a7b9684005b4b87de93c26f018e00609b4c506a5812abd13d20
-    .kiro/skills/brand/references/asset-organization.md: sha256:de98123417e9c5a1cc71a78131bba979c4c8ed2e5289e6c7a7f166576e488101
-    .kiro/skills/brand/references/brand-guideline-template.md: sha256:392db8cf10fef492221c15a86e68590074bf5716de1f2982f41c01fbe30567cc
-    .kiro/skills/brand/references/color-palette-management.md: sha256:c429298ffe3955edb8b22c9f51426fef75e83d02848cd4300e89c0d3fc34b44a
-    .kiro/skills/brand/references/consistency-checklist.md: sha256:56d8b2d4852cda11e600adec4b9dd68fc89a1b8265382359953bec5c5e5e2c36
-    .kiro/skills/brand/references/logo-usage-rules.md: sha256:044c5ddf30cfe0eea047451cfce6ea654939198ffdd8968a19161c97066a5a26
-    .kiro/skills/brand/references/messaging-framework.md: sha256:24b2500a72867b55dd10f4bf359178b0eb347fddd852659ce47b69d9f597d4e6
-    .kiro/skills/brand/references/typography-specifications.md: sha256:921c3d9e6ddfde2677b9a3e32eee94c7922f54f22c1f380c5ed2eb25a7d5bfa9
-    .kiro/skills/brand/references/update.md: sha256:537cb55ebe260e1de127bd6288b19d8d7b15b6c893545442a58b739cbd342b37
-    .kiro/skills/brand/references/visual-identity.md: sha256:63f0cfc5d95403d8e12aca4d839cc28471515574d9a431334bfbb96c15407c31
-    .kiro/skills/brand/references/voice-framework.md: sha256:08c15ac79f81cd964c5efbe593131b61a093c7e1b060d5dd28b17f3cc5b331fb
-    .kiro/skills/brand/scripts/extract-colors.cjs: sha256:36d21f3905e5762cfc8054b3f3b7276f6bc656884fe57c6bfa539526044778ed
-    .kiro/skills/brand/scripts/inject-brand-context.cjs: sha256:5b98abdeb5c636f247102cd235f1d3421db7a4de53fd853360feaa0c471b5c96
-    .kiro/skills/brand/scripts/sync-brand-to-tokens.cjs: sha256:390a760570fdba6d6ecfdfd8907fc802b64659b6178f8920349b0c6a2c822106
-    .kiro/skills/brand/scripts/tests/test_sync_brand_to_tokens.py: sha256:0ace0cf7c6a8c12c0b9154f317e847b1084eb00b065b6f22431e37b7c7e948d6
-    .kiro/skills/brand/scripts/validate-asset.cjs: sha256:4546c9109fb0f4f767426508cb29e60d02b301f8897cf16d8e378b7ce9d997fc
-    .kiro/skills/brand/templates/brand-guidelines-starter.md: sha256:d157a57b15f0b458c79636d11de42f3c89f03d8c0bbea1bdd3cf1c3542b2140d
-    .kiro/skills/design-system/SKILL.md: sha256:655468bb723a6bc9d17fcb09a6a005e10e313d63b879f4d74fb2abdc3041ae3f
-    .kiro/skills/design-system/data/slide-backgrounds.csv: sha256:d1bb701b87bef493d72974d6fac1087c8ba4e2df14185fe3e0c36a13fe35f3d1
-    .kiro/skills/design-system/data/slide-charts.csv: sha256:12ef876cd76e67a6553444bfa2ebf1d5d4d6216289d34db052a6e87421135033
-    .kiro/skills/design-system/data/slide-color-logic.csv: sha256:ea68c737075f1615b2a7e461e2878c06bfe8f803dcabfbcc2977ffe5f9ec9ded
-    .kiro/skills/design-system/data/slide-copy.csv: sha256:43152937a0e598b3fbfdd418684311c105d44e3c5b333703ddb0b8cb28e40658
-    .kiro/skills/design-system/data/slide-layout-logic.csv: sha256:26b5b75782d5aba89836c0479acd3111cc69b67853db9c2259b30ac1e966bc62
-    .kiro/skills/design-system/data/slide-layouts.csv: sha256:95d558c1b7d2552d7a75402dc68facbd16125e574985851db5729d1145e14896
-    .kiro/skills/design-system/data/slide-strategies.csv: sha256:f656be0ab0b3a85fa7fc74202e9701a7236220412d67d5f63eb6dbb100bb2639
-    .kiro/skills/design-system/data/slide-typography.csv: sha256:b96cd11dd4ff1dea8a9454b0b9e898e7f82f9243182f8f237af1f2c9b8824ce5
-    .kiro/skills/design-system/references/component-specs.md: sha256:b265d979a741dd748d4e595e6898ae430faeef4f6d13d7a634fa6241b91d2da4
-    .kiro/skills/design-system/references/component-tokens.md: sha256:e27f8f5999badee425c98235eabbd2cb3ebe2a1a364766d5c7a6b3134ceaaec8
-    .kiro/skills/design-system/references/primitive-tokens.md: sha256:91e6caa12646c08c8aadf8e09399aed65760a25c8d80595936d81a9131118fc3
-    .kiro/skills/design-system/references/semantic-tokens.md: sha256:97e16d8061bbc22e82b51966a7015e3fc990932902e4647843506669a1cdebcc
-    .kiro/skills/design-system/references/states-and-variants.md: sha256:8dacb95d57d4bb37d8a99cc55515ff26da272056f837d29abc74aedcaa3ba104
-    .kiro/skills/design-system/references/tailwind-integration.md: sha256:6d01092db1479dbd2060567b4232bb2b4bc16e89730ab07e1f87a3e7f5c406b9
-    .kiro/skills/design-system/references/token-architecture.md: sha256:925f4049c4c4313d9fd5df98cdfd52004112aca49fba1664ad85e76bc9dce4d3
-    .kiro/skills/design-system/scripts/embed-tokens.cjs: sha256:23a9ce214e3c0d2fb4c5442b3bf1222c66721f7988a181ab29dcb549a5e5f511
-    .kiro/skills/design-system/scripts/fetch-background.py: sha256:cecedad0a9054e6e65f31ab7ba7d07eb6af2179e237c5632bc962dad69fd6d66
-    .kiro/skills/design-system/scripts/generate-slide.py: sha256:0463c98efea54870816925015fe5819e42a29aaba57408c2c38bacb33e2605b9
-    .kiro/skills/design-system/scripts/generate-tokens.cjs: sha256:aac8a0f4ec4dccf0d371f9ee5a9111e44977bb0cad7e40a3754aba5571aa1231
-    .kiro/skills/design-system/scripts/html-token-validator.py: sha256:9556a65e7aacda23388478294ee9a5cb84b315d964fbbf754aa0dcdbcfee58e6
-    .kiro/skills/design-system/scripts/search-slides.py: sha256:fded9548bc1bbe1303da67fabe34006c6a7c57934c9d171ea3dc3eb5f6eee010
-    .kiro/skills/design-system/scripts/slide-token-validator.py: sha256:66da5da5e8e659d405a89b342e13dd1e469e79726c46002d9d2368c3c7aaf945
-    .kiro/skills/design-system/scripts/slide_search_core.py: sha256:2464050ae338eb50728086046b644845fa7ae943f32efead3908fdbe1473edbe
-    .kiro/skills/design-system/scripts/tests/test_validate_tokens.py: sha256:a32f34a9e89542a341b6ff3ee4392494b48dea622b22b99652d3cf0c1a1ee966
-    .kiro/skills/design-system/scripts/validate-tokens.cjs: sha256:65f03a29290b9029d8cc27537701f226de7bcffc303b3bc361648fadfa09b77d
-    .kiro/skills/design-system/templates/design-tokens-starter.json: sha256:5444f477b06bab9c72e2cc289d4a9104efef653391c9639972bcb712d5f2d81e
-    .kiro/skills/design/SKILL.md: sha256:413f4ab913d07f7fd92acbadc25d71aad63443be0c40d11234944aea688603b6
-    .kiro/skills/design/data/cip/deliverables.csv: sha256:229912f35c2f5a790508ddd62270cc7a92a84694027025ea5a30f1fb5ba84b70
-    .kiro/skills/design/data/cip/industries.csv: sha256:729b1dea6d6f39b0bc22a1e659584e7ca5cead75841146d599c9f8dc00d4da46
-    .kiro/skills/design/data/cip/mockup-contexts.csv: sha256:15d61cef16e6746d5aa665976f4de8074fedb64bfc5c7313a40eec1112a1d499
-    .kiro/skills/design/data/cip/styles.csv: sha256:4e7f9e209bc90b60df62fd9843a1a73b365e54161dbd820b82817a8e512af4c4
-    .kiro/skills/design/data/icon/styles.csv: sha256:a4aa7d326ffe1e50961eb70e25a6351f45c0247cd245461fa1a27cdc72f903b4
-    .kiro/skills/design/data/logo/colors.csv: sha256:d60218f0705bb0f0b892a10468a5c8d9a44eef3d0262ef8df8970ba3fbab567a
-    .kiro/skills/design/data/logo/industries.csv: sha256:e58dda4b9d28851f70914f82c1d2a2cff626a991ca41076f64122f33cc8a6525
-    .kiro/skills/design/data/logo/styles.csv: sha256:ea08bdfb7aa557f08d1b6299222423f948700f8e4029321acb58c8f83197bdf2
-    .kiro/skills/design/references/banner-sizes-and-styles.md: sha256:c8906fb1073a576ee8c680d9bc8586249cbc4ed36690da960d65a1c9c37143b7
-    .kiro/skills/design/references/cip-deliverable-guide.md: sha256:1424e120b967288e2334f24fcfa5cdc7f238420326a7444f4c5597efecfabc41
-    .kiro/skills/design/references/cip-design.md: sha256:47a3b2e445bc07185edd0cd24ba8a417229baf86717dcdff7c4e403adbceb3f1
-    .kiro/skills/design/references/cip-prompt-engineering.md: sha256:4bf3a0c858f38c230e43e872857b72d9eb692e066e8de5920da75aac733e753c
-    .kiro/skills/design/references/cip-style-guide.md: sha256:f3e15408cd981e93804440c1159c12e02d001bc37a3945f455b3fc13729ed4e1
-    .kiro/skills/design/references/design-routing.md: sha256:32914a913f4f20d4cb1e497e5a87cfc04b71af4e6d75db72ecf50e4f060201c8
-    .kiro/skills/design/references/icon-design.md: sha256:39281931d070918b4e51ecd71054da99493cabe06a07dfa8f1f682e48637c83f
-    .kiro/skills/design/references/logo-color-psychology.md: sha256:3fd0e93e24c3b2ea7f3be778e8f2d03b1c62c7c6eab3ade478c8fca332bff287
-    .kiro/skills/design/references/logo-design.md: sha256:2e845fe165c845fd9582c1d74204fa31de607380982a6ea0b5f8db4e293afa3a
-    .kiro/skills/design/references/logo-prompt-engineering.md: sha256:e50f55bf323263eb27b4cd4c5172383a787fb894581d5d2befb3f6e0180b253e
-    .kiro/skills/design/references/logo-style-guide.md: sha256:611baa841eedab101f45c113c6bfbd4d7e16e859c9d6ebd2cf941827a6e8dd15
-    .kiro/skills/design/references/slides-copywriting-formulas.md: sha256:03733d5916ab771834745550045b736deeb94a08226f2b200f7953009c35b219
-    .kiro/skills/design/references/slides-create.md: sha256:792d647a5d4f87d765cf417f7ac54dd0b2fc4d229cc23ea9df56282d4c1ee086
-    .kiro/skills/design/references/slides-html-template.md: sha256:fd5b051a37365fc6059c75bb388ec6f64daf1bd9ae938b287b6d762dc83c0c35
-    .kiro/skills/design/references/slides-layout-patterns.md: sha256:0a967ca3bd829d3234e6f1802bade6c76447fabbaddbc8117c41adbae7dfb6df
-    .kiro/skills/design/references/slides-strategies.md: sha256:27ee3e53ffa0ea679ec83ebeacb0bcfbce498df57277e99f574b9c139dc44286
-    .kiro/skills/design/references/slides.md: sha256:5630d5daec947ff58ab1ac97c7a1ee77a21cf6f5dce5155535b65d291691979f
-    .kiro/skills/design/references/social-photos-design.md: sha256:2544c143ff3a4471a775e2271797a3871480f94de91b267178da92e8952192a0
-    .kiro/skills/design/scripts/cip/core.py: sha256:78a78a51f12d2382b2854414df395dc62b68532626ef724ddd5de713507911e4
-    .kiro/skills/design/scripts/cip/generate.py: sha256:2745040c9b534cf4113d2f7f4d7a52bc96a9fbfa12204c4f8460be4e15449069
-    .kiro/skills/design/scripts/cip/render-html.py: sha256:a49a89a017ea4a2c492438055f05dfba3dfb4f91563f5f913359939beeaeccab
-    .kiro/skills/design/scripts/cip/search.py: sha256:6619fbbe71983003a858c5eb79bc59c607b342610a1178b6976c687c2932161b
-    .kiro/skills/design/scripts/icon/generate.py: sha256:1a6be99dc233f6d9f8b558c26148203418be5b47c677cd83e48e41e78e38780c
-    .kiro/skills/design/scripts/logo/core.py: sha256:4f8b36ffe538e5995d0e0b740053a0899a1adf445ffdf484bd47f94e71ade8d0
-    .kiro/skills/design/scripts/logo/generate.py: sha256:6e4358f21cd85fec51c8d01b03e3696d6db180815309d7e10a19c623d4d4462c
-    .kiro/skills/design/scripts/logo/search.py: sha256:693b3a1824831f120d4c60ed72477847604da1f6b654343381f8e9d3800a28f2
-    .kiro/skills/slides/SKILL.md: sha256:2b90bdaf63f231919a01f4962f374ecd84af101a7e7545f8d9c68e049025accb
-    .kiro/skills/slides/references/copywriting-formulas.md: sha256:03733d5916ab771834745550045b736deeb94a08226f2b200f7953009c35b219
-    .kiro/skills/slides/references/create.md: sha256:792d647a5d4f87d765cf417f7ac54dd0b2fc4d229cc23ea9df56282d4c1ee086
-    .kiro/skills/slides/references/html-template.md: sha256:fd5b051a37365fc6059c75bb388ec6f64daf1bd9ae938b287b6d762dc83c0c35
-    .kiro/skills/slides/references/layout-patterns.md: sha256:0a967ca3bd829d3234e6f1802bade6c76447fabbaddbc8117c41adbae7dfb6df
-    .kiro/skills/slides/references/slide-strategies.md: sha256:27ee3e53ffa0ea679ec83ebeacb0bcfbce498df57277e99f574b9c139dc44286
-    .kiro/skills/ui-styling/LICENSE.txt: sha256:58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd
-    .kiro/skills/ui-styling/SKILL.md: sha256:f8b6c3832d2af51f67b3932e3c4a79bcd8a8596cc61ce1547a686fc951e5c62d
-    .kiro/skills/ui-styling/canvas-fonts/ArsenalSC-OFL.txt: sha256:8ddd61b18ba2c0d0dbe4a691cf5f1a0673f473d02fa0546e67ee88c006aeff6e
-    .kiro/skills/ui-styling/canvas-fonts/ArsenalSC-Regular.ttf: sha256:65e6f89df58f68fd905b3add34a79dd6106aa3b3044df0dad9676fff53d504b9
-    .kiro/skills/ui-styling/canvas-fonts/BigShoulders-Bold.ttf: sha256:b43bcd198b9fdf717dd42aa61a34dba32e01aceaeae659d689afd0ca52c37ea2
-    .kiro/skills/ui-styling/canvas-fonts/BigShoulders-OFL.txt: sha256:fbc746aabf0eb1847dfd92e2efc4596d79fa897d60b8e64062a22f585508fb3f
-    .kiro/skills/ui-styling/canvas-fonts/BigShoulders-Regular.ttf: sha256:18a879fc71978a4447150705caf880a9da3860083c259fd29e6dc03057b6842a
-    .kiro/skills/ui-styling/canvas-fonts/Boldonse-OFL.txt: sha256:45cc82ab4032273c0924025ffcf8f0665a68e1a5955e3f7247e5daf1deeb1326
-    .kiro/skills/ui-styling/canvas-fonts/Boldonse-Regular.ttf: sha256:cc2e540604565c0f90a7d8d46194a2f42fc9c45512cd2e39bf03b50eb68c35a4
-    .kiro/skills/ui-styling/canvas-fonts/BricolageGrotesque-Bold.ttf: sha256:a737b146fe0d77ffe8a86e3cd16700dd431d3b1e420d4fd80e142cd68a1cb50d
-    .kiro/skills/ui-styling/canvas-fonts/BricolageGrotesque-OFL.txt: sha256:0e4f4eb8534bc66a76aca13dd19c1f9731b2008866b29ccff182b764649df9b4
-    .kiro/skills/ui-styling/canvas-fonts/BricolageGrotesque-Regular.ttf: sha256:972a6d098c9867ae131d0ea99e221e63976b11a19d4b931c2c7ace525674e4f6
-    .kiro/skills/ui-styling/canvas-fonts/CrimsonPro-Bold.ttf: sha256:48f191e38355c8db100eb3ce157c20f9302a3b9a37b44a660f77ecfce3986609
-    .kiro/skills/ui-styling/canvas-fonts/CrimsonPro-Italic.ttf: sha256:52318db3526b644e6efa60be0b3ca5a50e40fbe8bd026c261e0aa206f0772267
-    .kiro/skills/ui-styling/canvas-fonts/CrimsonPro-OFL.txt: sha256:35680d14547b6748b6f362a052a46d22764ce5eccf96e18b74f567bb2ee58114
-    .kiro/skills/ui-styling/canvas-fonts/CrimsonPro-Regular.ttf: sha256:48fad08cb1917a7b2f2c6fe5135d6c07743a6663cf7631ec4481108aaf081422
-    .kiro/skills/ui-styling/canvas-fonts/DMMono-OFL.txt: sha256:bfe7842fcb88323e2981e24710c25202677385a8c75fb6a87217b275a0247ae3
-    .kiro/skills/ui-styling/canvas-fonts/DMMono-Regular.ttf: sha256:f98ada968dc3b6b2c08d3f5caaf266977df0bfe0929372b93df5a06cf2ace450
-    .kiro/skills/ui-styling/canvas-fonts/EricaOne-OFL.txt: sha256:e0de629968b52255548d5fafcf30b24ff9edae0eda362380755a75816404d0fa
-    .kiro/skills/ui-styling/canvas-fonts/EricaOne-Regular.ttf: sha256:db1d89e80e33a8a01beaaac7a85df582857d24a43f1e181461aa7ff5d701476a
-    .kiro/skills/ui-styling/canvas-fonts/GeistMono-Bold.ttf: sha256:75c0828d5c1ee44b9ef9f4df577bf41595ec362e2ea3f1e558590c9e92c7949d
-    .kiro/skills/ui-styling/canvas-fonts/GeistMono-OFL.txt: sha256:6a873c900f584109b13ae0aaf81d6e3cf0a68751a216b03f7b6c68d547057bb4
-    .kiro/skills/ui-styling/canvas-fonts/GeistMono-Regular.ttf: sha256:a55c1b51cda4afeab9e471e7947b85a20f7c8831d7e6b1470c1b7fbdc0f0f15e
-    .kiro/skills/ui-styling/canvas-fonts/Gloock-OFL.txt: sha256:c0a3f3125ac491ef3d1f09f401be4834c646562f647e44f2bcbc49f0466c656d
-    .kiro/skills/ui-styling/canvas-fonts/Gloock-Regular.ttf: sha256:e86b4ce66dbd3f1f83eee8db99ec96e0da1128c3f53df0e9b3b7472025dfe960
-    .kiro/skills/ui-styling/canvas-fonts/IBMPlexMono-Bold.ttf: sha256:dbd2a2fb024579438d6400a84e57579bfd2dbe67c306c8fd9fde92a61e4f2eea
-    .kiro/skills/ui-styling/canvas-fonts/IBMPlexMono-OFL.txt: sha256:5294ce778857e1eb02e830b6ab06435537d38f43055327e73d03a2d4d57d5123
-    .kiro/skills/ui-styling/canvas-fonts/IBMPlexMono-Regular.ttf: sha256:ab08018ccd276b79fb2c636bb95b9c543598f9d50505fe92506fcb4dae7810cd
-    .kiro/skills/ui-styling/canvas-fonts/IBMPlexSerif-Bold.ttf: sha256:b8d294e9b5c5a0940f167c3ced0f7ef2e3f57082ca3ff096ef30e86e26c1c159
-    .kiro/skills/ui-styling/canvas-fonts/IBMPlexSerif-BoldItalic.ttf: sha256:da64b75f4284f53e7b5c71fa190a35b8bf3494fe19f1804c81c3a53340bca570
-    .kiro/skills/ui-styling/canvas-fonts/IBMPlexSerif-Italic.ttf: sha256:b11f1048745e715a55c9d837b3f10226ca3d78867b7db7251ddad8f98dcf0f38
-    .kiro/skills/ui-styling/canvas-fonts/IBMPlexSerif-Regular.ttf: sha256:77cd233a2af8dc6b1022faea3bb3b01f3c75af68bcf530cb6aeb15982ff3dbb7
-    .kiro/skills/ui-styling/canvas-fonts/InstrumentSans-Bold.ttf: sha256:444f85bf1c4b0e1ce1ca624f6be54bcd832207714ccaf4ea99ee531341683bdf
-    .kiro/skills/ui-styling/canvas-fonts/InstrumentSans-BoldItalic.ttf: sha256:3762f6cef95d6039489ad5ba5787d4c30f17a1ad01e9ac3c816ed69692722a68
-    .kiro/skills/ui-styling/canvas-fonts/InstrumentSans-Italic.ttf: sha256:78e85858e371b2cb4e18f617c10f0f937c0e12a0887ffee98555b24ed305b3a7
-    .kiro/skills/ui-styling/canvas-fonts/InstrumentSans-OFL.txt: sha256:bf4dc6d13a8cccd4807133c77a1ee9619a16b92cb23322258725ab6731c2f6e5
-    .kiro/skills/ui-styling/canvas-fonts/InstrumentSans-Regular.ttf: sha256:a22cb26e48fd79bcb01bf2fc92d36785474dce36d9c544ab0a8868c2657c4a87
-    .kiro/skills/ui-styling/canvas-fonts/InstrumentSerif-Italic.ttf: sha256:9c86e4d5a47b50224a2463a9eca8535835257c8e85c470c2c6b454b1af6f046e
-    .kiro/skills/ui-styling/canvas-fonts/InstrumentSerif-Regular.ttf: sha256:56ac3be03ac3ba283196b3e77850ab2ffcf56cfb6fd3212c5620109a972f8c99
-    .kiro/skills/ui-styling/canvas-fonts/Italiana-OFL.txt: sha256:8373b11312ace78c4cec2e8f9f6aa9f2330601107dac7bcf899c6f2dbd40c5a5
-    .kiro/skills/ui-styling/canvas-fonts/Italiana-Regular.ttf: sha256:15c4dd6ab8cf4a29ba8826f65edcbe2f6c266c557d34d081f25072dfd5605fd2
-    .kiro/skills/ui-styling/canvas-fonts/JetBrainsMono-Bold.ttf: sha256:a2349098b9e45419e7bf0e2958d6c4937a049dded37387b08be725be4c7615f3
-    .kiro/skills/ui-styling/canvas-fonts/JetBrainsMono-OFL.txt: sha256:a76abf002c49097d146e86740a3105a5d00450b1592e820a1109a8c5680cd697
-    .kiro/skills/ui-styling/canvas-fonts/JetBrainsMono-Regular.ttf: sha256:b6b1ff4ddefe36d7f2a6174e1d001cab374e594519ee9049af028d577b64c5f5
-    .kiro/skills/ui-styling/canvas-fonts/Jura-Light.ttf: sha256:c891a381df056b2c4dfe85841e911bf45da0890fa21a7b2692cbe5ea1f505e1e
-    .kiro/skills/ui-styling/canvas-fonts/Jura-Medium.ttf: sha256:c72965cb732a92872643819fd1734128238583cc36b116313859137a51d3368a
-    .kiro/skills/ui-styling/canvas-fonts/Jura-OFL.txt: sha256:eaf9bdb675f6d87e5feb88199ab3ea581d3bd2082f426e384fa9c394576d7260
-    .kiro/skills/ui-styling/canvas-fonts/LibreBaskerville-OFL.txt: sha256:55959eef5b0c3b2e3c1c7631b8ff0f9447d75de20f29cfa7db5bcfb026763343
-    .kiro/skills/ui-styling/canvas-fonts/LibreBaskerville-Regular.ttf: sha256:2101302538d9e88adb679031c04623e4578b5745e89566284fd2c508d79acae0
-    .kiro/skills/ui-styling/canvas-fonts/Lora-Bold.ttf: sha256:7d74015e950c2fb66519c7295b8155621d22200ae2ca2a4c6b43ce3c490cac87
-    .kiro/skills/ui-styling/canvas-fonts/Lora-BoldItalic.ttf: sha256:152f87e71f5ddb60d5c57ecd9132807c947e65c42977193c9164e7c5a6690081
-    .kiro/skills/ui-styling/canvas-fonts/Lora-Italic.ttf: sha256:be627e595184e8afe521f08da0607eee613f1997d423bc8dadc5798995581377
-    .kiro/skills/ui-styling/canvas-fonts/Lora-OFL.txt: sha256:62e37a82d3f1ef2a70712885fa8b3144b65fd144d8e748d6196b690a354d792c
-    .kiro/skills/ui-styling/canvas-fonts/Lora-Regular.ttf: sha256:7ed00e7c9cdf16ab7e2fd2361fe45d4f0b61263cd60aae398b27b7ee08108827
-    .kiro/skills/ui-styling/canvas-fonts/NationalPark-Bold.ttf: sha256:69ac4c301c4a7233c6e602d12a92c54d7967b575f4449951c45ce773f7acff53
-    .kiro/skills/ui-styling/canvas-fonts/NationalPark-OFL.txt: sha256:81c6c71d83b5b45d7344f96df12bb4a2477a5b092a9144757ee1d0f50f855175
-    .kiro/skills/ui-styling/canvas-fonts/NationalPark-Regular.ttf: sha256:a477338b7e18308d476650dfe31235ef86a883572665e56ffb5fb80f82009b58
-    .kiro/skills/ui-styling/canvas-fonts/NothingYouCouldDo-OFL.txt: sha256:7c2a6970584ddad04919816163746f83b378078015899b18468b40f05e9ce128
-    .kiro/skills/ui-styling/canvas-fonts/NothingYouCouldDo-Regular.ttf: sha256:d866f985896d3280f4fce72db7e17302c24a0c1fdb0699b6b5ed3af14f944d57
-    .kiro/skills/ui-styling/canvas-fonts/Outfit-Bold.ttf: sha256:6654b93d21301ec61887d3cedd6c11d9df1b1dfb63f9cf45ac7995f6e2235ab1
-    .kiro/skills/ui-styling/canvas-fonts/Outfit-OFL.txt: sha256:1945b62cd76da9a3051a1660dde72afaa64ffc2666d30e7a78356d651653ba2f
-    .kiro/skills/ui-styling/canvas-fonts/Outfit-Regular.ttf: sha256:f24945365147c9e783e91d8649959b59be6b00c9ee4ecd2f6b33afbb2dd871fe
-    .kiro/skills/ui-styling/canvas-fonts/PixelifySans-Medium.ttf: sha256:38397504f71c122b03d234ea6f55118e3d5bdbddffd82bedddbd7755d3b3be82
-    .kiro/skills/ui-styling/canvas-fonts/PixelifySans-OFL.txt: sha256:7f54d1d9f1ae1ba9f2722f978145f90324fea34ca3c2304b3a29cfa96ac6037e
-    .kiro/skills/ui-styling/canvas-fonts/PoiretOne-OFL.txt: sha256:2eaf541f7eb8b512e4c757a5212060abf5b6edfef230e9d7640bf736b315c33a
-    .kiro/skills/ui-styling/canvas-fonts/PoiretOne-Regular.ttf: sha256:9cf265b139648b36b6c0afdfeb0bf27f7e66db9a16094bc40f644d8da05bc318
-    .kiro/skills/ui-styling/canvas-fonts/RedHatMono-Bold.ttf: sha256:7ef48353f4be5ddb90f000f6fad48f2b62b3e8c27d9818d8d45ff46c201065e0
-    .kiro/skills/ui-styling/canvas-fonts/RedHatMono-OFL.txt: sha256:435fbfb7e66988b2a06686a4cb966faec733f35d8fe100a1601573c27f3e0bb8
-    .kiro/skills/ui-styling/canvas-fonts/RedHatMono-Regular.ttf: sha256:452fe826871b37539f5212b20c87cf30f82f58dd2741f1c96edd1dcbdc0db6b4
-    .kiro/skills/ui-styling/canvas-fonts/Silkscreen-OFL.txt: sha256:6b849745119bbe85ec01fd080c9cd50234da9f52ac6e48b55d1a424a0c4d7ca9
-    .kiro/skills/ui-styling/canvas-fonts/Silkscreen-Regular.ttf: sha256:49567408600809e25147e9225ac4f37f410e2df45a750696c45027531fb65f1b
-    .kiro/skills/ui-styling/canvas-fonts/SmoochSans-Medium.ttf: sha256:dd76e6e77cce82f827a8654cd906e9ce58f3aaf78adda63c4a7f655b8ecb41f0
-    .kiro/skills/ui-styling/canvas-fonts/SmoochSans-OFL.txt: sha256:74c9c4eb88e891483e1b7bc54780b452cbf4f4df66d4e71881d7569aa2130749
-    .kiro/skills/ui-styling/canvas-fonts/Tektur-Medium.ttf: sha256:52bbe8c9b057b3d2da4eeace31a524b1ea26a1375ae34319cf6900ccc57a4c82
-    .kiro/skills/ui-styling/canvas-fonts/Tektur-OFL.txt: sha256:3f1466cb5438f31782eeb6e895f3a655bc4d090e24263e331f555357d1cb734e
-    .kiro/skills/ui-styling/canvas-fonts/Tektur-Regular.ttf: sha256:162e1b36c4718c5b051b36c971ad7e50d341944f35618f480422ebbe72988f98
-    .kiro/skills/ui-styling/canvas-fonts/WorkSans-Bold.ttf: sha256:240d125fc9f8561363dc1ea3f513501253bd70942f41468f48f0b0cafb0c82e2
-    .kiro/skills/ui-styling/canvas-fonts/WorkSans-BoldItalic.ttf: sha256:a5b2cad813df0aaa7d16621f2e93b5117c25e9bc788bc9a3ad218e9d6348ce34
-    .kiro/skills/ui-styling/canvas-fonts/WorkSans-Italic.ttf: sha256:6b7f7002e0b0c8b261fe878658ef5551e3e59d9f6b609b04efb90dde1e2c1ada
-    .kiro/skills/ui-styling/canvas-fonts/WorkSans-OFL.txt: sha256:ace8c22a3326318b54e67c3691857929634205533f454a70ef5a3473ddb2e2ba
-    .kiro/skills/ui-styling/canvas-fonts/WorkSans-Regular.ttf: sha256:e67985a843df0d3cdee51a3d0f329eb1774a344ad9ff0c9ab923751f1577e2a4
-    .kiro/skills/ui-styling/canvas-fonts/YoungSerif-OFL.txt: sha256:cdcb8039606b40a027a6d24586ec62d5fe29c701343d82a048c829cb28a3dd28
-    .kiro/skills/ui-styling/canvas-fonts/YoungSerif-Regular.ttf: sha256:f8dc08f77abad753a00670af70756a8ace938e5c3f0b770f4f4c2071c4bd8fc6
-    .kiro/skills/ui-styling/references/canvas-design-system.md: sha256:f5de85ff39d9f3a8275c4164b921ba72d5e1d34b8d7a9243d9ee34b3870a4f5f
-    .kiro/skills/ui-styling/references/shadcn-accessibility.md: sha256:a22cd4ccf82b635b2b2c4f12416a0c4f7edcd825d219d6089450fa797a0d9511
-    .kiro/skills/ui-styling/references/shadcn-components.md: sha256:79c4f91cbf68993a43fa3a95889c35db73de45bdd3dfd83a6830863c01aa598a
-    .kiro/skills/ui-styling/references/shadcn-theming.md: sha256:d17d641474221123ff0e0288043ca2f2dab3ac96908a19eed28d82f9e58865ed
-    .kiro/skills/ui-styling/references/tailwind-customization.md: sha256:4c5adeed6263a274f74f6eb2c816ca420fd6ef4f35683582988bacd404799afe
-    .kiro/skills/ui-styling/references/tailwind-responsive.md: sha256:8d00ae620df26daea4623c7bf996d6e612e09d359305fcfa2b40cab757ed840c
-    .kiro/skills/ui-styling/references/tailwind-utilities.md: sha256:aba1c40ef84f43beea142ae310371e332541f39d973df90a71f1854823effda1
-    .kiro/skills/ui-styling/scripts/.coverage: sha256:a1f68d7a1d6322975c40c893004bc5e811d455d3ab124dab5154aad7060e66f5
-    .kiro/skills/ui-styling/scripts/requirements.txt: sha256:09402d2d274248e18bb5fd0a0267fd7cbf99b7a2440e73e87f054aa8f259f9da
-    .kiro/skills/ui-styling/scripts/shadcn_add.py: sha256:0c11d28ce9f12217df2c3306f24ae1f73527d5116db63707ab55cbe1a8bcf28c
-    .kiro/skills/ui-styling/scripts/tailwind_config_gen.py: sha256:2e264ec871499681aecd6111f60743fba31b5ceb7e9ccb2b71b7346039285f89
-    .kiro/skills/ui-styling/scripts/tests/coverage-ui.json: sha256:33bdc1f5998db9a38cac8e6128a82711f8f8b65fbb3dcb0c1680ae260441cbce
-    .kiro/skills/ui-styling/scripts/tests/requirements.txt: sha256:80846c98ee02a7e9651ec4eee6709f840b785646b469aad5284ab7ab9b344f17
-    .kiro/skills/ui-styling/scripts/tests/test_shadcn_add.py: sha256:4012b1efe1e51a5dcf31078b0d9069f92cfe2045e9a35dd52fdd4631b1815150
-    .kiro/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py: sha256:4efa59fdbe318d55e6a452d85401db5d1aa4504f93739878bb40d8bb504af585
-    .kiro/skills/ui-ux-pro-max/SKILL.md: sha256:360d09d9a3099c5e94fc725e8cb85753d210162e4c7822c9003d8c5f38899d15
-    .kiro/skills/ui-ux-pro-max/data/app-interface.csv: sha256:2a17ef810dab715ce1f339861817a8fbe3ccc38142b70517301e874803e838ac
-    .kiro/skills/ui-ux-pro-max/data/charts.csv: sha256:a70ef7460b0eaaea8614f86a0d09a4bc38b467804179762464b5ca45b491baac
-    .kiro/skills/ui-ux-pro-max/data/colors.csv: sha256:5a6cb6c5d6f19b5f5e51865ae1e643e4baa05d04304d0bab976f064632149a6a
-    .kiro/skills/ui-ux-pro-max/data/google-fonts.csv: sha256:3fd2898fb0fdd31ba758bf05cfcd2b58cd0f038a20cf08e417d09e5a8a4a509e
-    .kiro/skills/ui-ux-pro-max/data/icons.csv: sha256:f376c29fb4df37b4bdb366a5aa70cb211ba3dd8b435390aaa03152a64b07d2e8
-    .kiro/skills/ui-ux-pro-max/data/landing.csv: sha256:121a2cac7cf21050234b5f80e7b4e182f10123536032e0f9ad862ad3aec9677d
-    .kiro/skills/ui-ux-pro-max/data/motion.csv: sha256:528be03324785eb568c9570f5d60fc1644d5bc7ce2cbdd21b648cb90ce74e76e
-    .kiro/skills/ui-ux-pro-max/data/products.csv: sha256:9fd9e776ba847cf44c1ea78f95fe5e33b2c56bb7e186e3cfff9c49bc7fcb691b
-    .kiro/skills/ui-ux-pro-max/data/react-performance.csv: sha256:904c8afcda229629545912dde0e8ac37503757131f0169f80b016f1f58c4fd3f
-    .kiro/skills/ui-ux-pro-max/data/stacks/angular.csv: sha256:dd7cc2a2b34cd8f0508bd05b067545e7a44f7724440c432d491d92a61a8fb6c1
-    .kiro/skills/ui-ux-pro-max/data/stacks/astro.csv: sha256:ad18dae3ab6d148d37d144592df80dc1825b6c9e86d9d2d68fdda77434206a37
-    .kiro/skills/ui-ux-pro-max/data/stacks/flutter.csv: sha256:fe36d404c799781e8ba6e9a8179b45799ed5126a545528550cd2eb0f2346e8c5
-    .kiro/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv: sha256:7aef38e75c53559470afcfa91580a9917ca8b7dbf8b92110389e23e93703ac52
-    .kiro/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv: sha256:6c8fd4b0391c342c12b0af15610cd5becbeccaef0bbe8dcfc01d928c3195d93e
-    .kiro/skills/ui-ux-pro-max/data/stacks/laravel.csv: sha256:50e11e60a64b30f329af25ae71f4b8bbdb43bafc1865451b74f9f540a88964d5
-    .kiro/skills/ui-ux-pro-max/data/stacks/nextjs.csv: sha256:e828ccc04843742f52f545a068e8a9ab0d2b97c0e771f7e93bf0cef74da05554
-    .kiro/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv: sha256:05d6e74501b2b6a636faed32450622759f49a5bcafad971f5f4e7eba0eb7be71
-    .kiro/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv: sha256:f7a3f2d9542856d00199f85c6c023b7c284cc698e2e6e12d61afce2edacb24d6
-    .kiro/skills/ui-ux-pro-max/data/stacks/react-native.csv: sha256:077aefc81d194895ecf7936b3ed298b978e36961f183e3a275f8acda19b5f621
-    .kiro/skills/ui-ux-pro-max/data/stacks/react.csv: sha256:e5624ab41d33427d88e41d07581ce4eca59b37b36ab72a6ad43a9c8e2d0a1c72
-    .kiro/skills/ui-ux-pro-max/data/stacks/shadcn.csv: sha256:395c2e415ef6f48a474acccdc8eb2c7258a6ed751a5037ba171a2d8823e02ded
-    .kiro/skills/ui-ux-pro-max/data/stacks/svelte.csv: sha256:71af52d64f266c88070b91dbbaa900c2f8074b6baae9f35eaea6ba9cec6fd803
-    .kiro/skills/ui-ux-pro-max/data/stacks/swiftui.csv: sha256:c9c2d2510f8e66281a2514e8dd0125a6b653b9ef53a71281b5e7dfe003d5b569
-    .kiro/skills/ui-ux-pro-max/data/stacks/threejs.csv: sha256:f1c05f8f269fc4784170c837f4ff43b50042f00bbd6ba7dbef2896081a052544
-    .kiro/skills/ui-ux-pro-max/data/stacks/vue.csv: sha256:c2724915d3c11cd67263f25896cff721f787a0fdd8326002d31e9f5806dfd8f8
-    .kiro/skills/ui-ux-pro-max/data/styles.csv: sha256:f37eb20e7403a715d440efd45ce6952ea6a445d6143fd130c52e219a4bec9911
-    .kiro/skills/ui-ux-pro-max/data/typography.csv: sha256:dbea262a54e3bfa2e6c3b15989a365d5ef4c43349316aff46635e82ca825adce
-    .kiro/skills/ui-ux-pro-max/data/ui-reasoning.csv: sha256:06e4369445388ba9b7a57347510b125b7a2145bbf8546a327ba50292503b204a
-    .kiro/skills/ui-ux-pro-max/data/ux-guidelines.csv: sha256:e01943c433b2cad3040f19389b3b0455673758a569b7a927b5bedf65c989cb96
-    .kiro/skills/ui-ux-pro-max/scripts/core.py: sha256:ab9f398b493e34404448cefc766239ee86119c7a21d8581ba965cabdc698b0a8
-    .kiro/skills/ui-ux-pro-max/scripts/design_system.py: sha256:db272c6649322e383714c73305705101fe1d44c15bd64556d5a515b1c419c2d2
-    .kiro/skills/ui-ux-pro-max/scripts/search.py: sha256:d9983d2a21d330b6b696480940fd78029f7b34027814f2ac1cf17c5d0b042407
   content_hash: sha256:8704c750e400802bd67bf4f4c9187923267229ac91c8cec6bd32e92c35907449
   declared_license: MIT
 - repo_url: obra/superpowers
@@ -3825,15 +2675,6 @@ dependencies:
   - .claude/skills/brainstorming/scripts/stop-server.sh
   - .claude/skills/brainstorming/spec-document-reviewer-prompt.md
   - .claude/skills/brainstorming/visual-companion.md
-  - .kiro/skills/brainstorming
-  - .kiro/skills/brainstorming/SKILL.md
-  - .kiro/skills/brainstorming/scripts/frame-template.html
-  - .kiro/skills/brainstorming/scripts/helper.js
-  - .kiro/skills/brainstorming/scripts/server.cjs
-  - .kiro/skills/brainstorming/scripts/start-server.sh
-  - .kiro/skills/brainstorming/scripts/stop-server.sh
-  - .kiro/skills/brainstorming/spec-document-reviewer-prompt.md
-  - .kiro/skills/brainstorming/visual-companion.md
   deployed_file_hashes:
     .agents/skills/brainstorming/SKILL.md: sha256:e14914605f640e0841758e45d0ab2a53243b59b921f929e47921c99668f2e61d
     .agents/skills/brainstorming/scripts/frame-template.html: sha256:6a8a4e58bd6a44b904e2e3c57de774481d909204597e1498de53f1b2fecc4c4e
@@ -3851,14 +2692,6 @@ dependencies:
     .claude/skills/brainstorming/scripts/stop-server.sh: sha256:0b5ccbbd57f62d3ed88993f7940b5ee0e5c0fc9b21c550c623da4f6292e47daf
     .claude/skills/brainstorming/spec-document-reviewer-prompt.md: sha256:95a0a195de9d984be2fffa95bab16fc8c563bc296a9cfc5e9c29cb3ece0d7457
     .claude/skills/brainstorming/visual-companion.md: sha256:3321a044c777d03d7177df41c77bb83155ff2a6d0c16b8a3d752426d29f14ea8
-    .kiro/skills/brainstorming/SKILL.md: sha256:e14914605f640e0841758e45d0ab2a53243b59b921f929e47921c99668f2e61d
-    .kiro/skills/brainstorming/scripts/frame-template.html: sha256:6a8a4e58bd6a44b904e2e3c57de774481d909204597e1498de53f1b2fecc4c4e
-    .kiro/skills/brainstorming/scripts/helper.js: sha256:43c6d69954a46ec34a2a262bcc62a9a7e83e839c739f199cb72646d397c686e3
-    .kiro/skills/brainstorming/scripts/server.cjs: sha256:2d2961ea8d11f56c5f4c3a1a68d22709efa5d7601a2246d8c880774e7e9e8412
-    .kiro/skills/brainstorming/scripts/start-server.sh: sha256:a4e5ae84275bcaacd2f84345afeabe59cf7b00ba080e123da7cc1fb226f12847
-    .kiro/skills/brainstorming/scripts/stop-server.sh: sha256:0b5ccbbd57f62d3ed88993f7940b5ee0e5c0fc9b21c550c623da4f6292e47daf
-    .kiro/skills/brainstorming/spec-document-reviewer-prompt.md: sha256:95a0a195de9d984be2fffa95bab16fc8c563bc296a9cfc5e9c29cb3ece0d7457
-    .kiro/skills/brainstorming/visual-companion.md: sha256:3321a044c777d03d7177df41c77bb83155ff2a6d0c16b8a3d752426d29f14ea8
   content_hash: sha256:60f43c0a4a3032b99bf365570fc1f5f0c6ae4c2afd8fbeca3306125d7d7b3201
 - repo_url: obra/superpowers
   name: superpowers
@@ -3873,12 +2706,9 @@ dependencies:
   - .agents/skills/dispatching-parallel-agents/SKILL.md
   - .claude/skills/dispatching-parallel-agents
   - .claude/skills/dispatching-parallel-agents/SKILL.md
-  - .kiro/skills/dispatching-parallel-agents
-  - .kiro/skills/dispatching-parallel-agents/SKILL.md
   deployed_file_hashes:
     .agents/skills/dispatching-parallel-agents/SKILL.md: sha256:f0df13f584049059cc5619f90061405b89dcc6e28ab3f2a8517d27d99c7a46a6
     .claude/skills/dispatching-parallel-agents/SKILL.md: sha256:f0df13f584049059cc5619f90061405b89dcc6e28ab3f2a8517d27d99c7a46a6
-    .kiro/skills/dispatching-parallel-agents/SKILL.md: sha256:f0df13f584049059cc5619f90061405b89dcc6e28ab3f2a8517d27d99c7a46a6
   content_hash: sha256:85df55d2235a7623b315dac4bc340c14a37dcdc57c869c80a829e1a53a174689
 - repo_url: obra/superpowers
   name: superpowers
@@ -3893,12 +2723,9 @@ dependencies:
   - .agents/skills/executing-plans/SKILL.md
   - .claude/skills/executing-plans
   - .claude/skills/executing-plans/SKILL.md
-  - .kiro/skills/executing-plans
-  - .kiro/skills/executing-plans/SKILL.md
   deployed_file_hashes:
     .agents/skills/executing-plans/SKILL.md: sha256:bbd8d28bb655a52817cc129ce49f9e46fa7c6303f72ed5de95bfe914ef8e0ce8
     .claude/skills/executing-plans/SKILL.md: sha256:bbd8d28bb655a52817cc129ce49f9e46fa7c6303f72ed5de95bfe914ef8e0ce8
-    .kiro/skills/executing-plans/SKILL.md: sha256:bbd8d28bb655a52817cc129ce49f9e46fa7c6303f72ed5de95bfe914ef8e0ce8
   content_hash: sha256:08604f93f2e38dd3575e5503c79cda5c623c78a8df0e472457ac5ef7a33f22b8
 - repo_url: obra/superpowers
   name: superpowers
@@ -3913,12 +2740,9 @@ dependencies:
   - .agents/skills/finishing-a-development-branch/SKILL.md
   - .claude/skills/finishing-a-development-branch
   - .claude/skills/finishing-a-development-branch/SKILL.md
-  - .kiro/skills/finishing-a-development-branch
-  - .kiro/skills/finishing-a-development-branch/SKILL.md
   deployed_file_hashes:
     .agents/skills/finishing-a-development-branch/SKILL.md: sha256:e6d4a812de900d33c6eacfb40747f99427f25c304a7b7099120f9373b115a47f
     .claude/skills/finishing-a-development-branch/SKILL.md: sha256:e6d4a812de900d33c6eacfb40747f99427f25c304a7b7099120f9373b115a47f
-    .kiro/skills/finishing-a-development-branch/SKILL.md: sha256:e6d4a812de900d33c6eacfb40747f99427f25c304a7b7099120f9373b115a47f
   content_hash: sha256:aa2632ed96df59c36348bd8f8ec1ff0fb0c5cc68b60691834687bf4cedc6be3f
 - repo_url: obra/superpowers
   name: superpowers
@@ -3943,13 +2767,6 @@ dependencies:
   - .claude/skills/subagent-driven-development/scripts/sdd-workspace
   - .claude/skills/subagent-driven-development/scripts/task-brief
   - .claude/skills/subagent-driven-development/task-reviewer-prompt.md
-  - .kiro/skills/subagent-driven-development
-  - .kiro/skills/subagent-driven-development/SKILL.md
-  - .kiro/skills/subagent-driven-development/implementer-prompt.md
-  - .kiro/skills/subagent-driven-development/scripts/review-package
-  - .kiro/skills/subagent-driven-development/scripts/sdd-workspace
-  - .kiro/skills/subagent-driven-development/scripts/task-brief
-  - .kiro/skills/subagent-driven-development/task-reviewer-prompt.md
   deployed_file_hashes:
     .agents/skills/subagent-driven-development/SKILL.md: sha256:41ab239a6ad1c487cd839fdac972a8c9cf0f5e90efa59a63f963767864f0df4c
     .agents/skills/subagent-driven-development/implementer-prompt.md: sha256:49018b28dc11bc9f3d13a28959bb10ae1a96eabc5d8f19f4079d901f9ff2bf64
@@ -3963,12 +2780,6 @@ dependencies:
     .claude/skills/subagent-driven-development/scripts/sdd-workspace: sha256:9430befaff459ed862415b700c1a9efe45fd34838a684802a1d8320de0c3a007
     .claude/skills/subagent-driven-development/scripts/task-brief: sha256:5380283f00bffa99ab82ae78482b7d248abe10655129c72ca7050bdc0b6a85e1
     .claude/skills/subagent-driven-development/task-reviewer-prompt.md: sha256:2eb9d54373420de25bc0bd00635d3a3123a6c0eb30c881168e6f3348e2387331
-    .kiro/skills/subagent-driven-development/SKILL.md: sha256:41ab239a6ad1c487cd839fdac972a8c9cf0f5e90efa59a63f963767864f0df4c
-    .kiro/skills/subagent-driven-development/implementer-prompt.md: sha256:49018b28dc11bc9f3d13a28959bb10ae1a96eabc5d8f19f4079d901f9ff2bf64
-    .kiro/skills/subagent-driven-development/scripts/review-package: sha256:0c0629f6e2c46fc8bf68dcfb8a247ab24eb548b7004fe494035e6fcba9b5cdfb
-    .kiro/skills/subagent-driven-development/scripts/sdd-workspace: sha256:9430befaff459ed862415b700c1a9efe45fd34838a684802a1d8320de0c3a007
-    .kiro/skills/subagent-driven-development/scripts/task-brief: sha256:5380283f00bffa99ab82ae78482b7d248abe10655129c72ca7050bdc0b6a85e1
-    .kiro/skills/subagent-driven-development/task-reviewer-prompt.md: sha256:2eb9d54373420de25bc0bd00635d3a3123a6c0eb30c881168e6f3348e2387331
   content_hash: sha256:757034cd2210fcaa20f9aca84fe857ae33f4a4e73895207c15bc91dcdb0f2456
 - repo_url: obra/superpowers
   name: superpowers
@@ -4003,18 +2814,6 @@ dependencies:
   - .claude/skills/systematic-debugging/test-pressure-1.md
   - .claude/skills/systematic-debugging/test-pressure-2.md
   - .claude/skills/systematic-debugging/test-pressure-3.md
-  - .kiro/skills/systematic-debugging
-  - .kiro/skills/systematic-debugging/CREATION-LOG.md
-  - .kiro/skills/systematic-debugging/SKILL.md
-  - .kiro/skills/systematic-debugging/condition-based-waiting-example.ts
-  - .kiro/skills/systematic-debugging/condition-based-waiting.md
-  - .kiro/skills/systematic-debugging/defense-in-depth.md
-  - .kiro/skills/systematic-debugging/find-polluter.sh
-  - .kiro/skills/systematic-debugging/root-cause-tracing.md
-  - .kiro/skills/systematic-debugging/test-academic.md
-  - .kiro/skills/systematic-debugging/test-pressure-1.md
-  - .kiro/skills/systematic-debugging/test-pressure-2.md
-  - .kiro/skills/systematic-debugging/test-pressure-3.md
   deployed_file_hashes:
     .agents/skills/systematic-debugging/CREATION-LOG.md: sha256:c24733a5b1821bd6bed1fc950261f0b9f4e90097e0bbb96459d8179713730789
     .agents/skills/systematic-debugging/SKILL.md: sha256:3b20719eca4f0461cb51a195221320d775dcf03b6859271066a03a5132a6ce7a
@@ -4038,17 +2837,6 @@ dependencies:
     .claude/skills/systematic-debugging/test-pressure-1.md: sha256:0b6a915db0054577819834c79be9eb614e97bddba10d73768e1fbe91cfed048a
     .claude/skills/systematic-debugging/test-pressure-2.md: sha256:b2030aeffba07050e8ad573ddf87486457c4a016a786bb326235bebd856f2016
     .claude/skills/systematic-debugging/test-pressure-3.md: sha256:96b50a52e2c7989c9cf20fb752c47c1e9a3a70dc362f8f7989f8f5b64dac7708
-    .kiro/skills/systematic-debugging/CREATION-LOG.md: sha256:c24733a5b1821bd6bed1fc950261f0b9f4e90097e0bbb96459d8179713730789
-    .kiro/skills/systematic-debugging/SKILL.md: sha256:3b20719eca4f0461cb51a195221320d775dcf03b6859271066a03a5132a6ce7a
-    .kiro/skills/systematic-debugging/condition-based-waiting-example.ts: sha256:40ae5ebe497fdf310200e43fe986552546d0a22837c0d39e855db1cfd33eb88e
-    .kiro/skills/systematic-debugging/condition-based-waiting.md: sha256:e89fec8400d6cd50f43407cec9fab50976ba4d55d0ec2eb51c0bd68036b54c26
-    .kiro/skills/systematic-debugging/defense-in-depth.md: sha256:1e175fb86fc357e58c6aebf5441e481e1b7868b4380c0456b63a17eefbd18ba7
-    .kiro/skills/systematic-debugging/find-polluter.sh: sha256:6462747eae9b175ac145b78bcfaeab755654a75e32637f08eb633f065a9e1d7c
-    .kiro/skills/systematic-debugging/root-cause-tracing.md: sha256:6b0622269e098ca1399e123e553fd385f0b6412d88ef0e9c4f5a8ea9cf1cec7b
-    .kiro/skills/systematic-debugging/test-academic.md: sha256:fe2ba480d78ac0d686dc025f41c2a32a43d642bf533f91b0c6053a04d35d6486
-    .kiro/skills/systematic-debugging/test-pressure-1.md: sha256:0b6a915db0054577819834c79be9eb614e97bddba10d73768e1fbe91cfed048a
-    .kiro/skills/systematic-debugging/test-pressure-2.md: sha256:b2030aeffba07050e8ad573ddf87486457c4a016a786bb326235bebd856f2016
-    .kiro/skills/systematic-debugging/test-pressure-3.md: sha256:96b50a52e2c7989c9cf20fb752c47c1e9a3a70dc362f8f7989f8f5b64dac7708
   content_hash: sha256:1858a982fd8037b11e297b74f28375301304e79c7cc2cafe1c54e594fef849d7
 - repo_url: obra/superpowers
   name: superpowers
@@ -4065,16 +2853,11 @@ dependencies:
   - .claude/skills/test-driven-development
   - .claude/skills/test-driven-development/SKILL.md
   - .claude/skills/test-driven-development/testing-anti-patterns.md
-  - .kiro/skills/test-driven-development
-  - .kiro/skills/test-driven-development/SKILL.md
-  - .kiro/skills/test-driven-development/testing-anti-patterns.md
   deployed_file_hashes:
     .agents/skills/test-driven-development/SKILL.md: sha256:b5b4717b8b761cce15a6cfe9022e33fd959e0894c0c39d72c9cb49c23486c10e
     .agents/skills/test-driven-development/testing-anti-patterns.md: sha256:bde453bc258f06543987477c837939afaa774ea2acbd9f308d702fc452bc4283
     .claude/skills/test-driven-development/SKILL.md: sha256:b5b4717b8b761cce15a6cfe9022e33fd959e0894c0c39d72c9cb49c23486c10e
     .claude/skills/test-driven-development/testing-anti-patterns.md: sha256:bde453bc258f06543987477c837939afaa774ea2acbd9f308d702fc452bc4283
-    .kiro/skills/test-driven-development/SKILL.md: sha256:b5b4717b8b761cce15a6cfe9022e33fd959e0894c0c39d72c9cb49c23486c10e
-    .kiro/skills/test-driven-development/testing-anti-patterns.md: sha256:bde453bc258f06543987477c837939afaa774ea2acbd9f308d702fc452bc4283
   content_hash: sha256:eee144aea35d783296d178017e9fe843c6d16cc8b240e106f5e50910f6caf329
 - repo_url: obra/superpowers
   name: superpowers
@@ -4089,12 +2872,9 @@ dependencies:
   - .agents/skills/using-git-worktrees/SKILL.md
   - .claude/skills/using-git-worktrees
   - .claude/skills/using-git-worktrees/SKILL.md
-  - .kiro/skills/using-git-worktrees
-  - .kiro/skills/using-git-worktrees/SKILL.md
   deployed_file_hashes:
     .agents/skills/using-git-worktrees/SKILL.md: sha256:e2c3ec142e52868a51af246c620cd76ab648dcf27d6900d47e6ffd07159a9794
     .claude/skills/using-git-worktrees/SKILL.md: sha256:e2c3ec142e52868a51af246c620cd76ab648dcf27d6900d47e6ffd07159a9794
-    .kiro/skills/using-git-worktrees/SKILL.md: sha256:e2c3ec142e52868a51af246c620cd76ab648dcf27d6900d47e6ffd07159a9794
   content_hash: sha256:212ad917e5543e84ea3adf4e3fab537675db976fdab05d4de432870e38b49e80
 - repo_url: obra/superpowers
   name: superpowers
@@ -4115,11 +2895,6 @@ dependencies:
   - .claude/skills/using-superpowers/references/antigravity-tools.md
   - .claude/skills/using-superpowers/references/codex-tools.md
   - .claude/skills/using-superpowers/references/pi-tools.md
-  - .kiro/skills/using-superpowers
-  - .kiro/skills/using-superpowers/SKILL.md
-  - .kiro/skills/using-superpowers/references/antigravity-tools.md
-  - .kiro/skills/using-superpowers/references/codex-tools.md
-  - .kiro/skills/using-superpowers/references/pi-tools.md
   deployed_file_hashes:
     .agents/skills/using-superpowers/SKILL.md: sha256:55379fe7c1c473a02c61961c822996bff30e1320d6921d9062509bc508482c05
     .agents/skills/using-superpowers/references/antigravity-tools.md: sha256:d0bcfa94dd0fa399fb9606a0f7c9562b43040cad02be167a2b999c3913a1d5e9
@@ -4129,10 +2904,6 @@ dependencies:
     .claude/skills/using-superpowers/references/antigravity-tools.md: sha256:d0bcfa94dd0fa399fb9606a0f7c9562b43040cad02be167a2b999c3913a1d5e9
     .claude/skills/using-superpowers/references/codex-tools.md: sha256:9310bb2315eed2c1cebea02cd1c9e8fe121cb788fc6b41e8b8f8b5ff46f85f37
     .claude/skills/using-superpowers/references/pi-tools.md: sha256:703dbc83d23ecab9c6f388460c38abc482e9dee2fe6772a8c7a255152ad3a4d5
-    .kiro/skills/using-superpowers/SKILL.md: sha256:55379fe7c1c473a02c61961c822996bff30e1320d6921d9062509bc508482c05
-    .kiro/skills/using-superpowers/references/antigravity-tools.md: sha256:d0bcfa94dd0fa399fb9606a0f7c9562b43040cad02be167a2b999c3913a1d5e9
-    .kiro/skills/using-superpowers/references/codex-tools.md: sha256:9310bb2315eed2c1cebea02cd1c9e8fe121cb788fc6b41e8b8f8b5ff46f85f37
-    .kiro/skills/using-superpowers/references/pi-tools.md: sha256:703dbc83d23ecab9c6f388460c38abc482e9dee2fe6772a8c7a255152ad3a4d5
   content_hash: sha256:436454e9dc370401074b1df5c0d2a47b86d8a6350af405b63697a528a6167596
 - repo_url: obra/superpowers
   name: superpowers
@@ -4147,12 +2918,9 @@ dependencies:
   - .agents/skills/verification-before-completion/SKILL.md
   - .claude/skills/verification-before-completion
   - .claude/skills/verification-before-completion/SKILL.md
-  - .kiro/skills/verification-before-completion
-  - .kiro/skills/verification-before-completion/SKILL.md
   deployed_file_hashes:
     .agents/skills/verification-before-completion/SKILL.md: sha256:ea52d15aabaf72bc6b558efe2c126f161b53961090ddcd712000273bfe8c7b6c
     .claude/skills/verification-before-completion/SKILL.md: sha256:ea52d15aabaf72bc6b558efe2c126f161b53961090ddcd712000273bfe8c7b6c
-    .kiro/skills/verification-before-completion/SKILL.md: sha256:ea52d15aabaf72bc6b558efe2c126f161b53961090ddcd712000273bfe8c7b6c
   content_hash: sha256:9b446f0c7fe1cfb560b1d34439523b1a76d5f177290007b2c053a1c749a4a8ba
 - repo_url: obra/superpowers
   name: superpowers
@@ -4169,16 +2937,11 @@ dependencies:
   - .claude/skills/writing-plans
   - .claude/skills/writing-plans/SKILL.md
   - .claude/skills/writing-plans/plan-document-reviewer-prompt.md
-  - .kiro/skills/writing-plans
-  - .kiro/skills/writing-plans/SKILL.md
-  - .kiro/skills/writing-plans/plan-document-reviewer-prompt.md
   deployed_file_hashes:
     .agents/skills/writing-plans/SKILL.md: sha256:272e1af349f5062c28dc282b3e21b220d58d683a7314a10c455b7432ec91d845
     .agents/skills/writing-plans/plan-document-reviewer-prompt.md: sha256:aa728b96aad603c8be28875a4305637f6c984aa81ffcadcb13e743202fa2a0c7
     .claude/skills/writing-plans/SKILL.md: sha256:272e1af349f5062c28dc282b3e21b220d58d683a7314a10c455b7432ec91d845
     .claude/skills/writing-plans/plan-document-reviewer-prompt.md: sha256:aa728b96aad603c8be28875a4305637f6c984aa81ffcadcb13e743202fa2a0c7
-    .kiro/skills/writing-plans/SKILL.md: sha256:272e1af349f5062c28dc282b3e21b220d58d683a7314a10c455b7432ec91d845
-    .kiro/skills/writing-plans/plan-document-reviewer-prompt.md: sha256:aa728b96aad603c8be28875a4305637f6c984aa81ffcadcb13e743202fa2a0c7
   content_hash: sha256:56ce74d3f05986ea81295d3789adb71bf03845d05d182883fc5e56bf367c6af7
 - repo_url: openai/codex-plugin-cc
   name: codex-plugin-cc
@@ -4193,12 +2956,9 @@ dependencies:
   - .agents/skills/codex-cli-runtime/SKILL.md
   - .claude/skills/codex-cli-runtime
   - .claude/skills/codex-cli-runtime/SKILL.md
-  - .kiro/skills/codex-cli-runtime
-  - .kiro/skills/codex-cli-runtime/SKILL.md
   deployed_file_hashes:
     .agents/skills/codex-cli-runtime/SKILL.md: sha256:cce11c3bd6d7b5ec6277b3527e65ff38c5bd16084b436bf2870fabb30414359c
     .claude/skills/codex-cli-runtime/SKILL.md: sha256:cce11c3bd6d7b5ec6277b3527e65ff38c5bd16084b436bf2870fabb30414359c
-    .kiro/skills/codex-cli-runtime/SKILL.md: sha256:cce11c3bd6d7b5ec6277b3527e65ff38c5bd16084b436bf2870fabb30414359c
   content_hash: sha256:03b09f8ad5721f1d33d830cff54637656c58920befcb32835c6f003e625a7a54
 - repo_url: openai/codex-plugin-cc
   name: codex-plugin-cc
@@ -4213,12 +2973,9 @@ dependencies:
   - .agents/skills/codex-result-handling/SKILL.md
   - .claude/skills/codex-result-handling
   - .claude/skills/codex-result-handling/SKILL.md
-  - .kiro/skills/codex-result-handling
-  - .kiro/skills/codex-result-handling/SKILL.md
   deployed_file_hashes:
     .agents/skills/codex-result-handling/SKILL.md: sha256:99fcbbebaeac1e1504b8adfba513bd5964e171414f6709034f3f980a1f2385a8
     .claude/skills/codex-result-handling/SKILL.md: sha256:99fcbbebaeac1e1504b8adfba513bd5964e171414f6709034f3f980a1f2385a8
-    .kiro/skills/codex-result-handling/SKILL.md: sha256:99fcbbebaeac1e1504b8adfba513bd5964e171414f6709034f3f980a1f2385a8
   content_hash: sha256:1ca05b8eb3e45816b428dc71e24355a89a8f997502ade309e0c53a06adb1b1e7
 - repo_url: openai/codex-plugin-cc
   name: codex-plugin-cc
@@ -4239,11 +2996,6 @@ dependencies:
   - .claude/skills/gpt-5-4-prompting/references/codex-prompt-antipatterns.md
   - .claude/skills/gpt-5-4-prompting/references/codex-prompt-recipes.md
   - .claude/skills/gpt-5-4-prompting/references/prompt-blocks.md
-  - .kiro/skills/gpt-5-4-prompting
-  - .kiro/skills/gpt-5-4-prompting/SKILL.md
-  - .kiro/skills/gpt-5-4-prompting/references/codex-prompt-antipatterns.md
-  - .kiro/skills/gpt-5-4-prompting/references/codex-prompt-recipes.md
-  - .kiro/skills/gpt-5-4-prompting/references/prompt-blocks.md
   deployed_file_hashes:
     .agents/skills/gpt-5-4-prompting/SKILL.md: sha256:48222490b629e0e5cf7372253b864cc03b7780ce7afeaab4129f3dd2efdbf5d9
     .agents/skills/gpt-5-4-prompting/references/codex-prompt-antipatterns.md: sha256:ebf38d5d60244b0b80a35734d76a4c452abf96e9f1e4a4b8be78aa13a1ab2ab9
@@ -4253,10 +3005,6 @@ dependencies:
     .claude/skills/gpt-5-4-prompting/references/codex-prompt-antipatterns.md: sha256:ebf38d5d60244b0b80a35734d76a4c452abf96e9f1e4a4b8be78aa13a1ab2ab9
     .claude/skills/gpt-5-4-prompting/references/codex-prompt-recipes.md: sha256:fcc000e51cb967731c1b667fe27d024b0c51158a0d5d692792b23e6b46172331
     .claude/skills/gpt-5-4-prompting/references/prompt-blocks.md: sha256:9df47d9ac08c28c6ae302febc2b788cf6105ca18998a9649d7c8ccd816a047e9
-    .kiro/skills/gpt-5-4-prompting/SKILL.md: sha256:48222490b629e0e5cf7372253b864cc03b7780ce7afeaab4129f3dd2efdbf5d9
-    .kiro/skills/gpt-5-4-prompting/references/codex-prompt-antipatterns.md: sha256:ebf38d5d60244b0b80a35734d76a4c452abf96e9f1e4a4b8be78aa13a1ab2ab9
-    .kiro/skills/gpt-5-4-prompting/references/codex-prompt-recipes.md: sha256:fcc000e51cb967731c1b667fe27d024b0c51158a0d5d692792b23e6b46172331
-    .kiro/skills/gpt-5-4-prompting/references/prompt-blocks.md: sha256:9df47d9ac08c28c6ae302febc2b788cf6105ca18998a9649d7c8ccd816a047e9
   content_hash: sha256:8e00d64a5cd9b4477e55c4a7ad0f02328ff1991ea93e2ac1fb7839b3891d3f2d
 - repo_url: openai/skills
   name: skills
@@ -4281,13 +3029,6 @@ dependencies:
   - .claude/skills/gh-address-comments/assets/github-small.svg
   - .claude/skills/gh-address-comments/assets/github.png
   - .claude/skills/gh-address-comments/scripts/fetch_comments.py
-  - .kiro/skills/gh-address-comments
-  - .kiro/skills/gh-address-comments/LICENSE.txt
-  - .kiro/skills/gh-address-comments/SKILL.md
-  - .kiro/skills/gh-address-comments/agents/openai.yaml
-  - .kiro/skills/gh-address-comments/assets/github-small.svg
-  - .kiro/skills/gh-address-comments/assets/github.png
-  - .kiro/skills/gh-address-comments/scripts/fetch_comments.py
   deployed_file_hashes:
     .agents/skills/gh-address-comments/LICENSE.txt: sha256:58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd
     .agents/skills/gh-address-comments/SKILL.md: sha256:77389eefd3fb6584210668ca8e43f4b8de87e7722ddd953474bc9e24cdfaaedd
@@ -4301,12 +3042,6 @@ dependencies:
     .claude/skills/gh-address-comments/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
     .claude/skills/gh-address-comments/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
     .claude/skills/gh-address-comments/scripts/fetch_comments.py: sha256:d7bc64f6b26f7482f9ca9dd7c923a5b8b20e1ef13491ae2d9052cd208a7c1ad1
-    .kiro/skills/gh-address-comments/LICENSE.txt: sha256:58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd
-    .kiro/skills/gh-address-comments/SKILL.md: sha256:77389eefd3fb6584210668ca8e43f4b8de87e7722ddd953474bc9e24cdfaaedd
-    .kiro/skills/gh-address-comments/agents/openai.yaml: sha256:12cf845a78254dde85e60eefb45a60e6ce2129d321f3e1d691d4ebca9a140861
-    .kiro/skills/gh-address-comments/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
-    .kiro/skills/gh-address-comments/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
-    .kiro/skills/gh-address-comments/scripts/fetch_comments.py: sha256:d7bc64f6b26f7482f9ca9dd7c923a5b8b20e1ef13491ae2d9052cd208a7c1ad1
   content_hash: sha256:068d34fb59cb97a39aea3de1708877b6a01210d02fa7eda5e74fc8277ed52916
 - repo_url: openai/skills
   name: skills
@@ -4331,13 +3066,6 @@ dependencies:
   - .claude/skills/gh-fix-ci/assets/github-small.svg
   - .claude/skills/gh-fix-ci/assets/github.png
   - .claude/skills/gh-fix-ci/scripts/inspect_pr_checks.py
-  - .kiro/skills/gh-fix-ci
-  - .kiro/skills/gh-fix-ci/LICENSE.txt
-  - .kiro/skills/gh-fix-ci/SKILL.md
-  - .kiro/skills/gh-fix-ci/agents/openai.yaml
-  - .kiro/skills/gh-fix-ci/assets/github-small.svg
-  - .kiro/skills/gh-fix-ci/assets/github.png
-  - .kiro/skills/gh-fix-ci/scripts/inspect_pr_checks.py
   deployed_file_hashes:
     .agents/skills/gh-fix-ci/LICENSE.txt: sha256:4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9
     .agents/skills/gh-fix-ci/SKILL.md: sha256:7b326b4a2f0f5f85122144628ec02077e48841e0e0e82efce88b3415bcfb7c26
@@ -4351,12 +3079,6 @@ dependencies:
     .claude/skills/gh-fix-ci/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
     .claude/skills/gh-fix-ci/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
     .claude/skills/gh-fix-ci/scripts/inspect_pr_checks.py: sha256:9459e5b03f86785d184a83e5cd8d621b832e918ec04158a2962d867785812c6c
-    .kiro/skills/gh-fix-ci/LICENSE.txt: sha256:4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9
-    .kiro/skills/gh-fix-ci/SKILL.md: sha256:7b326b4a2f0f5f85122144628ec02077e48841e0e0e82efce88b3415bcfb7c26
-    .kiro/skills/gh-fix-ci/agents/openai.yaml: sha256:36f73b9450504983d1647c960689596f59bf9147c14b1b43162912ed7ada9af6
-    .kiro/skills/gh-fix-ci/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
-    .kiro/skills/gh-fix-ci/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
-    .kiro/skills/gh-fix-ci/scripts/inspect_pr_checks.py: sha256:9459e5b03f86785d184a83e5cd8d621b832e918ec04158a2962d867785812c6c
   content_hash: sha256:02b4d97e4bd91e342e3ec3efa06b7871097d6a64e8398f4ed5b69c64d8d902fb
 - repo_url: openai/skills
   name: skills
@@ -4391,18 +3113,6 @@ dependencies:
   - .claude/skills/screenshot/scripts/macos_window_info.swift
   - .claude/skills/screenshot/scripts/take_screenshot.ps1
   - .claude/skills/screenshot/scripts/take_screenshot.py
-  - .kiro/skills/screenshot
-  - .kiro/skills/screenshot/LICENSE.txt
-  - .kiro/skills/screenshot/SKILL.md
-  - .kiro/skills/screenshot/agents/openai.yaml
-  - .kiro/skills/screenshot/assets/screenshot-small.svg
-  - .kiro/skills/screenshot/assets/screenshot.png
-  - .kiro/skills/screenshot/scripts/ensure_macos_permissions.sh
-  - .kiro/skills/screenshot/scripts/macos_display_info.swift
-  - .kiro/skills/screenshot/scripts/macos_permissions.swift
-  - .kiro/skills/screenshot/scripts/macos_window_info.swift
-  - .kiro/skills/screenshot/scripts/take_screenshot.ps1
-  - .kiro/skills/screenshot/scripts/take_screenshot.py
   deployed_file_hashes:
     .agents/skills/screenshot/LICENSE.txt: sha256:4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9
     .agents/skills/screenshot/SKILL.md: sha256:081935a6a163277537d46365f49d6b4a3cb40b4748347e7e88759c5927fa8cf5
@@ -4426,17 +3136,6 @@ dependencies:
     .claude/skills/screenshot/scripts/macos_window_info.swift: sha256:c7faff7913d6072284b7ef1e5d26c524ab861ad32afc0c066f24ba95ae3f3597
     .claude/skills/screenshot/scripts/take_screenshot.ps1: sha256:a31a2242e41fd1c5471651afbcced660f98fbc884f11e531218348f700a3f826
     .claude/skills/screenshot/scripts/take_screenshot.py: sha256:56eeabe2dac5d23915b9a0fb57a07431fad2d310c5444f60f71f09299899232b
-    .kiro/skills/screenshot/LICENSE.txt: sha256:4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9
-    .kiro/skills/screenshot/SKILL.md: sha256:081935a6a163277537d46365f49d6b4a3cb40b4748347e7e88759c5927fa8cf5
-    .kiro/skills/screenshot/agents/openai.yaml: sha256:f29638eb930e27d44846474620b0d817b4b77fb5d09caf27db269463ae45cfa8
-    .kiro/skills/screenshot/assets/screenshot-small.svg: sha256:b0ff24097dfcd889504fab312a0e20d1d79dde0745268647a8cc2471b4baf794
-    .kiro/skills/screenshot/assets/screenshot.png: sha256:4ff96a476f2a2ac4ca7b626f9d4b78a7aa8cce0219e0688c5f15355513b61b5b
-    .kiro/skills/screenshot/scripts/ensure_macos_permissions.sh: sha256:9aa750f1e9592519d6c18b966fd65c1d4108c25bd3471ce625dfafd784856d7f
-    .kiro/skills/screenshot/scripts/macos_display_info.swift: sha256:0969cfef9c9890c82cae5ad75a6cd40fd56d33b28f27347642ef5e837f18b042
-    .kiro/skills/screenshot/scripts/macos_permissions.swift: sha256:cf110651350e50d600268f0a1a892ac8d662505474b4455cdfde2ac5b5f4aca6
-    .kiro/skills/screenshot/scripts/macos_window_info.swift: sha256:c7faff7913d6072284b7ef1e5d26c524ab861ad32afc0c066f24ba95ae3f3597
-    .kiro/skills/screenshot/scripts/take_screenshot.ps1: sha256:a31a2242e41fd1c5471651afbcced660f98fbc884f11e531218348f700a3f826
-    .kiro/skills/screenshot/scripts/take_screenshot.py: sha256:56eeabe2dac5d23915b9a0fb57a07431fad2d310c5444f60f71f09299899232b
   content_hash: sha256:59bd54a88ecfb293a88187164e8bdf9f27f8f28eb746a4cefcdb8f6084fde99e
 - repo_url: shadcn/improve
   name: improve
@@ -4455,11 +3154,6 @@ dependencies:
   - .claude/skills/improve/references/audit-playbook.md
   - .claude/skills/improve/references/closing-the-loop.md
   - .claude/skills/improve/references/plan-template.md
-  - .kiro/skills/improve
-  - .kiro/skills/improve/SKILL.md
-  - .kiro/skills/improve/references/audit-playbook.md
-  - .kiro/skills/improve/references/closing-the-loop.md
-  - .kiro/skills/improve/references/plan-template.md
   deployed_file_hashes:
     .agents/skills/improve/SKILL.md: sha256:1599aa29e9b16424cb767779efac53fa56e3f38be92dff4ac587393a1ad5070a
     .agents/skills/improve/references/audit-playbook.md: sha256:587c1b927070f3c28139ad95ac34cc21a7da32618cfeb966cb774e58a865d4c8
@@ -4469,17 +3163,13 @@ dependencies:
     .claude/skills/improve/references/audit-playbook.md: sha256:587c1b927070f3c28139ad95ac34cc21a7da32618cfeb966cb774e58a865d4c8
     .claude/skills/improve/references/closing-the-loop.md: sha256:5d526bb378e1783bbeb68d7af527776cbe98cde27a1aeccbd13e818e5b73b454
     .claude/skills/improve/references/plan-template.md: sha256:7be76dd3c29442288fa7cee4432fc6e95c2fdbf748c9b356344bf647c5f8722e
-    .kiro/skills/improve/SKILL.md: sha256:1599aa29e9b16424cb767779efac53fa56e3f38be92dff4ac587393a1ad5070a
-    .kiro/skills/improve/references/audit-playbook.md: sha256:587c1b927070f3c28139ad95ac34cc21a7da32618cfeb966cb774e58a865d4c8
-    .kiro/skills/improve/references/closing-the-loop.md: sha256:5d526bb378e1783bbeb68d7af527776cbe98cde27a1aeccbd13e818e5b73b454
-    .kiro/skills/improve/references/plan-template.md: sha256:7be76dd3c29442288fa7cee4432fc6e95c2fdbf748c9b356344bf647c5f8722e
   content_hash: sha256:4cd40e13503aac88bb60c202dc6a62977b290dbdc973d8cad0556ac46de6042d
   declared_license: MIT
 - repo_url: vercel-labs/agent-browser
   name: agent-browser
   host: github.com
   resolved_commit: dcbe3522f931d24f85a786ba6ba7f343d86f7294
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/agent-browser
   is_virtual: true
   package_type: claude_skill
@@ -4488,12 +3178,9 @@ dependencies:
   - .agents/skills/agent-browser/SKILL.md
   - .claude/skills/agent-browser
   - .claude/skills/agent-browser/SKILL.md
-  - .kiro/skills/agent-browser
-  - .kiro/skills/agent-browser/SKILL.md
   deployed_file_hashes:
     .agents/skills/agent-browser/SKILL.md: sha256:bb6b4c5aae49ff88addb31312437f94242a3e5aae950503ab4f332e28186c261
     .claude/skills/agent-browser/SKILL.md: sha256:bb6b4c5aae49ff88addb31312437f94242a3e5aae950503ab4f332e28186c261
-    .kiro/skills/agent-browser/SKILL.md: sha256:bb6b4c5aae49ff88addb31312437f94242a3e5aae950503ab4f332e28186c261
   content_hash: sha256:b93b77d9a63143fcefa7d371c1fceba58f1f310ef76a5f2ad3d4d2077efa8c25
 - repo_url: vercel-labs/agent-skills
   name: agent-skills
@@ -4534,21 +3221,6 @@ dependencies:
   - .claude/skills/composition-patterns/rules/state-context-interface.md
   - .claude/skills/composition-patterns/rules/state-decouple-implementation.md
   - .claude/skills/composition-patterns/rules/state-lift-state.md
-  - .kiro/skills/composition-patterns
-  - .kiro/skills/composition-patterns/AGENTS.md
-  - .kiro/skills/composition-patterns/README.md
-  - .kiro/skills/composition-patterns/SKILL.md
-  - .kiro/skills/composition-patterns/metadata.json
-  - .kiro/skills/composition-patterns/rules/_sections.md
-  - .kiro/skills/composition-patterns/rules/_template.md
-  - .kiro/skills/composition-patterns/rules/architecture-avoid-boolean-props.md
-  - .kiro/skills/composition-patterns/rules/architecture-compound-components.md
-  - .kiro/skills/composition-patterns/rules/patterns-children-over-render-props.md
-  - .kiro/skills/composition-patterns/rules/patterns-explicit-variants.md
-  - .kiro/skills/composition-patterns/rules/react19-no-forwardref.md
-  - .kiro/skills/composition-patterns/rules/state-context-interface.md
-  - .kiro/skills/composition-patterns/rules/state-decouple-implementation.md
-  - .kiro/skills/composition-patterns/rules/state-lift-state.md
   deployed_file_hashes:
     .agents/skills/composition-patterns/AGENTS.md: sha256:89e3ddd58fcf99a53a50e25dfd21b8cde1be5f10b7df6bacd3dfa6796932f516
     .agents/skills/composition-patterns/README.md: sha256:85915a43a6f0b4efe525e3cf6398dd866166da2025837c4460468a24a940da94
@@ -4578,20 +3250,6 @@ dependencies:
     .claude/skills/composition-patterns/rules/state-context-interface.md: sha256:09e73afbf9285fa416679cc864a287b9e8b821d0969272ab784295386d8c9bc3
     .claude/skills/composition-patterns/rules/state-decouple-implementation.md: sha256:76a8c1eb29a70d8996ab3f71260345af2f7bc89deab815a421d6c87c6591a9c3
     .claude/skills/composition-patterns/rules/state-lift-state.md: sha256:74c54038a6c554c748fe31cec673b80861b5d920b7553cf78cdf10d18b4b759b
-    .kiro/skills/composition-patterns/AGENTS.md: sha256:89e3ddd58fcf99a53a50e25dfd21b8cde1be5f10b7df6bacd3dfa6796932f516
-    .kiro/skills/composition-patterns/README.md: sha256:85915a43a6f0b4efe525e3cf6398dd866166da2025837c4460468a24a940da94
-    .kiro/skills/composition-patterns/SKILL.md: sha256:e38e0eaa609316b10423a9a138ed95e35099accd3f735585295c8a8f165c28a3
-    .kiro/skills/composition-patterns/metadata.json: sha256:49262ed5cb4186f31ee980cf8d990be0170c51efed4908d0464a1cff9905bd05
-    .kiro/skills/composition-patterns/rules/_sections.md: sha256:a174213b87e6911e2b766995a2cbaf8d1534057076e82fb79fe3f0ecb38047df
-    .kiro/skills/composition-patterns/rules/_template.md: sha256:587f7d16b0660eb61fee4a4d3d7df2b3077d6835de170602c7d6e60bee559131
-    .kiro/skills/composition-patterns/rules/architecture-avoid-boolean-props.md: sha256:007555ebb020f4d552582a2c4db194db71a1fd33094012e5187bcfa4f8c392d5
-    .kiro/skills/composition-patterns/rules/architecture-compound-components.md: sha256:f246af13dc269b521cf20eb8ad99a0cb645beac381c8c9b117262c34612c8457
-    .kiro/skills/composition-patterns/rules/patterns-children-over-render-props.md: sha256:7c45a0d21b3c4126a32cba916ee31adeae195386ad1dbbe6634aedb7457aa0ad
-    .kiro/skills/composition-patterns/rules/patterns-explicit-variants.md: sha256:8c19e596e61807549d01ce8c6954c6358199f97a8511c0c02c625ec0efda8c0e
-    .kiro/skills/composition-patterns/rules/react19-no-forwardref.md: sha256:881830adb7534c4b2d70db426556646ad9837f5478f744f35641f635ada22227
-    .kiro/skills/composition-patterns/rules/state-context-interface.md: sha256:09e73afbf9285fa416679cc864a287b9e8b821d0969272ab784295386d8c9bc3
-    .kiro/skills/composition-patterns/rules/state-decouple-implementation.md: sha256:76a8c1eb29a70d8996ab3f71260345af2f7bc89deab815a421d6c87c6591a9c3
-    .kiro/skills/composition-patterns/rules/state-lift-state.md: sha256:74c54038a6c554c748fe31cec673b80861b5d920b7553cf78cdf10d18b4b759b
   content_hash: sha256:5b3564ca435f4714d5e65023351e1999e4744818603a9cfb6a6f6a61b7d84918
 - repo_url: vercel-labs/agent-skills
   name: agent-skills
@@ -4756,83 +3414,6 @@ dependencies:
   - .claude/skills/react-best-practices/rules/server-parallel-fetching.md
   - .claude/skills/react-best-practices/rules/server-parallel-nested-fetching.md
   - .claude/skills/react-best-practices/rules/server-serialization.md
-  - .kiro/skills/react-best-practices
-  - .kiro/skills/react-best-practices/AGENTS.md
-  - .kiro/skills/react-best-practices/README.md
-  - .kiro/skills/react-best-practices/SKILL.md
-  - .kiro/skills/react-best-practices/metadata.json
-  - .kiro/skills/react-best-practices/rules/_sections.md
-  - .kiro/skills/react-best-practices/rules/_template.md
-  - .kiro/skills/react-best-practices/rules/advanced-effect-event-deps.md
-  - .kiro/skills/react-best-practices/rules/advanced-event-handler-refs.md
-  - .kiro/skills/react-best-practices/rules/advanced-init-once.md
-  - .kiro/skills/react-best-practices/rules/advanced-use-latest.md
-  - .kiro/skills/react-best-practices/rules/async-api-routes.md
-  - .kiro/skills/react-best-practices/rules/async-cheap-condition-before-await.md
-  - .kiro/skills/react-best-practices/rules/async-defer-await.md
-  - .kiro/skills/react-best-practices/rules/async-dependencies.md
-  - .kiro/skills/react-best-practices/rules/async-parallel.md
-  - .kiro/skills/react-best-practices/rules/async-suspense-boundaries.md
-  - .kiro/skills/react-best-practices/rules/bundle-analyzable-paths.md
-  - .kiro/skills/react-best-practices/rules/bundle-barrel-imports.md
-  - .kiro/skills/react-best-practices/rules/bundle-conditional.md
-  - .kiro/skills/react-best-practices/rules/bundle-defer-third-party.md
-  - .kiro/skills/react-best-practices/rules/bundle-dynamic-imports.md
-  - .kiro/skills/react-best-practices/rules/bundle-preload.md
-  - .kiro/skills/react-best-practices/rules/client-event-listeners.md
-  - .kiro/skills/react-best-practices/rules/client-localstorage-schema.md
-  - .kiro/skills/react-best-practices/rules/client-passive-event-listeners.md
-  - .kiro/skills/react-best-practices/rules/client-swr-dedup.md
-  - .kiro/skills/react-best-practices/rules/js-batch-dom-css.md
-  - .kiro/skills/react-best-practices/rules/js-cache-function-results.md
-  - .kiro/skills/react-best-practices/rules/js-cache-property-access.md
-  - .kiro/skills/react-best-practices/rules/js-cache-storage.md
-  - .kiro/skills/react-best-practices/rules/js-combine-iterations.md
-  - .kiro/skills/react-best-practices/rules/js-early-exit.md
-  - .kiro/skills/react-best-practices/rules/js-flatmap-filter.md
-  - .kiro/skills/react-best-practices/rules/js-hoist-regexp.md
-  - .kiro/skills/react-best-practices/rules/js-index-maps.md
-  - .kiro/skills/react-best-practices/rules/js-length-check-first.md
-  - .kiro/skills/react-best-practices/rules/js-min-max-loop.md
-  - .kiro/skills/react-best-practices/rules/js-request-idle-callback.md
-  - .kiro/skills/react-best-practices/rules/js-set-map-lookups.md
-  - .kiro/skills/react-best-practices/rules/js-tosorted-immutable.md
-  - .kiro/skills/react-best-practices/rules/rendering-activity.md
-  - .kiro/skills/react-best-practices/rules/rendering-animate-svg-wrapper.md
-  - .kiro/skills/react-best-practices/rules/rendering-conditional-render.md
-  - .kiro/skills/react-best-practices/rules/rendering-content-visibility.md
-  - .kiro/skills/react-best-practices/rules/rendering-hoist-jsx.md
-  - .kiro/skills/react-best-practices/rules/rendering-hydration-no-flicker.md
-  - .kiro/skills/react-best-practices/rules/rendering-hydration-suppress-warning.md
-  - .kiro/skills/react-best-practices/rules/rendering-resource-hints.md
-  - .kiro/skills/react-best-practices/rules/rendering-script-defer-async.md
-  - .kiro/skills/react-best-practices/rules/rendering-svg-precision.md
-  - .kiro/skills/react-best-practices/rules/rendering-usetransition-loading.md
-  - .kiro/skills/react-best-practices/rules/rerender-defer-reads.md
-  - .kiro/skills/react-best-practices/rules/rerender-dependencies.md
-  - .kiro/skills/react-best-practices/rules/rerender-derived-state-no-effect.md
-  - .kiro/skills/react-best-practices/rules/rerender-derived-state.md
-  - .kiro/skills/react-best-practices/rules/rerender-functional-setstate.md
-  - .kiro/skills/react-best-practices/rules/rerender-lazy-state-init.md
-  - .kiro/skills/react-best-practices/rules/rerender-memo-with-default-value.md
-  - .kiro/skills/react-best-practices/rules/rerender-memo.md
-  - .kiro/skills/react-best-practices/rules/rerender-move-effect-to-event.md
-  - .kiro/skills/react-best-practices/rules/rerender-no-inline-components.md
-  - .kiro/skills/react-best-practices/rules/rerender-simple-expression-in-memo.md
-  - .kiro/skills/react-best-practices/rules/rerender-split-combined-hooks.md
-  - .kiro/skills/react-best-practices/rules/rerender-transitions.md
-  - .kiro/skills/react-best-practices/rules/rerender-use-deferred-value.md
-  - .kiro/skills/react-best-practices/rules/rerender-use-ref-transient-values.md
-  - .kiro/skills/react-best-practices/rules/server-after-nonblocking.md
-  - .kiro/skills/react-best-practices/rules/server-auth-actions.md
-  - .kiro/skills/react-best-practices/rules/server-cache-lru.md
-  - .kiro/skills/react-best-practices/rules/server-cache-react.md
-  - .kiro/skills/react-best-practices/rules/server-dedup-props.md
-  - .kiro/skills/react-best-practices/rules/server-hoist-static-io.md
-  - .kiro/skills/react-best-practices/rules/server-no-shared-module-state.md
-  - .kiro/skills/react-best-practices/rules/server-parallel-fetching.md
-  - .kiro/skills/react-best-practices/rules/server-parallel-nested-fetching.md
-  - .kiro/skills/react-best-practices/rules/server-serialization.md
   deployed_file_hashes:
     .agents/skills/react-best-practices/AGENTS.md: sha256:fc93e7421177bbf869cce892bc60a6c83a4517d974bc3bf65c4e2c1e58a6ccf6
     .agents/skills/react-best-practices/README.md: sha256:9eafb2123d3b8b2aef41fba0db2648a3f4f49996f8c7c8bb2c86263befd8b48a
@@ -4986,82 +3567,6 @@ dependencies:
     .claude/skills/react-best-practices/rules/server-parallel-fetching.md: sha256:569a2e9fc04f9606686cd75c5894ef8781b502786a7fffe241396846c7733472
     .claude/skills/react-best-practices/rules/server-parallel-nested-fetching.md: sha256:ad5d9656984d4a959997a2367bf59cc6632297b4634a1dd13a087939d83f30b3
     .claude/skills/react-best-practices/rules/server-serialization.md: sha256:f4c7d68b29c82381baad059c4a7f09e868e71ec9c3115a26ad3ae7d24c0dfe1f
-    .kiro/skills/react-best-practices/AGENTS.md: sha256:fc93e7421177bbf869cce892bc60a6c83a4517d974bc3bf65c4e2c1e58a6ccf6
-    .kiro/skills/react-best-practices/README.md: sha256:9eafb2123d3b8b2aef41fba0db2648a3f4f49996f8c7c8bb2c86263befd8b48a
-    .kiro/skills/react-best-practices/SKILL.md: sha256:71ed7794962fa6e803ee83030517b5b93a9f70fbfeb431ec4535c5480a8d8355
-    .kiro/skills/react-best-practices/metadata.json: sha256:c4e18bac3290fbe1b471a605867d4df68b03144ea26b8befdbe8f9d8fd124354
-    .kiro/skills/react-best-practices/rules/_sections.md: sha256:01c59969e4e867f0708c8f8ef9c6d87fab9a07d0586244f429ff84013db8a115
-    .kiro/skills/react-best-practices/rules/_template.md: sha256:99df2a3ea088c6c22de2484ddc7e964d0e9923846f44c63380343ecc64455442
-    .kiro/skills/react-best-practices/rules/advanced-effect-event-deps.md: sha256:55ed8f9f27a1bff803d6fa55828176207714b02123cbb97ddb8a90d88024a723
-    .kiro/skills/react-best-practices/rules/advanced-event-handler-refs.md: sha256:a3097edeecfb2ff6851cd66ed8cdf0617c3c88180504bee824aa6e75a215bbbc
-    .kiro/skills/react-best-practices/rules/advanced-init-once.md: sha256:3e4dc22173eb0e2b6dcf583e3babd862b8696328f8f59aee7c4d746c5bc05f6c
-    .kiro/skills/react-best-practices/rules/advanced-use-latest.md: sha256:8a3f64dfe5a77d1564248faf17fe662ae75b55d497a243cb30b38eb07ccbbf9a
-    .kiro/skills/react-best-practices/rules/async-api-routes.md: sha256:523338540d73427dc14c0cbb19f2741ebccdf8b105a7b2c1b33d2905cf237a42
-    .kiro/skills/react-best-practices/rules/async-cheap-condition-before-await.md: sha256:03107c1f70a293cd58a8abc5474c5548e20ea4efdf01b6d45aae7ad0ac1cb32c
-    .kiro/skills/react-best-practices/rules/async-defer-await.md: sha256:f3c142d090615abdcc99d31c123be37b31f0f1ed8d9ec9f7789a3bc6883ae0fb
-    .kiro/skills/react-best-practices/rules/async-dependencies.md: sha256:16ef469f877e30c6b8e1e1b4bc3e527312fa3c6318cb785a4eca186ea236131a
-    .kiro/skills/react-best-practices/rules/async-parallel.md: sha256:6d2f841896279e976dfcdc1ac89e70771ac188baadfd43c096b5706cb838b961
-    .kiro/skills/react-best-practices/rules/async-suspense-boundaries.md: sha256:de05fedac2eb7ae563b887b5a424464ec3dfaf84e5b7797467ebe2a796ac8afc
-    .kiro/skills/react-best-practices/rules/bundle-analyzable-paths.md: sha256:62090b5c815fd71bf1133dce754f51abc16a9456d0ccd025fd627de27726e92a
-    .kiro/skills/react-best-practices/rules/bundle-barrel-imports.md: sha256:e648f6d54525f07a691357040ca5bff6ea3424788a91ff63812adb29622a671b
-    .kiro/skills/react-best-practices/rules/bundle-conditional.md: sha256:09c8259c3efb04fc0abb8e412ccbda217c222ae8118516283e571c995fe3a7d4
-    .kiro/skills/react-best-practices/rules/bundle-defer-third-party.md: sha256:3719fb47b191e8db4fe22686ec88448ad5af9e6838585425abbe103d0b642e37
-    .kiro/skills/react-best-practices/rules/bundle-dynamic-imports.md: sha256:401817a7369f315fc5a68a1095742ff7d53d0461906880dc9d64a41495ee1986
-    .kiro/skills/react-best-practices/rules/bundle-preload.md: sha256:d1f7cc28da7cd5ab249acd287edc5b761afcfb194e9cb62cd44c5f3543db2de2
-    .kiro/skills/react-best-practices/rules/client-event-listeners.md: sha256:242a873349febc1ce685e85617994784dbab92c2eaa68aed7fed5a83e7680e93
-    .kiro/skills/react-best-practices/rules/client-localstorage-schema.md: sha256:0fb7cdf9dc93fdf22f87e3669f953fb9d4ac9b0be42eec4a29fe9a2560610b88
-    .kiro/skills/react-best-practices/rules/client-passive-event-listeners.md: sha256:1f35016f9053de69e884ee9be00654e37979c2ca85f5e57764dc2626ff7acb4b
-    .kiro/skills/react-best-practices/rules/client-swr-dedup.md: sha256:644652c39c6cc00de8d1c77a7273612e868dc3f7edda30764164c12ec0f764a3
-    .kiro/skills/react-best-practices/rules/js-batch-dom-css.md: sha256:480b891b9eaf96e929dc1e964274a4828e3a78009b7d00ccd965a0d425215959
-    .kiro/skills/react-best-practices/rules/js-cache-function-results.md: sha256:3daaa11d24f4295cb6be8bc6f407f2ce83cc7b5bd1f0e68891ea8ab835721dc7
-    .kiro/skills/react-best-practices/rules/js-cache-property-access.md: sha256:73e47431e74878a927061bf0ddc7cd91a7556cb35d2573f3421e82300d9ae311
-    .kiro/skills/react-best-practices/rules/js-cache-storage.md: sha256:11b826b0433898c1ece2d3547010d8e77db9fb240185748c45db91493de9b6cc
-    .kiro/skills/react-best-practices/rules/js-combine-iterations.md: sha256:71add08aeeb43091d4ff4c0b2842cce8b4bdef8ad3e732cc034bb5a84827e746
-    .kiro/skills/react-best-practices/rules/js-early-exit.md: sha256:925ce5ce87f3347186ca62212f29cc6baa2b8c85a96d2720ad07c3d0abf781c0
-    .kiro/skills/react-best-practices/rules/js-flatmap-filter.md: sha256:9e5b166a41914d975bef7635467f8fb32cd98b5c3126c0bc6f163490812fb5f0
-    .kiro/skills/react-best-practices/rules/js-hoist-regexp.md: sha256:f9e9aef2f7c2307dd7310f283df85dcada45fc43e9bb941b0c3aa414dec21ec4
-    .kiro/skills/react-best-practices/rules/js-index-maps.md: sha256:5df1bdc2cfabb2c98abd55d26762e5c18189535c2e686184f426082e62920391
-    .kiro/skills/react-best-practices/rules/js-length-check-first.md: sha256:8b54a311c826b299272f29187fc58bc55772a04c4a72eeb29456ee96dc9fc624
-    .kiro/skills/react-best-practices/rules/js-min-max-loop.md: sha256:87dfb67e2f39df6ad8bcfb5b78c5fb364d3c07554ad188a202408d99f3763421
-    .kiro/skills/react-best-practices/rules/js-request-idle-callback.md: sha256:ee08f83905b4011abbc33d594033157d77561b5bbd9b36b04f0f409581ffec32
-    .kiro/skills/react-best-practices/rules/js-set-map-lookups.md: sha256:a7fd781a6ba9ad49065961b6f9a90ef486bf6b648390e1a08704025f98e1642b
-    .kiro/skills/react-best-practices/rules/js-tosorted-immutable.md: sha256:d0a5e1b0fec48a0a81397957e2f068e224329f7c42cb5feeed8aae6fa64025e8
-    .kiro/skills/react-best-practices/rules/rendering-activity.md: sha256:1e5e7eaf3555e61d6a2e900089c676527d26259501db5594f59544b6c664f85a
-    .kiro/skills/react-best-practices/rules/rendering-animate-svg-wrapper.md: sha256:9c6ae0ca7a51434e803887c64cded760956579a1452ccb80a461a03f9c937c77
-    .kiro/skills/react-best-practices/rules/rendering-conditional-render.md: sha256:2ec2fa23c4148285144687050c52369adba3da2fbe3d486f8d3e0aad8f06f2bc
-    .kiro/skills/react-best-practices/rules/rendering-content-visibility.md: sha256:64eee6d5b916fe74df33363994b27fc7f71bea3bcedc7ee04bda23107ca3e6e4
-    .kiro/skills/react-best-practices/rules/rendering-hoist-jsx.md: sha256:93b229560fae92005ed9a2a829064607b39b2e984e92d221d05b2d41df2b7c0e
-    .kiro/skills/react-best-practices/rules/rendering-hydration-no-flicker.md: sha256:dc7ab358c67c177bca6e6f360fbc935ebe4efa928c0ba3ebd3f9f3d9e2000ca3
-    .kiro/skills/react-best-practices/rules/rendering-hydration-suppress-warning.md: sha256:915bacb934e2927d84b37a3f3d225a47b309ac8f9e494ed2bcb66ce07c5676a2
-    .kiro/skills/react-best-practices/rules/rendering-resource-hints.md: sha256:351b1095d641717b930f1b2253282b7120af3023bc74e06c17675168d4286864
-    .kiro/skills/react-best-practices/rules/rendering-script-defer-async.md: sha256:4cea07b7875ba7fc2c7465ff23b63a2bb334f90aaf2d9293d38d67b05fdb32ab
-    .kiro/skills/react-best-practices/rules/rendering-svg-precision.md: sha256:ed468533f6e95f622859c884b122cf21f9f593ed6bb3d500a54de4b9f9bcb9fb
-    .kiro/skills/react-best-practices/rules/rendering-usetransition-loading.md: sha256:3a1249c3f13026b6f54ab5712c388df219d6af01b12aa542749acd99a46f4bc1
-    .kiro/skills/react-best-practices/rules/rerender-defer-reads.md: sha256:234050a77faf50cb306be10a9e15bd4421134ab5907e75f13e6d78e2bd262dc9
-    .kiro/skills/react-best-practices/rules/rerender-dependencies.md: sha256:17eb5830956fb56486fd3cfc7431f5849d39751730c05ad9e77dd4f0c27169c5
-    .kiro/skills/react-best-practices/rules/rerender-derived-state-no-effect.md: sha256:cb11ec76f50aa7b6847269f02d79b120c889a30d9ecd2c1d578f75144419c77a
-    .kiro/skills/react-best-practices/rules/rerender-derived-state.md: sha256:1c326bb67b01fb084eb00c8911b0a7cff54681c2315b629f88e49b64eaa6481d
-    .kiro/skills/react-best-practices/rules/rerender-functional-setstate.md: sha256:5e68df6b2ae8058e67f476ff1ac67bde159f5a9d18df439e46eabcdeb7b52e58
-    .kiro/skills/react-best-practices/rules/rerender-lazy-state-init.md: sha256:4ae844740f266fc8cbf050701230286624a2440ec5be67b9a63d9edc3c580573
-    .kiro/skills/react-best-practices/rules/rerender-memo-with-default-value.md: sha256:81c47476564ad8a79fc68fc442734255ca7d6829424359464503fda0a9f9a0dd
-    .kiro/skills/react-best-practices/rules/rerender-memo.md: sha256:1f258990c2f27ff6256b3cc5c43300631bb3f0d81f749aed08d07fcdcc131dd1
-    .kiro/skills/react-best-practices/rules/rerender-move-effect-to-event.md: sha256:abc2cbf167bee056743023351e96806a411d3398da8802093620aecf0721f029
-    .kiro/skills/react-best-practices/rules/rerender-no-inline-components.md: sha256:1cc32907a770272524ba682eef9e7efdd8ad4533b6f89b718a1fcd7d1d0eb6a3
-    .kiro/skills/react-best-practices/rules/rerender-simple-expression-in-memo.md: sha256:5bdcf2d1558ba5204e643c887b7b4060f89630969425651eb68e96427d97f800
-    .kiro/skills/react-best-practices/rules/rerender-split-combined-hooks.md: sha256:6f45d703343484ef9acef9388397f3642966ae6a5a258899a0cf1f9977cfbf6c
-    .kiro/skills/react-best-practices/rules/rerender-transitions.md: sha256:60f4033909a62df5e5b8c601494f9e50a562e2f8c1c2d81eac24f38142265f1c
-    .kiro/skills/react-best-practices/rules/rerender-use-deferred-value.md: sha256:8c3579576a61a949884167745dcfaf1d5426ba305cc61fd0a79602d70fda4909
-    .kiro/skills/react-best-practices/rules/rerender-use-ref-transient-values.md: sha256:f1a649af9d1d0b5c762f6c9c4c1c70c90d7df82aa10296ee87aadb78c1b76c54
-    .kiro/skills/react-best-practices/rules/server-after-nonblocking.md: sha256:d0b8d24a3db9f0f65f9e2bddbf230b0e03a5f60e1229d93a4a18f5e7a991c7c2
-    .kiro/skills/react-best-practices/rules/server-auth-actions.md: sha256:a2ca8aa102839251c7971ec784560fab943c20b36fe6f80365d4110c13260c23
-    .kiro/skills/react-best-practices/rules/server-cache-lru.md: sha256:1924b64561841923b88a657085097a0aeba3e0ba2d5470b9f5c15cc10d6ae70f
-    .kiro/skills/react-best-practices/rules/server-cache-react.md: sha256:fddeea6c870bb3da4134b61d54b7d09b83d2603f929b7547cd3dc1dc269edd5c
-    .kiro/skills/react-best-practices/rules/server-dedup-props.md: sha256:c2747424cdac46be62f835f245a0aa887b0090b416d28e2ac8676702645eeb37
-    .kiro/skills/react-best-practices/rules/server-hoist-static-io.md: sha256:5abea4dd882b13661bd5f7dfb93f9e547d5f08176c61c448ade91b210ed5d49f
-    .kiro/skills/react-best-practices/rules/server-no-shared-module-state.md: sha256:4d869bf1cd2f1632e5ca4c0e64b1cf0e71c5f5a0f940bc8a22174d205e735ed7
-    .kiro/skills/react-best-practices/rules/server-parallel-fetching.md: sha256:569a2e9fc04f9606686cd75c5894ef8781b502786a7fffe241396846c7733472
-    .kiro/skills/react-best-practices/rules/server-parallel-nested-fetching.md: sha256:ad5d9656984d4a959997a2367bf59cc6632297b4634a1dd13a087939d83f30b3
-    .kiro/skills/react-best-practices/rules/server-serialization.md: sha256:f4c7d68b29c82381baad059c4a7f09e868e71ec9c3115a26ad3ae7d24c0dfe1f
   content_hash: sha256:74f142d28d360d78e8bac4f239a84c87f0ced9015729bc72b5458d82ff45b015
 - repo_url: vercel-labs/agent-skills
   name: agent-skills
@@ -5076,12 +3581,9 @@ dependencies:
   - .agents/skills/web-design-guidelines/SKILL.md
   - .claude/skills/web-design-guidelines
   - .claude/skills/web-design-guidelines/SKILL.md
-  - .kiro/skills/web-design-guidelines
-  - .kiro/skills/web-design-guidelines/SKILL.md
   deployed_file_hashes:
     .agents/skills/web-design-guidelines/SKILL.md: sha256:f4647ca866a3accf763777f83e7682954f0187cd6bea7eea0399796652414e8f
     .claude/skills/web-design-guidelines/SKILL.md: sha256:f4647ca866a3accf763777f83e7682954f0187cd6bea7eea0399796652414e8f
-    .kiro/skills/web-design-guidelines/SKILL.md: sha256:f4647ca866a3accf763777f83e7682954f0187cd6bea7eea0399796652414e8f
   content_hash: sha256:a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a
 mcp_servers:
 - 1password
