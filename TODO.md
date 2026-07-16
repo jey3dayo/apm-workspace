@@ -3,8 +3,8 @@
 ## Open Tasks
 
 - Optional: run `apm prune` to drop the ~14 orphaned package cache entries not declared in `apm.yml`.
-- Review and execute the candidates in [`docs/skill-scope-proposals.md`](docs/skill-scope-proposals.md):
-  start with Agentation, browser automation, and React/UI validation skills.
+- Review and execute the candidates in [`docs/skill-inventory.md`](docs/skill-inventory.md) の「移管候補（未実施）」
+  (Agentation は repo-local 移管済み。残りは browser 系・understand 系・社内 API 系).
 - Before removing any candidate from the global manifest, verify it in a concrete consuming repository
   with a repo-local `apm.yml` and record the result in [`docs/package-decisions.md`](docs/package-decisions.md).
 
@@ -27,8 +27,9 @@
 
 - `[x]` `google-forms-survey-builder`: Google Forms 案件専用。`optional-skills` に移管済み。
 - `[x]` `slack-app-management`: Slack アプリ案件専用。`optional-skills` に移管済み。
-- `[ ]` Agentation、browser automation、React/UI validation: 対象リポジトリで利用実績を確認して段階移管。
-- `[ ]` UI bundle / framework-specific skills: UI を持つリポジトリだけへ移管。
+- `[x]` Agentation: `caad-loca-bff` / `ultra-rss-reader` の repo-local へ移管済み（2026-07-16）。
+- `[x]` UI bundle: `ui-ux-pro-max` 本体のみ global 維持に縮小済み（2026-07-16）。React/UI validation 系は棚卸しの結果 global 維持を決定。
+- `[ ]` browser automation（`browser-harness` / `agent-browser`）: 対象リポジトリで利用実績を確認して段階移管。
 - `[ ]` `ca-pass`、`mdb-api`、`notica-api`、`telma-api`: catalog の個人スキルではなく、外部 marketplace plugin。コピーせず upstream 参照を利用者側の `apm.yml` に置く。
 
 ### 社員向けスキル検索の設計メモ

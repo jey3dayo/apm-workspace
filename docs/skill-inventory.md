@@ -1,9 +1,8 @@
 # Skill Inventory
 
-スキル・MCP の配置レーン別の集約一覧（2026-07-16 時点）。
-「どこに何があるか」だけをここに置き、採用・撤去の理由は
-[`package-decisions.md`](package-decisions.md)、移管の判断基準は
-[`skill-scope-proposals.md`](skill-scope-proposals.md) を参照する。
+スキル・MCP の配置の現状と、移管候補・保留の一元管理（2026-07-16 時点）。
+「どこに何があるか」「次にどう動かすか」はこのファイルに集約する。
+個々の採用・撤去の理由と経緯は [`package-decisions.md`](package-decisions.md) を参照する。
 
 ## レーン一覧
 
@@ -72,22 +71,96 @@
 
 ## repo-local で活用中
 
-| ツール                                                                                    | 利用リポジトリ                      |
-| ----------------------------------------------------------------------------------------- | ----------------------------------- |
-| `agentation` / `agentation-self-driving` + `agentation-mcp`（MCP）                        | `caad-loca-bff`, `ultra-rss-reader` |
-| `agent-browser`                                                                           | `caad-loca-bff`, `ultra-rss-reader` |
-| `chrome-devtools`（MCP）                                                                  | `browser-toolkit`                   |
-| `tauri-mcp-server`（MCP）                                                                 | `ultra-rss-reader`                  |
-| `terraform-style-guide` / `terraform-test`（hashicorp）                                   | `ca-connect-site`, `caad-asta`      |
-| `workers-best-practices` / `wrangler`（cloudflare）                                       | `keep-on`                           |
-| `mcp-server-patterns`, `chatgpt-apps`                                                     | `caad-loca-bff`                     |
-| `tauri`（EpicenterHQ）, `rust-best-practices`, `tauri-icon-gen`, `tauri-webview-geometry` | `ultra-rss-reader`                  |
-| `marp-slide`, `slide-docs`                                                                | `tech-talks`                        |
-| `manga-rss-bridge`                                                                        | `manga-rss-bridge`, `homelab-k3s`   |
+global の一覧に無くても廃止ではない。各リポジトリの `apm.yml` が正本
+（2026-07-16 時点の `ghq` 配下スキャン）。
+
+| ツール                                                                                    | 利用リポジトリ                      | 用途                                                     |
+| ----------------------------------------------------------------------------------------- | ----------------------------------- | -------------------------------------------------------- |
+| `agentation` / `agentation-self-driving` + `agentation-mcp`（MCP）                        | `caad-loca-bff`, `ultra-rss-reader` | Agentation toolbar での UI アノテーション連携            |
+| `agent-browser`（vercel-labs）                                                            | `caad-loca-bff`, `ultra-rss-reader` | ブラウザ自動化・Web UI 検証                              |
+| `chrome-devtools`（MCP）                                                                  | `browser-toolkit`                   | Lighthouse・パフォーマンストレース等の DevTools 固有分析 |
+| `tauri-mcp-server`（MCP）                                                                 | `ultra-rss-reader`                  | Tauri ランタイム検証                                     |
+| `terraform-style-guide` / `terraform-test`（hashicorp）                                   | `ca-connect-site`, `caad-asta`      | Terraform 規約・テスト                                   |
+| `workers-best-practices` / `wrangler`（cloudflare）                                       | `keep-on`                           | Cloudflare Workers                                       |
+| `mcp-server-patterns`, `chatgpt-apps`                                                     | `caad-loca-bff`                     | MCP / ChatGPT Apps 実装                                  |
+| `tauri`（EpicenterHQ）, `rust-best-practices`, `tauri-icon-gen`, `tauri-webview-geometry` | `ultra-rss-reader`                  | Tauri / Rust 実装                                        |
+| `marp-slide`, `slide-docs`                                                                | `tech-talks`                        | スライド制作                                             |
+| `manga-rss-bridge`                                                                        | `manga-rss-bridge`, `homelab-k3s`   | プロジェクト固有運用                                     |
 
 ## global MCP（root apm.yml の mcp:）
 
 `context7`, `mcp-simple-voicevox`, `jina-reader`, `codex`, `1password`, `headroom`
+
+## デザイン / UI・UX / レビュー系の役割マップ
+
+2026-07-16 の棚卸し結果（経緯は
+[`package-decisions.md`](package-decisions.md) の「デザイン / UI・UX / レビュー系スキルの棲み分け」）。
+
+| 役割                                       | スキル                                                                                                         |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| 0→1 デザイン選定（スタイル・色・フォント） | `ui-ux-pro-max`（本体のみ）                                                                                    |
+| 美的方向性・脱テンプレ                     | `frontend-design`（anthropics）                                                                                |
+| ベースライン修正（deslop）                 | `baseline-ui` / `fixing-accessibility` / `fixing-metadata`（ibelick）                                          |
+| モーション taste・レビュー・監査           | `emil-design-eng` / `review-animations` / `improve-animations` / `animation-vocabulary`（emilkowalski/skills） |
+| モーション実装スニペット                   | `transitions-dev`                                                                                              |
+| UI ガイドライン準拠レビュー                | `web-design-guidelines`（vercel）                                                                              |
+| デザインシステム準拠レビュー               | `design-system-review`（catalog 自作）                                                                         |
+| UI レビューレーン選択ハブ                  | `review-board`（catalog 自作）                                                                                 |
+| デザインドキュメント                       | `design-md-workflow`（catalog 自作）                                                                           |
+| コードベース監査→計画（汎用）              | `improve`（shadcn）                                                                                            |
+| React 診断                                 | `react-doctor`（millionco）                                                                                    |
+
+### レビュー系の使い分け
+
+- UI の見た目・ガイドライン準拠 → `web-design-guidelines`
+- デザインシステム・トークン準拠 → `design-system-review`
+- アニメーション・モーションの質 → `review-animations`（単発）/ `improve-animations`（全体監査→plan 生成）
+- UI・フォーム・アクセシビリティ・マルチデバイスのレーン振り分け → `review-board`
+- コード品質全般 → `code-review` / `hunk-review` / `thermo-nuclear-code-quality-review`
+- 改善候補の洗い出し（実装しない）→ `improve`（shadcn、汎用）
+
+## 保留・watchlist
+
+- `apple-design`（emilkowalski）: Apple HIG 系。必要になったら global に 1 行追加。
+- `fixing-motion-performance`（ibelick）/ `make-interfaces-feel-better`（jakubkrehel）:
+  emil 新構成と発火競合したら間引く。モーション系は現在 emil 4 + ibelick 1 +
+  transitions-dev + make-interfaces の系統があり、2〜3 週間の実運用で
+  発火競合・指摘重複を確認する。
+
+## 移管候補（未実施）
+
+global から repo-local / optional へ移す候補。実施済みのもの
+（`agentation` 系、`slack-app-management`、`google-forms-survey-builder`、
+UI バンドル縮小）は上の各レーンへ反映済み。
+
+| 候補                                            | 推奨配置                                    | 判断理由                                                                                                        |
+| ----------------------------------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `browser-harness` / `agent-browser`             | 対象リポジトリの `apm.yml` または on-demand | ブラウザセッション・ログイン状態と結び付く。`agent-browser` は「保留撤去」判断済みだが global manifest には残存 |
+| `understand` / `understand-dashboard`           | 対象リポジトリの `apm.yml` または on-demand | 解析対象コードベースに結び付く                                                                                  |
+| `ca-pass`, `mdb-api`, `notica-api`, `telma-api` | 対象リポジトリの `apm.yml`                  | 社内 API・VPN・認証境界を利用側へ閉じ込める                                                                     |
+| `perman-aws-vault`                              | 当面 global 維持                            | 複数 AWS リポジトリで同じ認証導線を使うため。移管するなら profile/credential 境界を明記後                       |
+
+2026-07-16 の棚卸しで global 維持を決定したもの（候補から除外）:
+`react-doctor`, `composition-patterns`, `react-best-practices`,
+`baseline-ui` ほか ibelick 系, `web-design-guidelines`, `transitions-dev`,
+`frontend-design`, `ui-ux-pro-max`, `design-md-workflow`, `design-system-review`。
+
+### 移管の判断基準
+
+- 特定のフレームワーク、ランタイム、サービス、UI ワークフローに強く依存する
+- 使わないリポジトリでも毎回グローバル候補として読み込まれる
+- 認証情報、ブラウザセッション、ローカルアプリなどの境界をプロジェクト側へ閉じ込めた方が安全
+- 未発火データは補助根拠に留め、適用範囲と対象リポジトリの実態を優先する
+
+### 移管手順
+
+1. 対象リポジトリと実際の利用者を決める
+2. repo-local `apm.yml` で `apm install <package-ref> --skill <id>` し、check / 実作業を検証する
+   （workspace-owned は `catalog/skills/` → `optional-skills/.apm/skills/` へ移してから
+   `apm install jey3dayo/apm-workspace/optional-skills#main --skill <id>`）
+3. global root manifest から外す
+4. `mise run deploy` 後に `~/.agents/skills` と `~/.claude/skills` の残存を確認する
+5. このファイルと `docs/package-decisions.md` を更新する
 
 ## メンテナンス
 
