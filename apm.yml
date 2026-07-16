@@ -66,6 +66,7 @@ dependencies:
     - vercel-labs/agent-skills/skills/react-best-practices
     - vercel-labs/agent-skills/skills/web-design-guidelines
     - shadcn/improve
+    - fujibee/agmsg
   mcp:
     - name: context7
       registry: false
