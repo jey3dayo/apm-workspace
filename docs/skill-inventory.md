@@ -26,7 +26,7 @@
 - レビュー・監査: `hunk-review`, `thermo-nuclear-code-quality-review`,
   `improve`（shadcn）, `react-doctor`
 - React / Web 実装: `composition-patterns`, `react-best-practices`,
-  `browser-harness`, `agent-browser`, `screenshot`
+  `browser-harness`, `screenshot`
 - ワークフロー（obra/superpowers）: brainstorming, executing-plans,
   systematic-debugging, TDD, worktrees, verification ほか計 11
 - Codex 連携（openai）: `codex-cli-runtime`, `codex-result-handling`,
@@ -133,12 +133,12 @@ global から repo-local / optional へ移す候補。実施済みのもの
 （`agentation` 系、`slack-app-management`、`google-forms-survey-builder`、
 UI バンドル縮小）は上の各レーンへ反映済み。
 
-| 候補                                            | 推奨配置                                    | 判断理由                                                                                                        |
-| ----------------------------------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `browser-harness` / `agent-browser`             | 対象リポジトリの `apm.yml` または on-demand | ブラウザセッション・ログイン状態と結び付く。`agent-browser` は「保留撤去」判断済みだが global manifest には残存 |
-| `understand` / `understand-dashboard`           | 対象リポジトリの `apm.yml` または on-demand | 解析対象コードベースに結び付く                                                                                  |
-| `ca-pass`, `mdb-api`, `notica-api`, `telma-api` | 対象リポジトリの `apm.yml`                  | 社内 API・VPN・認証境界を利用側へ閉じ込める                                                                     |
-| `perman-aws-vault`                              | 当面 global 維持                            | 複数 AWS リポジトリで同じ認証導線を使うため。移管するなら profile/credential 境界を明記後                       |
+| 候補                                            | 推奨配置                                    | 判断理由                                                                                                                                         |
+| ----------------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `browser-harness`                               | 対象リポジトリの `apm.yml` または on-demand | ブラウザセッション・ログイン状態と結び付く。`agent-browser` は 2026-07-16 に global 撤去済み（repo-local: `caad-loca-bff` / `ultra-rss-reader`） |
+| `understand` / `understand-dashboard`           | 対象リポジトリの `apm.yml` または on-demand | 解析対象コードベースに結び付く                                                                                                                   |
+| `ca-pass`, `mdb-api`, `notica-api`, `telma-api` | 対象リポジトリの `apm.yml`                  | 社内 API・VPN・認証境界を利用側へ閉じ込める                                                                                                      |
+| `perman-aws-vault`                              | 当面 global 維持                            | 複数 AWS リポジトリで同じ認証導線を使うため。移管するなら profile/credential 境界を明記後                                                        |
 
 2026-07-16 の棚卸しで global 維持を決定したもの（候補から除外）:
 `react-doctor`, `composition-patterns`, `react-best-practices`,

@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-07-16T06:43:16.647990+00:00'
+generated_at: '2026-07-16T08:35:57.961068+00:00'
 apm_version: 0.22.0
 dependencies:
 - repo_url: Jakubantalik/transitions-dev
@@ -302,10 +302,10 @@ dependencies:
     .claude/skills/understand-dashboard/SKILL.md: sha256:d12cb059d8e6139873542111ccec691b0603496675182f5ac826d5b65273331a
   content_hash: sha256:5e3ac7994d20f16f8232164dbec7998b62073a5547fcfc0b0baba82cb48bed0a
 - repo_url: anthropics/claude-code
-  name: frontend-design
+  name: claude-code
   host: github.com
   resolved_commit: c39cb0f14bfe8bb519bae5bfc55add6867c5e2ab
-  version: 1.0.0
+  version: unknown
   virtual_path: plugins/frontend-design/skills/frontend-design
   is_virtual: true
   package_type: claude_skill
@@ -523,10 +523,27 @@ dependencies:
     .claude/skills/thermo-nuclear-code-quality-review/SKILL.md: sha256:7faca08b51b643b2ddd0836f92af15574444024685dcc1e677dbbb39ae8c9e8f
   content_hash: sha256:9052b01b46b1d8dbf94c45f9313ec1983443f9a460e83d49cdc7fe0f640ca476
 - repo_url: emilkowalski/skills
-  name: emil-design-eng
+  name: skills
   host: github.com
   resolved_commit: 6bf24434f7730ad169077756cf9c7cd7bd675fc6
-  version: 1.0.0
+  version: unknown
+  virtual_path: skills/animation-vocabulary
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/animation-vocabulary
+  - .agents/skills/animation-vocabulary/SKILL.md
+  - .claude/skills/animation-vocabulary
+  - .claude/skills/animation-vocabulary/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/animation-vocabulary/SKILL.md: sha256:d718b48fe3c7898804d588f050a2e266d82c9f5ef51da256c8cb8b5951527757
+    .claude/skills/animation-vocabulary/SKILL.md: sha256:d718b48fe3c7898804d588f050a2e266d82c9f5ef51da256c8cb8b5951527757
+  content_hash: sha256:39319fc9a33c15be08666b3685f58666f042ff36bb902b7814c0834a5ba99df4
+- repo_url: emilkowalski/skills
+  name: skills
+  host: github.com
+  resolved_commit: 6bf24434f7730ad169077756cf9c7cd7bd675fc6
+  version: unknown
   virtual_path: skills/emil-design-eng
   is_virtual: true
   package_type: claude_skill
@@ -535,12 +552,15 @@ dependencies:
   - .agents/skills/emil-design-eng/SKILL.md
   - .claude/skills/emil-design-eng
   - .claude/skills/emil-design-eng/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/emil-design-eng/SKILL.md: sha256:433b5a239cda18e0576e4e558532e7e53512e21fafe5b85db4894c28ec399b72
+    .claude/skills/emil-design-eng/SKILL.md: sha256:433b5a239cda18e0576e4e558532e7e53512e21fafe5b85db4894c28ec399b72
   content_hash: sha256:8bdf9e4e6de7a4969147bf4828a4ad2c5aacd9fba4b690b250a85e0467ca387d
 - repo_url: emilkowalski/skills
-  name: improve-animations
+  name: skills
   host: github.com
   resolved_commit: 6bf24434f7730ad169077756cf9c7cd7bd675fc6
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/improve-animations
   is_virtual: true
   package_type: claude_skill
@@ -562,10 +582,10 @@ dependencies:
     .claude/skills/improve-animations/SKILL.md: sha256:68f17bbc4671593d2f43dba26a679243e2153ba5f26965fb7d59df52842534ff
   content_hash: sha256:32f23d860467841f5b07cef198fb53efc70f2adaaa6144cf1a3434d782aed246
 - repo_url: emilkowalski/skills
-  name: review-animations
+  name: skills
   host: github.com
   resolved_commit: 6bf24434f7730ad169077756cf9c7cd7bd675fc6
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/review-animations
   is_virtual: true
   package_type: claude_skill
@@ -582,23 +602,6 @@ dependencies:
     .claude/skills/review-animations/SKILL.md: sha256:27c1ec78634a08bcb588229497f4fbc3bcb9db8f8032dcdd275eb844f30fc004
     .claude/skills/review-animations/STANDARDS.md: sha256:12b1a9dcee667981294ea065651b755910977f676e6300a31614003cde444db9
   content_hash: sha256:c92905bff59c3007d07c2638a2a83d5d71c901feef108cce1da0bf3c7cafd579
-- repo_url: emilkowalski/skills
-  name: skills
-  host: github.com
-  resolved_commit: 6bf24434f7730ad169077756cf9c7cd7bd675fc6
-  version: unknown
-  virtual_path: skills/animation-vocabulary
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/animation-vocabulary
-  - .agents/skills/animation-vocabulary/SKILL.md
-  - .claude/skills/animation-vocabulary
-  - .claude/skills/animation-vocabulary/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/animation-vocabulary/SKILL.md: sha256:d718b48fe3c7898804d588f050a2e266d82c9f5ef51da256c8cb8b5951527757
-    .claude/skills/animation-vocabulary/SKILL.md: sha256:d718b48fe3c7898804d588f050a2e266d82c9f5ef51da256c8cb8b5951527757
-  content_hash: sha256:39319fc9a33c15be08666b3685f58666f042ff36bb902b7814c0834a5ba99df4
 - repo_url: gonta223/humanizer-ja
   name: humanizer-ja
   host: github.com
@@ -623,10 +626,10 @@ dependencies:
     .claude/skills/humanizer-ja/SKILL.md: sha256:3fe07f06a179801d7445eff19ed40f1681ef9860665c50c1e9a032f6dffead89
   content_hash: sha256:b6da4ef92a941ab364ab1ddf259d9e511e098a0719f7ee2202847351c34a8194
 - repo_url: ibelick/ui-skills
-  name: baseline-ui
+  name: ui-skills
   host: github.com
   resolved_commit: ce91b85952f76ec738242bcf8aefa8c68653592c
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/baseline-ui
   is_virtual: true
   package_type: claude_skill
@@ -640,10 +643,10 @@ dependencies:
     .claude/skills/baseline-ui/SKILL.md: sha256:fea3322f36d58fdafafce2aef56e4556dd2ac7b20876b7dff7d8be7f25fa597f
   content_hash: sha256:dfcb3e778b57ad1cba92375689bb8265fa5aef78fba523a744f5220b3c619901
 - repo_url: ibelick/ui-skills
-  name: fixing-accessibility
+  name: ui-skills
   host: github.com
   resolved_commit: ce91b85952f76ec738242bcf8aefa8c68653592c
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/fixing-accessibility
   is_virtual: true
   package_type: claude_skill
@@ -657,10 +660,10 @@ dependencies:
     .claude/skills/fixing-accessibility/SKILL.md: sha256:549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf
   content_hash: sha256:4fa8f5a772b4eef3d28a54c136b507d070e54e2c326578f65eaf5e5a0118b38a
 - repo_url: ibelick/ui-skills
-  name: fixing-metadata
+  name: ui-skills
   host: github.com
   resolved_commit: ce91b85952f76ec738242bcf8aefa8c68653592c
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/fixing-metadata
   is_virtual: true
   package_type: claude_skill
@@ -674,10 +677,10 @@ dependencies:
     .claude/skills/fixing-metadata/SKILL.md: sha256:b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547
   content_hash: sha256:699e13890fb50acffa02dfd2d5b0e719bd916a9e2b7e6035bdc4513fc73d9174
 - repo_url: ibelick/ui-skills
-  name: fixing-motion-performance
+  name: ui-skills
   host: github.com
   resolved_commit: ce91b85952f76ec738242bcf8aefa8c68653592c
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/fixing-motion-performance
   is_virtual: true
   package_type: claude_skill
@@ -726,7 +729,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: 330b5ef91bc47ef4cf8ac566f42981fccf2adedc
+  resolved_commit: 818d9211c9f734073f0b630e78a7146a28ffc928
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -736,10 +739,6 @@ dependencies:
   - .agents/skills/1password-item-ops
   - .agents/skills/1password-item-ops/SKILL.md
   - .agents/skills/1password-item-ops/agents/openai.yaml
-  - .agents/skills/agent-curation
-  - .agents/skills/agent-curation/SKILL.md
-  - .agents/skills/agent-curation/agents/openai.yaml
-  - .agents/skills/agent-curation/references/hired-agents-registry.md
   - .agents/skills/apm-repo-bootstrap
   - .agents/skills/apm-repo-bootstrap/SKILL.md
   - .agents/skills/apm-repo-bootstrap/agents/openai.yaml
@@ -848,10 +847,6 @@ dependencies:
   - .agents/skills/jina-web-research
   - .agents/skills/jina-web-research/SKILL.md
   - .agents/skills/jina-web-research/agents/openai.yaml
-  - .agents/skills/macos-troubleshooting
-  - .agents/skills/macos-troubleshooting/SKILL.md
-  - .agents/skills/macos-troubleshooting/agents/openai.yaml
-  - .agents/skills/macos-troubleshooting/references/cases.md
   - .agents/skills/mcp-tools
   - .agents/skills/mcp-tools/SKILL.md
   - .agents/skills/mcp-tools/agents/openai.yaml
@@ -872,10 +867,6 @@ dependencies:
   - .agents/skills/mise/references/windows-shells.md
   - .agents/skills/mise/resources/examples/npm-package-migration.md
   - .agents/skills/mise/resources/templates/mise-config-template.toml
-  - .agents/skills/pc-ops
-  - .agents/skills/pc-ops/SKILL.md
-  - .agents/skills/pc-ops/agents/openai.yaml
-  - .agents/skills/pc-ops/references/codex-macos.md
   - .agents/skills/polish
   - .agents/skills/polish/SKILL.md
   - .agents/skills/predictive-analysis
@@ -970,10 +961,6 @@ dependencies:
   - .claude/skills/1password-item-ops
   - .claude/skills/1password-item-ops/SKILL.md
   - .claude/skills/1password-item-ops/agents/openai.yaml
-  - .claude/skills/agent-curation
-  - .claude/skills/agent-curation/SKILL.md
-  - .claude/skills/agent-curation/agents/openai.yaml
-  - .claude/skills/agent-curation/references/hired-agents-registry.md
   - .claude/skills/apm-repo-bootstrap
   - .claude/skills/apm-repo-bootstrap/SKILL.md
   - .claude/skills/apm-repo-bootstrap/agents/openai.yaml
@@ -1082,10 +1069,6 @@ dependencies:
   - .claude/skills/jina-web-research
   - .claude/skills/jina-web-research/SKILL.md
   - .claude/skills/jina-web-research/agents/openai.yaml
-  - .claude/skills/macos-troubleshooting
-  - .claude/skills/macos-troubleshooting/SKILL.md
-  - .claude/skills/macos-troubleshooting/agents/openai.yaml
-  - .claude/skills/macos-troubleshooting/references/cases.md
   - .claude/skills/mcp-tools
   - .claude/skills/mcp-tools/SKILL.md
   - .claude/skills/mcp-tools/agents/openai.yaml
@@ -1106,10 +1089,6 @@ dependencies:
   - .claude/skills/mise/references/windows-shells.md
   - .claude/skills/mise/resources/examples/npm-package-migration.md
   - .claude/skills/mise/resources/templates/mise-config-template.toml
-  - .claude/skills/pc-ops
-  - .claude/skills/pc-ops/SKILL.md
-  - .claude/skills/pc-ops/agents/openai.yaml
-  - .claude/skills/pc-ops/references/codex-macos.md
   - .claude/skills/polish
   - .claude/skills/polish/SKILL.md
   - .claude/skills/predictive-analysis
@@ -1204,13 +1183,10 @@ dependencies:
   deployed_file_hashes:
     .agents/skills/1password-item-ops/SKILL.md: sha256:b7fba64c86660630cbde7cf45b9228a45a921ef5836745a0025797debae6c212
     .agents/skills/1password-item-ops/agents/openai.yaml: sha256:7e861a0611c042f922c97096ec7ef4906d27b94f2b5d52d67638bce72c23ca6b
-    .agents/skills/agent-curation/SKILL.md: sha256:cf46408cdb91fd87a0985ccec8a1bc0f77501d521320f88a36a52e9fd9cc3900
-    .agents/skills/agent-curation/agents/openai.yaml: sha256:f7395c9113eaefcfc27c4b697b0d7c253cb7a67a88c84f038098e0ff06ba8694
-    .agents/skills/agent-curation/references/hired-agents-registry.md: sha256:8686ea777ab6c8eec3a0fd92f4ce9bbefe4ec5b76f409885c99f6e431f62237e
     .agents/skills/apm-repo-bootstrap/SKILL.md: sha256:c340f3997daf9ece1d6a0b6d02770948171549d69ccceebafd0f5cc68f995248
     .agents/skills/apm-repo-bootstrap/agents/openai.yaml: sha256:faed36da8f7980b88e395eb9aae322a9fc608e0c555ba93f843f6007ab50da19
     .agents/skills/apm-repo-bootstrap/references/recommendations.md: sha256:0fbd9a6d9656f05438834d6224a79a819bbc6933af7dc90835858263175b9c23
-    .agents/skills/apm-usage/SKILL.md: sha256:ba40469d268e3062d44452fe0318c258d59f87866f08a772a1361ff76134af88
+    .agents/skills/apm-usage/SKILL.md: sha256:bdf860e44f6ff9f3a3cafe93bc36582513e22b2071883bcffabf34c36469d3e7
     .agents/skills/apm-usage/agents/openai.yaml: sha256:b3743dad4fcd9f3c209210c40df277e75d949ac7ce1713a61d497cc1e7e3ba83
     .agents/skills/apm-usage/references/repo-local-mcp.md: sha256:adac5e0d08543b1dd95b5e7fefd113cd537be290146d9f367cafb51cac89ee41
     .agents/skills/architecture-boundary-docs/SKILL.md: sha256:a1ff83850e0cf330529b2f94436714692d933b80b780a08a21263679fe393d2e
@@ -1218,7 +1194,7 @@ dependencies:
     .agents/skills/architecture-boundary-docs/references/document-shape.md: sha256:1c0fedacef544a36804c64cc58cf159a4c7a2dcc25dbc05ef88f571b3ce425fa
     .agents/skills/atomic-commit/SKILL.md: sha256:e9a29b13aef5bf70c5f2c9955b5ccd912e52886440672e5428f86ab8dd371c25
     .agents/skills/atomic-commit/agents/openai.yaml: sha256:8486b70455d5ec0241bc7bf64bf52d806084132b2c4fcea7dcfd79ed7aec497f
-    .agents/skills/ci-stability-hooks/SKILL.md: sha256:2eb85b96927729a1b181f389d74f4d6965895d5d616936477e3955d3e37de479
+    .agents/skills/ci-stability-hooks/SKILL.md: sha256:a59b64440a7daf07908f76adecaa3279e2b413dfbcd35052f210a7a2a62c3123
     .agents/skills/ci-stability-hooks/agents/openai.yaml: sha256:60a9e8633c5933d8663858f15d71831b0af1c5265accf6f5e2ebba0916373cc2
     .agents/skills/code-quality-improvement/SKILL.md: sha256:13e0d11f43b1578bcf34c498b19e4d02b2acd674bf9312b123e13e2cc2ff37aa
     .agents/skills/code-quality-improvement/references/patterns.md: sha256:d371fb616f8c56d9aff936ce9518619856d66d3ad6968108945526882e032d69
@@ -1296,9 +1272,6 @@ dependencies:
     .agents/skills/japanese-tech-writing/SKILL.md: sha256:6d8da2f159b632b264985b7872b75e2813e597b04bd4853d11f720c548f0cdbb
     .agents/skills/jina-web-research/SKILL.md: sha256:3efcadae75ccddb7612d313e5896dc27d2cbddef4a4f013a70be8c75165283bb
     .agents/skills/jina-web-research/agents/openai.yaml: sha256:31aa67ba8347ed691d7fe4f14034a4b5f23b698640d50c8aeb60831534423a4d
-    .agents/skills/macos-troubleshooting/SKILL.md: sha256:5dbfb6b138966632e483ed30dff2b777b2e0842e457033d910f579a00618009c
-    .agents/skills/macos-troubleshooting/agents/openai.yaml: sha256:e0c22f96dba94a75c9689b34dd10c1ce965bfa9bbe8b613e586e72a87bf6f69a
-    .agents/skills/macos-troubleshooting/references/cases.md: sha256:331c8dafd6cf8f749d5565c77831c51a25cdee7b039caa2b2d7dc683cf2999bd
     .agents/skills/mcp-tools/SKILL.md: sha256:bd74f85bae6f8b0b29d875a4c4c89fee69de798c9c262244d2d7c01447beece4
     .agents/skills/mcp-tools/agents/openai.yaml: sha256:f2251a17f3ee854c9aa28c0ef7645c279b2dcd81afc53e65a102eff7c35101af
     .agents/skills/mcp-tools/references/mcp-placement.md: sha256:fb1c67b1b36376a24daf56f1348a8c439adbbc252a93f82c1ddd0b97f8c96452
@@ -1317,9 +1290,6 @@ dependencies:
     .agents/skills/mise/references/windows-shells.md: sha256:12b6015cec11e12745e9be6dc448a10c15ed49772954f960aa322eb69a96c6ec
     .agents/skills/mise/resources/examples/npm-package-migration.md: sha256:dd9c35732be0a4cb0dbd231bfaa16024c082d9bf0be61c66b6e531085b8bdfde
     .agents/skills/mise/resources/templates/mise-config-template.toml: sha256:7c0f5e891d7f3ae501287dcc849ad16251cb24beb2e699e435ad398bba954af0
-    .agents/skills/pc-ops/SKILL.md: sha256:3553f39a05498f040b5f6b7fdba9da1379f0afcee79469c9427cc54f14195b47
-    .agents/skills/pc-ops/agents/openai.yaml: sha256:15f300474d6ae5e83fc70c3ca350c753713fffb9dfd7e10c9fea888677d40fe0
-    .agents/skills/pc-ops/references/codex-macos.md: sha256:2298bc1f2586b817ce620e2904bc98423516c829a5f01269a8d9defe10931d4e
     .agents/skills/polish/SKILL.md: sha256:f584c16f0754c71b80b323f25e33172ab39efd655afa1081c72c0a07824a59a7
     .agents/skills/predictive-analysis/SKILL.md: sha256:eaf8fea7373abba60aa12872f5719d9b083d2b926ee7b24fbfad4fccc8226071
     .agents/skills/predictive-analysis/examples/preventive-measures.md: sha256:dc8ed47b58448932b8c0157c45d0d483a49c8f445aa1e601515c779de53217c3
@@ -1399,13 +1369,10 @@ dependencies:
     .agents/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
     .claude/skills/1password-item-ops/SKILL.md: sha256:b7fba64c86660630cbde7cf45b9228a45a921ef5836745a0025797debae6c212
     .claude/skills/1password-item-ops/agents/openai.yaml: sha256:7e861a0611c042f922c97096ec7ef4906d27b94f2b5d52d67638bce72c23ca6b
-    .claude/skills/agent-curation/SKILL.md: sha256:cf46408cdb91fd87a0985ccec8a1bc0f77501d521320f88a36a52e9fd9cc3900
-    .claude/skills/agent-curation/agents/openai.yaml: sha256:f7395c9113eaefcfc27c4b697b0d7c253cb7a67a88c84f038098e0ff06ba8694
-    .claude/skills/agent-curation/references/hired-agents-registry.md: sha256:8686ea777ab6c8eec3a0fd92f4ce9bbefe4ec5b76f409885c99f6e431f62237e
     .claude/skills/apm-repo-bootstrap/SKILL.md: sha256:c340f3997daf9ece1d6a0b6d02770948171549d69ccceebafd0f5cc68f995248
     .claude/skills/apm-repo-bootstrap/agents/openai.yaml: sha256:faed36da8f7980b88e395eb9aae322a9fc608e0c555ba93f843f6007ab50da19
     .claude/skills/apm-repo-bootstrap/references/recommendations.md: sha256:0fbd9a6d9656f05438834d6224a79a819bbc6933af7dc90835858263175b9c23
-    .claude/skills/apm-usage/SKILL.md: sha256:ba40469d268e3062d44452fe0318c258d59f87866f08a772a1361ff76134af88
+    .claude/skills/apm-usage/SKILL.md: sha256:bdf860e44f6ff9f3a3cafe93bc36582513e22b2071883bcffabf34c36469d3e7
     .claude/skills/apm-usage/agents/openai.yaml: sha256:b3743dad4fcd9f3c209210c40df277e75d949ac7ce1713a61d497cc1e7e3ba83
     .claude/skills/apm-usage/references/repo-local-mcp.md: sha256:adac5e0d08543b1dd95b5e7fefd113cd537be290146d9f367cafb51cac89ee41
     .claude/skills/architecture-boundary-docs/SKILL.md: sha256:a1ff83850e0cf330529b2f94436714692d933b80b780a08a21263679fe393d2e
@@ -1413,7 +1380,7 @@ dependencies:
     .claude/skills/architecture-boundary-docs/references/document-shape.md: sha256:1c0fedacef544a36804c64cc58cf159a4c7a2dcc25dbc05ef88f571b3ce425fa
     .claude/skills/atomic-commit/SKILL.md: sha256:e9a29b13aef5bf70c5f2c9955b5ccd912e52886440672e5428f86ab8dd371c25
     .claude/skills/atomic-commit/agents/openai.yaml: sha256:8486b70455d5ec0241bc7bf64bf52d806084132b2c4fcea7dcfd79ed7aec497f
-    .claude/skills/ci-stability-hooks/SKILL.md: sha256:2eb85b96927729a1b181f389d74f4d6965895d5d616936477e3955d3e37de479
+    .claude/skills/ci-stability-hooks/SKILL.md: sha256:a59b64440a7daf07908f76adecaa3279e2b413dfbcd35052f210a7a2a62c3123
     .claude/skills/ci-stability-hooks/agents/openai.yaml: sha256:60a9e8633c5933d8663858f15d71831b0af1c5265accf6f5e2ebba0916373cc2
     .claude/skills/code-quality-improvement/SKILL.md: sha256:13e0d11f43b1578bcf34c498b19e4d02b2acd674bf9312b123e13e2cc2ff37aa
     .claude/skills/code-quality-improvement/references/patterns.md: sha256:d371fb616f8c56d9aff936ce9518619856d66d3ad6968108945526882e032d69
@@ -1491,9 +1458,6 @@ dependencies:
     .claude/skills/japanese-tech-writing/SKILL.md: sha256:6d8da2f159b632b264985b7872b75e2813e597b04bd4853d11f720c548f0cdbb
     .claude/skills/jina-web-research/SKILL.md: sha256:3efcadae75ccddb7612d313e5896dc27d2cbddef4a4f013a70be8c75165283bb
     .claude/skills/jina-web-research/agents/openai.yaml: sha256:31aa67ba8347ed691d7fe4f14034a4b5f23b698640d50c8aeb60831534423a4d
-    .claude/skills/macos-troubleshooting/SKILL.md: sha256:5dbfb6b138966632e483ed30dff2b777b2e0842e457033d910f579a00618009c
-    .claude/skills/macos-troubleshooting/agents/openai.yaml: sha256:e0c22f96dba94a75c9689b34dd10c1ce965bfa9bbe8b613e586e72a87bf6f69a
-    .claude/skills/macos-troubleshooting/references/cases.md: sha256:331c8dafd6cf8f749d5565c77831c51a25cdee7b039caa2b2d7dc683cf2999bd
     .claude/skills/mcp-tools/SKILL.md: sha256:bd74f85bae6f8b0b29d875a4c4c89fee69de798c9c262244d2d7c01447beece4
     .claude/skills/mcp-tools/agents/openai.yaml: sha256:f2251a17f3ee854c9aa28c0ef7645c279b2dcd81afc53e65a102eff7c35101af
     .claude/skills/mcp-tools/references/mcp-placement.md: sha256:fb1c67b1b36376a24daf56f1348a8c439adbbc252a93f82c1ddd0b97f8c96452
@@ -1512,9 +1476,6 @@ dependencies:
     .claude/skills/mise/references/windows-shells.md: sha256:12b6015cec11e12745e9be6dc448a10c15ed49772954f960aa322eb69a96c6ec
     .claude/skills/mise/resources/examples/npm-package-migration.md: sha256:dd9c35732be0a4cb0dbd231bfaa16024c082d9bf0be61c66b6e531085b8bdfde
     .claude/skills/mise/resources/templates/mise-config-template.toml: sha256:7c0f5e891d7f3ae501287dcc849ad16251cb24beb2e699e435ad398bba954af0
-    .claude/skills/pc-ops/SKILL.md: sha256:3553f39a05498f040b5f6b7fdba9da1379f0afcee79469c9427cc54f14195b47
-    .claude/skills/pc-ops/agents/openai.yaml: sha256:15f300474d6ae5e83fc70c3ca350c753713fffb9dfd7e10c9fea888677d40fe0
-    .claude/skills/pc-ops/references/codex-macos.md: sha256:2298bc1f2586b817ce620e2904bc98423516c829a5f01269a8d9defe10931d4e
     .claude/skills/polish/SKILL.md: sha256:f584c16f0754c71b80b323f25e33172ab39efd655afa1081c72c0a07824a59a7
     .claude/skills/predictive-analysis/SKILL.md: sha256:eaf8fea7373abba60aa12872f5719d9b083d2b926ee7b24fbfad4fccc8226071
     .claude/skills/predictive-analysis/examples/preventive-measures.md: sha256:dc8ed47b58448932b8c0157c45d0d483a49c8f445aa1e601515c779de53217c3
@@ -1592,11 +1553,11 @@ dependencies:
     .claude/skills/work-log-maintenance/SKILL.md: sha256:26f4064ff1c0e757e415121675d6caaecd30040f95304e6ed4cd4c73e022f3f9
     .claude/skills/work-log-maintenance/agents/openai.yaml: sha256:e951b8256a5a1b032bcca3c7105230f5041467594434ca23b562b8ec5ec4abc8
     .claude/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
-  content_hash: sha256:80f4c8fe6a4787dbacb62bee0a25e90451720c4764a1a70a5407435a11086543
+  content_hash: sha256:a3cef4afc6154ce16a07a0631a164111494dda6fe3ea9c7750e8e71de3c9f9eb
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
-  resolved_commit: 330b5ef91bc47ef4cf8ac566f42981fccf2adedc
+  resolved_commit: 818d9211c9f734073f0b630e78a7146a28ffc928
   resolved_ref: main
   version: 1.0.0
   virtual_path: manual-skills
@@ -1604,10 +1565,10 @@ dependencies:
   package_type: apm_package
   content_hash: sha256:c9adaaf42924bc9edc428c03d4ed3465bdd46305c3437d5f4b1d1ee4346c69fe
 - repo_url: langchain-ai/deepagents
-  name: web-research
+  name: deepagents
   host: github.com
   resolved_commit: d13d299a0fc91369efdbc8376f09837c52f27969
-  version: 1.0.0
+  version: unknown
   virtual_path: libs/cli/examples/skills/web-research
   is_virtual: true
   package_type: claude_skill
@@ -1732,7 +1693,7 @@ dependencies:
 - repo_url: millionco/react-doctor
   name: react-doctor
   host: github.com
-  resolved_commit: 5915a58231c3ba640d2d17e3c703511b8c9c2746
+  resolved_commit: 1a30f2caac12f1678243cb8733dd7bc1b598a9da
   version: 1.0.0
   virtual_path: skills/react-doctor
   is_virtual: true
@@ -2495,23 +2456,6 @@ dependencies:
     .claude/skills/improve/references/plan-template.md: sha256:7be76dd3c29442288fa7cee4432fc6e95c2fdbf748c9b356344bf647c5f8722e
   content_hash: sha256:4cd40e13503aac88bb60c202dc6a62977b290dbdc973d8cad0556ac46de6042d
   declared_license: MIT
-- repo_url: vercel-labs/agent-browser
-  name: agent-browser
-  host: github.com
-  resolved_commit: e40e62d7c8378549646c9a36615c0a960a1378e8
-  version: 1.0.0
-  virtual_path: skills/agent-browser
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/agent-browser
-  - .agents/skills/agent-browser/SKILL.md
-  - .claude/skills/agent-browser
-  - .claude/skills/agent-browser/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/agent-browser/SKILL.md: sha256:bb6b4c5aae49ff88addb31312437f94242a3e5aae950503ab4f332e28186c261
-    .claude/skills/agent-browser/SKILL.md: sha256:bb6b4c5aae49ff88addb31312437f94242a3e5aae950503ab4f332e28186c261
-  content_hash: sha256:b93b77d9a63143fcefa7d371c1fceba58f1f310ef76a5f2ad3d4d2077efa8c25
 - repo_url: vercel-labs/agent-skills
   name: agent-skills
   host: github.com

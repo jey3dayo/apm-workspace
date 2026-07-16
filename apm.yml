@@ -61,7 +61,6 @@ dependencies:
     - openai/skills/skills/.curated/gh-address-comments
     - openai/skills/skills/.curated/gh-fix-ci
     - openai/skills/skills/.curated/screenshot
-    - vercel-labs/agent-browser/skills/agent-browser
     - vercel-labs/agent-skills/skills/composition-patterns
     - vercel-labs/agent-skills/skills/react-best-practices
     - vercel-labs/agent-skills/skills/web-design-guidelines

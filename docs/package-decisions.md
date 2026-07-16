@@ -42,7 +42,9 @@
 
 ### agent-browser
 
-- **Status: 保留撤去（2026-07-16）**
+- **Status: global 撤去実施（2026-07-16）**。repo-local では利用継続
+  （`caad-loca-bff`、`ultra-rss-reader`）。同日に `apm prune` で
+  trailofbits 系 3 件の orphan cache も削除。
 - 正本: `vercel-labs/agent-browser/skills/agent-browser`
 - 理由: `browser-harness` を通常のブラウザ操作の標準にするため。Electron、Slack、Vercel
   Sandbox などの特殊用途が必要になった時だけ repo-local で再導入する。
