@@ -582,6 +582,23 @@ dependencies:
     .claude/skills/review-animations/SKILL.md: sha256:27c1ec78634a08bcb588229497f4fbc3bcb9db8f8032dcdd275eb844f30fc004
     .claude/skills/review-animations/STANDARDS.md: sha256:12b1a9dcee667981294ea065651b755910977f676e6300a31614003cde444db9
   content_hash: sha256:c92905bff59c3007d07c2638a2a83d5d71c901feef108cce1da0bf3c7cafd579
+- repo_url: emilkowalski/skills
+  name: skills
+  host: github.com
+  resolved_commit: 6bf24434f7730ad169077756cf9c7cd7bd675fc6
+  version: unknown
+  virtual_path: skills/animation-vocabulary
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/animation-vocabulary
+  - .agents/skills/animation-vocabulary/SKILL.md
+  - .claude/skills/animation-vocabulary
+  - .claude/skills/animation-vocabulary/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/animation-vocabulary/SKILL.md: sha256:d718b48fe3c7898804d588f050a2e266d82c9f5ef51da256c8cb8b5951527757
+    .claude/skills/animation-vocabulary/SKILL.md: sha256:d718b48fe3c7898804d588f050a2e266d82c9f5ef51da256c8cb8b5951527757
+  content_hash: sha256:39319fc9a33c15be08666b3685f58666f042ff36bb902b7814c0834a5ba99df4
 - repo_url: gonta223/humanizer-ja
   name: humanizer-ja
   host: github.com
