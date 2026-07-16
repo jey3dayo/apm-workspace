@@ -74,6 +74,15 @@ repository and promote it to a global lane only after real use proves the need.
 If no consumer repository can be named yet, do not install anywhere; record the
 candidate and revisit when a concrete repository needs it.
 
+Before installing into or reviewing a `repository-local` manifest, check its
+`targets:` list against which agent runtimes are actually used in that
+repository. A `targets: [codex]`-only manifest never deploys to
+`.claude/skills/`; add `claude` (and `agent-skills` when applicable) whenever
+Claude Code is one of the repository's runtimes, otherwise every
+repository-local skill or MCP silently misses Claude Code. `apm-repo-bootstrap`
+preserves the repository's existing target style by design and does not check
+this — this gate is this skill's responsibility, not that one's.
+
 Use `docs/apm-task-coverage.md` for the workspace-only bridge contract and
 verification details.
 
@@ -115,6 +124,12 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
   running `apm install`. Use `apm install -g <package-ref>` only for the
   `global-dependency` lane; use `apm install <package-ref>` from the target
   repository for the `repository-local` lane.
+- If the request touches a `repository-local` manifest for any reason
+  (new dependency, audit, cleanup), also check that `targets:` covers every
+  agent runtime actually used in that repository before finishing. Fix a
+  `codex`-only manifest that should also deploy to Claude Code by adding
+  `claude`, then re-run `apm install` and verify `.claude/skills/<id>` exists
+  for the affected skills.
 - For an optional skill from this workspace, add
   `jey3dayo/apm-workspace/optional-skills#main` to the consuming repository and
   select it with `apm install --skill <id>`.
@@ -156,6 +171,7 @@ When deciding repo-local MCP placement by repository type, runtime, or workflow,
 - Do not duplicate an external dependency into `catalog/skills/**` just because a local checkout exists. Keep one source of truth: upstream checkout, managed catalog, manual copy, or private overlay.
 - Do not reintroduce many local `./packages/*` refs into `~/.apm/apm.yml`.
 - Do not hand-edit deployed targets such as `~/.claude/`, `~/.codex/`, or `~/.agents/skills`.
+- Do not assume a repository-local `apm.yml` with `targets: [codex]` is correct just because it predates this check. Verify against the repository's actual runtimes; a stale `codex`-only manifest silently starves Claude Code of every repo-local skill and MCP declared there.
 - Headroom MCP server registration lives in the `mcp:` section of `~/.apm/apm.yml` like other global foundation MCPs. Do not persist Headroom proxy/wrap configuration through APM package manifests; treat proxy/wrap setup as a local machine setup step unless the user explicitly asks to manage that runtime state.
 - Prefer `mise` tasks over ad hoc script entrypoints for normal operation.
 - Before changing user-global `mise` tools, verify the resolved binary path and install tree. `mise latest` can lag or differ because of release-age policy, so compare with the upstream registry when exact latest-version behavior matters.
@@ -204,6 +220,9 @@ When deciding repo-local MCP placement by repository type, runtime, or workflow,
    - for global dependencies, work in `~/.apm` and use `apm install -g <package-ref>` or `apm install -g --mcp <name> ...`
    - for repo-local dependencies, work in the target repository and use `apm install <package-ref>` or `apm install --mcp <name> ...`
    - for global changes, run `mise run check`, then `mise run deploy`; for repo-local changes, run that repository's defined APM or project checks
+   - for repo-local changes, also confirm `targets:` includes every runtime the
+     repository actually uses (add `claude` if it only lists `codex` but the
+     repository uses Claude Code) before running `apm install`
    - verify the intended `apm.yml`, `apm.lock.yaml`, and deployed target changed, and no unrelated workspace dependencies drifted
 
 7. Checked-out external dependency changed:
