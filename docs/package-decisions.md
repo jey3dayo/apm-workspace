@@ -3,14 +3,19 @@
 採用・撤去・見送りにした APM パッケージの意思決定ログ。1 パッケージ 1 セクション。
 「なぜ入れたか / なぜ消したか / 再検討するなら何を見るか」を残す。
 
-## emil-design-eng (emilkowalski/skill)
+## emilkowalski/skills (emil-design-eng ほか)
 
 - **Status: 採用・global（2026-07-16）**
-- 正本: `emilkowalski/skill/skills/emil-design-eng`
+- 正本: `emilkowalski/skills` リポジトリ配下
+  - `skills/emil-design-eng`
+  - `skills/review-animations`
+  - `skills/improve-animations`
+  - `skills/animation-vocabulary`
 - 理由: UI Skills ディレクトリ精査で選定。Emil Kowalski のデザインエンジニアリング哲学
   （アニメーション判断フレームワーク、easing/duration 基準、Sonner 原則）に特化しており、
   `frontend-design`（生成方向）や `baseline-ui`（高速 deslop）と役割が重ならない。
-  UI の仕上げ品質・モーション判断のレビュー基準として補完。
+  UI の仕上げ品質・モーション判断のレビュー基準として補完。同リポジトリの姉妹スキル
+  （レビュー・監査プラン・用語逆引き）も併せて導入。
 - 見送った同群: `vitest` / `pnpm`（モデル既知 + mise/lefthook 運用と衝突しうる）、
   `12-principles-of-animation`（`fixing-motion-performance` + `transitions-dev` でカバー）、
   `playwright-cli`（`browser-harness` で代替）、`shadcn`（`ui-styling` でカバー）。
@@ -208,7 +213,6 @@ global の一覧に無くても廃止ではない。各リポジトリの `apm.y
 
 ### 保留（再検討トリガー）
 
-- `animation-vocabulary`（emilkowalski）: モーション用語の逆引き辞書。軽量だが優先度低。欲しくなったら 1 行追加。
 - `apple-design`（emilkowalski）: Apple HIG 系。必要になったら追加。
 - `fixing-motion-performance`（ibelick）/ `make-interfaces-feel-better`（jakubkrehel）:
   emil 新構成と発火競合したら間引く。モーション系は現在 emil 3 + ibelick 1 + transitions-dev + make-interfaces の最大 6 系統あり要観察。
