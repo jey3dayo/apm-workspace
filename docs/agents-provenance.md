@@ -11,7 +11,7 @@ Entry-point memo for the curated agents under `catalog/agents/`. It records wher
 ## Sources
 
 Repo-level detail (APM-installability evidence, upstream Codex lane) lives in the registry:
-`catalog/skills/agent-curation/references/hired-agents-registry.md`.
+`.apm/skills/agent-curation/references/hired-agents-registry.md`.
 
 | Upstream repo                                   | Commit                                     | License                           |
 | ----------------------------------------------- | ------------------------------------------ | --------------------------------- |

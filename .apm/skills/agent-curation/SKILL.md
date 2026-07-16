@@ -5,7 +5,7 @@ description: "Curate external agent collections into this APM workspace. Use whe
 
 # Agent Curation
 
-Use this skill to turn external agent collections into workspace-managed agents without hand-editing deployed runtime targets.
+Use this workspace-only skill to turn external agent collections into workspace-managed agents without hand-editing deployed runtime targets.
 
 ## Core Rule
 
@@ -38,11 +38,9 @@ First test whether the upstream is an APM-valid package. If it is not, curate se
    - Add the hired agent, source repository, commit, source path, local target path, license, selection reason, verification status, and related candidates.
    - Keep this registry as the exploration index; do not put non-agent notes in `catalog/agents/`.
 
-6. Validate and deploy through APM workspace tasks.
-   - Run the relevant skill validation for this skill if it changed.
-   - Run `mise run prepare:catalog` when `catalog/agents` or catalog skill files changed.
-   - Run `mise run check`, then `mise run deploy` unless the user requested local-only work or a blocker appears.
-   - Verify the deployed target contains the curated agent and the deployed skill.
+6. Validate the affected delivery surface.
+   - If `catalog/agents` changed, run `mise run prepare:catalog`, `mise run check`, and `mise run deploy`; verify the curated agent in its runtime targets.
+   - If only this workspace-only skill or its registry changed, run `mise run check`; verify both local bridge entries resolve to `.apm/skills/agent-curation/`.
 
 ## Refresh Rules
 
@@ -57,7 +55,7 @@ First test whether the upstream is an APM-valid package. If it is not, curate se
 - Changed files.
 - Upstream repository, commit, source path, and license for each hired agent.
 - Validation commands with exit status.
-- Deployment target checks, or the reason deployment was not completed.
+- Curated-agent deployment target checks when agents changed; otherwise, local bridge checks for this workspace-only skill.
 
 ## References
 
