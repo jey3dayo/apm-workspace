@@ -26,6 +26,7 @@ dependencies:
     - emilkowalski/skills/skills/review-animations
     - emilkowalski/skills/skills/improve-animations
     - emilkowalski/skills/skills/animation-vocabulary
+    - emilkowalski/skills/skills/find-animation-opportunities
     - gonta223/humanizer-ja
     - ibelick/ui-skills/skills/baseline-ui
     - ibelick/ui-skills/skills/fixing-accessibility

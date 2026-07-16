@@ -602,6 +602,23 @@ dependencies:
     .claude/skills/review-animations/SKILL.md: sha256:27c1ec78634a08bcb588229497f4fbc3bcb9db8f8032dcdd275eb844f30fc004
     .claude/skills/review-animations/STANDARDS.md: sha256:12b1a9dcee667981294ea065651b755910977f676e6300a31614003cde444db9
   content_hash: sha256:c92905bff59c3007d07c2638a2a83d5d71c901feef108cce1da0bf3c7cafd579
+- repo_url: emilkowalski/skills
+  name: skills
+  host: github.com
+  resolved_commit: 6bf24434f7730ad169077756cf9c7cd7bd675fc6
+  version: unknown
+  virtual_path: skills/find-animation-opportunities
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/find-animation-opportunities
+  - .agents/skills/find-animation-opportunities/SKILL.md
+  - .claude/skills/find-animation-opportunities
+  - .claude/skills/find-animation-opportunities/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/find-animation-opportunities/SKILL.md: sha256:3d6533767ebcf4fb73ee7a2d9544a88671d09d50c4bf36c9b824768bca1dd9fb
+    .claude/skills/find-animation-opportunities/SKILL.md: sha256:3d6533767ebcf4fb73ee7a2d9544a88671d09d50c4bf36c9b824768bca1dd9fb
+  content_hash: sha256:15dc983ce2cd00489fcdc4a92e2752d47e1620f7619038b00eb84c2b97d50597
 - repo_url: gonta223/humanizer-ja
   name: humanizer-ja
   host: github.com

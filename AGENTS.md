@@ -185,6 +185,23 @@ mise run deploy
 
 Then review and commit the skill changes.
 
+### External Skill Add/Remove
+
+Use when adding or removing an external skill dependency in `apm.yml` (global
+via `apm install -g <package-ref>` or manual `dependencies.apm` edit).
+
+```bash
+cd ~/.apm
+apm install -g <package-ref>   # or edit apm.yml directly for removal
+mise run deploy
+```
+
+Every add/remove of an `apm.yml` external skill dependency MUST update
+`docs/package-decisions.md` in the same change: record what was added/removed,
+why, what was passed over, and what to re-check if reconsidering. Treat a
+dependency diff without a corresponding `docs/package-decisions.md` diff as
+incomplete work, not as optional follow-up.
+
 ## Editing Rules
 
 - Do not edit `apm_modules/`

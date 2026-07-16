@@ -11,11 +11,14 @@
   - `skills/review-animations`
   - `skills/improve-animations`
   - `skills/animation-vocabulary`
+  - `skills/find-animation-opportunities`
 - 理由: UI Skills ディレクトリ精査で選定。Emil Kowalski のデザインエンジニアリング哲学
   （アニメーション判断フレームワーク、easing/duration 基準、Sonner 原則）に特化しており、
   `frontend-design`（生成方向）や `baseline-ui`（高速 deslop）と役割が重ならない。
   UI の仕上げ品質・モーション判断のレビュー基準として補完。同リポジトリの姉妹スキル
-  （レビュー・監査プラン・用語逆引き）も併せて導入。
+  （レビュー・監査プラン・用語逆引き・アニメーション機会発見）も併せて導入。
+  `find-animation-opportunities` は read-only でアニメーション追加候補を提案するのみ、
+  実装は行わない点に注意（`improve-animations` / `review-animations` と役割分担）。
 - 見送った同群: `vitest` / `pnpm`（モデル既知 + mise/lefthook 運用と衝突しうる）、
   `12-principles-of-animation`（`fixing-motion-performance` + `transitions-dev` でカバー）、
   `playwright-cli`（`browser-harness` で代替）、`shadcn`（`ui-styling` でカバー）。
