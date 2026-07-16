@@ -12,6 +12,24 @@
 - 維持方針: APM 所有権、検証、安全性、横断的な環境運用スキルは global を維持
 - 判断方法: 対象リポジトリで repo-local install と実作業を検証してから global 依存を外す
 
+### agent-browser
+
+- **Status: 保留撤去（2026-07-16）**
+- 正本: `vercel-labs/agent-browser/skills/agent-browser`
+- 理由: `browser-harness` を通常のブラウザ操作の標準にするため。Electron、Slack、Vercel
+  Sandbox などの特殊用途が必要になった時だけ repo-local で再導入する。
+- 再導入: 対象リポジトリで `apm install vercel-labs/agent-browser/skills/agent-browser`
+  を実行する。
+
+### ui-styling
+
+- **Status: 保留撤去（2026-07-16）**
+- 正本: `nextlevelbuilder/ui-ux-pro-max-skill` の upstream bundle
+- 理由: `ui-ux-pro-max` と `baseline-ui` に UI/UX 判断と実装ガードレールがあり、
+  shadcn/Radix 前提の総合ガイドを常時候補にする必要性が低いため。
+- 再導入: 対象リポジトリで `apm install nextlevelbuilder/ui-ux-pro-max-skill --skill ui-styling`
+  を実行する。
+
 ### google-forms-survey-builder
 
 - **Status: 個別プロジェクト向けへ移管（2026-07-15）**
