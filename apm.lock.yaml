@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-07-15T15:51:36.791790+00:00'
+generated_at: '2026-07-16T06:43:16.647990+00:00'
 apm_version: 0.22.0
 dependencies:
 - repo_url: Jakubantalik/transitions-dev
@@ -72,10 +72,10 @@ dependencies:
     .claude/skills/transitions-dev/_root.css: sha256:6ed248a269da79f623729708dabcc3719485d400615a0d91b9f5e9fd307aa33f
   content_hash: sha256:8cf9ba1ed0d52741e4ed1dafc6ee4543e32f1e516f958d750e81412bfc36dd13
 - repo_url: Lum1104/Understand-Anything
-  name: understand
+  name: Understand-Anything
   host: github.com
   resolved_commit: 83a9b288b96046fdade7b11301424ba08a5def6a
-  version: 1.0.0
+  version: unknown
   virtual_path: understand-anything-plugin/skills/understand
   is_virtual: true
   package_type: claude_skill
@@ -285,10 +285,10 @@ dependencies:
     .claude/skills/understand/scan-project.mjs: sha256:10bd886733a6f5e91c3698ccba9997d71115367ceb3ba628d233b46493ba7a4a
   content_hash: sha256:4f892bda3867af034ef21e464487f32bb1537fcd02981c0a196c690a937351c3
 - repo_url: Lum1104/Understand-Anything
-  name: understand-dashboard
+  name: Understand-Anything
   host: github.com
   resolved_commit: 83a9b288b96046fdade7b11301424ba08a5def6a
-  version: 1.0.0
+  version: unknown
   virtual_path: understand-anything-plugin/skills/understand-dashboard
   is_virtual: true
   package_type: claude_skill
@@ -304,7 +304,7 @@ dependencies:
 - repo_url: anthropics/claude-code
   name: frontend-design
   host: github.com
-  resolved_commit: b7784f2c63ed4585c32bc20b94d3b64cf4fe6df3
+  resolved_commit: c39cb0f14bfe8bb519bae5bfc55add6867c5e2ab
   version: 1.0.0
   virtual_path: plugins/frontend-design/skills/frontend-design
   is_virtual: true
@@ -318,44 +318,6 @@ dependencies:
     .agents/skills/frontend-design/SKILL.md: sha256:1608ea77fbb6fc30d13a97d12cfa8ebf31358d40f0dd97beed24829d6b3f45dd
     .claude/skills/frontend-design/SKILL.md: sha256:1608ea77fbb6fc30d13a97d12cfa8ebf31358d40f0dd97beed24829d6b3f45dd
   content_hash: sha256:3e0be122a3db8206b6d0d6b07cca898b5c75fb9b7b2101abe143fb2851734d2e
-- repo_url: benjitaylor/agentation
-  name: agentation
-  host: github.com
-  resolved_commit: 8158a97c10c37e577b0a6e2d3175d143918216cd
-  version: unknown
-  virtual_path: skills/agentation
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/agentation
-  - .agents/skills/agentation/SKILL.md
-  - .claude/skills/agentation
-  - .claude/skills/agentation/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/agentation/SKILL.md: sha256:0b66fa852d1dfcd5de86e71970e6f484bcd44b991265f95034365c38ed1ad3a8
-    .claude/skills/agentation/SKILL.md: sha256:0b66fa852d1dfcd5de86e71970e6f484bcd44b991265f95034365c38ed1ad3a8
-  content_hash: sha256:6ba2c955bee6ab3e9c7781b2553e3574b4c9ec35e539437d0831bfe368de8550
-- repo_url: benjitaylor/agentation
-  name: agentation
-  host: github.com
-  resolved_commit: 8158a97c10c37e577b0a6e2d3175d143918216cd
-  version: unknown
-  virtual_path: skills/agentation-self-driving
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/agentation-self-driving
-  - .agents/skills/agentation-self-driving/SKILL.md
-  - .agents/skills/agentation-self-driving/references/two-session-workflow.md
-  - .claude/skills/agentation-self-driving
-  - .claude/skills/agentation-self-driving/SKILL.md
-  - .claude/skills/agentation-self-driving/references/two-session-workflow.md
-  deployed_file_hashes:
-    .agents/skills/agentation-self-driving/SKILL.md: sha256:3a9d99a656ea7e9ff907c0b2a9a6a2a6a18bd285bd6ad4b5d9dc55b27233e08a
-    .agents/skills/agentation-self-driving/references/two-session-workflow.md: sha256:3bff820a202d607cbf72a4b30ed9af28afa3b64ab83f63c3469b2f96a564f746
-    .claude/skills/agentation-self-driving/SKILL.md: sha256:3a9d99a656ea7e9ff907c0b2a9a6a2a6a18bd285bd6ad4b5d9dc55b27233e08a
-    .claude/skills/agentation-self-driving/references/two-session-workflow.md: sha256:3bff820a202d607cbf72a4b30ed9af28afa3b64ab83f63c3469b2f96a564f746
-  content_hash: sha256:405cf94e4df9b048ab42e51f26ad971dc6b986167b74eb46393abd6f1f5b5f88
 - repo_url: browser-use/browser-harness
   name: browser-harness
   host: github.com
@@ -560,6 +522,66 @@ dependencies:
     .agents/skills/thermo-nuclear-code-quality-review/SKILL.md: sha256:7faca08b51b643b2ddd0836f92af15574444024685dcc1e677dbbb39ae8c9e8f
     .claude/skills/thermo-nuclear-code-quality-review/SKILL.md: sha256:7faca08b51b643b2ddd0836f92af15574444024685dcc1e677dbbb39ae8c9e8f
   content_hash: sha256:9052b01b46b1d8dbf94c45f9313ec1983443f9a460e83d49cdc7fe0f640ca476
+- repo_url: emilkowalski/skills
+  name: emil-design-eng
+  host: github.com
+  resolved_commit: 6bf24434f7730ad169077756cf9c7cd7bd675fc6
+  version: 1.0.0
+  virtual_path: skills/emil-design-eng
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/emil-design-eng
+  - .agents/skills/emil-design-eng/SKILL.md
+  - .claude/skills/emil-design-eng
+  - .claude/skills/emil-design-eng/SKILL.md
+  content_hash: sha256:8bdf9e4e6de7a4969147bf4828a4ad2c5aacd9fba4b690b250a85e0467ca387d
+- repo_url: emilkowalski/skills
+  name: improve-animations
+  host: github.com
+  resolved_commit: 6bf24434f7730ad169077756cf9c7cd7bd675fc6
+  version: 1.0.0
+  virtual_path: skills/improve-animations
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/improve-animations
+  - .agents/skills/improve-animations/AUDIT.md
+  - .agents/skills/improve-animations/PLAN-TEMPLATE.md
+  - .agents/skills/improve-animations/SKILL.md
+  - .claude/skills/improve-animations
+  - .claude/skills/improve-animations/AUDIT.md
+  - .claude/skills/improve-animations/PLAN-TEMPLATE.md
+  - .claude/skills/improve-animations/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/improve-animations/AUDIT.md: sha256:a05f47b8f1e6cb6cd403704e447cc8e4fdf381466a149939606330301c09d7f9
+    .agents/skills/improve-animations/PLAN-TEMPLATE.md: sha256:2ec7a0332f57c4234a38d10b54e4d6b9ed96b2a5e224d8a6e936839698ff5678
+    .agents/skills/improve-animations/SKILL.md: sha256:68f17bbc4671593d2f43dba26a679243e2153ba5f26965fb7d59df52842534ff
+    .claude/skills/improve-animations/AUDIT.md: sha256:a05f47b8f1e6cb6cd403704e447cc8e4fdf381466a149939606330301c09d7f9
+    .claude/skills/improve-animations/PLAN-TEMPLATE.md: sha256:2ec7a0332f57c4234a38d10b54e4d6b9ed96b2a5e224d8a6e936839698ff5678
+    .claude/skills/improve-animations/SKILL.md: sha256:68f17bbc4671593d2f43dba26a679243e2153ba5f26965fb7d59df52842534ff
+  content_hash: sha256:32f23d860467841f5b07cef198fb53efc70f2adaaa6144cf1a3434d782aed246
+- repo_url: emilkowalski/skills
+  name: review-animations
+  host: github.com
+  resolved_commit: 6bf24434f7730ad169077756cf9c7cd7bd675fc6
+  version: 1.0.0
+  virtual_path: skills/review-animations
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/review-animations
+  - .agents/skills/review-animations/SKILL.md
+  - .agents/skills/review-animations/STANDARDS.md
+  - .claude/skills/review-animations
+  - .claude/skills/review-animations/SKILL.md
+  - .claude/skills/review-animations/STANDARDS.md
+  deployed_file_hashes:
+    .agents/skills/review-animations/SKILL.md: sha256:27c1ec78634a08bcb588229497f4fbc3bcb9db8f8032dcdd275eb844f30fc004
+    .agents/skills/review-animations/STANDARDS.md: sha256:12b1a9dcee667981294ea065651b755910977f676e6300a31614003cde444db9
+    .claude/skills/review-animations/SKILL.md: sha256:27c1ec78634a08bcb588229497f4fbc3bcb9db8f8032dcdd275eb844f30fc004
+    .claude/skills/review-animations/STANDARDS.md: sha256:12b1a9dcee667981294ea065651b755910977f676e6300a31614003cde444db9
+  content_hash: sha256:c92905bff59c3007d07c2638a2a83d5d71c901feef108cce1da0bf3c7cafd579
 - repo_url: gonta223/humanizer-ja
   name: humanizer-ja
   host: github.com
@@ -586,7 +608,7 @@ dependencies:
 - repo_url: ibelick/ui-skills
   name: baseline-ui
   host: github.com
-  resolved_commit: 75e6ffc712a553ae1ce647d7c677f24e2ceeeda9
+  resolved_commit: ce91b85952f76ec738242bcf8aefa8c68653592c
   version: 1.0.0
   virtual_path: skills/baseline-ui
   is_virtual: true
@@ -603,7 +625,7 @@ dependencies:
 - repo_url: ibelick/ui-skills
   name: fixing-accessibility
   host: github.com
-  resolved_commit: 75e6ffc712a553ae1ce647d7c677f24e2ceeeda9
+  resolved_commit: ce91b85952f76ec738242bcf8aefa8c68653592c
   version: 1.0.0
   virtual_path: skills/fixing-accessibility
   is_virtual: true
@@ -620,7 +642,7 @@ dependencies:
 - repo_url: ibelick/ui-skills
   name: fixing-metadata
   host: github.com
-  resolved_commit: 75e6ffc712a553ae1ce647d7c677f24e2ceeeda9
+  resolved_commit: ce91b85952f76ec738242bcf8aefa8c68653592c
   version: 1.0.0
   virtual_path: skills/fixing-metadata
   is_virtual: true
@@ -637,7 +659,7 @@ dependencies:
 - repo_url: ibelick/ui-skills
   name: fixing-motion-performance
   host: github.com
-  resolved_commit: 75e6ffc712a553ae1ce647d7c677f24e2ceeeda9
+  resolved_commit: ce91b85952f76ec738242bcf8aefa8c68653592c
   version: 1.0.0
   virtual_path: skills/fixing-motion-performance
   is_virtual: true
@@ -651,10 +673,43 @@ dependencies:
     .agents/skills/fixing-motion-performance/SKILL.md: sha256:0a2d654902bc04263ce68c8c02967ef03f17b482e855360a5463211d99d7baa9
     .claude/skills/fixing-motion-performance/SKILL.md: sha256:0a2d654902bc04263ce68c8c02967ef03f17b482e855360a5463211d99d7baa9
   content_hash: sha256:426dcf33f23419643f2aab71e2253e1a5b5684a808fabb8a4ad135e489ed7a0f
+- repo_url: jakubkrehel/make-interfaces-feel-better
+  name: make-interfaces-feel-better
+  host: github.com
+  resolved_commit: 366f0f86efcb2811c26e2cf386d09cf2ddc35fcb
+  version: unknown
+  virtual_path: skills/make-interfaces-feel-better
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/make-interfaces-feel-better
+  - .agents/skills/make-interfaces-feel-better/SKILL.md
+  - .agents/skills/make-interfaces-feel-better/animations.md
+  - .agents/skills/make-interfaces-feel-better/performance.md
+  - .agents/skills/make-interfaces-feel-better/surfaces.md
+  - .agents/skills/make-interfaces-feel-better/typography.md
+  - .claude/skills/make-interfaces-feel-better
+  - .claude/skills/make-interfaces-feel-better/SKILL.md
+  - .claude/skills/make-interfaces-feel-better/animations.md
+  - .claude/skills/make-interfaces-feel-better/performance.md
+  - .claude/skills/make-interfaces-feel-better/surfaces.md
+  - .claude/skills/make-interfaces-feel-better/typography.md
+  deployed_file_hashes:
+    .agents/skills/make-interfaces-feel-better/SKILL.md: sha256:1370f38d93bd92d2e9fe6d1c233b142eb5b04b51433fe3071d28aabc4351840f
+    .agents/skills/make-interfaces-feel-better/animations.md: sha256:eaaacab19a846f72692a48d6a84d96fcea79dbdee40d6447c73385b41b8d6135
+    .agents/skills/make-interfaces-feel-better/performance.md: sha256:f4537590cca884143b8e628123810286b4bfef29b9283f900265190bd3d8bd5e
+    .agents/skills/make-interfaces-feel-better/surfaces.md: sha256:36791f828aedeaa31d89aebe0efe818fa156016c6a53d9049cdd15a330fe214b
+    .agents/skills/make-interfaces-feel-better/typography.md: sha256:518cae9f0d48d48081cd87739993d76e145c0fe2394bb9f95cbde2b003c44549
+    .claude/skills/make-interfaces-feel-better/SKILL.md: sha256:1370f38d93bd92d2e9fe6d1c233b142eb5b04b51433fe3071d28aabc4351840f
+    .claude/skills/make-interfaces-feel-better/animations.md: sha256:eaaacab19a846f72692a48d6a84d96fcea79dbdee40d6447c73385b41b8d6135
+    .claude/skills/make-interfaces-feel-better/performance.md: sha256:f4537590cca884143b8e628123810286b4bfef29b9283f900265190bd3d8bd5e
+    .claude/skills/make-interfaces-feel-better/surfaces.md: sha256:36791f828aedeaa31d89aebe0efe818fa156016c6a53d9049cdd15a330fe214b
+    .claude/skills/make-interfaces-feel-better/typography.md: sha256:518cae9f0d48d48081cd87739993d76e145c0fe2394bb9f95cbde2b003c44549
+  content_hash: sha256:426954a73da0db6ffb93642fc79766915626c4d088233bae1cc0dd10e02dff8c
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: 94e32bfea1455c826220b16f7203a5196565fde2
+  resolved_commit: 330b5ef91bc47ef4cf8ac566f42981fccf2adedc
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -1524,7 +1579,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
-  resolved_commit: 94e32bfea1455c826220b16f7203a5196565fde2
+  resolved_commit: 330b5ef91bc47ef4cf8ac566f42981fccf2adedc
   resolved_ref: main
   version: 1.0.0
   virtual_path: manual-skills
@@ -1534,7 +1589,7 @@ dependencies:
 - repo_url: langchain-ai/deepagents
   name: web-research
   host: github.com
-  resolved_commit: dacc8b0eadb504a6ddb0d61f84d598a06b45e3a1
+  resolved_commit: d13d299a0fc91369efdbc8376f09837c52f27969
   version: 1.0.0
   virtual_path: libs/cli/examples/skills/web-research
   is_virtual: true
@@ -1549,10 +1604,10 @@ dependencies:
     .claude/skills/web-research/SKILL.md: sha256:7c2b1f1990370f7ce176fe3608a67028c72db11e337b4ba83b8fce6d927dfde3
   content_hash: sha256:2b66d5db8c8d70474e70638f437f324fb3af3724b71bf8501e48c8004e70e677
 - repo_url: mattpocock/skills
-  name: grill-with-docs
+  name: skills
   host: github.com
   resolved_commit: e9fcdf95b402d360f90f1db8d776d5dd450f9234
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/engineering/grill-with-docs
   is_virtual: true
   package_type: claude_skill
@@ -1570,10 +1625,10 @@ dependencies:
     .claude/skills/grill-with-docs/agents/openai.yaml: sha256:94cd0ab161fb468a836349f5ed482ba58ce8e709a05c57ce533d739dbd35cca9
   content_hash: sha256:c3a266bcc09eab29358eaae6e288f9a2cd492fd0af2bcaeeec55fd6207da9a89
 - repo_url: mattpocock/skills
-  name: wayfinder
+  name: skills
   host: github.com
   resolved_commit: e9fcdf95b402d360f90f1db8d776d5dd450f9234
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/engineering/wayfinder
   is_virtual: true
   package_type: claude_skill
@@ -1591,10 +1646,10 @@ dependencies:
     .claude/skills/wayfinder/agents/openai.yaml: sha256:88bc81a11a6d52ac67aeaa76b8b619e387020d47c5133a4dd4927fd15c4ad073
   content_hash: sha256:d4e1b0fa933e7377d97193e52626b880a8c1b441894fbec03f3ff0cb939e70c7
 - repo_url: mattpocock/skills
-  name: grilling
+  name: skills
   host: github.com
   resolved_commit: e9fcdf95b402d360f90f1db8d776d5dd450f9234
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/productivity/grilling
   is_virtual: true
   package_type: claude_skill
@@ -1612,10 +1667,10 @@ dependencies:
     .claude/skills/grilling/agents/openai.yaml: sha256:cf29b9a8dbf35a58a908a6ca4f64dcd86c2b2130291eee0a78b9f706b138825b
   content_hash: sha256:1f05b0ffe26fb4d4457e3e40b41ec2f3e379ae2d6877613240bc6ffef5f7f338
 - repo_url: mattpocock/skills
-  name: handoff
+  name: skills
   host: github.com
   resolved_commit: e9fcdf95b402d360f90f1db8d776d5dd450f9234
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/productivity/handoff
   is_virtual: true
   package_type: claude_skill
@@ -1633,10 +1688,10 @@ dependencies:
     .claude/skills/handoff/agents/openai.yaml: sha256:5c479fd562c691851690e8b18c8501045bef0943c10743d636b2fae26add1d28
   content_hash: sha256:89e3d3e72b94973b557120eee18232218691989f53564f9e163467e6d377d5a8
 - repo_url: mattpocock/skills
-  name: writing-great-skills
+  name: skills
   host: github.com
   resolved_commit: e9fcdf95b402d360f90f1db8d776d5dd450f9234
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/productivity/writing-great-skills
   is_virtual: true
   package_type: claude_skill
@@ -1660,7 +1715,7 @@ dependencies:
 - repo_url: millionco/react-doctor
   name: react-doctor
   host: github.com
-  resolved_commit: 3e6dcfc21712a8cdb7a43ac63c0ed466039852e1
+  resolved_commit: 5915a58231c3ba640d2d17e3c703511b8c9c2746
   version: 1.0.0
   virtual_path: skills/react-doctor
   is_virtual: true
@@ -1679,10 +1734,10 @@ dependencies:
     .claude/skills/react-doctor/references/explain.md: sha256:2382ea820f203d7e16e8102a7fa55c5ce315fdd4591a0638e95d863166834ef2
   content_hash: sha256:cdb0f2247aa09a5d8e2816b12a12582dd3775734923eee1284fe31fd44670fd4
 - repo_url: mizchi/skills
-  name: empirical-prompt-tuning
+  name: skills
   host: github.com
   resolved_commit: 7a0d72866a0bb3e9ac3e2768c328b09ba2bc40c4
-  version: 1.0.0
+  version: unknown
   virtual_path: meta/empirical-prompt-tuning
   is_virtual: true
   package_type: claude_skill
@@ -1704,10 +1759,10 @@ dependencies:
     .claude/skills/empirical-prompt-tuning/SKILL.md: sha256:252418e7ef022981d2dda2e3ec57fa1c786d30af68c50b7e062edf1d7361b0cb
   content_hash: sha256:20e7fba93c7267ba6e3a7b27787ca49191b762dffcfb804b01da9183b1b0c891
 - repo_url: modem-dev/hunk
-  name: hunk-review
+  name: hunk
   host: github.com
   resolved_commit: e098b3a3dc12143aafad3582ac9096b5c8db646b
-  version: 1.0.0
+  version: unknown
   virtual_path: skills/hunk-review
   is_virtual: true
   package_type: claude_skill
@@ -1727,195 +1782,6 @@ dependencies:
   version: 2.11.0
   package_type: marketplace_plugin
   deployed_files:
-  - .agents/skills/brand
-  - .agents/skills/brand/SKILL.md
-  - .agents/skills/brand/references/approval-checklist.md
-  - .agents/skills/brand/references/asset-organization.md
-  - .agents/skills/brand/references/brand-guideline-template.md
-  - .agents/skills/brand/references/color-palette-management.md
-  - .agents/skills/brand/references/consistency-checklist.md
-  - .agents/skills/brand/references/logo-usage-rules.md
-  - .agents/skills/brand/references/messaging-framework.md
-  - .agents/skills/brand/references/typography-specifications.md
-  - .agents/skills/brand/references/update.md
-  - .agents/skills/brand/references/visual-identity.md
-  - .agents/skills/brand/references/voice-framework.md
-  - .agents/skills/brand/scripts/extract-colors.cjs
-  - .agents/skills/brand/scripts/inject-brand-context.cjs
-  - .agents/skills/brand/scripts/sync-brand-to-tokens.cjs
-  - .agents/skills/brand/scripts/tests/test_sync_brand_to_tokens.py
-  - .agents/skills/brand/scripts/validate-asset.cjs
-  - .agents/skills/brand/templates/brand-guidelines-starter.md
-  - .agents/skills/design
-  - .agents/skills/design-system
-  - .agents/skills/design-system/SKILL.md
-  - .agents/skills/design-system/data/slide-backgrounds.csv
-  - .agents/skills/design-system/data/slide-charts.csv
-  - .agents/skills/design-system/data/slide-color-logic.csv
-  - .agents/skills/design-system/data/slide-copy.csv
-  - .agents/skills/design-system/data/slide-layout-logic.csv
-  - .agents/skills/design-system/data/slide-layouts.csv
-  - .agents/skills/design-system/data/slide-strategies.csv
-  - .agents/skills/design-system/data/slide-typography.csv
-  - .agents/skills/design-system/references/component-specs.md
-  - .agents/skills/design-system/references/component-tokens.md
-  - .agents/skills/design-system/references/primitive-tokens.md
-  - .agents/skills/design-system/references/semantic-tokens.md
-  - .agents/skills/design-system/references/states-and-variants.md
-  - .agents/skills/design-system/references/tailwind-integration.md
-  - .agents/skills/design-system/references/token-architecture.md
-  - .agents/skills/design-system/scripts/embed-tokens.cjs
-  - .agents/skills/design-system/scripts/fetch-background.py
-  - .agents/skills/design-system/scripts/generate-slide.py
-  - .agents/skills/design-system/scripts/generate-tokens.cjs
-  - .agents/skills/design-system/scripts/html-token-validator.py
-  - .agents/skills/design-system/scripts/search-slides.py
-  - .agents/skills/design-system/scripts/slide-token-validator.py
-  - .agents/skills/design-system/scripts/slide_search_core.py
-  - .agents/skills/design-system/scripts/tests/test_validate_tokens.py
-  - .agents/skills/design-system/scripts/validate-tokens.cjs
-  - .agents/skills/design-system/templates/design-tokens-starter.json
-  - .agents/skills/design/SKILL.md
-  - .agents/skills/design/data/cip/deliverables.csv
-  - .agents/skills/design/data/cip/industries.csv
-  - .agents/skills/design/data/cip/mockup-contexts.csv
-  - .agents/skills/design/data/cip/styles.csv
-  - .agents/skills/design/data/icon/styles.csv
-  - .agents/skills/design/data/logo/colors.csv
-  - .agents/skills/design/data/logo/industries.csv
-  - .agents/skills/design/data/logo/styles.csv
-  - .agents/skills/design/references/banner-sizes-and-styles.md
-  - .agents/skills/design/references/cip-deliverable-guide.md
-  - .agents/skills/design/references/cip-design.md
-  - .agents/skills/design/references/cip-prompt-engineering.md
-  - .agents/skills/design/references/cip-style-guide.md
-  - .agents/skills/design/references/design-routing.md
-  - .agents/skills/design/references/icon-design.md
-  - .agents/skills/design/references/logo-color-psychology.md
-  - .agents/skills/design/references/logo-design.md
-  - .agents/skills/design/references/logo-prompt-engineering.md
-  - .agents/skills/design/references/logo-style-guide.md
-  - .agents/skills/design/references/slides-copywriting-formulas.md
-  - .agents/skills/design/references/slides-create.md
-  - .agents/skills/design/references/slides-html-template.md
-  - .agents/skills/design/references/slides-layout-patterns.md
-  - .agents/skills/design/references/slides-strategies.md
-  - .agents/skills/design/references/slides.md
-  - .agents/skills/design/references/social-photos-design.md
-  - .agents/skills/design/scripts/cip/core.py
-  - .agents/skills/design/scripts/cip/generate.py
-  - .agents/skills/design/scripts/cip/render-html.py
-  - .agents/skills/design/scripts/cip/search.py
-  - .agents/skills/design/scripts/icon/generate.py
-  - .agents/skills/design/scripts/logo/core.py
-  - .agents/skills/design/scripts/logo/generate.py
-  - .agents/skills/design/scripts/logo/search.py
-  - .agents/skills/slides
-  - .agents/skills/slides/SKILL.md
-  - .agents/skills/slides/references/copywriting-formulas.md
-  - .agents/skills/slides/references/create.md
-  - .agents/skills/slides/references/html-template.md
-  - .agents/skills/slides/references/layout-patterns.md
-  - .agents/skills/slides/references/slide-strategies.md
-  - .agents/skills/ui-styling
-  - .agents/skills/ui-styling/LICENSE.txt
-  - .agents/skills/ui-styling/SKILL.md
-  - .agents/skills/ui-styling/canvas-fonts/ArsenalSC-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/ArsenalSC-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/BigShoulders-Bold.ttf
-  - .agents/skills/ui-styling/canvas-fonts/BigShoulders-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/BigShoulders-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/Boldonse-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/Boldonse-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/BricolageGrotesque-Bold.ttf
-  - .agents/skills/ui-styling/canvas-fonts/BricolageGrotesque-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/BricolageGrotesque-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/CrimsonPro-Bold.ttf
-  - .agents/skills/ui-styling/canvas-fonts/CrimsonPro-Italic.ttf
-  - .agents/skills/ui-styling/canvas-fonts/CrimsonPro-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/CrimsonPro-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/DMMono-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/DMMono-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/EricaOne-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/EricaOne-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/GeistMono-Bold.ttf
-  - .agents/skills/ui-styling/canvas-fonts/GeistMono-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/GeistMono-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/Gloock-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/Gloock-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/IBMPlexMono-Bold.ttf
-  - .agents/skills/ui-styling/canvas-fonts/IBMPlexMono-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/IBMPlexMono-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/IBMPlexSerif-Bold.ttf
-  - .agents/skills/ui-styling/canvas-fonts/IBMPlexSerif-BoldItalic.ttf
-  - .agents/skills/ui-styling/canvas-fonts/IBMPlexSerif-Italic.ttf
-  - .agents/skills/ui-styling/canvas-fonts/IBMPlexSerif-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/InstrumentSans-Bold.ttf
-  - .agents/skills/ui-styling/canvas-fonts/InstrumentSans-BoldItalic.ttf
-  - .agents/skills/ui-styling/canvas-fonts/InstrumentSans-Italic.ttf
-  - .agents/skills/ui-styling/canvas-fonts/InstrumentSans-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/InstrumentSans-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/InstrumentSerif-Italic.ttf
-  - .agents/skills/ui-styling/canvas-fonts/InstrumentSerif-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/Italiana-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/Italiana-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/JetBrainsMono-Bold.ttf
-  - .agents/skills/ui-styling/canvas-fonts/JetBrainsMono-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/JetBrainsMono-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/Jura-Light.ttf
-  - .agents/skills/ui-styling/canvas-fonts/Jura-Medium.ttf
-  - .agents/skills/ui-styling/canvas-fonts/Jura-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/LibreBaskerville-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/LibreBaskerville-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/Lora-Bold.ttf
-  - .agents/skills/ui-styling/canvas-fonts/Lora-BoldItalic.ttf
-  - .agents/skills/ui-styling/canvas-fonts/Lora-Italic.ttf
-  - .agents/skills/ui-styling/canvas-fonts/Lora-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/Lora-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/NationalPark-Bold.ttf
-  - .agents/skills/ui-styling/canvas-fonts/NationalPark-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/NationalPark-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/NothingYouCouldDo-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/NothingYouCouldDo-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/Outfit-Bold.ttf
-  - .agents/skills/ui-styling/canvas-fonts/Outfit-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/Outfit-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/PixelifySans-Medium.ttf
-  - .agents/skills/ui-styling/canvas-fonts/PixelifySans-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/PoiretOne-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/PoiretOne-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/RedHatMono-Bold.ttf
-  - .agents/skills/ui-styling/canvas-fonts/RedHatMono-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/RedHatMono-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/Silkscreen-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/Silkscreen-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/SmoochSans-Medium.ttf
-  - .agents/skills/ui-styling/canvas-fonts/SmoochSans-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/Tektur-Medium.ttf
-  - .agents/skills/ui-styling/canvas-fonts/Tektur-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/Tektur-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/WorkSans-Bold.ttf
-  - .agents/skills/ui-styling/canvas-fonts/WorkSans-BoldItalic.ttf
-  - .agents/skills/ui-styling/canvas-fonts/WorkSans-Italic.ttf
-  - .agents/skills/ui-styling/canvas-fonts/WorkSans-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/WorkSans-Regular.ttf
-  - .agents/skills/ui-styling/canvas-fonts/YoungSerif-OFL.txt
-  - .agents/skills/ui-styling/canvas-fonts/YoungSerif-Regular.ttf
-  - .agents/skills/ui-styling/references/canvas-design-system.md
-  - .agents/skills/ui-styling/references/shadcn-accessibility.md
-  - .agents/skills/ui-styling/references/shadcn-components.md
-  - .agents/skills/ui-styling/references/shadcn-theming.md
-  - .agents/skills/ui-styling/references/tailwind-customization.md
-  - .agents/skills/ui-styling/references/tailwind-responsive.md
-  - .agents/skills/ui-styling/references/tailwind-utilities.md
-  - .agents/skills/ui-styling/scripts/.coverage
-  - .agents/skills/ui-styling/scripts/requirements.txt
-  - .agents/skills/ui-styling/scripts/shadcn_add.py
-  - .agents/skills/ui-styling/scripts/tailwind_config_gen.py
-  - .agents/skills/ui-styling/scripts/tests/coverage-ui.json
-  - .agents/skills/ui-styling/scripts/tests/requirements.txt
-  - .agents/skills/ui-styling/scripts/tests/test_shadcn_add.py
-  - .agents/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py
   - .agents/skills/ui-ux-pro-max
   - .agents/skills/ui-ux-pro-max/SKILL.md
   - .agents/skills/ui-ux-pro-max/data/app-interface.csv
@@ -1960,195 +1826,6 @@ dependencies:
   - .agents/skills/ui-ux-pro-max/scripts/search.py
   - .agents/skills/ui-ux-pro-max/scripts/tests/test_core.py
   - .agents/skills/ui-ux-pro-max/scripts/validate_data.py
-  - .claude/skills/brand
-  - .claude/skills/brand/SKILL.md
-  - .claude/skills/brand/references/approval-checklist.md
-  - .claude/skills/brand/references/asset-organization.md
-  - .claude/skills/brand/references/brand-guideline-template.md
-  - .claude/skills/brand/references/color-palette-management.md
-  - .claude/skills/brand/references/consistency-checklist.md
-  - .claude/skills/brand/references/logo-usage-rules.md
-  - .claude/skills/brand/references/messaging-framework.md
-  - .claude/skills/brand/references/typography-specifications.md
-  - .claude/skills/brand/references/update.md
-  - .claude/skills/brand/references/visual-identity.md
-  - .claude/skills/brand/references/voice-framework.md
-  - .claude/skills/brand/scripts/extract-colors.cjs
-  - .claude/skills/brand/scripts/inject-brand-context.cjs
-  - .claude/skills/brand/scripts/sync-brand-to-tokens.cjs
-  - .claude/skills/brand/scripts/tests/test_sync_brand_to_tokens.py
-  - .claude/skills/brand/scripts/validate-asset.cjs
-  - .claude/skills/brand/templates/brand-guidelines-starter.md
-  - .claude/skills/design
-  - .claude/skills/design-system
-  - .claude/skills/design-system/SKILL.md
-  - .claude/skills/design-system/data/slide-backgrounds.csv
-  - .claude/skills/design-system/data/slide-charts.csv
-  - .claude/skills/design-system/data/slide-color-logic.csv
-  - .claude/skills/design-system/data/slide-copy.csv
-  - .claude/skills/design-system/data/slide-layout-logic.csv
-  - .claude/skills/design-system/data/slide-layouts.csv
-  - .claude/skills/design-system/data/slide-strategies.csv
-  - .claude/skills/design-system/data/slide-typography.csv
-  - .claude/skills/design-system/references/component-specs.md
-  - .claude/skills/design-system/references/component-tokens.md
-  - .claude/skills/design-system/references/primitive-tokens.md
-  - .claude/skills/design-system/references/semantic-tokens.md
-  - .claude/skills/design-system/references/states-and-variants.md
-  - .claude/skills/design-system/references/tailwind-integration.md
-  - .claude/skills/design-system/references/token-architecture.md
-  - .claude/skills/design-system/scripts/embed-tokens.cjs
-  - .claude/skills/design-system/scripts/fetch-background.py
-  - .claude/skills/design-system/scripts/generate-slide.py
-  - .claude/skills/design-system/scripts/generate-tokens.cjs
-  - .claude/skills/design-system/scripts/html-token-validator.py
-  - .claude/skills/design-system/scripts/search-slides.py
-  - .claude/skills/design-system/scripts/slide-token-validator.py
-  - .claude/skills/design-system/scripts/slide_search_core.py
-  - .claude/skills/design-system/scripts/tests/test_validate_tokens.py
-  - .claude/skills/design-system/scripts/validate-tokens.cjs
-  - .claude/skills/design-system/templates/design-tokens-starter.json
-  - .claude/skills/design/SKILL.md
-  - .claude/skills/design/data/cip/deliverables.csv
-  - .claude/skills/design/data/cip/industries.csv
-  - .claude/skills/design/data/cip/mockup-contexts.csv
-  - .claude/skills/design/data/cip/styles.csv
-  - .claude/skills/design/data/icon/styles.csv
-  - .claude/skills/design/data/logo/colors.csv
-  - .claude/skills/design/data/logo/industries.csv
-  - .claude/skills/design/data/logo/styles.csv
-  - .claude/skills/design/references/banner-sizes-and-styles.md
-  - .claude/skills/design/references/cip-deliverable-guide.md
-  - .claude/skills/design/references/cip-design.md
-  - .claude/skills/design/references/cip-prompt-engineering.md
-  - .claude/skills/design/references/cip-style-guide.md
-  - .claude/skills/design/references/design-routing.md
-  - .claude/skills/design/references/icon-design.md
-  - .claude/skills/design/references/logo-color-psychology.md
-  - .claude/skills/design/references/logo-design.md
-  - .claude/skills/design/references/logo-prompt-engineering.md
-  - .claude/skills/design/references/logo-style-guide.md
-  - .claude/skills/design/references/slides-copywriting-formulas.md
-  - .claude/skills/design/references/slides-create.md
-  - .claude/skills/design/references/slides-html-template.md
-  - .claude/skills/design/references/slides-layout-patterns.md
-  - .claude/skills/design/references/slides-strategies.md
-  - .claude/skills/design/references/slides.md
-  - .claude/skills/design/references/social-photos-design.md
-  - .claude/skills/design/scripts/cip/core.py
-  - .claude/skills/design/scripts/cip/generate.py
-  - .claude/skills/design/scripts/cip/render-html.py
-  - .claude/skills/design/scripts/cip/search.py
-  - .claude/skills/design/scripts/icon/generate.py
-  - .claude/skills/design/scripts/logo/core.py
-  - .claude/skills/design/scripts/logo/generate.py
-  - .claude/skills/design/scripts/logo/search.py
-  - .claude/skills/slides
-  - .claude/skills/slides/SKILL.md
-  - .claude/skills/slides/references/copywriting-formulas.md
-  - .claude/skills/slides/references/create.md
-  - .claude/skills/slides/references/html-template.md
-  - .claude/skills/slides/references/layout-patterns.md
-  - .claude/skills/slides/references/slide-strategies.md
-  - .claude/skills/ui-styling
-  - .claude/skills/ui-styling/LICENSE.txt
-  - .claude/skills/ui-styling/SKILL.md
-  - .claude/skills/ui-styling/canvas-fonts/ArsenalSC-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/ArsenalSC-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/BigShoulders-Bold.ttf
-  - .claude/skills/ui-styling/canvas-fonts/BigShoulders-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/BigShoulders-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/Boldonse-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/Boldonse-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/BricolageGrotesque-Bold.ttf
-  - .claude/skills/ui-styling/canvas-fonts/BricolageGrotesque-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/BricolageGrotesque-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/CrimsonPro-Bold.ttf
-  - .claude/skills/ui-styling/canvas-fonts/CrimsonPro-Italic.ttf
-  - .claude/skills/ui-styling/canvas-fonts/CrimsonPro-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/CrimsonPro-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/DMMono-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/DMMono-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/EricaOne-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/EricaOne-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/GeistMono-Bold.ttf
-  - .claude/skills/ui-styling/canvas-fonts/GeistMono-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/GeistMono-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/Gloock-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/Gloock-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/IBMPlexMono-Bold.ttf
-  - .claude/skills/ui-styling/canvas-fonts/IBMPlexMono-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/IBMPlexMono-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/IBMPlexSerif-Bold.ttf
-  - .claude/skills/ui-styling/canvas-fonts/IBMPlexSerif-BoldItalic.ttf
-  - .claude/skills/ui-styling/canvas-fonts/IBMPlexSerif-Italic.ttf
-  - .claude/skills/ui-styling/canvas-fonts/IBMPlexSerif-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/InstrumentSans-Bold.ttf
-  - .claude/skills/ui-styling/canvas-fonts/InstrumentSans-BoldItalic.ttf
-  - .claude/skills/ui-styling/canvas-fonts/InstrumentSans-Italic.ttf
-  - .claude/skills/ui-styling/canvas-fonts/InstrumentSans-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/InstrumentSans-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/InstrumentSerif-Italic.ttf
-  - .claude/skills/ui-styling/canvas-fonts/InstrumentSerif-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/Italiana-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/Italiana-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/JetBrainsMono-Bold.ttf
-  - .claude/skills/ui-styling/canvas-fonts/JetBrainsMono-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/JetBrainsMono-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/Jura-Light.ttf
-  - .claude/skills/ui-styling/canvas-fonts/Jura-Medium.ttf
-  - .claude/skills/ui-styling/canvas-fonts/Jura-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/LibreBaskerville-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/LibreBaskerville-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/Lora-Bold.ttf
-  - .claude/skills/ui-styling/canvas-fonts/Lora-BoldItalic.ttf
-  - .claude/skills/ui-styling/canvas-fonts/Lora-Italic.ttf
-  - .claude/skills/ui-styling/canvas-fonts/Lora-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/Lora-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/NationalPark-Bold.ttf
-  - .claude/skills/ui-styling/canvas-fonts/NationalPark-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/NationalPark-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/NothingYouCouldDo-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/NothingYouCouldDo-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/Outfit-Bold.ttf
-  - .claude/skills/ui-styling/canvas-fonts/Outfit-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/Outfit-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/PixelifySans-Medium.ttf
-  - .claude/skills/ui-styling/canvas-fonts/PixelifySans-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/PoiretOne-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/PoiretOne-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/RedHatMono-Bold.ttf
-  - .claude/skills/ui-styling/canvas-fonts/RedHatMono-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/RedHatMono-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/Silkscreen-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/Silkscreen-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/SmoochSans-Medium.ttf
-  - .claude/skills/ui-styling/canvas-fonts/SmoochSans-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/Tektur-Medium.ttf
-  - .claude/skills/ui-styling/canvas-fonts/Tektur-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/Tektur-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/WorkSans-Bold.ttf
-  - .claude/skills/ui-styling/canvas-fonts/WorkSans-BoldItalic.ttf
-  - .claude/skills/ui-styling/canvas-fonts/WorkSans-Italic.ttf
-  - .claude/skills/ui-styling/canvas-fonts/WorkSans-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/WorkSans-Regular.ttf
-  - .claude/skills/ui-styling/canvas-fonts/YoungSerif-OFL.txt
-  - .claude/skills/ui-styling/canvas-fonts/YoungSerif-Regular.ttf
-  - .claude/skills/ui-styling/references/canvas-design-system.md
-  - .claude/skills/ui-styling/references/shadcn-accessibility.md
-  - .claude/skills/ui-styling/references/shadcn-components.md
-  - .claude/skills/ui-styling/references/shadcn-theming.md
-  - .claude/skills/ui-styling/references/tailwind-customization.md
-  - .claude/skills/ui-styling/references/tailwind-responsive.md
-  - .claude/skills/ui-styling/references/tailwind-utilities.md
-  - .claude/skills/ui-styling/scripts/.coverage
-  - .claude/skills/ui-styling/scripts/requirements.txt
-  - .claude/skills/ui-styling/scripts/shadcn_add.py
-  - .claude/skills/ui-styling/scripts/tailwind_config_gen.py
-  - .claude/skills/ui-styling/scripts/tests/coverage-ui.json
-  - .claude/skills/ui-styling/scripts/tests/requirements.txt
-  - .claude/skills/ui-styling/scripts/tests/test_shadcn_add.py
-  - .claude/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py
   - .claude/skills/ui-ux-pro-max
   - .claude/skills/ui-ux-pro-max/SKILL.md
   - .claude/skills/ui-ux-pro-max/data/app-interface.csv
@@ -2194,190 +1871,6 @@ dependencies:
   - .claude/skills/ui-ux-pro-max/scripts/tests/test_core.py
   - .claude/skills/ui-ux-pro-max/scripts/validate_data.py
   deployed_file_hashes:
-    .agents/skills/brand/SKILL.md: sha256:6a450ee1a83a403d47cec2ede9030feb60a67a81fc425d2406e975339313bd44
-    .agents/skills/brand/references/approval-checklist.md: sha256:4bf8549687f53a7b9684005b4b87de93c26f018e00609b4c506a5812abd13d20
-    .agents/skills/brand/references/asset-organization.md: sha256:de98123417e9c5a1cc71a78131bba979c4c8ed2e5289e6c7a7f166576e488101
-    .agents/skills/brand/references/brand-guideline-template.md: sha256:392db8cf10fef492221c15a86e68590074bf5716de1f2982f41c01fbe30567cc
-    .agents/skills/brand/references/color-palette-management.md: sha256:c429298ffe3955edb8b22c9f51426fef75e83d02848cd4300e89c0d3fc34b44a
-    .agents/skills/brand/references/consistency-checklist.md: sha256:56d8b2d4852cda11e600adec4b9dd68fc89a1b8265382359953bec5c5e5e2c36
-    .agents/skills/brand/references/logo-usage-rules.md: sha256:044c5ddf30cfe0eea047451cfce6ea654939198ffdd8968a19161c97066a5a26
-    .agents/skills/brand/references/messaging-framework.md: sha256:24b2500a72867b55dd10f4bf359178b0eb347fddd852659ce47b69d9f597d4e6
-    .agents/skills/brand/references/typography-specifications.md: sha256:921c3d9e6ddfde2677b9a3e32eee94c7922f54f22c1f380c5ed2eb25a7d5bfa9
-    .agents/skills/brand/references/update.md: sha256:537cb55ebe260e1de127bd6288b19d8d7b15b6c893545442a58b739cbd342b37
-    .agents/skills/brand/references/visual-identity.md: sha256:63f0cfc5d95403d8e12aca4d839cc28471515574d9a431334bfbb96c15407c31
-    .agents/skills/brand/references/voice-framework.md: sha256:08c15ac79f81cd964c5efbe593131b61a093c7e1b060d5dd28b17f3cc5b331fb
-    .agents/skills/brand/scripts/extract-colors.cjs: sha256:36d21f3905e5762cfc8054b3f3b7276f6bc656884fe57c6bfa539526044778ed
-    .agents/skills/brand/scripts/inject-brand-context.cjs: sha256:5b98abdeb5c636f247102cd235f1d3421db7a4de53fd853360feaa0c471b5c96
-    .agents/skills/brand/scripts/sync-brand-to-tokens.cjs: sha256:390a760570fdba6d6ecfdfd8907fc802b64659b6178f8920349b0c6a2c822106
-    .agents/skills/brand/scripts/tests/test_sync_brand_to_tokens.py: sha256:0ace0cf7c6a8c12c0b9154f317e847b1084eb00b065b6f22431e37b7c7e948d6
-    .agents/skills/brand/scripts/validate-asset.cjs: sha256:4546c9109fb0f4f767426508cb29e60d02b301f8897cf16d8e378b7ce9d997fc
-    .agents/skills/brand/templates/brand-guidelines-starter.md: sha256:d157a57b15f0b458c79636d11de42f3c89f03d8c0bbea1bdd3cf1c3542b2140d
-    .agents/skills/design-system/SKILL.md: sha256:655468bb723a6bc9d17fcb09a6a005e10e313d63b879f4d74fb2abdc3041ae3f
-    .agents/skills/design-system/data/slide-backgrounds.csv: sha256:d1bb701b87bef493d72974d6fac1087c8ba4e2df14185fe3e0c36a13fe35f3d1
-    .agents/skills/design-system/data/slide-charts.csv: sha256:12ef876cd76e67a6553444bfa2ebf1d5d4d6216289d34db052a6e87421135033
-    .agents/skills/design-system/data/slide-color-logic.csv: sha256:ea68c737075f1615b2a7e461e2878c06bfe8f803dcabfbcc2977ffe5f9ec9ded
-    .agents/skills/design-system/data/slide-copy.csv: sha256:43152937a0e598b3fbfdd418684311c105d44e3c5b333703ddb0b8cb28e40658
-    .agents/skills/design-system/data/slide-layout-logic.csv: sha256:26b5b75782d5aba89836c0479acd3111cc69b67853db9c2259b30ac1e966bc62
-    .agents/skills/design-system/data/slide-layouts.csv: sha256:95d558c1b7d2552d7a75402dc68facbd16125e574985851db5729d1145e14896
-    .agents/skills/design-system/data/slide-strategies.csv: sha256:f656be0ab0b3a85fa7fc74202e9701a7236220412d67d5f63eb6dbb100bb2639
-    .agents/skills/design-system/data/slide-typography.csv: sha256:b96cd11dd4ff1dea8a9454b0b9e898e7f82f9243182f8f237af1f2c9b8824ce5
-    .agents/skills/design-system/references/component-specs.md: sha256:b265d979a741dd748d4e595e6898ae430faeef4f6d13d7a634fa6241b91d2da4
-    .agents/skills/design-system/references/component-tokens.md: sha256:e27f8f5999badee425c98235eabbd2cb3ebe2a1a364766d5c7a6b3134ceaaec8
-    .agents/skills/design-system/references/primitive-tokens.md: sha256:91e6caa12646c08c8aadf8e09399aed65760a25c8d80595936d81a9131118fc3
-    .agents/skills/design-system/references/semantic-tokens.md: sha256:97e16d8061bbc22e82b51966a7015e3fc990932902e4647843506669a1cdebcc
-    .agents/skills/design-system/references/states-and-variants.md: sha256:8dacb95d57d4bb37d8a99cc55515ff26da272056f837d29abc74aedcaa3ba104
-    .agents/skills/design-system/references/tailwind-integration.md: sha256:6d01092db1479dbd2060567b4232bb2b4bc16e89730ab07e1f87a3e7f5c406b9
-    .agents/skills/design-system/references/token-architecture.md: sha256:925f4049c4c4313d9fd5df98cdfd52004112aca49fba1664ad85e76bc9dce4d3
-    .agents/skills/design-system/scripts/embed-tokens.cjs: sha256:23a9ce214e3c0d2fb4c5442b3bf1222c66721f7988a181ab29dcb549a5e5f511
-    .agents/skills/design-system/scripts/fetch-background.py: sha256:cecedad0a9054e6e65f31ab7ba7d07eb6af2179e237c5632bc962dad69fd6d66
-    .agents/skills/design-system/scripts/generate-slide.py: sha256:0463c98efea54870816925015fe5819e42a29aaba57408c2c38bacb33e2605b9
-    .agents/skills/design-system/scripts/generate-tokens.cjs: sha256:aac8a0f4ec4dccf0d371f9ee5a9111e44977bb0cad7e40a3754aba5571aa1231
-    .agents/skills/design-system/scripts/html-token-validator.py: sha256:9556a65e7aacda23388478294ee9a5cb84b315d964fbbf754aa0dcdbcfee58e6
-    .agents/skills/design-system/scripts/search-slides.py: sha256:fded9548bc1bbe1303da67fabe34006c6a7c57934c9d171ea3dc3eb5f6eee010
-    .agents/skills/design-system/scripts/slide-token-validator.py: sha256:66da5da5e8e659d405a89b342e13dd1e469e79726c46002d9d2368c3c7aaf945
-    .agents/skills/design-system/scripts/slide_search_core.py: sha256:2464050ae338eb50728086046b644845fa7ae943f32efead3908fdbe1473edbe
-    .agents/skills/design-system/scripts/tests/test_validate_tokens.py: sha256:a32f34a9e89542a341b6ff3ee4392494b48dea622b22b99652d3cf0c1a1ee966
-    .agents/skills/design-system/scripts/validate-tokens.cjs: sha256:65f03a29290b9029d8cc27537701f226de7bcffc303b3bc361648fadfa09b77d
-    .agents/skills/design-system/templates/design-tokens-starter.json: sha256:5444f477b06bab9c72e2cc289d4a9104efef653391c9639972bcb712d5f2d81e
-    .agents/skills/design/SKILL.md: sha256:413f4ab913d07f7fd92acbadc25d71aad63443be0c40d11234944aea688603b6
-    .agents/skills/design/data/cip/deliverables.csv: sha256:229912f35c2f5a790508ddd62270cc7a92a84694027025ea5a30f1fb5ba84b70
-    .agents/skills/design/data/cip/industries.csv: sha256:729b1dea6d6f39b0bc22a1e659584e7ca5cead75841146d599c9f8dc00d4da46
-    .agents/skills/design/data/cip/mockup-contexts.csv: sha256:15d61cef16e6746d5aa665976f4de8074fedb64bfc5c7313a40eec1112a1d499
-    .agents/skills/design/data/cip/styles.csv: sha256:4e7f9e209bc90b60df62fd9843a1a73b365e54161dbd820b82817a8e512af4c4
-    .agents/skills/design/data/icon/styles.csv: sha256:a4aa7d326ffe1e50961eb70e25a6351f45c0247cd245461fa1a27cdc72f903b4
-    .agents/skills/design/data/logo/colors.csv: sha256:d60218f0705bb0f0b892a10468a5c8d9a44eef3d0262ef8df8970ba3fbab567a
-    .agents/skills/design/data/logo/industries.csv: sha256:e58dda4b9d28851f70914f82c1d2a2cff626a991ca41076f64122f33cc8a6525
-    .agents/skills/design/data/logo/styles.csv: sha256:ea08bdfb7aa557f08d1b6299222423f948700f8e4029321acb58c8f83197bdf2
-    .agents/skills/design/references/banner-sizes-and-styles.md: sha256:c8906fb1073a576ee8c680d9bc8586249cbc4ed36690da960d65a1c9c37143b7
-    .agents/skills/design/references/cip-deliverable-guide.md: sha256:1424e120b967288e2334f24fcfa5cdc7f238420326a7444f4c5597efecfabc41
-    .agents/skills/design/references/cip-design.md: sha256:47a3b2e445bc07185edd0cd24ba8a417229baf86717dcdff7c4e403adbceb3f1
-    .agents/skills/design/references/cip-prompt-engineering.md: sha256:4bf3a0c858f38c230e43e872857b72d9eb692e066e8de5920da75aac733e753c
-    .agents/skills/design/references/cip-style-guide.md: sha256:f3e15408cd981e93804440c1159c12e02d001bc37a3945f455b3fc13729ed4e1
-    .agents/skills/design/references/design-routing.md: sha256:32914a913f4f20d4cb1e497e5a87cfc04b71af4e6d75db72ecf50e4f060201c8
-    .agents/skills/design/references/icon-design.md: sha256:39281931d070918b4e51ecd71054da99493cabe06a07dfa8f1f682e48637c83f
-    .agents/skills/design/references/logo-color-psychology.md: sha256:3fd0e93e24c3b2ea7f3be778e8f2d03b1c62c7c6eab3ade478c8fca332bff287
-    .agents/skills/design/references/logo-design.md: sha256:2e845fe165c845fd9582c1d74204fa31de607380982a6ea0b5f8db4e293afa3a
-    .agents/skills/design/references/logo-prompt-engineering.md: sha256:e50f55bf323263eb27b4cd4c5172383a787fb894581d5d2befb3f6e0180b253e
-    .agents/skills/design/references/logo-style-guide.md: sha256:611baa841eedab101f45c113c6bfbd4d7e16e859c9d6ebd2cf941827a6e8dd15
-    .agents/skills/design/references/slides-copywriting-formulas.md: sha256:03733d5916ab771834745550045b736deeb94a08226f2b200f7953009c35b219
-    .agents/skills/design/references/slides-create.md: sha256:792d647a5d4f87d765cf417f7ac54dd0b2fc4d229cc23ea9df56282d4c1ee086
-    .agents/skills/design/references/slides-html-template.md: sha256:fd5b051a37365fc6059c75bb388ec6f64daf1bd9ae938b287b6d762dc83c0c35
-    .agents/skills/design/references/slides-layout-patterns.md: sha256:0a967ca3bd829d3234e6f1802bade6c76447fabbaddbc8117c41adbae7dfb6df
-    .agents/skills/design/references/slides-strategies.md: sha256:27ee3e53ffa0ea679ec83ebeacb0bcfbce498df57277e99f574b9c139dc44286
-    .agents/skills/design/references/slides.md: sha256:5630d5daec947ff58ab1ac97c7a1ee77a21cf6f5dce5155535b65d291691979f
-    .agents/skills/design/references/social-photos-design.md: sha256:2544c143ff3a4471a775e2271797a3871480f94de91b267178da92e8952192a0
-    .agents/skills/design/scripts/cip/core.py: sha256:78a78a51f12d2382b2854414df395dc62b68532626ef724ddd5de713507911e4
-    .agents/skills/design/scripts/cip/generate.py: sha256:2745040c9b534cf4113d2f7f4d7a52bc96a9fbfa12204c4f8460be4e15449069
-    .agents/skills/design/scripts/cip/render-html.py: sha256:a49a89a017ea4a2c492438055f05dfba3dfb4f91563f5f913359939beeaeccab
-    .agents/skills/design/scripts/cip/search.py: sha256:6619fbbe71983003a858c5eb79bc59c607b342610a1178b6976c687c2932161b
-    .agents/skills/design/scripts/icon/generate.py: sha256:1a6be99dc233f6d9f8b558c26148203418be5b47c677cd83e48e41e78e38780c
-    .agents/skills/design/scripts/logo/core.py: sha256:4f8b36ffe538e5995d0e0b740053a0899a1adf445ffdf484bd47f94e71ade8d0
-    .agents/skills/design/scripts/logo/generate.py: sha256:6e4358f21cd85fec51c8d01b03e3696d6db180815309d7e10a19c623d4d4462c
-    .agents/skills/design/scripts/logo/search.py: sha256:693b3a1824831f120d4c60ed72477847604da1f6b654343381f8e9d3800a28f2
-    .agents/skills/slides/SKILL.md: sha256:2b90bdaf63f231919a01f4962f374ecd84af101a7e7545f8d9c68e049025accb
-    .agents/skills/slides/references/copywriting-formulas.md: sha256:03733d5916ab771834745550045b736deeb94a08226f2b200f7953009c35b219
-    .agents/skills/slides/references/create.md: sha256:792d647a5d4f87d765cf417f7ac54dd0b2fc4d229cc23ea9df56282d4c1ee086
-    .agents/skills/slides/references/html-template.md: sha256:fd5b051a37365fc6059c75bb388ec6f64daf1bd9ae938b287b6d762dc83c0c35
-    .agents/skills/slides/references/layout-patterns.md: sha256:0a967ca3bd829d3234e6f1802bade6c76447fabbaddbc8117c41adbae7dfb6df
-    .agents/skills/slides/references/slide-strategies.md: sha256:27ee3e53ffa0ea679ec83ebeacb0bcfbce498df57277e99f574b9c139dc44286
-    .agents/skills/ui-styling/LICENSE.txt: sha256:58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd
-    .agents/skills/ui-styling/SKILL.md: sha256:f8b6c3832d2af51f67b3932e3c4a79bcd8a8596cc61ce1547a686fc951e5c62d
-    .agents/skills/ui-styling/canvas-fonts/ArsenalSC-OFL.txt: sha256:8ddd61b18ba2c0d0dbe4a691cf5f1a0673f473d02fa0546e67ee88c006aeff6e
-    .agents/skills/ui-styling/canvas-fonts/ArsenalSC-Regular.ttf: sha256:65e6f89df58f68fd905b3add34a79dd6106aa3b3044df0dad9676fff53d504b9
-    .agents/skills/ui-styling/canvas-fonts/BigShoulders-Bold.ttf: sha256:b43bcd198b9fdf717dd42aa61a34dba32e01aceaeae659d689afd0ca52c37ea2
-    .agents/skills/ui-styling/canvas-fonts/BigShoulders-OFL.txt: sha256:fbc746aabf0eb1847dfd92e2efc4596d79fa897d60b8e64062a22f585508fb3f
-    .agents/skills/ui-styling/canvas-fonts/BigShoulders-Regular.ttf: sha256:18a879fc71978a4447150705caf880a9da3860083c259fd29e6dc03057b6842a
-    .agents/skills/ui-styling/canvas-fonts/Boldonse-OFL.txt: sha256:45cc82ab4032273c0924025ffcf8f0665a68e1a5955e3f7247e5daf1deeb1326
-    .agents/skills/ui-styling/canvas-fonts/Boldonse-Regular.ttf: sha256:cc2e540604565c0f90a7d8d46194a2f42fc9c45512cd2e39bf03b50eb68c35a4
-    .agents/skills/ui-styling/canvas-fonts/BricolageGrotesque-Bold.ttf: sha256:a737b146fe0d77ffe8a86e3cd16700dd431d3b1e420d4fd80e142cd68a1cb50d
-    .agents/skills/ui-styling/canvas-fonts/BricolageGrotesque-OFL.txt: sha256:0e4f4eb8534bc66a76aca13dd19c1f9731b2008866b29ccff182b764649df9b4
-    .agents/skills/ui-styling/canvas-fonts/BricolageGrotesque-Regular.ttf: sha256:972a6d098c9867ae131d0ea99e221e63976b11a19d4b931c2c7ace525674e4f6
-    .agents/skills/ui-styling/canvas-fonts/CrimsonPro-Bold.ttf: sha256:48f191e38355c8db100eb3ce157c20f9302a3b9a37b44a660f77ecfce3986609
-    .agents/skills/ui-styling/canvas-fonts/CrimsonPro-Italic.ttf: sha256:52318db3526b644e6efa60be0b3ca5a50e40fbe8bd026c261e0aa206f0772267
-    .agents/skills/ui-styling/canvas-fonts/CrimsonPro-OFL.txt: sha256:35680d14547b6748b6f362a052a46d22764ce5eccf96e18b74f567bb2ee58114
-    .agents/skills/ui-styling/canvas-fonts/CrimsonPro-Regular.ttf: sha256:48fad08cb1917a7b2f2c6fe5135d6c07743a6663cf7631ec4481108aaf081422
-    .agents/skills/ui-styling/canvas-fonts/DMMono-OFL.txt: sha256:bfe7842fcb88323e2981e24710c25202677385a8c75fb6a87217b275a0247ae3
-    .agents/skills/ui-styling/canvas-fonts/DMMono-Regular.ttf: sha256:f98ada968dc3b6b2c08d3f5caaf266977df0bfe0929372b93df5a06cf2ace450
-    .agents/skills/ui-styling/canvas-fonts/EricaOne-OFL.txt: sha256:e0de629968b52255548d5fafcf30b24ff9edae0eda362380755a75816404d0fa
-    .agents/skills/ui-styling/canvas-fonts/EricaOne-Regular.ttf: sha256:db1d89e80e33a8a01beaaac7a85df582857d24a43f1e181461aa7ff5d701476a
-    .agents/skills/ui-styling/canvas-fonts/GeistMono-Bold.ttf: sha256:75c0828d5c1ee44b9ef9f4df577bf41595ec362e2ea3f1e558590c9e92c7949d
-    .agents/skills/ui-styling/canvas-fonts/GeistMono-OFL.txt: sha256:6a873c900f584109b13ae0aaf81d6e3cf0a68751a216b03f7b6c68d547057bb4
-    .agents/skills/ui-styling/canvas-fonts/GeistMono-Regular.ttf: sha256:a55c1b51cda4afeab9e471e7947b85a20f7c8831d7e6b1470c1b7fbdc0f0f15e
-    .agents/skills/ui-styling/canvas-fonts/Gloock-OFL.txt: sha256:c0a3f3125ac491ef3d1f09f401be4834c646562f647e44f2bcbc49f0466c656d
-    .agents/skills/ui-styling/canvas-fonts/Gloock-Regular.ttf: sha256:e86b4ce66dbd3f1f83eee8db99ec96e0da1128c3f53df0e9b3b7472025dfe960
-    .agents/skills/ui-styling/canvas-fonts/IBMPlexMono-Bold.ttf: sha256:dbd2a2fb024579438d6400a84e57579bfd2dbe67c306c8fd9fde92a61e4f2eea
-    .agents/skills/ui-styling/canvas-fonts/IBMPlexMono-OFL.txt: sha256:5294ce778857e1eb02e830b6ab06435537d38f43055327e73d03a2d4d57d5123
-    .agents/skills/ui-styling/canvas-fonts/IBMPlexMono-Regular.ttf: sha256:ab08018ccd276b79fb2c636bb95b9c543598f9d50505fe92506fcb4dae7810cd
-    .agents/skills/ui-styling/canvas-fonts/IBMPlexSerif-Bold.ttf: sha256:b8d294e9b5c5a0940f167c3ced0f7ef2e3f57082ca3ff096ef30e86e26c1c159
-    .agents/skills/ui-styling/canvas-fonts/IBMPlexSerif-BoldItalic.ttf: sha256:da64b75f4284f53e7b5c71fa190a35b8bf3494fe19f1804c81c3a53340bca570
-    .agents/skills/ui-styling/canvas-fonts/IBMPlexSerif-Italic.ttf: sha256:b11f1048745e715a55c9d837b3f10226ca3d78867b7db7251ddad8f98dcf0f38
-    .agents/skills/ui-styling/canvas-fonts/IBMPlexSerif-Regular.ttf: sha256:77cd233a2af8dc6b1022faea3bb3b01f3c75af68bcf530cb6aeb15982ff3dbb7
-    .agents/skills/ui-styling/canvas-fonts/InstrumentSans-Bold.ttf: sha256:444f85bf1c4b0e1ce1ca624f6be54bcd832207714ccaf4ea99ee531341683bdf
-    .agents/skills/ui-styling/canvas-fonts/InstrumentSans-BoldItalic.ttf: sha256:3762f6cef95d6039489ad5ba5787d4c30f17a1ad01e9ac3c816ed69692722a68
-    .agents/skills/ui-styling/canvas-fonts/InstrumentSans-Italic.ttf: sha256:78e85858e371b2cb4e18f617c10f0f937c0e12a0887ffee98555b24ed305b3a7
-    .agents/skills/ui-styling/canvas-fonts/InstrumentSans-OFL.txt: sha256:bf4dc6d13a8cccd4807133c77a1ee9619a16b92cb23322258725ab6731c2f6e5
-    .agents/skills/ui-styling/canvas-fonts/InstrumentSans-Regular.ttf: sha256:a22cb26e48fd79bcb01bf2fc92d36785474dce36d9c544ab0a8868c2657c4a87
-    .agents/skills/ui-styling/canvas-fonts/InstrumentSerif-Italic.ttf: sha256:9c86e4d5a47b50224a2463a9eca8535835257c8e85c470c2c6b454b1af6f046e
-    .agents/skills/ui-styling/canvas-fonts/InstrumentSerif-Regular.ttf: sha256:56ac3be03ac3ba283196b3e77850ab2ffcf56cfb6fd3212c5620109a972f8c99
-    .agents/skills/ui-styling/canvas-fonts/Italiana-OFL.txt: sha256:8373b11312ace78c4cec2e8f9f6aa9f2330601107dac7bcf899c6f2dbd40c5a5
-    .agents/skills/ui-styling/canvas-fonts/Italiana-Regular.ttf: sha256:15c4dd6ab8cf4a29ba8826f65edcbe2f6c266c557d34d081f25072dfd5605fd2
-    .agents/skills/ui-styling/canvas-fonts/JetBrainsMono-Bold.ttf: sha256:a2349098b9e45419e7bf0e2958d6c4937a049dded37387b08be725be4c7615f3
-    .agents/skills/ui-styling/canvas-fonts/JetBrainsMono-OFL.txt: sha256:a76abf002c49097d146e86740a3105a5d00450b1592e820a1109a8c5680cd697
-    .agents/skills/ui-styling/canvas-fonts/JetBrainsMono-Regular.ttf: sha256:b6b1ff4ddefe36d7f2a6174e1d001cab374e594519ee9049af028d577b64c5f5
-    .agents/skills/ui-styling/canvas-fonts/Jura-Light.ttf: sha256:c891a381df056b2c4dfe85841e911bf45da0890fa21a7b2692cbe5ea1f505e1e
-    .agents/skills/ui-styling/canvas-fonts/Jura-Medium.ttf: sha256:c72965cb732a92872643819fd1734128238583cc36b116313859137a51d3368a
-    .agents/skills/ui-styling/canvas-fonts/Jura-OFL.txt: sha256:eaf9bdb675f6d87e5feb88199ab3ea581d3bd2082f426e384fa9c394576d7260
-    .agents/skills/ui-styling/canvas-fonts/LibreBaskerville-OFL.txt: sha256:55959eef5b0c3b2e3c1c7631b8ff0f9447d75de20f29cfa7db5bcfb026763343
-    .agents/skills/ui-styling/canvas-fonts/LibreBaskerville-Regular.ttf: sha256:2101302538d9e88adb679031c04623e4578b5745e89566284fd2c508d79acae0
-    .agents/skills/ui-styling/canvas-fonts/Lora-Bold.ttf: sha256:7d74015e950c2fb66519c7295b8155621d22200ae2ca2a4c6b43ce3c490cac87
-    .agents/skills/ui-styling/canvas-fonts/Lora-BoldItalic.ttf: sha256:152f87e71f5ddb60d5c57ecd9132807c947e65c42977193c9164e7c5a6690081
-    .agents/skills/ui-styling/canvas-fonts/Lora-Italic.ttf: sha256:be627e595184e8afe521f08da0607eee613f1997d423bc8dadc5798995581377
-    .agents/skills/ui-styling/canvas-fonts/Lora-OFL.txt: sha256:62e37a82d3f1ef2a70712885fa8b3144b65fd144d8e748d6196b690a354d792c
-    .agents/skills/ui-styling/canvas-fonts/Lora-Regular.ttf: sha256:7ed00e7c9cdf16ab7e2fd2361fe45d4f0b61263cd60aae398b27b7ee08108827
-    .agents/skills/ui-styling/canvas-fonts/NationalPark-Bold.ttf: sha256:69ac4c301c4a7233c6e602d12a92c54d7967b575f4449951c45ce773f7acff53
-    .agents/skills/ui-styling/canvas-fonts/NationalPark-OFL.txt: sha256:81c6c71d83b5b45d7344f96df12bb4a2477a5b092a9144757ee1d0f50f855175
-    .agents/skills/ui-styling/canvas-fonts/NationalPark-Regular.ttf: sha256:a477338b7e18308d476650dfe31235ef86a883572665e56ffb5fb80f82009b58
-    .agents/skills/ui-styling/canvas-fonts/NothingYouCouldDo-OFL.txt: sha256:7c2a6970584ddad04919816163746f83b378078015899b18468b40f05e9ce128
-    .agents/skills/ui-styling/canvas-fonts/NothingYouCouldDo-Regular.ttf: sha256:d866f985896d3280f4fce72db7e17302c24a0c1fdb0699b6b5ed3af14f944d57
-    .agents/skills/ui-styling/canvas-fonts/Outfit-Bold.ttf: sha256:6654b93d21301ec61887d3cedd6c11d9df1b1dfb63f9cf45ac7995f6e2235ab1
-    .agents/skills/ui-styling/canvas-fonts/Outfit-OFL.txt: sha256:1945b62cd76da9a3051a1660dde72afaa64ffc2666d30e7a78356d651653ba2f
-    .agents/skills/ui-styling/canvas-fonts/Outfit-Regular.ttf: sha256:f24945365147c9e783e91d8649959b59be6b00c9ee4ecd2f6b33afbb2dd871fe
-    .agents/skills/ui-styling/canvas-fonts/PixelifySans-Medium.ttf: sha256:38397504f71c122b03d234ea6f55118e3d5bdbddffd82bedddbd7755d3b3be82
-    .agents/skills/ui-styling/canvas-fonts/PixelifySans-OFL.txt: sha256:7f54d1d9f1ae1ba9f2722f978145f90324fea34ca3c2304b3a29cfa96ac6037e
-    .agents/skills/ui-styling/canvas-fonts/PoiretOne-OFL.txt: sha256:2eaf541f7eb8b512e4c757a5212060abf5b6edfef230e9d7640bf736b315c33a
-    .agents/skills/ui-styling/canvas-fonts/PoiretOne-Regular.ttf: sha256:9cf265b139648b36b6c0afdfeb0bf27f7e66db9a16094bc40f644d8da05bc318
-    .agents/skills/ui-styling/canvas-fonts/RedHatMono-Bold.ttf: sha256:7ef48353f4be5ddb90f000f6fad48f2b62b3e8c27d9818d8d45ff46c201065e0
-    .agents/skills/ui-styling/canvas-fonts/RedHatMono-OFL.txt: sha256:435fbfb7e66988b2a06686a4cb966faec733f35d8fe100a1601573c27f3e0bb8
-    .agents/skills/ui-styling/canvas-fonts/RedHatMono-Regular.ttf: sha256:452fe826871b37539f5212b20c87cf30f82f58dd2741f1c96edd1dcbdc0db6b4
-    .agents/skills/ui-styling/canvas-fonts/Silkscreen-OFL.txt: sha256:6b849745119bbe85ec01fd080c9cd50234da9f52ac6e48b55d1a424a0c4d7ca9
-    .agents/skills/ui-styling/canvas-fonts/Silkscreen-Regular.ttf: sha256:49567408600809e25147e9225ac4f37f410e2df45a750696c45027531fb65f1b
-    .agents/skills/ui-styling/canvas-fonts/SmoochSans-Medium.ttf: sha256:dd76e6e77cce82f827a8654cd906e9ce58f3aaf78adda63c4a7f655b8ecb41f0
-    .agents/skills/ui-styling/canvas-fonts/SmoochSans-OFL.txt: sha256:74c9c4eb88e891483e1b7bc54780b452cbf4f4df66d4e71881d7569aa2130749
-    .agents/skills/ui-styling/canvas-fonts/Tektur-Medium.ttf: sha256:52bbe8c9b057b3d2da4eeace31a524b1ea26a1375ae34319cf6900ccc57a4c82
-    .agents/skills/ui-styling/canvas-fonts/Tektur-OFL.txt: sha256:3f1466cb5438f31782eeb6e895f3a655bc4d090e24263e331f555357d1cb734e
-    .agents/skills/ui-styling/canvas-fonts/Tektur-Regular.ttf: sha256:162e1b36c4718c5b051b36c971ad7e50d341944f35618f480422ebbe72988f98
-    .agents/skills/ui-styling/canvas-fonts/WorkSans-Bold.ttf: sha256:240d125fc9f8561363dc1ea3f513501253bd70942f41468f48f0b0cafb0c82e2
-    .agents/skills/ui-styling/canvas-fonts/WorkSans-BoldItalic.ttf: sha256:a5b2cad813df0aaa7d16621f2e93b5117c25e9bc788bc9a3ad218e9d6348ce34
-    .agents/skills/ui-styling/canvas-fonts/WorkSans-Italic.ttf: sha256:6b7f7002e0b0c8b261fe878658ef5551e3e59d9f6b609b04efb90dde1e2c1ada
-    .agents/skills/ui-styling/canvas-fonts/WorkSans-OFL.txt: sha256:ace8c22a3326318b54e67c3691857929634205533f454a70ef5a3473ddb2e2ba
-    .agents/skills/ui-styling/canvas-fonts/WorkSans-Regular.ttf: sha256:e67985a843df0d3cdee51a3d0f329eb1774a344ad9ff0c9ab923751f1577e2a4
-    .agents/skills/ui-styling/canvas-fonts/YoungSerif-OFL.txt: sha256:cdcb8039606b40a027a6d24586ec62d5fe29c701343d82a048c829cb28a3dd28
-    .agents/skills/ui-styling/canvas-fonts/YoungSerif-Regular.ttf: sha256:f8dc08f77abad753a00670af70756a8ace938e5c3f0b770f4f4c2071c4bd8fc6
-    .agents/skills/ui-styling/references/canvas-design-system.md: sha256:f5de85ff39d9f3a8275c4164b921ba72d5e1d34b8d7a9243d9ee34b3870a4f5f
-    .agents/skills/ui-styling/references/shadcn-accessibility.md: sha256:a22cd4ccf82b635b2b2c4f12416a0c4f7edcd825d219d6089450fa797a0d9511
-    .agents/skills/ui-styling/references/shadcn-components.md: sha256:79c4f91cbf68993a43fa3a95889c35db73de45bdd3dfd83a6830863c01aa598a
-    .agents/skills/ui-styling/references/shadcn-theming.md: sha256:d17d641474221123ff0e0288043ca2f2dab3ac96908a19eed28d82f9e58865ed
-    .agents/skills/ui-styling/references/tailwind-customization.md: sha256:4c5adeed6263a274f74f6eb2c816ca420fd6ef4f35683582988bacd404799afe
-    .agents/skills/ui-styling/references/tailwind-responsive.md: sha256:8d00ae620df26daea4623c7bf996d6e612e09d359305fcfa2b40cab757ed840c
-    .agents/skills/ui-styling/references/tailwind-utilities.md: sha256:aba1c40ef84f43beea142ae310371e332541f39d973df90a71f1854823effda1
-    .agents/skills/ui-styling/scripts/.coverage: sha256:a1f68d7a1d6322975c40c893004bc5e811d455d3ab124dab5154aad7060e66f5
-    .agents/skills/ui-styling/scripts/requirements.txt: sha256:09402d2d274248e18bb5fd0a0267fd7cbf99b7a2440e73e87f054aa8f259f9da
-    .agents/skills/ui-styling/scripts/shadcn_add.py: sha256:0c11d28ce9f12217df2c3306f24ae1f73527d5116db63707ab55cbe1a8bcf28c
-    .agents/skills/ui-styling/scripts/tailwind_config_gen.py: sha256:2e264ec871499681aecd6111f60743fba31b5ceb7e9ccb2b71b7346039285f89
-    .agents/skills/ui-styling/scripts/tests/coverage-ui.json: sha256:33bdc1f5998db9a38cac8e6128a82711f8f8b65fbb3dcb0c1680ae260441cbce
-    .agents/skills/ui-styling/scripts/tests/requirements.txt: sha256:80846c98ee02a7e9651ec4eee6709f840b785646b469aad5284ab7ab9b344f17
-    .agents/skills/ui-styling/scripts/tests/test_shadcn_add.py: sha256:4012b1efe1e51a5dcf31078b0d9069f92cfe2045e9a35dd52fdd4631b1815150
-    .agents/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py: sha256:4efa59fdbe318d55e6a452d85401db5d1aa4504f93739878bb40d8bb504af585
     .agents/skills/ui-ux-pro-max/SKILL.md: sha256:305a7527fcb2f5b6e4129ab22cd839b5172d26df7f14d3324bfdec8fc1763560
     .agents/skills/ui-ux-pro-max/data/app-interface.csv: sha256:2a17ef810dab715ce1f339861817a8fbe3ccc38142b70517301e874803e838ac
     .agents/skills/ui-ux-pro-max/data/charts.csv: sha256:a70ef7460b0eaaea8614f86a0d09a4bc38b467804179762464b5ca45b491baac
@@ -2421,190 +1914,6 @@ dependencies:
     .agents/skills/ui-ux-pro-max/scripts/search.py: sha256:69a349d69543f35f45a12c0c82922c550d1b0a16a2b37f6b1406afb2ad2919c8
     .agents/skills/ui-ux-pro-max/scripts/tests/test_core.py: sha256:ce60ac571164cf35e8c866550ad989fa686706a56fa48df4fdf76444b94fdd8d
     .agents/skills/ui-ux-pro-max/scripts/validate_data.py: sha256:f1b5e0916f3c2f8271416f93f6ff9ebf3311a68a943a19c1b83f16823cbb05a7
-    .claude/skills/brand/SKILL.md: sha256:6a450ee1a83a403d47cec2ede9030feb60a67a81fc425d2406e975339313bd44
-    .claude/skills/brand/references/approval-checklist.md: sha256:4bf8549687f53a7b9684005b4b87de93c26f018e00609b4c506a5812abd13d20
-    .claude/skills/brand/references/asset-organization.md: sha256:de98123417e9c5a1cc71a78131bba979c4c8ed2e5289e6c7a7f166576e488101
-    .claude/skills/brand/references/brand-guideline-template.md: sha256:392db8cf10fef492221c15a86e68590074bf5716de1f2982f41c01fbe30567cc
-    .claude/skills/brand/references/color-palette-management.md: sha256:c429298ffe3955edb8b22c9f51426fef75e83d02848cd4300e89c0d3fc34b44a
-    .claude/skills/brand/references/consistency-checklist.md: sha256:56d8b2d4852cda11e600adec4b9dd68fc89a1b8265382359953bec5c5e5e2c36
-    .claude/skills/brand/references/logo-usage-rules.md: sha256:044c5ddf30cfe0eea047451cfce6ea654939198ffdd8968a19161c97066a5a26
-    .claude/skills/brand/references/messaging-framework.md: sha256:24b2500a72867b55dd10f4bf359178b0eb347fddd852659ce47b69d9f597d4e6
-    .claude/skills/brand/references/typography-specifications.md: sha256:921c3d9e6ddfde2677b9a3e32eee94c7922f54f22c1f380c5ed2eb25a7d5bfa9
-    .claude/skills/brand/references/update.md: sha256:537cb55ebe260e1de127bd6288b19d8d7b15b6c893545442a58b739cbd342b37
-    .claude/skills/brand/references/visual-identity.md: sha256:63f0cfc5d95403d8e12aca4d839cc28471515574d9a431334bfbb96c15407c31
-    .claude/skills/brand/references/voice-framework.md: sha256:08c15ac79f81cd964c5efbe593131b61a093c7e1b060d5dd28b17f3cc5b331fb
-    .claude/skills/brand/scripts/extract-colors.cjs: sha256:36d21f3905e5762cfc8054b3f3b7276f6bc656884fe57c6bfa539526044778ed
-    .claude/skills/brand/scripts/inject-brand-context.cjs: sha256:5b98abdeb5c636f247102cd235f1d3421db7a4de53fd853360feaa0c471b5c96
-    .claude/skills/brand/scripts/sync-brand-to-tokens.cjs: sha256:390a760570fdba6d6ecfdfd8907fc802b64659b6178f8920349b0c6a2c822106
-    .claude/skills/brand/scripts/tests/test_sync_brand_to_tokens.py: sha256:0ace0cf7c6a8c12c0b9154f317e847b1084eb00b065b6f22431e37b7c7e948d6
-    .claude/skills/brand/scripts/validate-asset.cjs: sha256:4546c9109fb0f4f767426508cb29e60d02b301f8897cf16d8e378b7ce9d997fc
-    .claude/skills/brand/templates/brand-guidelines-starter.md: sha256:d157a57b15f0b458c79636d11de42f3c89f03d8c0bbea1bdd3cf1c3542b2140d
-    .claude/skills/design-system/SKILL.md: sha256:655468bb723a6bc9d17fcb09a6a005e10e313d63b879f4d74fb2abdc3041ae3f
-    .claude/skills/design-system/data/slide-backgrounds.csv: sha256:d1bb701b87bef493d72974d6fac1087c8ba4e2df14185fe3e0c36a13fe35f3d1
-    .claude/skills/design-system/data/slide-charts.csv: sha256:12ef876cd76e67a6553444bfa2ebf1d5d4d6216289d34db052a6e87421135033
-    .claude/skills/design-system/data/slide-color-logic.csv: sha256:ea68c737075f1615b2a7e461e2878c06bfe8f803dcabfbcc2977ffe5f9ec9ded
-    .claude/skills/design-system/data/slide-copy.csv: sha256:43152937a0e598b3fbfdd418684311c105d44e3c5b333703ddb0b8cb28e40658
-    .claude/skills/design-system/data/slide-layout-logic.csv: sha256:26b5b75782d5aba89836c0479acd3111cc69b67853db9c2259b30ac1e966bc62
-    .claude/skills/design-system/data/slide-layouts.csv: sha256:95d558c1b7d2552d7a75402dc68facbd16125e574985851db5729d1145e14896
-    .claude/skills/design-system/data/slide-strategies.csv: sha256:f656be0ab0b3a85fa7fc74202e9701a7236220412d67d5f63eb6dbb100bb2639
-    .claude/skills/design-system/data/slide-typography.csv: sha256:b96cd11dd4ff1dea8a9454b0b9e898e7f82f9243182f8f237af1f2c9b8824ce5
-    .claude/skills/design-system/references/component-specs.md: sha256:b265d979a741dd748d4e595e6898ae430faeef4f6d13d7a634fa6241b91d2da4
-    .claude/skills/design-system/references/component-tokens.md: sha256:e27f8f5999badee425c98235eabbd2cb3ebe2a1a364766d5c7a6b3134ceaaec8
-    .claude/skills/design-system/references/primitive-tokens.md: sha256:91e6caa12646c08c8aadf8e09399aed65760a25c8d80595936d81a9131118fc3
-    .claude/skills/design-system/references/semantic-tokens.md: sha256:97e16d8061bbc22e82b51966a7015e3fc990932902e4647843506669a1cdebcc
-    .claude/skills/design-system/references/states-and-variants.md: sha256:8dacb95d57d4bb37d8a99cc55515ff26da272056f837d29abc74aedcaa3ba104
-    .claude/skills/design-system/references/tailwind-integration.md: sha256:6d01092db1479dbd2060567b4232bb2b4bc16e89730ab07e1f87a3e7f5c406b9
-    .claude/skills/design-system/references/token-architecture.md: sha256:925f4049c4c4313d9fd5df98cdfd52004112aca49fba1664ad85e76bc9dce4d3
-    .claude/skills/design-system/scripts/embed-tokens.cjs: sha256:23a9ce214e3c0d2fb4c5442b3bf1222c66721f7988a181ab29dcb549a5e5f511
-    .claude/skills/design-system/scripts/fetch-background.py: sha256:cecedad0a9054e6e65f31ab7ba7d07eb6af2179e237c5632bc962dad69fd6d66
-    .claude/skills/design-system/scripts/generate-slide.py: sha256:0463c98efea54870816925015fe5819e42a29aaba57408c2c38bacb33e2605b9
-    .claude/skills/design-system/scripts/generate-tokens.cjs: sha256:aac8a0f4ec4dccf0d371f9ee5a9111e44977bb0cad7e40a3754aba5571aa1231
-    .claude/skills/design-system/scripts/html-token-validator.py: sha256:9556a65e7aacda23388478294ee9a5cb84b315d964fbbf754aa0dcdbcfee58e6
-    .claude/skills/design-system/scripts/search-slides.py: sha256:fded9548bc1bbe1303da67fabe34006c6a7c57934c9d171ea3dc3eb5f6eee010
-    .claude/skills/design-system/scripts/slide-token-validator.py: sha256:66da5da5e8e659d405a89b342e13dd1e469e79726c46002d9d2368c3c7aaf945
-    .claude/skills/design-system/scripts/slide_search_core.py: sha256:2464050ae338eb50728086046b644845fa7ae943f32efead3908fdbe1473edbe
-    .claude/skills/design-system/scripts/tests/test_validate_tokens.py: sha256:a32f34a9e89542a341b6ff3ee4392494b48dea622b22b99652d3cf0c1a1ee966
-    .claude/skills/design-system/scripts/validate-tokens.cjs: sha256:65f03a29290b9029d8cc27537701f226de7bcffc303b3bc361648fadfa09b77d
-    .claude/skills/design-system/templates/design-tokens-starter.json: sha256:5444f477b06bab9c72e2cc289d4a9104efef653391c9639972bcb712d5f2d81e
-    .claude/skills/design/SKILL.md: sha256:413f4ab913d07f7fd92acbadc25d71aad63443be0c40d11234944aea688603b6
-    .claude/skills/design/data/cip/deliverables.csv: sha256:229912f35c2f5a790508ddd62270cc7a92a84694027025ea5a30f1fb5ba84b70
-    .claude/skills/design/data/cip/industries.csv: sha256:729b1dea6d6f39b0bc22a1e659584e7ca5cead75841146d599c9f8dc00d4da46
-    .claude/skills/design/data/cip/mockup-contexts.csv: sha256:15d61cef16e6746d5aa665976f4de8074fedb64bfc5c7313a40eec1112a1d499
-    .claude/skills/design/data/cip/styles.csv: sha256:4e7f9e209bc90b60df62fd9843a1a73b365e54161dbd820b82817a8e512af4c4
-    .claude/skills/design/data/icon/styles.csv: sha256:a4aa7d326ffe1e50961eb70e25a6351f45c0247cd245461fa1a27cdc72f903b4
-    .claude/skills/design/data/logo/colors.csv: sha256:d60218f0705bb0f0b892a10468a5c8d9a44eef3d0262ef8df8970ba3fbab567a
-    .claude/skills/design/data/logo/industries.csv: sha256:e58dda4b9d28851f70914f82c1d2a2cff626a991ca41076f64122f33cc8a6525
-    .claude/skills/design/data/logo/styles.csv: sha256:ea08bdfb7aa557f08d1b6299222423f948700f8e4029321acb58c8f83197bdf2
-    .claude/skills/design/references/banner-sizes-and-styles.md: sha256:c8906fb1073a576ee8c680d9bc8586249cbc4ed36690da960d65a1c9c37143b7
-    .claude/skills/design/references/cip-deliverable-guide.md: sha256:1424e120b967288e2334f24fcfa5cdc7f238420326a7444f4c5597efecfabc41
-    .claude/skills/design/references/cip-design.md: sha256:47a3b2e445bc07185edd0cd24ba8a417229baf86717dcdff7c4e403adbceb3f1
-    .claude/skills/design/references/cip-prompt-engineering.md: sha256:4bf3a0c858f38c230e43e872857b72d9eb692e066e8de5920da75aac733e753c
-    .claude/skills/design/references/cip-style-guide.md: sha256:f3e15408cd981e93804440c1159c12e02d001bc37a3945f455b3fc13729ed4e1
-    .claude/skills/design/references/design-routing.md: sha256:32914a913f4f20d4cb1e497e5a87cfc04b71af4e6d75db72ecf50e4f060201c8
-    .claude/skills/design/references/icon-design.md: sha256:39281931d070918b4e51ecd71054da99493cabe06a07dfa8f1f682e48637c83f
-    .claude/skills/design/references/logo-color-psychology.md: sha256:3fd0e93e24c3b2ea7f3be778e8f2d03b1c62c7c6eab3ade478c8fca332bff287
-    .claude/skills/design/references/logo-design.md: sha256:2e845fe165c845fd9582c1d74204fa31de607380982a6ea0b5f8db4e293afa3a
-    .claude/skills/design/references/logo-prompt-engineering.md: sha256:e50f55bf323263eb27b4cd4c5172383a787fb894581d5d2befb3f6e0180b253e
-    .claude/skills/design/references/logo-style-guide.md: sha256:611baa841eedab101f45c113c6bfbd4d7e16e859c9d6ebd2cf941827a6e8dd15
-    .claude/skills/design/references/slides-copywriting-formulas.md: sha256:03733d5916ab771834745550045b736deeb94a08226f2b200f7953009c35b219
-    .claude/skills/design/references/slides-create.md: sha256:792d647a5d4f87d765cf417f7ac54dd0b2fc4d229cc23ea9df56282d4c1ee086
-    .claude/skills/design/references/slides-html-template.md: sha256:fd5b051a37365fc6059c75bb388ec6f64daf1bd9ae938b287b6d762dc83c0c35
-    .claude/skills/design/references/slides-layout-patterns.md: sha256:0a967ca3bd829d3234e6f1802bade6c76447fabbaddbc8117c41adbae7dfb6df
-    .claude/skills/design/references/slides-strategies.md: sha256:27ee3e53ffa0ea679ec83ebeacb0bcfbce498df57277e99f574b9c139dc44286
-    .claude/skills/design/references/slides.md: sha256:5630d5daec947ff58ab1ac97c7a1ee77a21cf6f5dce5155535b65d291691979f
-    .claude/skills/design/references/social-photos-design.md: sha256:2544c143ff3a4471a775e2271797a3871480f94de91b267178da92e8952192a0
-    .claude/skills/design/scripts/cip/core.py: sha256:78a78a51f12d2382b2854414df395dc62b68532626ef724ddd5de713507911e4
-    .claude/skills/design/scripts/cip/generate.py: sha256:2745040c9b534cf4113d2f7f4d7a52bc96a9fbfa12204c4f8460be4e15449069
-    .claude/skills/design/scripts/cip/render-html.py: sha256:a49a89a017ea4a2c492438055f05dfba3dfb4f91563f5f913359939beeaeccab
-    .claude/skills/design/scripts/cip/search.py: sha256:6619fbbe71983003a858c5eb79bc59c607b342610a1178b6976c687c2932161b
-    .claude/skills/design/scripts/icon/generate.py: sha256:1a6be99dc233f6d9f8b558c26148203418be5b47c677cd83e48e41e78e38780c
-    .claude/skills/design/scripts/logo/core.py: sha256:4f8b36ffe538e5995d0e0b740053a0899a1adf445ffdf484bd47f94e71ade8d0
-    .claude/skills/design/scripts/logo/generate.py: sha256:6e4358f21cd85fec51c8d01b03e3696d6db180815309d7e10a19c623d4d4462c
-    .claude/skills/design/scripts/logo/search.py: sha256:693b3a1824831f120d4c60ed72477847604da1f6b654343381f8e9d3800a28f2
-    .claude/skills/slides/SKILL.md: sha256:2b90bdaf63f231919a01f4962f374ecd84af101a7e7545f8d9c68e049025accb
-    .claude/skills/slides/references/copywriting-formulas.md: sha256:03733d5916ab771834745550045b736deeb94a08226f2b200f7953009c35b219
-    .claude/skills/slides/references/create.md: sha256:792d647a5d4f87d765cf417f7ac54dd0b2fc4d229cc23ea9df56282d4c1ee086
-    .claude/skills/slides/references/html-template.md: sha256:fd5b051a37365fc6059c75bb388ec6f64daf1bd9ae938b287b6d762dc83c0c35
-    .claude/skills/slides/references/layout-patterns.md: sha256:0a967ca3bd829d3234e6f1802bade6c76447fabbaddbc8117c41adbae7dfb6df
-    .claude/skills/slides/references/slide-strategies.md: sha256:27ee3e53ffa0ea679ec83ebeacb0bcfbce498df57277e99f574b9c139dc44286
-    .claude/skills/ui-styling/LICENSE.txt: sha256:58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd
-    .claude/skills/ui-styling/SKILL.md: sha256:f8b6c3832d2af51f67b3932e3c4a79bcd8a8596cc61ce1547a686fc951e5c62d
-    .claude/skills/ui-styling/canvas-fonts/ArsenalSC-OFL.txt: sha256:8ddd61b18ba2c0d0dbe4a691cf5f1a0673f473d02fa0546e67ee88c006aeff6e
-    .claude/skills/ui-styling/canvas-fonts/ArsenalSC-Regular.ttf: sha256:65e6f89df58f68fd905b3add34a79dd6106aa3b3044df0dad9676fff53d504b9
-    .claude/skills/ui-styling/canvas-fonts/BigShoulders-Bold.ttf: sha256:b43bcd198b9fdf717dd42aa61a34dba32e01aceaeae659d689afd0ca52c37ea2
-    .claude/skills/ui-styling/canvas-fonts/BigShoulders-OFL.txt: sha256:fbc746aabf0eb1847dfd92e2efc4596d79fa897d60b8e64062a22f585508fb3f
-    .claude/skills/ui-styling/canvas-fonts/BigShoulders-Regular.ttf: sha256:18a879fc71978a4447150705caf880a9da3860083c259fd29e6dc03057b6842a
-    .claude/skills/ui-styling/canvas-fonts/Boldonse-OFL.txt: sha256:45cc82ab4032273c0924025ffcf8f0665a68e1a5955e3f7247e5daf1deeb1326
-    .claude/skills/ui-styling/canvas-fonts/Boldonse-Regular.ttf: sha256:cc2e540604565c0f90a7d8d46194a2f42fc9c45512cd2e39bf03b50eb68c35a4
-    .claude/skills/ui-styling/canvas-fonts/BricolageGrotesque-Bold.ttf: sha256:a737b146fe0d77ffe8a86e3cd16700dd431d3b1e420d4fd80e142cd68a1cb50d
-    .claude/skills/ui-styling/canvas-fonts/BricolageGrotesque-OFL.txt: sha256:0e4f4eb8534bc66a76aca13dd19c1f9731b2008866b29ccff182b764649df9b4
-    .claude/skills/ui-styling/canvas-fonts/BricolageGrotesque-Regular.ttf: sha256:972a6d098c9867ae131d0ea99e221e63976b11a19d4b931c2c7ace525674e4f6
-    .claude/skills/ui-styling/canvas-fonts/CrimsonPro-Bold.ttf: sha256:48f191e38355c8db100eb3ce157c20f9302a3b9a37b44a660f77ecfce3986609
-    .claude/skills/ui-styling/canvas-fonts/CrimsonPro-Italic.ttf: sha256:52318db3526b644e6efa60be0b3ca5a50e40fbe8bd026c261e0aa206f0772267
-    .claude/skills/ui-styling/canvas-fonts/CrimsonPro-OFL.txt: sha256:35680d14547b6748b6f362a052a46d22764ce5eccf96e18b74f567bb2ee58114
-    .claude/skills/ui-styling/canvas-fonts/CrimsonPro-Regular.ttf: sha256:48fad08cb1917a7b2f2c6fe5135d6c07743a6663cf7631ec4481108aaf081422
-    .claude/skills/ui-styling/canvas-fonts/DMMono-OFL.txt: sha256:bfe7842fcb88323e2981e24710c25202677385a8c75fb6a87217b275a0247ae3
-    .claude/skills/ui-styling/canvas-fonts/DMMono-Regular.ttf: sha256:f98ada968dc3b6b2c08d3f5caaf266977df0bfe0929372b93df5a06cf2ace450
-    .claude/skills/ui-styling/canvas-fonts/EricaOne-OFL.txt: sha256:e0de629968b52255548d5fafcf30b24ff9edae0eda362380755a75816404d0fa
-    .claude/skills/ui-styling/canvas-fonts/EricaOne-Regular.ttf: sha256:db1d89e80e33a8a01beaaac7a85df582857d24a43f1e181461aa7ff5d701476a
-    .claude/skills/ui-styling/canvas-fonts/GeistMono-Bold.ttf: sha256:75c0828d5c1ee44b9ef9f4df577bf41595ec362e2ea3f1e558590c9e92c7949d
-    .claude/skills/ui-styling/canvas-fonts/GeistMono-OFL.txt: sha256:6a873c900f584109b13ae0aaf81d6e3cf0a68751a216b03f7b6c68d547057bb4
-    .claude/skills/ui-styling/canvas-fonts/GeistMono-Regular.ttf: sha256:a55c1b51cda4afeab9e471e7947b85a20f7c8831d7e6b1470c1b7fbdc0f0f15e
-    .claude/skills/ui-styling/canvas-fonts/Gloock-OFL.txt: sha256:c0a3f3125ac491ef3d1f09f401be4834c646562f647e44f2bcbc49f0466c656d
-    .claude/skills/ui-styling/canvas-fonts/Gloock-Regular.ttf: sha256:e86b4ce66dbd3f1f83eee8db99ec96e0da1128c3f53df0e9b3b7472025dfe960
-    .claude/skills/ui-styling/canvas-fonts/IBMPlexMono-Bold.ttf: sha256:dbd2a2fb024579438d6400a84e57579bfd2dbe67c306c8fd9fde92a61e4f2eea
-    .claude/skills/ui-styling/canvas-fonts/IBMPlexMono-OFL.txt: sha256:5294ce778857e1eb02e830b6ab06435537d38f43055327e73d03a2d4d57d5123
-    .claude/skills/ui-styling/canvas-fonts/IBMPlexMono-Regular.ttf: sha256:ab08018ccd276b79fb2c636bb95b9c543598f9d50505fe92506fcb4dae7810cd
-    .claude/skills/ui-styling/canvas-fonts/IBMPlexSerif-Bold.ttf: sha256:b8d294e9b5c5a0940f167c3ced0f7ef2e3f57082ca3ff096ef30e86e26c1c159
-    .claude/skills/ui-styling/canvas-fonts/IBMPlexSerif-BoldItalic.ttf: sha256:da64b75f4284f53e7b5c71fa190a35b8bf3494fe19f1804c81c3a53340bca570
-    .claude/skills/ui-styling/canvas-fonts/IBMPlexSerif-Italic.ttf: sha256:b11f1048745e715a55c9d837b3f10226ca3d78867b7db7251ddad8f98dcf0f38
-    .claude/skills/ui-styling/canvas-fonts/IBMPlexSerif-Regular.ttf: sha256:77cd233a2af8dc6b1022faea3bb3b01f3c75af68bcf530cb6aeb15982ff3dbb7
-    .claude/skills/ui-styling/canvas-fonts/InstrumentSans-Bold.ttf: sha256:444f85bf1c4b0e1ce1ca624f6be54bcd832207714ccaf4ea99ee531341683bdf
-    .claude/skills/ui-styling/canvas-fonts/InstrumentSans-BoldItalic.ttf: sha256:3762f6cef95d6039489ad5ba5787d4c30f17a1ad01e9ac3c816ed69692722a68
-    .claude/skills/ui-styling/canvas-fonts/InstrumentSans-Italic.ttf: sha256:78e85858e371b2cb4e18f617c10f0f937c0e12a0887ffee98555b24ed305b3a7
-    .claude/skills/ui-styling/canvas-fonts/InstrumentSans-OFL.txt: sha256:bf4dc6d13a8cccd4807133c77a1ee9619a16b92cb23322258725ab6731c2f6e5
-    .claude/skills/ui-styling/canvas-fonts/InstrumentSans-Regular.ttf: sha256:a22cb26e48fd79bcb01bf2fc92d36785474dce36d9c544ab0a8868c2657c4a87
-    .claude/skills/ui-styling/canvas-fonts/InstrumentSerif-Italic.ttf: sha256:9c86e4d5a47b50224a2463a9eca8535835257c8e85c470c2c6b454b1af6f046e
-    .claude/skills/ui-styling/canvas-fonts/InstrumentSerif-Regular.ttf: sha256:56ac3be03ac3ba283196b3e77850ab2ffcf56cfb6fd3212c5620109a972f8c99
-    .claude/skills/ui-styling/canvas-fonts/Italiana-OFL.txt: sha256:8373b11312ace78c4cec2e8f9f6aa9f2330601107dac7bcf899c6f2dbd40c5a5
-    .claude/skills/ui-styling/canvas-fonts/Italiana-Regular.ttf: sha256:15c4dd6ab8cf4a29ba8826f65edcbe2f6c266c557d34d081f25072dfd5605fd2
-    .claude/skills/ui-styling/canvas-fonts/JetBrainsMono-Bold.ttf: sha256:a2349098b9e45419e7bf0e2958d6c4937a049dded37387b08be725be4c7615f3
-    .claude/skills/ui-styling/canvas-fonts/JetBrainsMono-OFL.txt: sha256:a76abf002c49097d146e86740a3105a5d00450b1592e820a1109a8c5680cd697
-    .claude/skills/ui-styling/canvas-fonts/JetBrainsMono-Regular.ttf: sha256:b6b1ff4ddefe36d7f2a6174e1d001cab374e594519ee9049af028d577b64c5f5
-    .claude/skills/ui-styling/canvas-fonts/Jura-Light.ttf: sha256:c891a381df056b2c4dfe85841e911bf45da0890fa21a7b2692cbe5ea1f505e1e
-    .claude/skills/ui-styling/canvas-fonts/Jura-Medium.ttf: sha256:c72965cb732a92872643819fd1734128238583cc36b116313859137a51d3368a
-    .claude/skills/ui-styling/canvas-fonts/Jura-OFL.txt: sha256:eaf9bdb675f6d87e5feb88199ab3ea581d3bd2082f426e384fa9c394576d7260
-    .claude/skills/ui-styling/canvas-fonts/LibreBaskerville-OFL.txt: sha256:55959eef5b0c3b2e3c1c7631b8ff0f9447d75de20f29cfa7db5bcfb026763343
-    .claude/skills/ui-styling/canvas-fonts/LibreBaskerville-Regular.ttf: sha256:2101302538d9e88adb679031c04623e4578b5745e89566284fd2c508d79acae0
-    .claude/skills/ui-styling/canvas-fonts/Lora-Bold.ttf: sha256:7d74015e950c2fb66519c7295b8155621d22200ae2ca2a4c6b43ce3c490cac87
-    .claude/skills/ui-styling/canvas-fonts/Lora-BoldItalic.ttf: sha256:152f87e71f5ddb60d5c57ecd9132807c947e65c42977193c9164e7c5a6690081
-    .claude/skills/ui-styling/canvas-fonts/Lora-Italic.ttf: sha256:be627e595184e8afe521f08da0607eee613f1997d423bc8dadc5798995581377
-    .claude/skills/ui-styling/canvas-fonts/Lora-OFL.txt: sha256:62e37a82d3f1ef2a70712885fa8b3144b65fd144d8e748d6196b690a354d792c
-    .claude/skills/ui-styling/canvas-fonts/Lora-Regular.ttf: sha256:7ed00e7c9cdf16ab7e2fd2361fe45d4f0b61263cd60aae398b27b7ee08108827
-    .claude/skills/ui-styling/canvas-fonts/NationalPark-Bold.ttf: sha256:69ac4c301c4a7233c6e602d12a92c54d7967b575f4449951c45ce773f7acff53
-    .claude/skills/ui-styling/canvas-fonts/NationalPark-OFL.txt: sha256:81c6c71d83b5b45d7344f96df12bb4a2477a5b092a9144757ee1d0f50f855175
-    .claude/skills/ui-styling/canvas-fonts/NationalPark-Regular.ttf: sha256:a477338b7e18308d476650dfe31235ef86a883572665e56ffb5fb80f82009b58
-    .claude/skills/ui-styling/canvas-fonts/NothingYouCouldDo-OFL.txt: sha256:7c2a6970584ddad04919816163746f83b378078015899b18468b40f05e9ce128
-    .claude/skills/ui-styling/canvas-fonts/NothingYouCouldDo-Regular.ttf: sha256:d866f985896d3280f4fce72db7e17302c24a0c1fdb0699b6b5ed3af14f944d57
-    .claude/skills/ui-styling/canvas-fonts/Outfit-Bold.ttf: sha256:6654b93d21301ec61887d3cedd6c11d9df1b1dfb63f9cf45ac7995f6e2235ab1
-    .claude/skills/ui-styling/canvas-fonts/Outfit-OFL.txt: sha256:1945b62cd76da9a3051a1660dde72afaa64ffc2666d30e7a78356d651653ba2f
-    .claude/skills/ui-styling/canvas-fonts/Outfit-Regular.ttf: sha256:f24945365147c9e783e91d8649959b59be6b00c9ee4ecd2f6b33afbb2dd871fe
-    .claude/skills/ui-styling/canvas-fonts/PixelifySans-Medium.ttf: sha256:38397504f71c122b03d234ea6f55118e3d5bdbddffd82bedddbd7755d3b3be82
-    .claude/skills/ui-styling/canvas-fonts/PixelifySans-OFL.txt: sha256:7f54d1d9f1ae1ba9f2722f978145f90324fea34ca3c2304b3a29cfa96ac6037e
-    .claude/skills/ui-styling/canvas-fonts/PoiretOne-OFL.txt: sha256:2eaf541f7eb8b512e4c757a5212060abf5b6edfef230e9d7640bf736b315c33a
-    .claude/skills/ui-styling/canvas-fonts/PoiretOne-Regular.ttf: sha256:9cf265b139648b36b6c0afdfeb0bf27f7e66db9a16094bc40f644d8da05bc318
-    .claude/skills/ui-styling/canvas-fonts/RedHatMono-Bold.ttf: sha256:7ef48353f4be5ddb90f000f6fad48f2b62b3e8c27d9818d8d45ff46c201065e0
-    .claude/skills/ui-styling/canvas-fonts/RedHatMono-OFL.txt: sha256:435fbfb7e66988b2a06686a4cb966faec733f35d8fe100a1601573c27f3e0bb8
-    .claude/skills/ui-styling/canvas-fonts/RedHatMono-Regular.ttf: sha256:452fe826871b37539f5212b20c87cf30f82f58dd2741f1c96edd1dcbdc0db6b4
-    .claude/skills/ui-styling/canvas-fonts/Silkscreen-OFL.txt: sha256:6b849745119bbe85ec01fd080c9cd50234da9f52ac6e48b55d1a424a0c4d7ca9
-    .claude/skills/ui-styling/canvas-fonts/Silkscreen-Regular.ttf: sha256:49567408600809e25147e9225ac4f37f410e2df45a750696c45027531fb65f1b
-    .claude/skills/ui-styling/canvas-fonts/SmoochSans-Medium.ttf: sha256:dd76e6e77cce82f827a8654cd906e9ce58f3aaf78adda63c4a7f655b8ecb41f0
-    .claude/skills/ui-styling/canvas-fonts/SmoochSans-OFL.txt: sha256:74c9c4eb88e891483e1b7bc54780b452cbf4f4df66d4e71881d7569aa2130749
-    .claude/skills/ui-styling/canvas-fonts/Tektur-Medium.ttf: sha256:52bbe8c9b057b3d2da4eeace31a524b1ea26a1375ae34319cf6900ccc57a4c82
-    .claude/skills/ui-styling/canvas-fonts/Tektur-OFL.txt: sha256:3f1466cb5438f31782eeb6e895f3a655bc4d090e24263e331f555357d1cb734e
-    .claude/skills/ui-styling/canvas-fonts/Tektur-Regular.ttf: sha256:162e1b36c4718c5b051b36c971ad7e50d341944f35618f480422ebbe72988f98
-    .claude/skills/ui-styling/canvas-fonts/WorkSans-Bold.ttf: sha256:240d125fc9f8561363dc1ea3f513501253bd70942f41468f48f0b0cafb0c82e2
-    .claude/skills/ui-styling/canvas-fonts/WorkSans-BoldItalic.ttf: sha256:a5b2cad813df0aaa7d16621f2e93b5117c25e9bc788bc9a3ad218e9d6348ce34
-    .claude/skills/ui-styling/canvas-fonts/WorkSans-Italic.ttf: sha256:6b7f7002e0b0c8b261fe878658ef5551e3e59d9f6b609b04efb90dde1e2c1ada
-    .claude/skills/ui-styling/canvas-fonts/WorkSans-OFL.txt: sha256:ace8c22a3326318b54e67c3691857929634205533f454a70ef5a3473ddb2e2ba
-    .claude/skills/ui-styling/canvas-fonts/WorkSans-Regular.ttf: sha256:e67985a843df0d3cdee51a3d0f329eb1774a344ad9ff0c9ab923751f1577e2a4
-    .claude/skills/ui-styling/canvas-fonts/YoungSerif-OFL.txt: sha256:cdcb8039606b40a027a6d24586ec62d5fe29c701343d82a048c829cb28a3dd28
-    .claude/skills/ui-styling/canvas-fonts/YoungSerif-Regular.ttf: sha256:f8dc08f77abad753a00670af70756a8ace938e5c3f0b770f4f4c2071c4bd8fc6
-    .claude/skills/ui-styling/references/canvas-design-system.md: sha256:f5de85ff39d9f3a8275c4164b921ba72d5e1d34b8d7a9243d9ee34b3870a4f5f
-    .claude/skills/ui-styling/references/shadcn-accessibility.md: sha256:a22cd4ccf82b635b2b2c4f12416a0c4f7edcd825d219d6089450fa797a0d9511
-    .claude/skills/ui-styling/references/shadcn-components.md: sha256:79c4f91cbf68993a43fa3a95889c35db73de45bdd3dfd83a6830863c01aa598a
-    .claude/skills/ui-styling/references/shadcn-theming.md: sha256:d17d641474221123ff0e0288043ca2f2dab3ac96908a19eed28d82f9e58865ed
-    .claude/skills/ui-styling/references/tailwind-customization.md: sha256:4c5adeed6263a274f74f6eb2c816ca420fd6ef4f35683582988bacd404799afe
-    .claude/skills/ui-styling/references/tailwind-responsive.md: sha256:8d00ae620df26daea4623c7bf996d6e612e09d359305fcfa2b40cab757ed840c
-    .claude/skills/ui-styling/references/tailwind-utilities.md: sha256:aba1c40ef84f43beea142ae310371e332541f39d973df90a71f1854823effda1
-    .claude/skills/ui-styling/scripts/.coverage: sha256:a1f68d7a1d6322975c40c893004bc5e811d455d3ab124dab5154aad7060e66f5
-    .claude/skills/ui-styling/scripts/requirements.txt: sha256:09402d2d274248e18bb5fd0a0267fd7cbf99b7a2440e73e87f054aa8f259f9da
-    .claude/skills/ui-styling/scripts/shadcn_add.py: sha256:0c11d28ce9f12217df2c3306f24ae1f73527d5116db63707ab55cbe1a8bcf28c
-    .claude/skills/ui-styling/scripts/tailwind_config_gen.py: sha256:2e264ec871499681aecd6111f60743fba31b5ceb7e9ccb2b71b7346039285f89
-    .claude/skills/ui-styling/scripts/tests/coverage-ui.json: sha256:33bdc1f5998db9a38cac8e6128a82711f8f8b65fbb3dcb0c1680ae260441cbce
-    .claude/skills/ui-styling/scripts/tests/requirements.txt: sha256:80846c98ee02a7e9651ec4eee6709f840b785646b469aad5284ab7ab9b344f17
-    .claude/skills/ui-styling/scripts/tests/test_shadcn_add.py: sha256:4012b1efe1e51a5dcf31078b0d9069f92cfe2045e9a35dd52fdd4631b1815150
-    .claude/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py: sha256:4efa59fdbe318d55e6a452d85401db5d1aa4504f93739878bb40d8bb504af585
     .claude/skills/ui-ux-pro-max/SKILL.md: sha256:305a7527fcb2f5b6e4129ab22cd839b5172d26df7f14d3324bfdec8fc1763560
     .claude/skills/ui-ux-pro-max/data/app-interface.csv: sha256:2a17ef810dab715ce1f339861817a8fbe3ccc38142b70517301e874803e838ac
     .claude/skills/ui-ux-pro-max/data/charts.csv: sha256:a70ef7460b0eaaea8614f86a0d09a4bc38b467804179762464b5ca45b491baac
@@ -2650,11 +1959,6 @@ dependencies:
     .claude/skills/ui-ux-pro-max/scripts/validate_data.py: sha256:f1b5e0916f3c2f8271416f93f6ff9ebf3311a68a943a19c1b83f16823cbb05a7
   content_hash: sha256:365ed3a4db62464f2f359c60cac89b7bfdb87128ad5bd07ed69f8c7ba8969b49
   skill_subset:
-  - brand
-  - design
-  - design-system
-  - slides
-  - ui-styling
   - ui-ux-pro-max
   declared_license: MIT
 - repo_url: obra/superpowers
@@ -3177,7 +2481,7 @@ dependencies:
 - repo_url: vercel-labs/agent-browser
   name: agent-browser
   host: github.com
-  resolved_commit: 3591f0f4b719c94bcb9aec83ebe811c5dd7f587a
+  resolved_commit: e40e62d7c8378549646c9a36615c0a960a1378e8
   version: 1.0.0
   virtual_path: skills/agent-browser
   is_virtual: true
