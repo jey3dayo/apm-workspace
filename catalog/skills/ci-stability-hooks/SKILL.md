@@ -65,6 +65,7 @@ When adding or updating Lefthook:
 - If the repo already uses `pnpm.onlyBuiltDependencies`, include `lefthook` there when needed for install stability.
 - Preserve `.pre-commit-config.yaml` during a migration unless the user explicitly asks to remove it.
 - Remember that `lefthook run` can synchronize `.git/hooks` and `stage_fixed: true` can stage modified files. Report that side effect when it occurs.
+- If a Lefthook child exits but the hook process remains or Ctrl-C does not return, set `piped: true` on that hook; verify a known-failing job returns nonzero and leaves no hook or child process behind.
 
 Example shape, adapt commands to the repository:
 
