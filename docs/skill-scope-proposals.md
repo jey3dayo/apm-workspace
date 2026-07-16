@@ -59,7 +59,7 @@
 - 作業の安全性・検証: `systematic-debugging`, `verification-before-completion`,
   `test-driven-development`, `code-review`, `git-worktree`, `writing-plans`
 - 横断的な調査・環境: `jina-web-research`, `cross-research`, `mcp-tools`, `mise`,
-  `headroom`, `pc-ops`, `macos-troubleshooting`
+  `headroom`
 - 個人環境・認証運用: `1password-item-ops`, `perman-aws-vault`
 - ワークスペース運用: `caad-skill-deployer`, `work-log-maintenance`,
   `japanese-tech-writing`, `humanizer-ja`
