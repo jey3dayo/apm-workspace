@@ -22,11 +22,12 @@ dependencies:
     - anthropics/claude-code/plugins/frontend-design/skills/frontend-design
     - browser-use/browser-harness
     - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review#b8f2564c2e8da66b331c1dd63c2a2925d6739961
-    - emilkowalski/skills/skills/emil-design-eng
-    - emilkowalski/skills/skills/review-animations
-    - emilkowalski/skills/skills/improve-animations
     - emilkowalski/skills/skills/animation-vocabulary
+    - emilkowalski/skills/skills/apple-design
+    - emilkowalski/skills/skills/emil-design-eng
     - emilkowalski/skills/skills/find-animation-opportunities
+    - emilkowalski/skills/skills/improve-animations
+    - emilkowalski/skills/skills/review-animations
     - gonta223/humanizer-ja
     - ibelick/ui-skills/skills/baseline-ui
     - ibelick/ui-skills/skills/fixing-accessibility
