@@ -2313,10 +2313,6 @@ dependencies:
   - .agents/skills/review-plan
   - .agents/skills/review-plan/SKILL.md
   - .agents/skills/review-plan/agents/openai.yaml
-  - .agents/skills/rtk
-  - .agents/skills/rtk/SKILL.md
-  - .agents/skills/rtk/agents/openai.yaml
-  - .agents/skills/rtk/references/command-reference.md
   - .agents/skills/rules-creator
   - .agents/skills/rules-creator/SKILL.md
   - .agents/skills/rules-creator/references/rules-system.md
@@ -2535,10 +2531,6 @@ dependencies:
   - .claude/skills/review-plan
   - .claude/skills/review-plan/SKILL.md
   - .claude/skills/review-plan/agents/openai.yaml
-  - .claude/skills/rtk
-  - .claude/skills/rtk/SKILL.md
-  - .claude/skills/rtk/agents/openai.yaml
-  - .claude/skills/rtk/references/command-reference.md
   - .claude/skills/rules-creator
   - .claude/skills/rules-creator/SKILL.md
   - .claude/skills/rules-creator/references/rules-system.md
@@ -2727,9 +2719,6 @@ dependencies:
     .agents/skills/review-fix-loop/agents/openai.yaml: sha256:2ebea0b8282c864b31d92a942df6e46c9b6ab54a2bd51e38878c7f732ec3004d
     .agents/skills/review-plan/SKILL.md: sha256:52546313f3e4df277e2e1739a29b051ccb2466d4693ace191c09aa69aa58214f
     .agents/skills/review-plan/agents/openai.yaml: sha256:c8262db2188dc19436254c472b3fa8666beacde78db684eff4852c2089c9b995
-    .agents/skills/rtk/SKILL.md: sha256:c6840ba09b97ca3c0826553ed9a22405af1fab3dd789621ba14c5bee8d6a2318
-    .agents/skills/rtk/agents/openai.yaml: sha256:5a21360717bfc36ec38ef12f17f45849c496fd002300a9fd7a6badb60d0e4647
-    .agents/skills/rtk/references/command-reference.md: sha256:1b8437c2ad69891a7229b7887e518b11082448ffd75e6e964416124596263477
     .agents/skills/rules-creator/SKILL.md: sha256:b9617252cf4f5ae8bf53bbb0a0616a4f6e09ba81533411eb51d82715ce970717
     .agents/skills/rules-creator/references/rules-system.md: sha256:d238b9765103e3edca2645e38aebdf424da1890ca12a420a7dc523333be36308
     .agents/skills/rules-creator/resources/checklist.md: sha256:275dca37210bf1d3c79c361fa60ce575ef4fe771d44690aa95a8615d053541a7
@@ -2913,9 +2902,6 @@ dependencies:
     .claude/skills/review-fix-loop/agents/openai.yaml: sha256:2ebea0b8282c864b31d92a942df6e46c9b6ab54a2bd51e38878c7f732ec3004d
     .claude/skills/review-plan/SKILL.md: sha256:52546313f3e4df277e2e1739a29b051ccb2466d4693ace191c09aa69aa58214f
     .claude/skills/review-plan/agents/openai.yaml: sha256:c8262db2188dc19436254c472b3fa8666beacde78db684eff4852c2089c9b995
-    .claude/skills/rtk/SKILL.md: sha256:c6840ba09b97ca3c0826553ed9a22405af1fab3dd789621ba14c5bee8d6a2318
-    .claude/skills/rtk/agents/openai.yaml: sha256:5a21360717bfc36ec38ef12f17f45849c496fd002300a9fd7a6badb60d0e4647
-    .claude/skills/rtk/references/command-reference.md: sha256:1b8437c2ad69891a7229b7887e518b11082448ffd75e6e964416124596263477
     .claude/skills/rules-creator/SKILL.md: sha256:b9617252cf4f5ae8bf53bbb0a0616a4f6e09ba81533411eb51d82715ce970717
     .claude/skills/rules-creator/references/rules-system.md: sha256:d238b9765103e3edca2645e38aebdf424da1890ca12a420a7dc523333be36308
     .claude/skills/rules-creator/resources/checklist.md: sha256:275dca37210bf1d3c79c361fa60ce575ef4fe771d44690aa95a8615d053541a7

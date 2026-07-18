@@ -1,4 +1,0 @@
-interface:
-  display_name: "RTK CLI Proxy"
-  short_description: "Guide for compressing CLI noise with RTK"
-  default_prompt: "Use $rtk only when the user explicitly asks about RTK, manual RTK evaluation, or existing RTK filter maintenance."

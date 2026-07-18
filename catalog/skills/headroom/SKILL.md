@@ -12,9 +12,6 @@ Headroom is a local-first context compression layer for AI agents. Use it when y
 Treat Headroom as model-facing context compression:
 
 - Headroom compresses model-facing context through MCP, proxy, library, or agent wrapping.
-- RTK, when intentionally enabled, compresses CLI command output before it enters the agent transcript.
-
-Use RTK only when the user explicitly asks for it or when a specific workflow still benefits from CLI-output filtering. Do not treat RTK as the default companion to Headroom.
 
 ## Supported Local Targets
 
@@ -49,7 +46,7 @@ Use Headroom when the user asks for:
 - token reduction beyond CLI output filtering
 - cross-agent memory or reversible retrieval experiments
 
-For normal tests, builds, git, package manager, and log commands, prefer raw commands or tool-native quiet options unless the user explicitly asks to involve RTK.
+For normal tests, builds, git, package manager, and log commands, prefer raw commands or tool-native quiet options.
 
 ## Guardrails
 

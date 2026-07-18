@@ -140,7 +140,7 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 - If the request is to add an MCP server through APM, apply the same scope rule: use `apm install -g --mcp <name> ...` only for cross-repo foundation MCPs; use repo-local `apm install --mcp <name> ...` for project, framework, UI, database, browser, or app-runtime-specific MCPs.
 - If MCP placement, server selection, credentials, transport, or startup behavior is the main question, coordinate with `mcp-tools`; keep this skill focused on APM ownership, source of truth, and rollout commands.
 - If the APM workspace has no repo-local MCP distribution lane for a target repository, record the intended placement as guidance and keep the global manifest lightweight. Treat implementing repo-local MCP distribution as a separate workspace-mechanics task.
-- If the request is "enable Headroom MCP" or "compare Headroom with RTK", treat the Headroom MCP server as a global foundation managed through the `mcp:` section of `~/.apm/apm.yml`. Keep the Headroom binary itself managed by user-global `~/.config/mise`, and use the `headroom` skill for usage guidance; do not add Headroom to repo-local `mise.toml`.
+- If the request is "enable Headroom MCP", treat the Headroom MCP server as a global foundation managed through the `mcp:` section of `~/.apm/apm.yml`. Keep the Headroom binary itself managed by user-global `~/.config/mise`, and use the `headroom` skill for usage guidance; do not add Headroom to repo-local `mise.toml`.
 - If the request is "change only workspace docs or notes", edit the workspace files directly and do not restage the catalog unless `catalog/**` changed too.
 
 ## Repo-Local MCP Recommendations
