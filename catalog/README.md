@@ -4,7 +4,8 @@ This directory contains the managed catalog for the global APM workspace.
 
 - Edit personal skills in `~/.apm/catalog/skills/<id>/`
 - Keep repository-specific or infrequently used skills in
-  `~/.apm/optional-skills/.apm/skills/<id>/` instead of this global catalog.
+  `~/.apm/optional-skills/<id>/` instead of this global catalog, and install
+  each skill by its direct repository ref.
 - Edit shared guidance in `~/.apm/catalog/AGENTS.md`, `agents/**`, `commands/**`, and `rules/**`
 - `skills` are authored under `catalog/skills/**` and staged into the published package
 - `commands/**` stays top-level because it is runtime-synced shared guidance, not nested skill package content

@@ -24,10 +24,10 @@ Route `~/.apm` work by ownership first, then choose the smallest task that match
 - Edit `~/.apm/catalog/skills/**` for personal skills that should be available
   in the global automatic rollout.
 - Edit `~/.apm/catalog/{AGENTS.md,agents/**,commands/**,rules/**}` for shared guidance.
-- Edit `~/.apm/optional-skills/.apm/skills/**` for skills that should be tracked
+- Edit `~/.apm/optional-skills/<id>/**` for skills that should be tracked
   here but installed only by selected repositories.
-- Edit `~/.apm/optional-skills/apm.yml` for the standalone optional package
-  manifest.
+- Treat each optional skill directory as an individually installable package;
+  the `optional-skills` collection root has no package manifest.
 - Edit `~/.apm/apm.yml` and `~/.apm/apm.lock.yaml` for dependency selection and accepted upstream state.
 - Edit `~/.apm/README.md`, `llms.txt`, and `docs/**` only for workspace-owned prose.
 - Treat `~/.apm/.claude/skills/**` and `~/.apm/.agents/skills/**` as runtime
@@ -41,15 +41,15 @@ Route `~/.apm` work by ownership first, then choose the smallest task that match
 Choose the narrowest lane that matches who needs the skill. Name the lane
 before installing or creating a skill.
 
-| Lane                | Scope                                                         | Source of truth                     | Delivery                                                       |
-| ------------------- | ------------------------------------------------------------- | ----------------------------------- | -------------------------------------------------------------- |
-| `workspace-only`    | APM workspace operations only                                 | `.apm/skills/<id>/`                 | Local `.claude/skills/<id>` and `.agents/skills/<id>` bridges  |
-| `repository-local`  | One repository's runtime, credentials, framework, or workflow | Target repository's `apm.yml`       | `apm install <package-ref>` in that repository                 |
-| `optional`          | Workspace-owned skill used by selected repositories           | `optional-skills/.apm/skills/<id>/` | Explicit `apm install --skill <id>` in the consumer repository |
-| `global-catalog`    | Personal cross-repository workflow                            | `catalog/skills/<id>/`              | Global automatic rollout                                       |
-| `global-dependency` | External cross-repository foundation                          | Root `apm.yml` and `apm.lock.yaml`  | `apm install -g <package-ref>`                                 |
-| `private`           | Machine-local, untracked overlay                              | `private-skills/.apm/skills/<id>/`  | Local Codex skill sync only                                    |
-| `manual`            | Upstream package that cannot use the managed lane             | `manual-skills/.apm/skills/<id>/`   | Manual-skills package rollout                                  |
+| Lane                | Scope                                                         | Source of truth                    | Delivery                                                              |
+| ------------------- | ------------------------------------------------------------- | ---------------------------------- | --------------------------------------------------------------------- |
+| `workspace-only`    | APM workspace operations only                                 | `.apm/skills/<id>/`                | Local `.claude/skills/<id>` and `.agents/skills/<id>` bridges         |
+| `repository-local`  | One repository's runtime, credentials, framework, or workflow | Target repository's `apm.yml`      | `apm install <package-ref>` in that repository                        |
+| `optional`          | Workspace-owned skill used by selected repositories           | `optional-skills/<id>/`            | Direct `apm install jey3dayo/apm-workspace/optional-skills/<id>#main` |
+| `global-catalog`    | Personal cross-repository workflow                            | `catalog/skills/<id>/`             | Global automatic rollout                                              |
+| `global-dependency` | External cross-repository foundation                          | Root `apm.yml` and `apm.lock.yaml` | `apm install -g <package-ref>`                                        |
+| `private`           | Machine-local, untracked overlay                              | `private-skills/.apm/skills/<id>/` | Local Codex skill sync only                                           |
+| `manual`            | Upstream package that cannot use the managed lane             | `manual-skills/.apm/skills/<id>/`  | Manual-skills package rollout                                         |
 
 ## Install Gate
 
@@ -112,8 +112,7 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
   global catalog or root manifest.
 - If the request is "change a personal skill", edit `catalog/skills/**`; use `skill-creator` for new or migrated managed skills.
 - If the request is "make a skill repository-specific", edit
-  `optional-skills/.apm/skills/**` and keep `optional-skills` out of the root
-  `apm.yml`.
+  `optional-skills/<id>/**` and keep the skill out of the root `apm.yml`.
 - If the request is "optimize" or "customize" a cross-repository skill for this workspace, treat it as personal skill work and prefer `catalog/skills/<id>/`.
 - If the request is to preserve a reusable implementation judgment from real work, such as "Valibot belongs in schemas", "Result conversion belongs at a boundary", or "DB access belongs in repositories", encode it as a concern -> owner candidates -> caller rule table in the relevant personal skill under `catalog/skills/<id>/`.
 - If the user does not specify the target skill id for that reusable judgment, inspect named skills, catalog triggers, and existing examples first; update the closest existing personal skill instead of creating a new skill by default.
@@ -130,9 +129,8 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
   `codex`-only manifest that should also deploy to Claude Code by adding
   `claude`, then re-run `apm install` and verify `.claude/skills/<id>` exists
   for the affected skills.
-- For an optional skill from this workspace, add
-  `jey3dayo/apm-workspace/optional-skills#main` to the consuming repository and
-  select it with `apm install --skill <id>`.
+- For an optional skill from this workspace, add only
+  `jey3dayo/apm-workspace/optional-skills/<id>#main` to the consuming repository.
 - For an optional skill embedded in an external bundle, keep the external
   package as the source of truth and select it in the consuming repository with
   `apm install <package-ref> --skill <id>`.
@@ -164,10 +162,10 @@ When deciding repo-local MCP placement by repository type, runtime, or workflow,
 
 - Do not treat `~/.apm/apm_modules/` as the place to edit managed skills.
 - Do not manage the same skill in both `catalog/skills/**` and `manual-skills/.apm/skills/**`.
-- Do not manage the same skill in both `catalog/skills/**` and `optional-skills/.apm/skills/**`.
+- Do not manage the same skill in both `catalog/skills/**` and `optional-skills/<id>/**`.
 - Do not manage the same skill in `.apm/skills/**` and any global or optional
   skill lane.
-- Do not add `optional-skills` to the root `apm.yml`; its purpose is explicit repository-scoped installation.
+- Do not add the `optional-skills` collection root to the root `apm.yml`; install individual skill refs only in consuming repositories.
 - Do not duplicate an external dependency into `catalog/skills/**` just because a local checkout exists. Keep one source of truth: upstream checkout, managed catalog, manual copy, or private overlay.
 - Do not reintroduce many local `./packages/*` refs into `~/.apm/apm.yml`.
 - Do not hand-edit deployed targets such as `~/.claude/`, `~/.codex/`, or `~/.agents/skills`.
@@ -197,10 +195,10 @@ When deciding repo-local MCP placement by repository type, runtime, or workflow,
    - use `mise run apply:skills:local` only when the user explicitly wants a fast local Codex skill refresh
 
 3. Optional repository skill changed:
-   - edit `optional-skills/.apm/skills/**`
-   - run the optional package smoke check or a temporary `apm install --skill <id>` from a fixture repository
+   - edit `optional-skills/<id>/**`
+   - run a temporary `apm install jey3dayo/apm-workspace/optional-skills/<id>#main` from a fixture repository
    - do not run the global deployment as the delivery mechanism
-   - verify the consuming repository's selected skill is present after installation
+   - verify the consuming repository's directly referenced skill is present after installation
 
 4. Shared guidance changed:
    - edit `~/.apm/catalog/**`

@@ -6,15 +6,15 @@
 
 ## レーン一覧
 
-| レーン                 | 正本                                 | 配布                                        | 用途                                           |
-| ---------------------- | ------------------------------------ | ------------------------------------------- | ---------------------------------------------- |
-| global（外部）         | root `apm.yml` の `dependencies.apm` | 全リポジトリへ自動 rollout                  | 横断的に使う外部スキル                         |
-| global（自作 catalog） | `catalog/skills/**`                  | 全リポジトリへ自動 rollout                  | 個人の横断ワークフロー                         |
-| ~/.apm 専用            | `.apm/skills/**`                     | この workspace 内の symlink bridge のみ     | APM workspace 自身の運用手順                   |
-| optional               | `optional-skills/.apm/skills/**`     | 利用リポジトリで `apm install --skill <id>` | 選択リポジトリだけのワークフロー               |
-| private                | `private-skills/.apm/skills/**`      | ローカル Codex sync のみ・未追跡            | マシンローカルの overlay                       |
-| manual                 | `manual-skills/.apm/skills/**`       | 手動配置                                    | 通常レーンで壊れる upstream の受け皿（現在空） |
-| repo-local             | 各リポジトリの `apm.yml`             | そのリポジトリのみ                          | ランタイム・認証・ブラウザに結び付くもの       |
+| レーン                 | 正本                                 | 配布                                    | 用途                                           |
+| ---------------------- | ------------------------------------ | --------------------------------------- | ---------------------------------------------- |
+| global（外部）         | root `apm.yml` の `dependencies.apm` | 全リポジトリへ自動 rollout              | 横断的に使う外部スキル                         |
+| global（自作 catalog） | `catalog/skills/**`                  | 全リポジトリへ自動 rollout              | 個人の横断ワークフロー                         |
+| ~/.apm 専用            | `.apm/skills/**`                     | この workspace 内の symlink bridge のみ | APM workspace 自身の運用手順                   |
+| optional               | `optional-skills/<id>/**`            | 利用リポジトリで個別 ref を直接 install | 選択リポジトリだけのワークフロー               |
+| private                | `private-skills/.apm/skills/**`      | ローカル Codex sync のみ・未追跡        | マシンローカルの overlay                       |
+| manual                 | `manual-skills/.apm/skills/**`       | 手動配置                                | 通常レーンで壊れる upstream の受け皿（現在空） |
+| repo-local             | 各リポジトリの `apm.yml`             | そのリポジトリのみ                      | ランタイム・認証・ブラウザに結び付くもの       |
 
 ## global（外部スキル: root apm.yml）
 
@@ -64,6 +64,7 @@
 
 - `google-forms-survey-builder` — 利用例: `tech-talks`
 - `slack-app-management` — Slack App を持つリポジトリのみ
+- `premortem` — 実装前の失敗条件分析が必要なリポジトリのみ
 
 ## private（private-skills/・未追跡）
 
@@ -155,9 +156,9 @@ UI バンドル縮小）は上の各レーンへ反映済み。
 ### 移管手順
 
 1. 対象リポジトリと実際の利用者を決める
-2. repo-local `apm.yml` で `apm install <package-ref> --skill <id>` し、check / 実作業を検証する
-   （workspace-owned は `catalog/skills/` → `optional-skills/.apm/skills/` へ移してから
-   `apm install jey3dayo/apm-workspace/optional-skills#main --skill <id>`）
+2. repo-local `apm.yml` で対象スキルの個別 ref を install し、check / 実作業を検証する
+   （workspace-owned は `catalog/skills/` → `optional-skills/<id>/` へ移してから
+   `apm install jey3dayo/apm-workspace/optional-skills/<id>#main`）
 3. global root manifest から外す
 4. `mise run deploy` 後に `~/.agents/skills` と `~/.claude/skills` の残存を確認する
 5. このファイルと `docs/package-decisions.md` を更新する

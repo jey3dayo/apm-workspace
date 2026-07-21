@@ -66,19 +66,27 @@
 ### google-forms-survey-builder
 
 - **Status: 個別プロジェクト向けへ移管（2026-07-15）**
-- 正本: `optional-skills/.apm/skills/google-forms-survey-builder/`
+- 正本: `optional-skills/google-forms-survey-builder/`
 - 理由: Google Forms 案件に限定され、global rollout に含める必要がないため。
-- 再導入: 利用リポジトリで `jey3dayo/apm-workspace/optional-skills#main` を追加し、
-  `--skill google-forms-survey-builder` を選択する。
+- 再導入: 利用リポジトリで
+  `jey3dayo/apm-workspace/optional-skills/google-forms-survey-builder#main` を追加する。
 
 ### slack-app-management
 
 - **Status: 個別プロジェクト向けへ移管（2026-07-15）**
-- 正本: `optional-skills/.apm/skills/slack-app-management/`
+- 正本: `optional-skills/slack-app-management/`
 - 理由: Slack App を実装・運用するリポジトリに限定され、通常のリポジトリへ global
   rollout する必要がないため。
-- 再導入: 利用リポジトリで `jey3dayo/apm-workspace/optional-skills#main` を追加し、
-  `--skill slack-app-management` を選択する。
+- 再導入: 利用リポジトリで
+  `jey3dayo/apm-workspace/optional-skills/slack-app-management#main` を追加する。
+
+### premortem
+
+- **Status: 個別プロジェクト向けへ移管（2026-07-21）**
+- 正本: `optional-skills/premortem/`
+- 理由: 実装前の失敗条件分析を必要とするリポジトリで明示導入すればよく、通常の全リポジトリへ global rollout する必要がないため。
+- 再導入: 利用リポジトリで
+  `jey3dayo/apm-workspace/optional-skills/premortem#main` を追加する。
 
 ### banner-design
 

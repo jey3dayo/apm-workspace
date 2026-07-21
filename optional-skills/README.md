@@ -1,27 +1,24 @@
 # optional-skills
 
-This package contains skills that are tracked in the APM workspace but are not
-installed by the global rollout.
+This directory contains individually installable skills that are tracked in the
+APM workspace but are not installed by the global rollout. The collection root
+is not an APM package.
 
-- Author optional workspace-owned skills under `optional-skills/.apm/skills/<id>/`.
-- Add `jey3dayo/apm-workspace/optional-skills#main` to a repository's own
-  `apm.yml` when that repository needs one of these skills.
-- Install only the requested skill with `apm install --skill <id>`.
-- Do not add this package to the global `~/.apm/apm.yml` unless every project
-  should receive the package.
+- Author optional workspace-owned skills under `optional-skills/<id>/`.
+- Add only `jey3dayo/apm-workspace/optional-skills/<id>#main` to a repository's own
+  `apm.yml` when that repository needs the skill.
+- Do not add the `optional-skills` collection root to the global `~/.apm/apm.yml`.
 
 Example:
 
 ```bash
-apm install jey3dayo/apm-workspace/optional-skills#main \
-  --skill google-forms-survey-builder
+apm install jey3dayo/apm-workspace/optional-skills/google-forms-survey-builder#main
 ```
 
 For the workspace-owned Slack app guidance, use:
 
 ```bash
-apm install jey3dayo/apm-workspace/optional-skills#main \
-  --skill slack-app-management
+apm install jey3dayo/apm-workspace/optional-skills/slack-app-management#main
 ```
 
 External bundles that contain optional sub-skills should remain external

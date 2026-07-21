@@ -20,7 +20,7 @@ Use this table as the Source of Truth Table (SoTT) when deciding where to read o
 | 対象                                                              | 正本                                                          | 用途                                                                                           |
 | ----------------------------------------------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | Personal skills / shared guidance                                 | `catalog/**`                                                  | skills、AGENTS.md、agents、commands、rules の authoring surface                                |
-| Optional repository-scoped skills                                 | `optional-skills/.apm/skills/**` + `optional-skills/apm.yml`  | 保存するがグローバル配布せず、利用リポジトリの `apm.yml` から明示導入するスキル                |
+| Optional repository-scoped skills                                 | `optional-skills/<id>/**`                                     | 保存するがグローバル配布せず、利用リポジトリの `apm.yml` から個別参照するスキル                |
 | External skills / global MCP                                      | `apm.yml` + `apm.lock.yaml`                                   | 外部依存の宣言と accepted resolved state。global MCP は `apm.yml` の `mcp:`                    |
 | SaaS 連携（コネクタ / プラグイン）                                | `docs/saas-connectors.md`                                     | claude.ai / ChatGPT アプリ側コネクタの接続状況と配置優先度（plugin > apm.yml > catalog skill） |
 | Repo-local MCP                                                    | 各リポジトリの `apm.yml`（一覧は `ghq list -p`）              | リポジトリ固有の MCP セット                                                                    |
@@ -35,9 +35,9 @@ Use this table as the Source of Truth Table (SoTT) when deciding where to read o
   - `catalog/skills/**` for skills that belong in the global automatic rollout
   - `catalog/AGENTS.md`, `catalog/agents/**`, `catalog/commands/**`, and `catalog/rules/**` for shared guidance
 - `./optional-skills` is the tracked source of truth for repository-scoped skills
-  - `optional-skills/.apm/skills/**` contains skills that are not part of the global rollout
-  - `optional-skills/apm.yml` defines the standalone package consumed by repositories that opt in
-  - do not add `optional-skills` to the root `apm.yml`; install it from the target repository with `--skill <id>`
+  - `optional-skills/<id>/**` contains individually installable skills that are not part of the global rollout
+  - the collection root is not an APM package and has no package manifest
+  - do not add `optional-skills` to the root `apm.yml`; install `jey3dayo/apm-workspace/optional-skills/<id>#main` from the target repository
 - external skills are not authored under `./catalog`
   - their source of truth is the upstream reference recorded in `apm.yml`
   - the accepted resolved state is captured in `apm.lock.yaml`
@@ -51,7 +51,7 @@ Use this table as the Source of Truth Table (SoTT) when deciding where to read o
 In practice:
 
 - if the change is to a personal skill or shared guidance asset, edit `./catalog`
-- if the skill should be available only to selected repositories, edit `./optional-skills/.apm/skills/**` and keep the optional package out of the root manifest
+- if the skill should be available only to selected repositories, edit `./optional-skills/<id>/**` and reference that skill directly from the consuming repository
 - if the change is to external dependency selection or accepted upstream state, edit or review `apm.yml` and `apm.lock.yaml`
 - if an upstream skill does not install or deploy cleanly through the normal managed lane, copy it under `./manual-skills/.apm/skills/<id>/`, record provenance under `./manual-skills/upstreams/**`, and distribute it through the `jey3dayo/apm-workspace/manual-skills` package ref in root `apm.yml`
 - exception: a skill that exists only to carry runtime assets for `catalog/commands/**` (for example `codex-companion-scripts`) stays under `catalog/skills/<id>/` with provenance recorded in its own `SKILL.md`; do not move it onto the `manual-skills` lane, because deployed wiring (such as the `CLAUDE_PLUGIN_ROOT` default in `~/.claude/settings.json`) points at its catalog-deployed path

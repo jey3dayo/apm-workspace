@@ -1,7 +1,0 @@
-name: optional-skills
-version: 1.0.0
-description: Optional skills for explicit repository-scoped installation
-dependencies:
-  apm: []
-  mcp: []
-scripts: {}
