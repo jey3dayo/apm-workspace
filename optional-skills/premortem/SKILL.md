@@ -7,7 +7,7 @@ description: Use when planning, requirements, design, estimation, or task decomp
 
 Premortem analysis assumes the project has failed and works backward to identify the likely causes before implementation starts. The output is a short set of high-signal risks, evidence from the repository, and concrete decisions or follow-up work.
 
-Do not use it as a post-implementation code review. Use `predictive-analysis`, `code-review`, or project-specific review skills after code exists.
+Do not use it as a post-implementation code review. Use `code-review` or project-specific review skills after code exists.
 
 ## Output Contract
 

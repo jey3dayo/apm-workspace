@@ -88,6 +88,25 @@
 - 再導入: 利用リポジトリで
   `jey3dayo/apm-workspace/optional-skills/premortem#main` を追加する。
 
+### predictive-analysis
+
+- **Status: global catalog 撤去を commit（2026-07-21、rollout 待ち）**
+- 旧正本: `catalog/skills/predictive-analysis/`
+- 理由: 全リポジトリへ常時配布する対象から外す判断。後継配置や利用リポジトリは未確定のため、別レーンへ複製せず catalog source を削除する。push 後の catalog install で lock と global target から撤去する。
+- 再検討するなら: 実利用するリポジトリを特定してから、optional または repo-local のどちらが適切かを決め、git history から復元する。
+
+### ca-pass / mdb-api / notica-api / telma-api
+
+- **Status: global dependency から撤去・repo-local / on-demand 化（2026-07-21）**
+- 正本: `caad-develop/claude-code-marketplace` の各 `plugins/service-integrations/<id>`
+- 理由: 社内 API、VPN、認証境界に依存するため、全リポジトリへの自動配布ではなく利用側の `apm.yml` に閉じ込める。workspace catalog へコピーせず upstream を直接参照する。
+- 個別導入 ref:
+  - `caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass`
+  - `caad-develop/claude-code-marketplace/plugins/service-integrations/mdb-api`
+  - `caad-develop/claude-code-marketplace/plugins/service-integrations/notica-api`
+  - `caad-develop/claude-code-marketplace/plugins/service-integrations/telma-api`
+- 補足: `private-skills` の `ca-pass` overlay は machine-local な別レーンとして維持する。
+
 ### banner-design
 
 - **Status: global の skill subset から除外（2026-07-15）**

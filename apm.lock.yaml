@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-07-16T15:46:44.367387+00:00'
+generated_at: '2026-07-21T08:14:41+00:00'
 apm_version: 0.22.0
 dependencies:
 - repo_url: Jakubantalik/transitions-dev
@@ -380,102 +380,6 @@ dependencies:
     .claude/skills/perman-aws-vault/references/setup-guide.md: sha256:e4d2c9c4ac0e146e9a9ae45933bc1cf5fbcbd940cf8fa3587cfb1ffa64436704
   content_hash: sha256:d71e880080e421fe0554bafbf71b04f4a9fd02e57f043a1454a8bea28eb7f588
 - repo_url: caad-develop/claude-code-marketplace
-  name: ca-pass
-  host: github.com
-  resolved_commit: b0f0312316105fbe8ac8a95a4e14fbfcb08b3dd0
-  version: 1.0.0
-  virtual_path: plugins/service-integrations/ca-pass
-  is_virtual: true
-  package_type: marketplace_plugin
-  deployed_files:
-  - .agents/skills/ca-pass
-  - .agents/skills/ca-pass/SKILL.md
-  - .agents/skills/ca-pass/references/ca-pass-spec.md
-  - .agents/skills/ca-pass/references/review-checklist.md
-  - .claude/skills/ca-pass
-  - .claude/skills/ca-pass/SKILL.md
-  - .claude/skills/ca-pass/references/ca-pass-spec.md
-  - .claude/skills/ca-pass/references/review-checklist.md
-  deployed_file_hashes:
-    .agents/skills/ca-pass/SKILL.md: sha256:d8e626ad6e553d7d0e0de579049fdc53acd2f61f22284a0bd3bf23ff8fb12c22
-    .agents/skills/ca-pass/references/ca-pass-spec.md: sha256:7b04975aac27a753c216e0bac31114f2dbf1b73fd85f0074b275e66d180c694c
-    .agents/skills/ca-pass/references/review-checklist.md: sha256:a9870d591470b161820fb112bab8d53595e9c387958709c011905be070b7d01e
-    .claude/skills/ca-pass/SKILL.md: sha256:d8e626ad6e553d7d0e0de579049fdc53acd2f61f22284a0bd3bf23ff8fb12c22
-    .claude/skills/ca-pass/references/ca-pass-spec.md: sha256:7b04975aac27a753c216e0bac31114f2dbf1b73fd85f0074b275e66d180c694c
-    .claude/skills/ca-pass/references/review-checklist.md: sha256:a9870d591470b161820fb112bab8d53595e9c387958709c011905be070b7d01e
-  content_hash: sha256:2a3345aa4afcaac2d89c8a754f5c5492e0f9cc56edcdbfa988afe76dbd3ec038
-- repo_url: caad-develop/claude-code-marketplace
-  name: mdb-api
-  host: github.com
-  resolved_commit: b0f0312316105fbe8ac8a95a4e14fbfcb08b3dd0
-  version: 1.0.0
-  virtual_path: plugins/service-integrations/mdb-api
-  is_virtual: true
-  package_type: marketplace_plugin
-  deployed_files:
-  - .agents/skills/mdb-api
-  - .agents/skills/mdb-api/SKILL.md
-  - .agents/skills/mdb-api/references/api-reference.md
-  - .agents/skills/mdb-api/references/employee-schema.md
-  - .claude/skills/mdb-api
-  - .claude/skills/mdb-api/SKILL.md
-  - .claude/skills/mdb-api/references/api-reference.md
-  - .claude/skills/mdb-api/references/employee-schema.md
-  deployed_file_hashes:
-    .agents/skills/mdb-api/SKILL.md: sha256:4647c94f5ffb1d308d8ab0bcc79baa60f788108853626ac8b9fc2d1b0db97ca4
-    .agents/skills/mdb-api/references/api-reference.md: sha256:429205ad91ac78f4820563f7a245e6b0bf62ebd3fed67b3a1ebf77bd85d1ce11
-    .agents/skills/mdb-api/references/employee-schema.md: sha256:30ea251b6bab13b365bbbaeb943d9f875848fff17895cd389eb1a6072afe85ab
-    .claude/skills/mdb-api/SKILL.md: sha256:4647c94f5ffb1d308d8ab0bcc79baa60f788108853626ac8b9fc2d1b0db97ca4
-    .claude/skills/mdb-api/references/api-reference.md: sha256:429205ad91ac78f4820563f7a245e6b0bf62ebd3fed67b3a1ebf77bd85d1ce11
-    .claude/skills/mdb-api/references/employee-schema.md: sha256:30ea251b6bab13b365bbbaeb943d9f875848fff17895cd389eb1a6072afe85ab
-  content_hash: sha256:32e149f03e5d6000e26f871de886da973b9b6a63041f0527c48a573e513dbac9
-- repo_url: caad-develop/claude-code-marketplace
-  name: notica-api
-  host: github.com
-  resolved_commit: b0f0312316105fbe8ac8a95a4e14fbfcb08b3dd0
-  version: 1.1.0
-  virtual_path: plugins/service-integrations/notica-api
-  is_virtual: true
-  package_type: marketplace_plugin
-  deployed_files:
-  - .agents/skills/notica-api
-  - .agents/skills/notica-api/SKILL.md
-  - .agents/skills/notica-api/agents/openai.yaml
-  - .agents/skills/notica-api/references/notica-api-user-doc.md
-  - .claude/skills/notica-api
-  - .claude/skills/notica-api/SKILL.md
-  - .claude/skills/notica-api/agents/openai.yaml
-  - .claude/skills/notica-api/references/notica-api-user-doc.md
-  deployed_file_hashes:
-    .agents/skills/notica-api/SKILL.md: sha256:dd603652e4aee70fc6cee12c0327d3a50a3c8c16a6caeab0354803b958dd84aa
-    .agents/skills/notica-api/agents/openai.yaml: sha256:8ffc7677919942eb4affca68d5c27c3cf66d1894b99e10bcab963f2a33cabbca
-    .agents/skills/notica-api/references/notica-api-user-doc.md: sha256:2d6ee1aea02338012f3b61c3d82f930421cd7a1723126fa50ba3740a828ad316
-    .claude/skills/notica-api/SKILL.md: sha256:dd603652e4aee70fc6cee12c0327d3a50a3c8c16a6caeab0354803b958dd84aa
-    .claude/skills/notica-api/agents/openai.yaml: sha256:8ffc7677919942eb4affca68d5c27c3cf66d1894b99e10bcab963f2a33cabbca
-    .claude/skills/notica-api/references/notica-api-user-doc.md: sha256:2d6ee1aea02338012f3b61c3d82f930421cd7a1723126fa50ba3740a828ad316
-  content_hash: sha256:a02886d0d9f952547442bff6aea3bbadd91bec07068fa288244e958ff9307c3a
-- repo_url: caad-develop/claude-code-marketplace
-  name: telma-api
-  host: github.com
-  resolved_commit: b0f0312316105fbe8ac8a95a4e14fbfcb08b3dd0
-  version: 1.0.0
-  virtual_path: plugins/service-integrations/telma-api
-  is_virtual: true
-  package_type: marketplace_plugin
-  deployed_files:
-  - .agents/skills/telma-api
-  - .agents/skills/telma-api/SKILL.md
-  - .agents/skills/telma-api/agents/openai.yaml
-  - .claude/skills/telma-api
-  - .claude/skills/telma-api/SKILL.md
-  - .claude/skills/telma-api/agents/openai.yaml
-  deployed_file_hashes:
-    .agents/skills/telma-api/SKILL.md: sha256:47364c9727c36c99f1b8c9b587d61e4fe541b2e131ee1f29b137d66b54660c93
-    .agents/skills/telma-api/agents/openai.yaml: sha256:dee31bad38fa4a840a8f6a5be40a43b47770e1e8315a1d33d8b924546309d26a
-    .claude/skills/telma-api/SKILL.md: sha256:47364c9727c36c99f1b8c9b587d61e4fe541b2e131ee1f29b137d66b54660c93
-    .claude/skills/telma-api/agents/openai.yaml: sha256:dee31bad38fa4a840a8f6a5be40a43b47770e1e8315a1d33d8b924546309d26a
-  content_hash: sha256:69b7d9fc0da45982fb290223ab2f5a3cc81d8a2e8e5af69a923c6d0424f96ce8
-- repo_url: caad-develop/claude-code-marketplace
   name: caad-skill-deployer
   host: github.com
   resolved_commit: b0f0312316105fbe8ac8a95a4e14fbfcb08b3dd0
@@ -539,6 +443,23 @@ dependencies:
     .agents/skills/animation-vocabulary/SKILL.md: sha256:d718b48fe3c7898804d588f050a2e266d82c9f5ef51da256c8cb8b5951527757
     .claude/skills/animation-vocabulary/SKILL.md: sha256:d718b48fe3c7898804d588f050a2e266d82c9f5ef51da256c8cb8b5951527757
   content_hash: sha256:39319fc9a33c15be08666b3685f58666f042ff36bb902b7814c0834a5ba99df4
+- repo_url: emilkowalski/skills
+  name: skills
+  host: github.com
+  resolved_commit: 6bf24434f7730ad169077756cf9c7cd7bd675fc6
+  version: unknown
+  virtual_path: skills/apple-design
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/apple-design
+  - .agents/skills/apple-design/SKILL.md
+  - .claude/skills/apple-design
+  - .claude/skills/apple-design/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/apple-design/SKILL.md: sha256:11840b24a11d7f94f39c6aaab074750ae4e4de4ef54ee4b1dd97e16ebd485e61
+    .claude/skills/apple-design/SKILL.md: sha256:11840b24a11d7f94f39c6aaab074750ae4e4de4ef54ee4b1dd97e16ebd485e61
+  content_hash: sha256:8b94db67cb9edaad5f1501010804caa610131f1d2dfda0a27664b2e858deade3
 - repo_url: emilkowalski/skills
   name: skills
   host: github.com
@@ -619,23 +540,6 @@ dependencies:
     .claude/skills/review-animations/SKILL.md: sha256:27c1ec78634a08bcb588229497f4fbc3bcb9db8f8032dcdd275eb844f30fc004
     .claude/skills/review-animations/STANDARDS.md: sha256:12b1a9dcee667981294ea065651b755910977f676e6300a31614003cde444db9
   content_hash: sha256:c92905bff59c3007d07c2638a2a83d5d71c901feef108cce1da0bf3c7cafd579
-- repo_url: emilkowalski/skills
-  name: skills
-  host: github.com
-  resolved_commit: 6bf24434f7730ad169077756cf9c7cd7bd675fc6
-  version: unknown
-  virtual_path: skills/apple-design
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/apple-design
-  - .agents/skills/apple-design/SKILL.md
-  - .claude/skills/apple-design
-  - .claude/skills/apple-design/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/apple-design/SKILL.md: sha256:11840b24a11d7f94f39c6aaab074750ae4e4de4ef54ee4b1dd97e16ebd485e61
-    .claude/skills/apple-design/SKILL.md: sha256:11840b24a11d7f94f39c6aaab074750ae4e4de4ef54ee4b1dd97e16ebd485e61
-  content_hash: sha256:8b94db67cb9edaad5f1501010804caa610131f1d2dfda0a27664b2e858deade3
 - repo_url: fujibee/agmsg
   name: agmsg
   host: github.com
@@ -2871,7 +2775,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
-  resolved_commit: ce889234de97b1bfbffd0a31a3f99128550cf7d8
+  resolved_commit: 9e0c8c66dbe33de0e11da5367e1add3c7fd1bdcb
   resolved_ref: main
   version: 1.0.0
   virtual_path: manual-skills
@@ -2916,6 +2820,52 @@ dependencies:
     .claude/skills/grill-with-docs/SKILL.md: sha256:610d091047bcfb9db0f75c057d15538481a721111579fc5ec7f83ad9131a2165
     .claude/skills/grill-with-docs/agents/openai.yaml: sha256:94cd0ab161fb468a836349f5ed482ba58ce8e709a05c57ce533d739dbd35cca9
   content_hash: sha256:c3a266bcc09eab29358eaae6e288f9a2cd492fd0af2bcaeeec55fd6207da9a89
+- repo_url: mattpocock/skills
+  name: skills
+  host: github.com
+  resolved_commit: 9603c1cc8118d08bc1b3bf34cf714f62178dea3b
+  version: unknown
+  virtual_path: skills/engineering/improve-codebase-architecture
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/improve-codebase-architecture
+  - .agents/skills/improve-codebase-architecture/HTML-REPORT.md
+  - .agents/skills/improve-codebase-architecture/SKILL.md
+  - .agents/skills/improve-codebase-architecture/agents/openai.yaml
+  - .claude/skills/improve-codebase-architecture
+  - .claude/skills/improve-codebase-architecture/HTML-REPORT.md
+  - .claude/skills/improve-codebase-architecture/SKILL.md
+  - .claude/skills/improve-codebase-architecture/agents/openai.yaml
+  deployed_file_hashes:
+    .agents/skills/improve-codebase-architecture/HTML-REPORT.md: sha256:0b0936104158abeef7246ff6cbabefa4dc055f17589f2833f2d93001421910a1
+    .agents/skills/improve-codebase-architecture/SKILL.md: sha256:4b4cb798c3863d5b6f5c0b4604af1ecb5beb6df82553c972898a91ba38bcf289
+    .agents/skills/improve-codebase-architecture/agents/openai.yaml: sha256:c8cb20f68ebf0edb4e497bc11ae5fcaa196004e661cd189015b04f4109ced7f1
+    .claude/skills/improve-codebase-architecture/HTML-REPORT.md: sha256:0b0936104158abeef7246ff6cbabefa4dc055f17589f2833f2d93001421910a1
+    .claude/skills/improve-codebase-architecture/SKILL.md: sha256:4b4cb798c3863d5b6f5c0b4604af1ecb5beb6df82553c972898a91ba38bcf289
+    .claude/skills/improve-codebase-architecture/agents/openai.yaml: sha256:c8cb20f68ebf0edb4e497bc11ae5fcaa196004e661cd189015b04f4109ced7f1
+  content_hash: sha256:99a9513188420a190ea4e20f034d9a8f5ae43f887ba4c007fc19b1f168c716ff
+- repo_url: mattpocock/skills
+  name: skills
+  host: github.com
+  resolved_commit: 9603c1cc8118d08bc1b3bf34cf714f62178dea3b
+  version: unknown
+  virtual_path: skills/engineering/resolving-merge-conflicts
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/resolving-merge-conflicts
+  - .agents/skills/resolving-merge-conflicts/SKILL.md
+  - .agents/skills/resolving-merge-conflicts/agents/openai.yaml
+  - .claude/skills/resolving-merge-conflicts
+  - .claude/skills/resolving-merge-conflicts/SKILL.md
+  - .claude/skills/resolving-merge-conflicts/agents/openai.yaml
+  deployed_file_hashes:
+    .agents/skills/resolving-merge-conflicts/SKILL.md: sha256:c7c9ba81362a786aac05d2223123bf1bd2f8a99c3243a72882ede9c68bedfb24
+    .agents/skills/resolving-merge-conflicts/agents/openai.yaml: sha256:a1f4f96838f2ed6282eb28abbbf99029cb8fadce552baf53da90a025b8bffddf
+    .claude/skills/resolving-merge-conflicts/SKILL.md: sha256:c7c9ba81362a786aac05d2223123bf1bd2f8a99c3243a72882ede9c68bedfb24
+    .claude/skills/resolving-merge-conflicts/agents/openai.yaml: sha256:a1f4f96838f2ed6282eb28abbbf99029cb8fadce552baf53da90a025b8bffddf
+  content_hash: sha256:bfafce942f3d1264eb6bb931cd39b66cf8889f08072ba6264b5b111b141d2354
 - repo_url: mattpocock/skills
   name: skills
   host: github.com
@@ -3004,52 +2954,6 @@ dependencies:
     .claude/skills/writing-great-skills/SKILL.md: sha256:4d6ccbc3760b1bd4107c495a79872286ea69494003f3b0a719fc95b147457061
     .claude/skills/writing-great-skills/agents/openai.yaml: sha256:b3c555d2654ec61aed78f8435f583c6a0cd6bf980d71317724682ad20075c33d
   content_hash: sha256:83d8ec1619c1794cb8fcb1a325a74f5ff06b350df8099f70fc25818a743ad72e
-- repo_url: mattpocock/skills
-  name: skills
-  host: github.com
-  resolved_commit: 9603c1cc8118d08bc1b3bf34cf714f62178dea3b
-  version: unknown
-  virtual_path: skills/engineering/improve-codebase-architecture
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/improve-codebase-architecture
-  - .agents/skills/improve-codebase-architecture/HTML-REPORT.md
-  - .agents/skills/improve-codebase-architecture/SKILL.md
-  - .agents/skills/improve-codebase-architecture/agents/openai.yaml
-  - .claude/skills/improve-codebase-architecture
-  - .claude/skills/improve-codebase-architecture/HTML-REPORT.md
-  - .claude/skills/improve-codebase-architecture/SKILL.md
-  - .claude/skills/improve-codebase-architecture/agents/openai.yaml
-  deployed_file_hashes:
-    .agents/skills/improve-codebase-architecture/HTML-REPORT.md: sha256:0b0936104158abeef7246ff6cbabefa4dc055f17589f2833f2d93001421910a1
-    .agents/skills/improve-codebase-architecture/SKILL.md: sha256:4b4cb798c3863d5b6f5c0b4604af1ecb5beb6df82553c972898a91ba38bcf289
-    .agents/skills/improve-codebase-architecture/agents/openai.yaml: sha256:c8cb20f68ebf0edb4e497bc11ae5fcaa196004e661cd189015b04f4109ced7f1
-    .claude/skills/improve-codebase-architecture/HTML-REPORT.md: sha256:0b0936104158abeef7246ff6cbabefa4dc055f17589f2833f2d93001421910a1
-    .claude/skills/improve-codebase-architecture/SKILL.md: sha256:4b4cb798c3863d5b6f5c0b4604af1ecb5beb6df82553c972898a91ba38bcf289
-    .claude/skills/improve-codebase-architecture/agents/openai.yaml: sha256:c8cb20f68ebf0edb4e497bc11ae5fcaa196004e661cd189015b04f4109ced7f1
-  content_hash: sha256:99a9513188420a190ea4e20f034d9a8f5ae43f887ba4c007fc19b1f168c716ff
-- repo_url: mattpocock/skills
-  name: skills
-  host: github.com
-  resolved_commit: 9603c1cc8118d08bc1b3bf34cf714f62178dea3b
-  version: unknown
-  virtual_path: skills/engineering/resolving-merge-conflicts
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/resolving-merge-conflicts
-  - .agents/skills/resolving-merge-conflicts/SKILL.md
-  - .agents/skills/resolving-merge-conflicts/agents/openai.yaml
-  - .claude/skills/resolving-merge-conflicts
-  - .claude/skills/resolving-merge-conflicts/SKILL.md
-  - .claude/skills/resolving-merge-conflicts/agents/openai.yaml
-  deployed_file_hashes:
-    .agents/skills/resolving-merge-conflicts/SKILL.md: sha256:c7c9ba81362a786aac05d2223123bf1bd2f8a99c3243a72882ede9c68bedfb24
-    .agents/skills/resolving-merge-conflicts/agents/openai.yaml: sha256:a1f4f96838f2ed6282eb28abbbf99029cb8fadce552baf53da90a025b8bffddf
-    .claude/skills/resolving-merge-conflicts/SKILL.md: sha256:c7c9ba81362a786aac05d2223123bf1bd2f8a99c3243a72882ede9c68bedfb24
-    .claude/skills/resolving-merge-conflicts/agents/openai.yaml: sha256:a1f4f96838f2ed6282eb28abbbf99029cb8fadce552baf53da90a025b8bffddf
-  content_hash: sha256:bfafce942f3d1264eb6bb931cd39b66cf8889f08072ba6264b5b111b141d2354
 - repo_url: millionco/react-doctor
   name: react-doctor
   host: github.com
@@ -4270,3 +4174,10 @@ mcp_configs:
     - '@t09tanaka/mcp-simple-voicevox'
     registry: false
     command: npx
+local_deployed_files:
+- .agents/skills/agent-curation
+- .agents/skills/find-skills
+- .agents/skills/skill-auditor
+- .claude/skills/agent-curation
+- .claude/skills/find-skills
+- .claude/skills/skill-auditor

@@ -1,6 +1,6 @@
 # Skill Inventory
 
-スキル・MCP の配置の現状と、移管候補・保留の一元管理（2026-07-16 時点）。
+スキル・MCP の配置の現状と、移管候補・保留の一元管理（2026-07-21 時点）。
 「どこに何があるか」「次にどう動かすか」はこのファイルに集約する。
 個々の採用・撤去の理由と経緯は [`package-decisions.md`](package-decisions.md) を参照する。
 
@@ -31,20 +31,18 @@
   systematic-debugging, TDD, worktrees, verification ほか計 11
 - Codex 連携（openai）: `codex-cli-runtime`, `codex-result-handling`,
   `gpt-5-4-prompting`, `gh-address-comments`, `gh-fix-ci`
-- 社内（caad-develop）: `perman-aws-vault`, `ca-pass`, `notica-api`,
-  `mdb-api`, `telma-api`, `caad-skill-deployer`
+- 社内（caad-develop）: `perman-aws-vault`, `caad-skill-deployer`
 - その他: `understand` / `understand-dashboard`, `humanizer-ja`,
   `web-research`, mattpocock 系 5, `empirical-prompt-tuning`
 
 ## global（自作 catalog: catalog/skills/）
 
-34 スキル。主な系統:
+33 スキル。主な系統:
 
 - APM・環境運用: `apm-usage`, `apm-repo-bootstrap`, `mise`, `mcp-tools`,
   `headroom`, `dotenvx-env-ops`, `1password-item-ops`, `herdr`
 - レビュー・品質: `code-review`, `review-board`, `review-fix-loop`,
-  `review-plan`, `polish`, `code-quality-improvement`, `predictive-analysis`,
-  `quiet-command-auditor`
+  `review-plan`, `polish`, `code-quality-improvement`, `quiet-command-auditor`
 - デザイン: `design-md-workflow`, `design-system-review`
 - リファクタリング・解析: `refactoring`, `similarity`, `tsr`
 - ドキュメント: `docs-manager`, `docs-entrypoint-review`,
@@ -69,6 +67,12 @@
 ## private（private-skills/・未追跡）
 
 - `ca-pass`, `codex-private-smoke`
+
+## repo-local / on-demand へ移管済み
+
+- `ca-pass`, `mdb-api`, `notica-api`, `telma-api` — global から撤去済み。
+  必要な利用リポジトリの `apm.yml` から `caad-develop/claude-code-marketplace`
+  の各 `plugins/service-integrations/<id>` ref を個別導入する。
 
 ## repo-local で活用中
 
@@ -132,14 +136,13 @@ global の一覧に無くても廃止ではない。各リポジトリの `apm.y
 
 global から repo-local / optional へ移す候補。実施済みのもの
 （`agentation` 系、`slack-app-management`、`google-forms-survey-builder`、
-UI バンドル縮小）は上の各レーンへ反映済み。
+社内 API 系、UI バンドル縮小）は上の各レーンへ反映済み。
 
-| 候補                                            | 推奨配置                                    | 判断理由                                                                                                                                         |
-| ----------------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `browser-harness`                               | 対象リポジトリの `apm.yml` または on-demand | ブラウザセッション・ログイン状態と結び付く。`agent-browser` は 2026-07-16 に global 撤去済み（repo-local: `caad-loca-bff` / `ultra-rss-reader`） |
-| `understand` / `understand-dashboard`           | 対象リポジトリの `apm.yml` または on-demand | 解析対象コードベースに結び付く                                                                                                                   |
-| `ca-pass`, `mdb-api`, `notica-api`, `telma-api` | 対象リポジトリの `apm.yml`                  | 社内 API・VPN・認証境界を利用側へ閉じ込める                                                                                                      |
-| `perman-aws-vault`                              | 当面 global 維持                            | 複数 AWS リポジトリで同じ認証導線を使うため。移管するなら profile/credential 境界を明記後                                                        |
+| 候補                                  | 推奨配置                                    | 判断理由                                                                                                                                         |
+| ------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `browser-harness`                     | 対象リポジトリの `apm.yml` または on-demand | ブラウザセッション・ログイン状態と結び付く。`agent-browser` は 2026-07-16 に global 撤去済み（repo-local: `caad-loca-bff` / `ultra-rss-reader`） |
+| `understand` / `understand-dashboard` | 対象リポジトリの `apm.yml` または on-demand | 解析対象コードベースに結び付く                                                                                                                   |
+| `perman-aws-vault`                    | 当面 global 維持                            | 複数 AWS リポジトリで同じ認証導線を使うため。移管するなら profile/credential 境界を明記後                                                        |
 
 2026-07-16 の棚卸しで global 維持を決定したもの（候補から除外）:
 `react-doctor`, `composition-patterns`, `react-best-practices`,
