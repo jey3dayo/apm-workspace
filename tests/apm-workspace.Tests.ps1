@@ -1101,8 +1101,6 @@ dependencies: []
     $legacyMirrorPattern = 'transitional\s+' + 'mirror'
     $files = @(
       (Join-Path $workspaceRoot "catalog/skills/apm-usage/SKILL.md")
-      (Join-Path $workspaceRoot "catalog/skills/rtk/SKILL.md")
-      (Join-Path $workspaceRoot "catalog/skills/rtk/references/command-reference.md")
     )
 
     foreach ($file in $files) {

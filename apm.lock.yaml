@@ -3086,6 +3086,52 @@ dependencies:
     .claude/skills/writing-great-skills/SKILL.md: sha256:4d6ccbc3760b1bd4107c495a79872286ea69494003f3b0a719fc95b147457061
     .claude/skills/writing-great-skills/agents/openai.yaml: sha256:b3c555d2654ec61aed78f8435f583c6a0cd6bf980d71317724682ad20075c33d
   content_hash: sha256:83d8ec1619c1794cb8fcb1a325a74f5ff06b350df8099f70fc25818a743ad72e
+- repo_url: mattpocock/skills
+  name: skills
+  host: github.com
+  resolved_commit: 9603c1cc8118d08bc1b3bf34cf714f62178dea3b
+  version: unknown
+  virtual_path: skills/engineering/improve-codebase-architecture
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/improve-codebase-architecture
+  - .agents/skills/improve-codebase-architecture/HTML-REPORT.md
+  - .agents/skills/improve-codebase-architecture/SKILL.md
+  - .agents/skills/improve-codebase-architecture/agents/openai.yaml
+  - .claude/skills/improve-codebase-architecture
+  - .claude/skills/improve-codebase-architecture/HTML-REPORT.md
+  - .claude/skills/improve-codebase-architecture/SKILL.md
+  - .claude/skills/improve-codebase-architecture/agents/openai.yaml
+  deployed_file_hashes:
+    .agents/skills/improve-codebase-architecture/HTML-REPORT.md: sha256:0b0936104158abeef7246ff6cbabefa4dc055f17589f2833f2d93001421910a1
+    .agents/skills/improve-codebase-architecture/SKILL.md: sha256:4b4cb798c3863d5b6f5c0b4604af1ecb5beb6df82553c972898a91ba38bcf289
+    .agents/skills/improve-codebase-architecture/agents/openai.yaml: sha256:c8cb20f68ebf0edb4e497bc11ae5fcaa196004e661cd189015b04f4109ced7f1
+    .claude/skills/improve-codebase-architecture/HTML-REPORT.md: sha256:0b0936104158abeef7246ff6cbabefa4dc055f17589f2833f2d93001421910a1
+    .claude/skills/improve-codebase-architecture/SKILL.md: sha256:4b4cb798c3863d5b6f5c0b4604af1ecb5beb6df82553c972898a91ba38bcf289
+    .claude/skills/improve-codebase-architecture/agents/openai.yaml: sha256:c8cb20f68ebf0edb4e497bc11ae5fcaa196004e661cd189015b04f4109ced7f1
+  content_hash: sha256:99a9513188420a190ea4e20f034d9a8f5ae43f887ba4c007fc19b1f168c716ff
+- repo_url: mattpocock/skills
+  name: skills
+  host: github.com
+  resolved_commit: 9603c1cc8118d08bc1b3bf34cf714f62178dea3b
+  version: unknown
+  virtual_path: skills/engineering/resolving-merge-conflicts
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/resolving-merge-conflicts
+  - .agents/skills/resolving-merge-conflicts/SKILL.md
+  - .agents/skills/resolving-merge-conflicts/agents/openai.yaml
+  - .claude/skills/resolving-merge-conflicts
+  - .claude/skills/resolving-merge-conflicts/SKILL.md
+  - .claude/skills/resolving-merge-conflicts/agents/openai.yaml
+  deployed_file_hashes:
+    .agents/skills/resolving-merge-conflicts/SKILL.md: sha256:c7c9ba81362a786aac05d2223123bf1bd2f8a99c3243a72882ede9c68bedfb24
+    .agents/skills/resolving-merge-conflicts/agents/openai.yaml: sha256:a1f4f96838f2ed6282eb28abbbf99029cb8fadce552baf53da90a025b8bffddf
+    .claude/skills/resolving-merge-conflicts/SKILL.md: sha256:c7c9ba81362a786aac05d2223123bf1bd2f8a99c3243a72882ede9c68bedfb24
+    .claude/skills/resolving-merge-conflicts/agents/openai.yaml: sha256:a1f4f96838f2ed6282eb28abbbf99029cb8fadce552baf53da90a025b8bffddf
+  content_hash: sha256:bfafce942f3d1264eb6bb931cd39b66cf8889f08072ba6264b5b111b141d2354
 - repo_url: millionco/react-doctor
   name: react-doctor
   host: github.com

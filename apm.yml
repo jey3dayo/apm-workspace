@@ -36,6 +36,8 @@ dependencies:
     - jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
     - langchain-ai/deepagents/libs/cli/examples/skills/web-research
     - mattpocock/skills/skills/engineering/grill-with-docs
+    - mattpocock/skills/skills/engineering/improve-codebase-architecture
+    - mattpocock/skills/skills/engineering/resolving-merge-conflicts
     - mattpocock/skills/skills/engineering/wayfinder
     - mattpocock/skills/skills/productivity/grilling
     - mattpocock/skills/skills/productivity/handoff
