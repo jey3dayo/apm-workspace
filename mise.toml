@@ -16,7 +16,7 @@ node = "24"
 "aqua:bats-core/bats-core" = "1.11.1"
 fd = "10.4.2"
 lefthook = "2.1.9"
-"pipx:apm-cli" = "0.22.0"
+"pipx:apm-cli" = "0.26.0"
 taplo = "0.10.0"
 
 # npm packages
@@ -199,7 +199,7 @@ run = [
 # ========================================
 [tasks.upgrade]
 description = "Refresh upstream APM dependencies, verify, and inspect the ~/.apm workspace"
-run = ["apm install -g --update", { task = "deploy" }]
+run = ["apm update -g", { task = "deploy" }]
 
 [tasks."refresh:deploy"]
 description = "Update, verify, and deploy the ~/.apm workspace locally from the current manifest and lock"

@@ -1327,7 +1327,7 @@ manifest_external_skill_subset() {
     }
     in_skills && /^[[:space:]]*-[[:space:]]+/ {
       value = $2
-      gsub(/\"/, "", value)
+      gsub(/"/, "", value)
       print value
     }
   ' "$manifest_path"
@@ -1643,7 +1643,18 @@ collect_external_skill_records() {
       continue
     fi
 
-    if ! awk -v key="$canonical_ref" '$0 == key { found = 1; exit } END { exit(found ? 0 : 1) }' "$manifest_keys_file"; then
+    if ! awk -v key="$canonical_ref" '
+      function normalize_repo(ref, parts, count, i, normalized) {
+        if (index(ref, ":") > 0) return ref
+        count = split(ref, parts, "/")
+        if (count < 2) return ref
+        normalized = tolower(parts[1]) "/" tolower(parts[2])
+        for (i = 3; i <= count; i++) normalized = normalized "/" parts[i]
+        return normalized
+      }
+      normalize_repo($0) == normalize_repo(key) { found = 1; exit }
+      END { exit(found ? 0 : 1) }
+    ' "$manifest_keys_file"; then
       error "External lock record is not declared in apm.yml: $canonical_ref"
       has_failure=1
       continue
@@ -1699,7 +1710,19 @@ collect_external_skill_records() {
 
     required_keys_file=$(mktemp "${TMPDIR:-/tmp}/apm-required-keys.XXXXXX")
     printf '%s\n' "$required_keys" | awk 'NF && !seen[$0]++' >"$required_keys_file"
-    if ! awk 'NR == FNR { required[$0] = 1; next } ($0 in required) { found = 1; exit } END { exit(found ? 0 : 1) }' \
+    if ! awk '
+      function normalize_repo(ref, parts, count, i, normalized) {
+        if (index(ref, ":") > 0) return ref
+        count = split(ref, parts, "/")
+        if (count < 2) return ref
+        normalized = tolower(parts[1]) "/" tolower(parts[2])
+        for (i = 3; i <= count; i++) normalized = normalized "/" parts[i]
+        return normalized
+      }
+      NR == FNR { required[normalize_repo($0)] = 1; next }
+      (normalize_repo($0) in required) { found = 1; exit }
+      END { exit(found ? 0 : 1) }
+    ' \
       "$required_keys_file" "$matched_keys_file"; then
       error "External manifest ref is missing from apm.lock.yaml: $manifest_ref"
       has_failure=1
@@ -2152,7 +2175,7 @@ cmd_audit_ci_smoke() {
 
   if ! (
     cd "$temp_dir" &&
-      apm install --only apm --target all &&
+      apm install --only apm &&
       apm audit --ci
   ); then
     warn "APM audit smoke workspace left at $temp_dir for inspection."

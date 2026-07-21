@@ -2586,7 +2586,7 @@ function Invoke-AuditCiSmoke {
 
     Push-Location $tempDir
     try {
-      $installOutput = @(& apm install --only apm --target all 2>&1)
+      $installOutput = @(& apm install --only apm 2>&1)
       foreach ($line in $installOutput) {
         Write-Host $line
       }
