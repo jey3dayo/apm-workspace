@@ -186,7 +186,13 @@ global MCP はリポジトリをまたいで常時使う基盤だけに限定し
   - 通常操作（クリック・フォーム入力・スクショ・コンソール確認）は `claude-in-chrome` または Codex Chrome アドオン
   - `chrome-devtools` は Lighthouse・パフォーマンストレース・ヒープスナップショットなど DevTools 固有分析が必要な repo だけに repo-local で追加
 - 調査は source type で使い分ける: current docs は `context7`、直接指定された URL の取得・DOM 抽出は `ax`、Web 検索・検索結果経由の読み取りは `jina-reader`、広い比較調査は `web-research`、source-specific な到達性は専用 connector
-- 配置変更は APM の source of truth を編集して再生成する。`~/.codex/config.toml` などの deployed target は直接編集しない
+- MCP 設定を永続変更する前に、次の ownership gate を完了する
+  1. `~/.apm` が存在する場合は `apm-usage` を使う
+  2. 対象 MCP を root `apm.yml`、この ownership map、配布スクリプトから検索する
+  3. 編集対象を source of truth または deployed output に分類するまで書き込まない
+  4. APM 管理なら source of truth を編集して再生成し、`~/.codex/config.toml` などの deployed output は直接編集しない
+  5. 診断用の一時設定は `codex -c` などの one-shot override を使い、永続設定へ残さない
+- `jina-reader` の transport、URL、認証、tool filter の正本は root `apm.yml`。変更後は `codex mcp list` と実際の検索を確認する
 - repo-local MCP の固定リストは持たない。リポジトリ一覧は `ghq list -p`、実体は各リポジトリの `apm.yml` を確認する
 
 ## Git コミット規約

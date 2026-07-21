@@ -7,6 +7,8 @@ description: >-
   (`skillアップデートして再配布して`, `再配布`), `apm.yml` / `apm.lock.yaml` and managed catalog
   rollout, manual-skills package state, orphaned APM packages, checked-out
   external dependency repositories, optional repository-scoped skill packages,
+  `~/.codex/config.toml` の MCP block 編集、`codex mcp add` / `codex mcp remove`,
+  global MCP の追加・変更・削除、および所有元が不明な runtime MCP 設定,
   and `apmのバージョンあげて` / pinned `apm`
   source checks. For skill body, description, script, reference, or asset
   design itself, coordinate with `skill-creator`; for general mise usage
@@ -35,6 +37,18 @@ Route `~/.apm` work by ownership first, then choose the smallest task that match
   there, but never edit skill content through them.
 - Treat `~/.apm/apm_modules/` and deployed targets as generated state, not editing surfaces.
 - For an external dependency listed in `apm.yml` / `apm.lock.yaml`, edit the upstream repository checkout when that checkout is the user-specified source of truth. Commit and push there first, then accept the new resolved commit through `~/.apm`.
+
+## MCP Ownership Gate
+
+Before any persistent MCP configuration write:
+
+1. If `~/.apm` exists, inspect its root `apm.yml`, ownership guidance, and rollout script first.
+2. Classify the requested path as a source of truth or deployed output before writing.
+3. If the MCP is declared in APM, edit the tracked APM source and redeploy; do not run `codex mcp add` / `codex mcp remove` or hand-edit `~/.codex/config.toml` as the durable change.
+4. For diagnostics, prefer a one-run `codex -c` override and state that it is temporary.
+5. Verify the resolved server with `codex mcp list` and one real tool call before reporting completion.
+
+`jina-reader` is a cross-repository foundation MCP. Its transport, URL, authentication, and tool filter belong in the root `apm.yml`; `apm.lock.yaml` records the accepted state and runtime MCP blocks are deployed outputs.
 
 ## Skill Placement
 
