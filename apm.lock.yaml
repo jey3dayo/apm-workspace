@@ -2043,7 +2043,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: efa6ee89473de8501188215175cc611ce5bb2a7c
+  resolved_commit: bb231f5196c72e04020b909aab2a1c2b48088ce8
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -2071,9 +2071,6 @@ dependencies:
   - .agents/skills/ci-stability-hooks
   - .agents/skills/ci-stability-hooks/SKILL.md
   - .agents/skills/ci-stability-hooks/agents/openai.yaml
-  - .agents/skills/code-quality-improvement
-  - .agents/skills/code-quality-improvement/SKILL.md
-  - .agents/skills/code-quality-improvement/references/patterns.md
   - .agents/skills/code-review
   - .agents/skills/code-review/SKILL.md
   - .agents/skills/code-review/agents/openai.yaml
@@ -2183,15 +2180,6 @@ dependencies:
   - .agents/skills/mise/resources/templates/mise-config-template.toml
   - .agents/skills/polish
   - .agents/skills/polish/SKILL.md
-  - .agents/skills/predictive-analysis
-  - .agents/skills/predictive-analysis/SKILL.md
-  - .agents/skills/predictive-analysis/examples/preventive-measures.md
-  - .agents/skills/predictive-analysis/examples/project-specific-analysis.md
-  - .agents/skills/predictive-analysis/examples/risk-report-examples.md
-  - .agents/skills/predictive-analysis/references/analysis-methodology.md
-  - .agents/skills/predictive-analysis/references/issue-categorization.md
-  - .agents/skills/predictive-analysis/references/mitigation-strategies.md
-  - .agents/skills/predictive-analysis/references/risk-assessment-framework.md
   - .agents/skills/prepare-goal
   - .agents/skills/prepare-goal/SKILL.md
   - .agents/skills/prepare-goal/agents/openai.yaml
@@ -2201,6 +2189,8 @@ dependencies:
   - .agents/skills/refactoring
   - .agents/skills/refactoring/SKILL.md
   - .agents/skills/refactoring/references/boundary_ownership.md
+  - .agents/skills/refactoring/references/code_quality_cleanup.md
+  - .agents/skills/refactoring/references/dead_code_tsr.md
   - .agents/skills/refactoring/references/helper_extraction.md
   - .agents/skills/refactoring/references/parallel_dispatch.md
   - .agents/skills/review-board
@@ -2224,25 +2214,6 @@ dependencies:
   - .agents/skills/similarity/SKILL.md
   - .agents/skills/similarity/agents/openai.yaml
   - .agents/skills/similarity/references/report-analysis.md
-  - .agents/skills/tsr
-  - .agents/skills/tsr/MIGRATION.md
-  - .agents/skills/tsr/README.md
-  - .agents/skills/tsr/SKILL.md
-  - .agents/skills/tsr/config-loader.ts
-  - .agents/skills/tsr/examples/README.md
-  - .agents/skills/tsr/examples/home-config.json
-  - .agents/skills/tsr/examples/nextjs-app-router.json
-  - .agents/skills/tsr/examples/nextjs-pages-router.json
-  - .agents/skills/tsr/examples/nodejs-app.json
-  - .agents/skills/tsr/examples/react-app.json
-  - .agents/skills/tsr/package-lock.json
-  - .agents/skills/tsr/package.json
-  - .agents/skills/tsr/references/examples.md
-  - .agents/skills/tsr/references/tsrignore.md
-  - .agents/skills/tsr/references/workflow.md
-  - .agents/skills/tsr/tsconfig.json
-  - .agents/skills/tsr/tsr-config.default.json
-  - .agents/skills/tsr/tsr-config.schema.json
   - .agents/skills/work-log-maintenance
   - .agents/skills/work-log-maintenance/SKILL.md
   - .agents/skills/work-log-maintenance/agents/openai.yaml
@@ -2268,9 +2239,6 @@ dependencies:
   - .claude/skills/ci-stability-hooks
   - .claude/skills/ci-stability-hooks/SKILL.md
   - .claude/skills/ci-stability-hooks/agents/openai.yaml
-  - .claude/skills/code-quality-improvement
-  - .claude/skills/code-quality-improvement/SKILL.md
-  - .claude/skills/code-quality-improvement/references/patterns.md
   - .claude/skills/code-review
   - .claude/skills/code-review/SKILL.md
   - .claude/skills/code-review/agents/openai.yaml
@@ -2380,15 +2348,6 @@ dependencies:
   - .claude/skills/mise/resources/templates/mise-config-template.toml
   - .claude/skills/polish
   - .claude/skills/polish/SKILL.md
-  - .claude/skills/predictive-analysis
-  - .claude/skills/predictive-analysis/SKILL.md
-  - .claude/skills/predictive-analysis/examples/preventive-measures.md
-  - .claude/skills/predictive-analysis/examples/project-specific-analysis.md
-  - .claude/skills/predictive-analysis/examples/risk-report-examples.md
-  - .claude/skills/predictive-analysis/references/analysis-methodology.md
-  - .claude/skills/predictive-analysis/references/issue-categorization.md
-  - .claude/skills/predictive-analysis/references/mitigation-strategies.md
-  - .claude/skills/predictive-analysis/references/risk-assessment-framework.md
   - .claude/skills/prepare-goal
   - .claude/skills/prepare-goal/SKILL.md
   - .claude/skills/prepare-goal/agents/openai.yaml
@@ -2398,6 +2357,8 @@ dependencies:
   - .claude/skills/refactoring
   - .claude/skills/refactoring/SKILL.md
   - .claude/skills/refactoring/references/boundary_ownership.md
+  - .claude/skills/refactoring/references/code_quality_cleanup.md
+  - .claude/skills/refactoring/references/dead_code_tsr.md
   - .claude/skills/refactoring/references/helper_extraction.md
   - .claude/skills/refactoring/references/parallel_dispatch.md
   - .claude/skills/review-board
@@ -2421,25 +2382,6 @@ dependencies:
   - .claude/skills/similarity/SKILL.md
   - .claude/skills/similarity/agents/openai.yaml
   - .claude/skills/similarity/references/report-analysis.md
-  - .claude/skills/tsr
-  - .claude/skills/tsr/MIGRATION.md
-  - .claude/skills/tsr/README.md
-  - .claude/skills/tsr/SKILL.md
-  - .claude/skills/tsr/config-loader.ts
-  - .claude/skills/tsr/examples/README.md
-  - .claude/skills/tsr/examples/home-config.json
-  - .claude/skills/tsr/examples/nextjs-app-router.json
-  - .claude/skills/tsr/examples/nextjs-pages-router.json
-  - .claude/skills/tsr/examples/nodejs-app.json
-  - .claude/skills/tsr/examples/react-app.json
-  - .claude/skills/tsr/package-lock.json
-  - .claude/skills/tsr/package.json
-  - .claude/skills/tsr/references/examples.md
-  - .claude/skills/tsr/references/tsrignore.md
-  - .claude/skills/tsr/references/workflow.md
-  - .claude/skills/tsr/tsconfig.json
-  - .claude/skills/tsr/tsr-config.default.json
-  - .claude/skills/tsr/tsr-config.schema.json
   - .claude/skills/work-log-maintenance
   - .claude/skills/work-log-maintenance/SKILL.md
   - .claude/skills/work-log-maintenance/agents/openai.yaml
@@ -2460,8 +2402,6 @@ dependencies:
     .agents/skills/atomic-commit/agents/openai.yaml: sha256:8486b70455d5ec0241bc7bf64bf52d806084132b2c4fcea7dcfd79ed7aec497f
     .agents/skills/ci-stability-hooks/SKILL.md: sha256:a59b64440a7daf07908f76adecaa3279e2b413dfbcd35052f210a7a2a62c3123
     .agents/skills/ci-stability-hooks/agents/openai.yaml: sha256:60a9e8633c5933d8663858f15d71831b0af1c5265accf6f5e2ebba0916373cc2
-    .agents/skills/code-quality-improvement/SKILL.md: sha256:13e0d11f43b1578bcf34c498b19e4d02b2acd674bf9312b123e13e2cc2ff37aa
-    .agents/skills/code-quality-improvement/references/patterns.md: sha256:d371fb616f8c56d9aff936ce9518619856d66d3ad6968108945526882e032d69
     .agents/skills/code-review/SKILL.md: sha256:0645e0b0aa0b563ed61c5cbba0e927b77f3466d402e204a1aa762b70770f3116
     .agents/skills/code-review/agents/openai.yaml: sha256:4a105fb0747ac36ba050c012709c60c59b256eee9544dbe997d1f266075ce8db
     .agents/skills/code-review/config/default-projects.json: sha256:49f745428c8b22b22d66290b78fbf3de94d6ab79b02426162ed3ce61c7e28f07
@@ -2555,20 +2495,14 @@ dependencies:
     .agents/skills/mise/resources/examples/npm-package-migration.md: sha256:dd9c35732be0a4cb0dbd231bfaa16024c082d9bf0be61c66b6e531085b8bdfde
     .agents/skills/mise/resources/templates/mise-config-template.toml: sha256:7c0f5e891d7f3ae501287dcc849ad16251cb24beb2e699e435ad398bba954af0
     .agents/skills/polish/SKILL.md: sha256:f584c16f0754c71b80b323f25e33172ab39efd655afa1081c72c0a07824a59a7
-    .agents/skills/predictive-analysis/SKILL.md: sha256:eaf8fea7373abba60aa12872f5719d9b083d2b926ee7b24fbfad4fccc8226071
-    .agents/skills/predictive-analysis/examples/preventive-measures.md: sha256:dc8ed47b58448932b8c0157c45d0d483a49c8f445aa1e601515c779de53217c3
-    .agents/skills/predictive-analysis/examples/project-specific-analysis.md: sha256:999a24d8762cee62f8363c7cdd1a2708558d2e565315f4747e12cdf0ade2a41a
-    .agents/skills/predictive-analysis/examples/risk-report-examples.md: sha256:503799b04565cad0307ae2bc50f3f4aba29dba724ed4f9d3605dd564751766ad
-    .agents/skills/predictive-analysis/references/analysis-methodology.md: sha256:c92c6ebadaf01c9e6831e834ea926a19fa554f85d6e073ad2d6230f5bf33bc7b
-    .agents/skills/predictive-analysis/references/issue-categorization.md: sha256:99195f4aa92abfabc8fc2952da22db9f631399490859b0c607da6e8417ecf8e0
-    .agents/skills/predictive-analysis/references/mitigation-strategies.md: sha256:5312962dd75510fee9b27a0efce318e11b7df5d10860ef13480a524ea0463dbd
-    .agents/skills/predictive-analysis/references/risk-assessment-framework.md: sha256:743fac08f0860a79d250ab7556b977c3de991f1abd220898f886d9e843c374ff
     .agents/skills/prepare-goal/SKILL.md: sha256:792827300e8fa75400f2bc50d7d27c5a5a3f3b0a6c0859861d6c3566a1e88a35
     .agents/skills/prepare-goal/agents/openai.yaml: sha256:870d31c398ceb1c485a64b3a5e694942f055e85983718a61434b117bca5cefbc
     .agents/skills/quiet-command-auditor/SKILL.md: sha256:f6277836e6e6abf911131228442cbd6aad32d7b9f95ab5796e54d0667956e9cf
     .agents/skills/quiet-command-auditor/agents/openai.yaml: sha256:f291311cccf3c7de9195eaf3c032a88a2a9fc2cc13ab5296731316febadc755e
-    .agents/skills/refactoring/SKILL.md: sha256:55148c02acd04a8419d7a96e2f67a05bacff087c5ca6bf1cf57b4c5df7649a12
+    .agents/skills/refactoring/SKILL.md: sha256:ac746c1007120b1679db753cb8cf347d3ec8808b8b07c62bde8ec01caca38976
     .agents/skills/refactoring/references/boundary_ownership.md: sha256:e1453ec7788d1f013a356982568c7a5cbd727be72907b721ab8443040cc91058
+    .agents/skills/refactoring/references/code_quality_cleanup.md: sha256:c09cd24e853518d544d39ba80f5fcce381d477325001afde304be2f970c6562f
+    .agents/skills/refactoring/references/dead_code_tsr.md: sha256:3ca03e5ae296c2e0a67d45a6bda7da57329f06f4c56fa66099943de29dac0285
     .agents/skills/refactoring/references/helper_extraction.md: sha256:041609dbbd6d27e004e80bc0590c3c1a1482267306570fe07f12e6f338311930
     .agents/skills/refactoring/references/parallel_dispatch.md: sha256:4588d7ac3e700bc72f0b54a78537a0d248684e5924f3b9aa45f0e573a8adab49
     .agents/skills/review-board/SKILL.md: sha256:872c5b15040a14c75f689ae72d6ca0bbc81c17341207671c8420c7d155af3593
@@ -2584,27 +2518,9 @@ dependencies:
     .agents/skills/rules-creator/resources/examples/scoped-api-rule.md: sha256:4e2b713c335101969cb0cc5a9fa0b0d388c93bb82e7fbe3bd779e250b8a32da2
     .agents/skills/rules-creator/resources/examples/type-safety-rule.md: sha256:6328d3f9dc4226bd6432d43cf2e54012f8e232e796f82ba67c695000096f81bc
     .agents/skills/rules-creator/resources/templates/rule-template.md: sha256:eb9951d03ede7c9fbdb7b01b8b01ea7cbb2b58751b79e3c32493f7deaca1e9e3
-    .agents/skills/similarity/SKILL.md: sha256:9996c551ae8c69eddb2637e0cc0644f985f77911e7d94474167c6659e202e8fc
+    .agents/skills/similarity/SKILL.md: sha256:03c8bad77168fcb1cd783542f399dd847dee7c32b24c0ed4d542648ad732f198
     .agents/skills/similarity/agents/openai.yaml: sha256:256ce2d2a4a3f6ac024a9a08b2665de766232278500894c27c2c83569b778598
     .agents/skills/similarity/references/report-analysis.md: sha256:dad82829abba9e606035d045973cfc9a6f2b20ca359a79c3175dadcbbcb2edbe
-    .agents/skills/tsr/MIGRATION.md: sha256:4cfc6d22fe0569e71b50d106f2beb48a27bcc9ab9bc353c5974b3a1f9757a879
-    .agents/skills/tsr/README.md: sha256:baf1c761bcb44bf47c76b1fc762f1ad290bda38a59d1ccd70245f7fc455f59b9
-    .agents/skills/tsr/SKILL.md: sha256:1e61f765717fbf34e4c37b525264170440910a50b4ba07f5423412cb760d8fb7
-    .agents/skills/tsr/config-loader.ts: sha256:1cd498d2f8fadd2a4e1817b27a066f7cf019e77af9ec8e2faabcb4765550e946
-    .agents/skills/tsr/examples/README.md: sha256:3dee47bfa47ce09ff6ceb44fcaf8cf3c798227a0caad036c5cbe9a018ad88b1b
-    .agents/skills/tsr/examples/home-config.json: sha256:2459a9c3fcf6544bc27575f60be53dae212d26a158704ae4e3fa0dac439213db
-    .agents/skills/tsr/examples/nextjs-app-router.json: sha256:335470b3b381645fb4cfc084552a1573d388ce270ea552b8ee8998f90186a14c
-    .agents/skills/tsr/examples/nextjs-pages-router.json: sha256:48760e285e92ae55234819c91b702717ce1218577e9d686dae57a28723100170
-    .agents/skills/tsr/examples/nodejs-app.json: sha256:1ffdf6d51895c2d322f47784d75d0f702ffb31168f57c8afc9f708a66e4bcc64
-    .agents/skills/tsr/examples/react-app.json: sha256:128162b97b2677b2d3c0ef9e0ca1b2aee2c964aeadfd0cd9a7297a1d55a17139
-    .agents/skills/tsr/package-lock.json: sha256:60b33e523057cafe0db42d25c452a1d6d63036c2ebf2184e0abb4472cf76f248
-    .agents/skills/tsr/package.json: sha256:ac0fe02edaf53bb14443ec1c0246d23be705ca35b1b13c774a78f609a9b74297
-    .agents/skills/tsr/references/examples.md: sha256:4c6b467ad339480e03083106a74f592ed10c50963615433abb9b96a18f9c77b4
-    .agents/skills/tsr/references/tsrignore.md: sha256:e8e0f6e5aad20890526ecfd3ec2eac3d709db149e7e333e8b6787019604c34b6
-    .agents/skills/tsr/references/workflow.md: sha256:f8e12d2c1bf738b70ca736f492b18fb4d63edc9b6d16d6885ee19329193c8ce0
-    .agents/skills/tsr/tsconfig.json: sha256:7281659cf7d82c20093062d11b652d07c66f81f0938b76894f5a1a708730cfc8
-    .agents/skills/tsr/tsr-config.default.json: sha256:4a27845863e7648c90b898b2771b5390d6a26bcbcb4d9fccb120d15ae8479746
-    .agents/skills/tsr/tsr-config.schema.json: sha256:002f66fc8a6d432bd0909bfa9719939203bb687e50baa4425ee2f5150b0c714d
     .agents/skills/work-log-maintenance/SKILL.md: sha256:26f4064ff1c0e757e415121675d6caaecd30040f95304e6ed4cd4c73e022f3f9
     .agents/skills/work-log-maintenance/agents/openai.yaml: sha256:e951b8256a5a1b032bcca3c7105230f5041467594434ca23b562b8ec5ec4abc8
     .agents/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
@@ -2623,8 +2539,6 @@ dependencies:
     .claude/skills/atomic-commit/agents/openai.yaml: sha256:8486b70455d5ec0241bc7bf64bf52d806084132b2c4fcea7dcfd79ed7aec497f
     .claude/skills/ci-stability-hooks/SKILL.md: sha256:a59b64440a7daf07908f76adecaa3279e2b413dfbcd35052f210a7a2a62c3123
     .claude/skills/ci-stability-hooks/agents/openai.yaml: sha256:60a9e8633c5933d8663858f15d71831b0af1c5265accf6f5e2ebba0916373cc2
-    .claude/skills/code-quality-improvement/SKILL.md: sha256:13e0d11f43b1578bcf34c498b19e4d02b2acd674bf9312b123e13e2cc2ff37aa
-    .claude/skills/code-quality-improvement/references/patterns.md: sha256:d371fb616f8c56d9aff936ce9518619856d66d3ad6968108945526882e032d69
     .claude/skills/code-review/SKILL.md: sha256:0645e0b0aa0b563ed61c5cbba0e927b77f3466d402e204a1aa762b70770f3116
     .claude/skills/code-review/agents/openai.yaml: sha256:4a105fb0747ac36ba050c012709c60c59b256eee9544dbe997d1f266075ce8db
     .claude/skills/code-review/config/default-projects.json: sha256:49f745428c8b22b22d66290b78fbf3de94d6ab79b02426162ed3ce61c7e28f07
@@ -2718,20 +2632,14 @@ dependencies:
     .claude/skills/mise/resources/examples/npm-package-migration.md: sha256:dd9c35732be0a4cb0dbd231bfaa16024c082d9bf0be61c66b6e531085b8bdfde
     .claude/skills/mise/resources/templates/mise-config-template.toml: sha256:7c0f5e891d7f3ae501287dcc849ad16251cb24beb2e699e435ad398bba954af0
     .claude/skills/polish/SKILL.md: sha256:f584c16f0754c71b80b323f25e33172ab39efd655afa1081c72c0a07824a59a7
-    .claude/skills/predictive-analysis/SKILL.md: sha256:eaf8fea7373abba60aa12872f5719d9b083d2b926ee7b24fbfad4fccc8226071
-    .claude/skills/predictive-analysis/examples/preventive-measures.md: sha256:dc8ed47b58448932b8c0157c45d0d483a49c8f445aa1e601515c779de53217c3
-    .claude/skills/predictive-analysis/examples/project-specific-analysis.md: sha256:999a24d8762cee62f8363c7cdd1a2708558d2e565315f4747e12cdf0ade2a41a
-    .claude/skills/predictive-analysis/examples/risk-report-examples.md: sha256:503799b04565cad0307ae2bc50f3f4aba29dba724ed4f9d3605dd564751766ad
-    .claude/skills/predictive-analysis/references/analysis-methodology.md: sha256:c92c6ebadaf01c9e6831e834ea926a19fa554f85d6e073ad2d6230f5bf33bc7b
-    .claude/skills/predictive-analysis/references/issue-categorization.md: sha256:99195f4aa92abfabc8fc2952da22db9f631399490859b0c607da6e8417ecf8e0
-    .claude/skills/predictive-analysis/references/mitigation-strategies.md: sha256:5312962dd75510fee9b27a0efce318e11b7df5d10860ef13480a524ea0463dbd
-    .claude/skills/predictive-analysis/references/risk-assessment-framework.md: sha256:743fac08f0860a79d250ab7556b977c3de991f1abd220898f886d9e843c374ff
     .claude/skills/prepare-goal/SKILL.md: sha256:792827300e8fa75400f2bc50d7d27c5a5a3f3b0a6c0859861d6c3566a1e88a35
     .claude/skills/prepare-goal/agents/openai.yaml: sha256:870d31c398ceb1c485a64b3a5e694942f055e85983718a61434b117bca5cefbc
     .claude/skills/quiet-command-auditor/SKILL.md: sha256:f6277836e6e6abf911131228442cbd6aad32d7b9f95ab5796e54d0667956e9cf
     .claude/skills/quiet-command-auditor/agents/openai.yaml: sha256:f291311cccf3c7de9195eaf3c032a88a2a9fc2cc13ab5296731316febadc755e
-    .claude/skills/refactoring/SKILL.md: sha256:55148c02acd04a8419d7a96e2f67a05bacff087c5ca6bf1cf57b4c5df7649a12
+    .claude/skills/refactoring/SKILL.md: sha256:ac746c1007120b1679db753cb8cf347d3ec8808b8b07c62bde8ec01caca38976
     .claude/skills/refactoring/references/boundary_ownership.md: sha256:e1453ec7788d1f013a356982568c7a5cbd727be72907b721ab8443040cc91058
+    .claude/skills/refactoring/references/code_quality_cleanup.md: sha256:c09cd24e853518d544d39ba80f5fcce381d477325001afde304be2f970c6562f
+    .claude/skills/refactoring/references/dead_code_tsr.md: sha256:3ca03e5ae296c2e0a67d45a6bda7da57329f06f4c56fa66099943de29dac0285
     .claude/skills/refactoring/references/helper_extraction.md: sha256:041609dbbd6d27e004e80bc0590c3c1a1482267306570fe07f12e6f338311930
     .claude/skills/refactoring/references/parallel_dispatch.md: sha256:4588d7ac3e700bc72f0b54a78537a0d248684e5924f3b9aa45f0e573a8adab49
     .claude/skills/review-board/SKILL.md: sha256:872c5b15040a14c75f689ae72d6ca0bbc81c17341207671c8420c7d155af3593
@@ -2747,31 +2655,13 @@ dependencies:
     .claude/skills/rules-creator/resources/examples/scoped-api-rule.md: sha256:4e2b713c335101969cb0cc5a9fa0b0d388c93bb82e7fbe3bd779e250b8a32da2
     .claude/skills/rules-creator/resources/examples/type-safety-rule.md: sha256:6328d3f9dc4226bd6432d43cf2e54012f8e232e796f82ba67c695000096f81bc
     .claude/skills/rules-creator/resources/templates/rule-template.md: sha256:eb9951d03ede7c9fbdb7b01b8b01ea7cbb2b58751b79e3c32493f7deaca1e9e3
-    .claude/skills/similarity/SKILL.md: sha256:9996c551ae8c69eddb2637e0cc0644f985f77911e7d94474167c6659e202e8fc
+    .claude/skills/similarity/SKILL.md: sha256:03c8bad77168fcb1cd783542f399dd847dee7c32b24c0ed4d542648ad732f198
     .claude/skills/similarity/agents/openai.yaml: sha256:256ce2d2a4a3f6ac024a9a08b2665de766232278500894c27c2c83569b778598
     .claude/skills/similarity/references/report-analysis.md: sha256:dad82829abba9e606035d045973cfc9a6f2b20ca359a79c3175dadcbbcb2edbe
-    .claude/skills/tsr/MIGRATION.md: sha256:4cfc6d22fe0569e71b50d106f2beb48a27bcc9ab9bc353c5974b3a1f9757a879
-    .claude/skills/tsr/README.md: sha256:baf1c761bcb44bf47c76b1fc762f1ad290bda38a59d1ccd70245f7fc455f59b9
-    .claude/skills/tsr/SKILL.md: sha256:1e61f765717fbf34e4c37b525264170440910a50b4ba07f5423412cb760d8fb7
-    .claude/skills/tsr/config-loader.ts: sha256:1cd498d2f8fadd2a4e1817b27a066f7cf019e77af9ec8e2faabcb4765550e946
-    .claude/skills/tsr/examples/README.md: sha256:3dee47bfa47ce09ff6ceb44fcaf8cf3c798227a0caad036c5cbe9a018ad88b1b
-    .claude/skills/tsr/examples/home-config.json: sha256:2459a9c3fcf6544bc27575f60be53dae212d26a158704ae4e3fa0dac439213db
-    .claude/skills/tsr/examples/nextjs-app-router.json: sha256:335470b3b381645fb4cfc084552a1573d388ce270ea552b8ee8998f90186a14c
-    .claude/skills/tsr/examples/nextjs-pages-router.json: sha256:48760e285e92ae55234819c91b702717ce1218577e9d686dae57a28723100170
-    .claude/skills/tsr/examples/nodejs-app.json: sha256:1ffdf6d51895c2d322f47784d75d0f702ffb31168f57c8afc9f708a66e4bcc64
-    .claude/skills/tsr/examples/react-app.json: sha256:128162b97b2677b2d3c0ef9e0ca1b2aee2c964aeadfd0cd9a7297a1d55a17139
-    .claude/skills/tsr/package-lock.json: sha256:60b33e523057cafe0db42d25c452a1d6d63036c2ebf2184e0abb4472cf76f248
-    .claude/skills/tsr/package.json: sha256:ac0fe02edaf53bb14443ec1c0246d23be705ca35b1b13c774a78f609a9b74297
-    .claude/skills/tsr/references/examples.md: sha256:4c6b467ad339480e03083106a74f592ed10c50963615433abb9b96a18f9c77b4
-    .claude/skills/tsr/references/tsrignore.md: sha256:e8e0f6e5aad20890526ecfd3ec2eac3d709db149e7e333e8b6787019604c34b6
-    .claude/skills/tsr/references/workflow.md: sha256:f8e12d2c1bf738b70ca736f492b18fb4d63edc9b6d16d6885ee19329193c8ce0
-    .claude/skills/tsr/tsconfig.json: sha256:7281659cf7d82c20093062d11b652d07c66f81f0938b76894f5a1a708730cfc8
-    .claude/skills/tsr/tsr-config.default.json: sha256:4a27845863e7648c90b898b2771b5390d6a26bcbcb4d9fccb120d15ae8479746
-    .claude/skills/tsr/tsr-config.schema.json: sha256:002f66fc8a6d432bd0909bfa9719939203bb687e50baa4425ee2f5150b0c714d
     .claude/skills/work-log-maintenance/SKILL.md: sha256:26f4064ff1c0e757e415121675d6caaecd30040f95304e6ed4cd4c73e022f3f9
     .claude/skills/work-log-maintenance/agents/openai.yaml: sha256:e951b8256a5a1b032bcca3c7105230f5041467594434ca23b562b8ec5ec4abc8
     .claude/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
-  content_hash: sha256:0ad134958732bbd3a319f45819dd797420a1d64ca0d408a3afdc56108aefd614
+  content_hash: sha256:0e0a0b6a85ed18418507bb7e37a2cfcb3f3c3b48ad8b5d6d9f03ae6116732869
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
