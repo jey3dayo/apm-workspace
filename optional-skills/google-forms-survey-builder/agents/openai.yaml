@@ -1,0 +1,4 @@
+interface:
+  display_name: "Google Forms Survey Builder"
+  short_description: "SURVEY_QUESTIONS.md からアンケートを作成・更新"
+  default_prompt: "Use $google-forms-survey-builder to turn SURVEY_QUESTIONS.md into a Google Forms survey."
