@@ -152,6 +152,73 @@ EOF
   rm -rf "$workspace_dir"
 }
 
+@test "manifest skill subset parsing emits no awk warnings" {
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: nextlevelbuilder/ui-ux-pro-max-skill
+      skills:
+        - ui-ux-pro-max
+EOF
+  WORKSPACE_DIR="$workspace_dir"
+
+  run manifest_external_skill_subset "nextlevelbuilder/ui-ux-pro-max-skill"
+  [ "$status" -eq 0 ]
+  [ "$output" = "ui-ux-pro-max" ]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "upgrade uses the interactive apm update command" {
+  run rg -F 'run = ["apm update -g", { task = "deploy" }]' "$WORKSPACE_DIR/mise.toml"
+  [ "$status" -eq 0 ]
+}
+
+@test "audit smoke preserves manifest targets" {
+  run rg -F 'apm install --only apm &&' "$WORKSPACE_DIR/scripts/apm-workspace.sh"
+  [ "$status" -eq 0 ]
+}
+
+@test "Jina MCP ownership is guarded by tracked APM guidance" {
+  run rg -F 'This manifest entry is the source of truth; runtime MCP blocks are deployed outputs.' "$WORKSPACE_DIR/apm.yml"
+  [ "$status" -eq 0 ]
+
+  run rg -F 'MCP 設定を永続変更する前に、次の ownership gate を完了する' "$WORKSPACE_DIR/catalog/AGENTS.md"
+  [ "$status" -eq 0 ]
+
+  run rg -F '`~/.codex/config.toml` の MCP block 編集、`codex mcp add` / `codex mcp remove`' "$WORKSPACE_DIR/catalog/skills/apm-usage/SKILL.md"
+  [ "$status" -eq 0 ]
+}
+
+@test "external lock matching ignores GitHub reference casing" {
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand
+EOF
+  WORKSPACE_DIR="$workspace_dir"
+  locked_external_skill_records() {
+    printf '%s\n' 'lum1104/understand-anything|understand-anything-plugin/skills/understand|abc123|main'
+  }
+  external_skill_content_dir() {
+    printf '%s\n' '/tmp/understand'
+  }
+
+  run collect_external_skill_records
+  [ "$status" -eq 0 ]
+  [ "$output" = $'external\tunderstand\t/tmp/understand\tlum1104/understand-anything/understand-anything-plugin/skills/understand' ]
+
+  locked_external_skill_records() {
+    printf '%s\n' 'lum1104/understand-anything|understand-anything-plugin/skills/Understand|abc123|main'
+  }
+  run collect_external_skill_records
+  [ "$status" -ne 0 ]
+
+  rm -rf "$workspace_dir"
+}
+
 @test "workspace_remote_to_repo_reference parses an https remote" {
   run workspace_remote_to_repo_reference "https://github.com/owner/repo.git"
   [ "$status" -eq 0 ]

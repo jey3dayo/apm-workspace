@@ -1032,7 +1032,7 @@ dependencies: []
     try {
       Invoke-AuditCiSmoke
 
-      $apmCalls | Should -Be @("install --only apm --target all", "audit --ci")
+      $apmCalls | Should -Be @("install --only apm", "audit --ci")
       $script:installSawManifest | Should -Be $true
       $script:auditSawManifest | Should -Be $true
       Test-Path (Join-Path $TestDrive "apm-audit-ci-smoke") | Should -Be $false
@@ -1082,9 +1082,19 @@ dependencies: []
     $miseToml | Should -Match '(?s)\[tasks\.check\]\s*description = "Run lightweight pre-deploy checks for the ~/.apm workspace"\s*depends = \["format:check", "validate"\]'
     $miseToml | Should -Match '(?s)\[tasks\.verify\]\s*description = "Run deep verification for the ~/.apm workspace"\s*run = \[\{ task = "check" \}, \{ task = "smoke:catalog" \}\]'
     $miseToml | Should -Match '(?s)\[tasks\.deploy\]\s*description = "Run checks, deploy the current workspace state, and inspect targets"\s*run = \[\{ task = "check" \}, \{ task = "apply" \}, \{ task = "doctor" \}\]'
-    $miseToml | Should -Match '(?s)\[tasks\.upgrade\].*?apm install -g --update.*?\{ task = "deploy" \}'
+    $miseToml | Should -Match '(?s)\[tasks\.upgrade\].*?apm update -g.*?\{ task = "deploy" \}'
     $miseToml | Should -Match '(?s)\[tasks\."refresh:deploy"\].*?\{ task = "refresh" \}.*?\{ task = "deploy" \}'
     $miseToml | Should -Not -Match 'APM_BOOTSTRAP_REPO'
+  }
+
+  It "guards Jina MCP ownership in tracked APM guidance" {
+    $manifest = Get-Content -LiteralPath (Join-Path $workspaceRoot "apm.yml") -Raw
+    $agents = Get-Content -LiteralPath (Join-Path $workspaceRoot "catalog/AGENTS.md") -Raw
+    $apmUsage = Get-Content -LiteralPath (Join-Path $workspaceRoot "catalog/skills/apm-usage/SKILL.md") -Raw
+
+    $manifest | Should -Match 'This manifest entry is the source of truth; runtime MCP blocks are deployed outputs\.'
+    $agents | Should -Match 'MCP 設定を永続変更する前に、次の ownership gate を完了する'
+    $apmUsage | Should -Match '`~/.codex/config\.toml` の MCP block 編集、`codex mcp add` / `codex mcp remove`'
   }
 
   It "describes the catalog readme without legacy mirror wording" {
