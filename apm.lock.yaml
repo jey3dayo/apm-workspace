@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-07-21T16:29:06.686355+00:00'
+generated_at: '2026-07-21T17:11:01.451516+00:00'
 apm_version: 0.26.0
 dependencies:
 - repo_url: anthropics/claude-code
@@ -20299,37 +20299,13 @@ deployments:
   - obra/superpowers/skills/writing-plans
   active_owner: obra/superpowers/skills/writing-plans
   content_hash: sha256:aa728b96aad603c8be28875a4305637f6c984aa81ffcadcb13e743202fa2a0c7
-- kind: uri
-  target: mcp
-  value: 1password
-  runtime: claude
-  scope: project
-  owners:
-  - .
-  active_owner: .
-  content_hash: null
-- kind: uri
-  target: mcp
-  value: 1password
-  runtime: codex
-  scope: project
-  owners:
-  - .
-  active_owner: .
-  content_hash: null
 mcp_servers:
-- 1password
 - codex
 - context7
 - headroom
 - jina-reader
 - mcp-simple-voicevox
 mcp_configs:
-  1password:
-    name: 1password
-    transport: stdio
-    registry: false
-    command: /Applications/1Password.app/Contents/MacOS/onepassword-mcp
   codex:
     name: codex
     transport: stdio
@@ -20368,11 +20344,6 @@ mcp_configs:
     - '@t09tanaka/mcp-simple-voicevox'
     registry: false
     command: npx
-mcp_target_servers:
-  claude:
-  - 1password
-  codex:
-  - 1password
 local_deployed_files:
 - .agents/skills/agent-curation
 - .agents/skills/find-skills

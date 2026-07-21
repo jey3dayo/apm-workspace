@@ -3,6 +3,19 @@
 採用・撤去・見送りにした APM パッケージの意思決定ログ。1 パッケージ 1 セクション。
 「なぜ入れたか / なぜ消したか / 再検討するなら何を見るか」を残す。
 
+## 1Password MCP
+
+- **Status: global APM から撤去・host-local user scope へ移管（2026-07-22）**
+- 理由: 1Password デスクトップアプリとローカル承認 UI に依存し、macOS、native Linux、
+  WSL で実行コマンドが異なる。共有 `apm.yml` の macOS 絶対パスを WSL に配布すると
+  MCP startup error になるため、ポータブルな global MCP と分離する。
+- 現在の配置: `mise bootstrap` の final hook がホスト上の MCP コマンドを解決し、Codex / Claude
+  の user-scope MCP を冪等に同期する。native 環境では `onepassword-mcp` / `1password-mcp`、
+  WSL では Windows App Execution Alias の `1password-mcp.exe` を利用する。APM は同名エントリを
+  所有せず、`~/.codex/config.toml` と `~/.claude.json` は生成先として扱う。
+- 再検討するなら: APM が MCP エントリ単位の OS / capability 条件を正式サポートした時点で、
+  host-local 配置からの再統合を検討する。
+
 ## emilkowalski/skills (emil-design-eng ほか)
 
 - **Status: 採用・global（2026-07-16）**

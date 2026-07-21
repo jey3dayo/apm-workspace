@@ -1,4 +1,10 @@
 # ========================================
+# Settings
+# ========================================
+[settings]
+experimental = true
+
+# ========================================
 # Environment
 # ========================================
 [env]
@@ -26,6 +32,17 @@ taplo = "0.10.0"
 # ========================================
 # Workspace Commands
 # ========================================
+[tasks.bootstrap]
+description = "Converge host-local configuration after mise bootstrap"
+hide = true
+depends = ["setup:mcp:host"]
+
+[tasks."setup:mcp:host"]
+description = "Configure host-local MCP servers for Codex and Claude"
+hide = true
+run = "bash ./scripts/apm-workspace.sh setup:mcp:host"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 setup:mcp:host"
+
 [tasks.apply]
 description = "Deploy user-scope-compatible APM dependencies and compile Codex output"
 run = "bash ./scripts/apm-workspace.sh apply"

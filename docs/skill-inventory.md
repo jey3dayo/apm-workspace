@@ -94,7 +94,7 @@ global の一覧に無くても廃止ではない。各リポジトリの `apm.y
 
 ## global MCP（root apm.yml の mcp:）
 
-`context7`, `mcp-simple-voicevox`, `jina-reader`, `codex`, `1password`, `headroom`
+`context7`, `mcp-simple-voicevox`, `jina-reader`, `codex`, `headroom`
 
 ## デザイン / UI・UX / レビュー系の役割マップ
 

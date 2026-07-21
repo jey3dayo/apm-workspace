@@ -191,6 +191,47 @@ EOF
   [ "$status" -eq 0 ]
 }
 
+# --- host-local MCP bootstrap ----------------------------------------------
+
+@test "resolve_1password_mcp_command prefers a native command" {
+  fake_bin="$(mktemp -d)"
+  printf '#!/usr/bin/env bash\nexit 0\n' >"$fake_bin/1password-mcp"
+  chmod +x "$fake_bin/1password-mcp"
+
+  PATH="$fake_bin:$PATH" run resolve_1password_mcp_command
+
+  [ "$status" -eq 0 ]
+  [ "$output" = "$fake_bin/1password-mcp" ]
+  rm -rf "$fake_bin"
+}
+
+@test "resolve_1password_mcp_command converts the Windows app alias under WSL" {
+  fake_bin="$(mktemp -d)"
+  cat >"$fake_bin/cmd.exe" <<'EOF'
+#!/usr/bin/env bash
+printf 'C:\\Users\\sample\\AppData\\Local\\Microsoft\\WindowsApps\\1password-mcp.exe\r\n'
+EOF
+  cat >"$fake_bin/wslpath" <<'EOF'
+#!/usr/bin/env bash
+printf '/mnt/c/Users/sample/AppData/Local/Microsoft/WindowsApps/1password-mcp.exe\n'
+EOF
+  chmod +x "$fake_bin/cmd.exe" "$fake_bin/wslpath"
+
+  PATH="$fake_bin:/usr/bin:/bin" run resolve_1password_mcp_command
+
+  [ "$status" -eq 0 ]
+  [ "$output" = "/mnt/c/Users/sample/AppData/Local/Microsoft/WindowsApps/1password-mcp.exe" ]
+  rm -rf "$fake_bin"
+}
+
+@test "mise bootstrap keeps host MCP setup tasks hidden" {
+  run rg -U '\[tasks\.bootstrap\]\n(?:.*\n)*?hide = true' "$WORKSPACE_DIR/mise.toml"
+  [ "$status" -eq 0 ]
+
+  run rg -U '\[tasks\."setup:mcp:host"\]\n(?:.*\n)*?hide = true' "$WORKSPACE_DIR/mise.toml"
+  [ "$status" -eq 0 ]
+}
+
 @test "external lock matching ignores GitHub reference casing" {
   workspace_dir="$(mktemp -d)"
   cat >"$workspace_dir/apm.yml" <<'EOF'

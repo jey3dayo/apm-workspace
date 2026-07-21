@@ -95,10 +95,6 @@ dependencies:
       command: codex
       args:
         - mcp-server
-    - name: 1password
-      registry: false
-      transport: stdio
-      command: /Applications/1Password.app/Contents/MacOS/onepassword-mcp
     - name: headroom
       registry: false
       transport: stdio

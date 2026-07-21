@@ -467,6 +467,103 @@ function Install-WorkspaceMcpDependencies {
   Invoke-WorkspaceInstallCommand -InstallArgs @("-g", "--only", "mcp")
 }
 
+function Get-OnePasswordMcpCommand {
+  foreach ($commandName in @("1password-mcp", "onepassword-mcp", "1password-mcp.exe")) {
+    $resolvedCommand = Get-Command $commandName -ErrorAction SilentlyContinue
+    if ($resolvedCommand) {
+      if (-not [string]::IsNullOrWhiteSpace($resolvedCommand.Source)) {
+        return $resolvedCommand.Source
+      }
+      if (-not [string]::IsNullOrWhiteSpace($resolvedCommand.Path)) {
+        return $resolvedCommand.Path
+      }
+    }
+  }
+
+  $knownPaths = @(
+    "/Applications/1Password.app/Contents/MacOS/onepassword-mcp",
+    "/opt/1Password/onepassword-mcp"
+  )
+  foreach ($commandPath in $knownPaths) {
+    if (Test-Path -LiteralPath $commandPath -PathType Leaf) {
+      return $commandPath
+    }
+  }
+
+  return $null
+}
+
+function Test-CodexOnePasswordMcp {
+  param([Parameter(Mandatory = $true)][string]$McpCommandPath)
+
+  $details = @(& codex mcp get 1password 2>$null)
+  if ($LASTEXITCODE -ne 0) {
+    return $false
+  }
+  return (($details -join "`n").Contains("command: $McpCommandPath"))
+}
+
+function Test-ClaudeOnePasswordMcp {
+  param([Parameter(Mandatory = $true)][string]$McpCommandPath)
+
+  $details = @(& claude mcp get 1password 2>$null)
+  if ($LASTEXITCODE -ne 0) {
+    return $false
+  }
+  $joinedDetails = $details -join "`n"
+  return ($joinedDetails.Contains("Scope: User config") -and $joinedDetails.Contains("Command: $McpCommandPath"))
+}
+
+function Invoke-SetupHostMcp {
+  Require-Command -Name "codex"
+  Require-Command -Name "claude"
+
+  $mcpCommandPath = Get-OnePasswordMcpCommand
+  if ([string]::IsNullOrWhiteSpace($mcpCommandPath)) {
+    throw "1Password MCP command not found. Install or enable the 1Password desktop app MCP first."
+  }
+
+  if (Test-CodexOnePasswordMcp -McpCommandPath $mcpCommandPath) {
+    Write-Host "Codex 1Password MCP is already configured: $mcpCommandPath"
+  } else {
+    & codex mcp get 1password *> $null
+    if ($LASTEXITCODE -eq 0) {
+      & codex mcp remove 1password
+      if ($LASTEXITCODE -ne 0) {
+        throw "Failed to remove the existing Codex 1Password MCP entry."
+      }
+    }
+    & codex mcp add 1password -- $mcpCommandPath
+    if ($LASTEXITCODE -ne 0) {
+      throw "Failed to configure the Codex 1Password MCP entry."
+    }
+  }
+
+  if (Test-ClaudeOnePasswordMcp -McpCommandPath $mcpCommandPath) {
+    Write-Host "Claude 1Password MCP is already configured: $mcpCommandPath"
+  } else {
+    & claude mcp get 1password *> $null
+    if ($LASTEXITCODE -eq 0) {
+      & claude mcp remove 1password --scope user
+      if ($LASTEXITCODE -ne 0) {
+        throw "Failed to remove the existing Claude 1Password MCP entry."
+      }
+    }
+    & claude mcp add --scope user 1password -- $mcpCommandPath
+    if ($LASTEXITCODE -ne 0) {
+      throw "Failed to configure the Claude 1Password MCP entry."
+    }
+  }
+
+  if (-not (Test-CodexOnePasswordMcp -McpCommandPath $mcpCommandPath)) {
+    throw "Codex 1Password MCP verification failed."
+  }
+  if (-not (Test-ClaudeOnePasswordMcp -McpCommandPath $mcpCommandPath)) {
+    throw "Claude 1Password MCP verification failed."
+  }
+  Write-SuccessLine "Host-local 1Password MCP configuration is current."
+}
+
 function Test-ManifestHasLocalPackages {
   $manifestPath = Join-Path $WorkspaceDir "apm.yml"
   if (-not (Test-Path -LiteralPath $manifestPath)) {
@@ -2623,6 +2720,10 @@ if ($env:APM_WORKSPACE_LIB_ONLY -eq "1") {
 }
 
 switch ($Command) {
+  "setup:mcp:host" {
+    Invoke-SetupHostMcp
+  }
+
   "apply" {
     Invoke-Apply
   }
@@ -2680,6 +2781,7 @@ switch ($Command) {
 Usage: scripts/apm-workspace.ps1 <command> [args...]
 
 Commands:
+  setup:mcp:host     Configure host-local MCP servers for Codex and Claude
   apply              Offline deploy user-scope-compatible dependencies and compile Codex output
   apply:skills:local Quick-sync local catalog and private skills into ~/.agents/skills only
   refresh            Refresh the checkout and dependencies only; does not deploy

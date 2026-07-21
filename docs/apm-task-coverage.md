@@ -14,6 +14,7 @@
 - `~/.apm/optional-skills/<id>/**`: individually installable repository-scoped optional skills; tracked here but not included in the global rollout
 - `~/.apm/catalog/{AGENTS.md,agents/**,commands/**,rules/**}`: shared guidance
 - `~/.apm/apm.yml`, `~/.apm/apm.lock.yaml`: dependency selection and accepted upstream state
+- `~/.apm/mise.toml`, `~/.apm/scripts/apm-workspace.*`: host-local MCP bootstrap wiring; user-scope runtime configs are generated targets
 - `~/.apm/.apm/skills/**`: APM workspace-only skill source for skills intentionally excluded from global rollout
 - `~/.apm/.claude/skills/**`, `~/.apm/.agents/skills/**`: project runtime bridges; child skill directories symlink to the workspace-only source
 - `~/.apm/apm_modules/`: cache only
@@ -37,6 +38,7 @@
 | task / command                | skills   | agents   | rules    | `AGENTS.md` | commands | Coverage summary                                                                                                             |
 | ----------------------------- | -------- | -------- | -------- | ----------- | -------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `mise run apply`              | ○        | ○        | ○        | ○           | ○        | Installs and syncs the managed catalog from `~/.apm`                                                                         |
+| `mise bootstrap`              | n/a      | n/a      | n/a      | n/a         | n/a      | Runs the hidden final hook that reconciles host-local MCP entries for Codex and Claude                                       |
 | `mise run refresh`            | ○        | ○        | ○        | ○           | ○        | Refreshes the checkout and dependency state without deploying                                                                |
 | `mise run upgrade`            | ○        | ○        | ○        | ○           | ○        | Accepts newer upstream package content with `apm install -g --update`, then runs the local rollout                           |
 | `mise run refresh:deploy`     | ○        | ○        | ○        | ○           | ○        | Refreshes first, then runs the full local rollout without forcing upstream refresh                                           |
