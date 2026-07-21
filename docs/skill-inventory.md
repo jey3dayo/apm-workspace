@@ -38,13 +38,13 @@
 
 ## global（自作 catalog: catalog/skills/）
 
-35 スキル。主な系統:
+34 スキル。主な系統:
 
 - APM・環境運用: `apm-usage`, `apm-repo-bootstrap`, `mise`, `mcp-tools`,
   `headroom`, `dotenvx-env-ops`, `1password-item-ops`, `herdr`
 - レビュー・品質: `code-review`, `review-board`, `review-fix-loop`,
   `review-plan`, `polish`, `code-quality-improvement`, `predictive-analysis`,
-  `premortem`, `quiet-command-auditor`
+  `quiet-command-auditor`
 - デザイン: `design-md-workflow`, `design-system-review`
 - リファクタリング・解析: `refactoring`, `similarity`, `tsr`
 - ドキュメント: `docs-manager`, `docs-entrypoint-review`,
