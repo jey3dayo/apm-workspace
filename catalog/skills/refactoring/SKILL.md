@@ -3,8 +3,7 @@ name: refactoring
 description: |
   [What] Integrated refactoring workflow for TypeScript/JavaScript/React:
   similarity-ts (duplicate detection), react-doctor (React diagnostics),
-  tsr (dead code removal), and boundary ownership scanning, orchestrated
-  with code-quality-improvement.
+  dead-code and code-quality cleanup guidance, and boundary ownership scanning.
   [When] Use when users mention リファクタ / refactor, 重複コード /
   duplicate code, コード整理 / cleanup, デッドコード・未使用ファイル・
   未使用 export removal, 共通 helper extraction, validation / Result /
@@ -16,8 +15,8 @@ description: |
 # Refactoring - Integrated TypeScript/JavaScript/React Refactoring Workflow
 
 Orchestrator skill that combines `similarity-ts` (duplicate code detection),
-`react-doctor` (React diagnostics), boundary ownership scanning, and `tsr`
-(dead code removal) into a 3-phase incremental refactoring workflow:
+`react-doctor` (React diagnostics), boundary ownership scanning, and focused
+dead-code and code-quality cleanup guidance into a 3-phase refactoring workflow:
 Diagnose -> Analyze & Plan -> Execute.
 
 Save diagnostic outputs under `tmp/refactoring/` in the target repository
@@ -33,10 +32,10 @@ rg -q '"react"' package.json && echo "React project"
 [ -f tsconfig.json ] && echo "TypeScript project"
 ```
 
-| Project Type              | Parallel diagnostic tracks         |
-| ------------------------- | ---------------------------------- |
-| React + TypeScript/JS     | react-doctor + similarity-ts + tsr |
-| TypeScript/JS (non-React) | similarity-ts + tsr                |
+| Project Type              | Parallel diagnostic tracks                    |
+| ------------------------- | --------------------------------------------- |
+| React + TypeScript/JS     | react-doctor + similarity-ts + dead-code scan |
+| TypeScript/JS (non-React) | similarity-ts + dead-code scan                |
 
 ## Phase 1: Diagnose
 
@@ -218,15 +217,16 @@ check before moving to the next slice.
 ### 3-5: Fix ESLint/Type Safety Issues
 
 Fix remaining code quality issues after deduplication. Attempt the
-repository's lint auto-fix task first, then review remaining errors. For
-complex type safety issues (any-type elimination, Result<T,E> patterns),
-delegate to the `code-quality-improvement` skill.
+repository's lint auto-fix task first, then review remaining errors. For a
+large lint or type-safety backlog, load
+`references/code_quality_cleanup.md` and execute one bounded risk category at
+a time.
 
 ### 3-6: Remove Dead Code
 
-Detect dead code with the repository's tsr task (for example `pnpm tsr:check`),
-review the report, then remove incrementally. For detailed usage, refer to the
-`tsr` skill (`../tsr/SKILL.md`).
+Detect dead code with the repository's existing task, review the report, then
+remove incrementally. When the repository uses TSR, load
+`references/dead_code_tsr.md` for its actual CLI contract and safety checks.
 
 ### 3-7: Verification (Required)
 
@@ -240,13 +240,13 @@ pnpm type-check && pnpm lint && pnpm test
 
 Do not proceed to the next step until all pass.
 
-## Skill Delegation
+## Related Skills and References
 
-| Problem Area                                     | Delegated Skill                        |
+| Problem Area                                     | Skill or reference                     |
 | ------------------------------------------------ | -------------------------------------- |
 | Detailed duplicate code analysis                 | `../similarity/SKILL.md`               |
-| ESLint errors / type safety                      | `../code-quality-improvement/SKILL.md` |
-| Dead code removal                                | `../tsr/SKILL.md`                      |
+| Large lint / type-safety cleanup                 | `references/code_quality_cleanup.md`   |
+| Dead code removal with TSR                       | `references/dead_code_tsr.md`          |
 | React-specific pattern diagnosis                 | `../react-doctor/SKILL.md` (if exists) |
 | Parallel diagnostics / bounded slice review loop | `../review-fix-loop/SKILL.md`          |
 | Impact scope / reference tracking                | MCP Serena: `find_referencing_symbols` |

@@ -74,5 +74,5 @@ similarity-ts --no-size-penalty src/ > tmp/similarity-report.md
 
 ## 他スキルとの連携
 
-- 重複検出を含む広いリファクタ計画（react-doctor / tsr との組み合わせ）は `refactoring` スキルが束ねる。このスキルは similarity-ts 単体の実行と判断に集中する
-- ESLint・型安全性の修正は `code-quality-improvement`、デッドコード削除は `tsr` を使う
+- 重複検出を含む広いリファクタ計画（React 診断、コード品質、デッドコード整理との組み合わせ）は `refactoring` スキルが束ねる。このスキルは similarity-ts 単体の実行と判断に集中する
+- ESLint・型安全性・デッドコード整理は `refactoring` の該当 reference を使い、このスキルへ混在させない
