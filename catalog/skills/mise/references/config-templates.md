@@ -132,7 +132,7 @@ depends = ["format", "lint"]
 
 ## User-Global Dotfiles Template
 
-Use this for `~/.config/mise` style personal setups with environment-specific tool files and shared task includes.
+Use this for `~/.config/mise` style personal setups with environment-specific tool files and repository-local task includes. Add auto-loaded global tasks only as an explicit opt-in.
 
 ```toml
 # ~/.config/mise/config.toml
@@ -160,15 +160,17 @@ taplo = "<verified-version>"
 # ~/.config/.mise.toml
 [task_config]
 includes = [
-  ".config/mise/tasks/format.toml",
-  ".config/mise/tasks/lint.toml",
-  ".config/mise/tasks/ci.toml",
+  ".config/mise/local-tasks/format.toml",
+  ".config/mise/local-tasks/lint.toml",
+  ".config/mise/local-tasks/ci.toml",
 ]
 ```
 
 Notes:
 
 - Prefer this split layout only for personal global environments
+- Keep dotfiles and PC-maintenance tasks in `local-tasks/` by default, including machine-wide backup or restore families
+- Use `~/.config/mise/tasks/` only when cross-directory visibility is explicitly useful; machine-wide data scope alone is not a reason
 - In project repos, keep a single `mise.toml` unless there is a strong reason to split
 - If you add tools like `shellcheck` or `shfmt`, wire them into `lint:*` / `format:*` tasks
 

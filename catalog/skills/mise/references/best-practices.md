@@ -18,9 +18,10 @@ For `~/.config/mise` or similar personal environments, a split layout is often b
 
 - `config.toml` for shared settings only
 - `config.default.toml`, `config.ci.toml`, `config.windows.toml`, etc. for environment-specific toolsets
-- `.mise.toml` with `[task_config].includes = ["~/.config/mise/tasks/*.toml"]` style task loading
+- `~/.config/mise/tasks/` only as explicit opt-in for tasks intentionally available from every directory
+- `.mise.toml` with `[task_config].includes = ["~/.config/mise/local-tasks/*.toml"]` for dotfiles-repository-only task loading
 
-Use this when one person maintains multiple environments. For normal repositories, prefer a single project-local `mise.toml`.
+Use this when one person maintains multiple environments. Default PC-maintenance, credential-dependent, and destructive task families to `local-tasks/`; machine-wide data scope does not by itself justify global command visibility. For normal repositories, prefer a single project-local `mise.toml`.
 
 ### Typical Skeleton
 
@@ -92,7 +93,7 @@ run = "cargo test"
 
 - Use `depends` for _ordering/parallelism_
 - Use `run` for _the actual commands_ that constitute the task
-- Use `[task_config].includes` only when you intentionally split large user-global task collections across files
+- Use `[task_config].includes` only when you intentionally split a large task collection; keep repository-only includes outside mise's auto-loaded global task directory
 
 The official docs describe this separation under Task Configuration → run/depends
 

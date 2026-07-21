@@ -4,6 +4,7 @@ description: >-
   Guidance for mise (mise-en-place) as task runner, tool version manager, and
   package manager. Use when working with mise.toml, task definitions and
   dependency graphs (`mise run`, depends/run), `[task_config].includes` and
+  global-vs-repository task placement (`~/.config/mise/tasks` vs local includes),
   DB/env/dotenvx/secrets/tools task-family splitting, tool/package
   centralization (npm:/pipx:), `mise upgrade` and `minimum_release_age`,
   Windows settings (`run_windows`, `config.windows.toml`), `mise skills add`,
@@ -29,9 +30,19 @@ Classify the request into one mode and answer from that mode only:
    - Treat the repo's existing task names, workflow semantics, and source-of-truth rules as authoritative
 2. User-global / dotfiles mode — the user is managing `~/.config/mise`, personal toolchains, or `mise skills add`.
    - Split layouts are valid here: settings-only `config.toml`, environment files such as `config.default.toml` / `config.ci.toml` / `config.windows.toml`, shared task files via `[task_config].includes` — see `references/task-config-includes.md`
+   - Treat `~/.config/mise/tasks/` as an explicit opt-in surface for tasks intentionally available from any directory; keep dotfiles maintenance in a separate directory such as `~/.config/mise/local-tasks/` by default
    - `config.windows.toml` and `windows_default_*_shell_args` usually belong here unless the repository explicitly vendors its own Windows shell policy
 
 If the request mentions `mise skills add`, `mise bootstrap`, `[dotfiles]`, personal/global setup, or `~/.config/mise`, treat it as user-global. Otherwise default to project-local.
+
+## Global vs Repository-Local Tasks
+
+- Determine both operational scope and exposure need from the real `dir`, runner path, data paths, environment and credential dependencies, and intended invocation. Do not infer placement from a family name such as `backup` or from machine-wide data scope alone.
+- Default dotfiles and PC-maintenance tasks to repository-local includes even when they operate machine-wide state. Versioning and operating machine configuration in `~/.config` does not require exposing the commands in unrelated repositories.
+- Use `~/.config/mise/tasks/` only when the user explicitly wants repeated cross-directory invocation and the whole exposed task family is suitable for that visibility.
+- Keep credential-dependent or destructive task families repository-local by default. If only a safe subset truly needs global access, split that subset instead of exposing sibling tasks such as `restore-inplace`, `prune`, or `cleanup`.
+- Keep a project task repository-local when it operates one repository's files, service, environment, credentials, or lifecycle. Define it in that repository's `mise.toml` or repository-local includes.
+- Keep mise task placement separate from Agent skill placement. Task descriptions plus a named helper are often sufficient; add an Agent skill only when reusable, non-obvious operational guidance exceeds the task interface. Coordinate APM placement with `apm-usage` when that is the actual request.
 
 ## Repository Overrides
 
@@ -66,6 +77,13 @@ run = "cargo test"
 
 - Aggregation tasks (`check`, `lint`, `format`) coordinate independent prerequisites — prefer `depends`-only
 - `alias = ["b"]` is optional CLI sugar; a task named `deploy` or `format` is not an alias unless it declares `alias = [...]`
+
+### Entry points vs internal sub-tasks (`hide = true`)
+
+- When a task exists only as a `depends` component of an aggregate (e.g. `lint:eslint`, `lint:stylelint` under `lint`), keep it as a separate task for DAG parallelism but mark it `hide = true` so `mise tasks` lists only user-facing entry points
+- Hidden tasks still run via `depends` and remain directly runnable with `mise run <name>`; only listing/completion visibility changes
+- Prefer "hide internal parts" over "inline them into the aggregate's `run` list" — inlining serializes independent work and loses parallelism
+- If many sub-tasks are thin 1:1 wrappers around package-manager scripts, move the shell implementation to the package scripts (source of truth) and keep mise tasks as declarations of entry points + DAG only
 
 ### Configuration structure
 

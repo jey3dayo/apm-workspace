@@ -27,11 +27,14 @@ For normal repositories, prefer a single project-local `mise.toml`. For project-
     ├── config.default.toml
     ├── config.ci.toml
     ├── config.windows.toml
-    └── tasks/
+    ├── tasks/            # explicit opt-in user-global tasks
+    └── local-tasks/      # loaded only by ~/.config/.mise.toml
         ├── format.toml
         ├── lint.toml
         └── ci.toml
 ```
+
+`~/.config/mise/tasks/` is mise's auto-loaded global task directory. Treat it as explicit opt-in: do not put a task there merely because it operates machine-wide state or the dotfiles repository owns it. Use a separate directory such as `local-tasks/` for files loaded through the dotfiles repository's `[task_config].includes`.
 
 ## Recommended Responsibilities
 
@@ -73,9 +76,9 @@ taplo = "<verified-version>"
 # ~/.config/.mise.toml
 [task_config]
 includes = [
-  ".config/mise/tasks/format.toml",
-  ".config/mise/tasks/lint.toml",
-  ".config/mise/tasks/ci.toml",
+  ".config/mise/local-tasks/format.toml",
+  ".config/mise/local-tasks/lint.toml",
+  ".config/mise/local-tasks/ci.toml",
 ]
 
 [hooks]
@@ -85,7 +88,7 @@ enter = "mise run --quiet setup-env"
 ## Task File Example
 
 ```toml
-# ~/.config/mise/tasks/lint.toml
+# ~/.config/mise/local-tasks/lint.toml
 ["lint:shell"]
 description = "Check shell scripts"
 run = "fd -e sh -X shellcheck"
@@ -105,6 +108,9 @@ depends = ["lint:shell", "lint:yaml"]
   - Good: `format.toml`, `lint.toml`, `ci.toml`
   - Bad: `tasks-a.toml`, `tasks-b.toml`
 - Keep tool declarations near environment files, not task files
+- Reserve `~/.config/mise/tasks/` for entry points the user explicitly wants to appear in every repository; machine-wide scope alone is insufficient
+- Put dotfiles-repository checks and maintenance in `local-tasks/` (or another non-global directory) and load them from `~/.config/.mise.toml`
+- Keep credential-dependent or destructive task families local unless the globally exposed subset is split and independently justified
 - Wire added tools into real tasks
   - If `shellcheck` or `shfmt` is added under `[tools]`, expose `lint:shell` or `format:shell`
 - Keep project-local examples separate from user-global examples
@@ -128,6 +134,9 @@ depends = ["lint:shell", "lint:yaml"]
 ## Review Checklist
 
 - Is this a user-global or multi-environment setup?
+- Should each task be visible from unrelated repositories, or only while working in the dotfiles repository?
+- Is global visibility explicitly useful, rather than inferred from machine-wide data scope?
+- Are global tasks cwd-independent through an explicit `dir` and stable runner path?
 - If this is a project-local setup, is the split justified by clear task-family ownership?
 - Would a single `mise.toml` be simpler?
 - Are includes grouped by responsibility?
