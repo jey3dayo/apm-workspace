@@ -4,7 +4,7 @@ APM-based global skill workspace for `jey3dayo`.
 
 This repository is the day-to-day working copy of `~/.apm`. `~/.apm` is the source of truth for daily authoring and operation. `~/.config` is not the authoring or operational surface.
 
-Current `apm` CLI source is pinned through `mise` to `pipx:apm-cli@0.22.0`.
+Current `apm` CLI source is pinned through `mise` to `pipx:apm-cli@0.26.0`.
 
 ## Source Of Truth
 
@@ -13,15 +13,24 @@ Current `apm` CLI source is pinned through `mise` to `pipx:apm-cli@0.22.0`.
 - Local-only private skills: `~/.apm/private-skills/.apm/skills/<id>/`
 - Shared guidance: `~/.apm/catalog/{AGENTS.md,agents/**,commands/**,rules/**}`
 - Dependency selection and accepted upstream state: `~/.apm/apm.yml`, `~/.apm/apm.lock.yaml`
+- Host-local MCP bootstrap: `~/.apm/mise.toml`, `~/.apm/scripts/apm-workspace.*`
 - Checked-out external dependencies: edit and push the upstream checkout, then accept the pushed commit through `~/.apm`
 - Downloaded sources: `~/.apm/apm_modules/` is cache only, not an editing surface
 - Manual copied skills: `~/.apm/manual-skills/.apm/skills/<skill-id>/`
+
+## Initial Bootstrap
+
+```powershell
+cd ~/.apm
+mise bootstrap
+```
+
+The final hidden bootstrap task detects the host's 1Password MCP command and reconciles the Codex and Claude user-scope entries. `~/.codex/config.toml` and `~/.claude.json` are generated targets, not editing surfaces.
 
 ## Daily Flow
 
 ```powershell
 cd ~/.apm
-mise install
 mise run deploy
 ```
 
@@ -35,6 +44,7 @@ For Codex skill changes, verification is not complete until the deployed `~/.age
 
 ## Core Tasks
 
+- `mise bootstrap`: install the declared environment, then reconcile host-local MCP entries through hidden internal tasks
 - `mise run check`: lightweight validation only
 - `mise run verify`: `check` plus catalog smoke verification
 - `mise run audit:ci:smoke`: temp-install the workspace manifest and run `apm audit --ci`

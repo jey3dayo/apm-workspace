@@ -22,6 +22,7 @@ Use this table as the Source of Truth Table (SoTT) when deciding where to read o
 | Personal skills / shared guidance                                 | `catalog/**`                                                  | skills、AGENTS.md、agents、commands、rules の authoring surface                                |
 | Optional repository-scoped skills                                 | `optional-skills/<id>/**`                                     | 保存するがグローバル配布せず、利用リポジトリの `apm.yml` から個別参照するスキル                |
 | External skills / global MCP                                      | `apm.yml` + `apm.lock.yaml`                                   | 外部依存の宣言と accepted resolved state。global MCP は `apm.yml` の `mcp:`                    |
+| Host-local MCP                                                    | `mise.toml` + `scripts/apm-workspace.*`                       | OS / desktop app に依存する user-scope MCP の検出・同期                                        |
 | SaaS 連携（コネクタ / プラグイン）                                | `docs/saas-connectors.md`                                     | claude.ai / ChatGPT アプリ側コネクタの接続状況と配置優先度（plugin > apm.yml > catalog skill） |
 | Repo-local MCP                                                    | 各リポジトリの `apm.yml`（一覧は `ghq list -p`）              | リポジトリ固有の MCP セット                                                                    |
 | パッケージ採用・撤去の意思決定                                    | `docs/package-decisions.md`                                   | なぜ入れた / 消したかのログ                                                                    |
@@ -91,6 +92,9 @@ Keep Codex global MCP registration limited to cross-repo foundations.
   - reserve `chrome-devtools` (CDP-based) as a repo-local addition only when a repository needs DevTools-specific depth: Lighthouse audits, performance tracing, heap snapshots
 - When moving MCP servers, edit the tracked APM source first and regenerate deployed targets
   - do not hand-edit deployed Codex MCP config such as `~/.codex/config.toml`
+- Keep desktop-app-dependent MCP servers out of the portable global manifest
+  - `mise bootstrap` runs the hidden host-local setup task and reconciles the Codex / Claude user-scope entries
+  - treat `~/.codex/config.toml` and `~/.claude.json` as generated targets, not source files
 - Do not maintain a hardcoded list of repo-local MCP candidates here; it goes stale. Use `ghq list -p` as the SSoT for known repositories, then check each repository's own `apm.yml` for its actual repo-local MCP set
 - If the APM workspace has no repo-local MCP deployment lane for a target, keep the global manifest lightweight and treat repo-local MCP distribution as a separate workspace-mechanics task
 

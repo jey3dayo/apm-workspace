@@ -20,6 +20,7 @@ This workspace owns the global APM manifest, the lockfile, the downloaded depend
 - `manual-skills/`: copied skills kept outside the normal upstream-managed lane and published as a separate package when needed
 - `private-skills/`: gitignored machine-local skills used only for local Codex skill sync
 - `mise.toml`: workspace-local tasks for install, migration, validation, and repair
+- `scripts/apm-workspace.*`: tracked host-local MCP detection and user-scope reconciliation logic
 - `tests/`: Pester coverage for workspace helpers
 
 ## Managed Catalog Layout
@@ -68,11 +69,11 @@ jey3dayo/apm-workspace/catalog#main
 - The current script path is `apm compile --target codex --output ~/.codex/AGENTS.md`.
 - Codex skills are deployed through `~/.agents/skills`.
 - Do not use `~/.codex/skills` as the verification source of truth for this workspace. Verify Codex rollout through compile success, `~/.codex/AGENTS.md`, and the deployed tree in `~/.agents/skills`.
-- Current `apm` source is `pipx:apm-cli@0.22.0`.
+- Current `apm` source is `pipx:apm-cli@0.26.0`.
 - If both `~/.apm/mise.toml` and `~/.config/mise/config.windows.toml` define `apm`, keep them aligned to the same source.
 - Prefer `mise run deploy` for routine local rollout and `mise run apply` only when you need deploy-only behavior.
 - Reserve `mise run upgrade` for intentional upstream refresh, not for normal deployment.
-- When direct binary selection matters, prefer `mise exec pipx:apm-cli@0.22.0 -- apm ...`.
+- When direct binary selection matters, prefer `mise exec pipx:apm-cli@0.26.0 -- apm ...`.
 - If a Codex-targeted external skill is still missing after rollout, verify `~/.agents/skills` directly and treat it as a temporary Codex-specific delivery gap.
 
 ## Source Of Truth
@@ -93,11 +94,19 @@ jey3dayo/apm-workspace/catalog#main
 - Shared guidance
   - edit `catalog/AGENTS.md`, `catalog/agents/**`, `catalog/commands/**`, `catalog/rules/**`
 
+## Initial Bootstrap
+
+```powershell
+cd ~/.apm
+mise bootstrap
+```
+
+The hidden final bootstrap task reconciles host-local MCP entries for Codex and Claude. Treat `~/.codex/config.toml` and `~/.claude.json` as generated targets.
+
 ## Default Flow
 
 ```powershell
 cd ~/.apm
-mise install
 mise run deploy
 ```
 
@@ -137,6 +146,7 @@ When a machine-local skill lives under `~/.apm/private-skills/`:
 
 ## Useful Maintenance Commands
 
+- `mise bootstrap`: install the declared environment and reconcile host-local MCP entries
 - `mise run format`: format Markdown, TOML, and YAML in the workspace
 - `mise run format:markdown:bold-headings`: rewrite bold headings across Markdown in `catalog/`
 - `mise run check`: run formatting checks plus validation only
