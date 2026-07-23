@@ -20,7 +20,7 @@
 
 - デザイン・UI/UX: `frontend-design`, `ui-ux-pro-max`, `baseline-ui`,
   `fixing-accessibility`, `fixing-metadata`, `fixing-motion-performance`,
-  `make-interfaces-feel-better`, `transitions-dev`, `web-design-guidelines`
+  `transitions-dev`
 - モーション（emilkowalski/skills）: `emil-design-eng`, `review-animations`,
   `improve-animations`, `animation-vocabulary`
 - レビュー・監査: `hunk-review`, `thermo-nuclear-code-quality-review`,
@@ -32,7 +32,8 @@
 - GitHub 連携（openai）: `gh-address-comments`, `gh-fix-ci`
 - 社内（caad-develop）: `perman-aws-vault`, `caad-skill-deployer`
 - その他: `understand` / `understand-dashboard`, `humanizer-ja`,
-  `web-research`, mattpocock 系 5, `empirical-prompt-tuning`
+  `web-research`, mattpocock 系（improve-codebase-architecture,
+  resolving-merge-conflicts, wayfinder, grilling, handoff, writing-great-skills）
 
 ## global（自作 catalog: catalog/skills/）
 
@@ -48,7 +49,7 @@
   `architecture-boundary-docs`, `japanese-tech-writing`
 - Git・作業運用: `atomic-commit`, `git-worktree`, `ci-stability-hooks`,
   `work-log-maintenance`, `prepare-goal`
-- リサーチ: `jina-web-research`, `cross-research`
+- リサーチ: `web-research`（入口・並列委譲）, `jina-web-research`（Jina 収集手順）
 
 ## ~/.apm 専用（.apm/skills/）
 
@@ -106,7 +107,6 @@ global の一覧に無くても廃止ではない。各リポジトリの `apm.y
 | ベースライン修正（deslop）                 | `baseline-ui` / `fixing-accessibility` / `fixing-metadata`（ibelick）                                          |
 | モーション taste・レビュー・監査           | `emil-design-eng` / `review-animations` / `improve-animations` / `animation-vocabulary`（emilkowalski/skills） |
 | モーション実装スニペット                   | `transitions-dev`                                                                                              |
-| UI ガイドライン準拠レビュー                | `web-design-guidelines`（vercel）                                                                              |
 | デザインシステム準拠レビュー               | `design-system-review`（catalog 自作）                                                                         |
 | UI レビューレーン選択ハブ                  | `review-board`（catalog 自作）                                                                                 |
 | デザインドキュメント                       | `design-md-workflow`（catalog 自作）                                                                           |
@@ -115,20 +115,47 @@ global の一覧に無くても廃止ではない。各リポジトリの `apm.y
 
 ### レビュー系の使い分け
 
-- UI の見た目・ガイドライン準拠 → `web-design-guidelines`
+- UI の見た目・ガイドライン準拠 → `baseline-ui`（deslop）/ `design-system-review`
+  （`web-design-guidelines` は 2026-07-23 撤去）
 - デザインシステム・トークン準拠 → `design-system-review`
 - アニメーション・モーションの質 → `review-animations`（単発）/ `improve-animations`（全体監査→plan 生成）
 - UI・フォーム・アクセシビリティ・マルチデバイスのレーン振り分け → `review-board`
 - コード品質全般 → `code-review` / `hunk-review` / `thermo-nuclear-code-quality-review`
 - 改善候補の洗い出し（実装しない）→ `improve`（shadcn、汎用）
 
+### 検証中のレビュー・アニメーション系スキル（2026-07-23 棚卸し）
+
+レビュー系とアニメーション系は「どれを残すか検証するために意図的に複数入れている」領域。
+skill 監査（`~/.claude/skill-report/2026-07-23T11-14-21/`）の結果を踏まえた現状と撤去判断基準。
+自動発火はほぼ起きず明示 `/skill` 起動が中心のため、「発火 0」は撤去理由にしない。
+
+| スキル                               | 系統      | 役割                                    | 起動実績（監査時点） | 撤去を判断する基準                                                     |
+| ------------------------------------ | --------- | --------------------------------------- | -------------------- | ---------------------------------------------------------------------- |
+| `emil-design-eng`                    | アニメ    | モーション taste・設計哲学              | 手動起動あり         | 維持前提。アニメ系の基準スキル                                         |
+| `transitions-dev`                    | アニメ    | CSS トランジション実装スニペット        | 手動起動あり         | 維持。description が bloated 判定 → トリム対象                         |
+| `review-animations`                  | アニメ    | 単発アニメーションレビュー              | なし                 | emil-design-eng で代替できると分かったら撤去                           |
+| `improve-animations`                 | アニメ    | モーション全体監査 → plan 生成          | なし                 | `improve`（汎用）の nested subset と監査指摘。improve で足りるなら撤去 |
+| `animation-vocabulary`               | アニメ    | モーション用語の逆引き                  | なし                 | 逆引きを使う場面が来なければ次回棚卸しで撤去                           |
+| `find-animation-opportunities`       | アニメ    | アニメ追加候補の発見（read-only）       | なし                 | 同上                                                                   |
+| `fixing-motion-performance`          | アニメ    | モーション性能監査・修正                | なし                 | emil 系と指摘が重複したら間引く（従来 watchlist どおり）               |
+| `apple-design`                       | アニメ/UI | Apple 流ジェスチャ・物理モーション      | 手動起動あり         | 維持                                                                   |
+| `review-board`                       | レビュー  | UI レビューレーン選択ハブ               | なし                 | catalog 自作。レーン振り分けを使わないなら簡素化                       |
+| `design-system-review`               | レビュー  | デザインシステム・トークン準拠          | なし                 | catalog 自作。維持                                                     |
+| `code-review`                        | レビュー  | コード品質全般（catalog 自作）          | 手動起動あり         | 維持                                                                   |
+| `hunk-review`                        | レビュー  | Hunk セッションでの対話的 diff レビュー | なし                 | Hunk 自体を常用しなくなったら撤去                                      |
+| `thermo-nuclear-code-quality-review` | レビュー  | 保守性・構造の徹底監査                  | なし                 | `code-review` と指摘が重複しすぎたら撤去                               |
+| `improve`                            | レビュー  | 監査 → 他 agent 向け実装 plan 生成      | なし                 | 維持。improve-animations の撤去判断の受け皿                            |
+| `react-doctor`                       | レビュー  | React 診断                              | なし                 | `refactoring`（catalog）が参照するため維持                             |
+
+2026-07-23 撤去済み: `make-interfaces-feel-better`, `web-design-guidelines`,
+`grill-with-docs`, `empirical-prompt-tuning`（詳細は `package-decisions.md`）。
+
 ## 保留・watchlist
 
 - `apple-design`（emilkowalski）: Apple HIG 系。必要になったら global に 1 行追加。
-- `fixing-motion-performance`（ibelick）/ `make-interfaces-feel-better`（jakubkrehel）:
-  emil 新構成と発火競合したら間引く。モーション系は現在 emil 4 + ibelick 1 +
-  transitions-dev + make-interfaces の系統があり、2〜3 週間の実運用で
-  発火競合・指摘重複を確認する。
+- `fixing-motion-performance`（ibelick）: emil 系と発火競合・指摘重複したら間引く。
+  `make-interfaces-feel-better` は 2026-07-23 の skill 監査を受けて撤去済み。
+  検証状況は上の「検証中のレビュー・アニメーション系スキル」表を正とする。
 
 ## 移管候補（未実施）
 
@@ -144,8 +171,9 @@ global から repo-local / optional へ移す候補。実施済みのもの
 
 2026-07-16 の棚卸しで global 維持を決定したもの（候補から除外）:
 `react-doctor`, `composition-patterns`, `react-best-practices`,
-`baseline-ui` ほか ibelick 系, `web-design-guidelines`, `transitions-dev`,
-`frontend-design`, `ui-ux-pro-max`, `design-md-workflow`, `design-system-review`。
+`baseline-ui` ほか ibelick 系, `transitions-dev`,
+`frontend-design`, `ui-ux-pro-max`, `design-md-workflow`, `design-system-review`
+（`web-design-guidelines` は 2026-07-23 に撤去）。
 
 ### 移管の判断基準
 

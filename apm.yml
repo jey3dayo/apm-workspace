@@ -29,8 +29,6 @@ dependencies:
     - ibelick/ui-skills/skills/fixing-accessibility
     - ibelick/ui-skills/skills/fixing-metadata
     - ibelick/ui-skills/skills/fixing-motion-performance
-    - jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-    - mattpocock/skills/skills/engineering/grill-with-docs
     - mattpocock/skills/skills/engineering/improve-codebase-architecture
     - mattpocock/skills/skills/engineering/resolving-merge-conflicts
     - mattpocock/skills/skills/engineering/wayfinder
@@ -38,7 +36,6 @@ dependencies:
     - mattpocock/skills/skills/productivity/handoff
     - mattpocock/skills/skills/productivity/writing-great-skills
     - millionco/react-doctor/skills/react-doctor
-    - mizchi/skills/meta/empirical-prompt-tuning
     - modem-dev/hunk/skills/hunk-review
     - git: nextlevelbuilder/ui-ux-pro-max-skill
       skills:
@@ -58,7 +55,6 @@ dependencies:
     - openai/skills/skills/.curated/gh-fix-ci
     - openai/skills/skills/.curated/screenshot
     - vercel-labs/agent-skills/skills/react-best-practices
-    - vercel-labs/agent-skills/skills/web-design-guidelines
     - shadcn/improve
     - fujibee/agmsg
   mcp:

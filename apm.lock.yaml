@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-07-23T08:02:43.578600+00:00'
+generated_at: '2026-07-23T08:45:41.977210+00:00'
 apm_version: 0.26.0
 dependencies:
 - repo_url: anthropics/claude-code
@@ -1808,39 +1808,6 @@ dependencies:
     .claude/skills/transitions-dev/SKILL.md: sha256:a62129f3a894a79678f60276ca34838b46357820639d5755cf932e390d1bb735
     .claude/skills/transitions-dev/_root.css: sha256:6ed248a269da79f623729708dabcc3719485d400615a0d91b9f5e9fd307aa33f
   content_hash: sha256:8cf9ba1ed0d52741e4ed1dafc6ee4543e32f1e516f958d750e81412bfc36dd13
-- repo_url: jakubkrehel/make-interfaces-feel-better
-  name: make-interfaces-feel-better
-  host: github.com
-  resolved_commit: 366f0f86efcb2811c26e2cf386d09cf2ddc35fcb
-  version: unknown
-  virtual_path: skills/make-interfaces-feel-better
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/make-interfaces-feel-better
-  - .agents/skills/make-interfaces-feel-better/SKILL.md
-  - .agents/skills/make-interfaces-feel-better/animations.md
-  - .agents/skills/make-interfaces-feel-better/performance.md
-  - .agents/skills/make-interfaces-feel-better/surfaces.md
-  - .agents/skills/make-interfaces-feel-better/typography.md
-  - .claude/skills/make-interfaces-feel-better
-  - .claude/skills/make-interfaces-feel-better/SKILL.md
-  - .claude/skills/make-interfaces-feel-better/animations.md
-  - .claude/skills/make-interfaces-feel-better/performance.md
-  - .claude/skills/make-interfaces-feel-better/surfaces.md
-  - .claude/skills/make-interfaces-feel-better/typography.md
-  deployed_file_hashes:
-    .agents/skills/make-interfaces-feel-better/SKILL.md: sha256:1370f38d93bd92d2e9fe6d1c233b142eb5b04b51433fe3071d28aabc4351840f
-    .agents/skills/make-interfaces-feel-better/animations.md: sha256:eaaacab19a846f72692a48d6a84d96fcea79dbdee40d6447c73385b41b8d6135
-    .agents/skills/make-interfaces-feel-better/performance.md: sha256:f4537590cca884143b8e628123810286b4bfef29b9283f900265190bd3d8bd5e
-    .agents/skills/make-interfaces-feel-better/surfaces.md: sha256:36791f828aedeaa31d89aebe0efe818fa156016c6a53d9049cdd15a330fe214b
-    .agents/skills/make-interfaces-feel-better/typography.md: sha256:518cae9f0d48d48081cd87739993d76e145c0fe2394bb9f95cbde2b003c44549
-    .claude/skills/make-interfaces-feel-better/SKILL.md: sha256:1370f38d93bd92d2e9fe6d1c233b142eb5b04b51433fe3071d28aabc4351840f
-    .claude/skills/make-interfaces-feel-better/animations.md: sha256:eaaacab19a846f72692a48d6a84d96fcea79dbdee40d6447c73385b41b8d6135
-    .claude/skills/make-interfaces-feel-better/performance.md: sha256:f4537590cca884143b8e628123810286b4bfef29b9283f900265190bd3d8bd5e
-    .claude/skills/make-interfaces-feel-better/surfaces.md: sha256:36791f828aedeaa31d89aebe0efe818fa156016c6a53d9049cdd15a330fe214b
-    .claude/skills/make-interfaces-feel-better/typography.md: sha256:518cae9f0d48d48081cd87739993d76e145c0fe2394bb9f95cbde2b003c44549
-  content_hash: sha256:426954a73da0db6ffb93642fc79766915626c4d088233bae1cc0dd10e02dff8c
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
@@ -2645,27 +2612,6 @@ dependencies:
     .claude/skills/understand-dashboard/SKILL.md: sha256:d12cb059d8e6139873542111ccec691b0603496675182f5ac826d5b65273331a
   content_hash: sha256:5e3ac7994d20f16f8232164dbec7998b62073a5547fcfc0b0baba82cb48bed0a
 - repo_url: mattpocock/skills
-  name: grill-with-docs
-  host: github.com
-  resolved_commit: ed37663cc5fbef691ddfecd080dff42f7e7e350d
-  version: unknown
-  virtual_path: skills/engineering/grill-with-docs
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/grill-with-docs
-  - .agents/skills/grill-with-docs/SKILL.md
-  - .agents/skills/grill-with-docs/agents/openai.yaml
-  - .claude/skills/grill-with-docs
-  - .claude/skills/grill-with-docs/SKILL.md
-  - .claude/skills/grill-with-docs/agents/openai.yaml
-  deployed_file_hashes:
-    .agents/skills/grill-with-docs/SKILL.md: sha256:610d091047bcfb9db0f75c057d15538481a721111579fc5ec7f83ad9131a2165
-    .agents/skills/grill-with-docs/agents/openai.yaml: sha256:94cd0ab161fb468a836349f5ed482ba58ce8e709a05c57ce533d739dbd35cca9
-    .claude/skills/grill-with-docs/SKILL.md: sha256:610d091047bcfb9db0f75c057d15538481a721111579fc5ec7f83ad9131a2165
-    .claude/skills/grill-with-docs/agents/openai.yaml: sha256:94cd0ab161fb468a836349f5ed482ba58ce8e709a05c57ce533d739dbd35cca9
-  content_hash: sha256:c3a266bcc09eab29358eaae6e288f9a2cd492fd0af2bcaeeec55fd6207da9a89
-- repo_url: mattpocock/skills
   name: improve-codebase-architecture
   host: github.com
   resolved_commit: ed37663cc5fbef691ddfecd080dff42f7e7e350d
@@ -2820,31 +2766,6 @@ dependencies:
     .claude/skills/react-doctor/SKILL.md: sha256:48aa353031dabe76c84f1009e97caf4dca9562c750deeba3c9020e72ceaf2dec
     .claude/skills/react-doctor/references/explain.md: sha256:21fa0414874d117a63e5360d527884ccd42bf0906e6dcab371409cebac8b3d12
   content_hash: sha256:cd65b2ab2181873ed712aaa2f3ef44ce2f20d48b16a968a5fe1083037149d989
-- repo_url: mizchi/skills
-  name: empirical-prompt-tuning
-  host: github.com
-  resolved_commit: 7a0d72866a0bb3e9ac3e2768c328b09ba2bc40c4
-  version: unknown
-  virtual_path: meta/empirical-prompt-tuning
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/empirical-prompt-tuning
-  - .agents/skills/empirical-prompt-tuning/README.md
-  - .agents/skills/empirical-prompt-tuning/SKILL-ja.md
-  - .agents/skills/empirical-prompt-tuning/SKILL.md
-  - .claude/skills/empirical-prompt-tuning
-  - .claude/skills/empirical-prompt-tuning/README.md
-  - .claude/skills/empirical-prompt-tuning/SKILL-ja.md
-  - .claude/skills/empirical-prompt-tuning/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/empirical-prompt-tuning/README.md: sha256:c7db7d27122bcffe416e5607700a7cd1778cad260d3e104c5bb6da7b7f976b3d
-    .agents/skills/empirical-prompt-tuning/SKILL-ja.md: sha256:0a38d830802c2e08a7faca13928fedf6911e00b896946b4b03910d662de6dea5
-    .agents/skills/empirical-prompt-tuning/SKILL.md: sha256:252418e7ef022981d2dda2e3ec57fa1c786d30af68c50b7e062edf1d7361b0cb
-    .claude/skills/empirical-prompt-tuning/README.md: sha256:c7db7d27122bcffe416e5607700a7cd1778cad260d3e104c5bb6da7b7f976b3d
-    .claude/skills/empirical-prompt-tuning/SKILL-ja.md: sha256:0a38d830802c2e08a7faca13928fedf6911e00b896946b4b03910d662de6dea5
-    .claude/skills/empirical-prompt-tuning/SKILL.md: sha256:252418e7ef022981d2dda2e3ec57fa1c786d30af68c50b7e062edf1d7361b0cb
-  content_hash: sha256:20e7fba93c7267ba6e3a7b27787ca49191b762dffcfb804b01da9183b1b0c891
 - repo_url: modem-dev/hunk
   name: hunk-review
   host: github.com
@@ -3819,23 +3740,6 @@ dependencies:
     .claude/skills/react-best-practices/rules/server-parallel-nested-fetching.md: sha256:ad5d9656984d4a959997a2367bf59cc6632297b4634a1dd13a087939d83f30b3
     .claude/skills/react-best-practices/rules/server-serialization.md: sha256:f4c7d68b29c82381baad059c4a7f09e868e71ec9c3115a26ad3ae7d24c0dfe1f
   content_hash: sha256:74f142d28d360d78e8bac4f239a84c87f0ced9015729bc72b5458d82ff45b015
-- repo_url: vercel-labs/agent-skills
-  name: web-design-guidelines
-  host: github.com
-  resolved_commit: 4559f18a20c1691c744b4395194290db6a0df5e9
-  version: unknown
-  virtual_path: skills/web-design-guidelines
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/web-design-guidelines
-  - .agents/skills/web-design-guidelines/SKILL.md
-  - .claude/skills/web-design-guidelines
-  - .claude/skills/web-design-guidelines/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/web-design-guidelines/SKILL.md: sha256:f4647ca866a3accf763777f83e7682954f0187cd6bea7eea0399796652414e8f
-    .claude/skills/web-design-guidelines/SKILL.md: sha256:f4647ca866a3accf763777f83e7682954f0187cd6bea7eea0399796652414e8f
-  content_hash: sha256:a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a
 deployments:
 - kind: project-relative
   target: agents
@@ -8159,42 +8063,6 @@ deployments:
   content_hash: sha256:e71de849347050c2c573c1cf24d742d5a13459557ecffa6e562f08006f46b5b7
 - kind: project-relative
   target: claude
-  value: .claude/skills/empirical-prompt-tuning
-  runtime: null
-  scope: project
-  owners:
-  - mizchi/skills/meta/empirical-prompt-tuning
-  active_owner: mizchi/skills/meta/empirical-prompt-tuning
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/empirical-prompt-tuning/README.md
-  runtime: null
-  scope: project
-  owners:
-  - mizchi/skills/meta/empirical-prompt-tuning
-  active_owner: mizchi/skills/meta/empirical-prompt-tuning
-  content_hash: sha256:c7db7d27122bcffe416e5607700a7cd1778cad260d3e104c5bb6da7b7f976b3d
-- kind: project-relative
-  target: claude
-  value: .claude/skills/empirical-prompt-tuning/SKILL-ja.md
-  runtime: null
-  scope: project
-  owners:
-  - mizchi/skills/meta/empirical-prompt-tuning
-  active_owner: mizchi/skills/meta/empirical-prompt-tuning
-  content_hash: sha256:0a38d830802c2e08a7faca13928fedf6911e00b896946b4b03910d662de6dea5
-- kind: project-relative
-  target: claude
-  value: .claude/skills/empirical-prompt-tuning/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - mizchi/skills/meta/empirical-prompt-tuning
-  active_owner: mizchi/skills/meta/empirical-prompt-tuning
-  content_hash: sha256:252418e7ef022981d2dda2e3ec57fa1c786d30af68c50b7e062edf1d7361b0cb
-- kind: project-relative
-  target: claude
   value: .claude/skills/executing-plans
   runtime: null
   scope: project
@@ -8528,33 +8396,6 @@ deployments:
   content_hash: sha256:5582d5f0b45395f7a077ea3e3cbb3266138053166950ff7df274957833e3ffdf
 - kind: project-relative
   target: claude
-  value: .claude/skills/grill-with-docs
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/grill-with-docs
-  active_owner: mattpocock/skills/skills/engineering/grill-with-docs
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/grill-with-docs/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/grill-with-docs
-  active_owner: mattpocock/skills/skills/engineering/grill-with-docs
-  content_hash: sha256:610d091047bcfb9db0f75c057d15538481a721111579fc5ec7f83ad9131a2165
-- kind: project-relative
-  target: claude
-  value: .claude/skills/grill-with-docs/agents/openai.yaml
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/grill-with-docs
-  active_owner: mattpocock/skills/skills/engineering/grill-with-docs
-  content_hash: sha256:94cd0ab161fb468a836349f5ed482ba58ce8e709a05c57ce533d739dbd35cca9
-- kind: project-relative
-  target: claude
   value: .claude/skills/grilling
   runtime: null
   scope: project
@@ -8850,60 +8691,6 @@ deployments:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
   content_hash: sha256:31aa67ba8347ed691d7fe4f14034a4b5f23b698640d50c8aeb60831534423a4d
-- kind: project-relative
-  target: claude
-  value: .claude/skills/make-interfaces-feel-better
-  runtime: null
-  scope: project
-  owners:
-  - jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  active_owner: jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/make-interfaces-feel-better/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  active_owner: jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  content_hash: sha256:1370f38d93bd92d2e9fe6d1c233b142eb5b04b51433fe3071d28aabc4351840f
-- kind: project-relative
-  target: claude
-  value: .claude/skills/make-interfaces-feel-better/animations.md
-  runtime: null
-  scope: project
-  owners:
-  - jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  active_owner: jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  content_hash: sha256:eaaacab19a846f72692a48d6a84d96fcea79dbdee40d6447c73385b41b8d6135
-- kind: project-relative
-  target: claude
-  value: .claude/skills/make-interfaces-feel-better/performance.md
-  runtime: null
-  scope: project
-  owners:
-  - jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  active_owner: jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  content_hash: sha256:f4537590cca884143b8e628123810286b4bfef29b9283f900265190bd3d8bd5e
-- kind: project-relative
-  target: claude
-  value: .claude/skills/make-interfaces-feel-better/surfaces.md
-  runtime: null
-  scope: project
-  owners:
-  - jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  active_owner: jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  content_hash: sha256:36791f828aedeaa31d89aebe0efe818fa156016c6a53d9049cdd15a330fe214b
-- kind: project-relative
-  target: claude
-  value: .claude/skills/make-interfaces-feel-better/typography.md
-  runtime: null
-  scope: project
-  owners:
-  - jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  active_owner: jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  content_hash: sha256:518cae9f0d48d48081cd87739993d76e145c0fe2394bb9f95cbde2b003c44549
 - kind: project-relative
   target: claude
   value: .claude/skills/mcp-tools
@@ -11640,24 +11427,6 @@ deployments:
   - mattpocock/skills/skills/engineering/wayfinder
   active_owner: mattpocock/skills/skills/engineering/wayfinder
   content_hash: sha256:88bc81a11a6d52ac67aeaa76b8b619e387020d47c5133a4dd4927fd15c4ad073
-- kind: project-relative
-  target: claude
-  value: .claude/skills/web-design-guidelines
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/web-design-guidelines
-  active_owner: vercel-labs/agent-skills/skills/web-design-guidelines
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/web-design-guidelines/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/web-design-guidelines
-  active_owner: vercel-labs/agent-skills/skills/web-design-guidelines
-  content_hash: sha256:f4647ca866a3accf763777f83e7682954f0187cd6bea7eea0399796652414e8f
 - kind: project-relative
   target: claude
   value: .claude/skills/work-log-maintenance
@@ -15764,42 +15533,6 @@ deployments:
   content_hash: sha256:e71de849347050c2c573c1cf24d742d5a13459557ecffa6e562f08006f46b5b7
 - kind: project-relative
   target: codex
-  value: .agents/skills/empirical-prompt-tuning
-  runtime: null
-  scope: project
-  owners:
-  - mizchi/skills/meta/empirical-prompt-tuning
-  active_owner: mizchi/skills/meta/empirical-prompt-tuning
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/empirical-prompt-tuning/README.md
-  runtime: null
-  scope: project
-  owners:
-  - mizchi/skills/meta/empirical-prompt-tuning
-  active_owner: mizchi/skills/meta/empirical-prompt-tuning
-  content_hash: sha256:c7db7d27122bcffe416e5607700a7cd1778cad260d3e104c5bb6da7b7f976b3d
-- kind: project-relative
-  target: codex
-  value: .agents/skills/empirical-prompt-tuning/SKILL-ja.md
-  runtime: null
-  scope: project
-  owners:
-  - mizchi/skills/meta/empirical-prompt-tuning
-  active_owner: mizchi/skills/meta/empirical-prompt-tuning
-  content_hash: sha256:0a38d830802c2e08a7faca13928fedf6911e00b896946b4b03910d662de6dea5
-- kind: project-relative
-  target: codex
-  value: .agents/skills/empirical-prompt-tuning/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - mizchi/skills/meta/empirical-prompt-tuning
-  active_owner: mizchi/skills/meta/empirical-prompt-tuning
-  content_hash: sha256:252418e7ef022981d2dda2e3ec57fa1c786d30af68c50b7e062edf1d7361b0cb
-- kind: project-relative
-  target: codex
   value: .agents/skills/executing-plans
   runtime: null
   scope: project
@@ -16124,33 +15857,6 @@ deployments:
   content_hash: sha256:5582d5f0b45395f7a077ea3e3cbb3266138053166950ff7df274957833e3ffdf
 - kind: project-relative
   target: codex
-  value: .agents/skills/grill-with-docs
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/grill-with-docs
-  active_owner: mattpocock/skills/skills/engineering/grill-with-docs
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/grill-with-docs/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/grill-with-docs
-  active_owner: mattpocock/skills/skills/engineering/grill-with-docs
-  content_hash: sha256:610d091047bcfb9db0f75c057d15538481a721111579fc5ec7f83ad9131a2165
-- kind: project-relative
-  target: codex
-  value: .agents/skills/grill-with-docs/agents/openai.yaml
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/grill-with-docs
-  active_owner: mattpocock/skills/skills/engineering/grill-with-docs
-  content_hash: sha256:94cd0ab161fb468a836349f5ed482ba58ce8e709a05c57ce533d739dbd35cca9
-- kind: project-relative
-  target: codex
   value: .agents/skills/grilling
   runtime: null
   scope: project
@@ -16446,60 +16152,6 @@ deployments:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
   content_hash: sha256:31aa67ba8347ed691d7fe4f14034a4b5f23b698640d50c8aeb60831534423a4d
-- kind: project-relative
-  target: codex
-  value: .agents/skills/make-interfaces-feel-better
-  runtime: null
-  scope: project
-  owners:
-  - jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  active_owner: jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/make-interfaces-feel-better/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  active_owner: jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  content_hash: sha256:1370f38d93bd92d2e9fe6d1c233b142eb5b04b51433fe3071d28aabc4351840f
-- kind: project-relative
-  target: codex
-  value: .agents/skills/make-interfaces-feel-better/animations.md
-  runtime: null
-  scope: project
-  owners:
-  - jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  active_owner: jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  content_hash: sha256:eaaacab19a846f72692a48d6a84d96fcea79dbdee40d6447c73385b41b8d6135
-- kind: project-relative
-  target: codex
-  value: .agents/skills/make-interfaces-feel-better/performance.md
-  runtime: null
-  scope: project
-  owners:
-  - jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  active_owner: jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  content_hash: sha256:f4537590cca884143b8e628123810286b4bfef29b9283f900265190bd3d8bd5e
-- kind: project-relative
-  target: codex
-  value: .agents/skills/make-interfaces-feel-better/surfaces.md
-  runtime: null
-  scope: project
-  owners:
-  - jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  active_owner: jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  content_hash: sha256:36791f828aedeaa31d89aebe0efe818fa156016c6a53d9049cdd15a330fe214b
-- kind: project-relative
-  target: codex
-  value: .agents/skills/make-interfaces-feel-better/typography.md
-  runtime: null
-  scope: project
-  owners:
-  - jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  active_owner: jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-  content_hash: sha256:518cae9f0d48d48081cd87739993d76e145c0fe2394bb9f95cbde2b003c44549
 - kind: project-relative
   target: codex
   value: .agents/skills/mcp-tools
@@ -19227,24 +18879,6 @@ deployments:
   - mattpocock/skills/skills/engineering/wayfinder
   active_owner: mattpocock/skills/skills/engineering/wayfinder
   content_hash: sha256:88bc81a11a6d52ac67aeaa76b8b619e387020d47c5133a4dd4927fd15c4ad073
-- kind: project-relative
-  target: codex
-  value: .agents/skills/web-design-guidelines
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/web-design-guidelines
-  active_owner: vercel-labs/agent-skills/skills/web-design-guidelines
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/web-design-guidelines/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/web-design-guidelines
-  active_owner: vercel-labs/agent-skills/skills/web-design-guidelines
-  content_hash: sha256:f4647ca866a3accf763777f83e7682954f0187cd6bea7eea0399796652414e8f
 - kind: project-relative
   target: codex
   value: .agents/skills/work-log-maintenance
