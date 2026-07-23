@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-07-22T02:10:03.279319+00:00'
+generated_at: '2026-07-23T03:33:55.859614+00:00'
 apm_version: 0.26.0
 dependencies:
 - repo_url: anthropics/claude-code
@@ -20319,15 +20319,6 @@ deployments:
   content_hash: null
 - kind: uri
   target: mcp
-  value: headroom
-  runtime: claude
-  scope: project
-  owners:
-  - .
-  active_owner: .
-  content_hash: null
-- kind: uri
-  target: mcp
   value: jina-reader
   runtime: claude
   scope: project
@@ -20364,15 +20355,6 @@ deployments:
   content_hash: null
 - kind: uri
   target: mcp
-  value: headroom
-  runtime: codex
-  scope: project
-  owners:
-  - .
-  active_owner: .
-  content_hash: null
-- kind: uri
-  target: mcp
   value: mcp-simple-voicevox
   runtime: codex
   scope: project
@@ -20383,7 +20365,6 @@ deployments:
 mcp_servers:
 - codex
 - context7
-- headroom
 - jina-reader
 - mcp-simple-voicevox
 mcp_configs:
@@ -20402,14 +20383,6 @@ mcp_configs:
     - '@upstash/context7-mcp@latest'
     registry: false
     command: npx
-  headroom:
-    name: headroom
-    transport: stdio
-    args:
-    - mcp
-    - serve
-    registry: false
-    command: headroom
   jina-reader:
     name: jina-reader
     transport: streamable-http
@@ -20429,13 +20402,11 @@ mcp_target_servers:
   claude:
   - codex
   - context7
-  - headroom
   - jina-reader
   - mcp-simple-voicevox
   codex:
   - codex
   - context7
-  - headroom
   - mcp-simple-voicevox
 local_deployed_files:
 - .agents/skills/agent-curation
