@@ -36,16 +36,16 @@
 
 ## global（自作 catalog: catalog/skills/）
 
-31 スキル。主な系統:
+29 スキル。主な系統:
 
 - APM・環境運用: `apm-usage`, `apm-repo-bootstrap`, `mise`, `mcp-tools`,
-  `headroom`, `dotenvx-env-ops`, `1password-item-ops`, `herdr`
+  `dotenvx-env-ops`, `1password-item-ops`, `herdr`
 - レビュー・品質: `code-review`, `review-board`, `review-fix-loop`,
   `review-plan`, `polish`, `quiet-command-auditor`
 - デザイン: `design-md-workflow`, `design-system-review`
 - リファクタリング・解析: `refactoring`, `similarity`
 - ドキュメント: `docs-manager`, `docs-entrypoint-review`,
-  `architecture-boundary-docs`, `japanese-tech-writing`, `rules-creator`
+  `architecture-boundary-docs`, `japanese-tech-writing`
 - Git・作業運用: `atomic-commit`, `git-worktree`, `ci-stability-hooks`,
   `work-log-maintenance`, `prepare-goal`
 - リサーチ: `jina-web-research`, `cross-research`
@@ -92,7 +92,7 @@ global の一覧に無くても廃止ではない。各リポジトリの `apm.y
 
 ## global MCP（root apm.yml の mcp:）
 
-`context7`, `mcp-simple-voicevox`, `jina-reader`, `codex`, `headroom`
+`context7`, `mcp-simple-voicevox`, `jina-reader`, `codex`
 
 ## デザイン / UI・UX / レビュー系の役割マップ
 
