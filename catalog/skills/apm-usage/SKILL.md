@@ -155,7 +155,6 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 - If the request is to add an MCP server through APM, apply the same scope rule: use `apm install -g --mcp <name> ...` only for cross-repo foundation MCPs; use repo-local `apm install --mcp <name> ...` for project, framework, UI, database, browser, or app-runtime-specific MCPs.
 - If MCP placement, server selection, credentials, transport, or startup behavior is the main question, coordinate with `mcp-tools`; keep this skill focused on APM ownership, source of truth, and rollout commands.
 - If the APM workspace has no repo-local MCP distribution lane for a target repository, record the intended placement as guidance and keep the global manifest lightweight. Treat implementing repo-local MCP distribution as a separate workspace-mechanics task.
-- If the request is "enable Headroom MCP", treat the Headroom MCP server as a global foundation managed through the `mcp:` section of `~/.apm/apm.yml`. Keep the Headroom binary itself managed by user-global `~/.config/mise`, and use the `headroom` skill for usage guidance; do not add Headroom to repo-local `mise.toml`.
 - If the request is "change only workspace docs or notes", edit the workspace files directly and do not restage the catalog unless `catalog/**` changed too.
 
 ## Repo-Local MCP Recommendations
@@ -187,7 +186,6 @@ When deciding repo-local MCP placement by repository type, runtime, or workflow,
 - Do not reintroduce many local `./packages/*` refs into `~/.apm/apm.yml`.
 - Do not hand-edit deployed targets such as `~/.claude/`, `~/.codex/`, or `~/.agents/skills`.
 - Do not assume a repository-local `apm.yml` with `targets: [codex]` is correct just because it predates this check. Verify against the repository's actual runtimes; a stale `codex`-only manifest silently starves Claude Code of every repo-local skill and MCP declared there.
-- Headroom MCP server registration lives in the `mcp:` section of `~/.apm/apm.yml` like other global foundation MCPs. Do not persist Headroom proxy/wrap configuration through APM package manifests; treat proxy/wrap setup as a local machine setup step unless the user explicitly asks to manage that runtime state.
 - Prefer `mise` tasks over ad hoc script entrypoints for normal operation.
 - Before changing user-global `mise` tools, verify the resolved binary path and install tree. `mise latest` can lag or differ because of release-age policy, so compare with the upstream registry when exact latest-version behavior matters.
 - Before committing `apm.lock.yaml` after `mise run upgrade`, separate the intended dependency update from unrelated unpinned dependency drift. Report unrelated drift instead of hiding it inside the target dependency change.
