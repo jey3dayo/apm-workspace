@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-07-23T07:53:26.723977+00:00'
+generated_at: '2026-07-23T08:02:43.578600+00:00'
 apm_version: 0.26.0
 dependencies:
 - repo_url: anthropics/claude-code
@@ -129,7 +129,7 @@ dependencies:
 - repo_url: emilkowalski/skills
   name: animation-vocabulary
   host: github.com
-  resolved_commit: f6f79ca1d8e9e2d82c8b90d7481b70ca66f4adfb
+  resolved_commit: e695d13cb298db0f46d5ef05be2ad13fa12908a6
   version: unknown
   virtual_path: skills/animation-vocabulary
   is_virtual: true
@@ -146,7 +146,7 @@ dependencies:
 - repo_url: emilkowalski/skills
   name: apple-design
   host: github.com
-  resolved_commit: f6f79ca1d8e9e2d82c8b90d7481b70ca66f4adfb
+  resolved_commit: e695d13cb298db0f46d5ef05be2ad13fa12908a6
   version: unknown
   virtual_path: skills/apple-design
   is_virtual: true
@@ -163,7 +163,7 @@ dependencies:
 - repo_url: emilkowalski/skills
   name: emil-design-eng
   host: github.com
-  resolved_commit: f6f79ca1d8e9e2d82c8b90d7481b70ca66f4adfb
+  resolved_commit: e695d13cb298db0f46d5ef05be2ad13fa12908a6
   version: unknown
   virtual_path: skills/emil-design-eng
   is_virtual: true
@@ -180,7 +180,7 @@ dependencies:
 - repo_url: emilkowalski/skills
   name: find-animation-opportunities
   host: github.com
-  resolved_commit: f6f79ca1d8e9e2d82c8b90d7481b70ca66f4adfb
+  resolved_commit: e695d13cb298db0f46d5ef05be2ad13fa12908a6
   version: unknown
   virtual_path: skills/find-animation-opportunities
   is_virtual: true
@@ -197,7 +197,7 @@ dependencies:
 - repo_url: emilkowalski/skills
   name: improve-animations
   host: github.com
-  resolved_commit: f6f79ca1d8e9e2d82c8b90d7481b70ca66f4adfb
+  resolved_commit: e695d13cb298db0f46d5ef05be2ad13fa12908a6
   version: unknown
   virtual_path: skills/improve-animations
   is_virtual: true
@@ -222,7 +222,7 @@ dependencies:
 - repo_url: emilkowalski/skills
   name: review-animations
   host: github.com
-  resolved_commit: f6f79ca1d8e9e2d82c8b90d7481b70ca66f4adfb
+  resolved_commit: e695d13cb298db0f46d5ef05be2ad13fa12908a6
   version: unknown
   virtual_path: skills/review-animations
   is_virtual: true
@@ -1844,7 +1844,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: 6c30afd38b44caba596d35029a68590061363ad1
+  resolved_commit: 8d9a4cb97b182cd57894073396cb4d5422d652e4
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -2407,30 +2407,13 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
-  resolved_commit: 6c30afd38b44caba596d35029a68590061363ad1
+  resolved_commit: 8d9a4cb97b182cd57894073396cb4d5422d652e4
   resolved_ref: main
   version: 1.0.0
   virtual_path: manual-skills
   is_virtual: true
   package_type: apm_package
   content_hash: sha256:c9adaaf42924bc9edc428c03d4ed3465bdd46305c3437d5f4b1d1ee4346c69fe
-- repo_url: langchain-ai/deepagents
-  name: web-research
-  host: github.com
-  resolved_commit: 4b2ea36fbfceb6151f3b092e7c88da6052712a5d
-  version: unknown
-  virtual_path: libs/cli/examples/skills/web-research
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/web-research
-  - .agents/skills/web-research/SKILL.md
-  - .claude/skills/web-research
-  - .claude/skills/web-research/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/web-research/SKILL.md: sha256:7c2b1f1990370f7ce176fe3608a67028c72db11e337b4ba83b8fce6d927dfde3
-    .claude/skills/web-research/SKILL.md: sha256:7c2b1f1990370f7ce176fe3608a67028c72db11e337b4ba83b8fce6d927dfde3
-  content_hash: sha256:2b66d5db8c8d70474e70638f437f324fb3af3724b71bf8501e48c8004e70e677
 - repo_url: lum1104/understand-anything
   name: understand
   host: github.com
@@ -3519,75 +3502,6 @@ dependencies:
     .claude/skills/improve/references/plan-template.md: sha256:7be76dd3c29442288fa7cee4432fc6e95c2fdbf748c9b356344bf647c5f8722e
   content_hash: sha256:4cd40e13503aac88bb60c202dc6a62977b290dbdc973d8cad0556ac46de6042d
   declared_license: MIT
-- repo_url: vercel-labs/agent-skills
-  name: vercel-composition-patterns
-  host: github.com
-  resolved_commit: 4559f18a20c1691c744b4395194290db6a0df5e9
-  version: unknown
-  virtual_path: skills/composition-patterns
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/composition-patterns
-  - .agents/skills/composition-patterns/AGENTS.md
-  - .agents/skills/composition-patterns/README.md
-  - .agents/skills/composition-patterns/SKILL.md
-  - .agents/skills/composition-patterns/metadata.json
-  - .agents/skills/composition-patterns/rules/_sections.md
-  - .agents/skills/composition-patterns/rules/_template.md
-  - .agents/skills/composition-patterns/rules/architecture-avoid-boolean-props.md
-  - .agents/skills/composition-patterns/rules/architecture-compound-components.md
-  - .agents/skills/composition-patterns/rules/patterns-children-over-render-props.md
-  - .agents/skills/composition-patterns/rules/patterns-explicit-variants.md
-  - .agents/skills/composition-patterns/rules/react19-no-forwardref.md
-  - .agents/skills/composition-patterns/rules/state-context-interface.md
-  - .agents/skills/composition-patterns/rules/state-decouple-implementation.md
-  - .agents/skills/composition-patterns/rules/state-lift-state.md
-  - .claude/skills/composition-patterns
-  - .claude/skills/composition-patterns/AGENTS.md
-  - .claude/skills/composition-patterns/README.md
-  - .claude/skills/composition-patterns/SKILL.md
-  - .claude/skills/composition-patterns/metadata.json
-  - .claude/skills/composition-patterns/rules/_sections.md
-  - .claude/skills/composition-patterns/rules/_template.md
-  - .claude/skills/composition-patterns/rules/architecture-avoid-boolean-props.md
-  - .claude/skills/composition-patterns/rules/architecture-compound-components.md
-  - .claude/skills/composition-patterns/rules/patterns-children-over-render-props.md
-  - .claude/skills/composition-patterns/rules/patterns-explicit-variants.md
-  - .claude/skills/composition-patterns/rules/react19-no-forwardref.md
-  - .claude/skills/composition-patterns/rules/state-context-interface.md
-  - .claude/skills/composition-patterns/rules/state-decouple-implementation.md
-  - .claude/skills/composition-patterns/rules/state-lift-state.md
-  deployed_file_hashes:
-    .agents/skills/composition-patterns/AGENTS.md: sha256:89e3ddd58fcf99a53a50e25dfd21b8cde1be5f10b7df6bacd3dfa6796932f516
-    .agents/skills/composition-patterns/README.md: sha256:85915a43a6f0b4efe525e3cf6398dd866166da2025837c4460468a24a940da94
-    .agents/skills/composition-patterns/SKILL.md: sha256:e38e0eaa609316b10423a9a138ed95e35099accd3f735585295c8a8f165c28a3
-    .agents/skills/composition-patterns/metadata.json: sha256:49262ed5cb4186f31ee980cf8d990be0170c51efed4908d0464a1cff9905bd05
-    .agents/skills/composition-patterns/rules/_sections.md: sha256:a174213b87e6911e2b766995a2cbaf8d1534057076e82fb79fe3f0ecb38047df
-    .agents/skills/composition-patterns/rules/_template.md: sha256:587f7d16b0660eb61fee4a4d3d7df2b3077d6835de170602c7d6e60bee559131
-    .agents/skills/composition-patterns/rules/architecture-avoid-boolean-props.md: sha256:007555ebb020f4d552582a2c4db194db71a1fd33094012e5187bcfa4f8c392d5
-    .agents/skills/composition-patterns/rules/architecture-compound-components.md: sha256:f246af13dc269b521cf20eb8ad99a0cb645beac381c8c9b117262c34612c8457
-    .agents/skills/composition-patterns/rules/patterns-children-over-render-props.md: sha256:7c45a0d21b3c4126a32cba916ee31adeae195386ad1dbbe6634aedb7457aa0ad
-    .agents/skills/composition-patterns/rules/patterns-explicit-variants.md: sha256:8c19e596e61807549d01ce8c6954c6358199f97a8511c0c02c625ec0efda8c0e
-    .agents/skills/composition-patterns/rules/react19-no-forwardref.md: sha256:881830adb7534c4b2d70db426556646ad9837f5478f744f35641f635ada22227
-    .agents/skills/composition-patterns/rules/state-context-interface.md: sha256:09e73afbf9285fa416679cc864a287b9e8b821d0969272ab784295386d8c9bc3
-    .agents/skills/composition-patterns/rules/state-decouple-implementation.md: sha256:76a8c1eb29a70d8996ab3f71260345af2f7bc89deab815a421d6c87c6591a9c3
-    .agents/skills/composition-patterns/rules/state-lift-state.md: sha256:74c54038a6c554c748fe31cec673b80861b5d920b7553cf78cdf10d18b4b759b
-    .claude/skills/composition-patterns/AGENTS.md: sha256:89e3ddd58fcf99a53a50e25dfd21b8cde1be5f10b7df6bacd3dfa6796932f516
-    .claude/skills/composition-patterns/README.md: sha256:85915a43a6f0b4efe525e3cf6398dd866166da2025837c4460468a24a940da94
-    .claude/skills/composition-patterns/SKILL.md: sha256:e38e0eaa609316b10423a9a138ed95e35099accd3f735585295c8a8f165c28a3
-    .claude/skills/composition-patterns/metadata.json: sha256:49262ed5cb4186f31ee980cf8d990be0170c51efed4908d0464a1cff9905bd05
-    .claude/skills/composition-patterns/rules/_sections.md: sha256:a174213b87e6911e2b766995a2cbaf8d1534057076e82fb79fe3f0ecb38047df
-    .claude/skills/composition-patterns/rules/_template.md: sha256:587f7d16b0660eb61fee4a4d3d7df2b3077d6835de170602c7d6e60bee559131
-    .claude/skills/composition-patterns/rules/architecture-avoid-boolean-props.md: sha256:007555ebb020f4d552582a2c4db194db71a1fd33094012e5187bcfa4f8c392d5
-    .claude/skills/composition-patterns/rules/architecture-compound-components.md: sha256:f246af13dc269b521cf20eb8ad99a0cb645beac381c8c9b117262c34612c8457
-    .claude/skills/composition-patterns/rules/patterns-children-over-render-props.md: sha256:7c45a0d21b3c4126a32cba916ee31adeae195386ad1dbbe6634aedb7457aa0ad
-    .claude/skills/composition-patterns/rules/patterns-explicit-variants.md: sha256:8c19e596e61807549d01ce8c6954c6358199f97a8511c0c02c625ec0efda8c0e
-    .claude/skills/composition-patterns/rules/react19-no-forwardref.md: sha256:881830adb7534c4b2d70db426556646ad9837f5478f744f35641f635ada22227
-    .claude/skills/composition-patterns/rules/state-context-interface.md: sha256:09e73afbf9285fa416679cc864a287b9e8b821d0969272ab784295386d8c9bc3
-    .claude/skills/composition-patterns/rules/state-decouple-implementation.md: sha256:76a8c1eb29a70d8996ab3f71260345af2f7bc89deab815a421d6c87c6591a9c3
-    .claude/skills/composition-patterns/rules/state-lift-state.md: sha256:74c54038a6c554c748fe31cec673b80861b5d920b7553cf78cdf10d18b4b759b
-  content_hash: sha256:5b3564ca435f4714d5e65023351e1999e4744818603a9cfb6a6f6a61b7d84918
 - repo_url: vercel-labs/agent-skills
   name: vercel-react-best-practices
   host: github.com
@@ -7912,141 +7826,6 @@ deployments:
   content_hash: sha256:436e51071f08fc6961202255d2eae1ad919f9fc867367be52f06f82a7a992813
 - kind: project-relative
   target: claude
-  value: .claude/skills/composition-patterns
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/composition-patterns/AGENTS.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:89e3ddd58fcf99a53a50e25dfd21b8cde1be5f10b7df6bacd3dfa6796932f516
-- kind: project-relative
-  target: claude
-  value: .claude/skills/composition-patterns/README.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:85915a43a6f0b4efe525e3cf6398dd866166da2025837c4460468a24a940da94
-- kind: project-relative
-  target: claude
-  value: .claude/skills/composition-patterns/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:e38e0eaa609316b10423a9a138ed95e35099accd3f735585295c8a8f165c28a3
-- kind: project-relative
-  target: claude
-  value: .claude/skills/composition-patterns/metadata.json
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:49262ed5cb4186f31ee980cf8d990be0170c51efed4908d0464a1cff9905bd05
-- kind: project-relative
-  target: claude
-  value: .claude/skills/composition-patterns/rules/_sections.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:a174213b87e6911e2b766995a2cbaf8d1534057076e82fb79fe3f0ecb38047df
-- kind: project-relative
-  target: claude
-  value: .claude/skills/composition-patterns/rules/_template.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:587f7d16b0660eb61fee4a4d3d7df2b3077d6835de170602c7d6e60bee559131
-- kind: project-relative
-  target: claude
-  value: .claude/skills/composition-patterns/rules/architecture-avoid-boolean-props.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:007555ebb020f4d552582a2c4db194db71a1fd33094012e5187bcfa4f8c392d5
-- kind: project-relative
-  target: claude
-  value: .claude/skills/composition-patterns/rules/architecture-compound-components.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:f246af13dc269b521cf20eb8ad99a0cb645beac381c8c9b117262c34612c8457
-- kind: project-relative
-  target: claude
-  value: .claude/skills/composition-patterns/rules/patterns-children-over-render-props.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:7c45a0d21b3c4126a32cba916ee31adeae195386ad1dbbe6634aedb7457aa0ad
-- kind: project-relative
-  target: claude
-  value: .claude/skills/composition-patterns/rules/patterns-explicit-variants.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:8c19e596e61807549d01ce8c6954c6358199f97a8511c0c02c625ec0efda8c0e
-- kind: project-relative
-  target: claude
-  value: .claude/skills/composition-patterns/rules/react19-no-forwardref.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:881830adb7534c4b2d70db426556646ad9837f5478f744f35641f635ada22227
-- kind: project-relative
-  target: claude
-  value: .claude/skills/composition-patterns/rules/state-context-interface.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:09e73afbf9285fa416679cc864a287b9e8b821d0969272ab784295386d8c9bc3
-- kind: project-relative
-  target: claude
-  value: .claude/skills/composition-patterns/rules/state-decouple-implementation.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:76a8c1eb29a70d8996ab3f71260345af2f7bc89deab815a421d6c87c6591a9c3
-- kind: project-relative
-  target: claude
-  value: .claude/skills/composition-patterns/rules/state-lift-state.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:74c54038a6c554c748fe31cec673b80861b5d920b7553cf78cdf10d18b4b759b
-- kind: project-relative
-  target: claude
   value: .claude/skills/cross-research
   runtime: null
   scope: project
@@ -11881,24 +11660,6 @@ deployments:
   content_hash: sha256:f4647ca866a3accf763777f83e7682954f0187cd6bea7eea0399796652414e8f
 - kind: project-relative
   target: claude
-  value: .claude/skills/web-research
-  runtime: null
-  scope: project
-  owners:
-  - langchain-ai/deepagents/libs/cli/examples/skills/web-research
-  active_owner: langchain-ai/deepagents/libs/cli/examples/skills/web-research
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/web-research/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - langchain-ai/deepagents/libs/cli/examples/skills/web-research
-  active_owner: langchain-ai/deepagents/libs/cli/examples/skills/web-research
-  content_hash: sha256:7c2b1f1990370f7ce176fe3608a67028c72db11e337b4ba83b8fce6d927dfde3
-- kind: project-relative
-  target: claude
   value: .claude/skills/work-log-maintenance
   runtime: null
   scope: project
@@ -15668,141 +15429,6 @@ deployments:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
   content_hash: sha256:436e51071f08fc6961202255d2eae1ad919f9fc867367be52f06f82a7a992813
-- kind: project-relative
-  target: codex
-  value: .agents/skills/composition-patterns
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/composition-patterns/AGENTS.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:89e3ddd58fcf99a53a50e25dfd21b8cde1be5f10b7df6bacd3dfa6796932f516
-- kind: project-relative
-  target: codex
-  value: .agents/skills/composition-patterns/README.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:85915a43a6f0b4efe525e3cf6398dd866166da2025837c4460468a24a940da94
-- kind: project-relative
-  target: codex
-  value: .agents/skills/composition-patterns/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:e38e0eaa609316b10423a9a138ed95e35099accd3f735585295c8a8f165c28a3
-- kind: project-relative
-  target: codex
-  value: .agents/skills/composition-patterns/metadata.json
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:49262ed5cb4186f31ee980cf8d990be0170c51efed4908d0464a1cff9905bd05
-- kind: project-relative
-  target: codex
-  value: .agents/skills/composition-patterns/rules/_sections.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:a174213b87e6911e2b766995a2cbaf8d1534057076e82fb79fe3f0ecb38047df
-- kind: project-relative
-  target: codex
-  value: .agents/skills/composition-patterns/rules/_template.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:587f7d16b0660eb61fee4a4d3d7df2b3077d6835de170602c7d6e60bee559131
-- kind: project-relative
-  target: codex
-  value: .agents/skills/composition-patterns/rules/architecture-avoid-boolean-props.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:007555ebb020f4d552582a2c4db194db71a1fd33094012e5187bcfa4f8c392d5
-- kind: project-relative
-  target: codex
-  value: .agents/skills/composition-patterns/rules/architecture-compound-components.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:f246af13dc269b521cf20eb8ad99a0cb645beac381c8c9b117262c34612c8457
-- kind: project-relative
-  target: codex
-  value: .agents/skills/composition-patterns/rules/patterns-children-over-render-props.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:7c45a0d21b3c4126a32cba916ee31adeae195386ad1dbbe6634aedb7457aa0ad
-- kind: project-relative
-  target: codex
-  value: .agents/skills/composition-patterns/rules/patterns-explicit-variants.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:8c19e596e61807549d01ce8c6954c6358199f97a8511c0c02c625ec0efda8c0e
-- kind: project-relative
-  target: codex
-  value: .agents/skills/composition-patterns/rules/react19-no-forwardref.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:881830adb7534c4b2d70db426556646ad9837f5478f744f35641f635ada22227
-- kind: project-relative
-  target: codex
-  value: .agents/skills/composition-patterns/rules/state-context-interface.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:09e73afbf9285fa416679cc864a287b9e8b821d0969272ab784295386d8c9bc3
-- kind: project-relative
-  target: codex
-  value: .agents/skills/composition-patterns/rules/state-decouple-implementation.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:76a8c1eb29a70d8996ab3f71260345af2f7bc89deab815a421d6c87c6591a9c3
-- kind: project-relative
-  target: codex
-  value: .agents/skills/composition-patterns/rules/state-lift-state.md
-  runtime: null
-  scope: project
-  owners:
-  - vercel-labs/agent-skills/skills/composition-patterns
-  active_owner: vercel-labs/agent-skills/skills/composition-patterns
-  content_hash: sha256:74c54038a6c554c748fe31cec673b80861b5d920b7553cf78cdf10d18b4b759b
 - kind: project-relative
   target: codex
   value: .agents/skills/cross-research
@@ -19619,24 +19245,6 @@ deployments:
   - vercel-labs/agent-skills/skills/web-design-guidelines
   active_owner: vercel-labs/agent-skills/skills/web-design-guidelines
   content_hash: sha256:f4647ca866a3accf763777f83e7682954f0187cd6bea7eea0399796652414e8f
-- kind: project-relative
-  target: codex
-  value: .agents/skills/web-research
-  runtime: null
-  scope: project
-  owners:
-  - langchain-ai/deepagents/libs/cli/examples/skills/web-research
-  active_owner: langchain-ai/deepagents/libs/cli/examples/skills/web-research
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/web-research/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - langchain-ai/deepagents/libs/cli/examples/skills/web-research
-  active_owner: langchain-ai/deepagents/libs/cli/examples/skills/web-research
-  content_hash: sha256:7c2b1f1990370f7ce176fe3608a67028c72db11e337b4ba83b8fce6d927dfde3
 - kind: project-relative
   target: codex
   value: .agents/skills/work-log-maintenance

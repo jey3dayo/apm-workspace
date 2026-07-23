@@ -30,7 +30,6 @@ dependencies:
     - ibelick/ui-skills/skills/fixing-metadata
     - ibelick/ui-skills/skills/fixing-motion-performance
     - jakubkrehel/make-interfaces-feel-better/skills/make-interfaces-feel-better
-    - langchain-ai/deepagents/libs/cli/examples/skills/web-research
     - mattpocock/skills/skills/engineering/grill-with-docs
     - mattpocock/skills/skills/engineering/improve-codebase-architecture
     - mattpocock/skills/skills/engineering/resolving-merge-conflicts
@@ -58,7 +57,6 @@ dependencies:
     - openai/skills/skills/.curated/gh-address-comments
     - openai/skills/skills/.curated/gh-fix-ci
     - openai/skills/skills/.curated/screenshot
-    - vercel-labs/agent-skills/skills/composition-patterns
     - vercel-labs/agent-skills/skills/react-best-practices
     - vercel-labs/agent-skills/skills/web-design-guidelines
     - shadcn/improve
