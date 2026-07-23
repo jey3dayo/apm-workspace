@@ -13,7 +13,10 @@ description: >-
   source checks. For skill body, description, script, reference, or asset
   design itself, coordinate with `skill-creator`; for general mise usage
   outside the APM workspace (including `mise upgrade TOOL` and
-  `minimum_release_age`), use `mise`.
+  `minimum_release_age`), use `mise`. Re-invoke this skill even mid-session
+  when the conversation shifts to these topics — e.g. during a `/doctor` run
+  the user asks to remove an MCP and redistribute, or muses about deleting a
+  `catalog/skills/**` skill (`これいるかな`) and needs the correct rollout task.
 ---
 
 # APM Usage
