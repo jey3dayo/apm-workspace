@@ -1,0 +1,4 @@
+interface:
+  display_name: "Web Research"
+  short_description: "Plan, delegate, and synthesize public web research"
+  default_prompt: "Use $web-research to plan this research, collect evidence from the right public sources, and synthesize a cited answer."

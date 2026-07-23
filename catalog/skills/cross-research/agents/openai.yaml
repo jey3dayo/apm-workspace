@@ -1,4 +1,0 @@
-interface:
-  display_name: "Cross Research"
-  short_description: "Route research across source types"
-  default_prompt: "Use $cross-research to route this research across the right public sources and synthesize the evidence."
