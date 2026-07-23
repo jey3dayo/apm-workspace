@@ -58,10 +58,6 @@ description = "Inspect ~/.apm workspace state and deployed targets"
 run = "bash ./scripts/apm-workspace.sh doctor"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 doctor"
 
-[tasks."hooks:install"]
-description = "Install Lefthook git hooks for this workspace"
-run = "lefthook install"
-
 # ========================================
 # Catalog / Skill Commands
 # ========================================
