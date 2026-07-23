@@ -1,13 +1,13 @@
 ---
 name: jina-web-research
-description: "Run Jina Reader-first public web research with cited synthesis. Use when the user asks to research current public web signals, search X/Twitter via Jina, compare public sources, or produce a concise evidence-backed research brief using s.jina.ai."
+description: "Jina Reader-first collection workflow for public web research: s.jina.ai search, Reader page reading, and X/Twitter evidence rules. Use when Jina search or X/Twitter signal is explicitly requested, or as the collection procedure referenced by the web-research skill. For general 'research this topic' requests, prefer web-research as the entry point."
 ---
 
 # Jina Web Research
 
 ## Overview
 
-Use this skill for current public web research that should prefer Jina Reader. It adapts the `web-research` planning pattern, but uses Jina search URLs as the primary collection path and treats X/Twitter as an indexed public-source signal, not complete platform coverage.
+Use this skill as the collection workflow for public web research that should prefer Jina Reader. It uses Jina search URLs as the primary collection path and treats X/Twitter as an indexed public-source signal, not complete platform coverage. The `web-research` skill is the general entry point that plans, delegates, and synthesizes; this skill defines how each search-and-read pass is actually performed, both in the main session and inside delegated subagents.
 
 ## Scope
 
