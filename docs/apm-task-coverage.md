@@ -10,28 +10,7 @@
 
 ## Source Of Truth
 
-- `~/.apm/catalog/skills/**`: personal skills
-- `~/.apm/optional-skills/<id>/**`: individually installable repository-scoped optional skills; tracked here but not included in the global rollout
-- `~/.apm/catalog/{AGENTS.md,agents/**,commands/**,rules/**}`: shared guidance
-- `~/.apm/apm.yml`, `~/.apm/apm.lock.yaml`: dependency selection and accepted upstream state
-- `~/.apm/mise.toml`, `~/.apm/scripts/apm-workspace.*`: host-local MCP bootstrap wiring; user-scope runtime configs are generated targets
-- `~/.apm/.apm/skills/**`: APM workspace-only skill source for skills intentionally excluded from global rollout
-- `~/.apm/.claude/skills/**`, `~/.apm/.agents/skills/**`: project runtime bridges; child skill directories symlink to the workspace-only source
-- `~/.apm/apm_modules/`: cache only
-
-## Optional Skill Contract
-
-- The `optional-skills` collection root is not an APM package, is not listed in the root `apm.yml`, and is never installed by the global `mise run deploy` flow.
-- A consuming repository adds only the required `jey3dayo/apm-workspace/optional-skills/<id>#main` ref to its own `apm.yml`.
-- An optional skill that is already part of an upstream bundle remains owned by that upstream package. Select it in the consuming repository with the upstream package ref and `--skill <id>` rather than copying it into this workspace.
-
-## APM Workspace-only Skill Contract
-
-- Keep workspace-only skill content under `.apm/skills/<id>/`.
-- Do not add workspace-only skills to root `apm.yml` or `apm.lock.yaml`; they must not be included in the global APM rollout.
-- Keep `.claude/skills/` and `.agents/skills/` as real directories and symlink each skill directory to `.apm/skills/<id>/`.
-- Do not symlink the entire `.agents/skills` root or only `SKILL.md`; the skill directory is the unit of distribution.
-- Runtime checks must verify both symlink targets and the source `SKILL.md`.
+Path-by-path ownership (catalog, optional-skills, workspace-only skills, lockfiles, caches) is owned by the Source of Truth Table in the root `AGENTS.md`. This file covers only task responsibilities.
 
 ## Task Contract
 
