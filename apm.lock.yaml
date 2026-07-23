@@ -2748,7 +2748,7 @@ dependencies:
 - repo_url: millionco/react-doctor
   name: react-doctor
   host: github.com
-  resolved_commit: 1e67af03fec0991aaa9607fdf1b7e8719a63614c
+  resolved_commit: 9b532015f0c8fe2070eb8847454547ebe1ae6177
   version: unknown
   virtual_path: skills/react-doctor
   is_virtual: true
