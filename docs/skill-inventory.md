@@ -29,8 +29,7 @@
   `browser-harness`, `screenshot`
 - ワークフロー（obra/superpowers）: brainstorming, executing-plans,
   systematic-debugging, TDD, worktrees, verification ほか計 11
-- Codex 連携（openai）: `codex-cli-runtime`, `codex-result-handling`,
-  `gpt-5-4-prompting`, `gh-address-comments`, `gh-fix-ci`
+- GitHub 連携（openai）: `gh-address-comments`, `gh-fix-ci`
 - 社内（caad-develop）: `perman-aws-vault`, `caad-skill-deployer`
 - その他: `understand` / `understand-dashboard`, `humanizer-ja`,
   `web-research`, mattpocock 系 5, `empirical-prompt-tuning`
@@ -50,7 +49,6 @@
 - Git・作業運用: `atomic-commit`, `git-worktree`, `ci-stability-hooks`,
   `work-log-maintenance`, `prepare-goal`
 - リサーチ: `jina-web-research`, `cross-research`
-- ランタイム資産: `codex-companion-scripts`
 
 ## ~/.apm 専用（.apm/skills/）
 

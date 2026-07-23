@@ -74,7 +74,7 @@ Use this when a dependency in `apm.yml` is also checked out locally and that che
 - Keep repository-scoped skills out of the root `apm.yml`; add only the required `jey3dayo/apm-workspace/optional-skills/<id>#main` ref to the consuming repository.
 - For an upstream bundle with optional sub-skills, keep the upstream reference and select the sub-skill in the consuming repository, for example `apm install nextlevelbuilder/ui-ux-pro-max-skill --skill banner-design`.
 - When an upstream skill cannot stay on the normal managed lane, keep its copied source under `manual-skills/.apm/skills/**` and distribute it through `jey3dayo/apm-workspace/manual-skills`.
-- Exception: skills that only carry runtime assets for `catalog/commands/**` (for example `codex-companion-scripts`) stay under `catalog/skills/<id>/` with provenance recorded in their own `SKILL.md`.
+- Exception: skills that only carry runtime assets for `catalog/commands/**` stay under `catalog/skills/<id>/` with provenance recorded in their own `SKILL.md`.
 - Keep machine-local skills under `private-skills/.apm/skills/**`; this directory is gitignored and only participates in `mise run apply:skills:local`.
 - If a skill id exists in both `catalog/skills/**` and `private-skills/.apm/skills/**`, the local private copy wins during `mise run apply:skills:local`.
 - Codex is handled via `apm compile --target codex --output ~/.codex/AGENTS.md`, and skills deploy to `~/.agents/skills`.

@@ -55,9 +55,6 @@ dependencies:
     - obra/superpowers/skills/using-superpowers
     - obra/superpowers/skills/verification-before-completion
     - obra/superpowers/skills/writing-plans
-    - openai/codex-plugin-cc/plugins/codex/skills/codex-cli-runtime
-    - openai/codex-plugin-cc/plugins/codex/skills/codex-result-handling
-    - openai/codex-plugin-cc/plugins/codex/skills/gpt-5-4-prompting
     - openai/skills/skills/.curated/gh-address-comments
     - openai/skills/skills/.curated/gh-fix-ci
     - openai/skills/skills/.curated/screenshot

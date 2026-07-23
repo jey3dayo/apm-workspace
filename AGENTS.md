@@ -55,7 +55,7 @@ In practice:
 - if the skill should be available only to selected repositories, edit `./optional-skills/<id>/**` and reference that skill directly from the consuming repository
 - if the change is to external dependency selection or accepted upstream state, edit or review `apm.yml` and `apm.lock.yaml`
 - if an upstream skill does not install or deploy cleanly through the normal managed lane, copy it under `./manual-skills/.apm/skills/<id>/`, record provenance under `./manual-skills/upstreams/**`, and distribute it through the `jey3dayo/apm-workspace/manual-skills` package ref in root `apm.yml`
-- exception: a skill that exists only to carry runtime assets for `catalog/commands/**` (for example `codex-companion-scripts`) stays under `catalog/skills/<id>/` with provenance recorded in its own `SKILL.md`; do not move it onto the `manual-skills` lane, because deployed wiring (such as the `CLAUDE_PLUGIN_ROOT` default in `~/.claude/settings.json`) points at its catalog-deployed path
+- exception: a skill that exists only to carry runtime assets for `catalog/commands/**` stays under `catalog/skills/<id>/` with provenance recorded in its own `SKILL.md`; do not move it onto the `manual-skills` lane, because deployed wiring may point at its catalog-deployed path
 - if a skill should stay machine-local and untracked, place it under `./private-skills/.apm/skills/<id>/`; this gitignored lane is only used by the local Codex skill sync flow
 - if both `catalog/skills/<id>/` and `private-skills/.apm/skills/<id>/` exist, the private copy overrides the tracked copy for `mise run apply:skills:local`
 - if a skill is intentionally scoped only to this APM workspace, keep its source under `./.apm/skills/<id>/`; do not add it to root `apm.yml` or `apm.lock.yaml`
