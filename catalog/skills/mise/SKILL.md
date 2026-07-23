@@ -103,6 +103,7 @@ Within `[tasks]`: individual commands → aggregation tasks → aliases/meta-tas
 - Shared repositories: pin concrete LTS majors or exact patches (`node = "24"` or `node = "24.15.0"`); personal global configs may use symbolic channels (`node = "lts"`)
 - Resolve the newest acceptable version first, then record the concrete version — no floating channels in committed configs or CI
 - Add tools to `[tools]` only when tasks or documented setup flows actually invoke them
+- pnpm is the pinning exception: mise only bootstraps it with a loose major pin (`pnpm = "11"`); the exact version is owned by each repository's `package.json` `packageManager` field (pnpm 10+ self-management switches automatically). Do not use corepack — Node 25+ no longer ships it
 - Migration from `global-package.json`, pinning policy, pipx/CI caveats: `references/tool-management.md`
 
 ### mise skills add
