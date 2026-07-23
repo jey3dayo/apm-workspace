@@ -1,6 +1,6 @@
 ---
 name: dotenvx-env-ops
-description: Use when operating dotenvx-managed environment files, encrypted `encrypted:` values, `.env.*` loading, `dotenvx run`, or when dotenvx/mise environment injection may affect CLI tools such as AWS CLI, Terraform, CDK, GitHub CLI, or perman-aws-vault. Trigger for `.env.development`, `.env.staging`, `.env.production`, `.env.dev`, env drift, secret redaction, and commands that need a clean environment instead of decrypted app env.
+description: Use when operating dotenvx-managed environment files, encrypted `encrypted:` values, `.env.*` loading, `dotenvx run`, or when dotenvx/mise environment injection may affect CLI tools such as AWS CLI, Terraform, CDK, GitHub CLI, or perman-aws-vault. Trigger for `.env.development`, `.env.staging`, `.env.production`, `.env.dev`, env drift, secret redaction, and commands that need a clean environment instead of decrypted app env. This skill leads dotenvx key rotation end-to-end (`dotenvx rotate`, `.env.keys` replacement, storing the new private key in 1Password); delegate the 1Password item update step to `1password-item-ops`.
 ---
 
 # dotenvx-env-ops
