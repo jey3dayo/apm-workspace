@@ -17,20 +17,21 @@ Treat source of truth as a split model by asset type, not as "whatever is curren
 
 Use this table as the Source of Truth Table (SoTT) when deciding where to read or update durable workspace knowledge.
 
-| 対象                                                              | 正本                                                          | 用途                                                                                           |
-| ----------------------------------------------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| Personal skills / shared guidance                                 | `catalog/**`                                                  | skills、AGENTS.md、agents、commands、rules の authoring surface                                |
-| Optional repository-scoped skills                                 | `optional-skills/<id>/**`                                     | 保存するがグローバル配布せず、利用リポジトリの `apm.yml` から個別参照するスキル                |
-| External skills / global MCP                                      | `apm.yml` + `apm.lock.yaml`                                   | 外部依存の宣言と accepted resolved state。global MCP は `apm.yml` の `mcp:`                    |
-| Host-local MCP                                                    | `mise.toml` + `scripts/apm-workspace.*`                       | OS / desktop app に依存する user-scope MCP の検出・同期                                        |
-| SaaS 連携（コネクタ / プラグイン）                                | `docs/saas-connectors.md`                                     | claude.ai / ChatGPT アプリ側コネクタの接続状況と配置優先度（plugin > apm.yml > catalog skill） |
-| Repo-local MCP                                                    | 各リポジトリの `apm.yml`（一覧は `ghq list -p`）              | リポジトリ固有の MCP セット                                                                    |
-| パッケージ採用・撤去の意思決定                                    | `docs/package-decisions.md`                                   | なぜ入れた / 消したかのログ                                                                    |
-| APM タスクの使い分け                                              | `docs/apm-task-coverage.md`                                   | rollout / verify などのタスク責務                                                              |
-| Manual-lane skills                                                | `manual-skills/.apm/skills/**` + `manual-skills/upstreams/**` | managed lane で壊れる外部スキルの手動管理と provenance                                         |
-| APM workspace-only skills                                         | `.apm/skills/**`                                              | この APM リポジトリだけで使うスキルの正本。root `apm.yml` には登録しない                       |
-| APM workspace skill bridges                                       | `.claude/skills/**`, `.agents/skills/**`                      | 正本のスキルディレクトリを runtime ごとに参照する symlink。直接編集しない                      |
-| Deployed targets（`~/.claude/`, `~/.codex/`, `~/.agents/skills`） | 生成物（SSoT ではない）                                       | 検証・配布面。直接編集しない                                                                   |
+| 対象                                                              | 正本                                                      | 用途                                                                                           |
+| ----------------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Personal skills / shared guidance                                 | `catalog/**`                                              | skills、AGENTS.md、agents、commands、rules の authoring surface                                |
+| Optional repository-scoped skills                                 | `optional-skills/<id>/**`                                 | 保存するがグローバル配布せず、利用リポジトリの `apm.yml` から個別参照するスキル                |
+| External skills / global MCP                                      | `apm.yml` + `apm.lock.yaml`                               | 外部依存の宣言と accepted resolved state。global MCP は `apm.yml` の `mcp:`                    |
+| Host-local MCP                                                    | `mise.toml` + `scripts/apm-workspace.*`                   | OS / desktop app に依存する user-scope MCP の検出・同期（Codex / Claude）                      |
+| Cursor user-scope MCP                                             | `~/.cursor/mcp.json`（手書き）                            | APM global 対象外。判断ログは `docs/package-decisions.md`                                      |
+| SaaS 連携（コネクタ / プラグイン）                                | `docs/saas-connectors.md`                                 | claude.ai / ChatGPT アプリ側コネクタの接続状況と配置優先度（plugin > apm.yml > catalog skill） |
+| Repo-local MCP                                                    | 各リポジトリの `apm.yml`（一覧は `ghq list -p`）          | リポジトリ固有の MCP セット                                                                    |
+| パッケージ採用・撤去の意思決定                                    | `docs/package-decisions.md`                               | なぜ入れた / 消したかのログ                                                                    |
+| APM タスクの使い分け                                              | `docs/apm-task-coverage.md`                               | rollout / verify などのタスク責務                                                              |
+| Manual-lane skills                                                | `manual-skills/.apm/skills/` + `manual-skills/upstreams/` | managed lane で壊れる外部スキルの手動管理と provenance                                         |
+| APM workspace-only skills                                         | `.apm/skills/**`                                          | この APM リポジトリだけで使うスキルの正本。root `apm.yml` には登録しない                       |
+| APM workspace skill bridges                                       | `.claude/skills/`, `.agents/skills/`                      | 正本のスキルディレクトリを runtime ごとに参照する symlink。直接編集しない                      |
+| Deployed targets（`~/.claude/`, `~/.codex/`, `~/.agents/skills`） | 生成物（SSoT ではない）                                   | 検証・配布面。直接編集しない                                                                   |
 
 - `./catalog` is the tracked source of truth for managed content in this repository
   - `catalog/skills/**` for skills that belong in the global automatic rollout
@@ -88,6 +89,7 @@ Placement policy (global vs repo-local vs on-demand, browser-tool selection, own
 - Keep desktop-app-dependent MCP servers out of the portable global manifest
   - `mise bootstrap` runs the hidden host-local setup task and reconciles the Codex / Claude user-scope entries
   - treat `~/.codex/config.toml` and `~/.claude.json` as generated targets, not source files
+- Cursor user-scope MCP (`~/.cursor/mcp.json`) is hand-maintained; APM global does not write it
 - If the APM workspace has no repo-local MCP deployment lane for a target, keep the global manifest lightweight and treat repo-local MCP distribution as a separate workspace-mechanics task
 
 ## Task Selection

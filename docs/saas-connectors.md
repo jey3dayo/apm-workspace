@@ -7,9 +7,9 @@ SaaS 連携の接続状況インベントリと配置優先度。各アプリの
 
 SaaS への接続手段は次の優先順で選ぶ。上位が使えるなら下位で二重管理しない。
 
-1. **アプリ側プラグイン / コネクタ** — claude.ai の managed MCP コネクタ、ChatGPT アプリのプラグイン。認証・トークン更新・ツール定義のメンテナンスがアプリ側に集約される
-2. **`apm.yml`（external skill / MCP）** — アプリ側コネクタが無い、または headless / CLI 常用で必要な場合のみ
-3. **`catalog/skills`（自作スキル）** — 上記で賄えない固有ワークフローだけ
+1. アプリ側プラグイン / コネクタ — claude.ai の managed MCP コネクタ、ChatGPT アプリのプラグイン。認証・トークン更新・ツール定義のメンテナンスがアプリ側に集約される
+2. `apm.yml`（external skill / MCP） — アプリ側コネクタが無い、または headless / CLI 常用で必要な場合のみ
+3. `catalog/skills`（自作スキル） — 上記で賄えない固有ワークフローだけ
 
 コネクタと役割が被らないスキル（例: `slack-app-management` は Slack アプリ管理で SlackDB コネクタとは別役割）は撤去対象にしない。
 

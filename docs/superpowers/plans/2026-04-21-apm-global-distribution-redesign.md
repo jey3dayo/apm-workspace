@@ -2,11 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Restore `apm -g` based external skill ownership while keeping personal skills in `catalog/skills/**`, make `apply` offline, and deploy normalized skill trees to `~/.claude/skills` and `~/.codex/skills`.
+Goal: Restore `apm -g` based external skill ownership while keeping personal skills in `catalog/skills/**`, make `apply` offline, and deploy normalized skill trees to `~/.claude/skills` and `~/.codex/skills`.
 
-**Architecture:** Keep two sources of truth: personal skills from `catalog/skills/**` and external skills from `apm install/uninstall` managed `apm.yml` plus `apm.lock.yaml`. Refactor `apply` into a lock-backed deployment planner plus target-specific filesystem application, and keep shared guidance sync separate from skill inventory handling.
+Architecture: Keep two sources of truth: personal skills from `catalog/skills/**` and external skills from `apm install/uninstall` managed `apm.yml` plus `apm.lock.yaml`. Refactor `apply` into a lock-backed deployment planner plus target-specific filesystem application, and keep shared guidance sync separate from skill inventory handling.
 
-**Tech Stack:** Bash, PowerShell, APM CLI, mise tasks, Pester, Markdown docs
+Tech Stack: Bash, PowerShell, APM CLI, mise tasks, Pester, Markdown docs
 
 ---
 
@@ -36,7 +36,7 @@
 
 ### Task 1: Lock In Regression Coverage First
 
-**Files:**
+### Files:
 
 - Modify: `/Users/t00114/.apm/tests/apm-workspace.Tests.ps1`
 - Test: `/Users/t00114/.apm/tests/apm-workspace.Tests.ps1`
@@ -121,7 +121,7 @@ git commit -m "test: capture apm global distribution regressions"
 
 ### Task 2: Refactor Manifest and Inventory Handling
 
-**Files:**
+### Files:
 
 - Modify: `/Users/t00114/.apm/scripts/apm-workspace.sh`
 - Modify: `/Users/t00114/.apm/scripts/apm-workspace.ps1`
@@ -240,7 +240,7 @@ git commit -m "refactor: restore external skill inventory handling"
 
 ### Task 3: Implement Offline Apply and Target-Specific Deployment
 
-**Files:**
+### Files:
 
 - Modify: `/Users/t00114/.apm/scripts/apm-workspace.sh`
 - Modify: `/Users/t00114/.apm/scripts/apm-workspace.ps1`
@@ -348,7 +348,7 @@ git commit -m "feat: make apm apply offline and target-aware"
 
 ### Task 4: Rework Mise Tasks and Command Surface
 
-**Files:**
+### Files:
 
 - Modify: `/Users/t00114/.apm/mise.toml`
 - Modify: `/Users/t00114/.apm/scripts/apm-workspace.sh`
@@ -413,7 +413,7 @@ git commit -m "refactor: separate update apply and ci workflows"
 
 ### Task 5: Update Operator and LLM Documentation
 
-**Files:**
+### Files:
 
 - Modify: `/Users/t00114/.apm/README.md`
 - Create: `/Users/t00114/.apm/llms.txt`
@@ -502,7 +502,7 @@ git commit -m "docs: describe the new apm distribution workflow"
 
 ### Task 6: Final End-to-End Verification
 
-**Files:**
+### Files:
 
 - Modify: `/Users/t00114/.apm/scripts/apm-workspace.sh`
 - Modify: `/Users/t00114/.apm/scripts/apm-workspace.ps1`
