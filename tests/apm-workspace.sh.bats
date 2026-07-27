@@ -274,6 +274,33 @@ EOF
 
 # --- is_path_under_dir ------------------------------------------------------
 
+@test "sync_managed_catalog_runtime_assets replaces managed agent trees" {
+  workspace_dir="$(mktemp -d)"
+  runtime_home="$(mktemp -d)"
+  target_root="$runtime_home/.claude"
+
+  mkdir -p "$workspace_dir/catalog/agents" "$target_root/agents" "$target_root/commands"
+  printf '%s\n' 'current' >"$workspace_dir/catalog/agents/current.md"
+  printf '%s\n' 'old' >"$target_root/agents/current.md"
+  printf '%s\n' 'stale' >"$target_root/agents/stale.md"
+  printf '%s\n' 'outside' >"$target_root/commands/untouched.md"
+
+  WORKSPACE_DIR="$workspace_dir"
+  HOME="$runtime_home"
+  managed_catalog_runtime_targets() {
+    printf '%s\n' 'claude|.claude|CLAUDE.md|.claude'
+  }
+
+  run sync_managed_catalog_runtime_assets
+
+  [ "$status" -eq 0 ]
+  [ "$(<"$target_root/agents/current.md")" = "current" ]
+  [ ! -e "$target_root/agents/stale.md" ]
+  [ "$(<"$target_root/commands/untouched.md")" = "outside" ]
+
+  rm -rf "$workspace_dir" "$runtime_home"
+}
+
 @test "is_path_under_dir returns 0 for a child path" {
   parent="$(mktemp -d)"
   mkdir -p "$parent/child"

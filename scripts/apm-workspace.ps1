@@ -1501,34 +1501,10 @@ function Replace-SkillTargetsFromStage {
     New-Item -ItemType Directory -Path $skillsRoot -Force | Out-Null
     $legacySkillsRoot = Join-Path $target.Root "skills"
     $destinationSkillsRoot = Join-Path $skillsRoot "skills"
-    $backupSkillsRoot = Join-Path $target.Root (".skills.apm-backup-{0}" -f ([guid]::NewGuid().ToString("N")))
-
     if (($legacySkillsRoot -ne $destinationSkillsRoot) -and (Test-Path -LiteralPath $legacySkillsRoot)) {
       Remove-Item -LiteralPath $legacySkillsRoot -Recurse -Force
     }
-
-    if (Test-Path -LiteralPath $backupSkillsRoot) {
-      Remove-Item -LiteralPath $backupSkillsRoot -Recurse -Force
-    }
-
-    if (Test-Path -LiteralPath $destinationSkillsRoot) {
-      Move-Item -LiteralPath $destinationSkillsRoot -Destination $backupSkillsRoot
-    }
-
-    try {
-      Move-Item -LiteralPath $stagedSkillsRoot -Destination $destinationSkillsRoot
-    }
-    catch {
-      if ((-not (Test-Path -LiteralPath $destinationSkillsRoot)) -and (Test-Path -LiteralPath $backupSkillsRoot)) {
-        Move-Item -LiteralPath $backupSkillsRoot -Destination $destinationSkillsRoot
-      }
-      throw
-    }
-    finally {
-      if (Test-Path -LiteralPath $backupSkillsRoot) {
-        Remove-Item -LiteralPath $backupSkillsRoot -Recurse -Force
-      }
-    }
+    Replace-DirectoryTreeFromSource -SourceDir $stagedSkillsRoot -DestinationDir $destinationSkillsRoot -TreeName "skills"
   }
 }
 
@@ -2033,6 +2009,52 @@ function Copy-ManagedCatalogFile {
   Copy-Item -LiteralPath $SourcePath -Destination $DestinationPath -Force
 }
 
+function Replace-DirectoryTreeFromSource {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$SourceDir,
+
+    [Parameter(Mandatory = $true)]
+    [string]$DestinationDir,
+
+    [Parameter(Mandatory = $true)]
+    [string]$TreeName
+  )
+
+  $destinationParent = Split-Path -Parent $DestinationDir
+  $replacementId = [guid]::NewGuid().ToString("N")
+  $stagingDir = Join-Path $destinationParent (".apm-{0}-next-{1}" -f $TreeName, $replacementId)
+  $backupDir = Join-Path $destinationParent (".apm-{0}-backup-{1}" -f $TreeName, $replacementId)
+
+  New-Item -ItemType Directory -Path $destinationParent -Force | Out-Null
+
+  try {
+    Copy-DirectoryContents -SourceDir $SourceDir -DestinationDir $stagingDir
+
+    if (Test-Path -LiteralPath $DestinationDir) {
+      Move-Item -LiteralPath $DestinationDir -Destination $backupDir
+    }
+
+    try {
+      Move-Item -LiteralPath $stagingDir -Destination $DestinationDir
+    }
+    catch {
+      if ((-not (Test-Path -LiteralPath $DestinationDir)) -and (Test-Path -LiteralPath $backupDir)) {
+        Move-Item -LiteralPath $backupDir -Destination $DestinationDir
+      }
+      throw
+    }
+  }
+  finally {
+    if (Test-Path -LiteralPath $stagingDir) {
+      Remove-Item -LiteralPath $stagingDir -Recurse -Force
+    }
+    if (Test-Path -LiteralPath $backupDir) {
+      Remove-Item -LiteralPath $backupDir -Recurse -Force
+    }
+  }
+}
+
 function Sync-ManagedCatalogRuntimeAssets {
   $trackedDir = Get-TrackedCatalogDir
   if (-not (Test-Path -LiteralPath $trackedDir)) {
@@ -2052,7 +2074,7 @@ function Sync-ManagedCatalogRuntimeAssets {
     }
 
     if (Test-Path -LiteralPath $agentsSource) {
-      Copy-DirectoryContents -SourceDir $agentsSource -DestinationDir (Join-Path $target.Root "agents")
+      Replace-DirectoryTreeFromSource -SourceDir $agentsSource -DestinationDir (Join-Path $target.Root "agents") -TreeName "agents"
     }
 
     if (Test-Path -LiteralPath $commandsSource) {

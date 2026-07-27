@@ -1942,31 +1942,36 @@ build_target_skill_trees() {
   stage_target_skill_records "$deployment_plan" "$stage_root"
 }
 
-swap_staged_skill_tree_into_place() {
-  staged_skills_root="$1"
-  target_skills_root="$2"
-  target_parent_dir=$(dirname "$target_skills_root")
-  staging_copy_root="$target_parent_dir/.apm-skills-next.$$"
-  backup_root="$target_parent_dir/.apm-skills-backup.$$"
+swap_staged_tree_into_place() {
+  staged_tree_root="$1"
+  target_tree_root="$2"
+  tree_name="$3"
+  target_parent_dir=$(dirname "$target_tree_root")
+  staging_copy_root="$target_parent_dir/.apm-$tree_name-next.$$"
+  backup_root="$target_parent_dir/.apm-$tree_name-backup.$$"
 
   mkdir -p "$target_parent_dir"
   rm -rf "$staging_copy_root" "$backup_root"
-  cp -R "$staged_skills_root" "$staging_copy_root"
+  cp -R "$staged_tree_root" "$staging_copy_root"
 
-  if [ -e "$target_skills_root" ] || [ -L "$target_skills_root" ]; then
-    mv "$target_skills_root" "$backup_root"
+  if [ -e "$target_tree_root" ] || [ -L "$target_tree_root" ]; then
+    mv "$target_tree_root" "$backup_root"
   fi
 
-  if mv "$staging_copy_root" "$target_skills_root"; then
+  if mv "$staging_copy_root" "$target_tree_root"; then
     rm -rf "$backup_root"
     return 0
   fi
 
   rm -rf "$staging_copy_root"
   if [ -e "$backup_root" ] || [ -L "$backup_root" ]; then
-    mv "$backup_root" "$target_skills_root" || true
+    mv "$backup_root" "$target_tree_root" || true
   fi
-  fail "Failed to replace skill target: $target_skills_root"
+  fail "Failed to replace $tree_name target: $target_tree_root"
+}
+
+swap_staged_skill_tree_into_place() {
+  swap_staged_tree_into_place "$1" "$2" skills
 }
 
 replace_skill_targets_from_stage() {
@@ -2008,6 +2013,12 @@ remove_symlink_entries() {
   find "$target_dir" -type l -exec rm -f {} +
 }
 
+replace_managed_catalog_agents_tree() {
+  agents_source="$1"
+  target_agents_root="$2"
+  swap_staged_tree_into_place "$agents_source" "$target_agents_root" agents
+}
+
 sync_managed_catalog_runtime_assets() {
   tracked_dir=$(tracked_catalog_dir)
   [ -d "$tracked_dir" ] || fail "Tracked catalog missing: $tracked_dir. Run 'mise run prepare:catalog' first."
@@ -2026,9 +2037,7 @@ sync_managed_catalog_runtime_assets() {
     fi
 
     if [ -d "$agents_source" ]; then
-      mkdir -p "$target_root/agents"
-      remove_symlink_entries "$target_root/agents"
-      cp -R "$agents_source"/. "$target_root/agents"
+      replace_managed_catalog_agents_tree "$agents_source" "$target_root/agents"
     fi
 
     if [ -d "$commands_source" ]; then

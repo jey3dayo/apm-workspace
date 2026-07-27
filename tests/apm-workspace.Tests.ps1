@@ -764,6 +764,32 @@ Describe "public command surface" {
     ($targets | Where-Object Name -eq "cursor").ConfigName | Should -Be "AGENTS.md"
   }
 
+  It "replaces managed agent trees without touching adjacent runtime assets" {
+    $catalogRoot = Join-Path $TestDrive "catalog"
+    $runtimeRoot = Join-Path $TestDrive "runtime"
+    $targetRoot = Join-Path $runtimeRoot ".claude"
+    $agentsSource = Join-Path $catalogRoot "agents"
+    $agentsTarget = Join-Path $targetRoot "agents"
+    $untouchedCommand = Join-Path $targetRoot "commands/untouched.md"
+
+    New-Item -ItemType Directory -Path $agentsSource, $agentsTarget, (Split-Path -Parent $untouchedCommand) -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $agentsSource "current.md") -Value "current"
+    Set-Content -LiteralPath (Join-Path $agentsTarget "current.md") -Value "old"
+    Set-Content -LiteralPath (Join-Path $agentsTarget "stale.md") -Value "stale"
+    Set-Content -LiteralPath $untouchedCommand -Value "outside"
+
+    Mock Get-TrackedCatalogDir { $catalogRoot }
+    Mock Get-ManagedCatalogRuntimeTargets {
+      @([pscustomobject]@{ Name = "claude"; Root = $targetRoot; SkillsRoot = $targetRoot; ConfigName = "CLAUDE.md" })
+    }
+
+    Sync-ManagedCatalogRuntimeAssets
+
+    ((Get-Content -LiteralPath (Join-Path $agentsTarget "current.md") -Raw) -replace '\r?\n$', '') | Should -Be "current"
+    Test-Path -LiteralPath (Join-Path $agentsTarget "stale.md") | Should -Be $false
+    ((Get-Content -LiteralPath $untouchedCommand -Raw) -replace '\r?\n$', '') | Should -Be "outside"
+  }
+
   It "maps codex skills to ~/.agents while keeping config under ~/.codex" {
     $targets = @(Get-ManagedCatalogRuntimeTargets)
     $codex = $targets | Where-Object Name -eq "codex"
