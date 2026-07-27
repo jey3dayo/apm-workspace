@@ -191,6 +191,27 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 - 再検討するなら: claude.ai コネクタが使えない環境（headless / cron /
   コネクタ未認証のマシン）での CLI 作業が常態化した場合のみ、
   repo-local への追加を検討する。
+- Sentry は上記のまま撤去を維持する。Linear は下記のとおり復活した。
+
+## linear MCP + linear-task-ops（復活）
+
+- Status: global 復活（2026-07-27）
+- 経緯: claude.ai / ChatGPT のコネクタだけでは実現できない Linear 操作があり、
+  CLI 側（Claude Code / Codex）でも同じ tool 群が必要になった。さらに両アプリの
+  コネクタは同一の MCP だと想定していたが実際には剥離があり、issue の作成・編集
+  （書き込み系）の反映が信頼できないケースが出た。加えて
+  `catalog/skills/linear-task-ops`（JEY 固有のプロジェクトルーティング・ラベル
+  規約・取引ログ書式・GraphQL フォールバック）が `adc2578` の catalog 整理で
+  誤って削除されていた。
+- 構成: MCP は root `apm.yml` の `mcp:` に `linear`
+  （`streamable-http` / `https://mcp.linear.app/mcp`）として登録。旧構成の
+  `npx mcp-remote .../sse` は使わない。スキルは `catalog/skills/linear-task-ops`。
+- 二重管理にならない理由: MCP は CRUD だけを担い、スキルは workspace 固有の
+  ルーティング・書式・運用ルールと MCP に無い操作の GraphQL フォールバックを担う。
+  コネクタとの役割被りが無い（「役割が被らないスキルは撤去対象にしない」に該当）。
+- 一般則の更新: 「コネクタ提供サービスは二重管理しない」は、**コネクタが
+  当該操作を全部カバーしている場合**に限る。CLI 側で必要かつコネクタで
+  不足する操作があるなら global APM 管理でよい。
 
 ## skill-auditor / find-skills
 

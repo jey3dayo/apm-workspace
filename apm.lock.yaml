@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-07-23T08:45:41.977210+00:00'
+generated_at: '2026-07-27T08:38:41.013503+00:00'
 apm_version: 0.26.0
 dependencies:
 - repo_url: anthropics/claude-code
@@ -18978,10 +18978,29 @@ deployments:
   - obra/superpowers/skills/writing-plans
   active_owner: obra/superpowers/skills/writing-plans
   content_hash: sha256:aa728b96aad603c8be28875a4305637f6c984aa81ffcadcb13e743202fa2a0c7
+- kind: uri
+  target: mcp
+  value: linear
+  runtime: claude
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: uri
+  target: mcp
+  value: linear
+  runtime: codex
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
 mcp_servers:
 - codex
 - context7
 - jina-reader
+- linear
 - mcp-simple-voicevox
 mcp_configs:
   codex:
@@ -19006,6 +19025,11 @@ mcp_configs:
     headers:
       Authorization: Bearer ${JINA_API_KEY}
     url: https://mcp.jina.ai/v1?include_tags=search,read
+  linear:
+    name: linear
+    transport: streamable-http
+    registry: false
+    url: https://mcp.linear.app/mcp
   mcp-simple-voicevox:
     name: mcp-simple-voicevox
     transport: stdio
@@ -19014,6 +19038,11 @@ mcp_configs:
     - '@t09tanaka/mcp-simple-voicevox'
     registry: false
     command: npx
+mcp_target_servers:
+  claude:
+  - linear
+  codex:
+  - linear
 local_deployed_files:
 - .agents/skills/agent-curation
 - .agents/skills/find-skills

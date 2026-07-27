@@ -88,4 +88,11 @@ dependencies:
       command: codex
       args:
         - mcp-server
+    # Linear は claude.ai / ChatGPT 側コネクタだけでは足りない操作があり、CLI 側
+    # (Claude Code / Codex) でも同じ tool 群が必要なため APM 管理に戻した。
+    # 運用ルールと GraphQL フォールバックは catalog/skills/linear-task-ops が持つ。
+    - name: linear
+      registry: false
+      transport: streamable-http
+      url: https://mcp.linear.app/mcp
 scripts: {}
