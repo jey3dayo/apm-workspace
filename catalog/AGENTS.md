@@ -110,25 +110,14 @@ full gate を実行しない場合は、報告時に実行した軽い確認と�
 
 ## モデル運用方針（Orchestrator-Worker）
 
-高コストモデルを実装作業で使いすぎないよう、Orchestrator-Worker パターンで役割を分担する。モデルを役割に固定せず、タスクの複雑さ・速度・コストに応じて割り当てる。
+高コストモデルを実装作業で使いすぎないよう、Orchestrator-Worker パターンで役割を分担する。Orchestrator は要件整理・設計・タスク分解・委譲先出力の検証を担い、実装は Worker へ渡す。
 
-- Orchestrator（構想・指揮系統）
-  - 要件整理、設計方針の決定、タスク分解、レビュー判断、委譲先出力の検証・統合を担う
-  - Claude: Fable / Opus、Codex: `gpt-5.6-sol`
-- Worker（通常の実装）
-  - コード生成・編集、関連テスト、定型的な調査を担う
-  - Claude: Sonnet、Codex: `gpt-5.6-terra`
-- Lightweight Worker（軽量作業）
-  - 探索、要約、単純修正、機械的な確認を担う
-  - Claude: Haiku、Codex: `gpt-5.6-luna`
-- 複雑な実装、難しいデバッグ、セキュリティレビューなど高い判断力が必要な Worker 作業は高コストモデルへ昇格する。Codex（GPT-5.6 系）ではモデル変更に加えて reasoning effort の引き上げ（xhigh → max）も昇格手段とし、難タスクに限って使う
-- 旧世代モデルは列挙しない。必要な場合のみ利用可能な旧モデルへフォールバックする
+tier 対応表、委譲する / しないの判定、タスク分割基準、Claude / Codex での Worker 起動方法は `orchestrator-worker` スキルを正本とする。
 
-### Claude Code での agent へのモデル割り当て
+### agent 定義側のモデル割り当て
 
 - 各 agent のモデルは `catalog/agents/*.md` の frontmatter `model:` に書く。呼び出し時の指定漏れがあっても frontmatter の割り当てで動く
-- 汎用実装 Worker は `implementer` agent（`model: sonnet`）へ委譲する。Orchestrator 役はメインセッションが担い、agent 化しない
-- 昇格は Agent tool 呼び出し時の `model` override（frontmatter より優先される）で行う
+- Orchestrator 役はメインセッションが担い、agent 化しない
 - レビュー・監査・本番運用判断系の agent（code-reviewer、deployment、terraform-operations など）は `model` を指定せず親モデルを継承させる
 
 ## コマンド選択の原則
