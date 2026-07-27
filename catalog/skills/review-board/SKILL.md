@@ -59,9 +59,9 @@ Use persona overlays only as supporting rubrics. They adjust stance, evidence di
 
 Use at most two overlays. Add an overlay only when it changes how evidence is gathered, how fixes are constrained, or how ship/readiness claims are judged.
 
-- `Evidence Collector`: Use when visual, browser, responsive, QA, or interaction evidence may be under-collected. It raises evidence expectations; it does not create a separate QA lane.
-- `Reality Checker`: Use for launch readiness, production-ready claims, final gates, or inflated quality claims. It sharpens ship/block judgment; it does not override lane criteria.
-- `Minimal Change Engineer`: Use in Review And Fix Loop when implementation changes are requested. It constrains fixes to the smallest evidence-supported diff; it does not block required fixes.
+- `Evidence Collector`: Use when visual, browser, responsive, QA, or interaction evidence may be under-collected. Compare the current implementation with the stated criterion using screenshots, browser state, DOM, or test evidence as appropriate; record unavailable evidence as a gap. It does not create a separate QA lane.
+- `Reality Checker`: Use for launch readiness, production-ready claims, final gates, or inflated quality claims. A ship decision requires evidence for the applicable core flow and required gates; do not promote an unverified claim to approval. It sharpens ship/block judgment; it does not override lane criteria.
+- `Minimal Change Engineer`: Use in Review And Fix Loop when implementation changes are requested. It constrains fixes to the smallest evidence-supported diff, rejects unrelated cleanup or speculative abstraction in final diff review, and does not block required fixes.
 
 When overlays conflict, the primary lane defines what good means, the execution mode defines whether to fix, and the overlay only adjusts stance or evidence discipline.
 
@@ -82,6 +82,7 @@ When overlays conflict, the primary lane defines what good means, the execution 
 - For repository artifacts, inspect the implementation source or diff before making code-level findings.
 - For browser-visible UI, gather at least: project guidance, design source when present, implementation source or diff, one current screenshot or browser observation, and relevant viewport or focus evidence. If any item is unavailable, say so in `Evidence minimum`.
 - For accessibility, responsive, or interaction claims, do not rely on static screenshots alone. Include keyboard, viewport, DOM, or state evidence when practical.
+- When test output informs a finding or readiness decision, identify the executed command, affected scope, pass/fail result, and failure pattern. Distinguish product regressions from test or environment failures; do not treat an unrun or inconclusive test as a pass.
 - Do not report a finding without evidence. If a concern is plausible but unverified, list it as a residual verification gap instead.
 
 ## Severity
@@ -91,6 +92,12 @@ When overlays conflict, the primary lane defines what good means, the execution 
 - `P2`: Degrades completion, comprehension, consistency, or confidence, but has a clear workaround.
 - `P3`: Polish, consistency, maintainability, or minor usability issue that does not materially block the task.
 - Choose severity from user impact and likelihood, not implementation effort.
+
+## Readiness Judgement
+
+- For ship, launch, or production-ready claims, state `ship`, `block`, or `not assessed` and tie it to the selected rubric, required verification, and residual risk.
+- A passing test suite is evidence, not a blanket readiness approval. Account for relevant failures, recurring failure patterns, untested changed behavior, and unavailable evidence before judging residual risk.
+- A failing required gate or unresolved P0/P1 blocks readiness. If evidence is incomplete but does not prove a defect, report the verification gap rather than inventing a failure.
 
 ## Implementation Follow-Through
 
@@ -129,7 +136,7 @@ Implementation plan:
 
 Review score:
 
-- <0-100, with ship/block rationale when applicable>
+- <0-100, with ship/block/not-assessed rationale, test evidence, and residual risk when applicable>
 
 Verification performed:
 

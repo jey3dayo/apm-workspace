@@ -21,15 +21,22 @@ Repo-level detail (APM-installability evidence, upstream Codex lane) lives in th
 
 All rows below are curated (adapted) from `msitarzewski/agency-agents`: renamed and with frontmatter adjusted for Claude Code / Codex (`name`, `tools`, `color`); upstream `emoji` / `vibe` dropped. Not verbatim copies.
 
-| Local agent (`catalog/agents/`)     | Upstream path                                        | Consumed by                                    |
-| ----------------------------------- | ---------------------------------------------------- | ---------------------------------------------- |
-| `frontend-developer.md`             | `engineering/engineering-frontend-developer.md`      | general frontend work                          |
-| `ui-designer.md`                    | `design/design-ui-designer.md`                       | visual design / handoff                        |
-| `accessibility-auditor.md`          | `testing/testing-accessibility-auditor.md`           | accessibility review                           |
-| `agency-evidence-collector.md`      | `testing/testing-evidence-collector.md`              | `review-board` Evidence Collector overlay      |
-| `agency-reality-checker.md`         | `testing/testing-reality-checker.md`                 | `review-board` Reality Checker overlay         |
-| `agency-minimal-change-engineer.md` | `engineering/engineering-minimal-change-engineer.md` | `review-board` Minimal Change Engineer overlay |
-| `agency-test-results-analyzer.md`   | `testing/testing-test-results-analyzer.md`           | (not yet referenced by an overlay)             |
+| Local agent (`catalog/agents/`) | Upstream path                                   | Consumed by             |
+| ------------------------------- | ----------------------------------------------- | ----------------------- |
+| `frontend-developer.md`         | `engineering/engineering-frontend-developer.md` | general frontend work   |
+| `ui-designer.md`                | `design/design-ui-designer.md`                  | visual design / handoff |
+| `accessibility-auditor.md`      | `testing/testing-accessibility-auditor.md`      | accessibility review    |
+
+## Retired Agent Contracts
+
+The following verbose persona agents were retired. Their useful contracts are integrated into owning guidance; no runtime agent is distributed for them.
+
+| Retired local agent                 | Upstream path                                        | Integrated into                                      | Status                                                             |
+| ----------------------------------- | ---------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------ |
+| `agency-evidence-collector.md`      | `testing/testing-evidence-collector.md`              | `review-board` Evidence Collector overlay            | Retired; visual/browser evidence discipline retained.              |
+| `agency-reality-checker.md`         | `testing/testing-reality-checker.md`                 | `review-board` readiness judgement                   | Retired; evidence-based ship/block judgement retained.             |
+| `agency-minimal-change-engineer.md` | `engineering/engineering-minimal-change-engineer.md` | `implementer` and `review-board` Review And Fix Loop | Retired; minimal evidence-supported diff retained.                 |
+| `agency-test-results-analyzer.md`   | `testing/testing-test-results-analyzer.md`           | `review-board` evidence and readiness judgement      | Retired; test-result patterns and residual-risk handling retained. |
 
 ## Adding a Curated Agent
 
