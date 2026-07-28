@@ -43,8 +43,19 @@ hide = true
 run = "bash ./scripts/apm-workspace.sh setup:mcp:host"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 setup:mcp:host"
 
+[tasks."agmsg:state:save"]
+description = "Move the agmsg roster out of the deploy target before it is rewritten"
+hide = true
+run = "bash ./scripts/agmsg-state.sh save"
+
+[tasks."agmsg:state:restore"]
+description = "Relink the agmsg roster into the deployed skill directory"
+run = "bash ./scripts/agmsg-state.sh restore"
+
 [tasks.apply]
 description = "Deploy user-scope-compatible APM dependencies and compile Codex output"
+depends = ["agmsg:state:save"]
+depends_post = ["agmsg:state:restore"]
 run = "bash ./scripts/apm-workspace.sh apply"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 apply"
 

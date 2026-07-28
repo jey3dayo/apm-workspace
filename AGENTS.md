@@ -219,6 +219,15 @@ incomplete work, not as optional follow-up.
 - When updating user-global tools through `mise`, verify the actual install tree and resolved binary path before declaring success
   - `mise latest` can be affected by release-age policy; compare with the upstream registry when the exact latest version matters
 
+## agmsg Runtime State
+
+`~/.agents/skills/agmsg/db` and `~/.agents/skills/agmsg/teams` are intentional symlinks into `${XDG_STATE_HOME:-~/.local/state}/agmsg/`. They are the one sanctioned exception to the deployed-target rules above: agmsg resolves both paths relative to its own script directory, so `apm apply` used to wipe the message history and the roster on every deploy, leaving every agent silently unaddressable. `AGMSG_STORAGE_PATH` covers `db/` only, and `teams/` has no override until upstream `fujibee/agmsg#285` (`AGMSG_HOME`) ships.
+
+- Do not replace these symlinks with real directories; the data belongs outside the deploy target
+- `mise run apply` re-links them automatically via `agmsg:state:save` / `agmsg:state:restore`
+- After a failed `apply`, or after driving `apm` directly instead of through a `mise` task, run `mise run agmsg:state:restore`
+- When `AGMSG_HOME` lands upstream, drop `scripts/agmsg-state.sh`, its task wiring, and the `AGMSG_STORAGE_PATH` export in `~/.config/shell/env.sh`
+
 ## Cache Integrity Recovery
 
 If a deployed skill exists but its `SKILL.md` is clearly wrong, tiny, or a placeholder while the tracked source is complete, suspect a stale or corrupted `apm_modules/` cache before changing source files.
