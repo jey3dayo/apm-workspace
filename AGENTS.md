@@ -45,8 +45,7 @@ Use this table as the Source of Truth Table (SoTT) when deciding where to read o
   - the accepted resolved state is captured in `apm.lock.yaml`
 - deployed targets such as `~/.claude/`, `~/.codex/`, and other runtime roots are generated outputs
   - they are verification and delivery surfaces, not editing surfaces
-- Codex skill delivery uses `~/.agents/skills`
-  - `~/.codex/skills` is legacy and should not be used as the active deployment root
+  - Codex separates compiled guidance (`~/.codex/AGENTS.md`) from deployed skills (`~/.agents/skills`)
 - `apm_modules/` is cache state only
   - do not treat downloaded contents there as the place to edit or define truth
 
@@ -64,7 +63,6 @@ In practice:
 - expose an APM workspace-only skill to both runtimes through `./.claude/skills/<id>` and `./.agents/skills/<id>` symlinks to the source directory
 - keep `./.claude/skills/` and `./.agents/skills/` as real directories; symlink the child skill directories, not the roots or `SKILL.md` files
 - if the change only exists in a deployed target or cache, regenerate from the tracked workspace instead of editing it in place
-- if the question is specifically about Codex skills, treat `~/.agents/skills` as the deployed output and `~/.codex/AGENTS.md` as the compiled guidance output
 
 ## Operating Philosophy
 
@@ -73,9 +71,6 @@ In practice:
 - Review lockfile changes intentionally; do not normalize unexpected dependency drift into routine edits
 - Keep runtime targets reproducible from committed workspace state
 - Use tracked catalog workflows for shared guidance, not ad hoc edits under deployed targets
-- For Codex, separate compiled guidance from skills
-  - `~/.codex/AGENTS.md` is the compiled output
-  - `~/.agents/skills` is the deployed skill tree
 - Treat the current `apm` source as a pinned runtime dependency managed by `mise` (see `mise.toml`)
   - if both the workspace and global `mise` config define `apm`, keep them aligned to the same source to avoid command-resolution collisions
 

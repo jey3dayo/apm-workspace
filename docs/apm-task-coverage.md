@@ -33,4 +33,4 @@ Path-by-path ownership (catalog, optional-skills, workspace-only skills, lockfil
 | `mise run install:catalog`    | ○        | ○        | ○        | ○           | ○        | Installs a pushed `catalog` ref                                                                                              |
 | `mise run smoke:catalog`      | ○        | ○        | ○        | ○           | ○        | Performs a temporary-install smoke test                                                                                      |
 | `mise run validate:catalog`   | ○        | ○        | ○        | ○           | ○        | Public task for drift checks                                                                                                 |
-| `mise run apply` for Codex    | ○        | ○        | ○        | ○           | n/a      | Compiles `~/.codex/AGENTS.md` and syncs Codex-targeted skills into `~/.agents/skills`; `~/.codex/skills` is not the contract |
+| `mise run apply` for Codex    | ○        | ○        | ○        | ○           | n/a      | Compiles `~/.codex/AGENTS.md` and syncs Codex-targeted skills into `~/.agents/skills`; deployed skill tree is authoritative. |

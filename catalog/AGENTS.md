@@ -224,18 +224,6 @@ global MCP はリポジトリをまたいで常時使う基盤だけに限定し
 
 外部スキル（`openai/skills`, `vercel-labs/*`, その他公開スキル）が相対パスでファイルを参照する場合:
 
-- 基準ディレクトリ:
-  - Claude Code: `~/.claude/skills/<skill-name>/`
-  - Codex: `~/.agents/skills/<skill-name>/`
-- `~/.codex/skills` は legacy であり、Codex の active deployment root として扱わない
-- 解決方法: 相対パス `scripts/foo.py` → 絶対パス `<基準ディレクトリ>/scripts/foo.py`
-
-### 実行例 (gh-address-comments)
-
-```bash
-# Claude Code
-python3 ~/.claude/skills/gh-address-comments/scripts/fetch_comments.py
-
-# Codex
-python3 ~/.agents/skills/gh-address-comments/scripts/fetch_comments.py
-```
+- 読み込んだ `SKILL.md` の親ディレクトリを基準にする
+- 相対パス `scripts/foo.py` は `<SKILL.md の親ディレクトリ>/scripts/foo.py` に解決する
+- 実行前に解決先が存在することを確認する
