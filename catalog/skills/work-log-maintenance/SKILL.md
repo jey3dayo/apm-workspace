@@ -15,7 +15,12 @@ Use this skill to turn evidence of work into a short manager-facing report. The 
 4. `leave-days.md` - non-working day adjustments such as paid leave, half-day leave, public holidays, company holidays, or other user-provided exclusions from work-day counts.
 5. `git-log-evidence.md` - evidence excerpts from `git log`, `CHANGELOG.md`, `TODO.md`, issues, Slack notes, or manual notes.
 
-Default location is `tmp/work-log/` unless the user specifies another path. Keep product code untouched unless the user explicitly asks for product changes. Treat `tmp/` work-log artifacts as local reporting artifacts and do not commit, push, or open a PR unless explicitly requested.
+Default location is `~/src/github.com/jey3dayo/work-reports/work-log/<reporting-month>[-<scope>]/` unless the user specifies another path. The directory name is the **reporting month**, not the covered period: a report submitted in June may cover 4/25-6/26. Read each `report.md` for the actual period. Evidence usually spans multiple repositories.
+
+- No suffix (`2026-07/`) - the canonical submission for that reporting month, covering every theme.
+- With suffix (`2026-07-loca/`) - a one-off single-project report. Use only when the user asks for a report scoped to one project or period outside the monthly cycle.
+
+When both exist for the same month their periods can overlap, so never sum business days across sibling `work-log/<month>*/` directories. The suffix-less directory is the one to submit. Do not write work-log artifacts into product repositories; `tmp/work-log/` inside a product repository is a legacy location that gets lost. Keep product code untouched unless the user explicitly asks for product changes. In work-reports, writing files is always fine, but do not commit, push, or open a PR unless explicitly requested.
 
 For the detailed file contract, read `references/report-layout.md` before creating or restructuring work-log files.
 
@@ -26,7 +31,7 @@ Do not keep updating legacy all-in-one files such as `effort-report.md` after th
 1. Inspect repository or workspace guidance first when present, then check the current worktree status.
 2. Identify evidence sources. Prefer existing work-log files, `git log`, `CHANGELOG.md`, `TODO.md`, issues, and user-provided Slack examples. Git is strong evidence, but this skill must also work from manual notes or non-Git evidence.
 3. If complete Git history matters, consider `git fetch --all --prune`. If it fails or network is unavailable, continue from local evidence and record the limitation in `git-log-evidence.md` or a short note.
-4. If legacy or duplicate work-log files exist, choose the standard files as the canonical targets before editing. Migrate useful content into the standard files, then replace the legacy file with a deprecated pointer instead of leaving it fresher than the standard files.
+4. If legacy or duplicate work-log files exist, choose the standard files as the canonical targets before editing. Migrate useful content into the standard files, then replace the legacy file with a deprecated pointer instead of leaving it fresher than the standard files. This includes `tmp/work-log/` inside a product repository: migrate its content into the matching work-reports `work-log/<reporting-month>[-<scope>]/` directory, then delete the repository-local copy or reduce it to a pointer.
 5. Build or update `work-history.md` first when producing a manager report. Group work by theme, not by commit hash.
 6. Update `work-log.md` when daily detail exists, is requested, or is needed to justify the period grouping. Update existing dates in place and add missing recent dates, including explicit zero-work or no-commit days when they affect the requested period.
 7. If the user provides paid leave, half-day leave, public holidays, company holidays, holiday calendars, or attendance screenshots, record the date adjustments in `leave-days.md` and reference that file from `work-history.md`. Do not bury leave or holiday exclusions only in prose.

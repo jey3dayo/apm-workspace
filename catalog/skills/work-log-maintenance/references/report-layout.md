@@ -1,6 +1,6 @@
 # Work-Log File Layout
 
-Use these files under `tmp/work-log/` by default. Create only the files needed for the task, but prefer this naming when splitting an existing report.
+Use these files under `~/src/github.com/jey3dayo/work-reports/work-log/<reporting-month>[-<scope>]/` by default. The directory name is the reporting month, not the covered period; the suffix marks a one-off single-project report (see SKILL.md). Create only the files needed for the task, but prefer this naming when splitting an existing report.
 
 When reorganizing an existing all-in-one report, migrate its content into the standard files and remove or replace the old duplicate file. Do not leave two files that both look like the primary report.
 
