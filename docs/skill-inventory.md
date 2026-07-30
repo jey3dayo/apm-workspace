@@ -48,7 +48,7 @@
 - ドキュメント: `docs-manager`, `docs-entrypoint-review`,
   `architecture-boundary-docs`, `japanese-tech-writing`
 - Git・作業運用: `atomic-commit`, `git-worktree`, `ci-stability-hooks`,
-  `work-log-maintenance`, `prepare-goal`
+  `prepare-goal`
 - リサーチ: `web-research`（入口・並列委譲）, `jina-web-research`（Jina 収集手順）
 
 ## ~/.apm 専用（.apm/skills/）
@@ -65,7 +65,8 @@
 
 ## private（private-skills/・未追跡）
 
-- `ca-pass`, `codex-private-smoke`
+- `ca-pass`, `codex-private-smoke`, `work-reports`, `work-log-maintenance`
+  （社内情報を含むため private レーンへ移動）
 
 ## repo-local / on-demand へ移管済み
 

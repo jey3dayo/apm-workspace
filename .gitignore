@@ -9,7 +9,7 @@
 /.apm/*
 !/.apm/skills/
 !/.apm/skills/**
-/private-skills/
+/private-skills
 /.claude/settings.local.json
 /.claude/skill-report/
 /.vscode/mcp.json
