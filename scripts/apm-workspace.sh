@@ -943,6 +943,63 @@ replace_codex_skill_target_from_stage() {
   done
 }
 
+skill_record_is_private() {
+  source_path="$1"
+  private_root=$(private_skills_root)
+  case "$source_path" in
+    "$private_root"/*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+sync_claude_skill_symlinks_from_records() {
+  skill_records="$1"
+  target_skills_root="$HOME/.claude/skills"
+
+  mkdir -p "$target_skills_root"
+
+  printf '%s\n' "$skill_records" | while IFS=$'\t' read -r _source_kind source_skill_id source_path _source_ref; do
+    [ -n "$source_skill_id" ] || continue
+    skill_record_is_private "$source_path" || continue
+
+    deployed_skill_name=$(format_skill_name "$source_skill_id")
+    target_skill_path=$(internal_target_skill_path "$target_skills_root" "$deployed_skill_name")
+
+    if [ -L "$target_skill_path" ]; then
+      current_link_target=$(readlink "$target_skill_path")
+      if [ "$current_link_target" = "$source_path" ]; then
+        continue
+      fi
+      log "Relinking private skill symlink: $target_skill_path -> $source_path"
+      rm -f "$target_skill_path"
+    elif [ -e "$target_skill_path" ]; then
+      log "Replacing deployed catalog skill with private skill symlink: $target_skill_path"
+      rm -rf "$target_skill_path"
+    fi
+
+    mkdir -p "$(dirname "$target_skill_path")"
+    ln -s "$source_path" "$target_skill_path"
+  done
+}
+
+cleanup_stale_claude_private_skill_symlinks() {
+  target_skills_root="$HOME/.claude/skills"
+  private_root=$(private_skills_root)
+
+  [ -d "$target_skills_root" ] || return 0
+
+  find "$target_skills_root" -type l | while IFS= read -r link_path; do
+    link_target=$(readlink "$link_path")
+    case "$link_target" in
+      "$private_root"/*) ;;
+      *) continue ;;
+    esac
+    [ -e "$link_path" ] && continue
+    log "Removing stale private skill symlink: $link_path"
+    rm -f "$link_path"
+  done
+}
+
 cmd_sync_local_skills() {
   ensure_workspace_repo
   ensure_workspace_scaffold
@@ -953,6 +1010,8 @@ cmd_sync_local_skills() {
 
   stage_codex_skill_records "$skill_records" "$stage_root"
   replace_codex_skill_target_from_stage "$stage_root" "$skill_records"
+  sync_claude_skill_symlinks_from_records "$skill_records"
+  cleanup_stale_claude_private_skill_symlinks
 
   trap - RETURN
   rm -rf "$stage_root"
@@ -2276,7 +2335,7 @@ Usage: scripts/apm-workspace.sh <command> [args...]
 Commands:
   setup:mcp:host     Configure host-local MCP servers for Codex and Claude
   apply              Offline deploy user-scope-compatible dependencies and compile Codex output
-  apply:skills:local Quick-sync local catalog and private skills into ~/.agents/skills only
+  apply:skills:local Quick-sync local catalog and private skills into ~/.agents/skills; private skills also link into ~/.claude/skills
   refresh            Refresh the checkout and dependencies only; does not deploy
   repair:local-package-cache Rebuild workspace-owned package cache from tracked sources
   pin-external       Pin external manifest refs to lockfile commits
