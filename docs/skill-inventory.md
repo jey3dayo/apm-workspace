@@ -65,8 +65,8 @@
 
 ## private（private-skills/・未追跡）
 
-- `ca-pass`, `codex-private-smoke`, `work-reports`, `work-log-maintenance`
-  （社内情報を含むため private レーンへ移動）
+- `ca-pass`, `work-reports`, `work-log-maintenance`
+  （社内情報を含むため private レーンへ移動。正本は github.com/jey3dayo/private-skills）
 
 ## repo-local / on-demand へ移管済み
 
