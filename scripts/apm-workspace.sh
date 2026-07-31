@@ -891,6 +891,7 @@ cmd_apply() {
   sync_managed_catalog_runtime_assets
   sync_pi_instructions
   replace_skill_targets_from_stage "$apply_stage_root"
+  sync_private_skills_into_targets
 
   trap - RETURN
   rm -rf "$apply_stage_root"
@@ -904,6 +905,37 @@ requested_personal_skill_records() {
     source_path=$(local_skill_content_dir "$skill_id")
     printf 'personal\t%s\t%s\tcatalog\n' "$skill_id" "$source_path"
   done
+}
+
+private_skill_records() {
+  private_skill_ids | while IFS= read -r skill_id; do
+    [ -n "$skill_id" ] || continue
+    source_path=$(private_skill_content_dir "$skill_id")
+    printf 'personal\t%s\t%s\tcatalog\n' "$skill_id" "$source_path"
+  done
+}
+
+# full apply's build_target_skill_trees/replace_skill_targets_from_stage path
+# stages only managed catalog skills, so private skills (private-skills/.apm/skills)
+# need to be re-synced into both targets afterward using the same records/helpers
+# cmd_sync_local_skills uses, or a plain `apm apply` would delete their existing
+# Codex copies and Claude symlinks.
+sync_private_skills_into_targets() {
+  skill_records=$(private_skill_records)
+  if [ -z "$(printf '%s' "$skill_records" | tr -d '[:space:]')" ]; then
+    return 0
+  fi
+
+  stage_root=$(mktemp -d "${TMPDIR:-/tmp}/apm-private-sync.XXXXXX")
+  trap 'rm -rf "$stage_root"' RETURN
+
+  stage_codex_skill_records "$skill_records" "$stage_root"
+  replace_codex_skill_target_from_stage "$stage_root" "$skill_records"
+  sync_claude_skill_symlinks_from_records "$skill_records"
+  cleanup_stale_claude_private_skill_symlinks
+
+  trap - RETURN
+  rm -rf "$stage_root"
 }
 
 stage_codex_skill_records() {
