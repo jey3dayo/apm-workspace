@@ -17,6 +17,7 @@ dependencies:
     - Jakubantalik/transitions-dev/skills/transitions-dev
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-dashboard
+    - agavra/tuicr/skills/tuicr
     - anthropics/claude-code/plugins/frontend-design/skills/frontend-design
     - browser-use/browser-harness
     - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review

@@ -2,6 +2,35 @@ lockfile_version: '1'
 generated_at: '2026-07-27T08:38:41.013503+00:00'
 apm_version: 0.26.0
 dependencies:
+- repo_url: agavra/tuicr
+  name: tuicr
+  host: github.com
+  resolved_commit: 567528413e2600c69579f8ec37330b1c0933cf52
+  version: unknown
+  virtual_path: skills/tuicr
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/tuicr
+  - .agents/skills/tuicr/SKILL.md
+  - .agents/skills/tuicr/tuicr-wrapper-herdr.sh
+  - .agents/skills/tuicr/tuicr-wrapper-zellij.sh
+  - .agents/skills/tuicr/tuicr-wrapper.sh
+  - .claude/skills/tuicr
+  - .claude/skills/tuicr/SKILL.md
+  - .claude/skills/tuicr/tuicr-wrapper-herdr.sh
+  - .claude/skills/tuicr/tuicr-wrapper-zellij.sh
+  - .claude/skills/tuicr/tuicr-wrapper.sh
+  deployed_file_hashes:
+    .agents/skills/tuicr/SKILL.md: sha256:5f9af57c83419472e9b1f9fd023b605c9a32f0e7cdf356ce272c933fd5ba0aa5
+    .agents/skills/tuicr/tuicr-wrapper-herdr.sh: sha256:4ef8ed43c20cbc6e1a03a1c15c7db59b3753eadf7d1f4ddba7304e9f8d757bb8
+    .agents/skills/tuicr/tuicr-wrapper-zellij.sh: sha256:7a56005bf268c1a0c303448569c356cac34364075c9d3a1c27bb5a4a9c1eca49
+    .agents/skills/tuicr/tuicr-wrapper.sh: sha256:c9d2fdb1fa1688b696ccfe5cd4988abcdef636c7d62780f03a788f62aef23c45
+    .claude/skills/tuicr/SKILL.md: sha256:5f9af57c83419472e9b1f9fd023b605c9a32f0e7cdf356ce272c933fd5ba0aa5
+    .claude/skills/tuicr/tuicr-wrapper-herdr.sh: sha256:4ef8ed43c20cbc6e1a03a1c15c7db59b3753eadf7d1f4ddba7304e9f8d757bb8
+    .claude/skills/tuicr/tuicr-wrapper-zellij.sh: sha256:7a56005bf268c1a0c303448569c356cac34364075c9d3a1c27bb5a4a9c1eca49
+    .claude/skills/tuicr/tuicr-wrapper.sh: sha256:c9d2fdb1fa1688b696ccfe5cd4988abcdef636c7d62780f03a788f62aef23c45
+  content_hash: sha256:466b29c3369e07eaafe2746b304f0f7ee1e4b433b0bca39010e34744c9c022d7
 - repo_url: anthropics/claude-code
   name: frontend-design
   host: github.com
@@ -10421,6 +10450,51 @@ deployments:
   content_hash: sha256:6ed248a269da79f623729708dabcc3719485d400615a0d91b9f5e9fd307aa33f
 - kind: project-relative
   target: agents
+  value: .agents/skills/tuicr
+  runtime: null
+  scope: project
+  owners:
+  - agavra/tuicr/skills/tuicr
+  active_owner: agavra/tuicr/skills/tuicr
+  content_hash: null
+- kind: project-relative
+  target: agents
+  value: .agents/skills/tuicr/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - agavra/tuicr/skills/tuicr
+  active_owner: agavra/tuicr/skills/tuicr
+  content_hash: sha256:5f9af57c83419472e9b1f9fd023b605c9a32f0e7cdf356ce272c933fd5ba0aa5
+- kind: project-relative
+  target: agents
+  value: .agents/skills/tuicr/tuicr-wrapper-herdr.sh
+  runtime: null
+  scope: project
+  owners:
+  - agavra/tuicr/skills/tuicr
+  active_owner: agavra/tuicr/skills/tuicr
+  content_hash: sha256:4ef8ed43c20cbc6e1a03a1c15c7db59b3753eadf7d1f4ddba7304e9f8d757bb8
+- kind: project-relative
+  target: agents
+  value: .agents/skills/tuicr/tuicr-wrapper-zellij.sh
+  runtime: null
+  scope: project
+  owners:
+  - agavra/tuicr/skills/tuicr
+  active_owner: agavra/tuicr/skills/tuicr
+  content_hash: sha256:7a56005bf268c1a0c303448569c356cac34364075c9d3a1c27bb5a4a9c1eca49
+- kind: project-relative
+  target: agents
+  value: .agents/skills/tuicr/tuicr-wrapper.sh
+  runtime: null
+  scope: project
+  owners:
+  - agavra/tuicr/skills/tuicr
+  active_owner: agavra/tuicr/skills/tuicr
+  content_hash: sha256:c9d2fdb1fa1688b696ccfe5cd4988abcdef636c7d62780f03a788f62aef23c45
+- kind: project-relative
+  target: agents
   value: .agents/skills/ui-ux-pro-max
   runtime: null
   scope: project
@@ -17898,6 +17972,51 @@ deployments:
   - jakubantalik/transitions-dev/skills/transitions-dev
   active_owner: jakubantalik/transitions-dev/skills/transitions-dev
   content_hash: sha256:6ed248a269da79f623729708dabcc3719485d400615a0d91b9f5e9fd307aa33f
+- kind: project-relative
+  target: claude
+  value: .claude/skills/tuicr
+  runtime: null
+  scope: project
+  owners:
+  - agavra/tuicr/skills/tuicr
+  active_owner: agavra/tuicr/skills/tuicr
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/tuicr/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - agavra/tuicr/skills/tuicr
+  active_owner: agavra/tuicr/skills/tuicr
+  content_hash: sha256:5f9af57c83419472e9b1f9fd023b605c9a32f0e7cdf356ce272c933fd5ba0aa5
+- kind: project-relative
+  target: claude
+  value: .claude/skills/tuicr/tuicr-wrapper-herdr.sh
+  runtime: null
+  scope: project
+  owners:
+  - agavra/tuicr/skills/tuicr
+  active_owner: agavra/tuicr/skills/tuicr
+  content_hash: sha256:4ef8ed43c20cbc6e1a03a1c15c7db59b3753eadf7d1f4ddba7304e9f8d757bb8
+- kind: project-relative
+  target: claude
+  value: .claude/skills/tuicr/tuicr-wrapper-zellij.sh
+  runtime: null
+  scope: project
+  owners:
+  - agavra/tuicr/skills/tuicr
+  active_owner: agavra/tuicr/skills/tuicr
+  content_hash: sha256:7a56005bf268c1a0c303448569c356cac34364075c9d3a1c27bb5a4a9c1eca49
+- kind: project-relative
+  target: claude
+  value: .claude/skills/tuicr/tuicr-wrapper.sh
+  runtime: null
+  scope: project
+  owners:
+  - agavra/tuicr/skills/tuicr
+  active_owner: agavra/tuicr/skills/tuicr
+  content_hash: sha256:c9d2fdb1fa1688b696ccfe5cd4988abcdef636c7d62780f03a788f62aef23c45
 - kind: project-relative
   target: claude
   value: .claude/skills/ui-ux-pro-max
