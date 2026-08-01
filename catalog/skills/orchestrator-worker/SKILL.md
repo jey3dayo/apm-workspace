@@ -80,7 +80,7 @@ spawn_agent(
 )
 ```
 
-Codex は組み込みのサブエージェント機能を使う。サブエージェントは親の workspace と sandbox を引き継ぐため、Codex MCP や `codex exec` で別プロセスを起動しない。起動面が `gpt-5.6-luna` を提供していない場合だけ、利用可能な Worker tier の `gpt-5.6-terra` へフォールバックする。Codex では reasoning effort の引き上げ（xhigh → max）もモデル変更と並ぶ昇格手段で、難タスクに限って使う。
+Codex は組み込みのサブエージェント機能を使う。サブエージェントは親の workspace と sandbox を引き継ぐため、Codex MCP や `codex exec` で別プロセスを起動しない。起動面が `gpt-5.6-luna` を提供していない場合だけ、利用可能な Worker tier の `gpt-5.6-terra` へフォールバックする。組み込み `spawn_agent` が Worker tier のモデルを起動できない、または拒否される環境では、`agmsg-delegation` スキル（agmsg + herdr による別プロセス Worker）の手動起動をユーザーに提案する。Codex では reasoning effort の引き上げ（xhigh → max）もモデル変更と並ぶ昇格手段で、難タスクに限って使う。
 
 独立タスクは**同一レスポンス内で複数呼び出す**と並列に走る。1レスポンス1呼び出しは直列になる。プロンプトの組み立て方は `dispatching-parallel-agents` に従い、Orchestrator の会話履歴を引き継がせず、必要な文脈だけを構築して渡す。計画ファイルを順に消化する運用は `subagent-driven-development` を使う。
 
