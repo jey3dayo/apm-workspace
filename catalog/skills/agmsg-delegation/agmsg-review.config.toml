@@ -1,0 +1,12 @@
+# agmsg-delegation review role 用 Codex profile (CONFIG_PROFILE_V2)。
+# 正本: ~/.apm/catalog/skills/agmsg-delegation/agmsg-review.config.toml
+# 配置先: ~/.codex/agmsg-review.config.toml (SKILL.md Preflight が diff 検証する)
+# 意図: 対象 project は read のみ。agmsg の状態書込み (messages.db / teams / run)
+#       と一時ファイルだけを許可し、reviewer が READY/REVIEW/ACK を送信できるようにする。
+sandbox_permissions = [
+  "disk-full-read-access",
+  "disk-write-platform-user-temp-folder",
+  "disk-write-folder=/Users/t00114/.agents/skills/agmsg/db",
+  "disk-write-folder=/Users/t00114/.agents/skills/agmsg/teams",
+  "disk-write-folder=/Users/t00114/.agents/skills/agmsg/run",
+]
