@@ -17,9 +17,9 @@ tier 判定・委譲判定・タスク分割基準は `orchestrator-worker` ス�
 
 共通 lifecycle は同一で、role によって安全契約と報告フォーマットが異なる。
 
-| role      | 自分の tier              | spawn する相手         | 相手の権限                       | 報告   |
-| --------- | ------------------------ | ---------------------- | -------------------------------- | ------ |
-| implement | Orchestrator (fable/sol) | worker (sonnet / luna) | 対象 worktree の編集可           | DONE   |
+| role      | 自分の tier              | spawn する相手         | 相手の権限                   | 報告   |
+| --------- | ------------------------ | ---------------------- | ---------------------------- | ------ |
+| implement | Orchestrator (fable/sol) | worker (sonnet / luna) | 対象 worktree の編集可       | DONE   |
 | review    | Worker (sonnet/luna)     | reviewer (fable / sol) | read-only。編集・commit 禁止 | REVIEW |
 
 review role の fable/sol 指定は本スキル内の一時的な model override であり、`orchestrator-worker` の tier 対応表や既存 agent 定義（親モデル継承）を変更しない。
