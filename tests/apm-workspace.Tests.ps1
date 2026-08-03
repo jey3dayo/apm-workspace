@@ -68,12 +68,12 @@ scripts: {}
     Set-Content -LiteralPath (Join-Path $commandsRoot "review.md") -Value "# review"
     Set-Content -LiteralPath (Join-Path $commandsRoot "setup.md") -Value "# setup"
     Set-Content -LiteralPath (Join-Path $rulesRoot "claude-md-design.md") -Value "# rule"
-    Set-Content -LiteralPath (Join-Path $rulesRoot "tools\rtk.md") -Value "# rtk"
+    Set-Content -LiteralPath (Join-Path $rulesRoot "tools\example.md") -Value "# example"
 
     Mock Get-TrackedCatalogDir { $catalogRoot }
     @(Get-TrackedCatalogAgentRelativePaths) | Should -Be @("code-reviewer.md")
     @(Get-TrackedCatalogCommandRelativePaths) | Should -Be @("review.md", "setup.md")
-    @(Get-TrackedCatalogRuleRelativePaths) | Should -Be @("claude-md-design.md", "tools/rtk.md")
+    @(Get-TrackedCatalogRuleRelativePaths) | Should -Be @("claude-md-design.md", "tools/example.md")
     Test-Path -LiteralPath (Get-TrackedCatalogInstructionsPath) | Should -Be $true
   }
 
