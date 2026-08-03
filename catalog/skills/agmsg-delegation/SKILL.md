@@ -33,6 +33,8 @@ review role の fable/sol 指定は本スキル内の一時的な model override
 - 並列 implement は触るファイル集合が互いに素であることが前提。互いに素にできなければ直列化するか worktree を分ける
 - タスク文を shell command へ生 interpolation しない。boot payload は mode 600 の一時ファイル経由の quote-safe 方式にし、成功・timeout・crash の全経路で削除する
 - review role の read-only は prompt 規約でなく実行時に強制する（下記の runtime 別起動コマンド）
+- Codex worker / reviewer は無人実行のため `-a never` を必須とし、承認が必要なコマンドは待機させず失敗として model へ返す。`--dangerously-bypass-approvals-and-sandbox` / `--yolo` は使わない
+- Claude worker / reviewer は `run-claude-worker.sh` で起動する。Claude の承認処理は無効化し、macOS sandbox で role 別の書込境界を強制する
 - worker の commit / apply は自動化しない。orchestrator が実差分を自分の目で検証する
 
 ## Lifecycle
@@ -40,16 +42,16 @@ review role の fable/sol 指定は本スキル内の一時的な model override
 ### 1. Preflight
 
 - `herdr status` でサーバー稼働を確認
-- worker runtime の CLI 存在を確認: `command -v codex` / `command -v claude`
+- worker runtime の CLI 存在を確認: `command -v codex` / `command -v claude`。Claude は `command -v sandbox-exec` も必須
 - agmsg bootstrap 済みを確認（`~/.agents/skills/agmsg/` が存在）
 - role/runtime 別の起動コマンドを確定する。review は書込権限を実行時に強制する:
 
-| role      | Claude                                                 | Codex                                       |
-| --------- | ------------------------------------------------------ | ------------------------------------------- |
-| implement | `claude --model sonnet`                                | `codex --model gpt-5.6-luna`                |
-| review    | `claude --model claude-fable-5 --permission-mode plan` | `codex --model gpt-5.6-sol -p agmsg-review` |
+| role      | Claude                                                                | Codex                                                |
+| --------- | --------------------------------------------------------------------- | ---------------------------------------------------- |
+| implement | `run-claude-worker.sh implement <project> sonnet <payload-file>`      | `codex --model gpt-5.6-luna -a never`                |
+| review    | `run-claude-worker.sh review <project> claude-fable-5 <payload-file>` | `codex --model gpt-5.6-sol -a never -p agmsg-review` |
 
-Claude review で fable の起動に失敗した場合は `claude --model opus --permission-mode plan` へフォールバックする（それ以外のフォールバックはしない。sonnet までは落とさず、opus も不可なら停止して報告する）。
+`run-claude-worker.sh` の解決先は `~/.agents/skills/agmsg-delegation/scripts/run-claude-worker.sh`。Claude review で fable の起動に失敗した場合は、同じ helper の model だけを `opus` に変えてフォールバックする（それ以外のフォールバックはしない。sonnet までは落とさず、opus も不可なら停止して報告する）。helper は空の MCP 設定を強制して初回確認を防ぎ、`bypassPermissions` で承認画面を無効化したうえで、macOS sandbox により implement は対象 project 内だけ書込可、review は対象 project を read-only にする。`sandbox-exec` が無い環境では安全契約を弱めず停止する。
 
 Codex review に `--sandbox read-only` を使ってはならない。agmsg の送受信自体が DB 書込み（`send.sh` の messages.db 更新、`inbox.sh` の read_at 更新）と report 一時ファイル作成を必要とするため、完全 read-only では reviewer が READY/REVIEW/ACK を送信できない。代わりに、全ディスク read + agmsg 状態ディレクトリ（db/teams/run）と user temp のみ write を許可した profile `agmsg-review`（`CODEX_HOME/agmsg-review.config.toml`）を `-p` で layer する。対象 project は read のままにする。
 
@@ -60,7 +62,7 @@ diff ~/.agents/skills/agmsg-delegation/agmsg-review.config.toml ~/.codex/agmsg-r
 ```
 
 - 一致しない・存在しない場合は起動禁止。正本を `~/.codex/agmsg-review.config.toml` へコピーしてから再検証する
-- 初回利用前の smoke: (1) 対象 project への write が拒否される (2) READY send 成功 (3) inbox で STOP 受信 (4) REVIEW/ACK send 成功 (5) temp cleanup 成功、の5点を実際に確認する。Claude review（plan mode）も agmsg の Bash 実行が無承認で通るか同じ smoke を行う
+- 初回利用前の smoke: (1) review は対象 project への write が拒否される (2) implement は対象 project 内の edit が成功し project 外の write が拒否される (3) `send-report.sh` による READY send 成功 (4) inbox で STOP 受信 (5) DONE/REVIEW/ACK send 成功 (6) 全手順が承認画面・MCP 確認画面なしで完了、の6点を runtime ごとに実際に確認する
 
 完了条件: herdr・CLI・role 別起動コマンド（review は profile の diff 一致確認込み）・agmsg の4点が確認済み。
 
@@ -89,10 +91,13 @@ diff ~/.agents/skills/agmsg-delegation/agmsg-review.config.toml ~/.codex/agmsg-r
 2. `herdr pane process-info --pane <pane_id>` で shell 待機中であることを確認する（agent や TUI 稼働中の pane は使わない）
 3. `herdr pane split` を実行し、**戻り値から新 pane ID を取得**する
 4. boot payload を mode 600 の一時ファイルに書く（`install -m 600 /dev/null <payloadファイル>` してから書き込む）。内容は task_id 付き初回プロンプト:
-   - `/agmsg actas <worker_name>`（Claude）。Codex は actas を使わず、boot payload に「送信時は `send.sh <team> <worker_name> ...` を使う」と from 名を直接指示する
+   - `/agmsg actas <worker_name>`（Claude）。Codex は actas を使わず、boot payload に「報告本文を標準入力へ渡し、`send-report.sh <team> <worker_name> <orchestrator>` を使う」と exact な引数契約を指示する
    - タスク本文（**タスクは必ず初回プロンプトに含める**。Codex の agmsg 既定 delivery は turn なので、起動後の agmsg 送信は次 turn まで届かない）
    - handshake 最小形: READY/DONE または REVIEW のフォーマット、task_id、timeout、WORKER.md の解決済み絶対パス
-5. `herdr pane run <new_pane_id> "cd <対象project> && <role/runtime別起動コマンド> \"\$(cat <payloadファイル>)\""` で起動する
+   - 無人実行契約: 対話的な承認を待たないこと、報告は `send-report.sh` を使うこと、コマンド拒否時は安全な代替か BLOCKED を返すこと
+5. runtime 別に `herdr pane run` で起動する。Claude helper は payload file を自分で読むため command substitution を付けない:
+   - Claude: `herdr pane run <new_pane_id> "cd <対象project> && ~/.agents/skills/agmsg-delegation/scripts/run-claude-worker.sh <role> <対象project> <model> <payloadファイル>"`
+   - Codex: `herdr pane run <new_pane_id> "cd <対象project> && <Codex起動コマンド> \"\$(cat <payloadファイル>)\""`
 6. `herdr pane process-info` を再実行し、cwd と foreground process が期待通りか確認する
 
 完了条件: 新 pane で worker CLI が起動し、process-info が一致している。
@@ -108,7 +113,18 @@ readiness の source of truth は **inbox.sh で受信する READY(task_id) メ�
 
 完了条件: READY(task_id) を受信した。timeout 時は診断情報を添えて停止・報告。
 
-### 6. 報告を受けて検証する
+### 6. 完了まで監視する
+
+READY 後も DONE / REVIEW だけを無期限に待たず、agmsg と pane の両方を監視する。
+
+- `inbox.sh <team> <自分>` を最大60秒間隔でポーリングし、`WORKING` / `BLOCKED` / `DONE` / `REVIEW` を受信する
+- valid message が120秒無い場合は、`herdr pane read <pane_id>` と `herdr pane process-info --pane <pane_id>` を取得して、長時間コマンド・crash・承認待ちを区別する。長時間コマンドが動作中なら待機を継続し、診断時刻を更新する
+- 承認画面を検出した場合は Enter を自動送信しない。Codex では `-a never` 契約違反として最終出力を記録し、crash cleanup へ進む。Claude では安全な代替を指示できる場合だけ指示し、解消しなければ同様に cleanup する
+- boot payload の task timeout を超えたら最終 pane 出力と process-info を保存し、crash cleanup へ進む
+
+完了条件: DONE / REVIEW / BLOCKED を受信したか、timeout / crash の診断情報が揃っている。
+
+### 7. 報告を受けて検証する
 
 **implement** — `DONE(task_id, status, files, tests, blockers)` 受信後:
 
@@ -123,7 +139,7 @@ readiness の source of truth は **inbox.sh で受信する READY(task_id) メ�
 
 完了条件: role 別の検証を根拠にユーザーへ報告できる状態。
 
-### 7. 片付ける
+### 8. 片付ける
 
 順序を守る（`pane close` は worker を強制終了し得るため、必ず ACK 後）。終了契約は runtime で異なる。
 
@@ -141,6 +157,6 @@ worker が crash / timeout した場合も同じ順序で、ACK 待ちを省略�
 
 ## Worker プロトコル
 
-worker 側に注入する詳細プロトコル（報告フォーマット、途中相談ルール、role 別完了条件）は [WORKER.md](WORKER.md) が正本。boot プロンプトには handshake 最小形と WORKER.md の絶対パスだけを埋め込む。
+worker 側に注入する詳細プロトコル（報告フォーマット、途中相談ルール、role 別完了条件）は [WORKER.md](WORKER.md) が正本。boot プロンプトには handshake と無人実行契約の最小形、WORKER.md の絶対パスだけを埋め込む。
 
-WORKER.md は `~/.agents/skills/agmsg-delegation/WORKER.md` と `~/.claude/skills/agmsg-delegation/WORKER.md` の両方に配布されている必要がある。deploy 後に両方の存在と内容一致を確認する。
+WORKER.md、`scripts/send-report.sh`、`scripts/run-claude-worker.sh` は `~/.agents/skills/agmsg-delegation/` と `~/.claude/skills/agmsg-delegation/` の両方に配布されている必要がある。deploy 後に両方の存在・実行権限・内容一致を確認する。
