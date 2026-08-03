@@ -11,6 +11,8 @@ disable-model-invocation: true
 
 別プロセスの agent（herdr pane 上の Claude Code / Codex）へ、agmsg メッセージングで作業を委譲するライフサイクルを回す。組み込みサブエージェント（Agent tool / `spawn_agent`）が使える場合はそちらが正規経路であり、このスキルは **spawn 面の制約で組み込み経路が塞がっている場合の手動経路**である。
 
+既知の制約（2026-08 時点）: `gpt-5.6-sol` は MultiAgent V2 のデフォルト `hide_spawn_agent_metadata = true` により `spawn_agent` から `model` 指定が事実上無効化されており、Terra/Luna への委譲ができない（`openai/codex` issue #31814, #34964 ほか）。このため Codex sol からの委譲は当面本スキルが実質的な標準経路になる。本スキルが起動する `codex --model gpt-5.6-luna` は新規プロセスの CLI 引数指定であり `spawn_agent` を経由しないため、このバグの影響を受けない。
+
 tier 判定・委譲判定・タスク分割基準は `orchestrator-worker` スキルが正本。本スキルは transport と lifecycle だけを定義する。
 
 ## Role を決める
@@ -22,7 +24,7 @@ tier 判定・委譲判定・タスク分割基準は `orchestrator-worker` ス�
 | implement | Orchestrator (fable/sol) | worker (sonnet / luna) | 対象 worktree の編集可       | DONE   |
 | review    | Worker (sonnet/luna)     | reviewer (fable / sol) | read-only。編集・commit 禁止 | REVIEW |
 
-review role の fable/sol 指定は本スキル内の一時的な model override であり、`orchestrator-worker` の tier 対応表や既存 agent 定義（親モデル継承）を変更しない。
+review role の fable/sol 指定は本スキル内の一時的な model override であり、`orchestrator-worker` の tier 対応表や既存 agent 定義（親モデル継承）を変更しない。Claude reviewer は fable が利用不可（未提供・rate limit・plan 制限など起動失敗）の場合のみ opus へフォールバックする。
 
 ## Guardrails
 
@@ -46,6 +48,8 @@ review role の fable/sol 指定は本スキル内の一時的な model override
 | --------- | ------------------------------------------------------ | ------------------------------------------- |
 | implement | `claude --model sonnet`                                | `codex --model gpt-5.6-luna`                |
 | review    | `claude --model claude-fable-5 --permission-mode plan` | `codex --model gpt-5.6-sol -p agmsg-review` |
+
+Claude review で fable の起動に失敗した場合は `claude --model opus --permission-mode plan` へフォールバックする（それ以外のフォールバックはしない。sonnet までは落とさず、opus も不可なら停止して報告する）。
 
 Codex review に `--sandbox read-only` を使ってはならない。agmsg の送受信自体が DB 書込み（`send.sh` の messages.db 更新、`inbox.sh` の read_at 更新）と report 一時ファイル作成を必要とするため、完全 read-only では reviewer が READY/REVIEW/ACK を送信できない。代わりに、全ディスク read + agmsg 状態ディレクトリ（db/teams/run）と user temp のみ write を許可した profile `agmsg-review`（`CODEX_HOME/agmsg-review.config.toml`）を `-p` で layer する。対象 project は read のままにする。
 
