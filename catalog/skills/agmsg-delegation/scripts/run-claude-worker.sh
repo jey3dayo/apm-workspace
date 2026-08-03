@@ -84,16 +84,16 @@ fi
 	fi
 } >"$profile"
 
-payload=$(cat -- "$payload_file")
 claude_args=(
-	"$payload"
+	-p
 	--model "$model"
 	--permission-mode bypassPermissions
+	--no-chrome
 )
 
 if [[ "$role" == review ]]; then
-	claude_args+=(--disallowedTools Edit Write NotebookEdit)
+	claude_args+=(--fallback-model opus --disallowedTools Edit Write NotebookEdit)
 fi
 
 claude_args+=(--strict-mcp-config --mcp-config "$mcp_config")
-sandbox-exec -f "$profile" "$claude_bin" "${claude_args[@]}"
+sandbox-exec -f "$profile" "$claude_bin" "${claude_args[@]}" <"$payload_file"

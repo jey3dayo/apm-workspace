@@ -11,7 +11,7 @@ disable-model-invocation: true
 
 別プロセスの agent（herdr pane 上の Claude Code / Codex）へ、agmsg メッセージングで作業を委譲するライフサイクルを回す。組み込みサブエージェント（Agent tool / `spawn_agent`）が使える場合はそちらが正規経路であり、このスキルは **spawn 面の制約で組み込み経路が塞がっている場合の手動経路**である。
 
-既知の制約（2026-08 時点）: `gpt-5.6-sol` は MultiAgent V2 のデフォルト `hide_spawn_agent_metadata = true` により `spawn_agent` から `model` 指定が事実上無効化されており、Terra/Luna への委譲ができない（`openai/codex` issue #31814, #34964 ほか）。このため Codex sol からの委譲は当面本スキルが実質的な標準経路になる。本スキルが起動する `codex --model gpt-5.6-luna` は新規プロセスの CLI 引数指定であり `spawn_agent` を経由しないため、このバグの影響を受けない。
+既知の制約（2026-08 時点）: `gpt-5.6-sol` は MultiAgent V2 のデフォルト `hide_spawn_agent_metadata = true` により `spawn_agent` から `model` 指定が事実上無効化されており、Terra/Luna への委譲ができない（`openai/codex` issue #31814, #34964 ほか）。このため Codex sol からの委譲は当面本スキルが実質的な標準経路になる。本スキルが新規プロセスで起動する `codex -m gpt-5.6-luna exec` は `spawn_agent` を経由しないため、このバグの影響を受けない。
 
 tier 判定・委譲判定・タスク分割基準は `orchestrator-worker` スキルが正本。本スキルは transport と lifecycle だけを定義する。
 
@@ -33,8 +33,8 @@ review role の fable/sol 指定は本スキル内の一時的な model override
 - 並列 implement は触るファイル集合が互いに素であることが前提。互いに素にできなければ直列化するか worktree を分ける
 - タスク文を shell command へ生 interpolation しない。boot payload は mode 600 の一時ファイル経由の quote-safe 方式にし、成功・timeout・crash の全経路で削除する
 - review role の read-only は prompt 規約でなく実行時に強制する（下記の runtime 別起動コマンド）
-- Codex worker / reviewer は無人実行のため `-a never` を必須とし、承認が必要なコマンドは待機させず失敗として model へ返す。`--dangerously-bypass-approvals-and-sandbox` / `--yolo` は使わない
-- Claude worker / reviewer は `run-claude-worker.sh` で起動する。Claude の承認処理は無効化し、macOS sandbox で role 別の書込境界を強制する
+- Codex worker / reviewer は `run-codex-worker.sh` から `codex exec --ephemeral` で起動し、`-a never` を必須とする。承認が必要なコマンドは待機させず失敗として model へ返す。`--dangerously-bypass-approvals-and-sandbox` / `--yolo` は使わない
+- Claude worker / reviewer は `run-claude-worker.sh` から `claude -p` で起動する。Claude の承認処理は無効化し、macOS sandbox で role 別の書込境界を強制する
 - worker の commit / apply は自動化しない。orchestrator が実差分を自分の目で検証する
 
 ## Lifecycle
@@ -46,22 +46,22 @@ review role の fable/sol 指定は本スキル内の一時的な model override
 - agmsg bootstrap 済みを確認（`~/.agents/skills/agmsg/` が存在）
 - role/runtime 別の起動コマンドを確定する。review は書込権限を実行時に強制する:
 
-| role      | Claude                                                                | Codex                                                |
-| --------- | --------------------------------------------------------------------- | ---------------------------------------------------- |
-| implement | `run-claude-worker.sh implement <project> sonnet <payload-file>`      | `codex --model gpt-5.6-luna -a never`                |
-| review    | `run-claude-worker.sh review <project> claude-fable-5 <payload-file>` | `codex --model gpt-5.6-sol -a never -p agmsg-review` |
+| role      | Claude                                                                | Codex                                                                 |
+| --------- | --------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| implement | `run-claude-worker.sh implement <project> sonnet <payload-file>`      | `run-codex-worker.sh implement <project> gpt-5.6-luna <payload-file>` |
+| review    | `run-claude-worker.sh review <project> claude-fable-5 <payload-file>` | `run-codex-worker.sh review <project> gpt-5.6-sol <payload-file>`     |
 
-`run-claude-worker.sh` の解決先は `~/.agents/skills/agmsg-delegation/scripts/run-claude-worker.sh`。Claude review で fable の起動に失敗した場合は、同じ helper の model だけを `opus` に変えてフォールバックする（それ以外のフォールバックはしない。sonnet までは落とさず、opus も不可なら停止して報告する）。helper は空の MCP 設定を強制して初回確認を防ぎ、`bypassPermissions` で承認画面を無効化したうえで、macOS sandbox により implement は対象 project 内だけ書込可、review は対象 project を read-only にする。`sandbox-exec` が無い環境では安全契約を弱めず停止する。
+helper の解決先は `~/.agents/skills/agmsg-delegation/scripts/`。両 runtime とも headless mode と stdin prompt を使い、対話 TUI と shell interpolation を避ける。Claude helper は空の MCP 設定と `-p` を強制して workspace trust / MCP 確認を防ぎ、review では `--fallback-model opus` を設定する。`bypassPermissions` は macOS sandbox 内だけで使い、implement は対象 project 内だけ書込可、review は対象 project を read-only にする。`sandbox-exec` が無い環境では安全契約を弱めず停止する。Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、review profile の内容一致を起動時に検証する。
 
 Codex review に `--sandbox read-only` を使ってはならない。agmsg の送受信自体が DB 書込み（`send.sh` の messages.db 更新、`inbox.sh` の read_at 更新）と report 一時ファイル作成を必要とするため、完全 read-only では reviewer が READY/REVIEW/ACK を送信できない。代わりに、全ディスク read + agmsg 状態ディレクトリ（db/teams/run）と user temp のみ write を許可した profile `agmsg-review`（`CODEX_HOME/agmsg-review.config.toml`）を `-p` で layer する。対象 project は read のままにする。
 
-profile の正本は本スキルの [agmsg-review.config.toml](agmsg-review.config.toml)（tracked asset）。**`-p` は profile ファイルが欠落していても exit 0 で base config にフォールバックする（fail-open）ため、起動前の検証が必須**:
+profile の正本は本スキルの [agmsg-review.config.toml](agmsg-review.config.toml)（tracked asset）。**Codex の `-p` は profile ファイルが欠落していても exit 0 で base config にフォールバックする（fail-open）ため、`run-codex-worker.sh` が起動前に次の一致を検証する**:
 
 ```bash
 diff ~/.agents/skills/agmsg-delegation/agmsg-review.config.toml ~/.codex/agmsg-review.config.toml
 ```
 
-- 一致しない・存在しない場合は起動禁止。正本を `~/.codex/agmsg-review.config.toml` へコピーしてから再検証する
+- 一致しない・存在しない場合は helper が起動を拒否する。正本を `~/.codex/agmsg-review.config.toml` へコピーしてから再実行する
 - 初回利用前の smoke: (1) review は対象 project への write が拒否される (2) implement は対象 project 内の edit が成功し project 外の write が拒否される (3) `send-report.sh` による READY send 成功 (4) inbox で STOP 受信 (5) DONE/REVIEW/ACK send 成功 (6) 全手順が承認画面・MCP 確認画面なしで完了、の6点を runtime ごとに実際に確認する
 
 完了条件: herdr・CLI・role 別起動コマンド（review は profile の diff 一致確認込み）・agmsg の4点が確認済み。
@@ -95,9 +95,9 @@ diff ~/.agents/skills/agmsg-delegation/agmsg-review.config.toml ~/.codex/agmsg-r
    - タスク本文（**タスクは必ず初回プロンプトに含める**。Codex の agmsg 既定 delivery は turn なので、起動後の agmsg 送信は次 turn まで届かない）
    - handshake 最小形: READY/DONE または REVIEW のフォーマット、task_id、timeout、WORKER.md の解決済み絶対パス
    - 無人実行契約: 対話的な承認を待たないこと、報告は `send-report.sh` を使うこと、コマンド拒否時は安全な代替か BLOCKED を返すこと
-5. runtime 別に `herdr pane run` で起動する。Claude helper は payload file を自分で読むため command substitution を付けない:
+5. runtime 別に `herdr pane run` で起動する。両 helper は payload file を stdin へ渡すため command substitution を付けない:
    - Claude: `herdr pane run <new_pane_id> "cd <対象project> && ~/.agents/skills/agmsg-delegation/scripts/run-claude-worker.sh <role> <対象project> <model> <payloadファイル>"`
-   - Codex: `herdr pane run <new_pane_id> "cd <対象project> && <Codex起動コマンド> \"\$(cat <payloadファイル>)\""`
+   - Codex: `herdr pane run <new_pane_id> "cd <対象project> && ~/.agents/skills/agmsg-delegation/scripts/run-codex-worker.sh <role> <対象project> <model> <payloadファイル>"`
 6. `herdr pane process-info` を再実行し、cwd と foreground process が期待通りか確認する
 
 完了条件: 新 pane で worker CLI が起動し、process-info が一致している。
@@ -141,10 +141,7 @@ READY 後も DONE / REVIEW だけを無期限に待たず、agmsg と pane の�
 
 ### 8. 片付ける
 
-順序を守る（`pane close` は worker を強制終了し得るため、必ず ACK 後）。終了契約は runtime で異なる。
-
-- Claude worker: STOP は Monitor 経由で届く。`STOP(task_id)` を送信し ACK を待つ
-- **Codex worker**: idle セッションへの送信は届かない。WORKER.md の契約により、Codex worker は DONE/REVIEW 送信後も**同一 turn 内で** `inbox.sh` を timeout 付きポーリングして STOP を受信し ACK する。orchestrator は DONE/REVIEW 受信後すみやかに STOP を送る（worker のポーリング timeout 内に届かせる）
+順序を守る（`pane close` は worker を強制終了し得るため、必ず ACK 後）。Claude / Codex とも headless の1 turn で終了するため、WORKER.md の契約により DONE/REVIEW 送信後も**同一 turn 内で** `inbox.sh` を timeout 付きポーリングして STOP を受信し ACK する。orchestrator は DONE/REVIEW 受信後すみやかに STOP を送る（worker のポーリング timeout 内に届かせる）。
 
 1. worker へ `STOP(task_id)` を送信し、ACK を待つ（timeout 付き。超過したら crash 扱いで次へ）
 2. `herdr pane close <pane_id>`
@@ -159,4 +156,4 @@ worker が crash / timeout した場合も同じ順序で、ACK 待ちを省略�
 
 worker 側に注入する詳細プロトコル（報告フォーマット、途中相談ルール、role 別完了条件）は [WORKER.md](WORKER.md) が正本。boot プロンプトには handshake と無人実行契約の最小形、WORKER.md の絶対パスだけを埋め込む。
 
-WORKER.md、`scripts/send-report.sh`、`scripts/run-claude-worker.sh` は `~/.agents/skills/agmsg-delegation/` と `~/.claude/skills/agmsg-delegation/` の両方に配布されている必要がある。deploy 後に両方の存在・実行権限・内容一致を確認する。
+WORKER.md、`scripts/send-report.sh`、`scripts/run-claude-worker.sh`、`scripts/run-codex-worker.sh` は `~/.agents/skills/agmsg-delegation/` と `~/.claude/skills/agmsg-delegation/` の両方に配布されている必要がある。deploy 後に両方の存在・実行権限・内容一致を確認する。

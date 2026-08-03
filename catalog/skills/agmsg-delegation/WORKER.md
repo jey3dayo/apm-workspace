@@ -17,9 +17,7 @@ AGMSG_REPORT
 - 起動直後の手順: Claude は `/agmsg actas <自分の名前>` を実行する。Codex は actas を使わず、boot プロンプトで指定された from 名で send する。準備ができたら最初に `READY <task_id>` を agmsg で送り、send 成功後に terminal へも `READY <task_id>` を1行出力する（orchestrator の fallback 監視用マーカー）。Claude worker は READY 本文に `session: $CLAUDE_CODE_SESSION_ID` を exact contract として含める。送信前に `[ -n "$CLAUDE_CODE_SESSION_ID" ]` で non-empty を検証し、空なら READY に `session: unknown` と明記する（orchestrator が終了時の lock 解放に使う）
 - 作業が120秒を超える場合は、長いコマンドの実行前後または作業の区切りごとに `WORKING <task_id> <一行状況>` を送り、orchestrator が無通信を診断できるようにする
 - 判断に迷う点・ブロッカーが出たら、勝手に進めず `BLOCKED <task_id> <相談内容>` を送って指示を待つ
-- 終了契約（runtime 別）:
-  - Claude: orchestrator から `STOP <task_id>` を受信したら、作業を終えて `ACK <task_id>` を返し、以後は何もしない
-  - Codex: idle になると agmsg を受信できないため、DONE / REVIEW を送った**同じ turn 内で** `inbox.sh <team> <自分>` を数秒間隔・最大 120 秒ポーリングして `STOP <task_id>` を待ち、受信したら `ACK <task_id>` を返して終了する。timeout した場合はそのまま turn を終えてよい
+- Claude / Codex とも headless の1 turn で終了する。DONE / REVIEW を送った**同じ turn 内で** `inbox.sh <team> <自分>` を数秒間隔・最大 120 秒ポーリングして `STOP <task_id>` を待ち、受信したら `ACK <task_id>` を返して終了する。timeout した場合はそのまま turn を終えてよい
 
 ## role: implement
 
