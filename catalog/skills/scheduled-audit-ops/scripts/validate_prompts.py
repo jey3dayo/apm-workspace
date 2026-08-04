@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import re
 import tomllib
@@ -9,10 +10,20 @@ from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
+CONTRACTS_PATH = Path(__file__).with_name("audit_contracts.py")
+CONTRACTS_SPEC = importlib.util.spec_from_file_location("audit_contracts", CONTRACTS_PATH)
+if CONTRACTS_SPEC is None or CONTRACTS_SPEC.loader is None:
+    raise RuntimeError(f"unable to load {CONTRACTS_PATH}")
+CONTRACTS = importlib.util.module_from_spec(CONTRACTS_SPEC)
+CONTRACTS_SPEC.loader.exec_module(CONTRACTS)
+schedule_rrule = CONTRACTS.schedule_rrule
+source_path = CONTRACTS.source_path
+
 SUPPORTED_VERSION = 1
-SUPPORTED_SCHEDULE_TYPES = {"daily", "weekly"}
+SUPPORTED_SCHEDULE_TYPES = {"daily", "weekly", "monthly"}
 SUPPORTED_EXECUTION_ENVIRONMENTS = {"worktree"}
-SUPPORTED_REASONING_EFFORTS = {"low", "medium", "high"}
+SUPPORTED_REASONING_EFFORTS = {"low", "medium", "high", "xhigh", "max"}
+SUPPORTED_OPERATIONS = {"audit", "report"}
 SUPPORTED_NOTIFICATION_POLICIES = {"always", "failed_runs_only", "never"}
 SUPPORTED_ISSUE_MODES = {"create_or_update"}
 SUPPORTED_WEEKDAYS = {
@@ -73,6 +84,7 @@ def example_job(
         "```toml\n"
         f'id = "{job_id}"\n'
         "enabled = true\n"
+        'operation = "audit"\n'
         'schedule_type = "weekly"\n'
         f"{weekday_line}"
         'time = "10:00"\n'
@@ -136,12 +148,31 @@ def normalize_job_source(path: Path, repository_root: Path, prompts_root: Path) 
     return lexical_source
 
 
-def validate_job(path: Path, repository_root: Path, prompts_root: Path) -> dict[str, Any]:
+def validate_job(
+    path: Path,
+    repository_root: Path,
+    prompts_root: Path,
+    default_reasoning_effort: str,
+) -> dict[str, Any]:
     source = normalize_job_source(path, repository_root, prompts_root)
     name, metadata, body, weekdays_declared = parse_job(path)
     reject_unknown(
         metadata,
-        {"id", "enabled", "schedule_type", "weekdays", "time", "timezone", "labels"},
+        {
+            "id",
+            "enabled",
+            "operation",
+            "schedule_type",
+            "interval",
+            "weekdays",
+            "week_of_month",
+            "time",
+            "timezone",
+            "reasoning_effort",
+            "labels",
+            "report_write_paths",
+            "report_create_pull_request",
+        },
         str(path),
     )
     if not name:
@@ -151,6 +182,9 @@ def validate_job(path: Path, repository_root: Path, prompts_root: Path) -> dict[
     job_id = require_string(metadata.get("id"), f"{path}: id")
     if not ID_PATTERN.fullmatch(job_id):
         raise ValidationError(f"{path}: id must be lower-case hyphen-case")
+    operation = require_string(metadata.get("operation"), f"{path}: operation")
+    if operation not in SUPPORTED_OPERATIONS:
+        raise ValidationError(f"{path}: unsupported operation {operation}")
     schedule_type = require_string(
         metadata.get("schedule_type"), f"{path}: schedule_type"
     )
@@ -167,26 +201,116 @@ def validate_job(path: Path, repository_root: Path, prompts_root: Path) -> dict[
     enabled = metadata.get("enabled")
     if not isinstance(enabled, bool):
         raise ValidationError(f"{path}: enabled must be boolean")
+    interval = metadata.get("interval", 1)
+    if not isinstance(interval, int) or isinstance(interval, bool):
+        raise ValidationError(f"{path}: interval must be an integer")
+    if interval <= 0:
+        raise ValidationError(f"{path}: interval must be a positive integer")
+    week_of_month = metadata.get("week_of_month")
+    if "week_of_month" in metadata and (
+        not isinstance(week_of_month, int) or isinstance(week_of_month, bool)
+    ):
+        raise ValidationError(f"{path}: week_of_month must be an integer")
     weekdays = metadata.get("weekdays", [])
     if not isinstance(weekdays, list) or any(not isinstance(day, str) for day in weekdays):
         raise ValidationError(f"{path}: weekdays must be an array of strings")
-    if schedule_type == "weekly" and not weekdays:
-        raise ValidationError(f"{path}: weekdays is required for weekly schedules")
-    if schedule_type == "daily" and weekdays_declared:
-        raise ValidationError(f"{path}: weekdays is forbidden for daily schedules")
     if len(weekdays) != len(set(weekdays)):
         raise ValidationError(f"{path}: weekdays must be unique")
     if any(day not in SUPPORTED_WEEKDAYS for day in weekdays):
         raise ValidationError(f"{path}: weekdays contains an unsupported value")
-    labels = [] if "labels" not in metadata else require_string_array(metadata["labels"], f"{path}: labels")
+    if schedule_type == "daily":
+        if weekdays_declared:
+            raise ValidationError(f"{path}: daily schedules cannot declare weekdays")
+        if week_of_month is not None:
+            raise ValidationError(f"{path}: daily schedules cannot use week_of_month")
+    elif schedule_type == "weekly":
+        if not weekdays:
+            raise ValidationError(f"{path}: weekdays is required for weekly schedules")
+        if week_of_month is not None:
+            raise ValidationError(f"{path}: week_of_month is forbidden for weekly schedules")
+    else:
+        if "interval" in metadata:
+            raise ValidationError(f"{path}: interval is forbidden for monthly schedules")
+        if len(weekdays) != 1:
+            raise ValidationError(f"{path}: monthly schedules require one weekday in weekdays")
+        if week_of_month not in range(1, 6):
+            raise ValidationError(f"{path}: week_of_month must be in range 1..5")
+    try:
+        rrule = schedule_rrule(
+            schedule_type,
+            weekdays,
+            run_time,
+            interval=interval,
+            week_of_month=week_of_month,
+        )
+    except ValueError as error:
+        raise ValidationError(f"{path}: schedule: {error}") from error
+    reasoning_effort = default_reasoning_effort
+    if "reasoning_effort" in metadata:
+        reasoning_effort = require_string(
+            metadata["reasoning_effort"], f"{path}: reasoning_effort"
+        )
+        if reasoning_effort not in SUPPORTED_REASONING_EFFORTS:
+            raise ValidationError(
+                f"{path}: reasoning_effort unsupported value {reasoning_effort}"
+            )
+    if operation == "report":
+        if "labels" in metadata:
+            raise ValidationError(f"{path}: labels are only allowed for audit jobs")
+        labels = []
+        if "report_write_paths" not in metadata:
+            raise ValidationError(f"{path}: report_write_paths is required for report jobs")
+        report_paths = require_string_array(
+            metadata["report_write_paths"], f"{path}: report_write_paths"
+        )
+        report_write_paths = []
+        seen_report_paths: set[str] = set()
+        for report_path in report_paths:
+            try:
+                normalized_path = source_path(str(repository_root), report_path)
+            except (OSError, RuntimeError, ValueError) as error:
+                raise ValidationError(
+                    f"{path}: report_write_paths: {error}"
+                ) from error
+            resolved_path = (repository_root / normalized_path).resolve()
+            if resolved_path.is_dir():
+                raise ValidationError(
+                    f"{path}: report_write_paths must not contain directories"
+                )
+            if normalized_path in seen_report_paths:
+                raise ValidationError(
+                    f"{path}: report_write_paths must contain unique normalized paths"
+                )
+            seen_report_paths.add(normalized_path)
+            report_write_paths.append(normalized_path)
+        report_create_pull_request = metadata.get("report_create_pull_request", False)
+        if not isinstance(report_create_pull_request, bool):
+            raise ValidationError(f"{path}: report_create_pull_request must be boolean")
+    else:
+        labels = [] if "labels" not in metadata else require_string_array(metadata["labels"], f"{path}: labels")
+        if "report_write_paths" in metadata:
+            raise ValidationError(f"{path}: report_write_paths is only allowed for report jobs")
+        if "report_create_pull_request" in metadata:
+            raise ValidationError(
+                f"{path}: report_create_pull_request is only allowed for report jobs"
+            )
+        report_write_paths = []
+        report_create_pull_request = False
     return {
         "id": job_id,
         "name": name,
         "enabled": enabled,
+        "operation": operation,
         "schedule_type": schedule_type,
+        "interval": interval,
         "weekdays": weekdays,
+        "week_of_month": week_of_month,
         "time": run_time,
         "timezone": timezone,
+        "reasoning_effort": reasoning_effort,
+        "report_write_paths": report_write_paths,
+        "report_create_pull_request": report_create_pull_request,
+        "rrule": rrule,
         "source": source,
         "prompt": body,
         "labels": labels,
@@ -232,7 +356,14 @@ def validate_repository(root: Path) -> dict[str, Any]:
         require_string(severity.get(key), f"issues.severity_labels.{key}")
     for key in ("p1", "p2", "p3"):
         require_string(priority.get(key), f"issues.priority_labels.{key}")
-    jobs = [validate_job(path, root, prompts) for path in sorted(prompts.glob("*.md"))]
+    default_reasoning_effort = require_string(
+        defaults.get("reasoning_effort"),
+        "automation.defaults.reasoning_effort",
+    )
+    jobs = [
+        validate_job(path, root, prompts, default_reasoning_effort)
+        for path in sorted(prompts.glob("*.md"))
+    ]
     if not jobs:
         raise ValidationError("at least one job Markdown file is required")
     ids = [job["id"] for job in jobs]
@@ -241,7 +372,9 @@ def validate_repository(root: Path) -> dict[str, Any]:
         raise ValidationError(f"duplicate job id: {', '.join(duplicate_ids)}")
     global_labels = base_labels + list(severity.values()) + list(priority.values())
     for job in jobs:
-        job["preflight_labels"] = global_labels + job["labels"]
+        job["preflight_labels"] = (
+            global_labels + job["labels"] if job["operation"] == "audit" else []
+        )
     return {"version": SUPPORTED_VERSION, "config": config, "jobs": jobs}
 
 

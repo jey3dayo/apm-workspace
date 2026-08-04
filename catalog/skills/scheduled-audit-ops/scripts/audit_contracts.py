@@ -11,6 +11,46 @@ from typing import NamedTuple
 
 
 _PREFIX = re.compile(r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*")
+_WEEKDAY_CODES = {
+    "monday": "MO",
+    "tuesday": "TU",
+    "wednesday": "WE",
+    "thursday": "TH",
+    "friday": "FR",
+    "saturday": "SA",
+    "sunday": "SU",
+}
+
+
+def schedule_rrule(
+    schedule_type: str,
+    weekdays: Sequence[str],
+    run_time: str,
+    *,
+    interval: int = 1,
+    week_of_month: int | None = None,
+) -> str:
+    hour_text, minute_text = run_time.split(":", maxsplit=1)
+    hour, minute = int(hour_text), int(minute_text)
+    if interval <= 0:
+        raise ValueError("interval must be a positive integer")
+    try:
+        days = ",".join(_WEEKDAY_CODES[day] for day in weekdays)
+    except KeyError as error:
+        raise ValueError("unsupported weekday") from error
+    if schedule_type == "daily":
+        if weekdays or week_of_month is not None:
+            raise ValueError("daily schedule cannot use weekday fields")
+        return f"FREQ=DAILY;INTERVAL={interval};BYHOUR={hour};BYMINUTE={minute}"
+    if schedule_type == "weekly":
+        if not weekdays or week_of_month is not None:
+            raise ValueError("weekly schedule requires weekdays only")
+        return f"FREQ=WEEKLY;INTERVAL={interval};BYDAY={days};BYHOUR={hour};BYMINUTE={minute}"
+    if schedule_type == "monthly":
+        if interval != 1 or len(weekdays) != 1 or week_of_month not in range(1, 6):
+            raise ValueError("monthly schedule requires one weekday and week_of_month 1..5")
+        return f"FREQ=MONTHLY;BYDAY={days};BYSETPOS={week_of_month};BYHOUR={hour};BYMINUTE={minute}"
+    raise ValueError(f"unsupported schedule type: {schedule_type}")
 
 
 def repository_remote_slug(remote: str) -> str:

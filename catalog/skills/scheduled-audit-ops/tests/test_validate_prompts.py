@@ -60,6 +60,7 @@ p3 = "priority/P3"
 ```toml
 id = "performance-audit"
 enabled = true
+operation = "audit"
 schedule_type = "weekly"
 weekdays = ["monday"]
 time = "10:00"
@@ -77,6 +78,7 @@ Inspect performance.
 ```toml
 id = "security-audit"
 enabled = false
+operation = "audit"
 schedule_type = "daily"
 time = "11:30"
 timezone = "Asia/Tokyo"
@@ -215,6 +217,114 @@ Inspect security.
         self.assertFalse(hasattr(HELPER, "single_writer_winner"))
         with self.assertRaises(ValueError):
             HELPER.reconcile_issues([HELPER.IssueRecord(0, "source")])
+        self.assertEqual(
+            HELPER.schedule_rrule("weekly", ["monday"], "10:00", interval=2),
+            "FREQ=WEEKLY;INTERVAL=2;BYDAY=MO;BYHOUR=10;BYMINUTE=0",
+        )
+        self.assertEqual(
+            HELPER.schedule_rrule(
+                "monthly", ["monday"], "10:00", week_of_month=1
+            ),
+            "FREQ=MONTHLY;BYDAY=MO;BYSETPOS=1;BYHOUR=10;BYMINUTE=0",
+        )
+
+    def test_normalizes_biweekly_audit_and_monthly_report(self) -> None:
+        audit = MODULE.example_job("security-audit").replace(
+            'enabled = true\noperation = "audit"\nschedule_type = "weekly"',
+            'enabled = true\noperation = "audit"\nschedule_type = "weekly"\ninterval = 2',
+        ).replace(
+            'timezone = "Asia/Tokyo"',
+            'timezone = "Asia/Tokyo"\nreasoning_effort = "xhigh"\nlabels = ["area/security"]',
+        )
+        report = MODULE.example_job("ai-kpi-monthly-review").replace(
+            'enabled = true\noperation = "audit"\nschedule_type = "weekly"\nweekdays = ["monday"]',
+            'enabled = true\noperation = "report"\nschedule_type = "monthly"\nweekdays = ["monday"]\nweek_of_month = 1',
+        ).replace(
+            'timezone = "Asia/Tokyo"',
+            'timezone = "Asia/Tokyo"\nreasoning_effort = "high"\nreport_write_paths = ["docs/ai-kpi.md"]\nreport_create_pull_request = true',
+        )
+        root = self.write_repo(
+            MODULE.EXAMPLE_CONFIG,
+            {"security.md": audit, "ai-kpi.md": report},
+        )
+
+        result = {job["id"]: job for job in MODULE.validate_repository(root)["jobs"]}
+
+        self.assertEqual(result["security-audit"]["operation"], "audit")
+        self.assertEqual(result["security-audit"]["interval"], 2)
+        self.assertEqual(result["security-audit"]["reasoning_effort"], "xhigh")
+        self.assertEqual(
+            result["security-audit"]["rrule"],
+            "FREQ=WEEKLY;INTERVAL=2;BYDAY=MO;BYHOUR=10;BYMINUTE=0",
+        )
+        self.assertEqual(
+            result["ai-kpi-monthly-review"]["report_write_paths"],
+            ["docs/ai-kpi.md"],
+        )
+        self.assertTrue(result["ai-kpi-monthly-review"]["report_create_pull_request"])
+        self.assertEqual(
+            result["ai-kpi-monthly-review"]["rrule"],
+            "FREQ=MONTHLY;BYDAY=MO;BYSETPOS=1;BYHOUR=10;BYMINUTE=0",
+        )
+
+    def test_rejects_invalid_schedule_and_operation_combinations(self) -> None:
+        base = MODULE.example_job("job")
+        cases = {
+            "interval": base.replace('schedule_type = "weekly"', 'schedule_type = "weekly"\ninterval = 0'),
+            "week_of_month": base.replace('schedule_type = "weekly"', 'schedule_type = "monthly"'),
+            "weekdays": base.replace(
+                'schedule_type = "weekly"\nweekdays = ["monday"]',
+                'schedule_type = "monthly"\nweekdays = ["monday", "tuesday"]\nweek_of_month = 1',
+            ),
+            "daily": base.replace(
+                'schedule_type = "weekly"\nweekdays = ["monday"]',
+                'schedule_type = "daily"\nweek_of_month = 1',
+            ),
+            "reasoning_effort": base.replace(
+                'timezone = "Asia/Tokyo"',
+                'timezone = "Asia/Tokyo"\nreasoning_effort = "ultra"',
+            ),
+            "report_write_paths": base.replace(
+                'timezone = "Asia/Tokyo"',
+                'timezone = "Asia/Tokyo"\nreport_write_paths = ["docs/result.md"]',
+            ),
+            "labels": base.replace(
+                'operation = "audit"',
+                'operation = "report"\nlabels = ["area/security"]',
+            ),
+        }
+        for expected_field, job in cases.items():
+            with self.subTest(expected_field=expected_field):
+                with self.assertRaisesRegex(MODULE.ValidationError, expected_field):
+                    MODULE.validate_repository(
+                        self.write_repo(MODULE.EXAMPLE_CONFIG, {"job.md": job})
+                    )
+
+    def test_report_paths_are_repository_relative_and_symlink_safe(self) -> None:
+        report = MODULE.example_job("report").replace('operation = "audit"', 'operation = "report"').replace(
+            'timezone = "Asia/Tokyo"',
+            'timezone = "Asia/Tokyo"\nreport_write_paths = ["docs/result.md"]\nreport_create_pull_request = true',
+        )
+        root = self.write_repo(MODULE.EXAMPLE_CONFIG, {"report.md": report})
+        (root / "docs" / "result.md").write_text("result\n", encoding="utf-8")
+        self.assertEqual(
+            MODULE.validate_repository(root)["jobs"][0]["report_write_paths"],
+            ["docs/result.md"],
+        )
+
+        escaped = report.replace('docs/result.md', '../outside.md')
+        with self.assertRaisesRegex(MODULE.ValidationError, "report_write_paths"):
+            MODULE.validate_repository(
+                self.write_repo(MODULE.EXAMPLE_CONFIG, {"report.md": escaped})
+            )
+
+        outside = root.parent / f"{root.name}-outside.md"
+        outside.write_text("outside\n", encoding="utf-8")
+        (root / "docs" / "link.md").symlink_to(outside)
+        linked = report.replace('docs/result.md', 'docs/link.md')
+        (root / "docs" / "prompts" / "report.md").write_text(linked, encoding="utf-8")
+        with self.assertRaisesRegex(MODULE.ValidationError, "report_write_paths"):
+            MODULE.validate_repository(root)
 
     def test_legacy_markers_are_explicitly_searched_adopted_and_canonicalized(self) -> None:
         fingerprint = HELPER.finding_fingerprint("job", "security", "owner", "behavior")
@@ -341,7 +451,7 @@ Inspect security.
                 with self.assertRaisesRegex(MODULE.ValidationError, field):
                     MODULE.validate_repository(self.write_repo(config.replace(f'{field} = "{original}"', replacement), {"job.md": MODULE.example_job("job")}))
         invalid_job = MODULE.example_job("job").replace('schedule_type = "weekly"', 'schedule_type = "monthly"')
-        with self.assertRaisesRegex(MODULE.ValidationError, "schedule_type"):
+        with self.assertRaisesRegex(MODULE.ValidationError, "week_of_month"):
             MODULE.validate_repository(self.write_repo(config, {"job.md": invalid_job}))
         for labels in ("[]", '[" "]', '["a", "a"]'):
             with self.assertRaises(MODULE.ValidationError):
