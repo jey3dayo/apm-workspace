@@ -162,6 +162,13 @@ run_windows = """
 powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "fd -e yml -e yaml --exclude apm.lock.yaml -X prettier --check --log-level error"
 """
 
+[tasks."lint:yaml"]
+description = "Lint YAML files in the ~/.apm workspace"
+run = "fd -e yml -e yaml ${TASK_EXCLUDES} -X yamllint"
+run_windows = """
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "fd -e yml -e yaml --exclude apm.lock.yaml -X yamllint"
+"""
+
 # ========================================
 # Aggregation Tasks
 # ========================================
@@ -181,6 +188,7 @@ depends = [
   "format:markdown:check",
   "format:toml:check",
   "format:yaml:check",
+  "lint:yaml",
 ]
 
 [tasks.check]

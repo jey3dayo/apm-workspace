@@ -1,0 +1,10 @@
+extends: default
+
+ignore:
+  - apm_modules/
+  - .catalog-build/
+  - apm.lock.yaml
+
+rules:
+  line-length: disable
+  document-start: disable

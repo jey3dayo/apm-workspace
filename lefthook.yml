@@ -48,6 +48,9 @@ pre-push:
     - name: format:yaml:check
       run: mise run format:yaml:check
 
+    - name: lint:yaml
+      run: mise run lint:yaml
+
     - name: validate:workspace
       run: mise run validate:workspace
 
