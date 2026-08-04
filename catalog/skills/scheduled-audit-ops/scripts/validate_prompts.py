@@ -196,7 +196,7 @@ def validate_job(
     timezone = require_string(metadata.get("timezone"), f"{path}: timezone")
     try:
         ZoneInfo(timezone)
-    except ZoneInfoNotFoundError as error:
+    except (ZoneInfoNotFoundError, ValueError) as error:
         raise ValidationError(f"{path}: invalid timezone {timezone}") from error
     enabled = metadata.get("enabled")
     if not isinstance(enabled, bool):
