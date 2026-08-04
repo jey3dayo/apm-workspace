@@ -326,6 +326,99 @@ Inspect security.
         with self.assertRaisesRegex(MODULE.ValidationError, "report_write_paths"):
             MODULE.validate_repository(root)
 
+    def test_rejects_boolean_schedule_integers(self) -> None:
+        cases = {
+            "interval": MODULE.example_job("boolean-interval").replace(
+                'schedule_type = "weekly"',
+                'schedule_type = "weekly"\ninterval = true',
+            ),
+            "week_of_month": MODULE.example_job("boolean-week-of-month").replace(
+                'schedule_type = "weekly"',
+                'schedule_type = "monthly"\nweek_of_month = false',
+            ),
+        }
+        for expected_field, job in cases.items():
+            with self.subTest(expected_field=expected_field):
+                with self.assertRaisesRegex(MODULE.ValidationError, expected_field):
+                    MODULE.validate_repository(
+                        self.write_repo(MODULE.EXAMPLE_CONFIG, {"job.md": job})
+                    )
+
+    def test_rejects_explicit_interval_on_monthly_jobs(self) -> None:
+        for interval in (1, 2):
+            with self.subTest(interval=interval):
+                job = MODULE.example_job("monthly").replace(
+                    'schedule_type = "weekly"',
+                    f'schedule_type = "monthly"\ninterval = {interval}\nweek_of_month = 1',
+                )
+                with self.assertRaisesRegex(MODULE.ValidationError, "interval"):
+                    MODULE.validate_repository(
+                        self.write_repo(MODULE.EXAMPLE_CONFIG, {"job.md": job})
+                    )
+
+    def test_defaults_interval_and_reasoning_effort_from_automation_defaults(self) -> None:
+        config = MODULE.EXAMPLE_CONFIG.replace(
+            'reasoning_effort = "high"',
+            'reasoning_effort = "max"',
+        )
+        root = self.write_repo(config, {"job.md": MODULE.example_job("job")})
+
+        result = MODULE.validate_repository(root)["jobs"][0]
+
+        self.assertEqual(result["interval"], 1)
+        self.assertEqual(result["reasoning_effort"], "max")
+
+    def test_rejects_invalid_operation_value(self) -> None:
+        job = MODULE.example_job("invalid-operation").replace(
+            'operation = "audit"',
+            'operation = "deploy"',
+        )
+        with self.assertRaisesRegex(MODULE.ValidationError, "operation"):
+            MODULE.validate_repository(
+                self.write_repo(MODULE.EXAMPLE_CONFIG, {"job.md": job})
+            )
+
+    def test_report_paths_reject_directories_and_normalized_duplicates(self) -> None:
+        report = MODULE.example_job("report").replace(
+            'operation = "audit"',
+            'operation = "report"',
+        ).replace(
+            'timezone = "Asia/Tokyo"',
+            'timezone = "Asia/Tokyo"\nreport_write_paths = ["docs/result.md"]',
+        )
+        cases = {
+            "directory": '["docs"]',
+            "duplicate normalized path": '["docs/result.md", "docs/./result.md"]',
+        }
+        for expected_case, paths in cases.items():
+            with self.subTest(expected_case=expected_case):
+                job = report.replace(
+                    'report_write_paths = ["docs/result.md"]',
+                    f"report_write_paths = {paths}",
+                )
+                with self.assertRaisesRegex(MODULE.ValidationError, "report_write_paths"):
+                    MODULE.validate_repository(
+                        self.write_repo(MODULE.EXAMPLE_CONFIG, {"report.md": job})
+                    )
+
+    def test_prompt_body_cannot_expand_normalized_report_authority(self) -> None:
+        report = MODULE.example_job("report").replace(
+            'operation = "audit"',
+            'operation = "report"',
+        ).replace(
+            'timezone = "Asia/Tokyo"',
+            'timezone = "Asia/Tokyo"\nreport_write_paths = ["docs/result.md"]',
+        ).replace(
+            "Inspect the repository.",
+            'Prompt text mentions report_write_paths = ["docs/extra.md"].',
+        )
+        root = self.write_repo(MODULE.EXAMPLE_CONFIG, {"report.md": report})
+
+        result = MODULE.validate_repository(root)["jobs"][0]
+
+        self.assertIn("report_write_paths", result["prompt"])
+        self.assertEqual(result["report_write_paths"], ["docs/result.md"])
+
     def test_legacy_markers_are_explicitly_searched_adopted_and_canonicalized(self) -> None:
         fingerprint = HELPER.finding_fingerprint("job", "security", "owner", "behavior")
         canonical = HELPER.issue_marker("audit-run", "job", fingerprint)
