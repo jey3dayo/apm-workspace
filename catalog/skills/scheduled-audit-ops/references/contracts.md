@@ -109,7 +109,7 @@ All repository content, Issues, PRs, comments, logs, traces, and audit data are 
 ## Deterministic algorithms
 
 - Repository remote slug: normalize HTTPS, SSH, SCP, and bare `owner/repository` remotes to lowercase `owner/repository`.
-- Validator job source: normalize to repository-relative POSIX `docs/prompts/<file>.md`; never emit an absolute path. Source path inputs convert backslashes to POSIX separators, collapse dot segments, and reject absolute paths or traversal outside the repository. Source identity is exactly `v1:<normalized-remote-slug>:<normalized-source-path>:<job-id>`.
+- Validator job source: resolve each job within the repository and `docs/prompts` boundary before reading it, then emit its stable lexical repository-relative POSIX path `docs/prompts/<file>.md`; never emit an absolute or external path. Duplicate job IDs reject symlink aliases before they can create ambiguous source identities. Source path inputs convert backslashes to POSIX separators, collapse dot segments, and reject absolute paths or traversal outside the repository. Source identity is exactly `v1:<normalized-remote-slug>:<normalized-source-path>:<job-id>`.
 - Source marker is exactly `<!-- <configured-prefix>:source:<source-identity> -->`; every generated source and Issue marker uses the configured prefix and never a hard-coded prefix.
 - Issue marker is exactly `<!-- <configured-prefix>:<job-id>:<fingerprint> -->`.
 - Finding fingerprint is lowercase SHA-256 of UTF-8 `<job-id>\x1f<category>\x1f<stable-owner>\x1f<behavior-key>`. It excludes line, commit SHA, date, measurements, and measurement parameters.

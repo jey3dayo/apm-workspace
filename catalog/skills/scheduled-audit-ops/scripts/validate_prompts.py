@@ -125,7 +125,19 @@ def parse_job(path: Path) -> tuple[str, dict[str, Any], str, bool]:
     return name, metadata, body, "weekdays" in metadata
 
 
-def validate_job(path: Path, repository_root: Path) -> dict[str, Any]:
+def normalize_job_source(path: Path, repository_root: Path, prompts_root: Path) -> str:
+    try:
+        lexical_source = path.relative_to(repository_root).as_posix()
+        resolved_path = path.resolve()
+        resolved_path.relative_to(repository_root)
+        resolved_path.relative_to(prompts_root.resolve())
+    except (OSError, RuntimeError, ValueError) as error:
+        raise ValidationError(f"{path}: job path resolves outside docs/prompts boundary") from error
+    return lexical_source
+
+
+def validate_job(path: Path, repository_root: Path, prompts_root: Path) -> dict[str, Any]:
+    source = normalize_job_source(path, repository_root, prompts_root)
     name, metadata, body, weekdays_declared = parse_job(path)
     reject_unknown(
         metadata,
@@ -175,7 +187,7 @@ def validate_job(path: Path, repository_root: Path) -> dict[str, Any]:
         "weekdays": weekdays,
         "time": run_time,
         "timezone": timezone,
-        "source": path.resolve().relative_to(repository_root).as_posix(),
+        "source": source,
         "prompt": body,
         "labels": labels,
     }
@@ -220,7 +232,7 @@ def validate_repository(root: Path) -> dict[str, Any]:
         require_string(severity.get(key), f"issues.severity_labels.{key}")
     for key in ("p1", "p2", "p3"):
         require_string(priority.get(key), f"issues.priority_labels.{key}")
-    jobs = [validate_job(path, root) for path in sorted(prompts.glob("*.md"))]
+    jobs = [validate_job(path, root, prompts) for path in sorted(prompts.glob("*.md"))]
     if not jobs:
         raise ValidationError("at least one job Markdown file is required")
     ids = [job["id"] for job in jobs]

@@ -280,6 +280,30 @@ Inspect security.
             "<!-- scheduled-audit:source:v1:acme/widgets:docs/prompts/job.md:job -->",
         )
 
+    def test_validator_rejects_symlink_jobs_outside_docs_prompts_boundary(self) -> None:
+        for target_name in ("outside.md", "docs/other.md"):
+            with self.subTest(target_name=target_name):
+                root = self.write_repo(MODULE.EXAMPLE_CONFIG, {})
+                target = root / target_name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text(MODULE.example_job("job"), encoding="utf-8")
+                (root / "docs" / "prompts" / "job.md").symlink_to(target)
+                with self.assertRaisesRegex(MODULE.ValidationError, "outside docs/prompts"):
+                    MODULE.validate_repository(root)
+
+    def test_validator_uses_lexical_source_for_in_tree_symlink_and_rejects_aliases(self) -> None:
+        root = self.write_repo(MODULE.EXAMPLE_CONFIG, {})
+        target = root / "docs" / "prompts" / "job-source"
+        target.write_text(MODULE.example_job("job"), encoding="utf-8")
+        (root / "docs" / "prompts" / "job.md").symlink_to(target)
+
+        result = MODULE.validate_repository(root)
+        self.assertEqual(result["jobs"][0]["source"], "docs/prompts/job.md")
+
+        (root / "docs" / "prompts" / "alias.md").symlink_to(target)
+        with self.assertRaisesRegex(MODULE.ValidationError, "duplicate job id"):
+            MODULE.validate_repository(root)
+
     def test_skill_documents_untrusted_boundary_and_evidence_recheck(self) -> None:
         skill = (SCRIPT.parent.parent / "SKILL.md").read_text(encoding="utf-8")
         contracts = (SCRIPT.parent.parent / "references" / "contracts.md").read_text(encoding="utf-8")
