@@ -7,9 +7,7 @@ description: "Plan, route, and synthesize public web research with cited evidenc
 
 ## Overview
 
-Use this skill as the entry point for public web research. It decides how much orchestration a research task needs, keeps collection work in `jina-web-research` (the Jina Reader-first collection workflow), and owns planning, delegation, and synthesis.
-
-This skill stays thin on collection mechanics. Search URL formats, X/Twitter evidence rules, and Reader usage live in `jina-web-research`; do not duplicate them here.
+Entry point for public web research: this skill owns planning, delegation, and synthesis, and decides how much orchestration a task needs. Collection mechanics (search URL formats, X/Twitter evidence rules, Reader usage) live in `jina-web-research`.
 
 ## Workflow
 
@@ -27,7 +25,7 @@ For large tasks, spawn one subagent per subtopic with the Agent tool:
 - Launch independent subagents in a single message so they run in parallel (up to 3-5 at once).
 - Instruct each subagent to:
   - Research one specific subtopic, stated without acronyms.
-  - Follow the `jina-web-research` skill's collection workflow (Jina search via `search_web` or `s.jina.ai` URLs, page reading via Reader).
+  - Follow the `jina-web-research` skill's collection workflow.
   - Stay within roughly 3-5 searches.
   - Write findings with key facts, quotes, and source URLs to `tmp/research_<topic>/findings_<subtopic>.md`.
 - After all subagents finish, read every findings file before synthesizing. The parent owns integration, evidence ranking, and citations.

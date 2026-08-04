@@ -3,20 +3,16 @@ name: apm-usage
 description: >-
   Route work in the `~/.apm` global APM workspace: decide what owns a change,
   which path is the source of truth, and which APM rollout / `mise` task to
-  run. Use for skill update and redistribution requests
-  (`skillアップデートして再配布して`, `再配布`), `apm.yml` / `apm.lock.yaml` and managed catalog
-  rollout, manual-skills package state, orphaned APM packages, checked-out
-  external dependency repositories, optional repository-scoped skill packages,
-  `~/.codex/config.toml` の MCP block 編集、`codex mcp add` / `codex mcp remove`,
-  global MCP の追加・変更・削除、および所有元が不明な runtime MCP 設定,
-  and `apmのバージョンあげて` / pinned `apm`
-  source checks. For skill body, description, script, reference, or asset
-  design itself, coordinate with `skill-creator`; for general mise usage
-  outside the APM workspace (including `mise upgrade TOOL` and
-  `minimum_release_age`), use `mise`. Re-invoke this skill even mid-session
-  when the conversation shifts to these topics — e.g. during a `/doctor` run
-  the user asks to remove an MCP and redistribute, or muses about deleting a
-  `catalog/skills/**` skill (`これいるかな`) and needs the correct rollout task.
+  run. Use for skill update and redistribution requests (`再配布`),
+  `apm.yml` / `apm.lock.yaml` and managed catalog rollout, manual-skills or
+  orphaned package state, checked-out external dependency repositories,
+  optional repository-scoped skill packages, global MCP の追加・変更・削除
+  (`~/.codex/config.toml` の MCP block、`codex mcp add/remove`、所有元不明の
+  runtime MCP 設定を含む), and `apmのバージョンあげて` / pinned `apm` source checks.
+  For skill body or asset design itself, coordinate with `skill-creator`;
+  for general mise usage outside the APM workspace, use `mise`.
+  Re-invoke this skill even mid-session whenever the conversation shifts to
+  these topics.
 ---
 
 # APM Usage
@@ -159,20 +155,7 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 
 ## Repo-Local MCP Recommendations
 
-When moving tools out of global APM, prefer project-local APM installs for MCPs that depend on a specific app runtime, browser session, UI workflow, or repository credential context.
-
-Good repo-local candidates:
-
-- `chrome-devtools`: treat as a browser MCP, not as a lightweight web skill. Prefer `claude-in-chrome`/Codex Chrome addon for ordinary browser operation when sufficient; add `chrome-devtools` repo-local or on-demand only for DevTools-specific depth (Lighthouse, performance trace, heap snapshot), project login/session state, local runtime coupling, or repeatable browser verification beyond that.
-  - When a repository keeps `chrome-devtools` as an exception to the global default, record the concrete reason in that repository's own `apm.yml`/`AGENTS.md` (e.g. "uses Lighthouse audits for perf regression checks"), not just "this is a web app". Central `~/.apm` guidance states the default; repo-local docs state the exception and why it does not fit the default.
-- `tauri-mcp-server`: install only in repositories that own a Tauri runtime such as `src-tauri`.
-- `agentation-mcp`: install only in projects that use the Agentation toolbar and need annotation sync with agents.
-- `peekaboo` or other screen automation MCPs: keep repo-local or on-demand for visual inspection; avoid global startup fan-out.
-- database, SaaS observability, or project API MCPs: keep repo-local so credentials and environment loading stay scoped to the project.
-
-Use global APM only for cross-repo foundations such as lightweight notifications, current docs lookup, public research/readers, or core agent bridges.
-
-When deciding repo-local MCP placement by repository type, runtime, or workflow, read `references/repo-local-mcp.md`.
+Prefer project-local APM installs for MCPs that depend on a specific app runtime, browser session, UI workflow, or repository credential context; keep global APM limited to cross-repo foundations (lightweight notifications, current docs lookup, public research/readers, core agent bridges). Concrete tool-by-signal recommendations and the chrome-devtools exception-documentation rule are in `references/repo-local-mcp.md` — read it when deciding placement.
 
 ## Guardrails
 

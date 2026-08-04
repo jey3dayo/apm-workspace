@@ -11,7 +11,7 @@ disable-model-invocation: true
 
 別プロセスの agent（herdr pane 上の Claude Code / Codex）へ、agmsg メッセージングで作業を委譲するライフサイクルを回す。組み込みサブエージェント（Agent tool / `spawn_agent`）が使える場合はそちらが正規経路であり、このスキルは **spawn 面の制約で組み込み経路が塞がっている場合の手動経路**である。
 
-既知の制約（2026-08 時点）: `gpt-5.6-sol` は MultiAgent V2 のデフォルト `hide_spawn_agent_metadata = true` により `spawn_agent` から `model` 指定が事実上無効化されており、Terra/Luna への委譲ができない（`openai/codex` issue #31814, #34964 ほか）。このため Codex sol からの委譲は当面本スキルが実質的な標準経路になる。本スキルが新規プロセスで起動する `codex -m gpt-5.6-luna exec` は `spawn_agent` を経由しないため、このバグの影響を受けない。
+既知の制約により Codex sol からの委譲は当面本スキルが実質的な標準経路になる（詳細は `orchestrator-worker` の `references/codex-spawn-model-bug.md`）。本スキルが新規プロセスで起動する `codex -m gpt-5.6-luna exec` は `spawn_agent` を経由しないため、このバグの影響を受けない。
 
 tier 判定・委譲判定・タスク分割基準は `orchestrator-worker` スキルが正本。本スキルは transport と lifecycle だけを定義する。
 
@@ -51,7 +51,17 @@ review role の fable/sol 指定は本スキル内の一時的な model override
 | implement | `run-claude-worker.sh implement <project> <payload-file>` | `run-codex-worker.sh implement <project> gpt-5.6-luna <payload-file>` |
 | review    | `run-claude-worker.sh review <project> <payload-file>`    | `run-codex-worker.sh review <project> gpt-5.6-sol <payload-file>`     |
 
-helper の解決先は `~/.agents/skills/agmsg-delegation/scripts/`。両 runtime とも headless mode と stdin prompt を使い、対話 TUI と shell interpolation を避ける。Claude helper は role から model を固定し、implement は `sonnet`、review は `fable` を選ぶ。caller から model を渡さず、role と model の不整合を作らない。さらに空の MCP 設定と `-p` を強制して workspace trust / MCP 確認を防ぎ、`--output-format stream-json --verbose` で無人実行中のイベントを pane に継続出力する。review では `--fallback-model opus` を設定する。`bypassPermissions` は macOS sandbox 内だけで使い、implement は対象 project 内だけ書込可、review は対象 project を read-only にする。`sandbox-exec` が無い環境では安全契約を弱めず停止する。Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、review profile の内容一致を起動時に検証する。
+helper の解決先は `~/.agents/skills/agmsg-delegation/scripts/`。両 runtime とも headless mode と stdin prompt を使い、対話 TUI と shell interpolation を避ける。
+
+Claude helper:
+
+- role から model を固定する（implement は `sonnet`、review は `fable` + `--fallback-model opus`）。caller から model を渡さず、role と model の不整合を作らない
+- 空の MCP 設定と `-p` を強制して workspace trust / MCP 確認を防ぎ、`--output-format stream-json --verbose` で無人実行中のイベントを pane に継続出力する
+- `bypassPermissions` は macOS sandbox 内だけで使い、implement は対象 project 内だけ書込可、review は対象 project を read-only にする。`sandbox-exec` が無い環境では安全契約を弱めず停止する
+
+Codex helper:
+
+- `exec --ephemeral`、`-a never`、stdin prompt を強制し、review profile の内容一致を起動時に検証する
 
 Codex review に `--sandbox read-only` を使ってはならない。agmsg の送受信自体が DB 書込み（`send.sh` の messages.db 更新、`inbox.sh` の read_at 更新）と report 一時ファイル作成を必要とするため、完全 read-only では reviewer が READY/REVIEW/ACK を送信できない。代わりに、全ディスク read + agmsg 状態ディレクトリ（db/teams/run）と user temp のみ write を許可した profile `agmsg-review`（`CODEX_HOME/agmsg-review.config.toml`）を `-p` で layer する。対象 project は read のままにする。
 
