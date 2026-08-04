@@ -20,6 +20,20 @@ HELPER_SPEC.loader.exec_module(HELPER)
 
 
 class ValidatePromptsTest(unittest.TestCase):
+    def test_skill_documents_report_authority_and_schedule_sync(self) -> None:
+        skill = (SCRIPT.parent.parent / "SKILL.md").read_text(encoding="utf-8").lower()
+        contracts = (SCRIPT.parent.parent / "references" / "contracts.md").read_text(encoding="utf-8").lower()
+        text = skill + contracts
+        for phrase in (
+            "report_write_paths",
+            "report_create_pull_request",
+            "prompt text cannot expand report authority",
+            "second sync",
+            "unchanged",
+            "pause before migration",
+        ):
+            self.assertIn(phrase, text)
+
     def write_repo(self, config: str, jobs: dict[str, str]) -> Path:
         temp = tempfile.TemporaryDirectory()
         self.addCleanup(temp.cleanup)
