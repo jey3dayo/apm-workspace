@@ -2,19 +2,24 @@
 
 set -euo pipefail
 
-if [[ $# -ne 4 ]]; then
-	printf 'Usage: %s <implement|review> <project> <model> <payload-file>\n' "$0" >&2
+if [[ $# -ne 3 ]]; then
+	printf 'Usage: %s <implement|review> <project> <payload-file>\n' "$0" >&2
 	exit 2
 fi
 
 role=$1
 project=$2
-model=$3
-payload_file=$4
+payload_file=$3
 
 if [[ "$role" != implement && "$role" != review ]]; then
 	printf 'Unsupported role: %s\n' "$role" >&2
 	exit 2
+fi
+
+if [[ "$role" == implement ]]; then
+	model=sonnet
+else
+	model=fable
 fi
 
 if [[ ! -d "$project" ]]; then
@@ -87,6 +92,8 @@ fi
 claude_args=(
 	-p
 	--model "$model"
+	--output-format stream-json
+	--verbose
 	--permission-mode bypassPermissions
 	--no-chrome
 )

@@ -46,12 +46,12 @@ review role の fable/sol 指定は本スキル内の一時的な model override
 - agmsg bootstrap 済みを確認（`~/.agents/skills/agmsg/` が存在）
 - role/runtime 別の起動コマンドを確定する。review は書込権限を実行時に強制する:
 
-| role      | Claude                                                                | Codex                                                                 |
-| --------- | --------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| implement | `run-claude-worker.sh implement <project> sonnet <payload-file>`      | `run-codex-worker.sh implement <project> gpt-5.6-luna <payload-file>` |
-| review    | `run-claude-worker.sh review <project> claude-fable-5 <payload-file>` | `run-codex-worker.sh review <project> gpt-5.6-sol <payload-file>`     |
+| role      | Claude                                                    | Codex                                                                 |
+| --------- | --------------------------------------------------------- | --------------------------------------------------------------------- |
+| implement | `run-claude-worker.sh implement <project> <payload-file>` | `run-codex-worker.sh implement <project> gpt-5.6-luna <payload-file>` |
+| review    | `run-claude-worker.sh review <project> <payload-file>`    | `run-codex-worker.sh review <project> gpt-5.6-sol <payload-file>`     |
 
-helper の解決先は `~/.agents/skills/agmsg-delegation/scripts/`。両 runtime とも headless mode と stdin prompt を使い、対話 TUI と shell interpolation を避ける。Claude helper は空の MCP 設定と `-p` を強制して workspace trust / MCP 確認を防ぎ、review では `--fallback-model opus` を設定する。`bypassPermissions` は macOS sandbox 内だけで使い、implement は対象 project 内だけ書込可、review は対象 project を read-only にする。`sandbox-exec` が無い環境では安全契約を弱めず停止する。Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、review profile の内容一致を起動時に検証する。
+helper の解決先は `~/.agents/skills/agmsg-delegation/scripts/`。両 runtime とも headless mode と stdin prompt を使い、対話 TUI と shell interpolation を避ける。Claude helper は role から model を固定し、implement は `sonnet`、review は `fable` を選ぶ。caller から model を渡さず、role と model の不整合を作らない。さらに空の MCP 設定と `-p` を強制して workspace trust / MCP 確認を防ぎ、`--output-format stream-json --verbose` で無人実行中のイベントを pane に継続出力する。review では `--fallback-model opus` を設定する。`bypassPermissions` は macOS sandbox 内だけで使い、implement は対象 project 内だけ書込可、review は対象 project を read-only にする。`sandbox-exec` が無い環境では安全契約を弱めず停止する。Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、review profile の内容一致を起動時に検証する。
 
 Codex review に `--sandbox read-only` を使ってはならない。agmsg の送受信自体が DB 書込み（`send.sh` の messages.db 更新、`inbox.sh` の read_at 更新）と report 一時ファイル作成を必要とするため、完全 read-only では reviewer が READY/REVIEW/ACK を送信できない。代わりに、全ディスク read + agmsg 状態ディレクトリ（db/teams/run）と user temp のみ write を許可した profile `agmsg-review`（`CODEX_HOME/agmsg-review.config.toml`）を `-p` で layer する。対象 project は read のままにする。
 
@@ -96,7 +96,7 @@ diff ~/.agents/skills/agmsg-delegation/agmsg-review.config.toml ~/.codex/agmsg-r
    - handshake 最小形: READY/DONE または REVIEW のフォーマット、task_id、timeout、WORKER.md の解決済み絶対パス
    - 無人実行契約: 対話的な承認を待たないこと、報告は `send-report.sh` を使うこと、コマンド拒否時は安全な代替か BLOCKED を返すこと
 5. runtime 別に `herdr pane run` で起動する。両 helper は payload file を stdin へ渡すため command substitution を付けない:
-   - Claude: `herdr pane run <new_pane_id> "cd <対象project> && ~/.agents/skills/agmsg-delegation/scripts/run-claude-worker.sh <role> <対象project> <model> <payloadファイル>"`
+   - Claude: `herdr pane run <new_pane_id> "cd <対象project> && ~/.agents/skills/agmsg-delegation/scripts/run-claude-worker.sh <role> <対象project> <payloadファイル>"`
    - Codex: `herdr pane run <new_pane_id> "cd <対象project> && ~/.agents/skills/agmsg-delegation/scripts/run-codex-worker.sh <role> <対象project> <model> <payloadファイル>"`
 6. `herdr pane process-info` を再実行し、cwd と foreground process が期待通りか確認する
 
