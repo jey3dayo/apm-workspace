@@ -1,4 +1,4 @@
 interface:
   display_name: "Scheduled Audit Ops"
-  short_description: "Sync audit prompts and publish evidence-backed issues"
-  default_prompt: "Use $scheduled-audit-ops to validate and synchronize the current repository scheduled audits."
+  short_description: "Sync audits, publish Issues, or write allowlisted reports"
+  default_prompt: "Use $scheduled-audit-ops to validate and synchronize scheduled audits, publish evidence-backed GitHub Issues for audit jobs, or write allowlisted report documents and create at most one pull request for report jobs."

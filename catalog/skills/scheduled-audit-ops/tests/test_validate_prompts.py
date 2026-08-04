@@ -20,9 +20,47 @@ HELPER_SPEC.loader.exec_module(HELPER)
 
 
 class ValidatePromptsTest(unittest.TestCase):
-    def test_skill_documents_report_authority_and_schedule_sync(self) -> None:
+    def test_skill_documents_run_branches_bootstrap_and_agent_discovery(self) -> None:
         skill = (SCRIPT.parent.parent / "SKILL.md").read_text(encoding="utf-8").lower()
         contracts = (SCRIPT.parent.parent / "references" / "contracts.md").read_text(encoding="utf-8").lower()
+        agent = (SCRIPT.parent.parent / "agents" / "openai.yaml").read_text(encoding="utf-8").lower()
+
+        run_start = skill.index("## run")
+        for heading in (
+            "### common read-only setup",
+            "### audit-only issue/label/evidence lifecycle",
+            "### report-only allowlisted file/one-pr lifecycle",
+        ):
+            self.assertIn(heading, skill[run_start:])
+        common_start = skill.index("### common read-only setup", run_start)
+        audit_start = skill.index("### audit-only issue/label/evidence lifecycle", common_start)
+        report_start = skill.index("### report-only allowlisted file/one-pr lifecycle", audit_start)
+        common = skill[common_start:audit_start]
+        audit = skill[audit_start:report_start]
+        report = skill[report_start:]
+
+        self.assertLess(common_start, audit_start)
+        self.assertLess(audit_start, report_start)
+        for phrase in (
+            "read the current job body",
+            "automation memory",
+            "read-only",
+        ):
+            self.assertIn(phrase, common)
+        for phrase in (
+            "evidence gate",
+            "issue labels",
+            "issue lifecycle",
+        ):
+            self.assertIn(phrase, audit)
+        for phrase in (
+            "report_write_paths",
+            "report_create_pull_request",
+            "one pr",
+            "report run rejects issue labels and never runs the issue lifecycle",
+        ):
+            self.assertIn(phrase, report)
+
         text = skill + contracts
         for phrase in (
             "report_write_paths",
@@ -31,8 +69,16 @@ class ValidatePromptsTest(unittest.TestCase):
             "second sync",
             "unchanged",
             "pause before migration",
+            "canonical_source = source_marker(dedupe_marker_prefix, repository_remote, job[\"source\"], job[\"id\"])",
+            "audit bootstrap omits `report_write_paths` and `report_create_pull_request`",
+            "report bootstrap serializes normalized `report_write_paths` and `report_create_pull_request`",
+            "the normalized validator dictionary may contain `report_write_paths = []` and `report_create_pull_request = false` for audit jobs",
+            "reasoning_effort `low | medium | high | xhigh | max`",
         ):
             self.assertIn(phrase, text)
+        self.assertIn("evidence-backed github issues", agent)
+        self.assertIn("allowlisted report documents", agent)
+        self.assertIn("at most one pull request", agent)
 
     def write_repo(self, config: str, jobs: dict[str, str]) -> Path:
         temp = tempfile.TemporaryDirectory()
