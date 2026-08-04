@@ -1,0 +1,4 @@
+interface:
+  display_name: "Scheduled Audit Ops"
+  short_description: "Sync audit prompts and publish evidence-backed issues"
+  default_prompt: "Use $scheduled-audit-ops to validate and synchronize the current repository scheduled audits."
