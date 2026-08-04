@@ -125,7 +125,7 @@ def parse_job(path: Path) -> tuple[str, dict[str, Any], str, bool]:
     return name, metadata, body, "weekdays" in metadata
 
 
-def validate_job(path: Path) -> dict[str, Any]:
+def validate_job(path: Path, repository_root: Path) -> dict[str, Any]:
     name, metadata, body, weekdays_declared = parse_job(path)
     reject_unknown(
         metadata,
@@ -175,14 +175,15 @@ def validate_job(path: Path) -> dict[str, Any]:
         "weekdays": weekdays,
         "time": run_time,
         "timezone": timezone,
-        "source": str(path),
+        "source": path.resolve().relative_to(repository_root).as_posix(),
         "prompt": body,
         "labels": labels,
     }
 
 
 def validate_repository(root: Path) -> dict[str, Any]:
-    prompts = root.resolve() / "docs" / "prompts"
+    root = root.resolve()
+    prompts = root / "docs" / "prompts"
     config_path = prompts / "config.toml"
     if not config_path.is_file():
         raise ValidationError(f"missing {config_path}")
@@ -219,7 +220,7 @@ def validate_repository(root: Path) -> dict[str, Any]:
         require_string(severity.get(key), f"issues.severity_labels.{key}")
     for key in ("p1", "p2", "p3"):
         require_string(priority.get(key), f"issues.priority_labels.{key}")
-    jobs = [validate_job(path) for path in sorted(prompts.glob("*.md"))]
+    jobs = [validate_job(path, root) for path in sorted(prompts.glob("*.md"))]
     if not jobs:
         raise ValidationError("at least one job Markdown file is required")
     ids = [job["id"] for job in jobs]

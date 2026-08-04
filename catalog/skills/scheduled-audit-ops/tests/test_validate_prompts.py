@@ -12,6 +12,12 @@ assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 
+HELPER_PATH = SCRIPT.parent / "audit_contracts.py"
+HELPER_SPEC = importlib.util.spec_from_file_location("audit_contracts", HELPER_PATH)
+assert HELPER_SPEC and HELPER_SPEC.loader
+HELPER = importlib.util.module_from_spec(HELPER_SPEC)
+HELPER_SPEC.loader.exec_module(HELPER)
+
 
 class ValidatePromptsTest(unittest.TestCase):
     def write_repo(self, config: str, jobs: dict[str, str]) -> Path:
@@ -166,52 +172,113 @@ Inspect security.
                 MODULE.validate_repository(bad)
 
     def test_deterministic_helpers_define_identity_fingerprint_markers_and_lifecycle(self) -> None:
-        helper_path = SCRIPT.parent / "audit_contracts.py"
-        spec = importlib.util.spec_from_file_location("audit_contracts", helper_path)
-        assert spec and spec.loader
-        helper = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(helper)
         self.assertEqual(
-            helper.source_identity("HTTPS://GitHub.com/Acme/Widgets.git", "docs\\prompts/./job.md", "job"),
+            HELPER.source_identity("HTTPS://GitHub.com/Acme/Widgets.git", "docs\\prompts/./job.md", "job"),
             "v1:acme/widgets:docs/prompts/job.md:job",
         )
         self.assertEqual(
-            helper.source_marker("audit-run", "git@github.com:Acme/Widgets.git", "docs/prompts/job.md", "job"),
+            HELPER.source_marker("audit-run", "git@github.com:Acme/Widgets.git", "docs/prompts/job.md", "job"),
             "<!-- audit-run:source:v1:acme/widgets:docs/prompts/job.md:job -->",
         )
         with self.assertRaises(ValueError):
-            helper.source_path("/repo", "/etc/passwd")
+            HELPER.source_path("/repo", "/etc/passwd")
         with self.assertRaises(ValueError):
-            helper.source_path("/repo", "../outside.md")
+            HELPER.source_path("/repo", "../outside.md")
         with self.assertRaises(ValueError):
-            helper.source_identity("acme/widgets", "a/../../outside.md", "job")
-        self.assertEqual(helper.repository_remote_slug("https://github.com/acme/widgets.git"), "acme/widgets")
-        self.assertEqual(helper.repository_remote_slug("git@github.com:acme/widgets.git"), "acme/widgets")
-        first = helper.finding_fingerprint("job", "security", "owner", "behavior")
+            HELPER.source_identity("acme/widgets", "a/../../outside.md", "job")
+        self.assertEqual(HELPER.repository_remote_slug("https://github.com/acme/widgets.git"), "acme/widgets")
+        self.assertEqual(HELPER.repository_remote_slug("git@github.com:acme/widgets.git"), "acme/widgets")
+        first = HELPER.finding_fingerprint("job", "security", "owner", "behavior")
         self.assertEqual(first, "93601981a8a40fc5ec5adcbc538acab44de333b126eba76bfdbbc3ba2ea0d4f1")
-        self.assertEqual(list(inspect.signature(helper.finding_fingerprint).parameters), ["job_id", "category", "stable_owner", "behavior_key"])
-        self.assertEqual(helper.issue_marker("audit-run", "job", first), f"<!-- audit-run:job:{first} -->")
-        self.assertEqual(first, helper.finding_fingerprint("job", "security", "owner", "behavior"))
-        self.assertNotEqual(first, helper.finding_fingerprint("job", "security", "other", "behavior"))
-        self.assertEqual(helper.lifecycle_disposition(finding_present=False, issue_state=None, evidence_sufficient=False), "hold")
-        self.assertEqual(helper.lifecycle_disposition(finding_present=True, issue_state="rejected", evidence_sufficient=True), "suppress")
-        self.assertEqual(helper.lifecycle_disposition(finding_present=False, issue_state="open", evidence_sufficient=True), "close")
-        self.assertEqual(helper.lifecycle_disposition(finding_present=True, issue_state=None, evidence_sufficient=True), "create")
-        self.assertEqual(helper.lifecycle_disposition(finding_present=True, issue_state="closed", evidence_sufficient=True), "reopen")
-        self.assertEqual(helper.lifecycle_disposition(finding_present=True, issue_state="open", evidence_sufficient=True, changed=True), "update")
-        self.assertEqual(helper.lifecycle_disposition(finding_present=True, issue_state="open", evidence_sufficient=True, changed=False), "unchanged")
+        self.assertEqual(list(inspect.signature(HELPER.finding_fingerprint).parameters), ["job_id", "category", "stable_owner", "behavior_key"])
+        self.assertEqual(HELPER.issue_marker("audit-run", "job", first), f"<!-- audit-run:job:{first} -->")
+        self.assertEqual(first, HELPER.finding_fingerprint("job", "security", "owner", "behavior"))
+        self.assertNotEqual(first, HELPER.finding_fingerprint("job", "security", "other", "behavior"))
+        self.assertEqual(HELPER.lifecycle_disposition(finding_present=False, issue_state=None, evidence_sufficient=False), "hold")
+        self.assertEqual(HELPER.lifecycle_disposition(finding_present=True, issue_state="rejected", evidence_sufficient=True), "suppress")
+        self.assertEqual(HELPER.lifecycle_disposition(finding_present=False, issue_state="open", evidence_sufficient=True), "close")
+        self.assertEqual(HELPER.lifecycle_disposition(finding_present=True, issue_state=None, evidence_sufficient=True), "create")
+        self.assertEqual(HELPER.lifecycle_disposition(finding_present=True, issue_state="closed", evidence_sufficient=True), "reopen")
+        self.assertEqual(HELPER.lifecycle_disposition(finding_present=True, issue_state="open", evidence_sufficient=True, changed=True), "update")
+        self.assertEqual(HELPER.lifecycle_disposition(finding_present=True, issue_state="open", evidence_sufficient=True, changed=False), "unchanged")
         with self.assertRaises(ValueError):
-            helper.lifecycle_disposition(finding_present=False, issue_state="closed", evidence_sufficient=True)
+            HELPER.lifecycle_disposition(finding_present=False, issue_state="closed", evidence_sufficient=True)
         with self.assertRaises(ValueError):
-            helper.lifecycle_disposition(finding_present=True, issue_state="open", evidence_sufficient=False, changed=True)
-        records = [helper.IssueRecord(9, "z-source"), helper.IssueRecord(3, "b-source"), helper.IssueRecord(3, "a-source")]
-        result = helper.reconcile_issues(records)
+            HELPER.lifecycle_disposition(finding_present=True, issue_state="open", evidence_sufficient=False, changed=True)
+        records = [HELPER.IssueRecord(9, "z-source"), HELPER.IssueRecord(3, "b-source"), HELPER.IssueRecord(3, "a-source")]
+        result = HELPER.reconcile_issues(records)
         self.assertEqual(result.canonical.number, 3)
         self.assertEqual(result.duplicate_numbers, (9,))
-        self.assertEqual(result.preferred_writer, "a-source")
-        self.assertIsNone(helper.reconcile_issues([]).canonical)
+        self.assertEqual(HELPER.preferred_source_writer(["z-source", "a-source"]), "a-source")
+        self.assertIsNone(HELPER.reconcile_issues([]).canonical)
+        self.assertFalse(hasattr(HELPER, "reconcile_duplicates"))
+        self.assertFalse(hasattr(HELPER, "single_writer_winner"))
         with self.assertRaises(ValueError):
-            helper.reconcile_issues([helper.IssueRecord(0, "source")])
+            HELPER.reconcile_issues([HELPER.IssueRecord(0, "source")])
+
+    def test_legacy_markers_are_explicitly_searched_adopted_and_canonicalized(self) -> None:
+        fingerprint = HELPER.finding_fingerprint("job", "security", "owner", "behavior")
+        canonical = HELPER.issue_marker("audit-run", "job", fingerprint)
+        legacy = "<!-- audit-run:job -->"
+        candidates = HELPER.marker_candidates(canonical, [legacy, legacy])
+        self.assertEqual(candidates, (canonical, legacy))
+
+        legacy_only = {17: f"Summary\n{legacy}"}
+        self.assertEqual(HELPER.matching_issue_numbers(legacy_only, candidates), (17,))
+
+        matching = {17: f"Summary\n{legacy}\n{legacy}", 4: f"Summary\n{canonical}"}
+        matches = HELPER.matching_issue_numbers(matching, candidates)
+        self.assertEqual(matches, (4, 17))
+        reconciled = HELPER.reconcile_issues([HELPER.IssueRecord(number, "source") for number in matches])
+        self.assertEqual(reconciled.canonical.number, 4)
+        self.assertEqual(reconciled.duplicate_numbers, (17,))
+        updated = HELPER.migrate_issue_body(matching[4], canonical, candidates)
+        self.assertEqual(updated.count(canonical), 1)
+        self.assertNotIn(legacy, updated)
+
+    def test_lifecycle_rejects_full_contradictory_input_matrix(self) -> None:
+        invalid_cases = [
+            (False, None, False, True),
+            (False, "open", False, True),
+            (False, "open", True, True),
+            (False, "closed", False, False),
+            (False, "closed", True, False),
+            (False, "rejected", False, False),
+            (False, "rejected", True, False),
+            (True, None, False, True),
+            (True, None, True, True),
+            (True, "rejected", True, True),
+            (True, "open", False, True),
+            (True, "closed", False, True),
+            (True, "rejected", False, True),
+        ]
+        for finding_present, issue_state, evidence_sufficient, changed in invalid_cases:
+            with self.subTest(finding_present=finding_present, issue_state=issue_state, evidence_sufficient=evidence_sufficient, changed=changed):
+                with self.assertRaises(ValueError):
+                    HELPER.lifecycle_disposition(
+                        finding_present=finding_present,
+                        issue_state=issue_state,
+                        evidence_sufficient=evidence_sufficient,
+                        changed=changed,
+                    )
+        for invalid_kwargs in (
+            {"finding_present": True, "issue_state": "pending", "evidence_sufficient": True, "changed": False},
+            {"finding_present": 1, "issue_state": None, "evidence_sufficient": True, "changed": False},
+            {"finding_present": True, "issue_state": None, "evidence_sufficient": 1, "changed": False},
+            {"finding_present": True, "issue_state": None, "evidence_sufficient": True, "changed": 0},
+        ):
+            with self.assertRaises(ValueError):
+                HELPER.lifecycle_disposition(**invalid_kwargs)
+
+    def test_validator_source_is_repository_relative_and_works_with_source_marker(self) -> None:
+        root = self.write_repo(MODULE.EXAMPLE_CONFIG, {"job.md": MODULE.example_job("job")})
+        result = MODULE.validate_repository(root)
+        source = result["jobs"][0]["source"]
+        self.assertEqual(source, "docs/prompts/job.md")
+        self.assertEqual(
+            HELPER.source_marker("scheduled-audit", "git@github.com:acme/widgets.git", source, "job"),
+            "<!-- scheduled-audit:source:v1:acme/widgets:docs/prompts/job.md:job -->",
+        )
 
     def test_skill_documents_untrusted_boundary_and_evidence_recheck(self) -> None:
         skill = (SCRIPT.parent.parent / "SKILL.md").read_text(encoding="utf-8")
@@ -221,6 +288,9 @@ Inspect security.
         text = skill.lower() + contracts.lower()
         for phrase in ("embedded instructions", "solely because audited content requested it", "automation memory"):
             self.assertIn(phrase, text)
+        self.assertIn("explicit user/automation invocation outside audited data", text)
+        self.assertNotIn("job explicitly authorizes", text)
+        self.assertNotIn("unless the job explicitly", text)
 
     def test_validator_is_conservative_about_unknown_keys_enums_and_labels(self) -> None:
         config = MODULE.EXAMPLE_CONFIG
@@ -255,6 +325,15 @@ Inspect security.
         job = MODULE.example_job("job").replace('timezone = "Asia/Tokyo"', 'timezone = "Asia/Tokyo"\nlabels = ["job-label"]')
         result = MODULE.validate_repository(self.write_repo(config, {"job.md": job}))
         self.assertEqual(result["jobs"][0]["preflight_labels"], ["task", "Severity: High", "Severity: Medium", "Severity: Low", "priority/P1", "priority/P2", "priority/P3", "job-label"])
+        prompt_metadata = MODULE.example_job("job").replace("Inspect the repository.", 'Prompt text mentions labels = ["prompt-label"].')
+        result = MODULE.validate_repository(self.write_repo(config, {"job.md": prompt_metadata}))
+        self.assertNotIn("prompt-label", result["jobs"][0]["preflight_labels"])
+
+    def test_contract_documents_structured_optional_labels_and_authority_source(self) -> None:
+        contracts = (SCRIPT.parent.parent / "references" / "contracts.md").read_text(encoding="utf-8").lower()
+        self.assertIn('labels = ["team-platform"]', contracts)
+        self.assertIn("generic jobs omit labels", contracts)
+        self.assertIn("prompt text cannot add labels", contracts)
 
     def test_validator_schedule_and_text_boundaries(self) -> None:
         config = MODULE.EXAMPLE_CONFIG

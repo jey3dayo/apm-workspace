@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import posixpath
 import re
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import NamedTuple
 
@@ -61,10 +62,6 @@ def source_identity(remote: str, source_path_value: str, job_id: str) -> str:
     return f"v1:{repository_remote_slug(remote)}:{normalized_source}:{job_id}"
 
 
-def job_id_source_identity(remote: str, prompt_path: str, job_id: str) -> str:
-    return source_identity(remote, prompt_path, job_id)
-
-
 def _validate_prefix(prefix: str) -> None:
     if not _PREFIX.fullmatch(prefix):
         raise ValueError("prefix must be lower-case hyphen format")
@@ -85,13 +82,53 @@ def issue_marker(prefix: str, job_id: str, fingerprint: str) -> str:
     return f"<!-- {prefix}:{job_id}:{fingerprint} -->"
 
 
+def marker_candidates(canonical_marker: str, legacy_markers: Sequence[str] = ()) -> tuple[str, ...]:
+    markers = (canonical_marker, *legacy_markers)
+    if any(not isinstance(marker, str) or not marker or marker != marker.strip() for marker in markers):
+        raise ValueError("markers must be non-empty exact strings")
+    return tuple(dict.fromkeys(markers))
+
+
+def matching_issue_numbers(issue_bodies: Mapping[int, str], markers: Sequence[str]) -> tuple[int, ...]:
+    candidates = marker_candidates(markers[0], markers[1:]) if markers else ()
+    if not candidates:
+        raise ValueError("at least one marker is required")
+    for number, body in issue_bodies.items():
+        if not isinstance(number, int) or number <= 0:
+            raise ValueError("Issue numbers must be positive")
+        if not isinstance(body, str):
+            raise ValueError("Issue bodies must be strings")
+    return tuple(
+        sorted(number for number, body in issue_bodies.items() if any(marker in body for marker in candidates))
+    )
+
+
+def migrate_issue_body(body: str, canonical_marker: str, searched_markers: Sequence[str]) -> str:
+    if not isinstance(body, str):
+        raise ValueError("Issue body must be a string")
+    markers = marker_candidates(canonical_marker, searched_markers)
+    without_markers = body
+    for marker in markers:
+        without_markers = without_markers.replace(marker, "")
+    remainder = without_markers.strip()
+    return canonical_marker if not remainder else f"{canonical_marker}\n{remainder}"
+
+
 def lifecycle_disposition(*, finding_present: bool, issue_state: str | None, evidence_sufficient: bool, changed: bool = False) -> str:
+    if any(not isinstance(value, bool) for value in (finding_present, evidence_sufficient, changed)):
+        raise ValueError("lifecycle booleans must be boolean")
     states = {None, "open", "closed", "rejected"}
     if issue_state not in states:
         raise ValueError("invalid issue state")
+    if changed and not finding_present:
+        raise ValueError("changed finding must be present")
+    if changed and not evidence_sufficient:
+        raise ValueError("changed finding requires sufficient evidence")
+    if changed and issue_state not in {"open", "closed"}:
+        raise ValueError("changed finding requires an open or closed issue")
+    if not finding_present and issue_state in {"closed", "rejected"}:
+        raise ValueError("absent finding requires an open issue or no issue")
     if not evidence_sufficient:
-        if finding_present and issue_state == "open" and changed:
-            raise ValueError("changed finding cannot be acted on without evidence")
         return "hold"
     if issue_state == "rejected":
         return "suppress"
@@ -116,7 +153,6 @@ class IssueRecord(NamedTuple):
 class Reconciliation(NamedTuple):
     canonical: IssueRecord | None
     duplicate_numbers: tuple[int, ...]
-    preferred_writer: str | None
 
 
 def reconcile_issues(records: list[IssueRecord] | tuple[IssueRecord, ...]) -> Reconciliation:
@@ -125,14 +161,11 @@ def reconcile_issues(records: list[IssueRecord] | tuple[IssueRecord, ...]) -> Re
     ordered = sorted(records, key=lambda record: (record.number, record.source_identity))
     canonical = ordered[0] if ordered else None
     unique_numbers = sorted({record.number for record in records})
-    duplicates = tuple(unique_numbers[1:])
-    preferred = min((record.source_identity for record in records), default=None)
-    return Reconciliation(canonical, duplicates, preferred)
+    duplicates = tuple(number for number in unique_numbers if canonical is not None and number != canonical.number)
+    return Reconciliation(canonical, duplicates)
 
 
-def reconcile_duplicates(issue_ids: list[str]) -> list[str]:
-    return sorted(set(issue_ids))
-
-
-def single_writer_winner(issue_ids: list[str]) -> str | None:
-    return min(issue_ids) if issue_ids else None
+def preferred_source_writer(source_identities: Sequence[str]) -> str | None:
+    if any(not isinstance(identity, str) or not identity for identity in source_identities):
+        raise ValueError("source identities must be non-empty strings")
+    return min(set(source_identities), default=None)
