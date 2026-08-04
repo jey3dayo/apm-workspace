@@ -103,6 +103,12 @@ Inspect security.
         with self.assertRaisesRegex(MODULE.ValidationError, "duplicate job id"):
             MODULE.validate_repository(root)
 
+    def test_rejects_repository_without_jobs(self) -> None:
+        root = self.write_repo(MODULE.EXAMPLE_CONFIG, {})
+
+        with self.assertRaisesRegex(MODULE.ValidationError, "at least one job"):
+            MODULE.validate_repository(root)
+
     def test_rejects_missing_weekdays_for_weekly_job(self) -> None:
         root = self.write_repo(
             MODULE.EXAMPLE_CONFIG,

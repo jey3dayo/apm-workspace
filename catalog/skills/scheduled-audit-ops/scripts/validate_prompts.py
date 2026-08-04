@@ -168,6 +168,8 @@ def validate_repository(root: Path) -> dict[str, Any]:
     for key in ("p1", "p2", "p3"):
         require_string(priority.get(key), f"issues.priority_labels.{key}")
     jobs = [validate_job(path) for path in sorted(prompts.glob("*.md"))]
+    if not jobs:
+        raise ValidationError("at least one job Markdown file is required")
     ids = [job["id"] for job in jobs]
     duplicate_ids = sorted({job_id for job_id in ids if ids.count(job_id) > 1})
     if duplicate_ids:
