@@ -25,7 +25,14 @@ class ValidatePromptsTest(unittest.TestCase):
         contracts = (SCRIPT.parent.parent / "references" / "contracts.md").read_text(encoding="utf-8").lower()
         agent = (SCRIPT.parent.parent / "agents" / "openai.yaml").read_text(encoding="utf-8").lower()
 
+        sync_start = skill.index("## sync")
         run_start = skill.index("## run")
+        sync = skill[sync_start:run_start]
+        self.assertIn(
+            "2. confirm every github label required by audit jobs exists.",
+            sync,
+        )
+        self.assertNotIn("confirm every configured github label exists", sync)
         for heading in (
             "### common read-only setup",
             "### audit-only issue/label/evidence lifecycle",

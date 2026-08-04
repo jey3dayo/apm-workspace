@@ -32,7 +32,7 @@ After validation, route each normalized job by its immutable `operation` value:
 Use this branch when the user asks to create, update, validate, or reflect schedules.
 
 1. Validate every job before changing any automation.
-2. Confirm every configured GitHub label exists.
+2. Confirm every GitHub label required by audit jobs exists.
 3. Resolve the current repository through the Codex project list.
 4. Inspect existing automation files and match by job ID plus source marker.
 5. Preserve live model, project, and destination fields unless repository config owns them.
