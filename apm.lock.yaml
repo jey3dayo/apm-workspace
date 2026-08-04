@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-08-04T16:14:28.402323+00:00'
+generated_at: '2026-08-04T16:50:57.164316+00:00'
 apm_version: 0.26.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -19940,19 +19940,11 @@ deployments:
   active_owner: .
   content_hash: null
 mcp_servers:
-- codex
 - context7
 - jina-reader
 - linear
 - mcp-simple-voicevox
 mcp_configs:
-  codex:
-    name: codex
-    transport: stdio
-    args:
-    - mcp-server
-    registry: false
-    command: codex
   context7:
     name: context7
     transport: stdio

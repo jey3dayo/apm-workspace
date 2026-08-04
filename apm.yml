@@ -83,12 +83,6 @@ dependencies:
       url: https://mcp.jina.ai/v1?include_tags=search,read
       headers:
         Authorization: Bearer ${JINA_API_KEY}
-    - name: codex
-      registry: false
-      transport: stdio
-      command: codex
-      args:
-        - mcp-server
     # Linear は claude.ai / ChatGPT 側コネクタだけでは足りない操作があり、CLI 側
     # (Claude Code / Codex) でも同じ tool 群が必要なため APM 管理に戻した。
     # 運用ルールと GraphQL フォールバックは catalog/skills/linear-task-ops が持つ。
