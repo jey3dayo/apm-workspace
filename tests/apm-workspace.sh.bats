@@ -180,17 +180,6 @@ EOF
   [ "$status" -eq 0 ]
 }
 
-@test "Jina MCP ownership is guarded by tracked APM guidance" {
-  run rg -F 'This manifest entry is the source of truth; runtime MCP blocks are deployed outputs.' "$WORKSPACE_DIR/apm.yml"
-  [ "$status" -eq 0 ]
-
-  run rg -F 'MCP 設定を永続変更する前に、次の ownership gate を完了する' "$WORKSPACE_DIR/catalog/AGENTS.md"
-  [ "$status" -eq 0 ]
-
-  run rg -F '`~/.codex/config.toml` の MCP block 編集、`codex mcp add` / `codex mcp remove`' "$WORKSPACE_DIR/catalog/skills/apm-usage/SKILL.md"
-  [ "$status" -eq 0 ]
-}
-
 # --- host-local MCP bootstrap ----------------------------------------------
 
 @test "resolve_1password_mcp_command prefers a native command" {

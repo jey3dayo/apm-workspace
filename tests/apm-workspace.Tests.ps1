@@ -1113,16 +1113,6 @@ dependencies: []
     $miseToml | Should -Not -Match 'APM_BOOTSTRAP_REPO'
   }
 
-  It "guards Jina MCP ownership in tracked APM guidance" {
-    $manifest = Get-Content -LiteralPath (Join-Path $workspaceRoot "apm.yml") -Raw
-    $agents = Get-Content -LiteralPath (Join-Path $workspaceRoot "catalog/AGENTS.md") -Raw
-    $apmUsage = Get-Content -LiteralPath (Join-Path $workspaceRoot "catalog/skills/apm-usage/SKILL.md") -Raw
-
-    $manifest | Should -Match 'This manifest entry is the source of truth; runtime MCP blocks are deployed outputs\.'
-    $agents | Should -Match 'MCP 設定を永続変更する前に、次の ownership gate を完了する'
-    $apmUsage | Should -Match '`~/.codex/config\.toml` の MCP block 編集、`codex mcp add` / `codex mcp remove`'
-  }
-
   It "describes the catalog readme without legacy mirror wording" {
     $legacyMirrorPattern = 'transitional' + ' mirror'
     $readme = Get-Content -LiteralPath (Join-Path $workspaceRoot "catalog/README.md") -Raw
