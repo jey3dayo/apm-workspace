@@ -60,6 +60,7 @@ dependencies:
     - vercel-labs/agent-skills/skills/react-best-practices
     - shadcn/improve
     - fujibee/agmsg
+    - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke#main
   mcp:
     - name: context7
       registry: false
