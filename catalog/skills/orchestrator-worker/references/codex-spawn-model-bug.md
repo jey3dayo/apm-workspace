@@ -4,7 +4,7 @@
 
 ## 症状
 
-`gpt-5.6-sol` はモデルメタデータで MultiAgent V2 を選択し、V2 のデフォルト `hide_spawn_agent_metadata = true` が `spawn_agent` スキーマから `agent_type` / `model` / `reasoning_effort` / `service_tier` を隠す。この結果 Sol から spawn したサブエージェントは明示指定してもすべて Sol を継承し、`gpt-5.6-luna` は選択できない(`openai/codex` issue #31814, #34964 ほか多数)。`gpt-5.6-terra` への委譲も同様に効かないため、実質的に Sol からのモデル指定委譲は機能しない。
+`gpt-5.6-sol` はモデルメタデータで MultiAgent V2 を選択し、V2 のデフォルト `hide_spawn_agent_metadata = true` が `spawn_agent` スキーマから `agent_type` / `model` / `reasoning_effort` / `service_tier` を隠す。この結果 Sol から spawn したサブエージェントは明示指定してもすべて Sol を継承し、`gpt-5.6-luna` は選択できない(`openai/codex` issue #31814, #34964 ほか多数)。`gpt-5.6-terra` への委譲も同様に効かないため、実質的に Sol からのモデル指定委譲は機能しない。料金改定により `luna` が標準 Worker（Section 1 tier 表）になった後もこのバグの影響範囲は変わらず、`luna` 指定も同様に無効化される。
 
 ## 回避策(優先順)
 

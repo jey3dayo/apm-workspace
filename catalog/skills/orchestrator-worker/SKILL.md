@@ -19,13 +19,13 @@ description: >-
 
 現在のモデルが Orchestrator tier なら委譲、Worker tier なら自分で実装する。
 
-| 現在のモデル                                   | 役割         | Worker として呼ぶモデル                         |
-| ---------------------------------------------- | ------------ | ----------------------------------------------- |
-| Claude Fable / Opus                            | Orchestrator | `sonnet`                                        |
-| Codex `gpt-5.6-sol`                            | Orchestrator | `gpt-5.6-terra`（既知バグあり、Section 4 参照） |
-| Claude Sonnet / Codex `gpt-5.6-terra` / `luna` | Worker       | 委譲せず自分で実装する                          |
+| 現在のモデル                                   | 役割         | Worker として呼ぶモデル                        |
+| ---------------------------------------------- | ------------ | ---------------------------------------------- |
+| Claude Fable / Opus                            | Orchestrator | `sonnet`                                       |
+| Codex `gpt-5.6-sol`                            | Orchestrator | `gpt-5.6-luna`（既知バグあり、Section 4 参照） |
+| Claude Sonnet / Codex `gpt-5.6-terra` / `luna` | Worker       | 委譲せず自分で実装する                         |
 
-旧世代モデルは列挙しない。利用できない tier があるときだけ、使える旧モデルへフォールバックする。
+旧世代モデルは列挙しない。利用できない tier があるときだけ、使える旧モデルへフォールバックする。委譲は同一 platform 内で完結させ、他方の platform（Claude/Codex）の Worker へ跨ぐのはユーザーが明示的に指示した場合に限る。
 
 完了条件: 自分がどちらの tier かを言語化できている。
 
@@ -66,20 +66,35 @@ Claude:
 Agent(subagent_type: "implementer", prompt: <タスク定義>)
 ```
 
-`implementer` は frontmatter で `model: sonnet` を持つ。通常委譲では `model` を渡さない。難しいデバッグ、セキュリティレビュー、設計判断を含む Worker 作業だけ `model: "opus"` で昇格させる（呼び出し時の override が frontmatter より優先される）。
+`implementer` は frontmatter で `model: sonnet` を持つ。通常委譲では `model` を渡さない（呼び出し時の override が frontmatter より優先される）。
 
 Codex:
 
 ```text
 spawn_agent(
   agent_type: "worker",
-  model: "gpt-5.6-terra",
+  model: "gpt-5.6-luna",
   message: <タスク定義>,
   task_name: <短い一意な名前>
 )
 ```
 
-Codex は組み込みのサブエージェント機能を使う。サブエージェントは親の workspace と sandbox を引き継ぐため、Codex MCP や `codex exec` で別プロセスを起動しない。Codex では reasoning effort の引き上げ（xhigh → max）もモデル変更と並ぶ昇格手段で、難タスクに限って使う。
+Codex は組み込みのサブエージェント機能を使う。サブエージェントは親の workspace と sandbox を引き継ぎ、Codex MCP や `codex exec` の別プロセス起動は使わない。
+
+### 昇格
+
+次のいずれかを含む Worker タスクに限り、既定 Worker から昇格させる。判定基準は両 platform 共通。
+
+- 難しいデバッグ（再現困難、原因未特定）
+- セキュリティ境界に触る変更、セキュリティレビュー
+- 複数案のトレードオフ判断を含む実装
+
+昇格先は platform ごとに固定する。
+
+| platform | 既定 Worker    | 昇格手段（順に検討）                                         |
+| -------- | -------------- | ------------------------------------------------------------ |
+| Claude   | `sonnet`       | `model: "opus"` を呼び出し時に渡す                           |
+| Codex    | `gpt-5.6-luna` | ① reasoning effort 引き上げ（xhigh → max） ② `gpt-5.6-terra` |
 
 `gpt-5.6-sol` からの spawn は `model` 指定が事実上効かないバグがある。症状と回避策（V1 固定 / `agmsg-delegation` フォールバック）は [references/codex-spawn-model-bug.md](references/codex-spawn-model-bug.md) を読む。
 
