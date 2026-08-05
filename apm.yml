@@ -14,6 +14,7 @@ dependencies:
     - jey3dayo/apm-workspace/manual-skills#main
     - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
     - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+    - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
     - Jakubantalik/transitions-dev/skills/transitions-dev
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-dashboard
@@ -60,7 +61,6 @@ dependencies:
     - vercel-labs/agent-skills/skills/react-best-practices
     - shadcn/improve
     - fujibee/agmsg
-    - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke#main
   mcp:
     - name: context7
       registry: false
