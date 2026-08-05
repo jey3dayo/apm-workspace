@@ -61,6 +61,7 @@ dependencies:
     - vercel-labs/agent-skills/skills/react-best-practices
     - shadcn/improve
     - fujibee/agmsg
+    - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout#main
   mcp:
     - name: context7
       registry: false

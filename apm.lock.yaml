@@ -68,6 +68,44 @@ dependencies:
     .claude/skills/browser-harness/references/install.md: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
   content_hash: sha256:a2f89598e83c13691d7bd566e2bd986dfb32820dba8c6be71d74f752299c5dfd
   declared_license: MIT
+- repo_url: caad-develop/ai-butsukari-geiko
+  name: ai-butsukari-evidence-scout
+  host: github.com
+  resolved_commit: 3b7b471766cd8c195e46d02f61c810235dd59852
+  resolved_ref: main
+  version: unknown
+  virtual_path: .agents/skills/ai-butsukari-evidence-scout
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/ai-butsukari-evidence-scout
+  - .agents/skills/ai-butsukari-evidence-scout/SKILL.md
+  - .agents/skills/ai-butsukari-evidence-scout/evals/evals.json
+  - .agents/skills/ai-butsukari-evidence-scout/evals/files/common-sources.md
+  - .agents/skills/ai-butsukari-evidence-scout/evals/files/future-follow-up.md
+  - .agents/skills/ai-butsukari-evidence-scout/evals/files/unavailable-connector.md
+  - .agents/skills/ai-butsukari-evidence-scout/references/source-playbook.md
+  - .claude/skills/ai-butsukari-evidence-scout
+  - .claude/skills/ai-butsukari-evidence-scout/SKILL.md
+  - .claude/skills/ai-butsukari-evidence-scout/evals/evals.json
+  - .claude/skills/ai-butsukari-evidence-scout/evals/files/common-sources.md
+  - .claude/skills/ai-butsukari-evidence-scout/evals/files/future-follow-up.md
+  - .claude/skills/ai-butsukari-evidence-scout/evals/files/unavailable-connector.md
+  - .claude/skills/ai-butsukari-evidence-scout/references/source-playbook.md
+  deployed_file_hashes:
+    .agents/skills/ai-butsukari-evidence-scout/SKILL.md: sha256:a2aae99a14bfd9d6751f5055c6cf4ccbc8f2e72c8c8cfd563f8d14fe49dd2c84
+    .agents/skills/ai-butsukari-evidence-scout/evals/evals.json: sha256:5008efb0708ced4fd631a26ccbba6845a59974073461d88a046ddfafdb4d8cfc
+    .agents/skills/ai-butsukari-evidence-scout/evals/files/common-sources.md: sha256:6e18e91aa47aad2f060c7405d7b70600d7c0f777b55c636a93e863dc66889267
+    .agents/skills/ai-butsukari-evidence-scout/evals/files/future-follow-up.md: sha256:4e22ef55c18e94046b8e25cb66c9484526349ce2dc3beb28bc3c03217e094525
+    .agents/skills/ai-butsukari-evidence-scout/evals/files/unavailable-connector.md: sha256:7efbcb20f6a37623a2584dcf2ee14b89c68ef2a19c85b32cbeb47a7a05d34bcb
+    .agents/skills/ai-butsukari-evidence-scout/references/source-playbook.md: sha256:42836b106fb1fea3523cac3f7977be579a4951f34d1fe11e6804e2dc41ab9d3f
+    .claude/skills/ai-butsukari-evidence-scout/SKILL.md: sha256:a2aae99a14bfd9d6751f5055c6cf4ccbc8f2e72c8c8cfd563f8d14fe49dd2c84
+    .claude/skills/ai-butsukari-evidence-scout/evals/evals.json: sha256:5008efb0708ced4fd631a26ccbba6845a59974073461d88a046ddfafdb4d8cfc
+    .claude/skills/ai-butsukari-evidence-scout/evals/files/common-sources.md: sha256:6e18e91aa47aad2f060c7405d7b70600d7c0f777b55c636a93e863dc66889267
+    .claude/skills/ai-butsukari-evidence-scout/evals/files/future-follow-up.md: sha256:4e22ef55c18e94046b8e25cb66c9484526349ce2dc3beb28bc3c03217e094525
+    .claude/skills/ai-butsukari-evidence-scout/evals/files/unavailable-connector.md: sha256:7efbcb20f6a37623a2584dcf2ee14b89c68ef2a19c85b32cbeb47a7a05d34bcb
+    .claude/skills/ai-butsukari-evidence-scout/references/source-playbook.md: sha256:42836b106fb1fea3523cac3f7977be579a4951f34d1fe11e6804e2dc41ab9d3f
+  content_hash: sha256:d7fae943c96effd626576b7a9ee4f132b83afe990b23c0106d73e15e91a0d420
 - repo_url: caad-develop/claude-code-marketplace
   name: ai-banzuke
   host: github.com
@@ -7283,6 +7321,69 @@ deployments:
   - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
   active_owner: caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
   content_hash: sha256:b51c51e43a75530bcf5bfc0e14d218d9938bfd8b3031ce56c6ceb608b973bb47
+- kind: project-relative
+  target: agents
+  value: .agents/skills/ai-butsukari-evidence-scout
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  active_owner: caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  content_hash: null
+- kind: project-relative
+  target: agents
+  value: .agents/skills/ai-butsukari-evidence-scout/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  active_owner: caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  content_hash: sha256:a2aae99a14bfd9d6751f5055c6cf4ccbc8f2e72c8c8cfd563f8d14fe49dd2c84
+- kind: project-relative
+  target: agents
+  value: .agents/skills/ai-butsukari-evidence-scout/evals/evals.json
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  active_owner: caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  content_hash: sha256:5008efb0708ced4fd631a26ccbba6845a59974073461d88a046ddfafdb4d8cfc
+- kind: project-relative
+  target: agents
+  value: .agents/skills/ai-butsukari-evidence-scout/evals/files/common-sources.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  active_owner: caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  content_hash: sha256:6e18e91aa47aad2f060c7405d7b70600d7c0f777b55c636a93e863dc66889267
+- kind: project-relative
+  target: agents
+  value: .agents/skills/ai-butsukari-evidence-scout/evals/files/future-follow-up.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  active_owner: caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  content_hash: sha256:4e22ef55c18e94046b8e25cb66c9484526349ce2dc3beb28bc3c03217e094525
+- kind: project-relative
+  target: agents
+  value: .agents/skills/ai-butsukari-evidence-scout/evals/files/unavailable-connector.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  active_owner: caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  content_hash: sha256:7efbcb20f6a37623a2584dcf2ee14b89c68ef2a19c85b32cbeb47a7a05d34bcb
+- kind: project-relative
+  target: agents
+  value: .agents/skills/ai-butsukari-evidence-scout/references/source-playbook.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  active_owner: caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  content_hash: sha256:42836b106fb1fea3523cac3f7977be579a4951f34d1fe11e6804e2dc41ab9d3f
 - kind: project-relative
   target: agents
   value: .agents/skills/animation-vocabulary
@@ -15509,6 +15610,69 @@ deployments:
   - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
   active_owner: caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
   content_hash: sha256:b51c51e43a75530bcf5bfc0e14d218d9938bfd8b3031ce56c6ceb608b973bb47
+- kind: project-relative
+  target: claude
+  value: .claude/skills/ai-butsukari-evidence-scout
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  active_owner: caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/ai-butsukari-evidence-scout/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  active_owner: caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  content_hash: sha256:a2aae99a14bfd9d6751f5055c6cf4ccbc8f2e72c8c8cfd563f8d14fe49dd2c84
+- kind: project-relative
+  target: claude
+  value: .claude/skills/ai-butsukari-evidence-scout/evals/evals.json
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  active_owner: caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  content_hash: sha256:5008efb0708ced4fd631a26ccbba6845a59974073461d88a046ddfafdb4d8cfc
+- kind: project-relative
+  target: claude
+  value: .claude/skills/ai-butsukari-evidence-scout/evals/files/common-sources.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  active_owner: caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  content_hash: sha256:6e18e91aa47aad2f060c7405d7b70600d7c0f777b55c636a93e863dc66889267
+- kind: project-relative
+  target: claude
+  value: .claude/skills/ai-butsukari-evidence-scout/evals/files/future-follow-up.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  active_owner: caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  content_hash: sha256:4e22ef55c18e94046b8e25cb66c9484526349ce2dc3beb28bc3c03217e094525
+- kind: project-relative
+  target: claude
+  value: .claude/skills/ai-butsukari-evidence-scout/evals/files/unavailable-connector.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  active_owner: caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  content_hash: sha256:7efbcb20f6a37623a2584dcf2ee14b89c68ef2a19c85b32cbeb47a7a05d34bcb
+- kind: project-relative
+  target: claude
+  value: .claude/skills/ai-butsukari-evidence-scout/references/source-playbook.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  active_owner: caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout
+  content_hash: sha256:42836b106fb1fea3523cac3f7977be579a4951f34d1fe11e6804e2dc41ab9d3f
 - kind: project-relative
   target: claude
   value: .claude/skills/animation-vocabulary
