@@ -100,7 +100,7 @@ global MCP はリポジトリをまたいで常時使う基盤だけに限定し
 
 ## Git Worktree 方針
 
-- 実装開始時に隔離 workspace が必要かの判断は `superpowers-using-git-worktrees` スキル、操作仕様・`.worktrees/` 運用・作成削除手順は `git-worktree` スキルが正本
+- 操作仕様・`.worktrees/` 運用・作成削除手順は `git-worktree` スキルが正本
 - worktree 操作は `git wt` を優先し、native `git worktree` は低レベルの cleanup・診断のみ
 - コミット分割とメッセージ作成は `atomic-commit` スキルが担当し、worktree 操作の判断を持たせない
 
