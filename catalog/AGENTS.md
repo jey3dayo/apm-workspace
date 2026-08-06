@@ -8,16 +8,17 @@
 
 ### 検証粒度
 
-| タイミング                                   | 実行する確認                                                |
-| -------------------------------------------- | ----------------------------------------------------------- |
-| 実装中・小さな修正後                         | touched file の format、変更箇所の関連テスト                |
-| 型・lint・テストに影響する変更後             | 該当領域の focused check（typecheck / lint / unit test）    |
-| 共通基盤・依存・設定・永続データ構造の変更後 | 早めに full gate へ昇格                                     |
-| commit 前                                    | `git diff --check`、staged files の format / lint           |
-| push / PR / deploy 前                        | full gate（repo 定義の `check` / `test` / `ci` / `verify`） |
+| タイミング                                           | 実行する確認                                                |
+| ---------------------------------------------------- | ----------------------------------------------------------- |
+| 実装中・小さな修正後                                 | touched file の format、変更箇所の関連テスト                |
+| 型・lint・テストに影響する変更後                     | 該当領域の focused check（typecheck / lint / unit test）    |
+| 共通基盤・依存・設定・生成物・永続データ構造の変更後 | 早めに full gate へ昇格                                     |
+| commit 前                                            | `git diff --check`、staged files の format / lint           |
+| push / PR / deploy 前                                | full gate（repo 定義の `check` / `test` / `ci` / `verify`） |
 
 - lefthook が設定されているリポジトリでは pre-commit / pre-push フックを full gate とみなす。pre-push フックは `git push` 時に走るため、push 前に確認したい場合は `lefthook run pre-push` を手動実行する
 - full gate を実行しない場合は、報告時に実行した軽い確認と省略理由を短く明示する
+- 非軽微な変更は外部共有前に、通常のコードレビュー観点での独立レビューを行う（指摘対応は最大3回。sol-advisor 標準レーンの新規 Sol レビューはこれを満たす）
 
 ## 停止・確認ポリシー
 
@@ -33,6 +34,7 @@
 
 ## 開発原則
 
+- エラーを握りつぶさない。境界で処理し、呼び出し元へ意味のある形で伝播する
 - linter の warning / error はコード側の inline disable コメントでなく、設定ファイル側のルール調整で対策する。正当な理由で恒常的に出るパターンはルールのオプションや scoped override で、意図をコメント付きで設定に記録する。inline disable は「その1箇所だけが真に例外」で設定に一般化すると他の違反を隠す場合に限る
 - コードコメントは、コードだけでは読み取れない非自明な制約・判断理由・意図のみ書く。検討履歴や複数案の比較は PR・設計文書・ADR へ置く
 - テストはユーザー価値・業務ルール・外部契約・不具合の再発防止に直結する振る舞いを優先し、実装詳細（内部呼び出し回数、要件に根拠のない数・順序・version の固定）への依存を避ける。数・順序・version 自体が明示された契約であるときは固定してよく、その根拠をテスト名またはコメントで示す
@@ -45,10 +47,11 @@ tier 対応表、委譲する / しないの判定、タスク分割基準、Cla
 
 ### 推奨ワークフロー（経路の選択）
 
+- 役割分担: `orchestrator-worker` は委譲判定・タスク分割の正本、Codex での transport は `sol-advisor`、`agmsg-delegation` は sol-advisor 外の fallback
 - 組み込みサブエージェント（Agent tool / `spawn_agent`）が使える場合はそれが正規経路
 - Codex では `sol-advisor` plugin（`$sol-advisor:orchestration`）を推奨。標準レーンは Sol → Terra / High 実装 → 新規 Sol レビュー。コスパ優先時は依頼文に「Luna タスクレーンを使って」と明示すると Luna / Max の user-visible task へ委譲される（明示しない限り Terra。Luna が使えない場合は Terra へフォールバックせず停止する）
-- Luna は高コスパ（同一トークン量でクレジット消費が Sol の約 1/25、Terra の約 1/10）だが、共有クレジットプールと利用上限を消費する。無料・無制限ではない
-- Luna の直接起動は `codex -m gpt-5.6-luna`（`codex exec -m gpt-5.6-luna` も同様）
+- Luna は同一トークン量なら Sol より大幅に安い（比率は[公式 rate card](https://help.openai.com/en/articles/20001106-codex-rate-card)を参照）が、共有クレジットプールと利用上限を消費する。無料・無制限ではない
+- Luna の直接起動は `codex -m gpt-5.6-luna`（`codex exec -m gpt-5.6-luna` も同様）。これは Luna タスクレーンとは別物
 - spawn 面の制約で組み込み経路が塞がっている場合（Codex sol → luna 等）は `agmsg-delegation` スキルへ切り替える
 - sol-advisor の導入・更新手順は `docs/package-decisions.md` を参照
 
@@ -137,4 +140,4 @@ global MCP はリポジトリをまたいで常時使う基盤だけに限定し
 ## 禁止事項
 
 - 既存テスト・重要ファイルの無断削除
-- any 型の導入
+- any 型・型アサーションの導入
