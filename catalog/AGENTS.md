@@ -114,6 +114,15 @@ full gate を実行しない場合は、報告時に実行した軽い確認と�
 
 tier 対応表、委譲する / しないの判定、タスク分割基準、Claude / Codex での Worker 起動方法は `orchestrator-worker` スキルを正本とする。
 
+### 推奨ワークフロー（経路の選択）
+
+- 組み込みサブエージェント（Agent tool / `spawn_agent`）が使える場合はそれが正規経路
+- Codex では `sol-advisor` plugin（`$sol-advisor:orchestration`）を推奨。標準レーンは Sol → Terra / High 実装 → 新規 Sol レビュー。コスパ優先時は依頼文に「Luna タスクレーンを使って」と明示すると Luna / Max の user-visible task へ委譲される（明示しない限り Terra。Luna が使えない場合は Terra へフォールバックせず停止する）
+- Luna は高コスパ（同一トークン量でクレジット消費が Sol の約 1/25、Terra の約 1/10）だが、共有クレジットプールと利用上限を消費する。無料・無制限ではない
+- Luna の直接起動は `codex -m gpt-5.6-luna`（`codex exec -m gpt-5.6-luna` も同様）
+- spawn 面の制約で組み込み経路が塞がっている場合（Codex sol → luna 等）は `agmsg-delegation` スキルへ切り替える
+- sol-advisor の導入・更新手順は `docs/package-decisions.md` を参照
+
 ### agent 定義側のモデル割り当て
 
 - 各 agent のモデルは `catalog/agents/*.md` の frontmatter `model:` に書く。呼び出し時の指定漏れがあっても frontmatter の割り当てで動く
