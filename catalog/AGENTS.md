@@ -4,8 +4,18 @@
 
 ## Definition of Done (DoD)
 
-- 作業中は変更範囲に応じた軽い確認（touched file の format、関連テスト）に留め、push / PR / deploy など外部共有の直前に full gate（repo 定義の `check` / `test` / `ci` / `verify`）を実行する
-- 共通基盤・依存・設定・生成物・永続データ構造の変更後は、早めに full gate へ昇格する
+作業中は変更範囲に応じた軽い確認に留め、外部共有の直前に full gate を実行する。
+
+### 検証粒度
+
+| タイミング                                   | 実行する確認                                                |
+| -------------------------------------------- | ----------------------------------------------------------- |
+| 実装中・小さな修正後                         | touched file の format、変更箇所の関連テスト                |
+| 型・lint・テストに影響する変更後             | 該当領域の focused check（typecheck / lint / unit test）    |
+| 共通基盤・依存・設定・永続データ構造の変更後 | 早めに full gate へ昇格                                     |
+| commit 前                                    | `git diff --check`、staged files の format / lint           |
+| push / PR / deploy 前                        | full gate（repo 定義の `check` / `test` / `ci` / `verify`） |
+
 - lefthook が設定されているリポジトリでは pre-commit / pre-push フックを full gate とみなす。pre-push フックは `git push` 時に走るため、push 前に確認したい場合は `lefthook run pre-push` を手動実行する
 - full gate を実行しない場合は、報告時に実行した軽い確認と省略理由を短く明示する
 
