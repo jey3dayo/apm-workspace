@@ -25,6 +25,20 @@
   ここを再生成しない。
 - 再検討するなら: APM が `~/.cursor/mcp.json` への user-scope 書き込みを正式サポートした時点。
 
+## Sol Advisor (`DannyMac180/sol-advisor`)
+
+- Status: 採用・Codex plugin 管理（APM 管理外、2026-08-06）
+- 正本: `DannyMac180/sol-advisor` の Codex marketplace plugin
+- 理由: orchestration skill だけでなく、Codex plugin 登録、custom-agent TOML、付属の
+  companion installer を一体で利用する。APM では skill 部分しか再現できず、plugin と
+  companion agent の正本が分裂するため、root `apm.yml` / `apm.lock.yaml` には登録しない。
+- 現在の配置: 初回は `codex plugin marketplace add DannyMac180/sol-advisor --ref main` と
+  `codex plugin add sol-advisor@sol-advisor` で導入する。更新時は
+  `codex plugin marketplace upgrade sol-advisor` の後に plugin を再追加し、native mode 用
+  agent は plugin 付属の `scripts/install-agents.sh` で `~/.codex/agents/` に同期する。
+- 再検討するなら: APM が `.codex-plugin` と Codex custom-agent TOML を end-to-end で
+  配布・更新できるようになった時点で、APM 管理への統合を検討する。
+
 ## emilkowalski/skills (emil-design-eng ほか)
 
 - Status: 採用・global（2026-07-16）
