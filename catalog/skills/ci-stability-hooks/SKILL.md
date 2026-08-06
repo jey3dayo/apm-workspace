@@ -46,6 +46,7 @@ Use this split unless the repo contract says otherwise:
 - Put the repository CI-equivalent gate in `pre-push`.
 - Prefer registering `mise run ci`'s constituent sub-tasks as separate `pre-push` jobs over one aggregate `run: mise run ci` job. An aggregate job only reports pass/fail for the whole gate; separate jobs show which stage failed and let Lefthook's per-job summary track progress. Inspect the aggregate task definition (e.g. `mise run ci`'s `run` block or `depends`) to enumerate its stages, and mirror that same order as one `pre-push` job per stage.
 - Fall back to one aggregate `run: mise run ci` (or `mise run check`, `pnpm run ci`, `pnpm run check`) only when the aggregate task has no discoverable sub-tasks to split, or when the repo contract explicitly asks for a single gate.
+- Scope each `pre-push` job with `glob` to the file classes it can actually fail on. Since Lefthook 1.10.10, a job whose `glob` matches no changed files is skipped even when `run` contains no file template, so pushes that touch none of a job's inputs (e.g. no `terraform/**/*.tf` for a Terraform lint job) skip that job entirely while CI still runs everything. Include the check's non-obvious inputs in the glob: generated files it diffs against, the generator script, lockfiles or shared config that can break it. Leave a job unglobbed when nearly every push affects it or its inputs cannot be enumerated safely.
 
 For `pre-commit`, prefer named jobs per tool instead of one aggregate `mise run format`: a failed aggregate hides which formatter failed, while separate jobs make failures diagnosable. `mise run format` remains useful as a full auto-format pass before push or PR.
 
@@ -85,16 +86,24 @@ pre-commit:
 pre-push:
   jobs:
     - name: format:check
+      glob: "*.{js,jsx,ts,tsx,json,jsonc,md,yml,yaml}"
       run: mise run format:check
     - name: test:unit:ci
+      glob: "*.{js,jsx,ts,tsx,json,jsonc}"
       run: mise run test:unit:ci
     - name: lint
       run: mise run lint
     - name: test:rust
+      glob: "*.rs"
       run: mise run test:rust
     - name: build
       run: mise run build
+    - name: lint:terraform
+      glob: "terraform/**/*.tf"
+      run: mise run lint:terraform
 ```
+
+For `pre-push`, globs are matched against the files changed in the commits being pushed; verify skip behavior cheaply with `lefthook run pre-push` on a branch that is up to date with its remote (zero push files → every globbed job reports "skip: no matching push files").
 
 Lefthook runs a job list's entries sequentially by default (no `parallel: true`), so ordering the split jobs to match the aggregate task's own stage order preserves fail-fast behavior while naming which stage failed.
 
