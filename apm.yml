@@ -62,6 +62,16 @@ dependencies:
     - shadcn/improve
     - fujibee/agmsg
     - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout#main
+    - MiniMax-AI/MiniMax-H3/skills/3d-animation-short-generator
+    - MiniMax-AI/MiniMax-H3/skills/brand-promo-video-generator
+    - MiniMax-AI/MiniMax-H3/skills/co-op-game-intro-generator
+    - MiniMax-AI/MiniMax-H3/skills/h3-prompt-writing
+    - MiniMax-AI/MiniMax-H3/skills/handdrawn-live-video-generator
+    - MiniMax-AI/MiniMax-H3/skills/minimalist-product-ad-generator
+    - MiniMax-AI/MiniMax-H3/skills/music-video-subtitle-generator
+    - MiniMax-AI/MiniMax-H3/skills/paper-collage-explainer-generator
+    - MiniMax-AI/MiniMax-H3/skills/papercraft-stop-motion-explainer
+    - cathrynlavery/diagram-design#a157f7616473d966d6f433cf0b4d4f1880603504
   mcp:
     - name: context7
       registry: false
