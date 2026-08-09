@@ -17,12 +17,10 @@ dependencies:
     - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
     - Jakubantalik/transitions-dev/skills/transitions-dev
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand
-    - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand-dashboard
     - agavra/tuicr/skills/tuicr
     - anthropics/claude-code/plugins/frontend-design/skills/frontend-design
     - browser-use/browser-harness
     - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review
-    - emilkowalski/skills/skills/animation-vocabulary
     - emilkowalski/skills/skills/apple-design
     - emilkowalski/skills/skills/emil-design-eng
     - emilkowalski/skills/skills/find-animation-opportunities
@@ -33,28 +31,20 @@ dependencies:
     - ibelick/ui-skills/skills/fixing-accessibility
     - ibelick/ui-skills/skills/fixing-metadata
     - ibelick/ui-skills/skills/fixing-motion-performance
+    - mattpocock/skills/skills/engineering/codebase-design
+    - mattpocock/skills/skills/engineering/domain-modeling
     - mattpocock/skills/skills/engineering/improve-codebase-architecture
-    - mattpocock/skills/skills/engineering/resolving-merge-conflicts
+    - mattpocock/skills/skills/engineering/prototype
+    - mattpocock/skills/skills/engineering/research
+    - mattpocock/skills/skills/engineering/setup-matt-pocock-skills
     - mattpocock/skills/skills/engineering/wayfinder
     - mattpocock/skills/skills/productivity/grilling
-    - mattpocock/skills/skills/productivity/handoff
-    - mattpocock/skills/skills/productivity/writing-great-skills
+    - mattpocock/skills/skills/productivity/writing-for-agents
     - millionco/react-doctor/skills/react-doctor
     - modem-dev/hunk/skills/hunk-review
     - git: nextlevelbuilder/ui-ux-pro-max-skill
       skills:
         - ui-ux-pro-max
-    - obra/superpowers/skills/brainstorming
-    - obra/superpowers/skills/dispatching-parallel-agents
-    - obra/superpowers/skills/executing-plans
-    - obra/superpowers/skills/finishing-a-development-branch
-    - obra/superpowers/skills/subagent-driven-development
-    - obra/superpowers/skills/systematic-debugging
-    - obra/superpowers/skills/test-driven-development
-    - obra/superpowers/skills/using-git-worktrees
-    - obra/superpowers/skills/using-superpowers
-    - obra/superpowers/skills/verification-before-completion
-    - obra/superpowers/skills/writing-plans
     - openai/skills/skills/.curated/gh-address-comments
     - openai/skills/skills/.curated/gh-fix-ci
     - openai/skills/skills/.curated/screenshot
