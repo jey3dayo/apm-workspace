@@ -4,6 +4,7 @@ description: >-
   agmsg + herdr で別プロセスの CC/Codex を worker / reviewer として起動し、
   タスク委譲またはレビュー外注を行う。orchestrator-worker の組み込み
   spawn_agent が使えない環境（Codex sol → luna 等)の手動経路。
+  agent / セッション間の引き継ぎ（CC → Codex 等）メッセージの書式も定義する。
 disable-model-invocation: true
 ---
 
@@ -14,6 +15,16 @@ disable-model-invocation: true
 既知の制約により Codex sol からの委譲は当面本スキルが実質的な標準経路になる（詳細は `orchestrator-worker` の `references/codex-spawn-model-bug.md`）。本スキルが新規プロセスで起動する `codex -m gpt-5.6-luna exec` は `spawn_agent` を経由しないため、このバグの影響を受けない。
 
 tier 判定・委譲判定・タスク分割基準は `orchestrator-worker` スキルが正本。本スキルは transport と lifecycle だけを定義する。
+
+## 引き継ぎ（handoff）メッセージ
+
+**委譲**（新しいタスクを渡す）と**引き継ぎ**（進行中の作業を別 agent / セッションが継続する）は渡す中身が違う。引き継ぎは以下の書式に従い、transport は同じ agmsg を使う。lifecycle は不要で、本文を送るだけでよい。
+
+- 他の artifact（spec、plan、ADR、issue、commit、diff）に既にある内容を本文へ複製せず、パスまたは URL で参照する
+- 受け取り側が呼ぶべきスキルを **suggested skills** として列挙する
+- API key、パスワード、個人情報は redact する
+- 次セッションの目的が指定されていれば、それに合わせて内容を取捨する（全経緯の要約より、その目的に必要な決定事項を優先する）
+- 保存が必要な場合は OS の一時ディレクトリへ置き、作業リポジトリへコミットしない
 
 ## Role を決める
 

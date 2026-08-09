@@ -53,6 +53,7 @@ tier 対応表、委譲する / しないの判定、タスク分割基準、Cla
 - Luna は同一トークン量なら Sol より大幅に安い（比率は[公式 rate card](https://help.openai.com/en/articles/20001106-codex-rate-card)を参照）が、共有クレジットプールと利用上限を消費する。無料・無制限ではない
 - Luna の直接起動は `codex -m gpt-5.6-luna`（`codex exec -m gpt-5.6-luna` も同様）。これは Luna タスクレーンとは別物
 - spawn 面の制約で組み込み経路が塞がっている場合（Codex sol → luna 等）は `agmsg-delegation` スキルへ切り替える
+- エージェント / セッション間の引き継ぎ（CC → Codex 等）は transport に `agmsg` を使い、本文は `agmsg-delegation` の引き継ぎメッセージ書式（artifact は参照渡し・suggested skills・secrets redact・次セッションの目的に合わせる）に従う
 - sol-advisor の導入・更新手順は `docs/package-decisions.md` を参照
 
 ### agent 定義側のモデル割り当て
