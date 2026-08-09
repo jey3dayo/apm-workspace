@@ -19,12 +19,9 @@ Done when TEAM, FROM, and TO are all known-good roster names.
 
 ## 2. Write the doc
 
-Read `~/.claude/skills/handoff/SKILL.md` (Codex: `~/.agents/skills/handoff/SKILL.md`) and follow it, with two overrides:
+Follow the handoff message format in `agmsg-delegation`（「引き継ぎ（handoff）メッセージ」section）with one override: save to `<repo root>/tmp/baton/<topic>.md`, not the OS temp directory. That format assumes a same-user pickup; a baton crosses agents, so the doc lives where the peer can reach it.
 
-- Save to `<repo root>/tmp/baton/<topic>.md`, not the OS temp directory. Upstream assumes a same-user pickup; a baton crosses agents, so the doc lives where the peer can reach it.
-- Treat the skill's arguments as the next session's focus.
-
-Both files are APM-deployed targets of `mattpocock/skills` — read them, never edit them.
+Treat this skill's arguments as the next session's focus.
 
 Done when the file exists and its "suggested skills" section names skills the recipient can actually invoke.
 

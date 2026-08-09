@@ -98,7 +98,7 @@ Codex は組み込みのサブエージェント機能を使う。サブエー�
 
 `gpt-5.6-sol` からの spawn は `model` 指定が事実上効かないバグがある。症状と回避策（V1 固定 / `agmsg-delegation` フォールバック）は [references/codex-spawn-model-bug.md](references/codex-spawn-model-bug.md) を読む。
 
-独立タスクは**同一レスポンス内で複数呼び出す**と並列に走る。1レスポンス1呼び出しは直列になる。プロンプトの組み立て方は `dispatching-parallel-agents` に従い、Orchestrator の会話履歴を引き継がせず、必要な文脈だけを構築して渡す。計画ファイルを順に消化する運用は `subagent-driven-development` を使う。
+独立タスクは**同一レスポンス内で複数呼び出す**と並列に走る。1レスポンス1呼び出しは直列になる。Orchestrator の会話履歴は引き継がせず、各 Worker には必要な文脈だけを構築して渡す（Worker は前提を共有していないので、対象ファイル・完了条件・検証コマンドを明示する）。計画ファイルを順に消化して都度レビューする運用は `review-fix-loop` を使う。
 
 完了条件: 全タスクが Worker へ渡り、独立タスクは並列で起動している。
 

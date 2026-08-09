@@ -34,8 +34,8 @@ Include these recommendations in both the review findings and the copy prompt wh
 | Condition                                                                                                                                           | Required handling                                                                                                                                                    |
 | --------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | UI/UX, visual design, frontend pages/components, responsive behavior, interaction states, accessibility, or visual QA                               | Require `ui-ux-pro-max` and `frontend-design`. Review UI/UX, accessibility, responsive behavior, interaction states, visual consistency, and verification coverage.  |
-| Three or more mostly independent implementation tasks with low shared-file or shared-boundary conflict, and each task has a clear verification path | Recommend `subagent-driven-development` for same-session execution.                                                                                                  |
-| Tightly coupled implementation, unclear architecture, one large shared file, or unresolved requirements                                             | Do not recommend `subagent-driven-development`; ask for decomposition or clarification first.                                                                        |
+| Three or more mostly independent implementation tasks with low shared-file or shared-boundary conflict, and each task has a clear verification path | Recommend same-session parallel execution via the built-in subagents (Agent tool / `spawn_agent`).                                                                   |
+| Tightly coupled implementation, unclear architecture, one large shared file, or unresolved requirements                                             | Do not recommend parallel subagents; ask for decomposition or clarification first.                                                                                   |
 | Existing superpowers plan                                                                                                                           | Preserve the superpowers execution order, checklist style, and handoff conventions. Do not replace the plan's workflow; provide delta-style revision instructions.   |
 | Plan creation or major redesign is still needed                                                                                                     | Recommend revising the plan before execution. Do not tell the next agent to execute immediately.                                                                     |
 | Deployment, ECS, production, migration, destructive operation, cost-incurring operation, or external side effect is present                         | Treat review as a pre-execution safety gate. Require explicit user approval before execution and include rollback/verification gaps as review findings when missing. |
@@ -104,7 +104,7 @@ Instructions:
 - Preserve the original scope unless a finding says the scope is unsafe or incomplete.
 - Preserve superpowers conventions if this is a superpowers implementation plan.
 - If UI/frontend work is present, include UI/UX, accessibility, responsive, interaction-state, and visual QA requirements.
-- If subagent-driven-development is appropriate, decompose into independent tasks with disjoint ownership and verification steps.
+- If parallel subagents are appropriate, decompose into independent tasks with disjoint ownership and verification steps.
 - If execution is not yet safe, return an improved plan and open questions instead of implementation steps.
 
 Expected output:
@@ -132,10 +132,10 @@ If a category has no findings, write `- None found.` under that category. Keep t
 
 ## Common Failure Modes
 
-| Failure                                        | Correction                                                                            |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Reviewing only prose quality                   | Review buildability, risk, verification, sequence, and handoff clarity.               |
-| Adding UI skills only to the copy prompt       | Also include UI-specific review findings when UI/frontend content exists.             |
-| Over-recommending subagents                    | Recommend `subagent-driven-development` only when tasks are separable and verifiable. |
-| Telling the next agent to execute unsafe plans | Keep default mode as revision-only until blockers are resolved.                       |
-| Rewriting superpowers plans from scratch       | Preserve their conventions and provide delta-style fixes.                             |
+| Failure                                        | Correction                                                                 |
+| ---------------------------------------------- | -------------------------------------------------------------------------- |
+| Reviewing only prose quality                   | Review buildability, risk, verification, sequence, and handoff clarity.    |
+| Adding UI skills only to the copy prompt       | Also include UI-specific review findings when UI/frontend content exists.  |
+| Over-recommending subagents                    | Recommend parallel subagents only when tasks are separable and verifiable. |
+| Telling the next agent to execute unsafe plans | Keep default mode as revision-only until blockers are resolved.            |
+| Rewriting superpowers plans from scratch       | Preserve their conventions and provide delta-style fixes.                  |

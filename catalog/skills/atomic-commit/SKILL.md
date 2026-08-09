@@ -11,7 +11,7 @@ description: >
 
 変更ファイルを論理的な最小単位に分割し、1グループ = 1コミットで順番にコミットする。git コマンドは raw `git` を基本にする。
 
-worktree の作成・切替・削除や、隔離 workspace が必要かの判断は `using-git-worktrees` / `git-worktree` に委ねる。
+worktree の作成・切替・削除や、隔離 workspace が必要かの判断は `git-worktree` に委ねる。
 
 ## ワークフロー
 

@@ -9,7 +9,7 @@ description: |
   未使用 export removal, 共通 helper extraction, validation / Result /
   repository boundary, folder ownership, or cleanup-only plans. Do not use
   for feature implementation or task execution; use the normal
-  implementation flow or executing-plans instead.
+  implementation flow or review-fix-loop instead.
 ---
 
 # Refactoring - Integrated TypeScript/JavaScript/React Refactoring Workflow

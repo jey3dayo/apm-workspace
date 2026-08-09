@@ -9,7 +9,7 @@ description: Use when managing Git worktrees with `git wt` or `git worktree`, es
 
 Use `git wt` for normal list, switch/create, rename, and delete flows. Drop to native `git worktree` only when you need low-level cleanup or diagnosis.
 
-This skill owns command syntax and troubleshooting. It does not decide whether a new isolated workspace should be created for feature work; use `using-git-worktrees` for that workflow decision. PR 作成から統合までの一連フローや、追加ディレクトリ不要の通常ブランチ運用はこのスキルの対象外。
+This skill owns command syntax and troubleshooting. 隔離 workspace を新規に作るべきかどうかの判断自体（通常ブランチで足りるか、worktree を分けるか）はこのスキルの対象外で、並行作業やファイル衝突の有無から判断する。PR 作成から統合までの一連フローも対象外。
 
 ## First Pass
 
