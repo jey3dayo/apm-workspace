@@ -46,8 +46,8 @@
   - `skills/emil-design-eng`
   - `skills/review-animations`
   - `skills/improve-animations`
-  - `skills/animation-vocabulary`
   - `skills/find-animation-opportunities`
+  - `skills/apple-design`
 - 理由: UI Skills ディレクトリ精査で選定。Emil Kowalski のデザインエンジニアリング哲学
   （アニメーション判断フレームワーク、easing/duration 基準、Sonner 原則）に特化しており、
   `frontend-design`（生成方向）や `baseline-ui`（高速 deslop）と役割が重ならない。
@@ -55,6 +55,9 @@
   （レビュー・監査プラン・用語逆引き・アニメーション機会発見）も併せて導入。
   `find-animation-opportunities` は read-only でアニメーション追加候補を提案するのみ、
   実装は行わない点に注意（`improve-animations` / `review-animations` と役割分担）。
+- 撤去: `animation-vocabulary`（2026-08-09）。用語逆引きはモデルが素で答えられるため、
+  trigger を持つスキルとして常駐させる価値がない。`/review` `/fix` `/find` 系のように
+  「頼みたい作業の完成品プロンプト」になる verb スキルは残す。
 - 見送った同群: `vitest` / `pnpm`（モデル既知 + mise/lefthook 運用と衝突しうる）、
   `12-principles-of-animation`（`fixing-motion-performance` + `transitions-dev` でカバー）、
   `playwright-cli`（`browser-harness` で代替）、`shadcn`（`ui-styling` でカバー）。
@@ -294,3 +297,28 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
   [`docs/skill-inventory.md`](skill-inventory.md) の
   「検証中のレビュー・アニメーション系スキル」表を正とする。
 - 再導入する場合: 表の撤去基準を満たさなくなった実運用上の理由を本ファイルに追記してから戻す。
+
+## superpowers / mattpocock 系の再編（2026-08-09）
+
+- Status: `obra/superpowers` 全 11 スキルを撤去、`mattpocock/skills` を兄弟込みで揃える
+- 撤去: `brainstorming` / `dispatching-parallel-agents` / `executing-plans` /
+  `finishing-a-development-branch` / `subagent-driven-development` /
+  `systematic-debugging` / `test-driven-development` / `using-git-worktrees` /
+  `using-superpowers` / `verification-before-completion` / `writing-plans`、
+  および `mattpocock/skills` の `resolving-merge-conflicts` と `handoff`
+- 理由: superpowers は「手順を飛ばす・検証せず完了宣言する」世代のモデルへの矯正として
+  設計されたもので、その思想は本体の既定挙動と組み込み subagent（Agent tool /
+  `spawn_agent`）へ吸収された。`using-git-worktrees` は自前の `git-worktree` と、
+  計画系は `prepare-goal` / `review-plan` / `review-fix-loop` と役割が重複していた
+- `handoff` の 4 原則（artifact は参照渡し・suggested skills・secrets redact・
+  次セッションの目的に合わせる）は `agmsg-delegation` の「引き継ぎ（handoff）メッセージ」
+  セクションへ移植し、`baton` はそこを参照する。外部 8 行スキルへの依存を解消した
+- 追加: `codebase-design` / `domain-modeling` / `research` / `prototype` /
+  `setup-matt-pocock-skills`。`wayfinder` と `improve-codebase-architecture` は
+  これらを前提に相互参照する設計で、単体では参照先が空振りしていた
+- `writing-great-skills` は上流で `writing-for-agents` にリネーム（スキル本文に加え
+  AGENTS.md / CLAUDE.md の書き方も対象）。manifest を差し替えた
+- 残した判断: `browser-harness`（pi / opencode 向けの最低保証ブラウザ能力）、
+  `screenshot`（Win / Mac / Linux 対応。Mac 専用の `peekaboo` を撤去して一本化）、
+  `thermo-nuclear-code-quality-review`（レビュー文化の共通言語）、
+  `emil-design-eng`、React 系（`react-doctor` / `react-best-practices`）
