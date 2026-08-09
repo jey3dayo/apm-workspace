@@ -97,7 +97,7 @@ global MCP はリポジトリをまたいで常時使う基盤だけに限定し
 - global の実体は root `apm.yml` の `mcp:` を source of truth とし、固定リストをここに持たない（例: `mcp-simple-voicevox`（通知）、`context7`（current docs 確認）など）
 - SaaS への接続は「アプリ側プラグイン / コネクタ（claude.ai・ChatGPT） > `apm.yml`（external skill / MCP） > catalog skill」の優先順で選び、上位が使えるなら下位で二重管理しない。アプリ側を優先するのは、認証・トークン更新・ツール定義のメンテナンスがアプリ側に集約されるため
 - 片側のアプリにしかプラグイン / コネクタが無い場合は APM 管理にして両方へ配ってよい。両側に揃ったら撤去を検討する。接続状況の一覧は `~/.apm/docs/saas-connectors.md`、撤去判断の記録は `docs/package-decisions.md` を参照
-- repo-local / on-demand: `tauri-mcp-server`（Tauri repo）、`peekaboo`（画面操作が必要なときだけ）
+- repo-local / on-demand: `tauri-mcp-server`（Tauri repo）など。デスクトップ / OS レベルのスクリーンショットは `screenshot` スキル（Win / Mac / Linux 対応）を使い、画面操作 MCP は必要になった repo だけに on-demand で入れる
 - ブラウザ操作:
   - 通常操作（クリック・フォーム入力・スクショ・コンソール確認）は `claude-in-chrome` または Codex Chrome アドオン
   - `chrome-devtools` は Lighthouse・パフォーマンストレース・ヒープスナップショットなど DevTools 固有分析が必要な repo だけに repo-local で追加
