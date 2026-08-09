@@ -10,9 +10,21 @@
 !/.apm/skills/
 !/.apm/skills/**
 /private-skills
+# Deployed skill copies are generated state; only workspace-only symlink bridges stay tracked
+/.agents/skills/*
+!/.agents/skills/agent-curation
+!/.agents/skills/find-skills
+!/.agents/skills/skill-auditor
+/.claude/skills/*
+!/.claude/skills/agent-curation
+!/.claude/skills/find-skills
+!/.claude/skills/skill-auditor
 /.claude/settings.local.json
 /.claude/skill-report/
 /.vscode/mcp.json
+/.codex/config.toml
+/.cursor/mcp.json
+/opencode.json
 
 apm_modules/
 
