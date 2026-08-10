@@ -116,7 +116,9 @@ depends = ["validate:workspace", "validate:catalog"]
 
 [tasks."test:all"]
 description = "Run both behavioral suites for the workspace scripts"
-depends = ["test", "test:sh"]
+# Serial on purpose: both suites drive temp installs and sync the same deployed
+# targets, so running them in parallel races on shared workspace state.
+run = [{ task = "test" }, { task = "test:sh" }]
 
 [tasks."format:markdown"]
 description = "Format Markdown files in the ~/.apm workspace"
