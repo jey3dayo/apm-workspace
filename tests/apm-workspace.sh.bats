@@ -1,12 +1,18 @@
 #!/usr/bin/env bats
 #
-# Behavioral unit tests for the pure, side-effect-free helpers in
-# scripts/apm-workspace.sh. Sourcing the script from bats leaves
-# ${BASH_SOURCE[0]} != $0, so the bottom-of-file dispatch guard keeps the
-# command dispatch from running on load.
+# Behavioral unit tests for scripts/apm-workspace.sh: the pure,
+# side-effect-free helpers, the public command dispatch surface (invoked as a
+# subprocess), and fixture-backed guards such as assert_catalog_stage_safety
+# that protect the tracked catalog from destructive resets. Sourcing the
+# script from bats leaves ${BASH_SOURCE[0]} != $0, so the bottom-of-file
+# dispatch guard keeps the command dispatch from running on load.
 
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
+  # Sourcing the script re-derives its own REPO_ROOT from $0 (the bats
+  # runner), clobbering the value above. Subprocess-invocation tests need the
+  # real repo root, so keep a copy that survives sourcing.
+  SCRIPT_UNDER_TEST="$REPO_ROOT/scripts/apm-workspace.sh"
   source "$REPO_ROOT/scripts/apm-workspace.sh"
 }
 
@@ -311,4 +317,210 @@ EOF
   run is_path_under_dir "$dir" "$dir"
   [ "$status" -eq 0 ]
   rm -rf "$dir"
+}
+
+# --- public command dispatch surface ----------------------------------------
+
+@test "help lists the current public command set" {
+  run bash "$SCRIPT_UNDER_TEST" help
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"refresh"* ]]
+  [[ "$output" == *"validate:catalog"* ]]
+  [[ "$output" == *"prepare:catalog"* ]]
+  [[ "$output" == *"install:catalog"* ]]
+  [[ "$output" == *"apply:skills:local"* ]]
+  [[ "$output" == *"repair:local-package-cache"* ]]
+  [[ "$output" == *"smoke:catalog"* ]]
+  [[ "$output" == *"audit:ci:smoke"* ]]
+}
+
+@test "help does not list retired command names" {
+  run bash "$SCRIPT_UNDER_TEST" help
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"release:catalog"* ]]
+  [[ "$output" != *"format-catalog-metadata"* ]]
+  [[ "$output" != *"check-catalog-metadata"* ]]
+  [[ "$output" != *"validate-internal"* ]]
+  [[ "$output" != *"stage-internal"* ]]
+  [[ "$output" != *"register-internal"* ]]
+  [[ "$output" != *"migrate-internal"* ]]
+}
+
+@test "unknown command exits non-zero with a diagnosable message" {
+  run bash "$SCRIPT_UNDER_TEST" definitely-not-a-command
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"unknown command"* ]]
+}
+
+# --- assert_catalog_stage_safety --------------------------------------------
+
+# Builds a temp workspace with a tracked catalog and a matching
+# .catalog-build/catalog tree, both containing $1 skills (and one file each
+# under agents/commands/rules unless suppressed by the caller after the
+# fact). Sets WORKSPACE_DIR and CATALOG_BUILD_ROOT to point at it, along with
+# FIXTURE_WORKSPACE_DIR for teardown. Must be called directly (not inside a
+# command substitution) so those global assignments are not lost to a
+# subshell.
+make_catalog_fixture() {
+  tracked_skill_count="$1"
+  build_skill_count="$2"
+  workspace_dir="$(mktemp -d)"
+
+  tracked_dir="$workspace_dir/catalog"
+  build_dir="$workspace_dir/.catalog-build/catalog"
+
+  mkdir -p "$tracked_dir/skills" "$tracked_dir/agents" "$tracked_dir/commands" "$tracked_dir/rules"
+  mkdir -p "$build_dir/skills" "$build_dir/agents" "$build_dir/commands" "$build_dir/rules"
+
+  printf 'dependencies: []\n' >"$tracked_dir/apm.yml"
+  printf '# catalog\n' >"$tracked_dir/README.md"
+  printf '# instructions\n' >"$tracked_dir/AGENTS.md"
+  printf 'agent\n' >"$tracked_dir/agents/sample.md"
+  printf 'command\n' >"$tracked_dir/commands/sample.md"
+  printf 'rule\n' >"$tracked_dir/rules/sample.md"
+
+  printf 'dependencies: []\n' >"$build_dir/apm.yml"
+  printf '# catalog\n' >"$build_dir/README.md"
+  printf '# instructions\n' >"$build_dir/AGENTS.md"
+  printf 'agent\n' >"$build_dir/agents/sample.md"
+  printf 'command\n' >"$build_dir/commands/sample.md"
+  printf 'rule\n' >"$build_dir/rules/sample.md"
+
+  index=0
+  while [ "$index" -lt "$tracked_skill_count" ]; do
+    mkdir -p "$tracked_dir/skills/skill-$index"
+    touch "$tracked_dir/skills/skill-$index/SKILL.md"
+    index=$((index + 1))
+  done
+
+  index=0
+  while [ "$index" -lt "$build_skill_count" ]; do
+    mkdir -p "$build_dir/skills/skill-$index"
+    touch "$build_dir/skills/skill-$index/SKILL.md"
+    index=$((index + 1))
+  done
+
+  WORKSPACE_DIR="$workspace_dir"
+  CATALOG_BUILD_ROOT="$workspace_dir/.catalog-build"
+  FIXTURE_WORKSPACE_DIR="$workspace_dir"
+}
+
+@test "assert_catalog_stage_safety refuses a partial request without the override" {
+  make_catalog_fixture 2 2
+
+  run assert_catalog_stage_safety 1
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"Refusing to prepare a partial catalog"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "assert_catalog_stage_safety allows a partial request with the shrink override" {
+  make_catalog_fixture 2 2
+
+  APM_ALLOW_CATALOG_SHRINK=1 run assert_catalog_stage_safety 1
+  [ "$status" -eq 0 ]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "assert_catalog_stage_safety refuses a build that would shrink tracked skills" {
+  make_catalog_fixture 2 1
+
+  run assert_catalog_stage_safety 0
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"would shrink skills from"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "assert_catalog_stage_safety refuses an incomplete catalog build" {
+  make_catalog_fixture 2 2
+  rm -f "$workspace_dir/.catalog-build/catalog/apm.yml"
+
+  run assert_catalog_stage_safety 0
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"catalog build is incomplete"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "assert_catalog_stage_safety refuses a build with no skills" {
+  make_catalog_fixture 2 2
+  rm -rf "$workspace_dir/.catalog-build/catalog/skills"
+  mkdir -p "$workspace_dir/.catalog-build/catalog/skills"
+
+  run assert_catalog_stage_safety 0
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"catalog build has no skills"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "assert_catalog_stage_safety refuses a build that would empty agents" {
+  make_catalog_fixture 2 2
+  rm -f "$workspace_dir/.catalog-build/catalog/agents/sample.md"
+
+  run assert_catalog_stage_safety 0
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"would empty agents"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "assert_catalog_stage_safety passes for a fully valid fixture" {
+  make_catalog_fixture 2 2
+
+  run assert_catalog_stage_safety 0
+  [ "$status" -eq 0 ]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+# --- ensure_workspace_scaffold -----------------------------------------------
+
+@test "ensure_workspace_scaffold fails when apm.yml is missing" {
+  workspace_dir="$(mktemp -d)"
+  WORKSPACE_DIR="$workspace_dir"
+  ensure_workspace_repo() { :; }
+
+  run ensure_workspace_scaffold
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"Missing workspace apm.yml"* ]]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "ensure_workspace_scaffold succeeds when apm.yml is present" {
+  workspace_dir="$(mktemp -d)"
+  printf 'dependencies: []\n' >"$workspace_dir/apm.yml"
+  WORKSPACE_DIR="$workspace_dir"
+  ensure_workspace_repo() { :; }
+
+  run ensure_workspace_scaffold
+  [ "$status" -eq 0 ]
+
+  rm -rf "$workspace_dir"
+}
+
+# --- remove_internal_target_links --------------------------------------------
+
+@test "remove_internal_target_links removes symlinks but preserves real directories" {
+  runtime_home="$(mktemp -d)"
+  link_source="$(mktemp -d)"
+  HOME="$runtime_home"
+
+  mkdir -p "$runtime_home/.claude/skills"
+  ln -s "$link_source" "$runtime_home/.claude/skills/linked-skill"
+  mkdir -p "$runtime_home/.claude/skills/real-skill"
+  printf 'keep me\n' >"$runtime_home/.claude/skills/real-skill/note.md"
+
+  run remove_internal_target_links "linked-skill"$'\n'"real-skill"
+
+  [ "$status" -eq 0 ]
+  [ ! -e "$runtime_home/.claude/skills/linked-skill" ]
+  [ -d "$runtime_home/.claude/skills/real-skill" ]
+  [ "$(<"$runtime_home/.claude/skills/real-skill/note.md")" = "keep me" ]
+
+  rm -rf "$runtime_home" "$link_source"
 }
