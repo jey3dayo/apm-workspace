@@ -25,7 +25,7 @@ description: >-
 | Codex `gpt-5.6-sol`                            | Orchestrator | `gpt-5.6-luna`（既知バグあり、Section 4 参照） |
 | Claude Sonnet / Codex `gpt-5.6-terra` / `luna` | Worker       | 委譲せず自分で実装する                         |
 
-旧世代モデルは列挙しない。利用できない tier があるときだけ、使える旧モデルへフォールバックする。委譲は同一 platform 内で完結させ、他方の platform（Claude/Codex）の Worker へ跨ぐのはユーザーが明示的に指示した場合に限る。
+表の tier が使えないときだけ、利用可能な旧モデルへフォールバックする。委譲は同一 platform 内で完結させ、他方の platform（Claude / Codex）の Worker へ跨ぐのはユーザーが明示的に指示した場合に限る。
 
 完了条件: 自分がどちらの tier かを言語化できている。
 
@@ -66,7 +66,7 @@ Claude:
 Agent(subagent_type: "implementer", prompt: <タスク定義>)
 ```
 
-`implementer` は frontmatter で `model: sonnet` を持つ。通常委譲では `model` を渡さない（呼び出し時の override が frontmatter より優先される）。
+通常委譲では `model` を渡さない。呼び出し時の指定は agent 定義の frontmatter より優先されるため、渡すと `implementer` に設定済みの既定 tier を上書きしてしまう。
 
 Codex:
 
@@ -79,7 +79,7 @@ spawn_agent(
 )
 ```
 
-Codex は組み込みのサブエージェント機能を使う。サブエージェントは親の workspace と sandbox を引き継ぎ、Codex MCP や `codex exec` の別プロセス起動は使わない。
+この組み込み機能だけで完結させる。サブエージェントは親の workspace と sandbox を引き継ぐが、Codex MCP や `codex exec` の別プロセス起動は経路が別で workspace を引き継がない。
 
 ### 昇格
 
