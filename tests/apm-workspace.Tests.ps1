@@ -1106,7 +1106,7 @@ dependencies: []
     $miseToml | Should -Match '\./catalog --dry-run'
     $miseToml | Should -Match '(?s)\[tasks\."format:check"\]\s*description = "Check workspace docs and manifest formatting"\s*depends = \['
     $miseToml | Should -Match '(?s)\[tasks\.check\]\s*description = "Run lightweight pre-deploy checks for the ~/.apm workspace"\s*depends = \["format:check", "validate"\]'
-    $miseToml | Should -Match '(?s)\[tasks\.verify\]\s*description = "Run deep verification for the ~/.apm workspace"\s*run = \[\{ task = "check" \}, \{ task = "smoke:catalog" \}\]'
+    $miseToml | Should -Match '(?s)\[tasks\.verify\]\s*description = "Run deep verification for the ~/.apm workspace"\s*run = \[\{ task = "check" \}, \{ task = "test:all" \}, \{ task = "smoke:catalog" \}\]'
     $miseToml | Should -Match '(?s)\[tasks\.deploy\]\s*description = "Run checks, deploy the current workspace state, and inspect targets"\s*run = \[\{ task = "check" \}, \{ task = "apply" \}, \{ task = "doctor" \}\]'
     $miseToml | Should -Match '(?s)\[tasks\.upgrade\].*?apm update -g.*?\{ task = "deploy" \}'
     $miseToml | Should -Match '(?s)\[tasks\."refresh:deploy"\].*?\{ task = "refresh" \}.*?\{ task = "deploy" \}'

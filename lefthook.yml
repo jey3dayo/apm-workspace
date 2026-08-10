@@ -36,6 +36,12 @@ pre-push:
         bash -n scripts/apm-workspace.sh
         pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 help >/dev/null
 
+    - name: test:sh
+      run: mise run test:sh
+
+    - name: test
+      run: mise run test
+
     - name: format:markdown:bold-headings:check
       run: mise run format:markdown:bold-headings:check
 

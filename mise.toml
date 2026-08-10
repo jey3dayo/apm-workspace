@@ -114,6 +114,10 @@ run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts
 description = "Validate the ~/.apm workspace and managed catalog wiring"
 depends = ["validate:workspace", "validate:catalog"]
 
+[tasks."test:all"]
+description = "Run both behavioral suites for the workspace scripts"
+depends = ["test", "test:sh"]
+
 [tasks."format:markdown"]
 description = "Format Markdown files in the ~/.apm workspace"
 run = "fd -e md -X prettier --write --log-level error >/dev/null"
@@ -197,7 +201,7 @@ depends = ["format:check", "validate"]
 
 [tasks.verify]
 description = "Run deep verification for the ~/.apm workspace"
-run = [{ task = "check" }, { task = "smoke:catalog" }]
+run = [{ task = "check" }, { task = "test:all" }, { task = "smoke:catalog" }]
 
 [tasks.test]
 description = "Run the Pester behavioral suite for apm-workspace.ps1"
