@@ -9,4 +9,4 @@
 ## 回避策(優先順)
 
 1. `~/.codex/config.toml` で `multi_agent_v2 = false` にして V1 へ固定する(`model_catalog_json` で対象モデルの `multi_agent_version` を `"v1"` に上書きしたカタログを使う)
-2. それも使えない場合は `agmsg-delegation` スキル(agmsg + herdr による別プロセス Worker)の手動起動をユーザーに提案する
+2. それも使えない場合は `agmsg-delegation` スキル(agmsg + launchd detached な別プロセス Worker)の手動起動をユーザーに提案する
