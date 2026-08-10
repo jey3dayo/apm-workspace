@@ -239,6 +239,8 @@ If a deployed skill exists but its `SKILL.md` is clearly wrong, tiny, or a place
   - Codex target example: `~/.agents/skills/<id>/SKILL.md`
 - Do not fix this by editing `apm_modules/` contents or deployed targets in place
 - `deploy:fresh` runs `apm prune --dry-run`, `apm prune`, rebuilds workspace-owned `catalog` and `manual-skills` cache entries from tracked sources, runs `deploy`, then `check`
+- `apm prune` can report `apm_modules/ is clean` while orphans remain, so do not treat it as proof. It misses owner directories left by removed dependencies and per-skill leftovers nested inside a still-declared repository (for example `apm_modules/<owner>/<repo>/skills/<removed-skill>/`). To audit, compare `apm_modules` against `apm.yml` and `apm.lock.yaml` yourself, delete only paths with no lockfile reference, then confirm with `apm_cli.commands._helpers._check_orphaned_packages()` returning an empty list from `~/.apm`
+- The orphan list printed at the end of `mise run deploy` is evaluated in a temporary compile workspace, so it keeps naming removed packages even when `apm_modules/` is genuinely clean. Verify against `~/.apm` before acting on it
 - If a targeted manual repair is still needed, delete only the bad package cache directory after resolving and verifying the absolute path stays under `./apm_modules/`
 - Recreate the cache with `mise run deploy:fresh` or the smallest equivalent dependency-refresh command
 - If refresh times out, check whether the target cache was restored; stop only leftover refresh/update processes before retrying deploy

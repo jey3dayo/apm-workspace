@@ -2,7 +2,6 @@
 
 ## Open Tasks
 
-- Optional: run `apm prune` to drop the ~14 orphaned package cache entries not declared in `apm.yml`.
 - Review and execute the candidates in [`docs/skill-inventory.md`](docs/skill-inventory.md) の「移管候補（未実施）」
   (Agentation は repo-local 移管済み。残りは browser 系・understand 系・社内 API 系).
 - Before removing any candidate from the global manifest, verify it in a concrete consuming repository
