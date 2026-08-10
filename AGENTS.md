@@ -62,6 +62,8 @@ In practice:
 - if an external bundle contains a skill that should be opt-in, keep the upstream dependency external and install the selected skill in the target repository with `apm install <package-ref> --skill <id>`; do not copy it into `catalog/**` or `optional-skills/**`
 - expose an APM workspace-only skill to both runtimes through `./.claude/skills/<id>` and `./.agents/skills/<id>` symlinks to the source directory
 - keep `./.claude/skills/` and `./.agents/skills/` as real directories; symlink the child skill directories, not the roots or `SKILL.md` files
+- only the workspace-only bridge symlinks are tracked in git; every other entry under `./.claude/skills/` and `./.agents/skills/` is a deployed copy and is gitignored. Never commit deployed copies
+- a deploy can delete the tracked bridge symlinks (observed on `./.claude/skills/` 2026-08-09). After `mise run deploy`, verify each bridge still resolves and recreate a missing one with `ln -sfn ../../.apm/skills/<id> ./<runtime>/skills/<id>` — do not use `git restore` for this
 - if the change only exists in a deployed target or cache, regenerate from the tracked workspace instead of editing it in place
 
 ## Operating Philosophy
