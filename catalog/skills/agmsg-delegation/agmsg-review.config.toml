@@ -3,10 +3,15 @@
 # 配置先: ~/.codex/agmsg-review.config.toml (SKILL.md Preflight が diff 検証する)
 # 意図: 対象 project は read のみ。agmsg の状態書込み (messages.db / teams / run)
 #       と一時ファイルだけを許可し、reviewer が READY/REVIEW/ACK を送信できるようにする。
-sandbox_permissions = [
-  "disk-full-read-access",
-  "disk-write-platform-user-temp-folder",
-  "disk-write-folder=/Users/t00114/.agents/skills/agmsg/db",
-  "disk-write-folder=/Users/t00114/.agents/skills/agmsg/teams",
-  "disk-write-folder=/Users/t00114/.agents/skills/agmsg/run",
+#
+# workspace-write は cwd を必ず書込可能にする。run-codex-worker.sh が review role で
+# cwd を専用スクラッチへ逃がすことで project の read-only を成立させている。
+# writable_roots に対象 project を足してはならない。足すと read-only 契約が黙って壊れる。
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+writable_roots = [
+  "/Users/t00114/.agents/skills/agmsg/db",
+  "/Users/t00114/.agents/skills/agmsg/teams",
+  "/Users/t00114/.agents/skills/agmsg/run",
 ]

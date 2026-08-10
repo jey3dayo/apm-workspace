@@ -35,10 +35,12 @@ fi
 
 project=$(cd -- "$project" && pwd -P)
 payload_file=$(cd -- "$(dirname -- "$payload_file")" && printf '%s/%s\n' "$PWD" "$(basename -- "$payload_file")")
-codex_args=(--strict-config -m "$model" -a never -C "$project")
+codex_args=(--strict-config -m "$model" -a never)
+exec_args=(exec --ephemeral)
+review_scratch=
 
 if [[ "$role" == implement ]]; then
-	codex_args+=(-s workspace-write)
+	codex_args+=(-C "$project" -s workspace-write)
 else
 	script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 	profile_source=${AGMSG_CODEX_PROFILE_SOURCE:-"$script_dir/../agmsg-review.config.toml"}
@@ -54,8 +56,15 @@ else
 		exit 1
 	fi
 
-	codex_args+=(-p agmsg-review)
+	# profile の workspace-write は cwd を必ず書込可能にする。cwd を対象 project に
+	# したままでは reviewer が project を書き換えられてしまうため、専用スクラッチへ逃がす。
+	# project へは read のみで到達でき、payload が絶対パスで指示する。
+	review_scratch=$(mktemp -d "${TMPDIR:-/tmp}/agmsg-review-cwd.XXXXXX")
+	chmod 700 "$review_scratch"
+	trap 'rm -rf -- "$review_scratch"' EXIT
+	# スクラッチは git repo でないため、trusted-directory 判定を明示的に飛ばす。
+	codex_args+=(-C "$review_scratch" -p agmsg-review)
+	exec_args+=(--skip-git-repo-check)
 fi
 
-codex_args+=(exec --ephemeral -)
-"$codex_bin" "${codex_args[@]}" <"$payload_file"
+"$codex_bin" "${codex_args[@]}" "${exec_args[@]}" - <"$payload_file"
