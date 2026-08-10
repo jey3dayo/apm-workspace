@@ -96,9 +96,18 @@ spawn_agent(
 | Claude   | `sonnet`       | `model: "opus"` を呼び出し時に渡す                           |
 | Codex    | `gpt-5.6-luna` | ① reasoning effort 引き上げ（xhigh → max） ② `gpt-5.6-terra` |
 
+長文脈タスク（大規模コードベースの読解、複数文書の統合、長い履歴の追跡）は例外で、①を飛ばして直接 `gpt-5.6-terra` へ上げる。`luna` は長文脈リコールに崖があり（MRCR 41.3% / Sol 91.5% / Terra 89.6%、[OpenAI 2026-07-09](https://openai.com/index/advancing-the-price-performance-frontier-with-gpt-5-6)）、effort をいくら上げても埋まらない。
+
 `gpt-5.6-sol` からの spawn は `model` 指定が事実上効かないバグがある。症状と回避策（V1 固定 / `agmsg-delegation` フォールバック）は [references/codex-spawn-model-bug.md](references/codex-spawn-model-bug.md) を読む。
 
-独立タスクは**同一レスポンス内で複数呼び出す**と並列に走る。1レスポンス1呼び出しは直列になる。Orchestrator の会話履歴は引き継がせず、各 Worker には必要な文脈だけを構築して渡す（Worker は前提を共有していないので、対象ファイル・完了条件・検証コマンドを明示する）。計画ファイルを順に消化して都度レビューする運用は `review-fix-loop` を使う。
+独立タスクは**同一レスポンス内で複数呼び出す**と並列に走る。1レスポンス1呼び出しは直列になる。Orchestrator の会話履歴は引き継がせず、Section 3 で書き出した 3 点だけを渡す。
+
+起動後の扱いは 2 つ。
+
+- バリアを置かない。先に返った Worker から順に処理する。全員の完了を待つと、最も遅い Worker が全体の律速になるうえ、待つ間にリポジトリの状態が変わって先行 Worker の前提が古くなる。
+- Worker を使い回す。追加指示・スコープ縮小・再実行は、新規 spawn ではなく既存 Worker への追送で行う（Claude は `SendMessage`、Codex は同一タスクへの追送）。文脈を保った Worker はキャッシュが効くぶん安く、前提の再説明も要らない。
+
+計画ファイルを順に消化して都度レビューする運用は `review-fix-loop` を使う。
 
 完了条件: 全タスクが Worker へ渡り、独立タスクは並列で起動している。
 
