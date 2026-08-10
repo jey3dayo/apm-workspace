@@ -25,11 +25,13 @@
   `improve-animations`, `find-animation-opportunities`, `apple-design`
 - レビュー・監査: `hunk-review`, `thermo-nuclear-code-quality-review`,
   `improve`（shadcn）, `react-doctor`
-- React / Web 実装: `composition-patterns`, `react-best-practices`,
-  `browser-harness`, `screenshot`
+- React / Web 実装: `react-best-practices`, `browser-harness`, `screenshot`
 - GitHub 連携（openai）: `gh-address-comments`, `gh-fix-ci`
-- 社内（caad-develop）: `perman-aws-vault`, `caad-skill-deployer`
-- その他: `understand`, `humanizer-ja`, `web-research`,
+- 社内（caad-develop）: `perman-aws-vault`, `caad-skill-deployer`,
+  `ai-banzuke`, `ai-butsukari-evidence-scout`
+- 図・動画生成: `diagram-design`（cathrynlavery, SHA pin）,
+  MiniMax-H3 系 9 スキル（`h3-prompt-writing` と各種動画ジェネレーター）
+- その他: `understand`, `humanizer-ja`, `agmsg`, `tuicr`,
   mattpocock 系（`grilling`, `writing-for-agents`, `wayfinder`,
   `improve-codebase-architecture`, `codebase-design`, `domain-modeling`,
   `research`, `prototype`, `setup-matt-pocock-skills`）
@@ -173,10 +175,10 @@ global から repo-local / optional へ移す候補。実施済みのもの
 | `perman-aws-vault` | 当面 global 維持                            | 複数 AWS リポジトリで同じ認証導線を使うため。移管するなら profile/credential 境界を明記後                                                        |
 
 2026-07-16 の棚卸しで global 維持を決定したもの（候補から除外）:
-`react-doctor`, `composition-patterns`, `react-best-practices`,
+`react-doctor`, `react-best-practices`,
 `baseline-ui` ほか ibelick 系, `transitions-dev`,
 `frontend-design`, `ui-ux-pro-max`, `design-md-workflow`, `design-system-review`
-（`web-design-guidelines` は 2026-07-23 に撤去）。
+（`web-design-guidelines` と `composition-patterns` は撤去済み）。
 
 ### 移管の判断基準
 
