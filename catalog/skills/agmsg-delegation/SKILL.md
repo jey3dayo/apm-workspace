@@ -77,13 +77,10 @@ Codex review に `--sandbox read-only` を使ってはならない。agmsg の�
 
 **profile の `sandbox_mode = "workspace-write"` は cwd を必ず書込可能にする。** そのため `run-codex-worker.sh` は review role で **cwd を専用スクラッチ（`mktemp -d`）へ逃がし**、対象 project を cwd にしない。project へは read のみで到達でき、payload が絶対パスで指示する。スクラッチは git repo でないので `exec --skip-git-repo-check` を併せて渡す。`writable_roots` に対象 project を足してはならない。足すと read-only 契約が黙って壊れる。
 
-profile の正本は本スキルの [agmsg-review.config.toml](agmsg-review.config.toml)（tracked asset）。**Codex の `-p` は profile ファイルが欠落していても exit 0 で base config にフォールバックする（fail-open）ため、`run-codex-worker.sh` が起動前に次の一致を検証する**:
+profile の正本は本スキルの [agmsg-review.config.toml](agmsg-review.config.toml)（tracked asset）。**Codex の `-p` は profile ファイルが欠落していても exit 0 で base config にフォールバックする（fail-open）ため、`run-codex-worker.sh` が起動前に正本を `~/.codex/agmsg-review.config.toml` へ `install -m 600` で置き直し、その後 `cmp` で一致を検証する**。`CODEX_HOME` は APM の配布面ではないため（`targets:` は runtime 種別のリストで、skills / agents ディレクトリと `~/.codex/AGENTS.md` しか配布しない）、この置き直しが catalog 正本への追従経路になる。
 
-```bash
-diff ~/.agents/skills/agmsg-delegation/agmsg-review.config.toml ~/.codex/agmsg-review.config.toml
-```
-
-- 一致しない・存在しない場合は helper が起動を拒否する。正本を `~/.codex/agmsg-review.config.toml` へコピーしてから再実行する
+- 手動コピーは不要。catalog 側の profile を更新したら `mise run deploy` するだけでよい
+- source が欠落、コピー失敗、コピー後も不一致のいずれでも helper は起動を拒否する（fail-closed）
 - 初回利用前の smoke: (1) review は対象 project への write が拒否される (2) implement は対象 project 内の edit が成功し project 外の write が拒否される (3) `send-report.sh` による READY send 成功 (4) inbox で STOP 受信 (5) DONE/REVIEW/ACK send 成功 (6) 全手順が承認画面・MCP 確認画面なしで完了、の6点を runtime ごとに実際に確認する
 
 完了条件: CLI・role 別起動コマンド（review は profile の diff 一致確認込み）・agmsg・`launch-worker.sh` の4点が確認済み。

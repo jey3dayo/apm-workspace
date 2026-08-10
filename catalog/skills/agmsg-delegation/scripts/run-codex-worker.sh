@@ -46,11 +46,20 @@ else
 	profile_source=${AGMSG_CODEX_PROFILE_SOURCE:-"$script_dir/../agmsg-review.config.toml"}
 	profile_target=${AGMSG_CODEX_PROFILE_TARGET:-/Users/t00114/.codex/agmsg-review.config.toml}
 
-	if [[ ! -f "$profile_source" || ! -f "$profile_target" ]]; then
-		printf '%s\n' 'Codex review profile is missing; refusing fail-open launch.' >&2
+	if [[ ! -f "$profile_source" ]]; then
+		printf '%s\n' 'Codex review profile source is missing; refusing fail-open launch.' >&2
 		exit 1
 	fi
 
+	# Codex の -p は profile が CODEX_HOME 直下に無いと exit 0 で base config へ落ちる
+	# (fail-open)。CODEX_HOME は APM の配布面ではないため、正本から毎回置き直す。
+	if ! install -m 600 "$profile_source" "$profile_target"; then
+		printf '%s\n' 'Failed to deploy the Codex review profile; refusing fail-open launch.' >&2
+		exit 1
+	fi
+
+	# コピー後も検証する。install が成功しても内容が一致しない状況 (競合書込み等) では
+	# サンドボックス契約が保証できないため起動しない。
 	if ! cmp -s "$profile_source" "$profile_target"; then
 		printf '%s\n' 'Codex review profile differs from the deployed source; refusing fail-open launch.' >&2
 		exit 1

@@ -204,6 +204,9 @@ incomplete work, not as optional follow-up.
 
 - Do not edit `apm_modules/`
 - Do not treat deployed targets such as `~/.claude/` or `~/.codex/` as source of truth
+- Some Codex-specific runtime assets under `~/.codex/` are placed by a skill script at launch, not by `apm apply`; edit the catalog source, never the file under `~/.codex/`
+  - `targets:` is a list of runtime kinds and never distributes arbitrary paths, so a path such as `~/.codex/agmsg-review.config.toml` has no APM distribution route
+  - the tracked source and the placement contract live in `catalog/skills/agmsg-delegation/SKILL.md`
 - For APM workspace-only skills, edit `.apm/skills/**`; do not edit the symlinked bridge entries under `.claude/skills/**` or `.agents/skills/**`
 - Do not reintroduce local `./packages/*` refs into the global manifest
 - Do not hand-edit runtime outputs when the tracked workspace can regenerate them
