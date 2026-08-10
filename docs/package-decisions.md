@@ -322,3 +322,9 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
   `screenshot`（Win / Mac / Linux 対応。Mac 専用の `peekaboo` を撤去して一本化）、
   `thermo-nuclear-code-quality-review`（レビュー文化の共通言語）、
   `emil-design-eng`、React 系（`react-doctor` / `react-best-practices`）
+- `docs/superpowers/**`（2026-04-21 の APM global distribution 設計・計画文書 2 本）は
+  2026-08-10 に `tmp/superpowers/` へ移し、追跡対象から外した。superpowers 由来の
+  ワークフロー生成物であり、スキル実行の出力は `tmp/` に集約してコミットしないという
+  運用原則に合わせる。内容は git history に残るため、必要なら
+  `git show 062960a:docs/superpowers/specs/2026-04-21-apm-global-distribution-design.md`
+  のように取り出せる。
