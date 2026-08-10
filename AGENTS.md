@@ -113,8 +113,11 @@ Choose the command based on intent:
   - Does not deploy
 - `mise run verify`
   - Deep verification
-  - Runs `check` plus catalog smoke verification
+  - Runs `check`, both workspace-script test suites, then catalog smoke verification
   - Use when you want stronger confidence before or apart from deployment
+- `mise run test:all`
+  - Runs the bats suite for `scripts/apm-workspace.sh` and the Pester suite for `scripts/apm-workspace.ps1`
+  - Both suites also run as pre-push jobs; run this directly when you want them without the rest of `verify`
 - `mise run audit:ci:smoke`
   - Temp-install the current manifest and lock into an isolated project, then run `apm audit --ci`
   - Use when you want APM's lockfile/deployed-file integrity checks without depending on the current user-scope targets

@@ -46,7 +46,7 @@ For Codex skill changes, verification is not complete until the deployed `~/.age
 
 - `mise bootstrap`: install the declared environment, then reconcile host-local MCP entries through hidden internal tasks
 - `mise run check`: lightweight validation only
-- `mise run verify`: `check` plus catalog smoke verification
+- `mise run verify`: `check`, both workspace-script test suites, plus catalog smoke verification
 - `mise run audit:ci:smoke`: temp-install the workspace manifest and run `apm audit --ci`
 - `mise run deploy`: normal local rollout
 - `mise run refresh`: refresh checkout and dependency state without deploying

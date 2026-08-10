@@ -7,9 +7,6 @@
   (Agentation は repo-local 移管済み。残りは browser 系・understand 系・社内 API 系).
 - Before removing any candidate from the global manifest, verify it in a concrete consuming repository
   with a repo-local `apm.yml` and record the result in [`docs/package-decisions.md`](docs/package-decisions.md).
-- Wire the two `scripts/apm-workspace.{sh,ps1}` test suites into the repository gates
-  (`check` / `verify` / lefthook)。未着手の計画メモは `tmp/plans/003-wire-tests-into-gates.md`
-  （未追跡・コミット対象外）。
 - `understand`: 次に初見リポジトリを扱うときに実際に起動するかを観察し、使わなければ撤去する
   （`understand-dashboard` は 2026-08-09 に撤去済み）。
 - `scripts/apm-workspace.{sh,ps1}` に残る `obra/superpowers` 専用の仮想パッケージ名解決

@@ -16,7 +16,7 @@ This workspace owns the global APM manifest, the lockfile, the downloaded depend
 - `private-skills/`: gitignored machine-local skills used only for local Codex skill sync
 - `mise.toml`: workspace-local tasks for install, migration, validation, and repair
 - `scripts/apm-workspace.*`: tracked host-local MCP detection and user-scope reconciliation logic
-- `tests/`: Pester coverage for workspace helpers
+- `tests/`: bats and Pester coverage for the workspace helper scripts; both suites gate `git push`
 
 ## Managed Catalog Layout
 
@@ -143,7 +143,8 @@ When a machine-local skill lives under `~/.apm/private-skills/`:
 - `mise run format`: format Markdown, TOML, and YAML in the workspace
 - `mise run format:markdown:bold-headings`: rewrite bold headings across Markdown in `catalog/`
 - `mise run check`: run formatting checks plus validation only
-- `mise run verify`: run `check` plus catalog smoke verification
+- `mise run verify`: run `check`, both workspace-script test suites, then catalog smoke verification
+- `mise run test:all`: run the bats and Pester suites for `scripts/apm-workspace.*` on their own
 - `mise run audit:ci:smoke`: temp-install the current manifest and lock, then run `apm audit --ci`
 - `mise run deploy`: run `check -> apply -> doctor` for the current workspace state
 - `mise run upgrade`: accept upstream dependency updates with `apm install -g --update`, then run the local rollout
