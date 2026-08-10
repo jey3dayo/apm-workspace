@@ -1,6 +1,6 @@
 ---
 name: review-plan
-description: Review a pasted or freshly generated implementation, operation, research, or rollout plan as a pre-execution gate without executing it; return a concise human summary, prioritized plan-review findings, and a copy-ready prompt for another agent, with conditional routing for UI/frontend, superpowers, and subagent-suitable work.
+description: Review a pasted or freshly generated implementation, operation, research, or rollout plan as a pre-execution gate without executing it; return a concise human summary, prioritized plan-review findings, and a copy-ready prompt for another agent, with conditional routing for UI/frontend and delegation-suitable work.
 ---
 
 # Review Plan
@@ -20,7 +20,7 @@ If the user mentions deployment, ECS, production, data migration, destructive ac
 
 ## Workflow
 
-1. Identify the plan type: implementation, operations/release, research, refactor, UI/frontend, superpowers plan, or mixed.
+1. Identify the plan type: implementation, operations/release, research, refactor, UI/frontend, or mixed.
 2. State a concise verdict for the human: ready, ready with fixes, blocked, or unclear.
 3. Review the plan for blockers, risk, ambiguity, missing verification, sequencing problems, scope creep, and handoff gaps.
 4. Apply conditional skill routing rules.
@@ -36,7 +36,6 @@ Include these recommendations in both the review findings and the copy prompt wh
 | UI/UX, visual design, frontend pages/components, responsive behavior, interaction states, accessibility, or visual QA                               | Require `ui-ux-pro-max` and `frontend-design`. Review UI/UX, accessibility, responsive behavior, interaction states, visual consistency, and verification coverage.  |
 | Three or more mostly independent implementation tasks with low shared-file or shared-boundary conflict, and each task has a clear verification path | Recommend same-session parallel execution via the built-in subagents (Agent tool / `spawn_agent`).                                                                   |
 | Tightly coupled implementation, unclear architecture, one large shared file, or unresolved requirements                                             | Do not recommend parallel subagents; ask for decomposition or clarification first.                                                                                   |
-| Existing superpowers plan                                                                                                                           | Preserve the superpowers execution order, checklist style, and handoff conventions. Do not replace the plan's workflow; provide delta-style revision instructions.   |
 | Plan creation or major redesign is still needed                                                                                                     | Recommend revising the plan before execution. Do not tell the next agent to execute immediately.                                                                     |
 | Deployment, ECS, production, migration, destructive operation, cost-incurring operation, or external side effect is present                         | Treat review as a pre-execution safety gate. Require explicit user approval before execution and include rollback/verification gaps as review findings when missing. |
 
@@ -91,7 +90,7 @@ Mode:
 Revise only. Do not execute the plan unless the user explicitly asks you to execute after revision.
 
 Required skills:
-- <list required skills and why; include conditional UI/frontend/subagent/superpowers guidance when applicable>
+- <list required skills and why; include conditional UI/frontend/delegation guidance when applicable>
 
 Original plan:
 <paste or summarize the original plan faithfully. Preserve essential details, commands, file paths, constraints, and acceptance criteria.>
@@ -102,7 +101,6 @@ Review findings to address:
 Instructions:
 - Address blockers first.
 - Preserve the original scope unless a finding says the scope is unsafe or incomplete.
-- Preserve superpowers conventions if this is a superpowers implementation plan.
 - If UI/frontend work is present, include UI/UX, accessibility, responsive, interaction-state, and visual QA requirements.
 - If parallel subagents are appropriate, decompose into independent tasks with disjoint ownership and verification steps.
 - If execution is not yet safe, return an improved plan and open questions instead of implementation steps.
@@ -138,4 +136,3 @@ If a category has no findings, write `- None found.` under that category. Keep t
 | Adding UI skills only to the copy prompt       | Also include UI-specific review findings when UI/frontend content exists.  |
 | Over-recommending subagents                    | Recommend parallel subagents only when tasks are separable and verifiable. |
 | Telling the next agent to execute unsafe plans | Keep default mode as revision-only until blockers are resolved.            |
-| Rewriting superpowers plans from scratch       | Preserve their conventions and provide delta-style fixes.                  |

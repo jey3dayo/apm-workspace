@@ -9,7 +9,7 @@ description: >-
   optional repository-scoped skill packages, global MCP の追加・変更・削除
   (`~/.codex/config.toml` の MCP block、`codex mcp add/remove`、所有元不明の
   runtime MCP 設定を含む), and `apmのバージョンあげて` / pinned `apm` source checks.
-  For skill body or asset design itself, coordinate with `skill-creator`;
+  For skill body or asset design itself, coordinate with `writing-for-agents`;
   for general mise usage outside the APM workspace, use `mise`.
   Re-invoke this skill even mid-session whenever the conversation shifts to
   these topics.
@@ -123,7 +123,7 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 - If the request is "change a workspace-only skill", edit `.apm/skills/**`.
   Keep its bridge entries as symlinks to that source; do not add it to the
   global catalog or root manifest.
-- If the request is "change a personal skill", edit `catalog/skills/**`; use `skill-creator` for new or migrated managed skills.
+- If the request is "change a personal skill", edit `catalog/skills/**`; use `writing-for-agents` for new or migrated managed skills.
 - If the request is "make a skill repository-specific", edit
   `optional-skills/<id>/**` and keep the skill out of the root `apm.yml`.
 - If the request is "optimize" or "customize" a cross-repository skill for this workspace, treat it as personal skill work and prefer `catalog/skills/<id>/`.

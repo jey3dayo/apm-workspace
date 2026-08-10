@@ -35,7 +35,7 @@ Do not treat Review And Fix Loop as a review lane. It is the execution mode that
 
 1. Read `references/review-lanes.md` before presenting or choosing lanes.
 2. Choose the execution mode: Review Only or Review And Fix Loop.
-3. If the artifact is outside the lane catalog's UI/product scope, use a specialist rubric instead of forcing a UI lane. For example, review agent skills with `skill-creator` as the primary rubric and use this skill only for evidence discipline, severity, mode, and output structure.
+3. If the artifact is outside the lane catalog's UI/product scope, use a specialist rubric instead of forcing a UI lane. For example, review agent skills with `writing-for-agents` as the primary rubric and use this skill only for evidence discipline, severity, mode, and output structure.
 4. If the user asks only for a menu, show every lane number and title from the catalog, do not list execution modes as lanes, and wait for the user to choose a lane.
 5. If the user specifies a lane number or title, use that lane as the selected primary lane.
 6. If no lane is specified, infer the best lane from the artifact and choose one primary lane when the catalog routing notes or a lane trigger clearly match.
