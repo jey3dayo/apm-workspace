@@ -677,25 +677,10 @@ internal_target_skill_path() {
   printf '%s\n' "$path"
 }
 
-legacy_internal_cleanup_alias() {
-  skill_id="$1"
-  case "$skill_id" in
-    brainstorming | dispatching-parallel-agents | executing-plans | finishing-a-development-branch | receiving-code-review | requesting-code-review | subagent-driven-development | systematic-debugging | test-driven-development | using-git-worktrees | using-superpowers | verification-before-completion | writing-plans | writing-skills)
-      printf 'superpowers:%s\n' "$skill_id"
-      ;;
-  esac
-}
-
 internal_cleanup_skill_ids() {
   skill_ids="$1"
 
-  {
-    printf '%s\n' "$skill_ids"
-    printf '%s\n' "$skill_ids" | while IFS= read -r skill_id; do
-      [ -n "$skill_id" ] || continue
-      legacy_internal_cleanup_alias "$skill_id"
-    done
-  } | awk 'NF && !seen[$0]++'
+  printf '%s\n' "$skill_ids" | awk 'NF && !seen[$0]++'
 }
 
 remove_internal_target_links() {
@@ -1579,12 +1564,6 @@ external_skill_id_from_virtual_path() {
 external_skill_id_from_record() {
   repo_url="$1"
   virtual_path="$2"
-
-  if [ "$repo_url" = "obra/superpowers" ] && [ -n "$virtual_path" ]; then
-    skill_id=$(external_skill_id_from_virtual_path "$virtual_path")
-    printf 'superpowers:%s\n' "$skill_id"
-    return 0
-  fi
 
   if [ -z "$virtual_path" ]; then
     old_ifs=$IFS

@@ -1235,13 +1235,6 @@ function Get-ExternalSkillId {
     [string]$VirtualPath
   )
 
-  if ($RepoUrl -eq "obra/superpowers" -and -not [string]::IsNullOrWhiteSpace($VirtualPath)) {
-    $relativePath = Get-ExternalSkillRelativePath -VirtualPath $VirtualPath
-    $skillId = ((Convert-ReferencePathToSegments -Value $relativePath) -join ':')
-    Test-SkillId -SkillId $skillId
-    return ("superpowers:{0}" -f $skillId)
-  }
-
   if ([string]::IsNullOrWhiteSpace($VirtualPath)) {
     $segments = Convert-ReferencePathToSegments -Value $RepoUrl
     $skillId = $segments[-1]
@@ -2206,34 +2199,6 @@ function Get-InternalTargetSkillPath {
   return $path
 }
 
-function Get-LegacyInternalCleanupAlias {
-  param(
-    [Parameter(Mandatory = $true)]
-    [string]$SkillId
-  )
-
-  if ($SkillId -in @(
-      "brainstorming",
-      "dispatching-parallel-agents",
-      "executing-plans",
-      "finishing-a-development-branch",
-      "receiving-code-review",
-      "requesting-code-review",
-      "subagent-driven-development",
-      "systematic-debugging",
-      "test-driven-development",
-      "using-git-worktrees",
-      "using-superpowers",
-      "verification-before-completion",
-      "writing-plans",
-      "writing-skills"
-    )) {
-    return "superpowers:$SkillId"
-  }
-
-  return $null
-}
-
 function Get-InternalCleanupSkillIds {
   $result = New-Object System.Collections.Generic.List[string]
   $seen = New-Object 'System.Collections.Generic.HashSet[string]'
@@ -2241,11 +2206,6 @@ function Get-InternalCleanupSkillIds {
   foreach ($skillId in (Get-ManagedSkillIds)) {
     if ($seen.Add($skillId)) {
       $result.Add($skillId)
-    }
-
-    $legacyAlias = Get-LegacyInternalCleanupAlias -SkillId $skillId
-    if (-not [string]::IsNullOrWhiteSpace($legacyAlias) -and $seen.Add($legacyAlias)) {
-      $result.Add($legacyAlias)
     }
   }
 

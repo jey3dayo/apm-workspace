@@ -122,9 +122,9 @@ setup() {
 }
 
 @test "format_skill_name uses the final segment of a nested namespaced id" {
-  run format_skill_name "superpowers:using-superpowers"
+  run format_skill_name "mattpocock:engineering:wayfinder"
   [ "$status" -eq 0 ]
-  [ "$output" = "using-superpowers" ]
+  [ "$output" = "wayfinder" ]
 }
 
 # --- workspace_remote_to_repo_reference -------------------------------------
