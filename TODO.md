@@ -9,12 +9,6 @@
   with a repo-local `apm.yml` and record the result in [`docs/package-decisions.md`](docs/package-decisions.md).
 - `understand`: 次に初見リポジトリを扱うときに実際に起動するかを観察し、使わなければ撤去する
   （`understand-dashboard` は 2026-08-09 に撤去済み）。
-- `scripts/apm-workspace.{sh,ps1}` に残る `obra/superpowers` 専用の仮想パッケージ名解決
-  （`superpowers:<skill-id>` 変換と 14 スキル名のハードコード、各 2 箇所）を削除する。
-  依存撤去後は発火しない死んだ経路。`tests/apm-workspace.Tests.ps1` の 39 アサーションと
-  `tests/apm-workspace.sh.bats` の 2 箇所が同経路を検証しているため、fixture を実在
-  パッケージへ差し替えるかテストごと削るかの判断を含む。同ファイル群を編集中の作業が
-  着地してから着手する。
 
 ## Global / Repo-local Skill Strategy (2026-07-15)
 
