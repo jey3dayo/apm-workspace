@@ -29,12 +29,14 @@
 - GitHub 連携（openai）: `gh-address-comments`, `gh-fix-ci`
 - 社内（caad-develop）: `perman-aws-vault`, `caad-skill-deployer`,
   `ai-banzuke`, `ai-butsukari-evidence-scout`
-- 図・動画生成: `diagram-design`（cathrynlavery, SHA pin）,
-  MiniMax-H3 系 9 スキル（`h3-prompt-writing` と各種動画ジェネレーター）
+- 図生成: `diagram-design`（cathrynlavery, SHA pin）
 - その他: `understand`, `humanizer-ja`, `agmsg`, `tuicr`,
   mattpocock 系（`grilling`, `writing-for-agents`, `wayfinder`,
   `improve-codebase-architecture`, `codebase-design`, `domain-modeling`,
   `research`, `prototype`, `setup-matt-pocock-skills`）
+
+`MiniMax-AI/MiniMax-H3` 系 9 スキル（`h3-prompt-writing` と各種動画
+ジェネレーター）は 2026-08-10 に撤去した。
 
 `obra/superpowers` 全 11 スキルは 2026-08-09 に撤去した。判断理由は
 [`docs/package-decisions.md`](package-decisions.md) の
