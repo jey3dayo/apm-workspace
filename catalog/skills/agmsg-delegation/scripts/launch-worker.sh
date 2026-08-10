@@ -49,9 +49,14 @@ label_file="$run_dir/worker.label"
 umask 077
 {
 	printf '%s\n' '#!/usr/bin/env bash' 'set +e'
+	# wrapper 自身が pid を書く。launchctl print のポーリングでは job のプロセス
+	# 生成が間に合わず pid を取り逃すため。この pid は launchd job の pid と一致する
+	printf 'echo "$$" >%q\n' "$pid_file"
 	printf '%q ' "$@"
 	printf ' >%q 2>&1\n' "$log_file"
-	printf '%s\n' 'status=$?' "printf '%s\\n' \"\$status\" >$(printf '%q' "$exit_file")" 'exit "$status"'
+	printf '%s\n' 'status=$?'
+	printf 'echo "$status" >%q\n' "$exit_file"
+	printf '%s\n' 'exit "$status"'
 } >"$wrapper"
 chmod 700 "$wrapper"
 
@@ -72,7 +77,16 @@ if ! "$launchctl_bin" bootstrap "$domain" "$plist"; then
 fi
 
 printf '%s\n' "$label" >"$label_file"
-pid=$("$launchctl_bin" print "$domain/$label" 2>/dev/null | sed -n 's/^[[:space:]]*pid = \([0-9][0-9]*\);$/\1/p' | head -1)
-printf '%s\n' "${pid:--}" >"$pid_file"
 
-printf 'label=%s\npid=%s\nlog=%s\n' "$label" "${pid:--}" "$log_file"
+# wrapper が pid を書くまで待つ。job が即座に終了した場合も pid は実行前に
+# 書かれているため取得できる。上限を超えたら pid 不明として続行する
+pid=-
+for _ in $(seq 1 40); do
+	if [[ -s "$pid_file" ]]; then
+		pid=$(<"$pid_file")
+		break
+	fi
+	sleep 0.1
+done
+
+printf 'label=%s\npid=%s\nlog=%s\n' "$label" "$pid" "$log_file"
