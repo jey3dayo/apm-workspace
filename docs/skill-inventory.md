@@ -22,18 +22,21 @@
   `fixing-accessibility`, `fixing-metadata`, `fixing-motion-performance`,
   `transitions-dev`
 - モーション（emilkowalski/skills）: `emil-design-eng`, `review-animations`,
-  `improve-animations`, `animation-vocabulary`
+  `improve-animations`, `find-animation-opportunities`, `apple-design`
 - レビュー・監査: `hunk-review`, `thermo-nuclear-code-quality-review`,
   `improve`（shadcn）, `react-doctor`
 - React / Web 実装: `composition-patterns`, `react-best-practices`,
   `browser-harness`, `screenshot`
-- ワークフロー（obra/superpowers）: brainstorming, executing-plans,
-  systematic-debugging, TDD, worktrees, verification ほか計 11
 - GitHub 連携（openai）: `gh-address-comments`, `gh-fix-ci`
 - 社内（caad-develop）: `perman-aws-vault`, `caad-skill-deployer`
-- その他: `understand` / `understand-dashboard`, `humanizer-ja`,
-  `web-research`, mattpocock 系（improve-codebase-architecture,
-  resolving-merge-conflicts, wayfinder, grilling, handoff, writing-great-skills）
+- その他: `understand`, `humanizer-ja`, `web-research`,
+  mattpocock 系（`grilling`, `writing-for-agents`, `wayfinder`,
+  `improve-codebase-architecture`, `codebase-design`, `domain-modeling`,
+  `research`, `prototype`, `setup-matt-pocock-skills`）
+
+`obra/superpowers` 全 11 スキルは 2026-08-09 に撤去した。判断理由は
+[`docs/package-decisions.md`](package-decisions.md) の
+「superpowers / mattpocock 系の再編」を参照。
 
 ## global（自作 catalog: catalog/skills/）
 
@@ -101,18 +104,18 @@ global の一覧に無くても廃止ではない。各リポジトリの `apm.y
 2026-07-16 の棚卸し結果（経緯は
 [`package-decisions.md`](package-decisions.md) の「デザイン / UI・UX / レビュー系スキルの棲み分け」）。
 
-| 役割                                       | スキル                                                                                                         |
-| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| 0→1 デザイン選定（スタイル・色・フォント） | `ui-ux-pro-max`（本体のみ）                                                                                    |
-| 美的方向性・脱テンプレ                     | `frontend-design`（anthropics）                                                                                |
-| ベースライン修正（deslop）                 | `baseline-ui` / `fixing-accessibility` / `fixing-metadata`（ibelick）                                          |
-| モーション taste・レビュー・監査           | `emil-design-eng` / `review-animations` / `improve-animations` / `animation-vocabulary`（emilkowalski/skills） |
-| モーション実装スニペット                   | `transitions-dev`                                                                                              |
-| デザインシステム準拠レビュー               | `design-system-review`（catalog 自作）                                                                         |
-| UI レビューレーン選択ハブ                  | `review-board`（catalog 自作）                                                                                 |
-| デザインドキュメント                       | `design-md-workflow`（catalog 自作）                                                                           |
-| コードベース監査→計画（汎用）              | `improve`（shadcn）                                                                                            |
-| React 診断                                 | `react-doctor`（millionco）                                                                                    |
+| 役割                                       | スキル                                                                                                                 |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| 0→1 デザイン選定（スタイル・色・フォント） | `ui-ux-pro-max`（本体のみ）                                                                                            |
+| 美的方向性・脱テンプレ                     | `frontend-design`（anthropics）                                                                                        |
+| ベースライン修正（deslop）                 | `baseline-ui` / `fixing-accessibility` / `fixing-metadata`（ibelick）                                                  |
+| モーション taste・レビュー・監査           | `emil-design-eng` / `review-animations` / `improve-animations` / `find-animation-opportunities`（emilkowalski/skills） |
+| モーション実装スニペット                   | `transitions-dev`                                                                                                      |
+| デザインシステム準拠レビュー               | `design-system-review`（catalog 自作）                                                                                 |
+| UI レビューレーン選択ハブ                  | `review-board`（catalog 自作）                                                                                         |
+| デザインドキュメント                       | `design-md-workflow`（catalog 自作）                                                                                   |
+| コードベース監査→計画（汎用）              | `improve`（shadcn）                                                                                                    |
+| React 診断                                 | `react-doctor`（millionco）                                                                                            |
 
 ### レビュー系の使い分け
 
@@ -136,7 +139,6 @@ skill 監査（`~/.claude/skill-report/2026-07-23T11-14-21/`）の結果を踏�
 | `transitions-dev`                    | アニメ    | CSS トランジション実装スニペット        | 手動起動あり         | 維持。description が bloated 判定 → トリム対象                         |
 | `review-animations`                  | アニメ    | 単発アニメーションレビュー              | なし                 | emil-design-eng で代替できると分かったら撤去                           |
 | `improve-animations`                 | アニメ    | モーション全体監査 → plan 生成          | なし                 | `improve`（汎用）の nested subset と監査指摘。improve で足りるなら撤去 |
-| `animation-vocabulary`               | アニメ    | モーション用語の逆引き                  | なし                 | 逆引きを使う場面が来なければ次回棚卸しで撤去                           |
 | `find-animation-opportunities`       | アニメ    | アニメ追加候補の発見（read-only）       | なし                 | 同上                                                                   |
 | `fixing-motion-performance`          | アニメ    | モーション性能監査・修正                | なし                 | emil 系と指摘が重複したら間引く（従来 watchlist どおり）               |
 | `apple-design`                       | アニメ/UI | Apple 流ジェスチャ・物理モーション      | 手動起動あり         | 維持                                                                   |
@@ -164,11 +166,11 @@ global から repo-local / optional へ移す候補。実施済みのもの
 （`agentation` 系、`slack-app-management`、`google-forms-survey-builder`、
 社内 API 系、UI バンドル縮小）は上の各レーンへ反映済み。
 
-| 候補                                  | 推奨配置                                    | 判断理由                                                                                                                                         |
-| ------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `browser-harness`                     | 対象リポジトリの `apm.yml` または on-demand | ブラウザセッション・ログイン状態と結び付く。`agent-browser` は 2026-07-16 に global 撤去済み（repo-local: `caad-loca-bff` / `ultra-rss-reader`） |
-| `understand` / `understand-dashboard` | 対象リポジトリの `apm.yml` または on-demand | 解析対象コードベースに結び付く                                                                                                                   |
-| `perman-aws-vault`                    | 当面 global 維持                            | 複数 AWS リポジトリで同じ認証導線を使うため。移管するなら profile/credential 境界を明記後                                                        |
+| 候補               | 推奨配置                                    | 判断理由                                                                                                                                         |
+| ------------------ | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `browser-harness`  | 対象リポジトリの `apm.yml` または on-demand | ブラウザセッション・ログイン状態と結び付く。`agent-browser` は 2026-07-16 に global 撤去済み（repo-local: `caad-loca-bff` / `ultra-rss-reader`） |
+| `understand`       | 対象リポジトリの `apm.yml` または on-demand | 解析対象コードベースに結び付く。`understand-dashboard` は 2026-08-09 に撤去（従属品）                                                            |
+| `perman-aws-vault` | 当面 global 維持                            | 複数 AWS リポジトリで同じ認証導線を使うため。移管するなら profile/credential 境界を明記後                                                        |
 
 2026-07-16 の棚卸しで global 維持を決定したもの（候補から除外）:
 `react-doctor`, `composition-patterns`, `react-best-practices`,
