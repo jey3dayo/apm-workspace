@@ -801,9 +801,9 @@ resolve_1password_mcp_command() {
     fi
   done
 
-  for command_path in \
-    /Applications/1Password.app/Contents/MacOS/onepassword-mcp \
-    /opt/1Password/onepassword-mcp; do
+  # Overridable so tests can neutralize host-installed app paths; unset means the real list.
+  onepassword_app_paths=${APM_1PASSWORD_MCP_APP_PATHS-"/Applications/1Password.app/Contents/MacOS/onepassword-mcp /opt/1Password/onepassword-mcp"}
+  for command_path in $onepassword_app_paths; do
     if [ -x "$command_path" ]; then
       printf '%s\n' "$command_path"
       return 0

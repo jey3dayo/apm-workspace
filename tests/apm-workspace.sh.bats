@@ -206,7 +206,7 @@ printf '/mnt/c/Users/sample/AppData/Local/Microsoft/WindowsApps/1password-mcp.ex
 EOF
   chmod +x "$fake_bin/cmd.exe" "$fake_bin/wslpath"
 
-  PATH="$fake_bin:/usr/bin:/bin" run resolve_1password_mcp_command
+  APM_1PASSWORD_MCP_APP_PATHS="" PATH="$fake_bin:/usr/bin:/bin" run resolve_1password_mcp_command
 
   [ "$status" -eq 0 ]
   [ "$output" = "/mnt/c/Users/sample/AppData/Local/Microsoft/WindowsApps/1password-mcp.exe" ]
