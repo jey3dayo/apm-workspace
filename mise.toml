@@ -122,6 +122,7 @@ depends = ["validate:workspace", "validate:catalog"]
 
 [tasks."format:markdown"]
 description = "Format Markdown files in the ~/.apm workspace"
+hide = true
 run = "fd -e md -X prettier --write --log-level error >/dev/null"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e md -X prettier --write --log-level error | Out-Null\""
 
@@ -133,6 +134,7 @@ run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -
 
 [tasks."format:markdown:bold-headings"]
 description = "Rewrite bold headings inside catalog skill and shared guidance sources"
+hide = true
 run = "bash ./scripts/format-bold-headings.sh write"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/format-bold-headings.ps1 write"
 
