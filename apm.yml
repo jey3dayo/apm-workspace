@@ -46,9 +46,9 @@ dependencies:
     - git: nextlevelbuilder/ui-ux-pro-max-skill
       skills:
         - ui-ux-pro-max
-    - openai/skills/skills/.curated/gh-address-comments
-    - openai/skills/skills/.curated/gh-fix-ci
-    - openai/skills/skills/.curated/screenshot
+    - openai/plugins/plugins/github/skills/gh-address-comments
+    - openai/plugins/plugins/github/skills/gh-fix-ci
+    - openai/skills/skills/.curated/screenshot # openai/skills is deprecated; no migrated equivalent found in openai/plugins yet
     - vercel-labs/agent-skills/skills/react-best-practices
     - shadcn/improve
     - fujibee/agmsg
