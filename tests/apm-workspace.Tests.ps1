@@ -712,8 +712,11 @@ Describe "public command surface" {
       $content | Should -Not -Match $legacyDocsPattern
     }
 
-    $miseToml = Get-Content -LiteralPath (Join-Path $workspaceRoot "mise.toml") -Raw
-    $miseToml | Should -Match 'replace-bold-headings\.ts'
+    # The helper path moved out of mise.toml into the task runners.
+    foreach ($runner in @("scripts/format-bold-headings.sh", "scripts/format-bold-headings.ps1")) {
+      $content = Get-Content -LiteralPath (Join-Path $workspaceRoot $runner) -Raw
+      $content | Should -Match 'replace-bold-headings\.ts'
+    }
   }
 
   It "maps runtime config filenames per target" {
@@ -1056,13 +1059,14 @@ dependencies: []
     $miseToml | Should -Not -Match '\[tasks\."verify:catalog"\]'
     $miseToml | Should -Match 'run = "bash ./scripts/apm-workspace.sh apply"'
     $miseToml | Should -Match 'run = "bash ./scripts/apm-workspace.sh apply:skills:local"'
-    $miseToml | Should -Match 'replace-bold-headings\.ts'
-    $miseToml | Should -Match 'replace-bold-headings\.ts'
-    $miseToml | Should -Match '\./catalog'
-    $miseToml | Should -Match '\./catalog --dry-run'
+    $miseToml | Should -Match 'run = "bash ./scripts/format-bold-headings.sh write"'
+    $miseToml | Should -Match 'run = "bash ./scripts/format-bold-headings.sh check"'
+    $boldHeadingRunner = Get-Content -LiteralPath (Join-Path $workspaceRoot "scripts/format-bold-headings.sh") -Raw
+    $boldHeadingRunner | Should -Match 'TARGET="\./catalog"'
+    $boldHeadingRunner | Should -Match '(?s)"\$mode" = "check".*--dry-run'
     $miseToml | Should -Match '(?s)\[tasks\."format:check"\]\s*description = "Check workspace docs and manifest formatting"\s*depends = \['
-    $miseToml | Should -Match '(?s)\[tasks\.check\]\s*description = "Run lightweight pre-deploy checks for the ~/.apm workspace"\s*depends = \["format:check", "validate"\]'
-    $miseToml | Should -Match '(?s)\[tasks\.verify\]\s*description = "Run deep verification for the ~/.apm workspace"\s*run = \[\{ task = "check" \}, \{ task = "test:all" \}, \{ task = "smoke:catalog" \}\]'
+    $miseToml | Should -Match '(?s)\[tasks\.check\]\s*description = "Run lightweight pre-deploy checks for the ~/.apm workspace"\s*(#[^\n]*\n\s*)*depends = \["format:check", "lint:yaml", "validate"\]'
+    $miseToml | Should -Match '(?s)\[tasks\.verify\]\s*description = "Run deep verification for the ~/.apm workspace"\s*run = \[\{ task = "check" \}, \{ task = "test" \}, \{ task = "smoke:catalog" \}\]'
     $miseToml | Should -Match '(?s)\[tasks\.deploy\]\s*description = "Run checks, deploy the current workspace state, and inspect targets"\s*run = \[\{ task = "check" \}, \{ task = "apply" \}, \{ task = "doctor" \}\]'
     $miseToml | Should -Match '(?s)\[tasks\.upgrade\].*?apm update -g.*?\{ task = "deploy" \}'
     $miseToml | Should -Match '(?s)\[tasks\."refresh:deploy"\].*?\{ task = "refresh" \}.*?\{ task = "deploy" \}'

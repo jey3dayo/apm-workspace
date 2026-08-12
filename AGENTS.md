@@ -91,6 +91,13 @@ Placement policy (global vs repo-local vs on-demand, browser-tool selection, own
 
 ## Task Selection
 
+### Host Prerequisites
+
+`mise.toml` `[tools]` covers everything except two host-owned dependencies:
+
+- `pwsh` with the Pester module — required by `test:ps` (and therefore `test` / `verify`). Not mise-managed.
+- `~/.config/scripts/replace-bold-headings.ts` — required by `format:markdown:bold-headings` and its `:check` variant, which `format:check` and both lefthook gates run. Missing helper is a hard failure by design; point `APM_BOLD_HEADINGS_SCRIPT` at a copy, or set `APM_ALLOW_MISSING_BOLD_HEADINGS=1` to bypass knowingly.
+
 Choose the command based on intent:
 
 - Before running a rollout command, classify the work as `stable rollout`, `upstream refresh`, or `local-only skill sync`
@@ -99,7 +106,7 @@ Choose the command based on intent:
   - `local-only skill sync`: refresh local Codex skills only, then use `mise run apply:skills:local`
 
 - `mise run upgrade`
-  - Accept newer upstream package content with `apm install -g --update`
+  - Accept newer upstream package content with `apm update -g`
   - Avoid for routine rollout; reserve it for intentional upstream refresh of workspace dependencies
   - Use for weekly refreshes, dependency drift acceptance, and content-hash mismatch resolution
 - `mise run refresh:deploy`
@@ -115,9 +122,10 @@ Choose the command based on intent:
   - Deep verification
   - Runs `check`, both workspace-script test suites, then catalog smoke verification
   - Use when you want stronger confidence before or apart from deployment
-- `mise run test:all`
-  - Runs the bats suite for `scripts/apm-workspace.sh` and the Pester suite for `scripts/apm-workspace.ps1`
+- `mise run test`
+  - Runs the Pester suite for `scripts/apm-workspace.ps1` (`test:ps`) and the bats suite for `scripts/apm-workspace.sh` (`test:sh`), serially
   - Both suites also run as pre-push jobs; run this directly when you want them without the rest of `verify`
+  - `test:ps` needs a host-installed `pwsh` with the Pester module; mise does not manage either
 - `mise run audit:ci:smoke`
   - Temp-install the current manifest and lock into an isolated project, then run `apm audit --ci`
   - Use when you want APM's lockfile/deployed-file integrity checks without depending on the current user-scope targets

@@ -29,6 +29,10 @@ pre-commit:
         bash -n scripts/apm-workspace.sh
         pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 help >/dev/null
 
+    - name: shell-syntax
+      glob: "scripts/*.sh"
+      run: bash -n {staged_files}
+
 pre-push:
   jobs:
     - name: workspace-scripts
@@ -39,8 +43,8 @@ pre-push:
     - name: test:sh
       run: mise run test:sh
 
-    - name: test
-      run: mise run test
+    - name: test:ps
+      run: mise run test:ps
 
     - name: format:markdown:bold-headings:check
       run: mise run format:markdown:bold-headings:check
