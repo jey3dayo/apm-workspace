@@ -93,10 +93,11 @@ Placement policy (global vs repo-local vs on-demand, browser-tool selection, own
 
 ### Host Prerequisites
 
-`mise.toml` `[tools]` covers everything except two host-owned dependencies:
+`mise.toml` `[tools]` covers everything except one host-owned dependency:
 
 - `pwsh` with the Pester module — required by `test:ps` (and therefore `test` / `verify`). Not mise-managed.
-- `~/.config/scripts/replace-bold-headings.ts` — required by `format:markdown:bold-headings` and its `:check` variant, which `format:check` and both lefthook gates run. Missing helper is a hard failure by design; point `APM_BOLD_HEADINGS_SCRIPT` at a copy, or set `APM_ALLOW_MISSING_BOLD_HEADINGS=1` to bypass knowingly.
+
+The bold-heading formatter helper (`scripts/replace-bold-headings.ts`) is vendored into this repository, not host-owned; `format:markdown:bold-headings` and its `:check` variant run it from the checkout via `node`/`tsx`, both declared in `mise.toml` `[tools]`. Missing the vendored file is a hard failure by design (a broken checkout, not a missing optional tool); point `APM_BOLD_HEADINGS_SCRIPT` at an alternate copy for development/testing.
 
 Choose the command based on intent:
 

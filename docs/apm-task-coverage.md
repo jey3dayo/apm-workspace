@@ -4,7 +4,7 @@
 
 - `~/.apm` is the day-to-day source of truth for APM catalog content, task wiring, and supporting docs.
 - `~/.config` is reference-only for this workflow. It is not the operational source of truth.
-- The only allowed operational exception under `~/.config` is `~/.config/scripts/replace-bold-headings.ts`, which exists as a formatter helper for heading normalization.
+- The bold-heading formatter helper (`replace-bold-headings.ts`) is vendored into this repository at `scripts/replace-bold-headings.ts`; there is no operational exception under `~/.config` for it.
 - Codex guidance is handled as a compile target via `apm compile --target codex --output ~/.codex/AGENTS.md`.
 - Codex skills deploy separately to `~/.agents/skills`; skill rollout verification must inspect the deployed `SKILL.md` there.
 
