@@ -1,0 +1,4 @@
+(A) 2026-08-12 skill-inventory.md の移管候補（browser 系・understand 系・社内 API 系）をレビューして実行する +skill-migration @apm note:docs/skill-inventory.md
+(B) 2026-08-12 React/UI validation を利用するリポジトリで repo-local install を検証する +skill-migration @apm
+(B) 2026-08-12 global manifest から候補を外す前に consuming repo の apm.yml で検証し package-decisions.md へ記録する +skill-migration @apm note:docs/package-decisions.md
+(C) 2026-08-12 understand を次の初見リポジトリで実際に起動するか観察し、使わなければ撤去する +skill-migration @apm

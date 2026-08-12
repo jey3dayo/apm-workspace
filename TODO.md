@@ -31,7 +31,7 @@
 - `[x]` `premortem`: 実装前の失敗条件分析が必要なリポジトリだけで使うため、`optional-skills` に移管済み。
 - `[x]` Agentation: `caad-loca-bff` / `ultra-rss-reader` の repo-local へ移管済み（2026-07-16）。
 - `[x]` UI bundle: `ui-ux-pro-max` 本体のみ global 維持に縮小済み（2026-07-16）。React/UI validation 系は棚卸しの結果 global 維持を決定。
-- `[ ]` browser automation（`browser-harness` / `agent-browser`）: 対象リポジトリで利用実績を確認して段階移管。
+- `[x]` browser automation（`browser-harness` / `agent-browser`）: 複数リポジトリで常時使う基盤に該当するため global 維持を決定（2026-08-12、[#6](https://github.com/jey3dayo/apm-workspace/issues/6)）。
 - `[x]` `ca-pass`、`mdb-api`、`notica-api`、`telma-api`: global から撤去済み。コピーせず、必要な利用リポジトリの `apm.yml` から upstream ref を個別導入する。
 
 ### 社員向けスキル検索の設計メモ
@@ -54,7 +54,7 @@ Global から専門スキルを外すために、軽量な「スキル検索・�
 
 ### 次の実行順
 
-- `[ ]` Agentation / browser automation の利用リポジトリを特定する。
+- `[x]` Agentation / browser automation の利用リポジトリ特定: browser automation は global 維持を決定したため不要（2026-08-12）。
 - `[ ]` React/UI validation を利用するリポジトリで repo-local install を検証する。
 - `[ ]` 社員向け検索 index の最小仕様と `apm search` 相当の read-only CLI を設計する。
 - `[x]` flat optional skill を GitHub に公開し、`tech-talks` を `optional-skills/google-forms-survey-builder#main` の単体 ref へ移して lock / deploy を確定した。
