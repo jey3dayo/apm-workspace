@@ -84,9 +84,9 @@ run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts
 
 [tasks."install:catalog"]
 description = "Install the managed catalog package by upstream ref"
-# Known trap: running this alone can deploy from a stale package cache, so a
-# file newly added under catalog/ disappears from the deploy targets. Follow it
-# with `mise run deploy`, or use `deploy:fresh` when output already looks stale.
+# Hard-fails if the local package cache is stale (e.g. a file newly added
+# under catalog/ is missing from the cache) instead of silently deploying
+# stale output. Run `mise run deploy:fresh` to rebuild the cache and redeploy.
 run = "bash ./scripts/apm-workspace.sh install:catalog"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 install:catalog"
 

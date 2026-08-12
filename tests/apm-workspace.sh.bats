@@ -633,7 +633,7 @@ _git_track() {
 
   mkdir -p "$workspace_dir/catalog/skills/foo/__pycache__"
   printf '*.pyc\n' >"$workspace_dir/catalog/skills/foo/.gitignore"
-  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo/.gitignore"
+  printf '*.pyc\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo/.gitignore"
   printf 'compiled\n' >"$workspace_dir/catalog/skills/foo/__pycache__/module.cpython-314.pyc"
 
   _git_track "$workspace_dir/catalog"
@@ -644,6 +644,150 @@ _git_track() {
 
   [ "$status" -eq 0 ]
   [[ "$output" != *"pycache"* ]]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "assert_catalog_cache_freshness passes when a tracked dotfile is present in the cache" {
+  workspace_dir="$(mktemp -d)"
+  mkdir -p "$workspace_dir/catalog/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo"
+  printf 'a\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
+  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo/SKILL.md"
+  printf '\n' >"$workspace_dir/catalog/.gitkeep"
+  printf '\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.gitkeep"
+  _git_track "$workspace_dir/catalog"
+
+  WORKSPACE_DIR="$workspace_dir"
+
+  run assert_catalog_cache_freshness
+
+  [ "$status" -eq 0 ]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "assert_catalog_cache_freshness fails when a tracked dotfile is missing from the cache" {
+  workspace_dir="$(mktemp -d)"
+  mkdir -p "$workspace_dir/catalog/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo"
+  printf 'a\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
+  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo/SKILL.md"
+  printf '\n' >"$workspace_dir/catalog/.gitkeep"
+  _git_track "$workspace_dir/catalog"
+
+  WORKSPACE_DIR="$workspace_dir"
+
+  run assert_catalog_cache_freshness
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *".gitkeep"* ]]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "assert_catalog_cache_freshness fails when a cached file's contents differ from the tracked file" {
+  workspace_dir="$(mktemp -d)"
+  mkdir -p "$workspace_dir/catalog/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo"
+  printf 'a\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
+  printf 'DIFFERENT\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo/SKILL.md"
+  _git_track "$workspace_dir/catalog"
+
+  WORKSPACE_DIR="$workspace_dir"
+
+  run assert_catalog_cache_freshness
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"different contents"* ]]
+  [[ "$output" == *"deploy:fresh"* ]]
+
+  rm -rf "$workspace_dir"
+}
+
+# --- assert_tracked_catalog_published ----------------------------------------
+
+_setup_published_workspace() {
+  remote_dir="$1"
+  workspace_dir="$2"
+
+  git init -q --bare "$remote_dir"
+  git clone -q "$remote_dir" "$workspace_dir"
+  git -C "$workspace_dir" config user.email "test@example.com"
+  git -C "$workspace_dir" config user.name "Test"
+  git -C "$workspace_dir" checkout -q -b main
+  mkdir -p "$workspace_dir/catalog/skills/foo"
+  printf 'a\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
+  git -C "$workspace_dir" add -A
+  git -C "$workspace_dir" commit -q -m "init"
+  git -C "$workspace_dir" push -q -u origin main
+}
+
+@test "assert_tracked_catalog_published fails when the tracked catalog has uncommitted changes" {
+  remote_dir="$(mktemp -d)"
+  workspace_dir="$(mktemp -d)"
+  rmdir "$workspace_dir"
+  _setup_published_workspace "$remote_dir" "$workspace_dir"
+
+  printf 'dirty\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
+
+  WORKSPACE_DIR="$workspace_dir"
+
+  run assert_tracked_catalog_published
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"uncommitted changes"* ]]
+
+  rm -rf "$remote_dir" "$workspace_dir"
+}
+
+@test "assert_tracked_catalog_published fails when the tracked catalog has unpushed commits" {
+  remote_dir="$(mktemp -d)"
+  workspace_dir="$(mktemp -d)"
+  rmdir "$workspace_dir"
+  _setup_published_workspace "$remote_dir" "$workspace_dir"
+
+  printf 'b\n' >"$workspace_dir/catalog/skills/foo/extra.md"
+  git -C "$workspace_dir" add -A
+  git -C "$workspace_dir" commit -q -m "unpushed"
+
+  WORKSPACE_DIR="$workspace_dir"
+
+  run assert_tracked_catalog_published
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"commits not on"* ]]
+
+  rm -rf "$remote_dir" "$workspace_dir"
+}
+
+@test "assert_tracked_catalog_published fails closed when the workspace is not a git repository" {
+  workspace_dir="$(mktemp -d)"
+  mkdir -p "$workspace_dir/catalog/skills/foo"
+  printf 'a\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
+  # No `git init`: git status/rev-list must fail, and the gate must not treat
+  # that failure as "clean" / "pushed".
+
+  WORKSPACE_DIR="$workspace_dir"
+
+  run assert_tracked_catalog_published
+
+  [ "$status" -ne 0 ]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "assert_catalog_cache_freshness fails closed when git ls-files fails" {
+  workspace_dir="$(mktemp -d)"
+  mkdir -p "$workspace_dir/catalog/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo"
+  printf 'a\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
+  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo/SKILL.md"
+  # Deliberately do NOT git-init the tracked catalog dir: `git ls-files` fails
+  # (not a git repository), and the gate must not treat that as "no tracked
+  # files" and pass vacuously.
+
+  WORKSPACE_DIR="$workspace_dir"
+
+  run assert_catalog_cache_freshness
+
+  [ "$status" -ne 0 ]
 
   rm -rf "$workspace_dir"
 }

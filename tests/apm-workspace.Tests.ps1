@@ -529,12 +529,12 @@ dependencies:
     New-Item -ItemType Directory -Path $pycacheDir -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $pycacheDir "module.cpython-314.pyc") -Value "compiled"
 
-    # Use the repo-local exclude file rather than a tracked .gitignore: a
-    # tracked dotfile would itself go missing from the comparison, because
-    # Get-RelativeFilePaths (via Get-ChildItem without -Force) treats
-    # dotfiles as hidden on .NET/Unix and skips them on the cache side. The
-    # exclude file achieves the same "gitignored" effect without adding a
-    # tracked dotfile to either side.
+    # Use the repo-local exclude file rather than a tracked .gitignore just to
+    # keep this fixture focused on the gitignore behavior in isolation. (A
+    # tracked dotfile now works fine here too -- see the dedicated dotfile
+    # tests below -- because Assert-CatalogCacheFreshness walks the
+    # git-tracked path list directly instead of enumerating the cache with
+    # Get-RelativeFilePaths, which is the .NET/Unix dotfile blind spot.)
     & git -C $catalogRoot init -q | Out-Null
     Add-Content -LiteralPath (Join-Path $catalogRoot ".git\info\exclude") -Value "*.pyc"
     & git -C $catalogRoot add -A | Out-Null
@@ -542,6 +542,144 @@ dependencies:
     { Assert-CatalogCacheFreshness } | Should -Not -Throw
   }
 
+  It "passes when a tracked dotfile is present in the cache" {
+    $catalogRoot = Join-Path $script:WorkspaceDir "catalog"
+    $apmModulesRoot = Join-Path $script:WorkspaceDir "apm_modules"
+    Remove-Item -LiteralPath $catalogRoot -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $apmModulesRoot -Recurse -Force -ErrorAction SilentlyContinue
+    $trackedDir = Join-Path $catalogRoot "skills\foo"
+    $cacheDir = Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog\skills\foo"
+    New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
+    New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $trackedDir "SKILL.md") -Value "a"
+    Set-Content -LiteralPath (Join-Path $cacheDir "SKILL.md") -Value "a"
+    Set-Content -LiteralPath (Join-Path $catalogRoot ".gitkeep") -Value ""
+    Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog\.gitkeep") -Value ""
+    Initialize-GitTrackedDirectory -Directory $catalogRoot
+
+    { Assert-CatalogCacheFreshness } | Should -Not -Throw
+  }
+
+  It "throws when a tracked dotfile is missing from the cache" {
+    $catalogRoot = Join-Path $script:WorkspaceDir "catalog"
+    $apmModulesRoot = Join-Path $script:WorkspaceDir "apm_modules"
+    Remove-Item -LiteralPath $catalogRoot -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $apmModulesRoot -Recurse -Force -ErrorAction SilentlyContinue
+    $trackedDir = Join-Path $catalogRoot "skills\foo"
+    $cacheDir = Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog\skills\foo"
+    New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
+    New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $trackedDir "SKILL.md") -Value "a"
+    Set-Content -LiteralPath (Join-Path $cacheDir "SKILL.md") -Value "a"
+    Set-Content -LiteralPath (Join-Path $catalogRoot ".gitkeep") -Value ""
+    Initialize-GitTrackedDirectory -Directory $catalogRoot
+
+    { Assert-CatalogCacheFreshness } | Should -Throw "*.gitkeep*"
+  }
+
+  It "throws naming content differences when a cached file's contents differ from the tracked file" {
+    $catalogRoot = Join-Path $script:WorkspaceDir "catalog"
+    $apmModulesRoot = Join-Path $script:WorkspaceDir "apm_modules"
+    Remove-Item -LiteralPath $catalogRoot -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $apmModulesRoot -Recurse -Force -ErrorAction SilentlyContinue
+    $trackedDir = Join-Path $catalogRoot "skills\foo"
+    $cacheDir = Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog\skills\foo"
+    New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
+    New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $trackedDir "SKILL.md") -Value "a"
+    Set-Content -LiteralPath (Join-Path $cacheDir "SKILL.md") -Value "DIFFERENT"
+    Initialize-GitTrackedDirectory -Directory $catalogRoot
+
+    { Assert-CatalogCacheFreshness } | Should -Throw "*different contents*"
+  }
+
+  It "fails closed when git ls-files fails" {
+    $catalogRoot = Join-Path $script:WorkspaceDir "catalog"
+    $apmModulesRoot = Join-Path $script:WorkspaceDir "apm_modules"
+    Remove-Item -LiteralPath $catalogRoot -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $apmModulesRoot -Recurse -Force -ErrorAction SilentlyContinue
+    $trackedDir = Join-Path $catalogRoot "skills\foo"
+    $cacheDir = Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog\skills\foo"
+    New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
+    New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $trackedDir "SKILL.md") -Value "a"
+    Set-Content -LiteralPath (Join-Path $cacheDir "SKILL.md") -Value "a"
+    # Deliberately skip Initialize-GitTrackedDirectory: `git ls-files` fails
+    # (not a git repository), and the gate must not treat that as "no
+    # tracked files" and pass vacuously.
+
+    { Assert-CatalogCacheFreshness } | Should -Throw
+  }
+
+}
+
+Describe "Assert-TrackedCatalogPublished" {
+  BeforeAll {
+    $env:APM_WORKSPACE_LIB_ONLY = "1"
+    $modulePath = Join-Path (Join-Path $PSScriptRoot "..") "scripts/apm-workspace.ps1"
+    . (Resolve-Path -LiteralPath $modulePath).Path
+    Remove-Item Env:APM_WORKSPACE_LIB_ONLY -ErrorAction SilentlyContinue
+
+    function Initialize-PublishedWorkspace {
+      param(
+        [Parameter(Mandatory = $true)]
+        [string]$RemoteDir,
+
+        [Parameter(Mandatory = $true)]
+        [string]$WorkspaceDir
+      )
+
+      & git init -q --bare $RemoteDir | Out-Null
+      & git clone -q $RemoteDir $WorkspaceDir | Out-Null
+      & git -C $WorkspaceDir config user.email "test@example.com" | Out-Null
+      & git -C $WorkspaceDir config user.name "Test" | Out-Null
+      & git -C $WorkspaceDir checkout -q -b main | Out-Null
+      New-Item -ItemType Directory -Path (Join-Path $WorkspaceDir "catalog\skills\foo") -Force | Out-Null
+      Set-Content -LiteralPath (Join-Path $WorkspaceDir "catalog\skills\foo\SKILL.md") -Value "a"
+      & git -C $WorkspaceDir add -A | Out-Null
+      & git -C $WorkspaceDir commit -q -m "init" | Out-Null
+      & git -C $WorkspaceDir push -q -u origin main | Out-Null
+    }
+  }
+
+  BeforeEach {
+    # Each fixture creates and pushes a real git repo, so every test needs
+    # its own unique paths -- $TestDrive is shared across It blocks within
+    # this Describe and is not reset between them.
+    $script:caseId = [guid]::NewGuid().ToString("N")
+    $script:WorkspaceDir = Join-Path $TestDrive "workspace-$script:caseId"
+    $WorkspaceDir = $script:WorkspaceDir
+    $global:WorkspaceDir = $script:WorkspaceDir
+  }
+
+  It "throws when the tracked catalog has uncommitted changes" {
+    $remoteDir = Join-Path $TestDrive "remote-$script:caseId.git"
+    Initialize-PublishedWorkspace -RemoteDir $remoteDir -WorkspaceDir $script:WorkspaceDir
+
+    Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "catalog\skills\foo\SKILL.md") -Value "dirty"
+
+    { Assert-TrackedCatalogPublished } | Should -Throw "*uncommitted changes*"
+  }
+
+  It "throws when the tracked catalog has commits not on the upstream" {
+    $remoteDir = Join-Path $TestDrive "remote-$script:caseId.git"
+    Initialize-PublishedWorkspace -RemoteDir $remoteDir -WorkspaceDir $script:WorkspaceDir
+
+    Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "catalog\skills\foo\extra.md") -Value "b"
+    & git -C $script:WorkspaceDir add -A | Out-Null
+    & git -C $script:WorkspaceDir commit -q -m "unpushed" | Out-Null
+
+    { Assert-TrackedCatalogPublished } | Should -Throw "*commits not on*"
+  }
+
+  It "fails closed when the workspace is not a git repository" {
+    New-Item -ItemType Directory -Path (Join-Path $script:WorkspaceDir "catalog\skills\foo") -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "catalog\skills\foo\SKILL.md") -Value "a"
+    # Deliberately skip git init: git status/rev-list must fail, and the gate
+    # must not treat that failure as "clean" / "pushed".
+
+    { Assert-TrackedCatalogPublished } | Should -Throw
+  }
 }
 
 Describe "public command surface" {

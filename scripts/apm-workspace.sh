@@ -442,14 +442,18 @@ assert_tracked_catalog_published() {
 
   [ -d "$tracked_dir" ] || fail "Tracked catalog missing: $tracked_dir. Run 'mise run prepare:catalog' first."
 
-  dirty=$(git -C "$WORKSPACE_DIR" status --porcelain -- "$tracked_relative_path" 2>/dev/null || true)
+  if ! dirty=$(git -C "$WORKSPACE_DIR" status --porcelain -- "$tracked_relative_path" 2>/dev/null); then
+    fail "Failed to inspect git status for $tracked_relative_path"
+  fi
   [ -z "$dirty" ] || fail "Tracked catalog has uncommitted changes. Commit and push $tracked_relative_path before registering it."
 
   tracking_info=$(workspace_tracking_info)
   remote_name=${tracking_info%%"$(printf '\036')"*}
   branch_name=${tracking_info#*"$(printf '\036')"}
   upstream="$remote_name/$branch_name"
-  unpushed=$(git -C "$WORKSPACE_DIR" rev-list "$upstream..HEAD" -- "$tracked_relative_path" 2>/dev/null || true)
+  if ! unpushed=$(git -C "$WORKSPACE_DIR" rev-list "$upstream..HEAD" -- "$tracked_relative_path" 2>/dev/null); then
+    fail "Failed to compare $tracked_relative_path against $upstream"
+  fi
   [ -z "$unpushed" ] || fail "Tracked catalog has commits not on $upstream. Push the branch before registering it."
 }
 
@@ -463,7 +467,12 @@ assert_catalog_cache_freshness() {
   # gitignored build artifacts (.pytest_cache/, __pycache__/, etc.) are never
   # part of the deployed package, so they must never count as "missing" from
   # the cache.
-  tracked_files=$(git -C "$tracked_dir" ls-files 2>/dev/null | sort || true)
+  if ! tracked_files=$(git -C "$tracked_dir" ls-files 2>/dev/null | sort); then
+    fail "Failed to list git-tracked files in $tracked_dir. Cannot verify cache freshness."
+  fi
+  fresh_count=$(printf '%s\n' "$tracked_files" | grep -c . || true)
+  [ "$fresh_count" -gt 0 ] || fail "Tracked catalog has no git-tracked files: $tracked_dir. Cannot verify cache freshness."
+
   missing=$(comm -23 <(printf '%s\n' "$tracked_files") <(relative_file_list "$cache_dir"))
   if [ -n "$missing" ]; then
     missing_count=$(printf '%s\n' "$missing" | wc -l | tr -d ' ')
@@ -471,7 +480,23 @@ assert_catalog_cache_freshness() {
     fail "Local package cache is stale: $missing_count file(s) tracked in $tracked_dir are missing from $cache_dir (e.g. $examples). Run 'mise run deploy:fresh' to rebuild the cache and redeploy."
   fi
 
-  fresh_count=$(printf '%s\n' "$tracked_files" | grep -c . || true)
+  mismatched=""
+  mismatched_count=0
+  while IFS= read -r relative_path; do
+    [ -n "$relative_path" ] || continue
+    if ! file_content_equal "$tracked_dir/$relative_path" "$cache_dir/$relative_path"; then
+      mismatched="$mismatched$relative_path"$'\n'
+      mismatched_count=$((mismatched_count + 1))
+    fi
+  done <<EOF
+$tracked_files
+EOF
+
+  if [ "$mismatched_count" -gt 0 ]; then
+    examples=$(printf '%s' "$mismatched" | head -5 | tr '\n' ',' | sed 's/,$//' | sed 's/,/, /g')
+    fail "Local package cache is stale: $mismatched_count file(s) tracked in $tracked_dir have different contents in $cache_dir (e.g. $examples). Run 'mise run deploy:fresh' to rebuild the cache and redeploy."
+  fi
+
   log "Local package cache matches tracked catalog ($fresh_count files)."
 }
 

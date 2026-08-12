@@ -2510,17 +2510,42 @@ function Assert-CatalogCacheFreshness {
   # gitignored build artifacts (.pytest_cache/, __pycache__/, etc.) are never
   # part of the deployed package, so they must never count as "missing" from
   # the cache.
-  $gitOutput = @(& git -C $trackedDir ls-files 2>$null)
+  #
+  # Do NOT enumerate the cache with Get-RelativeFilePaths: it uses
+  # Get-ChildItem -Recurse -File without -Force, which silently omits
+  # dotfiles on Unix .NET. Instead, walk the git-tracked path list (which
+  # naturally includes dotfiles) and probe the cache directly.
+  $gitOutput = & git -C $trackedDir ls-files 2>$null
   if ($LASTEXITCODE -ne 0) {
-    $gitOutput = @()
+    throw "Failed to list git-tracked files in $trackedDir. Cannot verify cache freshness."
   }
-  $trackedFiles = @($gitOutput | Sort-Object)
-  $cacheFiles = [System.Collections.Generic.HashSet[string]]::new([string[]]@(Get-RelativeFilePaths -RootDir $cacheDir))
+  $trackedFiles = @($gitOutput | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Sort-Object)
+  if ($trackedFiles.Count -eq 0) {
+    throw "Tracked catalog has no git-tracked files: $trackedDir. Cannot verify cache freshness."
+  }
 
-  $missing = @($trackedFiles | Where-Object { -not $cacheFiles.Contains($_) })
+  $missing = New-Object System.Collections.Generic.List[string]
+  $mismatched = New-Object System.Collections.Generic.List[string]
+  foreach ($relativePath in $trackedFiles) {
+    $trackedPath = Join-Path $trackedDir ($relativePath -replace '/', [System.IO.Path]::DirectorySeparatorChar)
+    $cachePath = Join-Path $cacheDir ($relativePath -replace '/', [System.IO.Path]::DirectorySeparatorChar)
+    if (-not (Test-Path -LiteralPath $cachePath)) {
+      $missing.Add($relativePath)
+      continue
+    }
+    if (-not (Test-FileContentEqual -ExpectedPath $trackedPath -ActualPath $cachePath)) {
+      $mismatched.Add($relativePath)
+    }
+  }
+
   if ($missing.Count -gt 0) {
     $examples = ($missing | Select-Object -First 5) -join ", "
     throw "Local package cache is stale: $($missing.Count) file(s) tracked in $trackedDir are missing from $cacheDir (e.g. $examples). Run 'mise run deploy:fresh' to rebuild the cache and redeploy."
+  }
+
+  if ($mismatched.Count -gt 0) {
+    $examples = ($mismatched | Select-Object -First 5) -join ", "
+    throw "Local package cache is stale: $($mismatched.Count) file(s) tracked in $trackedDir have different contents in $cacheDir (e.g. $examples). Run 'mise run deploy:fresh' to rebuild the cache and redeploy."
   }
 
   Write-Host "Local package cache matches tracked catalog ($($trackedFiles.Count) files)."
