@@ -1,6 +1,6 @@
 ---
 name: todo-changelog-ops
-description: "Use when adding, closing, or pruning entries in a repository's `TODO.md`, when moving finished work into `CHANGELOG.md`, or when setting up local task tracking for a repository that has no tracker. Do not use for entrypoint-docs drift review (`docs-entrypoint-review`), for cutting a release version section or tag (the repository's release workflow), for manager-facing work reports (`work-log-maintenance`), or for commit splitting (`atomic-commit`)."
+description: "Use when adding, closing, or pruning entries in a repository's `TODO.md`, when moving finished work into `CHANGELOG.md` (including work tracked in `todo.txt`, GitHub Issues, or PRs), when setting up local task tracking for a repository that has no tracker, or when deciding where a task belongs among `todo.txt`, GitHub Issues, docs, and `TODO.md` (置き場の振り分け). Do not use for entrypoint-docs drift review (`docs-entrypoint-review`), for cutting a release version section or tag (the repository's release workflow), for manager-facing work reports (`work-log-maintenance`), or for commit splitting (`atomic-commit`)."
 version: 1.0.0
 tags: [todo, changelog, backlog, task-tracking]
 triggers:
@@ -14,6 +14,19 @@ triggers:
 # TODO / CHANGELOG Ops
 
 外部トラッカーを使わず、リポジトリ内の 2 ファイルだけで作業を追跡するローカル標準。`TODO.md` が未完了、`CHANGELOG.md` が完了済みを持つ。ツールは要らない。
+
+## 置き場の振り分け
+
+リポジトリが `todo.txt`（tuxedo 運用）や GitHub Issues を併用している場合は、この 2 ファイル標準へ寄せる前に次の基準で振り分ける。
+
+1. 完了したら消えていい軽い単発タスク → `todo.txt`（`tuxedo` スキル）
+2. 経緯・判断理由・議論を後から辿りたいもの → GitHub Issues（`note:<issue URL>` で todo.txt から参照してよい）
+3. 完了という概念がなく恒常的に参照するルール・手順 → `docs/` / `AGENTS.md` 系
+4. 上記のどれも使っていないリポジトリ → この標準（`TODO.md` + `CHANGELOG.md`）
+
+todo.txt のタスクが設計判断を要するほど育ったら issue へ昇格し、todo.txt 側は issue リンクを残して閉じるか行ごと消して一本化する。
+
+## 書式
 
 書式そのものは標準化しない。リポジトリごとに散文量も優先度記号も違ってよく、**必須項目が読み取れることだけ**を要求する。既存ファイルがあるときは、そこの現物書式に合わせる。
 
@@ -47,11 +60,11 @@ triggers:
 
 ## 完了して CHANGELOG へ移す
 
-実装が landed してから移す。着手中や検証待ちの項目は `TODO.md` に残す。
+タスクがどこで管理されていても（`todo.txt` / `TODO.md` / GitHub Issue / PR）、実装が landed したら CHANGELOG へ 1 エントリ書く。着手中や検証待ちの項目は元の置き場に残す。
 
-1. `TODO.md` から該当エントリを削除する。親項目へ寄せる場合は、残す検証観点を親側へ移してから消す。
-2. CHANGELOG のモードに従って 1 エントリ追加する。
-3. 利用者に見えない内部変更だけの項目は CHANGELOG へ書かず削除し、理由をコミットメッセージに残す。
+1. 元の置き場を閉じる。`TODO.md` は該当エントリを削除（親項目へ寄せる場合は、残す検証観点を親側へ移してから消す）、`todo.txt` は `done` → `archive`、issue はクローズ。PR は merge 自体が完了。
+2. CHANGELOG のモードに従って 1 エントリ追加する。issue / PR 起点のエントリには番号（`#12`）を添えて経緯を辿れるようにする。
+3. 利用者に見えない内部変更だけの項目は CHANGELOG へ書かず閉じるだけにし、理由をコミットメッセージに残す。
 
 ## 棚卸し
 

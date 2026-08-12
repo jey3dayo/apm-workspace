@@ -7,6 +7,8 @@ description: Use when managing todo.txt tasks with the `tuxedo` CLI/TUI — addi
 
 tuxedo は todo.txt 形式を扱う TUI + CLI（Rust 製単一バイナリ、Homebrew tap `webstonehq/tap/tuxedo`）。`tuxedo [FILE]` で TUI、`tuxedo <command>` でワンショット実行。正本ドキュメントは https://github.com/webstonehq/tuxedo の README。
 
+タスクを todo.txt に置くべきか（GitHub Issues / docs / `TODO.md` との使い分け）に迷ったら、`todo-changelog-ops` の「置き場の振り分け」に従う。
+
 ## Key facts
 
 - コマンド一覧と引数は `tuxedo --help` が正。ここには help に書かれていない挙動だけを記す
