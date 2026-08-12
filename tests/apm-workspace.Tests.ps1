@@ -12,6 +12,18 @@ Describe "catalog helpers" {
     $modulePath = Join-Path (Join-Path $PSScriptRoot "..") "scripts/apm-workspace.ps1"
     . (Resolve-Path -LiteralPath $modulePath).Path
     Remove-Item Env:APM_WORKSPACE_LIB_ONLY -ErrorAction SilentlyContinue
+
+    # Assert-CatalogCacheFreshness compares against git-tracked files, not a
+    # raw filesystem walk, so fixtures exercising it must be real git repos.
+    function Initialize-GitTrackedDirectory {
+      param(
+        [Parameter(Mandatory = $true)]
+        [string]$Directory
+      )
+
+      & git -C $Directory init -q | Out-Null
+      & git -C $Directory add -A | Out-Null
+    }
   }
 
   BeforeEach {
@@ -456,6 +468,78 @@ dependencies:
     $records[0].Repo | Should -Be "openai/skills"
     $records[0].Path | Should -Be "skills/.curated/gh-address-comments"
     $records[0].Commit | Should -Be "abcdef1234567890"
+  }
+
+  It "passes when the local package cache matches the tracked catalog" {
+    $catalogRoot = Join-Path $script:WorkspaceDir "catalog"
+    $apmModulesRoot = Join-Path $script:WorkspaceDir "apm_modules"
+    Remove-Item -LiteralPath $catalogRoot -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $apmModulesRoot -Recurse -Force -ErrorAction SilentlyContinue
+    $trackedDir = Join-Path $catalogRoot "skills\foo"
+    $cacheDir = Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog\skills\foo"
+    New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
+    New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $trackedDir "SKILL.md") -Value "a"
+    Set-Content -LiteralPath (Join-Path $cacheDir "SKILL.md") -Value "a"
+    Initialize-GitTrackedDirectory -Directory $catalogRoot
+
+    { Assert-CatalogCacheFreshness } | Should -Not -Throw
+  }
+
+  It "throws naming deploy:fresh when a tracked file is missing from the cache" {
+    $catalogRoot = Join-Path $script:WorkspaceDir "catalog"
+    $apmModulesRoot = Join-Path $script:WorkspaceDir "apm_modules"
+    Remove-Item -LiteralPath $catalogRoot -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $apmModulesRoot -Recurse -Force -ErrorAction SilentlyContinue
+    $trackedDir = Join-Path $catalogRoot "skills\new-skill"
+    $cacheRoot = Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog"
+    New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
+    New-Item -ItemType Directory -Path $cacheRoot -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $trackedDir "SKILL.md") -Value "a"
+    Initialize-GitTrackedDirectory -Directory $catalogRoot
+
+    { Assert-CatalogCacheFreshness } | Should -Throw "*deploy:fresh*"
+  }
+
+  It "throws naming deploy:fresh when the cache directory is absent" {
+    $catalogRoot = Join-Path $script:WorkspaceDir "catalog"
+    $apmModulesRoot = Join-Path $script:WorkspaceDir "apm_modules"
+    Remove-Item -LiteralPath $catalogRoot -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $apmModulesRoot -Recurse -Force -ErrorAction SilentlyContinue
+    $trackedDir = Join-Path $catalogRoot "skills\foo"
+    New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $trackedDir "SKILL.md") -Value "a"
+    Initialize-GitTrackedDirectory -Directory $catalogRoot
+
+    { Assert-CatalogCacheFreshness } | Should -Throw "*deploy:fresh*"
+  }
+
+  It "ignores gitignored untracked files under the tracked catalog dir" {
+    $catalogRoot = Join-Path $script:WorkspaceDir "catalog"
+    $apmModulesRoot = Join-Path $script:WorkspaceDir "apm_modules"
+    Remove-Item -LiteralPath $catalogRoot -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $apmModulesRoot -Recurse -Force -ErrorAction SilentlyContinue
+    $trackedDir = Join-Path $catalogRoot "skills\foo"
+    $cacheDir = Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog\skills\foo"
+    New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
+    New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $trackedDir "SKILL.md") -Value "a"
+    Set-Content -LiteralPath (Join-Path $cacheDir "SKILL.md") -Value "a"
+    $pycacheDir = Join-Path $trackedDir "__pycache__"
+    New-Item -ItemType Directory -Path $pycacheDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $pycacheDir "module.cpython-314.pyc") -Value "compiled"
+
+    # Use the repo-local exclude file rather than a tracked .gitignore: a
+    # tracked dotfile would itself go missing from the comparison, because
+    # Get-RelativeFilePaths (via Get-ChildItem without -Force) treats
+    # dotfiles as hidden on .NET/Unix and skips them on the cache side. The
+    # exclude file achieves the same "gitignored" effect without adding a
+    # tracked dotfile to either side.
+    & git -C $catalogRoot init -q | Out-Null
+    Add-Content -LiteralPath (Join-Path $catalogRoot ".git\info\exclude") -Value "*.pyc"
+    & git -C $catalogRoot add -A | Out-Null
+
+    { Assert-CatalogCacheFreshness } | Should -Not -Throw
   }
 
 }

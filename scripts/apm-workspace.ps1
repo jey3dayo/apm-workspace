@@ -2498,6 +2498,34 @@ function Assert-TrackedCatalogPublished {
   }
 }
 
+function Assert-CatalogCacheFreshness {
+  $trackedDir = Get-TrackedCatalogDir
+  $cacheDir = Join-Path (Get-WorkspacePackageCacheRoot) "catalog"
+
+  if (-not (Test-Path -LiteralPath $cacheDir)) {
+    throw "Local package cache missing: $cacheDir. Run 'mise run deploy:fresh' to rebuild it."
+  }
+
+  # Compare against git-tracked files only, not the filesystem listing:
+  # gitignored build artifacts (.pytest_cache/, __pycache__/, etc.) are never
+  # part of the deployed package, so they must never count as "missing" from
+  # the cache.
+  $gitOutput = @(& git -C $trackedDir ls-files 2>$null)
+  if ($LASTEXITCODE -ne 0) {
+    $gitOutput = @()
+  }
+  $trackedFiles = @($gitOutput | Sort-Object)
+  $cacheFiles = [System.Collections.Generic.HashSet[string]]::new([string[]]@(Get-RelativeFilePaths -RootDir $cacheDir))
+
+  $missing = @($trackedFiles | Where-Object { -not $cacheFiles.Contains($_) })
+  if ($missing.Count -gt 0) {
+    $examples = ($missing | Select-Object -First 5) -join ", "
+    throw "Local package cache is stale: $($missing.Count) file(s) tracked in $trackedDir are missing from $cacheDir (e.g. $examples). Run 'mise run deploy:fresh' to rebuild the cache and redeploy."
+  }
+
+  Write-Host "Local package cache matches tracked catalog ($($trackedFiles.Count) files)."
+}
+
 function Invoke-SeedCatalogBuild {
   param(
     [string[]]$RequestedSkillIds,
@@ -2582,6 +2610,7 @@ function Invoke-RegisterCatalog {
 
   $reference = Get-TrackedCatalogReference
   Invoke-WorkspaceInstallCommand -InstallArgs @("-g", $reference)
+  Assert-CatalogCacheFreshness
   Sync-ManagedCatalogRuntimeAssets
   Write-Host "Registered catalog from upstream ref: $reference"
 }

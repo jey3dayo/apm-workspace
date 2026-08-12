@@ -453,6 +453,28 @@ assert_tracked_catalog_published() {
   [ -z "$unpushed" ] || fail "Tracked catalog has commits not on $upstream. Push the branch before registering it."
 }
 
+assert_catalog_cache_freshness() {
+  tracked_dir=$(tracked_catalog_dir)
+  cache_dir="$(workspace_package_cache_root)/catalog"
+
+  [ -d "$cache_dir" ] || fail "Local package cache missing: $cache_dir. Run 'mise run deploy:fresh' to rebuild it."
+
+  # Compare against git-tracked files only, not the filesystem listing:
+  # gitignored build artifacts (.pytest_cache/, __pycache__/, etc.) are never
+  # part of the deployed package, so they must never count as "missing" from
+  # the cache.
+  tracked_files=$(git -C "$tracked_dir" ls-files 2>/dev/null | sort || true)
+  missing=$(comm -23 <(printf '%s\n' "$tracked_files") <(relative_file_list "$cache_dir"))
+  if [ -n "$missing" ]; then
+    missing_count=$(printf '%s\n' "$missing" | wc -l | tr -d ' ')
+    examples=$(printf '%s\n' "$missing" | head -5 | tr '\n' ',' | sed 's/,$//' | sed 's/,/, /g')
+    fail "Local package cache is stale: $missing_count file(s) tracked in $tracked_dir are missing from $cache_dir (e.g. $examples). Run 'mise run deploy:fresh' to rebuild the cache and redeploy."
+  fi
+
+  fresh_count=$(printf '%s\n' "$tracked_files" | grep -c . || true)
+  log "Local package cache matches tracked catalog ($fresh_count files)."
+}
+
 managed_skill_content_dir() {
   skill_id="$1"
   validate_skill_id "$skill_id"
@@ -2276,6 +2298,7 @@ cmd_register_catalog() {
 
   reference=$(tracked_catalog_reference)
   run_workspace_install_command -g "$reference"
+  assert_catalog_cache_freshness
   sync_managed_catalog_runtime_assets
   log "Registered catalog from upstream ref: $reference"
 }

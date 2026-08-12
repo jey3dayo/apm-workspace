@@ -524,3 +524,126 @@ make_catalog_fixture() {
 
   rm -rf "$runtime_home" "$link_source"
 }
+
+# --- assert_catalog_cache_freshness ------------------------------------------
+#
+# The tracked side of the comparison must be git-tracked files (`git
+# ls-files`), never a raw filesystem walk: gitignored build artifacts
+# (.pytest_cache/, __pycache__/, etc.) can exist under catalog/ without ever
+# being part of the deployed package, and must never be reported as missing
+# from the cache. Every fixture below `git init`s the tracked catalog dir and
+# `git add`s the files meant to count as tracked.
+
+_git_track() {
+  dir="$1"
+  git -C "$dir" init -q
+  git -C "$dir" add -A
+}
+
+@test "assert_catalog_cache_freshness cache_freshness passes when cache matches tracked" {
+  workspace_dir="$(mktemp -d)"
+  mkdir -p "$workspace_dir/catalog/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo"
+  printf 'a\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
+  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo/SKILL.md"
+  _git_track "$workspace_dir/catalog"
+
+  WORKSPACE_DIR="$workspace_dir"
+
+  run assert_catalog_cache_freshness
+
+  [ "$status" -eq 0 ]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "assert_catalog_cache_freshness cache_freshness fails with remedy when a tracked file is missing from cache" {
+  workspace_dir="$(mktemp -d)"
+  mkdir -p "$workspace_dir/catalog/skills/new-skill" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog"
+  printf 'a\n' >"$workspace_dir/catalog/skills/new-skill/SKILL.md"
+  _git_track "$workspace_dir/catalog"
+
+  WORKSPACE_DIR="$workspace_dir"
+
+  run assert_catalog_cache_freshness
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"new-skill"* ]]
+  [[ "$output" == *"deploy:fresh"* ]]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "assert_catalog_cache_freshness cache_freshness fails with remedy when the cache directory is absent" {
+  workspace_dir="$(mktemp -d)"
+  mkdir -p "$workspace_dir/catalog/skills/foo"
+  printf 'a\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
+  _git_track "$workspace_dir/catalog"
+
+  WORKSPACE_DIR="$workspace_dir"
+
+  run assert_catalog_cache_freshness
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"deploy:fresh"* ]]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "assert_catalog_cache_freshness cache_freshness passes when the cache has an extra file not tracked" {
+  workspace_dir="$(mktemp -d)"
+  mkdir -p "$workspace_dir/catalog/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo"
+  printf 'a\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
+  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo/SKILL.md"
+  printf 'metadata\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo/extra.json"
+  _git_track "$workspace_dir/catalog"
+
+  WORKSPACE_DIR="$workspace_dir"
+
+  run assert_catalog_cache_freshness
+
+  [ "$status" -eq 0 ]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "assert_catalog_cache_freshness cache_freshness truncates the message for many missing files" {
+  workspace_dir="$(mktemp -d)"
+  mkdir -p "$workspace_dir/catalog/skills" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog"
+  for i in $(seq 1 20); do
+    printf 'a\n' >"$workspace_dir/catalog/skills/file-$i.md"
+  done
+  _git_track "$workspace_dir/catalog"
+
+  WORKSPACE_DIR="$workspace_dir"
+
+  run assert_catalog_cache_freshness
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"20"* ]]
+  [[ "$output" != *"file-20.md"* ]]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "assert_catalog_cache_freshness cache_freshness ignores gitignored untracked files under tracked_dir" {
+  workspace_dir="$(mktemp -d)"
+  mkdir -p "$workspace_dir/catalog/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo"
+  printf 'a\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
+  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo/SKILL.md"
+
+  mkdir -p "$workspace_dir/catalog/skills/foo/__pycache__"
+  printf '*.pyc\n' >"$workspace_dir/catalog/skills/foo/.gitignore"
+  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo/.gitignore"
+  printf 'compiled\n' >"$workspace_dir/catalog/skills/foo/__pycache__/module.cpython-314.pyc"
+
+  _git_track "$workspace_dir/catalog"
+
+  WORKSPACE_DIR="$workspace_dir"
+
+  run assert_catalog_cache_freshness
+
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"pycache"* ]]
+
+  rm -rf "$workspace_dir"
+}
