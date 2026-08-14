@@ -59,6 +59,7 @@ Completion condition: commit hooks stay fast and push hooks block the failures m
 When adding or updating Lefthook:
 
 - Use `glob`, `{staged_files}`, and `stage_fixed: true` for staged-file formatters when supported.
+- Treat `glob` as required on every `pre-push` job. Write the glob at the same time you write the job; do not defer it. A job may omit `glob` only with an adjacent comment stating why its inputs cannot be scoped (e.g. a build whose inputs span sources, assets, config, and generator scripts). A `pre-push` job list where every job lacks `glob` is an incomplete implementation of this skill, not a stylistic choice.
 - Add separate jobs for fast non-code CI checks when the repo has them, such as YAML lint (`yamllint`), TOML format (`taplo`), Markdown lint, workflow lint, or lock/config validation.
 - Use package-manager prefixes that match the repo: `pnpm exec`, `mise exec --`, or direct commands managed by the repo.
 - Add Lefthook through the existing tool source: package dependency for package-managed repos, `mise` tool config for mise-managed dotfiles or tool repos.
@@ -124,6 +125,7 @@ Completion condition: local push checks catch normal CI failures, and intentiona
 
 Run the cheapest meaningful validation first, then heavier checks when appropriate:
 
+- Re-read the final `pre-push` job list and confirm every job either has a `glob` or an adjacent comment justifying its absence. If any job fails this check, return to step 4 before reporting completion.
 - Validate hook config through repo tooling, for example `pnpm exec lefthook validate` or `mise exec -- lefthook validate`.
 - To exercise a hook with specific files, check `lefthook run --help` for the installed version. Lefthook v2 uses repeated `--file <path>` flags, not `--files`.
 - Run `git diff --check`.
