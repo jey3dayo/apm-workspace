@@ -1,5 +1,5 @@
 ---
-name: docs-entrypoint-review
+name: docs-review
 description: Review which project entrypoint documents drifted after a change and propose update candidates before editing. Use when the user asks to check docs drift, update docs after a change, or mentions CLAUDE.md, AGENTS.md, llms.txt, TODO.md, DESIGN.md, DESIGN_REVIEW.md, README.md, CHANGELOG.md, or docs/**.
 ---
 
