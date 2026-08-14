@@ -1,12 +1,16 @@
-# Codex `gpt-5.6-sol` spawn_agent モデル指定バグ
+# Codex spawn_agent の luna 指定制限（sol / terra 共通）
 
-既知の制限(2026-08 時点)。解消されたら本ファイルと SKILL.md の参照行を更新すること。
+既知の制限(2026-08 時点)。解消されたら本ファイルと SKILL.md の参照箇所を更新すること。
 
-## 症状
+## 現在の症状
 
-`gpt-5.6-sol` はモデルメタデータで MultiAgent V2 を選択し、V2 のデフォルト `hide_spawn_agent_metadata = true` が `spawn_agent` スキーマから `agent_type` / `model` / `reasoning_effort` / `service_tier` を隠す。この結果 Sol から spawn したサブエージェントは明示指定してもすべて Sol を継承し、`gpt-5.6-luna` は選択できない(`openai/codex` issue #31814, #34964 ほか多数)。`gpt-5.6-terra` への委譲も同様に効かないため、実質的に Sol からのモデル指定委譲は機能しない。料金改定により `luna` が標準 Worker（Section 1 tier 表）になった後もこのバグの影響範囲は変わらず、`luna` 指定も同様に無効化される。
+`gpt-5.6-luna` はモデルカタログ上 MultiAgent V1 とマークされており、V2 で動く親（`gpt-5.6-sol` / `gpt-5.6-terra`）からの `spawn_agent(model: "gpt-5.6-luna")` は `Unknown model gpt-5.6-luna for spawn_agent. Available models: gpt-5.6-sol, gpt-5.6-terra` で拒否される（`openai/codex` issue #35097、2026-07-24 起票）。ローカルの model catalog を v1→v2 に書き換えれば技術的には子として動くが、OpenAI の Codex DX エンジニアが「MultiAgent V2 が要求するエージェント間の proactive な通信は Sol と Terra しかうまくできない。カタログ改変での強制は非推奨」と、意図的な制限であることを明言している（@pvncher、2026-07-31、<https://x.com/pvncher/status/2083300990350954981>）。
 
-## 回避策(優先順)
+## 旧症状（記録として残す）
 
-1. `~/.codex/config.toml` で `multi_agent_v2 = false` にして V1 へ固定する(`model_catalog_json` で対象モデルの `multi_agent_version` を `"v1"` に上書きしたカタログを使う)
-2. それも使えない場合は `agmsg-delegation` スキル(agmsg + launchd detached な別プロセス Worker)の手動起動をユーザーに提案する
+初期の報告では、sol がモデルメタデータで MultiAgent V2 を選択し、V2 のデフォルト `hide_spawn_agent_metadata = true` が `spawn_agent` スキーマから `agent_type` / `model` / `reasoning_effort` / `service_tier` を隠すため、明示指定してもサブエージェントがすべて Sol を継承する挙動だった（issue #31814, #34964）。#35097 の明示拒否はこれより後の codex での挙動で、症状は違えどいずれも spawn_agent 経由では luna に到達できない。
+
+## 対応（優先順）
+
+1. luna への委譲は `agmsg-delegation` スキル（別プロセスの `codex -m gpt-5.6-luna exec`。spawn_agent 非経由のため制限を受けない）を標準経路とする
+2. `multi_agent_v2 = false` での V1 固定や `model_catalog_json` の上書きは、OpenAI が非推奨と明言したカタログ改変に当たるため使わない

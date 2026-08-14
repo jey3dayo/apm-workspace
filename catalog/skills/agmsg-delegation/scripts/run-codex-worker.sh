@@ -41,6 +41,17 @@ review_scratch=
 
 if [[ "$role" == implement ]]; then
 	codex_args+=(-C "$project" -s workspace-write)
+	# worker の既定 effort。xhigh が品質/コストの損益分岐（Terra high 相当を最安で達成）。
+	# 昇格時は AGMSG_WORKER_EFFORT=max で上書きする。
+	worker_effort=${AGMSG_WORKER_EFFORT:-xhigh}
+	case "$worker_effort" in
+	none | low | medium | high | xhigh | max) ;;
+	*)
+		printf 'Unsupported AGMSG_WORKER_EFFORT: %s\n' "$worker_effort" >&2
+		exit 2
+		;;
+	esac
+	codex_args+=(-c "model_reasoning_effort=\"$worker_effort\"")
 else
 	script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 	profile_source=${AGMSG_CODEX_PROFILE_SOURCE:-"$script_dir/../agmsg-review.config.toml"}

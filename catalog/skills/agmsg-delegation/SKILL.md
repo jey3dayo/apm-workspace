@@ -3,7 +3,7 @@ name: agmsg-delegation
 description: >-
   agmsg で別プロセスの CC/Codex を worker / reviewer として起動し、
   タスク委譲またはレビュー外注を行う。orchestrator-worker の組み込み
-  spawn_agent が使えない環境（Codex sol → luna 等)の手動経路。
+  spawn_agent が使えない経路（Codex sol / terra → luna 等)の標準経路。
   agent / セッション間の引き継ぎ（CC → Codex 等）メッセージの書式も定義する。
 disable-model-invocation: true
 ---
@@ -12,7 +12,7 @@ disable-model-invocation: true
 
 別プロセスの agent（headless Claude Code / Codex）へ、agmsg メッセージングで作業を委譲するライフサイクルを回す。組み込みサブエージェント（Agent tool / `spawn_agent`）が使える場合はそちらが正規経路であり、このスキルは **spawn 面の制約で組み込み経路が塞がっている場合の手動経路**である。Herdr pane は使わない。
 
-既知の制約により Codex sol からの委譲は当面本スキルが実質的な標準経路になる（詳細は `orchestrator-worker` の `references/codex-spawn-model-bug.md`）。本スキルが新規プロセスで起動する `codex -m gpt-5.6-luna exec` は `spawn_agent` を経由しないため、このバグの影響を受けない。
+Codex では sol / terra とも `spawn_agent` で `gpt-5.6-luna` を指定できない意図的な制限があるため、Codex からの luna 委譲は本スキルが標準経路である（詳細は `orchestrator-worker` の `references/codex-spawn-model-bug.md`）。本スキルが新規プロセスで起動する `codex -m gpt-5.6-luna exec` は `spawn_agent` を経由しないため、この制限の影響を受けない。
 
 tier 判定・委譲判定・タスク分割基準は `orchestrator-worker` スキルが正本。本スキルは transport と lifecycle だけを定義する。
 
@@ -30,10 +30,10 @@ tier 判定・委譲判定・タスク分割基準は `orchestrator-worker` ス�
 
 共通 lifecycle は同一で、role によって安全契約と報告フォーマットが異なる。
 
-| role      | 自分の tier              | spawn する相手         | 相手の権限                   | 報告   |
-| --------- | ------------------------ | ---------------------- | ---------------------------- | ------ |
-| implement | Orchestrator (fable/sol) | worker (sonnet / luna) | 対象 worktree の編集可       | DONE   |
-| review    | Worker (sonnet/luna)     | reviewer (fable / sol) | read-only。編集・commit 禁止 | REVIEW |
+| role      | 自分の tier                    | spawn する相手         | 相手の権限                   | 報告   |
+| --------- | ------------------------------ | ---------------------- | ---------------------------- | ------ |
+| implement | Orchestrator (fable/sol/terra) | worker (sonnet / luna) | 対象 worktree の編集可       | DONE   |
+| review    | Worker (sonnet/luna)           | reviewer (fable / sol) | read-only。編集・commit 禁止 | REVIEW |
 
 review role の fable/sol 指定は本スキル内の一時的な model override であり、`orchestrator-worker` の tier 対応表や既存 agent 定義（親モデル継承）を変更しない。Claude reviewer は fable が利用不可（未提供・rate limit・plan 制限など起動失敗）の場合のみ opus へフォールバックする。
 
@@ -72,6 +72,7 @@ Claude helper:
 Codex helper:
 
 - `exec --ephemeral`、`-a never`、stdin prompt を強制し、review profile の内容一致を起動時に検証する
+- implement role は `model_reasoning_effort` を既定 `xhigh` で付与する（`AGMSG_WORKER_EFFORT` で上書き可。昇格時は `max` を渡す）
 
 Codex review に `--sandbox read-only` を使ってはならない。agmsg の送受信自体が DB 書込み（`send.sh` の messages.db 更新、`inbox.sh` の read_at 更新）と report 一時ファイル作成を必要とするため、完全 read-only では reviewer が READY/REVIEW/ACK を送信できない。代わりに、agmsg 状態ディレクトリ（db/teams/run）だけを `writable_roots` に持つ profile `agmsg-review`（`CODEX_HOME/agmsg-review.config.toml`）を `-p` で layer する。
 

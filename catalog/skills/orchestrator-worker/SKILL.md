@@ -1,7 +1,7 @@
 ---
 name: orchestrator-worker
 description: >-
-  高級モデル(Claude Fable/Opus、Codex sol)のセッションで実装作業(implement / fix / refactor / test / migrate)を受けたとき、
+  高級モデル(Claude Fable/Opus、Codex sol / terra)のセッションで実装作業(implement / fix / refactor / test / migrate)を受けたとき、
   自分で書かずに安価な Worker モデルへ委譲する Orchestrator-Worker 運用。
   タスクが複数ファイル・複数の独立サブタスクに跨るとき、
   または他のスキルが委譲判定・モデル tier 対応表を必要とするときにも使用する。
@@ -19,11 +19,11 @@ description: >-
 
 現在のモデルが Orchestrator tier なら委譲、Worker tier なら自分で実装する。
 
-| 現在のモデル                                   | 役割         | Worker として呼ぶモデル                        |
-| ---------------------------------------------- | ------------ | ---------------------------------------------- |
-| Claude Fable / Opus                            | Orchestrator | `sonnet`                                       |
-| Codex `gpt-5.6-sol`                            | Orchestrator | `gpt-5.6-luna`（既知バグあり、Section 4 参照） |
-| Claude Sonnet / Codex `gpt-5.6-terra` / `luna` | Worker       | 委譲せず自分で実装する                         |
+| 現在のモデル                          | 役割         | Worker として呼ぶモデル                                  |
+| ------------------------------------- | ------------ | -------------------------------------------------------- |
+| Claude Fable / Opus                   | Orchestrator | `sonnet`                                                 |
+| Codex `gpt-5.6-sol` / `gpt-5.6-terra` | Orchestrator | `gpt-5.6-luna` xhigh（spawn_agent 不可、Section 4 参照） |
+| Claude Sonnet / Codex `gpt-5.6-luna`  | Worker       | 委譲せず自分で実装する                                   |
 
 表の tier が使えないときだけ、利用可能な旧モデルへフォールバックする。委譲は同一 platform 内で完結させ、他方の platform（Claude / Codex）の Worker へ跨ぐのはユーザーが明示的に指示した場合に限る。
 
@@ -70,16 +70,9 @@ Agent(subagent_type: "implementer", prompt: <タスク定義>)
 
 Codex:
 
-```text
-spawn_agent(
-  agent_type: "worker",
-  model: "gpt-5.6-luna",
-  message: <タスク定義>,
-  task_name: <短い一意な名前>
-)
-```
+sol / terra とも `spawn_agent` では `gpt-5.6-luna` を指定できない。luna はモデルカタログ上 MultiAgent V1 扱いで、V2 親からの指定は `Unknown model` で拒否される意図的な制限である。model catalog を書き換えて強制する方法は OpenAI が非推奨と明言しているため使わない（経緯と一次情報は [references/codex-spawn-model-bug.md](references/codex-spawn-model-bug.md)）。
 
-この組み込み機能だけで完結させる。サブエージェントは親の workspace と sandbox を引き継ぐが、Codex MCP や `codex exec` の別プロセス起動は経路が別で workspace を引き継がない。
+luna への委譲は `agmsg-delegation` スキル（別プロセスの `codex -m gpt-5.6-luna exec`。`spawn_agent` を経由しないため制限を受けない）を標準経路とする。worker の reasoning effort は既定 `xhigh`（helper が付与する。Terra high 相当の品質を最安で得られる実測に基づく）。別プロセス起動は親の workspace を引き継がないため、agmsg-delegation の lifecycle（作業領域の固定、payload 渡し、READY / DONE 監視、片付け）に従う。
 
 ### 昇格
 
@@ -91,21 +84,21 @@ spawn_agent(
 
 昇格先は platform ごとに固定する。
 
-| platform | 既定 Worker    | 昇格手段（順に検討）                                         |
-| -------- | -------------- | ------------------------------------------------------------ |
-| Claude   | `sonnet`       | `model: "opus"` を呼び出し時に渡す                           |
-| Codex    | `gpt-5.6-luna` | ① reasoning effort 引き上げ（xhigh → max） ② `gpt-5.6-terra` |
+| platform | 既定 Worker          | 昇格手段（順に検討）                           |
+| -------- | -------------------- | ---------------------------------------------- |
+| Claude   | `sonnet`             | `model: "opus"` を呼び出し時に渡す             |
+| Codex    | `gpt-5.6-luna` xhigh | ① reasoning effort を max へ ② `gpt-5.6-terra` |
 
-長文脈タスク（大規模コードベースの読解、複数文書の統合、長い履歴の追跡）は例外で、①を飛ばして直接 `gpt-5.6-terra` へ上げる。`luna` は長文脈リコールに崖があり（MRCR 41.3% / Sol 91.5% / Terra 89.6%、[OpenAI 2026-07-09](https://openai.com/index/advancing-the-price-performance-frontier-with-gpt-5-6)）、effort をいくら上げても埋まらない。
+昇格先が現在のモデル自身になる場合（terra セッションで ② に達した場合など）は、委譲せず自分で実装する。
 
-`gpt-5.6-sol` からの spawn は `model` 指定が事実上効かないバグがある。症状と回避策（V1 固定 / `agmsg-delegation` フォールバック）は [references/codex-spawn-model-bug.md](references/codex-spawn-model-bug.md) を読む。
+長文脈タスク（大規模コードベースの読解、複数文書の統合、長い履歴の追跡）は例外で、①を飛ばして直接 `gpt-5.6-terra` へ上げる。`luna` は長文脈リコールに崖があり（MRCR 41.3% / Sol 91.5% / Terra 89.6%、[OpenAI 2026-07-09](https://openai.com/index/advancing-the-price-performance-frontier-with-gpt-5-6)）、effort 引き上げで緩和されるという実測は公表されていない（2026-08 時点）。terra セッション自身が長文脈タスクを受けた場合は、上の一般則どおり委譲せず自分で実装する。
 
-独立タスクは**同一レスポンス内で複数呼び出す**と並列に走る。1レスポンス1呼び出しは直列になる。Orchestrator の会話履歴は引き継がせず、Section 3 で書き出した 3 点だけを渡す。
+Claude では独立タスクを**同一レスポンス内で複数呼び出す**と並列に走る（1レスポンス1呼び出しは直列になる）。Codex では worker を複数 detached 起動する（触るファイル集合が互いに素であることが前提。guardrails は `agmsg-delegation` を参照）。どちらも Orchestrator の会話履歴は引き継がせず、Section 3 で書き出した 3 点だけを渡す。
 
 起動後の扱いは 2 つ。
 
 - バリアを置かない。先に返った Worker から順に処理する。全員の完了を待つと、最も遅い Worker が全体の律速になるうえ、待つ間にリポジトリの状態が変わって先行 Worker の前提が古くなる。
-- Worker を使い回す。追加指示・スコープ縮小・再実行は、新規 spawn ではなく既存 Worker への追送で行う（Claude は `SendMessage`、Codex は同一タスクへの追送）。文脈を保った Worker はキャッシュが効くぶん安く、前提の再説明も要らない。
+- Worker を使い回す。追加指示・スコープ縮小・再実行は、新規 spawn ではなく既存 Worker への追送で行う（Claude は `SendMessage`）。文脈を保った Worker はキャッシュが効くぶん安く、前提の再説明も要らない。Codex（agmsg-delegation 経由）は worker が headless 1 turn で終了する契約のため使い回せない。追加分は新しいタスクとして切り直す。
 
 計画ファイルを順に消化して都度レビューする運用は `review-fix-loop` を使う。
 
