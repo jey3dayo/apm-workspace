@@ -1,6 +1,6 @@
 ---
 name: todo-changelog-ops
-description: "Use when adding, closing, or pruning entries in a repository's `TODO.md`, when moving finished work into `CHANGELOG.md` (including work tracked in `todo.txt`, GitHub Issues, or PRs), when setting up local task tracking for a repository that has no tracker, or when deciding where a task belongs among `todo.txt`, GitHub Issues, docs, and `TODO.md` (置き場の振り分け). Do not use for entrypoint-docs drift review (`docs-entrypoint-review`), for cutting a release version section or tag (the repository's release workflow), for manager-facing work reports (`work-log-maintenance`), or for commit splitting (`atomic-commit`)."
+description: "Use when adding, closing, or pruning entries in a repository's `TODO.md`, when moving finished work into `CHANGELOG.md` (including work tracked in `todo.txt`, GitHub Issues, or PRs), when setting up local task tracking for a repository that has no tracker, or when deciding where a task belongs among `todo.txt`, GitHub Issues, docs, and `TODO.md` (置き場の振り分け). Do not use for entrypoint-docs drift review (`docs-review`), for cutting a release version section or tag (the repository's release workflow), for manager-facing work reports (`work-log-maintenance`), or for commit splitting (`atomic-commit`)."
 version: 1.0.0
 tags: [todo, changelog, backlog, task-tracking]
 triggers:

@@ -44,15 +44,15 @@
 
 ## global（自作 catalog: catalog/skills/）
 
-29 スキル。主な系統:
+27 スキル。主な系統:
 
 - APM・環境運用: `apm-usage`, `apm-repo-bootstrap`, `mise`, `mcp-tools`,
   `dotenvx-env-ops`, `1password-item-ops`, `herdr`
-- レビュー・品質: `code-review`, `review-board`, `review-fix-loop`,
-  `review-plan`, `polish`, `quiet-command-auditor`
+- レビュー・品質: `review-board`, `review-fix-loop`,
+  `polish`, `quiet-command-auditor`
 - デザイン: `design-md-workflow`, `design-system-review`
 - リファクタリング・解析: `refactoring`, `similarity`
-- ドキュメント: `docs-manager`, `docs-entrypoint-review`,
+- ドキュメント: `docs-manager`, `docs-review`,
   `architecture-boundary-docs`, `japanese-tech-writing`
 - Git・作業運用: `atomic-commit`, `git-worktree`, `ci-stability-hooks`,
   `prepare-goal`
@@ -128,7 +128,7 @@ global の一覧に無くても廃止ではない。各リポジトリの `apm.y
 - デザインシステム・トークン準拠 → `design-system-review`
 - アニメーション・モーションの質 → `review-animations`（単発）/ `improve-animations`（全体監査→plan 生成）
 - UI・フォーム・アクセシビリティ・マルチデバイスのレーン振り分け → `review-board`
-- コード品質全般 → `code-review` / `hunk-review` / `thermo-nuclear-code-quality-review`
+- コード品質全般 → 組み込み `/code-review` / `hunk-review` / `thermo-nuclear-code-quality-review`
 - 改善候補の洗い出し（実装しない）→ `improve`（shadcn、汎用）
 
 ### 検証中のレビュー・アニメーション系スキル（2026-07-23 棚卸し）
@@ -148,9 +148,8 @@ skill 監査（`~/.claude/skill-report/2026-07-23T11-14-21/`）の結果を踏�
 | `apple-design`                       | アニメ/UI | Apple 流ジェスチャ・物理モーション      | 手動起動あり         | 維持                                                                   |
 | `review-board`                       | レビュー  | UI レビューレーン選択ハブ               | なし                 | catalog 自作。レーン振り分けを使わないなら簡素化                       |
 | `design-system-review`               | レビュー  | デザインシステム・トークン準拠          | なし                 | catalog 自作。維持                                                     |
-| `code-review`                        | レビュー  | コード品質全般（catalog 自作）          | 手動起動あり         | 維持                                                                   |
 | `hunk-review`                        | レビュー  | Hunk セッションでの対話的 diff レビュー | なし                 | Hunk 自体を常用しなくなったら撤去                                      |
-| `thermo-nuclear-code-quality-review` | レビュー  | 保守性・構造の徹底監査                  | なし                 | `code-review` と指摘が重複しすぎたら撤去                               |
+| `thermo-nuclear-code-quality-review` | レビュー  | 保守性・構造の徹底監査                  | なし                 | 組み込み `/code-review` と指摘が重複しすぎたら撤去                     |
 | `improve`                            | レビュー  | 監査 → 他 agent 向け実装 plan 生成      | なし                 | 維持。improve-animations の撤去判断の受け皿                            |
 | `react-doctor`                       | レビュー  | React 診断                              | なし                 | `refactoring`（catalog）が参照するため維持                             |
 

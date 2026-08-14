@@ -328,3 +328,18 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
   運用原則に合わせる。内容は git history に残るため、必要なら
   `git show 062960a:docs/superpowers/specs/2026-04-21-apm-global-distribution-design.md`
   のように取り出せる。
+
+## review 系スキルの整理（2026-08-14）
+
+- Status: `code-review` と `review-plan` を catalog から撤去、
+  `docs-entrypoint-review` を `docs-review` にリネーム
+- `code-review` 撤去理由: Claude Code 組み込みの `/code-review`（adversarial verify つき
+  バグ検出）・`/security-review`・`/simplify` と直接競合。星評価つき品質アセスメントが
+  必要な場合は `thermo-nuclear-code-quality-review` で代替する
+- `review-plan` 撤去理由: 実行前ゲートとしての導線が `prepare-goal` / `grilling` /
+  組み込み plan mode と重複し、起動実績が乏しかった
+- 残した判断: `review-board`（レーン振り分けハブ）と `review-fix-loop`（backlog 管理つき
+  反復ループ）は独自導線ありとして検証継続。`docs-review` / `design-system-review` /
+  `quiet-command-auditor` / `scheduled-audit-ops` はドメイン特化で組み込みに代替なし
+- 再導入する場合: 組み込みレビューで賄えない要件（プロジェクト設定統合、
+  星評価レポート等）が実運用で必要になった理由を本ファイルに追記してから戻す

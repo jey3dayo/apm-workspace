@@ -1,4 +1,0 @@
-interface:
-  display_name: "Review Plan"
-  short_description: "Review plans before execution"
-  default_prompt: "Use $review-plan to review this plan before execution. Return the verdict, risks, missing verification, and a copy-ready revise-only prompt."
