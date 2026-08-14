@@ -18,25 +18,15 @@ dependencies:
     - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
     - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
     - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
+    - caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
     - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout#main
 
     # --- public ---
-    - Jakubantalik/transitions-dev/skills/transitions-dev
-    - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand
-    - agavra/tuicr/skills/tuicr
-    - anthropics/claude-code/plugins/frontend-design/skills/frontend-design
-    - browser-use/browser-harness
+    # code quality / review
     - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review
-    - emilkowalski/skills/skills/apple-design
-    - emilkowalski/skills/skills/emil-design-eng
-    - emilkowalski/skills/skills/find-animation-opportunities
-    - emilkowalski/skills/skills/improve-animations
-    - emilkowalski/skills/skills/review-animations
-    - gonta223/humanizer-ja
-    - ibelick/ui-skills/skills/baseline-ui
-    - ibelick/ui-skills/skills/fixing-accessibility
-    - ibelick/ui-skills/skills/fixing-metadata
-    - ibelick/ui-skills/skills/fixing-motion-performance
+    - shadcn/improve
+
+    # engineering practice (design, architecture, research)
     - mattpocock/skills/skills/engineering/codebase-design
     - mattpocock/skills/skills/engineering/domain-modeling
     - mattpocock/skills/skills/engineering/improve-codebase-architecture
@@ -44,21 +34,47 @@ dependencies:
     - mattpocock/skills/skills/engineering/research
     - mattpocock/skills/skills/engineering/setup-matt-pocock-skills
     - mattpocock/skills/skills/engineering/wayfinder
+
+    # react-specific
+    - millionco/react-doctor/skills/react-doctor
+    - vercel-labs/agent-skills/skills/react-best-practices
+
+    # github ops
+    - openai/plugins/plugins/github/skills/gh-address-comments
+    - openai/plugins/plugins/github/skills/gh-fix-ci
+
+    # productivity / writing
     - mattpocock/skills/skills/productivity/grilling
     - mattpocock/skills/skills/productivity/writing-for-agents
-    - millionco/react-doctor/skills/react-doctor
-    - modem-dev/hunk/skills/hunk-review
+    - gonta223/humanizer-ja
+
+    # browser / analysis tools
+    - browser-use/browser-harness
+    - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand
+    - cathrynlavery/diagram-design
+    - anthropics/claude-code/plugins/frontend-design/skills/frontend-design
+
+    - openai/skills/skills/.curated/screenshot # openai/skills is deprecated; no migrated equivalent found in openai/plugins yet
+
+    # --- design ---
     - git: nextlevelbuilder/ui-ux-pro-max-skill
       skills:
         - ui-ux-pro-max
-    - openai/plugins/plugins/github/skills/gh-address-comments
-    - openai/plugins/plugins/github/skills/gh-fix-ci
-    - openai/skills/skills/.curated/screenshot # openai/skills is deprecated; no migrated equivalent found in openai/plugins yet
-    - vercel-labs/agent-skills/skills/react-best-practices
-    - shadcn/improve
+    - Jakubantalik/transitions-dev/skills/transitions-dev
+    - emilkowalski/skills/skills/apple-design
+    - emilkowalski/skills/skills/emil-design-eng
+    - emilkowalski/skills/skills/find-animation-opportunities
+    - emilkowalski/skills/skills/improve-animations
+    - emilkowalski/skills/skills/review-animations
+    - ibelick/ui-skills/skills/baseline-ui
+    - ibelick/ui-skills/skills/fixing-accessibility
+    - ibelick/ui-skills/skills/fixing-metadata
+    - ibelick/ui-skills/skills/fixing-motion-performance
+
+    # --- tools ---
     - fujibee/agmsg
-    - cathrynlavery/diagram-design
-    - caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
+    - modem-dev/hunk/skills/hunk-review
+    - agavra/tuicr/skills/tuicr
   mcp:
     - name: context7
       registry: false
