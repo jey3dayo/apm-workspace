@@ -58,6 +58,7 @@ dependencies:
     - shadcn/improve
     - fujibee/agmsg
     - cathrynlavery/diagram-design
+    - caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
   mcp:
     - name: context7
       registry: false
