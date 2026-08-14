@@ -1,0 +1,24 @@
+["validate:workspace"]
+description = "Validate the ~/.apm workspace wiring"
+hide = true
+run = "bash ./scripts/apm-workspace.sh validate"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 validate"
+
+["validate:catalog"]
+description = "Fail when the managed catalog package is not normalized or missing required assets"
+hide = true
+run = "bash ./scripts/apm-workspace.sh validate:catalog"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 validate:catalog"
+
+["validate"]
+description = "Validate the ~/.apm workspace and managed catalog wiring"
+depends = ["validate:workspace", "validate:catalog"]
+
+["test:ps"]
+description = "Run the Pester behavioral suite for apm-workspace.ps1"
+# Host prerequisite, not mise-managed: pwsh with the Pester module. See AGENTS.md.
+run = "pwsh -NoProfile -Command \"Invoke-Pester -Path tests -CI -Output Detailed\""
+
+["test:sh"]
+description = "Run bats unit tests for scripts/apm-workspace.sh"
+run = "bats tests/apm-workspace.sh.bats"

@@ -26,6 +26,12 @@ taplo = "0.10.0"
 "npm:tsx" = "4.22.5"
 
 # ========================================
+# Task Includes
+# ========================================
+[task_config]
+includes = ["mise/catalog.toml", "mise/validate.toml", "mise/format.toml"]
+
+# ========================================
 # Workspace Commands
 # ========================================
 [tasks.bootstrap]
@@ -70,137 +76,8 @@ run = "bash ./scripts/apm-workspace.sh doctor"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 doctor"
 
 # ========================================
-# Catalog / Skill Commands
-# ========================================
-[tasks."apply:skills:local"]
-description = "Quick-apply managed catalog skills into the local Codex target only"
-run = "bash ./scripts/apm-workspace.sh apply:skills:local"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 apply:skills:local"
-
-[tasks."prepare:catalog"]
-description = "Normalize `catalog/` in place inside ~/.apm"
-run = "bash ./scripts/apm-workspace.sh prepare:catalog"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 prepare:catalog"
-
-[tasks."install:catalog"]
-description = "Install the managed catalog package by upstream ref"
-# Hard-fails if the local package cache is stale (e.g. a file newly added
-# under catalog/ is missing from the cache) instead of silently deploying
-# stale output. Run `mise run deploy:fresh` to rebuild the cache and redeploy.
-run = "bash ./scripts/apm-workspace.sh install:catalog"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 install:catalog"
-
-[tasks."smoke:catalog"]
-description = "Smoke-test the generated managed catalog package via a temp install"
-hide = true
-run = "bash ./scripts/apm-workspace.sh smoke:catalog"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 smoke:catalog"
-
-[tasks."audit:ci:smoke"]
-description = "Temp-install the workspace manifest and run `apm audit --ci`"
-run = "bash ./scripts/apm-workspace.sh audit:ci:smoke"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 audit:ci:smoke"
-
-# ========================================
-# Validation Commands
-# ========================================
-[tasks."validate:workspace"]
-description = "Validate the ~/.apm workspace wiring"
-hide = true
-run = "bash ./scripts/apm-workspace.sh validate"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 validate"
-
-[tasks."validate:catalog"]
-description = "Fail when the managed catalog package is not normalized or missing required assets"
-hide = true
-run = "bash ./scripts/apm-workspace.sh validate:catalog"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 validate:catalog"
-
-[tasks.validate]
-description = "Validate the ~/.apm workspace and managed catalog wiring"
-depends = ["validate:workspace", "validate:catalog"]
-
-[tasks."format:markdown"]
-description = "Format Markdown files in the ~/.apm workspace"
-hide = true
-run = "fd -e md -X prettier --write --log-level error >/dev/null"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e md -X prettier --write --log-level error | Out-Null\""
-
-[tasks."format:markdown:check"]
-description = "Check Markdown formatting in the ~/.apm workspace"
-hide = true
-run = "fd -e md -X prettier --check --log-level warn"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e md -X prettier --check --log-level warn\""
-
-[tasks."format:markdown:bold-headings"]
-description = "Rewrite bold headings inside catalog skill and shared guidance sources"
-hide = true
-run = "bash ./scripts/format-bold-headings.sh write"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/format-bold-headings.ps1 write"
-
-[tasks."format:markdown:bold-headings:check"]
-description = "Check bold heading rewrites inside catalog skill and shared guidance sources"
-hide = true
-run = "bash ./scripts/format-bold-headings.sh check"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/format-bold-headings.ps1 check"
-
-# RUST_LOG=taplo=warn quiets taplo's info logs. POSIX-only on purpose: setting it
-# inside the Windows -Command string depends on which shell mise wraps it in, and
-# that cannot be exercised from a mac/Linux host.
-[tasks."format:toml"]
-description = "Format TOML files in the ~/.apm workspace"
-hide = true
-run = "fd -e toml -X env RUST_LOG=taplo=warn taplo format"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e toml -X taplo format\""
-
-[tasks."format:toml:check"]
-description = "Check TOML formatting in the ~/.apm workspace"
-hide = true
-run = "fd -e toml -X env RUST_LOG=taplo=warn taplo format --check"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e toml -X taplo format --check\""
-
-# apm.lock.yaml needs no --exclude for the prettier tasks: it is listed in
-# .prettierignore, which prettier honors even for explicitly passed paths.
-# yamllint has no ignore file here, so lint:yaml excludes it at the fd level.
-[tasks."format:yaml"]
-description = "Format YAML files in the ~/.apm workspace"
-hide = true
-run = "fd -e yml -e yaml -X prettier --write --log-level error >/dev/null"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e yml -e yaml -X prettier --write --log-level error | Out-Null\""
-
-[tasks."format:yaml:check"]
-description = "Check YAML formatting in the ~/.apm workspace"
-hide = true
-run = "fd -e yml -e yaml -X prettier --check --log-level warn"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e yml -e yaml -X prettier --check --log-level warn\""
-
-[tasks."lint:yaml"]
-description = "Lint YAML files in the ~/.apm workspace"
-hide = true
-run = "fd -e yml -e yaml --exclude apm.lock.yaml -X yamllint"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e yml -e yaml --exclude apm.lock.yaml -X yamllint\""
-
-# ========================================
 # Aggregation Tasks
 # ========================================
-[tasks.format]
-description = "Format workspace docs and manifests"
-run = [
-  { task = "format:markdown:bold-headings" },
-  { task = "format:markdown" },
-  { task = "format:toml" },
-  { task = "format:yaml" },
-]
-
-[tasks."format:check"]
-description = "Check workspace docs and manifest formatting"
-depends = [
-  "format:markdown:bold-headings:check",
-  "format:markdown:check",
-  "format:toml:check",
-  "format:yaml:check",
-]
-
 [tasks.check]
 description = "Run lightweight pre-deploy checks for the ~/.apm workspace"
 # lint:yaml sits here rather than under format:check: it is a linter, not a
@@ -217,34 +94,9 @@ description = "Run both behavioral suites for the workspace scripts"
 # targets, so running them in parallel races on shared workspace state.
 run = [{ task = "test:ps" }, { task = "test:sh" }]
 
-[tasks."test:ps"]
-description = "Run the Pester behavioral suite for apm-workspace.ps1"
-# Host prerequisite, not mise-managed: pwsh with the Pester module. See AGENTS.md.
-run = "pwsh -NoProfile -Command \"Invoke-Pester -Path tests -CI -Output Detailed\""
-
-[tasks."test:sh"]
-description = "Run bats unit tests for scripts/apm-workspace.sh"
-run = "bats tests/apm-workspace.sh.bats"
-
 [tasks.deploy]
 description = "Run checks, deploy the current workspace state, and inspect targets"
 run = [{ task = "check" }, { task = "apply" }, { task = "doctor" }]
-
-[tasks."repair:local-package-cache"]
-description = "Rebuild workspace-owned APM package cache entries from tracked sources"
-hide = true
-run = "bash ./scripts/apm-workspace.sh repair:local-package-cache"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 repair:local-package-cache"
-
-[tasks."deploy:fresh"]
-description = "Rebuild APM dependency cache and deploy when normal deploy output looks stale"
-# Recovery path only; `deploy` already runs `check` before `apply`.
-hide = true
-run = [
-  "apm prune",
-  { task = "repair:local-package-cache" },
-  { task = "deploy" },
-]
 
 # ========================================
 # Meta Tasks

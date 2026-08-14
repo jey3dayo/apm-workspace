@@ -1,0 +1,77 @@
+["format:markdown"]
+description = "Format Markdown files in the ~/.apm workspace"
+hide = true
+run = "fd -e md -X prettier --write --log-level error >/dev/null"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e md -X prettier --write --log-level error | Out-Null\""
+
+["format:markdown:check"]
+description = "Check Markdown formatting in the ~/.apm workspace"
+hide = true
+run = "fd -e md -X prettier --check --log-level warn"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e md -X prettier --check --log-level warn\""
+
+["format:markdown:bold-headings"]
+description = "Rewrite bold headings inside catalog skill and shared guidance sources"
+hide = true
+run = "bash ./scripts/format-bold-headings.sh write"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/format-bold-headings.ps1 write"
+
+["format:markdown:bold-headings:check"]
+description = "Check bold heading rewrites inside catalog skill and shared guidance sources"
+hide = true
+run = "bash ./scripts/format-bold-headings.sh check"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/format-bold-headings.ps1 check"
+
+# RUST_LOG=taplo=warn quiets taplo's info logs. POSIX-only on purpose: setting it
+# inside the Windows -Command string depends on which shell mise wraps it in, and
+# that cannot be exercised from a mac/Linux host.
+["format:toml"]
+description = "Format TOML files in the ~/.apm workspace"
+hide = true
+run = "fd -e toml -X env RUST_LOG=taplo=warn taplo format"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e toml -X taplo format\""
+
+["format:toml:check"]
+description = "Check TOML formatting in the ~/.apm workspace"
+hide = true
+run = "fd -e toml -X env RUST_LOG=taplo=warn taplo format --check"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e toml -X taplo format --check\""
+
+# apm.lock.yaml needs no --exclude for the prettier tasks: it is listed in
+# .prettierignore, which prettier honors even for explicitly passed paths.
+# yamllint has no ignore file here, so lint:yaml excludes it at the fd level.
+["format:yaml"]
+description = "Format YAML files in the ~/.apm workspace"
+hide = true
+run = "fd -e yml -e yaml -X prettier --write --log-level error >/dev/null"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e yml -e yaml -X prettier --write --log-level error | Out-Null\""
+
+["format:yaml:check"]
+description = "Check YAML formatting in the ~/.apm workspace"
+hide = true
+run = "fd -e yml -e yaml -X prettier --check --log-level warn"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e yml -e yaml -X prettier --check --log-level warn\""
+
+["lint:yaml"]
+description = "Lint YAML files in the ~/.apm workspace"
+hide = true
+run = "fd -e yml -e yaml --exclude apm.lock.yaml -X yamllint"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e yml -e yaml --exclude apm.lock.yaml -X yamllint\""
+
+["format"]
+description = "Format workspace docs and manifests"
+run = [
+  { task = "format:markdown:bold-headings" },
+  { task = "format:markdown" },
+  { task = "format:toml" },
+  { task = "format:yaml" },
+]
+
+["format:check"]
+description = "Check workspace docs and manifest formatting"
+depends = [
+  "format:markdown:bold-headings:check",
+  "format:markdown:check",
+  "format:toml:check",
+  "format:yaml:check",
+]

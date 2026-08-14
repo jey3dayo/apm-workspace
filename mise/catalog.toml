@@ -1,0 +1,44 @@
+["apply:skills:local"]
+description = "Quick-apply managed catalog skills into the local Codex target only"
+run = "bash ./scripts/apm-workspace.sh apply:skills:local"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 apply:skills:local"
+
+["prepare:catalog"]
+description = "Normalize `catalog/` in place inside ~/.apm"
+run = "bash ./scripts/apm-workspace.sh prepare:catalog"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 prepare:catalog"
+
+["install:catalog"]
+description = "Install the managed catalog package by upstream ref"
+# Hard-fails if the local package cache is stale (e.g. a file newly added
+# under catalog/ is missing from the cache) instead of silently deploying
+# stale output. Run `mise run deploy:fresh` to rebuild the cache and redeploy.
+run = "bash ./scripts/apm-workspace.sh install:catalog"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 install:catalog"
+
+["smoke:catalog"]
+description = "Smoke-test the generated managed catalog package via a temp install"
+hide = true
+run = "bash ./scripts/apm-workspace.sh smoke:catalog"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 smoke:catalog"
+
+["audit:ci:smoke"]
+description = "Temp-install the workspace manifest and run `apm audit --ci`"
+run = "bash ./scripts/apm-workspace.sh audit:ci:smoke"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 audit:ci:smoke"
+
+["repair:local-package-cache"]
+description = "Rebuild workspace-owned APM package cache entries from tracked sources"
+hide = true
+run = "bash ./scripts/apm-workspace.sh repair:local-package-cache"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 repair:local-package-cache"
+
+["deploy:fresh"]
+description = "Rebuild APM dependency cache and deploy when normal deploy output looks stale"
+# Recovery path only; `deploy` already runs `check` before `apply`.
+hide = true
+run = [
+  "apm prune",
+  { task = "repair:local-package-cache" },
+  { task = "deploy" },
+]
