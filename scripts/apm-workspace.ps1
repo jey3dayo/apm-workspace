@@ -206,6 +206,39 @@ function Ensure-WorkspaceScaffold {
   }
 }
 
+# This workspace deploys global skills into the user-level runtime roots. Its
+# project-local skill directories are reserved for symlink bridges to
+# .apm/skills. Older APM project installs left physical skill directories here,
+# which causes a runtime opened in ~/.apm to discover both copies.
+function Get-WorkspaceSkillBridgeRoots {
+  return @(
+    (Join-Path $WorkspaceDir ".claude/skills"),
+    (Join-Path $WorkspaceDir ".agents/skills")
+  )
+}
+
+function Remove-LegacyWorkspaceSkillTargets {
+  foreach ($bridgeRoot in (Get-WorkspaceSkillBridgeRoots)) {
+    if (-not (Test-Path -LiteralPath $bridgeRoot -PathType Container)) {
+      continue
+    }
+
+    foreach ($candidate in @(Get-ChildItem -LiteralPath $bridgeRoot -Directory -Force)) {
+      if ($candidate.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+        continue
+      }
+
+      $skillPath = Join-Path $candidate.FullName "SKILL.md"
+      if (-not (Test-Path -LiteralPath $skillPath -PathType Leaf)) {
+        continue
+      }
+
+      Remove-Item -LiteralPath $candidate.FullName -Recurse -Force
+      Write-Host "Removed legacy project-scope skill target: $($candidate.FullName)"
+    }
+  }
+}
+
 function Copy-DirectoryContents {
   param(
     [Parameter(Mandatory = $true)]
@@ -1555,6 +1588,7 @@ function Invoke-Apply {
     Sync-ManagedCatalogRuntimeAssets
     Install-WorkspaceMcpDependencies
     Replace-SkillTargetsFromStage -StageRoot $stageDir
+    Remove-LegacyWorkspaceSkillTargets
   }
   finally {
     if (Test-Path -LiteralPath $stageDir) {
@@ -1619,6 +1653,8 @@ function Invoke-SyncLocalSkills {
       $destinationSkillPath = Get-InternalTargetSkillPath -TargetRoot $destinationSkillsRoot -SkillId $deployedSkillName
       Copy-DirectoryContents -SourceDir $stagedSkillPath -DestinationDir $destinationSkillPath
     }
+
+    Remove-LegacyWorkspaceSkillTargets
   }
   finally {
     if (Test-Path -LiteralPath $stageDir) {

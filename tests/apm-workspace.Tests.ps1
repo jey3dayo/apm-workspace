@@ -836,9 +836,11 @@ Describe "public command surface" {
 
   It "deploys managed MCP dependencies during shell apply" {
     $shellScript = Get-Content -LiteralPath (Join-Path $workspaceRoot "scripts/apm-workspace.sh") -Raw
+    $powerShellScript = Get-Content -LiteralPath (Join-Path $workspaceRoot "scripts/apm-workspace.ps1") -Raw
 
     $shellScript | Should -Match '(?s)install_workspace_mcp_dependencies\(\)\s*\{\s*run_workspace_install_command -g --only mcp\s*\}'
-    $shellScript | Should -Match '(?s)cmd_apply\(\)\s*\{.*?install_workspace_mcp_dependencies.*?compile_codex.*?replace_skill_targets_from_stage "\$apply_stage_root"'
+    $shellScript | Should -Match '(?s)cmd_apply\(\)\s*\{.*?install_workspace_mcp_dependencies.*?compile_codex.*?replace_skill_targets_from_stage "\$apply_stage_root".*?cleanup_legacy_workspace_skill_targets'
+    $powerShellScript | Should -Match '(?s)function Invoke-Apply\s*\{.*?Install-WorkspaceMcpDependencies.*?Replace-SkillTargetsFromStage.*?Remove-LegacyWorkspaceSkillTargets'
   }
 
   It "rejects local package refs before PowerShell update deploys" {
@@ -947,6 +949,28 @@ Describe "public command surface" {
     ($targets | Where-Object Name -eq "claude").ConfigName | Should -Be "CLAUDE.md"
     ($targets | Where-Object Name -eq "codex").ConfigName | Should -Be "AGENTS.md"
     ($targets | Where-Object Name -eq "cursor").ConfigName | Should -Be "AGENTS.md"
+  }
+
+  It "removes physical project skills while preserving bridge symlinks and adjacent files" {
+    $agentsRoot = Join-Path $workspaceDir ".agents/skills"
+    $claudeRoot = Join-Path $workspaceDir ".claude/skills"
+    $bridgeSource = Join-Path $workspaceDir ".apm/skills/workspace-only"
+    $adjacentFile = Join-Path $agentsRoot "notes/README.md"
+
+    New-Item -ItemType Directory -Path $bridgeSource, (Join-Path $agentsRoot "stale-skill"), (Join-Path $claudeRoot "stale-skill"), (Split-Path -Parent $adjacentFile) -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $agentsRoot "stale-skill/SKILL.md") -Value "# stale"
+    Set-Content -LiteralPath (Join-Path $claudeRoot "stale-skill/SKILL.md") -Value "# stale"
+    Set-Content -LiteralPath $adjacentFile -Value "keep me"
+    New-Item -ItemType SymbolicLink -Path (Join-Path $agentsRoot "workspace-only") -Target $bridgeSource | Out-Null
+    New-Item -ItemType SymbolicLink -Path (Join-Path $claudeRoot "workspace-only") -Target $bridgeSource | Out-Null
+
+    Remove-LegacyWorkspaceSkillTargets
+
+    Test-Path -LiteralPath (Join-Path $agentsRoot "stale-skill") | Should -Be $false
+    Test-Path -LiteralPath (Join-Path $claudeRoot "stale-skill") | Should -Be $false
+    (Get-Item -LiteralPath (Join-Path $agentsRoot "workspace-only") -Force).LinkType | Should -Be "SymbolicLink"
+    (Get-Item -LiteralPath (Join-Path $claudeRoot "workspace-only") -Force).LinkType | Should -Be "SymbolicLink"
+    (Get-Content -LiteralPath $adjacentFile -Raw).Trim() | Should -Be "keep me"
   }
 
   It "replaces managed agent trees without touching adjacent runtime assets" {

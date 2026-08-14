@@ -149,6 +149,34 @@ ensure_workspace_scaffold() {
   fi
 }
 
+# This workspace deploys global skills into the user-level runtime roots. Its
+# project-local skill directories are reserved for symlink bridges to
+# .apm/skills. Older APM project installs left physical skill directories here,
+# which causes a runtime opened in ~/.apm to discover both copies.
+workspace_skill_bridge_roots() {
+  printf '%s\n' \
+    "$WORKSPACE_DIR/.claude/skills" \
+    "$WORKSPACE_DIR/.agents/skills"
+}
+
+cleanup_legacy_workspace_skill_targets() {
+  workspace_skill_bridge_roots | while IFS= read -r bridge_root; do
+    [ -d "$bridge_root" ] || continue
+
+    find "$bridge_root" -mindepth 1 -maxdepth 1 -type d ! -type l -print0 | while IFS= read -r -d '' candidate_path; do
+      [ -f "$candidate_path/SKILL.md" ] || continue
+
+      case "$candidate_path" in
+        "$bridge_root"/*) ;;
+        *) fail "Refusing to remove legacy skill outside bridge root: $candidate_path" ;;
+      esac
+
+      rm -rf -- "$candidate_path"
+      log "Removed legacy project-scope skill target: $candidate_path"
+    done
+  done
+}
+
 catalog_build_dir() {
   printf '%s/%s\n' "$CATALOG_BUILD_ROOT" "$CATALOG_DIR_NAME"
 }
@@ -923,6 +951,7 @@ cmd_apply() {
   sync_managed_catalog_runtime_assets
   sync_pi_instructions
   replace_skill_targets_from_stage "$apply_stage_root"
+  cleanup_legacy_workspace_skill_targets
   sync_private_skills_into_targets
 
   trap - RETURN
@@ -1076,6 +1105,7 @@ cmd_sync_local_skills() {
   replace_codex_skill_target_from_stage "$stage_root" "$skill_records"
   sync_claude_skill_symlinks_from_records "$skill_records"
   cleanup_stale_claude_private_skill_symlinks
+  cleanup_legacy_workspace_skill_targets
 
   trap - RETURN
   rm -rf "$stage_root"

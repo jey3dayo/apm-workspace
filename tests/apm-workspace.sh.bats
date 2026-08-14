@@ -525,6 +525,31 @@ make_catalog_fixture() {
   rm -rf "$runtime_home" "$link_source"
 }
 
+# --- cleanup_legacy_workspace_skill_targets ---------------------------------
+
+@test "cleanup_legacy_workspace_skill_targets removes physical skills but preserves bridges and adjacent files" {
+  workspace_dir="$(mktemp -d)"
+  bridge_source="$workspace_dir/.apm/skills/workspace-only"
+  mkdir -p "$bridge_source" "$workspace_dir/.agents/skills/stale-skill" "$workspace_dir/.claude/skills/stale-skill" "$workspace_dir/.agents/skills/notes"
+  printf '# stale\n' >"$workspace_dir/.agents/skills/stale-skill/SKILL.md"
+  printf '# stale\n' >"$workspace_dir/.claude/skills/stale-skill/SKILL.md"
+  printf 'keep me\n' >"$workspace_dir/.agents/skills/notes/README.md"
+  ln -s "$bridge_source" "$workspace_dir/.agents/skills/workspace-only"
+  ln -s "$bridge_source" "$workspace_dir/.claude/skills/workspace-only"
+  WORKSPACE_DIR="$workspace_dir"
+
+  run cleanup_legacy_workspace_skill_targets
+
+  [ "$status" -eq 0 ]
+  [ ! -e "$workspace_dir/.agents/skills/stale-skill" ]
+  [ ! -e "$workspace_dir/.claude/skills/stale-skill" ]
+  [ -L "$workspace_dir/.agents/skills/workspace-only" ]
+  [ -L "$workspace_dir/.claude/skills/workspace-only" ]
+  [ "$(<"$workspace_dir/.agents/skills/notes/README.md")" = "keep me" ]
+
+  rm -rf "$workspace_dir"
+}
+
 # --- assert_catalog_cache_freshness ------------------------------------------
 #
 # The tracked side of the comparison must be git-tracked files (`git
