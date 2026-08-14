@@ -56,7 +56,7 @@
   `architecture-boundary-docs`, `japanese-tech-writing`
 - Git・作業運用: `atomic-commit`, `git-worktree`, `ci-stability-hooks`,
   `prepare-goal`
-- リサーチ: `web-research`（入口・並列委譲）, `jina-web-research`（Jina 収集手順）
+- リサーチ: `web-research`（計画・並列委譲・Jina 収集・合成まで一体）
 
 ## ~/.apm 専用（.apm/skills/）
 
