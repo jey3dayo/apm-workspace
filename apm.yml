@@ -10,12 +10,17 @@ targets:
   - agent-skills
 dependencies:
   apm:
+    # --- workspace-owned (this repository) ---
     - jey3dayo/apm-workspace/catalog#main
     - jey3dayo/apm-workspace/manual-skills#main
+
+    # --- org-restricted (caad-develop; requires org access) ---
     - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
     - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
     - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
     - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout#main
+
+    # --- public ---
     - Jakubantalik/transitions-dev/skills/transitions-dev
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand
     - agavra/tuicr/skills/tuicr
