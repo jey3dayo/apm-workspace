@@ -36,36 +36,48 @@ pre-commit:
 pre-push:
   jobs:
     - name: workspace-scripts
+      glob: "scripts/apm-workspace.{sh,ps1}"
       run: |
         bash -n scripts/apm-workspace.sh
         pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 help >/dev/null
 
     - name: test:sh
+      glob: "{scripts/apm-workspace.sh,tests/apm-workspace.sh.bats,mise.toml,mise/validate.toml}"
       run: mise run test:sh
 
     - name: test:ps
+      glob: "{scripts/apm-workspace.ps1,tests/apm-workspace.Tests.ps1,mise.toml,mise/validate.toml}"
       run: mise run test:ps
 
     - name: format:markdown:bold-headings:check
+      glob: "{catalog/*.md,catalog/**/*.md,scripts/format-bold-headings.*,scripts/replace-bold-headings.ts,mise.toml,mise/format.toml}"
       run: mise run format:markdown:bold-headings:check
 
     - name: format:markdown:check
+      glob: "{*.md,**/*.md,.prettierrc.json,.prettierignore,mise.toml,mise/format.toml}"
       run: mise run format:markdown:check
 
     - name: format:toml:check
+      glob: "{*.toml,**/*.toml,mise.toml,mise/format.toml}"
       run: mise run format:toml:check
 
     - name: format:yaml:check
+      glob: "{*.yml,*.yaml,**/*.yml,**/*.yaml,.prettierrc.json,.prettierignore,mise.toml,mise/format.toml}"
       run: mise run format:yaml:check
 
     - name: lint:yaml
+      glob: "{*.yml,*.yaml,**/*.yml,**/*.yaml,.yamllint.yml,mise.toml,mise/format.toml}"
       run: mise run lint:yaml
 
+    # no glob: validates apm.yml/apm.lock.yaml wiring against the whole workspace
+    # (scripts, catalog, deployed targets) — inputs cannot be safely enumerated.
     - name: validate:workspace
       run: mise run validate:workspace
 
+    # no glob: normalizes/validates the entire managed catalog package tree.
     - name: validate:catalog
       run: mise run validate:catalog
 
+    # no glob: smoke-tests the full catalog package end to end.
     - name: smoke:catalog
       run: mise run smoke:catalog
