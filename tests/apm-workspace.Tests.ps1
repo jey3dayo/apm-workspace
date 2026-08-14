@@ -1254,6 +1254,22 @@ dependencies: []
   It "publishes workspace mise tasks for formatting, verification, and workflow orchestration" {
     $miseToml = Get-Content -LiteralPath (Join-Path $workspaceRoot "mise.toml") -Raw
 
+    # Task definitions moved into included files (mise/*.toml) use bare
+    # `[taskname]` headers per mise's include-file convention. Normalize them
+    # to `[tasks.taskname]` so this test can keep matching against a single
+    # combined string regardless of where a task is physically defined.
+    $includePattern = [regex]::new('includes\s*=\s*\[(?<list>[^\]]*)\]')
+    $includeMatch = $includePattern.Match($miseToml)
+    if ($includeMatch.Success) {
+      $includePaths = [regex]::Matches($includeMatch.Groups['list'].Value, '"([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
+      foreach ($includePath in $includePaths) {
+        $includeContent = Get-Content -LiteralPath (Join-Path $workspaceRoot $includePath) -Raw
+        $includeContent = [regex]::Replace($includeContent, '(?m)^\["([a-zA-Z0-9_-]+)"\]', '[tasks.$1]')
+        $includeContent = [regex]::Replace($includeContent, '(?m)^\["([^"]+)"\]', '[tasks."$1"]')
+        $miseToml += "`n" + $includeContent
+      }
+    }
+
     $miseToml | Should -Match '\[tasks\.validate\]'
     $miseToml | Should -Match '\[tasks\."validate:workspace"\]'
     $miseToml | Should -Match '\[tasks\."validate:catalog"\]'
