@@ -931,6 +931,32 @@ install_workspace_mcp_dependencies() {
   run_workspace_install_command -g --only mcp
 }
 
+normalize_codex_mcp_config() {
+  config_path="$WORKSPACE_DIR/.codex/config.toml"
+  [ -f "$config_path" ] || return 0
+
+  # APM 0.28.0 emits its registry-only MCP identity field into Codex TOML.
+  # Codex rejects that field under --strict-config, so keep this compatibility
+  # boundary in the workspace rollout rather than editing generated output by hand.
+  sanitized_path=$(mktemp "$config_path.normalize.XXXXXX")
+  trap 'rm -f "$sanitized_path"' RETURN
+
+  awk '
+    /^\[mcp_servers\.[^.]+\]$/ { in_mcp_server = 1 }
+    /^\[/ && $0 !~ /^\[mcp_servers\.[^.]+\]$/ { in_mcp_server = 0 }
+    in_mcp_server && $0 ~ /^[[:space:]]*id[[:space:]]*=/ { next }
+    { print }
+  ' "$config_path" >"$sanitized_path"
+
+  if cmp -s "$config_path" "$sanitized_path"; then
+    return 0
+  fi
+
+  chmod 600 "$sanitized_path"
+  mv "$sanitized_path" "$config_path"
+  log "Removed unsupported Codex MCP identity fields: $config_path"
+}
+
 cmd_apply() {
   require_apm
   ensure_workspace_repo
@@ -947,6 +973,7 @@ cmd_apply() {
 
   build_target_skill_trees "$apply_stage_root"
   install_workspace_mcp_dependencies
+  normalize_codex_mcp_config
   compile_codex
   sync_managed_catalog_runtime_assets
   sync_pi_instructions

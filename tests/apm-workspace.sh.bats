@@ -227,6 +227,32 @@ EOF
   [ "$status" -eq 0 ]
 }
 
+@test "normalize_codex_mcp_config removes only top-level MCP identity fields" {
+  workspace_dir="$(mktemp -d)"
+  mkdir -p "$workspace_dir/.codex"
+  cat >"$workspace_dir/.codex/config.toml" <<'EOF'
+[mcp_servers.context7]
+command = "npx"
+id = ""
+
+[mcp_servers.context7.env]
+id = "preserve nested"
+
+[other]
+id = "preserve"
+EOF
+
+  WORKSPACE_DIR="$workspace_dir"
+  normalize_codex_mcp_config
+  config="$(<"$workspace_dir/.codex/config.toml")"
+
+  [[ "$config" != *'id = ""'* ]]
+  [[ "$config" == *'id = "preserve nested"'* ]]
+  [[ "$config" == *'id = "preserve"'* ]]
+
+  rm -rf "$workspace_dir"
+}
+
 @test "external lock matching ignores GitHub reference casing" {
   workspace_dir="$(mktemp -d)"
   cat >"$workspace_dir/apm.yml" <<'EOF'

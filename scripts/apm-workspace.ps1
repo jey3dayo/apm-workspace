@@ -500,6 +500,62 @@ function Install-WorkspaceMcpDependencies {
   Invoke-WorkspaceInstallCommand -InstallArgs @("-g", "--only", "mcp")
 }
 
+function Normalize-CodexMcpConfig {
+  param(
+    [string]$ConfigPath
+  )
+
+  $configPath = if ($ConfigPath) {
+    $ConfigPath
+  }
+  else {
+    Join-Path (Join-Path $WorkspaceDir ".codex") "config.toml"
+  }
+  if (-not (Test-Path -LiteralPath $configPath -PathType Leaf)) {
+    return
+  }
+
+  # APM 0.28.0 emits its registry-only MCP identity field into Codex TOML.
+  # Codex rejects that field under --strict-config, so keep this compatibility
+  # boundary in the workspace rollout rather than editing generated output by hand.
+  $content = [System.IO.File]::ReadAllText($configPath)
+  $lines = $content -split "\r?\n"
+  $inMcpServer = $false
+  $updatedLines = New-Object System.Collections.Generic.List[string]
+
+  foreach ($line in $lines) {
+    if ($line -match '^\[mcp_servers\.[^.]+\]$') {
+      $inMcpServer = $true
+    }
+    elseif ($line -match '^\[') {
+      $inMcpServer = $false
+    }
+
+    if ($inMcpServer -and $line -match '^\s*id\s*=') {
+      continue
+    }
+    $updatedLines.Add($line)
+  }
+
+  $updatedContent = $updatedLines -join "`n"
+  if ($updatedContent -eq ($content -replace "\r\n?", "`n")) {
+    return
+  }
+
+  $temporaryPath = "$configPath.normalize.$([guid]::NewGuid().ToString('N'))"
+  try {
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($temporaryPath, $updatedContent, $utf8NoBom)
+    Move-Item -LiteralPath $temporaryPath -Destination $configPath -Force
+    Write-Host "Removed unsupported Codex MCP identity fields: $configPath"
+  }
+  finally {
+    if (Test-Path -LiteralPath $temporaryPath) {
+      Remove-Item -LiteralPath $temporaryPath -Force -ErrorAction SilentlyContinue
+    }
+  }
+}
+
 function Get-OnePasswordMcpCommand {
   foreach ($commandName in @("1password-mcp", "onepassword-mcp", "1password-mcp.exe")) {
     $resolvedCommand = Get-Command $commandName -ErrorAction SilentlyContinue
@@ -1587,6 +1643,7 @@ function Invoke-Apply {
     $null = Build-TargetSkillTrees -StageRoot $stageDir
     Sync-ManagedCatalogRuntimeAssets
     Install-WorkspaceMcpDependencies
+    Normalize-CodexMcpConfig
     Replace-SkillTargetsFromStage -StageRoot $stageDir
     Remove-LegacyWorkspaceSkillTargets
   }

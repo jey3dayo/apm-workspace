@@ -837,6 +837,7 @@ command = "npx"
 id = ""
 
 [mcp_servers.context7.env]
+id = "preserve nested"
 
 [other]
 id = "preserve"
