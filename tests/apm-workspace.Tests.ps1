@@ -828,6 +828,27 @@ Describe "public command surface" {
     }
   }
 
+  It "removes unsupported Codex MCP identity fields from project config" {
+    $configDir = Join-Path $workspaceDir ".codex"
+    New-Item -ItemType Directory -Path $configDir -Force | Out-Null
+    @"
+[mcp_servers.context7]
+command = "npx"
+id = ""
+
+[mcp_servers.context7.env]
+
+[other]
+id = "preserve"
+"@ | Set-Content -LiteralPath (Join-Path $configDir "config.toml") -NoNewline
+
+    Normalize-CodexMcpConfig -ConfigPath (Join-Path $configDir "config.toml")
+
+    $config = Get-Content -LiteralPath (Join-Path $configDir "config.toml") -Raw
+    $config | Should -Not -Match '(?m)^id = ""$'
+    $config | Should -Match '(?m)^id = "preserve"$'
+  }
+
   It "rejects local package refs before update deploys" {
     $shellScript = Get-Content -LiteralPath (Join-Path $workspaceRoot "scripts/apm-workspace.sh") -Raw
 
@@ -839,8 +860,8 @@ Describe "public command surface" {
     $powerShellScript = Get-Content -LiteralPath (Join-Path $workspaceRoot "scripts/apm-workspace.ps1") -Raw
 
     $shellScript | Should -Match '(?s)install_workspace_mcp_dependencies\(\)\s*\{\s*run_workspace_install_command -g --only mcp\s*\}'
-    $shellScript | Should -Match '(?s)cmd_apply\(\)\s*\{.*?install_workspace_mcp_dependencies.*?compile_codex.*?replace_skill_targets_from_stage "\$apply_stage_root".*?cleanup_legacy_workspace_skill_targets'
-    $powerShellScript | Should -Match '(?s)function Invoke-Apply\s*\{.*?Install-WorkspaceMcpDependencies.*?Replace-SkillTargetsFromStage.*?Remove-LegacyWorkspaceSkillTargets'
+    $shellScript | Should -Match '(?s)cmd_apply\(\)\s*\{.*?install_workspace_mcp_dependencies.*?normalize_codex_mcp_config.*?compile_codex.*?replace_skill_targets_from_stage "\$apply_stage_root".*?cleanup_legacy_workspace_skill_targets'
+    $powerShellScript | Should -Match '(?s)function Invoke-Apply\s*\{.*?Install-WorkspaceMcpDependencies.*?Normalize-CodexMcpConfig.*?Replace-SkillTargetsFromStage.*?Remove-LegacyWorkspaceSkillTargets'
   }
 
   It "rejects local package refs before PowerShell update deploys" {
