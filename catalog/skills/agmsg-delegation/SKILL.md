@@ -3,16 +3,16 @@ name: agmsg-delegation
 description: >-
   agmsg で別プロセスの CC/Codex を worker / reviewer として起動し、
   タスク委譲またはレビュー外注を行う。orchestrator-worker の組み込み
-  spawn_agent が使えない経路（Codex sol / terra → luna 等)の標準経路。
+  spawn_agent が使えない経路、別セッションへの引き継ぎ、または外部プロセスが必要な場合の経路。
   agent / セッション間の引き継ぎ（CC → Codex 等）メッセージの書式も定義する。
 disable-model-invocation: true
 ---
 
 # agmsg-delegation
 
-別プロセスの agent（headless Claude Code / Codex）へ、agmsg メッセージングで作業を委譲するライフサイクルを回す。組み込みサブエージェント（Agent tool / `spawn_agent`）が使える場合はそちらが正規経路であり、このスキルは **spawn 面の制約で組み込み経路が塞がっている場合の手動経路**である。Herdr pane は使わない。
+別プロセスの agent（headless Claude Code / Codex）へ、agmsg メッセージングで作業を委譲するライフサイクルを回す。組み込みサブエージェント（Agent tool / `spawn_agent`）が使える場合はそちらが正規経路であり、このスキルは **native spawn が使えない場合、別セッションへ引き継ぐ場合、または外部プロセスが必要な場合の手動経路**である。Herdr pane は使わない。
 
-Codex では sol / terra とも `spawn_agent` で `gpt-5.6-luna` を指定できない意図的な制限があるため、Codex からの luna 委譲は本スキルが標準経路である（詳細は `orchestrator-worker` の `references/codex-spawn-model-bug.md`）。本スキルが新規プロセスで起動する `codex -m gpt-5.6-luna exec` は `spawn_agent` を経由しないため、この制限の影響を受けない。
+Codex CLI 0.147.0 以降は native `spawn_agent` から Luna を leaf worker として起動できるため、通常の Codex 内委譲では native spawn を優先する。本スキルが新規プロセスで起動する `codex -m gpt-5.6-luna exec` は、native spawn が利用できない環境、別セッション運用、または外部プロセスの分離が必要な場合の fallback とする。
 
 tier 判定・委譲判定・タスク分割基準は `orchestrator-worker` スキルが正本。本スキルは transport と lifecycle だけを定義する。
 

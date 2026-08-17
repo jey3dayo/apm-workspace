@@ -18,7 +18,7 @@
 
 - lefthook が設定されているリポジトリでは pre-commit / pre-push フックを full gate とみなす。pre-push フックは `git push` 時に走るため、push 前に確認したい場合は `lefthook run pre-push` を手動実行する
 - full gate を実行しない場合は、報告時に実行した軽い確認と省略理由を短く明示する
-- 非軽微な変更は外部共有前に、通常のコードレビュー観点での独立レビューを行う（指摘対応は最大3回。sol-advisor 標準レーンの新規 Sol レビューはこれを満たす）
+- 非軽微な変更は外部共有前に、通常のコードレビュー観点での独立レビューを行う（指摘対応は最大3回。Codex native の別セッションレビューでもよい）
 
 ## 停止・確認ポリシー
 
@@ -47,14 +47,13 @@ tier 対応表、委譲する / しないの判定、タスク分割基準、Cla
 
 ### 推奨ワークフロー（経路の選択）
 
-- 役割分担: `orchestrator-worker` は委譲判定・タスク分割の正本、Codex での transport は `sol-advisor`、`agmsg-delegation` は sol-advisor 外の fallback
+- 役割分担: `orchestrator-worker` は委譲判定・タスク分割の正本、Codex native の `spawn_agent` は標準 transport、`agmsg-delegation` は外部セッションや native spawn が使えない場合の fallback
 - 組み込みサブエージェント（Agent tool / `spawn_agent`）が使える場合はそれが正規経路
-- Codex では `sol-advisor` plugin（`$sol-advisor:orchestration`）を推奨。標準レーンは Sol → Terra / High 実装 → 新規 Sol レビュー。コスパ優先時は依頼文に「Luna タスクレーンを使って」と明示すると Luna / Max の user-visible task へ委譲される（明示しない限り Terra。Luna が使えない場合は Terra へフォールバックせず停止する）
+- Codex native では、bounded な作業の実装ワーカーに `gpt-5.6-luna` を明示指定できる。Luna は leaf worker として扱われ、自身の再帰的な委譲は行わない。判断・検証・独立レビューは親セッションが担う
 - Luna は同一トークン量なら Sol より大幅に安い（比率は[公式 rate card](https://help.openai.com/en/articles/20001106-codex-rate-card)を参照）が、共有クレジットプールと利用上限を消費する。無料・無制限ではない
 - Luna の直接起動は `codex -m gpt-5.6-luna`（`codex exec -m gpt-5.6-luna` も同様）。これは Luna タスクレーンとは別物
-- spawn 面の制約で組み込み経路が塞がっている場合（Codex sol → luna 等）は `agmsg-delegation` スキルへ切り替える
+- spawn 面の制約で組み込み経路が塞がっている場合は `agmsg-delegation` スキルへ切り替える
 - エージェント / セッション間の引き継ぎ（CC → Codex 等）は transport に `agmsg` を使い、本文は `agmsg-delegation` の引き継ぎメッセージ書式（artifact は参照渡し・suggested skills・secrets redact・次セッションの目的に合わせる）に従う
-- sol-advisor の導入・更新手順は `docs/package-decisions.md` を参照
 
 ### agent 定義側のモデル割り当て
 

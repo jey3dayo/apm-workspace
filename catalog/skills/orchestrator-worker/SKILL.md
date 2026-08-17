@@ -19,11 +19,11 @@ description: >-
 
 現在のモデルが Orchestrator tier なら委譲、Worker tier なら自分で実装する。
 
-| 現在のモデル                          | 役割         | Worker として呼ぶモデル                                  |
-| ------------------------------------- | ------------ | -------------------------------------------------------- |
-| Claude Fable / Opus                   | Orchestrator | `sonnet`                                                 |
-| Codex `gpt-5.6-sol` / `gpt-5.6-terra` | Orchestrator | `gpt-5.6-luna` xhigh（spawn_agent 不可、Section 4 参照） |
-| Claude Sonnet / Codex `gpt-5.6-luna`  | Worker       | 委譲せず自分で実装する                                   |
+| 現在のモデル                          | 役割         | Worker として呼ぶモデル |
+| ------------------------------------- | ------------ | ----------------------- |
+| Claude Fable / Opus                   | Orchestrator | `sonnet`                |
+| Codex `gpt-5.6-sol` / `gpt-5.6-terra` | Orchestrator | `gpt-5.6-luna` xhigh    |
+| Claude Sonnet / Codex `gpt-5.6-luna`  | Worker       | 委譲せず自分で実装する  |
 
 表の tier が使えないときだけ、利用可能な旧モデルへフォールバックする。委譲は同一 platform 内で完結させ、他方の platform（Claude / Codex）の Worker へ跨ぐのはユーザーが明示的に指示した場合に限る。
 
@@ -70,9 +70,9 @@ Agent(subagent_type: "implementer", prompt: <タスク定義>)
 
 Codex:
 
-sol / terra とも `spawn_agent` では `gpt-5.6-luna` を指定できない。luna はモデルカタログ上 MultiAgent V1 扱いで、V2 親からの指定は `Unknown model` で拒否される意図的な制限である。model catalog を書き換えて強制する方法は OpenAI が非推奨と明言しているため使わない（経緯と一次情報は [references/codex-spawn-model-bug.md](references/codex-spawn-model-bug.md)）。
+現行の Codex CLI 0.147.0 では、`spawn_agent` から `gpt-5.6-luna` を明示指定できる。モデル上書き時は `fork_turns: "none"` を使い、Luna は leaf worker として実装だけを担当させる。Luna の子には collaboration tools が公開されないため、再帰的な委譲・分解・検証は Orchestrator が担う（経緯は [references/codex-spawn-model-bug.md](references/codex-spawn-model-bug.md)）。
 
-luna への委譲は `agmsg-delegation` スキル（別プロセスの `codex -m gpt-5.6-luna exec`。`spawn_agent` を経由しないため制限を受けない）を標準経路とする。worker の reasoning effort は既定 `xhigh`（helper が付与する。Terra high 相当の品質を最安で得られる実測に基づく）。別プロセス起動は親の workspace を引き継がないため、agmsg-delegation の lifecycle（作業領域の固定、payload 渡し、READY / DONE 監視、片付け）に従う。
+Codex native の `spawn_agent` を標準経路とする。native spawn が利用できない環境、別セッション・別プロセスへの引き継ぎ、または native runtime の制約を回避する必要がある場合だけ `agmsg-delegation`（別プロセスの `codex -m gpt-5.6-luna exec`）へ切り替える。worker の reasoning effort は既定 `xhigh`（Terra high 相当の品質を最安で得るための設定）とし、別プロセス起動時は agmsg-delegation の lifecycle（作業領域の固定、payload 渡し、READY / DONE 監視、片付け）に従う。
 
 ### 昇格
 
