@@ -117,4 +117,6 @@ Worker の報告をそのまま信用しない。
 
 ## 委譲しない例外
 
-権限・認証・秘密情報の操作、破壊的操作、外部公開、production への変更は Orchestrator が自分で扱う。
+権限・認証・秘密情報の操作、破壊的操作、production への変更は Orchestrator が自分で扱う。
+
+外部公開（リリース・publish・deploy）は、手順が確立していて機械的に実行できるものなら Worker へ委譲してよい。ただし実行前に Orchestrator が対象バージョン・手順・影響範囲を確認し、結果の検証（公開されたことの確認）は Orchestrator が行う。手順が未確立、または判断を伴う公開は Orchestrator が自分で扱う。
