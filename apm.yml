@@ -35,6 +35,11 @@ dependencies:
     - mattpocock/skills/skills/engineering/setup-matt-pocock-skills
     - mattpocock/skills/skills/engineering/wayfinder
 
+    # productivity / writing
+    - mattpocock/skills/skills/productivity/grilling
+    - mattpocock/skills/skills/productivity/writing-for-agents
+    - gonta223/humanizer-ja
+
     # react-specific
     - millionco/react-doctor/skills/react-doctor
     - vercel-labs/agent-skills/skills/react-best-practices
@@ -42,11 +47,6 @@ dependencies:
     # github ops
     - openai/plugins/plugins/github/skills/gh-address-comments
     - openai/plugins/plugins/github/skills/gh-fix-ci
-
-    # productivity / writing
-    - mattpocock/skills/skills/productivity/grilling
-    - mattpocock/skills/skills/productivity/writing-for-agents
-    - gonta223/humanizer-ja
 
     # browser / analysis tools
     - browser-use/browser-harness
