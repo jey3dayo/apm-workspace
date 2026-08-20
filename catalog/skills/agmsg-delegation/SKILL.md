@@ -35,7 +35,7 @@ tier 判定・委譲判定・タスク分割基準は `orchestrator-worker` ス�
 | implement | Orchestrator (fable/sol/terra) | worker (sonnet / luna)         | 対象 worktree の編集可       | DONE   |
 | review    | Worker (sonnet/luna)           | reviewer (fable / sol / terra) | read-only。編集・commit 禁止 | REVIEW |
 
-review role の reviewer モデル指定は本スキル内の一時的な model override であり、`orchestrator-worker` の tier 対応表や既存 agent 定義（親モデル継承）を変更しない。Codex reviewer は起動時引数で `gpt-5.6-sol` / `gpt-5.6-terra` から選ぶ（既定は sol。設計影響が大きい・横断的なレビューは terra へ昇格し、必要なら `AGMSG_REVIEWER_EFFORT=high` などで effort も指定する）。Claude reviewer は fable 固定で、fable が利用不可（未提供・rate limit・plan 制限など起動失敗）の場合のみ opus へフォールバックする。
+review role の reviewer モデル指定は本スキル内の一時的な model override であり、`orchestrator-worker` の tier 対応表や既存 agent 定義（親モデル継承）を変更しない。**review 外注の既定経路は Codex**: 起動時引数で `gpt-5.6-sol` / `gpt-5.6-terra` から選ぶ（既定は sol。設計影響が大きい・横断的なレビューは terra へ昇格し、必要なら `AGMSG_REVIEWER_EFFORT=high` などで effort も指定する）。Claude reviewer（fable 固定）は明示指定された場合のみ使う。orchestrator 側の Fable rate limit と枠を共有するため実行中 429 で run ごと失敗しうる。失敗した場合は同経路で再試行せず、Codex sol へ切り替えて再外注するか orchestrator が判断する（`--fallback-model opus` は起動失敗時のみ効き、実行中 429 は救えない）。
 
 ## Guardrails
 
@@ -83,7 +83,7 @@ profile の正本は本スキルの [agmsg-review.config.toml](agmsg-review.conf
 
 - 手動コピーは不要。catalog 側の profile を更新したら `mise run deploy` するだけでよい
 - source が欠落、コピー失敗、コピー後も不一致のいずれでも helper は起動を拒否する（fail-closed）
-- 初回利用前の smoke: (1) review は対象 project への write が拒否される (2) implement は対象 project 内の edit が成功し project 外の write が拒否される (3) `send-report.sh` による READY send 成功 (4) inbox で STOP 受信 (5) DONE/REVIEW/ACK send 成功 (6) 全手順が承認画面・MCP 確認画面なしで完了、の6点を runtime ごとに実際に確認する
+- 初回利用前の smoke: (1) review は対象 project への write が拒否される (2) implement は対象 project 内の edit が成功し project 外の write が拒否される (3) `send-report.sh` による READY send 成功 (4) DONE / REVIEW send 成功 (5) 全手順が承認画面・MCP 確認画面なしで完了、の5点を runtime ごとに実際に確認する
 
 完了条件: CLI・role 別起動コマンド（review は profile の diff 一致確認込み）・agmsg・`launch-worker.sh` の4点が確認済み。
 
@@ -96,7 +96,10 @@ profile の正本は本スキルの [agmsg-review.config.toml](agmsg-review.conf
 
 ### 3. Worker を事前登録する
 
-`actas` と `send` は同一 team・同一 project の登録が前提。worker 起動**前**に対象 project で登録する。worker_name は task-scoped の一意な名前（例: `<role>-<task_id>`）にし、既存名の再利用を避ける。
+`actas` と `send` は同一 team・同一 project の登録が前提。worker 起動**前**に対象 project で登録する。
+
+- team 名は対象 repo 名と同一の永続 team を使う（1 repo = 1 team）。日付・issue 番号・topic を team 名に含めない。task-scoped な team を乱立させると identities・履歴・掃除の全部が破綻する
+- worker_name は task-scoped の一意な名前（例: `<role>-<task_id>`）にし、既存名の再利用を避ける。task の識別は team 名でなく worker_name と task_id が担う
 
 ```bash
 ~/.agents/skills/agmsg/scripts/team.sh <team>   # 名前衝突を確認
@@ -138,6 +141,7 @@ READY 後も DONE / REVIEW だけを無期限に待たず、agmsg と detached p
 - valid message が120秒無い場合は、launchd job 状態、`tail -n 200 "$run_dir/worker.log"`、`$run_dir/worker.exit`（あれば）を取得して、長時間コマンド・crash・承認待ちを区別する。長時間コマンドが動作中なら待機を継続し、診断時刻を更新する
 - 承認画面を検出した場合は Enter を自動送信しない。Codex では `-a never` 契約違反として最終出力を記録し、crash cleanup へ進む。Claude では安全な代替を指示できる場合だけ指示し、解消しなければ同様に cleanup する
 - boot payload の task timeout を超えたら最終ログ・launchd job 状態・exit status を保存し、crash cleanup へ進む
+- 作業を途中で打ち切りたい場合は `STOP(task_id)` を送る。ただし worker が拾うのは best-effort（WORKING の区切りで inbox を確認した時のみ）なので、応答が無ければ task timeout / crash cleanup 経路で job を落とす
 
 完了条件: DONE / REVIEW / BLOCKED を受信したか、timeout / crash の診断情報が揃っている。
 
@@ -158,14 +162,13 @@ READY 後も DONE / REVIEW だけを無期限に待たず、agmsg と detached p
 
 ### 8. 片付ける
 
-順序を守る。Claude / Codex とも headless の1 turn で終了するため、WORKER.md の契約により DONE/REVIEW 送信後も**同一 turn 内で** `inbox.sh` を timeout 付きポーリングして STOP を受信し ACK する。orchestrator は DONE/REVIEW 受信後すみやかに STOP を送る（worker のポーリング timeout 内に届かせる）。
+**DONE / REVIEW の受信が終了シグナルであり、成功経路に STOP/ACK handshake は無い**（worker は DONE/REVIEW 送信後すみやかに終了する契約）。STOP は途中中断専用の合図で、orchestrator が作業を打ち切りたい時だけ送る。worker が STOP を拾えるのは WORKING 送信の区切りで inbox を確認した場合に限る best-effort であり、応答が無ければ task timeout を待って crash cleanup と同じ手順で片付ける。
 
-1. worker へ `STOP(task_id)` を送信し、ACK を待つ（timeout 付き。超過したら crash 扱いで次へ）
-2. launchd job が終了するまで最大10秒待つ。終了しない場合は最終ログを保存して crash 扱いとし、job を bootout しない
-3. `~/.agents/skills/agmsg/scripts/reset.sh <対象project絶対パス> <runtime_type> <worker_name> <session_id>`（orchestrator 自身の cwd ではなく **対象 project と worker_name を指定**する。Claude worker は READY で受け取った session_id を第4引数に渡して actas lock も解放する。session_id を取得できなかった場合のみ省略し、crash cleanup として記録する）
-4. worker job が終了済みであることを確認して `launchctl bootout "gui/$(id -u)" "$run_dir/worker.plist"` を実行してから、`rm -rf -- "$run_dir"` で専用一時ディレクトリだけを削除する（登録は `launchctl bootstrap` なので解除も `bootout` を使う。旧 API の `launchctl remove` は使わない）
+1. launchd job が終了するまで最大10秒待つ。終了しない場合は最終ログを保存して crash 扱いとし、job を bootout しない
+2. `~/.agents/skills/agmsg/scripts/reset.sh <対象project絶対パス> <runtime_type> <worker_name> <session_id>`（orchestrator 自身の cwd ではなく **対象 project と worker_name を指定**する。Claude worker は READY で受け取った session_id を第4引数に渡して actas lock も解放する。session_id を取得できなかった場合のみ省略し、crash cleanup として記録する）
+3. worker job が終了済みであることを確認して `launchctl bootout "gui/$(id -u)" "$run_dir/worker.plist"` を実行してから、`rm -rf -- "$run_dir"` で専用一時ディレクトリだけを削除する（登録は `launchctl bootstrap` なので解除も `bootout` を使う。旧 API の `launchctl remove` は使わない）
 
-worker が crash / timeout した場合も同じ順序で、ACK 待ちを省略して 2→4 を実行し、最終ログ・launchd job 状態・exit status を記録する。job が終了していない場合は一時ディレクトリを残し、ユーザーへ job label とログパスを報告する。
+worker が crash / timeout した場合も同じ 1→3 の順序で片付け、最終ログ・launchd job 状態・exit status を記録する。job が終了していない場合は一時ディレクトリを残し、ユーザーへ job label とログパスを報告する。
 
 完了条件: worker job が終了・解除され、専用一時ディレクトリが削除され、`identities.sh <対象project> <runtime_type>` の出力に worker_name が残っていない。
 
