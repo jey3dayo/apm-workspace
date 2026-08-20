@@ -969,7 +969,12 @@ cmd_apply() {
   fi
 
   apply_stage_root=$(mktemp -d "${TMPDIR:-/tmp}/apm-apply.XXXXXX")
-  trap 'rm -rf "$apply_stage_root"' RETURN
+  # agmsg's roster (db/teams) lives inside the deploy target this command
+  # rewrites wholesale; save it now and bind restore to EXIT (not RETURN) so
+  # it fires on every path, including `fail`'s `exit` and any `set -e`
+  # abort — a RETURN trap never runs on those, only on a normal return.
+  "$REPO_ROOT/scripts/agmsg-state.sh" save
+  trap 'rm -rf "$apply_stage_root"; "$REPO_ROOT/scripts/agmsg-state.sh" restore || true' EXIT
 
   build_target_skill_trees "$apply_stage_root"
   install_workspace_mcp_dependencies
@@ -981,8 +986,9 @@ cmd_apply() {
   cleanup_legacy_workspace_skill_targets
   sync_private_skills_into_targets
 
-  trap - RETURN
+  trap - EXIT
   rm -rf "$apply_stage_root"
+  "$REPO_ROOT/scripts/agmsg-state.sh" restore || true
 }
 
 requested_personal_skill_records() {
@@ -1126,7 +1132,11 @@ cmd_sync_local_skills() {
 
   skill_records=$(requested_personal_skill_records "$@")
   stage_root=$(mktemp -d "${TMPDIR:-/tmp}/apm-sync-local.XXXXXX")
-  trap 'rm -rf "$stage_root"' RETURN
+  # Same roster-preservation contract as cmd_apply: save before this command
+  # touches the Codex skill target tree, and bind restore to EXIT so it fires
+  # on both normal completion and any `set -e`/`fail` abort.
+  "$REPO_ROOT/scripts/agmsg-state.sh" save
+  trap 'rm -rf "$stage_root"; "$REPO_ROOT/scripts/agmsg-state.sh" restore || true' EXIT
 
   stage_codex_skill_records "$skill_records" "$stage_root"
   replace_codex_skill_target_from_stage "$stage_root" "$skill_records"
@@ -1134,8 +1144,9 @@ cmd_sync_local_skills() {
   cleanup_stale_claude_private_skill_symlinks
   cleanup_legacy_workspace_skill_targets
 
-  trap - RETURN
+  trap - EXIT
   rm -rf "$stage_root"
+  "$REPO_ROOT/scripts/agmsg-state.sh" restore || true
   log "Synced local catalog/private skills to Codex target: $(printf '%s\n' "$skill_records" | awk -F '\t' 'NF >= 2 { print $2 }' | tr '\n' ',' | sed 's/,$//; s/,/, /g')"
 }
 

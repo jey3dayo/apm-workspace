@@ -2,7 +2,6 @@
 # Settings
 # ========================================
 [settings]
-# Required by `depends_post` on [tasks.apply] (agmsg roster relink).
 experimental = true
 
 # ========================================
@@ -47,21 +46,23 @@ run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts
 
 [tasks."agmsg:state:save"]
 description = "Move the agmsg roster out of the deploy target before it is rewritten"
+# Recovery adapter only: cmd_apply/cmd_sync_local_skills (apm-workspace.sh)
+# and Invoke-Apply/Invoke-SyncLocalSkills (apm-workspace.ps1) now call
+# save/restore directly and guarantee restore runs on every exit path
+# (bash: EXIT trap; PowerShell: try/finally). Run this by hand only to
+# recover a roster left unlinked by an apply that predates that change, or
+# by some other process that unlinked it outside of apply.
 hide = true
 run = "bash ./scripts/agmsg-state.sh save"
 
 [tasks."agmsg:state:restore"]
 description = "Relink the agmsg roster into the deployed skill directory"
-# Hidden like its `save` counterpart, but kept directly runnable on purpose:
-# `depends_post` does not fire when `apply` fails, which leaves the roster
-# unlinked until someone runs this by hand.
 hide = true
 run = "bash ./scripts/agmsg-state.sh restore"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/agmsg-state.ps1 restore"
 
 [tasks.apply]
 description = "Deploy user-scope-compatible APM dependencies and compile Codex output"
-depends = ["agmsg:state:save"]
-depends_post = ["agmsg:state:restore"]
 run = "bash ./scripts/apm-workspace.sh apply"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 apply"
 

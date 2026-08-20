@@ -79,9 +79,13 @@ symlinks resolving to `.apm/skills/<id>/SKILL.md`.
 
 `~/.agents/skills/agmsg/db` and `teams` must remain symlinks to
 `${XDG_STATE_HOME:-~/.local/state}/agmsg/`; `apm apply` would otherwise erase
-the roster and history. `mise run apply` saves and restores them automatically.
-After a failed direct apply, run `mise run agmsg:state:restore`. Remove this
-workaround only after upstream `AGMSG_HOME` supports both locations.
+the roster and history. `mise run apply` (both `apm-workspace.sh` and
+`apm-workspace.ps1`) saves and restores them automatically on every exit
+path, success or failure — the `agmsg:state:save`/`agmsg:state:restore` mise
+tasks are recovery adapters only, for a roster left unlinked by some other
+process. Run `mise run agmsg:state:restore` by hand to recover from that.
+Remove this workaround only after upstream `AGMSG_HOME` supports both
+locations.
 
 ## Cache Recovery
 

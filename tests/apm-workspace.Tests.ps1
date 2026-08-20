@@ -801,6 +801,11 @@ Describe "public command surface" {
     Mock Replace-SkillTargetsFromStage {}
     Mock Install-WorkspaceMcpDependencies {}
     Mock Invoke-CodexCompile {}
+    # Invoke-AgmsgStateSave/Restore shell out to agmsg-state.ps1 against the
+    # real $HOME by design (see its own subprocess-based test suite); mocked
+    # here so this unit test doesn't touch this machine's real agmsg roster.
+    Mock Invoke-AgmsgStateSave {}
+    Mock Invoke-AgmsgStateRestore {}
 
     Invoke-Apply
 
@@ -1208,6 +1213,11 @@ dependencies:
     Mock Get-LocalCodexSyncTarget {
       [pscustomobject]@{ Name = "codex"; Root = (Join-Path $TestDrive ".codex"); SkillsRoot = (Join-Path $TestDrive ".agents"); ConfigName = "AGENTS.md" }
     }
+    # Invoke-AgmsgStateSave/Restore shell out to agmsg-state.ps1 against the
+    # real $HOME by design (see its own subprocess-based test suite); mocked
+    # here so this unit test doesn't touch this machine's real agmsg roster.
+    Mock Invoke-AgmsgStateSave {}
+    Mock Invoke-AgmsgStateRestore {}
 
     $sourcePath = Join-Path $TestDrive "catalog/skills/mattpocock/wayfinder"
     New-Item -ItemType Directory -Path (Join-Path $sourcePath "references") -Force | Out-Null

@@ -1627,6 +1627,32 @@ function Invoke-PinExternal {
   Write-SuccessLine ("Pinned {0} external dependency references in apm.yml" -f $updatedCount)
 }
 
+# agmsg's roster (db/teams) lives inside the deploy target Invoke-Apply and
+# Invoke-SyncLocalSkills rewrite; these wrap the standalone agmsg-state.ps1
+# script (not dot-sourced here, so its state stays isolated) as ordinary
+# functions specifically so tests can Mock them like every other apply step
+# below, instead of a raw `&` call reaching the real $HOME on every unit test
+# that doesn't redirect it.
+function Invoke-AgmsgStateSave {
+  $agmsgStateScript = Join-Path $PSScriptRoot "agmsg-state.ps1"
+  & $agmsgStateScript save
+  if ($LASTEXITCODE -ne 0) {
+    throw "agmsg roster save failed (exit $LASTEXITCODE)"
+  }
+}
+
+function Invoke-AgmsgStateRestore {
+  # Never throws: this runs from a `finally`, where a new exception here
+  # would replace whatever the try block was already failing with. Failure
+  # is still visible — agmsg-state.ps1 writes its own warning/error to
+  # stderr — and recoverable via the `agmsg:state:restore` mise task.
+  $agmsgStateScript = Join-Path $PSScriptRoot "agmsg-state.ps1"
+  & $agmsgStateScript restore
+  if ($LASTEXITCODE -ne 0) {
+    Write-WarnLine "agmsg roster restore failed (exit $LASTEXITCODE); run 'mise run agmsg:state:restore' to recover."
+  }
+}
+
 function Invoke-Apply {
   Require-Apm
   Ensure-WorkspaceRepo
@@ -1638,24 +1664,31 @@ function Invoke-Apply {
     throw "apm 0.8.11 cannot deploy ./packages/* dependencies at user scope yet. Remove local package refs from ~/.apm/apm.yml and keep the global manifest on upstream refs such as jey3dayo/apm-workspace/catalog#main."
   }
 
+  Invoke-AgmsgStateSave
+
   $stageDir = New-TemporaryDirectory -Prefix "apm-apply"
   try {
-    $null = Build-TargetSkillTrees -StageRoot $stageDir
-    Install-WorkspaceMcpDependencies
-    Normalize-CodexMcpConfig
-    Invoke-CodexCompile
-    Sync-ManagedCatalogRuntimeAssets
-    Sync-PiInstructions
-    Replace-SkillTargetsFromStage -StageRoot $stageDir
-    Remove-LegacyWorkspaceSkillTargets
+    try {
+      $null = Build-TargetSkillTrees -StageRoot $stageDir
+      Install-WorkspaceMcpDependencies
+      Normalize-CodexMcpConfig
+      Invoke-CodexCompile
+      Sync-ManagedCatalogRuntimeAssets
+      Sync-PiInstructions
+      Replace-SkillTargetsFromStage -StageRoot $stageDir
+      Remove-LegacyWorkspaceSkillTargets
+    }
+    finally {
+      if (Test-Path -LiteralPath $stageDir) {
+        Remove-Item -LiteralPath $stageDir -Recurse -Force -ErrorAction SilentlyContinue
+      }
+    }
+
+    Sync-PrivateSkillsIntoTargets
   }
   finally {
-    if (Test-Path -LiteralPath $stageDir) {
-      Remove-Item -LiteralPath $stageDir -Recurse -Force -ErrorAction SilentlyContinue
-    }
+    Invoke-AgmsgStateRestore
   }
-
-  Sync-PrivateSkillsIntoTargets
 }
 
 function Get-RequestedPersonalSkillRecords {
@@ -1692,32 +1725,42 @@ function Invoke-SyncLocalSkills {
   Ensure-WorkspaceRepo
   Ensure-WorkspaceScaffold
 
+  # Same roster-preservation contract as Invoke-Apply: save before this
+  # command touches the Codex skill target tree, restore in the outer
+  # `finally` so it fires on both normal completion and any thrown error.
+  Invoke-AgmsgStateSave
+
   $targets = @(Get-LocalCodexSyncTarget)
   $stageDir = New-TemporaryDirectory -Prefix "apm-sync-local"
 
   try {
-    $skillRecords = @(Get-RequestedPersonalSkillRecords -RequestedSkillIds $RequestedSkillIds)
-    Validate-DeploymentCollisions -SkillRecords $skillRecords -Targets $targets
-    $null = Stage-TargetSkillRecords -StageRoot $stageDir -SkillRecords $skillRecords -Targets $targets
-    $target = $targets[0]
-    $stagedSkillsRoot = Get-StagedTargetSkillsRoot -StageRoot $stageDir -TargetName $target.Name
-    $destinationSkillsRoot = Join-Path $target.SkillsRoot "skills"
+    try {
+      $skillRecords = @(Get-RequestedPersonalSkillRecords -RequestedSkillIds $RequestedSkillIds)
+      Validate-DeploymentCollisions -SkillRecords $skillRecords -Targets $targets
+      $null = Stage-TargetSkillRecords -StageRoot $stageDir -SkillRecords $skillRecords -Targets $targets
+      $target = $targets[0]
+      $stagedSkillsRoot = Get-StagedTargetSkillsRoot -StageRoot $stageDir -TargetName $target.Name
+      $destinationSkillsRoot = Join-Path $target.SkillsRoot "skills"
 
-    New-Item -ItemType Directory -Path $destinationSkillsRoot -Force | Out-Null
+      New-Item -ItemType Directory -Path $destinationSkillsRoot -Force | Out-Null
 
-    foreach ($skillRecord in $skillRecords) {
-      $deployedSkillName = Format-SkillName -Target $target.Name -SourceSkillId $skillRecord.SourceSkillId
-      $stagedSkillPath = Get-InternalTargetSkillPath -TargetRoot $stagedSkillsRoot -SkillId $deployedSkillName
-      $destinationSkillPath = Get-InternalTargetSkillPath -TargetRoot $destinationSkillsRoot -SkillId $deployedSkillName
-      Copy-DirectoryContents -SourceDir $stagedSkillPath -DestinationDir $destinationSkillPath
+      foreach ($skillRecord in $skillRecords) {
+        $deployedSkillName = Format-SkillName -Target $target.Name -SourceSkillId $skillRecord.SourceSkillId
+        $stagedSkillPath = Get-InternalTargetSkillPath -TargetRoot $stagedSkillsRoot -SkillId $deployedSkillName
+        $destinationSkillPath = Get-InternalTargetSkillPath -TargetRoot $destinationSkillsRoot -SkillId $deployedSkillName
+        Copy-DirectoryContents -SourceDir $stagedSkillPath -DestinationDir $destinationSkillPath
+      }
+
+      Remove-LegacyWorkspaceSkillTargets
     }
-
-    Remove-LegacyWorkspaceSkillTargets
+    finally {
+      if (Test-Path -LiteralPath $stageDir) {
+        Remove-Item -LiteralPath $stageDir -Recurse -Force -ErrorAction SilentlyContinue
+      }
+    }
   }
   finally {
-    if (Test-Path -LiteralPath $stageDir) {
-      Remove-Item -LiteralPath $stageDir -Recurse -Force -ErrorAction SilentlyContinue
-    }
+    Invoke-AgmsgStateRestore
   }
 
   Write-Host ("Synced local catalog/private skills to Codex target: {0}" -f ((@($skillRecords | ForEach-Object SourceSkillId)) -join ", "))
