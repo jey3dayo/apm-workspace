@@ -76,8 +76,7 @@ jobs:
 
       - name: Run workspace checks
         run: |
-          mise run format:check
-          mise run validate:catalog
+          mise run check
           mise run smoke:catalog
 
       - name: Run tests
