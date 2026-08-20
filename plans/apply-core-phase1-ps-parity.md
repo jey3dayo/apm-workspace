@@ -2,11 +2,11 @@
 
 /improve #7 と architecture review 候補1の前半。証拠の正本: `tmp/apply-audit-20260821/report.md`(全主張を行番号付きで検証済み)。
 
-## 前提と仮定(実装前に確認)
+## 前提(2026-08-20 設計返答で確定した分を含む)
 
-- **canonical 順序は Bash 側**とする: stage → MCP install → MCP normalize → **compile** → asset 配布 → swap → legacy 掃除 → private overlay(`apm-workspace.sh:974-985`)。PS 側(compile が swap 後・try/finally 外)は後発の逸脱とみなす
-- Windows の Claude private skill symlink は、symlink 権限が無い環境を考慮し **copy 方式の fallback** を実装する(junction はディレクトリ単位のため skill 単位 copy が単純)
-- 実装統合(bash core 一本化)は Phase 4 で判断。本 Phase は両実装を残したままドリフトだけ解消する
+- **確定**: Windows は bash 前提にしない。両 adapter を維持し、deep module は「canonical step contract + conformance test」。PS adapter は「薄くする」のではなく**自前実装で契約を満たす**。bash core + PS thin wrapper 案(旧 Phase 4)は不採用
+- **確定(2026-08-20 設計返答・質問2)**: **公式の実行順**は Bash 側の現行順: (1) stage 組み立て → (2) MCP install → (3) Codex MCP 正規化 → (4) **compile** → (5) runtime 資産 + pi 指示の配布 → (6) swap → (7) legacy 掃除 → (8) private overlay(`apm-workspace.sh:974-985`)。理由: compile が失敗しても本番の skill 配置は旧状態のまま残る。現 PS は swap 後・try/finally 外で compile しており、失敗時に本番だけ先に書き換わる — それがドリフトの実害。ADR は不要で、この段落が根拠の記録。roster 退避/復帰はこの一連の入口と出口に付ける(Phase 2)。validate の target-tree 検査は別コマンドのまま両 adapter が同じ検査をする
+- Windows の Claude private skill symlink は、symlink 権限が無い環境を考慮し PS 側で **copy 方式の fallback** を実装する(junction はディレクトリ単位のため skill 単位 copy が単純)
 
 ## 変更内容
 

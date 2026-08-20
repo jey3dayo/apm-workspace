@@ -1,6 +1,6 @@
 # Phase 3: conformance fixture — コマンド interface をテスト面にする
 
-architecture review 候補3。**実行順は Phase 1 より先に着手する選択肢を推奨**(fixture を先に作り、現状ドリフトを failing case として固定してから Phase 1 で直すと、順序変更の regression 網になる)。
+architecture review 候補3。**実行順 3(本 Phase)→1→2 は 2026-08-20 の設計返答で承認済み**。fixture を先に作り、現状ドリフトを固定してから Phase 1 で直す。CI を green に保つため、PS 側のドリフト検出 assert は Phase 1 完了までは skip マーク + Phase 1 計画への参照コメントで保留する(ドリフトの記録と suite の green を両立)。
 
 ## 現状の問題(検証済み、report.md §4)
 

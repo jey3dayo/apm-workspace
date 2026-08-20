@@ -18,8 +18,8 @@ architecture review 候補2。/improve #1(copy 失敗時の rm -rf)は 2026-08-2
 
 ### 2. `scripts/apm-workspace.ps1` — Invoke-Apply に内蔵
 
-- 当面は `bash ./scripts/agmsg-state.sh save|restore` を呼ぶ(bash 不在なら warning を出して skip。agmsg-state 自体が既に bash 前提のため、ここで新たな制約は増えない)
-- try/finally の finally 節へ restore を追加
+- **確定(2026-08-20 設計返答)**: Windows は bash 前提にしない。agmsg-state 相当を **PowerShell へ移植**し(save/restore/absorb のロジックは56行の小規模)、`mise.toml` の `agmsg:state:*` タスクにも `run_windows` を追加する
+- try/finally の finally 節へ restore を追加。両 adapter が自前完結すること
 
 ### 3. `mise.toml` — depends/depends_post を recovery 用へ降格
 
