@@ -6,12 +6,10 @@
 #   (4) compile -> (5) runtime asset + pi instructions distribution ->
 #   (6) swap -> (7) legacy cleanup -> (8) private overlay
 #
-# report.md Sec.1 confirms Invoke-Apply drifts from this order (compile runs
-# after swap/cleanup instead of before, and private-skill overlay is missing
-# entirely). The two assertions that encode those drifts are marked -Skip
-# with a plans/apply-core-phase1-ps-parity.md reference below so this suite
-# stays green until that phase lands; when it does, drop -Skip from both and
-# they should pass unmodified.
+# report.md Sec.1 originally found Invoke-Apply drifting from this order
+# (compile ran after swap/cleanup instead of before, and private-skill
+# overlay was missing entirely). plans/apply-core-phase1-ps-parity.md closed
+# both gaps, so every assertion below now runs unskipped.
 
 $ErrorActionPreference = "Stop"
 
@@ -76,24 +74,14 @@ Describe "apm-workspace.ps1 apply conformance" {
     Join-Path $script:fixture["HOME"] ".agents/skills/sample-skill/SKILL.md" | Should -Exist
   }
 
-  # DRIFT (report.md Sec.1.3 / plans/apply-core-phase1-ps-parity.md): Invoke-Apply
-  # runs Sync-ManagedCatalogRuntimeAssets before Invoke-CodexCompile, the
-  # reverse of cmd_apply's order. So the compiled marker survives instead of
-  # being overwritten by the catalog instructions copy -- unskip once Phase 1
-  # reorders Invoke-Apply to match cmd_apply.
-  It "runtime asset distribution (step 5) overwrites the compiled Codex output (step 4)" -Skip {
+  It "runtime asset distribution (step 5) overwrites the compiled Codex output (step 4)" {
     Invoke-FixtureApply | Should -Be 0
 
     $codexAgentsPath = Join-Path $script:fixture["HOME"] ".codex/AGENTS.md"
     (Get-Content -LiteralPath $codexAgentsPath -Raw).Trim() | Should -Be "# instructions"
   }
 
-  # DRIFT (report.md Sec.1.2 / plans/apply-core-phase1-ps-parity.md):
-  # Invoke-Apply has no equivalent of sync_private_skills_into_targets at
-  # all, so private-skills/.apm/skills content never reaches the Codex
-  # target tree or gets a Claude symlink -- unskip once Phase 1 adds that
-  # step to Invoke-Apply.
-  It "private skill overlay (step 8) survives the managed skill swap (step 6)" -Skip {
+  It "private skill overlay (step 8) survives the managed skill swap (step 6)" {
     Invoke-FixtureApply | Should -Be 0
 
     Join-Path $script:fixture["HOME"] ".agents/skills/sample-private-skill" | Should -Exist

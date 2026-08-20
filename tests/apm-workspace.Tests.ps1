@@ -862,7 +862,7 @@ id = "preserve"
 
     $shellScript | Should -Match '(?s)install_workspace_mcp_dependencies\(\)\s*\{\s*run_workspace_install_command -g --only mcp\s*\}'
     $shellScript | Should -Match '(?s)cmd_apply\(\)\s*\{.*?install_workspace_mcp_dependencies.*?normalize_codex_mcp_config.*?compile_codex.*?replace_skill_targets_from_stage "\$apply_stage_root".*?cleanup_legacy_workspace_skill_targets'
-    $powerShellScript | Should -Match '(?s)function Invoke-Apply\s*\{.*?Install-WorkspaceMcpDependencies.*?Normalize-CodexMcpConfig.*?Replace-SkillTargetsFromStage.*?Remove-LegacyWorkspaceSkillTargets'
+    $powerShellScript | Should -Match '(?s)function Invoke-Apply\s*\{.*?Install-WorkspaceMcpDependencies.*?Normalize-CodexMcpConfig.*?Invoke-CodexCompile.*?Sync-ManagedCatalogRuntimeAssets.*?Replace-SkillTargetsFromStage.*?Remove-LegacyWorkspaceSkillTargets'
   }
 
   It "rejects local package refs before PowerShell update deploys" {
@@ -1228,6 +1228,100 @@ dependencies:
     Test-Path (Join-Path $TestDrive ".agents/skills/existing-skill/SKILL.md") | Should -Be $true
     Test-Path (Join-Path $TestDrive ".agents/skills/wayfinder/old.md") | Should -Be $true
     Test-Path (Join-Path $TestDrive ".codex/skills/wayfinder/SKILL.md") | Should -Be $true
+  }
+
+  It "fails validation when a Codex skill target tree is nested under another skills root" {
+    Mock Get-CodexSkillTargetRoot { Join-Path $TestDrive "nested/.agents/skills" }
+
+    $nestedSkill = Join-Path $TestDrive "nested/.agents/skills/outer/skills/inner"
+    New-Item -ItemType Directory -Path $nestedSkill -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $nestedSkill "SKILL.md") -Value "# inner"
+
+    { Test-CodexSkillTargetTree } | Should -Throw "*Nested Codex skill files found*"
+  }
+
+  It "fails validation when a Codex skill target tree is nested under a .apm skills root" {
+    Mock Get-CodexSkillTargetRoot { Join-Path $TestDrive "apm-nested/.agents/skills" }
+
+    $nestedSkill = Join-Path $TestDrive "apm-nested/.agents/skills/outer/.apm/skills/inner"
+    New-Item -ItemType Directory -Path $nestedSkill -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $nestedSkill "SKILL.md") -Value "# inner"
+
+    { Test-CodexSkillTargetTree } | Should -Throw "*Nested Codex skill files found*"
+  }
+
+  It "passes validation for a flat Codex skill target tree" {
+    Mock Get-CodexSkillTargetRoot { Join-Path $TestDrive "flat/.agents/skills" }
+
+    $flatSkill = Join-Path $TestDrive "flat/.agents/skills/sample-skill"
+    New-Item -ItemType Directory -Path $flatSkill -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $flatSkill "SKILL.md") -Value "# sample"
+
+    { Test-CodexSkillTargetTree } | Should -Not -Throw
+  }
+
+  It "passes validation when the Codex skill target root does not exist yet" {
+    Mock Get-CodexSkillTargetRoot { Join-Path $TestDrive "does-not-exist/.agents/skills" }
+
+    { Test-CodexSkillTargetTree } | Should -Not -Throw
+  }
+
+  It "syncs private skills into the Codex copy target and the Claude symlink target" {
+    Mock Get-CodexSkillTargetRoot { Join-Path $TestDrive "private-sync/.agents/skills" }
+    Mock Get-ClaudePrivateSkillTargetRoot { Join-Path $TestDrive "private-sync/.claude/skills" }
+
+    $privateSkillDir = Join-Path $WorkspaceDir "private-skills/.apm/skills/sample-private-skill"
+    New-Item -ItemType Directory -Path $privateSkillDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $privateSkillDir "SKILL.md") -Value "# private"
+
+    Sync-PrivateSkillsIntoTargets
+
+    $codexCopyPath = Join-Path $TestDrive "private-sync/.agents/skills/sample-private-skill/SKILL.md"
+    Test-Path -LiteralPath $codexCopyPath | Should -Be $true
+
+    $claudeLinkPath = Join-Path $TestDrive "private-sync/.claude/skills/sample-private-skill"
+    $claudeLink = Get-Item -LiteralPath $claudeLinkPath
+    $claudeLink.LinkType | Should -Be "SymbolicLink"
+    $claudeLink.Target | Should -Be $privateSkillDir
+  }
+
+  It "removes a stale Claude private skill symlink once its private source is gone" {
+    Mock Get-ClaudePrivateSkillTargetRoot { Join-Path $TestDrive "stale-sync/.claude/skills" }
+
+    $privateSkillsRoot = Join-Path $WorkspaceDir "private-skills/.apm/skills"
+    $goneSourceDir = Join-Path $privateSkillsRoot "gone-skill"
+    $claudeSkillsRoot = Join-Path $TestDrive "stale-sync/.claude/skills"
+    New-Item -ItemType Directory -Path $claudeSkillsRoot -Force | Out-Null
+    New-Item -ItemType SymbolicLink -Path (Join-Path $claudeSkillsRoot "gone-skill") -Target $goneSourceDir | Out-Null
+
+    Remove-StaleClaudePrivateSkillSymlinks
+
+    Test-Path -LiteralPath (Join-Path $claudeSkillsRoot "gone-skill") | Should -Be $false
+  }
+
+  It "falls back to copying a private skill when creating the Claude symlink is not permitted" {
+    Mock Get-CodexSkillTargetRoot { Join-Path $TestDrive "fallback-sync/.agents/skills" }
+    Mock Get-ClaudePrivateSkillTargetRoot { Join-Path $TestDrive "fallback-sync/.claude/skills" }
+    Mock New-Item -ParameterFilter { $ItemType -eq "SymbolicLink" } { throw "symlink privilege not held" }
+    Mock Write-WarnLine {}
+
+    $privateSkillDir = Join-Path $WorkspaceDir "private-skills/.apm/skills/sample-private-skill"
+    New-Item -ItemType Directory -Path $privateSkillDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $privateSkillDir "SKILL.md") -Value "# private"
+
+    Sync-PrivateSkillsIntoTargets
+
+    $claudeCopyPath = Join-Path $TestDrive "fallback-sync/.claude/skills/sample-private-skill/SKILL.md"
+    Test-Path -LiteralPath $claudeCopyPath | Should -Be $true
+    Assert-MockCalled Write-WarnLine -Times 1
+    # This exercises the fallback branch by mocking New-Item's SymbolicLink
+    # path to throw, since forcing a real symlink-permission failure isn't
+    # reproducible on this host (macOS/Linux CI runs as a user that can
+    # always create symlinks; only an unprivileged Windows account without
+    # Developer Mode hits this naturally). Manual verification on such a
+    # Windows account: run `mise run apply` and confirm the private skill
+    # under ~/.claude/skills is a real copy (not a reparse point) plus a
+    # "Symlink not permitted" warning on stdout.
   }
 
   It "smoke-audits the workspace manifest via temp install" {

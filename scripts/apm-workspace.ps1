@@ -1641,9 +1641,11 @@ function Invoke-Apply {
   $stageDir = New-TemporaryDirectory -Prefix "apm-apply"
   try {
     $null = Build-TargetSkillTrees -StageRoot $stageDir
-    Sync-ManagedCatalogRuntimeAssets
     Install-WorkspaceMcpDependencies
     Normalize-CodexMcpConfig
+    Invoke-CodexCompile
+    Sync-ManagedCatalogRuntimeAssets
+    Sync-PiInstructions
     Replace-SkillTargetsFromStage -StageRoot $stageDir
     Remove-LegacyWorkspaceSkillTargets
   }
@@ -1653,8 +1655,7 @@ function Invoke-Apply {
     }
   }
 
-  Invoke-CodexCompile
-  Sync-PiInstructions
+  Sync-PrivateSkillsIntoTargets
 }
 
 function Get-RequestedPersonalSkillRecords {
@@ -1787,6 +1788,51 @@ function Invoke-Validate {
   Ensure-WorkspaceRepo
   Ensure-WorkspaceScaffold
   Invoke-WorkspaceCommand -CommandArgs @("compile", "--validate")
+  Test-CodexSkillTargetTree
+}
+
+function Get-CodexSkillTargetRoot {
+  return (Join-Path $HOME ".agents\skills")
+}
+
+function Get-ClaudePrivateSkillTargetRoot {
+  return (Join-Path $HOME ".claude\skills")
+}
+
+function Test-CodexSkillTargetTree {
+  $targetSkillsRoot = Get-CodexSkillTargetRoot
+  if (-not (Test-Path -LiteralPath $targetSkillsRoot -PathType Container)) {
+    return
+  }
+
+  $nestedSkills = New-Object System.Collections.Generic.List[string]
+  foreach ($skillFile in (Get-ChildItem -LiteralPath $targetSkillsRoot -Recurse -Force -Filter "SKILL.md" -File)) {
+    $skillDir = Split-Path -Parent $skillFile.FullName
+    $relativePath = $skillDir.Substring($targetSkillsRoot.Length).TrimStart('\', '/')
+    if ([string]::IsNullOrWhiteSpace($relativePath)) {
+      continue
+    }
+
+    $segments = $relativePath -split '[\\/]'
+    $isNested = $false
+    if ($segments.Length -eq 3 -and $segments[1] -eq "skills") {
+      $isNested = $true
+    }
+    elseif ($segments.Length -eq 4 -and $segments[1] -eq ".apm" -and $segments[2] -eq "skills") {
+      $isNested = $true
+    }
+
+    if ($isNested) {
+      $nestedSkills.Add($skillFile.FullName)
+    }
+  }
+
+  if ($nestedSkills.Count -gt 0) {
+    foreach ($path in ($nestedSkills | Sort-Object)) {
+      Write-ErrorLine $path
+    }
+    throw "Nested Codex skill files found under $targetSkillsRoot. Run 'mise run apply:skills:local' to refresh the target."
+  }
 }
 
 function Get-CatalogBuildSkillsRoot {
@@ -1889,6 +1935,156 @@ function Get-LocalSkillIds {
   }
 
   return $result.ToArray()
+}
+
+function Get-PrivateSkillRecords {
+  $result = New-Object System.Collections.Generic.List[object]
+  foreach ($skillId in (Get-PrivateSkillIds)) {
+    $result.Add([pscustomobject]@{
+        SourceKind = "personal"
+        SourceSkillId = $skillId
+        SourcePath = Get-PrivateSkillContentDir -SkillId $skillId
+      })
+  }
+
+  return $result.ToArray()
+}
+
+# full apply's Build-TargetSkillTrees/Replace-SkillTargetsFromStage path stages
+# only managed catalog skills, so private skills (private-skills/.apm/skills)
+# need to be re-synced into both targets afterward, mirroring bash's
+# sync_private_skills_into_targets (apm-workspace.sh:1011-1027) -- otherwise a
+# plain `apm apply` would delete their existing Codex copies and Claude
+# symlinks.
+function Sync-PrivateSkillsIntoTargets {
+  $skillRecords = @(Get-PrivateSkillRecords)
+  if ($skillRecords.Count -eq 0) {
+    return
+  }
+
+  $stageDir = New-TemporaryDirectory -Prefix "apm-private-sync"
+  try {
+    Stage-CodexPrivateSkillRecords -StageRoot $stageDir -SkillRecords $skillRecords
+    Replace-CodexPrivateSkillTargetFromStage -StageRoot $stageDir -SkillRecords $skillRecords
+    Sync-ClaudePrivateSkillSymlinksFromRecords -SkillRecords $skillRecords
+    Remove-StaleClaudePrivateSkillSymlinks
+  }
+  finally {
+    if (Test-Path -LiteralPath $stageDir) {
+      Remove-Item -LiteralPath $stageDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+  }
+}
+
+function Stage-CodexPrivateSkillRecords {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$StageRoot,
+
+    [Parameter(Mandatory = $true)]
+    [object[]]$SkillRecords
+  )
+
+  $stageSkillsRoot = Join-Path $StageRoot "codex\skills"
+  New-Item -ItemType Directory -Path $stageSkillsRoot -Force | Out-Null
+
+  foreach ($record in $SkillRecords) {
+    $deployedSkillName = Format-SkillName -Target "codex" -SourceSkillId $record.SourceSkillId
+    $stagedSkillPath = Get-InternalTargetSkillPath -TargetRoot $stageSkillsRoot -SkillId $deployedSkillName
+    Copy-DirectoryContents -SourceDir $record.SourcePath -DestinationDir $stagedSkillPath
+  }
+}
+
+function Replace-CodexPrivateSkillTargetFromStage {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$StageRoot,
+
+    [Parameter(Mandatory = $true)]
+    [object[]]$SkillRecords
+  )
+
+  $targetSkillsRoot = Get-CodexSkillTargetRoot
+  $stagedSkillsRoot = Join-Path $StageRoot "codex\skills"
+  New-Item -ItemType Directory -Path $targetSkillsRoot -Force | Out-Null
+
+  foreach ($record in $SkillRecords) {
+    $deployedSkillName = Format-SkillName -Target "codex" -SourceSkillId $record.SourceSkillId
+    $stagedSkillPath = Get-InternalTargetSkillPath -TargetRoot $stagedSkillsRoot -SkillId $deployedSkillName
+    $targetSkillPath = Get-InternalTargetSkillPath -TargetRoot $targetSkillsRoot -SkillId $deployedSkillName
+
+    if (Test-Path -LiteralPath $targetSkillPath) {
+      Remove-Item -LiteralPath $targetSkillPath -Recurse -Force
+    }
+    New-Item -ItemType Directory -Path $targetSkillPath -Force | Out-Null
+    Copy-DirectoryContents -SourceDir $stagedSkillPath -DestinationDir $targetSkillPath
+  }
+}
+
+function Sync-ClaudePrivateSkillSymlinksFromRecords {
+  param(
+    [Parameter(Mandatory = $true)]
+    [object[]]$SkillRecords
+  )
+
+  $targetSkillsRoot = Get-ClaudePrivateSkillTargetRoot
+  New-Item -ItemType Directory -Path $targetSkillsRoot -Force | Out-Null
+
+  foreach ($record in $SkillRecords) {
+    $deployedSkillName = Format-SkillName -Target "claude" -SourceSkillId $record.SourceSkillId
+    $targetSkillPath = Get-InternalTargetSkillPath -TargetRoot $targetSkillsRoot -SkillId $deployedSkillName
+
+    $existingItem = Get-Item -LiteralPath $targetSkillPath -ErrorAction SilentlyContinue
+    if ($null -ne $existingItem) {
+      if ($existingItem.LinkType -eq "SymbolicLink") {
+        if ($existingItem.Target -eq $record.SourcePath) {
+          continue
+        }
+        Write-Host "Relinking private skill symlink: $targetSkillPath -> $($record.SourcePath)"
+        Remove-Item -LiteralPath $targetSkillPath -Force
+      }
+      else {
+        Write-Host "Replacing deployed catalog skill with private skill symlink: $targetSkillPath"
+        Remove-Item -LiteralPath $targetSkillPath -Recurse -Force
+      }
+    }
+
+    $parentDir = Split-Path -Parent $targetSkillPath
+    New-Item -ItemType Directory -Path $parentDir -Force | Out-Null
+
+    try {
+      New-Item -ItemType SymbolicLink -Path $targetSkillPath -Target $record.SourcePath -ErrorAction Stop | Out-Null
+    }
+    catch {
+      Write-WarnLine "Symlink not permitted; falling back to copy for private skill: $targetSkillPath"
+      Copy-DirectoryContents -SourceDir $record.SourcePath -DestinationDir $targetSkillPath
+    }
+  }
+}
+
+function Remove-StaleClaudePrivateSkillSymlinks {
+  $targetSkillsRoot = Get-ClaudePrivateSkillTargetRoot
+  if (-not (Test-Path -LiteralPath $targetSkillsRoot -PathType Container)) {
+    return
+  }
+
+  $privateRoot = Get-PrivateSkillsRoot
+
+  foreach ($linkItem in (Get-ChildItem -LiteralPath $targetSkillsRoot -Recurse -Force | Where-Object { $_.LinkType -eq "SymbolicLink" })) {
+    $linkTarget = $linkItem.Target
+    if ([string]::IsNullOrWhiteSpace($linkTarget)) {
+      continue
+    }
+    if ($linkTarget -notlike "$privateRoot*") {
+      continue
+    }
+    if (Test-Path -LiteralPath $linkTarget) {
+      continue
+    }
+
+    Write-Host "Removing stale private skill symlink: $($linkItem.FullName)"
+    Remove-Item -LiteralPath $linkItem.FullName -Force
+  }
 }
 
 function Get-RequestedManagedSkillIds {
