@@ -9,14 +9,15 @@
 ## 完了
 
 - #5 ca-pass の global 撤去(2026-08-21): ユーザー承認のうえ `apm.yml` から撤去、`apm lock` 再解決、deploy で両配布先から消滅を確認。`docs/package-decisions.md` へ実撤去を追記済み
+- #7 PS apply/validate のパリティ化(2026-08-21): apply-core Phase 1 として解消(`eb3a4ce`)
+- #11 CI path filter へ `optional-skills/**` 追加(2026-08-21)
 
 ## 小粒(次の worker バッチ候補、いずれも独立)
 
 - #6 commands/rules がマージコピー(`apm-workspace.sh:2217-2226`): 配布先で管理外ファイルと混ざる。swap 方式(stage → replace)へ寄せるか、管理 manifest で掃除対象を特定する設計判断が先
 - #9 `cp -RL` が skill 内 symlink を無条件に辿る(`apm-workspace.sh:2104`): ループ・意図しない実体化のリスク。`-RL` → `-R` + 明示解決の影響調査から
 - #10 cache repair の削除先が文字列 prefix 判定のみ(`apm-workspace.sh:1150-1159`): `is_path_under_dir` 相当の正規化済み判定へ
-- **#11** CI path filter が `optional-skills/**` を外している(`.github/workflows/ci.yml`): filter へ 1 行追加。#4 の変更とファイルが同じため、worker-improve-0821 の差分確定後に実施
-- #12 PS quick-sync が古いファイルを残し、Pester `:1229` がその挙動を期待: 実装とテストの同時修正。Phase 3 fixture 導入後にやると安全
+- #12 PS quick-sync が古いファイルを残し、Pester `:1229` がその挙動を期待: 実装とテストの同時修正。Phase 3 fixture 導入済みのため着手可能
 
 ## docs(まとめて 1 回)
 
