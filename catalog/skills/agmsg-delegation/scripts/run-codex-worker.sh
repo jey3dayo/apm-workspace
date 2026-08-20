@@ -53,6 +53,20 @@ if [[ "$role" == implement ]]; then
 	esac
 	codex_args+=(-c "model_reasoning_effort=\"$worker_effort\"")
 else
+	# reviewer の effort は既定で Codex 既定に任せる。terra 昇格時などに
+	# AGMSG_REVIEWER_EFFORT で明示指定する。
+	reviewer_effort=${AGMSG_REVIEWER_EFFORT:-}
+	if [[ -n "$reviewer_effort" ]]; then
+		case "$reviewer_effort" in
+		none | low | medium | high | xhigh | max) ;;
+		*)
+			printf 'Unsupported AGMSG_REVIEWER_EFFORT: %s\n' "$reviewer_effort" >&2
+			exit 2
+			;;
+		esac
+		codex_args+=(-c "model_reasoning_effort=\"$reviewer_effort\"")
+	fi
+
 	script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 	profile_source=${AGMSG_CODEX_PROFILE_SOURCE:-"$script_dir/../agmsg-review.config.toml"}
 	profile_target=${AGMSG_CODEX_PROFILE_TARGET:-/Users/t00114/.codex/agmsg-review.config.toml}

@@ -30,12 +30,12 @@ tier 判定・委譲判定・タスク分割基準は `orchestrator-worker` ス�
 
 共通 lifecycle は同一で、role によって安全契約と報告フォーマットが異なる。
 
-| role      | 自分の tier                    | spawn する相手         | 相手の権限                   | 報告   |
-| --------- | ------------------------------ | ---------------------- | ---------------------------- | ------ |
-| implement | Orchestrator (fable/sol/terra) | worker (sonnet / luna) | 対象 worktree の編集可       | DONE   |
-| review    | Worker (sonnet/luna)           | reviewer (fable / sol) | read-only。編集・commit 禁止 | REVIEW |
+| role      | 自分の tier                    | spawn する相手                 | 相手の権限                   | 報告   |
+| --------- | ------------------------------ | ------------------------------ | ---------------------------- | ------ |
+| implement | Orchestrator (fable/sol/terra) | worker (sonnet / luna)         | 対象 worktree の編集可       | DONE   |
+| review    | Worker (sonnet/luna)           | reviewer (fable / sol / terra) | read-only。編集・commit 禁止 | REVIEW |
 
-review role の fable/sol 指定は本スキル内の一時的な model override であり、`orchestrator-worker` の tier 対応表や既存 agent 定義（親モデル継承）を変更しない。Claude reviewer は fable が利用不可（未提供・rate limit・plan 制限など起動失敗）の場合のみ opus へフォールバックする。
+review role の reviewer モデル指定は本スキル内の一時的な model override であり、`orchestrator-worker` の tier 対応表や既存 agent 定義（親モデル継承）を変更しない。Codex reviewer は起動時引数で `gpt-5.6-sol` / `gpt-5.6-terra` から選ぶ（既定は sol。設計影響が大きい・横断的なレビューは terra へ昇格し、必要なら `AGMSG_REVIEWER_EFFORT=high` などで effort も指定する）。Claude reviewer は fable 固定で、fable が利用不可（未提供・rate limit・plan 制限など起動失敗）の場合のみ opus へフォールバックする。
 
 ## Guardrails
 
@@ -56,10 +56,10 @@ review role の fable/sol 指定は本スキル内の一時的な model override
 - agmsg bootstrap 済みを確認（`~/.agents/skills/agmsg/` が存在）
 - role/runtime 別の起動コマンドを確定する。review は書込権限を実行時に強制する:
 
-| role      | Claude                                                    | Codex                                                                 |
-| --------- | --------------------------------------------------------- | --------------------------------------------------------------------- |
-| implement | `run-claude-worker.sh implement <project> <payload-file>` | `run-codex-worker.sh implement <project> gpt-5.6-luna <payload-file>` |
-| review    | `run-claude-worker.sh review <project> <payload-file>`    | `run-codex-worker.sh review <project> gpt-5.6-sol <payload-file>`     |
+| role      | Claude                                                    | Codex                                                                                                          |
+| --------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| implement | `run-claude-worker.sh implement <project> <payload-file>` | `run-codex-worker.sh implement <project> gpt-5.6-luna <payload-file>`                                          |
+| review    | `run-claude-worker.sh review <project> <payload-file>`    | `run-codex-worker.sh review <project> <model> <payload-file>`（`gpt-5.6-sol` 既定 / `gpt-5.6-terra` へ昇格可） |
 
 helper の解決先は `~/.agents/skills/agmsg-delegation/scripts/`。両 runtime とも headless mode と stdin prompt を使い、対話 TUI と shell interpolation を避ける。`launch-worker.sh` は専用の一時ディレクトリに launchd job label・ログ・exit status を残して detached に起動する。
 
@@ -73,6 +73,7 @@ Codex helper:
 
 - `exec --ephemeral`、`-a never`、stdin prompt を強制し、review profile の内容一致を起動時に検証する
 - implement role は `model_reasoning_effort` を既定 `xhigh` で付与する（`AGMSG_WORKER_EFFORT` で上書き可。昇格時は `max` を渡す）
+- review role は既定では effort を付与せず Codex 既定に任せる。`AGMSG_REVIEWER_EFFORT` を指定した場合のみ `model_reasoning_effort` を付与する（例: terra レビューで `high`）
 
 Codex review に `--sandbox read-only` を使ってはならない。agmsg の送受信自体が DB 書込み（`send.sh` の messages.db 更新、`inbox.sh` の read_at 更新）と report 一時ファイル作成を必要とするため、完全 read-only では reviewer が READY/REVIEW/ACK を送信できない。代わりに、agmsg 状態ディレクトリ（db/teams/run）だけを `writable_roots` に持つ profile `agmsg-review`（`CODEX_HOME/agmsg-review.config.toml`）を `-p` で layer する。
 
