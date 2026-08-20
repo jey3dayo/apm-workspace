@@ -26,7 +26,18 @@ absorb_plain_dir() {
   mkdir -p "$store"
   # -n keeps an existing store copy authoritative: a post-deploy runtime dir is
   # a freshly re-created subset, never a superset of what was already saved.
-  cp -Rn "$target"/. "$store"/ 2>/dev/null || true
+  # BSD cp's -n exits 1 both when it silently skips an existing destination
+  # file (the normal -n outcome above) and when a real copy error occurs
+  # (permission denied, disk full, ...) — but only the latter writes to
+  # stderr. Use that, not the exit code, to tell the two apart: on a real
+  # failure, leave $target in place instead of discarding data that never
+  # made it into the store.
+  local cp_err
+  cp_err="$(cp -Rn "$target"/. "$store"/ 2>&1 1>/dev/null)" || true
+  if [ -n "$cp_err" ]; then
+    echo "agmsg-state: failed to absorb $target into $store, leaving $target in place: $cp_err" >&2
+    return 1
+  fi
   rm -rf "$target"
 }
 
