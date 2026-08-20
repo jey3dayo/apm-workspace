@@ -20,5 +20,5 @@ description = "Run the Pester behavioral suite for apm-workspace.ps1"
 run = "pwsh -NoProfile -Command \"Invoke-Pester -Path tests -CI -Output Detailed\""
 
 ["test:sh"]
-description = "Run bats unit tests for scripts/apm-workspace.sh"
-run = "bats tests/apm-workspace.sh.bats"
+description = "Run bats unit tests for the workspace's bash scripts"
+run = "bats tests/*.bats"
