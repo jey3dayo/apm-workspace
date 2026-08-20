@@ -61,14 +61,18 @@ escape_sb_path() {
 
 write_paths=(
 	/dev
-	"$(cd -- /Users/t00114/.claude && pwd -P)"
+	"$(cd -- "$HOME/.claude" && pwd -P)"
 	"$(cd -- "${TMPDIR:-/tmp}" && pwd -P)"
+	# Claude Code の Bash tool scratchpad は TMPDIR と無関係に /private/tmp/claude-<uid>/
+	# 配下に作られる。launchd 配下では TMPDIR が /var/folders を指すため、/tmp を
+	# 明示allowしないと worker の全 Bash 呼び出しが scratchpad mkdir の EPERM で死ぬ
+	"$(cd -- /tmp && pwd -P)"
 )
 
 for state_path in \
-	/Users/t00114/.agents/skills/agmsg/db \
-	/Users/t00114/.agents/skills/agmsg/teams \
-	/Users/t00114/.agents/skills/agmsg/run; do
+	"$HOME/.agents/skills/agmsg/db" \
+	"$HOME/.agents/skills/agmsg/teams" \
+	"$HOME/.agents/skills/agmsg/run"; do
 	if [[ -d "$state_path" ]]; then
 		write_paths+=("$(cd -- "$state_path" && pwd -P)")
 	fi

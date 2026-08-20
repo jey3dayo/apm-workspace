@@ -69,7 +69,7 @@ else
 
 	script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 	profile_source=${AGMSG_CODEX_PROFILE_SOURCE:-"$script_dir/../agmsg-review.config.toml"}
-	profile_target=${AGMSG_CODEX_PROFILE_TARGET:-/Users/t00114/.codex/agmsg-review.config.toml}
+	profile_target=${AGMSG_CODEX_PROFILE_TARGET:-$HOME/.codex/agmsg-review.config.toml}
 
 	if [[ ! -f "$profile_source" ]]; then
 		printf '%s\n' 'Codex review profile source is missing; refusing fail-open launch.' >&2

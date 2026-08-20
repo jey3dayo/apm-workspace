@@ -17,7 +17,7 @@ if [[ -z "$report_body" ]]; then
 	exit 2
 fi
 
-send_script=${AGMSG_SEND_SCRIPT:-/Users/t00114/.agents/skills/agmsg/scripts/send.sh}
+send_script=${AGMSG_SEND_SCRIPT:-$HOME/.agents/skills/agmsg/scripts/send.sh}
 
 if [[ ! -x "$send_script" ]]; then
 	printf 'agmsg send helper is not executable: %s\n' "$send_script" >&2
