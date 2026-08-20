@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-08-19T04:20:57.544003+00:00'
+generated_at: '2026-08-20T18:02:41.902017+00:00'
 apm_version: 0.28.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -184,35 +184,6 @@ dependencies:
     .claude/skills/perman-aws-vault/references/scenarios.md: sha256:0564b45728e19b58f501d4841c13e9bcaefe777ea3f72c4d1e043ea4bddb86e3
     .claude/skills/perman-aws-vault/references/setup-guide.md: sha256:e4d2c9c4ac0e146e9a9ae45933bc1cf5fbcbd940cf8fa3587cfb1ffa64436704
   content_hash: sha256:237621e16d036bf4a27ad66581c72c80d6854bc313dea3acca894a581e1e7931
-- repo_url: caad-develop/claude-code-marketplace
-  name: ca-pass
-  host: github.com
-  resolved_commit: 9869e9df63da283b29561923e7e5839a8a3d9152
-  version: unknown
-  virtual_path: plugins/service-integrations/ca-pass/skills/ca-pass
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/ca-pass
-  - .agents/skills/ca-pass/SKILL.md
-  - .agents/skills/ca-pass/agents/openai.yaml
-  - .agents/skills/ca-pass/references/ca-pass-spec.md
-  - .agents/skills/ca-pass/references/review-checklist.md
-  - .claude/skills/ca-pass
-  - .claude/skills/ca-pass/SKILL.md
-  - .claude/skills/ca-pass/agents/openai.yaml
-  - .claude/skills/ca-pass/references/ca-pass-spec.md
-  - .claude/skills/ca-pass/references/review-checklist.md
-  deployed_file_hashes:
-    .agents/skills/ca-pass/SKILL.md: sha256:f4857db105505b0690b426d9003e15e66c0b9d0d61520e730ccd612e53885868
-    .agents/skills/ca-pass/agents/openai.yaml: sha256:6218f109685948e068c035d1db75b0fec445dc2e0b495f4c56b4fd2e558d2fdf
-    .agents/skills/ca-pass/references/ca-pass-spec.md: sha256:3e5d9e1f5bb649f60b4be92b972ff2f76c4f8fa9a9ced199b6d1f88edff68dc6
-    .agents/skills/ca-pass/references/review-checklist.md: sha256:fe7d3ae5384a860363d171e443f0c2b99a5d7d5a643b49d7545322ddc2484d2d
-    .claude/skills/ca-pass/SKILL.md: sha256:f4857db105505b0690b426d9003e15e66c0b9d0d61520e730ccd612e53885868
-    .claude/skills/ca-pass/agents/openai.yaml: sha256:6218f109685948e068c035d1db75b0fec445dc2e0b495f4c56b4fd2e558d2fdf
-    .claude/skills/ca-pass/references/ca-pass-spec.md: sha256:3e5d9e1f5bb649f60b4be92b972ff2f76c4f8fa9a9ced199b6d1f88edff68dc6
-    .claude/skills/ca-pass/references/review-checklist.md: sha256:fe7d3ae5384a860363d171e443f0c2b99a5d7d5a643b49d7545322ddc2484d2d
-  content_hash: sha256:6c9ad9ee29688aa7bd6b28eedc3066b8b674b6b4d9f5db240a6a95b1234d3690
 - repo_url: caad-develop/claude-code-marketplace
   name: caad-skill-deployer
   host: github.com
@@ -10116,51 +10087,6 @@ deployments:
   - browser-use/browser-harness
   active_owner: browser-use/browser-harness
   content_hash: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
-- kind: project-relative
-  target: agents
-  value: .agents/skills/ca-pass
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
-  active_owner: caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
-  content_hash: null
-- kind: project-relative
-  target: agents
-  value: .agents/skills/ca-pass/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
-  active_owner: caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
-  content_hash: sha256:f4857db105505b0690b426d9003e15e66c0b9d0d61520e730ccd612e53885868
-- kind: project-relative
-  target: agents
-  value: .agents/skills/ca-pass/agents/openai.yaml
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
-  active_owner: caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
-  content_hash: sha256:6218f109685948e068c035d1db75b0fec445dc2e0b495f4c56b4fd2e558d2fdf
-- kind: project-relative
-  target: agents
-  value: .agents/skills/ca-pass/references/ca-pass-spec.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
-  active_owner: caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
-  content_hash: sha256:3e5d9e1f5bb649f60b4be92b972ff2f76c4f8fa9a9ced199b6d1f88edff68dc6
-- kind: project-relative
-  target: agents
-  value: .agents/skills/ca-pass/references/review-checklist.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
-  active_owner: caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
-  content_hash: sha256:fe7d3ae5384a860363d171e443f0c2b99a5d7d5a643b49d7545322ddc2484d2d
 - kind: project-relative
   target: agents
   value: .agents/skills/caad-skill-deployer
@@ -21204,51 +21130,6 @@ deployments:
   - browser-use/browser-harness
   active_owner: browser-use/browser-harness
   content_hash: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
-- kind: project-relative
-  target: claude
-  value: .claude/skills/ca-pass
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
-  active_owner: caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/ca-pass/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
-  active_owner: caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
-  content_hash: sha256:f4857db105505b0690b426d9003e15e66c0b9d0d61520e730ccd612e53885868
-- kind: project-relative
-  target: claude
-  value: .claude/skills/ca-pass/agents/openai.yaml
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
-  active_owner: caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
-  content_hash: sha256:6218f109685948e068c035d1db75b0fec445dc2e0b495f4c56b4fd2e558d2fdf
-- kind: project-relative
-  target: claude
-  value: .claude/skills/ca-pass/references/ca-pass-spec.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
-  active_owner: caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
-  content_hash: sha256:3e5d9e1f5bb649f60b4be92b972ff2f76c4f8fa9a9ced199b6d1f88edff68dc6
-- kind: project-relative
-  target: claude
-  value: .claude/skills/ca-pass/references/review-checklist.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
-  active_owner: caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
-  content_hash: sha256:fe7d3ae5384a860363d171e443f0c2b99a5d7d5a643b49d7545322ddc2484d2d
 - kind: project-relative
   target: claude
   value: .claude/skills/caad-skill-deployer

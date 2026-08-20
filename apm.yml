@@ -18,7 +18,6 @@ dependencies:
     - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
     - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
     - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-    - caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass/skills/ca-pass
     - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout#main
 
     # --- public ---

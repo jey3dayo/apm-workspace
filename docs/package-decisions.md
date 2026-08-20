@@ -132,6 +132,7 @@
   - `caad-develop/claude-code-marketplace/plugins/service-integrations/notica-api`
   - `caad-develop/claude-code-marketplace/plugins/service-integrations/telma-api`
 - 補足: `private-skills` の `ca-pass` overlay は machine-local な別レーンとして維持する。
+- 追記（2026-08-21）: `ca-pass` だけが root `apm.yml` に残留していた drift を /improve 監査（#5）で検出し、manifest から実撤去した。利用するリポジトリは repo-local `apm.yml` へ上記 ref を追加する（`apm-repo-bootstrap` 参照）。
 
 ### banner-design
 
