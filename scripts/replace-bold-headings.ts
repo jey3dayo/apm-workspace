@@ -455,6 +455,13 @@ function main() {
     });
     process.exit(1);
   }
+
+  // --dry-run is used as a check mode (format:check / lefthook gates): finding
+  // replacement candidates means the checkout is not formatted, so it must
+  // fail the gate rather than exit 0.
+  if (args.dryRun && totalReplacements > 0) {
+    process.exit(1);
+  }
 }
 
 main();
