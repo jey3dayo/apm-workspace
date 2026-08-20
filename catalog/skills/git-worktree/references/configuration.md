@@ -70,6 +70,16 @@ git config --add wt.copy ".env.local"
 
 Use repeated `--add` entries. This is useful for editor files and local env files that should follow new worktrees.
 
+For dotenvx-managed repositories, the encrypted `.env.*` files are committed and follow the checkout, but the gitignored `.env.keys` private key file does not. Without it, dotenvx decryption fails in every new worktree. Register it globally once:
+
+```bash
+git config --global --add wt.copy ".env.keys"
+git config --global --add wt.copy ".env.local"
+git config --global --add wt.copy ".env"
+```
+
+Do not use `wt.copyignored true` for this; it copies every ignored path, including `node_modules/`.
+
 ### wt.nocopy
 
 Exclude files matching gitignore-style patterns from copying.

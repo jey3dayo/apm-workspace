@@ -52,6 +52,15 @@ git wt -D feature/my-task
 git worktree prune -v
 ```
 
+### Distribute Env Files After Creation
+
+`wt.copy` が効くのは `git wt` での新規作成時のみ。native `git worktree add`、エージェントの worktree isolation、既存 worktree への遡及配布では、作成後に同梱スクリプトで main checkout から env ファイル（`.env` / `.env.local` / `.env.keys`、ネスト含む）を配る。
+
+```bash
+scripts/copy-env-files.sh <worktree-path>
+scripts/copy-env-files.sh <worktree-path> <source-checkout-path>
+```
+
 ### Diagnose
 
 ```bash
@@ -66,6 +75,7 @@ git worktree list
 - 同じ branch を複数 worktree で同時 checkout しない
 - 手動でディレクトリを消した後は `git worktree prune` を忘れない
 - `.env` などローカルファイル配布が必要な時だけ `wt.copy` / `--copy` を使う
+- dotenvx 管理のリポジトリでは `.env.keys` が gitignore されているため、`wt.copy` に `.env.keys` を含めないと新 worktree で復号が失敗する（グローバル設定例: `git config --global --add wt.copy ".env.keys"`）
 - main repository を日常作業場所にしない
 
 ## Common Mistakes
@@ -74,6 +84,7 @@ git worktree list
 - worktree ディレクトリだけ消して metadata を残す
 - `git wt <worktree>` と `git wt -b <branch> <worktree>` の意味を混同する
 - repo ごとの `.worktrees/` 前提を global config だけで済ませる
+- `wt.copy` 未設定のまま worktree を切り、`.env.keys` / `.env.local` が無くて dotenvx 復号や env 読み込みが失敗する
 
 ## References
 
