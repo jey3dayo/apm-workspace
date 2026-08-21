@@ -89,6 +89,13 @@
 - 再導入: 対象リポジトリで `apm install nextlevelbuilder/ui-ux-pro-max-skill --skill ui-styling`
   を実行する。
 
+### ui-ux-pro-max（managed skill 化）
+
+- Status: managed skill として維持
+- 正本: `nextlevelbuilder/ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-max`
+- 理由: subdir install だと `scripts/` などの相対参照が壊れるため、
+  通常の subdir ref ではなく managed skill 化で扱う。
+
 ### google-forms-survey-builder
 
 - Status: 個別プロジェクト向けへ移管（2026-07-15）
@@ -330,3 +337,11 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
   `quiet-command-auditor` / `scheduled-audit-ops` はドメイン特化で組み込みに代替なし
 - 再導入する場合: 組み込みレビューで賄えない要件（プロジェクト設定統合、
   星評価レポート等）が実運用で必要になった理由を本ファイルに追記してから戻す
+
+## Nix external skill sources (`agent-skills-sources.nix`)
+
+- Status: 廃止（意図して空のまま維持）
+- 理由: external skill の配布を APM（root `apm.yml` / `apm.lock.yaml`）へ一本化したため、
+  `~/.config/nix/agent-skills-sources.nix` は intentionally empty。空であることは
+  ミスではなく撤去の結果。
+- 再検討するなら: Nix 側で skill 配布を復活させる場合のみ。通常は APM レーンを使う。

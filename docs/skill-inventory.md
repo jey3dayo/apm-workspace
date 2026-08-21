@@ -198,6 +198,15 @@ global から repo-local / optional へ移す候補。実施済みのもの
 4. `mise run deploy` 後に `~/.agents/skills` と `~/.claude/skills` の残存を確認する
 5. このファイルと `docs/package-decisions.md` を更新する
 
+## 社員向けスキル検索の設計メモ（2026-07-15、未実装）
+
+global から専門スキルを外すために、軽量な「スキル検索・導入入口」だけを global に残す案を採用する。実装タスクは `todo.txt` の `+skill-search` を参照。
+
+- 検索インデックスは `catalog/**`、`optional-skills/**`、root `apm.yml` / `apm.lock.yaml` の external 依存を統合する。
+- 検索結果には skill id、用途、scope、source kind、upstream / package ref、trust・license 情報、導入コマンド、現在の global 配布状態を表示する。
+- 導入先リポジトリで `apm.yml` を更新する。workspace-owned optional は単体 ref、external bundle は必要な場合だけ `--skill <id>` を使い、global へ直接追加しない。
+- `find-skills` は検索体験・候補説明・導入導線の参考にする。ただし現状は skills.sh / `npx skills` 向けで、社内 catalog、optional skill collection、APM の scope 判定は扱わないため流用せず、APM-aware な index / CLI を別途設計する。
+
 ## メンテナンス
 
 - 更新タイミング: レーン間の移動、global への追加・撤去、repo-local の新規採用時

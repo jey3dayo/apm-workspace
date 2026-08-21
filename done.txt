@@ -1,0 +1,9 @@
+2026-07-21 Google Forms 案件専用スキルを optional-skills へ移管した +skill-migration @apm
+2026-07-21 Slack アプリ案件専用スキルを optional-skills へ移管した +skill-migration @apm
+2026-07-21 premortem を optional-skills へ移管した +skill-migration @apm
+2026-07-16 Agentation を caad-loca-bff / ultra-rss-reader の repo-local 管理へ移管した +skill-migration @apm
+2026-07-16 UI bundle を ui-ux-pro-max 本体だけの global 配布へ縮小した +skill-migration @apm
+2026-08-12 browser automation を複数リポジトリで常時使う global 基盤として維持すると決定した +skill-migration @apm issue:#6
+2026-08-21 ca-pass、mdb-api、notica-api、telma-api を global から撤去し、利用リポジトリの個別導入へ切り替えた +skill-migration @apm
+2026-08-12 Agentation / browser automation の利用リポジトリ特定を完了した +skill-migration @apm
+2026-07-21 flat optional skill を GitHub に公開し、tech-talks を単体 ref へ移して lock / deploy を確定した +skill-migration @apm

@@ -22,6 +22,13 @@ currently deployed.
 delivery surfaces. Regenerate them instead of editing them. Codex compiles
 guidance to `~/.codex/AGENTS.md` and deploys skills to `~/.agents/skills`.
 
+## Task Tracking
+
+`todo.txt` is the source of truth for unfinished work and is managed with
+`TODO_FILE=todo.txt tuxedo`. Completed internal tasks are archived in the
+sibling `done.txt`; release-visible history belongs in `CHANGELOG.md` when a
+changelog is introduced. Do not recreate `TODO.md` for active work.
+
 For the detailed lane inventory, use [`docs/skill-inventory.md`](docs/skill-inventory.md).
 Choose a lane by scope: global personal work goes to `catalog`, selected-repo
 work to `optional-skills`, machine-local work to `private-skills`, and

@@ -179,4 +179,4 @@ If a deployed skill exists but its `SKILL.md` is clearly wrong, tiny, or a place
 - Skill guidance: `~/.apm/catalog/skills/apm-usage/SKILL.md`
 - Task coverage memo: `docs/apm-task-coverage.md`
 - Curated agents placement & sources: `docs/agents-provenance.md`
-- Remaining work: `TODO.md`
+- Remaining work: `todo.txt` (completed internal tasks: `done.txt`)

@@ -8,6 +8,8 @@ authoring surface. The `apm` CLI is pinned by `mise`.
 
 - [`AGENTS.md`](AGENTS.md): operational rules, ownership, recovery, and
   verification requirements.
+- [`todo.txt`](todo.txt): unfinished work managed with tuxedo; [`done.txt`](done.txt)
+  archives completed internal tasks.
 - [`docs/skill-inventory.md`](docs/skill-inventory.md): canonical skill-lane
   inventory and placement decisions.
 - [`docs/apm-task-coverage.md`](docs/apm-task-coverage.md): task ownership.
