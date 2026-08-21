@@ -17,6 +17,19 @@ STATE_ROOT="${XDG_STATE_HOME:-$HOME/.local/state}/agmsg"
 SKILL_DIR="$HOME/.agents/skills/agmsg"
 RUNTIME_DIRS="db teams"
 
+copy_new_only() {
+  local target="$1" store="$2" cp_version
+
+  # GNU coreutils warns for the short -n option even when the copy succeeds.
+  # Its long-form replacement avoids treating that portability warning as a
+  # failed copy, while BSD cp still uses -n because it has no --update flag.
+  cp_version="$(cp --version 2>/dev/null || true)"
+  case "$cp_version" in
+    *"GNU coreutils"*) cp -R --update=none "$target"/. "$store"/ ;;
+    *) cp -Rn "$target"/. "$store"/ ;;
+  esac
+}
+
 # Move a runtime dir that is still a plain directory into the store, then leave
 # the deploy target free for the symlink.
 absorb_plain_dir() {
@@ -33,7 +46,7 @@ absorb_plain_dir() {
   # failure, leave $target in place instead of discarding data that never
   # made it into the store.
   local cp_err
-  cp_err="$(cp -Rn "$target"/. "$store"/ 2>&1 1>/dev/null)" || true
+  cp_err="$(copy_new_only "$target" "$store" 2>&1 1>/dev/null)" || true
   if [ -n "$cp_err" ]; then
     echo "agmsg-state: failed to absorb $target into $store, leaving $target in place: $cp_err" >&2
     return 1
