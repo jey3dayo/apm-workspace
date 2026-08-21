@@ -49,8 +49,8 @@ Path-by-path ownership (catalog, optional-skills, workspace-only skills, lockfil
 `mise tasks` lists only the entry points. Parts that exist to be composed by an aggregate, or to be reached only during recovery, carry `hide = true` and stay directly runnable by name:
 
 - check parts of `check` / `format:check`: `format:markdown`, `format:markdown:check`, `format:markdown:bold-headings`, `format:markdown:bold-headings:check`, `format:toml`, `format:toml:check`, `format:yaml`, `format:yaml:check`, `lint:yaml`, `validate:workspace`, `validate:catalog`, `smoke:catalog`
-- recovery-only: `repair:local-package-cache`, `deploy:fresh`, `refresh:deploy`, `agmsg:state:restore`
-- bootstrap hooks: `bootstrap`, `setup:mcp:host`, `agmsg:state:save`
+- recovery-only: `repair:local-package-cache`, `deploy:fresh`, `refresh:deploy`, `agmsg:state:save`, `agmsg:state:restore` (apply owns the roster save/restore on every exit path; these tasks recover a roster unlinked outside of apply)
+- bootstrap hooks: `bootstrap`, `setup:mcp:host`
 
 ## Script-Only Commands
 
