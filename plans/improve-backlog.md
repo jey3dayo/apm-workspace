@@ -14,7 +14,7 @@
 
 ## 小粒(次の worker バッチ候補、いずれも独立)
 
-- #6 commands/rules がマージコピー(`apm-workspace.sh:2217-2226`): 配布先で管理外ファイルと混ざる。swap 方式(stage → replace)へ寄せるか、管理 manifest で掃除対象を特定する設計判断が先
+- #6 commands/rules がマージコピー(`sync_managed_catalog_runtime_assets`): **設計確定(2026-08-21): manifest 方式を採用**。根拠: `~/.claude/commands/` には他パッケージ由来のファイル(agmsg.md、export-diagram.md 等)が同居しており、agents のような全ツリー swap(`swap_staged_tree_into_place`)は他オーナーのファイルを破壊する。実装: 配布先に管理ファイル一覧(`.managed-catalog-manifest`)を書き、次回 sync 時に「旧 manifest にあり新 source に無い」ファイルだけ削除→copy→manifest 更新。bash/PS 両 adapter に同時実装(パリティ契約)+ conformance 系テストで stale 消滅と他オーナー保全を固定
 - #9 `cp -RL` が skill 内 symlink を無条件に辿る(`apm-workspace.sh:2104`): ループ・意図しない実体化のリスク。`-RL` → `-R` + 明示解決の影響調査から
 - #10 cache repair の削除先が文字列 prefix 判定のみ(`apm-workspace.sh:1150-1159`): `is_path_under_dir` 相当の正規化済み判定へ
 - #12 PS quick-sync が古いファイルを残し、Pester `:1229` がその挙動を期待: 実装とテストの同時修正。Phase 3 fixture 導入済みのため着手可能
