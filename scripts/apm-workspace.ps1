@@ -2386,6 +2386,64 @@ function Replace-DirectoryTreeFromSource {
   }
 }
 
+function Remove-EmptyDirectories {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$RootDir
+  )
+
+  if (-not (Test-Path -LiteralPath $RootDir)) {
+    return
+  }
+
+  $directories = @(Get-ChildItem -LiteralPath $RootDir -Recurse -Directory -Force) |
+    Sort-Object { $_.FullName.Length } -Descending
+
+  foreach ($directory in $directories) {
+    $hasChildren = @(Get-ChildItem -LiteralPath $directory.FullName -Force).Count -gt 0
+    if (-not $hasChildren) {
+      Remove-Item -LiteralPath $directory.FullName -Force
+    }
+  }
+}
+
+# Manifest-tracked sync for a catalog dir (commands/rules) whose deployment
+# target is shared with files the catalog doesn't own (other packages, user
+# files). Unlike Replace-DirectoryTreeFromSource's full-tree swap, this only
+# removes files this catalog previously placed and no longer provides, so
+# co-located non-catalog files are never touched. The manifest itself is
+# deploy-target-only state, never written to source.
+function Sync-ManagedCatalogDirWithManifest {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$SourceDir,
+
+    [Parameter(Mandatory = $true)]
+    [string]$DestinationDir
+  )
+
+  New-Item -ItemType Directory -Path $DestinationDir -Force | Out-Null
+  $manifestPath = Join-Path $DestinationDir ".managed-catalog-manifest"
+  $newManifest = @(Get-RelativeFilePaths -RootDir $SourceDir)
+
+  if (Test-Path -LiteralPath $manifestPath) {
+    $oldManifest = @(Get-Content -LiteralPath $manifestPath -ErrorAction SilentlyContinue | Where-Object { $_ -ne "" })
+    $staleEntries = @($oldManifest | Where-Object { $newManifest -notcontains $_ })
+    foreach ($relativePath in $staleEntries) {
+      $stalePath = Join-Path $DestinationDir $relativePath
+      if (Test-Path -LiteralPath $stalePath) {
+        Remove-Item -LiteralPath $stalePath -Force
+      }
+    }
+    if ($staleEntries.Count -gt 0) {
+      Remove-EmptyDirectories -RootDir $DestinationDir
+    }
+  }
+
+  Copy-DirectoryContents -SourceDir $SourceDir -DestinationDir $DestinationDir
+  Set-Content -LiteralPath $manifestPath -Value $newManifest
+}
+
 function Sync-ManagedCatalogRuntimeAssets {
   $trackedDir = Get-TrackedCatalogDir
   if (-not (Test-Path -LiteralPath $trackedDir)) {
@@ -2409,11 +2467,11 @@ function Sync-ManagedCatalogRuntimeAssets {
     }
 
     if (Test-Path -LiteralPath $commandsSource) {
-      Copy-DirectoryContents -SourceDir $commandsSource -DestinationDir (Join-Path $target.Root "commands")
+      Sync-ManagedCatalogDirWithManifest -SourceDir $commandsSource -DestinationDir (Join-Path $target.Root "commands")
     }
 
     if (Test-Path -LiteralPath $rulesSource) {
-      Copy-DirectoryContents -SourceDir $rulesSource -DestinationDir (Join-Path $target.Root "rules")
+      Sync-ManagedCatalogDirWithManifest -SourceDir $rulesSource -DestinationDir (Join-Path $target.Root "rules")
     }
   }
 }

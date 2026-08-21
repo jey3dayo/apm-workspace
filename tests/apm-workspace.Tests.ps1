@@ -1026,6 +1026,62 @@ id = "preserve"
     ((Get-Content -LiteralPath $untouchedCommand -Raw) -replace '\r?\n$', '') | Should -Be "outside"
   }
 
+  It "removes a manifest-tracked file the catalog dropped" {
+    $sourceDir = Join-Path $TestDrive "manifest-drop-source"
+    $targetDir = Join-Path $TestDrive "manifest-drop-target"
+    New-Item -ItemType Directory -Path $sourceDir, $targetDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $sourceDir "kept.md") -Value "kept"
+    Set-Content -LiteralPath (Join-Path $targetDir "kept.md") -Value "kept"
+    Set-Content -LiteralPath (Join-Path $targetDir "dropped.md") -Value "dropped"
+    Set-Content -LiteralPath (Join-Path $targetDir ".managed-catalog-manifest") -Value @("kept.md", "dropped.md")
+
+    Sync-ManagedCatalogDirWithManifest -SourceDir $sourceDir -DestinationDir $targetDir
+
+    Test-Path -LiteralPath (Join-Path $targetDir "kept.md") | Should -Be $true
+    Test-Path -LiteralPath (Join-Path $targetDir "dropped.md") | Should -Be $false
+    ((Get-Content -LiteralPath (Join-Path $targetDir ".managed-catalog-manifest")) -join "`n") | Should -Be "kept.md"
+  }
+
+  It "preserves a file the catalog never owned" {
+    $sourceDir = Join-Path $TestDrive "manifest-preserve-source"
+    $targetDir = Join-Path $TestDrive "manifest-preserve-target"
+    New-Item -ItemType Directory -Path $sourceDir, $targetDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $sourceDir "catalog.md") -Value "catalog"
+    Set-Content -LiteralPath (Join-Path $targetDir "catalog.md") -Value "catalog"
+    Set-Content -LiteralPath (Join-Path $targetDir "user-owned.md") -Value "mine"
+    Set-Content -LiteralPath (Join-Path $targetDir ".managed-catalog-manifest") -Value @("catalog.md")
+
+    Sync-ManagedCatalogDirWithManifest -SourceDir $sourceDir -DestinationDir $targetDir
+
+    ((Get-Content -LiteralPath (Join-Path $targetDir "user-owned.md") -Raw) -replace '\r?\n$', '') | Should -Be "mine"
+  }
+
+  It "skips deletion on first sync when no manifest exists yet" {
+    $sourceDir = Join-Path $TestDrive "manifest-first-source"
+    $targetDir = Join-Path $TestDrive "manifest-first-target"
+    New-Item -ItemType Directory -Path $sourceDir, $targetDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $sourceDir "catalog.md") -Value "catalog"
+    Set-Content -LiteralPath (Join-Path $targetDir "pre-existing.md") -Value "pre-existing"
+
+    Sync-ManagedCatalogDirWithManifest -SourceDir $sourceDir -DestinationDir $targetDir
+
+    Test-Path -LiteralPath (Join-Path $targetDir "pre-existing.md") | Should -Be $true
+    Test-Path -LiteralPath (Join-Path $targetDir "catalog.md") | Should -Be $true
+    ((Get-Content -LiteralPath (Join-Path $targetDir ".managed-catalog-manifest")) -join "`n") | Should -Be "catalog.md"
+  }
+
+  It "writes a manifest that matches the new source, including nested paths" {
+    $sourceDir = Join-Path $TestDrive "manifest-nested-source"
+    $targetDir = Join-Path $TestDrive "manifest-nested-target"
+    New-Item -ItemType Directory -Path (Join-Path $sourceDir "nested"), $targetDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $sourceDir "a.md") -Value "a"
+    Set-Content -LiteralPath (Join-Path $sourceDir "nested/b.md") -Value "b"
+
+    Sync-ManagedCatalogDirWithManifest -SourceDir $sourceDir -DestinationDir $targetDir
+
+    ((Get-Content -LiteralPath (Join-Path $targetDir ".managed-catalog-manifest")) -join "`n") | Should -Be "a.md`nnested/b.md"
+  }
+
   It "maps codex skills to ~/.agents while keeping config under ~/.codex" {
     $targets = @(Get-ManagedCatalogRuntimeTargets)
     $codex = $targets | Where-Object Name -eq "codex"

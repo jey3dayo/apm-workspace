@@ -2204,6 +2204,37 @@ replace_managed_catalog_agents_tree() {
   swap_staged_tree_into_place "$agents_source" "$target_agents_root" agents
 }
 
+# Manifest-tracked sync for a catalog dir (commands/rules) whose deployment
+# target is shared with files the catalog doesn't own (other packages, user
+# files). Unlike replace_managed_catalog_agents_tree's full-tree swap, this
+# only removes files this catalog previously placed and no longer provides,
+# so co-located non-catalog files are never touched. The manifest itself is
+# deploy-target-only state, never written to source.
+sync_managed_catalog_dir_with_manifest() {
+  source_dir="$1"
+  target_dir="$2"
+  manifest_path="$target_dir/.managed-catalog-manifest"
+
+  mkdir -p "$target_dir"
+  new_manifest=$(relative_file_list "$source_dir")
+
+  if [ -f "$manifest_path" ]; then
+    old_manifest=$(cat "$manifest_path")
+    stale_entries=$(comm -23 <(printf '%s\n' "$old_manifest") <(printf '%s\n' "$new_manifest"))
+    if [ -n "$stale_entries" ]; then
+      printf '%s\n' "$stale_entries" | while IFS= read -r relative_path; do
+        [ -n "$relative_path" ] || continue
+        rm -f "$target_dir/$relative_path"
+      done
+      find "$target_dir" -mindepth 1 -type d -empty -delete
+    fi
+  fi
+
+  remove_symlink_entries "$target_dir"
+  cp -R "$source_dir"/. "$target_dir"
+  printf '%s\n' "$new_manifest" >"$manifest_path"
+}
+
 sync_managed_catalog_runtime_assets() {
   tracked_dir=$(tracked_catalog_dir)
   [ -d "$tracked_dir" ] || fail "Tracked catalog missing: $tracked_dir. Run 'mise run prepare:catalog' first."
@@ -2226,15 +2257,11 @@ sync_managed_catalog_runtime_assets() {
     fi
 
     if [ -d "$commands_source" ]; then
-      mkdir -p "$target_root/commands"
-      remove_symlink_entries "$target_root/commands"
-      cp -R "$commands_source"/. "$target_root/commands"
+      sync_managed_catalog_dir_with_manifest "$commands_source" "$target_root/commands"
     fi
 
     if [ -d "$rules_source" ]; then
-      mkdir -p "$target_root/rules"
-      remove_symlink_entries "$target_root/rules"
-      cp -R "$rules_source"/. "$target_root/rules"
+      sync_managed_catalog_dir_with_manifest "$rules_source" "$target_root/rules"
     fi
   done
 }

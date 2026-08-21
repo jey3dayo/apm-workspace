@@ -322,6 +322,78 @@ EOF
   rm -rf "$workspace_dir" "$runtime_home"
 }
 
+# --- sync_managed_catalog_dir_with_manifest ---------------------------------
+
+@test "sync_managed_catalog_dir_with_manifest removes a file the catalog dropped" {
+  source_dir="$(mktemp -d)"
+  target_dir="$(mktemp -d)"
+
+  printf '%s\n' 'kept' >"$source_dir/kept.md"
+  printf '%s\n' 'kept' >"$target_dir/kept.md"
+  printf '%s\n' 'dropped' >"$target_dir/dropped.md"
+  printf '%s\n' $'kept.md\ndropped.md' >"$target_dir/.managed-catalog-manifest"
+
+  run sync_managed_catalog_dir_with_manifest "$source_dir" "$target_dir"
+
+  [ "$status" -eq 0 ]
+  [ -f "$target_dir/kept.md" ]
+  [ ! -e "$target_dir/dropped.md" ]
+  [ "$(cat "$target_dir/.managed-catalog-manifest")" = "kept.md" ]
+
+  rm -rf "$source_dir" "$target_dir"
+}
+
+@test "sync_managed_catalog_dir_with_manifest preserves a file the catalog never owned" {
+  source_dir="$(mktemp -d)"
+  target_dir="$(mktemp -d)"
+
+  printf '%s\n' 'catalog' >"$source_dir/catalog.md"
+  printf '%s\n' 'catalog' >"$target_dir/catalog.md"
+  printf '%s\n' 'mine' >"$target_dir/user-owned.md"
+  printf '%s\n' 'catalog.md' >"$target_dir/.managed-catalog-manifest"
+
+  run sync_managed_catalog_dir_with_manifest "$source_dir" "$target_dir"
+
+  [ "$status" -eq 0 ]
+  [ "$(cat "$target_dir/user-owned.md")" = "mine" ]
+  [ "$(cat "$target_dir/.managed-catalog-manifest")" = "catalog.md" ]
+
+  rm -rf "$source_dir" "$target_dir"
+}
+
+@test "sync_managed_catalog_dir_with_manifest skips deletion on first sync (no manifest yet)" {
+  source_dir="$(mktemp -d)"
+  target_dir="$(mktemp -d)"
+
+  printf '%s\n' 'catalog' >"$source_dir/catalog.md"
+  printf '%s\n' 'pre-existing' >"$target_dir/pre-existing.md"
+
+  run sync_managed_catalog_dir_with_manifest "$source_dir" "$target_dir"
+
+  [ "$status" -eq 0 ]
+  [ -f "$target_dir/pre-existing.md" ]
+  [ -f "$target_dir/catalog.md" ]
+  [ "$(cat "$target_dir/.managed-catalog-manifest")" = "catalog.md" ]
+
+  rm -rf "$source_dir" "$target_dir"
+}
+
+@test "sync_managed_catalog_dir_with_manifest updates the manifest to match the new source" {
+  source_dir="$(mktemp -d)"
+  target_dir="$(mktemp -d)"
+
+  mkdir -p "$source_dir/nested"
+  printf '%s\n' 'a' >"$source_dir/a.md"
+  printf '%s\n' 'b' >"$source_dir/nested/b.md"
+
+  run sync_managed_catalog_dir_with_manifest "$source_dir" "$target_dir"
+
+  [ "$status" -eq 0 ]
+  [ "$(cat "$target_dir/.managed-catalog-manifest")" = "$(printf 'a.md\nnested/b.md')" ]
+
+  rm -rf "$source_dir" "$target_dir"
+}
+
 @test "is_path_under_dir returns 0 for a child path" {
   parent="$(mktemp -d)"
   mkdir -p "$parent/child"
