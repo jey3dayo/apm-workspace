@@ -7,3 +7,4 @@
 2026-08-21 ca-pass、mdb-api、notica-api、telma-api を global から撤去し、利用リポジトリの個別導入へ切り替えた +skill-migration @apm
 2026-08-12 Agentation / browser automation の利用リポジトリ特定を完了した +skill-migration @apm
 2026-07-21 flat optional skill を GitHub に公開し、tech-talks を単体 ref へ移して lock / deploy を確定した +skill-migration @apm
+2026-08-21 skill-inventory.md の移管候補レビューを完了した(browser 系は global 維持、社内 API 系は撤去、understand 系は観察タスクへ分離) +skill-migration @apm
