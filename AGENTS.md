@@ -26,8 +26,11 @@ guidance to `~/.codex/AGENTS.md` and deploys skills to `~/.agents/skills`.
 
 `todo.txt` is the source of truth for unfinished work and is managed with
 `TODO_FILE=todo.txt tuxedo`. Completed internal tasks are archived in the
-sibling `done.txt`; release-visible history belongs in `CHANGELOG.md` when a
-changelog is introduced. Do not recreate `TODO.md` for active work.
+sibling `done.txt`. Decision history (why a package or lane was adopted,
+removed, or deferred) belongs in `docs/package-decisions.md`; code-change
+history lives in git log and `plans/`. Do not introduce `CHANGELOG.md` and do
+not recreate `TODO.md` for active work — those roles are already covered by
+the three surfaces above.
 
 For the detailed lane inventory, use [`docs/skill-inventory.md`](docs/skill-inventory.md).
 Choose a lane by scope: global personal work goes to `catalog`, selected-repo
