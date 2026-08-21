@@ -1236,8 +1236,34 @@ dependencies:
     ((Get-Content -LiteralPath (Join-Path $TestDrive ".agents/skills/wayfinder/SKILL.md") -Raw) -replace '\r?\n$', '') | Should -Be "# wayfinder"
     ((Get-Content -LiteralPath (Join-Path $TestDrive ".agents/skills/wayfinder/references/note.md") -Raw) -replace '\r?\n$', '') | Should -Be "local"
     Test-Path (Join-Path $TestDrive ".agents/skills/existing-skill/SKILL.md") | Should -Be $true
-    Test-Path (Join-Path $TestDrive ".agents/skills/wayfinder/old.md") | Should -Be $true
+    Test-Path (Join-Path $TestDrive ".agents/skills/wayfinder/old.md") | Should -Be $false
     Test-Path (Join-Path $TestDrive ".codex/skills/wayfinder/SKILL.md") | Should -Be $true
+  }
+
+  It "quick-sync removes a stale file that the source no longer has" {
+    Mock Ensure-WorkspaceRepo {}
+    Mock Ensure-WorkspaceScaffold {}
+    Mock New-TemporaryDirectory { Join-Path $TestDrive "apm-sync-local-stale" }
+    Mock Get-RequestedLocalSkillIds { @("mattpocock:wayfinder") }
+    Mock Get-LocalSkillContentDir { Join-Path $TestDrive "stale-quick-sync/catalog/skills/mattpocock/wayfinder" }
+    Mock Get-LocalCodexSyncTarget {
+      [pscustomobject]@{ Name = "codex"; Root = (Join-Path $TestDrive "stale-quick-sync/.codex"); SkillsRoot = (Join-Path $TestDrive "stale-quick-sync/.agents"); ConfigName = "AGENTS.md" }
+    }
+    Mock Invoke-AgmsgStateSave {}
+    Mock Invoke-AgmsgStateRestore {}
+
+    $sourcePath = Join-Path $TestDrive "stale-quick-sync/catalog/skills/mattpocock/wayfinder"
+    New-Item -ItemType Directory -Path $sourcePath -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $sourcePath "SKILL.md") -Value "# wayfinder"
+
+    $destinationSkillPath = Join-Path $TestDrive "stale-quick-sync/.agents/skills/wayfinder"
+    New-Item -ItemType Directory -Path $destinationSkillPath -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $destinationSkillPath "old-reference.md") -Value "old"
+
+    Invoke-SyncLocalSkills -RequestedSkillIds @("mattpocock:wayfinder")
+
+    Test-Path (Join-Path $destinationSkillPath "SKILL.md") | Should -Be $true
+    Test-Path (Join-Path $destinationSkillPath "old-reference.md") | Should -Be $false
   }
 
   It "fails validation when a Codex skill target tree is nested under another skills root" {

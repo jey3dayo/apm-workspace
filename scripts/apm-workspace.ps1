@@ -1748,6 +1748,12 @@ function Invoke-SyncLocalSkills {
         $deployedSkillName = Format-SkillName -Target $target.Name -SourceSkillId $skillRecord.SourceSkillId
         $stagedSkillPath = Get-InternalTargetSkillPath -TargetRoot $stagedSkillsRoot -SkillId $deployedSkillName
         $destinationSkillPath = Get-InternalTargetSkillPath -TargetRoot $destinationSkillsRoot -SkillId $deployedSkillName
+        # Replace the skill wholesale (delete -> place), matching the bash
+        # cmd_sync_local_skills contract: a plain content copy would leave
+        # files behind that the source no longer has.
+        if (Test-Path -LiteralPath $destinationSkillPath) {
+          Remove-Item -LiteralPath $destinationSkillPath -Recurse -Force
+        }
         Copy-DirectoryContents -SourceDir $stagedSkillPath -DestinationDir $destinationSkillPath
       }
 
