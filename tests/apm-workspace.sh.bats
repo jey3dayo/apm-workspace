@@ -345,6 +345,50 @@ EOF
   rm -rf "$dir"
 }
 
+@test "is_path_under_dir returns 1 for a sibling whose name has the directory's name as a string prefix" {
+  base="$(mktemp -d)"
+  mkdir -p "$base/b" "$base/bc"
+  run is_path_under_dir "$base/bc" "$base/b"
+  [ "$status" -eq 1 ]
+  rm -rf "$base"
+}
+
+@test "repair_local_package_cache_entry refuses an empty package name (would rm -rf the cache root)" {
+  workspace_dir="$(mktemp -d)"
+  source_dir="$(mktemp -d)"
+  printf '%s\n' 'content' >"$source_dir/file.md"
+  WORKSPACE_DIR="$workspace_dir"
+  mkdir -p "$workspace_dir/apm_modules/jey3dayo/apm-workspace/keep-me"
+
+  run repair_local_package_cache_entry "" "$source_dir"
+
+  [ "$status" -ne 0 ]
+  # The cache root and its existing contents must be untouched.
+  [ -d "$workspace_dir/apm_modules/jey3dayo/apm-workspace/keep-me" ]
+
+  rm -rf "$workspace_dir" "$source_dir"
+}
+
+# --- stage_codex_skill_records ----------------------------------------------
+
+@test "stage_codex_skill_records preserves symlinks inside a skill source instead of dereferencing them" {
+  source_dir="$(mktemp -d)"
+  stage_root="$(mktemp -d)"
+  printf '%s\n' 'real' >"$source_dir/real-file.md"
+  ln -s /nonexistent-target "$source_dir/link.md"
+
+  skill_records=$(printf 'personal\tfoo\t%s\tcatalog\n' "$source_dir")
+  run stage_codex_skill_records "$skill_records" "$stage_root"
+
+  [ "$status" -eq 0 ]
+  staged_skill_path="$stage_root/codex/skills/foo"
+  [ "$(<"$staged_skill_path/real-file.md")" = "real" ]
+  [ -L "$staged_skill_path/link.md" ]
+  [ "$(readlink "$staged_skill_path/link.md")" = "/nonexistent-target" ]
+
+  rm -rf "$source_dir" "$stage_root"
+}
+
 # --- public command dispatch surface ----------------------------------------
 
 @test "help lists the current public command set" {

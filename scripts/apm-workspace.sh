@@ -1043,7 +1043,7 @@ stage_codex_skill_records() {
     deployed_skill_name=$(format_skill_name "$source_skill_id")
     staged_skill_path=$(internal_target_skill_path "$stage_skills_root" "$deployed_skill_name")
     mkdir -p "$staged_skill_path"
-    cp -RL "$source_path"/. "$staged_skill_path"
+    cp -R "$source_path"/. "$staged_skill_path"
   done
 }
 
@@ -1158,15 +1158,15 @@ repair_local_package_cache_entry() {
 
   [ -d "$source_dir" ] || fail "Local package source missing: $source_dir"
 
-  case "$destination_dir" in
-    "$WORKSPACE_DIR"/apm_modules/jey3dayo/apm-workspace/*)
-      ;;
-    *)
-      fail "Refusing to rebuild cache outside apm_modules: $destination_dir"
-      ;;
-  esac
-
   mkdir -p "$cache_root"
+  # is_path_under_dir treats path == directory as "under"; an empty package
+  # name would make destination the cache root itself and rm -rf it wholesale,
+  # so require a strict subpath.
+  if [ -z "$package_name" ] \
+    || ! is_path_under_dir "$destination_dir" "$cache_root" \
+    || [ "$(canonical_path "$destination_dir")" = "$(canonical_path "$cache_root")" ]; then
+    fail "Refusing to rebuild cache outside apm_modules: $destination_dir"
+  fi
   rm -rf "$destination_dir"
   mkdir -p "$destination_dir"
   cp -R "$source_dir"/. "$destination_dir"
@@ -2112,7 +2112,7 @@ stage_target_skill_records() {
     staged_skill_path=$(internal_target_skill_path "$stage_skills_root" "$deployed_skill_name")
     rm -rf "$staged_skill_path"
     mkdir -p "$staged_skill_path"
-    cp -RL "$source_path"/. "$staged_skill_path"
+    cp -R "$source_path"/. "$staged_skill_path"
   done
 }
 
