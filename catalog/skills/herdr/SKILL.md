@@ -43,6 +43,15 @@ herdr pane process-info --pane <pane_id>
 
 client / server の互換性エラーで操作できない場合も、稼働中セッションを中断し得る server restart は自動実行しない。`herdr status` の結果と失敗したコマンドを報告して確認を取る。
 
+### 新規ペインの作成
+
+「ペインを作って」と依頼されたときは、既定で agent 自身と同じ workspace / tab に作る。
+
+1. `herdr pane current` で自分の `pane_id` / `tab_id` / `workspace_id` を確認する。
+2. `herdr pane split --pane <自分の pane_id> --focus [--direction right|down] [--cwd <absolute-path>]` で分割する。`pane list` から拾った他ペインを対象にしない — 別 workspace に作られる。
+3. 別 workspace や新規 tab（`herdr tab create` / `herdr workspace create`）を使うのは、ユーザーがその workspace / tab を明示したときだけ。`workspace create` には command 指定フラグが無く bare shell しか起動しないため、コマンド起動は作成後の `pane run` で行う。
+4. 作成後に `herdr pane process-info --pane <新 pane_id>` で cwd と foreground process を読み戻し、報告には pane_id + workspace label + 絶対 cwd + 実際に読み戻したプロセスを併記する。読み戻していないプロセス名は報告に書かない。
+
 ## Keybinding safety rules
 
 キーバインドは prefix-first が原則。直接ショートカットはシェルや TUI から入力を奪う。
