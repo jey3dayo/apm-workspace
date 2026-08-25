@@ -10,7 +10,7 @@ disable-model-invocation: true
 
 # agmsg-delegation
 
-別プロセスの agent（headless Claude Code / Codex）へ、agmsg メッセージングで作業を委譲するライフサイクルを回す。組み込みサブエージェント（Agent tool / `spawn_agent`）が使える場合はそちらが正規経路であり、このスキルは **native spawn が使えない場合、別セッションへ引き継ぐ場合、または外部プロセスが必要な場合の手動経路**である。Herdr pane は使わない。
+別プロセスの agent（headless Claude Code / Codex）へ、agmsg メッセージングで作業を委譲するライフサイクルを回す。組み込みサブエージェント（Agent tool / `spawn_agent`）が使える場合はそちらが正規経路であり、このスキルは **native spawn が使えない場合、別セッションへ引き継ぐ場合、または外部プロセスが必要な場合の手動経路**である。**pane / workspace を作るのはユーザーであり、エージェントは作らない**（理由と常駐運用は「常駐プール経路」を参照）。
 
 Codex CLI 0.147.0 以降は native `spawn_agent` から Luna を leaf worker として起動できるため、通常の Codex 内委譲では native spawn を優先する。本スキルが新規プロセスで起動する `codex -m gpt-5.6-luna exec` は、native spawn が利用できない環境、別セッション運用、または外部プロセスの分離が必要な場合の fallback とする。
 
@@ -100,6 +100,7 @@ profile の正本は本スキルの [agmsg-review.config.toml](agmsg-review.conf
 
 - team 名は対象 repo 名と同一の永続 team を使う（1 repo = 1 team）。日付・issue 番号・topic を team 名に含めない。task-scoped な team を乱立させると identities・履歴・掃除の全部が破綻する
 - worker_name は task-scoped の一意な名前（例: `<role>-<task_id>`）にし、既存名の再利用を避ける。task の識別は team 名でなく worker_name と task_id が担う
+- 例外は常駐プール経路で、`worker-1`..`worker-N` の固定名を再利用する（`backlog-sweep`）。この場合 task の識別は task_id だけが担う
 
 ```bash
 ~/.agents/skills/agmsg/scripts/team.sh <team>   # 名前衝突を確認
@@ -171,6 +172,39 @@ READY 後も DONE / REVIEW だけを無期限に待たず、agmsg と detached p
 worker が crash / timeout した場合も同じ 1→3 の順序で片付け、最終ログ・launchd job 状態・exit status を記録する。job が終了していない場合は一時ディレクトリを残し、ユーザーへ job label とログパスを報告する。
 
 完了条件: worker job が終了・解除され、専用一時ディレクトリが削除され、`identities.sh <対象project> <runtime_type>` の出力に worker_name が残っていない。
+
+## 常駐プール経路
+
+ユーザーが手で立てた pane の agent が `join` してチームに常駐し、同じ identity で複数タスクを受け続ける経路。`backlog-sweep` の Worker プールがこれにあたる。Lifecycle の 4・6・8 が使えないので、以下で置き換える。
+
+**エージェントが pane を作らない。** `herdr workspace create` などは command 指定を持たず bare shell しか起動しないのに、読み戻さなければ「起動した」と報告できてしまう。確認していない foreground process 名を報告に書かないこと。プールが必要なときは、必要な枚数・モデル・cwd をユーザーへ提示して立ててもらう。
+
+| lifecycle   | spawn 経路                                              | 常駐プール経路                                                            |
+| ----------- | ------------------------------------------------------- | ------------------------------------------------------------------------- |
+| 3. 事前登録 | 同じ                                                    | 同じ。ただし固定名を再利用する                                            |
+| 4. 起動     | `launch-worker.sh` で launchd 登録                      | ユーザーが pane を起動し、agent が `join` する。orchestrator は起動しない |
+| 5. READY    | inbox の `READY(task_id)`                               | 同じ（inbox 一本化なのでそのまま使える）                                  |
+| 6. 監視     | inbox + `worker.log` / `worker.exit` / launchd job 状態 | inbox のみ。下記の heartbeat 契約に置き換える                             |
+| 8. 片付け   | `reset.sh` → `bootout` → 一時ディレクトリ削除           | `reset.sh` で identity を解放するだけ。pane は落とさない                  |
+
+### 生存契約
+
+`$run_dir/worker.log`・`worker.exit`・launchd job label が存在しないため、**crash・長時間コマンド・承認待ちを orchestrator 側だけでは区別できない**。この欠落を heartbeat とユーザーへの委譲で埋める。
+
+- boot payload が無い経路なので、**最初のタスクメッセージが Worker プロトコルの唯一の注入口**になる。1通目に `WORKER.md` の解決済み絶対パス、`send-report.sh <team> <worker_name> <orchestrator>` の引数契約、下記の heartbeat 間隔を必ず含める
+- worker は作業中、**5分を超えて無言にならないよう `WORKING` を送る**
+- `WORKING` が10分途切れたら、orchestrator は推測で crash 判定せず、**該当 pane の状態確認をユーザーへ依頼する**（承認プロンプトで停止している可能性がある。pane は対話 TUI なので画面には出ているが、agmsg には何も流れない）
+- 打ち切るときは `STOP(task_id)` を送る。応答が無い場合、spawn 経路のような job 停止手段は無いので、**ユーザーに pane で中断してもらう**
+
+### 安全契約の置き換え
+
+pane はユーザーが起動するので `run-claude-worker.sh` / `run-codex-worker.sh` を通らず、**macOS sandbox の書込境界も `-a never` も掛からない**。実行時強制を失う分は次で担保する。
+
+- pane の cwd を対象 worktree に固定する。ただし `join.sh` / `identities.sh` は渡された project パスを記録・列挙するだけで、**pane が実際にどこにいるかは検証しない**。cwd の正しさはプール編成時にユーザーが担保するものであり、機械的な確認手段は無い
+- 触るファイル集合が互いに素にできない行は直列化するか worktree を分ける
+- したがって **orchestrator が `git diff` で実差分を読む（Lifecycle 7）ことが、機械的に成立する唯一の境界チェック**になる。省略しない
+
+review role は常駐プールで運用しない。read-only の実行時強制が profile 起動に依存しており、pane では担保できない。レビュー外注は従来どおり spawn 経路を使う。
 
 ## Worker プロトコル
 

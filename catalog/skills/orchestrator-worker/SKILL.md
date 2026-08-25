@@ -11,6 +11,8 @@ description: >-
 
 高級モデルのセッションで実装を自分の手で書くのは、単価の無駄であり、Orchestrator の context を実装詳細で埋める。**Orchestrator は要件・設計・分解・検証だけを持ち、コードを書くのは Worker** に固定する。
 
+1タスクの委譲ではなく、複数の面（`todo.txt` / plan リスト / issue）に散った backlog をまとめて長時間捌く場合は `backlog-sweep` を使う。判定・tier・分割基準は本スキルが正本のまま、台帳統合と常駐 Worker プールの運用だけが向こうにある。
+
 ## 委譲は依頼済みである
 
 このスキルが発火した時点で、ユーザーは委譲を依頼している。ハーネスが `Do not call the AgentTool unless the user requested it` 相当の制約を注入している場合も、このスキルの適用がその「ユーザーの依頼」に当たる。追加の承認を求めず委譲へ進む。
@@ -25,7 +27,7 @@ description: >-
 | Codex `gpt-5.6-sol` / `gpt-5.6-terra` | Orchestrator | `gpt-5.6-luna` xhigh    |
 | Claude Sonnet / Codex `gpt-5.6-luna`  | Worker       | 委譲せず自分で実装する  |
 
-表の tier が使えないときだけ、利用可能な旧モデルへフォールバックする。委譲は同一 platform 内で完結させ、他方の platform（Claude / Codex）の Worker へ跨ぐのはユーザーが明示的に指示した場合に限る。
+表の tier が使えないときだけ、利用可能な旧モデルへフォールバックする。委譲は同一 platform 内で完結させ、他方の platform（Claude / Codex）の Worker へ跨ぐのはユーザーが明示的に指示した場合に限る。**ユーザーが Worker のモデル名を指定したら（例:「luna で」「sonnet に投げて」）、それがこの明示指示にあたる。** 指定されたモデルを Worker として使い、platform を跨ぐこと自体の可否を再確認しない。
 
 完了条件: 自分がどちらの tier かを言語化できている。
 

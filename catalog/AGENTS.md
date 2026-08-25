@@ -43,12 +43,16 @@
 
 高コストモデルを実装作業で使いすぎないよう、Orchestrator-Worker パターンで役割を分担する。Orchestrator は要件整理・設計・タスク分解・委譲先出力の検証を担い、実装は Worker へ渡す。
 
-tier 対応表、委譲する / しないの判定、タスク分割基準、Claude / Codex での Worker 起動方法は `orchestrator-worker` スキルを正本とする。
+**実装 / 修正 / リファクタ / テスト追加 / 移行の依頼を受けたら、着手前に `orchestrator-worker` を読む。** 高級モデルが自分でコードを書き始めない。tier 対応表、委譲する / しないの判定、タスク分割基準、Claude / Codex での Worker 起動方法は同スキルを正本とし、ここには写さない（締め付けやモデル更改で頻繁に変わるため）。
+
+**複数の面（`todo.txt` / plan リスト / issue / レビュー指摘）に散った backlog をまとめて捌く依頼は `backlog-sweep`。** 1タスクの委譲とは起点も終了条件も違うので、別スキルとして扱う。
 
 ### 推奨ワークフロー（経路の選択）
 
 - 役割分担: `orchestrator-worker` は委譲判定・タスク分割の正本、Codex native の `spawn_agent` は標準 transport、`agmsg-delegation` は外部セッションや native spawn が使えない場合の fallback
 - 組み込みサブエージェント（Agent tool / `spawn_agent`）が使える場合はそれが正規経路
+- Worker のモデル名をユーザーが指定したら（例:「luna で」）、それが platform を跨ぐ明示指示にあたる。既定は同一 platform 内で完結させる
+- pane / workspace を作るのはユーザーであり、エージェントは作らない。常駐 Worker プールを使う場合も、枚数・モデル・cwd を提示して立ててもらう
 - Codex native では、bounded な作業の実装ワーカーに `gpt-5.6-luna` を明示指定できる。Luna は leaf worker として扱われ、自身の再帰的な委譲は行わない。判断・検証・独立レビューは親セッションが担う
 - Luna は同一トークン量なら Sol より大幅に安い（比率は[公式 rate card](https://help.openai.com/en/articles/20001106-codex-rate-card)を参照）が、共有クレジットプールと利用上限を消費する。無料・無制限ではない
 - Luna の直接起動は `codex -m gpt-5.6-luna`（`codex exec -m gpt-5.6-luna` も同様）。これは Luna タスクレーンとは別物
