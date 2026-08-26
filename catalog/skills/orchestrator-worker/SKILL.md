@@ -70,6 +70,8 @@ Agent(subagent_type: "implementer", prompt: <タスク定義>)
 
 通常委譲では `model` を渡さない。呼び出し時の指定は agent 定義の frontmatter より優先されるため、渡すと `implementer` に設定済みの既定 tier を上書きしてしまう。
 
+**Claude セッションで Codex モデル（`luna` / `terra` / `sol`）を指定された場合、Agent tool は使えない。** `model` に取れるのは `sonnet` / `opus` / `haiku` / `fable` だけで、Codex worker を起動する手段が無い。この場合は `agmsg-delegation` の spawn 経路（`run-codex-worker.sh implement <project> gpt-5.6-luna <payload>`）へ切り替える。Agent tool で代わりに `sonnet` を使ってはならない——指定されたモデルを黙って別 tier へ差し替えることになる。
+
 Codex:
 
 現行の Codex CLI 0.147.0 では、`spawn_agent` から `gpt-5.6-luna` を明示指定できる。モデル上書き時は `fork_turns: "none"` を使い、Luna は leaf worker として実装だけを担当させる。Luna の子には collaboration tools が公開されないため、再帰的な委譲・分解・検証は Orchestrator が担う（経緯は [references/codex-spawn-model-bug.md](references/codex-spawn-model-bug.md)）。
