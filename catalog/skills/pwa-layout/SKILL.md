@@ -8,7 +8,7 @@ description: >-
   interactive-widget）、@media (display-mode) によるスコープを扱う。
 ---
 
-# PWA Safe Area
+# PWA Layout
 
 ## 仕組み（診断の前提）
 
