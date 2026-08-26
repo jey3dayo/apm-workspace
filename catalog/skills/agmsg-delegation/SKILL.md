@@ -75,7 +75,7 @@ Codex helper:
 - implement role は `model_reasoning_effort` を既定 `xhigh` で付与する（`AGMSG_WORKER_EFFORT` で上書き可。昇格時は `max` を渡す）
 - review role は既定では effort を付与せず Codex 既定に任せる。`AGMSG_REVIEWER_EFFORT` を指定した場合のみ `model_reasoning_effort` を付与する（例: terra レビューで `high`）
 
-Codex review に `--sandbox read-only` を使ってはならない。agmsg の送受信自体が DB 書込み（`send.sh` の messages.db 更新、`inbox.sh` の read_at 更新）と report 一時ファイル作成を必要とするため、完全 read-only では reviewer が READY/REVIEW/ACK を送信できない。代わりに、agmsg 状態ディレクトリ（db/teams/run）だけを `writable_roots` に持つ profile `agmsg-review`（`CODEX_HOME/agmsg-review.config.toml`）を `-p` で layer する。
+Codex review に `--sandbox read-only` を使ってはならない。agmsg の送受信自体が DB 書込み（`send.sh` の messages.db 更新、`inbox.sh` の read_at 更新）と report 一時ファイル作成を必要とするため、完全 read-only では reviewer が READY/REVIEW/ACK を送信できない。代わりに、agmsg 状態ディレクトリ（db/teams/run）だけを `writable_roots` に持つ profile `agmsg-review`（`CODEX_HOME/agmsg-review.config.toml`）を `-p` で layer する。**`writable_roots` は symlink 成分を含むと Codex が exec を拒否する**（"symlinked writable roots are not supported"）。`~/.agents/skills/agmsg/db`・`teams` は `~/.local/state/agmsg/` への symlink なので、profile には canonical path を列挙する（列挙内容は profile 正本のコメントを参照）。
 
 **profile の `sandbox_mode = "workspace-write"` は cwd を必ず書込可能にする。** そのため `run-codex-worker.sh` は review role で **cwd を専用スクラッチ（`mktemp -d`）へ逃がし**、対象 project を cwd にしない。project へは read のみで到達でき、payload が絶対パスで指示する。スクラッチは git repo でないので `exec --skip-git-repo-check` を併せて渡す。`writable_roots` に対象 project を足してはならない。足すと read-only 契約が黙って壊れる。
 
