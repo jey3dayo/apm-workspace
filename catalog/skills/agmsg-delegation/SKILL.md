@@ -10,7 +10,7 @@ disable-model-invocation: true
 
 # agmsg-delegation
 
-別プロセスの agent（headless Claude Code / Codex）へ、agmsg メッセージングで作業を委譲するライフサイクルを回す。組み込みサブエージェント（Agent tool / `spawn_agent`）が使える場合はそちらが正規経路であり、このスキルは **native spawn が使えない場合、別セッションへ引き継ぐ場合、または外部プロセスが必要な場合の手動経路**である。**pane / workspace を作るのはユーザーであり、エージェントは作らない**（理由と常駐運用は「常駐プール経路」を参照）。
+別プロセスの agent（headless Claude Code / Codex）へ、agmsg メッセージングで作業を委譲するライフサイクルを回す。組み込みサブエージェント（Agent tool / `spawn_agent`）が使える場合はそちらが正規経路であり、このスキルは **native spawn が使えない場合、別セッションへ引き継ぐ場合、または外部プロセスが必要な場合の手動経路**である。**pane / workspace を勝手に作らない。ユーザーが指示したときだけ、読み戻し付きの手順で作る**（理由と常駐運用は「常駐プール経路」を参照）。
 
 Codex CLI 0.147.0 以降は native `spawn_agent` から Luna を leaf worker として起動できるため、通常の Codex 内委譲では native spawn を優先する。本スキルが新規プロセスで起動する `codex -m gpt-5.6-luna exec` は、native spawn が利用できない環境、別セッション運用、または外部プロセスの分離が必要な場合の fallback とする。
 
@@ -100,7 +100,7 @@ profile の正本は本スキルの [agmsg-review.config.toml](agmsg-review.conf
 
 - team 名は対象 repo 名と同一の永続 team を使う（1 repo = 1 team）。日付・issue 番号・topic を team 名に含めない。task-scoped な team を乱立させると identities・履歴・掃除の全部が破綻する
 - worker_name は task-scoped の一意な名前（例: `<role>-<task_id>`）にし、既存名の再利用を避ける。task の識別は team 名でなく worker_name と task_id が担う
-- 例外は常駐プール経路で、`worker-1`..`worker-N` の固定名を再利用する（`backlog-sweep`）。この場合 task の識別は task_id だけが担う
+- 例外は常駐プール経路で、`worker-1`..`worker-N` や `luna-worker-1` のような固定名を再利用する（命名は `backlog-sweep`「Worker プールを組む」に従う）。この場合 task の識別は task_id だけが担う
 
 ```bash
 ~/.agents/skills/agmsg/scripts/team.sh <team>   # 名前衝突を確認
@@ -108,7 +108,7 @@ profile の正本は本スキルの [agmsg-review.config.toml](agmsg-review.conf
 ~/.agents/skills/agmsg/scripts/identities.sh <対象project絶対パス> <claude-code|codex>   # 登録を検証
 ```
 
-完了条件: `identities.sh` の出力に、対象 project・runtime type・worker_name の組が exact に含まれる。
+完了条件: 対象 project・runtime type を引数にした `identities.sh` の出力に、worker_name が exact に含まれる（出力は `team<TAB>agent` の2列で、project・runtime は引数側で固定される）。
 
 ### 4. Detached worker を起動する
 
@@ -177,7 +177,7 @@ worker が crash / timeout した場合も同じ 1→3 の順序で片付け、�
 
 ユーザーが手で立てた pane の agent が `join` してチームに常駐し、同じ identity で複数タスクを受け続ける経路。`backlog-sweep` の Worker プールがこれにあたる。Lifecycle の 4・6・8 が使えないので、以下で置き換える。
 
-**エージェントが pane を作らない。** `herdr workspace create` などは command 指定を持たず bare shell しか起動しないのに、読み戻さなければ「起動した」と報告できてしまう。確認していない foreground process 名を報告に書かないこと。プールが必要なときは、必要な枚数・モデル・cwd をユーザーへ提示して立ててもらう。
+**エージェントが pane を勝手に作らない。ユーザーが「用意して」と指示したときだけ作る。** その場合も `herdr workspace create` / `tab create` は使わない——command 指定フラグが無く bare shell しか起動しないのに、読み戻さなければ「起動した」と報告できてしまう。自分の pane からの `pane split --focus` → `pane run` → `pane process-info` での読み戻し、という `herdr` スキルの手順に従う（`backlog-sweep`「Worker プールを組む」に手順あり）。確認していない foreground process 名を報告に書かないこと。
 
 | lifecycle   | spawn 経路                                              | 常駐プール経路                                                            |
 | ----------- | ------------------------------------------------------- | ------------------------------------------------------------------------- |
@@ -200,7 +200,7 @@ worker が crash / timeout した場合も同じ 1→3 の順序で片付け、�
 
 pane はユーザーが起動するので `run-claude-worker.sh` / `run-codex-worker.sh` を通らず、**macOS sandbox の書込境界も `-a never` も掛からない**。実行時強制を失う分は次で担保する。
 
-- pane の cwd を対象 worktree に固定する。ただし `join.sh` / `identities.sh` は渡された project パスを記録・列挙するだけで、**pane が実際にどこにいるかは検証しない**。cwd の正しさはプール編成時にユーザーが担保するものであり、機械的な確認手段は無い
+- pane の cwd を対象 worktree に固定する。`join.sh` / `identities.sh` は渡された project パスを記録・列挙するだけで **pane が実際にどこにいるかは検証しない**が、エージェントが `pane split --cwd` で立てた場合に限り `herdr pane process-info` で実 cwd を読み戻せる。ユーザーが手で立てた pane では機械的な確認手段が無く、cwd の正しさはユーザーが担保する
 - 触るファイル集合が互いに素にできない行は直列化するか worktree を分ける
 - したがって **orchestrator が `git diff` で実差分を読む（Lifecycle 7）ことが、機械的に成立する唯一の境界チェック**になる。省略しない
 

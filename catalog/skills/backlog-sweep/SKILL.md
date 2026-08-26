@@ -43,17 +43,26 @@ tier 表・委譲判定・タスク分割基準・受領後の検証は `orchest
 
 ## 3. Worker プールを組む
 
-**pane / workspace を作るのは人間であり、エージェントは作らない。** エージェントが pane を起動すると、起動の成否を読み戻さないまま「起動した」と報告する事故が起きる。プールが必要なときは、必要な枚数とモデルをユーザーへ提示して立ててもらう。
+**pane を勝手に作らない。ユーザーが「用意して」と言ったときだけ作る。** プールが必要そうなら、まず枚数・モデル・cwd を提示して指示を待つ。
+
+ユーザーが立てるよう指示した場合は、`herdr` スキルの手順に従って作る。省略すると、起動の成否を読み戻さないまま「起動した」と報告する事故になる。
+
+1. `herdr pane current` で自分の pane_id と workspace を確認する
+2. `herdr pane split --pane <自分の pane_id> --focus --cwd <対象 worktree 絶対パス>` で分割する。**`workspace create` / `tab create` は使わない**（command 指定フラグが無く bare shell しか起動しないうえ、背面に作ると事故に気づけない）
+3. `~/.agents/skills/agmsg/scripts/join.sh <team> <worker_name> <claude-code|codex> <対象project絶対パス>` で先に identity を登録する。runtime type はその member のモデルに合わせる（Codex 系なら `codex`、Claude 系なら `claude-code`）
+4. `herdr pane run <新 pane_id> "cd <絶対パス> && <起動コマンド>"` で起動する。起動コマンドも member のモデルに合わせる（例: `codex -m gpt-5.6-luna`、`claude --model opus`）
+5. `herdr pane process-info --pane <新 pane_id>` で foreground process と cwd を**読み戻す**。読み戻していないプロセス名を報告に書かない
+6. 報告には pane_id + workspace label + 絶対 cwd + 実際に読み戻したプロセスを併記する
 
 - tier は**編成時に固定**する。既定 Worker を N 枚 + 昇格先を 1 枚。到着した行を性質で振り分けるだけにし、実行中に tier を組み替えない。編成の例:
   - `luna`×N + `opus`×1 — Claude orchestrator から Codex Worker を使う混成プール。platform を跨ぐが、**どのモデルを立てるかを選ぶのはユーザー**なので `orchestrator-worker`「モデル名の指定は跨ぐ明示指示にあたる」に合致する
   - `sonnet`×N + `opus`×1 — Claude で完結
   - `luna`×N + `terra`×1 — Codex で完結
 - 昇格先へ回すのは `orchestrator-worker` の昇格3条件（難しいデバッグ / セキュリティ境界 / 複数案のトレードオフ判断）に該当する行だけ。新しい条件を作らない
-- member 名は `worker-1`..`worker-N` の固定名を**再利用**する。task-scoped な名前を毎回作らない。文脈を保った Worker はキャッシュが効くぶん安く、前提の再説明も要らない
+- member 名は固定名を**再利用**する。tier が混在するプールでは `luna-worker-1`..`luna-worker-3` / `opus-worker-1` のようにモデル名を含めると、割当表を見るだけで tier が読める。task-scoped な名前を毎回作らない。文脈を保った Worker はキャッシュが効くぶん安く、前提の再説明も要らない
 - team は対象 repo 名と同一の永続 team。登録と検証の手順は `agmsg-delegation`「Worker を事前登録する」に従う
 
-完了条件: `identities.sh` の出力に、対象 project・runtime・全 member 名の組が含まれている。
+完了条件: 対象 project・runtime を引数にした `identities.sh` の出力に、全 member 名が含まれている（runtime が混在するプールは runtime ごとに実行して確認する）。
 
 ## 4. 振り分ける
 
@@ -68,6 +77,6 @@ tier 表・委譲判定・タスク分割基準・受領後の検証は `orchest
 
 表の全行が完了したとき、または人間が止めたときに終了する。
 
-中断する場合は、表の現在状態を `tmp/backlog-sweep/<topic>.md` へ書き出してから止める。プールの片付け（`reset.sh` と identity の解除）は `agmsg-delegation`「片付ける」に従うが、**人間が立てた pane は落とさない**。エージェントが作っていないものはエージェントが壊さない。
+中断する場合は、表の現在状態を `tmp/backlog-sweep/<topic>.md` へ書き出してから止める。プールの片付けは `agmsg-delegation`「常駐プール経路」に従い、`reset.sh` で identity を解放するだけにする。**人間が立てた pane は落とさない**。エージェントが作っていないものはエージェントが壊さない。
 
 完了条件: 表の最終状態と、消化した行が出典の面へ反映済みであることを報告した。

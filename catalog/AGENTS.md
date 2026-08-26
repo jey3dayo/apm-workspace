@@ -52,7 +52,7 @@
 - 役割分担: `orchestrator-worker` は委譲判定・タスク分割の正本、Codex native の `spawn_agent` は標準 transport、`agmsg-delegation` は外部セッションや native spawn が使えない場合の fallback
 - 組み込みサブエージェント（Agent tool / `spawn_agent`）が使える場合はそれが正規経路
 - Worker のモデル名をユーザーが指定したら（例:「luna で」）、それが platform を跨ぐ明示指示にあたる。既定は同一 platform 内で完結させる
-- pane / workspace を作るのはユーザーであり、エージェントは作らない。常駐 Worker プールを使う場合も、枚数・モデル・cwd を提示して立ててもらう
+- pane / workspace を勝手に作らない。ユーザーが「用意して」と指示したときだけ、`herdr` スキルの `pane split --focus` → `pane run` → `pane process-info` で読み戻す手順で作る。読み戻していないプロセス名を報告に書かない
 - Codex native では、bounded な作業の実装ワーカーに `gpt-5.6-luna` を明示指定できる。Luna は leaf worker として扱われ、自身の再帰的な委譲は行わない。判断・検証・独立レビューは親セッションが担う
 - Luna は同一トークン量なら Sol より大幅に安い（比率は[公式 rate card](https://help.openai.com/en/articles/20001106-codex-rate-card)を参照）が、共有クレジットプールと利用上限を消費する。無料・無制限ではない
 - Luna の直接起動は `codex -m gpt-5.6-luna`（`codex exec -m gpt-5.6-luna` も同様）。これは Luna タスクレーンとは別物
