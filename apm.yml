@@ -43,10 +43,6 @@ dependencies:
     - millionco/react-doctor/skills/react-doctor
     - vercel-labs/agent-skills/skills/react-best-practices
 
-    # github ops: openai/plugins が 33bd952 で app-only integration へ移行し
-    # gh-address-comments / gh-fix-ci は上流から退役した。後継パスが無いため
-    # 最終版(11c74d6)を catalog/skills/ へ salvage して workspace 管理に移行済み
-
     # browser / analysis tools
     - browser-use/browser-harness
     - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand
