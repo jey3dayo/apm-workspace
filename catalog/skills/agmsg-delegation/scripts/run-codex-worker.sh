@@ -33,13 +33,73 @@ if ! command -v "$codex_bin" >/dev/null 2>&1; then
 	exit 1
 fi
 
+# Codex は symlink 成分を含む writable_roots を拒否する ("symlinked writable roots are
+# not supported")。不正な root が1つでもあると sandbox 構築自体が失敗し、無関係な
+# コマンドまで起動前に全拒否される。worker からは「シェルすら起動できない」形で見え、
+# 原因が設定にあると分からないまま停止するため (2026-08-27 に実際に発生)、
+# 起動前に検査して原因を名指しで報告する。
+extract_writable_roots() {
+	local file=$1
+	[[ -r "$file" ]] || return 0
+	awk '
+		/^[[:space:]]*\[/ {
+			in_section = ($0 ~ /^[[:space:]]*\[sandbox_workspace_write\][[:space:]]*$/)
+			in_array = 0
+		}
+		in_section && /writable_roots[[:space:]]*=/ { in_array = 1 }
+		in_array {
+			line = $0
+			sub(/#.*/, "", line)
+			while (match(line, /"[^"]*"/)) {
+				value = substr(line, RSTART + 1, RLENGTH - 2)
+				if (value != "") print value
+				line = substr(line, RSTART + RLENGTH)
+			}
+			if (line ~ /\]/) in_array = 0
+		}
+	' "$file"
+}
+
+# root 自身だけでなく途中の成分も検査する。Codex は成分に1つでも symlink があれば拒否する。
+path_has_symlink_component() {
+	local path=$1 prefix= component
+	while IFS= read -r component; do
+		[[ -n "$component" ]] || continue
+		prefix="$prefix/$component"
+		[[ -L "$prefix" ]] && return 0
+	done < <(printf '%s\n' "${path//\//$'\n'}")
+	return 1
+}
+
+assert_writable_roots_are_canonical() {
+	local file=$1 origin=$2 root
+	while IFS= read -r root; do
+		[[ -n "$root" ]] || continue
+		if path_has_symlink_component "$root"; then
+			printf 'Writable root %s in %s (%s) contains a symlink component.\n' \
+				"$root" "$origin" "$file" >&2
+			printf '%s\n' 'Codex rejects symlinked writable roots and then denies every command in the sandbox.' >&2
+			printf '%s\n' 'Replace it with the canonical path (resolve symlinks) and relaunch; refusing to start a worker that would stall.' >&2
+			return 1
+		fi
+	done < <(extract_writable_roots "$file")
+	return 0
+}
+
 project=$(cd -- "$project" && pwd -P)
 payload_file=$(cd -- "$(dirname -- "$payload_file")" && printf '%s/%s\n' "$PWD" "$(basename -- "$payload_file")")
 codex_args=(--strict-config -m "$model" -a never)
 exec_args=(exec --ephemeral)
 review_scratch=
 
+codex_home=${CODEX_HOME:-$HOME/.codex}
+
 if [[ "$role" == implement ]]; then
+	# implement は profile を layer しないため base config の writable_roots が直接効く。
+	if ! assert_writable_roots_are_canonical "$codex_home/config.toml" 'the Codex base config'; then
+		exit 1
+	fi
+
 	codex_args+=(-C "$project" -s workspace-write)
 	# worker の既定 effort。xhigh が品質/コストの損益分岐（Terra high 相当を最安で達成）。
 	# 昇格時は AGMSG_WORKER_EFFORT=max で上書きする。
@@ -87,6 +147,12 @@ else
 	# サンドボックス契約が保証できないため起動しない。
 	if ! cmp -s "$profile_source" "$profile_target"; then
 		printf '%s\n' 'Codex review profile differs from the deployed source; refusing fail-open launch.' >&2
+		exit 1
+	fi
+
+	# profile の writable_roots は base config を置換する (実測済み) ため、review では
+	# base config ではなく profile 側だけを検査する。
+	if ! assert_writable_roots_are_canonical "$profile_target" 'the Codex review profile'; then
 		exit 1
 	fi
 
