@@ -26,7 +26,7 @@
 - レビュー・監査: `hunk-review`, `thermo-nuclear-code-quality-review`,
   `improve`（shadcn）, `react-doctor`
 - React / Web 実装: `react-best-practices`, `browser-harness`, `screenshot`
-- GitHub 連携（openai）: `gh-address-comments`, `gh-fix-ci`
+- GitHub 連携（openai 由来、上流退役につき catalog へ salvage 済み）: `gh-address-comments`, `gh-fix-ci`
 - 社内（caad-develop）: `perman-aws-vault`, `caad-skill-deployer`,
   `ai-banzuke`, `ai-butsukari-evidence-scout`
 - 図生成: `diagram-design`（cathrynlavery, SHA pin）
