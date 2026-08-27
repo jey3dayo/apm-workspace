@@ -43,9 +43,8 @@ dependencies:
     - millionco/react-doctor/skills/react-doctor
     - vercel-labs/agent-skills/skills/react-best-practices
 
-    # github ops
-    - openai/plugins/plugins/github/skills/gh-address-comments
-    - openai/plugins/plugins/github/skills/gh-fix-ci
+    # github ops: openai/plugins が 33bd952 で app-only integration へ移行し、
+    # gh-address-comments / gh-fix-ci は上流から退役した。後継パスは存在しない
 
     # browser / analysis tools
     - browser-use/browser-harness
@@ -56,6 +55,8 @@ dependencies:
     - openai/skills/skills/.curated/screenshot # openai/skills is deprecated; no migrated equivalent found in openai/plugins yet
 
     # --- design ---
+    - benjitaylor/agentation/skills/agentation
+    - benjitaylor/agentation/skills/agentation-self-driving
     - git: nextlevelbuilder/ui-ux-pro-max-skill
       skills:
         - ui-ux-pro-max
@@ -69,6 +70,7 @@ dependencies:
     - ibelick/ui-skills/skills/fixing-accessibility
     - ibelick/ui-skills/skills/fixing-metadata
     - ibelick/ui-skills/skills/fixing-motion-performance
+    - ibelick/ui-skills/skills/improve-ui
 
     # --- tools ---
     - fujibee/agmsg
