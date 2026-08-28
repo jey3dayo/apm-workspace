@@ -46,9 +46,24 @@ wrapper="$run_dir/worker-wrapper.sh"
 plist="$run_dir/worker.plist"
 label_file="$run_dir/worker.label"
 
+# codex を親プロセス側で絶対パスへ解決しておく。launchd job は親の環境も cwd も
+# 継承せず、mise の shim 解決は cwd と MISE_ENV の両方に依存するため、worker 内では
+# codex を解決できない ("No version is set for shim" で起動不能。2026-08-27 に発生)。
+# worker 内で MISE_ENV を設定する方法は `latest` のネットワーク解決でハングするため使わない。
+# このスクリプトは親コンテキストで動くのでここでだけ解決できる。
+# claude は mise 管理外 (~/.local/bin) でどこでも解決できるため対象外。
+codex_bin_resolved=${AGMSG_CODEX_BIN:-}
+if [[ -z "$codex_bin_resolved" ]]; then
+	codex_bin_resolved=$(mise which codex 2>/dev/null) || codex_bin_resolved=
+fi
+[[ -n "$codex_bin_resolved" && -x "$codex_bin_resolved" ]] || codex_bin_resolved=
+
 umask 077
 {
 	printf '%s\n' '#!/usr/bin/env bash' 'set +e'
+	if [[ -n "$codex_bin_resolved" ]]; then
+		printf 'export AGMSG_CODEX_BIN=%q\n' "$codex_bin_resolved"
+	fi
 	# wrapper 自身が pid を書く。launchctl print のポーリングでは job のプロセス
 	# 生成が間に合わず pid を取り逃すため。この pid は launchd job の pid と一致する
 	printf 'echo "$$" >%q\n' "$pid_file"
