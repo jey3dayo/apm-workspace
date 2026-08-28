@@ -5,7 +5,6 @@ description: >-
   タスク委譲またはレビュー外注を行う。orchestrator-worker の組み込み
   spawn_agent が使えない経路、別セッションへの引き継ぎ、または外部プロセスが必要な場合の経路。
   agent / セッション間の引き継ぎ（CC → Codex 等）メッセージの書式も定義する。
-disable-model-invocation: true
 ---
 
 # agmsg-delegation
