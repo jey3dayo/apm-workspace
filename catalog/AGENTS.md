@@ -102,11 +102,7 @@ global MCP はリポジトリをまたいで常時使う基盤だけに限定し
 - SaaS への接続は「アプリ側プラグイン / コネクタ（claude.ai・ChatGPT） > `apm.yml`（external skill / MCP） > catalog skill」の優先順で選び、上位が使えるなら下位で二重管理しない。アプリ側を優先するのは、認証・トークン更新・ツール定義のメンテナンスがアプリ側に集約されるため
 - 片側のアプリにしかプラグイン / コネクタが無い場合は APM 管理にして両方へ配ってよい。両側に揃ったら撤去を検討する。接続状況の一覧は `~/.apm/docs/saas-connectors.md`、撤去判断の記録は `docs/package-decisions.md` を参照
 - repo-local / on-demand: `tauri-mcp-server`（Tauri repo）など。デスクトップ / OS レベルのスクリーンショットは `screenshot` スキル（Win / Mac / Linux 対応）を使い、画面操作 MCP は必要になった repo だけに on-demand で入れる
-- ブラウザ操作は目的で選ぶ。コマンド仕様は各スキル / ツール側が正本
-  - ユーザーの画面を共有しながらの操作（クリック・フォーム入力・スクショ・コンソール確認）は `claude-in-chrome` または Codex Chrome アドオン
-  - 成果物やページをターミナルペインでユーザーの隣に出す・そのまま触ってもらうのは `terminal-browser`（kitty graphics 対応ターミナル必須）
-  - エージェント側で完結するヘッドレス自動化・スクレイピング・反復検証は `browser-harness`
-  - Lighthouse・パフォーマンストレース・ヒープスナップショットなど DevTools 固有分析は `chrome-devtools` を必要な repo だけに repo-local で追加
+- ブラウザ操作は目的で選ぶ（「ブラウザ操作の選択」表を参照）。コマンド仕様は各スキル / ツール側が正本
 - 調査は source type で使い分ける: current docs は `context7`、直接指定された URL の取得・DOM 抽出は `ax`、Web 検索・検索結果経由の読み取りは `jina-reader`、広い比較調査は `web-research`、source-specific な到達性は専用 connector
 - MCP 設定を永続変更する前に、次の ownership gate を完了する
   1. `~/.apm` が存在する場合は `apm-usage` を使う
@@ -116,6 +112,15 @@ global MCP はリポジトリをまたいで常時使う基盤だけに限定し
   5. 診断用の一時設定は `codex -c` などの one-shot override を使い、永続設定へ残さない
 - `jina-reader` の transport、URL、認証、tool filter の正本は root `apm.yml`。変更後は `codex mcp list` と実際の検索を確認する
 - repo-local MCP の固定リストは持たない。リポジトリ一覧は `ghq list -p`、実体は各リポジトリの `apm.yml` を確認する
+
+### ブラウザ操作の選択
+
+| 目的                                                                                   | 推奨                                                      |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| ユーザーの画面を共有しながらの操作（クリック・フォーム入力・スクショ・コンソール確認） | `claude-in-chrome` または Codex Chrome アドオン           |
+| 成果物やページをターミナルペインでユーザーの隣に出す・そのまま触ってもらう             | `terminal-browser`（kitty graphics 対応ターミナル必須）   |
+| エージェント側で完結するヘッドレス自動化・スクレイピング・反復検証                     | `browser-harness`                                         |
+| Lighthouse・パフォーマンストレース・ヒープスナップショットなど DevTools 固有分析       | `chrome-devtools`（必要な repo だけに repo-local で追加） |
 
 ## Git コミット規約
 
