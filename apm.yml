@@ -73,6 +73,7 @@ dependencies:
     - fujibee/agmsg
     - modem-dev/hunk/skills/hunk-review
     - agavra/tuicr/skills/tuicr
+    - humanlayer/skills/plugins/show-me/skills/show-me
   mcp:
     - name: context7
       registry: false
