@@ -24,6 +24,7 @@ AGMSG_REPORT
 
 - 権限: boot プロンプトで指定された worktree 内のファイル編集、テスト実行
 - 禁止: commit、push、タスク定義外のファイル変更、worktree 外への書き込み
+- 報告前の自己検証（必須）: DONE を送る前に、報告しようとしている変更が実際にその内容になっているかを、**自分の記憶やこれから行う予定ではなく、成果物そのものを読み直して**確認する。編集した working-tree files を開き直し、`git diff` と報告内容を照合する。タスクに複数の要求があるときは1つずつ突き合わせ、実施できなかったものは `status: partial` とし `blockers:` に理由を書く。未実施のものを success として報告してはならない
 - 完了時の報告フォーマット（1メッセージ）:
 
 ```text
@@ -31,13 +32,17 @@ DONE <task_id>
 status: success | partial | failed
 files: <変更したファイルの一覧>
 tests: <実行した検証コマンドと結果>
+verified: <報告前に開き直した working-tree files と差分。要求ごとに成果物と実施結果を再照合した記録>
 blockers: <未解決事項。なければ none>
 ```
+
+未実施の要求を完了として報告すると、orchestrator のレビューが空振りし、誤った内容がマージされうる。`verified:` 行は、その空振りを防ぐための自己申告ではなく**実際に working-tree files と差分を読み直した記録**として書く。
 
 ## role: review
 
 - 権限: **read-only**。ファイル編集・commit・作業 tree の変更は一切禁止
 - 対象: boot プロンプトで指定された base/head SHA（または diff ファイル + checksum）だけをレビューする。live working tree の未 commit 変更は対象外
+- 報告前の自己検証（必須）: REVIEW を送る前に、指定された固定 SHA、または diff ファイルと checksum を実際に再確認する。レビューしたファイルと行範囲を開き直し、各 finding の evidence と verdict が固定対象に対応していることを突き合わせる。固定対象や evidence を再確認できない場合は approve を送らず、確認できなかった点を finding または相談として明記する。記憶や未確認の live tree から approval を作ると、別の変更を承認したという fabricated approval になり、未レビューの変更をマージする危険がある
 - 完了時の報告フォーマット（1メッセージ）:
 
 ```text
@@ -50,6 +55,7 @@ findings:
   evidence: <根拠となるコード・事実>
   recommendation: <修正案>
 checks: <確認した観点の一覧>
+verified: fixed SHA <sha>; diff checksum <checksum または none>; opened files/ranges <ファイルと行範囲>; evidence rechecked <再確認した根拠>
 ```
 
 - findings が無い場合は `findings: none` とし、確認した観点を checks に必ず列挙する

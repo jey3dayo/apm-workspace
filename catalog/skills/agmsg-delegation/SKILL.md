@@ -43,7 +43,7 @@ review role の reviewer モデル指定は本スキル内の一時的な model 
 - 並列 implement は触るファイル集合が互いに素であることが前提。互いに素にできなければ直列化するか worktree を分ける
 - タスク文を shell command へ生 interpolation しない。boot payload は mode 600 の一時ファイル経由の quote-safe 方式にし、成功・timeout・crash の全経路で削除する
 - review role の read-only は prompt 規約でなく実行時に強制する（下記の runtime 別起動コマンド）
-- Codex worker / reviewer は `run-codex-worker.sh` から `codex exec --ephemeral` で起動し、`-a never` を必須とする。承認が必要なコマンドは待機させず失敗として model へ返す。`--dangerously-bypass-approvals-and-sandbox` / `--yolo` は使わない
+- Codex worker / reviewer は `run-codex-worker.sh` から `codex exec --ephemeral` で起動し、`-a never` を必須とする。承認が必要なコマンドは待機させず失敗として model へ返す。この spawn 経路では `--dangerously-bypass-approvals-and-sandbox` / `--yolo` を使わない（ユーザーが手で pane を起動する常駐プール経路の例外は「pane で Codex worker を起動するときのサンドボックス選択」を参照）
 - Claude worker / reviewer は `run-claude-worker.sh` から `claude -p` で起動する。Claude の承認処理は無効化し、macOS sandbox で role 別の書込境界を強制する
 - worker の commit / apply は自動化しない。orchestrator が実差分を自分の目で検証する
 
@@ -211,6 +211,26 @@ pane はユーザーが起動するので `run-claude-worker.sh` / `run-codex-wo
 - したがって **orchestrator が `git diff` で実差分を読む（Lifecycle 7）ことが、機械的に成立する唯一の境界チェック**になる。省略しない
 
 review role は常駐プールで運用しない。read-only の実行時強制が profile 起動に依存しており、pane では担保できない。レビュー外注は従来どおり spawn 経路を使う。
+
+### pane で Codex worker を起動するときのサンドボックス選択
+
+常駐プールの pane はユーザーが手で起動するが、実装 worker の通常経路は既存 worktree を使う sandboxed pane とする。orchestrator またはユーザーが pane の起動前に worktree を作成し、pane worker は次で起動する:
+
+```bash
+codex -m gpt-5.6-luna -a never -s workspace-write
+```
+
+起動後、orchestrator は pane の実 cwd と `git worktree list --porcelain` を照合し、`git -C "$worktree" rev-parse --show-toplevel` と `git -C "$worktree" branch --show-current` が指定した worktree / branch と完全一致することを確認する。さらに開始時点の `git status --short` / `git diff` と worker 後の差分を比較し、タスク定義にない unexpected diff がないことを確認する。
+
+worktree の事前作成ができない場合だけ、外部隔離された別の one-shot `--yolo` session に作成を限定する。その session は worktree の作成直後に終了し、実装は必ず新しく起動した上記 sandboxed pane worker に続けて渡す。実装 worker を `--yolo` のまま常駐させない。
+
+scoped `--add-dir` は worktree 作成の代替にならない。ローカルの一次観測では、Codex 0.150.1 の `codex --help` に `--add-dir` が出ていたが、`.git/worktrees` だけを書込可能にした isolated `workspace-write` probe は `.git/refs/heads/probe.lock` で rc255 `Operation not permitted` になった。source の `.git` 全体を追加し、target を事前作成しても、target の `/.git` への書込みで rc128 `Operation not permitted` になった。Codex が `git worktree add` に必要な Git administrative files を保護するため、scoped add-dir は insufficient である。従って `--yolo` は外部隔離された worktree 作成の one-shot session に限り、作成後は直ちに終了させる。
+
+`--yolo` は `--dangerously-bypass-approvals-and-sandbox` の別名で sandbox 自体を無効化する。外部隔離された one-shot の worktree 作成以外では使わず、承認プロンプトで停止させない目的だけなら `-a never` で足りる。
+
+`-a` の有効値は `on-request` と `never` のみ。`on-failure` は存在しない（0.149.1 で確認）。
+
+`writable_roots` に symlink 成分があると Codex は sandbox 構築ごと失敗し、agmsg と無関係なコマンドまで起動前に全拒否される。詳細は Preflight の記述を参照。
 
 ## Worker プロトコル
 
