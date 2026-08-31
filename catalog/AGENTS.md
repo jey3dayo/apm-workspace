@@ -72,6 +72,9 @@
 - Luna の直接起動は `codex -m gpt-5.6-luna`（`codex exec -m gpt-5.6-luna` も同様）。これは Luna タスクレーンとは別物
 - spawn 面の制約で組み込み経路が塞がっている場合は `agmsg-delegation` スキルへ切り替える
 - エージェント / セッション間の引き継ぎ（CC → Codex 等）は transport に `agmsg` を使い、本文は `agmsg-delegation` の引き継ぎメッセージ書式（artifact は参照渡し・suggested skills・secrets redact・次セッションの目的に合わせる）に従う
+- Worker の `DONE` は未検証の申告として扱う。Orchestrator が実際の比較元を確定し、差分、変更対象、要求との対応を独立に確認する
+- DoD に定める full gate は Orchestrator が実行し、Worker の実行報告では代替しない
+- タスクで明示されていない依存 version、manifest、lockfile の変更は、要求上の必要性を確認できない限り採用しない
 
 ### agent 定義側のモデル割り当て
 
