@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Branch Cleanup"
+  short_description: "Plan safe cleanup of merged Git branches"
+  default_prompt: "Use $git-branch-cleanup to plan and, after exact confirmation, safely clean merged Git branches and linked worktrees."
