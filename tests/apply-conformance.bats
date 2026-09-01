@@ -86,3 +86,49 @@ run_apply() {
   link_target=$(readlink "$FIXTURE_HOME/.claude/skills/sample-private-skill")
   [ "$link_target" = "$FIXTURE_PRIVATE_SKILL_DIR" ]
 }
+
+@test "bash apply: does not recreate the skills root directory itself" {
+  # reconcile_skills_root_from_stage (apm-workspace.sh) reconciles child
+  # entries under the skills root one at a time and never renames or removes
+  # the root itself, unlike the old full-tree swap_staged_skill_tree_into_place
+  # which replaced the whole root via rename. Seed a stale skill dir before
+  # apply and record the root's inode: if apply is still recreating the root,
+  # the inode changes; if it only reconciles children, the inode is stable
+  # and the stale (unstaged) skill is still removed.
+  mkdir -p "$FIXTURE_HOME/.agents/skills/stale-skill" "$FIXTURE_HOME/.claude/skills/stale-skill"
+  agents_root_inode_before=$(ls -di "$FIXTURE_HOME/.agents/skills" | awk '{print $1}')
+  claude_root_inode_before=$(ls -di "$FIXTURE_HOME/.claude/skills" | awk '{print $1}')
+
+  run run_apply
+  [ "$status" -eq 0 ]
+
+  agents_root_inode_after=$(ls -di "$FIXTURE_HOME/.agents/skills" | awk '{print $1}')
+  claude_root_inode_after=$(ls -di "$FIXTURE_HOME/.claude/skills" | awk '{print $1}')
+
+  [ "$agents_root_inode_before" = "$agents_root_inode_after" ]
+  [ "$claude_root_inode_before" = "$claude_root_inode_after" ]
+  [ ! -e "$FIXTURE_HOME/.agents/skills/stale-skill" ]
+  [ ! -e "$FIXTURE_HOME/.claude/skills/stale-skill" ]
+  [ -f "$FIXTURE_HOME/.agents/skills/sample-skill/SKILL.md" ]
+}
+
+@test "bash apply: leaves no swap staging/backup directories under the skills root" {
+  # Also seed a stale .apm-skills-backup.* left over from a hypothetical
+  # crashed prior run (swap_staged_tree_into_place only cleans its own
+  # staging/backup dirs on the success and handled-failure paths, not a hard
+  # kill mid-swap) to prove reconcile_skills_root_from_stage sweeps these
+  # explicitly now that it no longer replaces the whole root wholesale.
+  mkdir -p "$FIXTURE_HOME/.agents/skills/.apm-skills-backup.99999"
+  echo "stale" >"$FIXTURE_HOME/.agents/skills/.apm-skills-backup.99999/leftover"
+
+  run run_apply
+  [ "$status" -eq 0 ]
+
+  run bash -c "find '$FIXTURE_HOME/.agents/skills' -mindepth 1 -maxdepth 1 -name '.apm-*'"
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+
+  run bash -c "find '$FIXTURE_HOME/.claude/skills' -mindepth 1 -maxdepth 1 -name '.apm-*'"
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+}

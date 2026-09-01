@@ -24,12 +24,13 @@ setup() {
 
   FIXTURE_XDG_STATE_HOME="$FIXTURE_HOME/.local/state"
 
-  # `apply`'s skill-tree swap (replace_skill_targets_from_stage,
-  # apm-workspace.sh:980) wipes the *entire* deployed skills root and
-  # replaces it with only what's staged from the catalog, so agmsg needs to
-  # be a managed catalog skill here too — otherwise the swap would delete
-  # $AGMSG_SKILL_DIR outright regardless of the save/restore wiring under
-  # test, which would prove nothing about that wiring.
+  # `apply`'s skill-tree reconcile (reconcile_skills_root_from_stage, called
+  # from replace_skill_targets_from_stage) replaces each top-level skill
+  # entry under the deployed skills root with what's staged, and removes any
+  # deployed entry that isn't staged. agmsg needs to be a managed catalog
+  # skill here too — otherwise the reconcile's stale-removal pass would
+  # delete $AGMSG_SKILL_DIR outright regardless of the save/restore wiring
+  # under test, which would prove nothing about that wiring.
   mkdir -p "$FIXTURE_WORKSPACE_DIR/catalog/skills/agmsg"
   printf '# agmsg\n' >"$FIXTURE_WORKSPACE_DIR/catalog/skills/agmsg/SKILL.md"
 
@@ -147,4 +148,21 @@ STUB
 
   [ -L "$AGMSG_SKILL_DIR/db" ]
   [ -L "$AGMSG_SKILL_DIR/teams" ]
+}
+
+@test "apply relinks the roster immediately after the skill-tree reconcile, not only at the end" {
+  # cmd_apply now runs agmsg-state.sh restore twice on a successful run: once
+  # right after replace_skill_targets_from_stage (closing the roster window
+  # before the remaining apply steps run) and once more at the end (the
+  # existing failure-path guarantee, idempotent to repeat). Fixing this count
+  # at exactly 2 pins that contract — 1 would mean the mid-apply relink
+  # regressed back out, and >2 would mean it started running more than once.
+  run run_apply
+  [ "$status" -eq 0 ]
+
+  db_linked_count=$(printf '%s\n' "$output" | grep -c '^agmsg db linked:')
+  teams_linked_count=$(printf '%s\n' "$output" | grep -c '^agmsg teams linked:')
+
+  [ "$db_linked_count" -eq 2 ]
+  [ "$teams_linked_count" -eq 2 ]
 }

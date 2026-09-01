@@ -89,4 +89,47 @@ Describe "apm-workspace.ps1 apply conformance" {
     $claudeLinkPath | Should -Exist
     (Get-Item -LiteralPath $claudeLinkPath).LinkType | Should -Be "SymbolicLink"
   }
+
+  # Contract: the managed skill swap (step 6, Reconcile-SkillsRootFromStage)
+  # never moves or removes the skills root directory itself -- only its
+  # child skill dirs are replaced one at a time. A root-level swap (the old
+  # Replace-DirectoryTreeFromSource-for-the-whole-root behavior) would make
+  # the root briefly not exist, which is unsafe for a live agent depending
+  # on in-place state under that root (e.g. agmsg's helper scripts) between
+  # apply runs. CreationTimeUtc identifies the on-disk directory instance:
+  # a Move-Item swap would produce a new directory with a fresh creation
+  # time even if the path is identical afterward.
+  It "does not recreate the skills root directory itself during swap" {
+    $claudeSkillsRoot = Join-Path $script:fixture["HOME"] ".claude/skills"
+    $staleSkillDir = Join-Path $claudeSkillsRoot "stale-skill"
+    New-Item -ItemType Directory -Path $staleSkillDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $staleSkillDir "SKILL.md") -Value "# stale"
+    $rootCreationTimeBefore = (Get-Item -LiteralPath $claudeSkillsRoot).CreationTimeUtc
+
+    Invoke-FixtureApply | Should -Be 0
+
+    (Get-Item -LiteralPath $claudeSkillsRoot).CreationTimeUtc | Should -Be $rootCreationTimeBefore
+    $staleSkillDir | Should -Not -Exist
+    Join-Path $claudeSkillsRoot "sample-skill/SKILL.md" | Should -Exist
+  }
+
+  # Also seeds a `.apm-skills-backup-*` dir as if a previous apply run had
+  # crashed mid-swap and left its backup behind: Reconcile-SkillsRootFromStage
+  # must still sweep it, not just avoid creating new ones of its own. The old
+  # whole-root swap cleaned these incidentally (the parent dir holding them
+  # was the very root being replaced); the new per-child reconcile has no
+  # such side effect, so it sweeps known-stale `.apm-skills-*` prefixes
+  # explicitly instead.
+  It "leaves no swap staging/backup directories under the skills root" {
+    $claudeSkillsRoot = Join-Path $script:fixture["HOME"] ".claude/skills"
+    $staleBackupDir = Join-Path $claudeSkillsRoot ".apm-skills-backup-deadbeef"
+    New-Item -ItemType Directory -Path $staleBackupDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $staleBackupDir "SKILL.md") -Value "# stale backup"
+
+    Invoke-FixtureApply | Should -Be 0
+
+    $leftoverSwapDirs = @(Get-ChildItem -LiteralPath $claudeSkillsRoot -Force -Directory | Where-Object { $_.Name -like ".apm-*" })
+    $leftoverSwapDirs.Count | Should -Be 0
+    $staleBackupDir | Should -Not -Exist
+  }
 }

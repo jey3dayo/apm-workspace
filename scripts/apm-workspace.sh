@@ -983,6 +983,11 @@ cmd_apply() {
   sync_managed_catalog_runtime_assets
   sync_pi_instructions
   replace_skill_targets_from_stage "$apply_stage_root"
+  # The freshly placed agmsg skill has no db/teams links until restore runs;
+  # relink immediately so the roster window is the child swap itself, not the
+  # seconds the remaining apply steps take. The final restore and the EXIT
+  # trap stay as the failure-path guarantee (restore is idempotent).
+  "$REPO_ROOT/scripts/agmsg-state.sh" restore || true
   cleanup_legacy_workspace_skill_targets
   sync_private_skills_into_targets
 
@@ -2155,8 +2160,47 @@ swap_staged_tree_into_place() {
   fail "Failed to replace $tree_name target: $target_tree_root"
 }
 
-swap_staged_skill_tree_into_place() {
-  swap_staged_tree_into_place "$1" "$2" skills
+# swap_staged_tree_into_place replaces a whole tree via two renames (current
+# -> backup, staging -> target), which needs the target to tolerate being
+# briefly absent. Doing that at the skills *root* itself — as the old
+# full-tree swap did — makes the entire root vanish from the filesystem for
+# that window, including scripts a live agent (e.g. an agmsg worker) may be
+# polling mid-command; the root's absence, not the individual skill swap, is
+# what broke callers. Reconciling per top-level child keeps the root itself
+# always present: each child still gets the same backup+rename swap
+# (unavailable only for its own two renames), but the root directory and its
+# untouched siblings are never absent. Stale removal preserves the old
+# semantics of "target ends up matching what's staged" (private skills are
+# re-applied afterward by sync_private_skills_into_targets, same as before).
+reconcile_skills_root_from_stage() {
+  staged_skills_root="$1"
+  target_skills_root="$2"
+
+  mkdir -p "$target_skills_root"
+
+  # A crashed prior run can leave .apm-skills-next.<pid> / .apm-skills-backup.<pid>
+  # behind (swap_staged_tree_into_place only cleans these up on the success
+  # and handled-failure paths, not a hard kill mid-swap). The old whole-root
+  # swap incidentally wiped these too, since it replaced the entire root; this
+  # reconcile no longer does that, so it must sweep them explicitly. Safe to
+  # do unconditionally here: this process's own staging/backup dirs for this
+  # call don't exist yet (swap_staged_tree_into_place below creates and
+  # removes them per child), so nothing live is ever swept.
+  rm -rf "$target_skills_root"/.apm-skills-next.* "$target_skills_root"/.apm-skills-backup.*
+
+  find "$staged_skills_root" -mindepth 1 -maxdepth 1 | while IFS= read -r staged_entry; do
+    entry_name=$(basename "$staged_entry")
+    swap_staged_tree_into_place "$staged_entry" "$target_skills_root/$entry_name" skills
+  done
+
+  find "$target_skills_root" -mindepth 1 -maxdepth 1 | while IFS= read -r target_entry; do
+    entry_name=$(basename "$target_entry")
+    case "$entry_name" in
+      .apm-*) continue ;;
+    esac
+    [ -e "$staged_skills_root/$entry_name" ] && continue
+    rm -rf "$target_entry"
+  done
 }
 
 replace_skill_targets_from_stage() {
@@ -2172,7 +2216,7 @@ replace_skill_targets_from_stage() {
     if [ "$legacy_skills_root" != "$target_skills_root" ] && { [ -e "$legacy_skills_root" ] || [ -L "$legacy_skills_root" ]; }; then
       rm -rf "$legacy_skills_root"
     fi
-    swap_staged_skill_tree_into_place "$staged_skills_root" "$target_skills_root"
+    reconcile_skills_root_from_stage "$staged_skills_root" "$target_skills_root"
   done
 }
 

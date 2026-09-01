@@ -1586,7 +1586,7 @@ function Replace-SkillTargetsFromStage {
     if (($legacySkillsRoot -ne $destinationSkillsRoot) -and (Test-Path -LiteralPath $legacySkillsRoot)) {
       Remove-Item -LiteralPath $legacySkillsRoot -Recurse -Force
     }
-    Replace-DirectoryTreeFromSource -SourceDir $stagedSkillsRoot -DestinationDir $destinationSkillsRoot -TreeName "skills"
+    Reconcile-SkillsRootFromStage -StagedSkillsRoot $stagedSkillsRoot -TargetSkillsRoot $destinationSkillsRoot
   }
 }
 
@@ -1676,6 +1676,15 @@ function Invoke-Apply {
       Sync-ManagedCatalogRuntimeAssets
       Sync-PiInstructions
       Replace-SkillTargetsFromStage -StageRoot $stageDir
+      # Reconcile-SkillsRootFromStage just replaced the deployed agmsg skill
+      # dir with the staged one, which has no db/teams symlinks yet -- the
+      # roster stays unlinked until the outer `finally`'s restore runs.
+      # Relinking here immediately shrinks that unlinked window to roughly
+      # the swap itself instead of the rest of Invoke-Apply (legacy cleanup,
+      # private overlay). The outer restore stays as the failure-path
+      # guarantee: it is idempotent, so relinking twice on the success path
+      # is harmless.
+      Invoke-AgmsgStateRestore
       Remove-LegacyWorkspaceSkillTargets
     }
     finally {
@@ -2383,6 +2392,75 @@ function Replace-DirectoryTreeFromSource {
     if (Test-Path -LiteralPath $backupDir) {
       Remove-Item -LiteralPath $backupDir -Recurse -Force
     }
+  }
+}
+
+# Root-preserving alternative to Replace-DirectoryTreeFromSource for a
+# deployed skills root. Replace-DirectoryTreeFromSource swaps the whole tree
+# in two Move-Item calls (old -> backup, staging -> old), which makes the
+# target root itself vanish for the brief window between those two moves.
+# For most managed trees that's harmless, but a skills root can hold
+# in-place state a running agent depends on every poll (e.g. agmsg's
+# ~/.agents/skills/agmsg/scripts/* helper, invoked by workers between apply
+# runs) — a root that briefly doesn't exist turns into spurious command
+# failures or heartbeat misses for whatever is running concurrently with
+# `apm apply`. Reconciling child-by-child keeps the root directory itself
+# present at all times; only one child skill at a time is ever absent
+# (during its own Replace-DirectoryTreeFromSource swap), which is the same
+# per-skill unavailability apply already accepts for anything it replaces.
+#
+# Contract: staged skill roots are one level of skill directories (see
+# Copy-DirectoryContents / Stage-TargetSkillRecords), never loose files, so
+# only directory children are reconciled here; a stray file directly under a
+# staged skills root would indicate a bug upstream in staging, not a case
+# this function needs to shell out to file-level Copy-Item for.
+function Reconcile-SkillsRootFromStage {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$StagedSkillsRoot,
+
+    [Parameter(Mandatory = $true)]
+    [string]$TargetSkillsRoot
+  )
+
+  New-Item -ItemType Directory -Path $TargetSkillsRoot -Force | Out-Null
+
+  # Sweep leftover `.apm-skills-next-*` / `.apm-skills-backup-*` dirs from a
+  # crashed prior run before the child swap loop below. The old whole-root
+  # swap incidentally cleaned these up too, because a crash mid-swap left
+  # them one level up from the root it was about to replace outright. The
+  # stale-removal pass further down deliberately skips any `.apm-*` name so
+  # it never races this call's own in-flight per-child staging/backup dirs —
+  # but that same skip would let a genuinely stale leftover from a past
+  # crash live under the root forever. Safe to remove unconditionally here,
+  # before any child swap starts: this process has not created any
+  # `.apm-skills-*` dir of its own yet, so anything matching now predates it.
+  foreach ($leftover in @(Get-ChildItem -LiteralPath $TargetSkillsRoot -Force -Directory -ErrorAction SilentlyContinue | Where-Object { $_.Name -like ".apm-skills-next-*" -or $_.Name -like ".apm-skills-backup-*" })) {
+    Remove-Item -LiteralPath $leftover.FullName -Recurse -Force
+  }
+
+  $stagedChildren = @()
+  if (Test-Path -LiteralPath $StagedSkillsRoot) {
+    $stagedChildren = @(Get-ChildItem -LiteralPath $StagedSkillsRoot -Force -Directory)
+  }
+  $stagedNames = [System.Collections.Generic.HashSet[string]]::new([string[]]@($stagedChildren | ForEach-Object Name), [System.StringComparer]::Ordinal)
+
+  foreach ($stagedChild in $stagedChildren) {
+    $destinationChild = Join-Path $TargetSkillsRoot $stagedChild.Name
+    Replace-DirectoryTreeFromSource -SourceDir $stagedChild.FullName -DestinationDir $destinationChild -TreeName "skills"
+  }
+
+  # Stale removal: anything the target still has that staging no longer
+  # provides. Skip Replace-DirectoryTreeFromSource's own in-flight
+  # staging/backup dirs (`.apm-skills-*`) so a reconcile never races itself.
+  foreach ($existingChild in @(Get-ChildItem -LiteralPath $TargetSkillsRoot -Force)) {
+    if ($stagedNames.Contains($existingChild.Name)) {
+      continue
+    }
+    if ($existingChild.Name -like ".apm-*") {
+      continue
+    }
+    Remove-Item -LiteralPath $existingChild.FullName -Recurse -Force
   }
 }
 

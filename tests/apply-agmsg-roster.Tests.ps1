@@ -24,6 +24,15 @@ Describe "apm-workspace.ps1 apply agmsg roster" {
       return $LASTEXITCODE
     }
 
+    # Same subprocess invocation as Invoke-FixtureApply, but captures stdout
+    # (agmsg-state.ps1's `restore` writes "agmsg <name> linked: ..." via
+    # Write-Host) so a test can count relink passes instead of only checking
+    # the final linked state, which can't distinguish one relink from two.
+    function script:Invoke-FixtureApplyCapturingOutput {
+      $output = & $script:consoleShell -NoProfile -ExecutionPolicy Bypass -File $script:scriptPath apply 2>&1
+      return [pscustomobject]@{ ExitCode = $LASTEXITCODE; Output = @($output) }
+    }
+
     # Overrides the fixture's `apm` stub so `apm compile ...` fails partway
     # through Invoke-Apply, forcing a thrown error while still exercising the
     # steps before it (including the agmsg-state.ps1 save under test).
@@ -51,11 +60,13 @@ exit 0
       $script:fixture[$key] = $value
     }
 
-    # Invoke-Apply's skill-tree swap (Replace-SkillTargetsFromStage) wipes
-    # the entire deployed skills root and replaces it with only what's
-    # staged from the catalog, so agmsg needs to be a managed catalog skill
-    # here too — otherwise the swap would delete the agmsg skill dir
-    # outright regardless of the save/restore wiring under test.
+    # Invoke-Apply's skill-tree swap (Replace-SkillTargetsFromStage ->
+    # Reconcile-SkillsRootFromStage) replaces each child skill dir under the
+    # deployed skills root with what's staged from the catalog (root itself
+    # stays in place, but child dirs not present in staging are removed as
+    # stale), so agmsg needs to be a managed catalog skill here too —
+    # otherwise the swap would delete the agmsg skill dir outright
+    # regardless of the save/restore wiring under test.
     $agmsgCatalogSkillDir = Join-Path $script:fixture["WORKSPACE_DIR"] "catalog/skills/agmsg"
     New-Item -ItemType Directory -Path $agmsgCatalogSkillDir -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $agmsgCatalogSkillDir "SKILL.md") -Value "# agmsg"
@@ -108,5 +119,20 @@ exit 0
 
     (Get-Item -LiteralPath (Join-Path $script:agmsgSkillDir "db")).LinkType | Should -Be "SymbolicLink"
     (Get-Item -LiteralPath (Join-Path $script:agmsgSkillDir "teams")).LinkType | Should -Be "SymbolicLink"
+  }
+
+  # Contract: Invoke-Apply relinks the roster immediately after the skill
+  # swap (Reconcile-SkillsRootFromStage drops in agmsg's staged skill dir
+  # with no db/teams symlinks yet) in addition to the outer `finally`'s
+  # restore, so the roster-unlinked window is only the swap itself, not the
+  # rest of Invoke-Apply (legacy cleanup, private overlay). Two runtime dirs
+  # (db, teams) linked on two passes (mid-apply + final) = 4 matching lines;
+  # a regression back to a single relink pass would collapse this to 2.
+  It "relinks the agmsg roster tree twice on a successful apply (mid-swap and final)" {
+    $result = Invoke-FixtureApplyCapturingOutput
+    $result.ExitCode | Should -Be 0
+
+    $linkedLines = @($result.Output | Where-Object { $_ -match "agmsg (db|teams) linked:" })
+    $linkedLines.Count | Should -Be 4
   }
 }
