@@ -8,3 +8,8 @@ ignore:
 rules:
   line-length: disable
   document-start: disable
+  # prettier (format:yaml) normalizes inline comments to one space before
+  # `#` and would revert yamllint's default of 2; align yamllint with the
+  # formatter so the two gates never fight over the same line.
+  comments:
+    min-spaces-from-content: 1
