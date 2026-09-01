@@ -1,6 +1,10 @@
 $ErrorActionPreference = "Stop"
 
-$env:APM_WORKSPACE_LIB_ONLY = "1"
+# APM_WORKSPACE_LIB_ONLY must NOT be set at the top level: Pester evaluates
+# every file's top level during Discovery, before any file's Run phase, so a
+# top-level set leaks into other test files' subprocess `apply` runs (making
+# them silent no-ops) whenever this file appears later in the invocation list.
+# Every dot-source site below sets and removes it inside its own BeforeAll.
 $script:scriptPath = Join-Path $PSScriptRoot ".."
 $script:scriptPath = Join-Path $script:scriptPath "scripts/apm-workspace.ps1"
 $script:workspaceRoot = Split-Path -Parent $PSScriptRoot
