@@ -16,7 +16,7 @@ node = "24"
 "aqua:bats-core/bats-core" = "1.11.1"
 fd = "10.4.2"
 lefthook = "2.1.9"
-"pipx:apm-cli" = "0.28.0"
+"pipx:apm-cli" = "0.29.0"
 "pipx:yamllint" = "1.38.0"
 taplo = "0.10.0"
 
