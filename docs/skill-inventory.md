@@ -6,15 +6,15 @@
 
 ## レーン一覧
 
-| レーン                 | 正本                                 | 配布                                    | 用途                                                               |
-| ---------------------- | ------------------------------------ | --------------------------------------- | ------------------------------------------------------------------ |
-| global（外部）         | root `apm.yml` の `dependencies.apm` | 全リポジトリへ自動 rollout              | 横断的に使う外部スキル                                             |
-| global（自作 catalog） | `catalog/skills/**`                  | 全リポジトリへ自動 rollout              | 個人の横断ワークフロー                                             |
-| ~/.apm 専用            | `.apm/skills/**`                     | この workspace 内の symlink bridge のみ | APM workspace 自身の運用手順                                       |
-| optional               | `optional-skills/<id>/**`            | 利用リポジトリで個別 ref を直接 install | 選択リポジトリだけのワークフロー                                   |
-| private                | `private-skills/.apm/skills/**`      | ローカル Codex sync のみ・未追跡        | マシンローカルの overlay                                           |
-| manual                 | `manual-skills/.apm/skills/**`       | 手動配置                                | 通常レーンで壊れる upstream の受け皿（退役 upstream コピーを収容） |
-| repo-local             | 各リポジトリの `apm.yml`             | そのリポジトリのみ                      | ランタイム・認証・ブラウザに結び付くもの                           |
+| レーン                 | 正本                                 | 配布                                                                                    | 用途                                                               |
+| ---------------------- | ------------------------------------ | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| global（外部）         | root `apm.yml` の `dependencies.apm` | 全リポジトリへ自動 rollout                                                              | 横断的に使う外部スキル                                             |
+| global（自作 catalog） | `catalog/skills/**`                  | 全リポジトリへ自動 rollout                                                              | 個人の横断ワークフロー                                             |
+| ~/.apm 専用            | `.apm/skills/**`                     | この workspace 内の symlink bridge のみ                                                 | APM workspace 自身の運用手順                                       |
+| optional               | `optional-skills/<id>/**`            | 利用リポジトリで個別 ref を直接 install                                                 | 選択リポジトリだけのワークフロー                                   |
+| private                | `private-skills/.apm/skills/**`      | deploy で catalog と同時同期（fast path: `apply:skills:local`）・~/.apm では gitignored | マシンローカルの overlay（正本は private repo）                    |
+| manual                 | `manual-skills/.apm/skills/**`       | 手動配置                                                                                | 通常レーンで壊れる upstream の受け皿（退役 upstream コピーを収容） |
+| repo-local             | 各リポジトリの `apm.yml`             | そのリポジトリのみ                                                                      | ランタイム・認証・ブラウザに結び付くもの                           |
 
 ## global（外部スキル: root apm.yml）
 
@@ -76,7 +76,7 @@
 - `premortem` — 実装前の失敗条件分析が必要なリポジトリのみ
 - `scheduled-audit-ops` — 利用例: `ca-connect-site`（`docs/prompts/config.toml` を持つリポジトリのみ）
 
-## private（private-skills/・未追跡）
+## private（private-skills/・~/.apm では gitignored、正本は private repo）
 
 - `ca-pass`, `work-reports`, `work-log-maintenance`
   （社内情報を含むため private レーンへ移動。正本は github.com/jey3dayo/private-skills）

@@ -18,13 +18,13 @@ authoring surface. The `apm` CLI is pinned by `mise`.
 
 Keep this short index here; the inventory above owns the detailed list.
 
-| Need                                            | Authoring surface                  | Delivery                        |
-| ----------------------------------------------- | ---------------------------------- | ------------------------------- |
-| Global personal skill                           | `catalog/skills/<id>/`             | normal rollout                  |
-| Selected repositories only                      | `optional-skills/<id>/`            | consuming repo installs its ref |
-| Workspace-only operation                        | `.apm/skills/<id>/`                | tracked runtime bridges         |
-| Machine-local override                          | `private-skills/.apm/skills/<id>/` | local Codex sync only           |
-| Upstream skill that cannot use the managed lane | `manual-skills/.apm/skills/<id>/`  | manual-skills package           |
+| Need                                            | Authoring surface                  | Delivery                                            |
+| ----------------------------------------------- | ---------------------------------- | --------------------------------------------------- |
+| Global personal skill                           | `catalog/skills/<id>/`             | normal rollout                                      |
+| Selected repositories only                      | `optional-skills/<id>/`            | consuming repo installs its ref                     |
+| Workspace-only operation                        | `.apm/skills/<id>/`                | tracked runtime bridges                             |
+| Machine-local override                          | `private-skills/.apm/skills/<id>/` | `mise run deploy` (fast path: `apply:skills:local`) |
+| Upstream skill that cannot use the managed lane | `manual-skills/.apm/skills/<id>/`  | manual-skills package                               |
 
 External global skills and MCP declarations belong in `apm.yml`; their accepted
 resolution is `apm.lock.yaml`. `apm_modules/` and deployed targets (including

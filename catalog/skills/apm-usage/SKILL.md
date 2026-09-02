@@ -54,15 +54,15 @@ Before any persistent MCP configuration write:
 Choose the narrowest lane that matches who needs the skill. Name the lane
 before installing or creating a skill.
 
-| Lane                | Scope                                                         | Source of truth                    | Delivery                                                              |
-| ------------------- | ------------------------------------------------------------- | ---------------------------------- | --------------------------------------------------------------------- |
-| `workspace-only`    | APM workspace operations only                                 | `.apm/skills/<id>/`                | Local `.claude/skills/<id>` and `.agents/skills/<id>` bridges         |
-| `repository-local`  | One repository's runtime, credentials, framework, or workflow | Target repository's `apm.yml`      | `apm install <package-ref>` in that repository                        |
-| `optional`          | Workspace-owned skill used by selected repositories           | `optional-skills/<id>/`            | Direct `apm install jey3dayo/apm-workspace/optional-skills/<id>#main` |
-| `global-catalog`    | Personal cross-repository workflow                            | `catalog/skills/<id>/`             | Global automatic rollout                                              |
-| `global-dependency` | External cross-repository foundation                          | Root `apm.yml` and `apm.lock.yaml` | `apm install -g <package-ref>`                                        |
-| `private`           | Machine-local, untracked overlay                              | `private-skills/.apm/skills/<id>/` | Local Codex skill sync only                                           |
-| `manual`            | Upstream package that cannot use the managed lane             | `manual-skills/.apm/skills/<id>/`  | Manual-skills package rollout                                         |
+| Lane                | Scope                                                                | Source of truth                    | Delivery                                                                                     |
+| ------------------- | -------------------------------------------------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------- |
+| `workspace-only`    | APM workspace operations only                                        | `.apm/skills/<id>/`                | Local `.claude/skills/<id>` and `.agents/skills/<id>` bridges                                |
+| `repository-local`  | One repository's runtime, credentials, framework, or workflow        | Target repository's `apm.yml`      | `apm install <package-ref>` in that repository                                               |
+| `optional`          | Workspace-owned skill used by selected repositories                  | `optional-skills/<id>/`            | Direct `apm install jey3dayo/apm-workspace/optional-skills/<id>#main`                        |
+| `global-catalog`    | Personal cross-repository workflow                                   | `catalog/skills/<id>/`             | Global automatic rollout                                                                     |
+| `global-dependency` | External cross-repository foundation                                 | Root `apm.yml` and `apm.lock.yaml` | `apm install -g <package-ref>`                                                               |
+| `private`           | Machine-local overlay (gitignored here, tracked in the private repo) | `private-skills/.apm/skills/<id>/` | `mise run deploy` (same apply stage as the catalog); `apply:skills:local` for a fast refresh |
+| `manual`            | Upstream package that cannot use the managed lane                    | `manual-skills/.apm/skills/<id>/`  | Manual-skills package rollout                                                                |
 
 ## Install Gate
 
@@ -79,7 +79,7 @@ Before an install, assign exactly one lane name.
    `global-catalog` when this workspace owns and evolves the skill, and
    `global-dependency` when an external upstream package is the source of
    truth.
-5. Use `private` for untracked machine-local work and `manual` only for an
+5. Use `private` for machine-local work and `manual` only for an
    upstream packaging failure.
 
 If the lane is unclear, start with `repository-local` in a known consumer
