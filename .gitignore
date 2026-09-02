@@ -15,10 +15,12 @@
 !/.agents/skills/agent-curation
 !/.agents/skills/find-skills
 !/.agents/skills/skill-auditor
+!/.agents/skills/apm-deploy-verify
 /.claude/skills/*
 !/.claude/skills/agent-curation
 !/.claude/skills/find-skills
 !/.claude/skills/skill-auditor
+!/.claude/skills/apm-deploy-verify
 /.claude/settings.local.json
 /.claude/skill-report/
 /.vscode/mcp.json
