@@ -6,15 +6,15 @@
 
 ## レーン一覧
 
-| レーン                 | 正本                                 | 配布                                    | 用途                                           |
-| ---------------------- | ------------------------------------ | --------------------------------------- | ---------------------------------------------- |
-| global（外部）         | root `apm.yml` の `dependencies.apm` | 全リポジトリへ自動 rollout              | 横断的に使う外部スキル                         |
-| global（自作 catalog） | `catalog/skills/**`                  | 全リポジトリへ自動 rollout              | 個人の横断ワークフロー                         |
-| ~/.apm 専用            | `.apm/skills/**`                     | この workspace 内の symlink bridge のみ | APM workspace 自身の運用手順                   |
-| optional               | `optional-skills/<id>/**`            | 利用リポジトリで個別 ref を直接 install | 選択リポジトリだけのワークフロー               |
-| private                | `private-skills/.apm/skills/**`      | ローカル Codex sync のみ・未追跡        | マシンローカルの overlay                       |
-| manual                 | `manual-skills/.apm/skills/**`       | 手動配置                                | 通常レーンで壊れる upstream の受け皿（現在空） |
-| repo-local             | 各リポジトリの `apm.yml`             | そのリポジトリのみ                      | ランタイム・認証・ブラウザに結び付くもの       |
+| レーン                 | 正本                                 | 配布                                    | 用途                                                               |
+| ---------------------- | ------------------------------------ | --------------------------------------- | ------------------------------------------------------------------ |
+| global（外部）         | root `apm.yml` の `dependencies.apm` | 全リポジトリへ自動 rollout              | 横断的に使う外部スキル                                             |
+| global（自作 catalog） | `catalog/skills/**`                  | 全リポジトリへ自動 rollout              | 個人の横断ワークフロー                                             |
+| ~/.apm 専用            | `.apm/skills/**`                     | この workspace 内の symlink bridge のみ | APM workspace 自身の運用手順                                       |
+| optional               | `optional-skills/<id>/**`            | 利用リポジトリで個別 ref を直接 install | 選択リポジトリだけのワークフロー                                   |
+| private                | `private-skills/.apm/skills/**`      | ローカル Codex sync のみ・未追跡        | マシンローカルの overlay                                           |
+| manual                 | `manual-skills/.apm/skills/**`       | 手動配置                                | 通常レーンで壊れる upstream の受け皿（退役 upstream コピーを収容） |
+| repo-local             | 各リポジトリの `apm.yml`             | そのリポジトリのみ                      | ランタイム・認証・ブラウザに結び付くもの                           |
 
 ## global（外部スキル: root apm.yml）
 
@@ -26,7 +26,6 @@
 - レビュー・監査: `hunk-review`, `thermo-nuclear-code-quality-review`,
   `improve`（shadcn）, `react-doctor`
 - React / Web 実装: `react-best-practices`, `browser-harness`, `screenshot`
-- GitHub 連携（openai 由来、上流退役につき catalog へ salvage 済み）: `gh-address-comments`, `gh-fix-ci`
 - 社内（caad-develop）: `perman-aws-vault`, `caad-skill-deployer`,
   `ai-banzuke`, `ai-butsukari-evidence-scout`
 - 図生成: `diagram-design`（cathrynlavery, SHA pin）
@@ -44,7 +43,7 @@
 
 ## global（自作 catalog: catalog/skills/）
 
-31 スキル。主な系統:
+29 スキル。主な系統:
 
 - APM・環境運用: `apm-usage`, `apm-repo-manifest`, `mise`,
   `dotenvx`, `1password`, `herdr`
@@ -64,6 +63,11 @@
 - `skill-auditor` — スキル棚卸し
 - `find-skills` — スキル探索
 - `apm-deploy-verify` — catalog 変更後の deploy / 配布一致検証
+
+## manual（manual-skills/）
+
+- `gh-address-comments` — OpenAI 由来の退役 upstream コピー
+- `gh-fix-ci` — OpenAI 由来の退役 upstream コピー
 
 ## optional（optional-skills/）
 

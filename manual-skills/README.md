@@ -2,9 +2,9 @@
 
 This directory contains copied skills that are kept outside the default managed APM lane.
 
-Current state: this package is intentionally empty. Keep the package scaffold so
-future upstream skills can be routed here when the normal managed lane is not
-compatible.
+Current state: this package contains two copied skills, `gh-address-comments` and
+`gh-fix-ci`, which are retired upstream copies originating from OpenAI. Keep them
+outside the default managed APM lane.
 
 - Use this package for skills that APM does not manage cleanly from upstream
 - Typical reasons: symlinks, packaging quirks, or upstream layouts that break normal managed rollout

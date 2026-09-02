@@ -370,6 +370,11 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 
 - 移動理由: `SKILL.md` が `docs/prompts/config.toml` を必須とし、該当 repo は `ca-connect-site` の 1 件のみである。global 配布しても他 repo では起動即失敗する。会社 repo に個人ツールを持ち込まず個人 workspace で版管理するため `optional-skills`（repo-scoped lane）に置き、消費側 repo は `apm.yml` に direct ref を追加する。
 
+## `gh-address-comments` / `gh-fix-ci` を manual-skills へ移動（2026-09-02）
+
+- 移動理由: 上流退役で外部依存として参照できないが、中身は改変しないコピーであり自作スキルではない。catalog を自分の成果物に限定するため `manual-skills`（コピー済み upstream の手動レーン）へ分離する。
+- 配布結果: root `apm.yml` の `jey3dayo/apm-workspace/manual-skills#main` からの配布結果は不変。
+
 ## Nix external skill sources (`agent-skills-sources.nix`)
 
 - Status: 廃止（意図して空のまま維持）
