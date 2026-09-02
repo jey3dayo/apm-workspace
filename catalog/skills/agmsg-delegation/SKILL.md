@@ -91,6 +91,9 @@ profile の正本は本スキルの [agmsg-review.config.toml](agmsg-review.conf
 
 検査に引っかかった場合は該当 root・ファイル・canonical path へ直す指示を名指しで出して exit 1 する。
 
+launchd 経路では親の `MISE_ENV` が継承されず、node を必要とする mise 管理の npm wrapper が即死することがある。
+`launch-worker.sh` は `MISE_ENV` を wrapper に引き継ぎ、同じ npm install 配下の `vendor/*/bin/codex` native binary を優先する（無ければ node の PATH を補完する）。
+
 完了条件: CLI・role 別起動コマンド（review は profile の diff 一致確認込み）・agmsg・`launch-worker.sh` の4点が確認済み。
 
 ### 2. 作業領域を固定する
@@ -131,20 +134,22 @@ profile の正本は本スキルの [agmsg-review.config.toml](agmsg-review.conf
 
 ### 5. READY を待つ
 
-readiness の source of truth は **inbox.sh で受信する READY(task_id) メッセージ**に一本化する（actas lock や worker log を readiness 判定に使わない）。
+readiness の source of truth は **agmsg DB に届いた READY(task_id) メッセージ**である（actas lock や worker log を readiness 判定に使わない）。`inbox.sh` はその取得手段の1つであり、session-start の watcher が常駐しうる環境では既読化の影響を受ける。
 
 - `inbox.sh <team> <自分>` を timeout（既定 120 秒）付きでポーリングし、`READY <task_id>` を待つ
+- `pgrep -f 'agmsg/scripts/watch.sh'` が watcher 常駐を示す場合は、`history.sh <team> <自分>` も併用して task_id の READY を DB から確認する
 - Claude worker の READY 本文には `session: <session_id>` が含まれる契約。orchestrator はこれを lifecycle state に必ず保持し、終了時の `reset.sh` 第4引数に渡す。READY に session_id が無い場合は worker へ再送を求めるか、取得不能として crash cleanup 経路で処理する
-- fallback として `$run_dir/worker.log` の `READY <task_id>` を確認してよいが、readiness 判定は inbox の READY に限る
+- fallback として `$run_dir/worker.log` の `READY <task_id>` を確認してよいが、readiness 判定は agmsg DB の READY に基づく
 - timeout 時は `launchctl print "gui/$(id -u)/$(cat "$run_dir/worker.label")"`、`tail -n 200 "$run_dir/worker.log"`、`$run_dir/worker.exit`（あれば）を取得して原因を報告する
 
 完了条件: READY(task_id) を受信した。timeout 時は診断情報を添えて停止・報告。
 
 ### 6. 完了まで監視する
 
-READY 後も DONE / REVIEW だけを無期限に待たず、agmsg と detached process の両方を監視する。
+READY 後も DONE / REVIEW だけを無期限に待たず、agmsg DB に届いた DONE / REVIEW を正本として、agmsg と detached process の両方を監視する。
 
 - `inbox.sh <team> <自分>` を最大60秒間隔でポーリングし、`WORKING` / `BLOCKED` / `DONE` / `REVIEW` を受信する
+- `inbox.sh` に valid message が無く「無応答」と判定する前に、必ず `history.sh <team> <自分>` を task_id で確認する。watcher が常駐しうる（`pgrep -f 'agmsg/scripts/watch.sh'`）ため、既読化された DONE / REVIEW は history から復元する
 - valid message が120秒無い場合は、launchd job 状態、`tail -n 200 "$run_dir/worker.log"`、`$run_dir/worker.exit`（あれば）を取得して、長時間コマンド・crash・承認待ちを区別する。長時間コマンドが動作中なら待機を継続し、診断時刻を更新する
 - 承認画面を検出した場合は Enter を自動送信しない。Codex では `-a never` 契約違反として最終出力を記録し、crash cleanup へ進む。Claude では安全な代替を指示できる場合だけ指示し、解消しなければ同様に cleanup する
 - boot payload の task timeout を超えたら最終ログ・launchd job 状態・exit status を保存し、crash cleanup へ進む
@@ -199,6 +204,7 @@ worker が crash / timeout した場合も同じ 1→3 の順序で片付け、�
 
 - boot payload が無い経路なので、**最初のタスクメッセージが Worker プロトコルの唯一の注入口**になる。1通目に `WORKER.md` の解決済み絶対パス、`send-report.sh <team> <worker_name> <orchestrator>` の引数契約、下記の heartbeat 間隔を必ず含める
 - worker は作業中、**5分を超えて無言にならないよう `WORKING` を送る**
+- pane を `herdr` で立てた場合は、`herdr pane process-info` で `agent_status` と foreground process を読み戻してから生存判定する
 - `WORKING` が10分途切れたら、orchestrator は推測で crash 判定せず、**該当 pane の状態確認をユーザーへ依頼する**（承認プロンプトで停止している可能性がある。pane は対話 TUI なので画面には出ているが、agmsg には何も流れない）
 - 打ち切るときは `STOP(task_id)` を送る。応答が無い場合、spawn 経路のような job 停止手段は無いので、**ユーザーに pane で中断してもらう**
 

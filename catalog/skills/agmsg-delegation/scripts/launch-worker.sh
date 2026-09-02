@@ -49,18 +49,72 @@ label_file="$run_dir/worker.label"
 # codex を親プロセス側で絶対パスへ解決しておく。launchd job は親の環境も cwd も
 # 継承せず、mise の shim 解決は cwd と MISE_ENV の両方に依存するため、worker 内では
 # codex を解決できない ("No version is set for shim" で起動不能。2026-08-27 に発生)。
+# MISE_ENV が launchd に継承されず、mise の npm 版 codex が node を要する wrapper の
+# まま渡ると同じ経路で即死するため、環境を wrapper に明示し、vendor の native binary を優先する。
 # worker 内で MISE_ENV を設定する方法は `latest` のネットワーク解決でハングするため使わない。
 # このスクリプトは親コンテキストで動くのでここでだけ解決できる。
 # claude は mise 管理外 (~/.local/bin) でどこでも解決できるため対象外。
-codex_bin_resolved=${AGMSG_CODEX_BIN:-}
-if [[ -z "$codex_bin_resolved" ]]; then
-	codex_bin_resolved=$(mise which codex 2>/dev/null) || codex_bin_resolved=
-fi
+codex_is_native() {
+	local description
+	[[ -x "$1" ]] || return 1
+	description=$(file -b "$1" 2>/dev/null) || return 1
+	case "$description" in
+	*script*|*text*) return 1 ;;
+	Mach-O*|ELF*|PE32*) return 0 ;;
+	*) return 1 ;;
+	esac
+}
+
+resolve_codex_bin() {
+	local codex_path=${AGMSG_CODEX_BIN:-}
+	local install_root candidate native_path
+	if [[ -z "$codex_path" ]]; then
+		codex_path=$(mise which codex 2>/dev/null) || codex_path=
+	fi
+	[[ -n "$codex_path" && -x "$codex_path" ]] || return 1
+
+	if codex_is_native "$codex_path"; then
+		printf '%s\n' "$codex_path"
+		return 0
+	fi
+
+	install_root=$(cd -- "$(dirname -- "$codex_path")/.." 2>/dev/null && pwd -P) || install_root=
+	if [[ -n "$install_root" ]]; then
+		while IFS= read -r candidate; do
+			if codex_is_native "$candidate"; then
+				native_path=$candidate
+				printf '%s\n' "$native_path"
+				return 0
+			fi
+		done < <(find "$install_root" -type f -path '*/vendor/*/bin/codex' -perm -111 -print 2>/dev/null)
+	fi
+
+	# native binary が無い場合は、従来どおり npm wrapper を返して node の PATH 補完へ進む。
+	printf '%s\n' "$codex_path"
+}
+
+codex_bin_resolved=$(resolve_codex_bin) || codex_bin_resolved=
 [[ -n "$codex_bin_resolved" && -x "$codex_bin_resolved" ]] || codex_bin_resolved=
+
+codex_node_dir=
+if [[ -n "$codex_bin_resolved" ]] && ! codex_is_native "$codex_bin_resolved"; then
+	node_bin=$(mise which node 2>/dev/null) || node_bin=
+	if [[ -n "$node_bin" && -x "$node_bin" ]]; then
+		codex_node_dir=$(cd -- "$(dirname -- "$node_bin")" 2>/dev/null && pwd -P) || codex_node_dir=
+	fi
+fi
+
+mise_env=${MISE_ENV:-}
 
 umask 077
 {
 	printf '%s\n' '#!/usr/bin/env bash' 'set +e'
+	if [[ -n "$mise_env" ]]; then
+		printf 'export MISE_ENV=%q\n' "$mise_env"
+	fi
+	if [[ -n "$codex_node_dir" ]]; then
+		printf 'export PATH=%q\n' "$codex_node_dir:${PATH:-/usr/bin:/bin}"
+	fi
 	if [[ -n "$codex_bin_resolved" ]]; then
 		printf 'export AGMSG_CODEX_BIN=%q\n' "$codex_bin_resolved"
 	fi

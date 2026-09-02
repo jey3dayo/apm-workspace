@@ -14,7 +14,23 @@ AGMSG_REPORT
 ```
 
 - 各メッセージには必ず task_id を含める。同じ task_id の DONE / REVIEW は一度だけ送る（重複送信禁止）
-- 起動直後の手順: Claude は `/agmsg actas <自分の名前>` を実行する。Codex は actas を使わず、boot プロンプトで指定された from 名で send する。準備ができたら最初に `READY <task_id>` を agmsg で送り、send 成功後に標準出力へも `READY <task_id>` を1行出力する（orchestrator は worker log を fallback 診断に使う）。Claude worker は READY 本文に `session: $CLAUDE_CODE_SESSION_ID` を exact contract として含める。送信前に `[ -n "$CLAUDE_CODE_SESSION_ID" ]` で non-empty を検証し、空なら READY に `session: unknown` と明記する（orchestrator が終了時の lock 解放に使う）
+- 起動直後の手順: Claude は `/agmsg actas <自分の名前>` を実行する。Codex は actas を使わず、boot プロンプトで指定された from 名で send する。準備ができたら最初に `READY <task_id>` を agmsg で送り、send 成功後に標準出力へも `READY <task_id>` を1行出力する（orchestrator は worker log を fallback 診断に使う）。Claude worker は READY 本文に `session: <session_id>` を exact contract として含める。`CLAUDE_CODE_SESSION_ID` が non-empty ならその値を使い、空なら READY に `session: unknown` と明記する（orchestrator が終了時の lock 解放に使う）
+- Claude worker の READY は、session 値を heredoc の外で先に確定してから送る。quoted heredoc では変数が展開されないため、READY だけは次の unquoted heredoc を使い、送信直前に本文へリテラル `${` が残らないことを確認する。他の `WORKING` / `DONE` / `REVIEW` は quoted heredoc のままにする。理由は READY の session_id だけが実行時展開を必要とするためである。
+
+```bash
+session_id=${CLAUDE_CODE_SESSION_ID:-unknown}
+if [[ "$session_id" == *'${'* ]]; then
+  printf '%s\n' 'READY body contains an unexpanded variable.' >&2
+  exit 1
+fi
+~/.agents/skills/agmsg-delegation/scripts/send-report.sh <team> <自分> <orchestrator> <<AGMSG_REPORT
+READY <task_id>
+session: ${session_id}
+AGMSG_REPORT
+```
+
+`run-claude-worker.sh` は worker 起動時に `CLAUDE_CODE_SESSION_ID` を明示的に注入せず、環境を消去もしない。値が渡らない場合は launchd 起動元に変数が無いことが原因なので、DONE の blockers に記録する（この helper 自体で補わない）。
+
 - 作業が120秒を超える場合は、長いコマンドの実行前後または作業の区切りごとに `WORKING <task_id> <一行状況>` を送り、orchestrator が無通信を診断できるようにする
 - 判断に迷う点・ブロッカーが出たら、勝手に進めず `BLOCKED <task_id> <相談内容>` を送って指示を待つ
 - Claude / Codex とも headless の1 turn で終了する。**DONE / REVIEW を送ったら STOP を待たずにそのまま turn を終えてよい**（DONE / REVIEW が終了シグナル）
