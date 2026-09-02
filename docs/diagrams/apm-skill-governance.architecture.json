@@ -1,0 +1,340 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "APM スキル管理体制",
+    "output": "docs/diagrams/apm-skill-governance.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "managed-lane",
+        "label": "管理レーン (catalog + 外部)",
+        "focus": [
+          "catalog",
+          "upstream",
+          "manifest",
+          "deploy",
+          "claude_home",
+          "codex_home"
+        ],
+        "note": "catalog と外部 upstream は apm.yml / apm.lock.yaml を経由して deploy で配布される。"
+      },
+      {
+        "id": "local-lanes",
+        "label": "ローカル系レーン",
+        "focus": [
+          "private",
+          "deploy",
+          "wsonly",
+          "bridges",
+          "codex_home",
+          "claude_home"
+        ],
+        "note": "private は deploy の apply 段で catalog と同時に同期される。workspace-only は bridge symlink。"
+      },
+      {
+        "id": "repo-scoped",
+        "label": "repo 限定 / 手動レーン",
+        "focus": [
+          "optional",
+          "consumer_repo",
+          "manual",
+          "deploy"
+        ],
+        "note": "optional-skills は利用側 repo が直接 ref を入れる。manual は managed lane が使えない時だけ。"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "catalog",
+      "type": "database",
+      "label": "catalog/**",
+      "sublabel": "個人グローバル skill + 共有 guidance",
+      "pos": [
+        40,
+        40
+      ],
+      "size": [
+        200,
+        64
+      ],
+      "tag": "正本"
+    },
+    {
+      "id": "upstream",
+      "type": "external",
+      "label": "外部 upstream skill",
+      "sublabel": "GitHub 上の他者 skill",
+      "pos": [
+        40,
+        130
+      ],
+      "size": [
+        200,
+        64
+      ]
+    },
+    {
+      "id": "manual",
+      "type": "external",
+      "label": "manual-skills/",
+      "sublabel": "upstream の手動コピー",
+      "pos": [
+        40,
+        220
+      ],
+      "size": [
+        200,
+        64
+      ],
+      "tag": "例外レーン"
+    },
+    {
+      "id": "private",
+      "type": "security",
+      "label": "private-skills/",
+      "sublabel": "gitignored (正本は private repo)",
+      "pos": [
+        40,
+        310
+      ],
+      "size": [
+        200,
+        64
+      ],
+      "tag": "同名 catalog を上書き"
+    },
+    {
+      "id": "optional",
+      "type": "database",
+      "label": "optional-skills/<id>",
+      "sublabel": "repo 限定 skill",
+      "pos": [
+        40,
+        400
+      ],
+      "size": [
+        200,
+        64
+      ]
+    },
+    {
+      "id": "wsonly",
+      "type": "database",
+      "label": ".apm/skills/**",
+      "sublabel": "workspace 専用 skill",
+      "pos": [
+        40,
+        490
+      ],
+      "size": [
+        200,
+        64
+      ]
+    },
+    {
+      "id": "manifest",
+      "type": "security",
+      "label": "apm.yml + apm.lock.yaml",
+      "sublabel": "依存宣言と確定した解決",
+      "pos": [
+        560,
+        85
+      ],
+      "size": [
+        220,
+        64
+      ],
+      "tag": "global MCP もここ"
+    },
+    {
+      "id": "deploy",
+      "type": "backend",
+      "label": "mise run deploy",
+      "sublabel": "check → apply → doctor (private も同期)",
+      "pos": [
+        560,
+        265
+      ],
+      "size": [
+        220,
+        64
+      ],
+      "tag": "apm_modules/ を再生成"
+    },
+    {
+      "id": "bridges",
+      "type": "backend",
+      "label": "workspace 内 bridge",
+      "sublabel": ".claude/skills + .agents/skills",
+      "pos": [
+        560,
+        490
+      ],
+      "size": [
+        220,
+        64
+      ],
+      "tag": "symlink・手編集禁止"
+    },
+    {
+      "id": "claude_home",
+      "type": "frontend",
+      "label": "~/.claude/",
+      "sublabel": "Claude Code 配布先",
+      "pos": [
+        1080,
+        130
+      ],
+      "size": [
+        200,
+        64
+      ]
+    },
+    {
+      "id": "codex_home",
+      "type": "frontend",
+      "label": "~/.agents/skills + ~/.codex/",
+      "sublabel": "Codex 配布先 (AGENTS.md は compile)",
+      "pos": [
+        1080,
+        310
+      ],
+      "size": [
+        200,
+        64
+      ]
+    },
+    {
+      "id": "consumer_repo",
+      "type": "frontend",
+      "label": "利用側リポジトリ",
+      "sublabel": "repo-local apm.yml",
+      "pos": [
+        1080,
+        400
+      ],
+      "size": [
+        200,
+        64
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "~/.apm workspace (source of truth)",
+      "wraps": [
+        "catalog",
+        "upstream",
+        "manual",
+        "private",
+        "optional",
+        "wsonly",
+        "manifest",
+        "deploy",
+        "bridges"
+      ]
+    },
+    {
+      "kind": "security-group",
+      "label": "配布先: 再生成のみ・手編集禁止",
+      "wraps": [
+        "claude_home",
+        "codex_home"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "catalog-register",
+      "from": "catalog",
+      "to": "manifest",
+      "label": "install:catalog (push 済み ref)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "upstream-declare",
+      "from": "upstream",
+      "to": "manifest",
+      "label": "apm.yml で宣言、lock で固定",
+      "variant": "emphasis"
+    },
+    {
+      "id": "manual-fallback",
+      "from": "manual",
+      "to": "deploy",
+      "label": "managed lane 不可時のみ",
+      "variant": "dashed"
+    },
+    {
+      "id": "manifest-deploy",
+      "from": "manifest",
+      "to": "deploy",
+      "label": "解決した依存を配布",
+      "variant": "emphasis",
+      "labelDy": 24
+    },
+    {
+      "id": "deploy-claude",
+      "from": "deploy",
+      "to": "claude_home",
+      "label": "apm apply"
+    },
+    {
+      "id": "deploy-codex",
+      "from": "deploy",
+      "to": "codex_home",
+      "label": "apm apply + compile --target codex"
+    },
+    {
+      "id": "private-sync",
+      "from": "private",
+      "to": "deploy",
+      "label": "deploy の apply 段で同期 (fast path: apply:skills:local)"
+    },
+    {
+      "id": "optional-install",
+      "from": "optional",
+      "to": "consumer_repo",
+      "label": "repo 側が直接 ref を install",
+      "variant": "dashed"
+    },
+    {
+      "id": "wsonly-bridge",
+      "from": "wsonly",
+      "to": "bridges",
+      "label": "symlink"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "管理レーン (通常経路)",
+      "items": [
+        "catalog は編集後 push し install:catalog で apm.yml に登録",
+        "外部 skill は apm.yml に宣言し apm.lock.yaml で解決を固定",
+        "mise run deploy が check → apply → doctor を一括実行"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "レーン選択の基準",
+      "items": [
+        "グローバル個人用は catalog、選択 repo 用は optional-skills",
+        "機材ローカルは private-skills（deploy で catalog と同時同期）、workspace 専用は .apm/skills",
+        "managed lane で package / deploy できない upstream だけ manual へ"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "禁止・注意",
+      "items": [
+        "apm_modules/ と ~/.claude ~/.codex ~/.agents は cache / 配布先。手編集せず再生成",
+        "upgrade は upstream 更新を受け入れる。通常 rollout は deploy",
+        "外部依存の追加・削除は docs/package-decisions.md に記録"
+      ]
+    }
+  ]
+}

@@ -6,6 +6,10 @@
 
 ## レーン一覧
 
+全体像の図は [`diagrams/apm-skill-governance.html`](diagrams/apm-skill-governance.html)
+（ローカルで開く。正本は隣の `.architecture.json`）。再生成は
+`node ~/.claude/skills/archify/bin/archify.mjs deliver architecture <json> <html> --quality showcase`。
+
 | レーン                 | 正本                                 | 配布                                                                                    | 用途                                                               |
 | ---------------------- | ------------------------------------ | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
 | global（外部）         | root `apm.yml` の `dependencies.apm` | 全リポジトリへ自動 rollout                                                              | 横断的に使う外部スキル                                             |
