@@ -92,7 +92,7 @@ Before installing into or reviewing a `repository-local` manifest, check its
 repository. A `targets: [codex]`-only manifest never deploys to
 `.claude/skills/`; add `claude` (and `agent-skills` when applicable) whenever
 Claude Code is one of the repository's runtimes, otherwise every
-repository-local skill or MCP silently misses Claude Code. `apm-repo-bootstrap`
+repository-local skill or MCP silently misses Claude Code. `apm-repo-manifest`
 preserves the repository's existing target style by design and does not check
 this — this gate is this skill's responsibility, not that one's.
 
@@ -147,9 +147,9 @@ If a manual skill becomes a workspace-owned skill that will be tuned over time, 
 - For an optional skill embedded in an external bundle, keep the external
   package as the source of truth and select it in the consuming repository with
   `apm install <package-ref> --skill <id>`.
-- If the request is to scan an arbitrary repository and create, update, or clean up its repo-local `apm.yml`, use `apm-repo-bootstrap`; keep this skill focused on global APM ownership and rollout decisions.
+- If the request is to scan an arbitrary repository and create, update, or clean up its repo-local `apm.yml`, use `apm-repo-manifest`; keep this skill focused on global APM ownership and rollout decisions.
 - If the request is to add an MCP server through APM, apply the same scope rule: use `apm install -g --mcp <name> ...` only for cross-repo foundation MCPs; use repo-local `apm install --mcp <name> ...` for project, framework, UI, database, browser, or app-runtime-specific MCPs.
-- If MCP placement, server selection, credentials, transport, or startup behavior is the main question, coordinate with `mcp-tools`; keep this skill focused on APM ownership, source of truth, and rollout commands.
+- When an MCP server fails to start, check the sequence: (1) whether the executable exists and is executable, (2) whether the args are valid, (3) whether required env is injected, and (4) whether the config syntax is valid.
 - If the APM workspace has no repo-local MCP distribution lane for a target repository, record the intended placement as guidance and keep the global manifest lightweight. Treat implementing repo-local MCP distribution as a separate workspace-mechanics task.
 - If the request is "change only workspace docs or notes", edit the workspace files directly and do not restage the catalog unless `catalog/**` changed too.
 

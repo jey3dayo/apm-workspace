@@ -1,11 +1,11 @@
 ---
-name: apm-repo-bootstrap
-description: Use when scanning a repository to create, update, or clean up a repo-local `apm.yml` and install appropriate local APM skills or MCPs. Use for requests like `repo に apm.yml を置いて`, `この repo におすすめ skill 入れて`, `ローカルスキル整理`, `repo-local APM bootstrap`, or moving infra/runtime-specific skills out of global APM. Coordinate with `apm-usage` for global workspace ownership, lockfile rollout, and deployed target rules.
+name: apm-repo-manifest
+description: Use when scanning a repository to create, update, or clean up a repo-local `apm.yml` and install appropriate local APM skills or MCPs. Use for requests like `repo に apm.yml を置いて`, `この repo におすすめ skill 入れて`, `ローカルスキル整理`, `repo-local apm.yml を整理`, or moving infra/runtime-specific skills out of global APM. Coordinate with `apm-usage` for global workspace ownership, lockfile rollout, and deployed target rules.
 metadata:
-  short-description: Bootstrap repo-local APM dependencies
+  short-description: Create or clean up a repo-local apm.yml
 ---
 
-# APM Repo Bootstrap
+# APM Repo Manifest
 
 Scan the current repository, choose repo-local APM dependencies from concrete source-tree signals, and create or update the repository's `apm.yml` without turning common global preferences into local clutter.
 

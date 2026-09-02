@@ -1,0 +1,4 @@
+interface:
+  display_name: "dotenvx"
+  short_description: "Operate dotenvx env files and clean CLI environments safely"
+  default_prompt: "Use $dotenvx to decide whether this command should run with dotenvx, a clean environment, or sanitized AWS variables."

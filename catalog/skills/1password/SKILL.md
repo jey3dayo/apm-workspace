@@ -1,9 +1,9 @@
 ---
-name: 1password-item-ops
-description: Use when working with 1Password CLI (`op`) to find, inspect, create, edit, or update items such as logins, secure notes, API credentials, service-account token items, and dotenvx `.env.keys` file attachments. Defaults to the Personal vault, authenticates via dotenvx-managed `OP_SERVICE_ACCOUNT_TOKEN` when provided, and never exposes secret values. For dotenvx key rotation, `dotenvx-env-ops` leads the end-to-end procedure; this skill handles only the 1Password item update step.
+name: 1password
+description: Use when working with 1Password CLI (`op`) to find, inspect, create, edit, or update items such as logins, secure notes, API credentials, service-account token items, and dotenvx `.env.keys` file attachments. Defaults to the Personal vault, authenticates via dotenvx-managed `OP_SERVICE_ACCOUNT_TOKEN` when provided, and never exposes secret values. Covers the `op` CLI only; 1Password Environments and local `.env` file generation belong to the `1password` MCP server. For dotenvx key rotation, `dotenvx` leads the end-to-end procedure; this skill handles only the 1Password item update step.
 ---
 
-# 1Password Item Ops
+# 1Password
 
 Manage 1Password items through `op` while keeping secrets out of the conversation, shell history, and logs.
 
