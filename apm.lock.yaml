@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-09-02T10:28:13.128781+00:00'
+generated_at: '2026-09-02T12:20:31.593368+00:00'
 apm_version: 0.29.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -5098,7 +5098,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: a18140a5961996ae57a3320d6773d8e391e1cbaa
+  resolved_commit: 2b459ebde1c48fe11175240e80cbb152828535f9
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -5225,20 +5225,6 @@ dependencies:
   - .agents/skills/dotenvx/SKILL.md
   - .agents/skills/dotenvx/agents/openai.yaml
   - .agents/skills/dotenvx/references/asta-dotenvx.md
-  - .agents/skills/gh-address-comments
-  - .agents/skills/gh-address-comments/LICENSE.txt
-  - .agents/skills/gh-address-comments/SKILL.md
-  - .agents/skills/gh-address-comments/agents/openai.yaml
-  - .agents/skills/gh-address-comments/assets/github-small.svg
-  - .agents/skills/gh-address-comments/assets/github.png
-  - .agents/skills/gh-address-comments/scripts/fetch_comments.py
-  - .agents/skills/gh-fix-ci
-  - .agents/skills/gh-fix-ci/LICENSE.txt
-  - .agents/skills/gh-fix-ci/SKILL.md
-  - .agents/skills/gh-fix-ci/agents/openai.yaml
-  - .agents/skills/gh-fix-ci/assets/github-small.svg
-  - .agents/skills/gh-fix-ci/assets/github.png
-  - .agents/skills/gh-fix-ci/scripts/inspect_pr_checks.py
   - .agents/skills/git-branch-cleanup
   - .agents/skills/git-branch-cleanup/SKILL.md
   - .agents/skills/git-branch-cleanup/agents/openai.yaml
@@ -5406,20 +5392,6 @@ dependencies:
   - .claude/skills/dotenvx/SKILL.md
   - .claude/skills/dotenvx/agents/openai.yaml
   - .claude/skills/dotenvx/references/asta-dotenvx.md
-  - .claude/skills/gh-address-comments
-  - .claude/skills/gh-address-comments/LICENSE.txt
-  - .claude/skills/gh-address-comments/SKILL.md
-  - .claude/skills/gh-address-comments/agents/openai.yaml
-  - .claude/skills/gh-address-comments/assets/github-small.svg
-  - .claude/skills/gh-address-comments/assets/github.png
-  - .claude/skills/gh-address-comments/scripts/fetch_comments.py
-  - .claude/skills/gh-fix-ci
-  - .claude/skills/gh-fix-ci/LICENSE.txt
-  - .claude/skills/gh-fix-ci/SKILL.md
-  - .claude/skills/gh-fix-ci/agents/openai.yaml
-  - .claude/skills/gh-fix-ci/assets/github-small.svg
-  - .claude/skills/gh-fix-ci/assets/github.png
-  - .claude/skills/gh-fix-ci/scripts/inspect_pr_checks.py
   - .claude/skills/git-branch-cleanup
   - .claude/skills/git-branch-cleanup/SKILL.md
   - .claude/skills/git-branch-cleanup/agents/openai.yaml
@@ -5573,20 +5545,6 @@ dependencies:
   - .config/opencode/skills/dotenvx/SKILL.md
   - .config/opencode/skills/dotenvx/agents/openai.yaml
   - .config/opencode/skills/dotenvx/references/asta-dotenvx.md
-  - .config/opencode/skills/gh-address-comments
-  - .config/opencode/skills/gh-address-comments/LICENSE.txt
-  - .config/opencode/skills/gh-address-comments/SKILL.md
-  - .config/opencode/skills/gh-address-comments/agents/openai.yaml
-  - .config/opencode/skills/gh-address-comments/assets/github-small.svg
-  - .config/opencode/skills/gh-address-comments/assets/github.png
-  - .config/opencode/skills/gh-address-comments/scripts/fetch_comments.py
-  - .config/opencode/skills/gh-fix-ci
-  - .config/opencode/skills/gh-fix-ci/LICENSE.txt
-  - .config/opencode/skills/gh-fix-ci/SKILL.md
-  - .config/opencode/skills/gh-fix-ci/agents/openai.yaml
-  - .config/opencode/skills/gh-fix-ci/assets/github-small.svg
-  - .config/opencode/skills/gh-fix-ci/assets/github.png
-  - .config/opencode/skills/gh-fix-ci/scripts/inspect_pr_checks.py
   - .config/opencode/skills/git-branch-cleanup
   - .config/opencode/skills/git-branch-cleanup/SKILL.md
   - .config/opencode/skills/git-branch-cleanup/agents/openai.yaml
@@ -5777,18 +5735,6 @@ dependencies:
     .agents/skills/dotenvx/SKILL.md: sha256:8242451e4121b244890dcda36b860172892d0ea87ec822aa07c2020d1ee8d453
     .agents/skills/dotenvx/agents/openai.yaml: sha256:594feb9be08e2107ef649630aa69ae7b566c0344d4e4ac193b9620a5198c8c8b
     .agents/skills/dotenvx/references/asta-dotenvx.md: sha256:7d40a7f448f3464de894cedd9daa68082f8bfebbf870e77d41bffaf96bf85cf2
-    .agents/skills/gh-address-comments/LICENSE.txt: sha256:58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd
-    .agents/skills/gh-address-comments/SKILL.md: sha256:d266b583e4d5c5811132f9f24743b16472a14e251ce64aaaf772a2e7bf663e41
-    .agents/skills/gh-address-comments/agents/openai.yaml: sha256:8b9f604d79717d5aec58abfb192f2d713c45b5558f5572255d9f9e5d39877ee0
-    .agents/skills/gh-address-comments/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
-    .agents/skills/gh-address-comments/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
-    .agents/skills/gh-address-comments/scripts/fetch_comments.py: sha256:d7bc64f6b26f7482f9ca9dd7c923a5b8b20e1ef13491ae2d9052cd208a7c1ad1
-    .agents/skills/gh-fix-ci/LICENSE.txt: sha256:4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9
-    .agents/skills/gh-fix-ci/SKILL.md: sha256:a2770f3a24aa08c7eb459e8eedb0e77de0fb8f9c26f8623bbea74b3283f11373
-    .agents/skills/gh-fix-ci/agents/openai.yaml: sha256:ee649f6606ff1e5512bf07ab5732ee4690fc04d529b9717b507fd10120878fca
-    .agents/skills/gh-fix-ci/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
-    .agents/skills/gh-fix-ci/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
-    .agents/skills/gh-fix-ci/scripts/inspect_pr_checks.py: sha256:9459e5b03f86785d184a83e5cd8d621b832e918ec04158a2962d867785812c6c
     .agents/skills/git-branch-cleanup/SKILL.md: sha256:17507a784e9b830f67d7ac7fef6fde762dd4d6416bfeedb951493ff275c0c625
     .agents/skills/git-branch-cleanup/agents/openai.yaml: sha256:e6c11f6e2e50b9f9d93f9f127327ee1ff81f7b8043bf5866f0fea61ffdc9ecdd
     .agents/skills/git-worktree/SKILL.md: sha256:a5e9d2f45c77fccef843c3f99f8d7c2ce5d7df249664c264f217a27fa86add75
@@ -5919,18 +5865,6 @@ dependencies:
     .claude/skills/dotenvx/SKILL.md: sha256:8242451e4121b244890dcda36b860172892d0ea87ec822aa07c2020d1ee8d453
     .claude/skills/dotenvx/agents/openai.yaml: sha256:594feb9be08e2107ef649630aa69ae7b566c0344d4e4ac193b9620a5198c8c8b
     .claude/skills/dotenvx/references/asta-dotenvx.md: sha256:7d40a7f448f3464de894cedd9daa68082f8bfebbf870e77d41bffaf96bf85cf2
-    .claude/skills/gh-address-comments/LICENSE.txt: sha256:58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd
-    .claude/skills/gh-address-comments/SKILL.md: sha256:d266b583e4d5c5811132f9f24743b16472a14e251ce64aaaf772a2e7bf663e41
-    .claude/skills/gh-address-comments/agents/openai.yaml: sha256:8b9f604d79717d5aec58abfb192f2d713c45b5558f5572255d9f9e5d39877ee0
-    .claude/skills/gh-address-comments/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
-    .claude/skills/gh-address-comments/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
-    .claude/skills/gh-address-comments/scripts/fetch_comments.py: sha256:d7bc64f6b26f7482f9ca9dd7c923a5b8b20e1ef13491ae2d9052cd208a7c1ad1
-    .claude/skills/gh-fix-ci/LICENSE.txt: sha256:4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9
-    .claude/skills/gh-fix-ci/SKILL.md: sha256:a2770f3a24aa08c7eb459e8eedb0e77de0fb8f9c26f8623bbea74b3283f11373
-    .claude/skills/gh-fix-ci/agents/openai.yaml: sha256:ee649f6606ff1e5512bf07ab5732ee4690fc04d529b9717b507fd10120878fca
-    .claude/skills/gh-fix-ci/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
-    .claude/skills/gh-fix-ci/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
-    .claude/skills/gh-fix-ci/scripts/inspect_pr_checks.py: sha256:9459e5b03f86785d184a83e5cd8d621b832e918ec04158a2962d867785812c6c
     .claude/skills/git-branch-cleanup/SKILL.md: sha256:17507a784e9b830f67d7ac7fef6fde762dd4d6416bfeedb951493ff275c0c625
     .claude/skills/git-branch-cleanup/agents/openai.yaml: sha256:e6c11f6e2e50b9f9d93f9f127327ee1ff81f7b8043bf5866f0fea61ffdc9ecdd
     .claude/skills/git-worktree/SKILL.md: sha256:a5e9d2f45c77fccef843c3f99f8d7c2ce5d7df249664c264f217a27fa86add75
@@ -6048,18 +5982,6 @@ dependencies:
     .config/opencode/skills/dotenvx/SKILL.md: sha256:8242451e4121b244890dcda36b860172892d0ea87ec822aa07c2020d1ee8d453
     .config/opencode/skills/dotenvx/agents/openai.yaml: sha256:594feb9be08e2107ef649630aa69ae7b566c0344d4e4ac193b9620a5198c8c8b
     .config/opencode/skills/dotenvx/references/asta-dotenvx.md: sha256:7d40a7f448f3464de894cedd9daa68082f8bfebbf870e77d41bffaf96bf85cf2
-    .config/opencode/skills/gh-address-comments/LICENSE.txt: sha256:58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd
-    .config/opencode/skills/gh-address-comments/SKILL.md: sha256:d266b583e4d5c5811132f9f24743b16472a14e251ce64aaaf772a2e7bf663e41
-    .config/opencode/skills/gh-address-comments/agents/openai.yaml: sha256:8b9f604d79717d5aec58abfb192f2d713c45b5558f5572255d9f9e5d39877ee0
-    .config/opencode/skills/gh-address-comments/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
-    .config/opencode/skills/gh-address-comments/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
-    .config/opencode/skills/gh-address-comments/scripts/fetch_comments.py: sha256:d7bc64f6b26f7482f9ca9dd7c923a5b8b20e1ef13491ae2d9052cd208a7c1ad1
-    .config/opencode/skills/gh-fix-ci/LICENSE.txt: sha256:4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9
-    .config/opencode/skills/gh-fix-ci/SKILL.md: sha256:a2770f3a24aa08c7eb459e8eedb0e77de0fb8f9c26f8623bbea74b3283f11373
-    .config/opencode/skills/gh-fix-ci/agents/openai.yaml: sha256:ee649f6606ff1e5512bf07ab5732ee4690fc04d529b9717b507fd10120878fca
-    .config/opencode/skills/gh-fix-ci/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
-    .config/opencode/skills/gh-fix-ci/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
-    .config/opencode/skills/gh-fix-ci/scripts/inspect_pr_checks.py: sha256:9459e5b03f86785d184a83e5cd8d621b832e918ec04158a2962d867785812c6c
     .config/opencode/skills/git-branch-cleanup/SKILL.md: sha256:17507a784e9b830f67d7ac7fef6fde762dd4d6416bfeedb951493ff275c0c625
     .config/opencode/skills/git-branch-cleanup/agents/openai.yaml: sha256:e6c11f6e2e50b9f9d93f9f127327ee1ff81f7b8043bf5866f0fea61ffdc9ecdd
     .config/opencode/skills/git-worktree/SKILL.md: sha256:a5e9d2f45c77fccef843c3f99f8d7c2ce5d7df249664c264f217a27fa86add75
@@ -6130,17 +6052,97 @@ dependencies:
     .config/opencode/skills/tuxedo/references/tui-and-capture.md: sha256:13278531ebad1f152047aaebc247eacbfd69f75ba1887e3a611627c94a31f684
     .config/opencode/skills/web-research/SKILL.md: sha256:07109256e91fdd784259fc941efda1b914465da458587c85831a087f70f2b941
     .config/opencode/skills/web-research/agents/openai.yaml: sha256:50536a04fbc72b0f71fc9975a7e041893912ebfcaf9c671439843d20172e1264
-  content_hash: sha256:2289f3241a429a116a77b95f340d5ed0d7b863c93d2ffcc6847aed11f78185b6
+  content_hash: sha256:2a3e9f1186de0af682509c4eb64e72b167d3f0724e875d9ef3049fb3d122ad35
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
-  resolved_commit: a18140a5961996ae57a3320d6773d8e391e1cbaa
+  resolved_commit: 2b459ebde1c48fe11175240e80cbb152828535f9
   resolved_ref: main
   version: 1.0.0
   virtual_path: manual-skills
   is_virtual: true
   package_type: apm_package
-  content_hash: sha256:c9adaaf42924bc9edc428c03d4ed3465bdd46305c3437d5f4b1d1ee4346c69fe
+  deployed_files:
+  - .agents/skills/gh-address-comments
+  - .agents/skills/gh-address-comments/LICENSE.txt
+  - .agents/skills/gh-address-comments/SKILL.md
+  - .agents/skills/gh-address-comments/agents/openai.yaml
+  - .agents/skills/gh-address-comments/assets/github-small.svg
+  - .agents/skills/gh-address-comments/assets/github.png
+  - .agents/skills/gh-address-comments/scripts/fetch_comments.py
+  - .agents/skills/gh-fix-ci
+  - .agents/skills/gh-fix-ci/LICENSE.txt
+  - .agents/skills/gh-fix-ci/SKILL.md
+  - .agents/skills/gh-fix-ci/agents/openai.yaml
+  - .agents/skills/gh-fix-ci/assets/github-small.svg
+  - .agents/skills/gh-fix-ci/assets/github.png
+  - .agents/skills/gh-fix-ci/scripts/inspect_pr_checks.py
+  - .claude/skills/gh-address-comments
+  - .claude/skills/gh-address-comments/LICENSE.txt
+  - .claude/skills/gh-address-comments/SKILL.md
+  - .claude/skills/gh-address-comments/agents/openai.yaml
+  - .claude/skills/gh-address-comments/assets/github-small.svg
+  - .claude/skills/gh-address-comments/assets/github.png
+  - .claude/skills/gh-address-comments/scripts/fetch_comments.py
+  - .claude/skills/gh-fix-ci
+  - .claude/skills/gh-fix-ci/LICENSE.txt
+  - .claude/skills/gh-fix-ci/SKILL.md
+  - .claude/skills/gh-fix-ci/agents/openai.yaml
+  - .claude/skills/gh-fix-ci/assets/github-small.svg
+  - .claude/skills/gh-fix-ci/assets/github.png
+  - .claude/skills/gh-fix-ci/scripts/inspect_pr_checks.py
+  - .config/opencode/skills/gh-address-comments
+  - .config/opencode/skills/gh-address-comments/LICENSE.txt
+  - .config/opencode/skills/gh-address-comments/SKILL.md
+  - .config/opencode/skills/gh-address-comments/agents/openai.yaml
+  - .config/opencode/skills/gh-address-comments/assets/github-small.svg
+  - .config/opencode/skills/gh-address-comments/assets/github.png
+  - .config/opencode/skills/gh-address-comments/scripts/fetch_comments.py
+  - .config/opencode/skills/gh-fix-ci
+  - .config/opencode/skills/gh-fix-ci/LICENSE.txt
+  - .config/opencode/skills/gh-fix-ci/SKILL.md
+  - .config/opencode/skills/gh-fix-ci/agents/openai.yaml
+  - .config/opencode/skills/gh-fix-ci/assets/github-small.svg
+  - .config/opencode/skills/gh-fix-ci/assets/github.png
+  - .config/opencode/skills/gh-fix-ci/scripts/inspect_pr_checks.py
+  deployed_file_hashes:
+    .agents/skills/gh-address-comments/LICENSE.txt: sha256:58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd
+    .agents/skills/gh-address-comments/SKILL.md: sha256:d266b583e4d5c5811132f9f24743b16472a14e251ce64aaaf772a2e7bf663e41
+    .agents/skills/gh-address-comments/agents/openai.yaml: sha256:8b9f604d79717d5aec58abfb192f2d713c45b5558f5572255d9f9e5d39877ee0
+    .agents/skills/gh-address-comments/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
+    .agents/skills/gh-address-comments/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
+    .agents/skills/gh-address-comments/scripts/fetch_comments.py: sha256:d7bc64f6b26f7482f9ca9dd7c923a5b8b20e1ef13491ae2d9052cd208a7c1ad1
+    .agents/skills/gh-fix-ci/LICENSE.txt: sha256:4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9
+    .agents/skills/gh-fix-ci/SKILL.md: sha256:a2770f3a24aa08c7eb459e8eedb0e77de0fb8f9c26f8623bbea74b3283f11373
+    .agents/skills/gh-fix-ci/agents/openai.yaml: sha256:ee649f6606ff1e5512bf07ab5732ee4690fc04d529b9717b507fd10120878fca
+    .agents/skills/gh-fix-ci/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
+    .agents/skills/gh-fix-ci/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
+    .agents/skills/gh-fix-ci/scripts/inspect_pr_checks.py: sha256:9459e5b03f86785d184a83e5cd8d621b832e918ec04158a2962d867785812c6c
+    .claude/skills/gh-address-comments/LICENSE.txt: sha256:58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd
+    .claude/skills/gh-address-comments/SKILL.md: sha256:d266b583e4d5c5811132f9f24743b16472a14e251ce64aaaf772a2e7bf663e41
+    .claude/skills/gh-address-comments/agents/openai.yaml: sha256:8b9f604d79717d5aec58abfb192f2d713c45b5558f5572255d9f9e5d39877ee0
+    .claude/skills/gh-address-comments/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
+    .claude/skills/gh-address-comments/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
+    .claude/skills/gh-address-comments/scripts/fetch_comments.py: sha256:d7bc64f6b26f7482f9ca9dd7c923a5b8b20e1ef13491ae2d9052cd208a7c1ad1
+    .claude/skills/gh-fix-ci/LICENSE.txt: sha256:4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9
+    .claude/skills/gh-fix-ci/SKILL.md: sha256:a2770f3a24aa08c7eb459e8eedb0e77de0fb8f9c26f8623bbea74b3283f11373
+    .claude/skills/gh-fix-ci/agents/openai.yaml: sha256:ee649f6606ff1e5512bf07ab5732ee4690fc04d529b9717b507fd10120878fca
+    .claude/skills/gh-fix-ci/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
+    .claude/skills/gh-fix-ci/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
+    .claude/skills/gh-fix-ci/scripts/inspect_pr_checks.py: sha256:9459e5b03f86785d184a83e5cd8d621b832e918ec04158a2962d867785812c6c
+    .config/opencode/skills/gh-address-comments/LICENSE.txt: sha256:58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd
+    .config/opencode/skills/gh-address-comments/SKILL.md: sha256:d266b583e4d5c5811132f9f24743b16472a14e251ce64aaaf772a2e7bf663e41
+    .config/opencode/skills/gh-address-comments/agents/openai.yaml: sha256:8b9f604d79717d5aec58abfb192f2d713c45b5558f5572255d9f9e5d39877ee0
+    .config/opencode/skills/gh-address-comments/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
+    .config/opencode/skills/gh-address-comments/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
+    .config/opencode/skills/gh-address-comments/scripts/fetch_comments.py: sha256:d7bc64f6b26f7482f9ca9dd7c923a5b8b20e1ef13491ae2d9052cd208a7c1ad1
+    .config/opencode/skills/gh-fix-ci/LICENSE.txt: sha256:4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9
+    .config/opencode/skills/gh-fix-ci/SKILL.md: sha256:a2770f3a24aa08c7eb459e8eedb0e77de0fb8f9c26f8623bbea74b3283f11373
+    .config/opencode/skills/gh-fix-ci/agents/openai.yaml: sha256:ee649f6606ff1e5512bf07ab5732ee4690fc04d529b9717b507fd10120878fca
+    .config/opencode/skills/gh-fix-ci/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
+    .config/opencode/skills/gh-fix-ci/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
+    .config/opencode/skills/gh-fix-ci/scripts/inspect_pr_checks.py: sha256:9459e5b03f86785d184a83e5cd8d621b832e918ec04158a2962d867785812c6c
+  content_hash: sha256:a24e011b9bc66373b8cd912107dca25a2917b63e707ad390aa6ad12325dd62b1
 - repo_url: lum1104/understand-anything
   materialization_repo_url: Lum1104/Understand-Anything
   name: understand
@@ -6817,7 +6819,7 @@ dependencies:
 - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
   name: ui-ux-pro-max
   host: github.com
-  resolved_commit: e2effd57755d580318cce65ea1b2f98d896d5d40
+  resolved_commit: 58c220ff9d02be80523b06c03471925c52e8ab5d
   version: 2.13.0
   package_type: marketplace_plugin
   deployed_files:
@@ -7257,7 +7259,7 @@ dependencies:
     .config/opencode/skills/ui-ux-pro-max/scripts/tests/test_text_layout_resilience.py: sha256:b51d32ee8a15505b87cb81957fb2d1b385e041e8beb4463c311d236bfd29ebd4
     .config/opencode/skills/ui-ux-pro-max/scripts/tests/test_web_stack_freshness.py: sha256:becc5fa40e7516613d4e9930f226aa483e3796090c17cb16542c93d1927e680d
     .config/opencode/skills/ui-ux-pro-max/scripts/validate_data.py: sha256:a599aa256049cf30954d1f164721b99e453eb7e4cb8241bcab2d5573e6cf58b8
-  content_hash: sha256:deee56a06a544e854ed2231af7d3178e68280e843a896c9512acab3c763eee54
+  content_hash: sha256:a07b91470b5a5123f07221a5d00538bca64fb9bfb75f4d09fcdc8a16382c94cd
   skill_subset:
   - ui-ux-pro-max
   declared_license: MIT
@@ -19356,8 +19358,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: null
 - kind: project-relative
   target: claude
@@ -19365,8 +19367,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd
 - kind: project-relative
   target: claude
@@ -19374,8 +19376,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:d266b583e4d5c5811132f9f24743b16472a14e251ce64aaaf772a2e7bf663e41
 - kind: project-relative
   target: claude
@@ -19383,8 +19385,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:8b9f604d79717d5aec58abfb192f2d713c45b5558f5572255d9f9e5d39877ee0
 - kind: project-relative
   target: claude
@@ -19392,8 +19394,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
 - kind: project-relative
   target: claude
@@ -19401,8 +19403,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
 - kind: project-relative
   target: claude
@@ -19410,8 +19412,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:d7bc64f6b26f7482f9ca9dd7c923a5b8b20e1ef13491ae2d9052cd208a7c1ad1
 - kind: project-relative
   target: claude
@@ -19419,8 +19421,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: null
 - kind: project-relative
   target: claude
@@ -19428,8 +19430,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9
 - kind: project-relative
   target: claude
@@ -19437,8 +19439,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:a2770f3a24aa08c7eb459e8eedb0e77de0fb8f9c26f8623bbea74b3283f11373
 - kind: project-relative
   target: claude
@@ -19446,8 +19448,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:ee649f6606ff1e5512bf07ab5732ee4690fc04d529b9717b507fd10120878fca
 - kind: project-relative
   target: claude
@@ -19455,8 +19457,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
 - kind: project-relative
   target: claude
@@ -19464,8 +19466,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
 - kind: project-relative
   target: claude
@@ -19473,8 +19475,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:9459e5b03f86785d184a83e5cd8d621b832e918ec04158a2962d867785812c6c
 - kind: project-relative
   target: claude
@@ -31911,8 +31913,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: null
 - kind: project-relative
   target: codex
@@ -31920,8 +31922,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd
 - kind: project-relative
   target: codex
@@ -31929,8 +31931,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:d266b583e4d5c5811132f9f24743b16472a14e251ce64aaaf772a2e7bf663e41
 - kind: project-relative
   target: codex
@@ -31938,8 +31940,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:8b9f604d79717d5aec58abfb192f2d713c45b5558f5572255d9f9e5d39877ee0
 - kind: project-relative
   target: codex
@@ -31947,8 +31949,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
 - kind: project-relative
   target: codex
@@ -31956,8 +31958,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
 - kind: project-relative
   target: codex
@@ -31965,8 +31967,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:d7bc64f6b26f7482f9ca9dd7c923a5b8b20e1ef13491ae2d9052cd208a7c1ad1
 - kind: project-relative
   target: codex
@@ -31974,8 +31976,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: null
 - kind: project-relative
   target: codex
@@ -31983,8 +31985,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9
 - kind: project-relative
   target: codex
@@ -31992,8 +31994,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:a2770f3a24aa08c7eb459e8eedb0e77de0fb8f9c26f8623bbea74b3283f11373
 - kind: project-relative
   target: codex
@@ -32001,8 +32003,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:ee649f6606ff1e5512bf07ab5732ee4690fc04d529b9717b507fd10120878fca
 - kind: project-relative
   target: codex
@@ -32010,8 +32012,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
 - kind: project-relative
   target: codex
@@ -32019,8 +32021,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
 - kind: project-relative
   target: codex
@@ -32028,8 +32030,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:9459e5b03f86785d184a83e5cd8d621b832e918ec04158a2962d867785812c6c
 - kind: project-relative
   target: codex
@@ -45006,8 +45008,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: null
 - kind: project-relative
   target: opencode
@@ -45015,8 +45017,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd
 - kind: project-relative
   target: opencode
@@ -45024,8 +45026,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:d266b583e4d5c5811132f9f24743b16472a14e251ce64aaaf772a2e7bf663e41
 - kind: project-relative
   target: opencode
@@ -45033,8 +45035,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:8b9f604d79717d5aec58abfb192f2d713c45b5558f5572255d9f9e5d39877ee0
 - kind: project-relative
   target: opencode
@@ -45042,8 +45044,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
 - kind: project-relative
   target: opencode
@@ -45051,8 +45053,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
 - kind: project-relative
   target: opencode
@@ -45060,8 +45062,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:d7bc64f6b26f7482f9ca9dd7c923a5b8b20e1ef13491ae2d9052cd208a7c1ad1
 - kind: project-relative
   target: opencode
@@ -45069,8 +45071,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: null
 - kind: project-relative
   target: opencode
@@ -45078,8 +45080,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9
 - kind: project-relative
   target: opencode
@@ -45087,8 +45089,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:a2770f3a24aa08c7eb459e8eedb0e77de0fb8f9c26f8623bbea74b3283f11373
 - kind: project-relative
   target: opencode
@@ -45096,8 +45098,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:ee649f6606ff1e5512bf07ab5732ee4690fc04d529b9717b507fd10120878fca
 - kind: project-relative
   target: opencode
@@ -45105,8 +45107,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
 - kind: project-relative
   target: opencode
@@ -45114,8 +45116,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
 - kind: project-relative
   target: opencode
@@ -45123,8 +45125,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
   content_hash: sha256:9459e5b03f86785d184a83e5cd8d621b832e918ec04158a2962d867785812c6c
 - kind: project-relative
   target: opencode
