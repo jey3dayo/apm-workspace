@@ -29,3 +29,6 @@
 apm_modules/
 
 /.catalog-build/
+
+# ~/.config/.gitignore の `1Password/` が case-insensitive FS で一致するため、catalog 側を明示的に追跡対象へ戻す
+!/catalog/skills/1password/
