@@ -24,6 +24,20 @@ Describe "apm-workspace.ps1 apply conformance" {
       & $script:consoleShell -NoProfile -ExecutionPolicy Bypass -File $script:scriptPath apply | Out-Null
       return $LASTEXITCODE
     }
+
+    # Identifies the on-disk directory instance. On Unix use the inode (same
+    # contract as apply-conformance.bats): .NET's CreationTimeUtc on Linux is
+    # not a stable birth time and moves when children are added or removed,
+    # which made the root-swap assertion fail on ubuntu CI while the root was
+    # in fact never recreated. Windows has a real creation time, so keep it.
+    function script:Get-DirectoryIdentity {
+      param([Parameter(Mandatory = $true)][string]$Path)
+      if ($IsWindows) {
+        return (Get-Item -LiteralPath $Path).CreationTimeUtc.Ticks.ToString()
+      }
+      $statFormat = if ($IsMacOS) { @("-f", "%i") } else { @("-c", "%i") }
+      return (& stat @statFormat -- $Path).Trim()
+    }
   }
 
   BeforeEach {
@@ -96,19 +110,19 @@ Describe "apm-workspace.ps1 apply conformance" {
   # Replace-DirectoryTreeFromSource-for-the-whole-root behavior) would make
   # the root briefly not exist, which is unsafe for a live agent depending
   # on in-place state under that root (e.g. agmsg's helper scripts) between
-  # apply runs. CreationTimeUtc identifies the on-disk directory instance:
-  # a Move-Item swap would produce a new directory with a fresh creation
-  # time even if the path is identical afterward.
+  # apply runs. Get-DirectoryIdentity (inode on Unix, creation time on
+  # Windows) identifies the on-disk directory instance: a Move-Item swap
+  # would produce a new directory even if the path is identical afterward.
   It "does not recreate the skills root directory itself during swap" {
     $claudeSkillsRoot = Join-Path $script:fixture["HOME"] ".claude/skills"
     $staleSkillDir = Join-Path $claudeSkillsRoot "stale-skill"
     New-Item -ItemType Directory -Path $staleSkillDir -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $staleSkillDir "SKILL.md") -Value "# stale"
-    $rootCreationTimeBefore = (Get-Item -LiteralPath $claudeSkillsRoot).CreationTimeUtc
+    $rootIdentityBefore = Get-DirectoryIdentity -Path $claudeSkillsRoot
 
     Invoke-FixtureApply | Should -Be 0
 
-    (Get-Item -LiteralPath $claudeSkillsRoot).CreationTimeUtc | Should -Be $rootCreationTimeBefore
+    Get-DirectoryIdentity -Path $claudeSkillsRoot | Should -Be $rootIdentityBefore
     $staleSkillDir | Should -Not -Exist
     Join-Path $claudeSkillsRoot "sample-skill/SKILL.md" | Should -Exist
   }
