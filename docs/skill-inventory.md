@@ -44,16 +44,16 @@
 
 ## global（自作 catalog: catalog/skills/）
 
-27 スキル。主な系統:
+31 スキル。主な系統:
 
-- APM・環境運用: `apm-usage`, `apm-repo-bootstrap`, `mise`, `mcp-tools`,
-  `dotenvx-env-ops`, `1password-item-ops`, `herdr`
+- APM・環境運用: `apm-usage`, `apm-repo-manifest`, `mise`,
+  `dotenvx`, `1password`, `herdr`
 - レビュー・品質: `review-board`, `review-fix-loop`,
-  `polish`, `quiet-command-auditor`
-- デザイン: `design-md-workflow`, `design-system-review`
+  `quiet-command-auditor`
+- デザイン: `design-md-workflow`
 - リファクタリング・解析: `refactoring`, `similarity`
 - ドキュメント: `docs-manager`, `docs-review`,
-  `architecture-boundary-docs`, `japanese-tech-writing`
+  `japanese-tech-writing`
 - Git・作業運用: `atomic-commit`, `git-worktree`, `ci-stability-hooks`,
   `prepare-goal`
 - リサーチ: `web-research`（計画・並列委譲・Jina 収集・合成まで一体）
@@ -63,12 +63,14 @@
 - `agent-curation` — catalog/agents と採用台帳の運用
 - `skill-auditor` — スキル棚卸し
 - `find-skills` — スキル探索
+- `apm-deploy-verify` — catalog 変更後の deploy / 配布一致検証
 
 ## optional（optional-skills/）
 
 - `google-forms-survey-builder` — 利用例: `tech-talks`
 - `slack-app-management` — Slack App を持つリポジトリのみ
 - `premortem` — 実装前の失敗条件分析が必要なリポジトリのみ
+- `scheduled-audit-ops` — 利用例: `ca-connect-site`（`docs/prompts/config.toml` を持つリポジトリのみ）
 
 ## private（private-skills/・未追跡）
 
@@ -115,7 +117,7 @@ global の一覧に無くても廃止ではない。各リポジトリの `apm.y
 | ベースライン修正（deslop）                 | `baseline-ui` / `fixing-accessibility` / `fixing-metadata`（ibelick）                                                  |
 | モーション taste・レビュー・監査           | `emil-design-eng` / `review-animations` / `improve-animations` / `find-animation-opportunities`（emilkowalski/skills） |
 | モーション実装スニペット                   | `transitions-dev`                                                                                                      |
-| デザインシステム準拠レビュー               | `design-system-review`（catalog 自作）                                                                                 |
+| デザインシステム準拠レビュー               | `review-board`（lane 1）                                                                                               |
 | UI レビューレーン選択ハブ                  | `review-board`（catalog 自作）                                                                                         |
 | デザインドキュメント                       | `design-md-workflow`（catalog 自作）                                                                                   |
 | コードベース監査→計画（汎用）              | `improve`（shadcn）                                                                                                    |
@@ -123,9 +125,9 @@ global の一覧に無くても廃止ではない。各リポジトリの `apm.y
 
 ### レビュー系の使い分け
 
-- UI の見た目・ガイドライン準拠 → `baseline-ui`（deslop）/ `design-system-review`
+- UI の見た目・ガイドライン準拠 → `baseline-ui`（deslop）
   （`web-design-guidelines` は 2026-07-23 撤去）
-- デザインシステム・トークン準拠 → `design-system-review`
+- デザインシステム・トークン準拠 → `review-board`（lane 1）
 - アニメーション・モーションの質 → `review-animations`（単発）/ `improve-animations`（全体監査→plan 生成）
 - UI・フォーム・アクセシビリティ・マルチデバイスのレーン振り分け → `review-board`
 - コード品質全般 → 組み込み `/code-review` / `hunk-review` / `thermo-nuclear-code-quality-review`
@@ -147,7 +149,6 @@ skill 監査（`~/.claude/skill-report/2026-07-23T11-14-21/`）の結果を踏�
 | `fixing-motion-performance`          | アニメ    | モーション性能監査・修正                | なし                 | emil 系と指摘が重複したら間引く（従来 watchlist どおり）               |
 | `apple-design`                       | アニメ/UI | Apple 流ジェスチャ・物理モーション      | 手動起動あり         | 維持                                                                   |
 | `review-board`                       | レビュー  | UI レビューレーン選択ハブ               | なし                 | catalog 自作。レーン振り分けを使わないなら簡素化                       |
-| `design-system-review`               | レビュー  | デザインシステム・トークン準拠          | なし                 | catalog 自作。維持                                                     |
 | `hunk-review`                        | レビュー  | Hunk セッションでの対話的 diff レビュー | なし                 | Hunk 自体を常用しなくなったら撤去                                      |
 | `thermo-nuclear-code-quality-review` | レビュー  | 保守性・構造の徹底監査                  | なし                 | 組み込み `/code-review` と指摘が重複しすぎたら撤去                     |
 | `improve`                            | レビュー  | 監査 → 他 agent 向け実装 plan 生成      | なし                 | 維持。improve-animations の撤去判断の受け皿                            |
@@ -178,7 +179,7 @@ global から repo-local / optional へ移す候補。実施済みのもの
 2026-07-16 の棚卸しで global 維持を決定したもの（候補から除外）:
 `react-doctor`, `react-best-practices`,
 `baseline-ui` ほか ibelick 系, `transitions-dev`,
-`frontend-design`, `ui-ux-pro-max`, `design-md-workflow`, `design-system-review`
+`frontend-design`, `ui-ux-pro-max`, `design-md-workflow`
 （`web-design-guidelines` と `composition-patterns` は撤去済み）。
 
 ### 移管の判断基準

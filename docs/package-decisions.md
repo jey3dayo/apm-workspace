@@ -139,7 +139,7 @@
   - `caad-develop/claude-code-marketplace/plugins/service-integrations/notica-api`
   - `caad-develop/claude-code-marketplace/plugins/service-integrations/telma-api`
 - 補足: `private-skills` の `ca-pass` overlay は machine-local な別レーンとして維持する。
-- 追記（2026-08-21）: `ca-pass` だけが root `apm.yml` に残留していた drift を /improve 監査（#5）で検出し、manifest から実撤去した。利用するリポジトリは repo-local `apm.yml` へ上記 ref を追加する（`apm-repo-bootstrap` 参照）。
+- 追記（2026-08-21）: `ca-pass` だけが root `apm.yml` に残留していた drift を /improve 監査（#5）で検出し、manifest から実撤去した。利用するリポジトリは repo-local `apm.yml` へ上記 ref を追加する（`apm-repo-manifest` 参照）。
 
 ### banner-design
 
@@ -286,7 +286,7 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
     起動実績なし。
 - 撤去見送り: `transitions-dev` / `ui-ux-pro-max` は bloated 判定だが手動起動実績が
   あるため維持（description トリムを別途検討）。`perman-aws-vault` /
-  `1password-item-ops` / `dotenvx-env-ops` はインフラ系のため維持。
+  `1password` / `dotenvx` はインフラ系のため維持。
 - 検証継続中のレビュー・アニメーション系スキルの一覧と撤去判断基準は
   [`docs/skill-inventory.md`](skill-inventory.md) の
   「検証中のレビュー・アニメーション系スキル」表を正とする。
@@ -306,7 +306,8 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
   計画系は `prepare-goal` / `review-plan` / `review-fix-loop` と役割が重複していた
 - `handoff` の 4 原則（artifact は参照渡し・suggested skills・secrets redact・
   次セッションの目的に合わせる）は `agmsg-delegation` の「引き継ぎ（handoff）メッセージ」
-  セクションへ移植し、`baton` はそこを参照する。外部 8 行スキルへの依存を解消した
+  セクションへ移植した。`baton` は 2026-09-02 に撤去し、handoff は同セクションを直接使う。
+  外部 8 行スキルへの依存を解消した
 - 追加: `codebase-design` / `domain-modeling` / `research` / `prototype` /
   `setup-matt-pocock-skills`。`wayfinder` と `improve-codebase-architecture` は
   これらを前提に相互参照する設計で、単体では参照先が空振りしていた
@@ -333,10 +334,41 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 - `review-plan` 撤去理由: 実行前ゲートとしての導線が `prepare-goal` / `grilling` /
   組み込み plan mode と重複し、起動実績が乏しかった
 - 残した判断: `review-board`（レーン振り分けハブ）と `review-fix-loop`（backlog 管理つき
-  反復ループ）は独自導線ありとして検証継続。`docs-review` / `design-system-review` /
-  `quiet-command-auditor` / `scheduled-audit-ops` はドメイン特化で組み込みに代替なし
+  反復ループ）は独自導線ありとして検証継続。`docs-review` / `quiet-command-auditor` は
+  ドメイン特化で組み込みに代替なし。`design-system-review` は 2026-09-02 に撤去し
+  （`review-board` lane 1 で代替）、`scheduled-audit-ops` は 2026-09-02 に
+  `optional-skills` へ移動した
 - 再導入する場合: 組み込みレビューで賄えない要件（プロジェクト設定統合、
   星評価レポート等）が実運用で必要になった理由を本ファイルに追記してから戻す
+
+## `architecture-boundary-docs` の撤去（2026-09-02）
+
+- 撤去理由: 生成先 `docs/architecture-boundaries.md` を持つリポジトリが `ghq list -p`
+  全体で 0 件で、2026-05-23 の導入以降に産物が残っていない。層構造・依存方向の
+  文書化は `codebase-design` / `docs-manager` で賄える。
+- 再導入する場合: 境界ドキュメントを実際に必要とするリポジトリ名と、
+  `codebase-design` で不足した観点を本ファイルに追記してから戻す
+
+## `baton` の撤去（2026-09-02）
+
+- 撤去理由: `agmsg-delegation` の「引き継ぎ（handoff）メッセージ」セクションが正本となり、薄いラッパースキルを別に持つ必要がなくなった。
+
+## `mcp-tools` の撤去（2026-09-02）
+
+- 撤去理由: 配置判断は `~/.claude/CLAUDE.md`「MCP 配置方針」/ `catalog/AGENTS.md` / `apm-usage` に既にあり重複している。references 3 本（計 2,100 行超）は汎用知識で stale しやすく、context7 / 公式 docs で代替できる。固有価値だった起動失敗の切り分け手順は `apm-usage` に吸収した。
+
+## `polish` / `design-system-review` の撤去（2026-09-02）
+
+- `polish`: 利用実績が 0 で、lint→fix→再実行のループは `CLAUDE.md` の DoD に手順として吸収済み。
+- `design-system-review`: 汎用観点は `catalog/skills/review-board/references/review-lanes.md` の lane 1 "Design System Review" が持つ。`SKILL.md` は特定 repo のパス（`src/design-system/index.ts` 等）と画面名を決め打ちしていて他 repo では空振りするため、repo 固有値は当該 repo の steering へ置く。
+
+## `apm-deploy-verify` を workspace-only lane へ移動（2026-09-02）
+
+- 移動理由: 手順が `mise run format / check / deploy:fresh` と `~/.claude/skills` ↔ `~/.agents/skills` の diff で構成され、これらは `~/.apm/mise.toml` にしかない。他 repo へ global 配布しても実行不能である。AGENTS.md ownership 表の Workspace-only skills に該当する。
+
+## `scheduled-audit-ops` を optional-skills へ移動（2026-09-02）
+
+- 移動理由: `SKILL.md` が `docs/prompts/config.toml` を必須とし、該当 repo は `ca-connect-site` の 1 件のみである。global 配布しても他 repo では起動即失敗する。会社 repo に個人ツールを持ち込まず個人 workspace で版管理するため `optional-skills`（repo-scoped lane）に置き、消費側 repo は `apm.yml` に direct ref を追加する。
 
 ## Nix external skill sources (`agent-skills-sources.nix`)
 
