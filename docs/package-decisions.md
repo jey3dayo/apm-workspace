@@ -375,6 +375,28 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 - 移動理由: 上流退役で外部依存として参照できないが、中身は改変しないコピーであり自作スキルではない。catalog を自分の成果物に限定するため `manual-skills`（コピー済み upstream の手動レーン）へ分離する。
 - 配布結果: root `apm.yml` の `jey3dayo/apm-workspace/manual-skills#main` からの配布結果は不変。
 
+## `stablyai/orca` の 3 スキルを global-dependency として採用（2026-09-03）
+
+- 採用: `stablyai/orca/skills/orca-cli`, `stablyai/orca/skills/computer-use`,
+  `stablyai/orca/skills/orchestration`
+- 理由: Orca はデスクトップアプリと `orca` CLI（brew cask）を機材単位で導入する
+  横断ツールで、repo 固有の runtime や credential に依存しない。upstream は
+  `skills/<id>/SKILL.md` 単体構成で APM の path ref がそのまま通るため、
+  上流公式の `npx skills add` ではなく `apm.yml` で管理し配布を一本化する。
+- 注意: upstream repo に `apm.yml` は無く、APM 対応は「レイアウト互換」であって
+  公式サポートではない。skills 以外に `skill-stubs/` `skill-guides/` `docs/site` が
+  あるが配布対象にしない。
+- upstream の性質: 公式 docs（onorca.dev/docs/cli/skills）によれば配布物は
+  「discovery stub」で、本体ガイドは `orca skills get <id>` が起動中の CLI から
+  version-matched に返す。SKILL.md 自体は薄く、CLI 更新で drift しにくい。
+- 更新: Orca アプリは `npx skills update --global` を促すが、APM 管理下の
+  コピーはそれで書き換えず `mise run upgrade` で追随する。アプリ側の
+  "Needs attention" 表示は APM 管理の結果として容認する。
+- 同名衝突: Codex 同梱プラグイン `computer-use@openai-bundled`（macOS Computer Use）と
+  Orca の `computer-use` が同名で Codex 側に両方見える。用途が近いため容認し、
+  呼び分けに支障が出たら Orca 側だけ外す。
+- 再検討するなら: Orca を使わなくなった時点で 3 件まとめて撤去する。
+
 ## Nix external skill sources (`agent-skills-sources.nix`)
 
 - Status: 廃止（意図して空のまま維持）

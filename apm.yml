@@ -75,6 +75,9 @@ dependencies:
     - modem-dev/hunk/skills/hunk-review
     - agavra/tuicr/skills/tuicr
     - humanlayer/skills/plugins/show-me/skills/show-me
+    - stablyai/orca/skills/orca-cli
+    - stablyai/orca/skills/computer-use
+    - stablyai/orca/skills/orchestration
   mcp:
     - name: context7
       registry: false
