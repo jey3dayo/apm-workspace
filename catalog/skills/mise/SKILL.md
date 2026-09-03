@@ -7,7 +7,7 @@ description: >-
   global-vs-repository task placement (`~/.config/mise/tasks` vs local includes),
   DB/env/dotenvx/secrets/tools task-family splitting, tool/package
   centralization (npm:/pipx:), `mise upgrade` and `minimum_release_age`,
-  Windows settings (`run_windows`, `config.windows.toml`), `mise skills add`,
+  Windows settings (`run_windows`, `entry.workstation-windows.toml`), `mise skills add`,
   `mise bootstrap` and its config sections (`[bootstrap.packages]`,
   `[dotfiles]`, launchd/systemd units), `mise dotfiles apply`, or migrating a
   Brewfile to mise bootstrap.
@@ -29,9 +29,9 @@ Classify the request into one mode and answer from that mode only:
    - For large repos, use `[task_config].includes` only when task families have clear owners (DB, env/dotenvx, secrets, infra, deploy, tools) — see `references/task-family-splitting.md`
    - Treat the repo's existing task names, workflow semantics, and source-of-truth rules as authoritative
 2. User-global / dotfiles mode — the user is managing `~/.config/mise`, personal toolchains, or `mise skills add`.
-   - Split layouts are valid here: settings-only `config.toml`, environment files such as `config.default.toml` / `config.ci.toml` / `config.windows.toml`, shared task files via `[task_config].includes` — see `references/task-config-includes.md`
+   - Split layouts are valid here: settings-only `config.toml`, `MISE_CONFIG_FILE` entry points such as `entry.workstation-unix.toml`, `entry.ci.toml`, and `entry.workstation-windows.toml`, plus `MISE_ENV` overlays such as `config.shared.toml` and `config.workstation.toml`; see `references/task-config-includes.md`
    - Treat `~/.config/mise/tasks/` as an explicit opt-in surface for tasks intentionally available from any directory; keep dotfiles maintenance in a separate directory such as `~/.config/mise/local-tasks/` by default
-   - `config.windows.toml` and `windows_default_*_shell_args` usually belong here unless the repository explicitly vendors its own Windows shell policy
+   - `entry.workstation-windows.toml` and `windows_default_*_shell_args` usually belong here unless the repository explicitly vendors its own Windows shell policy
 
 If the request mentions `mise skills add`, `mise bootstrap`, `[dotfiles]`, personal/global setup, or `~/.config/mise`, treat it as user-global. Otherwise default to project-local.
 

@@ -17,7 +17,8 @@ This document contains comprehensive best practices for mise (mise-en-place) tas
 For `~/.config/mise` or similar personal environments, a split layout is often better than a monolithic file:
 
 - `config.toml` for shared settings only
-- `config.default.toml`, `config.ci.toml`, `config.windows.toml`, etc. for environment-specific toolsets
+- `entry.workstation-unix.toml`, `entry.ci.toml`, `entry.workstation-windows.toml`, and `entry.server-pi.toml` for `MISE_CONFIG_FILE` entry points
+- `config.shared.toml` and `config.workstation.toml` for `MISE_ENV` tool overlays
 - `~/.config/mise/tasks/` only as explicit opt-in for tasks intentionally available from every directory
 - `.mise.toml` with `[task_config].includes = ["~/.config/mise/local-tasks/*.toml"]` for dotfiles-repository-only task loading
 

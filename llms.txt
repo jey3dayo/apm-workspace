@@ -63,7 +63,7 @@ jey3dayo/apm-workspace/catalog#main
 - Codex uses split output: compile guidance with `apm compile --target codex --output ~/.codex/AGENTS.md`, and deploy skills to `~/.agents/skills`.
 - Verify Codex rollout through compile success, the generated `~/.codex/AGENTS.md`, and deployed `SKILL.md` files under `~/.agents/skills`.
 - Current `apm` source is `pipx:apm-cli@0.26.0`.
-- If both `~/.apm/mise.toml` and `~/.config/mise/config.windows.toml` define `apm`, keep them aligned to the same source.
+- If both `~/.apm/mise.toml` and `~/.config/mise/config.workstation.toml` define `apm`, keep them aligned to the same source.
 - Prefer `mise run deploy` for routine local rollout and `mise run apply` only when you need deploy-only behavior.
 - Reserve `mise run upgrade` for intentional upstream refresh, not for normal deployment.
 - When direct binary selection matters, prefer `mise exec pipx:apm-cli@0.26.0 -- apm ...`.

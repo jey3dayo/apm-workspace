@@ -1,6 +1,6 @@
 # Windows Shells for mise
 
-Use this reference when the task involves `run_windows`, `config.windows.toml`, `windows_default_inline_shell_args`, `windows_default_file_shell_args`, or Windows-specific quoting and env var behavior.
+Use this reference when the task involves `run_windows`, `entry.workstation-windows.toml`, `windows_default_inline_shell_args`, `windows_default_file_shell_args`, or Windows-specific quoting and env var behavior.
 
 ## Identify the Actual Task Shell First
 

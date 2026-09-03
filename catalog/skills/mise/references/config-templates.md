@@ -132,22 +132,28 @@ depends = ["format", "lint"]
 
 ## User-Global Dotfiles Template
 
-Use this for `~/.config/mise` style personal setups with environment-specific tool files and repository-local task includes. Add auto-loaded global tasks only as an explicit opt-in.
+Use this for `~/.config/mise` style personal setups with entry files, `MISE_ENV`
+tool overlays, and repository-local task includes. Add auto-loaded global tasks
+only as an explicit opt-in.
 
 ```toml
 # ~/.config/mise/config.toml
 [settings]
 experimental = true
-jobs = 8
 
 [settings.npm]
 package_manager = "pnpm"
 ```
 
 ```toml
-# ~/.config/mise/config.default.toml
+# ~/.config/mise/config.shared.toml
 [tools]
 node = "lts"
+```
+
+```toml
+# ~/.config/mise/config.workstation.toml
+[tools]
 python = "3.12"
 shellcheck = "<verified-version>"
 shfmt = "<verified-version>"
@@ -155,6 +161,15 @@ taplo = "<verified-version>"
 "npm:prettier" = "<verified-version>"
 "npm:tsx" = "<verified-version>"
 ```
+
+```toml
+# ~/.config/mise/entry.workstation-unix.toml
+[settings]
+jobs = 8
+```
+
+Select the entry file with `MISE_CONFIG_FILE` and load overlays by including
+their environment names in `MISE_ENV`, such as `shared,workstation`.
 
 ```toml
 # ~/.config/.mise.toml

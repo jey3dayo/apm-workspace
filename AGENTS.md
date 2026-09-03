@@ -77,7 +77,7 @@ symlinks resolving to `.apm/skills/<id>/SKILL.md`.
 - If a managed upstream skill repeatedly fails packaging or rollout, move it to
   the manual lane rather than patching cache or runtime output.
 - When changing the active `apm` source, update both `~/.apm/mise.toml` and
-  `~/.config/mise/config.windows.toml`.
+  `~/.config/mise/config.workstation.toml`.
 - Follow `catalog/AGENTS.md` for MCP placement. Root `apm.yml` contains only
   cross-repository global MCP; use the tracked source and regenerate, never
   edit `~/.codex/config.toml`. Desktop MCP setup belongs to bootstrap.

@@ -23,10 +23,13 @@ For normal repositories, prefer a single project-local `mise.toml`. For project-
 ~/.config/
 ├── .mise.toml
 └── mise/
-    ├── config.toml
-    ├── config.default.toml
-    ├── config.ci.toml
-    ├── config.windows.toml
+    ├── config.toml             # settings-only
+    ├── config.shared.toml      # shared tools overlay (MISE_ENV=shared)
+    ├── config.workstation.toml # workstation tools overlay (MISE_ENV=workstation)
+    ├── entry.ci.toml           # MISE_CONFIG_FILE entry point
+    ├── entry.workstation-unix.toml
+    ├── entry.workstation-windows.toml
+    ├── entry.server-pi.toml
     ├── tasks/            # explicit opt-in user-global tasks
     └── local-tasks/      # loaded only by ~/.config/.mise.toml
         ├── format.toml
@@ -39,11 +42,14 @@ For normal repositories, prefer a single project-local `mise.toml`. For project-
 ## Recommended Responsibilities
 
 - `config.toml`
-  - Shared settings only
-  - `settings`, `env`, package-manager defaults
-- `config.default.toml`, `config.ci.toml`, `config.windows.toml`
-  - Environment-specific `[tools]`
-  - Per-environment job counts and backend toggles
+  - Settings, environment variables, and dotfiles only; do not add `[tools]`
+- `config.shared.toml`
+  - Common `[tools]` overlay for environments that include `shared` in `MISE_ENV`
+- `config.workstation.toml`
+  - Workstation `[tools]` overlay for environments that include `workstation` in `MISE_ENV`
+- `entry.ci.toml`, `entry.workstation-unix.toml`, `entry.workstation-windows.toml`, `entry.server-pi.toml`
+  - Select one environment entry point with `MISE_CONFIG_FILE`
+  - Keep entry-specific settings and tools here
 - `.mise.toml`
   - Local task entrypoint
   - `[task_config].includes` list
@@ -61,16 +67,25 @@ package_manager = "pnpm"
 ```
 
 ```toml
-# ~/.config/mise/config.default.toml
+# ~/.config/mise/config.shared.toml
 [tools]
 node = "lts"
-python = "3.12"
-shellcheck = "<verified-version>"
-shfmt = "<verified-version>"
-taplo = "<verified-version>"
-"npm:prettier" = "<verified-version>"
-"npm:tsx" = "<verified-version>"
 ```
+
+```toml
+# ~/.config/mise/config.workstation.toml
+[tools]
+python = "3.12"
+```
+
+```toml
+# ~/.config/mise/entry.workstation-unix.toml
+[settings]
+jobs = 8
+```
+
+Set `MISE_CONFIG_FILE` to the entry point and include the desired overlays in
+`MISE_ENV`, for example `shared,workstation` for a workstation environment.
 
 ```toml
 # ~/.config/.mise.toml
