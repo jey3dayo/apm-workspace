@@ -1,6 +1,6 @@
 ---
 name: researcher
-description: Use this agent for investigation where the answer is not yet known, such as root-cause analysis of a failure, tracing how a subsystem works across a codebase, or comparing approaches before a decision. Produces findings and evidence, not edits. Not for tasks with a known fix (use error-fixer or implementer) and not for locating a file or symbol you can name (use Explore or serena).
+description: Use this agent for investigation where the answer is not yet known, such as root-cause analysis of a failure, tracing how a subsystem works across a codebase, or comparing approaches before a decision. Choose it when the exploration spans multiple subsystems, the answer will not fit in one file, or integration and causal tracing are required; for a location question within a single subsystem, use deep-explore. Produces findings and evidence, not edits. Not for tasks with a known fix (use error-fixer or implementer) and not for locating a file or symbol you can name (use the built-in Explore agent for a simple location check or serena when language-server-level precision is needed).
 tools: "*"
 color: yellow
 model: sonnet

@@ -1,6 +1,6 @@
 ---
 name: deep-explore
-description: Deep codebase exploration using grepai semantic search and call graph tracing. Use this agent for understanding code architecture, finding implementations by intent, analyzing function relationships, and exploring unfamiliar code areas. Use it when you can describe what the code does but cannot name the symbol; when you can name the symbol, use serena instead.
+description: Deep codebase exploration using grepai semantic search and call graph tracing. Use this agent for understanding code architecture, finding implementations by intent, analyzing function relationships, and exploring unfamiliar code areas within a single subsystem. Use it when you need to learn where something is or how its parts connect; when the question spans multiple subsystems and requires integration or causal tracing, use researcher. Use it when you can describe what the code does but cannot name the symbol; when you can name the symbol, use serena instead.
 tools: Read, Grep, Glob, Bash
 model: haiku
 ---
