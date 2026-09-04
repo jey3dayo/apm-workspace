@@ -75,6 +75,21 @@
 - 再検討するなら: 自分以外の利用者が増えて「どのスキルがあるか分からない」が実際に
   詰まりになったときに見る。それまでは `docs/skill-inventory.md` の一覧で足りる。
 
+## agmsg (fujibee/agmsg) の worktree path の癖
+
+- Status: 回避策で運用（2026-09-05）。upstream への起票はしない
+- 症状: `join.sh` は linked worktree の path を repo root へ正規化して登録するが、
+  `identities.sh` に worktree path を渡すと空を返す。`agmsg-delegation` の Lifecycle 3 が
+  求める exact identity verification が、worktree から呼ぶとそのままでは成立しない。
+- 回避策: `identities.sh` へは canonical な repo root を渡す。
+  `git -C <worktree> rev-parse --path-format=absolute --git-common-dir` の親、または
+  `git -C <worktree> worktree list --porcelain` の先頭 entry で求める（どちらも
+  `pwd -P` と一致することを実測済み）。手順は `agmsg-delegation` の Lifecycle 3 に記載。
+- なぜ直さないか: 外部パッケージで、こちらから触れるのは呼び出し側だけ。回避策が
+  スキルに入って運用が回っており、起票して追随を待つ利益が小さい。
+- 再検討するなら: worktree からの委譲が日常になり、呼び出し側の正規化を毎回書くのが
+  負担になったときに見る。
+
 ## make-interfaces-feel-better (jakubkrehel)
 
 - Status: 撤去（2026-07-23、下記「skill 監査に基づく撤去」参照）
