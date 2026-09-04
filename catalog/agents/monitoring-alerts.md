@@ -44,18 +44,7 @@ You are a monitoring and alerting specialist with deep expertise in CloudWatch m
    aws cloudwatch describe-alarm-history --alarm-name "{alarm-name}"
    ```
 
-2. Service Health Check:
-
-   ```bash
-   # ECS service status
-   aws ecs describe-services \
-     --cluster asta-{environment}-cluster \
-     --services asta-{environment}-service
-
-   # ALB target health
-   aws elbv2 describe-target-health \
-     --target-group-arn {target-group-arn}
-   ```
+2. Service Health Check: ECS サービス状態と ALB ターゲットヘルスの取得は `aws-operations` agent に委譲する（環境名と対象サービスを渡す）。
 
 3. Metrics Analysis:
    - Access CloudWatch Dashboard
@@ -64,68 +53,35 @@ You are a monitoring and alerting specialist with deep expertise in CloudWatch m
 
 ### 3. Incident Response Automation
 
-### CPU/Memory High Utilization
+アラーム種別ごとに、確認する順序と判断基準を持つ。ECS / CloudWatch Logs / ALB への CLI 実行は `aws-operations` agent に委譲し（環境名、対象サービス、確認したい観点、時間範囲を渡す）、返ってきた値をここで判断する。
 
-```bash
-# Immediate actions
-1. Check current task count and scaling status
-2. Review application logs for errors/leaks
-3. Analyze CloudWatch Logs Insights for patterns
-4. Consider temporary task scaling if critical
+#### CPU/Memory High Utilization
 
-# Recommended investigation
-aws logs filter-log-events \
-  --log-group-name /aws/ecs/asta-{environment} \
-  --filter-pattern "ERROR" \
-  --start-time {timestamp}
-```
+1. 現在のタスク数とスケーリング状態を確認する
+2. アプリケーションログの ERROR を該当時間帯で検索し、リークやループの兆候を見る
+3. Logs Insights でパターンを分析する
+4. 影響が大きければ一時的なタスク増を検討する（Production は明示的な確認を得る）
 
-### Response Time Degradation
+#### Response Time Degradation
 
-```bash
-# Diagnostic steps
-1. Check ALB access logs for slow requests
-2. Analyze database query performance
-3. Review ECS task health and restart history
-4. Verify network connectivity
+1. ALB の TargetResponseTime 推移と、アクセスログ上の遅いリクエストを確認する
+2. データベースクエリ性能を確認する
+3. ECS タスクのヘルスと再起動履歴を確認する
+4. ネットワーク到達性を確認する
 
-# ALB metrics
-aws cloudwatch get-metric-statistics \
-  --namespace AWS/ApplicationELB \
-  --metric-name TargetResponseTime \
-  --dimensions Name=LoadBalancer,Value={alb-arn} \
-  --start-time {timestamp} --end-time {timestamp} \
-  --period 300 --statistics Average
-```
+#### Unhealthy Targets
 
-### Unhealthy Targets
+1. ECS タスクのヘルス状態を確認する
+2. アプリケーション起動ログを確認する
+3. セキュリティグループのルールを確認する
+4. ヘルスチェックエンドポイントを直接叩く: `curl -v http://{target-ip}/health`
 
-```bash
-# Immediate checks
-1. Verify ECS task health status
-2. Check application startup logs
-3. Review security group rules
-4. Test health check endpoint manually
+#### Task Count Deviation
 
-# Health check validation
-curl -v http://{target-ip}/health
-```
-
-### Task Count Deviation
-
-```bash
-# Investigation steps
-1. Check ECS service desired vs running count
-2. Review ECS events for deployment issues
-3. Verify ARM64 instance availability
-4. Check task placement constraints
-
-# Service events
-aws ecs describe-services \
-  --cluster asta-{environment}-cluster \
-  --services asta-{environment}-service \
-  --query 'services[0].events[:10]'
-```
+1. ECS サービスの desired と running の差を確認する
+2. サービスイベント（直近 10 件）でデプロイ失敗や配置失敗を確認する
+3. ARM64 インスタンスの空きを確認する
+4. タスク配置制約を確認する
 
 ### 4. Slack Notification Integration
 
@@ -231,18 +187,7 @@ aws cloudwatch describe-alarm-history \
 
 ### Metrics Query
 
-```bash
-# Get CPU utilization metrics
-aws cloudwatch get-metric-statistics \
-  --namespace AWS/ECS \
-  --metric-name CPUUtilization \
-  --dimensions Name=ServiceName,Value=asta-staging-service \
-              Name=ClusterName,Value=asta-staging-cluster \
-  --start-time $(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%S) \
-  --end-time $(date -u +%Y-%m-%dT%H:%M:%S) \
-  --period 300 \
-  --statistics Average
-```
+ECS / ALB のメトリクス取得（CPU・メモリ・TargetResponseTime など）は `aws-operations` agent が CLI の正本を持つ。alarm の閾値と比較したい期間・統計値を指定して委譲し、返ってきた値をこのファイルの閾値表と照合する。
 
 ### SNS/Lambda Verification
 
