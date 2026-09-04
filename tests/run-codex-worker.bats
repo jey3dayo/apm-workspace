@@ -119,3 +119,70 @@ skill_models_for() {
   [ ! -f "$fake_home/elsewhere.config.toml" ]
   rm -rf -- "$fake_home"
 }
+
+# 以下は worker が継承する MCP の最小化。
+#
+# 実運用で leaf worker が global MCP をそのまま引き継ぎ、Voicevox・Context7・CUA・
+# memory lookup まで起動した（CyMaster PR892 のフィールド報告）。認証情報 (1password)
+# や GUI 操作 (computer-use / node_repl) を渡すことは能力面の境界を広げるので、
+# allowlist で明示したものだけ通す。
+
+mcp_fixture() {
+  local home=$1
+  mkdir -p "$home"
+  cat >"$home/config.toml" <<'TOML'
+[mcp_servers.context7]
+command = "npx"
+
+[mcp_servers.jina-reader]
+url = "https://example.invalid/mcp"
+
+[mcp_servers.1password]
+command = "/usr/local/bin/1password-mcp"
+
+[mcp_servers.mcp-simple-voicevox]
+command = "npx"
+TOML
+}
+
+# codex 本体は起動させず、渡された引数を捕まえる。
+arg_stub() {
+  local path=$1
+  printf '#!/bin/sh\nprintf "ARGS: %%s\\n" "$*"\nexit 0\n' >"$path"
+  chmod +x "$path"
+}
+
+@test "only the allowlisted MCP servers survive for a worker" {
+  local home stub
+  home="$(mktemp -d)/codex"; mcp_fixture "$home"
+  stub="$(mktemp -d)/stub"; arg_stub "$stub"
+  CODEX_HOME="$home" AGMSG_CODEX_BIN="$stub"     run "$SCRIPT" implement "$PROJECT" gpt-5.6-luna "$PAYLOAD"
+  [ "$status" -eq 0 ]
+  # 既定 allowlist は context7 と jina-reader。
+  [[ "$output" != *"mcp_servers.context7.enabled=false"* ]]
+  [[ "$output" != *"mcp_servers.jina-reader.enabled=false"* ]]
+  # 認証情報と通知は必ず落ちる。
+  [[ "$output" == *"mcp_servers.1password.enabled=false"* ]]
+  [[ "$output" == *"mcp_servers.mcp-simple-voicevox.enabled=false"* ]]
+}
+
+@test "AGMSG_WORKER_MCP_ALLOW replaces the default allowlist" {
+  local home stub
+  home="$(mktemp -d)/codex"; mcp_fixture "$home"
+  stub="$(mktemp -d)/stub"; arg_stub "$stub"
+  CODEX_HOME="$home" AGMSG_WORKER_MCP_ALLOW=1password AGMSG_CODEX_BIN="$stub"     run "$SCRIPT" implement "$PROJECT" gpt-5.6-luna "$PAYLOAD"
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"mcp_servers.1password.enabled=false"* ]]
+  # 既定で通っていた 2 つが、明示しなければ落ちる（allowlist は置換であって追加ではない）。
+  [[ "$output" == *"mcp_servers.context7.enabled=false"* ]]
+  [[ "$output" == *"mcp_servers.jina-reader.enabled=false"* ]]
+}
+
+@test "a CODEX_HOME without config.toml adds no MCP overrides" {
+  local home stub
+  home="$(mktemp -d)/codex"; mkdir -p "$home"
+  stub="$(mktemp -d)/stub"; arg_stub "$stub"
+  CODEX_HOME="$home" AGMSG_CODEX_BIN="$stub"     run "$SCRIPT" implement "$PROJECT" gpt-5.6-luna "$PAYLOAD"
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"enabled=false"* ]]
+}

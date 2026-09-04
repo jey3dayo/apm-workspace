@@ -117,6 +117,30 @@ review_scratch=
 
 codex_home=${CODEX_HOME:-$HOME/.codex}
 
+# worker が継承する MCP を最小化する。leaf worker は実装かレビューだけを行うので、
+# 認証情報 (1password)、GUI 操作 (computer-use / node_repl)、通知 (voicevox)、
+# タスク管理 (linear) は不要で、渡すこと自体が能力面の境界を広げる。
+#
+# allowlist にするのは、config.toml へ新しい MCP を足したときに既定で worker へ
+# 流れ込まないようにするため。明示したものだけ通す。
+#
+# 個別キーの上書きだけが効く。`-c mcp_servers={}` のテーブル全置換は無視される。
+# また config.toml に節を持たない plugin 由来のサーバ (computer-history / cua_repl) は
+# transport が欠けた定義になり設定読み込みごと失敗するため対象にしない。目的は
+# 最小化であってゼロ化ではない。
+mcp_allow=${AGMSG_WORKER_MCP_ALLOW:-context7,jina-reader}
+
+if [[ -f "$codex_home/config.toml" ]]; then
+	while IFS= read -r server; do
+		[[ -n "$server" ]] || continue
+		case ",$mcp_allow," in
+		*",$server,"*) continue ;;
+		esac
+		codex_args+=(-c "mcp_servers.$server.enabled=false")
+	done < <(grep -oE '^\[mcp_servers\.[A-Za-z0-9_-]+\]' "$codex_home/config.toml" |
+		sed 's/^\[mcp_servers\.//; s/\]$//')
+fi
+
 if [[ "$role" == implement ]]; then
 	# implement は profile を layer しないため base config の writable_roots が直接効く。
 	if ! assert_writable_roots_are_canonical "$codex_home/config.toml" 'the Codex base config'; then

@@ -98,7 +98,7 @@ helper の解決先は `~/.agents/skills/agmsg-delegation/scripts/`。両 runtim
 
 Claude helper は空の MCP 設定と `-p` を強制して workspace trust / MCP 確認を防ぎ、`--output-format stream-json --verbose` で無人実行中のイベントを worker log へ継続出力する。`bypassPermissions` は macOS sandbox 内だけで使い、implement は対象 project 内だけ書込可、review は対象 project を read-only にする。`sandbox-exec` が無い環境では安全契約を弱めず停止する。
 
-Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、review profile の内容一致を起動時に検証する。review profile の fail-open 対策・cwd scratch・`writable_roots` の symlink fail-closed 検査・launchd の `MISE_ENV` 継承は [references/codex-sandbox.md](references/codex-sandbox.md) を参照。
+Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、review profile の内容一致を起動時に検証する。**worker が継承する MCP は allowlist で絞る**（既定 `context7,jina-reader`、`AGMSG_WORKER_MCP_ALLOW` で置換）。認証情報・GUI 操作・通知・タスク管理の MCP を leaf worker へ渡すことは能力面の境界を広げるため、明示したものだけ通す。allowlist にするのは、`config.toml` へ新しい MCP を足したときに既定で流れ込まないようにするため。plugin 由来のサーバは `config.toml` に節が無く扱えないので、目的は最小化でありゼロ化ではない。review profile の fail-open 対策・cwd scratch・`writable_roots` の symlink fail-closed 検査・launchd の `MISE_ENV` 継承は [references/codex-sandbox.md](references/codex-sandbox.md) を参照。
 
 完了条件: CLI・role 別起動コマンド（review は profile の diff 一致確認込み）・agmsg・`launch-worker.sh` の4点が確認済み。初回利用前の smoke 5点は [references/runtime-smoke.md](references/runtime-smoke.md) を参照。
 
