@@ -18,6 +18,10 @@ setup() {
   # exec される側なので、cwd を出して即 exit するだけのスタブにする。
   printf '#!/bin/sh\nprintf "STUB cwd=%%s\\n" "$(pwd -P)"\nexit 0\n' >"$WORKDIR/stub"
   chmod +x "$WORKDIR/stub"
+  # sandbox-exec は macOS 固有なので、ここでは worker の引数・cwd 検証だけを
+  # 実行できる最小スタブに置き換え、Linux CI でも同じ契約を検証する。
+  printf '#!/bin/sh\nif [ "$1" = "-f" ]; then shift 2; fi\nexec "$@"\n' >"$WORKDIR/sandbox-exec"
+  chmod +x "$WORKDIR/sandbox-exec"
 }
 
 teardown() {
@@ -25,14 +29,16 @@ teardown() {
 }
 
 @test "a relative AGMSG_CLAUDE_BIN still launches after the cd into the project" {
-  run bash -c "cd '$WORKDIR' && AGMSG_CLAUDE_BIN=./stub '$SCRIPT' review '$PROJECT' '$PAYLOAD'"
+  run bash -c 'cd "$1" && PATH="$1:$PATH" AGMSG_CLAUDE_BIN=./stub "$2" review "$3" "$4"' \
+    _ "$WORKDIR" "$SCRIPT" "$PROJECT" "$PAYLOAD"
   [ "$status" -eq 0 ]
   [[ "$output" == *"STUB cwd="* ]]
   [[ "$output" != *"execvp"* ]]
 }
 
 @test "the worker starts in the target project, not the launcher's cwd" {
-  run bash -c "cd '$WORKDIR' && AGMSG_CLAUDE_BIN=./stub '$SCRIPT' review '$PROJECT' '$PAYLOAD'"
+  run bash -c 'cd "$1" && PATH="$1:$PATH" AGMSG_CLAUDE_BIN=./stub "$2" review "$3" "$4"' \
+    _ "$WORKDIR" "$SCRIPT" "$PROJECT" "$PAYLOAD"
   [ "$status" -eq 0 ]
   # $PROJECT は mktemp -d なので canonical path と比較する。
   local canonical
@@ -41,7 +47,8 @@ teardown() {
 }
 
 @test "a missing executable is refused before anything launches" {
-  run bash -c "cd '$WORKDIR' && AGMSG_CLAUDE_BIN=./does-not-exist '$SCRIPT' review '$PROJECT' '$PAYLOAD'"
+  run bash -c 'cd "$1" && PATH="$1:$PATH" AGMSG_CLAUDE_BIN=./does-not-exist "$2" review "$3" "$4"' \
+    _ "$WORKDIR" "$SCRIPT" "$PROJECT" "$PAYLOAD"
   [ "$status" -ne 0 ]
   [[ "$output" == *"Claude executable not found"* ]]
 }

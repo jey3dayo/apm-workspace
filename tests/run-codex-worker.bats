@@ -108,10 +108,13 @@ skill_models_for() {
 }
 
 @test "a profile target outside CODEX_HOME is refused instead of failing open" {
-  local fake_home
+  local fake_home stub
   fake_home="$(mktemp -d)"
   mkdir -p "$fake_home/codex"
-  CODEX_HOME="$fake_home/codex" \
+  stub="$fake_home/fake-codex"
+  printf '#!/bin/sh\nexit 0\n' >"$stub"
+  chmod +x "$stub"
+  CODEX_HOME="$fake_home/codex" AGMSG_CODEX_BIN="$stub" \
     AGMSG_CODEX_PROFILE_TARGET="$fake_home/elsewhere.config.toml" \
     run "$SCRIPT" review "$PROJECT" gpt-5.6-sol "$PAYLOAD"
   [ "$status" -eq 1 ]
