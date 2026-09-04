@@ -22,12 +22,12 @@ description: >-
 
 ## 1. 自分の役を判定する
 
-| 役        | 職掌                                                                                                                                   | Claude                                                | Codex                                                                 | 起動する側                                                                            |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Steward   | 人間との対話・状態確認・説明・軽微修正。許可条件を満たすとき Orchestrator 機能（分解・Worker/Reviewer 起動・差分検証・最終報告）も担う | Opus / Sonnet（会話品質で Opus 推奨。限定ではない）   | `gpt-5.6-luna`                                                        | 人間（pane）                                                                          |
-| Architect | 設計判断（後述 Q1 trigger 2〜4 の handoff 先）。常に Orchestrator 機能を担える                                                         | Fable / Opus                                          | `gpt-5.6-sol` / `gpt-5.6-terra`                                       | 人間（pane）                                                                          |
-| Reviewer  | SHA 固定 code review / 設計文書 review                                                                                                 | Fable（明示指定時、fallback Opus）                    | `gpt-5.6-sol` 既定、横断・設計影響大は `gpt-5.6-terra`（effort high） | Orchestrator 機能を担う側（Steward または Architect）。spawn 経路と pane 経路の両方可 |
-| Worker    | 実装（設計済みタスク）                                                                                                                 | `sonnet`（Agent `implementer`、Worker の昇格 `opus`） | `gpt-5.6-luna` xhigh（Worker の昇格 max → `gpt-5.6-terra`）           | Orchestrator 機能を担う側                                                             |
+| 役        | 職掌                                                                                                                                   | Claude                                                | Codex                                                                                  | 起動する側                                                                            |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Steward   | 人間との対話・状態確認・説明・軽微修正。許可条件を満たすとき Orchestrator 機能（分解・Worker/Reviewer 起動・差分検証・最終報告）も担う | Opus / Sonnet（会話品質で Opus 推奨。限定ではない）   | `gpt-5.6-luna`                                                                         | 人間（pane）                                                                          |
+| Architect | 設計判断（後述 Q1 trigger 2〜4 の handoff 先）。常に Orchestrator 機能を担える                                                         | Fable / Opus                                          | `gpt-5.6-sol` / `gpt-5.6-terra`                                                        | 人間（pane）                                                                          |
+| Reviewer  | SHA 固定 code review / 設計文書 review                                                                                                 | Fable（明示指定時、fallback Opus）                    | `gpt-5.6-sol` 既定。読む量が多いレビューはコストを下げて `gpt-5.6-terra` + effort high | Orchestrator 機能を担う側（Steward または Architect）。spawn 経路と pane 経路の両方可 |
+| Worker    | 実装（設計済みタスク）                                                                                                                 | `sonnet`（Agent `implementer`、Worker の昇格 `opus`） | `gpt-5.6-luna` xhigh（Worker の昇格 max → `gpt-5.6-terra`）                            | Orchestrator 機能を担う側                                                             |
 
 **「Orchestrator」は役ではなく機能。** 表の Steward / Architect のうち、後述の許可条件を満たす側が担う。Terra は Architect・Reviewer・Worker の昇格に残る。
 
@@ -96,7 +96,9 @@ handoff の実体は `agmsg-delegation` の引き継ぎ（handoff）メッセー
 
 ## Reviewer の tier
 
-review 外注の既定経路は Codex: 起動時引数で `gpt-5.6-sol` / `gpt-5.6-terra` から選ぶ（既定は sol。設計影響が大きい・横断的なレビューは terra へ昇格し、必要なら `AGMSG_REVIEWER_EFFORT=high` などで effort も指定する）。Claude reviewer（fable 固定）は明示指定された場合のみ使い、fallback は opus。Fable reviewer は Orchestrator 側の Fable rate limit と枠を共有するため、実行中 429 で run ごと失敗しうる。失敗した場合は同経路で再試行せず、Codex sol へ切り替えて再外注する。
+review 外注の既定経路は Codex: 起動時引数で `gpt-5.6-sol` / `gpt-5.6-terra` から選ぶ。既定は sol。
+
+**terra は sol より下で、価格でも能力でも安く弱い。** そのため terra を選ぶのは難度を上げたいときではなく、読む量が多くコストを抑えたいときで、`AGMSG_REVIEWER_EFFORT=high` を併せて指定して質を補う。判断の難度が理由なら terra へ移さず、sol のまま `AGMSG_REVIEWER_EFFORT` を上げる。Claude reviewer（fable 固定）は明示指定された場合のみ使い、fallback は opus。Fable reviewer は Orchestrator 側の Fable rate limit と枠を共有するため、実行中 429 で run ごと失敗しうる。失敗した場合は同経路で再試行せず、Codex sol へ切り替えて再外注する。
 
 ### self-review 禁止（approval gate）
 

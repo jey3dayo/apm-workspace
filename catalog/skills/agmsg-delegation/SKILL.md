@@ -66,10 +66,10 @@ review role の reviewer モデル指定は本スキル内の一時的な model 
 - agmsg bootstrap 済みを確認（`~/.agents/skills/agmsg/` が存在）
 - role/runtime 別の起動コマンドを確定する。review は書込権限を実行時に強制する:
 
-| role      | Claude                                                    | Codex                                                                                                          |
-| --------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| implement | `run-claude-worker.sh implement <project> <payload-file>` | `run-codex-worker.sh implement <project> gpt-5.6-luna <payload-file>`                                          |
-| review    | `run-claude-worker.sh review <project> <payload-file>`    | `run-codex-worker.sh review <project> <model> <payload-file>`（`gpt-5.6-sol` 既定 / `gpt-5.6-terra` へ昇格可） |
+| role      | Claude                                                    | Codex                                                                                                                                                   |
+| --------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| implement | `run-claude-worker.sh implement <project> <payload-file>` | `run-codex-worker.sh implement <project> gpt-5.6-luna <payload-file>`                                                                                   |
+| review    | `run-claude-worker.sh review <project> <payload-file>`    | `run-codex-worker.sh review <project> <model> <payload-file>`（許可 model は `orchestrator-worker` の tier 表が正本。script が fail-closed で検証する） |
 
 helper の解決先は `~/.agents/skills/agmsg-delegation/scripts/`。両 runtime とも headless mode と stdin prompt を使い、対話 TUI と shell interpolation を避ける。`launch-worker.sh` は専用の一時ディレクトリに launchd job label・ログ・exit status を残して detached に起動する。helper が role から model / effort を固定し、caller は model を渡さない（Codex は起動時の引数）。`run-codex-worker.sh` は role ごとの model allowlist を fail-closed で検証し、不一致は起動前に exit 2 で拒否する。上書き変数は各 script の Usage / コメントを参照（値は scripts が正本）。
 
