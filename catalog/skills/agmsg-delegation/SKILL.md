@@ -9,11 +9,20 @@ description: >-
 
 # agmsg-delegation
 
-別プロセスの agent（headless Claude Code / Codex）へ、agmsg メッセージングで作業を委譲するライフサイクルを回す。組み込みサブエージェント（Agent tool / `spawn_agent`）が使える場合はそちらが正規経路であり、このスキルは **native spawn が使えない場合、別セッションへ引き継ぐ場合、または外部プロセスが必要な場合の手動経路**である。**pane / workspace を勝手に作らない。ユーザーが指示したときだけ、読み戻し付きの手順で作る**（理由と常駐運用は「常駐プール経路」を参照）。
+別プロセスの agent（headless Claude Code / Codex）へ、agmsg メッセージングで作業を委譲するライフサイクルを回す。組み込みサブエージェント（Agent tool / `spawn_agent`）が使える場合はそちらが正規経路であり、このスキルは **native spawn が使えない場合、別セッションへ引き継ぐ場合、または外部プロセスが必要な場合の手動経路**である。**pane / workspace を勝手に作らない。ユーザーが指示したときだけ、読み戻し付きの手順で作る**（理由と常駐運用は [references/resident-pool.md](references/resident-pool.md) を参照）。
 
-Codex CLI 0.147.0 以降は native `spawn_agent` から Luna を leaf worker として起動できるため、通常の Codex 内委譲では native spawn を優先する。本スキルが新規プロセスで起動する `codex -m gpt-5.6-luna exec` は、native spawn が利用できない環境、別セッション運用、または外部プロセスの分離が必要な場合の fallback とする。
+tier 判定・委譲判定・タスク分割基準・Reviewer の model 選定は `orchestrator-worker` スキルが正本。本スキルは transport だけを定義する。
 
-tier 判定・委譲判定・タスク分割基準は `orchestrator-worker` スキルが正本。本スキルは transport と lifecycle だけを定義する。
+## この文はどこに書くか（transport 切り分け規則）
+
+ある文が次のどれに答えているかで置き場を決める。
+
+1. 相手は誰か（tier、model 選定、昇格、Reviewer の model）→ `orchestrator-worker`。
+2. 相手に何をさせ、結果をどう検証するか（委譲判定、分割、git diff 検証、DoD）→ `orchestrator-worker`。報告書式だけ本スキルの [WORKER.md](WORKER.md)。
+3. メッセージ/プロセスを届け、成立させ、片付けるか（identity 登録・解放、handshake、payload、起動・監視・timeout・cleanup、同一性確認）→ 本スキル。runtime 非依存は本文、runtime 依存（Codex profile、sandbox-exec、launchd、writable_roots）は `references/`。
+4. どれにも当たらない（価格、version 履歴、経緯）→ 書かない。
+
+Codex を起動する場合は [references/codex-sandbox.md](references/codex-sandbox.md) を先に読む。
 
 ## 引き継ぎ（handoff）メッセージ
 
@@ -25,16 +34,18 @@ tier 判定・委譲判定・タスク分割基準は `orchestrator-worker` ス�
 - 次セッションの目的が指定されていれば、それに合わせて内容を取捨する（全経緯の要約より、その目的に必要な決定事項を優先する）
 - 保存が必要な場合は OS の一時ディレクトリへ置き、作業リポジトリへコミットしない
 
+Steward から Architect への昇格 handoff もこの書式を使う。
+
 ## Role を決める
 
 共通 lifecycle は同一で、role によって安全契約と報告フォーマットが異なる。
 
-| role      | 自分の tier                    | spawn する相手                 | 相手の権限                   | 報告   |
-| --------- | ------------------------------ | ------------------------------ | ---------------------------- | ------ |
-| implement | Orchestrator (fable/sol/terra) | worker (sonnet / luna)         | 対象 worktree の編集可       | DONE   |
-| review    | Worker (sonnet/luna)           | reviewer (fable / sol / terra) | read-only。編集・commit 禁止 | REVIEW |
+| role      | 起動する側                                                | spawn する相手                 | 相手の権限                   | 報告   |
+| --------- | --------------------------------------------------------- | ------------------------------ | ---------------------------- | ------ |
+| implement | Orchestrator 機能を担う側                                 | worker (sonnet / luna)         | 対象 worktree の編集可       | DONE   |
+| review    | Orchestrator 機能を担う側。spawn 経路と pane 経路の両方可 | reviewer (fable / sol / terra) | read-only。編集・commit 禁止 | REVIEW |
 
-review role の reviewer モデル指定は本スキル内の一時的な model override であり、`orchestrator-worker` の tier 対応表や既存 agent 定義（親モデル継承）を変更しない。**review 外注の既定経路は Codex**: 起動時引数で `gpt-5.6-sol` / `gpt-5.6-terra` から選ぶ（既定は sol。設計影響が大きい・横断的なレビューは terra へ昇格し、必要なら `AGMSG_REVIEWER_EFFORT=high` などで effort も指定する）。Claude reviewer（fable 固定）は明示指定された場合のみ使う。orchestrator 側の Fable rate limit と枠を共有するため実行中 429 で run ごと失敗しうる。失敗した場合は同経路で再試行せず、Codex sol へ切り替えて再外注するか orchestrator が判断する（`--fallback-model opus` は起動失敗時のみ効き、実行中 429 は救えない）。
+review role の reviewer モデル指定は本スキル内の一時的な model override であり、`orchestrator-worker` の tier 対応表や既存 agent 定義（親モデル継承）を変更しない。model は helper の引数。選定は `orchestrator-worker` の「Reviewer の tier」が正本。
 
 ## Guardrails
 
@@ -60,41 +71,13 @@ review role の reviewer モデル指定は本スキル内の一時的な model 
 | implement | `run-claude-worker.sh implement <project> <payload-file>` | `run-codex-worker.sh implement <project> gpt-5.6-luna <payload-file>`                                          |
 | review    | `run-claude-worker.sh review <project> <payload-file>`    | `run-codex-worker.sh review <project> <model> <payload-file>`（`gpt-5.6-sol` 既定 / `gpt-5.6-terra` へ昇格可） |
 
-helper の解決先は `~/.agents/skills/agmsg-delegation/scripts/`。両 runtime とも headless mode と stdin prompt を使い、対話 TUI と shell interpolation を避ける。`launch-worker.sh` は専用の一時ディレクトリに launchd job label・ログ・exit status を残して detached に起動する。
+helper の解決先は `~/.agents/skills/agmsg-delegation/scripts/`。両 runtime とも headless mode と stdin prompt を使い、対話 TUI と shell interpolation を避ける。`launch-worker.sh` は専用の一時ディレクトリに launchd job label・ログ・exit status を残して detached に起動する。helper が role から model / effort を固定し、caller は model を渡さない（Codex は起動時の引数）。上書き変数は各 script の Usage / コメントを参照（値は scripts が正本）。
 
-Claude helper:
+Claude helper は空の MCP 設定と `-p` を強制して workspace trust / MCP 確認を防ぎ、`--output-format stream-json --verbose` で無人実行中のイベントを worker log へ継続出力する。`bypassPermissions` は macOS sandbox 内だけで使い、implement は対象 project 内だけ書込可、review は対象 project を read-only にする。`sandbox-exec` が無い環境では安全契約を弱めず停止する。
 
-- role から model を固定する（implement は `sonnet`、review は `fable` + `--fallback-model opus`）。caller から model を渡さず、role と model の不整合を作らない
-- 空の MCP 設定と `-p` を強制して workspace trust / MCP 確認を防ぎ、`--output-format stream-json --verbose` で無人実行中のイベントを worker log へ継続出力する
-- `bypassPermissions` は macOS sandbox 内だけで使い、implement は対象 project 内だけ書込可、review は対象 project を read-only にする。`sandbox-exec` が無い環境では安全契約を弱めず停止する
+Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、review profile の内容一致を起動時に検証する。review profile の fail-open 対策・cwd scratch・`writable_roots` の symlink fail-closed 検査・launchd の `MISE_ENV` 継承は [references/codex-sandbox.md](references/codex-sandbox.md) を参照。
 
-Codex helper:
-
-- `exec --ephemeral`、`-a never`、stdin prompt を強制し、review profile の内容一致を起動時に検証する
-- implement role は `model_reasoning_effort` を既定 `xhigh` で付与する（`AGMSG_WORKER_EFFORT` で上書き可。昇格時は `max` を渡す）
-- review role は既定では effort を付与せず Codex 既定に任せる。`AGMSG_REVIEWER_EFFORT` を指定した場合のみ `model_reasoning_effort` を付与する（例: terra レビューで `high`）
-
-Codex review に `--sandbox read-only` を使ってはならない。agmsg の送受信自体が DB 書込み（`send.sh` の messages.db 更新、`inbox.sh` の read_at 更新）と report 一時ファイル作成を必要とするため、完全 read-only では reviewer が READY/REVIEW/ACK を送信できない。代わりに、agmsg 状態ディレクトリ（db/teams/run）だけを `writable_roots` に持つ profile `agmsg-review`（`CODEX_HOME/agmsg-review.config.toml`）を `-p` で layer する。**`writable_roots` は symlink 成分を含むと Codex が exec を拒否する**（"symlinked writable roots are not supported"）。`~/.agents/skills/agmsg/db`・`teams` は `~/.local/state/agmsg/` への symlink なので、profile には canonical path を列挙する（列挙内容は profile 正本のコメントを参照）。
-
-**profile の `sandbox_mode = "workspace-write"` は cwd を必ず書込可能にする。** そのため `run-codex-worker.sh` は review role で **cwd を専用スクラッチ（`mktemp -d`）へ逃がし**、対象 project を cwd にしない。project へは read のみで到達でき、payload が絶対パスで指示する。スクラッチは git repo でないので `exec --skip-git-repo-check` を併せて渡す。`writable_roots` に対象 project を足してはならない。足すと read-only 契約が黙って壊れる。
-
-profile の正本は本スキルの [agmsg-review.config.toml](agmsg-review.config.toml)（tracked asset）。**Codex の `-p` は profile ファイルが欠落していても exit 0 で base config にフォールバックする（fail-open）ため、`run-codex-worker.sh` が起動前に正本を `~/.codex/agmsg-review.config.toml` へ `install -m 600` で置き直し、その後 `cmp` で一致を検証する**。`CODEX_HOME` は APM の配布面ではないため（`targets:` は runtime 種別のリストで、skills / agents ディレクトリと `~/.codex/AGENTS.md` しか配布しない）、この置き直しが catalog 正本への追従経路になる。
-
-- 手動コピーは不要。catalog 側の profile を更新したら `mise run deploy` するだけでよい
-- source が欠落、コピー失敗、コピー後も不一致のいずれでも helper は起動を拒否する（fail-closed）
-- 初回利用前の smoke: (1) review は対象 project への write が拒否される (2) implement は対象 project 内の edit が成功し project 外の write が拒否される (3) `send-report.sh` による READY send 成功 (4) DONE / REVIEW send 成功 (5) 全手順が承認画面・MCP 確認画面なしで完了、の5点を runtime ごとに実際に確認する
-
-**`run-codex-worker.sh` は起動前に `writable_roots` の symlink 成分を検査して fail-closed する。** 不正な root が1つでもあると Codex は sandbox 構築自体に失敗し、**agmsg と無関係なコマンドまで起動前に全拒否する**。worker 側からは「シェルすら起動できない」形にしか見えず、原因が設定にあると分からないまま停止する。検査対象は role で異なる。
-
-- implement: profile を layer しないため `CODEX_HOME/config.toml` の base config を検査する
-- review: profile の `writable_roots` は base config を**置換**する（実測済み）ため、配置後の profile だけを検査する
-
-検査に引っかかった場合は該当 root・ファイル・canonical path へ直す指示を名指しで出して exit 1 する。
-
-launchd 経路では親の `MISE_ENV` が継承されず、node を必要とする mise 管理の npm wrapper が即死することがある。
-`launch-worker.sh` は `MISE_ENV` を wrapper に引き継ぎ、同じ npm install 配下の `vendor/*/bin/codex` native binary を優先する（無ければ node の PATH を補完する）。
-
-完了条件: CLI・role 別起動コマンド（review は profile の diff 一致確認込み）・agmsg・`launch-worker.sh` の4点が確認済み。
+完了条件: CLI・role 別起動コマンド（review は profile の diff 一致確認込み）・agmsg・`launch-worker.sh` の4点が確認済み。初回利用前の smoke 5点は [references/runtime-smoke.md](references/runtime-smoke.md) を参照。
 
 ### 2. 作業領域を固定する
 
@@ -159,16 +142,9 @@ READY 後も DONE / REVIEW だけを無期限に待たず、agmsg DB に届い�
 
 ### 7. 報告を受けて検証する
 
-**implement** — `DONE(task_id, status, files, tests, blockers)` 受信後:
+**implement** — `DONE(task_id, status, files, tests, blockers)` 受信後は、`orchestrator-worker` の「5. 受け取って検証する」の手順へ渡す。
 
-- `git status --short` と `git diff` を自分の目で読む
-- untracked は `git ls-files --others --exclude-standard` で列挙し、各ファイルの内容を `git diff --no-index /dev/null <file>` または直接 Read で検証する
-- タスク定義に無い変更が入っていないか、test / typecheck が通るか確認する
-
-**review** — `REVIEW(task_id, verdict, findings[{severity, file, line, evidence, recommendation}], checks)` 受信後:
-
-- head SHA（+ diff ファイル方式なら checksum）が起動時と一致することを確認してから findings を採用する
-- implement 用の diff 検証手順は適用しない
+**review** — `REVIEW(task_id, verdict, findings[{severity, file, line, evidence, recommendation}], checks)` 受信後、head SHA（+ diff ファイル方式なら checksum）が起動時と一致することを確認してから findings を採用する。pane 常駐経路（[references/resident-pool.md](references/resident-pool.md)）で受けた場合は、加えて `git status --short` と `git ls-files --others --exclude-standard` が review 開始時点と差分なしであることを確認する（spawn 経路では不要）。implement 用の diff 検証手順は適用しない。
 
 完了条件: role 別の検証を根拠にユーザーへ報告できる状態。
 
@@ -186,60 +162,8 @@ worker が crash / timeout した場合も同じ 1→3 の順序で片付け、�
 
 ## 常駐プール経路
 
-ユーザーが手で立てた pane の agent が `join` してチームに常駐し、同じ identity で複数タスクを受け続ける経路。`backlog-sweep` の Worker プールがこれにあたる。Lifecycle の 4・6・8 が使えないので、以下で置き換える。
-
-**エージェントが pane を勝手に作らない。ユーザーが「用意して」と指示したときだけ作る。** その場合も `herdr workspace create` / `tab create` は使わない——command 指定フラグが無く bare shell しか起動しないのに、読み戻さなければ「起動した」と報告できてしまう。自分の pane からの `pane split --focus` → `pane run` → `pane process-info` での読み戻し、という `herdr` スキルの手順に従う（`backlog-sweep`「Worker プールを組む」に手順あり）。確認していない foreground process 名を報告に書かないこと。
-
-| lifecycle   | spawn 経路                                              | 常駐プール経路                                                            |
-| ----------- | ------------------------------------------------------- | ------------------------------------------------------------------------- |
-| 3. 事前登録 | 同じ                                                    | 同じ。ただし固定名を再利用する                                            |
-| 4. 起動     | `launch-worker.sh` で launchd 登録                      | ユーザーが pane を起動し、agent が `join` する。orchestrator は起動しない |
-| 5. READY    | inbox の `READY(task_id)`                               | 同じ（inbox 一本化なのでそのまま使える）                                  |
-| 6. 監視     | inbox + `worker.log` / `worker.exit` / launchd job 状態 | inbox のみ。下記の heartbeat 契約に置き換える                             |
-| 8. 片付け   | `reset.sh` → `bootout` → 一時ディレクトリ削除           | `reset.sh` で identity を解放するだけ。pane は落とさない                  |
-
-### 生存契約
-
-`$run_dir/worker.log`・`worker.exit`・launchd job label が存在しないため、**crash・長時間コマンド・承認待ちを orchestrator 側だけでは区別できない**。この欠落を heartbeat とユーザーへの委譲で埋める。
-
-- boot payload が無い経路なので、**最初のタスクメッセージが Worker プロトコルの唯一の注入口**になる。1通目に `WORKER.md` の解決済み絶対パス、`send-report.sh <team> <worker_name> <orchestrator>` の引数契約、下記の heartbeat 間隔を必ず含める
-- worker は作業中、**5分を超えて無言にならないよう `WORKING` を送る**
-- pane を `herdr` で立てた場合は、`herdr pane process-info` で `agent_status` と foreground process を読み戻してから生存判定する
-- `WORKING` が10分途切れたら、orchestrator は推測で crash 判定せず、**該当 pane の状態確認をユーザーへ依頼する**（承認プロンプトで停止している可能性がある。pane は対話 TUI なので画面には出ているが、agmsg には何も流れない）
-- 打ち切るときは `STOP(task_id)` を送る。応答が無い場合、spawn 経路のような job 停止手段は無いので、**ユーザーに pane で中断してもらう**
-
-### 安全契約の置き換え
-
-pane はユーザーが起動するので `run-claude-worker.sh` / `run-codex-worker.sh` を通らず、**macOS sandbox の書込境界も `-a never` も掛からない**。実行時強制を失う分は次で担保する。
-
-- pane の cwd を対象 worktree に固定する。`join.sh` / `identities.sh` は渡された project パスを記録・列挙するだけで **pane が実際にどこにいるかは検証しない**が、エージェントが `pane split --cwd` で立てた場合に限り `herdr pane process-info` で実 cwd を読み戻せる。ユーザーが手で立てた pane では機械的な確認手段が無く、cwd の正しさはユーザーが担保する
-- 触るファイル集合が互いに素にできない行は直列化するか worktree を分ける
-- したがって **orchestrator が `git diff` で実差分を読む（Lifecycle 7）ことが、機械的に成立する唯一の境界チェック**になる。省略しない
-
-review role は常駐プールで運用しない。read-only の実行時強制が profile 起動に依存しており、pane では担保できない。レビュー外注は従来どおり spawn 経路を使う。
-
-### pane で Codex worker を起動するときのサンドボックス選択
-
-常駐プールの pane はユーザーが手で起動するが、実装 worker の通常経路は既存 worktree を使う sandboxed pane とする。orchestrator またはユーザーが pane の起動前に worktree を作成し、pane worker は次で起動する:
-
-```bash
-codex -m gpt-5.6-luna -a never -s workspace-write
-```
-
-起動後、orchestrator は pane の実 cwd と `git worktree list --porcelain` を照合し、`git -C "$worktree" rev-parse --show-toplevel` と `git -C "$worktree" branch --show-current` が指定した worktree / branch と完全一致することを確認する。さらに開始時点の `git status --short` / `git diff` と worker 後の差分を比較し、タスク定義にない unexpected diff がないことを確認する。
-
-worktree の事前作成ができない場合だけ、外部隔離された別の one-shot `--yolo` session に作成を限定する。その session は worktree の作成直後に終了し、実装は必ず新しく起動した上記 sandboxed pane worker に続けて渡す。実装 worker を `--yolo` のまま常駐させない。
-
-scoped `--add-dir` は worktree 作成の代替にならない。ローカルの一次観測では、Codex 0.150.1 の `codex --help` に `--add-dir` が出ていたが、`.git/worktrees` だけを書込可能にした isolated `workspace-write` probe は `.git/refs/heads/probe.lock` で rc255 `Operation not permitted` になった。source の `.git` 全体を追加し、target を事前作成しても、target の `/.git` への書込みで rc128 `Operation not permitted` になった。Codex が `git worktree add` に必要な Git administrative files を保護するため、scoped add-dir は insufficient である。従って `--yolo` は外部隔離された worktree 作成の one-shot session に限り、作成後は直ちに終了させる。
-
-`--yolo` は `--dangerously-bypass-approvals-and-sandbox` の別名で sandbox 自体を無効化する。外部隔離された one-shot の worktree 作成以外では使わず、承認プロンプトで停止させない目的だけなら `-a never` で足りる。
-
-`-a` の有効値は `on-request` と `never` のみ。`on-failure` は存在しない（0.149.1 で確認）。
-
-`writable_roots` に symlink 成分があると Codex は sandbox 構築ごと失敗し、agmsg と無関係なコマンドまで起動前に全拒否される。詳細は Preflight の記述を参照。
+ユーザーが手で立てた pane の agent が `join` してチームに常駐し、同じ identity で複数タスクを受け続ける経路。`backlog-sweep` の Worker プールがこれにあたる。Lifecycle の置き換え表、heartbeat 契約、安全契約の置き換え、Reviewer の pane 常駐可否は [references/resident-pool.md](references/resident-pool.md) を参照。
 
 ## Worker プロトコル
 
-worker 側に注入する詳細プロトコル（報告フォーマット、途中相談ルール、role 別完了条件）は [WORKER.md](WORKER.md) が正本。boot プロンプトには handshake と無人実行契約の最小形、WORKER.md の絶対パスだけを埋め込む。
-
-WORKER.md、`scripts/send-report.sh`、`scripts/launch-worker.sh`、`scripts/run-claude-worker.sh`、`scripts/run-codex-worker.sh` は `~/.agents/skills/agmsg-delegation/` と `~/.claude/skills/agmsg-delegation/` の両方に配布されている必要がある。deploy 後に両方の存在・実行権限・内容一致を確認する。
+worker 側に注入する詳細プロトコル（報告フォーマット、途中相談ルール、role 別完了条件）は [WORKER.md](WORKER.md) が正本。boot プロンプトには handshake と無人実行契約の最小形、WORKER.md の絶対パスだけを埋め込む。deploy 後に両配布先の存在・実行権限・内容一致を確認する（`apm-deploy-verify`）。
