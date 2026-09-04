@@ -28,8 +28,9 @@ guidance to `~/.codex/AGENTS.md` and deploys skills to `~/.agents/skills`.
 `TODO_FILE=todo.txt tuxedo`. Completed internal tasks are archived in the
 sibling `done.txt`. Decision history (why a package or lane was adopted,
 removed, or deferred) belongs in `docs/package-decisions.md`; code-change
-history lives in git log and `plans/`. Do not introduce `CHANGELOG.md` and do
-not recreate `TODO.md` for active work — those roles are already covered by
+history lives in git log and `plans/`; flat `plans/*.md` files are tracked as
+history documents, while `plans/<tool>/` holds untracked skill output. Do not
+introduce `CHANGELOG.md` and do not recreate `TODO.md` for active work — those roles are already covered by
 the three surfaces above.
 
 For the detailed lane inventory, use [`docs/skill-inventory.md`](docs/skill-inventory.md).

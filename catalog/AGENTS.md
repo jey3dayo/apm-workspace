@@ -109,6 +109,7 @@
 
 - ユーザー未確認の変更を `git restore` などで復元・破棄しない。特に `main` / `master` 上では restore 系操作を実行しない
 - スキル実行や調査で作る一時的な出力（調査メモ、レビュー結果、レポート、スクリーンショット等）は、保存先の指定がない限りリポジトリ直下の `tmp/` 配下に集約し、原則コミットしない。スキルが `research_*` や `reports/` などの相対出力先を要求する場合も `tmp/<skill-or-topic>/` へ読み替える
+- 実装計画（plan）はスキルが `plans/` や `docs/**/plans/` を指定していても、リポジトリ直下の `plans/<skill-or-tool>/` へ読み替える（例: `plans/improve/`、`plans/superpowers/`）。次セッションでも読み返すため `tmp/` とは分け、原則コミットしない。Claude Code 本体が使う `.plans/` はそのまま扱う
 - README.md や \*.md は明示的に要求された場合のみ作成する
 
 ## ドキュメント作成の優先順位
