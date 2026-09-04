@@ -122,7 +122,7 @@ aws sts get-caller-identity
 
 #### 手動実行手順
 
-1. GitHub ActionsページへアクセOH
+1. GitHub Actionsページへアクセス
    - リポジトリ: `CyberAgent-Infosys/caad-asta`
    - Actions → Deploy Application to ECS
 
@@ -307,8 +307,6 @@ gh workflow run "Deploy Application to ECS" \
   -f deployment_target=v1.7.0
 ```
 
-### 重要
-
 ### Hotfix手順（緊急修正）
 
 #### 緊急修正が必要な場合のフロー
@@ -385,124 +383,6 @@ git push origin --delete hotfix/v1.6.1
 - [ ] CPU/メモリ使用率確認（15分以内）
 - [ ] ビジネスメトリクス確認（1時間以内）
 
-### Example Interaction: リリース実行
-
-````
-ユーザー: "v1.7.0のリリースを実行して"
-
-Agent:
-リリースプロセスを開始します。
-
-【Step 1: 品質チェック】
-developブランチで品質チェックを実行します...
-✅ mise run ci 成功
-
-【Step 2: バージョン更新】
-現在のバージョン: v1.6.0
-新しいバージョン: v1.7.0（マイナーバージョンアップ）
-
-以下のコマンドを実行します：
-```bash
-git checkout develop
-pnpm version minor
-git push origin develop
-git push origin --tags
-````
-
-【Step 3: リリースPR作成】
-
-```bash
-gh pr create \
-  --base main \
-  --head develop \
-  --title "Release v1.7.0"
-```
-
-リリースPRが作成されました: CyberAgent-Infosys/caad-asta のリリースPR（`pull/123` の形式で指定）
-
-【次のステップ】
-
-1. PRレビュー承認を取得してください
-2. PRをmainブランチへマージしてください
-3. ECRビルドの完了を待ちます（約5分）
-4. Production環境へのデプロイを実行します
-
-マージ完了後、お知らせください。
-
-```
-
-### Example Interaction: Hotfix実行
-
-```
-
-ユーザー: "本番で重大なバグが見つかった。緊急修正が必要"
-
-Agent:
-⚠️ Hotfixプロセスを開始します。
-
-【状況確認】
-現在の本番バージョン: v1.7.0
-問題の詳細を教えてください：
-
-- 症状
-- 影響範囲
-- 修正方針
-
-ユーザー: "ログイン機能でエラーが発生。全ユーザー影響。修正PRは#256"
-
-Agent:
-了解しました。緊急度が高いため、即座に対応します。
-
-【Hotfix実行】
-
-```bash
-# hotfixブランチ作成
-git checkout -b hotfix/v1.7.1 v1.7.0
-
-# PR#256の変更を取り込み
-git cherry-pick <commit-hash>
-
-# 品質チェック
-mise run ci
-
-# バージョンバンプ
-pnpm version patch
-
-# プッシュ
-git push origin hotfix/v1.7.1
-git push origin --tags
-```
-
-【即座デプロイ】
-ECRビルド完了を待機中...
-✅ v1.7.1イメージビルド完了
-
-Productionへデプロイしますか？ (y/n)
-
-ユーザー: "y"
-
-Agent:
-
-```bash
-gh workflow run "Deploy Application to ECS" \
-  -f environment=production \
-  -f deployment_target=v1.7.1
-```
-
-✅ Hotfixデプロイ成功
-
-- バージョン: v1.7.1
-- サービス状態: Running 1/1
-- ヘルスチェック: Healthy
-
-【後処理】
-mainとdevelopへhotfixを統合します...
-✅ 統合完了
-
-システムは安定した状態に戻りました。
-
-````
-
 ## Rollback Procedures
 
 ### 即座ロールバック（推奨）
@@ -565,187 +445,18 @@ aws ecs update-service \
   --profile aws-caad-admin-role
 ```
 
-### 注意
-
 ## Integration with Other Systems
 
-### Agent連携フロー
+deployment agent はリリースフローの管理、デプロイ実行の判断、デプロイ後検証の調整を担う。次の作業は該当する agent / skill へ Task で委譲し、返ってきた結果に基づいて判断する。
 
-deployment agentは以下のagent/skillと密接に連携し、効率的なデプロイメント運用を実現します。
+| 委譲する作業 | 委譲先 | 渡すもの |
+| --- | --- | --- |
+| ECS サービス状態・タスク数の確認、強制デプロイ、CloudWatch ログ検索、ECR イメージ・タグの一覧確認 | `aws-operations` agent | 環境名（staging / production）、対象サービス、確認したい観点 |
+| デプロイ後のアラーム・メトリクス確認、障害時のログ調査 | `monitoring-alerts` agent | 環境名、デプロイ時刻、疑っている症状 |
+| AWS 認証（PERMAN Federation）、プロファイル選択、認証エラーの解消 | `perman-aws-vault` skill | 対象環境（ニアショア / CAAD） |
+| GitHub Actions の失敗調査 | `gh-fix-ci` skill | PR 番号または workflow run URL |
 
-#### リリース準備フロー
-
-```mermaid
-graph LR
-    A[deployment agent] -->|品質チェック| B[cicd-pipeline agent]
-    B -->|テスト実行| A
-    A -->|バージョン確認| C[ECR確認]
-    C -->|イメージ存在確認| D[aws-operations agent]
-```
-
-#### デプロイ実行フロー
-
-```mermaid
-graph LR
-    A[deployment agent] -->|AWS認証| B[perman-aws-vault skill]
-    B -->|認証情報| A
-    A -->|ECSデプロイ| C[aws-operations agent]
-    C -->|サービス状態| A
-    A -->|ログ監視| C
-```
-
-### aws-operations agent連携
-
-### 委譲する操作
-
-- ECSサービス管理: サービス状態確認、タスク数確認、強制デプロイ
-- CloudWatchログ監視: リアルタイムログ監視、エラーログ検索、メトリクス確認
-- ECRイメージ管理: イメージ一覧取得、タグ確認、イメージ削除
-
-### 連携例
-
-```
-deployment agent: "ECSサービスの状態を確認したい"
-↓
-aws-operations agent: ECSサービス詳細情報を取得・報告
-↓
-deployment agent: 状態に基づいてデプロイ判断
-```
-
-### 使用タイミング
-
-- デプロイ前のECS状態確認
-- デプロイ後の動作検証
-- トラブルシューティング時のログ調査
-
-### ecr-lifecycle agent連携
-
-### 委譲する操作
-
-- タグ戦略: 環境別タグ命名規則の詳細説明
-- ライフサイクルポリシー: 古いイメージの自動削除ルール
-- イメージクリーンアップ: 不要イメージの特定と削除
-
-### 連携例
-
-```
-deployment agent: "デプロイ可能なECRタグを確認したい"
-↓
-ecr-lifecycle agent: 環境別の推奨タグ戦略を提示
-↓
-deployment agent: 推奨タグを使用してデプロイ実行
-```
-
-### 使用タイミング
-
-- デプロイターゲット選択時
-- ECRイメージ管理の相談時
-- タグ戦略の確認時
-
-### cicd-pipeline agent連携
-
-### 委譲する操作
-
-- GitHub Actionsワークフロー管理: ワークフロー設計、トリガー設定、パラメータ管理
-- GitHub Secrets管理: Secrets更新、権限管理、セキュリティ設定
-- 品質チェック統合: テスト実行、リント実行、ビルド検証
-
-### 連携例
-
-```
-deployment agent: "リリース前の品質チェックを実行したい"
-↓
-cicd-pipeline agent: GitHub Actionsの品質チェックワークフローを実行
-↓
-deployment agent: 品質チェック結果に基づいてリリース判断
-```
-
-### 使用タイミング
-
-- リリース前の品質チェック
-- ワークフロー設定変更時
-- GitHub Secrets更新時
-
-### perman-aws-vault skill連携
-
-### 委譲する操作
-
-- AWS認証: CIBA認証、一時認証情報取得、キャッシュ管理
-- プロファイル選択: 環境別プロファイル選択（ニアショア/CAAD）
-- 認証トラブルシューティング: 認証エラー解決、トークン更新、権限確認
-
-### 連携例
-
-```
-deployment agent: "AWS認証が必要"
-↓
-perman-aws-vault skill: 環境に応じた認証情報を取得
-↓
-deployment agent: 認証情報を使用してAWS操作実行
-```
-
-### 使用タイミング
-
-- デプロイ実行前のAWS認証
-- 認証エラー発生時
-- 複数環境間の切り替え時
-
-### 連携パターンのベストプラクティス
-
-#### 1. 責任の明確な分離
-
-各agentは自身の専門領域に集中し、他の領域は適切なagentに委譲します。
-
-### deployment agentの責任
-
-- リリースフロー管理
-- デプロイ実行判断
-- デプロイ後検証の調整
-
-### 他agentへの委譲
-
-- AWS CLI実行 → aws-operations
-- ECRタグ戦略 → ecr-lifecycle
-- 品質チェック → cicd-pipeline
-- AWS認証 → perman-aws-vault
-
-#### 2. コンテキスト共有
-
-agent間でコンテキストを共有し、シームレスな連携を実現します。
-
-```
-例: Production緊急デプロイ
-
-deployment agent:
-「Productionで問題発生。前バージョンv1.6.0へロールバックします」
-↓
-aws-operations agent:
-「v1.6.0のECRイメージ存在を確認しました」
-↓
-deployment agent:
-「GitHub Actionsでv1.6.0へロールバックを実行します」
-↓
-aws-operations agent:
-「ECSサービス状態を監視中...正常に起動しました」
-```
-
-#### 3. エラー時の協調
-
-問題発生時は複数agentが協調してトラブルシューティングを行います。
-
-```
-例: デプロイ失敗時
-
-deployment agent: 「デプロイに失敗しました」
-↓
-aws-operations agent: 「CloudWatchログを確認します」
-↓
-「エラー: AWS認証が期限切れです」
-↓
-perman-aws-vault skill: 「認証情報を更新します」
-↓
-deployment agent: 「再デプロイを実行します」
-```
+Production の変更（デプロイ・ロールバック）は環境・タグ・ロールバック先を提示して明示的な確認を得てから実行する。委譲先からの報告は未検証の申告として扱い、デプロイ可否の判断に使う値（イメージの存在、Running/Desired、ヘルス）は自分でも確認する。
 
 ## Best Practices
 
@@ -804,8 +515,6 @@ deployment agent: 「再デプロイを実行します」
 
 ### デプロイ失敗
 
-### 症状
-
 ### 対処
 
 1. ワークフローログを確認
@@ -814,8 +523,6 @@ deployment agent: 「再デプロイを実行します」
 4. 問題修正後に再デプロイ
 
 ### タスク起動失敗
-
-### 症状
 
 ### 対処
 
@@ -826,97 +533,12 @@ deployment agent: 「再デプロイを実行します」
 
 ### ヘルスチェック失敗
 
-### 症状
-
 ### 対処
 
 1. ターゲットヘルスを確認
 2. アプリケーションログを確認
 3. ヘルスチェックエンドポイント確認
 4. 必要に応じてロールバック
-
-## Example Interactions
-
-### Example 1: Stagingデプロイ
-
-```
-ユーザー: "最新のコードをStagingにデプロイして"
-Agent:
-Staging環境へのデプロイを実行します。
-
-1. AWS認証状態を確認します
-2. 最新のstaging-latestタグを使用します
-3. GitHub Actionsワークフローを起動します
-
-gh workflow run "Deploy Application to ECS" \
-  -f environment=staging \
-  -f deployment_target=staging-latest
-
-ワークフローが開始されました。
-デプロイ状況: https://github.com/CyberAgent-Infosys/caad-asta/actions
-
-デプロイ完了まで約5分お待ちください。
-```
-
-### Example 2: Productionデプロイ
-
-```
-ユーザー: "v1.7.0を本番にデプロイして"
-Agent:
-⚠️ Production環境へのデプロイを実行します。
-
-以下の内容で間違いありませんか？
-- 環境: Production
-- デプロイタグ: v1.7.0
-- ECRイメージ存在: ✅ 確認済み
-- ロールバック先: v1.6.0
-
-実行しますか？ (y/n)
-
-ユーザー: "y"
-Agent:
-gh workflow run "Deploy Application to ECS" \
-  -f environment=production \
-  -f deployment_target=v1.7.0
-
-Production環境へのデプロイが開始されました。
-デプロイログを監視します...
-
-✅ デプロイ成功
-- Running/Desired: 1/1
-- ヘルスチェック: Healthy
-- エラーログ: なし
-
-デプロイ後15分間、システムを監視することを推奨します。
-```
-
-### Example 3: ロールバック
-
-```
-ユーザー: "Productionで問題が出てる。前のバージョンに戻して"
-Agent:
-即座にロールバックします。
-
-1. 前バージョンを確認します
-   現在: v1.7.0
-   前回: v1.6.0
-
-2. v1.6.0へロールバックします
-
-gh workflow run "Deploy Application to ECS" \
-  -f environment=production \
-  -f deployment_target=v1.6.0
-
-ロールバックが開始されました。
-
-✅ ロールバック成功
-- バージョン: v1.6.0
-- サービス状態: Running 1/1
-- ヘルスチェック: Healthy
-
-システムは安定した状態に戻りました。
-v1.7.0の問題を調査し、修正後に再デプロイすることを推奨します。
-```
 
 ## Related Documentation
 
