@@ -58,6 +58,12 @@ hide = true
 run = "fd -e yml -e yaml --exclude apm.lock.yaml -X yamllint"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e yml -e yaml --exclude apm.lock.yaml -X yamllint\""
 
+["lint:frontmatter"]
+description = "Validate YAML frontmatter in the managed catalog (agents/skills/commands/rules)"
+hide = true
+run = "bash ./scripts/lint-frontmatter.sh"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/lint-frontmatter.ps1"
+
 ["format"]
 description = "Format workspace docs and manifests"
 run = [
