@@ -33,7 +33,7 @@
 - 社内（caad-develop）: `perman-aws-vault`, `caad-skill-deployer`,
   `ai-banzuke`, `ai-butsukari-evidence-scout`
 - 図生成: `diagram-design`（cathrynlavery, SHA pin）
-- その他: `understand`, `humanizer-ja`, `agmsg`, `tuicr`,
+- その他: `humanizer-ja`, `agmsg`, `tuicr`,
   mattpocock 系（`grilling`, `writing-for-agents`, `wayfinder`,
   `improve-codebase-architecture`, `codebase-design`, `domain-modeling`,
   `research`, `prototype`, `setup-matt-pocock-skills`）
@@ -181,7 +181,6 @@ global から repo-local / optional へ移す候補。実施済みのもの
 | 候補               | 推奨配置                                    | 判断理由                                                                                                                                         |
 | ------------------ | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `browser-harness`  | 対象リポジトリの `apm.yml` または on-demand | ブラウザセッション・ログイン状態と結び付く。`agent-browser` は 2026-07-16 に global 撤去済み（repo-local: `caad-loca-bff` / `ultra-rss-reader`） |
-| `understand`       | 対象リポジトリの `apm.yml` または on-demand | 解析対象コードベースに結び付く。`understand-dashboard` は 2026-08-09 に撤去（従属品）                                                            |
 | `perman-aws-vault` | 当面 global 維持                            | 複数 AWS リポジトリで同じ認証導線を使うため。移管するなら profile/credential 境界を明記後                                                        |
 
 2026-07-16 の棚卸しで global 維持を決定したもの（候補から除外）:
@@ -207,9 +206,9 @@ global から repo-local / optional へ移す候補。実施済みのもの
 4. `mise run deploy` 後に `~/.agents/skills` と `~/.claude/skills` の残存を確認する
 5. このファイルと `docs/package-decisions.md` を更新する
 
-## 社員向けスキル検索の設計メモ（2026-07-15、未実装）
+## 社員向けスキル検索の設計メモ（2026-07-15、見送り）
 
-global から専門スキルを外すために、軽量な「スキル検索・導入入口」だけを global に残す案を採用する。実装タスクは `todo.txt` の `+skill-search` を参照。
+global から専門スキルを外すために、軽量な「スキル検索・導入入口」だけを global に残す案。2026-09-05 に見送りを決定し、実装タスクは `todo.txt` から外した（判断は `docs/package-decisions.md`）。以下は再検討時の出発点として残す。
 
 - 検索インデックスは `catalog/**`、`optional-skills/**`、root `apm.yml` / `apm.lock.yaml` の external 依存を統合する。
 - 検索結果には skill id、用途、scope、source kind、upstream / package ref、trust・license 情報、導入コマンド、現在の global 配布状態を表示する。

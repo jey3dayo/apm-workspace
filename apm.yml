@@ -45,7 +45,6 @@ dependencies:
 
     # browser / analysis tools
     - browser-use/browser-harness
-    - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand
     - cathrynlavery/diagram-design
     - tt-a1i/archify/archify
     - anthropics/claude-code/plugins/frontend-design/skills/frontend-design

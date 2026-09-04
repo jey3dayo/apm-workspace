@@ -49,6 +49,32 @@
   `playwright-cli`（`browser-harness` で代替）、`shadcn`（`ui-styling` でカバー）。
 - 再検討するなら: `frontend-design` / `baseline-ui` との発火競合が実運用で目立つ場合。
 
+## understand (Lum1104/Understand-Anything)
+
+- Status: 撤去（2026-09-05）
+- 旧正本: `Lum1104/Understand-Anything/understand-anything-plugin/skills/understand`
+- 理由: 初見リポジトリで実際に起動するかを観察対象にしていたが、観察期間中に一度も
+  起動しなかった。コードベースの knowledge graph を生成する重量スキルで、実際の入口は
+  「どこにあるか」「どう繋がっているか」の問いであり、そこは `deep-explore` /
+  `serena` / `researcher` の 3 者で埋まっている。常駐 trigger を持つ価値がない。
+- 従属品: `understand-dashboard` は 2026-08-09 に先行撤去済み（本体の出力を表示するだけ）。
+- 再検討するなら: 単発の探索ではなく、同一リポジトリを繰り返し横断して構造を参照する
+  作業が定着したときに見る。その場合も global ではなく対象リポジトリの `apm.yml` へ
+  repo-local で入れる。
+
+## 社員向けスキル検索 index / CLI（自作案）
+
+- Status: 見送り（2026-09-05）
+- 提案: 2026-07-15。global から専門スキルを外し、軽量な検索・導入入口だけを global に残す案。
+  設計メモは `docs/skill-inventory.md` の「社員向けスキル検索の設計メモ」に残す。
+- 理由: スキルの採用は検索して選ぶのではなく、話題になったものを試して残すか決める形で
+  回っている。検索 index が要る前提そのものが成立していない。`apm search` は
+  マーケットプレイスのプラグイン検索で別物、`find-skills` は skills.sh / `npx skills`
+  向けで社内 catalog と APM の scope 判定を扱わないため、作るなら自作になる。
+  その工数を払う需要が観測されていない。
+- 再検討するなら: 自分以外の利用者が増えて「どのスキルがあるか分からない」が実際に
+  詰まりになったときに見る。それまでは `docs/skill-inventory.md` の一覧で足りる。
+
 ## make-interfaces-feel-better (jakubkrehel)
 
 - Status: 撤去（2026-07-23、下記「skill 監査に基づく撤去」参照）
@@ -65,7 +91,7 @@
   未実施候補と判断基準・手順は [`docs/skill-inventory.md`](skill-inventory.md) の
   「移管候補（未実施）」へ集約）
 - 最初の検討対象: `agentation` 系、`browser-harness` / `agent-browser`、React/UI 検証系
-- 次の検討対象: UI デザインバンドルの必要サブセット、`understand` 系、社内 API 系
+- 次の検討対象: UI デザインバンドルの必要サブセット、社内 API 系
 - 維持方針: APM 所有権、検証、安全性、横断的な環境運用スキルは global を維持
 - 判断方法: 対象リポジトリで repo-local install と実作業を検証してから global 依存を外す
 
