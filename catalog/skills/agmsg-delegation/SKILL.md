@@ -36,6 +36,21 @@ Codex を起動する場合は [references/codex-sandbox.md](references/codex-sa
 
 Steward から Architect への昇格 handoff もこの書式を使う。
 
+### envelope（task / handoff メッセージの必須フィールド）
+
+受け側が自分の役を本文から推測せずに済むよう、task と handoff の 1 通目は次を必ず持つ。欠けている場合、受け側は役を確定できないものとして扱う（判定規則は `orchestrator-worker`）。
+
+| フィールド        | 意味                                                           |
+| ----------------- | -------------------------------------------------------------- |
+| `source_role`     | 送り手の役（Steward / Architect / Reviewer / Worker）          |
+| `target_role`     | 受け手に担わせる役。これがあれば受け側の判定はこれで確定する   |
+| `task_id`         | 以後のすべての報告に載せる識別子                               |
+| `report_contract` | 受け側が返す契約。`DONE`（implement）または `REVIEW`（review） |
+
+`target_role` と `report_contract` は独立に指定する。役だけ渡して報告契約を省くと、受け側が何を返せば完了なのかを本文から推測することになり、envelope を必須化した意味が消える。
+
+本文の口調や「人間が話しかけてきたように見えるか」は役の根拠にしない。同じ文面が user メッセージとしても hook 経由でも届くため、受け側から区別できない。
+
 ## Role を決める
 
 共通 lifecycle は同一で、role によって安全契約と報告フォーマットが異なる。

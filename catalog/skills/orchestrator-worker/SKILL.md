@@ -33,17 +33,27 @@ description: >-
 
 **Codex 側の Steward は `gpt-5.6-luna` のみで、明示ポリシーとして常に Orchestrator 機能を持たない。Codex Steward は handoff 専用と扱う。** Codex 側に Opus 相当の中間 tier（terra）を Steward に置くかはユーザー判断に委ね、本スキルでは追加しない。
 
-### 自己判定規則（モデルから役を引かない）
+### 自己判定規則（本文から推測しない）
 
-役は **topology（誰に話しかけられているか）** で決め、モデルは **その役を担ってよいかの許可集合** だけを決める。判定は上から順に、最初に当たったところで止める。
+役は**受け取ったメッセージの envelope** で決まる。本文の口調や「人間が話しかけてきたように見えるか」からは判定しない——同じ文面が user メッセージとしても hook 経由でも届くため、受け側から区別できない。判定は上から順に、最初に当たったところで止める。
 
-1. Orchestrator から task 契約（READY/DONE、WORKER.md）を受けている → **Worker**。人間からの発話と同時なら Worker 契約を優先し、人間には task 完了後に応答する。
-2. review role を与えられている（spawn の boot payload、または pane への TASK で REVIEW 契約を指示された）→ **Reviewer**。
-3. 人間から直接話しかけられていて、自分のモデルが Steward の許可集合 {Opus, Sonnet, Luna} に入る → **Steward**。
-4. 人間から直接話しかけられていて、自分のモデルが許可集合に入らない（Fable / sol / terra）→ **Architect**。人間が Architect pane に直接話すのは正当で、Steward からの handoff を受けるのと同じ扱い。
-5. Steward からの handoff メッセージを受けている → **Architect**。
+1. envelope に `target_role` がある → **その役**。
+2. `target_role` は無いが task 契約（`task_id` + `report_contract`）がある → **契約が指す役**。`report_contract: DONE` なら Worker、`REVIEW` なら Reviewer。
+3. envelope が無い対話セッション → pane / session の起動時に宣言された **default role**。宣言が無ければ、自分のモデルが Steward の許可集合に入るなら Steward、入らないなら Architect。
 
-「人間から直接なら常に Steward」という判定は採らない。許可集合に入らないモデル（Fable / sol / terra）に人間が直接話しかける運用は実在し、その場合は Architect になる。
+envelope の必須フィールドと書式は `agmsg-delegation` の「envelope」節が正本。
+
+### 役が決まったら許可集合を検証する（fail closed）
+
+役を確定したら、**自分のモデルが §1 の表のその行（Claude 列 / Codex 列）に載っているか**を確認する。載っていなければその役を引き受けない。
+
+| 受け取り方     | 不一致のときの動作                                                                |
+| -------------- | --------------------------------------------------------------------------------- |
+| task 契約      | `BLOCKED(task_id)` を返す。自分のモデル名と、要求された役を本文に書く。実行しない |
+| handoff        | 引き受けず、適切な許可集合を持つ役へ handoff し直す                               |
+| 対話セッション | ユーザーへ不一致を報告して停止する                                                |
+
+黙って実行しない理由は、不一致が起動側の設定ミスであり、受け側で止めるほうが安いからである。Fable に Worker 契約が届いて実装を回す、Luna に review 契約が届いて verdict を出す、はいずれも起動側からは成功に見える。
 
 ### Orchestrator 機能を担う条件（機械的）
 
@@ -59,7 +69,7 @@ tier は能力とコストの属性であり、検証の独立性（後述「Rev
 - Sonnet Steward / Luna Steward: **明示ポリシーとして** Orchestrator 機能を持たず handoff 専用とする。3 条件を満たせないからではなく、Steward は人間との対話・軽微修正に専念させるという運用判断による。実装依頼（§2 の委譲条件に当たるもの）は Architect へ handoff。軽微修正（§1a の応答範囲内）は自分で行う。
 - Worker が「Worker の昇格」で親と同じモデル（同 tier）へ昇格した場合: 親は coordination（分解・起動・進捗管理）を継続してよいが、**最終 acceptance は作者と異なる identity かつ別 session の Reviewer を必須とする**（詳細は次節）。同一 identity・同一 session による自己承認は成立しない。
 
-**最終報告は、依頼が来た経路へ返す。** 人間から直接受けた Steward / Architect は人間へ直接報告する。Steward の handoff で受けた Architect は Steward へ handoff 書式で返し、Steward が人間へ伝える。Architect が人間と直接話すこと自体は禁止しない（上記 4）。
+**最終報告は、依頼が来た経路へ返す。** 人間から直接受けた Steward / Architect は人間へ直接報告する。Steward の handoff で受けた Architect は Steward へ handoff 書式で返し、Steward が人間へ伝える。Architect が人間と直接話すこと自体は禁止しない（自己判定規則 3 の既定でそうなる）。
 
 「起動する側: 人間（pane）」は Steward と Architect の両方に残る。どの pane に誰が常駐し、人間がどちらに話しかけるかという topology はユーザーが用意する前提であり、本スキルは pane を作らない。
 
