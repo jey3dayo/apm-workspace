@@ -43,8 +43,6 @@ model: sonnet
 
 ## AWS Authentication
 
-### 重要
-
 ### 認証確認手順
 
 ```bash

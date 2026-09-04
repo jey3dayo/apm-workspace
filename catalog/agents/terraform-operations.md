@@ -419,7 +419,3 @@ This agent executes AWS CLI commands and requires appropriate authentication.
 - 🔧 **Skill: perman-aws-vault** - AWS authentication
 - docs/terraform-best-practices.md - Terraform coding standards
 - docs/environment-variables-guide.md - Environment configuration
-
----
-
-### Remember
