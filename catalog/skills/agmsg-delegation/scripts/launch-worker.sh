@@ -15,12 +15,16 @@ if [[ ! -d "$run_dir" ]]; then
 	exit 2
 fi
 
+# macOS では /tmp が /private/tmp などへ解決されるため、入力と一時ルートを canonical path に揃えて比較する。
+# 表記上のパスではなく実体を比較し、想定外の場所への worker 起動を防ぐ。
 tmp_root=$(cd -- "${TMPDIR:-/tmp}" && pwd -P)
 run_dir=$(cd -- "$run_dir" && pwd -P)
 case "$run_dir" in
 "$tmp_root"/agmsg-delegation.*) ;;
 *)
 	printf 'Run directory must be a mktemp agmsg-delegation directory under %s: %s\n' "$tmp_root" "$run_dir" >&2
+	printf 'Create an accepted run directory with: mktemp -d "${TMPDIR:-/tmp}/agmsg-delegation.XXXXXX"\n' >&2
+	printf 'On macOS, TMPDIR may canonicalize to /private/...; passing /tmp/... directly can fail this check.\n' >&2
 	exit 2
 	;;
 esac

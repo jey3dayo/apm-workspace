@@ -60,6 +60,9 @@ blockers: <未解決事項。なければ none>
 - 対象: boot プロンプトで指定された base/head SHA（または diff ファイル + checksum）だけをレビューする。live working tree の未 commit 変更は対象外
 - 報告前の自己検証（必須）: REVIEW を送る前に、指定された固定 SHA、または diff ファイルと checksum を実際に再確認する。レビューしたファイルと行範囲を開き直し、各 finding の evidence と verdict が固定対象に対応していることを突き合わせる。固定対象や evidence を再確認できない場合は approve を送らず、確認できなかった点を finding または相談として明記する。記憶や未確認の live tree から approval を作ると、別の変更を承認したという fabricated approval になり、未レビューの変更をマージする危険がある
 - review_mode を確認する（必須）: boot payload / TASK の envelope にある `review_mode` に従って報告形式を変える。`review_mode` が無い場合は `advisory` として扱う（不明なときに強い側を選ばない）
+- 既存の CI / gate 結果を先に確認し、**追加のテスト実行は finding の再現に限定する**。網羅的な再実行はしない
+- テスト対象は repo が定義したもの（repo の `check` / `test` タスク）を優先し、環境を作り直す workaround を重ねない
+- sandbox で書込を拒否されるキャッシュ（Go の `GOCACHE` など）に当たったら、環境を弄らず、その事実を finding として報告する。回避を積むより、helper 側の不足として報告するほうが価値が高い
 - 完了時の報告フォーマット（1メッセージ）。`review_mode: verdict` のとき:
 
 ```text

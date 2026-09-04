@@ -1,6 +1,6 @@
 ---
 name: thermo-nuclear-code-quality-review
-description: Thermo-nuclear code quality audit (maintainability, structure, 1k-line rule, spaghetti, code-judo). Invoked via Task after a parent gathers diff and file contents. Loads the rubric from the `thermo-nuclear-code-quality-review` skill in the cursor-team-kit plugin.
+description: Thermo-nuclear code quality audit (maintainability, structure, 1k-line rule, spaghetti, code-judo). Select only when explicitly named or when the maintainability rubric itself is requested; use code-reviewer for ordinary code review. Requires the parent session to gather git output and changed-file contents before invoking it. Loads the rubric from the `thermo-nuclear-code-quality-review` skill in the cursor-team-kit plugin.
 ---
 
 # Thermo-Nuclear Code Quality Review
