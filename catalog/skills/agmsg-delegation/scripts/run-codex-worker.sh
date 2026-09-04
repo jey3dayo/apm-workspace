@@ -17,6 +17,29 @@ if [[ "$role" != implement && "$role" != review ]]; then
 	exit 2
 fi
 
+# role ごとに許可するモデルを固定する。role だけ検証して model を素通しすると、
+# implement=sol や review=luna のような role/model 不一致を runtime が拒否できず、
+# 起動して初めて（あるいは請求で）気づくことになる。正本は orchestrator-worker の
+# tier 表で、tests/run-codex-worker.bats が表と本 allowlist の一致を検証する。
+case "$role" in
+implement) allowed_models=(gpt-5.6-luna gpt-5.6-terra) ;;
+review) allowed_models=(gpt-5.6-sol gpt-5.6-terra) ;;
+esac
+
+model_allowed=0
+for allowed in "${allowed_models[@]}"; do
+	if [[ "$model" == "$allowed" ]]; then
+		model_allowed=1
+		break
+	fi
+done
+
+if [[ "$model_allowed" -eq 0 ]]; then
+	printf 'Model %s is not allowed for role %s (allowed: %s)\n' \
+		"$model" "$role" "${allowed_models[*]}" >&2
+	exit 2
+fi
+
 if [[ ! -d "$project" ]]; then
 	printf 'Project directory does not exist: %s\n' "$project" >&2
 	exit 2

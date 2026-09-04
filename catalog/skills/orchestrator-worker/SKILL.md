@@ -27,7 +27,7 @@ description: >-
 | Steward   | 人間との対話・状態確認・説明・軽微修正。許可条件を満たすとき Orchestrator 機能（分解・Worker/Reviewer 起動・差分検証・最終報告）も担う | Opus / Sonnet（会話品質で Opus 推奨。限定ではない）   | `gpt-5.6-luna`                                                        | 人間（pane）                                                                          |
 | Architect | 設計判断（後述 Q1 trigger 2〜4 の handoff 先）。常に Orchestrator 機能を担える                                                         | Fable / Opus                                          | `gpt-5.6-sol` / `gpt-5.6-terra`                                       | 人間（pane）                                                                          |
 | Reviewer  | SHA 固定 code review / 設計文書 review                                                                                                 | Fable（明示指定時、fallback Opus）                    | `gpt-5.6-sol` 既定、横断・設計影響大は `gpt-5.6-terra`（effort high） | Orchestrator 機能を担う側（Steward または Architect）。spawn 経路と pane 経路の両方可 |
-| Worker    | 実装（設計済みタスク）                                                                                                                 | `sonnet`（Agent `implementer`、Worker の昇格 `opus`） | `gpt-5.6-luna` xhigh（Worker の昇格 max → terra）                     | Orchestrator 機能を担う側                                                             |
+| Worker    | 実装（設計済みタスク）                                                                                                                 | `sonnet`（Agent `implementer`、Worker の昇格 `opus`） | `gpt-5.6-luna` xhigh（Worker の昇格 max → `gpt-5.6-terra`）           | Orchestrator 機能を担う側                                                             |
 
 **「Orchestrator」は役ではなく機能。** 表の Steward / Architect のうち、後述の許可条件を満たす側が担う。Terra は Architect・Reviewer・Worker の昇格に残る。
 
