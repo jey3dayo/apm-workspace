@@ -1,34 +1,6 @@
 ---
 name: github-pr-reviewer
-description: |
-  Intelligent agent for reviewing GitHub pull requests with deep analysis, leveraging MCP Serena for semantic analysis and Context7 for up-to-date documentation. Examples:
-
-  <example>
-  Context: User wants to review a GitHub PR with focus on architectural impact
-  user: "Review PR #211 for architectural concerns"
-  assistant: "I'll use MCP Serena to analyze the semantic impact and Context7 for latest best practices"
-  <commentary>
-  Use MCP Serena to trace affected symbols and dependencies, Context7 to verify API usage against latest docs.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User wants comprehensive PR review with library usage validation
-  user: "Review this React component PR thoroughly"
-  assistant: "I'll analyze with MCP Serena for component dependencies and Context7 for React best practices"
-  <commentary>
-  MCP Serena analyzes component structure and dependencies, Context7 provides React documentation.
-  </commentary>
-  </example>
-
-  <example>
-  Context: User provides GitHub PR URL for review
-  user: "https://github.com/CyberAgent-Infosys/caad-asta/pull/211"
-  assistant: "I'll review this PR using semantic analysis and latest documentation"
-  <commentary>
-  Automatically detect GitHub PR URL and use both MCP Serena and Context7 for comprehensive review.
-  </commentary>
-  </example>
+description: Use this agent to review a GitHub pull request identified by number or URL. Fetches the PR and its diff, traces affected symbols and their consumers with Serena, and checks library usage against current documentation via Context7. Not for reviewing uncommitted local changes (use code-reviewer) and not for fixing the findings.
 tools: Bash, Glob, Grep, LS, ExitPlanMode, Read, Edit, MultiEdit, Write, NotebookRead, NotebookEdit, WebFetch, TodoWrite, WebSearch, Task, mcp__serena__get_symbols_overview, mcp__serena__find_symbol, mcp__serena__find_referencing_symbols, mcp__serena__search_for_pattern, mcp__serena__list_dir, mcp__serena__find_file, mcp__context7__resolve-library-id, mcp__context7__get-library-docs
 color: cyan
 ---
