@@ -59,10 +59,12 @@ blockers: <未解決事項。なければ none>
 - 権限: **read-only**。ファイル編集・commit・作業 tree の変更は一切禁止
 - 対象: boot プロンプトで指定された base/head SHA（または diff ファイル + checksum）だけをレビューする。live working tree の未 commit 変更は対象外
 - 報告前の自己検証（必須）: REVIEW を送る前に、指定された固定 SHA、または diff ファイルと checksum を実際に再確認する。レビューしたファイルと行範囲を開き直し、各 finding の evidence と verdict が固定対象に対応していることを突き合わせる。固定対象や evidence を再確認できない場合は approve を送らず、確認できなかった点を finding または相談として明記する。記憶や未確認の live tree から approval を作ると、別の変更を承認したという fabricated approval になり、未レビューの変更をマージする危険がある
-- 完了時の報告フォーマット（1メッセージ）:
+- review_mode を確認する（必須）: boot payload / TASK の envelope にある `review_mode` に従って報告形式を変える。`review_mode` が無い場合は `advisory` として扱う（不明なときに強い側を選ばない）
+- 完了時の報告フォーマット（1メッセージ）。`review_mode: verdict` のとき:
 
 ```text
 REVIEW <task_id>
+review_mode: verdict
 verdict: approve | ready-with-fixes | reject
 findings:
 - severity: <blocker|high|medium|low>
@@ -73,5 +75,15 @@ findings:
 checks: <確認した観点の一覧>
 verified: fixed SHA <sha>; diff checksum <checksum または none>; opened files/ranges <ファイルと行範囲>; evidence rechecked <再確認した根拠>
 ```
+
+`review_mode: advisory` のときは `verdict` 行を持たず、代わりに `assessment` を使う。他の行は同じ。
+
+```text
+REVIEW <task_id>
+review_mode: advisory
+assessment: clean | findings-present
+```
+
+**advisory では `verdict` 行を送らない。** advisory は read-only の実行時強制が確認できていない経路なので、approve を作れる語彙を持たせない。所見に blocking が無ければ `assessment: clean` とする。これは approve ではなく「所見として問題を見つけなかった」という報告であり、受理側は承認の根拠に使わない。
 
 - findings が無い場合は `findings: none` とし、確認した観点を checks に必ず列挙する

@@ -65,4 +65,6 @@ REVIEW 受信後の確認 (1) head SHA（+ diff ファイル方式なら checksu
 - 同一 pane・同一 identity での Architect と Reviewer の兼務は、草案レビューや相談までとし、**approve を受理しない**
 - 同 tier であることは独立性の欠如を意味しない。独立性は actor と context の属性であり、モデルの能力とは別物
 
-WORKER.md の review role（SHA 再確認の自己検証）は変更不要。pane / spawn どちらでも同じ文が効く。
+pane で verdict reviewer を立てる場合、**強制境界の確認結果を起動前に記録する**（profile の `cmp` 出力、scratch cwd、実際の起動引数）。記録が無ければ `review_mode: advisory` で起動する。この記録は SKILL.md の Lifecycle 7 が approve を受理する条件になっている。
+
+報告形式は `review_mode` で分かれる。`verdict` は `verdict: approve | ready-with-fixes | reject`、`advisory` は `verdict` 行を持たず `assessment: clean | findings-present` を使う。**advisory に approve を作れる語彙を与えない**のがこの分割の要点で、契約は WORKER.md が正本。SHA 再確認の自己検証は両方に共通で効く。

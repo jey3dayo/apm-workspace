@@ -40,12 +40,13 @@ Steward から Architect への昇格 handoff もこの書式を使う。
 
 受け側が自分の役を本文から推測せずに済むよう、task と handoff の 1 通目は次を必ず持つ。欠けている場合、受け側は役を確定できないものとして扱う（判定規則は `orchestrator-worker`）。
 
-| フィールド        | 意味                                                           |
-| ----------------- | -------------------------------------------------------------- |
-| `source_role`     | 送り手の役（Steward / Architect / Reviewer / Worker）          |
-| `target_role`     | 受け手に担わせる役。これがあれば受け側の判定はこれで確定する   |
-| `task_id`         | 以後のすべての報告に載せる識別子                               |
-| `report_contract` | 受け側が返す契約。`DONE`（implement）または `REVIEW`（review） |
+| フィールド        | 意味                                                               |
+| ----------------- | ------------------------------------------------------------------ |
+| `source_role`     | 送り手の役（Steward / Architect / Reviewer / Worker）              |
+| `target_role`     | 受け手に担わせる役。これがあれば受け側の判定はこれで確定する       |
+| `task_id`         | 以後のすべての報告に載せる識別子                                   |
+| `report_contract` | 受け側が返す契約。`DONE`（implement）または `REVIEW`（review）     |
+| `review_mode`     | review のときのみ必須。`verdict`（強制境界を確認済み）/ `advisory` |
 
 `target_role` と `report_contract` は独立に指定する。役だけ渡して報告契約を省くと、受け側が何を返せば完了なのかを本文から推測することになり、envelope を必須化した意味が消える。
 
@@ -159,7 +160,15 @@ READY 後も DONE / REVIEW だけを無期限に待たず、agmsg DB に届い�
 
 **implement** — `DONE(task_id, status, files, tests, blockers)` 受信後は、`orchestrator-worker` の「5. 受け取って検証する」の手順へ渡す。
 
-**review** — `REVIEW(task_id, verdict, findings[{severity, file, line, evidence, recommendation}], checks)` 受信後、head SHA（+ diff ファイル方式なら checksum）が起動時と一致することを確認してから findings を採用する。pane 常駐経路（[references/resident-pool.md](references/resident-pool.md)）で受けた場合は、加えて `git status --short` と `git ls-files --others --exclude-standard` が review 開始時点と差分なしであることを確認する（spawn 経路では不要）。implement 用の diff 検証手順は適用しない。
+**review** — `REVIEW(task_id, review_mode, verdict または assessment, findings, checks)` 受信後、次を**すべて**満たさない限り approve として受理しない。1 つでも欠ければ advisory として扱い、承認の根拠にしない。
+
+1. head SHA（+ diff ファイル方式なら checksum）が起動時と一致する
+2. 報告の `review_mode` が起動時に envelope へ書いた値と一致する（`advisory` を渡したのに `verdict` 行が返るのは契約違反）
+3. `review_mode: verdict` の場合、**起動前に強制境界の証拠を記録している**。spawn 経路なら helper による profile 配置と `cmp` 成功、pane 経路なら [references/resident-pool.md](references/resident-pool.md) の確認手順の記録
+4. reviewer の identity がレビュー対象の作者と異なる（approval gate は `orchestrator-worker` が正本）
+5. pane 常駐経路では加えて、`git status --short` と `git ls-files --others --exclude-standard` が review 開始時点と差分なし
+
+implement 用の diff 検証手順は適用しない。
 
 完了条件: role 別の検証を根拠にユーザーへ報告できる状態。
 
