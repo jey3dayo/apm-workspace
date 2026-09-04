@@ -1571,15 +1571,14 @@ dependencies: []
 
   }
 
-  It "documents public external skill workflow references in README and todo.txt" {
+  It "documents public external skill workflow references in README" {
     $readme = Get-Content -LiteralPath (Join-Path $workspaceRoot "README.md") -Raw
-    $todo = Get-Content -LiteralPath (Join-Path $workspaceRoot "todo.txt") -Raw
 
     $readme | Should -Match 'mise run upgrade'
     $readme | Should -Match 'mise run check'
     $readme | Should -Match 'mise run verify'
     $readme | Should -Match 'mise run prepare:catalog'
-    $todo | Should -Match 'skill-inventory\.md'
+    $readme | Should -Match 'docs/skill-inventory\.md'
   }
 
 }
