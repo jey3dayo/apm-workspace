@@ -1,6 +1,6 @@
 ---
 name: serena
-description: Use this agent for symbol-level code navigation and impact analysis, such as finding implementations of an interface, tracing every reference to a symbol before changing it, and mapping dependencies across a codebase. Answers are grounded in the language server rather than text search. Not for text or filename search (use Grep or Glob) and not for open-ended investigation (use researcher).
+description: Use this agent for symbol-level code navigation and impact analysis, such as finding implementations of an interface, tracing every reference to a symbol before changing it, and mapping dependencies across a codebase. Answers are grounded in the language server rather than text search. It reports what it found and does not edit - hand the resulting change to implementer. Not for text or filename search (use Grep or Glob) and not for open-ended investigation (use researcher).
 tools: "*"
 color: purple
 model: sonnet
