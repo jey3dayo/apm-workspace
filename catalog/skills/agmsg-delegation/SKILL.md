@@ -84,7 +84,7 @@ profile の正本は本スキルの [agmsg-review.config.toml](agmsg-review.conf
 - source が欠落、コピー失敗、コピー後も不一致のいずれでも helper は起動を拒否する（fail-closed）
 - 初回利用前の smoke: (1) review は対象 project への write が拒否される (2) implement は対象 project 内の edit が成功し project 外の write が拒否される (3) `send-report.sh` による READY send 成功 (4) DONE / REVIEW send 成功 (5) 全手順が承認画面・MCP 確認画面なしで完了、の5点を runtime ごとに実際に確認する
 
-**`run-codex-worker.sh` は起動前に `writable_roots` の symlink 成分を検査して fail-closed する。** 不正な root が1つでもあると Codex は sandbox 構築自体に失敗し、**agmsg と無関係なコマンドまで起動前に全拒否する**。worker 側からは「シェルすら起動できない」形にしか見えず、原因が設定にあると分からないまま停止する（2026-08-27 に実際に発生）。検査対象は role で異なる。
+**`run-codex-worker.sh` は起動前に `writable_roots` の symlink 成分を検査して fail-closed する。** 不正な root が1つでもあると Codex は sandbox 構築自体に失敗し、**agmsg と無関係なコマンドまで起動前に全拒否する**。worker 側からは「シェルすら起動できない」形にしか見えず、原因が設定にあると分からないまま停止する。検査対象は role で異なる。
 
 - implement: profile を layer しないため `CODEX_HOME/config.toml` の base config を検査する
 - review: profile の `writable_roots` は base config を**置換**する（実測済み）ため、配置後の profile だけを検査する
