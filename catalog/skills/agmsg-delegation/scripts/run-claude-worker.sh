@@ -37,10 +37,19 @@ if ! command -v sandbox-exec >/dev/null 2>&1; then
 	exit 1
 fi
 
+# 存在確認と同時に絶対パスへ代入する。代入しないまま後段で cd すると、
+# AGMSG_CLAUDE_BIN に相対パスが渡された場合に cwd 基準の確認だけ通過して
+# 起動時に解決できなくなる。PATH 名 `claude` も同じ経路で絶対化される。
 claude_bin=${AGMSG_CLAUDE_BIN:-claude}
-if ! command -v "$claude_bin" >/dev/null 2>&1; then
+if ! claude_bin=$(command -v -- "$claude_bin"); then
 	printf 'Claude executable not found: %s\n' "$claude_bin" >&2
 	exit 1
+fi
+
+# `command -v` は PATH 名を絶対化するが、スラッシュを含む引数はそのまま返す。
+# 相対のままだと後段の cd で解決できなくなるので payload_file と同じ正規化を通す。
+if [[ "$claude_bin" != /* ]]; then
+	claude_bin=$(cd -- "$(dirname -- "$claude_bin")" && printf '%s/%s\n' "$PWD" "$(basename -- "$claude_bin")")
 fi
 
 project=$(cd -- "$project" && pwd -P)

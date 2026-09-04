@@ -107,7 +107,7 @@ AGMSG_REPORT
 ~/.agents/skills/agmsg/scripts/reset.sh <送り手の project 絶対パス> <claude-code|codex> <name>
 ```
 
-`<name>` は task-scoped な一意名（例: `<repo>-feedback-<topic>`）にする。envelope 書式と `HANDOFF` が返信を要求しない理由は `agmsg-delegation` が正本。
+`<name>` は task-scoped な一意名（例: `<repo>-feedback-<topic>`）にする。envelope 書式と `NOTIFY` が返信を要求しない理由は `agmsg-delegation` が正本。`HANDOFF` は最終結果を返す契約なので、一方通行の報告には使わない。
 
 受け取り側（`~/.apm`）は**受け取るだけでよい**。ack を返す必要はなく、対応するかどうかと優先度は受け取り側が決める。
 
