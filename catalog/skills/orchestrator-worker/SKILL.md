@@ -35,10 +35,24 @@ description: >-
 
 ### 自己判定規則（本文から推測しない）
 
-役は**受け取ったメッセージの envelope** で決まる。本文の口調や「人間が話しかけてきたように見えるか」からは判定しない——同じ文面が user メッセージとしても hook 経由でも届くため、受け側から区別できない。判定は上から順に、最初に当たったところで止める。
+役は**受け取ったメッセージの envelope** で決まる。本文の口調や「人間が話しかけてきたように見えるか」からは判定しない——同じ文面が user メッセージとしても hook 経由でも届くため、受け側から区別できない。
+
+**役を決める前に envelope を検証する。** 次のいずれかに当たったら役を確定せず、`BLOCKED(task_id)` を返す（対話セッションならユーザーへ報告して停止する）。矛盾した envelope を「たぶんこちらだろう」で解決すると、許可集合の検証を通り抜けたまま別の役の仕事をすることになる。
+
+- agmsg 経由の task / handoff で、必須 field（`source_role` / `target_role` / `task_id` / `report_contract`）のいずれかが欠けている
+- `target_role` と `report_contract` が下の対応表に反する（例: `target_role: Worker` + `report_contract: REVIEW`）
+- どちらかの値が対応表に無い
+
+| 役                  | `report_contract` |
+| ------------------- | ----------------- |
+| Worker              | `DONE`            |
+| Reviewer            | `REVIEW`          |
+| Steward / Architect | `HANDOFF`         |
+
+検証を通ったら役を決める。判定は上から順に、最初に当たったところで止める。
 
 1. envelope に `target_role` がある → **その役**。
-2. `target_role` は無いが task 契約（`task_id` + `report_contract`）がある → **契約が指す役**。`report_contract: DONE` なら Worker、`REVIEW` なら Reviewer。
+2. `target_role` が無く、`task_id` + `report_contract` だけがある → **対応表の逆引き**。これは agmsg の必須 envelope を満たさない経路（Agent tool や `spawn_agent` など、native の task transport）向けの緩和であり、agmsg 経由のメッセージは上の検証で BLOCKED になっているのでここへは来ない。
 3. envelope が無い対話セッション → pane / session の起動時に宣言された **default role**。宣言が無ければ、自分のモデルが Steward の許可集合に入るなら Steward、入らないなら Architect。
 
 envelope の必須フィールドと書式は `agmsg-delegation` の「envelope」節が正本。
@@ -182,11 +196,11 @@ Codex native の `spawn_agent` を標準経路とする。native spawn が利用
 | Claude   | `sonnet`             | `model: "opus"` を呼び出し時に渡す             |
 | Codex    | `gpt-5.6-luna` xhigh | ① reasoning effort を max へ ② `gpt-5.6-terra` |
 
-昇格先が現在のモデル自身になる場合（terra セッションで ② に達した場合など）は、委譲せず自分で実装する。
+昇格先が現在のモデル自身になる場合（terra セッションで ② に達した場合など）も、**親 session がそのまま実装しない**。同じモデルの Worker を、別 identity・別 session として起動する。§5 の検証は「Worker の DONE は未検証の申告」を前提にしており、起動側と実装側が同一 session だとその前提が崩れる（context も混ざる）。別 session を確保できない場合は `BLOCKED` とし、Architect へ handoff する。
 
 昇格の順序（① effort → ② terra）は、価格差だけでなく能力差で決める。Terra は Luna と Sol の中間段として、長文脈などの能力崖を埋める価値を持つ（下記例外の MRCR 参照）。判断規則: ① Luna の effort を max まで上げる → ② Luna の既知の能力崖（長文脈リコールなど）に該当する場合、または ① を固定して検証した結果 Luna が不足した場合に限り Terra へ上げる。Sol へ直接飛ばすのは Sol 固有の要件がある場合に限り、Terra を中間段として省略しない。価格は変わりやすいため本文に固定値を置かず、② を選ぶ際は [公式 rate card](https://help.openai.com/en/articles/20001106-codex-rate-card) で現在値を確認する。2026-07-30 に Luna -80% / Terra -20% の恒久値下げが行われ、Sol は 2026-11-21 まで期間限定値下げが行われると告知された。
 
-長文脈タスク（大規模コードベースの読解、複数文書の統合、長い履歴の追跡）は例外で、①を飛ばして直接 `gpt-5.6-terra` へ上げる。`luna` は長文脈リコールに崖があり（MRCR 41.3% / Sol 91.5% / Terra 89.6%、[OpenAI](https://openai.com/index/gpt-5-6)）、effort 引き上げで緩和されるという実測は公表されていない。terra セッション自身が長文脈タスクを受けた場合は、上の一般則どおり委譲せず自分で実装する。
+長文脈タスク（大規模コードベースの読解、複数文書の統合、長い履歴の追跡）は例外で、①を飛ばして直接 `gpt-5.6-terra` へ上げる。`luna` は長文脈リコールに崖があり（MRCR 41.3% / Sol 91.5% / Terra 89.6%、[OpenAI](https://openai.com/index/gpt-5-6)）、effort 引き上げで緩和されるという実測は公表されていない。terra セッション自身が長文脈タスクを受けた場合も、上の一般則どおり親 session では実装せず、別 identity・別 session の terra Worker を起動する。
 
 Claude では独立タスクを**同一レスポンス内で複数呼び出す**と並列に走る（1レスポンス1呼び出しは直列になる）。Codex では worker を複数 detached 起動する（触るファイル集合が互いに素であることが前提。guardrails は `agmsg-delegation` を参照）。どちらも Orchestrator の会話履歴は引き継がせず、Section 3 で書き出した 3 点だけを渡す。
 

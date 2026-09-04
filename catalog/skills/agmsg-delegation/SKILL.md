@@ -45,10 +45,10 @@ Steward から Architect への昇格 handoff もこの書式を使う。
 | `source_role`     | 送り手の役（Steward / Architect / Reviewer / Worker）              |
 | `target_role`     | 受け手に担わせる役。これがあれば受け側の判定はこれで確定する       |
 | `task_id`         | 以後のすべての報告に載せる識別子                                   |
-| `report_contract` | 受け側が返す契約。`DONE`（implement）または `REVIEW`（review）     |
+| `report_contract` | 受け側が返す契約。`DONE` / `REVIEW` / `HANDOFF`                    |
 | `review_mode`     | review のときのみ必須。`verdict`（強制境界を確認済み）/ `advisory` |
 
-`target_role` と `report_contract` は独立に指定する。役だけ渡して報告契約を省くと、受け側が何を返せば完了なのかを本文から推測することになり、envelope を必須化した意味が消える。
+`target_role` と `report_contract` は**対応していなければならない**（Worker↔`DONE`、Reviewer↔`REVIEW`、Steward / Architect↔`HANDOFF`）。対応表と不整合な組合せ、表に無い値、必須 field の欠落はいずれも、受け側が役を確定せず `BLOCKED` を返す契約である（判定は `orchestrator-worker` の自己判定規則が正本）。役だけ渡して報告契約を省くのも欠落にあたる。
 
 本文の口調や「人間が話しかけてきたように見えるか」は役の根拠にしない。同じ文面が user メッセージとしても hook 経由でも届くため、受け側から区別できない。
 
