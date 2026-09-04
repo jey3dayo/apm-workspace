@@ -48,6 +48,8 @@ Steward から Architect への昇格 handoff もこの書式を使う。
 | `report_contract` | 受け側が返す契約。`DONE` / `REVIEW` / `HANDOFF`                    |
 | `review_mode`     | review のときのみ必須。`verdict`（強制境界を確認済み）/ `advisory` |
 
+`HANDOFF` は例外で、**返信を要求しない**。`DONE` / `REVIEW` は受け側が結果を返す契約だが、handoff は渡した時点で送り手の関与が終わり、受け側は ack を返さない。送り手は返信を待たずに `reset.sh` まで進めてよい。
+
 `target_role` と `report_contract` は**対応していなければならない**（Worker↔`DONE`、Reviewer↔`REVIEW`、Steward / Architect↔`HANDOFF`）。対応表と不整合な組合せ、表に無い値、必須 field の欠落はいずれも、受け側が役を確定せず `BLOCKED` を返す契約である（判定は `orchestrator-worker` の自己判定規則が正本）。役だけ渡して報告契約を省くのも欠落にあたる。
 
 本文の口調や「人間が話しかけてきたように見えるか」は役の根拠にしない。同じ文面が user メッセージとしても hook 経由でも届くため、受け側から区別できない。
@@ -118,6 +120,8 @@ Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、r
 
 完了条件: 対象 project・runtime type を引数にした `identities.sh` の出力に、worker_name が exact に含まれる（出力は `team<TAB>agent` の2列で、project・runtime は引数側で固定される）。
 
+**linked worktree では canonical な repo root を渡す。** `join.sh` は worktree path を repo root へ正規化して登録するが、`identities.sh` に worktree path を渡すと空を返し、上の完了条件が成立しない。`git -C <worktree> rev-parse --path-format=absolute --git-common-dir` の親、または `git -C <worktree> worktree list --porcelain` の先頭 entry から repo root を求めて渡す。`agmsg` は外部パッケージなので本スキルからは直せず、呼び出し側で揃える。
+
 ### 4. Detached worker を起動する
 
 1. `run_dir=$(mktemp -d "${TMPDIR:-/tmp}/agmsg-delegation.XXXXXX")` を作り、`chmod 700 "$run_dir"` を実行する。payload・launchd job label・ログ・exit status はこのディレクトリだけに置く
@@ -127,7 +131,7 @@ Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、r
 3. `launch-worker.sh` に helper の固定引数を配列として渡し、直接起動する。shell command 文字列を組み立てない。launchd 配下は PATH が最小構成なので、helper は必ず絶対パスで渡す:
    - Claude: `~/.agents/skills/agmsg-delegation/scripts/launch-worker.sh "$run_dir" -- ~/.agents/skills/agmsg-delegation/scripts/run-claude-worker.sh <role> <対象project> "$payload"`
    - Codex: `~/.agents/skills/agmsg-delegation/scripts/launch-worker.sh "$run_dir" -- ~/.agents/skills/agmsg-delegation/scripts/run-codex-worker.sh <role> <対象project> <model> "$payload"`
-4. 出力された launchd job label と log path を保存し、`launchctl print "gui/$(id -u)/$(cat "$run_dir/worker.label")"` が成功することを確認する。起動失敗時は `$run_dir/worker.log` と `$run_dir/worker.exit` を読んで原因を記録する
+4. 出力された launchd job label と log path を保存し、`launchctl print "gui/$(id -u)/$(cat "$run_dir/worker.label")" | rg "state =|pid =|last exit code|runs ="` で状態だけを読む。**素の `launchctl print` は継承した環境変数を全部出力し、秘密値を tool output へ露出させる**（実運用で発生）。必ず絞って読む。起動失敗時は `$run_dir/worker.log` と `$run_dir/worker.exit` を読んで原因を記録する
 
 完了条件: worker job が launchd に登録され、ログ出力先と task_id が対応付けられている。
 
@@ -139,7 +143,7 @@ readiness の source of truth は **agmsg DB に届いた READY(task_id) メッ�
 - `pgrep -f 'agmsg/scripts/watch.sh'` が watcher 常駐を示す場合は、`history.sh <team> <自分>` も併用して task_id の READY を DB から確認する
 - Claude worker の READY 本文には `session: <session_id>` が含まれる契約。orchestrator はこれを lifecycle state に必ず保持し、終了時の `reset.sh` 第4引数に渡す。READY に session_id が無い場合は worker へ再送を求めるか、取得不能として crash cleanup 経路で処理する
 - fallback として `$run_dir/worker.log` の `READY <task_id>` を確認してよいが、readiness 判定は agmsg DB の READY に基づく
-- timeout 時は `launchctl print "gui/$(id -u)/$(cat "$run_dir/worker.label")"`、`tail -n 200 "$run_dir/worker.log"`、`$run_dir/worker.exit`（あれば）を取得して原因を報告する
+- timeout 時は `launchctl print "gui/$(id -u)/$(cat "$run_dir/worker.label")" | rg "state =|pid =|last exit code|runs ="`、`tail -n 200 "$run_dir/worker.log"`、`$run_dir/worker.exit`（あれば）を取得して原因を報告する
 
 完了条件: READY(task_id) を受信した。timeout 時は診断情報を添えて停止・報告。
 

@@ -76,6 +76,31 @@
 - DoD に定める full gate は Orchestrator が実行し、Worker の実行報告では代替しない
 - タスクで明示されていない依存 version、manifest、lockfile の変更は、要求上の必要性を確認できない限り採用しない
 
+### スキルの不具合・摩擦を owner へ返す
+
+スキルや agent を実運用で使って**不具合・契約の破れ・手順の摩擦**を踏んだら、その場の回避で終わらせずに `~/.apm` へ送る。回避策だけが各リポジトリに散ると、同じ穴を全員が踏み直す。
+
+送るのは次のような内容。
+
+- 手順どおりに実行して失敗した箇所（踏んだ経路とエラー実物）
+- ドキュメントと実装が食い違っていた箇所
+- 契約が成立しなかった箇所（完了条件が確認できない、報告書式が守られない等）
+- 実測値（所要時間、消費、再試行回数）。判断の根拠になる
+- 効いた点も書く。残す判断の材料になる
+
+送りっぱなしでよい。**返信は来ないし、待たない。**
+
+```bash
+~/.agents/skills/agmsg/scripts/join.sh apm <name> <claude-code|codex> <送り手の project 絶対パス>
+# 本文の 1 通目に envelope（source_role / target_role: Architect / task_id / report_contract: HANDOFF）を付ける
+~/.agents/skills/agmsg/scripts/send.sh apm <name> main-cc "<本文>"
+~/.agents/skills/agmsg/scripts/reset.sh <送り手の project 絶対パス> <claude-code|codex> <name>
+```
+
+`<name>` は task-scoped な一意名（例: `<repo>-feedback-<topic>`）にする。envelope 書式と `HANDOFF` が返信を要求しない理由は `agmsg-delegation` が正本。
+
+受け取り側（`~/.apm`）は**受け取るだけでよい**。ack を返す必要はなく、対応するかどうかと優先度は受け取り側が決める。
+
 ### agent 定義側のモデル割り当て
 
 - 各 agent のモデルは `catalog/agents/*.md` の frontmatter `model:` に書く。呼び出し時の指定漏れがあっても frontmatter の割り当てで動く

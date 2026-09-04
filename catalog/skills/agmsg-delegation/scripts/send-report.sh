@@ -17,6 +17,23 @@ if [[ -z "$report_body" ]]; then
 	exit 2
 fi
 
+# 報告 keyword には task_id を必須にする。WORKER.md で exact に指示しても model が
+# bare `READY` を送る事例が実運用で発生した。orchestrator は task_id で照合するため、
+# 欠けた報告は「どの task の報告か分からないもの」になり、無応答と区別できない。
+# 生成側の遵守に任せず、transport の入口で fail-closed にする。
+first_line=${report_body%%$'\n'*}
+
+if [[ "$first_line" =~ ^(READY|WORKING|BLOCKED|DONE|REVIEW)([[:space:]]*)(.*)$ ]]; then
+	keyword=${BASH_REMATCH[1]}
+	remainder=${BASH_REMATCH[3]}
+	task_id=${remainder%%[[:space:]]*}
+	if [[ -z "$task_id" ]]; then
+		printf '%s report is missing its task_id; refusing to send.\n' "$keyword" >&2
+		printf 'Send "%s <task_id>" as the first line (see WORKER.md).\n' "$keyword" >&2
+		exit 2
+	fi
+fi
+
 send_script=${AGMSG_SEND_SCRIPT:-$HOME/.agents/skills/agmsg/scripts/send.sh}
 
 if [[ ! -x "$send_script" ]]; then

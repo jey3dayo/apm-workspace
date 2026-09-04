@@ -107,4 +107,10 @@ if [[ "$role" == review ]]; then
 fi
 
 claude_args+=(--strict-mcp-config --mcp-config "$mcp_config")
+# worker は対象 project を cwd として開始する。launchd 配下の cwd は repo 外なので、
+# ここで移らないと worker が相対パスを解決できない（実運用で reviewer が repo 外から
+# 始まり relative path が繰り返し No such file になった）。profile・mcp_config・payload
+# はいずれも絶対パスなので cwd 変更の影響を受けない。
+cd -- "$project"
+
 sandbox-exec -f "$profile" "$claude_bin" "${claude_args[@]}" <"$payload_file"
