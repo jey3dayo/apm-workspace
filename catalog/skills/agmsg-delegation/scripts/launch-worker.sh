@@ -48,7 +48,7 @@ label_file="$run_dir/worker.label"
 
 # codex を親プロセス側で絶対パスへ解決しておく。launchd job は親の環境も cwd も
 # 継承せず、mise の shim 解決は cwd と MISE_ENV の両方に依存するため、worker 内では
-# codex を解決できない ("No version is set for shim" で起動不能。2026-08-27 に発生)。
+# codex を解決できない ("No version is set for shim" で起動不能)。
 # MISE_ENV が launchd に継承されず、mise の npm 版 codex が node を要する wrapper の
 # まま渡ると同じ経路で即死するため、環境を wrapper に明示し、vendor の native binary を優先する。
 # worker 内で MISE_ENV を設定する方法は `latest` のネットワーク解決でハングするため使わない。

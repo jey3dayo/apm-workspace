@@ -36,7 +36,7 @@ fi
 # Codex は symlink 成分を含む writable_roots を拒否する ("symlinked writable roots are
 # not supported")。不正な root が1つでもあると sandbox 構築自体が失敗し、無関係な
 # コマンドまで起動前に全拒否される。worker からは「シェルすら起動できない」形で見え、
-# 原因が設定にあると分からないまま停止するため (2026-08-27 に実際に発生)、
+# 原因が設定にあると分からないまま停止するため、
 # 起動前に検査して原因を名指しで報告する。
 extract_writable_roots() {
 	local file=$1
