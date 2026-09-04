@@ -23,10 +23,11 @@ fi
 # 生成側の遵守に任せず、transport の入口で fail-closed にする。
 first_line=${report_body%%$'\n'*}
 
-if [[ "$first_line" =~ ^(READY|WORKING|BLOCKED|DONE|REVIEW)([[:space:]]*)(.*)$ ]]; then
+# 空白区切りは 1 文字以上を必須にする。`*` だと `READYtask-42` や `REVIEW: approve` が
+# 通り、orchestrator が待つ exact `<KEYWORD> <task_id>` にならないまま送信される。
+if [[ "$first_line" =~ ^(READY|WORKING|BLOCKED|DONE|REVIEW)([[:space:]]+([^[:space:]]+))?[[:space:]]*(.*)$ ]]; then
 	keyword=${BASH_REMATCH[1]}
-	remainder=${BASH_REMATCH[3]}
-	task_id=${remainder%%[[:space:]]*}
+	task_id=${BASH_REMATCH[3]}
 	if [[ -z "$task_id" ]]; then
 		printf '%s report is missing its task_id; refusing to send.\n' "$keyword" >&2
 		printf 'Send "%s <task_id>" as the first line (see WORKER.md).\n' "$keyword" >&2

@@ -45,12 +45,17 @@ Steward から Architect への昇格 handoff もこの書式を使う。
 | `source_role`     | 送り手の役（Steward / Architect / Reviewer / Worker）              |
 | `target_role`     | 受け手に担わせる役。これがあれば受け側の判定はこれで確定する       |
 | `task_id`         | 以後のすべての報告に載せる識別子                                   |
-| `report_contract` | 受け側が返す契約。`DONE` / `REVIEW` / `HANDOFF`                    |
+| `report_contract` | 受け側が返す契約。`DONE` / `REVIEW` / `HANDOFF` / `NOTIFY`         |
 | `review_mode`     | review のときのみ必須。`verdict`（強制境界を確認済み）/ `advisory` |
 
-`HANDOFF` は例外で、**返信を要求しない**。`DONE` / `REVIEW` は受け側が結果を返す契約だが、handoff は渡した時点で送り手の関与が終わり、受け側は ack を返さない。送り手は返信を待たずに `reset.sh` まで進めてよい。
+契約は 2 種類に分かれる。
 
-`target_role` と `report_contract` は**対応していなければならない**（Worker↔`DONE`、Reviewer↔`REVIEW`、Steward / Architect↔`HANDOFF`）。対応表と不整合な組合せ、表に無い値、必須 field の欠落はいずれも、受け側が役を確定せず `BLOCKED` を返す契約である（判定は `orchestrator-worker` の自己判定規則が正本）。役だけ渡して報告契約を省くのも欠落にあたる。
+- 返信を伴うもの（`DONE` / `REVIEW` / `HANDOFF`）は、受け側が結果を返す。`HANDOFF` で受けた Architect は、作業を終えたら handoff 書式で送り手へ返す（`orchestrator-worker` の「最終報告は、依頼が来た経路へ返す」）。ack は不要だが**最終結果は返す**。
+- 返信を伴わないもの（`NOTIFY`）は、一方通行。送り手は渡した時点で関与が終わり、受け側は ack も結果も返さない。送り手は返信を待たず `reset.sh` まで進める。スキル不具合のフィールド報告がこれにあたる（導線は `catalog/AGENTS.md`）。
+
+**ack が不要なことと、最終結果が不要なことは別である。** `NOTIFY` 以外で「返信不要」と扱うと、Steward → Architect → Steward → 人間 の報告経路が切れる。
+
+`target_role` と `report_contract` は**対応していなければならない**（Worker↔`DONE`、Reviewer↔`REVIEW`、Steward / Architect↔`HANDOFF` または `NOTIFY`）。対応表と不整合な組合せ、表に無い値、必須 field の欠落はいずれも、受け側が役を確定せず `BLOCKED` を返す契約である（判定は `orchestrator-worker` の自己判定規則が正本）。役だけ渡して報告契約を省くのも欠落にあたる。
 
 本文の口調や「人間が話しかけてきたように見えるか」は役の根拠にしない。同じ文面が user メッセージとしても hook 経由でも届くため、受け側から区別できない。
 
@@ -131,7 +136,7 @@ Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、r
 3. `launch-worker.sh` に helper の固定引数を配列として渡し、直接起動する。shell command 文字列を組み立てない。launchd 配下は PATH が最小構成なので、helper は必ず絶対パスで渡す:
    - Claude: `~/.agents/skills/agmsg-delegation/scripts/launch-worker.sh "$run_dir" -- ~/.agents/skills/agmsg-delegation/scripts/run-claude-worker.sh <role> <対象project> "$payload"`
    - Codex: `~/.agents/skills/agmsg-delegation/scripts/launch-worker.sh "$run_dir" -- ~/.agents/skills/agmsg-delegation/scripts/run-codex-worker.sh <role> <対象project> <model> "$payload"`
-4. 出力された launchd job label と log path を保存し、`launchctl print "gui/$(id -u)/$(cat "$run_dir/worker.label")" | rg "state =|pid =|last exit code|runs ="` で状態だけを読む。**素の `launchctl print` は継承した環境変数を全部出力し、秘密値を tool output へ露出させる**（実運用で発生）。必ず絞って読む。起動失敗時は `$run_dir/worker.log` と `$run_dir/worker.exit` を読んで原因を記録する
+4. 出力された launchd job label と log path を保存し、`launchctl print "gui/$(id -u)/$(cat "$run_dir/worker.label")" | /usr/bin/grep -E '^[[:space:]]*(state|pid|last exit code|runs) = '` で状態だけを読む。**素の `launchctl print` は継承した環境変数を全部出力し、秘密値を tool output へ露出させる**（実運用で発生）。必ず絞って読む。**行頭に anchor する**のは、`SECRET => token state = hunter2` のように値が検索語を含む環境行が、非 anchored なパターンを通り抜けて再露出するためである（実測済み）。`rg` ではなく `/usr/bin/grep` を絶対パスで使うのは、この診断が repo 外の cwd でも走り、mise shim の `rg` が解決できない場合があるため。行頭に anchor するのは、`SECRET => token state = hunter2` のように値が検索語を含む環境行が非 anchored なパターンを通り抜けるためである。`rg` ではなく `/usr/bin/grep` を絶対パスで使うのは、この診断が repo 外の cwd でも走り、mise shim の `rg` が解決できないことがあるため。起動失敗時は `$run_dir/worker.log` と `$run_dir/worker.exit` を読んで原因を記録する
 
 完了条件: worker job が launchd に登録され、ログ出力先と task_id が対応付けられている。
 
@@ -143,7 +148,7 @@ readiness の source of truth は **agmsg DB に届いた READY(task_id) メッ�
 - `pgrep -f 'agmsg/scripts/watch.sh'` が watcher 常駐を示す場合は、`history.sh <team> <自分>` も併用して task_id の READY を DB から確認する
 - Claude worker の READY 本文には `session: <session_id>` が含まれる契約。orchestrator はこれを lifecycle state に必ず保持し、終了時の `reset.sh` 第4引数に渡す。READY に session_id が無い場合は worker へ再送を求めるか、取得不能として crash cleanup 経路で処理する
 - fallback として `$run_dir/worker.log` の `READY <task_id>` を確認してよいが、readiness 判定は agmsg DB の READY に基づく
-- timeout 時は `launchctl print "gui/$(id -u)/$(cat "$run_dir/worker.label")" | rg "state =|pid =|last exit code|runs ="`、`tail -n 200 "$run_dir/worker.log"`、`$run_dir/worker.exit`（あれば）を取得して原因を報告する
+- timeout 時は `launchctl print "gui/$(id -u)/$(cat "$run_dir/worker.label")" | /usr/bin/grep -E '^[[:space:]]*(state|pid|last exit code|runs) = '`、`tail -n 200 "$run_dir/worker.log"`、`$run_dir/worker.exit`（あれば）を取得して原因を報告する
 
 完了条件: READY(task_id) を受信した。timeout 時は診断情報を添えて停止・報告。
 

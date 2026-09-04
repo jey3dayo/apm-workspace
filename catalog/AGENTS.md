@@ -92,8 +92,18 @@
 
 ```bash
 ~/.agents/skills/agmsg/scripts/join.sh apm <name> <claude-code|codex> <送り手の project 絶対パス>
-# 本文の 1 通目に envelope（source_role / target_role: Architect / task_id / report_contract: HANDOFF）を付ける
-~/.agents/skills/agmsg/scripts/send.sh apm <name> main-cc "<本文>"
+
+# 本文は quoted heredoc で stdin へ渡す。不具合報告はバッククォート・$()・引用符・複数行を
+# 含みやすく、shell 引数へ組み立てると展開や破損が起きる。
+~/.agents/skills/agmsg-delegation/scripts/send-report.sh apm <name> main-cc <<'AGMSG_REPORT'
+source_role: Steward
+target_role: Architect
+task_id: <repo>-feedback-<topic>
+report_contract: NOTIFY
+
+<本文>
+AGMSG_REPORT
+
 ~/.agents/skills/agmsg/scripts/reset.sh <送り手の project 絶対パス> <claude-code|codex> <name>
 ```
 

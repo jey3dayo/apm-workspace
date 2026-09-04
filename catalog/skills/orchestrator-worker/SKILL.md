@@ -43,17 +43,19 @@ description: >-
 - `target_role` と `report_contract` が下の対応表に反する（例: `target_role: Worker` + `report_contract: REVIEW`）
 - どちらかの値が対応表に無い
 
-| 役                  | `report_contract` |
-| ------------------- | ----------------- |
-| Worker              | `DONE`            |
-| Reviewer            | `REVIEW`          |
-| Steward / Architect | `HANDOFF`         |
+| 役                  | `report_contract`    |
+| ------------------- | -------------------- |
+| Worker              | `DONE`               |
+| Reviewer            | `REVIEW`             |
+| Steward / Architect | `HANDOFF` / `NOTIFY` |
 
 検証を通ったら役を決める。判定は上から順に、最初に当たったところで止める。
 
 1. envelope に `target_role` がある → **その役**。
 2. `target_role` が無く、`task_id` + `report_contract` だけがある → **対応表の逆引き**。これは agmsg の必須 envelope を満たさない経路（Agent tool や `spawn_agent` など、native の task transport）向けの緩和であり、agmsg 経由のメッセージは上の検証で BLOCKED になっているのでここへは来ない。
 3. envelope が無い対話セッション → pane / session の起動時に宣言された **default role**。宣言が無ければ、自分のモデルが Steward の許可集合に入るなら Steward、入らないなら Architect。
+
+`report_contract: NOTIFY` は一方通行の通知で、受け側は ack も結果も返さない（スキル不具合のフィールド報告など）。役の判定は `HANDOFF` と同じだが、**返信を返さない点だけが違う**。ack 不要と最終結果不要を混同しない——`HANDOFF` で受けた作業は終わったら送り手へ返す。
 
 envelope の必須フィールドと書式は `agmsg-delegation` の「envelope」節が正本。
 

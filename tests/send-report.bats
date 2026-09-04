@@ -28,10 +28,27 @@ setup() {
   [[ "$output" == *"REVIEW task-42"* ]]
 }
 
-@test "trailing whitespace after a keyword does not count as a task_id" {
-  run bash -c "printf 'READY   \n' | '$SCRIPT' apm worker orch"
-  [ "$status" -eq 2 ]
-  [[ "$output" == *"missing its task_id"* ]]
+# delimiter 境界を全 keyword で確認する。`[[:space:]]*` だった間は `READYtask-42` と
+# `REVIEW: approve` が通過し、orchestrator が待つ exact `<KEYWORD> <task_id>` にならない
+# まま送信された（reviewer-field-fixes の実測）。
+@test "delimiter boundaries are enforced for every report keyword" {
+  for kw in READY WORKING BLOCKED DONE REVIEW; do
+    # 区切りなし
+    run bash -c "printf '%stask-42\n' '$kw' | '$SCRIPT' apm worker orch"
+    [ "$status" -eq 2 ]
+    # colon 直結
+    run bash -c "printf '%s: approve\n' '$kw' | '$SCRIPT' apm worker orch"
+    [ "$status" -eq 2 ]
+    # 空白のみ
+    run bash -c "printf '%s   \n' '$kw' | '$SCRIPT' apm worker orch"
+    [ "$status" -eq 2 ]
+    # space 区切りは通る
+    run bash -c "printf '%s task-1\n' '$kw' | '$SCRIPT' apm worker orch"
+    [ "$status" -eq 0 ]
+    # tab 区切りも通る
+    run bash -c "printf '%s\ttask-2\n' '$kw' | '$SCRIPT' apm worker orch"
+    [ "$status" -eq 0 ]
+  done
 }
 
 @test "a body that does not start with a report keyword is left alone" {
