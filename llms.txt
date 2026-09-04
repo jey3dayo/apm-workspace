@@ -62,11 +62,11 @@ jey3dayo/apm-workspace/catalog#main
 - Keep machine-local skills in `~/.apm/private-skills/.apm/skills/**` (gitignored here; the private repo is the source of truth).
 - Codex uses split output: compile guidance with `apm compile --target codex --output ~/.codex/AGENTS.md`, and deploy skills to `~/.agents/skills`.
 - Verify Codex rollout through compile success, the generated `~/.codex/AGENTS.md`, and deployed `SKILL.md` files under `~/.agents/skills`.
-- Current `apm` source is `pipx:apm-cli@0.26.0`.
+- The `apm` source and pinned version are defined in `mise.toml` (`"pipx:apm-cli"`); read it rather than relying on a version quoted here.
 - If both `~/.apm/mise.toml` and `~/.config/mise/config.workstation.toml` define `apm`, keep them aligned to the same source.
 - Prefer `mise run deploy` for routine local rollout and `mise run apply` only when you need deploy-only behavior.
 - Reserve `mise run upgrade` for intentional upstream refresh, not for normal deployment.
-- When direct binary selection matters, prefer `mise exec pipx:apm-cli@0.26.0 -- apm ...`.
+- When direct binary selection matters, prefer `mise exec pipx:apm-cli -- apm ...` (mise resolves the pinned version).
 - If a Codex-targeted external skill is still missing after rollout, verify `~/.agents/skills` directly and treat it as a temporary Codex-specific delivery gap.
 
 ## Source Of Truth
