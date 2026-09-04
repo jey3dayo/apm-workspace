@@ -152,7 +152,19 @@ else
 
 	script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 	profile_source=${AGMSG_CODEX_PROFILE_SOURCE:-"$script_dir/../agmsg-review.config.toml"}
-	profile_target=${AGMSG_CODEX_PROFILE_TARGET:-$HOME/.codex/agmsg-review.config.toml}
+	# Codex は profile を $CODEX_HOME 直下から探す。既定値を $HOME/.codex 直書きにすると、
+	# CODEX_HOME を設定した環境で「置く場所」と「読む場所」が食い違い、-p が base config へ
+	# fail-open して read-only 境界が黙って消える。必ず解決済みの codex_home を使う。
+	profile_expected=$codex_home/agmsg-review.config.toml
+	profile_target=${AGMSG_CODEX_PROFILE_TARGET:-$profile_expected}
+
+	# 上書きを許すが、Codex が実際に読む path 以外へ置かせない。ここを緩めると
+	# 上と同じ fail-open が env 経由で再現する。
+	if [[ "$profile_target" != "$profile_expected" ]]; then
+		printf 'AGMSG_CODEX_PROFILE_TARGET must be %s (got %s); refusing fail-open launch.\n' \
+			"$profile_expected" "$profile_target" >&2
+		exit 1
+	fi
 
 	if [[ ! -f "$profile_source" ]]; then
 		printf '%s\n' 'Codex review profile source is missing; refusing fail-open launch.' >&2

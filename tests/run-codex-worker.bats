@@ -80,3 +80,42 @@ skill_models_for() {
     return 1
   }
 }
+
+# 以下は CODEX_HOME 経路の fail-open 回帰テスト。
+#
+# profile_target の既定値が $HOME/.codex 直書きだった間、CODEX_HOME を設定した環境では
+# profile を置く場所と Codex が読む場所が食い違い、`-p` が exit 0 で base config へ
+# 落ちていた。script 側は install も cmp も成功するので、read-only 境界が消えたことに
+# 誰も気づけない（reviewer-spawn-final の final-review blocker）。
+
+@test "the review profile is deployed under CODEX_HOME, not a hardcoded ~/.codex" {
+  local fake_home stub
+  fake_home="$(mktemp -d)"
+  mkdir -p "$fake_home/codex"
+  # profile 配置は codex 本体の存在確認より後なので、到達させるには実行可能な
+  # スタブが要る。exec される側なので即 exit するだけのものにする。
+  stub="$fake_home/fake-codex"
+  printf '#!/bin/sh\nexit 0\n' >"$stub"
+  chmod +x "$stub"
+  CODEX_HOME="$fake_home/codex" AGMSG_CODEX_BIN="$stub" \
+    run "$SCRIPT" review "$PROJECT" gpt-5.6-sol "$PAYLOAD"
+  [ -f "$fake_home/codex/agmsg-review.config.toml" ]
+  run cmp -s "$REPO_ROOT/catalog/skills/agmsg-delegation/agmsg-review.config.toml" \
+    "$fake_home/codex/agmsg-review.config.toml"
+  [ "$status" -eq 0 ]
+  [ ! -f "$HOME/.codex/agmsg-review.config.toml.unexpected" ]
+  rm -rf -- "$fake_home"
+}
+
+@test "a profile target outside CODEX_HOME is refused instead of failing open" {
+  local fake_home
+  fake_home="$(mktemp -d)"
+  mkdir -p "$fake_home/codex"
+  CODEX_HOME="$fake_home/codex" \
+    AGMSG_CODEX_PROFILE_TARGET="$fake_home/elsewhere.config.toml" \
+    run "$SCRIPT" review "$PROJECT" gpt-5.6-sol "$PAYLOAD"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"must be"* ]]
+  [ ! -f "$fake_home/elsewhere.config.toml" ]
+  rm -rf -- "$fake_home"
+}
