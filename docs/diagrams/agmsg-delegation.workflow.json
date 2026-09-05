@@ -1,0 +1,144 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "agmsg-delegation の実行ライフサイクル",
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    { "id": "orchestrator", "label": "Orchestrator / Steward" },
+    { "id": "transport", "label": "agmsg + launchd transport" },
+    { "id": "worker", "label": "Worker / Reviewer runtime" }
+  ],
+  "phases": [
+    { "id": "prepare", "label": "準備", "fromCol": 0, "toCol": 1, "variant": "default" },
+    { "id": "start", "label": "安全に起動", "fromCol": 2, "toCol": 3, "variant": "security" },
+    { "id": "observe", "label": "監視", "fromCol": 4, "toCol": 4, "variant": "emphasis" },
+    { "id": "close", "label": "検証と終了", "fromCol": 5, "toCol": 5, "variant": "default" }
+  ],
+  "mainPath": [
+    "preflight",
+    "scope",
+    "register",
+    "payload",
+    "launch",
+    "ready",
+    "monitor",
+    "cleanup"
+  ],
+  "semanticChecks": {
+    "allowedRoots": ["preflight"],
+    "allowedTerminals": ["cleanup"],
+    "requiredEdges": [
+      { "from": "preflight", "to": "scope" },
+      { "from": "scope", "to": "register" },
+      { "from": "register", "to": "payload" },
+      { "from": "payload", "to": "launch" },
+      { "from": "launch", "to": "ready" },
+      { "from": "ready", "to": "monitor" },
+      { "from": "monitor", "to": "cleanup" },
+      { "from": "monitor", "to": "cleanup" }
+    ]
+  },
+  "nodes": [
+    {
+      "id": "preflight",
+      "label": "事前確認",
+      "lane": "orchestrator",
+      "col": 0,
+      "type": "backend",
+      "sublabel": "CLI + agmsg",
+      "tag": "gate"
+    },
+    {
+      "id": "scope",
+      "label": "範囲を固定",
+      "lane": "orchestrator",
+      "col": 1,
+      "type": "backend",
+      "sublabel": "role + worktree"
+    },
+    {
+      "id": "register",
+      "label": "identity 登録",
+      "lane": "transport",
+      "col": 2,
+      "type": "messagebus",
+      "sublabel": "team + name",
+      "tag": "identities.sh"
+    },
+    {
+      "id": "payload",
+      "label": "boot payload",
+      "lane": "transport",
+      "col": 3,
+      "type": "security",
+      "sublabel": "mode 600",
+      "tag": "temp dir"
+    },
+    {
+      "id": "launch",
+      "label": "detached 起動",
+      "lane": "transport",
+      "col": 4,
+      "type": "cloud",
+      "sublabel": "launchd helper",
+      "tag": "launch-worker.sh"
+    },
+    {
+      "id": "ready",
+      "label": "READY",
+      "lane": "worker",
+      "col": 4,
+      "type": "messagebus",
+      "sublabel": "agmsg DB",
+      "tag": "READY"
+    },
+    {
+      "id": "monitor",
+      "label": "監視・検証",
+      "lane": "orchestrator",
+      "col": 5,
+      "type": "backend",
+      "sublabel": "inbox + SHA",
+      "tag": "DONE / REVIEW"
+    },
+    {
+      "id": "cleanup",
+      "label": "cleanup / 報告",
+      "lane": "transport",
+      "col": 5,
+      "type": "security",
+      "sublabel": "reset + bootout",
+      "tag": "end"
+    }
+  ],
+  "edges": [
+    { "id": "e-preflight-scope", "from": "preflight", "to": "scope" },
+    { "id": "e-scope-register", "from": "scope", "to": "register", "label": "team + identity" },
+    { "id": "e-register-payload", "from": "register", "to": "payload", "label": "登録済み" },
+    { "id": "e-payload-launch", "from": "payload", "to": "launch", "label": "stdin payload" },
+    { "id": "e-launch-ready", "from": "launch", "to": "ready", "label": "spawn" },
+    { "id": "e-ready-monitor", "from": "ready", "to": "monitor", "label": "READY in DB" },
+    { "id": "e-monitor-cleanup", "from": "monitor", "to": "cleanup", "label": "close / cleanup" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "メッセージ契約",
+      "items": [
+        "READY(task_id) は agmsg DB が source of truth",
+        "DONE / REVIEW が正常終了の合図"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "安全境界",
+      "items": [
+        "payload は mode-600 の一時ディレクトリ",
+        "review は read-only + base/head SHA 固定",
+        "BLOCKED / timeout / crash は診断後に cleanup"
+      ]
+    }
+  ]
+}
