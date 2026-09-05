@@ -102,9 +102,9 @@ Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、r
 
 **依頼した書込先が worker の実効境界に収まるかを、起動前に照合する。** 委譲してよい（policy）ことと実行できる（runtime）ことは別で、境界の外へ書く必要があるタスクはその経路では成立しない。role と base 設定が境界を決めるため、モデルを替えれば通るとは限らない。
 
-- implement は base config の `writable_roots` と、`-C` で渡す対象 project（workspace-write）が書込可能な範囲になる
-- review は profile 側の `writable_roots` が base を置換し、cwd はスクラッチへ逃がす。対象 project は read-only
-- どちらも `~/.claude` や `~/.agents/skills` のような配布面へは届かない。配布・インストールのようにそこへ書く作業は、この経路では起動しない
+- Codex は role で分かれる。implement は base config の `writable_roots` と `-C` で渡す対象 project（workspace-write）、review は profile 側の `writable_roots` が base を置換し cwd はスクラッチへ逃がす（対象 project は read-only）。実際の値は [references/codex-sandbox.md](references/codex-sandbox.md) と base config が正本
+- Claude は `run-claude-worker.sh` が組む `write_paths` が実効集合で、role によって変わるのは対象 project の可否。列挙内容は helper が正本
+- 必要な書込先がその経路の実効許可集合に含まれないなら、その経路では起動しない。逆に書ける面が見つかっても、それだけで委譲が許可されるわけではない。WORKER.md の worktree 外書込禁止は別に効く
 
 境界の外だと分かった場合は、既に権限を持つ経路か Orchestrator 自身へ戻す。実際の path と profile の中身は [references/codex-sandbox.md](references/codex-sandbox.md) と各 helper が正本。
 

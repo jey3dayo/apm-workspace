@@ -8,7 +8,7 @@ Codex review に `--sandbox read-only` を使ってはならない。agmsg の�
 
 profile の正本は本スキルの [agmsg-review.config.toml](../agmsg-review.config.toml)（tracked asset）。**Codex の `-p` は profile ファイルが欠落していても exit 0 で base config にフォールバックする（fail-open）ため、`run-codex-worker.sh` が起動前に正本を解決済みの `$CODEX_HOME` 直下へ `install -m 600` で置き直し、その後 `cmp` で一致を検証する**。spawn 経路では `$CODEX_HOME` が実行ごとに生成する worker home（`mktemp -d` 配下）を指すため、置き場所は `~/.codex` 直下ではない。手で pane を立てる常駐経路ではこの置き直しが走らないので、起動前に自分で `cmp` を通す（[resident-pool.md](resident-pool.md)）。`CODEX_HOME` は APM の配布面ではないため（`targets:` は runtime 種別のリストで、skills / agents ディレクトリと `~/.codex/AGENTS.md` しか配布しない）、この置き直しが catalog 正本への追従経路になる。
 
-- 手動コピーは不要。catalog 側の profile を更新したら `mise run deploy` するだけでよい
+- spawn 経路では手動コピーは不要。catalog 側の profile を更新したら `mise run deploy` するだけでよい（手起動 pane は上記のとおり自分で `cmp` を通す）
 - source が欠落、コピー失敗、コピー後も不一致のいずれでも helper は起動を拒否する（fail-closed）
 
 ## worker 専用 CODEX_HOME と MCP allowlist

@@ -206,7 +206,7 @@ Codex native の `spawn_agent` を標準経路とする。native spawn が利用
 | Claude   | `sonnet`             | `model: "opus"` を呼び出し時に渡す             |
 | Codex    | `gpt-5.6-luna` xhigh | ① reasoning effort を max へ ② `gpt-5.6-terra` |
 
-昇格先が現在のモデル自身になる場合（terra セッションで ② に達した場合など）も、**親 session がそのまま実装しない**。同じモデルの Worker を、別 identity・別 session として起動する。§5 の検証は「Worker の DONE は未検証の申告」を前提にしており、起動側と実装側が同一 session だとその前提が崩れる（context も混ざる）。別 session を確保できない場合は `BLOCKED` とし、Architect へ handoff する。
+昇格先が現在のモデル自身になる場合（terra セッションで ② に達した場合など）も、**親 session がそのまま実装しない**。同じモデルの Worker を、別 identity・別 session として起動する。§5 の照合は成果物を独立に確かめることを前提にしており、起動側と実装側が同一 session だとその前提が崩れる（context も混ざる）。別 session を確保できない場合は `BLOCKED` とし、Architect へ handoff する。
 
 昇格の順序（① effort → ② terra）は、価格差だけでなく能力差で決める。Terra は Luna と Sol の中間段として、長文脈などの能力崖を埋める価値を持つ（下記例外の MRCR 参照）。判断規則: ① Luna の effort を max まで上げる → ② Luna の既知の能力崖（長文脈リコールなど）に該当する場合、または ① を固定して検証した結果 Luna が不足した場合に限り Terra へ上げる。Sol へ直接飛ばすのは Sol 固有の要件がある場合に限り、Terra を中間段として省略しない。価格は変わりやすいため本文に固定値を置かず、② を選ぶ際は [公式 rate card](https://help.openai.com/en/articles/20001106-codex-rate-card) で現在値を確認する。Luna が安いことは無制限であることを意味しない——どの tier も共有クレジットプールと利用上限を消費する。
 
