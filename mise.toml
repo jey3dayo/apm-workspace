@@ -83,7 +83,13 @@ run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts
 description = "Run lightweight pre-deploy checks for the ~/.apm workspace"
 # lint:yaml sits here rather than under format:check: it is a linter, not a
 # formatting check.
-depends = ["format:check", "lint:yaml", "lint:frontmatter", "validate"]
+depends = [
+  "format:check",
+  "lint:yaml",
+  "lint:frontmatter",
+  "lint:catalog-leaks",
+  "validate",
+]
 
 [tasks.verify]
 description = "Run deep verification for the ~/.apm workspace"

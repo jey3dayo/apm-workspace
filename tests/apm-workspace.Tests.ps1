@@ -1539,7 +1539,7 @@ dependencies: []
     $boldHeadingRunner | Should -Match 'TARGET="\./catalog"'
     $boldHeadingRunner | Should -Match '(?s)"\$mode" = "check".*--dry-run'
     $miseToml | Should -Match '(?s)\[tasks\."format:check"\]\s*description = "Check workspace docs and manifest formatting"\s*depends = \['
-    $miseToml | Should -Match '(?s)\[tasks\.check\]\s*description = "Run lightweight pre-deploy checks for the ~/.apm workspace"\s*(#[^\n]*\n\s*)*depends = \["format:check", "lint:yaml", "lint:frontmatter", "validate"\]'
+    $miseToml | Should -Match '(?s)\[tasks\.check\]\s*description = "Run lightweight pre-deploy checks for the ~/.apm workspace"\s*(#[^\n]*\n\s*)*depends = \[\s*"format:check",\s*"lint:yaml",\s*"lint:frontmatter",\s*"lint:catalog-leaks",\s*"validate",?\s*\]'
     $miseToml | Should -Match '(?s)\[tasks\.verify\]\s*description = "Run deep verification for the ~/.apm workspace"\s*run = \[\{ task = "check" \}, \{ task = "test" \}, \{ task = "smoke:catalog" \}\]'
     $miseToml | Should -Match '(?s)\[tasks\.deploy\]\s*description = "Run checks, deploy the current workspace state, and inspect targets"\s*run = \[\{ task = "check" \}, \{ task = "apply" \}, \{ task = "doctor" \}\]'
     $miseToml | Should -Match '(?s)\[tasks\.upgrade\].*?apm update -g.*?\{ task = "deploy" \}'
