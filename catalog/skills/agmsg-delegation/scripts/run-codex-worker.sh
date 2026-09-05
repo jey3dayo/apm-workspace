@@ -117,29 +117,60 @@ review_scratch=
 
 codex_home=${CODEX_HOME:-$HOME/.codex}
 
-# worker が継承する MCP を最小化する。leaf worker は実装かレビューだけを行うので、
-# 認証情報 (1password)、GUI 操作 (computer-use / node_repl)、通知 (voicevox)、
-# タスク管理 (linear) は不要で、渡すこと自体が能力面の境界を広げる。
+# worker が継承する MCP と plugin を最小化する。leaf worker は実装かレビューだけを
+# 行うので、認証情報 (1password)、GUI 操作 (computer-use / node_repl)、通知
+# (voicevox)、タスク管理 (linear) は不要で、渡すこと自体が能力面の境界を広げる。
+#
+# 個別キーの上書き (`-c mcp_servers.X.enabled=false`) は config.toml に節を持つ
+# サーバにしか効かない。plugin が持ち込む MCP には節が無く、`-c plugins."x@y".
+# enabled=false` は実測で無視される (codex 0.153.2)。そのため worker には base
+# config の複製から plugin と非 allowlist の MCP を落とした専用 CODEX_HOME を渡す。
+# base の他の設定 (openai_base_url、service_tier、sandbox_workspace_write、
+# projects の trust) はそのまま残すので、閉じるのは MCP と plugin だけになる。
 #
 # allowlist にするのは、config.toml へ新しい MCP を足したときに既定で worker へ
 # 流れ込まないようにするため。明示したものだけ通す。
-#
-# 個別キーの上書きだけが効く。`-c mcp_servers={}` のテーブル全置換は無視される。
-# また config.toml に節を持たない plugin 由来のサーバ (computer-history / cua_repl) は
-# transport が欠けた定義になり設定読み込みごと失敗するため対象にしない。目的は
-# 最小化であってゼロ化ではない。
 mcp_allow=${AGMSG_WORKER_MCP_ALLOW:-context7,jina-reader}
 
-if [[ -f "$codex_home/config.toml" ]]; then
-	while IFS= read -r server; do
-		[[ -n "$server" ]] || continue
-		case ",$mcp_allow," in
-		*",$server,"*) continue ;;
-		esac
-		codex_args+=(-c "mcp_servers.$server.enabled=false")
-	done < <(grep -oE '^\[mcp_servers\.[A-Za-z0-9_-]+\]' "$codex_home/config.toml" |
-		sed 's/^\[mcp_servers\.//; s/\]$//')
+worker_home=$(mktemp -d "${TMPDIR:-/tmp}/agmsg-worker-home.XXXXXX")/codex
+mkdir -p "$worker_home"
+chmod 700 "$worker_home"
+cleanup() {
+	rm -rf -- "${worker_home%/codex}"
+	[[ -n "$review_scratch" ]] && rm -rf -- "$review_scratch"
+	return 0
+}
+trap cleanup EXIT
+
+# auth は symlink で共有する。コピーするとトークン更新が worker 側に閉じ、
+# 本体の auth.json が更新されないまま失効する。
+if [[ -e "$codex_home/auth.json" ]]; then
+	ln -s "$codex_home/auth.json" "$worker_home/auth.json"
 fi
+
+if [[ -f "$codex_home/config.toml" ]]; then
+	awk -v allow=",$mcp_allow," '
+		/^\[/ {
+			in_notify = 0
+			drop = 0
+			if ($0 ~ /^\[plugins[.\]]/ || $0 ~ /^\[marketplaces[.\]]/) {
+				drop = 1
+			} else if (match($0, /^\[mcp_servers\.[^.\]]+/)) {
+				name = substr($0, RSTART + 13, RLENGTH - 13)
+				drop = (index(allow, "," name ",") == 0)
+			}
+		}
+		# notify は人間の通知先へ turn 終了イベントと payload 本文を渡す。worker の
+		# 出力を人間のデスクトップへ流す必要はなく、報告経路は agmsg 側にある。
+		!drop && /^notify[[:space:]]*=/ { in_notify = ($0 !~ /\]/); next }
+		in_notify { if ($0 ~ /\]/) in_notify = 0; next }
+		!drop { print }
+	' "$codex_home/config.toml" >"$worker_home/config.toml"
+	chmod 600 "$worker_home/config.toml"
+fi
+
+codex_home=$worker_home
+export CODEX_HOME="$worker_home"
 
 if [[ "$role" == implement ]]; then
 	# implement は profile を layer しないため base config の writable_roots が直接効く。
@@ -220,7 +251,6 @@ else
 	# project へは read のみで到達でき、payload が絶対パスで指示する。
 	review_scratch=$(mktemp -d "${TMPDIR:-/tmp}/agmsg-review-cwd.XXXXXX")
 	chmod 700 "$review_scratch"
-	trap 'rm -rf -- "$review_scratch"' EXIT
 	# スクラッチは git repo でないため、trusted-directory 判定を明示的に飛ばす。
 	codex_args+=(-C "$review_scratch" -p agmsg-review)
 	exec_args+=(--skip-git-repo-check)

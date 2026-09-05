@@ -88,22 +88,36 @@ skill_models_for() {
 # 落ちていた。script 側は install も cmp も成功するので、read-only 境界が消えたことに
 # 誰も気づけない（reviewer-spawn-final の final-review blocker）。
 
-@test "the review profile is deployed under CODEX_HOME, not a hardcoded ~/.codex" {
+@test "the review profile is deployed into the worker home the reviewer actually reads" {
   local fake_home stub
   fake_home="$(mktemp -d)"
   mkdir -p "$fake_home/codex"
   # profile 配置は codex 本体の存在確認より後なので、到達させるには実行可能な
-  # スタブが要る。exec される側なので即 exit するだけのものにする。
+  # スタブが要る。生成 home は EXIT trap で消えるため、起動時点で中身を確認する。
   stub="$fake_home/fake-codex"
-  printf '#!/bin/sh\nexit 0\n' >"$stub"
+  cat >"$stub" <<'SH'
+#!/bin/sh
+printf 'HOME_IS: %s\n' "$CODEX_HOME"
+if [ -f "$CODEX_HOME/agmsg-review.config.toml" ]; then
+  printf 'PROFILE_BEGIN\n'
+  cat "$CODEX_HOME/agmsg-review.config.toml"
+  printf 'PROFILE_END\n'
+fi
+exit 0
+SH
   chmod +x "$stub"
   CODEX_HOME="$fake_home/codex" AGMSG_CODEX_BIN="$stub" \
     run "$SCRIPT" review "$PROJECT" gpt-5.6-sol "$PAYLOAD"
-  [ -f "$fake_home/codex/agmsg-review.config.toml" ]
-  run cmp -s "$REPO_ROOT/catalog/skills/agmsg-delegation/agmsg-review.config.toml" \
-    "$fake_home/codex/agmsg-review.config.toml"
   [ "$status" -eq 0 ]
-  [ ! -f "$HOME/.codex/agmsg-review.config.toml.unexpected" ]
+  # reviewer が読む home は base home ではなく生成された home である。
+  [[ "$output" != *"HOME_IS: $fake_home/codex"* ]]
+  [[ "$output" == *"PROFILE_BEGIN"* ]]
+  # 正本の中身がそのまま届いている（fail-open で base config へ落ちていない）。
+  local marker
+  marker="$(head -1 "$REPO_ROOT/catalog/skills/agmsg-delegation/agmsg-review.config.toml")"
+  [[ "$output" == *"$marker"* ]]
+  # base home も $HOME/.codex も profile の置き場にはしない。
+  [ ! -f "$fake_home/codex/agmsg-review.config.toml" ]
   rm -rf -- "$fake_home"
 }
 
@@ -123,17 +137,28 @@ skill_models_for() {
   rm -rf -- "$fake_home"
 }
 
-# 以下は worker が継承する MCP の最小化。
+# 以下は worker が継承する MCP と plugin の最小化。
 #
 # 実運用で leaf worker が global MCP をそのまま引き継ぎ、Voicevox・Context7・CUA・
 # memory lookup まで起動した（CyMaster PR892 のフィールド報告）。認証情報 (1password)
 # や GUI 操作 (computer-use / node_repl) を渡すことは能力面の境界を広げるので、
 # allowlist で明示したものだけ通す。
+#
+# 個別キーの上書きでは plugin 由来の MCP を止められない（`-c plugins."x@y".
+# enabled=false` は codex 0.153.2 で無視されることを実測済み）。そのため script は
+# base config を複製して plugin・非 allowlist の MCP・notify を落とした専用
+# CODEX_HOME を worker へ渡す。下のテストは「worker が見る config」を検証する。
 
 mcp_fixture() {
   local home=$1
   mkdir -p "$home"
   cat >"$home/config.toml" <<'TOML'
+model = "gpt-5.6-luna"
+notify = [
+  "/Applications/Some.app/notify",
+  "turn-ended",
+]
+
 [mcp_servers.context7]
 command = "npx"
 
@@ -145,13 +170,40 @@ command = "/usr/local/bin/1password-mcp"
 
 [mcp_servers.mcp-simple-voicevox]
 command = "npx"
+
+[mcp_servers.mcp-simple-voicevox.tools.speak]
+enabled = true
+
+[plugins."computer-history@openai-bundled"]
+enabled = true
+
+[marketplaces.openai-bundled]
+source_type = "local"
+
+[sandbox_workspace_write]
+network_access = false
 TOML
+  printf '{"token":"unused"}\n' >"$home/auth.json"
 }
 
-# codex 本体は起動させず、渡された引数を捕まえる。
+# codex 本体は起動させず、worker が実際に見る CODEX_HOME の中身を書き出す。
+# 生成した home は script の EXIT trap で消えるため、起動時点で読む必要がある。
 arg_stub() {
   local path=$1
-  printf '#!/bin/sh\nprintf "ARGS: %%s\\n" "$*"\nexit 0\n' >"$path"
+  cat >"$path" <<'SH'
+#!/bin/sh
+printf 'ARGS: %s\n' "$*"
+printf 'HOME_IS: %s\n' "$CODEX_HOME"
+if [ -L "$CODEX_HOME/auth.json" ]; then printf 'AUTH_SYMLINK\n'; fi
+if [ -f "$CODEX_HOME/config.toml" ]; then
+  printf 'CONFIG_BEGIN\n'
+  cat "$CODEX_HOME/config.toml"
+  printf 'CONFIG_END\n'
+else
+  printf 'NO_CONFIG\n'
+fi
+exit 0
+SH
   chmod +x "$path"
 }
 
@@ -159,33 +211,62 @@ arg_stub() {
   local home stub
   home="$(mktemp -d)/codex"; mcp_fixture "$home"
   stub="$(mktemp -d)/stub"; arg_stub "$stub"
-  CODEX_HOME="$home" AGMSG_CODEX_BIN="$stub"     run "$SCRIPT" implement "$PROJECT" gpt-5.6-luna "$PAYLOAD"
+  CODEX_HOME="$home" AGMSG_CODEX_BIN="$stub" \
+    run "$SCRIPT" implement "$PROJECT" gpt-5.6-luna "$PAYLOAD"
   [ "$status" -eq 0 ]
+  # worker は base home ではなく生成された home を見る。
+  [[ "$output" != *"HOME_IS: $home"* ]]
   # 既定 allowlist は context7 と jina-reader。
-  [[ "$output" != *"mcp_servers.context7.enabled=false"* ]]
-  [[ "$output" != *"mcp_servers.jina-reader.enabled=false"* ]]
-  # 認証情報と通知は必ず落ちる。
-  [[ "$output" == *"mcp_servers.1password.enabled=false"* ]]
-  [[ "$output" == *"mcp_servers.mcp-simple-voicevox.enabled=false"* ]]
+  [[ "$output" == *"[mcp_servers.context7]"* ]]
+  [[ "$output" == *"[mcp_servers.jina-reader]"* ]]
+  # 認証情報と通知は必ず落ちる。入れ子の tools 節も一緒に落ちる。
+  [[ "$output" != *"[mcp_servers.1password]"* ]]
+  [[ "$output" != *"[mcp_servers.mcp-simple-voicevox]"* ]]
+  [[ "$output" != *"tools.speak"* ]]
+  # plugin 由来の MCP は個別キーで止められないので、定義ごと落とす。
+  [[ "$output" != *"[plugins."* ]]
+  [[ "$output" != *"[marketplaces"* ]]
+  # 人間向けの通知先へ worker の payload を流さない。
+  [[ "$output" != *"turn-ended"* ]]
+  # base の他の設定は残す。
+  [[ "$output" == *"[sandbox_workspace_write]"* ]]
+  [[ "$output" == *"model = \"gpt-5.6-luna\""* ]]
+  # auth は複製せず共有する。
+  [[ "$output" == *"AUTH_SYMLINK"* ]]
 }
 
 @test "AGMSG_WORKER_MCP_ALLOW replaces the default allowlist" {
   local home stub
   home="$(mktemp -d)/codex"; mcp_fixture "$home"
   stub="$(mktemp -d)/stub"; arg_stub "$stub"
-  CODEX_HOME="$home" AGMSG_WORKER_MCP_ALLOW=1password AGMSG_CODEX_BIN="$stub"     run "$SCRIPT" implement "$PROJECT" gpt-5.6-luna "$PAYLOAD"
+  CODEX_HOME="$home" AGMSG_WORKER_MCP_ALLOW=1password AGMSG_CODEX_BIN="$stub" \
+    run "$SCRIPT" implement "$PROJECT" gpt-5.6-luna "$PAYLOAD"
   [ "$status" -eq 0 ]
-  [[ "$output" != *"mcp_servers.1password.enabled=false"* ]]
+  [[ "$output" == *"[mcp_servers.1password]"* ]]
   # 既定で通っていた 2 つが、明示しなければ落ちる（allowlist は置換であって追加ではない）。
-  [[ "$output" == *"mcp_servers.context7.enabled=false"* ]]
-  [[ "$output" == *"mcp_servers.jina-reader.enabled=false"* ]]
+  [[ "$output" != *"[mcp_servers.context7]"* ]]
+  [[ "$output" != *"[mcp_servers.jina-reader]"* ]]
 }
 
-@test "a CODEX_HOME without config.toml adds no MCP overrides" {
+@test "a CODEX_HOME without config.toml leaves the worker home without one" {
   local home stub
   home="$(mktemp -d)/codex"; mkdir -p "$home"
   stub="$(mktemp -d)/stub"; arg_stub "$stub"
-  CODEX_HOME="$home" AGMSG_CODEX_BIN="$stub"     run "$SCRIPT" implement "$PROJECT" gpt-5.6-luna "$PAYLOAD"
+  CODEX_HOME="$home" AGMSG_CODEX_BIN="$stub" \
+    run "$SCRIPT" implement "$PROJECT" gpt-5.6-luna "$PAYLOAD"
   [ "$status" -eq 0 ]
-  [[ "$output" != *"enabled=false"* ]]
+  [[ "$output" == *"NO_CONFIG"* ]]
+}
+
+@test "the generated worker home is removed after the run" {
+  local home stub
+  home="$(mktemp -d)/codex"; mcp_fixture "$home"
+  stub="$(mktemp -d)/stub"; arg_stub "$stub"
+  CODEX_HOME="$home" AGMSG_CODEX_BIN="$stub" \
+    run "$SCRIPT" implement "$PROJECT" gpt-5.6-luna "$PAYLOAD"
+  [ "$status" -eq 0 ]
+  local generated
+  generated="$(printf '%s\n' "$output" | sed -n 's/^HOME_IS: //p')"
+  [ -n "$generated" ]
+  [ ! -e "$generated" ]
 }
