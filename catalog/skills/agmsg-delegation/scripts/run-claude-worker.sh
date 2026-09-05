@@ -78,10 +78,15 @@ write_paths=(
 	"$(cd -- /tmp && pwd -P)"
 )
 
+# agmsg は run/ を遅延生成する（actas lock がここに作られる）。sandbox 構築前に実体を
+# 用意しないと write_paths から落ち、起動直後の `/agmsg actas` が親ディレクトリへの
+# 書込拒否で失敗する。db / teams は ~/.local/state/agmsg への symlink なので mkdir -p は
+# 既存パスに対する no-op になる。
 for state_path in \
 	"$HOME/.agents/skills/agmsg/db" \
 	"$HOME/.agents/skills/agmsg/teams" \
 	"$HOME/.agents/skills/agmsg/run"; do
+	mkdir -p "$state_path" 2>/dev/null || true
 	if [[ -d "$state_path" ]]; then
 		write_paths+=("$(cd -- "$state_path" && pwd -P)")
 	fi
