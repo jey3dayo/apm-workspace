@@ -95,7 +95,7 @@
 
 - 各 agent のモデルは `catalog/agents/*.md` の frontmatter `model:` に書く。呼び出し時の指定漏れがあっても frontmatter の割り当てで動く
 - Orchestrator 役はメインセッションが担い、agent 化しない
-- レビュー・監査・本番運用判断系の agent（code-reviewer、deployment、terraform-operations など）は `model` を指定せず親モデルを継承させる
+- レビュー・監査・本番運用判断系の agent（code-reviewer、github-pr-reviewer、accessibility-auditor など）は `model` を指定せず親モデルを継承させる
 
 ## コマンド選択
 

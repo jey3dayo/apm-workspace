@@ -4,8 +4,8 @@
 // catalog/skills, catalog/commands, catalog/rules). `mise run check` never
 // parsed frontmatter, so an unquoted "key: value: more" in a `description`
 // field (broken YAML: a colon+space inside a plain scalar) passed the gate
-// and was distributed as-is (catalog/agents/{docs-manager,error-fixer,
-// monitoring-alerts,researcher,serena}.md, fixed in commit 5efd532).
+// and was distributed as-is (five catalog agent files, fixed in commit
+// 5efd532).
 //
 // yamllint is delegated to for syntax validation rather than reimplementing
 // a YAML parser here: it is already mise-managed (pipx:yamllint) and

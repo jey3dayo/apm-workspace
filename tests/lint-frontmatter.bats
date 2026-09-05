@@ -4,8 +4,7 @@
 # tsx, matching the subprocess-invocation style used in
 # replace-bold-headings.ts.bats). Guards the gate added after an unquoted
 # ": " inside a `description` scalar broke YAML frontmatter and still passed
-# `mise run check` (catalog/agents/{docs-manager,error-fixer,
-# monitoring-alerts,researcher,serena}.md, fixed in commit 5efd532).
+# `mise run check` (five catalog agent files, fixed in commit 5efd532).
 
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
