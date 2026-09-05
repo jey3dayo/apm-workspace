@@ -83,8 +83,9 @@ symlinks resolving to `.apm/skills/<id>/SKILL.md`.
   cross-repository global MCP; use the tracked source and regenerate, never
   edit `~/.codex/config.toml`. Desktop MCP setup belongs to bootstrap.
 - Runtime assets that a skill places at launch have no `targets:` distribution
-  route. For `~/.codex/agmsg-review.config.toml`, use the placement contract in
-  `catalog/skills/agmsg-delegation/SKILL.md`.
+  route. For `agmsg-review.config.toml` (spawn puts it in the per-run worker
+  home, a hand-started pane in `~/.codex`), use the placement contract in
+  `catalog/skills/agmsg-delegation/references/codex-sandbox.md`.
 
 ## agmsg State
 
