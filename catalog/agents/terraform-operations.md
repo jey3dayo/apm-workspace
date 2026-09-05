@@ -1,6 +1,6 @@
 ---
 name: terraform-operations
-description: Specialized agent for Terraform basic operations and infrastructure management. Automates terraform init/plan/apply/output, environment-specific deployments, and ECS service updates. Trigger when users mention "Terraform", "インフラ変更", "staging deploy", "production deploy", "terraform plan", or need infrastructure modification assistance.
+description: Use this agent to change infrastructure through Terraform - init, plan, apply, and output against a chosen environment, including changes to the ECS service resource definition. Covers infrastructure definitions only; shipping a new application image is deployment's job, and restarting or force-redeploying a running service is aws-operations'. Not for reading live AWS resources without changing them (use aws-operations).
 tools: "*"
 color: green
 ---

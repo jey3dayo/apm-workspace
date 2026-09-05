@@ -1,6 +1,6 @@
 ---
 name: deployment
-description: Specialized agent for ASTA deployment automation using GitHub Actions. Manages staging/production deployments, ECR tag strategies, rollback procedures, and deployment verification. Trigger when users mention "deploy", "deployment", "GitHub Actions", "staging deploy", "production deploy", "rollback", "ECR tag", or need deployment guidance for ASTA project.
+description: Use this agent to ship an ASTA application release through GitHub Actions - version bump, ECR tag selection, triggering the staging or production workflow, verifying the rollout, and rolling back. Covers deploying application images only; changes to the ECS service resource definition belong to terraform-operations. Not for ad-hoc AWS resource inspection outside a release (use aws-operations).
 tools: "*"
 color: green
 ---

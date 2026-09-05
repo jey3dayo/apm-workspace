@@ -1,6 +1,6 @@
 ---
 name: quality-validation
-description: Specialized agent for quality validation operations. Provides interactive support for type checking, lint validation, test execution, and API integration testing. Trigger when users mention "品質チェック", "quality check", "テスト実行", "型チェック", or need quality validation assistance.
+description: Use this agent to run and report a quality gate - type check, lint, unit and integration tests, and API integration checks - and to summarize which checks passed, which failed, and with what output. Proposes fixes and applies them only after explicit user approval; mechanical type or lint repairs determined by the diagnostic go to error-fixer. Not for reviewing design and maintainability (use code-reviewer).
 tools: "*"
 color: green
 model: sonnet

@@ -1,6 +1,6 @@
 ---
 name: debug-operations
-description: Specialized agent for debugging operations. Provides interactive support for server startup, log monitoring, port management, and troubleshooting. Trigger when users mention "デバッグ", "debug", "ログ確認", "サーバー起動", "ポート", or need debugging assistance.
+description: Use this agent for local development debugging - starting and supervising dev servers, tailing and searching logs, resolving port conflicts, and isolating failures in the running app. Works against a local environment, not deployed infrastructure. Not for CloudWatch alarms and deployed-environment incidents (use monitoring-alerts), and not for type, lint, or test failures with a mechanical fix (use error-fixer).
 tools: "*"
 color: yellow
 model: sonnet
