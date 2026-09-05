@@ -1,0 +1,159 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Orchestrator-Worker：委譲と受入",
+    "animation": "none",
+    "quality_profile": "showcase",
+    "output": "docs/diagrams/orchestrator-worker.html"
+  },
+  "lanes": [
+    { "id": "control", "label": "対話・役割判定・Orchestrator機能" },
+    { "id": "execution", "label": "Worker・Reviewer・受入" }
+  ],
+  "groups": [
+    { "id": "orchestrator_function", "label": "Orchestrator機能（役ではない）", "lane": "control", "fromCol": 3, "toCol": 3, "variant": "emphasis" },
+    { "id": "acceptance_gate", "label": "作者と分離したレビュー + 最終受入", "lane": "execution", "fromCol": 4, "toCol": 5, "variant": "security" }
+  ],
+  "mainPath": ["user", "steward", "architect", "orchestrator", "worker", "reviewer", "acceptance"],
+  "semanticChecks": {
+    "allowedRoots": ["user"],
+    "allowedTerminals": ["steward_end", "blocked", "acceptance"],
+    "requiredPaths": [
+      { "from": "user", "to": "steward" },
+      { "from": "steward", "to": "orchestrator" },
+      { "from": "orchestrator", "to": "worker" },
+      { "from": "worker", "to": "reviewer" },
+      { "from": "reviewer", "to": "acceptance" }
+    ]
+  },
+  "nodes": [
+    {
+      "id": "user",
+      "lane": "control",
+      "col": 0,
+      "type": "external",
+      "label": "依頼入口",
+      "sublabel": "宣言default / envelope",
+      "tag": "未宣言: 許可modelでS/A",
+      "width": 138
+    },
+    {
+      "id": "steward",
+      "lane": "control",
+      "col": 1,
+      "type": "backend",
+      "label": "Steward",
+      "sublabel": "軽量対応 / Architectへhandoff",
+      "tag": "まずここへ",
+      "width": 154
+    },
+    {
+      "id": "architect",
+      "lane": "control",
+      "col": 2,
+      "type": "backend",
+      "label": "Architect",
+      "sublabel": "設計判断・Orchestrator担当可",
+      "tag": "handoff先",
+      "width": 170
+    },
+    {
+      "id": "steward_end",
+      "lane": "control",
+      "col": 2,
+      "type": "backend",
+      "label": "Stewardで完了",
+      "sublabel": "説明・状態確認・軽微修正",
+      "tag": "ここで終了",
+      "width": 170,
+      "yOffset": -80
+    },
+    {
+      "id": "orchestrator",
+      "lane": "control",
+      "col": 3,
+      "type": "backend",
+      "label": "Orchestrator機能",
+      "sublabel": "分解・起動・diff + DoD検証",
+      "tag": "役ではない",
+      "width": 170,
+      "yOffset": 80
+    },
+    {
+      "id": "blocked",
+      "lane": "execution",
+      "col": 1,
+      "type": "security",
+      "label": "BLOCKED",
+      "sublabel": "許可外role/model・不整合",
+      "tag": "実行しない",
+      "width": 156,
+      "yOffset": 0
+    },
+    {
+      "id": "worker",
+      "lane": "execution",
+      "col": 3,
+      "type": "backend",
+      "label": "Worker",
+      "sublabel": "触るファイル・完了条件・検証cmd",
+      "tag": "DONEは未検証",
+      "width": 150,
+      "yOffset": 0
+    },
+    {
+      "id": "reviewer",
+      "lane": "execution",
+      "col": 4,
+      "type": "security",
+      "label": "Reviewer",
+      "sublabel": "別identity・別session/context",
+      "tag": "REVIEW",
+      "width": 156,
+      "yOffset": 0
+    },
+    {
+      "id": "acceptance",
+      "lane": "execution",
+      "col": 5,
+      "type": "backend",
+      "label": "Orchestrator受入・報告",
+      "sublabel": "独立diff + DoD → 元の依頼経路",
+      "tag": "最終受入",
+      "width": 156,
+      "yOffset": 0
+    }
+  ],
+  "edges": [
+    { "id": "request-steward", "from": "user", "to": "steward", "label": "依頼", "variant": "emphasis", "role": "main" },
+    { "id": "intake-blocked", "from": "user", "to": "blocked", "label": "不整合 → BLOCKED", "variant": "security", "role": "error" },
+    { "id": "steward-light", "from": "steward", "to": "steward_end", "label": "軽微対応", "variant": "default", "role": "branch" },
+    { "id": "steward-architect", "from": "steward", "to": "architect", "label": "handoff", "variant": "security", "role": "main" },
+    { "id": "steward-orchestrate", "from": "steward", "to": "orchestrator", "label": "Opus直行", "variant": "emphasis", "role": "branch" },
+    { "id": "architect-orchestrate", "from": "architect", "to": "orchestrator", "label": "設計確定", "variant": "emphasis", "role": "main" },
+    { "id": "orchestrate-worker", "from": "orchestrator", "to": "worker", "variant": "emphasis", "role": "main" },
+    { "id": "worker-reviewer", "from": "worker", "to": "reviewer", "label": "別context", "variant": "security", "role": "main" },
+    { "id": "reviewer-acceptance", "from": "reviewer", "to": "acceptance", "variant": "security", "role": "main" }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "役割判定・委譲・受入の境界",
+      "items": [
+        "task/handoff: envelope・model不整合→BLOCKED",
+        "軽微→Steward、Sonnet/Luna→Architect、Opus/Architect→Orchestrator",
+        "非委譲: 権限/認証/秘密/破壊/production。DONE→別Reviewer→diff + DoD→依頼元"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "モデル帯と役・昇格",
+      "items": [
+        "低コスト帯: sonnet / gpt-5.6-luna xhigh（既定）→max（第1昇格）",
+        "バランス帯: gpt-5.6-terra（既知能力崖/Luna max固定で不足実証、長文脈直行、多読Review+high）",
+        "高性能帯: Fable / gpt-5.6-sol / Opus（Architect/Reviewer、sol既定、Fable→Opus、sol固有直行、sonnet→opus）"
+      ]
+    }
+  ]
+}
