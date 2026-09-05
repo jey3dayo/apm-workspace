@@ -74,6 +74,8 @@ dependencies:
     - modem-dev/hunk/skills/hunk-review
     - agavra/tuicr/skills/tuicr
     - humanlayer/skills/plugins/show-me/skills/show-me
+
+    # --- orca ---
     - stablyai/orca/skills/orca-cli
     - stablyai/orca/skills/computer-use
     - stablyai/orca/skills/orchestration
