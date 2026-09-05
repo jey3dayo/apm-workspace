@@ -103,6 +103,29 @@ Use `manual-skills/.apm/skills/<id>/` only for upstream skills that do not insta
 
 If a manual skill becomes a workspace-owned skill that will be tuned over time, migrate it into `catalog/skills/<id>/`.
 
+## Migration Gate
+
+Moving content out of `catalog/` into a project repository is not a file move: every
+line is new at the destination even when the diff at the source is empty. Verify the
+contract before the content becomes active, not before the copy.
+
+1. Copy the candidate into an isolated branch or worktree and keep it out of the
+   destination's auto-loaded paths until the check passes. For `.claude/agents/`,
+   `.claude/commands/` and `.claude/skills/`, the copy itself is activation.
+2. Reconcile the contract surface in full against the destination's own sources of
+   truth: credentials and profile names, environment and resource identifiers,
+   executable scripts, delegation targets, and referenced paths. Prose outside that
+   surface does not need a line-by-line audit.
+3. Record the reconciliation as `statement -> destination source path:line -> match /
+fixed / unverified` in the existing PR or report. Do not open a new ledger.
+4. A migration that touches production operations needs a reviewer other than the
+   author to confirm the reconciliation before activation.
+5. Leave anything still `unverified` deactivated.
+
+After acceptance, cut the duplication: have the migrated content reference the
+repository's own operational skills and scripts instead of restating volatile values.
+A one-time gate does not stop the copy from rotting again once it lives repo-local.
+
 ## Task Selection
 
 - Run `mise run check` for a lightweight pre-deploy gate.
