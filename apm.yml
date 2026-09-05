@@ -79,6 +79,7 @@ dependencies:
     - stablyai/orca/skills/orca-cli
     - stablyai/orca/skills/computer-use
     - stablyai/orca/skills/orchestration
+    - coji/natural-japanese/skills/natural-japanese
   mcp:
     - name: context7
       registry: false
