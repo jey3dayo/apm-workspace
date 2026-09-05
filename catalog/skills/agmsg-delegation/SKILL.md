@@ -127,6 +127,8 @@ Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、r
 
 **linked worktree では canonical な repo root を渡す。** `join.sh` は worktree path を repo root へ正規化して登録するが、`identities.sh` に worktree path を渡すと空を返し、上の完了条件が成立しない。`git -C <worktree> rev-parse --path-format=absolute --git-common-dir` の親、または `git -C <worktree> worktree list --porcelain` の先頭 entry から repo root を求めて渡す。`agmsg` は外部パッケージなので本スキルからは直せず、呼び出し側で揃える。
 
+**登録済み repo の内側（nested repo・`tmp/` 配下）を対象にするときは `AGMSG_RESOLVE_PROJECT=0` を付ける。** `join.sh` と `reset.sh` は同じ `agmsg_resolve_project` を通り、既定では登録済みの祖先ディレクトリへ昇格する。nested `git init` があっても外側 repo として登録されるため、`identities.sh` は空を返して上の完了条件が成立しない。さらに同じ誤りが `reset.sh` に乗ると外側 repo の別 identity を消す。`join` と `reset` の両方へ同じ変数を付ける。
+
 ### 4. Detached worker を起動する
 
 1. `run_dir=$(mktemp -d "${TMPDIR:-/tmp}/agmsg-delegation.XXXXXX")` を作り、`chmod 700 "$run_dir"` を実行する。payload・launchd job label・ログ・exit status はこのディレクトリだけに置く
