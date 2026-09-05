@@ -8,3 +8,4 @@
 2026-08-12 Agentation / browser automation の利用リポジトリ特定を完了した +skill-migration @apm
 2026-07-21 flat optional skill を GitHub に公開し、tech-talks を単体 ref へ移して lock / deploy を確定した +skill-migration @apm
 2026-08-21 skill-inventory.md の移管候補レビューを完了した(browser 系は global 維持、社内 API 系は撤去、understand 系は観察タスクへ分離) +skill-migration @apm
+x 2026-09-05 2026-09-05 agmsg-delegationのdetached Codex workerで不要なglobal MCP・pluginを起動しない：catalog/skills/agmsg-delegation/scripts/run-codex-worker.shとCodex worker起動設定を対象に、implement/review workerをagmsg transportに必要な最小構成へ隔離し、Computer Use・Computer History・1Password・Context7・Voicevoxなど未使用MCPの自動起動とmacOSの他アプリアクセス確認を防ぐ。完了条件：生成されるworker homeのconfig.tomlにallowlist以外のMCP・plugin・notifyが残らないこと（tests/run-codex-worker.bats）と、worker起動時の子プロセス一覧に未使用MCPが現れないことを確認し、agmsgのREADY/DONE/REVIEW lifecycleと関連runtime testが通ることを確認する。unified logは起動イベントを記録せず判定手段にならないため条件から外した +security +agmsg @apm
