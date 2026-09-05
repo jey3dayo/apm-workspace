@@ -15,7 +15,7 @@ profile の正本は本スキルの [agmsg-review.config.toml](../agmsg-review.c
 
 base config を複製して plugin・非 allowlist の MCP・`notify` を落とした home を毎回作り、実行後に消す。auth は symlink で共有する。`-c mcp_servers.X.enabled=false` では `config.toml` に節を持たない plugin 由来のサーバを止められない（`-c plugins."x@y".enabled=false` は codex 0.153.2 で無視されることを実測済み）ため、home ごと分ける。
 
-base の他の設定（`openai_base_url`、`service_tier`、`sandbox_workspace_write`、`projects` の trust）はそのまま残るので、閉じるのは MCP と plugin だけになる。allowlist の既定と上書き変数は SKILL.md の Preflight 側に書いてある。
+base の他の設定（`openai_base_url`、`service_tier`、`sandbox_workspace_write`、`projects` の trust）はそのまま残るので、閉じるのは MCP と plugin だけになる。allowlist の既定値と上書き変数は `run-codex-worker.sh` が正本。
 
 ## cwd をスクラッチへ逃がす理由
 

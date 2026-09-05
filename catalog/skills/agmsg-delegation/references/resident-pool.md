@@ -42,7 +42,7 @@ pane はユーザーが起動するので `run-claude-worker.sh` / `run-codex-wo
 
 強制境界を pane に掛ける手順は runtime で異なる。
 
-- **Codex**: 対話起動でも `-p` / `-a` / `-s` を取れるため、scratch を cwd にして `cd "$(mktemp -d)" && codex -p agmsg-review -a never -m <model>` で立てれば spawn 経路と同じ境界になる。ただし `-p` は profile が `CODEX_HOME` 直下に無いと exit 0 で base config へ落ちる（fail-open）。`run-codex-worker.sh` が行っている「正本を `install -m 600` で置き直し `cmp` で一致検証」は手起動 pane では走らないので、**起動前に自分で `cmp` を通す**。通していない pane は advisory とする。
+- **Codex**: 対話起動でも `-p` / `-a` / `-s` を取れるため、scratch を cwd にして `cd "$(mktemp -d)" && codex -p agmsg-review -a never -m <model>` で立てれば spawn 経路と同じ境界になる。ただし `-p` は profile が `CODEX_HOME` 直下に無いと exit 0 で base config へ落ちる（fail-open）。`run-codex-worker.sh` が行っている置き直しと検証は手起動 pane では走らないので、**起動前に自分で置いて `cmp` を通す**。pane は `CODEX_HOME` を差し替えないので置き場所は `~/.codex` 直下になる: `install -m 600 <catalog の agmsg-review.config.toml> "${CODEX_HOME:-$HOME/.codex}/agmsg-review.config.toml"` のうえで `cmp` する。通していない pane は advisory とする。
 - **Claude**: `run-claude-worker.sh` の書込境界は `sandbox-exec` のラップで掛かっており、手で `claude` を起動した pane には掛からない。同等の境界を用意できない限り **advisory 固定**とする。
 
 ### status 比較は代替ではなく追加の検知

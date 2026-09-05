@@ -1,6 +1,7 @@
 # agmsg-delegation review role 用 Codex profile (CONFIG_PROFILE_V2)。
 # 正本: ~/.apm/catalog/skills/agmsg-delegation/agmsg-review.config.toml
-# 配置先: ~/.codex/agmsg-review.config.toml (SKILL.md Preflight が diff 検証する)
+# 配置先: $CODEX_HOME/agmsg-review.config.toml (spawn は実行ごとの worker home、手起動 pane は ~/.codex 直下)。
+# 置き直しと cmp 検証は run-codex-worker.sh が行う。pane 経路は自分で行う (references/resident-pool.md)。
 # 意図: 対象 project は read のみ。agmsg の状態書込み (messages.db / teams / run)
 #       と一時ファイルだけを許可し、reviewer が READY/REVIEW/ACK を送信できるようにする。
 #

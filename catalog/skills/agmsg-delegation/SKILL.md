@@ -96,7 +96,7 @@ review role の reviewer モデル指定は本スキル内の一時的な model 
 
 helper の解決先は `~/.agents/skills/agmsg-delegation/scripts/`。両 runtime とも headless mode と stdin prompt を使い、対話 TUI と shell interpolation を避ける。`launch-worker.sh` は専用の一時ディレクトリに launchd job label・ログ・exit status を残して detached に起動する。helper が role から model / effort を固定し、caller は model を渡さない（Codex は起動時の引数）。`run-codex-worker.sh` は role ごとの model allowlist を fail-closed で検証し、不一致は起動前に exit 2 で拒否する。上書き変数は各 script の Usage / コメントを参照（値は scripts が正本）。
 
-Claude helper は空の MCP 設定と `-p` を強制して workspace trust / MCP 確認を防ぎ、`--output-format stream-json --verbose` で無人実行中のイベントを worker log へ継続出力する。`bypassPermissions` は macOS sandbox 内だけで使い、implement は対象 project 内だけ書込可、review は対象 project を read-only にする。`sandbox-exec` が無い環境では安全契約を弱めず停止する。
+Claude helper は空の MCP 設定と `-p` を強制して workspace trust / MCP 確認を防ぎ、`--output-format stream-json --verbose` で無人実行中のイベントを worker log へ継続出力する。`bypassPermissions` は macOS sandbox 内だけで使い、implement は対象 project を書込可能集合へ加え、review は対象 project を deny する。実効集合は helper が正本。`sandbox-exec` が無い環境では安全契約を弱めず停止する。
 
 Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、review profile の内容一致を起動時に検証する。**worker には専用の CODEX_HOME を渡し、継承する MCP を allowlist で絞る**（既定 `context7,jina-reader`、`AGMSG_WORKER_MCP_ALLOW` で置換）。認証情報・GUI 操作・通知・タスク管理の MCP を leaf worker へ渡すことは能力面の境界を広げるため、明示したものだけ通す。専用 home の作り方、`-c` による個別無効化が効かない理由、review profile の fail-open 対策・cwd scratch・`writable_roots` の symlink fail-closed 検査・launchd の `MISE_ENV` 継承は [references/codex-sandbox.md](references/codex-sandbox.md) を参照。Codex を起動する前に同 reference を読む。
 
