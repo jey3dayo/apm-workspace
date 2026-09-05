@@ -67,9 +67,6 @@
 - 組み込みサブエージェント（Agent tool / `spawn_agent`）が使える場合はそれが正規経路
 - Worker のモデル名をユーザーが指定したら（例:「luna で」）、それが platform を跨ぐ明示指示にあたる。既定は同一 platform 内で完結させる
 - pane / workspace を勝手に作らない。ユーザーが「用意して」と指示したときだけ、`herdr` スキルの `pane split --focus` → `pane run` → `pane process-info` で読み戻す手順で作る。読み戻していないプロセス名を報告に書かない
-- Codex native では、bounded な作業の実装ワーカーに `gpt-5.6-luna` を明示指定できる。Luna は leaf worker として扱われ、自身の再帰的な委譲は行わない。判断・検証・独立レビューは親セッションが担う
-- Luna は同一トークン量なら Sol より大幅に安い（比率は[公式 rate card](https://help.openai.com/en/articles/20001106-codex-rate-card)を参照）が、共有クレジットプールと利用上限を消費する。無料・無制限ではない
-- Luna の直接起動は `codex -m gpt-5.6-luna`（`codex exec -m gpt-5.6-luna` も同様）。これは Luna タスクレーンとは別物
 - spawn 面の制約で組み込み経路が塞がっている場合は `agmsg-delegation` スキルへ切り替える
 - エージェント / セッション間の引き継ぎ（CC → Codex 等）は transport に `agmsg` を使い、本文は `agmsg-delegation` の引き継ぎメッセージ書式（artifact は参照渡し・suggested skills・secrets redact・次セッションの目的に合わせる）に従う
 - Worker の `DONE` は未検証の申告として扱う。Orchestrator が実際の比較元を確定し、差分、変更対象、要求との対応を独立に確認する
@@ -90,24 +87,7 @@
 
 送りっぱなしでよい。**返信は来ないし、待たない。**
 
-```bash
-~/.agents/skills/agmsg/scripts/join.sh apm <name> <claude-code|codex> <送り手の project 絶対パス>
-
-# 本文は quoted heredoc で stdin へ渡す。不具合報告はバッククォート・$()・引用符・複数行を
-# 含みやすく、shell 引数へ組み立てると展開や破損が起きる。
-~/.agents/skills/agmsg-delegation/scripts/send-report.sh apm <name> main-cc <<'AGMSG_REPORT'
-source_role: Steward
-target_role: Architect
-task_id: <repo>-feedback-<topic>
-report_contract: NOTIFY
-
-<本文>
-AGMSG_REPORT
-
-~/.agents/skills/agmsg/scripts/reset.sh <送り手の project 絶対パス> <claude-code|codex> <name>
-```
-
-`<name>` は task-scoped な一意名（例: `<repo>-feedback-<topic>`）にする。envelope 書式と `NOTIFY` が返信を要求しない理由は `agmsg-delegation` が正本。`HANDOFF` は最終結果を返す契約なので、一方通行の報告には使わない。
+送信は team `apm`・宛先 `main-cc`。envelope は `source_role: Steward` / `target_role: Architect` / `task_id: <repo>-feedback-<topic>` / `report_contract: NOTIFY` の 4 field を必ず載せる（欠けると受け側は役を確定できず `BLOCKED` を返す契約）。`<name>` は task_id と同じ task-scoped な一意名にする。join / send / reset のコマンド列と envelope の書式定義は `agmsg-delegation` が正本。`HANDOFF` は最終結果を返す契約なので、一方通行の報告には使わない。
 
 受け取り側（`~/.apm`）は**受け取るだけでよい**。ack を返す必要はなく、対応するかどうかと優先度は受け取り側が決める。
 
@@ -201,8 +181,6 @@ global MCP はリポジトリをまたいで常時使う基盤だけに限定し
 - タスク完了時は必ず、重要なお知らせやエラー発生時にも `mcp-simple-voicevox` で音声通知を行う
 - `mcp-simple-voicevox` tool が露出していないターンでは、音声通知を省略し、未実行だったことを報告しない
 - 文面は 100 文字以内で結果のみ。技術的詳細は含めず、英単語はカタカナへ変換し、不要なスペースを削除する
-- タイミングは命令受領時・作業開始時・作業中・進捗報告時・完了時を基本とする
-- 例: 「了解です」「〜を開始します」「調査中です」「半分完了です」「完了です」
 
 ## 禁止事項
 
