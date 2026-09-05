@@ -18,7 +18,7 @@ tier 判定・委譲判定・タスク分割基準・Reviewer の model 選定�
 ある文が次のどれに答えているかで置き場を決める。
 
 1. 相手は誰か（tier、model 選定、昇格、Reviewer の model）→ `orchestrator-worker`。
-2. 相手に何をさせ、結果をどう検証するか（委譲判定、分割、git diff 検証、DoD）→ `orchestrator-worker`。報告書式だけ本スキルの [WORKER.md](WORKER.md)。
+2. 相手に何をさせ、結果をどう検証するか（委譲判定、分割、git diff 検証、DoD）→ `orchestrator-worker`。受け側へ注入する行動契約と報告書式は本スキルの [WORKER.md](WORKER.md)。
 3. メッセージ/プロセスを届け、成立させ、片付けるか（identity 登録・解放、handshake、payload、起動・監視・timeout・cleanup、同一性確認）→ 本スキル。runtime 非依存は本文、runtime 依存（Codex profile、sandbox-exec、launchd、writable_roots）は `references/`。
 4. どれにも当たらない（価格、version 履歴、経緯）→ 書かない。
 
@@ -98,7 +98,7 @@ helper の解決先は `~/.agents/skills/agmsg-delegation/scripts/`。両 runtim
 
 Claude helper は空の MCP 設定と `-p` を強制して workspace trust / MCP 確認を防ぎ、`--output-format stream-json --verbose` で無人実行中のイベントを worker log へ継続出力する。`bypassPermissions` は macOS sandbox 内だけで使い、implement は対象 project 内だけ書込可、review は対象 project を read-only にする。`sandbox-exec` が無い環境では安全契約を弱めず停止する。
 
-Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、review profile の内容一致を起動時に検証する。**worker には専用の CODEX_HOME を渡し、継承する MCP を allowlist で絞る**（既定 `context7,jina-reader`、`AGMSG_WORKER_MCP_ALLOW` で置換）。base config を複製して plugin・非 allowlist の MCP・`notify` を落とした home を毎回作り、実行後に消す。auth は symlink で共有する。認証情報・GUI 操作・通知・タスク管理の MCP を leaf worker へ渡すことは能力面の境界を広げるため、明示したものだけ通す。`-c mcp_servers.X.enabled=false` では `config.toml` に節を持たない plugin 由来のサーバを止められない（`-c plugins."x@y".enabled=false` は codex 0.153.2 で無視されることを実測済み）ため、home ごと分ける。review profile の fail-open 対策・cwd scratch・`writable_roots` の symlink fail-closed 検査・launchd の `MISE_ENV` 継承は [references/codex-sandbox.md](references/codex-sandbox.md) を参照。
+Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、review profile の内容一致を起動時に検証する。**worker には専用の CODEX_HOME を渡し、継承する MCP を allowlist で絞る**（既定 `context7,jina-reader`、`AGMSG_WORKER_MCP_ALLOW` で置換）。認証情報・GUI 操作・通知・タスク管理の MCP を leaf worker へ渡すことは能力面の境界を広げるため、明示したものだけ通す。専用 home の作り方、`-c` による個別無効化が効かない理由、review profile の fail-open 対策・cwd scratch・`writable_roots` の symlink fail-closed 検査・launchd の `MISE_ENV` 継承は [references/codex-sandbox.md](references/codex-sandbox.md) を参照。Codex を起動する前に同 reference を読む。
 
 **依頼した書込先が worker の実効境界に収まるかを、起動前に照合する。** 委譲してよい（policy）ことと実行できる（runtime）ことは別で、境界の外へ書く必要があるタスクはその経路では成立しない。role と base 設定が境界を決めるため、モデルを替えれば通るとは限らない。
 

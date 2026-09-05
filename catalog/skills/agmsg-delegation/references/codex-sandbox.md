@@ -11,6 +11,12 @@ profile の正本は本スキルの [agmsg-review.config.toml](../agmsg-review.c
 - 手動コピーは不要。catalog 側の profile を更新したら `mise run deploy` するだけでよい
 - source が欠落、コピー失敗、コピー後も不一致のいずれでも helper は起動を拒否する（fail-closed）
 
+## worker 専用 CODEX_HOME と MCP allowlist
+
+base config を複製して plugin・非 allowlist の MCP・`notify` を落とした home を毎回作り、実行後に消す。auth は symlink で共有する。`-c mcp_servers.X.enabled=false` では `config.toml` に節を持たない plugin 由来のサーバを止められない（`-c plugins."x@y".enabled=false` は codex 0.153.2 で無視されることを実測済み）ため、home ごと分ける。
+
+base の他の設定（`openai_base_url`、`service_tier`、`sandbox_workspace_write`、`projects` の trust）はそのまま残るので、閉じるのは MCP と plugin だけになる。allowlist の既定と上書き変数は SKILL.md の Preflight 側に書いてある。
+
 ## cwd をスクラッチへ逃がす理由
 
 **profile の `sandbox_mode = "workspace-write"` は cwd を必ず書込可能にする。** そのため `run-codex-worker.sh` は review role で **cwd を専用スクラッチ（`mktemp -d`）へ逃がし**、対象 project を cwd にしない。project へは read のみで到達でき、payload が絶対パスで指示する。スクラッチは git repo でないので `exec --skip-git-repo-check` を併せて渡す。`writable_roots` に対象 project を足してはならない。足すと read-only 契約が黙って壊れる。

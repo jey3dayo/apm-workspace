@@ -59,11 +59,7 @@ REVIEW 受信後の確認 (1) head SHA（+ diff ファイル方式なら checksu
 
 ### approval gate は作者と別 identity・別 session
 
-対象の同一性（SHA / checksum の固定）と、判断の独立性（作者と別の reviewer）は**別々の要件**であり、片方が他方の代わりにならない。
-
-- Architect / Worker が作成した成果物を approve できるのは、**作者と異なる identity かつ別 session / 別 context の verdict reviewer** に限る
-- 同一 pane・同一 identity での Architect と Reviewer の兼務は、草案レビューや相談までとし、**approve を受理しない**
-- 同 tier であることは独立性の欠如を意味しない。独立性は actor と context の属性であり、モデルの能力とは別物
+approve を受理できる条件（作者と異なる identity かつ別 session / 別 context であること、対象の同一性と判断の独立性が別要件であること）は `orchestrator-worker` の「self-review 禁止（approval gate）」が正本。ここでは pane 常駐経路で追加になる部分だけを書く。
 
 pane で verdict reviewer を立てる場合、**強制境界の確認結果を起動前に記録する**（profile の `cmp` 出力、scratch cwd、実際の起動引数）。記録が無ければ `review_mode: advisory` で起動する。この記録は SKILL.md の Lifecycle 7 が approve を受理する条件になっている。
 
