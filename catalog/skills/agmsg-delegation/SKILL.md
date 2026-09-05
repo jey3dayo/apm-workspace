@@ -100,7 +100,15 @@ Claude helper は空の MCP 設定と `-p` を強制して workspace trust / MCP
 
 Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、review profile の内容一致を起動時に検証する。**worker には専用の CODEX_HOME を渡し、継承する MCP を allowlist で絞る**（既定 `context7,jina-reader`、`AGMSG_WORKER_MCP_ALLOW` で置換）。base config を複製して plugin・非 allowlist の MCP・`notify` を落とした home を毎回作り、実行後に消す。auth は symlink で共有する。認証情報・GUI 操作・通知・タスク管理の MCP を leaf worker へ渡すことは能力面の境界を広げるため、明示したものだけ通す。`-c mcp_servers.X.enabled=false` では `config.toml` に節を持たない plugin 由来のサーバを止められない（`-c plugins."x@y".enabled=false` は codex 0.153.2 で無視されることを実測済み）ため、home ごと分ける。review profile の fail-open 対策・cwd scratch・`writable_roots` の symlink fail-closed 検査・launchd の `MISE_ENV` 継承は [references/codex-sandbox.md](references/codex-sandbox.md) を参照。
 
-完了条件: CLI・role 別起動コマンド（review は profile の diff 一致確認込み）・agmsg・`launch-worker.sh` の4点が確認済み。初回利用前の smoke 5点は [references/runtime-smoke.md](references/runtime-smoke.md) を参照。
+**依頼した書込先が worker の実効境界に収まるかを、起動前に照合する。** 委譲してよい（policy）ことと実行できる（runtime）ことは別で、境界の外へ書く必要があるタスクはその経路では成立しない。role と base 設定が境界を決めるため、モデルを替えれば通るとは限らない。
+
+- implement は base config の `writable_roots` と、`-C` で渡す対象 project（workspace-write）が書込可能な範囲になる
+- review は profile 側の `writable_roots` が base を置換し、cwd はスクラッチへ逃がす。対象 project は read-only
+- どちらも `~/.claude` や `~/.agents/skills` のような配布面へは届かない。配布・インストールのようにそこへ書く作業は、この経路では起動しない
+
+境界の外だと分かった場合は、既に権限を持つ経路か Orchestrator 自身へ戻す。実際の path と profile の中身は [references/codex-sandbox.md](references/codex-sandbox.md) と各 helper が正本。
+
+完了条件: CLI・role 別起動コマンド（review は profile の diff 一致確認込み）・agmsg・`launch-worker.sh`・書込先と実効境界の照合の5点が確認済み。初回利用前の smoke 5点は [references/runtime-smoke.md](references/runtime-smoke.md) を参照。
 
 ### 2. 作業領域を固定する
 
@@ -135,6 +143,9 @@ Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、r
 2. boot payload を `$run_dir/payload.md` に mode 600 で書く（`install -m 600 /dev/null "$payload"`）。内容は task_id 付き初回プロンプト:
    - `/agmsg actas <worker_name>`（Claude）。Codex は actas を使わず、boot payload に「報告本文を標準入力へ渡し、`send-report.sh <team> <worker_name> <orchestrator>` を使う」と exact な引数契約を指示する
    - タスク本文、handshake、無人実行契約、WORKER.md の解決済み絶対パス
+
+   **envelope・指示と、成果物へ書き込ませる内容を分離する。** quoted heredoc は shell 展開を防ぐが、どこまでが書込内容でどこからが指示かという意味上の境界は作らない。ファイル全文を渡すときは既存 artifact の絶対パスを参照させるか、開始と終了の delimiter で内容を明示的に囲む。指示セクションを内容の後ろへ置くと、受け側が payload 末尾までを内容と解釈する。送信前に生成した payload を開き、内容の終端と WORKER.md への導線を目視する。秘密値は payload に載せない。
+
 3. `launch-worker.sh` に helper の固定引数を配列として渡し、直接起動する。shell command 文字列を組み立てない。launchd 配下は PATH が最小構成なので、helper は必ず絶対パスで渡す:
    - Claude: `~/.agents/skills/agmsg-delegation/scripts/launch-worker.sh "$run_dir" -- ~/.agents/skills/agmsg-delegation/scripts/run-claude-worker.sh <role> <対象project> "$payload"`
    - Codex: `~/.agents/skills/agmsg-delegation/scripts/launch-worker.sh "$run_dir" -- ~/.agents/skills/agmsg-delegation/scripts/run-codex-worker.sh <role> <対象project> <model> "$payload"`
