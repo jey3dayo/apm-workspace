@@ -1,6 +1,6 @@
 ---
 name: quiet-command-auditor
-description: Use when auditing noisy test, build, lint, package-manager, or CI commands before reducing output; deciding between tool-native quiet/silent/minimal options and optional agent-side compression; proposing changes that keep failures visible while suppressing successful boilerplate. Trigger when the user asks to audit noisy commands, quiet logs, reduce context, silence successful tests, or make CI less noisy. Do not edit command definitions unless the user explicitly approves the proposed change.
+description: Use when auditing noisy test, build, lint, package-manager, or CI commands before reducing output; deciding between tool-native quiet/silent/minimal options and optional agent-side compression; proposing changes that keep failures visible while suppressing successful boilerplate.
 ---
 
 # Quiet Command Auditor
