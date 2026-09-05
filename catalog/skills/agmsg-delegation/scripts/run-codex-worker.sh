@@ -207,27 +207,17 @@ else
 
 	script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 	profile_source=${AGMSG_CODEX_PROFILE_SOURCE:-"$script_dir/../agmsg-review.config.toml"}
-	# Codex は profile を $CODEX_HOME 直下から探す。既定値を $HOME/.codex 直書きにすると、
-	# CODEX_HOME を設定した環境で「置く場所」と「読む場所」が食い違い、-p が base config へ
-	# fail-open して read-only 境界が黙って消える。必ず解決済みの codex_home を使う。
-	profile_expected=$codex_home/agmsg-review.config.toml
-	profile_target=${AGMSG_CODEX_PROFILE_TARGET:-$profile_expected}
-
-	# 上書きを許すが、Codex が実際に読む path 以外へ置かせない。ここを緩めると
-	# 上と同じ fail-open が env 経由で再現する。
-	if [[ "$profile_target" != "$profile_expected" ]]; then
-		printf 'AGMSG_CODEX_PROFILE_TARGET must be %s (got %s); refusing fail-open launch.\n' \
-			"$profile_expected" "$profile_target" >&2
-		exit 1
-	fi
+	# Codex は profile を $CODEX_HOME 直下から探す。置き場が「読む場所」とずれると -p は
+	# exit 0 のまま base config へ fail-open し、read-only 境界が黙って消える。置き場は
+	# 解決済みの codex_home (実体は毎回生成する worker home) 直下に固定し、上書きさせない。
+	profile_target=$codex_home/agmsg-review.config.toml
 
 	if [[ ! -f "$profile_source" ]]; then
 		printf '%s\n' 'Codex review profile source is missing; refusing fail-open launch.' >&2
 		exit 1
 	fi
 
-	# Codex の -p は profile が CODEX_HOME 直下に無いと exit 0 で base config へ落ちる
-	# (fail-open)。CODEX_HOME は APM の配布面ではないため、正本から毎回置き直す。
+	# CODEX_HOME は APM の配布面ではないため、正本から毎回置き直す。
 	if ! install -m 600 "$profile_source" "$profile_target"; then
 		printf '%s\n' 'Failed to deploy the Codex review profile; refusing fail-open launch.' >&2
 		exit 1
