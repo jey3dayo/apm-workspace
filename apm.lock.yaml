@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-09-04T16:35:02.235432+00:00'
+generated_at: '2026-09-06T13:54:52.386788+00:00'
 apm_version: 0.29.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -6660,9 +6660,9 @@ dependencies:
 - repo_url: modem-dev/hunk
   name: hunk-review
   host: github.com
-  resolved_commit: 2c4801b28a8f1bd541c825330ee184dcf06cdd59
+  resolved_commit: 3aa212c6416181f9433392fb21c11366b52148fa
   version: unknown
-  virtual_path: skills/hunk-review
+  virtual_path: packages/hunk/skills/hunk-review
   is_virtual: true
   package_type: claude_skill
   deployed_files:
@@ -19105,8 +19105,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - modem-dev/hunk/skills/hunk-review
-  active_owner: modem-dev/hunk/skills/hunk-review
+  - modem-dev/hunk/packages/hunk/skills/hunk-review
+  active_owner: modem-dev/hunk/packages/hunk/skills/hunk-review
   content_hash: null
 - kind: project-relative
   target: agents
@@ -19114,8 +19114,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - modem-dev/hunk/skills/hunk-review
-  active_owner: modem-dev/hunk/skills/hunk-review
+  - modem-dev/hunk/packages/hunk/skills/hunk-review
+  active_owner: modem-dev/hunk/packages/hunk/skills/hunk-review
   content_hash: sha256:8974aeeaf4239a0f74691f92a44357821360aac373b4d0c215141e4b4c7f9f8f
 - kind: project-relative
   target: agents
@@ -32038,8 +32038,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - modem-dev/hunk/skills/hunk-review
-  active_owner: modem-dev/hunk/skills/hunk-review
+  - modem-dev/hunk/packages/hunk/skills/hunk-review
+  active_owner: modem-dev/hunk/packages/hunk/skills/hunk-review
   content_hash: null
 - kind: project-relative
   target: claude
@@ -32047,8 +32047,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - modem-dev/hunk/skills/hunk-review
-  active_owner: modem-dev/hunk/skills/hunk-review
+  - modem-dev/hunk/packages/hunk/skills/hunk-review
+  active_owner: modem-dev/hunk/packages/hunk/skills/hunk-review
   content_hash: sha256:8974aeeaf4239a0f74691f92a44357821360aac373b4d0c215141e4b4c7f9f8f
 - kind: project-relative
   target: claude
@@ -44773,8 +44773,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - modem-dev/hunk/skills/hunk-review
-  active_owner: modem-dev/hunk/skills/hunk-review
+  - modem-dev/hunk/packages/hunk/skills/hunk-review
+  active_owner: modem-dev/hunk/packages/hunk/skills/hunk-review
   content_hash: null
 - kind: project-relative
   target: legacy
@@ -44782,8 +44782,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - modem-dev/hunk/skills/hunk-review
-  active_owner: modem-dev/hunk/skills/hunk-review
+  - modem-dev/hunk/packages/hunk/skills/hunk-review
+  active_owner: modem-dev/hunk/packages/hunk/skills/hunk-review
   content_hash: sha256:8974aeeaf4239a0f74691f92a44357821360aac373b4d0c215141e4b4c7f9f8f
 - kind: project-relative
   target: legacy

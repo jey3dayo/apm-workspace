@@ -71,7 +71,7 @@ dependencies:
 
     # --- tools ---
     - fujibee/agmsg
-    - modem-dev/hunk/skills/hunk-review
+    - modem-dev/hunk/packages/hunk/skills/hunk-review
     - agavra/tuicr/skills/tuicr
     - humanlayer/skills/plugins/show-me/skills/show-me
 
