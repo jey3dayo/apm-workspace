@@ -504,6 +504,108 @@ EOF
   [[ "$output" == *"unknown command"* ]]
 }
 
+# --- doctor target outputs --------------------------------------------------
+
+make_doctor_fixture() {
+  doctor_workspace_dir="$(mktemp -d)"
+  doctor_home="$(mktemp -d)"
+  doctor_bin="$(mktemp -d)"
+
+  git -C "$doctor_workspace_dir" init -q
+  mkdir -p \
+    "$doctor_workspace_dir/catalog/skills" \
+    "$doctor_workspace_dir/catalog/agents" \
+    "$doctor_workspace_dir/catalog/commands" \
+    "$doctor_workspace_dir/catalog/rules"
+  printf 'dependencies: []\n' >"$doctor_workspace_dir/apm.yml"
+  printf '# instructions\n' >"$doctor_workspace_dir/catalog/AGENTS.md"
+
+  cat >"$doctor_bin/apm" <<'EOF'
+#!/bin/sh
+case "$1" in
+  --version) printf '%s\n' 'apm test fixture' ;;
+  deps|compile) ;;
+esac
+EOF
+  chmod +x "$doctor_bin/apm"
+
+  for target_dir in .claude .codex .cursor .opencode .openclaw; do
+    mkdir -p "$doctor_home/$target_dir/agents" "$doctor_home/$target_dir/commands" "$doctor_home/$target_dir/rules"
+  done
+  mkdir -p \
+    "$doctor_home/.claude/skills" \
+    "$doctor_home/.agents/skills" \
+    "$doctor_home/.cursor/skills" \
+    "$doctor_home/.opencode/skills" \
+    "$doctor_home/.openclaw/skills"
+  printf '# config\n' >"$doctor_home/.claude/CLAUDE.md"
+  printf '# config\n' >"$doctor_home/.codex/AGENTS.md"
+  printf '# config\n' >"$doctor_home/.cursor/AGENTS.md"
+  printf '# config\n' >"$doctor_home/.opencode/CLAUDE.md"
+  printf '# config\n' >"$doctor_home/.openclaw/CLAUDE.md"
+}
+
+doctor_fixture_env() {
+  env HOME="$doctor_home" PATH="$doctor_bin:$PATH" APM_WORKSPACE_DIR="$doctor_workspace_dir" "$@"
+}
+
+@test "validate ignores nested deployed Codex skills" {
+  make_doctor_fixture
+  nested_skill_path="$doctor_home/.agents/skills/legacy/skills/nested/SKILL.md"
+  mkdir -p "$(dirname "$nested_skill_path")"
+  printf '# nested\n' >"$nested_skill_path"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" validate
+
+  [ "$status" -eq 0 ]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "doctor reports nested deployed Codex skills and exits non-zero" {
+  make_doctor_fixture
+  nested_skill_path="$doctor_home/.agents/skills/legacy/skills/nested/SKILL.md"
+  mkdir -p "$(dirname "$nested_skill_path")"
+  printf '# nested\n' >"$nested_skill_path"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$nested_skill_path"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "doctor succeeds when all managed catalog outputs are present with the right type" {
+  make_doctor_fixture
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+
+  [ "$status" -eq 0 ]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "doctor reports missing and wrong-typed managed catalog outputs" {
+  make_doctor_fixture
+  rm -f "$doctor_home/.claude/CLAUDE.md"
+  mkdir "$doctor_home/.claude/CLAUDE.md"
+  rm -rf "$doctor_home/.claude/agents"
+  printf 'wrong type\n' >"$doctor_home/.claude/agents"
+  rm -rf "$doctor_home/.codex/commands"
+  rm -rf "$doctor_home/.cursor/rules"
+  printf 'wrong type\n' >"$doctor_home/.cursor/rules"
+  rm -rf "$doctor_home/.opencode/skills"
+  printf 'wrong type\n' >"$doctor_home/.opencode/skills"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$doctor_home/.claude/CLAUDE.md"* ]]
+  [[ "$output" == *"$doctor_home/.claude/agents"* ]]
+  [[ "$output" == *"$doctor_home/.codex/commands"* ]]
+  [[ "$output" == *"$doctor_home/.cursor/rules"* ]]
+  [[ "$output" == *"$doctor_home/.opencode/skills"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
 # --- assert_catalog_stage_safety --------------------------------------------
 
 # Builds a temp workspace with a tracked catalog and a matching

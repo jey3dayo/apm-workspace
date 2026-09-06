@@ -1369,6 +1369,236 @@ dependencies:
     { Test-CodexSkillTargetTree } | Should -Not -Throw
   }
 
+  It "does not let a nested Codex skill target make Invoke-Validate fail" {
+    Mock Require-Apm {}
+    Mock Ensure-WorkspaceRepo {}
+    Mock Ensure-WorkspaceScaffold {}
+    Mock Invoke-WorkspaceCommand {}
+    Mock Get-CodexSkillTargetRoot { Join-Path $TestDrive "validate-nested/.agents/skills" }
+
+    $nestedSkill = Join-Path $TestDrive "validate-nested/.agents/skills/outer/skills/inner"
+    New-Item -ItemType Directory -Path $nestedSkill -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $nestedSkill "SKILL.md") -Value "# inner"
+
+    { Invoke-Validate } | Should -Not -Throw
+  }
+
+  It "does not throw from Invoke-Doctor when all required outputs are present" {
+    $targetRoot = Join-Path $TestDrive "doctor-valid/.codex"
+    $skillsRoot = Join-Path $TestDrive "doctor-valid/.agents"
+    $codexSkillsRoot = Join-Path $skillsRoot "skills"
+    $sourceRoot = Join-Path $TestDrive "doctor-valid-source"
+    $instructionsPath = Join-Path $sourceRoot "AGENTS.md"
+    $agentsSource = Join-Path $sourceRoot "agents"
+    $commandsSource = Join-Path $sourceRoot "commands"
+    $rulesSource = Join-Path $sourceRoot "rules"
+
+    New-Item -ItemType Directory -Path $targetRoot, $codexSkillsRoot, (Join-Path $targetRoot "agents"), (Join-Path $targetRoot "commands"), (Join-Path $targetRoot "rules"), $agentsSource, $commandsSource, $rulesSource -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $targetRoot "AGENTS.md") -Value "# instructions"
+    Set-Content -LiteralPath $instructionsPath -Value "# instructions"
+
+    Mock Require-Apm {}
+    Mock Ensure-WorkspaceRepo {}
+    Mock Ensure-WorkspaceScaffold {}
+    Mock Get-CodexSkillTargetRoot { $codexSkillsRoot }
+    Mock Get-TrackedCatalogInstructionsPath { $instructionsPath }
+    Mock Get-TrackedCatalogAgentsRoot { $agentsSource }
+    Mock Get-TrackedCatalogCommandsRoot { $commandsSource }
+    Mock Get-TrackedCatalogRulesRoot { $rulesSource }
+    Mock Get-ManagedCatalogRuntimeTargets {
+      @([pscustomobject]@{ Name = "codex"; Root = $targetRoot; SkillsRoot = $skillsRoot; ConfigName = "AGENTS.md" })
+    }
+    Mock Get-ManagedCatalogSkillInventory { @() }
+    Mock Get-UnpinnedExternalReferences { @() }
+    Mock Write-CatalogSummary {}
+
+    function global:apm {
+      $global:LASTEXITCODE = 0
+    }
+
+    try {
+      { Invoke-Doctor } | Should -Not -Throw
+    }
+    finally {
+      Remove-Item Function:\apm -ErrorAction SilentlyContinue
+    }
+  }
+
+  It "throws from Invoke-Doctor when required outputs are missing or the wrong type" {
+    $targetRoot = Join-Path $TestDrive "doctor-invalid/.codex"
+    $skillsRoot = Join-Path $TestDrive "doctor-invalid/.agents"
+    $codexSkillsRoot = Join-Path $TestDrive "doctor-invalid/.agents/skills"
+    $sourceRoot = Join-Path $TestDrive "doctor-invalid-source"
+    $instructionsPath = Join-Path $sourceRoot "AGENTS.md"
+    $agentsSource = Join-Path $sourceRoot "agents"
+    $commandsSource = Join-Path $sourceRoot "commands"
+    $rulesSource = Join-Path $sourceRoot "rules"
+    $configPath = Join-Path $targetRoot "AGENTS.md"
+    $agentsPath = Join-Path $targetRoot "agents"
+    $commandsPath = Join-Path $targetRoot "commands"
+    $rulesPath = Join-Path $targetRoot "rules"
+    $skillsPath = Join-Path $skillsRoot "skills"
+
+    New-Item -ItemType Directory -Path $targetRoot, $configPath, $agentsSource, $commandsSource, $rulesSource -Force | Out-Null
+    Set-Content -LiteralPath $instructionsPath -Value "# instructions"
+    Set-Content -LiteralPath $agentsPath -Value "wrong type"
+
+    Mock Require-Apm {}
+    Mock Ensure-WorkspaceRepo {}
+    Mock Ensure-WorkspaceScaffold {}
+    Mock Get-CodexSkillTargetRoot { $codexSkillsRoot }
+    Mock Get-TrackedCatalogInstructionsPath { $instructionsPath }
+    Mock Get-TrackedCatalogAgentsRoot { $agentsSource }
+    Mock Get-TrackedCatalogCommandsRoot { $commandsSource }
+    Mock Get-TrackedCatalogRulesRoot { $rulesSource }
+    Mock Get-ManagedCatalogRuntimeTargets {
+      @([pscustomobject]@{ Name = "codex"; Root = $targetRoot; SkillsRoot = $skillsRoot; ConfigName = "AGENTS.md" })
+    }
+    Mock Get-ManagedCatalogSkillInventory { @() }
+    Mock Get-UnpinnedExternalReferences { @() }
+    Mock Write-CatalogSummary {}
+
+    function global:apm {
+      $global:LASTEXITCODE = 0
+    }
+
+    try {
+      $exception = $null
+      try {
+        Invoke-Doctor
+      }
+      catch {
+        $exception = $_.Exception
+      }
+
+      $exception | Should -Not -BeNullOrEmpty
+      foreach ($path in @($configPath, $agentsPath, $commandsPath, $rulesPath, $skillsPath)) {
+        $exception.Message | Should -Match ([regex]::Escape($path))
+      }
+    }
+    finally {
+      Remove-Item Function:\apm -ErrorAction SilentlyContinue
+    }
+  }
+
+  It "reports all diagnostics from multiple targets and nested Codex skills together" {
+    $targetOneRoot = Join-Path $TestDrive "doctor-multiple/claude"
+    $targetOneSkillsRoot = Join-Path $TestDrive "doctor-multiple/claude-skills"
+    $targetTwoRoot = Join-Path $TestDrive "doctor-multiple/codex"
+    $targetTwoSkillsRoot = Join-Path $TestDrive "doctor-multiple/codex-skills"
+    $codexSkillsRoot = Join-Path $TestDrive "doctor-multiple/nested/.agents/skills"
+    $nestedSkill = Join-Path $codexSkillsRoot "outer/skills/inner"
+    $sourceRoot = Join-Path $TestDrive "doctor-multiple-source"
+    $instructionsPath = Join-Path $sourceRoot "AGENTS.md"
+    $agentsSource = Join-Path $sourceRoot "agents"
+    $commandsSource = Join-Path $sourceRoot "commands"
+    $rulesSource = Join-Path $sourceRoot "rules"
+    $targetOneConfigPath = Join-Path $targetOneRoot "CLAUDE.md"
+    $targetOneAgentsPath = Join-Path $targetOneRoot "agents"
+    $targetOneCommandsPath = Join-Path $targetOneRoot "commands"
+    $targetOneRulesPath = Join-Path $targetOneRoot "rules"
+    $targetOneSkillsPath = Join-Path $targetOneSkillsRoot "skills"
+    $targetTwoConfigPath = Join-Path $targetTwoRoot "AGENTS.md"
+    $targetTwoAgentsPath = Join-Path $targetTwoRoot "agents"
+    $targetTwoCommandsPath = Join-Path $targetTwoRoot "commands"
+    $targetTwoRulesPath = Join-Path $targetTwoRoot "rules"
+
+    New-Item -ItemType Directory -Path $targetOneRoot, $targetOneRulesPath, $targetTwoRoot, $targetTwoConfigPath, (Join-Path $targetTwoSkillsRoot "skills"), $nestedSkill, $agentsSource, $commandsSource, $rulesSource -Force | Out-Null
+    Set-Content -LiteralPath $targetOneAgentsPath -Value "wrong type"
+    Set-Content -LiteralPath $targetTwoCommandsPath -Value "wrong type"
+    Set-Content -LiteralPath $instructionsPath -Value "# instructions"
+    Set-Content -LiteralPath (Join-Path $nestedSkill "SKILL.md") -Value "# inner"
+
+    Mock Require-Apm {}
+    Mock Ensure-WorkspaceRepo {}
+    Mock Ensure-WorkspaceScaffold {}
+    Mock Get-CodexSkillTargetRoot { $codexSkillsRoot }
+    Mock Get-TrackedCatalogInstructionsPath { $instructionsPath }
+    Mock Get-TrackedCatalogAgentsRoot { $agentsSource }
+    Mock Get-TrackedCatalogCommandsRoot { $commandsSource }
+    Mock Get-TrackedCatalogRulesRoot { $rulesSource }
+    Mock Get-ManagedCatalogRuntimeTargets {
+      @(
+        [pscustomobject]@{ Name = "claude"; Root = $targetOneRoot; SkillsRoot = $targetOneSkillsRoot; ConfigName = "CLAUDE.md" }
+        [pscustomobject]@{ Name = "codex"; Root = $targetTwoRoot; SkillsRoot = $targetTwoSkillsRoot; ConfigName = "AGENTS.md" }
+      )
+    }
+    Mock Get-ManagedCatalogSkillInventory { @() }
+    Mock Get-UnpinnedExternalReferences { @() }
+    Mock Write-CatalogSummary {}
+
+    function global:apm {
+      $global:LASTEXITCODE = 0
+    }
+
+    try {
+      $exception = $null
+      try {
+        Invoke-Doctor
+      }
+      catch {
+        $exception = $_.Exception
+      }
+
+      $exception | Should -Not -BeNullOrEmpty
+      foreach ($path in @(
+          $nestedSkill | ForEach-Object { Join-Path $_ "SKILL.md" }
+          (Join-Path $targetOneRoot "CLAUDE.md")
+          $targetOneAgentsPath
+          $targetOneCommandsPath
+          $targetOneSkillsPath
+          $targetTwoConfigPath
+          $targetTwoAgentsPath
+          $targetTwoCommandsPath
+          $targetTwoRulesPath
+        )) {
+        $exception.Message | Should -Match ([regex]::Escape($path))
+      }
+    }
+    finally {
+      Remove-Item Function:\apm -ErrorAction SilentlyContinue
+    }
+  }
+
+  It "does not require outputs whose source kind is absent" {
+    $targetRoot = Join-Path $TestDrive "doctor-source-absent/.codex"
+    $skillsRoot = Join-Path $TestDrive "doctor-source-absent/.agents"
+    $codexSkillsRoot = Join-Path $skillsRoot "skills"
+    $sourceRoot = Join-Path $TestDrive "doctor-source-absent-source"
+    $instructionsPath = Join-Path $sourceRoot "AGENTS.md"
+    $agentsSource = Join-Path $sourceRoot "agents"
+    $commandsSource = Join-Path $sourceRoot "commands"
+    $rulesSource = Join-Path $sourceRoot "rules"
+
+    New-Item -ItemType Directory -Path $codexSkillsRoot -Force | Out-Null
+
+    Mock Require-Apm {}
+    Mock Ensure-WorkspaceRepo {}
+    Mock Ensure-WorkspaceScaffold {}
+    Mock Get-CodexSkillTargetRoot { $codexSkillsRoot }
+    Mock Get-TrackedCatalogInstructionsPath { $instructionsPath }
+    Mock Get-TrackedCatalogAgentsRoot { $agentsSource }
+    Mock Get-TrackedCatalogCommandsRoot { $commandsSource }
+    Mock Get-TrackedCatalogRulesRoot { $rulesSource }
+    Mock Get-ManagedCatalogRuntimeTargets {
+      @([pscustomobject]@{ Name = "codex"; Root = $targetRoot; SkillsRoot = $skillsRoot; ConfigName = "AGENTS.md" })
+    }
+    Mock Get-ManagedCatalogSkillInventory { @() }
+    Mock Get-UnpinnedExternalReferences { @() }
+    Mock Write-CatalogSummary {}
+
+    function global:apm {
+      $global:LASTEXITCODE = 0
+    }
+
+    try {
+      { Invoke-Doctor } | Should -Not -Throw
+    }
+    finally {
+      Remove-Item Function:\apm -ErrorAction SilentlyContinue
+    }
+  }
+
   It "syncs private skills into the Codex copy target and the Claude symlink target" {
     Mock Get-CodexSkillTargetRoot { Join-Path $TestDrive "private-sync/.agents/skills" }
     Mock Get-ClaudePrivateSkillTargetRoot { Join-Path $TestDrive "private-sync/.claude/skills" }

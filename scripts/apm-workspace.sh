@@ -724,7 +724,8 @@ validate_codex_skill_target_tree() {
 
   if [ -n "$nested_skills" ]; then
     printf '%s\n' "$nested_skills" | sed "s#^\./#$target_skills_root/#" >&2
-    fail "Nested Codex skill files found under $target_skills_root. Run 'mise run apply:skills:local' to refresh the target."
+    error "Nested Codex skill files found under $target_skills_root. Run 'mise run apply:skills:local' to refresh the target."
+    return 1
   fi
 }
 
@@ -1391,7 +1392,6 @@ cmd_validate() {
     cd "$WORKSPACE_DIR"
     apm compile --validate
   )
-  validate_codex_skill_target_tree
 }
 
 managed_agent_relative_paths() {
@@ -2380,8 +2380,16 @@ cmd_doctor() {
     printf 'targets:\n'
     inventory_file=$(mktemp "${TMPDIR:-/tmp}/apm-skill-inventory.XXXXXX")
     codex_mcp_config="$HOME/.codex/config.toml"
+    has_failure=0
+    if ! validate_codex_skill_target_tree; then
+      has_failure=1
+    fi
+    tracked_instructions="$(tracked_catalog_instructions_path)"
+    tracked_agents_root="$(tracked_catalog_agents_root)"
+    tracked_commands_root="$(tracked_catalog_commands_root)"
+    tracked_rules_root="$(tracked_catalog_rules_root)"
     managed_catalog_skill_inventory >"$inventory_file"
-    managed_catalog_runtime_targets | while IFS='|' read -r target_name target_dir config_name skills_dir; do
+    while IFS='|' read -r target_name target_dir config_name skills_dir; do
       target_root="$HOME/$target_dir"
       skills_root_dir="${skills_dir:-$target_dir}"
       target_skills_root="$HOME/$skills_root_dir/skills"
@@ -2391,13 +2399,35 @@ cmd_doctor() {
       if [ -e "$target_root/rules" ]; then rules_state=present; else rules_state=missing; fi
       if [ -e "$target_skills_root" ]; then skills_state=present; else skills_state=missing; fi
       printf '  %s: config=%s agents=%s commands=%s rules=%s skills=%s\n' "$target_name" "$config_state" "$agents_state" "$commands_state" "$rules_state" "$skills_state"
-    done
+
+      if [ -f "$tracked_instructions" ] && [ ! -f "$target_root/$config_name" ]; then
+        error "Required catalog output is missing or has wrong type (file): $target_root/$config_name"
+        has_failure=1
+      fi
+      if [ -d "$tracked_agents_root" ] && [ ! -d "$target_root/agents" ]; then
+        error "Required catalog output is missing or has wrong type (directory): $target_root/agents"
+        has_failure=1
+      fi
+      if [ -d "$tracked_commands_root" ] && [ ! -d "$target_root/commands" ]; then
+        error "Required catalog output is missing or has wrong type (directory): $target_root/commands"
+        has_failure=1
+      fi
+      if [ -d "$tracked_rules_root" ] && [ ! -d "$target_root/rules" ]; then
+        error "Required catalog output is missing or has wrong type (directory): $target_root/rules"
+        has_failure=1
+      fi
+      if [ ! -d "$target_skills_root" ]; then
+        error "Required catalog output is missing or has wrong type (directory): $target_skills_root"
+        has_failure=1
+      fi
+    done < <(managed_catalog_runtime_targets)
     printf 'codex mcp config: %s\n' "$(test -f "$codex_mcp_config" && printf present || printf missing)"
     printf 'target skill inventory: entries=%s\n' "$(awk 'NF { count++ } END { print count + 0 }' "$inventory_file")"
     rm -f "$inventory_file"
     printf 'external pins: unpinned=%s\n' "$(unpinned_external_references | awk 'NF { count++ } END { print count + 0 }')"
     print_catalog_summary
     apm deps list -g
+    [ "$has_failure" -eq 0 ] || fail "Doctor found missing or invalid managed catalog outputs"
   )
 }
 

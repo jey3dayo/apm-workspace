@@ -1844,7 +1844,6 @@ function Invoke-Validate {
   Ensure-WorkspaceRepo
   Ensure-WorkspaceScaffold
   Invoke-WorkspaceCommand -CommandArgs @("compile", "--validate")
-  Test-CodexSkillTargetTree
 }
 
 function Get-CodexSkillTargetRoot {
@@ -1884,10 +1883,11 @@ function Test-CodexSkillTargetTree {
   }
 
   if ($nestedSkills.Count -gt 0) {
-    foreach ($path in ($nestedSkills | Sort-Object)) {
+    $sortedNestedSkills = @($nestedSkills | Sort-Object)
+    foreach ($path in $sortedNestedSkills) {
       Write-ErrorLine $path
     }
-    throw "Nested Codex skill files found under $targetSkillsRoot. Run 'mise run apply:skills:local' to refresh the target."
+    throw ("Nested Codex skill files found under {0}. Run 'mise run apply:skills:local' to refresh the target.`n{1}" -f $targetSkillsRoot, ($sortedNestedSkills -join "`n"))
   }
 }
 
@@ -2614,6 +2614,7 @@ function Invoke-Doctor {
   Ensure-WorkspaceRepo
   Ensure-WorkspaceScaffold
 
+  $diagnostics = New-Object System.Collections.Generic.List[string]
   $manifestState = if (Test-Path (Join-Path $WorkspaceDir "apm.yml")) { "present" } else { "missing" }
   Write-Host ("apm: {0}" -f (apm --version))
   Write-Host ("workspace: {0}" -f $WorkspaceDir)
@@ -2628,6 +2629,17 @@ function Invoke-Doctor {
   Write-Host "targets:"
   $skillInventory = @(Get-ManagedCatalogSkillInventory)
   $codexMcpConfigPath = Join-Path (Join-Path $HOME ".codex") "config.toml"
+  try {
+    Test-CodexSkillTargetTree
+  }
+  catch {
+    $diagnostics.Add($_.Exception.Message)
+  }
+
+  $trackedInstructionsPath = Get-TrackedCatalogInstructionsPath
+  $trackedAgentsRoot = Get-TrackedCatalogAgentsRoot
+  $trackedCommandsRoot = Get-TrackedCatalogCommandsRoot
+  $trackedRulesRoot = Get-TrackedCatalogRulesRoot
   foreach ($target in (Get-ManagedCatalogRuntimeTargets)) {
     $skillsRoot = if ($target.PSObject.Properties.Name -contains "SkillsRoot" -and $target.SkillsRoot) { $target.SkillsRoot } else { $target.Root }
     $skillsPath = Join-Path $skillsRoot "skills"
@@ -2636,6 +2648,22 @@ function Invoke-Doctor {
     $commandsPath = Join-Path $target.Root "commands"
     $rulesPath = Join-Path $target.Root "rules"
     Write-Host ("  {0}: config={1} agents={2} commands={3} rules={4} skills={5}" -f $target.Name, $(if (Test-Path $configPath) { "present" } else { "missing" }), $(if (Test-Path $agentsPath) { "present" } else { "missing" }), $(if (Test-Path $commandsPath) { "present" } else { "missing" }), $(if (Test-Path $rulesPath) { "present" } else { "missing" }), $(if (Test-Path $skillsPath) { "present" } else { "missing" }))
+
+    if ((Test-Path -LiteralPath $trackedInstructionsPath -PathType Leaf) -and -not (Test-Path -LiteralPath $configPath -PathType Leaf)) {
+      $diagnostics.Add("Required catalog output is missing or has wrong type (file): $configPath")
+    }
+    if ((Test-Path -LiteralPath $trackedAgentsRoot -PathType Container) -and -not (Test-Path -LiteralPath $agentsPath -PathType Container)) {
+      $diagnostics.Add("Required catalog output is missing or has wrong type (directory): $agentsPath")
+    }
+    if ((Test-Path -LiteralPath $trackedCommandsRoot -PathType Container) -and -not (Test-Path -LiteralPath $commandsPath -PathType Container)) {
+      $diagnostics.Add("Required catalog output is missing or has wrong type (directory): $commandsPath")
+    }
+    if ((Test-Path -LiteralPath $trackedRulesRoot -PathType Container) -and -not (Test-Path -LiteralPath $rulesPath -PathType Container)) {
+      $diagnostics.Add("Required catalog output is missing or has wrong type (directory): $rulesPath")
+    }
+    if (-not (Test-Path -LiteralPath $skillsPath -PathType Container)) {
+      $diagnostics.Add("Required catalog output is missing or has wrong type (directory): $skillsPath")
+    }
   }
   Write-Host ("codex mcp config: {0}" -f $(if (Test-Path $codexMcpConfigPath) { "present" } else { "missing" }))
   Write-Host ("target skill inventory: entries={0}" -f $skillInventory.Count)
@@ -2644,6 +2672,10 @@ function Invoke-Doctor {
   & apm deps list -g
   if ($LASTEXITCODE -ne 0) {
     throw "apm deps list -g failed."
+  }
+
+  if ($diagnostics.Count -gt 0) {
+    throw ($diagnostics -join "`n")
   }
 }
 
