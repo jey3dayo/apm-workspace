@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-09-06T15:47:33.102103+00:00'
+generated_at: '2026-09-06T17:35:29.240622+00:00'
 apm_version: 0.29.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -47899,24 +47899,6 @@ deployments:
   - .
   active_owner: .
   content_hash: null
-- kind: uri
-  target: mcp
-  value: mobbin
-  runtime: cursor
-  scope: project
-  owners:
-  - .
-  active_owner: .
-  content_hash: null
-- kind: uri
-  target: mcp
-  value: mobbin
-  runtime: opencode
-  scope: project
-  owners:
-  - .
-  active_owner: .
-  content_hash: null
 mcp_servers:
 - context7
 - jina-reader
@@ -47969,10 +47951,6 @@ mcp_target_servers:
   - jina-reader
   - linear
   - mcp-simple-voicevox
-  - mobbin
-  cursor:
-  - mobbin
-  opencode:
   - mobbin
 local_deployed_files:
 - .agents/skills/agent-curation
