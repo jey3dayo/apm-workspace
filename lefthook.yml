@@ -69,8 +69,17 @@ pre-push:
       glob: "{*.yml,*.yaml,**/*.yml,**/*.yaml,.yamllint.yml,mise.toml,mise/lint.toml}"
       run: mise run lint:yaml
 
-    # no glob: validates apm.yml/apm.lock.yaml wiring against the whole workspace
-    # (scripts, catalog, deployed targets) — inputs cannot be safely enumerated.
+    - name: lint:frontmatter
+      glob: "{catalog/**/*.md,scripts/lint-frontmatter.*,mise.toml,mise/lint.toml}"
+      run: mise run lint:frontmatter
+
+    - name: lint:catalog-leaks
+      glob: "{catalog/**,scripts/lint-catalog-leaks.*,mise.toml,mise/lint.toml}"
+      run: mise run lint:catalog-leaks
+
+    # no glob: validates apm.yml/apm.lock.yaml wiring against the whole tracked
+    # workspace — inputs cannot be safely enumerated. Deployed-target inspection
+    # is doctor's, not this task's.
     - name: validate:workspace
       run: mise run validate:workspace
 
@@ -81,3 +90,6 @@ pre-push:
     # no glob: smoke-tests the full catalog package end to end.
     - name: smoke:catalog
       run: mise run smoke:catalog
+
+    # doctor is deliberately not a push gate: it inspects this machine's deployed
+    # output, so it fails on any clone that has not run a rollout yet.

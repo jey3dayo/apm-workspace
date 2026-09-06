@@ -79,12 +79,11 @@ jobs:
           pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 help >/dev/null
 
       - name: Run workspace checks
-        run: |
-          mise run format:check
-          mise run lint:yaml
-          mise run validate:catalog
-          mise run smoke:catalog
+        run: mise run check
 
       - name: Run tests
         shell: bash
         run: mise run test
+
+      - name: Smoke-test the catalog package
+        run: mise run smoke:catalog
