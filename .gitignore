@@ -26,6 +26,7 @@ plans/*/
 /.claude/skill-report/
 /.vscode/mcp.json
 /.codex/config.toml
+/.codex/hooks.json
 /.cursor/mcp.json
 /opencode.json
 
