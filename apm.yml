@@ -110,4 +110,9 @@ dependencies:
       registry: false
       transport: streamable-http
       url: https://mcp.linear.app/mcp
+    # UI reference search for design work; added here so the CLI agents get it.
+    - name: mobbin
+      registry: false
+      transport: http
+      url: https://api.mobbin.com/mcp
 scripts: {}
