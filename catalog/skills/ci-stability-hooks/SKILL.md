@@ -46,7 +46,7 @@ Use this split unless the repo contract says otherwise:
 - Put the repository CI-equivalent gate in `pre-push`.
 - Prefer registering `mise run ci`'s constituent sub-tasks as separate `pre-push` jobs over one aggregate `run: mise run ci` job. An aggregate job only reports pass/fail for the whole gate; separate jobs show which stage failed and let Lefthook's per-job summary track progress. Inspect the aggregate task definition (e.g. `mise run ci`'s `run` block or `depends`) to enumerate its stages, and mirror that same order as one `pre-push` job per stage.
 - Fall back to one aggregate `run: mise run ci` (or `mise run check`, `pnpm run ci`, `pnpm run check`) only when the aggregate task has no discoverable sub-tasks to split, or when the repo contract explicitly asks for a single gate.
-- Scope each `pre-push` job with `glob` to the file classes it can actually fail on. Lefthook (1.10.10 or later) skips a job whose `glob` matches no changed files even when `run` contains no file template, so pushes that touch none of a job's inputs (e.g. no `terraform/**/*.tf` for a Terraform lint job) skip that job entirely while CI still runs everything. Include the check's non-obvious inputs in the glob: generated files it diffs against, the generator script, lockfiles or shared config that can break it. Leave a job unglobbed when nearly every push affects it or its inputs cannot be enumerated safely.
+- Scope each `pre-push` job with `glob` to the file classes it can actually fail on. Lefthook (1.10.10 or later) skips a job whose `glob` matches no changed files even when `run` contains no file template, so pushes that touch none of a job's inputs (e.g. no `terraform/**/*.tf` for a Terraform lint job) skip that job entirely while CI still runs everything. Include the check's non-obvious inputs in the glob: generated files it diffs against, the generator script, lockfiles or shared config that can break it. When a task moves between definition files through `[task_config].includes` or a similar include, re-check the glob for every hook job that runs it; a stale definition-file glob silently skips the gate. Leave a job unglobbed when nearly every push affects it or its inputs cannot be enumerated safely.
 
 For `pre-commit`, prefer named jobs per tool instead of one aggregate `mise run format`: a failed aggregate hides which formatter failed, while separate jobs make failures diagnosable. `mise run format` remains useful as a full auto-format pass before push or PR.
 
@@ -115,6 +115,7 @@ Completion condition: hooks are installable through repo tooling and each job's 
 If `.github/workflows` exists:
 
 - Compare `pre-push` with ordinary CI jobs.
+- Enumerate the components of the repo's aggregate gate (`check`, `ci`, `verify`, or equivalent) and verify that each stage runs in CI or a push hook. A stage included only in the aggregate but absent from both automated gates is a blind spot that runs only when invoked manually; call the aggregate from the workflow instead of copying individual task names so its composition cannot drift from CI.
 - Ensure local push gates cover format, lint, typecheck, tests, build, and generated-file checks that normally fail PR/push CI.
 - Do not include deploy, release, production, native-signing, cloud, or manual-only workflow jobs unless the repo already exposes them as the local CI gate.
 - Prefer updating the repo's shared `ci` or `check` task over copying long workflow logic into `lefthook.yml`.
@@ -127,7 +128,7 @@ Completion condition: local push checks catch normal CI failures, stale actions 
 
 Run the cheapest meaningful validation first, then heavier checks when appropriate:
 
-- Re-read the final `pre-push` job list and confirm every job either has a `glob` or an adjacent comment justifying its absence.
+- Re-read the final `pre-push` job list and confirm every job either has a `glob` or an adjacent comment justifying its absence. Treat no-glob justification comments as contract claims: when a task's contract changes, verify that the claim still holds; the comment's presence alone is not evidence.
 - Validate hook config through repo tooling, for example `pnpm exec lefthook validate` or `mise exec -- lefthook validate`.
 - To exercise a hook with specific files, check `lefthook run --help` for the installed version's flag shape.
 - Run `git diff --check`.
