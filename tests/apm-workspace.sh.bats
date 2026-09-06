@@ -176,8 +176,8 @@ EOF
   rm -rf "$workspace_dir"
 }
 
-@test "upgrade uses the interactive apm update command" {
-  run rg -F 'run = ["apm update -g", { task = "deploy" }]' "$WORKSPACE_DIR/mise.toml"
+@test "upgrade runs apm update non-interactively so agents and CI can drive it" {
+  run rg -F 'run = ["apm update -g --yes", { task = "deploy" }]' "$WORKSPACE_DIR/mise.toml"
   [ "$status" -eq 0 ]
 }
 

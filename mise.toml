@@ -123,7 +123,7 @@ run = [
 # ========================================
 [tasks.upgrade]
 description = "Refresh upstream APM dependencies, run checks, deploy, and inspect the ~/.apm workspace"
-run = ["apm update -g", { task = "deploy" }]
+run = ["apm update -g --yes", { task = "deploy" }]
 
 [tasks."refresh:deploy"]
 description = "Refresh, run checks, and deploy the ~/.apm workspace locally from the current manifest and lock"

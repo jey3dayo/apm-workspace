@@ -54,7 +54,9 @@ verified only after checking `~/.agents/skills/<id>/SKILL.md`.
 ## External Checkout Changes
 
 1. Edit, verify, commit, and push the upstream checkout.
-2. Run `mise run upgrade` here and confirm the resulting lockfile commit.
+2. Run `mise run upgrade` here and confirm the resulting lockfile commit. It runs
+   unattended; the acceptance gate is that lockfile review, and `apm update -g --dry-run`
+   renders the plan first without changing anything.
 3. Verify the deployed skill, then review unrelated lock drift separately.
 
 Adding or removing an external dependency also requires a decision record in
