@@ -692,6 +692,216 @@ Describe "public command surface" {
     $modulePath = Join-Path (Join-Path $PSScriptRoot "..") "scripts/apm-workspace.ps1"
     . (Resolve-Path -LiteralPath $modulePath).Path
     Remove-Item Env:APM_WORKSPACE_LIB_ONLY -ErrorAction SilentlyContinue
+
+    function Get-MiseTasksJson {
+      param(
+        [Parameter(Mandatory = $true)]
+        [string]$Directory,
+        [switch]$Hidden
+      )
+
+      $arguments = @("-C", $Directory, "tasks", "--json")
+      if ($Hidden) {
+        $arguments += "--hidden"
+      }
+
+      $previousTrustedPaths = $env:MISE_TRUSTED_CONFIG_PATHS
+      try {
+        $env:MISE_TRUSTED_CONFIG_PATHS = $Directory
+        $json = (& mise @arguments | Out-String)
+        if ($LASTEXITCODE -ne 0) {
+          throw "mise tasks --json failed for $Directory"
+        }
+
+        @($json | ConvertFrom-Json)
+      }
+      finally {
+        if ($null -eq $previousTrustedPaths) {
+          Remove-Item Env:MISE_TRUSTED_CONFIG_PATHS -ErrorAction SilentlyContinue
+        }
+        else {
+          $env:MISE_TRUSTED_CONFIG_PATHS = $previousTrustedPaths
+        }
+      }
+    }
+
+    function Get-MiseTask {
+      param(
+        [Parameter(Mandatory = $true)]
+        [object[]]$Tasks,
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+      )
+
+      $matches = @($Tasks | Where-Object { $_.name -eq $Name })
+      if ($matches.Count -ne 1) {
+        throw "Expected exactly one mise task named '$Name', found $($matches.Count)"
+      }
+
+      $matches[0]
+    }
+
+    function Assert-MisePublicTaskContract {
+      param([object[]]$PublicTasks)
+
+      $expectedNames = @(
+        "apply",
+        "apply:skills:local",
+        "audit:ci:smoke",
+        "brewfile:restore",
+        "check",
+        "deploy",
+        "doctor",
+        "format",
+        "format:check",
+        "install:catalog",
+        "prepare:catalog",
+        "refresh",
+        "test",
+        "test:ps",
+        "test:sh",
+        "upgrade",
+        "validate",
+        "verify"
+      )
+      $actualNames = @($PublicTasks | ForEach-Object { $_.name })
+      foreach ($expectedName in $expectedNames) {
+        if ($actualNames -notcontains $expectedName) {
+          throw "Expected public mise task '$expectedName'"
+        }
+      }
+    }
+
+    function Assert-MiseTaskVisibilityContract {
+      param(
+        [object[]]$PublicTasks,
+        [object[]]$HiddenTasks
+      )
+
+      $publicNames = @($PublicTasks | ForEach-Object { $_.name })
+      foreach ($name in @("bootstrap", "setup:mcp:host")) {
+        $task = Get-MiseTask -Tasks $HiddenTasks -Name $name
+        if ($task.hide -ne $true) {
+          throw "Mise task '$name' must be hidden"
+        }
+        if ($publicNames -contains $name) {
+          throw "Mise task '$name' must not be public"
+        }
+      }
+    }
+
+    function Assert-MiseCheckDependsContract {
+      param([object[]]$Tasks)
+
+      $task = Get-MiseTask -Tasks $Tasks -Name "check"
+      $depends = @($task.depends)
+      foreach ($required in @("format:check", "lint:yaml", "lint:frontmatter", "lint:catalog-leaks", "validate")) {
+        if ($depends -notcontains $required) {
+          throw "Mise task 'check' must depend on '$required'"
+        }
+      }
+    }
+
+    function Assert-MiseRunSequenceContract {
+      param(
+        [object[]]$Tasks,
+        [string]$Name,
+        [string[]]$Expected
+      )
+
+      $task = Get-MiseTask -Tasks $Tasks -Name $Name
+      $actual = @($task.run) | ForEach-Object {
+        if ($_ -is [string]) {
+          "command:$_"
+        }
+        elseif ($null -ne $_.PSObject.Properties["task"]) {
+          "task:$($_.task)"
+        }
+        else {
+          throw "Mise task '$Name' has an unsupported run step"
+        }
+      }
+
+      if (@($actual).Count -ne $Expected.Count) {
+        throw "Mise task '$Name' run length was $(@($actual).Count), expected $($Expected.Count)"
+      }
+      for ($index = 0; $index -lt $Expected.Count; $index++) {
+        if ($actual[$index] -ne $Expected[$index]) {
+          throw "Mise task '$Name' run step $index was '$($actual[$index])', expected '$($Expected[$index])'"
+        }
+      }
+    }
+
+    function Assert-MiseUpgradeContract {
+      param([object[]]$Tasks)
+
+      $task = Get-MiseTask -Tasks $Tasks -Name "upgrade"
+      $run = @($task.run)
+      if ($run.Count -ne 2 -or $run[0] -isnot [string] -or $run[0] -notlike "*apm update -g*" -or $run[0] -notlike "*--yes*") {
+        throw "Mise task 'upgrade' must update APM with --yes before deploying"
+      }
+      if ($null -eq $run[1].PSObject.Properties["task"] -or $run[1].task -ne "deploy") {
+        throw "Mise task 'upgrade' must run deploy second"
+      }
+    }
+
+    function Assert-MiseCommandConnectionContract {
+      param([object[]]$Tasks)
+
+      $expectedCommands = @{
+        "apply" = "bash ./scripts/apm-workspace.sh apply"
+        "apply:skills:local" = "bash ./scripts/apm-workspace.sh apply:skills:local"
+        "format:markdown:bold-headings" = "bash ./scripts/format-bold-headings.sh write"
+        "format:markdown:bold-headings:check" = "bash ./scripts/format-bold-headings.sh check"
+      }
+      foreach ($entry in $expectedCommands.GetEnumerator()) {
+        $task = Get-MiseTask -Tasks $Tasks -Name $entry.Key
+        $run = @($task.run)
+        if ($run.Count -ne 1 -or $run[0] -ne $entry.Value) {
+          throw "Mise task '$($entry.Key)' is not connected to '$($entry.Value)'"
+        }
+      }
+    }
+
+    function Remove-MiseCommentLines {
+      param([string]$Content)
+
+      (($Content -split "`r?`n") | Where-Object { $_ -notmatch '^\s*#' }) -join "`n"
+    }
+
+    function New-MiseTaskFixture {
+      param([string]$Name)
+
+      $fixture = Join-Path $TestDrive "mise-fixture-$Name"
+      New-Item -ItemType Directory -Path $fixture -Force | Out-Null
+      Copy-Item -LiteralPath (Join-Path $workspaceRoot "mise.toml") -Destination (Join-Path $fixture "mise.toml")
+      Copy-Item -LiteralPath (Join-Path $workspaceRoot "mise") -Destination (Join-Path $fixture "mise") -Recurse
+      $fixture
+    }
+
+    function Update-MiseTaskBlock {
+      param(
+        [string]$Path,
+        [string]$Name,
+        [scriptblock]$Transform
+      )
+
+      $content = Get-Content -LiteralPath $Path -Raw
+      $header = if ($Name -match '^[a-zA-Z0-9_-]+$') {
+        "\[tasks\.$([regex]::Escape($Name))\]"
+      }
+      else {
+        '\[tasks\."' + [regex]::Escape($Name) + '"\]'
+      }
+      $match = [regex]::Match($content, "(?ms)^$header.*?(?=^\[|\z)")
+      if (-not $match.Success) {
+        throw "Could not find mise task '$Name' in $Path"
+      }
+
+      $replacement = & $Transform $match.Value
+      $updated = $content.Substring(0, $match.Index) + $replacement + $content.Substring($match.Index + $match.Length)
+      Set-Content -LiteralPath $Path -Value $updated -NoNewline
+    }
   }
 
   BeforeEach {
@@ -952,13 +1162,18 @@ id = "preserve"
   }
 
   It "keeps local workspace scripts self-contained" {
+    $miseToml = Get-Content -LiteralPath (Join-Path $workspaceRoot "mise.toml") -Raw
     $shellScript = Get-Content -LiteralPath (Join-Path $workspaceRoot "scripts/apm-workspace.sh") -Raw
     $powerShellScript = Get-Content -LiteralPath $scriptPath -Raw
+    $miseTomlWithoutComments = Remove-MiseCommentLines $miseToml
+    $shellScriptWithoutComments = Remove-MiseCommentLines $shellScript
+    $powerShellScriptWithoutComments = Remove-MiseCommentLines $powerShellScript
 
-    $shellScript | Should -Not -Match 'APM_BOOTSTRAP_REPO'
-    $shellScript | Should -Not -Match '~/.config'
-    $powerShellScript | Should -Not -Match 'APM_BOOTSTRAP_REPO'
-    $powerShellScript | Should -Not -Match '\\.config\\scripts\\apm-workspace'
+    $miseTomlWithoutComments | Should -Not -Match 'APM_BOOTSTRAP_REPO'
+    $shellScriptWithoutComments | Should -Not -Match 'APM_BOOTSTRAP_REPO'
+    $shellScriptWithoutComments | Should -Not -Match '~/.config'
+    $powerShellScriptWithoutComments | Should -Not -Match 'APM_BOOTSTRAP_REPO'
+    $powerShellScriptWithoutComments | Should -Not -Match '\\.config\\scripts\\apm-workspace'
   }
 
   It "keeps workspace docs self-contained and preserves the bold headings exception" {
@@ -1724,64 +1939,120 @@ dependencies: []
     }
   }
 
-  It "publishes workspace mise tasks for formatting, verification, and workflow orchestration" {
-    $miseToml = Get-Content -LiteralPath (Join-Path $workspaceRoot "mise.toml") -Raw
+  It "publishes the expected public mise task set" {
+    $publicTasks = Get-MiseTasksJson -Directory $workspaceRoot
 
-    # Task definitions moved into included files (mise/*.toml) use bare
-    # `[taskname]` headers per mise's include-file convention. Normalize them
-    # to `[tasks.taskname]` so this test can keep matching against a single
-    # combined string regardless of where a task is physically defined.
-    $includePattern = [regex]::new('includes\s*=\s*\[(?<list>[^\]]*)\]')
-    $includeMatch = $includePattern.Match($miseToml)
-    if ($includeMatch.Success) {
-      $includePaths = [regex]::Matches($includeMatch.Groups['list'].Value, '"([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
-      foreach ($includePath in $includePaths) {
-        $includeContent = Get-Content -LiteralPath (Join-Path $workspaceRoot $includePath) -Raw
-        $includeContent = [regex]::Replace($includeContent, '(?m)^\["([a-zA-Z0-9_-]+)"\]', '[tasks.$1]')
-        $includeContent = [regex]::Replace($includeContent, '(?m)^\["([^"]+)"\]', '[tasks."$1"]')
-        $miseToml += "`n" + $includeContent
-      }
+    { Assert-MisePublicTaskContract -PublicTasks $publicTasks } | Should -Not -Throw
+  }
+
+  It "keeps recovery and host setup mise tasks hidden" {
+    $publicTasks = Get-MiseTasksJson -Directory $workspaceRoot
+    $hiddenTasks = Get-MiseTasksJson -Directory $workspaceRoot -Hidden
+
+    { Assert-MiseTaskVisibilityContract -PublicTasks $publicTasks -HiddenTasks $hiddenTasks } | Should -Not -Throw
+  }
+
+  It "keeps the check task's complete inspection set" {
+    $hiddenTasks = Get-MiseTasksJson -Directory $workspaceRoot -Hidden
+
+    { Assert-MiseCheckDependsContract -Tasks $hiddenTasks } | Should -Not -Throw
+  }
+
+  It "keeps deploy verify and refresh-deploy workflow order" {
+    $hiddenTasks = Get-MiseTasksJson -Directory $workspaceRoot -Hidden
+    $workflowContracts = @{
+      "deploy" = @("task:check", "task:apply", "task:doctor")
+      "verify" = @("task:check", "task:test", "task:smoke:catalog")
+      "refresh:deploy" = @("task:refresh", "task:deploy")
     }
 
-    $miseToml | Should -Match '\[tasks\.validate\]'
-    $miseToml | Should -Match '\[tasks\."validate:workspace"\]'
-    $miseToml | Should -Match '\[tasks\."validate:catalog"\]'
-    $miseToml | Should -Match '\[tasks\."format:markdown:bold-headings"\]'
-    $miseToml | Should -Not -Match '\[tasks\."apm:install"\]'
-    $miseToml | Should -Match '\[tasks\.apply\]'
-    $miseToml | Should -Match '\[tasks\."apply:skills:local"\]'
-    $miseToml | Should -Match '\[tasks\.refresh\]'
-    $miseToml | Should -Not -Match '\[tasks\."apm:update"\]'
-    $miseToml | Should -Match '\[tasks\.doctor\]'
-    $miseToml | Should -Match '\[tasks\.format\]'
-    $miseToml | Should -Match '\[tasks\."format:check"\]'
-    $miseToml | Should -Not -Match '\[tasks\."format:catalog-metadata"\]'
-    $miseToml | Should -Not -Match '\[tasks\."format:catalog-metadata:check"\]'
-    $miseToml | Should -Match '\[tasks\.check\]'
-    $miseToml | Should -Match '\[tasks\.verify\]'
-    $miseToml | Should -Match '\[tasks\.deploy\]'
-    $miseToml | Should -Match '\[tasks\.upgrade\]'
-    $miseToml | Should -Match '\[tasks\."refresh:deploy"\]'
-    $miseToml | Should -Match '\[tasks\."prepare:catalog"\]'
-    $miseToml | Should -Match '\[tasks\."install:catalog"\]'
-    $miseToml | Should -Match '\[tasks\."smoke:catalog"\]'
-    $miseToml | Should -Match '\[tasks\."audit:ci:smoke"\]'
-    $miseToml | Should -Not -Match '\[tasks\."release:catalog"\]'
-    $miseToml | Should -Not -Match '\[tasks\."verify:catalog"\]'
-    $miseToml | Should -Match 'run = "bash ./scripts/apm-workspace.sh apply"'
-    $miseToml | Should -Match 'run = "bash ./scripts/apm-workspace.sh apply:skills:local"'
-    $miseToml | Should -Match 'run = "bash ./scripts/format-bold-headings.sh write"'
-    $miseToml | Should -Match 'run = "bash ./scripts/format-bold-headings.sh check"'
+    foreach ($entry in $workflowContracts.GetEnumerator()) {
+      { Assert-MiseRunSequenceContract -Tasks $hiddenTasks -Name $entry.Key -Expected $entry.Value } | Should -Not -Throw
+    }
+  }
+
+  It "keeps upgrade non-interactive and deploy-bound" {
+    $hiddenTasks = Get-MiseTasksJson -Directory $workspaceRoot -Hidden
+
+    { Assert-MiseUpgradeContract -Tasks $hiddenTasks } | Should -Not -Throw
+  }
+
+  It "connects mise tasks to the expected workspace commands" {
+    $hiddenTasks = Get-MiseTasksJson -Directory $workspaceRoot -Hidden
+
+    { Assert-MiseCommandConnectionContract -Tasks $hiddenTasks } | Should -Not -Throw
+  }
+
+  It "keeps the bold heading runner behavior contract" {
     $boldHeadingRunner = Get-Content -LiteralPath (Join-Path $workspaceRoot "scripts/format-bold-headings.sh") -Raw
+
     $boldHeadingRunner | Should -Match 'TARGET="\./catalog"'
     $boldHeadingRunner | Should -Match '(?s)"\$mode" = "check".*--dry-run'
-    $miseToml | Should -Match '(?s)\[tasks\."format:check"\][^\[]*?depends = \['
-    $miseToml | Should -Match '(?s)\[tasks\.check\][^\[]*?depends = \[\s*"format:check",\s*"lint:yaml",\s*"lint:frontmatter",\s*"lint:catalog-leaks",\s*"validate",?\s*\]'
-    $miseToml | Should -Match '(?s)\[tasks\.verify\][^\[]*?run = \[\{ task = "check" \}, \{ task = "test" \}, \{ task = "smoke:catalog" \}\]'
-    $miseToml | Should -Match '(?s)\[tasks\.deploy\][^\[]*?run = \[\{ task = "check" \}, \{ task = "apply" \}, \{ task = "doctor" \}\]'
-    $miseToml | Should -Match '(?s)\[tasks\.upgrade\].*?apm update -g.*?\{ task = "deploy" \}'
-    $miseToml | Should -Match '(?s)\[tasks\."refresh:deploy"\].*?\{ task = "refresh" \}.*?\{ task = "deploy" \}'
-    $miseToml | Should -Not -Match 'APM_BOOTSTRAP_REPO'
+  }
+
+  It "detects a visible bootstrap task in a negative mise fixture" {
+    $fixture = New-MiseTaskFixture -Name "bootstrap-visible"
+    try {
+      Update-MiseTaskBlock -Path (Join-Path $fixture "mise.toml") -Name "bootstrap" -Transform {
+        param($block)
+        $block -replace '(?m)^\s*hide = true\r?\n', ''
+      }
+      $publicTasks = Get-MiseTasksJson -Directory $fixture
+      $hiddenTasks = Get-MiseTasksJson -Directory $fixture -Hidden
+
+      { Assert-MiseTaskVisibilityContract -PublicTasks $publicTasks -HiddenTasks $hiddenTasks } | Should -Throw
+    }
+    finally {
+      Remove-Item -LiteralPath $fixture -Recurse -Force -ErrorAction SilentlyContinue
+    }
+  }
+
+  It "detects a missing check inspection dependency in a negative mise fixture" {
+    $fixture = New-MiseTaskFixture -Name "check-missing-frontmatter"
+    try {
+      Update-MiseTaskBlock -Path (Join-Path $fixture "mise.toml") -Name "check" -Transform {
+        param($block)
+        $block -replace '(?m)^\s*"lint:frontmatter",\r?\n', ''
+      }
+      $hiddenTasks = Get-MiseTasksJson -Directory $fixture -Hidden
+
+      { Assert-MiseCheckDependsContract -Tasks $hiddenTasks } | Should -Throw
+    }
+    finally {
+      Remove-Item -LiteralPath $fixture -Recurse -Force -ErrorAction SilentlyContinue
+    }
+  }
+
+  It "detects reordered deploy steps in a negative mise fixture" {
+    $fixture = New-MiseTaskFixture -Name "deploy-reordered"
+    try {
+      Update-MiseTaskBlock -Path (Join-Path $fixture "mise.toml") -Name "deploy" -Transform {
+        param($block)
+        $block -replace '\{ task = "check" \}, \{ task = "apply" \}, \{ task = "doctor" \}', '{ task = "check" }, { task = "doctor" }, { task = "apply" }'
+      }
+      $hiddenTasks = Get-MiseTasksJson -Directory $fixture -Hidden
+
+      { Assert-MiseRunSequenceContract -Tasks $hiddenTasks -Name "deploy" -Expected @("task:check", "task:apply", "task:doctor") } | Should -Throw
+    }
+    finally {
+      Remove-Item -LiteralPath $fixture -Recurse -Force -ErrorAction SilentlyContinue
+    }
+  }
+
+  It "detects an interactive upgrade command in a negative mise fixture" {
+    $fixture = New-MiseTaskFixture -Name "upgrade-interactive"
+    try {
+      Update-MiseTaskBlock -Path (Join-Path $fixture "mise.toml") -Name "upgrade" -Transform {
+        param($block)
+        $block -replace 'apm update -g --yes', 'apm update -g'
+      }
+      $hiddenTasks = Get-MiseTasksJson -Directory $fixture -Hidden
+
+      { Assert-MiseUpgradeContract -Tasks $hiddenTasks } | Should -Throw
+    }
+    finally {
+      Remove-Item -LiteralPath $fixture -Recurse -Force -ErrorAction SilentlyContinue
+    }
   }
 
   It "describes the catalog readme without legacy mirror wording" {

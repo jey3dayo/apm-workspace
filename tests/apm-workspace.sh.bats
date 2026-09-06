@@ -12,8 +12,167 @@ setup() {
   # Sourcing the script re-derives its own REPO_ROOT from $0 (the bats
   # runner), clobbering the value above. Subprocess-invocation tests need the
   # real repo root, so keep a copy that survives sourcing.
+  TEST_REPO_ROOT="$REPO_ROOT"
   SCRIPT_UNDER_TEST="$REPO_ROOT/scripts/apm-workspace.sh"
   source "$REPO_ROOT/scripts/apm-workspace.sh"
+  mise_fixture=""
+}
+
+teardown() {
+  if [[ -n "${mise_fixture:-}" ]]; then
+    rm -rf "$mise_fixture"
+  fi
+}
+
+mise_tasks_json() {
+  local directory="$1"
+  shift
+  MISE_TRUSTED_CONFIG_PATHS="$directory" mise -C "$directory" tasks --json "$@"
+}
+
+node_json_assert() {
+  local script="$1"
+  shift
+  node -e "$script" "$@"
+}
+
+rewrite_mise_fixture() {
+  local path="$1"
+  local pattern="$2"
+  local replacement="$3"
+  local flags="$4"
+  node - "$path" "$pattern" "$replacement" "$flags" <<'NODE'
+const fs = require("node:fs");
+const [path, pattern, replacement, flags] = process.argv.slice(2);
+const content = fs.readFileSync(path, "utf8");
+const updated = content.replace(new RegExp(pattern, flags), replacement);
+if (updated === content) {
+  process.exit(1);
+}
+fs.writeFileSync(path, updated);
+NODE
+}
+
+assert_public_mise_tasks() {
+  local tasks_json="$1"
+  shift
+  node_json_assert '
+const fs = require("node:fs");
+const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
+const names = process.argv.slice(1);
+if (!names.every((name) => tasks.some((task) => task.name === name))) {
+  process.exit(1);
+}
+' "$@" <<<"$tasks_json"
+}
+
+assert_mise_task_visibility() {
+  local public_json="$1"
+  local hidden_json="$2"
+  local task_name
+  for task_name in bootstrap setup:mcp:host; do
+    node_json_assert '
+const fs = require("node:fs");
+const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
+const name = process.argv[1];
+if (!tasks.some((task) => task.name === name && task.hide === true)) {
+  process.exit(1);
+}
+' "$task_name" <<<"$hidden_json" || return 1
+    node_json_assert '
+const fs = require("node:fs");
+const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
+const name = process.argv[1];
+if (tasks.some((task) => task.name === name)) {
+  process.exit(1);
+}
+' "$task_name" <<<"$public_json" || return 1
+  done
+}
+
+assert_mise_check_depends() {
+  local tasks_json="$1"
+  local required
+  for required in format:check lint:yaml lint:frontmatter lint:catalog-leaks validate; do
+    node_json_assert '
+const fs = require("node:fs");
+const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
+const [taskName, required] = process.argv.slice(1);
+const task = tasks.find(({ name }) => name === taskName);
+if (!task || !Array.isArray(task.depends) || !task.depends.includes(required)) {
+  process.exit(1);
+}
+' check "$required" <<<"$tasks_json" || return 1
+  done
+}
+
+assert_mise_run_sequence() {
+  local tasks_json="$1"
+  local task_name="$2"
+  local expected_json="$3"
+  node_json_assert '
+const fs = require("node:fs");
+const { isDeepStrictEqual } = require("node:util");
+const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
+const [name, expectedJson] = process.argv.slice(1);
+const task = tasks.find(({ name: taskName }) => taskName === name);
+const expected = JSON.parse(expectedJson);
+if (!task || !isDeepStrictEqual(task.run, expected)) {
+  process.exit(1);
+}
+' "$task_name" "$expected_json" <<<"$tasks_json"
+}
+
+assert_mise_upgrade() {
+  local tasks_json="$1"
+  node_json_assert '
+const fs = require("node:fs");
+const { isDeepStrictEqual } = require("node:util");
+const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
+const taskName = process.argv[1];
+const task = tasks.find(({ name }) => name === taskName);
+const run = task?.run;
+if (
+  !Array.isArray(run) ||
+  run.length !== 2 ||
+  typeof run[0] !== "string" ||
+  !run[0].includes("apm update -g") ||
+  !run[0].includes("--yes") ||
+  !isDeepStrictEqual(run[1], { task: "deploy" })
+) {
+  process.exit(1);
+}
+' upgrade <<<"$tasks_json"
+}
+
+assert_mise_command_connections() {
+  local tasks_json="$1"
+  node_json_assert '
+const fs = require("node:fs");
+const { isDeepStrictEqual } = require("node:util");
+const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
+const args = process.argv.slice(1);
+for (let index = 0; index < args.length; index += 2) {
+  const name = args[index];
+  const expected = JSON.parse(args[index + 1]);
+  const task = tasks.find(({ name: taskName }) => taskName === name);
+  if (!task || !isDeepStrictEqual(task.run, expected)) {
+    process.exit(1);
+  }
+}
+' \
+    apply '["bash ./scripts/apm-workspace.sh apply"]' \
+    apply:skills:local '["bash ./scripts/apm-workspace.sh apply:skills:local"]' \
+    format:markdown:bold-headings '["bash ./scripts/format-bold-headings.sh write"]' \
+    format:markdown:bold-headings:check '["bash ./scripts/format-bold-headings.sh check"]' \
+    <<<"$tasks_json"
+}
+
+new_mise_fixture() {
+  mise_fixture="$(mktemp -d)"
+  cp "$TEST_REPO_ROOT/mise.toml" "$mise_fixture/mise.toml"
+  cp -R "$TEST_REPO_ROOT/mise" "$mise_fixture/mise"
+  printf '%s\n' "$mise_fixture"
 }
 
 # --- validate_skill_id -------------------------------------------------------
@@ -177,7 +336,8 @@ EOF
 }
 
 @test "upgrade runs apm update non-interactively so agents and CI can drive it" {
-  run rg -F 'run = ["apm update -g --yes", { task = "deploy" }]' "$WORKSPACE_DIR/mise.toml"
+  tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
+  run assert_mise_upgrade "$tasks_json"
   [ "$status" -eq 0 ]
 }
 
@@ -230,11 +390,85 @@ EOF
 }
 
 @test "mise bootstrap keeps host MCP setup tasks hidden" {
-  run rg -U '\[tasks\.bootstrap\]\n(?:.*\n)*?hide = true' "$WORKSPACE_DIR/mise.toml"
+  public_json="$(mise_tasks_json "$TEST_REPO_ROOT")"
+  hidden_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
+  run assert_mise_task_visibility "$public_json" "$hidden_json"
   [ "$status" -eq 0 ]
+}
 
-  run rg -U '\[tasks\."setup:mcp:host"\]\n(?:.*\n)*?hide = true' "$WORKSPACE_DIR/mise.toml"
+@test "mise exposes the expected public task set" {
+  tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT")"
+  run assert_public_mise_tasks "$tasks_json" \
+    apply apply:skills:local audit:ci:smoke brewfile:restore check deploy doctor format \
+    format:check install:catalog prepare:catalog refresh test test:ps test:sh upgrade validate verify
   [ "$status" -eq 0 ]
+}
+
+@test "mise check contains the complete inspection dependency set" {
+  tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
+  run assert_mise_check_depends "$tasks_json"
+  [ "$status" -eq 0 ]
+}
+
+@test "mise keeps deploy verify and refresh-deploy order" {
+  tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
+  run assert_mise_run_sequence "$tasks_json" deploy '[{"task":"check"},{"task":"apply"},{"task":"doctor"}]'
+  [ "$status" -eq 0 ]
+  run assert_mise_run_sequence "$tasks_json" verify '[{"task":"check"},{"task":"test"},{"task":"smoke:catalog"}]'
+  [ "$status" -eq 0 ]
+  run assert_mise_run_sequence "$tasks_json" refresh:deploy '[{"task":"refresh"},{"task":"deploy"}]'
+  [ "$status" -eq 0 ]
+}
+
+@test "mise tasks connect to the expected workspace commands" {
+  tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
+  run assert_mise_command_connections "$tasks_json"
+  [ "$status" -eq 0 ]
+}
+
+@test "workspace mise configuration remains self-contained outside comments" {
+  mise_without_comments="$(sed '/^[[:space:]]*#/d' "$TEST_REPO_ROOT/mise.toml")"
+  shell_without_comments="$(sed '/^[[:space:]]*#/d' "$TEST_REPO_ROOT/scripts/apm-workspace.sh")"
+  [[ "$mise_without_comments" != *APM_BOOTSTRAP_REPO* ]]
+  [[ "$shell_without_comments" != *APM_BOOTSTRAP_REPO* ]]
+  [[ "$shell_without_comments" != *'~/.config'* ]]
+}
+
+@test "negative fixture detects a visible bootstrap task" {
+  new_mise_fixture >/dev/null
+  rewrite_mise_fixture "$mise_fixture/mise.toml" \
+    '(\[tasks\.bootstrap\][^[]*)^[ \t]*hide = true\r?\n' '$1' 'm'
+  public_json="$(mise_tasks_json "$mise_fixture")"
+  hidden_json="$(mise_tasks_json "$mise_fixture" --hidden)"
+  run assert_mise_task_visibility "$public_json" "$hidden_json"
+  [ "$status" -ne 0 ]
+}
+
+@test "negative fixture detects a missing check inspection dependency" {
+  new_mise_fixture >/dev/null
+  rewrite_mise_fixture "$mise_fixture/mise.toml" \
+    '^[ \t]*"lint:frontmatter",\r?\n' '' 'm'
+  tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
+  run assert_mise_check_depends "$tasks_json"
+  [ "$status" -ne 0 ]
+}
+
+@test "negative fixture detects reordered deploy steps" {
+  new_mise_fixture >/dev/null
+  rewrite_mise_fixture "$mise_fixture/mise.toml" \
+    '\{ task = "check" \}, \{ task = "apply" \}, \{ task = "doctor" \}' \
+    '{ task = "check" }, { task = "doctor" }, { task = "apply" }' ''
+  tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
+  run assert_mise_run_sequence "$tasks_json" deploy '[{"task":"check"},{"task":"apply"},{"task":"doctor"}]'
+  [ "$status" -ne 0 ]
+}
+
+@test "negative fixture detects an interactive upgrade command" {
+  new_mise_fixture >/dev/null
+  rewrite_mise_fixture "$mise_fixture/mise.toml" 'apm update -g --yes' 'apm update -g' ''
+  tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
+  run assert_mise_upgrade "$tasks_json"
+  [ "$status" -ne 0 ]
 }
 
 @test "normalize_codex_mcp_config removes only top-level MCP identity fields" {
