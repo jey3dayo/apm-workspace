@@ -874,6 +874,13 @@ id = "preserve"
     $powerShellScript | Should -Match '(?s)function Invoke-Apply\s*\{.*?Install-WorkspaceMcpDependencies.*?Normalize-CodexMcpConfig.*?Invoke-CodexCompile.*?Sync-ManagedCatalogRuntimeAssets.*?Replace-SkillTargetsFromStage.*?Remove-LegacyWorkspaceSkillTargets'
   }
 
+  It "keeps legacy workspace cleanup in full apply, not quick local sync" {
+    $powerShellScript = Get-Content -LiteralPath (Join-Path $workspaceRoot "scripts/apm-workspace.ps1") -Raw
+
+    $powerShellScript | Should -Match '(?s)function Invoke-Apply\s*\{(?:(?!\r?\nfunction ).)*?Remove-LegacyWorkspaceSkillTargets'
+    $powerShellScript | Should -Not -Match '(?s)function Invoke-SyncLocalSkills\s*\{(?:(?!\r?\nfunction ).)*?Remove-LegacyWorkspaceSkillTargets'
+  }
+
   It "rejects local package refs before PowerShell update deploys" {
     $apmCalls = New-Object System.Collections.Generic.List[string]
 

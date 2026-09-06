@@ -186,6 +186,16 @@ EOF
   [ "$status" -eq 0 ]
 }
 
+@test "the legacy workspace cleanup belongs to full apply, not the quick local sync" {
+  run rg -U -o 'cmd_apply\(\) \{\n(?:[^\n]*\n)*?^\}' "$SCRIPT_UNDER_TEST"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *cleanup_legacy_workspace_skill_targets* ]]
+
+  run rg -U -o 'cmd_sync_local_skills\(\) \{\n(?:[^\n]*\n)*?^\}' "$SCRIPT_UNDER_TEST"
+  [ "$status" -eq 0 ]
+  [[ "$output" != *cleanup_legacy_workspace_skill_targets* ]]
+}
+
 # --- host-local MCP bootstrap ----------------------------------------------
 
 @test "resolve_1password_mcp_command prefers a native command" {

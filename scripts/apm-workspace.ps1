@@ -1765,8 +1765,6 @@ function Invoke-SyncLocalSkills {
         }
         Copy-DirectoryContents -SourceDir $stagedSkillPath -DestinationDir $destinationSkillPath
       }
-
-      Remove-LegacyWorkspaceSkillTargets
     }
     finally {
       if (Test-Path -LiteralPath $stageDir) {

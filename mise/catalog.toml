@@ -1,5 +1,5 @@
 ["apply:skills:local"]
-description = "Quick-apply managed catalog skills into the local Codex target only"
+description = "Quick-sync catalog/private skills into the Codex skill target and refresh Claude private skill links (no full rollout)"
 run = "bash ./scripts/apm-workspace.sh apply:skills:local"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 apply:skills:local"
 

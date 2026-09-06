@@ -1147,7 +1147,6 @@ cmd_sync_local_skills() {
   replace_codex_skill_target_from_stage "$stage_root" "$skill_records"
   sync_claude_skill_symlinks_from_records "$skill_records"
   cleanup_stale_claude_private_skill_symlinks
-  cleanup_legacy_workspace_skill_targets
 
   trap - EXIT
   rm -rf "$stage_root"
