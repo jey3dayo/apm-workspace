@@ -713,7 +713,9 @@ Describe "public command surface" {
           throw "mise tasks --json failed for $Directory"
         }
 
-        @($json | ConvertFrom-Json)
+        # Drop tasks contributed by the host's global mise config; only this
+        # repository's own tasks are part of the contract under test.
+        @($json | ConvertFrom-Json | Where-Object { -not $_.global })
       }
       finally {
         if ($null -eq $previousTrustedPaths) {
@@ -748,7 +750,6 @@ Describe "public command surface" {
         "apply",
         "apply:skills:local",
         "audit:ci:smoke",
-        "brewfile:restore",
         "check",
         "deploy",
         "doctor",

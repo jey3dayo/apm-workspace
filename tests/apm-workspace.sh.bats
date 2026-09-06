@@ -27,7 +27,14 @@ teardown() {
 mise_tasks_json() {
   local directory="$1"
   shift
-  MISE_TRUSTED_CONFIG_PATHS="$directory" mise -C "$directory" tasks --json "$@"
+  # Drop tasks contributed by the host's global mise config; only this
+  # repository's own tasks are part of the contract under test.
+  MISE_TRUSTED_CONFIG_PATHS="$directory" mise -C "$directory" tasks --json "$@" \
+    | node -e '
+const fs = require("node:fs");
+const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
+process.stdout.write(JSON.stringify(tasks.filter((task) => !task.global)));
+'
 }
 
 node_json_assert() {
@@ -399,7 +406,7 @@ EOF
 @test "mise exposes the expected public task set" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT")"
   run assert_public_mise_tasks "$tasks_json" \
-    apply apply:skills:local audit:ci:smoke brewfile:restore check deploy doctor format \
+    apply apply:skills:local audit:ci:smoke check deploy doctor format \
     format:check install:catalog prepare:catalog refresh test test:ps test:sh upgrade validate verify
   [ "$status" -eq 0 ]
 }
