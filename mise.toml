@@ -28,7 +28,13 @@ taplo = "0.10.0"
 # Task Includes
 # ========================================
 [task_config]
-includes = ["mise/catalog.toml", "mise/validate.toml", "mise/format.toml"]
+includes = [
+  "mise/catalog.toml",
+  "mise/validate.toml",
+  "mise/lint.toml",
+  "mise/test.toml",
+  "mise/format.toml",
+]
 
 # ========================================
 # Workspace Commands
@@ -46,14 +52,11 @@ run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts
 
 [tasks."agmsg:state:save"]
 description = "Move the agmsg roster out of the deploy target before it is rewritten"
-# Recovery adapter only: cmd_apply/cmd_sync_local_skills (apm-workspace.sh)
-# and Invoke-Apply/Invoke-SyncLocalSkills (apm-workspace.ps1) now call
-# save/restore directly and guarantee restore runs on every exit path
-# (bash: EXIT trap; PowerShell: try/finally). Run this by hand only to
-# recover a roster left unlinked by an apply that predates that change, or
-# by some other process that unlinked it outside of apply.
+# Recovery adapter only: apply owns save/restore on every exit path.
+# Run by hand to relink a roster unlinked outside of apply.
 hide = true
 run = "bash ./scripts/agmsg-state.sh save"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/agmsg-state.ps1 save"
 
 [tasks."agmsg:state:restore"]
 description = "Relink the agmsg roster into the deployed skill directory"
@@ -105,15 +108,25 @@ run = [{ task = "test:ps" }, { task = "test:sh" }]
 description = "Run checks, deploy the current workspace state, and inspect targets"
 run = [{ task = "check" }, { task = "apply" }, { task = "doctor" }]
 
+[tasks."deploy:fresh"]
+description = "Rebuild APM dependency cache and deploy when normal deploy output looks stale"
+# Recovery path only; `deploy` already runs `check` before `apply`.
+hide = true
+run = [
+  "apm prune",
+  { task = "repair:local-package-cache" },
+  { task = "deploy" },
+]
+
 # ========================================
 # Meta Tasks
 # ========================================
 [tasks.upgrade]
-description = "Refresh upstream APM dependencies, verify, and inspect the ~/.apm workspace"
+description = "Refresh upstream APM dependencies, run checks, deploy, and inspect the ~/.apm workspace"
 run = ["apm update -g", { task = "deploy" }]
 
 [tasks."refresh:deploy"]
-description = "Update, verify, and deploy the ~/.apm workspace locally from the current manifest and lock"
+description = "Refresh, run checks, and deploy the ~/.apm workspace locally from the current manifest and lock"
 # Broader than the day-to-day rollout path; `deploy` is the normal entry point.
 hide = true
 run = [{ task = "refresh" }, { task = "deploy" }]

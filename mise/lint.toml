@@ -1,0 +1,18 @@
+# yamllint has no ignore file here, so lint:yaml excludes apm.lock.yaml at the fd level.
+["lint:yaml"]
+description = "Lint YAML files in the ~/.apm workspace"
+hide = true
+run = "fd -e yml -e yaml --exclude apm.lock.yaml -X yamllint"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e yml -e yaml --exclude apm.lock.yaml -X yamllint\""
+
+["lint:frontmatter"]
+description = "Validate YAML frontmatter in the managed catalog (agents/skills/commands/rules)"
+hide = true
+run = "bash ./scripts/lint-frontmatter.sh"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/lint-frontmatter.ps1"
+
+["lint:catalog-leaks"]
+description = "Detect repository-specific values and unresolved agent references in the managed catalog"
+hide = true
+run = "bash ./scripts/lint-catalog-leaks.sh"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/lint-catalog-leaks.ps1"
