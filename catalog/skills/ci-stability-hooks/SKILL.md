@@ -115,7 +115,7 @@ Completion condition: hooks are installable through repo tooling and each job's 
 If `.github/workflows` exists:
 
 - Compare `pre-push` with ordinary CI jobs.
-- Enumerate the components of the repo's aggregate gate (`check`, `ci`, `verify`, or equivalent) and verify that each stage runs in CI or a push hook. A stage included only in the aggregate but absent from both automated gates is a blind spot that runs only when invoked manually; call the aggregate from the workflow instead of copying individual task names so its composition cannot drift from CI.
+- Enumerate the components of the repo's aggregate gate (`check`, `ci`, `verify`, or equivalent) and verify that each stage runs in CI or a push hook. A stage included only in the aggregate but absent from both automated gates is a blind spot that runs only when invoked manually; call the aggregate from the workflow instead of copying individual task names so its composition cannot drift from CI. Before doing so, check each stage for local-only inputs: a stage that reads installed dependency state, deployed output, or any gitignored tree passes locally and fails on a fresh clone. Keep those stages in the push hook, list the remaining stages in the workflow, and state the exclusion and its reason next to them.
 - Ensure local push gates cover format, lint, typecheck, tests, build, and generated-file checks that normally fail PR/push CI.
 - Do not include deploy, release, production, native-signing, cloud, or manual-only workflow jobs unless the repo already exposes them as the local CI gate.
 - Prefer updating the repo's shared `ci` or `check` task over copying long workflow logic into `lefthook.yml`.

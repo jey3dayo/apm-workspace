@@ -34,6 +34,8 @@ pre-commit:
       run: bash -n {staged_files}
 
 pre-push:
+  # doctor is deliberately not a push gate: it inspects this machine's deployed
+  # output, so it fails on any clone that has not run a rollout yet.
   jobs:
     - name: workspace-scripts
       glob: "scripts/apm-workspace.{sh,ps1}"
@@ -90,6 +92,3 @@ pre-push:
     # no glob: smoke-tests the full catalog package end to end.
     - name: smoke:catalog
       run: mise run smoke:catalog
-
-    # doctor is deliberately not a push gate: it inspects this machine's deployed
-    # output, so it fails on any clone that has not run a rollout yet.

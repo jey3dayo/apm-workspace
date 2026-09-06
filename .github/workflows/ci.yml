@@ -78,8 +78,16 @@ jobs:
           bash -n ./scripts/apm-workspace.sh
           pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 help >/dev/null
 
+      # `check` is not used here: it includes validate:workspace, which resolves MCP
+      # dependencies from the gitignored apm_modules/ tree that only exists after a
+      # local `apm install`. That stage runs in the pre-push hook instead.
       - name: Run workspace checks
-        run: mise run check
+        run: |
+          mise run format:check
+          mise run lint:yaml
+          mise run lint:frontmatter
+          mise run lint:catalog-leaks
+          mise run validate:catalog
 
       - name: Run tests
         shell: bash
