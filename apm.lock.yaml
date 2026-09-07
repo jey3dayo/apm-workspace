@@ -1,11 +1,12 @@
 lockfile_version: '1'
-generated_at: '2026-09-07T01:19:36.307513+00:00'
+generated_at: '2026-09-07T12:53:01.859779+00:00'
 apm_version: 0.29.0
 dependencies:
 - repo_url: agavra/tuicr
   name: tuicr
   host: github.com
   resolved_commit: b55e218f6d38a87ca4a6d9924a4c50b5f601dd07
+  resolved_ref: b55e218f6d38a87ca4a6d9924a4c50b5f601dd07
   version: unknown
   virtual_path: skills/tuicr
   is_virtual: true
@@ -56,6 +57,7 @@ dependencies:
   name: frontend-design
   host: github.com
   resolved_commit: ab9b2cf7bb9e4f98ff264c07a22e46d83c29c558
+  resolved_ref: ab9b2cf7bb9e4f98ff264c07a22e46d83c29c558
   version: unknown
   virtual_path: plugins/frontend-design/skills/frontend-design
   is_virtual: true
@@ -76,6 +78,7 @@ dependencies:
   name: agentation
   host: github.com
   resolved_commit: 8158a97c10c37e577b0a6e2d3175d143918216cd
+  resolved_ref: 8158a97c10c37e577b0a6e2d3175d143918216cd
   version: unknown
   virtual_path: skills/agentation
   is_virtual: true
@@ -96,6 +99,7 @@ dependencies:
   name: agentation-self-driving
   host: github.com
   resolved_commit: 8158a97c10c37e577b0a6e2d3175d143918216cd
+  resolved_ref: 8158a97c10c37e577b0a6e2d3175d143918216cd
   version: unknown
   virtual_path: skills/agentation-self-driving
   is_virtual: true
@@ -122,6 +126,7 @@ dependencies:
   name: browser-harness
   host: github.com
   resolved_commit: eba1021c78dc8c1a4e78f98155396c4fa979b7f0
+  resolved_ref: eba1021c78dc8c1a4e78f98155396c4fa979b7f0
   version: 0.1.0
   package_type: marketplace_plugin
   deployed_files:
@@ -204,6 +209,7 @@ dependencies:
   name: ai-banzuke
   host: github.com
   resolved_commit: 9869e9df63da283b29561923e7e5839a8a3d9152
+  resolved_ref: 9869e9df63da283b29561923e7e5839a8a3d9152
   version: unknown
   virtual_path: plugins/dev-tools/ai-banzuke/skills/ai-banzuke
   is_virtual: true
@@ -236,6 +242,7 @@ dependencies:
   name: perman-aws-vault
   host: github.com
   resolved_commit: 9869e9df63da283b29561923e7e5839a8a3d9152
+  resolved_ref: 9869e9df63da283b29561923e7e5839a8a3d9152
   version: 1.1.0
   virtual_path: plugins/infra/perman-aws-vault
   is_virtual: true
@@ -259,11 +266,12 @@ dependencies:
     .agents/skills/perman-aws-vault/references/profile-catalog.md: sha256:6eed982d8f2f4ae14957e402eaa09042ab3370507b87a759f92ff7f37e47b472
     .agents/skills/perman-aws-vault/references/scenarios.md: sha256:0564b45728e19b58f501d4841c13e9bcaefe777ea3f72c4d1e043ea4bddb86e3
     .agents/skills/perman-aws-vault/references/setup-guide.md: sha256:e4d2c9c4ac0e146e9a9ae45933bc1cf5fbcbd940cf8fa3587cfb1ffa64436704
-  content_hash: sha256:237621e16d036bf4a27ad66581c72c80d6854bc313dea3acca894a581e1e7931
+  content_hash: sha256:8d20e3aa7e2bf333f4fd3001c085e071f6b3e6bbf39769a447cd5b40f26a46fe
 - repo_url: caad-develop/claude-code-marketplace
   name: caad-skill-deployer
   host: github.com
   resolved_commit: 9869e9df63da283b29561923e7e5839a8a3d9152
+  resolved_ref: 9869e9df63da283b29561923e7e5839a8a3d9152
   version: 1.0.0
   virtual_path: plugins/utils/caad-skill-deployer
   is_virtual: true
@@ -279,11 +287,12 @@ dependencies:
     .agents/skills/caad-skill-deployer/agents/openai.yaml: sha256:37ef1416cc3c498f66cafe12850d63e6fef7fc7758e4770c44c16e1b844dab58
     .agents/skills/caad-skill-deployer/references/folder-policy.md: sha256:b70b055285d4372ed91a6d93c95aa454785eb31fbe1e6cd5248499cc69e3be2e
     .agents/skills/caad-skill-deployer/scripts/inspect_skill_source.py: sha256:6a2215b28f2738b0827c5680ee20a4e822e3457b9b620c397c21136c88a9ee9c
-  content_hash: sha256:cb32203710a69564002d0f812dc2e0673a91490ef407e90a13382e1cd48c9306
+  content_hash: sha256:a1a34580255f2a2049b5a52044d5973360764f9c4cfb00d42755a499eb20e55d
 - repo_url: cathrynlavery/diagram-design
   name: diagram-design
   host: github.com
   resolved_commit: 3b446333f164174a571106673f943c58df282ff8
+  resolved_ref: 3b446333f164174a571106673f943c58df282ff8
   version: 2.6.15
   package_type: marketplace_plugin
   deployed_files:
@@ -1599,6 +1608,7 @@ dependencies:
   name: natural-japanese
   host: github.com
   resolved_commit: 9a78a42964096da509b8f3e011f0085a5f080151
+  resolved_ref: 9a78a42964096da509b8f3e011f0085a5f080151
   version: unknown
   virtual_path: skills/natural-japanese
   is_virtual: true
@@ -1769,6 +1779,7 @@ dependencies:
   name: thermo-nuclear-code-quality-review
   host: github.com
   resolved_commit: 93b00b89ef425a9c1bac0d0b317dfc49c930ac99
+  resolved_ref: 93b00b89ef425a9c1bac0d0b317dfc49c930ac99
   version: unknown
   virtual_path: cursor-team-kit/skills/thermo-nuclear-code-quality-review
   is_virtual: true
@@ -1789,6 +1800,7 @@ dependencies:
   name: apple-design
   host: github.com
   resolved_commit: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
+  resolved_ref: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
   version: unknown
   virtual_path: skills/apple-design
   is_virtual: true
@@ -1809,6 +1821,7 @@ dependencies:
   name: emil-design-eng
   host: github.com
   resolved_commit: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
+  resolved_ref: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
   version: unknown
   virtual_path: skills/emil-design-eng
   is_virtual: true
@@ -1829,6 +1842,7 @@ dependencies:
   name: find-animation-opportunities
   host: github.com
   resolved_commit: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
+  resolved_ref: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
   version: unknown
   virtual_path: skills/find-animation-opportunities
   is_virtual: true
@@ -1849,6 +1863,7 @@ dependencies:
   name: improve-animations
   host: github.com
   resolved_commit: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
+  resolved_ref: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
   version: unknown
   virtual_path: skills/improve-animations
   is_virtual: true
@@ -1881,6 +1896,7 @@ dependencies:
   name: review-animations
   host: github.com
   resolved_commit: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
+  resolved_ref: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
   version: unknown
   virtual_path: skills/review-animations
   is_virtual: true
@@ -1907,6 +1923,7 @@ dependencies:
   name: agmsg
   host: github.com
   resolved_commit: 948b1003868b9f29567132084346368200c36963
+  resolved_ref: 948b1003868b9f29567132084346368200c36963
   version: 1.2.3
   package_type: marketplace_plugin
   deployed_files:
@@ -5056,6 +5073,7 @@ dependencies:
   name: humanizer-ja
   host: github.com
   resolved_commit: a1e343696e43aa50e7218891f3319ab22cde3464
+  resolved_ref: a1e343696e43aa50e7218891f3319ab22cde3464
   version: unknown
   package_type: claude_skill
   deployed_files:
@@ -5086,6 +5104,7 @@ dependencies:
   name: show-me
   host: github.com
   resolved_commit: 3c2629142c5d437428269b1b722b08c0b87f574d
+  resolved_ref: 3c2629142c5d437428269b1b722b08c0b87f574d
   version: unknown
   virtual_path: plugins/show-me/skills/show-me
   is_virtual: true
@@ -5106,6 +5125,7 @@ dependencies:
   name: baseline-ui
   host: github.com
   resolved_commit: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
+  resolved_ref: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
   version: unknown
   virtual_path: skills/baseline-ui
   is_virtual: true
@@ -5126,6 +5146,7 @@ dependencies:
   name: fixing-accessibility
   host: github.com
   resolved_commit: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
+  resolved_ref: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
   version: unknown
   virtual_path: skills/fixing-accessibility
   is_virtual: true
@@ -5146,6 +5167,7 @@ dependencies:
   name: fixing-metadata
   host: github.com
   resolved_commit: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
+  resolved_ref: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
   version: unknown
   virtual_path: skills/fixing-metadata
   is_virtual: true
@@ -5166,6 +5188,7 @@ dependencies:
   name: fixing-motion-performance
   host: github.com
   resolved_commit: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
+  resolved_ref: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
   version: unknown
   virtual_path: skills/fixing-motion-performance
   is_virtual: true
@@ -5186,6 +5209,7 @@ dependencies:
   name: improve-ui
   host: github.com
   resolved_commit: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
+  resolved_ref: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
   version: unknown
   virtual_path: skills/improve-ui
   is_virtual: true
@@ -5219,6 +5243,7 @@ dependencies:
   name: transitions-dev
   host: github.com
   resolved_commit: 038b0bdc75375c2beed51d1e824c98cdc7b86f8c
+  resolved_ref: 038b0bdc75375c2beed51d1e824c98cdc7b86f8c
   version: unknown
   virtual_path: skills/transitions-dev
   is_virtual: true
@@ -6383,6 +6408,7 @@ dependencies:
   name: codebase-design
   host: github.com
   resolved_commit: 3cca18b368ae95cdbdebbff572ccafa662551015
+  resolved_ref: 3cca18b368ae95cdbdebbff572ccafa662551015
   version: unknown
   virtual_path: skills/engineering/codebase-design
   is_virtual: true
@@ -6421,6 +6447,7 @@ dependencies:
   name: domain-modeling
   host: github.com
   resolved_commit: 3cca18b368ae95cdbdebbff572ccafa662551015
+  resolved_ref: 3cca18b368ae95cdbdebbff572ccafa662551015
   version: unknown
   virtual_path: skills/engineering/domain-modeling
   is_virtual: true
@@ -6459,6 +6486,7 @@ dependencies:
   name: improve-codebase-architecture
   host: github.com
   resolved_commit: 3cca18b368ae95cdbdebbff572ccafa662551015
+  resolved_ref: 3cca18b368ae95cdbdebbff572ccafa662551015
   version: unknown
   virtual_path: skills/engineering/improve-codebase-architecture
   is_virtual: true
@@ -6491,6 +6519,7 @@ dependencies:
   name: prototype
   host: github.com
   resolved_commit: 3cca18b368ae95cdbdebbff572ccafa662551015
+  resolved_ref: 3cca18b368ae95cdbdebbff572ccafa662551015
   version: unknown
   virtual_path: skills/engineering/prototype
   is_virtual: true
@@ -6529,6 +6558,7 @@ dependencies:
   name: research
   host: github.com
   resolved_commit: 3cca18b368ae95cdbdebbff572ccafa662551015
+  resolved_ref: 3cca18b368ae95cdbdebbff572ccafa662551015
   version: unknown
   virtual_path: skills/engineering/research
   is_virtual: true
@@ -6555,6 +6585,7 @@ dependencies:
   name: setup-matt-pocock-skills
   host: github.com
   resolved_commit: 3cca18b368ae95cdbdebbff572ccafa662551015
+  resolved_ref: 3cca18b368ae95cdbdebbff572ccafa662551015
   version: unknown
   virtual_path: skills/engineering/setup-matt-pocock-skills
   is_virtual: true
@@ -6611,6 +6642,7 @@ dependencies:
   name: wayfinder
   host: github.com
   resolved_commit: 3cca18b368ae95cdbdebbff572ccafa662551015
+  resolved_ref: 3cca18b368ae95cdbdebbff572ccafa662551015
   version: unknown
   virtual_path: skills/engineering/wayfinder
   is_virtual: true
@@ -6637,6 +6669,7 @@ dependencies:
   name: grilling
   host: github.com
   resolved_commit: 3cca18b368ae95cdbdebbff572ccafa662551015
+  resolved_ref: 3cca18b368ae95cdbdebbff572ccafa662551015
   version: unknown
   virtual_path: skills/productivity/grilling
   is_virtual: true
@@ -6663,6 +6696,7 @@ dependencies:
   name: writing-for-agents
   host: github.com
   resolved_commit: 3cca18b368ae95cdbdebbff572ccafa662551015
+  resolved_ref: 3cca18b368ae95cdbdebbff572ccafa662551015
   version: unknown
   virtual_path: skills/productivity/writing-for-agents
   is_virtual: true
@@ -6695,6 +6729,7 @@ dependencies:
   name: react-doctor
   host: github.com
   resolved_commit: ff7dd679e8b9939a7dd8f828a530559a275836f7
+  resolved_ref: ff7dd679e8b9939a7dd8f828a530559a275836f7
   version: unknown
   virtual_path: skills/react-doctor
   is_virtual: true
@@ -6721,6 +6756,7 @@ dependencies:
   name: hunk-review
   host: github.com
   resolved_commit: 91b586184f569832c6a218a1bc9a7e0f3cd5ac7e
+  resolved_ref: 91b586184f569832c6a218a1bc9a7e0f3cd5ac7e
   version: unknown
   virtual_path: packages/hunk/skills/hunk-review
   is_virtual: true
@@ -6741,6 +6777,7 @@ dependencies:
   name: ui-ux-pro-max
   host: github.com
   resolved_commit: 4aad0584d92131626b16d4ff4d77f0455385013c
+  resolved_ref: 4aad0584d92131626b16d4ff4d77f0455385013c
   version: 2.13.0
   package_type: marketplace_plugin
   deployed_files:
@@ -7200,6 +7237,7 @@ dependencies:
   name: screenshot
   host: github.com
   resolved_commit: 49f948faa9258a0c61caceaf225e179651397431
+  resolved_ref: 49f948faa9258a0c61caceaf225e179651397431
   version: unknown
   virtual_path: skills/.curated/screenshot
   is_virtual: true
@@ -7280,6 +7318,7 @@ dependencies:
   name: improve
   host: github.com
   resolved_commit: 03369ee6d7cafbfcecc4346539b05b3dc0a603bb
+  resolved_ref: 03369ee6d7cafbfcecc4346539b05b3dc0a603bb
   version: 1.0.0
   package_type: marketplace_plugin
   deployed_files:
@@ -7293,12 +7332,13 @@ dependencies:
     .agents/skills/improve/references/audit-playbook.md: sha256:587c1b927070f3c28139ad95ac34cc21a7da32618cfeb966cb774e58a865d4c8
     .agents/skills/improve/references/closing-the-loop.md: sha256:5d526bb378e1783bbeb68d7af527776cbe98cde27a1aeccbd13e818e5b73b454
     .agents/skills/improve/references/plan-template.md: sha256:7be76dd3c29442288fa7cee4432fc6e95c2fdbf748c9b356344bf647c5f8722e
-  content_hash: sha256:4cd40e13503aac88bb60c202dc6a62977b290dbdc973d8cad0556ac46de6042d
+  content_hash: sha256:4218ed348b5520fee6577f93104f70ab7fb6545d883b1540158b13d6323af916
   declared_license: MIT
 - repo_url: stablyai/orca
   name: computer-use
   host: github.com
   resolved_commit: 8b197ffdc2f43f0bf31158ff7dd9de35ac4fbea5
+  resolved_ref: 8b197ffdc2f43f0bf31158ff7dd9de35ac4fbea5
   version: unknown
   virtual_path: skills/computer-use
   is_virtual: true
@@ -7319,6 +7359,7 @@ dependencies:
   name: orca-cli
   host: github.com
   resolved_commit: 8b197ffdc2f43f0bf31158ff7dd9de35ac4fbea5
+  resolved_ref: 8b197ffdc2f43f0bf31158ff7dd9de35ac4fbea5
   version: unknown
   virtual_path: skills/orca-cli
   is_virtual: true
@@ -7339,6 +7380,7 @@ dependencies:
   name: orchestration
   host: github.com
   resolved_commit: 8b197ffdc2f43f0bf31158ff7dd9de35ac4fbea5
+  resolved_ref: 8b197ffdc2f43f0bf31158ff7dd9de35ac4fbea5
   version: unknown
   virtual_path: skills/orchestration
   is_virtual: true
@@ -7359,6 +7401,7 @@ dependencies:
   name: archify
   host: github.com
   resolved_commit: c6519401f7b91b9d43011657880893b0a8955548
+  resolved_ref: c6519401f7b91b9d43011657880893b0a8955548
   version: unknown
   virtual_path: archify
   is_virtual: true
@@ -8513,6 +8556,7 @@ dependencies:
   name: vercel-react-best-practices
   host: github.com
   resolved_commit: 063bee94c3f4df8453406c830b0a7df0f2860278
+  resolved_ref: 063bee94c3f4df8453406c830b0a7df0f2860278
   version: unknown
   virtual_path: skills/react-best-practices
   is_virtual: true
