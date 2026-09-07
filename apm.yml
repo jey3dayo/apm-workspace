@@ -15,71 +15,71 @@ dependencies:
     - jey3dayo/apm-workspace/manual-skills#main
 
     # --- org-restricted (caad-develop; requires org access) ---
-    - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
-    - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-    - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
+    - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault#9869e9df63da283b29561923e7e5839a8a3d9152
+    - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer#9869e9df63da283b29561923e7e5839a8a3d9152
+    - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke#9869e9df63da283b29561923e7e5839a8a3d9152
     - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout#main
 
     # --- public ---
     # code quality / review
-    - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review
-    - shadcn/improve
+    - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review#93b00b89ef425a9c1bac0d0b317dfc49c930ac99
+    - shadcn/improve#03369ee6d7cafbfcecc4346539b05b3dc0a603bb
 
     # engineering practice (design, architecture, research)
-    - mattpocock/skills/skills/engineering/codebase-design
-    - mattpocock/skills/skills/engineering/domain-modeling
-    - mattpocock/skills/skills/engineering/improve-codebase-architecture
-    - mattpocock/skills/skills/engineering/prototype
-    - mattpocock/skills/skills/engineering/research
-    - mattpocock/skills/skills/engineering/setup-matt-pocock-skills
-    - mattpocock/skills/skills/engineering/wayfinder
+    - mattpocock/skills/skills/engineering/codebase-design#3cca18b368ae95cdbdebbff572ccafa662551015
+    - mattpocock/skills/skills/engineering/domain-modeling#3cca18b368ae95cdbdebbff572ccafa662551015
+    - mattpocock/skills/skills/engineering/improve-codebase-architecture#3cca18b368ae95cdbdebbff572ccafa662551015
+    - mattpocock/skills/skills/engineering/prototype#3cca18b368ae95cdbdebbff572ccafa662551015
+    - mattpocock/skills/skills/engineering/research#3cca18b368ae95cdbdebbff572ccafa662551015
+    - mattpocock/skills/skills/engineering/setup-matt-pocock-skills#3cca18b368ae95cdbdebbff572ccafa662551015
+    - mattpocock/skills/skills/engineering/wayfinder#3cca18b368ae95cdbdebbff572ccafa662551015
 
     # productivity / writing
-    - mattpocock/skills/skills/productivity/grilling
-    - mattpocock/skills/skills/productivity/writing-for-agents
-    - gonta223/humanizer-ja
+    - mattpocock/skills/skills/productivity/grilling#3cca18b368ae95cdbdebbff572ccafa662551015
+    - mattpocock/skills/skills/productivity/writing-for-agents#3cca18b368ae95cdbdebbff572ccafa662551015
+    - gonta223/humanizer-ja#a1e343696e43aa50e7218891f3319ab22cde3464
 
     # react-specific
-    - millionco/react-doctor/skills/react-doctor
-    - vercel-labs/agent-skills/skills/react-best-practices
+    - millionco/react-doctor/skills/react-doctor#ff7dd679e8b9939a7dd8f828a530559a275836f7
+    - vercel-labs/agent-skills/skills/react-best-practices#063bee94c3f4df8453406c830b0a7df0f2860278
 
     # browser / analysis tools
-    - browser-use/browser-harness
-    - cathrynlavery/diagram-design
-    - tt-a1i/archify/archify
-    - anthropics/claude-code/plugins/frontend-design/skills/frontend-design
+    - browser-use/browser-harness#eba1021c78dc8c1a4e78f98155396c4fa979b7f0
+    - cathrynlavery/diagram-design#3b446333f164174a571106673f943c58df282ff8
+    - tt-a1i/archify/archify#c6519401f7b91b9d43011657880893b0a8955548
+    - anthropics/claude-code/plugins/frontend-design/skills/frontend-design#ab9b2cf7bb9e4f98ff264c07a22e46d83c29c558
 
     - openai/skills/skills/.curated/screenshot # openai/skills is deprecated; no migrated equivalent found in openai/plugins yet
 
     # --- design ---
-    - benjitaylor/agentation/skills/agentation
-    - benjitaylor/agentation/skills/agentation-self-driving
+    - benjitaylor/agentation/skills/agentation#8158a97c10c37e577b0a6e2d3175d143918216cd
+    - benjitaylor/agentation/skills/agentation-self-driving#8158a97c10c37e577b0a6e2d3175d143918216cd
     - git: nextlevelbuilder/ui-ux-pro-max-skill
       skills:
         - ui-ux-pro-max
     - Jakubantalik/transitions-dev/skills/transitions-dev
-    - emilkowalski/skills/skills/apple-design
-    - emilkowalski/skills/skills/emil-design-eng
-    - emilkowalski/skills/skills/find-animation-opportunities
-    - emilkowalski/skills/skills/improve-animations
-    - emilkowalski/skills/skills/review-animations
-    - ibelick/ui-skills/skills/baseline-ui
-    - ibelick/ui-skills/skills/fixing-accessibility
-    - ibelick/ui-skills/skills/fixing-metadata
-    - ibelick/ui-skills/skills/fixing-motion-performance
-    - ibelick/ui-skills/skills/improve-ui
+    - emilkowalski/skills/skills/apple-design#d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
+    - emilkowalski/skills/skills/emil-design-eng#d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
+    - emilkowalski/skills/skills/find-animation-opportunities#d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
+    - emilkowalski/skills/skills/improve-animations#d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
+    - emilkowalski/skills/skills/review-animations#d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
+    - ibelick/ui-skills/skills/baseline-ui#f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
+    - ibelick/ui-skills/skills/fixing-accessibility#f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
+    - ibelick/ui-skills/skills/fixing-metadata#f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
+    - ibelick/ui-skills/skills/fixing-motion-performance#f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
+    - ibelick/ui-skills/skills/improve-ui#f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
 
     # --- tools ---
-    - fujibee/agmsg
-    - modem-dev/hunk/packages/hunk/skills/hunk-review
-    - agavra/tuicr/skills/tuicr
-    - humanlayer/skills/plugins/show-me/skills/show-me
+    - fujibee/agmsg#948b1003868b9f29567132084346368200c36963
+    - modem-dev/hunk/packages/hunk/skills/hunk-review#91b586184f569832c6a218a1bc9a7e0f3cd5ac7e
+    - agavra/tuicr/skills/tuicr#b55e218f6d38a87ca4a6d9924a4c50b5f601dd07
+    - humanlayer/skills/plugins/show-me/skills/show-me#3c2629142c5d437428269b1b722b08c0b87f574d
 
     # --- orca ---
-    - stablyai/orca/skills/orca-cli
-    - stablyai/orca/skills/computer-use
-    - stablyai/orca/skills/orchestration
-    - coji/natural-japanese/skills/natural-japanese
+    - stablyai/orca/skills/orca-cli#8b197ffdc2f43f0bf31158ff7dd9de35ac4fbea5
+    - stablyai/orca/skills/computer-use#8b197ffdc2f43f0bf31158ff7dd9de35ac4fbea5
+    - stablyai/orca/skills/orchestration#8b197ffdc2f43f0bf31158ff7dd9de35ac4fbea5
+    - coji/natural-japanese/skills/natural-japanese#9a78a42964096da509b8f3e011f0085a5f080151
   mcp:
     - name: context7
       registry: false
