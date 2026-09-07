@@ -22,12 +22,12 @@ description: >-
 
 ## 1. 自分の役を判定する
 
-| 役        | 職掌                                                                                                                                   | Claude                                                | Codex                                                                                  | 起動する側                                                                            |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Steward   | 人間との対話・状態確認・説明・軽微修正。許可条件を満たすとき Orchestrator 機能（分解・Worker/Reviewer 起動・差分検証・最終報告）も担う | Opus / Sonnet（会話品質で Opus 推奨。限定ではない）   | `gpt-5.6-luna`                                                                         | 人間（pane）                                                                          |
-| Architect | 設計判断（後述 Q1 trigger 2〜4 の handoff 先）。常に Orchestrator 機能を担える                                                         | Fable / Opus                                          | `gpt-5.6-sol` / `gpt-5.6-terra`                                                        | 人間（pane）                                                                          |
-| Reviewer  | SHA 固定 code review / 設計文書 review                                                                                                 | Fable（明示指定時、fallback Opus）                    | `gpt-5.6-sol` 既定。読む量が多いレビューはコストを下げて `gpt-5.6-terra` + effort high | Orchestrator 機能を担う側（Steward または Architect）。spawn 経路と pane 経路の両方可 |
-| Worker    | 実装（設計済みタスク）                                                                                                                 | `sonnet`（Agent `implementer`、Worker の昇格 `opus`） | `gpt-5.6-luna` xhigh（Worker の昇格 max → `gpt-5.6-terra`）                            | Orchestrator 機能を担う側                                                             |
+| 役        | 職掌                                                                                                                                   | Claude                                                | Codex                                                                                                                  | 起動する側                                                                            |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Steward   | 人間との対話・状態確認・説明・軽微修正。許可条件を満たすとき Orchestrator 機能（分解・Worker/Reviewer 起動・差分検証・最終報告）も担う | Opus / Sonnet（会話品質で Opus 推奨。限定ではない）   | `gpt-5.6-luna`                                                                                                         | 人間（pane）                                                                          |
+| Architect | 設計判断（後述 Q1 trigger 2〜4 の handoff 先）。常に Orchestrator 機能を担える                                                         | Fable / Opus                                          | `gpt-6-astra` / `gpt-5.6-sol` / `gpt-5.6-terra`                                                                        | 人間（pane）                                                                          |
+| Reviewer  | SHA 固定 code review / 設計文書 review                                                                                                 | Fable（明示指定時、fallback Opus）                    | `gpt-5.6-sol` 既定。読む量が多いレビューはコストを下げて `gpt-5.6-terra` + effort high。`gpt-6-astra` は明示指定時のみ | Orchestrator 機能を担う側（Steward または Architect）。spawn 経路と pane 経路の両方可 |
+| Worker    | 実装（設計済みタスク）                                                                                                                 | `sonnet`（Agent `implementer`、Worker の昇格 `opus`） | `gpt-5.6-luna` xhigh（Worker の昇格 max → `gpt-5.6-terra`）                                                            | Orchestrator 機能を担う側                                                             |
 
 **「Orchestrator」は役ではなく機能。** 表の Steward / Architect のうち、後述の許可条件を満たす側が担う。Terra は Architect・Reviewer・Worker の昇格に残る。
 
@@ -124,9 +124,9 @@ handoff の実体は `agmsg-delegation` の引き継ぎ（handoff）メッセー
 
 ## Reviewer の tier
 
-review 外注の既定経路は Codex: 起動時引数で `gpt-5.6-sol` / `gpt-5.6-terra` から選ぶ。既定は sol。
+review 外注の既定経路は Codex: 起動時引数で `gpt-5.6-sol` / `gpt-5.6-terra` / `gpt-6-astra` から選ぶ。既定は sol。
 
-**terra は sol より下で、価格でも能力でも安く弱い。** そのため terra を選ぶのは難度を上げたいときではなく、読む量が多くコストを抑えたいときで、`AGMSG_REVIEWER_EFFORT=high` を併せて指定して質を補う。判断の難度が理由なら terra へ移さず、sol のまま `AGMSG_REVIEWER_EFFORT` を上げる。Claude reviewer（fable 固定）は明示指定された場合のみ使い、fallback は opus。Fable reviewer は Orchestrator 側の Fable rate limit と枠を共有するため、実行中 429 で run ごと失敗しうる。失敗した場合は同経路で再試行せず、Codex sol へ切り替えて再外注する。
+**terra は sol より下で、価格でも能力でも安く弱い。** そのため terra を選ぶのは難度を上げたいときではなく、読む量が多くコストを抑えたいときで、`AGMSG_REVIEWER_EFFORT=high` を併せて指定して質を補う。判断の難度が理由なら terra へ移さず、sol のまま `AGMSG_REVIEWER_EFFORT` を上げる。Claude reviewer（fable 固定）は明示指定された場合のみ使い、fallback は opus。Fable reviewer は Orchestrator 側の Fable rate limit と枠を共有するため、実行中 429 で run ごと失敗しうる。失敗した場合は同経路で再試行せず、Codex sol へ切り替えて再外注する。`gpt-6-astra` は sol より上の帯で、価格も能力も上。明示指定されたときだけ使い、既定に据えない。
 
 ### self-review 禁止（approval gate）
 
@@ -183,7 +183,7 @@ Agent(subagent_type: "implementer", prompt: <タスク定義>)
 
 通常委譲では `model` を渡さない。呼び出し時の指定は agent 定義の frontmatter より優先されるため、渡すと `implementer` に設定済みの既定 tier を上書きしてしまう。
 
-**Claude セッションで Codex モデル（`luna` / `terra` / `sol`）を指定された場合、Agent tool は使えない。** `model` に取れるのは `sonnet` / `opus` / `haiku` / `fable` だけで、Codex worker を起動する手段が無い。この場合は `agmsg-delegation` の spawn 経路（`run-codex-worker.sh implement <project> gpt-5.6-luna <payload>`）へ切り替える。Agent tool で代わりに `sonnet` を使ってはならない——指定されたモデルを黙って別 tier へ差し替えることになる。やむを得ず別の経路や tier を採るときは、起動前に差し替え先と理由をユーザーへ報告し、最終報告にも記す。
+**Claude セッションで Codex モデル（`luna` / `terra` / `sol` / `astra`）を指定された場合、Agent tool は使えない。** `model` に取れるのは `sonnet` / `opus` / `haiku` / `fable` だけで、Codex worker を起動する手段が無い。この場合は `agmsg-delegation` の spawn 経路（`run-codex-worker.sh implement <project> gpt-5.6-luna <payload>`）へ切り替える。Agent tool で代わりに `sonnet` を使ってはならない——指定されたモデルを黙って別 tier へ差し替えることになる。やむを得ず別の経路や tier を採るときは、起動前に差し替え先と理由をユーザーへ報告し、最終報告にも記す。
 
 Codex:
 
@@ -208,7 +208,7 @@ Codex native の `spawn_agent` を標準経路とする。native spawn が利用
 
 昇格先が現在のモデル自身になる場合（terra セッションで ② に達した場合など）も、**親 session がそのまま実装しない**。同じモデルの Worker を、別 identity・別 session として起動する。§5 の照合は成果物を独立に確かめることを前提にしており、起動側と実装側が同一 session だとその前提が崩れる（context も混ざる）。別 session を確保できない場合は `BLOCKED` とし、Architect へ handoff する。
 
-昇格の順序（① effort → ② terra）は、価格差だけでなく能力差で決める。Terra は Luna と Sol の中間段として、長文脈などの能力崖を埋める価値を持つ（下記例外の MRCR 参照）。判断規則: ① Luna の effort を max まで上げる → ② Luna の既知の能力崖（長文脈リコールなど）に該当する場合、または ① を固定して検証した結果 Luna が不足した場合に限り Terra へ上げる。Sol へ直接飛ばすのは Sol 固有の要件がある場合に限り、Terra を中間段として省略しない。価格は変わりやすいため本文に固定値を置かず、② を選ぶ際は [公式 rate card](https://help.openai.com/en/articles/20001106-codex-rate-card) で現在値を確認する。Luna が安いことは無制限であることを意味しない——どの tier も共有クレジットプールと利用上限を消費する。
+昇格の順序（① effort → ② terra）は、価格差だけでなく能力差で決める。Terra は Luna と Sol の中間段として、長文脈などの能力崖を埋める価値を持つ（下記例外の MRCR 参照）。判断規則: ① Luna の effort を max まで上げる → ② Luna の既知の能力崖（長文脈リコールなど）に該当する場合、または ① を固定して検証した結果 Luna が不足した場合に限り Terra へ上げる。Sol へ直接飛ばすのは Sol 固有の要件がある場合に限り、Terra を中間段として省略しない。価格は変わりやすいため本文に固定値を置かず、② を選ぶ際は [公式 rate card](https://help.openai.com/en/articles/20001106-codex-rate-card) で現在値を確認する。Luna が安いことは無制限であることを意味しない——どの tier も共有クレジットプールと利用上限を消費する。`gpt-6-astra` は Worker の昇格先にしない。実装トークンを安い Worker へ隔離するという本スキルの目的が反転するため。
 
 長文脈タスク（大規模コードベースの読解、複数文書の統合、長い履歴の追跡）は例外で、①を飛ばして直接 `gpt-5.6-terra` へ上げる。`luna` は長文脈リコールに崖があり（MRCR 41.3% / Sol 91.5% / Terra 89.6%、[OpenAI](https://openai.com/index/gpt-5-6)）、effort 引き上げで緩和されるという実測は公表されていない。terra セッション自身が長文脈タスクを受けた場合も、上の一般則どおり親 session では実装せず、別 identity・別 session の terra Worker を起動する。
 

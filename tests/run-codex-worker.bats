@@ -31,9 +31,9 @@ script_models_for() {
   sed -n "s/^$1) allowed_models=(\(.*\)) ;;$/\1/p" "$SCRIPT"
 }
 
-# tier 表の行から model ID を取り出す（表記は \`gpt-5.6-*\` で統一されている前提）
+# tier 表の行から model ID を取り出す（実在する世代は \`gpt-5.6-*\` と \`gpt-6-*\` のみ）
 skill_models_for() {
-  grep -E "^\| $1 " "$SKILL" | grep -oE 'gpt-5\.6-[a-z]+' | sort -u | tr '\n' ' '
+  grep -E "^\| $1 " "$SKILL" | grep -oE 'gpt-(5\.6|6)-[a-z]+' | sort -u | tr '\n' ' '
 }
 
 @test "implement rejects a reviewer-tier model" {
@@ -62,6 +62,24 @@ skill_models_for() {
   run "$SCRIPT" implement "$PROJECT" gpt-5.6-luna "$PAYLOAD"
   [ "$status" -ne 2 ]
   [[ "$output" != *"not allowed for role"* ]]
+}
+
+@test "review allows gpt-6-astra" {
+  run "$SCRIPT" review "$PROJECT" gpt-6-astra "$PAYLOAD"
+  [ "$status" -ne 2 ]
+  [[ "$output" != *"not allowed for role"* ]]
+}
+
+@test "implement rejects gpt-6-astra" {
+  run "$SCRIPT" implement "$PROJECT" gpt-6-astra "$PAYLOAD"
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"not allowed for role implement"* ]]
+}
+
+@test "an unknown model is rejected even with a gpt-6 style name" {
+  run "$SCRIPT" review "$PROJECT" gpt-6-nonexistent "$PAYLOAD"
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"not allowed for role review"* ]]
 }
 
 @test "script allowlist matches the orchestrator-worker tier table" {
