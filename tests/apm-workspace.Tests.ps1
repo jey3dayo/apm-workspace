@@ -838,7 +838,13 @@ Describe "public command surface" {
 
       $task = Get-MiseTask -Tasks $Tasks -Name "upgrade"
       $run = @($task.run)
-      if ($run.Count -ne 2 -or $run[0] -isnot [string] -or $run[0] -notlike "*apm update -g*" -or $run[0] -notlike "*--yes*") {
+      $commandTokens = if ($run.Count -gt 0 -and $run[0] -is [string]) {
+        $run[0].Trim() -split '\s+'
+      }
+      else {
+        @()
+      }
+      if ($run.Count -ne 2 -or $commandTokens.Count -eq 0 -or $commandTokens[0] -ne "apm" -or $commandTokens -notcontains "update" -or $commandTokens -notcontains "-g" -or $commandTokens -notcontains "--yes") {
         throw "Mise task 'upgrade' must update APM with --yes before deploying"
       }
       if ($null -eq $run[1].PSObject.Properties["task"] -or $run[1].task -ne "deploy") {
@@ -2077,6 +2083,22 @@ dependencies: []
       Update-MiseTaskBlock -Path (Join-Path $fixture "mise.toml") -Name "upgrade" -Transform {
         param($block)
         $block -replace 'apm update -g --yes', 'apm update -g'
+      }
+      $hiddenTasks = Get-MiseTasksJson -Directory $fixture -Hidden
+
+      { Assert-MiseUpgradeContract -Tasks $hiddenTasks } | Should -Throw
+    }
+    finally {
+      Remove-Item -LiteralPath $fixture -Recurse -Force -ErrorAction SilentlyContinue
+    }
+  }
+
+  It "detects a prefixed upgrade command in a negative mise fixture" {
+    $fixture = New-MiseTaskFixture -Name "upgrade-prefixed"
+    try {
+      Update-MiseTaskBlock -Path (Join-Path $fixture "mise.toml") -Name "upgrade" -Transform {
+        param($block)
+        $block -replace 'apm update -g --yes', 'echo apm update -g --yes'
       }
       $hiddenTasks = Get-MiseTasksJson -Directory $fixture -Hidden
 

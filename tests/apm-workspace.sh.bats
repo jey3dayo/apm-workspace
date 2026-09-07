@@ -139,12 +139,14 @@ const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
 const taskName = process.argv[1];
 const task = tasks.find(({ name }) => name === taskName);
 const run = task?.run;
+const commandTokens = typeof run?.[0] === "string" ? run[0].trim().split(/\s+/) : [];
 if (
   !Array.isArray(run) ||
   run.length !== 2 ||
-  typeof run[0] !== "string" ||
-  !run[0].includes("apm update -g") ||
-  !run[0].includes("--yes") ||
+  commandTokens[0] !== "apm" ||
+  !commandTokens.includes("update") ||
+  !commandTokens.includes("-g") ||
+  !commandTokens.includes("--yes") ||
   !isDeepStrictEqual(run[1], { task: "deploy" })
 ) {
   process.exit(1);
@@ -473,6 +475,14 @@ EOF
 @test "negative fixture detects an interactive upgrade command" {
   new_mise_fixture >/dev/null
   rewrite_mise_fixture "$mise_fixture/mise.toml" 'apm update -g --yes' 'apm update -g' ''
+  tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
+  run assert_mise_upgrade "$tasks_json"
+  [ "$status" -ne 0 ]
+}
+
+@test "negative fixture detects a prefixed upgrade command" {
+  new_mise_fixture >/dev/null
+  rewrite_mise_fixture "$mise_fixture/mise.toml" 'apm update -g --yes' 'echo apm update -g --yes' ''
   tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
   run assert_mise_upgrade "$tasks_json"
   [ "$status" -ne 0 ]
