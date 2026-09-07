@@ -19,7 +19,7 @@ pre-commit:
       stage_fixed: true
 
     - name: bold-headings
-      glob: "catalog/**/*.md"
+      glob: "{catalog/*.md,catalog/**/*.md}"
       run: mise run format:markdown:bold-headings
       stage_fixed: true
 
