@@ -1015,6 +1015,7 @@ Describe "public command surface" {
     Mock Sync-ManagedCatalogRuntimeAssets {}
     Mock Replace-SkillTargetsFromStage {}
     Mock Install-WorkspaceMcpDependencies {}
+    Mock Normalize-CodexMcpConfig {}
     Mock Invoke-CodexCompile {}
     # Invoke-AgmsgStateSave/Restore shell out to agmsg-state.ps1 against the
     # real $HOME by design (see its own subprocess-based test suite); mocked
@@ -1025,6 +1026,7 @@ Describe "public command surface" {
     Invoke-Apply
 
     Assert-MockCalled Install-WorkspaceMcpDependencies -Times 1 -Exactly
+    Assert-MockCalled Normalize-CodexMcpConfig -Times 2 -Exactly
   }
 
   It "installs MCP dependencies with apm install only mcp" {
@@ -1068,6 +1070,35 @@ id = "preserve"
     $config = Get-Content -LiteralPath (Join-Path $configDir "config.toml") -Raw
     $config | Should -Not -Match '(?m)^id = ""$'
     $config | Should -Match '(?m)^id = "preserve"$'
+  }
+
+  It "removes only top-level MCP identity fields from a user-global config" {
+    $fakeHome = Join-Path $TestDrive "fake-home"
+    $configDir = Join-Path $fakeHome ".codex"
+    $configPath = Join-Path $configDir "config.toml"
+    New-Item -ItemType Directory -Path $configDir -Force | Out-Null
+    @"
+[notice.model_migrations]
+id = "preserve notice"
+
+[mcp_servers.mobbin]
+transport = "http"
+id = ""
+
+[mcp_servers.mobbin.env]
+id = "preserve nested"
+
+[other]
+id = "preserve other"
+"@ | Set-Content -LiteralPath $configPath -NoNewline
+
+    Normalize-CodexMcpConfig -ConfigPath $configPath
+
+    $config = Get-Content -LiteralPath $configPath -Raw
+    $config | Should -Not -Match '(?m)^id = ""$'
+    $config | Should -Match '(?m)^id = "preserve notice"$'
+    $config | Should -Match '(?m)^id = "preserve nested"$'
+    $config | Should -Match '(?m)^id = "preserve other"$'
   }
 
   It "rejects local package refs before update deploys" {

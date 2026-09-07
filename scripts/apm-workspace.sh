@@ -933,7 +933,7 @@ install_workspace_mcp_dependencies() {
 }
 
 normalize_codex_mcp_config() {
-  config_path="$WORKSPACE_DIR/.codex/config.toml"
+  config_path="${1:-$WORKSPACE_DIR/.codex/config.toml}"
   [ -f "$config_path" ] || return 0
 
   # APM 0.28.0 emits its registry-only MCP identity field into Codex TOML.
@@ -980,6 +980,7 @@ cmd_apply() {
   build_target_skill_trees "$apply_stage_root"
   install_workspace_mcp_dependencies
   normalize_codex_mcp_config
+  normalize_codex_mcp_config "$HOME/.codex/config.toml"
   compile_codex
   sync_managed_catalog_runtime_assets
   sync_pi_instructions

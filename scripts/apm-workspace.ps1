@@ -1672,6 +1672,7 @@ function Invoke-Apply {
       $null = Build-TargetSkillTrees -StageRoot $stageDir
       Install-WorkspaceMcpDependencies
       Normalize-CodexMcpConfig
+      Normalize-CodexMcpConfig -ConfigPath (Join-Path (Join-Path $HOME ".codex") "config.toml")
       Invoke-CodexCompile
       Sync-ManagedCatalogRuntimeAssets
       Sync-PiInstructions

@@ -504,6 +504,36 @@ EOF
   rm -rf "$workspace_dir"
 }
 
+@test "normalize_codex_mcp_config sanitizes a user-global config without touching other sections" {
+  home_dir="$(mktemp -d)"
+  mkdir -p "$home_dir/.codex"
+  cat >"$home_dir/.codex/config.toml" <<'EOF'
+[notice.model_migrations]
+id = "preserve notice"
+
+[mcp_servers.mobbin]
+transport = "http"
+id = ""
+
+[mcp_servers.mobbin.env]
+id = "preserve nested"
+
+[other]
+id = "preserve other"
+EOF
+
+  HOME="$home_dir"
+  normalize_codex_mcp_config "$HOME/.codex/config.toml"
+  config="$(<"$HOME/.codex/config.toml")"
+
+  [[ "$config" != *'id = ""'* ]]
+  [[ "$config" == *'id = "preserve notice"'* ]]
+  [[ "$config" == *'id = "preserve nested"'* ]]
+  [[ "$config" == *'id = "preserve other"'* ]]
+
+  rm -rf "$home_dir"
+}
+
 @test "external lock matching ignores GitHub reference casing" {
   workspace_dir="$(mktemp -d)"
   cat >"$workspace_dir/apm.yml" <<'EOF'
