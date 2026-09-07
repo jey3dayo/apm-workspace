@@ -171,6 +171,7 @@ READY 後も DONE / REVIEW だけを無期限に待たず、agmsg DB に届い�
 
 - `inbox.sh <team> <自分>` を最大60秒間隔でポーリングし、`WORKING` / `BLOCKED` / `DONE` / `REVIEW` を受信する
 - `inbox.sh` に valid message が無く「無応答」と判定する前に、必ず `history.sh <team> <自分>` を task_id で確認する。watcher が常駐しうる（`pgrep -f 'agmsg/scripts/watch.sh'`）ため、既読化された DONE / REVIEW は history から復元する
+- `inbox.sh` は**自分宛の受信にのみ**使う。他 identity（他の worker/steward/architect）の受信状況を確認したいときは `inbox.sh` を使わず `history.sh <team> <agent> <limit>` を使う（非消費、`●` unread / `○` read で既読状態を出し分ける）。他 identity に対して `inbox.sh` を実行すると、その identity 宛の未読を消費してしまい、本来の受信者に届くはずだった未読が消える。history の既定 limit（20）は送受信の両方を含むため、確認時は宛先と task_id も併せて見る
 - valid message が120秒無い場合は、launchd job 状態、`tail -n 200 "$run_dir/worker.log"`、`$run_dir/worker.exit`（あれば）を取得して、長時間コマンド・crash・承認待ちを区別する。長時間コマンドが動作中なら待機を継続し、診断時刻を更新する
 - 承認画面を検出した場合は Enter を自動送信しない。Codex では `-a never` 契約違反として最終出力を記録し、crash cleanup へ進む。Claude では安全な代替を指示できる場合だけ指示し、解消しなければ同様に cleanup する
 - boot payload の task timeout を超えたら最終ログ・launchd job 状態・exit status を保存し、crash cleanup へ進む

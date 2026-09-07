@@ -4,14 +4,14 @@
 
 **エージェントが pane を勝手に作らない。ユーザーが「用意して」と指示したときだけ作る。** その場合も `herdr workspace create` / `tab create` は使わない——command 指定フラグが無く bare shell しか起動しないのに、読み戻さなければ「起動した」と報告できてしまう。自分の pane からの `pane split --focus` → `pane run` → `pane process-info` での読み戻し、という `herdr` スキルの手順に従う（`backlog-sweep`「Worker プールを組む」に手順あり）。確認していない foreground process 名を報告に書かないこと。
 
-| lifecycle   | spawn 経路                                              | 常駐プール経路                                                            |
-| ----------- | ------------------------------------------------------- | ------------------------------------------------------------------------- |
-| 3. 事前登録 | 同じ                                                    | 同じ。ただし固定名を再利用する                                            |
-| 4. 起動     | `launch-worker.sh` で launchd 登録                      | ユーザーが pane を起動し、agent が `join` する。orchestrator は起動しない |
-| 5. READY    | inbox の `READY(task_id)`                               | 同じ（inbox 一本化なのでそのまま使える）                                  |
-| 6. 監視     | inbox + `worker.log` / `worker.exit` / launchd job 状態 | inbox のみ。下記の heartbeat 契約に置き換える                             |
-| review role | spawn の profile / sandbox で read-only を実行時に強制  | 強制境界を確認できた pane のみ verdict 可。それ以外は advisory            |
-| 8. 片付け   | `reset.sh` → `bootout` → 一時ディレクトリ削除           | `reset.sh` で identity を解放するだけ。pane は落とさない                  |
+| lifecycle   | spawn 経路                                              | 常駐プール経路                                                                                          |
+| ----------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| 3. 事前登録 | 同じ                                                    | 同じ。ただし固定名を再利用する                                                                          |
+| 4. 起動     | `launch-worker.sh` で launchd 登録                      | ユーザーが pane を起動し、agent が `join` する。orchestrator は起動しない                               |
+| 5. READY    | inbox の `READY(task_id)`                               | 同じ（inbox 一本化なのでそのまま使える）                                                                |
+| 6. 監視     | inbox + `worker.log` / `worker.exit` / launchd job 状態 | inbox のみ（自分宛の受信のみに使う契約は SKILL.md Lifecycle 6 参照）。下記の heartbeat 契約に置き換える |
+| review role | spawn の profile / sandbox で read-only を実行時に強制  | 強制境界を確認できた pane のみ verdict 可。それ以外は advisory                                          |
+| 8. 片付け   | `reset.sh` → `bootout` → 一時ディレクトリ削除           | `reset.sh` で identity を解放するだけ。pane は落とさない                                                |
 
 ### 生存契約
 
