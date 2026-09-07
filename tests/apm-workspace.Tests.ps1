@@ -1781,7 +1781,7 @@ dependencies:
     Mock Write-CatalogSummary {}
 
     function global:apm {
-      $global:LASTEXITCODE = 0
+      $global:LASTEXITCODE = 1
     }
 
     try {
@@ -1794,6 +1794,7 @@ dependencies:
       }
 
       $exception | Should -Not -BeNullOrEmpty
+      $exception.Message | Should -Match 'apm deps list -g failed\.'
       foreach ($path in @(
           $nestedSkill | ForEach-Object { Join-Path $_ "SKILL.md" }
           (Join-Path $targetOneRoot "CLAUDE.md")

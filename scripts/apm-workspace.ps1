@@ -2672,7 +2672,7 @@ function Invoke-Doctor {
   Write-CatalogSummary
   & apm deps list -g
   if ($LASTEXITCODE -ne 0) {
-    throw "apm deps list -g failed."
+    $diagnostics.Add("apm deps list -g failed.")
   }
 
   if ($diagnostics.Count -gt 0) {
