@@ -16,6 +16,17 @@
 - 再検討するなら: APM が MCP エントリ単位の OS / capability 条件を正式サポートした時点で、
   host-local 配置からの再統合を検討する。
 
+## Mobbin MCP
+
+- Status: global APM 管理として追加（2026-09-06）
+- 理由: デザイン作業での UI reference 検索。CLI 側の agent（Claude Code / Codex）へ配る目的。
+- 現在の配置: `apm.yml` の `dependencies.mcp` が正本。`~/.claude.json` と
+  `~/.codex/config.toml` は生成先。`transport: http` を使っており、他の remote MCP エントリ
+  （linear / jina-reader）の `streamable-http` とは異なる。
+- 再検討するなら: app 側（claude.ai / ChatGPT）に Mobbin の connector が用意されたら、
+  `~/.apm/docs/saas-connectors.md` の優先順（アプリ側プラグイン > apm.yml > catalog skill）に
+  従って APM 管理からの撤去を検討する。
+
 ## Cursor user-scope MCP (`~/.cursor/mcp.json`)
 
 - Status: 手書き維持（2026-07-25）
