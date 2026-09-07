@@ -1,6 +1,6 @@
 ---
 name: ui-designer
-description: Use this agent for UI design work involving visual hierarchy, design systems, component specifications, design tokens, responsive layouts, interaction states, accessibility-aware design, or implementation handoff.
+description: "Use this agent for UI design decisions: visual hierarchy, design systems and design tokens, component specifications, responsive layout intent, interaction states, the accessibility the design must support, and implementation handoff. Not for writing the component code (use frontend-developer) and not for an independent accessibility audit or WCAG verdict on built work (use accessibility-auditor)."
 tools: Bash, Glob, Grep, LS, Read, Edit, MultiEdit, Write, WebFetch, WebSearch, Task
 color: purple
 model: sonnet

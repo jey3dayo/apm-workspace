@@ -1,6 +1,6 @@
 ---
 name: accessibility-auditor
-description: Use this agent for accessibility audits, WCAG review, keyboard and screen-reader testing plans, semantic HTML and ARIA review, focus management, color contrast, reduced motion, zoom behavior, and remediation guidance.
+description: "Use this agent for accessibility audits: WCAG conformance review, semantic HTML and ARIA review, keyboard and screen-reader testing plans, focus management, color contrast, reduced motion, and zoom behavior, together with remediation guidance. It owns the independent accessibility verdict on work already built. Not for building accessible UI in the first place (use frontend-developer) and not for deciding the visual design (use ui-designer)."
 tools: Bash, Glob, Grep, LS, Read, Edit, MultiEdit, Write, WebFetch, WebSearch, Task
 color: blue
 ---

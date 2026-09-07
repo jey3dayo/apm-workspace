@@ -96,11 +96,13 @@ pre-push:
       glob: "*.{js,jsx,ts,tsx,json,jsonc}"
       run: mise run test:unit:ci
     - name: lint
+      # no glob: lint covers every file class in the repo, so nearly every push runs it
       run: mise run lint
     - name: test:rust
       glob: "*.rs"
       run: mise run test:rust
     - name: build
+      # no glob: build inputs span sources, assets, config, and generator scripts
       run: mise run build
     - name: lint:terraform
       glob: "terraform/**/*.tf"

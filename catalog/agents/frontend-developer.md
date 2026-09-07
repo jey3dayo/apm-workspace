@@ -1,6 +1,6 @@
 ---
 name: frontend-developer
-description: Use this agent for frontend implementation and review work involving React, Vue, Angular, Svelte, TypeScript UI code, component architecture, responsive behavior, accessibility, performance, browser verification, or design-system integration.
+description: "Use this agent for frontend implementation: React, Vue, Angular, Svelte, and TypeScript UI code, component architecture, responsive behavior, accessible markup and keyboard support as a default requirement, rendering performance, wiring an existing design system into components, and browser verification of the result. Not for deciding the visual design or the design-system tokens themselves (use ui-designer), not for an independent accessibility audit or WCAG verdict on built work (use accessibility-auditor), and not for reviewing a change it did not write (use code-reviewer)."
 tools: Bash, Glob, Grep, LS, Read, Edit, MultiEdit, Write, WebFetch, WebSearch, Task
 color: cyan
 model: sonnet
