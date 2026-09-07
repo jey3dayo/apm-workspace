@@ -5,26 +5,101 @@
     "title": "Orchestrator-Worker：委譲と受入",
     "animation": "none",
     "quality_profile": "showcase",
-    "output": "docs/diagrams/orchestrator-worker.html"
+    "output": "docs/diagrams/orchestrator-worker.html",
+    "legend": {
+      "mode": "all",
+      "entries": {
+        "external": {
+          "label": "依頼元（人間）"
+        },
+        "frontend": {
+          "label": "Steward"
+        },
+        "database": {
+          "label": "Architect"
+        },
+        "cloud": {
+          "label": "Orchestrator機能"
+        },
+        "backend": {
+          "label": "Worker"
+        },
+        "messagebus": {
+          "label": "Reviewer"
+        },
+        "security": {
+          "label": "停止（BLOCKED）"
+        }
+      }
+    }
   },
   "lanes": [
-    { "id": "control", "label": "対話・役割判定・Orchestrator機能" },
-    { "id": "execution", "label": "Worker・Reviewer・受入" }
+    {
+      "id": "control",
+      "label": "対話・役割判定・Orchestrator機能"
+    },
+    {
+      "id": "execution",
+      "label": "Worker・Reviewer・受入"
+    }
   ],
   "groups": [
-    { "id": "orchestrator_function", "label": "Orchestrator機能（役ではない）", "lane": "control", "fromCol": 3, "toCol": 3, "variant": "emphasis" },
-    { "id": "acceptance_gate", "label": "作者と分離したレビュー + 最終受入", "lane": "execution", "fromCol": 4, "toCol": 5, "variant": "security" }
+    {
+      "id": "orchestrator_function",
+      "label": "Orchestrator機能（役ではない）",
+      "lane": "control",
+      "fromCol": 3,
+      "toCol": 3,
+      "variant": "emphasis"
+    },
+    {
+      "id": "acceptance_gate",
+      "label": "作者と分離したレビュー + 最終受入",
+      "lane": "execution",
+      "fromCol": 4,
+      "toCol": 5,
+      "variant": "security"
+    }
   ],
-  "mainPath": ["user", "steward", "architect", "orchestrator", "worker", "reviewer", "acceptance"],
+  "mainPath": [
+    "user",
+    "steward",
+    "architect",
+    "orchestrator",
+    "worker",
+    "reviewer",
+    "acceptance"
+  ],
   "semanticChecks": {
-    "allowedRoots": ["user"],
-    "allowedTerminals": ["steward_end", "blocked", "acceptance"],
+    "allowedRoots": [
+      "user"
+    ],
+    "allowedTerminals": [
+      "steward_end",
+      "blocked",
+      "acceptance"
+    ],
     "requiredPaths": [
-      { "from": "user", "to": "steward" },
-      { "from": "steward", "to": "orchestrator" },
-      { "from": "orchestrator", "to": "worker" },
-      { "from": "worker", "to": "reviewer" },
-      { "from": "reviewer", "to": "acceptance" }
+      {
+        "from": "user",
+        "to": "steward"
+      },
+      {
+        "from": "steward",
+        "to": "orchestrator"
+      },
+      {
+        "from": "orchestrator",
+        "to": "worker"
+      },
+      {
+        "from": "worker",
+        "to": "reviewer"
+      },
+      {
+        "from": "reviewer",
+        "to": "acceptance"
+      }
     ]
   },
   "nodes": [
@@ -42,7 +117,7 @@
       "id": "steward",
       "lane": "control",
       "col": 1,
-      "type": "backend",
+      "type": "frontend",
       "label": "Steward",
       "sublabel": "軽量対応 / Architectへhandoff",
       "tag": "まずここへ",
@@ -52,7 +127,7 @@
       "id": "architect",
       "lane": "control",
       "col": 2,
-      "type": "backend",
+      "type": "database",
       "label": "Architect",
       "sublabel": "設計判断・Orchestrator担当可",
       "tag": "handoff先",
@@ -62,7 +137,7 @@
       "id": "steward_end",
       "lane": "control",
       "col": 2,
-      "type": "backend",
+      "type": "frontend",
       "label": "Stewardで完了",
       "sublabel": "説明・状態確認・軽微修正",
       "tag": "ここで終了",
@@ -73,7 +148,7 @@
       "id": "orchestrator",
       "lane": "control",
       "col": 3,
-      "type": "backend",
+      "type": "cloud",
       "label": "Orchestrator機能",
       "sublabel": "分解・起動・diff + DoD検証",
       "tag": "役ではない",
@@ -106,7 +181,7 @@
       "id": "reviewer",
       "lane": "execution",
       "col": 4,
-      "type": "security",
+      "type": "messagebus",
       "label": "Reviewer",
       "sublabel": "別identity・別session/context",
       "tag": "REVIEW",
@@ -117,7 +192,7 @@
       "id": "acceptance",
       "lane": "execution",
       "col": 5,
-      "type": "backend",
+      "type": "cloud",
       "label": "Orchestrator受入・報告",
       "sublabel": "独立diff + DoD → 元の依頼経路",
       "tag": "最終受入",
@@ -126,15 +201,76 @@
     }
   ],
   "edges": [
-    { "id": "request-steward", "from": "user", "to": "steward", "label": "依頼", "variant": "emphasis", "role": "main" },
-    { "id": "intake-blocked", "from": "user", "to": "blocked", "label": "不整合 → BLOCKED", "variant": "security", "role": "error" },
-    { "id": "steward-light", "from": "steward", "to": "steward_end", "label": "軽微対応", "variant": "default", "role": "branch" },
-    { "id": "steward-architect", "from": "steward", "to": "architect", "label": "handoff", "variant": "security", "role": "main" },
-    { "id": "steward-orchestrate", "from": "steward", "to": "orchestrator", "label": "Opus直行", "variant": "emphasis", "role": "branch" },
-    { "id": "architect-orchestrate", "from": "architect", "to": "orchestrator", "label": "設計確定", "variant": "emphasis", "role": "main" },
-    { "id": "orchestrate-worker", "from": "orchestrator", "to": "worker", "variant": "emphasis", "role": "main" },
-    { "id": "worker-reviewer", "from": "worker", "to": "reviewer", "label": "別context", "variant": "security", "role": "main" },
-    { "id": "reviewer-acceptance", "from": "reviewer", "to": "acceptance", "variant": "security", "role": "main" }
+    {
+      "id": "request-steward",
+      "from": "user",
+      "to": "steward",
+      "label": "依頼",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "intake-blocked",
+      "from": "user",
+      "to": "blocked",
+      "label": "不整合 → BLOCKED",
+      "variant": "security",
+      "role": "error"
+    },
+    {
+      "id": "steward-light",
+      "from": "steward",
+      "to": "steward_end",
+      "label": "軽微対応",
+      "variant": "default",
+      "role": "branch"
+    },
+    {
+      "id": "steward-architect",
+      "from": "steward",
+      "to": "architect",
+      "label": "handoff",
+      "variant": "security",
+      "role": "main"
+    },
+    {
+      "id": "steward-orchestrate",
+      "from": "steward",
+      "to": "orchestrator",
+      "label": "Opus直行",
+      "variant": "emphasis",
+      "role": "branch"
+    },
+    {
+      "id": "architect-orchestrate",
+      "from": "architect",
+      "to": "orchestrator",
+      "label": "設計確定",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "orchestrate-worker",
+      "from": "orchestrator",
+      "to": "worker",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "worker-reviewer",
+      "from": "worker",
+      "to": "reviewer",
+      "label": "別context",
+      "variant": "security",
+      "role": "main"
+    },
+    {
+      "id": "reviewer-acceptance",
+      "from": "reviewer",
+      "to": "acceptance",
+      "variant": "security",
+      "role": "main"
+    }
   ],
   "cards": [
     {
@@ -150,9 +286,9 @@
       "dot": "violet",
       "title": "モデル帯と役・昇格",
       "items": [
-        "低コスト帯: sonnet / gpt-5.6-luna xhigh（既定）→max（第1昇格）",
-        "バランス帯: gpt-5.6-terra（既知能力崖/Luna max固定で不足実証、長文脈直行、多読Review+high）",
-        "高性能帯: Fable / gpt-5.6-sol / Opus（Architect/Reviewer、sol既定、Fable→Opus、sol固有直行、sonnet→opus）"
+        "低コスト帯: sonnet / gpt-5.6-luna xhigh（既定Worker）→ max（第1昇格）",
+        "バランス帯: gpt-5.6-terra（能力崖・長文脈直行、多読Review + high）",
+        "高性能帯: Fable / Opus / gpt-5.6-sol（sol既定）。最上位 gpt-6-astra は Architect可・Reviewerは明示時のみ、Worker 昇格先にしない"
       ]
     }
   ]

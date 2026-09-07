@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "deliver",
+  "type": "workflow",
+  "input": "/Users/t00114/.apm/docs/diagrams/orchestrator-worker.workflow.json",
+  "output": "/Users/t00114/.apm/docs/diagrams/orchestrator-worker.html",
+  "specification": {
+    "sha256": "120d468cda00942a50db423ac2dc4a23850e8653c4169a8c866f6aa622ee3844",
+    "bytes": 6796
+  },
+  "artifact": {
+    "sha256": "d1866ee12ce9ca47fbd70c26ec05196fdd7ffc7b4b114df45922c5b46797c2c3",
+    "bytes": 718364
+  },
+  "validation": {
+    "checksPassed": 9,
+    "checkCount": 9,
+    "compositionProfile": "showcase",
+    "compositionStatus": "pass",
+    "errors": 0,
+    "warnings": 0
+  }
+}

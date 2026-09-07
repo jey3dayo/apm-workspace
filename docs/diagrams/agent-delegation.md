@@ -24,8 +24,13 @@
 
 - [閲覧用 HTML](./orchestrator-worker.html)
 - [Archify 仕様](./orchestrator-worker.workflow.json)
+- [deliver 結果](./orchestrator-worker.deliver.json)
 - [visual-check 結果](./orchestrator-worker.visual-check.json)
-- 状態: HTML を生成済み。自動 visual-check は containment / readability /
-  viewerChrome / captures の 4 項目すべて pass（`diagnostics: 0`）。
-  receipt が記録するのは `visual-check` のみで、`deliver` の通過記録は無く
-  `visualReview` は pending。
+- 状態: `deliver`（showcase、9/9 checks、0 errors / 0 warnings）と
+  `visual-check`（containment / readability / viewerChrome / captures の
+  4 項目すべて pass、`diagnostics: 0`）を通過済み。両 receipt の
+  `artifact.sha256` は同一。`visualReview` は pending（人手の確認は別）。
+- ノードの色は役を表す。凡例のラベルは `meta.legend.entries` で役名へ差し替えてある
+  （既定は `User UI` などの汎用名で、役を示さない）。
+- コスト帯は色で表さない。パレットが役と共有の 7 色しかなく、
+  同じモデルが複数の役に出るため。帯はカード内の項目順序とラベルで示す。
