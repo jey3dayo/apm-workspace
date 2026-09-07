@@ -1418,3 +1418,190 @@ _setup_published_workspace() {
 
   rm -rf "$workspace_dir"
 }
+
+# --- pin-external ------------------------------------------------------------
+
+_pin_external_fixture() {
+  pin_external_dir="$(mktemp -d)"
+  git -C "$pin_external_dir" init -q
+}
+
+@test "cmd_pin_external pins a scalar entry that carries a trailing comment" {
+  # Real-world shape: apm.yml:52 keeps a deprecation note after the ref.
+  #   - openai/skills/skills/.curated/screenshot # openai/skills is deprecated; ...
+  # The bare single-token bullet regex used to skip this line entirely, so
+  # 44 of 45 external deps got pinned but this one never did.
+  _pin_external_fixture
+  cat >"$pin_external_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - openai/skills/skills/.curated/screenshot # openai/skills is deprecated; no migrated equivalent found in openai/plugins yet
+EOF
+  cat >"$pin_external_dir/apm.lock.yaml" <<'EOF'
+dependencies:
+  apm:
+  - repo_url: openai/skills
+    virtual_path: skills/.curated/screenshot
+    resolved_commit: 49f948faa9258a0c61caceaf225e179651397431
+EOF
+
+  WORKSPACE_DIR="$pin_external_dir"
+
+  run cmd_pin_external
+  [ "$status" -eq 0 ]
+
+  manifest="$(<"$pin_external_dir/apm.yml")"
+  [[ "$manifest" == *'- openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431 # openai/skills is deprecated; no migrated equivalent found in openai/plugins yet'* ]]
+
+  rm -rf "$pin_external_dir"
+}
+
+@test "cmd_pin_external pins a scalar entry via case-insensitive owner matching without lowercasing the manifest" {
+  # Real-world shape: apm.yml:60 uses the GitHub-displayed owner casing
+  # "Jakubantalik", but the lock's repo_url is lowercase "jakubantalik" (its
+  # materialization_repo_url preserves the original casing separately). A
+  # case-sensitive exact match on the pinned map misses this entry.
+  # Lowercasing the manifest ref itself would be wrong too: apm_modules/
+  # paths are derived from the manifest's owner casing.
+  _pin_external_fixture
+  cat >"$pin_external_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - Jakubantalik/transitions-dev/skills/transitions-dev
+EOF
+  cat >"$pin_external_dir/apm.lock.yaml" <<'EOF'
+dependencies:
+  apm:
+  - repo_url: jakubantalik/transitions-dev
+    virtual_path: skills/transitions-dev
+    resolved_commit: 038b0bdc75375c2beed51d1e824c98cdc7b86f8c
+EOF
+
+  WORKSPACE_DIR="$pin_external_dir"
+
+  run cmd_pin_external
+  [ "$status" -eq 0 ]
+
+  manifest="$(<"$pin_external_dir/apm.yml")"
+  # Owner casing "Jakubantalik" must survive unchanged; only "#<sha>" is appended.
+  [[ "$manifest" == *'- Jakubantalik/transitions-dev/skills/transitions-dev#038b0bdc75375c2beed51d1e824c98cdc7b86f8c'* ]]
+  [[ "$manifest" != *'- jakubantalik/transitions-dev'* ]]
+
+  rm -rf "$pin_external_dir"
+}
+
+@test "cmd_pin_external pins a structured git: mapping entry by adding a sibling ref: key" {
+  # Real-world shape: apm.yml:57-59.
+  #   - git: nextlevelbuilder/ui-ux-pro-max-skill
+  #     skills:
+  #       - ui-ux-pro-max
+  # apm's own reference model (apm_cli/models/dependency/reference.py:1931,
+  # 1943) writes the resolved commit back as a sibling "ref:" key, never as
+  # "#<sha>" appended to the git: value, so pin-external must match that
+  # contract.
+  _pin_external_fixture
+  cat >"$pin_external_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: nextlevelbuilder/ui-ux-pro-max-skill
+      skills:
+        - ui-ux-pro-max
+EOF
+  cat >"$pin_external_dir/apm.lock.yaml" <<'EOF'
+dependencies:
+  apm:
+  - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
+    resolved_commit: 4aad0584d92131626b16d4ff4d77f0455385013c
+EOF
+
+  WORKSPACE_DIR="$pin_external_dir"
+
+  run cmd_pin_external
+  [ "$status" -eq 0 ]
+
+  manifest="$(<"$pin_external_dir/apm.yml")"
+  # The git: value itself must be untouched (no "#<sha>" suffix).
+  [[ "$manifest" != *'- git: nextlevelbuilder/ui-ux-pro-max-skill#'* ]]
+  # ref: must land as the immediate sibling right after git: (before
+  # skills:), matching the layout apm itself writes.
+  expected=$'    - git: nextlevelbuilder/ui-ux-pro-max-skill\n      ref: 4aad0584d92131626b16d4ff4d77f0455385013c\n      skills:\n        - ui-ux-pro-max'
+  [[ "$manifest" == *"$expected"* ]]
+
+  rm -rf "$pin_external_dir"
+}
+
+@test "cmd_pin_external does not duplicate ref: on a structured entry that is already pinned" {
+  _pin_external_fixture
+  cat >"$pin_external_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: nextlevelbuilder/ui-ux-pro-max-skill
+      skills:
+        - ui-ux-pro-max
+      ref: 4aad0584d92131626b16d4ff4d77f0455385013c
+EOF
+  cat >"$pin_external_dir/apm.lock.yaml" <<'EOF'
+dependencies:
+  apm:
+  - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
+    resolved_commit: 4aad0584d92131626b16d4ff4d77f0455385013c
+EOF
+
+  WORKSPACE_DIR="$pin_external_dir"
+  before="$(<"$pin_external_dir/apm.yml")"
+
+  run cmd_pin_external
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"No external dependencies needed pinning."* ]]
+
+  after="$(<"$pin_external_dir/apm.yml")"
+  [ "$before" = "$after" ]
+  ref_count="$(grep -c 'ref: 4aad0584' "$pin_external_dir/apm.yml")"
+  [ "$ref_count" -eq 1 ]
+
+  rm -rf "$pin_external_dir"
+}
+
+@test "unpinned_external_references reports a structured git: entry's repo value, not the literal git: key or nested skills" {
+  # Regression for the doctor "unpinned" count being inflated: the old awk
+  # matched every "- " line at or below the apm bullet indent, so it also
+  # counted the literal "git:" token and the nested "- ui-ux-pro-max" item
+  # under skills: as separate unpinned refs.
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: nextlevelbuilder/ui-ux-pro-max-skill
+      skills:
+        - ui-ux-pro-max
+EOF
+
+  WORKSPACE_DIR="$workspace_dir"
+
+  run unpinned_external_references
+  [ "$status" -eq 0 ]
+  [ "$output" = "nextlevelbuilder/ui-ux-pro-max-skill" ]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "unpinned_external_references treats a structured entry with a ref: sibling as pinned" {
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: nextlevelbuilder/ui-ux-pro-max-skill
+      skills:
+        - ui-ux-pro-max
+      ref: 4aad0584d92131626b16d4ff4d77f0455385013c
+    - jey3dayo/apm-workspace/catalog#main
+EOF
+
+  WORKSPACE_DIR="$workspace_dir"
+
+  run unpinned_external_references
+  [ "$status" -eq 0 ]
+  [ "$output" = "" ]
+
+  rm -rf "$workspace_dir"
+}

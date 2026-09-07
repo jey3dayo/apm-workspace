@@ -1448,6 +1448,176 @@ dependencies:
     @(Get-UnpinnedExternalReferences) | Should -Be @("mattpocock/skills/skills/engineering/wayfinder")
   }
 
+  It "treats a plain entry with a trailing YAML comment as unpinned" {
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+    - jey3dayo/apm-workspace/catalog#main
+    - openai/skills/skills/.curated/screenshot # openai/skills is deprecated; no migrated equivalent found in openai/plugins yet
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+
+    @(Get-UnpinnedExternalReferences) | Should -Be @("openai/skills/skills/.curated/screenshot")
+  }
+
+  It "treats a structured git dependency without a ref sibling as unpinned" {
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+    - jey3dayo/apm-workspace/catalog#main
+    - git: nextlevelbuilder/ui-ux-pro-max-skill
+      skills:
+        - ui-ux-pro-max
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+
+    @(Get-UnpinnedExternalReferences) | Should -Be @("nextlevelbuilder/ui-ux-pro-max-skill")
+  }
+
+  It "treats a structured git dependency with a ref sibling as pinned" {
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+    - jey3dayo/apm-workspace/catalog#main
+    - git: nextlevelbuilder/ui-ux-pro-max-skill
+      ref: 4444444444444444444444444444444444444444
+      skills:
+        - ui-ux-pro-max
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+
+    @(Get-UnpinnedExternalReferences) | Should -Be @()
+  }
+
+  It "pin-external pins a plain reference while preserving its trailing YAML comment" {
+    Mock Ensure-WorkspaceRepo {}
+    Mock Ensure-WorkspaceScaffold {}
+
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+    - jey3dayo/apm-workspace/catalog#main
+    - openai/skills/skills/.curated/screenshot # openai/skills is deprecated; no migrated equivalent found in openai/plugins yet
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+    @"
+lockfile_version: "1"
+dependencies:
+  - repo_url: openai/skills
+    host: github.com
+    resolved_commit: abcdef1234567890abcdef1234567890abcdef12
+    virtual_path: skills/.curated/screenshot
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
+
+    Invoke-PinExternal
+
+    $manifestLines = @(Get-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml"))
+    $manifestLines | Should -Contain "    - openai/skills/skills/.curated/screenshot#abcdef1234567890abcdef1234567890abcdef12 # openai/skills is deprecated; no migrated equivalent found in openai/plugins yet"
+    @(Get-UnpinnedExternalReferences) | Should -Be @()
+  }
+
+  It "pin-external matches a case-insensitive git reference while preserving the manifest's original casing" {
+    Mock Ensure-WorkspaceRepo {}
+    Mock Ensure-WorkspaceScaffold {}
+
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+    - jey3dayo/apm-workspace/catalog#main
+    - Jakubantalik/transitions-dev/skills/transitions-dev
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+    @"
+lockfile_version: "1"
+dependencies:
+  - repo_url: jakubantalik/transitions-dev
+    host: github.com
+    resolved_commit: 1234567890abcdef1234567890abcdef12345678
+    virtual_path: skills/transitions-dev
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
+
+    Invoke-PinExternal
+
+    $manifestLines = @(Get-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml"))
+    $manifestLines | Should -Contain "    - Jakubantalik/transitions-dev/skills/transitions-dev#1234567890abcdef1234567890abcdef12345678"
+  }
+
+  It "pin-external adds a ref sibling to a structured git dependency without changing the git value" {
+    Mock Ensure-WorkspaceRepo {}
+    Mock Ensure-WorkspaceScaffold {}
+
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+    - jey3dayo/apm-workspace/catalog#main
+    - git: nextlevelbuilder/ui-ux-pro-max-skill
+      skills:
+        - ui-ux-pro-max
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+    @"
+lockfile_version: "1"
+dependencies:
+  - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
+    host: github.com
+    resolved_commit: 4444444444444444444444444444444444444444
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
+
+    Invoke-PinExternal
+
+    $manifestLines = @(Get-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml"))
+    $manifestLines | Should -Contain "    - git: nextlevelbuilder/ui-ux-pro-max-skill"
+    $manifestLines | Should -Contain "      ref: 4444444444444444444444444444444444444444"
+    $gitLineIndex = [array]::IndexOf($manifestLines, "    - git: nextlevelbuilder/ui-ux-pro-max-skill")
+    $manifestLines[$gitLineIndex + 1] | Should -Be "      ref: 4444444444444444444444444444444444444444"
+    @(Get-UnpinnedExternalReferences) | Should -Be @()
+  }
+
+  It "pin-external leaves an already-pinned structured git dependency unchanged" {
+    Mock Ensure-WorkspaceRepo {}
+    Mock Ensure-WorkspaceScaffold {}
+
+    $manifestPath = Join-Path $script:WorkspaceDir "apm.yml"
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+    - jey3dayo/apm-workspace/catalog#main
+    - git: nextlevelbuilder/ui-ux-pro-max-skill
+      ref: 1111111111111111111111111111111111111111
+      skills:
+        - ui-ux-pro-max
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath $manifestPath
+    @"
+lockfile_version: "1"
+dependencies:
+  - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
+    host: github.com
+    resolved_commit: 4444444444444444444444444444444444444444
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
+
+    $beforeContent = Get-Content -LiteralPath $manifestPath -Raw
+
+    Invoke-PinExternal
+
+    $afterContent = Get-Content -LiteralPath $manifestPath -Raw
+    $afterContent | Should -Be $beforeContent
+  }
+
   It "builds target-aware managed skill inventory with logical names" {
     $targets = @(
       [pscustomobject]@{ Name = "claude"; Root = (Join-Path $TestDrive "claude"); ConfigName = "CLAUDE.md" }

@@ -1211,11 +1211,16 @@ lock_pinned_reference_map() {
       if ($2 != "") {
         canonical = canonical "/" $2
       }
-      printf "%s\t%s#%s\n", canonical, canonical, $3
+      printf "%s\t%s\n", canonical, $3
     }
   '
 }
 
+# Reports manifest apm dependency entries that are not yet pinned to a
+# lockfile commit. A structured mapping entry ("- git: <repo>" with a
+# sibling "skills:" list) reports the repo value, never the literal "git:"
+# key or the nested skill names under "skills:", and is skipped once it
+# already carries a sibling "ref:" key (pinned).
 unpinned_external_references() {
   manifest_path="$WORKSPACE_DIR/apm.yml"
   [ -f "$manifest_path" ] || return 0
@@ -1226,7 +1231,25 @@ unpinned_external_references() {
       sub(/^[[:space:]]+/, "", trimmed)
       return length(line) - length(trimmed)
     }
+    function flush_pending() {
+      if (pending_is_git && !pending_has_ref && pending_repo != "") {
+        print pending_repo
+      }
+      pending_is_git = 0
+      pending_has_ref = 0
+      pending_repo = ""
+      pending_indent = -1
+    }
+    BEGIN {
+      pending_is_git = 0
+      pending_has_ref = 0
+      pending_repo = ""
+      pending_indent = -1
+    }
     /^[^[:space:]#][^:]*:/ {
+      if (in_apm) {
+        flush_pending()
+      }
       split($0, parts, ":")
       key = parts[1]
       in_dependencies = (key == "dependencies")
@@ -1238,6 +1261,12 @@ unpinned_external_references() {
     !in_dependencies {
       next
     }
+    in_apm && /^[[:space:]]+ref:[[:space:]]+/ && indent_level($0) > apm_indent {
+      if (pending_is_git && indent_level($0) == pending_indent + 2) {
+        pending_has_ref = 1
+      }
+      next
+    }
     /^[[:space:]]+[^-[:space:]#][^:]*:/ {
       current_indent = indent_level($0)
       line = $0
@@ -1246,6 +1275,9 @@ unpinned_external_references() {
       key = parts[1]
 
       if (current_indent <= dependencies_indent) {
+        if (in_apm) {
+          flush_pending()
+        }
         in_dependencies = 0
         dependencies_indent = -1
         in_apm = 0
@@ -1260,6 +1292,7 @@ unpinned_external_references() {
       }
 
       if (in_apm && current_indent <= apm_indent) {
+        flush_pending()
         in_apm = 0
         apm_indent = -1
       }
@@ -1269,10 +1302,19 @@ unpinned_external_references() {
       next
     }
     /^[[:space:]]*-[[:space:]]+/ {
-      if (indent_level($0) < apm_indent) {
+      current_indent = indent_level($0)
+      if (current_indent != apm_indent + 2) {
         next
       }
+      flush_pending()
       ref = $2
+      if (ref == "git:") {
+        pending_is_git = 1
+        pending_has_ref = 0
+        pending_repo = $3
+        pending_indent = current_indent
+        next
+      }
       if (ref ~ /^jey3dayo\/apm-workspace\/catalog(#|$)/) {
         next
       }
@@ -1282,6 +1324,10 @@ unpinned_external_references() {
       if (ref !~ /#/) {
         print ref
       }
+      next
+    }
+    END {
+      flush_pending()
     }
   ' "$manifest_path"
 }
@@ -1294,35 +1340,133 @@ cmd_pin_external() {
   [ -f "$manifest_path" ] || fail "Manifest not found: $manifest_path"
 
   map_file=$(mktemp)
-  awk 'BEGIN { FS = "\t" } { print $1 "\t" $2 }' <<EOF >"$map_file"
-$(lock_pinned_reference_map)
-EOF
+  lock_pinned_reference_map >"$map_file"
 
   updated_file=$(mktemp)
   awk -v map_file="$map_file" '
+    function indent_level(line, trimmed) {
+      trimmed = line
+      sub(/^[[:space:]]+/, "", trimmed)
+      return length(line) - length(trimmed)
+    }
+    # Case-insensitive fallback matches only the owner/repo segments, same
+    # as collect_external_skill_records() elsewhere in this script — a
+    # deeper path segment (e.g. a virtual_path under skills/) is a real,
+    # case-sensitive identifier, not GitHub-casing noise.
+    function normalize_repo(ref, parts, count, i, normalized) {
+      if (index(ref, ":") > 0) {
+        return ref
+      }
+      count = split(ref, parts, "/")
+      if (count < 2) {
+        return ref
+      }
+      normalized = tolower(parts[1]) "/" tolower(parts[2])
+      for (i = 3; i <= count; i++) {
+        normalized = normalized "/" parts[i]
+      }
+      return normalized
+    }
+    # Structured "- git: <repo>" entries are pinned by inserting a sibling
+    # "ref: <sha>" key right after git: (before skills:), never by
+    # appending "#<sha>" to the git: value itself (apm reads/writes ref:
+    # as a separate field; see apm_cli.models.dependency.reference for the
+    # entry["ref"] contract). The item is buffered so the insertion point
+    # is independent of where the item happens to dedent.
+    function flush_git_pending(i) {
+      if (!pending_is_git) {
+        return
+      }
+      print git_line
+      if (!pending_has_ref) {
+        if (pending_repo in pinned) {
+          printf "%*sref: %s\n", pending_indent + 2, "", pinned[pending_repo]
+          updated++
+        } else if (normalize_repo(pending_repo) in pinned_norm) {
+          printf "%*sref: %s\n", pending_indent + 2, "", pinned_norm[normalize_repo(pending_repo)]
+          updated++
+        }
+      }
+      for (i = 1; i <= buffer_count; i++) {
+        print buffer[i]
+      }
+      pending_is_git = 0
+      pending_has_ref = 0
+      pending_repo = ""
+      pending_indent = 0
+      buffer_count = 0
+      git_line = ""
+    }
     BEGIN {
-      FS = "\t"
-      while ((getline < map_file) > 0) {
-        pinned[$1] = $2
+      while ((getline map_line < map_file) > 0) {
+        n = split(map_line, cols, "\t")
+        if (n < 2) {
+          continue
+        }
+        pinned[cols[1]] = cols[2]
+        pinned_norm[normalize_repo(cols[1])] = cols[2]
       }
       close(map_file)
       updated = 0
+      pending_is_git = 0
+      pending_has_ref = 0
+      pending_repo = ""
+      pending_indent = 0
+      buffer_count = 0
     }
     {
-      if ($0 ~ /^[[:space:]]*-[[:space:]]+[^[:space:]]+[[:space:]]*$/) {
-        prefix_len = match($0, /-[[:space:]]+/) + RLENGTH - 1
-        prefix = substr($0, 1, prefix_len)
-        ref = substr($0, prefix_len + 1)
-        sub(/[[:space:]]+$/, "", ref)
-        if (index(ref, "#") == 0 && (ref in pinned)) {
-          print prefix pinned[ref]
-          updated++
+      current_indent = indent_level($0)
+
+      if (pending_is_git) {
+        if ($0 ~ /^[[:space:]]+ref:[[:space:]]+/ && current_indent == pending_indent + 2) {
+          pending_has_ref = 1
+          buffer[++buffer_count] = $0
           next
         }
+        if (current_indent > pending_indent) {
+          buffer[++buffer_count] = $0
+          next
+        }
+        flush_git_pending()
       }
+
+      if ($0 ~ /^[[:space:]]*-[[:space:]]+git:[[:space:]]+[^[:space:]]+[[:space:]]*$/) {
+        pending_is_git = 1
+        pending_has_ref = 0
+        pending_repo = $3
+        pending_indent = current_indent
+        git_line = $0
+        buffer_count = 0
+        next
+      }
+
+      if ($0 ~ /^[[:space:]]*-[[:space:]]+[^[:space:]]+[[:space:]]*(#.*)?$/) {
+        match($0, /-[[:space:]]+/)
+        prefix = substr($0, 1, RSTART + RLENGTH - 1)
+        rest = substr($0, RSTART + RLENGTH)
+        match(rest, /^[^[:space:]]+/)
+        ref = substr(rest, RSTART, RLENGTH)
+        trailing = substr(rest, RLENGTH + 1)
+
+        if (ref != "git:" && index(ref, "#") == 0) {
+          if (ref in pinned) {
+            print prefix ref "#" pinned[ref] trailing
+            updated++
+            next
+          }
+          norm_ref = normalize_repo(ref)
+          if (norm_ref in pinned_norm) {
+            print prefix ref "#" pinned_norm[norm_ref] trailing
+            updated++
+            next
+          }
+        }
+      }
+
       print
     }
     END {
+      flush_git_pending()
       printf "%d\n", updated > "/dev/stderr"
     }
   ' "$manifest_path" >"$updated_file" 2>"$updated_file.count"

@@ -815,12 +815,15 @@ function Get-ManifestApmDependencyReferences {
     return ($Line.Length - $Line.TrimStart(' ').Length)
   }
 
+  $lines = @(Get-Content -LiteralPath $manifestPath)
   $result = New-Object System.Collections.Generic.List[string]
   $inDependencies = $false
   $dependenciesIndent = -1
   $inApm = $false
   $apmIndent = -1
-  foreach ($line in (Get-Content -LiteralPath $manifestPath)) {
+  for ($i = 0; $i -lt $lines.Count; $i++) {
+    $line = $lines[$i]
+
     if ($line -match '^(?<indent>\s*)(?<key>[^:#][^:]*):(?:\s*(?<value>.*))?$') {
       $indentLevel = $Matches['indent'].Length
       $key = $Matches['key'].Trim()
@@ -859,19 +862,65 @@ function Get-ManifestApmDependencyReferences {
       continue
     }
 
-    if ($line -match '^\s*-\s+git:\s+(\S+)\s*$') {
-      if ((Get-YamlIndentLevel -Line $line) -lt $apmIndent) {
+    # Structured (mapping) entries look like:
+    #   - git: owner/repo
+    #     ref: <sha>
+    #     skills: [...]
+    # `ref:` is a sibling key of `git:`, not a `#<sha>` suffix on the value,
+    # so pin-status has to be discovered via lookahead rather than a regex
+    # on this single line.
+    if ($line -match '^(?<indent>\s*)-\s+git:\s+(?<repo>\S+)\s*$') {
+      $dashIndent = $Matches['indent'].Length
+      if ($dashIndent -lt $apmIndent) {
         continue
       }
 
-      $reference = $Matches[1]
-      if ($reference -notmatch '^jey3dayo/apm-workspace/catalog(?:#|$)' -and $reference -notmatch '^\./' -and -not $result.Contains($reference)) {
-        $result.Add($reference)
+      $reference = $Matches['repo']
+      if ($reference -match '^jey3dayo/apm-workspace/catalog(?:#|$)' -or $reference -match '^\./') {
+        continue
       }
+
+      $siblingIndent = $dashIndent + 2
+      $pinnedSha = $null
+      $blockEnd = $i
+      $j = $i + 1
+      while ($j -lt $lines.Count) {
+        $siblingLine = $lines[$j]
+        if ([string]::IsNullOrWhiteSpace($siblingLine)) {
+          $j += 1
+          continue
+        }
+
+        $siblingIndentLevel = Get-YamlIndentLevel -Line $siblingLine
+        if ($siblingIndentLevel -le $dashIndent) {
+          break
+        }
+
+        if ($siblingIndentLevel -eq $siblingIndent -and $siblingLine -match '^\s*ref:\s*(\S+)\s*$') {
+          $pinnedSha = $Matches[1]
+        }
+
+        # This entry's own sibling keys (e.g. `skills:` and its nested
+        # list items) belong to the mapping, not to the surrounding
+        # `dependencies.apm` list -- consume the whole block here so the
+        # plain-entry branch below never re-reads a `skills:` list item
+        # (such as `- ui-ux-pro-max`) as if it were its own dependency.
+        $blockEnd = $j
+        $j += 1
+      }
+
+      $canonicalReference = if ($pinnedSha) { "$reference#$pinnedSha" } else { $reference }
+      if (-not $result.Contains($canonicalReference)) {
+        $result.Add($canonicalReference)
+      }
+      $i = $blockEnd
       continue
     }
 
-    if ($line -match '^\s*-\s+(\S+)\s*$') {
+    # Plain entries may carry a trailing YAML comment (` # ...`); strip it
+    # so the captured reference is the bare value (optionally `#<sha>`
+    # pinned) rather than the comment text.
+    if ($line -match '^\s*-\s+(\S+)(?:\s+#.*)?\s*$') {
       if ((Get-YamlIndentLevel -Line $line) -lt $apmIndent) {
         continue
       }
@@ -1600,17 +1649,94 @@ function Invoke-PinExternal {
   }
 
   $pinMap = Get-LockPinnedReferenceMap
-  $updatedCount = 0
-  $updatedLines = New-Object System.Collections.Generic.List[string]
+  $pinMapLower = @{}
+  foreach ($key in $pinMap.Keys) {
+    $pinMapLower[$key.ToLowerInvariant()] = $key
+  }
 
-  foreach ($line in (Get-Content -LiteralPath $manifestPath)) {
-    if ($line -match '^(\s*-\s+)(\S+)\s*$') {
-      $prefix = $Matches[1]
-      $reference = $Matches[2]
-      if ($reference -notmatch '#' -and $pinMap.ContainsKey($reference)) {
-        $updatedLines.Add("$prefix$($pinMap[$reference])")
-        $updatedCount += 1
-        continue
+  function Resolve-PinExternalCommit {
+    param([string]$Reference)
+
+    # Manifest declarations may not match the lock's casing exactly (e.g. a
+    # GitHub owner segment typed with different capitalization). Fall back
+    # to a case-insensitive lookup, but always return the commit for the
+    # lock's own canonical key so the sha itself is correct.
+    $matchedKey = $null
+    if ($pinMap.ContainsKey($Reference)) {
+      $matchedKey = $Reference
+    } elseif ($pinMapLower.ContainsKey($Reference.ToLowerInvariant())) {
+      $matchedKey = $pinMapLower[$Reference.ToLowerInvariant()]
+    }
+
+    if (-not $matchedKey) {
+      return $null
+    }
+
+    return $pinMap[$matchedKey].Substring($matchedKey.Length + 1)
+  }
+
+  $lines = @(Get-Content -LiteralPath $manifestPath)
+  $updatedLines = New-Object System.Collections.Generic.List[string]
+  $updatedCount = 0
+
+  for ($i = 0; $i -lt $lines.Count; $i++) {
+    $line = $lines[$i]
+
+    # Structured (mapping) entries get a sibling `ref:` key instead of a
+    # `#<sha>` suffix on the `git:` value itself (apm accepts `ref:` as a
+    # dependency field and writes it back the same way). An entry that
+    # already has a `ref:` sibling is treated as pinned and left alone.
+    if ($line -match '^(?<indent>\s*)-\s+git:\s+(?<repo>\S+)\s*$') {
+      $dashIndent = $Matches['indent'].Length
+      $repo = $Matches['repo']
+      $siblingIndent = $dashIndent + 2
+
+      $alreadyPinned = $false
+      $j = $i + 1
+      while ($j -lt $lines.Count) {
+        $siblingLine = $lines[$j]
+        if ([string]::IsNullOrWhiteSpace($siblingLine)) {
+          $j += 1
+          continue
+        }
+
+        $siblingIndentLevel = $siblingLine.Length - $siblingLine.TrimStart(' ').Length
+        if ($siblingIndentLevel -lt $siblingIndent) {
+          break
+        }
+
+        if ($siblingIndentLevel -eq $siblingIndent -and $siblingLine -match '^\s*ref:\s*\S+\s*$') {
+          $alreadyPinned = $true
+          break
+        }
+
+        $j += 1
+      }
+
+      $updatedLines.Add($line)
+
+      if (-not $alreadyPinned) {
+        $commit = Resolve-PinExternalCommit -Reference $repo
+        if ($commit) {
+          $updatedLines.Add((' ' * $siblingIndent) + "ref: $commit")
+          $updatedCount += 1
+        }
+      }
+
+      continue
+    }
+
+    if ($line -match '^(?<prefix>\s*-\s+)(?<ref>\S+)(?<trail>\s+#.*)?\s*$') {
+      $prefix = $Matches['prefix']
+      $reference = $Matches['ref']
+      $trail = $Matches['trail']
+      if ($reference -notmatch '#') {
+        $commit = Resolve-PinExternalCommit -Reference $reference
+        if ($commit) {
+          $updatedLines.Add("$prefix$reference#$commit$trail")
+          $updatedCount += 1
+          continue
+        }
       }
     }
 
