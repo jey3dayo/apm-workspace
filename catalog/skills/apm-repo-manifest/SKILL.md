@@ -26,12 +26,14 @@ Scan the current repository, choose repo-local APM dependencies from concrete so
 - Never edit global APM manifests from this skill. Use `apm-usage` for `~/.apm/apm.yml`, global lockfiles, and deployment.
 
 Read `references/recommendations.md` when mapping repository signals to package refs.
+Read `references/preinstall-checklist.md` before a repository's first `apm install`, to check `.gitignore` and lint/format excludes for the install target directories, and the lockfile/yamllint interaction.
 
 ## Workflow
 
 1. Inspect the repository before editing.
    - Check `git status --short`.
    - Read existing `apm.yml` if present.
+   - On a repository's first `apm install`, walk `references/preinstall-checklist.md` before running install.
    - Search signals with `rg --files`, including `package.json`, `next.config.*`, `vite.config.*`, `src-tauri/**`, `terraform/**/*.tf`, `**/*.tftest.hcl`, `wrangler.toml`, `*.md`, and presentation sources.
 2. Decide dependency scope.
    - Keep global-common web skills out of repo-local manifests unless the user explicitly asks to localize web skills too.
