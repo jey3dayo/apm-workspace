@@ -39,6 +39,8 @@ Completion condition: local hooks can be derived from existing repo commands or 
 
 ### 3. Choose The Gate Split
 
+Before splitting commit vs. push, decide the layer: prefer a git hook (Lefthook) over an agent-side hook (e.g. Claude Code `PreToolUse`) for the quality gate itself. A git hook covers every actor (human, other agents, other worker processes); an agent hook only fires inside its own session and can miss wrapper tasks, aliases, or indirect pushes like `gh pr create` via tool-call/command-string matching. When the repo contract already names the git hook as the full gate, do not add a second gate in an agent hook — that creates two definitions that can drift. Reserve agent hooks for agent-specific permission guards (e.g. a worker must not push at all), not for the quality gate.
+
 Use this split unless the repo contract says otherwise:
 
 - Put staged-file formatters and very fast linters in `pre-commit`.
@@ -68,6 +70,7 @@ When adding or updating Lefthook:
 - Preserve `.pre-commit-config.yaml` during a migration unless the user explicitly asks to remove it.
 - `lefthook run` can synchronize `.git/hooks`, and `stage_fixed: true` can stage modified files. Report that side effect when it occurs.
 - If a Lefthook child exits but the hook process remains or Ctrl-C does not return, set `piped: true` on that hook; verify a known-failing job returns nonzero and leaves no hook or child process behind.
+- Moving the gate to a git hook does not serialize concurrent pushes; two worktrees can push at the same time and run the gate at the same time. Git worktree isolation already keeps their typecheck/test results from cross-contaminating, so it is the first-line answer. Reach for `flock` around the gate command only when pushes from the same working tree can still race.
 
 Example shape, adapt commands to the repository:
 
