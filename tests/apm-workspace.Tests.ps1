@@ -705,24 +705,54 @@ Describe "public command surface" {
         $arguments += "--hidden"
       }
 
-      $previousTrustedPaths = $env:MISE_TRUSTED_CONFIG_PATHS
+      $previousEnvironment = @{
+        MISE_ENV = $env:MISE_ENV
+        MISE_CONFIG_FILE = $env:MISE_CONFIG_FILE
+        MISE_TRUSTED_CONFIG_PATHS = $env:MISE_TRUSTED_CONFIG_PATHS
+      }
       try {
+        Remove-Item Env:MISE_ENV -ErrorAction SilentlyContinue
+        Remove-Item Env:MISE_CONFIG_FILE -ErrorAction SilentlyContinue
         $env:MISE_TRUSTED_CONFIG_PATHS = $Directory
         $json = (& mise @arguments | Out-String)
         if ($LASTEXITCODE -ne 0) {
           throw "mise tasks --json failed for $Directory"
         }
 
-        # Drop tasks contributed by the host's global mise config; only this
-        # repository's own tasks are part of the contract under test.
-        @($json | ConvertFrom-Json | Where-Object { -not $_.global })
+        $directoryPath = (Resolve-Path -LiteralPath $Directory).Path
+        @($json | ConvertFrom-Json | Where-Object {
+          $source = [string]$_.source
+          if ([string]::IsNullOrWhiteSpace($source)) {
+            return $false
+          }
+
+          $sourceCandidate = if ([IO.Path]::IsPathRooted($source)) {
+            $source
+          }
+          else {
+            Join-Path $Directory $source
+          }
+          try {
+            $sourcePath = (Resolve-Path -LiteralPath $sourceCandidate -ErrorAction Stop).Path
+          }
+          catch {
+            return $false
+          }
+          $relative = [IO.Path]::GetRelativePath($directoryPath, $sourcePath)
+          $relative -ne "" -and
+            -not $relative.StartsWith("..$([IO.Path]::DirectorySeparatorChar)") -and
+            $relative -ne ".." -and
+            -not [IO.Path]::IsPathRooted($relative)
+        })
       }
       finally {
-        if ($null -eq $previousTrustedPaths) {
-          Remove-Item Env:MISE_TRUSTED_CONFIG_PATHS -ErrorAction SilentlyContinue
-        }
-        else {
-          $env:MISE_TRUSTED_CONFIG_PATHS = $previousTrustedPaths
+        foreach ($name in $previousEnvironment.Keys) {
+          if ($null -eq $previousEnvironment[$name]) {
+            Remove-Item "Env:$name" -ErrorAction SilentlyContinue
+          }
+          else {
+            Set-Item "Env:$name" $previousEnvironment[$name]
+          }
         }
       }
     }
@@ -856,16 +886,25 @@ Describe "public command surface" {
       param([object[]]$Tasks)
 
       $expectedCommands = @{
-        "apply" = "bash ./scripts/apm-workspace.sh apply"
-        "apply:skills:local" = "bash ./scripts/apm-workspace.sh apply:skills:local"
-        "format:markdown:bold-headings" = "bash ./scripts/format-bold-headings.sh write"
-        "format:markdown:bold-headings:check" = "bash ./scripts/format-bold-headings.sh check"
+        "apply" = @{ Path = "scripts/apm-workspace.sh"; Subcommand = "apply" }
+        "apply:skills:local" = @{ Path = "scripts/apm-workspace.sh"; Subcommand = "apply:skills:local" }
+        "format:markdown:bold-headings" = @{ Path = "scripts/format-bold-headings.sh"; Subcommand = "write" }
+        "format:markdown:bold-headings:check" = @{ Path = "scripts/format-bold-headings.sh"; Subcommand = "check" }
       }
       foreach ($entry in $expectedCommands.GetEnumerator()) {
         $task = Get-MiseTask -Tasks $Tasks -Name $entry.Key
         $run = @($task.run)
-        if ($run.Count -ne 1 -or $run[0] -ne $entry.Value) {
-          throw "Mise task '$($entry.Key)' is not connected to '$($entry.Value)'"
+        $tokens = if ($run.Count -eq 1 -and $run[0] -is [string]) {
+          $run[0].Trim() -split '\s+'
+        }
+        else {
+          @()
+        }
+        $hasScript = @($tokens | Where-Object {
+          $_.EndsWith($entry.Value.Path, [StringComparison]::OrdinalIgnoreCase)
+        }).Count -gt 0
+        if ($run.Count -ne 1 -or -not $hasScript -or $tokens -notcontains $entry.Value.Subcommand) {
+          throw "Mise task '$($entry.Key)' is not connected to $($entry.Value.Path) $($entry.Value.Subcommand)"
         }
       }
     }
@@ -884,6 +923,24 @@ Describe "public command surface" {
       Copy-Item -LiteralPath (Join-Path $workspaceRoot "mise.toml") -Destination (Join-Path $fixture "mise.toml")
       Copy-Item -LiteralPath (Join-Path $workspaceRoot "mise") -Destination (Join-Path $fixture "mise") -Recurse
       $fixture
+    }
+
+    function Add-MiseExternalTaskFixture {
+      param([string]$Fixture)
+
+      $outside = Join-Path $TestDrive "mise-fixture-outside-source"
+      New-Item -ItemType Directory -Path $outside -Force | Out-Null
+      @'
+["outside-source"]
+run = "echo outside"
+'@ | Set-Content -LiteralPath (Join-Path $outside "tasks.toml")
+
+      $misePath = Join-Path $Fixture "mise.toml"
+      $content = Get-Content -LiteralPath $misePath -Raw
+      $updated = $content.Replace(
+        '  "mise/format.toml",',
+        "  `"mise/format.toml`",`n  `"$outside/tasks.toml`",")
+      Set-Content -LiteralPath $misePath -Value $updated -NoNewline
     }
 
     function Update-MiseTaskBlock {
@@ -2020,6 +2077,74 @@ dependencies: []
     $hiddenTasks = Get-MiseTasksJson -Directory $workspaceRoot -Hidden
 
     { Assert-MiseCommandConnectionContract -Tasks $hiddenTasks } | Should -Not -Throw
+  }
+
+  It "excludes a task whose source is outside the target directory in a negative fixture" {
+    $fixture = New-MiseTaskFixture -Name "source-outside"
+    try {
+      Add-MiseExternalTaskFixture -Fixture $fixture
+      $previousEnvironment = @{
+        MISE_ENV = $env:MISE_ENV
+        MISE_CONFIG_FILE = $env:MISE_CONFIG_FILE
+        MISE_TRUSTED_CONFIG_PATHS = $env:MISE_TRUSTED_CONFIG_PATHS
+      }
+      try {
+        Remove-Item Env:MISE_ENV -ErrorAction SilentlyContinue
+        Remove-Item Env:MISE_CONFIG_FILE -ErrorAction SilentlyContinue
+        $env:MISE_TRUSTED_CONFIG_PATHS = $fixture
+        $rawJson = (& mise -C $fixture tasks --json --hidden | Out-String)
+      }
+      finally {
+        foreach ($name in $previousEnvironment.Keys) {
+          if ($null -eq $previousEnvironment[$name]) {
+            Remove-Item "Env:$name" -ErrorAction SilentlyContinue
+          }
+          else {
+            Set-Item "Env:$name" $previousEnvironment[$name]
+          }
+        }
+      }
+      $rawTasks = @($rawJson | ConvertFrom-Json)
+      @($rawTasks | Where-Object { $_.name -eq "outside-source" }).Count | Should -Be 1
+
+      $tasks = Get-MiseTasksJson -Directory $fixture -Hidden
+      @($tasks | Where-Object { $_.name -eq "outside-source" }).Count | Should -Be 0
+    }
+    finally {
+      Remove-Item -LiteralPath $fixture -Recurse -Force -ErrorAction SilentlyContinue
+    }
+  }
+
+  It "detects a mise task connected to another script in a negative fixture" {
+    $fixture = New-MiseTaskFixture -Name "command-other-script"
+    try {
+      Update-MiseTaskBlock -Path (Join-Path $fixture "mise.toml") -Name "apply" -Transform {
+        param($block)
+        $block -replace 'bash \.\/scripts\/apm-workspace\.sh apply', 'bash ./scripts/other.sh apply'
+      }
+      $hiddenTasks = Get-MiseTasksJson -Directory $fixture -Hidden
+
+      { Assert-MiseCommandConnectionContract -Tasks $hiddenTasks } | Should -Throw
+    }
+    finally {
+      Remove-Item -LiteralPath $fixture -Recurse -Force -ErrorAction SilentlyContinue
+    }
+  }
+
+  It "accepts a mise task script path without a leading ./" {
+    $fixture = New-MiseTaskFixture -Name "command-without-dot-slash"
+    try {
+      Update-MiseTaskBlock -Path (Join-Path $fixture "mise.toml") -Name "apply" -Transform {
+        param($block)
+        $block -replace 'bash \.\/scripts\/apm-workspace\.sh apply', 'bash scripts/apm-workspace.sh apply'
+      }
+      $hiddenTasks = Get-MiseTasksJson -Directory $fixture -Hidden
+
+      { Assert-MiseCommandConnectionContract -Tasks $hiddenTasks } | Should -Not -Throw
+    }
+    finally {
+      Remove-Item -LiteralPath $fixture -Recurse -Force -ErrorAction SilentlyContinue
+    }
   }
 
   It "keeps the bold heading runner behavior contract" {

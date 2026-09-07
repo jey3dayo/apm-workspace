@@ -16,25 +16,46 @@ setup() {
   SCRIPT_UNDER_TEST="$REPO_ROOT/scripts/apm-workspace.sh"
   source "$REPO_ROOT/scripts/apm-workspace.sh"
   mise_fixture=""
+  mise_external_source=""
 }
 
 teardown() {
   if [[ -n "${mise_fixture:-}" ]]; then
     rm -rf "$mise_fixture"
   fi
+  if [[ -n "${mise_external_source:-}" ]]; then
+    rm -rf "$mise_external_source"
+  fi
 }
 
 mise_tasks_json() {
   local directory="$1"
   shift
-  # Drop tasks contributed by the host's global mise config; only this
-  # repository's own tasks are part of the contract under test.
-  MISE_TRUSTED_CONFIG_PATHS="$directory" mise -C "$directory" tasks --json "$@" \
+  # Keep only tasks whose source file is under the directory under test. This
+  # excludes host overlays and tasks included from outside the fixture.
+  env -u MISE_ENV -u MISE_CONFIG_FILE MISE_TRUSTED_CONFIG_PATHS="$directory" \
+    mise -C "$directory" tasks --json "$@" \
     | node -e '
 const fs = require("node:fs");
+const path = require("node:path");
+const directory = fs.realpathSync(path.resolve(process.argv[1]));
 const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
-process.stdout.write(JSON.stringify(tasks.filter((task) => !task.global)));
-'
+const isUnderDirectory = (source) => {
+  if (typeof source !== "string" || source.length === 0) {
+    return false;
+  }
+  let sourcePath;
+  try {
+    sourcePath = fs.realpathSync(path.resolve(source));
+  }
+  catch {
+    return false;
+  }
+  const relative = path.relative(directory, sourcePath);
+  return relative !== "" && !relative.startsWith("..") && !path.isAbsolute(relative);
+};
+process.stdout.write(JSON.stringify(tasks.filter((task) => isUnderDirectory(task.source))));
+' "$directory"
 }
 
 node_json_assert() {
@@ -158,23 +179,27 @@ assert_mise_command_connections() {
   local tasks_json="$1"
   node_json_assert '
 const fs = require("node:fs");
-const { isDeepStrictEqual } = require("node:util");
 const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
-const args = process.argv.slice(1);
-for (let index = 0; index < args.length; index += 2) {
-  const name = args[index];
-  const expected = JSON.parse(args[index + 1]);
+const expected = [
+  ["apply", "scripts/apm-workspace.sh", "apply"],
+  ["apply:skills:local", "scripts/apm-workspace.sh", "apply:skills:local"],
+  ["format:markdown:bold-headings", "scripts/format-bold-headings.sh", "write"],
+  ["format:markdown:bold-headings:check", "scripts/format-bold-headings.sh", "check"],
+];
+for (const [name, scriptPath, subcommand] of expected) {
   const task = tasks.find(({ name: taskName }) => taskName === name);
-  if (!task || !isDeepStrictEqual(task.run, expected)) {
+  const run = task?.run;
+  const tokens = typeof run?.[0] === "string" ? run[0].trim().split(/\s+/) : [];
+  if (
+    !Array.isArray(run) ||
+    run.length !== 1 ||
+    !tokens.some((token) => token.endsWith(scriptPath)) ||
+    !tokens.includes(subcommand)
+  ) {
     process.exit(1);
   }
 }
-' \
-    apply '["bash ./scripts/apm-workspace.sh apply"]' \
-    apply:skills:local '["bash ./scripts/apm-workspace.sh apply:skills:local"]' \
-    format:markdown:bold-headings '["bash ./scripts/format-bold-headings.sh write"]' \
-    format:markdown:bold-headings:check '["bash ./scripts/format-bold-headings.sh check"]' \
-    <<<"$tasks_json"
+' <<<"$tasks_json"
 }
 
 new_mise_fixture() {
@@ -182,6 +207,15 @@ new_mise_fixture() {
   cp "$TEST_REPO_ROOT/mise.toml" "$mise_fixture/mise.toml"
   cp -R "$TEST_REPO_ROOT/mise" "$mise_fixture/mise"
   printf '%s\n' "$mise_fixture"
+}
+
+add_external_mise_task_fixture() {
+  mise_external_source="$(mktemp -d)"
+  printf '%s\n' '["outside-source"]' 'run = "echo outside"' >"$mise_external_source/tasks.toml"
+  local includes
+  printf -v includes '  "mise/format.toml",\n  "%s/tasks.toml",\n' "$mise_external_source"
+  rewrite_mise_fixture "$mise_fixture/mise.toml" \
+    '  "mise/format.toml",\r?\n' "$includes" ''
 }
 
 # --- validate_skill_id -------------------------------------------------------
@@ -431,6 +465,39 @@ EOF
 
 @test "mise tasks connect to the expected workspace commands" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
+  run assert_mise_command_connections "$tasks_json"
+  [ "$status" -eq 0 ]
+}
+
+@test "negative fixture excludes a task whose source is outside the target directory" {
+  new_mise_fixture >/dev/null
+  add_external_mise_task_fixture
+  raw_json="$(env -u MISE_ENV -u MISE_CONFIG_FILE MISE_TRUSTED_CONFIG_PATHS="$mise_fixture" \
+    mise -C "$mise_fixture" tasks --json --hidden)"
+  run assert_public_mise_tasks "$raw_json" outside-source
+  [ "$status" -eq 0 ]
+
+  tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
+  run assert_public_mise_tasks "$tasks_json" outside-source
+  [ "$status" -ne 0 ]
+}
+
+@test "negative fixture detects a mise task connected to another script" {
+  new_mise_fixture >/dev/null
+  rewrite_mise_fixture "$mise_fixture/mise.toml" \
+    'bash \./scripts/apm-workspace\.sh apply' \
+    'bash ./scripts/other.sh apply' ''
+  tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
+  run assert_mise_command_connections "$tasks_json"
+  [ "$status" -ne 0 ]
+}
+
+@test "command connection contract accepts a path without a leading ./" {
+  new_mise_fixture >/dev/null
+  rewrite_mise_fixture "$mise_fixture/mise.toml" \
+    'bash \./scripts/apm-workspace\.sh apply' \
+    'bash scripts/apm-workspace.sh apply' ''
+  tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
   run assert_mise_command_connections "$tasks_json"
   [ "$status" -eq 0 ]
 }
