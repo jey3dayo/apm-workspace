@@ -49,15 +49,16 @@ dependencies:
     - tt-a1i/archify/archify#c6519401f7b91b9d43011657880893b0a8955548
     - anthropics/claude-code/plugins/frontend-design/skills/frontend-design#ab9b2cf7bb9e4f98ff264c07a22e46d83c29c558
 
-    - openai/skills/skills/.curated/screenshot # openai/skills is deprecated; no migrated equivalent found in openai/plugins yet
+    - openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431 # openai/skills is deprecated; no migrated equivalent found in openai/plugins yet
 
     # --- design ---
     - benjitaylor/agentation/skills/agentation#8158a97c10c37e577b0a6e2d3175d143918216cd
     - benjitaylor/agentation/skills/agentation-self-driving#8158a97c10c37e577b0a6e2d3175d143918216cd
     - git: nextlevelbuilder/ui-ux-pro-max-skill
+      ref: 4aad0584d92131626b16d4ff4d77f0455385013c
       skills:
         - ui-ux-pro-max
-    - Jakubantalik/transitions-dev/skills/transitions-dev
+    - Jakubantalik/transitions-dev/skills/transitions-dev#038b0bdc75375c2beed51d1e824c98cdc7b86f8c
     - emilkowalski/skills/skills/apple-design#d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
     - emilkowalski/skills/skills/emil-design-eng#d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
     - emilkowalski/skills/skills/find-animation-opportunities#d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
