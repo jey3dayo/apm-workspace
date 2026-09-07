@@ -43,13 +43,13 @@ bundle and install only the required sub-skill from the consuming repository.
 
 Classify work before running a rollout:
 
-| Intent                 | Command                       | Constraint                                                       |
-| ---------------------- | ----------------------------- | ---------------------------------------------------------------- |
-| Stable rollout         | `mise run deploy`             | Preserves manifest and lock.                                     |
-| Upstream refresh       | `mise run upgrade`            | Intentionally accepts newer content; review `apm.lock.yaml`.     |
-| Local Codex skill sync | `mise run apply:skills:local` | Does not replace a normal rollout.                               |
-| Validation only        | `mise run check`              | Does not deploy.                                                 |
-| Deep verification      | `mise run verify`             | Runs checks, both script suites, and catalog smoke verification. |
+| Intent                 | Command                       | Constraint                                                                                                   |
+| ---------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Stable rollout         | `mise run deploy`             | Preserves the manifest. Does not force an upstream refresh, but unpinned deps re-resolve when re-downloaded. |
+| Upstream refresh       | `mise run upgrade`            | Intentionally accepts newer content; review `apm.lock.yaml`.                                                 |
+| Local Codex skill sync | `mise run apply:skills:local` | Does not replace a normal rollout.                                                                           |
+| Validation only        | `mise run check`              | Does not deploy.                                                                                             |
+| Deep verification      | `mise run verify`             | Runs checks, both script suites, and catalog smoke verification.                                             |
 
 `mise run deploy` is the normal end-to-end entry point (`check`, `apply`, and
 `doctor`). `mise run refresh:deploy` is broader and should not be substituted
