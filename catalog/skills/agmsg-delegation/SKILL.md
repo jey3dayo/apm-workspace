@@ -86,7 +86,7 @@ review role の reviewer モデル指定は本スキル内の一時的な model 
 ### 1. Preflight
 
 - worker runtime の CLI 存在を確認: `command -v codex` / `command -v claude`。Claude は `command -v sandbox-exec` も必須
-- agmsg bootstrap 済みを確認（`~/.agents/skills/agmsg/` が存在）
+- agmsg bootstrap 済みを確認（`~/.agents/skills/agmsg/` が存在）。**state を持つ face は `~/.agents/skills/agmsg` だけである。** agmsg は `db` / `teams` を実行された script 自身の dir から解決し、上流の `SKILL.md` は全コマンドを `~/.agents/skills/agmsg/scripts/...` の絶対パスで書くため、`~/.claude/skills/agmsg` など他 face に `db` / `teams` が無いのは仕様であり不具合ではない。他 face へ手で symlink を張らない——deploy target の内側なので次の `apm apply` で消え、実体を書いた場合は save に吸い上げられず削除される。link の正本は `~/.apm` の `scripts/agmsg-state.sh`
 - role/runtime 別の起動コマンドを確定する。review は書込権限を実行時に強制する:
 
 | role      | Claude                                                    | Codex                                                                                                                                                   |
