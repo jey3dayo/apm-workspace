@@ -29,7 +29,7 @@ description: >-
 | Reviewer  | SHA 固定 code review / 設計文書 review                                                                                                 | Fable（明示指定時、fallback Opus）                    | `gpt-5.6-sol` 既定。読む量が多いレビューはコストを下げて `gpt-5.6-terra` + effort high。`gpt-6-astra` は明示指定時のみ | Orchestrator 機能を担う側（Steward または Architect）。spawn 経路と pane 経路の両方可 |
 | Worker    | 実装（設計済みタスク）                                                                                                                 | `sonnet`（Agent `implementer`、Worker の昇格 `opus`） | `gpt-5.6-luna` xhigh（Worker の昇格 max → `gpt-5.6-terra`）                                                            | Orchestrator 機能を担う側                                                             |
 
-**「Orchestrator」は役ではなく機能。** 表の Steward / Architect のうち、後述の許可条件を満たす側が担う。Terra は Architect・Reviewer・Worker の昇格に残る。
+**「Orchestrator」は役ではなく機能。** 表の Steward / Architect のうち、後述の許可条件を満たす側が担う。Terra は Architect・Reviewer・Worker の昇格に就く。
 
 **Codex 側の Steward は `gpt-5.6-luna` のみで、明示ポリシーとして常に Orchestrator 機能を持たない。Codex Steward は handoff 専用と扱う。** Codex 側に Opus 相当の中間 tier（terra）を Steward に置くかはユーザー判断に委ね、本スキルでは追加しない。
 
@@ -87,7 +87,7 @@ tier は能力とコストの属性であり、検証の独立性（後述「Rev
 
 **最終報告は、依頼が来た経路へ返す。** 人間から直接受けた Steward / Architect は人間へ直接報告する。Steward の handoff で受けた Architect は Steward へ handoff 書式で返し、Steward が人間へ伝える。Architect が人間と直接話すこと自体は禁止しない（自己判定規則 3 の既定でそうなる）。
 
-「起動する側: 人間（pane）」は Steward と Architect の両方に残る。どの pane に誰が常駐し、人間がどちらに話しかけるかという topology はユーザーが用意する前提であり、本スキルは pane を作らない。
+Steward と Architect はどちらも人間が pane から起動する。どの pane に誰が常駐し、人間がどちらに話しかけるかという topology はユーザーが用意する前提であり、本スキルは pane を作らない。
 
 完了条件: 自分がどの役かを言語化できている。
 
@@ -99,12 +99,12 @@ Steward は人間が最初に話す相手であり、応答の滑らかさが人
 
 ### 自分で答えてよい範囲（Q2）
 
-§2「Orchestrator が自分で処理する」の範囲に、状態確認・説明を加えたものが Steward の応答範囲になる。
-
 - 1ファイルの軽微修正、typo、設定値の変更
 - 調査・探索のみで編集を伴わないもの（下記トリガー 4 の bounded scan で範囲が閉じるもの）
 - 既存の決定・仕様・スキル・設定の**説明**（何が書いてあるか、どう使うか）
 - 状態確認と操作の代行: `git status`、inbox、pane 状態、`--help`、価格/version などの事実照会、図・表の読解
+
+§2 は Worker への委譲可否を扱う。Steward の設計・方針決定は Q1 に従う。通常の説明・確認対話は上記範囲に含む。
 
 ### handoff するトリガー（Q1）
 
@@ -154,6 +154,8 @@ Reviewer の起動経路（spawn / pane 常駐）と強制境界の詳細は `ag
 
 完了条件: 委譲する / しない のどちらかを、上の条件を根拠に宣言した。
 
+**「設計方針が確定している」は、並列タスク間でも成り立つ必要がある。** 触るファイル集合が互いに素でも、2 つのタスクがそれぞれ同じ規約（命名、エラーの形、型の設計）を自分で決めなければ実装できないなら、方針はまだ確定していない。Worker は互いの成果を見られないため、各自が単体では妥当な判断をしても、組み合わせた結果が食い違う。対処は直列化ではなく、その規約をタスク文に書いて渡すことである。
+
 ## 3. 最小単位へ切る
 
 委譲前にタスクを分割する。切り方の判定基準は 2 つだけで、どちらも機械的に確認できる。
@@ -187,7 +189,7 @@ Agent(subagent_type: "implementer", prompt: <タスク定義>)
 
 Codex:
 
-Codex では、`spawn_agent` から `gpt-5.6-luna` を明示指定できる。モデル上書き時は `fork_turns: "none"` を使い、Luna は leaf worker として実装だけを担当させる。Luna の子には collaboration tools が公開されないため、再帰的な委譲・分解・検証は Orchestrator 機能側が担う（経緯は [references/codex-spawn-model-bug.md](references/codex-spawn-model-bug.md)）。
+Codex では、`spawn_agent` から `gpt-5.6-luna` を明示指定できる。モデル上書き時は `fork_turns: "none"` を使い、Luna は leaf worker として実装だけを担当させる。Luna の子には collaboration tools が公開されないため、再帰的な委譲・分解・検証は Orchestrator 機能側が担う。`multi_agent_v2 = false` での V1 固定や `model_catalog_json` の上書きは、カタログ改変に当たるため使わない。
 
 Codex native の `spawn_agent` を標準経路とする。native spawn が利用できない環境、別セッション・別プロセスへの引き継ぎ、または native runtime の制約を回避する必要がある場合だけ `agmsg-delegation` へ切り替える。worker の reasoning effort は既定 `xhigh`（Terra high 相当の品質を最安で得るための設定）。別プロセス起動の手順・境界・片付けは `agmsg-delegation` の Lifecycle が正本で、本スキルでは繰り返さない。
 
