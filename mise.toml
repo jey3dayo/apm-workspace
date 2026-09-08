@@ -52,8 +52,9 @@ run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts
 
 [tasks."agmsg:state:save"]
 description = "Move the agmsg roster out of the deploy target before it is rewritten"
-# Recovery adapter only: apply owns save/restore on every exit path.
-# Run by hand to relink a roster unlinked outside of apply.
+# Hidden on purpose: apply owns save/restore on every exit path, and running
+# save alone leaves the roster unlinked from the deploy target until a
+# restore puts it back.
 hide = true
 run = "bash ./scripts/agmsg-state.sh save"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/agmsg-state.ps1 save"
