@@ -71,6 +71,7 @@
 - pane / workspace を勝手に作らない。ユーザーが「用意して」と指示したときだけ、`herdr` スキルの `pane split --focus` → `pane run` → `pane process-info` で読み戻す手順で作る。読み戻していないプロセス名を報告に書かない
 - spawn 面の制約で組み込み経路が塞がっている場合は `agmsg-delegation` スキルへ切り替える
 - エージェント / セッション間の引き継ぎ（CC → Codex 等）は transport に `agmsg` を使い、本文は `agmsg-delegation` の引き継ぎメッセージ書式（artifact は参照渡し・suggested skills・secrets redact・次セッションの目的に合わせる）に従う
+- agmsg が全断（`team.sh` が `Team not found`、`identities.sh` が空）したら、原因を症状から断定せず `~/.apm` で `mise run doctor` の agmsg 判定を読む。plain path が1つでもあれば手で突き合わせるまで復旧せず、plain path が無いと確認できたときだけ `mise run agmsg:state:restore` を実行する。手で `ln -s` は張らない
 - Worker の `DONE` は未検証の申告として扱う。Orchestrator が実際の比較元を確定し、差分、変更対象、要求との対応を独立に確認する
 - DoD に定める full gate は Orchestrator が実行し、Worker の実行報告では代替しない
 - タスクで明示されていない依存 version、manifest、lockfile の変更は、要求上の必要性を確認できない限り採用しない

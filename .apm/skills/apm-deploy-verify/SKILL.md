@@ -24,13 +24,25 @@ catalog 変更後の検証は判断を含まない機械作業なので、Orches
    diff -q <catalog>/skills/<skill>/SKILL.md ~/.claude/skills/<skill>/SKILL.md
    ```
 
-4. `agmsg-delegation` の runtime asset（scripts/・WORKER.md・agmsg-review.config.toml）を変更した場合のみ smoke を実行する。項目と合否基準は `agmsg-delegation` Preflight の「初回利用前の smoke 5点」が正本
-5. smoke の合否判定は worker モデルの自己申告でなく、ファイルシステムの実体で行う（touch したファイルの存在確認、拒否されるべき書込先にファイルが無いこと）。worker は書込失敗時でも成功を報告した実績がある
+4. agmsg roster link の到達性を確認する。確認対象は canonical face のみ。判定は `db` / `teams` の個別状態を見て `ls -l` でその場で二分するのではなく、両方を見た集約結果を持つ `~/.apm` の `mise run doctor` に一元化する:
+
+   ```bash
+   cd ~/.apm && mise run doctor
+   ```
+
+   他の face（`~/.claude/skills/agmsg` など）に `db` / `teams` が無いのは仕様であり、張ってはいけない。doctor の agmsg 判定に応じて対応する:
+   - db/teams とも symlink で正しい target を指していれば通過
+   - doctor の復旧推奨に `mise run agmsg:state:restore` が**含まれない**（plain path を含む集約結果）場合は実行しない。db または teams のどちらかが symlink ではなく plain なディレクトリ/ファイルで、断線中に書かれた roster 更新を保持している可能性があり、restore は state root 側で上書きし discard しうる（同名ファイルは store 優先でマージされ、plain 側は削除される）。先に中身を `${XDG_STATE_HOME:-$HOME/.local/state}/agmsg/<name>` と手動で突き合わせ、必要な差分を反映してから relink する
+   - doctor の復旧推奨に `mise run agmsg:state:restore` が含まれる（missing / dangling / wrong-target のみで plain path が無い）場合は、失うものが無いのでそのまま `~/.apm` で実行してよい。手で `ln -s` を張らない
+
+5. `agmsg-delegation` の runtime asset（scripts/・WORKER.md・agmsg-review.config.toml）を変更した場合のみ smoke を実行する。項目と合否基準は `agmsg-delegation` Preflight の「初回利用前の smoke 5点」が正本
+6. smoke の合否判定は worker モデルの自己申告でなく、ファイルシステムの実体で行う（touch したファイルの存在確認、拒否されるべき書込先にファイルが無いこと）。worker は書込失敗時でも成功を報告した実績がある
 
 ## 報告
 
 - 実行したコマンドと結果（通過 / 失敗）を列挙する
 - 配布一致は skill 名ごとに一致 / 不一致を明記する
+- agmsg roster link は canonical face の `db` / `teams` の symlink 先を明記する
 - smoke を実行した場合は、実体確認したパスと結果を添える
 - 失敗があっても自分で修正しない。失敗ログをそのまま呼び出し元へ返す
 
