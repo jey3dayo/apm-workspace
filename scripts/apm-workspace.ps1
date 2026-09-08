@@ -1941,15 +1941,45 @@ function Invoke-AgmsgStateSave {
 }
 
 function Invoke-AgmsgStateRestore {
-  # Never throws: this runs from a `finally`, where a new exception here
-  # would replace whatever the try block was already failing with. Failure
-  # is still visible — agmsg-state.ps1 writes its own warning/error to
-  # stderr — and recoverable via the `agmsg:state:restore` mise task.
+  # Never throws: use this variant only when the enclosing `try` is already
+  # failing (i.e. from a `finally` recovering after an exception), where a
+  # new exception here would replace whatever the try block was actually
+  # failing with. Failure is still surfaced with a warning, and recoverable
+  # via the `agmsg:state:restore` mise task -- it is just never allowed to
+  # mask the original error. Use Invoke-AgmsgStateRestoreOrThrow instead on
+  # the normal-completion path, where a restore failure must not be swallowed.
+  #
+  # agmsg-state.ps1 runs under $ErrorActionPreference = "Stop", and nothing
+  # inside its `restore` path (store creation, absorb, cleanup) has a
+  # top-level catch of its own -- a terminating error there propagates out
+  # of the `& $agmsgStateScript restore` call as a real exception, not just a
+  # non-zero $LASTEXITCODE. This function's never-throw contract requires
+  # catching that case too, or the outer `finally` recovering from the
+  # original failure would have its exception replaced by this one.
+  $agmsgStateScript = Join-Path $PSScriptRoot "agmsg-state.ps1"
+  try {
+    & $agmsgStateScript restore
+    if ($LASTEXITCODE -ne 0) {
+      Write-WarnLine "agmsg roster restore failed (exit $LASTEXITCODE); run 'mise run agmsg:state:restore' to recover."
+    }
+  }
+  catch {
+    Write-WarnLine "agmsg roster restore failed while recovering from a failed command: $($_.Exception.Message); run 'mise run agmsg:state:restore' to recover."
+  }
+}
+
+function Invoke-AgmsgStateRestoreOrThrow {
+  # Restore agmsg's roster symlinks and throw if either the restore script
+  # errors or the roster link postcondition (Test-AgmsgRosterLink) is not
+  # satisfied afterward. A zero exit code from agmsg-state.ps1 alone is not
+  # proof the roster ended up linked correctly, so this checks what callers
+  # actually depend on. Use on the normal-completion path only.
   $agmsgStateScript = Join-Path $PSScriptRoot "agmsg-state.ps1"
   & $agmsgStateScript restore
   if ($LASTEXITCODE -ne 0) {
-    Write-WarnLine "agmsg roster restore failed (exit $LASTEXITCODE); run 'mise run agmsg:state:restore' to recover."
+    throw "agmsg roster restore failed (exit $LASTEXITCODE); run 'mise run agmsg:state:restore' to recover."
   }
+  Test-AgmsgRosterLink
 }
 
 function Invoke-Apply {
@@ -1966,6 +1996,13 @@ function Invoke-Apply {
   Invoke-AgmsgStateSave
 
   $stageDir = New-TemporaryDirectory -Prefix "apm-apply"
+  # Tracks whether the try block ran to completion, so the outer `finally`
+  # below can tell a normal-completion restore (which must not swallow a
+  # failure -- Invoke-AgmsgStateRestoreOrThrow) from a failure-recovery
+  # restore (which must never replace the exception already in flight --
+  # Invoke-AgmsgStateRestore). PowerShell's `finally` always runs and has no
+  # built-in way to distinguish the two paths.
+  $applySucceeded = $false
   try {
     try {
       $null = Build-TargetSkillTrees -StageRoot $stageDir
@@ -1981,10 +2018,10 @@ function Invoke-Apply {
       # roster stays unlinked until the outer `finally`'s restore runs.
       # Relinking here immediately shrinks that unlinked window to roughly
       # the swap itself instead of the rest of Invoke-Apply (legacy cleanup,
-      # private overlay). The outer restore stays as the failure-path
-      # guarantee: it is idempotent, so relinking twice on the success path
-      # is harmless.
-      Invoke-AgmsgStateRestore
+      # private overlay). A failed restore or an unmet link postcondition
+      # here throws (via Invoke-AgmsgStateRestoreOrThrow), which the outer
+      # `finally` below still catches as a failure-recovery restore.
+      Invoke-AgmsgStateRestoreOrThrow
       Remove-LegacyWorkspaceSkillTargets
     }
     finally {
@@ -1994,9 +2031,15 @@ function Invoke-Apply {
     }
 
     Sync-PrivateSkillsIntoTargets
+    $applySucceeded = $true
   }
   finally {
-    Invoke-AgmsgStateRestore
+    if ($applySucceeded) {
+      Invoke-AgmsgStateRestoreOrThrow
+    }
+    else {
+      Invoke-AgmsgStateRestore
+    }
   }
 }
 
@@ -2041,6 +2084,11 @@ function Invoke-SyncLocalSkills {
 
   $targets = @(Get-LocalCodexSyncTarget)
   $stageDir = New-TemporaryDirectory -Prefix "apm-sync-local"
+  # See Invoke-Apply for why this flag exists: it lets the outer `finally`
+  # choose Invoke-AgmsgStateRestoreOrThrow (normal completion, must not
+  # swallow a restore failure) over Invoke-AgmsgStateRestore
+  # (failure-recovery, must not replace the exception already in flight).
+  $syncSucceeded = $false
 
   try {
     try {
@@ -2071,9 +2119,15 @@ function Invoke-SyncLocalSkills {
         Remove-Item -LiteralPath $stageDir -Recurse -Force -ErrorAction SilentlyContinue
       }
     }
+    $syncSucceeded = $true
   }
   finally {
-    Invoke-AgmsgStateRestore
+    if ($syncSucceeded) {
+      Invoke-AgmsgStateRestoreOrThrow
+    }
+    else {
+      Invoke-AgmsgStateRestore
+    }
   }
 
   Write-Host ("Synced local catalog/private skills to Codex target: {0}" -f ((@($skillRecords | ForEach-Object SourceSkillId)) -join ", "))
@@ -2188,6 +2242,103 @@ function Test-CodexSkillTargetTree {
       Write-ErrorLine $path
     }
     throw ("Nested Codex skill files found under {0}. Run 'mise run apply:skills:local' to refresh the target.`n{1}" -f $targetSkillsRoot, ($sortedNestedSkills -join "`n"))
+  }
+}
+
+# Extracted so Invoke-Doctor's tests can Mock these two seams the same way
+# they Mock Get-CodexSkillTargetRoot, instead of exercising this machine's
+# real $HOME/.agents/skills/agmsg on every unrelated Invoke-Doctor test.
+function Get-AgmsgSkillDir {
+  return (Join-Path (Join-Path (Join-Path $HOME ".agents") "skills") "agmsg")
+}
+
+function Get-AgmsgStateRoot {
+  if ($env:XDG_STATE_HOME) { return (Join-Path $env:XDG_STATE_HOME "agmsg") }
+  return (Join-Path $HOME ".local/state/agmsg")
+}
+
+# agmsg resolves db/ and teams/ relative to its own script directory
+# ($HOME/.agents/skills/agmsg), so those two entries must stay symlinks into
+# $XDG_STATE_HOME/agmsg (see scripts/agmsg-state.ps1:34). If anything outside
+# `apply` replaces a link with a plain dir or removes it, agmsg's error
+# messages ("Team not found", empty identities) give no hint that the link
+# itself is the problem -- the real db/teams data is untouched. Doctor checks
+# the canonical face only; other deployed faces (e.g. ~/.claude/skills/agmsg)
+# never carry db/teams and are not examined here.
+#
+# Per-item diagnostics stay separate from the recovery recommendation: db and
+# teams are each judged healthy / plain-path / missing / dangling /
+# wrong-target below, but the recommendation to run `mise run
+# agmsg:state:restore` is emitted at most once, from the aggregate of both
+# items. `agmsg:state:restore` relinks db and teams together, so naming it
+# from a single item's branch is wrong whenever the *other* item is a plain
+# path holding roster writes made while the link was severed: following that
+# per-item advice would run the restore anyway and let its absorb-and-discard
+# path clobber the plain path's contents in favor of the state root. See
+# scripts/agmsg-state.ps1's absorb-plain-dir handling.
+function Test-AgmsgRosterLink {
+  $agmsgSkillDir = Get-AgmsgSkillDir
+  if (-not (Test-Path -LiteralPath $agmsgSkillDir)) {
+    return
+  }
+
+  $agmsgStateRoot = Get-AgmsgStateRoot
+  $issues = New-Object System.Collections.Generic.List[string]
+  $hasPlainPath = $false
+  $hasOtherIssue = $false
+
+  foreach ($runtimeDir in @("db", "teams")) {
+    $linkPath = Join-Path $agmsgSkillDir $runtimeDir
+    $expectedTarget = Join-Path $agmsgStateRoot $runtimeDir
+    $item = Get-Item -LiteralPath $linkPath -Force -ErrorAction SilentlyContinue
+    if (-not $item) {
+      $issues.Add("agmsg roster link is missing: $linkPath.")
+      $hasOtherIssue = $true
+      continue
+    }
+    if (-not ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint)) {
+      # Unlike the other three issues below, nothing is lost here yet: a
+      # plain directory can hold roster writes made while the link was
+      # severed (see scripts/agmsg-state.ps1's absorb-plain-dir handling).
+      $issues.Add("agmsg roster link is a plain path, not a symlink: $linkPath. This may hold roster updates written while the link was severed.")
+      $hasPlainPath = $true
+      continue
+    }
+    $actualTarget = $item.Target
+    if ($actualTarget -is [System.Array]) {
+      $actualTarget = $actualTarget[0]
+    }
+    # $expectedTarget and agmsg-state.ps1's own $StateRoot literal both mix
+    # "/" and "\" (Join-Path only normalizes the separator it inserts, not
+    # ones already embedded in a segment such as ".local/state/agmsg"), while
+    # $item.Target reports the link's actual on-disk target with a single
+    # separator style. Compare on separator-normalized strings so a healthy
+    # link isn't misreported as pointing at the wrong target.
+    $normalizedActual = $actualTarget -replace '[\\/]+', '/'
+    $normalizedExpected = $expectedTarget -replace '[\\/]+', '/'
+    if ($normalizedActual -ne $normalizedExpected) {
+      $issues.Add("agmsg roster link points at the wrong target: $linkPath -> $actualTarget (expected $expectedTarget).")
+      $hasOtherIssue = $true
+      continue
+    }
+    # Test-Path without -PathType can report a dangling directory symlink as
+    # present on this platform's FileSystem provider, so check the resolved
+    # target's actual existence directly rather than trust that default.
+    if (-not (Test-Path -LiteralPath $linkPath -PathType Container)) {
+      $issues.Add("agmsg roster link is dangling (target does not exist): $linkPath -> $actualTarget.")
+      $hasOtherIssue = $true
+    }
+  }
+
+  if ($hasPlainPath) {
+    $issues.Add("agmsg roster link recovery: at least one of db/teams under $agmsgSkillDir is a plain path that may hold roster updates written while the link was severed. Automatically relinking db and teams together risks discarding those updates by absorbing the plain path into the state root instead of merging it. Inspect its contents and reconcile them with the agmsg state root by hand before relinking.")
+  }
+  elseif ($hasOtherIssue) {
+    $issues.Add("agmsg roster link recovery: run 'mise run agmsg:state:restore' to relink db/teams under $agmsgSkillDir.")
+  }
+
+  if ($issues.Count -gt 0) {
+    throw ($issues -join "`n")
   }
 }
 
@@ -2931,6 +3082,13 @@ function Invoke-Doctor {
   $codexMcpConfigPath = Join-Path (Join-Path $HOME ".codex") "config.toml"
   try {
     Test-CodexSkillTargetTree
+  }
+  catch {
+    $diagnostics.Add($_.Exception.Message)
+  }
+
+  try {
+    Test-AgmsgRosterLink
   }
   catch {
     $diagnostics.Add($_.Exception.Message)

@@ -1106,7 +1106,12 @@ EOF
 }
 
 doctor_fixture_env() {
-  env HOME="$doctor_home" PATH="$doctor_bin:$PATH" APM_WORKSPACE_DIR="$doctor_workspace_dir" "$@"
+  # Pin XDG_STATE_HOME into the fixture explicitly: agmsg-state.sh (and the
+  # doctor check mirroring it) fall back to "$HOME/.local/state" only when
+  # XDG_STATE_HOME is unset, but this session's real XDG_STATE_HOME is set
+  # and would otherwise leak in here, making the agmsg roster link check
+  # compare against the live machine's state root instead of the fixture's.
+  env HOME="$doctor_home" XDG_STATE_HOME="$doctor_home/.local/state" PATH="$doctor_bin:$PATH" APM_WORKSPACE_DIR="$doctor_workspace_dir" "$@"
 }
 
 @test "validate ignores nested deployed Codex skills" {
@@ -1175,6 +1180,301 @@ doctor_fixture_env() {
   [ "$status" -eq 0 ]
   [[ "$output" == *"opencode: config=present agents=present commands=present rules=present skills=n/a"* ]]
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+# --- doctor agmsg roster link reachability -----------------------------------
+#
+# agmsg resolves db/ and teams/ relative to $HOME/.agents/skills/agmsg, which
+# `apm apply` keeps symlinked into $XDG_STATE_HOME/agmsg (see
+# scripts/agmsg-state.sh:16). If that link is absorbed into a plain dir or
+# dropped by anything outside apply, agmsg's own errors ("Team not found",
+# empty identities) give no hint the link is the actual cause. These tests
+# never touch the real $HOME roster — everything runs inside the fake
+# $doctor_home fixture.
+
+@test "doctor skips the agmsg roster link check when the agmsg skill face is not deployed" {
+  make_doctor_fixture
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"agmsg roster link"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "doctor passes when the agmsg roster link correctly points into the state root" {
+  make_doctor_fixture
+  agmsg_skill_dir="$doctor_home/.agents/skills/agmsg"
+  agmsg_state_root="$doctor_home/.local/state/agmsg"
+  mkdir -p "$agmsg_state_root/db" "$agmsg_state_root/teams" "$agmsg_skill_dir"
+  ln -s "$agmsg_state_root/db" "$agmsg_skill_dir/db"
+  ln -s "$agmsg_state_root/teams" "$agmsg_skill_dir/teams"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"agmsg roster link"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "doctor fails on a plain-dir agmsg db link without naming agmsg:state:restore" {
+  make_doctor_fixture
+  agmsg_skill_dir="$doctor_home/.agents/skills/agmsg"
+  agmsg_state_root="$doctor_home/.local/state/agmsg"
+  mkdir -p "$agmsg_state_root/db" "$agmsg_state_root/teams" "$agmsg_skill_dir/db"
+  ln -s "$agmsg_state_root/teams" "$agmsg_skill_dir/teams"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"agmsg roster link is a plain path"* ]]
+  [[ "$output" == *"$agmsg_skill_dir/db"* ]]
+  # A plain dir can hold roster updates written while the link was severed;
+  # naming agmsg:state:restore here would steer straight at the absorb-and-
+  # discard path that can lose them (indicator 2 in the review), so this
+  # case must not suggest it.
+  [[ "$output" != *"mise run agmsg:state:restore"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "doctor fails and names agmsg:state:restore when the agmsg db link is dangling" {
+  make_doctor_fixture
+  agmsg_skill_dir="$doctor_home/.agents/skills/agmsg"
+  agmsg_state_root="$doctor_home/.local/state/agmsg"
+  mkdir -p "$agmsg_state_root/teams" "$agmsg_skill_dir"
+  ln -s "$agmsg_state_root/db" "$agmsg_skill_dir/db"
+  ln -s "$agmsg_state_root/teams" "$agmsg_skill_dir/teams"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"agmsg roster link is dangling"* ]]
+  [[ "$output" == *"$agmsg_skill_dir/db"* ]]
+  [[ "$output" == *"mise run agmsg:state:restore"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "doctor fails and names agmsg:state:restore when the agmsg teams link is missing" {
+  make_doctor_fixture
+  agmsg_skill_dir="$doctor_home/.agents/skills/agmsg"
+  agmsg_state_root="$doctor_home/.local/state/agmsg"
+  mkdir -p "$agmsg_state_root/db" "$agmsg_state_root/teams" "$agmsg_skill_dir"
+  ln -s "$agmsg_state_root/db" "$agmsg_skill_dir/db"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"agmsg roster link is missing"* ]]
+  [[ "$output" == *"$agmsg_skill_dir/teams"* ]]
+  [[ "$output" == *"mise run agmsg:state:restore"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+# The next three tests cover the mixed db/teams cases the aggregate
+# recommendation exists for: `mise run agmsg:state:restore` relinks db and
+# teams together, so a per-item recommendation is wrong whenever the *other*
+# item is a plain path holding roster writes made while the link was
+# severed -- following it would run the restore anyway and let its
+# absorb-and-discard path clobber the plain path's contents.
+
+@test "doctor names agmsg:state:restore for neither item when db is a plain path and teams is missing" {
+  make_doctor_fixture
+  agmsg_skill_dir="$doctor_home/.agents/skills/agmsg"
+  agmsg_state_root="$doctor_home/.local/state/agmsg"
+  mkdir -p "$agmsg_state_root/db" "$agmsg_state_root/teams" "$agmsg_skill_dir/db"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"agmsg roster link is a plain path"* ]]
+  [[ "$output" == *"agmsg roster link is missing"* ]]
+  [[ "$output" != *"mise run agmsg:state:restore"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "doctor names agmsg:state:restore for neither item when db is missing and teams is a plain path" {
+  make_doctor_fixture
+  agmsg_skill_dir="$doctor_home/.agents/skills/agmsg"
+  agmsg_state_root="$doctor_home/.local/state/agmsg"
+  mkdir -p "$agmsg_state_root/db" "$agmsg_state_root/teams" "$agmsg_skill_dir/teams"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"agmsg roster link is missing"* ]]
+  [[ "$output" == *"agmsg roster link is a plain path"* ]]
+  [[ "$output" != *"mise run agmsg:state:restore"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "doctor names agmsg:state:restore when db and teams are both missing (no plain path)" {
+  make_doctor_fixture
+  agmsg_skill_dir="$doctor_home/.agents/skills/agmsg"
+  agmsg_state_root="$doctor_home/.local/state/agmsg"
+  mkdir -p "$agmsg_state_root/db" "$agmsg_state_root/teams" "$agmsg_skill_dir"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"agmsg roster link is missing: $agmsg_skill_dir/db"* ]]
+  [[ "$output" == *"agmsg roster link is missing: $agmsg_skill_dir/teams"* ]]
+  [[ "$output" == *"mise run agmsg:state:restore"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+# --- apply / apply:skills:local agmsg restore failure handling -------------
+#
+# cmd_apply and cmd_sync_local_skills must not swallow an
+# agmsg-state.sh restore failure with `|| true` on the normal-completion
+# path, and must preserve the original failure (only reporting, never
+# masking, a recovery-restore failure) on the abnormal EXIT-trap path. These
+# reuse tests/conformance/build-fixture.sh's build_apply_fixture, the same
+# fixture tests/apply-agmsg-roster.bats drives, but run apply against a
+# private copy of scripts/ so a shim agmsg-state.sh can force `restore` to
+# fail on demand without touching the tracked scripts/agmsg-state.sh.
+
+make_apply_agmsg_restore_failure_fixture() {
+  APPLY_FIXTURE_BASE="$(mktemp -d)"
+  source "$TEST_REPO_ROOT/tests/conformance/build-fixture.sh"
+  build_apply_fixture "$APPLY_FIXTURE_BASE"
+
+  APPLY_FIXTURE_HOME="$FIXTURE_HOME"
+  APPLY_FIXTURE_XDG_STATE_HOME="$FIXTURE_HOME/.local/state"
+  APPLY_FIXTURE_WORKSPACE_DIR="$FIXTURE_WORKSPACE_DIR"
+  APPLY_FIXTURE_BIN_DIR="$FIXTURE_BIN_DIR"
+  APPLY_FIXTURE_CALL_LOG="$FIXTURE_CALL_LOG"
+
+  # agmsg needs to be a managed catalog skill, otherwise
+  # replace_skill_targets_from_stage's stale-removal pass deletes the
+  # deployed agmsg skill dir outright, regardless of the restore wiring
+  # under test.
+  mkdir -p "$APPLY_FIXTURE_WORKSPACE_DIR/catalog/skills/agmsg"
+  printf '# agmsg\n' >"$APPLY_FIXTURE_WORKSPACE_DIR/catalog/skills/agmsg/SKILL.md"
+
+  AGMSG_SKILL_DIR="$APPLY_FIXTURE_HOME/.agents/skills/agmsg"
+  AGMSG_STATE_ROOT="$APPLY_FIXTURE_XDG_STATE_HOME/agmsg"
+  mkdir -p "$AGMSG_SKILL_DIR/db" "$AGMSG_SKILL_DIR/teams"
+  echo "message-history" >"$AGMSG_SKILL_DIR/db/messages.db"
+
+  APPLY_FIXTURE_SCRIPTS_DIR="$APPLY_FIXTURE_BASE/repo/scripts"
+  mkdir -p "$APPLY_FIXTURE_SCRIPTS_DIR"
+  cp "$TEST_REPO_ROOT/scripts/apm-workspace.sh" "$APPLY_FIXTURE_SCRIPTS_DIR/apm-workspace.sh"
+  APPLY_FIXTURE_RESTORE_CALL_COUNT_FILE="$APPLY_FIXTURE_BASE/agmsg-restore-call-count"
+}
+
+# Writes a scripts/agmsg-state.sh shim next to the copied apm-workspace.sh
+# that fails `restore` from the $1'th call onward (and every call after
+# that), delegating to the real, tracked agmsg-state.sh otherwise.
+write_agmsg_state_restore_shim() {
+  fail_from_call="$1"
+  printf '0' >"$APPLY_FIXTURE_RESTORE_CALL_COUNT_FILE"
+  cat >"$APPLY_FIXTURE_SCRIPTS_DIR/agmsg-state.sh" <<SHIM
+#!/usr/bin/env bash
+set -euo pipefail
+if [ "\${1:-}" = "restore" ]; then
+  count=\$(( \$(cat "$APPLY_FIXTURE_RESTORE_CALL_COUNT_FILE") + 1 ))
+  printf '%s' "\$count" >"$APPLY_FIXTURE_RESTORE_CALL_COUNT_FILE"
+  if [ "\$count" -ge $fail_from_call ]; then
+    echo "agmsg-state.sh restore: forced failure for test (call \$count)" >&2
+    exit 7
+  fi
+fi
+exec "$TEST_REPO_ROOT/scripts/agmsg-state.sh" "\$@"
+SHIM
+  chmod +x "$APPLY_FIXTURE_SCRIPTS_DIR/agmsg-state.sh"
+}
+
+run_apply_with_shimmed_agmsg_state() {
+  HOME="$APPLY_FIXTURE_HOME" \
+    XDG_STATE_HOME="$APPLY_FIXTURE_XDG_STATE_HOME" \
+    PATH="$APPLY_FIXTURE_BIN_DIR:$PATH" \
+    APM_WORKSPACE_DIR="$APPLY_FIXTURE_WORKSPACE_DIR" \
+    bash "$APPLY_FIXTURE_SCRIPTS_DIR/apm-workspace.sh" apply
+}
+
+# Overrides the fixture's `apm` stub so `apm compile ...` (compile_codex,
+# called partway through cmd_apply, before the agmsg roster is ever
+# relinked) fails, forcing a mid-apply abort. Same override
+# tests/apply-agmsg-roster.bats's fail_apm_compile uses.
+#
+# Exits 3 (not 1) so tests asserting the *original* failure survives a
+# recovery-restore failure (which separately exits 7, see
+# write_agmsg_state_restore_shim) can assert on a status distinct from
+# both a generic failure and the restore shim's own status -- if a
+# regression let the restore failure replace the original one, asserting
+# `-eq 1` for both would pass either way and hide the swap.
+fail_apply_fixture_apm_compile() {
+  cat >"$APPLY_FIXTURE_BIN_DIR/apm" <<STUB
+#!/usr/bin/env bash
+printf 'apm %s\n' "\$*" >>"$APPLY_FIXTURE_CALL_LOG"
+case "\$1" in
+  compile) exit 3 ;;
+esac
+exit 0
+STUB
+  chmod +x "$APPLY_FIXTURE_BIN_DIR/apm"
+}
+
+@test "apply fails when the final agmsg roster restore fails on an otherwise normal run" {
+  make_apply_agmsg_restore_failure_fixture
+  # Call 1 is the mid-apply relink right after the skill-tree swap; call 2 is
+  # the final restore after `trap - EXIT`. Only the final one should fail
+  # here, so this exercises the normal-completion path specifically, not the
+  # EXIT-trap recovery path.
+  write_agmsg_state_restore_shim 2
+
+  run run_apply_with_shimmed_agmsg_state
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"agmsg-state.sh restore: forced failure for test (call 2)"* ]]
+  rm -rf "$APPLY_FIXTURE_BASE"
+}
+
+# Simulates a restore that reports success (exit 0) without actually
+# (re)establishing the roster symlinks -- the exact gap
+# validate_agmsg_roster_link exists to catch, and the reason
+# agmsg_state_restore_or_fail checks the postcondition instead of trusting
+# agmsg-state.sh's exit code alone.
+write_agmsg_state_noop_restore_success_shim() {
+  cat >"$APPLY_FIXTURE_SCRIPTS_DIR/agmsg-state.sh" <<SHIM
+#!/usr/bin/env bash
+set -euo pipefail
+if [ "\${1:-}" = "restore" ]; then
+  exit 0
+fi
+exec "$TEST_REPO_ROOT/scripts/agmsg-state.sh" "\$@"
+SHIM
+  chmod +x "$APPLY_FIXTURE_SCRIPTS_DIR/agmsg-state.sh"
+}
+
+@test "apply fails when the agmsg roster link postcondition is unmet even though restore reported success" {
+  make_apply_agmsg_restore_failure_fixture
+  write_agmsg_state_noop_restore_success_shim
+
+  run run_apply_with_shimmed_agmsg_state
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"agmsg roster link is missing"* ]]
+  rm -rf "$APPLY_FIXTURE_BASE"
+}
+
+@test "apply preserves the original failure and only reports (never swallows) a recovery-restore failure" {
+  make_apply_agmsg_restore_failure_fixture
+  fail_apply_fixture_apm_compile
+  # Fail every restore call, including the one the EXIT trap runs while
+  # recovering from apm compile's failure.
+  write_agmsg_state_restore_shim 1
+
+  run run_apply_with_shimmed_agmsg_state
+
+  # apm compile's stub exits 3 and the restore shim exits 7; that original
+  # failure (3) must survive the trap's own restore attempt failing, not be
+  # replaced by the restore shim's status (7) or any other value. Asserting
+  # the exact status (rather than just non-zero) is what catches a
+  # regression that lets the restore failure overwrite the original one.
+  [ "$status" -eq 3 ]
+  [[ "$output" == *"agmsg roster restore failed while recovering"* ]]
+  rm -rf "$APPLY_FIXTURE_BASE"
 }
 
 # --- replace_skill_targets_from_stage ---------------------------------------

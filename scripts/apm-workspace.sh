@@ -729,6 +729,98 @@ validate_codex_skill_target_tree() {
   fi
 }
 
+# agmsg resolves db/ and teams/ relative to its own script directory
+# ($HOME/.agents/skills/agmsg), so those two entries must stay symlinks into
+# $XDG_STATE_HOME/agmsg (see scripts/agmsg-state.sh:16). If anything outside
+# `apply` replaces a link with a plain dir or removes it, agmsg's error
+# messages ("Team not found", empty identities) give no hint that the link
+# itself is the problem — the real db/teams data is untouched. Doctor checks
+# the canonical face only; other deployed faces (e.g. ~/.claude/skills/agmsg)
+# never carry db/teams and are not examined here.
+# Per-item diagnostics stay separate from the recovery recommendation: db and
+# teams are each judged healthy / plain-path / missing / dangling /
+# wrong-target below, but the recommendation to run `mise run
+# agmsg:state:restore` is emitted at most once, from the aggregate of both
+# items. `agmsg:state:restore` relinks db and teams together, so naming it
+# from a single item's branch is wrong whenever the *other* item is a plain
+# path holding roster writes made while the link was severed: following that
+# per-item advice would run the restore anyway and let its absorb-and-discard
+# path clobber the plain path's contents in favor of the state root. See
+# scripts/agmsg-state.sh absorb_plain_dir.
+validate_agmsg_roster_link() {
+  agmsg_skill_dir="$HOME/.agents/skills/agmsg"
+  [ -e "$agmsg_skill_dir" ] || return 0
+
+  agmsg_state_root="${XDG_STATE_HOME:-$HOME/.local/state}/agmsg"
+  agmsg_link_ok=0
+  agmsg_has_plain_path=0
+  agmsg_has_other_issue=0
+
+  for runtime_dir in db teams; do
+    link_path="$agmsg_skill_dir/$runtime_dir"
+    expected_target="$agmsg_state_root/$runtime_dir"
+    if [ ! -e "$link_path" ] && [ ! -L "$link_path" ]; then
+      error "agmsg roster link is missing: $link_path."
+      agmsg_link_ok=1
+      agmsg_has_other_issue=1
+      continue
+    fi
+    if [ ! -L "$link_path" ]; then
+      # Unlike the other three cases, nothing is lost here yet: a plain
+      # directory can hold roster writes made while the link was severed
+      # (see scripts/agmsg-state.sh absorb_plain_dir).
+      error "agmsg roster link is a plain path, not a symlink: $link_path. This may hold roster updates written while the link was severed."
+      agmsg_link_ok=1
+      agmsg_has_plain_path=1
+      continue
+    fi
+    actual_target=$(readlink "$link_path")
+    if [ "$actual_target" != "$expected_target" ]; then
+      error "agmsg roster link points at the wrong target: $link_path -> $actual_target (expected $expected_target)."
+      agmsg_link_ok=1
+      agmsg_has_other_issue=1
+      continue
+    fi
+    if [ ! -e "$link_path" ]; then
+      error "agmsg roster link is dangling (target does not exist): $link_path -> $actual_target."
+      agmsg_link_ok=1
+      agmsg_has_other_issue=1
+    fi
+  done
+
+  if [ "$agmsg_has_plain_path" -eq 1 ]; then
+    error "agmsg roster link recovery: at least one of db/teams under $agmsg_skill_dir is a plain path that may hold roster updates written while the link was severed. Automatically relinking db and teams together risks discarding those updates by absorbing the plain path into the state root instead of merging it. Inspect its contents and reconcile them with \$XDG_STATE_HOME/agmsg (or \$HOME/.local/state/agmsg) by hand before relinking."
+  elif [ "$agmsg_has_other_issue" -eq 1 ]; then
+    error "agmsg roster link recovery: run 'mise run agmsg:state:restore' to relink db/teams under $agmsg_skill_dir."
+  fi
+
+  return "$agmsg_link_ok"
+}
+
+# Restore agmsg's roster symlinks and fail the whole command if either the
+# restore script errors or the roster link postcondition
+# (validate_agmsg_roster_link) is not satisfied afterward. A zero exit from
+# agmsg-state.sh alone is not proof the roster ended up linked correctly, so
+# this checks what callers actually depend on instead of trusting the
+# script's own exit code. Use on the normal-completion path only — the
+# EXIT-trap recovery path uses agmsg_state_restore_report_failure below,
+# which must never turn a cleanup step into the reported failure.
+agmsg_state_restore_or_fail() {
+  "$REPO_ROOT/scripts/agmsg-state.sh" restore
+  validate_agmsg_roster_link \
+    || fail "agmsg roster restore ran but the roster link postcondition still fails; see the error above."
+}
+
+# Same restore call, but for use inside an EXIT trap that is recovering from
+# an already-failed command: report a restore failure instead of silently
+# swallowing it, without letting that failure (or `set -e`) overwrite the
+# exit status the trap is preserving. Never call `fail`/`exit` from here.
+agmsg_state_restore_report_failure() {
+  if ! "$REPO_ROOT/scripts/agmsg-state.sh" restore; then
+    error "agmsg roster restore failed while recovering from a failed command; the agmsg db/teams symlinks under \$HOME/.agents/skills/agmsg may be stale. Run 'mise run agmsg:state:restore' manually once the underlying failure is fixed."
+  fi
+}
+
 internal_deploy_target_roots() {
   printf '%s\n' \
     "$HOME/.claude/skills" \
@@ -972,9 +1064,11 @@ cmd_apply() {
   # agmsg's roster (db/teams) lives inside the deploy target this command
   # rewrites wholesale; save it now and bind restore to EXIT (not RETURN) so
   # it fires on every path, including `fail`'s `exit` and any `set -e`
-  # abort — a RETURN trap never runs on those, only on a normal return.
+  # abort — a RETURN trap never runs on those, only on a normal return. The
+  # trap only reports a failed recovery restore (agmsg_state_restore_report_failure);
+  # it must never mask the failure that triggered the trap in the first place.
   "$REPO_ROOT/scripts/agmsg-state.sh" save
-  trap 'rm -rf "$apply_stage_root"; "$REPO_ROOT/scripts/agmsg-state.sh" restore || true' EXIT
+  trap 'rm -rf "$apply_stage_root"; agmsg_state_restore_report_failure' EXIT
 
   build_target_skill_trees "$apply_stage_root"
   install_workspace_mcp_dependencies
@@ -986,15 +1080,16 @@ cmd_apply() {
   replace_skill_targets_from_stage "$apply_stage_root"
   # The freshly placed agmsg skill has no db/teams links until restore runs;
   # relink immediately so the roster window is the child swap itself, not the
-  # seconds the remaining apply steps take. The final restore and the EXIT
-  # trap stay as the failure-path guarantee (restore is idempotent).
-  "$REPO_ROOT/scripts/agmsg-state.sh" restore || true
+  # seconds the remaining apply steps take. A failed restore or an unmet
+  # link postcondition here aborts the command (via agmsg_state_restore_or_fail),
+  # which is caught by the EXIT trap above rather than left unnoticed.
+  agmsg_state_restore_or_fail
   cleanup_legacy_workspace_skill_targets
   sync_private_skills_into_targets
 
   trap - EXIT
   rm -rf "$apply_stage_root"
-  "$REPO_ROOT/scripts/agmsg-state.sh" restore || true
+  agmsg_state_restore_or_fail
 }
 
 requested_personal_skill_records() {
@@ -1140,9 +1235,11 @@ cmd_sync_local_skills() {
   stage_root=$(mktemp -d "${TMPDIR:-/tmp}/apm-sync-local.XXXXXX")
   # Same roster-preservation contract as cmd_apply: save before this command
   # touches the Codex skill target tree, and bind restore to EXIT so it fires
-  # on both normal completion and any `set -e`/`fail` abort.
+  # on both normal completion and any `set -e`/`fail` abort. The trap only
+  # reports a failed recovery restore; it must never mask the failure that
+  # triggered it.
   "$REPO_ROOT/scripts/agmsg-state.sh" save
-  trap 'rm -rf "$stage_root"; "$REPO_ROOT/scripts/agmsg-state.sh" restore || true' EXIT
+  trap 'rm -rf "$stage_root"; agmsg_state_restore_report_failure' EXIT
 
   stage_codex_skill_records "$skill_records" "$stage_root"
   replace_codex_skill_target_from_stage "$stage_root" "$skill_records"
@@ -1151,7 +1248,7 @@ cmd_sync_local_skills() {
 
   trap - EXIT
   rm -rf "$stage_root"
-  "$REPO_ROOT/scripts/agmsg-state.sh" restore || true
+  agmsg_state_restore_or_fail
   log "Synced local catalog/private skills to Codex target: $(printf '%s\n' "$skill_records" | awk -F '\t' 'NF >= 2 { print $2 }' | tr '\n' ',' | sed 's/,$//; s/,/, /g')"
 }
 
@@ -2669,6 +2766,9 @@ cmd_doctor() {
     codex_mcp_config="$HOME/.codex/config.toml"
     has_failure=0
     if ! validate_codex_skill_target_tree; then
+      has_failure=1
+    fi
+    if ! validate_agmsg_roster_link; then
       has_failure=1
     fi
     tracked_instructions="$(tracked_catalog_instructions_path)"

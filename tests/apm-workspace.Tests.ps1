@@ -1080,16 +1080,88 @@ run = "echo outside"
     Mock Install-WorkspaceMcpDependencies {}
     Mock Normalize-CodexMcpConfig {}
     Mock Invoke-CodexCompile {}
-    # Invoke-AgmsgStateSave/Restore shell out to agmsg-state.ps1 against the
-    # real $HOME by design (see its own subprocess-based test suite); mocked
-    # here so this unit test doesn't touch this machine's real agmsg roster.
+    # Invoke-AgmsgStateSave/Restore(OrThrow) shell out to agmsg-state.ps1
+    # against the real $HOME by design (see its own subprocess-based test
+    # suite); mocked here so this unit test doesn't touch this machine's real
+    # agmsg roster.
     Mock Invoke-AgmsgStateSave {}
     Mock Invoke-AgmsgStateRestore {}
+    Mock Invoke-AgmsgStateRestoreOrThrow {}
 
     Invoke-Apply
 
     Assert-MockCalled Install-WorkspaceMcpDependencies -Times 1 -Exactly
     Assert-MockCalled Normalize-CodexMcpConfig -Times 2 -Exactly
+  }
+
+  It "throws from Invoke-Apply when the final agmsg roster restore fails on an otherwise normal run" {
+    Mock Require-Apm {}
+    Mock Ensure-WorkspaceRepo {}
+    Mock Ensure-WorkspaceScaffold {}
+    Mock Invoke-ValidateCatalog {}
+    Mock Ensure-WorkspaceMiseFile {}
+    Mock Test-ManifestHasLocalPackages { $false }
+    Mock New-TemporaryDirectory { Join-Path $TestDrive "apm-apply-restore-fail" }
+    Mock Build-TargetSkillTrees {}
+    Mock Sync-ManagedCatalogRuntimeAssets {}
+    Mock Replace-SkillTargetsFromStage {}
+    Mock Install-WorkspaceMcpDependencies {}
+    Mock Normalize-CodexMcpConfig {}
+    Mock Invoke-CodexCompile {}
+    Mock Invoke-AgmsgStateSave {}
+
+    # Invoke-Apply calls Invoke-AgmsgStateRestoreOrThrow twice on a normal
+    # run: once right after the skill-tree swap, once more (after `trap -
+    # EXIT`'s PowerShell equivalent, the $applySucceeded flag) at the very
+    # end. Succeed the first call and fail the second, so this exercises the
+    # normal-completion path specifically -- restore failing must not be
+    # swallowed, and the failure-recovery-only Invoke-AgmsgStateRestore must
+    # not run in its place.
+    $script:agmsgRestoreOrThrowCallCount = 0
+    Mock Invoke-AgmsgStateRestoreOrThrow {
+      $script:agmsgRestoreOrThrowCallCount++
+      if ($script:agmsgRestoreOrThrowCallCount -ge 2) {
+        throw "agmsg roster restore ran but the roster link postcondition still fails; see the error above."
+      }
+    }
+    Mock Invoke-AgmsgStateRestore {
+      throw "Invoke-AgmsgStateRestore (failure-recovery only) must not run when Invoke-Apply completes normally."
+    }
+
+    { Invoke-Apply } | Should -Throw "*roster link postcondition still fails*"
+    $script:agmsgRestoreOrThrowCallCount | Should -Be 2
+  }
+
+  It "preserves the original failure from Invoke-Apply and only reports (never masks) a recovery-restore failure" {
+    Mock Require-Apm {}
+    Mock Ensure-WorkspaceRepo {}
+    Mock Ensure-WorkspaceScaffold {}
+    Mock Invoke-ValidateCatalog {}
+    Mock Ensure-WorkspaceMiseFile {}
+    Mock Test-ManifestHasLocalPackages { $false }
+    Mock New-TemporaryDirectory { Join-Path $TestDrive "apm-apply-original-failure" }
+    Mock Build-TargetSkillTrees {}
+    Mock Sync-ManagedCatalogRuntimeAssets {}
+    Mock Replace-SkillTargetsFromStage {}
+    Mock Install-WorkspaceMcpDependencies {}
+    Mock Normalize-CodexMcpConfig {}
+    Mock Invoke-AgmsgStateSave {}
+    # Fails before the skill-tree swap ever runs, so the mid-apply
+    # Invoke-AgmsgStateRestoreOrThrow call never happens either -- only the
+    # outer `finally`'s recovery restore should run.
+    Mock Invoke-CodexCompile { throw "boom: apm compile failed" }
+
+    $script:recoveryRestoreCalled = $false
+    Mock Invoke-AgmsgStateRestore {
+      # Mirrors its real never-throws contract: report, don't propagate.
+      $script:recoveryRestoreCalled = $true
+    }
+    Mock Invoke-AgmsgStateRestoreOrThrow {
+      throw "Invoke-AgmsgStateRestoreOrThrow (normal-completion only) must not run when Invoke-Apply aborts early."
+    }
+
+    { Invoke-Apply } | Should -Throw "*boom: apm compile failed*"
+    $script:recoveryRestoreCalled | Should -Be $true
   }
 
   It "installs MCP dependencies with apm install only mcp" {
@@ -1760,11 +1832,13 @@ dependencies:
     Mock Get-LocalCodexSyncTarget {
       [pscustomobject]@{ Name = "codex"; Root = (Join-Path $TestDrive ".codex"); SkillsRoot = (Join-Path $TestDrive ".agents"); ConfigName = "AGENTS.md" }
     }
-    # Invoke-AgmsgStateSave/Restore shell out to agmsg-state.ps1 against the
-    # real $HOME by design (see its own subprocess-based test suite); mocked
-    # here so this unit test doesn't touch this machine's real agmsg roster.
+    # Invoke-AgmsgStateSave/Restore(OrThrow) shell out to agmsg-state.ps1
+    # against the real $HOME by design (see its own subprocess-based test
+    # suite); mocked here so this unit test doesn't touch this machine's real
+    # agmsg roster.
     Mock Invoke-AgmsgStateSave {}
     Mock Invoke-AgmsgStateRestore {}
+    Mock Invoke-AgmsgStateRestoreOrThrow {}
 
     $sourcePath = Join-Path $TestDrive "catalog/skills/mattpocock/wayfinder"
     New-Item -ItemType Directory -Path (Join-Path $sourcePath "references") -Force | Out-Null
@@ -1798,6 +1872,7 @@ dependencies:
     }
     Mock Invoke-AgmsgStateSave {}
     Mock Invoke-AgmsgStateRestore {}
+    Mock Invoke-AgmsgStateRestoreOrThrow {}
 
     $sourcePath = Join-Path $TestDrive "stale-quick-sync/catalog/skills/mattpocock/wayfinder"
     New-Item -ItemType Directory -Path $sourcePath -Force | Out-Null
@@ -1881,6 +1956,7 @@ dependencies:
     Mock Ensure-WorkspaceRepo {}
     Mock Ensure-WorkspaceScaffold {}
     Mock Get-CodexSkillTargetRoot { $codexSkillsRoot }
+    Mock Test-AgmsgRosterLink {}
     Mock Get-TrackedCatalogInstructionsPath { $instructionsPath }
     Mock Get-TrackedCatalogAgentsRoot { $agentsSource }
     Mock Get-TrackedCatalogCommandsRoot { $commandsSource }
@@ -1898,6 +1974,71 @@ dependencies:
 
     try {
       { Invoke-Doctor } | Should -Not -Throw
+    }
+    finally {
+      Remove-Item Function:\apm -ErrorAction SilentlyContinue
+    }
+  }
+
+  It "throws from Invoke-Doctor when the agmsg roster link is broken" {
+    $targetRoot = Join-Path $TestDrive "doctor-agmsg-broken/.codex"
+    $skillsRoot = Join-Path $TestDrive "doctor-agmsg-broken/.agents"
+    $codexSkillsRoot = Join-Path $skillsRoot "skills"
+    $sourceRoot = Join-Path $TestDrive "doctor-agmsg-broken-source"
+    $instructionsPath = Join-Path $sourceRoot "AGENTS.md"
+    $agentsSource = Join-Path $sourceRoot "agents"
+    $commandsSource = Join-Path $sourceRoot "commands"
+    $rulesSource = Join-Path $sourceRoot "rules"
+    $agmsgSkillDir = Join-Path $TestDrive "doctor-agmsg-broken/.agents/skills/agmsg"
+    $agmsgStateRoot = Join-Path $TestDrive "doctor-agmsg-broken/.local/state/agmsg"
+
+    New-Item -ItemType Directory -Path $targetRoot, $codexSkillsRoot, (Join-Path $targetRoot "agents"), (Join-Path $targetRoot "commands"), (Join-Path $targetRoot "rules"), $agentsSource, $commandsSource, $rulesSource -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $targetRoot "AGENTS.md") -Value "# instructions"
+    Set-Content -LiteralPath $instructionsPath -Value "# instructions"
+    # A plain (non-symlink) db dir, as if it had been absorbed outside `apply`.
+    New-Item -ItemType Directory -Path (Join-Path $agmsgSkillDir "db"), (Join-Path $agmsgStateRoot "teams") -Force | Out-Null
+    New-Item -ItemType SymbolicLink -Path (Join-Path $agmsgSkillDir "teams") -Target (Join-Path $agmsgStateRoot "teams") | Out-Null
+
+    Mock Require-Apm {}
+    Mock Ensure-WorkspaceRepo {}
+    Mock Ensure-WorkspaceScaffold {}
+    Mock Get-CodexSkillTargetRoot { $codexSkillsRoot }
+    # Test-AgmsgRosterLink itself runs for real here (not mocked) so this
+    # test proves Invoke-Doctor's try/catch -> $diagnostics.Add -> throw
+    # wiring, not just the standalone check.
+    Mock Get-AgmsgSkillDir { $agmsgSkillDir }
+    Mock Get-AgmsgStateRoot { $agmsgStateRoot }
+    Mock Get-TrackedCatalogInstructionsPath { $instructionsPath }
+    Mock Get-TrackedCatalogAgentsRoot { $agentsSource }
+    Mock Get-TrackedCatalogCommandsRoot { $commandsSource }
+    Mock Get-TrackedCatalogRulesRoot { $rulesSource }
+    Mock Get-ManagedCatalogRuntimeTargets {
+      @([pscustomobject]@{ Name = "codex"; Root = $targetRoot; SkillsRoot = $skillsRoot; ConfigName = "AGENTS.md" })
+    }
+    Mock Get-ManagedCatalogSkillInventory { @() }
+    Mock Get-UnpinnedExternalReferences { @() }
+    Mock Write-CatalogSummary {}
+
+    function global:apm {
+      $global:LASTEXITCODE = 0
+    }
+
+    try {
+      $exception = $null
+      try {
+        Invoke-Doctor
+      }
+      catch {
+        $exception = $_.Exception
+      }
+
+      $exception | Should -Not -BeNullOrEmpty
+      $exception.Message | Should -Match "agmsg roster link is a plain path, not a symlink"
+      # A plain dir can hold roster updates written while the link was
+      # severed; naming agmsg:state:restore here would steer straight at the
+      # absorb-and-discard path that can lose them, so this case must not
+      # suggest it.
+      $exception.Message | Should -Not -Match "mise run agmsg:state:restore"
     }
     finally {
       Remove-Item Function:\apm -ErrorAction SilentlyContinue
@@ -1927,6 +2068,7 @@ dependencies:
     Mock Ensure-WorkspaceRepo {}
     Mock Ensure-WorkspaceScaffold {}
     Mock Get-CodexSkillTargetRoot { $codexSkillsRoot }
+    Mock Test-AgmsgRosterLink {}
     Mock Get-TrackedCatalogInstructionsPath { $instructionsPath }
     Mock Get-TrackedCatalogAgentsRoot { $agentsSource }
     Mock Get-TrackedCatalogCommandsRoot { $commandsSource }
@@ -1993,6 +2135,7 @@ dependencies:
     Mock Ensure-WorkspaceRepo {}
     Mock Ensure-WorkspaceScaffold {}
     Mock Get-CodexSkillTargetRoot { $codexSkillsRoot }
+    Mock Test-AgmsgRosterLink {}
     Mock Get-TrackedCatalogInstructionsPath { $instructionsPath }
     Mock Get-TrackedCatalogAgentsRoot { $agentsSource }
     Mock Get-TrackedCatalogCommandsRoot { $commandsSource }
@@ -2057,6 +2200,7 @@ dependencies:
     Mock Ensure-WorkspaceRepo {}
     Mock Ensure-WorkspaceScaffold {}
     Mock Get-CodexSkillTargetRoot { $codexSkillsRoot }
+    Mock Test-AgmsgRosterLink {}
     Mock Get-TrackedCatalogInstructionsPath { $instructionsPath }
     Mock Get-TrackedCatalogAgentsRoot { $agentsSource }
     Mock Get-TrackedCatalogCommandsRoot { $commandsSource }
@@ -2078,6 +2222,131 @@ dependencies:
     finally {
       Remove-Item Function:\apm -ErrorAction SilentlyContinue
     }
+  }
+
+  # agmsg resolves db/ and teams/ relative to $HOME/.agents/skills/agmsg,
+  # which `apm apply` keeps symlinked into $XDG_STATE_HOME/agmsg (see
+  # scripts/agmsg-state.ps1:34). If that link is absorbed into a plain dir
+  # or dropped by anything outside apply, agmsg's own errors ("Team not
+  # found", empty identities) give no hint the link is the actual cause.
+  # Get-AgmsgSkillDir/Get-AgmsgStateRoot are mocked so these tests never
+  # touch this machine's real $HOME roster.
+  It "skips the agmsg roster link check when the agmsg skill face is not deployed" {
+    $agmsgSkillDir = Join-Path $TestDrive "agmsg-roster-absent/.agents/skills/agmsg"
+    Mock Get-AgmsgSkillDir { $agmsgSkillDir }
+
+    { Test-AgmsgRosterLink } | Should -Not -Throw
+  }
+
+  It "passes when the agmsg roster link correctly points into the state root" {
+    $agmsgSkillDir = Join-Path $TestDrive "agmsg-roster-ok/.agents/skills/agmsg"
+    $agmsgStateRoot = Join-Path $TestDrive "agmsg-roster-ok/.local/state/agmsg"
+    New-Item -ItemType Directory -Path $agmsgSkillDir, (Join-Path $agmsgStateRoot "db"), (Join-Path $agmsgStateRoot "teams") -Force | Out-Null
+    New-Item -ItemType SymbolicLink -Path (Join-Path $agmsgSkillDir "db") -Target (Join-Path $agmsgStateRoot "db") | Out-Null
+    New-Item -ItemType SymbolicLink -Path (Join-Path $agmsgSkillDir "teams") -Target (Join-Path $agmsgStateRoot "teams") | Out-Null
+
+    Mock Get-AgmsgSkillDir { $agmsgSkillDir }
+    Mock Get-AgmsgStateRoot { $agmsgStateRoot }
+
+    { Test-AgmsgRosterLink } | Should -Not -Throw
+  }
+
+  It "fails on a plain-dir agmsg db link without naming agmsg:state:restore" {
+    $agmsgSkillDir = Join-Path $TestDrive "agmsg-roster-plaindir/.agents/skills/agmsg"
+    $agmsgStateRoot = Join-Path $TestDrive "agmsg-roster-plaindir/.local/state/agmsg"
+    New-Item -ItemType Directory -Path (Join-Path $agmsgSkillDir "db"), (Join-Path $agmsgStateRoot "db"), (Join-Path $agmsgStateRoot "teams") -Force | Out-Null
+    New-Item -ItemType SymbolicLink -Path (Join-Path $agmsgSkillDir "teams") -Target (Join-Path $agmsgStateRoot "teams") | Out-Null
+
+    Mock Get-AgmsgSkillDir { $agmsgSkillDir }
+    Mock Get-AgmsgStateRoot { $agmsgStateRoot }
+
+    $exception = $null
+    try { Test-AgmsgRosterLink } catch { $exception = $_.Exception }
+
+    $exception | Should -Not -BeNullOrEmpty
+    $exception.Message | Should -Match "agmsg roster link is a plain path, not a symlink"
+    # A plain dir can hold roster updates written while the link was
+    # severed; naming agmsg:state:restore here would steer straight at the
+    # absorb-and-discard path that can lose them, so this case must not
+    # suggest it.
+    $exception.Message | Should -Not -Match "mise run agmsg:state:restore"
+  }
+
+  It "fails and names agmsg:state:restore when the agmsg teams link is missing" {
+    $agmsgSkillDir = Join-Path $TestDrive "agmsg-roster-missing/.agents/skills/agmsg"
+    $agmsgStateRoot = Join-Path $TestDrive "agmsg-roster-missing/.local/state/agmsg"
+    New-Item -ItemType Directory -Path $agmsgSkillDir, (Join-Path $agmsgStateRoot "db"), (Join-Path $agmsgStateRoot "teams") -Force | Out-Null
+    New-Item -ItemType SymbolicLink -Path (Join-Path $agmsgSkillDir "db") -Target (Join-Path $agmsgStateRoot "db") | Out-Null
+
+    Mock Get-AgmsgSkillDir { $agmsgSkillDir }
+    Mock Get-AgmsgStateRoot { $agmsgStateRoot }
+
+    { Test-AgmsgRosterLink } | Should -Throw -ExpectedMessage "*agmsg roster link is missing*mise run agmsg:state:restore*"
+  }
+
+  It "fails and names agmsg:state:restore when the agmsg db link is dangling" {
+    $agmsgSkillDir = Join-Path $TestDrive "agmsg-roster-dangling/.agents/skills/agmsg"
+    $agmsgStateRoot = Join-Path $TestDrive "agmsg-roster-dangling/.local/state/agmsg"
+    New-Item -ItemType Directory -Path $agmsgSkillDir, (Join-Path $agmsgStateRoot "teams") -Force | Out-Null
+    New-Item -ItemType SymbolicLink -Path (Join-Path $agmsgSkillDir "db") -Target (Join-Path $agmsgStateRoot "db") | Out-Null
+    New-Item -ItemType SymbolicLink -Path (Join-Path $agmsgSkillDir "teams") -Target (Join-Path $agmsgStateRoot "teams") | Out-Null
+
+    Mock Get-AgmsgSkillDir { $agmsgSkillDir }
+    Mock Get-AgmsgStateRoot { $agmsgStateRoot }
+
+    { Test-AgmsgRosterLink } | Should -Throw -ExpectedMessage "*agmsg roster link is dangling*mise run agmsg:state:restore*"
+  }
+
+  # The next three tests cover the mixed db/teams cases the aggregate
+  # recommendation exists for: `mise run agmsg:state:restore` relinks db and
+  # teams together, so a per-item recommendation is wrong whenever the
+  # *other* item is a plain path holding roster writes made while the link
+  # was severed -- following it would run the restore anyway and let its
+  # absorb-and-discard path clobber the plain path's contents.
+
+  It "names agmsg:state:restore for neither item when db is a plain path and teams is missing" {
+    $agmsgSkillDir = Join-Path $TestDrive "agmsg-roster-mixed1/.agents/skills/agmsg"
+    $agmsgStateRoot = Join-Path $TestDrive "agmsg-roster-mixed1/.local/state/agmsg"
+    New-Item -ItemType Directory -Path (Join-Path $agmsgSkillDir "db"), (Join-Path $agmsgStateRoot "db"), (Join-Path $agmsgStateRoot "teams") -Force | Out-Null
+
+    Mock Get-AgmsgSkillDir { $agmsgSkillDir }
+    Mock Get-AgmsgStateRoot { $agmsgStateRoot }
+
+    $exception = $null
+    try { Test-AgmsgRosterLink } catch { $exception = $_.Exception }
+
+    $exception | Should -Not -BeNullOrEmpty
+    $exception.Message | Should -Match "agmsg roster link is a plain path, not a symlink"
+    $exception.Message | Should -Match "agmsg roster link is missing"
+    $exception.Message | Should -Not -Match "mise run agmsg:state:restore"
+  }
+
+  It "names agmsg:state:restore for neither item when db is missing and teams is a plain path" {
+    $agmsgSkillDir = Join-Path $TestDrive "agmsg-roster-mixed2/.agents/skills/agmsg"
+    $agmsgStateRoot = Join-Path $TestDrive "agmsg-roster-mixed2/.local/state/agmsg"
+    New-Item -ItemType Directory -Path (Join-Path $agmsgSkillDir "teams"), (Join-Path $agmsgStateRoot "db"), (Join-Path $agmsgStateRoot "teams") -Force | Out-Null
+
+    Mock Get-AgmsgSkillDir { $agmsgSkillDir }
+    Mock Get-AgmsgStateRoot { $agmsgStateRoot }
+
+    $exception = $null
+    try { Test-AgmsgRosterLink } catch { $exception = $_.Exception }
+
+    $exception | Should -Not -BeNullOrEmpty
+    $exception.Message | Should -Match "agmsg roster link is missing"
+    $exception.Message | Should -Match "agmsg roster link is a plain path, not a symlink"
+    $exception.Message | Should -Not -Match "mise run agmsg:state:restore"
+  }
+
+  It "names agmsg:state:restore when db and teams are both missing (no plain path)" {
+    $agmsgSkillDir = Join-Path $TestDrive "agmsg-roster-mixed3/.agents/skills/agmsg"
+    $agmsgStateRoot = Join-Path $TestDrive "agmsg-roster-mixed3/.local/state/agmsg"
+    New-Item -ItemType Directory -Path $agmsgSkillDir, (Join-Path $agmsgStateRoot "db"), (Join-Path $agmsgStateRoot "teams") -Force | Out-Null
+
+    Mock Get-AgmsgSkillDir { $agmsgSkillDir }
+    Mock Get-AgmsgStateRoot { $agmsgStateRoot }
+
+    { Test-AgmsgRosterLink } | Should -Throw -ExpectedMessage "*agmsg roster link is missing*agmsg roster link is missing*mise run agmsg:state:restore*"
   }
 
   It "syncs private skills into the Codex copy target and the Claude symlink target" {
@@ -2439,6 +2708,55 @@ dependencies: []
     $readme | Should -Match 'docs/skill-inventory\.md'
   }
 
+}
+
+Describe "Invoke-AgmsgStateRestore never-throw contract" {
+  # Invoke-AgmsgStateRestore is only used from a `finally` recovering after
+  # an already-failed command, so it must never propagate an exception of
+  # its own -- doing so would replace the original failure with whatever
+  # went wrong during recovery instead of merely reporting it. Every other
+  # test in this file exercises that contract by mocking
+  # Invoke-AgmsgStateRestore itself, which cannot prove the function's own
+  # try/catch actually catches a terminating error raised by the child
+  # `agmsg-state.ps1` process it shells out to (as opposed to just a
+  # non-zero $LASTEXITCODE). This copies scripts/apm-workspace.ps1 into a
+  # throwaway directory next to a stub agmsg-state.ps1 that really throws,
+  # so $PSScriptRoot (fixed at the defining file's location, not
+  # overridable via Mock) resolves to the stub instead of the tracked
+  # scripts/agmsg-state.ps1 -- the tracked file itself is never touched.
+  BeforeEach {
+    $script:restoreFixtureDir = Join-Path $TestDrive "agmsg-restore-neverthrow"
+    New-Item -ItemType Directory -Path $script:restoreFixtureDir -Force | Out-Null
+
+    $realModulePath = (Resolve-Path -LiteralPath (Join-Path (Join-Path $PSScriptRoot "..") "scripts/apm-workspace.ps1")).Path
+    $script:restoreFixtureModulePath = Join-Path $script:restoreFixtureDir "apm-workspace.ps1"
+    Copy-Item -LiteralPath $realModulePath -Destination $script:restoreFixtureModulePath
+
+    @'
+Write-Error "agmsg-state.ps1 restore: forced failure for test" -ErrorAction Stop
+'@ | Set-Content -LiteralPath (Join-Path $script:restoreFixtureDir "agmsg-state.ps1")
+
+    $env:APM_WORKSPACE_LIB_ONLY = "1"
+    . $script:restoreFixtureModulePath
+    Remove-Item Env:APM_WORKSPACE_LIB_ONLY -ErrorAction SilentlyContinue
+  }
+
+  It "does not throw when the child agmsg-state.ps1 raises a terminating error, and reports the child's failure" {
+    # Assigning inside a `{ } | Should -Not -Throw` script block would not
+    # observe $warnings out here (Should invokes the block in its own child
+    # scope), so call and catch directly instead.
+    $caughtException = $null
+    $warnings = $null
+    try {
+      $warnings = Invoke-AgmsgStateRestore 3>&1
+    }
+    catch {
+      $caughtException = $_.Exception
+    }
+
+    $caughtException | Should -BeNullOrEmpty
+    ($warnings | Out-String) | Should -Match "agmsg-state.ps1 restore: forced failure for test"
+  }
 }
 
 Describe "internal cleanup skill ids" {
