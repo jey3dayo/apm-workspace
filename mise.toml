@@ -59,8 +59,7 @@ run = "bash ./scripts/agmsg-state.sh save"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/agmsg-state.ps1 save"
 
 [tasks."agmsg:state:restore"]
-description = "Relink the agmsg roster into the deployed skill directory"
-hide = true
+description = "Recovery adapter: relink an agmsg roster unlinked outside of apply"
 run = "bash ./scripts/agmsg-state.sh restore"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/agmsg-state.ps1 restore"
 
