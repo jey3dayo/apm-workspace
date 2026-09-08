@@ -639,6 +639,218 @@ EOF
   rm -rf "$workspace_dir"
 }
 
+# --- alias-aware external skill id / cache resolution -----------------------
+
+@test "external_skill_id_from_record uses the manifest alias instead of the repo_url tail" {
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
+      alias: japanese-tech-writing
+EOF
+  WORKSPACE_DIR="$workspace_dir"
+
+  # The lockfile records the bare gist key (owner/id) as repo_url, not the
+  # full clone URL that appears in apm.yml's git: field.
+  run external_skill_id_from_record "k16shikano/fd287c3133457c4fd8f5601d34aa817d" ""
+  [ "$status" -eq 0 ]
+  [ "$output" = "japanese-tech-writing" ]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "external_skill_id_from_record keeps the current repo_url-tail derivation when no alias is declared" {
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
+EOF
+  WORKSPACE_DIR="$workspace_dir"
+
+  run external_skill_id_from_record "k16shikano/fd287c3133457c4fd8f5601d34aa817d" ""
+  [ "$status" -eq 0 ]
+  [ "$output" = "fd287c3133457c4fd8f5601d34aa817d" ]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "external_skill_id_from_record leaves an unrelated, non-aliased dependency's derivation unchanged" {
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
+      alias: japanese-tech-writing
+    - mattpocock/skills/skills/engineering/codebase-design#hash
+EOF
+  WORKSPACE_DIR="$workspace_dir"
+
+  run external_skill_id_from_record "mattpocock/skills" "skills/engineering/codebase-design"
+  [ "$status" -eq 0 ]
+  [ "$output" = "engineering:codebase-design" ]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "external_skill_id_from_record matches an aliased dependency declared as a full github.com clone URL" {
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: https://github.com/owner/repo.git
+      alias: foo
+EOF
+  WORKSPACE_DIR="$workspace_dir"
+
+  # apm drops the default github.com host from the lockfile's repo_url, so it
+  # is recorded as the bare "owner/repo", not the full clone URL.
+  run external_skill_id_from_record "owner/repo" ""
+  [ "$status" -eq 0 ]
+  [ "$output" = "foo" ]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "external_skill_id_from_record matches an aliased dependency on a non-default host" {
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: https://gitlab.com/acme/repo.git
+      alias: foo
+EOF
+  WORKSPACE_DIR="$workspace_dir"
+
+  # Non-default hosts keep their FQDN in the lockfile's repo_url.
+  run external_skill_id_from_record "gitlab.com/acme/repo" ""
+  [ "$status" -eq 0 ]
+  [ "$output" = "foo" ]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "external_skill_id_from_record matches an aliased dependency declared in SCP form" {
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: git@bitbucket.org:team/standards.git
+      alias: foo
+EOF
+  WORKSPACE_DIR="$workspace_dir"
+
+  run external_skill_id_from_record "bitbucket.org/team/standards" ""
+  [ "$status" -eq 0 ]
+  [ "$output" = "foo" ]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "external_skill_content_dir resolves an aliased dependency via apm_modules/<alias> even when the canonical repo_url copy also exists" {
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
+      alias: japanese-tech-writing
+EOF
+  mkdir -p "$workspace_dir/apm_modules/japanese-tech-writing"
+  printf '%s\n' '# japanese-tech-writing' >"$workspace_dir/apm_modules/japanese-tech-writing/SKILL.md"
+  # apm also keeps the canonical repo_url copy alongside the alias copy; the
+  # adapter must prefer the alias without treating this as ambiguous.
+  mkdir -p "$workspace_dir/apm_modules/k16shikano/fd287c3133457c4fd8f5601d34aa817d"
+  printf '%s\n' '# japanese-tech-writing' >"$workspace_dir/apm_modules/k16shikano/fd287c3133457c4fd8f5601d34aa817d/SKILL.md"
+  WORKSPACE_DIR="$workspace_dir"
+
+  run external_skill_content_dir "k16shikano/fd287c3133457c4fd8f5601d34aa817d" "" "abc123"
+  [ "$status" -eq 0 ]
+  [ "$output" = "$workspace_dir/apm_modules/japanese-tech-writing" ]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "external_skill_content_dir keeps resolving apm_modules/<repo_url> unchanged when no alias is declared" {
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
+EOF
+  mkdir -p "$workspace_dir/apm_modules/k16shikano/fd287c3133457c4fd8f5601d34aa817d"
+  printf '%s\n' '# japanese-tech-writing' >"$workspace_dir/apm_modules/k16shikano/fd287c3133457c4fd8f5601d34aa817d/SKILL.md"
+  WORKSPACE_DIR="$workspace_dir"
+
+  run external_skill_content_dir "k16shikano/fd287c3133457c4fd8f5601d34aa817d" "" "abc123"
+  [ "$status" -eq 0 ]
+  [ "$output" = "$workspace_dir/apm_modules/k16shikano/fd287c3133457c4fd8f5601d34aa817d" ]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "collect_external_skill_records deploys an aliased gist dependency under the declared alias" {
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
+      alias: japanese-tech-writing
+EOF
+  WORKSPACE_DIR="$workspace_dir"
+  locked_external_skill_records() {
+    printf '%s\n' 'k16shikano/fd287c3133457c4fd8f5601d34aa817d||abc123|main'
+  }
+  external_skill_content_dir() {
+    printf '%s\n' '/tmp/japanese-tech-writing'
+  }
+
+  run collect_external_skill_records
+  [ "$status" -eq 0 ]
+  [ "$output" = $'external\tjapanese-tech-writing\t/tmp/japanese-tech-writing\tk16shikano/fd287c3133457c4fd8f5601d34aa817d' ]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "external_skill_id_from_record's alias derivation matches the name apm recorded in the lockfile's deployed_files" {
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
+      alias: japanese-tech-writing
+EOF
+  cat >"$workspace_dir/apm.lock.yaml" <<'EOF'
+lockfile_version: '1'
+generated_at: '2026-09-08T00:00:00.000000+00:00'
+apm_version: 0.29.0
+dependencies:
+- repo_url: k16shikano/fd287c3133457c4fd8f5601d34aa817d
+  name: japanese-tech-writing
+  host: gist.github.com
+  resolved_commit: abc123
+  resolved_ref: main
+  version: unknown
+  package_type: claude_skill
+  deployed_files:
+  - .claude/skills/japanese-tech-writing
+  - .claude/skills/japanese-tech-writing/SKILL.md
+EOF
+  WORKSPACE_DIR="$workspace_dir"
+
+  # Independently derive the name apm actually deployed under from the
+  # lockfile's own deployed_files record (apm's ground truth), then confirm
+  # the adapter's id derivation agrees with it for the same dependency.
+  deployed_name="$(awk -F/ '/^  - \.claude\/skills\// { print $3; exit }' "$workspace_dir/apm.lock.yaml")"
+  [ "$deployed_name" = "japanese-tech-writing" ]
+
+  run external_skill_id_from_record "k16shikano/fd287c3133457c4fd8f5601d34aa817d" ""
+  [ "$status" -eq 0 ]
+  [ "$output" = "$deployed_name" ]
+
+  rm -rf "$workspace_dir"
+}
+
 @test "workspace_remote_to_repo_reference parses an https remote" {
   run workspace_remote_to_repo_reference "https://github.com/owner/repo.git"
   [ "$status" -eq 0 ]

@@ -1000,6 +1000,93 @@ function Get-ManifestExternalSkillSubset {
   return $result.ToArray()
 }
 
+# Returns the set of forms a `git:` reference from apm.yml could appear as in
+# the lockfile's repo_url, so alias lookups can match apm's canonical form
+# without knowing in advance which form the manifest author used:
+#   - the raw reference itself
+#   - the gist key (https://gist.github.com/<owner>/<id>.git -> <owner>/<id>)
+#   - the canonical form apm records in apm.lock.yaml's repo_url: the scheme
+#     and a trailing .git are dropped, github.com (the default host) is
+#     dropped entirely (https://github.com/owner/repo(.git) -> owner/repo),
+#     a non-default host keeps its FQDN (https://gitlab.com/acme/repo(.git)
+#     -> gitlab.com/acme/repo), and an SCP-style ref
+#     (git@host:owner/repo.git) becomes host/owner/repo
+function Get-GitReferenceCandidateKeys {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Reference
+  )
+
+  $keys = New-Object 'System.Collections.Generic.HashSet[string]'
+  $null = $keys.Add($Reference)
+
+  if ($Reference -match '^https://gist\.github\.com/(.+?)\.git$') {
+    $null = $keys.Add($Matches[1])
+  }
+
+  if ($Reference -match '^https://') {
+    $working = $Reference -replace '^https://', ''
+    $working = $working -replace '\.git$', ''
+    $working = $working -replace '/$', ''
+    $working = $working -replace '^github\.com/', ''
+    $null = $keys.Add($working)
+  } elseif ($Reference -match '^git@') {
+    $working = $Reference -replace '^git@', ''
+    $working = $working -replace '\.git$', ''
+    $working = [regex]::new(':').Replace($working, '/', 1)
+    $null = $keys.Add($working)
+  }
+
+  return $keys
+}
+
+# Looks up the `alias:` value declared alongside an object-form dependency
+# entry (`- git: <ref>` ... `alias: <name>`) for the given git ref. apm 0.29.0
+# stages and deploys aliased dependencies under that alias, so the workspace
+# adapter must derive skill ids and search apm_modules the same way instead of
+# falling back to the repo_url/virtual_path tail. Returns $null when the
+# dependency has no object-form entry or no alias field.
+function Get-ManifestDependencyAlias {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Reference
+  )
+
+  $manifestPath = Join-Path $WorkspaceDir "apm.yml"
+  if (-not (Test-Path -LiteralPath $manifestPath)) {
+    return $null
+  }
+
+  $currentReference = $null
+  $currentCandidateKeys = $null
+  foreach ($line in (Get-Content -LiteralPath $manifestPath)) {
+    if ($line -match '^\s*-\s+git:\s+(\S+)\s*$') {
+      $currentReference = $Matches[1]
+      $currentCandidateKeys = Get-GitReferenceCandidateKeys -Reference $currentReference
+      continue
+    }
+
+    if ($line -match '^\s*-\s+\S+') {
+      $currentReference = $null
+      $currentCandidateKeys = $null
+      continue
+    }
+
+    if ($null -eq $currentCandidateKeys -or -not $currentCandidateKeys.Contains($Reference)) {
+      continue
+    }
+
+    if ($line -match '^\s+alias:\s+(.+?)\s*(#.*)?$') {
+      $value = $Matches[1].Trim().Trim('"')
+      if (-not [string]::IsNullOrWhiteSpace($value)) {
+        return $value
+      }
+    }
+  }
+
+  return $null
+}
+
 function Get-ManagedCatalogSkillInventory {
   param(
     [string[]]$SkillIds = @(Get-ManagedSkillIds),
@@ -1150,6 +1237,78 @@ function Get-ExternalSkillInstallPath {
   $virtualSegments = if ([string]::IsNullOrWhiteSpace($VirtualPath)) { @() } else { @(Convert-ReferencePathToSegments -Value $VirtualPath) }
   $strippedVirtualPath = if ([string]::IsNullOrWhiteSpace($VirtualPath)) { $null } else { Get-ExternalSkillRelativePath -VirtualPath $VirtualPath }
   $strippedVirtualSegments = if ([string]::IsNullOrWhiteSpace($strippedVirtualPath)) { @() } else { @(Convert-ReferencePathToSegments -Value $strippedVirtualPath) }
+
+  # apm 0.29.0 stages an aliased dependency under apm_modules/<alias> while
+  # also keeping the canonical apm_modules/<repo_url> copy in place. Try the
+  # alias location first and return as soon as it resolves: folding it into
+  # the single candidate list below would make the two intentionally
+  # duplicated copies look "ambiguous" and abort every alias lookup.
+  $aliasId = Get-ManifestDependencyAlias -Reference $RepoUrl
+  if (-not [string]::IsNullOrWhiteSpace($aliasId)) {
+    $aliasSegments = @(Convert-ReferencePathToSegments -Value $aliasId)
+    $aliasCandidatePaths = New-Object System.Collections.Generic.List[string]
+    $seenAliasCandidates = New-Object 'System.Collections.Generic.HashSet[string]'
+
+    function Add-ExternalSkillAliasCandidatePath {
+      param(
+        [Parameter(Mandatory = $true)]
+        [string[]]$Segments
+      )
+
+      $candidatePath = $apmModulesRoot
+      foreach ($segment in $Segments) {
+        $candidatePath = Join-Path $candidatePath $segment
+      }
+
+      if ($seenAliasCandidates.Add($candidatePath)) {
+        $aliasCandidatePaths.Add($candidatePath)
+      }
+    }
+
+    if ($virtualSegments.Count -gt 0) {
+      Add-ExternalSkillAliasCandidatePath -Segments @($aliasSegments + $virtualSegments)
+      if (-not [string]::IsNullOrWhiteSpace($ResolvedCommit)) {
+        Add-ExternalSkillAliasCandidatePath -Segments @($aliasSegments + @($ResolvedCommit) + $virtualSegments)
+      }
+    } else {
+      Add-ExternalSkillAliasCandidatePath -Segments $aliasSegments
+      if (-not [string]::IsNullOrWhiteSpace($ResolvedCommit)) {
+        Add-ExternalSkillAliasCandidatePath -Segments @($aliasSegments + @($ResolvedCommit))
+        Add-ExternalSkillAliasCandidatePath -Segments @(@($ResolvedCommit) + $aliasSegments)
+      }
+    }
+
+    if ($strippedVirtualSegments.Count -gt 0) {
+      Add-ExternalSkillAliasCandidatePath -Segments @($aliasSegments + $strippedVirtualSegments)
+      if (-not [string]::IsNullOrWhiteSpace($ResolvedCommit)) {
+        Add-ExternalSkillAliasCandidatePath -Segments @($aliasSegments + @($ResolvedCommit) + $strippedVirtualSegments)
+      }
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($ResolvedCommit) -and $virtualSegments.Count -gt 0) {
+      Add-ExternalSkillAliasCandidatePath -Segments @(@($ResolvedCommit) + $aliasSegments + $virtualSegments)
+    }
+    if (-not [string]::IsNullOrWhiteSpace($ResolvedCommit) -and $strippedVirtualSegments.Count -gt 0) {
+      Add-ExternalSkillAliasCandidatePath -Segments @(@($ResolvedCommit) + $aliasSegments + $strippedVirtualSegments)
+    }
+
+    $aliasFoundPath = $null
+    foreach ($candidatePath in $aliasCandidatePaths) {
+      if (-not (Test-Path -LiteralPath (Join-Path $candidatePath "SKILL.md"))) {
+        continue
+      }
+
+      if ($null -ne $aliasFoundPath -and $aliasFoundPath -ne $candidatePath) {
+        throw "Ambiguous external skill cache paths for $RepoUrl/$VirtualPath (alias: $aliasId)"
+      }
+
+      $aliasFoundPath = $candidatePath
+    }
+
+    if ($null -ne $aliasFoundPath) {
+      return $aliasFoundPath
+    }
+  }
 
   $candidatePaths = New-Object System.Collections.Generic.List[string]
   $seenCandidates = New-Object 'System.Collections.Generic.HashSet[string]'
@@ -1372,6 +1531,12 @@ function Get-ExternalSkillId {
 
     [string]$VirtualPath
   )
+
+  $aliasSkillId = Get-ManifestDependencyAlias -Reference $RepoUrl
+  if (-not [string]::IsNullOrWhiteSpace($aliasSkillId)) {
+    Test-SkillId -SkillId $aliasSkillId
+    return $aliasSkillId
+  }
 
   if ([string]::IsNullOrWhiteSpace($VirtualPath)) {
     $segments = Convert-ReferencePathToSegments -Value $RepoUrl

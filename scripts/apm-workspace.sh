@@ -1747,6 +1747,82 @@ manifest_external_skill_subset() {
   ' "$manifest_path"
 }
 
+# Looks up the `alias:` value declared alongside an object-form dependency
+# entry (`- git: <ref>` ... `alias: <name>`) for the given git ref. apm 0.29.0
+# stages and deploys aliased dependencies under that alias, so the workspace
+# adapter must derive skill ids and search apm_modules the same way instead of
+# falling back to the repo_url/virtual_path tail. Returns empty when the
+# dependency has no object-form entry or no alias field.
+manifest_dependency_alias() {
+  target_ref="$1"
+  manifest_path="$WORKSPACE_DIR/apm.yml"
+  [ -f "$manifest_path" ] || return 0
+
+  awk -v wanted="$target_ref" '
+    function gist_key(ref,    stripped) {
+      if (ref !~ /^https:\/\/gist\.github\.com\//) {
+        return ""
+      }
+      stripped = ref
+      sub(/^https:\/\/gist\.github\.com\//, "", stripped)
+      sub(/\.git$/, "", stripped)
+      return stripped
+    }
+    # apm records the lockfile repo_url in a canonical form: the scheme and
+    # a trailing .git are dropped, github.com (the default host) is dropped
+    # entirely (https://github.com/owner/repo(.git) -> owner/repo), a
+    # non-default host keeps its FQDN (https://gitlab.com/acme/repo(.git) ->
+    # gitlab.com/acme/repo), and an SCP-style ref (git@host:owner/repo.git)
+    # becomes host/owner/repo. apm.yml keeps whatever form the author wrote
+    # under git:, so alias lookups must normalize the same way or an aliased
+    # dependency on a non-gist host silently falls back to the old
+    # repo_url-tail derivation.
+    function canonical_ref(ref,    working) {
+      working = ref
+      if (working ~ /^https:\/\//) {
+        sub(/^https:\/\//, "", working)
+        sub(/\.git$/, "", working)
+        sub(/\/$/, "", working)
+        sub(/^github\.com\//, "", working)
+        return working
+      }
+      if (working ~ /^git@/) {
+        sub(/^git@/, "", working)
+        sub(/\.git$/, "", working)
+        sub(/:/, "/", working)
+        return working
+      }
+      return ""
+    }
+    /^    - git:[[:space:]]*/ {
+      current_ref = $3
+      current_gist_key = gist_key($3)
+      current_canonical_ref = canonical_ref($3)
+      next
+    }
+    /^    - [^[:space:]]/ {
+      current_ref = ""
+      current_gist_key = ""
+      current_canonical_ref = ""
+      next
+    }
+    (current_ref != wanted) && (current_gist_key != wanted) && (current_canonical_ref != wanted) {
+      next
+    }
+    /^      alias:[[:space:]]+/ {
+      value = substr($0, index($0, ":") + 1)
+      sub(/^[[:space:]]+/, "", value)
+      sub(/[[:space:]]+#.*$/, "", value)
+      sub(/[[:space:]]+$/, "", value)
+      gsub(/"/, "", value)
+      if (value != "") {
+        print value
+        exit
+      }
+    }
+  ' "$manifest_path"
+}
+
 manifest_external_reference_keys() {
   manifest_external_references | awk '
     NF {
@@ -1829,6 +1905,13 @@ external_skill_id_from_record() {
   repo_url="$1"
   virtual_path="$2"
 
+  alias_skill_id=$(manifest_dependency_alias "$repo_url")
+  if [ -n "$alias_skill_id" ]; then
+    validate_skill_id "$alias_skill_id"
+    printf '%s\n' "$alias_skill_id"
+    return 0
+  fi
+
   if [ -z "$virtual_path" ]; then
     old_ifs=$IFS
     IFS='/'
@@ -1853,6 +1936,52 @@ external_skill_content_dir() {
   relative_path=$(external_skill_relative_path "$virtual_path")
 
   [ -d "$apm_modules_root" ] || fail "External skill cache missing: $apm_modules_root"
+
+  # apm 0.29.0 stages an aliased dependency under apm_modules/<alias> while
+  # also keeping the canonical apm_modules/<repo_url> copy in place. Try the
+  # alias location first and return as soon as it resolves: folding it into
+  # the single candidate_paths list below would make the two intentionally
+  # duplicated copies look "ambiguous" and abort every alias lookup.
+  alias_id=$(manifest_dependency_alias "$repo_url")
+  if [ -n "$alias_id" ]; then
+    alias_candidate_paths=""
+    if [ -n "$virtual_path" ]; then
+      alias_candidate_paths=$(printf '%s\n%s\n%s\n' \
+        "$apm_modules_root/$alias_id/$virtual_path" \
+        "$apm_modules_root/$alias_id/$resolved_commit/$virtual_path" \
+        "$apm_modules_root/$resolved_commit/$alias_id/$virtual_path")
+    else
+      alias_candidate_paths=$(printf '%s\n%s\n%s\n' \
+        "$apm_modules_root/$alias_id" \
+        "$apm_modules_root/$alias_id/$resolved_commit" \
+        "$apm_modules_root/$resolved_commit/$alias_id")
+    fi
+
+    if [ -n "$relative_path" ] && [ "$relative_path" != "$virtual_path" ]; then
+      alias_candidate_paths=$(printf '%s\n%s\n%s\n%s\n' \
+        "$alias_candidate_paths" \
+        "$apm_modules_root/$alias_id/$relative_path" \
+        "$apm_modules_root/$alias_id/$resolved_commit/$relative_path" \
+        "$apm_modules_root/$resolved_commit/$alias_id/$relative_path")
+    fi
+
+    alias_found_path=""
+    while IFS= read -r candidate_path; do
+      [ -n "$candidate_path" ] || continue
+      [ -f "$candidate_path/SKILL.md" ] || continue
+      if [ -n "$alias_found_path" ] && [ "$alias_found_path" != "$candidate_path" ]; then
+        fail "Ambiguous external skill cache paths for $repo_url/$virtual_path (alias: $alias_id)"
+      fi
+      alias_found_path="$candidate_path"
+    done <<EOF
+$alias_candidate_paths
+EOF
+
+    if [ -n "$alias_found_path" ]; then
+      printf '%s\n' "$alias_found_path"
+      return 0
+    fi
+  fi
 
   found_path=""
   candidate_paths=""
