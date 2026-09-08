@@ -111,6 +111,40 @@
   hit area 44px 等）を持ち、`baseline-ui` の高速パスに対する深掘りレビューとして棲み分け可能。
 - 再検討するなら: `emil-design-eng` と指摘が重複しすぎる場合はどちらかに寄せる。
 
+## japanese-tech-writing (k16shikano の gist)
+
+- Status: catalog に vendored（2026-07-03、commit `10496d3`）。2026-09-08 に外部依存化を
+  試して差し戻した（下記）
+- 正本: `catalog/skills/japanese-tech-writing/SKILL.md`
+- 上流: `k16shikano` の gist `fd287c3133457c4fd8f5601d34aa817d`（第三者、現存・更新継続中）。
+  https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
+- 追随: 2026-09-08 に上流の 2 項目（新概念の導入を辞書型断定で始めない／イ形容詞 + 「です」の禁止）を反映。
+  上流 SHA は `c7189cdc9c2520be50418209834145bdf3a46e97`。検知は手動で、
+  `curl -sL https://gist.githubusercontent.com/k16shikano/<id>/raw/SKILL.md` を取って diff する。
+  `gh gist view <id> --raw` は先頭に gist description の行を足すので、そのまま比較しない。
+- 外部依存化を試して差し戻した理由（2026-09-08）: gist 自体は普通の git repo で
+  （`refs/heads/main` と commit SHA を持つ）、`apm.yml` に
+  `git: https://gist.github.com/<user>/<id>.git#<sha>` + `alias: japanese-tech-writing` と
+  書けば `apm install` は正しく解決し、alias 名で配布できる（scratchpad で実測）。
+  ところが `scripts/apm-workspace.sh` は `alias` を一切参照せず（出現 0 件）、
+  lockfile の `repo_url` だけで配布先ディレクトリ名を決める。実際に本 workspace で
+  rollout したところ、3 配布面すべてに `fd287c3133457c4fd8f5601d34aa817d` という
+  gist ID 名で配置された。名前で参照できないので差し戻した。
+  この adapter 側の穴は `todo.txt` に別件として起票済み。
+- 恒久的な差分: 上流は LLM 口調リストのラベルを `**予告と総括**：` のように太字化しているが、
+  この repo の `scripts/replace-bold-headings.ts` が `- **label**` を house style として剥がす
+  （2026-09-08 実測、6 箇所）。`mise run format` のたびに戻るため、上流と完全一致はしない。
+  太字の有無は規範の内容に影響しないので、house style を優先して差分を受け入れる。
+- lane の判断: 第三者コピーなので原則としては `manual-skills`（本ファイルの
+  `gh-address-comments` / `gh-fix-ci` の項が定める「catalog を自分の成果物に限定する」原則）。
+  2026-09-08 時点では `catalog` に置いたまま。移すなら `manual-skills/.apm/skills/**` +
+  `upstreams/japanese-tech-writing/PROVENANCE.md` を起こす。
+- `natural-japanese`（`coji/natural-japanese`、外部依存）との棲み分け: 本スキルは
+  技術書の章・記事の規範（一文一行、脚注、パラグラフライティング、論証の厳密さ）を扱い、
+  `natural-japanese` はビジネス文書の自然さと AI 臭さの除去を扱う。名前が近く混同しやすい。
+- 再検討するなら: adapter が `alias` を尊重するようになったら外部依存へ移す。
+  上流が gist から通常の repo へ移った場合も同じ（その場合は alias 無しでも名前が付く）。
+
 ## 移管候補の提案（2026-07-15）
 
 - Status: 提案中（2026-07-16 に `docs/skill-scope-proposals.md` を廃止し、
