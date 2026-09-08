@@ -6,6 +6,12 @@
 
 そこで agent を起こすときは `pane run` ではなく **`herdr agent start <name> --kind <kind> --pane <id>` を使う**。これは Herdr が同じ pane で当該 agent を検出し入力受付可能と判断するまで返らないので、「起動したつもりで実は未起動」を構造的に防げる。起動後の指示は `herdr agent prompt <name> "..." --wait`（settled 状態まで待つ。既に承認待ちなら入力を送らず `agent_blocked` を返す）。確認していない foreground process 名を報告に書かないこと。
 
+**agent を起動する前に自動配送を入れる。** hooks は session 開始時に読まれるので、後から設定しても走っている session には効かない。`delivery.sh set both <type> <対象project絶対パス>` を使う。
+
+- codex は `monitor` だけでは**何も pull しない**。`monitor` は Monitor tool を使う claude-code 専用モードで、codex には SessionStart / SessionEnd と app-server bridge しか入らない。実測（`~/.apm`、codex、mode: monitor）で `Stop entries: 0` / `PostToolUse entries: 0`。turn 終わりの pull も mid-turn 配送も無いので、送っても pane は気づかず、orchestrator は毎回 `herdr agent prompt` で起こす必要がある。`both` にすれば bridge を残したまま Stop 側の pull が入る
+- hooks file（codex は `.codex/hooks.json`、claude-code は `.claude/settings.local.json`）を**手で書かない**。`delivery.sh set` が生成する。中身は Windows 用の `commandWindows` に `GIT_BASH` → `AGMSG_BASH` → 既定パスの fallback 連鎖と三重クォートを含み、手写しでは再現できない。hooks file の場所は type の manifest の `hooks_file` で決まり、project 相対に制限されている（絶対パスと traversal は拒否される）
+- 入れたら `delivery.sh status <type> <対象project絶対パス>` で `Stop entries` / `PostToolUse entries` の件数を**読み戻す**。0 件なら配送は入っていない
+
 | lifecycle   | spawn 経路                                              | 常駐プール経路                                                                                          |
 | ----------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | 3. 事前登録 | 同じ                                                    | 同じ。ただし固定名を再利用する                                                                          |
