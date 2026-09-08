@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-09-08T05:52:17.020932+00:00'
+generated_at: '2026-09-08T06:54:12.595972+00:00'
 apm_version: 0.29.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -5393,7 +5393,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: 2c9ee1b99165daa4dbb459f96bf2066c38c4b652
+  resolved_commit: a9f981dedc116d12c1764ac1dc8b327ec86c6bf7
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -6369,7 +6369,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
-  resolved_commit: 2c9ee1b99165daa4dbb459f96bf2066c38c4b652
+  resolved_commit: a9f981dedc116d12c1764ac1dc8b327ec86c6bf7
   resolved_ref: main
   version: 1.0.0
   virtual_path: manual-skills
@@ -6456,6 +6456,14 @@ dependencies:
     .config/opencode/skills/gh-fix-ci/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
     .config/opencode/skills/gh-fix-ci/scripts/inspect_pr_checks.py: sha256:9459e5b03f86785d184a83e5cd8d621b832e918ec04158a2962d867785812c6c
   content_hash: sha256:a24e011b9bc66373b8cd912107dca25a2917b63e707ad390aa6ad12325dd62b1
+- repo_url: k16shikano/fd287c3133457c4fd8f5601d34aa817d
+  name: japanese-tech-writing
+  host: gist.github.com
+  resolved_commit: c7189cdc9c2520be50418209834145bdf3a46e97
+  resolved_ref: c7189cdc9c2520be50418209834145bdf3a46e97
+  version: unknown
+  package_type: claude_skill
+  content_hash: sha256:dd4b5495821a9ff455c6d9a3c021d87ebebbc1fbe4ada96cbce45170aa0dbab3
 - repo_url: mattpocock/skills
   name: codebase-design
   host: github.com

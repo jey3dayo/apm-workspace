@@ -38,6 +38,9 @@ dependencies:
     - mattpocock/skills/skills/productivity/grilling#3cca18b368ae95cdbdebbff572ccafa662551015
     - mattpocock/skills/skills/productivity/writing-for-agents#3cca18b368ae95cdbdebbff572ccafa662551015
     - gonta223/humanizer-ja#a1e343696e43aa50e7218891f3319ab22cde3464
+    - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
+      ref: c7189cdc9c2520be50418209834145bdf3a46e97
+      alias: japanese-tech-writing
 
     # react-specific
     - millionco/react-doctor/skills/react-doctor#ff7dd679e8b9939a7dd8f828a530559a275836f7
