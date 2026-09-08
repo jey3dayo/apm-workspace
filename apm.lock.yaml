@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-09-07T12:53:01.859779+00:00'
+generated_at: '2026-09-08T05:07:46.291742+00:00'
 apm_version: 0.29.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -257,6 +257,24 @@ dependencies:
   - .agents/skills/perman-aws-vault/references/profile-catalog.md
   - .agents/skills/perman-aws-vault/references/scenarios.md
   - .agents/skills/perman-aws-vault/references/setup-guide.md
+  - .claude/skills/perman-aws-vault
+  - .claude/skills/perman-aws-vault/SKILL.md
+  - .claude/skills/perman-aws-vault/agents/openai.yaml
+  - .claude/skills/perman-aws-vault/references/advanced-usage.md
+  - .claude/skills/perman-aws-vault/references/authentication-flow.md
+  - .claude/skills/perman-aws-vault/references/aws-profiles.md
+  - .claude/skills/perman-aws-vault/references/profile-catalog.md
+  - .claude/skills/perman-aws-vault/references/scenarios.md
+  - .claude/skills/perman-aws-vault/references/setup-guide.md
+  - .config/opencode/skills/perman-aws-vault
+  - .config/opencode/skills/perman-aws-vault/SKILL.md
+  - .config/opencode/skills/perman-aws-vault/agents/openai.yaml
+  - .config/opencode/skills/perman-aws-vault/references/advanced-usage.md
+  - .config/opencode/skills/perman-aws-vault/references/authentication-flow.md
+  - .config/opencode/skills/perman-aws-vault/references/aws-profiles.md
+  - .config/opencode/skills/perman-aws-vault/references/profile-catalog.md
+  - .config/opencode/skills/perman-aws-vault/references/scenarios.md
+  - .config/opencode/skills/perman-aws-vault/references/setup-guide.md
   deployed_file_hashes:
     .agents/skills/perman-aws-vault/SKILL.md: sha256:af80de0bd54fff43203bb1e60d30174ca52edeb70f27da6fca0a70938f04a4a1
     .agents/skills/perman-aws-vault/agents/openai.yaml: sha256:b80eeacb8b6c3d97383fc8966b3bbdf18b152851767b76998a88da8c604c458a
@@ -266,6 +284,22 @@ dependencies:
     .agents/skills/perman-aws-vault/references/profile-catalog.md: sha256:6eed982d8f2f4ae14957e402eaa09042ab3370507b87a759f92ff7f37e47b472
     .agents/skills/perman-aws-vault/references/scenarios.md: sha256:0564b45728e19b58f501d4841c13e9bcaefe777ea3f72c4d1e043ea4bddb86e3
     .agents/skills/perman-aws-vault/references/setup-guide.md: sha256:e4d2c9c4ac0e146e9a9ae45933bc1cf5fbcbd940cf8fa3587cfb1ffa64436704
+    .claude/skills/perman-aws-vault/SKILL.md: sha256:af80de0bd54fff43203bb1e60d30174ca52edeb70f27da6fca0a70938f04a4a1
+    .claude/skills/perman-aws-vault/agents/openai.yaml: sha256:b80eeacb8b6c3d97383fc8966b3bbdf18b152851767b76998a88da8c604c458a
+    .claude/skills/perman-aws-vault/references/advanced-usage.md: sha256:2698f047706da49e5417a2ab3256ebcda668c3c35a42c80f79146961d88e53f2
+    .claude/skills/perman-aws-vault/references/authentication-flow.md: sha256:c430d2bae599c92f8814c85a391cc7ee63877d549cfd30ead2f0c4ae2ef78cb6
+    .claude/skills/perman-aws-vault/references/aws-profiles.md: sha256:21140dbe617f1db5aa094a0112ec356481aa582ad3aa62efbaccb8dbe748536d
+    .claude/skills/perman-aws-vault/references/profile-catalog.md: sha256:6eed982d8f2f4ae14957e402eaa09042ab3370507b87a759f92ff7f37e47b472
+    .claude/skills/perman-aws-vault/references/scenarios.md: sha256:0564b45728e19b58f501d4841c13e9bcaefe777ea3f72c4d1e043ea4bddb86e3
+    .claude/skills/perman-aws-vault/references/setup-guide.md: sha256:e4d2c9c4ac0e146e9a9ae45933bc1cf5fbcbd940cf8fa3587cfb1ffa64436704
+    .config/opencode/skills/perman-aws-vault/SKILL.md: sha256:af80de0bd54fff43203bb1e60d30174ca52edeb70f27da6fca0a70938f04a4a1
+    .config/opencode/skills/perman-aws-vault/agents/openai.yaml: sha256:b80eeacb8b6c3d97383fc8966b3bbdf18b152851767b76998a88da8c604c458a
+    .config/opencode/skills/perman-aws-vault/references/advanced-usage.md: sha256:2698f047706da49e5417a2ab3256ebcda668c3c35a42c80f79146961d88e53f2
+    .config/opencode/skills/perman-aws-vault/references/authentication-flow.md: sha256:c430d2bae599c92f8814c85a391cc7ee63877d549cfd30ead2f0c4ae2ef78cb6
+    .config/opencode/skills/perman-aws-vault/references/aws-profiles.md: sha256:21140dbe617f1db5aa094a0112ec356481aa582ad3aa62efbaccb8dbe748536d
+    .config/opencode/skills/perman-aws-vault/references/profile-catalog.md: sha256:6eed982d8f2f4ae14957e402eaa09042ab3370507b87a759f92ff7f37e47b472
+    .config/opencode/skills/perman-aws-vault/references/scenarios.md: sha256:0564b45728e19b58f501d4841c13e9bcaefe777ea3f72c4d1e043ea4bddb86e3
+    .config/opencode/skills/perman-aws-vault/references/setup-guide.md: sha256:e4d2c9c4ac0e146e9a9ae45933bc1cf5fbcbd940cf8fa3587cfb1ffa64436704
   content_hash: sha256:8d20e3aa7e2bf333f4fd3001c085e071f6b3e6bbf39769a447cd5b40f26a46fe
 - repo_url: caad-develop/claude-code-marketplace
   name: caad-skill-deployer
@@ -282,11 +316,29 @@ dependencies:
   - .agents/skills/caad-skill-deployer/agents/openai.yaml
   - .agents/skills/caad-skill-deployer/references/folder-policy.md
   - .agents/skills/caad-skill-deployer/scripts/inspect_skill_source.py
+  - .claude/skills/caad-skill-deployer
+  - .claude/skills/caad-skill-deployer/SKILL.md
+  - .claude/skills/caad-skill-deployer/agents/openai.yaml
+  - .claude/skills/caad-skill-deployer/references/folder-policy.md
+  - .claude/skills/caad-skill-deployer/scripts/inspect_skill_source.py
+  - .config/opencode/skills/caad-skill-deployer
+  - .config/opencode/skills/caad-skill-deployer/SKILL.md
+  - .config/opencode/skills/caad-skill-deployer/agents/openai.yaml
+  - .config/opencode/skills/caad-skill-deployer/references/folder-policy.md
+  - .config/opencode/skills/caad-skill-deployer/scripts/inspect_skill_source.py
   deployed_file_hashes:
     .agents/skills/caad-skill-deployer/SKILL.md: sha256:61ebd3060e671c05495bcec6bbb09b6cea9eb4947dae51898bc01ae480564f82
     .agents/skills/caad-skill-deployer/agents/openai.yaml: sha256:37ef1416cc3c498f66cafe12850d63e6fef7fc7758e4770c44c16e1b844dab58
     .agents/skills/caad-skill-deployer/references/folder-policy.md: sha256:b70b055285d4372ed91a6d93c95aa454785eb31fbe1e6cd5248499cc69e3be2e
     .agents/skills/caad-skill-deployer/scripts/inspect_skill_source.py: sha256:6a2215b28f2738b0827c5680ee20a4e822e3457b9b620c397c21136c88a9ee9c
+    .claude/skills/caad-skill-deployer/SKILL.md: sha256:61ebd3060e671c05495bcec6bbb09b6cea9eb4947dae51898bc01ae480564f82
+    .claude/skills/caad-skill-deployer/agents/openai.yaml: sha256:37ef1416cc3c498f66cafe12850d63e6fef7fc7758e4770c44c16e1b844dab58
+    .claude/skills/caad-skill-deployer/references/folder-policy.md: sha256:b70b055285d4372ed91a6d93c95aa454785eb31fbe1e6cd5248499cc69e3be2e
+    .claude/skills/caad-skill-deployer/scripts/inspect_skill_source.py: sha256:6a2215b28f2738b0827c5680ee20a4e822e3457b9b620c397c21136c88a9ee9c
+    .config/opencode/skills/caad-skill-deployer/SKILL.md: sha256:61ebd3060e671c05495bcec6bbb09b6cea9eb4947dae51898bc01ae480564f82
+    .config/opencode/skills/caad-skill-deployer/agents/openai.yaml: sha256:37ef1416cc3c498f66cafe12850d63e6fef7fc7758e4770c44c16e1b844dab58
+    .config/opencode/skills/caad-skill-deployer/references/folder-policy.md: sha256:b70b055285d4372ed91a6d93c95aa454785eb31fbe1e6cd5248499cc69e3be2e
+    .config/opencode/skills/caad-skill-deployer/scripts/inspect_skill_source.py: sha256:6a2215b28f2738b0827c5680ee20a4e822e3457b9b620c397c21136c88a9ee9c
   content_hash: sha256:a1a34580255f2a2049b5a52044d5973360764f9c4cfb00d42755a499eb20e55d
 - repo_url: cathrynlavery/diagram-design
   name: diagram-design
@@ -7327,11 +7379,29 @@ dependencies:
   - .agents/skills/improve/references/audit-playbook.md
   - .agents/skills/improve/references/closing-the-loop.md
   - .agents/skills/improve/references/plan-template.md
+  - .claude/skills/improve
+  - .claude/skills/improve/SKILL.md
+  - .claude/skills/improve/references/audit-playbook.md
+  - .claude/skills/improve/references/closing-the-loop.md
+  - .claude/skills/improve/references/plan-template.md
+  - .config/opencode/skills/improve
+  - .config/opencode/skills/improve/SKILL.md
+  - .config/opencode/skills/improve/references/audit-playbook.md
+  - .config/opencode/skills/improve/references/closing-the-loop.md
+  - .config/opencode/skills/improve/references/plan-template.md
   deployed_file_hashes:
     .agents/skills/improve/SKILL.md: sha256:1599aa29e9b16424cb767779efac53fa56e3f38be92dff4ac587393a1ad5070a
     .agents/skills/improve/references/audit-playbook.md: sha256:587c1b927070f3c28139ad95ac34cc21a7da32618cfeb966cb774e58a865d4c8
     .agents/skills/improve/references/closing-the-loop.md: sha256:5d526bb378e1783bbeb68d7af527776cbe98cde27a1aeccbd13e818e5b73b454
     .agents/skills/improve/references/plan-template.md: sha256:7be76dd3c29442288fa7cee4432fc6e95c2fdbf748c9b356344bf647c5f8722e
+    .claude/skills/improve/SKILL.md: sha256:1599aa29e9b16424cb767779efac53fa56e3f38be92dff4ac587393a1ad5070a
+    .claude/skills/improve/references/audit-playbook.md: sha256:587c1b927070f3c28139ad95ac34cc21a7da32618cfeb966cb774e58a865d4c8
+    .claude/skills/improve/references/closing-the-loop.md: sha256:5d526bb378e1783bbeb68d7af527776cbe98cde27a1aeccbd13e818e5b73b454
+    .claude/skills/improve/references/plan-template.md: sha256:7be76dd3c29442288fa7cee4432fc6e95c2fdbf748c9b356344bf647c5f8722e
+    .config/opencode/skills/improve/SKILL.md: sha256:1599aa29e9b16424cb767779efac53fa56e3f38be92dff4ac587393a1ad5070a
+    .config/opencode/skills/improve/references/audit-playbook.md: sha256:587c1b927070f3c28139ad95ac34cc21a7da32618cfeb966cb774e58a865d4c8
+    .config/opencode/skills/improve/references/closing-the-loop.md: sha256:5d526bb378e1783bbeb68d7af527776cbe98cde27a1aeccbd13e818e5b73b454
+    .config/opencode/skills/improve/references/plan-template.md: sha256:7be76dd3c29442288fa7cee4432fc6e95c2fdbf748c9b356344bf647c5f8722e
   content_hash: sha256:4218ed348b5520fee6577f93104f70ab7fb6545d883b1540158b13d6323af916
   declared_license: MIT
 - repo_url: stablyai/orca
@@ -9197,51 +9267,6 @@ deployments:
   content_hash: sha256:fcd0dded85973fd92a4fa92b3d5622b942f2951b132756c8163eae00888feb62
 - kind: project-relative
   target: agents
-  value: .agents/skills/caad-skill-deployer
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  content_hash: null
-- kind: project-relative
-  target: agents
-  value: .agents/skills/caad-skill-deployer/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  content_hash: sha256:61ebd3060e671c05495bcec6bbb09b6cea9eb4947dae51898bc01ae480564f82
-- kind: project-relative
-  target: agents
-  value: .agents/skills/caad-skill-deployer/agents/openai.yaml
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  content_hash: sha256:37ef1416cc3c498f66cafe12850d63e6fef7fc7758e4770c44c16e1b844dab58
-- kind: project-relative
-  target: agents
-  value: .agents/skills/caad-skill-deployer/references/folder-policy.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  content_hash: sha256:b70b055285d4372ed91a6d93c95aa454785eb31fbe1e6cd5248499cc69e3be2e
-- kind: project-relative
-  target: agents
-  value: .agents/skills/caad-skill-deployer/scripts/inspect_skill_source.py
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  content_hash: sha256:6a2215b28f2738b0827c5680ee20a4e822e3457b9b620c397c21136c88a9ee9c
-- kind: project-relative
-  target: agents
   value: .agents/skills/code-review
   runtime: null
   scope: project
@@ -9710,51 +9735,6 @@ deployments:
   content_hash: sha256:679bc711c6972322318f50f5ba16763b4dc356814f8ed48e74f7c1044eae6f12
 - kind: project-relative
   target: agents
-  value: .agents/skills/improve
-  runtime: null
-  scope: project
-  owners:
-  - shadcn/improve
-  active_owner: shadcn/improve
-  content_hash: null
-- kind: project-relative
-  target: agents
-  value: .agents/skills/improve/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - shadcn/improve
-  active_owner: shadcn/improve
-  content_hash: sha256:1599aa29e9b16424cb767779efac53fa56e3f38be92dff4ac587393a1ad5070a
-- kind: project-relative
-  target: agents
-  value: .agents/skills/improve/references/audit-playbook.md
-  runtime: null
-  scope: project
-  owners:
-  - shadcn/improve
-  active_owner: shadcn/improve
-  content_hash: sha256:587c1b927070f3c28139ad95ac34cc21a7da32618cfeb966cb774e58a865d4c8
-- kind: project-relative
-  target: agents
-  value: .agents/skills/improve/references/closing-the-loop.md
-  runtime: null
-  scope: project
-  owners:
-  - shadcn/improve
-  active_owner: shadcn/improve
-  content_hash: sha256:5d526bb378e1783bbeb68d7af527776cbe98cde27a1aeccbd13e818e5b73b454
-- kind: project-relative
-  target: agents
-  value: .agents/skills/improve/references/plan-template.md
-  runtime: null
-  scope: project
-  owners:
-  - shadcn/improve
-  active_owner: shadcn/improve
-  content_hash: sha256:7be76dd3c29442288fa7cee4432fc6e95c2fdbf748c9b356344bf647c5f8722e
-- kind: project-relative
-  target: agents
   value: .agents/skills/jina-web-research
   runtime: null
   scope: project
@@ -9843,87 +9823,6 @@ deployments:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
   content_hash: sha256:14c2a50593bf13eb148781a4a03eb9d9a536e14a6d69ac9d814729e5df60cc0d
-- kind: project-relative
-  target: agents
-  value: .agents/skills/perman-aws-vault
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
-  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
-  content_hash: null
-- kind: project-relative
-  target: agents
-  value: .agents/skills/perman-aws-vault/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
-  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
-  content_hash: sha256:af80de0bd54fff43203bb1e60d30174ca52edeb70f27da6fca0a70938f04a4a1
-- kind: project-relative
-  target: agents
-  value: .agents/skills/perman-aws-vault/agents/openai.yaml
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
-  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
-  content_hash: sha256:b80eeacb8b6c3d97383fc8966b3bbdf18b152851767b76998a88da8c604c458a
-- kind: project-relative
-  target: agents
-  value: .agents/skills/perman-aws-vault/references/advanced-usage.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
-  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
-  content_hash: sha256:2698f047706da49e5417a2ab3256ebcda668c3c35a42c80f79146961d88e53f2
-- kind: project-relative
-  target: agents
-  value: .agents/skills/perman-aws-vault/references/authentication-flow.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
-  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
-  content_hash: sha256:c430d2bae599c92f8814c85a391cc7ee63877d549cfd30ead2f0c4ae2ef78cb6
-- kind: project-relative
-  target: agents
-  value: .agents/skills/perman-aws-vault/references/aws-profiles.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
-  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
-  content_hash: sha256:21140dbe617f1db5aa094a0112ec356481aa582ad3aa62efbaccb8dbe748536d
-- kind: project-relative
-  target: agents
-  value: .agents/skills/perman-aws-vault/references/profile-catalog.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
-  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
-  content_hash: sha256:6eed982d8f2f4ae14957e402eaa09042ab3370507b87a759f92ff7f37e47b472
-- kind: project-relative
-  target: agents
-  value: .agents/skills/perman-aws-vault/references/scenarios.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
-  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
-  content_hash: sha256:0564b45728e19b58f501d4841c13e9bcaefe777ea3f72c4d1e043ea4bddb86e3
-- kind: project-relative
-  target: agents
-  value: .agents/skills/perman-aws-vault/references/setup-guide.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
-  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
-  content_hash: sha256:e4d2c9c4ac0e146e9a9ae45933bc1cf5fbcbd940cf8fa3587cfb1ffa64436704
 - kind: project-relative
   target: agents
   value: .agents/skills/polish
@@ -17126,6 +17025,51 @@ deployments:
   content_hash: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
 - kind: project-relative
   target: claude
+  value: .claude/skills/caad-skill-deployer
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/caad-skill-deployer/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  content_hash: sha256:61ebd3060e671c05495bcec6bbb09b6cea9eb4947dae51898bc01ae480564f82
+- kind: project-relative
+  target: claude
+  value: .claude/skills/caad-skill-deployer/agents/openai.yaml
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  content_hash: sha256:37ef1416cc3c498f66cafe12850d63e6fef7fc7758e4770c44c16e1b844dab58
+- kind: project-relative
+  target: claude
+  value: .claude/skills/caad-skill-deployer/references/folder-policy.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  content_hash: sha256:b70b055285d4372ed91a6d93c95aa454785eb31fbe1e6cd5248499cc69e3be2e
+- kind: project-relative
+  target: claude
+  value: .claude/skills/caad-skill-deployer/scripts/inspect_skill_source.py
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  content_hash: sha256:6a2215b28f2738b0827c5680ee20a4e822e3457b9b620c397c21136c88a9ee9c
+- kind: project-relative
+  target: claude
   value: .claude/skills/ci-stability-hooks
   runtime: null
   scope: project
@@ -19871,6 +19815,15 @@ deployments:
   content_hash: sha256:a2817face7fbd563d525dd364c4f155c4d9a2a58cb22fbaee2a8ff76ff08e163
 - kind: project-relative
   target: claude
+  value: .claude/skills/improve
+  runtime: null
+  scope: project
+  owners:
+  - shadcn/improve
+  active_owner: shadcn/improve
+  content_hash: null
+- kind: project-relative
+  target: claude
   value: .claude/skills/improve-animations
   runtime: null
   scope: project
@@ -19977,6 +19930,42 @@ deployments:
   - ibelick/ui-skills/skills/improve-ui
   active_owner: ibelick/ui-skills/skills/improve-ui
   content_hash: sha256:8faca7a14659a7f951d3b89fb730a43a4ce99966cc00481bf83d82b90f34b868
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - shadcn/improve
+  active_owner: shadcn/improve
+  content_hash: sha256:1599aa29e9b16424cb767779efac53fa56e3f38be92dff4ac587393a1ad5070a
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve/references/audit-playbook.md
+  runtime: null
+  scope: project
+  owners:
+  - shadcn/improve
+  active_owner: shadcn/improve
+  content_hash: sha256:587c1b927070f3c28139ad95ac34cc21a7da32618cfeb966cb774e58a865d4c8
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve/references/closing-the-loop.md
+  runtime: null
+  scope: project
+  owners:
+  - shadcn/improve
+  active_owner: shadcn/improve
+  content_hash: sha256:5d526bb378e1783bbeb68d7af527776cbe98cde27a1aeccbd13e818e5b73b454
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve/references/plan-template.md
+  runtime: null
+  scope: project
+  owners:
+  - shadcn/improve
+  active_owner: shadcn/improve
+  content_hash: sha256:7be76dd3c29442288fa7cee4432fc6e95c2fdbf748c9b356344bf647c5f8722e
 - kind: project-relative
   target: claude
   value: .claude/skills/japanese-tech-writing
@@ -20472,6 +20461,87 @@ deployments:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
   content_hash: sha256:3226f9607101c0f4fd9318f6c349eda69247afb3ac7e9f909374b24c18af66be
+- kind: project-relative
+  target: claude
+  value: .claude/skills/perman-aws-vault
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/perman-aws-vault/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:af80de0bd54fff43203bb1e60d30174ca52edeb70f27da6fca0a70938f04a4a1
+- kind: project-relative
+  target: claude
+  value: .claude/skills/perman-aws-vault/agents/openai.yaml
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:b80eeacb8b6c3d97383fc8966b3bbdf18b152851767b76998a88da8c604c458a
+- kind: project-relative
+  target: claude
+  value: .claude/skills/perman-aws-vault/references/advanced-usage.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:2698f047706da49e5417a2ab3256ebcda668c3c35a42c80f79146961d88e53f2
+- kind: project-relative
+  target: claude
+  value: .claude/skills/perman-aws-vault/references/authentication-flow.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:c430d2bae599c92f8814c85a391cc7ee63877d549cfd30ead2f0c4ae2ef78cb6
+- kind: project-relative
+  target: claude
+  value: .claude/skills/perman-aws-vault/references/aws-profiles.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:21140dbe617f1db5aa094a0112ec356481aa582ad3aa62efbaccb8dbe748536d
+- kind: project-relative
+  target: claude
+  value: .claude/skills/perman-aws-vault/references/profile-catalog.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:6eed982d8f2f4ae14957e402eaa09042ab3370507b87a759f92ff7f37e47b472
+- kind: project-relative
+  target: claude
+  value: .claude/skills/perman-aws-vault/references/scenarios.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:0564b45728e19b58f501d4841c13e9bcaefe777ea3f72c4d1e043ea4bddb86e3
+- kind: project-relative
+  target: claude
+  value: .claude/skills/perman-aws-vault/references/setup-guide.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:e4d2c9c4ac0e146e9a9ae45933bc1cf5fbcbd940cf8fa3587cfb1ffa64436704
 - kind: project-relative
   target: claude
   value: .claude/skills/prepare-goal
@@ -29654,6 +29724,51 @@ deployments:
   content_hash: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
 - kind: project-relative
   target: codex
+  value: .agents/skills/caad-skill-deployer
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/caad-skill-deployer/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  content_hash: sha256:61ebd3060e671c05495bcec6bbb09b6cea9eb4947dae51898bc01ae480564f82
+- kind: project-relative
+  target: codex
+  value: .agents/skills/caad-skill-deployer/agents/openai.yaml
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  content_hash: sha256:37ef1416cc3c498f66cafe12850d63e6fef7fc7758e4770c44c16e1b844dab58
+- kind: project-relative
+  target: codex
+  value: .agents/skills/caad-skill-deployer/references/folder-policy.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  content_hash: sha256:b70b055285d4372ed91a6d93c95aa454785eb31fbe1e6cd5248499cc69e3be2e
+- kind: project-relative
+  target: codex
+  value: .agents/skills/caad-skill-deployer/scripts/inspect_skill_source.py
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  content_hash: sha256:6a2215b28f2738b0827c5680ee20a4e822e3457b9b620c397c21136c88a9ee9c
+- kind: project-relative
+  target: codex
   value: .agents/skills/ci-stability-hooks
   runtime: null
   scope: project
@@ -32399,6 +32514,15 @@ deployments:
   content_hash: sha256:a2817face7fbd563d525dd364c4f155c4d9a2a58cb22fbaee2a8ff76ff08e163
 - kind: project-relative
   target: codex
+  value: .agents/skills/improve
+  runtime: null
+  scope: project
+  owners:
+  - shadcn/improve
+  active_owner: shadcn/improve
+  content_hash: null
+- kind: project-relative
+  target: codex
   value: .agents/skills/improve-animations
   runtime: null
   scope: project
@@ -32505,6 +32629,42 @@ deployments:
   - ibelick/ui-skills/skills/improve-ui
   active_owner: ibelick/ui-skills/skills/improve-ui
   content_hash: sha256:8faca7a14659a7f951d3b89fb730a43a4ce99966cc00481bf83d82b90f34b868
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - shadcn/improve
+  active_owner: shadcn/improve
+  content_hash: sha256:1599aa29e9b16424cb767779efac53fa56e3f38be92dff4ac587393a1ad5070a
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve/references/audit-playbook.md
+  runtime: null
+  scope: project
+  owners:
+  - shadcn/improve
+  active_owner: shadcn/improve
+  content_hash: sha256:587c1b927070f3c28139ad95ac34cc21a7da32618cfeb966cb774e58a865d4c8
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve/references/closing-the-loop.md
+  runtime: null
+  scope: project
+  owners:
+  - shadcn/improve
+  active_owner: shadcn/improve
+  content_hash: sha256:5d526bb378e1783bbeb68d7af527776cbe98cde27a1aeccbd13e818e5b73b454
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve/references/plan-template.md
+  runtime: null
+  scope: project
+  owners:
+  - shadcn/improve
+  active_owner: shadcn/improve
+  content_hash: sha256:7be76dd3c29442288fa7cee4432fc6e95c2fdbf748c9b356344bf647c5f8722e
 - kind: project-relative
   target: codex
   value: .agents/skills/japanese-tech-writing
@@ -33000,6 +33160,87 @@ deployments:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
   content_hash: sha256:3226f9607101c0f4fd9318f6c349eda69247afb3ac7e9f909374b24c18af66be
+- kind: project-relative
+  target: codex
+  value: .agents/skills/perman-aws-vault
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/perman-aws-vault/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:af80de0bd54fff43203bb1e60d30174ca52edeb70f27da6fca0a70938f04a4a1
+- kind: project-relative
+  target: codex
+  value: .agents/skills/perman-aws-vault/agents/openai.yaml
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:b80eeacb8b6c3d97383fc8966b3bbdf18b152851767b76998a88da8c604c458a
+- kind: project-relative
+  target: codex
+  value: .agents/skills/perman-aws-vault/references/advanced-usage.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:2698f047706da49e5417a2ab3256ebcda668c3c35a42c80f79146961d88e53f2
+- kind: project-relative
+  target: codex
+  value: .agents/skills/perman-aws-vault/references/authentication-flow.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:c430d2bae599c92f8814c85a391cc7ee63877d549cfd30ead2f0c4ae2ef78cb6
+- kind: project-relative
+  target: codex
+  value: .agents/skills/perman-aws-vault/references/aws-profiles.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:21140dbe617f1db5aa094a0112ec356481aa582ad3aa62efbaccb8dbe748536d
+- kind: project-relative
+  target: codex
+  value: .agents/skills/perman-aws-vault/references/profile-catalog.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:6eed982d8f2f4ae14957e402eaa09042ab3370507b87a759f92ff7f37e47b472
+- kind: project-relative
+  target: codex
+  value: .agents/skills/perman-aws-vault/references/scenarios.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:0564b45728e19b58f501d4841c13e9bcaefe777ea3f72c4d1e043ea4bddb86e3
+- kind: project-relative
+  target: codex
+  value: .agents/skills/perman-aws-vault/references/setup-guide.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:e4d2c9c4ac0e146e9a9ae45933bc1cf5fbcbd940cf8fa3587cfb1ffa64436704
 - kind: project-relative
   target: codex
   value: .agents/skills/prepare-goal
@@ -42740,6 +42981,51 @@ deployments:
   content_hash: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
 - kind: project-relative
   target: opencode
+  value: .config/opencode/skills/caad-skill-deployer
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  content_hash: null
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/caad-skill-deployer/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  content_hash: sha256:61ebd3060e671c05495bcec6bbb09b6cea9eb4947dae51898bc01ae480564f82
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/caad-skill-deployer/agents/openai.yaml
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  content_hash: sha256:37ef1416cc3c498f66cafe12850d63e6fef7fc7758e4770c44c16e1b844dab58
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/caad-skill-deployer/references/folder-policy.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  content_hash: sha256:b70b055285d4372ed91a6d93c95aa454785eb31fbe1e6cd5248499cc69e3be2e
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/caad-skill-deployer/scripts/inspect_skill_source.py
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
+  content_hash: sha256:6a2215b28f2738b0827c5680ee20a4e822e3457b9b620c397c21136c88a9ee9c
+- kind: project-relative
+  target: opencode
   value: .config/opencode/skills/ci-stability-hooks
   runtime: null
   scope: project
@@ -45485,6 +45771,15 @@ deployments:
   content_hash: sha256:a2817face7fbd563d525dd364c4f155c4d9a2a58cb22fbaee2a8ff76ff08e163
 - kind: project-relative
   target: opencode
+  value: .config/opencode/skills/improve
+  runtime: null
+  scope: project
+  owners:
+  - shadcn/improve
+  active_owner: shadcn/improve
+  content_hash: null
+- kind: project-relative
+  target: opencode
   value: .config/opencode/skills/improve-animations
   runtime: null
   scope: project
@@ -45591,6 +45886,42 @@ deployments:
   - ibelick/ui-skills/skills/improve-ui
   active_owner: ibelick/ui-skills/skills/improve-ui
   content_hash: sha256:8faca7a14659a7f951d3b89fb730a43a4ce99966cc00481bf83d82b90f34b868
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/improve/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - shadcn/improve
+  active_owner: shadcn/improve
+  content_hash: sha256:1599aa29e9b16424cb767779efac53fa56e3f38be92dff4ac587393a1ad5070a
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/improve/references/audit-playbook.md
+  runtime: null
+  scope: project
+  owners:
+  - shadcn/improve
+  active_owner: shadcn/improve
+  content_hash: sha256:587c1b927070f3c28139ad95ac34cc21a7da32618cfeb966cb774e58a865d4c8
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/improve/references/closing-the-loop.md
+  runtime: null
+  scope: project
+  owners:
+  - shadcn/improve
+  active_owner: shadcn/improve
+  content_hash: sha256:5d526bb378e1783bbeb68d7af527776cbe98cde27a1aeccbd13e818e5b73b454
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/improve/references/plan-template.md
+  runtime: null
+  scope: project
+  owners:
+  - shadcn/improve
+  active_owner: shadcn/improve
+  content_hash: sha256:7be76dd3c29442288fa7cee4432fc6e95c2fdbf748c9b356344bf647c5f8722e
 - kind: project-relative
   target: opencode
   value: .config/opencode/skills/japanese-tech-writing
@@ -46086,6 +46417,87 @@ deployments:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
   content_hash: sha256:3226f9607101c0f4fd9318f6c349eda69247afb3ac7e9f909374b24c18af66be
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/perman-aws-vault
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: null
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/perman-aws-vault/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:af80de0bd54fff43203bb1e60d30174ca52edeb70f27da6fca0a70938f04a4a1
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/perman-aws-vault/agents/openai.yaml
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:b80eeacb8b6c3d97383fc8966b3bbdf18b152851767b76998a88da8c604c458a
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/perman-aws-vault/references/advanced-usage.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:2698f047706da49e5417a2ab3256ebcda668c3c35a42c80f79146961d88e53f2
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/perman-aws-vault/references/authentication-flow.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:c430d2bae599c92f8814c85a391cc7ee63877d549cfd30ead2f0c4ae2ef78cb6
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/perman-aws-vault/references/aws-profiles.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:21140dbe617f1db5aa094a0112ec356481aa582ad3aa62efbaccb8dbe748536d
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/perman-aws-vault/references/profile-catalog.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:6eed982d8f2f4ae14957e402eaa09042ab3370507b87a759f92ff7f37e47b472
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/perman-aws-vault/references/scenarios.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:0564b45728e19b58f501d4841c13e9bcaefe777ea3f72c4d1e043ea4bddb86e3
+- kind: project-relative
+  target: opencode
+  value: .config/opencode/skills/perman-aws-vault/references/setup-guide.md
+  runtime: null
+  scope: project
+  owners:
+  - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  active_owner: caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault
+  content_hash: sha256:e4d2c9c4ac0e146e9a9ae45933bc1cf5fbcbd940cf8fa3587cfb1ffa64436704
 - kind: project-relative
   target: opencode
   value: .config/opencode/skills/prepare-goal
