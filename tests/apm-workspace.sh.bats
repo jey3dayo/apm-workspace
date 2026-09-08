@@ -1152,8 +1152,8 @@ doctor_fixture_env() {
   rm -rf "$doctor_home/.codex/commands"
   rm -rf "$doctor_home/.cursor/rules"
   printf 'wrong type\n' >"$doctor_home/.cursor/rules"
-  rm -rf "$doctor_home/.opencode/skills"
-  printf 'wrong type\n' >"$doctor_home/.opencode/skills"
+  rm -rf "$doctor_home/.claude/skills"
+  printf 'wrong type\n' >"$doctor_home/.claude/skills"
 
   run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
 
@@ -1162,8 +1162,65 @@ doctor_fixture_env() {
   [[ "$output" == *"$doctor_home/.claude/agents"* ]]
   [[ "$output" == *"$doctor_home/.codex/commands"* ]]
   [[ "$output" == *"$doctor_home/.cursor/rules"* ]]
-  [[ "$output" == *"$doctor_home/.opencode/skills"* ]]
+  [[ "$output" == *"$doctor_home/.claude/skills"* ]]
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "doctor reports skills=n/a for a target with the skills-less sentinel and does not fail on it" {
+  make_doctor_fixture
+  rm -rf "$doctor_home/.opencode/skills"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"opencode: config=present agents=present commands=present rules=present skills=n/a"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+# --- replace_skill_targets_from_stage ---------------------------------------
+
+@test "replace_skill_targets_from_stage does not deploy skills for a target with the skills-less sentinel" {
+  stage_root="$(mktemp -d)"
+  runtime_home="$(mktemp -d)"
+  target_root="$runtime_home/.opencode"
+
+  mkdir -p "$target_root/skills/old-skill"
+  printf '%s\n' 'old' >"$target_root/skills/old-skill/SKILL.md"
+  mkdir -p "$stage_root/opencode/skills/new-skill"
+  printf '%s\n' 'new' >"$stage_root/opencode/skills/new-skill/SKILL.md"
+
+  HOME="$runtime_home"
+  managed_catalog_runtime_targets() {
+    printf '%s\n' 'opencode|.opencode|CLAUDE.md|-'
+  }
+
+  run replace_skill_targets_from_stage "$stage_root"
+
+  [ "$status" -eq 0 ]
+  [ ! -e "$target_root/skills" ]
+
+  rm -rf "$stage_root" "$runtime_home"
+}
+
+@test "replace_skill_targets_from_stage still deploys skills for a target without the sentinel" {
+  stage_root="$(mktemp -d)"
+  runtime_home="$(mktemp -d)"
+  target_root="$runtime_home/.claude"
+
+  mkdir -p "$stage_root/claude/skills/new-skill"
+  printf '%s\n' 'new' >"$stage_root/claude/skills/new-skill/SKILL.md"
+
+  HOME="$runtime_home"
+  managed_catalog_runtime_targets() {
+    printf '%s\n' 'claude|.claude|CLAUDE.md|.claude'
+  }
+
+  run replace_skill_targets_from_stage "$stage_root"
+
+  [ "$status" -eq 0 ]
+  [ -f "$target_root/skills/new-skill/SKILL.md" ]
+
+  rm -rf "$stage_root" "$runtime_home"
 }
 
 # --- assert_catalog_stage_safety --------------------------------------------
