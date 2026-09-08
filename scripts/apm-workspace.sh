@@ -1609,6 +1609,13 @@ print_catalog_summary() {
     "$instructions" "$tracked_manifest" "$global_ref" "$status"
 }
 
+# Fields: name|home-relative root|config file|skills root override.
+# An empty override deploys skills under the target's own root; "-" means the
+# target has no skills face at all. OpenCode takes "-" because it already reads
+# ~/.agents/skills as a global source, so ~/.opencode/skills only duplicated it.
+# Do not express that by pointing a second target at .agents instead:
+# reconcile_skills_root_from_stage prunes entries the stage lacks, so two
+# targets sharing one skills root delete each other's skills.
 managed_catalog_runtime_targets() {
   cat <<'EOF'
 claude|.claude|CLAUDE.md|
