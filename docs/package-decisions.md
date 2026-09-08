@@ -135,10 +135,10 @@
   この repo の `scripts/replace-bold-headings.ts` が `- **label**` を house style として剥がす
   （2026-09-08 実測、6 箇所）。`mise run format` のたびに戻るため、上流と完全一致はしない。
   太字の有無は規範の内容に影響しないので、house style を優先して差分を受け入れる。
-- lane の判断: 第三者コピーなので原則としては `manual-skills`（本ファイルの
-  `gh-address-comments` / `gh-fix-ci` の項が定める「catalog を自分の成果物に限定する」原則）。
-  2026-09-08 時点では `catalog` に置いたまま。移すなら `manual-skills/.apm/skills/**` +
-  `upstreams/japanese-tech-writing/PROVENANCE.md` を起こす。
+- lane の判断: 「第三者 skill の既定レーン（2026-09-08）」の既定に従い、adapter が `alias` を
+  尊重した時点で alias 付き外部依存へ移す。それまでは vendor 継続で、置き場は `catalog` ではなく
+  `manual-skills/.apm/skills/**` + `upstreams/japanese-tech-writing/PROVENANCE.md`
+  （catalog を自分の成果物に限定する原則による）。2026-09-08 時点では `catalog` に置いたまま。
 - `natural-japanese`（`coji/natural-japanese`、外部依存）との棲み分け: 本スキルは
   技術書の章・記事の規範（一文一行、脚注、パラグラフライティング、論証の厳密さ）を扱い、
   `natural-japanese` はビジネス文書の自然さと AI 臭さの除去を扱う。名前が近く混同しやすい。
@@ -490,3 +490,25 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
   `~/.config/nix/agent-skills-sources.nix` は intentionally empty。空であることは
   ミスではなく撤去の結果。
 - 再検討するなら: Nix 側で skill 配布を復活させる場合のみ。通常は APM レーンを使う。
+
+## 第三者 skill の既定レーン（2026-09-08）
+
+- 決定: 第三者 skill は alias 付き外部依存を既定とする。`apm.yml` に object form で
+  `git: <clone URL>` + `ref: <full commit SHA>` + `alias: <skill 名>` を書く。
+  repo 名や gist ID が skill 名として不適でも `alias` が配布名を決めるため、
+  名前を理由に vendor しない。`catalog/` を自分の成果物に限定する原則は変えない。
+- vendor（`manual-skills/.apm/skills/**` + `upstreams/<name>/PROVENANCE.md`）へ落とすのは
+  次のいずれかのときだけ。(a) 上流を意図的に改変して使う (b) 上流の消失・改竄リスクを
+  引き受けられない (c) 上流が git で取得できない形式で公開されている。
+- 根拠: apm 0.29.0 で gist 依存を `alias` 付きで解決させ、`.claude/skills/<alias>/` と
+  `.agents/skills/<alias>/` へ正しい名前で配布されることを実測した（2026-09-08）。
+  alias は `apm_cli/install/phases/integrate.py:612` と `download.py:58` が
+  `apm_modules/<alias>/` の staging を決め、lockfile の `deployed_files` にも実配布パスが残る。
+  upstream（`microsoft/apm`）の一次情報でも object form + `alias` が唯一の公式手段で、
+  文字列 shorthand の `@alias` は非対応。gist 専用の仕組みは存在しない。
+- 外部依存が優位な理由: 上流追随が `ref` の SHA 更新だけになる、ローカル改変を持たないので
+  house style 整形との恒久差分が生じない、provenance を `resolved_commit` と
+  `deployed_file_hashes` で機械検証できる（手書きの PROVENANCE.md より強い）。
+- 前提: `scripts/apm-workspace.sh` / `.ps1` が `alias` を無視して `repo_url` から配布名を
+  決める間は、外部依存にすると gist ID 名で配置される。この adapter 修正が入るまでは
+  既存 vendor をそのまま維持する（`todo.txt` に起票済み）。
