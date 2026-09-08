@@ -48,11 +48,12 @@ tier 表・委譲判定・タスク分割基準・受領後の検証は `orchest
 ユーザーが立てるよう指示した場合は、`herdr` スキルの手順に従って作る。省略すると、起動の成否を読み戻さないまま「起動した」と報告する事故になる。
 
 1. `herdr pane current` で自分の pane_id と workspace を確認する
-2. `herdr pane split --pane <自分の pane_id> --focus --cwd <対象 worktree 絶対パス>` で分割する。**`workspace create` / `tab create` は使わない**（command 指定フラグが無く bare shell しか起動しないうえ、背面に作ると事故に気づけない）
+2. `herdr pane split --current --focus --cwd <対象 worktree 絶対パス>` で分割し、新 pane_id を `.result.pane.pane_id` から読む。**`workspace create` / `tab create` は使わない**（command 指定フラグが無く bare shell しか起動しないうえ、背面に作ると事故に気づけない）
 3. `~/.agents/skills/agmsg/scripts/join.sh <team> <worker_name> <claude-code|codex> <対象project絶対パス>` で先に identity を登録する。runtime type はその member のモデルに合わせる（Codex 系なら `codex`、Claude 系なら `claude-code`）
-4. `herdr pane run <新 pane_id> "cd <絶対パス> && <起動コマンド>"` で起動する。起動コマンドも member のモデルに合わせる（例: `codex -m gpt-5.6-luna`、`claude --model opus`）
-5. `herdr pane process-info --pane <新 pane_id>` で foreground process と cwd を**読み戻す**。読み戻していないプロセス名を報告に書かない
-6. 報告には pane_id + workspace label + 絶対 cwd + 実際に読み戻したプロセスを併記する
+4. `herdr agent start <worker_name> --kind <claude|codex> --pane <新 pane_id> -- <ネイティブ引数...>` で起動する。**`pane run` は使わない** — `agent start` は Herdr が同じ pane で当該 agent を検出し入力受付可能と判断するまで返らないので、未起動を「起動した」と報告する事故が構造的に起きない。モデル指定などは `--` の後にそのまま渡す（例: `--kind codex -- -m gpt-5.6-luna`、`--kind claude -- --model opus`）。startup 中に承認待ちになると即 `agent_not_ready` が返るので、その場合は `herdr agent read <worker_name>` で画面を見てから判断する
+5. `herdr agent get <worker_name>` で lifecycle 状態を、`herdr pane process-info --pane <新 pane_id>` で cwd を**読み戻す**。読み戻していない状態やプロセス名を報告に書かない
+6. 報告には pane_id + workspace label + 絶対 cwd + 実際に読み戻した状態を併記する
+7. 起動後の指示出しは `herdr agent prompt <worker_name> "..." --wait`（settled 状態まで待つ）。承認待ちを掴みたいときだけ `herdr agent wait <worker_name> --until blocked`
 
 - tier は**編成時に固定**する。既定 Worker を N 枚 + 昇格先を 1 枚。到着した行を性質で振り分けるだけにし、実行中に tier を組み替えない。編成の例:
   - `luna`×N + `opus`×1 — Claude orchestrator から Codex Worker を使う混成プール。platform を跨ぐが、**どのモデルを立てるかを選ぶのはユーザー**なので `orchestrator-worker`「モデル名の指定は跨ぐ明示指示にあたる」に合致する

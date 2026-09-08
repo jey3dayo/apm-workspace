@@ -2,7 +2,9 @@
 
 ユーザーが手で立てた pane の agent が `join` してチームに常駐し、同じ identity で複数タスクを受け続ける経路。`backlog-sweep` の Worker プールがこれにあたる。Lifecycle の 4・6・8 が使えないので、以下で置き換える。
 
-**エージェントが pane を勝手に作らない。ユーザーが「用意して」と指示したときだけ作る。** その場合も `herdr workspace create` / `tab create` は使わない——command 指定フラグが無く bare shell しか起動しないのに、読み戻さなければ「起動した」と報告できてしまう。自分の pane からの `pane split --focus` → `pane run` → `pane process-info` での読み戻し、という `herdr` スキルの手順に従う（`backlog-sweep`「Worker プールを組む」に手順あり）。確認していない foreground process 名を報告に書かないこと。
+**エージェントが pane を勝手に作らない。ユーザーが「用意して」と指示したときだけ作る。** その場合も `herdr workspace create` / `tab create` は使わない——command 指定フラグが無く bare shell しか起動しないのに、読み戻さなければ「起動した」と報告できてしまう。自分の pane からの `pane split --current --cwd <絶対パス> --focus` で作る、という `herdr` スキルの手順に従う（`backlog-sweep`「Worker プールを組む」に手順あり）。
+
+そこで agent を起こすときは `pane run` ではなく **`herdr agent start <name> --kind <kind> --pane <id>` を使う**。これは Herdr が同じ pane で当該 agent を検出し入力受付可能と判断するまで返らないので、「起動したつもりで実は未起動」を構造的に防げる。起動後の指示は `herdr agent prompt <name> "..." --wait`（settled 状態まで待つ。既に承認待ちなら入力を送らず `agent_blocked` を返す）。確認していない foreground process 名を報告に書かないこと。
 
 | lifecycle   | spawn 経路                                              | 常駐プール経路                                                                                          |
 | ----------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
@@ -19,7 +21,7 @@
 
 - boot payload が無い経路なので、**最初のタスクメッセージが Worker プロトコルの唯一の注入口**になる。1通目に `WORKER.md` の解決済み絶対パス、`send-report.sh <team> <worker_name> <orchestrator>` の引数契約、下記の heartbeat 間隔を必ず含める
 - worker は作業中、**5分を超えて無言にならないよう `WORKING` を送る**
-- pane を `herdr` で立てた場合は、`herdr pane process-info` で `agent_status` と foreground process を読み戻してから生存判定する
+- pane を `herdr` で立てた場合は、`herdr agent get <name>` / `herdr agent list` で lifecycle 状態（`idle` / `working` / `blocked` / `done` / `unknown`）を読み戻してから生存判定する。agent として認識されていない pane は `herdr pane process-info` で foreground process を見る。`unknown` は「agent は居るが分類できない」であって完了の証明ではない
 - `WORKING` が10分途切れたら、orchestrator は推測で crash 判定せず、**該当 pane の状態確認をユーザーへ依頼する**（承認プロンプトで停止している可能性がある。pane は対話 TUI なので画面には出ているが、agmsg には何も流れない）
 - 打ち切るときは `STOP(task_id)` を送る。応答が無い場合、spawn 経路のような job 停止手段は無いので、**ユーザーに pane で中断してもらう**
 
@@ -27,7 +29,7 @@
 
 pane はユーザーが起動するので `run-claude-worker.sh` / `run-codex-worker.sh` を通らず、**macOS sandbox の書込境界も `-a never` も掛からない**。implement worker については次で担保する（reviewer は後述の「強制境界の有無で reviewer を 2 段に分ける」が正本）。
 
-- pane の cwd を対象 worktree に固定する。`join.sh` / `identities.sh` は渡された project パスを記録・列挙するだけで **pane が実際にどこにいるかは検証しない**が、エージェントが `pane split --cwd` で立てた場合に限り `herdr pane process-info` で実 cwd を読み戻せる。ユーザーが手で立てた pane では機械的な確認手段が無く、cwd の正しさはユーザーが担保する
+- pane の cwd を対象 worktree に固定する。`join.sh` / `identities.sh` は渡された project パスを記録・列挙するだけで **pane が実際にどこにいるかは検証しない**が、エージェントが `pane split --cwd` で立てた場合に限り `herdr pane process-info` で実 cwd を読み戻せる（cwd は agent 面ではなく pane 面の情報）。ユーザーが手で立てた pane では機械的な確認手段が無く、cwd の正しさはユーザーが担保する
 - 触るファイル集合が互いに素にできない行は直列化するか worktree を分ける
 - したがって **orchestrator が `git diff` で実差分を読む（Lifecycle 7）ことが、機械的に成立する唯一の境界チェック**になる。省略しない。ただしこれは worker の成果物を受け入れるための確認であり、reviewer の read-only 違反を検出する手段としては不十分（後述）
 
