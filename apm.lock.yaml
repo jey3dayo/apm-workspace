@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-09-08T05:07:46.291742+00:00'
+generated_at: '2026-09-08T05:52:17.020932+00:00'
 apm_version: 0.29.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -5393,7 +5393,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: 785ab801a8b6b68dd6840aa92ff1cdc5d19173e3
+  resolved_commit: 2c9ee1b99165daa4dbb459f96bf2066c38c4b652
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -5428,6 +5428,7 @@ dependencies:
   - .agents/skills/apm-repo-manifest
   - .agents/skills/apm-repo-manifest/SKILL.md
   - .agents/skills/apm-repo-manifest/agents/openai.yaml
+  - .agents/skills/apm-repo-manifest/references/preinstall-checklist.md
   - .agents/skills/apm-repo-manifest/references/recommendations.md
   - .agents/skills/apm-usage
   - .agents/skills/apm-usage/SKILL.md
@@ -5573,7 +5574,6 @@ dependencies:
   - .agents/skills/mise/resources/templates/mise-config-template.toml
   - .agents/skills/orchestrator-worker
   - .agents/skills/orchestrator-worker/SKILL.md
-  - .agents/skills/orchestrator-worker/references/codex-spawn-model-bug.md
   - .agents/skills/polish
   - .agents/skills/polish/SKILL.md
   - .agents/skills/prepare-goal
@@ -5653,6 +5653,7 @@ dependencies:
   - .claude/skills/apm-repo-manifest
   - .claude/skills/apm-repo-manifest/SKILL.md
   - .claude/skills/apm-repo-manifest/agents/openai.yaml
+  - .claude/skills/apm-repo-manifest/references/preinstall-checklist.md
   - .claude/skills/apm-repo-manifest/references/recommendations.md
   - .claude/skills/apm-usage
   - .claude/skills/apm-usage/SKILL.md
@@ -5731,7 +5732,6 @@ dependencies:
   - .claude/skills/mise/resources/templates/mise-config-template.toml
   - .claude/skills/orchestrator-worker
   - .claude/skills/orchestrator-worker/SKILL.md
-  - .claude/skills/orchestrator-worker/references/codex-spawn-model-bug.md
   - .claude/skills/prepare-goal
   - .claude/skills/prepare-goal/SKILL.md
   - .claude/skills/prepare-goal/agents/openai.yaml
@@ -5796,6 +5796,7 @@ dependencies:
   - .config/opencode/skills/apm-repo-manifest
   - .config/opencode/skills/apm-repo-manifest/SKILL.md
   - .config/opencode/skills/apm-repo-manifest/agents/openai.yaml
+  - .config/opencode/skills/apm-repo-manifest/references/preinstall-checklist.md
   - .config/opencode/skills/apm-repo-manifest/references/recommendations.md
   - .config/opencode/skills/apm-usage
   - .config/opencode/skills/apm-usage/SKILL.md
@@ -5894,7 +5895,6 @@ dependencies:
   - .config/opencode/skills/mise/resources/templates/mise-config-template.toml
   - .config/opencode/skills/orchestrator-worker
   - .config/opencode/skills/orchestrator-worker/SKILL.md
-  - .config/opencode/skills/orchestrator-worker/references/codex-spawn-model-bug.md
   - .config/opencode/skills/polish
   - .config/opencode/skills/polish/SKILL.md
   - .config/opencode/skills/prepare-goal
@@ -5947,23 +5947,24 @@ dependencies:
     .agents/skills/1password/SKILL.md: sha256:444aa4e2a0e3c8bdd18b1b67e3a7a945560e0687750ca4e971dd098e8cdbe1af
     .agents/skills/1password/agents/openai.yaml: sha256:56222c8ee4e46134079a90d2fbb86a4cfb5944fdb6c854a696be15d251c00681
     .agents/skills/1password/references/hermes-codex-token-rotation.md: sha256:ca2eae8ea676c60f801f0764a40c70ee39bb9d2d465aff0020a652dbf91568f3
-    .agents/skills/agmsg-delegation/SKILL.md: sha256:2277a44968b9fe82e84a42d15bea5b7d6f905ecfcc5143319e007fcd32309b02
+    .agents/skills/agmsg-delegation/SKILL.md: sha256:f7b388a09c26acbcc02979d2fb151d68d8f828fd95d7f8396c098e40e34e69eb
     .agents/skills/agmsg-delegation/WORKER.md: sha256:2d8424be0d842425e86595715607a7c999612f4485b463242e1a4e9cc8761272
     .agents/skills/agmsg-delegation/agmsg-review.config.toml: sha256:42fd32b3607ceba3bb2dccbb108cd4f03282e69df3bdcf2e6cabeadb08d6eb3e
     .agents/skills/agmsg-delegation/references/codex-sandbox.md: sha256:631f38a468d700d0ad16a48022ef7a340ac37c9d7e55f1b3cdef5b4af9956675
-    .agents/skills/agmsg-delegation/references/resident-pool.md: sha256:88b952d184e74b7e50098668e96927f56d78d070580e68643af36d0dce429851
+    .agents/skills/agmsg-delegation/references/resident-pool.md: sha256:7533c9da3b9d854bdc674a3162a7273b883ce850f51e29752155b633ffbb6430
     .agents/skills/agmsg-delegation/references/runtime-smoke.md: sha256:03e938a4721f4654c8cfce79e39f5b9a85dd5b40dedcd4bae4aa4799ddca641f
     .agents/skills/agmsg-delegation/scripts/launch-worker.sh: sha256:12e9c5a70daf532f57a7060e7eee30707c587a4ebdd5c7ad0588b77210ce34ed
     .agents/skills/agmsg-delegation/scripts/run-claude-worker.sh: sha256:763f2f456a664338ed50d73c996fe1560faf9a1edb02e2146e1ba9df46176458
-    .agents/skills/agmsg-delegation/scripts/run-codex-worker.sh: sha256:9324442a04b78163bfeb84aa4fc07332ccedb03ecd13a88923e3599a86688aea
+    .agents/skills/agmsg-delegation/scripts/run-codex-worker.sh: sha256:8adb1e714861e5aebfbae3fa1ab5bd1c022faea99aa4af3747cf16f78dc6fd01
     .agents/skills/agmsg-delegation/scripts/send-report.sh: sha256:60a61e0c29051dafd99d5019e1766421e5d196b0936494af611a7caf7b4bcb8c
     .agents/skills/apm-deploy-verify/SKILL.md: sha256:cb96d7fb632671c2502aae185d2dbc8752ddf712f2f9c609123abc551b1ac441
     .agents/skills/apm-repo-bootstrap/SKILL.md: sha256:c340f3997daf9ece1d6a0b6d02770948171549d69ccceebafd0f5cc68f995248
     .agents/skills/apm-repo-bootstrap/agents/openai.yaml: sha256:faed36da8f7980b88e395eb9aae322a9fc608e0c555ba93f843f6007ab50da19
     .agents/skills/apm-repo-bootstrap/references/recommendations.md: sha256:32c78235f15e2d17e435a5c94f919c2172cdf87e994c5e14dd374b6fe708f963
-    .agents/skills/apm-repo-manifest/SKILL.md: sha256:45deae4d7cd3209fae112c98b760bcf861aa2006079b57b8879c6f4c3efd9c40
+    .agents/skills/apm-repo-manifest/SKILL.md: sha256:921071d33a51d4e8f243ff54ccb17b451f2bca6b470d1c083b04605e3e429c2b
     .agents/skills/apm-repo-manifest/agents/openai.yaml: sha256:dbacea84e80eef5e32eefaf61c709331481dfd9ebe3a229884ee5fe00c84645b
-    .agents/skills/apm-repo-manifest/references/recommendations.md: sha256:32c78235f15e2d17e435a5c94f919c2172cdf87e994c5e14dd374b6fe708f963
+    .agents/skills/apm-repo-manifest/references/preinstall-checklist.md: sha256:0112fcadf9b87f6b9d5b19ab4a62b84b4d556562d89bfce9868c56be5830d23b
+    .agents/skills/apm-repo-manifest/references/recommendations.md: sha256:2e6128f48bc7b66ee2c8cdab64c6344f24d99841e7630762fd3e1882b280979f
     .agents/skills/apm-usage/SKILL.md: sha256:130c9461d22b869d8c9125aa139bf3e9b1798a5c6033061b916c96d073455323
     .agents/skills/apm-usage/agents/openai.yaml: sha256:b3743dad4fcd9f3c209210c40df277e75d949ac7ce1713a61d497cc1e7e3ba83
     .agents/skills/apm-usage/references/repo-local-mcp.md: sha256:b12b6b2fc81ed10d0db9427accd2f81b62796c3ed99bbddb66993a694af530f9
@@ -5974,7 +5975,7 @@ dependencies:
     .agents/skills/atomic-commit/agents/openai.yaml: sha256:8486b70455d5ec0241bc7bf64bf52d806084132b2c4fcea7dcfd79ed7aec497f
     .agents/skills/backlog-sweep/SKILL.md: sha256:2d35251cb10812a6edc2ca091e7b36675ef00ac8d871fa4496dfd29f353f1b08
     .agents/skills/baton/SKILL.md: sha256:fcd0dded85973fd92a4fa92b3d5622b942f2951b132756c8163eae00888feb62
-    .agents/skills/ci-stability-hooks/SKILL.md: sha256:c439bfe3f71338f30e73ce61e54099163f86f3485928f69032475a2873b1db22
+    .agents/skills/ci-stability-hooks/SKILL.md: sha256:b965789832b4cba6139ee98e03b64a028262a10e92a66d1dbd08d19db0e36c4e
     .agents/skills/ci-stability-hooks/agents/openai.yaml: sha256:60a9e8633c5933d8663858f15d71831b0af1c5265accf6f5e2ebba0916373cc2
     .agents/skills/code-review/SKILL.md: sha256:0645e0b0aa0b563ed61c5cbba0e927b77f3466d402e204a1aa762b70770f3116
     .agents/skills/code-review/agents/openai.yaml: sha256:4a105fb0747ac36ba050c012709c60c59b256eee9544dbe997d1f266075ce8db
@@ -6055,7 +6056,7 @@ dependencies:
     .agents/skills/headroom/SKILL.md: sha256:679bc711c6972322318f50f5ba16763b4dc356814f8ed48e74f7c1044eae6f12
     .agents/skills/herdr/SKILL.md: sha256:acb305a332f5f60f5a22abf354367a8ecd1dcc8b89c8101820feefd811b8dcf5
     .agents/skills/herdr/references/configuration.md: sha256:92a35f5472ad0056cf9199ee7c0af5237d646cb7af15606e906da3fbf336a732
-    .agents/skills/japanese-tech-writing/SKILL.md: sha256:6d8da2f159b632b264985b7872b75e2813e597b04bd4853d11f720c548f0cdbb
+    .agents/skills/japanese-tech-writing/SKILL.md: sha256:68a748df40d89a80194e626c5ffedc7856245fa7435817ba6e9e715229c8b256
     .agents/skills/jina-web-research/SKILL.md: sha256:3e14afb094d8e56bd930158f4b40028ef9ead90227ed13d6df8de15ffe2170a9
     .agents/skills/jina-web-research/agents/openai.yaml: sha256:31aa67ba8347ed691d7fe4f14034a4b5f23b698640d50c8aeb60831534423a4d
     .agents/skills/linear-task-ops/SKILL.md: sha256:c73d73156534c7bd432eea7282a93a473f35c1c2efe073c9e1ea75a935c65a67
@@ -6081,8 +6082,7 @@ dependencies:
     .agents/skills/mise/references/windows-shells.md: sha256:60a6586570f86b56d4f3acf9545443e6da4dd14daaea9772a443b762fd9db9c5
     .agents/skills/mise/resources/examples/npm-package-migration.md: sha256:dd9c35732be0a4cb0dbd231bfaa16024c082d9bf0be61c66b6e531085b8bdfde
     .agents/skills/mise/resources/templates/mise-config-template.toml: sha256:7c0f5e891d7f3ae501287dcc849ad16251cb24beb2e699e435ad398bba954af0
-    .agents/skills/orchestrator-worker/SKILL.md: sha256:4d3c9bf1afbbeaaecdfd15b181e094cbe226abb1dcb780124aa475516786e280
-    .agents/skills/orchestrator-worker/references/codex-spawn-model-bug.md: sha256:3226f9607101c0f4fd9318f6c349eda69247afb3ac7e9f909374b24c18af66be
+    .agents/skills/orchestrator-worker/SKILL.md: sha256:b83934820da7ba1f0c298a5c49410aa800af44a02ea87d861e05e38fecc02509
     .agents/skills/polish/SKILL.md: sha256:f584c16f0754c71b80b323f25e33172ab39efd655afa1081c72c0a07824a59a7
     .agents/skills/prepare-goal/SKILL.md: sha256:792827300e8fa75400f2bc50d7d27c5a5a3f3b0a6c0859861d6c3566a1e88a35
     .agents/skills/prepare-goal/agents/openai.yaml: sha256:870d31c398ceb1c485a64b3a5e694942f055e85983718a61434b117bca5cefbc
@@ -6116,11 +6116,11 @@ dependencies:
     .agents/skills/scheduled-audit-ops/scripts/audit_contracts.py: sha256:6211619280b0be58178f32e5dfb89caec55c3d378aa9f0f6c7f008e2114fe435
     .agents/skills/scheduled-audit-ops/scripts/validate_prompts.py: sha256:aee806e7e0b4190a4b3214d63126a9e2c2b8828d89645df31a5272badb7cc477
     .agents/skills/scheduled-audit-ops/tests/test_validate_prompts.py: sha256:ef73826712cf360deb8e2f3a75b2ada19a922e7be7887578c83ab33780c6084f
-    .agents/skills/similarity/SKILL.md: sha256:03c8bad77168fcb1cd783542f399dd847dee7c32b24c0ed4d542648ad732f198
+    .agents/skills/similarity/SKILL.md: sha256:d1d1de946bd1999eb9e485f7ac4406d3d9363fa3c41ac9dc0cf6836526894fce
     .agents/skills/similarity/agents/openai.yaml: sha256:256ce2d2a4a3f6ac024a9a08b2665de766232278500894c27c2c83569b778598
     .agents/skills/similarity/references/report-analysis.md: sha256:dad82829abba9e606035d045973cfc9a6f2b20ca359a79c3175dadcbbcb2edbe
     .agents/skills/terminal-browser/SKILL.md: sha256:b67ee7a3d272db3f9fb87fbb6c63a4259d93d52654e6721e15847277f4f90d4d
-    .agents/skills/todo-changelog-ops/SKILL.md: sha256:db459087ef9350e7fa6e0b2b2a16275fa3bb1d960edaf5daef128a3da4a692e2
+    .agents/skills/todo-changelog-ops/SKILL.md: sha256:3fe2654144662a6d0b7027bd51d2bebd2defdff6e521f68aedd5fc2f3c08a756
     .agents/skills/tuxedo/SKILL.md: sha256:a28fc2984a16c933fad272da292a5d91c01946e0fd13da0f2d74025b13ddad0b
     .agents/skills/tuxedo/references/tui-and-capture.md: sha256:13278531ebad1f152047aaebc247eacbfd69f75ba1887e3a611627c94a31f684
     .agents/skills/web-research/SKILL.md: sha256:07109256e91fdd784259fc941efda1b914465da458587c85831a087f70f2b941
@@ -6131,26 +6131,27 @@ dependencies:
     .claude/skills/1password/SKILL.md: sha256:444aa4e2a0e3c8bdd18b1b67e3a7a945560e0687750ca4e971dd098e8cdbe1af
     .claude/skills/1password/agents/openai.yaml: sha256:56222c8ee4e46134079a90d2fbb86a4cfb5944fdb6c854a696be15d251c00681
     .claude/skills/1password/references/hermes-codex-token-rotation.md: sha256:ca2eae8ea676c60f801f0764a40c70ee39bb9d2d465aff0020a652dbf91568f3
-    .claude/skills/agmsg-delegation/SKILL.md: sha256:2277a44968b9fe82e84a42d15bea5b7d6f905ecfcc5143319e007fcd32309b02
+    .claude/skills/agmsg-delegation/SKILL.md: sha256:f7b388a09c26acbcc02979d2fb151d68d8f828fd95d7f8396c098e40e34e69eb
     .claude/skills/agmsg-delegation/WORKER.md: sha256:2d8424be0d842425e86595715607a7c999612f4485b463242e1a4e9cc8761272
     .claude/skills/agmsg-delegation/agmsg-review.config.toml: sha256:42fd32b3607ceba3bb2dccbb108cd4f03282e69df3bdcf2e6cabeadb08d6eb3e
     .claude/skills/agmsg-delegation/references/codex-sandbox.md: sha256:631f38a468d700d0ad16a48022ef7a340ac37c9d7e55f1b3cdef5b4af9956675
-    .claude/skills/agmsg-delegation/references/resident-pool.md: sha256:88b952d184e74b7e50098668e96927f56d78d070580e68643af36d0dce429851
+    .claude/skills/agmsg-delegation/references/resident-pool.md: sha256:7533c9da3b9d854bdc674a3162a7273b883ce850f51e29752155b633ffbb6430
     .claude/skills/agmsg-delegation/references/runtime-smoke.md: sha256:03e938a4721f4654c8cfce79e39f5b9a85dd5b40dedcd4bae4aa4799ddca641f
     .claude/skills/agmsg-delegation/scripts/launch-worker.sh: sha256:12e9c5a70daf532f57a7060e7eee30707c587a4ebdd5c7ad0588b77210ce34ed
     .claude/skills/agmsg-delegation/scripts/run-claude-worker.sh: sha256:763f2f456a664338ed50d73c996fe1560faf9a1edb02e2146e1ba9df46176458
-    .claude/skills/agmsg-delegation/scripts/run-codex-worker.sh: sha256:9324442a04b78163bfeb84aa4fc07332ccedb03ecd13a88923e3599a86688aea
+    .claude/skills/agmsg-delegation/scripts/run-codex-worker.sh: sha256:8adb1e714861e5aebfbae3fa1ab5bd1c022faea99aa4af3747cf16f78dc6fd01
     .claude/skills/agmsg-delegation/scripts/send-report.sh: sha256:60a61e0c29051dafd99d5019e1766421e5d196b0936494af611a7caf7b4bcb8c
-    .claude/skills/apm-repo-manifest/SKILL.md: sha256:45deae4d7cd3209fae112c98b760bcf861aa2006079b57b8879c6f4c3efd9c40
+    .claude/skills/apm-repo-manifest/SKILL.md: sha256:921071d33a51d4e8f243ff54ccb17b451f2bca6b470d1c083b04605e3e429c2b
     .claude/skills/apm-repo-manifest/agents/openai.yaml: sha256:dbacea84e80eef5e32eefaf61c709331481dfd9ebe3a229884ee5fe00c84645b
-    .claude/skills/apm-repo-manifest/references/recommendations.md: sha256:32c78235f15e2d17e435a5c94f919c2172cdf87e994c5e14dd374b6fe708f963
+    .claude/skills/apm-repo-manifest/references/preinstall-checklist.md: sha256:0112fcadf9b87f6b9d5b19ab4a62b84b4d556562d89bfce9868c56be5830d23b
+    .claude/skills/apm-repo-manifest/references/recommendations.md: sha256:2e6128f48bc7b66ee2c8cdab64c6344f24d99841e7630762fd3e1882b280979f
     .claude/skills/apm-usage/SKILL.md: sha256:130c9461d22b869d8c9125aa139bf3e9b1798a5c6033061b916c96d073455323
     .claude/skills/apm-usage/agents/openai.yaml: sha256:b3743dad4fcd9f3c209210c40df277e75d949ac7ce1713a61d497cc1e7e3ba83
     .claude/skills/apm-usage/references/repo-local-mcp.md: sha256:b12b6b2fc81ed10d0db9427accd2f81b62796c3ed99bbddb66993a694af530f9
     .claude/skills/atomic-commit/SKILL.md: sha256:3bf21108155094f87a2db30142abf7d2a501a5ee7072102e7cc55e2a58e0e3d8
     .claude/skills/atomic-commit/agents/openai.yaml: sha256:8486b70455d5ec0241bc7bf64bf52d806084132b2c4fcea7dcfd79ed7aec497f
     .claude/skills/backlog-sweep/SKILL.md: sha256:2d35251cb10812a6edc2ca091e7b36675ef00ac8d871fa4496dfd29f353f1b08
-    .claude/skills/ci-stability-hooks/SKILL.md: sha256:c439bfe3f71338f30e73ce61e54099163f86f3485928f69032475a2873b1db22
+    .claude/skills/ci-stability-hooks/SKILL.md: sha256:b965789832b4cba6139ee98e03b64a028262a10e92a66d1dbd08d19db0e36c4e
     .claude/skills/ci-stability-hooks/agents/openai.yaml: sha256:60a9e8633c5933d8663858f15d71831b0af1c5265accf6f5e2ebba0916373cc2
     .claude/skills/design-md-workflow/SKILL.md: sha256:86a8393eb989689539eff10574e3102ccbfbd9afad9a03d7de8533286fb9e31a
     .claude/skills/design-md-workflow/agents/openai.yaml: sha256:9c0affb53d0d0703bf7e8d8199ec81dde316b76a71151c3839c8c021056ef10b
@@ -6187,7 +6188,7 @@ dependencies:
     .claude/skills/git-worktree/scripts/copy-env-files.sh: sha256:95988f9e305253348aefa6c1e2de9ade2fe1abea487a071ed533a9d8172066a0
     .claude/skills/herdr/SKILL.md: sha256:acb305a332f5f60f5a22abf354367a8ecd1dcc8b89c8101820feefd811b8dcf5
     .claude/skills/herdr/references/configuration.md: sha256:92a35f5472ad0056cf9199ee7c0af5237d646cb7af15606e906da3fbf336a732
-    .claude/skills/japanese-tech-writing/SKILL.md: sha256:6d8da2f159b632b264985b7872b75e2813e597b04bd4853d11f720c548f0cdbb
+    .claude/skills/japanese-tech-writing/SKILL.md: sha256:68a748df40d89a80194e626c5ffedc7856245fa7435817ba6e9e715229c8b256
     .claude/skills/linear-task-ops/SKILL.md: sha256:c73d73156534c7bd432eea7282a93a473f35c1c2efe073c9e1ea75a935c65a67
     .claude/skills/linear-task-ops/references/asana-to-linear-mapping.md: sha256:1834da757bf10fe142c5279fb187ef3c566d7e9a6a2c11b9c7fa7d87f5d2daf4
     .claude/skills/linear-task-ops/references/linear-labels-jey.md: sha256:45515c4bd6d2525aa761e3b784f401dd06972770c9d175dcb0f98214e25237d5
@@ -6205,8 +6206,7 @@ dependencies:
     .claude/skills/mise/references/windows-shells.md: sha256:60a6586570f86b56d4f3acf9545443e6da4dd14daaea9772a443b762fd9db9c5
     .claude/skills/mise/resources/examples/npm-package-migration.md: sha256:dd9c35732be0a4cb0dbd231bfaa16024c082d9bf0be61c66b6e531085b8bdfde
     .claude/skills/mise/resources/templates/mise-config-template.toml: sha256:7c0f5e891d7f3ae501287dcc849ad16251cb24beb2e699e435ad398bba954af0
-    .claude/skills/orchestrator-worker/SKILL.md: sha256:4d3c9bf1afbbeaaecdfd15b181e094cbe226abb1dcb780124aa475516786e280
-    .claude/skills/orchestrator-worker/references/codex-spawn-model-bug.md: sha256:3226f9607101c0f4fd9318f6c349eda69247afb3ac7e9f909374b24c18af66be
+    .claude/skills/orchestrator-worker/SKILL.md: sha256:b83934820da7ba1f0c298a5c49410aa800af44a02ea87d861e05e38fecc02509
     .claude/skills/prepare-goal/SKILL.md: sha256:792827300e8fa75400f2bc50d7d27c5a5a3f3b0a6c0859861d6c3566a1e88a35
     .claude/skills/prepare-goal/agents/openai.yaml: sha256:870d31c398ceb1c485a64b3a5e694942f055e85983718a61434b117bca5cefbc
     .claude/skills/pwa-layout/SKILL.md: sha256:06264ecbff00eabe633b7a278df4fc42e057893f0e9c4c208cd4c4ca0d7801f9
@@ -6223,11 +6223,11 @@ dependencies:
     .claude/skills/review-board/references/review-lanes.md: sha256:f0b4da03d63f70394c9dcd84fd08e41dd7f5b9036319f5d13892d4d247165c24
     .claude/skills/review-fix-loop/SKILL.md: sha256:d4d1a35255e544468e6a28c52cf8983e87b2ece18b665b07005f2684306a80b4
     .claude/skills/review-fix-loop/agents/openai.yaml: sha256:2ebea0b8282c864b31d92a942df6e46c9b6ab54a2bd51e38878c7f732ec3004d
-    .claude/skills/similarity/SKILL.md: sha256:03c8bad77168fcb1cd783542f399dd847dee7c32b24c0ed4d542648ad732f198
+    .claude/skills/similarity/SKILL.md: sha256:d1d1de946bd1999eb9e485f7ac4406d3d9363fa3c41ac9dc0cf6836526894fce
     .claude/skills/similarity/agents/openai.yaml: sha256:256ce2d2a4a3f6ac024a9a08b2665de766232278500894c27c2c83569b778598
     .claude/skills/similarity/references/report-analysis.md: sha256:dad82829abba9e606035d045973cfc9a6f2b20ca359a79c3175dadcbbcb2edbe
     .claude/skills/terminal-browser/SKILL.md: sha256:b67ee7a3d272db3f9fb87fbb6c63a4259d93d52654e6721e15847277f4f90d4d
-    .claude/skills/todo-changelog-ops/SKILL.md: sha256:db459087ef9350e7fa6e0b2b2a16275fa3bb1d960edaf5daef128a3da4a692e2
+    .claude/skills/todo-changelog-ops/SKILL.md: sha256:3fe2654144662a6d0b7027bd51d2bebd2defdff6e521f68aedd5fc2f3c08a756
     .claude/skills/tuxedo/SKILL.md: sha256:a28fc2984a16c933fad272da292a5d91c01946e0fd13da0f2d74025b13ddad0b
     .claude/skills/tuxedo/references/tui-and-capture.md: sha256:13278531ebad1f152047aaebc247eacbfd69f75ba1887e3a611627c94a31f684
     .claude/skills/web-research/SKILL.md: sha256:07109256e91fdd784259fc941efda1b914465da458587c85831a087f70f2b941
@@ -6238,23 +6238,24 @@ dependencies:
     .config/opencode/skills/1password/SKILL.md: sha256:444aa4e2a0e3c8bdd18b1b67e3a7a945560e0687750ca4e971dd098e8cdbe1af
     .config/opencode/skills/1password/agents/openai.yaml: sha256:56222c8ee4e46134079a90d2fbb86a4cfb5944fdb6c854a696be15d251c00681
     .config/opencode/skills/1password/references/hermes-codex-token-rotation.md: sha256:ca2eae8ea676c60f801f0764a40c70ee39bb9d2d465aff0020a652dbf91568f3
-    .config/opencode/skills/agmsg-delegation/SKILL.md: sha256:2277a44968b9fe82e84a42d15bea5b7d6f905ecfcc5143319e007fcd32309b02
+    .config/opencode/skills/agmsg-delegation/SKILL.md: sha256:f7b388a09c26acbcc02979d2fb151d68d8f828fd95d7f8396c098e40e34e69eb
     .config/opencode/skills/agmsg-delegation/WORKER.md: sha256:2d8424be0d842425e86595715607a7c999612f4485b463242e1a4e9cc8761272
     .config/opencode/skills/agmsg-delegation/agmsg-review.config.toml: sha256:42fd32b3607ceba3bb2dccbb108cd4f03282e69df3bdcf2e6cabeadb08d6eb3e
     .config/opencode/skills/agmsg-delegation/references/codex-sandbox.md: sha256:631f38a468d700d0ad16a48022ef7a340ac37c9d7e55f1b3cdef5b4af9956675
-    .config/opencode/skills/agmsg-delegation/references/resident-pool.md: sha256:88b952d184e74b7e50098668e96927f56d78d070580e68643af36d0dce429851
+    .config/opencode/skills/agmsg-delegation/references/resident-pool.md: sha256:7533c9da3b9d854bdc674a3162a7273b883ce850f51e29752155b633ffbb6430
     .config/opencode/skills/agmsg-delegation/references/runtime-smoke.md: sha256:03e938a4721f4654c8cfce79e39f5b9a85dd5b40dedcd4bae4aa4799ddca641f
     .config/opencode/skills/agmsg-delegation/scripts/launch-worker.sh: sha256:12e9c5a70daf532f57a7060e7eee30707c587a4ebdd5c7ad0588b77210ce34ed
     .config/opencode/skills/agmsg-delegation/scripts/run-claude-worker.sh: sha256:763f2f456a664338ed50d73c996fe1560faf9a1edb02e2146e1ba9df46176458
-    .config/opencode/skills/agmsg-delegation/scripts/run-codex-worker.sh: sha256:9324442a04b78163bfeb84aa4fc07332ccedb03ecd13a88923e3599a86688aea
+    .config/opencode/skills/agmsg-delegation/scripts/run-codex-worker.sh: sha256:8adb1e714861e5aebfbae3fa1ab5bd1c022faea99aa4af3747cf16f78dc6fd01
     .config/opencode/skills/agmsg-delegation/scripts/send-report.sh: sha256:60a61e0c29051dafd99d5019e1766421e5d196b0936494af611a7caf7b4bcb8c
     .config/opencode/skills/apm-deploy-verify/SKILL.md: sha256:cb96d7fb632671c2502aae185d2dbc8752ddf712f2f9c609123abc551b1ac441
     .config/opencode/skills/apm-repo-bootstrap/SKILL.md: sha256:c340f3997daf9ece1d6a0b6d02770948171549d69ccceebafd0f5cc68f995248
     .config/opencode/skills/apm-repo-bootstrap/agents/openai.yaml: sha256:faed36da8f7980b88e395eb9aae322a9fc608e0c555ba93f843f6007ab50da19
     .config/opencode/skills/apm-repo-bootstrap/references/recommendations.md: sha256:32c78235f15e2d17e435a5c94f919c2172cdf87e994c5e14dd374b6fe708f963
-    .config/opencode/skills/apm-repo-manifest/SKILL.md: sha256:45deae4d7cd3209fae112c98b760bcf861aa2006079b57b8879c6f4c3efd9c40
+    .config/opencode/skills/apm-repo-manifest/SKILL.md: sha256:921071d33a51d4e8f243ff54ccb17b451f2bca6b470d1c083b04605e3e429c2b
     .config/opencode/skills/apm-repo-manifest/agents/openai.yaml: sha256:dbacea84e80eef5e32eefaf61c709331481dfd9ebe3a229884ee5fe00c84645b
-    .config/opencode/skills/apm-repo-manifest/references/recommendations.md: sha256:32c78235f15e2d17e435a5c94f919c2172cdf87e994c5e14dd374b6fe708f963
+    .config/opencode/skills/apm-repo-manifest/references/preinstall-checklist.md: sha256:0112fcadf9b87f6b9d5b19ab4a62b84b4d556562d89bfce9868c56be5830d23b
+    .config/opencode/skills/apm-repo-manifest/references/recommendations.md: sha256:2e6128f48bc7b66ee2c8cdab64c6344f24d99841e7630762fd3e1882b280979f
     .config/opencode/skills/apm-usage/SKILL.md: sha256:130c9461d22b869d8c9125aa139bf3e9b1798a5c6033061b916c96d073455323
     .config/opencode/skills/apm-usage/agents/openai.yaml: sha256:b3743dad4fcd9f3c209210c40df277e75d949ac7ce1713a61d497cc1e7e3ba83
     .config/opencode/skills/apm-usage/references/repo-local-mcp.md: sha256:b12b6b2fc81ed10d0db9427accd2f81b62796c3ed99bbddb66993a694af530f9
@@ -6265,7 +6266,7 @@ dependencies:
     .config/opencode/skills/atomic-commit/agents/openai.yaml: sha256:8486b70455d5ec0241bc7bf64bf52d806084132b2c4fcea7dcfd79ed7aec497f
     .config/opencode/skills/backlog-sweep/SKILL.md: sha256:2d35251cb10812a6edc2ca091e7b36675ef00ac8d871fa4496dfd29f353f1b08
     .config/opencode/skills/baton/SKILL.md: sha256:fcd0dded85973fd92a4fa92b3d5622b942f2951b132756c8163eae00888feb62
-    .config/opencode/skills/ci-stability-hooks/SKILL.md: sha256:c439bfe3f71338f30e73ce61e54099163f86f3485928f69032475a2873b1db22
+    .config/opencode/skills/ci-stability-hooks/SKILL.md: sha256:b965789832b4cba6139ee98e03b64a028262a10e92a66d1dbd08d19db0e36c4e
     .config/opencode/skills/ci-stability-hooks/agents/openai.yaml: sha256:60a9e8633c5933d8663858f15d71831b0af1c5265accf6f5e2ebba0916373cc2
     .config/opencode/skills/design-md-workflow/SKILL.md: sha256:86a8393eb989689539eff10574e3102ccbfbd9afad9a03d7de8533286fb9e31a
     .config/opencode/skills/design-md-workflow/agents/openai.yaml: sha256:9c0affb53d0d0703bf7e8d8199ec81dde316b76a71151c3839c8c021056ef10b
@@ -6307,7 +6308,7 @@ dependencies:
     .config/opencode/skills/git-worktree/scripts/copy-env-files.sh: sha256:95988f9e305253348aefa6c1e2de9ade2fe1abea487a071ed533a9d8172066a0
     .config/opencode/skills/herdr/SKILL.md: sha256:acb305a332f5f60f5a22abf354367a8ecd1dcc8b89c8101820feefd811b8dcf5
     .config/opencode/skills/herdr/references/configuration.md: sha256:92a35f5472ad0056cf9199ee7c0af5237d646cb7af15606e906da3fbf336a732
-    .config/opencode/skills/japanese-tech-writing/SKILL.md: sha256:6d8da2f159b632b264985b7872b75e2813e597b04bd4853d11f720c548f0cdbb
+    .config/opencode/skills/japanese-tech-writing/SKILL.md: sha256:68a748df40d89a80194e626c5ffedc7856245fa7435817ba6e9e715229c8b256
     .config/opencode/skills/linear-task-ops/SKILL.md: sha256:c73d73156534c7bd432eea7282a93a473f35c1c2efe073c9e1ea75a935c65a67
     .config/opencode/skills/linear-task-ops/references/asana-to-linear-mapping.md: sha256:1834da757bf10fe142c5279fb187ef3c566d7e9a6a2c11b9c7fa7d87f5d2daf4
     .config/opencode/skills/linear-task-ops/references/linear-labels-jey.md: sha256:45515c4bd6d2525aa761e3b784f401dd06972770c9d175dcb0f98214e25237d5
@@ -6331,8 +6332,7 @@ dependencies:
     .config/opencode/skills/mise/references/windows-shells.md: sha256:60a6586570f86b56d4f3acf9545443e6da4dd14daaea9772a443b762fd9db9c5
     .config/opencode/skills/mise/resources/examples/npm-package-migration.md: sha256:dd9c35732be0a4cb0dbd231bfaa16024c082d9bf0be61c66b6e531085b8bdfde
     .config/opencode/skills/mise/resources/templates/mise-config-template.toml: sha256:7c0f5e891d7f3ae501287dcc849ad16251cb24beb2e699e435ad398bba954af0
-    .config/opencode/skills/orchestrator-worker/SKILL.md: sha256:4d3c9bf1afbbeaaecdfd15b181e094cbe226abb1dcb780124aa475516786e280
-    .config/opencode/skills/orchestrator-worker/references/codex-spawn-model-bug.md: sha256:3226f9607101c0f4fd9318f6c349eda69247afb3ac7e9f909374b24c18af66be
+    .config/opencode/skills/orchestrator-worker/SKILL.md: sha256:b83934820da7ba1f0c298a5c49410aa800af44a02ea87d861e05e38fecc02509
     .config/opencode/skills/polish/SKILL.md: sha256:f584c16f0754c71b80b323f25e33172ab39efd655afa1081c72c0a07824a59a7
     .config/opencode/skills/prepare-goal/SKILL.md: sha256:792827300e8fa75400f2bc50d7d27c5a5a3f3b0a6c0859861d6c3566a1e88a35
     .config/opencode/skills/prepare-goal/agents/openai.yaml: sha256:870d31c398ceb1c485a64b3a5e694942f055e85983718a61434b117bca5cefbc
@@ -6356,20 +6356,20 @@ dependencies:
     .config/opencode/skills/scheduled-audit-ops/scripts/audit_contracts.py: sha256:6211619280b0be58178f32e5dfb89caec55c3d378aa9f0f6c7f008e2114fe435
     .config/opencode/skills/scheduled-audit-ops/scripts/validate_prompts.py: sha256:aee806e7e0b4190a4b3214d63126a9e2c2b8828d89645df31a5272badb7cc477
     .config/opencode/skills/scheduled-audit-ops/tests/test_validate_prompts.py: sha256:ef73826712cf360deb8e2f3a75b2ada19a922e7be7887578c83ab33780c6084f
-    .config/opencode/skills/similarity/SKILL.md: sha256:03c8bad77168fcb1cd783542f399dd847dee7c32b24c0ed4d542648ad732f198
+    .config/opencode/skills/similarity/SKILL.md: sha256:d1d1de946bd1999eb9e485f7ac4406d3d9363fa3c41ac9dc0cf6836526894fce
     .config/opencode/skills/similarity/agents/openai.yaml: sha256:256ce2d2a4a3f6ac024a9a08b2665de766232278500894c27c2c83569b778598
     .config/opencode/skills/similarity/references/report-analysis.md: sha256:dad82829abba9e606035d045973cfc9a6f2b20ca359a79c3175dadcbbcb2edbe
     .config/opencode/skills/terminal-browser/SKILL.md: sha256:b67ee7a3d272db3f9fb87fbb6c63a4259d93d52654e6721e15847277f4f90d4d
-    .config/opencode/skills/todo-changelog-ops/SKILL.md: sha256:db459087ef9350e7fa6e0b2b2a16275fa3bb1d960edaf5daef128a3da4a692e2
+    .config/opencode/skills/todo-changelog-ops/SKILL.md: sha256:3fe2654144662a6d0b7027bd51d2bebd2defdff6e521f68aedd5fc2f3c08a756
     .config/opencode/skills/tuxedo/SKILL.md: sha256:a28fc2984a16c933fad272da292a5d91c01946e0fd13da0f2d74025b13ddad0b
     .config/opencode/skills/tuxedo/references/tui-and-capture.md: sha256:13278531ebad1f152047aaebc247eacbfd69f75ba1887e3a611627c94a31f684
     .config/opencode/skills/web-research/SKILL.md: sha256:07109256e91fdd784259fc941efda1b914465da458587c85831a087f70f2b941
     .config/opencode/skills/web-research/agents/openai.yaml: sha256:50536a04fbc72b0f71fc9975a7e041893912ebfcaf9c671439843d20172e1264
-  content_hash: sha256:e4c6a1b34f03976d565c96dae8787af9388272b0e9ebb080209c90a716daa7b2
+  content_hash: sha256:d1a1a98cd12c8cf0c84b1a518e8a537004fec3f19795ece7fe5bf3f6b7e2bd8a
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
-  resolved_commit: 785ab801a8b6b68dd6840aa92ff1cdc5d19173e3
+  resolved_commit: 2c9ee1b99165daa4dbb459f96bf2066c38c4b652
   resolved_ref: main
   version: 1.0.0
   virtual_path: manual-skills
@@ -10236,7 +10236,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:2277a44968b9fe82e84a42d15bea5b7d6f905ecfcc5143319e007fcd32309b02
+  content_hash: sha256:f7b388a09c26acbcc02979d2fb151d68d8f828fd95d7f8396c098e40e34e69eb
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg-delegation/WORKER.md
@@ -10272,7 +10272,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:88b952d184e74b7e50098668e96927f56d78d070580e68643af36d0dce429851
+  content_hash: sha256:7533c9da3b9d854bdc674a3162a7273b883ce850f51e29752155b633ffbb6430
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg-delegation/references/runtime-smoke.md
@@ -10308,7 +10308,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:9324442a04b78163bfeb84aa4fc07332ccedb03ecd13a88923e3599a86688aea
+  content_hash: sha256:8adb1e714861e5aebfbae3fa1ab5bd1c022faea99aa4af3747cf16f78dc6fd01
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg-delegation/scripts/send-report.sh
@@ -15141,7 +15141,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:45deae4d7cd3209fae112c98b760bcf861aa2006079b57b8879c6f4c3efd9c40
+  content_hash: sha256:921071d33a51d4e8f243ff54ccb17b451f2bca6b470d1c083b04605e3e429c2b
 - kind: project-relative
   target: claude
   value: .claude/skills/apm-repo-manifest/agents/openai.yaml
@@ -15153,13 +15153,22 @@ deployments:
   content_hash: sha256:dbacea84e80eef5e32eefaf61c709331481dfd9ebe3a229884ee5fe00c84645b
 - kind: project-relative
   target: claude
+  value: .claude/skills/apm-repo-manifest/references/preinstall-checklist.md
+  runtime: null
+  scope: project
+  owners:
+  - jey3dayo/apm-workspace/catalog
+  active_owner: jey3dayo/apm-workspace/catalog
+  content_hash: sha256:0112fcadf9b87f6b9d5b19ab4a62b84b4d556562d89bfce9868c56be5830d23b
+- kind: project-relative
+  target: claude
   value: .claude/skills/apm-repo-manifest/references/recommendations.md
   runtime: null
   scope: project
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:32c78235f15e2d17e435a5c94f919c2172cdf87e994c5e14dd374b6fe708f963
+  content_hash: sha256:2e6128f48bc7b66ee2c8cdab64c6344f24d99841e7630762fd3e1882b280979f
 - kind: project-relative
   target: claude
   value: .claude/skills/apm-usage
@@ -17085,7 +17094,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:c439bfe3f71338f30e73ce61e54099163f86f3485928f69032475a2873b1db22
+  content_hash: sha256:b965789832b4cba6139ee98e03b64a028262a10e92a66d1dbd08d19db0e36c4e
 - kind: project-relative
   target: claude
   value: .claude/skills/ci-stability-hooks/agents/openai.yaml
@@ -19983,7 +19992,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:6d8da2f159b632b264985b7872b75e2813e597b04bd4853d11f720c548f0cdbb
+  content_hash: sha256:68a748df40d89a80194e626c5ffedc7856245fa7435817ba6e9e715229c8b256
 - kind: project-relative
   target: claude
   value: .claude/skills/linear-task-ops
@@ -20451,16 +20460,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:4d3c9bf1afbbeaaecdfd15b181e094cbe226abb1dcb780124aa475516786e280
-- kind: project-relative
-  target: claude
-  value: .claude/skills/orchestrator-worker/references/codex-spawn-model-bug.md
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:3226f9607101c0f4fd9318f6c349eda69247afb3ac7e9f909374b24c18af66be
+  content_hash: sha256:b83934820da7ba1f0c298a5c49410aa800af44a02ea87d861e05e38fecc02509
 - kind: project-relative
   target: claude
   value: .claude/skills/perman-aws-vault
@@ -21774,7 +21774,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:03c8bad77168fcb1cd783542f399dd847dee7c32b24c0ed4d542648ad732f198
+  content_hash: sha256:d1d1de946bd1999eb9e485f7ac4406d3d9363fa3c41ac9dc0cf6836526894fce
 - kind: project-relative
   target: claude
   value: .claude/skills/similarity/agents/openai.yaml
@@ -21846,7 +21846,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:db459087ef9350e7fa6e0b2b2a16275fa3bb1d960edaf5daef128a3da4a692e2
+  content_hash: sha256:3fe2654144662a6d0b7027bd51d2bebd2defdff6e521f68aedd5fc2f3c08a756
 - kind: project-relative
   target: claude
   value: .claude/skills/transitions-dev
@@ -22935,7 +22935,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:2277a44968b9fe82e84a42d15bea5b7d6f905ecfcc5143319e007fcd32309b02
+  content_hash: sha256:f7b388a09c26acbcc02979d2fb151d68d8f828fd95d7f8396c098e40e34e69eb
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg-delegation/WORKER.md
@@ -22971,7 +22971,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:88b952d184e74b7e50098668e96927f56d78d070580e68643af36d0dce429851
+  content_hash: sha256:7533c9da3b9d854bdc674a3162a7273b883ce850f51e29752155b633ffbb6430
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg-delegation/references/runtime-smoke.md
@@ -23007,7 +23007,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:9324442a04b78163bfeb84aa4fc07332ccedb03ecd13a88923e3599a86688aea
+  content_hash: sha256:8adb1e714861e5aebfbae3fa1ab5bd1c022faea99aa4af3747cf16f78dc6fd01
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg-delegation/scripts/send-report.sh
@@ -27840,7 +27840,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:45deae4d7cd3209fae112c98b760bcf861aa2006079b57b8879c6f4c3efd9c40
+  content_hash: sha256:921071d33a51d4e8f243ff54ccb17b451f2bca6b470d1c083b04605e3e429c2b
 - kind: project-relative
   target: codex
   value: .agents/skills/apm-repo-manifest/agents/openai.yaml
@@ -27852,13 +27852,22 @@ deployments:
   content_hash: sha256:dbacea84e80eef5e32eefaf61c709331481dfd9ebe3a229884ee5fe00c84645b
 - kind: project-relative
   target: codex
+  value: .agents/skills/apm-repo-manifest/references/preinstall-checklist.md
+  runtime: null
+  scope: project
+  owners:
+  - jey3dayo/apm-workspace/catalog
+  active_owner: jey3dayo/apm-workspace/catalog
+  content_hash: sha256:0112fcadf9b87f6b9d5b19ab4a62b84b4d556562d89bfce9868c56be5830d23b
+- kind: project-relative
+  target: codex
   value: .agents/skills/apm-repo-manifest/references/recommendations.md
   runtime: null
   scope: project
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:32c78235f15e2d17e435a5c94f919c2172cdf87e994c5e14dd374b6fe708f963
+  content_hash: sha256:2e6128f48bc7b66ee2c8cdab64c6344f24d99841e7630762fd3e1882b280979f
 - kind: project-relative
   target: codex
   value: .agents/skills/apm-usage
@@ -29784,7 +29793,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:c439bfe3f71338f30e73ce61e54099163f86f3485928f69032475a2873b1db22
+  content_hash: sha256:b965789832b4cba6139ee98e03b64a028262a10e92a66d1dbd08d19db0e36c4e
 - kind: project-relative
   target: codex
   value: .agents/skills/ci-stability-hooks/agents/openai.yaml
@@ -32682,7 +32691,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:6d8da2f159b632b264985b7872b75e2813e597b04bd4853d11f720c548f0cdbb
+  content_hash: sha256:68a748df40d89a80194e626c5ffedc7856245fa7435817ba6e9e715229c8b256
 - kind: project-relative
   target: codex
   value: .agents/skills/linear-task-ops
@@ -33150,16 +33159,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:4d3c9bf1afbbeaaecdfd15b181e094cbe226abb1dcb780124aa475516786e280
-- kind: project-relative
-  target: codex
-  value: .agents/skills/orchestrator-worker/references/codex-spawn-model-bug.md
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:3226f9607101c0f4fd9318f6c349eda69247afb3ac7e9f909374b24c18af66be
+  content_hash: sha256:b83934820da7ba1f0c298a5c49410aa800af44a02ea87d861e05e38fecc02509
 - kind: project-relative
   target: codex
   value: .agents/skills/perman-aws-vault
@@ -34473,7 +34473,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:03c8bad77168fcb1cd783542f399dd847dee7c32b24c0ed4d542648ad732f198
+  content_hash: sha256:d1d1de946bd1999eb9e485f7ac4406d3d9363fa3c41ac9dc0cf6836526894fce
 - kind: project-relative
   target: codex
   value: .agents/skills/similarity/agents/openai.yaml
@@ -34545,7 +34545,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:db459087ef9350e7fa6e0b2b2a16275fa3bb1d960edaf5daef128a3da4a692e2
+  content_hash: sha256:3fe2654144662a6d0b7027bd51d2bebd2defdff6e521f68aedd5fc2f3c08a756
 - kind: project-relative
   target: codex
   value: .agents/skills/transitions-dev
@@ -36192,7 +36192,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:2277a44968b9fe82e84a42d15bea5b7d6f905ecfcc5143319e007fcd32309b02
+  content_hash: sha256:f7b388a09c26acbcc02979d2fb151d68d8f828fd95d7f8396c098e40e34e69eb
 - kind: project-relative
   target: opencode
   value: .config/opencode/skills/agmsg-delegation/WORKER.md
@@ -36228,7 +36228,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:88b952d184e74b7e50098668e96927f56d78d070580e68643af36d0dce429851
+  content_hash: sha256:7533c9da3b9d854bdc674a3162a7273b883ce850f51e29752155b633ffbb6430
 - kind: project-relative
   target: opencode
   value: .config/opencode/skills/agmsg-delegation/references/runtime-smoke.md
@@ -36264,7 +36264,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:9324442a04b78163bfeb84aa4fc07332ccedb03ecd13a88923e3599a86688aea
+  content_hash: sha256:8adb1e714861e5aebfbae3fa1ab5bd1c022faea99aa4af3747cf16f78dc6fd01
 - kind: project-relative
   target: opencode
   value: .config/opencode/skills/agmsg-delegation/scripts/send-report.sh
@@ -41097,7 +41097,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:45deae4d7cd3209fae112c98b760bcf861aa2006079b57b8879c6f4c3efd9c40
+  content_hash: sha256:921071d33a51d4e8f243ff54ccb17b451f2bca6b470d1c083b04605e3e429c2b
 - kind: project-relative
   target: opencode
   value: .config/opencode/skills/apm-repo-manifest/agents/openai.yaml
@@ -41109,13 +41109,22 @@ deployments:
   content_hash: sha256:dbacea84e80eef5e32eefaf61c709331481dfd9ebe3a229884ee5fe00c84645b
 - kind: project-relative
   target: opencode
+  value: .config/opencode/skills/apm-repo-manifest/references/preinstall-checklist.md
+  runtime: null
+  scope: project
+  owners:
+  - jey3dayo/apm-workspace/catalog
+  active_owner: jey3dayo/apm-workspace/catalog
+  content_hash: sha256:0112fcadf9b87f6b9d5b19ab4a62b84b4d556562d89bfce9868c56be5830d23b
+- kind: project-relative
+  target: opencode
   value: .config/opencode/skills/apm-repo-manifest/references/recommendations.md
   runtime: null
   scope: project
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:32c78235f15e2d17e435a5c94f919c2172cdf87e994c5e14dd374b6fe708f963
+  content_hash: sha256:2e6128f48bc7b66ee2c8cdab64c6344f24d99841e7630762fd3e1882b280979f
 - kind: project-relative
   target: opencode
   value: .config/opencode/skills/apm-usage
@@ -43041,7 +43050,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:c439bfe3f71338f30e73ce61e54099163f86f3485928f69032475a2873b1db22
+  content_hash: sha256:b965789832b4cba6139ee98e03b64a028262a10e92a66d1dbd08d19db0e36c4e
 - kind: project-relative
   target: opencode
   value: .config/opencode/skills/ci-stability-hooks/agents/openai.yaml
@@ -45939,7 +45948,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:6d8da2f159b632b264985b7872b75e2813e597b04bd4853d11f720c548f0cdbb
+  content_hash: sha256:68a748df40d89a80194e626c5ffedc7856245fa7435817ba6e9e715229c8b256
 - kind: project-relative
   target: opencode
   value: .config/opencode/skills/linear-task-ops
@@ -46407,16 +46416,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:4d3c9bf1afbbeaaecdfd15b181e094cbe226abb1dcb780124aa475516786e280
-- kind: project-relative
-  target: opencode
-  value: .config/opencode/skills/orchestrator-worker/references/codex-spawn-model-bug.md
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:3226f9607101c0f4fd9318f6c349eda69247afb3ac7e9f909374b24c18af66be
+  content_hash: sha256:b83934820da7ba1f0c298a5c49410aa800af44a02ea87d861e05e38fecc02509
 - kind: project-relative
   target: opencode
   value: .config/opencode/skills/perman-aws-vault
@@ -47730,7 +47730,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:03c8bad77168fcb1cd783542f399dd847dee7c32b24c0ed4d542648ad732f198
+  content_hash: sha256:d1d1de946bd1999eb9e485f7ac4406d3d9363fa3c41ac9dc0cf6836526894fce
 - kind: project-relative
   target: opencode
   value: .config/opencode/skills/similarity/agents/openai.yaml
@@ -47802,7 +47802,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:db459087ef9350e7fa6e0b2b2a16275fa3bb1d960edaf5daef128a3da4a692e2
+  content_hash: sha256:3fe2654144662a6d0b7027bd51d2bebd2defdff6e521f68aedd5fc2f3c08a756
 - kind: project-relative
   target: opencode
   value: .config/opencode/skills/transitions-dev
