@@ -180,9 +180,34 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
 
 Prefer project-local APM installs for MCPs that depend on a specific app runtime, browser session, UI workflow, or repository credential context; keep global APM limited to cross-repo foundations (lightweight notifications, current docs lookup, public research/readers, core agent bridges). Concrete tool-by-signal recommendations and the chrome-devtools exception-documentation rule are in `references/repo-local-mcp.md` — read it when deciding placement.
 
+## Self-Referencing Repo-Local Skills
+
+A repository whose `apm.yml` declares its own `skills/*` (for example
+`jey3dayo/dotfiles/skills/nvim` inside that same repository) resolves the
+**remote** ref, never the working tree. Two failure modes follow, and the
+second is the dangerous one.
+
+- Unpushed source. Running `apm install` before pushing reverts the deployed
+  copies to the remote content, and `apm audit` reports the corrected local files
+  as drift. Push first, then install.
+- Stale SHA pin — silent. `#main` earns an `unpinned` warning, so pinning to a
+  SHA is tempting. But once pinned, editing the source no longer changes anything:
+  `apm install` keeps deploying the pinned commit, `apm audit` reports
+  `No drift detected` because the deployed files do match the pin, and nothing
+  warns. The repository looks healthy while shipping stale skills.
+
+Prefer a SHA pin only when the repository's change flow bumps it as a required
+step. The full sequence is: edit the source, commit, **push**, bump the pin in
+`apm.yml` to the pushed SHA, `apm install`, then commit the lockfile. Treat a
+skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
+`#main` plus the unpinned warning is the safer trade: noisy but never silent.
+
 ## Guardrails
 
 - Do not treat `~/.apm/apm_modules/` as the place to edit managed skills.
+- Do not pin a self-referencing repo-local skill to a SHA without making the pin
+  bump part of the repository's documented change flow. A stale pin fails
+  silently — no warning, no drift, old content deployed.
 - Do not manage the same skill in both `catalog/skills/**` and `manual-skills/.apm/skills/**`.
 - Do not manage the same skill in both `catalog/skills/**` and `optional-skills/<id>/**`.
 - Do not manage the same skill in `.apm/skills/**` and any global or optional
