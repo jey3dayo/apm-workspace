@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-09-08T06:54:12.595972+00:00'
+generated_at: '2026-09-08T07:09:15.149919+00:00'
 apm_version: 0.29.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -5393,7 +5393,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: a9f981dedc116d12c1764ac1dc8b327ec86c6bf7
+  resolved_commit: a226fa5b73aac4af869b80e43732fe68b010deda
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -5541,8 +5541,6 @@ dependencies:
   - .agents/skills/herdr
   - .agents/skills/herdr/SKILL.md
   - .agents/skills/herdr/references/configuration.md
-  - .agents/skills/japanese-tech-writing
-  - .agents/skills/japanese-tech-writing/SKILL.md
   - .agents/skills/jina-web-research
   - .agents/skills/jina-web-research/SKILL.md
   - .agents/skills/jina-web-research/agents/openai.yaml
@@ -5709,8 +5707,6 @@ dependencies:
   - .claude/skills/herdr
   - .claude/skills/herdr/SKILL.md
   - .claude/skills/herdr/references/configuration.md
-  - .claude/skills/japanese-tech-writing
-  - .claude/skills/japanese-tech-writing/SKILL.md
   - .claude/skills/linear-task-ops
   - .claude/skills/linear-task-ops/SKILL.md
   - .claude/skills/linear-task-ops/references/asana-to-linear-mapping.md
@@ -5865,8 +5861,6 @@ dependencies:
   - .config/opencode/skills/herdr
   - .config/opencode/skills/herdr/SKILL.md
   - .config/opencode/skills/herdr/references/configuration.md
-  - .config/opencode/skills/japanese-tech-writing
-  - .config/opencode/skills/japanese-tech-writing/SKILL.md
   - .config/opencode/skills/linear-task-ops
   - .config/opencode/skills/linear-task-ops/SKILL.md
   - .config/opencode/skills/linear-task-ops/references/asana-to-linear-mapping.md
@@ -6056,7 +6050,6 @@ dependencies:
     .agents/skills/headroom/SKILL.md: sha256:679bc711c6972322318f50f5ba16763b4dc356814f8ed48e74f7c1044eae6f12
     .agents/skills/herdr/SKILL.md: sha256:acb305a332f5f60f5a22abf354367a8ecd1dcc8b89c8101820feefd811b8dcf5
     .agents/skills/herdr/references/configuration.md: sha256:92a35f5472ad0056cf9199ee7c0af5237d646cb7af15606e906da3fbf336a732
-    .agents/skills/japanese-tech-writing/SKILL.md: sha256:68a748df40d89a80194e626c5ffedc7856245fa7435817ba6e9e715229c8b256
     .agents/skills/jina-web-research/SKILL.md: sha256:3e14afb094d8e56bd930158f4b40028ef9ead90227ed13d6df8de15ffe2170a9
     .agents/skills/jina-web-research/agents/openai.yaml: sha256:31aa67ba8347ed691d7fe4f14034a4b5f23b698640d50c8aeb60831534423a4d
     .agents/skills/linear-task-ops/SKILL.md: sha256:c73d73156534c7bd432eea7282a93a473f35c1c2efe073c9e1ea75a935c65a67
@@ -6188,7 +6181,6 @@ dependencies:
     .claude/skills/git-worktree/scripts/copy-env-files.sh: sha256:95988f9e305253348aefa6c1e2de9ade2fe1abea487a071ed533a9d8172066a0
     .claude/skills/herdr/SKILL.md: sha256:acb305a332f5f60f5a22abf354367a8ecd1dcc8b89c8101820feefd811b8dcf5
     .claude/skills/herdr/references/configuration.md: sha256:92a35f5472ad0056cf9199ee7c0af5237d646cb7af15606e906da3fbf336a732
-    .claude/skills/japanese-tech-writing/SKILL.md: sha256:68a748df40d89a80194e626c5ffedc7856245fa7435817ba6e9e715229c8b256
     .claude/skills/linear-task-ops/SKILL.md: sha256:c73d73156534c7bd432eea7282a93a473f35c1c2efe073c9e1ea75a935c65a67
     .claude/skills/linear-task-ops/references/asana-to-linear-mapping.md: sha256:1834da757bf10fe142c5279fb187ef3c566d7e9a6a2c11b9c7fa7d87f5d2daf4
     .claude/skills/linear-task-ops/references/linear-labels-jey.md: sha256:45515c4bd6d2525aa761e3b784f401dd06972770c9d175dcb0f98214e25237d5
@@ -6308,7 +6300,6 @@ dependencies:
     .config/opencode/skills/git-worktree/scripts/copy-env-files.sh: sha256:95988f9e305253348aefa6c1e2de9ade2fe1abea487a071ed533a9d8172066a0
     .config/opencode/skills/herdr/SKILL.md: sha256:acb305a332f5f60f5a22abf354367a8ecd1dcc8b89c8101820feefd811b8dcf5
     .config/opencode/skills/herdr/references/configuration.md: sha256:92a35f5472ad0056cf9199ee7c0af5237d646cb7af15606e906da3fbf336a732
-    .config/opencode/skills/japanese-tech-writing/SKILL.md: sha256:68a748df40d89a80194e626c5ffedc7856245fa7435817ba6e9e715229c8b256
     .config/opencode/skills/linear-task-ops/SKILL.md: sha256:c73d73156534c7bd432eea7282a93a473f35c1c2efe073c9e1ea75a935c65a67
     .config/opencode/skills/linear-task-ops/references/asana-to-linear-mapping.md: sha256:1834da757bf10fe142c5279fb187ef3c566d7e9a6a2c11b9c7fa7d87f5d2daf4
     .config/opencode/skills/linear-task-ops/references/linear-labels-jey.md: sha256:45515c4bd6d2525aa761e3b784f401dd06972770c9d175dcb0f98214e25237d5
@@ -6365,11 +6356,11 @@ dependencies:
     .config/opencode/skills/tuxedo/references/tui-and-capture.md: sha256:13278531ebad1f152047aaebc247eacbfd69f75ba1887e3a611627c94a31f684
     .config/opencode/skills/web-research/SKILL.md: sha256:07109256e91fdd784259fc941efda1b914465da458587c85831a087f70f2b941
     .config/opencode/skills/web-research/agents/openai.yaml: sha256:50536a04fbc72b0f71fc9975a7e041893912ebfcaf9c671439843d20172e1264
-  content_hash: sha256:d1a1a98cd12c8cf0c84b1a518e8a537004fec3f19795ece7fe5bf3f6b7e2bd8a
+  content_hash: sha256:9a40494c3b37433e57f1bb71cff213e1c44e194898b957080508f103142329ae
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
-  resolved_commit: a9f981dedc116d12c1764ac1dc8b327ec86c6bf7
+  resolved_commit: a226fa5b73aac4af869b80e43732fe68b010deda
   resolved_ref: main
   version: 1.0.0
   virtual_path: manual-skills
@@ -6463,6 +6454,17 @@ dependencies:
   resolved_ref: c7189cdc9c2520be50418209834145bdf3a46e97
   version: unknown
   package_type: claude_skill
+  deployed_files:
+  - .agents/skills/japanese-tech-writing
+  - .agents/skills/japanese-tech-writing/SKILL.md
+  - .claude/skills/japanese-tech-writing
+  - .claude/skills/japanese-tech-writing/SKILL.md
+  - .config/opencode/skills/japanese-tech-writing
+  - .config/opencode/skills/japanese-tech-writing/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/japanese-tech-writing/SKILL.md: sha256:89e5e14385b1bfaa3c97631ca6a425f9ebbdbb8b18318fd881a79d0903b574ad
+    .claude/skills/japanese-tech-writing/SKILL.md: sha256:89e5e14385b1bfaa3c97631ca6a425f9ebbdbb8b18318fd881a79d0903b574ad
+    .config/opencode/skills/japanese-tech-writing/SKILL.md: sha256:89e5e14385b1bfaa3c97631ca6a425f9ebbdbb8b18318fd881a79d0903b574ad
   content_hash: sha256:dd4b5495821a9ff455c6d9a3c021d87ebebbc1fbe4ada96cbce45170aa0dbab3
 - repo_url: mattpocock/skills
   name: codebase-design
@@ -19989,8 +19991,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
+  active_owner: gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
   content_hash: null
 - kind: project-relative
   target: claude
@@ -19998,9 +20000,9 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:68a748df40d89a80194e626c5ffedc7856245fa7435817ba6e9e715229c8b256
+  - gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
+  active_owner: gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
+  content_hash: sha256:89e5e14385b1bfaa3c97631ca6a425f9ebbdbb8b18318fd881a79d0903b574ad
 - kind: project-relative
   target: claude
   value: .claude/skills/linear-task-ops
@@ -32688,8 +32690,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
+  active_owner: gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
   content_hash: null
 - kind: project-relative
   target: codex
@@ -32697,9 +32699,9 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:68a748df40d89a80194e626c5ffedc7856245fa7435817ba6e9e715229c8b256
+  - gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
+  active_owner: gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
+  content_hash: sha256:89e5e14385b1bfaa3c97631ca6a425f9ebbdbb8b18318fd881a79d0903b574ad
 - kind: project-relative
   target: codex
   value: .agents/skills/linear-task-ops
@@ -45945,8 +45947,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
+  - gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
+  active_owner: gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
   content_hash: null
 - kind: project-relative
   target: opencode
@@ -45954,9 +45956,9 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:68a748df40d89a80194e626c5ffedc7856245fa7435817ba6e9e715229c8b256
+  - gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
+  active_owner: gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
+  content_hash: sha256:89e5e14385b1bfaa3c97631ca6a425f9ebbdbb8b18318fd881a79d0903b574ad
 - kind: project-relative
   target: opencode
   value: .config/opencode/skills/linear-task-ops
