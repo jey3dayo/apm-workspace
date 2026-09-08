@@ -113,37 +113,32 @@
 
 ## japanese-tech-writing (k16shikano の gist)
 
-- Status: catalog に vendored（2026-07-03、commit `10496d3`）。2026-09-08 に外部依存化を
-  試して差し戻した（下記）
-- 正本: `catalog/skills/japanese-tech-writing/SKILL.md`
+- Status: alias 付き外部依存（2026-09-08）。2026-07-03 から catalog に vendored していたが、
+  adapter の alias 対応（commit `9d820b3`）が入ったので「第三者 skill の既定レーン（2026-09-08）」の
+  既定へ移した。`catalog/skills/japanese-tech-writing/SKILL.md` は削除済み。
+- 正本: 上流 gist。`apm.yml` の object form の依存宣言が参照を持つ。
+  `git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git`
+  - `ref: c7189cdc9c2520be50418209834145bdf3a46e97` + `alias: japanese-tech-writing`。
 - 上流: `k16shikano` の gist `fd287c3133457c4fd8f5601d34aa817d`（第三者、現存・更新継続中）。
   https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
-- 追随: 2026-09-08 に上流の 2 項目（新概念の導入を辞書型断定で始めない／イ形容詞 + 「です」の禁止）を反映。
-  上流 SHA は `c7189cdc9c2520be50418209834145bdf3a46e97`。検知は手動で、
-  `curl -sL https://gist.githubusercontent.com/k16shikano/<id>/raw/SKILL.md` を取って diff する。
-  `gh gist view <id> --raw` は先頭に gist description の行を足すので、そのまま比較しない。
-- 外部依存化を試して差し戻した理由（2026-09-08）: gist 自体は普通の git repo で
-  （`refs/heads/main` と commit SHA を持つ）、`apm.yml` に
-  `git: https://gist.github.com/<user>/<id>.git#<sha>` + `alias: japanese-tech-writing` と
-  書けば `apm install` は正しく解決し、alias 名で配布できる（scratchpad で実測）。
-  ところが `scripts/apm-workspace.sh` は `alias` を一切参照せず（出現 0 件）、
-  lockfile の `repo_url` だけで配布先ディレクトリ名を決める。実際に本 workspace で
-  rollout したところ、3 配布面すべてに `fd287c3133457c4fd8f5601d34aa817d` という
-  gist ID 名で配置された。名前で参照できないので差し戻した。
-  この adapter 側の穴は `todo.txt` に別件として起票済み。
-- 恒久的な差分: 上流は LLM 口調リストのラベルを `**予告と総括**：` のように太字化しているが、
-  この repo の `scripts/replace-bold-headings.ts` が `- **label**` を house style として剥がす
-  （2026-09-08 実測、6 箇所）。`mise run format` のたびに戻るため、上流と完全一致はしない。
-  太字の有無は規範の内容に影響しないので、house style を優先して差分を受け入れる。
-- lane の判断: 「第三者 skill の既定レーン（2026-09-08）」の既定に従い、adapter が `alias` を
-  尊重した時点で alias 付き外部依存へ移す。それまでは vendor 継続で、置き場は `catalog` ではなく
-  `manual-skills/.apm/skills/**` + `upstreams/japanese-tech-writing/PROVENANCE.md`
-  （catalog を自分の成果物に限定する原則による）。2026-09-08 時点では `catalog` に置いたまま。
+- `git:` は `https://` を明示する。短縮形へ正規化されると apm が SSH を先に試し、
+  `gist.github.com` の host key 未登録で `Host key verification failed` になる。
+  https 明示なら初回試行が HTTPS に固定され、`APM_ALLOW_PROTOCOL_FALLBACK` も
+  `known_hosts` の変更も要らない。
+- 追随: `ref` の SHA を更新して rollout する。手動 diff は不要になった。
+- 恒久的な差分は解消した（2026-09-08）。vendored の間は `scripts/replace-bold-headings.ts` が
+  LLM 口調リストの太字ラベル 6 箇所を house style として剥がしていたが、外部依存は
+  `apm_modules/` の clone をそのまま配るため整形の対象外で、上流と完全一致する
+  （実測: 配布物の sha256 が 4 面とも一致、太字 6 箇所を保持）。
+- 供給元が面によって違う。`~/.claude` / `~/.cursor` / `~/.opencode` / `~/.agents` は
+  `scripts/apm-workspace.sh` がローカル作業ツリーから stage するので `mise run apply` で即時に入れ替わる。
+  `~/.config/opencode` は upstream apm が `jey3dayo/apm-workspace/catalog#main` の取得済みコピーから
+  配るため、push と `mise run refresh` を回すまで旧 vendored 版を配り続ける（2026-09-08 実測）。
 - `natural-japanese`（`coji/natural-japanese`、外部依存）との棲み分け: 本スキルは
   技術書の章・記事の規範（一文一行、脚注、パラグラフライティング、論証の厳密さ）を扱い、
   `natural-japanese` はビジネス文書の自然さと AI 臭さの除去を扱う。名前が近く混同しやすい。
-- 再検討するなら: adapter が `alias` を尊重するようになったら外部依存へ移す。
-  上流が gist から通常の repo へ移った場合も同じ（その場合は alias 無しでも名前が付く）。
+- 再検討するなら: 上流 gist が消えた場合は vendor へ戻す。その場合の置き場は `catalog` ではなく
+  `manual-skills/.apm/skills/**` + `upstreams/japanese-tech-writing/PROVENANCE.md`。
 
 ## 移管候補の提案（2026-07-15）
 
