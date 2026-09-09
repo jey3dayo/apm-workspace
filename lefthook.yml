@@ -1,3 +1,8 @@
+# lefthook が見つからないとき、生成される hook は既定では警告を出して exit 0 する
+# ——つまり gate 無しで commit / push が通る。この workspace では gate の不在を
+# 成功と区別できないほうが危険なので、hard fail させる。
+assert_lefthook_installed: true
+
 pre-commit:
   parallel: true
   jobs:
