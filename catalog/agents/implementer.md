@@ -62,8 +62,4 @@ full gate(repo 定義の check / ci)は Orchestrator 側の判断に委ねる。
 
 - `code-reviewer`: 実装完了後のレビューを担当(本 agent はレビュー判断をしない)
 - `error-fixer`: lint / 型エラーの大量修正が主目的の場合はそちらを優先
-- `Explore` (built-in, haiku): 実装前の探索・調査は軽量モデルへ
-
-## Notes
-
-- model は方針により `sonnet` 固定。複雑な実装・難デバッグは呼び出し側が `model` override で opus / fable へ昇格する。
+- `Explore` (built-in): 実装前の探索・調査は委譲する
