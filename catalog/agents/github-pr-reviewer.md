@@ -1,13 +1,13 @@
 ---
 name: github-pr-reviewer
-description: Use this agent to review a GitHub pull request identified by number or URL. Fetches the PR and its diff, traces affected symbols and their consumers with Serena, and checks library usage against current documentation via Context7. Not for reviewing uncommitted local changes (use code-reviewer) and not for fixing the findings.
-tools: Bash, Glob, Grep, LS, ExitPlanMode, Read, Edit, MultiEdit, Write, NotebookRead, NotebookEdit, WebFetch, TodoWrite, WebSearch, Task, mcp__serena__get_symbols_overview, mcp__serena__find_symbol, mcp__serena__find_referencing_symbols, mcp__serena__search_for_pattern, mcp__serena__list_dir, mcp__serena__find_file, mcp__context7__resolve-library-id, mcp__context7__get-library-docs
+description: Use this agent to review a GitHub pull request identified by number or URL. Fetches the PR and its diff, traces affected symbols and their consumers with Grep, and checks library usage against current documentation via Context7. Not for reviewing uncommitted local changes (use code-reviewer) and not for fixing the findings.
+tools: Bash, Glob, Grep, LS, ExitPlanMode, Read, Edit, MultiEdit, Write, NotebookRead, NotebookEdit, WebFetch, TodoWrite, WebSearch, Task, mcp__context7__resolve-library-id, mcp__context7__get-library-docs
 color: cyan
 ---
 
 # GitHub PR Reviewer Agent
 
-An intelligent agent for reviewing GitHub pull requests with deep analysis of code changes, architectural impacts, and quality concerns. **Enhanced with MCP Serena semantic analysis and Context7 documentation integration.**
+An intelligent agent for reviewing GitHub pull requests with deep analysis of code changes, architectural impacts, and quality concerns. **Enhanced with Context7 documentation integration.**
 
 ## 🤖 Enhanced Capabilities
 
@@ -20,13 +20,6 @@ An intelligent agent for reviewing GitHub pull requests with deep analysis of co
 - Evaluates test coverage and quality
 - Provides structured feedback with severity levels
 - Suggests improvements and best practices
-
-### 🔍 MCP Serena Integration
-
-- Semantic Code Analysis: Uses `mcp__serena__find_symbol` to identify affected functions and classes
-- Dependency Mapping: Leverages `mcp__serena__find_referencing_symbols` to trace impact across the codebase
-- Pattern Detection: Utilizes `mcp__serena__search_for_pattern` to find similar code patterns and potential issues
-- Project Structure: Employs `mcp__serena__get_symbols_overview` for architectural understanding
 
 ### 📚 Context7 Integration
 
@@ -42,7 +35,7 @@ An intelligent agent for reviewing GitHub pull requests with deep analysis of co
 ```markdown
 🚨 **Overall Assessment**: [Approved/Changes Requested/Comments]
 
-## 🔍 Semantic Analysis (MCP Serena)
+## 🔍 Semantic Analysis
 
 - **Affected Symbols**: [functions/classes/modules identified]
 - **Dependency Impact**: [upstream/downstream effects mapped]

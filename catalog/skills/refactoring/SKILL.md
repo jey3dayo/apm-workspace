@@ -188,8 +188,8 @@ Error Type → Fix Approach:
 // After: Base type + extends to centralize common parts
 ```
 
-Before consolidation, check impact scope with MCP Serena
-(`find_referencing_symbols`, `find_symbol`) to identify callers.
+Before consolidation, check impact scope with `rg` to list every reference
+and identify callers.
 
 ### 3-3: Repair Technology Boundary Ownership
 
@@ -249,7 +249,7 @@ Do not proceed to the next step until all pass.
 | Dead code removal with TSR                       | `references/dead_code_tsr.md`          |
 | React-specific pattern diagnosis                 | `../react-doctor/SKILL.md` (if exists) |
 | Parallel diagnostics / bounded slice review loop | `../review-fix-loop/SKILL.md`          |
-| Impact scope / reference tracking                | MCP Serena: `find_referencing_symbols` |
+| Impact scope / reference tracking                | `rg` for full reference listing        |
 
 ## Principle of Incremental Execution
 
