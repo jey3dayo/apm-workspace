@@ -72,7 +72,7 @@ review role の reviewer モデル指定は本スキル内の一時的な model 
 
 ## Guardrails
 
-- worker と reviewer を同じ live working tree に同時接続しない。review は commit 済み SHA を対象にするか、review 中は implement worker への新規タスク送信を停止する
+- review 中は対象 tree を変更しない。停止するのは implement worker への新規タスク送信だけでなく、**Orchestrator 自身の `git checkout` / 編集 / commit も含む**。worker を 1 体も出していなくても、Orchestrator が tree を動かせば reviewer は指定 SHA と実体の不一致で `BLOCKED` を返す。worker と reviewer を同じ live working tree に同時接続しない。並行して別の作業を進める必要があるときは worktree を切り、review には commit 済み SHA を渡す
 - review の入力は base/head SHA で固定する。固定 diff ファイル方式を採る場合は head SHA に加えファイルの checksum（`shasum -a 256`）も保持し、受信後に改変を検知する
 - 並列 implement は触るファイル集合が互いに素であることが前提。互いに素にできなければ直列化するか worktree を分ける
 - タスク文を shell command へ生 interpolation しない。boot payload は mode 600 の一時ファイル経由の quote-safe 方式にし、成功・timeout・crash の全経路で削除する
@@ -115,7 +115,7 @@ Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、r
 - implement: 対象 worktree を決める。並列タスクはファイル集合が互いに素か確認する
 - review: 対象を base/head SHA で固定する（未 commit の作業を見せる場合は先に commit するか、diff ファイル + checksum 方式にする）
 
-完了条件: worker が触る（読む）領域が一意に特定され、tree 隔離規則に反していない。
+完了条件: worker が触る（読む）領域が一意に特定され、tree 隔離規則に反しておらず、review 中に対象 tree を動かさない段取りが取れている（並行作業の予定があるなら worktree を用意した）。
 
 ### 3. Worker を事前登録する
 
