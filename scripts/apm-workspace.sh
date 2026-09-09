@@ -1708,17 +1708,20 @@ print_catalog_summary() {
 
 # Fields: name|home-relative root|config file|skills root override.
 # An empty override deploys skills under the target's own root; "-" means the
-# target has no skills face at all. OpenCode takes "-" because it already reads
-# ~/.agents/skills as a global source, so ~/.opencode/skills only duplicated it.
-# Do not express that by pointing a second target at .agents instead:
-# reconcile_skills_root_from_stage prunes entries the stage lacks, so two
-# targets sharing one skills root delete each other's skills.
+# target has no skills face at all. OpenCode's root is .config/opencode
+# because that is the only path OpenCode reads agents/commands from (it does
+# not read a Claude-compatible agents/commands path). OpenCode takes "-" for
+# skills because it already reads ~/.claude/skills and ~/.agents/skills as
+# global sources, so a third copy under .config/opencode/skills would only
+# duplicate them. Do not express that by pointing a second target at .agents
+# instead: reconcile_skills_root_from_stage prunes entries the stage lacks,
+# so two targets sharing one skills root delete each other's skills.
 managed_catalog_runtime_targets() {
   cat <<'EOF'
 claude|.claude|CLAUDE.md|
 codex|.codex|AGENTS.md|.agents
 cursor|.cursor|AGENTS.md|
-opencode|.opencode|CLAUDE.md|-
+opencode|.config/opencode|CLAUDE.md|-
 openclaw|.openclaw|CLAUDE.md|
 EOF
 }

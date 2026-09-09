@@ -16,12 +16,36 @@ catalog 変更後の検証は判断を含まない機械作業なので、Orches
 ## 手順
 
 1. `mise run format` → `mise run check` を実行する。失敗したら以降へ進まず、失敗ログを添えて報告する
-2. `mise run deploy:fresh` を実行する。`install:catalog` 単独では新規追加ファイルが配布先から消えるため使わない
+2. `mise run deploy:fresh` を実行する。`install:catalog` 単独では新規追加ファイルが配布先から消えるため使わない。**注意:** opencode の deploy root が `.opencode` から `~/.config/opencode` へ変わった契約への移行後、初回 deploy は `~/.config/opencode/{skills,agents}` の既存内容を削除する。事前 archive はこのスキルの担当外であり、呼び出し元（Orchestrator）が deploy 前に行う
 3. 変更した skill ごとに配布一致を確認する:
 
    ```bash
    diff -rq ~/.claude/skills/<skill> ~/.agents/skills/<skill>
    diff -q <catalog>/skills/<skill>/SKILL.md ~/.claude/skills/<skill>/SKILL.md
+   ```
+
+   これに加えて opencode 面の配布一致を確認する。opencode は skills を `.config/opencode/skills` からは読まず `.claude/skills` / `.agents/skills` から読むため、上記の `~/.agents/skills` 一致確認がそのまま opencode の canonical skills face の検証にもなる。
+
+   ```bash
+   # negative: opencode 用 skills 面は存在してはいけない（二重配布の復活を検知する）
+   [ ! -e ~/.config/opencode/skills ]
+
+   # positive: opencode の agents は catalog と full-tree swap で厳密一致する（余剰・欠落なし）
+   diff -rq <catalog>/agents ~/.config/opencode/agents
+
+   # positive: opencode の commands は catalog が提供するファイルだけを個別比較する。
+   # commands は manifest scope 配布（sync_managed_catalog_dir_with_manifest）のため、
+   # `.managed-catalog-manifest` や同居する非 catalog ファイルが配布先にだけ存在するのは仕様であり、
+   # ディレクトリ全体の厳密一致では必ず失敗する
+   fail=0
+   while read -r f; do
+     rel=${f#<catalog>/commands/}
+     diff -q "$f" ~/.config/opencode/commands/"$rel" || fail=1
+   done < <(find <catalog>/commands -type f ! -name '.gitkeep')
+   [ "$fail" -eq 0 ]
+
+   # apm.yml の targets に opencode が再混入していないこと
+   ! grep -qx '  - opencode' apm.yml
    ```
 
 4. agmsg roster link の到達性を確認する。確認対象は canonical face のみ。判定は `db` / `teams` の個別状態を見て `ls -l` でその場で二分するのではなく、両方を見た集約結果を持つ `~/.apm` の `mise run doctor` に一元化する:

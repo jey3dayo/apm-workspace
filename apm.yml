@@ -6,7 +6,6 @@ targets:
   - claude
   - codex
   - cursor
-  - opencode
   - agent-skills
 dependencies:
   apm:
