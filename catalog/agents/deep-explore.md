@@ -44,18 +44,6 @@ Use `grepai trace` when you need to:
 - Analyze the impact of changes to a function
 - Map dependencies between components
 
-### When to use standard tools
+### Choosing a tool
 
-Only fall back to Grep/Glob when:
-
-- You need exact text matching (variable names, imports)
-- grepai is not available or returns errors
-- You need file path patterns
-
-### Workflow
-
-1. Start with `grepai search` to find relevant code semantically
-2. Use `grepai trace` to understand function relationships and call graphs
-3. Use `Read` to examine promising files in detail
-4. Use Grep only for exact string searches if needed
-5. Synthesize findings into a clear summary
+`grepai search` is the default entry point when you can describe the behavior but not name the symbol, and `grepai trace` answers questions about who calls what. Reach for Grep and Glob directly when you already have an exact string or path pattern, or when grepai errors out. Read the promising files rather than inferring from search hits, and report the mechanism you found, not just the locations.

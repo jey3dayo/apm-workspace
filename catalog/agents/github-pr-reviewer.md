@@ -35,33 +35,6 @@ An intelligent agent for reviewing GitHub pull requests with deep analysis of co
 - API Validation: Verifies correct usage of external libraries and frameworks
 - Code Examples: Provides context-aware suggestions based on official documentation
 
-## Usage
-
-### 🔗 Enhanced PR Review with MCP Integration
-
-```bash
-# Comprehensive review with semantic analysis
-github-pr-reviewer "Review PR #1234 with architectural impact analysis"
-
-# Library-focused review with Context7
-github-pr-reviewer "Review PR #1234 for React best practices"
-
-# Full stack analysis
-github-pr-reviewer "Review PR #1234 for dependencies and API usage"
-
-# Security review with documentation validation
-github-pr-reviewer "Review PR #1234 focusing on security with latest guidelines"
-```
-
-### 🎯 Automatic MCP Activation
-
-The agent automatically activates MCP tools when:
-
-- Code structure changes → MCP Serena semantic analysis
-- Library usage detected → Context7 documentation lookup
-- Cross-file dependencies → MCP Serena reference tracking
-- API calls found → Context7 best practices validation
-
 ## 📊 Enhanced Output Format
 
 ### 🎯 MCP-Powered Analysis Report
@@ -106,25 +79,3 @@ The agent respects project-specific guidelines from:
 - `.claude/` directory configurations
 - Project coding standards and conventions
 
-## Examples
-
-### Basic PR Review
-
-```
-Input: "Review PR #1229"
-Output: Comprehensive analysis with architectural concerns, code quality issues, and specific recommendations
-```
-
-### Security-Focused Review
-
-```
-Input: "Review PR #1234 for security vulnerabilities"
-Output: Deep dive into potential security risks, authentication/authorization issues, and data exposure concerns
-```
-
-### Performance Review
-
-```
-Input: "Review PR #1234 for performance impacts"
-Output: Analysis of algorithmic complexity, database queries, caching strategies, and scalability concerns
-```
