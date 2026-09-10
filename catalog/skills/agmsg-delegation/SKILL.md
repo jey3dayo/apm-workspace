@@ -136,7 +136,9 @@ Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、r
 
 **linked worktree では canonical な repo root を渡す。** `join.sh` は worktree path を repo root へ正規化して登録するが、`identities.sh` に worktree path を渡すと空を返し、上の完了条件が成立しない。`git -C <worktree> rev-parse --path-format=absolute --git-common-dir` の親、または `git -C <worktree> worktree list --porcelain` の先頭 entry から repo root を求めて渡す。`agmsg` は外部パッケージなので本スキルからは直せず、呼び出し側で揃える。
 
-**登録済み repo の内側（nested repo・`tmp/` 配下）を対象にするときは `AGMSG_RESOLVE_PROJECT=0` を付ける。** `join.sh` と `reset.sh` は同じ `agmsg_resolve_project` を通り、既定では登録済みの祖先ディレクトリへ昇格する。nested `git init` があっても外側 repo として登録されるため、`identities.sh` は空を返して上の完了条件が成立しない。さらに同じ誤りが `reset.sh` に乗ると外側 repo の別 identity を消す。`join` と `reset` の両方へ同じ変数を付ける。
+**明示した project を現セッションの project へ解決し直させたくないときは、`join` と `reset` の両方へ `AGMSG_RESOLVE_PROJECT=0` を付ける。** 別 repo への登録、独立させたい nested repo や `tmp/` 配下がこれにあたる。両者は同じ `agmsg_resolve_project` を通り、既定では取得できた SessionStart marker を入力 path より優先し、次に登録済みの祖先へ昇格する——渡した path と異なる登録になり得る。nested `git init` があっても外側 repo として登録され、`identities.sh` は空を返して上の完了条件が成立しない。同じ誤りが `reset.sh` に乗ると外側 repo の別 identity を消す。
+
+**送信が成功したことは project 一致の証拠にならない。** `send.sh` は team config の agents キーの存在だけを見て、登録 project を照合しない。対象 project と runtime を引数にした `identities.sh` で登録を確かめる。opt-out は main checkout への正規化も止めるため、raw な worktree path を無条件に渡さず、登録したい canonical root を先に決める（上の linked worktree の規則を参照）。
 
 ### 4. Detached worker を起動する
 
