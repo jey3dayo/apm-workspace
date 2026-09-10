@@ -6,7 +6,7 @@
 
 - ファイル、フラグ、コマンド、機能が存在しないと断定する前に、その主張に最も近い一次情報を確認する。CLI は `--help`、機能は公式文書またはソース、導入済みパッケージはインストール先の実体を優先する
 - 不存在や対応状況が回答の根拠になる場合は、確認に使ったコマンド、ファイル、文書を短く示す
-- 最初の確認で判断できない場合は、別の一次情報を確認するか未確認であることを明示する。推測を事実として断定しない
+- 最初の確認で判断できない場合は、別の一次情報を確認するか未確認であることを明示する。推測を事実として断定しない。**状態が変わった原因や操作の主体も同じ扱いで**、他セッション・他プロセスの仕業だと断定する前に自分で観測する（仮説として明示するのは妨げない）
 
 ## Definition of Done (DoD)
 
@@ -65,11 +65,11 @@
 
 ### 推奨ワークフロー（経路の選択）
 
-- 役割分担: `orchestrator-worker` は委譲判定・タスク分割の正本、Codex native の `spawn_agent` は標準 transport、`agmsg-delegation` は外部セッションや native spawn が使えない場合の fallback
-- 組み込みサブエージェント（Agent tool / `spawn_agent`）が使える場合はそれが正規経路
+- 役割分担: `orchestrator-worker` は委譲判定・タスク分割・**Reviewer と Worker の model 選定**の正本、`agmsg-delegation` は transport の正本
+- 先に `orchestrator-worker` で model を決め、その model と必要な強制境界を満たせる transport を選ぶ。 組み込みサブエージェント（Agent tool / `spawn_agent`）で満たせるならそれを使い、満たせないなら `agmsg-delegation` を使う。「組み込みが使えるなら常に組み込み」ではない——review 外注の既定は Codex 側の model なので、Claude セッションからはたいてい `agmsg-delegation` になる
+- 実行時に read-only を強制できていない経路の reviewer を verdict へ格上げしない（判定は `agmsg-delegation`）
 - Worker のモデル名をユーザーが指定したら（例:「luna で」）、それが platform を跨ぐ明示指示にあたる。既定は同一 platform 内で完結させる
-- pane / workspace を勝手に作らない。ユーザーが「用意して」と指示したときだけ、`herdr` スキルの `pane split --focus` → `pane run` → `pane process-info` で読み戻す手順で作る。読み戻していないプロセス名を報告に書かない
-- spawn 面の制約で組み込み経路が塞がっている場合は `agmsg-delegation` スキルへ切り替える
+- pane / workspace を勝手に作らない。ユーザーが「用意して」と指示したときだけ作り、作った実体を読み戻してから報告する。手順は `herdr` スキルと `agmsg-delegation` の `references/resident-pool.md` が正本（具体コマンドをここに写さない）
 - エージェント / セッション間の引き継ぎ（CC → Codex 等）は transport に `agmsg` を使い、本文は `agmsg-delegation` の引き継ぎメッセージ書式（artifact は参照渡し・suggested skills・secrets redact・次セッションの目的に合わせる）に従う
 - agmsg が全断（`team.sh` が `Team not found`、`identities.sh` が空）したら、原因を症状から断定せず `~/.apm` で `mise run doctor` の agmsg 判定を読む。plain path が1つでもあれば手で突き合わせるまで復旧せず、plain path が無いと確認できたときだけ `mise run agmsg:state:restore` を実行する。手で `ln -s` は張らない
 - Worker の `DONE` は未検証の申告として扱う。Orchestrator が実際の比較元を確定し、差分、変更対象、要求との対応を独立に確認する
@@ -78,21 +78,9 @@
 
 ### スキルの不具合・摩擦を owner へ返す
 
-スキルや agent を実運用で使って**不具合・契約の破れ・手順の摩擦**を踏んだら、その場の回避で終わらせずに `~/.apm` へ送る。回避策だけが各リポジトリに散ると、同じ穴を全員が踏み直す。
+スキルや agent を実運用で使って**不具合・契約の破れ・手順の摩擦**を踏んだら、その場の回避で終わらせずに `~/.apm` へ送る。回避策だけが各リポジトリに散ると、同じ穴を全員が踏み直す。効いた点も送る（残す判断の材料になる）。
 
-送るのは次のような内容。
-
-- 手順どおりに実行して失敗した箇所（踏んだ経路とエラー実物）
-- ドキュメントと実装が食い違っていた箇所
-- 契約が成立しなかった箇所（完了条件が確認できない、報告書式が守られない等）
-- 実測値（所要時間、消費、再試行回数）。判断の根拠になる
-- 効いた点も書く。残す判断の材料になる
-
-送りっぱなしでよい。**返信は来ないし、待たない。**
-
-送信は team `apm`・宛先 `main-cc`。envelope は `source_role: Steward` / `target_role: Architect` / `task_id: <repo>-feedback-<topic>` / `report_contract: NOTIFY` の 4 field を必ず載せる（欠けると受け側は役を確定できず `BLOCKED` を返す契約）。`<name>` は task_id と同じ task-scoped な一意名にする。join / send / reset のコマンド列と envelope の書式定義は `agmsg-delegation` が正本。`HANDOFF` は最終結果を返す契約なので、一方通行の報告には使わない。
-
-受け取り側（`~/.apm`）は**受け取るだけでよい**。ack を返す必要はなく、対応するかどうかと優先度は受け取り側が決める。
+**何を学びとして拾い、どの owner へ出すかは `learning-intake` が正本。** 別リポジトリで踏んだ APM 側の問題は team `apm`・宛先 `main-cc` へ agmsg で送る。envelope の必須 field と `NOTIFY` の意味（一方通行。ack も返信も来ないので待たない）は `agmsg-delegation` が正本。
 
 ### agent 定義側のモデル割り当て
 
@@ -110,6 +98,7 @@
 | ローカルリポジトリの場所特定        | `ghq list -p`（絞り込みは `ghq list -p <name>`）     | `fd` / `find` での全域探索     |
 
 - `ax` は mise 管理。初回利用前に必ず `ax agent-context` で使い方を確認する
+- `pnpm <word>` は、その名前の script が `package.json` にあると script 側が走る。help は `pnpm help <command>`、repo の script は `pnpm run <script>`、依存の実行ファイルは `pnpm exec <binary>` と明示的に呼び分ける。`--help` を付けても script は実行される（実測で `dist/` が消えた）
 - CLI が見つからない場合は PATH → リポジトリの `mise.toml` / `mise which` の順に確認し、未導入なら `mise install` を検討する。それでも使えない場合のみ理由を報告して fallback する
 
 ### ブラウザ操作の選択

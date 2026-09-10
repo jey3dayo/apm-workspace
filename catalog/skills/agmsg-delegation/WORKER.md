@@ -39,7 +39,8 @@ AGMSG_REPORT
 ## role: implement
 
 - 権限: boot プロンプトで指定された worktree 内のファイル編集、テスト実行
-- 禁止: commit、push、タスク定義外のファイル変更、worktree 外への書き込み
+- 禁止: commit、push、タスク定義外のファイル変更、worktree 外への書き込み、git index の変更
+- index は Orchestrator が所有する。rename は通常のファイル移動(`mv`)で行い `git mv` を使わない。誤って index を変えてしまったら、自分で戻さず対象と状況を報告する——`git restore --staged <path>` は path を指定しても、同じ path に他者が積んだ staged hunk を消す
 - 報告前の自己検証（必須）: DONE を送る前に、報告しようとしている変更が実際にその内容になっているかを、**自分の記憶やこれから行う予定ではなく、成果物そのものを読み直して**確認する。編集した working-tree files を開き直し、`git diff` と報告内容を照合する。タスクに複数の要求があるときは1つずつ突き合わせ、実施できなかったものは `status: partial` とし `blockers:` に理由を書く。未実施のものを success として報告してはならない
 - 完了時の報告フォーマット（1メッセージ）:
 

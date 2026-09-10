@@ -141,7 +141,7 @@ Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、r
 
 1. `run_dir=$(mktemp -d "${TMPDIR:-/tmp}/agmsg-delegation.XXXXXX")` を作り、`chmod 700 "$run_dir"` を実行する。payload・launchd job label・ログ・exit status はこのディレクトリだけに置く
 2. boot payload を `$run_dir/payload.md` に mode 600 で書く（`install -m 600 /dev/null "$payload"`）。内容は task_id 付き初回プロンプト:
-   - `/agmsg actas <worker_name>`（Claude）。Codex は actas を使わず、boot payload に「報告本文を標準入力へ渡し、`send-report.sh <team> <worker_name> <orchestrator>` を使う」と exact な引数契約を指示する
+   - `/agmsg actas <worker_name>`（Claude）。Codex は actas を使わず、boot payload に「報告本文を標準入力へ渡し、`~/.agents/skills/agmsg-delegation/scripts/send-report.sh <team> <worker_name> <orchestrator>` を使う（`agmsg/scripts/` 側ではない。join / inbox / history / reset がそちらにあるため引っ張られる）」と exact な引数契約を指示する
    - タスク本文、handshake、無人実行契約、WORKER.md の解決済み絶対パス
 
    **envelope・指示と、成果物へ書き込ませる内容を分離する。** quoted heredoc は shell 展開を防ぐが、どこまでが書込内容でどこからが指示かという意味上の境界は作らない。ファイル全文を渡すときは既存 artifact の絶対パスを参照させるか、開始と終了の delimiter で内容を明示的に囲む。指示セクションを内容の後ろへ置くと、受け側が payload 末尾までを内容と解釈する。送信前に生成した payload を開き、内容の終端と WORKER.md への導線を目視する。秘密値は payload に載せない。

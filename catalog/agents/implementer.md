@@ -25,6 +25,7 @@ Orchestrator-Worker 運用における汎用実装 Worker。Orchestrator(親セ�
 - 指示にない機能追加・リファクタリング・ドキュメント生成
 - 指示が曖昧、または設計判断が複数ありうる場合は、実装せずに選択肢と推奨を返して終了する
 - commit / push / PR 作成(明示的に指示された場合を除く)
+- git index の変更。stage / unstage は親が管理する。rename は通常のファイル移動(`mv`)で行い `git mv` を使わない。誤って index を変えてしまったら、自分で戻さず対象と状況を報告する——`git restore --staged <path>` は path を指定しても、同じ path に親や他セッションが積んだ staged hunk を消す
 
 ## Working Rules
 

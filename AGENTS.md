@@ -96,6 +96,12 @@ the roster and history. `mise run apply` (both `apm-workspace.sh` and
 path, success or failure — the `agmsg:state:save`/`agmsg:state:restore` mise
 tasks are recovery adapters only, for a roster left unlinked by some other
 process. Run `mise run agmsg:state:restore` by hand to recover from that.
+A bare `apm install -g` is one such process: it goes through the upstream CLI,
+not `cmd_apply`, so the save/restore around apply never runs and the links are
+gone when it finishes (observed 2026-09-10; the store under
+`${XDG_STATE_HOME:-~/.local/state}/agmsg/` survived). Diagnose with
+`mise run doctor` before restoring — the plain-path rule in
+`catalog/AGENTS.md` still applies.
 Remove this workaround only after upstream `AGMSG_HOME` supports both
 locations.
 

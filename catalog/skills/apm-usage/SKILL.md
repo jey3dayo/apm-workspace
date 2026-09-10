@@ -264,6 +264,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
      `global-catalog` is not an install lane — create the skill via
      Fast Path 2 instead
    - for global dependencies, work in `~/.apm` and use `apm install -g <package-ref>` or `apm install -g --mcp <name> ...`
+   - a bare `apm install -g` bypasses `mise run apply`, so the agmsg roster links it removes are not restored for you; follow the agmsg State section of `~/.apm/AGENTS.md` afterwards, diagnosing with `mise run doctor` before any restore
    - for repo-local dependencies, work in the target repository and use `apm install <package-ref>` or `apm install --mcp <name> ...`
    - for global changes, run `mise run check`, then `mise run deploy`; for repo-local changes, run that repository's defined APM or project checks
    - for repo-local changes, also confirm `targets:` includes every runtime the
