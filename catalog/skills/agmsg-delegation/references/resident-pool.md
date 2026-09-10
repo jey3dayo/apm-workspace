@@ -27,6 +27,7 @@
 `$run_dir/worker.log`・`worker.exit`・launchd job label が存在しないため、**crash・長時間コマンド・承認待ちを orchestrator 側だけでは区別できない**。この欠落を heartbeat とユーザーへの委譲で埋める。
 
 - boot payload が無い経路なので、**最初のタスクメッセージが Worker プロトコルの唯一の注入口**になる。1通目に `WORKER.md` の解決済み絶対パス、`~/.agents/skills/agmsg-delegation/scripts/send-report.sh <team> <worker_name> <orchestrator>` の引数契約、下記の heartbeat 間隔を必ず含める
+- 送信コマンドの成功（終了コード 0）を確認できたときだけ pane を起こす。 失敗したら起こさず、失敗そのものを診断する。起こす処理が送信の成否に依存していればよく、同じコマンド列に並べること自体は問題ない（`send && prompt` や exit status を見る `if` は要件を満たす）。送信の成功は readiness ではない——readiness は task_id 付きの `READY` で確認する
 - worker は作業中、**5分を超えて無言にならないよう `WORKING` を送る**
 - pane を `herdr` で立てた場合は、`herdr agent get <name>` / `herdr agent list` で lifecycle 状態（`idle` / `working` / `blocked` / `done` / `unknown`）を読み戻してから生存判定する。agent として認識されていない pane は `herdr pane process-info` で foreground process を見る。`unknown` は「agent は居るが分類できない」であって完了の証明ではない
 - `WORKING` が10分途切れたら、orchestrator は推測で crash 判定せず、**該当 pane の状態確認をユーザーへ依頼する**（承認プロンプトで停止している可能性がある。pane は対話 TUI なので画面には出ているが、agmsg には何も流れない）
