@@ -96,19 +96,22 @@ dirty な `.env.*` は自動除外せず、dotenvx-managed かを判定する。
 dotenvx-managed と判定できても、追加差分に平文 secret 候補が混入していないか検査する：
 
 ```bash
-# 追加された平文 secret 候補を key 名だけで検出する
-# tracked（staged + unstaged）と untracked の両方を同じフィルタへ流す
-{
-  git diff -U0 HEAD -- ':(glob)**/.env.*'
-  git ls-files --others --exclude-standard -z -- ':(glob)**/.env.*' \
-    | xargs -0 -I{} git diff --no-index -U0 /dev/null {}
-} \
-  | /usr/bin/grep -E '^\+(export )?[A-Za-z0-9_]*(SECRET|TOKEN|PASSWORD|PASSWD|PRIVATE|CREDENTIAL|DATABASE_URL|AUTH|APIKEY|KEY|PAT|DSN)[A-Za-z0-9_]*=' \
-  | /usr/bin/grep -vE '^\+(export )?[A-Za-z0-9_]+=encrypted:' \
+# 1. 収集。tracked（staged + unstaged）と untracked の両方をファイルへ落とし、
+#    収集側の終了コードを先に確かめる（空の出力を「secret なし」と読まないため）
+raw=$(mktemp)
+git diff -U0 HEAD -- ':(glob)**/.env.*' >"$raw" || { echo '収集失敗: 検査不成立'; exit 1; }
+git ls-files --others --exclude-standard -z -- ':(glob)**/.env.*' \
+  | xargs -0 -I{} git diff --no-index -U0 /dev/null {} >>"$raw"
+
+# 2. 検査。平文 secret 候補の key 名だけを出す
+/usr/bin/grep -E '^\+(export )?[A-Za-z0-9_]*(SECRET|TOKEN|PASSWORD|PASSWD|PRIVATE|CREDENTIAL|DATABASE_URL|AUTH|APIKEY|KEY|PAT|DSN)[A-Za-z0-9_]*=' "$raw" \
+  | /usr/bin/grep -vE '^\+(export )?(DOTENV_PUBLIC_KEY=|[A-Za-z0-9_]+=[^A-Za-z0-9_]?encrypted:)' \
   | /usr/bin/grep -oE '^\+(export )?[^=]+=' \
   | cut -c2-
 ```
 
 この検査は `encrypted:` 値の行を許可し、平文 secret らしき値が混入した行だけを止める。出力が 1 行でもあれば、その `.env.*` は stage しない。
 
-**空の出力を「secret なし」の根拠にしない。** 検査コマンドがエラーで終了した場合は「検査不成立」として同じく stage しない。`rg` ではなく `/usr/bin/grep` を絶対パスで呼ぶのはこのためで、mise shim の `rg` は repo 外の cwd で解決に失敗し、stderr にだけエラーを出して stdout を空にする——その空を通過と読むと平文 secret がそのまま stage される。
+**空の出力を「secret なし」の根拠にしない。** パイプは最終段の終了コードしか返さないため、収集側が失敗しても「一致なし」と区別がつかない（実測: producer を exit 128 にしても最終 exit は 0。`set -o pipefail` を足しても、一致なしという正常系と同じ 1 になるので区別できない）。上の手順が収集を先にファイルへ落とすのはこのためで、収集を確認できていない空出力は「検査不成立」として stage しない。`rg` ではなく `/usr/bin/grep` を絶対パスで呼ぶのも同じ理由——mise shim の `rg` は repo 外の cwd で解決に失敗し、stderr にだけエラーを出して stdout を空にする。
+
+除外側で `DOTENV_PUBLIC_KEY` を明示的に落としているのは、これが dotenvx の**公開**メタデータであり、上の managed 判定そのものの根拠だからである。`KEY` を検出語群に入れた副作用で、正規の managed ファイルが自分の公開鍵で stage 禁止になるのを防ぐ。`encrypted:` の除外が引用符を許すのも同じ理由（`API_KEY="encrypted:..."` を平文と誤判定しない）。
