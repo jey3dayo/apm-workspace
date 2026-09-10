@@ -113,4 +113,8 @@ dotenvx-managed と判定できても、追加差分に平文 secret 候補が�
 
 helper は値を出さず `<file>: <KEY>` だけを出す。`DOTENV_PUBLIC_KEY` は dotenvx の公開メタデータで上の managed 判定の根拠そのものなので、`KEY` を含んでいても候補にしない。`encrypted:` 値は引用符の有無にかかわらず除外する。サブディレクトリの `.env.*` も対象で、ファイル名は Git の一覧から保持するため tab や引用符を含むパスでも壊れない。値の展開や command substitution は行わない。
 
-**key の抽出は key 名のヒューリスティックであって、全 secret の検出を保証しない。** 解析できないファイル（引用が閉じない、NUL を含む）は安全側へ倒して 2 を返す。その場合は手で中身を確認するまで stage しない。
+**対応する形式は有限で、それ以外は 2 へ倒す。** 受理するのは `KEY=value` / `export KEY=value`（行頭空白・`=` 前後の空白・CRLF を許す）、単行で閉じる `KEY="value"` / `KEY='value'`、`#` コメント、空行。拒否するのは複数行値・区切り引用符が escape された値・backtick 値・BOM・NUL・`KEY=` の形でない行・symlink / gitlink・type change・conflict 中のパス。
+
+複数行と escape を追わずに拒否するのは、引用状態を早く抜けたときに**値の断片を key 名として出力してしまう**——「値を出さない」という契約そのものを破るからである。生の複数行秘密鍵はそもそも stage すべきでない。
+
+**key 名のヒューリスティックであって、全 secret の検出は保証しない。** 対応形式・終了コード・既知の欠陥は `tests/check-env-secrets.bats` が固定しており、helper を変更したらそこを通す。
