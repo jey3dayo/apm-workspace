@@ -26,7 +26,7 @@ git diff -- <non-env paths>
 
 staged 済みの変更と untracked ファイルも計画対象に含める。staged 済みでも論理グループと一致しない場合はグループを組み直す。
 
-完了条件: すべての dirty / staged / untracked ファイルが計画対象として列挙され、`.env.*` と secret 疑いファイルは差分本文を見ずに「環境ファイルの安全検査」へ回されている。
+完了条件: すべての dirty / staged / untracked ファイルが計画対象として列挙され、`.env.*` と secret 疑いファイルは差分本文を見ずに「環境ファイルの安全検査」へ回されている。untracked と staged 済みの `.env.*`、サブディレクトリの `.env.*` も検査に回す。
 
 ### 2. コミットスタイルの確認
 
@@ -83,24 +83,32 @@ git log --oneline -<グループ数>
 dirty な `.env.*` は自動除外せず、dotenvx-managed かを判定する。repo の source of truth になり得るためである。検査・報告のどの段階でも secret の値・差分本文は表示せず、ファイル名・key 名・管理方式・差分の有無だけを扱う。
 
 ```bash
-# dotenvx 管理ファイルかを値なしで判定する
-rg -n '^(DOTENV_PUBLIC_KEY=.*|[A-Z0-9_]+=encrypted:.*)' --replace '<dotenvx-managed>' .env.* 2>/dev/null
+# dotenvx 管理ファイルかを値なしで判定する（出力に現れたファイルが managed）
+/usr/bin/grep -lE '^(DOTENV_PUBLIC_KEY=|[A-Z0-9_]+=encrypted:)' .env.* 2>/dev/null
 ```
 
-| 判定結果                                       | 扱い                                                                  |
-| ---------------------------------------------- | --------------------------------------------------------------------- |
-| `DOTENV_PUBLIC_KEY` または `encrypted:` 値あり | dotenvx-managed。下の平文 secret 検査を通過すればコミット対象に入れる |
-| raw `.env` / dotenvx-managed と判定できない    | raw secret の可能性があるため stage しない                            |
-| 平文 secret 候補を含む（下の検査で検出）       | stage せず、ファイル名と key 名だけを報告して停止する                 |
+| 判定結果                                    | 扱い                                                                  |
+| ------------------------------------------- | --------------------------------------------------------------------- |
+| 上の出力にファイル名が現れる                | dotenvx-managed。下の平文 secret 検査を通過すればコミット対象に入れる |
+| raw `.env` / dotenvx-managed と判定できない | raw secret の可能性があるため stage しない                            |
+| 平文 secret 候補を含む（下の検査で検出）    | stage せず、ファイル名と key 名だけを報告して停止する                 |
 
 dotenvx-managed と判定できても、追加差分に平文 secret 候補が混入していないか検査する：
 
 ```bash
 # 追加された平文 secret 候補を key 名だけで検出する
-git diff -U0 -- .env.* \
-  | rg '^\+[A-Z0-9_]*(SECRET|TOKEN|PASSWORD|PRIVATE|CREDENTIAL|DATABASE_URL|AUTH)[A-Z0-9_]*=' \
-  | rg -v '^\+[A-Z0-9_]+=encrypted:' \
-  | rg -n '^\+([^=]+)=.*' --replace '$1=<plain-secret-candidate>'
+# tracked（staged + unstaged）と untracked の両方を同じフィルタへ流す
+{
+  git diff -U0 HEAD -- ':(glob)**/.env.*'
+  git ls-files --others --exclude-standard -z -- ':(glob)**/.env.*' \
+    | xargs -0 -I{} git diff --no-index -U0 /dev/null {}
+} \
+  | /usr/bin/grep -E '^\+(export )?[A-Za-z0-9_]*(SECRET|TOKEN|PASSWORD|PASSWD|PRIVATE|CREDENTIAL|DATABASE_URL|AUTH|APIKEY|KEY|PAT|DSN)[A-Za-z0-9_]*=' \
+  | /usr/bin/grep -vE '^\+(export )?[A-Za-z0-9_]+=encrypted:' \
+  | /usr/bin/grep -oE '^\+(export )?[^=]+=' \
+  | cut -c2-
 ```
 
 この検査は `encrypted:` 値の行を許可し、平文 secret らしき値が混入した行だけを止める。出力が 1 行でもあれば、その `.env.*` は stage しない。
+
+**空の出力を「secret なし」の根拠にしない。** 検査コマンドがエラーで終了した場合は「検査不成立」として同じく stage しない。`rg` ではなく `/usr/bin/grep` を絶対パスで呼ぶのはこのためで、mise shim の `rg` は repo 外の cwd で解決に失敗し、stderr にだけエラーを出して stdout を空にする——その空を通過と読むと平文 secret がそのまま stage される。
