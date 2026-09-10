@@ -109,6 +109,8 @@ dotenvx-managed と判定できても、追加差分に平文 secret 候補が�
 
 **helper は index・working tree・untracked を独立に見る。** commit に入るのは index なので、index を working tree と相殺させてはならない——HEAD が暗号文・index に平文が stage 済み・working tree は暗号文へ戻っている状態は、`git diff HEAD` では差分ゼロに見えるが、`git commit` はその平文を取り込む。
 
-helper は値を出さず `<file>: <KEY>` だけを出す。`DOTENV_PUBLIC_KEY` は dotenvx の公開メタデータで上の managed 判定の根拠そのものなので、`KEY` を含んでいても候補にしない。`encrypted:` 値は引用符の有無にかかわらず除外する。サブディレクトリの `.env.*` も対象で、ファイル名は Git の一覧から保持するため tab や引用符を含むパスでも壊れない。
+**diff の追加行ではなく、対象版のファイル全文を dotenv として解析する。** 追加行だけを見る方式は次を「追加行が無い＝安全」と読んでしまう: 引用された複数行値の途中行が代入やコメントに見える場合（値の断片を key と誤認する / 素通りする）、`.gitattributes` の `binary` や `-diff` で差分本体が出ない場合、rename 最適化で追加行が消える場合。全文解析ならどれも成立しない。**その代わり、以前から入っていた平文 secret も報告される**——commit する内容に含まれている以上それが正しい。
 
-**key の抽出は行の簡易一致であって dotenv parser ではない。** 複数行値の途中のように `KEY=VALUE` として解析できない追加行があれば、helper は安全側へ倒して 2 を返す（`unparsable .env line in <file>`）。その場合は手で中身を確認するまで stage しない。
+helper は値を出さず `<file>: <KEY>` だけを出す。`DOTENV_PUBLIC_KEY` は dotenvx の公開メタデータで上の managed 判定の根拠そのものなので、`KEY` を含んでいても候補にしない。`encrypted:` 値は引用符の有無にかかわらず除外する。サブディレクトリの `.env.*` も対象で、ファイル名は Git の一覧から保持するため tab や引用符を含むパスでも壊れない。値の展開や command substitution は行わない。
+
+**key の抽出は key 名のヒューリスティックであって、全 secret の検出を保証しない。** 解析できないファイル（引用が閉じない、NUL を含む）は安全側へ倒して 2 を返す。その場合は手で中身を確認するまで stage しない。
