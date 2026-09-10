@@ -105,6 +105,10 @@ dotenvx-managed と判定できても、追加差分に平文 secret 候補が�
 | 1    | 候補あり               | stage しない。出力の `<file>: <KEY>` をそのまま報告して停止 |
 | 2    | 検査を完了できなかった | stage しない。理由を報告して停止                            |
 
-**空の出力を「secret なし」の根拠にしない。** 収集が失敗しても出力は空になるので、0 と 2 を区別しないと平文 secret がそのまま stage される。パイプの最終段だけを見る書き方（`git diff ... | grep ... | grep ...`）はこの区別ができない——収集側を exit 128 にしても最終 exit は 0 になり、`set -o pipefail` を足しても「一致なし」という正常系と同じ 1 になる。helper が収集・判定・出力を分けているのはこのためである。
+**空の出力を「secret なし」の根拠にしない。** 収集や解析が失敗しても出力は空になるので、0 と 2 を区別しないと平文 secret がそのまま commit へ入る。パイプの最終段だけを見る書き方（`git diff ... | grep ... | grep ...`）はこの区別ができない——収集側を exit 128 にしても最終 exit は 0 になり、`set -o pipefail` を足しても「一致なし」という正常系と同じ 1 になる。helper が収集・判定・出力を分けているのはこのためである。
 
-helper は値を出さず `<file>: <KEY>` だけを出す。`DOTENV_PUBLIC_KEY` は dotenvx の公開メタデータで上の managed 判定の根拠そのものなので、`KEY` を含んでいても候補にしない。`encrypted:` 値は引用符の有無にかかわらず除外する。対象は tracked（staged + unstaged）と untracked の両方で、サブディレクトリの `.env.*` も含む。
+**helper は index・working tree・untracked を独立に見る。** commit に入るのは index なので、index を working tree と相殺させてはならない——HEAD が暗号文・index に平文が stage 済み・working tree は暗号文へ戻っている状態は、`git diff HEAD` では差分ゼロに見えるが、`git commit` はその平文を取り込む。
+
+helper は値を出さず `<file>: <KEY>` だけを出す。`DOTENV_PUBLIC_KEY` は dotenvx の公開メタデータで上の managed 判定の根拠そのものなので、`KEY` を含んでいても候補にしない。`encrypted:` 値は引用符の有無にかかわらず除外する。サブディレクトリの `.env.*` も対象で、ファイル名は Git の一覧から保持するため tab や引用符を含むパスでも壊れない。
+
+**key の抽出は行の簡易一致であって dotenv parser ではない。** 複数行値の途中のように `KEY=VALUE` として解析できない追加行があれば、helper は安全側へ倒して 2 を返す（`unparsable .env line in <file>`）。その場合は手で中身を確認するまで stage しない。
