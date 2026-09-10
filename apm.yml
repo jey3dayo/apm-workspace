@@ -26,15 +26,19 @@ dependencies:
 
     # engineering practice (design, architecture, research)
     - mattpocock/skills/skills/engineering/codebase-design#3cca18b368ae95cdbdebbff572ccafa662551015
+    - mattpocock/skills/skills/engineering/diagnosing-bugs#3cca18b368ae95cdbdebbff572ccafa662551015
     - mattpocock/skills/skills/engineering/domain-modeling#3cca18b368ae95cdbdebbff572ccafa662551015
     - mattpocock/skills/skills/engineering/improve-codebase-architecture#3cca18b368ae95cdbdebbff572ccafa662551015
     - mattpocock/skills/skills/engineering/prototype#3cca18b368ae95cdbdebbff572ccafa662551015
     - mattpocock/skills/skills/engineering/research#3cca18b368ae95cdbdebbff572ccafa662551015
     - mattpocock/skills/skills/engineering/setup-matt-pocock-skills#3cca18b368ae95cdbdebbff572ccafa662551015
+    - mattpocock/skills/skills/engineering/tdd#3cca18b368ae95cdbdebbff572ccafa662551015
     - mattpocock/skills/skills/engineering/wayfinder#3cca18b368ae95cdbdebbff572ccafa662551015
+    - mattpocock/skills/skills/engineering/wizard#3cca18b368ae95cdbdebbff572ccafa662551015
 
     # productivity / writing
     - mattpocock/skills/skills/productivity/grilling#3cca18b368ae95cdbdebbff572ccafa662551015
+    - mattpocock/skills/skills/productivity/wait-what#3cca18b368ae95cdbdebbff572ccafa662551015
     - mattpocock/skills/skills/productivity/writing-for-agents#3cca18b368ae95cdbdebbff572ccafa662551015
     - gonta223/humanizer-ja#a1e343696e43aa50e7218891f3319ab22cde3464
     - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
