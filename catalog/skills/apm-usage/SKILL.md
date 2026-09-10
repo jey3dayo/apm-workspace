@@ -24,7 +24,7 @@ Route `~/.apm` work by ownership first, then choose the smallest task that match
 - Edit `~/.apm/.apm/skills/**` for skills that operate only on this APM workspace.
 - Edit `~/.apm/catalog/skills/**` for personal skills that should be available
   in the global automatic rollout.
-- Edit `~/.apm/catalog/{AGENTS.md,agents/**,commands/**,rules/**}` for shared guidance.
+- Edit `~/.apm/catalog/{AGENTS.md,agents/**,commands/**,rules/**}` for shared guidance. When creating or changing an agent definition, read the model-assignment rules in `orchestrator-worker` first: an agent whose judgement drives a production change, an approval, or a rejection carries no `model:` and inherits the parent's.
 - Edit `~/.apm/optional-skills/<id>/**` for skills that should be tracked
   here but installed only by selected repositories.
 - Treat each optional skill directory as an individually installable package;
