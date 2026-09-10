@@ -48,6 +48,16 @@ stage_env() {
   git -C "$REPO" add -- "$1"
 }
 
+# 失敗時に「何が期待と違ったか」を CI ログへ残す。bats は落ちたテストの出力だけを
+# 表示するため、通常実行のノイズにはならない。
+dump_repo_state() {
+  printf 'status=%s\n' "$status"
+  printf 'output=%s\n' "$output"
+  printf 'branch=%s\n' "$(git -C "$REPO" branch --show-current)"
+  printf 'porcelain:\n%s\n' "$(git -C "$REPO" status --porcelain)"
+  printf 'unmerged:\n%s\n' "$(git -C "$REPO" ls-files -u)"
+}
+
 assert_no_sentinel() {
   [[ "$output" != *"$SENTINEL"* ]]
 }
@@ -252,9 +262,16 @@ assert_scratch_clean() {
   printf 'A=3\n' >"$REPO/.env.production"
   git -C "$REPO" add .env.production
   git -C "$REPO" -c user.email=t@example -c user.name=t commit -qm main
-  run git -C "$REPO" merge other
+  # `-c user.*` はその 1 コマンドにしか効かない。setup が global/system config を
+  # 無効化しているため、identity を渡さない merge は host の自動生成に依存する。
+  # macOS は生成値を受け入れるが Linux は拒否し、merge が 128 で止まって conflict
+  # が生まれない（CI 限定失敗の原因）。fixture を host から独立させる。
+  run git -C "$REPO" -c user.email=t@example -c user.name=t merge other
+  # merge が conflict しなければ未マージ経路に入らず、helper は「対象なし」で 0 を
+  # 返す。conflict の成立をここで固定しないと、原因が最後の assert 1 行に潰れる。
+  [ "$status" -eq 1 ] || { dump_repo_state; return 1; }
   check
-  [ "$status" -eq 2 ]
+  [ "$status" -eq 2 ] || { dump_repo_state; return 1; }
 }
 
 @test "a directory that is not a git repository refuses the check" {
