@@ -84,8 +84,10 @@ dirty な `.env.*` は自動除外せず、dotenvx-managed かを判定する。
 
 ```bash
 # dotenvx 管理ファイルかを値なしで判定する（出力に現れたファイルが managed）。
-# 対象の集合は helper と揃える——shell glob の `.env.*` は cwd しか展開せず、
-# サブディレクトリと staged only の path を落とす
+# shell glob の `.env.*` は cwd しか展開しないので、サブディレクトリを落とさない
+# 列挙にする。ただしこれは working tree の marker を見る補助でしかない——
+# 列挙は変更の有無に関わらず tracked を全件返し、grep は index でなく実体を読む。
+# 安全判断は helper の版ごとの検査が担う
 git ls-files -z --cached --others --exclude-standard -- ':(glob)**/.env.*' \
   | xargs -0 -r /usr/bin/grep -lE '^(DOTENV_PUBLIC_KEY=|[A-Z0-9_]+=encrypted:)'
 ```

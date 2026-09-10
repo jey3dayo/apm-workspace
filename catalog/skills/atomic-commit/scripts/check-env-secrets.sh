@@ -16,7 +16,8 @@ set -uo pipefail
 #
 # ## 明示的に拒否する形式（2）
 #
-# - 引用が同じ行で閉じない値（複数行値）と、区切り引用符が escape された値
+# - 引用が同じ行で閉じない値（複数行値）。escape が区切りを食って閉じない場合も含む。
+#   逆に escape を挟んでも同じ行で閉じるもの（`KEY="a\\"b"`）は受理する
 # - backtick で囲んだ値
 # - BOM、NUL を含むファイル、`KEY=` の形になっていない行
 # - regular file でない対象（symlink / gitlink）、type change、conflict 中
