@@ -28,8 +28,11 @@ and deletion order.
   branch on a resolved remote. A remote-only branch is never an automatic
   candidate.
 - The parsed base repository owner, same-repository PR head repository
-  identity, base repository, local branch SHA, upstream remote SHA, and every
-  same-repository matching PR head SHA must be known and agree. External rows
+  identity, base repository, local branch SHA, and every same-repository
+  matching PR head SHA must be known and agree. The upstream remote SHA must
+  agree as well while the upstream branch still exists; an upstream branch
+  already deleted from the remote is `remote-absent` and gates on the
+  remaining evidence. External rows
   are recorded separately and are never evidence for deletion. The
   authenticated GitHub actor must also be known, but is recorded separately
   from the base repository owner; do not require a human actor to be the owner
@@ -159,11 +162,19 @@ git ls-remote --heads <resolved-remote>
 ```
 
 Parse each complete successful result client-side. For a validated full
-`refs/heads/<remote-branch-name>`, require exactly one matching row, then use
-its SHA as the authoritative remote SHA. A missing, multiple, malformed, or
-divergent result is `SKIP`; do not issue another planning `ls-remote` for that
-remote. Resolve each local SHA with `git rev-parse <local-ref>` and require it
-to equal the mapped remote SHA.
+`refs/heads/<remote-branch-name>`, require at most one matching row; multiple
+or malformed rows are `SKIP`. Do not issue another planning `ls-remote` for
+that remote. Resolve each local SHA with `git rev-parse <local-ref>`.
+
+Exactly one row supplies the authoritative remote SHA, which must equal the
+local SHA; a divergent SHA is `SKIP`. Zero rows means the upstream branch is
+already gone from the remote, which is the normal end state in a repository
+that deletes head branches on merge. Classify that as `remote-absent` rather
+than `SKIP`: the candidate proceeds on agreement between the local SHA and the
+same-repository merged PR head SHA, and its plan carries no remote-deletion
+command because nothing is left to delete. A `remote-absent` candidate still
+needs every other gate, including at least one same-repository `MERGED`,
+non-draft PR whose `headRefOid` equals the local SHA.
 
 The planning pass also makes exactly one repository-wide PR query:
 
@@ -209,15 +220,23 @@ For each validated local branch row:
    gh api "repos/<nameWithOwner>/rules/branches/<URL-encoded-branch>"
    ```
 
-   Interpret only a successful JSON array. An empty array means no applicable
-   rule was returned. A non-empty array is valid only when every element has a
-   non-empty `type` plus ruleset identity such as `ruleset_id` and
-   `ruleset_source`; it means an applicable rule is present and the candidate
-   is `protected` for this cleanup. The branch-rules endpoint returns applied
-   rule objects rather than ruleset-level `enforcement` metadata, so do not
-   require an `enforcement` field. If the query fails, the result is not an
-   array, or any returned rule lacks that identity, classify the candidate as
-   `SKIP`.
+   Interpret only a successful JSON array. Every element must have a non-empty
+   `type` plus ruleset identity such as `ruleset_id` and `ruleset_source`. The
+   branch-rules endpoint returns applied rule objects rather than
+   ruleset-level `enforcement` metadata, so do not require an `enforcement`
+   field. If the query fails, the result is not an array, or any returned rule
+   lacks that identity, classify the candidate as `SKIP`.
+
+   Judge protection by rule `type`, never by array length. The candidate is
+   `protected` when the array contains `deletion` or `non_fast_forward`, the
+   rule types that forbid the mutations this skill performs. Record every
+   other returned type as evidence and let the candidate proceed. Repository
+   rulesets commonly apply push rules such as `max_file_size` and
+   `file_path_restriction` to every branch name, so treating a non-empty array
+   as protection marks every branch in such a repository protected and makes
+   cleanup permanently impossible. Query a branch name that does not exist to
+   separate the two: the types returned for it are the repository-wide
+   baseline and are never deletion protection.
    Combine this candidate-level result with the required protected baseline:
    legacy protection from `branches?protected=true` and ruleset-only
    protection both fail closed. A branch in either set is protected; do not
@@ -295,7 +314,8 @@ that row:
   `%(upstream:remoteref)`) and their resolved remote mapping;
 - local ref and SHA;
 - authoritative remote ref and SHA from a fresh targeted
-  `git ls-remote --heads <resolved-remote> <validated-upstream:remoteref>`;
+  `git ls-remote --heads <resolved-remote> <validated-upstream:remoteref>`,
+  re-confirming `remote-absent` when the fresh query returns no row;
 - candidate-level rules from a fresh
   `gh api "repos/<nameWithOwner>/rules/branches/<URL-encoded-branch>"` query;
 - every branch-name-matching PR from a fresh targeted query:
@@ -354,7 +374,9 @@ native syntax, and perform operations in this order:
    remote branch.
 4. Immediately before remote mutation, re-resolve the exact upstream remote
    and its authoritative SHA, and repeat the candidate-level rules and fresh
-   same-repository PR gate. With the local ref now gone, compare the remote and
+   same-repository PR gate. A `remote-absent` row has no remote mutation:
+   report remote deletion as `NOT_REQUIRED` and finish the row after local
+   deletion. With the local ref now gone, compare the remote and
    every same-repository PR head SHA with the confirmed row SHA. If anything
    changed or became unknown, report local deletion as complete and remote
    deletion as `SKIP_CHANGED`/`SKIP_UNSAFE` and `PRESERVED`; do not delete the
