@@ -253,10 +253,10 @@ For each validated local branch row:
    passes; do not let an unrecognized type through because it is not on the
    forbidden list.
 
-   | type                    | meaning                             | source                   |
-   | ----------------------- | ----------------------------------- | ------------------------ |
-   | `max_file_size`         | limits the size of a pushed file    | GitHub REST rules schema |
-   | `file_path_restriction` | limits which paths a push may touch | GitHub REST rules schema |
+   | type                    | meaning                             | source                                        |
+   | ----------------------- | ----------------------------------- | --------------------------------------------- |
+   | `max_file_size`         | limits the size of a pushed file    | <https://docs.github.com/en/rest/repos/rules> |
+   | `file_path_restriction` | limits which paths a push may touch | <https://docs.github.com/en/rest/repos/rules> |
 
    Array length is not the test because a repository ruleset can apply
    content-level push rules to a wide ref pattern, and treating a non-empty
@@ -406,8 +406,9 @@ native syntax, and perform operations in this order:
    successful `ls-remote`; a failed query is not absence. The user must have confirmed that exact row. Do not use `-D`
    for a mismatch, unknown state, failed worktree removal, remote failure, or
    an unmerged/OPEN/DRAFT PR. If local deletion fails for any other reason, or
-   the permitted fallback fails, stop before remote deletion and keep the
-   remote branch.
+   the permitted fallback fails, stop the row there; on a `remote-present` row
+   that means stopping before remote deletion and keeping the remote branch,
+   and on a `remote-absent` row there is no remote step to stop.
 4. A `remote-absent` row has no remote mutation. Repeat the candidate-level
    rules and fresh same-repository PR gate, confirm from a fresh successful
    `ls-remote` that the exact ref is still absent, then report remote deletion
@@ -451,10 +452,13 @@ the remote branch preserved/recoverable. On a `remote-absent` row there is no
 remote branch to preserve: report the remote action as `NOT_REQUIRED` when a
 fresh successful `ls-remote` confirmed the ref is still absent, and as
 `SKIP_CHANGED` (ref reappeared) or `SKIP_UNSAFE` (query failed) otherwise —
-never as preserved or recoverable. Those branches follow local deletion, so
-report the local action as `DELETED` alongside them rather than marking the
-whole row skipped. Report each worktree action, local action, and remote
-action separately.
+never as preserved or recoverable, and report those remote outcomes
+independently of how local deletion went. The local action always keeps its
+actual result: `FAILED` when step 3 failed, not run at all when the row
+stopped earlier, and `DELETED` only in the step 4 branch that runs after step
+3 succeeded. Never collapse a row into a single skipped result that hides a
+local deletion that already happened. Report each worktree action, local
+action, and remote action separately.
 
 Do not run prune merely because branch rows were confirmed or processed. If
 prune IDs were separately confirmed, immediately run a new
