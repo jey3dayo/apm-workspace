@@ -61,10 +61,12 @@ and deletion order.
   command.
 - Process a confirmed row in this order: remove its safe linked worktrees,
   delete the local branch with `git branch -d` (or the narrow `-D` fallback
-  described below), then delete the remote branch. Keep the remote/upstream
-  ref until local deletion completes: it supplies `git branch -d` with its
-  mergedness evidence, and a later remote-deletion failure leaves a
-  recoverable remote branch. Use `git branch -D` only for the narrow squash or
+  described below), then delete the remote branch. On a `remote-present` row,
+  keep the remote/upstream ref until local deletion completes: it supplies
+  `git branch -d` with its mergedness evidence, and a later remote-deletion
+  failure leaves a recoverable remote branch. A `remote-absent` row has no
+  such ref and no remote step at all — only worktrees and the local branch are
+  in scope, and nothing about it is recoverable from the remote. Use `git branch -D` only for the narrow squash or
   rebase case after the same exact SHA and merged-PR evidence has passed live
   revalidation and the user confirmed that row.
 
@@ -219,13 +221,20 @@ For each validated local branch row:
    one path segment and query the candidate-level rules endpoint:
 
    ```bash
-   gh api --paginate "repos/<nameWithOwner>/rules/branches/<URL-encoded-branch>"
+   gh api --paginate --slurp "repos/<nameWithOwner>/rules/branches/<URL-encoded-branch>"
    ```
 
-   Interpret only a successful JSON array, and only when every page was
-   retrieved. The endpoint paginates, so a rule that forbids deletion can sit
-   past the first page; merge all pages before judging, and classify the
-   candidate as `SKIP` if any page fails or the merged result is not an array.
+   This is the **all-page rules query**; every later step that re-runs the
+   rules check runs this exact form again rather than a bare `gh api`. The
+   endpoint paginates, so a rule that forbids deletion can sit past the first
+   page. Bare `--paginate` prints each page as its own JSON value, so never
+   parse that stream as one array; `--slurp` wraps the pages in an outer array.
+   Require the command itself to exit zero — a non-zero exit discards whatever
+   reached stdout, and the exit status of a trailing `jq` is not the exit
+   status of the query. Then require the outer value to be an array, require
+   every page inside it to be an array, and flatten one level to get the rule
+   list. Anything else is `SKIP`.
+
    Every element must have a non-empty `type` plus ruleset identity such as
    `ruleset_id` and `ruleset_source`. The branch-rules endpoint returns applied
    rule objects rather than ruleset-level `enforcement` metadata, so do not
@@ -237,12 +246,17 @@ For each validated local branch row:
    restricts deleting a matching ref and is protection at any scope or
    pattern; `non_fast_forward` restricts force-pushing a matching ref. A
    candidate carrying either is `protected`. Let a candidate proceed only when
-   every remaining type is one this skill has confirmed against primary
-   documentation to be unrelated to ref deletion — content-level push rules
-   such as `max_file_size` and `file_path_restriction` are such types. A type
-   whose meaning is unconfirmed is `SKIP_UNSAFE`, matching the rule that
-   unknown state in the gating set never passes; do not let an unrecognized
-   type through because it is not on the forbidden list.
+   every remaining type appears in the confirmed-unrelated table below, or is
+   one whose meaning you confirmed against primary documentation in this run
+   and recorded as evidence. A type whose meaning is unconfirmed is
+   `SKIP_UNSAFE`, matching the rule that unknown state in the gating set never
+   passes; do not let an unrecognized type through because it is not on the
+   forbidden list.
+
+   | type                    | meaning                             | source                   |
+   | ----------------------- | ----------------------------------- | ------------------------ |
+   | `max_file_size`         | limits the size of a pushed file    | GitHub REST rules schema |
+   | `file_path_restriction` | limits which paths a push may touch | GitHub REST rules schema |
 
    Array length is not the test because a repository ruleset can apply
    content-level push rules to a wide ref pattern, and treating a non-empty
@@ -302,8 +316,9 @@ separate exclusion table with the reason (`remote-only`, `other-owner`,
 `OPEN`, `DRAFT`, `SHA mismatch`, `default`, `current`, `protected`, `dirty`,
 `locked`, `main worktree`, or `ambiguous`). Do not hide uncertainty in prose.
 The planned command order must remain worktree removal, local `-d`, then
-remote deletion. The upstream/remote ref is intentionally retained until the
-local deletion result is known. If local `-d` needs the narrowly permitted
+remote deletion, with the remote step absent on a `remote-absent` row. On a
+`remote-present` row the upstream/remote ref is intentionally retained until
+the local deletion result is known. If local `-d` needs the narrowly permitted
 `-D` fallback, record that conditional fallback in the same row; it is never a
 general force authorization.
 
@@ -334,8 +349,8 @@ that row:
 - authoritative remote ref and SHA from a fresh targeted
   `git ls-remote --heads <resolved-remote> <validated-upstream:remoteref>`,
   re-confirming `remote-absent` when the fresh query returns no row;
-- candidate-level rules from a fresh
-  `gh api "repos/<nameWithOwner>/rules/branches/<URL-encoded-branch>"` query;
+- candidate-level rules from a fresh run of the all-page rules query defined
+  above, with the same exit-status, array, and flatten checks;
 - every branch-name-matching PR from a fresh targeted query:
 
   ```bash
@@ -379,8 +394,9 @@ native syntax, and perform operations in this order:
    report the row as `SKIP_CHANGED` or `SKIP_UNSAFE`, keep both branches in
    place, and do not continue.
 3. Delete the local branch first with the exact argv equivalent of
-   `git branch -d -- <local-branch>`, while the upstream/remote ref is still
-   present. If `-d` fails specifically because the graph does not mark a
+   `git branch -d -- <local-branch>`. On a `remote-present` row this runs while
+   the upstream/remote ref is still present; a `remote-absent` row does not
+   depend on that ref existing. If `-d` fails specifically because the graph does not mark a
    squash/rebase merge as an ancestor, permit the narrow fallback
    `git branch -D -- <local-branch>` only when the immediately preceding live
    evidence still proves all same-repository PRs are merged, non-draft, and
@@ -395,9 +411,12 @@ native syntax, and perform operations in this order:
 4. A `remote-absent` row has no remote mutation. Repeat the candidate-level
    rules and fresh same-repository PR gate, confirm from a fresh successful
    `ls-remote` that the exact ref is still absent, then report remote deletion
-   as `NOT_REQUIRED` and finish the row; it never reaches step 5. If that
-   fresh query fails, or the ref reappeared, report the row as `SKIP_CHANGED`
-   and do not delete anything on the remote.
+   as `NOT_REQUIRED` and finish the row; it never reaches step 5. If that fresh
+   query fails or the ref reappeared, still report the local action as
+   `DELETED` — it already happened in step 3 — and report the remote action as
+   `SKIP_UNSAFE` (query failed) or `SKIP_CHANGED` (ref reappeared). Do not
+   delete the reappeared remote ref, and do not collapse the row into a single
+   skipped result that hides the completed local deletion.
 
    For a `remote-present` row, immediately before remote mutation, re-resolve
    the exact upstream remote and its authoritative SHA, and repeat the
@@ -428,8 +447,14 @@ branches preserved; a failed post-worktree live gate leaves both branches
 preserved; a local `-d`/permitted `-D` failure reports the local action as
 `FAILED`, leaves the remote preserved, and reports remote deletion as `SKIP`;
 and a remote failure after local deletion reports the local branch deleted but
-the remote branch preserved/recoverable. Report each worktree action, local
-action, and remote action separately.
+the remote branch preserved/recoverable. On a `remote-absent` row there is no
+remote branch to preserve: report the remote action as `NOT_REQUIRED` when a
+fresh successful `ls-remote` confirmed the ref is still absent, and as
+`SKIP_CHANGED` (ref reappeared) or `SKIP_UNSAFE` (query failed) otherwise —
+never as preserved or recoverable. Those branches follow local deletion, so
+report the local action as `DELETED` alongside them rather than marking the
+whole row skipped. Report each worktree action, local action, and remote
+action separately.
 
 Do not run prune merely because branch rows were confirmed or processed. If
 prune IDs were separately confirmed, immediately run a new
