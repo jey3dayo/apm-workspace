@@ -82,12 +82,6 @@
 
 **何を学びとして拾い、どの owner へ出すかは `learning-intake` が正本。** 別リポジトリで踏んだ APM 側の問題は team `apm`・宛先 `main-cc` へ agmsg で送る。envelope の必須 field と `NOTIFY` の意味（一方通行。ack も返信も来ないので待たない）は `agmsg-delegation` が正本。
 
-### agent 定義側のモデル割り当て
-
-- 各 agent のモデルは `catalog/agents/*.md` の frontmatter `model:` に書く。呼び出し時の指定漏れがあっても frontmatter の割り当てで動く
-- Orchestrator 役はメインセッションが担い、agent 化しない
-- 判断の結果が本番反映・承認・却下に直結する agent は `model` を指定せず親モデルを継承させる。read-only の triage も含める（観測して判断を出す時点で結果に効くため）
-
 ## コマンド選択
 
 | やりたいこと                        | 推奨                                                 | 回避                           |
@@ -114,7 +108,6 @@
 
 ## ファイル操作原則
 
-- ユーザー未確認の変更を `git restore` などで復元・破棄しない。特に `main` / `master` 上では restore 系操作を実行しない
 - スキル実行や調査で作る一時的な出力（調査メモ、レビュー結果、レポート、スクリーンショット等）は、保存先の指定がない限りリポジトリ直下の `tmp/` 配下に集約し、原則コミットしない。スキルが `research_*` や `reports/` などの相対出力先を要求する場合も `tmp/<skill-or-topic>/` へ読み替える
 - 実装計画（plan）はスキルが `plans/` や `docs/**/plans/` を指定していても、リポジトリ直下の `plans/<skill-or-tool>/` へ読み替える（例: `plans/improve/`、`plans/superpowers/`）。次セッションでも読み返すため `tmp/` とは分け、原則コミットしない。Claude Code 本体が使う `.plans/` はそのまま扱う
 - README.md や \*.md は明示的に要求された場合のみ作成する
@@ -122,33 +115,16 @@
 
 ## ドキュメント作成の優先順位
 
-新しい知識を追加するとき:
-
-1. Skill - 繰り返し使う知識
-2. Agent - 自動実行すべきタスク
-3. Command - ユーザーが手動実行する操作
-4. Rules/Steering - プロジェクト固有のルール
-5. llms.txt - agent 向けの短い入口・索引
-6. Docs - 上記で表現できない場合のみ、最小限
+新しい知識は Skill > Agent > Command > Rules/Steering > llms.txt > Docs の順で置き場を選ぶ。各段の判断基準は `apm-usage` の Skill Placement が正本。
 
 ## MCP 配置方針
 
-global MCP はリポジトリをまたいで常時使う基盤だけに限定し、それ以外は repo-local または on-demand にする。
+global MCP はリポジトリをまたいで常時使う基盤だけに限定し、それ以外は repo-local または on-demand にする。global の実体は root `apm.yml` の `mcp:` が source of truth で、固定リストはどこにも持たない。
 
-- global の実体は root `apm.yml` の `mcp:` を source of truth とし、固定リストをここに持たない（例: `mcp-simple-voicevox`（通知）、`context7`（current docs 確認）など）
-- SaaS への接続は「アプリ側プラグイン / コネクタ（claude.ai・ChatGPT） > `apm.yml`（external skill / MCP） > catalog skill」の優先順で選び、上位が使えるなら下位で二重管理しない。アプリ側を優先するのは、認証・トークン更新・ツール定義のメンテナンスがアプリ側に集約されるため
-- 片側のアプリにしかプラグイン / コネクタが無い場合は APM 管理にして両方へ配ってよい。両側に揃ったら撤去を検討する。接続状況の一覧は `~/.apm/docs/saas-connectors.md`、撤去判断の記録は `docs/package-decisions.md` を参照
-- repo-local / on-demand: `tauri-mcp-server`（Tauri repo）など。デスクトップ / OS レベルのスクリーンショットは `screenshot` スキル（Win / Mac / Linux 対応）を使い、画面操作 MCP は必要になった repo だけに on-demand で入れる
-- ブラウザ操作ツールの使い分けは「ブラウザ操作の選択」表を参照。MCP として repo-local 追加が必要なのは `chrome-devtools` のみ
-- 調査は source type で使い分ける: current docs は `context7`、直接指定された URL の取得・DOM 抽出は `ax`、Web 検索・検索結果経由の読み取りは `jina-reader`、広い比較調査は `web-research`、source-specific な到達性は専用 connector
-- MCP 設定を永続変更する前に、次の ownership gate を完了する
-  1. `~/.apm` が存在する場合は `apm-usage` を使う
-  2. 対象 MCP を root `apm.yml`、この ownership map、配布スクリプトから検索する
-  3. 編集対象を source of truth または deployed output に分類するまで書き込まない
-  4. APM 管理なら source of truth を編集して再生成し、`~/.codex/config.toml` などの deployed output は直接編集しない
-  5. 診断用の一時設定は `codex -c` などの one-shot override を使い、永続設定へ残さない
-- `jina-reader` の transport、URL、認証、tool filter の正本は root `apm.yml`。変更後は `codex mcp list` と実際の検索を確認する
-- repo-local MCP の固定リストは持たない。リポジトリ一覧は `ghq list -p`、実体は各リポジトリの `apm.yml` を確認する
+- MCP 設定を永続変更する前に `apm-usage` の MCP ownership gate を通す。 手順と、source of truth / deployed output の判別は同スキルが正本
+- SaaS への接続は「アプリ側プラグイン / コネクタ（claude.ai・ChatGPT） > `apm.yml` > catalog skill」の優先順で選び、上位が使えるなら下位で二重管理しない。認証・トークン更新・ツール定義のメンテナンスがアプリ側へ集約されるため。片側にしか無い場合は APM 管理で両方へ配ってよく、両側に揃ったら撤去を検討する
+- 調査は source type で使い分ける: current docs は `context7`、直接指定された URL は `ax`、Web 検索は `jina-reader`、広い比較調査は `web-research`
+- MCP として repo-local 追加が必要なブラウザ系は `chrome-devtools` のみ（使い分けは上の「ブラウザ操作の選択」表）。デスクトップ / OS レベルのスクリーンショットは `screenshot` スキル
 
 ## Git コミット規約
 

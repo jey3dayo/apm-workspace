@@ -47,9 +47,20 @@ Before any persistent MCP configuration write:
 4. For diagnostics, prefer a one-run `codex -c` override and state that it is temporary.
 5. Verify the resolved server with `codex mcp list` and one real tool call before reporting completion.
 
+Repo-local and on-demand placement: keep `tauri-mcp-server`-style runtime MCPs in the repository that needs them, and add screen-control MCPs on demand rather than globally. There is no fixed list of repo-local MCPs — enumerate repositories with `ghq list -p` and read each `apm.yml`. Connection status for SaaS connectors lives in `~/.apm/docs/saas-connectors.md`; removal decisions are recorded in `docs/package-decisions.md`.
+
 `jina-reader` is a cross-repository foundation MCP. Its transport, URL, authentication, and tool filter belong in the root `apm.yml`; `apm.lock.yaml` records the accepted state and runtime MCP blocks are deployed outputs.
 
 ## Skill Placement
+
+新しい知識を追加するときの置き場は次の順で選ぶ。上位で表現できるものを下位へ落とさない。
+
+1. Skill — 繰り返し使う知識
+2. Agent — 自動実行すべきタスク
+3. Command — ユーザーが手動実行する操作
+4. Rules/Steering — プロジェクト固有のルール
+5. llms.txt — agent 向けの短い入口・索引
+6. Docs — 上記で表現できない場合のみ、最小限
 
 Choose the narrowest lane that matches who needs the skill. Name the lane
 before installing or creating a skill.

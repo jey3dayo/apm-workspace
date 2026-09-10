@@ -122,6 +122,12 @@ Steward は人間が最初に話す相手であり、応答の滑らかさが人
 
 handoff の実体は `agmsg-delegation` の引き継ぎ（handoff）メッセージ書式で Architect pane へ送るか、人間へその書式を添えて「これは Architect pane へ」と返すことである。走っているセッションは自分の model を変えられないため、昇格ではなく handoff と定義する。逆方向（Architect が安い問いを Steward へ下ろす）は定義しない。
 
+### agent 定義側のモデル割り当て
+
+- 各 agent のモデルは `catalog/agents/*.md` の frontmatter `model:` に書く。呼び出し時の指定漏れがあっても frontmatter の割り当てで動く
+- Orchestrator 役はメインセッションが担い、agent 化しない
+- 判断の結果が本番反映・承認・却下に直結する agent は `model` を指定せず親モデルを継承させる。read-only の triage も含める（観測して判断を出す時点で結果に効くため）
+
 ## Reviewer の tier
 
 review 外注の既定経路は Codex: 起動時引数で `gpt-5.6-sol` / `gpt-5.6-terra` / `gpt-6-astra` から選ぶ。既定は sol。
