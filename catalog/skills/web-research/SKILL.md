@@ -22,7 +22,8 @@ Public web research from planning through synthesis. Collection is Jina Reader-f
    - Large (comparison, report, or investigation with independent angles): split into 2-5 non-overlapping subtopics and delegate each to a parallel subagent.
 3. Collect per subtopic (see Collection).
 4. Cluster findings by source type and evidence strength.
-5. Synthesize a cited answer that separates observed evidence from inference.
+5. Re-check every load-bearing claim -- one the recommendation would change if it turned out to be false -- against its primary source before synthesizing. Three kinds go wrong most often: claims of state (unresolved, deprecated, fixed, a current default), claims of absence (no checksum block, no attestation, no primary source), and claims of applicability (a successor or fix that may require a version the user does not have). Open the issue, the file at the version in use, or the release note yourself rather than trusting the finding that cites it. A claim whose primary source you could not reach is reported as inference with the gap named, never as observed evidence.
+6. Synthesize a cited answer that separates observed evidence from inference.
 
 ## Delegated Research
 
@@ -35,7 +36,7 @@ For large tasks, spawn one subagent per subtopic with the Agent tool:
   - Follow this skill's Collection and Evidence Rules sections.
   - Stay within roughly 3-5 searches.
   - Write findings with key facts, quotes, and source URLs to `tmp/research_<topic>/findings_<subtopic>.md`.
-- After all subagents finish, read every findings file before synthesizing. The parent owns integration, evidence ranking, and citations.
+- After all subagents finish, read every findings file before synthesizing. The parent owns integration, the load-bearing re-check, evidence ranking, and citations.
 
 ## Collection
 
