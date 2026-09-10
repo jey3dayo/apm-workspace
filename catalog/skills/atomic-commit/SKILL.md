@@ -93,25 +93,18 @@ dirty な `.env.*` は自動除外せず、dotenvx-managed かを判定する。
 | raw `.env` / dotenvx-managed と判定できない | raw secret の可能性があるため stage しない                            |
 | 平文 secret 候補を含む（下の検査で検出）    | stage せず、ファイル名と key 名だけを報告して停止する                 |
 
-dotenvx-managed と判定できても、追加差分に平文 secret 候補が混入していないか検査する：
+dotenvx-managed と判定できても、追加差分に平文 secret 候補が混入していないか検査する。検査は helper が行い、**結果は終了コードで判別する**。
 
 ```bash
-# 1. 収集。tracked（staged + unstaged）と untracked の両方をファイルへ落とし、
-#    収集側の終了コードを先に確かめる（空の出力を「secret なし」と読まないため）
-raw=$(mktemp)
-git diff -U0 HEAD -- ':(glob)**/.env.*' >"$raw" || { echo '収集失敗: 検査不成立'; exit 1; }
-git ls-files --others --exclude-standard -z -- ':(glob)**/.env.*' \
-  | xargs -0 -I{} git diff --no-index -U0 /dev/null {} >>"$raw"
-
-# 2. 検査。平文 secret 候補の key 名だけを出す
-/usr/bin/grep -E '^\+(export )?[A-Za-z0-9_]*(SECRET|TOKEN|PASSWORD|PASSWD|PRIVATE|CREDENTIAL|DATABASE_URL|AUTH|APIKEY|KEY|PAT|DSN)[A-Za-z0-9_]*=' "$raw" \
-  | /usr/bin/grep -vE '^\+(export )?(DOTENV_PUBLIC_KEY=|[A-Za-z0-9_]+=[^A-Za-z0-9_]?encrypted:)' \
-  | /usr/bin/grep -oE '^\+(export )?[^=]+=' \
-  | cut -c2-
+~/.agents/skills/atomic-commit/scripts/check-env-secrets.sh
 ```
 
-この検査は `encrypted:` 値の行を許可し、平文 secret らしき値が混入した行だけを止める。出力が 1 行でもあれば、その `.env.*` は stage しない。
+| exit | 意味                   | 扱い                                                        |
+| ---- | ---------------------- | ----------------------------------------------------------- |
+| 0    | 平文 secret 候補なし   | コミット対象に入れてよい                                    |
+| 1    | 候補あり               | stage しない。出力の `<file>: <KEY>` をそのまま報告して停止 |
+| 2    | 検査を完了できなかった | stage しない。理由を報告して停止                            |
 
-**空の出力を「secret なし」の根拠にしない。** パイプは最終段の終了コードしか返さないため、収集側が失敗しても「一致なし」と区別がつかない（実測: producer を exit 128 にしても最終 exit は 0。`set -o pipefail` を足しても、一致なしという正常系と同じ 1 になるので区別できない）。上の手順が収集を先にファイルへ落とすのはこのためで、収集を確認できていない空出力は「検査不成立」として stage しない。`rg` ではなく `/usr/bin/grep` を絶対パスで呼ぶのも同じ理由——mise shim の `rg` は repo 外の cwd で解決に失敗し、stderr にだけエラーを出して stdout を空にする。
+**空の出力を「secret なし」の根拠にしない。** 収集が失敗しても出力は空になるので、0 と 2 を区別しないと平文 secret がそのまま stage される。パイプの最終段だけを見る書き方（`git diff ... | grep ... | grep ...`）はこの区別ができない——収集側を exit 128 にしても最終 exit は 0 になり、`set -o pipefail` を足しても「一致なし」という正常系と同じ 1 になる。helper が収集・判定・出力を分けているのはこのためである。
 
-除外側で `DOTENV_PUBLIC_KEY` を明示的に落としているのは、これが dotenvx の**公開**メタデータであり、上の managed 判定そのものの根拠だからである。`KEY` を検出語群に入れた副作用で、正規の managed ファイルが自分の公開鍵で stage 禁止になるのを防ぐ。`encrypted:` の除外が引用符を許すのも同じ理由（`API_KEY="encrypted:..."` を平文と誤判定しない）。
+helper は値を出さず `<file>: <KEY>` だけを出す。`DOTENV_PUBLIC_KEY` は dotenvx の公開メタデータで上の managed 判定の根拠そのものなので、`KEY` を含んでいても候補にしない。`encrypted:` 値は引用符の有無にかかわらず除外する。対象は tracked（staged + unstaged）と untracked の両方で、サブディレクトリの `.env.*` も含む。
