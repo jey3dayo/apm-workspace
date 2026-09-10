@@ -83,8 +83,11 @@ git log --oneline -<グループ数>
 dirty な `.env.*` は自動除外せず、dotenvx-managed かを判定する。repo の source of truth になり得るためである。検査・報告のどの段階でも secret の値・差分本文は表示せず、ファイル名・key 名・管理方式・差分の有無だけを扱う。
 
 ```bash
-# dotenvx 管理ファイルかを値なしで判定する（出力に現れたファイルが managed）
-/usr/bin/grep -lE '^(DOTENV_PUBLIC_KEY=|[A-Z0-9_]+=encrypted:)' .env.* 2>/dev/null
+# dotenvx 管理ファイルかを値なしで判定する（出力に現れたファイルが managed）。
+# 対象の集合は helper と揃える——shell glob の `.env.*` は cwd しか展開せず、
+# サブディレクトリと staged only の path を落とす
+git ls-files -z --cached --others --exclude-standard -- ':(glob)**/.env.*' \
+  | xargs -0 -r /usr/bin/grep -lE '^(DOTENV_PUBLIC_KEY=|[A-Z0-9_]+=encrypted:)'
 ```
 
 | 判定結果                                    | 扱い                                                                  |
@@ -113,8 +116,10 @@ dotenvx-managed と判定できても、追加差分に平文 secret 候補が�
 
 helper は値を出さず `<file>: <KEY>` だけを出す。`DOTENV_PUBLIC_KEY` は dotenvx の公開メタデータで上の managed 判定の根拠そのものなので、`KEY` を含んでいても候補にしない。`encrypted:` 値は引用符の有無にかかわらず除外する。サブディレクトリの `.env.*` も対象で、ファイル名は Git の一覧から保持するため tab や引用符を含むパスでも壊れない。値の展開や command substitution は行わない。
 
-**対応する形式は有限で、それ以外は 2 へ倒す。** 受理するのは `KEY=value` / `export KEY=value`（行頭空白・`=` 前後の空白・CRLF を許す）、単行で閉じる `KEY="value"` / `KEY='value'`、`#` コメント、空行。拒否するのは複数行値・区切り引用符が escape された値・backtick 値・BOM・NUL・`KEY=` の形でない行・symlink / gitlink・type change・conflict 中のパス。
+**対応する形式は有限で、それ以外は 2 へ倒す。** 受理・拒否する形式の一覧は helper の header コメントが正本で、
+ここには写さない（写すと 2 箇所が別々に古くなる）。追わずに拒否するのは、引用状態を早く抜けたときに**値の断片を
+key 名として出力してしまう**——「値を出さない」という契約そのものを破るからである。生の複数行秘密鍵は
+そもそも stage すべきでない。
 
-複数行と escape を追わずに拒否するのは、引用状態を早く抜けたときに**値の断片を key 名として出力してしまう**——「値を出さない」という契約そのものを破るからである。生の複数行秘密鍵はそもそも stage すべきでない。
-
-**key 名のヒューリスティックであって、全 secret の検出は保証しない。** 対応形式・終了コード・既知の欠陥は `tests/check-env-secrets.bats` が固定しており、helper を変更したらそこを通す。
+**key 名のヒューリスティックであって、全 secret の検出は保証しない。** 契約の正本は helper の header コメント、
+その契約が守られていることを固定するのが `tests/check-env-secrets.bats` で、helper を変更したら両方を通す。
