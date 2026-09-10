@@ -64,7 +64,7 @@ EOF
 )"
 ```
 
-- stage は対象ファイルの明示指定のみ（`git add -A` / `.` / `-u`、`git commit -a` は使わない）
+- stage は対象ファイルの明示指定のみ（一括 stage の禁止は global の Git コミット規約が正本）
 - commit 直前に `git diff --cached --name-only` の一覧がグループと完全一致することを確認する。グループ外の staged ファイルは `git restore --staged <file>` で外す
 - メッセージは変更内容の簡潔な記述のみ。署名・フッターは付けない
 - commit hook が失敗した、またはファイルを書き換えた場合は停止して報告する。`--no-verify` はユーザーの明示指示がない限り使わない

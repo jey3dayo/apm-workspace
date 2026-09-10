@@ -92,7 +92,7 @@ git wt hotfix/critical-bug origin/production
 # Work on hotfix
 cd .worktrees/critical-bug
 vim src/buggy-code.ts
-git add .
+git add src/buggy-code.ts
 git commit -m "fix: resolve critical production bug"
 git push origin hotfix/critical-bug
 
@@ -416,7 +416,7 @@ cd .worktrees/pr-456-fixes
 
 # Address comments
 vim src/file.ts
-git add .
+git add src/file.ts
 git commit -m "fix: address review comments"
 git push origin pr-456-fixes
 

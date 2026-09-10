@@ -133,7 +133,7 @@ fatal: Cannot remove worktree 'feature/work-in-progress'
 
 ```bash
 cd .worktrees/work-in-progress
-git add .
+git add <対象ファイル>
 git commit -m "save work in progress"
 cd /path/to/repo
 git wt -d work-in-progress
