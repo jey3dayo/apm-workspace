@@ -106,7 +106,7 @@ assert_scratch_clean() {
   assert_no_sentinel
 }
 
-@test "a partially staged hunk is inspected through the index" {
+@test "a staged change is inspected through the index" {
   printf 'A=1\nB=2\n' >"$REPO/.env.production"
   commit_env .env.production
   printf 'A=1\nB=2\nAPI_TOKEN=%s\n' "$SENTINEL" >"$REPO/.env.production"
@@ -114,6 +114,31 @@ assert_scratch_clean() {
   check
   [ "$status" -eq 1 ]
   [[ "$output" == *".env.production: API_TOKEN"* ]]
+  assert_no_sentinel
+}
+
+@test "the index and the work tree are scanned independently" {
+  printf 'A=1\n' >"$REPO/.env.production"
+  commit_env .env.production
+  printf 'A=1\nSTAGED_TOKEN=%s\n' "$SENTINEL" >"$REPO/.env.production"
+  git -C "$REPO" add .env.production
+  printf 'A=1\nSTAGED_TOKEN=%s\nUNSTAGED_SECRET=%s\n' "$SENTINEL" "$SENTINEL" >"$REPO/.env.production"
+  check
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"STAGED_TOKEN"* ]]
+  [[ "$output" == *"UNSTAGED_SECRET"* ]]
+  assert_no_sentinel
+}
+
+@test "a regular file turned into a symlink is refused as a type change" {
+  printf 'API_KEY=%s\n' "$SENTINEL" >"$REPO/.env.production"
+  commit_env .env.production
+  printf 'API_KEY=%s\n' "$SENTINEL" >"$BATS_TEST_TMPDIR/outside"
+  rm "$REPO/.env.production"
+  ln -s "$BATS_TEST_TMPDIR/outside" "$REPO/.env.production"
+  git -C "$REPO" add .env.production
+  check
+  [ "$status" -eq 2 ]
   assert_no_sentinel
 }
 
