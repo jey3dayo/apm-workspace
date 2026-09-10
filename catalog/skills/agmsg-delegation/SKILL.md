@@ -109,6 +109,8 @@ Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、r
 
 境界の外だと分かった場合は、既に権限を持つ経路か Orchestrator 自身へ戻す。実際の path と profile の中身は [references/codex-sandbox.md](references/codex-sandbox.md) と各 helper が正本。
 
+**基準への準拠を委譲するときは、受け側が読める固定した版の基準を指定する。** 抜粋で渡す場合も、その判定に必要な定義・例外・適用範囲を含める。起動済みの常駐 agent へ送る場合も同じ。基準を共有できなければ、依頼元が限定した代替タスクを明示するか、準拠判定は未完了として扱う。送り手だけが参照できるパスや、別 session からの到達性を未確認のパスを根拠にしない。
+
 完了条件: CLI・role 別起動コマンド（review は profile の diff 一致確認込み）・agmsg・`launch-worker.sh`・書込先と実効境界の照合の5点が確認済み。初回利用前の smoke 5点は [references/runtime-smoke.md](references/runtime-smoke.md) を参照。
 
 ### 2. 作業領域を固定する
