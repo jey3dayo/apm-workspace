@@ -2,14 +2,15 @@
 name: agmsg-delegation
 description: >-
   agmsg で別プロセスの CC/Codex を worker / reviewer として起動し、
-  タスク委譲またはレビュー外注を行う。orchestrator-worker の組み込み
-  spawn_agent が使えない経路、別セッションへの引き継ぎ、または外部プロセスが必要な場合の経路。
+  タスク委譲またはレビュー外注を行う。組み込みサブエージェントが
+  選んだ model と必要な強制境界を満たせない場合、別セッションへの引き継ぎ、
+  または外部プロセスが必要な場合の経路。
   agent / セッション間の引き継ぎ（CC → Codex 等）メッセージの書式も定義する。
 ---
 
 # agmsg-delegation
 
-別プロセスの agent（headless Claude Code / Codex）へ、agmsg メッセージングで作業を委譲するライフサイクルを回す。組み込みサブエージェント（Agent tool / `spawn_agent`）が使える場合はそちらが正規経路であり、このスキルは **native spawn が使えない場合、別セッションへ引き継ぐ場合、または外部プロセスが必要な場合の手動経路**である。**pane / workspace を勝手に作らない。ユーザーが指示したときだけ、読み戻し付きの手順で作る**（理由と常駐運用は [references/resident-pool.md](references/resident-pool.md) を参照）。
+別プロセスの agent（headless Claude Code / Codex）へ、agmsg メッセージングで作業を委譲するライフサイクルを回す。**経路は「組み込みが使えるか」ではなく「`orchestrator-worker` で選んだ model と必要な強制境界を、その経路が満たせるか」で決まる。** 組み込みサブエージェント（Agent tool / `spawn_agent`）が満たせるならそちらを使い、満たせない場合・別セッションへ引き継ぐ場合・外部プロセスが必要な場合が本スキルの経路である。Claude セッションから Codex model の reviewer / worker を起動するのは Agent tool ではできないため、review 外注の既定（Codex sol）はここへ来る。**pane / workspace を勝手に作らない。ユーザーが指示したときだけ、読み戻し付きの手順で作る**（理由と常駐運用は [references/resident-pool.md](references/resident-pool.md) を参照）。
 
 tier 判定・委譲判定・タスク分割基準・Reviewer の model 選定は `orchestrator-worker` スキルが正本。本スキルは transport だけを定義する。
 

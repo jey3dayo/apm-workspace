@@ -92,7 +92,7 @@
 | ローカルリポジトリの場所特定        | `ghq list -p`（絞り込みは `ghq list -p <name>`）     | `fd` / `find` での全域探索     |
 
 - `ax` は mise 管理。初回利用前に必ず `ax agent-context` で使い方を確認する
-- `pnpm <word>` は、その名前の script が `package.json` にあると script 側が走る。help は `pnpm help <command>`、repo の script は `pnpm run <script>`、依存の実行ファイルは `pnpm exec <binary>` と明示的に呼び分ける。`--help` を付けても script は実行される（実測で `dist/` が消えた）
+- `pnpm <word>` は呼び分けを明示する。help は `pnpm help <command>`、repo の script は `pnpm run <script>`、依存の実行ファイルは `pnpm exec <binary>`。script への `--help` は非実行を保証しない（実測で `dist/` が消えた）
 - CLI が見つからない場合は PATH → リポジトリの `mise.toml` / `mise which` の順に確認し、未導入なら `mise install` を検討する。それでも使えない場合のみ理由を報告して fallback する
 
 ### ブラウザ操作の選択
