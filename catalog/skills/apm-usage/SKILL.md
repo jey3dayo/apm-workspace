@@ -266,8 +266,15 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - review the diff, commit/push, then run `mise run install:catalog`
 
 5. Upstream refresh:
-   - run `mise run upgrade`
+   - run `mise run upgrade` to move dependencies that track a branch or tag
+   - when you bump a SHA pin in `apm.yml` by hand, `mise run upgrade` cannot do it:
+     `apm update` refuses to replace a revision pin, and `mise run deploy` re-applies
+     the lock without re-resolving the manifest, so the lockfile and the deployed
+     target both stay on the old commit while every command exits zero. Run
+     `apm install -g --only apm`, then `mise run deploy`
    - if the manifest contains `gist.github.com/...#<sha>`, verify the regenerated `apm.lock.yaml` kept the same `repo_url` spelling before deploy
+   - confirm the target dependency's `resolved_commit` and the deployed file's hash
+     before calling the refresh done; a zero exit from `deploy` is not evidence the pin moved
    - review `apm.lock.yaml` before commit
 
 6. Individual package or MCP added:
