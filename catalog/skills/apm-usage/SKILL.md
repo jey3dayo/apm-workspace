@@ -144,7 +144,7 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
 - Run `mise run deploy` for the normal local rollout from the current manifest and lock.
 - Run `mise run apply` only when deployment is needed without the bundled `check -> doctor` flow.
 - Run `mise run refresh` to refresh the checkout and dependency state without deploying.
-- Run `mise run upgrade` to accept newer upstream package content with `apm install -g --update`.
+- Run `mise run upgrade` to accept newer upstream package content; it runs `apm update -g --yes` then `mise run deploy`.
 - Run `mise run refresh:deploy` when you explicitly want `refresh -> deploy`.
 - Run `mise run prepare:catalog` before commit/push when tracked catalog content changed.
 - Run `mise run install:catalog` after commit/push when you want to install the tracked catalog ref.
@@ -268,10 +268,17 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
 5. Upstream refresh:
    - run `mise run upgrade` to move dependencies that track a branch or tag
    - when you bump a SHA pin in `apm.yml` by hand, `mise run upgrade` cannot do it:
-     `apm update` refuses to replace a revision pin, and `mise run deploy` re-applies
-     the lock without re-resolving the manifest, so the lockfile and the deployed
-     target both stay on the old commit while every command exits zero. Run
-     `apm install -g --only apm`, then `mise run deploy`
+     observed on apm 0.29.0, `apm update` refuses to replace a revision pin, and
+     `mise run deploy` re-applies the lock without re-resolving the manifest, so
+     the lockfile and the deployed target both stay on the old commit while every
+     command exits zero. Run `apm install -g --only apm`, then `mise run deploy`
+   - `apm install -g --only apm` bypasses `mise run apply` the same way the bare
+     `apm install -g` in Fast Path 6 does, so check the agmsg roster links per
+     that path's note before calling the refresh done. If the follow-up
+     `mise run deploy` fails at its `check` stage, it never reaches `apply`, so
+     the roster links stay unrestored — fix the `check` failure and rerun
+     `deploy` (or `mise run apply`) rather than assuming the earlier call
+     recovered them
    - if the manifest contains `gist.github.com/...#<sha>`, verify the regenerated `apm.lock.yaml` kept the same `repo_url` spelling before deploy
    - confirm the target dependency's `resolved_commit` and the deployed file's hash
      before calling the refresh done; a zero exit from `deploy` is not evidence the pin moved
@@ -295,7 +302,14 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - edit the external repository checkout that is the source of truth
    - run that repository's relevant checks
    - commit and push the external repository
-   - in `~/.apm`, run `mise run upgrade`
+   - in `~/.apm`, check how `apm.yml` pins that dependency: if it tracks a branch
+     or tag, run `mise run upgrade`; if it is SHA-pinned, bump the pin in
+     `apm.yml` to the pushed commit and follow Fast Path 5's SHA-pin sequence
+     (`apm install -g --only apm`, then `mise run deploy`, then that path's
+     agmsg roster check) instead of `mise run upgrade` alone — `apm update`
+     refuses to replace a revision pin (observed on apm 0.29.0), so
+     `mise run upgrade` alone leaves the lock and deployed target on the old
+     commit while exiting zero
    - verify `apm.lock.yaml` points the target dependency at the pushed commit
    - check whether `apm.lock.yaml` also changed unrelated unpinned dependencies
    - verify the deployed target such as `~/.agents/skills/<id>` contains the updated content
