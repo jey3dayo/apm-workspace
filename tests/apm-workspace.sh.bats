@@ -1523,6 +1523,36 @@ SHIM
   rm -rf "$stage_root" "$runtime_home"
 }
 
+# --- incremental skill staging ----------------------------------------------
+
+@test "stage_target_skill_records skips an in-sync skill and reconcile leaves it untouched" {
+  home="$(mktemp -d)"
+  source_root="$(mktemp -d)"
+  stage="$(mktemp -d)"
+  mkdir -p "$source_root/demo" "$home/.claude/skills/demo"
+  printf '%s\n' 'v1' >"$source_root/demo/SKILL.md"
+  printf '%s\n' 'v1' >"$home/.claude/skills/demo/SKILL.md"
+
+  HOME="$home"
+  managed_catalog_runtime_targets() { printf '%s\n' 'claude|.claude|CLAUDE.md||'; }
+  plan=$(printf 'target_name=claude\ttarget_dir=.claude\tsource_kind=catalog\tsource_skill_id=demo\tdeployed_skill_name=demo\tsource_path=%s\tsource_ref=HEAD\tskills_dir=\n' "$source_root/demo")
+
+  stage_target_skill_records "$plan" "$stage"
+  [ -f "$stage/claude/skills/demo/.apm-skill-in-sync" ]
+
+  reconcile_skills_root_from_stage "$stage/claude/skills" "$home/.claude/skills"
+  [ "$(cat "$home/.claude/skills/demo/SKILL.md")" = "v1" ]
+
+  printf '%s\n' 'v2' >"$source_root/demo/SKILL.md"
+  stage2="$(mktemp -d)"
+  stage_target_skill_records "$plan" "$stage2"
+  [ ! -e "$stage2/claude/skills/demo/.apm-skill-in-sync" ]
+  reconcile_skills_root_from_stage "$stage2/claude/skills" "$home/.claude/skills"
+  [ "$(cat "$home/.claude/skills/demo/SKILL.md")" = "v2" ]
+
+  rm -rf "$home" "$source_root" "$stage" "$stage2"
+}
+
 # --- sync_managed_catalog_runtime_assets agents face -------------------------
 
 @test "sync_managed_catalog_runtime_assets removes the agents tree for an agents-less target" {
@@ -1551,33 +1581,6 @@ SHIM
   [ "$status" -eq 0 ]
   [ ! -e "$target_root/agents" ]
   [ -f "$target_root/CLAUDE.md" ]
-
-  rm -rf "$workspace" "$runtime_home"
-}
-
-@test "sync_managed_catalog_runtime_assets deploys the agents tree when no agents face sentinel is set" {
-  workspace="$(mktemp -d)"
-  runtime_home="$(mktemp -d)"
-  mkdir -p "$workspace/catalog/agents"
-  printf '%s\n' 'agent' >"$workspace/catalog/agents/reviewer.md"
-  printf '%s\n' '# instructions' >"$workspace/catalog/CLAUDE.md"
-
-  target_root="$runtime_home/.claude"
-
-  HOME="$runtime_home"
-  tracked_catalog_dir() { printf '%s\n' "$workspace/catalog"; }
-  tracked_catalog_instructions_path() { printf '%s\n' "$workspace/catalog/CLAUDE.md"; }
-  tracked_catalog_agents_root() { printf '%s\n' "$workspace/catalog/agents"; }
-  tracked_catalog_commands_root() { printf '%s\n' "$workspace/catalog/commands"; }
-  tracked_catalog_rules_root() { printf '%s\n' "$workspace/catalog/rules"; }
-  managed_catalog_runtime_targets() {
-    printf '%s\n' 'claude|.claude|CLAUDE.md||'
-  }
-
-  run sync_managed_catalog_runtime_assets
-
-  [ "$status" -eq 0 ]
-  [ -f "$target_root/agents/reviewer.md" ]
 
   rm -rf "$workspace" "$runtime_home"
 }

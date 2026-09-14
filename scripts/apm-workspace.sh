@@ -263,7 +263,7 @@ skill_ids_from_root() {
 format_skill_name() {
   # Deploy using the logical skill name (the final namespace segment). Target
   # collision validation prevents two sources from claiming the same path.
-  printf '%s\n' "$1" | awk -F ':' '{ print $NF }'
+  printf '%s\n' "${1##*:}"
 }
 
 locked_external_skill_records() {
@@ -1346,6 +1346,21 @@ file_content_equal() {
   [ "$expected_hash" = "$actual_hash" ]
 }
 
+# Directory-tree equality for the incremental skill deploy. Returns 0 only when
+# both paths are directories with the same relative file set and byte-identical
+# contents. diff -rq is used rather than a per-file checksum walk so the check is
+# one read-only traversal; anything it cannot read cleanly (missing dir, extra
+# or differing entry) is reported as unequal, which falls back to a full swap.
+tree_content_equal() {
+  expected_root="$1"
+  actual_root="$2"
+
+  [ -d "$expected_root" ] || return 1
+  [ -d "$actual_root" ] || return 1
+
+  diff -rq "$expected_root" "$actual_root" >/dev/null 2>&1
+}
+
 tracked_catalog_skill_ids() {
   skill_ids_from_root "$(tracked_catalog_skills_root)"
 }
@@ -1902,25 +1917,8 @@ collect_external_skill_records() {
 }
 
 deployment_plan_record() {
-  printf 'target_name=%s\ttarget_dir=%s\tsource_kind=%s\tsource_skill_id=%s\tdeployed_skill_name=%s\tsource_path=%s\tsource_ref=%s\n' \
-    "$1" "$2" "$3" "$4" "$5" "$6" "$7"
-}
-
-deployment_plan_record_field() {
-  record="$1"
-  field_name="$2"
-
-  printf '%s\n' "$record" | awk -F '\t' -v key="$field_name" '
-    {
-      prefix = key "="
-      for (i = 1; i <= NF; i++) {
-        if (index($i, prefix) == 1) {
-          print substr($i, length(prefix) + 1)
-          exit
-        }
-      }
-    }
-  '
+  printf 'target_name=%s\ttarget_dir=%s\tsource_kind=%s\tsource_skill_id=%s\tdeployed_skill_name=%s\tsource_path=%s\tsource_ref=%s\tskills_dir=%s\n' \
+    "$1" "$2" "$3" "$4" "$5" "$6" "$7" "$8"
 }
 
 build_deployment_plan_entries() {
@@ -1938,7 +1936,8 @@ build_deployment_plan_entries() {
         "$source_skill_id" \
         "$deployed_skill_name" \
         "$source_path" \
-        "$source_ref"
+        "$source_ref" \
+        "$RT_SKILLS_DIR"
     done
   done
 }
@@ -2012,13 +2011,36 @@ stage_target_skill_records() {
 
   printf '%s\n' "$deployment_plan" | while IFS= read -r plan_record; do
     [ -n "$plan_record" ] || continue
-    target_name=$(deployment_plan_record_field "$plan_record" target_name)
-    deployed_skill_name=$(deployment_plan_record_field "$plan_record" deployed_skill_name)
-    source_path=$(deployment_plan_record_field "$plan_record" source_path)
+    # Field order mirrors deployment_plan_record; every value is tab-free, so a
+    # single tab-split avoids five awk spawns per record.
+    IFS=$'\t' read -r f_target_name f_target_dir _f_source_kind _f_source_skill_id \
+      f_deployed f_source_path _f_source_ref f_skills_dir <<<"$plan_record"
+    target_name=${f_target_name#target_name=}
+    target_dir=${f_target_dir#target_dir=}
+    deployed_skill_name=${f_deployed#deployed_skill_name=}
+    source_path=${f_source_path#source_path=}
+    skills_dir=${f_skills_dir#skills_dir=}
     [ -n "$target_name" ] || continue
+    # A target without a skills face never reconciles its staged skills (see
+    # replace_skill_targets_from_stage), so staging them would be pure waste.
+    [ "$skills_dir" != "-" ] || continue
+    skills_root_dir="${skills_dir:-$target_dir}"
     stage_skills_root="$stage_root/$target_name/skills"
     staged_skill_path=$(internal_target_skill_path "$stage_skills_root" "$deployed_skill_name")
     rm -rf "$staged_skill_path"
+
+    # Skip the copy *and* the swap when the deployed skill already matches the
+    # source: the marker below tells reconcile_skills_root_from_stage to leave
+    # this entry alone, and only entries whose source content changed (or that
+    # are new) get staged and swapped. The expected entry still exists in the
+    # stage tree, so the stale sweep does not remove it.
+    deployed_skill_path=$(internal_target_skill_path "$HOME/$skills_root_dir/skills" "$deployed_skill_name")
+    if [ -d "$source_path" ] && tree_content_equal "$source_path" "$deployed_skill_path"; then
+      mkdir -p "$staged_skill_path"
+      : >"$staged_skill_path/.apm-skill-in-sync"
+      continue
+    fi
+
     mkdir -p "$staged_skill_path"
     cp -R "$source_path"/. "$staged_skill_path"
   done
@@ -2119,6 +2141,11 @@ reconcile_skills_root_from_stage() {
 
   find "$staged_skills_root" -mindepth 1 -maxdepth 1 | while IFS= read -r staged_entry; do
     entry_name=$(basename "$staged_entry")
+    # stage_target_skill_records marks an entry it found already in sync; leave
+    # the deployed copy untouched instead of swapping it for the same content.
+    if [ -f "$staged_entry/.apm-skill-in-sync" ]; then
+      continue
+    fi
     swap_staged_tree_into_place "$staged_entry" "$target_skills_root/$entry_name" skills
   done
 
