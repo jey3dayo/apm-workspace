@@ -100,20 +100,29 @@ validate_skill_path_segments() {
   done
 }
 
-skill_id_to_manifest_path() {
-  skill_id="$1"
+# Validates a colon-separated skill id and sets SKILL_PATH to
+# "<root>/<seg1>/<seg2>/...". The split-and-validate runs in the current shell,
+# so a failure still aborts the script rather than only a subshell.
+skill_path_from_root() {
+  SKILL_PATH_ROOT="$1"
+  skill_id="$2"
+  validate_skill_id "$skill_id"
   old_ifs=$IFS
   IFS=':'
   # shellcheck disable=SC2086
   set -- $skill_id
   IFS=$old_ifs
   validate_skill_path_segments "$skill_id" "$@"
-  printf '%s' "$1"
-  shift
+
+  SKILL_PATH="$SKILL_PATH_ROOT"
   for segment in "$@"; do
-    printf '/%s' "$segment"
+    SKILL_PATH="$SKILL_PATH/$segment"
   done
-  printf '\n'
+}
+
+skill_id_to_manifest_path() {
+  skill_path_from_root "" "$1"
+  printf '%s\n' "${SKILL_PATH#/}"
 }
 
 ensure_workspace_repo() {
@@ -529,36 +538,16 @@ EOF
 }
 
 managed_skill_content_dir() {
-  skill_id="$1"
-  validate_skill_id "$skill_id"
-  source_dir="$(tracked_catalog_skills_root)"
-  old_ifs=$IFS
-  IFS=':'
-  # shellcheck disable=SC2086
-  set -- $skill_id
-  IFS=$old_ifs
-  validate_skill_path_segments "$skill_id" "$@"
-  for segment in "$@"; do
-    source_dir="$source_dir/$segment"
-  done
+  skill_path_from_root "$(tracked_catalog_skills_root)" "$1"
+  source_dir="$SKILL_PATH"
 
   [ -f "$source_dir/SKILL.md" ] || fail "Managed catalog skill missing SKILL.md: $source_dir"
   printf '%s\n' "$source_dir"
 }
 
 private_skill_content_dir() {
-  skill_id="$1"
-  validate_skill_id "$skill_id"
-  source_dir="$(private_skills_root)"
-  old_ifs=$IFS
-  IFS=':'
-  # shellcheck disable=SC2086
-  set -- $skill_id
-  IFS=$old_ifs
-  validate_skill_path_segments "$skill_id" "$@"
-  for segment in "$@"; do
-    source_dir="$source_dir/$segment"
-  done
+  skill_path_from_root "$(private_skills_root)" "$1"
+  source_dir="$SKILL_PATH"
 
   [ -f "$source_dir/SKILL.md" ] || fail "Private skill missing SKILL.md: $source_dir"
   printf '%s\n' "$source_dir"
@@ -583,19 +572,9 @@ local_skill_content_dir() {
 copy_managed_skill_into_catalog() {
   skill_id="$1"
   skills_root="$2"
-  validate_skill_id "$skill_id"
   source_dir=$(managed_skill_content_dir "$skill_id")
-
-  destination_dir="$skills_root"
-  old_ifs=$IFS
-  IFS=':'
-  # shellcheck disable=SC2086
-  set -- $skill_id
-  IFS=$old_ifs
-  validate_skill_path_segments "$skill_id" "$@"
-  for segment in "$@"; do
-    destination_dir="$destination_dir/$segment"
-  done
+  skill_path_from_root "$skills_root" "$skill_id"
+  destination_dir="$SKILL_PATH"
 
   mkdir -p "$destination_dir"
   cp -R "$source_dir"/. "$destination_dir"
@@ -829,19 +808,8 @@ internal_deploy_target_roots() {
 }
 
 internal_target_skill_path() {
-  target_root="$1"
-  skill_id="$2"
-  path="$target_root"
-  old_ifs=$IFS
-  IFS=':'
-  # shellcheck disable=SC2086
-  set -- $skill_id
-  IFS=$old_ifs
-  validate_skill_path_segments "$skill_id" "$@"
-  for segment in "$@"; do
-    path="$path/$segment"
-  done
-  printf '%s\n' "$path"
+  skill_path_from_root "$1" "$2"
+  printf '%s\n' "$SKILL_PATH"
 }
 
 internal_cleanup_skill_ids() {
@@ -1731,12 +1699,20 @@ openclaw|.openclaw|CLAUDE.md||
 EOF
 }
 
+# Reader for managed_catalog_runtime_targets. Binds one record's five
+# pipe-delimited fields to globals, so the record layout and field count live
+# only here. Returns non-zero at EOF, so it drives
+# `while read_runtime_target; do ... done < <(managed_catalog_runtime_targets)`.
+read_runtime_target() {
+  IFS='|' read -r RT_TARGET_NAME RT_TARGET_DIR RT_CONFIG_NAME RT_SKILLS_DIR RT_AGENTS_FACE
+}
+
 managed_catalog_skill_inventory() {
   skill_ids=$(managed_skill_ids)
-  managed_catalog_runtime_targets | while IFS='|' read -r target_name _target_dir _config_name _skills_dir _agents_face; do
+  managed_catalog_runtime_targets | while read_runtime_target; do
     printf '%s\n' "$skill_ids" | while IFS= read -r skill_id; do
       [ -n "$skill_id" ] || continue
-      printf '%s|%s|%s\n' "$target_name" "$skill_id" "$(format_skill_name "$skill_id")"
+      printf '%s|%s|%s\n' "$RT_TARGET_NAME" "$skill_id" "$(format_skill_name "$skill_id")"
     done
   done
 }
@@ -2409,12 +2385,12 @@ build_deployment_plan_entries() {
 
   printf '%s\n' "$skill_records" | while IFS=$'\t' read -r source_kind source_skill_id source_path source_ref; do
     [ -n "$source_skill_id" ] || continue
-    managed_catalog_runtime_targets | while IFS='|' read -r target_name target_dir _config_name _skills_dir _agents_face; do
+    managed_catalog_runtime_targets | while read_runtime_target; do
       deployed_skill_name=$(format_skill_name "$source_skill_id")
       validate_skill_id "$deployed_skill_name"
       deployment_plan_record \
-        "$target_name" \
-        "$target_dir" \
+        "$RT_TARGET_NAME" \
+        "$RT_TARGET_DIR" \
         "$source_kind" \
         "$source_skill_id" \
         "$deployed_skill_name" \
@@ -2487,8 +2463,8 @@ stage_target_skill_records() {
   deployment_plan="$1"
   stage_root="$2"
 
-  managed_catalog_runtime_targets | while IFS='|' read -r target_name _target_dir _config_name _skills_dir _agents_face; do
-    mkdir -p "$stage_root/$target_name/skills"
+  managed_catalog_runtime_targets | while read_runtime_target; do
+    mkdir -p "$stage_root/$RT_TARGET_NAME/skills"
   done
 
   printf '%s\n' "$deployment_plan" | while IFS= read -r plan_record; do
@@ -2616,19 +2592,19 @@ reconcile_skills_root_from_stage() {
 replace_skill_targets_from_stage() {
   stage_root="$1"
 
-  managed_catalog_runtime_targets | while IFS='|' read -r target_name target_dir _config_name skills_dir _agents_face; do
-    target_root="$HOME/$target_dir"
-    if [ "$skills_dir" = "-" ]; then
+  managed_catalog_runtime_targets | while read_runtime_target; do
+    target_root="$HOME/$RT_TARGET_DIR"
+    if [ "$RT_SKILLS_DIR" = "-" ]; then
       target_skills_root="$target_root/skills"
       if [ -e "$target_skills_root" ] || [ -L "$target_skills_root" ]; then
         rm -rf "$target_skills_root"
       fi
       continue
     fi
-    skills_root_dir="${skills_dir:-$target_dir}"
+    skills_root_dir="${RT_SKILLS_DIR:-$RT_TARGET_DIR}"
     legacy_skills_root="$target_root/skills"
     target_skills_root="$HOME/$skills_root_dir/skills"
-    staged_skills_root="$stage_root/$target_name/skills"
+    staged_skills_root="$stage_root/$RT_TARGET_NAME/skills"
     [ -d "$staged_skills_root" ] || mkdir -p "$staged_skills_root"
     if [ "$legacy_skills_root" != "$target_skills_root" ] && { [ -e "$legacy_skills_root" ] || [ -L "$legacy_skills_root" ]; }; then
       rm -rf "$legacy_skills_root"
@@ -2705,15 +2681,15 @@ sync_managed_catalog_runtime_assets() {
   commands_source=$(tracked_catalog_commands_root)
   rules_source=$(tracked_catalog_rules_root)
 
-  managed_catalog_runtime_targets | while IFS='|' read -r _target_name target_dir config_name _skills_dir agents_face; do
-    target_root="$HOME/$target_dir"
+  managed_catalog_runtime_targets | while read_runtime_target; do
+    target_root="$HOME/$RT_TARGET_DIR"
     mkdir -p "$target_root"
 
     if [ -f "$instructions_source" ]; then
-      copy_managed_catalog_file "$instructions_source" "$target_root/$config_name"
+      copy_managed_catalog_file "$instructions_source" "$target_root/$RT_CONFIG_NAME"
     fi
 
-    if [ "$agents_face" = "-" ]; then
+    if [ "$RT_AGENTS_FACE" = "-" ]; then
       if [ -e "$target_root/agents" ] || [ -L "$target_root/agents" ]; then
         rm -rf "$target_root/agents"
       fi
@@ -2814,12 +2790,12 @@ cmd_doctor() {
     tracked_commands_root="$(tracked_catalog_commands_root)"
     tracked_rules_root="$(tracked_catalog_rules_root)"
     managed_catalog_skill_inventory >"$inventory_file"
-    while IFS='|' read -r target_name target_dir config_name skills_dir agents_face; do
-      target_root="$HOME/$target_dir"
-      skills_root_dir="${skills_dir:-$target_dir}"
+    while read_runtime_target; do
+      target_root="$HOME/$RT_TARGET_DIR"
+      skills_root_dir="${RT_SKILLS_DIR:-$RT_TARGET_DIR}"
       target_skills_root="$HOME/$skills_root_dir/skills"
-      if [ -e "$target_root/$config_name" ]; then config_state=present; else config_state=missing; fi
-      if [ "$agents_face" = "-" ]; then
+      if [ -e "$target_root/$RT_CONFIG_NAME" ]; then config_state=present; else config_state=missing; fi
+      if [ "$RT_AGENTS_FACE" = "-" ]; then
         agents_state=n/a
       elif [ -e "$target_root/agents" ]; then
         agents_state=present
@@ -2828,20 +2804,20 @@ cmd_doctor() {
       fi
       if [ -e "$target_root/commands" ]; then commands_state=present; else commands_state=missing; fi
       if [ -e "$target_root/rules" ]; then rules_state=present; else rules_state=missing; fi
-      if [ "$skills_dir" = "-" ]; then
+      if [ "$RT_SKILLS_DIR" = "-" ]; then
         skills_state=n/a
       elif [ -e "$target_skills_root" ]; then
         skills_state=present
       else
         skills_state=missing
       fi
-      printf '  %s: config=%s agents=%s commands=%s rules=%s skills=%s\n' "$target_name" "$config_state" "$agents_state" "$commands_state" "$rules_state" "$skills_state"
+      printf '  %s: config=%s agents=%s commands=%s rules=%s skills=%s\n' "$RT_TARGET_NAME" "$config_state" "$agents_state" "$commands_state" "$rules_state" "$skills_state"
 
-      if [ -f "$tracked_instructions" ] && [ ! -f "$target_root/$config_name" ]; then
-        error "Required catalog output is missing or has wrong type (file): $target_root/$config_name"
+      if [ -f "$tracked_instructions" ] && [ ! -f "$target_root/$RT_CONFIG_NAME" ]; then
+        error "Required catalog output is missing or has wrong type (file): $target_root/$RT_CONFIG_NAME"
         has_failure=1
       fi
-      if [ -d "$tracked_agents_root" ] && [ "$agents_face" != "-" ] && [ ! -d "$target_root/agents" ]; then
+      if [ -d "$tracked_agents_root" ] && [ "$RT_AGENTS_FACE" != "-" ] && [ ! -d "$target_root/agents" ]; then
         error "Required catalog output is missing or has wrong type (directory): $target_root/agents"
         has_failure=1
       fi
@@ -2853,7 +2829,7 @@ cmd_doctor() {
         error "Required catalog output is missing or has wrong type (directory): $target_root/rules"
         has_failure=1
       fi
-      if [ "$skills_dir" != "-" ] && [ ! -d "$target_skills_root" ]; then
+      if [ "$RT_SKILLS_DIR" != "-" ] && [ ! -d "$target_skills_root" ]; then
         error "Required catalog output is missing or has wrong type (directory): $target_skills_root"
         has_failure=1
       fi
