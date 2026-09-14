@@ -15,6 +15,10 @@ MISE_DESTINATION="$WORKSPACE_DIR/mise.toml"
 CATALOG_BUILD_ROOT="$WORKSPACE_DIR/.catalog-build"
 CATALOG_DIR_NAME="catalog"
 
+# Resolved from BASH_SOURCE rather than $0 so the path is also correct when the
+# script is sourced (the bats suite sources it to exercise individual functions).
+APM_AWK_DIR=$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/lib
+
 have_command() {
   command -v "$1" >/dev/null 2>&1
 }
@@ -266,74 +270,7 @@ locked_external_skill_records() {
   lock_path="$WORKSPACE_DIR/apm.lock.yaml"
   [ -f "$lock_path" ] || fail "Lock file not found: $lock_path"
 
-  awk '
-    function indent_level(line, trimmed) {
-      trimmed = line
-      sub(/^[[:space:]]+/, "", trimmed)
-      return length(line) - length(trimmed)
-    }
-    function flush_record() {
-      if (repo_url != "" && resolved_commit != "") {
-        printf "%s|%s|%s|%s\n", repo_url, virtual_path, resolved_commit, resolved_ref
-      }
-    }
-    /^[^[:space:]#-][^:]*:/ {
-      if (in_dependencies && repo_url != "") {
-        flush_record()
-        repo_url = ""
-        resolved_commit = ""
-        resolved_ref = ""
-        virtual_path = ""
-        record_indent = -1
-      }
-
-      split($0, parts, ":")
-      key = parts[1]
-      in_dependencies = (key == "dependencies")
-      dependencies_indent = in_dependencies ? 0 : -1
-      next
-    }
-    !in_dependencies {
-      next
-    }
-    /^[[:space:]]*-[[:space:]]+repo_url:[[:space:]]+/ {
-      flush_record()
-      repo_url = substr($0, index($0, ":") + 1)
-      sub(/^[[:space:]]+/, "", repo_url)
-      resolved_commit = ""
-      resolved_ref = ""
-      virtual_path = ""
-      record_indent = indent_level($0)
-      next
-    }
-    /^[[:space:]]+resolved_commit:[[:space:]]+/ {
-      if (repo_url == "" || indent_level($0) <= record_indent) {
-        next
-      }
-      resolved_commit = substr($0, index($0, ":") + 1)
-      sub(/^[[:space:]]+/, "", resolved_commit)
-      next
-    }
-    /^[[:space:]]+resolved_ref:[[:space:]]+/ {
-      if (repo_url == "" || indent_level($0) <= record_indent) {
-        next
-      }
-      resolved_ref = substr($0, index($0, ":") + 1)
-      sub(/^[[:space:]]+/, "", resolved_ref)
-      next
-    }
-    /^[[:space:]]+virtual_path:[[:space:]]+/ {
-      if (repo_url == "" || indent_level($0) <= record_indent) {
-        next
-      }
-      virtual_path = substr($0, index($0, ":") + 1)
-      sub(/^[[:space:]]+/, "", virtual_path)
-      next
-    }
-    END {
-      flush_record()
-    }
-  ' "$lock_path"
+  awk -f "$APM_AWK_DIR/lockfile-dependencies.awk" "$lock_path"
 }
 
 reset_catalog_build_dir() {
@@ -1289,111 +1226,7 @@ unpinned_external_references() {
   manifest_path="$WORKSPACE_DIR/apm.yml"
   [ -f "$manifest_path" ] || return 0
 
-  awk '
-    function indent_level(line, trimmed) {
-      trimmed = line
-      sub(/^[[:space:]]+/, "", trimmed)
-      return length(line) - length(trimmed)
-    }
-    function flush_pending() {
-      if (pending_is_git && !pending_has_ref && pending_repo != "") {
-        print pending_repo
-      }
-      pending_is_git = 0
-      pending_has_ref = 0
-      pending_repo = ""
-      pending_indent = -1
-    }
-    BEGIN {
-      pending_is_git = 0
-      pending_has_ref = 0
-      pending_repo = ""
-      pending_indent = -1
-    }
-    /^[^[:space:]#][^:]*:/ {
-      if (in_apm) {
-        flush_pending()
-      }
-      split($0, parts, ":")
-      key = parts[1]
-      in_dependencies = (key == "dependencies")
-      dependencies_indent = in_dependencies ? 0 : -1
-      in_apm = 0
-      apm_indent = -1
-      next
-    }
-    !in_dependencies {
-      next
-    }
-    in_apm && /^[[:space:]]+ref:[[:space:]]+/ && indent_level($0) > apm_indent {
-      if (pending_is_git && indent_level($0) == pending_indent + 2) {
-        pending_has_ref = 1
-      }
-      next
-    }
-    /^[[:space:]]+[^-[:space:]#][^:]*:/ {
-      current_indent = indent_level($0)
-      line = $0
-      sub(/^[[:space:]]+/, "", line)
-      split(line, parts, ":")
-      key = parts[1]
-
-      if (current_indent <= dependencies_indent) {
-        if (in_apm) {
-          flush_pending()
-        }
-        in_dependencies = 0
-        dependencies_indent = -1
-        in_apm = 0
-        apm_indent = -1
-        next
-      }
-
-      if (current_indent == dependencies_indent + 2 && key == "apm") {
-        in_apm = 1
-        apm_indent = current_indent
-        next
-      }
-
-      if (in_apm && current_indent <= apm_indent) {
-        flush_pending()
-        in_apm = 0
-        apm_indent = -1
-      }
-      next
-    }
-    !in_apm {
-      next
-    }
-    /^[[:space:]]*-[[:space:]]+/ {
-      current_indent = indent_level($0)
-      if (current_indent != apm_indent + 2) {
-        next
-      }
-      flush_pending()
-      ref = $2
-      if (ref == "git:") {
-        pending_is_git = 1
-        pending_has_ref = 0
-        pending_repo = $3
-        pending_indent = current_indent
-        next
-      }
-      if (ref ~ /^jey3dayo\/apm-workspace\/catalog(#|$)/) {
-        next
-      }
-      if (ref ~ /^\.\//) {
-        next
-      }
-      if (ref !~ /#/) {
-        print ref
-      }
-      next
-    }
-    END {
-      flush_pending()
-    }
-  ' "$manifest_path"
+  awk -f "$APM_AWK_DIR/manifest-unpinned-refs.awk" "$manifest_path"
 }
 
 cmd_pin_external() {
@@ -1407,133 +1240,7 @@ cmd_pin_external() {
   lock_pinned_reference_map >"$map_file"
 
   updated_file=$(mktemp)
-  awk -v map_file="$map_file" '
-    function indent_level(line, trimmed) {
-      trimmed = line
-      sub(/^[[:space:]]+/, "", trimmed)
-      return length(line) - length(trimmed)
-    }
-    # Case-insensitive fallback matches only the owner/repo segments, same
-    # as collect_external_skill_records() elsewhere in this script — a
-    # deeper path segment (e.g. a virtual_path under skills/) is a real,
-    # case-sensitive identifier, not GitHub-casing noise.
-    function normalize_repo(ref, parts, count, i, normalized) {
-      if (index(ref, ":") > 0) {
-        return ref
-      }
-      count = split(ref, parts, "/")
-      if (count < 2) {
-        return ref
-      }
-      normalized = tolower(parts[1]) "/" tolower(parts[2])
-      for (i = 3; i <= count; i++) {
-        normalized = normalized "/" parts[i]
-      }
-      return normalized
-    }
-    # Structured "- git: <repo>" entries are pinned by inserting a sibling
-    # "ref: <sha>" key right after git: (before skills:), never by
-    # appending "#<sha>" to the git: value itself (apm reads/writes ref:
-    # as a separate field; see apm_cli.models.dependency.reference for the
-    # entry["ref"] contract). The item is buffered so the insertion point
-    # is independent of where the item happens to dedent.
-    function flush_git_pending(i) {
-      if (!pending_is_git) {
-        return
-      }
-      print git_line
-      if (!pending_has_ref) {
-        if (pending_repo in pinned) {
-          printf "%*sref: %s\n", pending_indent + 2, "", pinned[pending_repo]
-          updated++
-        } else if (normalize_repo(pending_repo) in pinned_norm) {
-          printf "%*sref: %s\n", pending_indent + 2, "", pinned_norm[normalize_repo(pending_repo)]
-          updated++
-        }
-      }
-      for (i = 1; i <= buffer_count; i++) {
-        print buffer[i]
-      }
-      pending_is_git = 0
-      pending_has_ref = 0
-      pending_repo = ""
-      pending_indent = 0
-      buffer_count = 0
-      git_line = ""
-    }
-    BEGIN {
-      while ((getline map_line < map_file) > 0) {
-        n = split(map_line, cols, "\t")
-        if (n < 2) {
-          continue
-        }
-        pinned[cols[1]] = cols[2]
-        pinned_norm[normalize_repo(cols[1])] = cols[2]
-      }
-      close(map_file)
-      updated = 0
-      pending_is_git = 0
-      pending_has_ref = 0
-      pending_repo = ""
-      pending_indent = 0
-      buffer_count = 0
-    }
-    {
-      current_indent = indent_level($0)
-
-      if (pending_is_git) {
-        if ($0 ~ /^[[:space:]]+ref:[[:space:]]+/ && current_indent == pending_indent + 2) {
-          pending_has_ref = 1
-          buffer[++buffer_count] = $0
-          next
-        }
-        if (current_indent > pending_indent) {
-          buffer[++buffer_count] = $0
-          next
-        }
-        flush_git_pending()
-      }
-
-      if ($0 ~ /^[[:space:]]*-[[:space:]]+git:[[:space:]]+[^[:space:]]+[[:space:]]*$/) {
-        pending_is_git = 1
-        pending_has_ref = 0
-        pending_repo = $3
-        pending_indent = current_indent
-        git_line = $0
-        buffer_count = 0
-        next
-      }
-
-      if ($0 ~ /^[[:space:]]*-[[:space:]]+[^[:space:]]+[[:space:]]*(#.*)?$/) {
-        match($0, /-[[:space:]]+/)
-        prefix = substr($0, 1, RSTART + RLENGTH - 1)
-        rest = substr($0, RSTART + RLENGTH)
-        match(rest, /^[^[:space:]]+/)
-        ref = substr(rest, RSTART, RLENGTH)
-        trailing = substr(rest, RLENGTH + 1)
-
-        if (ref != "git:" && index(ref, "#") == 0) {
-          if (ref in pinned) {
-            print prefix ref "#" pinned[ref] trailing
-            updated++
-            next
-          }
-          norm_ref = normalize_repo(ref)
-          if (norm_ref in pinned_norm) {
-            print prefix ref "#" pinned_norm[norm_ref] trailing
-            updated++
-            next
-          }
-        }
-      }
-
-      print
-    }
-    END {
-      flush_git_pending()
-      printf "%d\n", updated > "/dev/stderr"
-    }
-  ' "$manifest_path" >"$updated_file" 2>"$updated_file.count"
+  awk -v map_file="$map_file" -f "$APM_AWK_DIR/pin-external.awk" "$manifest_path" >"$updated_file" 2>"$updated_file.count"
 
   updated_count=$(tr -d '\r\n' <"$updated_file.count")
   if [ "${updated_count:-0}" -eq 0 ]; then
@@ -1721,74 +1428,7 @@ manifest_external_references() {
   manifest_path="$WORKSPACE_DIR/apm.yml"
   [ -f "$manifest_path" ] || return 0
 
-  awk '
-    function indent_level(line, trimmed) {
-      trimmed = line
-      sub(/^[[:space:]]+/, "", trimmed)
-      return length(line) - length(trimmed)
-    }
-    /^[^[:space:]#][^:]*:/ {
-      split($0, parts, ":")
-      key = parts[1]
-      in_dependencies = (key == "dependencies")
-      dependencies_indent = in_dependencies ? 0 : -1
-      in_apm = 0
-      apm_indent = -1
-      next
-    }
-    !in_dependencies {
-      next
-    }
-    /^[[:space:]]+[^-[:space:]#][^:]*:/ {
-      current_indent = indent_level($0)
-      line = $0
-      sub(/^[[:space:]]+/, "", line)
-      split(line, parts, ":")
-      key = parts[1]
-
-      if (current_indent <= dependencies_indent) {
-        in_dependencies = 0
-        dependencies_indent = -1
-        in_apm = 0
-        apm_indent = -1
-        next
-      }
-
-      if (current_indent == dependencies_indent + 2 && key == "apm") {
-        in_apm = 1
-        apm_indent = current_indent
-        next
-      }
-
-      if (in_apm && current_indent <= apm_indent) {
-        in_apm = 0
-        apm_indent = -1
-      }
-      next
-    }
-    !in_apm {
-      next
-    }
-    /^[[:space:]]*-[[:space:]]+/ {
-      if (indent_level($0) != apm_indent + 2) {
-        next
-      }
-      ref = $2
-      if (ref == "git:") {
-        ref = $3
-      }
-      if (ref == "") {
-        next
-      }
-      if (ref ~ /^jey3dayo\/apm-workspace\/catalog(#|$)/) {
-        next
-      }
-      if (ref ~ /^\.\//) {
-        next
-      }
-      print ref
-    }
-  ' "$manifest_path"
+  awk -f "$APM_AWK_DIR/manifest-external-refs.awk" "$manifest_path"
 }
 
 manifest_external_skill_subset() {
@@ -1796,42 +1436,7 @@ manifest_external_skill_subset() {
   manifest_path="$WORKSPACE_DIR/apm.yml"
   [ -f "$manifest_path" ] || return 0
 
-  awk -v wanted="$target_ref" '
-    function indent_level(line, trimmed) {
-      trimmed = line
-      sub(/^[[:space:]]+/, "", trimmed)
-      return length(line) - length(trimmed)
-    }
-    /^    - git:[[:space:]]*/ {
-      current_ref = $3
-      in_skills = 0
-      skills_indent = -1
-      next
-    }
-    /^    - [^[:space:]]/ {
-      current_ref = ""
-      in_skills = 0
-      skills_indent = -1
-      next
-    }
-    current_ref != wanted {
-      next
-    }
-    /^      skills:[[:space:]]*$/ {
-      in_skills = 1
-      skills_indent = indent_level($0)
-      next
-    }
-    in_skills && indent_level($0) <= skills_indent {
-      in_skills = 0
-      next
-    }
-    in_skills && /^[[:space:]]*-[[:space:]]+/ {
-      value = $2
-      gsub(/"/, "", value)
-      print value
-    }
-  ' "$manifest_path"
+  awk -v wanted="$target_ref" -f "$APM_AWK_DIR/manifest-skill-subset.awk" "$manifest_path"
 }
 
 # Looks up the `alias:` value declared alongside an object-form dependency
@@ -1845,69 +1450,7 @@ manifest_dependency_alias() {
   manifest_path="$WORKSPACE_DIR/apm.yml"
   [ -f "$manifest_path" ] || return 0
 
-  awk -v wanted="$target_ref" '
-    function gist_key(ref,    stripped) {
-      if (ref !~ /^https:\/\/gist\.github\.com\//) {
-        return ""
-      }
-      stripped = ref
-      sub(/^https:\/\/gist\.github\.com\//, "", stripped)
-      sub(/\.git$/, "", stripped)
-      return stripped
-    }
-    # apm records the lockfile repo_url in a canonical form: the scheme and
-    # a trailing .git are dropped, github.com (the default host) is dropped
-    # entirely (https://github.com/owner/repo(.git) -> owner/repo), a
-    # non-default host keeps its FQDN (https://gitlab.com/acme/repo(.git) ->
-    # gitlab.com/acme/repo), and an SCP-style ref (git@host:owner/repo.git)
-    # becomes host/owner/repo. apm.yml keeps whatever form the author wrote
-    # under git:, so alias lookups must normalize the same way or an aliased
-    # dependency on a non-gist host silently falls back to the old
-    # repo_url-tail derivation.
-    function canonical_ref(ref,    working) {
-      working = ref
-      if (working ~ /^https:\/\//) {
-        sub(/^https:\/\//, "", working)
-        sub(/\.git$/, "", working)
-        sub(/\/$/, "", working)
-        sub(/^github\.com\//, "", working)
-        return working
-      }
-      if (working ~ /^git@/) {
-        sub(/^git@/, "", working)
-        sub(/\.git$/, "", working)
-        sub(/:/, "/", working)
-        return working
-      }
-      return ""
-    }
-    /^    - git:[[:space:]]*/ {
-      current_ref = $3
-      current_gist_key = gist_key($3)
-      current_canonical_ref = canonical_ref($3)
-      next
-    }
-    /^    - [^[:space:]]/ {
-      current_ref = ""
-      current_gist_key = ""
-      current_canonical_ref = ""
-      next
-    }
-    (current_ref != wanted) && (current_gist_key != wanted) && (current_canonical_ref != wanted) {
-      next
-    }
-    /^      alias:[[:space:]]+/ {
-      value = substr($0, index($0, ":") + 1)
-      sub(/^[[:space:]]+/, "", value)
-      sub(/[[:space:]]+#.*$/, "", value)
-      sub(/[[:space:]]+$/, "", value)
-      gsub(/"/, "", value)
-      if (value != "") {
-        print value
-        exit
-      }
-    }
-  ' "$manifest_path"
+  awk -v wanted="$target_ref" -f "$APM_AWK_DIR/manifest-dependency-alias.awk" "$manifest_path"
 }
 
 manifest_external_reference_keys() {

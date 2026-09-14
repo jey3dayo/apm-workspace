@@ -49,7 +49,7 @@ pre-push:
         pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 help >/dev/null
 
     - name: test:sh
-      glob: "{scripts/apm-workspace.sh,tests/apm-workspace.sh.bats,mise.toml,mise/test.toml}"
+      glob: "{scripts/apm-workspace.sh,scripts/lib/*.awk,tests/apm-workspace.sh.bats,mise.toml,mise/test.toml}"
       run: mise run test:sh
 
     - name: test:ps
