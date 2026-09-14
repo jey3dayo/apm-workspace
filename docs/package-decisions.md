@@ -508,3 +508,28 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 - 前提: `scripts/apm-workspace.sh` / `.ps1` が `alias` を無視して `repo_url` から配布名を
   決める間は、外部依存にすると gist ID 名で配置される。この adapter 修正が入るまでは
   既存 vendor をそのまま維持する（`todo.txt` に起票済み）。
+
+## opencode の agents face を opt-out（2026-09-14）
+
+- Status: 採用。`managed_catalog_runtime_targets` の5フィールド目（agents face）を追加し、
+  opencode を `-` にした。opencode が受け取るのは config（`CLAUDE.md`）と commands のみ。
+  `scripts/apm-workspace.sh` / `.ps1` の両方に反映。
+- 理由: `catalog/agents/*.md` は Claude 形式（`tools` はカンマ区切り文字列、`color` は
+  `blue` などの名前色）で、opencode 1.18.29 は起動時に frontmatter を strict 検証する。
+  実測（再現済み）:
+  `Configuration is invalid at ~/.config/opencode/agents/<file>.md`
+  `Expected object | undefined, got "Bash, Glob, ..." tools` /
+  `Expected a regex-hex color, got "blue" color`。
+  1ファイル混入するだけで opencode 全体が起動を拒否する。
+- 経緯: `fc02ee2` が opencode の deploy root を `~/.opencode`（opencode が読まない path）から
+  `~/.config/opencode`（実際に読む path）へ変えたことで、Claude 形式 agents が初めて
+  実際にロードされ、起動不能として顕在化した。`.ps1` は root が `.opencode` のままで
+  この変更が未mirrorだったため、今回そろえた。
+- 代替案を却下した理由: frontmatter を deploy 時に opencode スキーマへ変換する案は変換
+  ロジックとメンテが増えるが、ほぼ使わない agents に払うコストが見合わない。catalog agents
+  自体を両対応形式にする案は `tools` の型（Claude=文字列 / opencode=object）が非互換で不可。
+- 実装: `sync_managed_catalog_runtime_assets` は agents face が `-` のとき配布先
+  `agents/` を削除し、それ以外は従来どおり full-tree swap。`cmd_doctor` は `agents=n/a` を
+  返し、欠落を失敗にしない。目印は skills の `-` と同じ。
+- 検証: `tests/apm-workspace.sh.bats`（agents face の配布/削除、doctor の `n/a`）と
+  `tests/apm-workspace.Tests.ps1`（opencode の root / face マッピング）で固定した。

@@ -16,7 +16,7 @@ catalog 変更後の検証は判断を含まない機械作業なので、Orches
 ## 手順
 
 1. `mise run format` → `mise run check` を実行する。失敗したら以降へ進まず、失敗ログを添えて報告する
-2. `mise run deploy:fresh` を実行する。`install:catalog` 単独では新規追加ファイルが配布先から消えるため使わない。**注意:** opencode の deploy root が `.opencode` から `~/.config/opencode` へ変わった契約への移行後、初回 deploy は `~/.config/opencode/{skills,agents}` の既存内容を削除する。事前 archive はこのスキルの担当外であり、呼び出し元（Orchestrator）が deploy 前に行う
+2. `mise run deploy:fresh` を実行する。`install:catalog` 単独では新規追加ファイルが配布先から消えるため使わない。**注意:** opencode は skills face を opt-out しており、`~/.config/opencode/agents` も配布対象外なので deploy は agents face を削除する。catalog が opencode 向けに持つのは config と commands だけになる
 3. 変更した skill ごとに配布一致を確認する:
 
    ```bash
@@ -30,8 +30,11 @@ catalog 変更後の検証は判断を含まない機械作業なので、Orches
    # negative: opencode 用 skills 面は存在してはいけない（二重配布の復活を検知する）
    [ ! -e ~/.config/opencode/skills ]
 
-   # positive: opencode の agents は catalog と full-tree swap で厳密一致する（余剰・欠落なし）
-   diff -rq <catalog>/agents ~/.config/opencode/agents
+   # negative: opencode 用 agents 面も存在してはいけない。catalog agents は Claude 形式
+   # （`tools` はカンマ区切り文字列、`color` は名前色）で、opencode のスキーマ検証
+   # （`tools` は object、`color` は hex）に適合せず、1ファイルでも入ると opencode が
+   # 起動を拒否する。opencode は agents face を opt-out している
+   [ ! -e ~/.config/opencode/agents ]
 
    # positive: opencode の commands は catalog が提供するファイルだけを個別比較する。
    # commands は manifest scope 配布（sync_managed_catalog_dir_with_manifest）のため、

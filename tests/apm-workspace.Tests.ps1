@@ -1483,6 +1483,15 @@ id = "preserve other"
     $codex.SkillsRoot | Should -Be (Join-Path $HOME ".agents")
   }
 
+  It "points opencode at the path OpenCode reads and opts it out of the skills and agents faces" {
+    $targets = @(Get-ManagedCatalogRuntimeTargets)
+    $opencode = $targets | Where-Object Name -eq "opencode"
+
+    $opencode.Root | Should -Be (Join-Path $HOME ".config/opencode")
+    $opencode.SkillsRoot | Should -Be "-"
+    $opencode.AgentsFace | Should -Be "-"
+  }
+
   It "uses the final segment of namespaced skill names for all targets" {
     Format-SkillName -Target "claude" -SourceSkillId "sample:spec-init" | Should -Be "spec-init"
     Format-SkillName -Target "codex" -SourceSkillId "mattpocock:wayfinder" | Should -Be "wayfinder"

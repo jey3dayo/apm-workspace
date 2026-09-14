@@ -1171,14 +1171,14 @@ doctor_fixture_env() {
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
 }
 
-@test "doctor reports skills=n/a for a target with the skills-less sentinel and does not fail on it" {
+@test "doctor reports skills=n/a and agents=n/a for the opencode sentinels and does not fail on them" {
   make_doctor_fixture
-  rm -rf "$doctor_home/.config/opencode/skills"
+  rm -rf "$doctor_home/.config/opencode/skills" "$doctor_home/.config/opencode/agents"
 
   run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
 
   [ "$status" -eq 0 ]
-  [[ "$output" == *"opencode: config=present agents=present commands=present rules=present skills=n/a"* ]]
+  [[ "$output" == *"opencode: config=present agents=n/a commands=present rules=present skills=n/a"* ]]
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
 }
 
@@ -1521,6 +1521,65 @@ SHIM
   [ -f "$target_root/skills/new-skill/SKILL.md" ]
 
   rm -rf "$stage_root" "$runtime_home"
+}
+
+# --- sync_managed_catalog_runtime_assets agents face -------------------------
+
+@test "sync_managed_catalog_runtime_assets removes the agents tree for an agents-less target" {
+  workspace="$(mktemp -d)"
+  runtime_home="$(mktemp -d)"
+  mkdir -p "$workspace/catalog/agents"
+  printf '%s\n' 'agent' >"$workspace/catalog/agents/reviewer.md"
+  printf '%s\n' '# instructions' >"$workspace/catalog/CLAUDE.md"
+
+  target_root="$runtime_home/.config/opencode"
+  mkdir -p "$target_root/agents"
+  printf '%s\n' 'stale' >"$target_root/agents/reviewer.md"
+
+  HOME="$runtime_home"
+  tracked_catalog_dir() { printf '%s\n' "$workspace/catalog"; }
+  tracked_catalog_instructions_path() { printf '%s\n' "$workspace/catalog/CLAUDE.md"; }
+  tracked_catalog_agents_root() { printf '%s\n' "$workspace/catalog/agents"; }
+  tracked_catalog_commands_root() { printf '%s\n' "$workspace/catalog/commands"; }
+  tracked_catalog_rules_root() { printf '%s\n' "$workspace/catalog/rules"; }
+  managed_catalog_runtime_targets() {
+    printf '%s\n' 'opencode|.config/opencode|CLAUDE.md|-|-'
+  }
+
+  run sync_managed_catalog_runtime_assets
+
+  [ "$status" -eq 0 ]
+  [ ! -e "$target_root/agents" ]
+  [ -f "$target_root/CLAUDE.md" ]
+
+  rm -rf "$workspace" "$runtime_home"
+}
+
+@test "sync_managed_catalog_runtime_assets deploys the agents tree when no agents face sentinel is set" {
+  workspace="$(mktemp -d)"
+  runtime_home="$(mktemp -d)"
+  mkdir -p "$workspace/catalog/agents"
+  printf '%s\n' 'agent' >"$workspace/catalog/agents/reviewer.md"
+  printf '%s\n' '# instructions' >"$workspace/catalog/CLAUDE.md"
+
+  target_root="$runtime_home/.claude"
+
+  HOME="$runtime_home"
+  tracked_catalog_dir() { printf '%s\n' "$workspace/catalog"; }
+  tracked_catalog_instructions_path() { printf '%s\n' "$workspace/catalog/CLAUDE.md"; }
+  tracked_catalog_agents_root() { printf '%s\n' "$workspace/catalog/agents"; }
+  tracked_catalog_commands_root() { printf '%s\n' "$workspace/catalog/commands"; }
+  tracked_catalog_rules_root() { printf '%s\n' "$workspace/catalog/rules"; }
+  managed_catalog_runtime_targets() {
+    printf '%s\n' 'claude|.claude|CLAUDE.md||'
+  }
+
+  run sync_managed_catalog_runtime_assets
+
+  [ "$status" -eq 0 ]
+  [ -f "$target_root/agents/reviewer.md" ]
+
+  rm -rf "$workspace" "$runtime_home"
 }
 
 # --- assert_catalog_stage_safety --------------------------------------------

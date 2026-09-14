@@ -1706,29 +1706,34 @@ print_catalog_summary() {
     "$instructions" "$tracked_manifest" "$global_ref" "$status"
 }
 
-# Fields: name|home-relative root|config file|skills root override.
-# An empty override deploys skills under the target's own root; "-" means the
-# target has no skills face at all. OpenCode's root is .config/opencode
-# because that is the only path OpenCode reads agents/commands from (it does
-# not read a Claude-compatible agents/commands path). OpenCode takes "-" for
-# skills because it already reads ~/.claude/skills and ~/.agents/skills as
-# global sources, so a third copy under .config/opencode/skills would only
-# duplicate them. Do not express that by pointing a second target at .agents
-# instead: reconcile_skills_root_from_stage prunes entries the stage lacks,
-# so two targets sharing one skills root delete each other's skills.
+# Fields: name|home-relative root|config file|skills root override|agents face.
+# An empty skills override deploys skills under the target's own root; "-" means
+# the target has no skills face at all. The agents face is empty when the target
+# receives the catalog agents/ tree and "-" when it must not: OpenCode validates
+# agent frontmatter against its own schema (object `tools`, hex `color`) and
+# refuses to start on a file it cannot parse, while the catalog agents carry the
+# Claude format (comma-separated `tools`, named colors). OpenCode's root is
+# .config/opencode because that is the only path OpenCode reads agents/commands
+# from (it does not read a Claude-compatible agents/commands path). OpenCode
+# takes "-" for skills because it already reads ~/.claude/skills and
+# ~/.agents/skills as global sources, so a third copy under
+# .config/opencode/skills would only duplicate them. Do not express that by
+# pointing a second target at .agents instead: reconcile_skills_root_from_stage
+# prunes entries the stage lacks, so two targets sharing one skills root delete
+# each other's skills.
 managed_catalog_runtime_targets() {
   cat <<'EOF'
-claude|.claude|CLAUDE.md|
-codex|.codex|AGENTS.md|.agents
-cursor|.cursor|AGENTS.md|
-opencode|.config/opencode|CLAUDE.md|-
-openclaw|.openclaw|CLAUDE.md|
+claude|.claude|CLAUDE.md||
+codex|.codex|AGENTS.md|.agents|
+cursor|.cursor|AGENTS.md||
+opencode|.config/opencode|CLAUDE.md|-|-
+openclaw|.openclaw|CLAUDE.md||
 EOF
 }
 
 managed_catalog_skill_inventory() {
   skill_ids=$(managed_skill_ids)
-  managed_catalog_runtime_targets | while IFS='|' read -r target_name _target_dir _config_name _skills_dir; do
+  managed_catalog_runtime_targets | while IFS='|' read -r target_name _target_dir _config_name _skills_dir _agents_face; do
     printf '%s\n' "$skill_ids" | while IFS= read -r skill_id; do
       [ -n "$skill_id" ] || continue
       printf '%s|%s|%s\n' "$target_name" "$skill_id" "$(format_skill_name "$skill_id")"
@@ -2404,7 +2409,7 @@ build_deployment_plan_entries() {
 
   printf '%s\n' "$skill_records" | while IFS=$'\t' read -r source_kind source_skill_id source_path source_ref; do
     [ -n "$source_skill_id" ] || continue
-    managed_catalog_runtime_targets | while IFS='|' read -r target_name target_dir _config_name _skills_dir; do
+    managed_catalog_runtime_targets | while IFS='|' read -r target_name target_dir _config_name _skills_dir _agents_face; do
       deployed_skill_name=$(format_skill_name "$source_skill_id")
       validate_skill_id "$deployed_skill_name"
       deployment_plan_record \
@@ -2482,7 +2487,7 @@ stage_target_skill_records() {
   deployment_plan="$1"
   stage_root="$2"
 
-  managed_catalog_runtime_targets | while IFS='|' read -r target_name _target_dir _config_name _skills_dir; do
+  managed_catalog_runtime_targets | while IFS='|' read -r target_name _target_dir _config_name _skills_dir _agents_face; do
     mkdir -p "$stage_root/$target_name/skills"
   done
 
@@ -2611,7 +2616,7 @@ reconcile_skills_root_from_stage() {
 replace_skill_targets_from_stage() {
   stage_root="$1"
 
-  managed_catalog_runtime_targets | while IFS='|' read -r target_name target_dir _config_name skills_dir; do
+  managed_catalog_runtime_targets | while IFS='|' read -r target_name target_dir _config_name skills_dir _agents_face; do
     target_root="$HOME/$target_dir"
     if [ "$skills_dir" = "-" ]; then
       target_skills_root="$target_root/skills"
@@ -2700,7 +2705,7 @@ sync_managed_catalog_runtime_assets() {
   commands_source=$(tracked_catalog_commands_root)
   rules_source=$(tracked_catalog_rules_root)
 
-  managed_catalog_runtime_targets | while IFS='|' read -r _target_name target_dir config_name _skills_dir; do
+  managed_catalog_runtime_targets | while IFS='|' read -r _target_name target_dir config_name _skills_dir agents_face; do
     target_root="$HOME/$target_dir"
     mkdir -p "$target_root"
 
@@ -2708,7 +2713,11 @@ sync_managed_catalog_runtime_assets() {
       copy_managed_catalog_file "$instructions_source" "$target_root/$config_name"
     fi
 
-    if [ -d "$agents_source" ]; then
+    if [ "$agents_face" = "-" ]; then
+      if [ -e "$target_root/agents" ] || [ -L "$target_root/agents" ]; then
+        rm -rf "$target_root/agents"
+      fi
+    elif [ -d "$agents_source" ]; then
       replace_managed_catalog_agents_tree "$agents_source" "$target_root/agents"
     fi
 
@@ -2805,12 +2814,18 @@ cmd_doctor() {
     tracked_commands_root="$(tracked_catalog_commands_root)"
     tracked_rules_root="$(tracked_catalog_rules_root)"
     managed_catalog_skill_inventory >"$inventory_file"
-    while IFS='|' read -r target_name target_dir config_name skills_dir; do
+    while IFS='|' read -r target_name target_dir config_name skills_dir agents_face; do
       target_root="$HOME/$target_dir"
       skills_root_dir="${skills_dir:-$target_dir}"
       target_skills_root="$HOME/$skills_root_dir/skills"
       if [ -e "$target_root/$config_name" ]; then config_state=present; else config_state=missing; fi
-      if [ -e "$target_root/agents" ]; then agents_state=present; else agents_state=missing; fi
+      if [ "$agents_face" = "-" ]; then
+        agents_state=n/a
+      elif [ -e "$target_root/agents" ]; then
+        agents_state=present
+      else
+        agents_state=missing
+      fi
       if [ -e "$target_root/commands" ]; then commands_state=present; else commands_state=missing; fi
       if [ -e "$target_root/rules" ]; then rules_state=present; else rules_state=missing; fi
       if [ "$skills_dir" = "-" ]; then
@@ -2826,7 +2841,7 @@ cmd_doctor() {
         error "Required catalog output is missing or has wrong type (file): $target_root/$config_name"
         has_failure=1
       fi
-      if [ -d "$tracked_agents_root" ] && [ ! -d "$target_root/agents" ]; then
+      if [ -d "$tracked_agents_root" ] && [ "$agents_face" != "-" ] && [ ! -d "$target_root/agents" ]; then
         error "Required catalog output is missing or has wrong type (directory): $target_root/agents"
         has_failure=1
       fi
