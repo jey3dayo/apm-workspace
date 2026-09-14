@@ -2523,12 +2523,33 @@ swap_staged_tree_into_place() {
   rm -rf "$staging_copy_root" "$backup_root"
   cp -R "$staged_tree_root" "$staging_copy_root"
 
+  # An unchecked move-aside is not survivable: if it fails the target is still
+  # there, and the promotion below then renames the staging dir *into* it.
   if [ -e "$target_tree_root" ] || [ -L "$target_tree_root" ]; then
-    mv "$target_tree_root" "$backup_root"
+    if ! mv "$target_tree_root" "$backup_root"; then
+      rm -rf "$staging_copy_root"
+      fail "Failed to move aside $tree_name target: $target_tree_root"
+    fi
   fi
 
-  if mv "$staging_copy_root" "$target_tree_root"; then
-    rm -rf "$backup_root"
+  # `mv staging target` nests instead of replacing whenever the target exists,
+  # and reports success: the real tree ends up one level down as
+  # .apm-$tree_name-next.<pid> while `rm -rf "$backup_root"` deletes the only
+  # remaining copy of the old one. The move-aside above is not enough to rule
+  # that out, because a live consumer can re-create the target inside the
+  # rename window (observed 2026-09-14: agmsg watchers re-created
+  # ~/.agents/skills/agmsg mid-swap, costing the deployed tree). So rename only
+  # into a genuinely absent target, and merge when it came back — the
+  # re-created entries belong to a running process, so copying into them is
+  # both non-destructive and free of an absence window.
+  if [ ! -e "$target_tree_root" ] && [ ! -L "$target_tree_root" ]; then
+    if mv "$staging_copy_root" "$target_tree_root"; then
+      rm -rf "$backup_root"
+      return 0
+    fi
+  elif [ -d "$target_tree_root" ] && [ ! -L "$target_tree_root" ] &&
+    cp -R "$staging_copy_root"/. "$target_tree_root"/; then
+    rm -rf "$staging_copy_root" "$backup_root"
     return 0
   fi
 
@@ -2566,6 +2587,11 @@ reconcile_skills_root_from_stage() {
   # call don't exist yet (swap_staged_tree_into_place below creates and
   # removes them per child), so nothing live is ever swept.
   rm -rf "$target_skills_root"/.apm-skills-next.* "$target_skills_root"/.apm-skills-backup.*
+  # Residue from a nested promotion sits one level deeper, inside the skill dir
+  # it was meant to replace, where the root-level sweep never reaches.
+  find "$target_skills_root" -mindepth 2 -maxdepth 2 \
+    \( -name '.apm-skills-next.*' -o -name '.apm-skills-backup.*' \) \
+    -exec rm -rf {} +
 
   find "$staged_skills_root" -mindepth 1 -maxdepth 1 | while IFS= read -r staged_entry; do
     entry_name=$(basename "$staged_entry")
