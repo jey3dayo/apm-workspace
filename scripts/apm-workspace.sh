@@ -104,9 +104,8 @@ validate_skill_path_segments() {
   done
 }
 
-# Validates a colon-separated skill id and sets SKILL_PATH to
-# "<root>/<seg1>/<seg2>/...". The split-and-validate runs in the current shell,
-# so a failure still aborts the script rather than only a subshell.
+# Sets SKILL_PATH to "<root>/<seg1>/<seg2>/..." for a colon-separated skill id.
+# Validates in the current shell so a failure aborts the script, not a subshell.
 skill_path_from_root() {
   SKILL_PATH_ROOT="$1"
   skill_id="$2"
@@ -1346,11 +1345,8 @@ file_content_equal() {
   [ "$expected_hash" = "$actual_hash" ]
 }
 
-# Directory-tree equality for the incremental skill deploy. Returns 0 only when
-# both paths are directories with the same relative file set and byte-identical
-# contents. diff -rq is used rather than a per-file checksum walk so the check is
-# one read-only traversal; anything it cannot read cleanly (missing dir, extra
-# or differing entry) is reported as unequal, which falls back to a full swap.
+# True when two directories hold the same files with identical contents; any
+# missing, extra, or differing entry is unequal and falls back to a full swap.
 tree_content_equal() {
   expected_root="$1"
   actual_root="$2"
@@ -1397,20 +1393,13 @@ print_catalog_summary() {
 }
 
 # Fields: name|home-relative root|config file|skills root override|agents face.
-# An empty skills override deploys skills under the target's own root; "-" means
-# the target has no skills face at all. The agents face is empty when the target
-# receives the catalog agents/ tree and "-" when it must not: OpenCode validates
-# agent frontmatter against its own schema (object `tools`, hex `color`) and
-# refuses to start on a file it cannot parse, while the catalog agents carry the
-# Claude format (comma-separated `tools`, named colors). OpenCode's root is
-# .config/opencode because that is the only path OpenCode reads agents/commands
-# from (it does not read a Claude-compatible agents/commands path). OpenCode
-# takes "-" for skills because it already reads ~/.claude/skills and
-# ~/.agents/skills as global sources, so a third copy under
-# .config/opencode/skills would only duplicate them. Do not express that by
-# pointing a second target at .agents instead: reconcile_skills_root_from_stage
-# prunes entries the stage lacks, so two targets sharing one skills root delete
-# each other's skills.
+# A "-" skills override marks a target with no skills face; a "-" agents face
+# marks one that must not receive the catalog agents/ tree. OpenCode takes both:
+# it reads skills from ~/.claude/skills and ~/.agents/skills already, and it
+# rejects the Claude-format agents (object `tools`, hex `color`) at startup, so
+# it only gets config and commands. Do not point a second target at a shared
+# skills root: reconcile_skills_root_from_stage prunes entries the stage lacks,
+# so two targets on one root delete each other's skills.
 managed_catalog_runtime_targets() {
   cat <<'EOF'
 claude|.claude|CLAUDE.md||
@@ -1421,10 +1410,8 @@ openclaw|.openclaw|CLAUDE.md||
 EOF
 }
 
-# Reader for managed_catalog_runtime_targets. Binds one record's five
-# pipe-delimited fields to globals, so the record layout and field count live
-# only here. Returns non-zero at EOF, so it drives
-# `while read_runtime_target; do ... done < <(managed_catalog_runtime_targets)`.
+# Binds one managed_catalog_runtime_targets record to RT_* globals, keeping the
+# pipe layout in one place. Returns non-zero at EOF to drive `while` loops.
 read_runtime_target() {
   IFS='|' read -r RT_TARGET_NAME RT_TARGET_DIR RT_CONFIG_NAME RT_SKILLS_DIR RT_AGENTS_FACE
 }
@@ -2011,8 +1998,7 @@ stage_target_skill_records() {
 
   printf '%s\n' "$deployment_plan" | while IFS= read -r plan_record; do
     [ -n "$plan_record" ] || continue
-    # Field order mirrors deployment_plan_record; every value is tab-free, so a
-    # single tab-split avoids five awk spawns per record.
+    # Field order mirrors deployment_plan_record; values are tab-free.
     IFS=$'\t' read -r f_target_name f_target_dir _f_source_kind _f_source_skill_id \
       f_deployed f_source_path _f_source_ref f_skills_dir <<<"$plan_record"
     target_name=${f_target_name#target_name=}
@@ -2021,19 +2007,15 @@ stage_target_skill_records() {
     source_path=${f_source_path#source_path=}
     skills_dir=${f_skills_dir#skills_dir=}
     [ -n "$target_name" ] || continue
-    # A target without a skills face never reconciles its staged skills (see
-    # replace_skill_targets_from_stage), so staging them would be pure waste.
+    # Skills-less targets never reconcile staged skills; skip their staging.
     [ "$skills_dir" != "-" ] || continue
     skills_root_dir="${skills_dir:-$target_dir}"
     stage_skills_root="$stage_root/$target_name/skills"
     staged_skill_path=$(internal_target_skill_path "$stage_skills_root" "$deployed_skill_name")
     rm -rf "$staged_skill_path"
 
-    # Skip the copy *and* the swap when the deployed skill already matches the
-    # source: the marker below tells reconcile_skills_root_from_stage to leave
-    # this entry alone, and only entries whose source content changed (or that
-    # are new) get staged and swapped. The expected entry still exists in the
-    # stage tree, so the stale sweep does not remove it.
+    # Unchanged and still deployed: mark it so reconcile leaves it alone, and
+    # keep the entry in the stage tree so the stale sweep does not remove it.
     deployed_skill_path=$(internal_target_skill_path "$HOME/$skills_root_dir/skills" "$deployed_skill_name")
     if [ -d "$source_path" ] && tree_content_equal "$source_path" "$deployed_skill_path"; then
       mkdir -p "$staged_skill_path"
@@ -2078,16 +2060,10 @@ swap_staged_tree_into_place() {
     fi
   fi
 
-  # `mv staging target` nests instead of replacing whenever the target exists,
-  # and reports success: the real tree ends up one level down as
-  # .apm-$tree_name-next.<pid> while `rm -rf "$backup_root"` deletes the only
-  # remaining copy of the old one. The move-aside above is not enough to rule
-  # that out, because a live consumer can re-create the target inside the
-  # rename window (observed 2026-09-14: agmsg watchers re-created
-  # ~/.agents/skills/agmsg mid-swap, costing the deployed tree). So rename only
-  # into a genuinely absent target, and merge when it came back — the
-  # re-created entries belong to a running process, so copying into them is
-  # both non-destructive and free of an absence window.
+  # `mv staging target` nests into an existing target and still reports success,
+  # so rename only into a genuinely absent target. A live consumer can re-create
+  # the target inside the rename window (observed 2026-09-14: agmsg watchers
+  # re-created ~/.agents/skills/agmsg mid-swap), so merge when it came back.
   if [ ! -e "$target_tree_root" ] && [ ! -L "$target_tree_root" ]; then
     if mv "$staging_copy_root" "$target_tree_root"; then
       rm -rf "$backup_root"
@@ -2106,18 +2082,10 @@ swap_staged_tree_into_place() {
   fail "Failed to replace $tree_name target: $target_tree_root"
 }
 
-# swap_staged_tree_into_place replaces a whole tree via two renames (current
-# -> backup, staging -> target), which needs the target to tolerate being
-# briefly absent. Doing that at the skills *root* itself — as the old
-# full-tree swap did — makes the entire root vanish from the filesystem for
-# that window, including scripts a live agent (e.g. an agmsg worker) may be
-# polling mid-command; the root's absence, not the individual skill swap, is
-# what broke callers. Reconciling per top-level child keeps the root itself
-# always present: each child still gets the same backup+rename swap
-# (unavailable only for its own two renames), but the root directory and its
-# untouched siblings are never absent. Stale removal preserves the old
-# semantics of "target ends up matching what's staged" (private skills are
-# re-applied afterward by sync_private_skills_into_targets, same as before).
+# Reconciling per top-level child keeps the skills root present at all times:
+# a whole-root swap made the root vanish for the two renames, and a live agent
+# polling it mid-command broke. Each child still gets the swap, and stale
+# removal keeps "target matches what's staged".
 reconcile_skills_root_from_stage() {
   staged_skills_root="$1"
   target_skills_root="$2"
