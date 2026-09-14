@@ -1525,32 +1525,39 @@ SHIM
 
 # --- incremental skill staging ----------------------------------------------
 
-@test "stage_target_skill_records skips an in-sync skill and reconcile leaves it untouched" {
+@test "stage_target_skill_records skips an unchanged skill and reconcile leaves it untouched" {
   home="$(mktemp -d)"
   source_root="$(mktemp -d)"
   stage="$(mktemp -d)"
-  mkdir -p "$source_root/demo" "$home/.claude/skills/demo"
+  mkdir -p "$source_root/demo"
   printf '%s\n' 'v1' >"$source_root/demo/SKILL.md"
-  printf '%s\n' 'v1' >"$home/.claude/skills/demo/SKILL.md"
 
   HOME="$home"
   managed_catalog_runtime_targets() { printf '%s\n' 'claude|.claude|CLAUDE.md||'; }
   plan=$(printf 'target_name=claude\ttarget_dir=.claude\tsource_kind=catalog\tsource_skill_id=demo\tdeployed_skill_name=demo\tsource_path=%s\tsource_ref=HEAD\tskills_dir=\n' "$source_root/demo")
 
+  # First deploy: nothing on the target yet, so the skill is staged and swapped.
   stage_target_skill_records "$plan" "$stage"
-  [ -f "$stage/claude/skills/demo/.apm-skill-in-sync" ]
-
+  [ ! -e "$stage/claude/skills/demo/.apm-skill-in-sync" ]
   reconcile_skills_root_from_stage "$stage/claude/skills" "$home/.claude/skills"
   [ "$(cat "$home/.claude/skills/demo/SKILL.md")" = "v1" ]
 
-  printf '%s\n' 'v2' >"$source_root/demo/SKILL.md"
+  # Unchanged source: skipped, and the deployed copy is left untouched.
   stage2="$(mktemp -d)"
   stage_target_skill_records "$plan" "$stage2"
-  [ ! -e "$stage2/claude/skills/demo/.apm-skill-in-sync" ]
+  [ -f "$stage2/claude/skills/demo/.apm-skill-in-sync" ]
   reconcile_skills_root_from_stage "$stage2/claude/skills" "$home/.claude/skills"
+  [ "$(cat "$home/.claude/skills/demo/SKILL.md")" = "v1" ]
+
+  # Changed source: staged and swapped in again.
+  printf '%s\n' 'v2' >"$source_root/demo/SKILL.md"
+  stage3="$(mktemp -d)"
+  stage_target_skill_records "$plan" "$stage3"
+  [ ! -e "$stage3/claude/skills/demo/.apm-skill-in-sync" ]
+  reconcile_skills_root_from_stage "$stage3/claude/skills" "$home/.claude/skills"
   [ "$(cat "$home/.claude/skills/demo/SKILL.md")" = "v2" ]
 
-  rm -rf "$home" "$source_root" "$stage" "$stage2"
+  rm -rf "$home" "$source_root" "$stage" "$stage2" "$stage3"
 }
 
 # --- sync_managed_catalog_runtime_assets agents face -------------------------
