@@ -64,10 +64,10 @@ Steward から Architect への昇格 handoff もこの書式を使う。
 
 共通 lifecycle は同一で、role によって安全契約と報告フォーマットが異なる。
 
-| role      | 起動する側                                                | spawn する相手                 | 相手の権限                   | 報告   |
-| --------- | --------------------------------------------------------- | ------------------------------ | ---------------------------- | ------ |
-| implement | Orchestrator 機能を担う側                                 | worker (sonnet / luna)         | 対象 worktree の編集可       | DONE   |
-| review    | Orchestrator 機能を担う側。spawn 経路と pane 経路の両方可 | reviewer (fable / sol / terra) | read-only。編集・commit 禁止 | REVIEW |
+| role      | 起動する側                                                | spawn する相手                                              | 相手の権限                   | 報告   |
+| --------- | --------------------------------------------------------- | ----------------------------------------------------------- | ---------------------------- | ------ |
+| implement | Orchestrator 機能を担う側                                 | worker（model は `orchestrator-worker` の tier 表が正本）   | 対象 worktree の編集可       | DONE   |
+| review    | Orchestrator 機能を担う側。spawn 経路と pane 経路の両方可 | reviewer（model は `orchestrator-worker` の tier 表が正本） | read-only。編集・commit 禁止 | REVIEW |
 
 review role の reviewer モデル指定は本スキル内の一時的な model override であり、`orchestrator-worker` の tier 対応表や既存 agent 定義（親モデル継承）を変更しない。model は helper の引数。選定は `orchestrator-worker` の「Reviewer の tier」が正本。
 
@@ -90,10 +90,10 @@ review role の reviewer モデル指定は本スキル内の一時的な model 
 - agmsg bootstrap 済みを確認（`~/.agents/skills/agmsg/` が存在）。**state を持つ face は `~/.agents/skills/agmsg` だけである。** agmsg は `db` / `teams` を実行された script 自身の dir から解決し、上流の `SKILL.md` は全コマンドを `~/.agents/skills/agmsg/scripts/...` の絶対パスで書くため、`~/.claude/skills/agmsg` など他 face に `db` / `teams` が無いのは仕様であり不具合ではない。他 face へ手で symlink を張らない——deploy target の内側なので次の `apm apply` で消え、実体を書いた場合は save に吸い上げられず削除される。link の正本は `~/.apm` の `scripts/agmsg-state.sh`
 - role/runtime 別の起動コマンドを確定する。review は書込権限を実行時に強制する:
 
-| role      | Claude                                                    | Codex                                                                                                                                                   |
-| --------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| implement | `run-claude-worker.sh implement <project> <payload-file>` | `run-codex-worker.sh implement <project> gpt-5.6-luna <payload-file>`                                                                                   |
-| review    | `run-claude-worker.sh review <project> <payload-file>`    | `run-codex-worker.sh review <project> <model> <payload-file>`（許可 model は `orchestrator-worker` の tier 表が正本。script が fail-closed で検証する） |
+| role      | Claude                                                    | Codex                                                                                                                                                      |
+| --------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| implement | `run-claude-worker.sh implement <project> <payload-file>` | `run-codex-worker.sh implement <project> <model> <payload-file>`（許可 model は `orchestrator-worker` の tier 表が正本。script が fail-closed で検証する） |
+| review    | `run-claude-worker.sh review <project> <payload-file>`    | `run-codex-worker.sh review <project> <model> <payload-file>`（許可 model は `orchestrator-worker` の tier 表が正本。script が fail-closed で検証する）    |
 
 helper の解決先は `~/.agents/skills/agmsg-delegation/scripts/`。両 runtime とも headless mode と stdin prompt を使い、対話 TUI と shell interpolation を避ける。`launch-worker.sh` は専用の一時ディレクトリに launchd job label・ログ・exit status を残して detached に起動する。helper が role から model / effort を固定し、caller は model を渡さない（Codex は起動時の引数）。`run-codex-worker.sh` は role ごとの model allowlist を fail-closed で検証し、不一致は起動前に exit 2 で拒否する。上書き変数は各 script の Usage / コメントを参照（値は scripts が正本）。
 
