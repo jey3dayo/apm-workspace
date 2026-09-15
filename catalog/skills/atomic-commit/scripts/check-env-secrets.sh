@@ -67,7 +67,7 @@ scan_file() {
 	/usr/bin/awk -v path="$path" '
 		BEGIN { SQ = sprintf("%c", 39); BOM = sprintf("%c%c%c", 239, 187, 191) }
 		function classify(key, value) {
-			if (key == "DOTENV_PUBLIC_KEY") return
+			if (key ~ /^DOTENV_PUBLIC_KEY(_[A-Z0-9_]+)?$/) return
 			if (value ~ /^encrypted:/) return
 			if (key !~ /(SECRET|TOKEN|PASSWORD|PASSWD|PRIVATE|CREDENTIAL|DATABASE_URL|AUTH|APIKEY|KEY|PAT|DSN)/) return
 			printf "%s: %s\n", path, key

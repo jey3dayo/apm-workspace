@@ -89,7 +89,7 @@ dirty な `.env.*` は自動除外せず、dotenvx-managed かを判定する。
 # 列挙は変更の有無に関わらず tracked を全件返し、grep は index でなく実体を読む。
 # 安全判断は helper の版ごとの検査が担う
 git ls-files -z --cached --others --exclude-standard -- ':(glob)**/.env.*' \
-  | xargs -0 -r /usr/bin/grep -lE '^(DOTENV_PUBLIC_KEY=|[A-Z0-9_]+=encrypted:)'
+  | xargs -0 -r /usr/bin/grep -lE '^(DOTENV_PUBLIC_KEY(_[A-Z0-9_]+)?=|[A-Z0-9_]+=encrypted:)'
 ```
 
 | 判定結果                                    | 扱い                                                                  |
@@ -116,7 +116,7 @@ dotenvx-managed と判定できても、追加差分に平文 secret 候補が�
 
 **diff の追加行ではなく、対象版のファイル全文を dotenv として解析する。** 追加行だけを見る方式は次を「追加行が無い＝安全」と読んでしまう: 引用された複数行値の途中行が代入やコメントに見える場合（値の断片を key と誤認する / 素通りする）、`.gitattributes` の `binary` や `-diff` で差分本体が出ない場合、rename 最適化で追加行が消える場合。全文解析ならどれも成立しない。**その代わり、以前から入っていた平文 secret も報告される**——commit する内容に含まれている以上それが正しい。
 
-helper は値を出さず `<file>: <KEY>` だけを出す。`DOTENV_PUBLIC_KEY` は dotenvx の公開メタデータで上の managed 判定の根拠そのものなので、`KEY` を含んでいても候補にしない。`encrypted:` 値は引用符の有無にかかわらず除外する。サブディレクトリの `.env.*` も対象で、ファイル名は Git の一覧から保持するため tab や引用符を含むパスでも壊れない。値の展開や command substitution は行わない。
+helper は値を出さず `<file>: <KEY>` だけを出す。`DOTENV_PUBLIC_KEY`（named env file の `DOTENV_PUBLIC_KEY_PRODUCTION` のような suffix 付きを含む）は dotenvx の公開メタデータで上の managed 判定の根拠そのものなので、`KEY` を含んでいても候補にしない。`encrypted:` 値は引用符の有無にかかわらず除外する。サブディレクトリの `.env.*` も対象で、ファイル名は Git の一覧から保持するため tab や引用符を含むパスでも壊れない。値の展開や command substitution は行わない。
 
 **対応する形式は有限で、それ以外は 2 へ倒す。** 受理・拒否する形式の一覧は helper の header コメントが正本で、
 ここには写さない（写すと 2 箇所が別々に古くなる）。追わずに拒否するのは、引用状態を早く抜けたときに**値の断片を

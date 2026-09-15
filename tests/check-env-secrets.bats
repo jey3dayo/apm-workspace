@@ -75,6 +75,15 @@ assert_scratch_clean() {
   assert_scratch_clean
 }
 
+@test "a named env file's suffixed public key is not reported as a secret candidate" {
+  printf 'DOTENV_PUBLIC_KEY_PRODUCTION=dummy-public\nAPI_KEY=encrypted:dummy\n' >"$REPO/.env.production"
+  stage_env .env.production
+  check
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+  assert_scratch_clean
+}
+
 @test "a plain secret staged in the index is reported even when the work tree hides it" {
   printf 'DOTENV_PUBLIC_KEY=dummy-public\nAPI_KEY=encrypted:dummy\n' >"$REPO/.env.production"
   commit_env .env.production
