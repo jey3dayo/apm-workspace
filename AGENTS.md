@@ -61,6 +61,12 @@ install:catalog`, and `mise run doctor` for pushed shared-guidance changes.
 vendored at `scripts/replace-bold-headings.ts`; a missing helper is a broken
 checkout, not an optional dependency.
 
+GNU parallel and a locking implementation (`flock` or `shlock`) are, by
+contrast, a real optional dependency for `test:sh`: bats' within-file
+parallelization requires both together, and a host missing either falls back
+to a serial `bats` run rather than failing. Parallel width is tunable via
+`BATS_JOBS` (default `4`).
+
 Before external sharing, run the repository's full gate. For smaller edits run
 touched-file formatting and the relevant focused check; always run `git diff
 --check` before committing. Confirm a Codex skill rollout from the deployed
