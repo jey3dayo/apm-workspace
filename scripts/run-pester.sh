@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Run each Pester file in its own pwsh process so the four *.Tests.ps1 suites
-# overlap on a multi-core runner instead of running back to back. The files are
-# independent: every one builds its own mktemp/TestDrive fixtures and pins HOME
-# into them, so no state is shared between processes.
-#
-# Each process logs to its own file, printed in a stable order once all of them
-# finish, so concurrent Pester output cannot interleave into unreadable logs.
+# Fanning the suites out is safe because each file pins HOME into its own
+# fixtures.
+if [ "${APM_TEST_PARALLEL:-1}" = "0" ]; then
+  exec pwsh -NoProfile -Command "Invoke-Pester -Path tests -CI -Output Detailed"
+fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -28,9 +26,7 @@ names=()
 for file in "${files[@]}"; do
   name="$(basename "$file")"
   names+=("$name")
-  # PowerShell single-quoted strings escape an embedded ' by doubling it;
-  # $file is an absolute path built from the repo checkout location, which is
-  # not guaranteed to be free of that character.
+  # PowerShell single-quoted strings escape an embedded ' by doubling it.
   escaped_file="${file//\'/\'\'}"
   pwsh -NoProfile -Command "Invoke-Pester -Path '$escaped_file' -CI -Output Detailed" \
     >"$log_dir/$name.log" 2>&1 &

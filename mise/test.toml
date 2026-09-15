@@ -1,19 +1,17 @@
 ["test:ps"]
 description = "Run the Pester behavioral suite for apm-workspace.ps1"
 # Host prerequisite, not mise-managed: pwsh with the Pester module. See AGENTS.md.
-# scripts/run-pester.sh fans the four *.Tests.ps1 files out to separate pwsh
-# processes; Windows keeps the single-process invocation.
 run = "bash ./scripts/run-pester.sh"
 run_windows = "pwsh -NoProfile -Command \"Invoke-Pester -Path tests -CI -Output Detailed\""
 
 ["test:sh"]
 description = "Run bats unit tests for the workspace's bash scripts"
-# bats' within-file parallelization (lib/bats-core/semaphore.bash) requires
-# GNU parallel plus a locking implementation, flock or shlock; without one of
-# flock/shlock bats exits 1 instead of falling back to serial on its own, so
-# this guard must check both before opting in. A host missing either falls
-# back to the serial runner.
+# bats --jobs needs GNU parallel plus flock or shlock, and exits 1 without them
+# rather than falling back, so the guard checks both.
 run = """
+if [ "${APM_TEST_PARALLEL:-1}" = "0" ]; then
+  exec bats tests/*.bats
+fi
 if command -v parallel >/dev/null 2>&1 \
   && { command -v flock >/dev/null 2>&1 || command -v shlock >/dev/null 2>&1; }; then
   exec bats --jobs "${BATS_JOBS:-4}" tests/*.bats
