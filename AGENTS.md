@@ -67,6 +67,25 @@ parallelization requires both together, and a host missing either falls back
 to a serial `bats` run rather than failing. Parallel width is tunable via
 `BATS_JOBS` (default `4`).
 
+Within-suite parallelization width is otherwise environment-dependent, not a
+fixed default: CI runners and local macOS hosts differ by an order of
+magnitude in per-process cost (process spawn overhead, and lock polling when
+neither `flock` nor `shlock` is available), so the same fan-out that helps on
+a developer machine loses to overhead on a CI runner's limited core count.
+`APM_TEST_PARALLEL=0` forces both `test:sh` and `test:ps` to their
+serial/single-process path regardless of the parallel/flock/shlock guard or
+`BATS_JOBS`; CI sets it, leaving local runs at the parallel default (unset or
+`1`).
+
+The `test:ps` lane is best-effort, not a verified Windows guarantee: CI and
+local runs execute `pwsh` on macOS/Linux, so a green Pester run only confirms
+the script's PowerShell syntax and logic run under those hosts' `pwsh`. It
+does not exercise Windows-specific failure modes such as path separators,
+`$USERPROFILE`, symlink-creation privileges, or CRLF handling, none of which
+have been verified on a Windows host. `test:ps` is not a pre-push gate for
+this reason; `test:sh` is the only workspace-script suite pre-push runs, and
+`test:ps` remains reachable through CI and `mise run test`/`verify`.
+
 Before external sharing, run the repository's full gate. For smaller edits run
 touched-file formatting and the relevant focused check; always run `git diff
 --check` before committing. Confirm a Codex skill rollout from the deployed
