@@ -76,6 +76,7 @@ jobs:
         shell: bash
         run: |
           bash -n ./scripts/apm-workspace.sh
+          bash -n ./scripts/run-pester.sh
           pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 help >/dev/null
 
       # `check` is not used here: it includes validate:workspace, which resolves MCP

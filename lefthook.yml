@@ -43,17 +43,18 @@ pre-push:
   # output, so it fails on any clone that has not run a rollout yet.
   jobs:
     - name: workspace-scripts
-      glob: "scripts/apm-workspace.{sh,ps1}"
+      glob: "{scripts/apm-workspace.{sh,ps1},scripts/run-pester.sh}"
       run: |
         bash -n scripts/apm-workspace.sh
         pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 help >/dev/null
+        bash -n scripts/run-pester.sh
 
     - name: test:sh
       glob: "{scripts/apm-workspace.sh,scripts/lib/*.awk,tests/apm-workspace.sh.bats,mise.toml,mise/test.toml}"
       run: mise run test:sh
 
     - name: test:ps
-      glob: "{scripts/apm-workspace.ps1,tests/apm-workspace.Tests.ps1,mise.toml,mise/test.toml}"
+      glob: "{scripts/apm-workspace.ps1,scripts/run-pester.sh,tests/apm-workspace.Tests.ps1,mise.toml,mise/test.toml}"
       run: mise run test:ps
 
     - name: format:markdown:bold-headings:check

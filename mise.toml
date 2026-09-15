@@ -100,9 +100,10 @@ run = [{ task = "check" }, { task = "test" }, { task = "smoke:catalog" }]
 
 [tasks.test]
 description = "Run both behavioral suites for the workspace scripts"
-# Serial on purpose: both suites drive temp installs and sync the same deployed
-# targets, so running them in parallel races on shared workspace state.
-run = [{ task = "test:ps" }, { task = "test:sh" }]
+# Parallel on purpose: each suite builds its own mktemp/fixture HOME, so the two
+# no longer race on shared workspace state (the old serial note predates that
+# isolation). `depends` runs them concurrently; `run` would serialize them.
+depends = ["test:ps", "test:sh"]
 
 [tasks.deploy]
 description = "Run checks, deploy the current workspace state, and inspect targets"
