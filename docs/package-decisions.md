@@ -415,11 +415,12 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
   必要な場合は `thermo-nuclear-code-quality-review` で代替する
 - `review-plan` 撤去理由: 実行前ゲートとしての導線が `prepare-goal` / `grilling` /
   組み込み plan mode と重複し、起動実績が乏しかった
-- 残した判断: `review-board`（レーン振り分けハブ）と `review-fix-loop`（backlog 管理つき
-  反復ループ）は独自導線ありとして検証継続。`docs-review` / `quiet-command-auditor` は
-  ドメイン特化で組み込みに代替なし。`design-system-review` は 2026-09-02 に撤去し
-  （`review-board` lane 1 で代替）、`scheduled-audit-ops` は 2026-09-02 に
-  `optional-skills` へ移動した
+- 残した判断: `review-fix-loop`（backlog 管理つき反復ループ）は独自導線ありとして検証継続。
+  `review-board`（レーン振り分けハブ）は 2026-09-16 に `optional-skills` へ移動した
+  （詳細は「`review-board` を optional-skills へ移動（2026-09-16）」）。
+  `docs-review` / `quiet-command-auditor` はドメイン特化で組み込みに代替なし。
+  `design-system-review` は 2026-09-02 に撤去し（`review-board` lane 1 で代替）、
+  `scheduled-audit-ops` は 2026-09-02 に `optional-skills` へ移動した
 - 再導入する場合: 組み込みレビューで賄えない要件（プロジェクト設定統合、
   星評価レポート等）が実運用で必要になった理由を本ファイルに追記してから戻す
 
@@ -442,7 +443,7 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 ## `polish` / `design-system-review` の撤去（2026-09-02）
 
 - `polish`: 利用実績が 0 で、lint→fix→再実行のループは `CLAUDE.md` の DoD に手順として吸収済み。
-- `design-system-review`: 汎用観点は `catalog/skills/review-board/references/review-lanes.md` の lane 1 "Design System Review" が持つ。`SKILL.md` は特定 repo のパス（`src/design-system/index.ts` 等）と画面名を決め打ちしていて他 repo では空振りするため、repo 固有値は当該 repo の steering へ置く。
+- `design-system-review`: 汎用観点は `optional-skills/review-board/references/review-lanes.md` の lane 1 "Design System Review" が持つ。`SKILL.md` は特定 repo のパス（`src/design-system/index.ts` 等）と画面名を決め打ちしていて他 repo では空振りするため、repo 固有値は当該 repo の steering へ置く。
 
 ## `apm-deploy-verify` を workspace-only lane へ移動（2026-09-02）
 
@@ -533,3 +534,10 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
   返し、欠落を失敗にしない。目印は skills の `-` と同じ。
 - 検証: `tests/apm-workspace.sh.bats`（agents face の配布/削除、doctor の `n/a`）と
   `tests/apm-workspace.Tests.ps1`（opencode の root / face マッピング）で固定した。
+
+## `review-board` を optional-skills へ移動（2026-09-16）
+
+- 移動理由: UI レビューの起動は組み込み `/code-review`、`review-fix-loop`、`agmsg-delegation` の review 外注が埋めており、global 配布層として選ばれない。レーン表自体は UI 作業のあるリポジトリで有効なため撤去せず optional へ移す。
+- 正本: `optional-skills/review-board/`
+- 再導入: 利用リポジトリで `jey3dayo/apm-workspace/optional-skills/review-board#main` を追加する。
+- 影響: `design-system-review` 撤去（2026-09-02）の受け皿だった lane 1 は global からは参照できなくなる。
