@@ -36,12 +36,6 @@ skill_models_for() {
   grep -E "^\| $1 " "$SKILL" | grep -oE 'gpt-(5\.6|6)-[a-z]+' | sort -u | tr '\n' ' '
 }
 
-@test "implement rejects a reviewer-tier model" {
-  run "$SCRIPT" implement "$PROJECT" gpt-5.6-sol "$PAYLOAD"
-  [ "$status" -eq 2 ]
-  [[ "$output" == *"not allowed for role implement"* ]]
-}
-
 @test "review rejects a worker-tier model" {
   run "$SCRIPT" review "$PROJECT" gpt-5.6-luna "$PAYLOAD"
   [ "$status" -eq 2 ]

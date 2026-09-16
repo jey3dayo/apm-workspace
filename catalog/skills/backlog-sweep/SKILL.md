@@ -59,7 +59,7 @@ tier 表・委譲判定・タスク分割基準・受領後の検証は `orchest
 - tier は**編成時に固定**する。既定 Worker を N 枚 + 昇格先を 1 枚。到着した行を性質で振り分けるだけにし、実行中に tier を組み替えない。編成の例:
   - `luna`×N + `opus`×1 — Claude orchestrator から Codex Worker を使う混成プール。platform を跨ぐが、**どのモデルを立てるかを選ぶのはユーザー**なので `orchestrator-worker`「モデル名の指定は跨ぐ明示指示にあたる」に合致する
   - `sonnet`×N + `opus`×1 — Claude で完結
-  - `luna`×N + `terra`×1 — Codex で完結
+  - `luna`×N + `sol`×1 — Codex で完結
 - 昇格先へ回すのは `orchestrator-worker` の昇格3条件（難しいデバッグ / セキュリティ境界 / 複数案のトレードオフ判断）に該当する行だけ。新しい条件を作らない
 - member 名は固定名を**再利用**する。tier が混在するプールでは `luna-worker-1`..`luna-worker-3` / `opus-worker-1` のようにモデル名を含めると、割当表を見るだけで tier が読める。task-scoped な名前を毎回作らない。文脈を保った Worker はキャッシュが効くぶん安く、前提の再説明も要らない
 - team は対象 repo 名と同一の永続 team。登録と検証の手順は `agmsg-delegation`「Worker を事前登録する」に従う

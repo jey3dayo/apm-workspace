@@ -27,7 +27,7 @@ description: >-
 | Steward   | 人間との対話・状態確認・説明・軽微修正。許可条件を満たすとき Orchestrator 機能（分解・Worker/Reviewer 起動・差分検証・最終報告）も担う | Opus / Sonnet（会話品質で Opus 推奨。限定ではない）   | `gpt-5.6-luna`                                                                                                         | 人間（pane）                                                                          |
 | Architect | 設計判断（後述 Q1 trigger 2〜4 の handoff 先）。常に Orchestrator 機能を担える                                                         | Fable / Opus                                          | `gpt-6-astra` / `gpt-5.6-sol` / `gpt-5.6-terra`                                                                        | 人間（pane）                                                                          |
 | Reviewer  | SHA 固定 code review / 設計文書 review                                                                                                 | Fable（明示指定時、fallback Opus）                    | `gpt-5.6-sol` 既定。読む量が多いレビューはコストを下げて `gpt-5.6-terra` + effort high。`gpt-6-astra` は明示指定時のみ | Orchestrator 機能を担う側（Steward または Architect）。spawn 経路と pane 経路の両方可 |
-| Worker    | 実装（設計済みタスク）                                                                                                                 | `sonnet`（Agent `implementer`、Worker の昇格 `opus`） | `gpt-5.6-luna` xhigh（Worker の昇格 max → `gpt-5.6-terra`）                                                            | Orchestrator 機能を担う側                                                             |
+| Worker    | 実装（設計済みタスク）                                                                                                                 | `sonnet`（Agent `implementer`、Worker の昇格 `opus`） | `gpt-5.6-luna` xhigh（難度の昇格は `gpt-5.6-sol`、長文脈の崖は `gpt-5.6-terra`）                                       | Orchestrator 機能を担う側                                                             |
 
 **「Orchestrator」は役ではなく機能。** 表の Steward / Architect のうち、後述の許可条件を満たす側が担う。Terra は Architect・Reviewer・Worker の昇格に就く。
 
@@ -208,18 +208,18 @@ Codex native の `spawn_agent` を標準経路とする。native spawn が利用
 - セキュリティ境界に触る変更、セキュリティレビュー
 - 複数案のトレードオフ判断を含む実装
 
-昇格先は platform ごとに固定する。
+昇格先は platform ごとに固定する。**昇格の理由が「難度」か「長文脈」かで行き先が変わる**ので、1 本の梯子にせず理由で分岐する。
 
-| platform | 既定 Worker          | 昇格手段（順に検討）                           |
-| -------- | -------------------- | ---------------------------------------------- |
-| Claude   | `sonnet`             | `model: "opus"` を呼び出し時に渡す             |
-| Codex    | `gpt-5.6-luna` xhigh | ① reasoning effort を max へ ② `gpt-5.6-terra` |
+| platform | 既定 Worker          | 難度で詰まったとき                 | 長文脈リコールの崖 |
+| -------- | -------------------- | ---------------------------------- | ------------------ |
+| Claude   | `sonnet`             | `model: "opus"` を呼び出し時に渡す | —                  |
+| Codex    | `gpt-5.6-luna` xhigh | effort を max へ → `gpt-5.6-sol`   | `gpt-5.6-terra`    |
 
-昇格先が現在のモデル自身になる場合（terra セッションで ② に達した場合など）も、**親 session がそのまま実装しない**。同じモデルの Worker を、別 identity・別 session として起動する。§5 の照合は成果物を独立に確かめることを前提にしており、起動側と実装側が同一 session だとその前提が崩れる（context も混ざる）。別 session を確保できない場合は `BLOCKED` とし、Architect へ handoff する。
+昇格先が現在のモデル自身になる場合（terra セッションが長文脈タスクで terra へ達した場合など）も、**親 session がそのまま実装しない**。同じモデルの Worker を、別 identity・別 session として起動する。§5 の照合は成果物を独立に確かめることを前提にしており、起動側と実装側が同一 session だとその前提が崩れる（context も混ざる）。別 session を確保できない場合は `BLOCKED` とし、Architect へ handoff する。
 
-昇格の順序（① effort → ② terra）は、価格差だけでなく能力差で決める。Terra は Luna と Sol の中間段として、長文脈などの能力崖を埋める価値を持つ（下記例外の MRCR 参照）。判断規則: ① Luna の effort を max まで上げる → ② Luna の既知の能力崖（長文脈リコールなど）に該当する場合、または ① を固定して検証した結果 Luna が不足した場合に限り Terra へ上げる。Sol へ直接飛ばすのは Sol 固有の要件がある場合に限り、Terra を中間段として省略しない。価格は変わりやすいため本文に固定値を置かず、② を選ぶ際は [公式 rate card](https://help.openai.com/en/articles/20001106-codex-rate-card) で現在値を確認する。Luna が安いことは無制限であることを意味しない——どの tier も共有クレジットプールと利用上限を消費する。`gpt-6-astra` は Worker の昇格先にしない。実装トークンを安い Worker へ隔離するという本スキルの目的が反転するため。
+難度が理由のときに Terra を中間段として挟まない。Terra は Sol より安く弱いため、上の 3 条件に対しては Sol より弱い段を 1 つ増やすことになる。挟んで足りなかったときに払うのは価格差ではなく、タスク 1 本分の作業と Orchestrator の再検証がもう一周ぶんである。「Terra では難度に足りない」という実測があるわけではなく、失敗した 1 周のコストが価格差より大きいという判断による。価格は変わりやすいため本文に固定値を置かず、昇格先を選ぶ際は [公式 rate card](https://help.openai.com/en/articles/20001106-codex-rate-card) で現在値を確認する。Luna が安いことは無制限であることを意味しない——どの tier も共有クレジットプールと利用上限を消費する。`gpt-6-astra` は Worker の昇格先にしない。実装トークンを安い Worker へ隔離するという本スキルの目的が反転するため。
 
-長文脈タスク（大規模コードベースの読解、複数文書の統合、長い履歴の追跡）は例外で、①を飛ばして直接 `gpt-5.6-terra` へ上げる。`luna` は長文脈リコールに崖があり（MRCR 41.3% / Sol 91.5% / Terra 89.6%、[OpenAI](https://openai.com/index/gpt-5-6)）、effort 引き上げで緩和されるという実測は公表されていない。terra セッション自身が長文脈タスクを受けた場合も、上の一般則どおり親 session では実装せず、別 identity・別 session の terra Worker を起動する。
+長文脈タスク（大規模コードベースの読解、複数文書の統合、長い履歴の追跡）は effort 引き上げを飛ばして直接 `gpt-5.6-terra` へ上げる。ここで Terra を選ぶのは能力不足を補うためではなく、Sol とほぼ同等の長文脈リコールを Sol より安く買うためである。`luna` は長文脈リコールに崖があり（MRCR 41.3% / Sol 91.5% / Terra 89.6%、[OpenAI](https://openai.com/index/gpt-5-6)）、effort 引き上げで緩和されるという実測は公表されていない。terra セッション自身が長文脈タスクを受けた場合も、上の一般則どおり親 session では実装せず、別 identity・別 session の terra Worker を起動する。
 
 Claude では独立タスクを**同一レスポンス内で複数呼び出す**と並列に走る（1レスポンス1呼び出しは直列になる）。Codex では worker を複数 detached 起動する（触るファイル集合が互いに素であることが前提。guardrails は `agmsg-delegation` を参照）。どちらも Orchestrator の会話履歴は引き継がせず、Section 3 で書き出した 3 点だけを渡す。
 
