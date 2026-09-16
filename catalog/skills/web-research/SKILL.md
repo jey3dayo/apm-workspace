@@ -34,7 +34,7 @@ For large tasks, spawn one subagent per subtopic with the Agent tool:
 - Instruct each subagent to:
   - Research one specific subtopic, stated without acronyms.
   - Follow this skill's Collection and Evidence Rules sections.
-  - Stay within roughly 3-5 searches.
+  - Stop when the subtopic's load-bearing claims each have a primary source; when one has none, report the gap instead of widening the search.
   - Write findings with key facts, quotes, and source URLs to `tmp/research_<topic>/findings_<subtopic>.md`.
 - After all subagents finish, read every findings file before synthesizing. The parent owns integration, the load-bearing re-check, evidence ranking, and citations.
 

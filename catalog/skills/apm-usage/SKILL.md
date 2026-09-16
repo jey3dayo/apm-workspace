@@ -236,8 +236,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
 - Before committing `apm.lock.yaml` after `mise run upgrade`, separate the intended dependency update from unrelated unpinned dependency drift. Report unrelated drift instead of hiding it inside the target dependency change.
 - When `apm.yml` includes a `gist.github.com/...#<sha>` dependency, verify the refreshed `apm.lock.yaml` record after `mise run upgrade` or any lock refresh. The workspace validator accepts APM's shortened `owner/<gist-id>` lock form as the same gist dependency, but the deployed target should still be checked before declaring the rollout complete.
 - If an upstream skill path is wrong, correct it to the real upstream path and treat the corrected successful install as the main result.
-- Treat known orphaned guidance or unrelated `manual-skills` deploy warnings as residual noise. Do not mention them in the final report when the command exits zero and the target skill source path, manifest or lock entry, and deployed target are correct.
-- Report deploy warnings only when they directly affect the skill changed in this task, its manifest entry, its `manual-skills` provenance, or the deploy exit code.
+- Report a deploy warning only when it affects the skill changed in this task, its manifest or lock entry, its `manual-skills` provenance, or the deploy exit code. Known orphaned guidance and unrelated `manual-skills` warnings are residual noise; leave them out of the final report.
 
 ## Fast Paths
 
