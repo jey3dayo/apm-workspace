@@ -22,14 +22,14 @@ description: >-
 
 ## 1. 自分の役を判定する
 
-| 役        | 職掌                                                                                                                                   | Claude                                                | Codex                                                                                                                  | 起動する側                                                                            |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Steward   | 人間との対話・状態確認・説明・軽微修正。許可条件を満たすとき Orchestrator 機能（分解・Worker/Reviewer 起動・差分検証・最終報告）も担う | Opus / Sonnet（会話品質で Opus 推奨。限定ではない）   | `gpt-5.6-luna`                                                                                                         | 人間（pane）                                                                          |
-| Architect | 設計判断（後述 Q1 trigger 2〜4 の handoff 先）。常に Orchestrator 機能を担える                                                         | Fable / Opus                                          | `gpt-6-astra` / `gpt-5.6-sol` / `gpt-5.6-terra`                                                                        | 人間（pane）                                                                          |
-| Reviewer  | SHA 固定 code review / 設計文書 review                                                                                                 | Fable（明示指定時、fallback Opus）                    | `gpt-5.6-sol` 既定。読む量が多いレビューはコストを下げて `gpt-5.6-terra` + effort high。`gpt-6-astra` は明示指定時のみ | Orchestrator 機能を担う側（Steward または Architect）。spawn 経路と pane 経路の両方可 |
-| Worker    | 実装（設計済みタスク）                                                                                                                 | `sonnet`（Agent `implementer`、Worker の昇格 `opus`） | `gpt-5.6-luna` xhigh（難度の昇格は `gpt-5.6-sol`、長文脈の崖は `gpt-5.6-terra`）                                       | Orchestrator 機能を担う側                                                             |
+| 役        | 職掌                                                                                                                                   | Claude                                                | Codex                                                                                                                  | opencode                                      | 起動する側                                                                            |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Steward   | 人間との対話・状態確認・説明・軽微修正。許可条件を満たすとき Orchestrator 機能（分解・Worker/Reviewer 起動・差分検証・最終報告）も担う | Opus / Sonnet（会話品質で Opus 推奨。限定ではない）   | `gpt-5.6-luna`                                                                                                         | —                                             | 人間（pane）                                                                          |
+| Architect | 設計判断（後述 Q1 trigger 2〜4 の handoff 先）。常に Orchestrator 機能を担える                                                         | Fable / Opus                                          | `gpt-6-astra` / `gpt-5.6-sol` / `gpt-5.6-terra`                                                                        | —                                             | 人間（pane）                                                                          |
+| Reviewer  | SHA 固定 code review / 設計文書 review                                                                                                 | Fable（明示指定時、fallback Opus）                    | `gpt-5.6-sol` 既定。読む量が多いレビューはコストを下げて `gpt-5.6-terra` + effort high。`gpt-6-astra` は明示指定時のみ | 不可（opencode は Reviewer に就けない）       | Orchestrator 機能を担う側（Steward または Architect）。spawn 経路と pane 経路の両方可 |
+| Worker    | 実装（設計済みタスク）                                                                                                                 | `sonnet`（Agent `implementer`、Worker の昇格 `opus`） | `gpt-5.6-luna` xhigh（難度の昇格は `gpt-5.6-sol`、長文脈の崖は `gpt-5.6-terra`）                                       | `deepseek/deepseek-v4-flash` `--variant high` | Orchestrator 機能を担う側                                                             |
 
-**「Orchestrator」は役ではなく機能。** 表の Steward / Architect のうち、後述の許可条件を満たす側が担う。Terra は Architect・Reviewer・Worker の昇格に就く。
+**「Orchestrator」は役ではなく機能。** 表の Steward / Architect のうち、後述の許可条件を満たす側が担う。Terra は Architect・Reviewer・Worker の昇格に就く。opencode は Worker 専用で、implement 以外の役には就けない（review も含む）。
 
 **Codex 側の Steward は `gpt-5.6-luna` のみで、明示ポリシーとして常に Orchestrator 機能を持たない。Codex Steward は handoff 専用と扱う。** Codex 側に Opus 相当の中間 tier（terra）を Steward に置くかはユーザー判断に委ね、本スキルでは追加しない。
 
@@ -210,10 +210,13 @@ Codex native の `spawn_agent` を標準経路とする。native spawn が利用
 
 昇格先は platform ごとに固定する。**昇格の理由が「難度」か「長文脈」かで行き先が変わる**ので、1 本の梯子にせず理由で分岐する。
 
-| platform | 既定 Worker          | 難度で詰まったとき                 | 長文脈リコールの崖 |
-| -------- | -------------------- | ---------------------------------- | ------------------ |
-| Claude   | `sonnet`             | `model: "opus"` を呼び出し時に渡す | —                  |
-| Codex    | `gpt-5.6-luna` xhigh | effort を max へ → `gpt-5.6-sol`   | `gpt-5.6-terra`    |
+| platform | 既定 Worker                                   | 難度で詰まったとき                                                                | 長文脈リコールの崖                        |
+| -------- | --------------------------------------------- | --------------------------------------------------------------------------------- | ----------------------------------------- |
+| Claude   | `sonnet`                                      | `model: "opus"` を呼び出し時に渡す                                                | —                                         |
+| Codex    | `gpt-5.6-luna` xhigh                          | effort を max へ → `gpt-5.6-sol`                                                  | `gpt-5.6-terra`                           |
+| opencode | `deepseek/deepseek-v4-flash` `--variant high` | 昇格ではなく経路差し替え。既存の Codex Luna 経路へ出す（§4 の差し替え契約を適用） | 計測まで対象外（既存の Terra 経路へ送る） |
+
+opencode 行の「難度で詰まったとき」は tier を上げる昇格ではない。opencode には昇格先の上位 tier が無く、Worker の昇格 3 条件（再現困難なデバッグ / セキュリティ境界 / トレードオフ判断）に当たるタスクはそもそも opencode へ出さず、既存の Claude / Codex 経路へ回す。`--variant max` で足りなかった場合に Codex Luna 経路へ出すのも同様に経路差し替えであり、差し替え先と理由を起動前にユーザーへ報告し、最終報告にも記す（§4 の「差し替え先と理由を…」契約と同じ扱い）。長文脈タスク（大規模コードベースの読解、複数文書の統合、長い履歴の追跡）は opencode の recall 実測が済むまで対象外とし、既存の Codex Terra 経路へ送る。
 
 昇格先が現在のモデル自身になる場合（terra セッションが長文脈タスクで terra へ達した場合など）も、**親 session がそのまま実装しない**。同じモデルの Worker を、別 identity・別 session として起動する。§5 の照合は成果物を独立に確かめることを前提にしており、起動側と実装側が同一 session だとその前提が崩れる（context も混ざる）。別 session を確保できない場合は `BLOCKED` とし、Architect へ handoff する。
 

@@ -64,10 +64,10 @@ Steward から Architect への昇格 handoff もこの書式を使う。
 
 共通 lifecycle は同一で、role によって安全契約と報告フォーマットが異なる。
 
-| role      | 起動する側                                                | spawn する相手                                              | 相手の権限                   | 報告   |
-| --------- | --------------------------------------------------------- | ----------------------------------------------------------- | ---------------------------- | ------ |
-| implement | Orchestrator 機能を担う側                                 | worker（model は `orchestrator-worker` の tier 表が正本）   | 対象 worktree の編集可       | DONE   |
-| review    | Orchestrator 機能を担う側。spawn 経路と pane 経路の両方可 | reviewer（model は `orchestrator-worker` の tier 表が正本） | read-only。編集・commit 禁止 | REVIEW |
+| role      | 起動する側                                                | spawn する相手                                                                                                                                             | 相手の権限                   | 報告   |
+| --------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- | ------ |
+| implement | Orchestrator 機能を担う側                                 | worker（model は `orchestrator-worker` の tier 表が正本。Claude / Codex に加え opencode（`deepseek/deepseek-v4-flash` のみ）も implement worker になれる） | 対象 worktree の編集可       | DONE   |
+| review    | Orchestrator 機能を担う側。spawn 経路と pane 経路の両方可 | reviewer（model は `orchestrator-worker` の tier 表が正本）。opencode は Reviewer に就けない                                                               | read-only。編集・commit 禁止 | REVIEW |
 
 review role の reviewer モデル指定は本スキル内の一時的な model override であり、`orchestrator-worker` の tier 対応表や既存 agent 定義（親モデル継承）を変更しない。model は helper の引数。選定は `orchestrator-worker` の「Reviewer の tier」が正本。
 
@@ -95,7 +95,11 @@ review role の reviewer モデル指定は本スキル内の一時的な model 
 | implement | `run-claude-worker.sh implement <project> <payload-file>` | `run-codex-worker.sh implement <project> <model> <payload-file>`（許可 model は `orchestrator-worker` の tier 表が正本。script が fail-closed で検証する） |
 | review    | `run-claude-worker.sh review <project> <payload-file>`    | `run-codex-worker.sh review <project> <model> <payload-file>`（許可 model は `orchestrator-worker` の tier 表が正本。script が fail-closed で検証する）    |
 
-helper の解決先は `~/.agents/skills/agmsg-delegation/scripts/`。両 runtime とも headless mode と stdin prompt を使い、対話 TUI と shell interpolation を避ける。`launch-worker.sh` は専用の一時ディレクトリに launchd job label・ログ・exit status を残して detached に起動する。helper が role から model / effort を固定し、caller は model を渡さない（Codex は起動時の引数）。`run-codex-worker.sh` は role ごとの model allowlist を fail-closed で検証し、不一致は起動前に exit 2 で拒否する。上書き変数は各 script の Usage / コメントを参照（値は scripts が正本）。
+opencode（implement のみ。review は不可）: `run-opencode-worker.sh implement <project> <model> <payload-file>`。許可 model は `deepseek/deepseek-v4-flash` の1つだけで、script が fail-closed で検証する。
+
+helper の解決先は `~/.agents/skills/agmsg-delegation/scripts/`。3 runtime とも headless mode と stdin/引数 prompt を使い、対話 TUI と shell interpolation を避ける。`launch-worker.sh` は専用の一時ディレクトリに launchd job label・ログ・exit status を残して detached に起動する。helper が role から model / effort を固定し、caller は model を渡さない（Codex / opencode は起動時の引数）。`run-codex-worker.sh` と `run-opencode-worker.sh` は role ごとの model allowlist を fail-closed で検証し、不一致は起動前に exit 2 で拒否する。上書き変数は各 script の Usage / コメントを参照（値は scripts が正本）。
+
+opencode helper の要点: mise shim ではなく実バイナリの絶対パス（`mise which opencode` で解決し、`AGMSG_OPENCODE_BIN` で上書き可）で起動し、専用 XDG 隔離と `OPENCODE_DISABLE_PROJECT_CONFIG=1` で project 側 MCP（bearer token を含む）を遮断したうえ、起動前に `opencode debug config` の mcp 件数を fail-closed で検査する（件数のみ確認し、キー名・値は出力しない）。credential は `auth.json` を渡さず `DEEPSEEK_API_KEY` を env で1つだけ渡す。書込境界は `run-claude-worker.sh` と同じ形の `sandbox-exec` 二層構成で強制し、詳細は script が正本。
 
 Claude helper は空の MCP 設定と `-p` を強制して workspace trust / MCP 確認を防ぎ、`--output-format stream-json --verbose` で無人実行中のイベントを worker log へ継続出力する。`bypassPermissions` は macOS sandbox 内だけで使い、implement は対象 project を書込可能集合へ加え、review は対象 project を deny する。実効集合は helper が正本。`sandbox-exec` が無い環境では安全契約を弱めず停止する。
 
