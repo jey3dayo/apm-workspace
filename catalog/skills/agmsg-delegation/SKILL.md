@@ -64,10 +64,10 @@ Steward から Architect への昇格 handoff もこの書式を使う。
 
 共通 lifecycle は同一で、role によって安全契約と報告フォーマットが異なる。
 
-| role      | 起動する側                                                | spawn する相手                                                                                                                                             | 相手の権限                   | 報告   |
-| --------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- | ------ |
-| implement | Orchestrator 機能を担う側                                 | worker（model は `orchestrator-worker` の tier 表が正本。Claude / Codex に加え opencode（`deepseek/deepseek-v4-flash` のみ）も implement worker になれる） | 対象 worktree の編集可       | DONE   |
-| review    | Orchestrator 機能を担う側。spawn 経路と pane 経路の両方可 | reviewer（model は `orchestrator-worker` の tier 表が正本）。opencode は Reviewer に就けない                                                               | read-only。編集・commit 禁止 | REVIEW |
+| role      | 起動する側                                                | spawn する相手                                                                                                                                                                                                                        | 相手の権限                   | 報告   |
+| --------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- | ------ |
+| implement | Orchestrator 機能を担う側                                 | worker（model は `orchestrator-worker` の tier 表が正本。Claude / Codex に加え opencode（`deepseek/deepseek-v4-flash` のみ）、cursor（`claude-sonnet-5-thinking-high` / `claude-opus-5-thinking-high`）も implement worker になれる） | 対象 worktree の編集可       | DONE   |
+| review    | Orchestrator 機能を担う側。spawn 経路と pane 経路の両方可 | reviewer（model は `orchestrator-worker` の tier 表が正本）。opencode は Reviewer に就けないが、cursor（`claude-fable-5-thinking-xhigh` 既定 / `claude-opus-5-thinking-high` / `gpt-5.6-sol-xhigh`）は就ける                          | read-only。編集・commit 禁止 | REVIEW |
 
 review role の reviewer モデル指定は本スキル内の一時的な model override であり、`orchestrator-worker` の tier 対応表や既存 agent 定義（親モデル継承）を変更しない。model は helper の引数。選定は `orchestrator-worker` の「Reviewer の tier」が正本。
 
@@ -86,20 +86,22 @@ review role の reviewer モデル指定は本スキル内の一時的な model 
 
 ### 1. Preflight
 
-- worker runtime の CLI 存在を確認: `command -v codex` / `command -v claude`。Claude は `command -v sandbox-exec` も必須
+- worker runtime の CLI 存在を確認: `command -v codex` / `command -v claude` / `~/.local/bin/cursor-agent`。Claude と cursor は `command -v sandbox-exec` も必須
 - agmsg bootstrap 済みを確認（`~/.agents/skills/agmsg/` が存在）。**state を持つ face は `~/.agents/skills/agmsg` だけである。** agmsg は `db` / `teams` を実行された script 自身の dir から解決し、上流の `SKILL.md` は全コマンドを `~/.agents/skills/agmsg/scripts/...` の絶対パスで書くため、`~/.claude/skills/agmsg` など他 face に `db` / `teams` が無いのは仕様であり不具合ではない。他 face へ手で symlink を張らない——deploy target の内側なので次の `apm apply` で消え、実体を書いた場合は save に吸い上げられず削除される。link の正本は `~/.apm` の `scripts/agmsg-state.sh`
 - role/runtime 別の起動コマンドを確定する。review は書込権限を実行時に強制する:
 
-| role      | Claude                                                    | Codex                                                                                                                                                      |
-| --------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| implement | `run-claude-worker.sh implement <project> <payload-file>` | `run-codex-worker.sh implement <project> <model> <payload-file>`（許可 model は `orchestrator-worker` の tier 表が正本。script が fail-closed で検証する） |
-| review    | `run-claude-worker.sh review <project> <payload-file>`    | `run-codex-worker.sh review <project> <model> <payload-file>`（許可 model は `orchestrator-worker` の tier 表が正本。script が fail-closed で検証する）    |
+| role      | Claude                                                    | Codex                                                                                                                                                      | cursor                                                                                                                                                      |
+| --------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| implement | `run-claude-worker.sh implement <project> <payload-file>` | `run-codex-worker.sh implement <project> <model> <payload-file>`（許可 model は `orchestrator-worker` の tier 表が正本。script が fail-closed で検証する） | `run-cursor-worker.sh implement <project> <model> <payload-file>`（許可 model は `orchestrator-worker` の tier 表が正本。script が fail-closed で検証する） |
+| review    | `run-claude-worker.sh review <project> <payload-file>`    | `run-codex-worker.sh review <project> <model> <payload-file>`（許可 model は `orchestrator-worker` の tier 表が正本。script が fail-closed で検証する）    | `run-cursor-worker.sh review <project> <model> <payload-file>`（許可 model は `orchestrator-worker` の tier 表が正本。script が fail-closed で検証する）    |
 
 opencode（implement のみ。review は不可）: `run-opencode-worker.sh implement <project> <model> <payload-file>`。許可 model は `deepseek/deepseek-v4-flash` の1つだけで、script が fail-closed で検証する。
 
-helper の解決先は `~/.agents/skills/agmsg-delegation/scripts/`。3 runtime とも headless mode と stdin/引数 prompt を使い、対話 TUI と shell interpolation を避ける。`launch-worker.sh` は専用の一時ディレクトリに launchd job label・ログ・exit status を残して detached に起動する。helper が role から model / effort を固定し、caller は model を渡さない（Codex / opencode は起動時の引数）。`run-codex-worker.sh` と `run-opencode-worker.sh` は role ごとの model allowlist を fail-closed で検証し、不一致は起動前に exit 2 で拒否する。上書き変数は各 script の Usage / コメントを参照（値は scripts が正本）。
+helper の解決先は `~/.agents/skills/agmsg-delegation/scripts/`。4 runtime とも headless mode と stdin/引数 prompt を使い、対話 TUI と shell interpolation を避ける。`launch-worker.sh` は専用の一時ディレクトリに launchd job label・ログ・exit status を残して detached に起動する。helper が role から model / effort を固定し、caller は model を渡さない（Codex / opencode / cursor は起動時の引数）。`run-codex-worker.sh` と `run-opencode-worker.sh` と `run-cursor-worker.sh` は role ごとの model allowlist を fail-closed で検証し、不一致は起動前に exit 2 で拒否する。上書き変数は各 script の Usage / コメントを参照（値は scripts が正本）。
 
 opencode helper の要点: mise shim ではなく実バイナリの絶対パス（`mise which opencode` で解決し、`AGMSG_OPENCODE_BIN` で上書き可）で起動し、専用 XDG 隔離と `OPENCODE_DISABLE_PROJECT_CONFIG=1` で project 側 MCP（bearer token を含む）を遮断したうえ、起動前に `opencode debug config` の mcp 件数を fail-closed で検査する（件数のみ確認し、キー名・値は出力しない）。credential は `auth.json` を渡さず `DEEPSEEK_API_KEY` を env で1つだけ渡す。書込境界は `run-claude-worker.sh` と同じ形の `sandbox-exec` 二層構成で強制し、詳細は script が正本。
+
+cursor helper の要点: 実体は `~/.local/bin/cursor-agent` → `~/.local/share/cursor-agent/versions/<ver>/cursor-agent` へ `readlink -f` で解決し（`AGMSG_CURSOR_BIN` で上書き可）、mise shim（`*/shims/*`）は opencode helper と同様に拒否する。`~/.cursor` と `<project>/.cursor` は全面 read 拒否する——`hooks.json` が `beforeShellExecution` / `preToolUse` / `postToolUse` を含む8イベントを定義しており、read を許すと worker が利用者の hook を実行するため。書込境界は `--sandbox enabled` ではなく `sandbox-exec` の二層構成で強制する（`--sandbox enabled --trust --force` は workspace 外への write を実測で止めなかった）。起動前に、生成した profile が期待内容と完全一致することを検証し、sandbox 下で `cursor-agent mcp list` が `No MCP servers configured` を返すことを capability check として確認する（境界成立の証拠ではない点は script のコメントを参照）。
 
 Claude helper は空の MCP 設定と `-p` を強制して workspace trust / MCP 確認を防ぎ、`--output-format stream-json --verbose` で無人実行中のイベントを worker log へ継続出力する。`bypassPermissions` は macOS sandbox 内だけで使い、implement は対象 project を書込可能集合へ加え、review は対象 project を deny する。実効集合は helper が正本。`sandbox-exec` が無い環境では安全契約を弱めず停止する。
 
@@ -134,8 +136,8 @@ Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、r
 
 ```bash
 ~/.agents/skills/agmsg/scripts/team.sh <team>   # 名前衝突を確認
-~/.agents/skills/agmsg/scripts/join.sh <team> <worker_name> <claude-code|codex> <対象project絶対パス>
-~/.agents/skills/agmsg/scripts/identities.sh <対象project絶対パス> <claude-code|codex>   # 登録を検証
+~/.agents/skills/agmsg/scripts/join.sh <team> <worker_name> <claude-code|codex|cursor> <対象project絶対パス>
+~/.agents/skills/agmsg/scripts/identities.sh <対象project絶対パス> <claude-code|codex|cursor>   # 登録を検証
 ```
 
 完了条件: 対象 project・runtime type を引数にした `identities.sh` の出力に、worker_name が exact に含まれる（出力は `team<TAB>agent` の2列で、project・runtime は引数側で固定される）。
@@ -196,7 +198,7 @@ READY 後も DONE / REVIEW だけを無期限に待たず、agmsg DB に届い�
 
 1. head SHA（+ diff ファイル方式なら checksum）が起動時と一致する
 2. 報告の `review_mode` が起動時に envelope へ書いた値と一致する（`advisory` を渡したのに `verdict` 行が返るのは契約違反）
-3. `review_mode: verdict` の場合、**起動前に強制境界の証拠を記録している**。spawn 経路なら helper による profile 配置と `cmp` 成功、pane 経路なら [references/resident-pool.md](references/resident-pool.md) の確認手順の記録
+3. `review_mode: verdict` の場合、**起動前に強制境界の証拠を記録している**。spawn 経路なら helper による profile 配置と `cmp` 成功、pane 経路なら [references/resident-pool.md](references/resident-pool.md) の確認手順の記録。**cursor 経路**では次の3点をすべて満たすことを証拠として記録する: (a) helper が生成した profile が期待内容と完全一致している、(b) preflight と本番 run が同一 profile・同一 canonical project で起動されている、(c) review profile 下の実 agent run で対象 project 内への write が拒否されファイルが実体として存在しないことを smoke 済みである
 4. reviewer の identity がレビュー対象の作者と異なる（approval gate は `orchestrator-worker` が正本）
 5. pane 常駐経路では加えて、`git status --short` と `git ls-files --others --exclude-standard` が review 開始時点と差分なし
 
