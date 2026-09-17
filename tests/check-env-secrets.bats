@@ -221,6 +221,13 @@ assert_scratch_clean() {
   assert_no_sentinel
 }
 
+@test "an escaped quote that still closes on the same line is accepted" {
+  printf 'HOST="a\\"b"\n' >"$REPO/.env.production"
+  stage_env .env.production
+  check
+  [ "$status" -eq 0 ]
+}
+
 @test "a backtick value is refused" {
   printf 'NOTE=`first\nSECRET_FRAGMENT=%s\nEND=last`\n' "$SENTINEL" >"$REPO/.env.production"
   stage_env .env.production
