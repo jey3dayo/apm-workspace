@@ -263,6 +263,10 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - edit `~/.apm/catalog/**`
    - run `mise run prepare:catalog`
    - review the diff, commit/push, then run `mise run install:catalog`
+   - after `install:catalog`, run `git diff apm.yml` — a ref-pinned `apm install -g <ref>`
+     rewrites `apm.yml` and can wrap the long `git:` gist URL onto two lines with a
+     trailing space, which fails `lint:yaml` and blocks `check` before `deploy:fresh`
+     ever reaches apply. Fold any wrapped `git:` line back to one line before continuing
 
 5. Upstream refresh:
    - run `mise run upgrade` to move dependencies that track a branch or tag
