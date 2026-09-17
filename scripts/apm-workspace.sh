@@ -1438,7 +1438,7 @@ manifest_external_skill_subset() {
   manifest_path="$WORKSPACE_DIR/apm.yml"
   [ -f "$manifest_path" ] || return 0
 
-  awk -v wanted="$target_ref" -f "$APM_AWK_DIR/manifest-skill-subset.awk" "$manifest_path"
+  awk -v wanted="$target_ref" -f "$APM_AWK_DIR/manifest-ref-normalize.awk" -f "$APM_AWK_DIR/manifest-skill-subset.awk" "$manifest_path"
 }
 
 # Looks up the `alias:` value declared alongside an object-form dependency
@@ -1452,7 +1452,7 @@ manifest_dependency_alias() {
   manifest_path="$WORKSPACE_DIR/apm.yml"
   [ -f "$manifest_path" ] || return 0
 
-  awk -v wanted="$target_ref" -f "$APM_AWK_DIR/manifest-dependency-alias.awk" "$manifest_path"
+  awk -v wanted="$target_ref" -f "$APM_AWK_DIR/manifest-ref-normalize.awk" -f "$APM_AWK_DIR/manifest-dependency-alias.awk" "$manifest_path"
 }
 
 manifest_external_reference_keys() {

@@ -958,26 +958,31 @@ function Get-ManifestExternalSkillSubset {
     return ($Line.Length - $Line.TrimStart(' ').Length)
   }
 
+  # The dependency list itself is always indented 4 spaces (matching the
+  # fixed indent scripts/lib/manifest-skill-subset.awk assumes), so the
+  # top-level-entry match must anchor to that indent. An unanchored `-\s+\S+`
+  # also matches the far-more-indented `skills:` list items themselves,
+  # resetting current_ref/current_candidate_keys before they are ever read.
   $result = New-Object System.Collections.Generic.List[string]
-  $currentReference = $null
+  $currentCandidateKeys = $null
   $inSkills = $false
   $skillsIndent = -1
   foreach ($line in (Get-Content -LiteralPath $manifestPath)) {
-    if ($line -match '^\s*-\s+git:\s+(\S+)\s*$') {
-      $currentReference = $Matches[1]
+    if ($line -match '^ {4}- git:\s+(\S+)\s*$') {
+      $currentCandidateKeys = Get-GitReferenceCandidateKeys -Reference $Matches[1]
       $inSkills = $false
       $skillsIndent = -1
       continue
     }
 
-    if ($line -match '^\s*-\s+\S+') {
-      $currentReference = $null
+    if ($line -match '^ {4}-\s+\S+') {
+      $currentCandidateKeys = $null
       $inSkills = $false
       $skillsIndent = -1
       continue
     }
 
-    if ($currentReference -ne $Reference) {
+    if ($null -eq $currentCandidateKeys -or -not $currentCandidateKeys.Contains($Reference)) {
       continue
     }
 

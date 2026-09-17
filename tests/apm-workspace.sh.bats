@@ -378,6 +378,28 @@ EOF
   rm -rf "$workspace_dir"
 }
 
+@test "manifest skill subset matches a full URL git: form the same as shorthand" {
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git
+      skills:
+        - design
+        - ui-ux-pro-max
+EOF
+  WORKSPACE_DIR="$workspace_dir"
+
+  # apm.lock.yaml's repo_url is recorded in canonical form (owner/repo), not
+  # the literal git: value the manifest author wrote, so lookups must match a
+  # full-URL git: entry against that canonical form too.
+  run manifest_external_skill_subset "nextlevelbuilder/ui-ux-pro-max-skill"
+  [ "$status" -eq 0 ]
+  [ "$output" = $'design\nui-ux-pro-max' ]
+
+  rm -rf "$workspace_dir"
+}
+
 @test "upgrade runs apm update non-interactively so agents and CI can drive it" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
   run assert_mise_upgrade "$tasks_json"

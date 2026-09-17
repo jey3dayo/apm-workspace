@@ -280,6 +280,27 @@ dependencies:
     $records[0].CanonicalReference | Should -Be "benjitaylor/agentation/skills/agentation"
   }
 
+  It "matches a manifest skill subset written as a full URL git: form the same as shorthand" {
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+    - git: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git
+      skills:
+        - design
+        - ui-ux-pro-max
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+
+    # apm.lock.yaml's repo_url is recorded in canonical form (owner/repo), not
+    # the literal git: value the manifest author wrote, so lookups must match
+    # a full-URL git: entry against that canonical form too.
+    $subset = @(Get-ManifestExternalSkillSubset -Reference "nextlevelbuilder/ui-ux-pro-max-skill")
+
+    $subset | Should -Be @("design", "ui-ux-pro-max")
+  }
+
   It "expands manual-skills package roots into copied skills" {
     $previousWorkspaceDir = $script:WorkspaceDir
     $previousGlobalWorkspaceDir = $global:WorkspaceDir
