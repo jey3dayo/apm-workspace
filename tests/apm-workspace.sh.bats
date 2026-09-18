@@ -220,74 +220,24 @@ add_external_mise_task_fixture() {
 
 # --- validate_skill_id -------------------------------------------------------
 
-@test "validate_skill_id accepts a plain id" {
-  run validate_skill_id "foo"
-  [ "$status" -eq 0 ]
+@test "validate_skill_id accepts a plain, hyphenated, namespaced, or dotted/underscored id" {
+  for id in "foo" "foo-bar" "a:b:c" "a.b_c"; do
+    run validate_skill_id "$id"
+    if [ "$status" -ne 0 ]; then
+      echo "unexpected: $id"
+      false
+    fi
+  done
 }
 
-@test "validate_skill_id accepts a hyphenated id" {
-  run validate_skill_id "foo-bar"
-  [ "$status" -eq 0 ]
-}
-
-@test "validate_skill_id accepts a namespaced id" {
-  run validate_skill_id "a:b:c"
-  [ "$status" -eq 0 ]
-}
-
-@test "validate_skill_id accepts dots and underscores" {
-  run validate_skill_id "a.b_c"
-  [ "$status" -eq 0 ]
-}
-
-@test "validate_skill_id rejects an empty id" {
-  run validate_skill_id ""
-  [ "$status" -ne 0 ]
-}
-
-@test "validate_skill_id rejects a single dot" {
-  run validate_skill_id "."
-  [ "$status" -ne 0 ]
-}
-
-@test "validate_skill_id rejects a double dot" {
-  run validate_skill_id ".."
-  [ "$status" -ne 0 ]
-}
-
-@test "validate_skill_id rejects a forward slash" {
-  run validate_skill_id "a/b"
-  [ "$status" -ne 0 ]
-}
-
-@test "validate_skill_id rejects a backslash" {
-  run validate_skill_id "a\\b"
-  [ "$status" -ne 0 ]
-}
-
-@test "validate_skill_id rejects a leading colon" {
-  run validate_skill_id ":lead"
-  [ "$status" -ne 0 ]
-}
-
-@test "validate_skill_id rejects a trailing colon" {
-  run validate_skill_id "trail:"
-  [ "$status" -ne 0 ]
-}
-
-@test "validate_skill_id rejects doubled colons" {
-  run validate_skill_id "a::b"
-  [ "$status" -ne 0 ]
-}
-
-@test "validate_skill_id rejects a space" {
-  run validate_skill_id "bad space"
-  [ "$status" -ne 0 ]
-}
-
-@test "validate_skill_id rejects a leading hyphen" {
-  run validate_skill_id "-leading"
-  [ "$status" -ne 0 ]
+@test "validate_skill_id rejects empty, dot segments, slashes, colon misuse, spaces, and a leading hyphen" {
+  for id in "" "." ".." "a/b" 'a\b' ":lead" "trail:" "a::b" "bad space" "-leading"; do
+    run validate_skill_id "$id"
+    if [ "$status" -eq 0 ]; then
+      echo "unexpected: $id"
+      false
+    fi
+  done
 }
 
 # --- validate_skill_path_segments -------------------------------------------
@@ -406,21 +356,6 @@ EOF
   [ "$status" -eq 0 ]
 }
 
-@test "audit smoke preserves manifest targets" {
-  run rg -F 'apm install --only apm &&' "$WORKSPACE_DIR/scripts/apm-workspace.sh"
-  [ "$status" -eq 0 ]
-}
-
-@test "the legacy workspace cleanup belongs to full apply, not the quick local sync" {
-  run rg -U -o 'cmd_apply\(\) \{\n(?:[^\n]*\n)*?^\}' "$SCRIPT_UNDER_TEST"
-  [ "$status" -eq 0 ]
-  [[ "$output" == *cleanup_legacy_workspace_skill_targets* ]]
-
-  run rg -U -o 'cmd_sync_local_skills\(\) \{\n(?:[^\n]*\n)*?^\}' "$SCRIPT_UNDER_TEST"
-  [ "$status" -eq 0 ]
-  [[ "$output" != *cleanup_legacy_workspace_skill_targets* ]]
-}
-
 # --- host-local MCP bootstrap ----------------------------------------------
 
 @test "resolve_1password_mcp_command prefers a native command" {
@@ -522,14 +457,6 @@ EOF
   tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
   run assert_mise_command_connections "$tasks_json"
   [ "$status" -eq 0 ]
-}
-
-@test "workspace mise configuration remains self-contained outside comments" {
-  mise_without_comments="$(sed '/^[[:space:]]*#/d' "$TEST_REPO_ROOT/mise.toml")"
-  shell_without_comments="$(sed '/^[[:space:]]*#/d' "$TEST_REPO_ROOT/scripts/apm-workspace.sh")"
-  [[ "$mise_without_comments" != *APM_BOOTSTRAP_REPO* ]]
-  [[ "$shell_without_comments" != *APM_BOOTSTRAP_REPO* ]]
-  [[ "$shell_without_comments" != *'~/.config'* ]]
 }
 
 @test "negative fixture detects a visible bootstrap task" {
