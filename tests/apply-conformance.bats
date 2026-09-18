@@ -12,37 +12,83 @@
 # PowerShell counterpart (tests/apply-conformance.Tests.ps1) currently
 # drifts from this order and keeps its matching assertions skipped until
 # plans/apply-core-phase1-ps-parity.md lands.
+#
+# The 5 success-path assertions below all check the same single apply run,
+# so setup_file() runs it once (macOS pays a Gatekeeper assessment on each
+# newly-written stub executable's first exec, which used to happen once per
+# test) and every success test only reads its result. Tests that need a
+# pre-apply seed (stale skill dir, stale swap backup) still build and run
+# their own fixture, since seeding would otherwise corrupt the shared one
+# for every other test.
 
-setup() {
+setup_file() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
+  export REPO_ROOT
   FIXTURE_LIB="$REPO_ROOT/tests/conformance/build-fixture.sh"
-  FIXTURE_BASE="$(mktemp -d)"
+  export FIXTURE_LIB
+
+  FIXTURE_SHARED_BIN_DIR="$(mktemp -d)"
+  export FIXTURE_SHARED_BIN_DIR
   source "$FIXTURE_LIB"
-  build_apply_fixture "$FIXTURE_BASE"
+  build_apply_stubs "$FIXTURE_SHARED_BIN_DIR" "$FIXTURE_SHARED_BIN_DIR/default-calls.log"
+
+  FIXTURE_SHARED_BASE="$(mktemp -d)"
+  export FIXTURE_SHARED_BASE
+  build_apply_fixture "$FIXTURE_SHARED_BASE" "$FIXTURE_SHARED_BIN_DIR"
+  export FIXTURE_SHARED_HOME="$FIXTURE_HOME"
+  export FIXTURE_SHARED_WORKSPACE_DIR="$FIXTURE_WORKSPACE_DIR"
+  export FIXTURE_SHARED_CALL_LOG="$FIXTURE_CALL_LOG"
+  export FIXTURE_SHARED_PRIVATE_SKILL_DIR="$FIXTURE_PRIVATE_SKILL_DIR"
+
+  FIXTURE_SHARED_OUTPUT_FILE="$FIXTURE_SHARED_BASE/apply-output.txt"
+  export FIXTURE_SHARED_OUTPUT_FILE
+
+  set +e
+  HOME="$FIXTURE_SHARED_HOME" \
+    PATH="$FIXTURE_SHARED_BIN_DIR:$PATH" \
+    APM_WORKSPACE_DIR="$FIXTURE_SHARED_WORKSPACE_DIR" \
+    FIXTURE_CALL_LOG="$FIXTURE_SHARED_CALL_LOG" \
+    bash "$REPO_ROOT/scripts/apm-workspace.sh" apply >"$FIXTURE_SHARED_OUTPUT_FILE" 2>&1
+  FIXTURE_SHARED_STATUS=$?
+  set -e
+  export FIXTURE_SHARED_STATUS
+}
+
+teardown_file() {
+  rm -rf "$FIXTURE_SHARED_BASE" "$FIXTURE_SHARED_BIN_DIR"
 }
 
 teardown() {
-  rm -rf "$FIXTURE_BASE"
+  if [ -n "${FIXTURE_BASE:-}" ]; then
+    rm -rf "$FIXTURE_BASE"
+  fi
+}
+
+# Fresh private fixture reusing the shared stub bin dir, for tests that seed state before apply runs.
+build_own_fixture() {
+  source "$FIXTURE_LIB"
+  FIXTURE_BASE="$(mktemp -d)"
+  build_apply_fixture "$FIXTURE_BASE" "$FIXTURE_SHARED_BIN_DIR"
 }
 
 run_apply() {
   HOME="$FIXTURE_HOME" \
     PATH="$FIXTURE_BIN_DIR:$PATH" \
     APM_WORKSPACE_DIR="$FIXTURE_WORKSPACE_DIR" \
+    FIXTURE_CALL_LOG="$FIXTURE_CALL_LOG" \
     bash "$REPO_ROOT/scripts/apm-workspace.sh" apply
 }
 
 @test "bash apply: succeeds against the conformance fixture" {
-  run run_apply
-  [ "$status" -eq 0 ]
+  cat "$FIXTURE_SHARED_OUTPUT_FILE"
+  [ "$FIXTURE_SHARED_STATUS" -eq 0 ]
 }
 
 @test "bash apply: calls apm install before apm compile (steps 2 then 4)" {
-  run run_apply
-  [ "$status" -eq 0 ]
+  [ "$FIXTURE_SHARED_STATUS" -eq 0 ]
 
-  install_line=$(grep -n '^apm install' "$FIXTURE_CALL_LOG" | head -1 | cut -d: -f1)
-  compile_line=$(grep -n '^apm compile' "$FIXTURE_CALL_LOG" | head -1 | cut -d: -f1)
+  install_line=$(grep -n '^apm install' "$FIXTURE_SHARED_CALL_LOG" | head -1 | cut -d: -f1)
+  compile_line=$(grep -n '^apm compile' "$FIXTURE_SHARED_CALL_LOG" | head -1 | cut -d: -f1)
 
   [ -n "$install_line" ]
   [ -n "$compile_line" ]
@@ -50,41 +96,38 @@ run_apply() {
 }
 
 @test "bash apply: deploys the managed catalog skill to every runtime target" {
-  run run_apply
-  [ "$status" -eq 0 ]
+  [ "$FIXTURE_SHARED_STATUS" -eq 0 ]
 
-  [ -f "$FIXTURE_HOME/.claude/skills/sample-skill/SKILL.md" ]
-  [ -f "$FIXTURE_HOME/.agents/skills/sample-skill/SKILL.md" ]
+  [ -f "$FIXTURE_SHARED_HOME/.claude/skills/sample-skill/SKILL.md" ]
+  [ -f "$FIXTURE_SHARED_HOME/.agents/skills/sample-skill/SKILL.md" ]
 }
 
 @test "bash apply: runtime asset distribution (step 5) overwrites the compiled Codex output (step 4)" {
-  run run_apply
-  [ "$status" -eq 0 ]
+  [ "$FIXTURE_SHARED_STATUS" -eq 0 ]
 
   # compile_codex (step 4) writes the fixture apm stub's dummy compile
   # marker to ~/.codex/AGENTS.md; sync_managed_catalog_runtime_assets +
   # sync_pi_instructions (step 5) then copies the tracked catalog
   # instructions over the same path. Seeing the catalog instructions text
   # survive is only possible if step 5 really ran after step 4.
-  [ "$(cat "$FIXTURE_HOME/.codex/AGENTS.md")" = "# instructions" ]
+  [ "$(cat "$FIXTURE_SHARED_HOME/.codex/AGENTS.md")" = "# instructions" ]
 }
 
 @test "bash apply: private skill overlay (step 8) survives the managed skill swap (step 6)" {
-  run run_apply
-  [ "$status" -eq 0 ]
+  [ "$FIXTURE_SHARED_STATUS" -eq 0 ]
 
   # replace_skill_targets_from_stage (step 6) does a full-tree swap of each
   # runtime target's skills root from the managed-only stage. If the private
   # overlay (step 8, sync_private_skills_into_targets) ran before the swap
   # instead of after, the swap would silently wipe it back out. Both the
   # managed skill and the private skill need to be present afterward.
-  [ -d "$FIXTURE_HOME/.agents/skills/sample-skill" ]
-  [ -d "$FIXTURE_HOME/.agents/skills/sample-private-skill" ]
+  [ -d "$FIXTURE_SHARED_HOME/.agents/skills/sample-skill" ]
+  [ -d "$FIXTURE_SHARED_HOME/.agents/skills/sample-private-skill" ]
 
-  [ -d "$FIXTURE_HOME/.claude/skills/sample-skill" ]
-  [ -L "$FIXTURE_HOME/.claude/skills/sample-private-skill" ]
-  link_target=$(readlink "$FIXTURE_HOME/.claude/skills/sample-private-skill")
-  [ "$link_target" = "$FIXTURE_PRIVATE_SKILL_DIR" ]
+  [ -d "$FIXTURE_SHARED_HOME/.claude/skills/sample-skill" ]
+  [ -L "$FIXTURE_SHARED_HOME/.claude/skills/sample-private-skill" ]
+  link_target=$(readlink "$FIXTURE_SHARED_HOME/.claude/skills/sample-private-skill")
+  [ "$link_target" = "$FIXTURE_SHARED_PRIVATE_SKILL_DIR" ]
 }
 
 @test "bash apply: does not recreate the skills root directory itself" {
@@ -95,6 +138,8 @@ run_apply() {
   # apply and record the root's inode: if apply is still recreating the root,
   # the inode changes; if it only reconciles children, the inode is stable
   # and the stale (unstaged) skill is still removed.
+  build_own_fixture
+
   mkdir -p "$FIXTURE_HOME/.agents/skills/stale-skill" "$FIXTURE_HOME/.claude/skills/stale-skill"
   agents_root_inode_before=$(ls -di "$FIXTURE_HOME/.agents/skills" | awk '{print $1}')
   claude_root_inode_before=$(ls -di "$FIXTURE_HOME/.claude/skills" | awk '{print $1}')
@@ -118,6 +163,8 @@ run_apply() {
   # staging/backup dirs on the success and handled-failure paths, not a hard
   # kill mid-swap) to prove reconcile_skills_root_from_stage sweeps these
   # explicitly now that it no longer replaces the whole root wholesale.
+  build_own_fixture
+
   mkdir -p "$FIXTURE_HOME/.agents/skills/.apm-skills-backup.99999"
   echo "stale" >"$FIXTURE_HOME/.agents/skills/.apm-skills-backup.99999/leftover"
 

@@ -16,23 +16,20 @@
 # Usage sourced:      build_apply_fixture <base_dir>  (sets the vars below)
 set -euo pipefail
 
-build_apply_fixture() {
-  base_dir="$1"
-  mkdir -p "$base_dir"
-
-  home_dir="$base_dir/home"
-  mkdir -p "$home_dir/.agents/skills" "$home_dir/.claude/skills" "$home_dir/.codex"
-
-  bin_dir="$base_dir/bin"
+# Writes the apm/git/codex recording stubs to $1. Every stub resolves its
+# log path at runtime as `${FIXTURE_CALL_LOG:-$2}` so a caller sharing one
+# stub set across fixtures (Gatekeeper only assesses a new executable file
+# once) can still route each run's call log to that run's own fixture by
+# exporting FIXTURE_CALL_LOG before invoking apply.
+build_apply_stubs() {
+  bin_dir="$1"
+  default_call_log="$2"
   mkdir -p "$bin_dir"
-
-  call_log="$base_dir/calls.log"
-  : >"$call_log"
 
   git_bin="$bin_dir/git"
   cat >"$git_bin" <<STUB
 #!/usr/bin/env bash
-printf 'git %s\n' "\$*" >>"$call_log"
+printf 'git %s\n' "\$*" >>"\${FIXTURE_CALL_LOG:-$default_call_log}"
 exit 0
 STUB
   chmod +x "$git_bin"
@@ -40,7 +37,7 @@ STUB
   codex_bin="$bin_dir/codex"
   cat >"$codex_bin" <<STUB
 #!/usr/bin/env bash
-printf 'codex %s\n' "\$*" >>"$call_log"
+printf 'codex %s\n' "\$*" >>"\${FIXTURE_CALL_LOG:-$default_call_log}"
 exit 0
 STUB
   chmod +x "$codex_bin"
@@ -53,7 +50,7 @@ STUB
   apm_bin="$bin_dir/apm"
   cat >"$apm_bin" <<STUB
 #!/usr/bin/env bash
-printf 'apm %s\n' "\$*" >>"$call_log"
+printf 'apm %s\n' "\$*" >>"\${FIXTURE_CALL_LOG:-$default_call_log}"
 
 output_path=""
 prev_arg=""
@@ -72,6 +69,28 @@ fi
 exit 0
 STUB
   chmod +x "$apm_bin"
+}
+
+# $2 (optional): an already-built stub bin dir (from build_apply_stubs) to
+# reuse instead of writing a fresh one. Every other part of the fixture
+# (home/, workspace/, calls.log) is still built fresh under $1.
+build_apply_fixture() {
+  base_dir="$1"
+  shared_bin_dir="${2:-}"
+  mkdir -p "$base_dir"
+
+  home_dir="$base_dir/home"
+  mkdir -p "$home_dir/.agents/skills" "$home_dir/.claude/skills" "$home_dir/.codex"
+
+  call_log="$base_dir/calls.log"
+  : >"$call_log"
+
+  if [ -n "$shared_bin_dir" ]; then
+    bin_dir="$shared_bin_dir"
+  else
+    bin_dir="$base_dir/bin"
+    build_apply_stubs "$bin_dir" "$call_log"
+  fi
 
   workspace_dir="$base_dir/workspace"
   mkdir -p "$workspace_dir/.git"
