@@ -958,11 +958,9 @@ function Get-ManifestExternalSkillSubset {
     return ($Line.Length - $Line.TrimStart(' ').Length)
   }
 
-  # The dependency list itself is always indented 4 spaces (matching the
-  # fixed indent scripts/lib/manifest-skill-subset.awk assumes), so the
-  # top-level-entry match must anchor to that indent. An unanchored `-\s+\S+`
-  # also matches the far-more-indented `skills:` list items themselves,
-  # resetting current_ref/current_candidate_keys before they are ever read.
+  # Anchored to the fixed 4-space indent manifest-skill-subset.awk assumes --
+  # unanchored, `-\s+\S+` also matches deeper-indented `skills:` items and
+  # resets the candidate keys before they're read.
   $result = New-Object System.Collections.Generic.List[string]
   $currentCandidateKeys = $null
   $inSkills = $false
