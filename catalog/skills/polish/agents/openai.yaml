@@ -1,0 +1,4 @@
+interface:
+  display_name: "Polish"
+  short_description: "Align the branch diff with the development principles before opening a PR"
+  default_prompt: "Use $polish to check the added lines against the base branch and fix comments, tests, type escapes, swallowed errors, and excess diff."

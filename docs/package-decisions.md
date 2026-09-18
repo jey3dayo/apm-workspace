@@ -541,3 +541,10 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 - 正本: `optional-skills/review-board/`
 - 再導入: 利用リポジトリで `jey3dayo/apm-workspace/optional-skills/review-board#main` を追加する。
 - 影響: `design-system-review` 撤去（2026-09-02）の受け皿だった lane 1 は global からは参照できなくなる。
+
+## `polish` を新規追加（2026-09-18）
+
+- 2026-09-02 に撤去した旧 `polish`（lint / format / test の自動修正ループ）とは別物。旧版の本体は DoD に吸収済みで復活させない。
+- 追加理由: PR 前に「diff のコメント圧縮・テストの実装詳細依存の除去」を毎回プロンプト手打ちで依頼していた。原則は global `AGENTS.md` にあるが、いまの diff へ適用する導線が無かった。
+- 形: user-invoked（`disable-model-invocation: true`）で context load ゼロ。原則本文は写さず `AGENTS.md` を正本とし、skill は範囲確定・観点表の全行適用・報告の手順と完了条件だけを持つ。観点は 1 行 = 1 観点の表で、追加は行追加のみ。
+- 初期観点: コメント / テスト / lint disable / 型逃げ / エラー握りつぶし / 過剰な差分 / 不要ファイル。依存・lockfile の無断変更、設定ファイルのメタコメント、既存テスト削除は該当 PR が少なく目視で拾えるため初期から外した。

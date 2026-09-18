@@ -51,7 +51,7 @@
 
 - APM・環境運用: `apm-usage`, `apm-repo-manifest`, `mise`,
   `dotenvx`, `1password`, `herdr`
-- レビュー・品質: `review-fix-loop`, `quiet-command-auditor`
+- レビュー・品質: `review-fix-loop`, `quiet-command-auditor`, `polish`
 - デザイン: `design-md-workflow`
 - リファクタリング・解析: `refactoring`, `similarity`
 - ドキュメント: `docs-manager`, `docs-review`,
