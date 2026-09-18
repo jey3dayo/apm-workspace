@@ -4,7 +4,7 @@ set -euo pipefail
 # Fanning the suites out is safe because each file pins HOME into its own
 # fixtures.
 if [ "${APM_TEST_PARALLEL:-1}" = "0" ]; then
-  exec pwsh -NoProfile -Command "Invoke-Pester -Path tests -CI -Output Detailed"
+  exec pwsh -NoProfile -Command "\$c = New-PesterConfiguration; \$c.Run.Path = 'tests'; \$c.Run.Exit = \$true; \$c.Output.Verbosity = 'Detailed'; Invoke-Pester -Configuration \$c"
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
