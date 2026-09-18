@@ -20,7 +20,7 @@ Work from the consequences outward:
 - Correctness and safety: bugs, unhandled error paths, race conditions, input validation, authentication and authorization gaps, data exposure. These are blocking.
 - Architecture and design: dependency direction and layer boundaries, whether the abstraction fits the problem without over-engineering, API clarity and backward compatibility, how the domain is modeled.
 - Implementation quality: naming, readability, error handling that propagates meaning rather than swallowing, performance where the data size makes it matter, test coverage and whether the tests exercise behavior rather than implementation details.
-- Maintainability: duplication, complexity, and whether comments and docs explain the why.
+- Maintainability: duplication, complexity, and whether comments and docs carry their weight. A missing rationale on a non-obvious constraint or contract is a finding; so is a comment that restates the code, labels steps a name could carry, or runs past one or two lines where the project's convention is brevity.
 
 Language specifics worth checking: in TypeScript, no `any`, minimal assertions, correct Promise handling, React hook rules; in Go, explicit wrapped errors, goroutine and channel safety, small interfaces; in Python, type hints, context managers, pytest idioms. Run the project's static checks (`tsc --noEmit`, `eslint`, `go vet`, `golangci-lint`, `mypy`) when a finding depends on them rather than guessing at their output.
 
