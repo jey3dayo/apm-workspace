@@ -16,10 +16,17 @@ setup() {
   # cursor-agent 本体を起動させない。allowlist / profile 生成は引数検証と
   # ファイル出力だけなので、実行前に exit させる。
   export AGMSG_CURSOR_BIN="$REPO_ROOT/tests/does-not-exist-cursor-agent"
+  STUB_DIR="$(mktemp -d)"
+  # sandbox-exec が無い環境では最小スタブへ fallback させ、Linux CI でも launch
+  # 経路を検証する。PATH の末尾に置くのは、下の mcp capability check が実
+  # sandbox-exec の read 拒否に依存していて、先頭だとスタブが本物を隠すため。
+  printf '#!/bin/sh\nif [ "$1" = "-f" ]; then shift 2; fi\nexec "$@"\n' >"$STUB_DIR/sandbox-exec"
+  chmod +x "$STUB_DIR/sandbox-exec"
+  export PATH="$PATH:$STUB_DIR"
 }
 
 teardown() {
-  rm -rf -- "$PROJECT" "$PAYLOAD"
+  rm -rf -- "$PROJECT" "$PAYLOAD" "$STUB_DIR"
 }
 
 # tier 表の Worker / Reviewer 行から cursor の model ID を取り出す。
@@ -33,11 +40,6 @@ skill_models_for() {
 # script が role ごとに許可している model を取り出す
 script_models_for() {
   sed -n "s/^$1) allowed_models=(\(.*\)) ;;$/\1/p" "$SCRIPT"
-}
-
-require_sandbox_exec() {
-  command -v sandbox-exec >/dev/null 2>&1 \
-    || skip "sandbox-exec is macOS-only; the launch path cannot be exercised here"
 }
 
 @test "implement with an allowed model passes the allowlist and fails later, not at validation" {
@@ -151,7 +153,6 @@ require_sandbox_exec() {
 }
 
 @test "cursor-agent binary is required to exist for a real launch (default path resolution rejected)" {
-  require_sandbox_exec
   # デフォルト解決先を使わせ、実体が無い環境では起動時に exit 1 になることを確認する
   # (allowlist・profile 生成は通過済みであることを exit != 2 で確認する)。
   run env -u AGMSG_CURSOR_BIN "$SCRIPT" implement "$PROJECT" claude-sonnet-5-thinking-high "$PAYLOAD"
@@ -163,7 +164,6 @@ require_sandbox_exec() {
 }
 
 @test "AGMSG_CURSOR_BIN pointing at a mise-shim-shaped path is rejected" {
-  require_sandbox_exec
   local shim_dir="$PROJECT/shims"
   mkdir -p "$shim_dir"
   local shim="$shim_dir/cursor-agent"
@@ -178,7 +178,6 @@ SH
 }
 
 @test "AGMSG_CURSOR_VERIFIED_VERSION mismatch is rejected before launch" {
-  require_sandbox_exec
   local stub_dir stub
   stub_dir="$(mktemp -d)"
   stub="$stub_dir/cursor-agent"
@@ -199,7 +198,6 @@ SH
 }
 
 @test "a matching AGMSG_CURSOR_VERIFIED_VERSION passes the version gate and reaches the mcp capability check" {
-  require_sandbox_exec
   local stub_dir stub
   stub_dir="$(mktemp -d)"
   stub="$stub_dir/cursor-agent"
@@ -223,7 +221,6 @@ SH
 }
 
 @test "a stub reporting a non-empty mcp list is rejected (fail-closed capability check)" {
-  require_sandbox_exec
   local stub_dir stub
   stub_dir="$(mktemp -d)"
   stub="$stub_dir/cursor-agent"
