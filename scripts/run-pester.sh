@@ -28,7 +28,10 @@ for file in "${files[@]}"; do
   names+=("$name")
   # PowerShell single-quoted strings escape an embedded ' by doubling it.
   escaped_file="${file//\'/\'\'}"
-  pwsh -NoProfile -Command "Invoke-Pester -Path '$escaped_file' -CI -Output Detailed" \
+  # -CI would also enable Pester's TestResult report, whose default OutputPath
+  # is a relative testResults.xml, so every parallel suite would write the same
+  # file. Set Run.Exit directly instead.
+  pwsh -NoProfile -Command "\$c = New-PesterConfiguration; \$c.Run.Path = '$escaped_file'; \$c.Run.Exit = \$true; \$c.Output.Verbosity = 'Detailed'; Invoke-Pester -Configuration \$c" \
     >"$log_dir/$name.log" 2>&1 &
   pids+=("$!")
 done
