@@ -15,22 +15,33 @@
 
 SENTINEL="SENTINEL-VALUE-MUST-NOT-LEAK"
 
+setup_file() {
+  # ユーザーの global gitignore が `.env*` を無視していると、fixture が untracked
+  # にも tracked にもならず全ケースが 0 になる。テストは環境から切り離す。
+  export GIT_CONFIG_GLOBAL=/dev/null
+  export GIT_CONFIG_SYSTEM=/dev/null
+  TEMPLATE="$BATS_FILE_TMPDIR/template"
+  mkdir -p "$TEMPLATE"
+  git -C "$TEMPLATE" init -q .
+  git -C "$TEMPLATE" config core.excludesFile /dev/null
+  printf 'x\n' >"$TEMPLATE/README"
+  git -C "$TEMPLATE" add README
+  git -C "$TEMPLATE" -c user.email=t@example -c user.name=t commit -qm init
+}
+
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
   SCRIPT="$REPO_ROOT/catalog/skills/atomic-commit/scripts/check-env-secrets.sh"
   REPO="$BATS_TEST_TMPDIR/repo"
   # helper の一時物が残らないことを見るため、専用の TMPDIR を与える。
   SCRATCH="$BATS_TEST_TMPDIR/scratch"
-  mkdir -p "$REPO" "$SCRATCH"
-  # ユーザーの global gitignore が `.env*` を無視していると、fixture が untracked
-  # にも tracked にもならず全ケースが 0 になる。テストは環境から切り離す。
+  mkdir -p "$SCRATCH"
   export GIT_CONFIG_GLOBAL=/dev/null
   export GIT_CONFIG_SYSTEM=/dev/null
-  git -C "$REPO" init -q .
-  git -C "$REPO" config core.excludesFile /dev/null
-  printf 'x\n' >"$REPO/README"
-  git -C "$REPO" add README
-  git -C "$REPO" -c user.email=t@example -c user.name=t commit -qm init
+  TEMPLATE="$BATS_FILE_TMPDIR/template"
+  cp -R "$TEMPLATE" "$REPO"
+  # cp -R で index の stat 情報が変わり dirty に見えるため、比較のみで吸収する。
+  git -C "$REPO" update-index --refresh -q >/dev/null 2>&1 || true
 }
 
 check() {
