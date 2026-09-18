@@ -10,7 +10,7 @@ argument-hint: "[base-ref]"
 
 PR 前に、このブランチで**追加・変更した行だけ**を観点表の全行へ照らして直す。原則の本文は global `AGENTS.md` / `CLAUDE.md` の「開発原則」「禁止事項」「ファイル操作原則」が正本で、ここには写さない。判断に迷ったらそちらを読む。
 
-lint / format / test のループは対象外（DoD が持つ）。base より前から存在する行も対象外で、diff の外に気づいた問題は報告に列挙するだけで触らない。
+lint / format / test のループは対象外（DoD が持つ）。再利用・効率・altitude（root cause の深さ）は built-in `/simplify` が持つ。base より前から存在する行も対象外で、diff の外に気づいた問題は報告に列挙するだけで触らない。
 
 ## 手順
 
