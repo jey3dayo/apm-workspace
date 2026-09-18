@@ -16,9 +16,24 @@ lint / format / test のループは対象外（DoD が持つ）。base より�
 
 ### 1. 範囲確定
 
-- base は引数、無ければ `gh pr view --json baseRefName` → upstream の default branch の順で決める
-- `git diff <base>...HEAD` を取り、追加行（`+`）と削除行（`-`）を hunk ごとに把握する
-- 完了条件: 対象ファイル一覧と base ref を報告に書ける状態
+base は上から順に解決し、最初に当たった段を採る。trunk 候補は `git symbolic-ref refs/remotes/origin/HEAD` が指す branch と `origin/develop` / `origin/main` / `origin/master` のうち `git rev-parse --verify` が通るもの。
+
+1. 引数
+2. `gh pr view --json baseRefName -q .baseRefName`（このブランチの open PR）
+3. HEAD が trunk 候補そのものに居るなら `@{upstream}`、upstream 未設定なら `HEAD`
+4. それ以外は `git rev-list --count origin/<候補>..HEAD` が最小の候補。分岐元に最も近い trunk がこれで出る
+
+順序が効く: develop 上に居るときに 4 を先に当てると、ahead が 0 の develop を飛ばして `origin/main` が選ばれ、develop の既存コミットまで対象に入る。
+
+対象は merge-base 起点の diff で、未コミットの変更まで含める。PR 前は commit していない行も polish 対象である。
+
+```sh
+git diff "$(git merge-base <base> HEAD)"
+```
+
+追加行（`+`）と削除行（`-`）を hunk ごとに把握する。`git diff` は untracked を映さないので、`git status --porcelain` の `??` も対象ファイルへ加える（step 2 の「不要ファイル」観点がこれを見る）。
+
+- 完了条件: base ref が確定し、対象ファイル一覧が取れている。diff が空なら「対象なし」と報告して終了する
 
 ### 2. 観点表を全行適用
 
@@ -44,7 +59,7 @@ touched file の format と、変更箇所に関連するテストを実行す�
 
 ### 4. 報告
 
-- base ref と対象ファイル数
+- base ref（解決した段）と対象ファイル数
 - 観点ごとの件数: 直した / 残した（残した理由を 1 行）
 - 判定に迷い触らなかった箇所
 - diff の外で気づいた既存の違反（触っていない）
