@@ -10,9 +10,9 @@ run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts
 
 ["install:catalog"]
 description = "Install the managed catalog package by upstream ref"
-# Hard-fails if the local package cache is stale (e.g. a file newly added
-# under catalog/ is missing from the cache) instead of silently deploying
-# stale output. Run `mise run deploy:fresh` to rebuild the cache and redeploy.
+# Re-resolves an already-referenced catalog via `apm update`, since
+# `apm install -g <ref>` can replay a stale cached commit. Still hard-fails
+# if the local package cache is stale after the refresh (`mise run deploy:fresh`).
 run = "bash ./scripts/apm-workspace.sh install:catalog"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 install:catalog"
 

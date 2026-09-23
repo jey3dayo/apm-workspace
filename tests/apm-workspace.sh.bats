@@ -2006,6 +2006,100 @@ _setup_published_workspace() {
   rm -rf "$workspace_dir"
 }
 
+# --- run_workspace_update_command / register_catalog_dependency --------------
+#
+# `apm install -g <ref>` can replay apm.lock.yaml's cached resolved_commit, so
+# an already-referenced catalog must re-resolve its pin via `apm update`.
+
+_write_fake_apm() {
+  bin_dir="$1"
+
+  cat >"$bin_dir/apm" <<'EOF'
+#!/bin/sh
+printf 'apm %s\n' "$*" >>"$FAKE_APM_CALL_LOG"
+if [ -n "${FAKE_APM_OUTPUT:-}" ]; then
+  printf '%s\n' "$FAKE_APM_OUTPUT"
+fi
+exit "${FAKE_APM_EXIT_CODE:-0}"
+EOF
+  chmod +x "$bin_dir/apm"
+}
+
+@test "run_workspace_update_command calls apm update in WORKSPACE_DIR and fails on non-zero exit" {
+  workspace_dir="$(mktemp -d)"
+  fake_bin="$(mktemp -d)"
+  call_log="$(mktemp)"
+  _write_fake_apm "$fake_bin"
+
+  WORKSPACE_DIR="$workspace_dir"
+  FAKE_APM_CALL_LOG="$call_log" FAKE_APM_EXIT_CODE=1 PATH="$fake_bin:$PATH" \
+    run run_workspace_update_command -g --yes some/package
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"apm update failed"* ]]
+  [ "$(cat "$call_log")" = "apm update -g --yes some/package" ]
+
+  rm -rf "$workspace_dir" "$fake_bin"
+  rm -f "$call_log"
+}
+
+@test "run_workspace_update_command fails when apm update reports integration diagnostics" {
+  workspace_dir="$(mktemp -d)"
+  fake_bin="$(mktemp -d)"
+  call_log="$(mktemp)"
+  _write_fake_apm "$fake_bin"
+
+  WORKSPACE_DIR="$workspace_dir"
+  FAKE_APM_CALL_LOG="$call_log" FAKE_APM_EXIT_CODE=0 \
+    FAKE_APM_OUTPUT="Installed 3 packages with 1 error(s)." \
+    PATH="$fake_bin:$PATH" \
+    run run_workspace_update_command -g --yes some/package
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"apm update reported integration diagnostics"* ]]
+
+  rm -rf "$workspace_dir" "$fake_bin"
+  rm -f "$call_log"
+}
+
+@test "register_catalog_dependency runs apm update --yes on the bare package when apm.yml already references the catalog" {
+  workspace_dir="$(mktemp -d)"
+  fake_bin="$(mktemp -d)"
+  call_log="$(mktemp)"
+  _write_fake_apm "$fake_bin"
+
+  printf 'apm:\n  dependencies:\n    - jey3dayo/apm-workspace/catalog#main\n' >"$workspace_dir/apm.yml"
+  WORKSPACE_DIR="$workspace_dir"
+
+  FAKE_APM_CALL_LOG="$call_log" PATH="$fake_bin:$PATH" \
+    run register_catalog_dependency "jey3dayo/apm-workspace/catalog#main"
+
+  [ "$status" -eq 0 ]
+  [ "$(cat "$call_log")" = "apm update -g --yes jey3dayo/apm-workspace/catalog" ]
+
+  rm -rf "$workspace_dir" "$fake_bin"
+  rm -f "$call_log"
+}
+
+@test "register_catalog_dependency runs apm install -g with the full ref when apm.yml has no catalog reference yet" {
+  workspace_dir="$(mktemp -d)"
+  fake_bin="$(mktemp -d)"
+  call_log="$(mktemp)"
+  _write_fake_apm "$fake_bin"
+
+  printf 'apm:\n  dependencies: []\n' >"$workspace_dir/apm.yml"
+  WORKSPACE_DIR="$workspace_dir"
+
+  FAKE_APM_CALL_LOG="$call_log" PATH="$fake_bin:$PATH" \
+    run register_catalog_dependency "jey3dayo/apm-workspace/catalog#main"
+
+  [ "$status" -eq 0 ]
+  [ "$(cat "$call_log")" = "apm install -g jey3dayo/apm-workspace/catalog#main" ]
+
+  rm -rf "$workspace_dir" "$fake_bin"
+  rm -f "$call_log"
+}
+
 # --- pin-external ------------------------------------------------------------
 
 _pin_external_fixture() {

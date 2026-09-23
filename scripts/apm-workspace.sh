@@ -849,6 +849,29 @@ run_workspace_install_command() {
   rm -f "$output_file"
 }
 
+run_workspace_update_command() {
+  output_file=$(mktemp)
+  pushd "$WORKSPACE_DIR" >/dev/null || fail "Workspace not found: $WORKSPACE_DIR"
+  if apm update "$@" >"$output_file" 2>&1; then
+    status=0
+  else
+    status=$?
+  fi
+  popd >/dev/null || true
+
+  cat "$output_file"
+  if [ "$status" -ne 0 ]; then
+    rm -f "$output_file"
+    fail "apm update failed: $*"
+  fi
+  if apm_install_has_diagnostics_failure "$output_file"; then
+    rm -f "$output_file"
+    fail "apm update reported integration diagnostics: $*"
+  fi
+
+  rm -f "$output_file"
+}
+
 resolve_1password_mcp_command() {
   for command_name in 1password-mcp onepassword-mcp; do
     if have_command "$command_name"; then
@@ -2428,6 +2451,17 @@ cmd_stage_catalog() {
   log "Push the updated apm-workspace repo before using 'apm install -g $reference'."
 }
 
+register_catalog_dependency() {
+  reference="$1"
+
+  if manifest_has_catalog_reference; then
+    package="${reference%%#*}"
+    run_workspace_update_command -g --yes "$package"
+  else
+    run_workspace_install_command -g "$reference"
+  fi
+}
+
 cmd_register_catalog() {
   require_apm
   skill_ids=$(managed_skill_ids)
@@ -2441,7 +2475,7 @@ cmd_register_catalog() {
   remove_internal_target_links "$cleanup_skill_ids"
 
   reference=$(tracked_catalog_reference)
-  run_workspace_install_command -g "$reference"
+  register_catalog_dependency "$reference"
   assert_catalog_cache_freshness
   sync_managed_catalog_runtime_assets
   log "Registered catalog from upstream ref: $reference"

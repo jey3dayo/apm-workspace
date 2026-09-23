@@ -496,6 +496,30 @@ function Invoke-WorkspaceInstallCommand {
   }
 }
 
+function Invoke-WorkspaceUpdateCommand {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string[]]$UpdateArgs
+  )
+
+  Push-Location $WorkspaceDir
+  try {
+    $outputLines = @(& apm update @UpdateArgs 2>&1)
+    foreach ($line in $outputLines) {
+      Write-Host $line
+    }
+    if ($LASTEXITCODE -ne 0) {
+      throw "apm update failed: $($UpdateArgs -join ' ')"
+    }
+    if (Test-ApmInstallDiagnosticsFailure -OutputLines $outputLines) {
+      throw "apm update reported integration diagnostics: $($UpdateArgs -join ' ')"
+    }
+  }
+  finally {
+    Pop-Location
+  }
+}
+
 function Install-WorkspaceMcpDependencies {
   Invoke-WorkspaceInstallCommand -InstallArgs @("-g", "--only", "mcp")
 }
@@ -3593,6 +3617,21 @@ function Invoke-StageCatalog {
   Write-Host "Push the updated apm-workspace repo before using 'apm install -g $reference'."
 }
 
+function Install-TrackedCatalogDependency {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Reference
+  )
+
+  if (Test-ManifestHasCatalogReference) {
+    $package = $Reference.Split('#')[0]
+    Invoke-WorkspaceUpdateCommand -UpdateArgs @("-g", "--yes", $package)
+    return
+  }
+
+  Invoke-WorkspaceInstallCommand -InstallArgs @("-g", $Reference)
+}
+
 function Invoke-RegisterCatalog {
   param(
     [string[]]$RequestedSkillIds
@@ -3609,7 +3648,7 @@ function Invoke-RegisterCatalog {
   Remove-InternalTargetReparsePoints -SkillIds $skillIds
 
   $reference = Get-TrackedCatalogReference
-  Invoke-WorkspaceInstallCommand -InstallArgs @("-g", $reference)
+  Install-TrackedCatalogDependency -Reference $reference
   Assert-CatalogCacheFreshness
   Sync-ManagedCatalogRuntimeAssets
   Write-Host "Registered catalog from upstream ref: $reference"

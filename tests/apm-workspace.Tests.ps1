@@ -2738,6 +2738,62 @@ dependencies: []
     $readme | Should -Match 'docs/skill-inventory\.md'
   }
 
+  It "updates the tracked catalog dependency when apm.yml already references it" {
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+  - jey3dayo/apm-workspace/catalog#main
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+
+    Mock Invoke-WorkspaceUpdateCommand {}
+    Mock Invoke-WorkspaceInstallCommand {}
+
+    Install-TrackedCatalogDependency -Reference "jey3dayo/apm-workspace/catalog#main"
+
+    Assert-MockCalled Invoke-WorkspaceUpdateCommand -Times 1 -Exactly -ParameterFilter {
+      ($UpdateArgs -join ' ') -eq "-g --yes jey3dayo/apm-workspace/catalog"
+    }
+    Assert-MockCalled Invoke-WorkspaceInstallCommand -Times 0 -Exactly
+  }
+
+  It "installs the tracked catalog dependency when apm.yml has no catalog reference yet" {
+    @"
+name: apm-workspace
+dependencies:
+  apm: []
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+
+    Mock Invoke-WorkspaceUpdateCommand {}
+    Mock Invoke-WorkspaceInstallCommand {}
+
+    Install-TrackedCatalogDependency -Reference "jey3dayo/apm-workspace/catalog#main"
+
+    Assert-MockCalled Invoke-WorkspaceInstallCommand -Times 1 -Exactly -ParameterFilter {
+      ($InstallArgs -join ' ') -eq "-g jey3dayo/apm-workspace/catalog#main"
+    }
+    Assert-MockCalled Invoke-WorkspaceUpdateCommand -Times 0 -Exactly
+  }
+
+  It "throws naming apm update failed when the update command exits non-zero" {
+    try {
+      function global:apm {
+        $global:LASTEXITCODE = 1
+        "update failed output"
+      }
+
+      { Invoke-WorkspaceUpdateCommand -UpdateArgs @("-g", "--yes", "jey3dayo/apm-workspace/catalog") } |
+        Should -Throw "*apm update failed*"
+    }
+    finally {
+      Remove-Item Function:\apm -ErrorAction SilentlyContinue
+    }
+  }
+
 }
 
 Describe "Invoke-AgmsgStateRestore never-throw contract" {
