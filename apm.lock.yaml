@@ -206,39 +206,6 @@ dependencies:
     .config/opencode/skills/ai-butsukari-evidence-scout/references/source-playbook.md: sha256:463f5d7b75e7330204d1d86a21aa1dad5d35e385a4406cb7af31d796315a15ff
   content_hash: sha256:e08b9040d83299165676cb7a9492f06b37d514b1a12c72de942aec72e1c28670
 - repo_url: caad-develop/claude-code-marketplace
-  name: ai-banzuke
-  host: github.com
-  resolved_commit: 9869e9df63da283b29561923e7e5839a8a3d9152
-  resolved_ref: 9869e9df63da283b29561923e7e5839a8a3d9152
-  version: unknown
-  virtual_path: plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/ai-banzuke
-  - .agents/skills/ai-banzuke/SKILL.md
-  - .agents/skills/ai-banzuke/references/ranks.md
-  - .agents/skills/ai-banzuke/references/zensha-ranks.md
-  - .claude/skills/ai-banzuke
-  - .claude/skills/ai-banzuke/SKILL.md
-  - .claude/skills/ai-banzuke/references/ranks.md
-  - .claude/skills/ai-banzuke/references/zensha-ranks.md
-  - .config/opencode/skills/ai-banzuke
-  - .config/opencode/skills/ai-banzuke/SKILL.md
-  - .config/opencode/skills/ai-banzuke/references/ranks.md
-  - .config/opencode/skills/ai-banzuke/references/zensha-ranks.md
-  deployed_file_hashes:
-    .agents/skills/ai-banzuke/SKILL.md: sha256:38165758b38400c7f5d5605b52372d13e3b13f28abdadfcd0650f7fbf1c3611e
-    .agents/skills/ai-banzuke/references/ranks.md: sha256:366b4419c96b930e62282fa3636530f839329d8e8d1c5ce27261585a57473301
-    .agents/skills/ai-banzuke/references/zensha-ranks.md: sha256:b51c51e43a75530bcf5bfc0e14d218d9938bfd8b3031ce56c6ceb608b973bb47
-    .claude/skills/ai-banzuke/SKILL.md: sha256:38165758b38400c7f5d5605b52372d13e3b13f28abdadfcd0650f7fbf1c3611e
-    .claude/skills/ai-banzuke/references/ranks.md: sha256:366b4419c96b930e62282fa3636530f839329d8e8d1c5ce27261585a57473301
-    .claude/skills/ai-banzuke/references/zensha-ranks.md: sha256:b51c51e43a75530bcf5bfc0e14d218d9938bfd8b3031ce56c6ceb608b973bb47
-    .config/opencode/skills/ai-banzuke/SKILL.md: sha256:38165758b38400c7f5d5605b52372d13e3b13f28abdadfcd0650f7fbf1c3611e
-    .config/opencode/skills/ai-banzuke/references/ranks.md: sha256:366b4419c96b930e62282fa3636530f839329d8e8d1c5ce27261585a57473301
-    .config/opencode/skills/ai-banzuke/references/zensha-ranks.md: sha256:b51c51e43a75530bcf5bfc0e14d218d9938bfd8b3031ce56c6ceb608b973bb47
-  content_hash: sha256:9048adb0aba70d8b22a7b1ceacdb2fe6acf2c09b5662b1c3fb8d813163ee3c0f
-- repo_url: caad-develop/claude-code-marketplace
   name: perman-aws-vault
   host: github.com
   resolved_commit: 9869e9df63da283b29561923e7e5839a8a3d9152
@@ -6524,32 +6491,6 @@ dependencies:
     .config/opencode/skills/codebase-design/agents/openai.yaml: sha256:edebc9e4fcfe102114012575eaa9600b9b5fd08c311664f389c36e7bc717740f
   content_hash: sha256:d1762a59416f411caa1e9a38dc07f091487b0491c15ba6031c1e33beee8e004d
 - repo_url: mattpocock/skills
-  name: diagnosing-bugs
-  host: github.com
-  resolved_commit: 3cca18b368ae95cdbdebbff572ccafa662551015
-  resolved_ref: 3cca18b368ae95cdbdebbff572ccafa662551015
-  version: unknown
-  virtual_path: skills/engineering/diagnosing-bugs
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/diagnosing-bugs
-  - .agents/skills/diagnosing-bugs/SKILL.md
-  - .agents/skills/diagnosing-bugs/agents/openai.yaml
-  - .agents/skills/diagnosing-bugs/scripts/hitl-loop.template.sh
-  - .claude/skills/diagnosing-bugs
-  - .claude/skills/diagnosing-bugs/SKILL.md
-  - .claude/skills/diagnosing-bugs/agents/openai.yaml
-  - .claude/skills/diagnosing-bugs/scripts/hitl-loop.template.sh
-  deployed_file_hashes:
-    .agents/skills/diagnosing-bugs/SKILL.md: sha256:77f3cf31bc99b2f49af943222526531fcc9fc41d047626d3640e875e85af3e84
-    .agents/skills/diagnosing-bugs/agents/openai.yaml: sha256:3e430dbe4334a87597488c060cb3dc3786bb00c9182877d6f5ec41f62490e90b
-    .agents/skills/diagnosing-bugs/scripts/hitl-loop.template.sh: sha256:35103539fc36873eea36074769ad454f9379d6fc8b2dc0e26ce987fd3bfe5503
-    .claude/skills/diagnosing-bugs/SKILL.md: sha256:77f3cf31bc99b2f49af943222526531fcc9fc41d047626d3640e875e85af3e84
-    .claude/skills/diagnosing-bugs/agents/openai.yaml: sha256:3e430dbe4334a87597488c060cb3dc3786bb00c9182877d6f5ec41f62490e90b
-    .claude/skills/diagnosing-bugs/scripts/hitl-loop.template.sh: sha256:35103539fc36873eea36074769ad454f9379d6fc8b2dc0e26ce987fd3bfe5503
-  content_hash: sha256:251e085e9d789c31d8b526929e62f57f668a21c2cc0d7bf185f0fba591a8ac60
-- repo_url: mattpocock/skills
   name: domain-modeling
   host: github.com
   resolved_commit: 3cca18b368ae95cdbdebbff572ccafa662551015
@@ -6801,32 +6742,6 @@ dependencies:
     .config/opencode/skills/wayfinder/SKILL.md: sha256:fee6e1d0c50f0e736b4ef8a599060c959afae904c9a97d82c97f049fcc3aa0f1
     .config/opencode/skills/wayfinder/agents/openai.yaml: sha256:88bc81a11a6d52ac67aeaa76b8b619e387020d47c5133a4dd4927fd15c4ad073
   content_hash: sha256:e1f9cc43b89181bd3d1fe1bd7784a3e8efe260d7e09c4abb53e96ec1fc5b8a24
-- repo_url: mattpocock/skills
-  name: wizard
-  host: github.com
-  resolved_commit: 3cca18b368ae95cdbdebbff572ccafa662551015
-  resolved_ref: 3cca18b368ae95cdbdebbff572ccafa662551015
-  version: unknown
-  virtual_path: skills/engineering/wizard
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/wizard
-  - .agents/skills/wizard/SKILL.md
-  - .agents/skills/wizard/agents/openai.yaml
-  - .agents/skills/wizard/template.sh
-  - .claude/skills/wizard
-  - .claude/skills/wizard/SKILL.md
-  - .claude/skills/wizard/agents/openai.yaml
-  - .claude/skills/wizard/template.sh
-  deployed_file_hashes:
-    .agents/skills/wizard/SKILL.md: sha256:bdf31d48211ea559878f95a4f344aeabf8d85897488ba564382bab0b000daac1
-    .agents/skills/wizard/agents/openai.yaml: sha256:98f44d682d58e262f160dc59a8befc365e0aa65820dd0261864af26aa8e59d83
-    .agents/skills/wizard/template.sh: sha256:33cbe9dfb1d0e9185b60248a52aabed14bc64785a00cac695e302e739dd6c153
-    .claude/skills/wizard/SKILL.md: sha256:bdf31d48211ea559878f95a4f344aeabf8d85897488ba564382bab0b000daac1
-    .claude/skills/wizard/agents/openai.yaml: sha256:98f44d682d58e262f160dc59a8befc365e0aa65820dd0261864af26aa8e59d83
-    .claude/skills/wizard/template.sh: sha256:33cbe9dfb1d0e9185b60248a52aabed14bc64785a00cac695e302e739dd6c153
-  content_hash: sha256:24acbe24c3b0b78bac07c3e7512b88140a448056562752dd8e0bce0854d8c3e8
 - repo_url: mattpocock/skills
   name: grilling
   host: github.com
@@ -14196,42 +14111,6 @@ deployments:
   content_hash: sha256:9492b45c5f31c47202fd2809e250aca28b43cb2a17fc1049357c38080caa1dfb
 - kind: project-relative
   target: agents
-  value: .agents/skills/ai-banzuke
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  active_owner: caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  content_hash: null
-- kind: project-relative
-  target: agents
-  value: .agents/skills/ai-banzuke/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  active_owner: caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  content_hash: sha256:38165758b38400c7f5d5605b52372d13e3b13f28abdadfcd0650f7fbf1c3611e
-- kind: project-relative
-  target: agents
-  value: .agents/skills/ai-banzuke/references/ranks.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  active_owner: caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  content_hash: sha256:366b4419c96b930e62282fa3636530f839329d8e8d1c5ce27261585a57473301
-- kind: project-relative
-  target: agents
-  value: .agents/skills/ai-banzuke/references/zensha-ranks.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  active_owner: caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  content_hash: sha256:b51c51e43a75530bcf5bfc0e14d218d9938bfd8b3031ce56c6ceb608b973bb47
-- kind: project-relative
-  target: agents
   value: .agents/skills/ai-butsukari-evidence-scout
   runtime: null
   scope: project
@@ -16903,42 +16782,6 @@ deployments:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
   content_hash: sha256:1ec6cb197376c3221f77b1f1e4625bbeb71b7ff730f97c4b30bc22ac6bb0a93a
-- kind: project-relative
-  target: agents
-  value: .agents/skills/diagnosing-bugs
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/diagnosing-bugs
-  active_owner: mattpocock/skills/skills/engineering/diagnosing-bugs
-  content_hash: null
-- kind: project-relative
-  target: agents
-  value: .agents/skills/diagnosing-bugs/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/diagnosing-bugs
-  active_owner: mattpocock/skills/skills/engineering/diagnosing-bugs
-  content_hash: sha256:77f3cf31bc99b2f49af943222526531fcc9fc41d047626d3640e875e85af3e84
-- kind: project-relative
-  target: agents
-  value: .agents/skills/diagnosing-bugs/agents/openai.yaml
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/diagnosing-bugs
-  active_owner: mattpocock/skills/skills/engineering/diagnosing-bugs
-  content_hash: sha256:3e430dbe4334a87597488c060cb3dc3786bb00c9182877d6f5ec41f62490e90b
-- kind: project-relative
-  target: agents
-  value: .agents/skills/diagnosing-bugs/scripts/hitl-loop.template.sh
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/diagnosing-bugs
-  active_owner: mattpocock/skills/skills/engineering/diagnosing-bugs
-  content_hash: sha256:35103539fc36873eea36074769ad454f9379d6fc8b2dc0e26ce987fd3bfe5503
 - kind: project-relative
   target: agents
   value: .agents/skills/diagram-design
@@ -23007,42 +22850,6 @@ deployments:
   content_hash: sha256:50536a04fbc72b0f71fc9975a7e041893912ebfcaf9c671439843d20172e1264
 - kind: project-relative
   target: agents
-  value: .agents/skills/wizard
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/wizard
-  active_owner: mattpocock/skills/skills/engineering/wizard
-  content_hash: null
-- kind: project-relative
-  target: agents
-  value: .agents/skills/wizard/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/wizard
-  active_owner: mattpocock/skills/skills/engineering/wizard
-  content_hash: sha256:bdf31d48211ea559878f95a4f344aeabf8d85897488ba564382bab0b000daac1
-- kind: project-relative
-  target: agents
-  value: .agents/skills/wizard/agents/openai.yaml
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/wizard
-  active_owner: mattpocock/skills/skills/engineering/wizard
-  content_hash: sha256:98f44d682d58e262f160dc59a8befc365e0aa65820dd0261864af26aa8e59d83
-- kind: project-relative
-  target: agents
-  value: .agents/skills/wizard/template.sh
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/wizard
-  active_owner: mattpocock/skills/skills/engineering/wizard
-  content_hash: sha256:33cbe9dfb1d0e9185b60248a52aabed14bc64785a00cac695e302e739dd6c153
-- kind: project-relative
-  target: agents
   value: .agents/skills/work-log-maintenance
   runtime: null
   scope: project
@@ -28065,42 +27872,6 @@ deployments:
   content_hash: sha256:9492b45c5f31c47202fd2809e250aca28b43cb2a17fc1049357c38080caa1dfb
 - kind: project-relative
   target: claude
-  value: .claude/skills/ai-banzuke
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  active_owner: caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/ai-banzuke/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  active_owner: caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  content_hash: sha256:38165758b38400c7f5d5605b52372d13e3b13f28abdadfcd0650f7fbf1c3611e
-- kind: project-relative
-  target: claude
-  value: .claude/skills/ai-banzuke/references/ranks.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  active_owner: caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  content_hash: sha256:366b4419c96b930e62282fa3636530f839329d8e8d1c5ce27261585a57473301
-- kind: project-relative
-  target: claude
-  value: .claude/skills/ai-banzuke/references/zensha-ranks.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  active_owner: caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  content_hash: sha256:b51c51e43a75530bcf5bfc0e14d218d9938bfd8b3031ce56c6ceb608b973bb47
-- kind: project-relative
-  target: claude
   value: .claude/skills/ai-butsukari-evidence-scout
   runtime: null
   scope: project
@@ -30286,42 +30057,6 @@ deployments:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
   content_hash: sha256:83014cfd675639ed7bacffdb2fd4312e8d982936cff0b2a5551cea54fb24ce6e
-- kind: project-relative
-  target: claude
-  value: .claude/skills/diagnosing-bugs
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/diagnosing-bugs
-  active_owner: mattpocock/skills/skills/engineering/diagnosing-bugs
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/diagnosing-bugs/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/diagnosing-bugs
-  active_owner: mattpocock/skills/skills/engineering/diagnosing-bugs
-  content_hash: sha256:77f3cf31bc99b2f49af943222526531fcc9fc41d047626d3640e875e85af3e84
-- kind: project-relative
-  target: claude
-  value: .claude/skills/diagnosing-bugs/agents/openai.yaml
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/diagnosing-bugs
-  active_owner: mattpocock/skills/skills/engineering/diagnosing-bugs
-  content_hash: sha256:3e430dbe4334a87597488c060cb3dc3786bb00c9182877d6f5ec41f62490e90b
-- kind: project-relative
-  target: claude
-  value: .claude/skills/diagnosing-bugs/scripts/hitl-loop.template.sh
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/diagnosing-bugs
-  active_owner: mattpocock/skills/skills/engineering/diagnosing-bugs
-  content_hash: sha256:35103539fc36873eea36074769ad454f9379d6fc8b2dc0e26ce987fd3bfe5503
 - kind: project-relative
   target: claude
   value: .claude/skills/diagram-design
@@ -35967,42 +35702,6 @@ deployments:
   content_hash: sha256:50536a04fbc72b0f71fc9975a7e041893912ebfcaf9c671439843d20172e1264
 - kind: project-relative
   target: claude
-  value: .claude/skills/wizard
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/wizard
-  active_owner: mattpocock/skills/skills/engineering/wizard
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/wizard/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/wizard
-  active_owner: mattpocock/skills/skills/engineering/wizard
-  content_hash: sha256:bdf31d48211ea559878f95a4f344aeabf8d85897488ba564382bab0b000daac1
-- kind: project-relative
-  target: claude
-  value: .claude/skills/wizard/agents/openai.yaml
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/wizard
-  active_owner: mattpocock/skills/skills/engineering/wizard
-  content_hash: sha256:98f44d682d58e262f160dc59a8befc365e0aa65820dd0261864af26aa8e59d83
-- kind: project-relative
-  target: claude
-  value: .claude/skills/wizard/template.sh
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills/skills/engineering/wizard
-  active_owner: mattpocock/skills/skills/engineering/wizard
-  content_hash: sha256:33cbe9dfb1d0e9185b60248a52aabed14bc64785a00cac695e302e739dd6c153
-- kind: project-relative
-  target: claude
   value: .claude/skills/writing-for-agents
   runtime: null
   scope: project
@@ -41077,42 +40776,6 @@ deployments:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
   content_hash: sha256:9492b45c5f31c47202fd2809e250aca28b43cb2a17fc1049357c38080caa1dfb
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/ai-banzuke
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  active_owner: caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  content_hash: null
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/ai-banzuke/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  active_owner: caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  content_hash: sha256:38165758b38400c7f5d5605b52372d13e3b13f28abdadfcd0650f7fbf1c3611e
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/ai-banzuke/references/ranks.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  active_owner: caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  content_hash: sha256:366b4419c96b930e62282fa3636530f839329d8e8d1c5ce27261585a57473301
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/ai-banzuke/references/zensha-ranks.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  active_owner: caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke
-  content_hash: sha256:b51c51e43a75530bcf5bfc0e14d218d9938bfd8b3031ce56c6ceb608b973bb47
 - kind: project-relative
   target: legacy
   value: .config/opencode/skills/ai-butsukari-evidence-scout
