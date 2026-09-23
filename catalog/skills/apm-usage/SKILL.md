@@ -323,3 +323,9 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - update `manual-skills/upstreams/**` to note the migration
    - run `mise run check`, then `mise run deploy`
    - verify the deployed target contains one copy of the skill
+
+9. Global external dependency removed:
+   - keep its `apm.yml` line and run `apm uninstall -g <manifest-ref>`; deleting the line by hand leaves the lock record behind, and `mise run apply` stops with `External lock record is not declared in apm.yml`
+   - if the uninstall aborts listing target directories (apm 0.29.0 leaves `.apm-pin` behind after removing the skill files), confirm each listed path under `~/.claude/skills/` and `~/.agents/skills/` is a real directory holding only `.apm-pin`, remove that file and the directory, then rerun the uninstall
+   - the uninstall re-integrates the remaining packages outside `mise run apply`: it rewrites `apm.yml` (drops comments, folds the gist URL), unlinks the agmsg roster, and deploys undeclared sub-skills and un-aliased gist names. Edit `apm.yml` until `git diff` shows only the removed line, follow the agmsg State section of `~/.apm/AGENTS.md`, then run `mise run deploy`, which removes the undeclared entries
+   - verify the `apm.lock.yaml` diff contains only the removed records and the skill is gone from both targets, and record the removal in `docs/package-decisions.md`
