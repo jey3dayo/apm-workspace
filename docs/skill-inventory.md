@@ -31,7 +31,7 @@
   `improve`（shadcn）, `react-doctor`
 - React / Web 実装: `react-best-practices`, `browser-harness`, `screenshot`
 - 社内（caad-develop）: `perman-aws-vault`, `caad-skill-deployer`,
-  `ai-banzuke`, `ai-butsukari-evidence-scout`
+  `ai-butsukari-evidence-scout`
 - 図生成: `diagram-design`（cathrynlavery, SHA pin）
 - その他: `humanizer-ja`, `agmsg`, `tuicr`,
   mattpocock 系（`grilling`, `writing-for-agents`, `wayfinder`,
@@ -51,7 +51,7 @@
 
 - APM・環境運用: `apm-usage`, `apm-repo-manifest`, `mise`,
   `dotenvx`, `1password`, `herdr`
-- レビュー・品質: `review-fix-loop`, `quiet-command-auditor`, `polish`
+- レビュー・品質: `review-fix-loop`, `polish`
 - デザイン: `design-md-workflow`
 - リファクタリング・解析: `refactoring`, `similarity`
 - ドキュメント: `docs-manager`, `docs-review`,

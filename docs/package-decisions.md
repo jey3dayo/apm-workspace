@@ -548,3 +548,10 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 - 追加理由: PR 前に「diff のコメント圧縮・テストの実装詳細依存の除去」を毎回プロンプト手打ちで依頼していた。原則は global `AGENTS.md` にあるが、いまの diff へ適用する導線が無かった。
 - 形: user-invoked（`disable-model-invocation: true`）で context load ゼロ。原則本文は写さず `AGENTS.md` を正本とし、skill は範囲確定・観点表の全行適用・報告の手順と完了条件だけを持つ。観点は 1 行 = 1 観点の表で、追加は行追加のみ。
 - 初期観点: コメント / テスト / lint disable / 型逃げ / エラー握りつぶし / 過剰な差分 / 不要ファイル。依存・lockfile の無断変更、設定ファイルのメタコメント、既存テスト削除は該当 PR が少なく目視で拾えるため初期から外した。
+
+## 利用実績の無いスキルを撤去（2026-09-23）
+
+- 撤去: `wizard` / `diagnosing-bugs`（mattpocock/skills）、`ai-banzuke`（caad marketplace）、catalog の `quiet-command-auditor`。
+- 理由: 2026-09 の Claude セッション 527 件と 2026-08 以降の Codex セッションで、Skill 起動と `SKILL.md` の読み込みが 0〜1 回。他スキルと global `AGENTS.md` からの参照も無く、ユーザーが不要と判断した。
+- 残した判断: 同じく実績 0 の `domain-modeling` / `research` / `prototype` / `setup-matt-pocock-skills` は、残す `wayfinder` が Skill tool で呼ぶ前提（`improve-codebase-architecture` も `domain-modeling` を参照）なので、`wayfinder` と一緒でなければ外さない。
+- 再導入: 利用場面ができたら `apm.yml` へ同じ ref を戻す。`quiet-command-auditor` は `git show 5bebf6a:catalog/skills/quiet-command-auditor/SKILL.md` から復元できる。

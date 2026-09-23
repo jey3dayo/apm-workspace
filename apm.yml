@@ -16,7 +16,6 @@ dependencies:
     # --- org-restricted (caad-develop; requires org access) ---
     - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault#9869e9df63da283b29561923e7e5839a8a3d9152
     - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer#9869e9df63da283b29561923e7e5839a8a3d9152
-    - caad-develop/claude-code-marketplace/plugins/dev-tools/ai-banzuke/skills/ai-banzuke#9869e9df63da283b29561923e7e5839a8a3d9152
     - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout#main
 
     # --- public ---
@@ -26,7 +25,6 @@ dependencies:
 
     # engineering practice (design, architecture, research)
     - mattpocock/skills/skills/engineering/codebase-design#3cca18b368ae95cdbdebbff572ccafa662551015
-    - mattpocock/skills/skills/engineering/diagnosing-bugs#3cca18b368ae95cdbdebbff572ccafa662551015
     - mattpocock/skills/skills/engineering/domain-modeling#3cca18b368ae95cdbdebbff572ccafa662551015
     - mattpocock/skills/skills/engineering/improve-codebase-architecture#3cca18b368ae95cdbdebbff572ccafa662551015
     - mattpocock/skills/skills/engineering/prototype#3cca18b368ae95cdbdebbff572ccafa662551015
@@ -34,7 +32,6 @@ dependencies:
     - mattpocock/skills/skills/engineering/setup-matt-pocock-skills#3cca18b368ae95cdbdebbff572ccafa662551015
     - mattpocock/skills/skills/engineering/tdd#3cca18b368ae95cdbdebbff572ccafa662551015
     - mattpocock/skills/skills/engineering/wayfinder#3cca18b368ae95cdbdebbff572ccafa662551015
-    - mattpocock/skills/skills/engineering/wizard#3cca18b368ae95cdbdebbff572ccafa662551015
 
     # productivity / writing
     - mattpocock/skills/skills/productivity/grilling#3cca18b368ae95cdbdebbff572ccafa662551015
