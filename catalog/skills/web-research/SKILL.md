@@ -1,13 +1,13 @@
 ---
 name: web-research
-description: "Plan, route, collect, and synthesize public web research with cited evidence. Use as the default entry point when the user asks to research a topic online, look something up, find current information, compare options, produce a research report, or requests Jina search or X/Twitter signal. Delegates large investigations to parallel Sonnet subagents; collection is Jina Reader-first."
+description: "Plan, route, collect, and synthesize public web research with cited evidence. Use as the default entry point when the user asks to research a topic online, look something up, find current information, compare options, produce a research report, or requests X/Twitter signal or Jina search. Delegates large investigations to parallel Sonnet subagents; collection uses the host's built-in web search and direct URL fetch, with Jina as a paid opt-in."
 ---
 
 # Web Research
 
 ## Overview
 
-Public web research from planning through synthesis. Collection is Jina Reader-first; X/Twitter is an indexed public-source signal, not complete platform coverage. Delegated subagents follow the Collection and Evidence Rules sections of this skill.
+Public web research from planning through synthesis. Collection uses the host's built-in search and direct fetch; X/Twitter is an indexed public-source signal, not complete platform coverage. Delegated subagents follow the Collection and Evidence Rules sections of this skill.
 
 ## Scope
 
@@ -40,18 +40,16 @@ For large tasks, spawn one subagent per subtopic with the Agent tool:
 
 ## Collection
 
-Prefer the Jina MCP server's direct search tool (e.g. `search_web`) when it is exposed. Otherwise use the Jina `read_url` tool with Jina search URLs, URL-encoding the full query after `q=`:
+- Search with the host's built-in web search tool (Claude Code `WebSearch`, Codex `web_search`). Narrow with `site:<domain>`.
+- Read a result or a user-given URL with `ax` (run `ax agent-context` once first) or the host's fetch tool (`WebFetch`). Use a browser tool only for pages that need JavaScript.
 
-- General search: `https://s.jina.ai/?q=<url-encoded query>`
-- X search: `https://s.jina.ai/?q=site%3Ax.com%20<url-encoded query terms>`
-- Twitter fallback: `https://s.jina.ai/?q=site%3Atwitter.com%20<url-encoded query terms>`
-- Source-specific search: add `site:<domain>` to the query.
+### Jina (paid opt-in)
 
-Read promising result URLs with Jina Reader when deeper source detail is needed.
+Jina bills the user's account: a web search request is priced from 10,000 tokens, `search_web` sends one request per element of a query array, and `read_url` bills per output token. Use Jina only when the user names it for this task, and pass that permission to subagents explicitly. When using it, send one query per search and pass `question` to `read_url`. A `402 InsufficientBalanceError` means the balance is exhausted: switch to the built-in tools and tell the user.
 
 ### Login-Walled Sources (X/Twitter etc.)
 
-Jina Reader renders pages server-side, so JS-heavy public pages usually work; login-walled content (X timelines, Instagram, paywalled articles) yields only indexed fragments. For X, search both `site:x.com` and `site:twitter.com`, cite snippets as excerpts (never as full post contents), attribute posts to their handle only, and prefer direct post URLs. Reaching protected or deleted content through a logged-in browser session needs an explicit user request.
+Fetchers without a login session see only public markup: login-walled content (X timelines, Instagram, paywalled articles) yields only indexed fragments. For X, search both `site:x.com` and `site:twitter.com`, cite snippets as excerpts (never as full post contents), attribute posts to their handle only, and prefer direct post URLs. Reaching protected or deleted content through a logged-in browser session needs an explicit user request.
 
 ## Source Type Notes
 
