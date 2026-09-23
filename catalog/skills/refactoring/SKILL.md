@@ -1,15 +1,10 @@
 ---
 name: refactoring
-description: |
-  [What] Integrated refactoring workflow for TypeScript/JavaScript/React:
-  similarity-ts (duplicate detection), react-doctor (React diagnostics),
-  dead-code and code-quality cleanup guidance, and boundary ownership scanning.
-  [When] Use when users mention リファクタ / refactor, 重複コード /
-  duplicate code, コード整理 / cleanup, デッドコード・未使用ファイル・
-  未使用 export removal, 共通 helper extraction, validation / Result /
-  repository boundary, folder ownership, or cleanup-only plans. Do not use
-  for feature implementation or task execution; use the normal
-  implementation flow or review-fix-loop instead.
+description: >-
+  Plan and execute TS/JS/React refactoring: duplicate code (similarity-ts), react-doctor
+  diagnostics, dead code and unused exports, helper extraction, and validation /
+  Result / repository boundary ownership（「リファクタ」「重複コード」「コード整理」）.
+  Not for feature work.
 ---
 
 # Refactoring - Integrated TypeScript/JavaScript/React Refactoring Workflow
@@ -24,18 +19,10 @@ unless the user specifies another location.
 
 ## Prerequisites: Project Type Detection
 
-```bash
-# Detect React project
-rg -q '"react"' package.json && echo "React project"
-
-# Detect TypeScript project
-[ -f tsconfig.json ] && echo "TypeScript project"
-```
-
-| Project Type              | Parallel diagnostic tracks                    |
-| ------------------------- | --------------------------------------------- |
-| React + TypeScript/JS     | react-doctor + similarity-ts + dead-code scan |
-| TypeScript/JS (non-React) | similarity-ts + dead-code scan                |
+| Project Type                                      | Parallel diagnostic tracks                    |
+| ------------------------------------------------- | --------------------------------------------- |
+| React + TypeScript/JS (`"react"` in package.json) | react-doctor + similarity-ts + dead-code scan |
+| TypeScript/JS (non-React, has `tsconfig.json`)    | similarity-ts + dead-code scan                |
 
 ## Phase 1: Diagnose
 
@@ -242,25 +229,25 @@ Do not proceed to the next step until all pass.
 
 ## Related Skills and References
 
-| Problem Area                                     | Skill or reference                     |
-| ------------------------------------------------ | -------------------------------------- |
-| Detailed duplicate code analysis                 | `../similarity/SKILL.md`               |
-| Large lint / type-safety cleanup                 | `references/code_quality_cleanup.md`   |
-| Dead code removal with TSR                       | `references/dead_code_tsr.md`          |
-| React-specific pattern diagnosis                 | `../react-doctor/SKILL.md` (if exists) |
-| Parallel diagnostics / bounded slice review loop | `../review-fix-loop/SKILL.md`          |
-| Impact scope / reference tracking                | `rg` for full reference listing        |
+| Problem Area                                     | Skill or reference                   |
+| ------------------------------------------------ | ------------------------------------ |
+| Detailed duplicate code analysis                 | `../similarity/SKILL.md`             |
+| Large lint / type-safety cleanup                 | `references/code_quality_cleanup.md` |
+| Dead code removal with TSR                       | `references/dead_code_tsr.md`        |
+| React-specific pattern diagnosis                 | `react-doctor` skill (if installed)  |
+| Parallel diagnostics / bounded slice review loop | `../review-fix-loop/SKILL.md`        |
+| Impact scope / reference tracking                | `rg` for full reference listing      |
 
 ## Principle of Incremental Execution
 
 1. Do not make large-scale changes at once: start with similarity 95%+, stop at
    90-95% in the planning phase.
-2. Commit between phases: after each phase, run `git commit` to keep rollback
-   possible.
+2. End each phase at a verified checkpoint (checks green, diff reviewed). Commit
+   only when the user asked for commits; hand splitting to `atomic-commit`.
 3. Verify business logic: high similarity != must consolidate (may have
    different semantics).
 4. Owner folder first: if a technology already has a clear owner folder, move
    implementation there and import its public API from other layers.
 
-Goals: zero similarity 90%+ pairs, react-doctor score 75+, 0 type errors,
-0 lint violations.
+Done when every Critical/High item in the plan is fixed or explicitly parked
+with a reason, and the repository's check tasks pass.

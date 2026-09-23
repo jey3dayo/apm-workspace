@@ -1,6 +1,9 @@
 ---
 name: gh-address-comments
-description: Address actionable GitHub pull request review feedback. Use when the user wants to inspect unresolved review threads, requested changes, or inline review comments on a PR, then implement selected fixes. Use `gh` for PR metadata and flat comment reads, and use the bundled GraphQL script whenever thread-level state, resolution status, or inline review context matters.
+description: >-
+  Work through GitHub PR review feedback: read unresolved review threads and inline
+  comments (bundled GraphQL script for thread state), cluster them, and implement
+  the selected fixes. Never replies or resolves threads unless asked.
 metadata:
   author: OpenAI
   source: openai/plugins plugins/github/skills/gh-address-comments@11c74d6 (retired upstream in 33bd952; salvaged 2026-08-28, connector references replaced with gh CLI)
@@ -10,7 +13,7 @@ metadata:
 
 Use this skill when the user wants to work through requested changes on a GitHub pull request. Use `gh` for PR metadata and patch context, but treat thread-aware review data as a `gh api graphql` problem because flat REST comment reads do not preserve full review-thread state.
 
-Run all `gh` commands with elevated network access. If CLI auth is required, confirm `gh auth status` first and ask the user to authenticate with `gh auth login` if it fails.
+If CLI auth is required, confirm `gh auth status` first and ask the user to authenticate with `gh auth login` if it fails.
 
 ## Workflow
 

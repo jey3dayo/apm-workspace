@@ -27,7 +27,7 @@ pnpm はこのピン方針の例外。mise の役割はブートストラップ�
 
 ```toml
 [tools]
-pnpm = "11" # bootstrap only; exact version is owned by package.json "packageManager"
+pnpm = "12" # bootstrap only; exact version is owned by package.json "packageManager"
 ```
 
 - 正確なバージョンの正本は各リポジトリの `package.json` の `packageManager` フィールド。pnpm 10+ の self-management（`managePackageManagerVersions`、デフォルト有効）が `packageManager` を読んで自動で該当バージョンに切り替えるため、mise 側で厳密ピンすると二重管理になる
@@ -524,7 +524,11 @@ mise install "npm:prettier@3.8.4"
 mise install "npm:@angular/cli"
 ```
 
-#### Issue 4: Python pipx Package Issues
+#### Issue 4: `github:` backend の macOS `.app` が「壊れているため開けません」（Gatekeeper）
+
+tar 展開が AppleDouble `._*` を実体化し codesign の resource seal を壊す（Developer ID + hardened runtime で顕在化。例: terminal-browser 0.7.x）。install/upgrade 後に bundle 内の `._*` を `find <app> -name "._*" -delete` で除去し、`codesign --verify --deep --strict` と `spctl --assess --type execute` で検証する。quarantine xattr の問題ではない。ダイアログで「ゴミ箱に入れる」を押すと本体が Trash へ移動するので、消えたら Trash 確認 → `mise uninstall`/`install` で入れ直す。
+
+#### Issue 5: Python pipx Package Issues
 
 ### Symptoms
 

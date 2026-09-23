@@ -1,7 +1,10 @@
 ---
 name: docs-manager
 model: sonnet
-description: Use when reviewing, validating, creating, updating, or fixing project documentation, especially docs directories and Markdown files governed by metadata, OKF / YAML frontmatter, tag, link, and size rules such as `.docs-manager-config.json`. Also use when a user asks to make docs OKF-compatible or says to use OKF docs, even if they do not spell out the frontmatter fields.
+description: >-
+  Docs governance: validate and fix Markdown docs against metadata, OKF / YAML
+  frontmatter, tag, link and size rules (`.docs-manager-config.json`), and make docs
+  OKF-compatible. Which docs drifted after a change is docs-review.
 ---
 
 # Docs Manager

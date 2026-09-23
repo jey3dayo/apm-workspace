@@ -1,12 +1,12 @@
 # Herdr config.toml リファレンス
 
-**基準は stable 0.9.0。** 「0.8.2 では未対応」と注記した項目だけが古い binary で通らない。
+基準は stable 0.9.1。
 
 - 現在の stable version と version 固定の一次情報の索引: `curl -fsSL https://herdr.dev/llms.txt`（先頭に `Current stable release:` が出る）
 - 全設定キーの型・デフォルト・許容値・説明は機械可読な JSON が正本。全文を読み込まず jq でキー指定して引く:
 
   ```bash
-  V=0.9.0   # llms.txt の Current stable release
+  V=0.9.1   # llms.txt の Current stable release
   curl -fsSL "https://raw.githubusercontent.com/herdrdev/herdr/v$V/docs/next/website/src/data/config-reference.json" \
     | jq --arg key 'ui.sidebar_width' '.sections[].keys[] | select(.key == $key)'
   ```
@@ -57,7 +57,7 @@ kitty_graphics = true   # pane 画像描画と pane graphics API。デフォル�
 
 - 既存ペインは再作成まで現行シェルを維持する。command pane は `/bin/sh -c`、detached は `/bin/sh -lc` 経由のまま（Windows は `cmd.exe /d /c`）
 - `new_cwd` に対して CLI / socket API の明示 `--cwd` が優先される
-- `[terminal] kitty_graphics` が正で、legacy `[experimental] kitty_graphics` も互換のため受理される（両方あれば `terminal` 側が勝つ）。**0.8.2 では `[terminal]` 側が未対応**なので `[experimental]` に書く。変更には server 再起動または client の再 attach が必要
+- `[terminal] kitty_graphics` が正で、legacy `[experimental] kitty_graphics` も互換のため受理される（両方あれば `terminal` 側が勝つ）。変更には server 再起動または client の再 attach が必要
 - remote では server 側の設定が pane graphics の解析と API 可用性を、client 側の設定が外側端末への出力を決める
 
 ## [worktrees]
@@ -145,7 +145,7 @@ panel_bg = "#1e1e2e"
 text = "#cdd6f4"
 ```
 
-適用順: 組込みテーマ → `[theme.custom]` → `[theme.custom.light]` / `[theme.custom.dark]`。mode 別サブテーブルは **0.8.2 では未対応**（`unknown config key`）。
+適用順: 組込みテーマ → `[theme.custom]` → `[theme.custom.light]` / `[theme.custom.dark]`。
 
 色トークンは `accent`, `panel_bg`, `sidebar_bg`, `active_row_bg`, `selection_bg`, `text`, `subtext0`, `surface0/1`, `surface_dim`, `overlay0/1`, `mauve`, `green`, `yellow`, `red`, `blue`, `teal`, `peach` など。全一覧は config-reference JSON を `startswith("theme.custom")` で引く。
 
@@ -168,7 +168,7 @@ mouse_scroll_lines = 3
 confirm_close = true                  # workspace close 時の確認
 prompt_new_tab_name = true            # 新規タブでラベル入力を求める
 prompt_new_workspace_name = false
-pane_borders = "auto"                 # "auto"(split のみ) | "always"(単一 pane も枠) | "off"。legacy boolean も parse される（true=auto / false=off）。0.8.2 は boolean のみ
+pane_borders = "auto"                 # "auto"(split のみ) | "always"(単一 pane も枠) | "off"。legacy boolean も parse される（true=auto / false=off）
 pane_outer_borders = true             # pane 領域の外周。always で単一 pane を囲むには必須
 pane_scrollbars = true
 pane_gaps = true
@@ -223,12 +223,12 @@ rows = [
 claude = [["state_icon", "workspace", "tab"], ["terminal_title_stripped"], ["agent"]]
 ```
 
-- Agent トークン: `state_icon`, `state_text`, `machine`, `workspace`, `tab`, `pane`, `agent`, `terminal_title`, `terminal_title_stripped`, `$name`（pane metadata）。`machine` は複数マシン接続時のみ表示され、**0.8.2 では未対応**
+- Agent トークン: `state_icon`, `state_text`, `machine`, `workspace`, `tab`, `pane`, `agent`, `terminal_title`, `terminal_title_stripped`, `$name`（pane metadata）。`machine` は複数マシン接続時のみ表示される
 - Space トークン: `state_icon`, `state_text`, `workspace`, `branch`, `git_status`, `$name`（workspace metadata）
 - 値の無いトークンと区切りは消え、全トークンが空の行は消える。1 layout あたり最大 16 行 × 各行最大 16 トークン
 - `rows_by_agent` は `rows` を**置換**する（追加ではない）
 - トークンは inline style table にできる: `{ token = "workspace", fg = "#89b4fa", bold = true, dim = false }`。`fg` は厳密な `#RGB` / `#RRGGBB`。省略フィールドは文脈デフォルトを維持し、明示 `false` は modifier を外す
-- text 系トークンは最大 16 個の順序付き `rules` を取れる。各 rule は `equals` / `contains` / `starts_with` / `gt` / `lt` のいずれか 1 つ + `fg` / `bold` / `dim`。最初にマッチした rule が勝ち、指定フィールドのみ上書きする。文字列条件は case-sensitive（`ignore_case = true` で ASCII のみ大小無視）、`gt` / `lt` は有限数値のみで完全一致 parse が必要。`state_icon` と composite の `git_status` は固定 style のみ。**0.8.2 では未対応**（`RawSidebarToken` の parse error）
+- text 系トークンは最大 16 個の順序付き `rules` を取れる。各 rule は `equals` / `contains` / `starts_with` / `gt` / `lt` のいずれか 1 つ + `fg` / `bold` / `dim`。最初にマッチした rule が勝ち、指定フィールドのみ上書きする。文字列条件は case-sensitive（`ignore_case = true` で ASCII のみ大小無視）、`gt` / `lt` は有限数値のみで完全一致 parse が必要。`state_icon` と composite の `git_status` は固定 style のみ
 
   ```toml
   rows = [
@@ -307,7 +307,7 @@ reveal_hidden_cursor_for_cjk_ime = false   # macOS IME の候補ウィンドウ�
 cjk_ime_agents = []         # allow-list（空=全ペイン）。"claude", "codex", "pi" 等
 cjk_ime_cursor_shape = "steady_block"      # block / steady_block / underline / steady_underline / bar / steady_bar
 switch_ascii_input_source_in_prefix = false  # macOS/Windows。prefix mode 中に ASCII 入力ソースへ切替
-# kitty_graphics            # legacy。[terminal] kitty_graphics が正（0.8.2 のみここに書く）
+# kitty_graphics            # legacy。[terminal] kitty_graphics が正
 ```
 
 CJK IME 利用者（日本語入力）は `reveal_hidden_cursor_for_cjk_ime` + `cjk_ime_agents` と `switch_ascii_input_source_in_prefix` が実用上重要。

@@ -1,6 +1,8 @@
 ---
 name: tuxedo
-description: Use when managing todo.txt tasks with the `tuxedo` CLI/TUI — adding, listing, prioritizing, completing, or archiving tasks, scripting against todo.txt with `--json`, capturing tasks from a phone or shell via the LAN capture endpoint and `inbox.txt`, or explaining tuxedo's natural-language date / recurrence syntax. Do not use for generic todo.txt format questions unrelated to tuxedo.
+description: >-
+  todo.txt via the `tuxedo` CLI/TUI: add, list, prioritize, complete, archive,
+  `--json` scripting, LAN capture / inbox.txt, and its natural-language dates and rec: syntax.
 ---
 
 # tuxedo

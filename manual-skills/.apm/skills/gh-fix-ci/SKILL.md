@@ -44,13 +44,13 @@ Prereq: authenticate with GitHub CLI once, then confirm with `gh auth status`. R
    - Manual fallback:
      - `gh pr checks <pr> --json name,state,bucket,link,startedAt,completedAt,workflow`
        - If a field is rejected, rerun with the available fields reported by `gh`.
-     - For each failing check, extract the run id from `detailsUrl` and run:
+     - For each failing check, extract the run id from `link` and run:
        - `gh run view <run_id> --json name,workflowName,conclusion,status,url,event,headBranch,headSha`
        - `gh run view <run_id> --log`
      - If the run log says it is still in progress, fetch job logs directly:
        - `gh api "/repos/<owner>/<repo>/actions/jobs/<job_id>/logs" > "<path>"`
 4. Scope non-GitHub Actions checks.
-   - If `detailsUrl` is not a GitHub Actions run, label it as external and only report the URL.
+   - If `link` is not a GitHub Actions run, label it as external and only report the URL.
    - Do not attempt Buildkite or other providers; keep the workflow lean.
 5. Summarize failures for the user.
    - Provide the failing check name, run URL (if any), and a concise log snippet.

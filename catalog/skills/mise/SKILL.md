@@ -1,19 +1,10 @@
 ---
 name: mise
 description: >-
-  Guidance for mise (mise-en-place) as task runner, tool version manager, and
-  package manager. Use when working with mise.toml, task definitions and
-  dependency graphs (`mise run`, depends/run), `[task_config].includes` and
-  global-vs-repository task placement (`~/.config/mise/tasks` vs local includes),
-  DB/env/dotenvx/secrets/tools task-family splitting, tool/package
-  centralization (npm:/pipx:), `mise upgrade` and `minimum_release_age`,
-  Windows settings (`run_windows`, `entry.workstation-windows.toml`), `mise skills add`,
-  `mise bootstrap` and its config sections (`[bootstrap.packages]`,
-  `[dotfiles]`, launchd/systemd units), `mise dotfiles apply`, or migrating a
-  Brewfile to mise bootstrap.
-  For `~/.apm` rollout work (apm.yml, lockfile, which APM task to run),
-  coordinate with `apm-usage`. For Home Manager / Nix Flake dotfiles, use
-  `nix-dotfiles`.
+  mise.toml task design (run vs depends DAG, [task_config].includes, global vs
+  repo-local task placement), tool and npm:/pipx: version pinning, `mise upgrade`
+  and minimum_release_age, Windows run_windows, and `mise bootstrap` /
+  `[dotfiles]` / Brewfile migration. For ~/.apm rollout use apm-usage.
 ---
 
 # mise - Task Runner Configuration
@@ -28,12 +19,12 @@ Classify the request into one mode and answer from that mode only:
    - Prefer a single root `mise.toml` for small or medium task sets
    - For large repos, use `[task_config].includes` only when task families have clear owners (DB, env/dotenvx, secrets, infra, deploy, tools) — see `references/task-family-splitting.md`
    - Treat the repo's existing task names, workflow semantics, and source-of-truth rules as authoritative
-2. User-global / dotfiles mode — the user is managing `~/.config/mise`, personal toolchains, or `mise skills add`.
+2. User-global / dotfiles mode — the user is managing `~/.config/mise` or personal toolchains.
    - Split layouts are valid here: settings-only `config.toml`, `MISE_CONFIG_FILE` entry points such as `entry.workstation-unix.toml`, `entry.ci.toml`, and `entry.workstation-windows.toml`, plus `MISE_ENV` overlays such as `config.shared.toml` and `config.workstation.toml`; see `references/task-config-includes.md`
    - Treat `~/.config/mise/tasks/` as an explicit opt-in surface for tasks intentionally available from any directory; keep dotfiles maintenance in a separate directory such as `~/.config/mise/local-tasks/` by default
    - `entry.workstation-windows.toml` and `windows_default_*_shell_args` usually belong here unless the repository explicitly vendors its own Windows shell policy
 
-If the request mentions `mise skills add`, `mise bootstrap`, `[dotfiles]`, personal/global setup, or `~/.config/mise`, treat it as user-global. Otherwise default to project-local.
+If the request mentions `mise bootstrap`, `[dotfiles]`, personal/global setup, or `~/.config/mise`, treat it as user-global. Otherwise default to project-local.
 
 ## Global vs Repository-Local Tasks
 
@@ -103,16 +94,8 @@ Within `[tasks]`: individual commands → aggregation tasks → aliases/meta-tas
 - Shared repositories: pin concrete LTS majors or exact patches (`node = "24"` or `node = "24.15.0"`); personal global configs may use symbolic channels (`node = "lts"`)
 - Resolve the newest acceptable version first, then record the concrete version — no floating channels in committed configs or CI
 - Add tools to `[tools]` only when tasks or documented setup flows actually invoke them
-- pnpm is the pinning exception: mise only bootstraps it with a loose major pin (`pnpm = "11"`); the exact version is owned by each repository's `package.json` `packageManager` field (pnpm 10+ self-management switches automatically). Do not use corepack — Node 25+ no longer ships it
+- pnpm is the pinning exception: mise only bootstraps it with a loose major pin (`pnpm = "12"`); the exact version is owned by each repository's `package.json` `packageManager` field (pnpm 10+ self-management switches automatically). Do not use corepack — Node 25+ no longer ships it
 - Migration from `global-package.json`, pinning policy, pipx/CI caveats: `references/tool-management.md`
-
-### mise skills add
-
-Treat as a user-global workflow, not project-local task design:
-
-1. Confirm the user is working in a personal/global mise setup
-2. Run `mise skills add <skill>`, then `mise install` if it adds tool dependencies
-3. Keep reusable automation in shared task files or `.mise.toml`, not ad hoc shell aliases
 
 ## mise bootstrap (user-global / dotfiles mode)
 
@@ -143,14 +126,13 @@ For repository-specific reviews, additionally verify the answer:
 
 ## Common Issues
 
-| Issue                                                                          | Fix                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `run = "mise build && mise test"` (nested processes)                           | `run = [{ task = "build" }, { task = "test" }]`                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| `{ task = "build" }` at the head of `run`                                      | Move to `depends = ["build"]`                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| Serial `{ task = ... }` list of independent tasks                              | Aggregate with `depends` for parallel execution                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| `run_windows` syntax mismatched with actual shell                              | Inspect the real shell first; see `references/windows-shells.md`                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| Generated `mise.toml` rejected after formatting                                | Fix the template/generator; exclude generated outputs from formatter tasks                                                                                                                                                                                                                                                                                                                                                                                                                |
-| `github:` backend の macOS `.app` が「壊れているため開けません」（Gatekeeper） | tar 展開が AppleDouble `._*` を実体化し codesign の resource seal を壊す（Developer ID + hardened runtime で顕在化。例: terminal-browser 0.7.x）。install/upgrade 後に bundle 内の `._*` を `find <app> -name "._*" -delete` で除去し、`codesign --verify --deep --strict` と `spctl --assess --type execute` で検証する。quarantine xattr の問題ではない。ダイアログで「ゴミ箱に入れる」を押すと本体が Trash へ移動するので、消えたら Trash 確認 → `mise uninstall`/`install` で入れ直す |
+| Issue                                                | Fix                                                                        |
+| ---------------------------------------------------- | -------------------------------------------------------------------------- |
+| `run = "mise build && mise test"` (nested processes) | `run = [{ task = "build" }, { task = "test" }]`                            |
+| `{ task = "build" }` at the head of `run`            | Move to `depends = ["build"]`                                              |
+| Serial `{ task = ... }` list of independent tasks    | Aggregate with `depends` for parallel execution                            |
+| `run_windows` syntax mismatched with actual shell    | Inspect the real shell first; see `references/windows-shells.md`           |
+| Generated `mise.toml` rejected after formatting      | Fix the template/generator; exclude generated outputs from formatter tasks |
 
 ## References
 

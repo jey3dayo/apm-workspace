@@ -1,6 +1,10 @@
 ---
 name: dotenvx
-description: Use when operating dotenvx-managed environment files, `encrypted:` values, `.env.*` loading, `dotenvx run`, env drift, secret redaction, or when dotenvx/mise environment injection may pollute CLI tools such as AWS CLI, Terraform, CDK, GitHub CLI, or perman-aws-vault. This skill leads dotenvx key rotation end-to-end (`dotenvx rotate`, `.env.keys` replacement, storing the new private key in 1Password); delegate the 1Password item update step to `1password`.
+description: >-
+  dotenvx env files: `dotenvx run`, `encrypted:` values, `.env.*` loading, env drift,
+  key rotation (`dotenvx rotate`, `.env.keys`; the 1Password step goes to 1password),
+  and sanitizing shells where dotenvx/mise injection pollutes aws, terraform, cdk,
+  gh or perman-aws-vault.
 ---
 
 # dotenvx

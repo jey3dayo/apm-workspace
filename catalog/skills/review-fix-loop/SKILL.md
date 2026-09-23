@@ -99,8 +99,11 @@ reproduction step, or diff inspection.
    - Run a review pass after each meaningful integration slice.
    - Triage every review comment with the triage vocabulary before spending fix
      time; apply the Low-Quality Review Filter.
-   - Score the result 0-100 with the Review Rubric. Fix `do-now` findings and
-     re-review until the score is at least 95, or a Stop Condition applies.
+   - Score the result 0-100 with the Review Rubric. The score that clears the
+     95 gate must come from a reviewer that is a different identity and a
+     separate session from the author (orchestrator-worker "self-review 禁止");
+     a self-score is a draft signal only. Fix `do-now` findings and re-review
+     until that reviewer scores 95+, or a Stop Condition applies.
    - When a reviewer finds a contract mismatch between representations, update
      the implementation and its observability surface together (debug displays,
      shared type comments, telemetry), and add a test at the exact conversion

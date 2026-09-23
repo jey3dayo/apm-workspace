@@ -1,6 +1,9 @@
 ---
 name: herdr
-description: Use when creating or editing herdr configuration (`~/.config/herdr/config.toml`) — keybindings, themes, sidebar rows, tab-bar status, window title, notifications, sounds, terminal defaults, worktrees, or experimental options — when `herdr config check` or a startup warning reports a config problem, or when inspecting or controlling live Herdr workspaces, tabs, panes, and agents through the CLI. Do not use for generic terminal multiplexer comparisons.
+description: >-
+  Edit ~/.config/herdr/config.toml (keys, theme, sidebar, notifications, worktrees)
+  and fix `herdr config check` / startup warnings; inspect or drive live Herdr
+  workspaces, panes and agents via the CLI.
 ---
 
 # Herdr Configuration and Runtime Control
@@ -23,7 +26,7 @@ herdr は tmux 風 prefix モードを持つ agent runtime。設定は単一の 
 ## Configuration workflow
 
 1. 既存 config を読む — `~/.config/herdr/config.toml` を必ず先に読む。コメントに書かれた規約（prefix 選定、Ghostty 互換バインド、JIS キーボードの `¥` 扱いなど）はユーザーの設計判断であり、編集時に必ず維持する。
-2. 設定項目を確認する — 対象セクションの要約は [references/configuration.md](references/configuration.md)（基準は stable 0.9.0）。そこに無い項目・挙動が疑わしい項目は推測せず、次の順で一次情報を引く。
+2. 設定項目を確認する — 対象セクションの要約は [references/configuration.md](references/configuration.md)（基準は stable 0.9.1）。そこに無い項目・挙動が疑わしい項目は推測せず、次の順で一次情報を引く。
 
    ```bash
    herdr --version                        # 手元の binary

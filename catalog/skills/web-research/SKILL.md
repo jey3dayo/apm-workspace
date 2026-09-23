@@ -1,6 +1,10 @@
 ---
 name: web-research
-description: "Plan, route, collect, and synthesize public web research with cited evidence. Use as the default entry point when the user asks to research a topic online, look something up, find current information, compare options, produce a research report, or requests X/Twitter signal or Jina search. Delegates large investigations to parallel Sonnet subagents; collection uses the host's built-in web search and direct URL fetch, with Jina as a paid opt-in."
+description: >-
+  Public web research with cited evidence: look something up, find current info,
+  compare options, or X/Twitter signal. Fans large investigations out to parallel
+  subagents; Jina only when the user names it. Repo-local Markdown research write-up
+  belongs to the upstream `research` skill.
 ---
 
 # Web Research

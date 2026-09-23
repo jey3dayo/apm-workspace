@@ -1,6 +1,10 @@
 ---
 name: todo-changelog-ops
-description: "Use when adding, closing, or pruning entries in a repository's `TODO.md`, when moving finished work into `CHANGELOG.md` (including work tracked in `todo.txt`, GitHub Issues, or PRs), when setting up local task tracking for a repository that has no tracker, or when deciding where a task belongs among `todo.txt`, GitHub Issues, docs, and `TODO.md` (置き場の振り分け). Do not use for entrypoint-docs drift review (`docs-review`), for cutting a release version section or tag (the repository's release workflow), for manager-facing work reports (`work-log-maintenance`), or for commit splitting (`atomic-commit`)."
+description: >-
+  Maintain a repository's TODO.md and CHANGELOG.md: add, close or prune TODO entries,
+  move landed work (from TODO.md, todo.txt, issues or PRs) into CHANGELOG, set up
+  tracking in a repo with none, and decide where a task belongs (todo.txt / issue /
+  docs / TODO.md). Release version sections belong to the release workflow.
 ---
 
 # TODO / CHANGELOG Ops
@@ -64,7 +68,7 @@ todo.txt のタスクが設計判断を要するほど育ったら issue へ昇�
 
 `TODO.md` が肥大化したら、優先度を下げる前に「これは恒久ルールではないか」を確認する。ルールなら `CLAUDE.md` や `.claude/rules/` などリポジトリのルール置き場へ移し、TODO からは消す。
 
-完了済みの記録を根拠にするときは、その完了条件が現物で成立しているかを確認する。完了行は「誰かが確認した」という見た目を持つが、部分完了で閉じられていることがある。2026-09-06 に `done.txt` へ「caad-asta へ移設した 3 agent から変動値の複製を減らす」を完了記録した項目は、実際には 3 つのうち 1 つしか終わっておらず、残り 2 ファイルに 25 箇所の焼き込みが残っていた。台帳は書いた時点の観測であって現在の状態ではない。
+完了済みの記録を根拠にするときは、その完了条件が現物で成立しているかを確認する。完了行は「誰かが確認した」という見た目を持つが、部分完了で閉じられていることがある。台帳は書いた時点の観測であって現在の状態ではない。
 
 項目が指すファイルを探して glob や grep が空を返したときは、「無い」ではなく「パターンが違う」を先に疑い、`git ls-files` で実パスを確認する。空の結果を不存在の根拠にすると、照合していないものを照合済みとして報告することになる。
 

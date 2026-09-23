@@ -1,11 +1,9 @@
 ---
 name: pwa-layout
 description: >-
-  PWA・ホーム画面起動（standalone / fullscreen）でフッターや固定要素がずれる・
-  ノッチやホームインジケーターに重なる・Safari タブでは正常なのにインストール後だけ崩れる、
-  といったレイアウト問題の診断と修正。env(safe-area-inset-*)、viewport-fit=cover、
-  manifest の display、100vh 問題（dvh / svh）、キーボード重なり（visualViewport /
-  interactive-widget）、@media (display-mode) によるスコープを扱う。
+  PWA / home-screen (standalone) layout bugs: footer or fixed UI hitting the notch or
+  home indicator, breakage only after install, safe-area env(), viewport-fit=cover,
+  100vh vs dvh/svh, keyboard overlap.
 ---
 
 # PWA Layout

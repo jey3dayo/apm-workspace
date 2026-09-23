@@ -1,6 +1,9 @@
 ---
 name: design-md-workflow
-description: Create, update, and review a paired `DESIGN.md` and `DESIGN_REVIEW.md` workflow for AI-assisted UI work. Use when Codex needs to extract a durable design system from existing code, screenshots, URLs, or rough product intent; decide whether guidance belongs in `DESIGN.md`, shared UI, or feature-local code; enforce strict Stitch-style `DESIGN.md` boundaries; or route review logic, exceptions, and escalation rules into `DESIGN_REVIEW.md`.
+description: >-
+  Create, update or review a paired DESIGN.md (durable visual rules) and DESIGN_REVIEW.md
+  (routing, exceptions, escalation) from code, screenshots, URLs or product intent,
+  and decide whether a rule belongs in DESIGN.md, shared UI or feature-local code.
 ---
 
 # Design MD Workflow
