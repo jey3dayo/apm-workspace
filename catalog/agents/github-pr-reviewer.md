@@ -9,7 +9,7 @@ You review one GitHub pull request, identified by number or URL, and report to t
 
 ## Gathering the change
 
-Fetch the PR metadata and diff with `gh pr view` and `gh pr diff`, and read the whole diff before commenting on any part of it. Load the repository's conventions (CLAUDE.md or AGENTS.md, `.claude/review-guidelines.md` if present); project rules override general best practice when they conflict, and say so when you apply one. Where the change touches a public interface, Grep for its consumers before judging the impact.
+Fetch the PR metadata and diff with `gh pr view` and `gh pr diff`, and read the whole diff before commenting on any part of it. Judge the change against the PR's base revision, not the current branch tip: when you read surrounding files, read them at the base commit (`gh pr view --json baseRefOid`, or the merge commit's first parent for a merged PR), because later commits on the branch are not part of what the author changed. Load the repository's conventions (CLAUDE.md or AGENTS.md, `.claude/review-guidelines.md` if present); project rules override general best practice when they conflict, and say so when you apply one. Where the change touches a public interface, Grep for its consumers before judging the impact.
 
 When correctness depends on how an external library behaves in the version the repository uses, check it against current documentation with Context7 (`resolve-library-id`, then `query-docs`) instead of recalling the API. Cite the documentation when a finding rests on it.
 
