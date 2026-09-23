@@ -30,14 +30,12 @@ dependencies:
     - mattpocock/skills/skills/engineering/prototype#3cca18b368ae95cdbdebbff572ccafa662551015
     - mattpocock/skills/skills/engineering/research#3cca18b368ae95cdbdebbff572ccafa662551015
     - mattpocock/skills/skills/engineering/setup-matt-pocock-skills#3cca18b368ae95cdbdebbff572ccafa662551015
-    - mattpocock/skills/skills/engineering/tdd#3cca18b368ae95cdbdebbff572ccafa662551015
     - mattpocock/skills/skills/engineering/wayfinder#3cca18b368ae95cdbdebbff572ccafa662551015
 
     # productivity / writing
     - mattpocock/skills/skills/productivity/grilling#3cca18b368ae95cdbdebbff572ccafa662551015
     - mattpocock/skills/skills/productivity/wait-what#3cca18b368ae95cdbdebbff572ccafa662551015
     - mattpocock/skills/skills/productivity/writing-for-agents#3cca18b368ae95cdbdebbff572ccafa662551015
-    - gonta223/humanizer-ja#a1e343696e43aa50e7218891f3319ab22cde3464
     - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
       ref: 8f2d57610a73efc97d743c9b0b0ecb1002e09fa4
       alias: japanese-tech-writing
@@ -48,7 +46,6 @@ dependencies:
 
     # browser / analysis tools
     - browser-use/browser-harness#eba1021c78dc8c1a4e78f98155396c4fa979b7f0
-    - cathrynlavery/diagram-design#3b446333f164174a571106673f943c58df282ff8
     - tt-a1i/archify/archify#c6519401f7b91b9d43011657880893b0a8955548
     - anthropics/claude-code/plugins/frontend-design/skills/frontend-design#ab9b2cf7bb9e4f98ff264c07a22e46d83c29c558
 
@@ -79,10 +76,6 @@ dependencies:
     - agavra/tuicr/skills/tuicr#b55e218f6d38a87ca4a6d9924a4c50b5f601dd07
     - humanlayer/skills/plugins/show-me/skills/show-me#3c2629142c5d437428269b1b722b08c0b87f574d
 
-    # --- orca ---
-    - stablyai/orca/skills/orca-cli#8b197ffdc2f43f0bf31158ff7dd9de35ac4fbea5
-    - stablyai/orca/skills/computer-use#8b197ffdc2f43f0bf31158ff7dd9de35ac4fbea5
-    - stablyai/orca/skills/orchestration#8b197ffdc2f43f0bf31158ff7dd9de35ac4fbea5
     - coji/natural-japanese/skills/natural-japanese#9a78a42964096da509b8f3e011f0085a5f080151
     - ayghri/i-have-adhd/skills/i-have-adhd#839872f9d1cd634fed642b4589ce7226199cc15f
     - mvanhorn/last30days-skill/skills/last30days#084662b501fb0dba95bd55eff0c258d35e0dc499
