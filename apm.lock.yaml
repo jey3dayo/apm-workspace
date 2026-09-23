@@ -5360,7 +5360,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: 2494e6a9b8ef4c02be9dc90ea76839a8bf563099
+  resolved_commit: cbb1064651b8fd999088d04091a7b34107e41d61
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -5714,9 +5714,6 @@ dependencies:
   - .claude/skills/prepare-goal/agents/openai.yaml
   - .claude/skills/pwa-layout
   - .claude/skills/pwa-layout/SKILL.md
-  - .claude/skills/quiet-command-auditor
-  - .claude/skills/quiet-command-auditor/SKILL.md
-  - .claude/skills/quiet-command-auditor/agents/openai.yaml
   - .claude/skills/refactoring
   - .claude/skills/refactoring/SKILL.md
   - .claude/skills/refactoring/references/boundary_ownership.md
@@ -5938,7 +5935,7 @@ dependencies:
     .agents/skills/apm-repo-manifest/agents/openai.yaml: sha256:dbacea84e80eef5e32eefaf61c709331481dfd9ebe3a229884ee5fe00c84645b
     .agents/skills/apm-repo-manifest/references/preinstall-checklist.md: sha256:0112fcadf9b87f6b9d5b19ab4a62b84b4d556562d89bfce9868c56be5830d23b
     .agents/skills/apm-repo-manifest/references/recommendations.md: sha256:2e6128f48bc7b66ee2c8cdab64c6344f24d99841e7630762fd3e1882b280979f
-    .agents/skills/apm-usage/SKILL.md: sha256:8d64e70d155538417eda0e9ee9f10c05e0a58c80ebc94ad05932f342031688e8
+    .agents/skills/apm-usage/SKILL.md: sha256:4b2eccb000f635c3761b9621e3696510d31714829d374f882af348ebfb0f79f7
     .agents/skills/apm-usage/agents/openai.yaml: sha256:b3743dad4fcd9f3c209210c40df277e75d949ac7ce1713a61d497cc1e7e3ba83
     .agents/skills/apm-usage/references/repo-local-mcp.md: sha256:b12b6b2fc81ed10d0db9427accd2f81b62796c3ed99bbddb66993a694af530f9
     .agents/skills/architecture-boundary-docs/SKILL.md: sha256:a1ff83850e0cf330529b2f94436714692d933b80b780a08a21263679fe393d2e
@@ -6098,7 +6095,7 @@ dependencies:
     .agents/skills/todo-changelog-ops/SKILL.md: sha256:3fe2654144662a6d0b7027bd51d2bebd2defdff6e521f68aedd5fc2f3c08a756
     .agents/skills/tuxedo/SKILL.md: sha256:a28fc2984a16c933fad272da292a5d91c01946e0fd13da0f2d74025b13ddad0b
     .agents/skills/tuxedo/references/tui-and-capture.md: sha256:13278531ebad1f152047aaebc247eacbfd69f75ba1887e3a611627c94a31f684
-    .agents/skills/web-research/SKILL.md: sha256:e229bec9faed4b2d89dac7ddbf7d3053583fb56b49f7d834385e5f314769ed8b
+    .agents/skills/web-research/SKILL.md: sha256:f282df8a0b0adf37eb5343a83de30962e66b86b055934b1c97c9f92943ad6533
     .agents/skills/web-research/agents/openai.yaml: sha256:50536a04fbc72b0f71fc9975a7e041893912ebfcaf9c671439843d20172e1264
     .agents/skills/work-log-maintenance/SKILL.md: sha256:26f4064ff1c0e757e415121675d6caaecd30040f95304e6ed4cd4c73e022f3f9
     .agents/skills/work-log-maintenance/agents/openai.yaml: sha256:e951b8256a5a1b032bcca3c7105230f5041467594434ca23b562b8ec5ec4abc8
@@ -6122,7 +6119,7 @@ dependencies:
     .claude/skills/apm-repo-manifest/agents/openai.yaml: sha256:dbacea84e80eef5e32eefaf61c709331481dfd9ebe3a229884ee5fe00c84645b
     .claude/skills/apm-repo-manifest/references/preinstall-checklist.md: sha256:0112fcadf9b87f6b9d5b19ab4a62b84b4d556562d89bfce9868c56be5830d23b
     .claude/skills/apm-repo-manifest/references/recommendations.md: sha256:2e6128f48bc7b66ee2c8cdab64c6344f24d99841e7630762fd3e1882b280979f
-    .claude/skills/apm-usage/SKILL.md: sha256:8d64e70d155538417eda0e9ee9f10c05e0a58c80ebc94ad05932f342031688e8
+    .claude/skills/apm-usage/SKILL.md: sha256:4b2eccb000f635c3761b9621e3696510d31714829d374f882af348ebfb0f79f7
     .claude/skills/apm-usage/agents/openai.yaml: sha256:b3743dad4fcd9f3c209210c40df277e75d949ac7ce1713a61d497cc1e7e3ba83
     .claude/skills/apm-usage/references/repo-local-mcp.md: sha256:b12b6b2fc81ed10d0db9427accd2f81b62796c3ed99bbddb66993a694af530f9
     .claude/skills/atomic-commit/SKILL.md: sha256:6dd6035d695157659bbcaa1baa560035143a5f52e36712e4faee2eceab52c82d
@@ -6190,8 +6187,6 @@ dependencies:
     .claude/skills/prepare-goal/SKILL.md: sha256:792827300e8fa75400f2bc50d7d27c5a5a3f3b0a6c0859861d6c3566a1e88a35
     .claude/skills/prepare-goal/agents/openai.yaml: sha256:870d31c398ceb1c485a64b3a5e694942f055e85983718a61434b117bca5cefbc
     .claude/skills/pwa-layout/SKILL.md: sha256:06264ecbff00eabe633b7a278df4fc42e057893f0e9c4c208cd4c4ca0d7801f9
-    .claude/skills/quiet-command-auditor/SKILL.md: sha256:3e41b443ad6a82cabbbeabbbf4d874e13aaecea2434cc4adef72f1a68b1d19f4
-    .claude/skills/quiet-command-auditor/agents/openai.yaml: sha256:f291311cccf3c7de9195eaf3c032a88a2a9fc2cc13ab5296731316febadc755e
     .claude/skills/refactoring/SKILL.md: sha256:ec521b96f0f47fe4fea2338c1d7a96121a6b78c418e912c75de04146ef456974
     .claude/skills/refactoring/references/boundary_ownership.md: sha256:e1453ec7788d1f013a356982568c7a5cbd727be72907b721ab8443040cc91058
     .claude/skills/refactoring/references/code_quality_cleanup.md: sha256:c09cd24e853518d544d39ba80f5fcce381d477325001afde304be2f970c6562f
@@ -6207,7 +6202,7 @@ dependencies:
     .claude/skills/todo-changelog-ops/SKILL.md: sha256:3fe2654144662a6d0b7027bd51d2bebd2defdff6e521f68aedd5fc2f3c08a756
     .claude/skills/tuxedo/SKILL.md: sha256:a28fc2984a16c933fad272da292a5d91c01946e0fd13da0f2d74025b13ddad0b
     .claude/skills/tuxedo/references/tui-and-capture.md: sha256:13278531ebad1f152047aaebc247eacbfd69f75ba1887e3a611627c94a31f684
-    .claude/skills/web-research/SKILL.md: sha256:e229bec9faed4b2d89dac7ddbf7d3053583fb56b49f7d834385e5f314769ed8b
+    .claude/skills/web-research/SKILL.md: sha256:f282df8a0b0adf37eb5343a83de30962e66b86b055934b1c97c9f92943ad6533
     .claude/skills/web-research/agents/openai.yaml: sha256:50536a04fbc72b0f71fc9975a7e041893912ebfcaf9c671439843d20172e1264
     .config/opencode/skills/1password-item-ops/SKILL.md: sha256:cc8da57562e1a03763ad160c4e8c7493fa3487299388990eb9e03f48e8540962
     .config/opencode/skills/1password-item-ops/agents/openai.yaml: sha256:7e861a0611c042f922c97096ec7ef4906d27b94f2b5d52d67638bce72c23ca6b
@@ -6341,11 +6336,11 @@ dependencies:
     .config/opencode/skills/tuxedo/references/tui-and-capture.md: sha256:13278531ebad1f152047aaebc247eacbfd69f75ba1887e3a611627c94a31f684
     .config/opencode/skills/web-research/SKILL.md: sha256:07109256e91fdd784259fc941efda1b914465da458587c85831a087f70f2b941
     .config/opencode/skills/web-research/agents/openai.yaml: sha256:50536a04fbc72b0f71fc9975a7e041893912ebfcaf9c671439843d20172e1264
-  content_hash: sha256:cbcd1afa6f3e7568d3a5cce3aa8bfae712b62dc52aa0daca193f988e664ce3b6
+  content_hash: sha256:d8690d2137edc8952ca05bbf1e7086c5db4cac0b2bc3c3bcd9a244b7ef74eb85
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
-  resolved_commit: 2494e6a9b8ef4c02be9dc90ea76839a8bf563099
+  resolved_commit: cbb1064651b8fd999088d04091a7b34107e41d61
   resolved_ref: main
   version: 1.0.0
   virtual_path: manual-skills
@@ -14297,7 +14292,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:8d64e70d155538417eda0e9ee9f10c05e0a58c80ebc94ad05932f342031688e8
+  content_hash: sha256:4b2eccb000f635c3761b9621e3696510d31714829d374f882af348ebfb0f79f7
 - kind: project-relative
   target: agents
   value: .agents/skills/apm-usage/agents/openai.yaml
@@ -22838,7 +22833,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:e229bec9faed4b2d89dac7ddbf7d3053583fb56b49f7d834385e5f314769ed8b
+  content_hash: sha256:f282df8a0b0adf37eb5343a83de30962e66b86b055934b1c97c9f92943ad6533
 - kind: project-relative
   target: agents
   value: .agents/skills/web-research/agents/openai.yaml
@@ -28004,7 +27999,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:8d64e70d155538417eda0e9ee9f10c05e0a58c80ebc94ad05932f342031688e8
+  content_hash: sha256:4b2eccb000f635c3761b9621e3696510d31714829d374f882af348ebfb0f79f7
 - kind: project-relative
   target: claude
   value: .claude/skills/apm-usage/agents/openai.yaml
@@ -33506,33 +33501,6 @@ deployments:
   content_hash: sha256:06264ecbff00eabe633b7a278df4fc42e057893f0e9c4c208cd4c4ca0d7801f9
 - kind: project-relative
   target: claude
-  value: .claude/skills/quiet-command-auditor
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/quiet-command-auditor/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:3e41b443ad6a82cabbbeabbbf4d874e13aaecea2434cc4adef72f1a68b1d19f4
-- kind: project-relative
-  target: claude
-  value: .claude/skills/quiet-command-auditor/agents/openai.yaml
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:f291311cccf3c7de9195eaf3c032a88a2a9fc2cc13ab5296731316febadc755e
-- kind: project-relative
-  target: claude
   value: .claude/skills/react-best-practices
   runtime: null
   scope: project
@@ -35690,7 +35658,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:e229bec9faed4b2d89dac7ddbf7d3053583fb56b49f7d834385e5f314769ed8b
+  content_hash: sha256:f282df8a0b0adf37eb5343a83de30962e66b86b055934b1c97c9f92943ad6533
 - kind: project-relative
   target: claude
   value: .claude/skills/web-research/agents/openai.yaml
