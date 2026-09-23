@@ -32,15 +32,19 @@
 - React / Web 実装: `react-best-practices`, `browser-harness`, `screenshot`
 - 社内（caad-develop）: `perman-aws-vault`, `caad-skill-deployer`,
   `ai-butsukari-evidence-scout`
-- 図生成: `diagram-design`（cathrynlavery, SHA pin）
 - リサーチ・出力スタイル: `last30days`（mvanhorn）, `i-have-adhd`（ayghri）
-- その他: `humanizer-ja`, `agmsg`, `tuicr`,
+- UI アノテーション: `agentation` / `agentation-self-driving`（benjitaylor, global dependency として再採用）
+- その他: `agmsg`, `tuicr`,
   mattpocock 系（`grilling`, `writing-for-agents`, `wayfinder`,
   `improve-codebase-architecture`, `codebase-design`, `domain-modeling`,
   `research`, `prototype`, `setup-matt-pocock-skills`）
 
 `MiniMax-AI/MiniMax-H3` 系 9 スキル（`h3-prompt-writing` と各種動画
 ジェネレーター）は 2026-08-10 に撤去した。
+
+`diagram-design`（cathrynlavery）と `humanizer-ja`（gonta223）は 2026-09-23 に撤去した。
+判断理由は `package-decisions.md` の「`diagram-design` / `humanizer-ja` / `tdd` の撤去
+（2026-09-23）」を参照。
 
 `obra/superpowers` 全 11 スキルは 2026-08-09 に撤去した。判断理由は
 [`docs/package-decisions.md`](package-decisions.md) の
@@ -50,7 +54,7 @@
 
 主な系統:
 
-- APM・環境運用: `apm-usage`, `apm-repo-manifest`, `mise`,
+- APM・環境運用: `apm-usage`（repo-local `apm.yml` の作成/整理は `references/repo-manifest.md`）, `mise`,
   `dotenvx`, `1password`, `herdr`
 - レビュー・品質: `review-fix-loop`, `polish`
 - デザイン: `design-md-workflow`
@@ -97,18 +101,19 @@
 global の一覧に無くても廃止ではない。各リポジトリの `apm.yml` が正本
 （2026-07-16 時点の `ghq` 配下スキャン）。
 
-| ツール                                                                                    | 利用リポジトリ                      | 用途                                                     |
-| ----------------------------------------------------------------------------------------- | ----------------------------------- | -------------------------------------------------------- |
-| `agentation` / `agentation-self-driving` + `agentation-mcp`（MCP）                        | `caad-loca-bff`, `ultra-rss-reader` | Agentation toolbar での UI アノテーション連携            |
-| `agent-browser`（vercel-labs）                                                            | `caad-loca-bff`, `ultra-rss-reader` | ブラウザ自動化・Web UI 検証                              |
-| `chrome-devtools`（MCP）                                                                  | `browser-toolkit`                   | Lighthouse・パフォーマンストレース等の DevTools 固有分析 |
-| `tauri-mcp-server`（MCP）                                                                 | `ultra-rss-reader`                  | Tauri ランタイム検証                                     |
-| `terraform-style-guide` / `terraform-test`（hashicorp）                                   | `ca-connect-site`, `caad-asta`      | Terraform 規約・テスト                                   |
-| `workers-best-practices` / `wrangler`（cloudflare）                                       | `keep-on`                           | Cloudflare Workers                                       |
-| `mcp-server-patterns`, `chatgpt-apps`                                                     | `caad-loca-bff`                     | MCP / ChatGPT Apps 実装                                  |
-| `tauri`（EpicenterHQ）, `rust-best-practices`, `tauri-icon-gen`, `tauri-webview-geometry` | `ultra-rss-reader`                  | Tauri / Rust 実装                                        |
-| `marp-slide`, `slide-docs`                                                                | `tech-talks`                        | スライド制作                                             |
-| `manga-rss-bridge`                                                                        | `manga-rss-bridge`, `homelab-k3s`   | プロジェクト固有運用                                     |
+| ツール                                                                                    | 利用リポジトリ                                                                | 用途                                                     |
+| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `agentation-mcp`（MCP）                                                                   | `caad-loca-bff`, `ultra-rss-reader`                                           | Agentation toolbar での UI アノテーション連携            |
+| `agentation` / `agentation-self-driving`（benjitaylor, global dependency と併用）         | `caad-loca-bff`（両方）, `ultra-rss-reader`（`agentation-self-driving` のみ） | repo-local での Agentation 自動レビュー導線              |
+| `agent-browser`（vercel-labs）                                                            | `caad-loca-bff`, `ultra-rss-reader`                                           | ブラウザ自動化・Web UI 検証                              |
+| `chrome-devtools`（MCP）                                                                  | `browser-toolkit`                                                             | Lighthouse・パフォーマンストレース等の DevTools 固有分析 |
+| `tauri-mcp-server`（MCP）                                                                 | `ultra-rss-reader`                                                            | Tauri ランタイム検証                                     |
+| `terraform-style-guide` / `terraform-test`（hashicorp）                                   | `ca-connect-site`, `caad-asta`                                                | Terraform 規約・テスト                                   |
+| `workers-best-practices` / `wrangler`（cloudflare）                                       | `keep-on`                                                                     | Cloudflare Workers                                       |
+| `mcp-server-patterns`, `chatgpt-apps`                                                     | `caad-loca-bff`                                                               | MCP / ChatGPT Apps 実装                                  |
+| `tauri`（EpicenterHQ）, `rust-best-practices`, `tauri-icon-gen`, `tauri-webview-geometry` | `ultra-rss-reader`                                                            | Tauri / Rust 実装                                        |
+| `marp-slide`, `slide-docs`                                                                | `tech-talks`                                                                  | スライド制作                                             |
+| `manga-rss-bridge`                                                                        | `manga-rss-bridge`, `homelab-k3s`                                             | プロジェクト固有運用                                     |
 
 ## global MCP（root apm.yml の mcp:）
 
@@ -176,8 +181,10 @@ skill 監査（`~/.claude/skill-report/2026-07-23T11-14-21/`）の結果を踏�
 ## 移管候補（未実施）
 
 global から repo-local / optional へ移す候補。実施済みのもの
-（`agentation` 系、`slack-app-management`、`google-forms-survey-builder`、
-社内 API 系、UI バンドル縮小）は上の各レーンへ反映済み。
+（`slack-app-management`、`google-forms-survey-builder`、
+社内 API 系、UI バンドル縮小）は上の各レーンへ反映済み。`agentation` 系は
+2026-07 に repo-local 化した後、global dependency として再採用済み（上の
+「global（外部スキル）」参照）。
 
 | 候補               | 推奨配置                                    | 判断理由                                                                                                                                         |
 | ------------------ | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |

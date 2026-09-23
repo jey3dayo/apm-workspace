@@ -70,6 +70,9 @@
   `researcher` の 2 者で埋まっている（`serena` は 2026-09-09 に撤去）。常駐 trigger を
   持つ価値がない。
 - 従属品: `understand-dashboard` は 2026-08-09 に先行撤去済み（本体の出力を表示するだけ）。
+- 追記（2026-09-23）: `deep-explore` agent を削除した。grepai が未導入で、実行しても
+  組み込み Explore agent へ縮退していたため。単一 subsystem の位置確認は組み込み
+  Explore agent、複数 subsystem に跨る調査は `researcher` に統一する。
 - 再検討するなら: 単発の探索ではなく、同一リポジトリを繰り返し横断して構造を参照する
   作業が定着したときに見る。その場合も global ではなく対象リポジトリの `apm.yml` へ
   repo-local で入れる。
@@ -221,7 +224,7 @@
   - `caad-develop/claude-code-marketplace/plugins/service-integrations/notica-api`
   - `caad-develop/claude-code-marketplace/plugins/service-integrations/telma-api`
 - 補足: `private-skills` の `ca-pass` overlay は machine-local な別レーンとして維持する。
-- 追記（2026-08-21）: `ca-pass` だけが root `apm.yml` に残留していた drift を /improve 監査（#5）で検出し、manifest から実撤去した。利用するリポジトリは repo-local `apm.yml` へ上記 ref を追加する（`apm-repo-manifest` 参照）。
+- 追記（2026-08-21）: `ca-pass` だけが root `apm.yml` に残留していた drift を /improve 監査（#5）で検出し、manifest から実撤去した。利用するリポジトリは repo-local `apm.yml` へ上記 ref を追加する（`apm-usage` の `references/repo-manifest.md` 参照）。
 
 ### banner-design
 
@@ -345,6 +348,8 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 
 - `agentation` / `agentation-self-driving` を global から撤去（repo-local で利用継続:
   `caad-loca-bff`、`ultra-rss-reader`）。
+  - 追記（2026-09-23）: `benjitaylor/agentation/skills/{agentation,agentation-self-driving}` は
+    現在は root `apm.yml` に SHA pin で存在し、global dependency として配布されている。
 
 現状の役割マップ、レビュー系の使い分け、repo-local 活用状況、保留 watchlist は
 [`docs/skill-inventory.md`](skill-inventory.md) に集約した。
@@ -479,6 +484,11 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
   Orca の `computer-use` が同名で Codex 側に両方見える。用途が近いため容認し、
   呼び分けに支障が出たら Orca 側だけ外す。
 - 再検討するなら: Orca を使わなくなった時点で 3 件まとめて撤去する。
+- 追記（2026-09-23）: `orca-cli` / `orchestration` / `computer-use` の3件を撤去した。
+  ユーザーが Orca を使わなくなり、上の再検討条件に合致した。description が
+  1,015 / 866 / 422 字とスキル一覧の予算を圧迫し、trigger も `agmsg` / `git wt`
+  の運用と衝突していた。
+  restore: `apm install -g <ref>`（apm-usage Fast Path 6）、その後 `mise run check` と `mise run deploy` を実行し、`mise run doctor` で agmsg roster を確認する。（前提: ~/.apm の変更が commit → push → `mise run install:catalog` 済みであること。未 push のまま実行すると古い catalog が一時的に再配布される）
 
 ## Nix external skill sources (`agent-skills-sources.nix`)
 
@@ -553,8 +563,20 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 
 - 撤去: `wizard` / `diagnosing-bugs`（mattpocock/skills）、`ai-banzuke`（caad marketplace）、catalog の `quiet-command-auditor`。
 - 理由: 2026-09 の Claude セッション 527 件と 2026-08 以降の Codex セッションで、Skill 起動と `SKILL.md` の読み込みが 0〜1 回。他スキルと global `AGENTS.md` からの参照も無く、ユーザーが不要と判断した。
-- 残した判断: 同じく実績 0 の `domain-modeling` / `research` / `prototype` / `setup-matt-pocock-skills` は、残す `wayfinder` が Skill tool で呼ぶ前提（`improve-codebase-architecture` も `domain-modeling` を参照）なので、`wayfinder` と一緒でなければ外さない。
+- 残した判断: 同じく実績 0 の `domain-modeling` / `research` / `prototype` / `setup-matt-pocock-skills` は、残す `wayfinder` が Skill tool で呼ぶ前提（`improve-codebase-architecture` も `domain-modeling` を参照）なので、`wayfinder` と一緒でなければ外さない。`research` は 2026-09-09 に subagent から 5 回起動されており、他の3件と違って実績 0 ではない。
 - 再導入: 利用場面ができたら `apm.yml` へ同じ ref を戻す。`quiet-command-auditor` は `git show 5bebf6a:catalog/skills/quiet-command-auditor/SKILL.md` から復元できる。
+
+## `diagram-design` / `humanizer-ja` / `tdd` の撤去（2026-09-23）
+
+- 撤去: `cathrynlavery/diagram-design`。
+  - 理由: 同梱の `commands/doctor.md` が組み込み `/doctor` を上書きしていた（transcript で観測）。3か月の Claude Code 利用が 0 件で、本体が約 13k tk あった。図生成は `archify` でカバーする。
+  - restore: `apm install -g <ref>`（apm-usage Fast Path 6）、その後 `mise run check` と `mise run deploy` を実行し、`mise run doctor` で agmsg roster を確認する。（前提: ~/.apm の変更が commit → push → `mise run install:catalog` 済みであること。未 push のまま実行すると古い catalog が一時的に再配布される）
+- 撤去: `gonta223/humanizer-ja`。
+  - 理由: `natural-japanese` に統合した。`natural-japanese` は上位互換（superset）。
+  - restore: `apm install -g <ref>`（apm-usage Fast Path 6）、その後 `mise run check` と `mise run deploy` を実行し、`mise run doctor` で agmsg roster を確認する。（前提: ~/.apm の変更が commit → push → `mise run install:catalog` 済みであること。未 push のまま実行すると古い catalog が一時的に再配布される）
+- 撤去: `mattpocock/.../tdd`。
+  - 理由: 「テスト前にシームをユーザーへ確認する」手順が停止・確認ポリシーと矛盾する。参照元が無く、3か月の利用が1件のみ。
+  - restore: `apm install -g <ref>`（apm-usage Fast Path 6）、その後 `mise run check` と `mise run deploy` を実行し、`mise run doctor` で agmsg roster を確認する。（前提: ~/.apm の変更が commit → push → `mise run install:catalog` 済みであること。未 push のまま実行すると古い catalog が一時的に再配布される）
 
 ## `i-have-adhd` / `last30days` を global-dependency として採用（2026-09-23）
 
@@ -564,3 +586,10 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 - 注意（last30days）: `skills/last30days/` に画像・mp3 の `assets/` が同居し、apm は upstream の `.skillignore` を読まないため `~/.claude/skills` と `~/.agents/skills` の両方へそのまま配布される。deploy 時の「Referenced file not found: url」警告は SKILL.md 内のプレースホルダリンクで、動作に影響しない。エンジンは `python3`（3.12+）と `node` を要し、鍵無しでも Reddit / HN / Polymarket / GitHub は動く。
 - 更新: 両方 SHA pin。`apm.yml` の pin を手で上げ、`apm install -g --only apm` → `mise run deploy`（`apm-usage` Fast Path 5）。`mise run upgrade` では動かない。
 - 再検討するなら: 利用実績が 0 のまま次の棚卸しを迎えたら撤去する。last30days は配布サイズが問題になれば `assets/` 抜きで manual-skills へ vendor する。
+
+## `apm-repo-manifest` を `apm-usage` へ統合（2026-09-23）
+
+- 統合: `catalog/skills/apm-repo-manifest/` を削除し、Policy / Workflow / Safety を `catalog/skills/apm-usage/references/repo-manifest.md` へ移した（`recommendations.md` / `preinstall-checklist.md` も同ディレクトリへ移動）。
+- 理由: 3経路とも直近3か月の利用実績が 0 で、description が 409字と常時読み込みのコストだけがあった。
+- 復元: 削除前の内容は `git log` の当該コミット以前の `catalog/skills/apm-repo-manifest/` から復元できる。
+- 併せて修正: Workflow 4 の `apm install --dry-run --target codex` / `apm install --target codex` を `--target` 指定なしに変更した（`targets: [codex]` 固定が `apm-usage` の targets gate と矛盾していたため）。
