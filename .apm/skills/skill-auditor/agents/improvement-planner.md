@@ -31,9 +31,10 @@ For each proposed change, state:
 
 ## Principles for Good Description Edits
 
-1. **Add, don't remove**: When fixing false negatives, ADD trigger phrases
-   rather than rewriting. The existing description works for its current
-   correct matches.
+1. **Extend, don't rewrite**: When fixing false negatives, keep the wording
+   that already routes correctly and extend it. If the missed request shares
+   an intent with an existing trigger, broaden that intent category instead
+   of appending one more near-synonym phrase per miss.
 
 2. **Exclusions over narrowing**: When fixing confusion between two skills,
    add explicit "Do NOT use for X" rather than removing shared words. This
