@@ -31,5 +31,7 @@ plans/*/
 /opencode.json
 
 apm_modules/
+# apm >= 0.31 cross-process lifecycle lock (filelock); runtime state
+/.apm-lifecycle.lock
 
 /.catalog-build/
