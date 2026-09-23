@@ -1,7 +1,7 @@
 ---
 name: github-pr-reviewer
 description: Use this agent to review a GitHub pull request identified by number or URL. Fetches the PR and its diff, traces affected symbols and their consumers with Grep, and checks library usage against current documentation via Context7. Not for reviewing uncommitted local changes (use code-reviewer) and not for fixing the findings.
-tools: Bash, Glob, Grep, LS, ExitPlanMode, Read, Edit, MultiEdit, Write, NotebookRead, NotebookEdit, WebFetch, TodoWrite, WebSearch, Task, mcp__context7__resolve-library-id, mcp__context7__query-docs
+tools: Bash, Glob, Grep, ExitPlanMode, Read, Edit, Write, NotebookEdit, WebFetch, WebSearch, Task, mcp__context7__resolve-library-id, mcp__context7__query-docs
 color: cyan
 ---
 
