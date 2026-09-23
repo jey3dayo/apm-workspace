@@ -91,7 +91,7 @@
 | -------------------------------------- | ---------------------------------------------------- | ------------------------------ |
 | 直接指定された URL の取得・DOM 抽出    | `ax`（`--outline` / `--row` / `--md`）               | `curl` + 使い捨て python/regex |
 | JS 実行が必要なページ（SPA 等）        | ブラウザ操作ツール（「ブラウザ操作の選択」表を参照） | `ax` での無理な取得            |
-| Web 検索・検索結果経由の読み取り       | `jina-reader`                                        | -                              |
+| Web 検索                               | 組み込みの Web 検索（`WebSearch` / `web_search`）    | -                              |
 | ローカルリポジトリの場所特定           | `ghq list -p`（絞り込みは `ghq list -p <name>`）     | `fd` / `find` での全域探索     |
 | ローカルのポート・プロセスの起動元調査 | `witr --port <port>` / `witr --pid <pid>`            | `lsof` と `ps` の手動追跡      |
 
@@ -127,7 +127,7 @@ global MCP はリポジトリをまたいで常時使う基盤だけに限定し
 
 - MCP 設定を永続変更する前に `apm-usage` の MCP ownership gate を通す。 手順と、source of truth / deployed output の判別は同スキルが正本
 - SaaS への接続は「アプリ側プラグイン / コネクタ（claude.ai・ChatGPT） > `apm.yml` > catalog skill」の優先順で選び、上位が使えるなら下位で二重管理しない。認証・トークン更新・ツール定義のメンテナンスがアプリ側へ集約されるため。片側にしか無い場合は APM 管理で両方へ配ってよく、両側に揃ったら撤去を検討する
-- 調査は source type で使い分ける: current docs は `context7`、直接指定された URL は `ax`、Web 検索は `jina-reader`、広い比較調査は `web-research`
+- 調査は source type で使い分ける: current docs は `context7`、直接指定された URL は `ax`、Web 検索は組み込みの Web 検索、広い比較調査は `web-research`
 - MCP として repo-local 追加が必要なブラウザ系は `chrome-devtools` のみ（使い分けは上の「ブラウザ操作の選択」表）。デスクトップ / OS レベルのスクリーンショットは `screenshot` スキル
 
 ## Git コミット規約
