@@ -1,18 +1,13 @@
 ---
 name: apm-usage
 description: >-
-  Route work in the `~/.apm` global APM workspace: decide what owns a change,
-  which path is the source of truth, and which APM rollout / `mise` task to
-  run. Use for skill update and redistribution requests (`再配布`),
-  `apm.yml` / `apm.lock.yaml` and managed catalog rollout, manual-skills or
-  orphaned package state, checked-out external dependency repositories,
-  optional repository-scoped skill packages, global MCP の追加・変更・削除
-  (`~/.codex/config.toml` の MCP block、`codex mcp add/remove`、所有元不明の
-  runtime MCP 設定を含む), and `apmのバージョンあげて` / pinned `apm` source checks.
-  For skill body or asset design itself, coordinate with `writing-for-agents`;
-  for general mise usage outside the APM workspace, use `mise`.
-  Re-invoke this skill even mid-session whenever the conversation shifts to
-  these topics.
+  Owner router for the ~/.apm APM workspace: which lane and path own a skill,
+  agent, rule or MCP change, and which mise task rolls it out (deploy, upgrade,
+  install:catalog, 再配布). Covers apm.yml / apm.lock.yaml pins, `apmのバージョンあげて`,
+  global MCP add/change/remove including ~/.codex/config.toml and `codex mcp
+  add`/`remove`, repo-local apm.yml creation/cleanup（「repo に apm.yml を置いて」
+  「この repo におすすめ skill 入れて」「ローカルスキル整理」）, and manual-skills /
+  orphaned package triage. Skill wording itself: writing-for-agents.
 ---
 
 # APM Usage
@@ -103,9 +98,7 @@ Before installing into or reviewing a `repository-local` manifest, check its
 repository. A `targets: [codex]`-only manifest never deploys to
 `.claude/skills/`; add `claude` (and `agent-skills` when applicable) whenever
 Claude Code is one of the repository's runtimes, otherwise every
-repository-local skill or MCP silently misses Claude Code. `apm-repo-manifest`
-preserves the repository's existing target style by design and does not check
-this — this gate is this skill's responsibility, not that one's.
+repository-local skill or MCP silently misses Claude Code.
 
 Use `docs/apm-task-coverage.md` for the workspace-only bridge contract and
 verification details.
@@ -181,7 +174,7 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
 - For an optional skill embedded in an external bundle, keep the external
   package as the source of truth and select it in the consuming repository with
   `apm install <package-ref> --skill <id>`.
-- If the request is to scan an arbitrary repository and create, update, or clean up its repo-local `apm.yml`, use `apm-repo-manifest`; keep this skill focused on global APM ownership and rollout decisions.
+- If the request is to scan an arbitrary repository and create, update, or clean up its repo-local `apm.yml`, read `references/repo-manifest.md`.
 - If the request is to add an MCP server through APM, apply the same scope rule: use `apm install -g --mcp <name> ...` only for cross-repo foundation MCPs; use repo-local `apm install --mcp <name> ...` for project, framework, UI, database, browser, or app-runtime-specific MCPs.
 - When an MCP server fails to start, check the sequence: (1) whether the executable exists and is executable, (2) whether the args are valid, (3) whether required env is injected, and (4) whether the config syntax is valid.
 - If the APM workspace has no repo-local MCP distribution lane for a target repository, record the intended placement as guidance and keep the global manifest lightweight. Treat implementing repo-local MCP distribution as a separate workspace-mechanics task.
@@ -228,8 +221,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
 - Do not reintroduce many local `./packages/*` refs into `~/.apm/apm.yml`.
 - Do not hand-edit deployed targets such as `~/.claude/`, `~/.codex/`, or `~/.agents/skills`.
 - Do not judge a deployed skill orphaned by its absence from `catalog/skills/**` and `optional-skills/**`; deployed targets are mostly fed by external dependencies, so that test marks most of a healthy target as orphaned. Name the supplier of every entry before it reaches a delete line -- a lock record, `apm_modules/**`, `private-skills/.apm/skills/<id>`, `manual-skills`, or a workspace-only symlink bridge -- and treat only an entry with no supplier as a candidate. A lock record keeps an entry off that line but never proves the skill is still supplied — the lock keeps records for skills the catalog has already retired, so check the manifest, the record's owner, the locator's scope and target, and the deployed path itself before concluding anything about a record.
-- Read an `apm audit --ci` finding by its check name and by the absolute path it resolves to, never by its count. `deployed-files-present` calls `exists()` on `<project_root>/<path>`, and apm 0.29.0 takes `project_root` from the current directory: run in `~/.apm` it asks about `~/.apm/.claude/...`, while the user-scope rollout lives under `~/.claude/...`. A finding there can be about the audit's root rather than the deployed runtime, and the runtime is confirmed separately with `mise run doctor` and a source-to-target comparison. Do not turn that into a standing rule that `apm audit --ci` may be ignored.
-- Do not measure what is left on a deployed target with a search whose defaults honour `.gitignore` -- deployed output is normally ignored, and the session's own `grep` may be such a wrapper (`type grep`). Sweep with `command grep -rIl <pattern> <root>` or `find -L <root> -type f -print0 | xargs -0 grep -Il <pattern>`, keep stderr, and open the matches before reporting a count.
+- `apm audit --ci` and searching a deployed target: see `references/rollout-fast-paths.md` for the reading and grep-wrapper caveats.
 - Do not assume a repository-local `apm.yml` with `targets: [codex]` is correct just because it predates this check. Verify against the repository's actual runtimes; a stale `codex`-only manifest silently starves Claude Code of every repo-local skill and MCP declared there.
 - Prefer `mise` tasks over ad hoc script entrypoints for normal operation.
 - Before changing user-global `mise` tools, verify the resolved binary path and install tree. `mise latest` can lag or differ because of release-age policy, so compare with the upstream registry when exact latest-version behavior matters.
@@ -273,18 +265,8 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
 
 5. Upstream refresh:
    - run `mise run upgrade` to move dependencies that track a branch or tag
-   - when you bump a SHA pin in `apm.yml` by hand, `mise run upgrade` cannot do it:
-     observed on apm 0.29.0, `apm update` refuses to replace a revision pin, and
-     `mise run deploy` re-applies the lock without re-resolving the manifest, so
-     the lockfile and the deployed target both stay on the old commit while every
-     command exits zero. Run `apm install -g --only apm`, then `mise run deploy`
-   - `apm install -g --only apm` bypasses `mise run apply` the same way the bare
-     `apm install -g` in Fast Path 6 does, so check the agmsg roster links per
-     that path's note before calling the refresh done. If the follow-up
-     `mise run deploy` fails at its `check` stage, it never reaches `apply`, so
-     the roster links stay unrestored — fix the `check` failure and rerun
-     `deploy` (or `mise run apply`) rather than assuming the earlier call
-     recovered them
+   - for a hand-bumped SHA pin, `mise run upgrade` cannot do it: see
+     `references/rollout-fast-paths.md` for the apm 0.29.0 sequence
    - if the manifest contains `gist.github.com/...#<sha>`, verify the regenerated `apm.lock.yaml` kept the same `repo_url` spelling before deploy
    - confirm the target dependency's `resolved_commit` and the deployed file's hash
      before calling the refresh done; a zero exit from `deploy` is not evidence the pin moved
@@ -309,13 +291,9 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - run that repository's relevant checks
    - commit and push the external repository
    - in `~/.apm`, check how `apm.yml` pins that dependency: if it tracks a branch
-     or tag, run `mise run upgrade`; if it is SHA-pinned, bump the pin in
-     `apm.yml` to the pushed commit and follow Fast Path 5's SHA-pin sequence
-     (`apm install -g --only apm`, then `mise run deploy`, then that path's
-     agmsg roster check) instead of `mise run upgrade` alone — `apm update`
-     refuses to replace a revision pin (observed on apm 0.29.0), so
-     `mise run upgrade` alone leaves the lock and deployed target on the old
-     commit while exiting zero
+     or tag, run `mise run upgrade`; if it is SHA-pinned, bump the pin and
+     follow the SHA-pin bump sequence in `references/rollout-fast-paths.md`
+     instead of `mise run upgrade` alone
    - verify `apm.lock.yaml` points the target dependency at the pushed commit
    - check whether `apm.lock.yaml` also changed unrelated unpinned dependencies
    - verify the deployed target such as `~/.agents/skills/<id>` contains the updated content
@@ -329,6 +307,5 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
 
 9. Global external dependency removed:
    - keep its `apm.yml` line and run `apm uninstall -g <manifest-ref>`; deleting the line by hand leaves the lock record behind, and `mise run apply` stops with `External lock record is not declared in apm.yml`
-   - if the uninstall aborts listing target directories (apm 0.29.0 leaves `.apm-pin` behind after removing the skill files), confirm each listed path under `~/.claude/skills/` and `~/.agents/skills/` is a real directory holding only `.apm-pin`, remove that file and the directory, then rerun the uninstall
-   - the uninstall re-integrates the remaining packages outside `mise run apply`: it rewrites `apm.yml` (drops comments, folds the gist URL), unlinks the agmsg roster, and deploys undeclared sub-skills and un-aliased gist names. Edit `apm.yml` until `git diff` shows only the removed line, follow the agmsg State section of `~/.apm/AGENTS.md`, then run `mise run deploy`, which removes the undeclared entries
+   - for the apm 0.29.0 `.apm-pin` residue and uninstall re-integration behavior, see `references/rollout-fast-paths.md`
    - verify the `apm.lock.yaml` diff contains only the removed records and the skill is gone from both targets, and record the removal in `docs/package-decisions.md`

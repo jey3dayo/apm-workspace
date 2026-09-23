@@ -1,13 +1,9 @@
----
-name: apm-repo-manifest
-description: Use when scanning a repository to create, update, or clean up a repo-local `apm.yml` and install appropriate local APM skills or MCPs. Use for requests like `repo に apm.yml を置いて`, `この repo におすすめ skill 入れて`, `ローカルスキル整理`, `repo-local apm.yml を整理`, or moving infra/runtime-specific skills out of global APM. Coordinate with `apm-usage` for global workspace ownership, lockfile rollout, and deployed target rules.
-metadata:
-  short-description: Create or clean up a repo-local apm.yml
----
-
-# APM Repo Manifest
+# Repo-Local Manifest — Scan and Create/Clean Up `apm.yml`
 
 Scan the current repository, choose repo-local APM dependencies from concrete source-tree signals, and create or update the repository's `apm.yml` without turning common global preferences into local clutter.
+
+Never edit global APM manifests through this reference. Use the rest of this
+skill for `~/.apm/apm.yml`, global lockfiles, and global deployment.
 
 ## Policy
 
@@ -23,17 +19,16 @@ Scan the current repository, choose repo-local APM dependencies from concrete so
   - Marp/slides/presentation skills belong near repositories that actually contain presentation sources.
   - Project-specific database, SaaS, observability, or private API MCPs belong near the project that owns their credentials and assumptions.
 - Existing repo-local entries that no longer match the policy should be removed from `apm.yml`, but do not delete generated targets unless the user explicitly asks.
-- Never edit global APM manifests from this skill. Use `apm-usage` for `~/.apm/apm.yml`, global lockfiles, and deployment.
 
-Read `references/recommendations.md` when mapping repository signals to package refs.
-Read `references/preinstall-checklist.md` before a repository's first `apm install`, to check `.gitignore` and lint/format excludes for the install target directories, and the lockfile/yamllint interaction.
+Read `recommendations.md` when mapping repository signals to package refs.
+Read `preinstall-checklist.md` before a repository's first `apm install`, to check `.gitignore` and lint/format excludes for the install target directories, and the lockfile/yamllint interaction.
 
 ## Workflow
 
 1. Inspect the repository before editing.
    - Check `git status --short`.
    - Read existing `apm.yml` if present.
-   - On a repository's first `apm install`, walk `references/preinstall-checklist.md` before running install.
+   - On a repository's first `apm install`, walk `preinstall-checklist.md` before running install.
    - Search signals with `rg --files`, including `package.json`, `next.config.*`, `vite.config.*`, `src-tauri/**`, `terraform/**/*.tf`, `**/*.tftest.hcl`, `wrangler.toml`, `*.md`, and presentation sources.
 2. Decide dependency scope.
    - Keep global-common web skills out of repo-local manifests unless the user explicitly asks to localize web skills too.
@@ -44,10 +39,10 @@ Read `references/preinstall-checklist.md` before a repository's first `apm insta
    - Preserve existing name, version, description, author, targets, includes, and scripts when present.
    - Merge dependencies without duplicates.
    - Remove entries made obsolete by the policy, especially web/common skills that should stay global.
-   - Use `targets: [codex]` or the repository's existing target style.
+   - Keep the repository's existing target style, then add every runtime the repository actually uses (see this skill's Install Gate).
 4. Verify the manifest.
-   - Run `apm install --dry-run --target codex` first.
-   - If the user asked to install/distribute, run `apm install --target codex`.
+   - Run `apm install --dry-run` (no `--target` override) first, so every manifest target is exercised.
+   - If the user asked to install/distribute, run `apm install`.
    - Report unpinned dependency warnings; do not hide them.
 5. Report results.
    - List changed files.
