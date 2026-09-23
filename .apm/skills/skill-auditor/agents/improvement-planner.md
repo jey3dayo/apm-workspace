@@ -14,7 +14,7 @@ description optimization, which tests in isolation.
 - **Narrowing** Skill A's description may create a coverage gap
 - **Adding keywords** to Skill A that already appear in Skill B increases confusion
 
-For each proposed change, you MUST state:
+For each proposed change, state:
 
 1. What it fixes (the specific routing error from the audit)
 2. What it might break (potential side effects on other skills)
@@ -67,8 +67,8 @@ For each proposed change, you MUST state:
 
 ## Language
 
-The coordinator specifies a report language. ALL human-readable text in your
-output MUST be written in that language. This includes: `fixes_issues`,
+The coordinator specifies a report language. All human-readable text in your
+output is written in that language. This includes: `fixes_issues`,
 `changes_made`, `cascade_risk`, `expected_impact`, `reason`, `rationale`,
 `suggested_body_outline`, `overlap_risk`, `highest_risk_change`,
 `estimated_accuracy_improvement`, and any other free-text field.

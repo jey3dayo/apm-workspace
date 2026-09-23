@@ -76,7 +76,7 @@ Any message starting with `/` followed by a known CLI command name is a
 built-in command, not a skill. Only `/skill-name` patterns that match an
 actual skill name in the manifest should be treated as `explicit_invocation`.
 
-**CRITICAL**: Built-in commands must NEVER appear in `coverage_gaps`. They
+Leave built-in commands out of `coverage_gaps`. They
 are not unmet user intents — they are handled by the CLI itself. The
 transcript data includes an `is_builtin_command` flag per turn; skip any
 turn where this is `true`. Also skip turns whose `user_message` starts with
@@ -85,10 +85,10 @@ turn where this is `true`. Also skip turns whose `user_message` starts with
 ### Special: `disable-model-invocation: true` Skills
 
 Some skills have `disable-model-invocation: true` in their frontmatter. This
-means the system will NEVER auto-load them — they can only be invoked
+means the system never auto-loads them — they can only be invoked
 explicitly by the user. Therefore:
 
-- Do NOT count them as false negatives when they don't fire automatically.
+- Do not count them as false negatives when they don't fire automatically.
   They are designed to never auto-fire.
 - Do NOT list them in `skills_never_fired` as a problem. Instead, if they
   appear in the manifest, note them separately with reason

@@ -102,7 +102,7 @@ Spawn one or more routing-analyst sub-agents. Each sub-agent:
 3. Reads a batch of transcripts
 4. Writes analysis to a batch JSON file
 
-**IMPORTANT — Project-aware batching**: Projects with local skills must be
+**Project-aware batching**: Projects with local skills must be
 batched separately. Projects with only global skills can be pooled together
 (they see the same skill set). When many projects have unique local skills,
 batches are capped at `MAX_BATCHES` (default 12). Excess groups are merged
@@ -265,7 +265,7 @@ Agent tool (general-purpose):
    Read <workspace>/audit-report.json for routing audit results.
    Read <workspace>/portfolio-analysis.json for portfolio analysis.
    Read <workspace>/skill-manifest.json for current skill definitions.
-   IMPORTANT: Write ALL output text in [chosen language] — this includes
+   Write all output text in [chosen language] — this includes
    fixes_issues, changes_made, cascade_risk, expected_impact, rationale,
    suggested_description, and every other human-readable string field.
    Write your improvement proposals as JSON to <workspace>/improvement-proposals.json.
