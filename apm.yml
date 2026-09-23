@@ -74,7 +74,7 @@ dependencies:
     - ibelick/ui-skills/skills/improve-ui#f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
 
     # --- tools ---
-    - fujibee/agmsg#948b1003868b9f29567132084346368200c36963
+    - fujibee/agmsg#f9fb4f1398a6086135f88deea98b7e5600cb1cda
     - modem-dev/hunk/packages/hunk/skills/hunk-review#91b586184f569832c6a218a1bc9a7e0f3cd5ac7e
     - agavra/tuicr/skills/tuicr#b55e218f6d38a87ca4a6d9924a4c50b5f601dd07
     - humanlayer/skills/plugins/show-me/skills/show-me#3c2629142c5d437428269b1b722b08c0b87f574d
