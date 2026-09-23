@@ -1,7 +1,7 @@
 ---
 name: code-reviewer
 description: Use this agent for code review focused on correctness, design, and maintainability, after code has been written or modified. It reads the change against the repository's own conventions (CLAUDE.md / AGENTS.md / review-guidelines) and reports findings to the parent session, which decides what to act on. Use thermo-nuclear-code-quality-review when a strict maintainability audit against its rubric is explicitly requested by name. Not for writing the fix, for reviewing GitHub pull requests by number or URL (use github-pr-reviewer), or for lint and type errors with a mechanical fix (use error-fixer).
-tools: Bash, Glob, Grep, ExitPlanMode, Read, LSP, Edit, Write, NotebookEdit, WebFetch, WebSearch, Task
+tools: Bash, Glob, Grep, ExitPlanMode, Read, LSP, WebFetch, WebSearch, Task
 color: green
 ---
 
