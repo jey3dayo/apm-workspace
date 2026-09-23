@@ -33,6 +33,7 @@
 - 社内（caad-develop）: `perman-aws-vault`, `caad-skill-deployer`,
   `ai-butsukari-evidence-scout`
 - 図生成: `diagram-design`（cathrynlavery, SHA pin）
+- リサーチ・出力スタイル: `last30days`（mvanhorn）, `i-have-adhd`（ayghri）
 - その他: `humanizer-ja`, `agmsg`, `tuicr`,
   mattpocock 系（`grilling`, `writing-for-agents`, `wayfinder`,
   `improve-codebase-architecture`, `codebase-design`, `domain-modeling`,

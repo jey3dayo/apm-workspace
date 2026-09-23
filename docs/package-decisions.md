@@ -555,3 +555,12 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 - 理由: 2026-09 の Claude セッション 527 件と 2026-08 以降の Codex セッションで、Skill 起動と `SKILL.md` の読み込みが 0〜1 回。他スキルと global `AGENTS.md` からの参照も無く、ユーザーが不要と判断した。
 - 残した判断: 同じく実績 0 の `domain-modeling` / `research` / `prototype` / `setup-matt-pocock-skills` は、残す `wayfinder` が Skill tool で呼ぶ前提（`improve-codebase-architecture` も `domain-modeling` を参照）なので、`wayfinder` と一緒でなければ外さない。
 - 再導入: 利用場面ができたら `apm.yml` へ同じ ref を戻す。`quiet-command-auditor` は `git show 5bebf6a:catalog/skills/quiet-command-auditor/SKILL.md` から復元できる。
+
+## `i-have-adhd` / `last30days` を global-dependency として採用（2026-09-23）
+
+- 採用: `ayghri/i-have-adhd/skills/i-have-adhd`、`mvanhorn/last30days-skill/skills/last30days`。いずれも upstream の `skills/<id>/` を path ref で SHA pin し、配布名は upstream のまま通る。
+- 理由: 前者は回答の出力スタイル、後者は直近 30 日の多ソースリサーチで、どちらも repo や credential に依存せず横断的に使う。upstream が正本なので catalog へ写さない。
+- 注意（i-have-adhd）: upstream は Claude Code plugin としても配布し、SessionStart hook で常時 ADHD モードにする always-on を持つ。APM の skill 配布に hook は含まれないので `/i-have-adhd` の明示起動のみ。常時化が要るなら別途判断する。
+- 注意（last30days）: `skills/last30days/` に画像・mp3 の `assets/` が同居し、apm は upstream の `.skillignore` を読まないため `~/.claude/skills` と `~/.agents/skills` の両方へそのまま配布される。deploy 時の「Referenced file not found: url」警告は SKILL.md 内のプレースホルダリンクで、動作に影響しない。エンジンは `python3`（3.12+）と `node` を要し、鍵無しでも Reddit / HN / Polymarket / GitHub は動く。
+- 更新: 両方 SHA pin。`apm.yml` の pin を手で上げ、`apm install -g --only apm` → `mise run deploy`（`apm-usage` Fast Path 5）。`mise run upgrade` では動かない。
+- 再検討するなら: 利用実績が 0 のまま次の棚卸しを迎えたら撤去する。last30days は配布サイズが問題になれば `assets/` 抜きで manual-skills へ vendor する。
