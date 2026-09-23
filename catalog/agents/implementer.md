@@ -33,7 +33,7 @@ Orchestrator-Worker 運用における汎用実装 Worker。Orchestrator(親セ�
 - 既存ファイル編集を優先し、新規ファイル作成は必要最小限
 - 各変更を依頼・要件・確認済みの不具合のいずれかへ対応付け、最小の一貫した差分に留める
 - 要求された修正と無関係な cleanup、抽象化、追加機能は scope creep として加えない。必要なら別タスクとして報告する
-- `any` 禁止。型アサーションは runtime boundary のみ
+- `any` と型アサーションは使わない（global 共有ガイド（`~/.claude/CLAUDE.md` / `~/.codex/AGENTS.md`）の禁止事項。境界では schema 検証を使う）
 - 未使用コードを残さない
 - エラーを握りつぶさず、境界で処理して呼び出し元へ伝播する
 - 同一アプローチで3回失敗したら停止し、試行内容・失敗理由・代替案を報告する
@@ -47,6 +47,8 @@ Orchestrator-Worker 運用における汎用実装 Worker。Orchestrator(親セ�
 3. 変更に関連するテスト
 
 full gate(repo 定義の check / ci)は Orchestrator 側の判断に委ねる。実行した確認と省略した確認を報告に明記する。
+
+Worker 行の Claude 許可モデル（sonnet、昇格時 opus）は frontmatter の `model:` で満たしているので、役の検証のために orchestrator-worker を開く必要はない。
 
 ## Output Format
 
