@@ -1,18 +1,15 @@
 ---
 name: orchestrator-worker
 description: >-
-  Steward / Architect / Reviewer / Worker の 4 役と tier の定義、委譲・昇格判定の正本。
-  高級モデル(Claude Fable/Opus、Codex sol / terra)のセッションで実装作業(implement / fix / refactor / test / migrate)を受けたとき、
-  自分で書かずに安価な Worker モデルへ委譲する Orchestrator-Worker 運用を扱う。
-  「Orchestrator」は役ではなく機能で、許可条件を満たす Steward / Architect が担う。
-  タスクが複数ファイル・複数の独立サブタスクに跨るとき、
-  自分が Steward として依頼を自分で答えるか handoff するかを判定するとき、
-  または他のスキルが委譲判定・モデル tier 対応表を必要とするときにも使用する。
+  実装・修正・リファクタ・テスト追加・移行（implement / fix / refactor / test / migrate、
+  「実装して」「直して」）を高級モデルのセッションで受けたとき、自分で書かず
+  Worker へ切って渡し差分を検証するための委譲判定と model tier 表の正本。Steward として
+  自答か handoff かを決めるとき、他スキルが tier 表を要るときにも使う。
 ---
 
 # Orchestrator-Worker
 
-高級モデルのセッションで実装を自分の手で書くのは、単価の無駄であり、Orchestrator の context を実装詳細で埋める。**Orchestrator 機能は要件・設計・分解・検証だけを持ち、コードを書くのは Worker** に固定する。
+高級モデルのセッションで実装を自分の手で書くのは、単価の無駄であり、Orchestrator の context を実装詳細で埋める。Orchestrator 機能は要件・設計・分解・検証だけを持ち、コードを書くのは Worker に固定する。
 
 1タスクの委譲ではなく、複数の面（`todo.txt` / plan リスト / issue）に散った backlog をまとめて長時間捌く場合は `backlog-sweep` を使う。判定・tier・分割基準は本スキルが正本のまま、台帳統合と常駐 Worker プールの運用だけが向こうにある。
 
@@ -29,17 +26,17 @@ description: >-
 | Reviewer  | SHA 固定 code review / 設計文書 review                                                                                                 | Fable（明示指定時、fallback Opus）                    | `gpt-5.6-sol` 既定。読む量が多いレビューはコストを下げて `gpt-5.6-terra` + effort high。`gpt-6-astra` は明示指定時のみ | 不可（opencode は Reviewer に就けない）       | `claude-fable-5-thinking-xhigh`（cursor 経路の既定） / `claude-opus-5-thinking-high` / `gpt-5.6-sol-xhigh` | Orchestrator 機能を担う側（Steward または Architect）。spawn 経路と pane 経路の両方可 |
 | Worker    | 実装（設計済みタスク）                                                                                                                 | `sonnet`（Agent `implementer`、Worker の昇格 `opus`） | `gpt-5.6-luna` xhigh（難度の昇格は `gpt-5.6-sol`、長文脈の崖は `gpt-5.6-terra`）                                       | `deepseek/deepseek-v4-flash` `--variant high` | `claude-sonnet-5-thinking-high`（昇格 `claude-opus-5-thinking-high`）                                      | Orchestrator 機能を担う側                                                             |
 
-**「Orchestrator」は役ではなく機能。** 表の Steward / Architect のうち、後述の許可条件を満たす側が担う。Terra は Architect・Reviewer・Worker の昇格に就く。opencode は Worker 専用で、implement 以外の役には就けない（review も含む）。cursor は Worker と Reviewer の両方に就けるが、Steward / Architect には就けない（Orchestrator 機能を担えない）。
+「Orchestrator」は役ではなく機能。表の Steward / Architect のうち、後述の許可条件を満たす側が担う。Terra は Architect・Reviewer・Worker の昇格に就く。opencode は Worker 専用で、implement 以外の役には就けない（review も含む）。cursor は Worker と Reviewer の両方に就けるが、Steward / Architect には就けない（Orchestrator 機能を担えない）。
 
-Reviewer 既定の範囲: cursor reviewer が既定になるのは**ユーザーが cursor 経路を明示したときだけ**である。review 外注の全体既定は下記「Reviewer の tier」のとおり Codex sol のままで、cursor 追加はこれを変えない。
+Reviewer 既定の範囲: cursor reviewer が既定になるのはユーザーが cursor 経路を明示したときだけである。review 外注の全体既定は下記「Reviewer の tier」のとおり Codex sol のままで、cursor 追加はこれを変えない。
 
-**Codex 側の Steward は `gpt-5.6-luna` のみで、明示ポリシーとして常に Orchestrator 機能を持たない。Codex Steward は handoff 専用と扱う。** Codex 側に Opus 相当の中間 tier（terra）を Steward に置くかはユーザー判断に委ね、本スキルでは追加しない。
+Codex 側の Steward は `gpt-5.6-luna` のみで、明示ポリシーとして常に Orchestrator 機能を持たない。Codex Steward は handoff 専用と扱う。Codex 側に Opus 相当の中間 tier（terra）を Steward に置くかはユーザー判断に委ね、本スキルでは追加しない。
 
 ### 自己判定規則（本文から推測しない）
 
-役は**受け取ったメッセージの envelope** で決まる。本文の口調や「人間が話しかけてきたように見えるか」からは判定しない——同じ文面が user メッセージとしても hook 経由でも届くため、受け側から区別できない。
+役は受け取ったメッセージの envelope で決まる。本文の口調や「人間が話しかけてきたように見えるか」からは判定しない——同じ文面が user メッセージとしても hook 経由でも届くため、受け側から区別できない。
 
-**役を決める前に envelope を検証する。** 次のいずれかに当たったら役を確定せず、`BLOCKED(task_id)` を返す（対話セッションならユーザーへ報告して停止する）。矛盾した envelope を「たぶんこちらだろう」で解決すると、許可集合の検証を通り抜けたまま別の役の仕事をすることになる。
+役を決める前に envelope を検証する。次のいずれかに当たったら役を確定せず、`BLOCKED(task_id)` を返す（対話セッションならユーザーへ報告して停止する）。矛盾した envelope を「たぶんこちらだろう」で解決すると、許可集合の検証を通り抜けたまま別の役の仕事をすることになる。
 
 - agmsg 経由の task / handoff で、必須 field（`source_role` / `target_role` / `task_id` / `report_contract`）のいずれかが欠けている
 - `target_role` と `report_contract` が下の対応表に反する（例: `target_role: Worker` + `report_contract: REVIEW`）
@@ -53,11 +50,11 @@ Reviewer 既定の範囲: cursor reviewer が既定になるのは**ユーザー
 
 検証を通ったら役を決める。判定は上から順に、最初に当たったところで止める。
 
-1. envelope に `target_role` がある → **その役**。
-2. `target_role` が無く、`task_id` + `report_contract` だけがある → **対応表の逆引き**。これは agmsg の必須 envelope を満たさない経路（Agent tool や `spawn_agent` など、native の task transport）向けの緩和であり、agmsg 経由のメッセージは上の検証で BLOCKED になっているのでここへは来ない。
-3. envelope が無い対話セッション → pane / session の起動時に宣言された **default role**。宣言が無ければ、自分のモデルが Steward の許可集合に入るなら Steward、入らないなら Architect。
+1. envelope に `target_role` がある → その役。
+2. `target_role` が無く、`task_id` + `report_contract` だけがある → 対応表の逆引き。これは agmsg の必須 envelope を満たさない経路（Agent tool や `spawn_agent` など、native の task transport）向けの緩和であり、agmsg 経由のメッセージは上の検証で BLOCKED になっているのでここへは来ない。
+3. envelope が無い対話セッション → pane / session の起動時に宣言された default role。宣言が無ければ、自分のモデルが Steward の許可集合に入るなら Steward、入らないなら Architect。
 
-`report_contract: NOTIFY` は一方通行の通知で、受け側は ack も結果も返さない（スキル不具合のフィールド報告など）。役の判定は `HANDOFF` と同じだが、**返信を返さない点だけが違う**。ack 不要と最終結果不要を混同しない——`HANDOFF` で受けた作業は終わったら送り手へ返す。
+`report_contract: NOTIFY` は一方通行の通知で、受け側は ack も結果も返さない（スキル不具合のフィールド報告など）。役の判定は `HANDOFF` と同じだが、返信を返さない点だけが違う。ack 不要と最終結果不要を混同しない——`HANDOFF` で受けた作業は終わったら送り手へ返す。
 
 envelope の必須フィールドと書式は `agmsg-delegation` の「envelope」節が正本。
 
@@ -75,7 +72,7 @@ envelope の必須フィールドと書式は `agmsg-delegation` の「envelope�
 
 ### Orchestrator 機能を担う条件（機械的）
 
-tier の上下ではなく **authority / capability** で判定する。次の 3 つをすべて満たすこと。
+tier の上下ではなく authority / capability で判定する。次の 3 つをすべて満たすこと。
 
 - 依頼を §3 の粒度（触るファイル / 完了条件 / 検証コマンド）へ自分で分解できる。
 - 固定した成果物（SHA / checksum で対象を固定した差分）を自分で検証できる。
@@ -84,10 +81,10 @@ tier の上下ではなく **authority / capability** で判定する。次の 3
 tier は能力とコストの属性であり、検証の独立性（後述「Reviewer の tier」の approval gate）とは別の軸である。同一モデルでも別 session・別 context なら独立した観測者になり得るし、上位モデルでも設計者自身の self-review は独立にならない。「Worker より上の tier であること」を許可条件に使わない。
 
 - Opus Steward、Architect（Fable / Opus / sol / terra）: 上記 3 条件を満たす。担える。実装依頼は自分で §3 分割 → Worker 起動 → §5 検証 → 人間へ最終報告。
-- Sonnet Steward / Luna Steward: **明示ポリシーとして** Orchestrator 機能を持たず handoff 専用とする。3 条件を満たせないからではなく、Steward は人間との対話・軽微修正に専念させるという運用判断による。実装依頼（§2 の委譲条件に当たるもの）は Architect へ handoff。軽微修正（§1a の応答範囲内）は自分で行う。
-- Worker が「Worker の昇格」で親と同じモデル（同 tier）へ昇格した場合: 親は coordination（分解・起動・進捗管理）を継続してよいが、**最終 acceptance は作者と異なる identity かつ別 session の Reviewer を必須とする**（詳細は次節）。同一 identity・同一 session による自己承認は成立しない。
+- Sonnet Steward / Luna Steward: 明示ポリシーとして Orchestrator 機能を持たず handoff 専用とする。3 条件を満たせないからではなく、Steward は人間との対話・軽微修正に専念させるという運用判断による。実装依頼（§2 の委譲条件に当たるもの）は Architect へ handoff。軽微修正（§1a の応答範囲内）は自分で行う。
+- Worker が「Worker の昇格」で親と同じモデル（同 tier）へ昇格した場合: 親は coordination（分解・起動・進捗管理）を継続してよいが、最終 acceptance は作者と異なる identity かつ別 session の Reviewer を必須とする（詳細は次節）。同一 identity・同一 session による自己承認は成立しない。
 
-**最終報告は、依頼が来た経路へ返す。** 人間から直接受けた Steward / Architect は人間へ直接報告する。Steward の handoff で受けた Architect は Steward へ handoff 書式で返し、Steward が人間へ伝える。Architect が人間と直接話すこと自体は禁止しない（自己判定規則 3 の既定でそうなる）。
+最終報告は、依頼が来た経路へ返す。人間から直接受けた Steward / Architect は人間へ直接報告する。Steward の handoff で受けた Architect は Steward へ handoff 書式で返し、Steward が人間へ伝える。Architect が人間と直接話すこと自体は禁止しない（自己判定規則 3 の既定でそうなる）。
 
 Steward と Architect はどちらも人間が pane から起動する。どの pane に誰が常駐し、人間がどちらに話しかけるかという topology はユーザーが用意する前提であり、本スキルは pane を作らない。
 
@@ -97,28 +94,30 @@ Steward と Architect はどちらも人間が pane から起動する。どの 
 
 Steward は人間が最初に話す相手であり、応答の滑らかさが人間の待ち時間と再説明の回数を直接決める。Opus Steward は Orchestrator 機能の許可条件を満たすため、そのまま Worker を起動し差分を検証できる。Sonnet / Luna を Steward にするのはユーザーの明示指定時に限り、その場合は明示ポリシーとして Orchestrator 機能を持たない。
 
-本スキルの狙いは**実装トークンを安い Worker に隔離し、高級 tier を設計判断・検証・review・対話に集中させる**ことである。総コストが下がるかどうかは**未計測の仮説**として扱う——長時間常駐する Steward の累積 context、全 diff の再読、対話の長期化、handoff での再説明は、タスク構成によっては支配的になりうる。判断するには task 別に model・input / cached / output・再試行回数・handoff 回数・latency・成功率を記録し、Steward と Architect を分けない運用と比較する必要がある。
+本スキルの狙いは実装トークンを安い Worker に隔離し、高級 tier を設計判断・検証・review・対話に集中させることである。総コストが下がるかどうかは未計測の仮説として扱う——長時間常駐する Steward の累積 context、全 diff の再読、対話の長期化、handoff での再説明は、タスク構成によっては支配的になりうる。判断するには task 別に model・input / cached / output・再試行回数・handoff 回数・latency・成功率を記録し、Steward と Architect を分けない運用と比較する必要がある。
 
 ### 自分で答えてよい範囲（Q2）
 
 - 1ファイルの軽微修正、typo、設定値の変更
 - 調査・探索のみで編集を伴わないもの（下記トリガー 4 の bounded scan で範囲が閉じるもの）
-- 既存の決定・仕様・スキル・設定の**説明**（何が書いてあるか、どう使うか）
+- 既存の決定・仕様・スキル・設定の説明（何が書いてあるか、どう使うか）
 - 状態確認と操作の代行: `git status`、inbox、pane 状態、`--help`、価格/version などの事実照会、図・表の読解
 
 §2 は Worker への委譲可否を扱う。Steward の設計・方針決定は Q1 に従う。通常の説明・確認対話は上記範囲に含む。
 
 ### handoff するトリガー（Q1）
 
-次の**いずれか 1 つ**に当たったら handoff する。当たらなければ自分で答える。判定順は上から。
+次のいずれか 1 つに当たったら handoff する。当たらなければ自分で答える。判定順は上から。
 
 1. 書込を伴い、§2 の委譲条件に当たる（3 ファイル以上 / 見積 50 行以上 / 独立サブタスク 2 件以上）: 自分が Orchestrator 機能を担う側（Opus Steward / Architect）なら handoff せず自分で §3 分割 → Worker 起動 → §5 検証を行う。handoff 専用と定めた Sonnet / Luna Steward なら Architect へ handoff する。
 2. 「Worker の昇格」の 3 条件のいずれか（再現困難なデバッグ / セキュリティ境界 / 複数案のトレードオフ判断）→ handoff。
-3. **成果物が「決定」である**: 依頼文が、ファイル構成・責務境界・API・データ構造・運用方針のうち 1 つ以上を**新たに決める**ことを求めている（「どう分けるべきか」「設計して」「方針を出して」）。既存の決定を**説明する**だけなら Steward が自分で答える。→ handoff。
-4. **最初の bounded scan で範囲が閉じない**: 答える前に、入口・ownership・依存だけを一度 scan する。その結果 (a) 複数の ownership boundary をまたぐ統合が要る (b) scan 中に、新しい責務・API・運用判断を決める必要があると分かった (c) 初期 scan の想定より範囲が広がった、のいずれかなら → handoff。トリガー 3 が依頼文から判定するのに対し、(b) は読んで初めて分かる場合を拾う。**ファイル数や行数だけで役を決めない**——読む前に読む量は見積もれない。
+3. 成果物が「決定」である: 依頼文が、ファイル構成・責務境界・API・データ構造・運用方針のうち 1 つ以上を新たに決めることを求めている（「どう分けるべきか」「設計して」「方針を出して」）。既存の決定を説明するだけなら Steward が自分で答える。→ handoff。
+4. 最初の bounded scan で範囲が閉じない: 答える前に、入口・ownership・依存だけを一度 scan する。その結果 (a) 複数の ownership boundary をまたぐ統合が要る (b) scan 中に、新しい責務・API・運用判断を決める必要があると分かった (c) 初期 scan の想定より範囲が広がった、のいずれかなら → handoff。トリガー 3 が依頼文から判定するのに対し、(b) は読んで初めて分かる場合を拾う。ファイル数や行数だけで役を決めない——読む前に読む量は見積もれない。
 5. 委譲しない例外に当たる（権限・認証・秘密情報・破壊的操作・production 変更）→ Steward は触らず handoff する。Orchestrator 機能側が自分で扱う契約のため、Worker へも出さない。
 
 判定不能なとき（依頼が曖昧で 1〜5 を当てられない）は、人間に 1 問だけ聞くか、既定で handoff する。既定を handoff 側へ倒す理由: Architect pane は常駐している前提なので、過剰 handoff のコストは「1 回の handoff メッセージ」に留まるが、過小 handoff のコストは「安いモデルの設計判断がそのまま実装される」ことであり、非対称だからである。
+
+自分のモデルが Architect の許可集合にも入り（Opus）、単独セッションでは、トリガー 2〜4 と判定不能時の既定は handoff せず、Architect として自分で答える——handoff 先が人間に戻るだけになるためである。トリガー 5（権限・認証・秘密情報・破壊的操作・production）も単独セッションでは自分で扱う。handoff 先が無いため、Architect として `AGENTS.md` の停止・確認ポリシーに従い人間へ確認する。「単独」は宣言で判定する: セッション起動時に default role が宣言されていて、かつこの作業用に Architect pane が宣言されているときに限り handoff する。それ以外は単独セッションとして扱う。
 
 人間が「執事で答えて」「アーキテクトへ」と明示したら、それが上記トリガーによる判定を上書きする（§4 の「モデル名指定は明示指示」と同じ扱い）。
 
@@ -135,13 +134,13 @@ handoff の実体は `agmsg-delegation` の引き継ぎ（handoff）メッセー
 
 review 外注の既定経路は Codex: 起動時引数で `gpt-5.6-sol` / `gpt-5.6-terra` / `gpt-6-astra` から選ぶ。既定は sol。
 
-**terra は sol より下で、価格でも能力でも安く弱い。** そのため terra を選ぶのは難度を上げたいときではなく、読む量が多くコストを抑えたいときで、`AGMSG_REVIEWER_EFFORT=high` を併せて指定して質を補う。判断の難度が理由なら terra へ移さず、sol のまま `AGMSG_REVIEWER_EFFORT` を上げる。Claude reviewer（fable 固定）は明示指定された場合のみ使い、fallback は opus。Fable reviewer は Orchestrator 側の Fable rate limit と枠を共有するため、実行中 429 で run ごと失敗しうる。失敗した場合は同経路で再試行せず、Codex sol へ切り替えて再外注する。`gpt-6-astra` は sol より上の帯で、価格も能力も上。明示指定されたときだけ使い、既定に据えない。
+terra は sol より下で、価格でも能力でも安く弱い。そのため terra を選ぶのは難度を上げたいときではなく、読む量が多くコストを抑えたいときで、`AGMSG_REVIEWER_EFFORT=high` を併せて指定して質を補う。判断の難度が理由なら terra へ移さず、sol のまま `AGMSG_REVIEWER_EFFORT` を上げる。Claude reviewer（fable 固定）は明示指定された場合のみ使い、fallback は opus。Fable reviewer は Orchestrator 側の Fable rate limit と枠を共有するため、実行中 429 で run ごと失敗しうる。失敗した場合は同経路で再試行せず、Codex sol へ切り替えて再外注する。`gpt-6-astra` は sol より上の帯で、価格も能力も上。明示指定されたときだけ使い、既定に据えない。
 
 ### self-review 禁止（approval gate）
 
-Architect / Worker が作成した成果物の **approval gate は、作者と異なる identity かつ別 session / 別 context の Reviewer を必須とする。** 同一 pane / 同一 identity での兼務は、草案レビューや相談までに限定し、**approve を受理しない**。
+Architect / Worker が作成した成果物の **approval gate は、作者と異なる identity かつ別 session / 別 context の Reviewer を必須とする。** 同一 pane / 同一 identity での兼務は、草案レビューや相談までに限定し、approve を受理しない。
 
-対象の同一性（SHA / checksum の固定）と判断の独立性（作者と別の reviewer であること）は**別々の要件**であり、片方が満たされてももう片方の代わりにならない。SHA を固定しただけの self-review は approval gate を通過しない。
+対象の同一性（SHA / checksum の固定）と判断の独立性（作者と別の reviewer であること）は別々の要件であり、片方が満たされてももう片方の代わりにならない。SHA を固定しただけの self-review は approval gate を通過しない。
 
 Reviewer の起動経路（spawn / pane 常駐）と強制境界の詳細は `agmsg-delegation` が正本。
 
@@ -163,7 +162,7 @@ Reviewer の起動経路（spawn / pane 常駐）と強制境界の詳細は `ag
 
 完了条件: 委譲する / しない のどちらかを、上の条件を根拠に宣言した。
 
-**「設計方針が確定している」は、並列タスク間でも成り立つ必要がある。** 触るファイル集合が互いに素でも、2 つのタスクがそれぞれ同じ規約（命名、エラーの形、型の設計）を自分で決めなければ実装できないなら、方針はまだ確定していない。Worker は互いの成果を見られないため、各自が単体では妥当な判断をしても、組み合わせた結果が食い違う。対処は直列化ではなく、その規約をタスク文に書いて渡すことである。
+「設計方針が確定している」は、並列タスク間でも成り立つ必要がある。触るファイル集合が互いに素でも、2 つのタスクがそれぞれ同じ規約（命名、エラーの形、型の設計）を自分で決めなければ実装できないなら、方針はまだ確定していない。Worker は互いの成果を見られないため、各自が単体では妥当な判断をしても、組み合わせた結果が食い違う。対処は直列化ではなく、その規約をタスク文に書いて渡すことである。
 
 ## 3. 最小単位へ切る
 
@@ -174,15 +173,15 @@ Reviewer の起動経路（spawn / pane 常駐）と強制境界の詳細は `ag
 
 互いに素にできない編集を並列でどうしても走らせる場合に限り、Claude 側は Agent tool の `isolation: "worktree"` を使う。
 
-**「触るファイル」には、指定した検証コマンドが書き換えを強制する対象まで含める。** 実装だけを列挙して渡すと、Worker は検証を通すために範囲外へ手を出すか `BLOCKED` で止まるしかない。設定値を変えるなら、その値を固定値で assert しているテストも同じタスクに入る。ただし全依存を無制限に洗い出すのではなく、変更する契約に直結する設定とテストまでを追い、起動前にタスク定義と対象テストを実際に読む。読んでも見つからなかったファイルが後から必要になった場合、Worker が `BLOCKED` を返すのが正しい振る舞いであり、Worker 側の失敗ではない。
+「触るファイル」には、指定した検証コマンドが書き換えを強制する対象まで含める。実装だけを列挙して渡すと、Worker は検証を通すために範囲外へ手を出すか `BLOCKED` で止まるしかない。設定値を変えるなら、その値を固定値で assert しているテストも同じタスクに入る。ただし全依存を無制限に洗い出すのではなく、変更する契約に直結する設定とテストまでを追い、起動前にタスク定義と対象テストを実際に読む。読んでも見つからなかったファイルが後から必要になった場合、Worker が `BLOCKED` を返すのが正しい振る舞いであり、Worker 側の失敗ではない。
 
 assert が業務契約なのか実装詳細なのかは Orchestrator が判断する。テストを機械的に新実装へ合わせさせない。
 
 「検証コマンド」は、そのタスク単体で通す focused gate と、Orchestrator が横断で回す統合 gate を区別して渡す。
 
-並行して別セッションが同じ tree を触りうる場合は、独立性の確認に**開始時点の差分と所有範囲**を含める。Worker が自分の成果と他者の変更を区別するための情報であり、dirty があるだけで一律に停止させない。**意図した base は full SHA へ固定し、その SHA を branch / worktree 作成の start-point として明示的に渡す。** 直前に HEAD を読み直すのは検出の補助にすぎず、読んでから作成するまでの間に別セッションが切り替えれば同じ事故が起きる。共有 tree での切り替えは並行させない。
+並行して別セッションが同じ tree を触りうる場合は、独立性の確認に開始時点の差分と所有範囲を含める。Worker が自分の成果と他者の変更を区別するための情報であり、dirty があるだけで一律に停止させない。意図した base は full SHA へ固定し、その SHA を branch / worktree 作成の start-point として明示的に渡す。直前に HEAD を読み直すのは検出の補助にすぎず、読んでから作成するまでの間に別セッションが切り替えれば同じ事故が起きる。共有 tree での切り替えは並行させない。
 
-完了条件: 各タスクについて「触るファイル」「完了条件」「検証コマンド」の 3 点が書けている。**完了条件には、満たすべき振る舞いと、満たさない反例を書く。** タスク文では must の制約（外部契約・責務境界・永続データ構造・安全境界・複数タスク共通の規約）と、任意の実装例を区別して示す。Worker は must の範囲内で手段を選び直してよく、その場合は理由を報告する——形だけを渡すと、その形に欠陥があっても欠陥ごと実装される。ただし must 側を変える必要が出たら、実装せず矛盾の根拠を親へ返す（§2 の「設計判断が未確定なものは委譲しない」と同じ境界）。
+完了条件: 各タスクについて「触るファイル」「完了条件」「検証コマンド」の 3 点が書けている。完了条件には、満たすべき振る舞いと、満たさない反例を書く。タスク文では must の制約（外部契約・責務境界・永続データ構造・安全境界・複数タスク共通の規約）と、任意の実装例を区別して示す。Worker は must の範囲内で手段を選び直してよく、その場合は理由を報告する——形だけを渡すと、その形に欠陥があっても欠陥ごと実装される。ただし must 側を変える必要が出たら、実装せず矛盾の根拠を親へ返す（§2 の「設計判断が未確定なものは委譲しない」と同じ境界）。
 
 ## 4. Worker を起動する
 
@@ -194,7 +193,7 @@ Agent(subagent_type: "implementer", prompt: <タスク定義>)
 
 通常委譲では `model` を渡さない。呼び出し時の指定は agent 定義の frontmatter より優先されるため、渡すと `implementer` に設定済みの既定 tier を上書きしてしまう。
 
-**Claude セッションで Codex モデル（`luna` / `terra` / `sol` / `astra`）を指定された場合、Agent tool は使えない。** `model` に取れるのは `sonnet` / `opus` / `haiku` / `fable` だけで、Codex worker を起動する手段が無い。この場合は `agmsg-delegation` の spawn 経路（`run-codex-worker.sh implement <project> gpt-5.6-luna <payload>`）へ切り替える。Agent tool で代わりに `sonnet` を使ってはならない——指定されたモデルを黙って別 tier へ差し替えることになる。やむを得ず別の経路や tier を採るときは、起動前に差し替え先と理由をユーザーへ報告し、最終報告にも記す。
+Claude セッションで Codex モデル（`luna` / `terra` / `sol` / `astra`）を指定された場合、Agent tool は使えない。`model` に取れるのは `sonnet` / `opus` / `haiku` / `fable` だけで、Codex worker を起動する手段が無い。この場合は `agmsg-delegation` の spawn 経路（`run-codex-worker.sh implement <project> gpt-5.6-luna <payload>`）へ切り替える。Agent tool で代わりに `sonnet` を使ってはならない——指定されたモデルを黙って別 tier へ差し替えることになる。やむを得ず別の経路や tier を採るときは、起動前に差し替え先と理由をユーザーへ報告し、最終報告にも記す。
 
 Codex:
 
@@ -210,7 +209,7 @@ Codex native の `spawn_agent` を標準経路とする。native spawn が利用
 - セキュリティ境界に触る変更、セキュリティレビュー
 - 複数案のトレードオフ判断を含む実装
 
-昇格先は platform ごとに固定する。**昇格の理由が「難度」か「長文脈」かで行き先が変わる**ので、1 本の梯子にせず理由で分岐する。
+昇格先は platform ごとに固定する。昇格の理由が「難度」か「長文脈」かで行き先が変わるので、1 本の梯子にせず理由で分岐する。
 
 | platform | 既定 Worker                                   | 難度で詰まったとき                                                                | 長文脈リコールの崖                              |
 | -------- | --------------------------------------------- | --------------------------------------------------------------------------------- | ----------------------------------------------- |
@@ -229,7 +228,7 @@ cursor 行の「難度で詰まったとき」は cursor 内で `claude-opus-5-t
 
 長文脈タスク（大規模コードベースの読解、複数文書の統合、長い履歴の追跡）は effort 引き上げを飛ばして直接 `gpt-5.6-terra` へ上げる。ここで Terra を選ぶのは能力不足を補うためではなく、Sol とほぼ同等の長文脈リコールを Sol より安く買うためである。`luna` は長文脈リコールに崖があり（MRCR 41.3% / Sol 91.5% / Terra 89.6%、[OpenAI](https://openai.com/index/gpt-5-6)）、effort 引き上げで緩和されるという実測は公表されていない。terra セッション自身が長文脈タスクを受けた場合も、上の一般則どおり親 session では実装せず、別 identity・別 session の terra Worker を起動する。
 
-Claude では独立タスクを**同一レスポンス内で複数呼び出す**と並列に走る（1レスポンス1呼び出しは直列になる）。Codex では worker を複数 detached 起動する（触るファイル集合が互いに素であることが前提。guardrails は `agmsg-delegation` を参照）。どちらも Orchestrator の会話履歴は引き継がせず、Section 3 で書き出した 3 点だけを渡す。
+Claude では独立タスクを同一レスポンス内で複数呼び出すと並列に走る（1レスポンス1呼び出しは直列になる）。Codex では worker を複数 detached 起動する（触るファイル集合が互いに素であることが前提。guardrails は `agmsg-delegation` を参照）。どちらも Orchestrator の会話履歴は引き継がせず、Section 3 で書き出した 3 点だけを渡す。
 
 起動後の扱いは 2 つ。
 
@@ -242,7 +241,7 @@ Claude では独立タスクを**同一レスポンス内で複数呼び出す**
 
 ## 5. 受け取って検証する
 
-**受入判断と最終報告の各主張を、固定した成果物と実行結果へ照合する。** Worker の `verified` は独立確認の入力であって、Orchestrator 自身の推論を保証しない。
+受入判断と最終報告の各主張を、固定した成果物と実行結果へ照合する。Worker の `verified` は独立確認の入力であって、Orchestrator 自身の推論を保証しない。
 
 - `git status --short` と `git diff` を自分の目で読み、実際の差分を確認する
 - untracked ファイルは `git ls-files --others --exclude-standard` で列挙し、各ファイルの内容も検証する（Worker が新規追加したファイルは diff に出ないため）
@@ -250,7 +249,7 @@ Claude では独立タスクを**同一レスポンス内で複数呼び出す**
 - タスク横断で衝突がないか確認し、全体の test / typecheck を通す
 - DoD の該当項目を満たす
 
-**主張の広さと検証の広さを一致させる。** 最終 tree が健全だと言うなら最終 SHA を確認すれば足りるが、途中の各 commit も成立すると言うなら各 commit を確認する。「参照が残っていない」と断定するなら、その主張が覆う集合を検索する。1 ファイルを見て全体を語らない。
+主張の広さと検証の広さを一致させる。最終 tree が健全だと言うなら最終 SHA を確認すれば足りるが、途中の各 commit も成立すると言うなら各 commit を確認する。「参照が残っていない」と断定するなら、その主張が覆う集合を検索する。1 ファイルを見て全体を語らない。
 
 ファイル・コマンド・タスクの不存在を根拠にするときは、global の共有ガイダンス（正本は `catalog/AGENTS.md`、配布先は `~/.claude/CLAUDE.md` と `~/.codex/AGENTS.md`）の「事実確認」に従う。一覧コマンドの出力に無いことは、存在しないことの証明にはならない。
 
