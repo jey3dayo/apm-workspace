@@ -84,6 +84,8 @@ dependencies:
     - stablyai/orca/skills/computer-use#8b197ffdc2f43f0bf31158ff7dd9de35ac4fbea5
     - stablyai/orca/skills/orchestration#8b197ffdc2f43f0bf31158ff7dd9de35ac4fbea5
     - coji/natural-japanese/skills/natural-japanese#9a78a42964096da509b8f3e011f0085a5f080151
+    - ayghri/i-have-adhd/skills/i-have-adhd#839872f9d1cd634fed642b4589ce7226199cc15f
+    - mvanhorn/last30days-skill/skills/last30days#084662b501fb0dba95bd55eff0c258d35e0dc499
   mcp:
     - name: context7
       registry: false
