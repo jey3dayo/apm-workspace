@@ -120,7 +120,7 @@ When shared runtime guidance changes under `~/.apm/catalog/`:
 5. Run `mise run install:catalog`.
 6. Run `mise run doctor` and confirm:
    - `catalog: ... status=ok`
-   - target lines show `config=present agents=present commands=present rules=present`
+   - target lines show `present` for each face, or `n/a` for a face that target opts out of
 
 If old package ownership from a previous install state is still hanging around, run `apm prune` once before re-applying.
 
