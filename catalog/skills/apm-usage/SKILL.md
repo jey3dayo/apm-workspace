@@ -176,7 +176,6 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
   `apm install <package-ref> --skill <id>`.
 - If the request is to scan an arbitrary repository and create, update, or clean up its repo-local `apm.yml`, read `references/repo-manifest.md`.
 - If the request is to add an MCP server through APM, apply the same scope rule: use `apm install -g --mcp <name> ...` only for cross-repo foundation MCPs; use repo-local `apm install --mcp <name> ...` for project, framework, UI, database, browser, or app-runtime-specific MCPs.
-- When an MCP server fails to start, check the sequence: (1) whether the executable exists and is executable, (2) whether the args are valid, (3) whether required env is injected, and (4) whether the config syntax is valid.
 - If the APM workspace has no repo-local MCP distribution lane for a target repository, record the intended placement as guidance and keep the global manifest lightweight. Treat implementing repo-local MCP distribution as a separate workspace-mechanics task.
 - If the request is "change only workspace docs or notes", edit the workspace files directly and do not restage the catalog unless `catalog/**` changed too.
 
@@ -222,7 +221,6 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
 - Do not hand-edit deployed targets such as `~/.claude/`, `~/.codex/`, or `~/.agents/skills`.
 - Do not judge a deployed skill orphaned by its absence from `catalog/skills/**` and `optional-skills/**`; deployed targets are mostly fed by external dependencies, so that test marks most of a healthy target as orphaned. Name the supplier of every entry before it reaches a delete line -- a lock record, `apm_modules/**`, `private-skills/.apm/skills/<id>`, `manual-skills`, or a workspace-only symlink bridge -- and treat only an entry with no supplier as a candidate. A lock record keeps an entry off that line but never proves the skill is still supplied — the lock keeps records for skills the catalog has already retired, so check the manifest, the record's owner, the locator's scope and target, and the deployed path itself before concluding anything about a record.
 - `apm audit --ci` and searching a deployed target: see `references/rollout-fast-paths.md` for the reading and grep-wrapper caveats.
-- Do not assume a repository-local `apm.yml` with `targets: [codex]` is correct just because it predates this check. Verify against the repository's actual runtimes; a stale `codex`-only manifest silently starves Claude Code of every repo-local skill and MCP declared there.
 - Prefer `mise` tasks over ad hoc script entrypoints for normal operation.
 - Before changing user-global `mise` tools, verify the resolved binary path and install tree. `mise latest` can lag or differ because of release-age policy, so compare with the upstream registry when exact latest-version behavior matters.
 - Before committing `apm.lock.yaml` after `mise run upgrade`, separate the intended dependency update from unrelated unpinned dependency drift. Report unrelated drift instead of hiding it inside the target dependency change.
