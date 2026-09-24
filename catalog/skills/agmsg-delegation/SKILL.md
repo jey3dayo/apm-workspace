@@ -64,10 +64,10 @@ Steward から Architect への昇格 handoff もこの書式を使う。
 
 共通 lifecycle は同一で、role によって安全契約と報告フォーマットが異なる。
 
-| role      | 起動する側                                                | spawn する相手                                                                                                                                                                                                                        | 相手の権限                   | 報告   |
-| --------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- | ------ |
-| implement | Orchestrator 機能を担う側                                 | worker（model は `orchestrator-worker` の tier 表が正本。Claude / Codex に加え opencode（`deepseek/deepseek-v4-flash` のみ）、cursor（`claude-sonnet-5-thinking-high` / `claude-opus-5-thinking-high`）も implement worker になれる） | 対象 worktree の編集可       | DONE   |
-| review    | Orchestrator 機能を担う側。spawn 経路と pane 経路の両方可 | reviewer（model は `orchestrator-worker` の tier 表が正本）。opencode は Reviewer に就けないが、cursor（`claude-fable-5-thinking-xhigh` 既定 / `claude-opus-5-thinking-high` / `gpt-5.6-sol-xhigh`）は就ける                          | read-only。編集・commit 禁止 | REVIEW |
+| role      | 起動する側                                                | spawn する相手                                                                                                                                                                                                                 | 相手の権限                   | 報告   |
+| --------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------- | ------ |
+| implement | Orchestrator 機能を担う側                                 | worker（model は `orchestrator-worker` の tier 表が正本。Claude / Codex に加え opencode（`deepseek/deepseek-v4-flash` のみ）、cursor（`claude-sonnet-5-thinking-high` / `claude-opus-5-5-high`）も implement worker になれる） | 対象 worktree の編集可       | DONE   |
+| review    | Orchestrator 機能を担う側。spawn 経路と pane 経路の両方可 | reviewer（model は `orchestrator-worker` の tier 表が正本）。opencode は Reviewer に就けないが、cursor（`claude-fable-5-1-thinking-xhigh` 既定 / `claude-opus-5-5-high` / `gpt-5.6-sol-xhigh`）は就ける                        | read-only。編集・commit 禁止 | REVIEW |
 
 review role の reviewer モデル指定は本スキル内の一時的な model override であり、`orchestrator-worker` の tier 対応表や既存 agent 定義（親モデル継承）を変更しない。model は helper の引数。選定は `orchestrator-worker` の「Reviewer の tier」が正本。
 

@@ -22,8 +22,8 @@ fi
 # 起動して初めて（あるいは請求で）気づくことになる。正本は orchestrator-worker の
 # tier 表で、tests/run-codex-worker.bats が表と本 allowlist の一致を検証する。
 case "$role" in
-implement) allowed_models=(gpt-5.6-luna gpt-5.6-sol gpt-5.6-terra) ;;
-review) allowed_models=(gpt-5.6-sol gpt-5.6-terra gpt-6-astra) ;;
+implement) allowed_models=(gpt-6-luna gpt-6-sol gpt-5.6-terra) ;;
+review) allowed_models=(gpt-6-sol gpt-5.6-terra gpt-6-astra) ;;
 esac
 
 model_allowed=0

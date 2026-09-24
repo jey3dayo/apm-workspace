@@ -40,7 +40,7 @@ launchd 経路では親の `MISE_ENV` が継承されず、node を必要とす�
 常駐プールの pane はユーザーが手で起動するが、実装 worker の通常経路は既存 worktree を使う sandboxed pane とする。orchestrator またはユーザーが pane の起動前に worktree を作成し、pane worker は次で起動する:
 
 ```bash
-codex -m gpt-5.6-luna -a never -s workspace-write
+codex -m gpt-6-luna -a never -s workspace-write
 ```
 
 起動後、orchestrator は pane の実 cwd と `git worktree list --porcelain` を照合し、`git -C "$worktree" rev-parse --show-toplevel` と `git -C "$worktree" branch --show-current` が指定した worktree / branch と完全一致することを確認する。さらに開始時点の `git status --short` / `git diff` と worker 後の差分を比較し、タスク定義にない unexpected diff がないことを確認する。

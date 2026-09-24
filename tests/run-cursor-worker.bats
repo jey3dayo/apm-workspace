@@ -30,7 +30,7 @@ teardown() {
 }
 
 # tier 表の Worker / Reviewer 行から cursor の model ID を取り出す。
-# claude-* 系と gpt-5.6-sol-xhigh のみが対象で、Codex 列の gpt-5.6-sol /
+# claude-* 系と gpt-5.6-sol-xhigh のみが対象で、Codex 列の gpt-6-sol /
 # gpt-5.6-terra / gpt-6-astra のような2segment id とは正規表現の segment数で
 # 区別される（gpt-[0-9.]+-[a-z]+-[a-z]+ は3segment必須）。
 skill_models_for() {
@@ -49,13 +49,13 @@ script_models_for() {
 }
 
 @test "implement with the escalation model also passes the allowlist" {
-  run "$SCRIPT" implement "$PROJECT" claude-opus-5-thinking-high "$PAYLOAD"
+  run "$SCRIPT" implement "$PROJECT" claude-opus-5-5-high "$PAYLOAD"
   [ "$status" -ne 2 ]
   [[ "$output" != *"not allowed for role"* ]]
 }
 
 @test "review with an allowed model passes the allowlist and fails later, not at validation" {
-  run "$SCRIPT" review "$PROJECT" claude-fable-5-thinking-xhigh "$PAYLOAD"
+  run "$SCRIPT" review "$PROJECT" claude-fable-5-1-thinking-xhigh "$PAYLOAD"
   [ "$status" -ne 2 ]
   [[ "$output" != *"not allowed for role"* ]]
 }
@@ -67,7 +67,7 @@ script_models_for() {
 }
 
 @test "a review-only model is rejected for implement" {
-  run "$SCRIPT" implement "$PROJECT" claude-fable-5-thinking-xhigh "$PAYLOAD"
+  run "$SCRIPT" implement "$PROJECT" claude-fable-5-1-thinking-xhigh "$PAYLOAD"
   [ "$status" -eq 2 ]
   [[ "$output" == *"not allowed for role implement"* ]]
 }
@@ -139,7 +139,7 @@ script_models_for() {
   [[ "$output" != *"(deny file-write* (subpath \"$canon_project\"))"* ]]
 
   run env AGMSG_CURSOR_SANDBOX_PROFILE_ONLY=1 \
-    "$SCRIPT" review "$PROJECT" claude-fable-5-thinking-xhigh "$PAYLOAD"
+    "$SCRIPT" review "$PROJECT" claude-fable-5-1-thinking-xhigh "$PAYLOAD"
   [ "$status" -eq 0 ]
   [[ "$output" == *"(deny file-write* (subpath \"$canon_project\"))"* ]]
 }

@@ -31,13 +31,16 @@ script_models_for() {
   sed -n "s/^$1) allowed_models=(\(.*\)) ;;$/\1/p" "$SCRIPT"
 }
 
-# tier 表の行から model ID を取り出す（実在する世代は \`gpt-5.6-*\` と \`gpt-6-*\` のみ）
+# tier 表の Codex 列だけから model ID を取り出す（実在する世代は \`gpt-5.6-*\` と
+# \`gpt-6-*\` のみ）。行全体を対象にすると cursor 列の \`gpt-5.6-sol-xhigh\` の
+# 先頭部分が同じ正規表現に誤って一致するため、列を切り出してから抽出する。
 skill_models_for() {
-  grep -E "^\| $1 " "$SKILL" | grep -oE 'gpt-(5\.6|6)-[a-z]+' | sort -u | tr '\n' ' '
+  awk -F'|' -v role="$1" '$2 ~ "^ *" role " *$" { print $5 }' "$SKILL" |
+    grep -oE 'gpt-(5\.6|6)-[a-z]+' | sort -u | tr '\n' ' '
 }
 
 @test "review rejects a worker-tier model" {
-  run "$SCRIPT" review "$PROJECT" gpt-5.6-luna "$PAYLOAD"
+  run "$SCRIPT" review "$PROJECT" gpt-6-luna "$PAYLOAD"
   [ "$status" -eq 2 ]
   [[ "$output" == *"not allowed for role review"* ]]
 }
@@ -53,7 +56,7 @@ skill_models_for() {
 @test "allowed models pass the allowlist and fail later, not at validation" {
   # 許可された組合せは allowlist を通過し、存在しない codex 本体で落ちる。
   # exit 2 (引数検証) ではないことが「通過した」ことの証拠になる。
-  run "$SCRIPT" implement "$PROJECT" gpt-5.6-luna "$PAYLOAD"
+  run "$SCRIPT" implement "$PROJECT" gpt-6-luna "$PAYLOAD"
   [ "$status" -ne 2 ]
   [[ "$output" != *"not allowed for role"* ]]
 }
@@ -119,7 +122,7 @@ exit 0
 SH
   chmod +x "$stub"
   CODEX_HOME="$fake_home/codex" AGMSG_CODEX_BIN="$stub" \
-    run "$SCRIPT" review "$PROJECT" gpt-5.6-sol "$PAYLOAD"
+    run "$SCRIPT" review "$PROJECT" gpt-6-sol "$PAYLOAD"
   [ "$status" -eq 0 ]
   # reviewer が読む home は base home ではなく生成された home である。
   [[ "$output" != *"HOME_IS: $fake_home/codex"* ]]
@@ -149,7 +152,7 @@ mcp_fixture() {
   local home=$1
   mkdir -p "$home"
   cat >"$home/config.toml" <<'TOML'
-model = "gpt-5.6-luna"
+model = "gpt-6-luna"
 notify = [
   "/Applications/Some.app/notify",
   "turn-ended",
@@ -208,7 +211,7 @@ SH
   home="$(mktemp -d)/codex"; mcp_fixture "$home"
   stub="$(mktemp -d)/stub"; arg_stub "$stub"
   CODEX_HOME="$home" AGMSG_CODEX_BIN="$stub" \
-    run "$SCRIPT" implement "$PROJECT" gpt-5.6-luna "$PAYLOAD"
+    run "$SCRIPT" implement "$PROJECT" gpt-6-luna "$PAYLOAD"
   [ "$status" -eq 0 ]
   # worker は base home ではなく生成された home を見る。
   [[ "$output" != *"HOME_IS: $home"* ]]
@@ -226,7 +229,7 @@ SH
   [[ "$output" != *"turn-ended"* ]]
   # base の他の設定は残す。
   [[ "$output" == *"[sandbox_workspace_write]"* ]]
-  [[ "$output" == *"model = \"gpt-5.6-luna\""* ]]
+  [[ "$output" == *"model = \"gpt-6-luna\""* ]]
   # auth は複製せず共有する。
   [[ "$output" == *"AUTH_SYMLINK"* ]]
 }
@@ -236,7 +239,7 @@ SH
   home="$(mktemp -d)/codex"; mcp_fixture "$home"
   stub="$(mktemp -d)/stub"; arg_stub "$stub"
   CODEX_HOME="$home" AGMSG_WORKER_MCP_ALLOW=1password AGMSG_CODEX_BIN="$stub" \
-    run "$SCRIPT" implement "$PROJECT" gpt-5.6-luna "$PAYLOAD"
+    run "$SCRIPT" implement "$PROJECT" gpt-6-luna "$PAYLOAD"
   [ "$status" -eq 0 ]
   [[ "$output" == *"[mcp_servers.1password]"* ]]
   # 既定で通っていた 2 つが、明示しなければ落ちる（allowlist は置換であって追加ではない）。
@@ -249,7 +252,7 @@ SH
   home="$(mktemp -d)/codex"; mkdir -p "$home"
   stub="$(mktemp -d)/stub"; arg_stub "$stub"
   CODEX_HOME="$home" AGMSG_CODEX_BIN="$stub" \
-    run "$SCRIPT" implement "$PROJECT" gpt-5.6-luna "$PAYLOAD"
+    run "$SCRIPT" implement "$PROJECT" gpt-6-luna "$PAYLOAD"
   [ "$status" -eq 0 ]
   [[ "$output" == *"NO_CONFIG"* ]]
 }
@@ -259,7 +262,7 @@ SH
   home="$(mktemp -d)/codex"; mcp_fixture "$home"
   stub="$(mktemp -d)/stub"; arg_stub "$stub"
   CODEX_HOME="$home" AGMSG_CODEX_BIN="$stub" \
-    run "$SCRIPT" implement "$PROJECT" gpt-5.6-luna "$PAYLOAD"
+    run "$SCRIPT" implement "$PROJECT" gpt-6-luna "$PAYLOAD"
   [ "$status" -eq 0 ]
   local generated
   generated="$(printf '%s\n' "$output" | sed -n 's/^HOME_IS: //p')"

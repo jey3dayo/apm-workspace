@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # cursor-agent worker/reviewer launcher. cursor-agent reaches the same
-# frontier models (claude-*, gpt-5.6-sol) through a billing/rate pool that is
+# frontier models (claude-*, gpt-5.6-sol-xhigh) through a billing/rate pool that is
 # separate from the Claude plan and Codex credits, so it can serve both
 # roles: implement and review (see tmp/cursor-worker/design.md for the
 # 2026-09-18 measurements this script encodes).
@@ -30,8 +30,8 @@ fi
 # の tier 表 (cursor 列) で、tests/run-cursor-worker.bats の drift テストが表と
 # 本 allowlist の集合一致を検証する。
 case "$role" in
-implement) allowed_models=(claude-sonnet-5-thinking-high claude-opus-5-thinking-high) ;;
-review) allowed_models=(claude-fable-5-thinking-xhigh claude-opus-5-thinking-high gpt-5.6-sol-xhigh) ;;
+implement) allowed_models=(claude-sonnet-5-thinking-high claude-opus-5-5-high) ;;
+review) allowed_models=(claude-fable-5-1-thinking-xhigh claude-opus-5-5-high gpt-5.6-sol-xhigh) ;;
 esac
 
 model_allowed=0

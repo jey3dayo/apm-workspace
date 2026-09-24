@@ -41,7 +41,7 @@ skill_opencode_models() {
 }
 
 @test "an unknown model is rejected" {
-  run "$SCRIPT" implement "$PROJECT" gpt-5.6-luna "$PAYLOAD"
+  run "$SCRIPT" implement "$PROJECT" gpt-6-luna "$PAYLOAD"
   [ "$status" -eq 2 ]
   [[ "$output" == *"not allowed for role implement"* ]]
 }
