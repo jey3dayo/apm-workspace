@@ -1131,6 +1131,17 @@ doctor_fixture_env() {
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
 }
 
+@test "doctor reports agents=n/a for the codex sentinel and does not fail on it" {
+  make_doctor_fixture
+  rm -rf "$doctor_home/.codex/agents"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"codex: config=present agents=n/a commands=present rules=present skills=present"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
 # --- doctor agmsg roster link reachability -----------------------------------
 #
 # agmsg resolves db/ and teams/ relative to $HOME/.agents/skills/agmsg, which
@@ -1537,6 +1548,36 @@ SHIM
   [ "$status" -eq 0 ]
   [ ! -e "$target_root/agents" ]
   [ -f "$target_root/CLAUDE.md" ]
+
+  rm -rf "$workspace" "$runtime_home"
+}
+
+@test "sync_managed_catalog_runtime_assets removes the agents tree for codex" {
+  workspace="$(mktemp -d)"
+  runtime_home="$(mktemp -d)"
+  mkdir -p "$workspace/catalog/agents"
+  printf '%s\n' 'agent' >"$workspace/catalog/agents/reviewer.md"
+  printf '%s\n' '# instructions' >"$workspace/catalog/AGENTS.md"
+
+  target_root="$runtime_home/.codex"
+  mkdir -p "$target_root/agents"
+  printf '%s\n' 'stale' >"$target_root/agents/reviewer.md"
+
+  HOME="$runtime_home"
+  tracked_catalog_dir() { printf '%s\n' "$workspace/catalog"; }
+  tracked_catalog_instructions_path() { printf '%s\n' "$workspace/catalog/AGENTS.md"; }
+  tracked_catalog_agents_root() { printf '%s\n' "$workspace/catalog/agents"; }
+  tracked_catalog_commands_root() { printf '%s\n' "$workspace/catalog/commands"; }
+  tracked_catalog_rules_root() { printf '%s\n' "$workspace/catalog/rules"; }
+  managed_catalog_runtime_targets() {
+    printf '%s\n' 'codex|.codex|AGENTS.md|.agents|-'
+  }
+
+  run sync_managed_catalog_runtime_assets
+
+  [ "$status" -eq 0 ]
+  [ ! -e "$target_root/agents" ]
+  [ -f "$target_root/AGENTS.md" ]
 
   rm -rf "$workspace" "$runtime_home"
 }

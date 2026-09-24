@@ -5,7 +5,7 @@ Entry-point memo for the curated agents under `catalog/agents/`. It records wher
 ## Placement & Distribution
 
 - Location: `catalog/agents/<name>.md` — all curated / vendored agents live here.
-- Distribution: the catalog rollout (`mise run deploy`) copies `catalog/agents/*` into each runtime target's `agents/` dir (`~/.claude/agents`, `~/.codex/agents`). `~/.agents` is a skills-only target and receives no agents.
+- Distribution: the catalog rollout (`mise run deploy`) copies `catalog/agents/*` into each runtime target's `agents/` dir (`~/.claude/agents`). `~/.agents` is a skills-only target and receives no agents; Codex opts out of the agents face too (`~/.codex/agents` is never populated) because codex-cli only discovers `~/.codex/agents/*.toml`, and the catalog's Claude-format `.md` agent files are silently ignored there.
 - Formatting: `catalog/agents/` is listed in `.prettierignore`, so the formatter leaves curated agent files in their upstream-derived shape. Only our own generated artifacts get reformatted.
 
 ## Sources

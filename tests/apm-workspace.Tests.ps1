@@ -1496,12 +1496,13 @@ id = "preserve other"
     ((Get-Content -LiteralPath (Join-Path $targetDir ".managed-catalog-manifest")) -join "`n") | Should -Be "a.md`nnested/b.md"
   }
 
-  It "maps codex skills to ~/.agents while keeping config under ~/.codex" {
+  It "maps codex skills to ~/.agents while keeping config under ~/.codex and opts it out of the agents face" {
     $targets = @(Get-ManagedCatalogRuntimeTargets)
     $codex = $targets | Where-Object Name -eq "codex"
 
     $codex.Root | Should -Be (Join-Path $HOME ".codex")
     $codex.SkillsRoot | Should -Be (Join-Path $HOME ".agents")
+    $codex.AgentsFace | Should -Be "-"
   }
 
   It "points opencode at the path OpenCode reads and opts it out of the skills and agents faces" {

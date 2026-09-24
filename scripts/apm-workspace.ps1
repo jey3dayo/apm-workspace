@@ -2798,10 +2798,16 @@ function Write-CatalogSummary {
 }
 
 
+# AgentsFace "-" marks a target that must not receive the catalog agents/
+# tree. Codex opts out: codex-cli only discovers `~/.codex/agents/*.toml`,
+# and the catalog's Claude-format `.md` agent files are silently ignored
+# there (or rejected once renamed to `.toml`, on the `tools`/`color` fields).
+# OpenCode opts out for the same reason (it rejects Claude-format agents at
+# startup) and also has no skills face of its own.
 function Get-ManagedCatalogRuntimeTargets {
   return @(
     [pscustomobject]@{ Name = "claude"; Root = (Join-Path $HOME ".claude"); SkillsRoot = (Join-Path $HOME ".claude"); AgentsFace = ""; ConfigName = "CLAUDE.md" },
-    [pscustomobject]@{ Name = "codex"; Root = (Join-Path $HOME ".codex"); SkillsRoot = (Join-Path $HOME ".agents"); AgentsFace = ""; ConfigName = "AGENTS.md" },
+    [pscustomobject]@{ Name = "codex"; Root = (Join-Path $HOME ".codex"); SkillsRoot = (Join-Path $HOME ".agents"); AgentsFace = "-"; ConfigName = "AGENTS.md" },
     [pscustomobject]@{ Name = "cursor"; Root = (Join-Path $HOME ".cursor"); SkillsRoot = (Join-Path $HOME ".cursor"); AgentsFace = ""; ConfigName = "AGENTS.md" },
     [pscustomobject]@{ Name = "opencode"; Root = (Join-Path $HOME ".config/opencode"); SkillsRoot = "-"; AgentsFace = "-"; ConfigName = "CLAUDE.md" },
     [pscustomobject]@{ Name = "openclaw"; Root = (Join-Path $HOME ".openclaw"); SkillsRoot = (Join-Path $HOME ".openclaw"); AgentsFace = ""; ConfigName = "CLAUDE.md" }

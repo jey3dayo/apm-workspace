@@ -1420,13 +1420,16 @@ print_catalog_summary() {
 # marks one that must not receive the catalog agents/ tree. OpenCode takes both:
 # it reads skills from ~/.claude/skills and ~/.agents/skills already, and it
 # rejects the Claude-format agents (object `tools`, hex `color`) at startup, so
-# it only gets config and commands. Do not point a second target at a shared
-# skills root: reconcile_skills_root_from_stage prunes entries the stage lacks,
-# so two targets on one root delete each other's skills.
+# it only gets config and commands. Codex opts out of agents too: codex-cli
+# only discovers `~/.codex/agents/*.toml`, and the catalog's Claude-format
+# `.md` agent files are silently ignored there (or rejected once renamed to
+# `.toml`, on the `tools`/`color` fields). Do not point a second target at a
+# shared skills root: reconcile_skills_root_from_stage prunes entries the
+# stage lacks, so two targets on one root delete each other's skills.
 managed_catalog_runtime_targets() {
   cat <<'EOF'
 claude|.claude|CLAUDE.md||
-codex|.codex|AGENTS.md|.agents|
+codex|.codex|AGENTS.md|.agents|-
 cursor|.cursor|AGENTS.md||
 opencode|.config/opencode|CLAUDE.md|-|-
 openclaw|.openclaw|CLAUDE.md||

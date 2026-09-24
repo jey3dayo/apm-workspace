@@ -593,3 +593,21 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 - 理由: 3経路とも直近3か月の利用実績が 0 で、description が 409字と常時読み込みのコストだけがあった。
 - 復元: 削除前の内容は `git log` の当該コミット以前の `catalog/skills/apm-repo-manifest/` から復元できる。
 - 併せて修正: Workflow 4 の `apm install --dry-run --target codex` / `apm install --target codex` を `--target` 指定なしに変更した（`targets: [codex]` 固定が `apm-usage` の targets gate と矛盾していたため）。
+
+## codex の agents face を opt-out（2026-09-24）
+
+- Status: 採用。`managed_catalog_runtime_targets`（`scripts/apm-workspace.sh`）と
+  `Get-ManagedCatalogRuntimeTargets`（`.ps1`）の codex 行を agents face `-` にした。opencode と
+  同じ仕組みで、codex が受け取るのは config（`AGENTS.md`）と skills（`.agents`）のみになる。
+- 理由: codex-cli 0.154.0 は `~/.codex/agents/*.toml` しか読まない。コード上の根拠
+  （`codex-rs/agent-roles/src/discovery.rs`）は拡張子を `extension == "toml"` でしか集めておらず、
+  `catalog/agents/*.md` は Claude 形式のまま置いても静かに無視される。加えて3か月間、codex 側の
+  agents face に利用実績が無い。
+- 変換案を却下した理由: `.md` を `.toml` へ変換して配っても、10件の role 説明を codex の spawn
+  ガイダンスへ注入することになり、本文は Claude のツール名（`Bash` / `Glob` / `Read` など）を
+  前提にしているため codex では意味を持たない。さらに role 名が codex の組み込み role と衝突する
+  ものがある。変換ロジックとメンテのコストに見合わない。
+- 実装: opencode と同じ agents face `-` の目印を使う。`sync_managed_catalog_runtime_assets` は
+  face が `-` のとき配布先 `agents/` を削除し、`cmd_doctor` は `agents=n/a` を返す。
+- 検証: `tests/apm-workspace.sh.bats` と `tests/apm-workspace.Tests.ps1` に opencode と同型の
+  codex ケース（doctor の `agents=n/a`、deploy 後に `~/.codex/agents` が残らないこと）を追加した。

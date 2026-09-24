@@ -36,6 +36,11 @@ catalog 変更後の検証は判断を含まない機械作業なので、Orches
    # 起動を拒否する。opencode は agents face を opt-out している
    [ ! -e ~/.config/opencode/agents ]
 
+   # negative: codex 用 agents 面も存在してはいけない。codex-cli は
+   # `~/.codex/agents/*.toml` しか読まず、catalog agents の Claude 形式 `.md` は
+   # 無視されるだけなので、codex も agents face を opt-out している
+   [ ! -e ~/.codex/agents ]
+
    # positive: opencode の commands は catalog が提供するファイルだけを個別比較する。
    # commands は manifest scope 配布（sync_managed_catalog_dir_with_manifest）のため、
    # `.managed-catalog-manifest` や同居する非 catalog ファイルが配布先にだけ存在するのは仕様であり、
