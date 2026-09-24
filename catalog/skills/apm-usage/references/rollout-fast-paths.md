@@ -1,16 +1,25 @@
-# Rollout Fast Paths — apm 0.29.0-specific procedures
+# Rollout Fast Paths — apm 0.31.0-specific procedures
 
 Detailed, version-specific procedures referenced by `SKILL.md` Fast Paths and
 Guardrails. Re-check these against the installed `apm` version before relying
-on them; they were observed on 0.29.0.
+on them. Each section says which parts were re-checked on 0.31.0; the rest
+were observed on 0.29.0 and carried forward.
 
 ## SHA-pin bump sequence (Fast Path 5 / Fast Path 7)
 
-When you bump a SHA pin in `apm.yml` by hand, `mise run upgrade` cannot do it:
-observed on apm 0.29.0, `apm update` refuses to replace a revision pin, and
-`mise run deploy` re-applies the lock without re-resolving the manifest, so
-the lockfile and the deployed target both stay on the old commit while every
-command exits zero. Run `apm install -g --only apm`, then `mise run deploy`.
+When you bump a SHA pin in `apm.yml` by hand, `mise run deploy` alone does not
+pick it up: `apply` stages external skills from the existing lock records and
+`apm_modules/`, so the lockfile and the deployed target both stay on the old
+commit while every command exits zero. Run `apm install -g --only apm`, then
+`mise run deploy`. The install re-resolves a dependency whose manifest ref
+differs from the locked one (`detect_ref_change`, observed on 0.31.0 with a
+single dependency).
+
+`mise run upgrade` also moves the lock to a hand-bumped SHA on 0.31.0, but it
+is the wrong tool here. Besides refreshing every unpinned dependency, it
+rewrites every declared SHA pin whose upstream has an annotated semver tag to
+the highest such tag's commit, which can be older than the pinned commit, and
+appends `# <tag>` to that line.
 
 `apm install -g --only apm` bypasses `mise run apply` the same way the bare
 `apm install -g` in Fast Path 6 does, so check the agmsg roster links per
@@ -21,43 +30,45 @@ the roster links stay unrestored — fix the `check` failure and rerun
 recovered them.
 
 For a checked-out external dependency (Fast Path 7) that is SHA-pinned, bump
-the pin in `apm.yml` to the pushed commit and follow this same sequence
-instead of `mise run upgrade` alone — `apm update` refuses to replace a
-revision pin (observed on apm 0.29.0), so `mise run upgrade` alone leaves the
-lock and deployed target on the old commit while exiting zero.
+the pin in `apm.yml` to the pushed commit and follow this same sequence.
 
 ## `.apm-pin` residue after uninstall (Fast Path 9)
 
-If the uninstall aborts listing target directories, apm 0.29.0 leaves
-`.apm-pin` behind after removing the skill files. Confirm each listed path
-under `~/.claude/skills/` and `~/.agents/skills/` is a real directory holding
-only `.apm-pin`, remove that file and the directory, then rerun the uninstall.
+Some deployed skill directories hold a copy of the package's `.apm-pin` cache
+marker, which the lock does not record. When one does, `apm uninstall`
+removes the tracked files, cannot remove the directory, and aborts listing it
+(`Uninstall could not remove tracked target files`, reproduced on 0.31.0).
+By then it has already removed the package from `apm_modules/` and the
+tracked files; `apm.yml` and the lock still declare it. Confirm each listed
+path under `~/.claude/skills/` and `~/.agents/skills/` is a real directory
+holding only `.apm-pin`, remove that file and the directory, then rerun the
+uninstall. The rerun's `Package ... not found in apm_modules/` is expected
+and it completes.
 
-The uninstall re-integrates the remaining packages outside `mise run apply`:
-it rewrites `apm.yml` (drops comments, folds the gist URL), unlinks the
-agmsg roster, and deploys undeclared sub-skills and un-aliased gist names.
-Edit `apm.yml` until `git diff` shows only the removed line, follow the
-agmsg State section of `~/.apm/AGENTS.md`, then run `mise run deploy`, which
-removes the undeclared entries.
-
-After the uninstall, check the removed package's deployed commands / agents /
-hooks against the real files on disk (`~/.claude/commands`, `~/.cursor/commands`,
-`~/.config/opencode/commands`): uninstall only cleans the targets of the
-packages that still remain, so files the removed package deployed under a
-still-installed package's directory can survive (microsoft/apm#2656). Move
-any orphaned files aside rather than deleting them.
+The uninstall re-integrates the remaining packages outside `mise run apply`.
+On 0.31.0 it rewrites `apm.yml` (drops the comment that follows the removed
+entry, such as the next section header, and folds the gist URL) and deploys
+the gist under its un-aliased hash name. Unlinking the agmsg roster and
+deploying undeclared sub-skills were observed on 0.29.0 and not re-checked.
+Edit
+`apm.yml` until `git diff` shows only the removed line, follow the agmsg State
+section of `~/.apm/AGENTS.md`, then run `mise run deploy`, which removes the
+undeclared entries.
 
 ## Guardrail details
 
 - `apm audit --ci`: read a finding by its check name and by the absolute path
-  it resolves to, never by its count. `deployed-files-present` calls
-  `exists()` on `<project_root>/<path>`, and apm 0.29.0 takes `project_root`
-  from the current directory: run in `~/.apm` it asks about
-  `~/.apm/.claude/...`, while the user-scope rollout lives under
-  `~/.claude/...`. A finding there can be about the audit's root rather than
-  the deployed runtime, and the runtime is confirmed separately with
-  `mise run doctor` and a source-to-target comparison. Do not turn that into
-  a standing rule that `apm audit --ci` may be ignored.
+  it resolves to, never by its count. Run in `~/.apm`, 0.31.0 maps the
+  workspace to the user deploy root, so `deployed-files-present` checks the
+  real `~/.claude/...` and `~/.agents/...` paths. Every relative lock row is
+  resolved against `$HOME`, so the missing list mixes three kinds: rows left
+  by skills retired from the catalog or by the opted-out
+  `~/.config/opencode/skills` face, stale files inside a live skill, and
+  workspace rows (`.agents/skills/<bridge>`, `.apm/skills/...`) that exist
+  under `~/.apm` but not under `$HOME`. The target label does not tell them
+  apart, so open each path under both `$HOME` and `~/.apm` before treating
+  it as a missing runtime file. Do not turn that into a standing rule that
+  `apm audit --ci` may be ignored.
 - grep wrapper: do not measure what is left on a deployed target with a
   search whose defaults honour `.gitignore` — deployed output is normally
   ignored, and the session's own `grep` may be such a wrapper (`type grep`).

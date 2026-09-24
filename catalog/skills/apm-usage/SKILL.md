@@ -263,8 +263,8 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
 
 5. Upstream refresh:
    - run `mise run upgrade` to move dependencies that track a branch or tag
-   - for a hand-bumped SHA pin, `mise run upgrade` cannot do it: see
-     `references/rollout-fast-paths.md` for the apm 0.29.0 sequence
+   - for a hand-bumped SHA pin, use the narrower SHA-pin bump sequence in
+     `references/rollout-fast-paths.md` instead of `mise run upgrade`
    - if the manifest contains `gist.github.com/...#<sha>`, verify the regenerated `apm.lock.yaml` kept the same `repo_url` spelling before deploy
    - confirm the target dependency's `resolved_commit` and the deployed file's hash
      before calling the refresh done; a zero exit from `deploy` is not evidence the pin moved
@@ -305,5 +305,5 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
 
 9. Global external dependency removed:
    - keep its `apm.yml` line and run `apm uninstall -g <manifest-ref>`; deleting the line by hand leaves the lock record behind, and `mise run apply` stops with `External lock record is not declared in apm.yml`
-   - for the apm 0.29.0 `.apm-pin` residue and uninstall re-integration behavior, see `references/rollout-fast-paths.md`
+   - for the `.apm-pin` residue and uninstall re-integration behavior, see `references/rollout-fast-paths.md`
    - verify the `apm.lock.yaml` diff contains only the removed records and the skill is gone from both targets, and record the removal in `docs/package-decisions.md`
