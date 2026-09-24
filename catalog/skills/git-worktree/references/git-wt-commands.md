@@ -47,7 +47,7 @@ git wt -d feature/user-auth
 git wt -D feature/user-auth
 ```
 
-`-d, --delete` safely deletes worktrees and branches only when the branch is merged. `-D, --force-delete` forces deletion.
+`-d, --delete` removes the worktree and deletes the branch only when it is fully merged; it refuses a dirty worktree (modified or untracked files) and keeps an unmerged branch. Read the command's output to see what was actually removed. `-D, --force-delete` skips these checks and removes the worktree together with its branch.
 
 The default branch, such as `main` or `master`, is protected from accidental deletion. Use `--allow-delete-default` only when that is intentional.
 

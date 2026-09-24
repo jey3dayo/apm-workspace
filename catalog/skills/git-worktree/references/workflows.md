@@ -64,8 +64,6 @@ cd .worktrees/ui-components
 # Switch between features easily
 cd /path/to/repo
 git wt feature/api-endpoints
-# or
-gwts  # Interactive selection (with Zsh integration)
 ```
 
 ### Benefits
@@ -161,7 +159,7 @@ for i in "${!TASKS[@]}"; do
   git wt "agent-${AGENT_ID}-${TASK}"
 
   # Copy necessary files
-  cp .env ".worktrees/${TASK}/.env"
+  scripts/copy-env-files.sh ".worktrees/agent-${AGENT_ID}-${TASK}"
 
   echo "Worktree for Agent ${AGENT_ID} (${TASK}) created"
 done
@@ -282,14 +280,7 @@ git bisect bad HEAD
 git bisect good v1.0.0
 
 # Test each commit
-while [ $? -ne 0 ]; do
-  npm test
-  if [ $? -eq 0 ]; then
-    git bisect good
-  else
-    git bisect bad
-  fi
-done
+git bisect run npm test
 
 # Found bad commit
 git bisect log

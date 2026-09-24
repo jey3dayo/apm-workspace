@@ -159,6 +159,8 @@ git wt -D work-in-progress
 
 ### Warning
 
+`-D` はブランチも強制削除し、未マージのコミットを失う。対象ブランチと worktree パスを確認し、ユーザーの明示承認を得てから実行する。
+
 ### Issue: Configuration Not Recognized
 
 ### Symptom
@@ -198,18 +200,6 @@ git config --global --unset wt.basedir
 git config --local wt.basedir ".worktrees"
 ```
 
-### Fix syntax
-
-```ini
-# Incorrect
-[wt]
-    basedir = .worktrees  # Missing quotes
-
-# Correct
-[wt]
-    basedir = ".worktrees"
-```
-
 ### Validate configuration
 
 ```bash
@@ -226,8 +216,7 @@ scripts/check-worktree-config.sh
 git wt
 # → bash: git-wt: command not found
 
-# Or switch doesn't change directory
-gwts
+# Or git wt <branch> doesn't change directory
 # → (no directory change)
 ```
 
@@ -239,9 +228,8 @@ gwts
 # Check if git-wt is installed
 which git-wt
 
-# Check if shell functions are loaded
-type gwt
-type gwts
+# Check if the git() wrapper is loaded
+type git
 ```
 
 ### Solutions
@@ -261,16 +249,7 @@ echo $PATH | grep -o '[^:]*mise[^:]*'
 
 ### For Zsh functions
 
-```bash
-# Check if functions are loaded
-grep -r "gwt" ~/.zshrc ~/.config/zsh/
-
-# Source configuration manually
-source ~/.config/zsh/config/tools/git.zsh
-
-# Verify functions
-type gwts
-```
+Shell integration が無効なら `eval "$(git-wt --init zsh)"` が shell 設定に入っているか確認する。
 
 ### Reload shell
 
@@ -388,7 +367,7 @@ fatal: '/path/to/repo/.worktrees/feature' already exists
 # Check if directory is a worktree
 git wt | grep feature
 
-# If not a worktree, safe to remove
+# If not a worktree: confirm the exact path and get explicit user approval before removing
 rm -rf .worktrees/feature
 
 # Create worktree
@@ -409,6 +388,8 @@ git wt -b feature/new-feature feature-v2 --basedir .worktrees
 ```
 
 ### Warning
+
+`rm -rf` は破壊的操作。exact path を確認し、ユーザーの明示承認を得てから実行する。
 
 ## Performance Issues
 
@@ -444,17 +425,6 @@ git config --get-all wt.hook
 
 git config --unset-all wt.hook
 git config --add wt.hook "npm install --prefer-offline"
-```
-
-### Use `--nocd`
-
-```bash
-# Skip checkout for faster creation
-git wt feature/test --nocd
-
-# Checkout later
-cd .worktrees/test
-git checkout feature/test
 ```
 
 ### Issue: Excessive Disk Usage
@@ -509,6 +479,8 @@ fatal: not a git repository: '/path/to/repo/.git/worktrees/broken'
 ### Cause
 
 ### Solution
+
+Manual cleanup is destructive and can discard uncommitted work in .worktrees/broken. Confirm the exact paths and get explicit user approval before running it.
 
 ```bash
 # Repair worktree
@@ -654,26 +626,6 @@ echo "Listing remaining worktrees..."
 git wt
 
 echo "Cleanup completed"
-```
-
-### Use Version Control for Configuration
-
-```bash
-# Commit git configuration
-git add .git/config
-# Note: .git/config is not normally tracked, use separate config file
-
-# Or document in README
-cat > docs/worktree-setup.md <<EOF
-# Worktree Setup
-
-## Configuration
-
-\`\`\`bash
-git config wt.basedir ".worktrees"
-git config worktree.guessRemote true
-\`\`\`
-EOF
 ```
 
 ### Team Guidelines
