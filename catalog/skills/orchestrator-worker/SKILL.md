@@ -26,7 +26,7 @@ description: >-
 | Reviewer  | SHA 固定 code review / 設計文書 review                                                                                                 | Fable（明示指定時、fallback Opus）                    | `gpt-6-sol` 既定。読む量が多いレビューはコストを下げて `gpt-5.6-terra` + effort high。`gpt-6-astra` は明示指定時のみ | 不可（opencode は Reviewer に就けない）       | `claude-fable-5-1-thinking-xhigh`（cursor 経路の既定） / `claude-opus-5-5-high` / `gpt-5.6-sol-xhigh` | Orchestrator 機能を担う側（Steward または Architect）。spawn 経路と pane 経路の両方可 |
 | Worker    | 実装（設計済みタスク）                                                                                                                 | `sonnet`（Agent `implementer`、Worker の昇格 `opus`） | `gpt-6-luna` xhigh（難度の昇格は `gpt-6-sol`、長文脈の崖は `gpt-5.6-terra`）                                         | `deepseek/deepseek-v4-flash` `--variant high` | `claude-sonnet-5-thinking-high`（昇格 `claude-opus-5-5-high`）                                        | Orchestrator 機能を担う側                                                             |
 
-「Orchestrator」は役ではなく機能。表の Steward / Architect のうち、後述の許可条件を満たす側が担う。Terra は Architect・Reviewer・Worker の昇格に就く。gpt-6 世代に terra の後継は無く、`gpt-5.6-terra` はより安価な長文脈選択肢としてそのまま残る。opencode は Worker 専用で、implement 以外の役には就けない（review も含む）。cursor は Worker と Reviewer の両方に就けるが、Steward / Architect には就けない（Orchestrator 機能を担えない）。
+「Orchestrator」は役ではなく機能。表の Steward / Architect のうち、後述の許可条件を満たす側が担う。Terra は Architect・Reviewer・Worker の昇格に就く。`gpt-5.6-terra` が terra の現行版で、Sol より安価な長文脈選択肢である。opencode は Worker 専用で、implement 以外の役には就けない（review も含む）。cursor は Worker と Reviewer の両方に就けるが、Steward / Architect には就けない（Orchestrator 機能を担えない）。
 
 Reviewer 既定の範囲: cursor reviewer が既定になるのはユーザーが cursor 経路を明示したときだけである。review 外注の全体既定は下記「Reviewer の tier」のとおり Codex sol のままで、cursor 追加はこれを変えない。
 
@@ -134,7 +134,7 @@ handoff の実体は `agmsg-delegation` の引き継ぎ（handoff）メッセー
 
 review 外注の既定経路は Codex: 起動時引数で `gpt-6-sol` / `gpt-5.6-terra` / `gpt-6-astra` から選ぶ。既定は sol。
 
-terra は sol より下で、価格でも能力でも安く弱い。gpt-6 に terra の後継は無く、5.6 世代のまま残る。そのため terra を選ぶのは難度を上げたいときではなく、読む量が多くコストを抑えたいときで、`AGMSG_REVIEWER_EFFORT=high` を併せて指定して質を補う。判断の難度が理由なら terra へ移さず、sol のまま `AGMSG_REVIEWER_EFFORT` を上げる。Claude reviewer（fable 固定）は明示指定された場合のみ使い、fallback は opus。Fable reviewer は Orchestrator 側の Fable rate limit と枠を共有するため、実行中 429 で run ごと失敗しうる。失敗した場合は同経路で再試行せず、Codex sol へ切り替えて再外注する。`gpt-6-astra` は sol より上の帯で、価格も能力も上。明示指定されたときだけ使い、既定に据えない。
+terra は sol より下で、価格でも能力でも安く弱い。そのため terra を選ぶのは難度を上げたいときではなく、読む量が多くコストを抑えたいときで、`AGMSG_REVIEWER_EFFORT=high` を併せて指定して質を補う。判断の難度が理由なら terra へ移さず、sol のまま `AGMSG_REVIEWER_EFFORT` を上げる。Claude reviewer（fable 固定）は明示指定された場合のみ使い、fallback は opus。Fable reviewer は Orchestrator 側の Fable rate limit と枠を共有するため、実行中 429 で run ごと失敗しうる。失敗した場合は同経路で再試行せず、Codex sol へ切り替えて再外注する。`gpt-6-astra` は sol より上の帯で、価格も能力も上。明示指定されたときだけ使い、既定に据えない。
 
 ### self-review 禁止（approval gate）
 

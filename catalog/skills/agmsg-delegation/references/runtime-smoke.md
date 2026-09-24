@@ -25,7 +25,7 @@ MCP / tool 面の不在は上記1〜5とは別の capability check として確�
 - `No MCP servers configured`（cwd が `~/.cursor/projects/<slug>/` を持たない場合）
 - `Failed to list MCP servers: EPERM ... <read deny した根の下のパス>`（cwd が cursor project entry を持つ場合。実測では `~/.cursor/projects/<slug>/mcp-approvals.json`）
 
-**出力が cwd で変わるため、前者だけを合格条件にしない。** 通常の作業リポジトリは cursor project entry を持つので、前者だけを条件にすると helper が常に起動を拒否する（2026-09-18 に実測）。EPERM を受理するときは、拒否されたパスが自分で read deny した根の下にあることまで確かめる。素の状態（sandbox なし）では 7 件が `: ready` として並ぶので、遮断が効いていないことは別の形で明確に分かる。
+**出力が cwd で変わるため、前者だけを合格条件にしない。** 通常の作業リポジトリは cursor project entry を持つので、前者だけを条件にすると helper が常に起動を拒否する。EPERM を受理するときは、拒否されたパスが自分で read deny した根の下にあることまで確かめる。素の状態（sandbox なし）では 7 件が `: ready` として並ぶので、遮断が効いていないことは別の形で明確に分かる。
 
 ## scratch と probe 先の置き場所
 
