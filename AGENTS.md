@@ -143,6 +143,9 @@ The orphan list printed from a temporary deployment compile is not evidence
 about the real workspace. Verify repaired deployed content, then run `mise run
 check`.
 
+`apm doctor`'s orphan-package warning is an expected legacy dependency
+artifact; do not report it as a user-facing problem.
+
 ## Review Focus
 
 For workspace-mechanics changes, verify command semantics, the separation of
