@@ -2031,6 +2031,10 @@ dependencies:
     Set-Content -LiteralPath (Join-Path $learningIntakeDir "20260101-0000-one.md") -Value "status: 未処理`n# report one" -Encoding utf8
     Set-Content -LiteralPath (Join-Path $learningIntakeDir "20260101-0001-two.md") -Value "# report two, no status line" -Encoding utf8
     Set-Content -LiteralPath (Join-Path $learningIntakeDir "20260101-0002-three.md") -Value "status: 保留`n不足: owner" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $learningIntakeDir "20260101-0003-four.md") -Value "- status: 保留" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $learningIntakeDir "20260101-0004-five.md") -Value "status: 保留（注記）" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $learningIntakeDir "20260101-0005-six.md") -Value "status: 未処理`nstatus: 保留" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $learningIntakeDir "UPPER.MD") -Value "status: 未処理" -Encoding utf8
     Set-Content -LiteralPath (Join-Path $learningIntakeDir "note.txt") -Value "not a report" -Encoding utf8
     Set-Content -LiteralPath (Join-Path $learningIntakeSubDir "nested.md") -Value "status: 未処理`n# nested report" -Encoding utf8
 
@@ -2056,7 +2060,7 @@ dependencies:
 
     try {
       $output = Invoke-Doctor 6>&1 | Out-String
-      $output | Should -Match "learning-intake inbox: 未処理 2 / 保留 1"
+      $output | Should -Match "learning-intake inbox: 未処理 4 / 保留 2"
     }
     finally {
       Remove-Item Function:\apm -ErrorAction SilentlyContinue

@@ -3103,11 +3103,15 @@ function Invoke-ValidateCatalog {
 function Get-LearningIntakeInboxSummary {
   param([string]$InboxDir)
 
+  $pendingLabel = [regex]::Unescape('\u672A\u51E6\u7406')
+  $deferredLabel = [regex]::Unescape('\u4FDD\u7559')
+  $deferredPattern = '^status: \u4FDD\u7559\s*$'
+
   $pendingCount = 0
   $deferredCount = 0
-  $reportFiles = @(Get-ChildItem -LiteralPath $InboxDir -File -Filter *.md -ErrorAction SilentlyContinue)
+  $reportFiles = @(Get-ChildItem -LiteralPath $InboxDir -File -ErrorAction SilentlyContinue | Where-Object { $_.Extension -ceq '.md' })
   foreach ($reportFile in $reportFiles) {
-    $isDeferred = @(Select-String -LiteralPath $reportFile.FullName -Pattern '^status: 保留\s*$' -Encoding utf8 -ErrorAction SilentlyContinue).Count -gt 0
+    $isDeferred = @(Select-String -LiteralPath $reportFile.FullName -Pattern $deferredPattern -CaseSensitive -Encoding utf8 -ErrorAction SilentlyContinue).Count -gt 0
     if ($isDeferred) {
       $deferredCount++
     }
@@ -3115,7 +3119,7 @@ function Get-LearningIntakeInboxSummary {
       $pendingCount++
     }
   }
-  return "未処理 {0} / 保留 {1}" -f $pendingCount, $deferredCount
+  return "{0} {1} / {2} {3}" -f $pendingLabel, $pendingCount, $deferredLabel, $deferredCount
 }
 
 function Invoke-Doctor {

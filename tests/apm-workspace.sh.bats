@@ -1148,13 +1148,16 @@ doctor_fixture_env() {
   printf 'status: 未処理\n# report one\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0000-one.md"
   printf '# report two, no status line\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0001-two.md"
   printf 'status: 保留\n不足: owner\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0002-three.md"
+  printf -- '- status: 保留\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0003-four.md"
+  printf 'status: 保留（注記）\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0004-five.md"
+  printf 'status: 未処理\nstatus: 保留\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0005-six.md"
   printf 'not a report\n' >"$doctor_workspace_dir/tmp/learning-intake/note.txt"
   printf 'status: 未処理\n# nested report\n' >"$doctor_workspace_dir/tmp/learning-intake/sub/nested.md"
 
   run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
 
   [ "$status" -eq 0 ]
-  [[ "$output" == *"learning-intake inbox: 未処理 2 / 保留 1"* ]]
+  [[ "$output" == *"learning-intake inbox: 未処理 4 / 保留 2"* ]]
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
 }
 
