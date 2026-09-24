@@ -3100,6 +3100,24 @@ function Invoke-ValidateCatalog {
   Write-SuccessLine ("Catalog validation passed ({0} skills, {1} agents, {2} commands, {3} rules)" -f $sourceSkillIds.Count, $sourceAgentPaths.Count, $sourceCommandPaths.Count, $sourceRulePaths.Count)
 }
 
+function Get-LearningIntakeInboxSummary {
+  param([string]$InboxDir)
+
+  $pendingCount = 0
+  $deferredCount = 0
+  $reportFiles = @(Get-ChildItem -LiteralPath $InboxDir -File -Filter *.md -ErrorAction SilentlyContinue)
+  foreach ($reportFile in $reportFiles) {
+    $isDeferred = @(Select-String -LiteralPath $reportFile.FullName -Pattern '^status: 保留\s*$' -Encoding utf8 -ErrorAction SilentlyContinue).Count -gt 0
+    if ($isDeferred) {
+      $deferredCount++
+    }
+    else {
+      $pendingCount++
+    }
+  }
+  return "未処理 {0} / 保留 {1}" -f $pendingCount, $deferredCount
+}
+
 function Invoke-Doctor {
   Require-Apm
   Ensure-WorkspaceRepo
@@ -3116,8 +3134,7 @@ function Invoke-Doctor {
   }
   Write-Host ("branch: {0}" -f ($branch | Out-String).Trim())
   $learningIntakeDir = Join-Path $WorkspaceDir "tmp/learning-intake"
-  $learningIntakeCount = @(Get-ChildItem -LiteralPath $learningIntakeDir -File -Filter *.md -ErrorAction SilentlyContinue).Count
-  Write-Host ("learning-intake inbox: {0}" -f $learningIntakeCount)
+  Write-Host ("learning-intake inbox: {0}" -f (Get-LearningIntakeInboxSummary -InboxDir $learningIntakeDir))
   Write-Host "remote:"
   & git -C $WorkspaceDir remote -v
   Write-Host "targets:"

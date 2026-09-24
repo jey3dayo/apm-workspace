@@ -2327,6 +2327,23 @@ cmd_validate_catalog() {
   log "Catalog validation passed ($source_skill_count skills, $source_agent_count agents, $source_command_count commands, $source_rule_count rules)"
 }
 
+learning_intake_inbox_summary() {
+  inbox_dir="$1"
+  pending_count=0
+  deferred_count=0
+  if [ -d "$inbox_dir" ]; then
+    for report_file in "$inbox_dir"/*.md; do
+      [ -f "$report_file" ] || continue
+      if grep -q '^status: 保留[[:space:]]*$' "$report_file" 2>/dev/null; then
+        deferred_count=$((deferred_count + 1))
+      else
+        pending_count=$((pending_count + 1))
+      fi
+    done
+  fi
+  printf '未処理 %s / 保留 %s' "$pending_count" "$deferred_count"
+}
+
 cmd_doctor() {
   require_apm
   ensure_workspace_repo
@@ -2337,7 +2354,7 @@ cmd_doctor() {
     printf 'workspace: %s\n' "$WORKSPACE_DIR"
     printf 'manifest: %s\n' "$(test -f apm.yml && printf present || printf missing)"
     printf 'branch: %s\n' "$(git branch --show-current 2>/dev/null || printf detached)"
-    printf 'learning-intake inbox: %s\n' "$(find tmp/learning-intake -maxdepth 1 -name '*.md' -type f 2>/dev/null | wc -l | tr -d ' ')"
+    printf 'learning-intake inbox: %s\n' "$(learning_intake_inbox_summary tmp/learning-intake)"
     printf 'remote:\n'
     git remote -v || true
     printf 'targets:\n'

@@ -2011,7 +2011,7 @@ dependencies:
     }
   }
 
-  It "reports the learning-intake drop box file count from Invoke-Doctor" {
+  It "reports the learning-intake inbox split into 未処理 and 保留 from Invoke-Doctor" {
     $targetRoot = Join-Path $TestDrive "doctor-inbox/.codex"
     $skillsRoot = Join-Path $TestDrive "doctor-inbox/.agents"
     $codexSkillsRoot = Join-Path $skillsRoot "skills"
@@ -2026,9 +2026,13 @@ dependencies:
     Set-Content -LiteralPath $instructionsPath -Value "# instructions"
 
     $learningIntakeDir = Join-Path $script:WorkspaceDir "tmp/learning-intake"
-    New-Item -ItemType Directory -Path $learningIntakeDir -Force | Out-Null
-    Set-Content -LiteralPath (Join-Path $learningIntakeDir "20260101-0000-one.md") -Value "# report one"
-    Set-Content -LiteralPath (Join-Path $learningIntakeDir "20260101-0001-two.md") -Value "# report two"
+    $learningIntakeSubDir = Join-Path $learningIntakeDir "sub"
+    New-Item -ItemType Directory -Path $learningIntakeSubDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $learningIntakeDir "20260101-0000-one.md") -Value "status: 未処理`n# report one" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $learningIntakeDir "20260101-0001-two.md") -Value "# report two, no status line" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $learningIntakeDir "20260101-0002-three.md") -Value "status: 保留`n不足: owner" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $learningIntakeDir "note.txt") -Value "not a report" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $learningIntakeSubDir "nested.md") -Value "status: 未処理`n# nested report" -Encoding utf8
 
     Mock Require-Apm {}
     Mock Ensure-WorkspaceRepo {}
@@ -2052,7 +2056,7 @@ dependencies:
 
     try {
       $output = Invoke-Doctor 6>&1 | Out-String
-      $output | Should -Match "learning-intake inbox: 2"
+      $output | Should -Match "learning-intake inbox: 未処理 2 / 保留 1"
     }
     finally {
       Remove-Item Function:\apm -ErrorAction SilentlyContinue

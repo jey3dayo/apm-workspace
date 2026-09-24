@@ -1142,18 +1142,19 @@ doctor_fixture_env() {
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
 }
 
-@test "doctor reports the learning-intake drop box file count" {
+@test "doctor reports the learning-intake inbox split into 未処理 and 保留" {
   make_doctor_fixture
   mkdir -p "$doctor_workspace_dir/tmp/learning-intake/sub"
-  printf '# report one\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0000-one.md"
-  printf '# report two\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0001-two.md"
+  printf 'status: 未処理\n# report one\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0000-one.md"
+  printf '# report two, no status line\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0001-two.md"
+  printf 'status: 保留\n不足: owner\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0002-three.md"
   printf 'not a report\n' >"$doctor_workspace_dir/tmp/learning-intake/note.txt"
-  printf '# nested report\n' >"$doctor_workspace_dir/tmp/learning-intake/sub/nested.md"
+  printf 'status: 未処理\n# nested report\n' >"$doctor_workspace_dir/tmp/learning-intake/sub/nested.md"
 
   run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
 
   [ "$status" -eq 0 ]
-  [[ "$output" == *"learning-intake inbox: 2"* ]]
+  [[ "$output" == *"learning-intake inbox: 未処理 2 / 保留 1"* ]]
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
 }
 
