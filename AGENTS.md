@@ -126,7 +126,7 @@ not `cmd_apply`, so the save/restore around apply never runs and the links are
 gone when it finishes (observed 2026-09-10; the store under
 `${XDG_STATE_HOME:-~/.local/state}/agmsg/` survived). Diagnose with
 `mise run doctor` before restoring — the plain-path rule in
-`catalog/AGENTS.md` still applies.
+`catalog/skills/agmsg-delegation/references/roster-recovery.md` still applies.
 Remove this workaround only after upstream `AGMSG_HOME` supports both
 locations.
 
