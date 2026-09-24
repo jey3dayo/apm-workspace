@@ -2210,9 +2210,30 @@ function Invoke-Update {
     throw "apm 0.8.11 cannot update ./packages/* dependencies at user scope yet. Refresh stopped before deps update; remove local package refs from ~/.apm/apm.yml first."
   }
 
-  & apm deps update -g
-  if ($LASTEXITCODE -ne 0) {
-    throw "apm deps update -g failed."
+  # Same roster-preservation contract as Invoke-Apply/Invoke-SyncLocalSkills:
+  # `apm deps update -g` redeploys the same target tree apply does, so save
+  # before it runs and restore in `finally` so it fires on both normal
+  # completion and a thrown error. See Invoke-Apply for why $updateSucceeded
+  # exists: it lets `finally` choose Invoke-AgmsgStateRestoreOrThrow (normal
+  # completion, must not swallow a restore failure) over
+  # Invoke-AgmsgStateRestore (failure-recovery, must not replace the
+  # exception already in flight).
+  Invoke-AgmsgStateSave
+  $updateSucceeded = $false
+  try {
+    & apm deps update -g
+    if ($LASTEXITCODE -ne 0) {
+      throw "apm deps update -g failed."
+    }
+    $updateSucceeded = $true
+  }
+  finally {
+    if ($updateSucceeded) {
+      Invoke-AgmsgStateRestoreOrThrow
+    }
+    else {
+      Invoke-AgmsgStateRestore
+    }
   }
 }
 
