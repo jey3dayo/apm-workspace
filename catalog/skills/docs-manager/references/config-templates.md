@@ -2,7 +2,7 @@
 
 This document provides configuration templates for documentation management.
 
-## .docs-config.json
+## .docs-manager-config.json
 
 Project-specific documentation configuration file placed in project root.
 
@@ -277,13 +277,14 @@ Standard emoji icons for document types:
 
 ## Usage
 
-### 1. Create .docs-config.json
+### 1. Create .docs-manager-config.json
 
 Place in project root directory:
 
 ```bash
 # For dotfiles project
-cp references/config-templates.md .docs-config.json
+# pick the closest file in examples/
+cp examples/dotfiles-config.json .docs-manager-config.json
 # Edit to match project needs
 ```
 
@@ -291,9 +292,7 @@ cp references/config-templates.md .docs-config.json
 
 For link validation:
 
-```bash
-cp references/config-templates.md .markdown-link-check.json
-```
+Write the Basic Template block above to `.markdown-link-check.json`.
 
 ### 3. Use Metadata Template
 
@@ -317,7 +316,7 @@ Run validation to ensure configuration is correct:
 
 ### Configuration File Location
 
-- `.docs-config.json` → Project root
+- `.docs-manager-config.json` → Project root
 - `.markdown-link-check.json` → Project root
 - Documentation → `docs/` or `./docs/` directory
 

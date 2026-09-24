@@ -45,7 +45,6 @@ Document size limits are configurable via `.docs-manager-config.json`:
 ### 🚫 Too Large
 
 - Must split
-- Approaching AI context limits
 - Poor user experience
 - Maintenance burden
 
@@ -389,7 +388,6 @@ After splitting:
 - [ ] Check size of new documents
 - [ ] Ensure consistent formatting
 - [ ] Update project documentation index
-- [ ] Notify team of structure changes
 
 ## Size Monitoring
 
@@ -413,26 +411,6 @@ Configure docs-manager to report:
 - Growth rate over time
 - Candidates for splitting
 - Size distribution across documentation
-
-### Size Trends
-
-Track document growth:
-
-```json
-{
-  "size_limits": {
-    "ideal": 300,
-    "acceptable": 500,
-    "warning": 1000,
-    "maximum": 2000
-  },
-  "size_tracking": {
-    "enabled": true,
-    "alert_threshold": 0.8,
-    "growth_rate_warning": "20%"
-  }
-}
-```
 
 ## Best Practices
 
@@ -494,7 +472,6 @@ Track document growth:
 
 - Create clear index documents
 - Add breadcrumbs
-- Provide search functionality
 - Include cross-references
 
 ### Broken Links
@@ -510,42 +487,9 @@ Track document growth:
 
 ## Tools and Automation
 
-### Size Checking
-
-```bash
-# docs-manager size report
-# (example command - actual implementation varies)
-docs-manager check-sizes --threshold 1000 --report
-```
-
-### Splitting Assistance
-
-```bash
-# Suggest split points
-docs-manager suggest-splits large-doc.md
-
-# Generate index from directory
-docs-manager generate-index docs/
-```
-
 ### Link Validation
 
 ```bash
 # Validate all links after split
 markdown-link-check docs/**/*.md
-```
-
-### Configuration
-
-```json
-{
-  "size_limits": {
-    "ideal": 300,
-    "acceptable": 500,
-    "warning": 1000,
-    "maximum": 2000
-  },
-  "auto_split_suggestions": true,
-  "split_strategy": "topic-based"
-}
 ```

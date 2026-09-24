@@ -106,7 +106,7 @@ Examples:
 ### Update Policy
 
 - Update on every significant content change
-- Flag documents not updated in 6+ months
+- Judge staleness only for files listed in `custom_rules.update_frequency`
 - Maintain update history section for major changes
 
 ### Configurable Update Frequency
@@ -335,7 +335,7 @@ Standard emoji icons for document types:
 
 - Must be in ISO 8601 format (YYYY-MM-DD)
 - Should not be in the future
-- Warn if > 6 months old (configurable threshold)
+- Judge staleness only against `custom_rules.update_frequency` when configured
 
 ### Tag Validation
 
@@ -343,19 +343,6 @@ Standard emoji icons for document types:
 - Tag values must match vocabulary (if configured)
 - Tag separator must match configuration
 - Each tag must use `prefix/value` format
-
-### Completeness Score
-
-Calculate metadata completeness:
-
-- Date field present: 25%
-- Date format valid: 10%
-- Date recent (< 6 months): 10%
-- Audience field present: 20%
-- All required tags present: 25%
-- Tags match vocabulary: 10%
-
-Total: 100% = Complete metadata
 
 ## Best Practices
 
