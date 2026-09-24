@@ -4563,7 +4563,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: 6e8399985558414c129a57a6ad442e437eeca5d9
+  resolved_commit: 341b58632a07e3bf564984885c736677454b4e11
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -5117,7 +5117,7 @@ dependencies:
     .agents/skills/1password/SKILL.md: sha256:d6de6da9217ef7f9326276d5ce53cfb473a3e2edb2fcf1e6128e5d0153d83283
     .agents/skills/1password/agents/openai.yaml: sha256:56222c8ee4e46134079a90d2fbb86a4cfb5944fdb6c854a696be15d251c00681
     .agents/skills/1password/references/hermes-codex-token-rotation.md: sha256:ca2eae8ea676c60f801f0764a40c70ee39bb9d2d465aff0020a652dbf91568f3
-    .agents/skills/agmsg-delegation/SKILL.md: sha256:2ec5e094578bcee33cfa5ab2ac1c0d5e0b1e307fea232c23df63e6266486eef6
+    .agents/skills/agmsg-delegation/SKILL.md: sha256:b16be1f3b14b50089237423d3d20eae880a468d631c8d1ec7e94fd1e42d70639
     .agents/skills/agmsg-delegation/WORKER.md: sha256:eecc3df94f4d3a9c1c490e547e5e1d0a0a4f2954e546e32181a07330e61caca0
     .agents/skills/agmsg-delegation/agmsg-review.config.toml: sha256:42fd32b3607ceba3bb2dccbb108cd4f03282e69df3bdcf2e6cabeadb08d6eb3e
     .agents/skills/agmsg-delegation/references/codex-sandbox.md: sha256:bd879557ebb2d4ea6bdbfd66a02e4c821b83756785be8a13f6df6bfb83c40f17
@@ -5256,7 +5256,7 @@ dependencies:
     .agents/skills/mise/references/windows-shells.md: sha256:60a6586570f86b56d4f3acf9545443e6da4dd14daaea9772a443b762fd9db9c5
     .agents/skills/mise/resources/examples/npm-package-migration.md: sha256:a94d2da7aad911df7faa5738ad16b36d4a105cff613d264856c22f15e46150e7
     .agents/skills/mise/resources/templates/mise-config-template.toml: sha256:7c0f5e891d7f3ae501287dcc849ad16251cb24beb2e699e435ad398bba954af0
-    .agents/skills/orchestrator-worker/SKILL.md: sha256:4926d50c8aa8444d0c5b029f0506ddfd4693ef58074b1efcc89b91f4d00840df
+    .agents/skills/orchestrator-worker/SKILL.md: sha256:669104320a7c350bc22b57862ef685e09832b7cc109f7b2d19766cffb3173435
     .agents/skills/polish/SKILL.md: sha256:baad62c3ce2fa014f7e95cd9cd1d19868b679004750ae6e632837add390fb2d7
     .agents/skills/polish/agents/openai.yaml: sha256:dc60fec55c211b80c2d188ab2caa345f9ab831a522761e46044f59d4951b12b9
     .agents/skills/prepare-goal/SKILL.md: sha256:792827300e8fa75400f2bc50d7d27c5a5a3f3b0a6c0859861d6c3566a1e88a35
@@ -5305,7 +5305,7 @@ dependencies:
     .agents/skills/work-log-maintenance/references/report-layout.md: sha256:d835849e0802baf1a32f0f26ab9fe78985cde3c122844782c1cb4cf1a3c4dad7
     .claude/skills/1password/SKILL.md: sha256:d6de6da9217ef7f9326276d5ce53cfb473a3e2edb2fcf1e6128e5d0153d83283
     .claude/skills/1password/agents/openai.yaml: sha256:56222c8ee4e46134079a90d2fbb86a4cfb5944fdb6c854a696be15d251c00681
-    .claude/skills/agmsg-delegation/SKILL.md: sha256:2ec5e094578bcee33cfa5ab2ac1c0d5e0b1e307fea232c23df63e6266486eef6
+    .claude/skills/agmsg-delegation/SKILL.md: sha256:b16be1f3b14b50089237423d3d20eae880a468d631c8d1ec7e94fd1e42d70639
     .claude/skills/agmsg-delegation/WORKER.md: sha256:eecc3df94f4d3a9c1c490e547e5e1d0a0a4f2954e546e32181a07330e61caca0
     .claude/skills/agmsg-delegation/agmsg-review.config.toml: sha256:42fd32b3607ceba3bb2dccbb108cd4f03282e69df3bdcf2e6cabeadb08d6eb3e
     .claude/skills/agmsg-delegation/references/codex-sandbox.md: sha256:bd879557ebb2d4ea6bdbfd66a02e4c821b83756785be8a13f6df6bfb83c40f17
@@ -5384,7 +5384,7 @@ dependencies:
     .claude/skills/mise/references/windows-shells.md: sha256:60a6586570f86b56d4f3acf9545443e6da4dd14daaea9772a443b762fd9db9c5
     .claude/skills/mise/resources/examples/npm-package-migration.md: sha256:a94d2da7aad911df7faa5738ad16b36d4a105cff613d264856c22f15e46150e7
     .claude/skills/mise/resources/templates/mise-config-template.toml: sha256:7c0f5e891d7f3ae501287dcc849ad16251cb24beb2e699e435ad398bba954af0
-    .claude/skills/orchestrator-worker/SKILL.md: sha256:4926d50c8aa8444d0c5b029f0506ddfd4693ef58074b1efcc89b91f4d00840df
+    .claude/skills/orchestrator-worker/SKILL.md: sha256:669104320a7c350bc22b57862ef685e09832b7cc109f7b2d19766cffb3173435
     .claude/skills/polish/SKILL.md: sha256:baad62c3ce2fa014f7e95cd9cd1d19868b679004750ae6e632837add390fb2d7
     .claude/skills/polish/agents/openai.yaml: sha256:dc60fec55c211b80c2d188ab2caa345f9ab831a522761e46044f59d4951b12b9
     .claude/skills/prepare-goal/SKILL.md: sha256:792827300e8fa75400f2bc50d7d27c5a5a3f3b0a6c0859861d6c3566a1e88a35
@@ -5539,7 +5539,7 @@ dependencies:
     .config/opencode/skills/tuxedo/references/tui-and-capture.md: sha256:13278531ebad1f152047aaebc247eacbfd69f75ba1887e3a611627c94a31f684
     .config/opencode/skills/web-research/SKILL.md: sha256:07109256e91fdd784259fc941efda1b914465da458587c85831a087f70f2b941
     .config/opencode/skills/web-research/agents/openai.yaml: sha256:50536a04fbc72b0f71fc9975a7e041893912ebfcaf9c671439843d20172e1264
-  content_hash: sha256:d0c9970cde9ebc87c9c3fcdfc4b1fd36d41dc5b0c64e3e8dcf0226c4d07d6ef9
+  content_hash: sha256:8415353376ea79ab869f08ab5ade06e37602b4bd3c57bccaae6e7684e09152fe
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
@@ -8952,7 +8952,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:2ec5e094578bcee33cfa5ab2ac1c0d5e0b1e307fea232c23df63e6266486eef6
+  content_hash: sha256:b16be1f3b14b50089237423d3d20eae880a468d631c8d1ec7e94fd1e42d70639
 - kind: project-relative
   target: agents
   value: .agents/skills/agmsg-delegation/WORKER.md
@@ -20301,7 +20301,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:4926d50c8aa8444d0c5b029f0506ddfd4693ef58074b1efcc89b91f4d00840df
+  content_hash: sha256:669104320a7c350bc22b57862ef685e09832b7cc109f7b2d19766cffb3173435
 - kind: project-relative
   target: agents
   value: .agents/skills/perman-aws-vault
@@ -23064,7 +23064,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:2ec5e094578bcee33cfa5ab2ac1c0d5e0b1e307fea232c23df63e6266486eef6
+  content_hash: sha256:b16be1f3b14b50089237423d3d20eae880a468d631c8d1ec7e94fd1e42d70639
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg-delegation/WORKER.md
@@ -33729,7 +33729,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:4926d50c8aa8444d0c5b029f0506ddfd4693ef58074b1efcc89b91f4d00840df
+  content_hash: sha256:669104320a7c350bc22b57862ef685e09832b7cc109f7b2d19766cffb3173435
 - kind: project-relative
   target: claude
   value: .claude/skills/perman-aws-vault
