@@ -148,32 +148,9 @@ integration, and quality gates even when a worker prepares a bounded slice.
 
 ### 3-1: Fix react-doctor Errors
 
-Fix react-doctor errors first (highest severity).
-
-```
-Error Type → Fix Approach:
-- Architecture: components inside components → Move components to top level
-- State & Effects: useState from props → Change to proper state management
-- Security: hardcoded secrets → Migrate to environment variables
-- Bundle Size: barrel imports → Change to direct imports
-- Next.js: missing metadata → Add metadata export
-```
+Fix react-doctor errors first (highest severity), following each finding's own guidance.
 
 ### 3-2: Consolidate Duplicate Code at 95%+
-
-```typescript
-// Pattern 1: Simple function extraction
-// Before: 98% similar functions in 2 files
-// After: Extract to common utils and import from both files
-
-// Pattern 2: Generalization
-// Before: getUserById / getAdminById (94% similar)
-// After: Consolidate into findByIdOrThrow<T>(model, id, resourceName)
-
-// Pattern 3: Extract common interface
-// Before: Multiple similar type definitions
-// After: Base type + extends to centralize common parts
-```
 
 Before consolidation, check impact scope with `rg` to list every reference
 and identify callers.
