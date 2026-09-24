@@ -62,10 +62,7 @@ catalog 変更後の検証は判断を含まない機械作業なので、Orches
    cd ~/.apm && mise run doctor
    ```
 
-   他の face（`~/.claude/skills/agmsg` など）に `db` / `teams` が無いのは仕様であり、張ってはいけない。doctor の agmsg 判定に応じて対応する:
-   - db/teams とも symlink で正しい target を指していれば通過
-   - doctor の復旧推奨に `mise run agmsg:state:restore` が**含まれない**（plain path を含む集約結果）場合は実行しない。db または teams のどちらかが symlink ではなく plain なディレクトリ/ファイルで、断線中に書かれた roster 更新を保持している可能性があり、restore は state root 側で上書きし discard しうる（同名ファイルは store 優先でマージされ、plain 側は削除される）。先に中身を `${XDG_STATE_HOME:-$HOME/.local/state}/agmsg/<name>` と手動で突き合わせ、必要な差分を反映してから relink する
-   - doctor の復旧推奨に `mise run agmsg:state:restore` が含まれる（missing / dangling / wrong-target のみで plain path が無い）場合は、失うものが無いのでそのまま `~/.apm` で実行してよい。手で `ln -s` を張らない
+   他の face（`~/.claude/skills/agmsg` など）に `db` / `teams` が無いのは仕様であり、張ってはいけない。db/teams とも symlink で正しい target を指していれば通過。診断・復旧の判断基準は `catalog/skills/agmsg-delegation/references/roster-recovery.md` が正本——**plain path があれば restore しない**（断線中に書かれた roster を上書きで失いうる）。手で `ln -s` を張らない
 
 5. `agmsg-delegation` の runtime asset（scripts/・WORKER.md・agmsg-review.config.toml）を変更した場合のみ smoke を実行する。項目と合否基準は `agmsg-delegation` Preflight の「初回利用前の smoke 5点」が正本
 6. smoke の合否判定は worker モデルの自己申告でなく、ファイルシステムの実体で行う（touch したファイルの存在確認、拒否されるべき書込先にファイルが無いこと）。worker は書込失敗時でも成功を報告した実績がある
