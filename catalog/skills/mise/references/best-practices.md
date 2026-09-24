@@ -46,7 +46,7 @@ rust = "stable"
 
 ### run – WHAT THIS TASK DOES
 
-### Characteristics
+#### Characteristics
 
 - Mandatory key for every task
 - Can be a single string, an array of strings, or an array mixing scripts and task objects
@@ -55,9 +55,7 @@ rust = "stable"
 - They are **not deduplicated** across the whole DAG
 - Won't run in parallel with siblings
 
-### Use Case
-
-### Example
+#### Example
 
 ```toml
 [tasks.release]
@@ -70,7 +68,7 @@ run = [
 
 ### depends – WHAT MUST FINISH _BEFORE_ THIS TASK CAN START
 
-### Characteristics
+#### Characteristics
 
 - Pure declarative prerequisites
 - Accepts a list of task names (optionally with args)
@@ -80,9 +78,7 @@ run = [
 - Great for fan-out/fan-in graphs such as "test depends on lint & build"
 - Cannot encode post-steps; use `depends_post` for that
 
-### Use Case
-
-### Example
+#### Example
 
 ```toml
 [tasks.test]
@@ -90,7 +86,7 @@ depends = ["lint", "build"]  # These run in parallel
 run = "cargo test"
 ```
 
-### Key Takeaway
+#### Key Takeaway
 
 - Use `depends` for _ordering/parallelism_
 - Use `run` for _the actual commands_ that constitute the task
@@ -261,7 +257,7 @@ steps:
 
 ### ✗ Calling mise Inside run Strings
 
-### Problem
+#### Problem
 
 ```toml
 [tasks.bad]
@@ -270,7 +266,7 @@ run = "mise build && mise test"  # ❌ Nested mise process
 
 This launches a nested mise process without DAG awareness.
 
-### Solution
+#### Solution
 
 ```toml
 [tasks.good]
@@ -308,7 +304,7 @@ alias = ["t"]  # ❌ Conflict
 
 ### Additional Dependencies
 
-### depends_post
+#### depends_post
 
 ```toml
 [tasks.test]
@@ -317,7 +313,7 @@ depends_post = ["cleanup"]  # Runs after test completes
 run = "pytest"
 ```
 
-### wait_for
+#### wait_for
 
 ```toml
 [tasks.integration-test]
@@ -327,7 +323,7 @@ run = "pytest tests/integration"
 
 ### Task Properties
 
-### Complete Example
+#### Complete Example
 
 ```toml
 [tasks.e2e]
@@ -370,7 +366,3 @@ run = "playwright test"
 | `timeout`      | Maximum execution time                           |
 | `dir`          | Working directory override                       |
 | `env`          | Task-specific environment variables              |
-
-### Source
-
-### Documentation

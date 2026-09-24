@@ -432,8 +432,6 @@ Worktrees share the same `.git` object database, saving disk space.
 1 × (repo size) + 2 × (working directory) = 1GB + 2 × 100MB = 1.2GB
 ```
 
-### Savings
-
 ### Parallel Operations
 
 Leverage worktrees for parallel operations.
@@ -517,7 +515,3 @@ git wt -d locked-worktree
 - [Troubleshooting](troubleshooting.md)
 
 ---
-
-### Version
-
-### Last Updated

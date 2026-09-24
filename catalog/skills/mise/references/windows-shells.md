@@ -34,8 +34,6 @@ Prefer this order:
 
 A useful signal: if the proposed fix would make mac-first contributors read Windows-only paths in core task definitions, stop and ask whether the repository wants that policy. For release gates, it is usually better to run the gate on the primary development platform or CI-equivalent environment than to bend repository tasks around a local Windows PATH issue.
 
-## Match Task Syntax to the Configured Shell
-
 ## Keep `run_windows` Thin Before Adding Bootstrap Wrappers
 
 If a Windows task cannot resolve a mise-provided tool such as `node` or `pnpm` under the default `cmd /c`, do not immediately add a thick PowerShell path or repo-local PATH bootstrap script to every `run_windows` command.

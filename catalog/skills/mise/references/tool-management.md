@@ -4,8 +4,6 @@ This document provides detailed guidance on managing language runtimes, CLI tool
 
 ## Core Philosophy: Centralized Package Management
 
-### Principle
-
 ### Why Centralization?
 
 1. Single Source of Truth: One file tracks all dependencies
@@ -93,8 +91,6 @@ mise supports multiple config locations with clear precedence:
 1. Project-local: `./mise.toml` (highest priority)
 2. User global: `~/.config/mise/config.toml`
 3. System-wide: `/etc/mise/config.toml` (lowest priority)
-
-### Best Practice
 
 ## Migration from global-package.json
 
@@ -189,13 +185,13 @@ echo "Then run: mise install"
 
 ### 1. Runtimes (Language Implementations)
 
-### Characteristics
+#### Characteristics
 
 - Provide language interpreters/compilers
 - Often have ecosystem package managers (npm, pip, cargo, etc.)
 - Version-sensitive for compatibility
 
-### Examples
+#### Examples
 
 ```toml
 [tools]
@@ -211,7 +207,7 @@ ruby = "<verified-version>"
 go = "<verified-version>"               # 1.25.x line
 ```
 
-### Version Selection Strategy
+#### Version Selection Strategy
 
 - Project-local: Pin specific versions for reproducibility
 - User global: Prefer concrete versions when documenting reusable setup; local rolling channels are a personal opt-in
@@ -219,13 +215,13 @@ go = "<verified-version>"               # 1.25.x line
 
 ### 2. CLI Tools (Standalone Binaries)
 
-### Characteristics
+#### Characteristics
 
 - Self-contained executables
 - No runtime dependencies (or bundled)
 - Pin concrete versions in shared configs; standalone binaries can still break scripts when their CLI changes
 
-### Examples
+#### Examples
 
 ```toml
 [tools]
@@ -236,19 +232,15 @@ fd = "<verified-version>"             # Fast find alternative
 bat = "<verified-version>"            # Cat with syntax highlighting
 ```
 
-### Best Practice
-
 ### 3. NPM Global Packages
 
-### Characteristics
+#### Characteristics
 
 - JavaScript packages installed globally
 - Require Node.js runtime
 - Often provide CLI commands
 
-### Prefix Syntax
-
-### Examples
+#### Examples
 
 ```toml
 [tools]
@@ -272,7 +264,7 @@ bat = "<verified-version>"            # Cat with syntax highlighting
 "npm:@vue/cli" = "<verified-version>"
 ```
 
-### Important Notes
+#### Important Notes
 
 - Scoped packages (starting with `@`) must include the full scope
 - Package names must match npm registry exactly
@@ -280,15 +272,13 @@ bat = "<verified-version>"            # Cat with syntax highlighting
 
 ### 4. Python Global Packages (via pipx)
 
-### Characteristics
+#### Characteristics
 
 - Python packages installed in isolated environments
 - Uses `pipx` for isolation (similar to `npx`)
 - Prevents dependency conflicts
 
-### Prefix Syntax
-
-### Examples
+#### Examples
 
 ```toml
 [tools]
@@ -310,7 +300,7 @@ bat = "<verified-version>"            # Cat with syntax highlighting
 "pipx:sphinx" = "<verified-version>"
 ```
 
-### Advantages of pipx
+#### Advantages of pipx
 
 - Each package in isolated virtual environment
 - No dependency conflicts
@@ -320,7 +310,7 @@ bat = "<verified-version>"            # Cat with syntax highlighting
 
 ### Shell Integration (Zsh Example)
 
-### Setup in `.zshrc`
+#### Setup in `.zshrc`
 
 ```zsh
 # Activate mise
@@ -334,7 +324,7 @@ export MISE_DATA_DIR="${HOME}/.local/share/mise"
 export MISE_CONFIG_DIR="${HOME}/.config/mise"
 ```
 
-### Benefits
+#### Benefits
 
 - Automatic PATH management
 - Tool shimming (fake binaries that route to mise-managed versions)
@@ -342,7 +332,7 @@ export MISE_CONFIG_DIR="${HOME}/.config/mise"
 
 ### Neovim Integration
 
-### Ensure tools are available
+#### Ensure tools are available
 
 ```toml
 [tools]
@@ -356,7 +346,7 @@ export MISE_CONFIG_DIR="${HOME}/.config/mise"
 "pipx:black" = "26.1.1"
 ```
 
-### Neovim Lua Config
+#### Neovim Lua Config
 
 ```lua
 -- ~/.config/nvim/lua/config/mise.lua
@@ -377,7 +367,7 @@ end
 
 ### CI/CD Integration
 
-### GitHub Actions Example
+#### GitHub Actions Example
 
 ```yaml
 name: CI
@@ -408,7 +398,7 @@ jobs:
           python -m pytest
 ```
 
-### GitLab CI Example
+#### GitLab CI Example
 
 ```yaml
 default:

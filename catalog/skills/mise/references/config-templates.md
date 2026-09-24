@@ -653,5 +653,3 @@ When creating mise.toml:
 - ✅ Use check/fix pairs for validation tasks
 
 ---
-
-### Note

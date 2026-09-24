@@ -21,28 +21,28 @@ Document size limits are configurable via `.docs-manager-config.json`:
 
 ### Standard Size Categories
 
-### ✅ Ideal
+#### ✅ Ideal
 
 - Quick comprehension
 - Easy to scan and navigate
 - Optimal for AI processing
 - Recommended for most documents
 
-### ⚠️ Acceptable
+#### ⚠️ Acceptable
 
 - Still manageable
 - Detailed technical content
 - Monitor for growth
 - Consider organization improvements
 
-### ⚠️ Large
+#### ⚠️ Large
 
 - Difficult to navigate
 - Consider splitting
 - Identify logical boundaries
 - Plan separation strategy
 
-### 🚫 Too Large
+#### 🚫 Too Large
 
 - Must split
 - Poor user experience
@@ -344,7 +344,7 @@ Structure content in layers of increasing detail:
 
 ### Example: Progressive API Documentation
 
-### api-overview.md
+#### api-overview.md
 
 ```markdown
 # API Overview
@@ -358,11 +358,11 @@ For complete API reference, see:
 - [Configuration API](api/configuration.md)
 ```
 
-### api/authentication.md
+#### api/authentication.md
 
 Detailed authentication endpoints, parameters, examples.
 
-### api/authentication-advanced.md
+#### api/authentication-advanced.md
 
 OAuth flows, custom authentication, security considerations.
 
@@ -446,9 +446,7 @@ Configure docs-manager to report:
 
 ### Over-Splitting
 
-### Problem
-
-### Solution
+#### Solution
 
 - Aim for 300-500 line documents
 - Combine closely related topics
@@ -456,9 +454,7 @@ Configure docs-manager to report:
 
 ### Under-Splitting
 
-### Problem
-
-### Solution
+#### Solution
 
 - Be more aggressive with splitting
 - Create more granular topics
@@ -466,9 +462,7 @@ Configure docs-manager to report:
 
 ### Poor Navigation
 
-### Problem
-
-### Solution
+#### Solution
 
 - Create clear index documents
 - Add breadcrumbs
@@ -476,9 +470,7 @@ Configure docs-manager to report:
 
 ### Broken Links
 
-### Problem
-
-### Solution
+#### Solution
 
 - Use link validation tools
 - Update all references systematically

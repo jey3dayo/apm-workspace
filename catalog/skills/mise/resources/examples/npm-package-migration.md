@@ -103,7 +103,7 @@ git commit -m "chore: backup before mise migration"
 
 ### Step 2: Convert to mise Format
 
-### Manual Conversion Script
+#### Manual Conversion Script
 
 ```bash
 #!/usr/bin/env bash
@@ -126,7 +126,7 @@ echo "✅ Converted packages written to ${OUTPUT}"
 echo "   Please review and add to mise/config.toml"
 ```
 
-### Generated mise-npm-packages.toml
+#### Generated mise-npm-packages.toml
 
 ```toml
 # NPM Global Packages
@@ -236,7 +236,7 @@ $ which prettier
 
 ### Step 5: Update Documentation
 
-### docs/maintenance.md (updated)
+#### docs/maintenance.md (updated)
 
 ```markdown
 # Dependency Reconstruction
@@ -254,7 +254,7 @@ mise ls
 \`\`\`
 ```
 
-### docs/setup.md (updated)
+#### docs/setup.md (updated)
 
 ```markdown
 ## Tool Installation
@@ -326,14 +326,14 @@ git commit -m "chore: migrate npm packages to mise, remove global-package.json"
 
 ### Benefits Realized
 
-### Before
+#### Before
 
 - 2 package managers: npm global + mise
 - 2 files: `global-package.json` + `mise/config.toml`
 - Potential drift: local npm packages vs tracked versions
 - Manual sync required
 
-### After
+#### After
 
 - 1 package manager: mise
 - 1 file: `mise/config.toml`
@@ -344,14 +344,14 @@ git commit -m "chore: migrate npm packages to mise, remove global-package.json"
 
 ### Issue: Old Global Packages Still Active
 
-### Symptom
+#### Symptom
 
 ```bash
 $ which prettier
 /usr/local/bin/prettier  # Old global install, not mise
 ```
 
-### Solution
+#### Solution
 
 ```bash
 # Check PATH
@@ -369,7 +369,7 @@ npm uninstall -g prettier
 
 ### Issue: Package Not Found After Migration
 
-### Symptom
+#### Symptom
 
 ```bash
 $ mise install
@@ -378,7 +378,7 @@ $ textlint --version
 textlint: command not found
 ```
 
-### Solution
+#### Solution
 
 ```bash
 # Verify package installed
@@ -397,7 +397,7 @@ mise install "npm:textlint"
 
 ### Issue: Neovim Node Client Not Working
 
-### Symptom
+#### Symptom
 
 ```lua
 -- In Neovim
@@ -405,7 +405,7 @@ mise install "npm:textlint"
 -- Error: Node.js provider: neovim npm package not found
 ```
 
-### Solution
+#### Solution
 
 ```bash
 # Verify neovim package installed
