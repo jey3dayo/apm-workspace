@@ -46,17 +46,14 @@ Steward から Architect への昇格 handoff もこの書式を使う。
 | `source_role`     | 送り手の役（Steward / Architect / Reviewer / Worker）              |
 | `target_role`     | 受け手に担わせる役。これがあれば受け側の判定はこれで確定する       |
 | `task_id`         | 以後のすべての報告に載せる識別子                                   |
-| `report_contract` | 受け側が返す契約。`DONE` / `REVIEW` / `HANDOFF` / `NOTIFY`         |
+| `report_contract` | 受け側が返す契約。`DONE` / `REVIEW` / `HANDOFF`                    |
 | `review_mode`     | review のときのみ必須。`verdict`（強制境界を確認済み）/ `advisory` |
 
-契約は 2 種類に分かれる。
+`DONE` / `REVIEW` / `HANDOFF` はいずれも返信を伴い、受け側が結果を返す。`HANDOFF` で受けた Architect は、作業を終えたら handoff 書式で送り手へ返す（`orchestrator-worker` の「最終報告は、依頼が来た経路へ返す」）。ack は不要だが**最終結果は返す**。
 
-- 返信を伴うもの（`DONE` / `REVIEW` / `HANDOFF`）は、受け側が結果を返す。`HANDOFF` で受けた Architect は、作業を終えたら handoff 書式で送り手へ返す（`orchestrator-worker` の「最終報告は、依頼が来た経路へ返す」）。ack は不要だが**最終結果は返す**。
-- 返信を伴わないもの（`NOTIFY`）は、一方通行。送り手は渡した時点で関与が終わり、受け側は ack も結果も返さない。送り手は返信を待たず `reset.sh` まで進める。
+**ack が不要なことと、最終結果が不要なことは別である。** 返信不要と扱うと、Steward → Architect → Steward → 人間 の報告経路が切れる。
 
-**ack が不要なことと、最終結果が不要なことは別である。** `NOTIFY` 以外で「返信不要」と扱うと、Steward → Architect → Steward → 人間 の報告経路が切れる。
-
-`target_role` と `report_contract` は**対応していなければならない**（Worker↔`DONE`、Reviewer↔`REVIEW`、Steward / Architect↔`HANDOFF` または `NOTIFY`）。対応表と不整合な組合せ、表に無い値、必須 field の欠落はいずれも、受け側が役を確定せず `BLOCKED` を返す契約である（判定は `orchestrator-worker` の自己判定規則が正本）。役だけ渡して報告契約を省くのも欠落にあたる。
+`target_role` と `report_contract` は**対応していなければならない**（Worker↔`DONE`、Reviewer↔`REVIEW`、Steward / Architect↔`HANDOFF`）。対応表と不整合な組合せ、表に無い値、必須 field の欠落はいずれも、受け側が役を確定せず `BLOCKED` を返す契約である（判定は `orchestrator-worker` の自己判定規則が正本）。役だけ渡して報告契約を省くのも欠落にあたる。
 
 本文の口調や「人間が話しかけてきたように見えるか」は役の根拠にしない。同じ文面が user メッセージとしても hook 経由でも届くため、受け側から区別できない。
 
