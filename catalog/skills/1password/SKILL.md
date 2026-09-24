@@ -23,7 +23,6 @@ Manage 1Password items through `op` while keeping secrets out of the conversatio
 
   2. `OP_SERVICE_ACCOUNT_TOKEN_FILE` when the user provides a token file path.
   3. Manual sign-in only when the user explicitly asks.
-- Homelab default dotenvx env file: `/home/pi/.config/.env`. Store the bootstrap token there as an `encrypted:` value; never create a plaintext token cache under `/home/pi/.config/op/`.
 - Verify create/edit permission for service accounts before changing items; successful list/read only proves read access. If create/edit returns `(101) You do not have permission`, and the vault holds a `Service Account Auth Token: <name>` item, read that item's token into process memory with `op item get <item-id> --fields <concealed-field-id> --reveal`, verify only its prefix/length, and retry with it as `OP_SERVICE_ACCOUNT_TOKEN`.
 - Do not install public 1Password skills or new credential tooling unless the user explicitly asks.
 
@@ -85,9 +84,9 @@ Prefer `registered email`, `purchase date`, and a custom `Registration Date` tex
   }
   ```
 
-## Hermes Codex App Token Rotation
+## Homelab
 
-For rotating the homelab Hermes Agent Codex app token from 1Password into the Kubernetes Pod, follow `references/hermes-codex-token-rotation.md` (item IDs, safe read/rotation/verification command patterns, backup rules).
+Homelab-specific items (e.g. the Hermes Agent Codex app token rotation, `/home/pi/.config/.env`) live in the homelab-k3s repo skills, not here.
 
 ## Failure Handling
 
