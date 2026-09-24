@@ -1142,6 +1142,19 @@ doctor_fixture_env() {
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
 }
 
+@test "doctor reports the learning-intake drop box file count" {
+  make_doctor_fixture
+  mkdir -p "$doctor_workspace_dir/tmp/learning-intake"
+  printf '# report one\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0000-one.md"
+  printf '# report two\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0001-two.md"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"learning-intake inbox: 2"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
 # --- doctor agmsg roster link reachability -----------------------------------
 #
 # agmsg resolves db/ and teams/ relative to $HOME/.agents/skills/agmsg, which

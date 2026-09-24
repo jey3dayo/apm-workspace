@@ -54,7 +54,7 @@ Codex 側の Steward は `gpt-6-luna` のみで、明示ポリシーとして常
 2. `target_role` が無く、`task_id` + `report_contract` だけがある → 対応表の逆引き。これは agmsg の必須 envelope を満たさない経路（Agent tool や `spawn_agent` など、native の task transport）向けの緩和であり、agmsg 経由のメッセージは上の検証で BLOCKED になっているのでここへは来ない。
 3. envelope が無い対話セッション → pane / session の起動時に宣言された default role。宣言が無ければ、自分のモデルが Steward の許可集合に入るなら Steward、入らないなら Architect。
 
-`report_contract: NOTIFY` は一方通行の通知で、受け側は ack も結果も返さない（スキル不具合のフィールド報告など）。役の判定は `HANDOFF` と同じだが、返信を返さない点だけが違う。ack 不要と最終結果不要を混同しない——`HANDOFF` で受けた作業は終わったら送り手へ返す。
+`report_contract: NOTIFY` は一方通行の通知で、受け側は ack も結果も返さない。役の判定は `HANDOFF` と同じだが、返信を返さない点だけが違う。ack 不要と最終結果不要を混同しない——`HANDOFF` で受けた作業は終わったら送り手へ返す。
 
 envelope の必須フィールドと書式は `agmsg-delegation` の「envelope」節が正本。
 

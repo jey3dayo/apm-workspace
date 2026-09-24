@@ -2337,6 +2337,7 @@ cmd_doctor() {
     printf 'workspace: %s\n' "$WORKSPACE_DIR"
     printf 'manifest: %s\n' "$(test -f apm.yml && printf present || printf missing)"
     printf 'branch: %s\n' "$(git branch --show-current 2>/dev/null || printf detached)"
+    printf 'learning-intake inbox: %s\n' "$(find tmp/learning-intake -maxdepth 1 -name '*.md' -type f 2>/dev/null | wc -l | tr -d ' ')"
     printf 'remote:\n'
     git remote -v || true
     printf 'targets:\n'

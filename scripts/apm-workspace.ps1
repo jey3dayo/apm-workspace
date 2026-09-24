@@ -3115,6 +3115,9 @@ function Invoke-Doctor {
     $branch = "detached"
   }
   Write-Host ("branch: {0}" -f ($branch | Out-String).Trim())
+  $learningIntakeDir = Join-Path $WorkspaceDir "tmp/learning-intake"
+  $learningIntakeCount = @(Get-ChildItem -LiteralPath $learningIntakeDir -File -Filter *.md -ErrorAction SilentlyContinue).Count
+  Write-Host ("learning-intake inbox: {0}" -f $learningIntakeCount)
   Write-Host "remote:"
   & git -C $WorkspaceDir remote -v
   Write-Host "targets:"

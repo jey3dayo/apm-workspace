@@ -52,7 +52,7 @@ Steward から Architect への昇格 handoff もこの書式を使う。
 契約は 2 種類に分かれる。
 
 - 返信を伴うもの（`DONE` / `REVIEW` / `HANDOFF`）は、受け側が結果を返す。`HANDOFF` で受けた Architect は、作業を終えたら handoff 書式で送り手へ返す（`orchestrator-worker` の「最終報告は、依頼が来た経路へ返す」）。ack は不要だが**最終結果は返す**。
-- 返信を伴わないもの（`NOTIFY`）は、一方通行。送り手は渡した時点で関与が終わり、受け側は ack も結果も返さない。送り手は返信を待たず `reset.sh` まで進める。スキル不具合のフィールド報告がこれにあたる（導線は `catalog/AGENTS.md`）。
+- 返信を伴わないもの（`NOTIFY`）は、一方通行。送り手は渡した時点で関与が終わり、受け側は ack も結果も返さない。送り手は返信を待たず `reset.sh` まで進める。
 
 **ack が不要なことと、最終結果が不要なことは別である。** `NOTIFY` 以外で「返信不要」と扱うと、Steward → Architect → Steward → 人間 の報告経路が切れる。
 
