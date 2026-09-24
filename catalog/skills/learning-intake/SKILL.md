@@ -46,13 +46,13 @@ description: >-
 
 1項目につき owner はちょうど1つ。2つに書くと、片方が古くなったとき現状を復元できなくなる。
 
-| 学びの性質                                             | owner                                                        | 適用の正本                        |
-| ------------------------------------------------------ | ------------------------------------------------------------ | --------------------------------- |
-| catalog skill の契約破れ・手順の摩擦・実装との食い違い | `catalog/skills/<name>/`                                     | `apm-usage` → `apm-deploy-verify` |
-| 全リポジトリに効く規範・禁止事項・判断基準             | `~/.apm/catalog/AGENTS.md`                                   | `apm-usage`                       |
-| owner が今回の許可範囲の外にある（報告経路）           | 上の行の owner 候補 + drop box `~/.apm/tmp/learning-intake/` | 本スキル §4                       |
-| そのリポジトリだけの規約・構成                         | 当該 repo の `AGENTS.md` / `CLAUDE.md`                       | `docs-review`                     |
-| コード・スクリプトの不具合                             | 当該 repo の `todo.txt` または issue（本スキルは起票まで）   | `orchestrator-worker`             |
+| 学びの性質                                             | owner                                                            | 適用の正本                        |
+| ------------------------------------------------------ | ---------------------------------------------------------------- | --------------------------------- |
+| catalog skill の契約破れ・手順の摩擦・実装との食い違い | `catalog/skills/<name>/`                                         | `apm-usage` → `apm-deploy-verify` |
+| 全リポジトリに効く規範・禁止事項・判断基準             | `~/.apm/catalog/AGENTS.md`                                       | `apm-usage`                       |
+| owner が今回の許可範囲の外にある（報告経路）           | APM 側が owner 候補の行 + drop box `~/.apm/tmp/learning-intake/` | 本スキル §4                       |
+| そのリポジトリだけの規約・構成                         | 当該 repo の `AGENTS.md` / `CLAUDE.md`                           | `docs-review`                     |
+| コード・スクリプトの不具合                             | 当該 repo の `todo.txt`（無ければ issue）。本スキルは起票まで    | `orchestrator-worker`             |
 
 ユーザー訂正は行き先が割れるので、次で判別する。
 
@@ -61,7 +61,7 @@ description: >-
 
 owner が決まらない、または根拠が弱い項目は `保留` にして、何が足りないかを名指しする。憶測で owner を埋めない。
 
-local 経路で `保留` にした項目のうち、owner 候補が APM 側（catalog skill・`~/.apm/catalog/AGENTS.md`）のものは、セッションが終わると消えるため、§4 の報告ファイル書式で `status: 保留` として drop box `~/.apm/tmp/learning-intake/` に置く。当該 repo 側が owner 候補のものは報告に残すだけでよい。
+local 経路で `保留` にした項目のうち、owner 候補が APM 側（catalog skill・`~/.apm/catalog/AGENTS.md`・`~/.apm` のスクリプト）のものは、セッションが終わると消えるため、§4 の報告ファイル書式で `status: 未処理` として置き、保留理由は `不足:` 項目に書いて drop box `~/.apm/tmp/learning-intake/` に置く。当該 repo 側が owner 候補のものは報告に残すだけでよい。
 
 完了条件: 各項目が `applied` 候補（owner 1つ）か `保留`（不足を明記）のどちらかに分かれている。
 
@@ -105,8 +105,11 @@ local 経路で `保留` にした項目のうち、owner 候補が APM 側（ca
 選ばれた行だけを書く。文体・粒度・構造は owner 側の既存記述に合わせる。
 
 - catalog skill / CLAUDE.md の編集と再配布は `apm-usage` の判定に従い、検証は `apm-deploy-verify` へ渡す
-- 報告ファイルの必須項目: 日付、送信元 repo、§1 の分類と根拠の実物、適用範囲、§2 の owner 候補、`status`（`未処理` / `保留`）
-- 受入れ後の片付け: `applied` にしたら削除する。`保留` にしたら `status: 保留` と不足を追記して残す
+- ファイル名書式: `<YYYYMMDD-HHMM>-<slug>.md`
+- 報告ファイルの必須項目: 日付、送信元 repo、§1 の分類と根拠の実物、適用範囲、§2 の owner 候補、`status`（`未処理` / `保留`）。保留理由があるときは `不足:` に書く
+- 受入れ後の片付け（`status: 保留` に遷移できるのは受入れ側だけ）:
+  - `applied` と不採用 → ファイルを削除し、判断は `~/.apm/done.txt` に記録する
+  - `保留` → `status: 保留` と不足を追記して残す
 - 書き込みを拒まれた場合（sandbox など）: 自 repo の `tmp/learning-intake/` に置き、その path をユーザーへ伝える
 
 報告には、`applied` にした行と、`保留` にした行および何が足りなかったかを両方書く。

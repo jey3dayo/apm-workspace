@@ -2011,6 +2011,55 @@ dependencies:
     }
   }
 
+  It "reports the learning-intake drop box file count from Invoke-Doctor" {
+    $targetRoot = Join-Path $TestDrive "doctor-inbox/.codex"
+    $skillsRoot = Join-Path $TestDrive "doctor-inbox/.agents"
+    $codexSkillsRoot = Join-Path $skillsRoot "skills"
+    $sourceRoot = Join-Path $TestDrive "doctor-inbox-source"
+    $instructionsPath = Join-Path $sourceRoot "AGENTS.md"
+    $agentsSource = Join-Path $sourceRoot "agents"
+    $commandsSource = Join-Path $sourceRoot "commands"
+    $rulesSource = Join-Path $sourceRoot "rules"
+
+    New-Item -ItemType Directory -Path $targetRoot, $codexSkillsRoot, (Join-Path $targetRoot "agents"), (Join-Path $targetRoot "commands"), (Join-Path $targetRoot "rules"), $agentsSource, $commandsSource, $rulesSource -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $targetRoot "AGENTS.md") -Value "# instructions"
+    Set-Content -LiteralPath $instructionsPath -Value "# instructions"
+
+    $learningIntakeDir = Join-Path $script:WorkspaceDir "tmp/learning-intake"
+    New-Item -ItemType Directory -Path $learningIntakeDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $learningIntakeDir "20260101-0000-one.md") -Value "# report one"
+    Set-Content -LiteralPath (Join-Path $learningIntakeDir "20260101-0001-two.md") -Value "# report two"
+
+    Mock Require-Apm {}
+    Mock Ensure-WorkspaceRepo {}
+    Mock Ensure-WorkspaceScaffold {}
+    Mock Get-CodexSkillTargetRoot { $codexSkillsRoot }
+    Mock Test-AgmsgRosterLink {}
+    Mock Get-TrackedCatalogInstructionsPath { $instructionsPath }
+    Mock Get-TrackedCatalogAgentsRoot { $agentsSource }
+    Mock Get-TrackedCatalogCommandsRoot { $commandsSource }
+    Mock Get-TrackedCatalogRulesRoot { $rulesSource }
+    Mock Get-ManagedCatalogRuntimeTargets {
+      @([pscustomobject]@{ Name = "codex"; Root = $targetRoot; SkillsRoot = $skillsRoot; ConfigName = "AGENTS.md" })
+    }
+    Mock Get-ManagedCatalogSkillInventory { @() }
+    Mock Get-UnpinnedExternalReferences { @() }
+    Mock Write-CatalogSummary {}
+
+    function global:apm {
+      $global:LASTEXITCODE = 0
+    }
+
+    try {
+      $output = Invoke-Doctor 6>&1 | Out-String
+      $output | Should -Match "learning-intake inbox: 2"
+    }
+    finally {
+      Remove-Item Function:\apm -ErrorAction SilentlyContinue
+      Remove-Item -LiteralPath $learningIntakeDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+  }
+
   It "throws from Invoke-Doctor when the agmsg roster link is broken" {
     $targetRoot = Join-Path $TestDrive "doctor-agmsg-broken/.codex"
     $skillsRoot = Join-Path $TestDrive "doctor-agmsg-broken/.agents"

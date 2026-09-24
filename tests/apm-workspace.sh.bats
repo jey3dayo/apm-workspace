@@ -1144,9 +1144,11 @@ doctor_fixture_env() {
 
 @test "doctor reports the learning-intake drop box file count" {
   make_doctor_fixture
-  mkdir -p "$doctor_workspace_dir/tmp/learning-intake"
+  mkdir -p "$doctor_workspace_dir/tmp/learning-intake/sub"
   printf '# report one\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0000-one.md"
   printf '# report two\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0001-two.md"
+  printf 'not a report\n' >"$doctor_workspace_dir/tmp/learning-intake/note.txt"
+  printf '# nested report\n' >"$doctor_workspace_dir/tmp/learning-intake/sub/nested.md"
 
   run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
 
