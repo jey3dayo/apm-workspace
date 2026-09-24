@@ -1221,12 +1221,7 @@ cmd_update() {
     fail "apm 0.8.11 cannot update ./packages/* dependencies at user scope yet. Refresh stopped before deps update; remove local package refs from ~/.apm/apm.yml first."
   fi
 
-  # Same roster-preservation contract as cmd_apply/cmd_sync_local_skills:
-  # `apm deps update -g` redeploys the same target tree apply does, so save
-  # before it runs and bind restore to EXIT (not RETURN) so it fires on every
-  # path, including a failed `apm deps update -g` under `set -e`. The trap
-  # only reports a failed recovery restore (agmsg_state_restore_report_failure);
-  # it must never mask the failure that triggered the trap in the first place.
+  # `apm deps update -g` redeploys the agmsg skill dir; same save/restore contract as cmd_apply.
   "$REPO_ROOT/scripts/agmsg-state.sh" save
   trap 'agmsg_state_restore_report_failure' EXIT
 

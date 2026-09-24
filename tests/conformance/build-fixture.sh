@@ -47,10 +47,7 @@ STUB
   # only mkdir -p's the parent dir; it never writes the file itself),
   # `install` has to exit 0 without printing the diagnostics-failure patterns
   # apm_install_has_diagnostics_failure() scans for, and `deps update -g` has
-  # to reproduce the observed real-world behavior (2026-09-23) of wiping the
-  # deployed agmsg skill dir wholesale, so tests/update-agmsg-roster.bats and
-  # its Pester parity can exercise cmd_update's roster save/restore without a
-  # live apm CLI.
+  # to wipe the deployed agmsg skill dir the way the real CLI does.
   apm_bin="$bin_dir/apm"
   cat >"$apm_bin" <<STUB
 #!/usr/bin/env bash
