@@ -800,7 +800,6 @@ Describe "public command surface" {
       $expectedNames = @(
         "apply",
         "apply:skills:local",
-        "audit:ci:smoke",
         "check",
         "deploy",
         "doctor",
@@ -2493,73 +2492,6 @@ dependencies:
     # Windows account: run `mise run apply` and confirm the private skill
     # under ~/.claude/skills is a real copy (not a reparse point) plus a
     # "Symlink not permitted" warning on stdout.
-  }
-
-  It "smoke-audits the workspace manifest via temp install" {
-    Mock Ensure-WorkspaceRepo {}
-    Mock Ensure-WorkspaceScaffold {}
-    Mock New-TemporaryDirectory {
-      $path = Join-Path $TestDrive "apm-audit-ci-smoke"
-      New-Item -ItemType Directory -Path $path -Force | Out-Null
-      $path
-    }
-
-    $previousWorkspaceDir = $script:WorkspaceDir
-    $previousGlobalWorkspaceDir = $global:WorkspaceDir
-    $workspaceDir = Join-Path $TestDrive "workspace-audit-ci-smoke"
-    $script:WorkspaceDir = $workspaceDir
-    $WorkspaceDir = $workspaceDir
-    $global:WorkspaceDir = $workspaceDir
-    New-Item -ItemType Directory -Path $workspaceDir -Force | Out-Null
-
-    @"
-name: apm-workspace
-version: 1.0.0
-dependencies:
-  apm: []
-  mcp: []
-scripts: {}
-"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
-    @"
-lockfile_version: "1"
-dependencies: []
-"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
-
-    $apmCalls = New-Object System.Collections.Generic.List[string]
-    $script:installSawManifest = $false
-    $script:auditSawManifest = $false
-
-    function global:apm {
-      $apmCalls.Add(($args -join ' '))
-
-      if ($args[0] -eq "install" -and $args[1] -eq "--only" -and $args[2] -eq "apm") {
-        if ((Test-Path -LiteralPath (Join-Path $PWD "apm.yml")) -and (Test-Path -LiteralPath (Join-Path $PWD "apm.lock.yaml"))) {
-          $script:installSawManifest = $true
-        }
-      }
-
-      if ($args[0] -eq "audit" -and $args[1] -eq "--ci") {
-        if ((Test-Path -LiteralPath (Join-Path $PWD "apm.yml")) -and (Test-Path -LiteralPath (Join-Path $PWD "apm.lock.yaml"))) {
-          $script:auditSawManifest = $true
-        }
-      }
-
-      $global:LASTEXITCODE = 0
-    }
-
-    try {
-      Invoke-AuditCiSmoke
-
-      $apmCalls | Should -Be @("install --only apm", "audit --ci")
-      $script:installSawManifest | Should -Be $true
-      $script:auditSawManifest | Should -Be $true
-      Test-Path (Join-Path $TestDrive "apm-audit-ci-smoke") | Should -Be $false
-    }
-    finally {
-      Remove-Item Function:\apm -ErrorAction SilentlyContinue
-      $script:WorkspaceDir = $previousWorkspaceDir
-      $global:WorkspaceDir = $previousGlobalWorkspaceDir
-    }
   }
 
   It "publishes the expected public mise task set" {

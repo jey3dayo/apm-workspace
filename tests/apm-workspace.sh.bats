@@ -399,7 +399,7 @@ EOF
 @test "mise exposes the expected public task set" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT")"
   run assert_public_mise_tasks "$tasks_json" \
-    apply apply:skills:local audit:ci:smoke check deploy doctor format \
+    apply apply:skills:local check deploy doctor format \
     format:check install:catalog prepare:catalog refresh test test:ps test:sh upgrade validate verify
   [ "$status" -eq 0 ]
 }
@@ -992,7 +992,6 @@ EOF
   [[ "$output" == *"apply:skills:local"* ]]
   [[ "$output" == *"repair:local-package-cache"* ]]
   [[ "$output" == *"smoke:catalog"* ]]
-  [[ "$output" == *"audit:ci:smoke"* ]]
 }
 
 @test "help does not list retired command names" {
