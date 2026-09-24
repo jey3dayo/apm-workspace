@@ -419,7 +419,7 @@ test:
 
 #### Issue 1: Tool Not Found After Installation
 
-### Symptoms
+##### Symptoms
 
 ```bash
 $ mise install
@@ -428,7 +428,7 @@ $ which prettier
 prettier not found
 ```
 
-### Solutions
+##### Solutions
 
 ```bash
 # 1. Verify installation
@@ -449,7 +449,7 @@ mise exec -- prettier --version
 
 #### Issue 2: Version Conflict with System Tools
 
-### Symptoms
+##### Symptoms
 
 ```bash
 $ which node
@@ -462,7 +462,7 @@ $ mise current node
 <verified-version>  # mise thinks it's using a different version
 ```
 
-### Solutions
+##### Solutions
 
 ```bash
 # 1. Check PATH order
@@ -483,7 +483,7 @@ which node  # Should now point to ~/.local/share/mise/...
 
 #### Issue 3: NPM Package Command Not Found
 
-### Symptoms
+##### Symptoms
 
 ```bash
 $ mise install "npm:prettier"
@@ -492,7 +492,7 @@ $ prettier --version
 prettier: command not found
 ```
 
-### Solutions
+##### Solutions
 
 ```bash
 # 1. Check if binary name differs from package name
@@ -519,14 +519,14 @@ tar 展開が AppleDouble `._*` を実体化し codesign の resource seal を�
 
 #### Issue 5: Python pipx Package Issues
 
-### Symptoms
+##### Symptoms
 
 ```bash
 $ mise install "pipx:black"
 Error: pipx backend not available
 ```
 
-### Solutions
+##### Solutions
 
 ```bash
 # 1. Ensure pipx is installed
@@ -546,7 +546,7 @@ pipx list
 
 #### Slow Shell Startup
 
-### Diagnosis
+##### Diagnosis
 
 ```bash
 # Benchmark shell startup
@@ -556,7 +556,7 @@ time zsh -i -c exit
 time eval "$(mise activate zsh)"
 ```
 
-### Optimization
+##### Optimization
 
 ```zsh
 # ~/.zshrc
