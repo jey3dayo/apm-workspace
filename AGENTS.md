@@ -120,7 +120,10 @@ the roster and history. `mise run apply` (both `apm-workspace.sh` and
 `apm-workspace.ps1`) saves and restores them automatically on every exit
 path, success or failure — the `agmsg:state:save`/`agmsg:state:restore` mise
 tasks are recovery adapters only, for a roster left unlinked by some other
-process. Run `mise run agmsg:state:restore` by hand to recover from that.
+process. `mise run refresh` (`cmd_update`/`Invoke-Update`, which runs
+`apm deps update -g`) carries the same save/restore wrapping, since that
+command redeploys the same target tree apply does. Run
+`mise run agmsg:state:restore` by hand to recover from that.
 A bare `apm install -g` is one such process: it goes through the upstream CLI,
 not `cmd_apply`, so the save/restore around apply never runs and the links are
 gone when it finishes (observed 2026-09-10; the store under
