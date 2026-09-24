@@ -31,7 +31,7 @@ pnpm = "12" # bootstrap only; exact version is owned by package.json "packageMan
 ```
 
 - 正確なバージョンの正本は各リポジトリの `package.json` の `packageManager` フィールド。pnpm 10+ の self-management（`managePackageManagerVersions`、デフォルト有効）が `packageManager` を読んで自動で該当バージョンに切り替えるため、mise 側で厳密ピンすると二重管理になる
-- 厳密ピンの実害例（2026-07, keep-on）: `mise.toml` が `pnpm = "10.29.3"`、`packageManager` が `pnpm@11.16.0` でドリフトし、実行されるのは self-management が切り替えた 11 系。mise のピンは実効性がないまま誤解だけ生む
+- 厳密ピンの実害例: `mise.toml` が `pnpm = "10.29.3"`、`packageManager` が `pnpm@11.16.0` でドリフトすると、実行されるのは self-management が切り替えた 11 系になり、mise のピンは実効性がないまま誤解だけ生む
 - corepack は採用しない。Node.js TSC が 2025-03 に Node 25+ からの corepack 同梱終了を決定しており（外部インストールが必要な別ツール化）、「Node に付いてくる corepack で pnpm を管理」という前提は成立しない
 
 ## Configuration Structure
@@ -44,47 +44,46 @@ pnpm = "12" # bootstrap only; exact version is owned by package.json "packageMan
 # ========================================
 # Runtimes (Language Implementations)
 # ========================================
-node = "24.16.0"         # Node.js runtime
-python = "3.12"          # Python with specific version
-ruby = "3.4.7"
-go = "1.25.5"
-rust = "1.91.1"
+node = "<verified-version>"         # Node.js runtime
+python = "<verified-version>"          # Python with specific version
+ruby = "<verified-version>"
+go = "<verified-version>"
+rust = "<verified-version>"
 lua = "5.1.5"            # Specific version for compatibility (e.g., LuaRocks/Neovim)
-luajit = "2.1.0"
+luajit = "<verified-version>"
 
 # ========================================
 # CLI Tools (Standalone Binaries)
 # ========================================
-ghq = "1.8.0"            # Repository manager
-github-cli = "2.83.1"    # gh command
-shellcheck = "0.11.0"    # Shell script linter
-yamllint = "1.37.1"      # YAML linter
-taplo = "0.10.0"         # TOML formatter/linter
+ghq = "<verified-version>"            # Repository manager
+github-cli = "<verified-version>"    # gh command
+shellcheck = "<verified-version>"    # Shell script linter
+yamllint = "<verified-version>"      # YAML linter
+taplo = "<verified-version>"         # TOML formatter/linter
 
 # ========================================
 # NPM Global Packages
 # ========================================
-"npm:@bufbuild/protoc-gen-es" = "2.11.0"
-"npm:@connectrpc/protoc-gen-connect-es" = "1.7.0"
-"npm:@fsouza/prettierd" = "0.26.2"
-"npm:@openai/codex" = "0.73.0"
-"npm:aicommits" = "1.11.0"
-"npm:corepack" = "0.34.4"
-"npm:husky" = "9.1.7"
-"npm:markdown-link-check" = "3.14.7"
-"npm:markdownlint-cli2" = "0.19.1"
-"npm:neovim" = "5.3.0"
-"npm:npm" = "11.7.0"
-"npm:npm-check-updates" = "19.2.0"
-"npm:textlint" = "15.2.2"
-"npm:textlint-rule-preset-ja-technical-writing" = "12.0.2"
+"npm:@bufbuild/protoc-gen-es" = "<verified-version>"
+"npm:@connectrpc/protoc-gen-connect-es" = "<verified-version>"
+"npm:@fsouza/prettierd" = "<verified-version>"
+"npm:@openai/codex" = "<verified-version>"
+"npm:aicommits" = "<verified-version>"
+"npm:husky" = "<verified-version>"
+"npm:markdown-link-check" = "<verified-version>"
+"npm:markdownlint-cli2" = "<verified-version>"
+"npm:neovim" = "<verified-version>"
+"npm:npm" = "<verified-version>"
+"npm:npm-check-updates" = "<verified-version>"
+"npm:textlint" = "<verified-version>"
+"npm:textlint-rule-preset-ja-technical-writing" = "<verified-version>"
 
 # ========================================
 # Python Global Packages (via pipx)
 # ========================================
-"pipx:black" = "26.1.1"
-"pipx:ruff" = "0.14.9"
-"pipx:poetry" = "2.2.1"
+"pipx:black" = "<verified-version>"
+"pipx:ruff" = "<verified-version>"
+"pipx:poetry" = "<verified-version>"
 ```
 
 ### Config Hierarchy
@@ -201,15 +200,15 @@ echo "Then run: mise install"
 ```toml
 [tools]
 # Specific version for project compatibility
-node = "18.20.0"          # LTS version
-python = "3.11.5"         # Specific patch version
+node = "<verified-version>"          # older major kept for project compatibility
+python = "<verified-version>"         # Specific patch version
 
 # Concrete current stable versions
-node = "24.16.0"
-ruby = "3.4.7"
+node = "<verified-version>"
+ruby = "<verified-version>"
 
 # Version ranges (if supported)
-go = "1.25"               # 1.25.x line
+go = "<verified-version>"               # 1.25.x line
 ```
 
 ### Version Selection Strategy
@@ -230,11 +229,11 @@ go = "1.25"               # 1.25.x line
 
 ```toml
 [tools]
-github-cli = "2.83.1"     # gh command
-jq = "1.8.1"              # JSON processor
-ripgrep = "15.1.0"        # Fast grep alternative
-fd = "10.4.2"             # Fast find alternative
-bat = "0.26.0"            # Cat with syntax highlighting
+github-cli = "<verified-version>"     # gh command
+jq = "<verified-version>"              # JSON processor
+ripgrep = "<verified-version>"        # Fast grep alternative
+fd = "<verified-version>"             # Fast find alternative
+bat = "<verified-version>"            # Cat with syntax highlighting
 ```
 
 ### Best Practice
@@ -254,23 +253,23 @@ bat = "0.26.0"            # Cat with syntax highlighting
 ```toml
 [tools]
 # Formatters/Linters
-"npm:prettier" = "3.8.4"
-"npm:eslint" = "9.39.1"
-"npm:@biomejs/biome" = "2.3.7"
+"npm:prettier" = "<verified-version>"
+"npm:eslint" = "<verified-version>"
+"npm:@biomejs/biome" = "<verified-version>"
 
 # Build Tools
-"npm:typescript" = "5.9.3"
-"npm:vite" = "7.2.7"
-"npm:webpack" = "5.103.0"
+"npm:typescript" = "<verified-version>"
+"npm:vite" = "<verified-version>"
+"npm:webpack" = "<verified-version>"
 
 # Development Tools
-"npm:nodemon" = "3.1.11"
-"npm:pm2" = "6.0.14"
-"npm:http-server" = "14.1.1"
+"npm:nodemon" = "<verified-version>"
+"npm:pm2" = "<verified-version>"
+"npm:http-server" = "<verified-version>"
 
 # Scoped Packages
-"npm:@angular/cli" = "21.0.5"
-"npm:@vue/cli" = "5.0.8"
+"npm:@angular/cli" = "<verified-version>"
+"npm:@vue/cli" = "<verified-version>"
 ```
 
 ### Important Notes
@@ -294,21 +293,21 @@ bat = "0.26.0"            # Cat with syntax highlighting
 ```toml
 [tools]
 # Formatters/Linters
-"pipx:black" = "26.1.1"
-"pipx:ruff" = "0.14.9"
-"pipx:pylint" = "4.0.4"
+"pipx:black" = "<verified-version>"
+"pipx:ruff" = "<verified-version>"
+"pipx:pylint" = "<verified-version>"
 
 # Package Management
-"pipx:poetry" = "2.2.1"
-"pipx:pipenv" = "2025.0.4"
+"pipx:poetry" = "<verified-version>"
+"pipx:pipenv" = "<verified-version>"
 
 # Development Tools
-"pipx:ipython" = "9.8.0"
-"pipx:jupyter" = "1.1.1"
+"pipx:ipython" = "<verified-version>"
+"pipx:jupyter" = "<verified-version>"
 
 # Documentation
-"pipx:mkdocs" = "1.6.1"
-"pipx:sphinx" = "9.0.4"
+"pipx:mkdocs" = "<verified-version>"
+"pipx:sphinx" = "<verified-version>"
 ```
 
 ### Advantages of pipx
@@ -394,7 +393,7 @@ jobs:
       - name: Install mise
         uses: jdx/mise-action@v2
         with:
-          version: 2025.10.0 # Pin version for reproducibility
+          version: <verified-version> # Pin version for reproducibility
 
       - name: Install tools
         run: mise install
@@ -470,7 +469,7 @@ $ node --version
 v14.0.0  # Old system version
 
 $ mise current node
-20.0.0  # mise thinks it's using v20
+<verified-version>  # mise thinks it's using a different version
 ```
 
 ### Solutions

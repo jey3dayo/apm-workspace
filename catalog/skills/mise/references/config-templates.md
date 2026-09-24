@@ -554,7 +554,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: jdx/mise-action@v2
         with:
-          version: 2025.10.0
+          version: <verified-version>
       - name: Run CI
         run: mise run +ci
         env:
@@ -648,7 +648,7 @@ When creating mise.toml:
 - ✅ Use `run` for actual commands
 - ✅ Create short aliases for frequent tasks
 - ✅ Group related tasks with namespaces (`build:types`, `test:unit`)
-- ✅ Prefix meta-tasks with `+` (`+ci`, `+check`)
+- ✅ Prefix meta-tasks with `+` only when the repository already uses that convention
 - ✅ Extract long scripts to separate files
 - ✅ Use check/fix pairs for validation tasks
 

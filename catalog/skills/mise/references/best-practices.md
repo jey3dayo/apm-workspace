@@ -1,6 +1,6 @@
-# mise Best Practices - 2025 Field-Tested Guide
+# mise Best Practices
 
-This document contains comprehensive best practices for mise (mise-en-place) task runner, based on real-world usage patterns converged in 2025. All examples assume mise v2025.x, whose syntax has been stable since 2024-09.
+Best practices for the mise task runner. Verify syntax against `mise --help` for the installed version.
 
 ## 1. File-System & Top-Level Layout
 
@@ -150,10 +150,10 @@ timeout     = "10m"
 3. Separate aggregation from aliasing
    - `format`, `lint`, `check:format`, `ci:check` can be ordinary task names even when they have no `alias = [...]`
    - Use `alias` only for genuine shortcuts such as `alias = ["f"]`
-4. Group optional meta-task aliases under a "+" prefix
+4. Use a "+" prefix for meta-tasks only when the repository already uses that convention
    - `+ci`, `+all` so they sort to the top and are obviously not leaf commands
 5. Keep shell in check
-   - If the run array grows past ~5 lines, move it to a standalone script or a file task
+   - If the run array grows past 3 lines, move it to a standalone script or a file task
 6. Wire tools to tasks
    - If you add `shellcheck`, `shfmt`, `taplo`, or similar tools under `[tools]`, connect them to `lint:*`, `format:*`, or documented setup tasks; otherwise omit them
 
@@ -231,9 +231,9 @@ prisma migrate deploy
 
 ### Best Practices
 
-- In GitHub Actions, `mise ci bootstrap` (or your own task) should be the _only_ shell block in the workflow
+- In GitHub Actions, a single `mise run <ci-task>` should be the _only_ shell block in the workflow
 - Let mise orchestrate the rest
-- Pin mise version (`mise use -g mise@2025.10`) so new releases don't surprise your build
+- Pin the mise version (`mise use -g mise@<verified-version>`) so new releases don't surprise your build
 - Prefer concrete LTS/runtime versions in `[tools]` for shared repos when reproducibility matters
 - Export `MISE_JOBS=$(nproc)` to fully exploit depends-based parallelism
 
@@ -250,11 +250,11 @@ steps:
   - name: Setup mise
     uses: jdx/mise-action@v2
     with:
-      version: 2025.10.0
+      version: <verified-version>
   - name: Run CI
     run: mise run +ci
     env:
-      MISE_JOBS: ${{ nproc }}
+      MISE_JOBS: 4
 ```
 
 ## 8. Common Pitfalls to Avoid
@@ -370,16 +370,6 @@ run = "playwright test"
 | `timeout`      | Maximum execution time                           |
 | `dir`          | Working directory override                       |
 | `env`          | Task-specific environment variables              |
-
-## Summary
-
-With this structure your mise.toml stays:
-
-- Readable: Clear separation of concerns
-- Parallel-friendly: Optimal use of depends for concurrency
-- Maintainable: Easy to extend and modify as project grows
-
----
 
 ### Source
 

@@ -17,7 +17,7 @@ The examples below are from a Claude Code project's mise.toml, showing documenta
 _.path = ['./node_modules/.bin']
 
 [tools]
-node = '22'         # 最新LTS
+node = '<verified-version>'  # LTS major
 fd = '<verified-version>'       # ファイル検索用
 prettier = '<verified-version>' # コードフォーマッター
 
@@ -46,7 +46,7 @@ run = "prettier --write --cache --log-level warn 'commands/**/*.md' 'docs/**/*.m
 description = "Prettierフォーマットチェック"
 run = "prettier --check --cache 'commands/**/*.md' 'docs/**/*.md' 'skills/**/*.md' 'agents/**/*.md' 'CLAUDE.md' '*.md'"
 
-# === エイリアス ===
+# === 集約タスク ===
 [tasks.format]
 description = "全ての自動修正を実行"
 depends = ["docs:fix", "docs:format"]
@@ -127,7 +127,7 @@ depends = ["docs:lint", "docs:format:check", "docs:links"]
 
 - No run property - Pure orchestration via depends
 - Parallel execution - All dependencies run concurrently
-- Short aliases - `format` and `lint` are easy to type
+- Short task names - `format` and `lint` are easy to type (ordinary task names, not `alias`)
 
 ### Execution Flow
 
@@ -150,7 +150,7 @@ mise lint
 
 ```toml
 [tools]
-node = '22'         # 最新LTS
+node = '<verified-version>'  # LTS major
 fd = '<verified-version>'       # ファイル検索用
 prettier = '<verified-version>' # コードフォーマッター
 ```
@@ -167,7 +167,7 @@ prettier = '<verified-version>' # コードフォーマッター
 [tools]
 node = "24.0.0"     # Pin exact version
 node = "24"         # Track the current LTS major
-node = "<verified-version>"     # Always pinned (not recommended for reproducibility)
+node = "latest"     # floating; not recommended for reproducibility
 ```
 
 ### Pattern 5: Environment Path Extension
@@ -367,15 +367,6 @@ depends = ["lint", "test"]  # Parallel
 3. Check/fix pairs - Clear CI vs development intent
 4. Short names for common tasks - `format`, `lint`, `test`
 5. Tool version management - Explicit in `[tools]`
-
-### Result
-
-- Fast parallel execution
-- Maintainable task definitions
-- Clear developer workflow
-- CI-friendly validation
-
----
 
 ### Source
 

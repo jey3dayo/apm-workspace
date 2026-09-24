@@ -97,7 +97,7 @@ npm list -g --depth=0 > npm-global-backup-20241224.txt
 cp global-package.json global-package.json.backup
 
 # Commit current state
-git add -A
+git add npm-global-backup-20241224.txt global-package.json.backup
 git commit -m "chore: backup before mise migration"
 ```
 
@@ -133,7 +133,6 @@ echo "   Please review and add to mise/config.toml"
 "npm:@bufbuild/protoc-gen-es" = "<verified-version>"
 "npm:@connectrpc/protoc-gen-connect-es" = "<verified-version>"
 "npm:aicommits" = "<verified-version>"
-"npm:corepack" = "<verified-version>"
 "npm:husky" = "<verified-version>"
 "npm:neovim" = "<verified-version>"
 "npm:npm-check-updates" = "<verified-version>"
@@ -175,7 +174,6 @@ taplo = "<verified-version>"
 "npm:@fsouza/prettierd" = "<verified-version>"  # Added (was in docs but not in global-package.json)
 "npm:@openai/codex" = "<verified-version>"
 "npm:aicommits" = "<verified-version>"
-"npm:corepack" = "<verified-version>"
 "npm:husky" = "<verified-version>"
 "npm:markdown-link-check" = "<verified-version>"
 "npm:markdownlint-cli2" = "<verified-version>"
