@@ -23,19 +23,20 @@ dependencies:
     - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review#93b00b89ef425a9c1bac0d0b317dfc49c930ac99
     - shadcn/improve#03369ee6d7cafbfcecc4346539b05b3dc0a603bb
 
-    # engineering practice (design, architecture, research)
-    - mattpocock/skills/skills/engineering/codebase-design#3cca18b368ae95cdbdebbff572ccafa662551015
-    - mattpocock/skills/skills/engineering/domain-modeling#3cca18b368ae95cdbdebbff572ccafa662551015
-    - mattpocock/skills/skills/engineering/improve-codebase-architecture#3cca18b368ae95cdbdebbff572ccafa662551015
-    - mattpocock/skills/skills/engineering/prototype#3cca18b368ae95cdbdebbff572ccafa662551015
-    - mattpocock/skills/skills/engineering/research#3cca18b368ae95cdbdebbff572ccafa662551015
-    - mattpocock/skills/skills/engineering/setup-matt-pocock-skills#3cca18b368ae95cdbdebbff572ccafa662551015
-    - mattpocock/skills/skills/engineering/wayfinder#3cca18b368ae95cdbdebbff572ccafa662551015
-
-    # productivity / writing
-    - mattpocock/skills/skills/productivity/grilling#3cca18b368ae95cdbdebbff572ccafa662551015
-    - mattpocock/skills/skills/productivity/wait-what#3cca18b368ae95cdbdebbff572ccafa662551015
-    - mattpocock/skills/skills/productivity/writing-for-agents#3cca18b368ae95cdbdebbff572ccafa662551015
+    # engineering practice / productivity / writing
+    - git: mattpocock/skills
+      ref: 3cca18b368ae95cdbdebbff572ccafa662551015
+      skills:
+        - codebase-design
+        - domain-modeling
+        - grilling
+        - improve-codebase-architecture
+        - prototype
+        - research
+        - setup-matt-pocock-skills
+        - wait-what
+        - wayfinder
+        - writing-for-agents
     - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
       ref: 8f2d57610a73efc97d743c9b0b0ecb1002e09fa4
       alias: japanese-tech-writing
@@ -49,7 +50,7 @@ dependencies:
     - tt-a1i/archify/archify#c6519401f7b91b9d43011657880893b0a8955548
     - anthropics/claude-code/plugins/frontend-design/skills/frontend-design#ab9b2cf7bb9e4f98ff264c07a22e46d83c29c558
 
-    - openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431 # openai/skills is deprecated; no migrated equivalent found in openai/plugins yet
+    - openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431
 
     # --- design ---
     - benjitaylor/agentation/skills/agentation#7982d83aa2d2ba46d0f68f257759ba527ba401a8

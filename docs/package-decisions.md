@@ -401,7 +401,8 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 - `writing-great-skills` は上流で `writing-for-agents` にリネーム（スキル本文に加え
   AGENTS.md / CLAUDE.md の書き方も対象）。manifest を差し替えた
 - 残した判断: `browser-harness`（pi / opencode 向けの最低保証ブラウザ能力）、
-  `screenshot`（Win / Mac / Linux 対応。Mac 専用の `peekaboo` を撤去して一本化）、
+  `screenshot`（Win / Mac / Linux 対応。Mac 専用の `peekaboo` を撤去して一本化。upstream の
+  `openai/skills` は deprecated だが、2026-09-25 時点で `openai/plugins` に移行先が無いため SHA pin で据え置く）、
   `thermo-nuclear-code-quality-review`（レビュー文化の共通言語）、
   `emil-design-eng`、React 系（`react-doctor` / `react-best-practices`）
 - `docs/superpowers/**`（2026-04-21 の APM global distribution 設計・計画文書 2 本）は
@@ -616,7 +617,8 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 
 - Status: 採用。当面 `mise run upgrade`（`apm update -g --yes`）を使わず、前へ進む更新だけを手動 pin bump で適用する。
 - 理由: apm 0.31.0 の `apm update` は SHA pin の依存を最新タグへ書き換え、タグが pin より古くても戻す。2026-09-25 の global dry-run では対象8件中6件が後退だった（mattpocock/skills 41 commit、millionco/react-doctor 29、tt-a1i/archify 21、ibelick/ui-skills 263、coji/natural-japanese 13、mvanhorn/last30days-skill 6）。前進は benjitaylor/agentation（v3.1.2）と modem-dev/hunk（v0.22.0）だけで、この2件は同日に手動で適用した。
-- 併発する失敗: 同じ SHA を共有する複数行を update が書き換えると `Expected exactly one apm.yml entry for <sha>, found 2` で止まる（agentation 2行で再現）。object 形式の `git:` + `ref:` + `skills:` へ畳めば apm 単体では回避でき、pin 時点の配布内容も byte 一致した。ただし `scripts/apm-workspace.sh` の `external_package_skills_root` が `.apm/skills` 構造しか解決できず、素の `skills/<name>/` bundle は apply で `Missing external skill cache` になるため、畳み込みは使っていない。
+- 併発する失敗: 同じ SHA を共有する複数行を update が書き換えると `Expected exactly one apm.yml entry for <sha>, found 2` で止まる（agentation 2行で再現）。object 形式の `git:` + `ref:` + `skills:` へ畳めば apm 単体では回避でき、pin 時点の配布内容も byte 一致した。ただし `scripts/apm-workspace.sh` の `external_package_skills_root` が `.apm/skills` 構造しか解決できず、素の `skills/<name>/` bundle は apply で `Missing external skill cache` になる。
+- 畳み込みの適用範囲: upstream のルートに `apm.yml` があり、apm がキャッシュを `.apm/skills/<name>/` へ作り直す repo だけを畳む。2026-09-25 に `mattpocock/skills` の10行を1エントリへ畳み、配布内容の一致を確かめた（配布先から消えたのはキャッシュ由来の `.apm-pin` だけ）。畳めないのは、素の bundle である agentation / emilkowalski / ibelick と、ルートが `marketplace.json` だけで subset を指定しても何も配布されない `caad-develop/claude-code-marketplace`。畳めるかどうかは、隔離 fixture に対して `APM_WORKSPACE_DIR=<fixture> bash -c 'source ./scripts/apm-workspace.sh; collect_external_skill_records'` を実行して確かめられる。
 - 更新手順: `apm.yml` の SHA を同じ repo の全行で揃えて上げ、`apm install -g --only apm` → `mise run deploy:fresh`。`apm install -g` は agmsg の db/teams symlink を外すので、`mise run doctor` で確かめて plain path が無ければ `mise run agmsg:state:restore`。
 - 前回の「ibelick/ui-skills の新構成と互換しない」は誤認だった。update の行き先が 2026-01 の古いタグ `v0.0.7`（`src/SKILL.md` だけの構造）だったためで、pin と HEAD の `skills/` は同一。
 - 再検討するなら: apm の update が pin より古いタグへ戻さなくなったとき、または workspace スクリプトが素の bundle を扱えるようになったとき。
