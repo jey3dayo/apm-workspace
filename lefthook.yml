@@ -3,6 +3,16 @@
 # 成功と区別できないほうが危険なので、hard fail させる。
 assert_lefthook_installed: true
 
+# meta（冒頭のバナー枠）だけを外す。残りは lefthook の既定と同じ。
+output:
+  - summary
+  - success
+  - failure
+  - execution
+  - execution_out
+  - execution_info
+  - skips
+
 pre-commit:
   parallel: true
   jobs:
@@ -21,6 +31,8 @@ pre-commit:
     - name: taplo-toml
       glob: "*.toml"
       run: mise exec -- taplo format {staged_files}
+      env:
+        RUST_LOG: taplo=warn
       stage_fixed: true
 
     - name: bold-headings
