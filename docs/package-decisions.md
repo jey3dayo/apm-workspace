@@ -18,14 +18,10 @@
 
 ## Mobbin MCP
 
-- Status: global APM 管理として追加（2026-09-06）
-- 理由: デザイン作業での UI reference 検索。CLI 側の agent（Claude Code / Codex）へ配る目的。
-- 現在の配置: `apm.yml` の `dependencies.mcp` が正本。`~/.claude.json` と
-  `~/.codex/config.toml` は生成先。`transport: http` を使っており、他の remote MCP エントリ
-  （linear / jina-reader）の `streamable-http` とは異なる。
-- 再検討するなら: app 側（claude.ai / ChatGPT）に Mobbin の connector が用意されたら、
-  `~/.apm/docs/saas-connectors.md` の優先順（アプリ側プラグイン > apm.yml > catalog skill）に
-  従って APM 管理からの撤去を検討する。
+- Status: global APM から撤去（2026-09-25）。2026-09-06 にデザイン作業の UI reference 検索用として追加していた。
+- 理由: 有料プランでしか使えないため。
+- 手順: `apm.yml` から外し（6bfca8b）、`mise run deploy:fresh` で `apm.lock.yaml`・`~/.claude.json`・`~/.codex/config.toml` から消した。
+- 再検討するなら: 無料で使えるようになったとき、または有料プランを契約したとき。
 
 ## Cursor user-scope MCP (`~/.cursor/mcp.json`)
 
