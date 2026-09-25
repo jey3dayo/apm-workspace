@@ -157,7 +157,7 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
 - If the request is to preserve a reusable implementation judgment from real work, such as "Valibot belongs in schemas", "Result conversion belongs at a boundary", or "DB access belongs in repositories", encode it as a concern -> owner candidates -> caller rule table in the relevant personal skill under `catalog/skills/<id>/`.
 - If the user does not specify the target skill id for that reusable judgment, inspect named skills, catalog triggers, and existing examples first; update the closest existing personal skill instead of creating a new skill by default.
 - If the request is "change shared guidance", edit `catalog/**`; use `prepare:catalog` before publish/install.
-- If the request is "change dependency selection", edit or review `apm.yml` / `apm.lock.yaml`.
+- If the request is "change dependency selection", edit or review `apm.yml` / `apm.lock.yaml`, writing entries per `references/manifest-style.md`.
 - If the request is about `mise upgrade <tool>`, `minimum_release_age`, latest eligible release selection, or why a non-APM tool version did not update, use the `mise` skill unless the pinned `apm` source, APM manifest, lockfile, or rollout task selection is the actual subject.
 - If the request is to add an individual APM package, assign its lane before
   running `apm install`. Use `apm install -g <package-ref>` only for the

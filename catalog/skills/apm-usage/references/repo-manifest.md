@@ -38,6 +38,7 @@ Read `preinstall-checklist.md` before a repository's first `apm install`, to che
 3. Create or update `apm.yml`.
    - Preserve existing name, version, description, author, targets, includes, and scripts when present.
    - Merge dependencies without duplicates.
+   - Write entries per `manifest-style.md` (form, ref, transport, comments).
    - Remove entries made obsolete by the policy, especially web/common skills that should stay global.
    - Keep the repository's existing target style, then add every runtime the repository actually uses (see this skill's Install Gate).
 4. Verify the manifest.
