@@ -1,6 +1,9 @@
 ---
 name: docs-manager
 model: sonnet
+context: fork
+agent: docs-manager
+background: false
 description: >-
   Docs governance: validate and fix Markdown docs against metadata, OKF / YAML
   frontmatter, tag, link and size rules (`.docs-manager-config.json`), and make docs
@@ -8,6 +11,8 @@ description: >-
 ---
 
 # Docs Manager
+
+fork 実行では会話履歴は見えない。対象 docs は ARGUMENTS があればそれ、無ければ config の `docs_root`。判断に迷う修正は適用せず報告へ回す。
 
 ## Overview
 

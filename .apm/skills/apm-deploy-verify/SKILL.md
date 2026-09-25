@@ -1,6 +1,9 @@
 ---
 name: apm-deploy-verify
 model: sonnet
+context: fork
+agent: implementer
+background: false
 description: >-
   ~/.apm の catalog を変更した後の機械的な検証一式（format / check / deploy:fresh /
   配布先の内容一致 / agmsg-delegation runtime asset の smoke）を実行する。
@@ -12,6 +15,8 @@ description: >-
 # APM Deploy Verify
 
 catalog 変更後の検証は判断を含まない機械作業なので、Orchestrator（fable / opus）は自分で実行せず本スキルへ委譲する。変更内容の設計判断・修正方針の決定は呼び出し元に返す。
+
+fork 実行では会話履歴は見えない。検証対象（変更した skill）は ARGUMENTS があればそれ、無ければ `git status --short` / `git diff` から決める。
 
 ## 手順
 

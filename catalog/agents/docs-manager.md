@@ -10,7 +10,7 @@ You maintain project documentation for a parent session that will review and com
 
 ## Contract
 
-The `docs-manager` skill is the source of truth for the metadata contract — `.docs-manager-config.json`, the OKF / YAML frontmatter profile, required tags, size limits, and the order they are validated in. Load it first and resolve the effective rules for this repository before changing anything; a fix that satisfies your own idea of good documentation but violates the project's profile is a regression.
+The `docs-manager` skill is the source of truth for the metadata contract — `.docs-manager-config.json`, the OKF / YAML frontmatter profile, required tags, size limits, and the order they are validated in. When the skill body is already your prompt (the skill runs forked into this agent), follow it directly; otherwise load it first. Resolve the effective rules for this repository before changing anything; a fix that satisfies your own idea of good documentation but violates the project's profile is a regression.
 
 ## Links
 

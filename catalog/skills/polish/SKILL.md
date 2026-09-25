@@ -1,9 +1,11 @@
 ---
 name: polish
 model: sonnet
-disable-model-invocation: true
+context: fork
+agent: implementer
+background: false
 description: PR を出す前に、base との diff で追加・変更した行を global AGENTS.md / CLAUDE.md の開発原則へ揃える（コメント圧縮・テストの実装詳細依存の除去・型逃げ・エラー握りつぶし・過剰な抽象化・不要ファイル）。
-argument-hint: "[base-ref]"
+argument-hint: "[base-ref] [files...] [intent]"
 ---
 
 # Polish
@@ -18,12 +20,14 @@ lint / format / test のループは対象外（DoD が持つ）。再利用・�
 
 base は上から順に解決し、最初に当たった段を採る。trunk 候補は `git symbolic-ref refs/remotes/origin/HEAD` が指す branch と `origin/develop` / `origin/main` / `origin/master` のうち `git rev-parse --verify` が通るもの。
 
-1. 引数
+1. 引数の先頭（`git rev-parse --verify` が通るときだけ base-ref として扱い、通らなければ対象ファイルとして読む）
 2. `gh pr view --json baseRefName -q .baseRefName`（このブランチの open PR）
 3. HEAD が trunk 候補そのものに居るなら `@{upstream}`、upstream 未設定なら `HEAD`
 4. それ以外は `git rev-list --count origin/<候補>..HEAD` が最小の候補。分岐元に最も近い trunk がこれで出る
 
 順序が効く: develop 上に居るときに 4 を先に当てると、ahead が 0 の develop を飛ばして `origin/main` が選ばれ、develop の既存コミットまで対象に入る。
+
+ARGUMENTS に対象ファイルが渡されたら、diff と untracked をそのファイルに限定する。渡されないときは diff 全体を対象にするが、共有ツリーでは他セッションの作りかけが混ざりうるので、自分の変更と判別できないファイルは直さず報告へ回す。
 
 対象は merge-base 起点の diff で、未コミットの変更まで含める。PR 前は commit していない行も polish 対象である。
 
@@ -39,15 +43,15 @@ git diff "$(git merge-base <base> HEAD)"
 
 各観点について、diff の追加行**全件**を判定し、該当箇所を直す。1 観点ずつ diff を読み直す。
 
-| 観点             | 検出（追加行に対して）                                                                                                 | 直し方                                                                                                       |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| コメント         | 追加・変更したコメント全件。名前・型・構造で伝わる内容、処理の見出し、検討履歴、How の説明                             | 削除。残すなら Why / What を 1〜2 行へ。検討履歴は PR 本文へ                                                 |
-| テスト           | 追加・変更したテスト全件。呼び出し回数・順序・version の固定、実装をなぞるだけの assertion、可逆で低影響な変更の鏡写し | 振る舞い（入力→出力、業務ルール、外部契約）の assertion へ置換。鏡写しは削除。固定が契約なら根拠をテスト名へ |
-| lint disable     | `eslint-disable` / `biome-ignore` / `@ts-ignore` / `@ts-expect-error` / `noqa` / `#[allow(` の追加                     | 設定ファイル側の rule 調整へ移す。その 1 箇所だけが真に例外なら理由を添えて残す                              |
-| 型逃げ           | `: any` / `<any>` / `as X`（`as const` は除く）/ 非 null `!` の追加                                                    | narrowing か型定義の修正で型を導く                                                                           |
-| エラー握りつぶし | 空 `catch`、`.catch(() => {})`、`except: pass`、結果を捨てる `try`                                                     | 境界で処理し、呼び出し元へ意味のある形で伝播                                                                 |
-| 過剰な差分       | 呼び出し元が 1 つの helper / option 引数、未使用 export、PR 目的と無関係な drive-by 変更、将来用途だけの抽象化・設定   | inline 化 or 削除。無関係な改善は別 PR へ切り出して diff から外す                                            |
-| 不要ファイル     | 新規 `*.md`（要求なし）、`tmp/`、`plans/`                                                                              | 削除。恒常的に生成されるなら `.gitignore`                                                                    |
+| 観点             | 検出（追加行に対して）                                                                                                 | 直し方                                                                                                                  |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| コメント         | 追加・変更したコメント全件。名前・型・構造で伝わる内容、処理の見出し、検討履歴、How の説明                             | 削除。残すなら Why / What を 1〜2 行へ。検討履歴は PR 本文へ                                                            |
+| テスト           | 追加・変更したテスト全件。呼び出し回数・順序・version の固定、実装をなぞるだけの assertion、可逆で低影響な変更の鏡写し | 振る舞い（入力→出力、業務ルール、外部契約）の assertion へ置換。鏡写しは削除。固定が契約なら根拠をテスト名へ            |
+| lint disable     | `eslint-disable` / `biome-ignore` / `@ts-ignore` / `@ts-expect-error` / `noqa` / `#[allow(` の追加                     | 設定ファイル側の rule 調整へ移す。その 1 箇所だけが真に例外なら理由を添えて残す                                         |
+| 型逃げ           | `: any` / `<any>` / `as X`（`as const` は除く）/ 非 null `!` の追加                                                    | narrowing か型定義の修正で型を導く                                                                                      |
+| エラー握りつぶし | 空 `catch`、`.catch(() => {})`、`except: pass`、結果を捨てる `try`                                                     | 境界で処理し、呼び出し元へ意味のある形で伝播                                                                            |
+| 過剰な差分       | 呼び出し元が 1 つの helper / option 引数、未使用 export、PR 目的と無関係な drive-by 変更、将来用途だけの抽象化・設定   | inline 化 or 削除。無関係な改善は別 PR へ切り出して diff から外す                                                       |
+| 不要ファイル     | 新規 `*.md`（要求なし）、`tmp/`、`plans/`                                                                              | 削除候補として報告し、削除は親が判断する（要求の有無は会話を見ないと判定できない）。恒常的に生成されるなら `.gitignore` |
 
 観点を足すときはこの表に 1 行追加する。手順と完了条件は変えない。
 
