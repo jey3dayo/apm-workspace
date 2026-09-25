@@ -2536,10 +2536,15 @@ cmd_smoke_catalog() {
   cmd_bundle_catalog "$@"
 
   temp_dir=$(mktemp -d "${TMPDIR:-/tmp}/apm-catalog-smoke.XXXXXX")
+  install_log="$temp_dir.install.log"
   (
     cd "$temp_dir"
     apm install "$(catalog_build_dir)" --target codex
-  ) || fail "apm install failed for catalog smoke test. Temp workspace: $temp_dir"
+  ) >"$install_log" 2>&1 || {
+    cat "$install_log" >&2
+    fail "apm install failed for catalog smoke test. Temp workspace: $temp_dir"
+  }
+  rm -f "$install_log"
 
   printf '%s\n' "$skill_ids" | while IFS= read -r skill_id; do
     [ -n "$skill_id" ] || continue
