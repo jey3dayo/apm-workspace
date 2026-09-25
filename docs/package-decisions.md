@@ -611,3 +611,12 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
   face が `-` のとき配布先 `agents/` を削除し、`cmd_doctor` は `agents=n/a` を返す。
 - 検証: `tests/apm-workspace.sh.bats` と `tests/apm-workspace.Tests.ps1` に opencode と同型の
   codex ケース（doctor の `agents=n/a`、deploy 後に `~/.codex/agents` が残らないこと）を追加した。
+
+## `mise run upgrade` の封印と SHA pin の手動更新（2026-09-25）
+
+- Status: 採用。当面 `mise run upgrade`（`apm update -g --yes`）を使わず、前へ進む更新だけを手動 pin bump で適用する。
+- 理由: apm 0.31.0 の `apm update` は SHA pin の依存を最新タグへ書き換え、タグが pin より古くても戻す。2026-09-25 の global dry-run では対象8件中6件が後退だった（mattpocock/skills 41 commit、millionco/react-doctor 29、tt-a1i/archify 21、ibelick/ui-skills 263、coji/natural-japanese 13、mvanhorn/last30days-skill 6）。前進は benjitaylor/agentation（v3.1.2）と modem-dev/hunk（v0.22.0）だけで、この2件は同日に手動で適用した。
+- 併発する失敗: 同じ SHA を共有する複数行を update が書き換えると `Expected exactly one apm.yml entry for <sha>, found 2` で止まる（agentation 2行で再現）。object 形式の `git:` + `ref:` + `skills:` へ畳めば apm 単体では回避でき、pin 時点の配布内容も byte 一致した。ただし `scripts/apm-workspace.sh` の `external_package_skills_root` が `.apm/skills` 構造しか解決できず、素の `skills/<name>/` bundle は apply で `Missing external skill cache` になるため、畳み込みは使っていない。
+- 更新手順: `apm.yml` の SHA を同じ repo の全行で揃えて上げ、`apm install -g --only apm` → `mise run deploy:fresh`。`apm install -g` は agmsg の db/teams symlink を外すので、`mise run doctor` で確かめて plain path が無ければ `mise run agmsg:state:restore`。
+- 前回の「ibelick/ui-skills の新構成と互換しない」は誤認だった。update の行き先が 2026-01 の古いタグ `v0.0.7`（`src/SKILL.md` だけの構造）だったためで、pin と HEAD の `skills/` は同一。
+- 再検討するなら: apm の update が pin より古いタグへ戻さなくなったとき、または workspace スクリプトが素の bundle を扱えるようになったとき。

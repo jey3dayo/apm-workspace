@@ -52,8 +52,8 @@ dependencies:
     - openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431 # openai/skills is deprecated; no migrated equivalent found in openai/plugins yet
 
     # --- design ---
-    - benjitaylor/agentation/skills/agentation#8158a97c10c37e577b0a6e2d3175d143918216cd
-    - benjitaylor/agentation/skills/agentation-self-driving#8158a97c10c37e577b0a6e2d3175d143918216cd
+    - benjitaylor/agentation/skills/agentation#7982d83aa2d2ba46d0f68f257759ba527ba401a8
+    - benjitaylor/agentation/skills/agentation-self-driving#7982d83aa2d2ba46d0f68f257759ba527ba401a8
     - git: nextlevelbuilder/ui-ux-pro-max-skill
       ref: 4aad0584d92131626b16d4ff4d77f0455385013c
       skills:
@@ -72,7 +72,7 @@ dependencies:
 
     # --- tools ---
     - fujibee/agmsg#f9fb4f1398a6086135f88deea98b7e5600cb1cda
-    - modem-dev/hunk/packages/hunk/skills/hunk-review#91b586184f569832c6a218a1bc9a7e0f3cd5ac7e
+    - modem-dev/hunk/packages/hunk/skills/hunk-review#3fdfde2dd77eb93802c43304c8edd34d79ce81de
     - agavra/tuicr/skills/tuicr#b55e218f6d38a87ca4a6d9924a4c50b5f601dd07
     - humanlayer/skills/plugins/show-me/skills/show-me#3c2629142c5d437428269b1b722b08c0b87f574d
 
