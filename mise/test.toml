@@ -6,25 +6,7 @@ run_windows = "pwsh -NoProfile -Command \"Invoke-Pester -Path tests -CI -Output 
 
 ["test:sh"]
 description = "Run bats unit tests for the workspace's bash scripts"
-# bats --jobs needs GNU parallel plus flock or shlock, and exits 1 without them
-# rather than falling back, so the guard checks both.
-run = """
-if [ "${APM_TEST_PARALLEL:-1}" = "0" ]; then
-  exec bats tests/*.bats
-fi
-if command -v parallel >/dev/null 2>&1 \
-  && { command -v flock >/dev/null 2>&1 || command -v shlock >/dev/null 2>&1; }; then
-  # Half the cores keeps the test run from starving the rest of the machine;
-  # floor of 4 preserves today's default when core detection is unavailable.
-  ncpu=$(sysctl -n hw.ncpu 2>/dev/null || nproc 2>/dev/null || echo 8)
-  default_jobs=$((ncpu / 2))
-  if [ "$default_jobs" -lt 4 ]; then
-    default_jobs=4
-  fi
-  exec bats --jobs "${BATS_JOBS:-$default_jobs}" tests/*.bats
-fi
-exec bats tests/*.bats
-"""
+run = "bash ./scripts/run-bats.sh"
 
 ["smoke:catalog"]
 description = "Smoke-test the generated managed catalog package via a temp install"
