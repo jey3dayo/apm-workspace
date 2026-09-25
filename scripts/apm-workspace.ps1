@@ -1514,18 +1514,22 @@ function Get-ExternalPackageSkillsRoot {
     }
   }
 
+  $allowPlainSkillsFallback = [string]::IsNullOrWhiteSpace($VirtualPath) -and (Get-ManifestExternalSkillSubset -Reference $RepoUrl).Count -gt 0
+
   $foundPath = $null
   foreach ($candidatePath in $candidatePaths) {
     $skillsRoot = Join-Path $candidatePath ".apm/skills"
     if (Test-Path -LiteralPath $skillsRoot -PathType Container) {
       $resolvedRoot = $skillsRoot
-    } else {
+    } elseif ($allowPlainSkillsFallback) {
       $plainSkillsRoot = Join-Path $candidatePath "skills"
       if ((Test-Path -LiteralPath $plainSkillsRoot -PathType Container) -and (Get-SkillIdsFromRoot -SkillsRoot $plainSkillsRoot).Count -gt 0) {
         $resolvedRoot = $plainSkillsRoot
       } else {
         continue
       }
+    } else {
+      continue
     }
 
     if ($null -ne $foundPath -and $foundPath -ne $resolvedRoot) {
@@ -1538,10 +1542,7 @@ function Get-ExternalPackageSkillsRoot {
   return $foundPath
 }
 
-# A `.apm/skills` root has its `.claude/skills` sibling checked first, since apm
-# 0.29.0+ deploys the thin `.apm/skills` copy alongside the full upstream one. A
-# plain `skills/` root declared without `.apm/skills` has no such sibling
-# convention, so it is used as-is.
+# Only a `.apm/skills` root has a `.claude/skills` sibling to prefer.
 function Test-ApmPackageSkillsRoot {
   param(
     [Parameter(Mandatory = $true)]

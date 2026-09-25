@@ -558,6 +558,54 @@ dependencies:
     }
   }
 
+  It "does not fall back to skills/ for a repo-root single skill with no subset declared" {
+    $previousWorkspaceDir = $script:WorkspaceDir
+    $previousGlobalWorkspaceDir = $global:WorkspaceDir
+    $workspaceDir = Join-Path $TestDrive "workspace-rootskill-no-subset"
+    $script:WorkspaceDir = $workspaceDir
+    $WorkspaceDir = $workspaceDir
+    $global:WorkspaceDir = $workspaceDir
+    New-Item -ItemType Directory -Path $workspaceDir -Force | Out-Null
+
+    @"
+name: apm-workspace
+version: 1.0.0
+description: test
+author: test
+dependencies:
+  apm:
+    - acme/rootskill
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+    @"
+lockfile_version: "1"
+dependencies:
+  - repo_url: acme/rootskill
+    host: github.com
+    resolved_commit: 3333333333333333333333333333333333333333
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
+
+    $packageRoot = Join-Path (Join-Path (Join-Path $script:WorkspaceDir "apm_modules") "acme") "rootskill"
+    $nestedSkillRoot = Join-Path $packageRoot "skills/x"
+    New-Item -ItemType Directory -Path $nestedSkillRoot -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $packageRoot "SKILL.md") -Value "# rootskill"
+    Set-Content -LiteralPath (Join-Path $nestedSkillRoot "SKILL.md") -Value "# x"
+
+    try {
+      $records = @(Get-ExternalSkillRecords)
+
+      $records.Count | Should -Be 1
+      $records[0].SourceSkillId | Should -Be "rootskill"
+      $records[0].SourcePath | Should -Be $packageRoot
+      $records[0].CanonicalReference | Should -Be "acme/rootskill"
+    }
+    finally {
+      $script:WorkspaceDir = $previousWorkspaceDir
+      $global:WorkspaceDir = $previousGlobalWorkspaceDir
+    }
+  }
+
   It "reads only top-level lock dependency records" {
     @"
 lockfile_version: "1"

@@ -1777,19 +1777,26 @@ external_package_skills_root() {
       "$apm_modules_root/$resolved_commit/$repo_url")
   fi
 
+  allow_plain_skills_fallback=0
+  if [ -z "$virtual_path" ] && [ -n "$(manifest_external_skill_subset "$repo_url")" ]; then
+    allow_plain_skills_fallback=1
+  fi
+
   found_root=""
   while IFS= read -r candidate_path; do
     [ -n "$candidate_path" ] || continue
     skills_root="$candidate_path/.apm/skills"
     if [ -d "$skills_root" ]; then
       resolved_root="$skills_root"
-    else
+    elif [ "$allow_plain_skills_fallback" -eq 1 ]; then
       plain_skills_root="$candidate_path/skills"
       if [ -d "$plain_skills_root" ] && [ -n "$(skill_ids_from_root "$plain_skills_root")" ]; then
         resolved_root="$plain_skills_root"
       else
         continue
       fi
+    else
+      continue
     fi
     if [ -n "$found_root" ] && [ "$found_root" != "$resolved_root" ]; then
       fail "Ambiguous external package cache paths for $repo_url/$virtual_path"

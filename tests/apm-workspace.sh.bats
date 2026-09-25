@@ -822,6 +822,32 @@ EOF
   rm -rf "$workspace_dir"
 }
 
+@test "collect_external_skill_records does not fall back to skills/ for a repo-root single skill with no subset declared" {
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - acme/rootskill
+EOF
+  cat >"$workspace_dir/apm.lock.yaml" <<'EOF'
+lockfile_version: '1'
+dependencies:
+- repo_url: acme/rootskill
+  host: github.com
+  resolved_commit: 3333333333333333333333333333333333333333
+EOF
+  mkdir -p "$workspace_dir/apm_modules/acme/rootskill/skills/x"
+  printf '%s\n' '# rootskill' >"$workspace_dir/apm_modules/acme/rootskill/SKILL.md"
+  printf '%s\n' '# x' >"$workspace_dir/apm_modules/acme/rootskill/skills/x/SKILL.md"
+  WORKSPACE_DIR="$workspace_dir"
+
+  run collect_external_skill_records
+  [ "$status" -eq 0 ]
+  [ "$output" = $'external\trootskill\t'"$workspace_dir"$'/apm_modules/acme/rootskill\tacme/rootskill' ]
+
+  rm -rf "$workspace_dir"
+}
+
 @test "external_skill_id_from_record's alias derivation matches the name apm recorded in the lockfile's deployed_files" {
   workspace_dir="$(mktemp -d)"
   cat >"$workspace_dir/apm.yml" <<'EOF'
