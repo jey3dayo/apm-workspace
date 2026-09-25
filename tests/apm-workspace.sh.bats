@@ -588,6 +588,43 @@ EOF
   rm -rf "$workspace_dir"
 }
 
+@test "collect_external_skill_records hints apm lock -g when a lock record has no manifest declaration" {
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm: []
+EOF
+  WORKSPACE_DIR="$workspace_dir"
+  locked_external_skill_records() {
+    printf '%s\n' 'acme/orphaned-dep||abc123|main'
+  }
+
+  run collect_external_skill_records
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"apm lock -g"* ]]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "collect_external_skill_records does not hint apm lock -g when a manifest ref is missing from the lock" {
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - acme/missing-from-lock
+EOF
+  WORKSPACE_DIR="$workspace_dir"
+  locked_external_skill_records() {
+    :
+  }
+
+  run collect_external_skill_records
+  [ "$status" -ne 0 ]
+  [[ "$output" != *"apm lock -g"* ]]
+
+  rm -rf "$workspace_dir"
+}
+
 # --- alias-aware external skill id / cache resolution -----------------------
 
 @test "external_skill_id_from_record uses the manifest alias instead of the repo_url tail" {

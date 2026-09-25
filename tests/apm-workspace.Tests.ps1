@@ -280,6 +280,49 @@ dependencies:
     $records[0].CanonicalReference | Should -Be "benjitaylor/agentation/skills/agentation"
   }
 
+  It "hints apm lock -g when a lock record has no manifest declaration" {
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+    - benjitaylor/agentation/skills/agentation
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+    @"
+lockfile_version: "1"
+dependencies:
+  - repo_url: acme/orphaned-dep
+    host: github.com
+    resolved_commit: 5555555555555555
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
+
+    { Get-ExternalSkillRecords } | Should -Throw "*apm lock -g*"
+  }
+
+  It "does not hint apm lock -g when a manifest ref is missing from the lock" {
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+    - acme/missing-from-lock
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+    @"
+lockfile_version: "1"
+dependencies: []
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
+
+    { Get-ExternalSkillRecords } | Should -Throw
+    try {
+      Get-ExternalSkillRecords
+    }
+    catch {
+      $_.Exception.Message | Should -Not -BeLike "*apm lock -g*"
+    }
+  }
+
   It "matches a manifest skill subset written as a full URL git: form the same as shorthand" {
     @"
 name: apm-workspace

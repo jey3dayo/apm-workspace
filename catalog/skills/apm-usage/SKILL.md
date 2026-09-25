@@ -304,6 +304,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - verify the deployed target contains one copy of the skill
 
 9. Global external dependency removed:
-   - keep its `apm.yml` line and run `apm uninstall -g <manifest-ref>`; deleting the line by hand leaves the lock record behind, and `mise run apply` stops with `External lock record is not declared in apm.yml`
-   - for the `.apm-pin` residue and uninstall re-integration behavior, see `references/rollout-fast-paths.md`
-   - verify the `apm.lock.yaml` diff contains only the removed records and the skill is gone from both targets, and record the removal in `docs/package-decisions.md`
+   - confirm `git status --short apm.lock.yaml` is clean, delete its `apm.yml` line, run `apm lock -g` (no `--update`) to drop the now-undeclared lock record, then `mise run deploy`; a bare hand-deleted line without `apm lock -g` leaves the lock record behind and `mise run apply` stops with `External lock record is not declared in apm.yml`
+   - check the diff with `git diff apm.lock.yaml | grep '^[-+]  resolved_commit'`: a lone `-` line is the removed dependency; a `-`/`+` pair is a branch-ref reresolution (expected) unless it lands on a SHA-pinned dependency (stop and investigate)
+   - verify the skill is gone from both deployed targets, and record the removal in `docs/package-decisions.md`
+   - `apm uninstall -g <manifest-ref>` is an alternative with more side effects on 0.31.0; see `references/rollout-fast-paths.md`

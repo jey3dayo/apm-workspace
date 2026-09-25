@@ -1637,7 +1637,7 @@ function Get-ExternalSkillRecords {
       continue
     }
     if (-not $manifestReferenceKeys.Contains($canonicalReference)) {
-      throw "External lock record is not declared in apm.yml: $canonicalReference"
+      throw "External lock record is not declared in apm.yml: $canonicalReference (removed on purpose? run 'apm lock -g' then 'mise run deploy')"
     }
 
     $null = $matchedReferences.Add($canonicalReference)

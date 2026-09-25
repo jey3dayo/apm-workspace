@@ -32,10 +32,23 @@ recovered them.
 For a checked-out external dependency (Fast Path 7) that is SHA-pinned, bump
 the pin in `apm.yml` to the pushed commit and follow this same sequence.
 
-## `.apm-pin` residue after uninstall (Fast Path 9)
+## `apm uninstall -g` side effects (Fast Path 9)
 
-Some deployed skill directories hold a copy of the package's `.apm-pin` cache
-marker, which the lock does not record. When one does, `apm uninstall`
+Fast Path 9's default is hand-editing `apm.yml` plus `apm lock -g`. `apm
+uninstall -g <manifest-ref>` is the alternative and carries more side effects
+on 0.31.0, so reach for it only when that default does not apply.
+
+The uninstall re-integrates the remaining packages outside `mise run apply`.
+On 0.31.0 it rewrites `apm.yml` (drops the comment that follows the removed
+entry, such as the next section header, and folds the gist URL) and deploys
+the gist under its un-aliased hash name. Unlinking the agmsg roster and
+deploying undeclared sub-skills were observed on 0.29.0 and not re-checked.
+Edit `apm.yml` until `git diff` shows only the removed line, follow the agmsg
+State section of `~/.apm/AGENTS.md`, then run `mise run deploy`, which
+removes the undeclared entries.
+
+Some deployed skill directories also hold a copy of the package's `.apm-pin`
+cache marker, which the lock does not record. When one does, `apm uninstall`
 removes the tracked files, cannot remove the directory, and aborts listing it
 (`Uninstall could not remove tracked target files`, reproduced on 0.31.0).
 By then it has already removed the package from `apm_modules/` and the
@@ -44,16 +57,6 @@ path under `~/.claude/skills/` and `~/.agents/skills/` is a real directory
 holding only `.apm-pin`, remove that file and the directory, then rerun the
 uninstall. The rerun's `Package ... not found in apm_modules/` is expected
 and it completes.
-
-The uninstall re-integrates the remaining packages outside `mise run apply`.
-On 0.31.0 it rewrites `apm.yml` (drops the comment that follows the removed
-entry, such as the next section header, and folds the gist URL) and deploys
-the gist under its un-aliased hash name. Unlinking the agmsg roster and
-deploying undeclared sub-skills were observed on 0.29.0 and not re-checked.
-Edit
-`apm.yml` until `git diff` shows only the removed line, follow the agmsg State
-section of `~/.apm/AGENTS.md`, then run `mise run deploy`, which removes the
-undeclared entries.
 
 ## Guardrail details
 

@@ -1877,7 +1877,7 @@ collect_external_skill_records() {
       normalize_repo($0) == normalize_repo(key) { found = 1; exit }
       END { exit(found ? 0 : 1) }
     ' "$manifest_keys_file"; then
-      error "External lock record is not declared in apm.yml: $canonical_ref"
+      error "External lock record is not declared in apm.yml: $canonical_ref (removed on purpose? run 'apm lock -g' then 'mise run deploy')"
       has_failure=1
       continue
     fi
