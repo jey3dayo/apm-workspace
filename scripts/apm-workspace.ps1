@@ -1517,18 +1517,42 @@ function Get-ExternalPackageSkillsRoot {
   $foundPath = $null
   foreach ($candidatePath in $candidatePaths) {
     $skillsRoot = Join-Path $candidatePath ".apm/skills"
-    if (-not (Test-Path -LiteralPath $skillsRoot -PathType Container)) {
-      continue
+    if (Test-Path -LiteralPath $skillsRoot -PathType Container) {
+      $resolvedRoot = $skillsRoot
+    } else {
+      $plainSkillsRoot = Join-Path $candidatePath "skills"
+      if ((Test-Path -LiteralPath $plainSkillsRoot -PathType Container) -and (Get-SkillIdsFromRoot -SkillsRoot $plainSkillsRoot).Count -gt 0) {
+        $resolvedRoot = $plainSkillsRoot
+      } else {
+        continue
+      }
     }
 
-    if ($null -ne $foundPath -and $foundPath -ne $skillsRoot) {
+    if ($null -ne $foundPath -and $foundPath -ne $resolvedRoot) {
       throw "Ambiguous external package cache paths for $RepoUrl/$VirtualPath"
     }
 
-    $foundPath = $skillsRoot
+    $foundPath = $resolvedRoot
   }
 
   return $foundPath
+}
+
+# A `.apm/skills` root has its `.claude/skills` sibling checked first, since apm
+# 0.29.0+ deploys the thin `.apm/skills` copy alongside the full upstream one. A
+# plain `skills/` root declared without `.apm/skills` has no such sibling
+# convention, so it is used as-is.
+function Test-ApmPackageSkillsRoot {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$PackageSkillsRoot
+  )
+
+  if ((Split-Path -Leaf $PackageSkillsRoot) -ne "skills") {
+    return $false
+  }
+
+  return (Split-Path -Leaf (Split-Path -Parent $PackageSkillsRoot)) -eq ".apm"
 }
 
 function Get-ExternalPackageSkillSourcePath {
@@ -1541,11 +1565,14 @@ function Get-ExternalPackageSkillSourcePath {
   )
 
   $relativeSkillPath = (Convert-SkillIdToPathSegments -SkillId $SkillId) -join [System.IO.Path]::DirectorySeparatorChar
-  $packageRoot = Split-Path -Parent (Split-Path -Parent $PackageSkillsRoot)
-  $claudeSkillPath = Join-Path $packageRoot ".claude/skills/$relativeSkillPath"
 
-  if (Test-Path -LiteralPath (Join-Path $claudeSkillPath "SKILL.md") -PathType Leaf) {
-    return $claudeSkillPath
+  if (Test-ApmPackageSkillsRoot -PackageSkillsRoot $PackageSkillsRoot) {
+    $packageRoot = Split-Path -Parent (Split-Path -Parent $PackageSkillsRoot)
+    $claudeSkillPath = Join-Path $packageRoot ".claude/skills/$relativeSkillPath"
+
+    if (Test-Path -LiteralPath (Join-Path $claudeSkillPath "SKILL.md") -PathType Leaf) {
+      return $claudeSkillPath
+    }
   }
 
   return (Join-Path $PackageSkillsRoot $relativeSkillPath)

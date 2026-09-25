@@ -452,6 +452,112 @@ dependencies:
     }
   }
 
+  It "resolves a plain skills/<name> bundle declared with a skills: subset" {
+    $previousWorkspaceDir = $script:WorkspaceDir
+    $previousGlobalWorkspaceDir = $global:WorkspaceDir
+    $workspaceDir = Join-Path $TestDrive "workspace-plain-skills-bundle"
+    $script:WorkspaceDir = $workspaceDir
+    $WorkspaceDir = $workspaceDir
+    $global:WorkspaceDir = $workspaceDir
+    New-Item -ItemType Directory -Path $workspaceDir -Force | Out-Null
+
+    @"
+name: apm-workspace
+version: 1.0.0
+description: test
+author: test
+dependencies:
+  apm:
+    - git: acme/bundle
+      skills:
+        - a
+        - c
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+    @"
+lockfile_version: "1"
+dependencies:
+  - repo_url: acme/bundle
+    host: github.com
+    resolved_commit: 1111111111111111111111111111111111111111
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
+
+    $bundleSkillsRoot = Join-Path (Join-Path (Join-Path $script:WorkspaceDir "apm_modules") "acme") "bundle"
+    $bundleSkillsRoot = Join-Path $bundleSkillsRoot "skills"
+    New-Item -ItemType Directory -Path (Join-Path $bundleSkillsRoot "a") -Force | Out-Null
+    New-Item -ItemType Directory -Path (Join-Path $bundleSkillsRoot "b") -Force | Out-Null
+    New-Item -ItemType Directory -Path (Join-Path $bundleSkillsRoot "c") -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $bundleSkillsRoot "a/SKILL.md") -Value "# a"
+    Set-Content -LiteralPath (Join-Path $bundleSkillsRoot "b/SKILL.md") -Value "# b"
+    Set-Content -LiteralPath (Join-Path $bundleSkillsRoot "c/SKILL.md") -Value "# c"
+
+    try {
+      $records = @(Get-ExternalSkillRecords)
+
+      $records.Count | Should -Be 2
+      $skillIds = @($records | ForEach-Object SourceSkillId | Sort-Object)
+      $skillIds | Should -Be @("a", "c")
+      $recordA = $records | Where-Object SourceSkillId -eq "a"
+      $recordA.SourcePath | Should -Be (Join-Path $bundleSkillsRoot "a")
+      $recordA.CanonicalReference | Should -Be "acme/bundle#a"
+    }
+    finally {
+      $script:WorkspaceDir = $previousWorkspaceDir
+      $global:WorkspaceDir = $previousGlobalWorkspaceDir
+    }
+  }
+
+  It "prefers .apm/skills over a sibling top-level skills/ directory" {
+    $previousWorkspaceDir = $script:WorkspaceDir
+    $previousGlobalWorkspaceDir = $global:WorkspaceDir
+    $workspaceDir = Join-Path $TestDrive "workspace-apm-skills-priority"
+    $script:WorkspaceDir = $workspaceDir
+    $WorkspaceDir = $workspaceDir
+    $global:WorkspaceDir = $workspaceDir
+    New-Item -ItemType Directory -Path $workspaceDir -Force | Out-Null
+
+    @"
+name: apm-workspace
+version: 1.0.0
+description: test
+author: test
+dependencies:
+  apm:
+    - git: acme/bundle2
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+    @"
+lockfile_version: "1"
+dependencies:
+  - repo_url: acme/bundle2
+    host: github.com
+    resolved_commit: 2222222222222222222222222222222222222222
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
+
+    $packageRoot = Join-Path (Join-Path (Join-Path $script:WorkspaceDir "apm_modules") "acme") "bundle2"
+    $apmSkillsRoot = Join-Path $packageRoot ".apm/skills/x"
+    $plainSkillsRoot = Join-Path $packageRoot "skills/y"
+    New-Item -ItemType Directory -Path $apmSkillsRoot -Force | Out-Null
+    New-Item -ItemType Directory -Path $plainSkillsRoot -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $apmSkillsRoot "SKILL.md") -Value "# x"
+    Set-Content -LiteralPath (Join-Path $plainSkillsRoot "SKILL.md") -Value "# y"
+
+    try {
+      $records = @(Get-ExternalSkillRecords)
+
+      $records.Count | Should -Be 1
+      $records[0].SourceSkillId | Should -Be "x"
+      $records[0].SourcePath | Should -Be $apmSkillsRoot
+      $records[0].CanonicalReference | Should -Be "acme/bundle2#x"
+    }
+    finally {
+      $script:WorkspaceDir = $previousWorkspaceDir
+      $global:WorkspaceDir = $previousGlobalWorkspaceDir
+    }
+  }
+
   It "reads only top-level lock dependency records" {
     @"
 lockfile_version: "1"

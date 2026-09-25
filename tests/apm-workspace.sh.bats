@@ -761,6 +761,67 @@ EOF
   rm -rf "$workspace_dir"
 }
 
+@test "collect_external_skill_records resolves a plain skills/<name> bundle declared with a skills: subset" {
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: acme/bundle
+      skills:
+        - a
+        - c
+EOF
+  cat >"$workspace_dir/apm.lock.yaml" <<'EOF'
+lockfile_version: '1'
+dependencies:
+- repo_url: acme/bundle
+  host: github.com
+  resolved_commit: 1111111111111111111111111111111111111111
+EOF
+  mkdir -p "$workspace_dir/apm_modules/acme/bundle/skills/a"
+  mkdir -p "$workspace_dir/apm_modules/acme/bundle/skills/b"
+  mkdir -p "$workspace_dir/apm_modules/acme/bundle/skills/c"
+  printf '%s\n' '# a' >"$workspace_dir/apm_modules/acme/bundle/skills/a/SKILL.md"
+  printf '%s\n' '# b' >"$workspace_dir/apm_modules/acme/bundle/skills/b/SKILL.md"
+  printf '%s\n' '# c' >"$workspace_dir/apm_modules/acme/bundle/skills/c/SKILL.md"
+  WORKSPACE_DIR="$workspace_dir"
+
+  run collect_external_skill_records
+  [ "$status" -eq 0 ]
+  expected=$'external\ta\t'"$workspace_dir"$'/apm_modules/acme/bundle/skills/a\tacme/bundle#a\n'
+  expected+=$'external\tc\t'"$workspace_dir"$'/apm_modules/acme/bundle/skills/c\tacme/bundle#c'
+  [ "$output" = "$expected" ]
+
+  rm -rf "$workspace_dir"
+}
+
+@test "collect_external_skill_records prefers .apm/skills over a sibling top-level skills/ directory" {
+  workspace_dir="$(mktemp -d)"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: acme/bundle2
+EOF
+  cat >"$workspace_dir/apm.lock.yaml" <<'EOF'
+lockfile_version: '1'
+dependencies:
+- repo_url: acme/bundle2
+  host: github.com
+  resolved_commit: 2222222222222222222222222222222222222222
+EOF
+  mkdir -p "$workspace_dir/apm_modules/acme/bundle2/.apm/skills/x"
+  mkdir -p "$workspace_dir/apm_modules/acme/bundle2/skills/y"
+  printf '%s\n' '# x' >"$workspace_dir/apm_modules/acme/bundle2/.apm/skills/x/SKILL.md"
+  printf '%s\n' '# y' >"$workspace_dir/apm_modules/acme/bundle2/skills/y/SKILL.md"
+  WORKSPACE_DIR="$workspace_dir"
+
+  run collect_external_skill_records
+  [ "$status" -eq 0 ]
+  [ "$output" = $'external\tx\t'"$workspace_dir"$'/apm_modules/acme/bundle2/.apm/skills/x\tacme/bundle2#x' ]
+
+  rm -rf "$workspace_dir"
+}
+
 @test "external_skill_id_from_record's alias derivation matches the name apm recorded in the lockfile's deployed_files" {
   workspace_dir="$(mktemp -d)"
   cat >"$workspace_dir/apm.yml" <<'EOF'

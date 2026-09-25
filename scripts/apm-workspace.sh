@@ -1781,11 +1781,20 @@ external_package_skills_root() {
   while IFS= read -r candidate_path; do
     [ -n "$candidate_path" ] || continue
     skills_root="$candidate_path/.apm/skills"
-    [ -d "$skills_root" ] || continue
-    if [ -n "$found_root" ] && [ "$found_root" != "$skills_root" ]; then
+    if [ -d "$skills_root" ]; then
+      resolved_root="$skills_root"
+    else
+      plain_skills_root="$candidate_path/skills"
+      if [ -d "$plain_skills_root" ] && [ -n "$(skill_ids_from_root "$plain_skills_root")" ]; then
+        resolved_root="$plain_skills_root"
+      else
+        continue
+      fi
+    fi
+    if [ -n "$found_root" ] && [ "$found_root" != "$resolved_root" ]; then
       fail "Ambiguous external package cache paths for $repo_url/$virtual_path"
     fi
-    found_root="$skills_root"
+    found_root="$resolved_root"
   done <<EOF
 $candidate_paths
 EOF
@@ -1798,13 +1807,17 @@ external_package_skill_source_path() {
   package_skills_root="$1"
   skill_id="$2"
   relative_skill_path=$(skill_id_to_manifest_path "$skill_id")
-  package_root=${package_skills_root%/.apm/skills}
-  claude_skill_path="$package_root/.claude/skills/$relative_skill_path"
 
-  if [ -f "$claude_skill_path/SKILL.md" ]; then
-    printf '%s\n' "$claude_skill_path"
-    return 0
-  fi
+  case "$package_skills_root" in
+    */.apm/skills)
+      package_root=${package_skills_root%/.apm/skills}
+      claude_skill_path="$package_root/.claude/skills/$relative_skill_path"
+      if [ -f "$claude_skill_path/SKILL.md" ]; then
+        printf '%s\n' "$claude_skill_path"
+        return 0
+      fi
+      ;;
+  esac
 
   printf '%s\n' "$package_skills_root/$relative_skill_path"
 }
