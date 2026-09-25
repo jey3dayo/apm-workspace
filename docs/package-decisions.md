@@ -624,3 +624,24 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 - 撤去: `caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout#main` を root `apm.yml` から外した。
 - 理由: 対象イベントが終了したため。
 - 手順: 行を消したあと `apm lock -g` で lock を manifest に合わせ、`mise run deploy` で `~/.claude/skills` / `~/.agents/skills` から配布を消した。lock で他に動いたのは `jey3dayo/apm-workspace/catalog#main` のブランチ再解決だけ。
+
+## `polish` を自動起動へ変更（2026-09-26）
+
+- 変更: `disable-model-invocation: true` を外し、`ship` の polish 工程から自動で呼ばれるようにした。
+- 理由: PR 前・作業終わりに毎回手動で `/polish` を起動していた。出荷の流れは `ship` に置いた（下の節）。
+- 代償: description 1 行が常時 skill 一覧に載る。2026-09-18 の「context load ゼロ」は撤回。
+- 実行形: `context: fork` + `agent: implementer` + `background: false`。polish はコメント清掃などの掃除で親が中身を知る必要がなく、fork なら `model: sonnet` がサブエージェントだけに効き親の後続作業（full gate・独立レビュー）を降格させない。`background: false` は polish の書き換え後に full gate を回す順序のため。Codex は skill 単位の model 指定が無く呼び出し側のモデルで動く。対象は ship から引数で渡し、削除候補の判断は親へ返す。
+
+## `model:` 指定スキルを fork 実行へ変更（2026-09-26）
+
+- 対象: `apm-deploy-verify` / `atomic-commit` / `docs-manager`（`polish` は上の節）。
+- 理由: `context: fork` の無い `model: sonnet` は、Opus / Fable の親が途中で呼ぶとそのターンの残り作業まで sonnet へ落とす。3件とも実行して結果を返すだけで親が中身を知る必要がないため、fork + `background: false` でサブエージェントだけを sonnet にする。
+- 代償: fork は会話履歴を見ないので対象は ARGUMENTS と git 状態から決める。`atomic-commit` の「意図不明の変更はユーザーに確認」は「保留して報告」へ変えた。
+- agent: `atomic-commit` は `general-purpose`（`implementer` は git index の変更を禁じる）、`docs-manager` は同名 agent（skill 本文が prompt のときは Skill で読み直さない）、他は `implementer`。
+
+## `ship` を新規追加（2026-09-26）
+
+- 追加理由: 実装後の polish → full gate → 独立レビュー → commit → push → PR → CI がほぼ固定の流れになり、毎回工程ごとに依頼していた。個別の skill 名と順序を global `AGENTS.md` に並べると他 repo へ持ち出しにくいため、流れは `ship` に閉じ、`AGENTS.md` には「仕上がったら `ship`」の案内と、停止・確認ポリシーでの常設の許可だけを置いた。
+- 形: 自動で出荷へ入るため model-invoked。範囲の判断・herdr での持ち主への依頼・承認待ちを親が担うので fork にせず `model:` も付けない。契機は「作業終わり」ではなく、観測できる行為（最終報告を書く前、commit / push / PR / deploy に進むとき）にした。
+- 許可: 引数・依頼文 > remote / gh が無ければ独立レビューまで > 自分が owner で fork ではない repo は PR まで（停止・確認ポリシーが常設の依頼として扱う）> それ以外は独立レビューまで。終点は repo の AGENTS.md が定めれば読み替えるが、許可は広げない。fork を除くのは `gh pr create` が既定で上流へ PR を作るため。
+- 含めないもの: PR のマージとレビュー指摘への対応。指摘は PR 作成直後には届いておらず、`gh-address-comments` / `gh-fix-ci` は途中で承認を待つ作りのため。

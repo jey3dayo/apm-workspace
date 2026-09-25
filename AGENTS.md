@@ -56,6 +56,10 @@ Classify work before running a rollout:
 for normal rollout. Use `mise run prepare:catalog`, then `mise run
 install:catalog`, and `mise run doctor` for pushed shared-guidance changes.
 
+Shipping here has no PR: commit directly on `main`, run `apm-deploy-verify`
+(it runs format, check, and deploy itself), then push `main` and watch the
+pushed CI run. `ship` reads this as the repository's end point.
+
 `mise.toml` manages required tools except `pwsh` plus Pester, which `test:ps`
 (and therefore `test`/`verify`) requires. The bold-heading formatter helper is
 vendored at `scripts/replace-bold-headings.ts`; a missing helper is a broken

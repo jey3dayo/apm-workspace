@@ -61,7 +61,7 @@
 - リファクタリング・解析: `refactoring`, `similarity`
 - ドキュメント: `docs-manager`, `docs-review`,
   `japanese-tech-writing`
-- Git・作業運用: `atomic-commit`, `git-worktree`, `ci-stability-hooks`,
+- Git・作業運用: `ship`, `atomic-commit`, `git-worktree`, `ci-stability-hooks`,
   `prepare-goal`
 - リサーチ: `web-research`（計画・並列委譲・Jina 収集・合成まで一体）
 

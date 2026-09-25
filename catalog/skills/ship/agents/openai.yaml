@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ship"
+  short_description: "Carry a finished change through polish, gate, review, commit, push, PR and CI as far as the repo allows"
+  default_prompt: "Use $ship to take the finished change through polish, full gate, review, commit, push, PR and CI, stopping where the repo's scope ends."
