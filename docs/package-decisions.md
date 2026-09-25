@@ -622,3 +622,9 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 - 更新手順: `apm.yml` の SHA を同じ repo の全行で揃えて上げ、`apm install -g --only apm` → `mise run deploy:fresh`。`apm install -g` は agmsg の db/teams symlink を外すので、`mise run doctor` で確かめて plain path が無ければ `mise run agmsg:state:restore`。
 - 前回の「ibelick/ui-skills の新構成と互換しない」は誤認だった。update の行き先が 2026-01 の古いタグ `v0.0.7`（`src/SKILL.md` だけの構造）だったためで、pin と HEAD の `skills/` は同一。
 - 再検討するなら: apm の update が pin より古いタグへ戻さなくなったとき。
+
+## `ai-butsukari-evidence-scout` を global から撤去（2026-09-25）
+
+- 撤去: `caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout#main` を root `apm.yml` から外した。
+- 理由: （未記入）
+- 手順: 行を消したあと `apm lock -g` で lock を manifest に合わせ、`mise run deploy` で `~/.claude/skills` / `~/.agents/skills` から配布を消した。lock で他に動いたのは `jey3dayo/apm-workspace/catalog#main` のブランチ再解決だけ。

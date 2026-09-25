@@ -16,7 +16,6 @@ dependencies:
     # --- org-restricted (caad-develop; requires org access) ---
     - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault#9869e9df63da283b29561923e7e5839a8a3d9152
     - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer#9869e9df63da283b29561923e7e5839a8a3d9152
-    - caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout#main
 
     # --- public ---
     # code quality / review
