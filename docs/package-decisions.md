@@ -626,5 +626,5 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 ## `ai-butsukari-evidence-scout` を global から撤去（2026-09-25）
 
 - 撤去: `caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout#main` を root `apm.yml` から外した。
-- 理由: （未記入）
+- 理由: 対象イベントが終了したため。
 - 手順: 行を消したあと `apm lock -g` で lock を manifest に合わせ、`mise run deploy` で `~/.claude/skills` / `~/.agents/skills` から配布を消した。lock で他に動いたのは `jey3dayo/apm-workspace/catalog#main` のブランチ再解決だけ。
