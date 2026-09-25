@@ -1,5 +1,5 @@
 lockfile_version: '2'
-generated_at: '2026-09-25T04:47:16.704277+00:00'
+generated_at: '2026-09-25T09:12:28.720108+00:00'
 apm_version: 0.31.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -32204,15 +32204,6 @@ deployments:
   content_hash: null
 - kind: uri
   target: mcp
-  value: mobbin
-  runtime: claude
-  scope: project
-  owners:
-  - .
-  active_owner: .
-  content_hash: null
-- kind: uri
-  target: mcp
   value: context7
   runtime: codex
   scope: project
@@ -32247,21 +32238,11 @@ deployments:
   - .
   active_owner: .
   content_hash: null
-- kind: uri
-  target: mcp
-  value: mobbin
-  runtime: codex
-  scope: project
-  owners:
-  - .
-  active_owner: .
-  content_hash: null
 mcp_servers:
 - context7
 - jina-reader
 - linear
 - mcp-simple-voicevox
-- mobbin
 mcp_configs:
   context7:
     name: context7
@@ -32273,14 +32254,14 @@ mcp_configs:
     command: npx
   jina-reader:
     name: jina-reader
-    transport: streamable-http
+    transport: http
     registry: false
     headers:
       Authorization: Bearer ${JINA_API_KEY}
     url: https://mcp.jina.ai/v1?include_tags=search,read
   linear:
     name: linear
-    transport: streamable-http
+    transport: http
     registry: false
     url: https://mcp.linear.app/mcp
   mcp-simple-voicevox:
@@ -32291,24 +32272,17 @@ mcp_configs:
     - '@t09tanaka/mcp-simple-voicevox'
     registry: false
     command: npx
-  mobbin:
-    name: mobbin
-    transport: http
-    registry: false
-    url: https://api.mobbin.com/mcp
 mcp_target_servers:
   claude:
   - context7
   - jina-reader
   - linear
   - mcp-simple-voicevox
-  - mobbin
   codex:
   - context7
   - jina-reader
   - linear
   - mcp-simple-voicevox
-  - mobbin
 local_deployed_files:
 - .agents/skills/agent-curation
 - .agents/skills/find-skills

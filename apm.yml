@@ -9,20 +9,23 @@ targets:
   - agent-skills
 dependencies:
   apm:
-    # --- workspace-owned (this repository) ---
+    # --- workspace ---
     - jey3dayo/apm-workspace/catalog#main
     - jey3dayo/apm-workspace/manual-skills#main
 
-    # --- org-restricted (caad-develop; requires org access) ---
+    # --- org-restricted ---
     - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault#9869e9df63da283b29561923e7e5839a8a3d9152
     - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer#9869e9df63da283b29561923e7e5839a8a3d9152
 
-    # --- public ---
-    # code quality / review
+    # --- review ---
     - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review#93b00b89ef425a9c1bac0d0b317dfc49c930ac99
     - shadcn/improve#03369ee6d7cafbfcecc4346539b05b3dc0a603bb
 
-    # engineering practice / productivity / writing
+    # --- engineering / writing ---
+    - coji/natural-japanese/skills/natural-japanese#9a78a42964096da509b8f3e011f0085a5f080151
+    - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
+      ref: 8f2d57610a73efc97d743c9b0b0ecb1002e09fa4
+      alias: japanese-tech-writing
     - git: mattpocock/skills
       ref: 3cca18b368ae95cdbdebbff572ccafa662551015
       skills:
@@ -36,32 +39,18 @@ dependencies:
         - wait-what
         - wayfinder
         - writing-for-agents
-    - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
-      ref: 8f2d57610a73efc97d743c9b0b0ecb1002e09fa4
-      alias: japanese-tech-writing
 
-    # react-specific
+    # --- react ---
     - millionco/react-doctor/skills/react-doctor#ff7dd679e8b9939a7dd8f828a530559a275836f7
     - vercel-labs/agent-skills/skills/react-best-practices#063bee94c3f4df8453406c830b0a7df0f2860278
 
-    # browser / analysis tools
-    - browser-use/browser-harness#eba1021c78dc8c1a4e78f98155396c4fa979b7f0
-    - tt-a1i/archify/archify#c6519401f7b91b9d43011657880893b0a8955548
-    - anthropics/claude-code/plugins/frontend-design/skills/frontend-design#ab9b2cf7bb9e4f98ff264c07a22e46d83c29c558
-
-    - openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431
-
     # --- design ---
+    - anthropics/claude-code/plugins/frontend-design/skills/frontend-design#ab9b2cf7bb9e4f98ff264c07a22e46d83c29c558
     - git: benjitaylor/agentation
       ref: 7982d83aa2d2ba46d0f68f257759ba527ba401a8
       skills:
         - agentation
         - agentation-self-driving
-    - git: nextlevelbuilder/ui-ux-pro-max-skill
-      ref: 4aad0584d92131626b16d4ff4d77f0455385013c
-      skills:
-        - ui-ux-pro-max
-    - Jakubantalik/transitions-dev/skills/transitions-dev#038b0bdc75375c2beed51d1e824c98cdc7b86f8c
     - git: emilkowalski/skills
       ref: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
       skills:
@@ -78,14 +67,24 @@ dependencies:
         - fixing-metadata
         - fixing-motion-performance
         - improve-ui
+    - Jakubantalik/transitions-dev/skills/transitions-dev#038b0bdc75375c2beed51d1e824c98cdc7b86f8c
+    - git: nextlevelbuilder/ui-ux-pro-max-skill
+      ref: 4aad0584d92131626b16d4ff4d77f0455385013c
+      skills:
+        - ui-ux-pro-max
 
-    # --- tools ---
-    - fujibee/agmsg#f9fb4f1398a6086135f88deea98b7e5600cb1cda
-    - modem-dev/hunk/packages/hunk/skills/hunk-review#3fdfde2dd77eb93802c43304c8edd34d79ce81de
+    # --- browser / analysis ---
+    - browser-use/browser-harness#eba1021c78dc8c1a4e78f98155396c4fa979b7f0
+    - openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431
+    - tt-a1i/archify/archify#c6519401f7b91b9d43011657880893b0a8955548
+
+    # --- agent tools ---
     - agavra/tuicr/skills/tuicr#b55e218f6d38a87ca4a6d9924a4c50b5f601dd07
+    - fujibee/agmsg#f9fb4f1398a6086135f88deea98b7e5600cb1cda
     - humanlayer/skills/plugins/show-me/skills/show-me#3c2629142c5d437428269b1b722b08c0b87f574d
+    - modem-dev/hunk/packages/hunk/skills/hunk-review#3fdfde2dd77eb93802c43304c8edd34d79ce81de
 
-    - coji/natural-japanese/skills/natural-japanese#9a78a42964096da509b8f3e011f0085a5f080151
+    # --- productivity / research ---
     - ayghri/i-have-adhd/skills/i-have-adhd#839872f9d1cd634fed642b4589ce7226199cc15f
     - mvanhorn/last30days-skill/skills/last30days#084662b501fb0dba95bd55eff0c258d35e0dc499
   mcp:
@@ -96,6 +95,17 @@ dependencies:
       args:
         - -y
         - "@upstash/context7-mcp@latest"
+    - name: jina-reader
+      registry: false
+      transport: http
+      url: https://mcp.jina.ai/v1?include_tags=search,read
+      headers:
+        Authorization: Bearer ${JINA_API_KEY}
+    # App-side connectors don't reach the CLI agents; ops rules and GraphQL fallback live in catalog/skills/linear-task-ops.
+    - name: linear
+      registry: false
+      transport: http
+      url: https://mcp.linear.app/mcp
     - name: mcp-simple-voicevox
       registry: false
       transport: stdio
@@ -103,19 +113,4 @@ dependencies:
       args:
         - -y
         - "@t09tanaka/mcp-simple-voicevox"
-    # Cross-repository public research foundation managed by this APM workspace.
-    # This manifest entry is the source of truth; runtime MCP blocks are deployed outputs.
-    - name: jina-reader
-      registry: false
-      transport: streamable-http
-      url: https://mcp.jina.ai/v1?include_tags=search,read
-      headers:
-        Authorization: Bearer ${JINA_API_KEY}
-    # Linear needs the same tool set on the CLI (Claude Code / Codex); app-side
-    # connectors alone are not enough, so it is back under APM management.
-    # Ops rules and GraphQL fallback live in catalog/skills/linear-task-ops.
-    - name: linear
-      registry: false
-      transport: streamable-http
-      url: https://mcp.linear.app/mcp
 scripts: {}
