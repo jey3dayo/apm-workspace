@@ -53,23 +53,32 @@ dependencies:
     - openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431
 
     # --- design ---
-    - benjitaylor/agentation/skills/agentation#7982d83aa2d2ba46d0f68f257759ba527ba401a8
-    - benjitaylor/agentation/skills/agentation-self-driving#7982d83aa2d2ba46d0f68f257759ba527ba401a8
+    - git: benjitaylor/agentation
+      ref: 7982d83aa2d2ba46d0f68f257759ba527ba401a8
+      skills:
+        - agentation
+        - agentation-self-driving
     - git: nextlevelbuilder/ui-ux-pro-max-skill
       ref: 4aad0584d92131626b16d4ff4d77f0455385013c
       skills:
         - ui-ux-pro-max
     - Jakubantalik/transitions-dev/skills/transitions-dev#038b0bdc75375c2beed51d1e824c98cdc7b86f8c
-    - emilkowalski/skills/skills/apple-design#d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
-    - emilkowalski/skills/skills/emil-design-eng#d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
-    - emilkowalski/skills/skills/find-animation-opportunities#d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
-    - emilkowalski/skills/skills/improve-animations#d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
-    - emilkowalski/skills/skills/review-animations#d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
-    - ibelick/ui-skills/skills/baseline-ui#f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
-    - ibelick/ui-skills/skills/fixing-accessibility#f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
-    - ibelick/ui-skills/skills/fixing-metadata#f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
-    - ibelick/ui-skills/skills/fixing-motion-performance#f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
-    - ibelick/ui-skills/skills/improve-ui#f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
+    - git: emilkowalski/skills
+      ref: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
+      skills:
+        - apple-design
+        - emil-design-eng
+        - find-animation-opportunities
+        - improve-animations
+        - review-animations
+    - git: ibelick/ui-skills
+      ref: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
+      skills:
+        - baseline-ui
+        - fixing-accessibility
+        - fixing-metadata
+        - fixing-motion-performance
+        - improve-ui
 
     # --- tools ---
     - fujibee/agmsg#f9fb4f1398a6086135f88deea98b7e5600cb1cda

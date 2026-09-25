@@ -1,5 +1,5 @@
 lockfile_version: '2'
-generated_at: '2026-09-25T02:58:20.854871+00:00'
+generated_at: '2026-09-25T03:27:40.632540+00:00'
 apm_version: 0.31.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -106,48 +106,29 @@ dependencies:
   resolved_commit: 7982d83aa2d2ba46d0f68f257759ba527ba401a8
   resolved_ref: 7982d83aa2d2ba46d0f68f257759ba527ba401a8
   version: unknown
-  virtual_path: skills/agentation
-  is_virtual: true
-  package_type: claude_skill
+  package_type: skill_bundle
   deployed_files:
   - .agents/skills/agentation
-  - .agents/skills/agentation/SKILL.md
-  - .claude/skills/agentation
-  - .claude/skills/agentation/SKILL.md
-  - .config/opencode/skills/agentation
-  - .config/opencode/skills/agentation/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/agentation/SKILL.md: sha256:09f4fee606d9f354b4e16eff5a83b3de1b5c35f89aa430c1e0976f214294f4c7
-    .claude/skills/agentation/SKILL.md: sha256:09f4fee606d9f354b4e16eff5a83b3de1b5c35f89aa430c1e0976f214294f4c7
-    .config/opencode/skills/agentation/SKILL.md: sha256:0b66fa852d1dfcd5de86e71970e6f484bcd44b991265f95034365c38ed1ad3a8
-  content_hash: sha256:52812c1707e9cc8ca68d9dba1dda4e307bfb57b2b3ab0ded89602972808cc699
-- repo_url: benjitaylor/agentation
-  name: agentation-self-driving
-  host: github.com
-  resolved_commit: 7982d83aa2d2ba46d0f68f257759ba527ba401a8
-  resolved_ref: 7982d83aa2d2ba46d0f68f257759ba527ba401a8
-  version: unknown
-  virtual_path: skills/agentation-self-driving
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
   - .agents/skills/agentation-self-driving
   - .agents/skills/agentation-self-driving/SKILL.md
   - .agents/skills/agentation-self-driving/references/two-session-workflow.md
+  - .agents/skills/agentation/SKILL.md
+  - .claude/skills/agentation
   - .claude/skills/agentation-self-driving
   - .claude/skills/agentation-self-driving/SKILL.md
   - .claude/skills/agentation-self-driving/references/two-session-workflow.md
-  - .config/opencode/skills/agentation-self-driving
-  - .config/opencode/skills/agentation-self-driving/SKILL.md
-  - .config/opencode/skills/agentation-self-driving/references/two-session-workflow.md
+  - .claude/skills/agentation/SKILL.md
   deployed_file_hashes:
     .agents/skills/agentation-self-driving/SKILL.md: sha256:3c556d51b44dfe5d898b7f955322a85a0bafda9f2e383c44d1b29be00052462a
     .agents/skills/agentation-self-driving/references/two-session-workflow.md: sha256:1b1f7c337c40c4f009e52eebd396d86b6adeb57221ad770b3b7cb254566c6e00
+    .agents/skills/agentation/SKILL.md: sha256:09f4fee606d9f354b4e16eff5a83b3de1b5c35f89aa430c1e0976f214294f4c7
     .claude/skills/agentation-self-driving/SKILL.md: sha256:3c556d51b44dfe5d898b7f955322a85a0bafda9f2e383c44d1b29be00052462a
     .claude/skills/agentation-self-driving/references/two-session-workflow.md: sha256:1b1f7c337c40c4f009e52eebd396d86b6adeb57221ad770b3b7cb254566c6e00
-    .config/opencode/skills/agentation-self-driving/SKILL.md: sha256:3a9d99a656ea7e9ff907c0b2a9a6a2a6a18bd285bd6ad4b5d9dc55b27233e08a
-    .config/opencode/skills/agentation-self-driving/references/two-session-workflow.md: sha256:3bff820a202d607cbf72a4b30ed9af28afa3b64ab83f63c3469b2f96a564f746
-  content_hash: sha256:f2239453083c4a0dc6033734e64451e788433b506bf948840b08799d1ac4a002
+    .claude/skills/agentation/SKILL.md: sha256:09f4fee606d9f354b4e16eff5a83b3de1b5c35f89aa430c1e0976f214294f4c7
+  content_hash: sha256:588ce714cd241bcdbeea19476b9def8da76eb84ef3dc5b85c38507feb6426d9b
+  skill_subset:
+  - agentation
+  - agentation-self-driving
 - repo_url: browser-use/browser-harness
   name: browser-harness
   host: github.com
@@ -526,128 +507,63 @@ dependencies:
     .config/opencode/skills/thermo-nuclear-code-quality-review/SKILL.md: sha256:7faca08b51b643b2ddd0836f92af15574444024685dcc1e677dbbb39ae8c9e8f
   content_hash: sha256:9052b01b46b1d8dbf94c45f9313ec1983443f9a460e83d49cdc7fe0f640ca476
 - repo_url: emilkowalski/skills
-  name: apple-design
+  name: skills
   host: github.com
   resolved_commit: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
   resolved_ref: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
   version: unknown
-  virtual_path: skills/apple-design
-  is_virtual: true
-  package_type: claude_skill
+  package_type: skill_bundle
   deployed_files:
   - .agents/skills/apple-design
   - .agents/skills/apple-design/SKILL.md
-  - .claude/skills/apple-design
-  - .claude/skills/apple-design/SKILL.md
-  - .config/opencode/skills/apple-design
-  - .config/opencode/skills/apple-design/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/apple-design/SKILL.md: sha256:11840b24a11d7f94f39c6aaab074750ae4e4de4ef54ee4b1dd97e16ebd485e61
-    .claude/skills/apple-design/SKILL.md: sha256:11840b24a11d7f94f39c6aaab074750ae4e4de4ef54ee4b1dd97e16ebd485e61
-    .config/opencode/skills/apple-design/SKILL.md: sha256:11840b24a11d7f94f39c6aaab074750ae4e4de4ef54ee4b1dd97e16ebd485e61
-  content_hash: sha256:8b94db67cb9edaad5f1501010804caa610131f1d2dfda0a27664b2e858deade3
-- repo_url: emilkowalski/skills
-  name: emil-design-eng
-  host: github.com
-  resolved_commit: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
-  resolved_ref: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
-  version: unknown
-  virtual_path: skills/emil-design-eng
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
   - .agents/skills/emil-design-eng
   - .agents/skills/emil-design-eng/SKILL.md
-  - .claude/skills/emil-design-eng
-  - .claude/skills/emil-design-eng/SKILL.md
-  - .config/opencode/skills/emil-design-eng
-  - .config/opencode/skills/emil-design-eng/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/emil-design-eng/SKILL.md: sha256:e71de849347050c2c573c1cf24d742d5a13459557ecffa6e562f08006f46b5b7
-    .claude/skills/emil-design-eng/SKILL.md: sha256:e71de849347050c2c573c1cf24d742d5a13459557ecffa6e562f08006f46b5b7
-    .config/opencode/skills/emil-design-eng/SKILL.md: sha256:e71de849347050c2c573c1cf24d742d5a13459557ecffa6e562f08006f46b5b7
-  content_hash: sha256:41b0a4dc1a27164fe297845a6c6850a39e9242c42c9be999967fcee9df2c5974
-- repo_url: emilkowalski/skills
-  name: find-animation-opportunities
-  host: github.com
-  resolved_commit: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
-  resolved_ref: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
-  version: unknown
-  virtual_path: skills/find-animation-opportunities
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
   - .agents/skills/find-animation-opportunities
   - .agents/skills/find-animation-opportunities/SKILL.md
-  - .claude/skills/find-animation-opportunities
-  - .claude/skills/find-animation-opportunities/SKILL.md
-  - .config/opencode/skills/find-animation-opportunities
-  - .config/opencode/skills/find-animation-opportunities/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/find-animation-opportunities/SKILL.md: sha256:91c1243164057fbf824088d12faea937878a757a7ac653e8288b775e8b27b882
-    .claude/skills/find-animation-opportunities/SKILL.md: sha256:91c1243164057fbf824088d12faea937878a757a7ac653e8288b775e8b27b882
-    .config/opencode/skills/find-animation-opportunities/SKILL.md: sha256:91c1243164057fbf824088d12faea937878a757a7ac653e8288b775e8b27b882
-  content_hash: sha256:8fb8492eb8fbed1313cb430b5831d925d9b8964ca24f3c41a6244cbd1fd98732
-- repo_url: emilkowalski/skills
-  name: improve-animations
-  host: github.com
-  resolved_commit: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
-  resolved_ref: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
-  version: unknown
-  virtual_path: skills/improve-animations
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
   - .agents/skills/improve-animations
   - .agents/skills/improve-animations/AUDIT.md
   - .agents/skills/improve-animations/PLAN-TEMPLATE.md
   - .agents/skills/improve-animations/SKILL.md
+  - .agents/skills/review-animations
+  - .agents/skills/review-animations/SKILL.md
+  - .agents/skills/review-animations/STANDARDS.md
+  - .claude/skills/apple-design
+  - .claude/skills/apple-design/SKILL.md
+  - .claude/skills/emil-design-eng
+  - .claude/skills/emil-design-eng/SKILL.md
+  - .claude/skills/find-animation-opportunities
+  - .claude/skills/find-animation-opportunities/SKILL.md
   - .claude/skills/improve-animations
   - .claude/skills/improve-animations/AUDIT.md
   - .claude/skills/improve-animations/PLAN-TEMPLATE.md
   - .claude/skills/improve-animations/SKILL.md
-  - .config/opencode/skills/improve-animations
-  - .config/opencode/skills/improve-animations/AUDIT.md
-  - .config/opencode/skills/improve-animations/PLAN-TEMPLATE.md
-  - .config/opencode/skills/improve-animations/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/improve-animations/AUDIT.md: sha256:551c8473e20e5f4774680bc24d45e1c68e50992582720905c6b077756b7b5a55
-    .agents/skills/improve-animations/PLAN-TEMPLATE.md: sha256:0a08ac8e23fd2082d7ffb86aeed7b789de77328c3cf874b16f1a755f2ef0a6ad
-    .agents/skills/improve-animations/SKILL.md: sha256:68f17bbc4671593d2f43dba26a679243e2153ba5f26965fb7d59df52842534ff
-    .claude/skills/improve-animations/AUDIT.md: sha256:551c8473e20e5f4774680bc24d45e1c68e50992582720905c6b077756b7b5a55
-    .claude/skills/improve-animations/PLAN-TEMPLATE.md: sha256:0a08ac8e23fd2082d7ffb86aeed7b789de77328c3cf874b16f1a755f2ef0a6ad
-    .claude/skills/improve-animations/SKILL.md: sha256:68f17bbc4671593d2f43dba26a679243e2153ba5f26965fb7d59df52842534ff
-    .config/opencode/skills/improve-animations/AUDIT.md: sha256:551c8473e20e5f4774680bc24d45e1c68e50992582720905c6b077756b7b5a55
-    .config/opencode/skills/improve-animations/PLAN-TEMPLATE.md: sha256:0a08ac8e23fd2082d7ffb86aeed7b789de77328c3cf874b16f1a755f2ef0a6ad
-    .config/opencode/skills/improve-animations/SKILL.md: sha256:68f17bbc4671593d2f43dba26a679243e2153ba5f26965fb7d59df52842534ff
-  content_hash: sha256:eeb219a407e325b687af88db25771cc3018e3148245604112f5ac6990b6fd79c
-- repo_url: emilkowalski/skills
-  name: review-animations
-  host: github.com
-  resolved_commit: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
-  resolved_ref: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
-  version: unknown
-  virtual_path: skills/review-animations
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/review-animations
-  - .agents/skills/review-animations/SKILL.md
-  - .agents/skills/review-animations/STANDARDS.md
   - .claude/skills/review-animations
   - .claude/skills/review-animations/SKILL.md
   - .claude/skills/review-animations/STANDARDS.md
-  - .config/opencode/skills/review-animations
-  - .config/opencode/skills/review-animations/SKILL.md
-  - .config/opencode/skills/review-animations/STANDARDS.md
   deployed_file_hashes:
+    .agents/skills/apple-design/SKILL.md: sha256:11840b24a11d7f94f39c6aaab074750ae4e4de4ef54ee4b1dd97e16ebd485e61
+    .agents/skills/emil-design-eng/SKILL.md: sha256:e71de849347050c2c573c1cf24d742d5a13459557ecffa6e562f08006f46b5b7
+    .agents/skills/find-animation-opportunities/SKILL.md: sha256:91c1243164057fbf824088d12faea937878a757a7ac653e8288b775e8b27b882
+    .agents/skills/improve-animations/AUDIT.md: sha256:551c8473e20e5f4774680bc24d45e1c68e50992582720905c6b077756b7b5a55
+    .agents/skills/improve-animations/PLAN-TEMPLATE.md: sha256:0a08ac8e23fd2082d7ffb86aeed7b789de77328c3cf874b16f1a755f2ef0a6ad
+    .agents/skills/improve-animations/SKILL.md: sha256:68f17bbc4671593d2f43dba26a679243e2153ba5f26965fb7d59df52842534ff
     .agents/skills/review-animations/SKILL.md: sha256:61cf8ac0c4c8e1f63385298c546b16c65ca9aec34abddcd04e821c16712d671d
     .agents/skills/review-animations/STANDARDS.md: sha256:e7d3605034acda54ca13e43aec9e64d65b53de20f75b11b8d694e373012fbe07
+    .claude/skills/apple-design/SKILL.md: sha256:11840b24a11d7f94f39c6aaab074750ae4e4de4ef54ee4b1dd97e16ebd485e61
+    .claude/skills/emil-design-eng/SKILL.md: sha256:e71de849347050c2c573c1cf24d742d5a13459557ecffa6e562f08006f46b5b7
+    .claude/skills/find-animation-opportunities/SKILL.md: sha256:91c1243164057fbf824088d12faea937878a757a7ac653e8288b775e8b27b882
+    .claude/skills/improve-animations/AUDIT.md: sha256:551c8473e20e5f4774680bc24d45e1c68e50992582720905c6b077756b7b5a55
+    .claude/skills/improve-animations/PLAN-TEMPLATE.md: sha256:0a08ac8e23fd2082d7ffb86aeed7b789de77328c3cf874b16f1a755f2ef0a6ad
+    .claude/skills/improve-animations/SKILL.md: sha256:68f17bbc4671593d2f43dba26a679243e2153ba5f26965fb7d59df52842534ff
     .claude/skills/review-animations/SKILL.md: sha256:61cf8ac0c4c8e1f63385298c546b16c65ca9aec34abddcd04e821c16712d671d
     .claude/skills/review-animations/STANDARDS.md: sha256:e7d3605034acda54ca13e43aec9e64d65b53de20f75b11b8d694e373012fbe07
-    .config/opencode/skills/review-animations/SKILL.md: sha256:61cf8ac0c4c8e1f63385298c546b16c65ca9aec34abddcd04e821c16712d671d
-    .config/opencode/skills/review-animations/STANDARDS.md: sha256:e7d3605034acda54ca13e43aec9e64d65b53de20f75b11b8d694e373012fbe07
-  content_hash: sha256:b9f669af5ae280c19a592a94611520335a81de25c88f225bf60ae4b2d66c8c7c
+  content_hash: sha256:071c5ca2527b9ad32a3ab4c86ff284f0024cb62790f530f0d23ea32ad8616323
+  skill_subset:
+  - apple-design
+  - emil-design-eng
+  - find-animation-opportunities
+  - improve-animations
+  - review-animations
 - repo_url: fujibee/agmsg
   name: agmsg
   host: github.com
@@ -4344,122 +4260,59 @@ dependencies:
     .config/opencode/skills/show-me/SKILL.md: sha256:bea6da70a58096730b9aeb0bae293ddf4726103a98efc9ce13c481619942a810
   content_hash: sha256:de32a72f802801f08a84641b467f2c6306d35a58ce5e59ea607ac3a993a18c91
 - repo_url: ibelick/ui-skills
-  name: baseline-ui
+  name: ui-skills
   host: github.com
   resolved_commit: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
   resolved_ref: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
   version: unknown
-  virtual_path: skills/baseline-ui
-  is_virtual: true
-  package_type: claude_skill
+  package_type: skill_bundle
   deployed_files:
   - .agents/skills/baseline-ui
   - .agents/skills/baseline-ui/SKILL.md
-  - .claude/skills/baseline-ui
-  - .claude/skills/baseline-ui/SKILL.md
-  - .config/opencode/skills/baseline-ui
-  - .config/opencode/skills/baseline-ui/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/baseline-ui/SKILL.md: sha256:fea3322f36d58fdafafce2aef56e4556dd2ac7b20876b7dff7d8be7f25fa597f
-    .claude/skills/baseline-ui/SKILL.md: sha256:fea3322f36d58fdafafce2aef56e4556dd2ac7b20876b7dff7d8be7f25fa597f
-    .config/opencode/skills/baseline-ui/SKILL.md: sha256:fea3322f36d58fdafafce2aef56e4556dd2ac7b20876b7dff7d8be7f25fa597f
-  content_hash: sha256:dfcb3e778b57ad1cba92375689bb8265fa5aef78fba523a744f5220b3c619901
-- repo_url: ibelick/ui-skills
-  name: fixing-accessibility
-  host: github.com
-  resolved_commit: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
-  resolved_ref: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
-  version: unknown
-  virtual_path: skills/fixing-accessibility
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
   - .agents/skills/fixing-accessibility
   - .agents/skills/fixing-accessibility/SKILL.md
-  - .claude/skills/fixing-accessibility
-  - .claude/skills/fixing-accessibility/SKILL.md
-  - .config/opencode/skills/fixing-accessibility
-  - .config/opencode/skills/fixing-accessibility/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/fixing-accessibility/SKILL.md: sha256:549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf
-    .claude/skills/fixing-accessibility/SKILL.md: sha256:549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf
-    .config/opencode/skills/fixing-accessibility/SKILL.md: sha256:549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf
-  content_hash: sha256:4fa8f5a772b4eef3d28a54c136b507d070e54e2c326578f65eaf5e5a0118b38a
-- repo_url: ibelick/ui-skills
-  name: fixing-metadata
-  host: github.com
-  resolved_commit: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
-  resolved_ref: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
-  version: unknown
-  virtual_path: skills/fixing-metadata
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
   - .agents/skills/fixing-metadata
   - .agents/skills/fixing-metadata/SKILL.md
-  - .claude/skills/fixing-metadata
-  - .claude/skills/fixing-metadata/SKILL.md
-  - .config/opencode/skills/fixing-metadata
-  - .config/opencode/skills/fixing-metadata/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/fixing-metadata/SKILL.md: sha256:b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547
-    .claude/skills/fixing-metadata/SKILL.md: sha256:b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547
-    .config/opencode/skills/fixing-metadata/SKILL.md: sha256:b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547
-  content_hash: sha256:699e13890fb50acffa02dfd2d5b0e719bd916a9e2b7e6035bdc4513fc73d9174
-- repo_url: ibelick/ui-skills
-  name: fixing-motion-performance
-  host: github.com
-  resolved_commit: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
-  resolved_ref: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
-  version: unknown
-  virtual_path: skills/fixing-motion-performance
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
   - .agents/skills/fixing-motion-performance
   - .agents/skills/fixing-motion-performance/SKILL.md
-  - .claude/skills/fixing-motion-performance
-  - .claude/skills/fixing-motion-performance/SKILL.md
-  - .config/opencode/skills/fixing-motion-performance
-  - .config/opencode/skills/fixing-motion-performance/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/fixing-motion-performance/SKILL.md: sha256:0a2d654902bc04263ce68c8c02967ef03f17b482e855360a5463211d99d7baa9
-    .claude/skills/fixing-motion-performance/SKILL.md: sha256:0a2d654902bc04263ce68c8c02967ef03f17b482e855360a5463211d99d7baa9
-    .config/opencode/skills/fixing-motion-performance/SKILL.md: sha256:0a2d654902bc04263ce68c8c02967ef03f17b482e855360a5463211d99d7baa9
-  content_hash: sha256:426dcf33f23419643f2aab71e2253e1a5b5684a808fabb8a4ad135e489ed7a0f
-- repo_url: ibelick/ui-skills
-  name: improve-ui
-  host: github.com
-  resolved_commit: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
-  resolved_ref: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
-  version: unknown
-  virtual_path: skills/improve-ui
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
   - .agents/skills/improve-ui
   - .agents/skills/improve-ui/SKILL.md
   - .agents/skills/improve-ui/agents/openai.yaml
   - .agents/skills/improve-ui/references/plan-template.md
+  - .claude/skills/baseline-ui
+  - .claude/skills/baseline-ui/SKILL.md
+  - .claude/skills/fixing-accessibility
+  - .claude/skills/fixing-accessibility/SKILL.md
+  - .claude/skills/fixing-metadata
+  - .claude/skills/fixing-metadata/SKILL.md
+  - .claude/skills/fixing-motion-performance
+  - .claude/skills/fixing-motion-performance/SKILL.md
   - .claude/skills/improve-ui
   - .claude/skills/improve-ui/SKILL.md
   - .claude/skills/improve-ui/agents/openai.yaml
   - .claude/skills/improve-ui/references/plan-template.md
-  - .config/opencode/skills/improve-ui
-  - .config/opencode/skills/improve-ui/SKILL.md
-  - .config/opencode/skills/improve-ui/agents/openai.yaml
-  - .config/opencode/skills/improve-ui/references/plan-template.md
   deployed_file_hashes:
+    .agents/skills/baseline-ui/SKILL.md: sha256:fea3322f36d58fdafafce2aef56e4556dd2ac7b20876b7dff7d8be7f25fa597f
+    .agents/skills/fixing-accessibility/SKILL.md: sha256:549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf
+    .agents/skills/fixing-metadata/SKILL.md: sha256:b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547
+    .agents/skills/fixing-motion-performance/SKILL.md: sha256:0a2d654902bc04263ce68c8c02967ef03f17b482e855360a5463211d99d7baa9
     .agents/skills/improve-ui/SKILL.md: sha256:fa2ac808f6d9dab7bb3620880b014d2c18e227e5b006102856038096e573e69a
     .agents/skills/improve-ui/agents/openai.yaml: sha256:933af431364517518cbcfcd4e70eb8e8b390ead920abc48c071a4eedb6747183
     .agents/skills/improve-ui/references/plan-template.md: sha256:8faca7a14659a7f951d3b89fb730a43a4ce99966cc00481bf83d82b90f34b868
+    .claude/skills/baseline-ui/SKILL.md: sha256:fea3322f36d58fdafafce2aef56e4556dd2ac7b20876b7dff7d8be7f25fa597f
+    .claude/skills/fixing-accessibility/SKILL.md: sha256:549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf
+    .claude/skills/fixing-metadata/SKILL.md: sha256:b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547
+    .claude/skills/fixing-motion-performance/SKILL.md: sha256:0a2d654902bc04263ce68c8c02967ef03f17b482e855360a5463211d99d7baa9
     .claude/skills/improve-ui/SKILL.md: sha256:fa2ac808f6d9dab7bb3620880b014d2c18e227e5b006102856038096e573e69a
     .claude/skills/improve-ui/agents/openai.yaml: sha256:933af431364517518cbcfcd4e70eb8e8b390ead920abc48c071a4eedb6747183
     .claude/skills/improve-ui/references/plan-template.md: sha256:8faca7a14659a7f951d3b89fb730a43a4ce99966cc00481bf83d82b90f34b868
-    .config/opencode/skills/improve-ui/SKILL.md: sha256:fa2ac808f6d9dab7bb3620880b014d2c18e227e5b006102856038096e573e69a
-    .config/opencode/skills/improve-ui/agents/openai.yaml: sha256:933af431364517518cbcfcd4e70eb8e8b390ead920abc48c071a4eedb6747183
-    .config/opencode/skills/improve-ui/references/plan-template.md: sha256:8faca7a14659a7f951d3b89fb730a43a4ce99966cc00481bf83d82b90f34b868
-  content_hash: sha256:60ffe2cfab2fe0fde3fb483dec28c48dacbff361df7096648a3f794c7c519110
+  content_hash: sha256:5fd0aa8180f94943f458b36798006eca2a4d9e1870fb32ef5cce9dc171e22f8a
+  skill_subset:
+  - baseline-ui
+  - fixing-accessibility
+  - fixing-metadata
+  - fixing-motion-performance
+  - improve-ui
 - repo_url: jakubantalik/transitions-dev
   materialization_repo_url: Jakubantalik/transitions-dev
   name: transitions-dev
@@ -8665,8 +8518,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - benjitaylor/agentation/skills/agentation
-  active_owner: benjitaylor/agentation/skills/agentation
+  - benjitaylor/agentation
+  active_owner: benjitaylor/agentation
   content_hash: null
 - kind: project-relative
   target: claude
@@ -8674,8 +8527,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - benjitaylor/agentation/skills/agentation-self-driving
-  active_owner: benjitaylor/agentation/skills/agentation-self-driving
+  - benjitaylor/agentation
+  active_owner: benjitaylor/agentation
   content_hash: null
 - kind: project-relative
   target: claude
@@ -8683,8 +8536,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - benjitaylor/agentation/skills/agentation-self-driving
-  active_owner: benjitaylor/agentation/skills/agentation-self-driving
+  - benjitaylor/agentation
+  active_owner: benjitaylor/agentation
   content_hash: sha256:3c556d51b44dfe5d898b7f955322a85a0bafda9f2e383c44d1b29be00052462a
 - kind: project-relative
   target: claude
@@ -8692,8 +8545,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - benjitaylor/agentation/skills/agentation-self-driving
-  active_owner: benjitaylor/agentation/skills/agentation-self-driving
+  - benjitaylor/agentation
+  active_owner: benjitaylor/agentation
   content_hash: sha256:1b1f7c337c40c4f009e52eebd396d86b6adeb57221ad770b3b7cb254566c6e00
 - kind: project-relative
   target: claude
@@ -8701,8 +8554,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - benjitaylor/agentation/skills/agentation
-  active_owner: benjitaylor/agentation/skills/agentation
+  - benjitaylor/agentation
+  active_owner: benjitaylor/agentation
   content_hash: sha256:09f4fee606d9f354b4e16eff5a83b3de1b5c35f89aa430c1e0976f214294f4c7
 - kind: project-relative
   target: claude
@@ -14866,8 +14719,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/apple-design
-  active_owner: emilkowalski/skills/skills/apple-design
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: null
 - kind: project-relative
   target: claude
@@ -14875,8 +14728,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/apple-design
-  active_owner: emilkowalski/skills/skills/apple-design
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: sha256:11840b24a11d7f94f39c6aaab074750ae4e4de4ef54ee4b1dd97e16ebd485e61
 - kind: project-relative
   target: claude
@@ -16657,8 +16510,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/baseline-ui
-  active_owner: ibelick/ui-skills/skills/baseline-ui
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: null
 - kind: project-relative
   target: claude
@@ -16666,8 +16519,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/baseline-ui
-  active_owner: ibelick/ui-skills/skills/baseline-ui
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: sha256:fea3322f36d58fdafafce2aef56e4556dd2ac7b20876b7dff7d8be7f25fa597f
 - kind: project-relative
   target: claude
@@ -17107,8 +16960,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/emil-design-eng
-  active_owner: emilkowalski/skills/skills/emil-design-eng
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: null
 - kind: project-relative
   target: claude
@@ -17116,8 +16969,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/emil-design-eng
-  active_owner: emilkowalski/skills/skills/emil-design-eng
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: sha256:e71de849347050c2c573c1cf24d742d5a13459557ecffa6e562f08006f46b5b7
 - kind: project-relative
   target: claude
@@ -17125,8 +16978,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/find-animation-opportunities
-  active_owner: emilkowalski/skills/skills/find-animation-opportunities
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: null
 - kind: project-relative
   target: claude
@@ -17134,8 +16987,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/find-animation-opportunities
-  active_owner: emilkowalski/skills/skills/find-animation-opportunities
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: sha256:91c1243164057fbf824088d12faea937878a757a7ac653e8288b775e8b27b882
 - kind: project-relative
   target: claude
@@ -17143,8 +16996,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/fixing-accessibility
-  active_owner: ibelick/ui-skills/skills/fixing-accessibility
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: null
 - kind: project-relative
   target: claude
@@ -17152,8 +17005,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/fixing-accessibility
-  active_owner: ibelick/ui-skills/skills/fixing-accessibility
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: sha256:549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf
 - kind: project-relative
   target: claude
@@ -17161,8 +17014,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/fixing-metadata
-  active_owner: ibelick/ui-skills/skills/fixing-metadata
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: null
 - kind: project-relative
   target: claude
@@ -17170,8 +17023,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/fixing-metadata
-  active_owner: ibelick/ui-skills/skills/fixing-metadata
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: sha256:b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547
 - kind: project-relative
   target: claude
@@ -17179,8 +17032,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/fixing-motion-performance
-  active_owner: ibelick/ui-skills/skills/fixing-motion-performance
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: null
 - kind: project-relative
   target: claude
@@ -17188,8 +17041,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/fixing-motion-performance
-  active_owner: ibelick/ui-skills/skills/fixing-motion-performance
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: sha256:0a2d654902bc04263ce68c8c02967ef03f17b482e855360a5463211d99d7baa9
 - kind: project-relative
   target: claude
@@ -17566,8 +17419,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/improve-animations
-  active_owner: emilkowalski/skills/skills/improve-animations
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: null
 - kind: project-relative
   target: claude
@@ -17575,8 +17428,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/improve-animations
-  active_owner: emilkowalski/skills/skills/improve-animations
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: sha256:551c8473e20e5f4774680bc24d45e1c68e50992582720905c6b077756b7b5a55
 - kind: project-relative
   target: claude
@@ -17584,8 +17437,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/improve-animations
-  active_owner: emilkowalski/skills/skills/improve-animations
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: sha256:0a08ac8e23fd2082d7ffb86aeed7b789de77328c3cf874b16f1a755f2ef0a6ad
 - kind: project-relative
   target: claude
@@ -17593,8 +17446,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/improve-animations
-  active_owner: emilkowalski/skills/skills/improve-animations
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: sha256:68f17bbc4671593d2f43dba26a679243e2153ba5f26965fb7d59df52842534ff
 - kind: project-relative
   target: claude
@@ -17638,8 +17491,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/improve-ui
-  active_owner: ibelick/ui-skills/skills/improve-ui
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: null
 - kind: project-relative
   target: claude
@@ -17647,8 +17500,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/improve-ui
-  active_owner: ibelick/ui-skills/skills/improve-ui
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: sha256:fa2ac808f6d9dab7bb3620880b014d2c18e227e5b006102856038096e573e69a
 - kind: project-relative
   target: claude
@@ -17656,8 +17509,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/improve-ui
-  active_owner: ibelick/ui-skills/skills/improve-ui
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: sha256:933af431364517518cbcfcd4e70eb8e8b390ead920abc48c071a4eedb6747183
 - kind: project-relative
   target: claude
@@ -17665,8 +17518,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/improve-ui
-  active_owner: ibelick/ui-skills/skills/improve-ui
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: sha256:8faca7a14659a7f951d3b89fb730a43a4ce99966cc00481bf83d82b90f34b868
 - kind: project-relative
   target: claude
@@ -20410,8 +20263,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/review-animations
-  active_owner: emilkowalski/skills/skills/review-animations
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: null
 - kind: project-relative
   target: claude
@@ -20419,8 +20272,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/review-animations
-  active_owner: emilkowalski/skills/skills/review-animations
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: sha256:61cf8ac0c4c8e1f63385298c546b16c65ca9aec34abddcd04e821c16712d671d
 - kind: project-relative
   target: claude
@@ -20428,8 +20281,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/review-animations
-  active_owner: emilkowalski/skills/skills/review-animations
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: sha256:e7d3605034acda54ca13e43aec9e64d65b53de20f75b11b8d694e373012fbe07
 - kind: project-relative
   target: claude
@@ -21787,8 +21640,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - benjitaylor/agentation/skills/agentation
-  active_owner: benjitaylor/agentation/skills/agentation
+  - benjitaylor/agentation
+  active_owner: benjitaylor/agentation
   content_hash: null
 - kind: project-relative
   target: codex
@@ -21796,8 +21649,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - benjitaylor/agentation/skills/agentation-self-driving
-  active_owner: benjitaylor/agentation/skills/agentation-self-driving
+  - benjitaylor/agentation
+  active_owner: benjitaylor/agentation
   content_hash: null
 - kind: project-relative
   target: codex
@@ -21805,8 +21658,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - benjitaylor/agentation/skills/agentation-self-driving
-  active_owner: benjitaylor/agentation/skills/agentation-self-driving
+  - benjitaylor/agentation
+  active_owner: benjitaylor/agentation
   content_hash: sha256:3c556d51b44dfe5d898b7f955322a85a0bafda9f2e383c44d1b29be00052462a
 - kind: project-relative
   target: codex
@@ -21814,8 +21667,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - benjitaylor/agentation/skills/agentation-self-driving
-  active_owner: benjitaylor/agentation/skills/agentation-self-driving
+  - benjitaylor/agentation
+  active_owner: benjitaylor/agentation
   content_hash: sha256:1b1f7c337c40c4f009e52eebd396d86b6adeb57221ad770b3b7cb254566c6e00
 - kind: project-relative
   target: codex
@@ -21823,8 +21676,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - benjitaylor/agentation/skills/agentation
-  active_owner: benjitaylor/agentation/skills/agentation
+  - benjitaylor/agentation
+  active_owner: benjitaylor/agentation
   content_hash: sha256:09f4fee606d9f354b4e16eff5a83b3de1b5c35f89aa430c1e0976f214294f4c7
 - kind: project-relative
   target: codex
@@ -27988,8 +27841,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/apple-design
-  active_owner: emilkowalski/skills/skills/apple-design
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: null
 - kind: project-relative
   target: codex
@@ -27997,8 +27850,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/apple-design
-  active_owner: emilkowalski/skills/skills/apple-design
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: sha256:11840b24a11d7f94f39c6aaab074750ae4e4de4ef54ee4b1dd97e16ebd485e61
 - kind: project-relative
   target: codex
@@ -29779,8 +29632,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/baseline-ui
-  active_owner: ibelick/ui-skills/skills/baseline-ui
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: null
 - kind: project-relative
   target: codex
@@ -29788,8 +29641,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/baseline-ui
-  active_owner: ibelick/ui-skills/skills/baseline-ui
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: sha256:fea3322f36d58fdafafce2aef56e4556dd2ac7b20876b7dff7d8be7f25fa597f
 - kind: project-relative
   target: codex
@@ -30229,8 +30082,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/emil-design-eng
-  active_owner: emilkowalski/skills/skills/emil-design-eng
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: null
 - kind: project-relative
   target: codex
@@ -30238,8 +30091,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/emil-design-eng
-  active_owner: emilkowalski/skills/skills/emil-design-eng
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: sha256:e71de849347050c2c573c1cf24d742d5a13459557ecffa6e562f08006f46b5b7
 - kind: project-relative
   target: codex
@@ -30247,8 +30100,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/find-animation-opportunities
-  active_owner: emilkowalski/skills/skills/find-animation-opportunities
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: null
 - kind: project-relative
   target: codex
@@ -30256,8 +30109,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/find-animation-opportunities
-  active_owner: emilkowalski/skills/skills/find-animation-opportunities
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: sha256:91c1243164057fbf824088d12faea937878a757a7ac653e8288b775e8b27b882
 - kind: project-relative
   target: codex
@@ -30265,8 +30118,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/fixing-accessibility
-  active_owner: ibelick/ui-skills/skills/fixing-accessibility
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: null
 - kind: project-relative
   target: codex
@@ -30274,8 +30127,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/fixing-accessibility
-  active_owner: ibelick/ui-skills/skills/fixing-accessibility
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: sha256:549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf
 - kind: project-relative
   target: codex
@@ -30283,8 +30136,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/fixing-metadata
-  active_owner: ibelick/ui-skills/skills/fixing-metadata
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: null
 - kind: project-relative
   target: codex
@@ -30292,8 +30145,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/fixing-metadata
-  active_owner: ibelick/ui-skills/skills/fixing-metadata
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: sha256:b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547
 - kind: project-relative
   target: codex
@@ -30301,8 +30154,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/fixing-motion-performance
-  active_owner: ibelick/ui-skills/skills/fixing-motion-performance
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: null
 - kind: project-relative
   target: codex
@@ -30310,8 +30163,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/fixing-motion-performance
-  active_owner: ibelick/ui-skills/skills/fixing-motion-performance
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: sha256:0a2d654902bc04263ce68c8c02967ef03f17b482e855360a5463211d99d7baa9
 - kind: project-relative
   target: codex
@@ -30688,8 +30541,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/improve-animations
-  active_owner: emilkowalski/skills/skills/improve-animations
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: null
 - kind: project-relative
   target: codex
@@ -30697,8 +30550,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/improve-animations
-  active_owner: emilkowalski/skills/skills/improve-animations
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: sha256:551c8473e20e5f4774680bc24d45e1c68e50992582720905c6b077756b7b5a55
 - kind: project-relative
   target: codex
@@ -30706,8 +30559,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/improve-animations
-  active_owner: emilkowalski/skills/skills/improve-animations
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: sha256:0a08ac8e23fd2082d7ffb86aeed7b789de77328c3cf874b16f1a755f2ef0a6ad
 - kind: project-relative
   target: codex
@@ -30715,8 +30568,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/improve-animations
-  active_owner: emilkowalski/skills/skills/improve-animations
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: sha256:68f17bbc4671593d2f43dba26a679243e2153ba5f26965fb7d59df52842534ff
 - kind: project-relative
   target: codex
@@ -30760,8 +30613,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/improve-ui
-  active_owner: ibelick/ui-skills/skills/improve-ui
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: null
 - kind: project-relative
   target: codex
@@ -30769,8 +30622,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/improve-ui
-  active_owner: ibelick/ui-skills/skills/improve-ui
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: sha256:fa2ac808f6d9dab7bb3620880b014d2c18e227e5b006102856038096e573e69a
 - kind: project-relative
   target: codex
@@ -30778,8 +30631,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/improve-ui
-  active_owner: ibelick/ui-skills/skills/improve-ui
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: sha256:933af431364517518cbcfcd4e70eb8e8b390ead920abc48c071a4eedb6747183
 - kind: project-relative
   target: codex
@@ -30787,8 +30640,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - ibelick/ui-skills/skills/improve-ui
-  active_owner: ibelick/ui-skills/skills/improve-ui
+  - ibelick/ui-skills
+  active_owner: ibelick/ui-skills
   content_hash: sha256:8faca7a14659a7f951d3b89fb730a43a4ce99966cc00481bf83d82b90f34b868
 - kind: project-relative
   target: codex
@@ -33532,8 +33385,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/review-animations
-  active_owner: emilkowalski/skills/skills/review-animations
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: null
 - kind: project-relative
   target: codex
@@ -33541,8 +33394,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/review-animations
-  active_owner: emilkowalski/skills/skills/review-animations
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: sha256:61cf8ac0c4c8e1f63385298c546b16c65ca9aec34abddcd04e821c16712d671d
 - kind: project-relative
   target: codex
@@ -33550,8 +33403,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - emilkowalski/skills/skills/review-animations
-  active_owner: emilkowalski/skills/skills/review-animations
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
   content_hash: sha256:e7d3605034acda54ca13e43aec9e64d65b53de20f75b11b8d694e373012fbe07
 - kind: project-relative
   target: codex
@@ -36019,51 +35872,6 @@ deployments:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
   content_hash: sha256:ca2eae8ea676c60f801f0764a40c70ee39bb9d2d465aff0020a652dbf91568f3
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/agentation
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation/skills/agentation
-  active_owner: benjitaylor/agentation/skills/agentation
-  content_hash: null
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/agentation-self-driving
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation/skills/agentation-self-driving
-  active_owner: benjitaylor/agentation/skills/agentation-self-driving
-  content_hash: null
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/agentation-self-driving/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation/skills/agentation-self-driving
-  active_owner: benjitaylor/agentation/skills/agentation-self-driving
-  content_hash: sha256:3a9d99a656ea7e9ff907c0b2a9a6a2a6a18bd285bd6ad4b5d9dc55b27233e08a
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/agentation-self-driving/references/two-session-workflow.md
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation/skills/agentation-self-driving
-  active_owner: benjitaylor/agentation/skills/agentation-self-driving
-  content_hash: sha256:3bff820a202d607cbf72a4b30ed9af28afa3b64ab83f63c3469b2f96a564f746
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/agentation/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation/skills/agentation
-  active_owner: benjitaylor/agentation/skills/agentation
-  content_hash: sha256:0b66fa852d1dfcd5de86e71970e6f484bcd44b991265f95034365c38ed1ad3a8
 - kind: project-relative
   target: legacy
   value: .config/opencode/skills/agmsg
@@ -41079,24 +40887,6 @@ deployments:
   content_hash: sha256:b12b6b2fc81ed10d0db9427accd2f81b62796c3ed99bbddb66993a694af530f9
 - kind: project-relative
   target: legacy
-  value: .config/opencode/skills/apple-design
-  runtime: null
-  scope: project
-  owners:
-  - emilkowalski/skills/skills/apple-design
-  active_owner: emilkowalski/skills/skills/apple-design
-  content_hash: null
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/apple-design/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - emilkowalski/skills/skills/apple-design
-  active_owner: emilkowalski/skills/skills/apple-design
-  content_hash: sha256:11840b24a11d7f94f39c6aaab074750ae4e4de4ef54ee4b1dd97e16ebd485e61
-- kind: project-relative
-  target: legacy
   value: .config/opencode/skills/archify
   runtime: null
   scope: project
@@ -42897,24 +42687,6 @@ deployments:
   content_hash: sha256:1f7b9d062b983d9532793c12962610e27e81c1e26c458c3ac68ac7760aa0aef5
 - kind: project-relative
   target: legacy
-  value: .config/opencode/skills/baseline-ui
-  runtime: null
-  scope: project
-  owners:
-  - ibelick/ui-skills/skills/baseline-ui
-  active_owner: ibelick/ui-skills/skills/baseline-ui
-  content_hash: null
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/baseline-ui/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - ibelick/ui-skills/skills/baseline-ui
-  active_owner: ibelick/ui-skills/skills/baseline-ui
-  content_hash: sha256:fea3322f36d58fdafafce2aef56e4556dd2ac7b20876b7dff7d8be7f25fa597f
-- kind: project-relative
-  target: legacy
   value: .config/opencode/skills/baton
   runtime: null
   scope: project
@@ -43338,96 +43110,6 @@ deployments:
   content_hash: sha256:7d40a7f448f3464de894cedd9daa68082f8bfebbf870e77d41bffaf96bf85cf2
 - kind: project-relative
   target: legacy
-  value: .config/opencode/skills/emil-design-eng
-  runtime: null
-  scope: project
-  owners:
-  - emilkowalski/skills/skills/emil-design-eng
-  active_owner: emilkowalski/skills/skills/emil-design-eng
-  content_hash: null
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/emil-design-eng/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - emilkowalski/skills/skills/emil-design-eng
-  active_owner: emilkowalski/skills/skills/emil-design-eng
-  content_hash: sha256:e71de849347050c2c573c1cf24d742d5a13459557ecffa6e562f08006f46b5b7
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/find-animation-opportunities
-  runtime: null
-  scope: project
-  owners:
-  - emilkowalski/skills/skills/find-animation-opportunities
-  active_owner: emilkowalski/skills/skills/find-animation-opportunities
-  content_hash: null
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/find-animation-opportunities/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - emilkowalski/skills/skills/find-animation-opportunities
-  active_owner: emilkowalski/skills/skills/find-animation-opportunities
-  content_hash: sha256:91c1243164057fbf824088d12faea937878a757a7ac653e8288b775e8b27b882
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/fixing-accessibility
-  runtime: null
-  scope: project
-  owners:
-  - ibelick/ui-skills/skills/fixing-accessibility
-  active_owner: ibelick/ui-skills/skills/fixing-accessibility
-  content_hash: null
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/fixing-accessibility/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - ibelick/ui-skills/skills/fixing-accessibility
-  active_owner: ibelick/ui-skills/skills/fixing-accessibility
-  content_hash: sha256:549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/fixing-metadata
-  runtime: null
-  scope: project
-  owners:
-  - ibelick/ui-skills/skills/fixing-metadata
-  active_owner: ibelick/ui-skills/skills/fixing-metadata
-  content_hash: null
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/fixing-metadata/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - ibelick/ui-skills/skills/fixing-metadata
-  active_owner: ibelick/ui-skills/skills/fixing-metadata
-  content_hash: sha256:b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/fixing-motion-performance
-  runtime: null
-  scope: project
-  owners:
-  - ibelick/ui-skills/skills/fixing-motion-performance
-  active_owner: ibelick/ui-skills/skills/fixing-motion-performance
-  content_hash: null
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/fixing-motion-performance/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - ibelick/ui-skills/skills/fixing-motion-performance
-  active_owner: ibelick/ui-skills/skills/fixing-motion-performance
-  content_hash: sha256:0a2d654902bc04263ce68c8c02967ef03f17b482e855360a5463211d99d7baa9
-- kind: project-relative
-  target: legacy
   value: .config/opencode/skills/frontend-design
   runtime: null
   scope: project
@@ -43732,78 +43414,6 @@ deployments:
   - shadcn/improve
   active_owner: shadcn/improve
   content_hash: null
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/improve-animations
-  runtime: null
-  scope: project
-  owners:
-  - emilkowalski/skills/skills/improve-animations
-  active_owner: emilkowalski/skills/skills/improve-animations
-  content_hash: null
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/improve-animations/AUDIT.md
-  runtime: null
-  scope: project
-  owners:
-  - emilkowalski/skills/skills/improve-animations
-  active_owner: emilkowalski/skills/skills/improve-animations
-  content_hash: sha256:551c8473e20e5f4774680bc24d45e1c68e50992582720905c6b077756b7b5a55
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/improve-animations/PLAN-TEMPLATE.md
-  runtime: null
-  scope: project
-  owners:
-  - emilkowalski/skills/skills/improve-animations
-  active_owner: emilkowalski/skills/skills/improve-animations
-  content_hash: sha256:0a08ac8e23fd2082d7ffb86aeed7b789de77328c3cf874b16f1a755f2ef0a6ad
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/improve-animations/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - emilkowalski/skills/skills/improve-animations
-  active_owner: emilkowalski/skills/skills/improve-animations
-  content_hash: sha256:68f17bbc4671593d2f43dba26a679243e2153ba5f26965fb7d59df52842534ff
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/improve-ui
-  runtime: null
-  scope: project
-  owners:
-  - ibelick/ui-skills/skills/improve-ui
-  active_owner: ibelick/ui-skills/skills/improve-ui
-  content_hash: null
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/improve-ui/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - ibelick/ui-skills/skills/improve-ui
-  active_owner: ibelick/ui-skills/skills/improve-ui
-  content_hash: sha256:fa2ac808f6d9dab7bb3620880b014d2c18e227e5b006102856038096e573e69a
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/improve-ui/agents/openai.yaml
-  runtime: null
-  scope: project
-  owners:
-  - ibelick/ui-skills/skills/improve-ui
-  active_owner: ibelick/ui-skills/skills/improve-ui
-  content_hash: sha256:933af431364517518cbcfcd4e70eb8e8b390ead920abc48c071a4eedb6747183
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/improve-ui/references/plan-template.md
-  runtime: null
-  scope: project
-  owners:
-  - ibelick/ui-skills/skills/improve-ui
-  active_owner: ibelick/ui-skills/skills/improve-ui
-  content_hash: sha256:8faca7a14659a7f951d3b89fb730a43a4ce99966cc00481bf83d82b90f34b868
 - kind: project-relative
   target: legacy
   value: .config/opencode/skills/improve/SKILL.md
@@ -45307,33 +44917,6 @@ deployments:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
   content_hash: sha256:4588d7ac3e700bc72f0b54a78537a0d248684e5924f3b9aa45f0e573a8adab49
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/review-animations
-  runtime: null
-  scope: project
-  owners:
-  - emilkowalski/skills/skills/review-animations
-  active_owner: emilkowalski/skills/skills/review-animations
-  content_hash: null
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/review-animations/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - emilkowalski/skills/skills/review-animations
-  active_owner: emilkowalski/skills/skills/review-animations
-  content_hash: sha256:61cf8ac0c4c8e1f63385298c546b16c65ca9aec34abddcd04e821c16712d671d
-- kind: project-relative
-  target: legacy
-  value: .config/opencode/skills/review-animations/STANDARDS.md
-  runtime: null
-  scope: project
-  owners:
-  - emilkowalski/skills/skills/review-animations
-  active_owner: emilkowalski/skills/skills/review-animations
-  content_hash: sha256:e7d3605034acda54ca13e43aec9e64d65b53de20f75b11b8d694e373012fbe07
 - kind: project-relative
   target: legacy
   value: .config/opencode/skills/review-board
