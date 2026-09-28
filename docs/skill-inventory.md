@@ -63,7 +63,7 @@
   `japanese-tech-writing`
 - Git・作業運用: `ship`, `atomic-commit`, `git-worktree`, `ci-stability-hooks`,
   `prepare-goal`
-- リサーチ: `web-research`（計画・並列委譲・Jina 収集・合成まで一体）
+- リサーチ: `web-research`（計画・並列委譲・合成まで一体）
 
 ## ~/.apm 専用（.apm/skills/）
 
@@ -117,7 +117,7 @@ global の一覧に無くても廃止ではない。各リポジトリの `apm.y
 
 ## global MCP（root apm.yml の mcp:）
 
-`context7`, `mcp-simple-voicevox`, `jina-reader`, `codex`
+`context7`, `mcp-simple-voicevox`, `codex`
 
 ## デザイン / UI・UX / レビュー系の役割マップ
 

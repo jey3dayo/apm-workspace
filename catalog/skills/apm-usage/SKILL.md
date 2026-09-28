@@ -44,8 +44,6 @@ Before any persistent MCP configuration write:
 
 Repo-local and on-demand placement: keep `tauri-mcp-server`-style runtime MCPs in the repository that needs them, and add screen-control MCPs on demand rather than globally. There is no fixed list of repo-local MCPs — enumerate repositories with `ghq list -p` and read each `apm.yml`. Connection status for SaaS connectors lives in `~/.apm/docs/saas-connectors.md`; removal decisions are recorded in `docs/package-decisions.md`.
 
-`jina-reader` is a cross-repository foundation MCP. Its transport, URL, authentication, and tool filter belong in the root `apm.yml`; `apm.lock.yaml` records the accepted state and runtime MCP blocks are deployed outputs.
-
 ## Skill Placement
 
 新しい知識を追加するときの置き場は次の順で選ぶ。上位で表現できるものを下位へ落とさない。

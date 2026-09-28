@@ -1,5 +1,5 @@
 lockfile_version: '2'
-generated_at: '2026-09-25T09:12:28.720108+00:00'
+generated_at: '2026-09-28T08:05:27.676380+00:00'
 apm_version: 0.31.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -32177,15 +32177,6 @@ deployments:
   content_hash: null
 - kind: uri
   target: mcp
-  value: jina-reader
-  runtime: claude
-  scope: project
-  owners:
-  - .
-  active_owner: .
-  content_hash: null
-- kind: uri
-  target: mcp
   value: linear
   runtime: claude
   scope: project
@@ -32213,15 +32204,6 @@ deployments:
   content_hash: null
 - kind: uri
   target: mcp
-  value: jina-reader
-  runtime: codex
-  scope: project
-  owners:
-  - .
-  active_owner: .
-  content_hash: null
-- kind: uri
-  target: mcp
   value: linear
   runtime: codex
   scope: project
@@ -32240,7 +32222,6 @@ deployments:
   content_hash: null
 mcp_servers:
 - context7
-- jina-reader
 - linear
 - mcp-simple-voicevox
 mcp_configs:
@@ -32252,13 +32233,6 @@ mcp_configs:
     - '@upstash/context7-mcp@latest'
     registry: false
     command: npx
-  jina-reader:
-    name: jina-reader
-    transport: http
-    registry: false
-    headers:
-      Authorization: Bearer ${JINA_API_KEY}
-    url: https://mcp.jina.ai/v1?include_tags=search,read
   linear:
     name: linear
     transport: http
@@ -32275,12 +32249,10 @@ mcp_configs:
 mcp_target_servers:
   claude:
   - context7
-  - jina-reader
   - linear
   - mcp-simple-voicevox
   codex:
   - context7
-  - jina-reader
   - linear
   - mcp-simple-voicevox
 local_deployed_files:

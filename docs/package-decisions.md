@@ -16,6 +16,13 @@
 - 再検討するなら: APM が MCP エントリ単位の OS / capability 条件を正式サポートした時点で、
   host-local 配置からの再統合を検討する。
 
+## Jina Reader MCP
+
+- Status: global APM から撤去（2026-09-28）。
+- 理由: ユーザー判断で撤去。検索と URL 取得は組み込みの `WebSearch` / `WebFetch` と `ax` で足りる。
+- 手順: `apm.yml` から外し、`mise run deploy:fresh` で `apm.lock.yaml`・`~/.claude.json`・`~/.codex/config.toml` から消した。
+- 再検討するなら: 組み込みツールで取れない検索・取得が繰り返し必要になったとき。
+
 ## Mobbin MCP
 
 - Status: global APM から撤去（2026-09-25）。2026-09-06 にデザイン作業の UI reference 検索用として追加していた。

@@ -3,8 +3,8 @@ name: web-research
 description: >-
   Public web research with cited evidence: look something up, find current info,
   compare options, or X/Twitter signal. Fans large investigations out to parallel
-  subagents; Jina only when the user names it. Repo-local Markdown research write-up
-  belongs to the upstream `research` skill.
+  subagents. Repo-local Markdown research write-up belongs to the upstream
+  `research` skill.
 ---
 
 # Web Research
@@ -46,10 +46,6 @@ For large tasks, spawn one subagent per subtopic with the Agent tool:
 
 - Search with the host's built-in web search tool (Claude Code `WebSearch`, Codex `web_search`). Narrow with `site:<domain>`.
 - Read a result or a user-given URL with `ax` (run `ax agent-context` once first) or the host's fetch tool (`WebFetch`). Use a browser tool only for pages that need JavaScript.
-
-### Jina (paid opt-in)
-
-Jina bills the user's account: a web search request is priced from 10,000 tokens, `search_web` sends one request per element of a query array, and `read_url` bills per output token. Use Jina only when the user names it for this task, and pass that permission to subagents explicitly. When using it, send one query per search and pass `question` to `read_url`. A `402 InsufficientBalanceError` means the balance is exhausted: switch to the built-in tools and tell the user.
 
 ### Login-Walled Sources (X/Twitter etc.)
 

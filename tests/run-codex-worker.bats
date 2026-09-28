@@ -215,9 +215,9 @@ SH
   [ "$status" -eq 0 ]
   # worker は base home ではなく生成された home を見る。
   [[ "$output" != *"HOME_IS: $home"* ]]
-  # 既定 allowlist は context7 と jina-reader。
+  # 既定 allowlist は context7 だけ。
   [[ "$output" == *"[mcp_servers.context7]"* ]]
-  [[ "$output" == *"[mcp_servers.jina-reader]"* ]]
+  [[ "$output" != *"[mcp_servers.jina-reader]"* ]]
   # 認証情報と通知は必ず落ちる。入れ子の tools 節も一緒に落ちる。
   [[ "$output" != *"[mcp_servers.1password]"* ]]
   [[ "$output" != *"[mcp_servers.mcp-simple-voicevox]"* ]]
@@ -242,9 +242,8 @@ SH
     run "$SCRIPT" implement "$PROJECT" gpt-6-luna "$PAYLOAD"
   [ "$status" -eq 0 ]
   [[ "$output" == *"[mcp_servers.1password]"* ]]
-  # 既定で通っていた 2 つが、明示しなければ落ちる（allowlist は置換であって追加ではない）。
+  # 既定で通っていた context7 が、明示しなければ落ちる（allowlist は置換であって追加ではない）。
   [[ "$output" != *"[mcp_servers.context7]"* ]]
-  [[ "$output" != *"[mcp_servers.jina-reader]"* ]]
 }
 
 @test "a CODEX_HOME without config.toml leaves the worker home without one" {

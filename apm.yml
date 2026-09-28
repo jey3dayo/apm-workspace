@@ -95,12 +95,6 @@ dependencies:
       args:
         - -y
         - "@upstash/context7-mcp@latest"
-    - name: jina-reader
-      registry: false
-      transport: http
-      url: https://mcp.jina.ai/v1?include_tags=search,read
-      headers:
-        Authorization: Bearer ${JINA_API_KEY}
     # App-side connectors don't reach the CLI agents; ops rules and GraphQL fallback live in catalog/skills/linear-task-ops.
     - name: linear
       registry: false

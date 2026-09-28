@@ -130,7 +130,7 @@ codex_home=${CODEX_HOME:-$HOME/.codex}
 #
 # allowlist にするのは、config.toml へ新しい MCP を足したときに既定で worker へ
 # 流れ込まないようにするため。明示したものだけ通す。
-mcp_allow=${AGMSG_WORKER_MCP_ALLOW:-context7,jina-reader}
+mcp_allow=${AGMSG_WORKER_MCP_ALLOW:-context7}
 
 worker_home=$(mktemp -d "${TMPDIR:-/tmp}/agmsg-worker-home.XXXXXX")/codex
 mkdir -p "$worker_home"
