@@ -161,9 +161,6 @@ notify = [
 [mcp_servers.context7]
 command = "npx"
 
-[mcp_servers.jina-reader]
-url = "https://example.invalid/mcp"
-
 [mcp_servers.1password]
 command = "/usr/local/bin/1password-mcp"
 
@@ -217,7 +214,6 @@ SH
   [[ "$output" != *"HOME_IS: $home"* ]]
   # 既定 allowlist は context7 だけ。
   [[ "$output" == *"[mcp_servers.context7]"* ]]
-  [[ "$output" != *"[mcp_servers.jina-reader]"* ]]
   # 認証情報と通知は必ず落ちる。入れ子の tools 節も一緒に落ちる。
   [[ "$output" != *"[mcp_servers.1password]"* ]]
   [[ "$output" != *"[mcp_servers.mcp-simple-voicevox]"* ]]

@@ -2,15 +2,12 @@
 
 2026-08-21 の /improve 引き継ぎ(#1-#13)のうち、即時実装(#1 #2-HOME化 #3 #4 = worker-improve-0821)と Phase 計画(#7 = apply-core-phase1)に含まれない残り。
 
-## ユーザー判断待ち
-
-- #8 Jina bearer の rotation: `.mcp.json` は chmod 600 済み・gitignore 済み(2026-08-21)。平文 bearer の rotation はユーザー操作が必要
-
 ## 完了
 
 - #5 ca-pass の global 撤去(2026-08-21): ユーザー承認のうえ `apm.yml` から撤去、`apm lock` 再解決、deploy で両配布先から消滅を確認。`docs/package-decisions.md` へ実撤去を追記済み
 - #7 PS apply/validate のパリティ化(2026-08-21): apply-core Phase 1 として解消(`eb3a4ce`)
 - #11 CI path filter へ `optional-skills/**` 追加(2026-08-21)
+- #8 Jina bearer の rotation(2026-09-28): rotation ではなく jina-reader MCP と `JINA_API_KEY` を撤去して解消(`7e06ef3`、`~/.config` 側 `efa02cd3`)
 
 ## 小粒(次の worker バッチ候補、いずれも独立)
 
