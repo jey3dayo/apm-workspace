@@ -22,12 +22,12 @@ dependencies:
     - shadcn/improve#03369ee6d7cafbfcecc4346539b05b3dc0a603bb
 
     # --- engineering / writing ---
-    - coji/natural-japanese/skills/natural-japanese#9a78a42964096da509b8f3e011f0085a5f080151
+    - coji/natural-japanese/skills/natural-japanese#b54954f8deb4f110f0959f4e4fac295708900120 # v1.3.0
     - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
       ref: 8f2d57610a73efc97d743c9b0b0ecb1002e09fa4
       alias: japanese-tech-writing
     - git: mattpocock/skills
-      ref: 3cca18b368ae95cdbdebbff572ccafa662551015
+      ref: 6acc160e4e0cd062dbbbd7a1b26ae92855edf07e # v1.2.3
       skills:
         - codebase-design
         - domain-modeling
@@ -41,7 +41,7 @@ dependencies:
         - writing-for-agents
 
     # --- react ---
-    - millionco/react-doctor/skills/react-doctor#ff7dd679e8b9939a7dd8f828a530559a275836f7
+    - millionco/react-doctor/skills/react-doctor#013f7373f91a3b9e68bd1dc7d4d354f4b041b117 # v2.2.9
     - vercel-labs/agent-skills/skills/react-best-practices#063bee94c3f4df8453406c830b0a7df0f2860278
 
     # --- design ---
@@ -60,7 +60,7 @@ dependencies:
         - improve-animations
         - review-animations
     - git: ibelick/ui-skills
-      ref: f5dd1de9c0fc6c033a43dc3fd2a5be41366e9f43
+      ref: main
       skills:
         - baseline-ui
         - fixing-accessibility
@@ -76,7 +76,7 @@ dependencies:
     # --- browser / analysis ---
     - browser-use/browser-harness#eba1021c78dc8c1a4e78f98155396c4fa979b7f0
     - openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431
-    - tt-a1i/archify/archify#c6519401f7b91b9d43011657880893b0a8955548
+    - tt-a1i/archify/archify#9286c3b9c2cef359e98586b420d769d87bcb163f # v3.0.0
 
     # --- agent tools ---
     - agavra/tuicr/skills/tuicr#b55e218f6d38a87ca4a6d9924a4c50b5f601dd07
@@ -86,7 +86,7 @@ dependencies:
 
     # --- productivity / research ---
     - ayghri/i-have-adhd/skills/i-have-adhd#839872f9d1cd634fed642b4589ce7226199cc15f
-    - mvanhorn/last30days-skill/skills/last30days#084662b501fb0dba95bd55eff0c258d35e0dc499
+    - mvanhorn/last30days-skill/skills/last30days#beb7ed1868f034f198842174bfe2694e44b78363 # v3.25.0
   mcp:
     - name: context7
       registry: false

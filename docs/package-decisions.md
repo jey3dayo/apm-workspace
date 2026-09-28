@@ -618,13 +618,19 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 
 ## `mise run upgrade` の封印と SHA pin の手動更新（2026-09-25）
 
-- Status: 採用。当面 `mise run upgrade`（`apm update -g --yes`）を使わず、前へ進む更新だけを手動 pin bump で適用する。
+- Status: 部分解除（2026-09-28）。`ibelick/ui-skills` を `ref: main` にしたうえで `mise run upgrade` を再開。それ以外の SHA pin は引き続き revision-pin 書き換えの後退リスクがあるため、意図しない後退が出たら手動 pin bump を優先する。
 - 理由: apm 0.31.0 の `apm update` は SHA pin の依存を最新タグへ書き換え、タグが pin より古くても戻す。2026-09-25 の global dry-run では対象8件中6件が後退だった（mattpocock/skills 41 commit、millionco/react-doctor 29、tt-a1i/archify 21、ibelick/ui-skills 263、coji/natural-japanese 13、mvanhorn/last30days-skill 6）。前進は benjitaylor/agentation（v3.1.2）と modem-dev/hunk（v0.22.0）だけで、この2件は同日に手動で適用した。
 - 併発する失敗: 同じ SHA を共有する複数行を update が書き換えると `Expected exactly one apm.yml entry for <sha>, found 2` で止まる（agentation 2行で再現）。object 形式の `git:` + `ref:` + `skills:` へ畳めば apm 単体では回避でき、pin 時点の配布内容も byte 一致した。workspace スクリプトは当初 `.apm/skills` 構造しか解決できず素の `skills/<name>/` bundle が `Missing external skill cache` になったが、同日 `external_package_skills_root`（`.ps1` は `Get-ExternalPackageSkillsRoot`）に、virtual_path が空で manifest が `skills:` subset を宣言したレコードに限って `<cache>/skills/` を package root とするフォールバックを入れた（`.apm/skills` があればそちらを優先）。
 - 畳み込みの適用範囲: 同じ repo・同じ SHA の複数行は `skills:` subset で1エントリに畳む。2026-09-25 に `mattpocock/skills`（apm が plugin.json の `skills` 配列から `.apm/skills` を生成する型）と、素の bundle である `benjitaylor/agentation` / `emilkowalski/skills` / `ibelick/ui-skills` を畳み、配布内容の一致を確かめた（配布先から消えたのはキャッシュ由来の `.apm-pin` だけ）。畳めないのは、ルートが `marketplace.json` だけで subset を指定しても何も配布されない `caad-develop/claude-code-marketplace`。この repo はルートに `skills` 配列付きの `.claude-plugin/plugin.json` を足せば畳める（scratchpad の複製で確認済み、upstream は未変更）。畳めるかどうかは、隔離 fixture に対して `APM_WORKSPACE_DIR=<fixture> bash -c 'source ./scripts/apm-workspace.sh; collect_external_skill_records'` を実行して確かめられる。
 - 更新手順: `apm.yml` の SHA を同じ repo の全行で揃えて上げ、`apm install -g --only apm` → `mise run deploy:fresh`。`apm install -g` は agmsg の db/teams symlink を外すので、`mise run doctor` で確かめて plain path が無ければ `mise run agmsg:state:restore`。
 - 前回の「ibelick/ui-skills の新構成と互換しない」は誤認だった。update の行き先が 2026-01 の古いタグ `v0.0.7`（`src/SKILL.md` だけの構造）だったためで、pin と HEAD の `skills/` は同一。
 - 再検討するなら: apm の update が pin より古いタグへ戻さなくなったとき。
+
+## `ibelick/ui-skills` を `ref: main` で追跡（2026-09-28）
+
+- 変更: 畳み込み済みの `git: ibelick/ui-skills` エントリを 40 文字 SHA から `ref: main` に切り替えた。`skills:` subset は従来どおり 5 件。
+- 理由: apm 0.31.0 の revision-pin 書き換えは annotated tag だけを見る。upstream の annotated tag は `v0.0.7` までしかなく（`v0.2.3` 以降は lightweight）、SHA pin の `apm update` は毎回 `28b74ce5` へ戻して skill bundle 検証に失敗する。`ref: main` は revision-pin 対象外のため `mise run upgrade` が通る。lock の `resolved_commit` はブランチ先端（2026-09-28 時点 `ee4596c4`）を記録する。
+- 検証: `apm update -g --yes ibelick/ui-skills` と `mise run upgrade` が exit 0、`mise run check` が通ること。
 
 ## `ai-butsukari-evidence-scout` を global から撤去（2026-09-25）
 
