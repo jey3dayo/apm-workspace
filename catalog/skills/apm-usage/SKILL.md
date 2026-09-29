@@ -131,7 +131,7 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
 ## Task Selection
 
 - Run `mise run check` for a lightweight pre-deploy gate.
-- Run `mise run verify` for `check` plus catalog smoke verification.
+- Run `mise run verify` for `check`, both script suites (`test`), and catalog smoke verification.
 - Run `mise run deploy` for the normal local rollout from the current manifest and lock.
 - Run `mise run apply` only when deployment is needed without the bundled `check -> doctor` flow.
 - Run `mise run refresh` to refresh the checkout and dependency state without deploying.
@@ -140,7 +140,7 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
 - Run `mise run prepare:catalog` before commit/push when tracked catalog content changed.
 - Run `mise run install:catalog` after commit/push when you want to install the tracked catalog ref.
 - Run `mise run smoke:catalog` to smoke-test the generated catalog package.
-- Run `mise run apply:skills:local` for a fast local Codex skill refresh only.
+- Run `mise run apply:skills:local` for a fast sync of catalog/private skills into the Codex target and the Claude private skill links; it does not replace a rollout.
 - For skill creation, updates, installs, or migrations in this workspace, include `mise run deploy` and a deployed target check in the plan unless the user explicitly asks for local-only refresh.
 
 ## Routing
@@ -215,7 +215,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
   skill lane.
 - Do not add the `optional-skills` collection root to the root `apm.yml`; install individual skill refs only in consuming repositories.
 - Do not duplicate an external dependency into `catalog/skills/**` just because a local checkout exists. Keep one source of truth: upstream checkout, managed catalog, manual copy, or private overlay.
-- Do not reintroduce many local `./packages/*` refs into `~/.apm/apm.yml`.
+- Do not add local `./packages/*` refs to `~/.apm/apm.yml`.
 - Do not hand-edit deployed targets such as `~/.claude/`, `~/.codex/`, or `~/.agents/skills`.
 - Do not judge a deployed skill orphaned by its absence from `catalog/skills/**` and `optional-skills/**`; deployed targets are mostly fed by external dependencies, so that test marks most of a healthy target as orphaned. Name the supplier of every entry before it reaches a delete line -- a lock record, `apm_modules/**`, `private-skills/.apm/skills/<id>`, `manual-skills`, or a workspace-only symlink bridge -- and treat only an entry with no supplier as a candidate. A lock record keeps an entry off that line but never proves the skill is still supplied — the lock keeps records for skills the catalog has already retired, so check the manifest, the record's owner, the locator's scope and target, and the deployed path itself before concluding anything about a record.
 - `apm audit --ci` and searching a deployed target: see `references/rollout-fast-paths.md` for the reading and grep-wrapper caveats.
@@ -239,7 +239,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - optionally run `mise run format:markdown:bold-headings`
    - run `mise run deploy`
    - verify `~/.agents/skills/<id>/` contains the deployed skill
-   - use `mise run apply:skills:local` only when the user explicitly wants a fast local Codex skill refresh
+   - use `mise run apply:skills:local` only when the user explicitly wants a fast local skill sync
 
 3. Optional repository skill changed:
    - edit `optional-skills/<id>/**`
@@ -266,7 +266,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - when upgrade fails with `Invalid APM package` on a SHA-pinned git
      dependency, triage revision-pin vs annotated tags in
      `references/rollout-fast-paths.md` before re-pinning by hand
-   - if the manifest contains `gist.github.com/...#<sha>`, verify the regenerated `apm.lock.yaml` kept the same `repo_url` spelling before deploy
+   - if the manifest contains `gist.github.com/...#<sha>`, verify its regenerated `apm.lock.yaml` record as the gist Guardrail describes (the shortened `owner/<gist-id>` `repo_url` is the accepted form) before deploy
    - confirm the target dependency's `resolved_commit` and the deployed file's hash
      before calling the refresh done; a zero exit from `deploy` is not evidence the pin moved
    - review `apm.lock.yaml` before commit

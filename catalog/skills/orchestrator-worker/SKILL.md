@@ -28,7 +28,7 @@ description: >-
 
 「Orchestrator」は役ではなく機能。表の Steward / Architect のうち、後述の許可条件を満たす側が担う。Terra は Architect・Reviewer・Worker の昇格に就く。`gpt-5.6-terra` が terra の現行版で、Sol より安価な長文脈選択肢である。opencode は Worker 専用で、implement 以外の役には就けない（review も含む）。cursor は Worker と Reviewer の両方に就けるが、Steward / Architect には就けない（Orchestrator 機能を担えない）。
 
-Reviewer 既定の範囲: cursor reviewer が既定になるのはユーザーが cursor 経路を明示したときだけである。review 外注の全体既定は下記「Reviewer の tier」のとおり Codex sol のままで、cursor 追加はこれを変えない。
+Reviewer 既定の範囲: cursor reviewer が既定になるのはユーザーが cursor 経路を明示したときだけである。review 外注の全体既定は下記「Reviewer の tier」のとおり Codex sol である。
 
 Codex 側の Steward は `gpt-6-luna` のみで、明示ポリシーとして常に Orchestrator 機能を持たない。Codex Steward は handoff 専用と扱う。Codex 側に Opus 相当の中間 tier（terra）を Steward に置くかはユーザー判断に委ね、本スキルでは追加しない。
 
@@ -92,7 +92,7 @@ Steward と Architect はどちらも人間が pane から起動する。どの 
 
 ## 1a. Steward の応答範囲と handoff
 
-Steward は人間が最初に話す相手であり、応答の滑らかさが人間の待ち時間と再説明の回数を直接決める。Opus Steward は Orchestrator 機能の許可条件を満たすため、そのまま Worker を起動し差分を検証できる。Sonnet / Luna を Steward にするのはユーザーの明示指定時に限り、その場合は明示ポリシーとして Orchestrator 機能を持たない。
+Steward は人間が最初に話す相手であり、応答の滑らかさが人間の待ち時間と再説明の回数を直接決める。Opus Steward は Orchestrator 機能の許可条件を満たすため、そのまま Worker を起動し差分を検証できる。Sonnet / Luna Steward は明示ポリシーとして Orchestrator 機能を持たない。
 
 本スキルの狙いは実装トークンを安い Worker に隔離し、高級 tier を設計判断・検証・review・対話に集中させることである。総コストが下がるかどうかは未計測の仮説として扱う——長時間常駐する Steward の累積 context、全 diff の再読、対話の長期化、handoff での再説明は、タスク構成によっては支配的になりうる。判断するには task 別に model・input / cached / output・再試行回数・handoff 回数・latency・成功率を記録し、Steward と Architect を分けない運用と比較する必要がある。
 
