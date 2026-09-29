@@ -91,6 +91,7 @@ depends = [
   "lint:yaml",
   "lint:frontmatter",
   "lint:catalog-leaks",
+  "lint:skill-inventory-mcp",
   "validate",
 ]
 

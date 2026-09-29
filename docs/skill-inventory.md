@@ -117,7 +117,9 @@ global の一覧に無くても廃止ではない。各リポジトリの `apm.y
 
 ## global MCP（root apm.yml の mcp:）
 
-`context7`, `mcp-simple-voicevox`, `codex`
+`context7`, `linear`, `mcp-simple-voicevox`
+
+`mise run check` の `lint:skill-inventory-mcp` が上記一覧と `apm.yml` の `dependencies.mcp` を照合する。Cursor user-scope（`~/.cursor/mcp.json`）は APM 外 — [`package-decisions.md`](package-decisions.md) の Cursor 節。
 
 ## デザイン / UI・UX / レビュー系の役割マップ
 
@@ -173,7 +175,6 @@ skill 監査（`~/.claude/skill-report/2026-07-23T11-14-21/`）の結果を踏�
 
 ## 保留・watchlist
 
-- `apple-design`（emilkowalski）: Apple HIG 系。必要になったら global に 1 行追加。
 - `fixing-motion-performance`（ibelick）: emil 系と発火競合・指摘重複したら間引く。
   `make-interfaces-feel-better` は 2026-07-23 の skill 監査を受けて撤去済み。
   検証状況は上の「検証中のレビュー・アニメーション系スキル」表を正とする。
@@ -226,4 +227,5 @@ global から専門スキルを外すために、軽量な「スキル検索・�
 ## メンテナンス
 
 - 更新タイミング: レーン間の移動、global への追加・撤去、repo-local の新規採用時
+- root `apm.yml` の `mcp:` を変えたら global MCP 節の backtick 行を同じ集合に更新する（`lint:skill-inventory-mcp` が `mise run check` で検証）
 - repo-local の再スキャン: `ghq list -p` で各リポジトリの `apm.yml` を確認
