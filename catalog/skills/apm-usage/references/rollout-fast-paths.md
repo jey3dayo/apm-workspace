@@ -32,6 +32,35 @@ recovered them.
 For a checked-out external dependency (Fast Path 7) that is SHA-pinned, bump
 the pin in `apm.yml` to the pushed commit and follow this same sequence.
 
+## Revision-pin failures on `mise run upgrade` (re-checked 0.31.0)
+
+On 0.31.0, `apm update` revision-pin rewrite considers **annotated semver tags
+only** (peeled `refs/tags/*^{}` from `git ls-remote`). Lightweight release tags
+do not count, even when their commits are newer than every annotated tag.
+
+When a SHA-pinned dependency's highest annotated tag points at an old package
+layout, `mise run upgrade` can fail during integration — not only move the pin
+backward. A typical symptom is `Invalid APM package … no apm.yml, SKILL.md,
+hooks, or plugin structure` for a dependency that installs cleanly at HEAD.
+
+Triage:
+
+1. Run `apm update -g --dry-run` and note revision-pin rewrites (`ref: <sha> ->
+<sha> (<tag>)`) for the failing package.
+2. On the upstream repo, run `git ls-remote <url> 'refs/tags/*'` and check
+   which semver tags have a matching `^{}` line (annotated). Compare that
+   commit to the manifest SHA and to `main`.
+3. If the annotated tag commit is stale but `main` (or a lightweight tag) has
+   the intended `skills/` bundle, switch the manifest to branch tracking
+   (`git:` + `ref: main`) so revision-pin rewrite no longer applies. Record the
+   reason in `docs/package-decisions.md`. The lock still records
+   `resolved_commit` at install time.
+4. If the dependency must stay SHA-pinned, bump the pin by hand and use the
+   SHA-pin bump sequence above instead of `mise run upgrade`.
+
+Workspace precedent: `ibelick/ui-skills` (`docs/package-decisions.md`,
+2026-09-28).
+
 ## `apm uninstall -g` side effects (Fast Path 9)
 
 Fast Path 9's default is hand-editing `apm.yml` plus `apm lock -g`. `apm

@@ -7,6 +7,7 @@ Applies to the root `~/.apm/apm.yml` and to repo-local manifests. The lane a dep
 - Shorthand is the default: `owner/repo[/path]#<ref>`, with `github.com` omitted (upstream canonical form).
 - Use the object form (`git:` + `ref:`) only for a field shorthand cannot carry: `skills:` to install a subset, `alias:`, or a non-GitHub host such as a gist URL.
 - External dependencies pin a full 40-character commit SHA. Workspace-owned refs (`jey3dayo/apm-workspace/...`) and self-referencing repo-local skills use `#main` (see Self-Referencing Repo-Local Skills in `SKILL.md`). A trailing `# vX.Y.Z` comment stays as `apm update` writes it.
+- Exception: when `mise run upgrade` revision-pin rewrite targets an annotated tag whose tree is not a valid skill bundle, use `git:` + `ref: main` (or another branch) on the object form and document it in `docs/package-decisions.md`. See `references/rollout-fast-paths.md` (Revision-pin failures on `mise run upgrade`).
 
 ## Grouping (root `apm.yml`)
 
