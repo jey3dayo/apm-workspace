@@ -17,6 +17,15 @@ description: "JEY workspace 固有の Linear 運用ルール: issue のプロジ
 MCP が利用可能な場合は読み取りを自前スクリプトで再実装しない。逆に MCP を使う場合も、
 プロジェクト選択・ラベル・タイトル・コメント書式はこのスキルのルールに従う。
 
+### MCP が未認証のとき
+
+`mcp__linear__*` に `authenticate` しか無い場合は、GraphQL へ逃げずに MCP を認証してから進める。
+
+- ユーザーに `/mcp` で `linear` を Authenticate してもらう。完了するとセッションを再起動せずに tool が現れる
+- `mcp__linear__authenticate` → callback URL を `complete_authentication` へ渡す経路は、
+  「No OAuth flow is in progress」で失敗したことがある。`/mcp` を先に案内する
+- claude.ai アプリ側でコネクタを認証しても、実行中の Claude Code セッションの tool 一覧には反映されない
+
 ### 書き込みの信頼性に関する注意
 
 claude.ai / ChatGPT のアプリ側 Linear コネクタは、issue の作成・編集で
