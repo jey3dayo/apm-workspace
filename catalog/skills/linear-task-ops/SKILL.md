@@ -78,6 +78,24 @@ claude.ai / ChatGPT のアプリ側 Linear コネクタは、issue の作成・�
 - 判定できないものは No priority のままにし、着手前に Urgent–Low へ確定させる
 - 周期タスクには `term:*` を付ける
 
+## ビュー
+
+JEY チームの共有ビュー。ユーザーがビュー名で依頼したら、その条件で issue を集める。
+
+| ビュー                   | 種類    | 条件                                           |
+| ------------------------ | ------- | ---------------------------------------------- |
+| `code` / `work` / `life` | Project | 同名のプロジェクトラベル                       |
+| 今月のルーティーン       | Issue   | `term:monthly` の未完了                        |
+| 期限が近いもの           | Issue   | 期日が7日以内（超過を含む）の未完了            |
+| お金の損が出るもの       | Issue   | finance で Priority が High 以上の未完了       |
+| 開発の Bug               | Issue   | `code` プロジェクトで `Bug` ラベル付きの未完了 |
+| Priority 未判定          | Issue   | Priority 未設定の未完了                        |
+| Inbox                    | Issue   | Done / Canceled 以外                           |
+
+ビューの作成・編集は MCP に無いため GraphQL の `customViewCreate` / `customViewUpdate` を使う。
+issue ビューは `filterData`、project ビューは `projectFilterData` に条件を入れ、`teamId` と `shared: true` を渡す。
+`icon` は未知の名前だと検証エラーになるので省略する。作成後は `customView { issues | projects }` で中身を読み戻す。
+
 ## コメント・本文の書式
 
 - 取引ログは 1 行 1 レコードで集計しやすい形にする
