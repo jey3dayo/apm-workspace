@@ -27,16 +27,16 @@ This registry tracks external agent collections that were evaluated or curated i
 
 These upstream persona files were evaluated at the repository and commit recorded above, then retired as standalone runtime agents. Only their concise, owning guidance contracts remain.
 
-| Former local agent                                 | Source path                                          | Integrated into                                                         | Status                                                    |
-| -------------------------------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------- |
-| `catalog/agents/agency-evidence-collector.md`      | `testing/testing-evidence-collector.md`              | `catalog/skills/review-board/SKILL.md` Evidence Collector overlay       | Retired; visual and browser evidence discipline retained. |
-| `catalog/agents/agency-reality-checker.md`         | `testing/testing-reality-checker.md`                 | `catalog/skills/review-board/SKILL.md` readiness judgement              | Retired; evidence-based ship/block judgement retained.    |
-| `catalog/agents/agency-minimal-change-engineer.md` | `engineering/engineering-minimal-change-engineer.md` | `catalog/agents/implementer.md` and Review And Fix Loop                 | Retired; minimal evidence-supported diffs retained.       |
-| `catalog/agents/agency-test-results-analyzer.md`   | `testing/testing-test-results-analyzer.md`           | `catalog/skills/review-board/SKILL.md` evidence and readiness judgement | Retired; test-result patterns and residual risk retained. |
+| Former local agent                                 | Source path                                          | Integrated into                                                          | Status                                                    |
+| -------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------- |
+| `catalog/agents/agency-evidence-collector.md`      | `testing/testing-evidence-collector.md`              | `optional-skills/review-board/SKILL.md` Evidence Collector overlay       | Retired; visual and browser evidence discipline retained. |
+| `catalog/agents/agency-reality-checker.md`         | `testing/testing-reality-checker.md`                 | `optional-skills/review-board/SKILL.md` readiness judgement              | Retired; evidence-based ship/block judgement retained.    |
+| `catalog/agents/agency-minimal-change-engineer.md` | `engineering/engineering-minimal-change-engineer.md` | `catalog/agents/implementer.md` and Review And Fix Loop                  | Retired; minimal evidence-supported diffs retained.       |
+| `catalog/agents/agency-test-results-analyzer.md`   | `testing/testing-test-results-analyzer.md`           | `optional-skills/review-board/SKILL.md` evidence and readiness judgement | Retired; test-result patterns and residual risk retained. |
 
 ### Role Split
 
-- Use `frontend-developer` for implementation and code review of frontend behavior.
+- Use `frontend-developer` for frontend implementation and verification of its own changes.
 - Use `ui-designer` for visual direction, design-system decisions, component specs, and handoff quality.
 - Use `accessibility-auditor` for independent accessibility review and remediation planning.
 

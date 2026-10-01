@@ -14,7 +14,7 @@ Run the project's real commands, not assumptions: the typecheck, lint, and test 
 
 - Mechanical: formatter and `eslint --fix` output, unused imports and variables. Apply directly.
 - Local type fixes: a missing annotation, a narrowed union, a nullable check. Apply when the fix is visible from the surrounding code.
-- Structural: replacing `any` or type assertions with validated types, converting thrown errors to `Result<T, E>`, removing dead exports whose callers are gone. Apply when you can verify every call site; otherwise report with a proposed change.
+- Structural: replacing `any` or type assertions with validated types, removing dead exports whose callers are gone. Apply when you can verify every call site; otherwise report with a proposed change.
 - Out of scope: business-logic changes, public API contract changes, security-sensitive or performance-critical code. Do not touch these; describe the problem and stop.
 
 ## Type-safety rules for this workspace
