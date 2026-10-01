@@ -56,8 +56,8 @@ Prefer the non-shim AWS binary when a `mise` shim or repo task injects dotenvx v
 Run a command with decrypted app env:
 
 ```bash
-dotenvx run -f .env.development -- pnpm dev
-dotenvx run -f .env.staging -- pnpm test
+dotenvx run -f .env.development -- pnpm run dev
+dotenvx run -f .env.staging -- pnpm run test
 ```
 
 When an encrypted `.env` has a separate `.env.keys` file, pass the key file before

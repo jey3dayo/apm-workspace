@@ -35,7 +35,7 @@ herdr は tmux 風 prefix モードを持つ agent runtime。設定は単一の 
 
    キーの型・デフォルト・許容値・説明は **機械可読な config-reference JSON が正本**。全文を読み込まず jq でキー指定して引く（コマンド形は references/configuration.md 冒頭）。構造の解説とレシピが要るときだけ https://herdr.dev/docs/configuration/ を取得する。
 
-   **手元の binary が stable より古いことがある。** references/configuration.md は古い binary で通らない項目に「〈version〉では未対応」と注記してある。該当したら回避策を書くのではなく、まず `herdr update` で上げられないかユーザーに確認する。
+   **手元の binary が stable より古いことがある。** `herdr config check` が references/configuration.md の項目を未知キーとして拒否したら、回避策を書かず、まず `herdr update` で上げられないかユーザーに確認する。
 
 3. 編集する — 既存のセクション順・コメントスタイルを保って編集する。新規作成時は `herdr --default-config` を丸ごと写さず、ユーザーが求めた項目だけを書く（herdr は未指定項目をデフォルトで補う）。
 4. 反映と検証 — `herdr config check` で `config: ok` を確認してから `herdr server reload-config` を実行し、`herdr-server.log` の末尾に新しい config warning が出ていないことを確認して完了。warning が出た場合は該当値を修正して再実行する。

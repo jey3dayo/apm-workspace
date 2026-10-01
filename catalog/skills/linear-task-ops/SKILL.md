@@ -1,6 +1,6 @@
 ---
 name: linear-task-ops
-description: "JEY workspace 固有の Linear 運用ルール: issue のプロジェクト自動ルーティング、ラベル/タイトル/取引ログの書式、Asana からの移行マッピング、ガードレール。CRUD 自体は Linear MCP tools を使い、MCP が使えない環境や MCP に無い操作のみ GraphQL スクリプトへフォールバックする。Use when creating or editing Linear tasks, choosing a project or label, migrating task notes from Asana, archiving issues to free the plan's issue limit, or appending transaction logs (date/payment/price) to an existing issue."
+description: "JEY workspace 固有の Linear 運用ルール: issue のプロジェクト自動ルーティング、ラベル/取引ログの書式、Asana からの移行マッピング、ガードレール。CRUD 自体は Linear MCP tools を使い、MCP が使えない環境や MCP に無い操作のみ GraphQL スクリプトへフォールバックする。Use when creating or editing Linear tasks, choosing a project or label, migrating task notes from Asana, archiving issues to free the plan's issue limit, or appending transaction logs (date/payment/price) to an existing issue."
 ---
 
 # Linear Task Ops
@@ -15,21 +15,20 @@ description: "JEY workspace 固有の Linear 運用ルール: issue のプロジ
 | MCP に無い操作 / 書き込みが期待どおり反映されない / MCP なし | `scripts/linear_task.py`（GraphQL フォールバック）                           |
 
 MCP が利用可能な場合は読み取りを自前スクリプトで再実装しない。逆に MCP を使う場合も、
-プロジェクト選択・ラベル・タイトル・コメント書式はこのスキルのルールに従う。
+プロジェクト選択・ラベル・コメント書式はこのスキルのルールに従う。
 
 ### MCP が未認証のとき
 
 `mcp__linear__*` に `authenticate` しか無い場合は、GraphQL へ逃げずに MCP を認証してから進める。
 
 - ユーザーに `/mcp` で `linear` を Authenticate してもらう。完了するとセッションを再起動せずに tool が現れる
-- `mcp__linear__authenticate` → callback URL を `complete_authentication` へ渡す経路は、
-  「No OAuth flow is in progress」で失敗したことがある。`/mcp` を先に案内する
+- `/mcp` での Authenticate を先に案内する（`mcp__linear__authenticate` → `complete_authentication` 経路は不安定で、「No OAuth flow is in progress」で止まることがある）
 - claude.ai アプリ側でコネクタを認証しても、実行中の Claude Code セッションの tool 一覧には反映されない
 
 ### 書き込みの信頼性に関する注意
 
 claude.ai / ChatGPT のアプリ側 Linear コネクタは、issue の作成・編集で
-挙動が一致しない（同一の MCP だと想定していたが実際には差異がある）。
+挙動が一致しない。
 そのため書き込みは次の手順を守る。
 
 1. 書き込みは APM 管理の `linear` MCP（`https://mcp.linear.app/mcp`）を優先する。
@@ -116,7 +115,7 @@ Free プランはアーカイブされていない issue が 250 件まで（ア
 上限に当たったら、完了済みと Canceled の issue を archive して枠を空ける。
 
 - team の auto-archive（JEY は 6ヶ月）は、issue が属する project が完了するまで効かない。
-  finance / labs / workbench / GBF は常設の In Progress なので、完了済みは手動で archive する
+  `references/linear-projects-jey.md` で In Progress のプロジェクトは常設なので、完了済みは手動で archive する
 - archive は MCP に無いため GraphQL の `issueArchive`（戻すときは `issueUnarchive`）を使う
 - 親を archive すると、未完了の子 issue も一緒に archive される。
   対象から未完了の子を持つ親を外し、実行後は `includeArchived: true` で

@@ -47,7 +47,7 @@ codex -m gpt-6-luna -a never -s workspace-write
 
 worktree の事前作成ができない場合だけ、外部隔離された別の one-shot `--yolo` session に作成を限定する。その session は worktree の作成直後に終了し、実装は必ず新しく起動した上記 sandboxed pane worker に続けて渡す。実装 worker を `--yolo` のまま常駐させない。
 
-scoped `--add-dir` は worktree 作成の代替にならない。ローカルの一次観測では、Codex 0.150.1 の `codex --help` に `--add-dir` が出ていたが、`.git/worktrees` だけを書込可能にした isolated `workspace-write` probe は `.git/refs/heads/probe.lock` で rc255 `Operation not permitted` になった。source の `.git` 全体を追加し、target を事前作成しても、target の `/.git` への書込みで rc128 `Operation not permitted` になった。Codex が `git worktree add` に必要な Git administrative files を保護するため、scoped add-dir は insufficient である。従って `--yolo` は外部隔離された worktree 作成の one-shot session に限り、作成後は直ちに終了させる。
+scoped `--add-dir` は worktree 作成の代替にならない。workspace-write は `git worktree add` が書く Git の管理ファイル（refs の lock、target の `.git`）を保護するため、`.git` を追加しても `Operation not permitted` で止まる。従って `--yolo` は外部隔離された worktree 作成の one-shot session に限り、作成後は直ちに終了させる。
 
 `--yolo` は `--dangerously-bypass-approvals-and-sandbox` の別名で sandbox 自体を無効化する。外部隔離された one-shot の worktree 作成以外では使わず、承認プロンプトで停止させない目的だけなら `-a never` で足りる。
 

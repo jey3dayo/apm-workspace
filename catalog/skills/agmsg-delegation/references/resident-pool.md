@@ -2,7 +2,7 @@
 
 ユーザーが手で立てた pane の agent が `join` してチームに常駐し、同じ identity で複数タスクを受け続ける経路。`backlog-sweep` の Worker プールがこれにあたる。Lifecycle の 4・6・8 が使えないので、以下で置き換える。
 
-**エージェントが pane を勝手に作らない。ユーザーが「用意して」と指示したときだけ作る。** その場合も `herdr workspace create` / `tab create` は使わない——command 指定フラグが無く bare shell しか起動しないのに、読み戻さなければ「起動した」と報告できてしまう。自分の pane からの `pane split --current --cwd <絶対パス> --focus` で作る、という `herdr` スキルの手順に従う（`backlog-sweep`「Worker プールを組む」に手順あり）。
+**エージェントが pane を勝手に作らない。ユーザーが「用意して」と指示したときだけ作る。** その場合も `herdr workspace create` / `tab create` は使わない——command 指定フラグが無く bare shell しか起動しないのに、読み戻さなければ「起動した」と報告できてしまう。自分の pane からの `pane split --current --cwd <絶対パス> --focus` で作る（背面に作ると起動の失敗や事故に気づけないため、herdr の「背景作業は `--no-focus`」の例外とする）、という `herdr` スキルの手順に従う（コマンド契約は `herdr --skill`、読み戻しは `herdr` の House rules）。
 
 そこで agent を起こすときは `pane run` ではなく **`herdr agent start <name> --kind <kind> --pane <id>` を使う**。これは Herdr が同じ pane で当該 agent を検出し入力受付可能と判断するまで返らないので、「起動したつもりで実は未起動」を構造的に防げる。起動後の指示は `herdr agent prompt <name> "..." --wait`（settled 状態まで待つ。既に承認待ちなら入力を送らず `agent_blocked` を返す）。確認していない foreground process 名を報告に書かないこと。
 

@@ -26,7 +26,7 @@
 
 - 複数ドメインに該当: キーワードマッチ数が最も多いドメインを選択
 - どのドメインにも該当しない: `web-development` を既定値とする（最も一般的なユースケースのため）
-- 複数ドメインが拮抗する場合は、ユーザー入力やリポジトリの主目的に近い方を選び、もう一方は `generic.yaml` の質問や Context-Specific Risk Lenses で補う
+- 同点のときは `detect_domain` の tiebreak 順（ai-ml → security → data-systems → infrastructure → mobile-apps → web-development）で、より具体的なドメインを選び、もう一方は `generic.yaml` の質問や Context-Specific Risk Lenses で補う
 
 ## Extension
 

@@ -9,7 +9,7 @@
 
 ## 原因
 
-`db` / `teams` は `${XDG_STATE_HOME:-~/.local/state}/agmsg/` への symlink であるべきだが、`apm install -g` の素の実行や `mise run refresh` は upstream CLI 経路を通るため `cmd_apply` の save/restore を経由せず、link を張り直さずに完了する。state root 側の実体（roster・履歴）は消えない。
+`db` / `teams` は `${XDG_STATE_HOME:-~/.local/state}/agmsg/` への symlink であるべきだが、`apm install -g` の素の実行は upstream CLI 経路を通るため `cmd_apply` の save/restore を経由せず、link を張り直さずに完了する。state root 側の実体（roster・履歴）は消えない。
 
 ## 診断
 

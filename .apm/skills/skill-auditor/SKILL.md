@@ -41,7 +41,7 @@ Store these choices. Pass the language choice to all sub-agents as an
 instruction prefix: "Write all output text (health_assessment, detail, reason,
 suggested_fix, etc.) in [chosen language]."
 
-For cross-project mode, use `"all"` as the project_path argument in Step 3.
+For cross-project mode, use `"all"` as the project_path argument in Step 1.
 For current-project mode, use `--cwd "$(pwd)"`.
 
 ### Step 1: Detect Project

@@ -31,4 +31,4 @@ MCP / tool 面の不在は上記1〜5とは別の capability check として確�
 
 - `/tmp` と `$TMPDIR` は Codex の workspace-write が既定で書込可にする（base config に `exclude_slash_tmp` / `exclude_tmpdir_env_var` が無い）。**拒否を確認する先には使えない**。書けることを確認する scratch 側には使ってよい
 - 登録済み repo の内側（`tmp/` 配下を含む）を対象にすると `join.sh` / `reset.sh` が外側 repo へ正規化する。`AGMSG_RESOLVE_PROJECT=0` を付ける（SKILL.md Lifecycle 3 参照）
-- 組み込み permission profile `:workspace` は `sandbox_workspace_write` の `writable_roots` を捨てて exclude flag だけ読む。`writable_roots` の効き目はこの smoke では見られないため、`assert_writable_roots_are_canonical` と bats の静的検査で担保する
+- 組み込み permission profile `:workspace` は `sandbox_workspace_write` の `writable_roots` を捨てて exclude flag だけ読む。`writable_roots` の効き目はこの smoke では見られないため、path が canonical（symlink を含まない）であることは `run-codex-worker.sh` の `assert_writable_roots_are_canonical`（起動前の fail-closed 検査）で担保する。writable_roots が実際に効くことはこの smoke でも検査でも確かめていない

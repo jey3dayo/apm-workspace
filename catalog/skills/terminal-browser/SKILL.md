@@ -23,8 +23,8 @@ description: >-
 ## ハマりどころ
 
 - kitty graphics protocol 対応ターミナル必須（ghostty / kitty / cmux / VSCode など）。macOS 標準 Terminal.app と Windows は不可。描画されないときはまずターミナル対応を疑う
-- `action` が既存ペインでなく新規 Chrome を操作することがある（upstream issue #60）。狙いのタブに当たらないときは `terminal-browser ls` で selector を確認し、`--browser <key> --tab <id>` を明示する
-- Herdr / 非 macOS Ghostty では split 関連の未修正バグが複数残っている（issues #37/#40/#48/#61）。split が壊れる環境では `--split` を諦めて専用タブで開いてもらう
+- `action` が既存ペインでなく新規 Chrome を操作することがある。狙いのタブに当たらないときは `terminal-browser ls` で selector を確認し、`--browser <key> --tab <id>` を明示する
+- Herdr / 非 macOS Ghostty では split が壊れることがある（現状は upstream issues で確認）。split が壊れる環境では `--split` を諦めて専用タブで開いてもらう
 - Codex sandbox 内では pane 検出に必要な内部コマンドがブロックされるため、escalated permissions で実行する（upstream の codex overlay と同旨）
 
 ## 検証への組み込み

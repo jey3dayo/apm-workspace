@@ -83,7 +83,7 @@ review role の reviewer モデル指定は本スキル内の一時的な model 
 
 ### 1. Preflight
 
-- worker runtime の CLI 存在を確認: `command -v codex` / `command -v claude` / `~/.local/bin/cursor-agent`。Claude と cursor は `command -v sandbox-exec` も必須
+- worker runtime の CLI 存在を確認: `command -v codex` / `command -v claude` / `~/.local/bin/cursor-agent` / opencode（`mise which opencode`、または `AGMSG_OPENCODE_BIN`）。Claude・cursor・opencode は `command -v sandbox-exec` も必須
 - agmsg bootstrap 済みを確認（`~/.agents/skills/agmsg/` が存在）。**state を持つ face は `~/.agents/skills/agmsg` だけである。** agmsg は `db` / `teams` を実行された script 自身の dir から解決し、上流の `SKILL.md` は全コマンドを `~/.agents/skills/agmsg/scripts/...` の絶対パスで書くため、`~/.claude/skills/agmsg` など他 face に `db` / `teams` が無いのは仕様であり不具合ではない。他 face へ手で symlink を張らない——deploy target の内側なので次の `apm apply` で消え、実体を書いた場合は save に吸い上げられず削除される。link の正本は `~/.apm` の `scripts/agmsg-state.sh`
 - `team.sh` が `Team not found` を返す、`identities.sh` が空を返すなど roster link が壊れている疑いがあるときの診断・復旧手順は [references/roster-recovery.md](references/roster-recovery.md) を参照
 - role/runtime 別の起動コマンドを確定する。review は書込権限を実行時に強制する:
@@ -95,7 +95,7 @@ review role の reviewer モデル指定は本スキル内の一時的な model 
 
 opencode（implement のみ。review は不可）: `run-opencode-worker.sh implement <project> <model> <payload-file>`。許可 model は `deepseek/deepseek-v4-flash` の1つだけで、script が fail-closed で検証する。
 
-helper の解決先は `~/.agents/skills/agmsg-delegation/scripts/`。4 runtime とも headless mode と stdin/引数 prompt を使い、対話 TUI と shell interpolation を避ける。`launch-worker.sh` は専用の一時ディレクトリに launchd job label・ログ・exit status を残して detached に起動する。helper が role から model / effort を固定し、caller は model を渡さない（Codex / opencode / cursor は起動時の引数）。`run-codex-worker.sh` と `run-opencode-worker.sh` と `run-cursor-worker.sh` は role ごとの model allowlist を fail-closed で検証し、不一致は起動前に exit 2 で拒否する。上書き変数は各 script の Usage / コメントを参照（値は scripts が正本）。
+helper の解決先は `~/.agents/skills/agmsg-delegation/scripts/`。4 runtime とも headless mode と stdin/引数 prompt を使い、対話 TUI と shell interpolation を避ける。`launch-worker.sh` は専用の一時ディレクトリに launchd job label・ログ・exit status を残して detached に起動する。Claude helper は role から model を固定し、caller は model を渡さない。Codex / opencode / cursor は caller が起動時の引数で model を渡す。effort / variant の既定は Codex・opencode の helper が持つ（上書き変数は各 script が正本）。`run-codex-worker.sh` と `run-opencode-worker.sh` と `run-cursor-worker.sh` は role ごとの model allowlist を fail-closed で検証し、不一致は起動前に exit 2 で拒否する。上書き変数は各 script の Usage / コメントを参照（値は scripts が正本）。
 
 opencode helper の要点: mise shim ではなく実バイナリの絶対パス（`mise which opencode` で解決し、`AGMSG_OPENCODE_BIN` で上書き可）で起動し、専用 XDG 隔離と `OPENCODE_DISABLE_PROJECT_CONFIG=1` で project 側 MCP（bearer token を含む）を遮断したうえ、起動前に `opencode debug config` の mcp 件数を fail-closed で検査する（件数のみ確認し、キー名・値は出力しない）。credential は `auth.json` を渡さず `DEEPSEEK_API_KEY` を env で1つだけ渡す。書込境界は `run-claude-worker.sh` と同じ形の `sandbox-exec` 二層構成で強制し、詳細は script が正本。
 

@@ -199,7 +199,7 @@ defined by the repository (mise/pnpm/npm scripts) over ad hoc commands:
 
 ```bash
 # Example for a pnpm repository
-pnpm type-check && pnpm lint && pnpm test
+pnpm run type-check && pnpm run lint && pnpm run test
 ```
 
 Do not proceed to the next step until all pass.
@@ -219,8 +219,8 @@ Do not proceed to the next step until all pass.
 
 1. Do not make large-scale changes at once: start with similarity 95%+, stop at
    90-95% in the planning phase.
-2. End each phase at a verified checkpoint (checks green, diff reviewed). Commit
-   only when the user asked for commits; hand splitting to `atomic-commit`.
+2. End each phase at a verified checkpoint (checks green, diff reviewed). Whether
+   to commit follows the global stop/confirm policy; hand commit splitting to `atomic-commit`.
 3. Verify business logic: high similarity != must consolidate (may have
    different semantics).
 4. Owner folder first: if a technology already has a clear owner folder, move

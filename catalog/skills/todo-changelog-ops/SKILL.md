@@ -43,7 +43,7 @@ todo.txt のタスクが設計判断を要するほど育ったら issue へ昇�
 
 リリースを切るかどうかで決まる。1 リポジトリ 1 モード。
 
-- versioned — リリース成果物とバージョンがあるリポジトリ。[Keep a Changelog](https://keepachangelog.com/) 形式。完了分は `## [Unreleased]` 配下へ入れ、`### Features` / `### Bug Fixes` / `### Documentation` / `### Maintenance` へ分類する。バージョン節への切り出しはリリース手順の担当。
+- versioned — リリース成果物とバージョンがあるリポジトリ。[Keep a Changelog](https://keepachangelog.com/) の `## [Unreleased]` 運用に倣う。完了分は `## [Unreleased]` 配下へ入れ、`### Features` / `### Bug Fixes` / `### Documentation` / `### Maintenance` へ分類する。バージョン節への切り出しはリリース手順の担当。
 - dated — 継続デプロイでバージョンを持たないリポジトリ。`## YYYY-MM-DD — 一行要約` を新しい順に積む。日付見出しは版の代わりであって手抜きではない。
 
 どちらも本文は日本語・過去形で、利用者や運用者から見た結果を書く。実装手段やファイル名を主語にしない。
