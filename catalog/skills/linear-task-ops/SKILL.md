@@ -1,6 +1,6 @@
 ---
 name: linear-task-ops
-description: "JEY workspace 固有の Linear 運用ルール: issue のプロジェクト自動ルーティング、ラベル/タイトル/取引ログの書式、Asana からの移行マッピング、ガードレール。CRUD 自体は Linear MCP tools を使い、MCP が使えない環境や MCP に無い操作のみ GraphQL スクリプトへフォールバックする。Use when creating or editing Linear tasks, choosing a project or label, migrating task notes from Asana, or appending transaction logs (date/payment/price) to an existing issue."
+description: "JEY workspace 固有の Linear 運用ルール: issue のプロジェクト自動ルーティング、ラベル/タイトル/取引ログの書式、Asana からの移行マッピング、ガードレール。CRUD 自体は Linear MCP tools を使い、MCP が使えない環境や MCP に無い操作のみ GraphQL スクリプトへフォールバックする。Use when creating or editing Linear tasks, choosing a project or label, migrating task notes from Asana, archiving issues to free the plan's issue limit, or appending transaction logs (date/payment/price) to an existing issue."
 ---
 
 # Linear Task Ops
@@ -47,14 +47,14 @@ claude.ai / ChatGPT のアプリ側 Linear コネクタは、issue の作成・�
 
 ### 分類ルール
 
-| プロジェクト | 対象ドメイン                                       | キーワード例                                                                                       |
-| ------------ | -------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| finance      | 決済・サブスク・固定費・ポイ活・請求               | 支払い、請求、決済、サブスク、解約、ポイント、固定費、d払い、クレカ、引き落とし、ギフトコード      |
-| household    | 家庭・生活基盤（住宅・保険・税・育児・光熱・車）   | 住宅、保険、確定申告、ふるさと納税、育児、保育園、光熱費、車検、通信契約                           |
-| labs         | 個人学習・調査・技術検証・個人開発実験             | 調べる、検証、学習、試す、リサーチ、PoC、実験、ドキュメント読む                                    |
-| GBF          | ゲーム、特にグランブルーファンタジー全般           | ゲーム、グラブル、GBF、古戦場、マグナ、召喚石、十天衆、エーテル                                    |
-| workbench    | 会社雑務・その他個人タスク（上記に該当しないもの） | 申請、会議、雑務、確認、連絡、その他                                                               |
-| リポジトリ名 | 特定リポジトリの開発タスク                         | `ultra-rss-reader`, `ca-connect-site`, `cygate`, `pr-labeler`, `LoCA` など repo 名が明示された場合 |
+| プロジェクト | 対象ドメイン                                       | キーワード例                                                                                                  |
+| ------------ | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| finance      | 決済・サブスク・固定費・ポイ活・請求               | 支払い、請求、決済、サブスク、解約、ポイント、固定費、d払い、クレカ、引き落とし、ギフトコード                 |
+| household    | 家庭・生活基盤（住宅・保険・税・育児・光熱・車）   | 住宅、保険、確定申告、ふるさと納税、育児、保育園、光熱費、車検、通信契約                                      |
+| labs         | 個人学習・調査・技術検証・個人開発実験             | 調べる、検証、学習、試す、リサーチ、PoC、実験、ドキュメント読む                                               |
+| GBF          | ゲーム、特にグランブルーファンタジー全般           | ゲーム、グラブル、GBF、古戦場、マグナ、召喚石、十天衆、エーテル                                               |
+| workbench    | 会社雑務・その他個人タスク（上記に該当しないもの） | 申請、会議、雑務、確認、連絡、その他                                                                          |
+| リポジトリ名 | 特定リポジトリの開発タスク                         | `ultra-rss-reader`, `ca-connect-site`, `cygate`, `pr-labeler`, `LoCA`, `keep-on` など repo 名が明示された場合 |
 
 `finance` と `household` は重なりやすい。支出の発生・決済手段そのものが主題なら
 `finance`、生活基盤の意思決定や手続きが主題なら `household`。
@@ -91,6 +91,20 @@ claude.ai / ChatGPT のアプリ側 Linear コネクタは、issue の作成・�
 4. 支払いログは行単位レコードとして書く
 5. 散文の期限は `dueDate` にも設定する
 
+## issue 上限と archive
+
+Free プランはアーカイブされていない issue が 250 件まで（アーカイブ済みは数えない）。
+上限に当たったら、完了済みと Canceled の issue を archive して枠を空ける。
+
+- team の auto-archive（JEY は 6ヶ月）は、issue が属する project が完了するまで効かない。
+  finance / labs / workbench / GBF は常設の In Progress なので、完了済みは手動で archive する
+- archive は MCP に無いため GraphQL の `issueArchive`（戻すときは `issueUnarchive`）を使う
+- 親を archive すると、未完了の子 issue も一緒に archive される。
+  対象から未完了の子を持つ親を外し、実行後は `includeArchived: true` で
+  「未完了かつ archived」を照会して、巻き込まれたものを `issueUnarchive` で戻す
+- archive 直後の再取得は古い値を返すことがある。数秒おいて取り直してから成否を判断する
+- 対象件数を dry-run で示し、ユーザーの了承を得てから実行する
+
 ## GraphQL フォールバック
 
 次のいずれかに該当する場合に `scripts/linear_task.py` を使う。
@@ -102,6 +116,8 @@ claude.ai / ChatGPT のアプリ側 Linear コネクタは、issue の作成・�
 
 ```bash
 export LINEAR_API_KEY=...   # または LINEAR_TOKEN / LINEAR_ENV_FILE=/path/to/.env
+# ~/.config では暗号化済みの .env.secrets に LINEAR_TOKEN がある:
+#   cd ~/.config && dotenvx run -q -f .env.secrets -- python3 <script>
 python3 scripts/linear_task.py teams
 python3 scripts/linear_task.py states --team JEY
 python3 scripts/linear_task.py list --team JEY --limit 30

@@ -1,4 +1,4 @@
-# Linear プロジェクト一覧（team: JEY / 取得日: 2026-07-27）
+# Linear プロジェクト一覧（team: JEY / 取得日: 2026-10-01）
 
 ## プロジェクト
 
@@ -14,6 +14,7 @@
 | ca-connect-site  | 143b6a46-2d79-475b-83a4-68dd6c121d17 | Backlog     | -                                        |
 | cygate           | 05fed0ff-02a4-4934-b340-9340d84541e1 | Backlog     | -                                        |
 | pr-labeler       | ce1a8d5f-e5c3-4f5d-8dd2-d293ee135734 | Backlog     | -                                        |
+| keep-on          | 881a2582-a0e1-42a5-b01a-dc0803f5df9c | Backlog     | -                                        |
 
 `finance` は旧 `finance-ops`。改名のみで ID は同じ。
 
