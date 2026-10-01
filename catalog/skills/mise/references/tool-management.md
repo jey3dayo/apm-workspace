@@ -19,16 +19,17 @@ This document provides detailed guidance on managing language runtimes, CLI tool
 - For pipx-backed tools, mise may route installs through uv or pipx. When dependency age controls are active, the pip fallback can pass pip's `--uploaded-prior-to`; that requires a new enough pip. Pinning the verified package version keeps installs current without making CI depend on a moving resolver target.
 - For personal global configs, rolling channels are a local preference, but do not copy them into shared repository examples.
 
-### Exception: pnpm (bootstrap only, loose major pin)
+### Exception: pnpm (version owned by package.json)
 
-pnpm はこのピン方針の例外。mise の役割はブートストラップだけにし、メジャーで緩くピンする:
+pnpm はこのピン方針の例外。バージョンは `package.json` の `packageManager` だけに置き、`mise.toml` に pnpm 行を書かない。mise には package.json を読ませる:
 
 ```toml
-[tools]
-pnpm = "12" # bootstrap only; exact version is owned by package.json "packageManager"
+[settings]
+idiomatic_version_file_enable_tools = ["pnpm"]
 ```
 
-- 正確なバージョンの正本は各リポジトリの `package.json` の `packageManager` フィールド。pnpm 10+ の self-management（`managePackageManagerVersions`、デフォルト有効）が `packageManager` を読んで自動で該当バージョンに切り替えるため、mise 側で厳密ピンすると二重管理になる
+- `npm:pnpm` backend は使わない（driver が pnpm 11.27 以降だと入らない）
+- 正確なバージョンの正本は各リポジトリの `package.json` の `packageManager` フィールド。pnpm 10+ の self-management（`managePackageManagerVersions`、デフォルト有効）が `packageManager` を読んで自動で該当バージョンに切り替えるため、mise.toml にピンを置くと二重管理になる
 - 厳密ピンの実害例: `mise.toml` が `pnpm = "10.29.3"`、`packageManager` が `pnpm@11.16.0` でドリフトすると、実行されるのは self-management が切り替えた 11 系になり、mise のピンは実効性がないまま誤解だけ生む
 - corepack は採用しない。Node.js TSC が 2025-03 に Node 25+ からの corepack 同梱終了を決定しており（外部インストールが必要な別ツール化）、「Node に付いてくる corepack で pnpm を管理」という前提は成立しない
 
@@ -361,7 +362,7 @@ end
 
 -- Example usage in LSP config
 if check_tool("typescript-language-server") then
-  require("lspconfig").tsserver.setup({})
+  require("lspconfig").ts_ls.setup({})
 end
 ```
 

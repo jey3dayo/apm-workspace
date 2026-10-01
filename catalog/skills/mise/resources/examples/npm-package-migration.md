@@ -221,7 +221,6 @@ npm:@bufbuild/protoc-gen-es    2.2.0
 npm:@connectrpc/protoc-gen-connect-es    1.6.1
 npm:@fsouza/prettierd    0.25.0
 npm:aicommits    1.11.0
-npm:corepack    0.29.4
 npm:husky    9.1.6
 npm:neovim    5.3.0
 npm:npm-check-updates    17.1.4
@@ -230,8 +229,6 @@ npm:textlint-rule-preset-ja-technical-writing    10.0.1
 npm:textlint    14.3.0
 ...
 
-$ which prettier
-<home-dir>/.local/share/mise/installs/npm-prettierd/0.25.0/bin/prettier
 ```
 
 ### Step 5: Update Documentation
@@ -422,4 +419,4 @@ vim.g.node_host_prog = vim.fn.expand("~/.local/share/mise/installs/node/24.16.0/
 
 - Detailed Guide: `references/tool-management.md`
 - Configuration Template: `resources/templates/mise-config-template.toml`
-- Task Aliases: See `SKILL.md` Section 5
+- Task Aliases: See `SKILL.md` → Aggregation vs alias

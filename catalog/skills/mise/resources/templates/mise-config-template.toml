@@ -135,7 +135,8 @@ github-cli = "<verified-version>" # gh command
 
 # Package Management
 "npm:npm" = "<verified-version>"
-# "npm:pnpm" = "<verified-version>"
+# pnpm: no pin here; put the version in package.json "packageManager" and set
+# [settings] idiomatic_version_file_enable_tools = ["pnpm"] so mise reads it
 # "npm:yarn" = "<verified-version>"
 
 # Neovim Integration
@@ -239,14 +240,6 @@ run = "mise doctor"
 # depends = ["format:toml:check", "format:yaml:check"]
 
 # ========================================
-# Aliases / Meta Tasks
-# ========================================
-
-# [tasks."+ci"]
-# description = "Run shared CI checks"
-# depends = ["check", "test", "build"]
-
-# ========================================
 # Additional Examples
 # ========================================
 
@@ -299,16 +292,11 @@ run = "mise doctor"
 # Alias Examples
 # ----------------------------------------
 
-# [tasks.b]
-# alias = "build"
+# Aliases live on the task they point to:
+# [tasks.build]
+# alias = ["b"]
 
-# [tasks.t]
-# alias = "test"
-
-# [tasks.f]
-# alias = "format"
-
-# [tasks."+all"]
+# [tasks.all]
 # description = "Run all checks"
 # depends = ["lint", "test", "build"]
 
@@ -323,10 +311,10 @@ run = "mise doctor"
 # # Run when leaving directory
 # leave = "echo 'Goodbye from {{ cwd }}'"
 
-# # Run before any task
+# # Run before tool installation
 # preinstall = "echo 'About to install tools...'"
 
-# # Run after any task
+# # Run after tool installation
 # postinstall = "echo 'Tools installed successfully!'"
 
 # ========================================

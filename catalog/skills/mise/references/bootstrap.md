@@ -1,6 +1,6 @@
 # mise bootstrap — Declarative Machine Setup
 
-`mise bootstrap` sets up a machine for the current config in one command: OS packages, git repos, dotfiles, shell activation, macOS defaults, LaunchAgents, systemd user services, login shell, `[tools]`, and a final custom task. Introduced in v2026.6.6, completed end-to-end in v2026.6.14. Still gated behind `settings.experimental = true` (verified on 2026.7.3: commands error with "mise bootstrap is experimental" without it) — set it in config or `mise settings experimental=true` before running. Older mise binaries emit `unknown field: bootstrap` warnings — upgrade mise first.
+`mise bootstrap` sets up a machine for the current config in one command: OS packages, git repos, dotfiles, shell activation, macOS defaults, LaunchAgents, systemd user services, login shell, `[tools]`, and a final custom task. `settings.experimental = true` is required; without it commands stop with "mise bootstrap is experimental". Set it in config or `mise settings experimental=true` before running, and re-check per mise version. Older mise binaries emit `unknown field: bootstrap` warnings — upgrade mise first.
 
 Declarative sections converge idempotently: already-installed packages, matching dotfiles, repos at the requested ref, and defaults already set are skipped. The custom `[tasks.bootstrap]` hook runs every time — its idempotency is your responsibility.
 
@@ -76,7 +76,7 @@ Dotfiles conflicts are refused by default; `--force-dotfiles` overrides explicit
 | Cask / mas | Yes                           | Yes (cask without Homebrew itself)       |
 | Linux pkgs | No                            | apt/apk/dnf/pacman                       |
 
-Path: `packages import --dry-run` for formulae, hand-translate casks/mas entries (import doesn't cover them), verify with `packages status --missing`, then retire the Brewfile. Community migration precedent is essentially nil (feature is from June 2026) — treat as early adoption and pin a recent mise version.
+Path: `packages import --dry-run` for formulae, hand-translate casks/mas entries (import doesn't cover them), verify with `packages status --missing`, then retire the Brewfile. Treat as early adoption and pin a recent mise version.
 
 ## Real-world example
 

@@ -19,7 +19,7 @@ _.path = ['./node_modules/.bin']
 [tools]
 node = '<verified-version>'  # LTS major
 fd = '<verified-version>'       # ファイル検索用
-prettier = '<verified-version>' # コードフォーマッター
+"npm:prettier" = '<verified-version>' # コードフォーマッター
 
 # === ドキュメント管理 ===
 [tasks."docs:lint"]
@@ -48,8 +48,8 @@ run = "prettier --check --cache 'commands/**/*.md' 'docs/**/*.md' 'skills/**/*.m
 
 # === 集約タスク ===
 [tasks.format]
-description = "全ての自動修正を実行"
-depends = ["docs:fix", "docs:format"]
+description = "全ての自動修正を実行（同じファイルを書くので直列）"
+run = [{ task = "docs:fix" }, { task = "docs:format" }]
 
 [tasks.lint]
 description = "全体検証(修正はしない)"
@@ -115,8 +115,8 @@ run = "prettier --write --cache '...'"
 
 ```toml
 [tasks.format]
-description = "全ての自動修正を実行"
-depends = ["docs:fix", "docs:format"]
+description = "全ての自動修正を実行（同じファイルを書くので直列）"
+run = [{ task = "docs:fix" }, { task = "docs:format" }]
 
 [tasks.lint]
 description = "全体検証(修正はしない)"
@@ -125,20 +125,20 @@ depends = ["docs:lint", "docs:format:check", "docs:links"]
 
 #### Key Points
 
-- No run property - Pure orchestration via depends
-- Parallel execution - All dependencies run concurrently
+- `lint` has no run property - pure orchestration via depends; the read-only checks are independent, so they run concurrently
+- `format` uses `run = [{ task = ... }]` - fixers that write the same files are not independent and must run serially
 - Short task names - `format` and `lint` are easy to type (ordinary task names, not `alias`)
 
 #### Execution Flow
 
 ```bash
 mise format
-# Runs in parallel:
+# Runs serially (both write the same files):
 # - docs:fix (markdownlint-cli2 --fix)
 # - docs:format (prettier --write)
 
 mise lint
-# Runs in parallel:
+# Runs in parallel (read-only):
 # - docs:lint (markdownlint-cli2)
 # - docs:format:check (prettier --check)
 # - docs:links (markdown-link-check)
@@ -152,7 +152,7 @@ mise lint
 [tools]
 node = '<verified-version>'  # LTS major
 fd = '<verified-version>'       # ファイル検索用
-prettier = '<verified-version>' # コードフォーマッター
+"npm:prettier" = '<verified-version>' # コードフォーマッター
 ```
 
 #### Benefits
@@ -253,18 +253,23 @@ run = [
 ]
 ```
 
-#### After (Parallel)
+#### After (Reuse existing tasks)
 
 ```toml
+# Fixers write the same files: serial
 [tasks.format]
-depends = ["docs:fix", "docs:format"]
+run = [{ task = "docs:fix" }, { task = "docs:format" }]
+
+# Independent read-only checks: depends runs them in parallel
+[tasks.lint]
+depends = ["docs:lint", "docs:format:check", "docs:links"]
 ```
 
 #### Benefits
 
-- 2x faster (parallel execution)
 - Easier to maintain (reuse existing tasks)
 - Better error isolation
+- Read-only checks run in parallel; same-file writers stay ordered
 
 ### 2. Consistent Naming
 

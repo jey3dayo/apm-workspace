@@ -66,7 +66,8 @@ run = "cargo test"
 
 ### Aggregation vs alias
 
-- Aggregation tasks (`check`, `lint`, `format`) coordinate independent prerequisites — prefer `depends`-only
+- Aggregation tasks (`check`, `lint`) coordinate independent prerequisites — prefer `depends`-only
+- Tasks that write the same files are not independent — run them serially with `run = [{ task = "a" }, { task = "b" }]` instead of listing them in `depends`
 - `alias = ["b"]` is optional CLI sugar; a task named `deploy` or `format` is not an alias unless it declares `alias = [...]`
 
 ### Entry points vs internal sub-tasks (`hide = true`)
@@ -94,12 +95,12 @@ Within `[tasks]`: individual commands → aggregation tasks → aliases/meta-tas
 - Shared repositories: pin concrete LTS majors or exact patches (`node = "24"` or `node = "24.15.0"`); personal global configs may use symbolic channels (`node = "lts"`)
 - Resolve the newest acceptable version first, then record the concrete version — no floating channels in committed configs or CI
 - Add tools to `[tools]` only when tasks or documented setup flows actually invoke them
-- pnpm is the pinning exception: mise only bootstraps it with a loose major pin (`pnpm = "12"`); the exact version is owned by each repository's `package.json` `packageManager` field (pnpm 10+ self-management switches automatically). Do not use corepack — Node 25+ no longer ships it
+- pnpm is the pinning exception: the version lives only in `package.json` `packageManager` (CI's `pnpm/action-setup` reads it, so a mise.toml pin is a drifting duplicate). Put no pnpm line in `[tools]`; set `[settings] idiomatic_version_file_enable_tools = ["pnpm"]` so mise reads package.json. Never use the `npm:pnpm` backend or corepack (Node 25+ no longer ships it)
 - Migration from `global-package.json`, pinning policy, pipx/CI caveats: `references/tool-management.md`
 
 ## mise bootstrap (user-global / dotfiles mode)
 
-`mise bootstrap` (v2026.6.6+, completed v2026.6.14) is declarative machine setup: OS packages, repos, dotfiles, macOS defaults, launchd/systemd units, login shell, tools, and a final `[tasks.bootstrap]`. Classify these requests as user-global / dotfiles mode.
+`mise bootstrap` is declarative machine setup: OS packages, repos, dotfiles, macOS defaults, launchd/systemd units, login shell, tools, and a final `[tasks.bootstrap]`. Classify these requests as user-global / dotfiles mode.
 
 - Config keys must be nested tables (`[bootstrap.packages]`, not flat `bootstrap = ...`)
 - Package backends: apk/apt/dnf/pacman/brew/brew-cask/mas; cask support is native (no Homebrew required); pin versions via name suffix (`brew:postgresql@17`), values are `"latest"`

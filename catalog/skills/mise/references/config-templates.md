@@ -58,9 +58,9 @@ LOG_LEVEL = "info"
 # === Tools ===
 [tools]
 node = "24"              # Current LTS major
-rust = "1.75"
-python = "3.12"
-go = "1.21"
+rust = "<verified-version>"
+python = "<verified-version>"
+go = "<verified-version>"
 
 # === Development Tasks ===
 [tasks.dev]
@@ -117,17 +117,17 @@ alias = ["f"]
 run = "prettier --write ."
 
 # === Meta Tasks ===
-[tasks."+ci"]
+[tasks."ci"]
 description = "Full CI pipeline"
 depends = ["lint", "test", "build"]
 
-[tasks."+check"]
+[tasks."check"]
 description = "Quick validation (no build)"
 depends = ["lint", "format:check"]
 
-[tasks."+fix"]
+[tasks."fix"]
 description = "Auto-fix all issues"
-depends = ["format", "lint"]
+run = [{ task = "format" }, { task = "lint" }]
 ```
 
 ## User-Global Dotfiles Template
@@ -294,7 +294,7 @@ run = "cargo fmt --check"
 description = "Generate documentation"
 run = "cargo doc --no-deps --open"
 
-[tasks."+ci"]
+[tasks."ci"]
 description = "Full CI checks"
 depends = ["fmt:check", "clippy", "test", "build"]
 ```
@@ -343,7 +343,7 @@ run = "black --check src/ tests/"
 description = "Type check with mypy"
 run = "mypy src/"
 
-[tasks."+ci"]
+[tasks."ci"]
 description = "Full CI checks"
 depends = ["format:check", "lint", "type-check", "test"]
 ```
@@ -352,7 +352,7 @@ depends = ["format:check", "lint", "type-check", "test"]
 
 ```toml
 [tools]
-go = "1.21"
+go = "<verified-version>"
 
 [tasks.build]
 description = "Build binary"
@@ -386,7 +386,7 @@ run = "go fmt ./..."
 description = "Vet code"
 run = "go vet ./..."
 
-[tasks."+ci"]
+[tasks."ci"]
 description = "Full CI checks"
 depends = ["fmt", "vet", "lint", "test"]
 ```
@@ -489,7 +489,7 @@ run = "docker compose logs -f"
 ```toml
 [tasks."release:check"]
 description = "Pre-release checks"
-depends = ["+ci", "docs:build"]
+depends = ["ci", "docs:build"]
 
 [tasks."release:version"]
 description = "Bump version"
@@ -520,15 +520,15 @@ run = [
 ### GitHub Actions Integration
 
 ```toml
-[tasks."+ci"]
+[tasks."ci"]
 description = "Full CI pipeline"
 depends = ["lint", "test", "build"]
 
-[tasks."+ci:fast"]
+[tasks."ci:fast"]
 description = "Quick CI checks"
 depends = ["lint", "test:unit"]
 
-[tasks."+ci:full"]
+[tasks."ci:full"]
 description = "Comprehensive CI"
 depends = [
   "lint",
@@ -556,7 +556,7 @@ jobs:
         with:
           version: <verified-version>
       - name: Run CI
-        run: mise run +ci
+        run: mise run ci
         env:
           MISE_JOBS: 4
 ```
@@ -564,24 +564,13 @@ jobs:
 ### Pre-commit Hooks
 
 ```toml
-[tasks."+pre-commit"]
+[tasks."pre-commit"]
 description = "Pre-commit validation"
-depends = ["format", "lint"]
+run = [{ task = "format" }, { task = "lint" }]
 
-[tasks."+pre-push"]
+[tasks."pre-push"]
 description = "Pre-push validation"
 depends = ["test", "build"]
-```
-
-### With Husky
-
-```json
-{
-  "hooks": {
-    "pre-commit": "mise run +pre-commit",
-    "pre-push": "mise run +pre-push"
-  }
-}
 ```
 
 ## Advanced Patterns
@@ -602,7 +591,7 @@ run = "terraform apply -var-file=staging.tfvars"
 [tasks."deploy:prod"]
 description = "Deploy to production"
 env = { ENVIRONMENT = "production" }
-depends = ["+ci"]
+depends = ["ci"]
 run = "terraform apply -var-file=prod.tfvars"
 ```
 

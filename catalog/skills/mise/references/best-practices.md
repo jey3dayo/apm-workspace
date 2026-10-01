@@ -48,7 +48,7 @@ rust = "stable"
 
 #### Characteristics
 
-- Mandatory key for every task
+- Optional when `depends` alone defines the task (aggregation-only tasks)
 - Can be a single string, an array of strings, or an array mixing scripts and task objects
 - Executes in the order written, serially, **inside the task's shell**
 - Tasks referenced with `{ task = "x" }` (or `{ tasks=[...] }`) are _inline_ steps
@@ -248,7 +248,7 @@ steps:
     with:
       version: <verified-version>
   - name: Run CI
-    run: mise run +ci
+    run: mise run ci
     env:
       MISE_JOBS: 4
 ```

@@ -1,6 +1,6 @@
 ---
 name: scheduled-audit-ops
-description: Synchronize repository-owned audit definitions under docs/prompts with Codex automations, or run those audits and publish evidence-backed, prioritized, deduplicated GitHub Issues. Use when creating or updating scheduled repository audits, validating audit prompt configuration, reflecting prompt changes into Codex schedules, executing a configured audit, or reconciling prior audit findings with Issues.
+description: Synchronize repository-owned audit definitions under docs/prompts with Codex automations, or run those audits and publish evidence-backed, prioritized, deduplicated GitHub Issues. Use when creating or updating scheduled repository audits, validating audit prompt configuration, reflecting prompt changes into Codex schedules, executing a configured audit, reconciling prior audit findings with Issues, or running report jobs that write only allowlisted report files and open at most one pull request.
 ---
 
 # Scheduled Audit Ops
