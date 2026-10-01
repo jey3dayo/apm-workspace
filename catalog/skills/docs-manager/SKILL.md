@@ -6,8 +6,8 @@ agent: docs-manager
 background: false
 description: >-
   Docs governance: validate and fix Markdown docs against metadata, OKF / YAML
-  frontmatter, tag, link and size rules (`.docs-manager-config.json`), and make docs
-  OKF-compatible. Which docs drifted after a change is docs-review.
+  frontmatter, tag, link and size rules (`.docs-manager-config.json`), and convert docs
+  to OKF when the project opts in. Which docs drifted after a change is docs-review.
 ---
 
 # Docs Manager
@@ -44,7 +44,9 @@ config がない場合は default behavior として扱う:
 - size limits: ideal 300 lines, acceptable 500 lines, warning 1000 lines, maximum 2000 lines
 - link validation: enabled unless the project clearly disables it
 
-ただし、ユーザーが OKF / Open Knowledge Format / YAML frontmatter 対応を求めた場合は、config がなくても `metadata_profile: okf` 相当として扱う。`type` を required、`title`, `description`, `resource`, `tags`, `timestamp`, `audience`, `owner` を recommended とし、既存 docs への最小 frontmatter 追加を第一候補にする。OKF 化のためだけに本文を大きく再構成したり、新規説明 docs を増やしたりしない。
+config が `metadata_profile: none` を指定している repo は metadata を持たない方針を宣言している。metadata block・frontmatter・tag の検証と追加を行わず、OKF 化も提案しない。ユーザーが OKF 化を求めた場合も変換せず、config が不採用を宣言していることを報告する。
+
+config が無い repo で、ユーザーが OKF / Open Knowledge Format / YAML frontmatter 対応を求めた場合は `metadata_profile: okf` 相当として扱う。`type` を required、`title`, `description`, `resource`, `tags`, `timestamp`, `audience`, `owner` を recommended とし、既存 docs への最小 frontmatter 追加を第一候補にする。OKF 化のためだけに本文を大きく再構成したり、新規説明 docs を増やしたりしない。
 
 ## Validation Order
 

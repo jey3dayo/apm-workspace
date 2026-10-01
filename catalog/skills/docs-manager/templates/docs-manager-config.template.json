@@ -16,8 +16,8 @@
     },
     "metadata_profile": {
       "type": "string",
-      "description": "Metadata profile: legacy body metadata block or OKF-compatible YAML frontmatter",
-      "enum": ["legacy", "okf"],
+      "description": "Metadata profile: legacy body metadata block, OKF-compatible YAML frontmatter, or none (docs carry no metadata)",
+      "enum": ["legacy", "okf", "none"],
       "default": "legacy"
     },
     "required_tags": {

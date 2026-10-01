@@ -90,7 +90,7 @@ Field mapping:
 | `audience`    | `対象`                 | Recommended project governance field             |
 | `owner`       | none                   | Recommended stewardship field                    |
 
-Do not force-convert existing repositories unless their config opts into the OKF profile. In legacy profile, accept body metadata blocks as the canonical format.
+Do not force-convert existing repositories unless their config opts into the OKF profile. In legacy profile, accept body metadata blocks as the canonical format. `metadata_profile: "none"` declares that the project's docs carry no metadata: skip metadata and tag validation, and do not add frontmatter or body metadata blocks.
 
 ## Date Field
 
