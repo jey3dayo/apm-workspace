@@ -18,6 +18,8 @@
 
 `finance` は旧 `finance-ops`。改名のみで ID は同じ。
 
+プロジェクトにはラベル `dev`（開発・技術: repo 系と labs）か `life`（生活: finance / household / GBF / workbench）を1つ付ける。プロジェクトの Priority は使わない。
+
 ## 使い方
 
 MCP はプロジェクト名で指定できる。
