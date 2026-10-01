@@ -2,7 +2,6 @@
 
 ## ラベル
 
-- Research
 - term
   - term:daily
   - term:weekly
@@ -10,29 +9,21 @@
   - term:quarterly
   - term:semiannual
   - term:yearly
-- household
-  - household:utilities（光熱費・通信・生活インフラ）
-  - household:shopping（買い物・価格比較）
-  - household:car（車・交通関連）
-  - household:insurance（保険・保障）
-  - household:tax（税金・控除・ふるさと納税）
-  - household:finance（家計・資金計画）
-  - household:childcare（育児・子ども関連）
-  - household:house（住宅・土地・建築）
-- LT
 - Bug
-- Improvement
 - Feature
+- Improvement
 
 ## 使い分けの実例
 
 - 期限・周期管理: `term:*`（例: `term:monthly`, `term:yearly`）
-- 緊急度・重要度: ラベルでなく Priority（Urgent / High / Medium / Low）
-- household プロジェクトの領域分類: `household:*`
-- 研究・検証: `Research`
-- 種別: `Bug` / `Improvement` / `Feature`
+- 種別（開発系プロジェクト）: `Bug` / `Feature` / `Improvement`
+- 領域はプロジェクト、緊急度・重要度は Priority で表す
+
+## retire 済み（新しい issue には付けない）
+
+- `risk:*`（Priority へ移行）、`household:*` と `domain`（project で足りる）、`Research`（labs で足りる）、`LT`
 
 ## 注意
 
-- ラベルはチームごとに異なる。
-- 最新化は Linear MCP の `list_issue_labels`（`team: JEY`）で取得し、このファイルを更新する。
+- ラベルはワークスペース共通。
+- 最新化は Linear MCP の `list_issue_labels`（`team: JEY`）で取得し、このファイルを更新する。retire 済みは `retiredAt` で判別する。

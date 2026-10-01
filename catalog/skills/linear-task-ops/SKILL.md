@@ -69,10 +69,12 @@ claude.ai / ChatGPT のアプリ側 Linear コネクタは、issue の作成・�
 ## ラベル
 
 実在するラベルのみ使う。一覧は `references/linear-labels-jey.md`。
-新しいタグを発明せず、既存の `term:*` / `household:*` /
-`Research` / `Bug` / `Improvement` / `Feature` から選ぶ。
+ラベルは project と Priority で表せない軸だけに使い、`term:*`（周期）と
+`Bug` / `Feature` / `Improvement`（開発系プロジェクトの種別）から選ぶ。
+新しいラベルは、それで絞り込む用途がユーザーから示されたときだけ足す。
 
-- 緊急度・重要度はラベルでなく issue の Priority で表す（`risk:*` は 2026-10-01 に retire 済み）
+- 緊急度・重要度はラベルでなく issue の Priority で表す
+- `retiredAt` のあるラベルは付けない。既存 issue に残っていても付け直さない
 - 判定できないものは No priority のままにし、着手前に Urgent–Low へ確定させる
 - 周期タスクには `term:*` を付ける
 
