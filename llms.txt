@@ -2,7 +2,7 @@
 
 `~/.apm` is the working copy and operational source of truth for the global APM workspace for `jey3dayo`.
 
-`~/.config` is bootstrap-only for authoring in this workspace model. The external source mapping at `~/.config/nix/agent-skills-sources.nix` is retired and intentionally empty, so it is not an active editing target. The exception is global `mise` tool resolution for `apm`, which must stay aligned with this workspace when the active `apm` source changes.
+`~/.config` is bootstrap-only for authoring in this workspace model. The exception is global `mise` tool resolution for `apm`, which must stay aligned with this workspace when the active `apm` source changes.
 
 This workspace owns the global APM manifest, the lockfile, the downloaded dependency cache, your personal skill sources, and the shared runtime guidance package.
 
@@ -16,7 +16,7 @@ This workspace owns the global APM manifest, the lockfile, the downloaded depend
 - `private-skills/`: gitignored machine-local skills (tracked in a private repo) synced by `mise run deploy` alongside the catalog; `apply:skills:local` is the fast partial path
 - `mise.toml`: workspace-local tasks for install, migration, validation, and repair
 - `scripts/apm-workspace.*`: tracked host-local MCP detection and user-scope reconciliation logic
-- `tests/`: bats and Pester coverage for the workspace helper scripts; both suites gate `git push`
+- `tests/`: bats and Pester coverage for the workspace helper scripts; only the bats suite (`test:sh`) gates `git push`
 
 ## Managed Catalog Layout
 
@@ -29,7 +29,7 @@ Workspace assets are split by role.
   - provenance: `~/.apm/manual-skills/upstreams/**`
 - Local-only private skills
   - source: `~/.apm/private-skills/.apm/skills/<skill-id>/`
-  - rollout: `mise run apply:skills:local` only
+  - rollout: `mise run deploy` (fast partial path: `mise run apply:skills:local`)
 - Shared guidance
   - source: `~/.apm/catalog/AGENTS.md`
   - source: `~/.apm/catalog/agents/**`
@@ -147,11 +147,11 @@ When a machine-local skill lives under `~/.apm/private-skills/`:
 - `mise run verify`: run `check`, both workspace-script test suites, then catalog smoke verification
 - `mise run test`: run the bats and Pester suites for `scripts/apm-workspace.*` on their own, in parallel
 - `mise run deploy`: run `check -> apply -> doctor` for the current workspace state
-- `mise run upgrade`: accept upstream dependency updates with `apm install -g --update`, then run the local rollout
-- `mise run refresh:deploy`: refresh first, then run the full local rollout from the current manifest and lock
+- `mise run upgrade`: accept upstream dependency updates with `apm update -g --yes`, then run the local rollout
+- `mise run refresh:deploy`: pull the checkout and run `apm deps update -g` (re-resolves branch/tag refs and regenerates `apm.lock.yaml`), then run the full local rollout (`deploy`). Unlike `upgrade` (`apm update -g --yes`, then `deploy`), it also pulls the checkout.
 - `mise run apply`: deploy the current manifest and lock without changing upstream refs
 - `mise run apply:skills:local`: fast partial sync of catalog skills plus local `private-skills` into `~/.agents/skills`, skipping the full `deploy`
-- `mise run refresh`: refresh the checkout and dependency state without deploying
+- `mise run refresh`: pull the checkout (skipped when the tree is dirty) and run `apm deps update -g` (deprecated; superseded by `apm update`), which advances unpinned dependencies, regenerates `apm.lock.yaml`, and rewrites deployed targets; agmsg links are saved/restored around it. It does not run `check`, the workspace apply, or `doctor`.
 - `mise run deploy:fresh`: recover from stale or corrupted `apm_modules/` cache before redeploying
 - `mise run validate`: run both workspace and catalog validation
 - `mise run validate:workspace`: verify workspace wiring with workspace overrides
@@ -174,9 +174,8 @@ If a deployed skill exists but its `SKILL.md` is clearly wrong, tiny, or a place
 ## References
 
 - Human overview: `~/.apm/README.md`
-- Full contract: `~/.apm/README.md`
+- Full contract: `~/.apm/AGENTS.md`
 - Task catalog: `docs/apm-task-coverage.md`
 - Skill guidance: `~/.apm/catalog/skills/apm-usage/SKILL.md`
-- Task coverage memo: `docs/apm-task-coverage.md`
 - Curated agents placement & sources: `docs/agents-provenance.md`
 - Remaining work: `todo.txt` (completed internal tasks: `done.txt`)

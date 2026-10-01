@@ -70,7 +70,7 @@ run = "bash ./scripts/apm-workspace.sh apply"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 apply"
 
 [tasks.refresh]
-description = "Refresh the ~/.apm checkout and dependencies without deploying"
+description = "Pull the checkout and advance unpinned APM dependencies (apm deps update -g, regenerates apm.lock.yaml); no check/apply/doctor"
 run = "bash ./scripts/apm-workspace.sh refresh"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 refresh"
 
@@ -112,7 +112,7 @@ run = [{ task = "check" }, { task = "apply" }, { task = "doctor" }]
 
 [tasks."deploy:fresh"]
 description = "Rebuild APM dependency cache and deploy when normal deploy output looks stale"
-# Recovery path only; `deploy` already runs `check` before `apply`.
+# Recovery path and apm-deploy-verify's rollout (prunes and repairs caches first); plain `deploy` is the normal path.
 hide = true
 run = [
   "apm prune",
@@ -128,7 +128,7 @@ description = "Refresh upstream APM dependencies, run checks, deploy, and inspec
 run = ["apm update -g --yes", { task = "deploy" }]
 
 [tasks."refresh:deploy"]
-description = "Refresh, run checks, and deploy the ~/.apm workspace locally from the current manifest and lock"
+description = "Pull the checkout and run `apm deps update -g` (re-resolves refs, regenerates apm.lock.yaml), then `deploy`; unlike `upgrade`, it also pulls the checkout"
 # Broader than the day-to-day rollout path; `deploy` is the normal entry point.
 hide = true
 run = [{ task = "refresh" }, { task = "deploy" }]

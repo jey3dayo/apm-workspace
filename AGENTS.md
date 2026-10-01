@@ -69,7 +69,7 @@ GNU parallel and a locking implementation (`flock` or `shlock`) are, by
 contrast, a real optional dependency for `test:sh`: bats' within-file
 parallelization requires both together, and a host missing either falls back
 to a serial `bats` run rather than failing. Parallel width is tunable via
-`BATS_JOBS` (default `4`).
+`BATS_JOBS` (default: half the detected cores, minimum `4`).
 
 Within-suite parallelization width is otherwise environment-dependent, not a
 fixed default: CI runners and local macOS hosts differ by an order of
@@ -129,8 +129,8 @@ process. Run `mise run agmsg:state:restore` by hand to recover from that.
 `apm deps update -g`) carries the same save/restore wrapping as apply.
 A bare `apm install -g` is not wrapped: it goes through the upstream CLI,
 not `cmd_apply`, so the save/restore around apply never runs and the links are
-gone when it finishes (observed 2026-09-10; the store under
-`${XDG_STATE_HOME:-~/.local/state}/agmsg/` survived). Diagnose with
+gone when it finishes; the store under
+`${XDG_STATE_HOME:-~/.local/state}/agmsg/` survives. Diagnose with
 `mise run doctor` before restoring — the plain-path rule in
 `catalog/skills/agmsg-delegation/references/roster-recovery.md` still applies.
 Remove this workaround only after upstream `AGMSG_HOME` supports both

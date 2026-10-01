@@ -98,8 +98,8 @@ repository. A `targets: [codex]`-only manifest never deploys to
 Claude Code is one of the repository's runtimes, otherwise every
 repository-local skill or MCP silently misses Claude Code.
 
-Use `docs/apm-task-coverage.md` for the workspace-only bridge contract and
-verification details.
+The workspace-only bridge contract is the Ownership table and the Rollout and
+Verification section of `~/.apm/AGENTS.md`.
 
 Use `manual-skills/.apm/skills/<id>/` only for upstream skills that do not install or deploy cleanly through the normal managed lane because of symlinks, packaging quirks, missing bundled files, or incompatible upstream layout. Record the reason and provenance under `manual-skills/upstreams/**`.
 
@@ -134,7 +134,7 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
 - Run `mise run verify` for `check`, both script suites (`test`), and catalog smoke verification.
 - Run `mise run deploy` for the normal local rollout from the current manifest and lock.
 - Run `mise run apply` only when deployment is needed without the bundled `check -> doctor` flow.
-- Run `mise run refresh` to refresh the checkout and dependency state without deploying.
+- Run `mise run refresh` to pull the checkout (skipped when the tree is dirty) and run `apm deps update -g` (deprecated; superseded by `apm update`): it advances unpinned dependencies, regenerates `apm.lock.yaml`, and rewrites deployed targets, with agmsg links saved/restored, but skips `check`, the workspace apply, and `doctor`.
 - Run `mise run upgrade` to accept newer upstream package content; it runs `apm update -g --yes` then `mise run deploy`.
 - Run `mise run refresh:deploy` when you explicitly want `refresh -> deploy`.
 - Run `mise run prepare:catalog` before commit/push when tracked catalog content changed.
