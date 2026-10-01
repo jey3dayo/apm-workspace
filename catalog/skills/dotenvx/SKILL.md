@@ -2,7 +2,7 @@
 name: dotenvx
 description: >-
   dotenvx env files: `dotenvx run`, `encrypted:` values, `.env.*` loading, env drift,
-  key rotation (`dotenvx rotate`, `.env.keys`; the 1Password step goes to 1password),
+  key rotation (`.env.keys`, no `rotate` command in 2.x; the 1Password step goes to 1password),
   and sanitizing shells where dotenvx/mise injection pollutes aws, terraform, cdk,
   gh or perman-aws-vault.
 ---
@@ -86,6 +86,26 @@ printf 'derived_public_prefix=%s\n' "$derived_public_prefix"
 
 If the prefixes match, retry with `-fk .env.keys -f .env` ordering before
 rotating keys or replacing `.env.keys`.
+
+### Key rotation
+
+dotenvx 2.x has no `rotate` command (removed in 2.0.0). Rotate by re-encrypting
+under a fresh keypair. Since 2.25.0, `encrypt` stores a new private key in the OS
+secret store by default, so a repository that keeps keys in `.env.keys` passes
+`--no-native` on every step:
+
+```bash
+dotenvx decrypt -f .env.production -fk .env.keys --no-native
+sed -i '' '/^DOTENV_PUBLIC_KEY_PRODUCTION/d' .env.production   # .env uses DOTENV_PUBLIC_KEY
+sed -i '' '/^DOTENV_PRIVATE_KEY_PRODUCTION/d' .env.keys
+dotenvx encrypt -f .env.production -fk .env.keys --no-native
+dotenvx get <KEY> -f .env.production -fk .env.keys --no-native >/dev/null
+```
+
+The env file is plaintext between `decrypt` and `encrypt`; run the steps back to
+back and do not stage it in between. Done when the `DOTENV_PUBLIC_KEY_*` line
+changed and `get` succeeds. Replacing the `.env.keys` attachment in 1Password
+goes to `1password`.
 
 Check which keys exist without exposing values (`-o` prints only the matched key, never the value):
 
