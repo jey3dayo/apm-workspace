@@ -29,8 +29,9 @@ Project-specific documentation configuration file placed in project root.
     "core_technologies": ["zsh", "nvim", "wezterm"],
     "detail_level_required": "⭐⭐⭐⭐",
     "update_frequency": {
-      "core_tech": "monthly",
-      "additional_tools": "quarterly"
+      "docs/tools/zsh.md": "monthly",
+      "docs/tools/nvim.md": "monthly",
+      "docs/tools/wezterm.md": "monthly"
     }
   },
   "tag_separator": ", ",
@@ -302,15 +303,6 @@ When creating new documentation:
 2. Replace placeholders with actual values
 3. Ensure required tags are included
 4. Add appropriate icon
-
-### 4. Validate Configuration
-
-Run validation to ensure configuration is correct:
-
-```bash
-# Check documentation compliance
-# (specific validation commands depend on project setup)
-```
 
 ## Best Practices
 

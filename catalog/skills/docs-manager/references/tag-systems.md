@@ -138,14 +138,14 @@ All projects use these standard tag prefix formats:
 
 ### Metadata Block Format
 
-All projects use this standard format:
+Separator follows `tag_separator` in the project config (default `", "`):
 
 ```markdown
 # [Icon] [Title]
 
 **最終更新**: YYYY-MM-DD
 **対象**: [Target Audience]
-**タグ**: `category/value` `audience/value` [additional tags]
+**タグ**: `category/value`, `audience/value`, [additional tags]
 ```
 
 ### Tag Separator

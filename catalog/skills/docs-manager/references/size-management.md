@@ -403,15 +403,6 @@ find docs -name "*.md" -exec wc -l {} + | sort -n
 find docs -name "*.md" -exec wc -l {} + | awk '$1 > 1000'
 ```
 
-### Automated Tracking
-
-Configure docs-manager to report:
-
-- Documents exceeding size thresholds
-- Growth rate over time
-- Candidates for splitting
-- Size distribution across documentation
-
 ## Best Practices
 
 ### Before Splitting

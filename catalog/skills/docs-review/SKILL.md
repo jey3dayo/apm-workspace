@@ -27,15 +27,15 @@ Done when every existing entrypoint document is listed as a candidate.
 
 Route each piece of knowledge to its owner document:
 
-| Change or knowledge type                                | Owner                    |
-| ------------------------------------------------------- | ------------------------ |
-| Agent behavior, repo rules, development workflow        | `AGENTS.md`, `CLAUDE.md` |
-| AI-facing index or short repository map (not a runbook) | `llms.txt`               |
-| Unfinished work, follow-up tasks, known gaps            | `TODO.md`                |
-| Durable reusable UI or visual-system rule               | `DESIGN.md`              |
-| Design review process, routing, exceptions, escalation  | `DESIGN_REVIEW.md`       |
-| User-facing setup, usage, architecture, operations      | `README.md`, `docs/**`   |
-| Release-visible behavior or user-facing change history  | `CHANGELOG.md`           |
+| Change or knowledge type                                | Owner                                                                                  |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Agent behavior, repo rules, development workflow        | `AGENTS.md`, `CLAUDE.md`                                                               |
+| AI-facing index or short repository map (not a runbook) | `llms.txt`                                                                             |
+| Unfinished work, follow-up tasks, known gaps            | Existing tracker (`todo.txt` / issues / `TODO.md`; placement per `todo-changelog-ops`) |
+| Durable reusable UI or visual-system rule               | `DESIGN.md`                                                                            |
+| Design review process, routing, exceptions, escalation  | `DESIGN_REVIEW.md`                                                                     |
+| User-facing setup, usage, architecture, operations      | `README.md`, `docs/**`                                                                 |
+| Release-visible behavior or user-facing change history  | `CHANGELOG.md`                                                                         |
 
 Hand off instead of routing here when:
 
