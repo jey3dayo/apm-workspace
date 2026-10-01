@@ -18,7 +18,7 @@
 
 `finance` は旧 `finance-ops`。改名のみで ID は同じ。
 
-プロジェクトにはラベル `dev`（開発・技術: repo 系と labs）か `life`（生活: finance / household / GBF / workbench）を1つ付ける。プロジェクトの Priority は使わない。
+プロジェクトにはラベルを1つ付ける。`code`（リポジトリのある開発。会社・個人を問わない）、`work`（会社の雑務と学習・検証・homelab: workbench / labs）、`life`（生活・趣味: finance / household / GBF）。同名の project ビューがある。プロジェクトの Priority は使わない。
 
 ## 使い方
 
