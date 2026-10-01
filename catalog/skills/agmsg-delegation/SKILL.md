@@ -130,8 +130,8 @@ Codex helper は `exec --ephemeral`、`-a never`、stdin prompt を強制し、r
 
 - team 名は対象 repo 名と同一の永続 team を使う（1 repo = 1 team）。日付・issue 番号・topic を team 名に含めない。task-scoped な team を乱立させると identities・履歴・掃除の全部が破綻する
 - worker_name は task-scoped の一意な名前（例: `<role>-<task_id>`）にし、既存名の再利用を避ける。task の識別は team 名でなく worker_name と task_id が担う
-- 例外は常駐プール経路で、`worker-1`..`worker-N` や `luna-worker-1` のような固定名を再利用する（命名は `backlog-sweep`「Worker プールを組む」に従う）。この場合 task の識別は task_id だけが担う
-- 座席名にモデルを含む場合、名乗れるのはそのモデルの session だけ。`join` / `actas` が自分の名前を拒否したら、理由を問わず rename 先を名乗らず、`--force` で復活もさせず、自分のモデル名で次の空き番号（`reviewer-fable-2`、`luna-worker-4`）を join する
+- 例外は常駐プール経路で、`worker-luna` や `reviewer-opus` のような固定名を再利用する（命名は `backlog-sweep`「Worker プールを組む」に従う）。この場合 task の識別は task_id だけが担う
+- 座席名にモデルを含む場合、名乗れるのはそのモデルの session だけ。`join` / `actas` が自分の名前を拒否したら、理由を問わず rename 先を名乗らず、`--force` で復活もさせず、自分のモデル名で次の空き番号（`reviewer-fable-2`、`worker-luna-4`）を join する
 
 ```bash
 ~/.agents/skills/agmsg/scripts/team.sh <team>   # 名前衝突を確認

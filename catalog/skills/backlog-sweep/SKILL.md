@@ -52,7 +52,7 @@ pane を立てるのはユーザーが指示したときだけ。起動と読み
   - `sonnet`×N + `opus`×1 — Claude で完結
   - `luna`×N + `sol`×1 — Codex で完結
 - 昇格先へ回すのは `orchestrator-worker` の昇格3条件（難しいデバッグ / セキュリティ境界 / 複数案のトレードオフ判断）に該当する行だけ。新しい条件を作らない
-- member 名は固定名を**再利用**する。tier が混在するプールでは `luna-worker-1`..`luna-worker-3` / `opus-worker-1` のようにモデル名を含めると、割当表を見るだけで tier が読める。task-scoped な名前を毎回作らない。文脈を保った Worker はキャッシュが効くぶん安く、前提の再説明も要らない。名前のモデルは表示でなく拘束でもある（`agmsg-delegation`「Worker を事前登録する」）
+- member 名は固定名を**再利用**する。名前は `<role>-<model>-<n>` で、1つ目は番号を付けず2つ目から `-2` を付ける（`worker-luna`、`worker-luna-2`、`worker-opus`、`reviewer-fable-2`）。モデル名を含めると割当表を見るだけで tier が読める。task-scoped な名前を毎回作らない。文脈を保った Worker はキャッシュが効くぶん安く、前提の再説明も要らない。名前のモデルは表示でなく拘束でもある（`agmsg-delegation`「Worker を事前登録する」）
 - team は対象 repo 名と同一の永続 team。登録と検証の手順は `agmsg-delegation`「Worker を事前登録する」に従う
 
 完了条件: 対象 project・runtime を引数にした `identities.sh` の出力に、全 member 名が含まれている（runtime が混在するプールは runtime ごとに実行して確認する）。
