@@ -68,7 +68,7 @@ Manual metadata deletion is destructive. Confirm the exact path and get explicit
 
 ```bash
 # Manual cleanup
-rm -rf .git/worktrees/deleted
+trash .git/worktrees/deleted
 
 # Verify
 git wt
@@ -344,7 +344,7 @@ fatal: '/path/to/repo/.worktrees/feature' already exists
 git wt | grep feature
 
 # If not a worktree: confirm the exact path and get explicit user approval before removing
-rm -rf .worktrees/feature
+trash .worktrees/feature
 
 # Create worktree
 git wt feature/new-feature
@@ -365,7 +365,7 @@ git wt -b feature/new-feature feature-v2 --basedir .worktrees
 
 #### Warning
 
-`rm -rf` は破壊的操作。exact path を確認し、ユーザーの明示承認を得てから実行する。
+worktree の実体を消す操作は、exact path を確認し、ユーザーの明示承認を得てから `trash` で行う。
 
 ## Performance Issues
 
@@ -415,7 +415,7 @@ npm install
 
 # Symlink in each worktree
 cd /path/to/repo/.worktrees/feature-a
-rm -rf node_modules
+trash node_modules
 ln -s ../../.cache/node_modules node_modules
 ```
 
@@ -423,17 +423,6 @@ ln -s ../../.cache/node_modules node_modules
 
 ```bash
 git config --add wt.deletehook "rm -rf dist .next build"
-```
-
-##### Use workspace feature
-
-```bash
-# package.json (root)
-{
-  "workspaces": [
-    ".worktrees/*"
-  ]
-}
 ```
 
 ## Git Internal Issues
@@ -455,8 +444,8 @@ Manual cleanup is destructive and can discard uncommitted work in .worktrees/bro
 git worktree repair .worktrees/broken
 
 # If repair fails, manual cleanup
-rm -rf .git/worktrees/broken
-rm -rf .worktrees/broken
+trash .git/worktrees/broken
+trash .worktrees/broken
 
 # Recreate if needed
 git wt existing-branch
@@ -557,7 +546,7 @@ find .worktrees -maxdepth 1 -type d | while read dir; do
   name=$(basename "$dir")
   if ! git wt | grep -q "$name"; then
     echo "Orphaned directory: $dir"
-    # rm -rf "$dir"  # Uncomment to remove
+    # trash "$dir"  # Uncomment to remove
   fi
 done
 ```
@@ -573,7 +562,7 @@ git wt -d feature/test
 
 # ❌ Incorrect
 mkdir .worktrees/test
-rm -rf .worktrees/test
+trash .worktrees/test
 ```
 
 ### Regular Maintenance
@@ -605,32 +594,3 @@ echo "Cleanup completed"
 - [Command Reference](git-wt-commands.md)
 - [Configuration Options](configuration.md)
 - [Workflow Patterns](workflows.md)
-
-## Emergency Recovery
-
-### Nuclear Option: Reset Everything
-
-#### Warning
-
-This recovery path removes worktrees forcefully. Back up the list, inspect each target path, and get explicit user approval before running the removal loop.
-
-```bash
-# Backup first
-git worktree list > /tmp/worktrees-backup.txt
-
-# Remove all worktrees
-git worktree list | grep -v '(bare)' | awk '{print $1}' | while read wt; do
-  git worktree remove --force "$wt"
-done
-
-# Prune metadata
-git worktree prune
-
-# Clean up directories
-rm -rf .worktrees/*
-
-# Verify
-git worktree list
-```
-
----

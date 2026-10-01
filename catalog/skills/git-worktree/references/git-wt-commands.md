@@ -1,6 +1,6 @@
 # git-wt Command Reference
 
-Command reference for `git-wt` 0.29.0.
+Command reference for `git-wt`. If a flag is missing, check `git wt --help`.
 
 ## Overview
 
@@ -179,7 +179,7 @@ Hooks run in the new worktree directory. They do not run when switching to an ex
 Commands to run before deleting a worktree.
 
 ```bash
-git config --add wt.deletehook "git push origin --delete $(git branch --show-current)"
+git config --add wt.deletehook "git status --short"
 ```
 
 Hooks run in the worktree directory before removal. They do not run when deleting a branch without a worktree.
@@ -245,7 +245,6 @@ Invoke-Expression (git-wt --init powershell | Out-String)
 | Local development worktree creation and switching  | `git wt`             |
 | Copying ignored or local files into a new worktree | `git wt`             |
 | Running setup hooks after creating a worktree      | `git wt`             |
-| Portable automation and CI scripts                 | `git worktree`       |
 | Pruning stale Git metadata                         | `git worktree prune` |
 | Locked worktree diagnosis or repair                | `git worktree`       |
 

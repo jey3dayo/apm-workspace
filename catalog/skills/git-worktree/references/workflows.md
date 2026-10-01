@@ -36,12 +36,7 @@ git commit -m "test: add authentication tests"
 
 ### Cleanup
 
-```bash
-# After PR is merged
-cd /path/to/repo
-git wt -d feature/user-authentication
-git branch -d feature/user-authentication
-```
+After the PR is merged, plan and run the cleanup with the git-branch-cleanup skill.
 
 ### Parallel Feature Development
 
@@ -96,9 +91,7 @@ git push origin hotfix/critical-bug
 
 # Create PR, get it merged
 
-# Clean up
-cd /path/to/repo
-git wt -d hotfix/critical-bug
+# After the PR is merged, plan and run the cleanup with the git-branch-cleanup skill
 
 # Resume original work (no stash/unstash needed)
 cd .worktrees/feature-in-progress
@@ -122,11 +115,16 @@ npm install
 npm test
 npm run build
 
-# Leave review comments, then clean up
-cd /path/to/repo
-git wt -d pr-123
-git branch -d pr-123
+# Leave review comments
 ```
+
+Cleanup: `pull/<n>/head:pr-<n>` has no upstream, so git-branch-cleanup does not pick it up.
+
+```bash
+git worktree remove <absolute-worktree-path>
+```
+
+Deleting the branch is the user's call.
 
 ## Advanced Workflows
 
@@ -183,23 +181,13 @@ cd .worktrees/agent-3-task-c
 
 ### Cleanup
 
+Agent worktrees may have no PR, so remove them directly:
+
 ```bash
-#!/bin/bash
-# cleanup-agent-worktrees.sh
-
-TASKS=("task-a" "task-b" "task-c")
-
-for i in "${!TASKS[@]}"; do
-  TASK="${TASKS[$i]}"
-  AGENT_ID=$((i + 1))
-
-  # Remove worktree
-  git wt -d "agent-${AGENT_ID}-${TASK}"
-
-  # Delete branch (if merged)
-  git branch -d "agent-${AGENT_ID}-${TASK}"
-done
+git worktree remove <absolute-worktree-path>
 ```
+
+Deleting the branch is the user's call.
 
 ### Continuous Integration (CI) Workflow
 
@@ -292,7 +280,7 @@ git wt -d bisect-session
 
 ## Hooks
 
-`git-wt` 0.29.0 uses Git config entries for hooks.
+`git-wt` uses Git config entries for hooks.
 
 ### Post-Create Hook: Dependency Installation
 

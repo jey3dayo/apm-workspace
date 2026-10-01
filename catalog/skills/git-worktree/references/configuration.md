@@ -1,6 +1,6 @@
 # Git Worktree Configuration
 
-Configuration reference for `git-wt` 0.29.0 and native `git worktree`.
+Configuration reference for `git-wt` and native `git worktree`.
 
 ## Configuration Levels
 
