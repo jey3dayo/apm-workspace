@@ -1,4 +1,4 @@
-# Linear ラベル一覧（team: JEY / 取得日: 2026-07-27）
+# Linear ラベル一覧（team: JEY / 取得日: 2026-10-01）
 
 ## ラベル
 
@@ -10,12 +10,6 @@
   - term:quarterly
   - term:semiannual
   - term:yearly
-- risk
-  - risk:unknown
-  - risk:P0
-  - risk:P1
-  - risk:P2
-  - risk:P3
 - household
   - household:utilities（光熱費・通信・生活インフラ）
   - household:shopping（買い物・価格比較）
@@ -33,7 +27,7 @@
 ## 使い分けの実例
 
 - 期限・周期管理: `term:*`（例: `term:monthly`, `term:yearly`）
-- 緊急度・重要度: `risk:*`（例: `risk:P1`, `risk:P3`）
+- 緊急度・重要度: ラベルでなく Priority（Urgent / High / Medium / Low）
 - household プロジェクトの領域分類: `household:*`
 - 研究・検証: `Research`
 - 種別: `Bug` / `Improvement` / `Feature`

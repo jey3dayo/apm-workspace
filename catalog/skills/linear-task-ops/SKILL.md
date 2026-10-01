@@ -69,12 +69,11 @@ claude.ai / ChatGPT のアプリ側 Linear コネクタは、issue の作成・�
 ## ラベル
 
 実在するラベルのみ使う。一覧は `references/linear-labels-jey.md`。
-新しいタグを発明せず、既存の `term:*` / `risk:*` / `household:*` /
+新しいタグを発明せず、既存の `term:*` / `household:*` /
 `Research` / `Bug` / `Improvement` / `Feature` から選ぶ。
 
-- `risk:*` は P0–P3 と `unknown` の 5 値。issue ごとに 1 つだけ付け、
-  既存の `risk:*` があれば置換する
-- 判定できないものは `risk:unknown` を付け、着手前に P0–P3 へ確定させる
+- 緊急度・重要度はラベルでなく issue の Priority で表す（`risk:*` は 2026-10-01 に retire 済み）
+- 判定できないものは No priority のままにし、着手前に Urgent–Low へ確定させる
 - 周期タスクには `term:*` を付ける
 
 ## タイトル・コメント書式
