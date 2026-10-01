@@ -68,6 +68,13 @@ dotenvx set SLACK_BOT_TOKEN "$slack_token" -fk .env.keys -f .env
 dotenvx get SLACK_BOT_TOKEN -fk .env.keys -f .env >/dev/null
 ```
 
+The first `encrypt` or `set` on a new env file creates its keypair. Since 2.25.0 the
+private key then goes only to the OS secret store, with no error, so 1Password, CI,
+other machines and worktree copies cannot decrypt the file. Keys stay in `.env.keys`
+here: pass `--no-native` when creating a key, and move one that landed in the store
+with `dotenvx native down -f <env-file>`. Existing keys already in `.env.keys` keep
+working without the flag.
+
 If `dotenvx set` fails with `MISPAIRED_PRIVATE_KEY`, do not assume the stored
 secrets are corrupt. First verify whether `.env`'s `DOTENV_PUBLIC_KEY` matches
 the public key derived from `.env.keys`, while printing only short prefixes:
