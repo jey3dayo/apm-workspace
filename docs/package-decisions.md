@@ -363,7 +363,7 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
   - 追記（2026-09-23）: `benjitaylor/agentation/skills/{agentation,agentation-self-driving}` は
     現在は root `apm.yml` に SHA pin で存在し、global dependency として配布されている。
 
-現状の役割マップとレビュー系の使い分けは [`docs/skill-roles.md`](skill-roles.md)、
+現状の役割マップとレビュー系の使い分けは [`docs/skill-overlaps.md`](skill-overlaps.md)、
 repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に置く。
 
 ## skill 監査に基づく撤去（2026-07-23）
@@ -387,7 +387,7 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
   あるため維持（description トリムを別途検討）。`perman-aws-vault` /
   `1password` / `dotenvx` はインフラ系のため維持。
 - 検証継続中のレビュー・アニメーション系スキルの一覧と撤去判断基準は
-  [`docs/skill-roles.md`](skill-roles.md) の
+  [`docs/skill-overlaps.md`](skill-overlaps.md) の
   「検証中の競合スキル」表を正とする。
 - 再導入する場合: 表の撤去基準を満たさなくなった実運用上の理由を本ファイルに追記してから戻す。
 

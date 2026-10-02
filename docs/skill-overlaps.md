@@ -1,4 +1,4 @@
-# Skill Roles
+# Skill Overlaps
 
 役割の近いスキルのうち、どれを使うかの使い分けと、どれを残すか検証中の組み合わせ。
 各スキルがどのレーンにあるかは [`skill-inventory.md`](skill-inventory.md)、採用・撤去の判断は [`package-decisions.md`](package-decisions.md) に置く。

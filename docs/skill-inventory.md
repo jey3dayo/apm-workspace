@@ -1,7 +1,7 @@
 # Skill Inventory
 
 スキル・MCP がどのレーンのどこにあるか。
-どれを使うかの使い分けと検証中の競合スキルは [`skill-roles.md`](skill-roles.md)、残作業は `todo.txt` に置く。
+どれを使うかの使い分けと検証中の競合スキルは [`skill-overlaps.md`](skill-overlaps.md)、残作業は `todo.txt` に置く。
 個々の採用・撤去の理由と経緯は [`package-decisions.md`](package-decisions.md) を参照する。
 
 ## レーン一覧
