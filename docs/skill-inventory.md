@@ -149,26 +149,31 @@ global の一覧に無くても廃止ではない。各リポジトリの `apm.y
 - コード品質全般 → 組み込み `/code-review` / `hunk-review` / `thermo-nuclear-code-quality-review`
 - 改善候補の洗い出し（実装しない）→ `improve`（shadcn、汎用）
 
-### 検証中のレビュー・アニメーション系スキル（2026-07-23 棚卸し）
+### 検証中の競合スキル
 
-レビュー系とアニメーション系は「どれを残すか検証するために意図的に複数入れている」領域。
-skill 監査（`~/.claude/skill-report/2026-07-23T11-14-21/`）の結果を踏まえた現状と撤去判断基準。
+役割が重なり、どれを残すか検証するために意図的に複数入れているスキル。
+判定の期限と完了条件は `todo.txt` に置き、判定したら結果を `package-decisions.md` に書いて行を外す。
+レビュー系とアニメーション系の行は skill 監査（`~/.claude/skill-report/2026-07-23T11-14-21/`）の結果を踏まえている。
 自動発火はほぼ起きず明示 `/skill` 起動が中心のため、「発火 0」は撤去理由にしない。
 
-| スキル                               | 系統      | 役割                                    | 起動実績（監査時点） | 撤去を判断する基準                                                     |
-| ------------------------------------ | --------- | --------------------------------------- | -------------------- | ---------------------------------------------------------------------- |
-| `emil-design-eng`                    | アニメ    | モーション taste・設計哲学              | 手動起動あり         | 維持前提。アニメ系の基準スキル                                         |
-| `transitions-dev`                    | アニメ    | CSS トランジション実装スニペット        | 手動起動あり         | 維持。description が bloated 判定 → トリム対象                         |
-| `review-animations`                  | アニメ    | 単発アニメーションレビュー              | なし                 | emil-design-eng で代替できると分かったら撤去                           |
-| `improve-animations`                 | アニメ    | モーション全体監査 → plan 生成          | なし                 | `improve`（汎用）の nested subset と監査指摘。improve で足りるなら撤去 |
-| `find-animation-opportunities`       | アニメ    | アニメ追加候補の発見（read-only）       | なし                 | 同上                                                                   |
-| `fixing-motion-performance`          | アニメ    | モーション性能監査・修正                | なし                 | emil 系と指摘が重複したら間引く（従来 watchlist どおり）               |
-| `apple-design`                       | アニメ/UI | Apple 流ジェスチャ・物理モーション      | 手動起動あり         | 維持                                                                   |
-| `review-board`                       | レビュー  | UI レビューレーン選択ハブ               | なし                 | 2026-09-16 に optional へ移動                                          |
-| `hunk-review`                        | レビュー  | Hunk セッションでの対話的 diff レビュー | なし                 | Hunk 自体を常用しなくなったら撤去                                      |
-| `thermo-nuclear-code-quality-review` | レビュー  | 保守性・構造の徹底監査                  | なし                 | 組み込み `/code-review` と指摘が重複しすぎたら撤去                     |
-| `improve`                            | レビュー  | 監査 → 他 agent 向け実装 plan 生成      | なし                 | 維持。improve-animations の撤去判断の受け皿                            |
-| `react-doctor`                       | レビュー  | React 診断                              | なし                 | `refactoring`（catalog）が参照するため維持                             |
+| スキル                               | 系統      | 役割                                         | 起動実績（監査時点）      | 撤去を判断する基準                                                       |
+| ------------------------------------ | --------- | -------------------------------------------- | ------------------------- | ------------------------------------------------------------------------ |
+| `emil-design-eng`                    | アニメ    | モーション taste・設計哲学                   | 手動起動あり              | 維持前提。アニメ系の基準スキル                                           |
+| `transitions-dev`                    | アニメ    | CSS トランジション実装スニペット             | 手動起動あり              | 維持。description が bloated 判定 → トリム対象                           |
+| `review-animations`                  | アニメ    | 単発アニメーションレビュー                   | なし                      | emil-design-eng で代替できると分かったら撤去                             |
+| `improve-animations`                 | アニメ    | モーション全体監査 → plan 生成               | なし                      | `improve`（汎用）の nested subset と監査指摘。improve で足りるなら撤去   |
+| `find-animation-opportunities`       | アニメ    | アニメ追加候補の発見（read-only）            | なし                      | 同上                                                                     |
+| `fixing-motion-performance`          | アニメ    | モーション性能監査・修正                     | なし                      | emil 系と指摘が重複したら間引く（従来 watchlist どおり）                 |
+| `apple-design`                       | アニメ/UI | Apple 流ジェスチャ・物理モーション           | 手動起動あり              | 維持                                                                     |
+| `review-board`                       | レビュー  | UI レビューレーン選択ハブ                    | なし                      | 2026-09-16 に optional へ移動                                            |
+| `hunk-review`                        | レビュー  | Hunk セッションでの対話的 diff レビュー      | なし                      | Hunk 自体を常用しなくなったら撤去                                        |
+| `thermo-nuclear-code-quality-review` | レビュー  | 保守性・構造の徹底監査                       | なし                      | 組み込み `/code-review` と指摘が重複しすぎたら撤去                       |
+| `improve`                            | レビュー  | 監査 → 他 agent 向け実装 plan 生成           | なし                      | 維持。improve-animations の撤去判断の受け皿                              |
+| `react-doctor`                       | レビュー  | React 診断                                   | なし                      | `refactoring`（catalog）が参照するため維持                               |
+| `natural-japanese`                   | 日本語    | 日本語文書の執筆・推敲・AI 臭さの診断        | 未計測                    | yomiyasu と同じ依頼で発火して出力が混ざるなら、推敲で劣るほうを抑える    |
+| `yomiyasu`                           | 日本語    | AI 文の推敲（意味保持、lint / diff で点検）  | 未計測（2026-10-02 追加） | 同上                                                                     |
+| `ui-ux-pro-max`                      | UI        | 0→1 のデザイン選定（スタイル・色・フォント） | 手動起動あり              | baseline-ui との使い分けで迷い続けるなら、役割マップを直すか片方を抑える |
+| `baseline-ui`                        | UI        | 既存 UI の高速 deslop                        | 未計測                    | 同上                                                                     |
 
 2026-07-23 撤去済み: `make-interfaces-feel-better`, `web-design-guidelines`,
 `grill-with-docs`, `empirical-prompt-tuning`（詳細は `package-decisions.md`）。
@@ -177,7 +182,7 @@ skill 監査（`~/.claude/skill-report/2026-07-23T11-14-21/`）の結果を踏�
 
 - `fixing-motion-performance`（ibelick）: emil 系と発火競合・指摘重複したら間引く。
   `make-interfaces-feel-better` は 2026-07-23 の skill 監査を受けて撤去済み。
-  検証状況は上の「検証中のレビュー・アニメーション系スキル」表を正とする。
+  検証状況は上の「検証中の競合スキル」表を正とする。
 
 ## 移管候補（未実施）
 
