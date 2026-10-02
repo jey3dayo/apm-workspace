@@ -83,7 +83,6 @@ dependencies:
     - agavra/tuicr/skills/tuicr#b55e218f6d38a87ca4a6d9924a4c50b5f601dd07
     - fujibee/agmsg#f9fb4f1398a6086135f88deea98b7e5600cb1cda
     - humanlayer/skills/plugins/show-me/skills/show-me#3c2629142c5d437428269b1b722b08c0b87f574d
-    - modem-dev/hunk/packages/hunk/skills/hunk-review#3fdfde2dd77eb93802c43304c8edd34d79ce81de
 
     # --- productivity / research ---
     - ayghri/i-have-adhd/skills/i-have-adhd#839872f9d1cd634fed642b4589ce7226199cc15f

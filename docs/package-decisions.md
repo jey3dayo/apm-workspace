@@ -679,3 +679,10 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 
 - 撤去: `h3-prompt-writing` と各種動画ジェネレーターの 9 スキル（`f8adddf`）。
 - 理由: 撤去時の記録が無い（commit メッセージにも理由が無い）。
+
+## `hunk-review` の撤去（2026-10-02）
+
+- 撤去: `modem-dev/hunk/packages/hunk/skills/hunk-review`。
+- 理由: `tuicr` と役割が重なり（どちらも人間が TUI で diff を見て agent とコメントをやり取りする）、ユーザー判断で `tuicr` に寄せた。`tuicr` は vim キーで人間が主導し、レビューを GitHub などへ push できる。`hunk` は agent が人間の画面に注釈を付ける向きが中心。
+- 手順: `apm.yml` から外し、`apm lock -g` で lock を合わせ、`mise run deploy` で `~/.claude/skills` / `~/.agents/skills` から消した。lock で動いたのは `hunk-review` の記録だけ。
+- 再導入: `apm install -g modem-dev/hunk/packages/hunk/skills/hunk-review#<sha>`（apm-usage Fast Path 6）。

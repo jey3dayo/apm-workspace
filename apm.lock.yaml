@@ -1,5 +1,5 @@
 lockfile_version: '2'
-generated_at: '2026-10-02T04:51:52.256010+00:00'
+generated_at: '2026-10-02T06:23:20.987865+00:00'
 apm_version: 0.31.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -3949,25 +3949,6 @@ dependencies:
     .claude/skills/react-doctor/references/explain.md: sha256:21fa0414874d117a63e5360d527884ccd42bf0906e6dcab371409cebac8b3d12
   content_hash: sha256:efd7603983d3d278fe6cebcb332f36e1114a41f4b54cd0f71e468fe4891f3b7b
   resolved_tag: v2.2.9
-- repo_url: modem-dev/hunk
-  name: hunk-review
-  host: github.com
-  resolved_commit: 3fdfde2dd77eb93802c43304c8edd34d79ce81de
-  resolved_ref: 3fdfde2dd77eb93802c43304c8edd34d79ce81de
-  version: unknown
-  virtual_path: packages/hunk/skills/hunk-review
-  is_virtual: true
-  package_type: claude_skill
-  deployed_files:
-  - .agents/skills/hunk-review
-  - .agents/skills/hunk-review/SKILL.md
-  - .claude/skills/hunk-review
-  - .claude/skills/hunk-review/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/hunk-review/SKILL.md: sha256:a2817face7fbd563d525dd364c4f155c4d9a2a58cb22fbaee2a8ff76ff08e163
-    .claude/skills/hunk-review/SKILL.md: sha256:a2817face7fbd563d525dd364c4f155c4d9a2a58cb22fbaee2a8ff76ff08e163
-  content_hash: sha256:ebad9a743f1835959a61d61b49c7e783419833d01f6c29de225932605f2765c5
-  resolved_tag: v0.22.0
 - repo_url: mvanhorn/last30days-skill
   name: last30days
   host: github.com
@@ -16369,24 +16350,6 @@ deployments:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
   content_hash: sha256:b694f7a8f709e37a04d1939c16f6d10ae36bcd33b8eecafc32c4898f7a442737
-- kind: project-relative
-  target: claude
-  value: .claude/skills/hunk-review
-  runtime: null
-  scope: project
-  owners:
-  - modem-dev/hunk/packages/hunk/skills/hunk-review
-  active_owner: modem-dev/hunk/packages/hunk/skills/hunk-review
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/hunk-review/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - modem-dev/hunk/packages/hunk/skills/hunk-review
-  active_owner: modem-dev/hunk/packages/hunk/skills/hunk-review
-  content_hash: sha256:a2817face7fbd563d525dd364c4f155c4d9a2a58cb22fbaee2a8ff76ff08e163
 - kind: project-relative
   target: claude
   value: .claude/skills/i-have-adhd
@@ -30724,24 +30687,6 @@ deployments:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
   content_hash: sha256:b694f7a8f709e37a04d1939c16f6d10ae36bcd33b8eecafc32c4898f7a442737
-- kind: project-relative
-  target: legacy
-  value: .agents/skills/hunk-review
-  runtime: null
-  scope: project
-  owners:
-  - modem-dev/hunk/packages/hunk/skills/hunk-review
-  active_owner: modem-dev/hunk/packages/hunk/skills/hunk-review
-  content_hash: null
-- kind: project-relative
-  target: legacy
-  value: .agents/skills/hunk-review/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - modem-dev/hunk/packages/hunk/skills/hunk-review
-  active_owner: modem-dev/hunk/packages/hunk/skills/hunk-review
-  content_hash: sha256:a2817face7fbd563d525dd364c4f155c4d9a2a58cb22fbaee2a8ff76ff08e163
 - kind: project-relative
   target: legacy
   value: .agents/skills/i-have-adhd
