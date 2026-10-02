@@ -3,6 +3,15 @@
 採用・撤去・見送りにした APM パッケージの意思決定ログ。1 パッケージ 1 セクション。
 「なぜ入れたか / なぜ消したか / 再検討するなら何を見るか」を残す。
 
+## caad-skill-deployer
+
+- Status: global APM の管理対象から撤去（2026-10-02）
+- 理由: 使っていないため、ユーザー判断で削除。
+- 手順: `apm.yml` の依存、`apm.lock.yaml` の該当レコードと所有する配布メタデータ、
+  skill inventory の記載を削除。残りの依存は変更せず、`perman-aws-vault` は維持する。
+- 配布先: 今回は commit / push まで。実環境への deploy は未実施。
+- 再検討するなら: スキル配布の具体的な利用が必要になったとき。
+
 ## 1Password MCP
 
 - Status: global APM から撤去・host-local user scope へ移管（2026-07-22）
