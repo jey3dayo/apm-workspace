@@ -1,7 +1,7 @@
 # Skill Inventory
 
-スキル・MCP の配置の現状と、移管候補・保留の一元管理（2026-07-21 時点）。
-「どこに何があるか」「次にどう動かすか」はこのファイルに集約する。
+スキル・MCP の配置の現状、使い分け、検証中の競合スキル。
+残作業は `todo.txt` に置く。
 個々の採用・撤去の理由と経緯は [`package-decisions.md`](package-decisions.md) を参照する。
 
 ## レーン一覧
@@ -184,53 +184,9 @@ global の一覧に無くても廃止ではない。各リポジトリの `apm.y
   `make-interfaces-feel-better` は 2026-07-23 の skill 監査を受けて撤去済み。
   検証状況は上の「検証中の競合スキル」表を正とする。
 
-## 移管候補（未実施）
-
-global から repo-local / optional へ移す候補。実施済みのもの
-（`slack-app-management`、`google-forms-survey-builder`、
-社内 API 系、UI バンドル縮小）は上の各レーンへ反映済み。`agentation` 系は
-2026-07 に repo-local 化した後、global dependency として再採用済み（上の
-「global（外部スキル）」参照）。
-
-| 候補               | 推奨配置                                    | 判断理由                                                                                                                                         |
-| ------------------ | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `browser-harness`  | 対象リポジトリの `apm.yml` または on-demand | ブラウザセッション・ログイン状態と結び付く。`agent-browser` は 2026-07-16 に global 撤去済み（repo-local: `caad-loca-bff` / `ultra-rss-reader`） |
-| `perman-aws-vault` | 当面 global 維持                            | 複数 AWS リポジトリで同じ認証導線を使うため。移管するなら profile/credential 境界を明記後                                                        |
-
-2026-07-16 の棚卸しで global 維持を決定したもの（候補から除外）:
-`react-doctor`, `react-best-practices`,
-`baseline-ui` ほか ibelick 系, `transitions-dev`,
-`frontend-design`, `ui-ux-pro-max`, `design-md-workflow`
-（`web-design-guidelines` と `composition-patterns` は撤去済み）。
-
-### 移管の判断基準
-
-- 特定のフレームワーク、ランタイム、サービス、UI ワークフローに強く依存する
-- 使わないリポジトリでも毎回グローバル候補として読み込まれる
-- 認証情報、ブラウザセッション、ローカルアプリなどの境界をプロジェクト側へ閉じ込めた方が安全
-- 未発火データは補助根拠に留め、適用範囲と対象リポジトリの実態を優先する
-
-### 移管手順
-
-1. 対象リポジトリと実際の利用者を決める
-2. repo-local `apm.yml` で対象スキルの個別 ref を install し、check / 実作業を検証する
-   （workspace-owned は `catalog/skills/` → `optional-skills/<id>/` へ移してから
-   `apm install jey3dayo/apm-workspace/optional-skills/<id>#main`）
-3. global root manifest から外す
-4. `mise run deploy` 後に `~/.agents/skills` と `~/.claude/skills` の残存を確認する
-5. このファイルと `docs/package-decisions.md` を更新する
-
-## 社員向けスキル検索の設計メモ（2026-07-15、見送り）
-
-global から専門スキルを外すために、軽量な「スキル検索・導入入口」だけを global に残す案。2026-09-05 に見送りを決定し、実装タスクは `todo.txt` から外した（判断は `docs/package-decisions.md`）。以下は再検討時の出発点として残す。
-
-- 検索インデックスは `catalog/**`、`optional-skills/**`、root `apm.yml` / `apm.lock.yaml` の external 依存を統合する。
-- 検索結果には skill id、用途、scope、source kind、upstream / package ref、trust・license 情報、導入コマンド、現在の global 配布状態を表示する。
-- 導入先リポジトリで `apm.yml` を更新する。workspace-owned optional は単体 ref、external bundle は必要な場合だけ `--skill <id>` を使い、global へ直接追加しない。
-- `find-skills` は検索体験・候補説明・導入導線の参考にする。ただし現状は skills.sh / `npx skills` 向けで、社内 catalog、optional skill collection、APM の scope 判定は扱わないため流用せず、APM-aware な index / CLI を別途設計する。
-
 ## メンテナンス
 
 - 更新タイミング: レーン間の移動、global への追加・撤去、repo-local の新規採用時
 - root `apm.yml` の `mcp:` を変えたら global MCP 節の backtick 行を同じ集合に更新する（`lint:skill-inventory-mcp` が `mise run check` で検証）
+- global から repo-local / optional への移管: `apm-usage` の Install Gate と Fast Path 9 に従う
 - repo-local の再スキャン: `ghq list -p` で各リポジトリの `apm.yml` を確認

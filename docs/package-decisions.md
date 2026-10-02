@@ -84,7 +84,6 @@
 
 - Status: 見送り（2026-09-05）
 - 提案: 2026-07-15。global から専門スキルを外し、軽量な検索・導入入口だけを global に残す案。
-  設計メモは `docs/skill-inventory.md` の「社員向けスキル検索の設計メモ」に残す。
 - 理由: スキルの採用は検索して選ぶのではなく、話題になったものを試して残すか決める形で
   回っている。検索 index が要る前提そのものが成立していない。`apm search` は
   マーケットプレイスのプラグイン検索で別物、`find-skills` は skills.sh / `npx skills`
@@ -92,6 +91,11 @@
   その工数を払う需要が観測されていない。
 - 再検討するなら: 自分以外の利用者が増えて「どのスキルがあるか分からない」が実際に
   詰まりになったときに見る。それまでは `docs/skill-inventory.md` の一覧で足りる。
+- 再検討時の出発点（2026-07-15 の設計メモ）:
+  - 検索インデックスは `catalog/**`、`optional-skills/**`、root `apm.yml` / `apm.lock.yaml` の external 依存を統合する。
+  - 検索結果には skill id、用途、scope、source kind、upstream / package ref、trust・license 情報、導入コマンド、現在の global 配布状態を表示する。
+  - 導入先リポジトリで `apm.yml` を更新する。workspace-owned optional は単体 ref、external bundle は必要な場合だけ `--skill <id>` を使い、global へ直接追加しない。
+  - `find-skills` は検索体験・候補説明・導入導線の参考にとどめ、APM-aware な index / CLI を別途設計する。
 
 ## agmsg (fujibee/agmsg) の worktree path の癖
 
@@ -149,13 +153,18 @@
 
 ## 移管候補の提案（2026-07-15）
 
-- Status: 提案中（2026-07-16 に `docs/skill-scope-proposals.md` を廃止し、
-  未実施候補と判断基準・手順は [`docs/skill-inventory.md`](skill-inventory.md) の
-  「移管候補（未実施）」へ集約）
+- Status: 完了（2026-08-21 に候補のレビューを終え、未実施の候補は残っていない）
+- 結果: 社内 API 系は撤去して repo-local 化した（下の `ca-pass` ほか）。`browser-harness` は
+  global 維持（global `AGENTS.md` の「ブラウザ操作の選択」でヘッドレス操作を担い、pi / opencode 向けの最低保証でもある）。
+  `perman-aws-vault` は複数の AWS リポジトリで同じ認証導線を使うため global 維持
+  （移すなら profile / credential の境界を明記してから）。understand 系は観察タスクへ分け、のちに撤去した。
+- 2026-07-16 の棚卸しで global 維持を決めたもの: `react-doctor`、`react-best-practices`、
+  `baseline-ui` ほか ibelick 系、`transitions-dev`、`frontend-design`、`ui-ux-pro-max`、
+  `design-md-workflow`（`web-design-guidelines` と `composition-patterns` は撤去済み）
 - 最初の検討対象: `agentation` 系、`browser-harness` / `agent-browser`、React/UI 検証系
 - 次の検討対象: UI デザインバンドルの必要サブセット、社内 API 系
 - 維持方針: APM 所有権、検証、安全性、横断的な環境運用スキルは global を維持
-- 判断方法: 対象リポジトリで repo-local install と実作業を検証してから global 依存を外す
+- 判断方法: 対象リポジトリで repo-local install と実作業を検証してから global 依存を外す。判断基準と手順は `apm-usage` の Install Gate と Fast Path 9
 
 ### agent-browser
 
