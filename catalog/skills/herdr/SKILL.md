@@ -93,4 +93,4 @@ version 依存の詳細が要るときは `herdr <group>`（例 `herdr pane`, `h
 - ID は JSON レスポンスから読む。sidebar の並び順や「3 タブ目」といった表示位置から推測しない。ユーザーが表示順で指定したら label と表示順を照合し、raw `number` が workspace 内の連番だと仮定しない
 - 読み戻していないプロセス名を報告に書かない。pane にコマンドを起動したら `herdr pane process-info --pane <pane_id>` で cwd と foreground process を読み戻し、報告には pane_id + workspace label + 絶対 cwd + 実際に読み戻したプロセスを併記する
 - shell が待機中の pane にだけコマンドを起動する。agent や別 TUI が動作中なら上書きせず、別 pane の選択・作成またはユーザー確認へ切り替える
-- `hunk diff` や `lazygit` などの interactive TUI は agent 自身の PTY ではなく、ユーザーが見る Herdr pane で起動する
+- `tuicr` や `lazygit` などの interactive TUI は agent 自身の PTY ではなく、ユーザーが見る Herdr pane で起動する

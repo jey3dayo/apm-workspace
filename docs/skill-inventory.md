@@ -86,21 +86,21 @@
 
 ## repo-local で活用中
 
-global の一覧に無くても廃止ではない。各リポジトリの `apm.yml` が正本
-（2026-07-16 時点の `ghq` 配下スキャン）。
+global の一覧に無くても廃止ではない。各リポジトリの `apm.yml` が正本（2026-10-02 時点の `ghq` 配下スキャン。パッケージ置き場の `our-apm` は除く）。
 
 | ツール                                                                                    | 利用リポジトリ                                                                | 用途                                                     |
 | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------- |
-| `agentation-mcp`（MCP）                                                                   | `caad-loca-bff`, `ultra-rss-reader`                                           | Agentation toolbar での UI アノテーション連携            |
+| `agentation-mcp`（MCP）                                                                   | `ultra-rss-reader`                                                            | Agentation toolbar での UI アノテーション連携            |
 | `agentation` / `agentation-self-driving`（benjitaylor, global dependency と併用）         | `caad-loca-bff`（両方）, `ultra-rss-reader`（`agentation-self-driving` のみ） | repo-local での Agentation 自動レビュー導線              |
-| `agent-browser`（vercel-labs）                                                            | `caad-loca-bff`, `ultra-rss-reader`                                           | ブラウザ自動化・Web UI 検証                              |
 | `chrome-devtools`（MCP）                                                                  | `browser-toolkit`                                                             | Lighthouse・パフォーマンストレース等の DevTools 固有分析 |
 | `tauri-mcp-server`（MCP）                                                                 | `ultra-rss-reader`                                                            | Tauri ランタイム検証                                     |
-| `terraform-style-guide` / `terraform-test`（hashicorp）                                   | `ca-connect-site`, `caad-asta`                                                | Terraform 規約・テスト                                   |
+| `terraform-style-guide` / `terraform-test`（hashicorp）                                   | `ca-connect-site`, `caad-asta`, `caad-terraform-infra`                        | Terraform 規約・テスト                                   |
 | `workers-best-practices` / `wrangler`（cloudflare）                                       | `keep-on`                                                                     | Cloudflare Workers                                       |
+| `perman-aws-vault` / `ca-pass` / `mdb-api` / `telma-api`（caad marketplace）              | `ca-connect-site`, `caad-asta`, `caad-loca-bff`                               | AWS 認証と社内 API 連携                                  |
+| `notica-api`（caad marketplace）                                                          | `ca-connect-site`                                                             | Notica API 連携                                          |
 | `mcp-server-patterns`, `chatgpt-apps`                                                     | `caad-loca-bff`                                                               | MCP / ChatGPT Apps 実装                                  |
 | `tauri`（EpicenterHQ）, `rust-best-practices`, `tauri-icon-gen`, `tauri-webview-geometry` | `ultra-rss-reader`                                                            | Tauri / Rust 実装                                        |
-| `marp-slide`, `slide-docs`                                                                | `tech-talks`                                                                  | スライド制作                                             |
+| `marp-slide`, `slide-docs`, `google-forms-survey-builder`（optional）                     | `tech-talks`                                                                  | スライド制作・アンケート作成                             |
 | `manga-rss-bridge`                                                                        | `manga-rss-bridge`, `homelab-k3s`                                             | プロジェクト固有運用                                     |
 
 ## global MCP（root apm.yml の mcp:）

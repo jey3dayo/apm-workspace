@@ -1,7 +1,7 @@
 ---
 name: review-fix-loop
 description: >-
-  Run a managed fix-and-review loop for complex implementation work: parallel
+  Run a managed fix-and-review loop for one complex implementation task (a whole backlog is backlog-sweep): parallel
   subagent investigation feeding a main-session task backlog, evidence-backed
   triage, and repeated scored reviews until ship quality. Use when the user asks
   for a review fix loop / fix-and-review loop, asks to coordinate subagents with
