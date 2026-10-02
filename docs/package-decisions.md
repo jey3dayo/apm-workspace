@@ -658,3 +658,10 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 - 形: 自動で出荷へ入るため model-invoked。範囲の判断・herdr での持ち主への依頼・承認待ちを親が担うので fork にせず `model:` も付けない。契機は「作業終わり」ではなく、観測できる行為（最終報告を書く前、commit / push / PR / deploy に進むとき）にした。
 - 許可: 引数・依頼文 > remote / gh が無ければ独立レビューまで > 自分が owner で fork ではない repo は PR まで（停止・確認ポリシーが常設の依頼として扱う）> それ以外は独立レビューまで。終点は repo の AGENTS.md が定めれば読み替えるが、許可は広げない。fork を除くのは `gh pr create` が既定で上流へ PR を作るため。
 - 含めないもの: PR のマージとレビュー指摘への対応。指摘は PR 作成直後には届いておらず、`gh-address-comments` / `gh-fix-ci` は途中で承認を待つ作りのため。
+
+## `nanaism/yomiyasu` を追加（2026-10-02）
+
+- 追加理由: ユーザー依頼。AI が生成した日本語を自然な文章へ推敲するスキルで、同梱の lint / diff スクリプト（`python3`）で書き直しの増減を点検できる。
+- 配置: `global-dependency`、`engineering / writing` グループ。repo 直下と `skills/yomiyasu/` に同じスキルがあり、後者を参照する。
+- 注意: `natural-japanese` と守備範囲が重なる。upstream の SKILL.md は類似スキルとの同時有効化で出力が乱れるおそれがあると書いている。
+- 再検討するなら: 両方が同じ依頼で発火して出力が混ざるとき、どちらかを外すか `skillOverrides` で抑える。
