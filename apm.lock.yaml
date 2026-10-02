@@ -180,36 +180,6 @@ dependencies:
     .claude/skills/perman-aws-vault/references/scenarios.md: sha256:0564b45728e19b58f501d4841c13e9bcaefe777ea3f72c4d1e043ea4bddb86e3
     .claude/skills/perman-aws-vault/references/setup-guide.md: sha256:e4d2c9c4ac0e146e9a9ae45933bc1cf5fbcbd940cf8fa3587cfb1ffa64436704
   content_hash: sha256:8d20e3aa7e2bf333f4fd3001c085e071f6b3e6bbf39769a447cd5b40f26a46fe
-- repo_url: caad-develop/claude-code-marketplace
-  name: caad-skill-deployer
-  host: github.com
-  resolved_commit: 9869e9df63da283b29561923e7e5839a8a3d9152
-  resolved_ref: 9869e9df63da283b29561923e7e5839a8a3d9152
-  version: 1.0.0
-  virtual_path: plugins/utils/caad-skill-deployer
-  is_virtual: true
-  package_type: marketplace_plugin
-  deployed_files:
-  - .agents/skills/caad-skill-deployer
-  - .agents/skills/caad-skill-deployer/SKILL.md
-  - .agents/skills/caad-skill-deployer/agents/openai.yaml
-  - .agents/skills/caad-skill-deployer/references/folder-policy.md
-  - .agents/skills/caad-skill-deployer/scripts/inspect_skill_source.py
-  - .claude/skills/caad-skill-deployer
-  - .claude/skills/caad-skill-deployer/SKILL.md
-  - .claude/skills/caad-skill-deployer/agents/openai.yaml
-  - .claude/skills/caad-skill-deployer/references/folder-policy.md
-  - .claude/skills/caad-skill-deployer/scripts/inspect_skill_source.py
-  deployed_file_hashes:
-    .agents/skills/caad-skill-deployer/SKILL.md: sha256:61ebd3060e671c05495bcec6bbb09b6cea9eb4947dae51898bc01ae480564f82
-    .agents/skills/caad-skill-deployer/agents/openai.yaml: sha256:37ef1416cc3c498f66cafe12850d63e6fef7fc7758e4770c44c16e1b844dab58
-    .agents/skills/caad-skill-deployer/references/folder-policy.md: sha256:b70b055285d4372ed91a6d93c95aa454785eb31fbe1e6cd5248499cc69e3be2e
-    .agents/skills/caad-skill-deployer/scripts/inspect_skill_source.py: sha256:6a2215b28f2738b0827c5680ee20a4e822e3457b9b620c397c21136c88a9ee9c
-    .claude/skills/caad-skill-deployer/SKILL.md: sha256:61ebd3060e671c05495bcec6bbb09b6cea9eb4947dae51898bc01ae480564f82
-    .claude/skills/caad-skill-deployer/agents/openai.yaml: sha256:37ef1416cc3c498f66cafe12850d63e6fef7fc7758e4770c44c16e1b844dab58
-    .claude/skills/caad-skill-deployer/references/folder-policy.md: sha256:b70b055285d4372ed91a6d93c95aa454785eb31fbe1e6cd5248499cc69e3be2e
-    .claude/skills/caad-skill-deployer/scripts/inspect_skill_source.py: sha256:6a2215b28f2738b0827c5680ee20a4e822e3457b9b620c397c21136c88a9ee9c
-  content_hash: sha256:a1a34580255f2a2049b5a52044d5973360764f9c4cfb00d42755a499eb20e55d
 - repo_url: coji/natural-japanese
   name: natural-japanese
   host: github.com
@@ -15551,51 +15521,6 @@ deployments:
   content_hash: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
 - kind: project-relative
   target: claude
-  value: .claude/skills/caad-skill-deployer
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/caad-skill-deployer/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  content_hash: sha256:61ebd3060e671c05495bcec6bbb09b6cea9eb4947dae51898bc01ae480564f82
-- kind: project-relative
-  target: claude
-  value: .claude/skills/caad-skill-deployer/agents/openai.yaml
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  content_hash: sha256:37ef1416cc3c498f66cafe12850d63e6fef7fc7758e4770c44c16e1b844dab58
-- kind: project-relative
-  target: claude
-  value: .claude/skills/caad-skill-deployer/references/folder-policy.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  content_hash: sha256:b70b055285d4372ed91a6d93c95aa454785eb31fbe1e6cd5248499cc69e3be2e
-- kind: project-relative
-  target: claude
-  value: .claude/skills/caad-skill-deployer/scripts/inspect_skill_source.py
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  content_hash: sha256:6a2215b28f2738b0827c5680ee20a4e822e3457b9b620c397c21136c88a9ee9c
-- kind: project-relative
-  target: claude
   value: .claude/skills/ci-stability-hooks
   runtime: null
   scope: project
@@ -29877,51 +29802,6 @@ deployments:
   - browser-use/browser-harness
   active_owner: browser-use/browser-harness
   content_hash: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
-- kind: project-relative
-  target: legacy
-  value: .agents/skills/caad-skill-deployer
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  content_hash: null
-- kind: project-relative
-  target: legacy
-  value: .agents/skills/caad-skill-deployer/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  content_hash: sha256:61ebd3060e671c05495bcec6bbb09b6cea9eb4947dae51898bc01ae480564f82
-- kind: project-relative
-  target: legacy
-  value: .agents/skills/caad-skill-deployer/agents/openai.yaml
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  content_hash: sha256:37ef1416cc3c498f66cafe12850d63e6fef7fc7758e4770c44c16e1b844dab58
-- kind: project-relative
-  target: legacy
-  value: .agents/skills/caad-skill-deployer/references/folder-policy.md
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  content_hash: sha256:b70b055285d4372ed91a6d93c95aa454785eb31fbe1e6cd5248499cc69e3be2e
-- kind: project-relative
-  target: legacy
-  value: .agents/skills/caad-skill-deployer/scripts/inspect_skill_source.py
-  runtime: null
-  scope: project
-  owners:
-  - caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  active_owner: caad-develop/claude-code-marketplace/plugins/utils/caad-skill-deployer
-  content_hash: sha256:6a2215b28f2738b0827c5680ee20a4e822e3457b9b620c397c21136c88a9ee9c
 - kind: project-relative
   target: legacy
   value: .agents/skills/ci-stability-hooks
