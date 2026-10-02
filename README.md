@@ -12,6 +12,8 @@ authoring surface. The `apm` CLI is pinned by `mise`.
   archives completed internal tasks.
 - [`docs/skill-inventory.md`](docs/skill-inventory.md): canonical skill-lane
   inventory and placement decisions.
+- [`docs/skill-roles.md`](docs/skill-roles.md): which skill to use when roles
+  overlap, and the competing skills still under evaluation.
 - [`docs/apm-task-coverage.md`](docs/apm-task-coverage.md): task ownership.
 
 ## Skill Lanes

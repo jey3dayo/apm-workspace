@@ -235,7 +235,7 @@
   - `caad-develop/claude-code-marketplace/plugins/service-integrations/mdb-api`
   - `caad-develop/claude-code-marketplace/plugins/service-integrations/notica-api`
   - `caad-develop/claude-code-marketplace/plugins/service-integrations/telma-api`
-- 補足: `private-skills` の `ca-pass` overlay は machine-local な別レーンとして維持する。
+- 補足: `private-skills` の `ca-pass` overlay は machine-local な別レーンとして維持していたが、2026-08-14 に撤去した（private repo の `3d3dd0b`、`caad-develop/claude-code-marketplace` の ref で置き換えたため）。
 - 追記（2026-08-21）: `ca-pass` だけが root `apm.yml` に残留していた drift を /improve 監査（#5）で検出し、manifest から実撤去した。利用するリポジトリは repo-local `apm.yml` へ上記 ref を追加する（`apm-usage` の `references/repo-manifest.md` 参照）。
 
 ### banner-design
@@ -363,8 +363,8 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
   - 追記（2026-09-23）: `benjitaylor/agentation/skills/{agentation,agentation-self-driving}` は
     現在は root `apm.yml` に SHA pin で存在し、global dependency として配布されている。
 
-現状の役割マップ、レビュー系の使い分け、repo-local 活用状況、保留 watchlist は
-[`docs/skill-inventory.md`](skill-inventory.md) に集約した。
+現状の役割マップとレビュー系の使い分けは [`docs/skill-roles.md`](skill-roles.md)、
+repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に置く。
 
 ## skill 監査に基づく撤去（2026-07-23）
 
@@ -387,7 +387,7 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
   あるため維持（description トリムを別途検討）。`perman-aws-vault` /
   `1password` / `dotenvx` はインフラ系のため維持。
 - 検証継続中のレビュー・アニメーション系スキルの一覧と撤去判断基準は
-  [`docs/skill-inventory.md`](skill-inventory.md) の
+  [`docs/skill-roles.md`](skill-roles.md) の
   「検証中の競合スキル」表を正とする。
 - 再導入する場合: 表の撤去基準を満たさなくなった実運用上の理由を本ファイルに追記してから戻す。
 
@@ -674,3 +674,8 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 - 配置: `global-dependency`、`engineering / writing` グループ。repo 直下と `skills/yomiyasu/` に同じスキルがあり、後者を参照する。
 - 注意: `natural-japanese` と守備範囲が重なる。upstream の SKILL.md は類似スキルとの同時有効化で出力が乱れるおそれがあると書いている。
 - 再検討するなら: 両方が同じ依頼で発火して出力が混ざるとき、どちらかを外すか `skillOverrides` で抑える。
+
+## `MiniMax-AI/MiniMax-H3` の撤去（2026-08-10）
+
+- 撤去: `h3-prompt-writing` と各種動画ジェネレーターの 9 スキル（`f8adddf`）。
+- 理由: 撤去時の記録が無い（commit メッセージにも理由が無い）。

@@ -1,7 +1,7 @@
 # Skill Inventory
 
-スキル・MCP の配置の現状、使い分け、検証中の競合スキル。
-残作業は `todo.txt` に置く。
+スキル・MCP がどのレーンのどこにあるか。
+どれを使うかの使い分けと検証中の競合スキルは [`skill-roles.md`](skill-roles.md)、残作業は `todo.txt` に置く。
 個々の採用・撤去の理由と経緯は [`package-decisions.md`](package-decisions.md) を参照する。
 
 ## レーン一覧
@@ -22,47 +22,35 @@
 
 ## global（外部スキル: root apm.yml）
 
-- デザイン・UI/UX: `frontend-design`, `ui-ux-pro-max`, `baseline-ui`,
-  `fixing-accessibility`, `fixing-metadata`, `fixing-motion-performance`,
-  `transitions-dev`
-- モーション（emilkowalski/skills）: `emil-design-eng`, `review-animations`,
-  `improve-animations`, `find-animation-opportunities`, `apple-design`
-- レビュー・監査: `hunk-review`, `thermo-nuclear-code-quality-review`,
-  `improve`（shadcn）, `react-doctor`
-- React / Web 実装: `react-best-practices`, `browser-harness`, `screenshot`
-- 社内（caad-develop）: `perman-aws-vault`, `caad-skill-deployer`,
-  `ai-butsukari-evidence-scout`
-- リサーチ・出力スタイル: `last30days`（mvanhorn）, `i-have-adhd`（ayghri）
-- UI アノテーション: `agentation` / `agentation-self-driving`（benjitaylor, global dependency として再採用）
-- その他: `agmsg`, `tuicr`,
-  mattpocock 系（`grilling`, `writing-for-agents`, `wayfinder`,
-  `improve-codebase-architecture`, `codebase-design`, `domain-modeling`,
-  `research`, `prototype`, `setup-matt-pocock-skills`）
+グループは `apm.yml` の `# --- <group> ---` 見出しと同じ。
 
-`MiniMax-AI/MiniMax-H3` 系 9 スキル（`h3-prompt-writing` と各種動画
-ジェネレーター）は 2026-08-10 に撤去した。
-
-`diagram-design`（cathrynlavery）と `humanizer-ja`（gonta223）は 2026-09-23 に撤去した。
-判断理由は `package-decisions.md` の「`diagram-design` / `humanizer-ja` / `tdd` の撤去
-（2026-09-23）」を参照。
-
-`obra/superpowers` 全 11 スキルは 2026-08-09 に撤去した。判断理由は
-[`docs/package-decisions.md`](package-decisions.md) の
-「superpowers / mattpocock 系の再編」を参照。
+- org-restricted: `perman-aws-vault`, `caad-skill-deployer`
+- review: `thermo-nuclear-code-quality-review`, `improve`（shadcn）
+- engineering / writing: `natural-japanese`, `japanese-tech-writing`（gist、alias）, `yomiyasu`,
+  mattpocock 系（`codebase-design`, `domain-modeling`, `grilling`,
+  `improve-codebase-architecture`, `prototype`, `research`, `setup-matt-pocock-skills`,
+  `wait-what`, `wayfinder`, `writing-for-agents`）
+- react: `react-doctor`, `react-best-practices`
+- design: `frontend-design`, `agentation` / `agentation-self-driving`,
+  emilkowalski 系（`apple-design`, `emil-design-eng`, `find-animation-opportunities`,
+  `improve-animations`, `review-animations`）,
+  ibelick 系（`baseline-ui`, `fixing-accessibility`, `fixing-metadata`,
+  `fixing-motion-performance`, `improve-ui`）, `transitions-dev`, `ui-ux-pro-max`
+- browser / analysis: `browser-harness`, `screenshot`, `archify`
+- agent tools: `tuicr`, `agmsg`, `show-me`, `hunk-review`
+- productivity / research: `i-have-adhd`, `last30days`
 
 ## global（自作 catalog: catalog/skills/）
 
-主な系統:
-
-- APM・環境運用: `apm-usage`（repo-local `apm.yml` の作成/整理は `references/repo-manifest.md`）, `mise`,
-  `dotenvx`, `1password`, `herdr`
+- APM・環境運用: `apm-usage`（repo-local `apm.yml` の作成/整理は `references/repo-manifest.md`）,
+  `mise`, `dotenvx`, `1password`, `herdr`, `tuxedo`
+- 委譲・エージェント運用: `orchestrator-worker`, `agmsg-delegation`, `backlog-sweep`, `learning-intake`
 - レビュー・品質: `review-fix-loop`, `polish`
-- デザイン: `design-md-workflow`
+- Git・出荷: `ship`, `atomic-commit`, `git-worktree`, `git-branch-cleanup`,
+  `ci-stability-hooks`, `prepare-goal`
 - リファクタリング・解析: `refactoring`, `similarity`
-- ドキュメント: `docs-manager`, `docs-review`,
-  `japanese-tech-writing`
-- Git・作業運用: `ship`, `atomic-commit`, `git-worktree`, `ci-stability-hooks`,
-  `prepare-goal`
+- ドキュメント・タスク: `docs-manager`, `docs-review`, `todo-changelog-ops`, `linear-task-ops`
+- デザイン・ブラウザ: `design-md-workflow`, `pwa-layout`, `terminal-browser`
 - リサーチ: `web-research`（計画・並列委譲・合成まで一体）
 
 ## ~/.apm 専用（.apm/skills/）
@@ -87,7 +75,7 @@
 
 ## private（private-skills/・~/.apm では gitignored、正本は private repo）
 
-- `ca-pass`, `work-reports`, `work-log-maintenance`
+- `work-reports`, `work-log-maintenance`
   （社内情報を含むため private レーンへ移動。正本は github.com/jey3dayo/private-skills）
 
 ## repo-local / on-demand へ移管済み
@@ -120,69 +108,6 @@ global の一覧に無くても廃止ではない。各リポジトリの `apm.y
 `context7`, `linear`, `mcp-simple-voicevox`
 
 `mise run check` の `lint:skill-inventory-mcp` が上記一覧と `apm.yml` の `dependencies.mcp` を照合する。Cursor user-scope（`~/.cursor/mcp.json`）は APM 外 — [`package-decisions.md`](package-decisions.md) の Cursor 節。
-
-## デザイン / UI・UX / レビュー系の役割マップ
-
-2026-07-16 の棚卸し結果（経緯は
-[`package-decisions.md`](package-decisions.md) の「デザイン / UI・UX / レビュー系スキルの棲み分け」）。
-
-| 役割                                       | スキル                                                                                                                 |
-| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| 0→1 デザイン選定（スタイル・色・フォント） | `ui-ux-pro-max`（本体のみ）                                                                                            |
-| 美的方向性・脱テンプレ                     | `frontend-design`（anthropics）                                                                                        |
-| ベースライン修正（deslop）                 | `baseline-ui` / `fixing-accessibility` / `fixing-metadata`（ibelick）                                                  |
-| モーション taste・レビュー・監査           | `emil-design-eng` / `review-animations` / `improve-animations` / `find-animation-opportunities`（emilkowalski/skills） |
-| モーション実装スニペット                   | `transitions-dev`                                                                                                      |
-| デザインシステム準拠レビュー               | `review-board`（lane 1、optional）                                                                                     |
-| UI レビューレーン選択ハブ                  | `review-board`（optional、自作）                                                                                       |
-| デザインドキュメント                       | `design-md-workflow`（catalog 自作）                                                                                   |
-| コードベース監査→計画（汎用）              | `improve`（shadcn）                                                                                                    |
-| React 診断                                 | `react-doctor`（millionco）                                                                                            |
-
-### レビュー系の使い分け
-
-- UI の見た目・ガイドライン準拠 → `baseline-ui`（deslop）
-  （`web-design-guidelines` は 2026-07-23 撤去）
-- デザインシステム・トークン準拠 → `review-board`（lane 1、optional）
-- アニメーション・モーションの質 → `review-animations`（単発）/ `improve-animations`（全体監査→plan 生成）
-- UI・フォーム・アクセシビリティ・マルチデバイスのレーン振り分け → `review-board`（optional）
-- コード品質全般 → 組み込み `/code-review` / `hunk-review` / `thermo-nuclear-code-quality-review`
-- 改善候補の洗い出し（実装しない）→ `improve`（shadcn、汎用）
-
-### 検証中の競合スキル
-
-役割が重なり、どれを残すか検証するために意図的に複数入れているスキル。
-判定の期限と完了条件は `todo.txt` に置き、判定したら結果を `package-decisions.md` に書いて行を外す。
-レビュー系とアニメーション系の行は skill 監査（`~/.claude/skill-report/2026-07-23T11-14-21/`）の結果を踏まえている。
-自動発火はほぼ起きず明示 `/skill` 起動が中心のため、「発火 0」は撤去理由にしない。
-
-| スキル                               | 系統      | 役割                                         | 起動実績（監査時点）      | 撤去を判断する基準                                                       |
-| ------------------------------------ | --------- | -------------------------------------------- | ------------------------- | ------------------------------------------------------------------------ |
-| `emil-design-eng`                    | アニメ    | モーション taste・設計哲学                   | 手動起動あり              | 維持前提。アニメ系の基準スキル                                           |
-| `transitions-dev`                    | アニメ    | CSS トランジション実装スニペット             | 手動起動あり              | 維持。description が bloated 判定 → トリム対象                           |
-| `review-animations`                  | アニメ    | 単発アニメーションレビュー                   | なし                      | emil-design-eng で代替できると分かったら撤去                             |
-| `improve-animations`                 | アニメ    | モーション全体監査 → plan 生成               | なし                      | `improve`（汎用）の nested subset と監査指摘。improve で足りるなら撤去   |
-| `find-animation-opportunities`       | アニメ    | アニメ追加候補の発見（read-only）            | なし                      | 同上                                                                     |
-| `fixing-motion-performance`          | アニメ    | モーション性能監査・修正                     | なし                      | emil 系と指摘が重複したら間引く（従来 watchlist どおり）                 |
-| `apple-design`                       | アニメ/UI | Apple 流ジェスチャ・物理モーション           | 手動起動あり              | 維持                                                                     |
-| `review-board`                       | レビュー  | UI レビューレーン選択ハブ                    | なし                      | 2026-09-16 に optional へ移動                                            |
-| `hunk-review`                        | レビュー  | Hunk セッションでの対話的 diff レビュー      | なし                      | Hunk 自体を常用しなくなったら撤去                                        |
-| `thermo-nuclear-code-quality-review` | レビュー  | 保守性・構造の徹底監査                       | なし                      | 組み込み `/code-review` と指摘が重複しすぎたら撤去                       |
-| `improve`                            | レビュー  | 監査 → 他 agent 向け実装 plan 生成           | なし                      | 維持。improve-animations の撤去判断の受け皿                              |
-| `react-doctor`                       | レビュー  | React 診断                                   | なし                      | `refactoring`（catalog）が参照するため維持                               |
-| `natural-japanese`                   | 日本語    | 日本語文書の執筆・推敲・AI 臭さの診断        | 未計測                    | yomiyasu と同じ依頼で発火して出力が混ざるなら、推敲で劣るほうを抑える    |
-| `yomiyasu`                           | 日本語    | AI 文の推敲（意味保持、lint / diff で点検）  | 未計測（2026-10-02 追加） | 同上                                                                     |
-| `ui-ux-pro-max`                      | UI        | 0→1 のデザイン選定（スタイル・色・フォント） | 手動起動あり              | baseline-ui との使い分けで迷い続けるなら、役割マップを直すか片方を抑える |
-| `baseline-ui`                        | UI        | 既存 UI の高速 deslop                        | 未計測                    | 同上                                                                     |
-
-2026-07-23 撤去済み: `make-interfaces-feel-better`, `web-design-guidelines`,
-`grill-with-docs`, `empirical-prompt-tuning`（詳細は `package-decisions.md`）。
-
-## 保留・watchlist
-
-- `fixing-motion-performance`（ibelick）: emil 系と発火競合・指摘重複したら間引く。
-  `make-interfaces-feel-better` は 2026-07-23 の skill 監査を受けて撤去済み。
-  検証状況は上の「検証中の競合スキル」表を正とする。
 
 ## メンテナンス
 
