@@ -2231,8 +2231,10 @@ dependencies:
 - repo_url: owner/str
   resolved_commit: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
   virtual_path: skills/str
-- repo_url: gist.github.com/obj
+- repo_url: k16/obj
   resolved_commit: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+- repo_url: owner/multi
+  resolved_commit: 9999999999999999999999999999999999999999
 "@
 
       function Set-PinManifest {
@@ -2248,7 +2250,7 @@ dependencies:
     It "passes when every SHA pin, string or object form, is in the lock" {
       Set-PinManifest -Body @"
     - owner/str/skills/str#aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa # v1.0.0
-    - git: https://gist.github.com/obj.git
+    - git: https://gist.github.com/k16/obj.git
       ref: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb # v1.2.3
 "@
       { Test-ManifestShaPinsLocked } | Should -Not -Throw
@@ -2261,9 +2263,38 @@ dependencies:
 
     It "fails for a bumped object ref with a trailing comment" {
       Set-PinManifest -Body @"
-    - git: https://gist.github.com/obj.git
+    - git: https://gist.github.com/k16/obj.git
       ref: dddddddddddddddddddddddddddddddddddddddd # v1.2.3
 "@
+      { Test-ManifestShaPinsLocked } | Should -Throw "*$($script:pinHint)*"
+    }
+
+    It "passes an object pin with a skills subset against its own lock record" {
+      Set-PinManifest -Body @"
+    - git: owner/multi
+      ref: 9999999999999999999999999999999999999999 # v2
+      skills:
+        - a
+        - b
+"@
+      { Test-ManifestShaPinsLocked } | Should -Not -Throw
+    }
+
+    It "fails a string pin whose SHA exists only on an unrelated lock record" {
+      Set-PinManifest -Body "    - owner/str/skills/str#bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      { Test-ManifestShaPinsLocked } | Should -Throw "*$($script:pinHint)*"
+    }
+
+    It "fails an object pin whose SHA exists only on an unrelated lock record" {
+      Set-PinManifest -Body @"
+    - git: owner/multi
+      ref: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+"@
+      { Test-ManifestShaPinsLocked } | Should -Throw "*$($script:pinHint)*"
+    }
+
+    It "fails a pinned new dependency that has no lock record" {
+      Set-PinManifest -Body "    - owner/new/skills/x#aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
       { Test-ManifestShaPinsLocked } | Should -Throw "*$($script:pinHint)*"
     }
 

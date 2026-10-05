@@ -1354,7 +1354,7 @@ validate_manifest_sha_pins() {
   lock_path="$WORKSPACE_DIR/apm.lock.yaml"
   [ -f "$manifest_path" ] || return 0
 
-  pins=$(awk -f "$APM_AWK_DIR/manifest-sha-pins.awk" "$manifest_path")
+  pins=$(awk -f "$APM_AWK_DIR/manifest-ref-normalize.awk" -f "$APM_AWK_DIR/manifest-sha-pins.awk" "$manifest_path")
   [ -n "$pins" ] || return 0
 
   if [ ! -f "$lock_path" ]; then
@@ -1362,25 +1362,20 @@ validate_manifest_sha_pins() {
     fail "apm.yml SHA pins differ from apm.lock.yaml; run 'mise run deploy:pins' to re-resolve them before deploying."
   fi
 
-  locked_commits=$(awk -f "$APM_AWK_DIR/lockfile-dependencies.awk" "$lock_path" | awk -F '|' '{print $3}')
+  unmatched=$({
+    locked_external_skill_records
+    printf '@@\n'
+    printf '%s\n' "$pins"
+  } | awk -f "$APM_AWK_DIR/manifest-sha-pins-check.awk")
   unmatched_count=0
-  while IFS='|' read -r pin_entry pin_ref; do
-    pin_matched=0
-    for locked_commit in $locked_commits; do
-      case "$locked_commit" in
-        "$pin_ref"*)
-          pin_matched=1
-          break
-          ;;
-      esac
-    done
-    if [ "$pin_matched" -eq 0 ]; then
-      error "apm.yml pin not in apm.lock.yaml: $pin_entry#$pin_ref"
+  if [ -n "$unmatched" ]; then
+    while IFS= read -r unmatched_line; do
+      error "apm.yml pin not in apm.lock.yaml: $unmatched_line"
       unmatched_count=$((unmatched_count + 1))
-    fi
-  done <<EOF
-$pins
+    done <<EOF
+$unmatched
 EOF
+  fi
 
   if [ "$unmatched_count" -gt 0 ]; then
     fail "apm.yml SHA pins differ from apm.lock.yaml; run 'mise run deploy:pins' to re-resolve them before deploying."

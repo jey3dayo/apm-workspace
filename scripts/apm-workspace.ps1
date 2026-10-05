@@ -2323,40 +2323,24 @@ function Get-ManifestShaPins {
       $value = $Matches['value']
       if ($value -match '^git:\s+(?<repo>.+)$') {
         $entry = ($Matches['repo'] -replace '\s+#.*$', '')
+        $entryKeys = @(Get-GitReferenceCandidateKeys -Reference $entry)
         continue
       }
       $value = ($value -replace '\s+#.*$', '')
       $hashIndex = $value.IndexOf('#')
       if ($hashIndex -gt 0) {
-        $pins.Add([pscustomobject]@{ Entry = $value.Substring(0, $hashIndex); Ref = $value.Substring($hashIndex + 1) })
+        $pathEntry = $value.Substring(0, $hashIndex)
+        $pins.Add([pscustomobject]@{ Entry = $pathEntry; Ref = $value.Substring($hashIndex + 1); Mode = "path"; Keys = @($pathEntry) })
       }
       continue
     }
 
     if ($entry -ne "" -and $line -match '^      ref:\s+(?<ref>.+)$') {
-      $pins.Add([pscustomobject]@{ Entry = $entry; Ref = ($Matches['ref'] -replace '\s+#.*$', '') })
+      $pins.Add([pscustomobject]@{ Entry = $entry; Ref = ($Matches['ref'] -replace '\s+#.*$', ''); Mode = "repo"; Keys = $entryKeys })
     }
   }
 
   return @($pins | Where-Object { $_.Ref -cmatch '^[0-9a-f]{7,40}$' })
-}
-
-function Get-LockResolvedCommits {
-  param([string]$LockPath)
-
-  $commits = New-Object System.Collections.Generic.List[string]
-  $inDependencies = $false
-  foreach ($line in (Get-Content -LiteralPath $LockPath)) {
-    if ($line -match '^[^\s#-][^:]*:') {
-      $inDependencies = ($line -match '^dependencies:')
-      continue
-    }
-    if ($inDependencies -and $line -match '^\s+resolved_commit:\s+(?<commit>\S+)') {
-      $commits.Add($Matches['commit'])
-    }
-  }
-
-  return $commits.ToArray()
 }
 
 # `apply` stages from apm.lock.yaml records offline, so a hand-bumped SHA pin
@@ -2374,12 +2358,21 @@ function Test-ManifestShaPinsLocked {
     throw $hint
   }
 
-  $lockedCommits = @(Get-LockResolvedCommits -LockPath $lockPath)
+  $records = @(Get-LockedExternalSkillRecords)
   $unmatched = 0
   foreach ($pin in $pins) {
-    $matched = $lockedCommits | Where-Object { $_.StartsWith($pin.Ref, [System.StringComparison]::Ordinal) } | Select-Object -First 1
-    if (-not $matched) {
-      Write-ErrorLine "apm.yml pin not in apm.lock.yaml: $($pin.Entry)#$($pin.Ref)"
+    $own = @($records | Where-Object {
+        $key = if ($pin.Mode -eq "repo") { $_.Repo } elseif ($_.Path) { "$($_.Repo)/$($_.Path)" } else { $_.Repo }
+        $pin.Keys | Where-Object { $_ -ieq $key }
+      })
+    $reason = if ($own.Count -eq 0) {
+      "no lock record"
+    }
+    elseif (@($own | Where-Object { -not $_.Commit.StartsWith($pin.Ref, [System.StringComparison]::Ordinal) }).Count -gt 0) {
+      "lock records a different commit"
+    }
+    if ($reason) {
+      Write-ErrorLine "apm.yml pin not in apm.lock.yaml: $($pin.Entry)#$($pin.Ref) ($reason)"
       $unmatched++
     }
   }

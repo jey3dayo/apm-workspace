@@ -1211,8 +1211,10 @@ dependencies:
 - repo_url: owner/str
   resolved_commit: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
   virtual_path: skills/str
-- repo_url: gist.github.com/obj
+- repo_url: k16/obj
   resolved_commit: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+- repo_url: owner/multi
+  resolved_commit: 9999999999999999999999999999999999999999
 EOF
 }
 
@@ -1220,7 +1222,7 @@ pin_hint="apm.yml SHA pins differ from apm.lock.yaml; run 'mise run deploy:pins'
 
 @test "validate passes when every SHA pin, string or object form, is in the lock" {
   write_pin_fixture "    - owner/str/skills/str#aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa # v1.0.0
-    - git: https://gist.github.com/obj.git
+    - git: https://gist.github.com/k16/obj.git
       ref: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb # v1.2.3"
 
   run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" validate
@@ -1241,13 +1243,63 @@ pin_hint="apm.yml SHA pins differ from apm.lock.yaml; run 'mise run deploy:pins'
 }
 
 @test "validate fails for a bumped object ref with a trailing version comment" {
-  write_pin_fixture "    - git: https://gist.github.com/obj.git
+  write_pin_fixture "    - git: https://gist.github.com/k16/obj.git
       ref: dddddddddddddddddddddddddddddddddddddddd # v1.2.3"
 
   run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" validate
 
   [ "$status" -ne 0 ]
-  [[ "$output" == *"https://gist.github.com/obj.git#dddddddddddddddddddddddddddddddddddddddd"* ]]
+  [[ "$output" == *"https://gist.github.com/k16/obj.git#dddddddddddddddddddddddddddddddddddddddd"* ]]
+  [[ "$output" == *"$pin_hint"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "validate passes an object pin with a skills subset against its own lock record" {
+  write_pin_fixture "    - git: owner/multi
+      ref: 9999999999999999999999999999999999999999 # v2
+      skills:
+        - a
+        - b"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" validate
+
+  [ "$status" -eq 0 ]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "validate fails a string pin whose SHA exists only on an unrelated lock record" {
+  write_pin_fixture "    - owner/str/skills/str#bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" validate
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"owner/str/skills/str#bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"* ]]
+  [[ "$output" == *"$pin_hint"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "validate fails an object pin whose SHA exists only on an unrelated lock record" {
+  write_pin_fixture "    - git: owner/multi
+      ref: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" validate
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"owner/multi#aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"* ]]
+  [[ "$output" == *"$pin_hint"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "validate fails a pinned new dependency that has no lock record" {
+  write_pin_fixture "    - owner/new/skills/x#aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    - git: owner/new2
+      ref: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" validate
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"owner/new/skills/x#aaaa"*"(no lock record)"* ]]
+  [[ "$output" == *"owner/new2#bbbb"*"(no lock record)"* ]]
   [[ "$output" == *"$pin_hint"* ]]
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
 }
