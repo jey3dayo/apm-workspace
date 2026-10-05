@@ -1477,11 +1477,13 @@ print_catalog_summary() {
 }
 
 # Fields: name|home-relative root|config file|skills root override|agents face.
+# A "-" config file marks a target that reads guidance from elsewhere (OpenCode
+# falls back to ~/.claude/CLAUDE.md); see docs/package-decisions.md.
 # A "-" skills override marks a target with no skills face; a "-" agents face
 # marks one that must not receive the catalog agents/ tree. OpenCode takes both:
 # it reads skills from ~/.claude/skills and ~/.agents/skills already, and it
 # rejects the Claude-format agents (object `tools`, hex `color`) at startup, so
-# it only gets config and commands. Codex opts out of agents too: codex-cli
+# it only gets commands. Codex opts out of agents too: codex-cli
 # only discovers `~/.codex/agents/*.toml`, and the catalog's Claude-format
 # `.md` agent files are silently ignored there (or rejected once renamed to
 # `.toml`, on the `tools`/`color` fields). Do not point a second target at a
@@ -1492,7 +1494,7 @@ managed_catalog_runtime_targets() {
 claude|.claude|CLAUDE.md||
 codex|.codex|AGENTS.md|.agents|-
 cursor|.cursor|AGENTS.md||
-opencode|.config/opencode|CLAUDE.md|-|-
+opencode|.config/opencode|-|-|-
 openclaw|.openclaw|CLAUDE.md||
 EOF
 }
@@ -2270,6 +2272,15 @@ copy_managed_catalog_file() {
   cp "$source_path" "$destination_path"
 }
 
+remove_stale_catalog_config() {
+  source_path="$1"
+  stale_path="$2"
+  [ -f "$source_path" ] || return 0
+  [ -f "$stale_path" ] && [ ! -L "$stale_path" ] || return 0
+  cmp -s "$source_path" "$stale_path" || return 0
+  rm -f "$stale_path"
+}
+
 remove_symlink_entries() {
   target_dir="$1"
   if [ -L "$target_dir" ]; then
@@ -2330,7 +2341,9 @@ sync_managed_catalog_runtime_assets() {
     target_root="$HOME/$RT_TARGET_DIR"
     mkdir -p "$target_root"
 
-    if [ -f "$instructions_source" ]; then
+    if [ "$RT_CONFIG_NAME" = "-" ]; then
+      remove_stale_catalog_config "$instructions_source" "$target_root/CLAUDE.md"
+    elif [ -f "$instructions_source" ]; then
       copy_managed_catalog_file "$instructions_source" "$target_root/$RT_CONFIG_NAME"
     fi
 
@@ -2457,7 +2470,13 @@ cmd_doctor() {
       target_root="$HOME/$RT_TARGET_DIR"
       skills_root_dir="${RT_SKILLS_DIR:-$RT_TARGET_DIR}"
       target_skills_root="$HOME/$skills_root_dir/skills"
-      if [ -e "$target_root/$RT_CONFIG_NAME" ]; then config_state=present; else config_state=missing; fi
+      if [ "$RT_CONFIG_NAME" = "-" ]; then
+        config_state=n/a
+      elif [ -e "$target_root/$RT_CONFIG_NAME" ]; then
+        config_state=present
+      else
+        config_state=missing
+      fi
       if [ "$RT_AGENTS_FACE" = "-" ]; then
         agents_state=n/a
       elif [ -e "$target_root/agents" ]; then
@@ -2476,7 +2495,7 @@ cmd_doctor() {
       fi
       printf '  %s: config=%s agents=%s commands=%s rules=%s skills=%s\n' "$RT_TARGET_NAME" "$config_state" "$agents_state" "$commands_state" "$rules_state" "$skills_state"
 
-      if [ -f "$tracked_instructions" ] && [ ! -f "$target_root/$RT_CONFIG_NAME" ]; then
+      if [ -f "$tracked_instructions" ] && [ "$RT_CONFIG_NAME" != "-" ] && [ ! -f "$target_root/$RT_CONFIG_NAME" ]; then
         error "Required catalog output is missing or has wrong type (file): $target_root/$RT_CONFIG_NAME"
         has_failure=1
       fi

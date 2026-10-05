@@ -545,7 +545,8 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 ## opencode の agents face を opt-out（2026-09-14）
 
 - Status: 採用。`managed_catalog_runtime_targets` の5フィールド目（agents face）を追加し、
-  opencode を `-` にした。opencode が受け取るのは config（`CLAUDE.md`）と commands のみ。
+  opencode を `-` にした。opencode が受け取るのは commands のみ（2026-10-05 以降。config の
+  扱いは下の理由を参照）。
   `scripts/apm-workspace.sh` / `.ps1` の両方に反映。
 - 理由: `catalog/agents/*.md` は Claude 形式（`tools` はカンマ区切り文字列、`color` は
   `blue` などの名前色）で、opencode 1.18.29 は起動時に frontmatter を strict 検証する。
@@ -554,6 +555,12 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
   `Expected object | undefined, got "Bash, Glob, ..." tools` /
   `Expected a regex-hex color, got "blue" color`。
   1ファイル混入するだけで opencode 全体が起動を拒否する。
+- config も配らない（2026-10-05）: 3フィールド目の config file 名も `-` にした。OpenCode の
+  global rules は `~/.config/opencode/AGENTS.md`、無ければ `~/.claude/CLAUDE.md` で、
+  `~/.config/opencode/CLAUDE.md` は読まない（opencode.ai/docs/rules で確認）。配っていた
+  CLAUDE.md は `~/.claude/CLAUDE.md` と同一内容で、フォールバック経由で既に届いている。
+  apply は `~/.config/opencode/CLAUDE.md` が通常ファイルで catalog の指示書と同一内容のときだけ
+  削除し、内容が違うファイルは残す。`doctor` は `config=n/a` を返す。
 - 経緯: `fc02ee2` が opencode の deploy root を `~/.opencode`（opencode が読まない path）から
   `~/.config/opencode`（実際に読む path）へ変えたことで、Claude 形式 agents が初めて
   実際にロードされ、起動不能として顕在化した。`.ps1` は root が `.opencode` のままで

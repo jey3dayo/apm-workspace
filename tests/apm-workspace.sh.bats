@@ -1177,7 +1177,6 @@ EOF
   printf '# config\n' >"$doctor_home/.claude/CLAUDE.md"
   printf '# config\n' >"$doctor_home/.codex/AGENTS.md"
   printf '# config\n' >"$doctor_home/.cursor/AGENTS.md"
-  printf '# config\n' >"$doctor_home/.config/opencode/CLAUDE.md"
   printf '# config\n' >"$doctor_home/.openclaw/CLAUDE.md"
 }
 
@@ -1406,7 +1405,7 @@ EOF
   run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
 
   [ "$status" -eq 0 ]
-  [[ "$output" == *"opencode: config=present agents=n/a commands=present rules=present skills=n/a"* ]]
+  [[ "$output" == *"opencode: config=n/a agents=n/a commands=present rules=present skills=n/a"* ]]
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
 }
 
@@ -1907,14 +1906,64 @@ run_install_pins_with_fixture() {
   tracked_catalog_commands_root() { printf '%s\n' "$workspace/catalog/commands"; }
   tracked_catalog_rules_root() { printf '%s\n' "$workspace/catalog/rules"; }
   managed_catalog_runtime_targets() {
-    printf '%s\n' 'opencode|.config/opencode|CLAUDE.md|-|-'
+    printf '%s\n' 'opencode|.config/opencode|-|-|-'
   }
 
   run sync_managed_catalog_runtime_assets
 
   [ "$status" -eq 0 ]
   [ ! -e "$target_root/agents" ]
-  [ -f "$target_root/CLAUDE.md" ]
+  [ ! -e "$target_root/CLAUDE.md" ]
+
+  rm -rf "$workspace" "$runtime_home"
+}
+
+_stub_opencode_sync_fixture() {
+  workspace="$(mktemp -d)"
+  runtime_home="$(mktemp -d)"
+  mkdir -p "$workspace/catalog/commands"
+  printf '%s\n' 'cmd' >"$workspace/catalog/commands/cmd.md"
+  printf '%s\n' '# instructions' >"$workspace/catalog/CLAUDE.md"
+  target_root="$runtime_home/.config/opencode"
+  mkdir -p "$target_root"
+
+  HOME="$runtime_home"
+  tracked_catalog_dir() { printf '%s\n' "$workspace/catalog"; }
+  tracked_catalog_instructions_path() { printf '%s\n' "$workspace/catalog/CLAUDE.md"; }
+  tracked_catalog_agents_root() { printf '%s\n' "$workspace/catalog/agents"; }
+  tracked_catalog_commands_root() { printf '%s\n' "$workspace/catalog/commands"; }
+  tracked_catalog_rules_root() { printf '%s\n' "$workspace/catalog/rules"; }
+  managed_catalog_runtime_targets() {
+    printf '%s\n' 'opencode|.config/opencode|-|-|-'
+  }
+}
+
+@test "sync_managed_catalog_runtime_assets gives opencode commands but no CLAUDE.md and removes a stale identical one" {
+  _stub_opencode_sync_fixture
+  printf '%s\n' '# instructions' >"$target_root/CLAUDE.md"
+  printf '%s\n' 'user rules' >"$target_root/AGENTS.md"
+  printf '%s\n' '{}' >"$target_root/opencode.json"
+
+  run sync_managed_catalog_runtime_assets
+
+  [ "$status" -eq 0 ]
+  [ ! -e "$target_root/CLAUDE.md" ]
+  [ -f "$target_root/commands/cmd.md" ]
+  [ "$(cat "$target_root/AGENTS.md")" = "user rules" ]
+  [ -f "$target_root/opencode.json" ]
+
+  rm -rf "$workspace" "$runtime_home"
+}
+
+@test "sync_managed_catalog_runtime_assets leaves an opencode CLAUDE.md with different content alone" {
+  _stub_opencode_sync_fixture
+  printf '%s\n' 'my own edits' >"$target_root/CLAUDE.md"
+
+  run sync_managed_catalog_runtime_assets
+
+  [ "$status" -eq 0 ]
+  [ "$(cat "$target_root/CLAUDE.md")" = "my own edits" ]
+  [ -f "$target_root/commands/cmd.md" ]
 
   rm -rf "$workspace" "$runtime_home"
 }

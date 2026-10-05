@@ -1692,6 +1692,40 @@ id = "preserve other"
     ((Get-Content -LiteralPath $untouchedCommand -Raw) -replace '\r?\n$', '') | Should -Be "outside"
   }
 
+  It "delivers commands but no config to a target with ConfigName '-' and removes only a stale identical CLAUDE.md" {
+    $catalogRoot = Join-Path $TestDrive "noconfig-catalog"
+    $identicalRoot = Join-Path $TestDrive "noconfig-identical"
+    $divergedRoot = Join-Path $TestDrive "noconfig-diverged"
+    $instructions = Join-Path $catalogRoot "CLAUDE.md"
+    $commandsSource = Join-Path $catalogRoot "commands"
+
+    New-Item -ItemType Directory -Path $commandsSource, $identicalRoot, $divergedRoot -Force | Out-Null
+    Set-Content -LiteralPath $instructions -Value "# instructions"
+    Set-Content -LiteralPath (Join-Path $commandsSource "cmd.md") -Value "cmd"
+    Set-Content -LiteralPath (Join-Path $identicalRoot "CLAUDE.md") -Value "# instructions"
+    Set-Content -LiteralPath (Join-Path $identicalRoot "AGENTS.md") -Value "user rules"
+    Set-Content -LiteralPath (Join-Path $identicalRoot "opencode.json") -Value "{}"
+    Set-Content -LiteralPath (Join-Path $divergedRoot "CLAUDE.md") -Value "my own edits"
+
+    Mock Get-TrackedCatalogDir { $catalogRoot }
+    Mock Get-TrackedCatalogInstructionsPath { $instructions }
+    Mock Get-ManagedCatalogRuntimeTargets {
+      @(
+        [pscustomobject]@{ Name = "identical"; Root = $identicalRoot; SkillsRoot = "-"; AgentsFace = "-"; ConfigName = "-" },
+        [pscustomobject]@{ Name = "diverged"; Root = $divergedRoot; SkillsRoot = "-"; AgentsFace = "-"; ConfigName = "-" }
+      )
+    }
+
+    Sync-ManagedCatalogRuntimeAssets
+
+    Test-Path -LiteralPath (Join-Path $identicalRoot "CLAUDE.md") | Should -Be $false
+    Test-Path -LiteralPath (Join-Path $identicalRoot "AGENTS.md") | Should -Be $true
+    Test-Path -LiteralPath (Join-Path $identicalRoot "opencode.json") | Should -Be $true
+    Test-Path -LiteralPath (Join-Path $identicalRoot "commands/cmd.md") | Should -Be $true
+    ((Get-Content -LiteralPath (Join-Path $divergedRoot "CLAUDE.md") -Raw).Trim()) | Should -Be "my own edits"
+    Test-Path -LiteralPath (Join-Path $divergedRoot "commands/cmd.md") | Should -Be $true
+  }
+
   It "removes a manifest-tracked file the catalog dropped" {
     $sourceDir = Join-Path $TestDrive "manifest-drop-source"
     $targetDir = Join-Path $TestDrive "manifest-drop-target"
@@ -1764,6 +1798,12 @@ id = "preserve other"
     $opencode.Root | Should -Be (Join-Path $HOME ".config/opencode")
     $opencode.SkillsRoot | Should -Be "-"
     $opencode.AgentsFace | Should -Be "-"
+  }
+
+  It "marks opencode as having no config file because OpenCode never reads CLAUDE.md under its own root" {
+    $opencode = @(Get-ManagedCatalogRuntimeTargets) | Where-Object Name -eq "opencode"
+
+    $opencode.ConfigName | Should -Be "-"
   }
 
   It "uses the final segment of namespaced skill names for all targets" {

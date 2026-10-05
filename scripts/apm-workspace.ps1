@@ -2966,13 +2966,16 @@ function Write-CatalogSummary {
 # and the catalog's Claude-format `.md` agent files are silently ignored
 # there (or rejected once renamed to `.toml`, on the `tools`/`color` fields).
 # OpenCode opts out for the same reason (it rejects Claude-format agents at
-# startup) and also has no skills face of its own.
+# startup) and also has no skills face of its own. ConfigName "-" marks a
+# target that reads guidance from elsewhere (OpenCode reads
+# ~/.config/opencode/AGENTS.md, else ~/.claude/CLAUDE.md); a byte-identical
+# CLAUDE.md that an earlier apply left there is removed.
 function Get-ManagedCatalogRuntimeTargets {
   return @(
     [pscustomobject]@{ Name = "claude"; Root = (Join-Path $HOME ".claude"); SkillsRoot = (Join-Path $HOME ".claude"); AgentsFace = ""; ConfigName = "CLAUDE.md" },
     [pscustomobject]@{ Name = "codex"; Root = (Join-Path $HOME ".codex"); SkillsRoot = (Join-Path $HOME ".agents"); AgentsFace = "-"; ConfigName = "AGENTS.md" },
     [pscustomobject]@{ Name = "cursor"; Root = (Join-Path $HOME ".cursor"); SkillsRoot = (Join-Path $HOME ".cursor"); AgentsFace = ""; ConfigName = "AGENTS.md" },
-    [pscustomobject]@{ Name = "opencode"; Root = (Join-Path $HOME ".config/opencode"); SkillsRoot = "-"; AgentsFace = "-"; ConfigName = "CLAUDE.md" },
+    [pscustomobject]@{ Name = "opencode"; Root = (Join-Path $HOME ".config/opencode"); SkillsRoot = "-"; AgentsFace = "-"; ConfigName = "-" },
     [pscustomobject]@{ Name = "openclaw"; Root = (Join-Path $HOME ".openclaw"); SkillsRoot = (Join-Path $HOME ".openclaw"); AgentsFace = ""; ConfigName = "CLAUDE.md" }
   )
 }
@@ -3167,6 +3170,22 @@ function Sync-ManagedCatalogDirWithManifest {
   Set-Content -LiteralPath $manifestPath -Value $newManifest
 }
 
+function Remove-StaleCatalogConfig {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$SourcePath,
+
+    [Parameter(Mandatory = $true)]
+    [string]$StalePath
+  )
+
+  if (-not (Test-Path -LiteralPath $SourcePath -PathType Leaf)) { return }
+  $item = Get-Item -LiteralPath $StalePath -Force -ErrorAction SilentlyContinue
+  if (($null -eq $item) -or $item.PSIsContainer -or $item.LinkType) { return }
+  if ((Get-FileHash -LiteralPath $SourcePath).Hash -ne (Get-FileHash -LiteralPath $StalePath).Hash) { return }
+  Remove-Item -LiteralPath $StalePath -Force
+}
+
 function Sync-ManagedCatalogRuntimeAssets {
   $trackedDir = Get-TrackedCatalogDir
   if (-not (Test-Path -LiteralPath $trackedDir)) {
@@ -3181,7 +3200,10 @@ function Sync-ManagedCatalogRuntimeAssets {
   foreach ($target in (Get-ManagedCatalogRuntimeTargets)) {
     New-Item -ItemType Directory -Path $target.Root -Force | Out-Null
 
-    if (Test-Path -LiteralPath $instructionsSource) {
+    if ($target.ConfigName -eq "-") {
+      Remove-StaleCatalogConfig -SourcePath $instructionsSource -StalePath (Join-Path $target.Root "CLAUDE.md")
+    }
+    elseif (Test-Path -LiteralPath $instructionsSource) {
       Copy-ManagedCatalogFile -SourcePath $instructionsSource -DestinationPath (Join-Path $target.Root $target.ConfigName)
     }
 
@@ -3330,15 +3352,16 @@ function Invoke-Doctor {
     $hasAgentsFace = -not (($target.PSObject.Properties.Name -contains "AgentsFace") -and $target.AgentsFace -eq "-")
     $skillsRoot = if ($target.PSObject.Properties.Name -contains "SkillsRoot" -and $target.SkillsRoot) { $target.SkillsRoot } else { $target.Root }
     $skillsPath = Join-Path $skillsRoot "skills"
+    $hasConfig = $target.ConfigName -ne "-"
     $configPath = Join-Path $target.Root $target.ConfigName
     $agentsPath = Join-Path $target.Root "agents"
     $commandsPath = Join-Path $target.Root "commands"
     $rulesPath = Join-Path $target.Root "rules"
     $skillsState = if (-not $hasSkillsRoot) { "n/a" } elseif (Test-Path $skillsPath) { "present" } else { "missing" }
     $agentsState = if (-not $hasAgentsFace) { "n/a" } elseif (Test-Path $agentsPath) { "present" } else { "missing" }
-    Write-Host ("  {0}: config={1} agents={2} commands={3} rules={4} skills={5}" -f $target.Name, $(if (Test-Path $configPath) { "present" } else { "missing" }), $agentsState, $(if (Test-Path $commandsPath) { "present" } else { "missing" }), $(if (Test-Path $rulesPath) { "present" } else { "missing" }), $skillsState)
+    Write-Host ("  {0}: config={1} agents={2} commands={3} rules={4} skills={5}" -f $target.Name, $(if (-not $hasConfig) { "n/a" } elseif (Test-Path $configPath) { "present" } else { "missing" }), $agentsState, $(if (Test-Path $commandsPath) { "present" } else { "missing" }), $(if (Test-Path $rulesPath) { "present" } else { "missing" }), $skillsState)
 
-    if ((Test-Path -LiteralPath $trackedInstructionsPath -PathType Leaf) -and -not (Test-Path -LiteralPath $configPath -PathType Leaf)) {
+    if ($hasConfig -and (Test-Path -LiteralPath $trackedInstructionsPath -PathType Leaf) -and -not (Test-Path -LiteralPath $configPath -PathType Leaf)) {
       $diagnostics.Add("Required catalog output is missing or has wrong type (file): $configPath")
     }
     if ($hasAgentsFace -and (Test-Path -LiteralPath $trackedAgentsRoot -PathType Container) -and -not (Test-Path -LiteralPath $agentsPath -PathType Container)) {
