@@ -98,8 +98,15 @@ query(
 """
 
 
+class GhNotFoundError(RuntimeError):
+    pass
+
+
 def _run(cmd: list[str], stdin: str | None = None) -> str:
-    p = subprocess.run(cmd, input=stdin, capture_output=True, text=True)
+    try:
+        p = subprocess.run(cmd, input=stdin, capture_output=True, text=True)
+    except FileNotFoundError:
+        raise GhNotFoundError(f"{cmd[0]} not found on PATH") from None
     if p.returncode != 0:
         raise RuntimeError(f"Command failed: {' '.join(cmd)}\n{p.stderr}")
     return p.stdout
@@ -116,8 +123,9 @@ def _run_json(cmd: list[str], stdin: str | None = None) -> dict[str, Any]:
 def _ensure_gh_authenticated() -> None:
     try:
         _run(["gh", "auth", "status"])
+    except GhNotFoundError:
+        raise
     except RuntimeError:
-        print("run `gh auth login` to authenticate the GitHub CLI", file=sys.stderr)
         raise RuntimeError("gh auth status failed; run `gh auth login` to authenticate the GitHub CLI") from None
 
 
@@ -229,7 +237,9 @@ def fetch_all(owner: str, repo: str, number: int) -> dict[str, Any]:
         if "errors" in payload and payload["errors"]:
             raise RuntimeError(f"GitHub GraphQL errors:\n{json.dumps(payload['errors'], indent=2)}")
 
-        pr = payload["data"]["repository"]["pullRequest"]
+        pr = ((payload.get("data") or {}).get("repository") or {}).get("pullRequest")
+        if pr is None:
+            raise RuntimeError(f"PR not found: {owner}/{repo}#{number}")
         if pr_meta is None:
             pr_meta = {
                 "number": pr["number"],
