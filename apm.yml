@@ -13,9 +13,6 @@ dependencies:
     - jey3dayo/apm-workspace/catalog#main
     - jey3dayo/apm-workspace/manual-skills#main
 
-    # --- org-restricted ---
-    - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault#9869e9df63da283b29561923e7e5839a8a3d9152
-
     # --- review ---
     - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review#93b00b89ef425a9c1bac0d0b317dfc49c930ac99
     - shadcn/improve#03369ee6d7cafbfcecc4346539b05b3dc0a603bb

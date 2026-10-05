@@ -3,6 +3,14 @@
 採用・撤去・見送りにした APM パッケージの意思決定ログ。1 パッケージ 1 セクション。
 「なぜ入れたか / なぜ消したか / 再検討するなら何を見るか」を残す。
 
+## perman-aws-vault
+
+- Status: global APM から撤去・repo-local へ移管（2026-10-05）
+- 理由: 依存元 `caad-develop/claude-code-marketplace` は internal repo で、global の全体更新を妨げていた（ユーザー判断）。利用する AWS リポジトリ側の `apm.yml` で宣言する。
+- 手順: `apm.yml` の依存と `# --- org-restricted ---` グループ、`apm.lock.yaml` の該当レコード、manifest-style のグループ順、skill inventory の global 記載を削除。
+- 移管先: `ca-connect-site`、`caad-asta`、`caad-loca-bff`、`our-apm` は repo-local で宣言済み。未宣言の AWS リポジトリは必要になった時点でその repo の `apm.yml` に追加する。
+- 再検討するなら: 未宣言リポジトリで AWS 認証の導線が繰り返し欠けるとき。
+
 ## caad-skill-deployer
 
 - Status: global APM の管理対象から撤去（2026-10-02）
@@ -165,7 +173,7 @@
 - Status: 完了（2026-08-21 に候補のレビューを終え、未実施の候補は残っていない）
 - 結果: 社内 API 系は撤去して repo-local 化した（下の `ca-pass` ほか）。`browser-harness` は
   global 維持（global `AGENTS.md` の「ブラウザ操作の選択」でヘッドレス操作を担い、pi / opencode 向けの最低保証でもある）。
-  `perman-aws-vault` は複数の AWS リポジトリで同じ認証導線を使うため global 維持
+  `perman-aws-vault` は複数の AWS リポジトリで同じ認証導線を使うため global 維持（2026-10-05 に repo-local へ移管）
   （移すなら profile / credential の境界を明記してから）。understand 系は観察タスクへ分け、のちに撤去した。
 - 2026-07-16 の棚卸しで global 維持を決めたもの: `react-doctor`、`react-best-practices`、
   `baseline-ui` ほか ibelick 系、`transitions-dev`、`frontend-design`、`ui-ux-pro-max`、

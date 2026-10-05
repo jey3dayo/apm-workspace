@@ -12,7 +12,7 @@ Applies to the root `~/.apm/apm.yml` and to repo-local manifests. The lane a dep
 ## Grouping (root `apm.yml`)
 
 - `dependencies.apm` sits under one level of headers written `# --- <group> ---`, with one blank line between groups and none inside a group.
-- Groups, in this order: `workspace`, `org-restricted`, `review`, `engineering / writing`, `react`, `design`, `browser / analysis`, `agent tools`, `productivity / research`.
+- Groups, in this order: `workspace`, `review`, `engineering / writing`, `react`, `design`, `browser / analysis`, `agent tools`, `productivity / research`.
 - A new entry joins the group whose purpose matches. Add a group only when none fits, and update the list above in the same change.
 - Within a group, entries are ordered case-insensitively by owner (for a URL, the path after the host), then by the rest of the ref.
 - `dependencies.mcp` is ordered by `name`, without group headers.
