@@ -22,7 +22,7 @@ If CLI auth is required, confirm `gh auth status` first and ask the user to auth
    - If the request is about the current branch PR, use local git context plus `gh auth status` and `gh pr view --json number,url` to resolve it.
 2. Inspect review context with thread-aware reads.
    - Use `gh pr view` / `gh pr diff` to fetch PR metadata and patch context when the repo and PR are known.
-   - Use the bundled `scripts/fetch_comments.py` workflow whenever the task depends on unresolved review threads, inline review locations, or resolution state. That script fetches `reviewThreads`, `isResolved`, `isOutdated`, and file and line anchors that flat REST comment reads do not preserve.
+   - Use the bundled `scripts/fetch_comments.py` workflow whenever the task depends on unresolved review threads, inline review locations, or resolution state. That script fetches `reviewThreads`, `isResolved`, `isOutdated`, and file and line anchors that flat REST comment reads do not preserve. When the user named a PR, pass it (`scripts/fetch_comments.py <owner>/<repo> <number>` or the PR URL) and check that `pull_request.number` in the output matches; with no argument it reads the current branch's PR.
    - Use flat comment reads (`gh pr view --comments`) only for lightweight top-level PR comment summaries.
 3. Cluster actionable review threads.
    - Group comments by file or behavior area.

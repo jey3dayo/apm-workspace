@@ -1,24 +1,30 @@
 #!/usr/bin/env python3
 """
 Fetch all PR conversation comments + reviews + review threads (inline threads)
-for the PR associated with the current git branch, by shelling out to:
+for a PR (the current branch's PR by default), by shelling out to:
 
   gh api graphql
 
 Requires:
   - `gh auth login` already set up
-  - current branch has an associated (open) PR
+  - without arguments, the current branch has an associated (open) PR
 
 Usage:
-  python fetch_comments.py > pr_comments.json
+  python fetch_comments.py [<owner>/<repo>] <number|PR URL> > pr_comments.json
+  python fetch_comments.py > pr_comments.json   # PR of the current branch
 """
 
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 from typing import Any
+
+USAGE = "usage: fetch_comments.py [<owner>/<repo>] <number|PR URL>"
+PR_URL_RE = re.compile(r"^https://github\.com/([^/\s]+)/([^/\s]+)/pull/(\d+)(?:[/?#].*)?$")
+REPO_RE = re.compile(r"^([^/\s]+)/([^/\s]+)$")
 
 QUERY = """\
 query(
@@ -132,6 +138,38 @@ def get_current_pr_ref() -> tuple[str, str, int]:
     return owner, repo, number
 
 
+def resolve_pr_ref(args: list[str]) -> tuple[str, str, int]:
+    """
+    Resolve (owner, repo, number) from CLI args:
+      []                        -> PR of the current branch
+      [<url>]                   -> owner/repo/number from the PR URL
+      [<number>]                -> base repo as gh resolves it for the PR
+      [<owner>/<repo>, <number>]
+    """
+    if not args:
+        return get_current_pr_ref()
+    if len(args) == 1:
+        m = PR_URL_RE.match(args[0])
+        if m:
+            return m.group(1), m.group(2), int(m.group(3))
+        if args[0].isdigit():
+            # The PR URL carries the base repo, where the PR lives (headRepository would be a fork).
+            url = _run_json(["gh", "pr", "view", args[0], "--json", "url"])["url"]
+            m = PR_URL_RE.match(url)
+            if not m:
+                raise ValueError(f"unexpected PR URL from gh: {url}")
+            return m.group(1), m.group(2), int(m.group(3))
+        raise ValueError(f"not a PR number or URL: {args[0]}")
+    if len(args) == 2:
+        m = REPO_RE.match(args[0])
+        if not m:
+            raise ValueError(f"not an <owner>/<repo>: {args[0]}")
+        if not args[1].isdigit():
+            raise ValueError(f"not a PR number: {args[1]}")
+        return m.group(1), m.group(2), int(args[1])
+    raise ValueError("too many arguments")
+
+
 def gh_api_graphql(
     owner: str,
     repo: str,
@@ -226,12 +264,21 @@ def fetch_all(owner: str, repo: str, number: int) -> dict[str, Any]:
     }
 
 
-def main() -> None:
-    _ensure_gh_authenticated()
-    owner, repo, number = get_current_pr_ref()
-    result = fetch_all(owner, repo, number)
+def main(argv: list[str]) -> int:
+    if any(a in ("-h", "--help") for a in argv):
+        print(USAGE)
+        return 0
+    try:
+        _ensure_gh_authenticated()
+        owner, repo, number = resolve_pr_ref(argv)
+        result = fetch_all(owner, repo, number)
+    except (RuntimeError, ValueError, KeyError) as e:
+        cause = " ".join(str(e).split()) or type(e).__name__
+        print(f"{USAGE}\nerror: {cause}", file=sys.stderr)
+        return 2
     print(json.dumps(result, indent=2))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main(sys.argv[1:]))
