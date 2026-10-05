@@ -79,6 +79,11 @@ description = "Inspect ~/.apm workspace state and deployed targets"
 run = "bash ./scripts/apm-workspace.sh doctor"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 doctor"
 
+[tasks."lock:diff"]
+description = "Summarize apm.lock.yaml changes against a git ref (resolved commits, removed artifacts, target counts); read-only"
+run = "bash ./scripts/lock-diff.sh"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/lock-diff.ps1"
+
 # ========================================
 # Aggregation Tasks
 # ========================================
