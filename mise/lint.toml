@@ -17,8 +17,8 @@ hide = true
 run = "bash ./scripts/lint-catalog-leaks.sh"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/lint-catalog-leaks.ps1"
 
-["lint:skill-inventory-mcp"]
-description = "Ensure docs/skill-inventory.md global MCP list matches apm.yml"
+["lint:skill-inventory"]
+description = "Ensure docs/skill-inventory.md global MCP and external skill lists match apm.yml and apm.lock.yaml"
 hide = true
-run = "bash ./scripts/lint-skill-inventory-mcp.sh"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/lint-skill-inventory-mcp.ps1"
+run = "bash ./scripts/lint-skill-inventory.sh"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/lint-skill-inventory.ps1"

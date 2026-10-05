@@ -10,15 +10,15 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
 
-$scriptPath = if ($env:APM_LINT_SKILL_INVENTORY_MCP_SCRIPT) {
-  $env:APM_LINT_SKILL_INVENTORY_MCP_SCRIPT
+$scriptPath = if ($env:APM_LINT_SKILL_INVENTORY_SCRIPT) {
+  $env:APM_LINT_SKILL_INVENTORY_SCRIPT
 }
 else {
-  [IO.Path]::Combine($repoRoot, 'scripts', 'lint-skill-inventory-mcp.ts')
+  [IO.Path]::Combine($repoRoot, 'scripts', 'lint-skill-inventory.ts')
 }
 
 if (-not (Test-Path -LiteralPath $scriptPath -PathType Leaf)) {
-  Write-Error "Skill inventory MCP lint helper missing: $scriptPath"
+  Write-Error "Skill inventory lint helper missing: $scriptPath"
   exit 1
 }
 

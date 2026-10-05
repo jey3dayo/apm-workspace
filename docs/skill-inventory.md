@@ -106,11 +106,12 @@ global の一覧に無くても廃止ではない。各リポジトリの `apm.y
 
 `context7`, `linear`, `mcp-simple-voicevox`
 
-`mise run check` の `lint:skill-inventory-mcp` が上記一覧と `apm.yml` の `dependencies.mcp` を照合する。Cursor user-scope（`~/.cursor/mcp.json`）は APM 外 — [`package-decisions.md`](package-decisions.md) の Cursor 節。
+`mise run check` の `lint:skill-inventory` が上記一覧と `apm.yml` の `dependencies.mcp` を照合する。Cursor user-scope（`~/.cursor/mcp.json`）は APM 外 — [`package-decisions.md`](package-decisions.md) の Cursor 節。
 
 ## メンテナンス
 
 - 更新タイミング: レーン間の移動、global への追加・撤去、repo-local の新規採用時
-- root `apm.yml` の `mcp:` を変えたら global MCP 節の backtick 行を同じ集合に更新する（`lint:skill-inventory-mcp` が `mise run check` で検証）
+- root `apm.yml` の `mcp:` を変えたら global MCP 節の backtick 行を同じ集合に更新する（`lint:skill-inventory` が `mise run check` で検証）
+- 外部スキルの dependency を追加・撤去したら `## global（外部スキル: root apm.yml）` の一覧を更新する（`lint:skill-inventory` が `apm.lock.yaml` と照合する）
 - global から repo-local / optional への移管: `apm-usage` の Install Gate と Fast Path 9 に従う
 - repo-local の再スキャン: `ghq list -p` で各リポジトリの `apm.yml` を確認
