@@ -28,7 +28,7 @@
 - review: `thermo-nuclear-code-quality-review`, `improve`（shadcn）
 - engineering / writing: `natural-japanese`, `japanese-tech-writing`（gist、alias）, `yomiyasu`,
   mattpocock 系（`codebase-design`, `domain-modeling`, `grilling`,
-  `improve-codebase-architecture`, `prototype`, `research`, `setup-matt-pocock-skills`,
+  `improve-codebase-architecture`, `prototype`, `research`, `retro`, `setup-matt-pocock-skills`,
   `wait-what`, `wayfinder`, `writing-for-agents`）
 - react: `react-doctor`, `react-best-practices`
 - design: `frontend-design`, `agentation` / `agentation-self-driving`,

@@ -26,7 +26,7 @@ dependencies:
       ref: 8f2d57610a73efc97d743c9b0b0ecb1002e09fa4
       alias: japanese-tech-writing
     - git: mattpocock/skills
-      ref: 6acc160e4e0cd062dbbbd7a1b26ae92855edf07e # v1.2.3
+      ref: 24fe0ef7737efae15c87225755e9f6f5965e4888 # v1.3.1
       skills:
         - codebase-design
         - domain-modeling
@@ -34,6 +34,7 @@ dependencies:
         - improve-codebase-architecture
         - prototype
         - research
+        - retro
         - setup-matt-pocock-skills
         - wait-what
         - wayfinder

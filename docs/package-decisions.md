@@ -684,6 +684,12 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - 注意: `natural-japanese` と守備範囲が重なる。upstream の SKILL.md は類似スキルとの同時有効化で出力が乱れるおそれがあると書いている。
 - 再検討するなら: 両方が同じ依頼で発火して出力が混ざるとき、どちらかを外すか `skillOverrides` で抑える。
 
+## `mattpocock/skills` の `retro` を追加（2026-10-05）
+
+- 追加理由: ユーザー依頼。セッションを読み直し、エージェントの環境（ナビゲーション・自動チェック・規約・AGENTS.md・ツールの燃費・情報アクセス）の改善案を重大度順に挙げる。`disable-model-invocation: true` のため `/retro` で明示したときだけ動く。
+- 手順: `retro` は v1.3.0 で入ったため、pin を v1.2.3（`6acc160`）から v1.3.1（`24fe0ef`）へ上げ、`skills:` に足した。既存10スキルの v1.3.1 での存在を確かめてから `apm install -g --only apm` と `mise run deploy` を回した。lock で `resolved_commit` が動いたのは `mattpocock/skills` だけ。同梱スキルの更新も一緒に入り、`domain-modeling` の `CONTEXT-FORMAT.md` は upstream で `GLOSSARY-FORMAT.md` に改名されている。
+- 注意: `learning-intake` と守備範囲が近い。`retro` は改善案を提示して終わり、`learning-intake` は owner を1つ決めて反映まで行う。
+
 ## `MiniMax-AI/MiniMax-H3` の撤去（2026-08-10）
 
 - 撤去: `h3-prompt-writing` と各種動画ジェネレーターの 9 スキル（`f8adddf`）。
