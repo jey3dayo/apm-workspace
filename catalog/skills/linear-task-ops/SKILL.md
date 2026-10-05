@@ -156,6 +156,6 @@ python3 scripts/linear_task.py comment --issue <ISSUE_ID> --body "2026-03-14 | d
 - 書き込み前に state 名を解決する。state 名はチームごとに異なる
 - 小さな書き込みを繰り返さず、1 回の update / comment にまとめる
 - API トークンをログやチャットに出さない
-- GitHub 連携は、branch 名に issue ID を含む PR のマージで issue を Done にする。issue の一部だけを片付ける PR では branch 名に ID を入れない。入れた場合はマージ後に `get_issue` で state を確かめ、未完了なら戻す
+- GitHub 連携は、branch 名・PR タイトルの issue ID や、本文の closing magic word（`Fixes JEY-NNN` など）で PR を issue にリンクし、マージ時に team の「On PR or commit merge」設定の state へ動かす（JEY では Done になった）。issue の一部だけを片付ける PR は、branch 名とタイトルに ID を入れず、本文に `Part of JEY-NNN` などの non-closing magic word で書く。マージ後は `get_issue` で state を確かめ、未完了なら戻す
 - 更新後は issue を再取得して結果を確認する。書き込み成功のレスポンスだけを
   根拠に完了を報告しない（コネクタによって反映されないフィールドがある）
