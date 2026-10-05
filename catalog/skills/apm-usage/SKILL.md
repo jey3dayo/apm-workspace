@@ -269,8 +269,9 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - if the manifest contains `gist.github.com/...#<sha>`, verify its regenerated `apm.lock.yaml` record as the gist Guardrail describes (the shortened `owner/<gist-id>` `repo_url` is the accepted form) before deploy
    - confirm the target dependency's `resolved_commit` and the deployed file's hash
      before calling the refresh done; a zero exit from `deploy` is not evidence the pin moved
-   - review `apm.lock.yaml` before commit with `mise run lock:diff` (moved
-     commits, removed artifacts, per-target counts) instead of the raw diff
+   - review `apm.lock.yaml` before commit: start from `mise run lock:diff`
+     (moved commits, removed artifacts, per-target counts, other changed
+     sections), then read the raw diff of every section it lists as changed
    - the upstream skill content a refresh or pin bump accepts makes it a
      non-trivial change for `ship`'s independent review, even when `apm.yml`
      moves by one line; give the reviewer the upstream compare of each moved commit

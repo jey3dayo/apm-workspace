@@ -12,7 +12,11 @@ interface Lock {
   commits: Map<string, string>;
   artifacts: Set<string>;
   targetCounts: Map<string, number>;
+  sections: Map<string, string>;
 }
+
+const HEADER_KEYS = new Set(["generated_at", "apm_version", "lockfile_version"]);
+const PARSED_SECTIONS = new Set(["dependencies", "deployments"]);
 
 class LockDiffError extends Error {}
 
@@ -24,6 +28,7 @@ function parseLock(text: string, label: string): Lock {
   const commits = new Map<string, string>();
   const artifacts = new Set<string>();
   const targetCounts = new Map<string, number>();
+  const sectionLines = new Map<string, string[]>();
 
   let section = "";
   let seenDependencies = false;
@@ -33,6 +38,9 @@ function parseLock(text: string, label: string): Lock {
   let resolvedCommit = "";
 
   const flushDependency = () => {
+    if (repoUrl && !resolvedCommit) {
+      throw new LockDiffError(`${label}: dependency ${repoUrl} lacks resolved_commit`);
+    }
     if (repoUrl) commits.set(virtualPath ? `${repoUrl} (${virtualPath})` : repoUrl, resolvedCommit);
     repoUrl = "";
     virtualPath = "";
@@ -46,8 +54,10 @@ function parseLock(text: string, label: string): Lock {
       section = topLevel[1];
       seenDependencies ||= section === "dependencies";
       seenDeployments ||= section === "deployments";
+      sectionLines.set(section, [line]);
       continue;
     }
+    sectionLines.get(section)?.push(line);
 
     if (section === "dependencies") {
       const item = line.match(/^- repo_url:\s*(.+)$/);
@@ -72,7 +82,8 @@ function parseLock(text: string, label: string): Lock {
 
   if (!seenDependencies) throw new LockDiffError(`${label}: missing 'dependencies:' section`);
   if (!seenDeployments) throw new LockDiffError(`${label}: missing 'deployments:' section`);
-  return { commits, artifacts, targetCounts };
+  const sections = new Map([...sectionLines].map(([name, lines]) => [name, lines.join("\n").trimEnd()]));
+  return { commits, artifacts, targetCounts, sections };
 }
 
 function readFile(filePath: string, label: string): string {
@@ -146,6 +157,21 @@ function render(base: Lock, head: Lock): string {
     .filter((r) => r.before !== r.after)
     .map((r) => `${r.t}: ${r.before} -> ${r.after}`);
   out.push(...(rows.length > 0 ? rows : ["unchanged"]));
+
+  out.push("", "== other sections ==");
+  const otherChanges: string[] = [];
+  const baseVersion = base.sections.get("apm_version");
+  const headVersion = head.sections.get("apm_version");
+  if (baseVersion !== headVersion) {
+    const version = (line: string | undefined) => line?.replace(/^apm_version:\s*/, "") ?? "(absent)";
+    otherChanges.push(`apm_version: ${version(baseVersion)} -> ${version(headVersion)}`);
+  }
+  const names = new Set([...base.sections.keys(), ...head.sections.keys()]);
+  for (const name of sorted(names)) {
+    if (HEADER_KEYS.has(name) || PARSED_SECTIONS.has(name)) continue;
+    if (base.sections.get(name) !== head.sections.get(name)) otherChanges.push(name);
+  }
+  out.push(...(otherChanges.length > 0 ? otherChanges : ["unchanged"]));
 
   return `${out.join("\n")}\n`;
 }

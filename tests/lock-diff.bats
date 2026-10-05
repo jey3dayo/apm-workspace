@@ -17,7 +17,7 @@ run_fixture() {
 }
 
 write_lock() {
-  local file="$1" commit_a="$2" commit_b="$3" artifacts="$4"
+  local file="$1" commit_a="$2" commit_b="$3" artifacts="$4" mcp_url="${5:-https://example.test/mcp}"
   cat >"$FIXTURE_DIR/$file" <<EOF
 lockfile_version: '2'
 dependencies:
@@ -35,6 +35,8 @@ deployments:
 ${artifacts}
 mcp_servers:
 - name: x
+mcp_configs:
+- url: ${mcp_url}
 EOF
 }
 
@@ -129,4 +131,35 @@ deployment() {
   run_fixture
   [ "$status" -ne 0 ]
   [[ "$output" == *"deployments"* ]]
+}
+
+@test "lists a section that changed only outside dependencies and deployments" {
+  arts="$(deployment claude .claude/skills/a)"
+  write_lock base.yaml aaaaaaa1111111111111111111111111111111111 bbbbbbb1111111111111111111111111111111111 "$arts" https://old.test/mcp
+  write_lock head.yaml aaaaaaa1111111111111111111111111111111111 bbbbbbb1111111111111111111111111111111111 "$arts" https://new.test/mcp
+
+  run_fixture
+  [ "$status" -eq 0 ]
+  [[ "$output" == *$'== other sections ==\nmcp_configs'* ]]
+  [[ "$output" != *"mcp_servers"* ]]
+}
+
+@test "reports other sections unchanged when only dependencies move" {
+  arts="$(deployment claude .claude/skills/a)"
+  write_lock base.yaml aaaaaaa1111111111111111111111111111111111 bbbbbbb1111111111111111111111111111111111 "$arts"
+  write_lock head.yaml ccccccc2222222222222222222222222222222222 bbbbbbb1111111111111111111111111111111111 "$arts"
+
+  run_fixture
+  [ "$status" -eq 0 ]
+  [[ "$output" == *$'== other sections ==\nunchanged'* ]]
+}
+
+@test "fails naming the repo_url when a dependency lacks resolved_commit" {
+  arts="$(deployment claude .claude/skills/a)"
+  write_lock base.yaml aaaaaaa1111111111111111111111111111111111 bbbbbbb1111111111111111111111111111111111 "$arts"
+  printf 'dependencies:\n- repo_url: owner/nocommit\n  name: x\ndeployments:\n' >"$FIXTURE_DIR/head.yaml"
+
+  run_fixture
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"owner/nocommit"* ]]
 }
