@@ -606,7 +606,7 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - 理由: 前者は回答の出力スタイル、後者は直近 30 日の多ソースリサーチで、どちらも repo や credential に依存せず横断的に使う。upstream が正本なので catalog へ写さない。
 - 注意（i-have-adhd）: upstream は Claude Code plugin としても配布し、SessionStart hook で常時 ADHD モードにする always-on を持つ。APM の skill 配布に hook は含まれないので `/i-have-adhd` の明示起動のみ。常時化が要るなら別途判断する。
 - 注意（last30days）: `skills/last30days/` に画像・mp3 の `assets/` が同居し、apm は upstream の `.skillignore` を読まないため `~/.claude/skills` と `~/.agents/skills` の両方へそのまま配布される。deploy 時の「Referenced file not found: url」警告は SKILL.md 内のプレースホルダリンクで、動作に影響しない。エンジンは `python3`（3.12+）と `node` を要し、鍵無しでも Reddit / HN / Polymarket / GitHub は動く。
-- 更新: 両方 SHA pin。`apm.yml` の pin を手で上げ、`apm install -g --only apm` → `mise run deploy`（`apm-usage` Fast Path 5）。`mise run upgrade` では動かない。
+- 更新: 両方 SHA pin。`apm.yml` の pin を手で上げ、`mise run deploy:pins`（`apm-usage` Fast Path 5）。`mise run upgrade` では動かない。
 - 再検討するなら: 利用実績が 0 のまま次の棚卸しを迎えたら撤去する。last30days は配布サイズが問題になれば `assets/` 抜きで manual-skills へ vendor する。
 
 ## `apm-repo-manifest` を `apm-usage` へ統合（2026-09-23）
@@ -640,7 +640,7 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - 理由: apm 0.31.0 の `apm update` は SHA pin の依存を最新タグへ書き換え、タグが pin より古くても戻す。2026-09-25 の global dry-run では対象8件中6件が後退だった（mattpocock/skills 41 commit、millionco/react-doctor 29、tt-a1i/archify 21、ibelick/ui-skills 263、coji/natural-japanese 13、mvanhorn/last30days-skill 6）。前進は benjitaylor/agentation（v3.1.2）と modem-dev/hunk（v0.22.0）だけで、この2件は同日に手動で適用した。
 - 併発する失敗: 同じ SHA を共有する複数行を update が書き換えると `Expected exactly one apm.yml entry for <sha>, found 2` で止まる（agentation 2行で再現）。object 形式の `git:` + `ref:` + `skills:` へ畳めば apm 単体では回避でき、pin 時点の配布内容も byte 一致した。workspace スクリプトは当初 `.apm/skills` 構造しか解決できず素の `skills/<name>/` bundle が `Missing external skill cache` になったが、同日 `external_package_skills_root`（`.ps1` は `Get-ExternalPackageSkillsRoot`）に、virtual_path が空で manifest が `skills:` subset を宣言したレコードに限って `<cache>/skills/` を package root とするフォールバックを入れた（`.apm/skills` があればそちらを優先）。
 - 畳み込みの適用範囲: 同じ repo・同じ SHA の複数行は `skills:` subset で1エントリに畳む。2026-09-25 に `mattpocock/skills`（apm が plugin.json の `skills` 配列から `.apm/skills` を生成する型）と、素の bundle である `benjitaylor/agentation` / `emilkowalski/skills` / `ibelick/ui-skills` を畳み、配布内容の一致を確かめた（配布先から消えたのはキャッシュ由来の `.apm-pin` だけ）。畳めないのは、ルートが `marketplace.json` だけで subset を指定しても何も配布されない `caad-develop/claude-code-marketplace`。この repo はルートに `skills` 配列付きの `.claude-plugin/plugin.json` を足せば畳める（scratchpad の複製で確認済み、upstream は未変更）。畳めるかどうかは、隔離 fixture に対して `APM_WORKSPACE_DIR=<fixture> bash -c 'source ./scripts/apm-workspace.sh; collect_external_skill_records'` を実行して確かめられる。
-- 更新手順: `apm.yml` の SHA を同じ repo の全行で揃えて上げ、`apm install -g --only apm` → `mise run deploy:fresh`。`apm install -g` は agmsg の db/teams symlink を外すので、`mise run doctor` で確かめて plain path が無ければ `mise run agmsg:state:restore`。
+- 更新手順: `apm.yml` の SHA を同じ repo の全行で揃えて上げ、`mise run install:pins` → `mise run deploy:fresh`。
 - 前回の「ibelick/ui-skills の新構成と互換しない」は誤認だった。update の行き先が 2026-01 の古いタグ `v0.0.7`（`src/SKILL.md` だけの構造）だったためで、pin と HEAD の `skills/` は同一。
 - 再検討するなら: apm の update が pin より古いタグへ戻さなくなったとき。
 

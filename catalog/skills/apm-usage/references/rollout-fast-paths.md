@@ -10,10 +10,11 @@ were observed on 0.29.0 and carried forward.
 When you bump a SHA pin in `apm.yml` by hand, `mise run deploy` alone does not
 pick it up: `apply` stages external skills from the existing lock records and
 `apm_modules/`, so the lockfile and the deployed target both stay on the old
-commit while every command exits zero. Run `apm install -g --only apm`, then
-`mise run deploy`. The install re-resolves a dependency whose manifest ref
-differs from the locked one (`detect_ref_change`, observed on 0.31.0 with a
-single dependency).
+commit while every command exits zero. Run `mise run deploy:pins`: it runs
+`apm install -g --only apm` with the agmsg roster saved and restored, then
+`deploy`. The install re-resolves a dependency whose manifest ref differs
+from the locked one (`detect_ref_change`, observed on 0.31.0 with a single
+dependency).
 
 `mise run upgrade` also moves the lock to a hand-bumped SHA on 0.31.0, but it
 is the wrong tool here. Besides refreshing every unpinned dependency, it
@@ -21,13 +22,9 @@ rewrites every declared SHA pin whose upstream has an annotated semver tag to
 the highest such tag's commit, which can be older than the pinned commit, and
 appends `# <tag>` to that line.
 
-`apm install -g --only apm` bypasses `mise run apply` the same way the bare
-`apm install -g` in Fast Path 6 does, so check the agmsg roster links per
-that path's note before calling the refresh done. If the follow-up
-`mise run deploy` fails at its `check` stage, it never reaches `apply`, so
-the roster links stay unrestored — fix the `check` failure and rerun
-`deploy` (or `mise run apply`) rather than assuming the earlier call
-recovered them.
+If `deploy:pins` fails at its `deploy` stage, the install has already moved
+the lock and the roster links are restored; fix the failure and rerun
+`mise run deploy` rather than the whole task.
 
 For a checked-out external dependency (Fast Path 7) that is SHA-pinned, bump
 the pin in `apm.yml` to the pushed commit and follow this same sequence.

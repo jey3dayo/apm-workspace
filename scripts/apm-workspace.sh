@@ -1234,6 +1234,24 @@ cmd_update() {
   agmsg_state_restore_or_fail
 }
 
+cmd_install_pins() {
+  require_apm
+  ensure_workspace_repo
+  ensure_workspace_scaffold
+
+  # A bare `apm install -g` redeploys the agmsg skill dir; same save/restore contract as cmd_update.
+  "$REPO_ROOT/scripts/agmsg-state.sh" save
+  trap 'agmsg_state_restore_report_failure' EXIT
+
+  (
+    cd "$WORKSPACE_DIR"
+    apm install -g --only apm
+  )
+
+  trap - EXIT
+  agmsg_state_restore_or_fail
+}
+
 lock_pinned_reference_map() {
   locked_external_skill_records | awk -F '|' '
     {
@@ -2576,6 +2594,7 @@ Commands:
   apply              Offline deploy user-scope-compatible dependencies and compile Codex output
   apply:skills:local Quick-sync local catalog and private skills into ~/.agents/skills; private skills also link into ~/.claude/skills
   refresh            Refresh the checkout and dependencies only; does not deploy
+  install-pins       Re-resolve hand-bumped SHA pins (apm install -g --only apm); does not deploy
   repair:local-package-cache Rebuild workspace-owned package cache from tracked sources
   pin-external       Pin external manifest refs to lockfile commits
   validate           Validate the ~/.apm workspace
@@ -2601,6 +2620,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     apply) cmd_apply ;;
     apply:skills:local) cmd_sync_local_skills "$@" ;;
     refresh) cmd_update ;;
+    install-pins) cmd_install_pins ;;
     repair:local-package-cache) cmd_repair_local_package_cache ;;
     pin-external) cmd_pin_external ;;
     validate) cmd_validate ;;

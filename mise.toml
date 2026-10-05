@@ -132,6 +132,16 @@ run = [
 description = "Refresh upstream APM dependencies, run checks, deploy, and inspect the ~/.apm workspace"
 run = ["apm update -g --yes", { task = "deploy" }]
 
+[tasks."install:pins"]
+description = "Run `apm install -g --only apm` with the agmsg roster preserved; no check/apply/doctor"
+hide = true
+run = "bash ./scripts/apm-workspace.sh install-pins"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 install-pins"
+
+[tasks."deploy:pins"]
+description = "Re-resolve hand-bumped SHA pins (apm install -g --only apm, agmsg roster preserved), then deploy"
+run = [{ task = "install:pins" }, { task = "deploy" }]
+
 [tasks."refresh:deploy"]
 description = "Pull the checkout and run `apm deps update -g` (re-resolves refs, regenerates apm.lock.yaml), then `deploy`; unlike `upgrade`, it also pulls the checkout"
 # Broader than the day-to-day rollout path; `deploy` is the normal entry point.

@@ -999,6 +999,7 @@ Describe "public command surface" {
         "apply:skills:local",
         "check",
         "deploy",
+        "deploy:pins",
         "doctor",
         "format",
         "format:check",
@@ -1105,6 +1106,7 @@ Describe "public command surface" {
       $expectedCommands = @{
         "apply" = @{ Path = "scripts/apm-workspace.sh"; Subcommand = "apply" }
         "apply:skills:local" = @{ Path = "scripts/apm-workspace.sh"; Subcommand = "apply:skills:local" }
+        "install:pins" = @{ Path = "scripts/apm-workspace.sh"; Subcommand = "install-pins" }
         "format:markdown:bold-headings" = @{ Path = "scripts/format-bold-headings.sh"; Subcommand = "write" }
         "format:markdown:bold-headings:check" = @{ Path = "scripts/format-bold-headings.sh"; Subcommand = "check" }
       }
@@ -1209,6 +1211,7 @@ run = "echo outside"
     $help = (& $bashShell (Join-Path $workspaceRoot "scripts/apm-workspace.sh") help | Out-String) -replace "`r`n", "`n" -replace "`r", "`n"
 
     $help | Should -Match $updateHelpPattern
+    $help | Should -Match '(?m)^  install-pins\s+'
     $help | Should -Match "validate:catalog"
     $help | Should -Match "prepare:catalog"
     $help | Should -Match "install:catalog"
@@ -1228,6 +1231,7 @@ run = "echo outside"
     $help = (& $consoleShell -NoProfile -ExecutionPolicy Bypass -File $scriptPath help | Out-String) -replace "`r`n", "`n" -replace "`r", "`n"
 
     $help | Should -Match $updateHelpPattern
+    $help | Should -Match '(?m)^  install-pins\s+'
     $help | Should -Match "validate:catalog"
     $help | Should -Match "prepare:catalog"
     $help | Should -Match "install:catalog"
@@ -1239,6 +1243,58 @@ run = "echo outside"
     $help | Should -Not -Match "stage-internal"
     $help | Should -Not -Match "register-internal"
     $help | Should -Not -Match "migrate-internal"
+  }
+
+  It "runs apm install -g --only apm between agmsg save and restore" {
+    $script:installPinsCalls = New-Object System.Collections.Generic.List[string]
+
+    function global:apm {
+      $script:installPinsCalls.Add("apm " + (@($args) -join ' '))
+      $global:LASTEXITCODE = 0
+    }
+
+    try {
+      Mock Require-Apm {}
+      Mock Ensure-WorkspaceRepo {}
+      Mock Ensure-WorkspaceScaffold {}
+      Mock Refresh-WorkspaceCheckout {}
+      Mock Invoke-AgmsgStateSave { $script:installPinsCalls.Add("save") }
+      Mock Invoke-AgmsgStateRestoreOrThrow { $script:installPinsCalls.Add("restore") }
+      Mock Invoke-AgmsgStateRestore { $script:installPinsCalls.Add("recovery-restore") }
+
+      Invoke-InstallPins
+
+      $script:installPinsCalls | Should -Be @("save", "apm install -g --only apm", "restore")
+      Assert-MockCalled Refresh-WorkspaceCheckout -Times 0 -Exactly
+    }
+    finally {
+      Remove-Item Function:\apm -ErrorAction SilentlyContinue
+    }
+  }
+
+  It "fails install-pins when apm install fails and still restores the agmsg roster" {
+    $script:installPinsCalls = New-Object System.Collections.Generic.List[string]
+
+    function global:apm {
+      $script:installPinsCalls.Add("apm " + (@($args) -join ' '))
+      $global:LASTEXITCODE = 1
+    }
+
+    try {
+      Mock Require-Apm {}
+      Mock Ensure-WorkspaceRepo {}
+      Mock Ensure-WorkspaceScaffold {}
+      Mock Invoke-AgmsgStateSave { $script:installPinsCalls.Add("save") }
+      Mock Invoke-AgmsgStateRestoreOrThrow { $script:installPinsCalls.Add("restore") }
+      Mock Invoke-AgmsgStateRestore { $script:installPinsCalls.Add("recovery-restore") }
+
+      { Invoke-InstallPins } | Should -Throw "apm install -g --only apm failed."
+
+      $script:installPinsCalls | Should -Be @("save", "apm install -g --only apm", "recovery-restore")
+    }
+    finally {
+      Remove-Item Function:\apm -ErrorAction SilentlyContinue
+    }
   }
 
   It "keeps update on the non-deploy path" {
@@ -2716,6 +2772,7 @@ dependencies:
       "deploy" = @("task:check", "task:apply", "task:doctor")
       "verify" = @("task:check", "task:test", "task:smoke:catalog")
       "refresh:deploy" = @("task:refresh", "task:deploy")
+      "deploy:pins" = @("task:install:pins", "task:deploy")
     }
 
     foreach ($entry in $workflowContracts.GetEnumerator()) {

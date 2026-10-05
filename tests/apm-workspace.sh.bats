@@ -183,6 +183,7 @@ const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
 const expected = [
   ["apply", "scripts/apm-workspace.sh", "apply"],
   ["apply:skills:local", "scripts/apm-workspace.sh", "apply:skills:local"],
+  ["install:pins", "scripts/apm-workspace.sh", "install-pins"],
   ["format:markdown:bold-headings", "scripts/format-bold-headings.sh", "write"],
   ["format:markdown:bold-headings:check", "scripts/format-bold-headings.sh", "check"],
 ];
@@ -399,7 +400,7 @@ EOF
 @test "mise exposes the expected public task set" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT")"
   run assert_public_mise_tasks "$tasks_json" \
-    apply apply:skills:local check deploy doctor format \
+    apply apply:skills:local check deploy deploy:pins doctor format \
     format:check install:catalog prepare:catalog refresh test test:ps test:sh upgrade validate verify
   [ "$status" -eq 0 ]
 }
@@ -417,6 +418,8 @@ EOF
   run assert_mise_run_sequence "$tasks_json" verify '[{"task":"check"},{"task":"test"},{"task":"smoke:catalog"}]'
   [ "$status" -eq 0 ]
   run assert_mise_run_sequence "$tasks_json" refresh:deploy '[{"task":"refresh"},{"task":"deploy"}]'
+  [ "$status" -eq 0 ]
+  run assert_mise_run_sequence "$tasks_json" deploy:pins '[{"task":"install:pins"},{"task":"deploy"}]'
   [ "$status" -eq 0 ]
 }
 
@@ -1110,6 +1113,7 @@ EOF
   run bash "$SCRIPT_UNDER_TEST" help
   [ "$status" -eq 0 ]
   [[ "$output" == *"refresh"* ]]
+  [[ "$output" == *"install-pins"* ]]
   [[ "$output" == *"validate:catalog"* ]]
   [[ "$output" == *"prepare:catalog"* ]]
   [[ "$output" == *"install:catalog"* ]]
@@ -1576,6 +1580,75 @@ SHIM
   # regression that lets the restore failure overwrite the original one.
   [ "$status" -eq 3 ]
   [[ "$output" == *"agmsg roster restore failed while recovering"* ]]
+  rm -rf "$APPLY_FIXTURE_BASE"
+}
+
+# --- install-pins agmsg roster save/restore ---------------------------------
+#
+# `apm install -g --only apm` is the external contract. The stub wipes the
+# deployed agmsg skill dir like the real CLI so only a save before and a
+# restore after leave the roster intact.
+
+write_install_pins_apm_stub() {
+  install_exit="$1"
+  cat >"$APPLY_FIXTURE_BIN_DIR/apm" <<STUB
+#!/usr/bin/env bash
+printf 'apm %s\n' "\$*" >>"$APPLY_FIXTURE_CALL_LOG"
+if [ "\$*" = "install -g --only apm" ]; then
+  rm -rf "\$HOME/.agents/skills/agmsg"
+  mkdir -p "\$HOME/.agents/skills/agmsg"
+  exit $install_exit
+fi
+exit 0
+STUB
+  chmod +x "$APPLY_FIXTURE_BIN_DIR/apm"
+}
+
+write_agmsg_state_logging_shim() {
+  cat >"$APPLY_FIXTURE_SCRIPTS_DIR/agmsg-state.sh" <<SHIM
+#!/usr/bin/env bash
+printf 'agmsg-state %s\n' "\${1:-}" >>"$APPLY_FIXTURE_CALL_LOG"
+exec "$TEST_REPO_ROOT/scripts/agmsg-state.sh" "\$@"
+SHIM
+  chmod +x "$APPLY_FIXTURE_SCRIPTS_DIR/agmsg-state.sh"
+}
+
+run_install_pins_with_fixture() {
+  HOME="$APPLY_FIXTURE_HOME" \
+    XDG_STATE_HOME="$APPLY_FIXTURE_XDG_STATE_HOME" \
+    PATH="$APPLY_FIXTURE_BIN_DIR:$PATH" \
+    APM_WORKSPACE_DIR="$APPLY_FIXTURE_WORKSPACE_DIR" \
+    bash "$APPLY_FIXTURE_SCRIPTS_DIR/apm-workspace.sh" install-pins
+}
+
+@test "install-pins runs apm install -g --only apm between agmsg save and restore and keeps the roster linked" {
+  make_apply_agmsg_restore_failure_fixture
+  write_install_pins_apm_stub 0
+  write_agmsg_state_logging_shim
+
+  run run_install_pins_with_fixture
+
+  [ "$status" -eq 0 ]
+  order="$(grep -E '^(agmsg-state (save|restore)|apm install .*)$' "$APPLY_FIXTURE_CALL_LOG")"
+  [ "$order" = "$(printf 'agmsg-state save\napm install -g --only apm\nagmsg-state restore')" ]
+  [ -L "$AGMSG_SKILL_DIR/db" ]
+  [ -L "$AGMSG_SKILL_DIR/teams" ]
+  [ "$(cat "$AGMSG_STATE_ROOT/db/messages.db")" = "message-history" ]
+  rm -rf "$APPLY_FIXTURE_BASE"
+}
+
+@test "install-pins fails when apm install fails and still restores the agmsg roster" {
+  make_apply_agmsg_restore_failure_fixture
+  write_install_pins_apm_stub 3
+  write_agmsg_state_logging_shim
+
+  run run_install_pins_with_fixture
+
+  [ "$status" -eq 3 ]
+  grep -q '^agmsg-state restore$' "$APPLY_FIXTURE_CALL_LOG"
+  [ -L "$AGMSG_SKILL_DIR/db" ]
+  [ -L "$AGMSG_SKILL_DIR/teams" ]
+  [ "$(cat "$AGMSG_STATE_ROOT/db/messages.db")" = "message-history" ]
   rm -rf "$APPLY_FIXTURE_BASE"
 }
 

@@ -2227,6 +2227,31 @@ function Invoke-RepairLocalPackageCache {
   Repair-LocalPackageCacheEntry -PackageName "manual-skills" -SourceDir (Join-Path $WorkspaceDir "manual-skills")
 }
 
+function Invoke-InstallPins {
+  Require-Apm
+  Ensure-WorkspaceRepo
+  Ensure-WorkspaceScaffold
+
+  # A bare `apm install -g` redeploys the agmsg skill dir; same save/restore contract as Invoke-Update.
+  Invoke-AgmsgStateSave
+  $installSucceeded = $false
+  try {
+    & apm install -g --only apm
+    if ($LASTEXITCODE -ne 0) {
+      throw "apm install -g --only apm failed."
+    }
+    $installSucceeded = $true
+  }
+  finally {
+    if ($installSucceeded) {
+      Invoke-AgmsgStateRestoreOrThrow
+    }
+    else {
+      Invoke-AgmsgStateRestore
+    }
+  }
+}
+
 function Invoke-Update {
   Require-Apm
   Ensure-WorkspaceRepo
@@ -3809,6 +3834,10 @@ switch ($Command) {
     Invoke-Update
   }
 
+  "install-pins" {
+    Invoke-InstallPins
+  }
+
   "repair:local-package-cache" {
     Invoke-RepairLocalPackageCache
   }
@@ -3854,6 +3883,7 @@ Commands:
   apply              Offline deploy user-scope-compatible dependencies and compile Codex output
   apply:skills:local Quick-sync local catalog and private skills into ~/.agents/skills only
   refresh            Refresh the checkout and dependencies only; does not deploy
+  install-pins       Re-resolve hand-bumped SHA pins (apm install -g --only apm); does not deploy
   repair:local-package-cache Rebuild workspace-owned package cache from tracked sources
   pin-external       Pin external manifest refs to lockfile commits
   validate           Validate the ~/.apm workspace
