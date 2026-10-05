@@ -100,6 +100,8 @@ issue ビューは `filterData`、project ビューは `projectFilterData` に�
 - 取引ログは 1 行 1 レコードで集計しやすい形にする
   - `2026-03-14 | d払いタッチ | 4,435円`
 - 本文中に散文で期限が書かれている場合は、issue の `dueDate` にも反映する
+- PR は `[owner/repo#NN](https://github.com/owner/repo/pull/NN)` の完全 URL で書く。`#NN` だけだと、workspace に連携された別 repo の PR へ自動リンクされることがある
+- `get_issue` が返す `<pull-request>` / `<issue>` タグは表示用の変換で、保存されている本文とは一致しない。patch の anchor には使わず、平文の句を両端に置いた `replace_range` で書き換える
 
 ## Asana → Linear 移行フロー
 
@@ -154,5 +156,6 @@ python3 scripts/linear_task.py comment --issue <ISSUE_ID> --body "2026-03-14 | d
 - 書き込み前に state 名を解決する。state 名はチームごとに異なる
 - 小さな書き込みを繰り返さず、1 回の update / comment にまとめる
 - API トークンをログやチャットに出さない
+- GitHub 連携は、branch 名に issue ID を含む PR のマージで issue を Done にする。issue の一部だけを片付ける PR では branch 名に ID を入れない。入れた場合はマージ後に `get_issue` で state を確かめ、未完了なら戻す
 - 更新後は issue を再取得して結果を確認する。書き込み成功のレスポンスだけを
   根拠に完了を報告しない（コネクタによって反映されないフィールドがある）
