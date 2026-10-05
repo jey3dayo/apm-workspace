@@ -2212,6 +2212,7 @@ dependencies:
     Mock Ensure-WorkspaceRepo {}
     Mock Ensure-WorkspaceScaffold {}
     Mock Invoke-WorkspaceCommand {}
+    Mock Test-ManifestShaPinsLocked {}
     Mock Get-CodexSkillTargetRoot { Join-Path $TestDrive "validate-nested/.agents/skills" }
 
     $nestedSkill = Join-Path $TestDrive "validate-nested/.agents/skills/outer/skills/inner"
@@ -2219,6 +2220,78 @@ dependencies:
     Set-Content -LiteralPath (Join-Path $nestedSkill "SKILL.md") -Value "# inner"
 
     { Invoke-Validate } | Should -Not -Throw
+  }
+
+  Context "manifest SHA pins versus apm.lock.yaml" {
+    BeforeAll {
+      $script:pinHint = "apm.yml SHA pins differ from apm.lock.yaml; run 'mise run deploy:pins' to re-resolve them before deploying."
+      $script:pinLock = @"
+lockfile_version: '2'
+dependencies:
+- repo_url: owner/str
+  resolved_commit: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  virtual_path: skills/str
+- repo_url: gist.github.com/obj
+  resolved_commit: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+"@
+
+      function Set-PinManifest {
+        param([string]$Body)
+        "name: ws`ndependencies:`n  apm:`n$Body" | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+      }
+    }
+
+    BeforeEach {
+      $script:pinLock | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
+    }
+
+    It "passes when every SHA pin, string or object form, is in the lock" {
+      Set-PinManifest -Body @"
+    - owner/str/skills/str#aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa # v1.0.0
+    - git: https://gist.github.com/obj.git
+      ref: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb # v1.2.3
+"@
+      { Test-ManifestShaPinsLocked } | Should -Not -Throw
+    }
+
+    It "fails naming a bumped string pin and prints the deploy:pins hint" {
+      Set-PinManifest -Body "    - owner/str/skills/str#cccccccccccccccccccccccccccccccccccccccc"
+      { Test-ManifestShaPinsLocked } | Should -Throw "*$($script:pinHint)*"
+    }
+
+    It "fails for a bumped object ref with a trailing comment" {
+      Set-PinManifest -Body @"
+    - git: https://gist.github.com/obj.git
+      ref: dddddddddddddddddddddddddddddddddddddddd # v1.2.3
+"@
+      { Test-ManifestShaPinsLocked } | Should -Throw "*$($script:pinHint)*"
+    }
+
+    It "ignores tag and branch refs" {
+      Set-PinManifest -Body @"
+    - owner/other#main
+    - owner/other2#v1.2.3
+    - git: owner/other3
+      ref: release
+"@
+      { Test-ManifestShaPinsLocked } | Should -Not -Throw
+    }
+
+    It "accepts a short SHA that prefixes a locked commit" {
+      Set-PinManifest -Body "    - owner/str/skills/str#aaaaaaa"
+      { Test-ManifestShaPinsLocked } | Should -Not -Throw
+    }
+
+    It "ignores a SHA ref that appears only under mcp" {
+      "name: ws`ndependencies:`n  apm: []`n  mcp:`n    - name: x`n      ref: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee`n    - owner/x#eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+      { Test-ManifestShaPinsLocked } | Should -Not -Throw
+    }
+
+    It "fails when apm.lock.yaml is missing while SHA pins are declared" {
+      Set-PinManifest -Body "    - owner/str/skills/str#aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      Remove-Item -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
+      { Test-ManifestShaPinsLocked } | Should -Throw "*$($script:pinHint)*"
+    }
   }
 
   It "does not throw from Invoke-Doctor when all required outputs are present" {

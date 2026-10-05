@@ -1347,6 +1347,46 @@ requested_local_skill_ids() {
   local_skill_ids
 }
 
+# `apply` stages from apm.lock.yaml records offline, so a hand-bumped SHA pin
+# in apm.yml that the lock does not carry deploys the old commit with exit 0.
+validate_manifest_sha_pins() {
+  manifest_path="$WORKSPACE_DIR/apm.yml"
+  lock_path="$WORKSPACE_DIR/apm.lock.yaml"
+  [ -f "$manifest_path" ] || return 0
+
+  pins=$(awk -f "$APM_AWK_DIR/manifest-sha-pins.awk" "$manifest_path")
+  [ -n "$pins" ] || return 0
+
+  if [ ! -f "$lock_path" ]; then
+    error "Lock file not found: $lock_path"
+    fail "apm.yml SHA pins differ from apm.lock.yaml; run 'mise run deploy:pins' to re-resolve them before deploying."
+  fi
+
+  locked_commits=$(awk -f "$APM_AWK_DIR/lockfile-dependencies.awk" "$lock_path" | awk -F '|' '{print $3}')
+  unmatched_count=0
+  while IFS='|' read -r pin_entry pin_ref; do
+    pin_matched=0
+    for locked_commit in $locked_commits; do
+      case "$locked_commit" in
+        "$pin_ref"*)
+          pin_matched=1
+          break
+          ;;
+      esac
+    done
+    if [ "$pin_matched" -eq 0 ]; then
+      error "apm.yml pin not in apm.lock.yaml: $pin_entry#$pin_ref"
+      unmatched_count=$((unmatched_count + 1))
+    fi
+  done <<EOF
+$pins
+EOF
+
+  if [ "$unmatched_count" -gt 0 ]; then
+    fail "apm.yml SHA pins differ from apm.lock.yaml; run 'mise run deploy:pins' to re-resolve them before deploying."
+  fi
+}
+
 cmd_validate() {
   require_apm
   ensure_workspace_repo
@@ -1355,6 +1395,7 @@ cmd_validate() {
     cd "$WORKSPACE_DIR"
     apm compile --validate
   )
+  validate_manifest_sha_pins
 }
 
 managed_agent_relative_paths() {

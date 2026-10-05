@@ -1202,6 +1202,106 @@ doctor_fixture_env() {
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
 }
 
+write_pin_fixture() {
+  make_doctor_fixture
+  printf 'name: ws\ndependencies:\n  apm:\n%s\n' "$1" >"$doctor_workspace_dir/apm.yml"
+  cat >"$doctor_workspace_dir/apm.lock.yaml" <<'EOF'
+lockfile_version: '2'
+dependencies:
+- repo_url: owner/str
+  resolved_commit: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  virtual_path: skills/str
+- repo_url: gist.github.com/obj
+  resolved_commit: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+EOF
+}
+
+pin_hint="apm.yml SHA pins differ from apm.lock.yaml; run 'mise run deploy:pins' to re-resolve them before deploying."
+
+@test "validate passes when every SHA pin, string or object form, is in the lock" {
+  write_pin_fixture "    - owner/str/skills/str#aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa # v1.0.0
+    - git: https://gist.github.com/obj.git
+      ref: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb # v1.2.3"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" validate
+
+  [ "$status" -eq 0 ]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "validate fails naming a bumped string SHA pin and prints the deploy:pins hint" {
+  write_pin_fixture "    - owner/str/skills/str#cccccccccccccccccccccccccccccccccccccccc"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" validate
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"owner/str/skills/str#cccccccccccccccccccccccccccccccccccccccc"* ]]
+  [[ "$output" == *"$pin_hint"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "validate fails for a bumped object ref with a trailing version comment" {
+  write_pin_fixture "    - git: https://gist.github.com/obj.git
+      ref: dddddddddddddddddddddddddddddddddddddddd # v1.2.3"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" validate
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"https://gist.github.com/obj.git#dddddddddddddddddddddddddddddddddddddddd"* ]]
+  [[ "$output" == *"$pin_hint"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "validate ignores tag and branch refs" {
+  write_pin_fixture "    - owner/other#main
+    - owner/other2#v1.2.3
+    - git: owner/other3
+      ref: release"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" validate
+
+  [ "$status" -eq 0 ]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "validate accepts a short SHA pin that prefixes a locked commit" {
+  write_pin_fixture "    - owner/str/skills/str#aaaaaaa"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" validate
+
+  [ "$status" -eq 0 ]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "validate ignores a SHA ref that appears only under mcp" {
+  make_doctor_fixture
+  cat >"$doctor_workspace_dir/apm.yml" <<'EOF'
+name: ws
+dependencies:
+  apm: []
+  mcp:
+    - name: x
+      ref: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+    - owner/x#eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+EOF
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" validate
+
+  [ "$status" -eq 0 ]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "validate fails when apm.lock.yaml is missing while SHA pins are declared" {
+  write_pin_fixture "    - owner/str/skills/str#aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  rm "$doctor_workspace_dir/apm.lock.yaml"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" validate
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$pin_hint"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
 @test "doctor reports nested deployed Codex skills and exits non-zero" {
   make_doctor_fixture
   nested_skill_path="$doctor_home/.agents/skills/legacy/skills/nested/SKILL.md"

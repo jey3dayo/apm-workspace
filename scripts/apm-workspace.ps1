@@ -2287,11 +2287,114 @@ function Get-CatalogBuildDir {
   return (Join-Path $CatalogBuildRootDir $CatalogDirName)
 }
 
+function Get-ManifestShaPins {
+  $manifestPath = Join-Path $WorkspaceDir "apm.yml"
+  if (-not (Test-Path -LiteralPath $manifestPath)) {
+    return @()
+  }
+
+  $pins = New-Object System.Collections.Generic.List[object]
+  $inDependencies = $false
+  $inApm = $false
+  $entry = ""
+  foreach ($line in (Get-Content -LiteralPath $manifestPath)) {
+    if ($line -match '^\s*(#|$)') {
+      continue
+    }
+    if ($line -match '^\S') {
+      $inDependencies = ($line -match '^dependencies:')
+      $inApm = $false
+      continue
+    }
+    if (-not $inDependencies) {
+      continue
+    }
+    if ($line -match '^  [^\s-]') {
+      $inApm = ($line -match '^  apm:')
+      $entry = ""
+      continue
+    }
+    if (-not $inApm) {
+      continue
+    }
+
+    if ($line -match '^    -\s+(?<value>.+)$') {
+      $entry = ""
+      $value = $Matches['value']
+      if ($value -match '^git:\s+(?<repo>.+)$') {
+        $entry = ($Matches['repo'] -replace '\s+#.*$', '')
+        continue
+      }
+      $value = ($value -replace '\s+#.*$', '')
+      $hashIndex = $value.IndexOf('#')
+      if ($hashIndex -gt 0) {
+        $pins.Add([pscustomobject]@{ Entry = $value.Substring(0, $hashIndex); Ref = $value.Substring($hashIndex + 1) })
+      }
+      continue
+    }
+
+    if ($entry -ne "" -and $line -match '^      ref:\s+(?<ref>.+)$') {
+      $pins.Add([pscustomobject]@{ Entry = $entry; Ref = ($Matches['ref'] -replace '\s+#.*$', '') })
+    }
+  }
+
+  return @($pins | Where-Object { $_.Ref -cmatch '^[0-9a-f]{7,40}$' })
+}
+
+function Get-LockResolvedCommits {
+  param([string]$LockPath)
+
+  $commits = New-Object System.Collections.Generic.List[string]
+  $inDependencies = $false
+  foreach ($line in (Get-Content -LiteralPath $LockPath)) {
+    if ($line -match '^[^\s#-][^:]*:') {
+      $inDependencies = ($line -match '^dependencies:')
+      continue
+    }
+    if ($inDependencies -and $line -match '^\s+resolved_commit:\s+(?<commit>\S+)') {
+      $commits.Add($Matches['commit'])
+    }
+  }
+
+  return $commits.ToArray()
+}
+
+# `apply` stages from apm.lock.yaml records offline, so a hand-bumped SHA pin
+# in apm.yml that the lock does not carry deploys the old commit with exit 0.
+function Test-ManifestShaPinsLocked {
+  $pins = @(Get-ManifestShaPins)
+  if ($pins.Count -eq 0) {
+    return
+  }
+
+  $hint = "apm.yml SHA pins differ from apm.lock.yaml; run 'mise run deploy:pins' to re-resolve them before deploying."
+  $lockPath = Join-Path $WorkspaceDir "apm.lock.yaml"
+  if (-not (Test-Path -LiteralPath $lockPath)) {
+    Write-ErrorLine "Lock file not found: $lockPath"
+    throw $hint
+  }
+
+  $lockedCommits = @(Get-LockResolvedCommits -LockPath $lockPath)
+  $unmatched = 0
+  foreach ($pin in $pins) {
+    $matched = $lockedCommits | Where-Object { $_.StartsWith($pin.Ref, [System.StringComparison]::Ordinal) } | Select-Object -First 1
+    if (-not $matched) {
+      Write-ErrorLine "apm.yml pin not in apm.lock.yaml: $($pin.Entry)#$($pin.Ref)"
+      $unmatched++
+    }
+  }
+
+  if ($unmatched -gt 0) {
+    throw $hint
+  }
+}
+
 function Invoke-Validate {
   Require-Apm
   Ensure-WorkspaceRepo
   Ensure-WorkspaceScaffold
   Invoke-WorkspaceCommand -CommandArgs @("compile", "--validate")
+  Test-ManifestShaPinsLocked
 }
 
 function Get-CodexSkillTargetRoot {

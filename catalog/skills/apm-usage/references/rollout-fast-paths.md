@@ -7,10 +7,11 @@ were observed on 0.29.0 and carried forward.
 
 ## SHA-pin bump sequence (Fast Path 5 / Fast Path 7)
 
-When you bump a SHA pin in `apm.yml` by hand, `mise run deploy` alone does not
-pick it up: `apply` stages external skills from the existing lock records and
-`apm_modules/`, so the lockfile and the deployed target both stay on the old
-commit while every command exits zero. Run `mise run deploy:pins`: it runs
+When you bump a SHA pin in `apm.yml` by hand, `mise run deploy` alone cannot
+pick it up: `apply` stages external skills offline from the existing lock
+records and `apm_modules/`. `validate:workspace` therefore fails `check` while
+a manifest SHA pin has no matching `resolved_commit` in `apm.lock.yaml`, and
+names the pin. Run `mise run deploy:pins`: it runs
 `apm install -g --only apm` with the agmsg roster saved and restored, then
 `deploy`. The install re-resolves a dependency whose manifest ref differs
 from the locked one (`detect_ref_change`, observed on 0.31.0 with a single
