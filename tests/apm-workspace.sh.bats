@@ -1938,31 +1938,13 @@ _stub_opencode_sync_fixture() {
   }
 }
 
-@test "sync_managed_catalog_runtime_assets gives opencode commands but no CLAUDE.md and removes a stale identical one" {
+@test "sync_managed_catalog_runtime_assets gives opencode commands but writes no CLAUDE.md" {
   _stub_opencode_sync_fixture
-  printf '%s\n' '# instructions' >"$target_root/CLAUDE.md"
-  printf '%s\n' 'user rules' >"$target_root/AGENTS.md"
-  printf '%s\n' '{}' >"$target_root/opencode.json"
 
   run sync_managed_catalog_runtime_assets
 
   [ "$status" -eq 0 ]
   [ ! -e "$target_root/CLAUDE.md" ]
-  [ -f "$target_root/commands/cmd.md" ]
-  [ "$(cat "$target_root/AGENTS.md")" = "user rules" ]
-  [ -f "$target_root/opencode.json" ]
-
-  rm -rf "$workspace" "$runtime_home"
-}
-
-@test "sync_managed_catalog_runtime_assets leaves an opencode CLAUDE.md with different content alone" {
-  _stub_opencode_sync_fixture
-  printf '%s\n' 'my own edits' >"$target_root/CLAUDE.md"
-
-  run sync_managed_catalog_runtime_assets
-
-  [ "$status" -eq 0 ]
-  [ "$(cat "$target_root/CLAUDE.md")" = "my own edits" ]
   [ -f "$target_root/commands/cmd.md" ]
 
   rm -rf "$workspace" "$runtime_home"

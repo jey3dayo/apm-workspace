@@ -2968,8 +2968,7 @@ function Write-CatalogSummary {
 # OpenCode opts out for the same reason (it rejects Claude-format agents at
 # startup) and also has no skills face of its own. ConfigName "-" marks a
 # target that reads guidance from elsewhere (OpenCode reads
-# ~/.config/opencode/AGENTS.md, else ~/.claude/CLAUDE.md); a byte-identical
-# CLAUDE.md that an earlier apply left there is removed.
+# ~/.config/opencode/AGENTS.md, else ~/.claude/CLAUDE.md).
 function Get-ManagedCatalogRuntimeTargets {
   return @(
     [pscustomobject]@{ Name = "claude"; Root = (Join-Path $HOME ".claude"); SkillsRoot = (Join-Path $HOME ".claude"); AgentsFace = ""; ConfigName = "CLAUDE.md" },
@@ -3170,22 +3169,6 @@ function Sync-ManagedCatalogDirWithManifest {
   Set-Content -LiteralPath $manifestPath -Value $newManifest
 }
 
-function Remove-StaleCatalogConfig {
-  param(
-    [Parameter(Mandatory = $true)]
-    [string]$SourcePath,
-
-    [Parameter(Mandatory = $true)]
-    [string]$StalePath
-  )
-
-  if (-not (Test-Path -LiteralPath $SourcePath -PathType Leaf)) { return }
-  $item = Get-Item -LiteralPath $StalePath -Force -ErrorAction SilentlyContinue
-  if (($null -eq $item) -or $item.PSIsContainer -or $item.LinkType) { return }
-  if ((Get-FileHash -LiteralPath $SourcePath).Hash -ne (Get-FileHash -LiteralPath $StalePath).Hash) { return }
-  Remove-Item -LiteralPath $StalePath -Force
-}
-
 function Sync-ManagedCatalogRuntimeAssets {
   $trackedDir = Get-TrackedCatalogDir
   if (-not (Test-Path -LiteralPath $trackedDir)) {
@@ -3200,10 +3183,7 @@ function Sync-ManagedCatalogRuntimeAssets {
   foreach ($target in (Get-ManagedCatalogRuntimeTargets)) {
     New-Item -ItemType Directory -Path $target.Root -Force | Out-Null
 
-    if ($target.ConfigName -eq "-") {
-      Remove-StaleCatalogConfig -SourcePath $instructionsSource -StalePath (Join-Path $target.Root "CLAUDE.md")
-    }
-    elseif (Test-Path -LiteralPath $instructionsSource) {
+    if (($target.ConfigName -ne "-") -and (Test-Path -LiteralPath $instructionsSource)) {
       Copy-ManagedCatalogFile -SourcePath $instructionsSource -DestinationPath (Join-Path $target.Root $target.ConfigName)
     }
 

@@ -1692,38 +1692,26 @@ id = "preserve other"
     ((Get-Content -LiteralPath $untouchedCommand -Raw) -replace '\r?\n$', '') | Should -Be "outside"
   }
 
-  It "delivers commands but no config to a target with ConfigName '-' and removes only a stale identical CLAUDE.md" {
+  It "delivers commands but writes no config to a target with ConfigName '-'" {
     $catalogRoot = Join-Path $TestDrive "noconfig-catalog"
-    $identicalRoot = Join-Path $TestDrive "noconfig-identical"
-    $divergedRoot = Join-Path $TestDrive "noconfig-diverged"
+    $targetRoot = Join-Path $TestDrive "noconfig-target"
     $instructions = Join-Path $catalogRoot "CLAUDE.md"
     $commandsSource = Join-Path $catalogRoot "commands"
 
-    New-Item -ItemType Directory -Path $commandsSource, $identicalRoot, $divergedRoot -Force | Out-Null
+    New-Item -ItemType Directory -Path $commandsSource, $targetRoot -Force | Out-Null
     Set-Content -LiteralPath $instructions -Value "# instructions"
     Set-Content -LiteralPath (Join-Path $commandsSource "cmd.md") -Value "cmd"
-    Set-Content -LiteralPath (Join-Path $identicalRoot "CLAUDE.md") -Value "# instructions"
-    Set-Content -LiteralPath (Join-Path $identicalRoot "AGENTS.md") -Value "user rules"
-    Set-Content -LiteralPath (Join-Path $identicalRoot "opencode.json") -Value "{}"
-    Set-Content -LiteralPath (Join-Path $divergedRoot "CLAUDE.md") -Value "my own edits"
 
     Mock Get-TrackedCatalogDir { $catalogRoot }
     Mock Get-TrackedCatalogInstructionsPath { $instructions }
     Mock Get-ManagedCatalogRuntimeTargets {
-      @(
-        [pscustomobject]@{ Name = "identical"; Root = $identicalRoot; SkillsRoot = "-"; AgentsFace = "-"; ConfigName = "-" },
-        [pscustomobject]@{ Name = "diverged"; Root = $divergedRoot; SkillsRoot = "-"; AgentsFace = "-"; ConfigName = "-" }
-      )
+      @([pscustomobject]@{ Name = "opencode"; Root = $targetRoot; SkillsRoot = "-"; AgentsFace = "-"; ConfigName = "-" })
     }
 
     Sync-ManagedCatalogRuntimeAssets
 
-    Test-Path -LiteralPath (Join-Path $identicalRoot "CLAUDE.md") | Should -Be $false
-    Test-Path -LiteralPath (Join-Path $identicalRoot "AGENTS.md") | Should -Be $true
-    Test-Path -LiteralPath (Join-Path $identicalRoot "opencode.json") | Should -Be $true
-    Test-Path -LiteralPath (Join-Path $identicalRoot "commands/cmd.md") | Should -Be $true
-    ((Get-Content -LiteralPath (Join-Path $divergedRoot "CLAUDE.md") -Raw).Trim()) | Should -Be "my own edits"
-    Test-Path -LiteralPath (Join-Path $divergedRoot "commands/cmd.md") | Should -Be $true
+    Test-Path -LiteralPath (Join-Path $targetRoot "CLAUDE.md") | Should -Be $false
+    Test-Path -LiteralPath (Join-Path $targetRoot "commands/cmd.md") | Should -Be $true
   }
 
   It "removes a manifest-tracked file the catalog dropped" {

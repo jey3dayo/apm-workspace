@@ -556,11 +556,11 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
   `Expected a regex-hex color, got "blue" color`。
   1ファイル混入するだけで opencode 全体が起動を拒否する。
 - config も配らない（2026-10-05）: 3フィールド目の config file 名も `-` にした。OpenCode の
-  global rules は `~/.config/opencode/AGENTS.md`、無ければ `~/.claude/CLAUDE.md` で、
-  `~/.config/opencode/CLAUDE.md` は読まない（opencode.ai/docs/rules で確認）。配っていた
-  CLAUDE.md は `~/.claude/CLAUDE.md` と同一内容で、フォールバック経由で既に届いている。
-  apply は `~/.config/opencode/CLAUDE.md` が通常ファイルで catalog の指示書と同一内容のときだけ
-  削除し、内容が違うファイルは残す。`doctor` は `config=n/a` を返す。
+  global rules は `~/.config/opencode/AGENTS.md` で、これが無く Claude 互換が無効でない
+  （`OPENCODE_DISABLE_CLAUDE_CODE` / `OPENCODE_DISABLE_CLAUDE_CODE_PROMPT` 未設定）ときだけ
+  `~/.claude/CLAUDE.md` を読む。`~/.config/opencode/CLAUDE.md` は rules ファイルとして
+  認識されない（opencode.ai/docs/rules で確認）。以前の apply が置いた
+  `~/.config/opencode/CLAUDE.md` は 2026-10-05 に手作業で削除した。`doctor` は `config=n/a` を返す。
 - 経緯: `fc02ee2` が opencode の deploy root を `~/.opencode`（opencode が読まない path）から
   `~/.config/opencode`（実際に読む path）へ変えたことで、Claude 形式 agents が初めて
   実際にロードされ、起動不能として顕在化した。`.ps1` は root が `.opencode` のままで

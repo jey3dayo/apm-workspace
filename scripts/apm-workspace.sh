@@ -2272,15 +2272,6 @@ copy_managed_catalog_file() {
   cp "$source_path" "$destination_path"
 }
 
-remove_stale_catalog_config() {
-  source_path="$1"
-  stale_path="$2"
-  [ -f "$source_path" ] || return 0
-  [ -f "$stale_path" ] && [ ! -L "$stale_path" ] || return 0
-  cmp -s "$source_path" "$stale_path" || return 0
-  rm -f "$stale_path"
-}
-
 remove_symlink_entries() {
   target_dir="$1"
   if [ -L "$target_dir" ]; then
@@ -2341,9 +2332,7 @@ sync_managed_catalog_runtime_assets() {
     target_root="$HOME/$RT_TARGET_DIR"
     mkdir -p "$target_root"
 
-    if [ "$RT_CONFIG_NAME" = "-" ]; then
-      remove_stale_catalog_config "$instructions_source" "$target_root/CLAUDE.md"
-    elif [ -f "$instructions_source" ]; then
+    if [ "$RT_CONFIG_NAME" != "-" ] && [ -f "$instructions_source" ]; then
       copy_managed_catalog_file "$instructions_source" "$target_root/$RT_CONFIG_NAME"
     fi
 
