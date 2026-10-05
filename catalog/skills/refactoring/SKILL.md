@@ -88,6 +88,11 @@ duplication by concern and owner first. Load `references/helper_extraction.md`
 for the concern -> owner candidates -> caller rule table and the extract/keep
 decision rule before deciding individual extractions.
 
+Apply the deletion test as the positive criterion: imagine deleting the
+candidate helper. If its complexity would reappear across N callers, it earns
+its keep; if the complexity just vanishes, it is a pass-through, so inline it.
+Load the `codebase-design` skill for the vocabulary (module, interface, seam).
+
 ### 1-E: Parallel Diagnostic Dispatch
 
 When the diagnostic surface is broad enough to split safely, dispatch parallel
@@ -159,7 +164,11 @@ and identify callers.
 
 When a technology concern is implemented outside its owner folder, refactor to
 the repository's existing boundary shape instead of inventing a new
-abstraction:
+abstraction. Hold to seam discipline: one adapter is a hypothetical seam, two
+(for example production and test) make a real one, so introduce no port or
+seam without two adapters. Load the `codebase-design` skill (its `DEEPENING.md`
+for dependency categories) when the owner's interface or seam placement is in
+question.
 
 1. Move schema definitions, parsers, or validation helpers into the discovered
    schema/validation owner, then update callers to import the exported schema
@@ -169,7 +178,9 @@ abstraction:
 3. Move direct DB, Drizzle, SQL, query builder, and transaction code out of
    UI, route, and feature modules into the existing `db` or repository owner.
 4. Add or update focused tests for the boundary contract: parser shape, error
-   conversion, repository return value, or transaction behavior.
+   conversion, repository return value, or transaction behavior. Replace,
+   don't layer: once tests exist at the consolidated owner's interface, delete
+   the old tests that exercised the shallow pieces past that interface.
 
 ### 3-4: Execute Bounded Refactor Slices
 
@@ -206,14 +217,16 @@ Do not proceed to the next step until all pass.
 
 ## Related Skills and References
 
-| Problem Area                                     | Skill or reference                   |
-| ------------------------------------------------ | ------------------------------------ |
-| Detailed duplicate code analysis                 | `../similarity/SKILL.md`             |
-| Large lint / type-safety cleanup                 | `references/code_quality_cleanup.md` |
-| Dead code removal with TSR                       | `references/dead_code_tsr.md`        |
-| React-specific pattern diagnosis                 | `react-doctor` skill (if installed)  |
-| Parallel diagnostics / bounded slice review loop | `../review-fix-loop/SKILL.md`        |
-| Impact scope / reference tracking                | `rg` for full reference listing      |
+| Problem Area                                                                     | Skill or reference                                    |
+| -------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| Detailed duplicate code analysis                                                 | `../similarity/SKILL.md`                              |
+| Large lint / type-safety cleanup                                                 | `references/code_quality_cleanup.md`                  |
+| Dead code removal with TSR                                                       | `references/dead_code_tsr.md`                         |
+| React-specific pattern diagnosis                                                 | `react-doctor` skill (if installed)                   |
+| Parallel diagnostics / bounded slice review loop                                 | `../review-fix-loop/SKILL.md`                         |
+| Impact scope / reference tracking                                                | `rg` for full reference listing                       |
+| Interface / seam design vocabulary                                               | `codebase-design` skill                               |
+| Deepening opportunities across the codebase (architecture-level, not diff-level) | suggest the user run `/improve-codebase-architecture` |
 
 ## Principle of Incremental Execution
 

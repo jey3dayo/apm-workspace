@@ -708,3 +708,10 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - 理由: `tuicr` と役割が重なり（どちらも人間が TUI で diff を見て agent とコメントをやり取りする）、ユーザー判断で `tuicr` に寄せた。`tuicr` は vim キーで人間が主導し、レビューを GitHub などへ push できる。`hunk` は agent が人間の画面に注釈を付ける向きが中心。
 - 手順: `apm.yml` から外し、`apm lock -g` で lock を合わせ、`mise run deploy` で `~/.claude/skills` / `~/.agents/skills` から消した。lock で動いたのは `hunk-review` の記録だけ。
 - 再導入: `apm install -g modem-dev/hunk/packages/hunk/skills/hunk-review#<sha>`（apm-usage Fast Path 6）。
+
+## `refactoring` から `codebase-design` を参照（2026-10-05）
+
+- 配線: `refactoring` の Phase 1-D に deletion test（候補 helper を消して複雑さが N 箇所の呼び出し元へ戻るか）、Phase 3-3 に seam の規律（adapter が1つなら仮の seam、2つで本物）と replace, don't layer、関連スキル表に `codebase-design` と `improve-codebase-architecture` を足した。用語は `codebase-design` のものをそのまま使う。
+- 参照にした理由: upstream は root `apm.yml` で pin され全体に配布済みのため、名前で読み込ませれば足りる。用語集を `refactoring` へ写すと upstream の更新から乖離する。
+- 残す理由: `codebase-design` は `wayfinder` / `improve-codebase-architecture` に加え、`refactoring` からも参照される。
+- 見送り: `polish` は diff の行単位の機械的なチェックリストで、「過剰な差分」の行が呼び出し元1つの helper を既に扱うため配線しなかった。
