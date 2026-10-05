@@ -18,7 +18,8 @@ setup() {
   PROJECT="$(mktemp -d)"
   PAYLOAD="$(mktemp)"
   printf 'noop\n' >"$PAYLOAD"
-  # codex 本体を起動させない。allowlist は引数検証なので、実行前に exit する。
+  export CODEX_HOME="$PROJECT/codex-home"
+  # 実 Codex は起動しない。既定は allowlist で停止し、許可モデルは下のテストで stub CLI に渡す。
   export AGMSG_CODEX_BIN="$REPO_ROOT/tests/does-not-exist-codex"
 }
 
@@ -31,12 +32,36 @@ script_models_for() {
   sed -n "s/^$1) allowed_models=(\(.*\)) ;;$/\1/p" "$SCRIPT"
 }
 
-# tier 表の Codex 列だけから model ID を取り出す（実在する世代は \`gpt-5.6-*\` と
-# \`gpt-6-*\` のみ）。行全体を対象にすると cursor 列の \`gpt-5.6-sol-xhigh\` の
-# 先頭部分が同じ正規表現に誤って一致するため、列を切り出してから抽出する。
+# tier 表から Codex 列だけを取り出し、model ID の前後が区切り文字である場合だけ照合する。
 skill_models_for() {
-  awk -F'|' -v role="$1" '$2 ~ "^ *" role " *$" { print $5 }' "$SKILL" |
-    grep -oE 'gpt-(5\.6|6)-[a-z]+' | sort -u | tr '\n' ' '
+  awk -F'|' -v role="$1" '
+    $2 ~ "^ *" role " *$" {
+      column = $5
+      while (match(column, /(^|[^[:alnum:].-])gpt-[0-9]+(\.[0-9]+)?-[a-z]+($|[^[:alnum:].-])/)) {
+        token = substr(column, RSTART, RLENGTH)
+        sub(/^[^[:alnum:].-]+/, "", token)
+        sub(/[^[:alnum:].-]+$/, "", token)
+        if (token ~ /^gpt-[0-9]+(\.[0-9]+)?-[a-z]+$/) print token
+        column = substr(column, RSTART + RLENGTH)
+      }
+    }
+  ' "$SKILL" | sort -u | tr '\n' ' '
+}
+
+codex_stub() {
+  local stub="$PROJECT/codex-stub"
+  cat >"$stub" <<'SH'
+#!/bin/sh
+printf '%s\n' "$@" >"$AGMSG_STUB_ARGS"
+exit 0
+SH
+  chmod +x "$stub"
+  export AGMSG_CODEX_BIN="$stub"
+  export AGMSG_STUB_ARGS="$PROJECT/codex-args"
+}
+
+stub_received_model() {
+  awk -v expected="$1" 'previous == "-m" && $0 == expected { found = 1 } { previous = $0 } END { exit !found }' "$AGMSG_STUB_ARGS"
 }
 
 @test "review rejects a worker-tier model" {
@@ -65,6 +90,28 @@ skill_models_for() {
   run "$SCRIPT" review "$PROJECT" gpt-6-astra "$PAYLOAD"
   [ "$status" -ne 2 ]
   [[ "$output" != *"not allowed for role"* ]]
+}
+
+@test "Codex Sol model IDs are accepted for implement and review" {
+  for role in implement review; do
+    for model in gpt-6.1-sol gpt-6-sol; do
+      codex_stub
+      run "$SCRIPT" "$role" "$PROJECT" "$model" "$PAYLOAD"
+      [ "$status" -eq 0 ]
+      stub_received_model "$model"
+    done
+  done
+}
+
+@test "the Codex extractor matches complete decimal IDs from its column only" {
+  local original_skill="$SKILL"
+  SKILL="$PROJECT/models.md"
+  cat >"$SKILL" <<'MD'
+| role | purpose | Claude | Codex | opencode | cursor |
+| Worker | implementation | — | gpt-6.1-sol / gpt-6-sol / gpt-6.1-sol-preview | — | gpt-5.6-sol-xhigh |
+MD
+  [ "$(skill_models_for Worker)" = "gpt-6-sol gpt-6.1-sol " ]
+  SKILL="$original_skill"
 }
 
 @test "implement rejects gpt-6-astra" {
