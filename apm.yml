@@ -13,6 +13,9 @@ dependencies:
     - jey3dayo/apm-workspace/catalog#main
     - jey3dayo/apm-workspace/manual-skills#main
 
+    # --- org-restricted ---
+    - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault#9869e9df63da283b29561923e7e5839a8a3d9152
+
     # --- review ---
     - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review#93b00b89ef425a9c1bac0d0b317dfc49c930ac99
     - shadcn/improve#03369ee6d7cafbfcecc4346539b05b3dc0a603bb
@@ -36,7 +39,7 @@ dependencies:
         - wait-what
         - wayfinder
         - writing-for-agents
-    - nanaism/yomiyasu/skills/yomiyasu#e5c6a8443a427726a472e2e560fc8679125ea2b8
+    - nanaism/yomiyasu/skills/yomiyasu#d7869000576a9f811a1542eceec57044219550a9
 
     # --- react ---
     - millionco/react-doctor/skills/react-doctor#013f7373f91a3b9e68bd1dc7d4d354f4b041b117 # v2.2.9

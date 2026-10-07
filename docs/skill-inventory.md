@@ -24,6 +24,7 @@
 
 グループは `apm.yml` の `# --- <group> ---` 見出しと同じ。
 
+- org-restricted: `perman-aws-vault`
 - review: `thermo-nuclear-code-quality-review`, `improve`（shadcn）
 - engineering / writing: `natural-japanese`, `japanese-tech-writing`（gist、alias）, `yomiyasu`,
   mattpocock 系（`codebase-design`, `domain-modeling`, `grilling`,
