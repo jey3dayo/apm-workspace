@@ -14,14 +14,14 @@ dependencies:
     - jey3dayo/apm-workspace/manual-skills#main
 
     # --- org-restricted ---
-    - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault#9869e9df63da283b29561923e7e5839a8a3d9152
+    - caad-develop/claude-code-marketplace/plugins/infra/perman-aws-vault#0f23c8f7a8f14ebaf7e9034c9715740e5bff5c64
 
     # --- review ---
-    - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review#93b00b89ef425a9c1bac0d0b317dfc49c930ac99
-    - shadcn/improve#03369ee6d7cafbfcecc4346539b05b3dc0a603bb
+    - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review#d0ef80d86795816da932a153458c5dbe192d294e
+    - shadcn/improve#cac56e1ebd3c279aa9153616cfeac7b174ab90f9
 
     # --- engineering / writing ---
-    - coji/natural-japanese/skills/natural-japanese#b54954f8deb4f110f0959f4e4fac295708900120 # v1.3.0
+    - coji/natural-japanese/skills/natural-japanese#9a78a42964096da509b8f3e011f0085a5f080151 # v1.3.0
     - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
       ref: 8f2d57610a73efc97d743c9b0b0ecb1002e09fa4
       alias: japanese-tech-writing
@@ -42,11 +42,11 @@ dependencies:
     - nanaism/yomiyasu/skills/yomiyasu#d7869000576a9f811a1542eceec57044219550a9
 
     # --- react ---
-    - millionco/react-doctor/skills/react-doctor#013f7373f91a3b9e68bd1dc7d4d354f4b041b117 # v2.2.9
+    - millionco/react-doctor/skills/react-doctor#3c668e121bcd2cabe72508d5a3a2dc32d0bec50a # v2.2.9
     - vercel-labs/agent-skills/skills/react-best-practices#063bee94c3f4df8453406c830b0a7df0f2860278
 
     # --- design ---
-    - anthropics/claude-code/plugins/frontend-design/skills/frontend-design#ab9b2cf7bb9e4f98ff264c07a22e46d83c29c558
+    - anthropics/claude-code/plugins/frontend-design/skills/frontend-design#765f236fe1bfcc678e0ec59af9170fb7d6771a3a
     - git: benjitaylor/agentation
       ref: 7982d83aa2d2ba46d0f68f257759ba527ba401a8
       skills:
@@ -75,18 +75,18 @@ dependencies:
         - ui-ux-pro-max
 
     # --- browser / analysis ---
-    - browser-use/browser-harness#eba1021c78dc8c1a4e78f98155396c4fa979b7f0
+    - browser-use/browser-harness#afbcc381b963040c19627d788e40c7e7663171ee
     - openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431
-    - tt-a1i/archify/archify#9286c3b9c2cef359e98586b420d769d87bcb163f # v3.0.0
+    - tt-a1i/archify/archify#73aaa0696e8f72c232ea710e6fa94fd953f3e773 # v3.0.0
 
     # --- agent tools ---
-    - agavra/tuicr/skills/tuicr#b55e218f6d38a87ca4a6d9924a4c50b5f601dd07
-    - fujibee/agmsg#f9fb4f1398a6086135f88deea98b7e5600cb1cda
-    - humanlayer/skills/plugins/show-me/skills/show-me#3c2629142c5d437428269b1b722b08c0b87f574d
+    - agavra/tuicr/skills/tuicr#9175dc95b97a0a7dd290d43d38385745a7fb7d40
+    - fujibee/agmsg#46e364d50dfd9662c54bf7992801f2f03a20adbb
+    - humanlayer/skills/plugins/show-me/skills/show-me#ca7c8088db69e315a8b2deea43820270457f8f3c
 
     # --- productivity / research ---
-    - ayghri/i-have-adhd/skills/i-have-adhd#839872f9d1cd634fed642b4589ce7226199cc15f
-    - mvanhorn/last30days-skill/skills/last30days#beb7ed1868f034f198842174bfe2694e44b78363 # v3.25.0
+    - ayghri/i-have-adhd/skills/i-have-adhd#723af7d9afaf43eb871dbcce6129e2bf80de90d5
+    - mvanhorn/last30days-skill/skills/last30days#7f582ad8c2e140eca08098b245f9e31b68e28b60 # v3.25.0
   mcp:
     - name: context7
       registry: false
