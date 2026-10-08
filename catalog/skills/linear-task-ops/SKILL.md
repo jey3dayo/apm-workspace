@@ -118,13 +118,14 @@ Free プランはアーカイブされていない issue が 250 件まで（ア
 
 - team の auto-archive（JEY は 6ヶ月）は、issue が属する project が完了するまで効かない。
   `references/linear-projects-jey.md` で In Progress のプロジェクトは常設なので、完了済みは手動で archive する
-- archive は MCP に無いため GraphQL の `issueArchive`（戻すときは `issueUnarchive`）を使う
+- archive は MCP に無いため `scripts/linear_task.py archive --team KEY --closed-older-than DAYS` を使う。
+  戻すときは `unarchive --issue JEY-538`（UUID も可）
 - 親を archive すると、未完了の子 issue も一緒に archive される。
-  対象から未完了の子を持つ親を外し、実行後は `includeArchived: true` で
-  「未完了かつ archived」を照会して、巻き込まれたものを `issueUnarchive` で戻す
+  `archive` は未完了の子を持つ親を対象から外して表示し、実行後に
+  「未完了かつ archived」を照会して出力する。巻き込まれたものは `unarchive` で戻す
 - GraphQL の書き込み（`issueArchive` / `issueUpdate` など）直後の再取得は古い値を返すことがある。
   数秒おいて取り直してから成否を判断する
-- 対象件数を dry-run で示し、ユーザーの了承を得てから実行する
+- 先に `--dry-run` で対象件数と一覧を示し、ユーザーの了承を得てから `--dry-run` なしで実行する
 - 未完了 issue の整理候補は、更新されていない日数や完了条件の有無など根拠を添えて示す。
   メモや読書リストといった種類だけでは候補にしない。上限に余裕が戻ったら、残す・消すの判断はユーザーに任せる
 

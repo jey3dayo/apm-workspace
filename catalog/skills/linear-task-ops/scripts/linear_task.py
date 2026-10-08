@@ -7,6 +7,9 @@ Usage examples:
   python3 scripts/linear_task.py create --team KEY --project PROJECT --title "Task title" --description "details" --due-date 2026-03-20
   python3 scripts/linear_task.py update --issue <UUID> --title "new title" --state "Done"
   python3 scripts/linear_task.py comment --issue <UUID> --body "追加メモ"
+  python3 scripts/linear_task.py archive --team KEY --closed-older-than 90 --dry-run
+  python3 scripts/linear_task.py archive --team KEY --closed-older-than 90
+  python3 scripts/linear_task.py unarchive --issue JEY-538
 """
 
 from __future__ import annotations
@@ -15,11 +18,14 @@ import argparse
 import datetime
 import json
 import os
-from typing import Any, Dict, Optional
+import time
+from typing import Any, Dict, List, Optional
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 LINEAR_API_URL = "https://api.linear.app/graphql"
+CLOSED_STATE_TYPES = ["completed", "canceled"]
+STALE_READ_WAIT_SECONDS = 5
 
 _cached_token: Optional[str] = None
 
@@ -309,6 +315,132 @@ def cmd_comment(args: argparse.Namespace) -> None:
     print(f"COMMENTED\t{c['id']}")
 
 
+def fetch_team_issues(
+    team_id: str, issue_filter: Dict[str, Any], include_archived: bool = False
+) -> List[Dict[str, Any]]:
+    q = """
+    query($teamId: String!, $filter: IssueFilter, $after: String, $includeArchived: Boolean) {
+      team(id: $teamId) {
+        issues(first: 100, after: $after, filter: $filter, includeArchived: $includeArchived) {
+          nodes {
+            id
+            identifier
+            title
+            completedAt
+            canceledAt
+          }
+          pageInfo { hasNextPage endCursor }
+        }
+      }
+    }
+    """
+    nodes: List[Dict[str, Any]] = []
+    after: Optional[str] = None
+    while True:
+        data = gql(
+            q,
+            {
+                "teamId": team_id,
+                "filter": issue_filter,
+                "after": after,
+                "includeArchived": include_archived,
+            },
+        )
+        team = data.get("team")
+        if not team:
+            raise SystemExit(f"Team not found: {team_id}")
+        page = team["issues"]
+        nodes.extend(page["nodes"])
+        if not page["pageInfo"]["hasNextPage"]:
+            return nodes
+        after = page["pageInfo"]["endCursor"]
+
+
+def closed_date(issue: Dict[str, Any]) -> str:
+    return (issue.get("completedAt") or issue.get("canceledAt") or "-")[:10]
+
+
+def cmd_archive(args: argparse.Namespace) -> None:
+    team_id = get_team_id_by_key(args.team)
+    cutoff = (
+        datetime.datetime.now(datetime.timezone.utc)
+        - datetime.timedelta(days=args.closed_older_than)
+    ).isoformat()
+    closed_filter: Dict[str, Any] = {
+        "state": {"type": {"in": CLOSED_STATE_TYPES}},
+        "or": [
+            {"completedAt": {"lt": cutoff}},
+            {"canceledAt": {"lt": cutoff}},
+        ],
+    }
+    has_open_child: Dict[str, Any] = {
+        "children": {
+            "some": {"state": {"type": {"nin": CLOSED_STATE_TYPES}}},
+        }
+    }
+    candidates = fetch_team_issues(team_id, closed_filter)
+    excluded_ids = {
+        i["id"]
+        for i in fetch_team_issues(team_id, {"and": [closed_filter, has_open_child]})
+    }
+    excluded = [i for i in candidates if i["id"] in excluded_ids]
+    targets = [i for i in candidates if i["id"] not in excluded_ids]
+
+    print(f"TARGETS\t{len(targets)}")
+    for i in targets:
+        print(f"{i['identifier']}\t{closed_date(i)}\t{i['title']}")
+    for i in excluded:
+        print(f"EXCLUDED\t{i['identifier']}\t{i['title']}\t未完了の子 issue を持つ")
+
+    if args.dry_run:
+        print("DRY-RUN\tno mutation executed")
+        return
+
+    q = """
+    mutation($id: String!) {
+      issueArchive(id: $id) {
+        success
+      }
+    }
+    """
+    archived = 0
+    for i in targets:
+        result = gql(q, {"id": i["id"]})["issueArchive"]
+        if not result.get("success"):
+            raise SystemExit(f"issueArchive failed: {i['identifier']}")
+        archived += 1
+
+    time.sleep(STALE_READ_WAIT_SECONDS)
+    leaked = fetch_team_issues(
+        team_id,
+        {
+            "archivedAt": {"null": False},
+            "state": {"type": {"nin": CLOSED_STATE_TYPES}},
+        },
+        include_archived=True,
+    )
+    print(f"ARCHIVED\t{archived}")
+    print(f"未完了かつ archived\t{len(leaked)}")
+    for i in leaked:
+        print(f"{i['identifier']}\t{i['title']}")
+
+
+def cmd_unarchive(args: argparse.Namespace) -> None:
+    q = """
+    mutation($id: String!) {
+      issueUnarchive(id: $id) {
+        success
+        entity { id identifier title url }
+      }
+    }
+    """
+    result = gql(q, {"id": args.issue})["issueUnarchive"]
+    issue = result.get("entity")
+    if not result.get("success") or not issue:
+        raise SystemExit("issueUnarchive failed (success=false or null entity).")
+    print(f"UNARCHIVED\t{issue['identifier']}\t{issue['title']}\t{issue['url']}")
+
+
 def valid_date(s: str) -> str:
     """Validate YYYY-MM-DD format."""
     datetime.date.fromisoformat(s)
@@ -358,6 +490,26 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--issue", required=True, help="Issue UUID")
     s.add_argument("--body", required=True)
     s.set_defaults(func=cmd_comment)
+
+    s = sub.add_parser(
+        "archive", help="Archive old completed/canceled issues (use --dry-run first)"
+    )
+    s.add_argument("--team", required=True, help="Team key")
+    s.add_argument(
+        "--closed-older-than",
+        required=True,
+        type=int,
+        metavar="DAYS",
+        help="Only issues completed/canceled more than DAYS days ago",
+    )
+    s.add_argument("--dry-run", action="store_true", help="List targets only")
+    s.set_defaults(func=cmd_archive)
+
+    s = sub.add_parser("unarchive", help="Unarchive an issue")
+    s.add_argument(
+        "--issue", required=True, help="Issue UUID or identifier (e.g. JEY-538)"
+    )
+    s.set_defaults(func=cmd_unarchive)
 
     return p
 
