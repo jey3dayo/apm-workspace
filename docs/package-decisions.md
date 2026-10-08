@@ -724,3 +724,12 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - 参照にした理由: upstream は root `apm.yml` で pin され全体に配布済みのため、名前で読み込ませれば足りる。用語集を `refactoring` へ写すと upstream の更新から乖離する。
 - 残す理由: `codebase-design` は `wayfinder` / `improve-codebase-architecture` に加え、`refactoring` からも参照される。
 - 見送り: `polish` は diff の行単位の機械的なチェックリストで、「過剰な差分」の行が呼び出し元1つの helper を既に扱うため配線しなかった。
+
+## apm 0.33.0 を見送り 0.31.0 に据え置く（2026-10-08）
+
+- 見送り理由: 0.33.0 の `apm deps list`（`-g` / `--all` を含む）が、lock に `local_deployed_files` がある限り `Invalid local package path '': path segments must not be empty` で exit 1 になる。`mise run doctor` が呼ぶため `mise run deploy` も exit 1 になる（apply は通る）。
+- 原因: lock 読み込み時に `local_deployed_files` から合成される self エントリ（キー `.`、`local_path: .`）を、`commands/deps/cli.py` の `_resolve_scope_deps` が除外せずにインストール先を計算する。install・prune・drift は `_SELF_KEY` を除外している。0.31.0 でも同じ計算は失敗していたが `except Exception: pass` で隠れており、#2876（v0.33.0）が `except PathTraversalError: raise` を足して表に出た。`apm.yml` と `.apm/skills/<id>/SKILL.md` だけの新規プロジェクトで再現するため、workspace 固有の問題ではない。同じ最小構成で install・prune・audit・outdated・update・compile・`deps tree` は通った。
+- もう1件: 0.33.0 の `apm prune --dry-run` は、0.31.0 が見逃していた本物の orphan 20 件を拾う一方、`alias:` 付きの gist 依存（`japanese-tech-writing`）も orphan と判定する。キャッシュを消すと `mise run deploy` は取り直さない（配布済みの SKILL.md は残る）。`deploy:fresh` は先頭で `apm prune` を回すため影響する。
+- 0.33.0 でも外せない既存の回避策（ソース比較）: Codex の MCP `id` 除去（`adapters/client/codex.py` が引き続き出力）、revision-pin が annotated tag だけを見る件（`deps/revision_pins.py` は 0.31.0 と同一）、`apm uninstall` の `.apm-pin` 中断（同じエラー文が残る）。
+- upstream（2026-10-08 時点）: 両件とも該当する issue / PR は無く、main にも修正は無い。prune の open PR #3158 は alias を対象外としている。`local_deployed_files` の別件として #3179（改名・削除した local skill の `.agents/skills` 行が残る）が open。
+- 再検討するなら: `apm deps list -g` が exit 0 になり、`apm prune --dry-run` が alias 付き gist を orphan に挙げないリリース。`mise.toml` と `~/.config/mise/config.workstation.toml` の両方を上げる。
