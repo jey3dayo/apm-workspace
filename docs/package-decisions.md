@@ -733,3 +733,8 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - 0.33.0 でも外せない既存の回避策（ソース比較）: Codex の MCP `id` 除去（`adapters/client/codex.py` が引き続き出力）、revision-pin が annotated tag だけを見る件（`deps/revision_pins.py` は 0.31.0 と同一）、`apm uninstall` の `.apm-pin` 中断（同じエラー文が残る）。
 - upstream（2026-10-08 時点）: 両件とも該当する issue / PR は無く、main にも修正は無い。prune の open PR #3158 は alias を対象外としている。`local_deployed_files` の別件として #3179（改名・削除した local skill の `.agents/skills` 行が残る）が open。
 - 再検討するなら: `apm deps list -g` が exit 0 になり、`apm prune --dry-run` が alias 付き gist を orphan に挙げないリリース。`mise.toml` と `~/.config/mise/config.workstation.toml` の両方を上げる。
+
+## `show-me` と `archify` を両方残す（2026-10-08）
+
+- 判定: ユーザーが両方を使っており、用途が違う。`show-me` は会話の中の軽い説明、`archify` は見せるための HTML 図。`docs/skill-overlaps.md` の「検証中の競合スキル」表から「図解」行を外した。
+- 現状の起動条件: `show-me` は `disable-model-invocation: true` でモデルの一覧に出ず、メッセージ先頭の `/show-me` でだけ動く。`archify` は `skillOverrides` で `name-only`。
