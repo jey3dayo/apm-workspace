@@ -738,3 +738,9 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 
 - 判定: ユーザーが両方を使っており、用途が違う。`show-me` は会話の中の軽い説明、`archify` は見せるための HTML 図。`docs/skill-overlaps.md` の「検証中の競合スキル」表から「図解」行を外した。
 - 現状の起動条件: `show-me` は `disable-model-invocation: true` でモデルの一覧に出ず、メッセージ先頭の `/show-me` でだけ動く。`archify` は `skillOverrides` で `name-only`。
+
+## `polish` を残し、組み込み `/simplify` と併用する（2026-10-08）
+
+- 判定: ユーザーが `polish` を残すと決めた。`/simplify` は Claude Code の組み込みで撤去の対象にならず、Codex には無い。同じ diff で比べる判定は不要になった。`docs/skill-overlaps.md` の「検証中の競合スキル」表から「PR 前の掃除」行を外した。
+- 境界: `polish` は AGENTS.md の開発原則（コメント、テスト、型逃げ、握りつぶし、過剰な差分）を、`/simplify` は再利用・効率・altitude を見る。`polish` の本文に記載済み。
+- 併用: `polish` は `context: fork` で動くので、中から `/simplify` を呼ばない。両方かけるときはメインセッションで順に呼ぶ。
