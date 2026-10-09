@@ -48,7 +48,7 @@
 - レビュー・品質: `review-fix-loop`, `polish`
 - Git・出荷: `ship`, `atomic-commit`, `git-worktree`, `git-branch-cleanup`,
   `ci-stability-hooks`, `prepare-goal`
-- リファクタリング・解析: `refactoring`, `similarity`
+- リファクタリング・解析: `refactoring`, `similarity`, `cccc`
 - ドキュメント・タスク: `docs-manager`, `docs-review`, `todo-changelog-ops`, `linear-task-ops`
 - デザイン・ブラウザ: `design-md-workflow`, `pwa-layout`, `terminal-browser`
 - リサーチ: `web-research`（計画・並列委譲・合成まで一体）
