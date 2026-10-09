@@ -216,6 +216,7 @@ check_opencode() {
       skip "opencode/$provider" "opencode models failed or timed out"
       continue
     fi
+    live=$(sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//' <<<"$live" | grep -E "^${provider}/[A-Za-z0-9._-]+\$" || true)
     provider_allowlist=$(awk -v p="$provider/" 'index($2, p) == 1' <<<"$allowlist")
     report_provider "opencode/$provider" "$provider_allowlist" "$live"
   done

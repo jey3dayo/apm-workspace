@@ -43,7 +43,7 @@ script_models_for() {
 }
 
 @test "implement with an allowed model passes the allowlist and fails later, not at validation" {
-  run "$SCRIPT" implement "$PROJECT" claude-sonnet-5-thinking-high "$PAYLOAD"
+  run "$SCRIPT" implement "$PROJECT" claude-sonnet-5-5-high "$PAYLOAD"
   [ "$status" -ne 2 ]
   [[ "$output" != *"not allowed for role"* ]]
 }
@@ -87,7 +87,7 @@ script_models_for() {
 }
 
 @test "an unsupported role is rejected" {
-  run "$SCRIPT" plan "$PROJECT" claude-sonnet-5-thinking-high "$PAYLOAD"
+  run "$SCRIPT" plan "$PROJECT" claude-sonnet-5-5-high "$PAYLOAD"
   [ "$status" -eq 2 ]
   [[ "$output" == *"Unsupported role"* ]]
 }
@@ -115,13 +115,13 @@ script_models_for() {
 
 @test "AGMSG_CURSOR_SANDBOX_PROFILE_ONLY does not require cursor-agent or sandbox-exec" {
   run env AGMSG_CURSOR_SANDBOX_PROFILE_ONLY=1 AGMSG_CURSOR_BIN=/no/such/cursor-agent \
-    "$SCRIPT" implement "$PROJECT" claude-sonnet-5-thinking-high "$PAYLOAD"
+    "$SCRIPT" implement "$PROJECT" claude-sonnet-5-5-high "$PAYLOAD"
   [ "$status" -eq 0 ]
 }
 
 @test "the profile denies read of ~/.cursor and <project>/.cursor" {
   run env AGMSG_CURSOR_SANDBOX_PROFILE_ONLY=1 \
-    "$SCRIPT" implement "$PROJECT" claude-sonnet-5-thinking-high "$PAYLOAD"
+    "$SCRIPT" implement "$PROJECT" claude-sonnet-5-5-high "$PAYLOAD"
   [ "$status" -eq 0 ]
   [[ "$output" == *"(deny file-read* (subpath \"$HOME/.cursor\"))"* ]]
   local canon_project
@@ -131,7 +131,7 @@ script_models_for() {
 
 @test "implement allows write to the project; review denies it" {
   run env AGMSG_CURSOR_SANDBOX_PROFILE_ONLY=1 \
-    "$SCRIPT" implement "$PROJECT" claude-sonnet-5-thinking-high "$PAYLOAD"
+    "$SCRIPT" implement "$PROJECT" claude-sonnet-5-5-high "$PAYLOAD"
   [ "$status" -eq 0 ]
   local canon_project
   canon_project="$(cd "$PROJECT" && pwd -P)"
@@ -146,7 +146,7 @@ script_models_for() {
 
 @test "the profile allows /dev, tmp, runtime_dir, and agmsg state" {
   run env AGMSG_CURSOR_SANDBOX_PROFILE_ONLY=1 \
-    "$SCRIPT" implement "$PROJECT" claude-sonnet-5-thinking-high "$PAYLOAD"
+    "$SCRIPT" implement "$PROJECT" claude-sonnet-5-5-high "$PAYLOAD"
   [ "$status" -eq 0 ]
   [[ "$output" == *'(subpath "/dev")'* ]]
   [[ "$output" == *"agmsg"* ]]
@@ -155,7 +155,7 @@ script_models_for() {
 @test "cursor-agent binary is required to exist for a real launch (default path resolution rejected)" {
   # デフォルト解決先を使わせ、実体が無い環境では起動時に exit 1 になることを確認する
   # (allowlist・profile 生成は通過済みであることを exit != 2 で確認する)。
-  run env -u AGMSG_CURSOR_BIN "$SCRIPT" implement "$PROJECT" claude-sonnet-5-thinking-high "$PAYLOAD"
+  run env -u AGMSG_CURSOR_BIN "$SCRIPT" implement "$PROJECT" claude-sonnet-5-5-high "$PAYLOAD"
   if [[ -x "$HOME/.local/bin/cursor-agent" ]] || command -v cursor-agent >/dev/null 2>&1; then
     skip "cursor-agent is actually installed on this host; binary-missing path cannot be exercised without launching it"
   fi
@@ -172,7 +172,7 @@ script_models_for() {
 exit 0
 SH
   chmod +x "$shim"
-  run env AGMSG_CURSOR_BIN="$shim" "$SCRIPT" implement "$PROJECT" claude-sonnet-5-thinking-high "$PAYLOAD"
+  run env AGMSG_CURSOR_BIN="$shim" "$SCRIPT" implement "$PROJECT" claude-sonnet-5-5-high "$PAYLOAD"
   [ "$status" -eq 1 ]
   [[ "$output" == *"could not be resolved"* ]]
 }
@@ -191,7 +191,7 @@ esac
 SH
   chmod +x "$stub"
   run env AGMSG_CURSOR_BIN="$stub" AGMSG_CURSOR_VERIFIED_VERSION=9.9.9 \
-    "$SCRIPT" implement "$PROJECT" claude-sonnet-5-thinking-high "$PAYLOAD"
+    "$SCRIPT" implement "$PROJECT" claude-sonnet-5-5-high "$PAYLOAD"
   [ "$status" -eq 2 ]
   [[ "$output" == *"AGMSG_CURSOR_VERIFIED_VERSION"* ]]
   rm -rf -- "$stub_dir"
@@ -211,10 +211,10 @@ esac
 SH
   chmod +x "$stub"
   run env AGMSG_CURSOR_BIN="$stub" AGMSG_CURSOR_VERIFIED_VERSION=1.2.3 \
-    "$SCRIPT" implement "$PROJECT" claude-sonnet-5-thinking-high "$PAYLOAD"
+    "$SCRIPT" implement "$PROJECT" claude-sonnet-5-5-high "$PAYLOAD"
   [ "$status" -eq 0 ]
   [[ "$output" == *"LAUNCHED:"* ]]
-  [[ "$output" == *"--model claude-sonnet-5-thinking-high"* ]]
+  [[ "$output" == *"--model claude-sonnet-5-5-high"* ]]
   [[ "$output" == *"--trust"* ]]
   [[ "$output" == *"--force"* ]]
   rm -rf -- "$stub_dir"
@@ -233,7 +233,7 @@ case "$1" in
 esac
 SH
   chmod +x "$stub"
-  run env AGMSG_CURSOR_BIN="$stub" "$SCRIPT" implement "$PROJECT" claude-sonnet-5-thinking-high "$PAYLOAD"
+  run env AGMSG_CURSOR_BIN="$stub" "$SCRIPT" implement "$PROJECT" claude-sonnet-5-5-high "$PAYLOAD"
   [ "$status" -eq 2 ]
   [[ "$output" == *"did not confirm an empty MCP surface"* ]]
   rm -rf -- "$stub_dir"
@@ -250,7 +250,7 @@ SH
   cd "$HOME/.apm" || skip "~/.apm not present"
   [ -d "$HOME/.cursor/projects" ] || skip "no cursor project entries on this machine"
   command -v cursor-agent >/dev/null || skip "cursor-agent is not installed"
-  run env -u AGMSG_CURSOR_BIN AGMSG_CURSOR_MCP_CHECK_ONLY=1 "$SCRIPT" implement "$PROJECT" claude-sonnet-5-thinking-high "$PAYLOAD"
+  run env -u AGMSG_CURSOR_BIN AGMSG_CURSOR_MCP_CHECK_ONLY=1 "$SCRIPT" implement "$PROJECT" claude-sonnet-5-5-high "$PAYLOAD"
   [ "$status" -eq 0 ]
   [[ "$output" == *"mcp surface confirmed empty"* ]]
 }
@@ -258,7 +258,7 @@ SH
 @test "the mcp capability check passes from a cwd without a cursor project entry" {
   cd /tmp || return 1
   command -v cursor-agent >/dev/null || skip "cursor-agent is not installed"
-  run env -u AGMSG_CURSOR_BIN AGMSG_CURSOR_MCP_CHECK_ONLY=1 "$SCRIPT" implement "$PROJECT" claude-sonnet-5-thinking-high "$PAYLOAD"
+  run env -u AGMSG_CURSOR_BIN AGMSG_CURSOR_MCP_CHECK_ONLY=1 "$SCRIPT" implement "$PROJECT" claude-sonnet-5-5-high "$PAYLOAD"
   [ "$status" -eq 0 ]
   [[ "$output" == *"mcp surface confirmed empty"* ]]
 }

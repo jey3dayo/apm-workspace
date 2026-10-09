@@ -30,7 +30,7 @@ fi
 # の tier 表 (cursor 列) で、tests/run-cursor-worker.bats の drift テストが表と
 # 本 allowlist の集合一致を検証する。
 case "$role" in
-implement) allowed_models=(claude-sonnet-5-thinking-high claude-opus-5-5-high) ;;
+implement) allowed_models=(claude-sonnet-5-5-high claude-opus-5-5-high) ;;
 review) allowed_models=(claude-fable-5-1-thinking-xhigh claude-opus-5-5-high gpt-5.6-sol-xhigh) ;;
 esac
 

@@ -244,3 +244,18 @@ SH
   [[ "$output" == *"SKIP opencode/deepseek live model list empty or unparseable"* ]]
   [[ "$output" != *MISSING* ]]
 }
+
+@test "an opencode response with no provider/id lines is SKIP, not MISSING, and exits 0" {
+  write_opencode_stub deepseek "Available models" "models deepseek"
+  run_check
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"SKIP opencode/deepseek live model list empty or unparseable"* ]]
+  [[ "$output" != *MISSING* ]]
+}
+
+@test "opencode ids are extracted from surrounding header and whitespace noise" {
+  write_opencode_stub deepseek "Available models" "  deepseek/deepseek-v4-flash  " "other/deepseek-v4-flash"
+  run_check
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"OK opencode/deepseek all deepseek/deepseek-v4-flash"* ]]
+}
