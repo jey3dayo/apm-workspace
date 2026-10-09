@@ -185,7 +185,7 @@ READY 後も DONE / REVIEW だけを無期限に待たず、agmsg DB に届い�
 - valid message が120秒無い場合は、launchd job 状態、`tail -n 200 "$run_dir/worker.log"`、`$run_dir/worker.exit`（あれば）を取得して、長時間コマンド・crash・承認待ちを区別する。長時間コマンドが動作中なら待機を継続し、診断時刻を更新する
 - 承認画面を検出した場合は Enter を自動送信しない。Codex では `-a never` 契約違反として最終出力を記録し、crash cleanup へ進む。Claude では安全な代替を指示できる場合だけ指示し、解消しなければ同様に cleanup する
 - boot payload の task timeout を超えたら最終ログ・launchd job 状態・exit status を保存し、crash cleanup へ進む
-- 作業を途中で打ち切りたい場合は `STOP(task_id)` を送る。ただし worker が拾うのは best-effort（WORKING の区切りで inbox を確認した時のみ）なので、応答が無ければ task timeout / crash cleanup 経路で job を落とす
+- 作業を途中で打ち切りたい場合は `STOP(task_id)` を送る。ただし worker が拾うのは best-effort（WORKING の区切りか DONE / REVIEW 送信の直前に inbox を確認した時のみ）なので、応答が無ければ task timeout / crash cleanup 経路で job を落とす
 
 完了条件: DONE / REVIEW / BLOCKED を受信したか、timeout / crash の診断情報が揃っている。
 
@@ -207,7 +207,7 @@ implement 用の diff 検証手順は適用しない。
 
 ### 8. 片付ける
 
-**DONE / REVIEW の受信が終了シグナルであり、成功経路に STOP/ACK handshake は無い**（worker は DONE/REVIEW 送信後すみやかに終了する契約）。STOP は途中中断専用の合図で、orchestrator が作業を打ち切りたい時だけ送る。worker が STOP を拾えるのは WORKING 送信の区切りで inbox を確認した場合に限る best-effort であり、応答が無ければ task timeout を待って crash cleanup と同じ手順で片付ける。
+**DONE / REVIEW の受信が終了シグナルであり、成功経路に STOP/ACK handshake は無い**（worker は DONE/REVIEW 送信後すみやかに終了する契約）。STOP は途中中断専用の合図で、orchestrator が作業を打ち切りたい時だけ送る。worker が STOP を拾えるのは WORKING 送信の区切りか DONE / REVIEW 送信の直前に inbox を確認した場合に限る best-effort であり、応答が無ければ task timeout を待って crash cleanup と同じ手順で片付ける。
 
 1. launchd job が終了するまで最大10秒待つ。終了しない場合は最終ログを保存して crash 扱いとし、job を bootout しない
 2. `~/.agents/skills/agmsg/scripts/reset.sh <対象project絶対パス> <runtime_type> <worker_name> <session_id>`（orchestrator 自身の cwd ではなく **対象 project と worker_name を指定**する。Claude worker は READY で受け取った session_id を第4引数に渡して actas lock も解放する。session_id を取得できなかった場合のみ省略し、crash cleanup として記録する）

@@ -34,7 +34,7 @@ AGMSG_REPORT
 - 作業が120秒を超える場合は、長いコマンドの実行前後または作業の区切りごとに `WORKING <task_id> <一行状況>` を送り、orchestrator が無通信を診断できるようにする
 - 判断に迷う点・ブロッカーが出たら、勝手に進めず `BLOCKED <task_id> <相談内容>` を送って指示を待つ
 - Claude / Codex とも headless の1 turn で終了する。**DONE / REVIEW を送ったら STOP を待たずにそのまま turn を終えてよい**（DONE / REVIEW が終了シグナル）
-- `STOP <task_id>` や同じ task_id の追加指示は途中で届きうる。WORKING 送信の区切りと DONE / REVIEW 送信の直前に `~/.agents/skills/agmsg/scripts/inbox.sh <team> <自分>` を確認する（`agmsg-delegation/scripts/` 側には無い）。STOP を受信した場合は、安全に手を止めて `ACK <task_id>` を返し、そこまでの状態を `DONE`（status: partial）または `BLOCKED` で報告して終了する。追加指示を受信した場合は報告前の自己検証の要求に加えて成果物と照合し、反映できなかったものは `status: partial` とし `blockers:` に書く
+- `STOP <task_id>` や同じ task_id の追加指示は途中で届きうる。WORKING 送信の区切りと DONE / REVIEW 送信の直前に `~/.agents/skills/agmsg/scripts/inbox.sh <team> <自分>` を確認する（`agmsg-delegation/scripts/` 側には無い）。inbox.sh は未読しか返さず watcher が先に既読化しうるので、DONE / REVIEW 送信の直前は `~/.agents/skills/agmsg/scripts/history.sh <team> <自分> <limit>` でも同じ task_id の指示を確かめる（limit は送受信の合計で数える）。STOP を受信した場合は、安全に手を止めて `ACK <task_id>` を返し、そこまでの状態を `DONE`（status: partial）または `BLOCKED` で報告して終了する。追加指示は role ごとに扱う。implement は成果物と照合し、反映できなかったものを `status: partial` とし `blockers:` に書く。review は固定対象のまま追加の観点を確認し、確認できなかったものを findings / checks に書いて `approve` を返さない。固定対象の変更や権限外の要求は `BLOCKED` で返す
 
 ## role: implement
 

@@ -289,7 +289,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
      repository actually uses (add `claude` if it only lists `codex` but the
      repository uses Claude Code) before running `apm install`
    - verify the intended `apm.yml`, `apm.lock.yaml`, and deployed target changed, and no unrelated workspace dependencies drifted
-   - judge a repo-local `apm install` by the tree, not by its exit code or summary: after a failure run `git status --short`, since target files and tracked skills can already be rewritten even when it reports no transaction changes committed; after a rerun, confirm each new dependency has `deployed_files` in `apm.lock.yaml`, because leftovers skipped as local/unmanaged still exit 0. Revert only the files this install wrote
+   - judge a repo-local `apm install` by the tree, not by its exit code or summary: after a failure run `git status --short`, since target files and tracked skills can already be rewritten even when it reports no transaction changes committed; after a rerun, confirm each new dependency has `deployed_files` in `apm.lock.yaml`, because leftovers skipped as local/unmanaged can still exit 0. Revert only the files this install wrote
 
 7. Checked-out external dependency changed:
    - edit the external repository checkout that is the source of truth
