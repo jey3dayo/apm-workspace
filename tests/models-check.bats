@@ -63,9 +63,42 @@ write_opencode_stub() {
   cat >"$FIXTURE_DIR/opencode" <<SH
 #!/bin/sh
 [ "\$1" = models ] || exit 2
+if [ "\${3:-}" = --verbose ]; then
+  [ -f "$FIXTURE_DIR/opencode-verbose-fail" ] && exit 1
+  if [ -f "$FIXTURE_DIR/opencode-\$2.verbose.txt" ]; then
+    cat "$FIXTURE_DIR/opencode-\$2.verbose.txt"
+    exit 0
+  fi
+fi
 cat "$FIXTURE_DIR/opencode-\$2.txt"
 SH
   chmod +x "$FIXTURE_DIR/opencode"
+}
+
+write_opencode_verbose() {
+  local provider=$1 id=$2 status=$3
+  cat >"$FIXTURE_DIR/opencode-$provider.verbose.txt" <<JSON
+$provider/other-model
+{
+  "id": "other-model",
+  "providerID": "$provider",
+  "status": "active",
+  "limit": { "context": 1000 }
+}
+$id
+{
+  "id": "${id#*/}",
+  "providerID": "$provider",
+  "name": "Display",
+  "status": "$status",
+  "cost": { "input": 1, "output": 2 },
+  "limit": { "context": 1000 }
+}
+JSON
+}
+
+write_codex_cache_json() {
+  printf '%s\n' "$1" >"$FIXTURE_DIR/codex/models_cache.json"
 }
 
 run_check() {
@@ -258,4 +291,83 @@ SH
   run_check
   [ "$status" -eq 0 ]
   [[ "$output" == *"OK opencode/deepseek all deepseek/deepseek-v4-flash"* ]]
+}
+
+@test "a codex slug with an upgrade is RETIRING with date and successor and exits 0" {
+  write_codex_cache_json '{"fetched_at":"2026-01-02T03:04:05Z","models":[
+    {"slug":"gpt-6-luna","visibility":"list","upgrade":null},
+    {"slug":"gpt-5.6-terra","visibility":"list","upgrade":{"model":"gpt-6.1-sol","migration_markdown":"retires","retirement_at":"2026-10-14T19:00:00Z"}},
+    {"slug":"gpt-6-sol","visibility":"list","upgrade":null}]}'
+  run_check
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"RETIRING codex implement gpt-5.6-terra (retires 2026-10-14T19:00:00Z, upgrade to gpt-6.1-sol)"* ]]
+  [ "$(grep -c '^RETIRING' <<<"$output")" -eq 1 ]
+}
+
+@test "a codex upgrade without usable fields is RETIRING with unknown values" {
+  write_codex_cache_json '{"models":[
+    {"slug":"gpt-6-luna","upgrade":{}},
+    {"slug":"gpt-5.6-terra","upgrade":"gpt-7"},
+    {"slug":"gpt-6-sol","upgrade":null}]}'
+  run_check
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"RETIRING codex implement gpt-6-luna (retires unknown, upgrade to unknown)"* ]]
+  [[ "$output" == *"RETIRING codex implement gpt-5.6-terra (retires unknown, upgrade to unknown)"* ]]
+}
+
+@test "a hidden codex slug without an upgrade is RETIRING hidden and exits 0" {
+  write_codex_cache_json '{"models":[
+    {"slug":"gpt-6-luna","visibility":"list","upgrade":null},
+    {"slug":"gpt-5.6-terra","visibility":"list","upgrade":null},
+    {"slug":"gpt-6-sol","visibility":"hide","upgrade":null}]}'
+  run_check
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"RETIRING codex review gpt-6-sol (hidden from the model list)"* ]]
+  [[ "$output" == *"OK codex review gpt-6-sol"* ]]
+}
+
+@test "listed codex slugs without an upgrade are not RETIRING" {
+  write_codex_cache_json '{"models":[
+    {"slug":"gpt-6-luna","visibility":"list","upgrade":null},
+    {"slug":"gpt-5.6-terra","visibility":"list"},
+    {"slug":"gpt-6-sol","visibility":"list","upgrade":null}]}'
+  run_check
+  [ "$status" -eq 0 ]
+  [[ "$output" != *RETIRING* ]]
+}
+
+@test "a deprecated opencode model is RETIRING and exits 0" {
+  write_opencode_verbose deepseek deepseek/deepseek-v4-flash deprecated
+  run_check
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"OK opencode/deepseek all deepseek/deepseek-v4-flash"* ]]
+  [[ "$output" == *"RETIRING opencode/deepseek all deepseek/deepseek-v4-flash (status deprecated)"* ]]
+}
+
+@test "active and beta opencode models are not RETIRING" {
+  local status_name
+  for status_name in active beta; do
+    write_opencode_verbose deepseek deepseek/deepseek-v4-flash "$status_name"
+    run_check
+    [ "$status" -eq 0 ]
+    [[ "$output" != *RETIRING* ]]
+    [[ "$output" != *"INFO opencode"* ]]
+  done
+}
+
+@test "a failing opencode --verbose call is INFO and keeps the OK line and exit 0" {
+  : >"$FIXTURE_DIR/opencode-verbose-fail"
+  run_check
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"INFO opencode/deepseek retirement status unavailable"* ]]
+  [[ "$output" == *"OK opencode/deepseek all deepseek/deepseek-v4-flash"* ]]
+  [[ "$output" != *"SKIP opencode"* ]]
+}
+
+@test "unparseable opencode --verbose output is INFO and exits 0" {
+  printf 'deepseek/deepseek-v4-flash\n{ not json\n' >"$FIXTURE_DIR/opencode-deepseek.verbose.txt"
+  run_check
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"INFO opencode/deepseek retirement status unavailable"* ]]
+  [[ "$output" != *RETIRING* ]]
 }

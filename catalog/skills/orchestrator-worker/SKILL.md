@@ -28,7 +28,7 @@ description: >-
 
 「Orchestrator」は役ではなく機能。表の Steward / Architect のうち、後述の許可条件を満たす側が担う。Terra は Architect・Reviewer・Worker の昇格に就く。`gpt-5.6-terra` が terra の現行版で、Sol より安価な長文脈選択肢である。opencode は Worker 専用で、implement 以外の役には就けない（review も含む）。cursor は Worker と Reviewer の両方に就けるが、Steward / Architect には就けない（Orchestrator 機能を担えない）。
 
-agmsg-delegation の helper の allowlist が各 provider から取得したモデル一覧（Codex は fetched_at 付きのローカル cache）に載っているかは `~/.apm` の `mise run models:check` で確認する（MISSING は取得した一覧に未掲載で直ちに直し、NEWER は同系列の新しい版で原則として helper の allowlist と tier 表を新しい版へ上げる（価格帯が変わる場合だけ確認する）。tier 表と helper の一致は helper のテストが見る）。
+agmsg-delegation の helper の allowlist が各 provider から取得したモデル一覧（Codex は fetched_at 付きのローカル cache）に載っているかは `~/.apm` の `mise run models:check` で確認する（MISSING は取得した一覧に未掲載で直ちに直し、NEWER は同系列の新しい版で原則として helper の allowlist と tier 表を新しい版へ上げる（価格帯が変わる場合だけ確認する）、RETIRING は廃止予告（Codex の retirement_at / opencode の deprecated）で後継へ切り替える。tier 表と helper の一致は helper のテストが見る）。
 
 Codex の Architect / Reviewer と、難度で昇格する Worker には `gpt-6.1-sol` を推奨する。アカウントや client で利用できない場合、または応答前に `server_overloaded` が返る場合は、skill 起因と判断せず、利用可能なら model picker / 設定で旧版 `gpt-6-sol` を明示選択して再試行する。自動 alias や fallback は行わない。利用可能モデルはアカウントと client により異なるため、[公式モデル一覧](https://learn.chatgpt.com/docs/models)を参照する。
 

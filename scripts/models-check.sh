@@ -124,6 +124,33 @@ skip() {
   printf 'SKIP %s %s\n' "$1" "$2"
 }
 
+report_codex_retiring() {
+  local allowlist=$1 cache=$2
+  local role model found kind retires successor
+
+  while read -r role model; do
+    [ -n "$model" ] || continue
+    found=$(jq -r --arg slug "$model" '
+      [.models[]? | objects | select(.slug == $slug)] | first // empty
+      | (.upgrade? // null) as $u
+      | if $u != null then
+          ($u | if type == "object" then . else {} end) as $o
+          | ["upgrade",
+             (($o.retirement_at? // null) | if type == "string" and . != "" then . else "unknown" end),
+             (($o.model? // null) | if type == "string" and . != "" then . else "unknown" end)]
+          | join("\t")
+        elif (.visibility? // null) == "hide" then "hidden"
+        else empty end' "$cache" 2>/dev/null || true)
+    [ -n "$found" ] || continue
+    IFS=$'\t' read -r kind retires successor <<<"$found"
+    if [ "$kind" = upgrade ]; then
+      printf 'RETIRING codex %s %s (retires %s, upgrade to %s)\n' "$role" "$model" "$retires" "$successor"
+    else
+      printf 'RETIRING codex %s %s (hidden from the model list)\n' "$role" "$model"
+    fi
+  done <<<"$allowlist"
+}
+
 check_codex() {
   local helper="$HELPERS_DIR/run-codex-worker.sh"
   local cache="${CODEX_HOME:-$HOME/.codex}/models_cache.json"
@@ -152,6 +179,7 @@ check_codex() {
   fetched_at=$(jq -r '.fetched_at // "unknown"' "$cache" 2>/dev/null || echo unknown)
   printf 'INFO codex models_cache fetched_at=%s\n' "$fetched_at"
   report_provider codex "$allowlist" "$live"
+  report_codex_retiring "$allowlist" "$cache"
 }
 
 check_cursor() {
@@ -193,6 +221,33 @@ resolve_opencode_bin() {
   fi
 }
 
+# Deprecated status comes from `models <provider> --verbose`: a `<provider>/<id>` header line followed by a JSON object.
+report_opencode_retiring() {
+  local bin=$1 provider=$2 provider_allowlist=$3
+  local verbose role model status unavailable=0
+
+  if ! command -v jq >/dev/null 2>&1 || ! verbose=$(with_timeout "$bin" models "$provider" --verbose 2>/dev/null); then
+    printf 'INFO opencode/%s retirement status unavailable\n' "$provider"
+    return
+  fi
+  while read -r role model; do
+    [ -n "$model" ] || continue
+    if ! status=$(awk -v id="$model" '
+      { line = $0; gsub(/^[[:space:]]+|[[:space:]]+$/, "", line) }
+      line ~ /^[A-Za-z0-9._-]+\/[A-Za-z0-9._\/-]+$/ { inblock = (line == id); next }
+      inblock { print }' <<<"$verbose" | jq -r 'objects | .status? | strings' 2>/dev/null) || [ -z "$status" ]; then
+      unavailable=1
+      continue
+    fi
+    if [ "$status" = deprecated ]; then
+      printf 'RETIRING opencode/%s %s %s (status deprecated)\n' "$provider" "$role" "$model"
+    fi
+  done <<<"$provider_allowlist"
+  if [ "$unavailable" -eq 1 ]; then
+    printf 'INFO opencode/%s retirement status unavailable\n' "$provider"
+  fi
+}
+
 check_opencode() {
   local helper="$HELPERS_DIR/run-opencode-worker.sh"
   local allowlist bin provider providers live provider_allowlist rc=0
@@ -219,6 +274,7 @@ check_opencode() {
     live=$(sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//' <<<"$live" | grep -E "^${provider}/[A-Za-z0-9._-]+\$" || true)
     provider_allowlist=$(awk -v p="$provider/" 'index($2, p) == 1' <<<"$allowlist")
     report_provider "opencode/$provider" "$provider_allowlist" "$live"
+    report_opencode_retiring "$bin" "$provider" "$provider_allowlist"
   done
 }
 
