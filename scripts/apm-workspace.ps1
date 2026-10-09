@@ -2974,8 +2974,7 @@ function Get-ManagedCatalogRuntimeTargets {
     [pscustomobject]@{ Name = "claude"; Root = (Join-Path $HOME ".claude"); SkillsRoot = (Join-Path $HOME ".claude"); AgentsFace = ""; ConfigName = "CLAUDE.md" },
     [pscustomobject]@{ Name = "codex"; Root = (Join-Path $HOME ".codex"); SkillsRoot = (Join-Path $HOME ".agents"); AgentsFace = "-"; ConfigName = "AGENTS.md" },
     [pscustomobject]@{ Name = "cursor"; Root = (Join-Path $HOME ".cursor"); SkillsRoot = (Join-Path $HOME ".cursor"); AgentsFace = ""; ConfigName = "AGENTS.md" },
-    [pscustomobject]@{ Name = "opencode"; Root = (Join-Path $HOME ".config/opencode"); SkillsRoot = "-"; AgentsFace = "-"; ConfigName = "-" },
-    [pscustomobject]@{ Name = "openclaw"; Root = (Join-Path $HOME ".openclaw"); SkillsRoot = (Join-Path $HOME ".openclaw"); AgentsFace = ""; ConfigName = "CLAUDE.md" }
+    [pscustomobject]@{ Name = "opencode"; Root = (Join-Path $HOME ".config/opencode"); SkillsRoot = "-"; AgentsFace = "-"; ConfigName = "-" }
   )
 }
 

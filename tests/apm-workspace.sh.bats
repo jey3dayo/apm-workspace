@@ -1165,19 +1165,17 @@ esac
 EOF
   chmod +x "$doctor_bin/apm"
 
-  for target_dir in .claude .codex .cursor .config/opencode .openclaw; do
+  for target_dir in .claude .codex .cursor .config/opencode; do
     mkdir -p "$doctor_home/$target_dir/agents" "$doctor_home/$target_dir/commands" "$doctor_home/$target_dir/rules"
   done
   mkdir -p \
     "$doctor_home/.claude/skills" \
     "$doctor_home/.agents/skills" \
     "$doctor_home/.cursor/skills" \
-    "$doctor_home/.config/opencode/skills" \
-    "$doctor_home/.openclaw/skills"
+    "$doctor_home/.config/opencode/skills"
   printf '# config\n' >"$doctor_home/.claude/CLAUDE.md"
   printf '# config\n' >"$doctor_home/.codex/AGENTS.md"
   printf '# config\n' >"$doctor_home/.cursor/AGENTS.md"
-  printf '# config\n' >"$doctor_home/.openclaw/CLAUDE.md"
 }
 
 doctor_fixture_env() {

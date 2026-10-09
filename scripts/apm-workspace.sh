@@ -1495,7 +1495,6 @@ claude|.claude|CLAUDE.md||
 codex|.codex|AGENTS.md|.agents|-
 cursor|.cursor|AGENTS.md||
 opencode|.config/opencode|-|-|-
-openclaw|.openclaw|CLAUDE.md||
 EOF
 }
 
