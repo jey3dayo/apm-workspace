@@ -315,6 +315,32 @@ SH
   [[ "$output" == *"RETIRING codex implement gpt-5.6-terra (retires unknown, upgrade to unknown)"* ]]
 }
 
+@test "a codex upgrade of false is RETIRING with unknown values" {
+  write_codex_cache_json '{"models":[
+    {"slug":"gpt-6-luna","upgrade":false},
+    {"slug":"gpt-5.6-terra","upgrade":null},
+    {"slug":"gpt-6-sol","upgrade":null}]}'
+  run_check
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"RETIRING codex implement gpt-6-luna (retires unknown, upgrade to unknown)"* ]]
+}
+
+@test "a failed codex retirement read is INFO, keeps the OK lines and exits 0" {
+  mkdir -p "$FIXTURE_DIR/bin"
+  cat >"$FIXTURE_DIR/bin/jq" <<SH
+#!/bin/sh
+for a in "\$@"; do [ "\$a" = --arg ] && exit 5; done
+exec "$(command -v jq)" "\$@"
+SH
+  chmod +x "$FIXTURE_DIR/bin/jq"
+  PATH="$FIXTURE_DIR/bin:$PATH" run_check
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"INFO codex retirement status unavailable"* ]]
+  [[ "$output" == *"OK codex implement gpt-6-luna"* ]]
+  [[ "$output" == *"OK codex review gpt-6-sol"* ]]
+  [[ "$output" != *RETIRING* ]]
+}
+
 @test "a hidden codex slug without an upgrade is RETIRING hidden and exits 0" {
   write_codex_cache_json '{"models":[
     {"slug":"gpt-6-luna","visibility":"list","upgrade":null},

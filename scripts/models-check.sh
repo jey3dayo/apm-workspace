@@ -130,9 +130,9 @@ report_codex_retiring() {
 
   while read -r role model; do
     [ -n "$model" ] || continue
-    found=$(jq -r --arg slug "$model" '
+    if ! found=$(jq -r --arg slug "$model" '
       [.models[]? | objects | select(.slug == $slug)] | first // empty
-      | (.upgrade? // null) as $u
+      | .upgrade? as $u
       | if $u != null then
           ($u | if type == "object" then . else {} end) as $o
           | ["upgrade",
@@ -140,7 +140,10 @@ report_codex_retiring() {
              (($o.model? // null) | if type == "string" and . != "" then . else "unknown" end)]
           | join("\t")
         elif (.visibility? // null) == "hide" then "hidden"
-        else empty end' "$cache" 2>/dev/null || true)
+        else empty end' "$cache" 2>/dev/null); then
+      printf 'INFO codex retirement status unavailable\n'
+      return 0
+    fi
     [ -n "$found" ] || continue
     IFS=$'\t' read -r kind retires successor <<<"$found"
     if [ "$kind" = upgrade ]; then
