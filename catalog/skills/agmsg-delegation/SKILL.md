@@ -61,10 +61,10 @@ Steward から Architect への昇格 handoff もこの書式を使う。
 
 共通 lifecycle は同一で、role によって安全契約と報告フォーマットが異なる。
 
-| role      | 起動する側                                                | spawn する相手                                                                                                                                                                                                                 | 相手の権限                   | 報告   |
-| --------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------- | ------ |
-| implement | Orchestrator 機能を担う側                                 | worker（model は `orchestrator-worker` の tier 表が正本。Claude / Codex に加え opencode（`deepseek/deepseek-v4-flash` のみ）、cursor（`claude-sonnet-5-thinking-high` / `claude-opus-5-5-high`）も implement worker になれる） | 対象 worktree の編集可       | DONE   |
-| review    | Orchestrator 機能を担う側。spawn 経路と pane 経路の両方可 | reviewer（model は `orchestrator-worker` の tier 表が正本）。opencode は Reviewer に就けないが、cursor（`claude-fable-5-1-thinking-xhigh` 既定 / `claude-opus-5-5-high` / `gpt-5.6-sol-xhigh`）は就ける                        | read-only。編集・commit 禁止 | REVIEW |
+| role      | 起動する側                                                | spawn する相手                                                                                                                                                                                                              | 相手の権限                   | 報告   |
+| --------- | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- | ------ |
+| implement | Orchestrator 機能を担う側                                 | worker（model は `orchestrator-worker` の tier 表が正本。Claude / Codex に加え opencode（`deepseek/deepseek-flash` のみ）、cursor（`claude-sonnet-5-thinking-high` / `claude-opus-5-5-high`）も implement worker になれる） | 対象 worktree の編集可       | DONE   |
+| review    | Orchestrator 機能を担う側。spawn 経路と pane 経路の両方可 | reviewer（model は `orchestrator-worker` の tier 表が正本）。opencode は Reviewer に就けないが、cursor（`claude-fable-5-1-thinking-xhigh` 既定 / `claude-opus-5-5-high` / `gpt-5.6-sol-xhigh`）は就ける                     | read-only。編集・commit 禁止 | REVIEW |
 
 review role の reviewer モデル指定は本スキル内の一時的な model override であり、`orchestrator-worker` の tier 対応表や既存 agent 定義（親モデル継承）を変更しない。model は helper の引数。選定は `orchestrator-worker` の「Reviewer の tier」が正本。
 
@@ -93,7 +93,7 @@ review role の reviewer モデル指定は本スキル内の一時的な model 
 | implement | `run-claude-worker.sh implement <project> <payload-file>` | `run-codex-worker.sh implement <project> <model> <payload-file>`（許可 model は `orchestrator-worker` の tier 表が正本。script が fail-closed で検証する） | `run-cursor-worker.sh implement <project> <model> <payload-file>`（許可 model は `orchestrator-worker` の tier 表が正本。script が fail-closed で検証する） |
 | review    | `run-claude-worker.sh review <project> <payload-file>`    | `run-codex-worker.sh review <project> <model> <payload-file>`（許可 model は `orchestrator-worker` の tier 表が正本。script が fail-closed で検証する）    | `run-cursor-worker.sh review <project> <model> <payload-file>`（許可 model は `orchestrator-worker` の tier 表が正本。script が fail-closed で検証する）    |
 
-opencode（implement のみ。review は不可）: `run-opencode-worker.sh implement <project> <model> <payload-file>`。許可 model は `deepseek/deepseek-v4-flash` の1つだけで、script が fail-closed で検証する。
+opencode（implement のみ。review は不可）: `run-opencode-worker.sh implement <project> <model> <payload-file>`。許可 model は `deepseek/deepseek-flash` の1つだけで、script が fail-closed で検証する。
 
 helper の解決先は `~/.agents/skills/agmsg-delegation/scripts/`。4 runtime とも headless mode と stdin/引数 prompt を使い、対話 TUI と shell interpolation を避ける。`launch-worker.sh` は専用の一時ディレクトリに launchd job label・ログ・exit status を残して detached に起動する。Claude helper は role から model を固定し、caller は model を渡さない。Codex / opencode / cursor は caller が起動時の引数で model を渡す。effort / variant の既定は Codex・opencode の helper が持つ（上書き変数は各 script が正本）。`run-codex-worker.sh` と `run-opencode-worker.sh` と `run-cursor-worker.sh` は role ごとの model allowlist を fail-closed で検証し、不一致は起動前に exit 2 で拒否する。上書き変数は各 script の Usage / コメントを参照（値は scripts が正本）。
 

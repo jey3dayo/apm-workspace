@@ -73,8 +73,16 @@ run_check() {
     bash "$SCRIPT"
 }
 
-allowlist_tokens() {
-  sed -nE 's/.*allowed_models=\(([^)]*)\).*/\1/p' "$1" | tr ' ' '\n' | sort -u
+# "<role> <model>" per single-line allowed_models declaration, same shape the script reports.
+real_allowlist() {
+  sed -nE 's/^[[:space:]]*(([a-z]+)\)[[:space:]]+)?allowed_models=\(([^)]*)\).*/\2|\3/p' "$1" |
+    while IFS='|' read -r role models; do
+      for m in $models; do printf '%s %s\n' "${role:-all}" "$m"; done
+    done
+}
+
+models_of() {
+  awk '{ print $2 }' <<<"$1" | sort -u
 }
 
 @test "all allowlisted models present reports OK per role and exits 0" {
@@ -146,14 +154,93 @@ SH
 
 @test "allowlists are read from the real helper scripts" {
   unset MODELS_CHECK_SCRIPTS_DIR
+  local codex cursor opencode
+  codex=$(real_allowlist "$REAL_HELPERS/run-codex-worker.sh")
+  cursor=$(real_allowlist "$REAL_HELPERS/run-cursor-worker.sh")
+  opencode=$(real_allowlist "$REAL_HELPERS/run-opencode-worker.sh")
+  [ -n "$codex" ] && [ -n "$cursor" ] && [ -n "$opencode" ]
   # shellcheck disable=SC2046
-  write_codex_cache $(allowlist_tokens "$REAL_HELPERS/run-codex-worker.sh")
+  write_codex_cache $(models_of "$codex")
   # shellcheck disable=SC2046
-  write_cursor_stub $(allowlist_tokens "$REAL_HELPERS/run-cursor-worker.sh")
+  write_cursor_stub $(models_of "$cursor")
   # shellcheck disable=SC2046
-  write_opencode_stub deepseek $(allowlist_tokens "$REAL_HELPERS/run-opencode-worker.sh")
+  write_opencode_stub deepseek $(models_of "$opencode")
   run_check
   [ "$status" -eq 0 ]
   [[ "$output" != *MISSING* ]]
-  [ "$(grep -c '^OK ' <<<"$output")" -ge 3 ]
+  [[ "$output" != *SKIP* ]]
+  [[ "$output" != *ERROR* ]]
+  local role model
+  while read -r role model; do
+    [[ "$output" == *"OK codex $role $model"* ]]
+  done <<<"$codex"
+  while read -r role model; do
+    [[ "$output" == *"OK cursor $role $model"* ]]
+  done <<<"$cursor"
+  while read -r role model; do
+    [[ "$output" == *"OK opencode/${model%%/*} $role $model"* ]]
+  done <<<"$opencode"
+}
+
+@test "a helper with no parsable declaration is an ERROR and exits 1" {
+  printf 'echo no allowlist here\n' >"$FIXTURE_DIR/helpers/run-codex-worker.sh"
+  run_check
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"ERROR codex could not extract allowlist from"* ]]
+  [[ "$output" != *"OK codex"* ]]
+}
+
+@test "a multi-line allowed_models array next to a single-line one is a partial-extraction ERROR" {
+  cat >"$FIXTURE_DIR/helpers/run-codex-worker.sh" <<'SH'
+case "$role" in
+implement) allowed_models=(gpt-6-luna) ;;
+review) allowed_models=(
+  gpt-6-sol
+  gpt-6.1-sol
+) ;;
+esac
+SH
+  run_check
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"ERROR codex could not extract allowlist from"* ]]
+  [[ "$output" != *"OK codex"* ]]
+}
+
+@test "an ERROR is reported even when the provider CLI is absent" {
+  printf 'echo no allowlist here\n' >"$FIXTURE_DIR/helpers/run-cursor-worker.sh"
+  run env AGMSG_CURSOR_BIN=/no/such/cursor-agent AGMSG_OPENCODE_BIN=/no/such/opencode bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"ERROR cursor could not extract allowlist"* ]]
+}
+
+@test "a cursor list with no model lines is SKIP, not MISSING, and exits 0" {
+  printf '#!/bin/sh\nprintf "Available models\\n\\n"\n' >"$FIXTURE_DIR/cursor-agent"
+  run_check
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"SKIP cursor live model list empty or unparseable"* ]]
+  [[ "$output" != *MISSING* ]]
+}
+
+@test "an empty codex models cache is SKIP, not MISSING, and exits 0" {
+  printf '{"fetched_at": "2026-01-02T03:04:05Z", "models": []}\n' >"$FIXTURE_DIR/codex/models_cache.json"
+  run_check
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"SKIP codex live model list empty or unparseable"* ]]
+  [[ "$output" != *MISSING* ]]
+}
+
+@test "codex cache entries without string slugs are SKIP, not MISSING" {
+  printf '{"models": [{"slug": null}, {"name": "x"}]}\n' >"$FIXTURE_DIR/codex/models_cache.json"
+  run_check
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"SKIP codex live model list empty or unparseable"* ]]
+  [[ "$output" != *MISSING* ]]
+}
+
+@test "an empty opencode list is SKIP, not MISSING, and exits 0" {
+  : >"$FIXTURE_DIR/opencode-deepseek.txt"
+  run_check
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"SKIP opencode/deepseek live model list empty or unparseable"* ]]
+  [[ "$output" != *MISSING* ]]
 }

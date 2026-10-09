@@ -21,7 +21,7 @@ teardown() {
 }
 
 # tier 表の Worker 行から opencode の model ID を取り出す
-# (実在する id は `deepseek/deepseek-v4-flash` のみ)
+# (実在する id は `deepseek/deepseek-flash` のみ)
 skill_opencode_models() {
   grep -E '^\| Worker ' "$SKILL" | grep -oE 'deepseek/[a-z0-9.-]+' | sort -u | tr '\n' ' '
 }
@@ -29,7 +29,7 @@ skill_opencode_models() {
 @test "implement with the allowed model passes the allowlist and fails later, not at validation" {
   # 許可された組合せは allowlist を通過し、存在しない opencode 本体で落ちる。
   # exit 2 (引数検証) ではないことが「通過した」ことの証拠になる。
-  run "$SCRIPT" implement "$PROJECT" deepseek/deepseek-v4-flash "$PAYLOAD"
+  run "$SCRIPT" implement "$PROJECT" deepseek/deepseek-flash "$PAYLOAD"
   [ "$status" -ne 2 ]
   [[ "$output" != *"not allowed for role"* ]]
 }
@@ -47,26 +47,26 @@ skill_opencode_models() {
 }
 
 @test "review role is rejected; opencode cannot be a reviewer" {
-  run "$SCRIPT" review "$PROJECT" deepseek/deepseek-v4-flash "$PAYLOAD"
+  run "$SCRIPT" review "$PROJECT" deepseek/deepseek-flash "$PAYLOAD"
   [ "$status" -eq 2 ]
 }
 
 @test "an unsupported role other than review is also rejected" {
-  run "$SCRIPT" plan "$PROJECT" deepseek/deepseek-v4-flash "$PAYLOAD"
+  run "$SCRIPT" plan "$PROJECT" deepseek/deepseek-flash "$PAYLOAD"
   [ "$status" -eq 2 ]
 }
 
 @test "AGMSG_OPENCODE_VARIANT accepts low, high, and max" {
   for variant in low high max; do
     run env AGMSG_OPENCODE_VARIANT="$variant" AGMSG_OPENCODE_SANDBOX_PROFILE_ONLY=1 \
-      "$SCRIPT" implement "$PROJECT" deepseek/deepseek-v4-flash "$PAYLOAD"
+      "$SCRIPT" implement "$PROJECT" deepseek/deepseek-flash "$PAYLOAD"
     [ "$status" -eq 0 ]
   done
 }
 
 @test "an unsupported AGMSG_OPENCODE_VARIANT is rejected" {
   run env AGMSG_OPENCODE_VARIANT=medium \
-    "$SCRIPT" implement "$PROJECT" deepseek/deepseek-v4-flash "$PAYLOAD"
+    "$SCRIPT" implement "$PROJECT" deepseek/deepseek-flash "$PAYLOAD"
   [ "$status" -eq 2 ]
   [[ "$output" == *"AGMSG_OPENCODE_VARIANT"* ]]
 }
@@ -91,14 +91,14 @@ skill_opencode_models() {
 
 @test "the sandbox profile excludes ~/.local/share/opencode (the auth.json location)" {
   run env AGMSG_OPENCODE_SANDBOX_PROFILE_ONLY=1 \
-    "$SCRIPT" implement "$PROJECT" deepseek/deepseek-v4-flash "$PAYLOAD"
+    "$SCRIPT" implement "$PROJECT" deepseek/deepseek-flash "$PAYLOAD"
   [ "$status" -eq 0 ]
   [[ "$output" != *".local/share/opencode"* ]]
 }
 
 @test "the sandbox profile allows /dev, tmp, runtime_dir, agmsg state, and the project" {
   run env AGMSG_OPENCODE_SANDBOX_PROFILE_ONLY=1 \
-    "$SCRIPT" implement "$PROJECT" deepseek/deepseek-v4-flash "$PAYLOAD"
+    "$SCRIPT" implement "$PROJECT" deepseek/deepseek-flash "$PAYLOAD"
   [ "$status" -eq 0 ]
   [[ "$output" == *'(subpath "/dev")'* ]]
   [[ "$output" == *"agmsg"* ]]
@@ -107,6 +107,6 @@ skill_opencode_models() {
 
 @test "AGMSG_OPENCODE_SANDBOX_PROFILE_ONLY does not require opencode or sandbox-exec" {
   run env AGMSG_OPENCODE_SANDBOX_PROFILE_ONLY=1 AGMSG_OPENCODE_BIN=/no/such/opencode \
-    "$SCRIPT" implement "$PROJECT" deepseek/deepseek-v4-flash "$PAYLOAD"
+    "$SCRIPT" implement "$PROJECT" deepseek/deepseek-flash "$PAYLOAD"
   [ "$status" -eq 0 ]
 }

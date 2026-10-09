@@ -24,9 +24,9 @@ if [[ "$role" != implement ]]; then
 fi
 
 # 正本は orchestrator-worker の tier 表 Worker 行。opencode 側は
-# deepseek/deepseek-v4-flash の1つだけを許可する。tests/run-opencode-worker.bats
+# deepseek/deepseek-flash の1つだけを許可する。tests/run-opencode-worker.bats
 # の drift テストがこの1行と tier 表の集合一致を検証する。
-allowed_models=(deepseek/deepseek-v4-flash)
+allowed_models=(deepseek/deepseek-flash)
 
 model_allowed=0
 for allowed in "${allowed_models[@]}"; do
