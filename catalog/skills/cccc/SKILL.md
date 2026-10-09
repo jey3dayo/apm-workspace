@@ -33,8 +33,10 @@ description: Use when measuring function-level Cognitive or Cyclomatic Complexit
 4. `excl.json` の `files[].functions[]`（`name` / `kind` / `line` / `cognitive` / `cyclomatic`）から triage 対象を出す。`--top-cognitive` を付けると出力の形が `{metric, top[], summary}` に変わるので、全件の集計には付けない。
 
    ```bash
-   jq '[.files[] | .path as $p | .functions[] | select(.cognitive > 15) | {path: $p, name, line, cognitive, cyclomatic}]' tmp/cccc/excl.json
+   jq '[.files[] | .path as $p | .functions[] | recurse(.children[]?) | select(.cognitive > 15) | {path: $p, name, line, cognitive, cyclomatic}]' tmp/cccc/excl.json
    ```
+
+   入れ子の関数（arrow、callback、内側の `function`）は親に加算されず、`children[]` に別に入る。`recurse` を外すとこれらを取りこぼす
 
    完了条件: この出力の全件を、下の「読み方」の分類（本物 / ノイズ / 誤判定 / テスト）に振り分け、分類ごとの件数と各件の根拠を報告している
 
