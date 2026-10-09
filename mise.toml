@@ -84,6 +84,10 @@ description = "Summarize apm.lock.yaml changes against a git ref (resolved commi
 run = "bash ./scripts/lock-diff.sh"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/lock-diff.ps1"
 
+[tasks."models:check"]
+description = "Compare agmsg-delegation helper model allowlists with each provider's live model list (calls provider CLIs over the network); read-only"
+run = "bash ./scripts/models-check.sh"
+
 # ========================================
 # Aggregation Tasks
 # ========================================

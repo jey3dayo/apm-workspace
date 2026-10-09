@@ -28,6 +28,8 @@ description: >-
 
 「Orchestrator」は役ではなく機能。表の Steward / Architect のうち、後述の許可条件を満たす側が担う。Terra は Architect・Reviewer・Worker の昇格に就く。`gpt-5.6-terra` が terra の現行版で、Sol より安価な長文脈選択肢である。opencode は Worker 専用で、implement 以外の役には就けない（review も含む）。cursor は Worker と Reviewer の両方に就けるが、Steward / Architect には就けない（Orchestrator 機能を担えない）。
 
+tier 表と helper の allowlist が provider の現行モデル一覧とずれていないかは `~/.apm` の `mise run models:check` で確認する（MISSING は provider の一覧から消えたモデル、NEWER は同系列の新しい版で、どちらも tier 見直しの合図）。
+
 Codex の Architect / Reviewer と、難度で昇格する Worker には `gpt-6.1-sol` を推奨する。アカウントや client で利用できない場合、または応答前に `server_overloaded` が返る場合は、skill 起因と判断せず、利用可能なら model picker / 設定で旧版 `gpt-6-sol` を明示選択して再試行する。自動 alias や fallback は行わない。利用可能モデルはアカウントと client により異なるため、[公式モデル一覧](https://learn.chatgpt.com/docs/models)を参照する。
 
 Reviewer 既定の範囲: cursor reviewer が既定になるのはユーザーが cursor 経路を明示したときだけである。review 外注の全体既定は下記「Reviewer の tier」のとおり Codex sol である。
