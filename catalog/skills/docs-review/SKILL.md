@@ -9,6 +9,8 @@ Decide which high-signal entrypoint documents drifted from the change, then prop
 
 ## Workflow
 
+Hand steps 1–4 to a subagent (Claude Code: the Agent tool with `model: sonnet`): it reads every entrypoint document, which is the expensive part, and the routing table below keeps the judgment bounded. Pass it the user's request and the change summary, since it cannot see the conversation. It returns the step 4 table and never edits. The parent session checks the `update` and `ask` rows against the documents, shows the table, and runs step 5 itself after confirmation.
+
 ### 1. Understand the Change
 
 Start from the newest concrete evidence: user request, `git status` / `git diff`, files changed by the current task, and related config, routes, commands, screens, or workflows.

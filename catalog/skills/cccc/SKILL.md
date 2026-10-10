@@ -9,6 +9,8 @@ description: Use when measuring function-level Cognitive or Cyclomatic Complexit
 
 ## 実行
 
+手順 1〜4 はサブエージェント（Claude Code では Agent tool の `model: sonnet`）へ渡す。手順 4 の分類は「読み方」の規則に当てはめる判断で、根拠の確認にコードを読むため、haiku ではなく sonnet にする。返させるのは `tmp/cccc/` のパス、`parse_error_count`、手順 3 の完了条件の結果、分類表と各件の根拠。元のセッションは根拠を抜き取りで確かめてから報告し、「採用判断」はユーザーとの会話で扱う。
+
 1. バイナリが無ければ `mise x github:moznion/cccc@1.8.0 -- cccc ...` で一時実行する（以降の `cccc` もこの形に置き換える）。完全な版指定は mise の `minimum_release_age` に掛からない
 2. 出力は `tmp/cccc/` に置き、まず除外なしで全体を見る。`cccc.toml` は cwd から親方向に自動で読まれ、その `exclude` が知らないうちに効くので、基準の実行には `--no-config` を付ける。
 
