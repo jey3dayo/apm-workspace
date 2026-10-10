@@ -46,6 +46,10 @@ pre-commit:
         bash -n scripts/apm-workspace.sh
         pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 help >/dev/null
 
+    - name: jactionlint
+      glob: ".github/workflows/*.{yml,yaml}"
+      run: mise exec -- jactionlint {staged_files}
+
     - name: shell-syntax
       glob: "scripts/*.sh"
       run: bash -n {staged_files}

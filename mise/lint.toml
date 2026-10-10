@@ -5,6 +5,11 @@ hide = true
 run = "fd -e yml -e yaml --exclude apm.lock.yaml -X yamllint"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e yml -e yaml --exclude apm.lock.yaml -X yamllint\""
 
+["lint:actions"]
+description = "Lint GitHub Actions workflows with jactionlint"
+hide = true
+run = "jactionlint"
+
 ["lint:frontmatter"]
 description = "Validate YAML frontmatter in the managed catalog (agents/skills/commands/rules)"
 hide = true

@@ -15,6 +15,7 @@ node = "26"
 "aqua:BurntSushi/ripgrep" = "15.2.0"
 "aqua:bats-core/bats-core" = "1.14.0"
 fd = "10.5.0"
+"github:jdx/jactionlint" = "2.1.0"
 lefthook = "2.1.12"
 "pipx:apm-cli" = "0.31.0"
 "pipx:yamllint" = "1.38.0"
@@ -98,6 +99,7 @@ description = "Run lightweight pre-deploy checks for the ~/.apm workspace"
 depends = [
   "format:check",
   "lint:yaml",
+  "lint:actions",
   "lint:frontmatter",
   "lint:catalog-leaks",
   "lint:skill-inventory",
