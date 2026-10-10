@@ -53,7 +53,7 @@ dependencies:
         - agentation
         - agentation-self-driving
     - git: emilkowalski/skills
-      ref: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
+      ref: e8a175de22ae1e49370fc144c1f3bb9aeedf988d
       skills:
         - apple-design
         - emil-design-eng
@@ -70,12 +70,12 @@ dependencies:
         - improve-ui
     - Jakubantalik/transitions-dev/skills/transitions-dev#038b0bdc75375c2beed51d1e824c98cdc7b86f8c
     - git: nextlevelbuilder/ui-ux-pro-max-skill
-      ref: 4aad0584d92131626b16d4ff4d77f0455385013c
+      ref: 50d8a7de0900119855614541f15a1a616691eb33
       skills:
         - ui-ux-pro-max
 
     # --- browser / analysis ---
-    - browser-use/browser-harness#afbcc381b963040c19627d788e40c7e7663171ee
+    - browser-use/browser-harness#dbf0e4f3a37ebc31aaeaf9d378ab1760b5776c15
     - openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431
     - tt-a1i/archify/archify#58ab0b98d2d0def8e49dced705c7b566936723ec
 

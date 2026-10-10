@@ -1,5 +1,5 @@
 lockfile_version: '2'
-generated_at: '2026-10-10T13:29:31.915915+00:00'
+generated_at: '2026-10-10T13:56:44.632387+00:00'
 apm_version: 0.31.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -116,8 +116,8 @@ dependencies:
 - repo_url: browser-use/browser-harness
   name: browser-harness
   host: github.com
-  resolved_commit: afbcc381b963040c19627d788e40c7e7663171ee
-  resolved_ref: afbcc381b963040c19627d788e40c7e7663171ee
+  resolved_commit: dbf0e4f3a37ebc31aaeaf9d378ab1760b5776c15
+  resolved_ref: dbf0e4f3a37ebc31aaeaf9d378ab1760b5776c15
   version: 0.1.0
   package_type: marketplace_plugin
   deployed_files:
@@ -132,7 +132,7 @@ dependencies:
     .agents/skills/browser-harness/references/install.md: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
     .claude/skills/browser-harness/SKILL.md: sha256:9e25a96375a0e120c16b76ea9d0a57c2fb7a5765813f89d5b9bcdc6dba6ea175
     .claude/skills/browser-harness/references/install.md: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
-  content_hash: sha256:f9f0d238d1f8035c1000f7149ad36c745660b800498efbea695aaf605a49be90
+  content_hash: sha256:9e5838e21b3b84b955592ef44bfe8198d324db16f68291a74075d4b795383d39
   declared_license: MIT
 - repo_url: caad-develop/claude-code-marketplace
   name: perman-aws-vault
@@ -319,9 +319,9 @@ dependencies:
 - repo_url: emilkowalski/skills
   name: skills
   host: github.com
-  resolved_commit: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
-  resolved_ref: d23d7f88a2e21c9e4b1418c7abe420f5c1052ba7
-  version: unknown
+  resolved_commit: e8a175de22ae1e49370fc144c1f3bb9aeedf988d
+  resolved_ref: e8a175de22ae1e49370fc144c1f3bb9aeedf988d
+  version: 0.0.0
   package_type: skill_bundle
   deployed_files:
   - .agents/skills/apple-design
@@ -351,23 +351,23 @@ dependencies:
   - .claude/skills/review-animations/SKILL.md
   - .claude/skills/review-animations/STANDARDS.md
   deployed_file_hashes:
-    .agents/skills/apple-design/SKILL.md: sha256:11840b24a11d7f94f39c6aaab074750ae4e4de4ef54ee4b1dd97e16ebd485e61
-    .agents/skills/emil-design-eng/SKILL.md: sha256:e71de849347050c2c573c1cf24d742d5a13459557ecffa6e562f08006f46b5b7
-    .agents/skills/find-animation-opportunities/SKILL.md: sha256:91c1243164057fbf824088d12faea937878a757a7ac653e8288b775e8b27b882
+    .agents/skills/apple-design/SKILL.md: sha256:77bb63b7043bb93aca2ff4ab040c249484eef35682bb6ff7163433c31d30adc7
+    .agents/skills/emil-design-eng/SKILL.md: sha256:ffbe68e6007fb42cb8149f089b400a1ca007d59ba23e8948e2be4476f3175939
+    .agents/skills/find-animation-opportunities/SKILL.md: sha256:d52a377819b84a71930f0c822cfe2849f40301605a2d5c7eccbfa3b257700df2
     .agents/skills/improve-animations/AUDIT.md: sha256:551c8473e20e5f4774680bc24d45e1c68e50992582720905c6b077756b7b5a55
     .agents/skills/improve-animations/PLAN-TEMPLATE.md: sha256:0a08ac8e23fd2082d7ffb86aeed7b789de77328c3cf874b16f1a755f2ef0a6ad
-    .agents/skills/improve-animations/SKILL.md: sha256:68f17bbc4671593d2f43dba26a679243e2153ba5f26965fb7d59df52842534ff
-    .agents/skills/review-animations/SKILL.md: sha256:61cf8ac0c4c8e1f63385298c546b16c65ca9aec34abddcd04e821c16712d671d
+    .agents/skills/improve-animations/SKILL.md: sha256:73962447464433476343e2c12cd08ab39cc99a9e5f3c118c5fb54ed897574ef6
+    .agents/skills/review-animations/SKILL.md: sha256:6ff590d29e436766135aa3d137be1fac2a867165c7257fc315b189361f1873af
     .agents/skills/review-animations/STANDARDS.md: sha256:e7d3605034acda54ca13e43aec9e64d65b53de20f75b11b8d694e373012fbe07
-    .claude/skills/apple-design/SKILL.md: sha256:11840b24a11d7f94f39c6aaab074750ae4e4de4ef54ee4b1dd97e16ebd485e61
-    .claude/skills/emil-design-eng/SKILL.md: sha256:e71de849347050c2c573c1cf24d742d5a13459557ecffa6e562f08006f46b5b7
-    .claude/skills/find-animation-opportunities/SKILL.md: sha256:91c1243164057fbf824088d12faea937878a757a7ac653e8288b775e8b27b882
+    .claude/skills/apple-design/SKILL.md: sha256:77bb63b7043bb93aca2ff4ab040c249484eef35682bb6ff7163433c31d30adc7
+    .claude/skills/emil-design-eng/SKILL.md: sha256:ffbe68e6007fb42cb8149f089b400a1ca007d59ba23e8948e2be4476f3175939
+    .claude/skills/find-animation-opportunities/SKILL.md: sha256:d52a377819b84a71930f0c822cfe2849f40301605a2d5c7eccbfa3b257700df2
     .claude/skills/improve-animations/AUDIT.md: sha256:551c8473e20e5f4774680bc24d45e1c68e50992582720905c6b077756b7b5a55
     .claude/skills/improve-animations/PLAN-TEMPLATE.md: sha256:0a08ac8e23fd2082d7ffb86aeed7b789de77328c3cf874b16f1a755f2ef0a6ad
-    .claude/skills/improve-animations/SKILL.md: sha256:68f17bbc4671593d2f43dba26a679243e2153ba5f26965fb7d59df52842534ff
-    .claude/skills/review-animations/SKILL.md: sha256:61cf8ac0c4c8e1f63385298c546b16c65ca9aec34abddcd04e821c16712d671d
+    .claude/skills/improve-animations/SKILL.md: sha256:73962447464433476343e2c12cd08ab39cc99a9e5f3c118c5fb54ed897574ef6
+    .claude/skills/review-animations/SKILL.md: sha256:6ff590d29e436766135aa3d137be1fac2a867165c7257fc315b189361f1873af
     .claude/skills/review-animations/STANDARDS.md: sha256:e7d3605034acda54ca13e43aec9e64d65b53de20f75b11b8d694e373012fbe07
-  content_hash: sha256:071c5ca2527b9ad32a3ab4c86ff284f0024cb62790f530f0d23ea32ad8616323
+  content_hash: sha256:d37e253fb640f51d061c8d85ac68d3b0da3f4b6ca784534fb81425e9c84be788
   skill_subset:
   - apple-design
   - emil-design-eng
@@ -4736,8 +4736,8 @@ dependencies:
 - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
   name: ui-ux-pro-max
   host: github.com
-  resolved_commit: 4aad0584d92131626b16d4ff4d77f0455385013c
-  resolved_ref: 4aad0584d92131626b16d4ff4d77f0455385013c
+  resolved_commit: 50d8a7de0900119855614541f15a1a616691eb33
+  resolved_ref: 50d8a7de0900119855614541f15a1a616691eb33
   version: 2.13.0
   package_type: marketplace_plugin
   deployed_files:
@@ -4892,7 +4892,7 @@ dependencies:
   deployed_file_hashes:
     .agents/skills/ui-ux-pro-max/SKILL.md: sha256:ea087c341bfb5b23195c7302027268ede86da802554c18a5c4896a6017b439f9
     .agents/skills/ui-ux-pro-max/data/app-interface.csv: sha256:331e7cf2c0b222d80c566c5f255c63cb339f65bfd02e471a720f28e4864a9f08
-    .agents/skills/ui-ux-pro-max/data/catalog-summary.json: sha256:a257ccd1f85ff5e59f566a069d4c8ba91c90db3f88fc6bc7323a1cb4e9e37421
+    .agents/skills/ui-ux-pro-max/data/catalog-summary.json: sha256:6638da97231c07fb5cef3cd9d3ce483ca7b2f9748980f8c27490eb03968d8894
     .agents/skills/ui-ux-pro-max/data/charts.csv: sha256:4115cf1120680f2cedef0676cb648f30c7ef4699e2a947535d4113e71ed3b12a
     .agents/skills/ui-ux-pro-max/data/colors.csv: sha256:8162429222bce22df62b564085946a30d07cc9722c58d0a3a494bd0d1d00841c
     .agents/skills/ui-ux-pro-max/data/data-provenance.json: sha256:e82fb33ed49375a300e93d9c11ccd1c1493c999e84ee7ee295e527634786e2e0
@@ -4913,14 +4913,14 @@ dependencies:
     .agents/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv: sha256:699de218b286948eaec7d15767b6e1350ee299167e49bf476d82e3ff58724e0a
     .agents/skills/ui-ux-pro-max/data/stacks/laravel.csv: sha256:854ea4daa5fc61292d22235ad33b49ba3fe22423c3de8d3cb03758ffed3b59f9
     .agents/skills/ui-ux-pro-max/data/stacks/nextjs.csv: sha256:ecd2c27b2ea0127d203ae726060efcdd7335b5e83f96b99e4f3befbbfeebd5a4
-    .agents/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv: sha256:c36ee8470926b4a0748d241363c71664c9969c2edbc62f7f72de0db73880fac6
+    .agents/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv: sha256:fce682a338cfcdbf35d318d20e5befbe7b5d81b05abc37f87677a6d9cde84dc6
     .agents/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv: sha256:3d9b54ed2d151bd9c86e9e5609b8a6f88a00c4c52fa601a30af96c49b2c4d176
     .agents/skills/ui-ux-pro-max/data/stacks/react-native.csv: sha256:ba31dd9c0c04da6bc02a74448bf121f9c0728ae5ba3b4d47b487778b0a1135b5
-    .agents/skills/ui-ux-pro-max/data/stacks/react.csv: sha256:2d2b9c198e875106a30f7ee68341a9ee0033cad60a7e130cf23152783e08aeda
+    .agents/skills/ui-ux-pro-max/data/stacks/react.csv: sha256:4dd176a9787e5c6306b5df94158d75955adcdc6edab41ce5286641a5842303c1
     .agents/skills/ui-ux-pro-max/data/stacks/shadcn.csv: sha256:e56cfde5b74907836ac3582a4779d5b7f3d206a702ab81b8669a1b668c3eeb51
     .agents/skills/ui-ux-pro-max/data/stacks/svelte.csv: sha256:f6e379ba802941ba26b01d4ffbe3cd39120f2587659a1d93851c707f66bc13db
     .agents/skills/ui-ux-pro-max/data/stacks/swiftui.csv: sha256:bdd9231ff3ad658f4e7c063e1eb49df2fd09ac8d90631a86df899b39833b9623
-    .agents/skills/ui-ux-pro-max/data/stacks/threejs.csv: sha256:97542e0ba34915a0ff7578be20e1619495df47c95c8c1c39b83e3785e1de771f
+    .agents/skills/ui-ux-pro-max/data/stacks/threejs.csv: sha256:155d583b9c64da0df4b6c6cb060c02eab222505e0734d6353da02c9e2b5d982b
     .agents/skills/ui-ux-pro-max/data/stacks/uno.csv: sha256:a0474363e4225b5367214d5675fd3e075f137026f9500f0d04357882ef4f6d48
     .agents/skills/ui-ux-pro-max/data/stacks/uwp.csv: sha256:c409f08c1fbba1f1029f1acaa554e7b4471cc85517a5751c9f2e62465badcd5c
     .agents/skills/ui-ux-pro-max/data/stacks/vue.csv: sha256:b655f1ebb9dff2652d15981f31b1784c8a6d4759efd2815a14f3088257569f95
@@ -4932,8 +4932,8 @@ dependencies:
     .agents/skills/ui-ux-pro-max/data/ux-guidelines.csv: sha256:ff81ec613f70ba9fc3fcce52dbe4ae35d44b2079dbe6dc066d2d6e38c28facd5
     .agents/skills/ui-ux-pro-max/references/pro-rules.md: sha256:d28442d61c310b49c054a4ea736f89fb3008beebdbbc38c4b3a540b8f7fadf23
     .agents/skills/ui-ux-pro-max/references/quick-reference.md: sha256:0609bc7c89dacb40472465d8fc14257b56b2c43439660fc8d6fa3b8c022e1876
-    .agents/skills/ui-ux-pro-max/scripts/core.py: sha256:e544826963efefce3c59b65e18d83d92a5baf571f05458025bf1fa9021eced42
-    .agents/skills/ui-ux-pro-max/scripts/design_system.py: sha256:6a94743c3362c9c7e6d1450b94f4014d9ea752e7b4e151f6f0bdb217e0544bf7
+    .agents/skills/ui-ux-pro-max/scripts/core.py: sha256:c3be4b23e7150e6b45095213158cfa3c8ad96502f01dde3f6ffff9de64a4f481
+    .agents/skills/ui-ux-pro-max/scripts/design_system.py: sha256:e7d1c94c4b2eada17c5551157668362659ccf9626d34dbd58e68142410f90103
     .agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py: sha256:b8bac1af82aa280d3e06f00aabaeac4337e632996b07fed874e2b6ee6e9c5913
     .agents/skills/ui-ux-pro-max/scripts/search.py: sha256:d54e648fe0ec2932cac66684220cc17be4bd4b4eba1d23d3195d509d398db374
     .agents/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/google-api.json: sha256:22d8dc81a7d6827b7e8b64b53e7d184210fb9759e8e294e0d5133c81cc460176
@@ -4946,26 +4946,26 @@ dependencies:
     .agents/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/phosphor-package.json: sha256:500588c757d6de03e3d7e69b27a8b8b1f88ccf6bb0333e4c1e9b0d6a4f112475
     .agents/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/phosphor-react-exports.json: sha256:d79f2ee0afdbc2f87776733e145df3538a16a25d7c2fba0056bb48295dad0ded
     .agents/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/phosphor-react-package.json: sha256:1c57a1d76bcc0cdd3632d4c18b9c0e79576b4591df39831c9607e5d0eb4f2cec
-    .agents/skills/ui-ux-pro-max/scripts/tests/fixtures/relevance-baseline.json: sha256:38398452985116e74e31bd6bccca0f4decd1bbfe4eebc1ac99f7a1836baaf77f
+    .agents/skills/ui-ux-pro-max/scripts/tests/fixtures/relevance-baseline.json: sha256:0df200fc54c1cb97a52d6775e7f501509163cea8f8b73fd7268429bc1f835afe
     .agents/skills/ui-ux-pro-max/scripts/tests/fixtures/relevance-cases.json: sha256:e77d36eebbf6ddc2860946a02cdb659351da6c09f2688f1ed30939a418099646
-    .agents/skills/ui-ux-pro-max/scripts/tests/fixtures/relevance-thresholds.json: sha256:9d738e11c6b82fecc8d0946e7b38515518ded5ed3294a7eb19a021c4edb5b57d
+    .agents/skills/ui-ux-pro-max/scripts/tests/fixtures/relevance-thresholds.json: sha256:1fbe8623fe3e49c8d828139bca9df69043746e488e8bf09d93dfb9cbc31f5cef
     .agents/skills/ui-ux-pro-max/scripts/tests/test_catalog_refresh.py: sha256:3e2ca5d12702318f641ae62d0c14f22a3bcc84d84e79b863c0e947d475604adb
     .agents/skills/ui-ux-pro-max/scripts/tests/test_catalog_summary_line_endings.py: sha256:fa6ff09f0ec2c99013588c77397f5082dddebe8f467e94c5f8378ec9595f4989
     .agents/skills/ui-ux-pro-max/scripts/tests/test_core.py: sha256:3527fe2f4b852f69f07c17ddc0d615d9a6e025c924e45a33985579a94a8d2118
     .agents/skills/ui-ux-pro-max/scripts/tests/test_core_data_quality.py: sha256:3ffc6b4905c9ea26d7ac4527ab154d153584231aee71b2ae4bd017977fa09cc5
     .agents/skills/ui-ux-pro-max/scripts/tests/test_data_contracts.py: sha256:0360d6e10080c0bca214f2b0bbad582ba50702a542ce21013351aca54938df3a
-    .agents/skills/ui-ux-pro-max/scripts/tests/test_design_system_mode.py: sha256:517ba1ba6195c94811126d1162139c51aff77fc68c3e320c7bb6c1e89e76bc9b
+    .agents/skills/ui-ux-pro-max/scripts/tests/test_design_system_mode.py: sha256:95ad2c154349f7021f55a558f8dcdd71df1a24fcf531a4364a8e49526a0865ef
     .agents/skills/ui-ux-pro-max/scripts/tests/test_design_system_stack.py: sha256:83d09ffe8cfbf7b265f362129f061dfe8e5e167ce5db43adaead197cabc9ca38
-    .agents/skills/ui-ux-pro-max/scripts/tests/test_native_desktop_stack_freshness.py: sha256:904f90bc6d364763673fa6067d98a4227d535760fa8b6d26abe22208176997ca
+    .agents/skills/ui-ux-pro-max/scripts/tests/test_native_desktop_stack_freshness.py: sha256:3942845712b9a829323cd3568511483135f2a8c7cd79ccf61679da4b0f624dbb
     .agents/skills/ui-ux-pro-max/scripts/tests/test_relevance_evaluator.py: sha256:2fe56a4d6fe5fff15ff592274b0eeaba925146cefea6c0fa29d8f1b77c9aca1f
     .agents/skills/ui-ux-pro-max/scripts/tests/test_skill_script_paths.py: sha256:7cec24b94be771bc60bc84f8993e614bb16d4047930e1dd3d3bed91628311d44
     .agents/skills/ui-ux-pro-max/scripts/tests/test_style_taxonomy.py: sha256:cd14d0092e8a454d213aa104b53e4e70ba698491fa00fde9fdec5ca8a3d70011
     .agents/skills/ui-ux-pro-max/scripts/tests/test_text_layout_resilience.py: sha256:b51d32ee8a15505b87cb81957fb2d1b385e041e8beb4463c311d236bfd29ebd4
-    .agents/skills/ui-ux-pro-max/scripts/tests/test_web_stack_freshness.py: sha256:becc5fa40e7516613d4e9930f226aa483e3796090c17cb16542c93d1927e680d
+    .agents/skills/ui-ux-pro-max/scripts/tests/test_web_stack_freshness.py: sha256:74897571398585f27e2c35d09d81b0a531c8c774f4a2967e5e1b1d1b05a483d9
     .agents/skills/ui-ux-pro-max/scripts/validate_data.py: sha256:a599aa256049cf30954d1f164721b99e453eb7e4cb8241bcab2d5573e6cf58b8
     .claude/skills/ui-ux-pro-max/SKILL.md: sha256:ea087c341bfb5b23195c7302027268ede86da802554c18a5c4896a6017b439f9
     .claude/skills/ui-ux-pro-max/data/app-interface.csv: sha256:331e7cf2c0b222d80c566c5f255c63cb339f65bfd02e471a720f28e4864a9f08
-    .claude/skills/ui-ux-pro-max/data/catalog-summary.json: sha256:a257ccd1f85ff5e59f566a069d4c8ba91c90db3f88fc6bc7323a1cb4e9e37421
+    .claude/skills/ui-ux-pro-max/data/catalog-summary.json: sha256:6638da97231c07fb5cef3cd9d3ce483ca7b2f9748980f8c27490eb03968d8894
     .claude/skills/ui-ux-pro-max/data/charts.csv: sha256:4115cf1120680f2cedef0676cb648f30c7ef4699e2a947535d4113e71ed3b12a
     .claude/skills/ui-ux-pro-max/data/colors.csv: sha256:8162429222bce22df62b564085946a30d07cc9722c58d0a3a494bd0d1d00841c
     .claude/skills/ui-ux-pro-max/data/data-provenance.json: sha256:e82fb33ed49375a300e93d9c11ccd1c1493c999e84ee7ee295e527634786e2e0
@@ -4986,14 +4986,14 @@ dependencies:
     .claude/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv: sha256:699de218b286948eaec7d15767b6e1350ee299167e49bf476d82e3ff58724e0a
     .claude/skills/ui-ux-pro-max/data/stacks/laravel.csv: sha256:854ea4daa5fc61292d22235ad33b49ba3fe22423c3de8d3cb03758ffed3b59f9
     .claude/skills/ui-ux-pro-max/data/stacks/nextjs.csv: sha256:ecd2c27b2ea0127d203ae726060efcdd7335b5e83f96b99e4f3befbbfeebd5a4
-    .claude/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv: sha256:c36ee8470926b4a0748d241363c71664c9969c2edbc62f7f72de0db73880fac6
+    .claude/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv: sha256:fce682a338cfcdbf35d318d20e5befbe7b5d81b05abc37f87677a6d9cde84dc6
     .claude/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv: sha256:3d9b54ed2d151bd9c86e9e5609b8a6f88a00c4c52fa601a30af96c49b2c4d176
     .claude/skills/ui-ux-pro-max/data/stacks/react-native.csv: sha256:ba31dd9c0c04da6bc02a74448bf121f9c0728ae5ba3b4d47b487778b0a1135b5
-    .claude/skills/ui-ux-pro-max/data/stacks/react.csv: sha256:2d2b9c198e875106a30f7ee68341a9ee0033cad60a7e130cf23152783e08aeda
+    .claude/skills/ui-ux-pro-max/data/stacks/react.csv: sha256:4dd176a9787e5c6306b5df94158d75955adcdc6edab41ce5286641a5842303c1
     .claude/skills/ui-ux-pro-max/data/stacks/shadcn.csv: sha256:e56cfde5b74907836ac3582a4779d5b7f3d206a702ab81b8669a1b668c3eeb51
     .claude/skills/ui-ux-pro-max/data/stacks/svelte.csv: sha256:f6e379ba802941ba26b01d4ffbe3cd39120f2587659a1d93851c707f66bc13db
     .claude/skills/ui-ux-pro-max/data/stacks/swiftui.csv: sha256:bdd9231ff3ad658f4e7c063e1eb49df2fd09ac8d90631a86df899b39833b9623
-    .claude/skills/ui-ux-pro-max/data/stacks/threejs.csv: sha256:97542e0ba34915a0ff7578be20e1619495df47c95c8c1c39b83e3785e1de771f
+    .claude/skills/ui-ux-pro-max/data/stacks/threejs.csv: sha256:155d583b9c64da0df4b6c6cb060c02eab222505e0734d6353da02c9e2b5d982b
     .claude/skills/ui-ux-pro-max/data/stacks/uno.csv: sha256:a0474363e4225b5367214d5675fd3e075f137026f9500f0d04357882ef4f6d48
     .claude/skills/ui-ux-pro-max/data/stacks/uwp.csv: sha256:c409f08c1fbba1f1029f1acaa554e7b4471cc85517a5751c9f2e62465badcd5c
     .claude/skills/ui-ux-pro-max/data/stacks/vue.csv: sha256:b655f1ebb9dff2652d15981f31b1784c8a6d4759efd2815a14f3088257569f95
@@ -5005,8 +5005,8 @@ dependencies:
     .claude/skills/ui-ux-pro-max/data/ux-guidelines.csv: sha256:ff81ec613f70ba9fc3fcce52dbe4ae35d44b2079dbe6dc066d2d6e38c28facd5
     .claude/skills/ui-ux-pro-max/references/pro-rules.md: sha256:d28442d61c310b49c054a4ea736f89fb3008beebdbbc38c4b3a540b8f7fadf23
     .claude/skills/ui-ux-pro-max/references/quick-reference.md: sha256:0609bc7c89dacb40472465d8fc14257b56b2c43439660fc8d6fa3b8c022e1876
-    .claude/skills/ui-ux-pro-max/scripts/core.py: sha256:e544826963efefce3c59b65e18d83d92a5baf571f05458025bf1fa9021eced42
-    .claude/skills/ui-ux-pro-max/scripts/design_system.py: sha256:6a94743c3362c9c7e6d1450b94f4014d9ea752e7b4e151f6f0bdb217e0544bf7
+    .claude/skills/ui-ux-pro-max/scripts/core.py: sha256:c3be4b23e7150e6b45095213158cfa3c8ad96502f01dde3f6ffff9de64a4f481
+    .claude/skills/ui-ux-pro-max/scripts/design_system.py: sha256:e7d1c94c4b2eada17c5551157668362659ccf9626d34dbd58e68142410f90103
     .claude/skills/ui-ux-pro-max/scripts/reasoning_contract.py: sha256:b8bac1af82aa280d3e06f00aabaeac4337e632996b07fed874e2b6ee6e9c5913
     .claude/skills/ui-ux-pro-max/scripts/search.py: sha256:d54e648fe0ec2932cac66684220cc17be4bd4b4eba1d23d3195d509d398db374
     .claude/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/google-api.json: sha256:22d8dc81a7d6827b7e8b64b53e7d184210fb9759e8e294e0d5133c81cc460176
@@ -5019,24 +5019,24 @@ dependencies:
     .claude/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/phosphor-package.json: sha256:500588c757d6de03e3d7e69b27a8b8b1f88ccf6bb0333e4c1e9b0d6a4f112475
     .claude/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/phosphor-react-exports.json: sha256:d79f2ee0afdbc2f87776733e145df3538a16a25d7c2fba0056bb48295dad0ded
     .claude/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/phosphor-react-package.json: sha256:1c57a1d76bcc0cdd3632d4c18b9c0e79576b4591df39831c9607e5d0eb4f2cec
-    .claude/skills/ui-ux-pro-max/scripts/tests/fixtures/relevance-baseline.json: sha256:38398452985116e74e31bd6bccca0f4decd1bbfe4eebc1ac99f7a1836baaf77f
+    .claude/skills/ui-ux-pro-max/scripts/tests/fixtures/relevance-baseline.json: sha256:0df200fc54c1cb97a52d6775e7f501509163cea8f8b73fd7268429bc1f835afe
     .claude/skills/ui-ux-pro-max/scripts/tests/fixtures/relevance-cases.json: sha256:e77d36eebbf6ddc2860946a02cdb659351da6c09f2688f1ed30939a418099646
-    .claude/skills/ui-ux-pro-max/scripts/tests/fixtures/relevance-thresholds.json: sha256:9d738e11c6b82fecc8d0946e7b38515518ded5ed3294a7eb19a021c4edb5b57d
+    .claude/skills/ui-ux-pro-max/scripts/tests/fixtures/relevance-thresholds.json: sha256:1fbe8623fe3e49c8d828139bca9df69043746e488e8bf09d93dfb9cbc31f5cef
     .claude/skills/ui-ux-pro-max/scripts/tests/test_catalog_refresh.py: sha256:3e2ca5d12702318f641ae62d0c14f22a3bcc84d84e79b863c0e947d475604adb
     .claude/skills/ui-ux-pro-max/scripts/tests/test_catalog_summary_line_endings.py: sha256:fa6ff09f0ec2c99013588c77397f5082dddebe8f467e94c5f8378ec9595f4989
     .claude/skills/ui-ux-pro-max/scripts/tests/test_core.py: sha256:3527fe2f4b852f69f07c17ddc0d615d9a6e025c924e45a33985579a94a8d2118
     .claude/skills/ui-ux-pro-max/scripts/tests/test_core_data_quality.py: sha256:3ffc6b4905c9ea26d7ac4527ab154d153584231aee71b2ae4bd017977fa09cc5
     .claude/skills/ui-ux-pro-max/scripts/tests/test_data_contracts.py: sha256:0360d6e10080c0bca214f2b0bbad582ba50702a542ce21013351aca54938df3a
-    .claude/skills/ui-ux-pro-max/scripts/tests/test_design_system_mode.py: sha256:517ba1ba6195c94811126d1162139c51aff77fc68c3e320c7bb6c1e89e76bc9b
+    .claude/skills/ui-ux-pro-max/scripts/tests/test_design_system_mode.py: sha256:95ad2c154349f7021f55a558f8dcdd71df1a24fcf531a4364a8e49526a0865ef
     .claude/skills/ui-ux-pro-max/scripts/tests/test_design_system_stack.py: sha256:83d09ffe8cfbf7b265f362129f061dfe8e5e167ce5db43adaead197cabc9ca38
-    .claude/skills/ui-ux-pro-max/scripts/tests/test_native_desktop_stack_freshness.py: sha256:904f90bc6d364763673fa6067d98a4227d535760fa8b6d26abe22208176997ca
+    .claude/skills/ui-ux-pro-max/scripts/tests/test_native_desktop_stack_freshness.py: sha256:3942845712b9a829323cd3568511483135f2a8c7cd79ccf61679da4b0f624dbb
     .claude/skills/ui-ux-pro-max/scripts/tests/test_relevance_evaluator.py: sha256:2fe56a4d6fe5fff15ff592274b0eeaba925146cefea6c0fa29d8f1b77c9aca1f
     .claude/skills/ui-ux-pro-max/scripts/tests/test_skill_script_paths.py: sha256:7cec24b94be771bc60bc84f8993e614bb16d4047930e1dd3d3bed91628311d44
     .claude/skills/ui-ux-pro-max/scripts/tests/test_style_taxonomy.py: sha256:cd14d0092e8a454d213aa104b53e4e70ba698491fa00fde9fdec5ca8a3d70011
     .claude/skills/ui-ux-pro-max/scripts/tests/test_text_layout_resilience.py: sha256:b51d32ee8a15505b87cb81957fb2d1b385e041e8beb4463c311d236bfd29ebd4
-    .claude/skills/ui-ux-pro-max/scripts/tests/test_web_stack_freshness.py: sha256:becc5fa40e7516613d4e9930f226aa483e3796090c17cb16542c93d1927e680d
+    .claude/skills/ui-ux-pro-max/scripts/tests/test_web_stack_freshness.py: sha256:74897571398585f27e2c35d09d81b0a531c8c774f4a2967e5e1b1d1b05a483d9
     .claude/skills/ui-ux-pro-max/scripts/validate_data.py: sha256:a599aa256049cf30954d1f164721b99e453eb7e4cb8241bcab2d5573e6cf58b8
-  content_hash: sha256:1e8c3a8e237c63a3c5a4f7f7386636d55a76e54063c2df09d17ceefb5ba6cb44
+  content_hash: sha256:3857207d8af246cffb093257dc8508cbda4cf61e4a07db9e572d3da951c7dedc
   skill_subset:
   - ui-ux-pro-max
   declared_license: MIT
@@ -13096,7 +13096,7 @@ deployments:
   owners:
   - emilkowalski/skills
   active_owner: emilkowalski/skills
-  content_hash: sha256:11840b24a11d7f94f39c6aaab074750ae4e4de4ef54ee4b1dd97e16ebd485e61
+  content_hash: sha256:77bb63b7043bb93aca2ff4ab040c249484eef35682bb6ff7163433c31d30adc7
 - kind: project-relative
   target: claude
   value: .claude/skills/archify
@@ -16372,7 +16372,7 @@ deployments:
   owners:
   - emilkowalski/skills
   active_owner: emilkowalski/skills
-  content_hash: sha256:e71de849347050c2c573c1cf24d742d5a13459557ecffa6e562f08006f46b5b7
+  content_hash: sha256:ffbe68e6007fb42cb8149f089b400a1ca007d59ba23e8948e2be4476f3175939
 - kind: project-relative
   target: claude
   value: .claude/skills/find-animation-opportunities
@@ -16390,7 +16390,7 @@ deployments:
   owners:
   - emilkowalski/skills
   active_owner: emilkowalski/skills
-  content_hash: sha256:91c1243164057fbf824088d12faea937878a757a7ac653e8288b775e8b27b882
+  content_hash: sha256:d52a377819b84a71930f0c822cfe2849f40301605a2d5c7eccbfa3b257700df2
 - kind: project-relative
   target: claude
   value: .claude/skills/fixing-accessibility
@@ -16831,7 +16831,7 @@ deployments:
   owners:
   - emilkowalski/skills
   active_owner: emilkowalski/skills
-  content_hash: sha256:68f17bbc4671593d2f43dba26a679243e2153ba5f26965fb7d59df52842534ff
+  content_hash: sha256:73962447464433476343e2c12cd08ab39cc99a9e5f3c118c5fb54ed897574ef6
 - kind: project-relative
   target: claude
   value: .claude/skills/improve-codebase-architecture
@@ -19855,7 +19855,7 @@ deployments:
   owners:
   - emilkowalski/skills
   active_owner: emilkowalski/skills
-  content_hash: sha256:61cf8ac0c4c8e1f63385298c546b16c65ca9aec34abddcd04e821c16712d671d
+  content_hash: sha256:6ff590d29e436766135aa3d137be1fac2a867165c7257fc315b189361f1873af
 - kind: project-relative
   target: claude
   value: .claude/skills/review-animations/STANDARDS.md
@@ -20476,7 +20476,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:a257ccd1f85ff5e59f566a069d4c8ba91c90db3f88fc6bc7323a1cb4e9e37421
+  content_hash: sha256:6638da97231c07fb5cef3cd9d3ce483ca7b2f9748980f8c27490eb03968d8894
 - kind: project-relative
   target: claude
   value: .claude/skills/ui-ux-pro-max/data/charts.csv
@@ -20665,7 +20665,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:c36ee8470926b4a0748d241363c71664c9969c2edbc62f7f72de0db73880fac6
+  content_hash: sha256:fce682a338cfcdbf35d318d20e5befbe7b5d81b05abc37f87677a6d9cde84dc6
 - kind: project-relative
   target: claude
   value: .claude/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv
@@ -20692,7 +20692,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:2d2b9c198e875106a30f7ee68341a9ee0033cad60a7e130cf23152783e08aeda
+  content_hash: sha256:4dd176a9787e5c6306b5df94158d75955adcdc6edab41ce5286641a5842303c1
 - kind: project-relative
   target: claude
   value: .claude/skills/ui-ux-pro-max/data/stacks/shadcn.csv
@@ -20728,7 +20728,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:97542e0ba34915a0ff7578be20e1619495df47c95c8c1c39b83e3785e1de771f
+  content_hash: sha256:155d583b9c64da0df4b6c6cb060c02eab222505e0734d6353da02c9e2b5d982b
 - kind: project-relative
   target: claude
   value: .claude/skills/ui-ux-pro-max/data/stacks/uno.csv
@@ -20836,7 +20836,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:e544826963efefce3c59b65e18d83d92a5baf571f05458025bf1fa9021eced42
+  content_hash: sha256:c3be4b23e7150e6b45095213158cfa3c8ad96502f01dde3f6ffff9de64a4f481
 - kind: project-relative
   target: claude
   value: .claude/skills/ui-ux-pro-max/scripts/design_system.py
@@ -20845,7 +20845,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:6a94743c3362c9c7e6d1450b94f4014d9ea752e7b4e151f6f0bdb217e0544bf7
+  content_hash: sha256:e7d1c94c4b2eada17c5551157668362659ccf9626d34dbd58e68142410f90103
 - kind: project-relative
   target: claude
   value: .claude/skills/ui-ux-pro-max/scripts/reasoning_contract.py
@@ -20962,7 +20962,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:38398452985116e74e31bd6bccca0f4decd1bbfe4eebc1ac99f7a1836baaf77f
+  content_hash: sha256:0df200fc54c1cb97a52d6775e7f501509163cea8f8b73fd7268429bc1f835afe
 - kind: project-relative
   target: claude
   value: .claude/skills/ui-ux-pro-max/scripts/tests/fixtures/relevance-cases.json
@@ -20980,7 +20980,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:9d738e11c6b82fecc8d0946e7b38515518ded5ed3294a7eb19a021c4edb5b57d
+  content_hash: sha256:1fbe8623fe3e49c8d828139bca9df69043746e488e8bf09d93dfb9cbc31f5cef
 - kind: project-relative
   target: claude
   value: .claude/skills/ui-ux-pro-max/scripts/tests/test_catalog_refresh.py
@@ -21034,7 +21034,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:517ba1ba6195c94811126d1162139c51aff77fc68c3e320c7bb6c1e89e76bc9b
+  content_hash: sha256:95ad2c154349f7021f55a558f8dcdd71df1a24fcf531a4364a8e49526a0865ef
 - kind: project-relative
   target: claude
   value: .claude/skills/ui-ux-pro-max/scripts/tests/test_design_system_stack.py
@@ -21052,7 +21052,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:904f90bc6d364763673fa6067d98a4227d535760fa8b6d26abe22208176997ca
+  content_hash: sha256:3942845712b9a829323cd3568511483135f2a8c7cd79ccf61679da4b0f624dbb
 - kind: project-relative
   target: claude
   value: .claude/skills/ui-ux-pro-max/scripts/tests/test_relevance_evaluator.py
@@ -21097,7 +21097,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:becc5fa40e7516613d4e9930f226aa483e3796090c17cb16542c93d1927e680d
+  content_hash: sha256:74897571398585f27e2c35d09d81b0a531c8c774f4a2967e5e1b1d1b05a483d9
 - kind: project-relative
   target: claude
   value: .claude/skills/ui-ux-pro-max/scripts/validate_data.py
@@ -27739,7 +27739,7 @@ deployments:
   owners:
   - emilkowalski/skills
   active_owner: emilkowalski/skills
-  content_hash: sha256:11840b24a11d7f94f39c6aaab074750ae4e4de4ef54ee4b1dd97e16ebd485e61
+  content_hash: sha256:77bb63b7043bb93aca2ff4ab040c249484eef35682bb6ff7163433c31d30adc7
 - kind: project-relative
   target: codex
   value: .agents/skills/archify
@@ -31015,7 +31015,7 @@ deployments:
   owners:
   - emilkowalski/skills
   active_owner: emilkowalski/skills
-  content_hash: sha256:e71de849347050c2c573c1cf24d742d5a13459557ecffa6e562f08006f46b5b7
+  content_hash: sha256:ffbe68e6007fb42cb8149f089b400a1ca007d59ba23e8948e2be4476f3175939
 - kind: project-relative
   target: codex
   value: .agents/skills/find-animation-opportunities
@@ -31033,7 +31033,7 @@ deployments:
   owners:
   - emilkowalski/skills
   active_owner: emilkowalski/skills
-  content_hash: sha256:91c1243164057fbf824088d12faea937878a757a7ac653e8288b775e8b27b882
+  content_hash: sha256:d52a377819b84a71930f0c822cfe2849f40301605a2d5c7eccbfa3b257700df2
 - kind: project-relative
   target: codex
   value: .agents/skills/fixing-accessibility
@@ -31474,7 +31474,7 @@ deployments:
   owners:
   - emilkowalski/skills
   active_owner: emilkowalski/skills
-  content_hash: sha256:68f17bbc4671593d2f43dba26a679243e2153ba5f26965fb7d59df52842534ff
+  content_hash: sha256:73962447464433476343e2c12cd08ab39cc99a9e5f3c118c5fb54ed897574ef6
 - kind: project-relative
   target: codex
   value: .agents/skills/improve-codebase-architecture
@@ -34498,7 +34498,7 @@ deployments:
   owners:
   - emilkowalski/skills
   active_owner: emilkowalski/skills
-  content_hash: sha256:61cf8ac0c4c8e1f63385298c546b16c65ca9aec34abddcd04e821c16712d671d
+  content_hash: sha256:6ff590d29e436766135aa3d137be1fac2a867165c7257fc315b189361f1873af
 - kind: project-relative
   target: codex
   value: .agents/skills/review-animations/STANDARDS.md
@@ -35119,7 +35119,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:a257ccd1f85ff5e59f566a069d4c8ba91c90db3f88fc6bc7323a1cb4e9e37421
+  content_hash: sha256:6638da97231c07fb5cef3cd9d3ce483ca7b2f9748980f8c27490eb03968d8894
 - kind: project-relative
   target: codex
   value: .agents/skills/ui-ux-pro-max/data/charts.csv
@@ -35308,7 +35308,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:c36ee8470926b4a0748d241363c71664c9969c2edbc62f7f72de0db73880fac6
+  content_hash: sha256:fce682a338cfcdbf35d318d20e5befbe7b5d81b05abc37f87677a6d9cde84dc6
 - kind: project-relative
   target: codex
   value: .agents/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv
@@ -35335,7 +35335,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:2d2b9c198e875106a30f7ee68341a9ee0033cad60a7e130cf23152783e08aeda
+  content_hash: sha256:4dd176a9787e5c6306b5df94158d75955adcdc6edab41ce5286641a5842303c1
 - kind: project-relative
   target: codex
   value: .agents/skills/ui-ux-pro-max/data/stacks/shadcn.csv
@@ -35371,7 +35371,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:97542e0ba34915a0ff7578be20e1619495df47c95c8c1c39b83e3785e1de771f
+  content_hash: sha256:155d583b9c64da0df4b6c6cb060c02eab222505e0734d6353da02c9e2b5d982b
 - kind: project-relative
   target: codex
   value: .agents/skills/ui-ux-pro-max/data/stacks/uno.csv
@@ -35479,7 +35479,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:e544826963efefce3c59b65e18d83d92a5baf571f05458025bf1fa9021eced42
+  content_hash: sha256:c3be4b23e7150e6b45095213158cfa3c8ad96502f01dde3f6ffff9de64a4f481
 - kind: project-relative
   target: codex
   value: .agents/skills/ui-ux-pro-max/scripts/design_system.py
@@ -35488,7 +35488,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:6a94743c3362c9c7e6d1450b94f4014d9ea752e7b4e151f6f0bdb217e0544bf7
+  content_hash: sha256:e7d1c94c4b2eada17c5551157668362659ccf9626d34dbd58e68142410f90103
 - kind: project-relative
   target: codex
   value: .agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py
@@ -35605,7 +35605,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:38398452985116e74e31bd6bccca0f4decd1bbfe4eebc1ac99f7a1836baaf77f
+  content_hash: sha256:0df200fc54c1cb97a52d6775e7f501509163cea8f8b73fd7268429bc1f835afe
 - kind: project-relative
   target: codex
   value: .agents/skills/ui-ux-pro-max/scripts/tests/fixtures/relevance-cases.json
@@ -35623,7 +35623,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:9d738e11c6b82fecc8d0946e7b38515518ded5ed3294a7eb19a021c4edb5b57d
+  content_hash: sha256:1fbe8623fe3e49c8d828139bca9df69043746e488e8bf09d93dfb9cbc31f5cef
 - kind: project-relative
   target: codex
   value: .agents/skills/ui-ux-pro-max/scripts/tests/test_catalog_refresh.py
@@ -35677,7 +35677,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:517ba1ba6195c94811126d1162139c51aff77fc68c3e320c7bb6c1e89e76bc9b
+  content_hash: sha256:95ad2c154349f7021f55a558f8dcdd71df1a24fcf531a4364a8e49526a0865ef
 - kind: project-relative
   target: codex
   value: .agents/skills/ui-ux-pro-max/scripts/tests/test_design_system_stack.py
@@ -35695,7 +35695,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:904f90bc6d364763673fa6067d98a4227d535760fa8b6d26abe22208176997ca
+  content_hash: sha256:3942845712b9a829323cd3568511483135f2a8c7cd79ccf61679da4b0f624dbb
 - kind: project-relative
   target: codex
   value: .agents/skills/ui-ux-pro-max/scripts/tests/test_relevance_evaluator.py
@@ -35740,7 +35740,7 @@ deployments:
   owners:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
-  content_hash: sha256:becc5fa40e7516613d4e9930f226aa483e3796090c17cb16542c93d1927e680d
+  content_hash: sha256:74897571398585f27e2c35d09d81b0a531c8c774f4a2967e5e1b1d1b05a483d9
 - kind: project-relative
   target: codex
   value: .agents/skills/ui-ux-pro-max/scripts/validate_data.py
