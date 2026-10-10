@@ -29,6 +29,7 @@ Build a small map of available commands:
 - Auto-format commands: `mise run format`, `pnpm run format`, formatter-specific tasks.
 - Format-check commands: `mise run format:check`, `pnpm run format:check`, `biome check`, `prettier --check`.
 - Fast checks: lint, shellcheck, yaml lint, markdown lint, type-only checks if cheap.
+- Secret scan: a staged-diff scan such as `gitleaks git --staged` is fast enough for `pre-commit`; a full-history scan belongs in `pre-push` or CI.
 - Heavy checks: typecheck, test, build, `mise run check`, `mise run ci`, `pnpm run check`, `pnpm run ci`.
 - Workflow checks: ordinary CI jobs for format, lint, typecheck, test, build, and generated-file validation.
 - File classes covered by CI format/lint tasks: at minimum JS/TS, JSON, CSS, Markdown, YAML, TOML, shell, Python, Dockerfile, Rust, Nix, and repo-specific config files when those tasks exist.
@@ -60,9 +61,11 @@ Completion condition: commit hooks stay fast and push hooks block the failures m
 
 When adding or updating Lefthook:
 
+- Set `assert_lefthook_installed: true` when the hooks are the repo's full gate. By default, a generated hook that cannot find the `lefthook` executable lets the commit or push through, so a missing gate looks like a passing one.
 - Use `glob`, `{staged_files}`, and `stage_fixed: true` for staged-file formatters when supported.
 - Give every `pre-push` job a `glob` when you write it, because an unscoped job runs on every push and that cost is what drives developers to `--no-verify`. A job may omit `glob` with an adjacent comment stating why its inputs cannot be scoped (e.g. a build whose inputs span sources, assets, config, and generator scripts).
 - Add separate jobs for fast non-code CI checks when the repo has them, such as YAML lint (`yamllint`), TOML format (`taplo`), Markdown lint, workflow lint, or lock/config validation.
+- For workflow lint, use `jactionlint` (mise `"github:jdx/jactionlint"`), not `rhysd/actionlint`, which stopped being maintained in 2026-04. Pin its version, because releases are frequent and include breaking changes. Its `default` profile adds security/policy rules beyond actionlint, so when replacing actionlint set `profile: correctness` in `.github/jactionlint.yaml` and adopt a wider profile as a separate decision. Keep its GitHub API checks (`--online`) out of hooks. If the repo requires actions pinned to commit SHAs and has a checker for that, run it as a staged `pre-commit` job on the same workflow glob.
 - Use package-manager prefixes that match the repo: `pnpm exec`, `mise exec --`, or direct commands managed by the repo.
 - Add Lefthook through the existing tool source: package dependency for package-managed repos, `mise` tool config for mise-managed dotfiles or tool repos.
 - Add an install helper only when the repo already has a scripts/tasks pattern for setup.
