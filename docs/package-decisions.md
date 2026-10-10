@@ -744,3 +744,9 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - 判定: ユーザーが `polish` を残すと決めた。`/simplify` は Claude Code の組み込みで撤去の対象にならず、Codex には無い。同じ diff で比べる判定は不要になった。`docs/skill-overlaps.md` の「検証中の競合スキル」表から「PR 前の掃除」行を外した。
 - 境界: `polish` は AGENTS.md の開発原則（コメント、テスト、型逃げ、握りつぶし、過剰な差分）を、`/simplify` は再利用・効率・altitude を見る。`polish` の本文に記載済み。
 - 併用: `polish` は `context: fork` で動くので、中から `/simplify` を呼ばない。両方かけるときはメインセッションで順に呼ぶ。
+
+## `apm-deploy-verify` を catalog（global）へ戻す（2026-10-10）
+
+- 変更: 2026-09-02 の workspace-only 移動を取り消し、`catalog/skills/` へ戻した。コマンドはすべて `mise -C ~/.apm` / `git -C ~/.apm` で `~/.apm` を明示し、呼び出し元の cwd に依存しない。
+- 理由: 移動理由の「他 repo では実行不能」はコマンドが cwd 前提だったためで、`~/.apm` を明示すれば解消する。一方 `learning-intake` / `agmsg-delegation` / `orchestrator-worker` は global に配布されたまま本スキルを名前で呼んでおり、スキル調整を `~/.apm` 外のセッションで行うと `Unknown skill` で失敗していた。
+- 代償: description が全 repo の skill 一覧に常時載る。

@@ -16,12 +16,14 @@ description: >-
 
 catalog 変更後の検証は判断を含まない機械作業なので、Orchestrator（fable / opus）は自分で実行せず本スキルへ委譲する。変更内容の設計判断・修正方針の決定は呼び出し元に返す。
 
-fork 実行では会話履歴は見えない。検証対象（変更した skill）は ARGUMENTS があればそれ、無ければ `git status --short` / `git diff` から決める。
+検証対象は呼び出し元の cwd によらず常に `~/.apm` である。他の repo から呼ばれても、以下のコマンドはすべて `cd ~/.apm` したシェルで実行する（`<catalog>` は `~/.apm/catalog`）。
+
+fork 実行では会話履歴は見えない。検証対象（変更した skill）は ARGUMENTS があればそれ、無ければ `git -C ~/.apm status --short` / `git -C ~/.apm diff` から決める。
 
 ## 手順
 
-1. `mise run format` → `mise run check` を実行する。失敗したら以降へ進まず、失敗ログを添えて報告する
-2. `mise run deploy:fresh` を実行する。`install:catalog` 単独では新規追加ファイルが配布先から消えるため使わない。**注意:** opencode は skills face を opt-out しており、`~/.config/opencode/agents` も配布対象外なので deploy は agents face を削除する。catalog が opencode 向けに持つのは config と commands だけになる
+1. `mise -C ~/.apm run format` → `mise -C ~/.apm run check` を実行する。失敗したら以降へ進まず、失敗ログを添えて報告する
+2. `mise -C ~/.apm run deploy:fresh` を実行する。`install:catalog` 単独では新規追加ファイルが配布先から消えるため使わない。**注意:** opencode は skills face を opt-out しており、`~/.config/opencode/agents` も配布対象外なので deploy は agents face を削除する。catalog が opencode 向けに持つのは config と commands だけになる
 3. 変更した skill ごとに配布一致を確認する:
 
    ```bash
@@ -65,10 +67,10 @@ fork 実行では会話履歴は見えない。検証対象（変更した skill
    ! grep -qx '  - opencode' apm.yml
    ```
 
-4. agmsg roster link の到達性を確認する。確認対象は canonical face のみ。判定は `db` / `teams` の個別状態を見て `ls -l` でその場で二分するのではなく、両方を見た集約結果を持つ `~/.apm` の `mise run doctor` に一元化する:
+4. agmsg roster link の到達性を確認する。確認対象は canonical face のみ。判定は `db` / `teams` の個別状態を見て `ls -l` でその場で二分するのではなく、両方を見た集約結果を持つ `mise -C ~/.apm run doctor` に一元化する:
 
    ```bash
-   cd ~/.apm && mise run doctor
+   mise -C ~/.apm run doctor
    ```
 
    roster link が正常なとき doctor は何も出力しない。失敗時だけ（`validate_agmsg_roster_link`）失敗行を出して非 0 で終了する。exit 0 なら通過、非 0 なら doctor の出力から roster link の失敗行を読んで報告する。

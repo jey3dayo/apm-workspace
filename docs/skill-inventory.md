@@ -43,7 +43,7 @@
 ## global（自作 catalog: catalog/skills/）
 
 - APM・環境運用: `apm-usage`（repo-local `apm.yml` の作成/整理は `references/repo-manifest.md`）,
-  `mise`, `dotenvx`, `1password`, `herdr`, `tuxedo`
+  `mise`, `dotenvx`, `1password`, `herdr`, `tuxedo`, `apm-deploy-verify`
 - 委譲・エージェント運用: `orchestrator-worker`, `agmsg-delegation`, `backlog-sweep`, `learning-intake`
 - レビュー・品質: `review-fix-loop`, `polish`
 - Git・出荷: `ship`, `atomic-commit`, `git-worktree`, `git-branch-cleanup`,
@@ -58,7 +58,6 @@
 - `agent-curation` — catalog/agents と採用台帳の運用
 - `skill-auditor` — スキル棚卸し
 - `find-skills` — スキル探索
-- `apm-deploy-verify` — catalog 変更後の deploy / 配布一致検証
 
 ## manual（manual-skills/）
 
