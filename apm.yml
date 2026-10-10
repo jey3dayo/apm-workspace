@@ -21,7 +21,7 @@ dependencies:
     - shadcn/improve#cac56e1ebd3c279aa9153616cfeac7b174ab90f9
 
     # --- engineering / writing ---
-    - coji/natural-japanese/skills/natural-japanese#9a78a42964096da509b8f3e011f0085a5f080151 # v1.3.0
+    - coji/natural-japanese/skills/natural-japanese#9a78a42964096da509b8f3e011f0085a5f080151
     - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
       ref: 8f2d57610a73efc97d743c9b0b0ecb1002e09fa4
       alias: japanese-tech-writing
@@ -39,10 +39,10 @@ dependencies:
         - wait-what
         - wayfinder
         - writing-for-agents
-    - nanaism/yomiyasu/skills/yomiyasu#d7869000576a9f811a1542eceec57044219550a9
+    - nanaism/yomiyasu/skills/yomiyasu#373356eb874af5184962c88e925ea7eb58450318 # v1.1.1
 
     # --- react ---
-    - millionco/react-doctor/skills/react-doctor#3c668e121bcd2cabe72508d5a3a2dc32d0bec50a # v2.2.9
+    - millionco/react-doctor/skills/react-doctor#673ce802a375eeb4c3c5cb9a96d21eaeb7eafd93 # v2.3.1
     - vercel-labs/agent-skills/skills/react-best-practices#063bee94c3f4df8453406c830b0a7df0f2860278
 
     # --- design ---
@@ -77,7 +77,7 @@ dependencies:
     # --- browser / analysis ---
     - browser-use/browser-harness#afbcc381b963040c19627d788e40c7e7663171ee
     - openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431
-    - tt-a1i/archify/archify#73aaa0696e8f72c232ea710e6fa94fd953f3e773 # v3.0.0
+    - tt-a1i/archify/archify#58ab0b98d2d0def8e49dced705c7b566936723ec
 
     # --- agent tools ---
     - agavra/tuicr/skills/tuicr#9175dc95b97a0a7dd290d43d38385745a7fb7d40
@@ -86,7 +86,7 @@ dependencies:
 
     # --- productivity / research ---
     - ayghri/i-have-adhd/skills/i-have-adhd#723af7d9afaf43eb871dbcce6129e2bf80de90d5
-    - mvanhorn/last30days-skill/skills/last30days#7f582ad8c2e140eca08098b245f9e31b68e28b60 # v3.25.0
+    - mvanhorn/last30days-skill/skills/last30days#267d50f7fcbab8a6457a93ad6ca15cbc199f633c # v3.27.2
   mcp:
     - name: context7
       registry: false
