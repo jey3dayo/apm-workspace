@@ -18,6 +18,19 @@ Read and use `$git-worktree` before any worktree operation. That skill owns
 owns the branch/PR safety contract, candidate evidence, confirmation boundary,
 and deletion order.
 
+## Delegate planning to a cheap subagent
+
+Planning is read-only and fails closed, so hand it to a subagent on a cheap
+model (Claude Code: the Agent tool with `model: haiku`). Pass it the checkout
+path and this skill's path; it runs "Resolve the repository and live context"
+through "Present the Markdown plan" and returns the proposed, exclusion, and
+prune tables with their evidence objects. The subagent is plan-only: it never
+asks the user and never runs a deletion or prune. The parent session shows the
+returned plan, collects exact row confirmation, and runs "Revalidate and
+execute confirmed rows" itself; that live revalidation is what catches a wrong
+plan row. Keep `model:` out of this skill's frontmatter: a forked skill cannot
+reach the user, and the confirmation boundary must stay with the parent.
+
 ## Safety contract
 
 - Treat every invocation as `plan-only` until the user explicitly confirms the
