@@ -13,13 +13,15 @@ Manage 1Password items through `op` while keeping secrets out of the conversatio
 
 ## Vault and Authentication
 
-- Default to the `Personal` vault. Use the exact vault the user names (e.g. `Automation` for automation-only tasks). Use vault IDs, not names, when duplicate names exist — if `Personal` matches multiple vaults, run `op vault list --format json`, identify the likely one, and confirm before changing anything.
-- Prefer the signed-in account or app integration when available (`--account <id-or-shorthand>` when known). Otherwise authenticate in this order:
-  1. Dotenvx-managed `OP_SERVICE_ACCOUNT_TOKEN` when the repo or user points to `.env` / `.env.keys`:
+- Default vault: `Personal` with app integration, `Automation` with a service account. Service accounts see only vaults granted to them (normally `Automation`), never the built-in `Personal` / `Private` / `Employee`; items there need app integration. Use the exact vault the user names. Use vault IDs, not names, when duplicate names exist — if `Personal` matches multiple vaults, run `op vault list --format json`, identify the likely one, and confirm before changing anything.
+- Prefer the signed-in account or app integration when available (`--account <id-or-shorthand>` when known; omit `--account` when using a service account token). Otherwise authenticate in this order:
+  1. Dotenvx-managed `OP_SERVICE_ACCOUNT_TOKEN`. Unless the repo or user names another env file, use the dotfiles copy in `~/.config/.env.secrets` (keys in `~/.config/.env.keys`, found automatically). `dotenvx` may only resolve inside `~/.config`, so run from any cwd as:
 
      ```bash
-     dotenvx run -f <env-file> -fk <env-keys-file> -- op <command>
+     mise -C ~/.config x -- dotenvx run -q -f ~/.config/.env.secrets -- op <command>
      ```
+
+     In zsh, `ws op <command>` is the same wrapper. Token rotation and the `.env.keys` item ID live in `~/.config/docs/tools/1password.md`.
 
   2. `OP_SERVICE_ACCOUNT_TOKEN_FILE` when the user provides a token file path.
   3. Manual sign-in only when the user explicitly asks.
@@ -91,7 +93,7 @@ Homelab-specific items (e.g. the Hermes Agent Codex app token rotation, `/home/p
 ## Failure Handling
 
 - If `op item edit` fails with `unsupported field type: ssoLogin`, stop retrying that approach and report that the item needs UI editing or a narrower CLI-safe update.
-- If authentication fails, check only whether the env file contains the `OP_SERVICE_ACCOUNT_TOKEN` key and whether dotenvx can inject it. Do not print token contents.
+- If authentication fails, check only whether the env file (default `~/.config/.env.secrets`) contains the `OP_SERVICE_ACCOUNT_TOKEN` key and whether dotenvx can inject it. Do not print token contents.
 - After three failures with the same approach, stop and report the attempts, concrete errors, and a different next approach.
 
 ## Done When
