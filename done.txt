@@ -57,3 +57,6 @@ x 2026-10-09 2026-10-09 learning-intake 受入れ（不採用）: hashicorp terr
 x 2026-10-09 2026-10-09 learning-intake 受入れ（applied）: headless worker の inbox 確認を WORKER.md に統合（0135・1336 の2報告）。inbox.sh を絶対パスで示し、WORKING の区切りに加えて DONE / REVIEW 直前にも確認、watcher 既読化に備えて history.sh でも同 task_id を照合、追加指示は implement は partial/blockers、review は findings/checks で扱う。agmsg-delegation SKILL.md の Lifecycle 6/8 も揃えた。Codex gpt-6.1-sol の verdict review で ready-with-fixes → approve +apm
 x 2026-10-09 2026-10-09 learning-intake 受入れ（applied）: repo-local apm install を exit code と要約文で判定しない規則を apm-usage Fast Path 6 に追加（失敗後は git status、再実行後は新依存の deployed_files を確認、戻すのは自分の install が書いたファイルだけ）。観測は APM 0.31.0 +apm
 x 2026-10-09 2026-10-06 learning-intake 受入れ（applied）: launchd wrapper が AGMSG_WORKER_EFFORT などの上書き変数を落とす件を todo.txt へ起票（スクリプト修正は起票まで） +apm
+x 2026-10-11 2026-10-11 env配布の探索とパス検査を修正し回帰検証・配布一致を確認 +skills note:https://github.com/jey3dayo/apm-workspace/commit/8841f90
+x 2026-10-11 2026-10-11 CI対象ジョブのログ選択とPython変更時のgateを修正・検証 +skills note:https://github.com/jey3dayo/apm-workspace/commit/dae0e72
+x 2026-10-11 2026-10-11 固定SHA fixtureの共有依存を検査し配布一致を確認 +skills note:https://github.com/jey3dayo/apm-workspace/commit/4a5bc7b
