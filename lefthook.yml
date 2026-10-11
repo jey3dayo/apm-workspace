@@ -68,7 +68,7 @@ pre-push:
         bash -n scripts/run-pester.sh
 
     - name: test:sh
-      glob: "{scripts/*.sh,scripts/lib/*.awk,catalog/skills/**/scripts/*.sh,tests/*.bats,mise.toml,mise/test.toml}"
+      glob: "{scripts/*.sh,scripts/lib/*.awk,catalog/skills/**/scripts/*.sh,catalog/skills/**/scripts/*.py,manual-skills/.apm/skills/**/scripts/*.py,tests/*.bats,mise.toml,mise/test.toml}"
       run: mise run test:sh
 
     - name: format:markdown:bold-headings:check

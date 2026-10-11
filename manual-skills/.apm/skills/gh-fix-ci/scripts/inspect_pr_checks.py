@@ -65,16 +65,6 @@ def run_gh_command(args: Sequence[str], cwd: Path) -> GhResult:
     return GhResult(process.returncode, process.stdout, process.stderr)
 
 
-def run_gh_command_raw(args: Sequence[str], cwd: Path) -> tuple[int, bytes, str]:
-    process = subprocess.run(
-        ["gh", *args],
-        cwd=cwd,
-        capture_output=True,
-    )
-    stderr = process.stderr.decode(errors="replace")
-    return process.returncode, process.stdout, stderr
-
-
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
@@ -335,23 +325,19 @@ def fetch_check_log(
     job_id: str | None,
     repo_root: Path,
 ) -> tuple[str, str, str]:
+    if job_id:
+        log_text, log_error = fetch_job_log(run_id, job_id, repo_root)
+        if log_text.strip():
+            return log_text, "", "ok"
+        if is_log_pending_message(log_error):
+            return "", log_error, "pending"
+        return "", log_error or "The selected job log was empty.", "error"
+
     log_text, log_error = fetch_run_log(run_id, repo_root)
     if not log_error:
         return log_text, "", "ok"
-
-    if is_log_pending_message(log_error) and job_id:
-        job_log, job_error = fetch_job_log(job_id, repo_root)
-        if job_log:
-            return job_log, "", "ok"
-        if job_error and is_log_pending_message(job_error):
-            return "", job_error, "pending"
-        if job_error:
-            return "", job_error, "error"
-        return "", log_error, "pending"
-
     if is_log_pending_message(log_error):
         return "", log_error, "pending"
-
     return "", log_error, "error"
 
 
@@ -363,32 +349,15 @@ def fetch_run_log(run_id: str, repo_root: Path) -> tuple[str, str]:
     return result.stdout, ""
 
 
-def fetch_job_log(job_id: str, repo_root: Path) -> tuple[str, str]:
-    repo_slug = fetch_repo_slug(repo_root)
-    if not repo_slug:
-        return "", "Error: unable to resolve repository name for job logs."
-    endpoint = f"/repos/{repo_slug}/actions/jobs/{job_id}/logs"
-    returncode, stdout_bytes, stderr = run_gh_command_raw(["api", endpoint], cwd=repo_root)
-    if returncode != 0:
-        message = (stderr or stdout_bytes.decode(errors="replace")).strip()
-        return "", message or "gh api job logs failed"
-    if is_zip_payload(stdout_bytes):
-        return "", "Job logs returned a zip archive; unable to parse."
-    return stdout_bytes.decode(errors="replace"), ""
-
-
-def fetch_repo_slug(repo_root: Path) -> str | None:
-    result = run_gh_command(["repo", "view", "--json", "nameWithOwner"], cwd=repo_root)
+def fetch_job_log(run_id: str, job_id: str, repo_root: Path) -> tuple[str, str]:
+    result = run_gh_command(
+        ["run", "view", run_id, "--job", job_id, "--log"],
+        cwd=repo_root,
+    )
     if result.returncode != 0:
-        return None
-    try:
-        data = json.loads(result.stdout or "{}")
-    except json.JSONDecodeError:
-        return None
-    name_with_owner = data.get("nameWithOwner")
-    if not name_with_owner:
-        return None
-    return str(name_with_owner)
+        message = (result.stderr or result.stdout).strip()
+        return "", message or "gh run view job log failed"
+    return result.stdout, ""
 
 
 def normalize_field(value: Any) -> str:
@@ -418,10 +387,6 @@ def parse_available_fields(message: str) -> list[str]:
 def is_log_pending_message(message: str) -> bool:
     lowered = message.lower()
     return any(marker in lowered for marker in PENDING_LOG_MARKERS)
-
-
-def is_zip_payload(payload: bytes) -> bool:
-    return payload.startswith(b"PK")
 
 
 def extract_failure_snippet(log_text: str, max_lines: int, context: int) -> str:

@@ -1,8 +1,7 @@
 #!/usr/bin/env bats
 #
-# Locks the pre-push `test:sh` glob to a `tests/*.bats` wildcard: an
-# individual-file listing silently leaves every new suite out of the push gate.
-# Scope is bats only — the PS lane is deliberately ungated (see AGENTS.md).
+# Locks the pre-push `test:sh` glob to its shell, Bats, and Python helper inputs.
+# Individual-file listings silently leave new suites out of the push gate.
 
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
@@ -25,10 +24,38 @@ extract_pre_push_test_sh_glob() {
   ' "$1"
 }
 
+glob_matches_path() {
+  local path="$1"
+  shift
+  local pattern
+  for pattern in "$@"; do
+    [[ "$path" == $pattern ]] && return 0
+  done
+  return 1
+}
+
 @test "pre-push test:sh job wildcards tests/*.bats" {
   glob_line="$(extract_pre_push_test_sh_glob "$LEFTHOOK_FILE")"
   [ -n "$glob_line" ]
   [[ "$glob_line" == *"tests/*.bats"* ]]
+}
+
+@test "pre-push test:sh matches representative shell, Bats, and Python paths" {
+  glob_line="$(extract_pre_push_test_sh_glob "$LEFTHOOK_FILE")"
+  glob_content="${glob_line#*\"}"
+  glob_content="${glob_content%\"*}"
+  glob_content="${glob_content#\{}"
+  glob_content="${glob_content%\}}"
+  IFS=',' read -r -a patterns <<<"$glob_content"
+
+  for path in \
+    "scripts/apm-workspace.sh" \
+    "tests/gh-fix-ci-job-log.bats" \
+    "catalog/skills/linear-task-ops/scripts/linear_task.py" \
+    "manual-skills/.apm/skills/gh-fix-ci/scripts/inspect_pr_checks.py"; do
+    [ -f "$REPO_ROOT/$path" ]
+    glob_matches_path "$path" "${patterns[@]}"
+  done
 }
 
 @test "negative fixture detects a test:sh job that enumerates individual bats files" {
