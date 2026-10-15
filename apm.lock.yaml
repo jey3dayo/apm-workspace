@@ -1,5 +1,5 @@
-lockfile_version: '2'
-generated_at: '2026-10-10T13:56:44.632387+00:00'
+lockfile_version: '1'
+generated_at: '2026-10-15T03:55:26.119694+00:00'
 apm_version: 0.31.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -294,7 +294,6 @@ dependencies:
     .claude/skills/natural-japanese/scripts/terms.py: sha256:304acb82d8d8cb8a2f45b5efc1110f407e2316d23c13bfc8734670fc1ac81e19
     .claude/skills/natural-japanese/scripts/textcore.py: sha256:ea363ed8611256afb07b0ce83b478c2d559a910d00bfa152d9244f60025da1f2
   content_hash: sha256:90f3c9f5eae5af0bb047e6653a5639a3485ac936e6cbe5ff68284fc98752ec77
-  resolved_tag: v1.3.0
 - repo_url: cursor/plugins
   name: thermo-nuclear-code-quality-review
   host: github.com
@@ -318,7 +317,7 @@ dependencies:
   host: github.com
   resolved_commit: e8a175de22ae1e49370fc144c1f3bb9aeedf988d
   resolved_ref: e8a175de22ae1e49370fc144c1f3bb9aeedf988d
-  version: 0.0.0
+  version: unknown
   package_type: skill_bundle
   deployed_files:
   - .agents/skills/apple-design
@@ -3039,7 +3038,6 @@ dependencies:
     .claude/skills/agmsg/tests/test_where.bats: sha256:5677288b66c0a9b312ce7ac87a370fbefc32cddd335094c3bcc28baab1e45260
     .claude/skills/agmsg/uninstall.sh: sha256:45461aaa26d0383c15f58da8601cd2e0b6e769a61a4708388296052bb1e8d4da
   content_hash: sha256:cae8415fb0039de3ff1e61ebca51448038562e0b5ebe21bf7c007f036d7af172
-  resolved_tag: v1.5.1
   declared_license: MIT
 - repo_url: humanlayer/skills
   name: show-me
@@ -3066,9 +3064,9 @@ dependencies:
 - repo_url: ibelick/ui-skills
   name: ui-skills
   host: github.com
-  resolved_commit: 9a0cb1e610e3a1a4f0f2723bf2e7680ac1b89cf5
+  resolved_commit: c628a5917754ec2396d9cbb47988f280ba1d5cb0
   resolved_ref: main
-  version: 0.0.0
+  version: unknown
   package_type: skill_bundle
   deployed_files:
   - .agents/skills/baseline-ui
@@ -3110,7 +3108,7 @@ dependencies:
     .claude/skills/improve-ui/SKILL.md: sha256:fa2ac808f6d9dab7bb3620880b014d2c18e227e5b006102856038096e573e69a
     .claude/skills/improve-ui/agents/openai.yaml: sha256:933af431364517518cbcfcd4e70eb8e8b390ead920abc48c071a4eedb6747183
     .claude/skills/improve-ui/references/plan-template.md: sha256:8faca7a14659a7f951d3b89fb730a43a4ce99966cc00481bf83d82b90f34b868
-  content_hash: sha256:4741788c0c458d773594725c47280bbceb79d8205f928d163b9df497f8cc0885
+  content_hash: sha256:106cf55da7ddef54855e6c17181fdb5faab5726c50079b23282e8e9cea885059
   skill_subset:
   - baseline-ui
   - fixing-accessibility
@@ -3189,9 +3187,525 @@ dependencies:
     .claude/skills/transitions-dev/_root.css: sha256:6ed248a269da79f623729708dabcc3719485d400615a0d91b9f5e9fd307aa33f
   content_hash: sha256:8cf9ba1ed0d52741e4ed1dafc6ee4543e32f1e516f958d750e81412bfc36dd13
 - repo_url: jey3dayo/apm-workspace
+  name: catalog
+  host: github.com
+  resolved_commit: a642b332ee25960547ef5b8b000d2d4b27a8ec0c
+  resolved_ref: main
+  version: 1.0.0
+  virtual_path: catalog
+  is_virtual: true
+  package_type: skill_bundle
+  deployed_files:
+  - .agents/skills/1password
+  - .agents/skills/1password/SKILL.md
+  - .agents/skills/1password/agents/openai.yaml
+  - .agents/skills/agmsg-delegation
+  - .agents/skills/agmsg-delegation/SKILL.md
+  - .agents/skills/agmsg-delegation/WORKER.md
+  - .agents/skills/agmsg-delegation/agmsg-review.config.toml
+  - .agents/skills/agmsg-delegation/references/codex-sandbox.md
+  - .agents/skills/agmsg-delegation/references/resident-pool.md
+  - .agents/skills/agmsg-delegation/references/roster-recovery.md
+  - .agents/skills/agmsg-delegation/references/runtime-smoke.md
+  - .agents/skills/agmsg-delegation/scripts/launch-worker.sh
+  - .agents/skills/agmsg-delegation/scripts/run-claude-worker.sh
+  - .agents/skills/agmsg-delegation/scripts/run-codex-worker.sh
+  - .agents/skills/agmsg-delegation/scripts/run-cursor-worker.sh
+  - .agents/skills/agmsg-delegation/scripts/run-opencode-worker.sh
+  - .agents/skills/agmsg-delegation/scripts/send-report.sh
+  - .agents/skills/apm-deploy-verify
+  - .agents/skills/apm-deploy-verify/SKILL.md
+  - .agents/skills/apm-usage
+  - .agents/skills/apm-usage/SKILL.md
+  - .agents/skills/apm-usage/agents/openai.yaml
+  - .agents/skills/apm-usage/references/manifest-style.md
+  - .agents/skills/apm-usage/references/preinstall-checklist.md
+  - .agents/skills/apm-usage/references/recommendations.md
+  - .agents/skills/apm-usage/references/repo-local-mcp.md
+  - .agents/skills/apm-usage/references/repo-manifest.md
+  - .agents/skills/apm-usage/references/rollout-fast-paths.md
+  - .agents/skills/atomic-commit
+  - .agents/skills/atomic-commit/SKILL.md
+  - .agents/skills/atomic-commit/agents/openai.yaml
+  - .agents/skills/atomic-commit/scripts/check-env-secrets.sh
+  - .agents/skills/backlog-sweep
+  - .agents/skills/backlog-sweep/SKILL.md
+  - .agents/skills/cccc
+  - .agents/skills/cccc/SKILL.md
+  - .agents/skills/ci-stability-hooks
+  - .agents/skills/ci-stability-hooks/SKILL.md
+  - .agents/skills/ci-stability-hooks/agents/openai.yaml
+  - .agents/skills/design-md-workflow
+  - .agents/skills/design-md-workflow/SKILL.md
+  - .agents/skills/design-md-workflow/agents/openai.yaml
+  - .agents/skills/design-md-workflow/references/design-md-structure.md
+  - .agents/skills/design-md-workflow/references/design-review-structure.md
+  - .agents/skills/design-md-workflow/references/input-modes.md
+  - .agents/skills/design-md-workflow/references/routing-examples.md
+  - .agents/skills/docs-manager
+  - .agents/skills/docs-manager/SKILL.md
+  - .agents/skills/docs-manager/agents/openai.yaml
+  - .agents/skills/docs-manager/examples/.docs-manager-config.example.json
+  - .agents/skills/docs-manager/examples/custom-project-config.json
+  - .agents/skills/docs-manager/examples/dotfiles-config.json
+  - .agents/skills/docs-manager/examples/generic-config.json
+  - .agents/skills/docs-manager/examples/okf-config.json
+  - .agents/skills/docs-manager/references/config-templates.md
+  - .agents/skills/docs-manager/references/metadata-standards.md
+  - .agents/skills/docs-manager/references/size-management.md
+  - .agents/skills/docs-manager/references/tag-systems.md
+  - .agents/skills/docs-manager/templates/docs-manager-config.template.json
+  - .agents/skills/docs-review
+  - .agents/skills/docs-review/SKILL.md
+  - .agents/skills/docs-review/agents/openai.yaml
+  - .agents/skills/dotenvx
+  - .agents/skills/dotenvx/SKILL.md
+  - .agents/skills/dotenvx/agents/openai.yaml
+  - .agents/skills/dotenvx/references/asta-dotenvx.md
+  - .agents/skills/git-branch-cleanup
+  - .agents/skills/git-branch-cleanup/SKILL.md
+  - .agents/skills/git-branch-cleanup/agents/openai.yaml
+  - .agents/skills/git-worktree
+  - .agents/skills/git-worktree/SKILL.md
+  - .agents/skills/git-worktree/agents/openai.yaml
+  - .agents/skills/git-worktree/references/configuration.md
+  - .agents/skills/git-worktree/references/git-wt-commands.md
+  - .agents/skills/git-worktree/references/troubleshooting.md
+  - .agents/skills/git-worktree/references/workflows.md
+  - .agents/skills/git-worktree/scripts/check-worktree-config.sh
+  - .agents/skills/git-worktree/scripts/copy-env-files.sh
+  - .agents/skills/herdr
+  - .agents/skills/herdr/SKILL.md
+  - .agents/skills/herdr/references/configuration.md
+  - .agents/skills/learning-intake
+  - .agents/skills/learning-intake/SKILL.md
+  - .agents/skills/linear-task-ops
+  - .agents/skills/linear-task-ops/SKILL.md
+  - .agents/skills/linear-task-ops/references/asana-to-linear-mapping.md
+  - .agents/skills/linear-task-ops/references/linear-labels-jey.md
+  - .agents/skills/linear-task-ops/references/linear-projects-jey.md
+  - .agents/skills/linear-task-ops/scripts/linear_task.py
+  - .agents/skills/mise
+  - .agents/skills/mise/SKILL.md
+  - .agents/skills/mise/agents/openai.yaml
+  - .agents/skills/mise/references/best-practices.md
+  - .agents/skills/mise/references/bootstrap.md
+  - .agents/skills/mise/references/config-templates.md
+  - .agents/skills/mise/references/current-patterns.md
+  - .agents/skills/mise/references/task-config-includes.md
+  - .agents/skills/mise/references/task-family-splitting.md
+  - .agents/skills/mise/references/tool-management.md
+  - .agents/skills/mise/references/windows-shells.md
+  - .agents/skills/mise/resources/examples/npm-package-migration.md
+  - .agents/skills/mise/resources/templates/mise-config-template.toml
+  - .agents/skills/orchestrator-worker
+  - .agents/skills/orchestrator-worker/SKILL.md
+  - .agents/skills/orchestrator-worker/references/regression-fixtures.md
+  - .agents/skills/orchestrator-worker/scripts/check-fixture-isolation.py
+  - .agents/skills/polish
+  - .agents/skills/polish/SKILL.md
+  - .agents/skills/polish/agents/openai.yaml
+  - .agents/skills/prepare-goal
+  - .agents/skills/prepare-goal/SKILL.md
+  - .agents/skills/prepare-goal/agents/openai.yaml
+  - .agents/skills/pwa-layout
+  - .agents/skills/pwa-layout/SKILL.md
+  - .agents/skills/refactoring
+  - .agents/skills/refactoring/SKILL.md
+  - .agents/skills/refactoring/references/boundary_ownership.md
+  - .agents/skills/refactoring/references/code_quality_cleanup.md
+  - .agents/skills/refactoring/references/dead_code_tsr.md
+  - .agents/skills/refactoring/references/helper_extraction.md
+  - .agents/skills/refactoring/references/parallel_dispatch.md
+  - .agents/skills/review-fix-loop
+  - .agents/skills/review-fix-loop/SKILL.md
+  - .agents/skills/review-fix-loop/agents/openai.yaml
+  - .agents/skills/ship
+  - .agents/skills/ship/SKILL.md
+  - .agents/skills/ship/agents/openai.yaml
+  - .agents/skills/similarity
+  - .agents/skills/similarity/SKILL.md
+  - .agents/skills/similarity/agents/openai.yaml
+  - .agents/skills/similarity/references/report-analysis.md
+  - .agents/skills/terminal-browser
+  - .agents/skills/terminal-browser/SKILL.md
+  - .agents/skills/todo-changelog-ops
+  - .agents/skills/todo-changelog-ops/SKILL.md
+  - .agents/skills/tuxedo
+  - .agents/skills/tuxedo/SKILL.md
+  - .agents/skills/tuxedo/references/tui-and-capture.md
+  - .agents/skills/web-research
+  - .agents/skills/web-research/SKILL.md
+  - .agents/skills/web-research/agents/openai.yaml
+  - .claude/skills/1password
+  - .claude/skills/1password/SKILL.md
+  - .claude/skills/1password/agents/openai.yaml
+  - .claude/skills/agmsg-delegation
+  - .claude/skills/agmsg-delegation/SKILL.md
+  - .claude/skills/agmsg-delegation/WORKER.md
+  - .claude/skills/agmsg-delegation/agmsg-review.config.toml
+  - .claude/skills/agmsg-delegation/references/codex-sandbox.md
+  - .claude/skills/agmsg-delegation/references/resident-pool.md
+  - .claude/skills/agmsg-delegation/references/roster-recovery.md
+  - .claude/skills/agmsg-delegation/references/runtime-smoke.md
+  - .claude/skills/agmsg-delegation/scripts/launch-worker.sh
+  - .claude/skills/agmsg-delegation/scripts/run-claude-worker.sh
+  - .claude/skills/agmsg-delegation/scripts/run-codex-worker.sh
+  - .claude/skills/agmsg-delegation/scripts/run-cursor-worker.sh
+  - .claude/skills/agmsg-delegation/scripts/run-opencode-worker.sh
+  - .claude/skills/agmsg-delegation/scripts/send-report.sh
+  - .claude/skills/apm-deploy-verify
+  - .claude/skills/apm-deploy-verify/SKILL.md
+  - .claude/skills/apm-usage
+  - .claude/skills/apm-usage/SKILL.md
+  - .claude/skills/apm-usage/agents/openai.yaml
+  - .claude/skills/apm-usage/references/manifest-style.md
+  - .claude/skills/apm-usage/references/preinstall-checklist.md
+  - .claude/skills/apm-usage/references/recommendations.md
+  - .claude/skills/apm-usage/references/repo-local-mcp.md
+  - .claude/skills/apm-usage/references/repo-manifest.md
+  - .claude/skills/apm-usage/references/rollout-fast-paths.md
+  - .claude/skills/atomic-commit
+  - .claude/skills/atomic-commit/SKILL.md
+  - .claude/skills/atomic-commit/agents/openai.yaml
+  - .claude/skills/atomic-commit/scripts/check-env-secrets.sh
+  - .claude/skills/backlog-sweep
+  - .claude/skills/backlog-sweep/SKILL.md
+  - .claude/skills/cccc
+  - .claude/skills/cccc/SKILL.md
+  - .claude/skills/ci-stability-hooks
+  - .claude/skills/ci-stability-hooks/SKILL.md
+  - .claude/skills/ci-stability-hooks/agents/openai.yaml
+  - .claude/skills/design-md-workflow
+  - .claude/skills/design-md-workflow/SKILL.md
+  - .claude/skills/design-md-workflow/agents/openai.yaml
+  - .claude/skills/design-md-workflow/references/design-md-structure.md
+  - .claude/skills/design-md-workflow/references/design-review-structure.md
+  - .claude/skills/design-md-workflow/references/input-modes.md
+  - .claude/skills/design-md-workflow/references/routing-examples.md
+  - .claude/skills/docs-manager
+  - .claude/skills/docs-manager/SKILL.md
+  - .claude/skills/docs-manager/agents/openai.yaml
+  - .claude/skills/docs-manager/examples/.docs-manager-config.example.json
+  - .claude/skills/docs-manager/examples/custom-project-config.json
+  - .claude/skills/docs-manager/examples/dotfiles-config.json
+  - .claude/skills/docs-manager/examples/generic-config.json
+  - .claude/skills/docs-manager/examples/okf-config.json
+  - .claude/skills/docs-manager/references/config-templates.md
+  - .claude/skills/docs-manager/references/metadata-standards.md
+  - .claude/skills/docs-manager/references/size-management.md
+  - .claude/skills/docs-manager/references/tag-systems.md
+  - .claude/skills/docs-manager/templates/docs-manager-config.template.json
+  - .claude/skills/docs-review
+  - .claude/skills/docs-review/SKILL.md
+  - .claude/skills/docs-review/agents/openai.yaml
+  - .claude/skills/dotenvx
+  - .claude/skills/dotenvx/SKILL.md
+  - .claude/skills/dotenvx/agents/openai.yaml
+  - .claude/skills/dotenvx/references/asta-dotenvx.md
+  - .claude/skills/git-branch-cleanup
+  - .claude/skills/git-branch-cleanup/SKILL.md
+  - .claude/skills/git-branch-cleanup/agents/openai.yaml
+  - .claude/skills/git-worktree
+  - .claude/skills/git-worktree/SKILL.md
+  - .claude/skills/git-worktree/agents/openai.yaml
+  - .claude/skills/git-worktree/references/configuration.md
+  - .claude/skills/git-worktree/references/git-wt-commands.md
+  - .claude/skills/git-worktree/references/troubleshooting.md
+  - .claude/skills/git-worktree/references/workflows.md
+  - .claude/skills/git-worktree/scripts/check-worktree-config.sh
+  - .claude/skills/git-worktree/scripts/copy-env-files.sh
+  - .claude/skills/herdr
+  - .claude/skills/herdr/SKILL.md
+  - .claude/skills/herdr/references/configuration.md
+  - .claude/skills/learning-intake
+  - .claude/skills/learning-intake/SKILL.md
+  - .claude/skills/linear-task-ops
+  - .claude/skills/linear-task-ops/SKILL.md
+  - .claude/skills/linear-task-ops/references/asana-to-linear-mapping.md
+  - .claude/skills/linear-task-ops/references/linear-labels-jey.md
+  - .claude/skills/linear-task-ops/references/linear-projects-jey.md
+  - .claude/skills/linear-task-ops/scripts/linear_task.py
+  - .claude/skills/mise
+  - .claude/skills/mise/SKILL.md
+  - .claude/skills/mise/agents/openai.yaml
+  - .claude/skills/mise/references/best-practices.md
+  - .claude/skills/mise/references/bootstrap.md
+  - .claude/skills/mise/references/config-templates.md
+  - .claude/skills/mise/references/current-patterns.md
+  - .claude/skills/mise/references/task-config-includes.md
+  - .claude/skills/mise/references/task-family-splitting.md
+  - .claude/skills/mise/references/tool-management.md
+  - .claude/skills/mise/references/windows-shells.md
+  - .claude/skills/mise/resources/examples/npm-package-migration.md
+  - .claude/skills/mise/resources/templates/mise-config-template.toml
+  - .claude/skills/orchestrator-worker
+  - .claude/skills/orchestrator-worker/SKILL.md
+  - .claude/skills/orchestrator-worker/references/regression-fixtures.md
+  - .claude/skills/orchestrator-worker/scripts/check-fixture-isolation.py
+  - .claude/skills/polish
+  - .claude/skills/polish/SKILL.md
+  - .claude/skills/polish/agents/openai.yaml
+  - .claude/skills/prepare-goal
+  - .claude/skills/prepare-goal/SKILL.md
+  - .claude/skills/prepare-goal/agents/openai.yaml
+  - .claude/skills/pwa-layout
+  - .claude/skills/pwa-layout/SKILL.md
+  - .claude/skills/refactoring
+  - .claude/skills/refactoring/SKILL.md
+  - .claude/skills/refactoring/references/boundary_ownership.md
+  - .claude/skills/refactoring/references/code_quality_cleanup.md
+  - .claude/skills/refactoring/references/dead_code_tsr.md
+  - .claude/skills/refactoring/references/helper_extraction.md
+  - .claude/skills/refactoring/references/parallel_dispatch.md
+  - .claude/skills/review-fix-loop
+  - .claude/skills/review-fix-loop/SKILL.md
+  - .claude/skills/review-fix-loop/agents/openai.yaml
+  - .claude/skills/ship
+  - .claude/skills/ship/SKILL.md
+  - .claude/skills/ship/agents/openai.yaml
+  - .claude/skills/similarity
+  - .claude/skills/similarity/SKILL.md
+  - .claude/skills/similarity/agents/openai.yaml
+  - .claude/skills/similarity/references/report-analysis.md
+  - .claude/skills/terminal-browser
+  - .claude/skills/terminal-browser/SKILL.md
+  - .claude/skills/todo-changelog-ops
+  - .claude/skills/todo-changelog-ops/SKILL.md
+  - .claude/skills/tuxedo
+  - .claude/skills/tuxedo/SKILL.md
+  - .claude/skills/tuxedo/references/tui-and-capture.md
+  - .claude/skills/web-research
+  - .claude/skills/web-research/SKILL.md
+  - .claude/skills/web-research/agents/openai.yaml
+  deployed_file_hashes:
+    .agents/skills/1password/SKILL.md: sha256:41e73d6d0a1797f872d0971858eea30d3d5c8346030f21cf3436e78c2ad13137
+    .agents/skills/1password/agents/openai.yaml: sha256:56222c8ee4e46134079a90d2fbb86a4cfb5944fdb6c854a696be15d251c00681
+    .agents/skills/agmsg-delegation/SKILL.md: sha256:63b605709612c5ab72bc8ef415e871ae6a799316ce1f64b4f28e08ce6732da6e
+    .agents/skills/agmsg-delegation/WORKER.md: sha256:b847eb5420485cc6e3bd0054ceb306f98fbe7d4f3377244b9da8f11a76f8c6a2
+    .agents/skills/agmsg-delegation/agmsg-review.config.toml: sha256:42fd32b3607ceba3bb2dccbb108cd4f03282e69df3bdcf2e6cabeadb08d6eb3e
+    .agents/skills/agmsg-delegation/references/codex-sandbox.md: sha256:b3fe055bdbc70ce00919cb4600afbe91ba066e30688f84ac292ff3cf25d3151a
+    .agents/skills/agmsg-delegation/references/resident-pool.md: sha256:37becb66f651b5aa28316e9f7ec8f7943e7c7e55232e472f17c2d4d9de265c3e
+    .agents/skills/agmsg-delegation/references/roster-recovery.md: sha256:29d89e1529b1146dd2739c07d8b226b42ad2ca0e6874cd80e11fca52d27b7fc8
+    .agents/skills/agmsg-delegation/references/runtime-smoke.md: sha256:ff70897c4fe2f6562df8f63649c96164858db5300debae6396835a26c52aaa18
+    .agents/skills/agmsg-delegation/scripts/launch-worker.sh: sha256:12e9c5a70daf532f57a7060e7eee30707c587a4ebdd5c7ad0588b77210ce34ed
+    .agents/skills/agmsg-delegation/scripts/run-claude-worker.sh: sha256:763f2f456a664338ed50d73c996fe1560faf9a1edb02e2146e1ba9df46176458
+    .agents/skills/agmsg-delegation/scripts/run-codex-worker.sh: sha256:358e0fb8196fce08f75b275fc03f3e74172fca6dde03db582fcfd7654b2ab54e
+    .agents/skills/agmsg-delegation/scripts/run-cursor-worker.sh: sha256:ed4a5e4b9c1f7e190b21ad8ecbbe79eac8aa0a42b354d48885425b6c5d442706
+    .agents/skills/agmsg-delegation/scripts/run-opencode-worker.sh: sha256:736512347f6594fba23b4f2b6182ca00ea9ca141da0acc96ddd95358ec345b28
+    .agents/skills/agmsg-delegation/scripts/send-report.sh: sha256:60a61e0c29051dafd99d5019e1766421e5d196b0936494af611a7caf7b4bcb8c
+    .agents/skills/apm-deploy-verify/SKILL.md: sha256:a404b45c2e7e5f83a1d7d4bcd9cdefef0d7d7aca8b2c1caf0cd45fba99984e8e
+    .agents/skills/apm-usage/SKILL.md: sha256:76a18a3ed494af71c1cde68baf9155056dc1025b3706ae11bf87eb95be14be0e
+    .agents/skills/apm-usage/agents/openai.yaml: sha256:b3743dad4fcd9f3c209210c40df277e75d949ac7ce1713a61d497cc1e7e3ba83
+    .agents/skills/apm-usage/references/manifest-style.md: sha256:45bea67ac71f466b8ca0955541a8cf0901138935b5b90c9a773a4d1c8d8f02e0
+    .agents/skills/apm-usage/references/preinstall-checklist.md: sha256:0112fcadf9b87f6b9d5b19ab4a62b84b4d556562d89bfce9868c56be5830d23b
+    .agents/skills/apm-usage/references/recommendations.md: sha256:2e6128f48bc7b66ee2c8cdab64c6344f24d99841e7630762fd3e1882b280979f
+    .agents/skills/apm-usage/references/repo-local-mcp.md: sha256:b12b6b2fc81ed10d0db9427accd2f81b62796c3ed99bbddb66993a694af530f9
+    .agents/skills/apm-usage/references/repo-manifest.md: sha256:acec5f2ee49dc94aeced267dd40699049b3bbc116a6b9500de11cd9c35691ba7
+    .agents/skills/apm-usage/references/rollout-fast-paths.md: sha256:e95936a616cb45ba6df81e748baacf6121d7aae519c9bc81f1e8e40d38b08fa1
+    .agents/skills/atomic-commit/SKILL.md: sha256:d95eece0de5d7bd62c515432c685900f8a2f00864b879b18750af473a3f7cd4e
+    .agents/skills/atomic-commit/agents/openai.yaml: sha256:8486b70455d5ec0241bc7bf64bf52d806084132b2c4fcea7dcfd79ed7aec497f
+    .agents/skills/atomic-commit/scripts/check-env-secrets.sh: sha256:fbce1ec0cb356cca7fcd11541d439702d0cb8dd8d0c2eab065f9d348354e2913
+    .agents/skills/backlog-sweep/SKILL.md: sha256:db4209f98b2564d64daedc2b061c7fed6bd2c5cb7fa87910b19bc55bc2e907ff
+    .agents/skills/cccc/SKILL.md: sha256:92ace70e71770bf2ab5d7c9eb43f9b387473e7fd91299385b55177b59700ae57
+    .agents/skills/ci-stability-hooks/SKILL.md: sha256:2ee8a2f4fd036017cd2f471f4c6feeb757ad2c8a68333a5d1ff1831ffa1f5e52
+    .agents/skills/ci-stability-hooks/agents/openai.yaml: sha256:60a9e8633c5933d8663858f15d71831b0af1c5265accf6f5e2ebba0916373cc2
+    .agents/skills/design-md-workflow/SKILL.md: sha256:d72b92220b78bb53cb0f9fa96a87e5ff9cfc418d6b24702bd93f6f04666b2116
+    .agents/skills/design-md-workflow/agents/openai.yaml: sha256:9c0affb53d0d0703bf7e8d8199ec81dde316b76a71151c3839c8c021056ef10b
+    .agents/skills/design-md-workflow/references/design-md-structure.md: sha256:2a273b9805b2476961ee0852bcdb7905778ad3c25260ed03082681323059c569
+    .agents/skills/design-md-workflow/references/design-review-structure.md: sha256:446dc1fcda31bb29a1b9387601176f4bba97c20c43db9532bedf0e586e56b05f
+    .agents/skills/design-md-workflow/references/input-modes.md: sha256:e451f000f63e10583b99257a5102cf64582323f358c575c278658286c27bf343
+    .agents/skills/design-md-workflow/references/routing-examples.md: sha256:83014cfd675639ed7bacffdb2fd4312e8d982936cff0b2a5551cea54fb24ce6e
+    .agents/skills/docs-manager/SKILL.md: sha256:0f3cb9c33a2f10b0eac6453d0badd6ad60b10168962c145fc5fb36fd516312b8
+    .agents/skills/docs-manager/agents/openai.yaml: sha256:82518b06e1ec3c0ff6a5c86d5718791ba4c0a077d680ca60ca1745887f315977
+    .agents/skills/docs-manager/examples/.docs-manager-config.example.json: sha256:e560bdc83be580828502155168300a5ee64cfef47b2420bbec177bf8494d3a54
+    .agents/skills/docs-manager/examples/custom-project-config.json: sha256:bb49877f1356562166dee7f57eed2a467da8ee178529e372e973602f59f17bbc
+    .agents/skills/docs-manager/examples/dotfiles-config.json: sha256:5ff986677d974597f64125281e7b296df76cefdbf1250289989f39ba97fdde01
+    .agents/skills/docs-manager/examples/generic-config.json: sha256:1427598bd4c71dfced87d47a71c87c9d23be20e3fc2be3bfa600232c264a653d
+    .agents/skills/docs-manager/examples/okf-config.json: sha256:2f5d4b204a37d2fbdff41764298820aa3dae123a08c7e01385101cbd9e6e9942
+    .agents/skills/docs-manager/references/config-templates.md: sha256:b54725da29beba710dc618b3d3fe9a1375d4a6ba8a7c4c8ffe7c9cddaef33b2b
+    .agents/skills/docs-manager/references/metadata-standards.md: sha256:e9b706dacc9cd844725e039cb9f85294779f4e8173ce86c582362298cf5a5a48
+    .agents/skills/docs-manager/references/size-management.md: sha256:dd624f049ddd4a0f79bf6815129f9fd0a6226fe72db895a0ebdc119e6aa85f5e
+    .agents/skills/docs-manager/references/tag-systems.md: sha256:ffebb0f824768f3762bc3f2ab819a8034b7b6add0025400c5ca8b37d03ff8eae
+    .agents/skills/docs-manager/templates/docs-manager-config.template.json: sha256:19c3bd7d4f539bfbb37667f1eccb15395d39e8e0ba74cd67c719a24efb57dd6f
+    .agents/skills/docs-review/SKILL.md: sha256:5056d6bf5a17255261490c177368d0cb42f80e26ff9ce459d7205544a7214baf
+    .agents/skills/docs-review/agents/openai.yaml: sha256:505226b173b1637449d2ec1df8199b1c7c46365b865dcf20dde2f3d80e7404e0
+    .agents/skills/dotenvx/SKILL.md: sha256:80216be0080c2687fbc88886d10b55838d4ac4a98bd184a44ecad01d6bfc10ea
+    .agents/skills/dotenvx/agents/openai.yaml: sha256:594feb9be08e2107ef649630aa69ae7b566c0344d4e4ac193b9620a5198c8c8b
+    .agents/skills/dotenvx/references/asta-dotenvx.md: sha256:7d40a7f448f3464de894cedd9daa68082f8bfebbf870e77d41bffaf96bf85cf2
+    .agents/skills/git-branch-cleanup/SKILL.md: sha256:029ace59375a45ab5bda699d9057766b6e8efbc7bd535ab8464002557f1a1e32
+    .agents/skills/git-branch-cleanup/agents/openai.yaml: sha256:e6c11f6e2e50b9f9d93f9f127327ee1ff81f7b8043bf5866f0fea61ffdc9ecdd
+    .agents/skills/git-worktree/SKILL.md: sha256:a5e9d2f45c77fccef843c3f99f8d7c2ce5d7df249664c264f217a27fa86add75
+    .agents/skills/git-worktree/agents/openai.yaml: sha256:13edbe566f94c15bcb553a532b392da27bbe1c81e71b0f229af6b161ac30bc88
+    .agents/skills/git-worktree/references/configuration.md: sha256:9082e69e442a038197bd62cf9c60313f6ef43086f16f85a1610374a1746b03a4
+    .agents/skills/git-worktree/references/git-wt-commands.md: sha256:fcab97e6a5bf055379889cc27a5df846378d768a7d2a61d39e8b7bbde7758cca
+    .agents/skills/git-worktree/references/troubleshooting.md: sha256:92639d6e587ef3dd943663b2e943a57eb43f0dad53f332155d1b97d329e76b67
+    .agents/skills/git-worktree/references/workflows.md: sha256:bccf9c623053e4d7438d79589171f8e0474552685c2297fef331fefd136d499c
+    .agents/skills/git-worktree/scripts/check-worktree-config.sh: sha256:5582d5f0b45395f7a077ea3e3cbb3266138053166950ff7df274957833e3ffdf
+    .agents/skills/git-worktree/scripts/copy-env-files.sh: sha256:6ef5050c930b48674c71c441e9dfbc6e543161f6acd78aaa34184296785d3c78
+    .agents/skills/herdr/SKILL.md: sha256:2e9d8af0ba3cf39d80ada5ca543c09ba25a580100bf5d10e171682aaf93431d8
+    .agents/skills/herdr/references/configuration.md: sha256:b694f7a8f709e37a04d1939c16f6d10ae36bcd33b8eecafc32c4898f7a442737
+    .agents/skills/learning-intake/SKILL.md: sha256:72a999631392afcc2f8b41d67503a043e343bbd84dda5ebcfd4a5cfef2146972
+    .agents/skills/linear-task-ops/SKILL.md: sha256:7aaef54f501977e06bca74184f5e05dd477e6b50187b622bdf64bebb832f9167
+    .agents/skills/linear-task-ops/references/asana-to-linear-mapping.md: sha256:1691e00b02c9172cf28e9b4c1aca3aaf8e2b6d90f6371736000a240bc4e68840
+    .agents/skills/linear-task-ops/references/linear-labels-jey.md: sha256:5f988e9da4a4d0588633497533237a685d1f7c24aa535e262c1039d33eba9cfd
+    .agents/skills/linear-task-ops/references/linear-projects-jey.md: sha256:a7007429e64875350a698d8c96cafd5449bf674b2aa32a693b84d45e3a33dbf1
+    .agents/skills/linear-task-ops/scripts/linear_task.py: sha256:131d394b3cb4d9d34bd8c165158a9c223bb9ef3277c824e4a6b98e56e5d998fd
+    .agents/skills/mise/SKILL.md: sha256:46fb7aec213bfa259f1000a5542523858c0e78bc07d781faef71e564e003a62a
+    .agents/skills/mise/agents/openai.yaml: sha256:5032c53d31fa12d2b209f729ae559a941d0ca68a2494101f952eba0b87cff7ef
+    .agents/skills/mise/references/best-practices.md: sha256:8e7fccc78b18e74eaf535d170ed8763486dff6799daa05fcb0fb5e1e7944ff82
+    .agents/skills/mise/references/bootstrap.md: sha256:d394612ee040fd6140d4ed10921b35f04f2594a744686a12196adc1a57853ecc
+    .agents/skills/mise/references/config-templates.md: sha256:cf656edb872bf855256906a1325342ea3f1b75ff48d2899696be3dfee086123b
+    .agents/skills/mise/references/current-patterns.md: sha256:fc357599a20de278da0df7ab9b601b77f800150f4f543d6ec1522d50260aa2ca
+    .agents/skills/mise/references/task-config-includes.md: sha256:cf40ad9158fcc509bc5a3144f9ea13877b9825ca740e4d3f5eb93e16377b5859
+    .agents/skills/mise/references/task-family-splitting.md: sha256:43022a96ae2bbbc7c00179b4d6fd91787e2e573a3b7a2682b18bab2ad230f26a
+    .agents/skills/mise/references/tool-management.md: sha256:4a382268f67c2417f82730ed720b7dccfced830a50e002bedbec163d62be37a7
+    .agents/skills/mise/references/windows-shells.md: sha256:e9a69026c9ba4690712d944366005dd385652a4def4746ab1a0dd5d017738c44
+    .agents/skills/mise/resources/examples/npm-package-migration.md: sha256:e0d1bacf5fc34155c0b125a3b014c822fbd742a39e9b9b7b872dd7c8574017ae
+    .agents/skills/mise/resources/templates/mise-config-template.toml: sha256:165dd9449fe4c8467bd5f0de32e74d7806786b215ad2dcde658b30c606657fce
+    .agents/skills/orchestrator-worker/SKILL.md: sha256:952cee6e281eac3453828123d825d4ae79a9236fc2bacc1137dc14b833dcc36b
+    .agents/skills/orchestrator-worker/references/regression-fixtures.md: sha256:a14203036122e0ebc17476af79b08eb9855fa75359ef822d114543e8fd2d105e
+    .agents/skills/orchestrator-worker/scripts/check-fixture-isolation.py: sha256:c987134ef85c0bcd851bd0c597ab43e3b60017aa804f965d7b79426e399b6e6e
+    .agents/skills/polish/SKILL.md: sha256:0d91b746bbc511ede772b504407a6ce181fb3a7d9f9debbf07d4e4b152807bca
+    .agents/skills/polish/agents/openai.yaml: sha256:dc60fec55c211b80c2d188ab2caa345f9ab831a522761e46044f59d4951b12b9
+    .agents/skills/prepare-goal/SKILL.md: sha256:792827300e8fa75400f2bc50d7d27c5a5a3f3b0a6c0859861d6c3566a1e88a35
+    .agents/skills/prepare-goal/agents/openai.yaml: sha256:870d31c398ceb1c485a64b3a5e694942f055e85983718a61434b117bca5cefbc
+    .agents/skills/pwa-layout/SKILL.md: sha256:869c997c6e6cbca873aa37a377bdcc8681d696a0475c39433c42546289ded4db
+    .agents/skills/refactoring/SKILL.md: sha256:7d51ffe56c72ec31cbf07604771bbc840ae76a6806718a04a93ade6b094afcf8
+    .agents/skills/refactoring/references/boundary_ownership.md: sha256:e1453ec7788d1f013a356982568c7a5cbd727be72907b721ab8443040cc91058
+    .agents/skills/refactoring/references/code_quality_cleanup.md: sha256:c09cd24e853518d544d39ba80f5fcce381d477325001afde304be2f970c6562f
+    .agents/skills/refactoring/references/dead_code_tsr.md: sha256:3ca03e5ae296c2e0a67d45a6bda7da57329f06f4c56fa66099943de29dac0285
+    .agents/skills/refactoring/references/helper_extraction.md: sha256:041609dbbd6d27e004e80bc0590c3c1a1482267306570fe07f12e6f338311930
+    .agents/skills/refactoring/references/parallel_dispatch.md: sha256:4588d7ac3e700bc72f0b54a78537a0d248684e5924f3b9aa45f0e573a8adab49
+    .agents/skills/review-fix-loop/SKILL.md: sha256:aaffd8263eb2bb46e64b7a3c107b41f314d82a052dfe30820a5300e8ad18c9c9
+    .agents/skills/review-fix-loop/agents/openai.yaml: sha256:2ebea0b8282c864b31d92a942df6e46c9b6ab54a2bd51e38878c7f732ec3004d
+    .agents/skills/ship/SKILL.md: sha256:f62ef62d147a81e027719a83f503b5a6aa8708cb98bce07844ce67d00ccc6aa6
+    .agents/skills/ship/agents/openai.yaml: sha256:b676e15b87ec52e10d8b36dabeb1685ee5a0348d4220a3c87f1e5c1e3602b0f0
+    .agents/skills/similarity/SKILL.md: sha256:b34b03b003c842dd5b5ff77b373d9442decfc0224eeb19d6c6542e8b671db31d
+    .agents/skills/similarity/agents/openai.yaml: sha256:256ce2d2a4a3f6ac024a9a08b2665de766232278500894c27c2c83569b778598
+    .agents/skills/similarity/references/report-analysis.md: sha256:3188868e0decf956df49933ceb253f52e590cb6c19af5fdfecf6aedc46ced55c
+    .agents/skills/terminal-browser/SKILL.md: sha256:cf0608450f6f83ce788a55f448ec268f8b10700c42211d6e00c509d6b16ce65e
+    .agents/skills/todo-changelog-ops/SKILL.md: sha256:89b31894049a27acbd6ef7bdf7d6dff8c90b1bc87618b210e06fe673304dcbd1
+    .agents/skills/tuxedo/SKILL.md: sha256:0b89f27106a026b03fc7f3043d0c4adf409ed3902e4f415a4acf7e15908a0c1a
+    .agents/skills/tuxedo/references/tui-and-capture.md: sha256:13278531ebad1f152047aaebc247eacbfd69f75ba1887e3a611627c94a31f684
+    .agents/skills/web-research/SKILL.md: sha256:a9c97632b56dbf89f7e57f70d97e96ff477afbd8837b1a99a5300ddd6bfba562
+    .agents/skills/web-research/agents/openai.yaml: sha256:50536a04fbc72b0f71fc9975a7e041893912ebfcaf9c671439843d20172e1264
+    .claude/skills/1password/SKILL.md: sha256:41e73d6d0a1797f872d0971858eea30d3d5c8346030f21cf3436e78c2ad13137
+    .claude/skills/1password/agents/openai.yaml: sha256:56222c8ee4e46134079a90d2fbb86a4cfb5944fdb6c854a696be15d251c00681
+    .claude/skills/agmsg-delegation/SKILL.md: sha256:63b605709612c5ab72bc8ef415e871ae6a799316ce1f64b4f28e08ce6732da6e
+    .claude/skills/agmsg-delegation/WORKER.md: sha256:b847eb5420485cc6e3bd0054ceb306f98fbe7d4f3377244b9da8f11a76f8c6a2
+    .claude/skills/agmsg-delegation/agmsg-review.config.toml: sha256:42fd32b3607ceba3bb2dccbb108cd4f03282e69df3bdcf2e6cabeadb08d6eb3e
+    .claude/skills/agmsg-delegation/references/codex-sandbox.md: sha256:b3fe055bdbc70ce00919cb4600afbe91ba066e30688f84ac292ff3cf25d3151a
+    .claude/skills/agmsg-delegation/references/resident-pool.md: sha256:37becb66f651b5aa28316e9f7ec8f7943e7c7e55232e472f17c2d4d9de265c3e
+    .claude/skills/agmsg-delegation/references/roster-recovery.md: sha256:29d89e1529b1146dd2739c07d8b226b42ad2ca0e6874cd80e11fca52d27b7fc8
+    .claude/skills/agmsg-delegation/references/runtime-smoke.md: sha256:ff70897c4fe2f6562df8f63649c96164858db5300debae6396835a26c52aaa18
+    .claude/skills/agmsg-delegation/scripts/launch-worker.sh: sha256:12e9c5a70daf532f57a7060e7eee30707c587a4ebdd5c7ad0588b77210ce34ed
+    .claude/skills/agmsg-delegation/scripts/run-claude-worker.sh: sha256:763f2f456a664338ed50d73c996fe1560faf9a1edb02e2146e1ba9df46176458
+    .claude/skills/agmsg-delegation/scripts/run-codex-worker.sh: sha256:358e0fb8196fce08f75b275fc03f3e74172fca6dde03db582fcfd7654b2ab54e
+    .claude/skills/agmsg-delegation/scripts/run-cursor-worker.sh: sha256:ed4a5e4b9c1f7e190b21ad8ecbbe79eac8aa0a42b354d48885425b6c5d442706
+    .claude/skills/agmsg-delegation/scripts/run-opencode-worker.sh: sha256:736512347f6594fba23b4f2b6182ca00ea9ca141da0acc96ddd95358ec345b28
+    .claude/skills/agmsg-delegation/scripts/send-report.sh: sha256:60a61e0c29051dafd99d5019e1766421e5d196b0936494af611a7caf7b4bcb8c
+    .claude/skills/apm-deploy-verify/SKILL.md: sha256:a404b45c2e7e5f83a1d7d4bcd9cdefef0d7d7aca8b2c1caf0cd45fba99984e8e
+    .claude/skills/apm-usage/SKILL.md: sha256:76a18a3ed494af71c1cde68baf9155056dc1025b3706ae11bf87eb95be14be0e
+    .claude/skills/apm-usage/agents/openai.yaml: sha256:b3743dad4fcd9f3c209210c40df277e75d949ac7ce1713a61d497cc1e7e3ba83
+    .claude/skills/apm-usage/references/manifest-style.md: sha256:45bea67ac71f466b8ca0955541a8cf0901138935b5b90c9a773a4d1c8d8f02e0
+    .claude/skills/apm-usage/references/preinstall-checklist.md: sha256:0112fcadf9b87f6b9d5b19ab4a62b84b4d556562d89bfce9868c56be5830d23b
+    .claude/skills/apm-usage/references/recommendations.md: sha256:2e6128f48bc7b66ee2c8cdab64c6344f24d99841e7630762fd3e1882b280979f
+    .claude/skills/apm-usage/references/repo-local-mcp.md: sha256:b12b6b2fc81ed10d0db9427accd2f81b62796c3ed99bbddb66993a694af530f9
+    .claude/skills/apm-usage/references/repo-manifest.md: sha256:acec5f2ee49dc94aeced267dd40699049b3bbc116a6b9500de11cd9c35691ba7
+    .claude/skills/apm-usage/references/rollout-fast-paths.md: sha256:e95936a616cb45ba6df81e748baacf6121d7aae519c9bc81f1e8e40d38b08fa1
+    .claude/skills/atomic-commit/SKILL.md: sha256:d95eece0de5d7bd62c515432c685900f8a2f00864b879b18750af473a3f7cd4e
+    .claude/skills/atomic-commit/agents/openai.yaml: sha256:8486b70455d5ec0241bc7bf64bf52d806084132b2c4fcea7dcfd79ed7aec497f
+    .claude/skills/atomic-commit/scripts/check-env-secrets.sh: sha256:fbce1ec0cb356cca7fcd11541d439702d0cb8dd8d0c2eab065f9d348354e2913
+    .claude/skills/backlog-sweep/SKILL.md: sha256:db4209f98b2564d64daedc2b061c7fed6bd2c5cb7fa87910b19bc55bc2e907ff
+    .claude/skills/cccc/SKILL.md: sha256:92ace70e71770bf2ab5d7c9eb43f9b387473e7fd91299385b55177b59700ae57
+    .claude/skills/ci-stability-hooks/SKILL.md: sha256:2ee8a2f4fd036017cd2f471f4c6feeb757ad2c8a68333a5d1ff1831ffa1f5e52
+    .claude/skills/ci-stability-hooks/agents/openai.yaml: sha256:60a9e8633c5933d8663858f15d71831b0af1c5265accf6f5e2ebba0916373cc2
+    .claude/skills/design-md-workflow/SKILL.md: sha256:d72b92220b78bb53cb0f9fa96a87e5ff9cfc418d6b24702bd93f6f04666b2116
+    .claude/skills/design-md-workflow/agents/openai.yaml: sha256:9c0affb53d0d0703bf7e8d8199ec81dde316b76a71151c3839c8c021056ef10b
+    .claude/skills/design-md-workflow/references/design-md-structure.md: sha256:2a273b9805b2476961ee0852bcdb7905778ad3c25260ed03082681323059c569
+    .claude/skills/design-md-workflow/references/design-review-structure.md: sha256:446dc1fcda31bb29a1b9387601176f4bba97c20c43db9532bedf0e586e56b05f
+    .claude/skills/design-md-workflow/references/input-modes.md: sha256:e451f000f63e10583b99257a5102cf64582323f358c575c278658286c27bf343
+    .claude/skills/design-md-workflow/references/routing-examples.md: sha256:83014cfd675639ed7bacffdb2fd4312e8d982936cff0b2a5551cea54fb24ce6e
+    .claude/skills/docs-manager/SKILL.md: sha256:0f3cb9c33a2f10b0eac6453d0badd6ad60b10168962c145fc5fb36fd516312b8
+    .claude/skills/docs-manager/agents/openai.yaml: sha256:82518b06e1ec3c0ff6a5c86d5718791ba4c0a077d680ca60ca1745887f315977
+    .claude/skills/docs-manager/examples/.docs-manager-config.example.json: sha256:e560bdc83be580828502155168300a5ee64cfef47b2420bbec177bf8494d3a54
+    .claude/skills/docs-manager/examples/custom-project-config.json: sha256:bb49877f1356562166dee7f57eed2a467da8ee178529e372e973602f59f17bbc
+    .claude/skills/docs-manager/examples/dotfiles-config.json: sha256:5ff986677d974597f64125281e7b296df76cefdbf1250289989f39ba97fdde01
+    .claude/skills/docs-manager/examples/generic-config.json: sha256:1427598bd4c71dfced87d47a71c87c9d23be20e3fc2be3bfa600232c264a653d
+    .claude/skills/docs-manager/examples/okf-config.json: sha256:2f5d4b204a37d2fbdff41764298820aa3dae123a08c7e01385101cbd9e6e9942
+    .claude/skills/docs-manager/references/config-templates.md: sha256:b54725da29beba710dc618b3d3fe9a1375d4a6ba8a7c4c8ffe7c9cddaef33b2b
+    .claude/skills/docs-manager/references/metadata-standards.md: sha256:e9b706dacc9cd844725e039cb9f85294779f4e8173ce86c582362298cf5a5a48
+    .claude/skills/docs-manager/references/size-management.md: sha256:dd624f049ddd4a0f79bf6815129f9fd0a6226fe72db895a0ebdc119e6aa85f5e
+    .claude/skills/docs-manager/references/tag-systems.md: sha256:ffebb0f824768f3762bc3f2ab819a8034b7b6add0025400c5ca8b37d03ff8eae
+    .claude/skills/docs-manager/templates/docs-manager-config.template.json: sha256:19c3bd7d4f539bfbb37667f1eccb15395d39e8e0ba74cd67c719a24efb57dd6f
+    .claude/skills/docs-review/SKILL.md: sha256:5056d6bf5a17255261490c177368d0cb42f80e26ff9ce459d7205544a7214baf
+    .claude/skills/docs-review/agents/openai.yaml: sha256:505226b173b1637449d2ec1df8199b1c7c46365b865dcf20dde2f3d80e7404e0
+    .claude/skills/dotenvx/SKILL.md: sha256:80216be0080c2687fbc88886d10b55838d4ac4a98bd184a44ecad01d6bfc10ea
+    .claude/skills/dotenvx/agents/openai.yaml: sha256:594feb9be08e2107ef649630aa69ae7b566c0344d4e4ac193b9620a5198c8c8b
+    .claude/skills/dotenvx/references/asta-dotenvx.md: sha256:7d40a7f448f3464de894cedd9daa68082f8bfebbf870e77d41bffaf96bf85cf2
+    .claude/skills/git-branch-cleanup/SKILL.md: sha256:029ace59375a45ab5bda699d9057766b6e8efbc7bd535ab8464002557f1a1e32
+    .claude/skills/git-branch-cleanup/agents/openai.yaml: sha256:e6c11f6e2e50b9f9d93f9f127327ee1ff81f7b8043bf5866f0fea61ffdc9ecdd
+    .claude/skills/git-worktree/SKILL.md: sha256:a5e9d2f45c77fccef843c3f99f8d7c2ce5d7df249664c264f217a27fa86add75
+    .claude/skills/git-worktree/agents/openai.yaml: sha256:13edbe566f94c15bcb553a532b392da27bbe1c81e71b0f229af6b161ac30bc88
+    .claude/skills/git-worktree/references/configuration.md: sha256:9082e69e442a038197bd62cf9c60313f6ef43086f16f85a1610374a1746b03a4
+    .claude/skills/git-worktree/references/git-wt-commands.md: sha256:fcab97e6a5bf055379889cc27a5df846378d768a7d2a61d39e8b7bbde7758cca
+    .claude/skills/git-worktree/references/troubleshooting.md: sha256:92639d6e587ef3dd943663b2e943a57eb43f0dad53f332155d1b97d329e76b67
+    .claude/skills/git-worktree/references/workflows.md: sha256:bccf9c623053e4d7438d79589171f8e0474552685c2297fef331fefd136d499c
+    .claude/skills/git-worktree/scripts/check-worktree-config.sh: sha256:5582d5f0b45395f7a077ea3e3cbb3266138053166950ff7df274957833e3ffdf
+    .claude/skills/git-worktree/scripts/copy-env-files.sh: sha256:6ef5050c930b48674c71c441e9dfbc6e543161f6acd78aaa34184296785d3c78
+    .claude/skills/herdr/SKILL.md: sha256:2e9d8af0ba3cf39d80ada5ca543c09ba25a580100bf5d10e171682aaf93431d8
+    .claude/skills/herdr/references/configuration.md: sha256:b694f7a8f709e37a04d1939c16f6d10ae36bcd33b8eecafc32c4898f7a442737
+    .claude/skills/learning-intake/SKILL.md: sha256:72a999631392afcc2f8b41d67503a043e343bbd84dda5ebcfd4a5cfef2146972
+    .claude/skills/linear-task-ops/SKILL.md: sha256:7aaef54f501977e06bca74184f5e05dd477e6b50187b622bdf64bebb832f9167
+    .claude/skills/linear-task-ops/references/asana-to-linear-mapping.md: sha256:1691e00b02c9172cf28e9b4c1aca3aaf8e2b6d90f6371736000a240bc4e68840
+    .claude/skills/linear-task-ops/references/linear-labels-jey.md: sha256:5f988e9da4a4d0588633497533237a685d1f7c24aa535e262c1039d33eba9cfd
+    .claude/skills/linear-task-ops/references/linear-projects-jey.md: sha256:a7007429e64875350a698d8c96cafd5449bf674b2aa32a693b84d45e3a33dbf1
+    .claude/skills/linear-task-ops/scripts/linear_task.py: sha256:131d394b3cb4d9d34bd8c165158a9c223bb9ef3277c824e4a6b98e56e5d998fd
+    .claude/skills/mise/SKILL.md: sha256:46fb7aec213bfa259f1000a5542523858c0e78bc07d781faef71e564e003a62a
+    .claude/skills/mise/agents/openai.yaml: sha256:5032c53d31fa12d2b209f729ae559a941d0ca68a2494101f952eba0b87cff7ef
+    .claude/skills/mise/references/best-practices.md: sha256:8e7fccc78b18e74eaf535d170ed8763486dff6799daa05fcb0fb5e1e7944ff82
+    .claude/skills/mise/references/bootstrap.md: sha256:d394612ee040fd6140d4ed10921b35f04f2594a744686a12196adc1a57853ecc
+    .claude/skills/mise/references/config-templates.md: sha256:cf656edb872bf855256906a1325342ea3f1b75ff48d2899696be3dfee086123b
+    .claude/skills/mise/references/current-patterns.md: sha256:fc357599a20de278da0df7ab9b601b77f800150f4f543d6ec1522d50260aa2ca
+    .claude/skills/mise/references/task-config-includes.md: sha256:cf40ad9158fcc509bc5a3144f9ea13877b9825ca740e4d3f5eb93e16377b5859
+    .claude/skills/mise/references/task-family-splitting.md: sha256:43022a96ae2bbbc7c00179b4d6fd91787e2e573a3b7a2682b18bab2ad230f26a
+    .claude/skills/mise/references/tool-management.md: sha256:4a382268f67c2417f82730ed720b7dccfced830a50e002bedbec163d62be37a7
+    .claude/skills/mise/references/windows-shells.md: sha256:e9a69026c9ba4690712d944366005dd385652a4def4746ab1a0dd5d017738c44
+    .claude/skills/mise/resources/examples/npm-package-migration.md: sha256:e0d1bacf5fc34155c0b125a3b014c822fbd742a39e9b9b7b872dd7c8574017ae
+    .claude/skills/mise/resources/templates/mise-config-template.toml: sha256:165dd9449fe4c8467bd5f0de32e74d7806786b215ad2dcde658b30c606657fce
+    .claude/skills/orchestrator-worker/SKILL.md: sha256:952cee6e281eac3453828123d825d4ae79a9236fc2bacc1137dc14b833dcc36b
+    .claude/skills/orchestrator-worker/references/regression-fixtures.md: sha256:a14203036122e0ebc17476af79b08eb9855fa75359ef822d114543e8fd2d105e
+    .claude/skills/orchestrator-worker/scripts/check-fixture-isolation.py: sha256:c987134ef85c0bcd851bd0c597ab43e3b60017aa804f965d7b79426e399b6e6e
+    .claude/skills/polish/SKILL.md: sha256:0d91b746bbc511ede772b504407a6ce181fb3a7d9f9debbf07d4e4b152807bca
+    .claude/skills/polish/agents/openai.yaml: sha256:dc60fec55c211b80c2d188ab2caa345f9ab831a522761e46044f59d4951b12b9
+    .claude/skills/prepare-goal/SKILL.md: sha256:792827300e8fa75400f2bc50d7d27c5a5a3f3b0a6c0859861d6c3566a1e88a35
+    .claude/skills/prepare-goal/agents/openai.yaml: sha256:870d31c398ceb1c485a64b3a5e694942f055e85983718a61434b117bca5cefbc
+    .claude/skills/pwa-layout/SKILL.md: sha256:869c997c6e6cbca873aa37a377bdcc8681d696a0475c39433c42546289ded4db
+    .claude/skills/refactoring/SKILL.md: sha256:7d51ffe56c72ec31cbf07604771bbc840ae76a6806718a04a93ade6b094afcf8
+    .claude/skills/refactoring/references/boundary_ownership.md: sha256:e1453ec7788d1f013a356982568c7a5cbd727be72907b721ab8443040cc91058
+    .claude/skills/refactoring/references/code_quality_cleanup.md: sha256:c09cd24e853518d544d39ba80f5fcce381d477325001afde304be2f970c6562f
+    .claude/skills/refactoring/references/dead_code_tsr.md: sha256:3ca03e5ae296c2e0a67d45a6bda7da57329f06f4c56fa66099943de29dac0285
+    .claude/skills/refactoring/references/helper_extraction.md: sha256:041609dbbd6d27e004e80bc0590c3c1a1482267306570fe07f12e6f338311930
+    .claude/skills/refactoring/references/parallel_dispatch.md: sha256:4588d7ac3e700bc72f0b54a78537a0d248684e5924f3b9aa45f0e573a8adab49
+    .claude/skills/review-fix-loop/SKILL.md: sha256:aaffd8263eb2bb46e64b7a3c107b41f314d82a052dfe30820a5300e8ad18c9c9
+    .claude/skills/review-fix-loop/agents/openai.yaml: sha256:2ebea0b8282c864b31d92a942df6e46c9b6ab54a2bd51e38878c7f732ec3004d
+    .claude/skills/ship/SKILL.md: sha256:f62ef62d147a81e027719a83f503b5a6aa8708cb98bce07844ce67d00ccc6aa6
+    .claude/skills/ship/agents/openai.yaml: sha256:b676e15b87ec52e10d8b36dabeb1685ee5a0348d4220a3c87f1e5c1e3602b0f0
+    .claude/skills/similarity/SKILL.md: sha256:b34b03b003c842dd5b5ff77b373d9442decfc0224eeb19d6c6542e8b671db31d
+    .claude/skills/similarity/agents/openai.yaml: sha256:256ce2d2a4a3f6ac024a9a08b2665de766232278500894c27c2c83569b778598
+    .claude/skills/similarity/references/report-analysis.md: sha256:3188868e0decf956df49933ceb253f52e590cb6c19af5fdfecf6aedc46ced55c
+    .claude/skills/terminal-browser/SKILL.md: sha256:cf0608450f6f83ce788a55f448ec268f8b10700c42211d6e00c509d6b16ce65e
+    .claude/skills/todo-changelog-ops/SKILL.md: sha256:89b31894049a27acbd6ef7bdf7d6dff8c90b1bc87618b210e06fe673304dcbd1
+    .claude/skills/tuxedo/SKILL.md: sha256:0b89f27106a026b03fc7f3043d0c4adf409ed3902e4f415a4acf7e15908a0c1a
+    .claude/skills/tuxedo/references/tui-and-capture.md: sha256:13278531ebad1f152047aaebc247eacbfd69f75ba1887e3a611627c94a31f684
+    .claude/skills/web-research/SKILL.md: sha256:a9c97632b56dbf89f7e57f70d97e96ff477afbd8837b1a99a5300ddd6bfba562
+    .claude/skills/web-research/agents/openai.yaml: sha256:50536a04fbc72b0f71fc9975a7e041893912ebfcaf9c671439843d20172e1264
+  content_hash: sha256:e1592402b486abe85f60e72f78e06ef7d99b29331cda072a973dbd157585913e
+- repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
-  resolved_commit: ed39730ed82a5c8ec033d7cfbf436c22642aa419
+  resolved_commit: a642b332ee25960547ef5b8b000d2d4b27a8ec0c
   resolved_ref: main
   version: 1.0.0
   virtual_path: manual-skills
@@ -3238,7 +3752,7 @@ dependencies:
     .agents/skills/gh-fix-ci/agents/openai.yaml: sha256:ee649f6606ff1e5512bf07ab5732ee4690fc04d529b9717b507fd10120878fca
     .agents/skills/gh-fix-ci/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
     .agents/skills/gh-fix-ci/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
-    .agents/skills/gh-fix-ci/scripts/inspect_pr_checks.py: sha256:9459e5b03f86785d184a83e5cd8d621b832e918ec04158a2962d867785812c6c
+    .agents/skills/gh-fix-ci/scripts/inspect_pr_checks.py: sha256:3bdf92c3ef5fcae825748d1a3f3bfd9bb2f9e567334f2addeb2d9dd54e31a272
     .claude/skills/gh-address-comments/LICENSE.txt: sha256:58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd
     .claude/skills/gh-address-comments/SKILL.md: sha256:1ce75a659142aaa41b95f92e1983488751a5474d5ba231024fd11f24e5d92db0
     .claude/skills/gh-address-comments/agents/openai.yaml: sha256:8b9f604d79717d5aec58abfb192f2d713c45b5558f5572255d9f9e5d39877ee0
@@ -3250,8 +3764,8 @@ dependencies:
     .claude/skills/gh-fix-ci/agents/openai.yaml: sha256:ee649f6606ff1e5512bf07ab5732ee4690fc04d529b9717b507fd10120878fca
     .claude/skills/gh-fix-ci/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
     .claude/skills/gh-fix-ci/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
-    .claude/skills/gh-fix-ci/scripts/inspect_pr_checks.py: sha256:9459e5b03f86785d184a83e5cd8d621b832e918ec04158a2962d867785812c6c
-  content_hash: sha256:eb2408829fd07f77129891ec428e95e57da8d58d04a74e1d22858b05f890dac4
+    .claude/skills/gh-fix-ci/scripts/inspect_pr_checks.py: sha256:3bdf92c3ef5fcae825748d1a3f3bfd9bb2f9e567334f2addeb2d9dd54e31a272
+  content_hash: sha256:c92705797cf174e1fd4e11c6b3cb82aff481e2b724cf1b74ec8758a95303b50b
 - repo_url: k16shikano/fd287c3133457c4fd8f5601d34aa817d
   name: japanese-tech-writing
   host: gist.github.com
@@ -3477,7 +3991,6 @@ dependencies:
     .claude/skills/react-doctor/SKILL.md: sha256:9efaa6a77162e0aafa75bcb1ac18f162631a9028d646a3cb2367423073517927
     .claude/skills/react-doctor/references/explain.md: sha256:237dd81672c858c8c52325bafeefdde2d5b842c9a98c2ea6a820534a0df8e927
   content_hash: sha256:ab6d7a9efbf8c66cb6fc28c4a32386d6a26e1abe37a7d7817ed2d48bb150bde0
-  resolved_tag: v2.4.0
 - repo_url: mvanhorn/last30days-skill
   name: last30days
   host: github.com
@@ -4120,7 +4633,6 @@ dependencies:
     .claude/skills/last30days/scripts/watchlist.py: sha256:0f6f88160d7936600edaadac31a42396d8ac561848b807641fb9050225f59dc1
     .claude/skills/last30days/scripts/x_lane_parity.py: sha256:84c67104874856ebe0faa063345d4c3f042fd4ba17e8b76b15f18680ce2d1767
   content_hash: sha256:c7973f55ac5e0121bacbdcc44991c50457a3c1daf375508989f0c1f33e68ce4b
-  resolved_tag: v3.28.0
 - repo_url: nanaism/yomiyasu
   name: yomiyasu
   host: github.com
@@ -4191,7 +4703,6 @@ dependencies:
     .claude/skills/yomiyasu/scripts/yomiyasu_diff.py: sha256:b704e088fd6e1b01c21fb6b97373cc21d441cb14e976f3a47a95c3ba1c73a964
     .claude/skills/yomiyasu/scripts/yomiyasu_lint.py: sha256:299a61970e8c30092f947e2ace95e80ff8a513fac87824363f89ba77e6cac468
   content_hash: sha256:c020d25c12dc197ea45240118549e56dd6c6a0820294300367e76454f4c39002
-  resolved_tag: v1.1.2
   declared_license: MIT
 - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
   name: ui-ux-pro-max
@@ -5845,7 +6356,6 @@ dependencies:
     .claude/skills/archify/test/workflow-shared-trunks.test.mjs: sha256:d8b51c34dd1df32358fde48204b971b15bdfcd20975e4cdad56145b6752130f6
     .claude/skills/archify/test/workflow-vertical-label.test.mjs: sha256:aca8a9cc02844e9e28fab7c5b3b70ee3cb56a41025bb35fb8eed3f10177422d2
   content_hash: sha256:64783d26ac88f96eb96f59d86c71c66a62d7eb15de1622016ea2ad98e85a0c76
-  resolved_tag: v3.0.1
 - repo_url: vercel-labs/agent-skills
   name: vercel-react-best-practices
   host: github.com
@@ -6389,7 +6899,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:7e6c6591f1e426c5e5652b25a19b7462b92f949c04b78c80618ca2176f66628d
+  content_hash: sha256:2efd5ded1d7603301e7493b50503a371b6f85c9dc0912a6ba8741aae36ffc979
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/.gitattributes
@@ -6443,7 +6953,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:e69caaef6c72897a99b0bf1473693e143d7ed1f21b4ed45e934a87cd57563495
+  content_hash: sha256:bdc07db7f0280cc878a9ed2fcfdacbc22c97cbb5e0a5a2fc30e2fc3462084887
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/.github/scripts/check-enforced-assertions.sh
@@ -6542,7 +7052,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:8404c12c5b3195935b9ad33e63b2a4986bc15a17c234ef5252200c3c5d8231a2
+  content_hash: sha256:dbe4856102bc06b48c4eb6ba25b1f4822f7ecdb57b2921f81294586f75195cd3
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/.github/workflows/release.yml
@@ -6605,7 +7115,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:a92139b7c4ca928c3496149f99626d5a2af57d85de416987cbc1a5034b56db56
+  content_hash: sha256:6672683f4adc87be71ac28e4da856e0968e7c8380044df2d82c67df03e7bd09d
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/CONTRIBUTING.ja.md
@@ -6641,7 +7151,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:daa8f8fb133cb8ae2260266f2e7f43dc48a70ef98b55ffd0aafdc84e25ed2d43
+  content_hash: sha256:7d17a5786dff213ec5856254bd07b5450c09d74d654b641bfcf8a44014cc078d
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/README.ja.md
@@ -6659,7 +7169,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:98c46aa185f184c9ef8fce888af3fb852803c94dd3343e8eb6dab29bfb10fef8
+  content_hash: sha256:3303aeb52fcdd7ce45c1cdc0cd4488054889fff0bc929c57921d7ed522b68297
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/RELEASING.md
@@ -6686,7 +7196,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:bfa5e800fb14ec96585698a68ef1d4aaba2d25bb33948350c2f8b2a581cdc05f
+  content_hash: sha256:d8de64058b1d559467bc5a155d200a279087a98b559a40e52bfd849e8ab2f8e0
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/VERSION
@@ -6695,7 +7205,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:c03e3824001f39b9518249b8d6522422fc4de7227e12a568c0164662b03b7758
+  content_hash: sha256:dfe7d71b3f428eb73ed853f8fded65e2986896e21d69f45ebf06bb623b450e14
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/app/.gitignore
@@ -6722,7 +7232,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:c8d27debf356c5ef491bb6f3d8ee52346ccf94177a95866e8b5adf4f196bc0a2
+  content_hash: sha256:9175ff0018726fde2492e0b23c52832e2cc1bb720465ec162526ae15f36b80b0
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/app/README.md
@@ -6749,7 +7259,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:e92ec2a32a1319e0e0d61a5da82cecf6bb8cd6cdfab7fcc6f8822d9bc124403c
+  content_hash: sha256:9358e7953deb03538749701283aed3bfa9f60e2ce3698e6cb065c68d39bd867a
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/app/pnpm-lock.yaml
@@ -6839,7 +7349,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:94320a59c65150c18ed398764f79f163103858f5166f5e1dcc14aa4b3dcd3138
+  content_hash: sha256:bb1df845b437b72599323288dfcb40a3289ab28a4b8b337e12703467bc0e897f
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/app/scripts/sign-windows.ps1
@@ -6866,7 +7376,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:80acc4f2917454c1de98f263832807c348634cef1fa9c3659125b6f02b3cd3a8
+  content_hash: sha256:92aeac91e315958c629d0faf236054d510d90cddfc253a3c50364a8c2942cc10
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/app/src-tauri/Cargo.toml
@@ -6875,7 +7385,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:a4cb9f47cae3cb053b59efcff9a56cdbe5a66f858500d8c5d81e7dd436a2760a
+  content_hash: sha256:4eb37bdd81d3a4a0ff439876dbc77ae1033a45392f6fa500854ad9c98ddb623c
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/app/src-tauri/build.rs
@@ -7064,7 +7574,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:ffa48bbfa7c2ff70e71208ee6826fba5ccb610620e5f54f67747743f4b43483a
+  content_hash: sha256:3f9d36482af645710485ea4ee0e974298dda7f75c1a1bb40cdc2cfde5da2918b
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/app/src-tauri/src/lib.rs
@@ -7109,7 +7619,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:a40e81ada24d2c6a66015d9298a3524edaa2a935168919c34d933c598e4a3bc8
+  content_hash: sha256:704424e10d0e8ddd028fade69f1b6fcbeeecf627bb25a59ec2a83a10863ad992
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/app/src/App.css
@@ -7118,7 +7628,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:8e9dafb6021aba1f86190210a3bcad82adec4b202a51d81a19aade7df8a642fe
+  content_hash: sha256:2f81afb3cde0738573a1afac0aa8437e83504e3d35a07de40d012ef1c3d062f1
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/app/src/App.test.ts
@@ -7127,7 +7637,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:f0769796195976781c3e27d79f2485a7a3c07d0d4aa23fbeb2cd99288333bbfc
+  content_hash: sha256:ef614839851ed9e66decb08a89d4f37e0fee8bdb20feec689e40cce1b628a6a8
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/app/src/App.tsx
@@ -7136,16 +7646,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:f62f0b05ee18f64bc855cb691a35a04c17818e54b7c00b957576aa8254786b29
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agmsg/app/src/SidebarUser.tsx
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:19b7655498f797b5156d5f0cc9834c0bf2d580547e79077ac7bd9db8898374b3
+  content_hash: sha256:6a62485cf0642e27d4b40233e9d8b7baee5a0827c0650c28a7109030b0f701b6
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/app/src/TerminalPane.tsx
@@ -7199,7 +7700,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:6265d6279ef03097f182945fb000223dc761730af7ddd5a68a9e63929556a617
+  content_hash: sha256:a07d7081246c9fda1fb6379b7b06122051ab390d062d8d4978bb55b5ae72ddf1
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/app/src/i18n/locales/en.json
@@ -7208,7 +7709,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:1ed76eb0e6bccb3a3adbced9e86f126cb7c0dc9b1a7366f63f8faecdf6a9027e
+  content_hash: sha256:d1d5d28a1e6bf019854cde38aa34f6f6ec75f91f227a7a529d61ef4b54dafa04
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/app/src/i18n/locales/es.json
@@ -7217,7 +7718,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:0112302269358354db89f6519d369244994ff3fe51d5207eed20be3d2e5232e7
+  content_hash: sha256:087700c3e192d7dbcd1e8ab7bbd7593ab8f8cd7542ba239bd7bef75db6cefc78
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/app/src/i18n/locales/fr.json
@@ -7226,7 +7727,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:f9b2cb1e06afdb6e509d608af38a25c47bd66008c973de89765eb3cdcbab7a60
+  content_hash: sha256:43c68a242a8338e20f771ba63dd86ae49b75a1466be3c764a7709505504ed24d
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/app/src/i18n/locales/ja.json
@@ -7235,7 +7736,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:01e3d3fb743b5e656f5d3991e88a588fed6635e95707f2bf6db9dccacba01328
+  content_hash: sha256:6a7542d97cf96513e1a08fe1476bcd7ea1bf971c6d9ca2f30f596dbb039a6e8a
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/app/src/i18n/locales/ko.json
@@ -7244,7 +7745,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:73f15dfd28de2ed188694a44e4492a5f2a747578df5e38cf1c0d4b3855d0d8e3
+  content_hash: sha256:bfe61187f595bb5a897666c4595ae825f8d82fb0c778631243d41c48141a00bf
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/app/src/i18n/locales/pt-BR.json
@@ -7253,7 +7754,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:fc915bbdd0164fa5ae33f0e1f8646931f8052493ebe9f618c596d05e89681459
+  content_hash: sha256:39e6aa6a58ee0078abff9459076c4978fe86069727cbb42869cf6bfd1dc9647b
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/app/src/i18n/locales/zh-CN.json
@@ -7262,7 +7763,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:eb500100d13b8563124d1fc99035f909b7a2286c4feb286d242a54094db366c8
+  content_hash: sha256:b4fa81e2c8c5a31119de1e183fdba73c3ea514f538549a730f73ec7a79d03bce
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/app/src/i18n/locales/zh-TW.json
@@ -7271,7 +7772,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:526428e96473945442e5f2f522077654440111461b6f5bcc1564599168188a03
+  content_hash: sha256:a886fcac7c2da1aca0926a7c31a572c98981ec71deffec1e38a0efc725e98786
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/app/src/main.tsx
@@ -7451,7 +7952,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:17ddaccae691cc5b6bee541764f1111c75bab7e74e25264ed220d4c5dffee183
+  content_hash: sha256:2a1eab0405f700c16f379cae7ac6fb45dddb28e984046294e5fbf42b27f4d408
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/docs/actas.md
@@ -8405,7 +8906,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:8d1f345aff9a20022314b0f6260348c91e32d906c4c471857c27ffa50395a04f
+  content_hash: sha256:a58d81411495fafe6108f8d9fe572672b171e8dbec2b7e2dffb550edc9cdbb46
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/llms.txt
@@ -8432,7 +8933,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:eddb346386dceb4a51763ce294fb6344ad7e03c3c06a335daf3f3a4b0ad5c05c
+  content_hash: sha256:d20e6056b022156b16c830dfd80cc67513f975b7a257ab8d74d8c70105bc20dc
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/plugins/.gitignore
@@ -8459,7 +8960,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:a5b75110dc54861b3f9c2e72f25859e1bd2c96ef5d8a6e723deae4cc164e7c22
+  content_hash: sha256:18e95481308314ef5a40efc75b73bbaa8fbc89ceb72e2537e850216dbcf5e591
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/scripts/api.sh
@@ -8513,7 +9014,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:6b92aeb033cd910fc8a5b70fee5f8d05a824faefec126141435c2e01b0cc9aed
+  content_hash: sha256:c80841adf071efe9438fa5caf5280180cdc64e5bc653011c6b8ee459a17068a5
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/scripts/despawn.sh
@@ -8531,7 +9032,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:481de9459ee9af9627a5511a01146f5d4581b61170717f0a622be8ee41c16f3f
+  content_hash: sha256:f45a09cba963304f516300a8526c7fa8b2b04a4374887b6332b7020a4cf3976b
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/scripts/drivers/ext-tools/README.md
@@ -8730,60 +9231,6 @@ deployments:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
   content_hash: sha256:3bd4f0898066415f48708de18950bea74f08254fe956a27b38f8e7edbc48303f
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agmsg/scripts/drivers/terminals/claude-desktop/README.md
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:d7693455f98267b2ad7c85a94767f51217ace45307ca9158501fe6655e07dbe9
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agmsg/scripts/drivers/terminals/claude-desktop/ops.sh
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:d09dfd3d415e8373c91bc30644482de3ec282c8a67d0c4cad82384a97eaec581
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agmsg/scripts/drivers/terminals/claude-desktop/terminal.conf
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:6efb7d0a80dfbb8d5894ed02234c1421b6529044b64756d45d791bc060101327
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agmsg/scripts/drivers/terminals/codex-app/README.md
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:aec3e37f495ef18acf14c20e67b49a8504dd4ffb2d7173d916dae39930bf39ae
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agmsg/scripts/drivers/terminals/codex-app/ops.sh
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:c8d5cecbdcb42b7e96956e7d5e50590e82f7587df00b8026d6281f16013134dc
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agmsg/scripts/drivers/terminals/codex-app/terminal.conf
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:50326784cf5caec53d2dc2b043ea5307dcc0eba31dc3945c9425f86e667bb65a
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/scripts/drivers/terminals/herdr/README.md
@@ -9080,7 +9527,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:dce1790aea6dc6dc12e8a35ea8d0773001338194c9ffda6fbaac409eb4fed28e
+  content_hash: sha256:b37bd43d0546492f6faff953560d090c7250829e7c6083dcaaf0a842d9f45a0e
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/scripts/drivers/types/claude-code/type.conf
@@ -9161,7 +9608,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:4a17ad308c54ec168b49f1bbfe72c1c00b53716c077fa04b9139848c206a6256
+  content_hash: sha256:3d39c256b898c6107645c28528101d56301b689f09072aec2afad23df6e85dea
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/scripts/drivers/types/codex/codex-monitor.sh
@@ -9170,7 +9617,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:a68a0eb2538c578436ba6ad5c41553205e5add0fab7b1948c90c0231136a1817
+  content_hash: sha256:27db19b943acae5494c2a7157b3675ffec2c9df255a097789364363f4f882bef
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/scripts/drivers/types/codex/codex-record-session.sh
@@ -9179,7 +9626,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:235a75f4bb66f6928644adf2e60f28b8217257a3c72cd36171207fe91a5cdb16
+  content_hash: sha256:5b6b1e172d222c09953d8eedb3985af01edd830fc236d1c8e5c21fa283a4dbaa
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/scripts/drivers/types/codex/codex-shim-install.sh
@@ -9197,7 +9644,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:e922294c5cddcaeb2ca0b485c68ab6d31d8997d0a11e5aee319fa85d5f6c8d77
+  content_hash: sha256:851a0acc82c243c17156ac782953ae1caadcf5004d11faf7efe839c711d0c27a
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/scripts/drivers/types/codex/eligible-pairs.sh
@@ -9215,7 +9662,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:eabd9cc6dbef73bb1f88246c589f828bbdc46076653f6237add590f4716dc852
+  content_hash: sha256:fbf2e4a83ef624b089d9cbd19278e2b3d25bccfc551a3899e06c061945dc3537
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/scripts/drivers/types/codex/type.conf
@@ -9620,7 +10067,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:53b79a8db1416a751db0c1e4ab59f083f02fe23532e702945629508a9ef119b5
+  content_hash: sha256:1c633d0cec1989742d3129c4b4f1b47e4aaead6337b8ead4baac8cb293ed0cfc
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/scripts/internal/strict-jsonl.mjs
@@ -9872,7 +10319,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:fc2a41e7af041807ba22f9310ed7acb1249f8d6b80cbaa54e34d4a843748dc1a
+  content_hash: sha256:3b717c8b989e160fc6fefe5ae14af2a4b8850238d9374d3510631a12124eaddb
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/scripts/lib/require-python3.sh
@@ -9899,7 +10346,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:da7adccc15f3a0925cb3f76f344ed6855af85f14802ecc38521bfe066e564ccd
+  content_hash: sha256:7c528ef5befd4281fdceba96c3761b49cc54dfc2797e9a7dc2cb04bcfbe63d79
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/scripts/lib/roster-journal.sh
@@ -9998,7 +10445,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:1ea8e89b53eba16ee732a6d2127d5d312d011165cea1ac973f8f0f2c7f6751af
+  content_hash: sha256:e37490a335965e147d3399929d5933359bebd18a06e134e3cf20d326cd33104f
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/scripts/lib/spawn-options.sh
@@ -10017,15 +10464,6 @@ deployments:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
   content_hash: sha256:ef10adac6ef348db2cd6f0b395a551d3488e03fe42ddafcea7ae13fada249494
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agmsg/scripts/lib/stale-outcome-files.sh
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:dbba60f15b390e6d9d792ac773fa5e330de2ab328fc1deb6d0b3c8768df1253b
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/scripts/lib/storage.sh
@@ -10088,7 +10526,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:d58c65eab749dee0df6183bcaa4a64c79469a9044265cfe01930d9b3ace4a42e
+  content_hash: sha256:4849a592ea99297dc6862d8244970536810c465ed2d31bc3743375c40b33d44e
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/scripts/lib/token-locate.sh
@@ -10125,15 +10563,6 @@ deployments:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
   content_hash: sha256:e9d98817fcf8293f19779554869f827596497b56c586395d6f89adc5245d1b8c
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agmsg/scripts/lib/windows-elevation.sh
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:1624c90fcf614d26c417955bc8bf881a188a56dc95745cb22e08266c6580f72f
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/scripts/peek.sh
@@ -10190,15 +10619,6 @@ deployments:
   content_hash: sha256:928748a44a4f6adf8a02a9141e2d9a9ce5c78c35d7c9979e6a8de5fe67fbe245
 - kind: project-relative
   target: claude
-  value: .claude/skills/agmsg/scripts/release/render-plugin-skill.sh
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:ecd417257292a88c9e94f080e401ee59aa67e404bc3047d5044fd277c19d9ddf
-- kind: project-relative
-  target: claude
   value: .claude/skills/agmsg/scripts/release/sync-version.sh
   runtime: null
   scope: project
@@ -10232,7 +10652,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:9fb7b2c5ca2c2bd32e595dd29f7361171a2a8ec651fd7555e44e69bd000563f3
+  content_hash: sha256:b9ea460ad87b5e069b7a801f71a8b0ee0534deae6f96226e40d88029bb110e89
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/scripts/rename-team.sh
@@ -10286,25 +10706,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:44dae99b785493117909de3da1c14eeb3bf2c8487477064aabe61a9d175c5ffc
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agmsg/scripts/skill-base.md
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:abe308c05d347b203ad9c62a2307dff9ebe36a290fd2219713ffd4004a5acd23
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agmsg/scripts/skill-plugin-step0.md
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:a2cdcbad5278fb0fc9adb1d70ee2ab835ea71ed61ddd06214c29c7417bdd16cf
+  content_hash: sha256:7be4a270f8692b886843f7939c669be6b158314284ffc5162914fd529afca3af
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/scripts/spawn.sh
@@ -10349,7 +10751,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:366804934949e67f5b510082036d281fb58b219f754c9ba01ca2a648d5b20de8
+  content_hash: sha256:bcd6fbd0df4bf428d27103939adfc80f32915b2c852aa3ec654ddfc124de907d
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/scripts/where.sh
@@ -10664,7 +11066,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:b7332c1c55db6f1bd24355936e100016a2814da7a7e902a5272a9e61dccac91e
+  content_hash: sha256:051950db75deaf76fe4ea8c41fd0b74f7d8dd835983d440d7b953764935c3fc1
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/site/package-lock.json
@@ -10673,7 +11075,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:047f9cf6686c81b7f73172227d9da5bb2dfd9aae4ebfa6b912ad83a1b863918c
+  content_hash: sha256:8bfd15746d0636f8885aaf46f84d1c863a51c33146a7f5c5ab44d887378a8b31
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/site/package.json
@@ -10682,7 +11084,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:49a14f0be7876eae96db9c6c82db6848ec92c848368697d7d9600454fca7af9d
+  content_hash: sha256:8387904be5c7c8fb15aef6632c32f0ab1b6ea74dafc249d1573cb443faf6606b
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/site/public/CNAME
@@ -11015,7 +11417,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:2075f5ad58a52e7fbd6d2a7ca29c4665f0f3a94e26dd5ca5088f72c5f75ca259
+  content_hash: sha256:22b100fceea74859cb1d41d3b1cf138bc0dfd0d4ac35cca89e0fd798385d8efd
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/site/src/pages/[lang]/index.astro
@@ -11294,7 +11696,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:f38e1ca7a1d7b33ad101aa18400ba0aef9d02a4abae39a807019a72b97c0f620
+  content_hash: sha256:b821523afae8c871e7d3fe06706f8e9ac33e2866827d350507c039b0c552cd43
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/tests/test_actas_lock.bats
@@ -11429,7 +11831,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:6e651f2aee200a2f9b97d838bb296b6a7cd24b364b2a11b618597f36ab682d5d
+  content_hash: sha256:3c2fd94b0e0f5e08e28c49ede7ae7ec8c9734a33b1db71ab412646b29809a25b
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/tests/test_close_fds.bats
@@ -11456,7 +11858,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:6a70e4f8472b579add22effd34d43e9807f81069f7a778ebf2e4f7aa122f8627
+  content_hash: sha256:f5360df70495e3c6703f118983e7df6c037db71a75630f8c64fc30fc88002e3f
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/tests/test_codex_bridge_launcher.bats
@@ -11465,7 +11867,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:45d8f6f613ff77d15b40ce2bcabde510e701b6e3cd465fd341d0caf82e0362f1
+  content_hash: sha256:f625a78a44a16e6e9a59a12b8964dd732e485d803a7f1beace6cf7727a3849cf
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/tests/test_codex_monitor.bats
@@ -11474,7 +11876,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:6bbc3ab56751d4b8f30f3dfbce3c5b762f8fcc642f21de0b721dad7e96bcb8a8
+  content_hash: sha256:31102de868c22b43a432c918c9abca29cdf7f4e59384eaec0a23400e513d14b4
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/tests/test_codex_resume.bats
@@ -11483,7 +11885,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:71bc844c82c40acba8b5eb762d7c6e8352b70f3fc1dc9c25df87f5d6fdd89257
+  content_hash: sha256:389191e2e56bc5a6a145f30bf8d9c1436b816ac0e653535861ab553aff686aee
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/tests/test_codex_shim.bats
@@ -11492,7 +11894,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:127dbe143f64bf567bda642509241afd3167a0ba4bbc4647d09a4bc1b2135f6a
+  content_hash: sha256:75f6ee56cbb733b5446c7e6205dc1d284034e41d2c78256f0e032b0eaab80031
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/tests/test_compat.bats
@@ -11537,7 +11939,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:60d419b7df40e3e15c57a39e281e6d546e90e91bffb31cafd5173176107f9458
+  content_hash: sha256:62404721ff4007e61cc6c5aa0a6e264b92493b50430e2c4ca5a26dae4f41c870
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/tests/test_despawn.bats
@@ -11564,7 +11966,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:e105c7abf60190552dbb6428d9c57d594d1793076b95264aae9295fdadcf5d2b
+  content_hash: sha256:b2b9b4b186701834039aec45f498572924e9549bb9cc06f5fdec6400af5bbac3
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/tests/test_endpoint_scheme.bats
@@ -11663,7 +12065,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:661a4c109601dc8ca10997cb9adf6b32826882344a452ff13d10576e53c322ea
+  content_hash: sha256:5d2a3c3f691dda0cef5a635e2886c6986660abbc63c16bde68aea12d942b1f36
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/tests/test_herdr_cli_routing.bats
@@ -11690,7 +12092,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:1039185a75164d1d1861446c15950f3d37b753c16881abb44a05a940c87ed186
+  content_hash: sha256:727b2d371d5f98d3ae491dfd2df2b5d8b079c014e40c2813f40394e07bac3200
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/tests/test_install.bats
@@ -11699,7 +12101,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:5bdc91b1b71e16cd52d45a5356d2f00c0071c57ab8f76599bca6c7f3386c1ee5
+  content_hash: sha256:1574d2c12b5ff19cf27e28f0a3526dd9566c13721c5a7ac3919c9a3a8fc4387f
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/tests/test_instance_id.bats
@@ -11861,7 +12263,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:c63f748dbefbd22353f267da3ecb0cce74b8f5f986db4e10cabb7c8591f31724
+  content_hash: sha256:9a5dbf19ede3f608d5a50cbf4282c96f939938d542a8dc2a0ee150b484730dbe
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/tests/test_release_ci_skip.bats
@@ -11888,7 +12290,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:1ae128a0192ad993789dabed758afcccb0ca39d306301bf76a4a8bc16a5f66df
+  content_hash: sha256:dff9feca25cce95fd39cc1bcfff79eedc3e274026875d2951a8bdaf600a3ce58
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/tests/test_remote_curl_config_paths.bats
@@ -11978,7 +12380,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:0bbd0ded41a6be485184a060198decd60441699560e736f9af05e40522187e9d
+  content_hash: sha256:f6b2059e7d8c41430a8a6bc98b248a601363508705ef40f9d3c9fc2139d3c7f4
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/tests/test_remote_sync_apply_blob.bats
@@ -12059,7 +12461,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:8b46578dde41339428267feefe76e1bd920453991e0d8acbb7c3739cf05614f7
+  content_hash: sha256:186c6c7ce9a89e79dc0466bb1e7d5de2a9d26daabf2892569d8b7f21e55b9824
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/tests/test_resurrect_panes.bats
@@ -12122,7 +12524,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:4e1e1b9925b3aa2a5cae8fe73f5f91dde374c2521bab95e8fa378ae8b0b81f51
+  content_hash: sha256:624508af6e5a4b834cdd5ce83e7d37a210fdef013d70e65cb2d754410eaec165
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/tests/test_self_proof.bats
@@ -12194,7 +12596,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:3eeb8a70f9f13ad1232c93b44955fbacaaa82ae91914ebd541eda6629d96f791
+  content_hash: sha256:e2e15d721e9e46b2f522fde44c45bb95368a06f362d9ebf5f16e3addf895ddee
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/tests/test_spawn_fd_guard.bats
@@ -12338,7 +12740,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:b064e1114116dd8e96750a3ae70333686dd16d45066fec30709447811c44525f
+  content_hash: sha256:3eb8c8506123f11ad5b5892199bcde6a812ffc7b2ecb3e1f2d8e3007b5c0d192
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/tests/test_token_locate.bats
@@ -12392,7 +12794,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:e405781f88a39dc4f19d42709f7fdbfd5da5beb37693a557969ee49e0952d896
+  content_hash: sha256:d2431db4482d1c9c65f7e27e312cd56e965b80bf421c6a841fbed1a87bae6d7e
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/tests/test_watch_install_changed.bats
@@ -12437,7 +12839,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:fe75329da01119de6e8682e704f9532a514085c5ac515ead86c36581812aad05
+  content_hash: sha256:5677288b66c0a9b312ce7ac87a370fbefc32cddd335094c3bcc28baab1e45260
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg/uninstall.sh
@@ -12447,6 +12849,24 @@ deployments:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
   content_hash: sha256:45461aaa26d0383c15f58da8601cd2e0b6e769a61a4708388296052bb1e8d4da
+- kind: project-relative
+  target: claude
+  value: .claude/skills/apm-deploy-verify
+  runtime: null
+  scope: project
+  owners:
+  - jey3dayo/apm-workspace/catalog
+  active_owner: jey3dayo/apm-workspace/catalog
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/apm-deploy-verify/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - jey3dayo/apm-workspace/catalog
+  active_owner: jey3dayo/apm-workspace/catalog
+  content_hash: sha256:a404b45c2e7e5f83a1d7d4bcd9cdefef0d7d7aca8b2c1caf0cd45fba99984e8e
 - kind: project-relative
   target: claude
   value: .claude/skills/apm-usage
@@ -12572,7 +12992,7 @@ deployments:
   owners:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
-  content_hash: sha256:cf348309c5350c285714151a409d7451669fe00f4537824c38038a6e18767b6d
+  content_hash: sha256:66dfe99b35d7ceff95bcbdb00f138b8b3ec8094629acf69efba1eeda1013aaf3
 - kind: project-relative
   target: claude
   value: .claude/skills/archify/THIRD_PARTY_NOTICES.md
@@ -12905,7 +13325,7 @@ deployments:
   owners:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
-  content_hash: sha256:1b598ae0631f20322902faf50feb259b18d13dee458756d41627f2536b756940
+  content_hash: sha256:92a7889f34ae342586aa11e9241f33d4622cfee786d7637cf13c709b55a754ce
 - kind: project-relative
   target: claude
   value: .claude/skills/archify/package.json
@@ -12914,7 +13334,7 @@ deployments:
   owners:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
-  content_hash: sha256:5c20239e54ff4c73c03b42b95c021f5b5ce74b35f6bb878d1f5bc59a213c9aa3
+  content_hash: sha256:b609dc658a8e1a2097c304a7873ef039b9d6079832028980f60965d8d3ea886d
 - kind: project-relative
   target: claude
   value: .claude/skills/archify/recipes/scenarios.mjs
@@ -13688,7 +14108,7 @@ deployments:
   owners:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
-  content_hash: sha256:b351e8c5a0eaba8e2889a3ce52f9cecdc98df8742e86d73ebe71c8a7ba4715b0
+  content_hash: sha256:86c8fab8e2b267e76a2db9fa85f088587a6f2d7ecd8d7165f986b4c46154169f
 - kind: project-relative
   target: claude
   value: .claude/skills/archify/test/checkout-line-endings.test.mjs
@@ -13743,24 +14163,6 @@ deployments:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
   content_hash: sha256:96038981fbee27438f526bf3cf73cc7dd8ff4603cdb5c83f8b0f2d1f543ebe88
-- kind: project-relative
-  target: claude
-  value: .claude/skills/archify/test/cloudflare-deployment-workflow.test.mjs
-  runtime: null
-  scope: project
-  owners:
-  - tt-a1i/archify/archify
-  active_owner: tt-a1i/archify/archify
-  content_hash: sha256:7d3ab0cc6ba6bdd755623380352b23d7ad31c9a89520d3fab2f5e18a25885d5f
-- kind: project-relative
-  target: claude
-  value: .claude/skills/archify/test/community-packages.test.mjs
-  runtime: null
-  scope: project
-  owners:
-  - tt-a1i/archify/archify
-  active_owner: tt-a1i/archify/archify
-  content_hash: sha256:6059812104596a50cc3d51deb799e5b2e9cc964096db0b484426b3f004725e38
 - kind: project-relative
   target: claude
   value: .claude/skills/archify/test/community-proof-intake.test.mjs
@@ -14031,6 +14433,15 @@ deployments:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
   content_hash: sha256:1490118d959b0e7b6cc22752196ce0a2135cc2c22cd2fc72b458fac398fd1417
+- kind: project-relative
+  target: claude
+  value: .claude/skills/archify/test/fixtures/fail-migration-cleanup.mjs
+  runtime: null
+  scope: project
+  owners:
+  - tt-a1i/archify/archify
+  active_owner: tt-a1i/archify/archify
+  content_hash: sha256:be853150f7b2e129f0f57ae56c12fe38e81bcac340fae497c56c84edec3b6183
 - kind: project-relative
   target: claude
   value: .claude/skills/archify/test/fixtures/issue-126/custom-widths.workflow.json
@@ -14525,7 +14936,7 @@ deployments:
   owners:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
-  content_hash: sha256:840a235f01550b13317dcf027b0033716b1625b5f48abe4b09d8c20fdbbe314f
+  content_hash: sha256:36e86dd74fdc335b38991bc30fab3035e940036422da4754042683a52e7577ae
 - kind: project-relative
   target: claude
   value: .claude/skills/archify/test/motion-governor.test.mjs
@@ -14723,7 +15134,7 @@ deployments:
   owners:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
-  content_hash: sha256:1048752309d6425e1b01117097a48d6753545cf7aae4ca040902bae18b83f156
+  content_hash: sha256:a795ca70c71f7b516ff6690df24739ca85e163e7eed4306096fee2d688436f80
 - kind: project-relative
   target: claude
   value: .claude/skills/archify/test/real-repository-proof.test.mjs
@@ -14841,15 +15252,6 @@ deployments:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
   content_hash: sha256:7af5caeb664c9c9fc3e503dff07d275b710e04af60556ea5ab92ea74920f31cb
-- kind: project-relative
-  target: claude
-  value: .claude/skills/archify/test/repair-rounds.test.mjs
-  runtime: null
-  scope: project
-  owners:
-  - tt-a1i/archify/archify
-  active_owner: tt-a1i/archify/archify
-  content_hash: sha256:88fa563fa4fb82478facdf77cfc93f4246162e638ab71c55717f4084286d6524
 - kind: project-relative
   target: claude
   value: .claude/skills/archify/test/repository-evidence-replacement.test.mjs
@@ -15083,7 +15485,7 @@ deployments:
   owners:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
-  content_hash: sha256:96c4956079e3bf6ff04e8f224ca979d8c1eb559c975f34f952dd93b4cc528238
+  content_hash: sha256:e85614f0f9e99d3340be5c57524a5d95e3a473dd81681801b14b484e3923377b
 - kind: project-relative
   target: claude
   value: .claude/skills/archify/test/site-language-integration.mjs
@@ -15095,22 +15497,13 @@ deployments:
   content_hash: sha256:fa1ea2ceeecfb4c675e07e07fe614d6c1a1aa0d28fd9cef3d3df978b694580d7
 - kind: project-relative
   target: claude
-  value: .claude/skills/archify/test/skill-installation.test.mjs
-  runtime: null
-  scope: project
-  owners:
-  - tt-a1i/archify/archify
-  active_owner: tt-a1i/archify/archify
-  content_hash: sha256:ec660d8e7403018e6a1923c782f36f9482fe79f62f972ffc6084d2ff6e2438a1
-- kind: project-relative
-  target: claude
   value: .claude/skills/archify/test/skill-metadata.test.mjs
   runtime: null
   scope: project
   owners:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
-  content_hash: sha256:566c8510b9be19126acf479c1211ddd3b1eeced13b75e223263dd4617c8a803c
+  content_hash: sha256:eff3094bf4fa23584a1137ff7c7569433b870c2a742e4071808ffe50c6298067
 - kind: project-relative
   target: claude
   value: .claude/skills/archify/test/spatial-grid.test.mjs
@@ -15290,7 +15683,7 @@ deployments:
   owners:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
-  content_hash: sha256:0762c04d573de96bf428d594f432604b2c54a84538599f2ffe2b99a29574cb4b
+  content_hash: sha256:d976e91991fcd8230f135f4a97b1f13a5fa358ebb2af54757c7a818756cbfa3c
 - kind: project-relative
   target: claude
   value: .claude/skills/archify/test/workflow-routing-clarity.test.mjs
@@ -15443,7 +15836,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:f3201db74752235e17b24deaf6e18c66255face418dfa42d52b3918133c2fe67
+  content_hash: sha256:92ace70e71770bf2ab5d7c9eb43f9b387473e7fd91299385b55177b59700ae57
 - kind: project-relative
   target: claude
   value: .claude/skills/ci-stability-hooks
@@ -15461,7 +15854,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:b965789832b4cba6139ee98e03b64a028262a10e92a66d1dbd08d19db0e36c4e
+  content_hash: sha256:2ee8a2f4fd036017cd2f471f4c6feeb757ad2c8a68333a5d1ff1831ffa1f5e52
 - kind: project-relative
   target: claude
   value: .claude/skills/ci-stability-hooks/agents/openai.yaml
@@ -15713,7 +16106,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:44caeba3f9a8397770f2ec1518328428e43388226d1f45ffe616507f4259eb26
+  content_hash: sha256:5056d6bf5a17255261490c177368d0cb42f80e26ff9ce459d7205544a7214baf
 - kind: project-relative
   target: claude
   value: .claude/skills/docs-review/agents/openai.yaml
@@ -16037,7 +16430,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/manual-skills
   active_owner: jey3dayo/apm-workspace/manual-skills
-  content_hash: sha256:9459e5b03f86785d184a83e5cd8d621b832e918ec04158a2962d867785812c6c
+  content_hash: sha256:3bdf92c3ef5fcae825748d1a3f3bfd9bb2f9e567334f2addeb2d9dd54e31a272
 - kind: project-relative
   target: claude
   value: .claude/skills/git-branch-cleanup
@@ -16055,7 +16448,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:cb860e2fb96c809011924d692d392eea64e616765aecab082cb4b0276c2ea5c1
+  content_hash: sha256:029ace59375a45ab5bda699d9057766b6e8efbc7bd535ab8464002557f1a1e32
 - kind: project-relative
   target: claude
   value: .claude/skills/git-branch-cleanup/agents/openai.yaml
@@ -16145,7 +16538,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:95988f9e305253348aefa6c1e2de9ade2fe1abea487a071ed533a9d8172066a0
+  content_hash: sha256:6ef5050c930b48674c71c441e9dfbc6e543161f6acd78aaa34184296785d3c78
 - kind: project-relative
   target: claude
   value: .claude/skills/grilling
@@ -16433,7 +16826,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:a83e65f9e445a05ef6606a528789bd2c20fccd259f80aacfe2fc2be2d0231abc
+  content_hash: sha256:afccc5bf61eba07d1833a74a011b25374a6b9d1b3886eeb8334e2922e4e67b41
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/agents/openai.yaml
@@ -16586,7 +16979,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:ed576d83662c974dda950fe702cdd43f00fb3a8162e670ec3c74df7dfec30b98
+  content_hash: sha256:4bb379288080fd8635508acf637bef3e9c8ab7f7844ec69fae9a910d0a4846f6
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/references/runtime.md
@@ -16676,7 +17069,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:ab0a8581a9e61b89254a4fd5d268625bfdb8b7f8bce4b6fa0fc6b3133529d8e3
+  content_hash: sha256:3e4d2a0734d2e0f307b76292f84b249af06104c8a81da0763801cad84c11f552
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/scripts/lib/__init__.py
@@ -16757,7 +17150,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:78a7e501585376d9d7a67a723c99c85e2ec987a6e086a0cf3e978cc9e3f1b752
+  content_hash: sha256:bdabd016fed02ae9cd9ae40fcc93a76072b69c894b404725651e30dc0b199593
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/scripts/lib/categories.py
@@ -16859,6 +17252,15 @@ deployments:
   content_hash: sha256:f089918c3a118a0099ea572cb33725bfa15584d1b0e37cb1081c2440085c7d36
 - kind: project-relative
   target: claude
+  value: .claude/skills/last30days/scripts/lib/devto.py
+  runtime: null
+  scope: project
+  owners:
+  - mvanhorn/last30days-skill/skills/last30days
+  active_owner: mvanhorn/last30days-skill/skills/last30days
+  content_hash: sha256:32c4b5d49600c036a6a57d4a1737183564cdb8e9ec5bf543916c46c8d98b3a8c
+- kind: project-relative
+  target: claude
   value: .claude/skills/last30days/scripts/lib/digg.py
   runtime: null
   scope: project
@@ -16883,7 +17285,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:521a2750714009cc77bf60c7af59a9e9cead3b4decf3a0284817292ff97f76a7
+  content_hash: sha256:a00c33bc79dffa60bef521ed4e9d98e8f8cf8351e24120bae337fd67d403e05e
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/scripts/lib/dripstack.py
@@ -16910,7 +17312,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:d0f15e481749d5a6318fab7466459d5656203fae6baa56b3a5a3fa4d4026b8f5
+  content_hash: sha256:7b3f7d9fb4ed9c4c6a991a902134db080b258176147ae35ff57cc1b2411999a2
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/scripts/lib/fanout.py
@@ -16931,6 +17333,15 @@ deployments:
   content_hash: sha256:9bf0a9d2862851121dc7d3642cec6fc6d64627ede5f47d363a935c239858718e
 - kind: project-relative
   target: claude
+  value: .claude/skills/last30days/scripts/lib/fetch_memo.py
+  runtime: null
+  scope: project
+  owners:
+  - mvanhorn/last30days-skill/skills/last30days
+  active_owner: mvanhorn/last30days-skill/skills/last30days
+  content_hash: sha256:aeb136e654736b7154307ae79a3bbacb8372d73b07c36df22cf19c4adb9ad723
+- kind: project-relative
+  target: claude
   value: .claude/skills/last30days/scripts/lib/freshness.py
   runtime: null
   scope: project
@@ -16946,7 +17357,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:3022badfff38035758f82ccd1187b6c68e434b620ae43de23594f631944bdef1
+  content_hash: sha256:d3d004003d13ab0e85a4c16fa9f1abbd758077ce70ca7e4f3bc0e0e5d0a30690
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/scripts/lib/github.py
@@ -16955,7 +17366,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:05abe351947c11bfff3834294f4609ad4c816df262f7fa8ea74fa08961c1f479
+  content_hash: sha256:9fa40868bec294a020c0e5d850ec937c18094b287769d0f48df80cb6a0db8bce
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/scripts/lib/grok_x.py
@@ -16982,7 +17393,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:211346e23d6ce9d58529ff2f70cc1b9a3185b5e885ecd1124c8b5236f406af07
+  content_hash: sha256:ab515fa5930422074cc220c786b43465c49fb41e256adec7cbe38930f33873a6
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/scripts/lib/health.py
@@ -17009,7 +17420,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:267113343a44dea86fcb0d9ca8146c4f39281d93724fb077c69597db622180a3
+  content_hash: sha256:715494725adb7097b8a063a15689835c0808a714d9c23c5ecee168c66d5f1713
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/scripts/lib/html_publish.py
@@ -17108,7 +17519,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:c7ba22551c152334946cfe82fd5c4791cdbefc4cf1057522b0abc3c16b796fdd
+  content_hash: sha256:e2d29fb842f16a83032e5834d014f0cd77889c260d1f88c760e06e5bf62aa535
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/scripts/lib/parallel_mcp.py
@@ -17153,7 +17564,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:b75780d432b0ce5ccc11d090c97f78181618dd95e2a13d35130dc03ef45c0475
+  content_hash: sha256:ef7f383becc2622fde960f8b1cf9bd4253687f2cd98a17d7a76b9998dda4eb37
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/scripts/lib/planner.py
@@ -17162,7 +17573,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:3496728a1fbde738a710b7b09b117898142e5c7ad66c0f82ecdcedf0d333eb01
+  content_hash: sha256:f7b6dd10d01a2927e81056d7466bc81361a67c2b2c3822a14b4599bf360d2501
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/scripts/lib/polymarket.py
@@ -17190,6 +17601,15 @@ deployments:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
   content_hash: sha256:0e2e80fc3ee1f532eff3369785eeea48e20fb918a02996b1e8853b7bbe1b2c46
+- kind: project-relative
+  target: claude
+  value: .claude/skills/last30days/scripts/lib/private_files.py
+  runtime: null
+  scope: project
+  owners:
+  - mvanhorn/last30days-skill/skills/last30days
+  active_owner: mvanhorn/last30days-skill/skills/last30days
+  content_hash: sha256:747913b70a70bc8c53906ce2b3a87445f0e3bb5f82d0e2a15c53239a81dc8f7f
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/scripts/lib/providers.py
@@ -17297,7 +17717,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:35cee7900974215563071506968a6e86fff7cd3fbd364631dc1ae197477af098
+  content_hash: sha256:b0c3873dda0e08939c1189e4521c13d9ca7e176a69bf3f35195f2b288db44ea6
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/scripts/lib/relevance.py
@@ -17315,7 +17735,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:080239b43303506fd220fa194127ca8a14c448e3b18e19fbc550c8554a1ecbeb
+  content_hash: sha256:8bdb119e92f2da0c28f168ad6ce3b485bfe4ed802d8244d15900e0d3cb7de7ce
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/scripts/lib/rerank.py
@@ -17324,7 +17744,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:d8f917676e14712c77bda2f9b01f149314199b7f12b8037c22a561c400b560cf
+  content_hash: sha256:6242b9528fa440cafaf0b469e26062f6b66e91705f60ee9b1b92f6302d00e595
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/scripts/lib/resolve.py
@@ -17360,7 +17780,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:431df7010d1dece31ada55afe15b3b7c8beedf1bb24e4424f3a6e49693c1c562
+  content_hash: sha256:24c3a3c29b9af92717294b1b04b49e05751b784e3bb7f5eb5be6adebc6af844a
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/scripts/lib/signals.py
@@ -17369,7 +17789,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:c260c4dda853e102bf7c67db7410aa4255668fad17bb27bb8b8a240d85bf4e08
+  content_hash: sha256:3e23133f865eb2fe7d4c74f7aaa2c0d5caa13948107690f741d5211e590f5f9b
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/scripts/lib/skill_meta.py
@@ -17486,7 +17906,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:bf04978785709c7872d51b06872a8590ec121dda149f6112512fd5d09fb25199
+  content_hash: sha256:2a699dfe9af94fd1862882b542489690a91cbb568c9970e4f84b592c3ab47b6d
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/scripts/lib/usage.py
@@ -17729,7 +18149,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:dad20d5578a72c84b619265074adeb15435639e4c8f5443d59b189483c1baeee
+  content_hash: sha256:4e0846a8d8fe48d3cea4329964e9b67ac41a781ed760d1c55007e4a0e60ad5c8
 - kind: project-relative
   target: claude
   value: .claude/skills/last30days/scripts/setup-keychain.sh
@@ -18008,7 +18428,7 @@ deployments:
   owners:
   - coji/natural-japanese/skills/natural-japanese
   active_owner: coji/natural-japanese/skills/natural-japanese
-  content_hash: sha256:0f662a6ab4955b9146a138a38b73a619b27fa1448ef71e27fcc57f67d3ad0267
+  content_hash: sha256:bb2c45e3aa6eadd02a48c8a848106baa9187a02417df65b3b37ef65085d7ff61
 - kind: project-relative
   target: claude
   value: .claude/skills/natural-japanese/assets/style-profile-template.md
@@ -18074,15 +18494,6 @@ deployments:
   content_hash: sha256:1ca8db97566ad053cdb0115a72e12099f94648c5ba3a3d0bd6d33bf91c7f59d8
 - kind: project-relative
   target: claude
-  value: .claude/skills/natural-japanese/references/eval-rubric.md
-  runtime: null
-  scope: project
-  owners:
-  - coji/natural-japanese/skills/natural-japanese
-  active_owner: coji/natural-japanese/skills/natural-japanese
-  content_hash: sha256:77a49a4d0f70a51d4e595dec3ab236543b404edab5c6ccafb57c3f1f68d4ae65
-- kind: project-relative
-  target: claude
   value: .claude/skills/natural-japanese/references/examples.md
   runtime: null
   scope: project
@@ -18098,7 +18509,7 @@ deployments:
   owners:
   - coji/natural-japanese/skills/natural-japanese
   active_owner: coji/natural-japanese/skills/natural-japanese
-  content_hash: sha256:0cce2ad7f053611a8c983ebf86f55631e019bbf752cc815c04077b229a557b1f
+  content_hash: sha256:dc6d9eb4dc5adefe0e99e50aa038344a83544a1493ecfac7f7e488cb15d21168
 - kind: project-relative
   target: claude
   value: .claude/skills/natural-japanese/references/genre-notes.md
@@ -18125,7 +18536,7 @@ deployments:
   owners:
   - coji/natural-japanese/skills/natural-japanese
   active_owner: coji/natural-japanese/skills/natural-japanese
-  content_hash: sha256:10418600db75d12da4ba7ca6d76cc9d0bc60e305ae4e75fa90f28c2aa76317b0
+  content_hash: sha256:05f7bbee94e3461b7d9141a794d75cee064a9503a9db458bcc5617f7ef081a22
 - kind: project-relative
   target: claude
   value: .claude/skills/natural-japanese/references/readability-principles.md
@@ -18143,7 +18554,7 @@ deployments:
   owners:
   - coji/natural-japanese/skills/natural-japanese
   active_owner: coji/natural-japanese/skills/natural-japanese
-  content_hash: sha256:27641d1a2aa5b41821d3da186ddf4139dc091c5dd8fb20544d814675b863433a
+  content_hash: sha256:92719c75fd54c9d9c348a298349a15ce16da500d8f2601ef0da0bbdad3bf30e1
 - kind: project-relative
   target: claude
   value: .claude/skills/natural-japanese/references/translationese.md
@@ -18152,7 +18563,7 @@ deployments:
   owners:
   - coji/natural-japanese/skills/natural-japanese
   active_owner: coji/natural-japanese/skills/natural-japanese
-  content_hash: sha256:09b3da1ebf4c663be9cb0bf9ed5bade476ba10804509e6ca6dc22dc15129f827
+  content_hash: sha256:71dd72471151901b8c7d49783c23f258f500d13fb6cafa3b0807dafa6ae27afc
 - kind: project-relative
   target: claude
   value: .claude/skills/natural-japanese/references/writing-constitution.md
@@ -18161,7 +18572,7 @@ deployments:
   owners:
   - coji/natural-japanese/skills/natural-japanese
   active_owner: coji/natural-japanese/skills/natural-japanese
-  content_hash: sha256:457b83afa64fa0da95a9daa25a8140e203fc4a3e87b2ff2c2839e0c8aad7ffdb
+  content_hash: sha256:ae256b6ba32a656aab4e958253821d5e4268e2b1555c4d0a3ba217ed1717dd23
 - kind: project-relative
   target: claude
   value: .claude/skills/natural-japanese/scripts/calibrate.py
@@ -18197,7 +18608,7 @@ deployments:
   owners:
   - coji/natural-japanese/skills/natural-japanese
   active_owner: coji/natural-japanese/skills/natural-japanese
-  content_hash: sha256:576fb564126b6a81feadc88969a0ec8fb8fc7a755899e5b90fe91981e644881a
+  content_hash: sha256:fd19c74136f2963ad7f8b76626029c19b1fc66faff8906d3af5e13d5ed4944b0
 - kind: project-relative
   target: claude
   value: .claude/skills/natural-japanese/scripts/outline.py
@@ -18251,7 +18662,25 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:ac307676e7e0a62dae3e4d12a16c9a21c594da61885fb9f4b307766aaa6cb9bb
+  content_hash: sha256:952cee6e281eac3453828123d825d4ae79a9236fc2bacc1137dc14b833dcc36b
+- kind: project-relative
+  target: claude
+  value: .claude/skills/orchestrator-worker/references/regression-fixtures.md
+  runtime: null
+  scope: project
+  owners:
+  - jey3dayo/apm-workspace/catalog
+  active_owner: jey3dayo/apm-workspace/catalog
+  content_hash: sha256:a14203036122e0ebc17476af79b08eb9855fa75359ef822d114543e8fd2d105e
+- kind: project-relative
+  target: claude
+  value: .claude/skills/orchestrator-worker/scripts/check-fixture-isolation.py
+  runtime: null
+  scope: project
+  owners:
+  - jey3dayo/apm-workspace/catalog
+  active_owner: jey3dayo/apm-workspace/catalog
+  content_hash: sha256:c987134ef85c0bcd851bd0c597ab43e3b60017aa804f965d7b79426e399b6e6e
 - kind: project-relative
   target: claude
   value: .claude/skills/perman-aws-vault
@@ -19160,7 +19589,7 @@ deployments:
   owners:
   - millionco/react-doctor/skills/react-doctor
   active_owner: millionco/react-doctor/skills/react-doctor
-  content_hash: sha256:2b1d8b88956d6b60c49e75aa793762067dc3a1bd42a7204ef40685f17e89a037
+  content_hash: sha256:9efaa6a77162e0aafa75bcb1ac18f162631a9028d646a3cb2367423073517927
 - kind: project-relative
   target: claude
   value: .claude/skills/react-doctor/references/explain.md
@@ -19169,7 +19598,7 @@ deployments:
   owners:
   - millionco/react-doctor/skills/react-doctor
   active_owner: millionco/react-doctor/skills/react-doctor
-  content_hash: sha256:21fa0414874d117a63e5360d527884ccd42bf0906e6dcab371409cebac8b3d12
+  content_hash: sha256:237dd81672c858c8c52325bafeefdde2d5b842c9a98c2ea6a820534a0df8e927
 - kind: project-relative
   target: claude
   value: .claude/skills/refactoring
@@ -19592,7 +20021,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:aa8e57e5986721fc6df3927ff02e73eb3091c28d4c27387109875a16894ec5e7
+  content_hash: sha256:b34b03b003c842dd5b5ff77b373d9442decfc0224eeb19d6c6542e8b671db31d
 - kind: project-relative
   target: claude
   value: .claude/skills/similarity/agents/openai.yaml
@@ -20690,7 +21119,7 @@ deployments:
   owners:
   - nanaism/yomiyasu/skills/yomiyasu
   active_owner: nanaism/yomiyasu/skills/yomiyasu
-  content_hash: sha256:16269e0707004f0808466ec7f9d671d86dacca5d02d75f2cd009ccd97153679a
+  content_hash: sha256:1d563e4a0e24d8a419d01f4cd729ec2577f189f9dd61a1d4a8ab22119aef1d35
 - kind: project-relative
   target: claude
   value: .claude/skills/yomiyasu/.claude-plugin/plugin.json
@@ -20699,7 +21128,7 @@ deployments:
   owners:
   - nanaism/yomiyasu/skills/yomiyasu
   active_owner: nanaism/yomiyasu/skills/yomiyasu
-  content_hash: sha256:e292eef1b3c2bc09e4ca39862cf88f1b5262f2fe7b89356126ecf4c3cfe8cfed
+  content_hash: sha256:8cde4dc0893bc46827776a45610356f8997100bff0cc6e3e8699372f90316129
 - kind: project-relative
   target: claude
   value: .claude/skills/yomiyasu/LICENSE
@@ -20717,7 +21146,7 @@ deployments:
   owners:
   - nanaism/yomiyasu/skills/yomiyasu
   active_owner: nanaism/yomiyasu/skills/yomiyasu
-  content_hash: sha256:651818c2f5b97f0114b9a568bc5e672b5d190226cec2e403acc03450d8b958ac
+  content_hash: sha256:0a8915986b0228abdf137d00f8e35959336f1914d36dfb73f1e8c053357209cf
 - kind: project-relative
   target: claude
   value: .claude/skills/yomiyasu/UNICODE-LICENSE.txt
@@ -20771,7 +21200,7 @@ deployments:
   owners:
   - nanaism/yomiyasu/skills/yomiyasu
   active_owner: nanaism/yomiyasu/skills/yomiyasu
-  content_hash: sha256:9d1dc107a2e389d5bfc2db9e826d0fdcb69be5115d07afd4586d6b0cf5b87879
+  content_hash: sha256:7685424e9f63cd0d45c0fca673eabd10d7879f29e220b7d8517e73fcd2a9b6e7
 - kind: project-relative
   target: claude
   value: .claude/skills/yomiyasu/references/slop-catalog.md
@@ -20780,7 +21209,7 @@ deployments:
   owners:
   - nanaism/yomiyasu/skills/yomiyasu
   active_owner: nanaism/yomiyasu/skills/yomiyasu
-  content_hash: sha256:402fff215d7171f021bd418075832dc4a3867801ccb4c3a5ecdab60eb0241897
+  content_hash: sha256:e7791d123db2573f50ee922c51f7d50694ab7e6b81f318713e9f405fe3c6daf2
 - kind: project-relative
   target: claude
   value: .claude/skills/yomiyasu/scripts/markdown_visibility.py
@@ -20798,7 +21227,7 @@ deployments:
   owners:
   - nanaism/yomiyasu/skills/yomiyasu
   active_owner: nanaism/yomiyasu/skills/yomiyasu
-  content_hash: sha256:090868e2ab0d2b7eb9dadb014a80c7a5865b5082f250d05fea8ce4483730c312
+  content_hash: sha256:b704e088fd6e1b01c21fb6b97373cc21d441cb14e976f3a47a95c3ba1c73a964
 - kind: project-relative
   target: claude
   value: .claude/skills/yomiyasu/scripts/yomiyasu_lint.py
@@ -20807,7 +21236,7 @@ deployments:
   owners:
   - nanaism/yomiyasu/skills/yomiyasu
   active_owner: nanaism/yomiyasu/skills/yomiyasu
-  content_hash: sha256:a5a253fbe5db7cde021e7c34b1e203472ff164f60a3886c85d5f69b140dcf230
+  content_hash: sha256:299a61970e8c30092f947e2ace95e80ff8a513fac87824363f89ba77e6cac468
 - kind: project-relative
   target: codex
   value: .agents/skills/1password
@@ -21032,7 +21461,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:7e6c6591f1e426c5e5652b25a19b7462b92f949c04b78c80618ca2176f66628d
+  content_hash: sha256:2efd5ded1d7603301e7493b50503a371b6f85c9dc0912a6ba8741aae36ffc979
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/.gitattributes
@@ -21086,7 +21515,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:e69caaef6c72897a99b0bf1473693e143d7ed1f21b4ed45e934a87cd57563495
+  content_hash: sha256:bdc07db7f0280cc878a9ed2fcfdacbc22c97cbb5e0a5a2fc30e2fc3462084887
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/.github/scripts/check-enforced-assertions.sh
@@ -21185,7 +21614,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:8404c12c5b3195935b9ad33e63b2a4986bc15a17c234ef5252200c3c5d8231a2
+  content_hash: sha256:dbe4856102bc06b48c4eb6ba25b1f4822f7ecdb57b2921f81294586f75195cd3
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/.github/workflows/release.yml
@@ -21248,7 +21677,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:a92139b7c4ca928c3496149f99626d5a2af57d85de416987cbc1a5034b56db56
+  content_hash: sha256:6672683f4adc87be71ac28e4da856e0968e7c8380044df2d82c67df03e7bd09d
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/CONTRIBUTING.ja.md
@@ -21284,7 +21713,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:daa8f8fb133cb8ae2260266f2e7f43dc48a70ef98b55ffd0aafdc84e25ed2d43
+  content_hash: sha256:7d17a5786dff213ec5856254bd07b5450c09d74d654b641bfcf8a44014cc078d
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/README.ja.md
@@ -21302,7 +21731,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:98c46aa185f184c9ef8fce888af3fb852803c94dd3343e8eb6dab29bfb10fef8
+  content_hash: sha256:3303aeb52fcdd7ce45c1cdc0cd4488054889fff0bc929c57921d7ed522b68297
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/RELEASING.md
@@ -21329,7 +21758,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:bfa5e800fb14ec96585698a68ef1d4aaba2d25bb33948350c2f8b2a581cdc05f
+  content_hash: sha256:d8de64058b1d559467bc5a155d200a279087a98b559a40e52bfd849e8ab2f8e0
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/VERSION
@@ -21338,7 +21767,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:c03e3824001f39b9518249b8d6522422fc4de7227e12a568c0164662b03b7758
+  content_hash: sha256:dfe7d71b3f428eb73ed853f8fded65e2986896e21d69f45ebf06bb623b450e14
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/app/.gitignore
@@ -21365,7 +21794,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:c8d27debf356c5ef491bb6f3d8ee52346ccf94177a95866e8b5adf4f196bc0a2
+  content_hash: sha256:9175ff0018726fde2492e0b23c52832e2cc1bb720465ec162526ae15f36b80b0
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/app/README.md
@@ -21392,7 +21821,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:e92ec2a32a1319e0e0d61a5da82cecf6bb8cd6cdfab7fcc6f8822d9bc124403c
+  content_hash: sha256:9358e7953deb03538749701283aed3bfa9f60e2ce3698e6cb065c68d39bd867a
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/app/pnpm-lock.yaml
@@ -21482,7 +21911,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:94320a59c65150c18ed398764f79f163103858f5166f5e1dcc14aa4b3dcd3138
+  content_hash: sha256:bb1df845b437b72599323288dfcb40a3289ab28a4b8b337e12703467bc0e897f
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/app/scripts/sign-windows.ps1
@@ -21509,7 +21938,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:80acc4f2917454c1de98f263832807c348634cef1fa9c3659125b6f02b3cd3a8
+  content_hash: sha256:92aeac91e315958c629d0faf236054d510d90cddfc253a3c50364a8c2942cc10
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/app/src-tauri/Cargo.toml
@@ -21518,7 +21947,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:a4cb9f47cae3cb053b59efcff9a56cdbe5a66f858500d8c5d81e7dd436a2760a
+  content_hash: sha256:4eb37bdd81d3a4a0ff439876dbc77ae1033a45392f6fa500854ad9c98ddb623c
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/app/src-tauri/build.rs
@@ -21707,7 +22136,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:ffa48bbfa7c2ff70e71208ee6826fba5ccb610620e5f54f67747743f4b43483a
+  content_hash: sha256:3f9d36482af645710485ea4ee0e974298dda7f75c1a1bb40cdc2cfde5da2918b
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/app/src-tauri/src/lib.rs
@@ -21752,7 +22181,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:a40e81ada24d2c6a66015d9298a3524edaa2a935168919c34d933c598e4a3bc8
+  content_hash: sha256:704424e10d0e8ddd028fade69f1b6fcbeeecf627bb25a59ec2a83a10863ad992
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/app/src/App.css
@@ -21761,7 +22190,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:8e9dafb6021aba1f86190210a3bcad82adec4b202a51d81a19aade7df8a642fe
+  content_hash: sha256:2f81afb3cde0738573a1afac0aa8437e83504e3d35a07de40d012ef1c3d062f1
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/app/src/App.test.ts
@@ -21770,7 +22199,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:f0769796195976781c3e27d79f2485a7a3c07d0d4aa23fbeb2cd99288333bbfc
+  content_hash: sha256:ef614839851ed9e66decb08a89d4f37e0fee8bdb20feec689e40cce1b628a6a8
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/app/src/App.tsx
@@ -21779,16 +22208,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:f62f0b05ee18f64bc855cb691a35a04c17818e54b7c00b957576aa8254786b29
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agmsg/app/src/SidebarUser.tsx
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:19b7655498f797b5156d5f0cc9834c0bf2d580547e79077ac7bd9db8898374b3
+  content_hash: sha256:6a62485cf0642e27d4b40233e9d8b7baee5a0827c0650c28a7109030b0f701b6
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/app/src/TerminalPane.tsx
@@ -21842,7 +22262,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:6265d6279ef03097f182945fb000223dc761730af7ddd5a68a9e63929556a617
+  content_hash: sha256:a07d7081246c9fda1fb6379b7b06122051ab390d062d8d4978bb55b5ae72ddf1
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/app/src/i18n/locales/en.json
@@ -21851,7 +22271,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:1ed76eb0e6bccb3a3adbced9e86f126cb7c0dc9b1a7366f63f8faecdf6a9027e
+  content_hash: sha256:d1d5d28a1e6bf019854cde38aa34f6f6ec75f91f227a7a529d61ef4b54dafa04
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/app/src/i18n/locales/es.json
@@ -21860,7 +22280,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:0112302269358354db89f6519d369244994ff3fe51d5207eed20be3d2e5232e7
+  content_hash: sha256:087700c3e192d7dbcd1e8ab7bbd7593ab8f8cd7542ba239bd7bef75db6cefc78
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/app/src/i18n/locales/fr.json
@@ -21869,7 +22289,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:f9b2cb1e06afdb6e509d608af38a25c47bd66008c973de89765eb3cdcbab7a60
+  content_hash: sha256:43c68a242a8338e20f771ba63dd86ae49b75a1466be3c764a7709505504ed24d
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/app/src/i18n/locales/ja.json
@@ -21878,7 +22298,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:01e3d3fb743b5e656f5d3991e88a588fed6635e95707f2bf6db9dccacba01328
+  content_hash: sha256:6a7542d97cf96513e1a08fe1476bcd7ea1bf971c6d9ca2f30f596dbb039a6e8a
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/app/src/i18n/locales/ko.json
@@ -21887,7 +22307,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:73f15dfd28de2ed188694a44e4492a5f2a747578df5e38cf1c0d4b3855d0d8e3
+  content_hash: sha256:bfe61187f595bb5a897666c4595ae825f8d82fb0c778631243d41c48141a00bf
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/app/src/i18n/locales/pt-BR.json
@@ -21896,7 +22316,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:fc915bbdd0164fa5ae33f0e1f8646931f8052493ebe9f618c596d05e89681459
+  content_hash: sha256:39e6aa6a58ee0078abff9459076c4978fe86069727cbb42869cf6bfd1dc9647b
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/app/src/i18n/locales/zh-CN.json
@@ -21905,7 +22325,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:eb500100d13b8563124d1fc99035f909b7a2286c4feb286d242a54094db366c8
+  content_hash: sha256:b4fa81e2c8c5a31119de1e183fdba73c3ea514f538549a730f73ec7a79d03bce
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/app/src/i18n/locales/zh-TW.json
@@ -21914,7 +22334,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:526428e96473945442e5f2f522077654440111461b6f5bcc1564599168188a03
+  content_hash: sha256:a886fcac7c2da1aca0926a7c31a572c98981ec71deffec1e38a0efc725e98786
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/app/src/main.tsx
@@ -22094,7 +22514,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:17ddaccae691cc5b6bee541764f1111c75bab7e74e25264ed220d4c5dffee183
+  content_hash: sha256:2a1eab0405f700c16f379cae7ac6fb45dddb28e984046294e5fbf42b27f4d408
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/docs/actas.md
@@ -23048,7 +23468,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:8d1f345aff9a20022314b0f6260348c91e32d906c4c471857c27ffa50395a04f
+  content_hash: sha256:a58d81411495fafe6108f8d9fe572672b171e8dbec2b7e2dffb550edc9cdbb46
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/llms.txt
@@ -23075,7 +23495,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:eddb346386dceb4a51763ce294fb6344ad7e03c3c06a335daf3f3a4b0ad5c05c
+  content_hash: sha256:d20e6056b022156b16c830dfd80cc67513f975b7a257ab8d74d8c70105bc20dc
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/plugins/.gitignore
@@ -23102,7 +23522,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:a5b75110dc54861b3f9c2e72f25859e1bd2c96ef5d8a6e723deae4cc164e7c22
+  content_hash: sha256:18e95481308314ef5a40efc75b73bbaa8fbc89ceb72e2537e850216dbcf5e591
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/scripts/api.sh
@@ -23156,7 +23576,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:6b92aeb033cd910fc8a5b70fee5f8d05a824faefec126141435c2e01b0cc9aed
+  content_hash: sha256:c80841adf071efe9438fa5caf5280180cdc64e5bc653011c6b8ee459a17068a5
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/scripts/despawn.sh
@@ -23174,7 +23594,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:481de9459ee9af9627a5511a01146f5d4581b61170717f0a622be8ee41c16f3f
+  content_hash: sha256:f45a09cba963304f516300a8526c7fa8b2b04a4374887b6332b7020a4cf3976b
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/scripts/drivers/ext-tools/README.md
@@ -23373,60 +23793,6 @@ deployments:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
   content_hash: sha256:3bd4f0898066415f48708de18950bea74f08254fe956a27b38f8e7edbc48303f
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agmsg/scripts/drivers/terminals/claude-desktop/README.md
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:d7693455f98267b2ad7c85a94767f51217ace45307ca9158501fe6655e07dbe9
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agmsg/scripts/drivers/terminals/claude-desktop/ops.sh
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:d09dfd3d415e8373c91bc30644482de3ec282c8a67d0c4cad82384a97eaec581
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agmsg/scripts/drivers/terminals/claude-desktop/terminal.conf
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:6efb7d0a80dfbb8d5894ed02234c1421b6529044b64756d45d791bc060101327
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agmsg/scripts/drivers/terminals/codex-app/README.md
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:aec3e37f495ef18acf14c20e67b49a8504dd4ffb2d7173d916dae39930bf39ae
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agmsg/scripts/drivers/terminals/codex-app/ops.sh
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:c8d5cecbdcb42b7e96956e7d5e50590e82f7587df00b8026d6281f16013134dc
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agmsg/scripts/drivers/terminals/codex-app/terminal.conf
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:50326784cf5caec53d2dc2b043ea5307dcc0eba31dc3945c9425f86e667bb65a
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/scripts/drivers/terminals/herdr/README.md
@@ -23723,7 +24089,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:dce1790aea6dc6dc12e8a35ea8d0773001338194c9ffda6fbaac409eb4fed28e
+  content_hash: sha256:b37bd43d0546492f6faff953560d090c7250829e7c6083dcaaf0a842d9f45a0e
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/scripts/drivers/types/claude-code/type.conf
@@ -23804,7 +24170,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:4a17ad308c54ec168b49f1bbfe72c1c00b53716c077fa04b9139848c206a6256
+  content_hash: sha256:3d39c256b898c6107645c28528101d56301b689f09072aec2afad23df6e85dea
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/scripts/drivers/types/codex/codex-monitor.sh
@@ -23813,7 +24179,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:a68a0eb2538c578436ba6ad5c41553205e5add0fab7b1948c90c0231136a1817
+  content_hash: sha256:27db19b943acae5494c2a7157b3675ffec2c9df255a097789364363f4f882bef
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/scripts/drivers/types/codex/codex-record-session.sh
@@ -23822,7 +24188,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:235a75f4bb66f6928644adf2e60f28b8217257a3c72cd36171207fe91a5cdb16
+  content_hash: sha256:5b6b1e172d222c09953d8eedb3985af01edd830fc236d1c8e5c21fa283a4dbaa
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/scripts/drivers/types/codex/codex-shim-install.sh
@@ -23840,7 +24206,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:e922294c5cddcaeb2ca0b485c68ab6d31d8997d0a11e5aee319fa85d5f6c8d77
+  content_hash: sha256:851a0acc82c243c17156ac782953ae1caadcf5004d11faf7efe839c711d0c27a
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/scripts/drivers/types/codex/eligible-pairs.sh
@@ -23858,7 +24224,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:eabd9cc6dbef73bb1f88246c589f828bbdc46076653f6237add590f4716dc852
+  content_hash: sha256:fbf2e4a83ef624b089d9cbd19278e2b3d25bccfc551a3899e06c061945dc3537
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/scripts/drivers/types/codex/type.conf
@@ -24263,7 +24629,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:53b79a8db1416a751db0c1e4ab59f083f02fe23532e702945629508a9ef119b5
+  content_hash: sha256:1c633d0cec1989742d3129c4b4f1b47e4aaead6337b8ead4baac8cb293ed0cfc
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/scripts/internal/strict-jsonl.mjs
@@ -24515,7 +24881,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:fc2a41e7af041807ba22f9310ed7acb1249f8d6b80cbaa54e34d4a843748dc1a
+  content_hash: sha256:3b717c8b989e160fc6fefe5ae14af2a4b8850238d9374d3510631a12124eaddb
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/scripts/lib/require-python3.sh
@@ -24542,7 +24908,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:da7adccc15f3a0925cb3f76f344ed6855af85f14802ecc38521bfe066e564ccd
+  content_hash: sha256:7c528ef5befd4281fdceba96c3761b49cc54dfc2797e9a7dc2cb04bcfbe63d79
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/scripts/lib/roster-journal.sh
@@ -24641,7 +25007,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:1ea8e89b53eba16ee732a6d2127d5d312d011165cea1ac973f8f0f2c7f6751af
+  content_hash: sha256:e37490a335965e147d3399929d5933359bebd18a06e134e3cf20d326cd33104f
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/scripts/lib/spawn-options.sh
@@ -24660,15 +25026,6 @@ deployments:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
   content_hash: sha256:ef10adac6ef348db2cd6f0b395a551d3488e03fe42ddafcea7ae13fada249494
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agmsg/scripts/lib/stale-outcome-files.sh
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:dbba60f15b390e6d9d792ac773fa5e330de2ab328fc1deb6d0b3c8768df1253b
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/scripts/lib/storage.sh
@@ -24731,7 +25088,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:d58c65eab749dee0df6183bcaa4a64c79469a9044265cfe01930d9b3ace4a42e
+  content_hash: sha256:4849a592ea99297dc6862d8244970536810c465ed2d31bc3743375c40b33d44e
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/scripts/lib/token-locate.sh
@@ -24768,15 +25125,6 @@ deployments:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
   content_hash: sha256:e9d98817fcf8293f19779554869f827596497b56c586395d6f89adc5245d1b8c
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agmsg/scripts/lib/windows-elevation.sh
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:1624c90fcf614d26c417955bc8bf881a188a56dc95745cb22e08266c6580f72f
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/scripts/peek.sh
@@ -24833,15 +25181,6 @@ deployments:
   content_hash: sha256:928748a44a4f6adf8a02a9141e2d9a9ce5c78c35d7c9979e6a8de5fe67fbe245
 - kind: project-relative
   target: codex
-  value: .agents/skills/agmsg/scripts/release/render-plugin-skill.sh
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:ecd417257292a88c9e94f080e401ee59aa67e404bc3047d5044fd277c19d9ddf
-- kind: project-relative
-  target: codex
   value: .agents/skills/agmsg/scripts/release/sync-version.sh
   runtime: null
   scope: project
@@ -24875,7 +25214,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:9fb7b2c5ca2c2bd32e595dd29f7361171a2a8ec651fd7555e44e69bd000563f3
+  content_hash: sha256:b9ea460ad87b5e069b7a801f71a8b0ee0534deae6f96226e40d88029bb110e89
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/scripts/rename-team.sh
@@ -24929,25 +25268,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:44dae99b785493117909de3da1c14eeb3bf2c8487477064aabe61a9d175c5ffc
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agmsg/scripts/skill-base.md
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:abe308c05d347b203ad9c62a2307dff9ebe36a290fd2219713ffd4004a5acd23
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agmsg/scripts/skill-plugin-step0.md
-  runtime: null
-  scope: project
-  owners:
-  - fujibee/agmsg
-  active_owner: fujibee/agmsg
-  content_hash: sha256:a2cdcbad5278fb0fc9adb1d70ee2ab835ea71ed61ddd06214c29c7417bdd16cf
+  content_hash: sha256:7be4a270f8692b886843f7939c669be6b158314284ffc5162914fd529afca3af
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/scripts/spawn.sh
@@ -24992,7 +25313,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:366804934949e67f5b510082036d281fb58b219f754c9ba01ca2a648d5b20de8
+  content_hash: sha256:bcd6fbd0df4bf428d27103939adfc80f32915b2c852aa3ec654ddfc124de907d
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/scripts/where.sh
@@ -25307,7 +25628,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:b7332c1c55db6f1bd24355936e100016a2814da7a7e902a5272a9e61dccac91e
+  content_hash: sha256:051950db75deaf76fe4ea8c41fd0b74f7d8dd835983d440d7b953764935c3fc1
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/site/package-lock.json
@@ -25316,7 +25637,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:047f9cf6686c81b7f73172227d9da5bb2dfd9aae4ebfa6b912ad83a1b863918c
+  content_hash: sha256:8bfd15746d0636f8885aaf46f84d1c863a51c33146a7f5c5ab44d887378a8b31
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/site/package.json
@@ -25325,7 +25646,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:49a14f0be7876eae96db9c6c82db6848ec92c848368697d7d9600454fca7af9d
+  content_hash: sha256:8387904be5c7c8fb15aef6632c32f0ab1b6ea74dafc249d1573cb443faf6606b
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/site/public/CNAME
@@ -25658,7 +25979,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:2075f5ad58a52e7fbd6d2a7ca29c4665f0f3a94e26dd5ca5088f72c5f75ca259
+  content_hash: sha256:22b100fceea74859cb1d41d3b1cf138bc0dfd0d4ac35cca89e0fd798385d8efd
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/site/src/pages/[lang]/index.astro
@@ -25937,7 +26258,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:f38e1ca7a1d7b33ad101aa18400ba0aef9d02a4abae39a807019a72b97c0f620
+  content_hash: sha256:b821523afae8c871e7d3fe06706f8e9ac33e2866827d350507c039b0c552cd43
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/tests/test_actas_lock.bats
@@ -26072,7 +26393,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:6e651f2aee200a2f9b97d838bb296b6a7cd24b364b2a11b618597f36ab682d5d
+  content_hash: sha256:3c2fd94b0e0f5e08e28c49ede7ae7ec8c9734a33b1db71ab412646b29809a25b
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/tests/test_close_fds.bats
@@ -26099,7 +26420,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:6a70e4f8472b579add22effd34d43e9807f81069f7a778ebf2e4f7aa122f8627
+  content_hash: sha256:f5360df70495e3c6703f118983e7df6c037db71a75630f8c64fc30fc88002e3f
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/tests/test_codex_bridge_launcher.bats
@@ -26108,7 +26429,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:45d8f6f613ff77d15b40ce2bcabde510e701b6e3cd465fd341d0caf82e0362f1
+  content_hash: sha256:f625a78a44a16e6e9a59a12b8964dd732e485d803a7f1beace6cf7727a3849cf
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/tests/test_codex_monitor.bats
@@ -26117,7 +26438,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:6bbc3ab56751d4b8f30f3dfbce3c5b762f8fcc642f21de0b721dad7e96bcb8a8
+  content_hash: sha256:31102de868c22b43a432c918c9abca29cdf7f4e59384eaec0a23400e513d14b4
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/tests/test_codex_resume.bats
@@ -26126,7 +26447,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:71bc844c82c40acba8b5eb762d7c6e8352b70f3fc1dc9c25df87f5d6fdd89257
+  content_hash: sha256:389191e2e56bc5a6a145f30bf8d9c1436b816ac0e653535861ab553aff686aee
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/tests/test_codex_shim.bats
@@ -26135,7 +26456,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:127dbe143f64bf567bda642509241afd3167a0ba4bbc4647d09a4bc1b2135f6a
+  content_hash: sha256:75f6ee56cbb733b5446c7e6205dc1d284034e41d2c78256f0e032b0eaab80031
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/tests/test_compat.bats
@@ -26180,7 +26501,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:60d419b7df40e3e15c57a39e281e6d546e90e91bffb31cafd5173176107f9458
+  content_hash: sha256:62404721ff4007e61cc6c5aa0a6e264b92493b50430e2c4ca5a26dae4f41c870
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/tests/test_despawn.bats
@@ -26207,7 +26528,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:e105c7abf60190552dbb6428d9c57d594d1793076b95264aae9295fdadcf5d2b
+  content_hash: sha256:b2b9b4b186701834039aec45f498572924e9549bb9cc06f5fdec6400af5bbac3
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/tests/test_endpoint_scheme.bats
@@ -26306,7 +26627,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:661a4c109601dc8ca10997cb9adf6b32826882344a452ff13d10576e53c322ea
+  content_hash: sha256:5d2a3c3f691dda0cef5a635e2886c6986660abbc63c16bde68aea12d942b1f36
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/tests/test_herdr_cli_routing.bats
@@ -26333,7 +26654,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:1039185a75164d1d1861446c15950f3d37b753c16881abb44a05a940c87ed186
+  content_hash: sha256:727b2d371d5f98d3ae491dfd2df2b5d8b079c014e40c2813f40394e07bac3200
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/tests/test_install.bats
@@ -26342,7 +26663,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:5bdc91b1b71e16cd52d45a5356d2f00c0071c57ab8f76599bca6c7f3386c1ee5
+  content_hash: sha256:1574d2c12b5ff19cf27e28f0a3526dd9566c13721c5a7ac3919c9a3a8fc4387f
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/tests/test_instance_id.bats
@@ -26504,7 +26825,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:c63f748dbefbd22353f267da3ecb0cce74b8f5f986db4e10cabb7c8591f31724
+  content_hash: sha256:9a5dbf19ede3f608d5a50cbf4282c96f939938d542a8dc2a0ee150b484730dbe
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/tests/test_release_ci_skip.bats
@@ -26531,7 +26852,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:1ae128a0192ad993789dabed758afcccb0ca39d306301bf76a4a8bc16a5f66df
+  content_hash: sha256:dff9feca25cce95fd39cc1bcfff79eedc3e274026875d2951a8bdaf600a3ce58
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/tests/test_remote_curl_config_paths.bats
@@ -26621,7 +26942,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:0bbd0ded41a6be485184a060198decd60441699560e736f9af05e40522187e9d
+  content_hash: sha256:f6b2059e7d8c41430a8a6bc98b248a601363508705ef40f9d3c9fc2139d3c7f4
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/tests/test_remote_sync_apply_blob.bats
@@ -26702,7 +27023,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:8b46578dde41339428267feefe76e1bd920453991e0d8acbb7c3739cf05614f7
+  content_hash: sha256:186c6c7ce9a89e79dc0466bb1e7d5de2a9d26daabf2892569d8b7f21e55b9824
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/tests/test_resurrect_panes.bats
@@ -26765,7 +27086,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:4e1e1b9925b3aa2a5cae8fe73f5f91dde374c2521bab95e8fa378ae8b0b81f51
+  content_hash: sha256:624508af6e5a4b834cdd5ce83e7d37a210fdef013d70e65cb2d754410eaec165
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/tests/test_self_proof.bats
@@ -26837,7 +27158,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:3eeb8a70f9f13ad1232c93b44955fbacaaa82ae91914ebd541eda6629d96f791
+  content_hash: sha256:e2e15d721e9e46b2f522fde44c45bb95368a06f362d9ebf5f16e3addf895ddee
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/tests/test_spawn_fd_guard.bats
@@ -26981,7 +27302,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:b064e1114116dd8e96750a3ae70333686dd16d45066fec30709447811c44525f
+  content_hash: sha256:3eb8c8506123f11ad5b5892199bcde6a812ffc7b2ecb3e1f2d8e3007b5c0d192
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/tests/test_token_locate.bats
@@ -27035,7 +27356,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:e405781f88a39dc4f19d42709f7fdbfd5da5beb37693a557969ee49e0952d896
+  content_hash: sha256:d2431db4482d1c9c65f7e27e312cd56e965b80bf421c6a841fbed1a87bae6d7e
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/tests/test_watch_install_changed.bats
@@ -27080,7 +27401,7 @@ deployments:
   owners:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
-  content_hash: sha256:fe75329da01119de6e8682e704f9532a514085c5ac515ead86c36581812aad05
+  content_hash: sha256:5677288b66c0a9b312ce7ac87a370fbefc32cddd335094c3bcc28baab1e45260
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg/uninstall.sh
@@ -27090,6 +27411,24 @@ deployments:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
   content_hash: sha256:45461aaa26d0383c15f58da8601cd2e0b6e769a61a4708388296052bb1e8d4da
+- kind: project-relative
+  target: codex
+  value: .agents/skills/apm-deploy-verify
+  runtime: null
+  scope: project
+  owners:
+  - jey3dayo/apm-workspace/catalog
+  active_owner: jey3dayo/apm-workspace/catalog
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/apm-deploy-verify/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - jey3dayo/apm-workspace/catalog
+  active_owner: jey3dayo/apm-workspace/catalog
+  content_hash: sha256:a404b45c2e7e5f83a1d7d4bcd9cdefef0d7d7aca8b2c1caf0cd45fba99984e8e
 - kind: project-relative
   target: codex
   value: .agents/skills/apm-usage
@@ -27215,7 +27554,7 @@ deployments:
   owners:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
-  content_hash: sha256:cf348309c5350c285714151a409d7451669fe00f4537824c38038a6e18767b6d
+  content_hash: sha256:66dfe99b35d7ceff95bcbdb00f138b8b3ec8094629acf69efba1eeda1013aaf3
 - kind: project-relative
   target: codex
   value: .agents/skills/archify/THIRD_PARTY_NOTICES.md
@@ -27548,7 +27887,7 @@ deployments:
   owners:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
-  content_hash: sha256:1b598ae0631f20322902faf50feb259b18d13dee458756d41627f2536b756940
+  content_hash: sha256:92a7889f34ae342586aa11e9241f33d4622cfee786d7637cf13c709b55a754ce
 - kind: project-relative
   target: codex
   value: .agents/skills/archify/package.json
@@ -27557,7 +27896,7 @@ deployments:
   owners:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
-  content_hash: sha256:5c20239e54ff4c73c03b42b95c021f5b5ce74b35f6bb878d1f5bc59a213c9aa3
+  content_hash: sha256:b609dc658a8e1a2097c304a7873ef039b9d6079832028980f60965d8d3ea886d
 - kind: project-relative
   target: codex
   value: .agents/skills/archify/recipes/scenarios.mjs
@@ -28331,7 +28670,7 @@ deployments:
   owners:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
-  content_hash: sha256:b351e8c5a0eaba8e2889a3ce52f9cecdc98df8742e86d73ebe71c8a7ba4715b0
+  content_hash: sha256:86c8fab8e2b267e76a2db9fa85f088587a6f2d7ecd8d7165f986b4c46154169f
 - kind: project-relative
   target: codex
   value: .agents/skills/archify/test/checkout-line-endings.test.mjs
@@ -28386,24 +28725,6 @@ deployments:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
   content_hash: sha256:96038981fbee27438f526bf3cf73cc7dd8ff4603cdb5c83f8b0f2d1f543ebe88
-- kind: project-relative
-  target: codex
-  value: .agents/skills/archify/test/cloudflare-deployment-workflow.test.mjs
-  runtime: null
-  scope: project
-  owners:
-  - tt-a1i/archify/archify
-  active_owner: tt-a1i/archify/archify
-  content_hash: sha256:7d3ab0cc6ba6bdd755623380352b23d7ad31c9a89520d3fab2f5e18a25885d5f
-- kind: project-relative
-  target: codex
-  value: .agents/skills/archify/test/community-packages.test.mjs
-  runtime: null
-  scope: project
-  owners:
-  - tt-a1i/archify/archify
-  active_owner: tt-a1i/archify/archify
-  content_hash: sha256:6059812104596a50cc3d51deb799e5b2e9cc964096db0b484426b3f004725e38
 - kind: project-relative
   target: codex
   value: .agents/skills/archify/test/community-proof-intake.test.mjs
@@ -28674,6 +28995,15 @@ deployments:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
   content_hash: sha256:1490118d959b0e7b6cc22752196ce0a2135cc2c22cd2fc72b458fac398fd1417
+- kind: project-relative
+  target: codex
+  value: .agents/skills/archify/test/fixtures/fail-migration-cleanup.mjs
+  runtime: null
+  scope: project
+  owners:
+  - tt-a1i/archify/archify
+  active_owner: tt-a1i/archify/archify
+  content_hash: sha256:be853150f7b2e129f0f57ae56c12fe38e81bcac340fae497c56c84edec3b6183
 - kind: project-relative
   target: codex
   value: .agents/skills/archify/test/fixtures/issue-126/custom-widths.workflow.json
@@ -29168,7 +29498,7 @@ deployments:
   owners:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
-  content_hash: sha256:840a235f01550b13317dcf027b0033716b1625b5f48abe4b09d8c20fdbbe314f
+  content_hash: sha256:36e86dd74fdc335b38991bc30fab3035e940036422da4754042683a52e7577ae
 - kind: project-relative
   target: codex
   value: .agents/skills/archify/test/motion-governor.test.mjs
@@ -29366,7 +29696,7 @@ deployments:
   owners:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
-  content_hash: sha256:1048752309d6425e1b01117097a48d6753545cf7aae4ca040902bae18b83f156
+  content_hash: sha256:a795ca70c71f7b516ff6690df24739ca85e163e7eed4306096fee2d688436f80
 - kind: project-relative
   target: codex
   value: .agents/skills/archify/test/real-repository-proof.test.mjs
@@ -29484,15 +29814,6 @@ deployments:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
   content_hash: sha256:7af5caeb664c9c9fc3e503dff07d275b710e04af60556ea5ab92ea74920f31cb
-- kind: project-relative
-  target: codex
-  value: .agents/skills/archify/test/repair-rounds.test.mjs
-  runtime: null
-  scope: project
-  owners:
-  - tt-a1i/archify/archify
-  active_owner: tt-a1i/archify/archify
-  content_hash: sha256:88fa563fa4fb82478facdf77cfc93f4246162e638ab71c55717f4084286d6524
 - kind: project-relative
   target: codex
   value: .agents/skills/archify/test/repository-evidence-replacement.test.mjs
@@ -29726,7 +30047,7 @@ deployments:
   owners:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
-  content_hash: sha256:96c4956079e3bf6ff04e8f224ca979d8c1eb559c975f34f952dd93b4cc528238
+  content_hash: sha256:e85614f0f9e99d3340be5c57524a5d95e3a473dd81681801b14b484e3923377b
 - kind: project-relative
   target: codex
   value: .agents/skills/archify/test/site-language-integration.mjs
@@ -29738,22 +30059,13 @@ deployments:
   content_hash: sha256:fa1ea2ceeecfb4c675e07e07fe614d6c1a1aa0d28fd9cef3d3df978b694580d7
 - kind: project-relative
   target: codex
-  value: .agents/skills/archify/test/skill-installation.test.mjs
-  runtime: null
-  scope: project
-  owners:
-  - tt-a1i/archify/archify
-  active_owner: tt-a1i/archify/archify
-  content_hash: sha256:ec660d8e7403018e6a1923c782f36f9482fe79f62f972ffc6084d2ff6e2438a1
-- kind: project-relative
-  target: codex
   value: .agents/skills/archify/test/skill-metadata.test.mjs
   runtime: null
   scope: project
   owners:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
-  content_hash: sha256:566c8510b9be19126acf479c1211ddd3b1eeced13b75e223263dd4617c8a803c
+  content_hash: sha256:eff3094bf4fa23584a1137ff7c7569433b870c2a742e4071808ffe50c6298067
 - kind: project-relative
   target: codex
   value: .agents/skills/archify/test/spatial-grid.test.mjs
@@ -29933,7 +30245,7 @@ deployments:
   owners:
   - tt-a1i/archify/archify
   active_owner: tt-a1i/archify/archify
-  content_hash: sha256:0762c04d573de96bf428d594f432604b2c54a84538599f2ffe2b99a29574cb4b
+  content_hash: sha256:d976e91991fcd8230f135f4a97b1f13a5fa358ebb2af54757c7a818756cbfa3c
 - kind: project-relative
   target: codex
   value: .agents/skills/archify/test/workflow-routing-clarity.test.mjs
@@ -30086,7 +30398,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:f3201db74752235e17b24deaf6e18c66255face418dfa42d52b3918133c2fe67
+  content_hash: sha256:92ace70e71770bf2ab5d7c9eb43f9b387473e7fd91299385b55177b59700ae57
 - kind: project-relative
   target: codex
   value: .agents/skills/ci-stability-hooks
@@ -30104,7 +30416,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:b965789832b4cba6139ee98e03b64a028262a10e92a66d1dbd08d19db0e36c4e
+  content_hash: sha256:2ee8a2f4fd036017cd2f471f4c6feeb757ad2c8a68333a5d1ff1831ffa1f5e52
 - kind: project-relative
   target: codex
   value: .agents/skills/ci-stability-hooks/agents/openai.yaml
@@ -30356,7 +30668,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:44caeba3f9a8397770f2ec1518328428e43388226d1f45ffe616507f4259eb26
+  content_hash: sha256:5056d6bf5a17255261490c177368d0cb42f80e26ff9ce459d7205544a7214baf
 - kind: project-relative
   target: codex
   value: .agents/skills/docs-review/agents/openai.yaml
@@ -30680,7 +30992,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/manual-skills
   active_owner: jey3dayo/apm-workspace/manual-skills
-  content_hash: sha256:9459e5b03f86785d184a83e5cd8d621b832e918ec04158a2962d867785812c6c
+  content_hash: sha256:3bdf92c3ef5fcae825748d1a3f3bfd9bb2f9e567334f2addeb2d9dd54e31a272
 - kind: project-relative
   target: codex
   value: .agents/skills/git-branch-cleanup
@@ -30698,7 +31010,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:cb860e2fb96c809011924d692d392eea64e616765aecab082cb4b0276c2ea5c1
+  content_hash: sha256:029ace59375a45ab5bda699d9057766b6e8efbc7bd535ab8464002557f1a1e32
 - kind: project-relative
   target: codex
   value: .agents/skills/git-branch-cleanup/agents/openai.yaml
@@ -30788,7 +31100,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:95988f9e305253348aefa6c1e2de9ade2fe1abea487a071ed533a9d8172066a0
+  content_hash: sha256:6ef5050c930b48674c71c441e9dfbc6e543161f6acd78aaa34184296785d3c78
 - kind: project-relative
   target: codex
   value: .agents/skills/grilling
@@ -31076,7 +31388,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:a83e65f9e445a05ef6606a528789bd2c20fccd259f80aacfe2fc2be2d0231abc
+  content_hash: sha256:afccc5bf61eba07d1833a74a011b25374a6b9d1b3886eeb8334e2922e4e67b41
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/agents/openai.yaml
@@ -31229,7 +31541,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:ed576d83662c974dda950fe702cdd43f00fb3a8162e670ec3c74df7dfec30b98
+  content_hash: sha256:4bb379288080fd8635508acf637bef3e9c8ab7f7844ec69fae9a910d0a4846f6
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/references/runtime.md
@@ -31319,7 +31631,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:ab0a8581a9e61b89254a4fd5d268625bfdb8b7f8bce4b6fa0fc6b3133529d8e3
+  content_hash: sha256:3e4d2a0734d2e0f307b76292f84b249af06104c8a81da0763801cad84c11f552
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/scripts/lib/__init__.py
@@ -31400,7 +31712,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:78a7e501585376d9d7a67a723c99c85e2ec987a6e086a0cf3e978cc9e3f1b752
+  content_hash: sha256:bdabd016fed02ae9cd9ae40fcc93a76072b69c894b404725651e30dc0b199593
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/scripts/lib/categories.py
@@ -31502,6 +31814,15 @@ deployments:
   content_hash: sha256:f089918c3a118a0099ea572cb33725bfa15584d1b0e37cb1081c2440085c7d36
 - kind: project-relative
   target: codex
+  value: .agents/skills/last30days/scripts/lib/devto.py
+  runtime: null
+  scope: project
+  owners:
+  - mvanhorn/last30days-skill/skills/last30days
+  active_owner: mvanhorn/last30days-skill/skills/last30days
+  content_hash: sha256:32c4b5d49600c036a6a57d4a1737183564cdb8e9ec5bf543916c46c8d98b3a8c
+- kind: project-relative
+  target: codex
   value: .agents/skills/last30days/scripts/lib/digg.py
   runtime: null
   scope: project
@@ -31526,7 +31847,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:521a2750714009cc77bf60c7af59a9e9cead3b4decf3a0284817292ff97f76a7
+  content_hash: sha256:a00c33bc79dffa60bef521ed4e9d98e8f8cf8351e24120bae337fd67d403e05e
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/scripts/lib/dripstack.py
@@ -31553,7 +31874,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:d0f15e481749d5a6318fab7466459d5656203fae6baa56b3a5a3fa4d4026b8f5
+  content_hash: sha256:7b3f7d9fb4ed9c4c6a991a902134db080b258176147ae35ff57cc1b2411999a2
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/scripts/lib/fanout.py
@@ -31574,6 +31895,15 @@ deployments:
   content_hash: sha256:9bf0a9d2862851121dc7d3642cec6fc6d64627ede5f47d363a935c239858718e
 - kind: project-relative
   target: codex
+  value: .agents/skills/last30days/scripts/lib/fetch_memo.py
+  runtime: null
+  scope: project
+  owners:
+  - mvanhorn/last30days-skill/skills/last30days
+  active_owner: mvanhorn/last30days-skill/skills/last30days
+  content_hash: sha256:aeb136e654736b7154307ae79a3bbacb8372d73b07c36df22cf19c4adb9ad723
+- kind: project-relative
+  target: codex
   value: .agents/skills/last30days/scripts/lib/freshness.py
   runtime: null
   scope: project
@@ -31589,7 +31919,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:3022badfff38035758f82ccd1187b6c68e434b620ae43de23594f631944bdef1
+  content_hash: sha256:d3d004003d13ab0e85a4c16fa9f1abbd758077ce70ca7e4f3bc0e0e5d0a30690
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/scripts/lib/github.py
@@ -31598,7 +31928,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:05abe351947c11bfff3834294f4609ad4c816df262f7fa8ea74fa08961c1f479
+  content_hash: sha256:9fa40868bec294a020c0e5d850ec937c18094b287769d0f48df80cb6a0db8bce
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/scripts/lib/grok_x.py
@@ -31625,7 +31955,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:211346e23d6ce9d58529ff2f70cc1b9a3185b5e885ecd1124c8b5236f406af07
+  content_hash: sha256:ab515fa5930422074cc220c786b43465c49fb41e256adec7cbe38930f33873a6
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/scripts/lib/health.py
@@ -31652,7 +31982,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:267113343a44dea86fcb0d9ca8146c4f39281d93724fb077c69597db622180a3
+  content_hash: sha256:715494725adb7097b8a063a15689835c0808a714d9c23c5ecee168c66d5f1713
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/scripts/lib/html_publish.py
@@ -31751,7 +32081,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:c7ba22551c152334946cfe82fd5c4791cdbefc4cf1057522b0abc3c16b796fdd
+  content_hash: sha256:e2d29fb842f16a83032e5834d014f0cd77889c260d1f88c760e06e5bf62aa535
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/scripts/lib/parallel_mcp.py
@@ -31796,7 +32126,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:b75780d432b0ce5ccc11d090c97f78181618dd95e2a13d35130dc03ef45c0475
+  content_hash: sha256:ef7f383becc2622fde960f8b1cf9bd4253687f2cd98a17d7a76b9998dda4eb37
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/scripts/lib/planner.py
@@ -31805,7 +32135,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:3496728a1fbde738a710b7b09b117898142e5c7ad66c0f82ecdcedf0d333eb01
+  content_hash: sha256:f7b6dd10d01a2927e81056d7466bc81361a67c2b2c3822a14b4599bf360d2501
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/scripts/lib/polymarket.py
@@ -31833,6 +32163,15 @@ deployments:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
   content_hash: sha256:0e2e80fc3ee1f532eff3369785eeea48e20fb918a02996b1e8853b7bbe1b2c46
+- kind: project-relative
+  target: codex
+  value: .agents/skills/last30days/scripts/lib/private_files.py
+  runtime: null
+  scope: project
+  owners:
+  - mvanhorn/last30days-skill/skills/last30days
+  active_owner: mvanhorn/last30days-skill/skills/last30days
+  content_hash: sha256:747913b70a70bc8c53906ce2b3a87445f0e3bb5f82d0e2a15c53239a81dc8f7f
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/scripts/lib/providers.py
@@ -31940,7 +32279,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:35cee7900974215563071506968a6e86fff7cd3fbd364631dc1ae197477af098
+  content_hash: sha256:b0c3873dda0e08939c1189e4521c13d9ca7e176a69bf3f35195f2b288db44ea6
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/scripts/lib/relevance.py
@@ -31958,7 +32297,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:080239b43303506fd220fa194127ca8a14c448e3b18e19fbc550c8554a1ecbeb
+  content_hash: sha256:8bdb119e92f2da0c28f168ad6ce3b485bfe4ed802d8244d15900e0d3cb7de7ce
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/scripts/lib/rerank.py
@@ -31967,7 +32306,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:d8f917676e14712c77bda2f9b01f149314199b7f12b8037c22a561c400b560cf
+  content_hash: sha256:6242b9528fa440cafaf0b469e26062f6b66e91705f60ee9b1b92f6302d00e595
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/scripts/lib/resolve.py
@@ -32003,7 +32342,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:431df7010d1dece31ada55afe15b3b7c8beedf1bb24e4424f3a6e49693c1c562
+  content_hash: sha256:24c3a3c29b9af92717294b1b04b49e05751b784e3bb7f5eb5be6adebc6af844a
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/scripts/lib/signals.py
@@ -32012,7 +32351,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:c260c4dda853e102bf7c67db7410aa4255668fad17bb27bb8b8a240d85bf4e08
+  content_hash: sha256:3e23133f865eb2fe7d4c74f7aaa2c0d5caa13948107690f741d5211e590f5f9b
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/scripts/lib/skill_meta.py
@@ -32129,7 +32468,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:bf04978785709c7872d51b06872a8590ec121dda149f6112512fd5d09fb25199
+  content_hash: sha256:2a699dfe9af94fd1862882b542489690a91cbb568c9970e4f84b592c3ab47b6d
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/scripts/lib/usage.py
@@ -32372,7 +32711,7 @@ deployments:
   owners:
   - mvanhorn/last30days-skill/skills/last30days
   active_owner: mvanhorn/last30days-skill/skills/last30days
-  content_hash: sha256:dad20d5578a72c84b619265074adeb15435639e4c8f5443d59b189483c1baeee
+  content_hash: sha256:4e0846a8d8fe48d3cea4329964e9b67ac41a781ed760d1c55007e4a0e60ad5c8
 - kind: project-relative
   target: codex
   value: .agents/skills/last30days/scripts/setup-keychain.sh
@@ -32651,7 +32990,7 @@ deployments:
   owners:
   - coji/natural-japanese/skills/natural-japanese
   active_owner: coji/natural-japanese/skills/natural-japanese
-  content_hash: sha256:0f662a6ab4955b9146a138a38b73a619b27fa1448ef71e27fcc57f67d3ad0267
+  content_hash: sha256:bb2c45e3aa6eadd02a48c8a848106baa9187a02417df65b3b37ef65085d7ff61
 - kind: project-relative
   target: codex
   value: .agents/skills/natural-japanese/assets/style-profile-template.md
@@ -32717,15 +33056,6 @@ deployments:
   content_hash: sha256:1ca8db97566ad053cdb0115a72e12099f94648c5ba3a3d0bd6d33bf91c7f59d8
 - kind: project-relative
   target: codex
-  value: .agents/skills/natural-japanese/references/eval-rubric.md
-  runtime: null
-  scope: project
-  owners:
-  - coji/natural-japanese/skills/natural-japanese
-  active_owner: coji/natural-japanese/skills/natural-japanese
-  content_hash: sha256:77a49a4d0f70a51d4e595dec3ab236543b404edab5c6ccafb57c3f1f68d4ae65
-- kind: project-relative
-  target: codex
   value: .agents/skills/natural-japanese/references/examples.md
   runtime: null
   scope: project
@@ -32741,7 +33071,7 @@ deployments:
   owners:
   - coji/natural-japanese/skills/natural-japanese
   active_owner: coji/natural-japanese/skills/natural-japanese
-  content_hash: sha256:0cce2ad7f053611a8c983ebf86f55631e019bbf752cc815c04077b229a557b1f
+  content_hash: sha256:dc6d9eb4dc5adefe0e99e50aa038344a83544a1493ecfac7f7e488cb15d21168
 - kind: project-relative
   target: codex
   value: .agents/skills/natural-japanese/references/genre-notes.md
@@ -32768,7 +33098,7 @@ deployments:
   owners:
   - coji/natural-japanese/skills/natural-japanese
   active_owner: coji/natural-japanese/skills/natural-japanese
-  content_hash: sha256:10418600db75d12da4ba7ca6d76cc9d0bc60e305ae4e75fa90f28c2aa76317b0
+  content_hash: sha256:05f7bbee94e3461b7d9141a794d75cee064a9503a9db458bcc5617f7ef081a22
 - kind: project-relative
   target: codex
   value: .agents/skills/natural-japanese/references/readability-principles.md
@@ -32786,7 +33116,7 @@ deployments:
   owners:
   - coji/natural-japanese/skills/natural-japanese
   active_owner: coji/natural-japanese/skills/natural-japanese
-  content_hash: sha256:27641d1a2aa5b41821d3da186ddf4139dc091c5dd8fb20544d814675b863433a
+  content_hash: sha256:92719c75fd54c9d9c348a298349a15ce16da500d8f2601ef0da0bbdad3bf30e1
 - kind: project-relative
   target: codex
   value: .agents/skills/natural-japanese/references/translationese.md
@@ -32795,7 +33125,7 @@ deployments:
   owners:
   - coji/natural-japanese/skills/natural-japanese
   active_owner: coji/natural-japanese/skills/natural-japanese
-  content_hash: sha256:09b3da1ebf4c663be9cb0bf9ed5bade476ba10804509e6ca6dc22dc15129f827
+  content_hash: sha256:71dd72471151901b8c7d49783c23f258f500d13fb6cafa3b0807dafa6ae27afc
 - kind: project-relative
   target: codex
   value: .agents/skills/natural-japanese/references/writing-constitution.md
@@ -32804,7 +33134,7 @@ deployments:
   owners:
   - coji/natural-japanese/skills/natural-japanese
   active_owner: coji/natural-japanese/skills/natural-japanese
-  content_hash: sha256:457b83afa64fa0da95a9daa25a8140e203fc4a3e87b2ff2c2839e0c8aad7ffdb
+  content_hash: sha256:ae256b6ba32a656aab4e958253821d5e4268e2b1555c4d0a3ba217ed1717dd23
 - kind: project-relative
   target: codex
   value: .agents/skills/natural-japanese/scripts/calibrate.py
@@ -32840,7 +33170,7 @@ deployments:
   owners:
   - coji/natural-japanese/skills/natural-japanese
   active_owner: coji/natural-japanese/skills/natural-japanese
-  content_hash: sha256:576fb564126b6a81feadc88969a0ec8fb8fc7a755899e5b90fe91981e644881a
+  content_hash: sha256:fd19c74136f2963ad7f8b76626029c19b1fc66faff8906d3af5e13d5ed4944b0
 - kind: project-relative
   target: codex
   value: .agents/skills/natural-japanese/scripts/outline.py
@@ -32894,7 +33224,25 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:ac307676e7e0a62dae3e4d12a16c9a21c594da61885fb9f4b307766aaa6cb9bb
+  content_hash: sha256:952cee6e281eac3453828123d825d4ae79a9236fc2bacc1137dc14b833dcc36b
+- kind: project-relative
+  target: codex
+  value: .agents/skills/orchestrator-worker/references/regression-fixtures.md
+  runtime: null
+  scope: project
+  owners:
+  - jey3dayo/apm-workspace/catalog
+  active_owner: jey3dayo/apm-workspace/catalog
+  content_hash: sha256:a14203036122e0ebc17476af79b08eb9855fa75359ef822d114543e8fd2d105e
+- kind: project-relative
+  target: codex
+  value: .agents/skills/orchestrator-worker/scripts/check-fixture-isolation.py
+  runtime: null
+  scope: project
+  owners:
+  - jey3dayo/apm-workspace/catalog
+  active_owner: jey3dayo/apm-workspace/catalog
+  content_hash: sha256:c987134ef85c0bcd851bd0c597ab43e3b60017aa804f965d7b79426e399b6e6e
 - kind: project-relative
   target: codex
   value: .agents/skills/perman-aws-vault
@@ -33803,7 +34151,7 @@ deployments:
   owners:
   - millionco/react-doctor/skills/react-doctor
   active_owner: millionco/react-doctor/skills/react-doctor
-  content_hash: sha256:2b1d8b88956d6b60c49e75aa793762067dc3a1bd42a7204ef40685f17e89a037
+  content_hash: sha256:9efaa6a77162e0aafa75bcb1ac18f162631a9028d646a3cb2367423073517927
 - kind: project-relative
   target: codex
   value: .agents/skills/react-doctor/references/explain.md
@@ -33812,7 +34160,7 @@ deployments:
   owners:
   - millionco/react-doctor/skills/react-doctor
   active_owner: millionco/react-doctor/skills/react-doctor
-  content_hash: sha256:21fa0414874d117a63e5360d527884ccd42bf0906e6dcab371409cebac8b3d12
+  content_hash: sha256:237dd81672c858c8c52325bafeefdde2d5b842c9a98c2ea6a820534a0df8e927
 - kind: project-relative
   target: codex
   value: .agents/skills/refactoring
@@ -34235,7 +34583,7 @@ deployments:
   owners:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:aa8e57e5986721fc6df3927ff02e73eb3091c28d4c27387109875a16894ec5e7
+  content_hash: sha256:b34b03b003c842dd5b5ff77b373d9442decfc0224eeb19d6c6542e8b671db31d
 - kind: project-relative
   target: codex
   value: .agents/skills/similarity/agents/openai.yaml
@@ -35333,7 +35681,7 @@ deployments:
   owners:
   - nanaism/yomiyasu/skills/yomiyasu
   active_owner: nanaism/yomiyasu/skills/yomiyasu
-  content_hash: sha256:16269e0707004f0808466ec7f9d671d86dacca5d02d75f2cd009ccd97153679a
+  content_hash: sha256:1d563e4a0e24d8a419d01f4cd729ec2577f189f9dd61a1d4a8ab22119aef1d35
 - kind: project-relative
   target: codex
   value: .agents/skills/yomiyasu/.claude-plugin/plugin.json
@@ -35342,7 +35690,7 @@ deployments:
   owners:
   - nanaism/yomiyasu/skills/yomiyasu
   active_owner: nanaism/yomiyasu/skills/yomiyasu
-  content_hash: sha256:e292eef1b3c2bc09e4ca39862cf88f1b5262f2fe7b89356126ecf4c3cfe8cfed
+  content_hash: sha256:8cde4dc0893bc46827776a45610356f8997100bff0cc6e3e8699372f90316129
 - kind: project-relative
   target: codex
   value: .agents/skills/yomiyasu/LICENSE
@@ -35360,7 +35708,7 @@ deployments:
   owners:
   - nanaism/yomiyasu/skills/yomiyasu
   active_owner: nanaism/yomiyasu/skills/yomiyasu
-  content_hash: sha256:651818c2f5b97f0114b9a568bc5e672b5d190226cec2e403acc03450d8b958ac
+  content_hash: sha256:0a8915986b0228abdf137d00f8e35959336f1914d36dfb73f1e8c053357209cf
 - kind: project-relative
   target: codex
   value: .agents/skills/yomiyasu/UNICODE-LICENSE.txt
@@ -35414,7 +35762,7 @@ deployments:
   owners:
   - nanaism/yomiyasu/skills/yomiyasu
   active_owner: nanaism/yomiyasu/skills/yomiyasu
-  content_hash: sha256:9d1dc107a2e389d5bfc2db9e826d0fdcb69be5115d07afd4586d6b0cf5b87879
+  content_hash: sha256:7685424e9f63cd0d45c0fca673eabd10d7879f29e220b7d8517e73fcd2a9b6e7
 - kind: project-relative
   target: codex
   value: .agents/skills/yomiyasu/references/slop-catalog.md
@@ -35423,7 +35771,7 @@ deployments:
   owners:
   - nanaism/yomiyasu/skills/yomiyasu
   active_owner: nanaism/yomiyasu/skills/yomiyasu
-  content_hash: sha256:402fff215d7171f021bd418075832dc4a3867801ccb4c3a5ecdab60eb0241897
+  content_hash: sha256:e7791d123db2573f50ee922c51f7d50694ab7e6b81f318713e9f405fe3c6daf2
 - kind: project-relative
   target: codex
   value: .agents/skills/yomiyasu/scripts/markdown_visibility.py
@@ -35441,7 +35789,7 @@ deployments:
   owners:
   - nanaism/yomiyasu/skills/yomiyasu
   active_owner: nanaism/yomiyasu/skills/yomiyasu
-  content_hash: sha256:090868e2ab0d2b7eb9dadb014a80c7a5865b5082f250d05fea8ce4483730c312
+  content_hash: sha256:b704e088fd6e1b01c21fb6b97373cc21d441cb14e976f3a47a95c3ba1c73a964
 - kind: project-relative
   target: codex
   value: .agents/skills/yomiyasu/scripts/yomiyasu_lint.py
@@ -35450,7 +35798,7 @@ deployments:
   owners:
   - nanaism/yomiyasu/skills/yomiyasu
   active_owner: nanaism/yomiyasu/skills/yomiyasu
-  content_hash: sha256:a5a253fbe5db7cde021e7c34b1e203472ff164f60a3886c85d5f69b140dcf230
+  content_hash: sha256:299a61970e8c30092f947e2ace95e80ff8a513fac87824363f89ba77e6cac468
 - kind: project-relative
   target: legacy
   value: .agents/skills/agent-curation
