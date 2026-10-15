@@ -3,7 +3,7 @@ name: ship
 description: >-
   実作業の依頼で変更を終えて最終報告を書く前、commit / push / PR / deploy に進むとき、
   または「出荷して」「PR まで出して」と言われたときに、polish → full gate → 独立レビュー →
-  commit → push → PR → CI の出荷を、repo ごとに許された範囲まで機械的に進める。
+  commit → push → PR → CI → PR レビュー指摘の出荷を、repo ごとに許された範囲まで機械的に進める。
 argument-hint: "[commit | push | pr]"
 ---
 
@@ -26,18 +26,21 @@ argument-hint: "[commit | push | pr]"
 
 ## 2. 順に進める
 
-| 工程         | 担当                                                                                                                                    | 次へ進む条件                             |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| polish       | `polish`（base-ref、自分の変更ファイル、変更の意図を引数で渡す）                                                                        | 報告を受け取った。削除候補は親が判断する |
-| full gate    | repo 定義の `check` / `test` / `ci` / `verify`。task が無く lefthook だけなら push 時の pre-push を gate とし、ここは該当なしと報告する | green                                    |
-| 独立レビュー | 非軽微な変更だけ。reviewer と経路は `orchestrator-worker`。Codex native の別セッションレビューでもよい                                  | blocking 指摘ゼロ（指摘対応は最大3回）   |
-| branch 確認  | default branch 上なら、repo の AGENTS.md が直接 commit を定めているか                                                                   | 定めがある、または default branch 外     |
-| commit       | `atomic-commit`（自分の変更ファイルと意図を引数で渡す）                                                                                 | 意図した commit が揃い、保留が無い       |
-| push         | `git push`（upstream 未設定なら `-u`）。lefthook の pre-push はここで走る                                                               | hook を含めて成功                        |
-| PR           | `gh pr create`。本文は global AGENTS.md「issue / PR 本文の扱い」                                                                        | PR URL を得た                            |
-| CI           | `gh pr checks --watch`                                                                                                                  | 全 check が pass                         |
+| 工程            | 担当                                                                                                                                    | 次へ進む条件                             |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| polish          | `polish`（base-ref、自分の変更ファイル、変更の意図を引数で渡す）                                                                        | 報告を受け取った。削除候補は親が判断する |
+| full gate       | repo 定義の `check` / `test` / `ci` / `verify`。task が無く lefthook だけなら push 時の pre-push を gate とし、ここは該当なしと報告する | green                                    |
+| 独立レビュー    | 非軽微な変更だけ。reviewer と経路は `orchestrator-worker`。Codex native の別セッションレビューでもよい                                  | blocking 指摘ゼロ（指摘対応は最大3回）   |
+| branch 確認     | default branch 上なら、repo の AGENTS.md が直接 commit を定めているか                                                                   | 定めがある、または default branch 外     |
+| commit          | `atomic-commit`（自分の変更ファイルと意図を引数で渡す）                                                                                 | 意図した commit が揃い、保留が無い       |
+| push            | `git push`（upstream 未設定なら `-u`）。lefthook の pre-push はここで走る                                                               | hook を含めて成功                        |
+| PR              | `gh pr create`。本文は global AGENTS.md「issue / PR 本文の扱い」                                                                        | PR URL を得た                            |
+| CI              | `gh pr checks --watch`                                                                                                                  | 全 check が pass                         |
+| PR レビュー指摘 | `gh-address-comments`（PR を引数で渡す）。CI 完了時点で付いている未解決 thread（bot のレビューを含む）を対象にする                      | 未解決の actionable thread がゼロ        |
 
 差分を書き換えた工程（polish、削除候補の削除、レビュー指摘の修正）の後は、full gate から回し直す。
+
+ship の中では未解決の actionable thread をすべて対象にし、どれを直すかは聞かない。指摘同士が衝突する、振る舞いが退行する、指摘が曖昧、のどれかなら §3 で止める。PR レビュー指摘の修正は新しい commit として積む（force push しない。squash merge で畳まれる）。push 後、その thread に commit SHA と対応内容を返信して resolve する。ship の許可が PR まで届いているなら、この返信と resolve は依頼に含まれる（`gh-address-comments` の「依頼が無ければ返信・resolve しない」はここで満たされる）。§3 で止めた thread は返信の案だけを作り、resolve しない。
 
 - 完了条件: 終点の工程まで「次へ進む条件」を満たした
 
@@ -50,7 +53,7 @@ argument-hint: "[commit | push | pr]"
 - full gate・CI・レビュー指摘が、判断を挟まないと直らない。CI の失敗は `gh-fix-ci` で原因と修正案を出したところで止める
 - global AGENTS.md の停止・確認ポリシーの条件に当たる
 
-PR のマージとレビュー指摘への対応（`gh-address-comments`）は出荷に含めない。依頼を受けてから始める。
+PR のマージは出荷に含めない。依頼を受けてから始める。
 
 ## 4. 報告
 
