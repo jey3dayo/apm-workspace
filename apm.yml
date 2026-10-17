@@ -21,7 +21,7 @@ dependencies:
     - shadcn/improve#cac56e1ebd3c279aa9153616cfeac7b174ab90f9
 
     # --- engineering / writing ---
-    - coji/natural-japanese/skills/natural-japanese#b54954f8deb4f110f0959f4e4fac295708900120 # v1.3.0
+    - coji/natural-japanese/skills/natural-japanese#a739fee1b6d5cdac157959cb4fefb7f84a29c77b # v1.6.0
     - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
       ref: 8f2d57610a73efc97d743c9b0b0ecb1002e09fa4
       alias: japanese-tech-writing
@@ -39,7 +39,7 @@ dependencies:
         - wait-what
         - wayfinder
         - writing-for-agents
-    - nanaism/yomiyasu/skills/yomiyasu#602a3690dadd5d620bb21524353b8d192914eabb # v1.1.2
+    - nanaism/yomiyasu/skills/yomiyasu#1bc21f9c8e6a55fc4ccd5a2c7dfe78a7b0d814c5 # v2.0.1
 
     # --- react ---
     - millionco/react-doctor/skills/react-doctor#695e46eee203a5d1855020191aa7e9c010a1250e # v2.4.0
@@ -77,7 +77,7 @@ dependencies:
     # --- browser / analysis ---
     - browser-use/browser-harness#dbf0e4f3a37ebc31aaeaf9d378ab1760b5776c15
     - openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431
-    - tt-a1i/archify/archify#2ab3cae7ac2c2a55d7386ca789d03c4fcd31816c # v3.0.1
+    - tt-a1i/archify/archify#1c2b42d660e4a7571813fb43839c79e3e9ca7720 # v3.1.0
 
     # --- agent tools ---
     - agavra/tuicr/skills/tuicr#9175dc95b97a0a7dd290d43d38385745a7fb7d40
