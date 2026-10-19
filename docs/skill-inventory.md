@@ -24,7 +24,6 @@
 
 グループは `apm.yml` の `# --- <group> ---` 見出しと同じ。
 
-- org-restricted: `perman-aws-vault`
 - review: `thermo-nuclear-code-quality-review`, `improve`（shadcn）
 - engineering / writing: `natural-japanese`, `japanese-tech-writing`（gist、alias）, `yomiyasu`,
   mattpocock 系（`codebase-design`, `domain-modeling`, `grilling`,
@@ -82,6 +81,7 @@
 - `ca-pass`, `mdb-api`, `notica-api`, `telma-api` — global から撤去済み。
   必要な利用リポジトリの `apm.yml` から `caad-develop/claude-code-marketplace`
   の各 `plugins/service-integrations/<id>` ref を個別導入する。
+- `perman-aws-vault` — global APM から撤去済み（2026-10-19）。caad マーケットのプラグインで管理（Claude Code / Codex / Grok 共通）。APM の `apm.yml` には載せない。
 
 ## repo-local で活用中
 
@@ -94,7 +94,8 @@ global の一覧に無くても廃止ではない。各リポジトリの `apm.y
 | `tauri-mcp-server`（MCP）                                                                 | `ultra-rss-reader`                                                            | Tauri ランタイム検証                          |
 | `terraform-style-guide` / `terraform-test`（hashicorp）                                   | `ca-connect-site`, `caad-asta`, `caad-terraform-infra`                        | Terraform 規約・テスト                        |
 | `workers-best-practices` / `wrangler`（cloudflare）                                       | `keep-on`                                                                     | Cloudflare Workers                            |
-| `perman-aws-vault` / `ca-pass` / `mdb-api` / `telma-api`（caad marketplace）              | `ca-connect-site`, `caad-asta`, `caad-loca-bff`                               | AWS 認証と社内 API 連携                       |
+| `ca-pass` / `mdb-api` / `telma-api`（caad marketplace、repo-local apm）                   | `ca-connect-site`, `caad-asta`, `caad-loca-bff`                               | 社内 API 連携                                 |
+| `perman-aws-vault`（caad marketplace プラグイン、APM 管理外）                             | Claude Code / Codex / Grok 共通（host 導入）                                  | AWS 認証導線                                  |
 | `notica-api`（caad marketplace）                                                          | `ca-connect-site`                                                             | Notica API 連携                               |
 | `mcp-server-patterns`, `chatgpt-apps`                                                     | `caad-loca-bff`                                                               | MCP / ChatGPT Apps 実装                       |
 | `tauri`（EpicenterHQ）, `rust-best-practices`, `tauri-icon-gen`, `tauri-webview-geometry` | `ultra-rss-reader`                                                            | Tauri / Rust 実装                             |
