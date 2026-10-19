@@ -5,12 +5,12 @@
 
 ## perman-aws-vault
 
-- Status: global APM へ再追加（2026-10-07、ユーザー判断）。`# --- org-restricted ---` グループ、manifest-style のグループ順、skill inventory の記載も戻した。
-- 経緯: 2026-10-05 に global から撤去し repo-local へ移管していた（以下はその時点の記録）。
-- 理由: 依存元 `caad-develop/claude-code-marketplace` は internal repo で、global の全体更新を妨げていた（ユーザー判断）。利用する AWS リポジトリ側の `apm.yml` で宣言する。
-- 手順: `apm.yml` の依存と `# --- org-restricted ---` グループ、`apm.lock.yaml` の該当レコード、manifest-style のグループ順、skill inventory の global 記載を削除。
-- 移管先: `ca-connect-site`、`caad-asta`、`caad-loca-bff`、`our-apm` は repo-local で宣言済み。未宣言の AWS リポジトリは必要になった時点でその repo の `apm.yml` に追加する。
-- 再検討するなら: 未宣言リポジトリで AWS 認証の導線が繰り返し欠けるとき。
+- Status: global APM の管理対象から撤去（2026-10-19、ユーザー判断）。caad マーケットのプラグインで管理する形に一本化。
+- 決定: perman-aws-vault は caad マーケットのプラグインで管理（Claude Code / Codex / Grok 共通）。理由は org 制限リポジトリの参照権限の問題と、apm との二重導入を防ぐため。
+- 手順: `apm.yml` の `# --- org-restricted ---` グループごと削除、`apm.lock.yaml` の該当レコード削除、skill inventory の global 記載を更新。
+- 経緯: 2026-10-07 に global APM へ再追加していた。2026-10-05 には一度 global から撤去し repo-local へ移管していた（依存元 `caad-develop/claude-code-marketplace` が internal で全体更新を妨げるため）。
+- 利用側: Claude CLI / Codex CLI には marketplace プラグインとして導入済み。APM 経由の配置は次の `mise run deploy` で所有記録が消える（プラグイン側のコピーは別レーン）。
+- 再検討するなら: marketplace プラグインだけでは届かないターゲットが出たとき。
 
 ## caad-skill-deployer
 
