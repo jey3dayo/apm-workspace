@@ -39,7 +39,7 @@ dependencies:
         - wait-what
         - wayfinder
         - writing-for-agents
-    - nanaism/yomiyasu/skills/yomiyasu#1bc21f9c8e6a55fc4ccd5a2c7dfe78a7b0d814c5 # v2.0.1
+    - nanaism/yomiyasu/skills/yomiyasu#5b7cacc7749e9195338d7305635c06871fc6daf1 # v2.0.2
 
     # --- react ---
     - millionco/react-doctor/skills/react-doctor#695e46eee203a5d1855020191aa7e9c010a1250e # v2.4.0
@@ -77,7 +77,7 @@ dependencies:
     # --- browser / analysis ---
     - browser-use/browser-harness#dbf0e4f3a37ebc31aaeaf9d378ab1760b5776c15
     - openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431
-    - tt-a1i/archify/archify#1c2b42d660e4a7571813fb43839c79e3e9ca7720 # v3.1.0
+    - tt-a1i/archify/archify#208acba8d412335185b2056fedf54b3405df43fb # v3.2.0
 
     # --- agent tools ---
     - agavra/tuicr/skills/tuicr#9175dc95b97a0a7dd290d43d38385745a7fb7d40
