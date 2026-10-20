@@ -2754,7 +2754,7 @@ EOF
   [ -f "$runtime_home/.codex/rules/shared.md" ]
   [ ! -e "$runtime_home/.codex/rules/model-policy.md" ]
 
-  rm "$workspace/catalog/claude/rules/model-policy.md"
+  rm -rf "$workspace/catalog/claude"
   run sync_managed_catalog_runtime_assets
   [ "$status" -eq 0 ]
   [ ! -e "$runtime_home/.claude/rules/model-policy.md" ]

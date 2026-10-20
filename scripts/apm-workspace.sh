@@ -209,6 +209,10 @@ catalog_build_rules_root() {
   printf '%s/rules\n' "$(catalog_build_dir)"
 }
 
+catalog_build_claude_rules_root() {
+  printf '%s/claude/rules\n' "$(catalog_build_dir)"
+}
+
 catalog_build_instructions_path() {
   printf '%s/AGENTS.md\n' "$(catalog_build_dir)"
 }
@@ -338,7 +342,8 @@ assert_catalog_stage_safety() {
   for asset_spec in \
     "agents|$(tracked_catalog_agents_root)|$(catalog_build_agents_root)" \
     "commands|$(tracked_catalog_commands_root)|$(catalog_build_commands_root)" \
-    "rules|$(tracked_catalog_rules_root)|$(catalog_build_rules_root)"; do
+    "rules|$(tracked_catalog_rules_root)|$(catalog_build_rules_root)" \
+    "claude-rules|$(tracked_catalog_claude_rules_root)|$(catalog_build_claude_rules_root)"; do
     asset_label=${asset_spec%%|*}
     rest=${asset_spec#*|}
     current_root=${rest%%|*}
@@ -549,6 +554,14 @@ copy_managed_rule_assets_into_catalog() {
   destination_dir="$1"
   source_dir=$(tracked_catalog_rules_root)
   [ -d "$source_dir" ] || fail "Managed catalog rules missing: $source_dir"
+  mkdir -p "$destination_dir"
+  cp -R "$source_dir"/. "$destination_dir"
+}
+
+copy_managed_claude_rule_assets_into_catalog() {
+  destination_dir="$1"
+  source_dir=$(tracked_catalog_claude_rules_root)
+  [ -d "$source_dir" ] || return 0
   mkdir -p "$destination_dir"
   cp -R "$source_dir"/. "$destination_dir"
 }
@@ -2323,6 +2336,24 @@ sync_managed_catalog_dir_with_manifest() {
   printf '%s\n' "$new_manifest" >"$manifest_path"
 }
 
+# Counterpart of the stale-entries branch above for a source dir that vanished
+# entirely: confine removal to what this catalog previously placed (the files
+# the manifest lists), then drop now-empty subdirectories the same way. A
+# missing manifest is not an error — there is nothing this source ever placed.
+cleanup_claude_rules_target_with_manifest() {
+  target_dir="$1"
+  manifest_path="$target_dir/.managed-claude-rules-manifest"
+
+  [ -f "$manifest_path" ] || return 0
+
+  while IFS= read -r relative_path; do
+    [ -n "$relative_path" ] || continue
+    rm -f "$target_dir/$relative_path"
+  done <"$manifest_path"
+  rm -f "$manifest_path"
+  find "$target_dir" -mindepth 1 -type d -empty -delete
+}
+
 sync_managed_catalog_runtime_assets() {
   tracked_dir=$(tracked_catalog_dir)
   [ -d "$tracked_dir" ] || fail "Tracked catalog missing: $tracked_dir. Run 'mise run prepare:catalog' first."
@@ -2357,8 +2388,12 @@ sync_managed_catalog_runtime_assets() {
       sync_managed_catalog_dir_with_manifest "$rules_source" "$target_root/rules"
     fi
 
-    if [ "$RT_TARGET_NAME" = "claude" ] && [ -d "$claude_rules_source" ]; then
-      sync_managed_catalog_dir_with_manifest "$claude_rules_source" "$target_root/rules" ".managed-claude-rules-manifest"
+    if [ "$RT_TARGET_NAME" = "claude" ]; then
+      if [ -d "$claude_rules_source" ]; then
+        sync_managed_catalog_dir_with_manifest "$claude_rules_source" "$target_root/rules" ".managed-claude-rules-manifest"
+      else
+        cleanup_claude_rules_target_with_manifest "$target_root/rules"
+      fi
     fi
   done
 }
@@ -2574,6 +2609,7 @@ cmd_seed_catalog_build() {
   copy_managed_agent_assets_into_catalog "$(catalog_build_agents_root)"
   copy_managed_command_assets_into_catalog "$(catalog_build_commands_root)"
   copy_managed_rule_assets_into_catalog "$(catalog_build_rules_root)"
+  copy_managed_claude_rule_assets_into_catalog "$(catalog_build_claude_rules_root)"
 
   printf '%s\n' "$skill_ids" | while IFS= read -r skill_id; do
     [ -n "$skill_id" ] || continue

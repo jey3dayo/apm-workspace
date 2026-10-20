@@ -2548,6 +2548,10 @@ function Get-CatalogBuildRulesRoot {
   return (Join-Path (Get-CatalogBuildDir) "rules")
 }
 
+function Get-CatalogBuildClaudeRulesRoot {
+  return (Join-Path (Join-Path (Get-CatalogBuildDir) "claude") "rules")
+}
+
 function Get-CatalogBuildInstructionsPath {
   return (Join-Path (Get-CatalogBuildDir) "AGENTS.md")
 }
@@ -3212,8 +3216,25 @@ function Sync-ManagedCatalogRuntimeAssets {
       Sync-ManagedCatalogDirWithManifest -SourceDir $rulesSource -DestinationDir (Join-Path $target.Root "rules")
     }
 
-    if ($target.Name -eq "claude" -and (Test-Path -LiteralPath $claudeRulesSource)) {
-      Sync-ManagedCatalogDirWithManifest -SourceDir $claudeRulesSource -DestinationDir (Join-Path $target.Root "rules") -ManifestName ".managed-claude-rules-manifest"
+    if ($target.Name -eq "claude") {
+      $claudeRulesDir = Join-Path $target.Root "rules"
+      $claudeRulesManifestPath = Join-Path $claudeRulesDir ".managed-claude-rules-manifest"
+      if (Test-Path -LiteralPath $claudeRulesSource) {
+        Sync-ManagedCatalogDirWithManifest -SourceDir $claudeRulesSource -DestinationDir $claudeRulesDir -ManifestName ".managed-claude-rules-manifest"
+      }
+      elseif (Test-Path -LiteralPath $claudeRulesManifestPath) {
+        $staleClaudeRuleEntries = @(Get-Content -LiteralPath $claudeRulesManifestPath -ErrorAction SilentlyContinue | Where-Object { $_ -ne "" })
+        foreach ($relativePath in $staleClaudeRuleEntries) {
+          $stalePath = Join-Path $claudeRulesDir $relativePath
+          if (Test-Path -LiteralPath $stalePath) {
+            Remove-Item -LiteralPath $stalePath -Force
+          }
+        }
+        Remove-Item -LiteralPath $claudeRulesManifestPath -Force
+        if ($staleClaudeRuleEntries.Count -gt 0) {
+          Remove-EmptyDirectories -RootDir $claudeRulesDir
+        }
+      }
     }
   }
 }
@@ -3557,7 +3578,8 @@ function Assert-CatalogStageSafety {
   foreach ($assetRoot in @(
       @{ Label = "agents"; Current = (Get-TrackedCatalogAgentsRoot); Build = (Get-CatalogBuildAgentsRoot) },
       @{ Label = "commands"; Current = (Get-TrackedCatalogCommandsRoot); Build = (Get-CatalogBuildCommandsRoot) },
-      @{ Label = "rules"; Current = (Get-TrackedCatalogRulesRoot); Build = (Get-CatalogBuildRulesRoot) }
+      @{ Label = "rules"; Current = (Get-TrackedCatalogRulesRoot); Build = (Get-CatalogBuildRulesRoot) },
+      @{ Label = "claude-rules"; Current = (Get-TrackedCatalogClaudeRulesRoot); Build = (Get-CatalogBuildClaudeRulesRoot) }
     )) {
     $currentFiles = @(Get-RelativeFilePaths -RootDir $assetRoot.Current)
     $buildFiles = @(Get-RelativeFilePaths -RootDir $assetRoot.Build)
@@ -3695,6 +3717,20 @@ function Copy-ManagedRuleAssetsIntoCatalog {
   Copy-DirectoryContents -SourceDir $sourceDir -DestinationDir $DestinationDir
 }
 
+function Copy-ManagedClaudeRuleAssetsIntoCatalog {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$DestinationDir
+  )
+
+  $sourceDir = Get-TrackedCatalogClaudeRulesRoot
+  if (-not (Test-Path -LiteralPath $sourceDir)) {
+    return
+  }
+
+  Copy-DirectoryContents -SourceDir $sourceDir -DestinationDir $DestinationDir
+}
+
 function Get-TrackedCatalogReference {
   $tracking = Get-WorkspaceTrackingInfo
   $repoReference = Get-WorkspaceRepoReference -RemoteName $tracking.RemoteName
@@ -3811,6 +3847,7 @@ function Invoke-SeedCatalogBuild {
   Copy-ManagedAgentAssetsIntoCatalog -DestinationDir (Get-CatalogBuildAgentsRoot)
   Copy-ManagedCommandAssetsIntoCatalog -DestinationDir (Get-CatalogBuildCommandsRoot)
   Copy-ManagedRuleAssetsIntoCatalog -DestinationDir (Get-CatalogBuildRulesRoot)
+  Copy-ManagedClaudeRuleAssetsIntoCatalog -DestinationDir (Get-CatalogBuildClaudeRulesRoot)
   foreach ($skillId in $skillIds) {
     Copy-ManagedSkillIntoCatalog -SkillId $skillId -SkillsRoot (Get-CatalogBuildSkillsRoot)
   }
