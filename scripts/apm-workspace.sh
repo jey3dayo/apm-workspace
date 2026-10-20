@@ -241,6 +241,10 @@ tracked_catalog_rules_root() {
   printf '%s/rules\n' "$(tracked_catalog_dir)"
 }
 
+tracked_catalog_claude_rules_root() {
+  printf '%s/claude/rules\n' "$(tracked_catalog_dir)"
+}
+
 tracked_catalog_instructions_path() {
   printf '%s/AGENTS.md\n' "$(tracked_catalog_dir)"
 }
@@ -2296,7 +2300,8 @@ replace_managed_catalog_agents_tree() {
 sync_managed_catalog_dir_with_manifest() {
   source_dir="$1"
   target_dir="$2"
-  manifest_path="$target_dir/.managed-catalog-manifest"
+  manifest_name="${3:-.managed-catalog-manifest}"
+  manifest_path="$target_dir/$manifest_name"
 
   mkdir -p "$target_dir"
   new_manifest=$(relative_file_list "$source_dir")
@@ -2326,6 +2331,7 @@ sync_managed_catalog_runtime_assets() {
   agents_source=$(tracked_catalog_agents_root)
   commands_source=$(tracked_catalog_commands_root)
   rules_source=$(tracked_catalog_rules_root)
+  claude_rules_source=$(tracked_catalog_claude_rules_root)
 
   managed_catalog_runtime_targets | while read_runtime_target; do
     target_root="$HOME/$RT_TARGET_DIR"
@@ -2349,6 +2355,10 @@ sync_managed_catalog_runtime_assets() {
 
     if [ -d "$rules_source" ]; then
       sync_managed_catalog_dir_with_manifest "$rules_source" "$target_root/rules"
+    fi
+
+    if [ "$RT_TARGET_NAME" = "claude" ] && [ -d "$claude_rules_source" ]; then
+      sync_managed_catalog_dir_with_manifest "$claude_rules_source" "$target_root/rules" ".managed-claude-rules-manifest"
     fi
   done
 }
@@ -2401,12 +2411,34 @@ cmd_validate_catalog() {
     has_failure=1
   fi
 
+  claude_rules_root=$(tracked_catalog_claude_rules_root)
+  if [ -d "$claude_rules_root" ]; then
+    claude_rule_names=$(relative_file_list "$claude_rules_root" | awk -F/ '{ print $NF }' | awk 'NF')
+    regular_rule_names=$(relative_file_list "$(tracked_catalog_rules_root)" | awk -F/ '{ print $NF }' | awk 'NF' | sort)
+    claude_rule_collisions=$(printf '%s\n' "$claude_rule_names" | while IFS= read -r claude_rule_name; do
+      [ -n "$claude_rule_name" ] || continue
+      if printf '%s\n' "$regular_rule_names" | grep -qxF -- "$claude_rule_name"; then
+        printf '%s\n' "$claude_rule_name"
+      fi
+    done)
+    if [ -n "$claude_rule_collisions" ]; then
+      printf '%s\n' "$claude_rule_collisions" | while IFS= read -r claude_rule_name; do
+        [ -n "$claude_rule_name" ] || continue
+        error "Claude rules file name collides with catalog rules: $claude_rule_name"
+      done
+      has_failure=1
+    fi
+    claude_rule_count=$(printf '%s\n' "$claude_rule_names" | awk 'NF { count++ } END { print count + 0 }')
+  else
+    claude_rule_count=0
+  fi
+
   [ "$has_failure" -eq 0 ] || fail "Catalog validation failed"
   source_skill_count=$(printf '%s\n' "$source_skill_ids" | awk 'NF { count++ } END { print count + 0 }')
   source_agent_count=$(printf '%s\n' "$source_agent_paths" | awk 'NF { count++ } END { print count + 0 }')
   source_command_count=$(printf '%s\n' "$source_command_paths" | awk 'NF { count++ } END { print count + 0 }')
   source_rule_count=$(printf '%s\n' "$source_rule_paths" | awk 'NF { count++ } END { print count + 0 }')
-  log "Catalog validation passed ($source_skill_count skills, $source_agent_count agents, $source_command_count commands, $source_rule_count rules)"
+  log "Catalog validation passed ($source_skill_count skills, $source_agent_count agents, $source_command_count commands, $source_rule_count rules, $claude_rule_count claude-rules)"
 }
 
 learning_intake_inbox_summary() {
@@ -2498,6 +2530,17 @@ cmd_doctor() {
       if [ -d "$tracked_rules_root" ] && [ ! -d "$target_root/rules" ]; then
         error "Required catalog output is missing or has wrong type (directory): $target_root/rules"
         has_failure=1
+      fi
+      tracked_claude_rules_root=$(tracked_catalog_claude_rules_root)
+      if [ "$RT_TARGET_NAME" = "claude" ] && [ -d "$tracked_claude_rules_root" ]; then
+        for claude_rule_file in "$tracked_claude_rules_root"/*; do
+          [ -f "$claude_rule_file" ] || continue
+          claude_rule_name=${claude_rule_file##*/}
+          if [ ! -f "$target_root/rules/$claude_rule_name" ]; then
+            error "Required catalog output is missing or has wrong type (file): $target_root/rules/$claude_rule_name"
+            has_failure=1
+          fi
+        done
       fi
       if [ "$RT_SKILLS_DIR" != "-" ] && [ ! -d "$target_skills_root" ]; then
         error "Required catalog output is missing or has wrong type (directory): $target_skills_root"

@@ -2580,6 +2580,10 @@ function Get-TrackedCatalogRulesRoot {
   return (Join-Path (Get-TrackedCatalogDir) "rules")
 }
 
+function Get-TrackedCatalogClaudeRulesRoot {
+  return (Join-Path (Join-Path (Get-TrackedCatalogDir) "claude") "rules")
+}
+
 function Get-TrackedCatalogInstructionsPath {
   return (Join-Path (Get-TrackedCatalogDir) "AGENTS.md")
 }
@@ -3143,11 +3147,13 @@ function Sync-ManagedCatalogDirWithManifest {
     [string]$SourceDir,
 
     [Parameter(Mandatory = $true)]
-    [string]$DestinationDir
+    [string]$DestinationDir,
+
+    [string]$ManifestName = ".managed-catalog-manifest"
   )
 
   New-Item -ItemType Directory -Path $DestinationDir -Force | Out-Null
-  $manifestPath = Join-Path $DestinationDir ".managed-catalog-manifest"
+  $manifestPath = Join-Path $DestinationDir $ManifestName
   $newManifest = @(Get-RelativeFilePaths -RootDir $SourceDir)
 
   if (Test-Path -LiteralPath $manifestPath) {
@@ -3178,6 +3184,7 @@ function Sync-ManagedCatalogRuntimeAssets {
   $agentsSource = Get-TrackedCatalogAgentsRoot
   $commandsSource = Get-TrackedCatalogCommandsRoot
   $rulesSource = Get-TrackedCatalogRulesRoot
+  $claudeRulesSource = Get-TrackedCatalogClaudeRulesRoot
 
   foreach ($target in (Get-ManagedCatalogRuntimeTargets)) {
     New-Item -ItemType Directory -Path $target.Root -Force | Out-Null
@@ -3203,6 +3210,10 @@ function Sync-ManagedCatalogRuntimeAssets {
 
     if (Test-Path -LiteralPath $rulesSource) {
       Sync-ManagedCatalogDirWithManifest -SourceDir $rulesSource -DestinationDir (Join-Path $target.Root "rules")
+    }
+
+    if ($target.Name -eq "claude" -and (Test-Path -LiteralPath $claudeRulesSource)) {
+      Sync-ManagedCatalogDirWithManifest -SourceDir $claudeRulesSource -DestinationDir (Join-Path $target.Root "rules") -ManifestName ".managed-claude-rules-manifest"
     }
   }
 }
@@ -3257,11 +3268,25 @@ function Invoke-ValidateCatalog {
     $hasFailure = $true
   }
 
+  $claudeRulesRoot = Get-TrackedCatalogClaudeRulesRoot
+  $claudeRuleCount = 0
+  if (Test-Path -LiteralPath $claudeRulesRoot -PathType Container) {
+    $claudeRuleLeafNames = @(Get-RelativeFilePaths -RootDir $claudeRulesRoot | ForEach-Object { ($_ -split '/')[-1] })
+    $regularRuleLeafNames = @(Get-RelativeFilePaths -RootDir (Get-TrackedCatalogRulesRoot) | ForEach-Object { ($_ -split '/')[-1] })
+    foreach ($claudeRuleLeafName in $claudeRuleLeafNames) {
+      if ($regularRuleLeafNames -ccontains $claudeRuleLeafName) {
+        Write-ErrorLine ("Claude rules file name collides with catalog rules: {0}" -f $claudeRuleLeafName)
+        $hasFailure = $true
+      }
+    }
+    $claudeRuleCount = $claudeRuleLeafNames.Count
+  }
+
   if ($hasFailure) {
     throw "Catalog validation failed"
   }
 
-  Write-SuccessLine ("Catalog validation passed ({0} skills, {1} agents, {2} commands, {3} rules)" -f $sourceSkillIds.Count, $sourceAgentPaths.Count, $sourceCommandPaths.Count, $sourceRulePaths.Count)
+  Write-SuccessLine ("Catalog validation passed ({0} skills, {1} agents, {2} commands, {3} rules, {4} claude-rules)" -f $sourceSkillIds.Count, $sourceAgentPaths.Count, $sourceCommandPaths.Count, $sourceRulePaths.Count, $claudeRuleCount)
 }
 
 function Get-LearningIntakeInboxSummary {
@@ -3351,6 +3376,17 @@ function Invoke-Doctor {
     }
     if ((Test-Path -LiteralPath $trackedRulesRoot -PathType Container) -and -not (Test-Path -LiteralPath $rulesPath -PathType Container)) {
       $diagnostics.Add("Required catalog output is missing or has wrong type (directory): $rulesPath")
+    }
+    if ($target.Name -eq "claude") {
+      $trackedClaudeRulesRoot = Get-TrackedCatalogClaudeRulesRoot
+      if (Test-Path -LiteralPath $trackedClaudeRulesRoot -PathType Container) {
+        foreach ($claudeRuleFile in (Get-ChildItem -LiteralPath $trackedClaudeRulesRoot -File)) {
+          $claudeRulePath = Join-Path $rulesPath $claudeRuleFile.Name
+          if (-not (Test-Path -LiteralPath $claudeRulePath -PathType Leaf)) {
+            $diagnostics.Add("Required catalog output is missing or has wrong type (file): $claudeRulePath")
+          }
+        }
+      }
     }
     if ($hasSkillsRoot -and -not (Test-Path -LiteralPath $skillsPath -PathType Container)) {
       $diagnostics.Add("Required catalog output is missing or has wrong type (directory): $skillsPath")

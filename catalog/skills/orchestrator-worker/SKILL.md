@@ -21,7 +21,7 @@ description: >-
 
 | 役        | 職掌                                                                                                                                   | Claude                                                                                    | Codex                                                                                                                                    | opencode                                   | cursor                                                                                                | 起動する側                                                                            |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Steward   | 人間との対話・状態確認・説明・軽微修正。許可条件を満たすとき Orchestrator 機能（分解・Worker/Reviewer 起動・差分検証・最終報告）も担う | Opus / Sonnet（会話品質で Opus 推奨。限定ではない）                                       | `gpt-6-luna`                                                                                                                             | —                                          | —                                                                                                     | 人間（pane）                                                                          |
+| Steward   | 人間との対話・状態確認・説明・軽微修正。許可条件を満たすとき Orchestrator 機能（分解・Worker/Reviewer 起動・差分検証・最終報告）も担う | Sonnet（Opus advisor 併用が既定。Opus も可）                                              | `gpt-6-luna`                                                                                                                             | —                                          | —                                                                                                     | 人間（pane）                                                                          |
 | Architect | 設計判断（後述 Q1 trigger 2〜4 の handoff 先）。常に Orchestrator 機能を担える                                                         | Fable / Opus                                                                              | `gpt-6-astra` / `gpt-6.1-sol` 推奨 / `gpt-6-sol` 旧版 / `gpt-5.6-terra`                                                                  | —                                          | —                                                                                                     | 人間（pane）                                                                          |
 | Reviewer  | SHA 固定 code review / 設計文書 review                                                                                                 | Fable（明示指定時、fallback Opus）                                                        | `gpt-6.1-sol` 既定。`gpt-6-sol` は旧版の明示選択肢。読む量が多いレビューは `gpt-5.6-terra` + effort high。`gpt-6-astra` は明示指定時のみ | 不可（opencode は Reviewer に就けない）    | `claude-fable-5-1-thinking-xhigh`（cursor 経路の既定） / `claude-opus-5-5-high` / `gpt-5.6-sol-xhigh` | Orchestrator 機能を担う側（Steward または Architect）。spawn 経路と pane 経路の両方可 |
 | Worker    | 実装（設計済みタスク）                                                                                                                 | `sonnet`（Agent `implementer`、Worker の昇格 `opus`。判断を含まない機械的検証は `haiku`） | `gpt-6-luna` xhigh（難度の昇格は `gpt-6.1-sol` 推奨、旧版 `gpt-6-sol` も明示選択可。長文脈の崖は `gpt-5.6-terra`）                       | `deepseek/deepseek-flash` `--variant high` | `claude-sonnet-5-5-high`（昇格 `claude-opus-5-5-high`）                                               | Orchestrator 機能を担う側                                                             |
@@ -85,7 +85,8 @@ tier の上下ではなく authority / capability で判定する。次の 3 つ
 tier は能力とコストの属性であり、検証の独立性（後述「Reviewer の tier」の approval gate）とは別の軸である。同一モデルでも別 session・別 context なら独立した観測者になり得るし、上位モデルでも設計者自身の self-review は独立にならない。「Worker より上の tier であること」を許可条件に使わない。
 
 - Opus Steward、Architect（Fable / Opus / sol / terra）: 上記 3 条件を満たす。担える。実装依頼は自分で §3 分割 → Worker 起動 → §5 検証 → 人間へ最終報告。
-- Sonnet Steward / Luna Steward: 明示ポリシーとして Orchestrator 機能を持たず handoff 専用とする。3 条件を満たせないからではなく、Steward は人間との対話・軽微修正に専念させるという運用判断による。実装依頼（§2 の委譲条件に当たるもの）は Architect へ handoff。軽微修正（§1a の応答範囲内）は自分で行う。
+- Sonnet Steward: Claude Code の Sonnet 対話メインは、Opus advisor が利用でき、Orchestrator 機能の3条件を満たす場合、Orchestrator 機能を担える。設計判断は Claude 専用モデル運用ルールに従って advisor に相談する。Worker・Reviewer の選定と成果物の検証は本スキルに従う。advisor が利用できない場合は Orchestrator 機能を持たず、実装依頼（§2 の委譲条件に当たるもの）は Architect へ handoff する。
+- Luna Steward: 明示ポリシーとして Orchestrator 機能を持たず handoff 専用とする。実装依頼（§2 の委譲条件に当たるもの）は Architect へ handoff。軽微修正（§1a の応答範囲内）は自分で行う。
 - Worker が「Worker の昇格」で親と同じモデル（同 tier）へ昇格した場合: 親は coordination（分解・起動・進捗管理）を継続してよいが、最終 acceptance は作者と異なる identity かつ別 session の Reviewer を必須とする（詳細は次節）。同一 identity・同一 session による自己承認は成立しない。
 
 最終報告は、依頼が来た経路へ返す。人間から直接受けた Steward / Architect は人間へ直接報告する。Steward の handoff で受けた Architect は Steward へ handoff 書式で返し、Steward が人間へ伝える。Architect が人間と直接話すこと自体は禁止しない（自己判定規則 3 の既定でそうなる）。
@@ -96,7 +97,7 @@ Steward と Architect はどちらも人間が pane から起動する。どの 
 
 ## 1a. Steward の応答範囲と handoff
 
-Steward は人間が最初に話す相手であり、応答の滑らかさが人間の待ち時間と再説明の回数を直接決める。Opus Steward は Orchestrator 機能の許可条件を満たすため、そのまま Worker を起動し差分を検証できる。Sonnet / Luna Steward は明示ポリシーとして Orchestrator 機能を持たない。
+Steward は人間が最初に話す相手であり、応答の滑らかさが人間の待ち時間と再説明の回数を直接決める。Opus Steward は Orchestrator 機能の許可条件を満たすため、そのまま Worker を起動し差分を検証できる。Claude Code の Sonnet 対話メインは、Opus advisor が利用でき、Orchestrator 機能の3条件を満たす場合、Orchestrator 機能を担える。設計判断は Claude 専用モデル運用ルールに従って advisor に相談する。Worker・Reviewer の選定と成果物の検証は本スキルに従う。Luna Steward は明示ポリシーとして Orchestrator 機能を持たない。
 
 本スキルの狙いは実装トークンを安い Worker に隔離し、高級 tier を設計判断・検証・review・対話に集中させることである。総コストが下がるかどうかは未計測の仮説として扱う——長時間常駐する Steward の累積 context、全 diff の再読、対話の長期化、handoff での再説明は、タスク構成によっては支配的になりうる。判断するには task 別に model・input / cached / output・再試行回数・handoff 回数・latency・成功率を記録し、Steward と Architect を分けない運用と比較する必要がある。
 
@@ -113,7 +114,7 @@ Steward は人間が最初に話す相手であり、応答の滑らかさが人
 
 次のいずれか 1 つに当たったら handoff する。当たらなければ自分で答える。判定順は上から。
 
-1. 書込を伴い、§2 の委譲条件に当たる（3 ファイル以上 / 見積 50 行以上 / 独立サブタスク 2 件以上）: 自分が Orchestrator 機能を担う側（Opus Steward / Architect）なら handoff せず自分で §3 分割 → Worker 起動 → §5 検証を行う。handoff 専用と定めた Sonnet / Luna Steward なら Architect へ handoff する。
+1. 書込を伴い、§2 の委譲条件に当たる（3 ファイル以上 / 見積 50 行以上 / 独立サブタスク 2 件以上）: 自分が Orchestrator 機能を担う側（Opus Steward / Opus advisor が利用できる Sonnet Steward / Architect）なら handoff せず自分で §3 分割 → Worker 起動 → §5 検証を行う。Sonnet Steward は設計判断を Claude 専用モデル運用ルールに従って advisor に相談する。handoff 専用と定めた Luna Steward、または advisor が利用できない Sonnet Steward なら Architect へ handoff する。
 2. 「Worker の昇格」の 3 条件のいずれか（再現困難なデバッグ / セキュリティ境界 / 複数案のトレードオフ判断）→ handoff。
 3. 成果物が「決定」である: 依頼文が、ファイル構成・責務境界・API・データ構造・運用方針のうち 1 つ以上を新たに決めることを求めている（「どう分けるべきか」「設計して」「方針を出して」）。既存の決定を説明するだけなら Steward が自分で答える。→ handoff。
 4. 最初の bounded scan で範囲が閉じない: 答える前に、入口・ownership・依存だけを一度 scan する。その結果 (a) 複数の ownership boundary をまたぐ統合が要る (b) scan 中に、新しい責務・API・運用判断を決める必要があると分かった (c) 初期 scan の想定より範囲が広がった、のいずれかなら → handoff。トリガー 3 が依頼文から判定するのに対し、(b) は読んで初めて分かる場合を拾う。ファイル数や行数だけで役を決めない——読む前に読む量は見積もれない。
@@ -122,6 +123,8 @@ Steward は人間が最初に話す相手であり、応答の滑らかさが人
 判定不能なとき（依頼が曖昧で 1〜5 を当てられない）は、人間に 1 問だけ聞くか、既定で handoff する。既定を handoff 側へ倒す理由: Architect pane は常駐している前提なので、過剰 handoff のコストは「1 回の handoff メッセージ」に留まるが、過小 handoff のコストは「安いモデルの設計判断がそのまま実装される」ことであり、非対称だからである。
 
 自分のモデルが Architect の許可集合にも入り（Opus）、単独セッションでは、トリガー 2〜4 と判定不能時の既定は handoff せず、Architect として自分で答える——handoff 先が人間に戻るだけになるためである。トリガー 5（権限・認証・秘密情報・破壊的操作・production）も単独セッションでは自分で扱う。handoff 先が無いため、Architect として `AGENTS.md` の停止・確認ポリシーに従い人間へ確認する。「単独」は宣言で判定する: セッション起動時に default role が宣言されていて、かつこの作業用に Architect pane が宣言されているときに限り handoff する。それ以外は単独セッションとして扱う。
+
+Opus advisor が利用できる Claude Code の Sonnet 対話メインの単独セッションも同様に扱い、トリガー 2〜4 の設計判断は Claude 専用モデル運用ルールに従って advisor に相談してから自分で答える。
 
 人間が「執事で答えて」「アーキテクトへ」と明示したら、それが上記トリガーによる判定を上書きする（global AGENTS.md「推奨ワークフロー」の、Worker のモデル名指定を明示指示とみなす規則と同じ扱い）。
 
