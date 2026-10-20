@@ -2548,6 +2548,10 @@ function Get-CatalogBuildRulesRoot {
   return (Join-Path (Get-CatalogBuildDir) "rules")
 }
 
+function Get-CatalogBuildClaudeRulesRoot {
+  return (Join-Path (Join-Path (Get-CatalogBuildDir) "claude") "rules")
+}
+
 function Get-CatalogBuildInstructionsPath {
   return (Join-Path (Get-CatalogBuildDir) "AGENTS.md")
 }
@@ -2578,6 +2582,10 @@ function Get-TrackedCatalogCommandsRoot {
 
 function Get-TrackedCatalogRulesRoot {
   return (Join-Path (Get-TrackedCatalogDir) "rules")
+}
+
+function Get-TrackedCatalogClaudeRulesRoot {
+  return (Join-Path (Join-Path (Get-TrackedCatalogDir) "claude") "rules")
 }
 
 function Get-TrackedCatalogInstructionsPath {
@@ -3143,11 +3151,13 @@ function Sync-ManagedCatalogDirWithManifest {
     [string]$SourceDir,
 
     [Parameter(Mandatory = $true)]
-    [string]$DestinationDir
+    [string]$DestinationDir,
+
+    [string]$ManifestName = ".managed-catalog-manifest"
   )
 
   New-Item -ItemType Directory -Path $DestinationDir -Force | Out-Null
-  $manifestPath = Join-Path $DestinationDir ".managed-catalog-manifest"
+  $manifestPath = Join-Path $DestinationDir $ManifestName
   $newManifest = @(Get-RelativeFilePaths -RootDir $SourceDir)
 
   if (Test-Path -LiteralPath $manifestPath) {
@@ -3178,6 +3188,7 @@ function Sync-ManagedCatalogRuntimeAssets {
   $agentsSource = Get-TrackedCatalogAgentsRoot
   $commandsSource = Get-TrackedCatalogCommandsRoot
   $rulesSource = Get-TrackedCatalogRulesRoot
+  $claudeRulesSource = Get-TrackedCatalogClaudeRulesRoot
 
   foreach ($target in (Get-ManagedCatalogRuntimeTargets)) {
     New-Item -ItemType Directory -Path $target.Root -Force | Out-Null
@@ -3203,6 +3214,27 @@ function Sync-ManagedCatalogRuntimeAssets {
 
     if (Test-Path -LiteralPath $rulesSource) {
       Sync-ManagedCatalogDirWithManifest -SourceDir $rulesSource -DestinationDir (Join-Path $target.Root "rules")
+    }
+
+    if ($target.Name -eq "claude") {
+      $claudeRulesDir = Join-Path $target.Root "rules"
+      $claudeRulesManifestPath = Join-Path $claudeRulesDir ".managed-claude-rules-manifest"
+      if (Test-Path -LiteralPath $claudeRulesSource) {
+        Sync-ManagedCatalogDirWithManifest -SourceDir $claudeRulesSource -DestinationDir $claudeRulesDir -ManifestName ".managed-claude-rules-manifest"
+      }
+      elseif (Test-Path -LiteralPath $claudeRulesManifestPath) {
+        $staleClaudeRuleEntries = @(Get-Content -LiteralPath $claudeRulesManifestPath -ErrorAction SilentlyContinue | Where-Object { $_ -ne "" })
+        foreach ($relativePath in $staleClaudeRuleEntries) {
+          $stalePath = Join-Path $claudeRulesDir $relativePath
+          if (Test-Path -LiteralPath $stalePath) {
+            Remove-Item -LiteralPath $stalePath -Force
+          }
+        }
+        Remove-Item -LiteralPath $claudeRulesManifestPath -Force
+        if ($staleClaudeRuleEntries.Count -gt 0) {
+          Remove-EmptyDirectories -RootDir $claudeRulesDir
+        }
+      }
     }
   }
 }
@@ -3257,11 +3289,25 @@ function Invoke-ValidateCatalog {
     $hasFailure = $true
   }
 
+  $claudeRulesRoot = Get-TrackedCatalogClaudeRulesRoot
+  $claudeRuleCount = 0
+  if (Test-Path -LiteralPath $claudeRulesRoot -PathType Container) {
+    $claudeRuleLeafNames = @(Get-RelativeFilePaths -RootDir $claudeRulesRoot | ForEach-Object { ($_ -split '/')[-1] })
+    $regularRuleLeafNames = @(Get-RelativeFilePaths -RootDir (Get-TrackedCatalogRulesRoot) | ForEach-Object { ($_ -split '/')[-1] })
+    foreach ($claudeRuleLeafName in $claudeRuleLeafNames) {
+      if ($regularRuleLeafNames -ccontains $claudeRuleLeafName) {
+        Write-ErrorLine ("Claude rules file name collides with catalog rules: {0}" -f $claudeRuleLeafName)
+        $hasFailure = $true
+      }
+    }
+    $claudeRuleCount = $claudeRuleLeafNames.Count
+  }
+
   if ($hasFailure) {
     throw "Catalog validation failed"
   }
 
-  Write-SuccessLine ("Catalog validation passed ({0} skills, {1} agents, {2} commands, {3} rules)" -f $sourceSkillIds.Count, $sourceAgentPaths.Count, $sourceCommandPaths.Count, $sourceRulePaths.Count)
+  Write-SuccessLine ("Catalog validation passed ({0} skills, {1} agents, {2} commands, {3} rules, {4} claude-rules)" -f $sourceSkillIds.Count, $sourceAgentPaths.Count, $sourceCommandPaths.Count, $sourceRulePaths.Count, $claudeRuleCount)
 }
 
 function Get-LearningIntakeInboxSummary {
@@ -3351,6 +3397,17 @@ function Invoke-Doctor {
     }
     if ((Test-Path -LiteralPath $trackedRulesRoot -PathType Container) -and -not (Test-Path -LiteralPath $rulesPath -PathType Container)) {
       $diagnostics.Add("Required catalog output is missing or has wrong type (directory): $rulesPath")
+    }
+    if ($target.Name -eq "claude") {
+      $trackedClaudeRulesRoot = Get-TrackedCatalogClaudeRulesRoot
+      if (Test-Path -LiteralPath $trackedClaudeRulesRoot -PathType Container) {
+        foreach ($claudeRuleFile in (Get-ChildItem -LiteralPath $trackedClaudeRulesRoot -File)) {
+          $claudeRulePath = Join-Path $rulesPath $claudeRuleFile.Name
+          if (-not (Test-Path -LiteralPath $claudeRulePath -PathType Leaf)) {
+            $diagnostics.Add("Required catalog output is missing or has wrong type (file): $claudeRulePath")
+          }
+        }
+      }
     }
     if ($hasSkillsRoot -and -not (Test-Path -LiteralPath $skillsPath -PathType Container)) {
       $diagnostics.Add("Required catalog output is missing or has wrong type (directory): $skillsPath")
@@ -3521,7 +3578,8 @@ function Assert-CatalogStageSafety {
   foreach ($assetRoot in @(
       @{ Label = "agents"; Current = (Get-TrackedCatalogAgentsRoot); Build = (Get-CatalogBuildAgentsRoot) },
       @{ Label = "commands"; Current = (Get-TrackedCatalogCommandsRoot); Build = (Get-CatalogBuildCommandsRoot) },
-      @{ Label = "rules"; Current = (Get-TrackedCatalogRulesRoot); Build = (Get-CatalogBuildRulesRoot) }
+      @{ Label = "rules"; Current = (Get-TrackedCatalogRulesRoot); Build = (Get-CatalogBuildRulesRoot) },
+      @{ Label = "claude-rules"; Current = (Get-TrackedCatalogClaudeRulesRoot); Build = (Get-CatalogBuildClaudeRulesRoot) }
     )) {
     $currentFiles = @(Get-RelativeFilePaths -RootDir $assetRoot.Current)
     $buildFiles = @(Get-RelativeFilePaths -RootDir $assetRoot.Build)
@@ -3659,6 +3717,20 @@ function Copy-ManagedRuleAssetsIntoCatalog {
   Copy-DirectoryContents -SourceDir $sourceDir -DestinationDir $DestinationDir
 }
 
+function Copy-ManagedClaudeRuleAssetsIntoCatalog {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$DestinationDir
+  )
+
+  $sourceDir = Get-TrackedCatalogClaudeRulesRoot
+  if (-not (Test-Path -LiteralPath $sourceDir)) {
+    return
+  }
+
+  Copy-DirectoryContents -SourceDir $sourceDir -DestinationDir $DestinationDir
+}
+
 function Get-TrackedCatalogReference {
   $tracking = Get-WorkspaceTrackingInfo
   $repoReference = Get-WorkspaceRepoReference -RemoteName $tracking.RemoteName
@@ -3775,6 +3847,7 @@ function Invoke-SeedCatalogBuild {
   Copy-ManagedAgentAssetsIntoCatalog -DestinationDir (Get-CatalogBuildAgentsRoot)
   Copy-ManagedCommandAssetsIntoCatalog -DestinationDir (Get-CatalogBuildCommandsRoot)
   Copy-ManagedRuleAssetsIntoCatalog -DestinationDir (Get-CatalogBuildRulesRoot)
+  Copy-ManagedClaudeRuleAssetsIntoCatalog -DestinationDir (Get-CatalogBuildClaudeRulesRoot)
   foreach ($skillId in $skillIds) {
     Copy-ManagedSkillIntoCatalog -SkillId $skillId -SkillsRoot (Get-CatalogBuildSkillsRoot)
   }

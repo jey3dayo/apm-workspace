@@ -2723,3 +2723,43 @@ EOF
 
   rm -rf "$workspace_dir"
 }
+
+@test "sync_managed_catalog_runtime_assets deploys claude-only rules to the claude target only" {
+  workspace="$(mktemp -d)"
+  runtime_home="$(mktemp -d)"
+  mkdir -p "$workspace/catalog/rules" "$workspace/catalog/claude/rules"
+  printf '%s\n' 'shared' >"$workspace/catalog/rules/shared.md"
+  printf '%s\n' 'claude' >"$workspace/catalog/claude/rules/model-policy.md"
+  mkdir -p "$runtime_home/.claude/rules"
+  printf '%s\n' 'user' >"$runtime_home/.claude/rules/user.md"
+
+  HOME="$runtime_home"
+  tracked_catalog_dir() { printf '%s\n' "$workspace/catalog"; }
+  tracked_catalog_instructions_path() { printf '%s\n' "$workspace/catalog/AGENTS.md"; }
+  tracked_catalog_agents_root() { printf '%s\n' "$workspace/catalog/agents"; }
+  tracked_catalog_commands_root() { printf '%s\n' "$workspace/catalog/commands"; }
+  tracked_catalog_rules_root() { printf '%s\n' "$workspace/catalog/rules"; }
+  managed_catalog_runtime_targets() {
+    printf '%s\n' 'claude|.claude|CLAUDE.md||' 'codex|.codex|AGENTS.md|.agents|-'
+  }
+
+  run sync_managed_catalog_runtime_assets
+
+  [ "$status" -eq 0 ]
+  [ -f "$runtime_home/.claude/rules/model-policy.md" ]
+  [ -f "$runtime_home/.claude/rules/shared.md" ]
+  [ -f "$runtime_home/.claude/rules/user.md" ]
+  [ "$(cat "$runtime_home/.claude/rules/.managed-claude-rules-manifest")" = "model-policy.md" ]
+  [ "$(cat "$runtime_home/.claude/rules/.managed-catalog-manifest")" = "shared.md" ]
+  [ -f "$runtime_home/.codex/rules/shared.md" ]
+  [ ! -e "$runtime_home/.codex/rules/model-policy.md" ]
+
+  rm -rf "$workspace/catalog/claude"
+  run sync_managed_catalog_runtime_assets
+  [ "$status" -eq 0 ]
+  [ ! -e "$runtime_home/.claude/rules/model-policy.md" ]
+  [ -f "$runtime_home/.claude/rules/user.md" ]
+  [ -f "$runtime_home/.claude/rules/shared.md" ]
+
+  rm -rf "$workspace" "$runtime_home"
+}
