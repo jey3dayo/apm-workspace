@@ -68,8 +68,9 @@ pre-push:
         bash -n scripts/run-pester.sh
 
     - name: test:sh
-      glob: "{scripts/*.sh,scripts/lib/*.awk,catalog/skills/**/scripts/*.sh,catalog/skills/**/scripts/*.py,manual-skills/.apm/skills/**/scripts/*.py,tests/*.bats,mise.toml,mise/test.toml}"
-      run: mise run test:sh
+      glob: "{scripts/*.sh,scripts/lib/*.awk,scripts/lib/*.sh,catalog/skills/**/scripts/*.sh,catalog/skills/**/scripts/*.py,manual-skills/.apm/skills/**/scripts/*.py,tests/*.bats,mise.toml,mise/test.toml}"
+      # Hooks export GIT_DIR for the repo being pushed; suites must not inherit it.
+      run: env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE mise run test:sh
 
     - name: format:markdown:bold-headings:check
       glob: "{catalog/*.md,catalog/**/*.md,scripts/format-bold-headings.*,scripts/replace-bold-headings.ts,mise.toml,mise/format.toml}"
