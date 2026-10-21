@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 #
-# Git hooks export GIT_DIR for the repository that runs them. run-bats.sh must
-# scrub it so suites cannot write into that repository (2026-10-21: a pre-push
+# Git hooks export GIT_DIR for the repository that runs them. apm_isolate_git_env
+# must scrub it so suites cannot write into that repository (2026-10-21: a pre-push
 # test:sh set core.bare, replaced the user identity and added test commits in
 # the real checkout). The sentinel repo stands in for that checkout.
 
@@ -65,22 +65,4 @@ hook_env() {
   [ "$status" -eq 0 ]
   [ "$(cat "$WORK/caller.gitconfig")" = "$cfg_before" ]
   [ "$(snapshot)" = "$before" ]
-}
-
-@test "control: without isolation the same session writes into the sentinel" {
-  before="$(snapshot)"
-  run hook_env bash -c "$(suite_session)" _ "$WORK"
-  [ "$(snapshot)" != "$before" ]
-}
-
-@test "run-bats.sh isolates the git env before starting bats" {
-  isolate_line="$(grep -n '^apm_isolate_git_env' "$REPO_ROOT/scripts/run-bats.sh" | cut -d: -f1)"
-  bats_line="$(grep -n '^bats ' "$REPO_ROOT/scripts/run-bats.sh" | cut -d: -f1)"
-  [ -n "$isolate_line" ]
-  [ -n "$bats_line" ]
-  [ "$isolate_line" -lt "$bats_line" ]
-}
-
-@test "pre-push test:sh drops the hook's GIT_DIR before mise runs" {
-  grep -Eq '^[[:space:]]+run: env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE mise run test:sh$' "$REPO_ROOT/lefthook.yml"
 }

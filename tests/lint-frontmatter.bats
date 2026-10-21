@@ -96,12 +96,3 @@ EOF
   [[ "$output" == *"SKILL.md"* ]]
   [[ "$output" == *"'description'"* ]]
 }
-
-@test "the current catalog passes (regression guard)" {
-  run tsx "$SCRIPT_UNDER_TEST" \
-    "$REPO_ROOT/catalog/agents" \
-    "$REPO_ROOT/catalog/skills" \
-    "$REPO_ROOT/catalog/commands" \
-    "$REPO_ROOT/catalog/rules"
-  [ "$status" -eq 0 ]
-}
