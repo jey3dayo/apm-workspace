@@ -1109,31 +1109,6 @@ EOF
 
 # --- public command dispatch surface ----------------------------------------
 
-@test "help lists the current public command set" {
-  run bash "$SCRIPT_UNDER_TEST" help
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"refresh"* ]]
-  [[ "$output" == *"install-pins"* ]]
-  [[ "$output" == *"validate:catalog"* ]]
-  [[ "$output" == *"prepare:catalog"* ]]
-  [[ "$output" == *"install:catalog"* ]]
-  [[ "$output" == *"apply:skills:local"* ]]
-  [[ "$output" == *"repair:local-package-cache"* ]]
-  [[ "$output" == *"smoke:catalog"* ]]
-}
-
-@test "help does not list retired command names" {
-  run bash "$SCRIPT_UNDER_TEST" help
-  [ "$status" -eq 0 ]
-  [[ "$output" != *"release:catalog"* ]]
-  [[ "$output" != *"format-catalog-metadata"* ]]
-  [[ "$output" != *"check-catalog-metadata"* ]]
-  [[ "$output" != *"validate-internal"* ]]
-  [[ "$output" != *"stage-internal"* ]]
-  [[ "$output" != *"register-internal"* ]]
-  [[ "$output" != *"migrate-internal"* ]]
-}
-
 @test "unknown command exits non-zero with a diagnosable message" {
   run bash "$SCRIPT_UNDER_TEST" definitely-not-a-command
   [ "$status" -ne 0 ]

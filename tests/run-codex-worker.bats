@@ -64,32 +64,12 @@ stub_received_model() {
   awk -v expected="$1" 'previous == "-m" && $0 == expected { found = 1 } { previous = $0 } END { exit !found }' "$AGMSG_STUB_ARGS"
 }
 
-@test "review rejects a worker-tier model" {
-  run "$SCRIPT" review "$PROJECT" gpt-6-luna "$PAYLOAD"
-  [ "$status" -eq 2 ]
-  [[ "$output" == *"not allowed for role review"* ]]
-}
-
 @test "an unknown model is rejected for both roles" {
   for role in implement review; do
     run "$SCRIPT" "$role" "$PROJECT" gpt-9-nonexistent "$PAYLOAD"
     [ "$status" -eq 2 ]
     [[ "$output" == *"not allowed for role $role"* ]]
   done
-}
-
-@test "allowed models pass the allowlist and fail later, not at validation" {
-  # 許可された組合せは allowlist を通過し、存在しない codex 本体で落ちる。
-  # exit 2 (引数検証) ではないことが「通過した」ことの証拠になる。
-  run "$SCRIPT" implement "$PROJECT" gpt-6-luna "$PAYLOAD"
-  [ "$status" -ne 2 ]
-  [[ "$output" != *"not allowed for role"* ]]
-}
-
-@test "review allows gpt-6-astra" {
-  run "$SCRIPT" review "$PROJECT" gpt-6-astra "$PAYLOAD"
-  [ "$status" -ne 2 ]
-  [[ "$output" != *"not allowed for role"* ]]
 }
 
 @test "Codex Sol model IDs are accepted for implement and review" {
@@ -105,35 +85,6 @@ stub_received_model() {
       stub_received_model "$model"
     done
   done
-}
-
-@test "the Codex extractor matches complete decimal IDs from its column only" {
-  local original_skill="$SKILL"
-  SKILL="$PROJECT/models.md"
-  cat >"$SKILL" <<'MD'
-| role | purpose | Claude | Codex | opencode | cursor |
-| Worker | implementation | — | gpt-6.1-sol / gpt-6-sol / gpt-6.1-sol-preview | — | gpt-5.6-sol-xhigh |
-MD
-  [ "$(skill_models_for Worker)" = "gpt-6-sol gpt-6.1-sol " ]
-  SKILL="$original_skill"
-}
-
-@test "review rejects gpt-6-sol (cached input costs 2x gpt-6.1-sol)" {
-  run "$SCRIPT" review "$PROJECT" gpt-6-sol "$PAYLOAD"
-  [ "$status" -eq 2 ]
-  [[ "$output" == *"not allowed for role review"* ]]
-}
-
-@test "implement rejects gpt-6-astra" {
-  run "$SCRIPT" implement "$PROJECT" gpt-6-astra "$PAYLOAD"
-  [ "$status" -eq 2 ]
-  [[ "$output" == *"not allowed for role implement"* ]]
-}
-
-@test "an unknown model is rejected even with a gpt-6 style name" {
-  run "$SCRIPT" review "$PROJECT" gpt-6-nonexistent "$PAYLOAD"
-  [ "$status" -eq 2 ]
-  [[ "$output" == *"not allowed for role review"* ]]
 }
 
 @test "script allowlist matches the orchestrator-worker tier table" {

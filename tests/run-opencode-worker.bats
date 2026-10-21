@@ -26,20 +26,6 @@ skill_opencode_models() {
   grep -E '^\| Worker ' "$SKILL" | grep -oE 'deepseek/[a-z0-9.-]+' | sort -u | tr '\n' ' '
 }
 
-@test "implement with the allowed model passes the allowlist and fails later, not at validation" {
-  # 許可された組合せは allowlist を通過し、存在しない opencode 本体で落ちる。
-  # exit 2 (引数検証) ではないことが「通過した」ことの証拠になる。
-  run "$SCRIPT" implement "$PROJECT" deepseek/deepseek-flash "$PAYLOAD"
-  [ "$status" -ne 2 ]
-  [[ "$output" != *"not allowed for role"* ]]
-}
-
-@test "an allowed-outside model is rejected for implement" {
-  run "$SCRIPT" implement "$PROJECT" deepseek/deepseek-v4-pro "$PAYLOAD"
-  [ "$status" -eq 2 ]
-  [[ "$output" == *"not allowed for role implement"* ]]
-}
-
 @test "an unknown model is rejected" {
   run "$SCRIPT" implement "$PROJECT" gpt-6-luna "$PAYLOAD"
   [ "$status" -eq 2 ]

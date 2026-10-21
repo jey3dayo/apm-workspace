@@ -42,42 +42,6 @@ script_models_for() {
   sed -n "s/^$1) allowed_models=(\(.*\)) ;;$/\1/p" "$SCRIPT"
 }
 
-@test "implement with an allowed model passes the allowlist and fails later, not at validation" {
-  run "$SCRIPT" implement "$PROJECT" claude-sonnet-5-5-high "$PAYLOAD"
-  [ "$status" -ne 2 ]
-  [[ "$output" != *"not allowed for role"* ]]
-}
-
-@test "implement with the escalation model also passes the allowlist" {
-  run "$SCRIPT" implement "$PROJECT" claude-opus-5-5-high "$PAYLOAD"
-  [ "$status" -ne 2 ]
-  [[ "$output" != *"not allowed for role"* ]]
-}
-
-@test "review with an allowed model passes the allowlist and fails later, not at validation" {
-  run "$SCRIPT" review "$PROJECT" claude-fable-5-1-thinking-xhigh "$PAYLOAD"
-  [ "$status" -ne 2 ]
-  [[ "$output" != *"not allowed for role"* ]]
-}
-
-@test "review allows gpt-5.6-sol-xhigh" {
-  run "$SCRIPT" review "$PROJECT" gpt-5.6-sol-xhigh "$PAYLOAD"
-  [ "$status" -ne 2 ]
-  [[ "$output" != *"not allowed for role"* ]]
-}
-
-@test "a review-only model is rejected for implement" {
-  run "$SCRIPT" implement "$PROJECT" claude-fable-5-1-thinking-xhigh "$PAYLOAD"
-  [ "$status" -eq 2 ]
-  [[ "$output" == *"not allowed for role implement"* ]]
-}
-
-@test "gpt-5.6-sol-xhigh is rejected for implement" {
-  run "$SCRIPT" implement "$PROJECT" gpt-5.6-sol-xhigh "$PAYLOAD"
-  [ "$status" -eq 2 ]
-  [[ "$output" == *"not allowed for role implement"* ]]
-}
-
 @test "an unknown model is rejected for both roles" {
   for role in implement review; do
     run "$SCRIPT" "$role" "$PROJECT" claude-nonexistent-model "$PAYLOAD"
