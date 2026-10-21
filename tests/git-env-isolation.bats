@@ -55,6 +55,18 @@ hook_env() {
   sentinel_git -C "$WORK/fixture" rev-parse --verify -q refs/heads/other
 }
 
+@test "GIT_CONFIG and GIT_CONFIG_COUNT from the caller cannot redirect suite writes" {
+  printf '[apm]\n\tsentinel = kept\n' >"$WORK/caller.gitconfig"
+  cfg_before="$(cat "$WORK/caller.gitconfig")"
+  before="$(snapshot)"
+  run env GIT_DIR="$SENTINEL/.git" GIT_CONFIG="$WORK/caller.gitconfig" \
+    GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=user.name GIT_CONFIG_VALUE_0=leaked \
+    bash -c ". \"\$2/scripts/lib/git-test-env.sh\"; apm_isolate_git_env; set -e; $(suite_session); [ \"\$(git log -1 --format=%an)\" = t ]" _ "$WORK" "$REPO_ROOT"
+  [ "$status" -eq 0 ]
+  [ "$(cat "$WORK/caller.gitconfig")" = "$cfg_before" ]
+  [ "$(snapshot)" = "$before" ]
+}
+
 @test "control: without isolation the same session writes into the sentinel" {
   before="$(snapshot)"
   run hook_env bash -c "$(suite_session)" _ "$WORK"
