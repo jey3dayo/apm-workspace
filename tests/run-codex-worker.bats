@@ -94,7 +94,11 @@ stub_received_model() {
 
 @test "Codex Sol model IDs are accepted for implement and review" {
   for role in implement review; do
-    for model in gpt-6.1-sol gpt-6-sol; do
+    case "$role" in
+    implement) models="gpt-6.1-sol gpt-6-sol" ;;
+    review) models="gpt-6.1-sol" ;;
+    esac
+    for model in $models; do
       codex_stub
       run "$SCRIPT" "$role" "$PROJECT" "$model" "$PAYLOAD"
       [ "$status" -eq 0 ]
@@ -112,6 +116,12 @@ stub_received_model() {
 MD
   [ "$(skill_models_for Worker)" = "gpt-6-sol gpt-6.1-sol " ]
   SKILL="$original_skill"
+}
+
+@test "review rejects gpt-6-sol (cached input costs 2x gpt-6.1-sol)" {
+  run "$SCRIPT" review "$PROJECT" gpt-6-sol "$PAYLOAD"
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"not allowed for role review"* ]]
 }
 
 @test "implement rejects gpt-6-astra" {
@@ -169,7 +179,7 @@ exit 0
 SH
   chmod +x "$stub"
   CODEX_HOME="$fake_home/codex" AGMSG_CODEX_BIN="$stub" \
-    run "$SCRIPT" review "$PROJECT" gpt-6-sol "$PAYLOAD"
+    run "$SCRIPT" review "$PROJECT" gpt-6.1-sol "$PAYLOAD"
   [ "$status" -eq 0 ]
   # reviewer が読む home は base home ではなく生成された home である。
   [[ "$output" != *"HOME_IS: $fake_home/codex"* ]]
