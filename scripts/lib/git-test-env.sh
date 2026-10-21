@@ -13,7 +13,16 @@
 apm_isolate_git_env() {
 	unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_PREFIX GIT_COMMON_DIR \
 		GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_NAMESPACE \
-		GIT_QUARANTINE_PATH
+		GIT_QUARANTINE_PATH GIT_CONFIG GIT_CONFIG_PARAMETERS GIT_CONFIG_COUNT
+	# Everything git itself treats as repository-local (covers additions in newer git).
+	local v
+	for v in $(git rev-parse --local-env-vars 2>/dev/null); do
+		unset "$v"
+	done
+	# GIT_CONFIG_COUNT pairs override every config file, so drop the pairs too.
+	for v in $(compgen -e); do
+		case "$v" in GIT_CONFIG_KEY_* | GIT_CONFIG_VALUE_*) unset "$v" ;; esac
+	done
 
 	# Suites must neither read nor write the user's ~/.gitconfig or /etc/gitconfig.
 	export GIT_CONFIG_GLOBAL="${1:-/dev/null}"
