@@ -18,7 +18,7 @@ dependencies:
     - shadcn/improve#cac56e1ebd3c279aa9153616cfeac7b174ab90f9
 
     # --- engineering / writing ---
-    - coji/natural-japanese/skills/natural-japanese#a739fee1b6d5cdac157959cb4fefb7f84a29c77b # v1.6.0
+    - coji/natural-japanese/skills/natural-japanese#a88b8e92d38cf5b339950752faba1da5ec1f49f4 # v1.6.2
     - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
       ref: 8f2d57610a73efc97d743c9b0b0ecb1002e09fa4
       alias: japanese-tech-writing
@@ -36,7 +36,7 @@ dependencies:
         - wait-what
         - wayfinder
         - writing-for-agents
-    - nanaism/yomiyasu/skills/yomiyasu#8be3ef6e0e668f14cae30c3da6b0c20b95b2179f # v2.1.0
+    - nanaism/yomiyasu/skills/yomiyasu#ae258d7a57b335673e30b88a018ae08d4f72c449 # v2.4.0
 
     # --- react ---
     - millionco/react-doctor/skills/react-doctor#695e46eee203a5d1855020191aa7e9c010a1250e # v2.4.0
@@ -83,7 +83,7 @@ dependencies:
 
     # --- productivity / research ---
     - ayghri/i-have-adhd/skills/i-have-adhd#723af7d9afaf43eb871dbcce6129e2bf80de90d5
-    - mvanhorn/last30days-skill/skills/last30days#50998cd1ba583f13a63b20e3fb5d906c71c31655 # v3.28.0
+    - mvanhorn/last30days-skill/skills/last30days#7fac0fc31ba5212b5ddaa29252d9f7148cec8423 # v3.30.0
   mcp:
     - name: context7
       registry: false
