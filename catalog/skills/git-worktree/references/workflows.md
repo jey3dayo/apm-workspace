@@ -258,7 +258,7 @@ Use worktrees for git bisect without interrupting current work.
 
 ```bash
 # Create worktree for bisect (throwaway branch at HEAD)
-git wt bisect-session HEAD
+git wt --basedir .worktrees bisect-session HEAD
 
 cd .worktrees/bisect-session
 
