@@ -312,3 +312,46 @@ assert_scratch_clean() {
   check
   [ "$status" -eq 0 ]
 }
+
+@test "a plain .env file with a secret candidate is reported" {
+  printf 'API_TOKEN=%s\n' "$SENTINEL" >"$REPO/.env"
+  stage_env .env
+  check
+  [ "$status" -eq 1 ]
+  [[ "$output" == *".env: API_TOKEN"* ]]
+  assert_no_sentinel
+}
+
+@test "a plain .env file with encrypted values passes" {
+  printf 'DOTENV_PUBLIC_KEY=dummy-public\nAPI_KEY=encrypted:dummy\n' >"$REPO/.env"
+  stage_env .env
+  check
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+}
+
+@test ".envrc with a secret candidate is reported" {
+  printf 'export DATABASE_URL=%s\n' "$SENTINEL" >"$REPO/.envrc"
+  stage_env .envrc
+  check
+  [ "$status" -eq 1 ]
+  [[ "$output" == *".envrc: DATABASE_URL"* ]]
+  assert_no_sentinel
+}
+
+@test "untracked .env in the root is checked" {
+  printf 'SECRET_KEY=%s\n' "$SENTINEL" >"$REPO/.env"
+  check
+  [ "$status" -eq 1 ]
+  [[ "$output" == *".env: SECRET_KEY"* ]]
+  assert_no_sentinel
+}
+
+@test "untracked .envrc in a subdirectory is checked" {
+  mkdir -p "$REPO/subdir"
+  printf 'PRIVATE_KEY=%s\n' "$SENTINEL" >"$REPO/subdir/.envrc"
+  check
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"subdir/.envrc: PRIVATE_KEY"* ]]
+  assert_no_sentinel
+}

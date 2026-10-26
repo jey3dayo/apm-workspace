@@ -2,7 +2,7 @@
 
 set -uo pipefail
 
-# `.env.*` に平文 secret 候補が含まれていないかを、値を出さずに検査する。
+# `.env*` に平文 secret 候補が含まれていないかを、値を出さずに検査する。
 #
 #   0  平文 secret 候補なし
 #   1  候補あり。`<file>: <KEY>` を1行ずつ標準出力へ出す（値は出さない）
@@ -55,7 +55,7 @@ trap 'rm -rf -- "$work"' EXIT
 hits="$work/hits"
 : >"$hits" || exit 2
 
-ENV_PATHSPEC=':(glob)**/.env.*'
+ENV_PATHSPEC=':(glob)**/.env*'
 
 refuse() {
 	printf 'check-env-secrets: %s (%s) -- check by hand\n' "$1" "$2" >&2
@@ -154,7 +154,7 @@ scan_group() {
 
 # conflict 中は stage 0 が無く、検査が成立しない。
 if [ -n "$(git ls-files -u -z -- "$ENV_PATHSPEC" 2>/dev/null | LC_ALL=C tr -d '\000')" ]; then
-	refuse "a .env.* path is unmerged" cached
+	refuse "a .env* path is unmerged" cached
 fi
 
 scan_group cached
