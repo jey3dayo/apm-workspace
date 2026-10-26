@@ -48,7 +48,7 @@ permission / hook に拒否されたコマンドは、同じものもほぼ同�
 
 - テストのために実在する API キーや秘密値を書き込み、上書き、再設定しない。専用の一時変数、ダミー値、または read-only の確認方法を使う
 - `.env*` にある実在の秘密値を変更する場合は、値を出力せず対象キーと注入元を確認し、ユーザーの明示確認を得る
-- `.env*` の中身は読まない。Read だけでなく Bash の `cat` / `sed` / `grep` / `head` / `tail` も同じ。必要ならキー名をユーザーに聞く。例外は `dotenvx` スキルにある、値を出さない診断・鍵ローテーション手順だけ
+- 秘密を含み得る `.env*`（追跡済みの `.env.example` などのテンプレートは除く）の中身は読まない。Read だけでなく Bash の `cat` / `sed` / `grep` / `head` / `tail` も同じ。必要ならキー名をユーザーに聞く。例外は `dotenvx` スキルにある、値を出さない診断・鍵ローテーション手順だけ
 - 環境変数が戻った、反映されない、上書きされたと判断する前に、値を露出しない方法で解決後の環境と注入元を確認する。`mise` の `env_file` や `.env.local` による shadowing も確認対象に含める
 - `witr --env` / `--verbose` の出力には環境変数、引数、ローカルパス、Git 情報が含まれ得るため、外部共有前に秘密情報を除去する
 - dotenvx 管理の詳細な診断・変更手順は `dotenvx` スキルを正本とする
@@ -159,7 +159,7 @@ global MCP はリポジトリをまたいで常時使う基盤だけに限定し
 ## Git Worktree 方針
 
 - 操作仕様・`.worktrees/` 運用・作成削除手順は `git-worktree` スキルが正本
-- worktree の作成は `git wt` だけで行う。`git worktree add` は deny 済みなので使わない（`--detach` の一時確認も含む）。native `git worktree` は cleanup・診断（`list` / `remove` / `prune`）のみ
+- worktree の作成は `git wt` だけで行う。`git worktree add` は deny 済みなので使わない（`--detach` の一時確認も含む）。native `git worktree` は cleanup・診断・復旧（`list` / `remove` / `prune` / `unlock` / `repair` など）のみ
 - コミット分割とメッセージ作成は `atomic-commit` スキルが担当し、worktree 操作の判断を持たせない
 
 ## コミュニケーション原則
