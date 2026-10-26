@@ -32,8 +32,12 @@ ARGUMENTS に対象ファイルが渡されたら、diff と untracked をその
 対象は merge-base 起点の diff で、未コミットの変更まで含める。PR 前は commit していない行も polish 対象である。
 
 ```sh
-git diff "$(git merge-base <base> HEAD)"
+base="$(git merge-base <base> HEAD)"
+git diff --name-only "$base"
+git diff "$base" -- . ':(exclude,glob)**/.env*'
 ```
+
+変更ファイル名を先に一覧し、`.env*` の diff 本文は出さない（追跡済みの `.env.example` などのテンプレートは除く）。`.env*` の安全確認は `atomic-commit` の検査へ回す。
 
 追加行（`+`）と削除行（`-`）を hunk ごとに把握する。`git diff` は untracked を映さないので、`git status --porcelain` の `??` も対象ファイルへ加える（step 2 の「不要ファイル」観点がこれを見る）。
 
