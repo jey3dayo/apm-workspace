@@ -88,6 +88,8 @@ git log --oneline -<グループ数>
 
 dirty な `.env*` は自動除外せず、dotenvx-managed かを判定する。repo の source of truth になり得るためである。検査・報告のどの段階でも secret の値・差分本文は表示せず、ファイル名・key 名・管理方式・差分の有無だけを扱う。
 
+`.envrc` は shell 構文（`use flake`, `dotenv`, `source_env` 等）を含むため dotenv parser から除外され、通常ファイルとして扱う。
+
 ```bash
 # dotenvx 管理ファイルかを値なしで判定する（出力に現れたファイルが managed）。
 # shell glob の `.env*` は cwd しか展開しないので、サブディレクトリを落とさない

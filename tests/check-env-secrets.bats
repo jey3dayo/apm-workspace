@@ -330,13 +330,12 @@ assert_scratch_clean() {
   [ -z "$output" ]
 }
 
-@test ".envrc with a secret candidate is reported" {
-  printf 'export DATABASE_URL=%s\n' "$SENTINEL" >"$REPO/.envrc"
+@test ".envrc is skipped (shell directives, not dotenv format)" {
+  printf 'use flake\n' >"$REPO/.envrc"
   stage_env .envrc
   check
-  [ "$status" -eq 1 ]
-  [[ "$output" == *".envrc: DATABASE_URL"* ]]
-  assert_no_sentinel
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
 }
 
 @test "untracked .env in the root is checked" {
@@ -347,11 +346,11 @@ assert_scratch_clean() {
   assert_no_sentinel
 }
 
-@test "untracked .envrc in a subdirectory is checked" {
+@test ".envrc in a subdirectory with shell directives is skipped" {
   mkdir -p "$REPO/subdir"
-  printf 'PRIVATE_KEY=%s\n' "$SENTINEL" >"$REPO/subdir/.envrc"
+  printf 'use flake\ndotenv\nsource_env .envrc.local\n' >"$REPO/subdir/.envrc"
+  stage_env subdir/.envrc
   check
-  [ "$status" -eq 1 ]
-  [[ "$output" == *"subdir/.envrc: PRIVATE_KEY"* ]]
-  assert_no_sentinel
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
 }

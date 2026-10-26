@@ -3,6 +3,7 @@
 set -uo pipefail
 
 # `.env*` に平文 secret 候補が含まれていないかを、値を出さずに検査する。
+# `.envrc` は shell 構文なので除外する。
 #
 #   0  平文 secret 候補なし
 #   1  候補あり。`<file>: <KEY>` を1行ずつ標準出力へ出す（値は出さない）
@@ -132,6 +133,12 @@ scan_group() {
 	esac || refuse "listing failed" "$mode"
 
 	while IFS= read -r -d '' file; do
+		# .envrc uses shell directives (use flake, dotenv, source_env), not dotenv
+		# format, so skip it from dotenv-only parsing.
+		case "$(basename "$file")" in
+			.envrc) continue ;;
+		esac
+
 		if [ "$mode" = cached ]; then
 			check_regular_index_entry "$file"
 			git show ":$file" >"$work/blob" 2>/dev/null ||
