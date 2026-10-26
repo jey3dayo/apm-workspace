@@ -42,10 +42,13 @@
 
 `main` / `master` 上と、自分が作っていない未コミット変更があるツリーでは、`git restore`、`git checkout --`、`git reset --hard` など作業ツリーを破棄・復元する操作を行わない（並行セッションの作りかけが消える）。必要に見える場合でも、まず `git status --short` で対象を確認し、ユーザーに明示確認する。
 
+permission や PreToolUse hook のポリシーで拒否されたコマンドは、同じものもほぼ同じもの（引数違い・連結し直し）も出し直さない。拒否された操作は、ラッパーや別ツール経由でも行わない。代替は拒否理由を解消し、許可範囲に収まるものだけに切り替え、なければ拒否された内容を報告する。pre-commit / pre-push など検証フックの失敗は別扱いで、原因を直したあとなら再実行してよい。
+
 ## 秘密情報・環境変数の安全
 
 - テストのために実在する API キーや秘密値を書き込み、上書き、再設定しない。専用の一時変数、ダミー値、または read-only の確認方法を使う
 - `.env*` にある実在の秘密値を変更する場合は、値を出力せず対象キーと注入元を確認し、ユーザーの明示確認を得る
+- 秘密を含み得る `.env*`（追跡済みの `.env.example` などのテンプレートは除く）の中身は読まない。Read だけでなく Bash の `cat` / `sed` / `grep` / `head` / `tail` も同じ。必要ならキー名をユーザーに聞く。例外はスキルが定める値を出さない検査・操作だけ（`dotenvx` の診断・鍵ローテーション、`atomic-commit` の secret 検査など）
 - 環境変数が戻った、反映されない、上書きされたと判断する前に、値を露出しない方法で解決後の環境と注入元を確認する。`mise` の `env_file` や `.env.local` による shadowing も確認対象に含める
 - `witr --env` / `--verbose` の出力には環境変数、引数、ローカルパス、Git 情報が含まれ得るため、外部共有前に秘密情報を除去する
 - dotenvx 管理の詳細な診断・変更手順は `dotenvx` スキルを正本とする
@@ -101,6 +104,8 @@
 - `ax` は mise 管理。初回利用前に必ず `ax agent-context` で使い方を確認する
 - `pnpm <word>` は呼び分けを明示する。help は `pnpm help <command>`、repo の script は `pnpm run <script>`、依存の実行ファイルは `pnpm exec <binary>`。script への `--help` は非実行を保証しない（実測で `dist/` が消えた）
 - CLI が見つからない場合は PATH → リポジトリの `mise.toml` / `mise which` の順に確認し、未導入なら `mise install` を検討する。それでも使えない場合のみ理由を報告して fallback する
+- mise 設定のない scratchpad / `/tmp` で `gh` / `node` / `pnpm` / `uv` / `go` を使うときは `mise x -- <cmd>` か `~` から実行する（shim の「No version is set」を避ける）
+- 今いるディレクトリへ `cd` しない。別 repo の操作は `git -C <path>` か絶対パスで行う
 
 ### ブラウザ操作の選択
 
@@ -154,7 +159,7 @@ global MCP はリポジトリをまたいで常時使う基盤だけに限定し
 ## Git Worktree 方針
 
 - 操作仕様・`.worktrees/` 運用・作成削除手順は `git-worktree` スキルが正本
-- worktree 操作は `git wt` を優先し、native `git worktree` は低レベルの cleanup・診断のみ
+- worktree の作成は `git wt` だけで行う。`git worktree add` は deny 済みなので使わない（`--detach` の一時確認も含む）。native `git worktree` は cleanup・診断・復旧（`list` / `remove` / `prune` / `unlock` / `repair` など）のみ
 - コミット分割とメッセージ作成は `atomic-commit` スキルが担当し、worktree 操作の判断を持たせない
 
 ## コミュニケーション原則

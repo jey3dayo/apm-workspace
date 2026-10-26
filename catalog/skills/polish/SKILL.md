@@ -35,6 +35,10 @@ ARGUMENTS に対象ファイルが渡されたら、diff と untracked をその
 git diff "$(git merge-base <base> HEAD)"
 ```
 
+`.env*` の扱い: diff 本文を出す前に、リポジトリルートで `git -C "$(git rev-parse --show-toplevel)" diff --name-only "$(git merge-base <base> HEAD)"` を見る。
+`.env*` に当たるファイルは、名前と `git -C "$(git rev-parse --show-toplevel)" ls-files` から追跡済みで秘密を含まないテンプレート（`.env.example` など）と判断できるものを除き、diff 本文を出さずにファイル名だけ報告する。
+未コミットのものは `atomic-commit` の安全確認へ、コミット済みのものはユーザーへ回す。
+
 追加行（`+`）と削除行（`-`）を hunk ごとに把握する。`git diff` は untracked を映さないので、`git status --porcelain` の `??` も対象ファイルへ加える（step 2 の「不要ファイル」観点がこれを見る）。
 
 - 完了条件: base ref が確定し、対象ファイル一覧が取れている。diff が空なら「対象なし」と報告して終了する

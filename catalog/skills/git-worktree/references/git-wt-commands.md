@@ -4,7 +4,7 @@ Command reference for `git-wt`. If a flag is missing, check `git wt --help`.
 
 ## Overview
 
-`git-wt` is a Git subcommand that makes `git worktree` operations shorter. Use it for day-to-day local worktree operations, and use native `git worktree` for low-level Git cleanup, locked worktrees, or portable automation.
+`git-wt` is a Git subcommand that makes `git worktree` operations shorter. Create worktrees only with `git wt` (including scripts); use native `git worktree` only for cleanup, diagnosis, or recovery (`list` / `remove` / `prune` / `unlock` / `repair`).
 
 ## Usage
 

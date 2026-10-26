@@ -168,7 +168,7 @@ Native Git can guess a remote branch when adding a worktree for an existing bran
 git config worktree.guessRemote true
 ```
 
-Use this for native `git worktree add` flows. It is separate from `git-wt`'s copy, hook, and directory behavior.
+This is native Git behavior for `git worktree add` itself; agents create worktrees with `git wt` and do not run `git worktree add` directly. It is separate from `git-wt`'s copy, hook, and directory behavior.
 
 ## Shell Integration
 
