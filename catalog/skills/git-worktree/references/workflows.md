@@ -257,8 +257,8 @@ git push origin release/v3.x
 Use worktrees for git bisect without interrupting current work.
 
 ```bash
-# Create worktree for bisect
-git worktree add --detach .worktrees/bisect-session HEAD
+# Create worktree for bisect (throwaway branch at HEAD)
+git wt bisect-session HEAD
 
 cd .worktrees/bisect-session
 
