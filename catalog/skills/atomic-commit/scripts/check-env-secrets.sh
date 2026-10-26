@@ -124,8 +124,47 @@ check_regular_index_entry() {
 	esac
 }
 
+scan_envrc() {
+	local file=$1
+	/usr/bin/awk -v path="$file" '
+		function classify(key, value) {
+			if (key ~ /^DOTENV_PUBLIC_KEY(_[A-Z0-9_]+)?$/) return
+			if (value ~ /^encrypted:/) return
+			if (value ~ /^\$[A-Za-z_][A-Za-z0-9_]*$/) return
+			if (value ~ /^\$\(.*\)$/) return
+			if (value ~ /^\$\{.*\}$/) return
+			if (value == "") return
+			if (key !~ /(SECRET|TOKEN|PASSWORD|PASSWD|PRIVATE|CREDENTIAL|DATABASE_URL|AUTH|APIKEY|KEY|PAT|DSN)/) return
+			printf "%s: %s\n", path, key
+		}
+		{
+			line = $0
+			sub(/\r$/, "", line)
+			work = line
+			sub(/^[ \t]+/, "", work)
+			if (work == "" || work ~ /^#/) next
+			if (work ~ /^(use|dotenv|source_env|layout|PATH_add|watch_file|load_prefix|has|expand_path|join_path|strict_env|user_rel_path|find_up|source_up|direnv_load|path_add|export_function|on_git_branch|source|unset|nix)[ \t]/) next
+			sub(/^export[ \t]+/, "", work)
+			eq = index(work, "=")
+			if (eq == 0) next
+			key = substr(work, 1, eq - 1)
+			value = substr(work, eq + 1)
+			sub(/[ \t]+$/, "", key)
+			sub(/^[ \t]+/, "", value)
+			if (key !~ /^[A-Za-z0-9_]+$/) next
+			q = substr(value, 1, 1)
+			if (q == "\"" || q == "'\''" ) {
+				rest = substr(value, 2)
+				close_at = index(rest, q)
+				if (close_at > 0) value = substr(rest, 1, close_at - 1)
+			}
+			classify(key, value)
+		}
+	'
+}
+
 scan_group() {
-	local mode=$1 list="$work/list.$1" file
+	local mode=$1 list="$work/list.$1" file base
 	case "$mode" in
 		cached) git diff --cached --name-only -z --diff-filter=ACMRT -- "$ENV_PATHSPEC" >"$list" 2>/dev/null ;;
 		worktree) git diff --name-only -z --diff-filter=ACMRT -- "$ENV_PATHSPEC" >"$list" 2>/dev/null ;;
@@ -133,10 +172,23 @@ scan_group() {
 	esac || refuse "listing failed" "$mode"
 
 	while IFS= read -r -d '' file; do
-		# .envrc uses shell directives (use flake, dotenv, source_env), not dotenv
-		# format, so skip it from dotenv-only parsing.
-		case "$(basename "$file")" in
-			.envrc) continue ;;
+		base=$(basename "$file")
+		# .envrc and .envrc.* use shell / direnv syntax, not dotenv format.
+		# Skip them from dotenv parsing but still check for plain secret assignments.
+		case "$base" in
+			.envrc | .envrc.*)
+				if [ "$mode" = cached ]; then
+					check_regular_index_entry "$file"
+					git show ":$file" >"$work/blob" 2>/dev/null ||
+						refuse "cannot read the staged content of $file" "$mode"
+				else
+					[ ! -L "$file" ] || refuse "$file is a symlink" "$mode"
+					[ -f "$file" ] || refuse "$file is not a regular file" "$mode"
+					cat -- "$file" >"$work/blob" 2>/dev/null || refuse "cannot read $file" "$mode"
+				fi
+				scan_envrc "$file" <"$work/blob" >>"$hits"
+				continue
+				;;
 		esac
 
 		if [ "$mode" = cached ]; then
