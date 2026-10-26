@@ -7,7 +7,7 @@ background: false
 description: >
   ユーザーがコミット実行を依頼したとき（`commit`、「コミット」、「最小単位でコミット」、`atomic commit`）、
   未コミットで残った変更をまとめるよう依頼したとき、コミットと push をあわせて依頼したとき、
-  または dotenvx-managed `.env.*` を含むコミット計画を依頼したときに使用する。
+  または dotenvx-managed `.env*` を含むコミット計画を依頼したときに使用する。
   push 単独、PR 作成、ブランチ作成は扱わず、コミット分割とメッセージ作成に範囲を絞る。
 ---
 
@@ -32,7 +32,7 @@ git diff -- <non-env paths>
 
 staged 済みの変更と untracked ファイルも計画対象に含める。staged 済みでも論理グループと一致しない場合はグループを組み直す。
 
-完了条件: すべての dirty / staged / untracked ファイルが計画対象として列挙され、`.env.*` と secret 疑いファイルは差分本文を見ずに「環境ファイルの安全検査」へ回されている。untracked と staged 済みの `.env.*`、サブディレクトリの `.env.*` も検査に回す。
+完了条件: すべての dirty / staged / untracked ファイルが計画対象として列挙され、`.env*` と secret 疑いファイルは差分本文を見ずに「環境ファイルの安全検査」へ回されている。untracked と staged 済みの `.env*`、サブディレクトリの `.env*` も検査に回す。
 
 ### 2. コミットスタイルの確認
 
@@ -57,7 +57,7 @@ git log --oneline -10
 - グループ間に依存がある場合は、依存される側（設定・型定義・ユーティリティなど）を先にコミットする
 - 未完成・意図が判断できない変更は commit せず保留に回し、完了報告に名前と保留理由を書く（fork 実行ではユーザーに直接確認できないため、判断は親へ返す）
 
-完了条件: すべての計画対象ファイル（安全検査を通過した `.env.*` を含む）がちょうど1つのグループまたは保留に属し、グループ間の依存順が決まっている。
+完了条件: すべての計画対象ファイル（安全検査を通過した `.env*` を含む）がちょうど1つのグループまたは保留に属し、グループ間の依存順が決まっている。
 
 ### 4. グループごとにコミット
 
@@ -86,15 +86,17 @@ git log --oneline -<グループ数>
 
 ## 環境ファイルの安全検査
 
-dirty な `.env.*` は自動除外せず、dotenvx-managed かを判定する。repo の source of truth になり得るためである。検査・報告のどの段階でも secret の値・差分本文は表示せず、ファイル名・key 名・管理方式・差分の有無だけを扱う。
+dirty な `.env*` は自動除外せず、dotenvx-managed かを判定する。repo の source of truth になり得るためである。検査・報告のどの段階でも secret の値・差分本文は表示せず、ファイル名・key 名・管理方式・差分の有無だけを扱う。
+
+`.envrc` および `.envrc.*` は shell / direnv 構文（`use flake`, `dotenv`, `source_env` 等）を含むため dotenv parser から除外する。ただし、`export KEY=VALUE` / `KEY=VALUE` 形式の代入行は既存の dotenv 側と同じ基準で軽くチェックし、平文 secret 候補として報告する。direnv の指示行（`use`, `dotenv`, `source_env`, `layout`, `PATH_add` など）は無視し、変数参照（`$VAR`, `$(...)`, `${...}`）や空の値も除外する。
 
 ```bash
 # dotenvx 管理ファイルかを値なしで判定する（出力に現れたファイルが managed）。
-# shell glob の `.env.*` は cwd しか展開しないので、サブディレクトリを落とさない
+# shell glob の `.env*` は cwd しか展開しないので、サブディレクトリを落とさない
 # 列挙にする。ただしこれは working tree の marker を見る補助でしかない——
 # 列挙は変更の有無に関わらず tracked を全件返し、grep は index でなく実体を読む。
 # 安全判断は helper の版ごとの検査が担う
-git ls-files -z --cached --others --exclude-standard -- ':(glob)**/.env.*' \
+git ls-files -z --cached --others --exclude-standard -- ':(glob)**/.env*' \
   | xargs -0 -r /usr/bin/grep -lE '^(DOTENV_PUBLIC_KEY(_[A-Z0-9_]+)?=|[A-Z0-9_]+=encrypted:)'
 ```
 
@@ -122,7 +124,7 @@ dotenvx-managed と判定できても、追加差分に平文 secret 候補が�
 
 **diff の追加行ではなく、対象版のファイル全文を dotenv として解析する。** 追加行だけを見る方式は次を「追加行が無い＝安全」と読んでしまう: 引用された複数行値の途中行が代入やコメントに見える場合（値の断片を key と誤認する / 素通りする）、`.gitattributes` の `binary` や `-diff` で差分本体が出ない場合、rename 最適化で追加行が消える場合。全文解析ならどれも成立しない。**その代わり、以前から入っていた平文 secret も報告される**——commit する内容に含まれている以上それが正しい。
 
-helper は値を出さず `<file>: <KEY>` だけを出す。`DOTENV_PUBLIC_KEY`（named env file の `DOTENV_PUBLIC_KEY_PRODUCTION` のような suffix 付きを含む）は dotenvx の公開メタデータで上の managed 判定の根拠そのものなので、`KEY` を含んでいても候補にしない。`encrypted:` 値は引用符の有無にかかわらず除外する。サブディレクトリの `.env.*` も対象で、ファイル名は Git の一覧から保持するため tab や引用符を含むパスでも壊れない。値の展開や command substitution は行わない。
+helper は値を出さず `<file>: <KEY>` だけを出す。`DOTENV_PUBLIC_KEY`（named env file の `DOTENV_PUBLIC_KEY_PRODUCTION` のような suffix 付きを含む）は dotenvx の公開メタデータで上の managed 判定の根拠そのものなので、`KEY` を含んでいても候補にしない。`encrypted:` 値は引用符の有無にかかわらず除外する。サブディレクトリの `.env*` も対象で、ファイル名は Git の一覧から保持するため tab や引用符を含むパスでも壊れない。値の展開や command substitution は行わない。
 
 **対応する形式は有限で、それ以外は 2 へ倒す。** 受理・拒否する形式の一覧は helper の header コメントが正本で、
 ここには写さない（写すと 2 箇所が別々に古くなる）。追わずに拒否するのは、引用状態を早く抜けたときに**値の断片を

@@ -312,3 +312,70 @@ assert_scratch_clean() {
   check
   [ "$status" -eq 0 ]
 }
+
+@test "a plain .env file with a secret candidate is reported" {
+  printf 'API_TOKEN=%s\n' "$SENTINEL" >"$REPO/.env"
+  stage_env .env
+  check
+  [ "$status" -eq 1 ]
+  [[ "$output" == *".env: API_TOKEN"* ]]
+  assert_no_sentinel
+}
+
+@test "a plain .env file with encrypted values passes" {
+  printf 'DOTENV_PUBLIC_KEY=dummy-public\nAPI_KEY=encrypted:dummy\n' >"$REPO/.env"
+  stage_env .env
+  check
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+}
+
+@test ".envrc is skipped (shell directives, not dotenv format)" {
+  printf 'use flake\n' >"$REPO/.envrc"
+  stage_env .envrc
+  check
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+}
+
+@test "untracked .env in the root is checked" {
+  printf 'SECRET_KEY=%s\n' "$SENTINEL" >"$REPO/.env"
+  check
+  [ "$status" -eq 1 ]
+  [[ "$output" == *".env: SECRET_KEY"* ]]
+  assert_no_sentinel
+}
+
+@test ".envrc in a subdirectory with shell directives is skipped" {
+  mkdir -p "$REPO/subdir"
+  printf 'use flake\ndotenv\nsource_env .envrc.local\n' >"$REPO/subdir/.envrc"
+  stage_env subdir/.envrc
+  check
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+}
+
+@test ".envrc.local with direnv directives passes" {
+  printf 'use flake\nsource_env .envrc\nlayout python\n' >"$REPO/.envrc.local"
+  stage_env .envrc.local
+  check
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+}
+
+@test ".envrc with export and plain secret is reported" {
+  printf 'use flake\nexport API_TOKEN=%s\n' "$SENTINEL" >"$REPO/.envrc"
+  stage_env .envrc
+  check
+  [ "$status" -eq 1 ]
+  [[ "$output" == *".envrc: API_TOKEN"* ]]
+  assert_no_sentinel
+}
+
+@test ".envrc with variable reference passes" {
+  printf 'use flake\nexport FOO=$BAR\nexport BAZ=$(get_value)\n' >"$REPO/.envrc"
+  stage_env .envrc
+  check
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+}
