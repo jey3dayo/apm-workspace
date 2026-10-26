@@ -35,13 +35,14 @@ ARGUMENTS に対象ファイルが渡されたら、diff と untracked をその
 base="$(git merge-base <base> HEAD)"
 git diff --name-only "$base"
 git diff "$base" -- . ':(exclude,glob)**/.env*'
+git diff "$base" -- ':(glob)**/.env.example' ':(glob)**/.env.template' ':(glob)**/.env.sample'
 ```
 
-変更ファイル名を先に一覧し、`.env*` の diff 本文は出さない（追跡済みの `.env.example` などのテンプレートは除く）。`.env*` の安全確認は `atomic-commit` の検査へ回す。
+変更ファイル名を先に一覧し、`.env*` の diff 本文は出さない（追跡済みの `.env.example` などのテンプレートは除く）。未コミットの `.env*` は `atomic-commit` の検査へ回す。コミット済みの `.env*` 変更はその検査に映らないので、ファイル名だけを報告してユーザーに確認を求める。
 
 追加行（`+`）と削除行（`-`）を hunk ごとに把握する。`git diff` は untracked を映さないので、`git status --porcelain` の `??` も対象ファイルへ加える（step 2 の「不要ファイル」観点がこれを見る）。
 
-- 完了条件: base ref が確定し、対象ファイル一覧が取れている。diff が空なら「対象なし」と報告して終了する
+- 完了条件: base ref が確定し、対象ファイル一覧が取れている。変更ファイル一覧（`--name-only` と untracked）が空なら「対象なし」と報告して終了する
 
 ### 2. 観点表を全行適用
 
