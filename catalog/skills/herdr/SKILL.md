@@ -94,3 +94,27 @@ version 依存の詳細が要るときは `herdr <group>`（例 `herdr pane`, `h
 - 読み戻していないプロセス名を報告に書かない。pane にコマンドを起動したら `herdr pane process-info --pane <pane_id>` で cwd と foreground process を読み戻し、報告には pane_id + workspace label + 絶対 cwd + 実際に読み戻したプロセスを併記する
 - shell が待機中の pane にだけコマンドを起動する。agent や別 TUI が動作中なら上書きせず、別 pane の選択・作成またはユーザー確認へ切り替える
 - `tuicr` や `lazygit` などの interactive TUI は agent 自身の PTY ではなく、ユーザーが見る Herdr pane で起動する
+
+### Agent を起動する
+
+Claude / Codex などを新しい pane で起動するときは、split → shell 待機 → `agent start` → 読み戻しを手で組まず、同梱の `scripts/spawn-agent.sh` を使う。上の House rules どおり、呼び出し元 pane の隣に `--no-focus` で split し（幅広なら right、縦長なら down）、新しい shell が待機状態になってから `herdr agent start` し、`agent list` / `pane process-info` で kind と cwd を読み戻して照合する。workspace / tab は作らない。
+
+```bash
+scripts/spawn-agent.sh --kind codex                       # 自分の隣・同じ cwd。pane_id を出力
+scripts/spawn-agent.sh --kind claude --cwd ~/src/my-app --name reviewer --json
+scripts/spawn-agent.sh --kind codex --session work --pane w1:p1 -- --model <model>  # 別 session は --pane 必須
+```
+
+名前は省略すると `<kind>-N`（空き番号）。exit は 0 成功、1 herdr コマンド失敗（split / agent start）、2 引数・検証エラー、3 新しい shell が `--shell-timeout` 内に待機状態にならない、4 読み戻した kind / cwd が不一致。1・3・4 で作った pane は閉じずに残すので、`herdr pane read` で確認してから扱いを決める。
+
+キーバインドから人が起動する場合は `scripts/spawn-picker.sh` を popup で使う。fzf で `ghq list -p` のリポジトリ（アクティブ pane の repo が先頭）→ kind（claude / codex が先頭）を選び、アクティブ pane の隣・現在の session で `spawn-agent.sh` を呼ぶ。Esc で何もせず閉じ、失敗時だけキー入力を待つ。fzf / ghq / jq が必要。
+
+```toml
+[[keys.command]]
+key = "prefix+a"
+type = "popup"
+command = "bash \"$HOME/.agents/skills/herdr/scripts/spawn-picker.sh\""
+description = "spawn agent (pick repo + kind)"
+width = "80%"
+height = "60%"
+```
