@@ -106,3 +106,15 @@ scripts/spawn-agent.sh --kind codex --session work --pane w1:p1 -- --model <mode
 ```
 
 名前は省略すると `<kind>-N`（空き番号）。exit は 0 成功、1 herdr コマンド失敗（split / agent start）、2 引数・検証エラー、3 新しい shell が `--shell-timeout` 内に待機状態にならない、4 読み戻した kind / cwd が不一致。1・3・4 で作った pane は閉じずに残すので、`herdr pane read` で確認してから扱いを決める。
+
+キーバインドから人が起動する場合は `scripts/spawn-picker.sh` を popup で使う。fzf で `ghq list -p` のリポジトリ（アクティブ pane の repo が先頭）→ kind（claude / codex が先頭）を選び、アクティブ pane の隣・現在の session で `spawn-agent.sh` を呼ぶ。Esc で何もせず閉じ、失敗時だけキー入力を待つ。fzf / ghq / jq が必要。
+
+```toml
+[[keys.command]]
+key = "prefix+a"
+type = "popup"
+command = "bash \"$HOME/.agents/skills/herdr/scripts/spawn-picker.sh\""
+description = "spawn agent (pick repo + kind)"
+width = "80%"
+height = "60%"
+```
