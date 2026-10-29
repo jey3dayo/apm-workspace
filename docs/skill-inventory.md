@@ -104,7 +104,7 @@ global の一覧に無くても廃止ではない。各リポジトリの `apm.y
 
 ## global MCP（root apm.yml の mcp:）
 
-`context7`, `linear`, `mcp-simple-voicevox`
+`context7`, `linear`
 
 `mise run check` の `lint:skill-inventory` が上記一覧と `apm.yml` の `dependencies.mcp` を照合する。Cursor user-scope（`~/.cursor/mcp.json`）は APM 外 — [`package-decisions.md`](package-decisions.md) の Cursor 節。
 

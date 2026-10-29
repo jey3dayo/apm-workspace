@@ -1,5 +1,5 @@
 lockfile_version: '2'
-generated_at: '2026-10-29T04:48:27.598577+00:00'
+generated_at: '2026-10-29T09:54:01.954403+00:00'
 apm_version: 0.31.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -30247,15 +30247,6 @@ deployments:
   content_hash: null
 - kind: uri
   target: mcp
-  value: mcp-simple-voicevox
-  runtime: claude
-  scope: project
-  owners:
-  - .
-  active_owner: .
-  content_hash: null
-- kind: uri
-  target: mcp
   value: context7
   runtime: codex
   scope: project
@@ -30272,19 +30263,9 @@ deployments:
   - .
   active_owner: .
   content_hash: null
-- kind: uri
-  target: mcp
-  value: mcp-simple-voicevox
-  runtime: codex
-  scope: project
-  owners:
-  - .
-  active_owner: .
-  content_hash: null
 mcp_servers:
 - context7
 - linear
-- mcp-simple-voicevox
 mcp_configs:
   context7:
     name: context7
@@ -30299,23 +30280,13 @@ mcp_configs:
     transport: http
     registry: false
     url: https://mcp.linear.app/mcp
-  mcp-simple-voicevox:
-    name: mcp-simple-voicevox
-    transport: stdio
-    args:
-    - -y
-    - '@t09tanaka/mcp-simple-voicevox'
-    registry: false
-    command: npx
 mcp_target_servers:
   claude:
   - context7
   - linear
-  - mcp-simple-voicevox
   codex:
   - context7
   - linear
-  - mcp-simple-voicevox
 local_deployed_files:
 - .agents/skills/agent-curation
 - .agents/skills/find-skills
