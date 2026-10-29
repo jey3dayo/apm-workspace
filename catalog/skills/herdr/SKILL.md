@@ -3,7 +3,8 @@ name: herdr
 description: >-
   Edit ~/.config/herdr/config.toml (keys, theme, sidebar, notifications, worktrees)
   and fix `herdr config check` / startup warnings; inspect or drive live Herdr
-  workspaces, panes and agents via the CLI.
+  workspaces, panes and agents via the CLI; spawn Claude/Codex in a new pane
+  (scripts/spawn-agent.sh).
 ---
 
 # Herdr Configuration and Runtime Control
