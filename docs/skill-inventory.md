@@ -62,6 +62,7 @@
 
 - `gh-address-comments` — OpenAI 由来の退役 upstream コピー
 - `gh-fix-ci` — OpenAI 由来の退役 upstream コピー
+- `explain-before-shorten` — Zenn 記事の SKILL.md を原文のまま手動管理
 
 ## optional（optional-skills/）
 

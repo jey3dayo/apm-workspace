@@ -616,6 +616,13 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
   - 理由: 「テスト前にシームをユーザーへ確認する」手順が停止・確認ポリシーと矛盾する。参照元が無く、3か月の利用が1件のみ。
   - restore: `apm install -g <ref>`（apm-usage Fast Path 6）、その後 `mise run check` と `mise run deploy` を実行し、`mise run doctor` で agmsg roster を確認する。（前提: ~/.apm の変更が commit → push → `mise run install:catalog` 済みであること。未 push のまま実行すると古い catalog が一時的に再配布される）
 
+## `i-have-adhd` を撤去し `explain-before-shorten` を manual-skills へ取り込み（2026-10-29）
+
+- 撤去: `ayghri/i-have-adhd/skills/i-have-adhd`。ユーザーの指示。restore は `apm install -g ayghri/i-have-adhd/skills/i-have-adhd#723af7d9afaf43eb871dbcce6129e2bf80de90d5`（`apm-usage` Fast Path 6）。
+- 取り込み: `manual-skills/.apm/skills/explain-before-shorten/`（manual レーン）。出典は https://zenn.dev/microsoft/articles/explain-before-shorten に載った SKILL.md 全文で、upstream の package が無い。ユーザーが貼った全文を改変せずに置き、来歴は `manual-skills/upstreams/explain-before-shorten/PROVENANCE.md` に残した。skill 名は記事の frontmatter のまま。
+- 注意: 「関連スキルとの分担」の `slide-review` / `markdstage` はこの環境に無い。原文のまま残している。
+- 更新: 記事が 2026-10-29 に否定形のルールを追加している。再取り込みするときは記事の更新履歴を確認する。
+
 ## `i-have-adhd` / `last30days` を global-dependency として採用（2026-09-23）
 
 - 採用: `ayghri/i-have-adhd/skills/i-have-adhd`、`mvanhorn/last30days-skill/skills/last30days`。いずれも upstream の `skills/<id>/` を path ref で SHA pin し、配布名は upstream のまま通る。
