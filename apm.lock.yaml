@@ -1,5 +1,5 @@
 lockfile_version: '2'
-generated_at: '2026-10-29T04:29:46.707758+00:00'
+generated_at: '2026-10-29T04:48:27.598577+00:00'
 apm_version: 0.31.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -3098,7 +3098,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: d49e70bd0e9581a7436b573f52085cd900dff11c
+  resolved_commit: a7379e888f202abb2fbcc8df2ea8d9fe444f53bf
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -3610,17 +3610,19 @@ dependencies:
     .claude/skills/tuxedo/references/tui-and-capture.md: sha256:13278531ebad1f152047aaebc247eacbfd69f75ba1887e3a611627c94a31f684
     .claude/skills/web-research/SKILL.md: sha256:a9c97632b56dbf89f7e57f70d97e96ff477afbd8837b1a99a5300ddd6bfba562
     .claude/skills/web-research/agents/openai.yaml: sha256:50536a04fbc72b0f71fc9975a7e041893912ebfcaf9c671439843d20172e1264
-  content_hash: sha256:0f74b6767c7dbe8c036006879908a2c6f543245a7809fc5e4a6ec1378b185757
+  content_hash: sha256:11b4084b0e7bf25f6c143a492f574371042eeafd49c408f4490133cbf636ef02
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
-  resolved_commit: d49e70bd0e9581a7436b573f52085cd900dff11c
+  resolved_commit: a7379e888f202abb2fbcc8df2ea8d9fe444f53bf
   resolved_ref: main
   version: 1.0.0
   virtual_path: manual-skills
   is_virtual: true
   package_type: apm_package
   deployed_files:
+  - .agents/skills/explain-before-shorten
+  - .agents/skills/explain-before-shorten/SKILL.md
   - .agents/skills/gh-address-comments
   - .agents/skills/gh-address-comments/LICENSE.txt
   - .agents/skills/gh-address-comments/SKILL.md
@@ -3635,6 +3637,8 @@ dependencies:
   - .agents/skills/gh-fix-ci/assets/github-small.svg
   - .agents/skills/gh-fix-ci/assets/github.png
   - .agents/skills/gh-fix-ci/scripts/inspect_pr_checks.py
+  - .claude/skills/explain-before-shorten
+  - .claude/skills/explain-before-shorten/SKILL.md
   - .claude/skills/gh-address-comments
   - .claude/skills/gh-address-comments/LICENSE.txt
   - .claude/skills/gh-address-comments/SKILL.md
@@ -3650,6 +3654,7 @@ dependencies:
   - .claude/skills/gh-fix-ci/assets/github.png
   - .claude/skills/gh-fix-ci/scripts/inspect_pr_checks.py
   deployed_file_hashes:
+    .agents/skills/explain-before-shorten/SKILL.md: sha256:bb96bfb03fad06636c2977f3bc3792c733afe4bbf486bc96af2b0cbfbc77f19e
     .agents/skills/gh-address-comments/LICENSE.txt: sha256:58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd
     .agents/skills/gh-address-comments/SKILL.md: sha256:1ce75a659142aaa41b95f92e1983488751a5474d5ba231024fd11f24e5d92db0
     .agents/skills/gh-address-comments/agents/openai.yaml: sha256:8b9f604d79717d5aec58abfb192f2d713c45b5558f5572255d9f9e5d39877ee0
@@ -3662,6 +3667,7 @@ dependencies:
     .agents/skills/gh-fix-ci/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
     .agents/skills/gh-fix-ci/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
     .agents/skills/gh-fix-ci/scripts/inspect_pr_checks.py: sha256:3bdf92c3ef5fcae825748d1a3f3bfd9bb2f9e567334f2addeb2d9dd54e31a272
+    .claude/skills/explain-before-shorten/SKILL.md: sha256:bb96bfb03fad06636c2977f3bc3792c733afe4bbf486bc96af2b0cbfbc77f19e
     .claude/skills/gh-address-comments/LICENSE.txt: sha256:58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd
     .claude/skills/gh-address-comments/SKILL.md: sha256:1ce75a659142aaa41b95f92e1983488751a5474d5ba231024fd11f24e5d92db0
     .claude/skills/gh-address-comments/agents/openai.yaml: sha256:8b9f604d79717d5aec58abfb192f2d713c45b5558f5572255d9f9e5d39877ee0
@@ -3674,7 +3680,7 @@ dependencies:
     .claude/skills/gh-fix-ci/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
     .claude/skills/gh-fix-ci/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
     .claude/skills/gh-fix-ci/scripts/inspect_pr_checks.py: sha256:3bdf92c3ef5fcae825748d1a3f3bfd9bb2f9e567334f2addeb2d9dd54e31a272
-  content_hash: sha256:c92705797cf174e1fd4e11c6b3cb82aff481e2b724cf1b74ec8758a95303b50b
+  content_hash: sha256:f2b66885a3403cf4736c1dd8185ca41713278c8d34850865d7747c192a45d5da
 - repo_url: k16shikano/fd287c3133457c4fd8f5601d34aa817d
   name: japanese-tech-writing
   host: gist.github.com
@@ -3706,7 +3712,6 @@ dependencies:
   - .agents/skills/codebase-design/agents/openai.yaml
   - .agents/skills/domain-modeling
   - .agents/skills/domain-modeling/ADR-FORMAT.md
-  - .agents/skills/domain-modeling/CONTEXT-FORMAT.md
   - .agents/skills/domain-modeling/GLOSSARY-FORMAT.md
   - .agents/skills/domain-modeling/SKILL.md
   - .agents/skills/domain-modeling/agents/openai.yaml
@@ -3798,7 +3803,6 @@ dependencies:
     .agents/skills/codebase-design/SKILL.md: sha256:2c20617f87ec8af6a434859f381b2f061a69b530444e74eb39e78bb016a6d1e2
     .agents/skills/codebase-design/agents/openai.yaml: sha256:edebc9e4fcfe102114012575eaa9600b9b5fd08c311664f389c36e7bc717740f
     .agents/skills/domain-modeling/ADR-FORMAT.md: sha256:944c92aa790e8fbdc9199640b170979abb8a34ba8d0fe18c2a01a63bce140ca0
-    .agents/skills/domain-modeling/CONTEXT-FORMAT.md: sha256:b8cc318f2a4285b530e908b6bc43901c3c5cd11100362636bbc4216639bef597
     .agents/skills/domain-modeling/GLOSSARY-FORMAT.md: sha256:21dcc40cdec8e151a829b98ab1517c1867bc444e3665134a98c6983411996801
     .agents/skills/domain-modeling/SKILL.md: sha256:7b925d7b1e341a2eeae33ad68a8a8c0ab889a38ddd22a7598e4c240e5a7556a3
     .agents/skills/domain-modeling/agents/openai.yaml: sha256:f6bf2aa996c6e6f53fdd0708e18a0d16a56aed8322cca59fedbe3c0d2c75f06b
@@ -4688,18 +4692,6 @@ dependencies:
   - .agents/skills/archify/scripts/render-examples.mjs
   - .agents/skills/archify/scripts/update-contract.mjs
   - .agents/skills/archify/skill-release.json
-  - .agents/skills/archify/test/chapter-delta-preview.test.mjs
-  - .agents/skills/archify/test/chapter-handoff.test.mjs
-  - .agents/skills/archify/test/chapter-rail.test.mjs
-  - .agents/skills/archify/test/guided-views.test.mjs
-  - .agents/skills/archify/test/story-beat-navigator.test.mjs
-  - .agents/skills/archify/test/story-carrier.test.mjs
-  - .agents/skills/archify/test/story-director-strip.test.mjs
-  - .agents/skills/archify/test/story-follow-camera.test.mjs
-  - .agents/skills/archify/test/story-horizon.test.mjs
-  - .agents/skills/archify/test/story-moment-link.test.mjs
-  - .agents/skills/archify/test/story-shelf.test.mjs
-  - .agents/skills/archify/test/story-trail.test.mjs
   - .claude/skills/archify
   - .claude/skills/archify/LICENSE
   - .claude/skills/archify/SKILL.md
@@ -5094,18 +5086,6 @@ dependencies:
     .agents/skills/archify/scripts/render-examples.mjs: sha256:c2c99c4153cf21f0526cf3f041c1d81716017be182d404173f8961fa494e8c8c
     .agents/skills/archify/scripts/update-contract.mjs: sha256:b6eb5e18ebea770c0a0c2cf2ba45d122d85abe61e94b9a5426602a9f84910b31
     .agents/skills/archify/skill-release.json: sha256:1ea25551e0359e547267d40e83812ffd1a7bdf7398826b65f2a2fcf1a11ba596
-    .agents/skills/archify/test/chapter-delta-preview.test.mjs: sha256:834fab9360c66e333e028879d12c751e540e26618ee39cdcb6def1699376dbe3
-    .agents/skills/archify/test/chapter-handoff.test.mjs: sha256:384683b85c8181b9be6a54f24dc00e739d5347b86b1a878d2d9a865a650b4f3e
-    .agents/skills/archify/test/chapter-rail.test.mjs: sha256:a95d33c9d19e400954aa93e8585788828dba40698b7a9ada9648430872da8f9c
-    .agents/skills/archify/test/guided-views.test.mjs: sha256:fbed156af01082f3bbde7b0c0b6675664613c47644e14a33fad3fbd1b8dc062e
-    .agents/skills/archify/test/story-beat-navigator.test.mjs: sha256:6b6c0ab5b396e8a608d337cd8e351d4118a75678a5d90620943249b1bc53d7b0
-    .agents/skills/archify/test/story-carrier.test.mjs: sha256:05143cd9c5f28ac5041fcb46daddf830ac171c0bf72335a8f9623a14916bf8bc
-    .agents/skills/archify/test/story-director-strip.test.mjs: sha256:8ab2e1ff83cb63384ef9d2b459f7d86b2e7de767a30173b845009a02d26a7cce
-    .agents/skills/archify/test/story-follow-camera.test.mjs: sha256:edc511d606a6eb18e41d8110a6fb9c9c0958c5638dce109ffb7968151cc709d7
-    .agents/skills/archify/test/story-horizon.test.mjs: sha256:4136e9b4e296048e422f44d64e3d10f9d81884d1a6f099d5eb0c33c4c1e5d8dd
-    .agents/skills/archify/test/story-moment-link.test.mjs: sha256:acd13d838b3af58058a68dca90b7f4aad81a4d2fea7e6a89afd3a21345aa2207
-    .agents/skills/archify/test/story-shelf.test.mjs: sha256:b734d038ca09136f46b5b514d1f19b8ca8bfa3377839d27cbcc338179c7da210
-    .agents/skills/archify/test/story-trail.test.mjs: sha256:9ec4a06fcd365cc7a4ecc31927a004d98a62bab0eb6f3dd9feefa4e9f7ae009b
     .claude/skills/archify/LICENSE: sha256:b799ab081703e7821ae5096d2c1abdf14bbdc75e8ea1c4045998c36ed6db9706
     .claude/skills/archify/SKILL.md: sha256:93434ad579983f4cff639c2b7230c311e0785cc48a25b66b1498e1802be7de91
     .claude/skills/archify/THIRD_PARTY_NOTICES.md: sha256:ae6f236bd0aef72bad196099aa8687cccff6e01cc3a60e6c32bbad688266f678
@@ -14182,6 +14162,24 @@ deployments:
   - emilkowalski/skills
   active_owner: emilkowalski/skills
   content_hash: sha256:ffbe68e6007fb42cb8149f089b400a1ca007d59ba23e8948e2be4476f3175939
+- kind: project-relative
+  target: claude
+  value: .claude/skills/explain-before-shorten
+  runtime: null
+  scope: project
+  owners:
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/explain-before-shorten/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
+  content_hash: sha256:bb96bfb03fad06636c2977f3bc3792c733afe4bbf486bc96af2b0cbfbc77f19e
 - kind: project-relative
   target: claude
   value: .claude/skills/find-animation-opportunities
@@ -26442,6 +26440,24 @@ deployments:
   content_hash: sha256:ffbe68e6007fb42cb8149f089b400a1ca007d59ba23e8948e2be4476f3175939
 - kind: project-relative
   target: codex
+  value: .agents/skills/explain-before-shorten
+  runtime: null
+  scope: project
+  owners:
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/explain-before-shorten/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - jey3dayo/apm-workspace/manual-skills
+  active_owner: jey3dayo/apm-workspace/manual-skills
+  content_hash: sha256:bb96bfb03fad06636c2977f3bc3792c733afe4bbf486bc96af2b0cbfbc77f19e
+- kind: project-relative
+  target: codex
   value: .agents/skills/find-animation-opportunities
   runtime: null
   scope: project
@@ -30166,123 +30182,6 @@ deployments:
   - fujibee/agmsg
   active_owner: fujibee/agmsg
   content_hash: sha256:2ef65fe183a44d8b91b3139c815f0feadc8f1496992197cf8ee186ebed8ce716
-- kind: project-relative
-  target: legacy
-  value: .agents/skills/archify/test/chapter-delta-preview.test.mjs
-  runtime: null
-  scope: project
-  owners:
-  - tt-a1i/archify/archify
-  active_owner: tt-a1i/archify/archify
-  content_hash: sha256:834fab9360c66e333e028879d12c751e540e26618ee39cdcb6def1699376dbe3
-- kind: project-relative
-  target: legacy
-  value: .agents/skills/archify/test/chapter-handoff.test.mjs
-  runtime: null
-  scope: project
-  owners:
-  - tt-a1i/archify/archify
-  active_owner: tt-a1i/archify/archify
-  content_hash: sha256:384683b85c8181b9be6a54f24dc00e739d5347b86b1a878d2d9a865a650b4f3e
-- kind: project-relative
-  target: legacy
-  value: .agents/skills/archify/test/chapter-rail.test.mjs
-  runtime: null
-  scope: project
-  owners:
-  - tt-a1i/archify/archify
-  active_owner: tt-a1i/archify/archify
-  content_hash: sha256:a95d33c9d19e400954aa93e8585788828dba40698b7a9ada9648430872da8f9c
-- kind: project-relative
-  target: legacy
-  value: .agents/skills/archify/test/guided-views.test.mjs
-  runtime: null
-  scope: project
-  owners:
-  - tt-a1i/archify/archify
-  active_owner: tt-a1i/archify/archify
-  content_hash: sha256:fbed156af01082f3bbde7b0c0b6675664613c47644e14a33fad3fbd1b8dc062e
-- kind: project-relative
-  target: legacy
-  value: .agents/skills/archify/test/story-beat-navigator.test.mjs
-  runtime: null
-  scope: project
-  owners:
-  - tt-a1i/archify/archify
-  active_owner: tt-a1i/archify/archify
-  content_hash: sha256:6b6c0ab5b396e8a608d337cd8e351d4118a75678a5d90620943249b1bc53d7b0
-- kind: project-relative
-  target: legacy
-  value: .agents/skills/archify/test/story-carrier.test.mjs
-  runtime: null
-  scope: project
-  owners:
-  - tt-a1i/archify/archify
-  active_owner: tt-a1i/archify/archify
-  content_hash: sha256:05143cd9c5f28ac5041fcb46daddf830ac171c0bf72335a8f9623a14916bf8bc
-- kind: project-relative
-  target: legacy
-  value: .agents/skills/archify/test/story-director-strip.test.mjs
-  runtime: null
-  scope: project
-  owners:
-  - tt-a1i/archify/archify
-  active_owner: tt-a1i/archify/archify
-  content_hash: sha256:8ab2e1ff83cb63384ef9d2b459f7d86b2e7de767a30173b845009a02d26a7cce
-- kind: project-relative
-  target: legacy
-  value: .agents/skills/archify/test/story-follow-camera.test.mjs
-  runtime: null
-  scope: project
-  owners:
-  - tt-a1i/archify/archify
-  active_owner: tt-a1i/archify/archify
-  content_hash: sha256:edc511d606a6eb18e41d8110a6fb9c9c0958c5638dce109ffb7968151cc709d7
-- kind: project-relative
-  target: legacy
-  value: .agents/skills/archify/test/story-horizon.test.mjs
-  runtime: null
-  scope: project
-  owners:
-  - tt-a1i/archify/archify
-  active_owner: tt-a1i/archify/archify
-  content_hash: sha256:4136e9b4e296048e422f44d64e3d10f9d81884d1a6f099d5eb0c33c4c1e5d8dd
-- kind: project-relative
-  target: legacy
-  value: .agents/skills/archify/test/story-moment-link.test.mjs
-  runtime: null
-  scope: project
-  owners:
-  - tt-a1i/archify/archify
-  active_owner: tt-a1i/archify/archify
-  content_hash: sha256:acd13d838b3af58058a68dca90b7f4aad81a4d2fea7e6a89afd3a21345aa2207
-- kind: project-relative
-  target: legacy
-  value: .agents/skills/archify/test/story-shelf.test.mjs
-  runtime: null
-  scope: project
-  owners:
-  - tt-a1i/archify/archify
-  active_owner: tt-a1i/archify/archify
-  content_hash: sha256:b734d038ca09136f46b5b514d1f19b8ca8bfa3377839d27cbcc338179c7da210
-- kind: project-relative
-  target: legacy
-  value: .agents/skills/archify/test/story-trail.test.mjs
-  runtime: null
-  scope: project
-  owners:
-  - tt-a1i/archify/archify
-  active_owner: tt-a1i/archify/archify
-  content_hash: sha256:9ec4a06fcd365cc7a4ecc31927a004d98a62bab0eb6f3dd9feefa4e9f7ae009b
-- kind: project-relative
-  target: legacy
-  value: .agents/skills/domain-modeling/CONTEXT-FORMAT.md
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills
-  active_owner: mattpocock/skills
-  content_hash: sha256:b8cc318f2a4285b530e908b6bc43901c3c5cd11100362636bbc4216639bef597
 - kind: project-relative
   target: legacy
   value: .agents/skills/find-skills
