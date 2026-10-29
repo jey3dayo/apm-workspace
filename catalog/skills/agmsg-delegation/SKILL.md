@@ -10,7 +10,7 @@ description: >-
 
 # agmsg-delegation
 
-別プロセスの agent（headless Claude Code / Codex）へ、agmsg メッセージングで作業を委譲するライフサイクルを回す。**経路は「組み込みが使えるか」ではなく「`orchestrator-worker` で選んだ model と必要な強制境界を、その経路が満たせるか」で決まる。** 組み込みサブエージェント（Agent tool / `spawn_agent`）が満たせるならそちらを使い、満たせない場合・別セッションへ引き継ぐ場合・外部プロセスが必要な場合が本スキルの経路である。Claude セッションから Codex model の reviewer / worker を起動するのは Agent tool ではできないため、review 外注の既定（Codex sol）はここへ来る。**pane / workspace を勝手に作らない。ユーザーが指示したときだけ、読み戻し付きの手順で作る**（理由と常駐運用は [references/resident-pool.md](references/resident-pool.md) を参照）。
+別プロセスの agent（headless Claude Code / Codex）へ、agmsg メッセージングで作業を委譲するライフサイクルを回す。**経路は「組み込みが使えるか」ではなく「`orchestrator-worker` で選んだ model と必要な強制境界を、その経路が満たせるか」で決まる。** 組み込みサブエージェント（Agent tool / `spawn_agent`）が満たせるならそちらを使い、満たせない場合・別セッションへ引き継ぐ場合・外部プロセスが必要な場合が本スキルの経路である。Claude セッションから Codex model の reviewer / worker を起動するのは Agent tool ではできないため、review 外注の既定（Codex terra）はここへ来る。**pane / workspace を勝手に作らない。ユーザーが指示したときだけ、読み戻し付きの手順で作る**（理由と常駐運用は [references/resident-pool.md](references/resident-pool.md) を参照）。
 
 tier 判定・委譲判定・タスク分割基準・Reviewer の model 選定は `orchestrator-worker` スキルが正本。本スキルは transport だけを定義する。
 
