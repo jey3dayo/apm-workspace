@@ -287,7 +287,7 @@
       "title": "モデル帯と役・昇格",
       "items": [
         "低コスト帯: sonnet / gpt-6-luna xhigh（既定Worker）→ max（第1昇格）",
-        "バランス帯: gpt-5.6-terra（Review既定 + high、能力崖・長文脈直行）",
+        "バランス帯: gpt-6.1-terra（Review既定 + high、能力崖・長文脈直行）",
         "高性能帯: Fable / Opus / gpt-6.1-sol（難度の高いReview・Worker昇格）。最上位 gpt-6-astra は Architect可・Reviewerは明示時のみ、Worker 昇格先にしない"
       ]
     }
