@@ -80,9 +80,6 @@ dependencies:
     - agavra/tuicr/skills/tuicr#9175dc95b97a0a7dd290d43d38385745a7fb7d40
     - fujibee/agmsg#4a712f2aeba8f0b2070f7533b827c7cac78c9fdf # v1.5.1
     - humanlayer/skills/plugins/show-me/skills/show-me#ca7c8088db69e315a8b2deea43820270457f8f3c
-
-    # --- productivity / research ---
-    - mvanhorn/last30days-skill/skills/last30days#7fac0fc31ba5212b5ddaa29252d9f7148cec8423 # v3.30.0
   mcp:
     - name: context7
       registry: false

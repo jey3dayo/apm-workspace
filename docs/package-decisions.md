@@ -757,3 +757,10 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - 変更: 2026-09-02 の workspace-only 移動を取り消し、`catalog/skills/` へ戻した。コマンドはすべて `mise -C ~/.apm` / `git -C ~/.apm` で `~/.apm` を明示し、呼び出し元の cwd に依存しない。
 - 理由: 移動理由の「他 repo では実行不能」はコマンドが cwd 前提だったためで、`~/.apm` を明示すれば解消する。一方 `learning-intake` / `agmsg-delegation` / `orchestrator-worker` は global に配布されたまま本スキルを名前で呼んでおり、スキル調整を `~/.apm` 外のセッションで行うと `Unknown skill` で失敗していた。
 - 代償: description が全 repo の skill 一覧に常時載る。
+
+## `last30days` を撤去（2026-10-29）
+
+- 撤去: `last30days`（mvanhorn/last30days-skill）。2026-09-23 の節の「利用実績が 0 のまま次の棚卸しを迎えたら撤去する」に従う。
+- 理由: 2026-09-07 以降の Claude transcript、`history.jsonl`（2025-09 以降のスラッシュ起動）、2026-06 以降の Codex セッションの `SKILL.md` 読み込みのいずれにも使用が 0 回。Claude 側は `skillOverrides` で `off` だった。保持基準（verb 導線・弱いランタイムの保険・社会的理由・思い入れ）のどれにも当たらない。
+- 残した判断: `agentation` / `agentation-self-driving` は、使っていた時期があるためユーザー判断で残す。
+- 再導入: 使う場面ができたら `mvanhorn/last30days-skill/skills/last30days#7fac0fc31ba5212b5ddaa29252d9f7148cec8423`（v3.30.0）を `apm.yml` の dependencies.apm へ戻す。
