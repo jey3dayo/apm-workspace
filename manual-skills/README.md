@@ -2,9 +2,12 @@
 
 This directory contains copied skills that are kept outside the default managed APM lane.
 
-Current state: this package contains `gh-address-comments` and `gh-fix-ci`, retired
-upstream copies originating from OpenAI, and `explain-before-shorten`, copied from a
-published article. Keep them outside the default managed APM lane.
+Current skills:
+
+- `gh-address-comments`, `gh-fix-ci`: retired upstream copies originating from OpenAI
+- `explain-before-shorten`: copied from a published article
+
+Keep them outside the default managed APM lane.
 
 - Use this package for skills that APM does not manage cleanly from upstream
 - Typical reasons: symlinks, packaging quirks, or upstream layouts that break normal managed rollout
