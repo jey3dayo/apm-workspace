@@ -82,7 +82,6 @@ dependencies:
     - humanlayer/skills/plugins/show-me/skills/show-me#ca7c8088db69e315a8b2deea43820270457f8f3c
 
     # --- productivity / research ---
-    - ayghri/i-have-adhd/skills/i-have-adhd#723af7d9afaf43eb871dbcce6129e2bf80de90d5
     - mvanhorn/last30days-skill/skills/last30days#7fac0fc31ba5212b5ddaa29252d9f7148cec8423 # v3.30.0
   mcp:
     - name: context7

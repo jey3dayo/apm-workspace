@@ -37,7 +37,7 @@
   `fixing-motion-performance`, `improve-ui`）, `transitions-dev`, `ui-ux-pro-max`
 - browser / analysis: `browser-harness`, `screenshot`, `archify`
 - agent tools: `tuicr`, `agmsg`, `show-me`
-- productivity / research: `i-have-adhd`, `last30days`
+- productivity / research: `last30days`
 
 ## global（自作 catalog: catalog/skills/）
 
