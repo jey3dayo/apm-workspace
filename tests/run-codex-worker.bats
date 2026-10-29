@@ -87,6 +87,18 @@ stub_received_model() {
   done
 }
 
+@test "a reviewer runs at medium effort unless AGMSG_REVIEWER_EFFORT overrides it" {
+  codex_stub
+  run "$SCRIPT" review "$PROJECT" gpt-6.1-terra "$PAYLOAD"
+  [ "$status" -eq 0 ]
+  grep -qx 'model_reasoning_effort="medium"' "$AGMSG_STUB_ARGS"
+
+  codex_stub
+  AGMSG_REVIEWER_EFFORT=high run "$SCRIPT" review "$PROJECT" gpt-6.1-terra "$PAYLOAD"
+  [ "$status" -eq 0 ]
+  grep -qx 'model_reasoning_effort="high"' "$AGMSG_STUB_ARGS"
+}
+
 @test "script allowlist matches the orchestrator-worker tier table" {
   local script_impl skill_impl script_review skill_review
   script_impl="$(script_models_for implement | tr ' ' '\n' | sort -u | tr '\n' ' ')"
