@@ -119,7 +119,9 @@ scripts/spawn-agent.sh --kind claude --cwd ~/src/my-app --name reviewer --json
 scripts/spawn-agent.sh --kind codex --session work --pane w1:p1 -- --model <model>  # 別 session は --pane 必須
 ```
 
-名前は省略すると `<kind>-N`（空き番号）。exit は 0 成功、1 herdr コマンド失敗（split / agent start）、2 引数・検証エラー、3 新しい shell が `--shell-timeout` 内に待機状態にならない、4 読み戻した kind / cwd が不一致。1・3・4 で作った pane は閉じずに残すので、`herdr pane read` で確認してから扱いを決める。
+名前は省略すると `<kind>-N`（空き番号）。exit は 0 成功、1 herdr コマンド失敗（split / agent start）、2 引数・検証エラー、3 新しい shell が `--shell-timeout` 内に待機状態にならない、4 読み戻した kind / cwd が不一致、5 `agent_not_ready` を受けて agent の起動を読み戻したが、入力可能状態ではない。5 の場合も pane は閉じずに残し、既定出力は pane_id、`--json` は `ready: false` と Herdr のエラーを `reason` に含める。読み戻しに失敗した場合は従来どおり 1 または 4 を返す。
+
+exit 5 は `herdr agent start` が返した `agent_not_ready` だけを根拠にし、`agent_status` の値から readiness を推定しない。agent 名で `find-agent.sh --name <name>` を使って状態を確認し、入力前にその Herdr version の `herdr --skill` に従う。
 
 キーバインドから人が起動する場合は `scripts/spawn-picker.sh` を popup で使う。fzf で `ghq list -p` のリポジトリ（アクティブ pane の repo が先頭）→ kind（claude / codex が先頭）を選び、アクティブ pane の隣・現在の session で `spawn-agent.sh` を呼ぶ。Esc で何もせず閉じ、失敗時だけキー入力を待つ。fzf / ghq / jq が必要。
 

@@ -103,3 +103,10 @@ answers() { printf '%s\n' "$@" >"$STUB_DIR/answers"; }
   [ "$status" -eq 3 ]
   [[ "$output" == *"spawn-agent.sh exited 3"* ]]
 }
+
+@test "passes spawn-agent.sh's not-ready code through with the error" {
+  answers /src/github.com/me/apm codex
+  STUB_SPAWN_RC=5 run "$SCRIPT_UNDER_TEST"
+  [ "$status" -eq 5 ]
+  [[ "$output" == *"spawn-agent.sh exited 5"* ]]
+}

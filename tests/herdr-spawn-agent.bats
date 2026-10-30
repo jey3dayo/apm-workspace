@@ -21,10 +21,17 @@ case "$*" in
   agent)
     echo "  kinds: pi|claude|codex|gemini" >&2; exit 2 ;;
   "agent list")
+    if [ -f "$STUB_DIR/started" ] && [ -n "${STUB_READBACK_AGENT_LIST_FAIL:-}" ]; then
+      echo '{"error":{"code":"readback_agent_list_failed"}}' >&2; exit 1
+    fi
     if [ -f "$STUB_DIR/started" ]; then
       read -r name kind <"$STUB_DIR/started"
-      printf '{"result":{"agents":[{"pane_id":"w1:p9","name":"%s","agent":"%s","agent_status":"idle","cwd":"%s","workspace_id":"w1","tab_id":"w1:t1"}]}}\n' \
-        "$name" "${STUB_KIND:-$kind}" "${STUB_CWD:-$(cat "$STUB_DIR/cwd")}"
+      if [ -n "${STUB_NO_READBACK_AGENT:-}" ]; then
+        echo '{"result":{"agents":[]}}'
+        exit
+      fi
+      printf '{"result":{"agents":[{"pane_id":"w1:p9","name":"%s","agent":"%s","agent_status":"%s","cwd":"%s","workspace_id":"w1","tab_id":"w1:t1"}]}}\n' \
+        "$name" "${STUB_KIND:-$kind}" "${STUB_AGENT_STATUS:-idle}" "${STUB_CWD:-$(cat "$STUB_DIR/cwd")}"
     else
       echo '{"result":{"agents":[{"pane_id":"w1:p2","name":"codex-1","agent":"codex"}]}}'
     fi ;;
@@ -36,10 +43,18 @@ case "$*" in
     while [ $# -gt 0 ]; do [ "$1" = --cwd ] && echo "$2" >"$STUB_DIR/cwd"; shift; done
     echo '{"result":{"pane":{"pane_id":"w1:p9"}}}' ;;
   "pane process-info --pane w1:p9")
+    if [ -f "$STUB_DIR/started" ] && [ -n "${STUB_READBACK_PROCESS_INFO_FAIL:-}" ]; then
+      echo '{"error":{"code":"readback_process_info_failed"}}' >&2; exit 1
+    fi
     pid=100; [ -n "${STUB_BUSY:-}" ] && pid=200
     [ -f "$STUB_DIR/started" ] && pid=300
     printf '{"result":{"process_info":{"shell_pid":100,"foreground_process_group_id":%s,"foreground_processes":[{"pid":%s,"cmdline":"x","cwd":"/"}]}}}\n' "$pid" "$pid" ;;
   "agent start "*)
+    if [ -n "${STUB_START_NOT_READY:-}" ]; then
+      echo "$3 $5" >"$STUB_DIR/started"
+      echo '{"error":{"code":"agent_not_ready","message":"startup approval needs attention"}}' >&2
+      exit 1
+    fi
     [ -n "${STUB_START_FAIL:-}" ] && { echo '{"error":{"code":"timeout"}}' >&2; exit 1; }
     echo "$3 $5" >"$STUB_DIR/started"
     echo '{"result":{"type":"agent_started"}}' ;;
@@ -111,6 +126,67 @@ calls() { cat "$STUB_DIR/calls"; }
 @test "exit 1 when agent start fails" {
   STUB_START_FAIL=1 run "$SCRIPT_UNDER_TEST" --kind codex --cwd "$WORK"
   [ "$status" -eq 1 ]
+}
+
+@test "exit 5 with a JSON reason when Herdr reports agent_not_ready" {
+  STUB_START_NOT_READY=1 STUB_AGENT_STATUS=idle run --separate-stderr \
+    "$SCRIPT_UNDER_TEST" --kind codex --cwd "$WORK" --name reviewer --json
+  [ "$status" -eq 5 ]
+  [ "$(jq -r '.pane_id + " " + .name + " " + .kind' <<<"$output")" = "w1:p9 reviewer codex" ]
+  [ "$(jq -r '.ready' <<<"$output")" = "false" ]
+  [ "$(jq -r '.status' <<<"$output")" = "idle" ]
+  [ "$(jq -r '.reason.code' <<<"$output")" = "agent_not_ready" ]
+  [ "$(jq -r '.reason.message' <<<"$output")" = "startup approval needs attention" ]
+  [[ "$stderr" == *"not ready for input"* ]]
+  grep -qx -- "agent start reviewer --kind codex --pane w1:p9" "$STUB_DIR/calls"
+}
+
+@test "exit 5 exposes the verified pane id in the default output" {
+  STUB_START_NOT_READY=1 run --separate-stderr \
+    "$SCRIPT_UNDER_TEST" --kind codex --cwd "$WORK" --name reviewer
+  [ "$status" -eq 5 ]
+  [ "$output" = "w1:p9" ]
+  [[ "$stderr" == *"startup approval needs attention"* ]]
+}
+
+@test "read-back agent-list failure retains pane id and original not-ready reason" {
+  STUB_START_NOT_READY=1 STUB_READBACK_AGENT_LIST_FAIL=1 run --separate-stderr \
+    "$SCRIPT_UNDER_TEST" --kind codex --cwd "$WORK" --name reviewer
+  [ "$status" -eq 1 ]
+  [[ "$stderr" == *"herdr agent list failed"* ]]
+  [[ "$stderr" == *"w1:p9"* ]]
+  [[ "$stderr" == *"agent_not_ready"* ]]
+  [[ "$stderr" == *"startup approval needs attention"* ]]
+}
+
+@test "read-back process-info failure retains pane id and original not-ready reason" {
+  STUB_START_NOT_READY=1 STUB_READBACK_PROCESS_INFO_FAIL=1 run --separate-stderr \
+    "$SCRIPT_UNDER_TEST" --kind codex --cwd "$WORK" --name reviewer
+  [ "$status" -eq 1 ]
+  [[ "$stderr" == *"herdr pane process-info failed"* ]]
+  [[ "$stderr" == *"w1:p9"* ]]
+  [[ "$stderr" == *"agent_not_ready"* ]]
+  [[ "$stderr" == *"startup approval needs attention"* ]]
+}
+
+@test "missing read-back agent retains pane id and original not-ready reason" {
+  STUB_START_NOT_READY=1 STUB_NO_READBACK_AGENT=1 run --separate-stderr \
+    "$SCRIPT_UNDER_TEST" --kind codex --cwd "$WORK" --name reviewer
+  [ "$status" -eq 4 ]
+  [[ "$stderr" == *"no agent found"* ]]
+  [[ "$stderr" == *"w1:p9"* ]]
+  [[ "$stderr" == *"agent_not_ready"* ]]
+  [[ "$stderr" == *"startup approval needs attention"* ]]
+}
+
+@test "mismatched read-back retains pane id and original not-ready reason" {
+  STUB_START_NOT_READY=1 STUB_KIND=claude run --separate-stderr \
+    "$SCRIPT_UNDER_TEST" --kind codex --cwd "$WORK" --name reviewer
+  [ "$status" -eq 4 ]
+  [[ "$stderr" == *"does not match --kind codex"* ]]
+  [[ "$stderr" == *"w1:p9"* ]]
+  [[ "$stderr" == *"agent_not_ready"* ]]
+  [[ "$stderr" == *"startup approval needs attention"* ]]
 }
 
 @test "exit 4 when the read-back kind or cwd does not match" {

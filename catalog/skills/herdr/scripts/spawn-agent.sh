@@ -30,7 +30,8 @@ usage: spawn-agent.sh --kind KIND [--cwd DIR] [--session NAME] [--pane TARGET]
 
 exit: 0 started and verified, 1 herdr command failed (split / agent start),
       2 usage or validation error, 3 the new shell never became idle,
-      4 agent started but read-back did not match the kind or cwd
+      4 agent started but read-back did not match the kind or cwd,
+      5 agent_not_ready was returned and the started agent was read back
 USAGE
   exit 2
 }
@@ -137,7 +138,13 @@ start=(agent start "$name" --kind "$kind" --pane "$new_pane")
 [ "${#agent_args[@]}" -eq 0 ] || start+=(-- "${agent_args[@]}")
 # The shell can own the foreground before its prompt is drawn; herdr then
 # answers agent_pane_busy, so retry that one error within the shell timeout.
+start_not_ready=0
+start_reason=""
 while ! err=$(h "${start[@]}" 2>&1 >/dev/null); do
+  if start_reason=$(jq -ce '.error | select(.code == "agent_not_ready")' <<<"$err" 2>/dev/null); then
+    start_not_ready=1
+    break
+  fi
   tries=$((tries - 1))
   if [[ "$err" != *agent_pane_busy* ]] || [ "$tries" -le 0 ]; then
     echo "$err" >&2
@@ -148,8 +155,19 @@ while ! err=$(h "${start[@]}" 2>&1 >/dev/null); do
 done
 
 # Read back instead of trusting the start response.
-agents=$(h agent list) || die "herdr agent list failed" 1
-info=$(h pane process-info --pane "$new_pane") || die "herdr pane process-info failed" 1
+report_readback_failure() {
+  echo "error: $1" >&2
+  if [ "$start_not_ready" -eq 1 ]; then
+    printf 'error: agent %s in pane %s was not ready: %s\n' \
+      "$name" "$new_pane" "$start_reason" >&2
+  fi
+}
+
+agents=$(h agent list) || { report_readback_failure "herdr agent list failed"; exit 1; }
+info=$(h pane process-info --pane "$new_pane") || {
+  report_readback_failure "herdr pane process-info failed"
+  exit 1
+}
 result=$(jq -n --arg session "$session" --arg pane "$new_pane" --arg name "$name" \
   --arg direction "$direction" --argjson a "$agents" --argjson i "$info" '
   ($a.result.agents[] | select(.pane_id == $pane)) as $ag
@@ -161,14 +179,23 @@ result=$(jq -n --arg session "$session" --arg pane "$new_pane" --arg name "$name
      processes: [$i.result.process_info.foreground_processes[] | {pid, cmdline, cwd}]}
   ' 2>/dev/null) || result=""
 if [ -z "$result" ]; then
-  echo "error: no agent found in $new_pane after start" >&2
+  report_readback_failure "no agent found in $new_pane after start"
   exit 4
 fi
 if ! jq -e --arg kind "$kind" --arg c "$cwd" --arg cp "$cwd_physical" '
   .kind == $kind and (.cwd == $c or .cwd == $cp)' <<<"$result" >/dev/null; then
-  echo "error: read-back of $new_pane does not match --kind $kind / --cwd $cwd:" >&2
+  report_readback_failure "read-back of $new_pane does not match --kind $kind / --cwd $cwd:"
   jq -c . <<<"$result" >&2
   exit 4
+fi
+
+if [ "$start_not_ready" -eq 1 ]; then
+  result=$(jq --argjson reason "$start_reason" \
+    '. + {ready: false, reason: $reason}' <<<"$result")
+  if [ "$mode" = json ]; then jq . <<<"$result"; else echo "$new_pane"; fi
+  message=$(jq -r '.message // .code' <<<"$start_reason")
+  echo "error: agent '$name' was read back in $new_pane but is not ready for input: $message" >&2
+  exit 5
 fi
 
 if [ "$mode" = json ]; then jq . <<<"$result"; else echo "$new_pane"; fi
