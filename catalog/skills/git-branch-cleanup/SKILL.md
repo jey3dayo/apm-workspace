@@ -26,7 +26,7 @@ path and this skill's path; it runs "Resolve the repository and live context"
 through "Present the Markdown plan" and returns the proposed, exclusion, and
 prune tables with their evidence objects. The subagent is plan-only: it never
 asks the user and never runs a deletion or prune. The parent session shows the
-returned plan, asks one y/n for the proposed rows, and runs "Revalidate and
+returned plan, asks one y/n when the proposed table has rows, and runs "Revalidate and
 execute confirmed rows" itself; that live revalidation is what catches a wrong
 plan row. Keep `model:` out of this skill's frontmatter: a forked skill cannot
 reach the user, and the confirmation boundary must stay with the parent.
@@ -36,7 +36,7 @@ reach the user, and the confirmation boundary must stay with the parent.
 - Treat every invocation as `plan-only` until the user answers y to the plan
   just shown. One y/n covers every row in the proposed table, which holds only
   rows that passed every gate; the user does not restate row IDs, refs, or
-  SHAs, and the skill never asks per row. “Clean up branches” alone is not that
+  SHAs, and the skill never asks per proposed row. “Clean up branches” alone is not that
   answer, because it comes before the plan exists. A y never covers the
   exclusion table or the prune table. A y given to a stale plan is invalid;
   make a new plan.
@@ -346,14 +346,19 @@ records. Because native prune is repository-wide, it may run only when the
 confirmed prune IDs are the complete preview set; otherwise mark prune
 `SKIP` because exact targeting cannot be guaranteed.
 
-Stop after presenting the plan and ask one question answerable with y or n,
-for example: “提案の 8 行（マージ済み・SHA 一致・clean）を削除しますか？ y/n”.
+Stop after presenting the plan. When the proposed table has rows, ask one
+question answerable with y or n that states the actual row count, for example:
+“提案の 8 行（マージ済み・SHA 一致・clean）を削除しますか？ y/n”. An n deletes
+nothing. When the proposed table is empty, ask no y/n.
 
 Do not ask about a row that failed a gate for a reason a human could resolve
-(SHA mismatch, no upstream, no same-repository PR) before that y/n. Run the
-confirmed rows first, then list those rows once, each with its reason and a
-suggested action, as a deferred question. A deferred row is never deleted
-without its own later answer.
+(SHA mismatch, no upstream, no same-repository PR) before that y/n. After the
+confirmed rows run, after an n, or right away when nothing was proposed, list
+those rows once, each with its reason and a suggested action, as a deferred
+question. An answer to it is an instruction to resolve the cause, never a
+deletion confirmation: once the cause is resolved, make a new plan, and delete
+such a row only after it appears in a new proposed table and the user answers y
+to that plan.
 
 ## Revalidate and execute confirmed rows
 
