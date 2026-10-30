@@ -23,7 +23,7 @@ description: >-
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
 | Steward   | 人間との対話・状態確認・説明・軽微修正。許可条件を満たすとき Orchestrator 機能（分解・Worker/Reviewer 起動・差分検証・最終報告）も担う | Sonnet（Opus advisor 併用が既定。Opus も可）                                              | `gpt-6-luna`                                                                                                                                | —                                          | —                                                                                                     | 人間（pane）                                                                          |
 | Architect | 設計判断（後述 Q1 trigger 2〜4 の handoff 先）。常に Orchestrator 機能を担える                                                         | Fable / Opus                                                                              | `gpt-6-astra` / `gpt-6.1-sol` 推奨 / `gpt-6-sol` 旧版 / `gpt-6.1-terra`                                                                     | —                                          | —                                                                                                     | 人間（pane）                                                                          |
-| Reviewer  | SHA 固定 code review / 設計文書 review                                                                                                 | Fable（明示指定時、fallback Opus）                                                        | `gpt-6.1-terra` + effort medium 既定。判断の難度が高いレビューは `gpt-6.1-sol`。旧版 6-sol は Reviewer 不可。`gpt-6-astra` は明示指定時のみ | 不可（opencode は Reviewer に就けない）    | `claude-fable-5-1-thinking-xhigh`（cursor 経路の既定） / `claude-opus-5-5-high` / `gpt-5.6-sol-xhigh` | Orchestrator 機能を担う側（Steward または Architect）。spawn 経路と pane 経路の両方可 |
+| Reviewer  | SHA 固定 code review / 設計文書 review                                                                                                 | Fable（Codex が書いた差分・明示指定時、fallback Opus）                                    | `gpt-6.1-terra` + effort medium 既定。判断の難度が高いレビューは `gpt-6.1-sol`。旧版 6-sol は Reviewer 不可。`gpt-6-astra` は明示指定時のみ | 不可（opencode は Reviewer に就けない）    | `claude-fable-5-1-thinking-xhigh`（cursor 経路の既定） / `claude-opus-5-5-high` / `gpt-5.6-sol-xhigh` | Orchestrator 機能を担う側（Steward または Architect）。spawn 経路と pane 経路の両方可 |
 | Worker    | 実装（設計済みタスク）                                                                                                                 | `sonnet`（Agent `implementer`、Worker の昇格 `opus`。判断を含まない機械的検証は `haiku`） | `gpt-6-luna` xhigh（難度の昇格は `gpt-6.1-sol` 推奨、旧版 `gpt-6-sol` も明示選択可。長文脈の崖は `gpt-6.1-terra`）                          | `deepseek/deepseek-flash` `--variant high` | `claude-sonnet-5-5-high`（昇格 `claude-opus-5-5-high`）                                               | Orchestrator 機能を担う側                                                             |
 
 「Orchestrator」は役ではなく機能。表の Steward / Architect のうち、後述の許可条件を満たす側が担う。Terra は Architect・Reviewer・Worker の昇格に就く。`gpt-6.1-terra` が terra の現行版で、Sol より安価な長文脈選択肢である。opencode は Worker 専用で、implement 以外の役には就けない（review も含む）。cursor は Worker と Reviewer の両方に就けるが、Steward / Architect には就けない（Orchestrator 機能を担えない）。
@@ -32,7 +32,7 @@ agmsg-delegation の helper の allowlist が各 provider から取得したモ�
 
 Codex の Architect と、難度で昇格する Worker には `gpt-6.1-sol` を推奨する。アカウントや client で利用できない場合、または応答前に `server_overloaded` が返る場合は、skill 起因と判断せず、利用可能なら model picker / 設定で旧版 `gpt-6-sol` を明示選択して再試行する。Reviewer は helper が `gpt-6-sol` を拒否する（exit 2）。自動 alias や fallback は行わない。利用可能モデルはアカウントと client により異なるため、[公式モデル一覧](https://learn.chatgpt.com/docs/models)を参照する。
 
-Reviewer 既定の範囲: cursor reviewer が既定になるのはユーザーが cursor 経路を明示したときだけである。review 外注の全体既定は下記「Reviewer の tier」のとおり Codex terra である。
+Reviewer 既定の範囲: cursor reviewer が既定になるのはユーザーが cursor 経路を明示したときだけである。review 外注の全体既定は下記「Reviewer の tier」が決める。
 
 Codex 側の Steward は `gpt-6-luna` のみで、明示ポリシーとして常に Orchestrator 機能を持たない。Codex Steward は handoff 専用と扱う。Codex 側に Opus 相当の中間 tier（terra）を Steward に置くかはユーザー判断に委ね、本スキルでは追加しない。
 
@@ -139,9 +139,11 @@ handoff の実体は `agmsg-delegation` の引き継ぎ（handoff）メッセー
 
 ## Reviewer の tier
 
-review 外注の既定経路は Codex: 起動時引数で `gpt-6.1-sol` / `gpt-6.1-terra` / `gpt-6-astra` から選ぶ。既定は `gpt-6.1-terra`。helper は effort を medium に揃える（`AGMSG_REVIEWER_EFFORT` で上書き）。旧版 `gpt-6-sol` は cached input 単価が `gpt-6.1-sol` の2倍（5 vs 2.5 credits/1M、他の単価は同じ）なので Reviewer では選べない。
+review 外注の既定は、差分を書いた runtime（Worker がいれば Worker の runtime）の逆側にする。Codex が書いた差分は Claude reviewer、それ以外が書いた差分は Codex へ出す。脱相関は Reviewer 側で買うためである。
 
-terra は Sol より安く、レビューの既定に据える。価格差が大きく、読む量が多いレビューでも長文脈リコールが Sol に近いため（5.6 世代の計測、§長文脈）。Sol より下の帯だが、terra は high にしても割に合わないと報告されているため medium に留める。判断の難度が理由で足りないときは `gpt-6.1-sol` へ上げ、必要なら `AGMSG_REVIEWER_EFFORT` も上げる。Claude reviewer（fable 固定）は明示指定された場合のみ使い、fallback は opus。Fable reviewer は Orchestrator 側の Fable rate limit と枠を共有するため、実行中 429 で run ごと失敗しうる。失敗した場合は同経路で再試行せず、Codex `gpt-6.1-terra` へ切り替えて再外注する。`gpt-6-astra` は Sol より上の帯で、価格も能力も上。明示指定されたときだけ使い、既定に据えない。
+Codex 経路は起動時引数で `gpt-6.1-sol` / `gpt-6.1-terra` / `gpt-6-astra` から選ぶ。既定は `gpt-6.1-terra`。helper は effort を medium に揃える（`AGMSG_REVIEWER_EFFORT` で上書き）。旧版 `gpt-6-sol` は cached input 単価が `gpt-6.1-sol` の2倍（5 vs 2.5 credits/1M、他の単価は同じ）なので Reviewer では選べない。
+
+terra は Sol より安く、レビューの既定に据える。価格差が大きく、読む量が多いレビューでも長文脈リコールが Sol に近いため（5.6 世代の計測、§長文脈）。Sol より下の帯だが、terra は high にしても割に合わないと報告されているため medium に留める。判断の難度が理由で足りないときは `gpt-6.1-sol` へ上げ、必要なら `AGMSG_REVIEWER_EFFORT` も上げる。Claude reviewer（fable 固定）は Codex が書いた差分と明示指定された場合に使い、fallback は opus。Fable reviewer は Orchestrator 側の Fable rate limit と枠を共有するため、実行中 429 で run ごと失敗しうる。失敗した場合は同経路で再試行せず、Codex `gpt-6.1-terra` へ切り替えて再外注する。Codex が書いた差分でこの切り替えをしたら、逆側でないことを報告に書く。`gpt-6-astra` は Sol より上の帯で、価格も能力も上。明示指定されたときだけ使い、既定に据えない。
 
 ### self-review 禁止（approval gate）
 

@@ -24,7 +24,7 @@
 
 - lefthook が設定されているリポジトリでは pre-commit / pre-push フックを full gate とみなす。pre-push フックは `git push` 時に走るため、push 前に確認したい場合は `lefthook run pre-push` を手動実行する
 - full gate を実行しない場合は、報告時に実行した軽い確認と省略理由を短く明示する
-- 非軽微な変更は外部共有前に、通常のコードレビュー観点での独立レビューを行う（指摘対応は最大3回。Codex native の別セッションレビューでもよい）。実作業の変更が仕上がったら `ship` で出荷する
+- 非軽微な変更は外部共有前に、通常のコードレビュー観点での独立レビューを行う（指摘対応は最大3回。reviewer の model は `orchestrator-worker`）。実作業の変更が仕上がったら `ship` で出荷する
 
 ## 停止・確認ポリシー
 
@@ -75,7 +75,7 @@ permission や PreToolUse hook のポリシーで拒否されたコマンドは�
 ### 推奨ワークフロー（経路の選択）
 
 - 役割分担: `orchestrator-worker` は委譲判定・タスク分割・**Reviewer と Worker の model 選定**の正本、`agmsg-delegation` は transport の正本
-- 先に `orchestrator-worker` で model を決め、その model と必要な強制境界を満たせる transport を選ぶ。 組み込みサブエージェント（Agent tool / `spawn_agent`）で満たせるならそれを使い、満たせないなら `agmsg-delegation` を使う。「組み込みが使えるなら常に組み込み」ではない——review 外注の既定は Codex 側の model なので、Claude セッションからはたいてい `agmsg-delegation` になる
+- 先に `orchestrator-worker` で model を決め、その model と必要な強制境界を満たせる transport を選ぶ。 組み込みサブエージェント（Agent tool / `spawn_agent`）で満たせるならそれを使い、満たせないなら `agmsg-delegation` を使う。「組み込みが使えるなら常に組み込み」ではない——review 外注の既定は差分を書いた runtime の逆側なので、Claude が書いた差分の review は `agmsg-delegation` で Codex へ出す
 - 実行時に read-only を強制できていない経路の reviewer を verdict へ格上げしない（判定は `agmsg-delegation`）
 - Worker のモデル名をユーザーが指定したら（例:「luna で」）、それが platform を跨ぐ明示指示にあたる。既定は同一 platform 内で完結させる
 - pane / workspace を勝手に作らない。ユーザーが「用意して」と指示したときだけ作り、作った実体を読み戻してから報告する。手順は `herdr` スキルと `agmsg-delegation` の `references/resident-pool.md` が正本（具体コマンドをここに写さない）
