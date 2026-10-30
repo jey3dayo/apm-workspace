@@ -71,7 +71,7 @@ review role の reviewer モデル指定は本スキル内の一時的な model 
 ## Guardrails
 
 - review 中は対象 tree を変更しない。停止するのは implement worker への新規タスク送信だけでなく、**Orchestrator 自身の `git checkout` / 編集 / commit も含む**。worker を 1 体も出していなくても、Orchestrator が tree を動かせば reviewer は指定 SHA と実体の不一致で `BLOCKED` を返す。worker と reviewer を同じ live working tree に同時接続しない。並行して別の作業を進める必要があるときは worktree を切り、review には commit 済み SHA を渡す
-- review の入力は base/head SHA で固定する。固定 diff ファイル方式を採る場合は head SHA に加えファイルの checksum（`shasum -a 256`）も保持し、受信後に改変を検知する
+- review の入力は base/head SHA で固定する。固定 diff ファイル方式を採る場合は head SHA に加えファイルの checksum（`shasum -a 256`）も保持し、受信後に改変を検知する。未 commit の差分では、head SHA は差分の適用元 `HEAD` の full SHA を指す
 - 並列 implement は触るファイル集合が互いに素であることが前提。互いに素にできなければ直列化するか worktree を分ける
 - タスク文を shell command へ生 interpolation しない。boot payload は mode 600 の一時ファイル経由の quote-safe 方式にし、成功・timeout・crash の全経路で削除する
 - review role の read-only は prompt 規約でなく実行時に強制する（下記の runtime 別起動コマンド）
