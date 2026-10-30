@@ -3332,6 +3332,122 @@ function Get-LearningIntakeInboxSummary {
   return "{0} {1} / {2} {3}" -f $pendingLabel, $pendingCount, $deferredLabel, $deferredCount
 }
 
+function Get-ApmReadOnlyOutput {
+  param([string[]]$Arguments)
+  $apmCommand = Get-Command apm -ErrorAction Stop
+  $oldColumns = $env:COLUMNS
+  $oldNoColor = $env:NO_COLOR
+  $oldErrorActionPreference = $ErrorActionPreference
+  try {
+    $env:COLUMNS = "4096"
+    $env:NO_COLOR = "1"
+    # Windows PowerShell 5.1 redirects native stderr as ErrorRecord objects.
+    $ErrorActionPreference = "Continue"
+    $lines = @(& $apmCommand @Arguments 2>&1)
+    $exitCode = $LASTEXITCODE
+    $output = ($lines | ForEach-Object { $_.ToString() } | Out-String).TrimEnd()
+    return [pscustomobject]@{ Output = $output; ExitCode = $exitCode }
+  }
+  finally {
+    $ErrorActionPreference = $oldErrorActionPreference
+    $env:COLUMNS = $oldColumns
+    $env:NO_COLOR = $oldNoColor
+  }
+}
+
+function Get-PrunePreview {
+  $result = Get-ApmReadOnlyOutput -Arguments @("prune", "--dry-run")
+  if ($result.ExitCode -ne 0) {
+    Write-Host $result.Output
+    throw "apm prune --dry-run failed; refusing automatic prune."
+  }
+  return $result.Output
+}
+
+function Get-PrunePreviewState {
+  param([string]$Preview)
+  $started = 0
+  $complete = 0
+  $expected = 0
+  $actual = 0
+  $changes = $false
+  foreach ($line in ($Preview -split "`r?`n")) {
+    switch -Regex ($line) {
+      '^\[>\] Analyzing installed packages vs apm.yml\.\.\.$' { $started++; break }
+      '^\[i\] Retained .+: required package content\.$' { break }
+      '^\[!\] Found ([0-9]+) orphaned package\(s\):$' { $expected += [int]$Matches[1]; $changes = $true; break }
+      '^\[!\]   - ([A-Za-z0-9_./-]+) \(would be removed\)$' {
+        if ($Matches[1] -match '^/|(^|/)\.\.?($|/)|//') {
+          throw "Unrecognized prune preview; refusing automatic prune."
+        }
+        $actual++; break
+      }
+      '^\[!\] Found [0-9]+ invalid deployment ownership record\(s\) in apm.lock.yaml\.$' { $changes = $true; break }
+      '^\[i\] Found [0-9]+ stale lockfile dependency record\(s\) without removable package content\.$' { $changes = $true; break }
+      '^\[i\] \[dry-run\] (remove [0-9]+ stale lockfile dependency record\(s\)|repair .+)$' { $changes = $true; break }
+      '^\[\*\] Dry run complete - no changes made$' { $complete++; break }
+      '^\[\+\] No orphaned packages found\. apm_modules/ is clean\.$' { $complete++; break }
+      '^\[i\] No apm_modules/ directory found\. Nothing to prune\.$' { $complete++; break }
+      default { throw "Unrecognized prune preview; refusing automatic prune." }
+    }
+  }
+  if ($started -ne 1 -or $complete -ne 1 -or $actual -ne $expected) {
+    throw "Unrecognized prune preview; refusing automatic prune."
+  }
+  if ($changes) { return "changes" }
+  return "clean"
+}
+
+function Invoke-PruneCache {
+  Require-Apm
+  Push-Location $WorkspaceDir
+  try {
+    $cache = Join-Path $WorkspaceDir "apm_modules"
+    if (Test-Path -LiteralPath $cache) {
+      $links = @(Get-Item -LiteralPath $cache; Get-ChildItem -LiteralPath $cache -Recurse -Force) |
+        Where-Object { $_.Attributes -band [IO.FileAttributes]::ReparsePoint }
+      if ($links) { throw "Cache contains symlinks; refusing automatic prune." }
+    }
+    $preview = Get-PrunePreview
+    Write-Host $preview
+    $state = Get-PrunePreviewState -Preview $preview
+    $aliases = Select-String -LiteralPath "apm.yml", "apm.lock.yaml" -Pattern '^\s+alias:'
+    if ($aliases) {
+      Write-WarnLine "Automatic prune skipped: aliased packages may be falsely classified as orphaned. Cache retained; repair/deploy may continue."
+    } elseif ($state -eq "changes") {
+      Write-WarnLine "Automatic prune skipped: preview proposes cache or ownership changes whose safety is unverified. Cache retained; repair/deploy may continue."
+    } else {
+      Write-Host "Prune preview is clean; native prune was not executed. Automatic cache cleanup is disabled to avoid deleting packages added after the preview."
+    }
+  }
+  finally { Pop-Location }
+}
+
+function Write-DependencyState {
+  $result = Get-ApmReadOnlyOutput -Arguments @("deps", "list", "-g")
+  Write-Host $result.Output
+  if ($result.ExitCode -eq 0) { return }
+  $normalized = ($result.Output -replace '\s+', ' ').Trim()
+  if ($normalized -ne "[x] Error listing dependencies: Invalid local package path '': path segments must not be empty") {
+    throw "apm deps list -g failed."
+  }
+  $lockPath = Join-Path $WorkspaceDir "apm.lock.yaml"
+  $localFiles = $false
+  $hasLocalFiles = $false
+  foreach ($line in (Get-Content -LiteralPath $lockPath)) {
+    if ($line -eq 'local_deployed_files:') { $localFiles = $true; continue }
+    if ($localFiles -and $line -match '^ *- ') { $hasLocalFiles = $true; break }
+    if ($localFiles -and $line -match '^\S') { break }
+  }
+  if (-not $hasLocalFiles) {
+    throw "apm deps list -g failed."
+  }
+  Write-WarnLine "Known local self-entry failure: using deps tree with reduced orphan detection. Prune preview below is read-only and may include declared packages; no deletion is authorized by this report."
+  & apm deps tree -g
+  if ($LASTEXITCODE -ne 0) { throw "apm deps tree -g failed." }
+  Write-Host (Get-PrunePreview)
+}
+
 function Invoke-Doctor {
   Require-Apm
   Ensure-WorkspaceRepo
@@ -3417,9 +3533,11 @@ function Invoke-Doctor {
   Write-Host ("target skill inventory: entries={0}" -f $skillInventory.Count)
   Write-Host ("external pins: unpinned={0}" -f (@(Get-UnpinnedExternalReferences)).Count)
   Write-CatalogSummary
-  & apm deps list -g
-  if ($LASTEXITCODE -ne 0) {
-    $diagnostics.Add("apm deps list -g failed.")
+  try {
+    Write-DependencyState
+  }
+  catch {
+    $diagnostics.Add($_.Exception.Message)
   }
 
   if ($diagnostics.Count -gt 0) {
@@ -4029,6 +4147,10 @@ switch ($Command) {
     Invoke-Doctor
   }
 
+  "prune:cache" {
+    Invoke-PruneCache
+  }
+
   "bundle-catalog" {
     Invoke-BundleCatalog -RequestedSkillIds $CommandArgs
   }
@@ -4055,6 +4177,7 @@ Commands:
   apply:skills:local Quick-sync local catalog and private skills into ~/.agents/skills only
   refresh            Refresh the checkout and dependencies only; does not deploy
   install-pins       Re-resolve hand-bumped SHA pins (apm install -g --only apm); does not deploy
+  prune:cache        Preview cache cleanup; skip unverified removals
   repair:local-package-cache Rebuild workspace-owned package cache from tracked sources
   pin-external       Pin external manifest refs to lockfile commits
   validate           Validate the ~/.apm workspace

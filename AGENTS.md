@@ -140,7 +140,8 @@ locations.
 
 When a deployed `SKILL.md` is tiny, placeholder, or differs from a complete
 tracked source, compare source, cache, and target first. Prefer `mise run
-deploy:fresh`; it prunes, repairs workspace package caches, then deploys.
+deploy:fresh`; it previews pruning without deleting packages, repairs workspace
+package caches, then deploys.
 
 `apm prune` can miss orphaned owner directories and removed nested skills.
 Compare `apm_modules/` with both manifest and lock; delete only an unreferenced

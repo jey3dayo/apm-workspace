@@ -2493,6 +2493,69 @@ learning_intake_inbox_summary() {
   printf '未処理 %s / 保留 %s' "$pending_count" "$deferred_count"
 }
 
+apm_prune_preview() {
+  local preview
+  if ! preview=$(NO_COLOR=1 COLUMNS=4096 apm prune --dry-run 2>&1); then
+    printf '%s\n' "$preview" >&2
+    error "apm prune --dry-run failed; refusing automatic prune."
+    return 1
+  fi
+  printf '%s\n' "$preview"
+}
+
+cmd_prune_cache() {
+  require_apm
+  (
+    cd "$WORKSPACE_DIR"
+    local cache_links=""
+    if [ -d apm_modules ]; then
+      cache_links=$(find apm_modules -type l -print -quit) || fail "Cannot inspect cache; refusing automatic prune."
+    fi
+    if [ -L apm_modules ] || [ -n "$cache_links" ]; then
+      fail "Cache contains symlinks; refusing automatic prune."
+    fi
+    [ -r apm.yml ] && [ -r apm.lock.yaml ] || fail "Manifest and lockfile are required for the prune preview."
+    local preview preview_state
+    preview=$(apm_prune_preview) || return 1
+    printf '%s\n' "$preview"
+    preview_state=$(printf '%s\n' "$preview" | awk -f "$APM_AWK_DIR/prune-preview.awk") || {
+      error "Unrecognized prune preview; refusing automatic prune."
+      return 1
+    }
+    local alias_status=0
+    grep -E '^[[:space:]]+alias:' apm.yml apm.lock.yaml >/dev/null || alias_status=$?
+    if [ "$alias_status" -gt 1 ]; then
+      error "Cannot read alias declarations; refusing to continue cache recovery."
+      return "$alias_status"
+    fi
+    if [ "$alias_status" -eq 0 ]; then
+      warn "Automatic prune skipped: aliased packages may be falsely classified as orphaned. Cache retained; repair/deploy may continue."
+    elif [ "$preview_state" = changes ]; then
+      warn "Automatic prune skipped: preview proposes cache or ownership changes whose safety is unverified. Cache retained; repair/deploy may continue."
+    else
+      log "Prune preview is clean; native prune was not executed. Automatic cache cleanup is disabled to avoid deleting packages added after the preview."
+    fi
+  )
+}
+
+report_dependency_state() {
+  local dependency_output normalized
+  if dependency_output=$(NO_COLOR=1 COLUMNS=4096 apm deps list -g 2>&1); then
+    printf '%s\n' "$dependency_output"
+    return 0
+  fi
+  printf '%s\n' "$dependency_output" >&2
+  normalized=$(printf '%s\n' "$dependency_output" | awk '{$1=$1; printf "%s%s", sep, $0; sep=" "}')
+  if [ "$normalized" != "[x] Error listing dependencies: Invalid local package path '': path segments must not be empty" ] ||
+    ! awk '/^local_deployed_files:$/ { local_files=1; next } local_files && /^ *- / { found=1; exit } local_files && /^[^ ]/ { exit } END { exit !found }' apm.lock.yaml; then
+    error "apm deps list -g failed."
+    return 1
+  fi
+  warn "Known local self-entry failure: using deps tree with reduced orphan detection. Prune preview below is read-only and may include declared packages; no deletion is authorized by this report."
+  apm deps tree -g || return 1
+  apm_prune_preview
+}
+
 cmd_doctor() {
   require_apm
   ensure_workspace_repo
@@ -2587,8 +2650,8 @@ cmd_doctor() {
     rm -f "$inventory_file"
     printf 'external pins: unpinned=%s\n' "$(unpinned_external_references | awk 'NF { count++ } END { print count + 0 }')"
     print_catalog_summary
-    apm deps list -g
-    [ "$has_failure" -eq 0 ] || fail "Doctor found missing or invalid managed catalog outputs"
+    report_dependency_state || has_failure=1
+    [ "$has_failure" -eq 0 ] || fail "Doctor found dependency or managed catalog output failures"
   )
 }
 
@@ -2717,6 +2780,7 @@ Commands:
   apply:skills:local Quick-sync local catalog and private skills into ~/.agents/skills; private skills also link into ~/.claude/skills
   refresh            Refresh the checkout and dependencies only; does not deploy
   install-pins       Re-resolve hand-bumped SHA pins (apm install -g --only apm); does not deploy
+  prune:cache        Preview cache cleanup; skip unverified removals
   repair:local-package-cache Rebuild workspace-owned package cache from tracked sources
   pin-external       Pin external manifest refs to lockfile commits
   validate           Validate the ~/.apm workspace
@@ -2748,6 +2812,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     validate) cmd_validate ;;
     validate:catalog) cmd_validate_catalog ;;
     doctor) cmd_doctor ;;
+    prune:cache) cmd_prune_cache ;;
     bundle-catalog) cmd_bundle_catalog "$@" ;;
     prepare:catalog) cmd_stage_catalog "$@" ;;
     install:catalog) cmd_register_catalog "$@" ;;

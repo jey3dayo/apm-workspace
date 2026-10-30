@@ -121,12 +121,18 @@ depends = ["test:ps", "test:sh"]
 description = "Run checks, deploy the current workspace state, and inspect targets"
 run = [{ task = "check" }, { task = "apply" }, { task = "doctor" }]
 
+[tasks."prune:cache"]
+description = "Report cache prune preview without automatic deletion"
+hide = true
+run = "bash ./scripts/apm-workspace.sh prune:cache"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 prune:cache"
+
 [tasks."deploy:fresh"]
 description = "Rebuild APM dependency cache and deploy when normal deploy output looks stale"
-# Recovery path and apm-deploy-verify's rollout (prunes and repairs caches first); plain `deploy` is the normal path.
+# Recovery retains unverified prune candidates and repairs owned caches; plain `deploy` is the normal path.
 hide = true
 run = [
-  "apm prune",
+  { task = "prune:cache" },
   { task = "repair:local-package-cache" },
   { task = "deploy" },
 ]
