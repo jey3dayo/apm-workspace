@@ -28,9 +28,9 @@ description: >-
 
 「Orchestrator」は役ではなく機能。表の Steward / Architect のうち、後述の許可条件を満たす側が担う。Terra は Architect・Reviewer・Worker の昇格に就く。`gpt-6.1-terra` が terra の現行版で、Sol より安価な長文脈選択肢である。opencode は Worker 専用で、implement 以外の役には就けない（review も含む）。cursor は Worker と Reviewer の両方に就けるが、Steward / Architect には就けない（Orchestrator 機能を担えない）。
 
-agmsg-delegation の helper の allowlist が各 provider から取得したモデル一覧（Codex は fetched_at 付きのローカル cache）に載っているかは `~/.apm` の `mise run models:check` で確認する（MISSING は取得した一覧に未掲載で直ちに直し、NEWER は同系列の新しい版で原則として helper の allowlist と tier 表を新しい版へ上げる（価格帯が変わる場合だけ確認する）、RETIRING は廃止予告（Codex の retirement_at または一覧から隠されたモデル / opencode の deprecated）で後継へ切り替える。tier 表と helper の一致は helper のテストが見る）。
+モデルを更改するとき、表のモデルが使えないとき、`server_overloaded` が返ったとき、表の選定理由を確かめるときは [references/models.md](references/models.md) を読む。
 
-Codex の Architect と、難度で昇格する Worker には `gpt-6.1-sol` を推奨する。アカウントや client で利用できない場合、または応答前に `server_overloaded` が返る場合は、skill 起因と判断せず、利用可能なら model picker / 設定で旧版 `gpt-6-sol` を明示選択して再試行する。Reviewer は helper が `gpt-6-sol` を拒否する（exit 2）。自動 alias や fallback は行わない。利用可能モデルはアカウントと client により異なるため、[公式モデル一覧](https://learn.chatgpt.com/docs/models)を参照する。
+Codex の Architect と、難度で昇格する Worker には `gpt-6.1-sol` を推奨する。
 
 Reviewer 既定の範囲: cursor reviewer が既定になるのはユーザーが cursor 経路を明示したときだけである。review 外注の全体既定は下記「Reviewer の tier」が決める。
 
@@ -141,9 +141,9 @@ handoff の実体は `agmsg-delegation` の引き継ぎ（handoff）メッセー
 
 review 外注の既定は、差分を書いた runtime（Worker がいれば Worker の runtime）の逆側にする。Codex が書いた差分は Claude reviewer、それ以外が書いた差分は Codex へ出す。脱相関は Reviewer 側で買うためである。
 
-Codex 経路は起動時引数で `gpt-6.1-sol` / `gpt-6.1-terra` / `gpt-6-astra` から選ぶ。既定は `gpt-6.1-terra`。helper は effort を medium に揃える（`AGMSG_REVIEWER_EFFORT` で上書き）。旧版 `gpt-6-sol` は cached input 単価が `gpt-6.1-sol` の2倍（5 vs 2.5 credits/1M、他の単価は同じ）なので Reviewer では選べない。
+Codex 経路は起動時引数で `gpt-6.1-sol` / `gpt-6.1-terra` / `gpt-6-astra` から選ぶ。既定は `gpt-6.1-terra`。helper は effort を medium に揃える（`AGMSG_REVIEWER_EFFORT` で上書き）。旧版 `gpt-6-sol` は Reviewer では選べない。判断の難度が理由で足りないときは `gpt-6.1-sol` へ上げ、必要なら `AGMSG_REVIEWER_EFFORT` も上げる。`gpt-6-astra` は明示指定されたときだけ使う。
 
-terra は Sol より安く、レビューの既定に据える。価格差が大きく、読む量が多いレビューでも長文脈リコールが Sol に近いため（5.6 世代の計測、§長文脈）。Sol より下の帯だが、terra は high にしても割に合わないと報告されているため medium に留める。判断の難度が理由で足りないときは `gpt-6.1-sol` へ上げ、必要なら `AGMSG_REVIEWER_EFFORT` も上げる。Claude reviewer（fable 固定）は Codex が書いた差分と明示指定された場合に使い、fallback は opus。Fable reviewer は Orchestrator 側の Fable rate limit と枠を共有するため、実行中 429 で run ごと失敗しうる。失敗した場合は同経路で再試行せず、Codex `gpt-6.1-terra` へ切り替えて再外注する。Codex が書いた差分でこの切り替えをしたら、逆側でないことを報告に書く。`gpt-6-astra` は Sol より上の帯で、価格も能力も上。明示指定されたときだけ使い、既定に据えない。
+Claude reviewer（fable 固定）は Codex が書いた差分と明示指定された場合に使い、fallback は opus。Fable reviewer が実行中に 429 で失敗したら同経路で再試行せず、Codex `gpt-6.1-terra` へ切り替えて再外注する。Codex が書いた差分でこの切り替えをしたら、逆側でないことを報告に書く。
 
 ### self-review 禁止（approval gate）
 
@@ -231,15 +231,13 @@ Codex native の `spawn_agent` を標準経路とする。native spawn が利用
 | opencode | `deepseek/deepseek-flash` `--variant high` | 昇格ではなく経路差し替え。既存の Codex Luna 経路へ出す（§4 の差し替え契約を適用） | 計測まで対象外（既存の Terra 経路へ送る）       |
 | cursor   | `claude-sonnet-5-5-high`                   | cursor 内で `claude-opus-5-5-high` へ昇格                                         | 計測まで対象外（既存の Codex Terra 経路へ送る） |
 
-opencode 行の「難度で詰まったとき」は tier を上げる昇格ではない。opencode には昇格先の上位 tier が無く、Worker の昇格 3 条件（再現困難なデバッグ / セキュリティ境界 / トレードオフ判断）に当たるタスクはそもそも opencode へ出さず、既存の Claude / Codex 経路へ回す。`--variant max` で足りなかった場合に Codex Luna 経路へ出すのも同様に経路差し替えであり、差し替え先と理由を起動前にユーザーへ報告し、最終報告にも記す（§4 の「差し替え先と理由を…」契約と同じ扱い）。長文脈タスク（大規模コードベースの読解、複数文書の統合、長い履歴の追跡）は opencode の recall 実測が済むまで対象外とし、既存の Codex Terra 経路へ送る。
-
-cursor 行の「難度で詰まったとき」は cursor 内で `claude-opus-5-5-high` へ昇格する（tier 表 Reviewer 行と同じ model へ揃える）。長文脈リコールは未計測であり、計測が済むまで長文脈タスクは cursor の対象外として既存の Codex Terra 経路へ送る（経路差し替えであり昇格ではない。差し替え先と理由を起動前にユーザーへ報告し、最終報告にも記す）。
+Worker の昇格 3 条件に当たるタスクは opencode へ出さず、既存の Claude / Codex 経路へ回す。opencode 行と cursor 行で別経路へ送るのは昇格ではなく経路差し替えで、§4 の契約どおり差し替え先と理由を起動前にユーザーへ報告し、最終報告にも記す。
 
 昇格先が現在のモデル自身になる場合（terra セッションが長文脈タスクで terra へ達した場合など）も、**親 session がそのまま実装しない**。同じモデルの Worker を、別 identity・別 session として起動する。§5 の照合は成果物を独立に確かめることを前提にしており、起動側と実装側が同一 session だとその前提が崩れる（context も混ざる）。別 session を確保できない場合は `BLOCKED` とし、Architect へ handoff する。
 
-難度が理由のときに Terra を中間段として挟まない。Terra は Sol より安く弱いため、上の 3 条件に対しては Sol より弱い段を 1 つ増やすことになる。挟んで足りなかったときに払うのは価格差ではなく、タスク 1 本分の作業と Orchestrator の再検証がもう一周ぶんである。「Terra では難度に足りない」という実測があるわけではなく、失敗した 1 周のコストが価格差より大きいという判断による。価格は変わりやすいため本文に固定値を置かず、昇格先を選ぶ際は [公式 rate card](https://help.openai.com/en/articles/20001106-codex-rate-card) で現在値を確認する。Luna が安いことは無制限であることを意味しない——どの tier も共有クレジットプールと利用上限を消費する。`gpt-6-astra` は Worker の昇格先にしない。実装トークンを安い Worker へ隔離するという本スキルの目的が反転するため。
+難度が理由のときに Terra を中間段として挟まない。`gpt-6-astra` は Worker の昇格先にしない。昇格先を選ぶ際は [公式 rate card](https://help.openai.com/en/articles/20001106-codex-rate-card) で現在の価格を確認する。
 
-長文脈タスク（大規模コードベースの読解、複数文書の統合、長い履歴の追跡）は effort 引き上げを飛ばして直接 `gpt-6.1-terra` へ上げる。ここで Terra を選ぶのは能力不足を補うためではなく、Sol とほぼ同等の長文脈リコールを Sol より安く買うためである。`luna` は長文脈リコールに崖があり（5.6 世代の計測: MRCR 41.3% / Sol 91.5% / Terra 89.6%、[OpenAI](https://openai.com/index/gpt-5-6)。gpt-6 世代は未計測）、effort 引き上げで緩和されるという実測は公表されていない。terra セッション自身が長文脈タスクを受けた場合も、上の一般則どおり親 session では実装せず、別 identity・別 session の terra Worker を起動する。
+長文脈タスク（大規模コードベースの読解、複数文書の統合、長い履歴の追跡）は effort 引き上げを飛ばして直接 `gpt-6.1-terra` へ上げる。terra セッション自身が長文脈タスクを受けた場合も、上の一般則どおり親 session では実装せず、別 identity・別 session の terra Worker を起動する。
 
 Claude では独立タスクを同一レスポンス内で複数呼び出すと並列に走る（1レスポンス1呼び出しは直列になる）。Codex では worker を複数 detached 起動する（触るファイル集合が互いに素であることが前提。guardrails は `agmsg-delegation` を参照）。どちらも Orchestrator の会話履歴は引き継がせず、Section 3 で書き出した 3 点だけを渡す。
 
