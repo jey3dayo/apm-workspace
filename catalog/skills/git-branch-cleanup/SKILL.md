@@ -26,17 +26,20 @@ path and this skill's path; it runs "Resolve the repository and live context"
 through "Present the Markdown plan" and returns the proposed, exclusion, and
 prune tables with their evidence objects. The subagent is plan-only: it never
 asks the user and never runs a deletion or prune. The parent session shows the
-returned plan, collects exact row confirmation, and runs "Revalidate and
+returned plan, asks one y/n for the proposed rows, and runs "Revalidate and
 execute confirmed rows" itself; that live revalidation is what catches a wrong
 plan row. Keep `model:` out of this skill's frontmatter: a forked skill cannot
 reach the user, and the confirmation boundary must stay with the parent.
 
 ## Safety contract
 
-- Treat every invocation as `plan-only` until the user explicitly confirms the
-  exact plan row IDs, branch refs, and SHAs to mutate. “Clean up branches” is
-  not confirmation. A confirmation for a stale plan is invalid; make a new
-  plan.
+- Treat every invocation as `plan-only` until the user answers y to the plan
+  just shown. One y/n covers every row in the proposed table, which holds only
+  rows that passed every gate; the user does not restate row IDs, refs, or
+  SHAs, and the skill never asks per row. “Clean up branches” alone is not that
+  answer, because it comes before the plan exists. A y never covers the
+  exclusion table or the prune table. A y given to a stale plan is invalid;
+  make a new plan.
 - The automatic candidate set is a local branch with one unambiguous upstream
   branch on a resolved remote. A remote-only branch is never an automatic
   candidate.
@@ -81,7 +84,7 @@ reach the user, and the confirmation boundary must stay with the parent.
   such ref and no remote step at all — only worktrees and the local branch are
   in scope, and nothing about it is recoverable from the remote. Use `git branch -D` only for the narrow squash or
   rebase case after the same exact SHA and merged-PR evidence has passed live
-  revalidation and the user confirmed that row.
+  revalidation and the row was in the plan the user confirmed with y.
 
 ## Resolve the repository and live context
 
@@ -343,14 +346,18 @@ records. Because native prune is repository-wide, it may run only when the
 confirmed prune IDs are the complete preview set; otherwise mark prune
 `SKIP` because exact targeting cannot be guaranteed.
 
-Stop after presenting the plan and ask for confirmation of exact rows, for
-example: “Confirm rows 1 and 3 exactly as shown, including their refs and
-SHAs.” Do not treat confirmation of a branch prefix, a PR number alone, or a
-general cleanup request as row confirmation.
+Stop after presenting the plan and ask one question answerable with y or n,
+for example: “提案の 8 行（マージ済み・SHA 一致・clean）を削除しますか？ y/n”.
+
+Do not ask about a row that failed a gate for a reason a human could resolve
+(SHA mismatch, no upstream, no same-repository PR) before that y/n. Run the
+confirmed rows first, then list those rows once, each with its reason and a
+suggested action, as a deferred question. A deferred row is never deleted
+without its own later answer.
 
 ## Revalidate and execute confirmed rows
 
-Only after exact row confirmation, process rows one at a time. Immediately
+Only after the user's y, process the proposed rows one at a time. Immediately
 before each deletion, independently re-resolve and compare the live state with
 that row:
 
@@ -416,7 +423,7 @@ native syntax, and perform operations in this order:
    same-owner/same-repository, with every head SHA equal to the local SHA, and
    equal to the remote SHA as well on a `remote-present` row. On a
    `remote-absent` row the exact ref must still be absent from a fresh
-   successful `ls-remote`; a failed query is not absence. The user must have confirmed that exact row. Do not use `-D`
+   successful `ls-remote`; a failed query is not absence. The row must have been in the plan the user confirmed with y. Do not use `-D`
    for a mismatch, unknown state, failed worktree removal, remote failure, or
    an unmerged/OPEN/DRAFT PR. If local deletion fails for any other reason, or
    the permitted fallback fails, stop the row there; on a `remote-present` row
