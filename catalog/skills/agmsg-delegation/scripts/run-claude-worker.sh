@@ -68,6 +68,8 @@ escape_sb_path() {
 	printf '%s' "$value"
 }
 
+# 未作成のまま解決すると空要素になり、profile に不正な (subpath "") が入る。
+mkdir -p -- "$HOME/.claude"
 write_paths=(
 	/dev
 	"$(cd -- "$HOME/.claude" && pwd -P)"

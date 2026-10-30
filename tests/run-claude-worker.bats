@@ -100,6 +100,20 @@ file_mode() {
   ! grep -qF "(deny file-write* (subpath \"$canonical\"))" "$dir/profile.sb"
 }
 
+# CI の runner には ~/.claude が無く、空の write path が全 root を重なり判定にしていた。
+@test "a HOME without .claude still launches with no empty subpath in the profile" {
+  mkdir "$WORKDIR/home"
+  run bash -c 'cd "$1" && HOME="$5" PATH="$1:$PATH" AGMSG_CLAUDE_BIN=./stub "$2" review "$3" "$4"' \
+    _ "$WORKDIR" "$SCRIPT" "$PROJECT" "$PAYLOAD" "$WORKDIR/home"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"STUB cwd="* ]]
+  local dir claude_dir
+  dir="$AGMSG_EVIDENCE_ROOT/$(basename "$(dirname "$PAYLOAD")")"
+  claude_dir="$(cd "$WORKDIR/home/.claude" && pwd -P)"
+  ! grep -qF '(subpath "")' "$dir/profile.sb"
+  grep -qF "(subpath \"$claude_dir\")" "$dir/profile.sb"
+}
+
 @test "an existing evidence directory refuses the run before anything launches" {
   mkdir -p "$AGMSG_EVIDENCE_ROOT/$(basename "$(dirname "$PAYLOAD")")"
   run bash -c 'cd "$1" && PATH="$1:$PATH" AGMSG_CLAUDE_BIN=./stub "$2" review "$3" "$4"' \
