@@ -197,7 +197,7 @@ READY 後も DONE / REVIEW だけを無期限に待たず、agmsg DB に届い�
 
 1. head SHA（+ diff ファイル方式なら checksum）が起動時と一致する
 2. 報告の `review_mode` が起動時に envelope へ書いた値と一致する（`advisory` を渡したのに `verdict` 行が返るのは契約違反）
-3. `review_mode: verdict` の場合、**起動前に強制境界の証拠を記録している**。spawn 経路なら helper による profile 配置と `cmp` 成功、pane 経路なら [references/resident-pool.md](references/resident-pool.md) の確認手順の記録。**cursor 経路**では次の3点をすべて満たすことを証拠として記録する: (a) helper が生成した profile が期待内容と完全一致している、(b) preflight と本番 run が同一 profile・同一 canonical project で起動されている、(c) review profile 下の実 agent run で対象 project 内への write が拒否されファイルが実体として存在しないことを smoke 済みである
+3. `review_mode: verdict` の場合、**起動前に強制境界の証拠を記録している**。Codex の spawn 経路なら helper による profile 配置と `cmp` 成功、Claude の spawn 経路なら helper が起動前に書いた `~/.local/state/agmsg-delegation/evidence/<run_dir の basename>/`（`pwd -P` の結果が同じ位置で、symlink 経由でない）で、`meta` が `role=review` と対象 project の canonical path の2行であり、`profile.sb` に同じ path を指す `(deny file-write* (subpath "…"))` 行があること（worker が書ける `worker.log` の内容は証拠にしない）、pane 経路なら [references/resident-pool.md](references/resident-pool.md) の確認手順の記録。**cursor 経路**では次の3点をすべて満たすことを証拠として記録する: (a) helper が生成した profile が期待内容と完全一致している、(b) preflight と本番 run が同一 profile・同一 canonical project で起動されている、(c) review profile 下の実 agent run で対象 project 内への write が拒否されファイルが実体として存在しないことを smoke 済みである
 4. reviewer の identity がレビュー対象の作者と異なる（approval gate は `orchestrator-worker` が正本）
 5. pane 常駐経路では加えて、`git status --short` と `git ls-files --others --exclude-standard` が review 開始時点と差分なし
 
@@ -211,7 +211,7 @@ implement 用の diff 検証手順は適用しない。
 
 1. launchd job が終了するまで最大10秒待つ。終了しない場合は最終ログを保存して crash 扱いとし、job を bootout しない
 2. `~/.agents/skills/agmsg/scripts/reset.sh <対象project絶対パス> <runtime_type> <worker_name> <session_id>`（orchestrator 自身の cwd ではなく **対象 project と worker_name を指定**する。Claude worker は READY で受け取った session_id を第4引数に渡して actas lock も解放する。session_id を取得できなかった場合のみ省略し、crash cleanup として記録する）
-3. worker job が終了済みであることを確認して `launchctl bootout "gui/$(id -u)" "$run_dir/worker.plist"` を実行してから、`rm -rf -- "$run_dir"` で専用一時ディレクトリだけを削除する（登録は `launchctl bootstrap` なので解除も `bootout` を使う。旧 API の `launchctl remove` は使わない）
+3. worker job が終了済みであることを確認して `launchctl bootout "gui/$(id -u)" "$run_dir/worker.plist"` を実行してから、`rm -rf -- "$run_dir"` で専用一時ディレクトリだけを削除する。Claude worker なら、受理判定を終えた後に同じ basename の証拠ディレクトリも削除する（登録は `launchctl bootstrap` なので解除も `bootout` を使う。旧 API の `launchctl remove` は使わない）
 
 worker が crash / timeout した場合も同じ 1→3 の順序で片付け、最終ログ・launchd job 状態・exit status を記録する。job が終了していない場合は一時ディレクトリを残し、ユーザーへ job label とログパスを報告する。
 

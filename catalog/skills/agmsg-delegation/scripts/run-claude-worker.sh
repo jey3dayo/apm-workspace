@@ -107,6 +107,33 @@ fi
 	fi
 } >"$profile"
 
+# 同一パス・配下・祖先のいずれかなら、worker が chmod・削除・再作成で証拠を偽装できる。
+paths_overlap() {
+	[[ "$1" == "$2" || "$1" == "${2%/}/"* || "$2" == "${1%/}/"* ]]
+}
+
+# profile は終了時に消えるので、書込境界の証拠を worker の write_paths 外へ残す。
+# worker が書けない場所に置くことで改ざんを防ぎ、既存の run id は偽証拠の先置きとみなして拒否する。
+evidence_root=${AGMSG_EVIDENCE_ROOT:-$HOME/.local/state/agmsg-delegation/evidence}
+run_id=$(basename -- "$(dirname -- "$payload_file")")
+mkdir -p -- "$evidence_root"
+evidence_root=$(cd -- "$evidence_root" && pwd -P)
+for write_path in "${write_paths[@]}"; do
+	if paths_overlap "$evidence_root" "$write_path"; then
+		printf 'Evidence root %s overlaps worker-writable path %s\n' "$evidence_root" "$write_path" >&2
+		exit 1
+	fi
+done
+evidence_dir="$evidence_root/$run_id"
+if ! mkdir -m 700 -- "$evidence_dir"; then
+	printf 'Evidence directory already exists or cannot be created: %s\n' "$evidence_dir" >&2
+	exit 1
+fi
+cp -- "$profile" "$evidence_dir/profile.sb"
+printf 'role=%s\nproject=%s\n' "$role" "$project" >"$evidence_dir/meta"
+chmod 400 "$evidence_dir/profile.sb" "$evidence_dir/meta"
+printf 'agmsg-delegation: sandbox profile evidence=%s\n' "$evidence_dir" >&2
+
 claude_args=(
 	-p
 	--model "$model"
