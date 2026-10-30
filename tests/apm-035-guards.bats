@@ -3,7 +3,7 @@
 setup() {
   repo_root="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
   mise_binary=$(command -v mise)
-  fixture=$(mktemp -d "$repo_root/tmp/apm-guards.XXXXXX")
+  fixture="$BATS_TEST_TMPDIR"
   export HOME="$fixture/home" APM_WORKSPACE_DIR="$fixture/workspace"
   export GUARD_CALLS="$fixture/calls" GUARD_PREVIEW="$fixture/preview"
   mkdir -p "$HOME" "$APM_WORKSPACE_DIR/apm_modules/owner/gist" "$fixture/bin"
@@ -30,10 +30,6 @@ SH
   export PATH="$fixture/bin:$PATH"
   source "$repo_root/scripts/apm-workspace.sh"
   WORKSPACE_DIR="$APM_WORKSPACE_DIR"
-}
-
-teardown() {
-  trash "$fixture"
 }
 
 doctor_fixture() {

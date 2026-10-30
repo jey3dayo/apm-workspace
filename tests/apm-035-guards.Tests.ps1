@@ -3,7 +3,7 @@ $ErrorActionPreference = "Stop"
 Describe "APM 0.35 cache and doctor safeguards" -Tag "apm035" {
   BeforeAll {
     $script:originalWorkspaceEnv = $env:APM_WORKSPACE_DIR
-    $script:fixtureRoot = Join-Path (Join-Path $PSScriptRoot "../tmp") ("guards-pester-" + [guid]::NewGuid().ToString("N"))
+    $script:fixtureRoot = Join-Path $TestDrive "guards-pester"
     New-Item -ItemType Directory -Path $script:fixtureRoot -Force | Out-Null
     $env:APM_WORKSPACE_DIR = $script:fixtureRoot
     $env:APM_WORKSPACE_LIB_ONLY = "1"
@@ -14,7 +14,6 @@ Describe "APM 0.35 cache and doctor safeguards" -Tag "apm035" {
 
   AfterAll {
     $env:APM_WORKSPACE_DIR = $script:originalWorkspaceEnv
-    & trash $script:fixtureRoot
   }
 
   BeforeEach {
@@ -115,7 +114,10 @@ Describe "APM 0.35 cache and doctor safeguards" -Tag "apm035" {
   }
 
   It "fails closed for symlinked cache content" {
-    New-Item -ItemType SymbolicLink -Path (Join-Path $WorkspaceDir "apm_modules/link") -Target $script:fixtureRoot | Out-Null
+    $symlinkTarget = Join-Path $TestDrive "guards-cache-symlink-target"
+    $symlinkPath = Join-Path $WorkspaceDir "apm_modules/link"
+    New-Item -ItemType Directory -Path $symlinkTarget -Force | Out-Null
+    New-Item -ItemType SymbolicLink -Path $symlinkPath -Target $symlinkTarget | Out-Null
     { Invoke-PruneCache } | Should -Throw '*Cache contains symlinks*'
   }
 
@@ -129,7 +131,7 @@ Describe "APM 0.35 cache and doctor safeguards" -Tag "apm035" {
 Describe "native APM stderr capture" -Tag "apm035" {
   BeforeAll {
     $script:originalNativeWorkspaceEnv = $env:APM_WORKSPACE_DIR
-    $script:nativeFixtureRoot = Join-Path (Join-Path $PSScriptRoot "../tmp") ("guards-native-" + [guid]::NewGuid().ToString("N"))
+    $script:nativeFixtureRoot = Join-Path $TestDrive "guards-native"
     New-Item -ItemType Directory -Path $script:nativeFixtureRoot -Force | Out-Null
     $env:APM_WORKSPACE_DIR = $script:nativeFixtureRoot
     $env:APM_WORKSPACE_LIB_ONLY = "1"
@@ -139,7 +141,6 @@ Describe "native APM stderr capture" -Tag "apm035" {
 
   AfterAll {
     $env:APM_WORKSPACE_DIR = $script:originalNativeWorkspaceEnv
-    & trash $script:nativeFixtureRoot
   }
 
   It "preserves native stderr and exit status <ExitStatus> under Stop and restores preferences" -TestCases @(
