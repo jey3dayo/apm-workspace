@@ -46,17 +46,23 @@ herdr="${HERDR_BIN_PATH:-herdr}"
 # --session beats HERDR_SOCKET_PATH, so each session is addressed explicitly.
 session_list=$("$herdr" session list --json)
 sessions=$(jq -r '.sessions[] | select(.running) | .name' <<<"$session_list")
-current=$(jq -r --arg sock "${HERDR_SOCKET_PATH:-}" '
-  (.sessions[] | select($sock != "" and .socket_path == $sock) | .name),
-  (.sessions[] | select($sock == "" and .default) | .name)' <<<"$session_list")
+current=$(jq -r --arg sock "${HERDR_SOCKET_PATH-}" --arg socket_set "${HERDR_SOCKET_PATH+x}" \
+  --arg session_env "${HERDR_SESSION:-}" '
+  if $socket_set != "" then
+    .sessions[] | select(.socket_path == $sock) | .name
+  elif $session_env != "" then
+    $session_env
+  else
+    .sessions[] | select(.default) | .name
+  end' <<<"$session_list")
 
 rows="[]"
 for s in $sessions; do
   [ -z "$session" ] || [ "$s" = "$session" ] || continue
-  if ! agents=$("$herdr" --session "$s" agent list 2>/dev/null) ||
-    ! workspaces=$("$herdr" --session "$s" workspace list 2>/dev/null); then
-    echo "warning: session '$s' did not answer; skipped" >&2
-    continue
+  if ! agents=$("$herdr" --session "$s" agent list) ||
+    ! workspaces=$("$herdr" --session "$s" workspace list); then
+    echo "error: session '$s' did not answer; results are incomplete" >&2
+    exit 2
   fi
   rows=$(jq -n --arg s "$s" --argjson acc "$rows" \
     --argjson a "$agents" --argjson w "$workspaces" '
@@ -69,6 +75,7 @@ for s in $sessions; do
         name: (.name // null),
         workspace: ($labels[.workspace_id] // .workspace_id),
         cwd: (.foreground_cwd // .cwd),
+        _repo_cwd: .cwd,
         title: (.terminal_title_stripped // null),
         agent_session: (.agent_session.value // null)
       }]')
@@ -83,9 +90,9 @@ matches=$(jq --arg q "$query" --arg kind "$kind" --arg status "$status" \
     and ($kind == "" or .kind == $kind)
     and ($status == "" or .status == $status)
     and ($name == "" or .name == $name)
-    and has(.cwd; $repo)
+    and (has(.cwd; $repo) or has(._repo_cwd; $repo))
     and has(.title; $title)
-  )]' <<<"$rows")
+  ) | del(._repo_cwd)]' <<<"$rows")
 count=$(jq length <<<"$matches")
 
 case "$mode" in

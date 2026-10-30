@@ -86,16 +86,16 @@ version 依存の詳細が要るときは `herdr <group>`（例 `herdr pane`, `h
 
 ### Agent を探す
 
-Claude / Codex などの agent を探すときは、`herdr agent list` の raw JSON を読んで推論せず、同梱の `scripts/find-agent.sh` を使う。読み取り専用で、起動中の全 named session を横断して 1 agent 1 行（session・pane_id・kind・status・name・workspace・cwd・title・agent session id）で出す。
+Claude / Codex などの agent を探すときは、`herdr agent list` の raw JSON を読んで推論せず、配布済みの `~/.agents/skills/herdr/scripts/find-agent.sh` を使う。読み取り専用で、起動中の全 named session を横断して 1 agent 1 行（session・pane_id・kind・status・name・workspace・cwd・title・agent session id）で出す。
 
 ```bash
-scripts/find-agent.sh                       # 全 session の agent 一覧
-scripts/find-agent.sh 019a2b3c              # agent session id（前方一致）/ herdr session 名 / agent 名
-scripts/find-agent.sh --kind codex --repo my-app --status idle
-pane=$(scripts/find-agent.sh -q --kind claude --title 受信トレイ)  # 1件のときだけ pane_id。0件は exit 1、複数は exit 3
+"$HOME/.agents/skills/herdr/scripts/find-agent.sh"                       # 全 session の agent 一覧
+"$HOME/.agents/skills/herdr/scripts/find-agent.sh" 019a2b3c              # agent session id（前方一致）/ herdr session 名 / agent 名
+"$HOME/.agents/skills/herdr/scripts/find-agent.sh" --kind codex --repo my-app --status idle
+pane=$("$HOME/.agents/skills/herdr/scripts/find-agent.sh" -q --kind claude --title 受信トレイ)  # 1件のときだけ pane_id。0件は exit 1、複数は exit 3
 ```
 
-pane_id は session ごとの ID。別 session の agent を操作するときは `herdr --session <name> agent ...` と明示する（`HERDR_SOCKET_PATH` が立っていると `HERDR_SESSION` より優先されるので、pane 内では環境変数での切替が効かない）。`-q` は該当時に stderr へその旨を出す。
+pane_id は session ごとの ID。別 session の agent を操作するときは `herdr --session <name> agent ...` と明示する。環境変数で対象を選ぶ場合は、`HERDR_SOCKET_PATH` があればそちらが優先され、未設定なら `HERDR_SESSION` が使われる。pane 内では `HERDR_SOCKET_PATH` が注入されるため、`HERDR_SESSION` だけでは切り替わらない。`-q` は現在と別 session のとき stderr にコマンド例を出す。
 
 ### House rules（このスキル固有の運用規約）
 
