@@ -30,7 +30,8 @@ usage: spawn-agent.sh --kind KIND [--cwd DIR] [--session NAME] [--pane TARGET]
 
 exit: 0 started and verified, 1 herdr command failed (split / agent start),
       2 usage or validation error, 3 the new shell never became idle,
-      4 agent started but read-back did not match the kind or cwd
+      4 agent started but read-back did not match the kind or cwd,
+      5 agent_not_ready was returned and the started agent was read back
 USAGE
   exit 2
 }
@@ -137,7 +138,13 @@ start=(agent start "$name" --kind "$kind" --pane "$new_pane")
 [ "${#agent_args[@]}" -eq 0 ] || start+=(-- "${agent_args[@]}")
 # The shell can own the foreground before its prompt is drawn; herdr then
 # answers agent_pane_busy, so retry that one error within the shell timeout.
+start_not_ready=0
+start_reason=""
 while ! err=$(h "${start[@]}" 2>&1 >/dev/null); do
+  if start_reason=$(jq -ce '.error | select(.code == "agent_not_ready")' <<<"$err" 2>/dev/null); then
+    start_not_ready=1
+    break
+  fi
   tries=$((tries - 1))
   if [[ "$err" != *agent_pane_busy* ]] || [ "$tries" -le 0 ]; then
     echo "$err" >&2
@@ -169,6 +176,15 @@ if ! jq -e --arg kind "$kind" --arg c "$cwd" --arg cp "$cwd_physical" '
   echo "error: read-back of $new_pane does not match --kind $kind / --cwd $cwd:" >&2
   jq -c . <<<"$result" >&2
   exit 4
+fi
+
+if [ "$start_not_ready" -eq 1 ]; then
+  result=$(jq --argjson reason "$start_reason" \
+    '. + {ready: false, reason: $reason}' <<<"$result")
+  if [ "$mode" = json ]; then jq . <<<"$result"; else echo "$new_pane"; fi
+  message=$(jq -r '.message // .code' <<<"$start_reason")
+  echo "error: agent '$name' was read back in $new_pane but is not ready for input: $message" >&2
+  exit 5
 fi
 
 if [ "$mode" = json ]; then jq . <<<"$result"; else echo "$new_pane"; fi
