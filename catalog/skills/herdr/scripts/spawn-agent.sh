@@ -155,8 +155,19 @@ while ! err=$(h "${start[@]}" 2>&1 >/dev/null); do
 done
 
 # Read back instead of trusting the start response.
-agents=$(h agent list) || die "herdr agent list failed" 1
-info=$(h pane process-info --pane "$new_pane") || die "herdr pane process-info failed" 1
+report_readback_failure() {
+  echo "error: $1" >&2
+  if [ "$start_not_ready" -eq 1 ]; then
+    printf 'error: agent %s in pane %s was not ready: %s\n' \
+      "$name" "$new_pane" "$start_reason" >&2
+  fi
+}
+
+agents=$(h agent list) || { report_readback_failure "herdr agent list failed"; exit 1; }
+info=$(h pane process-info --pane "$new_pane") || {
+  report_readback_failure "herdr pane process-info failed"
+  exit 1
+}
 result=$(jq -n --arg session "$session" --arg pane "$new_pane" --arg name "$name" \
   --arg direction "$direction" --argjson a "$agents" --argjson i "$info" '
   ($a.result.agents[] | select(.pane_id == $pane)) as $ag
@@ -168,12 +179,12 @@ result=$(jq -n --arg session "$session" --arg pane "$new_pane" --arg name "$name
      processes: [$i.result.process_info.foreground_processes[] | {pid, cmdline, cwd}]}
   ' 2>/dev/null) || result=""
 if [ -z "$result" ]; then
-  echo "error: no agent found in $new_pane after start" >&2
+  report_readback_failure "no agent found in $new_pane after start"
   exit 4
 fi
 if ! jq -e --arg kind "$kind" --arg c "$cwd" --arg cp "$cwd_physical" '
   .kind == $kind and (.cwd == $c or .cwd == $cp)' <<<"$result" >/dev/null; then
-  echo "error: read-back of $new_pane does not match --kind $kind / --cwd $cwd:" >&2
+  report_readback_failure "read-back of $new_pane does not match --kind $kind / --cwd $cwd:"
   jq -c . <<<"$result" >&2
   exit 4
 fi
