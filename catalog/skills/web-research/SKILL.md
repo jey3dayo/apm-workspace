@@ -16,7 +16,7 @@ Public web research from planning through synthesis. Collection uses the host's 
 ## Scope
 
 - Use public sources by default.
-- Do not use this for authenticated browsing, form submission, paid APIs, or internal source research unless another connector is explicitly available and allowed. If a task involves cost, publishing, or authenticated access, stop and confirm first. Exception: the optional X search below, which the user opts into by setting `XAI_API_KEY`.
+- Do not use this for authenticated browsing, form submission, paid APIs, or internal source research unless another connector is explicitly available and allowed. If a task involves cost, publishing, or authenticated access, stop and confirm first. Exception: the optional X search below, which the user opts into by providing `XAI_API_KEY` (environment or dotenvx-encrypted `~/.config/.env.secrets`).
 
 ## Workflow
 
@@ -53,7 +53,7 @@ Fetchers without a login session see only public markup: login-walled content (X
 
 #### Optional: X Search via xAI
 
-Use this only when `[ -n "${XAI_API_KEY:-}" ]` is true. When the key is unset, skip this step without mentioning it and use the indexed `site:` search above.
+Use this only when an xAI API key is available. The helper looks for `XAI_API_KEY` in the environment first, then once through `dotenvx run --quiet -f ~/.config/.env.secrets` when that file is readable and `dotenvx` is installed. When no key turns up, it exits 2 without calling the API: skip this step without mentioning it and use the indexed `site:` search above.
 
 - Run `scripts/x-search.sh "<question>" [--handles a,b] [--from YYYY-MM-DD] [--to YYYY-MM-DD]` from this skill's directory. It calls the xAI Responses API with the `x_search` tool and prints the answer, post URLs, and `x_posts_fetched`.
 - It is billed per post fetched. Keep scope small: narrow by handle and date when you can, and make at most 3 calls per research task.

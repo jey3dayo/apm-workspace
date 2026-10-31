@@ -1,10 +1,20 @@
 #!/usr/bin/env bash
 # Optional X search through the xAI Responses API (x_search tool).
-# Runs only when XAI_API_KEY is set; otherwise exits 2 without calling anything,
-# and the caller falls back to site:x.com / site:twitter.com web search.
+# Runs only when XAI_API_KEY is available. If it is unset, the script re-runs itself once
+# through `dotenvx run` with ${XDG_CONFIG_HOME:-~/.config}/.env.secrets (when that file is
+# readable and dotenvx exists). If the key is still empty, it exits 2 without calling
+# anything, and the caller falls back to site:x.com / site:twitter.com web search.
 # Usage: x-search.sh "<question>" [--handles a,b] [--from YYYY-MM-DD] [--to YYYY-MM-DD]
 # Env: XAI_API_KEY (required), XAI_MODEL (default grok-4.7), XAI_MAX_TURNS (default 2)
 set -euo pipefail
+
+config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
+env_secrets="${config_home}/.env.secrets"
+if [ -z "${XAI_API_KEY:-}" ] && [ -z "${_XSEARCH_SECRETS_TRIED:-}" ] && [ -r "$env_secrets" ] && command -v dotenvx >/dev/null 2>&1; then
+  export _XSEARCH_SECRETS_TRIED=1
+  export DOTENV_PRIVATE_KEY_PATH="${config_home}/.env.keys"
+  exec dotenvx run --quiet -f "$env_secrets" -- "$0" "$@"
+fi
 
 if [ -z "${XAI_API_KEY:-}" ]; then
   exit 2
