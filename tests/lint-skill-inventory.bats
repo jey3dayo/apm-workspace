@@ -138,6 +138,30 @@ write_matching_fixture() {
   [[ "$output" == *"only in skill-inventory: apm-usage"* ]]
 }
 
+@test "uses the alias as the skill name for a path alias dependency without deployed_files" {
+  write_matching_fixture
+  # Insert inside the dependencies: block, before mcp_configs:.
+  local lock="$FIXTURE_DIR/apm.lock.yaml"
+  awk '/^mcp_configs:/ {
+    print "- repo_url: heydamir/unslop"
+    print "  alias: unslop-ui"
+    print "  name: unslop"
+    print "  virtual_path: skills/unslop"
+    print "  is_virtual: true"
+    print "  package_type: claude_skill"
+  }
+  { print }' "$lock" >"$lock.tmp"
+  mv "$lock.tmp" "$lock"
+
+  run_fixture
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"only in apm.lock.yaml:   unslop-ui"* ]]
+
+  write_inventory '`context7`, `linear`' '- review: `tuicr`, `retro`, `unslop-ui`'
+  run_fixture
+  [ "$status" -eq 0 ]
+}
+
 @test "fails when the external skills section is missing" {
   write_matching_fixture
   printf '## global MCP\n\n`context7`, `linear`\n' >"$FIXTURE_DIR/skill-inventory.md"

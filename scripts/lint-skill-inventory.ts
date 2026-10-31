@@ -58,6 +58,13 @@ function parseLockExternalSkillNames(lock: string): string[] {
       continue;
     }
     if (!isExternal) continue;
+    // A `path:` + `alias:` dependency is staged by apm-workspace.sh, so apm
+    // records no deployed_files for it; the alias is the deployed skill name.
+    const alias = line.match(/^ {2}alias: (\S+)$/);
+    if (alias) {
+      names.add(alias[1]);
+      continue;
+    }
     const skill = line.match(/^ {2}- \.claude\/skills\/([^/\s]+)$/);
     if (skill) names.add(skill[1]);
   }
