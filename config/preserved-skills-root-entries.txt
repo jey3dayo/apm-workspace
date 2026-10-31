@@ -1,0 +1,6 @@
+# Top-level entries under a runtime skills root that `mise run deploy` must not
+# sweep away because another tool owns them (see
+# preserved_skills_root_entries in scripts/apm-workspace.sh).
+# Format: `<target> <entry>` per line. <target> is claude, codex, or cursor;
+# <entry> is a single directory name (no `/`, `\` or `..`).
+claude synced

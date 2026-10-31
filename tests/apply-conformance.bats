@@ -157,24 +157,27 @@ run_apply() {
   [ -f "$FIXTURE_HOME/.agents/skills/sample-skill/SKILL.md" ]
 }
 
-@test "bash apply: keeps a preserved non-apm entry such as synced under the skills root" {
+@test "bash apply: keeps entries listed in config/preserved-skills-root-entries.txt for their target only" {
   # ~/.claude/skills/synced is written by Claude's own skill sync, not by
-  # apm-workspace. The stale sweep in reconcile_skills_root_from_stage used to
-  # delete it on every deploy because the stage never contains it. It must
-  # survive apply with its contents, while an ordinary stale skill is still
-  # removed.
+  # apm-workspace, so the stale sweep must keep it once the config lists it.
+  # The same name under another target is still swept (the entry is
+  # target-specific), unlisted stale skills are still removed, and invalid
+  # lines only warn. The other tests here run without the config file, which
+  # covers the "missing file preserves nothing" path.
   build_own_fixture
 
-  mkdir -p "$FIXTURE_HOME/.claude/skills/synced/morning" "$FIXTURE_HOME/.agents/skills/synced/morning"
+  mkdir -p "$FIXTURE_WORKSPACE_DIR/config"
+  printf '%s\n' '# comment' '' 'claude synced  # trailing comment' 'claude ../escape' >"$FIXTURE_WORKSPACE_DIR/config/preserved-skills-root-entries.txt"
+  mkdir -p "$FIXTURE_HOME/.claude/skills/synced/morning" "$FIXTURE_HOME/.agents/skills/synced"
   printf '# morning\n' >"$FIXTURE_HOME/.claude/skills/synced/morning/SKILL.md"
-  printf '# morning\n' >"$FIXTURE_HOME/.agents/skills/synced/morning/SKILL.md"
   mkdir -p "$FIXTURE_HOME/.claude/skills/stale-skill"
 
   run run_apply
   [ "$status" -eq 0 ]
+  [[ "$output" == *"invalid entry name '../escape'"* ]]
 
   [ -f "$FIXTURE_HOME/.claude/skills/synced/morning/SKILL.md" ]
-  [ -f "$FIXTURE_HOME/.agents/skills/synced/morning/SKILL.md" ]
+  [ ! -e "$FIXTURE_HOME/.agents/skills/synced" ]
   [ ! -e "$FIXTURE_HOME/.claude/skills/stale-skill" ]
   [ -f "$FIXTURE_HOME/.claude/skills/sample-skill/SKILL.md" ]
 }
