@@ -3170,6 +3170,17 @@ function Replace-DirectoryTreeFromSource {
 # only directory children are reconciled here; a stray file directly under a
 # staged skills root would indicate a bug upstream in staging, not a case
 # this function needs to shell out to file-level Copy-Item for.
+# Top-level entries under a runtime skills root that apm-workspace never
+# deploys but another tool owns, so the stale-removal pass in
+# Reconcile-SkillsRootFromStage must leave them in place. `synced` is the
+# skills folder Claude's own sync writes into ~/.claude/skills; the pass used
+# to delete it on every deploy. A catalog or external skill of the same name
+# still replaces it, because only the stale-removal pass consults this list.
+# Keep in sync with preserved_skills_root_entries in apm-workspace.sh.
+function Get-PreservedSkillsRootEntries {
+  return @("synced")
+}
+
 function Reconcile-SkillsRootFromStage {
   param(
     [Parameter(Mandatory = $true)]
@@ -3200,6 +3211,7 @@ function Reconcile-SkillsRootFromStage {
     $stagedChildren = @(Get-ChildItem -LiteralPath $StagedSkillsRoot -Force -Directory)
   }
   $stagedNames = [System.Collections.Generic.HashSet[string]]::new([string[]]@($stagedChildren | ForEach-Object Name), [System.StringComparer]::Ordinal)
+  $preservedNames = [System.Collections.Generic.HashSet[string]]::new([string[]]@(Get-PreservedSkillsRootEntries), [System.StringComparer]::Ordinal)
 
   foreach ($stagedChild in $stagedChildren) {
     $destinationChild = Join-Path $TargetSkillsRoot $stagedChild.Name
@@ -3214,6 +3226,9 @@ function Reconcile-SkillsRootFromStage {
       continue
     }
     if ($existingChild.Name -like ".apm-*") {
+      continue
+    }
+    if ($preservedNames.Contains($existingChild.Name)) {
       continue
     }
     Remove-Item -LiteralPath $existingChild.FullName -Recurse -Force

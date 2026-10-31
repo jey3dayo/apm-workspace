@@ -127,6 +127,26 @@ Describe "apm-workspace.ps1 apply conformance" {
     Join-Path $claudeSkillsRoot "sample-skill/SKILL.md" | Should -Exist
   }
 
+  # ~/.claude/skills/synced is written by Claude's own skill sync, not by
+  # apm-workspace. The stale-removal pass in Reconcile-SkillsRootFromStage
+  # used to delete it on every deploy because the stage never contains it.
+  # It must survive apply with its contents, while an ordinary stale skill is
+  # still removed.
+  It "keeps a preserved non-apm entry such as synced under the skills root" {
+    $claudeSkillsRoot = Join-Path $script:fixture["HOME"] ".claude/skills"
+    $syncedSkillDir = Join-Path $claudeSkillsRoot "synced/morning"
+    New-Item -ItemType Directory -Path $syncedSkillDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $syncedSkillDir "SKILL.md") -Value "# morning"
+    $staleSkillDir = Join-Path $claudeSkillsRoot "stale-skill"
+    New-Item -ItemType Directory -Path $staleSkillDir -Force | Out-Null
+
+    Invoke-FixtureApply | Should -Be 0
+
+    Join-Path $syncedSkillDir "SKILL.md" | Should -Exist
+    $staleSkillDir | Should -Not -Exist
+    Join-Path $claudeSkillsRoot "sample-skill/SKILL.md" | Should -Exist
+  }
+
   # Also seeds a `.apm-skills-backup-*` dir as if a previous apply run had
   # crashed mid-swap and left its backup behind: Reconcile-SkillsRootFromStage
   # must still sweep it, not just avoid creating new ones of its own. The old

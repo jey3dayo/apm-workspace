@@ -2207,6 +2207,21 @@ swap_staged_tree_into_place() {
   fail "Failed to replace $tree_name target: $target_tree_root"
 }
 
+# Top-level entries under a runtime skills root that apm-workspace never
+# deploys but another tool owns, so the stale sweep in
+# reconcile_skills_root_from_stage must leave them in place. `synced` is the
+# skills folder Claude's own sync writes into ~/.claude/skills; the sweep used
+# to delete it on every deploy. A catalog or external skill of the same name
+# still replaces it, because only the stale sweep consults this list.
+# Keep in sync with Get-PreservedSkillsRootEntries in apm-workspace.ps1.
+preserved_skills_root_entries() {
+  printf '%s\n' synced
+}
+
+is_preserved_skills_root_entry() {
+  preserved_skills_root_entries | grep -Fxq -- "$1"
+}
+
 # Reconciling per top-level child keeps the skills root present at all times:
 # a whole-root swap made the root vanish for the two renames, and a live agent
 # polling it mid-command broke. Each child still gets the swap, and stale
@@ -2248,6 +2263,7 @@ reconcile_skills_root_from_stage() {
       .apm-*) continue ;;
     esac
     [ -e "$staged_skills_root/$entry_name" ] && continue
+    is_preserved_skills_root_entry "$entry_name" && continue
     rm -rf "$target_entry"
   done
 }

@@ -157,6 +157,28 @@ run_apply() {
   [ -f "$FIXTURE_HOME/.agents/skills/sample-skill/SKILL.md" ]
 }
 
+@test "bash apply: keeps a preserved non-apm entry such as synced under the skills root" {
+  # ~/.claude/skills/synced is written by Claude's own skill sync, not by
+  # apm-workspace. The stale sweep in reconcile_skills_root_from_stage used to
+  # delete it on every deploy because the stage never contains it. It must
+  # survive apply with its contents, while an ordinary stale skill is still
+  # removed.
+  build_own_fixture
+
+  mkdir -p "$FIXTURE_HOME/.claude/skills/synced/morning" "$FIXTURE_HOME/.agents/skills/synced/morning"
+  printf '# morning\n' >"$FIXTURE_HOME/.claude/skills/synced/morning/SKILL.md"
+  printf '# morning\n' >"$FIXTURE_HOME/.agents/skills/synced/morning/SKILL.md"
+  mkdir -p "$FIXTURE_HOME/.claude/skills/stale-skill"
+
+  run run_apply
+  [ "$status" -eq 0 ]
+
+  [ -f "$FIXTURE_HOME/.claude/skills/synced/morning/SKILL.md" ]
+  [ -f "$FIXTURE_HOME/.agents/skills/synced/morning/SKILL.md" ]
+  [ ! -e "$FIXTURE_HOME/.claude/skills/stale-skill" ]
+  [ -f "$FIXTURE_HOME/.claude/skills/sample-skill/SKILL.md" ]
+}
+
 @test "bash apply: leaves no swap staging/backup directories under the skills root" {
   # Also seed a stale .apm-skills-backup.* left over from a hypothetical
   # crashed prior run (swap_staged_tree_into_place only cleans its own
