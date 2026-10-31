@@ -3,6 +3,14 @@
 採用・撤去・見送りにした APM パッケージの意思決定ログ。1 パッケージ 1 セクション。
 「なぜ入れたか / なぜ消したか / 再検討するなら何を見るか」を残す。
 
+## agent-desktop (vercel-labs/agent-desktop)
+
+- Status: 採用・global（2026-10-31、ユーザー判断）
+- 正本: `vercel-labs/agent-desktop/skills/agent-desktop`（v1.0.2 の commit に pin）。CLI 本体は dotfiles の mise で `npm:agent-desktop` 1.0.2 に pin
+- 理由: OS のアクセシビリティツリー経由でデスクトップアプリを読んで操作する CLI。macOS では Ghostty にアクセシビリティ権限を付けて使う
+- OS 別スキル（`agent-desktop-macos` など）は入れない。本体スキルが `agent-desktop skills get platform` で CLI から読み込む設計のため
+- 再検討するなら: CLI のバージョンを上げるときは、スキルの pin も同じタグの commit に揃える
+
 ## mcp-simple-voicevox
 
 - Status: global MCP から一時的に外した（2026-10-29、ユーザー判断）。復活は後で検討する。

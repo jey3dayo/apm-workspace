@@ -81,6 +81,7 @@ dependencies:
     - tt-a1i/archify/archify#208acba8d412335185b2056fedf54b3405df43fb # v3.2.0
 
     # --- agent tools ---
+    - vercel-labs/agent-desktop/skills/agent-desktop#a47ed664e0db00d1d4df364eb3fe8a5599882f3c # v1.0.2
     - agavra/tuicr/skills/tuicr#9175dc95b97a0a7dd290d43d38385745a7fb7d40
     - fujibee/agmsg#4a712f2aeba8f0b2070f7533b827c7cac78c9fdf # v1.5.1
     - humanlayer/skills/plugins/show-me/skills/show-me#ca7c8088db69e315a8b2deea43820270457f8f3c

@@ -1,5 +1,5 @@
 lockfile_version: '2'
-generated_at: '2026-10-31T08:22:22.657423+00:00'
+generated_at: '2026-10-31T08:57:30.190470+00:00'
 apm_version: 0.35.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -5289,6 +5289,42 @@ dependencies:
     .claude/skills/archify/skill-release.json: sha256:1ea25551e0359e547267d40e83812ffd1a7bdf7398826b65f2a2fcf1a11ba596
   content_hash: sha256:a27667596bd22b09d30381eb3d49a4e4da24e173bb52be1390cf69477803947a
   resolved_tag: v3.2.0
+- repo_url: vercel-labs/agent-desktop
+  name: agent-desktop
+  host: github.com
+  resolved_commit: a47ed664e0db00d1d4df364eb3fe8a5599882f3c
+  resolved_ref: a47ed664e0db00d1d4df364eb3fe8a5599882f3c
+  version: unknown
+  virtual_path: skills/agent-desktop
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/agent-desktop
+  - .agents/skills/agent-desktop/SKILL.md
+  - .agents/skills/agent-desktop/references
+  - .agents/skills/agent-desktop/references/commands-interaction.md
+  - .agents/skills/agent-desktop/references/commands-observation.md
+  - .agents/skills/agent-desktop/references/commands-system.md
+  - .agents/skills/agent-desktop/references/workflows.md
+  - .claude/skills/agent-desktop
+  - .claude/skills/agent-desktop/SKILL.md
+  - .claude/skills/agent-desktop/references
+  - .claude/skills/agent-desktop/references/commands-interaction.md
+  - .claude/skills/agent-desktop/references/commands-observation.md
+  - .claude/skills/agent-desktop/references/commands-system.md
+  - .claude/skills/agent-desktop/references/workflows.md
+  deployed_file_hashes:
+    .agents/skills/agent-desktop/SKILL.md: sha256:359140fc5ede5ba29c54c24b4bb4eae374f65ecc883a83404cb7f96dc5edc3b9
+    .agents/skills/agent-desktop/references/commands-interaction.md: sha256:43bf29f80af740f71234a74f274d41646a213a5fda5088e9e072bd844f395a11
+    .agents/skills/agent-desktop/references/commands-observation.md: sha256:983291f1f8272fe3bea0a099d3faaf1aa6694c4e1f1a36c83362d9a1cd58e2f7
+    .agents/skills/agent-desktop/references/commands-system.md: sha256:a99042f2cecf66f315f3bc38e4cf265bf36441ff08a4a4e847c718e1b6f2deb4
+    .agents/skills/agent-desktop/references/workflows.md: sha256:e78194d24d3963d10a8069833c90a1bdb932f0ab8f6b645df79149d95471645c
+    .claude/skills/agent-desktop/SKILL.md: sha256:359140fc5ede5ba29c54c24b4bb4eae374f65ecc883a83404cb7f96dc5edc3b9
+    .claude/skills/agent-desktop/references/commands-interaction.md: sha256:43bf29f80af740f71234a74f274d41646a213a5fda5088e9e072bd844f395a11
+    .claude/skills/agent-desktop/references/commands-observation.md: sha256:983291f1f8272fe3bea0a099d3faaf1aa6694c4e1f1a36c83362d9a1cd58e2f7
+    .claude/skills/agent-desktop/references/commands-system.md: sha256:a99042f2cecf66f315f3bc38e4cf265bf36441ff08a4a4e847c718e1b6f2deb4
+    .claude/skills/agent-desktop/references/workflows.md: sha256:e78194d24d3963d10a8069833c90a1bdb932f0ab8f6b645df79149d95471645c
+  content_hash: sha256:1f9a9343005beaf687ac0b2dfb81ff2728de7c423a9c32a0efb3807a1243beca
 - repo_url: vercel-labs/agent-skills
   name: vercel-react-best-practices
   host: github.com
