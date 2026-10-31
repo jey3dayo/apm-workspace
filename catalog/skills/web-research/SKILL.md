@@ -55,9 +55,9 @@ Fetchers without a login session see only public markup: login-walled content (X
 
 Use this only when an xAI API key is available. The helper looks for `XAI_API_KEY` in the environment first, then once through `dotenvx run --quiet -f ~/.config/.env.secrets` when that file is readable and `dotenvx` is installed. When no key turns up, it exits 2 without calling the API: skip this step without mentioning it and use the indexed `site:` search above.
 
-- Run `scripts/x-search.sh "<question>" [--handles a,b] [--from YYYY-MM-DD] [--to YYYY-MM-DD]` from this skill's directory. It calls the xAI Responses API with the `x_search` tool and prints the answer, post URLs, and `x_posts_fetched`.
+- Run `scripts/x-search.sh "<question>" [--handles a,b] [--from YYYY-MM-DD] [--to YYYY-MM-DD]` from this skill's directory. It calls the xAI Responses API with the `x_search` tool and prints the answer, the post URLs cited in it, other URLs it encountered, and `x_posts_fetched`. `--from` and `--to` are inclusive UTC days.
 - It is billed per post fetched. Keep scope small: narrow by handle and date when you can, and make at most 3 calls per research task.
-- Cite the returned post URLs and attribute each post to its handle. Treat the model's summary as a lead and quote only what the cited posts say.
+- Cite only the URLs under "Cited in answer" as evidence and attribute each post to its handle. URLs under "Other URLs encountered" were not used in the answer; open one before citing it. Treat the model's summary as a lead and quote only what the cited posts say.
 - Report `x_posts_fetched` in the X/Twitter signal section.
 - If the script exits non-zero (key unset, request failed), fall back to the `site:` search without erroring.
 - Never print, log, or write the key.
