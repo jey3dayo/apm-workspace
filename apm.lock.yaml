@@ -1,5 +1,5 @@
 lockfile_version: '2'
-generated_at: '2026-10-31T03:55:35.158070+00:00'
+generated_at: '2026-10-31T04:02:58.095440+00:00'
 apm_version: 0.35.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -215,19 +215,52 @@ dependencies:
   - .agents/skills/apple-design/SKILL.md
   - .agents/skills/emil-design-eng
   - .agents/skills/emil-design-eng/SKILL.md
+  - .agents/skills/find-animation-opportunities
+  - .agents/skills/find-animation-opportunities/SKILL.md
+  - .agents/skills/improve-animations
+  - .agents/skills/improve-animations/AUDIT.md
+  - .agents/skills/improve-animations/PLAN-TEMPLATE.md
+  - .agents/skills/improve-animations/SKILL.md
+  - .agents/skills/review-animations
+  - .agents/skills/review-animations/SKILL.md
+  - .agents/skills/review-animations/STANDARDS.md
   - .claude/skills/apple-design
   - .claude/skills/apple-design/SKILL.md
   - .claude/skills/emil-design-eng
   - .claude/skills/emil-design-eng/SKILL.md
+  - .claude/skills/find-animation-opportunities
+  - .claude/skills/find-animation-opportunities/SKILL.md
+  - .claude/skills/improve-animations
+  - .claude/skills/improve-animations/AUDIT.md
+  - .claude/skills/improve-animations/PLAN-TEMPLATE.md
+  - .claude/skills/improve-animations/SKILL.md
+  - .claude/skills/review-animations
+  - .claude/skills/review-animations/SKILL.md
+  - .claude/skills/review-animations/STANDARDS.md
   deployed_file_hashes:
     .agents/skills/apple-design/SKILL.md: sha256:77bb63b7043bb93aca2ff4ab040c249484eef35682bb6ff7163433c31d30adc7
     .agents/skills/emil-design-eng/SKILL.md: sha256:ffbe68e6007fb42cb8149f089b400a1ca007d59ba23e8948e2be4476f3175939
+    .agents/skills/find-animation-opportunities/SKILL.md: sha256:d52a377819b84a71930f0c822cfe2849f40301605a2d5c7eccbfa3b257700df2
+    .agents/skills/improve-animations/AUDIT.md: sha256:551c8473e20e5f4774680bc24d45e1c68e50992582720905c6b077756b7b5a55
+    .agents/skills/improve-animations/PLAN-TEMPLATE.md: sha256:0a08ac8e23fd2082d7ffb86aeed7b789de77328c3cf874b16f1a755f2ef0a6ad
+    .agents/skills/improve-animations/SKILL.md: sha256:73962447464433476343e2c12cd08ab39cc99a9e5f3c118c5fb54ed897574ef6
+    .agents/skills/review-animations/SKILL.md: sha256:6ff590d29e436766135aa3d137be1fac2a867165c7257fc315b189361f1873af
+    .agents/skills/review-animations/STANDARDS.md: sha256:e7d3605034acda54ca13e43aec9e64d65b53de20f75b11b8d694e373012fbe07
     .claude/skills/apple-design/SKILL.md: sha256:77bb63b7043bb93aca2ff4ab040c249484eef35682bb6ff7163433c31d30adc7
     .claude/skills/emil-design-eng/SKILL.md: sha256:ffbe68e6007fb42cb8149f089b400a1ca007d59ba23e8948e2be4476f3175939
+    .claude/skills/find-animation-opportunities/SKILL.md: sha256:d52a377819b84a71930f0c822cfe2849f40301605a2d5c7eccbfa3b257700df2
+    .claude/skills/improve-animations/AUDIT.md: sha256:551c8473e20e5f4774680bc24d45e1c68e50992582720905c6b077756b7b5a55
+    .claude/skills/improve-animations/PLAN-TEMPLATE.md: sha256:0a08ac8e23fd2082d7ffb86aeed7b789de77328c3cf874b16f1a755f2ef0a6ad
+    .claude/skills/improve-animations/SKILL.md: sha256:73962447464433476343e2c12cd08ab39cc99a9e5f3c118c5fb54ed897574ef6
+    .claude/skills/review-animations/SKILL.md: sha256:6ff590d29e436766135aa3d137be1fac2a867165c7257fc315b189361f1873af
+    .claude/skills/review-animations/STANDARDS.md: sha256:e7d3605034acda54ca13e43aec9e64d65b53de20f75b11b8d694e373012fbe07
   content_hash: sha256:d37e253fb640f51d061c8d85ac68d3b0da3f4b6ca784534fb81425e9c84be788
   skill_subset:
   - apple-design
   - emil-design-eng
+  - find-animation-opportunities
+  - improve-animations
+  - review-animations
 - repo_url: fujibee/agmsg
   name: agmsg
   host: github.com
@@ -14107,6 +14140,24 @@ deployments:
   content_hash: sha256:bb96bfb03fad06636c2977f3bc3792c733afe4bbf486bc96af2b0cbfbc77f19e
 - kind: project-relative
   target: claude
+  value: .claude/skills/find-animation-opportunities
+  runtime: null
+  scope: project
+  owners:
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/find-animation-opportunities/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
+  content_hash: sha256:d52a377819b84a71930f0c822cfe2849f40301605a2d5c7eccbfa3b257700df2
+- kind: project-relative
+  target: claude
   value: .claude/skills/fixing-accessibility
   runtime: null
   scope: project
@@ -14456,6 +14507,42 @@ deployments:
   - shadcn/improve
   active_owner: shadcn/improve
   content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve-animations
+  runtime: null
+  scope: project
+  owners:
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve-animations/AUDIT.md
+  runtime: null
+  scope: project
+  owners:
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
+  content_hash: sha256:551c8473e20e5f4774680bc24d45e1c68e50992582720905c6b077756b7b5a55
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve-animations/PLAN-TEMPLATE.md
+  runtime: null
+  scope: project
+  owners:
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
+  content_hash: sha256:0a08ac8e23fd2082d7ffb86aeed7b789de77328c3cf874b16f1a755f2ef0a6ad
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve-animations/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
+  content_hash: sha256:73962447464433476343e2c12cd08ab39cc99a9e5f3c118c5fb54ed897574ef6
 - kind: project-relative
   target: claude
   value: .claude/skills/improve-codebase-architecture
@@ -15950,6 +16037,33 @@ deployments:
   - mattpocock/skills
   active_owner: mattpocock/skills
   content_hash: sha256:cb6fb9d7e6b4be5975f41f6def1dd00a1255bad5d9b02696b124c924a8b8745c
+- kind: project-relative
+  target: claude
+  value: .claude/skills/review-animations
+  runtime: null
+  scope: project
+  owners:
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/review-animations/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
+  content_hash: sha256:6ff590d29e436766135aa3d137be1fac2a867165c7257fc315b189361f1873af
+- kind: project-relative
+  target: claude
+  value: .claude/skills/review-animations/STANDARDS.md
+  runtime: null
+  scope: project
+  owners:
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
+  content_hash: sha256:e7d3605034acda54ca13e43aec9e64d65b53de20f75b11b8d694e373012fbe07
 - kind: project-relative
   target: claude
   value: .claude/skills/review-fix-loop
@@ -26266,6 +26380,24 @@ deployments:
   content_hash: sha256:bb96bfb03fad06636c2977f3bc3792c733afe4bbf486bc96af2b0cbfbc77f19e
 - kind: project-relative
   target: codex
+  value: .agents/skills/find-animation-opportunities
+  runtime: null
+  scope: project
+  owners:
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/find-animation-opportunities/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
+  content_hash: sha256:d52a377819b84a71930f0c822cfe2849f40301605a2d5c7eccbfa3b257700df2
+- kind: project-relative
+  target: codex
   value: .agents/skills/fixing-accessibility
   runtime: null
   scope: project
@@ -26615,6 +26747,42 @@ deployments:
   - shadcn/improve
   active_owner: shadcn/improve
   content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve-animations
+  runtime: null
+  scope: project
+  owners:
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve-animations/AUDIT.md
+  runtime: null
+  scope: project
+  owners:
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
+  content_hash: sha256:551c8473e20e5f4774680bc24d45e1c68e50992582720905c6b077756b7b5a55
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve-animations/PLAN-TEMPLATE.md
+  runtime: null
+  scope: project
+  owners:
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
+  content_hash: sha256:0a08ac8e23fd2082d7ffb86aeed7b789de77328c3cf874b16f1a755f2ef0a6ad
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve-animations/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
+  content_hash: sha256:73962447464433476343e2c12cd08ab39cc99a9e5f3c118c5fb54ed897574ef6
 - kind: project-relative
   target: codex
   value: .agents/skills/improve-codebase-architecture
@@ -28109,6 +28277,33 @@ deployments:
   - mattpocock/skills
   active_owner: mattpocock/skills
   content_hash: sha256:cb6fb9d7e6b4be5975f41f6def1dd00a1255bad5d9b02696b124c924a8b8745c
+- kind: project-relative
+  target: codex
+  value: .agents/skills/review-animations
+  runtime: null
+  scope: project
+  owners:
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/review-animations/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
+  content_hash: sha256:6ff590d29e436766135aa3d137be1fac2a867165c7257fc315b189361f1873af
+- kind: project-relative
+  target: codex
+  value: .agents/skills/review-animations/STANDARDS.md
+  runtime: null
+  scope: project
+  owners:
+  - emilkowalski/skills
+  active_owner: emilkowalski/skills
+  content_hash: sha256:e7d3605034acda54ca13e43aec9e64d65b53de20f75b11b8d694e373012fbe07
 - kind: project-relative
   target: codex
   value: .agents/skills/review-fix-loop

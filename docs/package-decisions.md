@@ -785,7 +785,7 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 
 ## 2026-10-31 重なっているスキルを間引いた
 
-- 撤去：baseline-ui（ibelick）、frontend-design（anthropics）、review-animations / improve-animations / find-animation-opportunities（emilkowalski）。74→69。
-- 残す：emil-design-eng、transitions-dev、ui-ux-pro-max、improve-ui、fixing-motion-performance。improve-ui と fixing-motion-performance は skillOverrides の off を外し、手で呼べるようにした。
+- 撤去：baseline-ui（ibelick）、frontend-design（anthropics）。74→72。
+- 残す：emilkowalski の5つ（apple-design、emil-design-eng、review-animations、improve-animations、find-animation-opportunities。アニメーション系3つは評判がよいので off から on に戻した）、transitions-dev、ui-ux-pro-max、improve-ui、fixing-motion-performance。improve-ui と fixing-motion-performance は skillOverrides の off を外し、手で呼べるようにした。
 - domain-modeling と improve-codebase-architecture は wayfinder と refactoring から呼ばれるので残す。
-- 根拠：直近60日の利用ログで、撤去した5つは呼ばれていないか、emil-design-eng / improve-ui と役割がほぼ重なっていた。
+- 根拠：直近60日の利用ログで、撤去した2つは呼ばれていないか、emil-design-eng / improve-ui と役割がほぼ重なっていた。

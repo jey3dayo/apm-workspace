@@ -53,6 +53,9 @@ dependencies:
       skills:
         - apple-design
         - emil-design-eng
+        - find-animation-opportunities
+        - improve-animations
+        - review-animations
     - git: ibelick/ui-skills
       ref: main
       skills:
