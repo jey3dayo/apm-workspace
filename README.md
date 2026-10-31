@@ -33,6 +33,10 @@ resolution is `apm.lock.yaml`. `apm_modules/` and deployed targets (including
 `~/.agents/skills` and `~/.codex/`) are generated/cache state, never edit them
 directly.
 
+`mise run deploy` removes anything under a deployed skills root that it did not
+stage. To keep a folder another tool writes there (e.g. `~/.claude/skills/synced`),
+add a `<target> <entry>` line to `config/preserved-skills-root-entries.txt`.
+
 ## Common Commands
 
 ```powershell

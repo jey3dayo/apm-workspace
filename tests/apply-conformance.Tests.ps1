@@ -127,6 +127,33 @@ Describe "apm-workspace.ps1 apply conformance" {
     Join-Path $claudeSkillsRoot "sample-skill/SKILL.md" | Should -Exist
   }
 
+  # Mirrors the bash apply-conformance case: an entry listed in
+  # config/preserved-skills-root-entries.txt survives for its target only,
+  # unlisted stale skills are still removed, and invalid lines only warn. The
+  # other cases here run without the config file (missing file path).
+  It "keeps entries listed in config/preserved-skills-root-entries.txt for their target only" {
+    $configDir = Join-Path $script:fixture["WORKSPACE_DIR"] "config"
+    New-Item -ItemType Directory -Path $configDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $configDir "preserved-skills-root-entries.txt") -Value @("# comment", "", "claude synced  # trailing comment", "claude ../escape")
+    $claudeSkillsRoot = Join-Path $script:fixture["HOME"] ".claude/skills"
+    $syncedSkillDir = Join-Path $claudeSkillsRoot "synced/morning"
+    New-Item -ItemType Directory -Path $syncedSkillDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $syncedSkillDir "SKILL.md") -Value "# morning"
+    $agentsSyncedDir = Join-Path $script:fixture["HOME"] ".agents/skills/synced"
+    New-Item -ItemType Directory -Path $agentsSyncedDir -Force | Out-Null
+    $staleSkillDir = Join-Path $claudeSkillsRoot "stale-skill"
+    New-Item -ItemType Directory -Path $staleSkillDir -Force | Out-Null
+
+    $applyOutput = & $script:consoleShell -NoProfile -ExecutionPolicy Bypass -File $script:scriptPath apply 2>&1 | Out-String
+    $LASTEXITCODE | Should -Be 0
+    $applyOutput | Should -Match ([regex]::Escape("invalid entry name '../escape'"))
+
+    Join-Path $syncedSkillDir "SKILL.md" | Should -Exist
+    $agentsSyncedDir | Should -Not -Exist
+    $staleSkillDir | Should -Not -Exist
+    Join-Path $claudeSkillsRoot "sample-skill/SKILL.md" | Should -Exist
+  }
+
   # Also seeds a `.apm-skills-backup-*` dir as if a previous apply run had
   # crashed mid-swap and left its backup behind: Reconcile-SkillsRootFromStage
   # must still sweep it, not just avoid creating new ones of its own. The old

@@ -2207,6 +2207,52 @@ swap_staged_tree_into_place() {
   fail "Failed to replace $tree_name target: $target_tree_root"
 }
 
+# Top-level entries under a runtime skills root that apm-workspace never
+# deploys but another tool owns (e.g. `claude synced`, the folder Claude's own
+# skill sync writes into ~/.claude/skills). The stale sweep in
+# reconcile_skills_root_from_stage leaves them in place. The list lives in
+# config/preserved-skills-root-entries.txt: one `<target> <entry>` pair per
+# line, where <target> is a managed_catalog_runtime_targets name; `#` starts a
+# comment and blank lines are ignored. A missing or empty file preserves
+# nothing. Invalid lines (missing fields, a `/`, `\` or `..` in the entry) are
+# skipped with a warning instead of failing the deploy. Only the stale sweep
+# consults this list, so a catalog or external skill of the same name still
+# replaces the entry. Get-PreservedSkillsRootEntries in apm-workspace.ps1
+# reads the same file with the same rules.
+preserved_skills_root_entries_file() {
+  printf '%s/config/preserved-skills-root-entries.txt\n' "$WORKSPACE_DIR"
+}
+
+preserved_skills_root_entries() {
+  wanted_target="$1"
+  entries_file=$(preserved_skills_root_entries_file)
+  [ -f "$entries_file" ] || return 0
+
+  line_number=0
+  while IFS= read -r raw_line || [ -n "$raw_line" ]; do
+    line_number=$((line_number + 1))
+    line=${raw_line%%#*}
+    line=${line//$'\r'/}
+    entry_target=""
+    entry_name=""
+    entry_extra=""
+    read -r entry_target entry_name entry_extra <<<"$line" || true
+    [ -n "$entry_target" ] || continue
+    if [ -z "$entry_name" ] || [ -n "$entry_extra" ]; then
+      warn "Ignoring $entries_file:$line_number: expected '<target> <entry>'"
+      continue
+    fi
+    [ "$entry_target" = "$wanted_target" ] || continue
+    case "$entry_name" in
+      . | */* | *\\* | *..* | .apm-*)
+        warn "Ignoring $entries_file:$line_number: invalid entry name '$entry_name'"
+        continue
+        ;;
+    esac
+    printf '%s\n' "$entry_name"
+  done <"$entries_file"
+}
+
 # Reconciling per top-level child keeps the skills root present at all times:
 # a whole-root swap made the root vanish for the two renames, and a live agent
 # polling it mid-command broke. Each child still gets the swap, and stale
@@ -2214,6 +2260,12 @@ swap_staged_tree_into_place() {
 reconcile_skills_root_from_stage() {
   staged_skills_root="$1"
   target_skills_root="$2"
+  # Optional: the runtime target name, used to look up preserved entries.
+  reconcile_target_name="${3:-}"
+  preserved_entries=""
+  if [ -n "$reconcile_target_name" ]; then
+    preserved_entries=$(preserved_skills_root_entries "$reconcile_target_name")
+  fi
 
   mkdir -p "$target_skills_root"
 
@@ -2248,6 +2300,9 @@ reconcile_skills_root_from_stage() {
       .apm-*) continue ;;
     esac
     [ -e "$staged_skills_root/$entry_name" ] && continue
+    if [ -n "$preserved_entries" ] && printf '%s\n' "$preserved_entries" | grep -Fxq -- "$entry_name"; then
+      continue
+    fi
     rm -rf "$target_entry"
   done
 }
@@ -2272,7 +2327,7 @@ replace_skill_targets_from_stage() {
     if [ "$legacy_skills_root" != "$target_skills_root" ] && { [ -e "$legacy_skills_root" ] || [ -L "$legacy_skills_root" ]; }; then
       rm -rf "$legacy_skills_root"
     fi
-    reconcile_skills_root_from_stage "$staged_skills_root" "$target_skills_root"
+    reconcile_skills_root_from_stage "$staged_skills_root" "$target_skills_root" "$RT_TARGET_NAME"
   done
 }
 

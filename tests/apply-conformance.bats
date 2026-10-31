@@ -157,6 +157,31 @@ run_apply() {
   [ -f "$FIXTURE_HOME/.agents/skills/sample-skill/SKILL.md" ]
 }
 
+@test "bash apply: keeps entries listed in config/preserved-skills-root-entries.txt for their target only" {
+  # ~/.claude/skills/synced is written by Claude's own skill sync, not by
+  # apm-workspace, so the stale sweep must keep it once the config lists it.
+  # The same name under another target is still swept (the entry is
+  # target-specific), unlisted stale skills are still removed, and invalid
+  # lines only warn. The other tests here run without the config file, which
+  # covers the "missing file preserves nothing" path.
+  build_own_fixture
+
+  mkdir -p "$FIXTURE_WORKSPACE_DIR/config"
+  printf '%s\n' '# comment' '' 'claude synced  # trailing comment' 'claude ../escape' >"$FIXTURE_WORKSPACE_DIR/config/preserved-skills-root-entries.txt"
+  mkdir -p "$FIXTURE_HOME/.claude/skills/synced/morning" "$FIXTURE_HOME/.agents/skills/synced"
+  printf '# morning\n' >"$FIXTURE_HOME/.claude/skills/synced/morning/SKILL.md"
+  mkdir -p "$FIXTURE_HOME/.claude/skills/stale-skill"
+
+  run run_apply
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"invalid entry name '../escape'"* ]]
+
+  [ -f "$FIXTURE_HOME/.claude/skills/synced/morning/SKILL.md" ]
+  [ ! -e "$FIXTURE_HOME/.agents/skills/synced" ]
+  [ ! -e "$FIXTURE_HOME/.claude/skills/stale-skill" ]
+  [ -f "$FIXTURE_HOME/.claude/skills/sample-skill/SKILL.md" ]
+}
+
 @test "bash apply: leaves no swap staging/backup directories under the skills root" {
   # Also seed a stale .apm-skills-backup.* left over from a hypothetical
   # crashed prior run (swap_staged_tree_into_place only cleans its own

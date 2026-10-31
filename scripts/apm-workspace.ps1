@@ -1948,7 +1948,7 @@ function Replace-SkillTargetsFromStage {
     if (($legacySkillsRoot -ne $destinationSkillsRoot) -and (Test-Path -LiteralPath $legacySkillsRoot)) {
       Remove-Item -LiteralPath $legacySkillsRoot -Recurse -Force
     }
-    Reconcile-SkillsRootFromStage -StagedSkillsRoot $stagedSkillsRoot -TargetSkillsRoot $destinationSkillsRoot
+    Reconcile-SkillsRootFromStage -StagedSkillsRoot $stagedSkillsRoot -TargetSkillsRoot $destinationSkillsRoot -TargetName $target.Name
   }
 }
 
@@ -3170,13 +3170,65 @@ function Replace-DirectoryTreeFromSource {
 # only directory children are reconciled here; a stray file directly under a
 # staged skills root would indicate a bug upstream in staging, not a case
 # this function needs to shell out to file-level Copy-Item for.
+# Top-level entries under a runtime skills root that apm-workspace never
+# deploys but another tool owns (e.g. `claude synced`, the folder Claude's own
+# skill sync writes into ~/.claude/skills). The stale-removal pass in
+# Reconcile-SkillsRootFromStage leaves them in place. Reads
+# config/preserved-skills-root-entries.txt with the same rules as
+# preserved_skills_root_entries in apm-workspace.sh: one `<target> <entry>`
+# pair per line, `#` comments and blank lines ignored, a missing or empty file
+# preserves nothing, and invalid lines are skipped with a warning.
+function Get-PreservedSkillsRootEntriesFile {
+  return (Join-Path (Join-Path $WorkspaceDir "config") "preserved-skills-root-entries.txt")
+}
+
+function Get-PreservedSkillsRootEntries {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$TargetName
+  )
+
+  $entriesFile = Get-PreservedSkillsRootEntriesFile
+  if (-not (Test-Path -LiteralPath $entriesFile -PathType Leaf)) {
+    return @()
+  }
+
+  $entries = [System.Collections.Generic.List[string]]::new()
+  $lineNumber = 0
+  foreach ($rawLine in @(Get-Content -LiteralPath $entriesFile)) {
+    $lineNumber++
+    $line = ([string]$rawLine -split "#", 2)[0].Trim()
+    if (-not $line) {
+      continue
+    }
+    $fields = @($line -split "\s+")
+    if ($fields.Count -ne 2) {
+      Write-WarnLine "Ignoring ${entriesFile}:${lineNumber}: expected '<target> <entry>'"
+      continue
+    }
+    if ($fields[0] -cne $TargetName) {
+      continue
+    }
+    $entryName = $fields[1]
+    if ($entryName -eq "." -or $entryName.Contains("/") -or $entryName.Contains("\") -or $entryName.Contains("..") -or $entryName.StartsWith(".apm-")) {
+      Write-WarnLine "Ignoring ${entriesFile}:${lineNumber}: invalid entry name '$entryName'"
+      continue
+    }
+    $entries.Add($entryName)
+  }
+  return $entries.ToArray()
+}
+
 function Reconcile-SkillsRootFromStage {
   param(
     [Parameter(Mandatory = $true)]
     [string]$StagedSkillsRoot,
 
     [Parameter(Mandatory = $true)]
-    [string]$TargetSkillsRoot
+    [string]$TargetSkillsRoot,
+
+    # Runtime target name used to look up preserved entries; empty preserves nothing.
+    [string]$TargetName = ""
   )
 
   New-Item -ItemType Directory -Path $TargetSkillsRoot -Force | Out-Null
@@ -3200,6 +3252,7 @@ function Reconcile-SkillsRootFromStage {
     $stagedChildren = @(Get-ChildItem -LiteralPath $StagedSkillsRoot -Force -Directory)
   }
   $stagedNames = [System.Collections.Generic.HashSet[string]]::new([string[]]@($stagedChildren | ForEach-Object Name), [System.StringComparer]::Ordinal)
+  $preservedNames = [System.Collections.Generic.HashSet[string]]::new([string[]]@(if ($TargetName) { Get-PreservedSkillsRootEntries -TargetName $TargetName }), [System.StringComparer]::Ordinal)
 
   foreach ($stagedChild in $stagedChildren) {
     $destinationChild = Join-Path $TargetSkillsRoot $stagedChild.Name
@@ -3214,6 +3267,9 @@ function Reconcile-SkillsRootFromStage {
       continue
     }
     if ($existingChild.Name -like ".apm-*") {
+      continue
+    }
+    if ($preservedNames.Contains($existingChild.Name)) {
       continue
     }
     Remove-Item -LiteralPath $existingChild.FullName -Recurse -Force
