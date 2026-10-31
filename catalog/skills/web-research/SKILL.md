@@ -16,7 +16,7 @@ Public web research from planning through synthesis. Collection uses the host's 
 ## Scope
 
 - Use public sources by default.
-- Do not use this for authenticated browsing, form submission, paid APIs, or internal source research unless another connector is explicitly available and allowed. If a task involves cost, publishing, or authenticated access, stop and confirm first.
+- Do not use this for authenticated browsing, form submission, paid APIs, or internal source research unless another connector is explicitly available and allowed. If a task involves cost, publishing, or authenticated access, stop and confirm first. Exception: the optional X search below, which the user opts into by setting `XAI_API_KEY`.
 
 ## Workflow
 
@@ -50,6 +50,17 @@ For large tasks, spawn one subagent per subtopic with the Agent tool:
 ### Login-Walled Sources (X/Twitter etc.)
 
 Fetchers without a login session see only public markup: login-walled content (X timelines, Instagram, paywalled articles) yields only indexed fragments. For X, search both `site:x.com` and `site:twitter.com`, cite snippets as excerpts (never as full post contents), attribute posts to their handle only, and prefer direct post URLs. Reaching protected or deleted content through a logged-in browser session needs an explicit user request.
+
+#### Optional: X Search via xAI
+
+Use this only when `[ -n "${XAI_API_KEY:-}" ]` is true. When the key is unset, skip this step without mentioning it and use the indexed `site:` search above.
+
+- Run `scripts/x-search.sh "<question>" [--handles a,b] [--from YYYY-MM-DD] [--to YYYY-MM-DD]` from this skill's directory. It calls the xAI Responses API with the `x_search` tool and prints the answer, post URLs, and `x_posts_fetched`.
+- It is billed per post fetched. Keep scope small: narrow by handle and date when you can, and make at most 3 calls per research task.
+- Cite the returned post URLs and attribute each post to its handle. Treat the model's summary as a lead and quote only what the cited posts say.
+- Report `x_posts_fetched` in the X/Twitter signal section.
+- If the script exits non-zero (key unset, request failed), fall back to the `site:` search without erroring.
+- Never print, log, or write the key.
 
 ## Source Type Notes
 
