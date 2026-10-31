@@ -23,7 +23,7 @@ dependencies:
       ref: 8f2d57610a73efc97d743c9b0b0ecb1002e09fa4
       alias: japanese-tech-writing
     - git: mattpocock/skills
-      ref: 24fe0ef7737efae15c87225755e9f6f5965e4888 # v1.3.1
+      ref: d1478fcb140db0b93c0c8df17bcfd311844749d0 # v1.3.2
       skills:
         - codebase-design
         - domain-modeling
@@ -43,7 +43,6 @@ dependencies:
     - vercel-labs/agent-skills/skills/react-best-practices#063bee94c3f4df8453406c830b0a7df0f2860278
 
     # --- design ---
-    - anthropics/claude-code/plugins/frontend-design/skills/frontend-design#765f236fe1bfcc678e0ec59af9170fb7d6771a3a
     - git: benjitaylor/agentation
       ref: 7982d83aa2d2ba46d0f68f257759ba527ba401a8
       skills:
@@ -54,13 +53,9 @@ dependencies:
       skills:
         - apple-design
         - emil-design-eng
-        - find-animation-opportunities
-        - improve-animations
-        - review-animations
     - git: ibelick/ui-skills
       ref: main
       skills:
-        - baseline-ui
         - fixing-accessibility
         - fixing-metadata
         - fixing-motion-performance

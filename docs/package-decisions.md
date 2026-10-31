@@ -782,3 +782,10 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - 理由: 2026-09-07 以降の Claude transcript、`history.jsonl`（2025-09 以降のスラッシュ起動）、2026-06 以降の Codex セッションの `SKILL.md` 読み込みのいずれにも使用が 0 回。Claude 側は `skillOverrides` で `off` だった。保持基準（verb 導線・弱いランタイムの保険・社会的理由・思い入れ）のどれにも当たらない。
 - 残した判断: `agentation` / `agentation-self-driving` は、使っていた時期があるためユーザー判断で残す。
 - 再導入: 使う場面ができたら `mvanhorn/last30days-skill/skills/last30days#7fac0fc31ba5212b5ddaa29252d9f7148cec8423`（v3.30.0）を `apm.yml` の dependencies.apm へ戻す。
+
+## 2026-10-31 重なっているスキルを間引いた
+
+- 撤去：baseline-ui（ibelick）、frontend-design（anthropics）、review-animations / improve-animations / find-animation-opportunities（emilkowalski）。74→69。
+- 残す：emil-design-eng、transitions-dev、ui-ux-pro-max、improve-ui、fixing-motion-performance。improve-ui と fixing-motion-performance は skillOverrides の off を外し、手で呼べるようにした。
+- domain-modeling と improve-codebase-architecture は wayfinder と refactoring から呼ばれるので残す。
+- 根拠：直近60日の利用ログで、撤去した5つは呼ばれていないか、emil-design-eng / improve-ui と役割がほぼ重なっていた。
