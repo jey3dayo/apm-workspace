@@ -351,6 +351,115 @@ EOF
   rm -rf "$workspace_dir"
 }
 
+@test "manifest object git and path match canonical references for subsets and aliases" {
+  workspace_dir="$BATS_TEST_TMPDIR/manifest-git-path"
+  mkdir -p "$workspace_dir"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: https://github.com/acme/tools.git
+      alias: example-tools
+      path: packages/example
+      skills:
+        - example
+EOF
+  WORKSPACE_DIR="$workspace_dir"
+
+  run manifest_external_references
+  [ "$status" -eq 0 ]
+  [ "$output" = "https://github.com/acme/tools.git/packages/example" ]
+
+  run manifest_external_skill_subset "acme/tools/packages/example"
+  [ "$status" -eq 0 ]
+  [ "$output" = "example" ]
+
+  run manifest_dependency_alias_for_record "acme/tools" "packages/example"
+  [ "$status" -eq 0 ]
+  [ "$output" = "example-tools" ]
+
+  alias_skill_dir="$workspace_dir/apm_modules/example-tools/packages/example"
+  mkdir -p "$alias_skill_dir"
+  printf '%s\n' '# example' >"$alias_skill_dir/SKILL.md"
+
+  run external_skill_id_from_record "acme/tools" "packages/example"
+  [ "$status" -eq 0 ]
+  [ "$output" = "example-tools" ]
+
+  run external_skill_content_dir "acme/tools" "packages/example" "abc123"
+  [ "$status" -eq 0 ]
+  [ "$output" = "$alias_skill_dir" ]
+}
+
+@test "external_skill_content_dir finds a path alias dependency staged flat under apm_modules/<alias>" {
+  workspace_dir="$BATS_TEST_TMPDIR/manifest-git-path-flat"
+  mkdir -p "$workspace_dir"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: acme/tools
+      path: skills/example
+      ref: abc123
+      alias: example-tools
+EOF
+  WORKSPACE_DIR="$workspace_dir"
+
+  alias_skill_dir="$workspace_dir/apm_modules/example-tools"
+  mkdir -p "$alias_skill_dir"
+  printf '%s\n' '# example' >"$alias_skill_dir/SKILL.md"
+
+  run external_skill_content_dir "acme/tools" "skills/example" "abc123"
+  [ "$status" -eq 0 ]
+  [ "$output" = "$alias_skill_dir" ]
+}
+
+@test "manifest path dependencies do not match bare repo or sibling path references" {
+  workspace_dir="$BATS_TEST_TMPDIR/manifest-path-collision"
+  mkdir -p "$workspace_dir"
+  cat >"$workspace_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: https://github.com/acme/tools.git
+      alias: first-path
+      skills:
+        - first
+      path: packages/first
+    - git: https://github.com/acme/tools.git
+      path: packages/second
+      alias: second-path
+      skills:
+        - second
+    - git: https://github.com/acme/tools.git
+      alias: repo-only
+      skills:
+        - root-only
+EOF
+  WORKSPACE_DIR="$workspace_dir"
+
+  run manifest_external_skill_subset "acme/tools"
+  [ "$status" -eq 0 ]
+  [ "$output" = "root-only" ]
+
+  run manifest_external_skill_subset "acme/tools/packages/first"
+  [ "$status" -eq 0 ]
+  [ "$output" = "first" ]
+
+  run manifest_external_skill_subset "acme/tools/packages/second"
+  [ "$status" -eq 0 ]
+  [ "$output" = "second" ]
+
+  run manifest_dependency_alias "acme/tools"
+  [ "$status" -eq 0 ]
+  [ "$output" = "repo-only" ]
+
+  run manifest_dependency_alias "acme/tools/packages/first"
+  [ "$status" -eq 0 ]
+  [ "$output" = "first-path" ]
+
+  run manifest_dependency_alias "acme/tools/packages/second"
+  [ "$status" -eq 0 ]
+  [ "$output" = "second-path" ]
+}
+
 @test "upgrade runs apm update non-interactively so agents and CI can drive it" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
   run assert_mise_upgrade "$tasks_json"
@@ -2623,6 +2732,59 @@ EOF
   rm -rf "$pin_external_dir"
 }
 
+@test "cmd_pin_external matches a structured git dependency using its sibling path" {
+  _pin_external_fixture
+  cat >"$pin_external_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: https://github.com/acme/tools.git
+      path: packages/example
+      alias: example-tools
+EOF
+  cat >"$pin_external_dir/apm.lock.yaml" <<'EOF'
+dependencies:
+  apm:
+  - repo_url: acme/tools
+    virtual_path: packages/example
+    resolved_commit: 1234567890abcdef1234567890abcdef12345678
+EOF
+
+  WORKSPACE_DIR="$pin_external_dir"
+
+  run cmd_pin_external
+  [ "$status" -eq 0 ]
+
+  manifest="$(<"$pin_external_dir/apm.yml")"
+  expected=$'    - git: https://github.com/acme/tools.git\n      ref: 1234567890abcdef1234567890abcdef12345678\n      path: packages/example\n      alias: example-tools'
+  [[ "$manifest" == *"$expected"* ]]
+
+  rm -rf "$pin_external_dir"
+}
+
+@test "cmd_pin_external does not use a repo-only lock record for a path dependency" {
+  _pin_external_fixture
+  cat >"$pin_external_dir/apm.yml" <<'EOF'
+dependencies:
+  apm:
+    - git: https://github.com/acme/tools.git
+      path: packages/example
+EOF
+  cat >"$pin_external_dir/apm.lock.yaml" <<'EOF'
+dependencies:
+  apm:
+  - repo_url: acme/tools
+    resolved_commit: 1234567890abcdef1234567890abcdef12345678
+EOF
+
+  WORKSPACE_DIR="$pin_external_dir"
+
+  run cmd_pin_external
+  [ "$status" -eq 0 ]
+  [[ "$(<"$pin_external_dir/apm.yml")" != *"ref:"* ]]
+
+  rm -rf "$pin_external_dir"
+}
+
 @test "cmd_pin_external does not duplicate ref: on a structured entry that is already pinned" {
   _pin_external_fixture
   cat >"$pin_external_dir/apm.yml" <<'EOF'
@@ -2655,7 +2817,7 @@ EOF
   rm -rf "$pin_external_dir"
 }
 
-@test "unpinned_external_references reports a structured git: entry's repo value, not the literal git: key or nested skills" {
+@test "unpinned_external_references includes a structured git dependency path but not nested skills" {
   # Regression for the doctor "unpinned" count being inflated: the old awk
   # matched every "- " line at or below the apm bullet indent, so it also
   # counted the literal "git:" token and the nested "- ui-ux-pro-max" item
@@ -2665,6 +2827,7 @@ EOF
 dependencies:
   apm:
     - git: nextlevelbuilder/ui-ux-pro-max-skill
+      path: plugins/ui-ux-pro-max
       skills:
         - ui-ux-pro-max
 EOF
@@ -2673,7 +2836,7 @@ EOF
 
   run unpinned_external_references
   [ "$status" -eq 0 ]
-  [ "$output" = "nextlevelbuilder/ui-ux-pro-max-skill" ]
+  [ "$output" = "nextlevelbuilder/ui-ux-pro-max-skill/plugins/ui-ux-pro-max" ]
 
   rm -rf "$workspace_dir"
 }

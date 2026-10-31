@@ -343,6 +343,73 @@ scripts: {}
     $subset | Should -Be @("design", "ui-ux-pro-max")
   }
 
+  It "matches object git and path dependencies by their canonical reference for subsets and aliases" {
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+    - git: https://github.com/acme/tools.git
+      alias: example-tools
+      path: packages/example
+      skills:
+        - example
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+
+    $references = @(Get-ManifestApmDependencyReferences)
+    $references | Should -Contain "https://github.com/acme/tools.git/packages/example"
+
+    $keys = @(Get-ManifestReferenceCandidateKeys -Reference $references[0])
+    $keys | Should -Contain "acme/tools/packages/example"
+
+    $subset = @(Get-ManifestExternalSkillSubset -Reference "acme/tools/packages/example")
+    $subset | Should -Be @("example")
+
+    $alias = Get-ManifestDependencyAlias -Reference "acme/tools" -Path "packages/example"
+    $alias | Should -Be "example-tools"
+
+    $aliasSkillDir = Join-Path (Join-Path (Join-Path $script:WorkspaceDir "apm_modules") "example-tools") "packages/example"
+    New-Item -ItemType Directory -Path $aliasSkillDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $aliasSkillDir "SKILL.md") -Value "# example"
+
+    Get-ExternalSkillId -RepoUrl "acme/tools" -VirtualPath "packages/example" | Should -Be "example-tools"
+    Get-ExternalSkillInstallPath -RepoUrl "acme/tools" -VirtualPath "packages/example" -ResolvedCommit "abc123" | Should -Be $aliasSkillDir
+  }
+
+  It "does not match path dependencies as a bare repo or a sibling path" {
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+    - git: https://github.com/acme/tools.git
+      alias: first-path
+      skills:
+        - first
+      path: packages/first
+    - git: https://github.com/acme/tools.git
+      path: packages/second
+      alias: second-path
+      skills:
+        - second
+    - git: https://github.com/acme/tools.git
+      alias: repo-only
+      skills:
+        - root-only
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+
+    @(Get-ManifestExternalSkillSubset -Reference "acme/tools") | Should -Be @("root-only")
+    @(Get-ManifestExternalSkillSubset -Reference "acme/tools/packages/first") | Should -Be @("first")
+    @(Get-ManifestExternalSkillSubset -Reference "acme/tools/packages/second") | Should -Be @("second")
+
+    Get-ManifestDependencyAlias -Reference "acme/tools" | Should -Be "repo-only"
+    Get-ManifestDependencyAlias -Reference "acme/tools" -Path "packages/first" | Should -Be "first-path"
+    Get-ManifestDependencyAlias -Reference "acme/tools" -Path "packages/second" | Should -Be "second-path"
+    @(Get-GitReferenceCandidateKeys -Reference "https://github.com/acme/tools.git" -Path "packages/first") | Should -Not -Contain "acme/tools"
+  }
+
   It "expands manual-skills package roots into copied skills" {
     $previousWorkspaceDir = $script:WorkspaceDir
     $previousGlobalWorkspaceDir = $global:WorkspaceDir
@@ -1503,13 +1570,14 @@ dependencies:
   apm:
     - jey3dayo/apm-workspace/catalog#main
     - git: nextlevelbuilder/ui-ux-pro-max-skill
+      path: plugins/ui-ux-pro-max
       skills:
         - ui-ux-pro-max
   mcp: []
 scripts: {}
 "@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
 
-    @(Get-UnpinnedExternalReferences) | Should -Be @("nextlevelbuilder/ui-ux-pro-max-skill")
+    @(Get-UnpinnedExternalReferences) | Should -Be @("nextlevelbuilder/ui-ux-pro-max-skill/plugins/ui-ux-pro-max")
   }
 
   It "treats a structured git dependency with a ref sibling as pinned" {
@@ -1617,6 +1685,62 @@ dependencies:
     $gitLineIndex = [array]::IndexOf($manifestLines, "    - git: nextlevelbuilder/ui-ux-pro-max-skill")
     $manifestLines[$gitLineIndex + 1] | Should -Be "      ref: 4444444444444444444444444444444444444444"
     @(Get-UnpinnedExternalReferences) | Should -Be @()
+  }
+
+  It "pin-external matches a structured git dependency using its sibling path" {
+    Mock Ensure-WorkspaceRepo {}
+    Mock Ensure-WorkspaceScaffold {}
+
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+    - git: https://github.com/acme/tools.git
+      path: packages/example
+      alias: example-tools
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+    @"
+lockfile_version: "1"
+dependencies:
+  - repo_url: acme/tools
+    host: github.com
+    resolved_commit: 1234567890abcdef1234567890abcdef12345678
+    virtual_path: packages/example
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
+
+    Invoke-PinExternal
+
+    $manifestLines = @(Get-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml"))
+    $manifestLines | Should -Contain "      ref: 1234567890abcdef1234567890abcdef12345678"
+    @(Get-UnpinnedExternalReferences) | Should -Be @()
+  }
+
+  It "pin-external does not use a repo-only lock record for a path dependency" {
+    Mock Ensure-WorkspaceRepo {}
+    Mock Ensure-WorkspaceScaffold {}
+
+    @"
+name: apm-workspace
+dependencies:
+  apm:
+    - git: https://github.com/acme/tools.git
+      path: packages/example
+  mcp: []
+scripts: {}
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")
+    @"
+lockfile_version: "1"
+dependencies:
+  - repo_url: acme/tools
+    host: github.com
+    resolved_commit: 1234567890abcdef1234567890abcdef12345678
+"@ | Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.lock.yaml")
+
+    Invoke-PinExternal
+
+    @(Get-Content -LiteralPath (Join-Path $script:WorkspaceDir "apm.yml")) | Should -Not -Contain "      ref: 1234567890abcdef1234567890abcdef12345678"
   }
 
   It "pin-external leaves an already-pinned structured git dependency unchanged" {

@@ -30,11 +30,12 @@
   `improve-codebase-architecture`, `prototype`, `research`, `retro`, `setup-matt-pocock-skills`,
   `wait-what`, `wayfinder`, `writing-for-agents`）
 - react: `react-doctor`, `react-best-practices`
-- design: `frontend-design`, `agentation` / `agentation-self-driving`,
+- design: `agentation` / `agentation-self-driving`,
   emilkowalski 系（`apple-design`, `emil-design-eng`, `find-animation-opportunities`,
   `improve-animations`, `review-animations`）,
-  ibelick 系（`baseline-ui`, `fixing-accessibility`, `fixing-metadata`,
-  `fixing-motion-performance`, `improve-ui`）, `transitions-dev`, `ui-ux-pro-max`
+  ibelick 系（`fixing-accessibility`, `fixing-metadata`,
+  `fixing-motion-performance`, `improve-ui`）, `transitions-dev`, `ui-ux-pro-max`,
+  `unslop-ui`（heydamir/unslop の skills/unslop、alias）
 - browser / analysis: `browser-harness`, `screenshot`, `archify`
 - agent tools: `tuicr`, `agmsg`, `show-me`
 

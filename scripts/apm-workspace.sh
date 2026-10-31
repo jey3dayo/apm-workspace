@@ -1560,23 +1560,18 @@ manifest_dependency_alias() {
   awk -v wanted="$target_ref" -f "$APM_AWK_DIR/manifest-ref-normalize.awk" -f "$APM_AWK_DIR/manifest-dependency-alias.awk" "$manifest_path"
 }
 
+manifest_dependency_alias_for_record() {
+  local repo_url="$1"
+  local virtual_path="$2"
+  local target_ref="$repo_url"
+  if [ -n "$virtual_path" ]; then
+    target_ref="$target_ref/$virtual_path"
+  fi
+  manifest_dependency_alias "$target_ref"
+}
+
 manifest_external_reference_keys() {
-  manifest_external_references | awk '
-    NF {
-      print $0
-      base = $0
-      sub(/#.*/, "", base)
-      print base
-      if (index(base, "https://gist.github.com/") == 1) {
-        gist_key = base
-        sub("^https://gist[.]github[.]com/", "", gist_key)
-        sub("[.]git$", "", gist_key)
-        if (split(gist_key, gist_parts, "/") == 2) {
-          print gist_key
-        }
-      }
-    }
-  ' | awk 'NF && !seen[$0]++'
+  manifest_external_references | awk -f "$APM_AWK_DIR/manifest-ref-normalize.awk" -f "$APM_AWK_DIR/manifest-reference-keys.awk" | awk 'NF && !seen[$0]++'
 }
 
 external_skill_relative_path() {
@@ -1642,7 +1637,7 @@ external_skill_id_from_record() {
   repo_url="$1"
   virtual_path="$2"
 
-  alias_skill_id=$(manifest_dependency_alias "$repo_url")
+  alias_skill_id=$(manifest_dependency_alias_for_record "$repo_url" "$virtual_path")
   if [ -n "$alias_skill_id" ]; then
     validate_skill_id "$alias_skill_id"
     printf '%s\n' "$alias_skill_id"
@@ -1679,14 +1674,19 @@ external_skill_content_dir() {
   # alias location first and return as soon as it resolves: folding it into
   # the single candidate_paths list below would make the two intentionally
   # duplicated copies look "ambiguous" and abort every alias lookup.
-  alias_id=$(manifest_dependency_alias "$repo_url")
+  alias_id=$(manifest_dependency_alias_for_record "$repo_url" "$virtual_path")
   if [ -n "$alias_id" ]; then
     alias_candidate_paths=""
     if [ -n "$virtual_path" ]; then
-      alias_candidate_paths=$(printf '%s\n%s\n%s\n' \
+      # apm 0.35 stages a `path:` + `alias:` dependency flat under
+      # apm_modules/<alias>, so the bare alias roots are candidates too.
+      alias_candidate_paths=$(printf '%s\n%s\n%s\n%s\n%s\n%s\n' \
         "$apm_modules_root/$alias_id/$virtual_path" \
         "$apm_modules_root/$alias_id/$resolved_commit/$virtual_path" \
-        "$apm_modules_root/$resolved_commit/$alias_id/$virtual_path")
+        "$apm_modules_root/$resolved_commit/$alias_id/$virtual_path" \
+        "$apm_modules_root/$alias_id" \
+        "$apm_modules_root/$alias_id/$resolved_commit" \
+        "$apm_modules_root/$resolved_commit/$alias_id")
     else
       alias_candidate_paths=$(printf '%s\n%s\n%s\n' \
         "$apm_modules_root/$alias_id" \
