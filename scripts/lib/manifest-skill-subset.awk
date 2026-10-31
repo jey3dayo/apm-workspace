@@ -9,23 +9,36 @@ function indent_level(line, trimmed) {
   sub(/^[[:space:]]+/, "", trimmed)
   return length(line) - length(trimmed)
 }
+function flush_dependency(i) {
+  if (current_ref != "" && dependency_ref_matches(wanted, current_ref, current_path)) {
+    for (i = 1; i <= skill_count; i++) {
+      print skill_names[i]
+    }
+  }
+  for (i = 1; i <= skill_count; i++) {
+    delete skill_names[i]
+  }
+  current_ref = ""
+  current_path = ""
+  skill_count = 0
+  in_skills = 0
+  skills_indent = -1
+}
 /^    - git:[[:space:]]*/ {
+  flush_dependency()
   current_ref = $3
-  current_gist_key = gist_key($3)
-  current_canonical_ref = canonical_ref($3)
+  current_path = ""
   in_skills = 0
   skills_indent = -1
   next
 }
 /^    - [^[:space:]]/ {
-  current_ref = ""
-  current_gist_key = ""
-  current_canonical_ref = ""
-  in_skills = 0
-  skills_indent = -1
+  flush_dependency()
   next
 }
-(current_ref != wanted) && (current_gist_key != wanted) && (current_canonical_ref != wanted) {
+/^      path:[[:space:]]*/ {
+  current_path = $2
+  gsub(/["']/, "", current_path)
   next
 }
 /^      skills:[[:space:]]*$/ {
@@ -35,10 +48,12 @@ function indent_level(line, trimmed) {
 }
 in_skills && indent_level($0) <= skills_indent {
   in_skills = 0
-  next
 }
 in_skills && /^[[:space:]]*-[[:space:]]+/ {
   value = $2
   gsub(/"/, "", value)
-  print value
+  skill_names[++skill_count] = value
+}
+END {
+  flush_dependency()
 }

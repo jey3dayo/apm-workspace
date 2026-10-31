@@ -6,19 +6,35 @@
 # whatever form the author wrote.
 # Invoked as:
 #   awk -v wanted=<ref> -f scripts/lib/manifest-ref-normalize.awk -f scripts/lib/manifest-dependency-alias.awk <manifest_path>
+function flush_dependency() {
+  if (current_ref != "" && current_alias != "" && dependency_ref_matches(wanted, current_ref, current_path)) {
+    print current_alias
+    found = 1
+  }
+  current_ref = ""
+  current_path = ""
+  current_alias = ""
+}
 /^    - git:[[:space:]]*/ {
+  flush_dependency()
+  if (found) {
+    exit
+  }
   current_ref = $3
-  current_gist_key = gist_key($3)
-  current_canonical_ref = canonical_ref($3)
+  current_path = ""
+  current_alias = ""
   next
 }
 /^    - [^[:space:]]/ {
-  current_ref = ""
-  current_gist_key = ""
-  current_canonical_ref = ""
+  flush_dependency()
+  if (found) {
+    exit
+  }
   next
 }
-(current_ref != wanted) && (current_gist_key != wanted) && (current_canonical_ref != wanted) {
+/^      path:[[:space:]]*/ {
+  current_path = $2
+  gsub(/["']/, "", current_path)
   next
 }
 /^      alias:[[:space:]]+/ {
@@ -27,8 +43,11 @@
   sub(/[[:space:]]+#.*$/, "", value)
   sub(/[[:space:]]+$/, "", value)
   gsub(/"/, "", value)
-  if (value != "") {
-    print value
-    exit
+  current_alias = value
+  next
+}
+END {
+  if (!found && current_ref != "" && current_alias != "" && dependency_ref_matches(wanted, current_ref, current_path)) {
+    print current_alias
   }
 }

@@ -906,6 +906,7 @@ function Get-ManifestApmDependencyReferences {
 
       $siblingIndent = $dashIndent + 2
       $pinnedSha = $null
+      $virtualPath = $null
       $blockEnd = $i
       $j = $i + 1
       while ($j -lt $lines.Count) {
@@ -923,6 +924,9 @@ function Get-ManifestApmDependencyReferences {
         if ($siblingIndentLevel -eq $siblingIndent -and $siblingLine -match '^\s*ref:\s*(\S+)\s*$') {
           $pinnedSha = $Matches[1]
         }
+        if ($siblingIndentLevel -eq $siblingIndent -and $siblingLine -match '^\s*path:\s*(\S+)(?:\s+#.*)?$') {
+          $virtualPath = $Matches[1].Trim('"').Trim("'")
+        }
 
         # This entry's own sibling keys (e.g. `skills:` and its nested
         # list items) belong to the mapping, not to the surrounding
@@ -933,7 +937,10 @@ function Get-ManifestApmDependencyReferences {
         $j += 1
       }
 
-      $canonicalReference = if ($pinnedSha) { "$reference#$pinnedSha" } else { $reference }
+      $canonicalReference = if ($virtualPath) { "$reference/$virtualPath" } else { $reference }
+      if ($pinnedSha) {
+        $canonicalReference = "$canonicalReference#$pinnedSha"
+      }
       if (-not $result.Contains($canonicalReference)) {
         $result.Add($canonicalReference)
       }
@@ -986,41 +993,61 @@ function Get-ManifestExternalSkillSubset {
   # unanchored, `-\s+\S+` also matches deeper-indented `skills:` items and
   # resets the candidate keys before they're read.
   $result = New-Object System.Collections.Generic.List[string]
-  $currentCandidateKeys = $null
+  $currentReference = $null
+  $currentPath = $null
+  $currentSkills = New-Object System.Collections.Generic.List[string]
   $inSkills = $false
   $skillsIndent = -1
   foreach ($line in (Get-Content -LiteralPath $manifestPath)) {
-    if ($line -match '^ {4}- git:\s+(\S+)\s*$') {
-      $currentCandidateKeys = Get-GitReferenceCandidateKeys -Reference $Matches[1]
+    if ($line -match '^ {4}- git:\s+(\S+)\s*$' -or $line -match '^ {4}-\s+\S+') {
+      if ($null -ne $currentReference) {
+        $currentCandidateKeys = Get-GitReferenceCandidateKeys -Reference $currentReference -Path $currentPath
+        if ($currentCandidateKeys.Contains($Reference)) {
+          foreach ($skill in $currentSkills) {
+            $result.Add($skill)
+          }
+        }
+      }
+
+      if ($line -match '^ {4}- git:\s+(\S+)\s*$') {
+        $currentReference = $Matches[1]
+        $currentPath = $null
+      } else {
+        $currentReference = $null
+        $currentPath = $null
+      }
+      $currentSkills = New-Object System.Collections.Generic.List[string]
       $inSkills = $false
       $skillsIndent = -1
-      continue
-    }
-
-    if ($line -match '^ {4}-\s+\S+') {
-      $currentCandidateKeys = $null
-      $inSkills = $false
-      $skillsIndent = -1
-      continue
-    }
-
-    if ($null -eq $currentCandidateKeys -or -not $currentCandidateKeys.Contains($Reference)) {
-      continue
-    }
-
-    if ($line -match '^\s+skills:\s*$') {
-      $inSkills = $true
-      $skillsIndent = Get-YamlIndentLevel -Line $line
       continue
     }
 
     if ($inSkills -and (Get-YamlIndentLevel -Line $line) -le $skillsIndent) {
       $inSkills = $false
+    }
+
+    if ($null -ne $currentReference -and $line -match '^ {6}path:\s*(\S+)(?:\s+#.*)?$') {
+      $currentPath = $Matches[1].Trim('"').Trim("'")
       continue
     }
 
-    if ($inSkills -and $line -match '^\s*-\s+(\S+)\s*$') {
-      $result.Add($Matches[1].Trim('"'))
+    if ($line -match '^ {6}skills:\s*$') {
+      $inSkills = $true
+      $skillsIndent = Get-YamlIndentLevel -Line $line
+      continue
+    }
+
+    if ($inSkills -and $line -match '^ {8}-\s+(\S+)\s*$') {
+      $currentSkills.Add($Matches[1].Trim('"'))
+    }
+  }
+
+  if ($null -ne $currentReference) {
+    $currentCandidateKeys = Get-GitReferenceCandidateKeys -Reference $currentReference -Path $currentPath
+    if ($currentCandidateKeys.Contains($Reference)) {
+      foreach ($skill in $currentSkills) {
+        $result.Add($skill)
+      }
     }
   }
 
@@ -1041,26 +1068,41 @@ function Get-ManifestExternalSkillSubset {
 function Get-GitReferenceCandidateKeys {
   param(
     [Parameter(Mandatory = $true)]
-    [string]$Reference
+    [string]$Reference,
+
+    [string]$Path
   )
 
   $keys = New-Object 'System.Collections.Generic.HashSet[string]'
-  $null = $keys.Add($Reference)
+  $hasPath = -not [string]::IsNullOrWhiteSpace($Path)
+  $lookupReference = if ($hasPath) { "$Reference/$Path" } else { $Reference }
+  $null = $keys.Add($lookupReference)
 
-  if ($Reference -match '^https://gist\.github\.com/(.+?)\.git$') {
-    $null = $keys.Add($Matches[1])
+  if ($Reference -match '^https://gist\.github\.com/') {
+    $gistKey = $Reference -replace '^https://gist\.github\.com/', ''
+    $gistKey = $gistKey -replace '\.git(?=/|$)', ''
+    if ($hasPath) {
+      $gistKey = "$gistKey/$Path"
+    }
+    $null = $keys.Add($gistKey)
   }
 
   if ($Reference -match '^https://') {
     $working = $Reference -replace '^https://', ''
-    $working = $working -replace '\.git$', ''
+    $working = $working -replace '\.git(?=/|$)', ''
     $working = $working -replace '/$', ''
     $working = $working -replace '^github\.com/', ''
+    if ($hasPath) {
+      $working = "$working/$Path"
+    }
     $null = $keys.Add($working)
   } elseif ($Reference -match '^git@') {
     $working = $Reference -replace '^git@', ''
-    $working = $working -replace '\.git$', ''
+    $working = $working -replace '\.git(?=/|$)', ''
     $working = [regex]::new(':').Replace($working, '/', 1)
+    if ($hasPath) {
+      $working = "$working/$Path"
+    }
     $null = $keys.Add($working)
   }
 
@@ -1076,7 +1118,9 @@ function Get-GitReferenceCandidateKeys {
 function Get-ManifestDependencyAlias {
   param(
     [Parameter(Mandatory = $true)]
-    [string]$Reference
+    [string]$Reference,
+
+    [string]$Path
   )
 
   $manifestPath = Join-Path $WorkspaceDir "apm.yml"
@@ -1084,29 +1128,59 @@ function Get-ManifestDependencyAlias {
     return $null
   }
 
-  $currentReference = $null
-  $currentCandidateKeys = $null
+  $dependencies = New-Object System.Collections.Generic.List[object]
+  $currentDependency = $null
+  $targetCandidateKeys = Get-GitReferenceCandidateKeys -Reference $Reference -Path $Path
   foreach ($line in (Get-Content -LiteralPath $manifestPath)) {
-    if ($line -match '^\s*-\s+git:\s+(\S+)\s*$') {
-      $currentReference = $Matches[1]
-      $currentCandidateKeys = Get-GitReferenceCandidateKeys -Reference $currentReference
+    if ($line -match '^ {4}- git:\s+(\S+)\s*$') {
+      if ($null -ne $currentDependency) {
+        $dependencies.Add($currentDependency)
+      }
+      $currentDependency = [pscustomobject]@{
+        Reference = $Matches[1]
+        Path = $null
+        Alias = $null
+      }
       continue
     }
 
-    if ($line -match '^\s*-\s+\S+') {
-      $currentReference = $null
-      $currentCandidateKeys = $null
+    if ($line -match '^ {4}-\s+\S+') {
+      if ($null -ne $currentDependency) {
+        $dependencies.Add($currentDependency)
+      }
+      $currentDependency = $null
       continue
     }
 
-    if ($null -eq $currentCandidateKeys -or -not $currentCandidateKeys.Contains($Reference)) {
+    if ($null -eq $currentDependency) {
       continue
     }
 
-    if ($line -match '^\s+alias:\s+(.+?)\s*(#.*)?$') {
+    if ($line -match '^ {6}path:\s*(\S+)(?:\s+#.*)?$') {
+      $currentDependency.Path = $Matches[1].Trim('"').Trim("'")
+      continue
+    }
+
+    if ($line -match '^ {6}alias:\s+(.+?)\s*(#.*)?$') {
       $value = $Matches[1].Trim().Trim('"')
       if (-not [string]::IsNullOrWhiteSpace($value)) {
-        return $value
+        $currentDependency.Alias = $value
+      }
+    }
+  }
+
+  if ($null -ne $currentDependency) {
+    $dependencies.Add($currentDependency)
+  }
+
+  foreach ($dependency in $dependencies) {
+    if ([string]::IsNullOrWhiteSpace($dependency.Alias)) {
+      continue
+    }
+    $candidateKeys = Get-GitReferenceCandidateKeys -Reference $dependency.Reference -Path $dependency.Path
+    foreach ($candidate in $targetCandidateKeys) {
+      if ($candidateKeys.Contains($candidate)) {
+        return $dependency.Alias
       }
     }
   }
@@ -1144,6 +1218,11 @@ function Get-ManifestReferenceCandidateKeys {
   $null = $keys.Add($Reference)
   $baseReference = ($Reference -replace '#.*$', '')
   $null = $keys.Add($baseReference)
+  foreach ($candidate in (Get-GitReferenceCandidateKeys -Reference $baseReference)) {
+    if (-not $keys.Contains($candidate)) {
+      $keys.Add($candidate)
+    }
+  }
 
   # Gist references are declared in apm.yml as full clone URLs
   # (https://gist.github.com/<owner>/<id>.git[#<sha>]) but the lockfile
@@ -1270,7 +1349,7 @@ function Get-ExternalSkillInstallPath {
   # alias location first and return as soon as it resolves: folding it into
   # the single candidate list below would make the two intentionally
   # duplicated copies look "ambiguous" and abort every alias lookup.
-  $aliasId = Get-ManifestDependencyAlias -Reference $RepoUrl
+  $aliasId = Get-ManifestDependencyAlias -Reference $RepoUrl -Path $VirtualPath
   if (-not [string]::IsNullOrWhiteSpace($aliasId)) {
     $aliasSegments = @(Convert-ReferencePathToSegments -Value $aliasId)
     $aliasCandidatePaths = New-Object System.Collections.Generic.List[string]
@@ -1296,6 +1375,12 @@ function Get-ExternalSkillInstallPath {
       Add-ExternalSkillAliasCandidatePath -Segments @($aliasSegments + $virtualSegments)
       if (-not [string]::IsNullOrWhiteSpace($ResolvedCommit)) {
         Add-ExternalSkillAliasCandidatePath -Segments @($aliasSegments + @($ResolvedCommit) + $virtualSegments)
+      }
+      # apm 0.35 stages a path + alias dependency flat under apm_modules/<alias>.
+      Add-ExternalSkillAliasCandidatePath -Segments $aliasSegments
+      if (-not [string]::IsNullOrWhiteSpace($ResolvedCommit)) {
+        Add-ExternalSkillAliasCandidatePath -Segments @($aliasSegments + @($ResolvedCommit))
+        Add-ExternalSkillAliasCandidatePath -Segments @(@($ResolvedCommit) + $aliasSegments)
       }
     } else {
       Add-ExternalSkillAliasCandidatePath -Segments $aliasSegments
@@ -1587,7 +1672,7 @@ function Get-ExternalSkillId {
     [string]$VirtualPath
   )
 
-  $aliasSkillId = Get-ManifestDependencyAlias -Reference $RepoUrl
+  $aliasSkillId = Get-ManifestDependencyAlias -Reference $RepoUrl -Path $VirtualPath
   if (-not [string]::IsNullOrWhiteSpace($aliasSkillId)) {
     Test-SkillId -SkillId $aliasSkillId
     return $aliasSkillId
@@ -1883,24 +1968,37 @@ function Invoke-PinExternal {
   }
 
   function Resolve-PinExternalCommit {
-    param([string]$Reference)
+    param(
+      [string]$Reference,
+
+      [string]$Path
+    )
 
     # Manifest declarations may not match the lock's casing exactly (e.g. a
     # GitHub owner segment typed with different capitalization). Fall back
     # to a case-insensitive lookup, but always return the commit for the
     # lock's own canonical key so the sha itself is correct.
-    $matchedKey = $null
-    if ($pinMap.ContainsKey($Reference)) {
-      $matchedKey = $Reference
-    } elseif ($pinMapLower.ContainsKey($Reference.ToLowerInvariant())) {
-      $matchedKey = $pinMapLower[$Reference.ToLowerInvariant()]
+    $candidateReferences = New-Object System.Collections.Generic.List[string]
+    $referenceToResolve = if ([string]::IsNullOrWhiteSpace($Path)) { $Reference } else { "$Reference/$Path" }
+    foreach ($candidate in (Get-GitReferenceCandidateKeys -Reference $referenceToResolve)) {
+      if (-not $candidateReferences.Contains($candidate)) {
+        $candidateReferences.Add($candidate)
+      }
     }
 
-    if (-not $matchedKey) {
-      return $null
+    foreach ($candidateReference in $candidateReferences) {
+      $matchedKey = $null
+      if ($pinMap.ContainsKey($candidateReference)) {
+        $matchedKey = $candidateReference
+      } elseif ($pinMapLower.ContainsKey($candidateReference.ToLowerInvariant())) {
+        $matchedKey = $pinMapLower[$candidateReference.ToLowerInvariant()]
+      }
+      if ($matchedKey) {
+        return $pinMap[$matchedKey].Substring($matchedKey.Length + 1)
+      }
     }
 
-    return $pinMap[$matchedKey].Substring($matchedKey.Length + 1)
+    return $null
   }
 
   $lines = @(Get-Content -LiteralPath $manifestPath)
@@ -1920,6 +2018,7 @@ function Invoke-PinExternal {
       $siblingIndent = $dashIndent + 2
 
       $alreadyPinned = $false
+      $virtualPath = $null
       $j = $i + 1
       while ($j -lt $lines.Count) {
         $siblingLine = $lines[$j]
@@ -1937,6 +2036,9 @@ function Invoke-PinExternal {
           $alreadyPinned = $true
           break
         }
+        if ($siblingIndentLevel -eq $siblingIndent -and $siblingLine -match '^\s*path:\s*(\S+)(?:\s+#.*)?$') {
+          $virtualPath = $Matches[1].Trim('"').Trim("'")
+        }
 
         $j += 1
       }
@@ -1944,7 +2046,7 @@ function Invoke-PinExternal {
       $updatedLines.Add($line)
 
       if (-not $alreadyPinned) {
-        $commit = Resolve-PinExternalCommit -Reference $repo
+        $commit = Resolve-PinExternalCommit -Reference $repo -Path $virtualPath
         if ($commit) {
           $updatedLines.Add((' ' * $siblingIndent) + "ref: $commit")
           $updatedCount += 1

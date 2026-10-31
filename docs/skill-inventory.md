@@ -34,7 +34,8 @@
   emilkowalski 系（`apple-design`, `emil-design-eng`, `find-animation-opportunities`,
   `improve-animations`, `review-animations`）,
   ibelick 系（`fixing-accessibility`, `fixing-metadata`,
-  `fixing-motion-performance`, `improve-ui`）, `transitions-dev`, `ui-ux-pro-max`
+  `fixing-motion-performance`, `improve-ui`）, `transitions-dev`, `ui-ux-pro-max`,
+  `unslop-ui`（heydamir/unslop の skills/unslop、alias）
 - browser / analysis: `browser-harness`, `screenshot`, `archify`
 - agent tools: `tuicr`, `agmsg`, `show-me`
 

@@ -26,23 +26,65 @@ function normalize_repo(ref, parts, count, i, normalized) {
   }
   return normalized
 }
+function canonical_git_ref(ref, working) {
+  working = ref
+  if (working ~ /^https:\/\//) {
+    sub(/^https:\/\//, "", working)
+    sub(/\.git\//, "/", working)
+    sub(/\.git$/, "", working)
+    sub(/\/$/, "", working)
+    sub(/^github\.com\//, "", working)
+    return working
+  }
+  if (working ~ /^git@/) {
+    sub(/^git@/, "", working)
+    sub(/\.git\//, "/", working)
+    sub(/\.git$/, "", working)
+    sub(/:/, "/", working)
+    return working
+  }
+  return ""
+}
+function pinned_commit(ref, canonical, normalized) {
+  if (ref in pinned) {
+    return pinned[ref]
+  }
+  normalized = normalize_repo(ref)
+  if (normalized in pinned_norm) {
+    return pinned_norm[normalized]
+  }
+  canonical = canonical_git_ref(ref)
+  if (canonical != "") {
+    if (canonical in pinned) {
+      return pinned[canonical]
+    }
+    normalized = normalize_repo(canonical)
+    if (normalized in pinned_norm) {
+      return pinned_norm[normalized]
+    }
+  }
+  return ""
+}
 # Structured "- git: <repo>" entries are pinned by inserting a sibling
 # "ref: <sha>" key right after git: (before skills:), never by appending
 # "#<sha>" to the git: value itself (apm reads/writes ref: as a separate field;
 # see apm_cli.models.dependency.reference for the entry["ref"] contract). The
 # item is buffered so the insertion point is independent of where the item
 # happens to dedent.
-function flush_git_pending(i) {
+function flush_git_pending(i, pending_key, pin) {
   if (!pending_is_git) {
     return
   }
+  pin = ""
+  pending_key = pending_repo
+  if (pending_path != "") {
+    pending_key = pending_key "/" pending_path
+  }
+  pin = pinned_commit(pending_key)
   print git_line
   if (!pending_has_ref) {
-    if (pending_repo in pinned) {
-      printf "%*sref: %s\n", pending_indent + 2, "", pinned[pending_repo]
-      updated++
-    } else if (normalize_repo(pending_repo) in pinned_norm) {
-      printf "%*sref: %s\n", pending_indent + 2, "", pinned_norm[normalize_repo(pending_repo)]
+    if (pin != "") {
+      printf "%*sref: %s\n", pending_indent + 2, "", pin
       updated++
     }
   }
@@ -52,6 +94,7 @@ function flush_git_pending(i) {
   pending_is_git = 0
   pending_has_ref = 0
   pending_repo = ""
+  pending_path = ""
   pending_indent = 0
   buffer_count = 0
   git_line = ""
@@ -70,6 +113,7 @@ BEGIN {
   pending_is_git = 0
   pending_has_ref = 0
   pending_repo = ""
+  pending_path = ""
   pending_indent = 0
   buffer_count = 0
 }
@@ -82,6 +126,11 @@ BEGIN {
       buffer[++buffer_count] = $0
       next
     }
+    if ($0 ~ /^[[:space:]]+path:[[:space:]]+/ && current_indent == pending_indent + 2) {
+      pending_path = $2
+      gsub(/["']/, "", pending_path)
+      sub(/#.*/, "", pending_path)
+    }
     if (current_indent > pending_indent) {
       buffer[++buffer_count] = $0
       next
@@ -93,6 +142,7 @@ BEGIN {
     pending_is_git = 1
     pending_has_ref = 0
     pending_repo = $3
+    pending_path = ""
     pending_indent = current_indent
     git_line = $0
     buffer_count = 0

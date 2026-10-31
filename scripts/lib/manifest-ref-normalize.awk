@@ -16,6 +16,7 @@ function gist_key(ref, stripped) {
   }
   stripped = ref
   sub(/^https:\/\/gist\.github\.com\//, "", stripped)
+  sub(/\.git\//, "/", stripped)
   sub(/\.git$/, "", stripped)
   return stripped
 }
@@ -23,6 +24,7 @@ function canonical_ref(ref, working) {
   working = ref
   if (working ~ /^https:\/\//) {
     sub(/^https:\/\//, "", working)
+    sub(/\.git\//, "/", working)
     sub(/\.git$/, "", working)
     sub(/\/$/, "", working)
     sub(/^github\.com\//, "", working)
@@ -30,9 +32,17 @@ function canonical_ref(ref, working) {
   }
   if (working ~ /^git@/) {
     sub(/^git@/, "", working)
+    sub(/\.git\//, "/", working)
     sub(/\.git$/, "", working)
     sub(/:/, "/", working)
     return working
   }
   return ""
+}
+function dependency_ref_matches(wanted, ref, path, combined) {
+  if (path != "") {
+    combined = ref "/" path
+    return combined == wanted || gist_key(combined) == wanted || canonical_ref(combined) == wanted
+  }
+  return ref == wanted || gist_key(ref) == wanted || canonical_ref(ref) == wanted
 }

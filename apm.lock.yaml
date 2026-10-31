@@ -1,5 +1,5 @@
 lockfile_version: '2'
-generated_at: '2026-10-31T04:02:58.095440+00:00'
+generated_at: '2026-10-31T04:30:54.755257+00:00'
 apm_version: 0.35.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -2930,6 +2930,17 @@ dependencies:
     .claude/skills/agmsg/uninstall.sh: sha256:45461aaa26d0383c15f58da8601cd2e0b6e769a61a4708388296052bb1e8d4da
   content_hash: sha256:cae8415fb0039de3ff1e61ebca51448038562e0b5ebe21bf7c007f036d7af172
   declared_license: MIT
+- repo_url: heydamir/unslop
+  alias: unslop-ui
+  name: unslop
+  host: github.com
+  resolved_commit: 4652254daff586ff4739849395a127b56f7f8cc7
+  resolved_ref: 4652254daff586ff4739849395a127b56f7f8cc7
+  version: unknown
+  virtual_path: skills/unslop
+  is_virtual: true
+  package_type: claude_skill
+  content_hash: sha256:6590d540174fea4363d385964eafaac017ce4e867b00a1f597611d9b72682d52
 - repo_url: humanlayer/skills
   name: show-me
   host: github.com

@@ -1,7 +1,6 @@
-# Emits the repo value of each manifest apm dependency that is not yet pinned
-# to a lockfile commit. A structured "- git: <repo>" entry with a sibling
-# skills: list reports the repo value (never the literal "git:" key or the
-# nested skill names) and is skipped once a sibling "ref:" key is present.
+# Emits the reference of each manifest apm dependency that is not yet pinned
+# to a lockfile commit. A structured "- git: <repo>" entry includes its sibling
+# path in that reference; nested skills are never reported as dependencies.
 # Invoked as:
 #   awk -f scripts/lib/manifest-unpinned-refs.awk <manifest_path>
 function indent_level(line, trimmed) {
@@ -11,17 +10,23 @@ function indent_level(line, trimmed) {
 }
 function flush_pending() {
   if (pending_is_git && !pending_has_ref && pending_repo != "") {
-    print pending_repo
+    reference = pending_repo
+    if (pending_path != "") {
+      reference = reference "/" pending_path
+    }
+    print reference
   }
   pending_is_git = 0
   pending_has_ref = 0
   pending_repo = ""
+  pending_path = ""
   pending_indent = -1
 }
 BEGIN {
   pending_is_git = 0
   pending_has_ref = 0
   pending_repo = ""
+  pending_path = ""
   pending_indent = -1
 }
 /^[^[:space:]#][^:]*:/ {
@@ -42,6 +47,14 @@ BEGIN {
 in_apm && /^[[:space:]]+ref:[[:space:]]+/ && indent_level($0) > apm_indent {
   if (pending_is_git && indent_level($0) == pending_indent + 2) {
     pending_has_ref = 1
+  }
+  next
+}
+in_apm && /^[[:space:]]+path:[[:space:]]+/ && indent_level($0) > apm_indent {
+  if (pending_is_git && indent_level($0) == pending_indent + 2) {
+    pending_path = $2
+    gsub(/["']/, "", pending_path)
+    sub(/#.*/, "", pending_path)
   }
   next
 }
@@ -90,6 +103,7 @@ in_apm && /^[[:space:]]+ref:[[:space:]]+/ && indent_level($0) > apm_indent {
     pending_is_git = 1
     pending_has_ref = 0
     pending_repo = $3
+    pending_path = ""
     pending_indent = current_indent
     next
   }

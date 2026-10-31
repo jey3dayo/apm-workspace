@@ -56,6 +56,10 @@ dependencies:
         - find-animation-opportunities
         - improve-animations
         - review-animations
+    - git: heydamir/unslop
+      path: skills/unslop
+      ref: 4652254daff586ff4739849395a127b56f7f8cc7
+      alias: unslop-ui
     - git: ibelick/ui-skills
       ref: main
       skills:
