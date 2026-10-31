@@ -789,3 +789,9 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - 残す：emilkowalski の5つ（apple-design、emil-design-eng、review-animations、improve-animations、find-animation-opportunities。アニメーション系3つは評判がよいので off から on に戻した）、transitions-dev、ui-ux-pro-max、improve-ui、fixing-motion-performance。improve-ui と fixing-motion-performance は skillOverrides の off を外し、手で呼べるようにした。
 - domain-modeling と improve-codebase-architecture は wayfinder と refactoring から呼ばれるので残す。
 - 根拠：直近60日の利用ログで、撤去した2つは呼ばれていないか、emil-design-eng / improve-ui と役割がほぼ重なっていた。
+
+## 2026-10-31 emilkowalski/skills に animation-performance と break-ui を足した
+
+- ref を `e8a175de` → `a81dbca07f2217b7103e510c0f13f8d5b017afc9`（上流 main）に上げ、`animation-performance`（アニメーションのフレーム落ちの原因調査と軽いプロパティ選び）と `break-ui`（長い名前・空・多言語などの最悪データで UI を壊して直す）を追加。
+- 入れない：`remove-animations`（同じ ref で追加されたもの）。
+- 既存5つは ref 間で中身の変更なし。`animation-performance` は `fixing-motion-performance`（ibelick）と領域が近いので、重なりすぎたらどちらかに寄せる。
