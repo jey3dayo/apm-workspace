@@ -37,7 +37,7 @@
   `fixing-motion-performance`, `improve-ui`）, `transitions-dev`, `ui-ux-pro-max`,
   `unslop-ui`（heydamir/unslop の skills/unslop、alias）
 - browser / analysis: `browser-harness`, `screenshot`, `archify`
-- agent tools: `tuicr`, `agmsg`, `show-me`
+- agent tools: `tuicr`, `agmsg`, `show-me`, `agent-desktop`
 
 ## global（自作 catalog: catalog/skills/）
 
