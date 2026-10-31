@@ -49,9 +49,11 @@ dependencies:
         - agentation
         - agentation-self-driving
     - git: emilkowalski/skills
-      ref: e8a175de22ae1e49370fc144c1f3bb9aeedf988d
+      ref: a81dbca07f2217b7103e510c0f13f8d5b017afc9
       skills:
+        - animation-performance
         - apple-design
+        - break-ui
         - emil-design-eng
         - find-animation-opportunities
         - improve-animations
