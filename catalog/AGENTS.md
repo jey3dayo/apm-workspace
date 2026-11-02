@@ -72,19 +72,6 @@ permission や PreToolUse hook のポリシーで拒否されたコマンドは�
 
 **複数の面（`todo.txt` / plan リスト / issue / レビュー指摘）に散った backlog をまとめて捌く依頼は `backlog-sweep`。** 1タスクの委譲とは起点も終了条件も違うので、別スキルとして扱う。
 
-### 推奨ワークフロー（経路の選択）
-
-- 役割分担: `orchestrator-worker` は委譲判定・タスク分割・**Reviewer と Worker の model 選定**の正本、`agmsg-delegation` は transport の正本
-- 先に `orchestrator-worker` で model を決め、その model と必要な強制境界を満たせる transport を選ぶ。 組み込みサブエージェント（Agent tool / `spawn_agent`）で満たせるならそれを使い、満たせないなら `agmsg-delegation` を使う。「組み込みが使えるなら常に組み込み」ではない——review 外注の既定は差分を書いた runtime の逆側なので、Claude が書いた差分の review は `agmsg-delegation` で Codex へ出す
-- 実行時に read-only を強制できていない経路の reviewer を verdict へ格上げしない（判定は `agmsg-delegation`）
-- Worker のモデル名をユーザーが指定したら（例:「luna で」）、それが platform を跨ぐ明示指示にあたる。既定は同一 platform 内で完結させる
-- pane / workspace を勝手に作らない。ユーザーが「用意して」と指示したときだけ作り、作った実体を読み戻してから報告する。手順は `herdr` スキルと `agmsg-delegation` の `references/resident-pool.md` が正本（具体コマンドをここに写さない）
-- エージェント / セッション間の引き継ぎ（CC → Codex 等）は transport に `agmsg` を使い、本文は `agmsg-delegation` の引き継ぎメッセージ書式（artifact は参照渡し・suggested skills・secrets redact・次セッションの目的に合わせる）に従う
-- agmsg が全断（`team.sh` が `Team not found`、`identities.sh` が空）したら `~/.apm` で `mise run doctor` を読み、plain path が無いと確認できたときだけ `mise run agmsg:state:restore` を実行する（plain 側の roster を上書きで失うため）。手順は `agmsg-delegation` の `references/roster-recovery.md`
-- Worker の `DONE` は未検証の申告として扱う。Orchestrator が実際の比較元を確定し、差分、変更対象、要求との対応を独立に確認する
-- DoD に定める full gate は Orchestrator が実行し、Worker の実行報告では代替しない
-- タスクで明示されていない依存 version、manifest、lockfile の変更は、要求上の必要性を確認できない限り採用しない
-
 ### スキルの不具合・摩擦を owner へ返す
 
 スキルや agent を実運用で使って**不具合・契約の破れ・手順の摩擦**を踏んだら、その場の回避で終わらせずに `~/.apm` へ送る。回避策だけが各リポジトリに散ると、同じ穴を全員が踏み直す。効いた点も送る（残す判断の材料になる）。
@@ -130,37 +117,11 @@ permission や PreToolUse hook のポリシーで拒否されたコマンドは�
 
 新しい知識は Skill > Agent > Command > Rules/Steering > llms.txt > Docs の順で置き場を選ぶ。各段の判断基準は `apm-usage` の Skill Placement が正本。
 
-## MCP 配置方針
-
-global MCP はリポジトリをまたいで常時使う基盤だけに限定し、それ以外は repo-local または on-demand にする。global の実体は root `apm.yml` の `mcp:` が source of truth で、固定リストはどこにも持たない。
-
-- MCP 設定を永続変更する前に `apm-usage` の MCP ownership gate を通す。SaaS 接続の優先順（アプリ側コネクタ > `apm.yml` > skill）と理由は `~/.apm/docs/saas-connectors.md` が正本
-- current docs は `context7`、広い比較調査は `web-research`（URL 取得と Web 検索は「コマンド選択」の表）
-- MCP として repo-local 追加が必要なブラウザ系は `chrome-devtools` のみ（使い分けは上の「ブラウザ操作の選択」表）。デスクトップ / OS レベルのスクリーンショットは `screenshot` スキル
-
 ## Git コミット規約
 
 - stage は対象ファイルの明示指定のみ。`git add -A` / `git add .` / `git add -u` / `git commit -a` を使わない。 作業ツリーには自分が作っていないものが居る——並行セッションの作りかけ、worker の出力、ツールの生成物。一括 stage はそれを読まずにコミットへ入れる
 - 変更内容を簡潔に記述するのみ
 - 追加の署名やフッターは不要
-
-## PR マージ方針
-
-- PR のマージを依頼されたときは squash merge を既定とする（`gh pr merge --squash`）。毎回の方式確認は不要
-- repo 側で squash merge が許可されていない場合は repo の設定に従う
-- マージを行うのは依頼に含まれるときだけ。既定の方式を決めるだけであり、停止・確認ポリシーの依頼範囲解釈は変えない
-
-## issue / PR 本文の扱い
-
-- issue / PR は本文が正本。着手後に前提の誤り、範囲の変更、追加で判明した事実が出たら、本文の該当箇所をリライトして現状と一致させる
-- コメントは他者との対話（質問への回答、レビュー指摘への応答）に使う。訂正や補足はコメントへ積まず本文へ反映する——本文とコメント列を突き合わせないと現状を復元できなくなるため
-- リライトで消える内容のうち、決定の根拠として後から参照されるものは本文へ書き直して残す。作業ログは残さない
-
-## Git Worktree 方針
-
-- 操作仕様・`.worktrees/` 運用・作成削除手順は `git-worktree` スキルが正本
-- worktree の作成は `git wt` だけで行う。`git worktree add` は deny 済みなので使わない（`--detach` の一時確認も含む）。native `git worktree` は cleanup・診断・復旧（`list` / `remove` / `prune` / `unlock` / `repair` など）のみ
-- コミット分割とメッセージ作成は `atomic-commit` スキルが担当し、worktree 操作の判断を持たせない
 
 ## コミュニケーション原則
 
@@ -170,13 +131,6 @@ global MCP はリポジトリをまたいで常時使う基盤だけに限定し
 - 番号だけの回答を求める場合は、同じメッセージ内に `1.` `2.` `3.` の各選択肢本文を必ず再掲する
 - 確認や小さな判断は、`y/n`・番号・短い語句だけで返答できる聞き方にする
 - 選択肢を出すときは推奨を1つ明示する。依頼範囲内で停止条件に当たらない判断は、聞かずに推奨で進めて報告に採った案を書く（返答の大半が「推奨で」なので、聞くと往復が増えるだけ）。読み取りの依頼を実装へ広げる根拠にはしない
-
-### 音声通知ルール
-
-- 設定は `speaker=1` `speedScale=1.3` `async=true` を使う
-- ユーザーと対話しているメインセッションでは、タスク完了・重要なお知らせ・エラー時に `mcp-simple-voicevox` で通知する。サブエージェントと Worker は通知しない（並列で同時に鳴るため）
-- tool が deferred なら読み込みは1回まで。使えなければ省略し、省略したことは報告しない
-- 文面は結果だけを述べ、読み上げて数秒で終わる長さに収める。技術的詳細は含めず、英単語はカタカナへ変換し、不要なスペースを削除する
 
 ## 禁止事項
 

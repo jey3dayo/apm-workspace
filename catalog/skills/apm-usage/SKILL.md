@@ -42,6 +42,8 @@ Before any persistent MCP configuration write:
 4. For diagnostics, prefer a one-run `codex -c` override and state that it is temporary.
 5. Verify the resolved server with `codex mcp list` and one real tool call before reporting completion.
 
+Which MCPs belong in global APM versus repo-local or on-demand, and the SaaS connector priority, are in `references/mcp-placement.md` — read it when deciding placement.
+
 Repo-local and on-demand placement: keep `tauri-mcp-server`-style runtime MCPs in the repository that needs them, and add screen-control MCPs on demand rather than globally. There is no fixed list of repo-local MCPs — enumerate repositories with `ghq list -p` and read each `apm.yml`. Connection status for SaaS connectors lives in `~/.apm/docs/saas-connectors.md`; removal decisions are recorded in `docs/package-decisions.md`.
 
 ## Skill Placement

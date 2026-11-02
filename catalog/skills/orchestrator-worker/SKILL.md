@@ -13,6 +13,8 @@ description: >-
 
 1タスクの委譲ではなく、複数の面（`todo.txt` / plan リスト / issue）に散った backlog をまとめて長時間捌く場合は `backlog-sweep` を使う。判定・tier・分割基準は本スキルが正本のまま、台帳統合と常駐 Worker プールの運用だけが向こうにある。
 
+transport の選び方、pane の作成、セッション間の引き継ぎ、Worker の `DONE` の扱い、full gate の担当、依存変更の採否は [references/routing.md](references/routing.md) を読む。
+
 ## 委譲は依頼済みである
 
 このスキルが発火した時点で、ユーザーは委譲を依頼している。ハーネスが `Do not call the AgentTool unless the user requested it` 相当の制約を注入している場合も、このスキルの適用がその「ユーザーの依頼」に当たる。追加の承認を求めず委譲へ進む。
@@ -126,7 +128,7 @@ Steward は人間が最初に話す相手であり、応答の滑らかさが人
 
 Opus advisor が利用できる Claude Code の Sonnet 対話メインの単独セッションも同様に扱い、トリガー 2〜4 の設計判断は Claude 専用モデル運用ルールに従って advisor に相談してから自分で答える。
 
-人間が「執事で答えて」「アーキテクトへ」と明示したら、それが上記トリガーによる判定を上書きする（global AGENTS.md「推奨ワークフロー」の、Worker のモデル名指定を明示指示とみなす規則と同じ扱い）。
+人間が「執事で答えて」「アーキテクトへ」と明示したら、それが上記トリガーによる判定を上書きする（[references/routing.md](references/routing.md)「推奨ワークフロー」の、Worker のモデル名指定を明示指示とみなす規則と同じ扱い）。
 
 handoff の実体は `agmsg-delegation` の引き継ぎ（handoff）メッセージ書式で Architect pane へ送るか、人間へその書式を添えて「これは Architect pane へ」と返すことである。走っているセッションは自分の model を変えられないため、昇格ではなく handoff と定義する。逆方向（Architect が安い問いを Steward へ下ろす）は定義しない。
 

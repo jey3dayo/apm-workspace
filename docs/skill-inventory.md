@@ -46,7 +46,8 @@
 - 委譲・エージェント運用: `orchestrator-worker`, `agmsg-delegation`, `backlog-sweep`, `learning-intake`
 - レビュー・品質: `review-fix-loop`, `polish`
 - Git・出荷: `ship`, `atomic-commit`, `git-worktree`, `git-branch-cleanup`,
-  `ci-stability-hooks`, `prepare-goal`
+  `ci-stability-hooks`, `prepare-goal`, `pr-conventions`
+- 通知: `voice-notify`
 - リファクタリング・解析: `refactoring`, `similarity`, `cccc`
 - ドキュメント・タスク: `docs-manager`, `docs-review`, `todo-changelog-ops`, `linear-task-ops`
 - デザイン・ブラウザ: `design-md-workflow`, `pwa-layout`, `terminal-browser`

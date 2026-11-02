@@ -34,7 +34,7 @@ argument-hint: "[commit | push | pr]"
 | branch 確認     | default branch 上なら、repo の AGENTS.md が直接 commit を定めているか                                                                                                                                | 定めがある、または default branch 外     |
 | commit          | `atomic-commit`（自分の変更ファイルと意図を引数で渡す）                                                                                                                                              | 意図した commit が揃い、保留が無い       |
 | push            | `git push`（upstream 未設定なら `-u`）。lefthook の pre-push はここで走る                                                                                                                            | hook を含めて成功                        |
-| PR              | `gh pr create`。本文は global AGENTS.md「issue / PR 本文の扱い」                                                                                                                                     | PR URL を得た                            |
+| PR              | `gh pr create`。本文は `pr-conventions`「issue / PR 本文の扱い」                                                                                                                                     | PR URL を得た                            |
 | CI              | `gh pr checks --watch`                                                                                                                                                                               | 全 check が pass                         |
 | PR レビュー指摘 | `gh-address-comments`（PR を引数で渡す）。CI 完了時点で付いている未解決 thread（bot のレビューを含む）を対象にする                                                                                   | 未解決の actionable thread がゼロ        |
 
