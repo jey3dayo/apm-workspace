@@ -36,7 +36,7 @@ dependencies:
         - wait-what
         - wayfinder
         - writing-for-agents
-    - nanaism/yomiyasu/skills/yomiyasu#ae258d7a57b335673e30b88a018ae08d4f72c449 # v2.4.0
+    - nanaism/yomiyasu/skills/yomiyasu#29d67ccb05e370b5958d72920a9cd1aa829dee80 # v2.5.0
 
     # --- react ---
     - millionco/react-doctor/skills/react-doctor#695e46eee203a5d1855020191aa7e9c010a1250e # v2.4.0

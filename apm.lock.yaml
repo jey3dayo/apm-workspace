@@ -1,5 +1,5 @@
 lockfile_version: '2'
-generated_at: '2026-10-31T09:06:15.654889+00:00'
+generated_at: '2026-11-02T01:34:14.220914+00:00'
 apm_version: 0.35.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -2984,7 +2984,7 @@ dependencies:
 - repo_url: ibelick/ui-skills
   name: ui-skills
   host: github.com
-  resolved_commit: 3823f1573f6fb564a091a062594b95066dbd974c
+  resolved_commit: 4907a526b07943b3a338177558d42fae4fdf0a86
   resolved_ref: main
   version: unknown
   package_type: skill_bundle
@@ -3022,7 +3022,7 @@ dependencies:
     .claude/skills/improve-ui/SKILL.md: sha256:fa2ac808f6d9dab7bb3620880b014d2c18e227e5b006102856038096e573e69a
     .claude/skills/improve-ui/agents/openai.yaml: sha256:933af431364517518cbcfcd4e70eb8e8b390ead920abc48c071a4eedb6747183
     .claude/skills/improve-ui/references/plan-template.md: sha256:8faca7a14659a7f951d3b89fb730a43a4ce99966cc00481bf83d82b90f34b868
-  content_hash: sha256:0f330fe2a674fe8626b1700c90ce6ff851542f78ca49e0322cc6e4beb38ab8f8
+  content_hash: sha256:3d771bfaa0c6413c879a1fe5e8963d7543c1a238da1128568d6cffb29e3f788a
   skill_subset:
   - fixing-accessibility
   - fixing-metadata
@@ -3102,7 +3102,7 @@ dependencies:
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
-  resolved_commit: a7379e888f202abb2fbcc8df2ea8d9fe444f53bf
+  resolved_commit: 2628f1b99177b5a2a8add3bc9e405facb63b895b
   resolved_ref: main
   version: 1.0.0
   virtual_path: catalog
@@ -3614,11 +3614,11 @@ dependencies:
     .claude/skills/tuxedo/references/tui-and-capture.md: sha256:13278531ebad1f152047aaebc247eacbfd69f75ba1887e3a611627c94a31f684
     .claude/skills/web-research/SKILL.md: sha256:a9c97632b56dbf89f7e57f70d97e96ff477afbd8837b1a99a5300ddd6bfba562
     .claude/skills/web-research/agents/openai.yaml: sha256:50536a04fbc72b0f71fc9975a7e041893912ebfcaf9c671439843d20172e1264
-  content_hash: sha256:11b4084b0e7bf25f6c143a492f574371042eeafd49c408f4490133cbf636ef02
+  content_hash: sha256:7ce252d3077f74ef81dde5082e289dfebcc0259fbdd76f343dc320c387a457f4
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
-  resolved_commit: a7379e888f202abb2fbcc8df2ea8d9fe444f53bf
+  resolved_commit: 2628f1b99177b5a2a8add3bc9e405facb63b895b
   resolved_ref: main
   version: 1.0.0
   virtual_path: manual-skills
@@ -3912,8 +3912,8 @@ dependencies:
 - repo_url: nanaism/yomiyasu
   name: yomiyasu
   host: github.com
-  resolved_commit: ae258d7a57b335673e30b88a018ae08d4f72c449
-  resolved_ref: ae258d7a57b335673e30b88a018ae08d4f72c449
+  resolved_commit: 29d67ccb05e370b5958d72920a9cd1aa829dee80
+  resolved_ref: 29d67ccb05e370b5958d72920a9cd1aa829dee80
   version: 0.0.0
   virtual_path: skills/yomiyasu
   is_virtual: true
@@ -4094,8 +4094,7 @@ dependencies:
     .claude/skills/yomiyasu/scripts/yomiyasu_diff.py: sha256:31c46a98bcd987c0a2dda7d9712fb830f3a70b1e0636b6a034ae191530d51ab5
     .claude/skills/yomiyasu/scripts/yomiyasu_hook.py: sha256:689ffbeecbaf0380ac99e37b6093f136364b7c7bbf014ada961c8e0781e8ab8b
     .claude/skills/yomiyasu/scripts/yomiyasu_lint.py: sha256:b02c21464353b726a8c4e366f89bdfd2f341613f7bf75f779e83cc4dfbc54c9e
-  content_hash: sha256:5d6ce8c8a068fa3a92e7ae238aa378aee48ae7c8ba351125cbba0e7cd82ec714
-  resolved_tag: v2.4.0
+  content_hash: sha256:287bfa99bfb083db3257b595866afef4f335b0a332fc18bc9d40674fa07d3f5d
 - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
   name: ui-ux-pro-max
   host: github.com
