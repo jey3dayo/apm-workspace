@@ -1,5 +1,5 @@
 lockfile_version: '2'
-generated_at: '2026-11-02T01:34:14.220914+00:00'
+generated_at: '2026-11-03T10:46:19.815845+00:00'
 apm_version: 0.35.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -40,35 +40,6 @@ dependencies:
     .claude/skills/tuicr/tuicr-wrapper-zellij.sh: sha256:e442e97902abaa4924ab295707de455a15371f0d72e89c1b76f0563bbf43125a
     .claude/skills/tuicr/tuicr-wrapper.sh: sha256:69ba7c046e36058a8c5431ac2df1258bf1547df8844ffbbf3c68112d7b546784
   content_hash: sha256:894be7d063dbfa0a43bb070d9377224cac842f34a0536cb90b52da9556a63768
-- repo_url: benjitaylor/agentation
-  name: agentation
-  host: github.com
-  resolved_commit: 7982d83aa2d2ba46d0f68f257759ba527ba401a8
-  resolved_ref: 7982d83aa2d2ba46d0f68f257759ba527ba401a8
-  version: unknown
-  package_type: skill_bundle
-  deployed_files:
-  - .agents/skills/agentation
-  - .agents/skills/agentation-self-driving
-  - .agents/skills/agentation-self-driving/SKILL.md
-  - .agents/skills/agentation-self-driving/references/two-session-workflow.md
-  - .agents/skills/agentation/SKILL.md
-  - .claude/skills/agentation
-  - .claude/skills/agentation-self-driving
-  - .claude/skills/agentation-self-driving/SKILL.md
-  - .claude/skills/agentation-self-driving/references/two-session-workflow.md
-  - .claude/skills/agentation/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/agentation-self-driving/SKILL.md: sha256:3c556d51b44dfe5d898b7f955322a85a0bafda9f2e383c44d1b29be00052462a
-    .agents/skills/agentation-self-driving/references/two-session-workflow.md: sha256:1b1f7c337c40c4f009e52eebd396d86b6adeb57221ad770b3b7cb254566c6e00
-    .agents/skills/agentation/SKILL.md: sha256:09f4fee606d9f354b4e16eff5a83b3de1b5c35f89aa430c1e0976f214294f4c7
-    .claude/skills/agentation-self-driving/SKILL.md: sha256:3c556d51b44dfe5d898b7f955322a85a0bafda9f2e383c44d1b29be00052462a
-    .claude/skills/agentation-self-driving/references/two-session-workflow.md: sha256:1b1f7c337c40c4f009e52eebd396d86b6adeb57221ad770b3b7cb254566c6e00
-    .claude/skills/agentation/SKILL.md: sha256:09f4fee606d9f354b4e16eff5a83b3de1b5c35f89aa430c1e0976f214294f4c7
-  content_hash: sha256:588ce714cd241bcdbeea19476b9def8da76eb84ef3dc5b85c38507feb6426d9b
-  skill_subset:
-  - agentation
-  - agentation-self-driving
 - repo_url: browser-use/browser-harness
   name: browser-harness
   host: github.com
@@ -2985,14 +2956,12 @@ dependencies:
   name: ui-skills
   host: github.com
   resolved_commit: 4907a526b07943b3a338177558d42fae4fdf0a86
-  resolved_ref: main
-  version: unknown
+  resolved_ref: 4907a526b07943b3a338177558d42fae4fdf0a86
+  version: 0.0.0
   package_type: skill_bundle
   deployed_files:
   - .agents/skills/fixing-accessibility
   - .agents/skills/fixing-accessibility/SKILL.md
-  - .agents/skills/fixing-metadata
-  - .agents/skills/fixing-metadata/SKILL.md
   - .agents/skills/fixing-motion-performance
   - .agents/skills/fixing-motion-performance/SKILL.md
   - .agents/skills/improve-ui
@@ -3001,8 +2970,6 @@ dependencies:
   - .agents/skills/improve-ui/references/plan-template.md
   - .claude/skills/fixing-accessibility
   - .claude/skills/fixing-accessibility/SKILL.md
-  - .claude/skills/fixing-metadata
-  - .claude/skills/fixing-metadata/SKILL.md
   - .claude/skills/fixing-motion-performance
   - .claude/skills/fixing-motion-performance/SKILL.md
   - .claude/skills/improve-ui
@@ -3011,13 +2978,11 @@ dependencies:
   - .claude/skills/improve-ui/references/plan-template.md
   deployed_file_hashes:
     .agents/skills/fixing-accessibility/SKILL.md: sha256:549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf
-    .agents/skills/fixing-metadata/SKILL.md: sha256:b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547
     .agents/skills/fixing-motion-performance/SKILL.md: sha256:0a2d654902bc04263ce68c8c02967ef03f17b482e855360a5463211d99d7baa9
     .agents/skills/improve-ui/SKILL.md: sha256:fa2ac808f6d9dab7bb3620880b014d2c18e227e5b006102856038096e573e69a
     .agents/skills/improve-ui/agents/openai.yaml: sha256:933af431364517518cbcfcd4e70eb8e8b390ead920abc48c071a4eedb6747183
     .agents/skills/improve-ui/references/plan-template.md: sha256:8faca7a14659a7f951d3b89fb730a43a4ce99966cc00481bf83d82b90f34b868
     .claude/skills/fixing-accessibility/SKILL.md: sha256:549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf
-    .claude/skills/fixing-metadata/SKILL.md: sha256:b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547
     .claude/skills/fixing-motion-performance/SKILL.md: sha256:0a2d654902bc04263ce68c8c02967ef03f17b482e855360a5463211d99d7baa9
     .claude/skills/improve-ui/SKILL.md: sha256:fa2ac808f6d9dab7bb3620880b014d2c18e227e5b006102856038096e573e69a
     .claude/skills/improve-ui/agents/openai.yaml: sha256:933af431364517518cbcfcd4e70eb8e8b390ead920abc48c071a4eedb6747183
@@ -3025,7 +2990,6 @@ dependencies:
   content_hash: sha256:3d771bfaa0c6413c879a1fe5e8963d7543c1a238da1128568d6cffb29e3f788a
   skill_subset:
   - fixing-accessibility
-  - fixing-metadata
   - fixing-motion-performance
   - improve-ui
 - repo_url: jakubantalik/transitions-dev
@@ -5733,51 +5697,6 @@ deployments:
   - vercel-labs/agent-desktop/skills/agent-desktop
   active_owner: vercel-labs/agent-desktop/skills/agent-desktop
   content_hash: sha256:e78194d24d3963d10a8069833c90a1bdb932f0ab8f6b645df79149d95471645c
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agentation
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation
-  active_owner: benjitaylor/agentation
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agentation-self-driving
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation
-  active_owner: benjitaylor/agentation
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agentation-self-driving/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation
-  active_owner: benjitaylor/agentation
-  content_hash: sha256:3c556d51b44dfe5d898b7f955322a85a0bafda9f2e383c44d1b29be00052462a
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agentation-self-driving/references/two-session-workflow.md
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation
-  active_owner: benjitaylor/agentation
-  content_hash: sha256:1b1f7c337c40c4f009e52eebd396d86b6adeb57221ad770b3b7cb254566c6e00
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agentation/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation
-  active_owner: benjitaylor/agentation
-  content_hash: sha256:09f4fee606d9f354b4e16eff5a83b3de1b5c35f89aa430c1e0976f214294f4c7
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg
@@ -14348,24 +14267,6 @@ deployments:
   content_hash: sha256:549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf
 - kind: project-relative
   target: claude
-  value: .claude/skills/fixing-metadata
-  runtime: null
-  scope: project
-  owners:
-  - ibelick/ui-skills
-  active_owner: ibelick/ui-skills
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/fixing-metadata/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - ibelick/ui-skills
-  active_owner: ibelick/ui-skills
-  content_hash: sha256:b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547
-- kind: project-relative
-  target: claude
   value: .claude/skills/fixing-motion-performance
   runtime: null
   scope: project
@@ -18018,51 +17919,6 @@ deployments:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
   content_hash: sha256:56222c8ee4e46134079a90d2fbb86a4cfb5944fdb6c854a696be15d251c00681
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agentation
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation
-  active_owner: benjitaylor/agentation
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agentation-self-driving
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation
-  active_owner: benjitaylor/agentation
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agentation-self-driving/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation
-  active_owner: benjitaylor/agentation
-  content_hash: sha256:3c556d51b44dfe5d898b7f955322a85a0bafda9f2e383c44d1b29be00052462a
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agentation-self-driving/references/two-session-workflow.md
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation
-  active_owner: benjitaylor/agentation
-  content_hash: sha256:1b1f7c337c40c4f009e52eebd396d86b6adeb57221ad770b3b7cb254566c6e00
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agentation/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation
-  active_owner: benjitaylor/agentation
-  content_hash: sha256:09f4fee606d9f354b4e16eff5a83b3de1b5c35f89aa430c1e0976f214294f4c7
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg
@@ -26631,24 +26487,6 @@ deployments:
   - ibelick/ui-skills
   active_owner: ibelick/ui-skills
   content_hash: sha256:549261e8a53b53a1a20c0ddbf736821e5fc0876ad82eee76e0efab8e9ee9dadf
-- kind: project-relative
-  target: codex
-  value: .agents/skills/fixing-metadata
-  runtime: null
-  scope: project
-  owners:
-  - ibelick/ui-skills
-  active_owner: ibelick/ui-skills
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/fixing-metadata/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - ibelick/ui-skills
-  active_owner: ibelick/ui-skills
-  content_hash: sha256:b8315ff95a92dcfa48c33e2b4838a31d9448bd46252aab45726549ce865d6547
 - kind: project-relative
   target: codex
   value: .agents/skills/fixing-motion-performance

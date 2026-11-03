@@ -785,6 +785,7 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - 撤去: `last30days`（mvanhorn/last30days-skill）。2026-09-23 の節の「利用実績が 0 のまま次の棚卸しを迎えたら撤去する」に従う。
 - 理由: 2026-09-07 以降の Claude transcript、`history.jsonl`（2025-09 以降のスラッシュ起動）、2026-06 以降の Codex セッションの `SKILL.md` 読み込みのいずれにも使用が 0 回。Claude 側は `skillOverrides` で `off` だった。保持基準（verb 導線・弱いランタイムの保険・社会的理由・思い入れ）のどれにも当たらない。
 - 残した判断: `agentation` / `agentation-self-driving` は、使っていた時期があるためユーザー判断で残す。
+  - 追記（2026-11-03）: `agentation` / `agentation-self-driving` は global から撤去した。プロジェクトの `package.json` に `agentation` を依存として入れないと動かないため、使うプロジェクトの repo-local スキルとして持つ。戻すときは `benjitaylor/agentation`（`7982d83aa2d2ba46d0f68f257759ba527ba401a8`、`skills:` subset）を `apm.yml` へ戻す。
 - 再導入: 使う場面ができたら `mvanhorn/last30days-skill/skills/last30days#7fac0fc31ba5212b5ddaa29252d9f7148cec8423`（v3.30.0）を `apm.yml` の dependencies.apm へ戻す。
 
 ## 2026-10-31 重なっているスキルを間引いた
@@ -799,3 +800,11 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - ref を `e8a175de` → `a81dbca07f2217b7103e510c0f13f8d5b017afc9`（上流 main）に上げ、`animation-performance`（アニメーションのフレーム落ちの原因調査と軽いプロパティ選び）と `break-ui`（長い名前・空・多言語などの最悪データで UI を壊して直す）を追加。
 - 入れない：`remove-animations`（同じ ref で追加されたもの）。
 - 既存5つは ref 間で中身の変更なし。`animation-performance` は `fixing-motion-performance`（ibelick）と領域が近いので、重なりすぎたらどちらかに寄せる。
+
+## 2026-11-03 使われていない fixing-metadata を撤去し、ibelick を commit 固定にした
+
+- 撤去：`fixing-metadata`（ibelick）。直近60日の Claude transcript と Codex セッションで、`Skill` 起動・`SKILL.md` 読み込みとも 0 回（棚卸し時の監査読みを除く）。
+- 残す：`wayfinder` も利用 0 回だったが、使いたいのでユーザー判断で残す（2026-11-03）。`wayfinder` が呼ぶ `prototype`・`setup-matt-pocock-skills`・`domain-modeling` も合わせて残す。`fixing-motion-performance` と `transitions-dev` は 2026-10-31 に手で呼べるよう残すと決めたばかりなので、次の棚卸しで判断する。
+- `refactoring` の委譲表から `/improve-codebase-architecture` を勧める行を削除した。
+- ibelick/ui-skills の ref を `main` から lock 済みの `4907a526b07943b3a338177558d42fae4fdf0a86` に固定した（上流 main の追従は ref 更新で行う）。
+- 再導入：ibelick/ui-skills（`4907a526`）の `skills:` に `fixing-metadata` を戻す。

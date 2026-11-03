@@ -30,10 +30,10 @@
   `improve-codebase-architecture`, `prototype`, `research`, `retro`, `setup-matt-pocock-skills`,
   `wait-what`, `wayfinder`, `writing-for-agents`）
 - react: `react-doctor`, `react-best-practices`
-- design: `agentation` / `agentation-self-driving`,
+- design:
   emilkowalski 系（`animation-performance`, `apple-design`, `break-ui`, `emil-design-eng`,
   `find-animation-opportunities`, `improve-animations`, `review-animations`）,
-  ibelick 系（`fixing-accessibility`, `fixing-metadata`,
+  ibelick 系（`fixing-accessibility`,
   `fixing-motion-performance`, `improve-ui`）, `transitions-dev`, `ui-ux-pro-max`,
   `unslop-ui`（heydamir/unslop の skills/unslop、alias）
 - browser / analysis: `browser-harness`, `screenshot`, `archify`
@@ -91,7 +91,7 @@ global の一覧に無くても廃止ではない。各リポジトリの `apm.y
 | ツール                                                                                     | 利用リポジトリ                                                           | 用途                                          |
 | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ | --------------------------------------------- |
 | `agentation-mcp`（MCP）                                                                    | `ultra-rss-reader`                                                       | Agentation toolbar での UI アノテーション連携 |
-| `agentation` / `agentation-self-driving`（benjitaylor, global dependency と併用）          | `work-bff`（両方）, `ultra-rss-reader`（`agentation-self-driving` のみ） | repo-local での Agentation 自動レビュー導線   |
+| `agentation` / `agentation-self-driving`（benjitaylor, repo-local のみ）                   | `work-bff`（両方）, `ultra-rss-reader`（`agentation-self-driving` のみ） | repo-local での Agentation 自動レビュー導線   |
 | `tauri-mcp-server`（MCP）                                                                  | `ultra-rss-reader`                                                       | Tauri ランタイム検証                          |
 | `terraform-style-guide` / `terraform-test`（hashicorp）                                    | `work-site`, `work-infra`, `terraform-infra`                             | Terraform 規約・テスト                        |
 | `workers-best-practices` / `wrangler`（cloudflare）                                        | `keep-on`                                                                | Cloudflare Workers                            |

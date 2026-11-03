@@ -2304,6 +2304,9 @@ reconcile_skills_root_from_stage() {
       continue
     fi
     rm -rf "$target_entry"
+    # The sweep deletes whatever staging no longer provides, including skills
+    # another tool wrote; say so, so a missing skill can be traced to a deploy.
+    log "removed unmanaged skills entry: ${reconcile_target_name:-$target_skills_root}/$entry_name"
   done
 }
 
