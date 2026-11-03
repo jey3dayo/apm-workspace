@@ -19,16 +19,16 @@ SaaS への接続手段は次の優先順で選ぶ。上位が使えるなら下
 
 ○ = 接続済み / × = 未接続・非提供 / △ = 接続に問題あり
 
-| SaaS            | Claude (claude.ai コネクタ)     | Codex (ChatGPT プラグイン) | APM 側の扱い                                   |
-| --------------- | ------------------------------- | -------------------------- | ---------------------------------------------- |
-| Linear          | ○                               | ○                          | MCP + `linear-task-ops` を復活（2026-07-27）   |
-| Sentry          | ○                               | ○                          | 撤去済み（2026-07-10、package-decisions 参照） |
-| GitHub          | ○                               | ○                          | `gh` CLI 併用                                  |
-| Gmail           | ○                               | ○                          | —                                              |
-| Google Calendar | ○                               | ○                          | —                                              |
-| Google Drive    | ○                               | ×                          | —                                              |
-| Datadog         | ○                               | ×                          | —                                              |
-| Slack           | ○（SlackDB / Slack は要再接続） | ×                          | `slack-app-management` は別役割で維持          |
-| Snowflake       | △（接続の問題）                 | ×                          | —                                              |
-| Excalidraw      | ○                               | ×                          | —                                              |
-| 社員情報検索    | △（要再接続）                   | ×                          | `mdb-api` スキルは API 実装レビュー用で別役割  |
+| SaaS            | Claude (claude.ai コネクタ)     | Codex (ChatGPT プラグイン) | APM 側の扱い                                         |
+| --------------- | ------------------------------- | -------------------------- | ---------------------------------------------------- |
+| Linear          | ○                               | ○                          | MCP + `linear-task-ops` を復活（2026-07-27）         |
+| Sentry          | ○                               | ○                          | 撤去済み（2026-07-10、package-decisions 参照）       |
+| GitHub          | ○                               | ○                          | `gh` CLI 併用                                        |
+| Gmail           | ○                               | ○                          | —                                                    |
+| Google Calendar | ○                               | ○                          | —                                                    |
+| Google Drive    | ○                               | ×                          | —                                                    |
+| Datadog         | ○                               | ×                          | —                                                    |
+| Slack           | ○（SlackDB / Slack は要再接続） | ×                          | `slack-app-management` は別役割で維持                |
+| Snowflake       | △（接続の問題）                 | ×                          | —                                                    |
+| Excalidraw      | ○                               | ×                          | —                                                    |
+| 社員情報検索    | △（要再接続）                   | ×                          | `internal-api-b` スキルは API 実装レビュー用で別役割 |

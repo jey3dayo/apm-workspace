@@ -4,7 +4,7 @@
 
 ## 完了
 
-- #5 ca-pass の global 撤去(2026-08-21): ユーザー承認のうえ `apm.yml` から撤去、`apm lock` 再解決、deploy で両配布先から消滅を確認。`docs/package-decisions.md` へ実撤去を追記済み
+- #5 internal-api-a の global 撤去(2026-08-21): ユーザー承認のうえ `apm.yml` から撤去、`apm lock` 再解決、deploy で両配布先から消滅を確認。`docs/package-decisions.md` へ実撤去を追記済み
 - #7 PS apply/validate のパリティ化(2026-08-21): apply-core Phase 1 として解消(`eb3a4ce`)
 - #11 CI path filter へ `optional-skills/**` 追加(2026-08-21)
 - #8 Jina bearer の rotation(2026-09-28): rotation ではなく jina-reader MCP と `JINA_API_KEY` を撤去して解消(`7e06ef3`、`~/.config` 側 `efa02cd3`)

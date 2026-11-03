@@ -9,14 +9,13 @@
 | labs             | d72d07ba-695c-471c-9a29-a8d975bc7976 | In Progress | 学習・調査・技術検証・homelab 運用       |
 | GBF              | 108edeba-9579-41fb-8b32-82d44678d382 | In Progress | グランブルーファンタジー全般             |
 | workbench        | 039463de-1a52-4ce7-a89b-c3d3cd26bb96 | In Progress | 会社雑務・その他個人タスク               |
-| LoCA             | c95a2787-7dd8-4fe8-9aac-ffb1ae534b71 | Backlog     | repo: CyberAgent-Infosys/caad-loca-bff   |
 | ultra-rss-reader | 530ead2d-64f7-42a3-92c4-c4f248b2ff90 | Backlog     | repo: jey3dayo/ultra-rss-reader          |
-| ca-connect-site  | 143b6a46-2d79-475b-83a4-68dd6c121d17 | Backlog     | -                                        |
-| cygate           | 05fed0ff-02a4-4934-b340-9340d84541e1 | Backlog     | -                                        |
 | pr-labeler       | ce1a8d5f-e5c3-4f5d-8dd2-d293ee135734 | Completed   | -                                        |
 | keep-on          | 881a2582-a0e1-42a5-b01a-dc0803f5df9c | Backlog     | 習慣トラッカー keepon                    |
 
 `finance` は旧 `finance-ops`。改名のみで ID は同じ。
+
+会社リポジトリ用のプロジェクトはこの公開リポジトリに載せない。名前と ID は Linear MCP の `list_projects`（`team: JEY`）で確認する。
 
 プロジェクトにはラベルを1つ付ける。`code`（リポジトリのある開発。会社・個人を問わない）、`work`（会社の雑務と学習・検証・homelab: workbench / labs）、`life`（生活・趣味: finance / household / GBF）。同名の project ビューがある。プロジェクトの Priority は使わない。
 

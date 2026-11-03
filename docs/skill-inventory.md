@@ -69,7 +69,7 @@
 - `google-forms-survey-builder` — 利用例: `tech-talks`
 - `slack-app-management` — Slack App を持つリポジトリのみ
 - `premortem` — 実装前の失敗条件分析が必要なリポジトリのみ
-- `scheduled-audit-ops` — 利用例: `ca-connect-site`（`docs/prompts/config.toml` を持つリポジトリのみ）
+- `scheduled-audit-ops` — 利用例: `work-site`（`docs/prompts/config.toml` を持つリポジトリのみ）
 - `review-board` — UI レビューのレーン振り分けが要るリポジトリのみ
 
 ## private（private-skills/・~/.apm では gitignored、正本は private repo）
@@ -79,29 +79,29 @@
 
 ## repo-local / on-demand へ移管済み
 
-- `ca-pass`, `mdb-api`, `notica-api`, `telma-api` — global から撤去済み。
-  必要な利用リポジトリの `apm.yml` から `caad-develop/claude-code-marketplace`
+- `internal-api-a`, `internal-api-b`, `internal-api-c`, `internal-api-d` — global から撤去済み。
+  必要な利用リポジトリの `apm.yml` から `<work-marketplace>`
   の各 `plugins/service-integrations/<id>` ref を個別導入する。
-- `perman-aws-vault` — global APM から撤去済み（2026-10-19）。caad マーケットのプラグインで管理（Claude Code / Codex / Grok 共通）。APM の `apm.yml` には載せない。
+- `aws-credential-helper` — global APM から撤去済み（2026-10-19）。会社マーケットのプラグインで管理（Claude Code / Codex / Grok 共通）。APM の `apm.yml` には載せない。
 
 ## repo-local で活用中
 
 global の一覧に無くても廃止ではない。各リポジトリの `apm.yml` が正本（2026-10-02 時点の `ghq` 配下スキャン。パッケージ置き場の `our-apm` は除く）。
 
-| ツール                                                                                    | 利用リポジトリ                                                                | 用途                                          |
-| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------------- |
-| `agentation-mcp`（MCP）                                                                   | `ultra-rss-reader`                                                            | Agentation toolbar での UI アノテーション連携 |
-| `agentation` / `agentation-self-driving`（benjitaylor, global dependency と併用）         | `caad-loca-bff`（両方）, `ultra-rss-reader`（`agentation-self-driving` のみ） | repo-local での Agentation 自動レビュー導線   |
-| `tauri-mcp-server`（MCP）                                                                 | `ultra-rss-reader`                                                            | Tauri ランタイム検証                          |
-| `terraform-style-guide` / `terraform-test`（hashicorp）                                   | `ca-connect-site`, `caad-asta`, `caad-terraform-infra`                        | Terraform 規約・テスト                        |
-| `workers-best-practices` / `wrangler`（cloudflare）                                       | `keep-on`                                                                     | Cloudflare Workers                            |
-| `ca-pass` / `mdb-api` / `telma-api`（caad marketplace、repo-local apm）                   | `ca-connect-site`, `caad-asta`, `caad-loca-bff`                               | 社内 API 連携                                 |
-| `perman-aws-vault`（caad marketplace プラグイン、APM 管理外）                             | Claude Code / Codex / Grok 共通（host 導入）                                  | AWS 認証導線                                  |
-| `notica-api`（caad marketplace）                                                          | `ca-connect-site`                                                             | Notica API 連携                               |
-| `mcp-server-patterns`, `chatgpt-apps`                                                     | `caad-loca-bff`                                                               | MCP / ChatGPT Apps 実装                       |
-| `tauri`（EpicenterHQ）, `rust-best-practices`, `tauri-icon-gen`, `tauri-webview-geometry` | `ultra-rss-reader`                                                            | Tauri / Rust 実装                             |
-| `marp-slide`, `slide-docs`, `google-forms-survey-builder`（optional）                     | `tech-talks`                                                                  | スライド制作・アンケート作成                  |
-| `manga-rss-bridge`                                                                        | `manga-rss-bridge`, `homelab-k3s`                                             | プロジェクト固有運用                          |
+| ツール                                                                                     | 利用リポジトリ                                                           | 用途                                          |
+| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ | --------------------------------------------- |
+| `agentation-mcp`（MCP）                                                                    | `ultra-rss-reader`                                                       | Agentation toolbar での UI アノテーション連携 |
+| `agentation` / `agentation-self-driving`（benjitaylor, global dependency と併用）          | `work-bff`（両方）, `ultra-rss-reader`（`agentation-self-driving` のみ） | repo-local での Agentation 自動レビュー導線   |
+| `tauri-mcp-server`（MCP）                                                                  | `ultra-rss-reader`                                                       | Tauri ランタイム検証                          |
+| `terraform-style-guide` / `terraform-test`（hashicorp）                                    | `work-site`, `work-infra`, `terraform-infra`                             | Terraform 規約・テスト                        |
+| `workers-best-practices` / `wrangler`（cloudflare）                                        | `keep-on`                                                                | Cloudflare Workers                            |
+| `internal-api-a` / `internal-api-b` / `internal-api-d`（work marketplace、repo-local apm） | `work-site`, `work-infra`, `work-bff`                                    | 社内 API 連携                                 |
+| `aws-credential-helper`（work marketplace プラグイン、APM 管理外）                         | Claude Code / Codex / Grok 共通（host 導入）                             | AWS 認証導線                                  |
+| `internal-api-c`（work marketplace）                                                       | `work-site`                                                              | 社内 API 連携                                 |
+| `mcp-server-patterns`, `chatgpt-apps`                                                      | `work-bff`                                                               | MCP / ChatGPT Apps 実装                       |
+| `tauri`（EpicenterHQ）, `rust-best-practices`, `tauri-icon-gen`, `tauri-webview-geometry`  | `ultra-rss-reader`                                                       | Tauri / Rust 実装                             |
+| `marp-slide`, `slide-docs`, `google-forms-survey-builder`（optional）                      | `tech-talks`                                                             | スライド制作・アンケート作成                  |
+| `manga-rss-bridge`                                                                         | `manga-rss-bridge`, `homelab-k3s`                                        | プロジェクト固有運用                          |
 
 ## global MCP（root apm.yml の mcp:）
 

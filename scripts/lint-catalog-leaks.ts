@@ -3,8 +3,16 @@
 // Checks the managed catalog for repository-specific values and references to
 // agents that are not present in catalog/agents. Only catalog agents and
 // skills are in scope; commands and rules deliberately remain untouched.
+//
+// Organization names must not appear anywhere in this public repository, but
+// the list of names cannot be committed either. When a local denylist file
+// exists (APM_LEAK_DENYLIST, default
+// ${XDG_DATA_HOME:-~/.local/share}/apm-workspace/leak-denylist.txt, one term
+// per line, `#` comments), every listed term fails the lint. With no
+// arguments the denylist also covers docs/, plans/ and the root todo files.
 
 import * as fs from "node:fs";
+import * as os from "node:os";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -12,6 +20,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "..");
 const DEFAULT_TARGET_SUBDIRS = ["catalog/agents", "catalog/skills"];
+const DEFAULT_DENYLIST_EXTRA_SUBDIRS = ["docs", "plans", "todo.txt", "done.txt"];
 
 const EXCLUDED_AGENTS = new Set([
   "Explore",
@@ -53,7 +62,7 @@ function collectMarkdownFiles(targetDirs: string[]): string[] {
     if (!fs.existsSync(targetDir)) continue;
     const stat = fs.statSync(targetDir);
     if (stat.isDirectory()) walk(targetDir);
-    else if (stat.isFile() && targetDir.endsWith(".md")) files.add(targetDir);
+    else if (stat.isFile() && /\.(md|txt)$/.test(targetDir)) files.add(targetDir);
   }
 
   return Array.from(files).sort();
@@ -169,6 +178,41 @@ function addWarnings(filePath: string, content: string, warnings: Issue[]) {
   }
 }
 
+function denylistPath(): string {
+  if (process.env.APM_LEAK_DENYLIST) return process.env.APM_LEAK_DENYLIST;
+  const dataHome = process.env.XDG_DATA_HOME || path.join(os.homedir(), ".local", "share");
+  return path.join(dataHome, "apm-workspace", "leak-denylist.txt");
+}
+
+function loadDenylist(): RegExp[] {
+  const filePath = denylistPath();
+  if (!fs.existsSync(filePath)) return [];
+  return fs
+    .readFileSync(filePath, "utf8")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0 && !line.startsWith("#"))
+    .map((term) => {
+      const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      // Alphanumeric neighbours are excluded so a short term does not match
+      // inside hashes or ordinary words.
+      return new RegExp(`(?<![A-Za-z0-9])${escaped}(?![A-Za-z0-9])`, "gi");
+    });
+}
+
+function addDenylistFailures(filePath: string, content: string, denylist: RegExp[], failures: Issue[]) {
+  for (const pattern of denylist) {
+    for (const match of content.matchAll(pattern)) {
+      // The matched text is not echoed so CI logs do not repeat the name.
+      failures.push({
+        filePath,
+        line: lineNumberAt(content, match.index ?? 0),
+        message: "denylisted organization term",
+      });
+    }
+  }
+}
+
 function main() {
   const args = process.argv.slice(2);
   const targetDirs =
@@ -176,6 +220,14 @@ function main() {
       ? args.map((arg) => path.resolve(process.cwd(), arg))
       : DEFAULT_TARGET_SUBDIRS.map((subdir) => path.join(REPO_ROOT, subdir));
   const files = collectMarkdownFiles(targetDirs);
+  const denylist = loadDenylist();
+  const denylistFiles =
+    args.length > 0
+      ? files
+      : collectMarkdownFiles([
+          ...targetDirs,
+          ...DEFAULT_DENYLIST_EXTRA_SUBDIRS.map((subdir) => path.join(REPO_ROOT, subdir)),
+        ]);
   const agentNames = collectAgentNames(findAgentDirectory(targetDirs));
   const failures: Issue[] = [];
   const warnings: Issue[] = [];
@@ -184,6 +236,10 @@ function main() {
     const content = fs.readFileSync(filePath, "utf8");
     addAgentReferenceFailures(filePath, content, agentNames, failures);
     addWarnings(filePath, content, warnings);
+  }
+
+  for (const filePath of denylistFiles) {
+    addDenylistFailures(filePath, fs.readFileSync(filePath, "utf8"), denylist, failures);
   }
 
   if (failures.length > 0) {
