@@ -105,4 +105,15 @@ Describe "agmsg-state.ps1 save/restore" {
     $exitCode = Invoke-AgmsgState -SubCommand "restore"
     $exitCode | Should -Be 0
   }
+
+  It "save is a no-op when agmsg was never deployed" {
+    Remove-Item -LiteralPath $script:skillDir -Recurse -Force
+
+    Invoke-AgmsgState -SubCommand "save" | Should -Be 0
+    Test-Path -LiteralPath $script:skillDir | Should -BeFalse
+    Test-Path -LiteralPath $script:stateRoot | Should -BeFalse
+    Invoke-AgmsgState -SubCommand "restore" | Should -Be 0
+    Test-Path -LiteralPath $script:skillDir | Should -BeFalse
+    Test-Path -LiteralPath $script:stateRoot | Should -BeFalse
+  }
 }

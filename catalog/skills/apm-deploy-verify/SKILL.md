@@ -6,7 +6,7 @@ agent: implementer
 background: false
 description: >-
   ~/.apm の catalog を変更した後の機械的な検証一式（format / check / deploy:fresh /
-  配布先の内容一致 / agmsg-delegation runtime asset の smoke）を実行する。
+  配布先の内容一致 / agmsg 導入時の roster link と agmsg-delegation runtime asset の smoke）を実行する。
   「配布して検証して」「deploy 検証」「smoke 回して」「配布一致を確認して」で使う。
   何を変更するか・どこが正本かの判断は apm-usage、smoke の合否基準は
   agmsg-delegation が正本。本スキルは実行と結果報告だけを担う。
@@ -67,7 +67,7 @@ fork 実行では会話履歴は見えない。検証対象（変更した skill
    ! grep -qx '  - opencode' apm.yml
    ```
 
-4. agmsg roster link の到達性を確認する。確認対象は canonical face のみ。判定は `db` / `teams` の個別状態を見て `ls -l` でその場で二分するのではなく、両方を見た集約結果を持つ `mise -C ~/.apm run doctor` に一元化する:
+4. agmsg が導入済み（`~/.agents/skills/agmsg` が存在する）ときだけ、agmsg roster link の到達性を確認する。未導入なら doctor はこの確認を飛ばすので、本手順は「agmsg 未導入のため対象外」と報告して次へ進む。確認対象は canonical face のみ。判定は `db` / `teams` の個別状態を見て `ls -l` でその場で二分するのではなく、両方を見た集約結果を持つ `mise -C ~/.apm run doctor` に一元化する:
 
    ```bash
    mise -C ~/.apm run doctor
@@ -77,14 +77,14 @@ fork 実行では会話履歴は見えない。検証対象（変更した skill
 
    他の face（`~/.claude/skills/agmsg` など）に `db` / `teams` が無いのは仕様であり、張ってはいけない。診断・復旧の判断基準は `catalog/skills/agmsg-delegation/references/roster-recovery.md` が正本——**plain path があれば restore しない**（断線中に書かれた roster を上書きで失いうる）。手で `ln -s` を張らない
 
-5. `agmsg-delegation` の runtime asset（scripts/・WORKER.md・agmsg-review.config.toml）を変更した場合のみ smoke を実行する。項目と合否基準は `agmsg-delegation` Preflight の「初回利用前の smoke 5点」が正本
+5. agmsg が導入済みで、かつ `agmsg-delegation` の runtime asset（scripts/・WORKER.md・agmsg-review.config.toml）を変更した場合のみ smoke を実行する。agmsg 未導入なら smoke は実行できないので「agmsg 未導入のため未実行」と報告する。項目と合否基準は `agmsg-delegation` Preflight の「初回利用前の smoke 5点」が正本
 6. smoke の合否判定は worker モデルの自己申告でなく、ファイルシステムの実体で行う（touch したファイルの存在確認、拒否されるべき書込先にファイルが無いこと）。worker は書込失敗時でも成功を報告した実績がある
 
 ## 報告
 
 - 実行したコマンドと結果（通過 / 失敗）を列挙する
 - 配布一致は skill 名ごとに一致 / 不一致を明記する
-- agmsg roster link は doctor の exit code で判定し、補足証拠として `ls -l ~/.agents/skills/agmsg/db ~/.agents/skills/agmsg/teams` で得た `db` / `teams` の symlink 先を明記する（doctor の出力からは得られない）
+- agmsg roster link は、agmsg 導入済みなら doctor の exit code で判定し、補足証拠として `ls -l ~/.agents/skills/agmsg/db ~/.agents/skills/agmsg/teams` で得た `db` / `teams` の symlink 先を明記する（doctor の出力からは得られない）。未導入なら「対象外」と明記する
 - smoke を実行した場合は、実体確認したパスと結果を添える
 - 失敗があっても自分で修正しない。失敗ログをそのまま呼び出し元へ返す
 
