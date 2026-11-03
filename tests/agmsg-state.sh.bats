@@ -53,3 +53,18 @@ teardown() {
   [ "$(cat "$SKILL_DIR/db/messages.db")" = "message-history" ]
   [[ "$output" == *"$SKILL_DIR/db"* ]]
 }
+
+@test "save and restore are no-ops when agmsg was never deployed" {
+  rm -rf "$FIXTURE_HOME/.agents"
+
+  run env HOME="$FIXTURE_HOME" XDG_STATE_HOME="$FIXTURE_HOME/.local/state" bash "$SCRIPT_UNDER_TEST" save
+  [ "$status" -eq 0 ]
+  [ ! -e "$SKILL_DIR" ]
+  [ ! -e "$STATE_ROOT" ]
+  run env HOME="$FIXTURE_HOME" XDG_STATE_HOME="$FIXTURE_HOME/.local/state" bash "$SCRIPT_UNDER_TEST" restore
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"agmsg not deployed"* ]]
+  # Neither command may create the skill face or the state store.
+  [ ! -e "$SKILL_DIR" ]
+  [ ! -e "$STATE_ROOT" ]
+}
