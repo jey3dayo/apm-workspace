@@ -2,8 +2,9 @@
 
 React 19 以降の前提。Action は `startTransition` に渡した関数、または `action` / `formAction` など Action prop に渡した関数のこと。
 
-## useOptimistic は Action の中で呼ぶ
+## useOptimistic の setter は Action の中で呼ぶ
 
+- hook 自体は他の hook と同じくトップレベルで呼ぶ。Action の中で呼ぶのは返された setter
 - setter は `startTransition` の中か Action prop の中でだけ呼ぶ。外で呼ぶと開発時に警告が出て、楽観値が一瞬しか出ない
 - レンダー中に setter を呼ぶのはエラー
 - Action が終わると楽観値は本当の値に置き換わる。失敗したら元の値に戻るので、rollback 用の state を自分で持たない

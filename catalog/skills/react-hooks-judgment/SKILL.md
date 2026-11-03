@@ -15,9 +15,9 @@ API の正本は react.dev で、ここには判断の順序と落とし穴だ�
 ## 棲み分け
 
 - このスキル: hook の選択、Effect の要否、React 19 の非同期 hook、state の置き場と Suspense 境界、完了ゲート
-- パフォーマンス規則（waterfall、bundle、再レンダー削減、SSR）: `react-best-practices`（vercel-labs）。本文は写さず、規則 ID で参照する
+- パフォーマンス規則（waterfall、bundle、再レンダー削減、SSR）: `react-best-practices`（外部スキル）。本文は写さず、規則 ID で参照する
 - 変更後の健全性スコア・診断: `react-doctor`
-- 先に `package.json` / lockfile で React と eslint-plugin-react-hooks のバージョンを確かめる。React 18 以前なら React 19 の節は使わない
+- 先に `package.json` / lockfile で React と eslint-plugin-react-hooks のバージョンを確かめる。React 18 以前なら React 19 の節を使わない。`useEffectEvent` は 19.2 以降、`useOptimistic` / `useActionState` / `useFormStatus` / `use` は 19.0 以降
 
 ## 判断の順序
 
@@ -30,18 +30,18 @@ API の正本は react.dev で、ここには判断の順序と落とし穴だ�
 
 ## 早見表
 
-| 状況                                         | 選ぶ                                       | 避ける                               |
-| -------------------------------------------- | ------------------------------------------ | ------------------------------------ |
-| props / state から計算できる値               | レンダー中に計算                           | `useState` + `useEffect` で同期      |
-| prop が変わったら子の state を全部戻す       | 子に `key` を渡す                          | Effect の中で `setState`             |
-| 共有・リロード・戻るで復元したい UI 状態     | URL（router の search params）             | `useState` だけで持つ                |
-| 入力に重い一覧描画が引きずられる             | `useDeferredValue`                         | 固定ミリ秒のデバウンス（描画が原因） |
-| 送信結果を待たずに画面へ反映                 | Action 内の `useOptimistic`                | 手書きの rollback 用 state           |
-| フォーム送信の結果・エラー・pending          | `useActionState`                           | `useState` + `onSubmit` + `loading`  |
-| 送信ボタンだけが pending を知りたい          | `<form>` の子で `useFormStatus`            | `isPending` を props で配る          |
-| ブラウザ API や外部ストアの購読              | `useSyncExternalStore`                     | `useEffect` + `setState`             |
-| 読み取り系のデータ取得                       | framework / キャッシュ済み Promise + `use` | cleanup のない `useEffect` + `fetch` |
-| 外部システムとの同期（接続、購読、DOM 連携） | `useEffect`（理由コメント付き）            | —                                    |
+| 状況                                         | 選ぶ                                         | 避ける                               |
+| -------------------------------------------- | -------------------------------------------- | ------------------------------------ |
+| props / state から計算できる値               | レンダー中に計算                             | `useState` + `useEffect` で同期      |
+| prop が変わったら子の state を全部戻す       | 子に `key` を渡す                            | Effect の中で `setState`             |
+| 共有・リロード・戻るで復元したい UI 状態     | URL（router の search params）               | `useState` だけで持つ                |
+| 入力に重い一覧描画が引きずられる             | `useDeferredValue`                           | 固定ミリ秒のデバウンス（描画が原因） |
+| 送信結果を待たずに画面へ反映                 | `useOptimistic`（setter は Action 内で呼ぶ） | 手書きの rollback 用 state           |
+| フォーム送信の結果・エラー・pending          | `useActionState`                             | `useState` + `onSubmit` + `loading`  |
+| 送信ボタンだけが pending を知りたい          | `<form>` の子で `useFormStatus`              | `isPending` を props で配る          |
+| ブラウザ API や外部ストアの購読              | `useSyncExternalStore`                       | `useEffect` + `setState`             |
+| 読み取り系のデータ取得                       | framework / キャッシュ済み Promise + `use`   | cleanup のない `useEffect` + `fetch` |
+| 外部システムとの同期（接続、購読、DOM 連携） | `useEffect`（理由コメント付き）              | —                                    |
 
 ## 設計
 
