@@ -178,3 +178,25 @@ EOF
   run_fixture
   [ "$status" -eq 0 ]
 }
+
+@test "redacts denylisted terms from other diagnostics and paths" {
+  printf 'example-org\n' >"$APM_LEAK_DENYLIST"
+  mkdir -p "$FIXTURE_DIR/catalog/skills/example-org-skill"
+  cat >"$FIXTURE_DIR/catalog/skills/example-org-skill/SKILL.md" <<'EOF'
+(use example-org-agent)
+EOF
+
+  run_fixture
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"unresolved agent reference: <redacted>-agent"* ]]
+  [[ "$output" != *"example-org"* ]]
+}
+
+@test "checks non-markdown files under explicit targets" {
+  printf 'example-org\n' >"$APM_LEAK_DENYLIST"
+  printf 'owner: example-org\n' >"$FIXTURE_DIR/catalog/skills/notes.txt"
+
+  run_fixture
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"notes.txt:1: denylisted organization term"* ]]
+}

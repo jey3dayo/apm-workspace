@@ -81,7 +81,7 @@
 
 - `internal-api-a`, `internal-api-b`, `internal-api-c`, `internal-api-d` — global から撤去済み。
   必要な利用リポジトリの `apm.yml` から `<work-marketplace>`
-  の各 `plugins/service-integrations/<id>` ref を個別導入する。
+  の各 `plugins/service-integrations/<id>` ref を個別導入する（実際の repo と id は会社マーケットプレイスのプラグイン一覧で確認する）。
 - `aws-credential-helper` — global APM から撤去済み（2026-10-19）。会社マーケットのプラグインで管理（Claude Code / Codex / Grok 共通）。APM の `apm.yml` には載せない。
 
 ## repo-local で活用中

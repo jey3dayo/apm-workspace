@@ -9,8 +9,10 @@
 // exists (APM_LEAK_DENYLIST, default
 // ${XDG_DATA_HOME:-~/.local/share}/apm-workspace/leak-denylist.txt, one term
 // per line, `#` comments), every listed term fails the lint. With no
-// arguments the denylist also covers docs/, plans/ and the root todo files.
+// arguments the denylist covers every git-tracked text file; with arguments it
+// covers every text file under them. Listed terms are redacted from all output.
 
+import { execFileSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
@@ -20,7 +22,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "..");
 const DEFAULT_TARGET_SUBDIRS = ["catalog/agents", "catalog/skills"];
-const DEFAULT_DENYLIST_EXTRA_SUBDIRS = ["docs", "plans", "todo.txt", "done.txt"];
 
 const EXCLUDED_AGENTS = new Set([
   "Explore",
@@ -62,7 +63,7 @@ function collectMarkdownFiles(targetDirs: string[]): string[] {
     if (!fs.existsSync(targetDir)) continue;
     const stat = fs.statSync(targetDir);
     if (stat.isDirectory()) walk(targetDir);
-    else if (stat.isFile() && /\.(md|txt)$/.test(targetDir)) files.add(targetDir);
+    else if (stat.isFile() && targetDir.endsWith(".md")) files.add(targetDir);
   }
 
   return Array.from(files).sort();
@@ -200,6 +201,48 @@ function loadDenylist(): RegExp[] {
     });
 }
 
+function collectTextFiles(targetDirs: string[]): string[] {
+  const files = new Set<string>();
+  const walk = (current: string) => {
+    let stat: fs.Stats;
+    try {
+      stat = fs.statSync(current);
+    } catch {
+      return;
+    }
+    if (stat.isDirectory()) {
+      if (path.basename(current) === ".git") return;
+      for (const entry of fs.readdirSync(current)) walk(path.join(current, entry));
+    } else if (stat.isFile()) {
+      files.add(current);
+    }
+  };
+  for (const targetDir of targetDirs) walk(targetDir);
+  return Array.from(files).sort();
+}
+
+function collectTrackedFiles(): string[] {
+  try {
+    return execFileSync("git", ["-C", REPO_ROOT, "ls-files", "-z"], { encoding: "utf8" })
+      .split("\0")
+      .filter((file) => file.length > 0)
+      .map((file) => path.join(REPO_ROOT, file))
+      .filter((file) => fs.existsSync(file) && fs.statSync(file).isFile())
+      .sort();
+  } catch {
+    return collectTextFiles([REPO_ROOT]);
+  }
+}
+
+function readText(filePath: string): string | null {
+  const buffer = fs.readFileSync(filePath);
+  return buffer.includes(0) ? null : buffer.toString("utf8");
+}
+
+function redact(text: string, denylist: RegExp[]): string {
+  return denylist.reduce((current, pattern) => current.replace(pattern, "<redacted>"), text);
+}
+
 function addDenylistFailures(filePath: string, content: string, denylist: RegExp[], failures: Issue[]) {
   for (const pattern of denylist) {
     for (const match of content.matchAll(pattern)) {
@@ -222,12 +265,7 @@ function main() {
   const files = collectMarkdownFiles(targetDirs);
   const denylist = loadDenylist();
   const denylistFiles =
-    args.length > 0
-      ? files
-      : collectMarkdownFiles([
-          ...targetDirs,
-          ...DEFAULT_DENYLIST_EXTRA_SUBDIRS.map((subdir) => path.join(REPO_ROOT, subdir)),
-        ]);
+    denylist.length === 0 ? [] : args.length > 0 ? collectTextFiles(targetDirs) : collectTrackedFiles();
   const agentNames = collectAgentNames(findAgentDirectory(targetDirs));
   const failures: Issue[] = [];
   const warnings: Issue[] = [];
@@ -239,13 +277,14 @@ function main() {
   }
 
   for (const filePath of denylistFiles) {
-    addDenylistFailures(filePath, fs.readFileSync(filePath, "utf8"), denylist, failures);
+    const content = readText(filePath);
+    if (content !== null) addDenylistFailures(filePath, content, denylist, failures);
   }
 
   if (failures.length > 0) {
     console.error(`Catalog leak lint failed (${failures.length} issue(s)):`);
     for (const issue of failures) {
-      console.error(`  ${issue.filePath}:${issue.line}: ${issue.message}`);
+      console.error(redact(`  ${issue.filePath}:${issue.line}: ${issue.message}`, denylist));
     }
     process.exit(1);
   }
@@ -253,7 +292,7 @@ function main() {
   if (warnings.length > 0) {
     console.error(`Catalog leak lint: ${warnings.length} warning(s):`);
     for (const warning of warnings) {
-      console.error(`  ${warning.filePath}:${warning.line}: ${warning.message}`);
+      console.error(redact(`  ${warning.filePath}:${warning.line}: ${warning.message}`, denylist));
     }
   }
 

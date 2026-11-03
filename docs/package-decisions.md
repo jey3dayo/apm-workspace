@@ -274,11 +274,7 @@
 - Status: global dependency から撤去・repo-local / on-demand 化（2026-07-21）
 - 正本: `<work-marketplace>` の各 `plugins/service-integrations/<id>`
 - 理由: 社内 API、VPN、認証境界に依存するため、全リポジトリへの自動配布ではなく利用側の `apm.yml` に閉じ込める。workspace catalog へコピーせず upstream を直接参照する。
-- 個別導入 ref:
-  - `<work-marketplace>/plugins/service-integrations/internal-api-a`
-  - `<work-marketplace>/plugins/service-integrations/internal-api-b`
-  - `<work-marketplace>/plugins/service-integrations/internal-api-c`
-  - `<work-marketplace>/plugins/service-integrations/internal-api-d`
+- 個別導入 ref: `<work-marketplace>/plugins/service-integrations/<id>`。実際の repo と id は公開リポジトリに載せないので、会社マーケットプレイスのプラグイン一覧で確認する。
 - 補足: `private-skills` の `internal-api-a` overlay は machine-local な別レーンとして維持していたが、2026-08-14 に撤去した（private repo の `3d3dd0b`、`<work-marketplace>` の ref で置き換えたため）。
 - 追記（2026-08-21）: `internal-api-a` だけが root `apm.yml` に残留していた drift を /improve 監査（#5）で検出し、manifest から実撤去した。利用するリポジトリは repo-local `apm.yml` へ上記 ref を追加する（`apm-usage` の `references/repo-manifest.md` 参照）。
 
