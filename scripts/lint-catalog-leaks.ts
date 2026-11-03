@@ -311,11 +311,13 @@ try {
   main();
 } catch (error) {
   // Unexpected errors (unreadable files etc.) can carry paths; redact them too.
-  let denylist: RegExp[] = [];
+  let denylist: RegExp[];
   try {
     denylist = loadDenylist();
   } catch {
-    denylist = [];
+    // Without the denylist nothing can be redacted, so print no details.
+    console.error("Catalog leak lint crashed (details hidden: the denylist could not be read).");
+    process.exit(2);
   }
   const message = error instanceof Error ? error.message : String(error);
   console.error(redact(`Catalog leak lint crashed: ${message}`, denylist));
