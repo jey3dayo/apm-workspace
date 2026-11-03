@@ -130,5 +130,7 @@ rg -n -o '^[A-Z0-9_]+=encrypted:' .env .env.* 2>/dev/null
 
 - Load encrypted `.env.*` only through dotenvx commands, never shell `source` or `export $(...)`.
 - Keep plain secret files out of commits; a needed local plain file must already be repo-ignored.
+- Keep `.env.keys` out of git (repo-ignored) and share private keys only through a secure secret store, never chat, issues, or commits.
+- Use a separate keypair per environment; give CI only that environment's private key (e.g. `DOTENV_PRIVATE_KEY_PRODUCTION`) as a CI secret.
 - Follow existing repo env docs/tasks before introducing a new env convention.
 - Decryption failure only inside a git worktree (key not found, `MISPAIRED_PRIVATE_KEY` while the main checkout works) usually means the gitignored `.env.keys` was never copied there. Fix it via the `git-worktree` skill: `wt.copy` config for `git wt`, or `scripts/copy-env-files.sh` for worktrees created by any other path.
