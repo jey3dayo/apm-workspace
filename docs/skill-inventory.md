@@ -6,10 +6,6 @@
 
 ## レーン一覧
 
-全体像の図は [`diagrams/apm-skill-governance.html`](diagrams/apm-skill-governance.html)
-（ローカルで開く。正本は隣の `.architecture.json`）。再生成は
-`node ~/.claude/skills/archify/bin/archify.mjs deliver architecture <json> <html> --quality showcase`。
-
 | レーン                 | 正本                                 | 配布                                                                                    | 用途                                                               |
 | ---------------------- | ------------------------------------ | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
 | global（外部）         | root `apm.yml` の `dependencies.apm` | 全リポジトリへ自動 rollout                                                              | 横断的に使う外部スキル                                             |
@@ -20,37 +16,10 @@
 | manual                 | `manual-skills/.apm/skills/**`       | 手動配置                                                                                | 通常レーンで壊れる upstream の受け皿（退役 upstream コピーを収容） |
 | repo-local             | 各リポジトリの `apm.yml`             | そのリポジトリのみ                                                                      | ランタイム・認証・ブラウザに結び付くもの                           |
 
-## global（外部スキル: root apm.yml）
+## global の一覧
 
-グループは `apm.yml` の `# --- <group> ---` 見出しと同じ。
-
-- review: `thermo-nuclear-code-quality-review`, `improve`（shadcn）
-- engineering / writing: `natural-japanese`, `japanese-tech-writing`（gist、alias）, `yomiyasu`,
-  mattpocock 系（`codebase-design`, `domain-modeling`, `grilling`,
-  `improve-codebase-architecture`, `prototype`, `research`, `retro`, `setup-matt-pocock-skills`,
-  `wait-what`, `wayfinder`, `writing-for-agents`）
-- react: `react-doctor`, `react-best-practices`
-- design:
-  emilkowalski 系（`animation-performance`, `apple-design`, `break-ui`, `emil-design-eng`,
-  `find-animation-opportunities`, `improve-animations`, `review-animations`）,
-  ibelick 系（`fixing-accessibility`,
-  `fixing-motion-performance`, `improve-ui`）, `transitions-dev`, `ui-ux-pro-max`,
-  `unslop-ui`（heydamir/unslop の skills/unslop、alias）
-- browser / analysis: `browser-harness`, `screenshot`, `archify`
-- agent tools: `tuicr`, `agmsg`, `show-me`, `agent-desktop`
-
-## global（自作 catalog: catalog/skills/）
-
-- APM・環境運用: `apm-usage`（repo-local `apm.yml` の作成/整理は `references/repo-manifest.md`）,
-  `mise`, `dotenvx`, `1password`, `herdr`, `tuxedo`, `apm-deploy-verify`
-- 委譲・エージェント運用: `orchestrator-worker`, `agmsg-delegation`, `backlog-sweep`, `learning-intake`
-- レビュー・品質: `review-fix-loop`, `polish`
-- Git・出荷: `ship`, `atomic-commit`, `git-worktree`, `git-branch-cleanup`,
-  `ci-stability-hooks`, `prepare-goal`
-- リファクタリング・解析: `refactoring`, `similarity`, `cccc`
-- ドキュメント・タスク: `docs-manager`, `docs-review`, `todo-changelog-ops`, `linear-task-ops`
-- デザイン・ブラウザ: `design-md-workflow`, `pwa-layout`, `terminal-browser`
-- リサーチ: `web-research`（計画・並列委譲・合成まで一体）
+global の外部スキルと MCP は root `apm.yml`（`dependencies.apm` / `dependencies.mcp`）と `apm.lock.yaml`、自作 catalog スキルは `catalog/skills/` を正本として直接見る。このファイルには名前を写さない。
+Cursor user-scope（`~/.cursor/mcp.json`）は APM 外 — [`package-decisions.md`](package-decisions.md) の Cursor 節。
 
 ## ~/.apm 専用（.apm/skills/）
 
@@ -103,16 +72,8 @@ global の一覧に無くても廃止ではない。各リポジトリの `apm.y
 | `marp-slide`, `slide-docs`, `google-forms-survey-builder`（optional）                      | `tech-talks`                                                             | スライド制作・アンケート作成                  |
 | `manga-rss-bridge`                                                                         | `manga-rss-bridge`, `homelab-k3s`                                        | プロジェクト固有運用                          |
 
-## global MCP（root apm.yml の mcp:）
-
-`context7`, `linear`
-
-`mise run check` の `lint:skill-inventory` が上記一覧と `apm.yml` の `dependencies.mcp` を照合する。Cursor user-scope（`~/.cursor/mcp.json`）は APM 外 — [`package-decisions.md`](package-decisions.md) の Cursor 節。
-
 ## メンテナンス
 
-- 更新タイミング: レーン間の移動、global への追加・撤去、repo-local の新規採用時
-- root `apm.yml` の `mcp:` を変えたら global MCP 節の backtick 行を同じ集合に更新する（`lint:skill-inventory` が `mise run check` で検証）
-- 外部スキルの dependency を追加・撤去したら `## global（外部スキル: root apm.yml）` の一覧を更新する（`lint:skill-inventory` が `apm.lock.yaml` と照合する）
+- 更新タイミング: レーンの追加・変更、optional / manual / private の出入り、repo-local の新規採用・撤去時（global の追加・撤去だけならこのファイルは触らない）
 - global から repo-local / optional への移管: `apm-usage` の Install Gate と Fast Path 9 に従う
 - repo-local の再スキャン: `ghq list -p` で各リポジトリの `apm.yml` を確認

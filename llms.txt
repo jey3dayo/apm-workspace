@@ -1,181 +1,24 @@
 # apm-workspace
 
-`~/.apm` is the working copy and operational source of truth for the global APM workspace for `jey3dayo`.
+`~/.apm` is the working copy and operational source of truth for the global APM workspace of `jey3dayo`.
+It owns the global manifest (`apm.yml`), the lockfile (`apm.lock.yaml`), the cache-only `apm_modules/`, personal skill sources, and the shared runtime guidance package (`catalog/`).
 
-`~/.config` is bootstrap-only for authoring in this workspace model. The exception is global `mise` tool resolution for `apm`, which must stay aligned with this workspace when the active `apm` source changes.
+## Where to read
 
-This workspace owns the global APM manifest, the lockfile, the downloaded dependency cache, your personal skill sources, and the shared runtime guidance package.
+- `README.md`: human overview and day-to-day flow
+- `AGENTS.md`: full contract, guardrails, and edit surfaces
+- `docs/apm-task-coverage.md`: every `mise` task and what gates it
+- `docs/skill-inventory.md`: skill lanes (global, catalog, optional, manual, private, repo-local)
+- `docs/package-decisions.md`: why each package was added, kept, or removed
+- `docs/skill-overlaps.md`: which of several similar skills to use
+- `catalog/skills/apm-usage/SKILL.md`: operating guidance for agents
+- `todo.txt` / `done.txt`: open and finished internal tasks
 
-## What This Workspace Owns
+## Key rules (details in AGENTS.md)
 
-- `apm.yml`: global dependency manifest for user-scope rollout
-- `apm.lock.yaml`: resolved commits and install state captured by APM
-- `apm_modules/`: downloaded upstream sources; cache only, not an editing surface
-- `catalog/`: shared runtime guidance package for AGENTS, agents, commands, rules, and managed personal skills under `catalog/skills/`
-- `manual-skills/`: copied skills kept outside the normal upstream-managed lane and published as a separate package when needed
-- `private-skills/`: gitignored machine-local skills (tracked in a private repo) synced by `mise run deploy` alongside the catalog; `apply:skills:local` is the fast partial path
-- `mise.toml`: workspace-local tasks for install, migration, validation, and repair
-- `scripts/apm-workspace.*`: tracked host-local MCP detection and user-scope reconciliation logic
-- `tests/`: bats and Pester coverage for the workspace helper scripts; only the bats suite (`test:sh`) gates `git push`
-
-## Managed Catalog Layout
-
-Workspace assets are split by role.
-
-- Personal skills
-  - source: `~/.apm/catalog/skills/<id>/`
-- Manual-only copied skills
-  - source: `~/.apm/manual-skills/.apm/skills/<skill-id>/`
-  - provenance: `~/.apm/manual-skills/upstreams/**`
-- Local-only private skills
-  - source: `~/.apm/private-skills/.apm/skills/<skill-id>/`
-  - rollout: `mise run deploy` (fast partial path: `mise run apply:skills:local`)
-- Shared guidance
-  - source: `~/.apm/catalog/AGENTS.md`
-  - source: `~/.apm/catalog/agents/**`
-  - source: `~/.apm/catalog/commands/**`
-  - source: `~/.apm/catalog/rules/**`
-
-The tracked layout is intentionally asymmetric:
-
-- `catalog/skills/**` is the authoring layer for personal assets, plus vendored runtime-support skills for `catalog/commands/**` whose provenance lives in their own `SKILL.md` instead of `manual-skills/upstreams/**`.
-- external skills stay visible in `apm.yml` / `apm.lock.yaml` as command-managed upstream refs.
-- `manual-skills/**` is for copied skills that cannot stay on the normal upstream-managed lane.
-- `private-skills/**` is for machine-local overrides or additions that stay out of git tracking here and out of `apm.yml`, but still enter the local rollout through `mise run deploy`.
-- `commands/**` stay top-level inside `catalog/**` because they are synced into runtime targets as shared guidance, not installed as nested skill packages.
-
-Shared runtime guidance is published through the catalog ref in `apm.yml`:
-
-```text
-jey3dayo/apm-workspace/catalog#main
-```
-
-`apm_modules/` remains a cache-only layer, not an editing surface.
-
-## Operational Guardrails
-
-- Do not edit `apm_modules/`.
-- Do not reintroduce `./packages/*` or `~/.apm/skills/` as alternate editing surfaces for managed global skills.
-- Keep `scripts/replace-bold-headings.ts` vendored in this repository; do not reintroduce a `~/.config` dependency for it.
-- Keep `apm.yml` on upstream refs, especially `jey3dayo/apm-workspace/catalog#main`.
-- Keep managed personal source in `~/.apm/catalog/skills/**`, manual copied skills in `~/.apm/manual-skills/**`, and runtime guidance in `~/.apm/catalog/**`.
-- Keep machine-local skills in `~/.apm/private-skills/.apm/skills/**` (gitignored here; the private repo is the source of truth).
-- Codex uses split output: compile guidance with `apm compile --target codex --output ~/.codex/AGENTS.md`, and deploy skills to `~/.agents/skills`.
-- Verify Codex rollout through compile success, the generated `~/.codex/AGENTS.md`, and deployed `SKILL.md` files under `~/.agents/skills`.
-- The `apm` source and pinned version are defined in `mise.toml` (`"pipx:apm-cli"`); read it rather than relying on a version quoted here.
-- If both `~/.apm/mise.toml` and `~/.config/mise/config.workstation.toml` define `apm`, keep them aligned to the same source.
-- Prefer `mise run deploy` for routine local rollout and `mise run apply` only when you need deploy-only behavior.
-- Reserve `mise run upgrade` for intentional upstream refresh, not for normal deployment.
-- When direct binary selection matters, prefer `mise exec pipx:apm-cli -- apm ...` (mise resolves the pinned version).
-- If a Codex-targeted external skill is still missing after rollout, verify `~/.agents/skills` directly and treat it as a temporary Codex-specific delivery gap.
-
-## Source Of Truth
-
-- Personal skills
-  - edit `catalog/skills/**`
-- Manual-only copied skills
-  - edit `manual-skills/**`
-  - keep them out of the root `apm.yml`
-- Local-only private skills
-  - edit `private-skills/.apm/skills/**`
-  - keep them out of `apm.yml` / `apm.lock.yaml`; they are gitignored in `~/.apm` and tracked in the private repo
-  - `mise run deploy` syncs them in the same apply stage as the catalog; `mise run apply:skills:local` is the fast partial path
-  - if the same skill id exists in `catalog/skills/**`, the private copy wins
-- External skills
-  - use `apm install <package-ref>` to add
-  - use `apm uninstall <package-ref>` to remove
-  - treat `apm.yml` and `apm.lock.yaml` as command-managed state
-- Shared guidance
-  - edit `catalog/AGENTS.md`, `catalog/agents/**`, `catalog/commands/**`, `catalog/rules/**`
-
-## Initial Bootstrap
-
-```powershell
-cd ~/.apm
-mise bootstrap
-```
-
-The hidden final bootstrap task reconciles host-local MCP entries for Codex and Claude. Treat `~/.codex/config.toml` and `~/.claude.json` as generated targets.
-
-## Default Flow
-
-```powershell
-cd ~/.apm
-mise run deploy
-```
-
-## Managed Catalog Update Flow
-
-When a personal skill changes under `~/.apm/catalog/skills/`:
-
-1. Edit `catalog/skills/<id>/` directly.
-2. Run `mise run format:markdown:bold-headings` when you want heading normalization.
-
-When shared runtime guidance changes under `~/.apm/catalog/`:
-
-1. Edit `catalog/` directly.
-2. Run `mise run prepare:catalog`.
-3. Review the normalized `catalog/` diff.
-4. Commit and push the updated `catalog/`.
-5. Run `mise run install:catalog`.
-6. Run `mise run doctor` and confirm:
-   - `catalog: ... status=ok`
-   - target lines show `present` for each face, or `n/a` for a face that target opts out of
-
-If old package ownership from a previous install state is still hanging around, run `apm prune` once before re-applying.
-
-When a copied skill lives under `~/.apm/manual-skills/`:
-
-1. Treat it as a manually curated copy from upstream.
-2. Keep provenance in the copied source README under `manual-skills/upstreams/**`.
-3. If the skill should ship in the default global rollout, add the package ref `jey3dayo/apm-workspace/manual-skills` to the root `apm.yml`.
-4. If the normal upstream-managed lane starts working again, prefer moving the skill back out of `manual-skills/`.
-
-When a machine-local skill lives under `~/.apm/private-skills/`:
-
-1. Treat it as a machine-local asset: gitignored in `~/.apm`, tracked in the private repo.
-2. Keep it out of `~/.apm` commits, `apm.yml`, and `apm.lock.yaml`.
-3. `mise run deploy` syncs it into `~/.agents/skills` (copy) and `~/.claude/skills` (symlink) in the same apply stage as the catalog; use `mise run apply:skills:local` for a fast partial refresh.
-4. If the same skill id exists under `catalog/skills/`, expect the private copy to override it.
-
-## Useful Maintenance Commands
-
-- `mise bootstrap`: install the declared environment and reconcile host-local MCP entries
-- `mise run format`: format Markdown, TOML, and YAML in the workspace
-- `mise run format:markdown:bold-headings`: rewrite bold headings across Markdown in `catalog/`
-- `mise run check`: run formatting checks plus validation only
-- `mise run verify`: run `check`, both workspace-script test suites, then catalog smoke verification
-- `mise run test`: run the bats and Pester suites for `scripts/apm-workspace.*` on their own, in parallel
-- `mise run deploy`: run `check -> apply -> doctor` for the current workspace state
-- `mise run upgrade`: accept upstream dependency updates with `apm update -g --yes`, then run the local rollout
-- `mise run refresh:deploy`: pull the checkout and run `apm deps update -g` (re-resolves branch/tag refs and regenerates `apm.lock.yaml`), then run the full local rollout (`deploy`). Unlike `upgrade` (`apm update -g --yes`, then `deploy`), it also pulls the checkout.
-- `mise run apply`: deploy the current manifest and lock without changing upstream refs
-- `mise run apply:skills:local`: fast partial sync of catalog skills plus local `private-skills` into `~/.agents/skills`, skipping the full `deploy`
-- `mise run refresh`: pull the checkout (skipped when the tree is dirty) and run `apm deps update -g` (deprecated; superseded by `apm update`), which advances unpinned dependencies, regenerates `apm.lock.yaml`, and rewrites deployed targets; agmsg links are saved/restored around it. It does not run `check`, the workspace apply, or `doctor`.
-- `mise run deploy:fresh`: recover from stale or corrupted `apm_modules/` cache before redeploying
-- `mise run validate`: run both workspace and catalog validation
-- `mise run validate:workspace`: verify workspace wiring with workspace overrides
-- `mise run prepare:catalog`: normalize `catalog/` in place before commit and push
-- `mise run validate:catalog`: verify managed catalog package integrity
-
-## Cache Integrity Recovery
-
-If a deployed skill exists but its `SKILL.md` is clearly wrong, tiny, or a placeholder while the tracked source is complete, suspect stale or corrupted cache under `apm_modules/` before changing source files.
-
-- Prefer `mise run deploy:fresh` when normal `mise run deploy` succeeds but deployed output still looks stale or corrupted.
-- Compare tracked source, cache, and deployed target first:
-  - source example: `manual-skills/.apm/skills/<id>/SKILL.md`
-  - cache example: `apm_modules/<owner>/<repo>/<virtual-path>/.apm/skills/<id>/SKILL.md`
-  - Codex target example: `~/.agents/skills/<id>/SKILL.md`
-- Do not edit `apm_modules/` contents or deployed targets in place.
-- If targeted manual repair is still needed, delete only the bad package cache directory after verifying the resolved absolute path stays under `./apm_modules/`.
-- After repair, recreate cache with `mise run deploy:fresh` or the smallest equivalent dependency-refresh command, then run `mise run check`.
-
-## References
-
-- Human overview: `~/.apm/README.md`
-- Full contract: `~/.apm/AGENTS.md`
-- Task catalog: `docs/apm-task-coverage.md`
-- Skill guidance: `~/.apm/catalog/skills/apm-usage/SKILL.md`
-- Curated agents placement & sources: `docs/agents-provenance.md`
-- Remaining work: `todo.txt` (completed internal tasks: `done.txt`)
+- Edit personal skills in `catalog/skills/**`, copied skills in `manual-skills/**`, shared guidance in `catalog/**`.
+- `private-skills/**` is gitignored here; its source of truth is a private repo.
+- Treat `apm.yml` / `apm.lock.yaml` as command-managed; add or remove external skills with `apm install` / `apm uninstall`.
+- Never edit `apm_modules/` or deployed targets in place.
+- The `apm` version is pinned in `mise.toml`; read it there instead of trusting a quoted version.
+- Routine rollout is `mise run deploy`; run `mise run check` before pushing.

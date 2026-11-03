@@ -10,8 +10,7 @@
 | 役割                                                     | スキル                                                                                                                 |
 | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | 0→1 デザイン選定（スタイル・色・フォント）               | `ui-ux-pro-max`（本体のみ）                                                                                            |
-| 美的方向性・脱テンプレ                                   | `frontend-design`（anthropics）                                                                                        |
-| ベースライン修正（deslop）                               | `baseline-ui` / `fixing-accessibility`（ibelick）                                                                      |
+| アクセシビリティ修正                                     | `fixing-accessibility`（ibelick）                                                                                      |
 | モーション taste・レビュー・監査                         | `emil-design-eng` / `review-animations` / `improve-animations` / `find-animation-opportunities`（emilkowalski/skills） |
 | モーション実装スニペット                                 | `transitions-dev`                                                                                                      |
 | UI レビューのレーン選択（lane 1 がデザインシステム準拠） | `review-board`（optional、自作）                                                                                       |
@@ -22,7 +21,7 @@
 
 ## レビュー系の使い分け
 
-- UI の見た目・ガイドライン準拠 → `baseline-ui`（deslop）
+- UI のアクセシビリティ → `fixing-accessibility`
 - デザインシステム・トークン準拠 → `review-board`（lane 1、optional）
 - アニメーション・モーションの質 → `review-animations`（単発）/ `improve-animations`（全体監査→plan 生成）
 - UI・フォーム・アクセシビリティ・マルチデバイスのレーン振り分け → `review-board`（optional）
