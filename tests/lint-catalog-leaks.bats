@@ -200,3 +200,13 @@ EOF
   [ "$status" -eq 1 ]
   [[ "$output" == *"notes.txt:1: denylisted organization term"* ]]
 }
+
+@test "checks denylisted terms in file names" {
+  printf 'example-org\n' >"$APM_LEAK_DENYLIST"
+  printf 'clean\n' >"$FIXTURE_DIR/catalog/skills/example-org-notes.txt"
+
+  run_fixture
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"denylisted organization term in path"* ]]
+  [[ "$output" != *"example-org"* ]]
+}

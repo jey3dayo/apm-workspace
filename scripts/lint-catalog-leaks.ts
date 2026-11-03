@@ -243,6 +243,13 @@ function redact(text: string, denylist: RegExp[]): string {
   return denylist.reduce((current, pattern) => current.replace(pattern, "<redacted>"), text);
 }
 
+function addDenylistPathFailure(filePath: string, denylist: RegExp[], failures: Issue[]) {
+  const relativePath = path.relative(REPO_ROOT, filePath);
+  if (denylist.some((pattern) => relativePath.search(pattern) !== -1)) {
+    failures.push({ filePath, line: 0, message: "denylisted organization term in path" });
+  }
+}
+
 function addDenylistFailures(filePath: string, content: string, denylist: RegExp[], failures: Issue[]) {
   for (const pattern of denylist) {
     for (const match of content.matchAll(pattern)) {
@@ -277,6 +284,7 @@ function main() {
   }
 
   for (const filePath of denylistFiles) {
+    addDenylistPathFailure(filePath, denylist, failures);
     const content = readText(filePath);
     if (content !== null) addDenylistFailures(filePath, content, denylist, failures);
   }
@@ -299,4 +307,17 @@ function main() {
   console.log(`Catalog leak lint passed: checked ${files.length} file(s).`);
 }
 
-main();
+try {
+  main();
+} catch (error) {
+  // Unexpected errors (unreadable files etc.) can carry paths; redact them too.
+  let denylist: RegExp[] = [];
+  try {
+    denylist = loadDenylist();
+  } catch {
+    denylist = [];
+  }
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(redact(`Catalog leak lint crashed: ${message}`, denylist));
+  process.exit(2);
+}

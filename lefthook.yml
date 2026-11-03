@@ -96,8 +96,9 @@ pre-push:
       glob: "{catalog/**/*.md,scripts/lint-frontmatter.*,mise.toml,mise/lint.toml}"
       run: mise run lint:frontmatter
 
+    # no glob: the optional denylist covers every tracked file, so any change
+    # can introduce a hit.
     - name: lint:catalog-leaks
-      glob: "{catalog/**,scripts/lint-catalog-leaks.*,mise.toml,mise/lint.toml}"
       run: mise run lint:catalog-leaks
 
     # no glob: validates apm.yml/apm.lock.yaml wiring against the whole tracked
