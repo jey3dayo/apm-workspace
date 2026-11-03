@@ -3273,6 +3273,10 @@ function Reconcile-SkillsRootFromStage {
       continue
     }
     Remove-Item -LiteralPath $existingChild.FullName -Recurse -Force
+    # Same as reconcile_skills_root_from_stage: name each swept entry so a
+    # missing skill (possibly one another tool wrote) can be traced to a deploy.
+    $removedLabel = if ($TargetName) { $TargetName } else { $TargetSkillsRoot }
+    Write-Host "removed unmanaged skills entry: $removedLabel/$($existingChild.Name)"
   }
 }
 

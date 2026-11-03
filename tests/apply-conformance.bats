@@ -175,6 +175,10 @@ run_apply() {
   run run_apply
   [ "$status" -eq 0 ]
   [[ "$output" == *"invalid entry name '../escape'"* ]]
+  # Each swept entry is named once, by target; preserved ones are not.
+  [[ "$output" == *"removed unmanaged skills entry: claude/stale-skill"* ]]
+  [[ "$output" == *"removed unmanaged skills entry: codex/synced"* ]]
+  [[ "$output" != *"removed unmanaged skills entry: claude/synced"* ]]
 
   [ -f "$FIXTURE_HOME/.claude/skills/synced/morning/SKILL.md" ]
   [ ! -e "$FIXTURE_HOME/.agents/skills/synced" ]
