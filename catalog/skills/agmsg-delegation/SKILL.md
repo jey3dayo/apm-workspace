@@ -219,7 +219,7 @@ worker が crash / timeout した場合も同じ 1→3 の順序で片付け、�
 
 ## 常駐プール経路
 
-ユーザーが手で立てた pane の agent が `join` してチームに常駐し、同じ identity で複数タスクを受け続ける経路。`backlog-sweep` の Worker プールがこれにあたる。Lifecycle の置き換え表、heartbeat 契約、安全契約の置き換え、Reviewer の pane 常駐可否は [references/resident-pool.md](references/resident-pool.md) を参照。
+ユーザーが手で立てた pane の agent が `join` してチームに常駐し、同じ identity で複数タスクを受け続ける経路。`backlog-sweep` で常駐 pane プールを選んだ場合がこれにあたる（既定は組み込み subagent）。Lifecycle の置き換え表、heartbeat 契約、安全契約の置き換え、Reviewer の pane 常駐可否は [references/resident-pool.md](references/resident-pool.md) を参照。
 
 ## Worker プロトコル
 

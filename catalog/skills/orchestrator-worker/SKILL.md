@@ -128,7 +128,7 @@ Opus advisor が利用できる Claude Code の Sonnet 対話メインの単独�
 
 人間が「執事で答えて」「アーキテクトへ」と明示したら、それが上記トリガーによる判定を上書きする（global AGENTS.md「推奨ワークフロー」の、Worker のモデル名指定を明示指示とみなす規則と同じ扱い）。
 
-handoff の実体は `agmsg-delegation` の引き継ぎ（handoff）メッセージ書式で Architect pane へ送るか、人間へその書式を添えて「これは Architect pane へ」と返すことである。走っているセッションは自分の model を変えられないため、昇格ではなく handoff と定義する。逆方向（Architect が安い問いを Steward へ下ろす）は定義しない。
+handoff の実体は `agmsg-delegation` の引き継ぎ（handoff）メッセージ書式（どの transport で渡しても書式は同じ）で Architect pane へ送るか、人間へその書式を添えて「これは Architect pane へ」と返すことである。走っているセッションは自分の model を変えられないため、昇格ではなく handoff と定義する。逆方向（Architect が安い問いを Steward へ下ろす）は定義しない。
 
 ### agent / skill 定義側のモデル割り当て
 
@@ -141,7 +141,7 @@ handoff の実体は `agmsg-delegation` の引き継ぎ（handoff）メッセー
 
 review 外注の既定は、差分を書いた runtime（Worker がいれば Worker の runtime）の逆側にする。Codex が書いた差分は Claude reviewer、それ以外が書いた差分は Codex へ出す。脱相関は Reviewer 側で買うためである。
 
-Codex 経路は起動時引数で `gpt-6.1-sol` / `gpt-6.1-terra` / `gpt-6-astra` から選ぶ。既定は `gpt-6.1-terra`。helper は effort を medium に揃える（`AGMSG_REVIEWER_EFFORT` で上書き）。旧版 `gpt-6-sol` は Reviewer では選べない。判断の難度が理由で足りないときは `gpt-6.1-sol` へ上げ、必要なら `AGMSG_REVIEWER_EFFORT` も上げる。`gpt-6-astra` は明示指定されたときだけ使う。
+Codex reviewer のモデルは `gpt-6.1-sol` / `gpt-6.1-terra` / `gpt-6-astra` から選ぶ。既定は `gpt-6.1-terra`。Codex セッションでは native `spawn_agent` の model 指定で選び、Claude セッションからは Agent tool で Codex モデルを起動できないため `agmsg-delegation` の helper の起動時引数で選ぶ。helper は effort を medium に揃える（`AGMSG_REVIEWER_EFFORT` で上書き）。旧版 `gpt-6-sol` は Reviewer では選べない。判断の難度が理由で足りないときは `gpt-6.1-sol` へ上げ、helper 経路なら必要に応じて `AGMSG_REVIEWER_EFFORT` も上げる。`gpt-6-astra` は明示指定されたときだけ使う。
 
 Claude reviewer（fable 固定）は Codex が書いた差分と明示指定された場合に使い、fallback は opus。Fable reviewer が実行中に 429 で失敗したら同経路で再試行せず、Codex `gpt-6.1-terra` へ切り替えて再外注する。Codex が書いた差分でこの切り替えをしたら、逆側でないことを報告に書く。
 
@@ -151,7 +151,7 @@ Architect / Worker が作成した成果物の **approval gate は、作者と�
 
 対象の同一性（SHA / checksum の固定）と判断の独立性（作者と別の reviewer であること）は別々の要件であり、片方が満たされてももう片方の代わりにならない。SHA を固定しただけの self-review は approval gate を通過しない。
 
-Reviewer の起動経路（spawn / pane 常駐）と強制境界の詳細は `agmsg-delegation` が正本。
+Reviewer は組み込みの subagent（Claude は Agent tool、Codex は `spawn_agent`）で起動するのを既定にする。runtime を跨ぐとき（Claude セッションから Codex reviewer を使うなど）、pane 常駐の Reviewer を使うとき、組み込みでは満たせない強制境界が要るときは `agmsg-delegation` の経路を使い、その起動経路（spawn / pane 常駐）と強制境界の詳細は `agmsg-delegation` が正本。
 
 ## 2. 委譲するか決める
 
@@ -239,7 +239,7 @@ Worker の昇格 3 条件に当たるタスクは opencode へ出さず、既存
 
 長文脈タスク（大規模コードベースの読解、複数文書の統合、長い履歴の追跡）は effort 引き上げを飛ばして直接 `gpt-6.1-terra` へ上げる。terra セッション自身が長文脈タスクを受けた場合も、上の一般則どおり親 session では実装せず、別 identity・別 session の terra Worker を起動する。
 
-Claude では独立タスクを同一レスポンス内で複数呼び出すと並列に走る（1レスポンス1呼び出しは直列になる）。Codex では worker を複数 detached 起動する（触るファイル集合が互いに素であることが前提。guardrails は `agmsg-delegation` を参照）。どちらも Orchestrator の会話履歴は引き継がせず、Section 3 で書き出した 3 点だけを渡す。
+Claude では独立タスクを同一レスポンス内で複数呼び出すと並列に走る（1レスポンス1呼び出しは直列になる）。Codex では `spawn_agent` で worker を複数起動する。どちらも触るファイル集合が互いに素であることが前提。`agmsg-delegation` の別プロセス経路で worker を複数 detached 起動するときの guardrails は同 skill を参照する。どちらも Orchestrator の会話履歴は引き継がせず、Section 3 で書き出した 3 点だけを渡す。
 
 起動後の扱いは 2 つ。
 
@@ -275,6 +275,6 @@ Claude では独立タスクを同一レスポンス内で複数呼び出すと�
 
 - 実行前に Orchestrator 機能側が対象バージョン・手順・影響範囲を確認する
 - 結果の検証（公開されたことの確認）も Orchestrator 機能側が自分で行う
-- 依頼した範囲を、選ぶ実行経路の権限で実際に実行できること。委譲してよい（policy）と実行できる（runtime）は別で、書込先が worker の実効境界の外にあれば経路ごと成立しない。境界は role と base 設定が決めるため、モデルを替えれば通るとは限らない。起動前の照合手順は `agmsg-delegation` の Preflight が正本
+- 依頼した範囲を、選ぶ実行経路の権限で実際に実行できること。委譲してよい（policy）と実行できる（runtime）は別で、書込先が worker の実効境界の外にあれば経路ごと成立しない。境界は role と base 設定が決めるため、モデルを替えれば通るとは限らない。`agmsg-delegation` 経由で起動するときの照合手順は同 skill の Preflight が正本
 
-手順が未確立、または判断を伴う公開は自分で扱う。実効境界の外だと分かった場合は、既に権限を持つ経路か Orchestrator 自身へ戻す。指定されたモデルと異なる経路を採るときは §4 のとおり差し替えを明示する。この委譲許可は、`agmsg-delegation` の worktree 外書込禁止と「worker の commit / apply は自動化しない」を解除しない。
+手順が未確立、または判断を伴う公開は自分で扱う。実効境界の外だと分かった場合は、既に権限を持つ経路か Orchestrator 自身へ戻す。指定されたモデルと異なる経路を採るときは §4 のとおり差し替えを明示する。この委譲許可は、`agmsg-delegation` の worktree 外書込禁止と「worker の commit / apply は自動化しない」を解除しない。組み込み subagent 経路でも同じ扱いにする。
