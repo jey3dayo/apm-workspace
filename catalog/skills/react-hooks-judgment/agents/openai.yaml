@@ -1,0 +1,4 @@
+interface:
+  display_name: "React Hooks Judgment"
+  short_description: "Pick the right React hook, drop needless Effects, and pass the hooks lint gate"
+  default_prompt: "Use $react-hooks-judgment to decide which React hooks this code needs, remove unnecessary Effects, and confirm eslint-plugin-react-hooks recommended passes."
