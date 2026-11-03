@@ -4,7 +4,7 @@ description: >-
   dotenvx env files: `dotenvx run`, `encrypted:` values, `.env.*` loading, env drift,
   key rotation (`.env.keys`, no `rotate` command in 2.x; the 1Password step goes to 1password),
   and sanitizing shells where dotenvx/mise injection pollutes aws, terraform, cdk,
-  gh or perman-aws-vault.
+  gh or an AWS credential helper.
 ---
 
 # dotenvx
@@ -14,7 +14,7 @@ Decide whether a command runs inside dotenvx, outside dotenvx, or in a sanitized
 ## Core Rule
 
 - App/runtime commands that intentionally need project secrets run inside dotenvx: `dotenvx run -f <env-file> -- <command>`.
-- Infrastructure/auth/tooling commands (`aws`, `terraform`, `cdk`, `gh`, `git`, `mise`, `perman-aws-vault`) run outside dotenvx unless the repo explicitly requires decrypted app env.
+- Infrastructure/auth/tooling commands (`aws`, `terraform`, `cdk`, `gh`, `git`, `mise`, AWS credential helpers) run outside dotenvx unless the repo explicitly requires decrypted app env.
 - A shell where `AWS_*`, `GITHUB_*`, or other tool credentials look like `encrypted:...` is polluted: sanitize to a clean env before running the tool.
 - Show only presence, file names, key names, or masked values — never a decrypted secret.
 
@@ -26,9 +26,9 @@ Decide whether a command runs inside dotenvx, outside dotenvx, or in a sanitized
 4. Verify with a harmless read-only command first: `sts get-caller-identity` for AWS; a non-secret health/version or dry-run command for dotenvx app env.
 5. Report only the command shape, selected env file, and pass/fail signal.
 
-## AWS and perman-aws-vault
+## AWS and Credential Helpers
 
-When AWS CLI, Terraform, CDK, or perman-aws-vault is involved, also use the `perman-aws-vault` skill for profile/account selection. This skill owns the sanitation step before invoking those tools.
+When AWS CLI, Terraform, CDK, or an AWS credential helper is involved, also follow the repo's AWS profile/account selection guidance (or its credential-helper skill, if one is enabled). This skill owns the sanitation step before invoking those tools.
 
 Before AWS execution, inspect these names without printing secrets:
 
