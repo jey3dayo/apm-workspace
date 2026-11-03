@@ -103,6 +103,7 @@ pane_id は session ごとの ID。別 session の agent を操作するとき�
 - server を勝手に再起動しない。client / server の互換エラーで操作できない場合も `herdr status` の結果と失敗したコマンドを報告して確認を取る。`herdr server stop` / main プロセスの kill も同様
 - 自分が作っていない workspace / tab / pane / session を閉じない。
 - ユーザーが明示しない限り新しい workspace / tab / worktree / cwd を作らない。「ペインを作って」は既定で自分と同じ tab の sibling pane（`herdr pane split --current`）として解釈する
+- pane / workspace を勝手に作らない。ユーザーが「用意して」と指示したときだけ作る
 - 背景作業は `--no-focus`。ユーザーがコンテキストを切り替えたいと言ったときだけ focus する
 - ID は JSON レスポンスから読む。sidebar の並び順や「3 タブ目」といった表示位置から推測しない。ユーザーが表示順で指定したら label と表示順を照合し、raw `number` が workspace 内の連番だと仮定しない
 - 読み戻していないプロセス名を報告に書かない。pane にコマンドを起動したら `herdr pane process-info --pane <pane_id>` で cwd と foreground process を読み戻し、報告には pane_id + workspace label + 絶対 cwd + 実際に読み戻したプロセスを併記する

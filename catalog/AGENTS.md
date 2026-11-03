@@ -40,6 +40,8 @@
 
 実作業の依頼では、`ship` が許可する範囲（自分が owner で fork ではない repo への commit / push / PR 作成）を常設の依頼として扱う。この範囲は上の「外部公開」の停止条件に当たらない。マージと、それ以外の repo への commit / push / PR は依頼に含まれるときだけ行う。
 
+PR のマージ、issue / PR 本文の作成・更新・訂正（作業中の前提・範囲変更を含む）は `pr-conventions` を読む。
+
 `main` / `master` 上と、自分が作っていない未コミット変更があるツリーでは、`git restore`、`git checkout --`、`git reset --hard` など作業ツリーを破棄・復元する操作を行わない（並行セッションの作りかけが消える）。必要に見える場合でも、まず `git status --short` で対象を確認し、ユーザーに明示確認する。
 
 permission や PreToolUse hook のポリシーで拒否されたコマンドは、同じものもほぼ同じもの（引数違い・連結し直し）も出し直さない。拒否された操作は、ラッパーや別ツール経由でも行わない。代替は拒否理由を解消し、許可範囲に収まるものだけに切り替え、なければ拒否された内容を報告する。pre-commit / pre-push など検証フックの失敗は別扱いで、原因を直したあとなら再実行してよい。
@@ -72,6 +74,8 @@ permission や PreToolUse hook のポリシーで拒否されたコマンドは�
 
 **複数の面（`todo.txt` / plan リスト / issue / レビュー指摘）に散った backlog をまとめて捌く依頼は `backlog-sweep`。** 1タスクの委譲とは起点も終了条件も違うので、別スキルとして扱う。
 
+agmsg が全断したら `agmsg-delegation/references/roster-recovery.md` を読むまで restore / join しない。
+
 ### スキルの不具合・摩擦を owner へ返す
 
 スキルや agent を実運用で使って**不具合・契約の破れ・手順の摩擦**を踏んだら、その場の回避で終わらせずに `~/.apm` へ送る。回避策だけが各リポジトリに散ると、同じ穴を全員が踏み直す。効いた点も送る（残す判断の材料になる）。
@@ -80,13 +84,14 @@ permission や PreToolUse hook のポリシーで拒否されたコマンドは�
 
 ## コマンド選択
 
-| やりたいこと                           | 推奨                                                 | 回避                           |
-| -------------------------------------- | ---------------------------------------------------- | ------------------------------ |
-| 直接指定された URL の取得・DOM 抽出    | `ax`（`--outline` / `--row` / `--md`）               | `curl` + 使い捨て python/regex |
-| JS 実行が必要なページ（SPA 等）        | ブラウザ操作ツール（「ブラウザ操作の選択」表を参照） | `ax` での無理な取得            |
-| Web 検索                               | 組み込みの Web 検索（`WebSearch` / `web_search`）    | -                              |
-| ローカルリポジトリの場所特定           | `ghq list -p`（絞り込みは `ghq list -p <name>`）     | `fd` / `find` での全域探索     |
-| ローカルのポート・プロセスの起動元調査 | `witr --port <port>` / `witr --pid <pid>`            | `lsof` と `ps` の手動追跡      |
+| やりたいこと                           | 推奨                                                  | 回避                           |
+| -------------------------------------- | ----------------------------------------------------- | ------------------------------ |
+| 直接指定された URL の取得・DOM 抽出    | `ax`（`--outline` / `--row` / `--md`）                | `curl` + 使い捨て python/regex |
+| JS 実行が必要なページ（SPA 等）        | ブラウザ操作ツール（「ブラウザ操作の選択」表を参照）  | `ax` での無理な取得            |
+| Web 検索                               | 組み込みの Web 検索（`WebSearch` / `web_search`）     | -                              |
+| current docs / 広い比較調査            | current docs は `context7`、広い比較は `web-research` | -                              |
+| ローカルリポジトリの場所特定           | `ghq list -p`（絞り込みは `ghq list -p <name>`）      | `fd` / `find` での全域探索     |
+| ローカルのポート・プロセスの起動元調査 | `witr --port <port>` / `witr --pid <pid>`             | `lsof` と `ps` の手動追跡      |
 
 - `ax` は mise 管理。初回利用前に必ず `ax agent-context` で使い方を確認する
 - `pnpm <word>` は呼び分けを明示する。help は `pnpm help <command>`、repo の script は `pnpm run <script>`、依存の実行ファイルは `pnpm exec <binary>`。script への `--help` は非実行を保証しない（実測で `dist/` が消えた）

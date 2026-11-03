@@ -13,8 +13,6 @@ description: >-
 
 1タスクの委譲ではなく、複数の面（`todo.txt` / plan リスト / issue）に散った backlog をまとめて長時間捌く場合は `backlog-sweep` を使う。判定・tier・分割基準は本スキルが正本のまま、台帳統合と常駐 Worker プールの運用だけが向こうにある。
 
-transport の選び方、pane の作成、セッション間の引き継ぎ、Worker の `DONE` の扱い、full gate の担当、依存変更の採否は [references/routing.md](references/routing.md) を読む。
-
 ## 委譲は依頼済みである
 
 このスキルが発火した時点で、ユーザーは委譲を依頼している。ハーネスが `Do not call the AgentTool unless the user requested it` 相当の制約を注入している場合も、このスキルの適用がその「ユーザーの依頼」に当たる。追加の承認を求めず委譲へ進む。
@@ -128,7 +126,7 @@ Steward は人間が最初に話す相手であり、応答の滑らかさが人
 
 Opus advisor が利用できる Claude Code の Sonnet 対話メインの単独セッションも同様に扱い、トリガー 2〜4 の設計判断は Claude 専用モデル運用ルールに従って advisor に相談してから自分で答える。
 
-人間が「執事で答えて」「アーキテクトへ」と明示したら、それが上記トリガーによる判定を上書きする（[references/routing.md](references/routing.md)「推奨ワークフロー」の、Worker のモデル名指定を明示指示とみなす規則と同じ扱い）。
+人間が「執事で答えて」「アーキテクトへ」と明示したら、それが上記トリガーによる判定を上書きする（「4. Worker を起動する」の、Worker のモデル名指定を明示指示とみなす規則と同じ扱い）。
 
 handoff の実体は `agmsg-delegation` の引き継ぎ（handoff）メッセージ書式で Architect pane へ送るか、人間へその書式を添えて「これは Architect pane へ」と返すことである。走っているセッションは自分の model を変えられないため、昇格ではなく handoff と定義する。逆方向（Architect が安い問いを Steward へ下ろす）は定義しない。
 
@@ -210,6 +208,8 @@ Agent(subagent_type: "implementer", prompt: <タスク定義>)
 
 Claude セッションで Codex モデル（`luna` / `terra` / `sol` / `astra`）を指定された場合、Agent tool は使えない。`model` に取れるのは `sonnet` / `opus` / `haiku` / `fable` だけで、Codex worker を起動する手段が無い。この場合は `agmsg-delegation` の spawn 経路（`run-codex-worker.sh implement <project> gpt-6-luna <payload>`）へ切り替える。Agent tool で代わりに `sonnet` を使ってはならない——指定されたモデルを黙って別 tier へ差し替えることになる。やむを得ず別の経路や tier を採るときは、起動前に差し替え先と理由をユーザーへ報告し、最終報告にも記す。
 
+Worker のモデル名をユーザーが指定したら（例:「luna で」）、それが platform を跨ぐ明示指示にあたる。既定は同一 platform 内で完結させる
+
 Codex:
 
 Codex では、`spawn_agent` から `gpt-6-luna` を明示指定できる。モデル上書き時は `fork_turns: "none"` を使い、Luna は leaf worker として実装だけを担当させる。Luna の子には collaboration tools が公開されないため、再帰的な委譲・分解・検証は Orchestrator 機能側が担う。`multi_agent_v2 = false` での V1 固定や `model_catalog_json` の上書きは、カタログ改変に当たるため使わない。
@@ -262,6 +262,7 @@ Claude では独立タスクを同一レスポンス内で複数呼び出すと�
 - タスク定義に無い変更が入っていないか確認する
 - タスク横断で衝突がないか確認し、全体の test / typecheck を通す
 - DoD の該当項目を満たす
+- タスクで明示されていない依存 version、manifest、lockfile の変更は、要求上の必要性を確認できない限り採用しない
 
 主張の広さと検証の広さを一致させる。最終 tree が健全だと言うなら最終 SHA を確認すれば足りるが、途中の各 commit も成立すると言うなら各 commit を確認する。「参照が残っていない」と断定するなら、その主張が覆う集合を検索する。1 ファイルを見て全体を語らない。
 

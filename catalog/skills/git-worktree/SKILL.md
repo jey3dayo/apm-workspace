@@ -11,11 +11,7 @@ Use `git wt` for normal list, switch/create, rename, and delete flows. Create wo
 
 This skill owns command syntax and troubleshooting. 隔離 workspace を新規に作るべきかどうかの判断自体（通常ブランチで足りるか、worktree を分けるか）はこのスキルの対象外で、並行作業やファイル衝突の有無から判断する。PR 作成から統合までの一連フローも対象外。
 
-## Git Worktree 方針
-
-- 操作仕様・`.worktrees/` 運用・作成削除手順は `git-worktree` スキルが正本
-- worktree の作成は `git wt` だけで行う。`git worktree add` は deny 済みなので使わない（`--detach` の一時確認も含む）。native `git worktree` は cleanup・診断・復旧（`list` / `remove` / `prune` / `unlock` / `repair` など）のみ
-- コミット分割とメッセージ作成は `atomic-commit` スキルが担当し、worktree 操作の判断を持たせない
+コミット分割とメッセージ作成は `atomic-commit` スキルが担当し、worktree 操作の判断を持たせない。
 
 ## First Pass
 
