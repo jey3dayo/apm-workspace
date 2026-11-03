@@ -147,6 +147,10 @@ Describe "apm-workspace.ps1 apply conformance" {
     $applyOutput = & $script:consoleShell -NoProfile -ExecutionPolicy Bypass -File $script:scriptPath apply 2>&1 | Out-String
     $LASTEXITCODE | Should -Be 0
     $applyOutput | Should -Match ([regex]::Escape("invalid entry name '../escape'"))
+    # Each swept entry is named once, by target; preserved ones are not.
+    $applyOutput | Should -Match ([regex]::Escape("removed unmanaged skills entry: claude/stale-skill"))
+    $applyOutput | Should -Match ([regex]::Escape("removed unmanaged skills entry: codex/synced"))
+    $applyOutput | Should -Not -Match ([regex]::Escape("removed unmanaged skills entry: claude/synced"))
 
     Join-Path $syncedSkillDir "SKILL.md" | Should -Exist
     $agentsSyncedDir | Should -Not -Exist

@@ -1968,6 +1968,35 @@ run_install_pins_with_fixture() {
   rm -rf "$home" "$source_root" "$stage" "$stage2" "$stage3"
 }
 
+@test "shipped preserved-skills-root-entries keeps Herdr.app skills for claude and codex" {
+  # Herdr.app writes herdr-automations and herdr-gpui-browser into
+  # ~/.claude/skills (claude) and ~/.agents/skills (codex); deploy must not
+  # sweep them.
+  WORKSPACE_DIR="$TEST_REPO_ROOT"
+  for target in claude codex; do
+    entries=$(preserved_skills_root_entries "$target")
+    grep -Fxq herdr-automations <<<"$entries"
+    grep -Fxq herdr-gpui-browser <<<"$entries"
+  done
+  # The codex target is the one whose skills root is ~/.agents/skills.
+  managed_catalog_runtime_targets | grep -Fxq 'codex|.codex|AGENTS.md|.agents|-'
+}
+
+@test "reconcile_skills_root_from_stage names each removed entry, with the root when no target is given" {
+  home="$(mktemp -d)"
+  stage="$(mktemp -d)"
+  mkdir -p "$stage/skills/kept" "$home/skills/kept" "$home/skills/gone"
+
+  run reconcile_skills_root_from_stage "$stage/skills" "$home/skills"
+
+  [ "$status" -eq 0 ]
+  [ ! -e "$home/skills/gone" ]
+  [[ "$output" == *"removed unmanaged skills entry: $home/skills/gone"* ]]
+  [[ "$output" != *"kept"* ]]
+
+  rm -rf "$home" "$stage"
+}
+
 # --- sync_managed_catalog_runtime_assets agents face -------------------------
 
 @test "sync_managed_catalog_runtime_assets removes the agents tree for an agents-less target" {
