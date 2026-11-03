@@ -29,9 +29,12 @@ dependencies:
         - domain-modeling
         - grilling
         - improve-codebase-architecture
+        - prototype
         - research
         - retro
+        - setup-matt-pocock-skills
         - wait-what
+        - wayfinder
         - writing-for-agents
     - nanaism/yomiyasu/skills/yomiyasu#29d67ccb05e370b5958d72920a9cd1aa829dee80 # v2.5.0
 

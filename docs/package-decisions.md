@@ -804,11 +804,10 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - 入れない：`remove-animations`（同じ ref で追加されたもの）。
 - 既存5つは ref 間で中身の変更なし。`animation-performance` は `fixing-motion-performance`（ibelick）と領域が近いので、重なりすぎたらどちらかに寄せる。
 
-## 2026-11-03 使われていない外部スキルを撤去し、ibelick を commit 固定にした
+## 2026-11-03 使われていない fixing-metadata を撤去し、ibelick を commit 固定にした
 
-- 撤去：`wayfinder`、`prototype`、`setup-matt-pocock-skills`（mattpocock/skills）、`fixing-metadata`（ibelick）。
-- 理由：直近60日の Claude transcript と Codex セッションで、`Skill` 起動・`SKILL.md` 読み込みとも 0 回（棚卸し時の監査読みを除く）。`prototype` と `setup-matt-pocock-skills` は `wayfinder` から呼ばれるので残していたが、`wayfinder` 自体が 0 回だったので一緒に外す。
+- 撤去：`fixing-metadata`（ibelick）。直近60日の Claude transcript と Codex セッションで、`Skill` 起動・`SKILL.md` 読み込みとも 0 回（棚卸し時の監査読みを除く）。
+- 残す：`wayfinder` も利用 0 回だったが、使いたいのでユーザー判断で残す（2026-11-03）。`wayfinder` が呼ぶ `prototype`・`setup-matt-pocock-skills`・`domain-modeling` も合わせて残す。`fixing-motion-performance` と `transitions-dev` は 2026-10-31 に手で呼べるよう残すと決めたばかりなので、次の棚卸しで判断する。
 - `refactoring` の委譲表から `/improve-codebase-architecture` を勧める行を削除した。
-- 残す：`domain-modeling`（`improve-codebase-architecture` が呼ぶため）、`fixing-motion-performance` と `transitions-dev`（2026-10-31 に手で呼べるよう残すと決めたばかりなので、次の棚卸しで判断する）。
 - ibelick/ui-skills の ref を `main` から lock 済みの `4907a526b07943b3a338177558d42fae4fdf0a86` に固定した（上流 main の追従は ref 更新で行う）。
-- 再導入：mattpocock/skills（`d1478fcb`、v1.3.2）と ibelick/ui-skills（`4907a526`）の `skills:` に名前を戻す。
+- 再導入：ibelick/ui-skills（`4907a526`）の `skills:` に `fixing-metadata` を戻す。
