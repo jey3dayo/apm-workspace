@@ -101,7 +101,7 @@ All projects use these standard tag prefix formats:
 - Status tracking: ✅ 作成済, 📝 計画中, ⏳ 随時更新
 - GitHub Actions specific documentation
 
-### caad-terraform-infra Project
+### terraform-infra Project
 
 #### Category Tags
 
@@ -123,8 +123,8 @@ All projects use these standard tag prefix formats:
 
 #### Environment Tags
 
-- `environment/caad-aws-ndev` - Nearshore environment
-- `environment/caad-aws` - CAAD environment
+- `environment/aws-dev` - Development account
+- `environment/aws-prod` - Production account
 - `environment/shared` - Shared/common
 
 #### Special Features
@@ -153,7 +153,7 @@ Separator follows `tag_separator` in the project config (default `", "`):
 - dotfiles & pr-labeler: Comma-separated backticked tags
   - Example: `` `category/shell`, `tool/zsh`, `layer/core` ``
 
-- caad-terraform-infra: Space-separated backticked tags
+- terraform-infra: Space-separated backticked tags
   - Example: `` `category/infrastructure` `audience/developer` `environment/shared` ``
 
 ## Validation Rules
@@ -175,7 +175,7 @@ All projects require at minimum:
 
 - Must include: `category/`, `audience/`
 
-#### caad-terraform-infra
+#### terraform-infra
 
 - Must include: `category/`, `audience/`, `environment/`
 

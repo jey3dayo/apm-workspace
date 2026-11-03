@@ -29,21 +29,21 @@
       - "@t09tanaka/mcp-simple-voicevox"
   ```
 
-## perman-aws-vault
+## aws-credential-helper
 
-- Status: global APM の管理対象から撤去（2026-10-19、ユーザー判断）。caad マーケットのプラグインで管理する形に一本化。
-- 決定: perman-aws-vault は caad マーケットのプラグインで管理（Claude Code / Codex / Grok 共通）。理由は org 制限リポジトリの参照権限の問題と、apm との二重導入を防ぐため。
+- Status: global APM の管理対象から撤去（2026-10-19、ユーザー判断）。会社マーケットのプラグインで管理する形に一本化。
+- 決定: aws-credential-helper は 会社マーケットのプラグインで管理（Claude Code / Codex / Grok 共通）。理由は org 制限リポジトリの参照権限の問題と、apm との二重導入を防ぐため。
 - 手順: `apm.yml` の `# --- org-restricted ---` グループごと削除、`apm.lock.yaml` の該当レコード削除、skill inventory の global 記載を更新。
-- 経緯: 2026-10-07 に global APM へ再追加していた。2026-10-05 には一度 global から撤去し repo-local へ移管していた（依存元 `caad-develop/claude-code-marketplace` が internal で全体更新を妨げるため）。
+- 経緯: 2026-10-07 に global APM へ再追加していた。2026-10-05 には一度 global から撤去し repo-local へ移管していた（依存元 `<work-marketplace>` が internal で全体更新を妨げるため）。
 - 利用側: Claude CLI / Codex CLI には marketplace プラグインとして導入済み。APM 経由の配置は次の `mise run deploy` で所有記録が消える（プラグイン側のコピーは別レーン）。
 - 再検討するなら: marketplace プラグインだけでは届かないターゲットが出たとき。
 
-## caad-skill-deployer
+## work-skill-deployer
 
 - Status: global APM の管理対象から撤去（2026-10-02）
 - 理由: 使っていないため、ユーザー判断で削除。
 - 手順: `apm.yml` の依存、`apm.lock.yaml` の該当レコードと所有する配布メタデータ、
-  skill inventory の記載を削除。残りの依存は変更せず、`perman-aws-vault` は維持する。
+  skill inventory の記載を削除。残りの依存は変更せず、`aws-credential-helper` は維持する。
 - 配布先: 今回は commit / push まで。実環境への deploy は未実施。
 - 再検討するなら: スキル配布の具体的な利用が必要になったとき。
 
@@ -198,9 +198,9 @@
 ## 移管候補の提案（2026-07-15）
 
 - Status: 完了（2026-08-21 に候補のレビューを終え、未実施の候補は残っていない）
-- 結果: 社内 API 系は撤去して repo-local 化した（下の `ca-pass` ほか）。`browser-harness` は
+- 結果: 社内 API 系は撤去して repo-local 化した（下の `internal-api-a` ほか）。`browser-harness` は
   global 維持（global `AGENTS.md` の「ブラウザ操作の選択」でヘッドレス操作を担い、pi / opencode 向けの最低保証でもある）。
-  `perman-aws-vault` は複数の AWS リポジトリで同じ認証導線を使うため global 維持（2026-10-05 に repo-local へ移管）
+  `aws-credential-helper` は複数の AWS リポジトリで同じ認証導線を使うため global 維持（2026-10-05 に repo-local へ移管）
   （移すなら profile / credential の境界を明記してから）。understand 系は観察タスクへ分け、のちに撤去した。
 - 2026-07-16 の棚卸しで global 維持を決めたもの: `react-doctor`、`react-best-practices`、
   `baseline-ui` ほか ibelick 系、`transitions-dev`、`frontend-design`、`ui-ux-pro-max`、
@@ -213,7 +213,7 @@
 ### agent-browser
 
 - Status: global 撤去実施（2026-07-16）。repo-local では利用継続
-  （`caad-loca-bff`、`ultra-rss-reader`）。同日に `apm prune` で
+  （`work-bff`、`ultra-rss-reader`）。同日に `apm prune` で
   trailofbits 系 3 件の orphan cache も削除。
 - 正本: `vercel-labs/agent-browser/skills/agent-browser`
 - 理由: `browser-harness` を通常のブラウザ操作の標準にするため。Electron、Slack、Vercel
@@ -269,18 +269,14 @@
 - 理由: 全リポジトリへ常時配布する対象から外す判断。後継配置や利用リポジトリは未確定のため、別レーンへ複製せず catalog source を削除する。push 後の catalog install で lock と global target から撤去する。
 - 再検討するなら: 実利用するリポジトリを特定してから、optional または repo-local のどちらが適切かを決め、git history から復元する。
 
-### ca-pass / mdb-api / notica-api / telma-api
+### internal-api-a / internal-api-b / internal-api-c / internal-api-d
 
 - Status: global dependency から撤去・repo-local / on-demand 化（2026-07-21）
-- 正本: `caad-develop/claude-code-marketplace` の各 `plugins/service-integrations/<id>`
+- 正本: `<work-marketplace>` の各 `plugins/service-integrations/<id>`
 - 理由: 社内 API、VPN、認証境界に依存するため、全リポジトリへの自動配布ではなく利用側の `apm.yml` に閉じ込める。workspace catalog へコピーせず upstream を直接参照する。
-- 個別導入 ref:
-  - `caad-develop/claude-code-marketplace/plugins/service-integrations/ca-pass`
-  - `caad-develop/claude-code-marketplace/plugins/service-integrations/mdb-api`
-  - `caad-develop/claude-code-marketplace/plugins/service-integrations/notica-api`
-  - `caad-develop/claude-code-marketplace/plugins/service-integrations/telma-api`
-- 補足: `private-skills` の `ca-pass` overlay は machine-local な別レーンとして維持していたが、2026-08-14 に撤去した（private repo の `3d3dd0b`、`caad-develop/claude-code-marketplace` の ref で置き換えたため）。
-- 追記（2026-08-21）: `ca-pass` だけが root `apm.yml` に残留していた drift を /improve 監査（#5）で検出し、manifest から実撤去した。利用するリポジトリは repo-local `apm.yml` へ上記 ref を追加する（`apm-usage` の `references/repo-manifest.md` 参照）。
+- 個別導入 ref: `<work-marketplace>/plugins/service-integrations/<id>`。実際の repo と id は公開リポジトリに載せないので、会社マーケットプレイスのプラグイン一覧で確認する。
+- 補足: `private-skills` の `internal-api-a` overlay は machine-local な別レーンとして維持していたが、2026-08-14 に撤去した（private repo の `3d3dd0b`、`<work-marketplace>` の ref で置き換えたため）。
+- 追記（2026-08-21）: `internal-api-a` だけが root `apm.yml` に残留していた drift を /improve 監査（#5）で検出し、manifest から実撤去した。利用するリポジトリは repo-local `apm.yml` へ上記 ref を追加する（`apm-usage` の `references/repo-manifest.md` 参照）。
 
 ### banner-design
 
@@ -403,7 +399,7 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
   導入は `emil-design-eng` + `review-animations` + `improve-animations` の 3 つ。
 
 - `agentation` / `agentation-self-driving` を global から撤去（repo-local で利用継続:
-  `caad-loca-bff`、`ultra-rss-reader`）。
+  `work-bff`、`ultra-rss-reader`）。
   - 追記（2026-09-23）: `benjitaylor/agentation/skills/{agentation,agentation-self-driving}` は
     現在は root `apm.yml` に SHA pin で存在し、global dependency として配布されている。
 
@@ -428,7 +424,7 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
   - `empirical-prompt-tuning`（mizchi）: operator が名指しで呼ぶときのみのメタスキルで
     起動実績なし。
 - 撤去見送り: `transitions-dev` / `ui-ux-pro-max` は bloated 判定だが手動起動実績が
-  あるため維持（description トリムを別途検討）。`perman-aws-vault` /
+  あるため維持（description トリムを別途検討）。`aws-credential-helper` /
   `1password` / `dotenvx` はインフラ系のため維持。
 - 検証継続中のレビュー・アニメーション系スキルの一覧と撤去判断基準は
   [`docs/skill-overlaps.md`](skill-overlaps.md) の
@@ -513,7 +509,7 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 
 ## `scheduled-audit-ops` を optional-skills へ移動（2026-09-02）
 
-- 移動理由: `SKILL.md` が `docs/prompts/config.toml` を必須とし、該当 repo は `ca-connect-site` の 1 件のみである。global 配布しても他 repo では起動即失敗する。会社 repo に個人ツールを持ち込まず個人 workspace で版管理するため `optional-skills`（repo-scoped lane）に置き、消費側 repo は `apm.yml` に direct ref を追加する。
+- 移動理由: `SKILL.md` が `docs/prompts/config.toml` を必須とし、該当 repo は `work-site` の 1 件のみである。global 配布しても他 repo では起動即失敗する。会社 repo に個人ツールを持ち込まず個人 workspace で版管理するため `optional-skills`（repo-scoped lane）に置き、消費側 repo は `apm.yml` に direct ref を追加する。
 
 ## `gh-address-comments` / `gh-fix-ci` を manual-skills へ移動（2026-09-02）
 
@@ -625,7 +621,7 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 
 ## 利用実績の無いスキルを撤去（2026-09-23）
 
-- 撤去: `wizard` / `diagnosing-bugs`（mattpocock/skills）、`ai-banzuke`（caad marketplace）、catalog の `quiet-command-auditor`。
+- 撤去: `wizard` / `diagnosing-bugs`（mattpocock/skills）、`work-event-skill`（work marketplace）、catalog の `quiet-command-auditor`。
 - 理由: 2026-09 の Claude セッション 527 件と 2026-08 以降の Codex セッションで、Skill 起動と `SKILL.md` の読み込みが 0〜1 回。他スキルと global `AGENTS.md` からの参照も無く、ユーザーが不要と判断した。
 - 残した判断: 同じく実績 0 の `domain-modeling` / `research` / `prototype` / `setup-matt-pocock-skills` は、残す `wayfinder` が Skill tool で呼ぶ前提（`improve-codebase-architecture` も `domain-modeling` を参照）なので、`wayfinder` と一緒でなければ外さない。`research` は 2026-09-09 に subagent から 5 回起動されており、他の3件と違って実績 0 ではない。
 - 再導入: 利用場面ができたら `apm.yml` へ同じ ref を戻す。`quiet-command-auditor` は `git show 5bebf6a:catalog/skills/quiet-command-auditor/SKILL.md` から復元できる。
@@ -688,7 +684,7 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - Status: 部分解除（2026-09-28）。`ibelick/ui-skills` を `ref: main` にしたうえで `mise run upgrade` を再開。それ以外の SHA pin は引き続き revision-pin 書き換えの後退リスクがあるため、意図しない後退が出たら手動 pin bump を優先する。
 - 理由: apm 0.31.0 の `apm update` は SHA pin の依存を最新タグへ書き換え、タグが pin より古くても戻す。2026-09-25 の global dry-run では対象8件中6件が後退だった（mattpocock/skills 41 commit、millionco/react-doctor 29、tt-a1i/archify 21、ibelick/ui-skills 263、coji/natural-japanese 13、mvanhorn/last30days-skill 6）。前進は benjitaylor/agentation（v3.1.2）と modem-dev/hunk（v0.22.0）だけで、この2件は同日に手動で適用した。
 - 併発する失敗: 同じ SHA を共有する複数行を update が書き換えると `Expected exactly one apm.yml entry for <sha>, found 2` で止まる（agentation 2行で再現）。object 形式の `git:` + `ref:` + `skills:` へ畳めば apm 単体では回避でき、pin 時点の配布内容も byte 一致した。workspace スクリプトは当初 `.apm/skills` 構造しか解決できず素の `skills/<name>/` bundle が `Missing external skill cache` になったが、同日 `external_package_skills_root`（`.ps1` は `Get-ExternalPackageSkillsRoot`）に、virtual_path が空で manifest が `skills:` subset を宣言したレコードに限って `<cache>/skills/` を package root とするフォールバックを入れた（`.apm/skills` があればそちらを優先）。
-- 畳み込みの適用範囲: 同じ repo・同じ SHA の複数行は `skills:` subset で1エントリに畳む。2026-09-25 に `mattpocock/skills`（apm が plugin.json の `skills` 配列から `.apm/skills` を生成する型）と、素の bundle である `benjitaylor/agentation` / `emilkowalski/skills` / `ibelick/ui-skills` を畳み、配布内容の一致を確かめた（配布先から消えたのはキャッシュ由来の `.apm-pin` だけ）。畳めないのは、ルートが `marketplace.json` だけで subset を指定しても何も配布されない `caad-develop/claude-code-marketplace`。この repo はルートに `skills` 配列付きの `.claude-plugin/plugin.json` を足せば畳める（scratchpad の複製で確認済み、upstream は未変更）。畳めるかどうかは、隔離 fixture に対して `APM_WORKSPACE_DIR=<fixture> bash -c 'source ./scripts/apm-workspace.sh; collect_external_skill_records'` を実行して確かめられる。
+- 畳み込みの適用範囲: 同じ repo・同じ SHA の複数行は `skills:` subset で1エントリに畳む。2026-09-25 に `mattpocock/skills`（apm が plugin.json の `skills` 配列から `.apm/skills` を生成する型）と、素の bundle である `benjitaylor/agentation` / `emilkowalski/skills` / `ibelick/ui-skills` を畳み、配布内容の一致を確かめた（配布先から消えたのはキャッシュ由来の `.apm-pin` だけ）。畳めないのは、ルートが `marketplace.json` だけで subset を指定しても何も配布されない `<work-marketplace>`。この repo はルートに `skills` 配列付きの `.claude-plugin/plugin.json` を足せば畳める（scratchpad の複製で確認済み、upstream は未変更）。畳めるかどうかは、隔離 fixture に対して `APM_WORKSPACE_DIR=<fixture> bash -c 'source ./scripts/apm-workspace.sh; collect_external_skill_records'` を実行して確かめられる。
 - 更新手順: `apm.yml` の SHA を同じ repo の全行で揃えて上げ、`mise run install:pins` → `mise run deploy:fresh`。
 - 前回の「ibelick/ui-skills の新構成と互換しない」は誤認だった。update の行き先が 2026-01 の古いタグ `v0.0.7`（`src/SKILL.md` だけの構造）だったためで、pin と HEAD の `skills/` は同一。
 - 再検討するなら: apm の update が pin より古いタグへ戻さなくなったとき。
@@ -699,9 +695,9 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - 理由: apm 0.31.0 の revision-pin 書き換えは annotated tag だけを見る。upstream の annotated tag は `v0.0.7` までしかなく（`v0.2.3` 以降は lightweight）、SHA pin の `apm update` は毎回 `28b74ce5` へ戻して skill bundle 検証に失敗する。`ref: main` は revision-pin 対象外のため `mise run upgrade` が通る。lock の `resolved_commit` はブランチ先端（2026-09-28 時点 `ee4596c4`）を記録する。
 - 検証: `apm update -g --yes ibelick/ui-skills` と `mise run upgrade` が exit 0、`mise run check` が通ること。
 
-## `ai-butsukari-evidence-scout` を global から撤去（2026-09-25）
+## 社内イベント用スキルを global から撤去（2026-09-25）
 
-- 撤去: `caad-develop/ai-butsukari-geiko/.agents/skills/ai-butsukari-evidence-scout#main` を root `apm.yml` から外した。
+- 撤去: `<work-org>/<event-repo>/.agents/skills/<event-skill>#main` を root `apm.yml` から外した。
 - 理由: 対象イベントが終了したため。
 - 手順: 行を消したあと `apm lock -g` で lock を manifest に合わせ、`mise run deploy` で `~/.claude/skills` / `~/.agents/skills` から配布を消した。lock で他に動いたのは `jey3dayo/apm-workspace/catalog#main` のブランチ再解決だけ。
 

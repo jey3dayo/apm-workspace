@@ -64,7 +64,7 @@ Project-specific documentation configuration file placed in project root.
 }
 ```
 
-### caad-terraform-infra Project Template
+### terraform-infra Project Template
 
 ```json
 {
@@ -77,7 +77,7 @@ Project-specific documentation configuration file placed in project root.
   },
   "custom_rules": {
     "multi_account": true,
-    "environments": ["caad-aws-ndev", "caad-aws", "shared"],
+    "environments": ["aws-dev", "aws-prod", "shared"],
     "mise_integration": true,
     "directory_structure": [
       "features/",
@@ -244,7 +244,7 @@ Brief description of the document's purpose and scope.
 📝 計画中
 ```
 
-### caad-terraform-infra Metadata Example
+### terraform-infra Metadata Example
 
 ```markdown
 # 🔐 VPN証明書管理ガイド

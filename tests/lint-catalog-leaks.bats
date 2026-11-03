@@ -9,6 +9,8 @@ setup() {
   FIXTURE_DIR="$(mktemp -d)"
   mkdir -p "$FIXTURE_DIR/catalog/agents" "$FIXTURE_DIR/catalog/skills"
   touch "$FIXTURE_DIR/catalog/agents/existing-agent.md"
+  # Point at a fixture path so a real local denylist never leaks into tests.
+  export APM_LEAK_DENYLIST="$FIXTURE_DIR/denylist.txt"
 }
 
 teardown() {
@@ -84,12 +86,12 @@ EOF
 
 @test "warns on a concrete profile value" {
   cat >"$FIXTURE_DIR/catalog/skills/warn.md" <<'EOF'
-aws --profile aws-caad-admin-role
+aws --profile aws-example-admin-role
 EOF
 
   run_fixture
   [ "$status" -eq 0 ]
-  [[ "$output" == *"aws-caad-admin-role"* ]]
+  [[ "$output" == *"aws-example-admin-role"* ]]
   [[ "$output" == *"warn.md:1"* ]]
 }
 
@@ -144,4 +146,67 @@ EOF
   run_fixture
   [ "$status" -eq 0 ]
   [[ "$output" != *"warning(s)"* ]]
+}
+
+@test "fails on a denylisted organization term without echoing it" {
+  printf '# comment\nexample-org\n' >"$APM_LEAK_DENYLIST"
+  cat >"$FIXTURE_DIR/catalog/skills/broken.md" <<'EOF'
+Deploy to Example-Org/service first.
+EOF
+
+  run_fixture
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"broken.md:1: denylisted organization term"* ]]
+  [[ "$output" != *"Example-Org"* ]]
+}
+
+@test "does not match a denylisted term inside a longer token" {
+  printf 'org\n' >"$APM_LEAK_DENYLIST"
+  cat >"$FIXTURE_DIR/catalog/skills/ok.md" <<'EOF'
+sha256:abcorg123 organization
+EOF
+
+  run_fixture
+  [ "$status" -eq 0 ]
+}
+
+@test "skips the denylist when the file is absent" {
+  cat >"$FIXTURE_DIR/catalog/skills/ok.md" <<'EOF'
+example-org
+EOF
+
+  run_fixture
+  [ "$status" -eq 0 ]
+}
+
+@test "redacts denylisted terms from other diagnostics and paths" {
+  printf 'example-org\n' >"$APM_LEAK_DENYLIST"
+  mkdir -p "$FIXTURE_DIR/catalog/skills/example-org-skill"
+  cat >"$FIXTURE_DIR/catalog/skills/example-org-skill/SKILL.md" <<'EOF'
+(use example-org-agent)
+EOF
+
+  run_fixture
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"unresolved agent reference: <redacted>-agent"* ]]
+  [[ "$output" != *"example-org"* ]]
+}
+
+@test "checks non-markdown files under explicit targets" {
+  printf 'example-org\n' >"$APM_LEAK_DENYLIST"
+  printf 'owner: example-org\n' >"$FIXTURE_DIR/catalog/skills/notes.txt"
+
+  run_fixture
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"notes.txt:1: denylisted organization term"* ]]
+}
+
+@test "checks denylisted terms in file names" {
+  printf 'example-org\n' >"$APM_LEAK_DENYLIST"
+  printf 'clean\n' >"$FIXTURE_DIR/catalog/skills/example-org-notes.txt"
+
+  run_fixture
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"denylisted organization term in path"* ]]
+  [[ "$output" != *"example-org"* ]]
 }
