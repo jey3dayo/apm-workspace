@@ -49,7 +49,7 @@ env -u AWS_PROFILE -u AWS_DEFAULT_PROFILE \
   "$AWS_BIN" sts get-caller-identity
 ```
 
-Prefer the non-shim AWS binary when a `mise` shim or repo task injects dotenvx values; `mise which aws` resolves the real binary behind the shim. A concrete worked example (profile, region, incident) is in `references/asta-dotenvx.md`.
+Prefer the non-shim AWS binary when a `mise` shim or repo task injects dotenvx values; `mise which aws` resolves the real binary behind the shim. A concrete worked example (profile, region, incident) is in `references/aws-cli-dotenvx.md`.
 
 ## dotenvx Recipes
 
