@@ -33,7 +33,7 @@
 - design: `agentation` / `agentation-self-driving`,
   emilkowalski 系（`animation-performance`, `apple-design`, `break-ui`, `emil-design-eng`,
   `find-animation-opportunities`, `improve-animations`, `review-animations`）,
-  ibelick 系（`fixing-accessibility`, `fixing-metadata`,
+  ibelick 系（`fixing-accessibility`,
   `fixing-motion-performance`, `improve-ui`）, `transitions-dev`, `ui-ux-pro-max`,
   `unslop-ui`（heydamir/unslop の skills/unslop、alias）
 - browser / analysis: `browser-harness`, `screenshot`, `archify`

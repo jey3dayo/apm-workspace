@@ -11,7 +11,7 @@
 | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | 0→1 デザイン選定（スタイル・色・フォント）               | `ui-ux-pro-max`（本体のみ）                                                                                            |
 | 美的方向性・脱テンプレ                                   | `frontend-design`（anthropics）                                                                                        |
-| ベースライン修正（deslop）                               | `baseline-ui` / `fixing-accessibility` / `fixing-metadata`（ibelick）                                                  |
+| ベースライン修正（deslop）                               | `baseline-ui` / `fixing-accessibility`（ibelick）                                                                      |
 | モーション taste・レビュー・監査                         | `emil-design-eng` / `review-animations` / `improve-animations` / `find-animation-opportunities`（emilkowalski/skills） |
 | モーション実装スニペット                                 | `transitions-dev`                                                                                                      |
 | UI レビューのレーン選択（lane 1 がデザインシステム準拠） | `review-board`（optional、自作）                                                                                       |

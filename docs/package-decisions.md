@@ -803,3 +803,11 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - ref を `e8a175de` → `a81dbca07f2217b7103e510c0f13f8d5b017afc9`（上流 main）に上げ、`animation-performance`（アニメーションのフレーム落ちの原因調査と軽いプロパティ選び）と `break-ui`（長い名前・空・多言語などの最悪データで UI を壊して直す）を追加。
 - 入れない：`remove-animations`（同じ ref で追加されたもの）。
 - 既存5つは ref 間で中身の変更なし。`animation-performance` は `fixing-motion-performance`（ibelick）と領域が近いので、重なりすぎたらどちらかに寄せる。
+
+## 2026-11-03 使われていない fixing-metadata を撤去し、ibelick を commit 固定にした
+
+- 撤去：`fixing-metadata`（ibelick）。直近60日の Claude transcript と Codex セッションで、`Skill` 起動・`SKILL.md` 読み込みとも 0 回（棚卸し時の監査読みを除く）。
+- 残す：`wayfinder` も利用 0 回だったが、使いたいのでユーザー判断で残す（2026-11-03）。`wayfinder` が呼ぶ `prototype`・`setup-matt-pocock-skills`・`domain-modeling` も合わせて残す。`fixing-motion-performance` と `transitions-dev` は 2026-10-31 に手で呼べるよう残すと決めたばかりなので、次の棚卸しで判断する。
+- `refactoring` の委譲表から `/improve-codebase-architecture` を勧める行を削除した。
+- ibelick/ui-skills の ref を `main` から lock 済みの `4907a526b07943b3a338177558d42fae4fdf0a86` に固定した（上流 main の追従は ref 更新で行う）。
+- 再導入：ibelick/ui-skills（`4907a526`）の `skills:` に `fixing-metadata` を戻す。
