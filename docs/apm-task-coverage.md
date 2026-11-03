@@ -51,7 +51,7 @@ Path-by-path ownership (catalog, optional-skills, workspace-only skills, lockfil
 
 `mise tasks` lists only the entry points. Parts that exist to be composed by an aggregate, or to be reached only during recovery, carry `hide = true` and stay directly runnable by name:
 
-- check parts of `check` / `format:check`: `format:markdown`, `format:markdown:check`, `format:markdown:bold-headings`, `format:markdown:bold-headings:check`, `format:toml`, `format:toml:check`, `format:yaml`, `format:yaml:check`, `lint:yaml`, `lint:actions`, `lint:frontmatter`, `lint:catalog-leaks`, `lint:skill-inventory`, `validate:workspace`, `validate:catalog`, `smoke:catalog`
+- check parts of `check` / `format:check`: `format:markdown`, `format:markdown:check`, `format:markdown:bold-headings`, `format:markdown:bold-headings:check`, `format:toml`, `format:toml:check`, `format:yaml`, `format:yaml:check`, `lint:yaml`, `lint:actions`, `lint:frontmatter`, `lint:catalog-leaks`, `validate:workspace`, `validate:catalog`, `smoke:catalog`
 - `format:check`, `validate`, `test:ps`, and `test:sh` are aggregate parts but remain visible because CI or the procedures call them directly; `test:sh` is also a pre-push job, while `test:ps` is not (see AGENTS.md on the PS lane's best-effort scope).
 - recovery-only: `repair:local-package-cache`, `deploy:fresh`, `refresh:deploy`, `agmsg:state:save`, `agmsg:state:restore` (apply owns the roster save/restore on every exit path; these tasks recover a roster unlinked outside of apply)
 - part of `deploy:pins`: `install:pins`

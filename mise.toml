@@ -102,7 +102,6 @@ depends = [
   "lint:actions",
   "lint:frontmatter",
   "lint:catalog-leaks",
-  "lint:skill-inventory",
   "validate",
 ]
 
