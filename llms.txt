@@ -11,6 +11,7 @@ It owns the global manifest (`apm.yml`), the lockfile (`apm.lock.yaml`), the cac
 - `docs/skill-inventory.md`: skill lanes (global, catalog, optional, manual, private, repo-local)
 - `docs/package-decisions.md`: why each package was added, kept, or removed
 - `docs/skill-overlaps.md`: which of several similar skills to use
+- `docs/learning-ledger.md`: changes applied by `learning-intake`, graded on whether they worked
 - `catalog/skills/apm-usage/SKILL.md`: operating guidance for agents
 - `todo.txt` / `done.txt`: open and finished internal tasks
 
