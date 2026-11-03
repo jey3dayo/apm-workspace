@@ -789,6 +789,7 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - 撤去: `last30days`（mvanhorn/last30days-skill）。2026-09-23 の節の「利用実績が 0 のまま次の棚卸しを迎えたら撤去する」に従う。
 - 理由: 2026-09-07 以降の Claude transcript、`history.jsonl`（2025-09 以降のスラッシュ起動）、2026-06 以降の Codex セッションの `SKILL.md` 読み込みのいずれにも使用が 0 回。Claude 側は `skillOverrides` で `off` だった。保持基準（verb 導線・弱いランタイムの保険・社会的理由・思い入れ）のどれにも当たらない。
 - 残した判断: `agentation` / `agentation-self-driving` は、使っていた時期があるためユーザー判断で残す。
+  - 追記（2026-11-03）: `agentation` / `agentation-self-driving` は global から撤去した。プロジェクトの `package.json` に `agentation` を依存として入れないと動かないため、使うプロジェクトの repo-local スキルとして持つ。戻すときは `benjitaylor/agentation`（`7982d83aa2d2ba46d0f68f257759ba527ba401a8`、`skills:` subset）を `apm.yml` へ戻す。
 - 再導入: 使う場面ができたら `mvanhorn/last30days-skill/skills/last30days#7fac0fc31ba5212b5ddaa29252d9f7148cec8423`（v3.30.0）を `apm.yml` の dependencies.apm へ戻す。
 
 ## 2026-10-31 重なっているスキルを間引いた

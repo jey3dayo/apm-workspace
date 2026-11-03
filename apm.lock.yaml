@@ -40,35 +40,6 @@ dependencies:
     .claude/skills/tuicr/tuicr-wrapper-zellij.sh: sha256:e442e97902abaa4924ab295707de455a15371f0d72e89c1b76f0563bbf43125a
     .claude/skills/tuicr/tuicr-wrapper.sh: sha256:69ba7c046e36058a8c5431ac2df1258bf1547df8844ffbbf3c68112d7b546784
   content_hash: sha256:894be7d063dbfa0a43bb070d9377224cac842f34a0536cb90b52da9556a63768
-- repo_url: benjitaylor/agentation
-  name: agentation
-  host: github.com
-  resolved_commit: 7982d83aa2d2ba46d0f68f257759ba527ba401a8
-  resolved_ref: 7982d83aa2d2ba46d0f68f257759ba527ba401a8
-  version: unknown
-  package_type: skill_bundle
-  deployed_files:
-  - .agents/skills/agentation
-  - .agents/skills/agentation-self-driving
-  - .agents/skills/agentation-self-driving/SKILL.md
-  - .agents/skills/agentation-self-driving/references/two-session-workflow.md
-  - .agents/skills/agentation/SKILL.md
-  - .claude/skills/agentation
-  - .claude/skills/agentation-self-driving
-  - .claude/skills/agentation-self-driving/SKILL.md
-  - .claude/skills/agentation-self-driving/references/two-session-workflow.md
-  - .claude/skills/agentation/SKILL.md
-  deployed_file_hashes:
-    .agents/skills/agentation-self-driving/SKILL.md: sha256:3c556d51b44dfe5d898b7f955322a85a0bafda9f2e383c44d1b29be00052462a
-    .agents/skills/agentation-self-driving/references/two-session-workflow.md: sha256:1b1f7c337c40c4f009e52eebd396d86b6adeb57221ad770b3b7cb254566c6e00
-    .agents/skills/agentation/SKILL.md: sha256:09f4fee606d9f354b4e16eff5a83b3de1b5c35f89aa430c1e0976f214294f4c7
-    .claude/skills/agentation-self-driving/SKILL.md: sha256:3c556d51b44dfe5d898b7f955322a85a0bafda9f2e383c44d1b29be00052462a
-    .claude/skills/agentation-self-driving/references/two-session-workflow.md: sha256:1b1f7c337c40c4f009e52eebd396d86b6adeb57221ad770b3b7cb254566c6e00
-    .claude/skills/agentation/SKILL.md: sha256:09f4fee606d9f354b4e16eff5a83b3de1b5c35f89aa430c1e0976f214294f4c7
-  content_hash: sha256:588ce714cd241bcdbeea19476b9def8da76eb84ef3dc5b85c38507feb6426d9b
-  skill_subset:
-  - agentation
-  - agentation-self-driving
 - repo_url: browser-use/browser-harness
   name: browser-harness
   host: github.com
@@ -5726,51 +5697,6 @@ deployments:
   - vercel-labs/agent-desktop/skills/agent-desktop
   active_owner: vercel-labs/agent-desktop/skills/agent-desktop
   content_hash: sha256:e78194d24d3963d10a8069833c90a1bdb932f0ab8f6b645df79149d95471645c
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agentation
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation
-  active_owner: benjitaylor/agentation
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agentation-self-driving
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation
-  active_owner: benjitaylor/agentation
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agentation-self-driving/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation
-  active_owner: benjitaylor/agentation
-  content_hash: sha256:3c556d51b44dfe5d898b7f955322a85a0bafda9f2e383c44d1b29be00052462a
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agentation-self-driving/references/two-session-workflow.md
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation
-  active_owner: benjitaylor/agentation
-  content_hash: sha256:1b1f7c337c40c4f009e52eebd396d86b6adeb57221ad770b3b7cb254566c6e00
-- kind: project-relative
-  target: claude
-  value: .claude/skills/agentation/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation
-  active_owner: benjitaylor/agentation
-  content_hash: sha256:09f4fee606d9f354b4e16eff5a83b3de1b5c35f89aa430c1e0976f214294f4c7
 - kind: project-relative
   target: claude
   value: .claude/skills/agmsg
@@ -17993,51 +17919,6 @@ deployments:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
   content_hash: sha256:56222c8ee4e46134079a90d2fbb86a4cfb5944fdb6c854a696be15d251c00681
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agentation
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation
-  active_owner: benjitaylor/agentation
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agentation-self-driving
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation
-  active_owner: benjitaylor/agentation
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agentation-self-driving/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation
-  active_owner: benjitaylor/agentation
-  content_hash: sha256:3c556d51b44dfe5d898b7f955322a85a0bafda9f2e383c44d1b29be00052462a
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agentation-self-driving/references/two-session-workflow.md
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation
-  active_owner: benjitaylor/agentation
-  content_hash: sha256:1b1f7c337c40c4f009e52eebd396d86b6adeb57221ad770b3b7cb254566c6e00
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agentation/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - benjitaylor/agentation
-  active_owner: benjitaylor/agentation
-  content_hash: sha256:09f4fee606d9f354b4e16eff5a83b3de1b5c35f89aa430c1e0976f214294f4c7
 - kind: project-relative
   target: codex
   value: .agents/skills/agmsg

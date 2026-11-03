@@ -30,7 +30,7 @@
   `improve-codebase-architecture`, `prototype`, `research`, `retro`, `setup-matt-pocock-skills`,
   `wait-what`, `wayfinder`, `writing-for-agents`）
 - react: `react-doctor`, `react-best-practices`
-- design: `agentation` / `agentation-self-driving`,
+- design:
   emilkowalski 系（`animation-performance`, `apple-design`, `break-ui`, `emil-design-eng`,
   `find-animation-opportunities`, `improve-animations`, `review-animations`）,
   ibelick 系（`fixing-accessibility`,
