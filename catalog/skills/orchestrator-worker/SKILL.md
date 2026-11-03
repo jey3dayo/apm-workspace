@@ -241,7 +241,7 @@ Worker の昇格 3 条件に当たるタスクは opencode へ出さず、既存
 
 Claude では独立タスクを同一レスポンス内で複数呼び出すと並列に走る（1レスポンス1呼び出しは直列になる）。Codex では worker を複数 detached 起動する（触るファイル集合が互いに素であることが前提。guardrails は `agmsg-delegation` を参照）。どちらも Orchestrator の会話履歴は引き継がせず、Section 3 で書き出した 3 点だけを渡す。
 
-起動後の扱いは 2 つ。
+起動後の扱いは次のとおり。
 
 - バリアを置かない。先に返った Worker から順に処理する。全員の完了を待つと、最も遅い Worker が全体の律速になるうえ、待つ間にリポジトリの状態が変わって先行 Worker の前提が古くなる。
 - Worker を使い回す。追加指示・スコープ縮小・再実行は、新規 spawn ではなく既存 Worker への追送で行う（Claude は `SendMessage`）。文脈を保った Worker はキャッシュが効くぶん安く、前提の再説明も要らない。Codex（agmsg-delegation 経由）は worker が headless 1 turn で終了する契約のため使い回せない。追加分は新しいタスクとして切り直す。
