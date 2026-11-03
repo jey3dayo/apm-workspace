@@ -217,16 +217,15 @@ Do not proceed to the next step until all pass.
 
 ## Related Skills and References
 
-| Problem Area                                                                     | Skill or reference                                    |
-| -------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| Detailed duplicate code analysis                                                 | `../similarity/SKILL.md`                              |
-| Large lint / type-safety cleanup                                                 | `references/code_quality_cleanup.md`                  |
-| Dead code removal with TSR                                                       | `references/dead_code_tsr.md`                         |
-| React-specific pattern diagnosis                                                 | `react-doctor` skill (if installed)                   |
-| Parallel diagnostics / bounded slice review loop                                 | `../review-fix-loop/SKILL.md`                         |
-| Impact scope / reference tracking                                                | `rg` for full reference listing                       |
-| Interface / seam design vocabulary                                               | `codebase-design` skill                               |
-| Deepening opportunities across the codebase (architecture-level, not diff-level) | suggest the user run `/improve-codebase-architecture` |
+| Problem Area                                     | Skill or reference                   |
+| ------------------------------------------------ | ------------------------------------ |
+| Detailed duplicate code analysis                 | `../similarity/SKILL.md`             |
+| Large lint / type-safety cleanup                 | `references/code_quality_cleanup.md` |
+| Dead code removal with TSR                       | `references/dead_code_tsr.md`        |
+| React-specific pattern diagnosis                 | `react-doctor` skill (if installed)  |
+| Parallel diagnostics / bounded slice review loop | `../review-fix-loop/SKILL.md`        |
+| Impact scope / reference tracking                | `rg` for full reference listing      |
+| Interface / seam design vocabulary               | `codebase-design` skill              |
 
 ## Principle of Incremental Execution
 

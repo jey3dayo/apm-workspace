@@ -29,12 +29,9 @@ dependencies:
         - domain-modeling
         - grilling
         - improve-codebase-architecture
-        - prototype
         - research
         - retro
-        - setup-matt-pocock-skills
         - wait-what
-        - wayfinder
         - writing-for-agents
     - nanaism/yomiyasu/skills/yomiyasu#29d67ccb05e370b5958d72920a9cd1aa829dee80 # v2.5.0
 
@@ -63,10 +60,9 @@ dependencies:
       ref: 4652254daff586ff4739849395a127b56f7f8cc7
       alias: unslop-ui
     - git: ibelick/ui-skills
-      ref: main
+      ref: 4907a526b07943b3a338177558d42fae4fdf0a86
       skills:
         - fixing-accessibility
-        - fixing-metadata
         - fixing-motion-performance
         - improve-ui
     - Jakubantalik/transitions-dev/skills/transitions-dev#038b0bdc75375c2beed51d1e824c98cdc7b86f8c
