@@ -119,7 +119,7 @@ permission や PreToolUse hook のポリシーで拒否されたコマンドは�
 ## ファイル操作原則
 
 - スキル実行や調査で作る一時的な出力（調査メモ、レビュー結果、レポート、スクリーンショット等）は、保存先の指定がない限りリポジトリ直下の `tmp/` 配下に集約し、原則コミットしない。スキルが `research_*` や `reports/` などの相対出力先を要求する場合も `tmp/<skill-or-topic>/` へ読み替える
-- 実装計画（plan）はスキルが `plans/` や `docs/**/plans/` を指定していても、リポジトリ直下の `plans/<skill-or-tool>/` へ読み替える（例: `plans/improve/`、`plans/superpowers/`）。次セッションでも読み返すため `tmp/` とは分け、原則コミットしない。Claude Code 本体が使う `.plans/` はそのまま扱う。完了・放棄した plan は残さず削除してよい（必要な判断は `docs/` か `done.txt` に移す）
+- 実装計画（plan）はスキルが `plans/` や `docs/**/plans/` を指定していても、リポジトリ直下の `plans/<skill-or-tool>/` へ読み替える（例: `plans/improve/`、`plans/superpowers/`）。次セッションでも読み返すため `tmp/` とは分け、原則コミットしない。Claude Code 本体が使う `.plans/` はそのまま扱う。完了・放棄した plan のうち、自分が作った未コミットのものは残さず削除してよい（必要な判断は `docs/` か `done.txt` に移す）。コミット済みの plan や他者が作った plan は、そのリポジトリの方針に従う
 - README.md や \*.md は明示的に要求された場合のみ作成する
 - リポジトリ外（`~/.config` など）へのファイル作成・変更は、保存先が明示されていない限り行わない。repo 内の該当箇所か `tmp/` へ置き、repo 外が必要ならユーザーへ確認する
 - ファイルやディレクトリの削除は `rm -rf` でなく `trash` を使う。Claude の deny ルールは絶対パスと `~/` 配下への `rm -rf` を拒否し、連結コマンドなら全体が止まる
