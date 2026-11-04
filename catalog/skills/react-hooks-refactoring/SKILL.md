@@ -1,13 +1,14 @@
 ---
-name: react-hooks-judgment
+name: react-hooks-refactoring
 description: >-
-  Choosing React hooks and deciding when not to use one: values computed during render, key resets, URL state,
-  useEffect anti-patterns (You Might Not Need an Effect), React 19 Actions with useOptimistic / useActionState /
-  useFormStatus, use + Suspense data reads, useEffectEvent limits, state placement and Suspense boundaries,
-  React Compiler memoization defaults, and the eslint-plugin-react-hooks recommended gate.
+  Choosing React hooks and refactoring existing hook / useEffect code, including deciding when not to use a hook:
+  values computed during render, key resets, URL state, useEffect anti-patterns (You Might Not Need an Effect),
+  React 19 Actions with useOptimistic / useActionState / useFormStatus, use + Suspense data reads,
+  useEffectEvent limits, state placement and Suspense boundaries, React Compiler memoization defaults,
+  and the eslint-plugin-react-hooks recommended gate.
 ---
 
-# React Hooks Judgment
+# React Hooks Refactoring
 
 React コンポーネントを書く・直す・レビューするときに「どの hook を使うか」「そもそも hook が要るか」を決めるための判断基準。
 API の正本は react.dev で、ここには判断の順序と落とし穴だけを置く。

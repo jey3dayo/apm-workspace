@@ -18,7 +18,7 @@
 | デザインドキュメント                                     | `design-md-workflow`（catalog 自作）                                                                                   |
 | コードベース監査→計画（汎用）                            | `improve`（shadcn）                                                                                                    |
 | React 診断                                               | `react-doctor`（millionco）                                                                                            |
-| React の hook 選択・Effect の要否・React 19 非同期 hook  | `react-hooks-judgment`（catalog 自作。性能規則は `react-best-practices` に委ねる）                                     |
+| React の hook 選択・Effect の要否・React 19 非同期 hook  | `react-hooks-refactoring`（catalog 自作。性能規則は `react-best-practices` に委ねる）                                  |
 
 ## レビュー系の使い分け
 
