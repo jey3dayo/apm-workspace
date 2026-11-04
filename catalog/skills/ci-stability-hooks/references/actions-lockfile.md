@@ -61,9 +61,9 @@ Rerun the generate task after adding a workflow or changing any `uses:`.
 - Same-repository composite actions: `uses: ./.github/actions/setup` becomes `uses: $/.github/actions/setup`, in workflows and inside the repository's own action files. A `$/` reference always runs at the workflow's own commit and takes no `@ref`. Without the migration, a local `./` action that uses remote actions is a blocking error, because `./` actions are never followed or locked. If the repository uses self-hosted runners, confirm their runner version supports `$/` inside composite actions before merging.
 - `./` and `$/` are not always the same code. `./` reads whatever sits in the job's workspace at that step, so it differs from the workflow's commit when a job checks out another ref or repository into the workspace path, or when an earlier step generates or edits the action. Before migrating, look for those jobs. Keep `./` for any reference that depends on that behavior: replace `--migrate-local-actions` with `--ignore-local-actions` in the generate task, rewrite the safe references to `$/` by hand, and accept that the remote actions used by the remaining `./` actions are not locked.
 - Same-repository reusable workflow calls (`jobs.<id>.uses: ./.github/workflows/x.yml`) can stay `./`; the called workflow is locked as its own workflow.
-- Version comments such as `# actions/checkout v7.0.1` above or after `uses:` become redundant: the tag and the lockfile carry the version. Delete them in the same change; the generator does not.
+- Version comments such as `# actions/checkout v7.0.1` above or after a `uses:` that now carries a tag become redundant: the tag and the lockfile carry the version. Delete them in the same change; the generator does not. Keep the comment on any reference that stays a SHA.
 
-Before merging the migration, compare each lockfile `commit` with the SHA the old `uses:` pinned at the same reference. If they match, the code that runs has not changed.
+Before merging the migration, compare each lockfile `commit` for a direct external action with the SHA the old `uses:` pinned at the same reference. A match shows those direct actions run the same code. It says nothing about references migrated from `./` to `$/` or about transitive actions that were not pinned before; review those separately.
 
 ## CI Check
 
