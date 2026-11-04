@@ -1,6 +1,6 @@
 # 常駐プール経路
 
-ユーザーが手で立てた pane の agent が `join` してチームに常駐し、同じ identity で複数タスクを受け続ける経路。`backlog-sweep` の Worker プールがこれにあたる。Lifecycle の 4・6・8 が使えないので、以下で置き換える。
+ユーザーが手で立てた pane の agent が `join` してチームに常駐し、同じ identity で複数タスクを受け続ける経路。`backlog-sweep` で常駐 pane プールを選んだ場合の Worker プールがこれにあたる（既定は組み込み subagent）。Lifecycle の 4・6・8 が使えないので、以下で置き換える。
 
 **エージェントが pane を勝手に作らない。ユーザーが「用意して」と指示したときだけ作る。** その場合も `herdr workspace create` / `tab create` は使わない——command 指定フラグが無く bare shell しか起動しないのに、読み戻さなければ「起動した」と報告できてしまう。自分の pane からの `pane split --current --cwd <絶対パス> --focus` で作る（背面に作ると起動の失敗や事故に気づけないため、herdr の「背景作業は `--no-focus`」の例外とする）、という `herdr` スキルの手順に従う（コマンド契約は `herdr --skill`、読み戻しは `herdr` の House rules）。
 

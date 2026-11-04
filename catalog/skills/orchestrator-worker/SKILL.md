@@ -11,7 +11,7 @@ description: >-
 
 高級モデルのセッションで実装を自分の手で書くのは、単価の無駄であり、Orchestrator の context を実装詳細で埋める。Orchestrator 機能は要件・設計・分解・検証だけを持ち、コードを書くのは Worker に固定する。
 
-1タスクの委譲ではなく、複数の面（`todo.txt` / plan リスト / issue）に散った backlog をまとめて長時間捌く場合は `backlog-sweep` を使う。判定・tier・分割基準は本スキルが正本のまま、台帳統合と常駐 Worker プールの運用だけが向こうにある。
+1タスクの委譲ではなく、複数の面（`todo.txt` / plan リスト / issue）に散った backlog をまとめて長時間捌く場合は `backlog-sweep` を使う。判定・tier・分割基準は本スキルが正本のまま、台帳統合と Worker プール（組み込み subagent が既定、常駐 pane は任意）の運用だけが向こうにある。
 
 ## 委譲は依頼済みである
 
@@ -163,12 +163,12 @@ codex exec --ephemeral --ignore-user-config --ignore-rules \
 - `--ignore-rules`: sandbox 外の実行を許す execpolicy の `.rules` を読まない
 - `--ephemeral`: セッションを残さない。0.166.0 ではこの状態だと `spawn_agent` が失敗し、子 agent を起動できない（`--disable multi_agent` は feature を false にしても tool 一覧から消えないため使わない）。ログと prompt は対象 repo の外に置く
 
-prompt には、固定したレビュー対象（適用元 `HEAD` の SHA と diff ファイルの絶対パス・checksum）を書き、その diff ファイルだけをレビュー対象にすること、報告の冒頭に読んだ diff ファイルの checksum と `HEAD` の SHA を書くことを指示する。diff ファイルとログは対象 repo の外に置く。
+prompt には、固定したレビュー対象（適用元 `HEAD` の SHA と diff ファイルの絶対パス・checksum）を書き、その diff ファイルだけをレビュー対象にすること、読んだ diff ファイルの checksum と `HEAD` の SHA を報告に書くことを指示する。書く位置は経路の報告形式に従う（`codex exec` 経路は報告の冒頭、`agmsg-delegation` 経路は同 skill の `verified:` 行）。diff ファイルは、その経路の強制境界が reviewer の書込みを拒否するパスに置く。`codex exec` 経路は sandbox が repo の内外とも書込みを拒否するため、対象 repo の外でよい。`agmsg-delegation` 経路で拒否されるパスを選べないときは verdict にしない。ログも対象 repo の外に置く。
 
 verdict は、経路によらず次の共通条件をすべて満たした場合だけ受理する。
 
 1. 作者と別 identity・新規 session・別 context で起動している。作者が Codex でもよい
-2. 固定した SHA と diff checksum が、prompt に書いた値・reviewer が報告冒頭に書いた値の両方と一致する。終了後は実ツリーからレビュー対象 diff を再生成して checksum を照合し、`git status --short` と `git ls-files --others --exclude-standard` も開始時と一致する。レビュー対象に未追跡ファイルが含まれる場合は、その内容も固定・照合する
+2. 固定した SHA と diff checksum が、prompt に書いた値・reviewer が報告に書いた値の両方と一致する。終了後は、実際の `HEAD` が固定 SHA と一致すること、diff ファイルの checksum を再計算して固定値と一致すること、実ツリーからレビュー対象 diff を再生成した checksum も一致することを確かめ、`git status --short` と `git ls-files --others --exclude-standard` も開始時と一致する。レビュー対象に未追跡ファイルが含まれる場合は、その内容も固定・照合する
 3. 正常終了し、経路の形式で明示的な verdict と findings が返っている
 
 経路ごとに次も満たす。
