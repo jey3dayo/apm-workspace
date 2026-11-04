@@ -2,14 +2,14 @@
 name: backlog-sweep
 description: >-
   複数の面（todo.txt / plan リスト / issue / レビュー指摘）に散った backlog を1つの表に畳み、
-  常駐 Worker プールへ長時間振り分けて消化する。
+  Worker（既定は組み込み subagent、指示があれば常駐 pane プール）へ長時間振り分けて消化する。
   「溜まってるタスクを消化して」「backlog を回して」のような、
   1タスクの依頼ではなく残作業全体を捌く依頼で使う。
 ---
 
 # Backlog Sweep
 
-1タスクの委譲は `orchestrator-worker` が扱う。本スキルは**残作業全体**を対象にし、散らばった台帳を1つの表へ畳んで、常駐 Worker プールへ長時間流し続ける運用を定義する。
+1タスクの委譲は `orchestrator-worker` が扱う。本スキルは**残作業全体**を対象にし、散らばった台帳を1つの表へ畳んで、Worker プールへ長時間流し続ける運用を定義する。
 
 tier 表・委譲判定・タスク分割基準・受領後の検証は `orchestrator-worker` が正本。本スキルが自前で持つのは**台帳統合・プール編成・振り分けループ・終了条件**の4点だけで、判定を二重に書かない。
 
@@ -43,19 +43,21 @@ tier 表・委譲判定・タスク分割基準・受領後の検証は `orchest
 
 ## 3. Worker プールを組む
 
-**pane を勝手に作らない。ユーザーが「用意して」と言ったときだけ作る。** プールが必要そうなら、まず枚数・モデル・cwd を提示して指示を待つ。
+既定は組み込みの subagent（Claude は Agent tool、Codex は `spawn_agent`）でプールを組む。並列起動と使い回し（Claude は `SendMessage`）、完了 agent の扱いは `orchestrator-worker` §4 に従う。
+
+常駐 pane プール（herdr + agmsg）は任意の経路である。**pane を勝手に作らない。ユーザーが「用意して」と言ったときだけ作る。** pane プールが必要そうなら、まず枚数・モデル・cwd を提示して指示を待つ。
 
 pane を立てるのはユーザーが指示したときだけ。起動と読み戻しは `herdr` の House rules と `herdr --skill`、配送モードと heartbeat は `agmsg-delegation/references/resident-pool.md` に従う。報告には pane_id / workspace label / 絶対 cwd / 読み戻した状態を併記する。
 
 - tier は**編成時に固定**する。既定 Worker を N 枚 + 昇格先を 1 枚。到着した行を性質で振り分けるだけにし、実行中に tier を組み替えない。編成の例:
-  - `luna`×N + `opus`×1 — Claude orchestrator から Codex Worker を使う混成プール。platform を跨ぐが、**どのモデルを立てるかを選ぶのはユーザー**なので global AGENTS.md「推奨ワークフロー」の、Worker のモデル名をユーザーが指定したらそれが platform を跨ぐ明示指示にあたる、という規則に合致する
+  - `luna`×N + `opus`×1 — Claude orchestrator から Codex Worker を使う混成プール。Claude の組み込み subagent では Codex Worker を起動できないので `agmsg-delegation` 経由になる。platform を跨ぐが、**どのモデルを立てるかを選ぶのはユーザー**なので global AGENTS.md「推奨ワークフロー」の、Worker のモデル名をユーザーが指定したらそれが platform を跨ぐ明示指示にあたる、という規則に合致する
   - `sonnet`×N + `opus`×1 — Claude で完結
   - `luna`×N + `sol`×1 — Codex で完結
 - 昇格先へ回すのは `orchestrator-worker` の昇格3条件（難しいデバッグ / セキュリティ境界 / 複数案のトレードオフ判断）に該当する行だけ。新しい条件を作らない
-- member 名は固定名を**再利用**する。名前は `<role>-<model>-<n>` で、1つ目は番号を付けず2つ目から `-2` を付ける（`worker-luna`、`worker-luna-2`、`worker-opus`、`reviewer-fable-2`）。モデル名を含めると割当表を見るだけで tier が読める。task-scoped な名前を毎回作らない。文脈を保った Worker はキャッシュが効くぶん安く、前提の再説明も要らない。名前のモデルは表示でなく拘束でもある（`agmsg-delegation`「Worker を事前登録する」）
-- team は対象 repo 名と同一の永続 team。登録と検証の手順は `agmsg-delegation`「Worker を事前登録する」に従う
+- pane プールでは、member 名は固定名を**再利用**する。名前は `<role>-<model>-<n>` で、1つ目は番号を付けず2つ目から `-2` を付ける（`worker-luna`、`worker-luna-2`、`worker-opus`、`reviewer-fable-2`）。モデル名を含めると割当表を見るだけで tier が読める。task-scoped な名前を毎回作らない。文脈を保った Worker はキャッシュが効くぶん安く、前提の再説明も要らない。名前のモデルは表示でなく拘束でもある（`agmsg-delegation`「Worker を事前登録する」）
+- pane プールの team は対象 repo 名と同一の永続 team。登録と検証の手順は `agmsg-delegation`「Worker を事前登録する」に従う
 
-完了条件: 対象 project・runtime を引数にした `identities.sh` の出力に、全 member 名が含まれている（runtime が混在するプールは runtime ごとに実行して確認する）。
+完了条件: 組み込み subagent なら、編成（tier と枚数）を提示した。pane プールなら、対象 project・runtime を引数にした `identities.sh` の出力に、全 member 名が含まれている（runtime が混在するプールは runtime ごとに実行して確認する）。
 
 ## 4. 振り分ける
 
@@ -70,6 +72,6 @@ pane を立てるのはユーザーが指示したときだけ。起動と読み
 
 表の全行が完了したとき、または人間が止めたときに終了する。
 
-中断する場合は、表の現在状態を `tmp/backlog-sweep/<topic>.md` へ書き出してから止める。プールの片付けは `agmsg-delegation` の `references/resident-pool.md` に従い、`reset.sh` で identity を解放するだけにする。**人間が立てた pane は落とさない**。エージェントが作っていないものはエージェントが壊さない。
+中断する場合は、表の現在状態を `tmp/backlog-sweep/<topic>.md` へ書き出してから止める。組み込み subagent は `orchestrator-worker` §4 のとおり不要な完了 agent だけを閉じる。pane プールの片付けは `agmsg-delegation` の `references/resident-pool.md` に従い、`reset.sh` で identity を解放するだけにする。**人間が立てた pane は落とさない**。エージェントが作っていないものはエージェントが壊さない。
 
 完了条件: 表の最終状態と、消化した行が出典の面へ反映済みであることを報告した。

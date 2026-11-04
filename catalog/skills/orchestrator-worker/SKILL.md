@@ -11,7 +11,7 @@ description: >-
 
 高級モデルのセッションで実装を自分の手で書くのは、単価の無駄であり、Orchestrator の context を実装詳細で埋める。Orchestrator 機能は要件・設計・分解・検証だけを持ち、コードを書くのは Worker に固定する。
 
-1タスクの委譲ではなく、複数の面（`todo.txt` / plan リスト / issue）に散った backlog をまとめて長時間捌く場合は `backlog-sweep` を使う。判定・tier・分割基準は本スキルが正本のまま、台帳統合と常駐 Worker プールの運用だけが向こうにある。
+1タスクの委譲ではなく、複数の面（`todo.txt` / plan リスト / issue）に散った backlog をまとめて長時間捌く場合は `backlog-sweep` を使う。判定・tier・分割基準は本スキルが正本のまま、台帳統合と Worker プール（組み込み subagent が既定、常駐 pane は任意）の運用だけが向こうにある。
 
 ## 委譲は依頼済みである
 
@@ -128,7 +128,7 @@ Opus advisor が利用できる Claude Code の Sonnet 対話メインの単独�
 
 人間が「執事で答えて」「アーキテクトへ」と明示したら、それが上記トリガーによる判定を上書きする（global AGENTS.md「推奨ワークフロー」の、Worker のモデル名指定を明示指示とみなす規則と同じ扱い）。
 
-handoff の実体は `agmsg-delegation` の引き継ぎ（handoff）メッセージ書式で Architect pane へ送るか、人間へその書式を添えて「これは Architect pane へ」と返すことである。走っているセッションは自分の model を変えられないため、昇格ではなく handoff と定義する。逆方向（Architect が安い問いを Steward へ下ろす）は定義しない。
+handoff の実体は `agmsg-delegation` の引き継ぎ（handoff）メッセージ書式（どの transport で渡しても書式は同じ）で Architect pane へ送るか、人間へその書式を添えて「これは Architect pane へ」と返すことである。走っているセッションは自分の model を変えられないため、昇格ではなく handoff と定義する。逆方向（Architect が安い問いを Steward へ下ろす）は定義しない。
 
 ### agent / skill 定義側のモデル割り当て
 
@@ -139,11 +139,47 @@ handoff の実体は `agmsg-delegation` の引き継ぎ（handoff）メッセー
 
 ## Reviewer の tier
 
-review 外注の既定は、差分を書いた runtime（Worker がいれば Worker の runtime）の逆側にする。Codex が書いた差分は Claude reviewer、それ以外が書いた差分は Codex へ出す。脱相関は Reviewer 側で買うためである。
+通常のレビュー・相談は、セッションと同じ runtime の組み込み subagent（Claude は Agent tool、Codex は `spawn_agent`）を既定にし、作者と別 context で起動する。実行時の read-only 境界を証明できない結果は advisory として扱う。verdict を必要とするレビュー（`ship` の非軽微な変更など）は、作者と別の新規セッションで起動する `codex exec -s read-only`（下の「verdict review の起動と受理」）を既定にする。`agmsg-delegation` の review は任意の代替経路で、使うときは同 skill の受理条件にも従う。差分を書いた runtime の逆側の reviewer は必須としない。追加の脱相関が欲しいときに選べる任意の経路である。
 
-Codex 経路は起動時引数で `gpt-6.1-sol` / `gpt-6.1-terra` / `gpt-6-astra` から選ぶ。既定は `gpt-6.1-terra`。helper は effort を medium に揃える（`AGMSG_REVIEWER_EFFORT` で上書き）。旧版 `gpt-6-sol` は Reviewer では選べない。判断の難度が理由で足りないときは `gpt-6.1-sol` へ上げ、必要なら `AGMSG_REVIEWER_EFFORT` も上げる。`gpt-6-astra` は明示指定されたときだけ使う。
+Codex reviewer のモデルは `gpt-6.1-sol` / `gpt-6.1-terra` / `gpt-6-astra` から選ぶ。既定は `gpt-6.1-terra`。verdict review では起動コマンドの `-m` で選び、effort は medium に揃える。組み込み subagent では Codex セッションの native `spawn_agent` の model 指定で選ぶ。`agmsg-delegation` の helper 経路では起動時引数で選び、helper も effort を medium に揃える（`AGMSG_REVIEWER_EFFORT` で上書き）。旧版 `gpt-6-sol` は Reviewer では選べない。判断の難度が理由で足りないときは `gpt-6.1-sol` へ上げ、必要に応じて effort も上げる（helper 経路なら `AGMSG_REVIEWER_EFFORT`）。`gpt-6-astra` は明示指定されたときだけ使う。
 
-Claude reviewer（fable 固定）は Codex が書いた差分と明示指定された場合に使い、fallback は opus。Fable reviewer が実行中に 429 で失敗したら同経路で再試行せず、Codex `gpt-6.1-terra` へ切り替えて再外注する。Codex が書いた差分でこの切り替えをしたら、逆側でないことを報告に書く。
+Claude reviewer は fable を既定にし、fallback は opus。組み込み subagent の Claude reviewer は強制 read-only 境界の証拠を残せないため、結果は advisory に留まる。Fable reviewer が実行中に 429 で失敗したら同経路で再試行せず、opus か Codex reviewer へ切り替えて再外注する。
+
+### verdict review の起動と受理
+
+verdict review は、対象 repo を `-C` で渡し、次の flag をすべて付けた新規の `codex exec` で起動する（codex-cli 0.166.0 で確認）。
+
+```sh
+codex exec --ephemeral --ignore-user-config --ignore-rules \
+  --disable hooks --disable plugins --disable apps \
+  -c 'mcp_servers={}' -s read-only \
+  -m gpt-6.1-terra -c model_reasoning_effort=medium \
+  -C <対象 repo> --json - < <prompt ファイル> > <ログ> 2>&1
+```
+
+- `-s read-only`: model が生成する shell コマンドと `apply_patch` の書込みを、repo の内外とも sandbox で拒否する
+- `--ignore-user-config`: `$CODEX_HOME/config.toml` の MCP・plugin・hooks・projects trust を読まない（auth は `CODEX_HOME` のまま）
+- `--disable hooks` / `plugins` / `apps` と `-c 'mcp_servers={}'`: 既定で有効な hook・plugin・apps を止め、MCP サーバを空にする。sandbox が効くのは model が生成するコマンドだけで、MCP・hook は別経路で起動するため、境界とは別に閉じる
+- `--ignore-rules`: sandbox 外の実行を許す execpolicy の `.rules` を読まない
+- `--ephemeral`: セッションを残さない。0.166.0 ではこの状態だと `spawn_agent` が失敗し、子 agent を起動できない（`--disable multi_agent` は feature を false にしても tool 一覧から消えないため使わない）。ログと prompt は対象 repo の外に置く
+
+prompt には、固定したレビュー対象（適用元 `HEAD` の SHA と diff ファイルの絶対パス・checksum）を書き、その diff ファイルだけをレビュー対象にすること、読んだ diff ファイルの checksum と `HEAD` の SHA を報告に書くことを指示する。書く位置は経路の報告形式に従う（`codex exec` 経路は報告の冒頭、`agmsg-delegation` 経路は同 skill の `verified:` 行）。diff ファイルは、その経路の強制境界が reviewer の書込みを拒否するパスに置く。`codex exec` 経路は sandbox が repo の内外とも書込みを拒否するため、対象 repo の外でよい。`agmsg-delegation` 経路で拒否されるパスを選べないときは verdict にしない。ログも対象 repo の外に置く。
+
+verdict は、経路によらず次の共通条件をすべて満たした場合だけ受理する。
+
+1. 作者と別 identity・新規 session・別 context で起動している。作者が Codex でもよい
+2. 固定した SHA と diff checksum が、prompt に書いた値・reviewer が報告に書いた値の両方と一致する。終了後は、実際の `HEAD` が固定 SHA と一致すること、diff ファイルの checksum を再計算して固定値と一致すること、実ツリーからレビュー対象 diff を再生成した checksum も一致することを確かめ、`git status --short` と `git ls-files --others --exclude-standard` も開始時と一致する。レビュー対象に未追跡ファイルが含まれる場合は、その内容も固定・照合する
+3. 正常終了し、経路の形式で明示的な verdict と findings が返っている
+
+経路ごとに次も満たす。
+
+- 上の `codex exec` 経路
+  - 起動側が `codex --version` と起動引数をログに残し、上の flag がすべて揃っていることを確かめている。`codex --disable hooks --disable plugins --disable apps features list` で3つが false であること、ログの JSONL に `mcp_tool_call` が無いこと、`turn.completed` で終わっていることも確かめる
+  - 同じ codex version と同じ flag で、対象 repo 内・repo 外（`/tmp`・`$HOME`）への shell 書込みと `apply_patch` が拒否され、`spawn_agent` で子 agent を起動できず、ファイルが作られないことを scratch の git repo で実測済みである。version か flag を変えたら測り直す
+  - verdict は最後の行の `VERDICT: APPROVE` か `VERDICT: REQUEST_CHANGES` で、blocking 指摘が1件でもあれば REQUEST_CHANGES とする
+- `agmsg-delegation` の review 経路: 同 skill の「7. 報告を受けて検証する」の review 受理条件（`review_mode: verdict` と起動前の強制境界の証拠を含む）をすべて満たし、verdict は同 skill の形式に従う。flag と実測の条件は同 skill の強制境界の証拠で置き換える
+
+条件が欠けた結果は advisory とし、出荷工程の通過根拠にしない。ファイル sandbox は外部サービスへの操作を制限しないため、prompt には外部への書込みをしないことも書く。
 
 ### self-review 禁止（approval gate）
 
@@ -151,7 +187,7 @@ Architect / Worker が作成した成果物の **approval gate は、作者と�
 
 対象の同一性（SHA / checksum の固定）と判断の独立性（作者と別の reviewer であること）は別々の要件であり、片方が満たされてももう片方の代わりにならない。SHA を固定しただけの self-review は approval gate を通過しない。
 
-Reviewer の起動経路（spawn / pane 常駐）と強制境界の詳細は `agmsg-delegation` が正本。
+Reviewer は組み込みの subagent（Claude は Agent tool、Codex は `spawn_agent`）で起動するのを既定にし、その結果は advisory として扱う。verdict が要るときは「verdict review の起動と受理」の `codex exec` を使う。pane 常駐の Reviewer や agmsg の helper を使うときは `agmsg-delegation` の経路を使い、その起動経路（spawn / pane 常駐）と強制境界の詳細は `agmsg-delegation` が正本。
 
 ## 2. 委譲するか決める
 
@@ -239,7 +275,7 @@ Worker の昇格 3 条件に当たるタスクは opencode へ出さず、既存
 
 長文脈タスク（大規模コードベースの読解、複数文書の統合、長い履歴の追跡）は effort 引き上げを飛ばして直接 `gpt-6.1-terra` へ上げる。terra セッション自身が長文脈タスクを受けた場合も、上の一般則どおり親 session では実装せず、別 identity・別 session の terra Worker を起動する。
 
-Claude では独立タスクを同一レスポンス内で複数呼び出すと並列に走る（1レスポンス1呼び出しは直列になる）。Codex では worker を複数 detached 起動する（触るファイル集合が互いに素であることが前提。guardrails は `agmsg-delegation` を参照）。どちらも Orchestrator の会話履歴は引き継がせず、Section 3 で書き出した 3 点だけを渡す。
+Claude では独立タスクを同一レスポンス内で複数呼び出すと並列に走る（1レスポンス1呼び出しは直列になる）。Codex では `spawn_agent` で worker を複数起動する。どちらも触るファイル集合が互いに素であることが前提。`agmsg-delegation` の別プロセス経路で worker を複数 detached 起動するときの guardrails は同 skill を参照する。どちらも Orchestrator の会話履歴は引き継がせず、Section 3 で書き出した 3 点だけを渡す。
 
 起動後の扱いは次のとおり。
 
@@ -275,6 +311,6 @@ Claude では独立タスクを同一レスポンス内で複数呼び出すと�
 
 - 実行前に Orchestrator 機能側が対象バージョン・手順・影響範囲を確認する
 - 結果の検証（公開されたことの確認）も Orchestrator 機能側が自分で行う
-- 依頼した範囲を、選ぶ実行経路の権限で実際に実行できること。委譲してよい（policy）と実行できる（runtime）は別で、書込先が worker の実効境界の外にあれば経路ごと成立しない。境界は role と base 設定が決めるため、モデルを替えれば通るとは限らない。起動前の照合手順は `agmsg-delegation` の Preflight が正本
+- 依頼した範囲を、選ぶ実行経路の権限で実際に実行できること。委譲してよい（policy）と実行できる（runtime）は別で、書込先が worker の実効境界の外にあれば経路ごと成立しない。境界は role と base 設定が決めるため、モデルを替えれば通るとは限らない。`agmsg-delegation` 経由で起動するときの照合手順は同 skill の Preflight が正本
 
-手順が未確立、または判断を伴う公開は自分で扱う。実効境界の外だと分かった場合は、既に権限を持つ経路か Orchestrator 自身へ戻す。指定されたモデルと異なる経路を採るときは §4 のとおり差し替えを明示する。この委譲許可は、`agmsg-delegation` の worktree 外書込禁止と「worker の commit / apply は自動化しない」を解除しない。
+手順が未確立、または判断を伴う公開は自分で扱う。実効境界の外だと分かった場合は、既に権限を持つ経路か Orchestrator 自身へ戻す。指定されたモデルと異なる経路を採るときは §4 のとおり差し替えを明示する。この委譲許可は、`agmsg-delegation` の worktree 外書込禁止と「worker の commit / apply は自動化しない」を解除しない。組み込み subagent 経路でも同じ扱いにする。
