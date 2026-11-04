@@ -88,6 +88,31 @@ It fails when the lockfile is malformed or when a `uses:` has no lockfile entry.
 
 `--verify-local` is a coverage check, not a provenance check. It does not notice a lockfile edit that moves a ref back to an older commit in its history. Reading the lockfile diff in review is what covers that.
 
+## Pitfalls Seen During Adoption
+
+Generating:
+
+- Read the whole generate output, not the summary. One unresolvable reference can make the run report every workflow as `Not pinned` and end with `Nothing was written`, while the actual error (for example `Pinned commit not in upstream history`) is printed in the middle. Find the first error line before changing anything.
+- `Pinned commit not in upstream history` means the SHA in `uses:` is no longer reachable from any ref of the action's repository, typically because upstream force-pushed the branch that held it. The lockfile cannot record it. Re-pin to a reachable commit, preferably a release tag, after comparing the code (`gh api repos/<owner>/<repo>/compare/<new>...<old>`), and state the old SHA, the new one, and the reason in the PR. Do not reach for `--accept-moved`; it is for a ref that moved, not for an orphaned commit.
+- Call the tool through the repo's task runner (`mise run actions-lock:generate`, or `mise x -- gh-actions-lock ...` for a one-off). A global mise shim run outside a directory that pins the tool fails with `No version is set`.
+- Run the generate task from the checkout whose workflows you are locking. A `git worktree` nested inside another mise-managed directory can also pick up that directory's tool config and install tools the repository does not pin; that is noise, not a lockfile problem.
+
+Repository tests and hooks:
+
+- Contract tests and lint scripts that assert exact SHAs in `uses:`, a SHA-only `uses:` format, or literal `./.github/actions/...` paths fail after the migration. Replace those assertions with lockfile coverage (`actions-lock:verify`) or with the `$/` form, and remove helpers or imports that only the deleted assertions used.
+- lefthook has no `--files` flag; to exercise a hook, stage the change and run `lefthook run pre-commit`. A freshly generated `actions.lock` is untracked, so globs and staged-file hooks skip it until it is added; `git add -N .github/workflows/actions.lock` marks it intent-to-add for a dry run.
+- Repository scripts that require `.git` to be a directory (for example a validator that checks "is this a git checkout") fail inside a `git worktree`, where `.git` is a file. Run those checks from a fresh clone of the pushed branch instead of weakening them for the migration.
+
+Updating actions:
+
+- Dependency updaters that rewrite `uses:` to commit SHAs with a version comment, such as pnpm's `update.githubActions` setting or a script around `pnpm update --include-github-actions`, undo the tag form and leave the lockfile stale. Before adoption, find them (`pnpm-workspace.yaml`, update scripts, scheduled workflows) and decide with the user whether to disable them for onboarded workflows or follow every run with the generate task. Read-only reports such as `pnpm outdated --include-github-actions` are fine.
+- Bumping to a new major can change an action's input defaults, not just its runtime. Read the release notes between the old and new tag, and set any input explicitly where the workflow relied on the old default (for example a setup action whose default language version moved, or a tool installer that started enforcing a minimum release age).
+- Old `uses:` that were moving tags such as `@v5` have no pinned SHA to compare against. Resolve what the tag points at now (`gh api repos/<owner>/<repo>/commits/<tag> --jq .sha`), compare that, and say in the PR that the old reference was a moving tag, so a matching commit does not read as "unchanged since it was pinned".
+
+CI wiring:
+
+- If the workflow that runs `actions-lock:verify` filters on `on.<event>.paths`, include `.github/workflows/**`, which covers `actions.lock` and any workflow added later. Listing only the existing workflow files lets a pull request that adds an unlocked workflow skip the check.
+
 ## Rules
 
 - Bump a `uses:` tag only to a release published at least 7 days earlier, the same cooldown idea as for other dependencies. Then run the generate task and review the diff.
