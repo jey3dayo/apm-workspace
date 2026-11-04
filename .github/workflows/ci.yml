@@ -3,8 +3,7 @@ name: CI
 on:
   push:
     paths:
-      - ".github/workflows/ci.yml"
-      - ".github/workflows/actions.lock"
+      - ".github/workflows/**"
       - "AGENTS.md"
       - "README.md"
       - "todo.txt"
@@ -26,8 +25,7 @@ on:
       - "catalog/**"
   pull_request:
     paths:
-      - ".github/workflows/ci.yml"
-      - ".github/workflows/actions.lock"
+      - ".github/workflows/**"
       - "AGENTS.md"
       - "README.md"
       - "todo.txt"

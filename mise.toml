@@ -15,6 +15,7 @@ node = "26"
 "aqua:BurntSushi/ripgrep" = "15.2.0"
 "aqua:bats-core/bats-core" = "1.14.0"
 fd = "10.5.0"
+# Release assets are bare platform names, so `bin` gives the binary a stable name.
 gh-actions-lock = { version = "0.4.0", bin = "gh-actions-lock" }
 "github:jdx/jactionlint" = "2.1.0"
 lefthook = "2.1.12"
@@ -26,7 +27,6 @@ taplo = "0.10.0"
 "npm:prettier" = "3.9.6"
 "npm:tsx" = "4.23.13"
 
-# Release assets are bare platform names, so `bin` gives the binary a stable name.
 [tool_alias]
 gh-actions-lock = "github:github/gh-actions-lock"
 
