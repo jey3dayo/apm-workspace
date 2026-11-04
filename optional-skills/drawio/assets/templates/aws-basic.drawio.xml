@@ -24,7 +24,7 @@
           <mxGeometry x="480" y="305" width="160" height="30" as="geometry"/>
         </mxCell>
         <mxCell id="label-metrics" value="Metrics/Logs" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontFamily=Helvetica;" parent="1" vertex="1">
-          <mxGeometry x="250" y="415" width="140" height="30" as="geometry"/>
+          <mxGeometry x="350" y="500" width="140" height="30" as="geometry"/>
         </mxCell>
         <mxCell id="label-title" value="AWS Basic Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontFamily=Helvetica;fontStyle=1;" parent="1" vertex="1">
           <mxGeometry x="270" y="50" width="300" height="40" as="geometry"/>
@@ -32,7 +32,7 @@
 
         <!-- Layer 3: VPC Container (Background Rectangle) -->
         <mxCell id="vpc" value="VPC (10.0.0.0/16)" style="rounded=1;whiteSpace=wrap;html=1;fontSize=18;fontFamily=Helvetica;dashed=1;dashPattern=8 8;strokeWidth=2;fillColor=none;align=left;verticalAlign=top;" parent="1" vertex="1">
-          <mxGeometry x="150" y="120" width="550" height="350" as="geometry"/>
+          <mxGeometry x="150" y="120" width="550" height="370" as="geometry"/>
         </mxCell>
 
         <!-- Layer 4: Subnet Containers -->
@@ -40,7 +40,7 @@
           <mxGeometry x="170" y="160" width="250" height="140" as="geometry"/>
         </mxCell>
         <mxCell id="subnet-private" value="Private Subnet (10.0.2.0/24)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fontFamily=Helvetica;dashed=1;strokeWidth=1;fillColor=none;align=left;verticalAlign=top;" parent="1" vertex="1">
-          <mxGeometry x="430" y="160" width="250" height="140" as="geometry"/>
+          <mxGeometry x="430" y="160" width="250" height="310" as="geometry"/>
         </mxCell>
 
         <!-- Layer 5: AWS Components (Shapes) -->
@@ -59,9 +59,9 @@
           <mxGeometry x="510" y="350" width="120" height="100" as="geometry"/>
         </mxCell>
 
-        <!-- CloudWatch (Outside VPC - Below Left) -->
+        <!-- CloudWatch (Outside VPC - Below) -->
         <mxCell id="cloudwatch" value="CloudWatch&#xa;Monitoring" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fontSize=18;fontFamily=Helvetica;fillColor=#F8CECC;strokeColor=#B85450;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="170" y="370" width="160" height="100" as="geometry"/>
+          <mxGeometry x="170" y="540" width="160" height="100" as="geometry"/>
         </mxCell>
       </root>
     </mxGraphModel>

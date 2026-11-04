@@ -69,9 +69,9 @@ Generate entity-relationship diagrams for data modeling.
 
 - **Always load:** `references/xml-structure.md` for XML format basics
 - **For font issues:** `references/font-config.md` for font troubleshooting
-- **For AWS diagrams:** Load AWS-specific patterns if needed
-- **For other types:** Load diagram-specific patterns if needed
-- **For complex layouts:** Load layout rules if needed
+- **For AWS diagrams:** Use `assets/templates/aws-basic.drawio.xml` as the pattern
+- **For other types:** Use the shape and style examples in `references/xml-structure.md`
+- **For complex layouts:** Follow Step 5 and "Layout Requirements" below
 
 #### Step 4: Generate XML
 
@@ -120,7 +120,7 @@ Generate entity-relationship diagrams for data modeling.
 - Minimum 20px spacing: arrows to labels
 - Japanese text: 30-40px per character
 - All coordinates: multiples of 10 (grid alignment)
-- Background: transparent (no fillColor)
+- Background: transparent (no `background` attribute on mxGraphModel; containers such as VPC/subnet use `fillColor=none`)
 - Page: `page="0"` (infinite canvas)
 
 #### Font Size
@@ -240,7 +240,8 @@ Load these as needed using progressive disclosure:
    - All x, y, width, height: multiples of 10
 
 8. **Use transparent background**
-   - No fillColor specification
+   - Do not set a diagram `background`; use `fillColor=none` for containers and text
+   - Service shapes may use fillColor to distinguish components
 
 9. **Set page="0"**
    - Infinite canvas, export only needed area
@@ -263,8 +264,8 @@ Load these as needed using progressive disclosure:
 5. **Don't use insufficient width for Japanese**
    - 30-40px per character required
 
-6. **Don't use fillColor**
-   - Keep background transparent
+6. **Don't set a diagram background color**
+   - Keep the canvas transparent; avoid filling containers that hold other shapes
 
 ## Common Issues & Solutions
 
