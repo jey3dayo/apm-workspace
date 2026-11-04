@@ -1,0 +1,4 @@
+interface:
+  display_name: "React Hooks Refactoring"
+  short_description: "Pick the right React hook, drop needless Effects, and pass the hooks lint gate"
+  default_prompt: "Use $react-hooks-refactoring to decide which React hooks this code needs, refactor existing hooks, remove unnecessary Effects, and confirm eslint-plugin-react-hooks recommended passes."
