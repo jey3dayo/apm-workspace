@@ -12,9 +12,11 @@ A lockfile freezes what runs; it does not decide whether an action is safe. Revi
 
 ## Which Pinning Style Applies
 
-- Workflow lockfile, preferred when available: `uses:` carries a full version tag such as `actions/checkout@v7.0.1`, the commit lives in `actions.lock`, and no version comment sits next to `uses:`.
-- Commit SHA in `uses:` with a version comment: keep this only where the lockfile cannot be used, for example GitHub Enterprise Server (not supported by the tool), or a repository that has not onboarded yet.
-- Do not run a SHA-pin checker (for example one that requires `uses: owner/repo@<40-hex>`) on workflows covered by the lockfile; it will reject the tag form. Replace it with the `--verify-local` check below.
+Decide per workflow and per reference type, not per repository:
+
+- Action references in an onboarded workflow (a workflow listed in `actions.lock`): prefer a full version tag such as `actions/checkout@v7.0.1`, with the commit in the lockfile and no version comment next to `uses:`. A commit SHA in `uses:` is still valid under a lockfile; keep it when no release tag points at that commit or when the repo deliberately keeps SHAs.
+- Commit SHA in `uses:` with a version comment: keep this where the lockfile does not reach. That covers workflows not onboarded yet, reusable workflows called from another repository (`jobs.<id>.uses: owner/repo/.github/workflows/x.yml@ref`, which the tool does not lock), and GitHub Enterprise Server, which the tool does not support.
+- A SHA-pin checker (one that requires `owner/repo@<40-hex>`) rejects the tag form, so scope it away from action references in onboarded workflows and let the `--verify-local` check below cover those. Keep it for everything in the previous bullet; dropping it repo-wide leaves those references unchecked.
 
 ## Install The Generator
 
@@ -47,7 +49,7 @@ description = "Offline check: every uses: has a lockfile entry and the lockfile 
 run = "gh-actions-lock --verify-local"
 ```
 
-- `--migrate-local-actions` rewrites same-repository `./` action references to `$/` so the actions they use can be locked (see below).
+- `--migrate-local-actions` rewrites every same-repository `./` action reference to `$/` so the actions they use can be locked. Check that this is safe first (see below).
 - `--no-interactive` keeps the run headless.
 - The trailing `--verify` asks GitHub whether every locked commit is reachable from its recorded ref. It needs network access and a GitHub login that can read every action repository the workflows reference, including private or internal ones.
 
@@ -55,17 +57,17 @@ Rerun the generate task after adding a workflow or changing any `uses:`.
 
 ## What The Workflows Look Like Afterwards
 
-- External actions: `uses: owner/repo@<sha>` becomes `uses: owner/repo@vX.Y.Z`. A partial tag such as `@v4` is narrowed to the full tag unless `--no-narrow` is passed. The commit moves into the lockfile.
+- External actions: a SHA ref that matches a release tag is typically rewritten to that full tag (`uses: owner/repo@vX.Y.Z`), and the commit moves into the lockfile. A SHA with no matching tag stays as written and is still locked. A newly pinned partial tag such as `@v4` is narrowed to the highest matching full semver tag unless `--no-narrow` is passed; branch names are never narrowed.
 - Same-repository composite actions: `uses: ./.github/actions/setup` becomes `uses: $/.github/actions/setup`, in workflows and inside the repository's own action files. A `$/` reference always runs at the workflow's own commit and takes no `@ref`. Without the migration, a local `./` action that uses remote actions is a blocking error, because `./` actions are never followed or locked. If the repository uses self-hosted runners, confirm their runner version supports `$/` inside composite actions before merging.
+- `./` and `$/` are not always the same code. `./` reads whatever sits in the job's workspace at that step, so it differs from the workflow's commit when a job checks out another ref or repository into the workspace path, or when an earlier step generates or edits the action. Before migrating, look for those jobs. Keep `./` for any reference that depends on that behavior: replace `--migrate-local-actions` with `--ignore-local-actions` in the generate task, rewrite the safe references to `$/` by hand, and accept that the remote actions used by the remaining `./` actions are not locked.
 - Same-repository reusable workflow calls (`jobs.<id>.uses: ./.github/workflows/x.yml`) can stay `./`; the called workflow is locked as its own workflow.
 - Version comments such as `# actions/checkout v7.0.1` above or after `uses:` become redundant: the tag and the lockfile carry the version. Delete them in the same change; the generator does not.
-- The generator may add a header comment marking the workflow as managed by `gh actions-lock`.
 
 Before merging the migration, compare each lockfile `commit` with the SHA the old `uses:` pinned at the same reference. If they match, the code that runs has not changed.
 
 ## CI Check
 
-Add a lightweight job (or a step in an existing lockfile/config sync job) that installs the tool and runs the verify task:
+Add these steps to a job that already checks out the repository and sets up mise (an existing lockfile or config sync job fits; mise itself can be set up without installing every tool). A new job needs its own checkout and mise setup steps first.
 
 ```yaml
 - name: Install gh-actions-lock
@@ -77,7 +79,7 @@ Add a lightweight job (or a step in an existing lockfile/config sync job) that i
   run: mise run actions-lock:verify
 ```
 
-It fails when the lockfile is malformed or when a `uses:` has no lockfile entry. Keep this check even though GitHub enforces the lockfile at runtime: GitHub currently ignores a malformed lockfile instead of failing the run ([gh-actions-lock#125](https://github.com/github/gh-actions-lock/issues/125), open as of 2026-11), so CI is the only place that stops one from landing. `--verify-local` is offline and fast, so it also fits a staged `pre-commit` job on `.github/**` per the gate split in `SKILL.md`.
+It fails when the lockfile is malformed or when a `uses:` has no lockfile entry. Keep this check even though GitHub enforces the lockfile at runtime: GitHub currently ignores a malformed lockfile instead of failing the run ([gh-actions-lock#125](https://github.com/github/gh-actions-lock/issues/125), open as of 2026-11), so CI is the only place that stops one from landing. `--verify-local` is offline and fast, so it also fits a `pre-commit` job on `.github/**` per the gate split in `SKILL.md`. It reads the working tree, not the staged snapshot, so with a partially staged change it can pass on content that is not being committed; CI stays the authoritative check.
 
 ### `--verify-local` vs `--verify` in CI
 
