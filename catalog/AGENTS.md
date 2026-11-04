@@ -75,7 +75,7 @@ permission や PreToolUse hook のポリシーで拒否されたコマンドは�
 ### 推奨ワークフロー（経路の選択）
 
 - 役割分担: `orchestrator-worker` は委譲判定・タスク分割・**Reviewer と Worker の model 選定**（review 外注先の既定を含む）の正本
-- 委譲は組み込みサブエージェント（Claude の Agent tool / Codex の `spawn_agent`）を既定にする。選んだ model や必要な強制境界を組み込みで満たせないとき、または別プロセス・別セッションが要るとき（セッション間の引き継ぎを含む）だけ `agmsg-delegation` を使う。transport の選び方・envelope・引き継ぎ書式・roster の復旧・常駐プールの手順は同スキルが正本で、ここには写さない verdict review の既定は `orchestrator-worker`「Reviewer の tier」の `codex exec -s read-only` で、`agmsg-delegation` は pane 常駐・helper を使うときの任意経路。
+- 委譲は組み込みサブエージェント（Claude の Agent tool / Codex の `spawn_agent`）を既定にする。選んだ model や必要な強制境界を組み込みで満たせないとき、または別プロセス・別セッションが要るとき（セッション間の引き継ぎを含む）だけ `agmsg-delegation` を使う。transport の選び方・envelope・引き継ぎ書式・roster の復旧・常駐プールの手順は同スキルが正本で、ここには写さない。verdict review の既定は `orchestrator-worker`「Reviewer の tier」の `codex exec -s read-only` で、`agmsg-delegation` は pane 常駐・helper を使うときの任意経路。
 - 実行時に read-only を強制できていない経路の reviewer を verdict へ格上げしない
 - Worker のモデル名をユーザーが指定したら（例:「luna で」）、それが platform を跨ぐ明示指示にあたる。既定は同一 platform 内で完結させる
 - pane / workspace を勝手に作らない。ユーザーが「用意して」と指示したときだけ作り、作った実体を読み戻してから報告する。手順は `herdr` スキルが正本（具体コマンドをここに写さない）
