@@ -65,6 +65,8 @@ Rerun the generate task after adding a workflow or changing any `uses:`.
 
 Before merging the migration, compare each lockfile `commit` for a direct external action with the SHA the old `uses:` pinned at the same reference. A match shows those direct actions run the same code. It says nothing about references migrated from `./` to `$/` or about transitive actions that were not pinned before; review those separately.
 
+When the old `uses:` were moving tags such as `@v5`, there is no pinned SHA to compare against. Resolve what the tag points at now (`gh api repos/<owner>/<repo>/commits/<tag> --jq .sha`), compare that, and say in the PR that the old reference was a moving tag, so a matching commit does not read as "unchanged since it was pinned".
+
 ## CI Check
 
 Add these steps to a job that already checks out the repository and sets up mise (an existing lockfile or config sync job fits; mise itself can be set up without installing every tool). A new job needs its own checkout and mise setup steps first.
@@ -87,6 +89,30 @@ It fails when the lockfile is malformed or when a `uses:` has no lockfile entry.
 - Use `--verify-local` in CI when the workflows use private or internal actions from another repository or organization. The job's `GITHUB_TOKEN` is scoped to the current repository, so `--verify` cannot read those action repositories and fails. Provisioning a broader token as a secret only for this check usually costs more than it adds, because the generate task already ran `--verify` with a developer login and the runner checks provenance again at job start.
 
 `--verify-local` is a coverage check, not a provenance check. It does not notice a lockfile edit that moves a ref back to an older commit in its history. Reading the lockfile diff in review is what covers that.
+
+## Pitfalls Seen During Adoption
+
+Generating:
+
+- Read the whole generate output, not the summary. One unresolvable reference can make the run report every workflow as `Not pinned` and end with `Nothing was written`, while the actual error (for example `Pinned commit not in upstream history`) is printed in the middle. Find the first error line before changing anything.
+- `Pinned commit not in upstream history` means a commit the tool must record (the SHA in `uses:`, or the commit already locked for a ref) is no longer reachable from any ref of the action's repository. The tool reports it as a possible upstream history rewrite or lockfile forgery, so first check who introduced that SHA and when (`git log -S <sha> -- .github/`). If the orphaned commit is pinned inside a third-party action's own `action.yml` (a transitive dependency), you cannot re-pin it; update the direct action to a release that pins a current upstream ref. Otherwise re-pin explicitly to a reachable commit, preferably a release tag that also passes the 7-day rule below, after reviewing the code: `gh api repos/<owner>/<repo>/compare/<old>...<new>` lists what the new commit adds, and `compare/<new>...<old>` what only the old one had; check both when the histories diverged. The compare API returns at most 250 commits and 300 files per response; for larger ranges page through it or compare in a local clone, so a truncated result is not mistaken for the full diff. If the orphaned commit can no longer be fetched, compare against the release or tag it was taken from, and say in the PR that this is a proxy, not a diff against the old code. State the old SHA, the new one, and the reason in the PR. Do not use `--accept-moved` for this: it re-resolves moved refs and unreachable pins to whatever SHA is live now, with no comparison, which skips the review this step exists for. `--relock` leaves unreachable pins as errors.
+- Call the tool through the repo's task runner (`mise run actions-lock:generate`, or `mise x -- gh-actions-lock ...` for a one-off). A global mise shim run outside a directory that pins the tool fails with `No version is set`.
+- Run the generate task from the checkout whose workflows you are locking. A `git worktree` nested inside another mise-managed directory can also pick up that directory's tool config and install tools the repository does not pin; that is noise, not a lockfile problem.
+
+Repository tests and hooks:
+
+- Contract tests and lint scripts that assert exact SHAs in `uses:`, a SHA-only `uses:` format, or literal `./.github/actions/...` paths fail after the migration. Change only the assertions about pin format: for onboarded workflows, assert lockfile coverage (`actions-lock:verify`) or the `$/` form instead. Keep the assertions about behavior (which actions or steps a workflow must run) and keep the SHA-only check for references the lockfile does not cover, as scoped in "Which Pinning Style Applies". Remove helpers or imports that only the deleted assertions used.
+- lefthook has no `--files` flag. To run a hook against specific files, use `lefthook run pre-commit --file .github/workflows/actions.lock` (repeatable) or `--all-files`. A freshly generated `actions.lock` is untracked, so hooks that match globs against git's file lists skip it: `git add -N` puts it in `git ls-files`, but hooks that read `{staged_files}` only see it after a real `git add`.
+- Repository scripts that require `.git` to be a directory (for example a validator that checks "is this a git checkout") fail inside a `git worktree`, where `.git` is a file. Run those checks from a fresh clone of the pushed branch instead of weakening them for the migration.
+
+Updating actions:
+
+- Dependency updaters that rewrite `uses:` to commit SHAs with a version comment, such as pnpm's `update.githubActions` setting or a script around `pnpm update --include-github-actions`, undo the tag form and leave the lockfile stale. Before adoption, find them (`pnpm-workspace.yaml`, update scripts, scheduled workflows) and decide with the user whether to disable them for onboarded workflows or follow every run with the generate task. Read-only reports such as `pnpm outdated --include-github-actions` are fine.
+- Bumping to a new major can change an action's input defaults, not just its runtime. Read the release notes between the old and new tag, and set any input explicitly where the workflow relied on the old default (for example a setup action whose default language version moved, or a tool installer that started enforcing a minimum release age).
+
+CI wiring:
+
+- If the workflow that runs `actions-lock:verify` filters on `on.<event>.paths`, include `.github/workflows/**`, which covers `actions.lock` and any workflow added later, plus every directory that holds the repository's own local actions (commonly `.github/actions/**`), because those are locked too. A `paths-ignore` filter needs the same check in reverse. Listing only the existing workflow files lets a pull request that adds an unlocked workflow skip the check.
 
 ## Rules
 
