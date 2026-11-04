@@ -1,0 +1,4 @@
+interface:
+  display_name: "Draw.io Diagrams"
+  short_description: "draw.io XML diagrams with font and layout rules"
+  default_prompt: "Use $drawio to create a draw.io diagram with explicit fontFamily and clean layout."

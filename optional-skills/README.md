@@ -27,6 +27,12 @@ For scheduled audit prompt operations in repositories with `docs/prompts/config.
 apm install jey3dayo/apm-workspace/optional-skills/scheduled-audit-ops#main
 ```
 
+For draw.io diagram authoring (AWS architecture, flowcharts, sequence, ER), use:
+
+```bash
+apm install jey3dayo/apm-workspace/optional-skills/drawio#main
+```
+
 External bundles that contain optional sub-skills should remain external
 dependencies. For example, install `banner-design` in a repository that needs
 it with:

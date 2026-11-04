@@ -254,6 +254,14 @@
 - 再導入: 利用リポジトリで
   `jey3dayo/apm-workspace/optional-skills/slack-app-management#main` を追加する。
 
+### drawio
+
+- Status: 個別プロジェクト向けに追加（2026-11-04）
+- 正本: `optional-skills/drawio/`
+- 理由: draw.io 図を扱うリポジトリに限定され、global rollout に含める必要がないため。
+- 導入: 利用リポジトリで
+  `jey3dayo/apm-workspace/optional-skills/drawio#main` を追加する。
+
 ### premortem
 
 - Status: 個別プロジェクト向けへ移管（2026-07-21）
