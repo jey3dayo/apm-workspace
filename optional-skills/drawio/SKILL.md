@@ -169,7 +169,7 @@ Use this template for every diagram creation:
 
 Ready-to-use diagram templates with all best practices applied:
 
-- `aws-basic.drawio.xml` - VPC, ALB, ECS, RDS, CloudWatch
+- `aws-basic.drawio.xml` - VPC, ALB, ECS, RDS, CloudWatch (simplified single-AZ layout; for production diagrams, draw subnets in at least two AZs since ALB and Aurora require them)
 
 The template includes:
 

@@ -602,31 +602,31 @@ XMLの記述順序 = レンダリング順序 (z-index):
 
 **Fixed:** fontSize=18 (1.5倍) → 読みやすさ向上、height も調整
 
-### Example 6: Background Color
+### Example 6: Background / Container Fill
 
 ❌ **Before (Bad):**
 
 ```xml
-<mxCell id="shape1" value="Box"
+<mxCell id="vpc" value="VPC"
         style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontSize=18;fontFamily=Helvetica;"
         parent="1" vertex="1">
-  <mxGeometry x="100" y="100" width="120" height="60" as="geometry"/>
+  <mxGeometry x="100" y="100" width="400" height="300" as="geometry"/>
 </mxCell>
 ```
 
-**Problem:** fillColor=#FFFFFF → 背景色が固定される、透明度なし
+**Problem:** コンテナ（VPC / subnet など）に白い fillColor → 背景が固定され、中の図形や矢印を隠す。fillColor を削除するだけではデフォルトスタイルの塗りが継承されることがある。
 
 ✅ **After (Good):**
 
 ```xml
-<mxCell id="shape1" value="Box"
-        style="rounded=1;whiteSpace=wrap;html=1;fontSize=18;fontFamily=Helvetica;"
+<mxCell id="vpc" value="VPC"
+        style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;fontSize=18;fontFamily=Helvetica;"
         parent="1" vertex="1">
-  <mxGeometry x="100" y="100" width="120" height="60" as="geometry"/>
+  <mxGeometry x="100" y="100" width="400" height="300" as="geometry"/>
 </mxCell>
 ```
 
-**Fixed:** fillColor を削除 → 透明背景、柔軟性向上
+**Fixed:** コンテナとテキストは `fillColor=none` を明示。キャンバス背景は mxGraphModel に `background` を設定しないことで透明にする。サービス図形の識別用の塗りは使ってよい。
 
 ### Example 7: Grid Misalignment
 
