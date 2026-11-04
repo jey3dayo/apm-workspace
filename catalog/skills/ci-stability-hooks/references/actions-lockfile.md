@@ -83,7 +83,7 @@ It fails when the lockfile is malformed or when a `uses:` has no lockfile entry.
 
 ### `--verify-local` vs `--verify` in CI
 
-- Use `--verify` in CI when every locked action is public or readable with the job's `GITHUB_TOKEN`. It re-checks provenance online and is the stronger check; GitHub's own template does this.
+- Use `--verify` in CI when every locked action is public or readable with the job's `GITHUB_TOKEN`. It re-checks provenance online and is the stronger check; GitHub's own template does this. Give that step `GH_TOKEN: ${{ github.token }}`; on GitHub Enterprise Cloud with data residency, lookups of github.com actions also need `GH_ACTIONS_LOCK_GITHUB_COM_TOKEN` (see the tool's README).
 - Use `--verify-local` in CI when the workflows use private or internal actions from another repository or organization. The job's `GITHUB_TOKEN` is scoped to the current repository, so `--verify` cannot read those action repositories and fails. Provisioning a broader token as a secret only for this check usually costs more than it adds, because the generate task already ran `--verify` with a developer login and the runner checks provenance again at job start.
 
 `--verify-local` is a coverage check, not a provenance check. It does not notice a lockfile edit that moves a ref back to an older commit in its history. Reading the lockfile diff in review is what covers that.
