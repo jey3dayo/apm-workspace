@@ -163,13 +163,21 @@ codex exec --ephemeral --ignore-user-config --ignore-rules \
 - `--ignore-rules`: sandbox 外の実行を許す execpolicy の `.rules` を読まない
 - `--ephemeral`: セッションを残さない。0.166.0 ではこの状態だと `spawn_agent` が失敗し、子 agent を起動できない（`--disable multi_agent` は feature を false にしても tool 一覧から消えないため使わない）。ログと prompt は対象 repo の外に置く
 
-verdict は次の条件をすべて満たした場合だけ受理する。
+prompt には、固定したレビュー対象（適用元 `HEAD` の SHA と diff ファイルの絶対パス・checksum）を書き、その diff ファイルだけをレビュー対象にすること、報告の冒頭に読んだ diff ファイルの checksum と `HEAD` の SHA を書くことを指示する。diff ファイルとログは対象 repo の外に置く。
+
+verdict は、経路によらず次の共通条件をすべて満たした場合だけ受理する。
 
 1. 作者と別 identity・新規 session・別 context で起動している。作者が Codex でもよい
-2. 起動側が `codex --version` と起動引数をログに残し、上の flag がすべて揃っていることを確かめている。`codex --disable hooks --disable plugins --disable apps features list` で3つが false であること、ログの JSONL に `mcp_tool_call` が無いことも確かめる
-3. 同じ codex version と同じ flag で、対象 repo 内・repo 外（`/tmp`・`$HOME`）への shell 書込みと `apply_patch` が拒否され、`spawn_agent` で子 agent を起動できず、ファイルが作られないことを scratch の git repo で実測済みである。version か flag を変えたら測り直す
-4. 固定した SHA と diff checksum が報告対象と一致する。終了後は実ツリーからレビュー対象 diff を再生成して checksum を照合し、`git status --short` と `git ls-files --others --exclude-standard` も開始時と一致する。レビュー対象に未追跡ファイルが含まれる場合は、その内容も固定・照合する
-5. 正常終了（exit 0、`turn.completed`）し、明示的な verdict（APPROVE / REQUEST_CHANGES）と findings が返っている
+2. 固定した SHA と diff checksum が、prompt に書いた値・reviewer が報告冒頭に書いた値の両方と一致する。終了後は実ツリーからレビュー対象 diff を再生成して checksum を照合し、`git status --short` と `git ls-files --others --exclude-standard` も開始時と一致する。レビュー対象に未追跡ファイルが含まれる場合は、その内容も固定・照合する
+3. 正常終了し、経路の形式で明示的な verdict と findings が返っている
+
+経路ごとに次も満たす。
+
+- 上の `codex exec` 経路
+  - 起動側が `codex --version` と起動引数をログに残し、上の flag がすべて揃っていることを確かめている。`codex --disable hooks --disable plugins --disable apps features list` で3つが false であること、ログの JSONL に `mcp_tool_call` が無いこと、`turn.completed` で終わっていることも確かめる
+  - 同じ codex version と同じ flag で、対象 repo 内・repo 外（`/tmp`・`$HOME`）への shell 書込みと `apply_patch` が拒否され、`spawn_agent` で子 agent を起動できず、ファイルが作られないことを scratch の git repo で実測済みである。version か flag を変えたら測り直す
+  - verdict は最後の行の `VERDICT: APPROVE` か `VERDICT: REQUEST_CHANGES` で、blocking 指摘が1件でもあれば REQUEST_CHANGES とする
+- `agmsg-delegation` の review 経路: 同 skill の「7. 報告を受けて検証する」の review 受理条件（`review_mode: verdict` と起動前の強制境界の証拠を含む）をすべて満たし、verdict は同 skill の形式に従う。flag と実測の条件は同 skill の強制境界の証拠で置き換える
 
 条件が欠けた結果は advisory とし、出荷工程の通過根拠にしない。ファイル sandbox は外部サービスへの操作を制限しないため、prompt には外部への書込みをしないことも書く。
 
