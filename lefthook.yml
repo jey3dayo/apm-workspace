@@ -50,6 +50,12 @@ pre-commit:
       glob: ".github/workflows/*.{yml,yaml}"
       run: mise exec -- jactionlint {staged_files}
 
+    # Offline: every uses: has an actions.lock entry. It reads the working tree,
+    # so CI stays the authoritative check.
+    - name: actions-lock
+      glob: ".github/**"
+      run: mise run actions-lock:verify
+
     - name: shell-syntax
       glob: "scripts/*.sh"
       run: bash -n {staged_files}

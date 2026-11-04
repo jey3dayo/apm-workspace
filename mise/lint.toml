@@ -10,6 +10,19 @@ description = "Lint GitHub Actions workflows with jactionlint"
 hide = true
 run = "jactionlint"
 
+# Never edit .github/workflows/actions.lock by hand; regenerate it through this task.
+["actions-lock:generate"]
+description = "Regenerate .github/workflows/actions.lock and verify it upstream (needs a gh login)"
+run = [
+  "gh-actions-lock --migrate-local-actions --no-interactive",
+  "gh-actions-lock --verify",
+]
+
+["actions-lock:verify"]
+description = "Offline check: every uses: has an actions.lock entry and the lockfile parses"
+hide = true
+run = "gh-actions-lock --verify-local"
+
 ["lint:frontmatter"]
 description = "Validate YAML frontmatter in the managed catalog (agents/skills/commands/rules)"
 hide = true
