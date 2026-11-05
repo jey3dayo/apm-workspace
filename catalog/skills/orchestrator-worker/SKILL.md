@@ -224,7 +224,7 @@ Reviewer は組み込みの subagent（Claude は Agent tool、Codex は `spawn_
 
 assert が業務契約なのか実装詳細なのかは Orchestrator が判断する。テストを機械的に新実装へ合わせさせない。
 
-「検証コマンド」は、そのタスク単体で通す focused gate と、Orchestrator が横断で回す統合 gate を区別して渡す。隔離 worktree の Worker は guard に `pwsh` を拒否され、worktree には gitignore 済みの `private-skills` なども無い。ps1 の検証と実ツリーでの配布確認は統合 gate に入れ、Orchestrator が主ツリーで回す。
+「検証コマンド」は、そのタスク単体で通す focused gate と、Orchestrator が横断で回す統合 gate を区別して渡す。隔離 worktree の Worker は guard に `pwsh` を拒否され、worktree には gitignore 済みの `private-skills` なども無い。ps1 の検証と実ツリーでの配布確認は統合 gate に入れ、Orchestrator が主ツリーで回す。検証コマンドは、先に repo の `mise` task と CI の定義から実コマンドを確認して写す。独自のフラグを足すときは理由を書き、その失敗は repo の gate との差として扱う。worktree の Worker には、検証コマンドごとに実 cwd（`git rev-parse --show-toplevel`）が指定した worktree だと分かる出力を報告へ含めさせる。
 
 回帰修正で修正前の失敗を証明する場合は、共有 checkout を切り替えずに[固定SHA fixtureを隔離](references/regression-fixtures.md)する。
 
@@ -293,6 +293,7 @@ Claude では独立タスクを同一レスポンス内で複数呼び出すと�
 
 - `git status --short` と `git diff` を自分の目で読み、実際の差分を確認する
 - untracked ファイルは `git ls-files --others --exclude-standard` で列挙し、各ファイルの内容も検証する（Worker が新規追加したファイルは diff に出ないため）
+- worktree の Worker を受け取るときは、主 checkout の `git status --short` も実装前後で比べる（書込み先の取り違えは worktree 側の diff に出ない）
 - タスク定義に無い変更が入っていないか確認する
 - タスク横断で衝突がないか確認し、全体の test / typecheck を通す
 - DoD の該当項目を満たす
