@@ -186,6 +186,42 @@ run_apply() {
   [ -f "$FIXTURE_HOME/.claude/skills/sample-skill/SKILL.md" ]
 }
 
+@test "bash apply: does not sweep a current private skill from either target as unmanaged" {
+  # A private skill is deployed after the stage swap, so the stale sweep must
+  # not delete it first: a failed apply would leave it gone, and a live agent
+  # would see it missing mid-apply.
+  build_own_fixture
+
+  mkdir -p "$FIXTURE_HOME/.agents/skills/sample-private-skill"
+  printf '# deployed private skill\n' >"$FIXTURE_HOME/.agents/skills/sample-private-skill/SKILL.md"
+  ln -s "$FIXTURE_PRIVATE_SKILL_DIR" "$FIXTURE_HOME/.claude/skills/sample-private-skill"
+
+  run run_apply
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"removed unmanaged skills entry: claude/sample-private-skill"* ]]
+  [[ "$output" != *"removed unmanaged skills entry: codex/sample-private-skill"* ]]
+
+  [ -f "$FIXTURE_HOME/.agents/skills/sample-private-skill/SKILL.md" ]
+  [ -L "$FIXTURE_HOME/.claude/skills/sample-private-skill" ]
+}
+
+@test "bash apply: still sweeps a previously deployed private skill whose source was removed" {
+  build_own_fixture
+
+  mkdir -p "$FIXTURE_HOME/.agents/skills/removed-private-skill"
+  printf '# removed\n' >"$FIXTURE_HOME/.agents/skills/removed-private-skill/SKILL.md"
+  ln -s "$FIXTURE_WORKSPACE_DIR/private-skills/.apm/skills/removed-private-skill" "$FIXTURE_HOME/.claude/skills/removed-private-skill"
+
+  run run_apply
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"removed unmanaged skills entry: codex/removed-private-skill"* ]]
+  [[ "$output" == *"removed unmanaged skills entry: claude/removed-private-skill"* ]]
+
+  [ ! -e "$FIXTURE_HOME/.agents/skills/removed-private-skill" ]
+  [ ! -e "$FIXTURE_HOME/.claude/skills/removed-private-skill" ]
+  [ ! -L "$FIXTURE_HOME/.claude/skills/removed-private-skill" ]
+}
+
 @test "bash apply: leaves no swap staging/backup directories under the skills root" {
   # Also seed a stale .apm-skills-backup.* left over from a hypothetical
   # crashed prior run (swap_staged_tree_into_place only cleans its own

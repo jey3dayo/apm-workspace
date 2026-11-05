@@ -1056,9 +1056,9 @@ private_skill_records() {
 
 # full apply's build_target_skill_trees/replace_skill_targets_from_stage path
 # stages only managed catalog skills, so private skills (private-skills/.apm/skills)
-# need to be re-synced into both targets afterward using the same records/helpers
-# cmd_sync_local_skills uses, or a plain `apm apply` would delete their existing
-# Codex copies and Claude symlinks.
+# are not in the stage. The stale sweep spares the current ones
+# (current_private_skill_entries); this re-syncs them into both targets
+# afterward using the same records/helpers cmd_sync_local_skills uses.
 sync_private_skills_into_targets() {
   skill_records=$(private_skill_records)
   if [ -z "$(printf '%s' "$skill_records" | tr -d '[:space:]')" ]; then
@@ -2253,6 +2253,21 @@ preserved_skills_root_entries() {
   done <"$entries_file"
 }
 
+# Private skills are deployed after the stage swap, so the stale sweep must
+# spare the current ones: deleting them first leaves them missing if apply
+# fails, and a live agent sees them gone meanwhile. Skills removed from the
+# private source are not listed and are still swept.
+current_private_skill_entries() {
+  case "$1" in
+    claude | codex) ;;
+    *) return 0 ;;
+  esac
+  private_skill_ids | while IFS= read -r skill_id; do
+    [ -n "$skill_id" ] || continue
+    format_skill_name "$skill_id"
+  done
+}
+
 # Reconciling per top-level child keeps the skills root present at all times:
 # a whole-root swap made the root vanish for the two renames, and a live agent
 # polling it mid-command broke. Each child still gets the swap, and stale
@@ -2264,7 +2279,10 @@ reconcile_skills_root_from_stage() {
   reconcile_target_name="${3:-}"
   preserved_entries=""
   if [ -n "$reconcile_target_name" ]; then
-    preserved_entries=$(preserved_skills_root_entries "$reconcile_target_name")
+    preserved_entries=$(
+      preserved_skills_root_entries "$reconcile_target_name"
+      current_private_skill_entries "$reconcile_target_name"
+    )
   fi
 
   mkdir -p "$target_skills_root"

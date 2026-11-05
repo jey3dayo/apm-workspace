@@ -2759,10 +2759,9 @@ function Get-PrivateSkillRecords {
 
 # full apply's Build-TargetSkillTrees/Replace-SkillTargetsFromStage path stages
 # only managed catalog skills, so private skills (private-skills/.apm/skills)
-# need to be re-synced into both targets afterward, mirroring bash's
-# sync_private_skills_into_targets (apm-workspace.sh:1011-1027) -- otherwise a
-# plain `apm apply` would delete their existing Codex copies and Claude
-# symlinks.
+# are not in the stage. The stale sweep spares the current ones
+# (Get-CurrentPrivateSkillEntries); this re-syncs them into both targets
+# afterward, mirroring bash's sync_private_skills_into_targets.
 function Sync-PrivateSkillsIntoTargets {
   $skillRecords = @(Get-PrivateSkillRecords)
   if ($skillRecords.Count -eq 0) {
@@ -3219,6 +3218,21 @@ function Get-PreservedSkillsRootEntries {
   return $entries.ToArray()
 }
 
+# Mirrors current_private_skill_entries in apm-workspace.sh: private skills are
+# deployed after the stage swap, so the stale sweep spares the current ones.
+# Skills removed from the private source are not listed and are still swept.
+function Get-CurrentPrivateSkillEntries {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$TargetName
+  )
+
+  if ($TargetName -cne "claude" -and $TargetName -cne "codex") {
+    return @()
+  }
+  return @(Get-PrivateSkillIds | ForEach-Object { Format-SkillName -Target $TargetName -SourceSkillId $_ })
+}
+
 function Reconcile-SkillsRootFromStage {
   param(
     [Parameter(Mandatory = $true)]
@@ -3252,7 +3266,7 @@ function Reconcile-SkillsRootFromStage {
     $stagedChildren = @(Get-ChildItem -LiteralPath $StagedSkillsRoot -Force -Directory)
   }
   $stagedNames = [System.Collections.Generic.HashSet[string]]::new([string[]]@($stagedChildren | ForEach-Object Name), [System.StringComparer]::Ordinal)
-  $preservedNames = [System.Collections.Generic.HashSet[string]]::new([string[]]@(if ($TargetName) { Get-PreservedSkillsRootEntries -TargetName $TargetName }), [System.StringComparer]::Ordinal)
+  $preservedNames = [System.Collections.Generic.HashSet[string]]::new([string[]]@(if ($TargetName) { Get-PreservedSkillsRootEntries -TargetName $TargetName; Get-CurrentPrivateSkillEntries -TargetName $TargetName }), [System.StringComparer]::Ordinal)
 
   foreach ($stagedChild in $stagedChildren) {
     $destinationChild = Join-Path $TargetSkillsRoot $stagedChild.Name

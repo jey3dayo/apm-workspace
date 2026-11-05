@@ -158,6 +158,43 @@ Describe "apm-workspace.ps1 apply conformance" {
     Join-Path $claudeSkillsRoot "sample-skill/SKILL.md" | Should -Exist
   }
 
+  # Mirrors the bash apply-conformance case: a private skill is deployed after
+  # the stage swap, so the stale sweep must not delete a current one first.
+  It "does not sweep a current private skill from either target as unmanaged" {
+    $homeDir = $script:fixture["HOME"]
+    $codexSkillDir = Join-Path $homeDir ".agents/skills/sample-private-skill"
+    New-Item -ItemType Directory -Path $codexSkillDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $codexSkillDir "SKILL.md") -Value "# deployed private skill"
+    $claudeLinkPath = Join-Path $homeDir ".claude/skills/sample-private-skill"
+    New-Item -ItemType SymbolicLink -Path $claudeLinkPath -Target $script:fixture["PRIVATE_SKILL_DIR"] | Out-Null
+
+    $applyOutput = & $script:consoleShell -NoProfile -ExecutionPolicy Bypass -File $script:scriptPath apply 2>&1 | Out-String
+    $LASTEXITCODE | Should -Be 0
+    $applyOutput | Should -Not -Match ([regex]::Escape("removed unmanaged skills entry: claude/sample-private-skill"))
+    $applyOutput | Should -Not -Match ([regex]::Escape("removed unmanaged skills entry: codex/sample-private-skill"))
+
+    Join-Path $codexSkillDir "SKILL.md" | Should -Exist
+    (Get-Item -LiteralPath $claudeLinkPath).LinkType | Should -Be "SymbolicLink"
+  }
+
+  It "still sweeps a previously deployed private skill whose source was removed" {
+    $homeDir = $script:fixture["HOME"]
+    $codexSkillDir = Join-Path $homeDir ".agents/skills/removed-private-skill"
+    New-Item -ItemType Directory -Path $codexSkillDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $codexSkillDir "SKILL.md") -Value "# removed"
+    $claudeLinkPath = Join-Path $homeDir ".claude/skills/removed-private-skill"
+    $removedSource = Join-Path $script:fixture["WORKSPACE_DIR"] "private-skills/.apm/skills/removed-private-skill"
+    New-Item -ItemType SymbolicLink -Path $claudeLinkPath -Target $removedSource | Out-Null
+
+    $applyOutput = & $script:consoleShell -NoProfile -ExecutionPolicy Bypass -File $script:scriptPath apply 2>&1 | Out-String
+    $LASTEXITCODE | Should -Be 0
+    $applyOutput | Should -Match ([regex]::Escape("removed unmanaged skills entry: codex/removed-private-skill"))
+    $applyOutput | Should -Match ([regex]::Escape("removed unmanaged skills entry: claude/removed-private-skill"))
+
+    $codexSkillDir | Should -Not -Exist
+    Get-Item -LiteralPath $claudeLinkPath -Force -ErrorAction SilentlyContinue | Should -BeNullOrEmpty
+  }
+
   # Also seeds a `.apm-skills-backup-*` dir as if a previous apply run had
   # crashed mid-swap and left its backup behind: Reconcile-SkillsRootFromStage
   # must still sweep it, not just avoid creating new ones of its own. The old
