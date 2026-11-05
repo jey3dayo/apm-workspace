@@ -127,13 +127,15 @@ git wt -d work-in-progress
 
 ##### Option 2: Stash changes
 
+stash は repo 共通で、`git wt -d` はブランチも削除する。`git stash pop` した変更は元のブランチではなく、そのとき居る checkout に入る。元のブランチへ戻したいときは Option 1 を使う。
+
 ```bash
 cd .worktrees/work-in-progress
 git stash push -m "WIP changes"
 cd /path/to/repo
 git wt -d work-in-progress
 
-# Later, restore stash
+# Later, restore stash in the checkout that should receive the changes
 git stash pop
 ```
 
