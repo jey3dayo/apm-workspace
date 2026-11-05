@@ -289,8 +289,12 @@ For each validated local branch row:
    name exactly once.
 
 4. For every related worktree, exclude the candidate if it is the main or
-   current worktree, has a `locked` or `prunable` marker, or has any tracked or
-   untracked change. Require every related worktree to be clean and safe before
+   current worktree, has a `locked` or `prunable` marker, has any tracked or
+   untracked change, or has a process using its path (`lsof +D <path>` lists a
+   working directory or open file under it; a failed query is `SKIP_UNSAFE`).
+   `lsof` may not see a process inside a container's bind mount, so ask the
+   user before removing a worktree that runs a dev stack such as `tilt` or
+   `docker compose`. Require every related worktree to be clean and safe before
    proposing that candidate; never select only the safe subset of an unsafe
    branch's worktrees.
 

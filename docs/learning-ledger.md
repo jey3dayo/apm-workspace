@@ -24,3 +24,4 @@
 | 2026-11-06 | セッションログの数え方（`server_tool_use` など）を `references/` に足し、報告にセッション ID を書かせる | `catalog/skills/learning-intake/SKILL.md` | 次のログ集計で `server_tool_use` の見落とし・`-` 始まりのパス誤読が起きず、報告からセッションを 1 件で特定できる | 未計測 | |
 | 2026-11-06 | 反映の報告の末尾に、次にやること（コミット・保留の再開条件・滞留）を添える完了条件を足した | `catalog/skills/learning-intake/SKILL.md` | 次の受入れの報告の末尾に、次にやることが 1〜2 行ある | 未計測 | |
 | 2026-11-06 | `~/.apm` で引数なしに呼ばれ、未処理があるときは受入れ経路を既定にした | `catalog/skills/learning-intake/SKILL.md` | 引数なしの `/learning-intake` で、経路の確認を挟まず受入れが始まる | 未計測 | |
+| 2026-11-06 | `git-branch-cleanup` の worktree 除外条件に、パスを使う生きたプロセス（`lsof +D`）を足した | `catalog/skills/git-branch-cleanup/SKILL.md` | 次に dev stack が動く worktree を掃除するとき、候補から除外されるか確認を求められ、削除後に tilt などが壊れない | 未計測 | |
