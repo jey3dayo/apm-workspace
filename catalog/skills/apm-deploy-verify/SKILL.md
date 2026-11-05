@@ -20,7 +20,7 @@ catalog 変更後の検証は判断を含まない機械作業なので、Orches
 
 fork 実行では会話履歴は見えない。検証対象（変更した skill）は ARGUMENTS があればそれ、無ければ `git -C ~/.apm status --short` / `git -C ~/.apm diff` から決める。
 
-ログを残すときは `~/.apm/tmp/` に置く（`$HOME` 直下や repo 外には作らない）。ログへ `tee` するコマンドの終了コードは、`set -o pipefail` か `PIPESTATUS` で取る（pipe の終了コードは最後のコマンドのものになり、失敗を取り逃す）。
+ログを残すときは `~/.apm/tmp/` に置く（`$HOME` 直下や repo 外には作らない）。ログへ `tee` するコマンドの終了コードは、`set -o pipefail` で取る（pipe の終了コードは最後のコマンドのものになり、失敗を取り逃す）。Bash ツールのシェルは zsh で、`PIPESTATUS` は空になる（zsh は `pipestatus`）。
 
 ## 手順
 
