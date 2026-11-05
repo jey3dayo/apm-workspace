@@ -21,3 +21,4 @@
 | 2026-11-06 | 外した voicevox を指す音声通知ルールを削除した                          | `catalog/AGENTS.md`                                                | `grep -rn 'mcp-simple-voicevox\|音声通知' catalog` が 0 件で、音声通知の未実施を指摘する報告が出ない       | 未計測 |          |
 | 2026-11-06 | 受入れの提示を「学び・owner・次回の振る舞い」の 3 列にし、根拠と確認方法は求められたときだけ出す | `catalog/skills/learning-intake/SKILL.md` | 次の受入れで、提示が 3 列の表と y/n だけになり、「情報が多い」の訂正が出ない | 未計測 | |
 | 2026-11-06 | 台帳の表を `prettier-ignore` で整形の対象から外し、行を足したときの差分を 1 行にした | `docs/learning-ledger.md` | 次に行を足したとき、差分が追記の 1 行だけになり、`atomic-commit` が行単位で分けられる | 未計測 | |
+| 2026-11-06 | セッションログの数え方（`server_tool_use` など）を `references/` に足し、報告にセッション ID を書かせる | `catalog/skills/learning-intake/SKILL.md` | 次のログ集計で `server_tool_use` の見落とし・`-` 始まりのパス誤読が起きず、報告からセッションを 1 件で特定できる | 未計測 | |
