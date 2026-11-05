@@ -13,10 +13,10 @@
 
 ## mcp-simple-voicevox
 
-- Status: global MCP から一時的に外した（2026-10-29、ユーザー判断）。復活は後で検討する。
+- Status: global MCP から外した（2026-10-29、ユーザー判断）。2026-11-06 に、通知が邪魔になったため復活しない方針と確認した。
 - 理由: apm 0.31.0 のマニフェストには MCP を無効のまま残す項目がない（`enabled` は `extra` の拒否リストに入っている。`apm_cli/models/dependency/mcp.py`）。止めるにはエントリの削除しか手段がない。
 - 手順: `apm.yml` の `dependencies.mcp` から削除し、skill inventory の global MCP 一覧を更新した。`apm.lock.yaml` は deploy で再生成する。
-- 通知への影響: `catalog/AGENTS.md` の音声通知ルールは「使えなければ省略」と定めているため、ルール自体は変えない。
+- 通知への影響: `catalog/AGENTS.md` の音声通知ルールは、2026-11-06 に削除した。
 - 復活手順: 次の定義を `apm.yml` の `dependencies.mcp` に戻し、skill inventory の一覧にも `mcp-simple-voicevox` を足して `mise run deploy` を実行する。
 
   ```yaml
