@@ -88,6 +88,8 @@ It fails when the lockfile is malformed or when a `uses:` has no lockfile entry.
 - Use `--verify` in CI when every locked action is public or readable with the job's `GITHUB_TOKEN`. It re-checks provenance online and is the stronger check; GitHub's own template does this. Give that step `GH_TOKEN: ${{ github.token }}`; on GitHub Enterprise Cloud with data residency, lookups of github.com actions also need `GH_ACTIONS_LOCK_GITHUB_COM_TOKEN` (see the tool's README).
 - Use `--verify-local` in CI when the workflows use private or internal actions from another repository or organization. The job's `GITHUB_TOKEN` is scoped to the current repository, so `--verify` cannot read those action repositories and fails. Provisioning a broader token as a secret only for this check usually costs more than it adds, because the generate task already ran `--verify` with a developer login and the runner checks provenance again at job start.
 
+Before switching CI to `--verify`, confirm the job token can read every locked action repository (`gh api repos/<owner>/<repo> --jq .visibility`; the `GH_TOKEN: ${{ github.token }}` step above has been confirmed with public actions only), avoid partial mutable tags such as `@v0.2` in `uses:` (if the tag is force-moved so the locked commit is no longer reachable from it, `--verify` fails on pull requests that did not touch it), and check that a warnings-only run exits 0.
+
 `--verify-local` is a coverage check, not a provenance check. It does not notice a lockfile edit that moves a ref back to an older commit in its history. Reading the lockfile diff in review is what covers that.
 
 ## Pitfalls Seen During Adoption
@@ -107,23 +109,21 @@ Repository tests and hooks:
 
 Updating actions:
 
-- Dependency updaters that rewrite `uses:` to commit SHAs with a version comment, such as pnpm's `update.githubActions` setting or a script around `pnpm update --include-github-actions`, undo the tag form and leave the lockfile stale. Before adoption, find them (`pnpm-workspace.yaml`, update scripts, scheduled workflows) and decide with the user whether to disable them for onboarded workflows or follow every run with the generate task. Also search for Renovate, `pinact`, and scripts that cross-check SHAs against tags; all assume the SHA form. pnpm's GitHub Actions updates also ignore `minimumReleaseAge` ([pnpm/pnpm#13923](https://github.com/pnpm/pnpm/issues/13923)), so they bypass the 7-day rule below as well. Read-only reports such as `pnpm outdated --include-github-actions` are fine; it exits 1 whenever anything is outdated, so do not wire it as a pass/fail gate.
+- Dependency updaters that rewrite `uses:` to commit SHAs with a version comment, such as pnpm's `update.githubActions` setting or a script around `pnpm update --include-github-actions`, undo the tag form and leave the lockfile stale. Before adoption, find them (`pnpm-workspace.yaml`, update scripts, scheduled workflows) and decide with the user whether to disable them for onboarded workflows or follow every run with the generate task. Also search for `pinact`, Renovate configs that enable digest pinning, and scripts that cross-check SHAs against tags. Some pnpm versions also skipped `minimumReleaseAge` for GitHub Actions updates ([pnpm/pnpm#13923](https://github.com/pnpm/pnpm/issues/13923)); check the installed version before relying on it for the 7-day rule below. Read-only reports such as `pnpm outdated --include-github-actions` are fine; it exits 1 whenever anything is outdated, so do not wire it as a pass/fail gate.
 - Bumping to a new major can change an action's input defaults, not just its runtime. Read the release notes between the old and new tag, and set any input explicitly where the workflow relied on the old default (for example a setup action whose default language version moved, or a tool installer that started enforcing a minimum release age).
 
 SHA exceptions and tags:
 
-- Keep every reference that deliberately stays a SHA in one table (reference, reason, owner), and enforce it with an offline checker that rejects SHAs not listed there. `gh-actions-lock` 0.4.0 prints a `sha-as-ref` warning for each such reference and has no flag to silence it; it still exits 0, so document the warning as expected instead of chasing it.
+- In onboarded workflows, keep every action reference that deliberately stays a SHA in one table (reference, reason), and enforce it with an offline checker that rejects unlisted SHAs there. References the lockfile does not reach stay under the existing SHA-pin checker (see "Which Pinning Style Applies"). `gh-actions-lock` 0.4.0 prints a `sha-as-ref` warning for each such reference and has no flag to silence it; it still exits 0, so document the warning as expected instead of chasing it.
 - Before writing "no tag exists" as the reason for a SHA, list the tags (`gh api repos/<owner>/<repo>/tags --paginate`). Some actions publish only a mutable major tag (for example `v1`) that points at a different commit than the pin; the accurate reason is "no tag points at this commit".
 
 CI wiring:
 
 - If the workflow that runs `actions-lock:verify` filters on `on.<event>.paths`, include `.github/workflows/**`, which covers `actions.lock` and any workflow added later, plus every directory that holds the repository's own local actions (commonly `.github/actions/**`), because those are locked too. A `paths-ignore` filter needs the same check in reverse. Listing only the existing workflow files lets a pull request that adds an unlocked workflow skip the check.
 
-- Before moving CI from `--verify-local` to `--verify`, check that every locked action repository is public (`gh api repos/<owner>/<repo> --jq .visibility`), that no `uses:` keeps a partial mutable tag such as `@v0.2` (a re-pointed tag then turns unrelated pull requests red), and that a warnings-only run exits 0. `--verify` with `GH_TOKEN: ${{ github.token }}` has been confirmed to work for public actions only.
-
 General CI and git pitfalls:
 
-- A worktree created with `git worktree add -b <branch> <path> origin/main` (or a wrapper like `git wt`) tracks `origin/main`; push the first time with `git push -u origin <branch>`.
+- With the default `branch.autoSetupMerge`, a branch created from `origin/main` (by `git worktree add -b` or a wrapper) tracks `origin/main`. Check `git rev-parse --abbrev-ref @{u}` and push the first time with `git push -u origin <branch>`.
 - When a macOS (or other scarce) runner job goes red without output, check whether a runner was ever attached: zero steps and an empty `runner_name` in `gh api repos/<owner>/<repo>/actions/runs/<run>/jobs` mean it was not. A rerun creates new job IDs, so re-read with `?filter=latest` instead of drawing conclusions from the first attempt.
 - When running a long local CI task in the background, set an explicit timeout. A tool-level default timeout (often 10 minutes) sends SIGTERM, which looks like a failure of whichever step was running.
 
