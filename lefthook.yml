@@ -78,6 +78,11 @@ pre-push:
       # Hooks export GIT_DIR for the repo being pushed; suites must not inherit it.
       run: env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE mise run test:sh
 
+    # Offline: every uses: in the pushed workflows has an actions.lock entry.
+    - name: actions-lock
+      glob: "{.github/**,mise.toml,mise/lint.toml}"
+      run: mise run actions-lock:verify
+
     - name: format:markdown:bold-headings:check
       glob: "{catalog/*.md,catalog/**/*.md,scripts/format-bold-headings.*,scripts/replace-bold-headings.ts,mise.toml,mise/format.toml}"
       run: mise run format:markdown:bold-headings:check
