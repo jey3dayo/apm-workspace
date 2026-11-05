@@ -40,6 +40,8 @@ argument-hint: "[commit | push | pr]"
 
 差分を書き換えた工程（polish、削除候補の削除、レビュー指摘の修正）の後は、full gate から回し直す。
 
+独立レビューの blocking 指摘が、既存の挙動で依頼範囲外と判断できるときは、根拠を添えて todo に移し、同じ reviewer へ再提示して非 blocking へ再分類させる。再分類されなければ §3 で止める。
+
 ship の中では actionable な指摘をすべて対象にし、どれを直すかは聞かない。確認待ち（`pr-followup` §1）が出たら §3 で止める。修正の積み方、返信、resolve は `pr-followup` に従う。この返信と resolve の許可は `pr-followup` の起動条件に従う。指摘への対応と full gate から CI までの反復は最大3回とし、超えたら §3 で止める。
 
 - 完了条件: 終点の工程まで「次へ進む条件」を満たした
