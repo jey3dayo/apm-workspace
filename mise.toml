@@ -81,9 +81,18 @@ run = "bash ./scripts/apm-workspace.sh refresh"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 refresh"
 
 [tasks.doctor]
+description = "Inspect workspace state, deployed targets, and the learning-intake inbox"
+run = [{ task = "doctor:workspace" }, { task = "doctor:intake" }]
+
+[tasks."doctor:workspace"]
 description = "Inspect ~/.apm workspace state and deployed targets"
 run = "bash ./scripts/apm-workspace.sh doctor"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 doctor"
+
+[tasks."doctor:intake"]
+description = "Report the learning-intake inbox and warn when pending reports pile up"
+run = "bash ./scripts/apm-workspace.sh doctor-intake"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 doctor-intake"
 
 [tasks."lock:diff"]
 description = "Summarize apm.lock.yaml changes against a git ref (resolved commits, removed artifacts, target counts); read-only"

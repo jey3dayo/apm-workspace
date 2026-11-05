@@ -17,6 +17,7 @@ $PiOutput = if ($env:APM_PI_OUTPUT) { $env:APM_PI_OUTPUT } else { Join-Path $HOM
 $MiseDestination = Join-Path $WorkspaceDir "mise.toml"
 $CatalogBuildRootDir = Join-Path $WorkspaceDir ".catalog-build"
 $CatalogDirName = "catalog"
+$LearningIntakePendingWarnThreshold = 10
 
 function Test-CommandAvailable {
   param(
@@ -3486,26 +3487,72 @@ function Invoke-ValidateCatalog {
   Write-SuccessLine ("Catalog validation passed ({0} skills, {1} agents, {2} commands, {3} rules, {4} claude-rules)" -f $sourceSkillIds.Count, $sourceAgentPaths.Count, $sourceCommandPaths.Count, $sourceRulePaths.Count, $claudeRuleCount)
 }
 
-function Get-LearningIntakeInboxSummary {
-  param([string]$InboxDir)
+function Get-LearningIntakeReportDate {
+  param([string]$ReportName)
 
-  $pendingLabel = [regex]::Unescape('\u672A\u51E6\u7406')
-  $deferredLabel = [regex]::Unescape('\u4FDD\u7559')
+  $match = [regex]::Match($ReportName, '^(?<y>[0-9]{4})(?<m>0[1-9]|1[0-2])(?<d>0[1-9]|[12][0-9]|3[01])-')
+  if (-not $match.Success) {
+    $match = [regex]::Match($ReportName, '^(?<y>[0-9]{4})-(?<m>0[1-9]|1[0-2])-(?<d>0[1-9]|[12][0-9]|3[01])-')
+  }
+  if (-not $match.Success) {
+    return $null
+  }
+  return "{0}-{1}-{2}" -f $match.Groups['y'].Value, $match.Groups['m'].Value, $match.Groups['d'].Value
+}
+
+function Invoke-DoctorIntake {
+  $inboxDir = Join-Path $WorkspaceDir "tmp/learning-intake"
   $deferredPattern = '^status: \u4FDD\u7559\s*$'
-
   $pendingCount = 0
   $deferredCount = 0
-  $reportFiles = @(Get-ChildItem -LiteralPath $InboxDir -File -ErrorAction SilentlyContinue | Where-Object { $_.Extension -ceq '.md' })
-  foreach ($reportFile in $reportFiles) {
-    $isDeferred = @(Select-String -LiteralPath $reportFile.FullName -Pattern $deferredPattern -CaseSensitive -Encoding utf8 -ErrorAction SilentlyContinue).Count -gt 0
-    if ($isDeferred) {
-      $deferredCount++
+  $unreadableCount = 0
+  $undatedCount = 0
+  $oldestDate = $null
+
+  if (Test-Path -LiteralPath $inboxDir -PathType Container) {
+    try {
+      $reportFiles = @(Get-ChildItem -LiteralPath $inboxDir -File -ErrorAction Stop | Where-Object { $_.Extension -ceq '.md' })
     }
-    else {
+    catch {
+      Write-WarnLine ([regex]::Unescape('learning-intake: tmp/learning-intake/ \u3092\u4E00\u89A7\u3067\u304D\u307E\u305B\u3093\uFF08\u4EF6\u6570\u3092\u6570\u3048\u3066\u3044\u307E\u305B\u3093\uFF09'))
+      return
+    }
+    foreach ($reportFile in $reportFiles) {
+      try {
+        $isDeferred = @(Select-String -LiteralPath $reportFile.FullName -Pattern $deferredPattern -CaseSensitive -Encoding utf8 -ErrorAction Stop).Count -gt 0
+      }
+      catch {
+        $unreadableCount++
+        continue
+      }
+      if ($isDeferred) {
+        $deferredCount++
+        continue
+      }
       $pendingCount++
+      $reportDate = Get-LearningIntakeReportDate -ReportName $reportFile.Name
+      if ($null -eq $reportDate) {
+        $undatedCount++
+      }
+      elseif ($null -eq $oldestDate -or [string]::CompareOrdinal($reportDate, $oldestDate) -lt 0) {
+        $oldestDate = $reportDate
+      }
     }
   }
-  return "{0} {1} / {2} {3}" -f $pendingLabel, $pendingCount, $deferredLabel, $deferredCount
+
+  Write-Host ([regex]::Unescape('learning-intake inbox: \u672A\u51E6\u7406 {0} / \u4FDD\u7559 {1}') -f $pendingCount, $deferredCount)
+  if ($null -ne $oldestDate) {
+    Write-Host ([regex]::Unescape('  \u6700\u53E4\u306E\u672A\u51E6\u7406: {0}') -f $oldestDate)
+  }
+  if ($undatedCount -gt 0) {
+    Write-Host ([regex]::Unescape('  \u65E5\u4ED8\u4E0D\u660E: {0} \u4EF6') -f $undatedCount)
+  }
+  if ($unreadableCount -gt 0) {
+    Write-WarnLine ([regex]::Unescape('learning-intake: \u8AAD\u307F\u53D6\u308A\u4E0D\u80FD\u306A\u5831\u544A {0} \u4EF6\uFF08\u672A\u51E6\u7406\u30FB\u4FDD\u7559\u306E\u4EF6\u6570\u306B\u542B\u3081\u3066\u3044\u306A\u3044\uFF09') -f $unreadableCount)
+  }
+  if ($pendingCount -ge $LearningIntakePendingWarnThreshold) {
+    Write-WarnLine ([regex]::Unescape('learning-intake: \u672A\u51E6\u7406 {0} \u4EF6\u304C\u6E9C\u307E\u3063\u3066\u3044\u307E\u3059\uFF08\u95BE\u5024 {1}\uFF09\u3002tmp/learning-intake/ \u3092 learning-intake \u306E\u53D7\u5165\u308C\u7D4C\u8DEF\u3067\u51E6\u7406\u3057\u3066\u304F\u3060\u3055\u3044') -f $pendingCount, $LearningIntakePendingWarnThreshold)
+  }
 }
 
 function Get-ApmReadOnlyOutput {
@@ -3639,8 +3686,6 @@ function Invoke-Doctor {
     $branch = "detached"
   }
   Write-Host ("branch: {0}" -f ($branch | Out-String).Trim())
-  $learningIntakeDir = Join-Path $WorkspaceDir "tmp/learning-intake"
-  Write-Host ("learning-intake inbox: {0}" -f (Get-LearningIntakeInboxSummary -InboxDir $learningIntakeDir))
   Write-Host "remote:"
   & git -C $WorkspaceDir remote -v
   Write-Host "targets:"
@@ -4323,6 +4368,10 @@ switch ($Command) {
     Invoke-Doctor
   }
 
+  "doctor-intake" {
+    Invoke-DoctorIntake
+  }
+
   "prune:cache" {
     Invoke-PruneCache
   }
@@ -4359,6 +4408,7 @@ Commands:
   validate           Validate the ~/.apm workspace
   validate:catalog   Fail when ~/.apm/catalog is not normalized or missing required assets
   doctor             Inspect workspace and target state
+  doctor-intake      Report the learning-intake inbox and warn when pending reports pile up
   bundle-catalog     Build ~/.apm/.catalog-build/catalog as the catalog package artifact
   prepare:catalog    Rewrite ~/.apm/catalog into its normalized publishable layout and print its upstream ref
   install:catalog    Install the catalog ref after commit/push

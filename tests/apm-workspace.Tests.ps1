@@ -982,6 +982,19 @@ Describe "public command surface" {
 
       (($Content -split "`r?`n") | Where-Object { $_ -notmatch '^\s*#' }) -join "`n"
     }
+
+    function Get-DoctorIntakeOutput {
+      (Invoke-DoctorIntake 3>&1 6>&1 | ForEach-Object { $_.ToString() }) -join "`n"
+    }
+
+    function New-IntakePendingReports {
+      param([string]$InboxDir, [int]$Count)
+
+      New-Item -ItemType Directory -Path $InboxDir -Force | Out-Null
+      foreach ($index in 1..$Count) {
+        Set-Content -LiteralPath (Join-Path $InboxDir ("20261101-{0:D4}-report.md" -f $index)) -Value "status: 未処理" -Encoding utf8
+      }
+    }
   }
 
   BeforeEach {
@@ -2170,7 +2183,7 @@ dependencies:
     }
   }
 
-  It "reports the learning-intake inbox split into 未処理 and 保留 from Invoke-Doctor" {
+  It "leaves the learning-intake inbox to Invoke-DoctorIntake in Invoke-Doctor" {
     $targetRoot = Join-Path $TestDrive "doctor-inbox/.codex"
     $skillsRoot = Join-Path $TestDrive "doctor-inbox/.agents"
     $codexSkillsRoot = Join-Path $skillsRoot "skills"
@@ -2185,17 +2198,8 @@ dependencies:
     Set-Content -LiteralPath $instructionsPath -Value "# instructions"
 
     $learningIntakeDir = Join-Path $script:WorkspaceDir "tmp/learning-intake"
-    $learningIntakeSubDir = Join-Path $learningIntakeDir "sub"
-    New-Item -ItemType Directory -Path $learningIntakeSubDir -Force | Out-Null
-    Set-Content -LiteralPath (Join-Path $learningIntakeDir "20260101-0000-one.md") -Value "status: 未処理`n# report one" -Encoding utf8
-    Set-Content -LiteralPath (Join-Path $learningIntakeDir "20260101-0001-two.md") -Value "# report two, no status line" -Encoding utf8
-    Set-Content -LiteralPath (Join-Path $learningIntakeDir "20260101-0002-three.md") -Value "status: 保留`n不足: owner" -Encoding utf8
-    Set-Content -LiteralPath (Join-Path $learningIntakeDir "20260101-0003-four.md") -Value "- status: 保留" -Encoding utf8
-    Set-Content -LiteralPath (Join-Path $learningIntakeDir "20260101-0004-five.md") -Value "status: 保留（注記）" -Encoding utf8
-    Set-Content -LiteralPath (Join-Path $learningIntakeDir "20260101-0005-six.md") -Value "status: 未処理`nstatus: 保留" -Encoding utf8
-    Set-Content -LiteralPath (Join-Path $learningIntakeDir "UPPER.MD") -Value "status: 未処理" -Encoding utf8
-    Set-Content -LiteralPath (Join-Path $learningIntakeDir "note.txt") -Value "not a report" -Encoding utf8
-    Set-Content -LiteralPath (Join-Path $learningIntakeSubDir "nested.md") -Value "status: 未処理`n# nested report" -Encoding utf8
+    New-Item -ItemType Directory -Path $learningIntakeDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $learningIntakeDir "20260101-0000-one.md") -Value "status: 未処理" -Encoding utf8
 
     Mock Require-Apm {}
     Mock Ensure-WorkspaceRepo {}
@@ -2219,11 +2223,176 @@ dependencies:
 
     try {
       $output = Invoke-Doctor 6>&1 | Out-String
-      $output | Should -Match "learning-intake inbox: 未処理 4 / 保留 2"
+      $output | Should -Not -Match "learning-intake"
     }
     finally {
       Remove-Item Function:\apm -ErrorAction SilentlyContinue
       Remove-Item -LiteralPath $learningIntakeDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+  }
+
+  It "reports the learning-intake inbox split into 未処理 and 保留 from Invoke-DoctorIntake" {
+    $inboxDir = Join-Path $script:WorkspaceDir "tmp/learning-intake"
+    $inboxSubDir = Join-Path $inboxDir "sub"
+    New-Item -ItemType Directory -Path $inboxSubDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $inboxDir "20260101-0000-one.md") -Value "status: 未処理`n# report one" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $inboxDir "20260101-0001-two.md") -Value "# report two, no status line" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $inboxDir "20260101-0002-three.md") -Value "status: 保留`n不足: owner" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $inboxDir "20260101-0003-four.md") -Value "- status: 保留" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $inboxDir "20260101-0004-five.md") -Value "status: 保留（注記）" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $inboxDir "20260101-0005-six.md") -Value "status: 未処理`nstatus: 保留" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $inboxDir "UPPER.MD") -Value "status: 未処理" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $inboxDir "note.txt") -Value "not a report" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $inboxSubDir "nested.md") -Value "status: 未処理`n# nested report" -Encoding utf8
+
+    try {
+      $output = Get-DoctorIntakeOutput
+      $output | Should -Match "learning-intake inbox: 未処理 4 / 保留 2"
+    }
+    finally {
+      Remove-Item -LiteralPath $inboxDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+  }
+
+  It "stays quiet at 9 pending reports in Invoke-DoctorIntake" {
+    $inboxDir = Join-Path $script:WorkspaceDir "tmp/learning-intake"
+    New-IntakePendingReports -InboxDir $inboxDir -Count 9
+
+    try {
+      $output = Get-DoctorIntakeOutput
+      $output | Should -Match "learning-intake inbox: 未処理 9 / 保留 0"
+      $output | Should -Not -Match "溜まっています"
+    }
+    finally {
+      Remove-Item -LiteralPath $inboxDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+  }
+
+  It "warns at 10 pending reports in Invoke-DoctorIntake and does not throw" {
+    $inboxDir = Join-Path $script:WorkspaceDir "tmp/learning-intake"
+    New-IntakePendingReports -InboxDir $inboxDir -Count 10
+
+    try {
+      { Invoke-DoctorIntake 3>&1 6>&1 | Out-Null } | Should -Not -Throw
+      $output = Get-DoctorIntakeOutput
+      $output | Should -Match "learning-intake inbox: 未処理 10 / 保留 0"
+      $output | Should -Match "learning-intake: 未処理 10 件が溜まっています（閾値 10）"
+    }
+    finally {
+      Remove-Item -LiteralPath $inboxDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+  }
+
+  It "leaves deferred reports out of the threshold and the oldest date in Invoke-DoctorIntake" {
+    $inboxDir = Join-Path $script:WorkspaceDir "tmp/learning-intake"
+    New-IntakePendingReports -InboxDir $inboxDir -Count 9
+    Set-Content -LiteralPath (Join-Path $inboxDir "20200101-0001-deferred.md") -Value "status: 保留" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $inboxDir "20200102-0001-deferred.md") -Value "status: 保留" -Encoding utf8
+
+    try {
+      $output = Get-DoctorIntakeOutput
+      $output | Should -Match "learning-intake inbox: 未処理 9 / 保留 2"
+      $output | Should -Match "最古の未処理: 2026-11-01"
+      $output | Should -Not -Match "2020-01-01"
+      $output | Should -Not -Match "溜まっています"
+    }
+    finally {
+      Remove-Item -LiteralPath $inboxDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+  }
+
+  It "reports the oldest pending date across YYYYMMDD- and YYYY-MM-DD- names in Invoke-DoctorIntake" {
+    $inboxDir = Join-Path $script:WorkspaceDir "tmp/learning-intake"
+    New-Item -ItemType Directory -Path $inboxDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $inboxDir "20261105-0042-newer.md") -Value "x" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $inboxDir "2026-09-30-cursor-middle.md") -Value "x" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $inboxDir "20260815-0001-oldest.md") -Value "x" -Encoding utf8
+
+    try {
+      $output = Get-DoctorIntakeOutput
+      $output | Should -Match "最古の未処理: 2026-08-15"
+      $output | Should -Not -Match "日付不明"
+
+      Remove-Item -LiteralPath (Join-Path $inboxDir "20260815-0001-oldest.md")
+      Set-Content -LiteralPath (Join-Path $inboxDir "2026-07-04-cursor-oldest.md") -Value "x" -Encoding utf8
+
+      $output = Get-DoctorIntakeOutput
+      $output | Should -Match "最古の未処理: 2026-07-04"
+    }
+    finally {
+      Remove-Item -LiteralPath $inboxDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+  }
+
+  It "counts pending reports whose name carries no date in Invoke-DoctorIntake" {
+    $inboxDir = Join-Path $script:WorkspaceDir "tmp/learning-intake"
+    New-Item -ItemType Directory -Path $inboxDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $inboxDir "20261105-0042-dated.md") -Value "x" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $inboxDir "native-undated.md") -Value "x" -Encoding utf8
+    Set-Content -LiteralPath (Join-Path $inboxDir "20261399-bad-month-day.md") -Value "x" -Encoding utf8
+
+    try {
+      $output = Get-DoctorIntakeOutput
+      $output | Should -Match "最古の未処理: 2026-11-05"
+      $output | Should -Match "日付不明: 2 件"
+    }
+    finally {
+      Remove-Item -LiteralPath $inboxDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+  }
+
+  It "prints no oldest date when every pending report is undated in Invoke-DoctorIntake" {
+    $inboxDir = Join-Path $script:WorkspaceDir "tmp/learning-intake"
+    New-Item -ItemType Directory -Path $inboxDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $inboxDir "native-undated.md") -Value "x" -Encoding utf8
+
+    try {
+      $output = Get-DoctorIntakeOutput
+      $output | Should -Match "learning-intake inbox: 未処理 1 / 保留 0"
+      $output | Should -Match "日付不明: 1 件"
+      $output | Should -Not -Match "最古の未処理"
+    }
+    finally {
+      Remove-Item -LiteralPath $inboxDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+  }
+
+  It "reports an empty inbox without a warning in Invoke-DoctorIntake" {
+    $inboxDir = Join-Path $script:WorkspaceDir "tmp/learning-intake"
+    New-Item -ItemType Directory -Path $inboxDir -Force | Out-Null
+
+    try {
+      $output = Get-DoctorIntakeOutput
+      $output | Should -Be "learning-intake inbox: 未処理 0 / 保留 0"
+    }
+    finally {
+      Remove-Item -LiteralPath $inboxDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+  }
+
+  It "reports a missing inbox directory without a warning in Invoke-DoctorIntake" {
+    Remove-Item -LiteralPath (Join-Path $script:WorkspaceDir "tmp/learning-intake") -Recurse -Force -ErrorAction SilentlyContinue
+
+    $output = Get-DoctorIntakeOutput
+    $output | Should -Be "learning-intake inbox: 未処理 0 / 保留 0"
+  }
+
+  It "does not count an unreadable report as pending in Invoke-DoctorIntake (non-Windows: chmod 000)" -Skip:($IsWindows -eq $true) {
+    $inboxDir = Join-Path $script:WorkspaceDir "tmp/learning-intake"
+    New-Item -ItemType Directory -Path $inboxDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $inboxDir "20261101-0001-readable.md") -Value "status: 未処理" -Encoding utf8
+    $lockedPath = Join-Path $inboxDir "20261101-0002-locked.md"
+    Set-Content -LiteralPath $lockedPath -Value "status: 未処理" -Encoding utf8
+    & chmod 000 $lockedPath
+
+    try {
+      $output = Get-DoctorIntakeOutput
+      $output | Should -Match "learning-intake inbox: 未処理 1 / 保留 0"
+      $output | Should -Match "読み取り不能な報告 1 件"
+    }
+    finally {
+      & chmod 644 $lockedPath
+      Remove-Item -LiteralPath $inboxDir -Recurse -Force -ErrorAction SilentlyContinue
     }
   }
 

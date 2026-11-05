@@ -509,7 +509,7 @@ EOF
 @test "mise exposes the expected public task set" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT")"
   run assert_public_mise_tasks "$tasks_json" \
-    apply apply:skills:local check deploy deploy:pins doctor format \
+    apply apply:skills:local check deploy deploy:pins doctor doctor:intake doctor:workspace format \
     format:check install:catalog prepare:catalog refresh test test:ps test:sh upgrade validate verify
   [ "$status" -eq 0 ]
 }
@@ -523,6 +523,8 @@ EOF
 @test "mise keeps deploy verify and refresh-deploy order" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
   run assert_mise_run_sequence "$tasks_json" deploy '[{"task":"check"},{"task":"apply"},{"task":"doctor"}]'
+  [ "$status" -eq 0 ]
+  run assert_mise_run_sequence "$tasks_json" doctor '[{"task":"doctor:workspace"},{"task":"doctor:intake"}]'
   [ "$status" -eq 0 ]
   run assert_mise_run_sequence "$tasks_json" verify '[{"task":"check"},{"task":"test"},{"task":"smoke:catalog"}]'
   [ "$status" -eq 0 ]
@@ -1502,23 +1504,195 @@ EOF
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
 }
 
-@test "doctor reports the learning-intake inbox split into 未処理 and 保留" {
+@test "doctor leaves the learning-intake inbox to doctor-intake" {
   make_doctor_fixture
-  mkdir -p "$doctor_workspace_dir/tmp/learning-intake/sub"
-  printf 'status: 未処理\n# report one\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0000-one.md"
-  printf '# report two, no status line\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0001-two.md"
-  printf 'status: 保留\n不足: owner\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0002-three.md"
-  printf -- '- status: 保留\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0003-four.md"
-  printf 'status: 保留（注記）\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0004-five.md"
-  printf 'status: 未処理\nstatus: 保留\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0005-six.md"
-  printf 'not a report\n' >"$doctor_workspace_dir/tmp/learning-intake/note.txt"
-  printf 'status: 未処理\n# nested report\n' >"$doctor_workspace_dir/tmp/learning-intake/sub/nested.md"
+  mkdir -p "$doctor_workspace_dir/tmp/learning-intake"
+  printf 'status: 未処理\n' >"$doctor_workspace_dir/tmp/learning-intake/20260101-0000-one.md"
 
   run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
 
   [ "$status" -eq 0 ]
-  [[ "$output" == *"learning-intake inbox: 未処理 4 / 保留 2"* ]]
+  [[ "$output" != *"learning-intake"* ]]
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+# --- doctor-intake -----------------------------------------------------------
+
+make_intake_fixture() {
+  intake_workspace_dir="$(mktemp -d)"
+  intake_dir="$intake_workspace_dir/tmp/learning-intake"
+  mkdir -p "$intake_dir"
+}
+
+write_pending_reports() {
+  local count="$1"
+  local index
+  for ((index = 1; index <= count; index++)); do
+    printf 'status: 未処理\n' >"$intake_dir/$(printf '20261101-%04d-report.md' "$index")"
+  done
+}
+
+run_doctor_intake() {
+  run env APM_WORKSPACE_DIR="$intake_workspace_dir" bash "$SCRIPT_UNDER_TEST" doctor-intake
+}
+
+@test "doctor-intake reports the inbox split into 未処理 and 保留" {
+  make_intake_fixture
+  mkdir -p "$intake_dir/sub"
+  printf 'status: 未処理\n# report one\n' >"$intake_dir/20260101-0000-one.md"
+  printf '# report two, no status line\n' >"$intake_dir/20260101-0001-two.md"
+  printf 'status: 保留\n不足: owner\n' >"$intake_dir/20260101-0002-three.md"
+  printf -- '- status: 保留\n' >"$intake_dir/20260101-0003-four.md"
+  printf 'status: 保留（注記）\n' >"$intake_dir/20260101-0004-five.md"
+  printf 'status: 未処理\nstatus: 保留\n' >"$intake_dir/20260101-0005-six.md"
+  printf 'not a report\n' >"$intake_dir/note.txt"
+  printf 'status: 未処理\n' >"$intake_dir/UPPER.MD"
+  printf 'status: 未処理\n' >"$intake_dir/.hidden.md"
+  printf 'status: 未処理\n# nested report\n' >"$intake_dir/sub/nested.md"
+
+  run_doctor_intake
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"learning-intake inbox: 未処理 4 / 保留 2"* ]]
+  rm -rf "$intake_workspace_dir"
+}
+
+@test "doctor-intake stays quiet at 9 pending reports" {
+  make_intake_fixture
+  write_pending_reports 9
+
+  run_doctor_intake
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"learning-intake inbox: 未処理 9 / 保留 0"* ]]
+  [[ "$output" != *"溜まっています"* ]]
+  rm -rf "$intake_workspace_dir"
+}
+
+@test "doctor-intake warns at 10 pending reports and still succeeds" {
+  make_intake_fixture
+  write_pending_reports 10
+
+  run_doctor_intake
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"learning-intake inbox: 未処理 10 / 保留 0"* ]]
+  [[ "$output" == *"learning-intake: 未処理 10 件が溜まっています（閾値 10）"* ]]
+  rm -rf "$intake_workspace_dir"
+}
+
+@test "doctor-intake leaves deferred reports out of the threshold and the oldest date" {
+  make_intake_fixture
+  write_pending_reports 9
+  printf 'status: 保留\n' >"$intake_dir/20200101-0001-deferred.md"
+  printf 'status: 保留\n' >"$intake_dir/20200102-0001-deferred.md"
+
+  run_doctor_intake
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"learning-intake inbox: 未処理 9 / 保留 2"* ]]
+  [[ "$output" == *"最古の未処理: 2026-11-01"* ]]
+  [[ "$output" != *"2020-01-01"* ]]
+  [[ "$output" != *"溜まっています"* ]]
+  rm -rf "$intake_workspace_dir"
+}
+
+@test "doctor-intake reports the oldest pending date across YYYYMMDD- and YYYY-MM-DD- names" {
+  make_intake_fixture
+  printf 'x\n' >"$intake_dir/20261105-0042-newer.md"
+  printf 'x\n' >"$intake_dir/2026-09-30-cursor-middle.md"
+  printf 'x\n' >"$intake_dir/20260815-0001-oldest.md"
+
+  run_doctor_intake
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"最古の未処理: 2026-08-15"* ]]
+  [[ "$output" != *"日付不明"* ]]
+
+  rm "$intake_dir/20260815-0001-oldest.md"
+  printf 'x\n' >"$intake_dir/2026-07-04-cursor-oldest.md"
+
+  run_doctor_intake
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"最古の未処理: 2026-07-04"* ]]
+  rm -rf "$intake_workspace_dir"
+}
+
+@test "doctor-intake counts pending reports whose name carries no date" {
+  make_intake_fixture
+  printf 'x\n' >"$intake_dir/20261105-0042-dated.md"
+  printf 'x\n' >"$intake_dir/native-undated.md"
+  printf 'x\n' >"$intake_dir/20261399-bad-month-day.md"
+
+  run_doctor_intake
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"最古の未処理: 2026-11-05"* ]]
+  [[ "$output" == *"日付不明: 2 件"* ]]
+  rm -rf "$intake_workspace_dir"
+}
+
+@test "doctor-intake prints no oldest date when every pending report is undated" {
+  make_intake_fixture
+  printf 'x\n' >"$intake_dir/native-undated.md"
+
+  run_doctor_intake
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"learning-intake inbox: 未処理 1 / 保留 0"* ]]
+  [[ "$output" == *"日付不明: 1 件"* ]]
+  [[ "$output" != *"最古の未処理"* ]]
+  rm -rf "$intake_workspace_dir"
+}
+
+@test "doctor-intake reports an empty inbox without a warning" {
+  make_intake_fixture
+
+  run_doctor_intake
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == "learning-intake inbox: 未処理 0 / 保留 0" ]]
+  rm -rf "$intake_workspace_dir"
+}
+
+@test "doctor-intake reports a missing inbox directory without a warning" {
+  make_intake_fixture
+  rmdir "$intake_dir"
+
+  run_doctor_intake
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == "learning-intake inbox: 未処理 0 / 保留 0" ]]
+  rm -rf "$intake_workspace_dir"
+}
+
+@test "doctor-intake does not count an unreadable report as pending (needs a non-root user: chmod 000 is ignored for root)" {
+  make_intake_fixture
+  printf 'status: 未処理\n' >"$intake_dir/20261101-0001-readable.md"
+  printf 'status: 未処理\n' >"$intake_dir/20261101-0002-locked.md"
+  chmod 000 "$intake_dir/20261101-0002-locked.md"
+
+  run_doctor_intake
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"learning-intake inbox: 未処理 1 / 保留 0"* ]]
+  [[ "$output" == *"読み取り不能な報告 1 件"* ]]
+  rm -rf "$intake_workspace_dir"
+}
+
+@test "doctor-intake warns instead of reporting an empty inbox when the directory cannot be listed (needs a non-root user: chmod 000 is ignored for root)" {
+  make_intake_fixture
+  printf 'status: 未処理\n' >"$intake_dir/20261101-0001-report.md"
+  chmod 000 "$intake_dir"
+
+  run_doctor_intake
+  chmod 755 "$intake_dir"
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"一覧できません"* ]]
+  [[ "$output" != *"未処理 0"* ]]
+  rm -rf "$intake_workspace_dir"
 }
 
 # --- doctor agmsg roster link reachability -----------------------------------
