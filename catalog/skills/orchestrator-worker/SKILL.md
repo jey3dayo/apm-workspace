@@ -97,7 +97,7 @@ Steward と Architect はどちらも人間が pane から起動する。どの 
 
 ## 1a. Steward の応答範囲と handoff
 
-Steward は人間が最初に話す相手であり、応答の滑らかさが人間の待ち時間と再説明の回数を直接決める。Opus Steward は Orchestrator 機能の許可条件を満たすため、そのまま Worker を起動し差分を検証できる。Claude Code の Sonnet 対話メインは、Opus advisor が利用でき、Orchestrator 機能の3条件を満たす場合、Orchestrator 機能を担える。設計判断は Claude 専用モデル運用ルールに従って advisor に相談する。Worker・Reviewer の選定と成果物の検証は本スキルに従う。Luna Steward は明示ポリシーとして Orchestrator 機能を持たない。
+Steward は人間が最初に話す相手であり、応答の滑らかさが人間の待ち時間と再説明の回数を直接決める。どの Steward が Orchestrator 機能を担えるかは §1「Orchestrator 機能を担う条件」に従う。
 
 本スキルの狙いは実装トークンを安い Worker に隔離し、高級 tier を設計判断・検証・review・対話に集中させることである。総コストが下がるかどうかは未計測の仮説として扱う——長時間常駐する Steward の累積 context、全 diff の再読、対話の長期化、handoff での再説明は、タスク構成によっては支配的になりうる。判断するには task 別に model・input / cached / output・再試行回数・handoff 回数・latency・成功率を記録し、Steward と Architect を分けない運用と比較する必要がある。
 
@@ -114,7 +114,7 @@ Steward は人間が最初に話す相手であり、応答の滑らかさが人
 
 次のいずれか 1 つに当たったら handoff する。当たらなければ自分で答える。判定順は上から。
 
-1. 書込を伴い、§2 の委譲条件に当たる（3 ファイル以上 / 見積 50 行以上 / 独立サブタスク 2 件以上）: 自分が Orchestrator 機能を担う側（Opus Steward / Opus advisor が利用できる Sonnet Steward / Architect）なら handoff せず自分で §3 分割 → Worker 起動 → §5 検証を行う。Sonnet Steward は設計判断を Claude 専用モデル運用ルールに従って advisor に相談する。handoff 専用と定めた Luna Steward、または advisor が利用できない Sonnet Steward なら Architect へ handoff する。
+1. 書込を伴い、§2 の委譲条件に当たる（3 ファイル以上 / 見積 50 行以上 / 独立サブタスク 2 件以上）: 自分が Orchestrator 機能を担う側（Opus Steward / Opus advisor が利用できる Sonnet Steward / Architect）なら handoff せず自分で §3 分割 → Worker 起動 → §5 検証を行う。handoff 専用と定めた Luna Steward、または advisor が利用できない Sonnet Steward なら Architect へ handoff する。
 2. 「Worker の昇格」の 3 条件のいずれか（再現困難なデバッグ / セキュリティ境界 / 複数案のトレードオフ判断）→ handoff。
 3. 成果物が「決定」である: 依頼文が、ファイル構成・責務境界・API・データ構造・運用方針のうち 1 つ以上を新たに決めることを求めている（「どう分けるべきか」「設計して」「方針を出して」）。既存の決定を説明するだけなら Steward が自分で答える。→ handoff。
 4. 最初の bounded scan で範囲が閉じない: 答える前に、入口・ownership・依存だけを一度 scan する。その結果 (a) 複数の ownership boundary をまたぐ統合が要る (b) scan 中に、新しい責務・API・運用判断を決める必要があると分かった (c) 初期 scan の想定より範囲が広がった、のいずれかなら → handoff。トリガー 3 が依頼文から判定するのに対し、(b) は読んで初めて分かる場合を拾う。ファイル数や行数だけで役を決めない——読む前に読む量は見積もれない。
