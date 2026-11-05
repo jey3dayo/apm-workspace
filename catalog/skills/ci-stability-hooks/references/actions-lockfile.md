@@ -78,8 +78,10 @@ Add these steps to a job that already checks out the repository and sets up mise
   run: mise install gh-actions-lock
 
 - name: Check actions.lock covers workflows
-  run: mise run actions-lock:verify
+  run: mise run --skip-tools actions-lock:verify
 ```
+
+`mise run` installs every missing tool in `[tools]` before the task, even when mise was set up with `install: false`. `--skip-tools` skips that and keeps the tools already installed on `PATH`, so only `gh-actions-lock` is installed here.
 
 It fails when the lockfile is malformed or when a `uses:` has no lockfile entry. Keep this check even though GitHub enforces the lockfile at runtime: GitHub currently ignores a malformed lockfile instead of failing the run ([gh-actions-lock#125](https://github.com/github/gh-actions-lock/issues/125), open as of 2026-11), so CI is the only place that stops one from landing. `--verify-local` is offline and fast, so it also fits a `pre-commit` job on `.github/**` per the gate split in `SKILL.md`. It reads the working tree, not the staged snapshot, so with a partially staged change it can pass on content that is not being committed; CI stays the authoritative check.
 
