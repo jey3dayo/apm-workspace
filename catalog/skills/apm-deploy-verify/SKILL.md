@@ -54,14 +54,17 @@ fork 実行では会話履歴は見えない。検証対象（変更した skill
    # commands は manifest scope 配布（sync_managed_catalog_dir_with_manifest）のため、
    # `.managed-catalog-manifest` や同居する非 catalog ファイルが配布先にだけ存在するのは仕様であり、
    # ディレクトリ全体の厳密一致では必ず失敗する
-   fail=0
+   fail=0; checked=0
    while read -r f; do
      rel=${f#<catalog>/commands/}
      diff -q "$f" ~/.config/opencode/commands/"$rel" || fail=1
+     checked=$((checked + 1))
    done < <(find <catalog>/commands -type f ! -name '.gitkeep')
    [ "$fail" -eq 0 ]
-   # catalog/commands に比較対象が 0 件（`.gitkeep` のみ）のとき、このループは空振りで通る。
-   # その場合は「通過」でなく「対象 0 件・未検証」と報告する
+   # 比較対象が 0 件（`.gitkeep` のみ）のときループは空振りで通る。件数を必ず出し、
+   # 0 件は「通過」でなく「対象 0 件・未検証」と報告する。`validate:catalog` の
+   # 「N commands」は `.gitkeep` を数えるので、この件数の代わりにしない
+   echo "opencode commands checked: $checked"; [ "$checked" -gt 0 ] || echo "UNVERIFIED: 対象 0 件"
 
    # apm.yml の targets に opencode が再混入していないこと
    ! grep -qx '  - opencode' apm.yml

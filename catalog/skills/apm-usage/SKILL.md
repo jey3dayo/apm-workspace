@@ -79,11 +79,15 @@ Before an install, assign exactly one lane name.
    repositories need it.
 4. Use `global-catalog` or `global-dependency` only when it is useful across
    unrelated repositories, has no repository-specific credential or runtime
-   dependency, and is expected to be used repeatedly. Between the two, use
+   dependency, is publishable as written (this workspace is a public repo, so
+   no colleague handles, internal system names or URLs, or personal data), and
+   is expected to be used repeatedly. Between the two, use
    `global-catalog` when this workspace owns and evolves the skill, and
    `global-dependency` when an external upstream package is the source of
    truth.
-5. Use `private` for machine-local work and `manual` only for an
+5. Use `private` for machine-local work and for any skill that fails the
+   publishable test in step 4 (`scripts/lint-catalog-leaks.ts` only catches
+   known leaks, so decide this before writing). Use `manual` only for an
    upstream packaging failure.
 
 If the lane is unclear, start with `repository-local` in a known consumer
