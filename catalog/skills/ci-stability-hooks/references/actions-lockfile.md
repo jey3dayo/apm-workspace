@@ -94,7 +94,7 @@ It fails when the lockfile is malformed or when a `uses:` has no lockfile entry.
 
 Generating:
 
-- Read the whole generate output, not the summary. One unresolvable reference can make the run report every workflow as `Not pinned` and end with `Nothing was written`, while the actual error (for example `Pinned commit not in upstream history`) is printed in the middle. Find the first error line before changing anything.
+- Read the whole generate output, not the summary. One unresolvable reference can make the run report every workflow as `Not pinned` and end with `Nothing was written`, while the actual error (for example `Pinned commit not in upstream history`) is printed in the middle. Find the first error line before changing anything; `--json` output lists them under `findings`, which is faster to read than the text log.
 - `Pinned commit not in upstream history` means a commit the tool must record (the SHA in `uses:`, or the commit already locked for a ref) is no longer reachable from any ref of the action's repository. The tool reports it as a possible upstream history rewrite or lockfile forgery, so first check who introduced that SHA and when (`git log -S <sha> -- .github/`). If the orphaned commit is pinned inside a third-party action's own `action.yml` (a transitive dependency), you cannot re-pin it; update the direct action to a release that pins a current upstream ref. Otherwise re-pin explicitly to a reachable commit, preferably a release tag that also passes the 7-day rule below, after reviewing the code: `gh api repos/<owner>/<repo>/compare/<old>...<new>` lists what the new commit adds, and `compare/<new>...<old>` what only the old one had; check both when the histories diverged. The compare API returns at most 250 commits and 300 files per response; for larger ranges page through it or compare in a local clone, so a truncated result is not mistaken for the full diff. If the orphaned commit can no longer be fetched, compare against the release or tag it was taken from, and say in the PR that this is a proxy, not a diff against the old code. State the old SHA, the new one, and the reason in the PR. Do not use `--accept-moved` for this: it re-resolves moved refs and unreachable pins to whatever SHA is live now, with no comparison, which skips the review this step exists for. `--relock` leaves unreachable pins as errors.
 - Call the tool through the repo's task runner (`mise run actions-lock:generate`, or `mise x -- gh-actions-lock ...` for a one-off). A global mise shim run outside a directory that pins the tool fails with `No version is set`.
 - Run the generate task from the checkout whose workflows you are locking. A `git worktree` nested inside another mise-managed directory can also pick up that directory's tool config and install tools the repository does not pin; that is noise, not a lockfile problem.
@@ -107,12 +107,25 @@ Repository tests and hooks:
 
 Updating actions:
 
-- Dependency updaters that rewrite `uses:` to commit SHAs with a version comment, such as pnpm's `update.githubActions` setting or a script around `pnpm update --include-github-actions`, undo the tag form and leave the lockfile stale. Before adoption, find them (`pnpm-workspace.yaml`, update scripts, scheduled workflows) and decide with the user whether to disable them for onboarded workflows or follow every run with the generate task. Read-only reports such as `pnpm outdated --include-github-actions` are fine.
+- Dependency updaters that rewrite `uses:` to commit SHAs with a version comment, such as pnpm's `update.githubActions` setting or a script around `pnpm update --include-github-actions`, undo the tag form and leave the lockfile stale. Before adoption, find them (`pnpm-workspace.yaml`, update scripts, scheduled workflows) and decide with the user whether to disable them for onboarded workflows or follow every run with the generate task. Also search for Renovate, `pinact`, and scripts that cross-check SHAs against tags; all assume the SHA form. pnpm's GitHub Actions updates also ignore `minimumReleaseAge` ([pnpm/pnpm#13923](https://github.com/pnpm/pnpm/issues/13923)), so they bypass the 7-day rule below as well. Read-only reports such as `pnpm outdated --include-github-actions` are fine; it exits 1 whenever anything is outdated, so do not wire it as a pass/fail gate.
 - Bumping to a new major can change an action's input defaults, not just its runtime. Read the release notes between the old and new tag, and set any input explicitly where the workflow relied on the old default (for example a setup action whose default language version moved, or a tool installer that started enforcing a minimum release age).
+
+SHA exceptions and tags:
+
+- Keep every reference that deliberately stays a SHA in one table (reference, reason, owner), and enforce it with an offline checker that rejects SHAs not listed there. `gh-actions-lock` 0.4.0 prints a `sha-as-ref` warning for each such reference and has no flag to silence it; it still exits 0, so document the warning as expected instead of chasing it.
+- Before writing "no tag exists" as the reason for a SHA, list the tags (`gh api repos/<owner>/<repo>/tags --paginate`). Some actions publish only a mutable major tag (for example `v1`) that points at a different commit than the pin; the accurate reason is "no tag points at this commit".
 
 CI wiring:
 
 - If the workflow that runs `actions-lock:verify` filters on `on.<event>.paths`, include `.github/workflows/**`, which covers `actions.lock` and any workflow added later, plus every directory that holds the repository's own local actions (commonly `.github/actions/**`), because those are locked too. A `paths-ignore` filter needs the same check in reverse. Listing only the existing workflow files lets a pull request that adds an unlocked workflow skip the check.
+
+- Before moving CI from `--verify-local` to `--verify`, check that every locked action repository is public (`gh api repos/<owner>/<repo> --jq .visibility`), that no `uses:` keeps a partial mutable tag such as `@v0.2` (a re-pointed tag then turns unrelated pull requests red), and that a warnings-only run exits 0. `--verify` with `GH_TOKEN: ${{ github.token }}` has been confirmed to work for public actions only.
+
+General CI and git pitfalls:
+
+- A worktree created with `git worktree add -b <branch> <path> origin/main` (or a wrapper like `git wt`) tracks `origin/main`; push the first time with `git push -u origin <branch>`.
+- When a macOS (or other scarce) runner job goes red without output, check whether a runner was ever attached: zero steps and an empty `runner_name` in `gh api repos/<owner>/<repo>/actions/runs/<run>/jobs` mean it was not. A rerun creates new job IDs, so re-read with `?filter=latest` instead of drawing conclusions from the first attempt.
+- When running a long local CI task in the background, set an explicit timeout. A tool-level default timeout (often 10 minutes) sends SIGTERM, which looks like a failure of whichever step was running.
 
 ## Rules
 
