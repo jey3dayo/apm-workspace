@@ -68,6 +68,20 @@ dotenvx set SLACK_BOT_TOKEN "$slack_token" -fk .env.keys -f .env
 dotenvx get SLACK_BOT_TOKEN -fk .env.keys -f .env >/dev/null
 ```
 
+When the user holds a new secret value (a token shown once in a dashboard), have them copy it
+to the clipboard and pass it as `"$(pbpaste)"`, so the value never enters the transcript.
+If the value is on a page in a browser the agent drives, the agent can press the page's copy
+button itself, but must not screenshot or read that page, and must not leave it before copying.
+Check the format first, printing only a count or yes/no, never the value; if it does not
+match, stop and ask for a fresh copy instead of writing it. A repo with no `.env.keys` still
+accepts `set` when `.env` already has `DOTENV_PUBLIC_KEY`; confirm with `get … >/dev/null`.
+
+```bash
+pbpaste | grep -Ecx '<token-regex>'   # expect 1; never print the clipboard
+dotenvx set <KEY> "$(pbpaste)" -f .env
+dotenvx get <KEY> -f .env >/dev/null && echo ok
+```
+
 The first `encrypt` or `set` on a new env file creates its keypair. Since 2.25.0 the
 private key then goes only to the OS secret store, with no error, so 1Password, CI,
 other machines and worktree copies cannot decrypt the file. Keys stay in `.env.keys`
