@@ -23,3 +23,4 @@
 | 2026-11-06 | 台帳の表を `prettier-ignore` で整形の対象から外し、行を足したときの差分を 1 行にした | `docs/learning-ledger.md` | 次に行を足したとき、差分が追記の 1 行だけになり、`atomic-commit` が行単位で分けられる | 未計測 | |
 | 2026-11-06 | セッションログの数え方（`server_tool_use` など）を `references/` に足し、報告にセッション ID を書かせる | `catalog/skills/learning-intake/SKILL.md` | 次のログ集計で `server_tool_use` の見落とし・`-` 始まりのパス誤読が起きず、報告からセッションを 1 件で特定できる | 未計測 | |
 | 2026-11-06 | 反映の報告の末尾に、次にやること（コミット・保留の再開条件・滞留）を添える完了条件を足した | `catalog/skills/learning-intake/SKILL.md` | 次の受入れの報告の末尾に、次にやることが 1〜2 行ある | 未計測 | |
+| 2026-11-06 | `~/.apm` で引数なしに呼ばれ、未処理があるときは受入れ経路を既定にした | `catalog/skills/learning-intake/SKILL.md` | 引数なしの `/learning-intake` で、経路の確認を挟まず受入れが始まる | 未計測 | |
