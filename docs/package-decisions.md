@@ -816,3 +816,13 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - `refactoring` の委譲表から `/improve-codebase-architecture` を勧める行を削除した。
 - ibelick/ui-skills の ref を `main` から lock 済みの `4907a526b07943b3a338177558d42fae4fdf0a86` に固定した（上流 main の追従は ref 更新で行う）。
 - 再導入：ibelick/ui-skills（`4907a526`）の `skills:` に `fixing-metadata` を戻す。
+
+## 2026-11-06 日本語の推敲を `yomiyasu` に寄せた
+
+- 決めたこと（ユーザー判断）: 推敲の担当を1つにする。他者が読む長い日本語の文書は、これまでどおり `explain-before-shorten` のあとに `yomiyasu` を明示して呼ぶ（`catalog/AGENTS.md` の推敲規則のまま）。
+- `natural-japanese`: `~/.claude/settings.json` の `skillOverrides` で `user-invocable-only` にした。自動では選ばれず、名前で呼べば使える。外してはいない。
+- `japanese-tech-writing`: 技術記事や技術書の論証を点検するときに名前で呼ぶ。推敲の担当ではない。
+- 理由: 「推敲して」「AI臭さを消して」が `natural-japanese` と `yomiyasu` の両方の description に当たる。`yomiyasu` の upstream も、似た校正スキルを一緒に有効にすると指示が食い違う場合があると書いている。一緒に有効にして壊れたという再現例は見つからず、比べたデータも1件ずつしかないので、優劣ではなく役割の重なりを理由にした。
+- 残ること: Codex には `skillOverrides` に当たる設定がないので、Codex では `natural-japanese` がこれまでどおり自動で選ばれることがある。英語向けの unslop 系を日本語の標準の流れから外すかは、まだ決めていない。
+- 戻し方: `~/.claude/settings.json` の `skillOverrides` から `"natural-japanese": "user-invocable-only"` の行を消す。
+- 再検討するなら: 仕事の文書を書くのが中心になり、`natural-japanese` の lint を毎回使いたくなったとき。そのときは `natural-japanese` を担当にして、仕上げの検査に textlint の AI 文検出ルールを足す案がある。
