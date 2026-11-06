@@ -100,8 +100,8 @@ pane_id は session ごとの ID。別 session の agent を操作するとき�
 
 ### House rules（このスキル固有の運用規約）
 
-- 外部チャネル（inbox / ファイル受け渡しなど）で常駐 agent へタスクを送ったら、送信成功のあと必ず `herdr agent prompt <name> "..." --wait` で起こす。**送信成功 ≠ 到達**。特に Codex 常駐ペインは inbox を自動で読まない（Claude の SessionStart watcher とは違う）。起こす前に `herdr agent list` / `find-agent.sh` で name と pane を読み直す
-- 同一 checkout を複数 agent が触る並行作業では、実装 Worker は隔離 worktree を使う。共有ツリーでは他セッションの差分を `git restore` / 広い stage で消さない。相手の完了は idle やツリー静止だけでは判定せず、明示の完了合図か成果物の独立確認を正とする
+- 外部チャネル（inbox / ファイル受け渡しなど）で常駐 agent へタスクを送ったら、送信成功のあと必ず `herdr agent prompt <name> "..." --wait` で起こす。**送信成功 ≠ 到達**。Codex 常駐は delivery が `turn` でない／未設定のとき inbox を自動で読まない（`agmsg-delegation` の resident-pool を参照）。起こす前に `find-agent.sh` で name と pane を読み直す
+- 同一 checkout を複数 agent が触る並行作業では、実装 Worker は隔離 worktree を使う。共有ツリーでは他セッションの差分を `git restore` / 広い stage で消さない。相手の完了は idle やツリー静止だけでは判定しない。正とするのは明示の完了合図（DONE 等）であり、成果物の独立確認は合図のあと（または作業が止まったことを確認したあと）に行う
 
 - server を勝手に再起動しない。client / server の互換エラーで操作できない場合も `herdr status` の結果と失敗したコマンドを報告して確認を取る。`herdr server stop` / main プロセスの kill も同様
 - 自分が作っていない workspace / tab / pane / session を閉じない。

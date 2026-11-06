@@ -80,7 +80,7 @@ permission や PreToolUse hook のポリシーで拒否されたコマンドは�
 - Worker のモデル名をユーザーが指定したら（例:「luna で」）、それが platform を跨ぐ明示指示にあたる。既定は同一 platform 内で完結させる
 - pane / workspace を勝手に作らない。ユーザーが「用意して」と指示したときだけ作り、作った実体を読み戻してから報告する。手順は `herdr` スキルが正本（具体コマンドをここに写さない）
 - Worker の `DONE` は未検証の申告として扱う。Orchestrator が実際の比較元を確定し、差分、変更対象、要求との対応を独立に確認する
-- 同一 checkout の並行セッションでは、実装を渡す Worker を隔離 worktree に置く。共有ツリーでは他セッションの差分を破棄・一括 stage しない。完了は idle やツリー静止ではなく、相手の明示か成果物の独立確認で取る（手順の詳細は `herdr`）
+- 同一 checkout の並行セッションでは、実装を渡す Worker を隔離 worktree に置く。共有ツリーでは他セッションの差分を破棄・一括 stage しない。完了は idle やツリー静止ではなく、相手の明示の完了合図を正とし、成果物の独立確認はそのあと（または作業停止を確認したあと）に行う（手順の詳細は `herdr`）
 - DoD に定める full gate は Orchestrator が実行し、Worker の実行報告では代替しない
 - タスクで明示されていない依存 version、manifest、lockfile の変更は、要求上の必要性を確認できない限り採用しない
 
