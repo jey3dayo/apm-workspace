@@ -21,10 +21,15 @@ and deletion order.
 ## Delegate planning to a cheap subagent
 
 Planning is read-only and fails closed, so hand it to a subagent on a cheap
-model (Claude Code: the Agent tool with `model: haiku`). Pass it the checkout
-path and this skill's path; it runs "Resolve the repository and live context"
-through "Present the Markdown plan" and returns the proposed, exclusion, and
-prune tables with their evidence objects. The subagent is plan-only: it never
+model (Claude Code: the Agent tool with `model: haiku`). Pass it the absolute
+checkout path and this skill's path. The subagent inherits the parent's
+working directory, not the checkout's, so it runs every Git command as
+`git -C <checkout> …` and never `cd`s. It runs "Resolve the repository and
+live context" through "Present the Markdown plan" and returns the proposed,
+exclusion, and prune tables with their evidence objects, plus the output of
+`git -C <checkout> rev-parse --path-format=absolute --show-toplevel --git-common-dir`.
+The parent runs that command itself and discards a plan whose output differs.
+The subagent is plan-only: it never
 asks the user and never runs a deletion or prune. The parent session shows the
 returned plan, asks one y/n when the proposed table has rows, and runs "Revalidate and
 execute confirmed rows" itself; that live revalidation is what catches a wrong
@@ -58,7 +63,7 @@ reach the user, and the confirmation boundary must stay with the parent.
   branch whose related worktree is the main worktree, current worktree,
   locked, dirty, unreadable, or otherwise ambiguous.
 - A dirty worktree includes any tracked or untracked file reported by
-  `git status --porcelain=v1 --untracked-files=all`.
+  `git -C <worktree-path> status --porcelain=v1 --untracked-files=all`.
 - Partition PRs whose head branch matches the candidate into same-repository
   rows and fork/other-repository rows. Record the count and details of the
   excluded fork/other-repository rows, but do not put them in the matching set
@@ -68,10 +73,10 @@ reach the user, and the confirmation boundary must stay with the parent.
   candidate. Fork/other-repository rows neither veto the candidate nor satisfy
   the at-least-one requirement.
 - Only clean linked worktrees can be removed, and only with the exact native,
-  non-forced command `git worktree remove -- <exact-absolute-path>` after
+  non-forced command `git -C <checkout> worktree remove -- <exact-absolute-path>` after
   validating the installed Git syntax. If that Git does not accept `--`, pass
   the exact absolute path as its own argv element in the non-forced form
-  `git worktree remove <exact-absolute-path>`; never turn the path into a shell
+  `git -C <checkout> worktree remove <exact-absolute-path>`; never turn the path into a shell
   fragment. Do not use a `git wt` delete operation: it can also delete the
   branch and run `wt.deletehook`. Never pass a force flag to a worktree removal
   command.
@@ -88,18 +93,32 @@ reach the user, and the confirmation boundary must stay with the parent.
 
 ## Resolve the repository and live context
 
-Run these checks from the checkout being cleaned. Resolve values; do not assume
-`main`, `master`, or `origin`.
+Every Git command in this skill, in planning and in execution, takes the
+checkout explicitly as `git -C <checkout> …`; never rely on the shell's working
+directory and never `cd` into the checkout. No `gh` command may infer the
+repository from the working directory. Resolve values; do not assume `main`,
+`master`, or `origin`.
 
-1. Confirm that the path is a Git checkout and record its top-level path:
-   `git rev-parse --show-toplevel`. Resolve the GitHub repository and default
-   branch from GitHub, not from a conventional branch name:
+1. Confirm that the path is a Git checkout and record its identity:
+   `git -C <checkout> rev-parse --path-format=absolute --show-toplevel --git-common-dir`.
+   Choose the base remote: the one remote whose `remote.<name>.gh-resolved` is
+   `base` (written by `gh repo set-default`; read it with
+   `git -C <checkout> config --get-regexp '^remote\..*\.gh-resolved$'`);
+   otherwise the only configured remote; otherwise, if every remote's fetch URL
+   resolves (with `gh repo view <fetch-url> --json nameWithOwner`) to the same
+   repository, any of them; a failed or empty resolution counts as a mismatch.
+   Anything else makes automatic cleanup unavailable; suggest running
+   `gh repo set-default` in that checkout instead of picking a remote by name. Resolve the GitHub repository and default branch from that
+   remote's fetch URL, not from a conventional branch name:
 
    ```bash
-   gh repo view --json nameWithOwner,defaultBranchRef --jq '[.nameWithOwner, .defaultBranchRef.name] | @tsv'
+   gh repo view "$(git -C <checkout> remote get-url <base-remote>)" --json nameWithOwner,defaultBranchRef --jq '[.nameWithOwner, .defaultBranchRef.name] | @tsv'
    ```
 
-   Failure to resolve either value makes automatic cleanup unavailable.
+   Record `nameWithOwner`, never the URL, in evidence: a remote URL can embed
+   credentials. Failure to resolve either value makes automatic cleanup
+   unavailable. A branch that tracks a fork remote never maps to the base
+   repository and ends as `SKIP`.
 
 2. Resolve the authenticated actor with `gh api user --jq .login`. Record it
    as the actor, and treat an unavailable login as `SKIP`; do not infer actor
@@ -107,20 +126,22 @@ Run these checks from the checkout being cleaned. Resolve values; do not assume
    repository owner check below.
 
 3. Resolve the current branch with
-   `git symbolic-ref --quiet --short HEAD`. A detached HEAD has no automatic
+   `git -C <checkout> symbolic-ref --quiet --short HEAD`. A detached HEAD has no automatic
    cleanup candidates. Record the exact current worktree path and common Git
    directory as additional identity checks.
 
-4. Enumerate configured remotes with `git remote` and inspect each fetch URL
-   using `git remote get-url <remote>`. For a branch, use its configured
+4. Enumerate configured remotes with `git -C <checkout> remote` and inspect each fetch URL
+   using `git -C <checkout> remote get-url <remote>`. For a branch, use its configured
    upstream metadata rather than choosing a name by convention:
 
    ```bash
-   git for-each-ref --format='%(refname:short)%09%(upstream)%09%(upstream:remotename)%09%(upstream:remoteref)%09%(objectname)' refs/heads
+   git -C <checkout> for-each-ref --format='%(refname:short)%09%(upstream)%09%(upstream:remotename)%09%(upstream:remoteref)%09%(objectname)' refs/heads
    ```
 
-   Select a remote only when its fetch URL resolves to the GitHub repository
-   returned above and the branch's upstream metadata names that remote. If a
+   Select a remote only when its fetch URL, resolved with
+   `gh repo view <fetch-url> --json nameWithOwner` rather than by parsing the URL,
+   resolves to the GitHub repository returned above and the branch's upstream
+   metadata names that remote. If a
    remote cannot be mapped, or a branch has no single upstream, mark that
    branch `SKIP`. A remote can be selected per candidate; there is no implicit
    `origin`.
@@ -136,7 +157,7 @@ Run these checks from the checkout being cleaned. Resolve values; do not assume
    gh api --paginate "repos/<nameWithOwner>/branches?protected=true&per_page=100" --jq '.[].name'
    ```
 
-6. Read registered worktrees with `git worktree list --porcelain`, then use
+6. Read registered worktrees with `git -C <checkout> worktree list --porcelain`, then use
    `$git-worktree` for interpretation and command details. The first porcelain
    worktree record is the main worktree only when that record is non-bare. If
    the first record has `bare`, there is no main worktree; never label a later
@@ -168,7 +189,7 @@ during live revalidation and for remote deletion. Use the validated full
 `%(upstream:remoteref)` for remote-ref matching.
 
 After the identity checks, fetch-prune each resolved remote represented in the
-planning set. This synchronization is allowed in plan-only mode; it does not
+planning set (`git -C <checkout> fetch --prune <remote>`). This synchronization is allowed in plan-only mode; it does not
 authorize branch or worktree deletion. A failed fetch leaves that remote's
 candidates in `SKIP`.
 
@@ -176,13 +197,13 @@ The planning pass makes exactly one remote-head query per resolved remote, with
 no branch argument:
 
 ```bash
-git ls-remote --heads <resolved-remote>
+git -C <checkout> ls-remote --heads <resolved-remote>
 ```
 
 Parse each complete successful result client-side. For a validated full
 `refs/heads/<remote-branch-name>`, require at most one matching row; multiple
 or malformed rows are `SKIP`. Do not issue another planning `ls-remote` for
-that remote. Resolve each local SHA with `git rev-parse <local-ref>`.
+that remote. Resolve each local SHA with `git -C <checkout> rev-parse <local-ref>`.
 
 Exactly one row supplies the authoritative remote SHA, which must equal the
 local SHA; a divergent SHA is `SKIP`. Zero rows means the upstream branch is
@@ -302,7 +323,7 @@ Before presenting the plan, preview stale worktree metadata without changing
 anything:
 
 ```bash
-git worktree prune --dry-run --verbose
+git -C <checkout> worktree prune --dry-run --verbose
 ```
 
 Treat each exact prunable metadata record from this preview as its own numbered
@@ -324,11 +345,11 @@ SHAs, and related worktree paths and status.
 Show both proposed and excluded rows. Proposed branch rows must be numbered and
 have stable IDs for confirmation. Use a table with at least these columns:
 
-| ID  | local ref | upstream ref / remoteref / remote         | local SHA | live remote SHA | same-repo PRs; excluded external rows            | actor / owner / repository       | linked worktrees       | planned commands                                                                                                     | force?                        |
-| --- | --------- | ----------------------------------------- | --------- | --------------- | ------------------------------------------------ | -------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| 1   | `<local>` | `<upstream>` / `<remoteref>` / `<remote>` | `<sha>`   | `<sha>`         | `#123 MERGED non-draft; external: 1 (#456 fork)` | `<actor>` / `<owner>` / `<repo>` | `clean linked: <path>` | `git worktree remove -- <exact-path>`; `git branch -d -- <local>`; `git push <remote> --delete <remote-branch-name>` | `no; narrow -D fallback only` |
+| ID  | local ref | upstream ref / remoteref / remote         | local SHA | live remote SHA | same-repo PRs; excluded external rows            | actor / owner / repository       | linked worktrees       | planned commands                                                                                                                                               | force?                        |
+| --- | --------- | ----------------------------------------- | --------- | --------------- | ------------------------------------------------ | -------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| 1   | `<local>` | `<upstream>` / `<remoteref>` / `<remote>` | `<sha>`   | `<sha>`         | `#123 MERGED non-draft; external: 1 (#456 fork)` | `<actor>` / `<owner>` / `<repo>` | `clean linked: <path>` | `git -C <checkout> worktree remove -- <exact-path>`; `git -C <checkout> branch -d -- <local>`; `git -C <checkout> push <remote> --delete <remote-branch-name>` | `no; narrow -D fallback only` |
 
-The command column must identify the exact remote and branch refs. A
+The command column must identify the exact remote and branch refs, and every Git command in it carries `-C <checkout>`. A
 `remote-absent` row carries `remote-absent` in the live remote SHA column and
 no `git push --delete` in its command column; do not print a placeholder SHA
 or a remote command it will not run. Include a
@@ -370,13 +391,15 @@ Only after the user's y, process the proposed rows one at a time. Immediately
 before each deletion, independently re-resolve and compare the live state with
 that row:
 
+- checkout top-level and common Git directory from the same `rev-parse`
+  command as planning;
 - repository, default branch, protected branch set, authenticated actor, parsed
   base repository owner, and current branch;
 - both exact upstream metadata fields (`%(upstream)` and
   `%(upstream:remoteref)`) and their resolved remote mapping;
 - local ref and SHA;
 - authoritative remote ref and SHA from a fresh targeted
-  `git ls-remote --heads <resolved-remote> <validated-upstream:remoteref>`,
+  `git -C <checkout> ls-remote --heads <resolved-remote> <validated-upstream:remoteref>`,
   re-confirming `remote-absent` when the fresh query returns no row;
 - candidate-level rules from a fresh run of the all-page rules query defined
   above, with the same exit-status, array, and flatten checks;
@@ -396,7 +419,7 @@ that row:
   owner/repository checks still use the parsed base owner/repository, not the
   actor; and
 
-- all related worktrees from a fresh `git worktree list --porcelain` read plus
+- all related worktrees from a fresh `git -C <checkout> worktree list --porcelain` read plus
   fresh tracked/untracked status checks.
 
 This is a per-candidate gate, not a batch check. If any branch identity, SHA,
@@ -411,9 +434,9 @@ For a row that still passes, use `$git-worktree`, validate the installed
 native syntax, and perform operations in this order:
 
 1. Remove each related clean linked worktree with the exact native argv
-   `git worktree remove -- <exact-absolute-path>` and no force flag. If `--` is
+   `git -C <checkout> worktree remove -- <exact-absolute-path>` and no force flag. If `--` is
    unsupported, use the validated argv-safe form
-   `git worktree remove <exact-absolute-path>` from the installed Git help. If
+   `git -C <checkout> worktree remove <exact-absolute-path>` from the installed Git help. If
    any removal fails, stop that row and leave its remote and local branches in
    place. Never remove the main/current/locked/dirty worktree.
 2. After all worktrees for the row have been removed, repeat the branch,
@@ -423,11 +446,11 @@ native syntax, and perform operations in this order:
    report the row as `SKIP_CHANGED` or `SKIP_UNSAFE`, keep both branches in
    place, and do not continue.
 3. Delete the local branch first with the exact argv equivalent of
-   `git branch -d -- <local-branch>`. On a `remote-present` row this runs while
+   `git -C <checkout> branch -d -- <local-branch>`. On a `remote-present` row this runs while
    the upstream/remote ref is still present; a `remote-absent` row does not
    depend on that ref existing. If `-d` fails specifically because the graph does not mark a
    squash/rebase merge as an ancestor, permit the narrow fallback
-   `git branch -D -- <local-branch>` only when the immediately preceding live
+   `git -C <checkout> branch -D -- <local-branch>` only when the immediately preceding live
    evidence still proves all same-repository PRs are merged, non-draft, and
    same-owner/same-repository, with every head SHA equal to the local SHA, and
    equal to the remote SHA as well on a `remote-present` row. On a
@@ -464,7 +487,7 @@ native syntax, and perform operations in this order:
    there to preserve:
 
    ```bash
-   git push <remote> --delete <remote-branch-name>
+   git -C <checkout> push <remote> --delete <remote-branch-name>
    ```
 
    If this remote deletion fails, stop that row and report local deletion as
@@ -491,11 +514,11 @@ action, and remote action separately.
 
 Do not run prune merely because branch rows were confirmed or processed. If
 prune IDs were separately confirmed, immediately run a new
-`git worktree prune --dry-run --verbose` preview and compare every exact
+`git -C <checkout> worktree prune --dry-run --verbose` preview and compare every exact
 metadata record/path with the complete confirmed set. If any record is added,
 removed, changed, unparseable, or not explicitly confirmed, mark prune
 `SKIP` because the repository-wide command cannot target the requested subset.
-Only an exact match authorizes the non-forced `git worktree prune --verbose`
+Only an exact match authorizes the non-forced `git -C <checkout> worktree prune --verbose`
 operation; record its output and one outcome for each confirmed prune action.
 Report one outcome row per candidate, per worktree action, and per prune action,
 using statuses such as `DELETED`, `SKIP_CHANGED`, `SKIP_UNSAFE`, `SKIP`, or
