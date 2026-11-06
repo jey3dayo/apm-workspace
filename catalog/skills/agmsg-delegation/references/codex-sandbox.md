@@ -34,6 +34,8 @@ base の他の設定（`openai_base_url`、`service_tier`、`sandbox_workspace_w
 
 launchd 経路では親の `MISE_ENV` が継承されず、node を必要とする mise 管理の npm wrapper が即死することがある。
 `launch-worker.sh` は `MISE_ENV` を wrapper に引き継ぎ、同じ npm install 配下の `vendor/*/bin/codex` native binary を優先する（無ければ node の PATH を補完する）。
+同じ理由で、helper が読む上書き変数 `AGMSG_WORKER_EFFORT` / `AGMSG_REVIEWER_EFFORT` / `AGMSG_WORKER_MCP_ALLOW` / `AGMSG_OPENCODE_VARIANT` も、親で空でなく設定済みのものだけを wrapper に引き継ぐ。
+effort と variant の値は各 helper が検証し、`AGMSG_WORKER_MCP_ALLOW` は検証せず許可リストの照合にそのまま使う。`MISE_ENV` / `PATH` / `AGMSG_CODEX_BIN` と上の 4 変数以外の環境変数は launchd job に引き継がれない。
 
 ## pane で Codex worker を起動するときのサンドボックス選択
 

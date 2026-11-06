@@ -38,7 +38,7 @@ if [[ -e "$pid_file" || -e "$log_file" || -e "$exit_file" ]]; then
 	exit 2
 fi
 
-launchctl_bin=/bin/launchctl
+launchctl_bin=${AGMSG_LAUNCHCTL_BIN:-/bin/launchctl}
 if [[ ! -x "$launchctl_bin" ]]; then
 	printf '%s\n' 'launchctl is required for detached macOS worker execution.' >&2
 	exit 1
@@ -116,6 +116,11 @@ umask 077
 	if [[ -n "$mise_env" ]]; then
 		printf 'export MISE_ENV=%q\n' "$mise_env"
 	fi
+	for passthrough_name in AGMSG_WORKER_EFFORT AGMSG_REVIEWER_EFFORT AGMSG_WORKER_MCP_ALLOW AGMSG_OPENCODE_VARIANT; do
+		if [[ -n "${!passthrough_name:-}" ]]; then
+			printf 'export %s=%q\n' "$passthrough_name" "${!passthrough_name}"
+		fi
+	done
 	if [[ -n "$codex_node_dir" ]]; then
 		printf 'export PATH=%q\n' "$codex_node_dir:${PATH:-/usr/bin:/bin}"
 	fi
