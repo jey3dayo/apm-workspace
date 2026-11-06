@@ -35,3 +35,7 @@ apm_modules/
 /.apm-lifecycle.lock
 
 /.catalog-build/
+
+# Python bytecode left by tests that import catalog scripts
+__pycache__/
+*.pyc

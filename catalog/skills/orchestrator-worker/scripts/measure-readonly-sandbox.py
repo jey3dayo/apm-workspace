@@ -63,7 +63,7 @@ def check_writes_denied(events: list[Event], markers: dict[str, Path]) -> tuple[
         items = [i for i in completed if i is not None and i.get("type") == "command_execution"
                  and path.name in str(i.get("command")) and ">" in str(i.get("command"))]
         if not items:
-            notes.append(f"NOTE: {label} write has no command_execution item; denial is only model-reported")
+            reasons.append(f"{label}: write has no command_execution item; a denial only the model reports is not a measurement")
         for item in items:
             code, output = item.get("exit_code"), str(item.get("aggregated_output"))
             if not isinstance(code, int) or isinstance(code, bool) or code == 0:
