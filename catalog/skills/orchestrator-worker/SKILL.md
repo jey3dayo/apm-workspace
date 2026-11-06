@@ -175,7 +175,7 @@ verdict は、経路によらず次の共通条件をすべて満たした場合
 
 - 上の `codex exec` 経路
   - 起動側が `codex --version` と起動引数をログに残し、上の flag がすべて揃っていることを確かめている。`codex --disable hooks --disable plugins --disable apps features list` で3つが false であること、ログの JSONL に `mcp_tool_call` が無いこと、`turn.completed` で終わっていることも確かめる
-  - 同じ codex version と同じ flag で、対象 repo 内・repo 外（`/tmp`・`$HOME`）への shell 書込みと `apply_patch` が拒否され、`spawn_agent` で子 agent を起動できず、ファイルが作られないことを scratch の git repo で実測済みである。version か flag を変えたら測り直す
+  - 同じ codex version と同じ flag で、対象 repo 内・repo 外（`/tmp`・`$HOME`）への shell 書込みと `apply_patch` が拒否され、`spawn_agent` で子 agent を起動できず、ファイルが作られないことを scratch の git repo で実測済みである。version か flag を変えたら `scripts/measure-readonly-sandbox.py` で測り直す（プロンプトは [references/readonly-sandbox-measure-prompt.md](references/readonly-sandbox-measure-prompt.md)）
   - verdict は最後の行の `VERDICT: APPROVE` か `VERDICT: REQUEST_CHANGES` で、blocking 指摘が1件でもあれば REQUEST_CHANGES とする
 - `agmsg-delegation` の review 経路: 同 skill の「7. 報告を受けて検証する」の review 受理条件（`review_mode: verdict` と起動前の強制境界の証拠を含む）をすべて満たし、verdict は同 skill の形式に従う。flag と実測の条件は同 skill の強制境界の証拠で置き換える
 
@@ -224,7 +224,7 @@ Reviewer は組み込みの subagent（Claude は Agent tool、Codex は `spawn_
 
 assert が業務契約なのか実装詳細なのかは Orchestrator が判断する。テストを機械的に新実装へ合わせさせない。
 
-「検証コマンド」は、そのタスク単体で通す focused gate と、Orchestrator が横断で回す統合 gate を区別して渡す。隔離 worktree の Worker は guard に `pwsh` を拒否され、worktree には gitignore 済みの `private-skills` なども無い。ps1 の検証と実ツリーでの配布確認は統合 gate に入れ、Orchestrator が主ツリーで回す。検証コマンドは、先に repo の `mise` task と CI の定義から実コマンドを確認して写す。独自のフラグを足すときは理由を書き、その失敗は repo の gate との差として扱う。worktree の Worker には、検証コマンドごとに実 cwd（`git rev-parse --show-toplevel`）が指定した worktree だと分かる出力を報告へ含めさせる。
+「検証コマンド」は、そのタスク単体で通す focused gate と、Orchestrator が横断で回す統合 gate を区別して渡す。隔離 worktree の Worker は guard に `pwsh` を拒否され、worktree には gitignore 済みの `private-skills` なども無い。ps1 の検証と実ツリーでの配布確認は統合 gate に入れ、Orchestrator が主ツリーで回す。props の形・layout・共有 lib の公開面など共通の境界を変えるタスクは、focused gate にその境界を縛る architecture / boundary テストを含める。変更ファイルの単体テストだけでは、境界違反が統合 gate まで見つからない。検証コマンドは、先に repo の `mise` task と CI の定義から実コマンドを確認して写す。独自のフラグを足すときは理由を書き、その失敗は repo の gate との差として扱う。worktree の Worker には、検証コマンドごとに実 cwd（`git rev-parse --show-toplevel`）が指定した worktree だと分かる出力を報告へ含めさせる。
 
 回帰修正で修正前の失敗を証明する場合は、共有 checkout を切り替えずに[固定SHA fixtureを隔離](references/regression-fixtures.md)する。
 
