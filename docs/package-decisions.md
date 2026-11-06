@@ -821,8 +821,8 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 
 - 決めたこと（ユーザー判断）: 推敲の担当を1つにする。他者が読む長い日本語の文書は、これまでどおり `explain-before-shorten` のあとに `yomiyasu` を明示して呼ぶ（`catalog/AGENTS.md` の推敲規則のまま）。
 - `natural-japanese`: `~/.claude/settings.json` の `skillOverrides` で `user-invocable-only` にした。自動では選ばれず、名前で呼べば使える。外してはいない。
-- `japanese-tech-writing`: 技術記事や技術書の論証を点検するときに名前で呼ぶ。推敲の担当ではない。
-- 理由: 「推敲して」「AI臭さを消して」が `natural-japanese` と `yomiyasu` の両方の description に当たる。`yomiyasu` の upstream も、似た校正スキルを一緒に有効にすると指示が食い違う場合があると書いている。一緒に有効にして壊れたという再現例は見つからず、比べたデータも1件ずつしかないので、優劣ではなく役割の重なりを理由にした。
+- `japanese-tech-writing`: description では技術文書の執筆・推敲・リライトにも当たり、自動で選ばれることは止めていない。ただ `catalog/AGENTS.md` の推敲の流れには入れず、技術記事や技術書の論証（段落の構成、因果、反論への備え）を点検したいときに名前で呼んで使う。
+- 理由: `yomiyasu` は名前を出して頼んだときか、`catalog/AGENTS.md` の推敲規則で呼ばれたときだけ動く。一方 `natural-japanese` の description は「推敲」「AI っぽい」「読みやすくしたい」など名前の無い依頼にも当たる。そのため、推敲規則で `yomiyasu` を呼んだ場面で `natural-japanese` も自動で選ばれ、2つの指示が同時に効くことがある。`yomiyasu` の upstream も、似た校正スキルを一緒に有効にすると指示が食い違う場合があると書いている。一緒に有効にして壊れたという再現例は見つからず、比べたデータも1件ずつしかないので、優劣ではなく役割の重なりを理由にした。
 - 残ること: Codex には `skillOverrides` に当たる設定がないので、Codex では `natural-japanese` がこれまでどおり自動で選ばれることがある。英語向けの unslop 系を日本語の標準の流れから外すかは、まだ決めていない。
 - 戻し方: `~/.claude/settings.json` の `skillOverrides` から `"natural-japanese": "user-invocable-only"` の行を消す。
 - 再検討するなら: 仕事の文書を書くのが中心になり、`natural-japanese` の lint を毎回使いたくなったとき。そのときは `natural-japanese` を担当にして、仕上げの検査に textlint の AI 文検出ルールを足す案がある。
