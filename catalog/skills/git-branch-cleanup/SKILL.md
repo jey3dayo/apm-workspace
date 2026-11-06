@@ -20,7 +20,8 @@ and deletion order.
 
 ## Delegate planning to a cheap subagent
 
-Planning is read-only and fails closed, so hand it to a subagent on a cheap
+Planning has no step that deletes a branch or worktree and fails closed (the
+only write command it runs is `git fetch --prune`), so hand it to a subagent on a cheap
 model (Claude Code: the Agent tool with `model: haiku`). Pass it the absolute
 checkout path and this skill's path. The subagent inherits the parent's
 working directory, not the checkout's, so it runs every Git command as
@@ -144,7 +145,13 @@ repository from the working directory. Resolve values; do not assume `main`,
    metadata names that remote. If a
    remote cannot be mapped, or a branch has no single upstream, mark that
    branch `SKIP`. A remote can be selected per candidate; there is no implicit
-   `origin`.
+   `origin`. `git push` sends to every push URL of the remote, and those can
+   differ from the fetch URL: list them with
+   `git -C <checkout> remote get-url --push --all <remote>`. Require exactly
+   one push URL and resolve it with `gh repo view <push-url> --json
+nameWithOwner`; zero or several URLs, a failed resolution, or a different
+   repository makes that remote's `remote-present` candidates `SKIP_UNSAFE`
+   (a partial push to several URLs could not be reported as `PRESERVED`).
 
 5. Parse the base repository owner from the resolved `nameWithOwner`: require
    exactly one `/` separating two non-empty segments, using the first as the
@@ -472,7 +479,8 @@ native syntax, and perform operations in this order:
    skipped result that hides the completed local deletion.
 
    For a `remote-present` row, immediately before remote mutation, re-resolve
-   the exact upstream remote and its authoritative SHA, and repeat the
+   the exact upstream remote, its single push URL (the same check as step 4 of
+   "Resolve the repository and live context"), and its authoritative SHA, and repeat the
    candidate-level rules and fresh same-repository PR gate. With the local ref
    now gone, compare the remote and every same-repository PR head SHA with the
    confirmed row SHA. If anything
