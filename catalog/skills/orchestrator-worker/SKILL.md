@@ -175,7 +175,7 @@ verdict は、経路によらず次の共通条件をすべて満たした場合
 
 - 上の `codex exec` 経路
   - 起動側が `codex --version` と起動引数をログに残し、上の flag がすべて揃っていることを確かめている。`codex --disable hooks --disable plugins --disable apps features list` で3つが false であること、ログの JSONL に `mcp_tool_call` が無いこと、`turn.completed` で終わっていることも確かめる
-  - 同じ codex version と同じ flag で、対象 repo 内・repo 外（`/tmp`・`$HOME`）への shell 書込みと `apply_patch` が拒否され、`spawn_agent` で子 agent を起動できず、ファイルが作られないことを scratch の git repo で実測済みである。version か flag を変えたら測り直す
+  - 同じ codex version と同じ flag で、対象 repo 内・repo 外（`/tmp`・`$HOME`）への shell 書込みと `apply_patch` が拒否され、`spawn_agent` で子 agent を起動できず、ファイルが作られないことを scratch の git repo で実測済みである。version か flag を変えたら `scripts/measure-readonly-sandbox.py` で測り直す（プロンプトは [references/readonly-sandbox-measure-prompt.md](references/readonly-sandbox-measure-prompt.md)）
   - verdict は最後の行の `VERDICT: APPROVE` か `VERDICT: REQUEST_CHANGES` で、blocking 指摘が1件でもあれば REQUEST_CHANGES とする
 - `agmsg-delegation` の review 経路: 同 skill の「7. 報告を受けて検証する」の review 受理条件（`review_mode: verdict` と起動前の強制境界の証拠を含む）をすべて満たし、verdict は同 skill の形式に従う。flag と実測の条件は同 skill の強制境界の証拠で置き換える
 
