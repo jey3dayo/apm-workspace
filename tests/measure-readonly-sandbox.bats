@@ -7,6 +7,8 @@ setup() {
   MEASURE="$REPO_ROOT/catalog/skills/orchestrator-worker/scripts/measure-readonly-sandbox.py"
   SKILL="$REPO_ROOT/catalog/skills/orchestrator-worker/SKILL.md"
   unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE
+  # Importing the script must not leave __pycache__ in catalog/: smoke:catalog would see it as an extra file.
+  export PYTHONDONTWRITEBYTECODE=1
 }
 
 # Prints the report for the base fixture after applying the variant named in $1.
@@ -136,12 +138,12 @@ PY
   [[ "$output" == *"no denial text"* ]]
 }
 
-@test "a write without a command_execution item is a note, not a pass by the model's report" {
+@test "a write without a command_execution item fails instead of trusting the model's report" {
   run judge_variant noitem
 
-  [[ "$output" == *"[PASS] 2 "* ]]
-  [[ "$output" == *"NOTE: tmp write has no command_execution item; denial is only model-reported"* ]]
-  [[ "$output" == *"overall: PASS"* ]]
+  [[ "$output" == *"[FAIL] 2 "* ]]
+  [[ "$output" == *"tmp: write has no command_execution item"* ]]
+  [[ "$output" == *"overall: FAIL"* ]]
 }
 
 @test "a patch rejection that only the model quotes does not pass" {
