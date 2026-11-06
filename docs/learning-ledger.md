@@ -27,3 +27,4 @@
 | 2026-11-06 | `git-branch-cleanup` の worktree 除外条件に、パスを使う生きたプロセス（`lsof +D`）を足した | `catalog/skills/git-branch-cleanup/SKILL.md` | 次に dev stack が動く worktree を掃除するとき、候補から除外されるか確認を求められ、削除後に tilt などが壊れない | 未計測 | |
 | 2026-11-06 | Worker の検証に、実 cwd（`git rev-parse --show-toplevel`）の報告と、主 checkout の前後比較を求めるようにした | `catalog/skills/orchestrator-worker/SKILL.md` | 次の worktree Worker の報告に cwd 出力が付き、書込み先の取り違えが主 checkout の差分で検出される | 未計測 | |
 | 2026-11-06 | 検証コマンドは repo の `mise` task と CI 定義から確認して写し、独自フラグは理由を書くようにした | `catalog/skills/orchestrator-worker/SKILL.md` | 次の Worker の検証コマンドが repo の gate と一致し、独自フラグの失敗が gate との差として報告される | 未計測 | |
+| 2026-11-06 | `apm-deploy-verify` に、archify の既知の link 警告（アンカー付きと例文中のリンク）を既知として扱う旨を足した | `catalog/skills/apm-deploy-verify/SKILL.md` | 次の deploy 検証の報告で、archify の警告を「原因未調査」と申し送らず、既知の 1 行で済ませる | 未計測 | |

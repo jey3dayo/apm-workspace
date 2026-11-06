@@ -25,7 +25,7 @@ fork 実行では会話履歴は見えない。検証対象（変更した skill
 ## 手順
 
 1. `mise -C ~/.apm run format` → `mise -C ~/.apm run check` を実行する。失敗したら以降へ進まず、失敗ログを添えて報告する
-2. `mise -C ~/.apm run deploy:fresh` を実行する。`install:catalog` 単独では新規追加ファイルが配布先から消えるため使わない。**注意:** opencode は skills face を opt-out しており、`~/.config/opencode/agents` も配布対象外なので deploy は agents face を削除する。catalog が opencode 向けに持つのは config と commands だけになる
+2. `mise -C ~/.apm run deploy:fresh` を実行する。`install:catalog` 単独では新規追加ファイルが配布先から消えるため使わない。**注意:** opencode は skills face を opt-out しており、`~/.config/opencode/agents` も配布対象外なので deploy は agents face を削除する。catalog が opencode 向けに持つのは config と commands だけになる。exit 0 で出る `apm_modules/tt-a1i/archify/archify/SKILL.md: Referenced file not found: references/<file>.md#<anchor>` の警告（アンカー付きで参照先の実体がある）と `/abs/path/checkout-timing.html`（例文中のリンク）の警告は、失敗扱いにせず既知として1行で報告する。これ以外の `Referenced file not found` は別扱い
 3. 変更した skill ごとに配布一致を確認する:
 
    ```bash
