@@ -50,6 +50,26 @@ scripts: {}
     Test-ManifestHasCatalogReference | Should -Be $true
   }
 
+  It "reports no .apm claim when catalog/.apm is absent or holds only the placeholder" {
+    Get-CatalogApmDirClaimMessage | Should -BeNullOrEmpty
+
+    $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
+    New-Item -ItemType Directory -Path $apmDir -Force | Out-Null
+    New-Item -ItemType File -Path (Join-Path $apmDir ".gitkeep") | Out-Null
+
+    Get-CatalogApmDirClaimMessage | Should -BeNullOrEmpty
+    { Assert-CatalogApmDirUnclaimed } | Should -Not -Throw
+  }
+
+  It "refuses to stage a catalog whose .apm holds a primitive the build would drop" {
+    $agentsDir = Join-Path (Join-Path (Get-TrackedCatalogDir) ".apm") "agents"
+    New-Item -ItemType Directory -Path $agentsDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $agentsDir "sample.agent.md") -Value "agent"
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds agents/sample.agent.md*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds agents/sample.agent.md*"
+  }
+
   It "lists skill ids from the managed catalog tree" {
     $skillsRoot = Join-Path (Join-Path $TestDrive "catalog") "skills"
     New-Item -ItemType Directory -Path (Join-Path $skillsRoot "mypc-manager") -Force | Out-Null
