@@ -195,7 +195,7 @@ catalog_build_dir() {
 }
 
 catalog_build_skills_root() {
-  printf '%s/skills\n' "$(catalog_build_dir)"
+  printf '%s/.apm/skills\n' "$(catalog_build_dir)"
 }
 
 catalog_build_agents_root() {
@@ -227,7 +227,7 @@ workspace_package_cache_root() {
 }
 
 tracked_catalog_skills_root() {
-  printf '%s/catalog/skills\n' "$WORKSPACE_DIR"
+  printf '%s/.apm/skills\n' "$(tracked_catalog_dir)"
 }
 
 private_skills_root() {
@@ -258,14 +258,14 @@ tracked_catalog_relative_path() {
   printf '%s\n' "$CATALOG_DIR_NAME"
 }
 
-# The catalog build recreates only catalog/.apm/.gitkeep, so prepare:catalog would delete anything else
+# The catalog build recreates only catalog/.apm/skills, so prepare:catalog would delete any other primitive
 # there, and APM installs .apm/agents/** whatever the package type while the legacy sync still rewrites
-# the same targets. Prints a message when catalog/.apm holds something other than the placeholder.
+# the same targets. Prints a message when catalog/.apm holds something other than skills.
 catalog_apm_dir_claim_message() {
-  claimed_entry=$(relative_file_list "$(tracked_catalog_dir)/.apm" | awk 'NF && $0 != ".gitkeep" { print; exit }')
+  claimed_entry=$(relative_file_list "$(tracked_catalog_dir)/.apm" | awk 'NF && $0 !~ /^skills\// { print; exit }')
   [ -n "$claimed_entry" ] || return 0
 
-  printf 'catalog/.apm holds %s, but the legacy catalog sync still owns every primitive: prepare:catalog would delete it and APM would install it alongside the sync output. Move a primitive into catalog/.apm only in the change that retires its legacy writer.\n' "$claimed_entry"
+  printf 'catalog/.apm holds %s, but only catalog/.apm/skills is migrated: the legacy catalog sync still owns every other primitive, so prepare:catalog would delete it and APM would install it alongside the sync output. Move a primitive into catalog/.apm only in the change that retires its legacy writer.\n' "$claimed_entry"
 }
 
 assert_catalog_apm_dir_unclaimed() {
@@ -301,8 +301,6 @@ reset_catalog_build_dir() {
   rm -rf "$destination_dir"
   mkdir -p "$destination_dir"
   mkdir -p "$(catalog_build_skills_root)"
-  mkdir -p "$destination_dir/.apm"
-  printf '\n' >"$destination_dir/.apm/.gitkeep"
 }
 
 reset_tracked_catalog_dir() {
@@ -1356,7 +1354,7 @@ requested_catalog_skill_ids() {
     for skill_id in "$@"; do
       validate_skill_id "$skill_id"
       if ! tracked_catalog_skill_ids | awk -v target="$skill_id" '$0 == target { found = 1; exit } END { exit(found ? 0 : 1) }'; then
-        fail "Requested catalog skill is not tracked in catalog/skills: $skill_id"
+        fail "Requested catalog skill is not tracked in catalog/.apm/skills: $skill_id"
       fi
       printf '%s\n' "$skill_id"
     done
@@ -1372,7 +1370,7 @@ requested_local_skill_ids() {
     for skill_id in "$@"; do
       validate_skill_id "$skill_id"
       if ! printf '%s\n' "$available_skill_ids" | awk -v target="$skill_id" '$0 == target { found = 1; exit } END { exit(found ? 0 : 1) }'; then
-        fail "Requested local skill is not available in catalog/skills or private-skills: $skill_id"
+        fail "Requested local skill is not available in catalog/.apm/skills or private-skills: $skill_id"
       fi
       printf '%s\n' "$skill_id"
     done

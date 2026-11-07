@@ -9,7 +9,7 @@
 | レーン                 | 正本                                 | 配布                                                                                    | 用途                                                               |
 | ---------------------- | ------------------------------------ | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
 | global（外部）         | root `apm.yml` の `dependencies.apm` | 全リポジトリへ自動 rollout                                                              | 横断的に使う外部スキル                                             |
-| global（自作 catalog） | `catalog/skills/**`                  | 全リポジトリへ自動 rollout                                                              | 個人の横断ワークフロー                                             |
+| global（自作 catalog） | `catalog/.apm/skills/**`             | 全リポジトリへ自動 rollout                                                              | 個人の横断ワークフロー                                             |
 | ~/.apm 専用            | `.apm/skills/**`                     | この workspace 内の symlink bridge のみ                                                 | APM workspace 自身の運用手順                                       |
 | optional               | `optional-skills/<id>/**`            | 利用リポジトリで個別 ref を直接 install                                                 | 選択リポジトリだけのワークフロー                                   |
 | private                | `private-skills/.apm/skills/**`      | deploy で catalog と同時同期（fast path: `apply:skills:local`）・~/.apm では gitignored | マシンローカルの overlay（正本は private repo）                    |
@@ -18,7 +18,7 @@
 
 ## global の一覧
 
-global の外部スキルと MCP は root `apm.yml`（`dependencies.apm` / `dependencies.mcp`）と `apm.lock.yaml`、自作 catalog スキルは `catalog/skills/` を正本として直接見る。このファイルには名前を写さない。
+global の外部スキルと MCP は root `apm.yml`（`dependencies.apm` / `dependencies.mcp`）と `apm.lock.yaml`、自作 catalog スキルは `catalog/.apm/skills/` を正本として直接見る。このファイルには名前を写さない。
 Cursor user-scope（`~/.cursor/mcp.json`）は APM 外 — [`package-decisions.md`](package-decisions.md) の Cursor 節。
 
 ## ~/.apm 専用（.apm/skills/）

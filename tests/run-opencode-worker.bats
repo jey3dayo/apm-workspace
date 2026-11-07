@@ -7,8 +7,8 @@
 
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
-  SCRIPT="$REPO_ROOT/catalog/skills/agmsg-delegation/scripts/run-opencode-worker.sh"
-  SKILL="$REPO_ROOT/catalog/skills/orchestrator-worker/SKILL.md"
+  SCRIPT="$REPO_ROOT/catalog/.apm/skills/agmsg-delegation/scripts/run-opencode-worker.sh"
+  SKILL="$REPO_ROOT/catalog/.apm/skills/orchestrator-worker/SKILL.md"
   PROJECT="$(mktemp -d)"
   PAYLOAD="$(mktemp)"
   printf 'noop\n' >"$PAYLOAD"

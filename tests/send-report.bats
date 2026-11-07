@@ -9,7 +9,7 @@
 
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
-  SCRIPT="$REPO_ROOT/catalog/skills/agmsg-delegation/scripts/send-report.sh"
+  SCRIPT="$REPO_ROOT/catalog/.apm/skills/agmsg-delegation/scripts/send-report.sh"
   # 実際の agmsg へ送らせない。通過したら引数がそのまま echo される。
   export AGMSG_SEND_SCRIPT=/bin/echo
 }

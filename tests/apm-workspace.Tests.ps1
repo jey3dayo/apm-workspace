@@ -50,12 +50,12 @@ scripts: {}
     Test-ManifestHasCatalogReference | Should -Be $true
   }
 
-  It "reports no .apm claim when catalog/.apm is absent or holds only the placeholder" {
+  It "reports no .apm claim when catalog/.apm is absent or holds only skills" {
     Get-CatalogApmDirClaimMessage | Should -BeNullOrEmpty
 
-    $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
-    New-Item -ItemType Directory -Path $apmDir -Force | Out-Null
-    New-Item -ItemType File -Path (Join-Path $apmDir ".gitkeep") | Out-Null
+    $skillDir = Join-Path (Join-Path (Join-Path (Get-TrackedCatalogDir) ".apm") "skills") "demo"
+    New-Item -ItemType Directory -Path $skillDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $skillDir "SKILL.md") -Value "# demo"
 
     Get-CatalogApmDirClaimMessage | Should -BeNullOrEmpty
     { Assert-CatalogApmDirUnclaimed } | Should -Not -Throw
@@ -68,6 +68,38 @@ scripts: {}
 
     Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds agents/sample.agent.md*"
     { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds agents/sample.agent.md*"
+  }
+
+  It "refuses to stage a catalog whose .apm holds a dotfile the build would drop" {
+    $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
+    New-Item -ItemType Directory -Path $apmDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $apmDir ".gitkeep") -Value ""
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds .gitkeep*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds .gitkeep*"
+  }
+
+  It "seeds the catalog build with skills under .apm/skills and no top-level skills directory" {
+    $trackedDir = Join-Path $TestDrive "tracked-catalog"
+    $buildDir = Join-Path $TestDrive "build-catalog"
+    foreach ($subdir in @("agents", "commands", "rules", ".apm/skills/demo")) {
+      New-Item -ItemType Directory -Path (Join-Path $trackedDir $subdir) -Force | Out-Null
+    }
+    Set-Content -LiteralPath (Join-Path $trackedDir ".apm/skills/demo/SKILL.md") -Value "# demo"
+    Set-Content -LiteralPath (Join-Path $trackedDir "apm.yml") -Value "name: catalog"
+    Set-Content -LiteralPath (Join-Path $trackedDir "README.md") -Value "# catalog"
+    Set-Content -LiteralPath (Join-Path $trackedDir "AGENTS.md") -Value "# instructions"
+
+    Mock Ensure-WorkspaceRepo {}
+    Mock Ensure-WorkspaceScaffold {}
+    Mock Ensure-WorkspaceMiseFile {}
+    Mock Get-TrackedCatalogDir { $trackedDir }
+    Mock Get-CatalogBuildDir { $buildDir }
+
+    Invoke-SeedCatalogBuild
+
+    Test-Path -LiteralPath (Join-Path $buildDir ".apm/skills/demo/SKILL.md") | Should -Be $true
+    Test-Path -LiteralPath (Join-Path $buildDir "skills") | Should -Be $false
   }
 
   It "lists skill ids from the managed catalog tree" {
@@ -783,8 +815,8 @@ dependencies:
     $apmModulesRoot = Join-Path $script:WorkspaceDir "apm_modules"
     Remove-Item -LiteralPath $catalogRoot -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item -LiteralPath $apmModulesRoot -Recurse -Force -ErrorAction SilentlyContinue
-    $trackedDir = Join-Path $catalogRoot "skills\foo"
-    $cacheDir = Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog\skills\foo"
+    $trackedDir = Join-Path $catalogRoot ".apm\skills\foo"
+    $cacheDir = Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog\.apm\skills\foo"
     New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
     New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $trackedDir "SKILL.md") -Value "a"
@@ -799,7 +831,7 @@ dependencies:
     $apmModulesRoot = Join-Path $script:WorkspaceDir "apm_modules"
     Remove-Item -LiteralPath $catalogRoot -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item -LiteralPath $apmModulesRoot -Recurse -Force -ErrorAction SilentlyContinue
-    $trackedDir = Join-Path $catalogRoot "skills\new-skill"
+    $trackedDir = Join-Path $catalogRoot ".apm\skills\new-skill"
     $cacheRoot = Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog"
     New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
     New-Item -ItemType Directory -Path $cacheRoot -Force | Out-Null
@@ -814,7 +846,7 @@ dependencies:
     $apmModulesRoot = Join-Path $script:WorkspaceDir "apm_modules"
     Remove-Item -LiteralPath $catalogRoot -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item -LiteralPath $apmModulesRoot -Recurse -Force -ErrorAction SilentlyContinue
-    $trackedDir = Join-Path $catalogRoot "skills\foo"
+    $trackedDir = Join-Path $catalogRoot ".apm\skills\foo"
     New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $trackedDir "SKILL.md") -Value "a"
     Initialize-GitTrackedDirectory -Directory $catalogRoot
@@ -827,8 +859,8 @@ dependencies:
     $apmModulesRoot = Join-Path $script:WorkspaceDir "apm_modules"
     Remove-Item -LiteralPath $catalogRoot -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item -LiteralPath $apmModulesRoot -Recurse -Force -ErrorAction SilentlyContinue
-    $trackedDir = Join-Path $catalogRoot "skills\foo"
-    $cacheDir = Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog\skills\foo"
+    $trackedDir = Join-Path $catalogRoot ".apm\skills\foo"
+    $cacheDir = Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog\.apm\skills\foo"
     New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
     New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $trackedDir "SKILL.md") -Value "a"
@@ -855,8 +887,8 @@ dependencies:
     $apmModulesRoot = Join-Path $script:WorkspaceDir "apm_modules"
     Remove-Item -LiteralPath $catalogRoot -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item -LiteralPath $apmModulesRoot -Recurse -Force -ErrorAction SilentlyContinue
-    $trackedDir = Join-Path $catalogRoot "skills\foo"
-    $cacheDir = Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog\skills\foo"
+    $trackedDir = Join-Path $catalogRoot ".apm\skills\foo"
+    $cacheDir = Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog\.apm\skills\foo"
     New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
     New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $trackedDir "SKILL.md") -Value "a"
@@ -873,8 +905,8 @@ dependencies:
     $apmModulesRoot = Join-Path $script:WorkspaceDir "apm_modules"
     Remove-Item -LiteralPath $catalogRoot -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item -LiteralPath $apmModulesRoot -Recurse -Force -ErrorAction SilentlyContinue
-    $trackedDir = Join-Path $catalogRoot "skills\foo"
-    $cacheDir = Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog\skills\foo"
+    $trackedDir = Join-Path $catalogRoot ".apm\skills\foo"
+    $cacheDir = Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog\.apm\skills\foo"
     New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
     New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $trackedDir "SKILL.md") -Value "a"
@@ -890,8 +922,8 @@ dependencies:
     $apmModulesRoot = Join-Path $script:WorkspaceDir "apm_modules"
     Remove-Item -LiteralPath $catalogRoot -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item -LiteralPath $apmModulesRoot -Recurse -Force -ErrorAction SilentlyContinue
-    $trackedDir = Join-Path $catalogRoot "skills\foo"
-    $cacheDir = Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog\skills\foo"
+    $trackedDir = Join-Path $catalogRoot ".apm\skills\foo"
+    $cacheDir = Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog\.apm\skills\foo"
     New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
     New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $trackedDir "SKILL.md") -Value "a"
@@ -906,8 +938,8 @@ dependencies:
     $apmModulesRoot = Join-Path $script:WorkspaceDir "apm_modules"
     Remove-Item -LiteralPath $catalogRoot -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item -LiteralPath $apmModulesRoot -Recurse -Force -ErrorAction SilentlyContinue
-    $trackedDir = Join-Path $catalogRoot "skills\foo"
-    $cacheDir = Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog\skills\foo"
+    $trackedDir = Join-Path $catalogRoot ".apm\skills\foo"
+    $cacheDir = Join-Path $script:WorkspaceDir "apm_modules\jey3dayo\apm-workspace\catalog\.apm\skills\foo"
     New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
     New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $trackedDir "SKILL.md") -Value "a"
@@ -942,8 +974,8 @@ Describe "Assert-TrackedCatalogPublished" {
       & git -C $WorkspaceDir config user.email "test@example.com" | Out-Null
       & git -C $WorkspaceDir config user.name "Test" | Out-Null
       & git -C $WorkspaceDir checkout -q -b main | Out-Null
-      New-Item -ItemType Directory -Path (Join-Path $WorkspaceDir "catalog\skills\foo") -Force | Out-Null
-      Set-Content -LiteralPath (Join-Path $WorkspaceDir "catalog\skills\foo\SKILL.md") -Value "a"
+      New-Item -ItemType Directory -Path (Join-Path $WorkspaceDir "catalog\.apm\skills\foo") -Force | Out-Null
+      Set-Content -LiteralPath (Join-Path $WorkspaceDir "catalog\.apm\skills\foo\SKILL.md") -Value "a"
       & git -C $WorkspaceDir add -A | Out-Null
       & git -C $WorkspaceDir commit -q -m "init" | Out-Null
       & git -C $WorkspaceDir push -q -u origin main | Out-Null
@@ -964,7 +996,7 @@ Describe "Assert-TrackedCatalogPublished" {
     $remoteDir = Join-Path $TestDrive "remote-$script:caseId.git"
     Initialize-PublishedWorkspace -RemoteDir $remoteDir -WorkspaceDir $script:WorkspaceDir
 
-    Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "catalog\skills\foo\SKILL.md") -Value "dirty"
+    Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "catalog\.apm\skills\foo\SKILL.md") -Value "dirty"
 
     { Assert-TrackedCatalogPublished } | Should -Throw "*uncommitted changes*"
   }
@@ -973,7 +1005,7 @@ Describe "Assert-TrackedCatalogPublished" {
     $remoteDir = Join-Path $TestDrive "remote-$script:caseId.git"
     Initialize-PublishedWorkspace -RemoteDir $remoteDir -WorkspaceDir $script:WorkspaceDir
 
-    Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "catalog\skills\foo\extra.md") -Value "b"
+    Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "catalog\.apm\skills\foo\extra.md") -Value "b"
     & git -C $script:WorkspaceDir add -A | Out-Null
     & git -C $script:WorkspaceDir commit -q -m "unpushed" | Out-Null
 
@@ -981,8 +1013,8 @@ Describe "Assert-TrackedCatalogPublished" {
   }
 
   It "fails closed when the workspace is not a git repository" {
-    New-Item -ItemType Directory -Path (Join-Path $script:WorkspaceDir "catalog\skills\foo") -Force | Out-Null
-    Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "catalog\skills\foo\SKILL.md") -Value "a"
+    New-Item -ItemType Directory -Path (Join-Path $script:WorkspaceDir "catalog\.apm\skills\foo") -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $script:WorkspaceDir "catalog\.apm\skills\foo\SKILL.md") -Value "a"
     # Deliberately skip git init: git status/rev-list must fail, and the gate
     # must not treat that failure as "clean" / "pushed".
 
@@ -1823,7 +1855,7 @@ dependencies:
 
   It "smoke:catalog normalizes Codex-installed skill paths for namespaced skill ids" {
     $buildDir = Join-Path $TestDrive "catalog-build"
-    $buildSkillsRoot = Join-Path $buildDir "skills"
+    $buildSkillsRoot = Join-Path (Join-Path $buildDir ".apm") "skills"
     $bundleSkillRoot = Join-Path (Join-Path $buildSkillsRoot "mattpocock") "wayfinder"
     $bundleRequestedSkillIds = New-Object System.Collections.Generic.List[string]
     $installCalls = New-Object System.Collections.Generic.List[string]
@@ -1947,7 +1979,7 @@ dependencies:
     Mock Ensure-WorkspaceScaffold {}
     Mock New-TemporaryDirectory { Join-Path $TestDrive "apm-sync-local" }
     Mock Get-RequestedLocalSkillIds { @("mattpocock:wayfinder") }
-    Mock Get-LocalSkillContentDir { Join-Path $TestDrive "catalog/skills/mattpocock/wayfinder" }
+    Mock Get-LocalSkillContentDir { Join-Path $TestDrive "catalog/.apm/skills/mattpocock/wayfinder" }
     Mock Get-LocalCodexSyncTarget {
       [pscustomobject]@{ Name = "codex"; Root = (Join-Path $TestDrive ".codex"); SkillsRoot = (Join-Path $TestDrive ".agents"); ConfigName = "AGENTS.md" }
     }
@@ -1959,7 +1991,7 @@ dependencies:
     Mock Invoke-AgmsgStateRestore {}
     Mock Invoke-AgmsgStateRestoreOrThrow {}
 
-    $sourcePath = Join-Path $TestDrive "catalog/skills/mattpocock/wayfinder"
+    $sourcePath = Join-Path $TestDrive "catalog/.apm/skills/mattpocock/wayfinder"
     New-Item -ItemType Directory -Path (Join-Path $sourcePath "references") -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $sourcePath "SKILL.md") -Value "# wayfinder"
     Set-Content -LiteralPath (Join-Path $sourcePath "references/note.md") -Value "local"
@@ -1985,7 +2017,7 @@ dependencies:
     Mock Ensure-WorkspaceScaffold {}
     Mock New-TemporaryDirectory { Join-Path $TestDrive "apm-sync-local-stale" }
     Mock Get-RequestedLocalSkillIds { @("mattpocock:wayfinder") }
-    Mock Get-LocalSkillContentDir { Join-Path $TestDrive "stale-quick-sync/catalog/skills/mattpocock/wayfinder" }
+    Mock Get-LocalSkillContentDir { Join-Path $TestDrive "stale-quick-sync/catalog/.apm/skills/mattpocock/wayfinder" }
     Mock Get-LocalCodexSyncTarget {
       [pscustomobject]@{ Name = "codex"; Root = (Join-Path $TestDrive "stale-quick-sync/.codex"); SkillsRoot = (Join-Path $TestDrive "stale-quick-sync/.agents"); ConfigName = "AGENTS.md" }
     }
@@ -1993,7 +2025,7 @@ dependencies:
     Mock Invoke-AgmsgStateRestore {}
     Mock Invoke-AgmsgStateRestoreOrThrow {}
 
-    $sourcePath = Join-Path $TestDrive "stale-quick-sync/catalog/skills/mattpocock/wayfinder"
+    $sourcePath = Join-Path $TestDrive "stale-quick-sync/catalog/.apm/skills/mattpocock/wayfinder"
     New-Item -ItemType Directory -Path $sourcePath -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $sourcePath "SKILL.md") -Value "# wayfinder"
 

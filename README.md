@@ -22,7 +22,7 @@ Keep this short index here; the inventory above owns the detailed list.
 
 | Need                                            | Authoring surface                  | Delivery                                            |
 | ----------------------------------------------- | ---------------------------------- | --------------------------------------------------- |
-| Global personal skill                           | `catalog/skills/<id>/`             | normal rollout                                      |
+| Global personal skill                           | `catalog/.apm/skills/<id>/`        | normal rollout                                      |
 | Selected repositories only                      | `optional-skills/<id>/`            | consuming repo installs its ref                     |
 | Workspace-only operation                        | `.apm/skills/<id>/`                | tracked runtime bridges                             |
 | Machine-local override                          | `private-skills/.apm/skills/<id>/` | `mise run deploy` (fast path: `apply:skills:local`) |

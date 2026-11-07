@@ -7,7 +7,7 @@
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
   SCRIPT="$REPO_ROOT/scripts/models-check.sh"
-  REAL_HELPERS="$REPO_ROOT/catalog/skills/agmsg-delegation/scripts"
+  REAL_HELPERS="$REPO_ROOT/catalog/.apm/skills/agmsg-delegation/scripts"
   FIXTURE_DIR="$(mktemp -d)"
   mkdir -p "$FIXTURE_DIR/helpers" "$FIXTURE_DIR/codex"
   export CODEX_HOME="$FIXTURE_DIR/codex"

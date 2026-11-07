@@ -3,7 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-HELPERS_DIR="${MODELS_CHECK_SCRIPTS_DIR:-$REPO_ROOT/catalog/skills/agmsg-delegation/scripts}"
+HELPERS_DIR="${MODELS_CHECK_SCRIPTS_DIR:-$REPO_ROOT/catalog/.apm/skills/agmsg-delegation/scripts}"
 CALL_TIMEOUT="${MODELS_CHECK_TIMEOUT:-30}"
 
 missing_count=0

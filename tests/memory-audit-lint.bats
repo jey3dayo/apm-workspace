@@ -6,7 +6,7 @@ bats_require_minimum_version 1.5.0
 
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
-  SCRIPT_UNDER_TEST="$REPO_ROOT/catalog/skills/memory-audit/scripts/lint-memory.sh"
+  SCRIPT_UNDER_TEST="$REPO_ROOT/catalog/.apm/skills/memory-audit/scripts/lint-memory.sh"
   MEM="$BATS_TEST_TMPDIR/memory"
   mkdir -p "$MEM"
 }

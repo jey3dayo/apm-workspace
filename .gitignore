@@ -4,7 +4,8 @@
 /config.json
 !/catalog/.apm/
 /catalog/.apm/*
-!/catalog/.apm/.gitkeep
+!/catalog/.apm/skills/
+!/catalog/.apm/skills/**
 /.github/skills/
 
 /.apm/*

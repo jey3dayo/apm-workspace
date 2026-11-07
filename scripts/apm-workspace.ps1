@@ -269,7 +269,8 @@ function Copy-DirectoryContents {
 function Get-RelativeFilePaths {
   param(
     [Parameter(Mandatory = $true)]
-    [string]$RootDir
+    [string]$RootDir,
+    [switch]$IncludeHidden
   )
 
   if (-not (Test-Path -LiteralPath $RootDir)) {
@@ -278,7 +279,7 @@ function Get-RelativeFilePaths {
 
   $rootFullPath = (Resolve-Path -LiteralPath $RootDir).Path
   $result = New-Object System.Collections.Generic.List[string]
-  foreach ($file in Get-ChildItem -LiteralPath $RootDir -Recurse -File) {
+  foreach ($file in Get-ChildItem -LiteralPath $RootDir -Recurse -File -Force:$IncludeHidden) {
     $relativePath = $file.FullName.Substring($rootFullPath.Length).TrimStart('\', '/')
     $result.Add(($relativePath -replace '\\', '/'))
   }
@@ -2636,7 +2637,7 @@ function Test-AgmsgRosterLink {
 }
 
 function Get-CatalogBuildSkillsRoot {
-  return (Join-Path (Get-CatalogBuildDir) "skills")
+  return (Join-Path (Join-Path (Get-CatalogBuildDir) ".apm") "skills")
 }
 
 function Get-CatalogBuildAgentsRoot {
@@ -2668,7 +2669,7 @@ function Get-WorkspacePackageCacheRoot {
 }
 
 function Get-TrackedCatalogSkillsRoot {
-  return (Join-Path $WorkspaceDir "catalog\skills")
+  return (Join-Path (Join-Path (Get-TrackedCatalogDir) ".apm") "skills")
 }
 
 function Get-PrivateSkillsRoot {
@@ -2919,7 +2920,7 @@ function Get-RequestedCatalogSkillIds {
     foreach ($skillId in $RequestedSkillIds) {
       Test-SkillId -SkillId $skillId
       if ($skillId -notin $trackedSkillIds) {
-        throw "Requested catalog skill is not tracked in catalog/skills: $skillId"
+        throw "Requested catalog skill is not tracked in catalog/.apm/skills: $skillId"
       }
     }
     return $RequestedSkillIds
@@ -2938,7 +2939,7 @@ function Get-RequestedLocalSkillIds {
     foreach ($skillId in $RequestedSkillIds) {
       Test-SkillId -SkillId $skillId
       if ($skillId -notin $availableSkillIds) {
-        throw "Requested local skill is not available in catalog/skills or private-skills: $skillId"
+        throw "Requested local skill is not available in catalog/.apm/skills or private-skills: $skillId"
       }
     }
     return $RequestedSkillIds
@@ -3853,8 +3854,6 @@ function Reset-CatalogBuildDir {
 
   New-Item -ItemType Directory -Path $buildDir -Force | Out-Null
   New-Item -ItemType Directory -Path (Get-CatalogBuildSkillsRoot) -Force | Out-Null
-  New-Item -ItemType Directory -Path (Join-Path $buildDir ".apm") -Force | Out-Null
-  [System.IO.File]::WriteAllText((Join-Path $buildDir ".apm\.gitkeep"), "`n", [System.Text.UTF8Encoding]::new($false))
 }
 
 function Reset-TrackedCatalogDir {
@@ -3867,12 +3866,12 @@ function Reset-TrackedCatalogDir {
 }
 
 function Get-CatalogApmDirClaimMessage {
-  $claimedEntry = @(Get-RelativeFilePaths -RootDir (Join-Path (Get-TrackedCatalogDir) ".apm") | Where-Object { $_ -ne ".gitkeep" }) | Select-Object -First 1
+  $claimedEntry = @(Get-RelativeFilePaths -RootDir (Join-Path (Get-TrackedCatalogDir) ".apm") -IncludeHidden | Where-Object { $_ -cnotlike "skills/*" }) | Select-Object -First 1
   if (-not $claimedEntry) {
     return $null
   }
 
-  return ("catalog/.apm holds {0}, but the legacy catalog sync still owns every primitive: prepare:catalog would delete it and APM would install it alongside the sync output. Move a primitive into catalog/.apm only in the change that retires its legacy writer." -f $claimedEntry)
+  return ("catalog/.apm holds {0}, but only catalog/.apm/skills is migrated: the legacy catalog sync still owns every other primitive, so prepare:catalog would delete it and APM would install it alongside the sync output. Move a primitive into catalog/.apm only in the change that retires its legacy writer." -f $claimedEntry)
 }
 
 function Assert-CatalogApmDirUnclaimed {

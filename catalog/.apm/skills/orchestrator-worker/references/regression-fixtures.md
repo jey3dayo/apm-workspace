@@ -6,7 +6,7 @@ Use this procedure when a regression claim depends on seeing the failing test be
 
 1. Record the full base SHA and materialize it into a task-specific scratch directory, for example with `git archive <full-sha> | tar -x -C <fixture-root>`. Do not switch the shared checkout to the old revision.
 2. Keep dependencies independent of the shared worktree. Prefer an offline frozen install whose `node_modules` and package-manager store both live inside the fixture. If those packages are unavailable offline, stop rather than falling back to a shared store.
-3. Run `python3 <orchestrator-worker-skill-root>/scripts/check-fixture-isolation.py <fixture-root>`. In the APM source tree, the skill root is `catalog/skills/orchestrator-worker`; the deployed skill retains the same relative `scripts/` path.
+3. Run `python3 <orchestrator-worker-skill-root>/scripts/check-fixture-isolation.py <fixture-root>`. In the APM source tree, the skill root is `catalog/.apm/skills/orchestrator-worker`; the deployed skill retains the same relative `scripts/` path.
 4. Treat a shared dependency tree as a separate, exceptional execution mode: it is usable only when the test process runs with an OS-enforced read-only mount or sandbox boundary. Verify that boundary from the OS/sandbox configuration; a clean Git status, a frozen lockfile, or file mode alone does not prove writes are denied. The containment checker intentionally rejects external dependency links, so a rejected link must never be reported as checker-approved or fixture-contained.
 
 ## Prove red and green

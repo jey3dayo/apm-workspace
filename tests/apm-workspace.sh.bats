@@ -1235,7 +1235,7 @@ make_doctor_fixture() {
 
   git -C "$doctor_workspace_dir" init -q
   mkdir -p \
-    "$doctor_workspace_dir/catalog/skills" \
+    "$doctor_workspace_dir/catalog/.apm/skills" \
     "$doctor_workspace_dir/catalog/agents" \
     "$doctor_workspace_dir/catalog/commands" \
     "$doctor_workspace_dir/catalog/rules"
@@ -1861,8 +1861,8 @@ make_apply_agmsg_restore_failure_fixture() {
   # replace_skill_targets_from_stage's stale-removal pass deletes the
   # deployed agmsg skill dir outright, regardless of the restore wiring
   # under test.
-  mkdir -p "$APPLY_FIXTURE_WORKSPACE_DIR/catalog/skills/agmsg"
-  printf '# agmsg\n' >"$APPLY_FIXTURE_WORKSPACE_DIR/catalog/skills/agmsg/SKILL.md"
+  mkdir -p "$APPLY_FIXTURE_WORKSPACE_DIR/catalog/.apm/skills/agmsg"
+  printf '# agmsg\n' >"$APPLY_FIXTURE_WORKSPACE_DIR/catalog/.apm/skills/agmsg/SKILL.md"
 
   AGMSG_SKILL_DIR="$APPLY_FIXTURE_HOME/.agents/skills/agmsg"
   AGMSG_STATE_ROOT="$APPLY_FIXTURE_XDG_STATE_HOME/agmsg"
@@ -2282,8 +2282,8 @@ make_catalog_fixture() {
   tracked_dir="$workspace_dir/catalog"
   build_dir="$workspace_dir/.catalog-build/catalog"
 
-  mkdir -p "$tracked_dir/skills" "$tracked_dir/agents" "$tracked_dir/commands" "$tracked_dir/rules"
-  mkdir -p "$build_dir/skills" "$build_dir/agents" "$build_dir/commands" "$build_dir/rules"
+  mkdir -p "$tracked_dir/.apm/skills" "$tracked_dir/agents" "$tracked_dir/commands" "$tracked_dir/rules"
+  mkdir -p "$build_dir/.apm/skills" "$build_dir/agents" "$build_dir/commands" "$build_dir/rules"
 
   printf 'dependencies: []\n' >"$tracked_dir/apm.yml"
   printf '# catalog\n' >"$tracked_dir/README.md"
@@ -2301,15 +2301,15 @@ make_catalog_fixture() {
 
   index=0
   while [ "$index" -lt "$tracked_skill_count" ]; do
-    mkdir -p "$tracked_dir/skills/skill-$index"
-    touch "$tracked_dir/skills/skill-$index/SKILL.md"
+    mkdir -p "$tracked_dir/.apm/skills/skill-$index"
+    touch "$tracked_dir/.apm/skills/skill-$index/SKILL.md"
     index=$((index + 1))
   done
 
   index=0
   while [ "$index" -lt "$build_skill_count" ]; do
-    mkdir -p "$build_dir/skills/skill-$index"
-    touch "$build_dir/skills/skill-$index/SKILL.md"
+    mkdir -p "$build_dir/.apm/skills/skill-$index"
+    touch "$build_dir/.apm/skills/skill-$index/SKILL.md"
     index=$((index + 1))
   done
 
@@ -2370,10 +2370,9 @@ make_catalog_fixture() {
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
-@test "assert_catalog_stage_safety allows a tracked catalog whose .apm holds only the placeholder" {
+@test "assert_catalog_stage_safety allows a tracked catalog whose .apm holds only skills" {
   make_catalog_fixture 2 2
-  mkdir -p "$workspace_dir/catalog/.apm"
-  : >"$workspace_dir/catalog/.apm/.gitkeep"
+  [ -f "$workspace_dir/catalog/.apm/skills/skill-0/SKILL.md" ]
 
   run assert_catalog_stage_safety 0
   [ "$status" -eq 0 ]
@@ -2381,15 +2380,14 @@ make_catalog_fixture() {
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
-@test "catalog_apm_dir_claim_message is silent when .apm is absent or holds only the placeholder" {
+@test "catalog_apm_dir_claim_message is silent when .apm is absent or holds only skills" {
   make_catalog_fixture 2 2
 
   run catalog_apm_dir_claim_message
   [ "$status" -eq 0 ]
   [ -z "$output" ]
 
-  mkdir -p "$workspace_dir/catalog/.apm"
-  : >"$workspace_dir/catalog/.apm/.gitkeep"
+  rm -rf "$workspace_dir/catalog/.apm"
   run catalog_apm_dir_claim_message
   [ "$status" -eq 0 ]
   [ -z "$output" ]
@@ -2397,23 +2395,59 @@ make_catalog_fixture() {
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
-@test "catalog_apm_dir_claim_message names the first primitive found under .apm" {
+@test "catalog_apm_dir_claim_message names the first non-skills primitive found under .apm" {
   make_catalog_fixture 2 2
-  mkdir -p "$workspace_dir/catalog/.apm/skills/demo"
-  : >"$workspace_dir/catalog/.apm/.gitkeep"
-  printf 'skill\n' >"$workspace_dir/catalog/.apm/skills/demo/SKILL.md"
+  mkdir -p "$workspace_dir/catalog/.apm/agents"
+  printf 'agent\n' >"$workspace_dir/catalog/.apm/agents/sample.agent.md"
 
   run catalog_apm_dir_claim_message
   [ "$status" -eq 0 ]
-  [[ "$output" == *"catalog/.apm holds skills/demo/SKILL.md"* ]]
+  [[ "$output" == *"catalog/.apm holds agents/sample.agent.md"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+make_stageable_catalog_fixture() {
+  make_catalog_fixture 2 0
+  mkdir -p "$workspace_dir/.git"
+  printf 'dependencies: []\n' >"$workspace_dir/apm.yml"
+  : >"$workspace_dir/mise.toml"
+  MISE_DESTINATION="$workspace_dir/mise.toml"
+  tracked_catalog_reference() { printf 'owner/repo/catalog#main\n'; }
+}
+
+@test "cmd_seed_catalog_build writes skills under .apm/skills and no top-level skills directory" {
+  make_stageable_catalog_fixture
+
+  run cmd_seed_catalog_build
+  [ "$status" -eq 0 ]
+  [ -f "$workspace_dir/.catalog-build/catalog/.apm/skills/skill-0/SKILL.md" ]
+  [ -f "$workspace_dir/.catalog-build/catalog/.apm/skills/skill-1/SKILL.md" ]
+  [ ! -e "$workspace_dir/.catalog-build/catalog/skills" ]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "cmd_stage_catalog keeps skills under .apm/skills across repeated prepares" {
+  make_stageable_catalog_fixture
+
+  run cmd_stage_catalog
+  [ "$status" -eq 0 ]
+  run cmd_stage_catalog
+  [ "$status" -eq 0 ]
+
+  [ -f "$workspace_dir/catalog/.apm/skills/skill-0/SKILL.md" ]
+  [ -f "$workspace_dir/catalog/.apm/skills/skill-1/SKILL.md" ]
+  [ ! -e "$workspace_dir/catalog/skills" ]
+  [ -z "$(catalog_apm_dir_claim_message)" ]
 
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
 @test "assert_catalog_stage_safety refuses a build with no skills" {
   make_catalog_fixture 2 2
-  rm -rf "$workspace_dir/.catalog-build/catalog/skills"
-  mkdir -p "$workspace_dir/.catalog-build/catalog/skills"
+  rm -rf "$workspace_dir/.catalog-build/catalog/.apm/skills"
+  mkdir -p "$workspace_dir/.catalog-build/catalog/.apm/skills"
 
   run assert_catalog_stage_safety 0
   [ "$status" -ne 0 ]
@@ -2532,9 +2566,9 @@ _git_track() {
 
 @test "assert_catalog_cache_freshness cache_freshness passes when cache matches tracked" {
   workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo"
-  printf 'a\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
-  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo/SKILL.md"
+  mkdir -p "$workspace_dir/catalog/.apm/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo"
+  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
+  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo/SKILL.md"
   _git_track "$workspace_dir/catalog"
 
   WORKSPACE_DIR="$workspace_dir"
@@ -2548,8 +2582,8 @@ _git_track() {
 
 @test "assert_catalog_cache_freshness cache_freshness fails with remedy when a tracked file is missing from cache" {
   workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/skills/new-skill" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog"
-  printf 'a\n' >"$workspace_dir/catalog/skills/new-skill/SKILL.md"
+  mkdir -p "$workspace_dir/catalog/.apm/skills/new-skill" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog"
+  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/new-skill/SKILL.md"
   _git_track "$workspace_dir/catalog"
 
   WORKSPACE_DIR="$workspace_dir"
@@ -2565,8 +2599,8 @@ _git_track() {
 
 @test "assert_catalog_cache_freshness cache_freshness fails with remedy when the cache directory is absent" {
   workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/skills/foo"
-  printf 'a\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
+  mkdir -p "$workspace_dir/catalog/.apm/skills/foo"
+  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
   _git_track "$workspace_dir/catalog"
 
   WORKSPACE_DIR="$workspace_dir"
@@ -2581,10 +2615,10 @@ _git_track() {
 
 @test "assert_catalog_cache_freshness cache_freshness passes when the cache has an extra file not tracked" {
   workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo"
-  printf 'a\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
-  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo/SKILL.md"
-  printf 'metadata\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo/extra.json"
+  mkdir -p "$workspace_dir/catalog/.apm/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo"
+  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
+  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo/SKILL.md"
+  printf 'metadata\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo/extra.json"
   _git_track "$workspace_dir/catalog"
 
   WORKSPACE_DIR="$workspace_dir"
@@ -2598,9 +2632,9 @@ _git_track() {
 
 @test "assert_catalog_cache_freshness cache_freshness truncates the message for many missing files" {
   workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/skills" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog"
+  mkdir -p "$workspace_dir/catalog/.apm/skills" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog"
   for i in $(seq 1 20); do
-    printf 'a\n' >"$workspace_dir/catalog/skills/file-$i.md"
+    printf 'a\n' >"$workspace_dir/catalog/.apm/skills/file-$i.md"
   done
   _git_track "$workspace_dir/catalog"
 
@@ -2617,14 +2651,14 @@ _git_track() {
 
 @test "assert_catalog_cache_freshness cache_freshness ignores gitignored untracked files under tracked_dir" {
   workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo"
-  printf 'a\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
-  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo/SKILL.md"
+  mkdir -p "$workspace_dir/catalog/.apm/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo"
+  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
+  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo/SKILL.md"
 
-  mkdir -p "$workspace_dir/catalog/skills/foo/__pycache__"
-  printf '*.pyc\n' >"$workspace_dir/catalog/skills/foo/.gitignore"
-  printf '*.pyc\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo/.gitignore"
-  printf 'compiled\n' >"$workspace_dir/catalog/skills/foo/__pycache__/module.cpython-314.pyc"
+  mkdir -p "$workspace_dir/catalog/.apm/skills/foo/__pycache__"
+  printf '*.pyc\n' >"$workspace_dir/catalog/.apm/skills/foo/.gitignore"
+  printf '*.pyc\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo/.gitignore"
+  printf 'compiled\n' >"$workspace_dir/catalog/.apm/skills/foo/__pycache__/module.cpython-314.pyc"
 
   _git_track "$workspace_dir/catalog"
 
@@ -2640,9 +2674,9 @@ _git_track() {
 
 @test "assert_catalog_cache_freshness passes when a tracked dotfile is present in the cache" {
   workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo"
-  printf 'a\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
-  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo/SKILL.md"
+  mkdir -p "$workspace_dir/catalog/.apm/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo"
+  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
+  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo/SKILL.md"
   printf '\n' >"$workspace_dir/catalog/.gitkeep"
   printf '\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.gitkeep"
   _git_track "$workspace_dir/catalog"
@@ -2658,9 +2692,9 @@ _git_track() {
 
 @test "assert_catalog_cache_freshness fails when a tracked dotfile is missing from the cache" {
   workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo"
-  printf 'a\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
-  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo/SKILL.md"
+  mkdir -p "$workspace_dir/catalog/.apm/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo"
+  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
+  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo/SKILL.md"
   printf '\n' >"$workspace_dir/catalog/.gitkeep"
   _git_track "$workspace_dir/catalog"
 
@@ -2676,9 +2710,9 @@ _git_track() {
 
 @test "assert_catalog_cache_freshness fails when a cached file's contents differ from the tracked file" {
   workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo"
-  printf 'a\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
-  printf 'DIFFERENT\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo/SKILL.md"
+  mkdir -p "$workspace_dir/catalog/.apm/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo"
+  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
+  printf 'DIFFERENT\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo/SKILL.md"
   _git_track "$workspace_dir/catalog"
 
   WORKSPACE_DIR="$workspace_dir"
@@ -2703,8 +2737,8 @@ _setup_published_workspace() {
   git -C "$workspace_dir" config user.email "test@example.com"
   git -C "$workspace_dir" config user.name "Test"
   git -C "$workspace_dir" checkout -q -b main
-  mkdir -p "$workspace_dir/catalog/skills/foo"
-  printf 'a\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
+  mkdir -p "$workspace_dir/catalog/.apm/skills/foo"
+  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
   git -C "$workspace_dir" add -A
   git -C "$workspace_dir" commit -q -m "init"
   git -C "$workspace_dir" push -q -u origin main
@@ -2716,7 +2750,7 @@ _setup_published_workspace() {
   rmdir "$workspace_dir"
   _setup_published_workspace "$remote_dir" "$workspace_dir"
 
-  printf 'dirty\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
+  printf 'dirty\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
 
   WORKSPACE_DIR="$workspace_dir"
 
@@ -2734,7 +2768,7 @@ _setup_published_workspace() {
   rmdir "$workspace_dir"
   _setup_published_workspace "$remote_dir" "$workspace_dir"
 
-  printf 'b\n' >"$workspace_dir/catalog/skills/foo/extra.md"
+  printf 'b\n' >"$workspace_dir/catalog/.apm/skills/foo/extra.md"
   git -C "$workspace_dir" add -A
   git -C "$workspace_dir" commit -q -m "unpushed"
 
@@ -2750,8 +2784,8 @@ _setup_published_workspace() {
 
 @test "assert_tracked_catalog_published fails closed when the workspace is not a git repository" {
   workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/skills/foo"
-  printf 'a\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
+  mkdir -p "$workspace_dir/catalog/.apm/skills/foo"
+  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
   # No `git init`: git status/rev-list must fail, and the gate must not treat
   # that failure as "clean" / "pushed".
 
@@ -2766,9 +2800,9 @@ _setup_published_workspace() {
 
 @test "assert_catalog_cache_freshness fails closed when git ls-files fails" {
   workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo"
-  printf 'a\n' >"$workspace_dir/catalog/skills/foo/SKILL.md"
-  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/skills/foo/SKILL.md"
+  mkdir -p "$workspace_dir/catalog/.apm/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo"
+  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
+  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo/SKILL.md"
   # Deliberately do NOT git-init the tracked catalog dir: `git ls-files` fails
   # (not a git repository), and the gate must not treat that as "no tracked
   # files" and pass vacuously.

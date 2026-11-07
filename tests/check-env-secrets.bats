@@ -31,7 +31,7 @@ setup_file() {
 
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
-  SCRIPT="$REPO_ROOT/catalog/skills/atomic-commit/scripts/check-env-secrets.sh"
+  SCRIPT="$REPO_ROOT/catalog/.apm/skills/atomic-commit/scripts/check-env-secrets.sh"
   REPO="$BATS_TEST_TMPDIR/repo"
   # helper の一時物が残らないことを見るため、専用の TMPDIR を与える。
   SCRATCH="$BATS_TEST_TMPDIR/scratch"

@@ -67,7 +67,7 @@ exit 0
     # stale), so agmsg needs to be a managed catalog skill here too —
     # otherwise the swap would delete the agmsg skill dir outright
     # regardless of the save/restore wiring under test.
-    $agmsgCatalogSkillDir = Join-Path $script:fixture["WORKSPACE_DIR"] "catalog/skills/agmsg"
+    $agmsgCatalogSkillDir = Join-Path $script:fixture["WORKSPACE_DIR"] "catalog/.apm/skills/agmsg"
     New-Item -ItemType Directory -Path $agmsgCatalogSkillDir -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $agmsgCatalogSkillDir "SKILL.md") -Value "# agmsg"
 

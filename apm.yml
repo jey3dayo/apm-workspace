@@ -87,7 +87,7 @@ dependencies:
       args:
         - -y
         - "@upstash/context7-mcp@latest"
-    # App-side connectors don't reach the CLI agents; ops rules and GraphQL fallback live in catalog/skills/linear-task-ops.
+    # App-side connectors don't reach the CLI agents; ops rules and GraphQL fallback live in catalog/.apm/skills/linear-task-ops.
     - name: linear
       registry: false
       transport: http
