@@ -122,6 +122,8 @@ scripts/spawn-agent.sh --kind claude --cwd ~/src/my-app --name reviewer --json
 scripts/spawn-agent.sh --kind codex --session work --pane w1:p1 -- --model <model>  # 別 session は --pane 必須
 ```
 
+`--pane` / `--session` は人間が外部 script から呼ぶときにも使える引数であり、agent に Herdr 外からの操作を許可するものではない。agent は前提どおり `HERDR_ENV=1` の pane 内からだけ呼ぶ。立っていなければ Herdr 外なので停止し、`HERDR_ENV` を自分で設定して通さない。
+
 名前は省略すると `<kind>-N`（空き番号）。exit は 0 成功、1 herdr コマンド失敗（split / agent start）、2 引数・検証エラー、3 新しい shell が `--shell-timeout` 内に待機状態にならない、4 読み戻した kind / cwd が不一致、5 `agent_not_ready` を受けて agent の起動を読み戻したが、入力可能状態ではない。5 の場合も pane は閉じずに残し、既定出力は pane_id、`--json` は `ready: false` と Herdr のエラーを `reason` に含める。読み戻しに失敗した場合は従来どおり 1 または 4 を返す。
 
 exit 5 は `herdr agent start` が返した `agent_not_ready` だけを根拠にし、`agent_status` の値から readiness を推定しない。agent 名で `find-agent.sh --name <name>` を使って状態を確認し、入力前にその Herdr version の `herdr --skill` に従う。
