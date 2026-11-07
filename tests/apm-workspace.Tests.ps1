@@ -1906,7 +1906,7 @@ dependencies:
       Invoke-SmokeCatalog -RequestedSkillIds @("mattpocock:wayfinder")
 
       $bundleRequestedSkillIds | Should -Be @("mattpocock:wayfinder")
-      $installCalls | Should -Contain ("install {0} --target codex" -f $buildDir)
+      $installCalls | Should -Contain ("install {0} --target agent-skills" -f $buildDir)
     }
     finally {
       Remove-Item Function:\apm -ErrorAction SilentlyContinue

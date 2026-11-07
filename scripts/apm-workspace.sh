@@ -2901,7 +2901,7 @@ cmd_smoke_catalog() {
   install_log="$temp_dir.install.log"
   (
     cd "$temp_dir"
-    apm install "$(catalog_build_dir)" --target codex
+    apm install "$(catalog_build_dir)" --target agent-skills
   ) >"$install_log" 2>&1 || {
     cat "$install_log" >&2
     fail "apm install failed for catalog smoke test. Temp workspace: $temp_dir"

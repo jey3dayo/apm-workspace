@@ -4326,7 +4326,7 @@ function Invoke-SmokeCatalog {
     New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
     Push-Location $tempDir
     try {
-      $installOutput = & apm install (Get-CatalogBuildDir) --target codex 2>&1
+      $installOutput = & apm install (Get-CatalogBuildDir) --target agent-skills 2>&1
       if ($LASTEXITCODE -ne 0) {
         $installOutput | ForEach-Object { Write-Host $_ }
         throw "apm install failed for catalog smoke test."
