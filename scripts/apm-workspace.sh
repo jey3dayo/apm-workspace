@@ -258,6 +258,21 @@ tracked_catalog_relative_path() {
   printf '%s\n' "$CATALOG_DIR_NAME"
 }
 
+# The catalog build recreates only catalog/.apm/.gitkeep, so prepare:catalog would delete anything else
+# there, and APM installs .apm/agents/** whatever the package type while the legacy sync still rewrites
+# the same targets. Prints a message when catalog/.apm holds something other than the placeholder.
+catalog_apm_dir_claim_message() {
+  claimed_entry=$(relative_file_list "$(tracked_catalog_dir)/.apm" | awk 'NF && $0 != ".gitkeep" { print; exit }')
+  [ -n "$claimed_entry" ] || return 0
+
+  printf 'catalog/.apm holds %s, but the legacy catalog sync still owns every primitive: prepare:catalog would delete it and APM would install it alongside the sync output. Move a primitive into catalog/.apm only in the change that retires its legacy writer.\n' "$claimed_entry"
+}
+
+assert_catalog_apm_dir_unclaimed() {
+  claim_message=$(catalog_apm_dir_claim_message)
+  [ -z "$claim_message" ] || fail "Refusing to reset tracked catalog; $claim_message"
+}
+
 skill_ids_from_root() {
   skills_root="$1"
   [ -d "$skills_root" ] || return 0
@@ -315,6 +330,8 @@ assert_catalog_stage_safety() {
   if [ "$(canonical_path "$tracked_dir")" = "$(canonical_path "$build_dir")" ]; then
     fail "Refusing to stage catalog because source and destination are the same path: $tracked_dir"
   fi
+
+  assert_catalog_apm_dir_unclaimed
 
   for required_path in \
     "$build_dir/apm.yml" \
@@ -2520,6 +2537,12 @@ cmd_validate_catalog() {
 
   if [ -z "$(printf '%s\n' "$source_skill_ids" | awk 'NF { print; exit }')" ]; then
     error "Tracked catalog has no managed skills"
+    has_failure=1
+  fi
+
+  apm_dir_claim_message=$(catalog_apm_dir_claim_message)
+  if [ -n "$apm_dir_claim_message" ]; then
+    error "$apm_dir_claim_message"
     has_failure=1
   fi
 

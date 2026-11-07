@@ -2358,6 +2358,58 @@ make_catalog_fixture() {
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
+@test "assert_catalog_stage_safety refuses a tracked catalog whose .apm holds a primitive the build would drop" {
+  make_catalog_fixture 2 2
+  mkdir -p "$workspace_dir/catalog/.apm/agents"
+  printf 'agent\n' >"$workspace_dir/catalog/.apm/agents/sample.agent.md"
+
+  run assert_catalog_stage_safety 0
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"catalog/.apm holds agents/sample.agent.md"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "assert_catalog_stage_safety allows a tracked catalog whose .apm holds only the placeholder" {
+  make_catalog_fixture 2 2
+  mkdir -p "$workspace_dir/catalog/.apm"
+  : >"$workspace_dir/catalog/.apm/.gitkeep"
+
+  run assert_catalog_stage_safety 0
+  [ "$status" -eq 0 ]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "catalog_apm_dir_claim_message is silent when .apm is absent or holds only the placeholder" {
+  make_catalog_fixture 2 2
+
+  run catalog_apm_dir_claim_message
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+
+  mkdir -p "$workspace_dir/catalog/.apm"
+  : >"$workspace_dir/catalog/.apm/.gitkeep"
+  run catalog_apm_dir_claim_message
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "catalog_apm_dir_claim_message names the first primitive found under .apm" {
+  make_catalog_fixture 2 2
+  mkdir -p "$workspace_dir/catalog/.apm/skills/demo"
+  : >"$workspace_dir/catalog/.apm/.gitkeep"
+  printf 'skill\n' >"$workspace_dir/catalog/.apm/skills/demo/SKILL.md"
+
+  run catalog_apm_dir_claim_message
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"catalog/.apm holds skills/demo/SKILL.md"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
 @test "assert_catalog_stage_safety refuses a build with no skills" {
   make_catalog_fixture 2 2
   rm -rf "$workspace_dir/.catalog-build/catalog/skills"

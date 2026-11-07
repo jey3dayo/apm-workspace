@@ -3466,6 +3466,12 @@ function Invoke-ValidateCatalog {
     $hasFailure = $true
   }
 
+  $apmDirClaimMessage = Get-CatalogApmDirClaimMessage
+  if ($apmDirClaimMessage) {
+    Write-ErrorLine $apmDirClaimMessage
+    $hasFailure = $true
+  }
+
   $claudeRulesRoot = Get-TrackedCatalogClaudeRulesRoot
   $claudeRuleCount = 0
   if (Test-Path -LiteralPath $claudeRulesRoot -PathType Container) {
@@ -3860,6 +3866,22 @@ function Reset-TrackedCatalogDir {
   New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
 }
 
+function Get-CatalogApmDirClaimMessage {
+  $claimedEntry = @(Get-RelativeFilePaths -RootDir (Join-Path (Get-TrackedCatalogDir) ".apm") | Where-Object { $_ -ne ".gitkeep" }) | Select-Object -First 1
+  if (-not $claimedEntry) {
+    return $null
+  }
+
+  return ("catalog/.apm holds {0}, but the legacy catalog sync still owns every primitive: prepare:catalog would delete it and APM would install it alongside the sync output. Move a primitive into catalog/.apm only in the change that retires its legacy writer." -f $claimedEntry)
+}
+
+function Assert-CatalogApmDirUnclaimed {
+  $claimMessage = Get-CatalogApmDirClaimMessage
+  if ($claimMessage) {
+    throw "Refusing to reset tracked catalog; $claimMessage"
+  }
+}
+
 function Assert-CatalogStageSafety {
   param(
     [string[]]$RequestedSkillIds
@@ -3882,6 +3904,8 @@ function Assert-CatalogStageSafety {
   if (([System.IO.Path]::GetFullPath($trackedDir).TrimEnd('\', '/')).Equals(([System.IO.Path]::GetFullPath($buildDir).TrimEnd('\', '/')), [System.StringComparison]::OrdinalIgnoreCase)) {
     throw "Refusing to stage catalog because source and destination are the same path: $trackedDir"
   }
+
+  Assert-CatalogApmDirUnclaimed
 
   foreach ($requiredPath in @(
       (Join-Path $buildDir "apm.yml"),
