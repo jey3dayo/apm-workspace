@@ -1,6 +1,6 @@
 ---
 name: agent-curation
-description: "Curate external agent collections into this APM workspace. Use when evaluating whether an outside agent repository can be installed through APM, importing selected agents into catalog/agents, recording provenance, or refreshing curated agents from upstream."
+description: "Curate external agent collections into this APM workspace. Use when evaluating whether an outside agent repository can be installed through APM, importing selected agents into catalog/.apm/agents, recording provenance, or refreshing curated agents from upstream."
 ---
 
 # Agent Curation
@@ -9,7 +9,7 @@ Use this workspace-only skill to turn external agent collections into workspace-
 
 ## Core Rule
 
-First test whether the upstream is an APM-valid package. If it is not, curate selected agents into `catalog/agents/` and record provenance. Do not add invalid upstream repositories directly to `apm.yml`, and do not run upstream installers that write directly to `~/.codex/agents`, `~/.claude/agents`, or other runtime targets.
+First test whether the upstream is an APM-valid package. If it is not, curate selected agents into `catalog/.apm/agents/` and record provenance. Do not add invalid upstream repositories directly to `apm.yml`, and do not run upstream installers that write directly to `~/.codex/agents`, `~/.claude/agents`, or other runtime targets.
 
 ## Workflow
 
@@ -28,7 +28,7 @@ First test whether the upstream is an APM-valid package. If it is not, curate se
    - Include adjacent candidates in `references/hired-agents-registry.md` when they may be useful later.
    - Do not bulk-import a whole collection unless the user explicitly asks for broad adoption.
 
-4. Curate into `catalog/agents/`.
+4. Curate into `catalog/.apm/agents/<name>.agent.md`.
    - Adapt the agent to this workspace's agent format and existing communication style.
    - Preserve the useful behavior, but remove upstream-specific installer assumptions, unsupported tool lists, and verbose persona boilerplate.
    - Add provenance near the top of the agent body: upstream repository, commit, source path, license, curation date, and relationship to the original.
@@ -36,10 +36,10 @@ First test whether the upstream is an APM-valid package. If it is not, curate se
 5. Update the hiring registry.
    - Read `references/hired-agents-registry.md` before adding or refreshing curated agents.
    - Add the hired agent, source repository, commit, source path, local target path, license, selection reason, verification status, and related candidates.
-   - Keep this registry as the exploration index; do not put non-agent notes in `catalog/agents/`.
+   - Keep this registry as the exploration index; do not put non-agent notes in `catalog/.apm/agents/`.
 
 6. Validate the affected delivery surface.
-   - If `catalog/agents` changed, run `mise run prepare:catalog`, `mise run check`, and `mise run deploy`; verify the curated agent in its runtime targets.
+   - If `catalog/.apm/agents` changed, run `mise run prepare:catalog`, `mise run check`, and `mise run deploy`; verify the curated agent in its runtime targets.
    - If only this workspace-only skill or its registry changed, run `mise run check`; verify both local bridge entries resolve to `.apm/skills/agent-curation/`.
 
 ## Refresh Rules

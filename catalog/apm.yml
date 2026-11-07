@@ -1,6 +1,8 @@
 name: catalog
 version: 1.0.0
 description: Managed catalog package for global APM rollout
+# Codex には制限付き agent を配らない。理由は docs/package-decisions.md の Codex 変換の却下。
+targets: [claude, cursor, agent-skills]
 dependencies:
   apm: []
   mcp: []

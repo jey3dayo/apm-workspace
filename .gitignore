@@ -6,6 +6,8 @@
 /catalog/.apm/*
 !/catalog/.apm/skills/
 !/catalog/.apm/skills/**
+!/catalog/.apm/agents/
+!/catalog/.apm/agents/**
 /.github/skills/
 
 /.apm/*

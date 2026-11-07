@@ -50,24 +50,26 @@ scripts: {}
     Test-ManifestHasCatalogReference | Should -Be $true
   }
 
-  It "reports no .apm claim when catalog/.apm is absent or holds only skills" {
+  It "reports no .apm claim when catalog/.apm is absent or holds only skills and agents" {
     Get-CatalogApmDirClaimMessage | Should -BeNullOrEmpty
 
     $skillDir = Join-Path (Join-Path (Join-Path (Get-TrackedCatalogDir) ".apm") "skills") "demo"
-    New-Item -ItemType Directory -Path $skillDir -Force | Out-Null
+    $agentsDir = Join-Path (Join-Path (Get-TrackedCatalogDir) ".apm") "agents"
+    New-Item -ItemType Directory -Path $skillDir, $agentsDir -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $skillDir "SKILL.md") -Value "# demo"
+    Set-Content -LiteralPath (Join-Path $agentsDir "sample.agent.md") -Value "agent"
 
     Get-CatalogApmDirClaimMessage | Should -BeNullOrEmpty
     { Assert-CatalogApmDirUnclaimed } | Should -Not -Throw
   }
 
   It "refuses to stage a catalog whose .apm holds a primitive the build would drop" {
-    $agentsDir = Join-Path (Join-Path (Get-TrackedCatalogDir) ".apm") "agents"
-    New-Item -ItemType Directory -Path $agentsDir -Force | Out-Null
-    Set-Content -LiteralPath (Join-Path $agentsDir "sample.agent.md") -Value "agent"
+    $instructionsDir = Join-Path (Join-Path (Get-TrackedCatalogDir) ".apm") "instructions"
+    New-Item -ItemType Directory -Path $instructionsDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $instructionsDir "sample.instructions.md") -Value "instruction"
 
-    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds agents/sample.agent.md*"
-    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds agents/sample.agent.md*"
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds instructions/sample.instructions.md*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds instructions/sample.instructions.md*"
   }
 
   It "refuses to stage a catalog whose .apm holds a dotfile the build would drop" {
@@ -79,13 +81,14 @@ scripts: {}
     { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds .gitkeep*"
   }
 
-  It "seeds the catalog build with skills under .apm/skills and no top-level skills directory" {
+  It "seeds the catalog build with skills and agents under .apm and no top-level skills or agents directory" {
     $trackedDir = Join-Path $TestDrive "tracked-catalog"
     $buildDir = Join-Path $TestDrive "build-catalog"
-    foreach ($subdir in @("agents", "commands", "rules", ".apm/skills/demo")) {
+    foreach ($subdir in @(".apm/agents", "commands", "rules", ".apm/skills/demo")) {
       New-Item -ItemType Directory -Path (Join-Path $trackedDir $subdir) -Force | Out-Null
     }
     Set-Content -LiteralPath (Join-Path $trackedDir ".apm/skills/demo/SKILL.md") -Value "# demo"
+    Set-Content -LiteralPath (Join-Path $trackedDir ".apm/agents/sample.agent.md") -Value "agent"
     Set-Content -LiteralPath (Join-Path $trackedDir "apm.yml") -Value "name: catalog"
     Set-Content -LiteralPath (Join-Path $trackedDir "README.md") -Value "# catalog"
     Set-Content -LiteralPath (Join-Path $trackedDir "AGENTS.md") -Value "# instructions"
@@ -99,7 +102,9 @@ scripts: {}
     Invoke-SeedCatalogBuild
 
     Test-Path -LiteralPath (Join-Path $buildDir ".apm/skills/demo/SKILL.md") | Should -Be $true
+    Test-Path -LiteralPath (Join-Path $buildDir ".apm/agents/sample.agent.md") | Should -Be $true
     Test-Path -LiteralPath (Join-Path $buildDir "skills") | Should -Be $false
+    Test-Path -LiteralPath (Join-Path $buildDir "agents") | Should -Be $false
   }
 
   It "lists skill ids from the managed catalog tree" {
@@ -124,21 +129,21 @@ scripts: {}
 
   It "lists managed agent, command, and rule files plus instructions" {
     $catalogRoot = Join-Path $TestDrive "catalog"
-    $agentsRoot = Join-Path $catalogRoot "agents"
+    $agentsRoot = Join-Path (Join-Path $catalogRoot ".apm") "agents"
     $commandsRoot = Join-Path $catalogRoot "commands"
     $rulesRoot = Join-Path $catalogRoot "rules"
     New-Item -ItemType Directory -Path $agentsRoot -Force | Out-Null
     New-Item -ItemType Directory -Path $commandsRoot -Force | Out-Null
     New-Item -ItemType Directory -Path (Join-Path $rulesRoot "tools") -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $catalogRoot "AGENTS.md") -Value "# shared guidance"
-    Set-Content -LiteralPath (Join-Path $agentsRoot "code-reviewer.md") -Value "# agent"
+    Set-Content -LiteralPath (Join-Path $agentsRoot "code-reviewer.agent.md") -Value "# agent"
     Set-Content -LiteralPath (Join-Path $commandsRoot "review.md") -Value "# review"
     Set-Content -LiteralPath (Join-Path $commandsRoot "setup.md") -Value "# setup"
     Set-Content -LiteralPath (Join-Path $rulesRoot "claude-md-design.md") -Value "# rule"
     Set-Content -LiteralPath (Join-Path $rulesRoot "tools\example.md") -Value "# example"
 
     Mock Get-TrackedCatalogDir { $catalogRoot }
-    @(Get-TrackedCatalogAgentRelativePaths) | Should -Be @("code-reviewer.md")
+    @(Get-TrackedCatalogAgentRelativePaths) | Should -Be @("code-reviewer.agent.md")
     @(Get-TrackedCatalogCommandRelativePaths) | Should -Be @("review.md", "setup.md")
     @(Get-TrackedCatalogRuleRelativePaths) | Should -Be @("claude-md-design.md", "tools/example.md")
     Test-Path -LiteralPath (Get-TrackedCatalogInstructionsPath) | Should -Be $true
@@ -1449,29 +1454,29 @@ id = "preserve other"
     (Get-Content -LiteralPath $adjacentFile -Raw).Trim() | Should -Be "keep me"
   }
 
-  It "replaces managed agent trees without touching adjacent runtime assets" {
+  It "leaves the agents of an apm-owned target untouched" {
     $catalogRoot = Join-Path $TestDrive "catalog"
     $runtimeRoot = Join-Path $TestDrive "runtime"
     $targetRoot = Join-Path $runtimeRoot ".claude"
-    $agentsSource = Join-Path $catalogRoot "agents"
+    $agentsSource = Join-Path (Join-Path $catalogRoot ".apm") "agents"
     $agentsTarget = Join-Path $targetRoot "agents"
     $untouchedCommand = Join-Path $targetRoot "commands/untouched.md"
 
     New-Item -ItemType Directory -Path $agentsSource, $agentsTarget, (Split-Path -Parent $untouchedCommand) -Force | Out-Null
-    Set-Content -LiteralPath (Join-Path $agentsSource "current.md") -Value "current"
-    Set-Content -LiteralPath (Join-Path $agentsTarget "current.md") -Value "old"
-    Set-Content -LiteralPath (Join-Path $agentsTarget "stale.md") -Value "stale"
+    Set-Content -LiteralPath (Join-Path $agentsSource "current.agent.md") -Value "catalog"
+    Set-Content -LiteralPath (Join-Path $agentsTarget "current.md") -Value "apm-placed"
+    Set-Content -LiteralPath (Join-Path $agentsTarget "mine.md") -Value "mine"
     Set-Content -LiteralPath $untouchedCommand -Value "outside"
 
     Mock Get-TrackedCatalogDir { $catalogRoot }
     Mock Get-ManagedCatalogRuntimeTargets {
-      @([pscustomobject]@{ Name = "claude"; Root = $targetRoot; SkillsRoot = $targetRoot; ConfigName = "CLAUDE.md" })
+      @([pscustomobject]@{ Name = "claude"; Root = $targetRoot; SkillsRoot = $targetRoot; AgentsFace = "apm"; ConfigName = "CLAUDE.md" })
     }
 
     Sync-ManagedCatalogRuntimeAssets
 
-    ((Get-Content -LiteralPath (Join-Path $agentsTarget "current.md") -Raw) -replace '\r?\n$', '') | Should -Be "current"
-    Test-Path -LiteralPath (Join-Path $agentsTarget "stale.md") | Should -Be $false
+    ((Get-Content -LiteralPath (Join-Path $agentsTarget "current.md") -Raw) -replace '\r?\n$', '') | Should -Be "apm-placed"
+    ((Get-Content -LiteralPath (Join-Path $agentsTarget "mine.md") -Raw) -replace '\r?\n$', '') | Should -Be "mine"
     ((Get-Content -LiteralPath $untouchedCommand -Raw) -replace '\r?\n$', '') | Should -Be "outside"
   }
 
@@ -1551,6 +1556,13 @@ id = "preserve other"
     Sync-ManagedCatalogDirWithManifest -SourceDir $sourceDir -DestinationDir $targetDir
 
     ((Get-Content -LiteralPath (Join-Path $targetDir ".managed-catalog-manifest")) -join "`n") | Should -Be "a.md`nnested/b.md"
+  }
+
+  It "hands claude and cursor agents to APM and opts codex and opencode out" {
+    $targets = @(Get-ManagedCatalogRuntimeTargets)
+
+    ($targets | Where-Object Name -eq "claude").AgentsFace | Should -Be "apm"
+    ($targets | Where-Object Name -eq "cursor").AgentsFace | Should -Be "apm"
   }
 
   It "maps codex skills to ~/.agents while keeping config under ~/.codex and opts it out of the agents face" {
@@ -2232,6 +2244,64 @@ dependencies:
     }
     finally {
       Remove-Item Function:\apm -ErrorAction SilentlyContinue
+    }
+  }
+
+  Context "agents owned by APM" {
+    BeforeEach {
+      $script:agentsRuntimeRoot = Join-Path $TestDrive "doctor-agents/.claude"
+      $script:agentsSkillsRoot = Join-Path $script:agentsRuntimeRoot "skills"
+      $script:agentsSource = Join-Path $TestDrive "doctor-agents-source/.apm/agents"
+      $sourceRoot = Join-Path $TestDrive "doctor-agents-source"
+      $commandsSource = Join-Path $sourceRoot "commands"
+      $rulesSource = Join-Path $sourceRoot "rules"
+      $instructionsPath = Join-Path $sourceRoot "AGENTS.md"
+
+      New-Item -ItemType Directory -Path $script:agentsSkillsRoot, (Join-Path $script:agentsRuntimeRoot "agents"), (Join-Path $script:agentsRuntimeRoot "commands"), (Join-Path $script:agentsRuntimeRoot "rules"), $script:agentsSource, $commandsSource, $rulesSource -Force | Out-Null
+      Set-Content -LiteralPath (Join-Path $script:agentsRuntimeRoot "CLAUDE.md") -Value "# instructions"
+      Set-Content -LiteralPath $instructionsPath -Value "# instructions"
+      Set-Content -LiteralPath (Join-Path $script:agentsSource "reviewer.agent.md") -Value "agent body"
+
+      Mock Require-Apm {}
+      Mock Ensure-WorkspaceRepo {}
+      Mock Ensure-WorkspaceScaffold {}
+      Mock Get-CodexSkillTargetRoot { $script:agentsSkillsRoot }
+      Mock Test-AgmsgRosterLink {}
+      Mock Get-TrackedCatalogInstructionsPath { $instructionsPath }
+      Mock Get-TrackedCatalogAgentsRoot { $script:agentsSource }
+      Mock Get-TrackedCatalogCommandsRoot { $commandsSource }
+      Mock Get-TrackedCatalogRulesRoot { $rulesSource }
+      Mock Get-ManagedCatalogRuntimeTargets {
+        @([pscustomobject]@{ Name = "claude"; Root = $script:agentsRuntimeRoot; SkillsRoot = $script:agentsRuntimeRoot; AgentsFace = "apm"; ConfigName = "CLAUDE.md" })
+      }
+      Mock Get-ManagedCatalogSkillInventory { @() }
+      Mock Get-UnpinnedExternalReferences { @() }
+      Mock Write-CatalogSummary {}
+
+      function global:apm {
+        $global:LASTEXITCODE = 0
+      }
+    }
+
+    AfterEach {
+      Remove-Item Function:\apm -ErrorAction SilentlyContinue
+    }
+
+    It "does not throw when deployed agents match the catalog and extra agent files are present" {
+      Set-Content -LiteralPath (Join-Path $script:agentsRuntimeRoot "agents/reviewer.md") -Value "agent body"
+      Set-Content -LiteralPath (Join-Path $script:agentsRuntimeRoot "agents/mine.md") -Value "mine"
+
+      { Invoke-Doctor } | Should -Not -Throw
+    }
+
+    It "throws when a deployed agent differs from the catalog" {
+      Set-Content -LiteralPath (Join-Path $script:agentsRuntimeRoot "agents/reviewer.md") -Value "locally edited"
+
+      { Invoke-Doctor } | Should -Throw "*agents*reviewer.md*"
+    }
+
+    It "throws when a catalog agent is missing from the target" {
+      { Invoke-Doctor } | Should -Throw "*agents*reviewer.md*"
     }
   }
 

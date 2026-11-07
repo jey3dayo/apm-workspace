@@ -2641,7 +2641,7 @@ function Get-CatalogBuildSkillsRoot {
 }
 
 function Get-CatalogBuildAgentsRoot {
-  return (Join-Path (Get-CatalogBuildDir) "agents")
+  return (Join-Path (Join-Path (Get-CatalogBuildDir) ".apm") "agents")
 }
 
 function Get-CatalogBuildCommandsRoot {
@@ -2677,7 +2677,7 @@ function Get-PrivateSkillsRoot {
 }
 
 function Get-TrackedCatalogAgentsRoot {
-  return (Join-Path (Get-TrackedCatalogDir) "agents")
+  return (Join-Path (Join-Path (Get-TrackedCatalogDir) ".apm") "agents")
 }
 
 function Get-TrackedCatalogCommandsRoot {
@@ -3072,8 +3072,11 @@ function Write-CatalogSummary {
 }
 
 
-# AgentsFace "-" marks a target that must not receive the catalog agents/
-# tree. Codex opts out: codex-cli only discovers `~/.codex/agents/*.toml`,
+# AgentsFace "apm" marks a target whose agents/ APM installs from
+# catalog/.apm/agents: the sync neither writes nor prunes it, and doctor
+# compares its content. AgentsFace "-" marks a target that must not receive the
+# catalog agents (any agents/ is removed). Codex opts out: codex-cli only
+# discovers `~/.codex/agents/*.toml`,
 # and the catalog's Claude-format `.md` agent files are silently ignored
 # there (or rejected once renamed to `.toml`, on the `tools`/`color` fields).
 # OpenCode opts out for the same reason (it rejects Claude-format agents at
@@ -3082,9 +3085,9 @@ function Write-CatalogSummary {
 # ~/.config/opencode/AGENTS.md, else ~/.claude/CLAUDE.md).
 function Get-ManagedCatalogRuntimeTargets {
   return @(
-    [pscustomobject]@{ Name = "claude"; Root = (Join-Path $HOME ".claude"); SkillsRoot = (Join-Path $HOME ".claude"); AgentsFace = ""; ConfigName = "CLAUDE.md" },
+    [pscustomobject]@{ Name = "claude"; Root = (Join-Path $HOME ".claude"); SkillsRoot = (Join-Path $HOME ".claude"); AgentsFace = "apm"; ConfigName = "CLAUDE.md" },
     [pscustomobject]@{ Name = "codex"; Root = (Join-Path $HOME ".codex"); SkillsRoot = (Join-Path $HOME ".agents"); AgentsFace = "-"; ConfigName = "AGENTS.md" },
-    [pscustomobject]@{ Name = "cursor"; Root = (Join-Path $HOME ".cursor"); SkillsRoot = (Join-Path $HOME ".cursor"); AgentsFace = ""; ConfigName = "AGENTS.md" },
+    [pscustomobject]@{ Name = "cursor"; Root = (Join-Path $HOME ".cursor"); SkillsRoot = (Join-Path $HOME ".cursor"); AgentsFace = "apm"; ConfigName = "AGENTS.md" },
     [pscustomobject]@{ Name = "opencode"; Root = (Join-Path $HOME ".config/opencode"); SkillsRoot = "-"; AgentsFace = "-"; ConfigName = "-" }
   )
 }
@@ -3319,10 +3322,10 @@ function Remove-EmptyDirectories {
 
 # Manifest-tracked sync for a catalog dir (commands/rules) whose deployment
 # target is shared with files the catalog doesn't own (other packages, user
-# files). Unlike Replace-DirectoryTreeFromSource's full-tree swap, this only
-# removes files this catalog previously placed and no longer provides, so
-# co-located non-catalog files are never touched. The manifest itself is
-# deploy-target-only state, never written to source.
+# files). Unlike a full-tree swap, this only removes files this catalog
+# previously placed and no longer provides, so co-located non-catalog files are
+# never touched. The manifest itself is deploy-target-only state, never written
+# to source.
 function Sync-ManagedCatalogDirWithManifest {
   param(
     [Parameter(Mandatory = $true)]
@@ -3363,7 +3366,6 @@ function Sync-ManagedCatalogRuntimeAssets {
   }
 
   $instructionsSource = Get-TrackedCatalogInstructionsPath
-  $agentsSource = Get-TrackedCatalogAgentsRoot
   $commandsSource = Get-TrackedCatalogCommandsRoot
   $rulesSource = Get-TrackedCatalogRulesRoot
   $claudeRulesSource = Get-TrackedCatalogClaudeRulesRoot
@@ -3381,9 +3383,6 @@ function Sync-ManagedCatalogRuntimeAssets {
       if (Test-Path -LiteralPath $agentsPath) {
         Remove-Item -LiteralPath $agentsPath -Recurse -Force
       }
-    }
-    elseif (Test-Path -LiteralPath $agentsSource) {
-      Replace-DirectoryTreeFromSource -SourceDir $agentsSource -DestinationDir (Join-Path $target.Root "agents") -TreeName "agents"
     }
 
     if (Test-Path -LiteralPath $commandsSource) {
@@ -3678,6 +3677,27 @@ function Write-DependencyState {
   Write-Host (Get-PrunePreview)
 }
 
+function Get-AgentsDifferingFromCatalog {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$TargetAgentsRoot
+  )
+
+  $agentsRoot = Get-TrackedCatalogAgentsRoot
+  foreach ($agentRelativePath in (Get-RelativeFilePaths -RootDir $agentsRoot -IncludeHidden)) {
+    if (-not $agentRelativePath.EndsWith(".agent.md", [System.StringComparison]::Ordinal)) {
+      continue
+    }
+
+    $deployedAgent = Join-Path $TargetAgentsRoot ($agentRelativePath.Substring(0, $agentRelativePath.Length - ".agent.md".Length) + ".md")
+    $sourceHash = (Get-FileHash -LiteralPath (Join-Path $agentsRoot $agentRelativePath) -Algorithm SHA256).Hash
+    $deployedHash = if (Test-Path -LiteralPath $deployedAgent -PathType Leaf) { (Get-FileHash -LiteralPath $deployedAgent -Algorithm SHA256).Hash } else { $null }
+    if ($sourceHash -ne $deployedHash) {
+      $deployedAgent
+    }
+  }
+}
+
 function Invoke-Doctor {
   Require-Apm
   Ensure-WorkspaceRepo
@@ -3735,6 +3755,11 @@ function Invoke-Doctor {
     }
     if ($hasAgentsFace -and (Test-Path -LiteralPath $trackedAgentsRoot -PathType Container) -and -not (Test-Path -LiteralPath $agentsPath -PathType Container)) {
       $diagnostics.Add("Required catalog output is missing or has wrong type (directory): $agentsPath")
+    }
+    elseif (($target.PSObject.Properties.Name -contains "AgentsFace") -and $target.AgentsFace -eq "apm") {
+      foreach ($differingAgent in (Get-AgentsDifferingFromCatalog -TargetAgentsRoot $agentsPath)) {
+        $diagnostics.Add("Deployed agent is missing or differs from catalog/.apm/agents (APM skips a locally modified file and still exits 0): $differingAgent")
+      }
     }
     if ((Test-Path -LiteralPath $trackedCommandsRoot -PathType Container) -and -not (Test-Path -LiteralPath $commandsPath -PathType Container)) {
       $diagnostics.Add("Required catalog output is missing or has wrong type (directory): $commandsPath")
@@ -3866,12 +3891,12 @@ function Reset-TrackedCatalogDir {
 }
 
 function Get-CatalogApmDirClaimMessage {
-  $claimedEntry = @(Get-RelativeFilePaths -RootDir (Join-Path (Get-TrackedCatalogDir) ".apm") -IncludeHidden | Where-Object { $_ -cnotlike "skills/*" }) | Select-Object -First 1
+  $claimedEntry = @(Get-RelativeFilePaths -RootDir (Join-Path (Get-TrackedCatalogDir) ".apm") -IncludeHidden | Where-Object { $_ -cnotlike "skills/*" -and $_ -cnotlike "agents/*" }) | Select-Object -First 1
   if (-not $claimedEntry) {
     return $null
   }
 
-  return ("catalog/.apm holds {0}, but only catalog/.apm/skills is migrated: the legacy catalog sync still owns every other primitive, so prepare:catalog would delete it and APM would install it alongside the sync output. Move a primitive into catalog/.apm only in the change that retires its legacy writer." -f $claimedEntry)
+  return ("catalog/.apm holds {0}, but only catalog/.apm/skills and catalog/.apm/agents are migrated: the legacy catalog sync still owns every other primitive, so prepare:catalog would delete it and APM would install it alongside the sync output. Move a primitive into catalog/.apm only in the change that retires its legacy writer." -f $claimedEntry)
 }
 
 function Assert-CatalogApmDirUnclaimed {

@@ -199,7 +199,7 @@ catalog_build_skills_root() {
 }
 
 catalog_build_agents_root() {
-  printf '%s/agents\n' "$(catalog_build_dir)"
+  printf '%s/.apm/agents\n' "$(catalog_build_dir)"
 }
 
 catalog_build_commands_root() {
@@ -235,7 +235,7 @@ private_skills_root() {
 }
 
 tracked_catalog_agents_root() {
-  printf '%s/agents\n' "$(tracked_catalog_dir)"
+  printf '%s/.apm/agents\n' "$(tracked_catalog_dir)"
 }
 
 tracked_catalog_commands_root() {
@@ -258,14 +258,14 @@ tracked_catalog_relative_path() {
   printf '%s\n' "$CATALOG_DIR_NAME"
 }
 
-# The catalog build recreates only catalog/.apm/skills, so prepare:catalog would delete any other primitive
-# there, and APM installs .apm/agents/** whatever the package type while the legacy sync still rewrites
-# the same targets. Prints a message when catalog/.apm holds something other than skills.
+# The catalog build recreates only catalog/.apm/skills and catalog/.apm/agents, so prepare:catalog would delete any other
+# primitive there, and APM installs .apm/<primitive>/** whatever the package type while the legacy sync still rewrites
+# the same targets. Prints a message when catalog/.apm holds something other than skills and agents.
 catalog_apm_dir_claim_message() {
-  claimed_entry=$(relative_file_list "$(tracked_catalog_dir)/.apm" | awk 'NF && $0 !~ /^skills\// { print; exit }')
+  claimed_entry=$(relative_file_list "$(tracked_catalog_dir)/.apm" | awk 'NF && $0 !~ /^skills\// && $0 !~ /^agents\// { print; exit }')
   [ -n "$claimed_entry" ] || return 0
 
-  printf 'catalog/.apm holds %s, but only catalog/.apm/skills is migrated: the legacy catalog sync still owns every other primitive, so prepare:catalog would delete it and APM would install it alongside the sync output. Move a primitive into catalog/.apm only in the change that retires its legacy writer.\n' "$claimed_entry"
+  printf 'catalog/.apm holds %s, but only catalog/.apm/skills and catalog/.apm/agents are migrated: the legacy catalog sync still owns every other primitive, so prepare:catalog would delete it and APM would install it alongside the sync output. Move a primitive into catalog/.apm only in the change that retires its legacy writer.\n' "$claimed_entry"
 }
 
 assert_catalog_apm_dir_unclaimed() {
@@ -1512,8 +1512,11 @@ print_catalog_summary() {
 # Fields: name|home-relative root|config file|skills root override|agents face.
 # A "-" config file marks a target that reads guidance from elsewhere (OpenCode
 # falls back to ~/.claude/CLAUDE.md); see docs/package-decisions.md.
-# A "-" skills override marks a target with no skills face; a "-" agents face
-# marks one that must not receive the catalog agents/ tree. OpenCode takes both:
+# A "-" skills override marks a target with no skills face. An "apm" agents face
+# marks a target whose agents/ APM installs from catalog/.apm/agents: the sync
+# neither writes nor prunes it, and doctor compares its content. A "-" agents face
+# marks one that must not receive the catalog agents at all (any agents/ is
+# removed). OpenCode takes both "-" faces:
 # it reads skills from ~/.claude/skills and ~/.agents/skills already, and it
 # rejects the Claude-format agents (object `tools`, hex `color`) at startup, so
 # it only gets commands. Codex opts out of agents too: codex-cli
@@ -1524,9 +1527,9 @@ print_catalog_summary() {
 # stage lacks, so two targets on one root delete each other's skills.
 managed_catalog_runtime_targets() {
   cat <<'EOF'
-claude|.claude|CLAUDE.md||
+claude|.claude|CLAUDE.md||apm
 codex|.codex|AGENTS.md|.agents|-
-cursor|.cursor|AGENTS.md||
+cursor|.cursor|AGENTS.md||apm
 opencode|.config/opencode|-|-|-
 EOF
 }
@@ -2390,18 +2393,12 @@ remove_symlink_entries() {
   find "$target_dir" -type l -exec rm -f {} +
 }
 
-replace_managed_catalog_agents_tree() {
-  agents_source="$1"
-  target_agents_root="$2"
-  swap_staged_tree_into_place "$agents_source" "$target_agents_root" agents
-}
-
 # Manifest-tracked sync for a catalog dir (commands/rules) whose deployment
 # target is shared with files the catalog doesn't own (other packages, user
-# files). Unlike replace_managed_catalog_agents_tree's full-tree swap, this
-# only removes files this catalog previously placed and no longer provides,
-# so co-located non-catalog files are never touched. The manifest itself is
-# deploy-target-only state, never written to source.
+# files). Unlike a full-tree swap, this only removes files this catalog
+# previously placed and no longer provides, so co-located non-catalog files are
+# never touched. The manifest itself is deploy-target-only state, never written
+# to source.
 sync_managed_catalog_dir_with_manifest() {
   source_dir="$1"
   target_dir="$2"
@@ -2451,7 +2448,6 @@ sync_managed_catalog_runtime_assets() {
   [ -d "$tracked_dir" ] || fail "Tracked catalog missing: $tracked_dir. Run 'mise run prepare:catalog' first."
 
   instructions_source=$(tracked_catalog_instructions_path)
-  agents_source=$(tracked_catalog_agents_root)
   commands_source=$(tracked_catalog_commands_root)
   rules_source=$(tracked_catalog_rules_root)
   claude_rules_source=$(tracked_catalog_claude_rules_root)
@@ -2468,8 +2464,6 @@ sync_managed_catalog_runtime_assets() {
       if [ -e "$target_root/agents" ] || [ -L "$target_root/agents" ]; then
         rm -rf "$target_root/agents"
       fi
-    elif [ -d "$agents_source" ]; then
-      replace_managed_catalog_agents_tree "$agents_source" "$target_root/agents"
     fi
 
     if [ -d "$commands_source" ]; then
@@ -2701,6 +2695,19 @@ report_dependency_state() {
   apm_prune_preview
 }
 
+agents_differing_from_catalog() {
+  target_agents_root="$1"
+  agents_root=$(tracked_catalog_agents_root)
+  tracked_catalog_agent_relative_paths | while IFS= read -r agent_relative_path; do
+    case "$agent_relative_path" in
+      *.agent.md) ;;
+      *) continue ;;
+    esac
+    deployed_agent="$target_agents_root/${agent_relative_path%.agent.md}.md"
+    cmp -s "$agents_root/$agent_relative_path" "$deployed_agent" || printf '%s\n' "$deployed_agent"
+  done
+}
+
 cmd_doctor() {
   require_apm
   ensure_workspace_repo
@@ -2764,6 +2771,14 @@ cmd_doctor() {
       if [ -d "$tracked_agents_root" ] && [ "$RT_AGENTS_FACE" != "-" ] && [ ! -d "$target_root/agents" ]; then
         error "Required catalog output is missing or has wrong type (directory): $target_root/agents"
         has_failure=1
+      elif [ "$RT_AGENTS_FACE" = "apm" ]; then
+        differing_agents=$(agents_differing_from_catalog "$target_root/agents")
+        if [ -n "$differing_agents" ]; then
+          printf '%s\n' "$differing_agents" | while IFS= read -r differing_agent; do
+            error "Deployed agent is missing or differs from catalog/.apm/agents (APM skips a locally modified file and still exits 0): $differing_agent"
+          done
+          has_failure=1
+        fi
       fi
       if [ -d "$tracked_commands_root" ] && [ ! -d "$target_root/commands" ]; then
         error "Required catalog output is missing or has wrong type (directory): $target_root/commands"
