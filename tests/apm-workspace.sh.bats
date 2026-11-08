@@ -4180,3 +4180,14 @@ commit_instruction_version() {
   [[ "$output" == *"guard stopped it"* ]]
   [[ "$output" != *"apm deps update"* ]]
 }
+
+@test "catalog_lock_deployed_entries also reads a catalog installed from a local path" {
+  lock_dir="$(mktemp -d)"
+  printf "lockfile_version: '1'\ndependencies:\n- repo_url: _local/catalog\n  name: catalog\n  package_type: apm_package\n  deployed_files:\n  - .claude/rules/ai-collaboration.md\n  source: local\ndeployments:\n- kind: project-relative\n  value: .claude/agents/x.md\n" >"$lock_dir/apm.lock.yaml"
+
+  run catalog_lock_deployed_entries "$lock_dir/apm.lock.yaml"
+
+  [ "$status" -eq 0 ]
+  [ "$output" = "$(printf 'F\t.claude/rules/ai-collaboration.md')" ]
+  rm -rf "$lock_dir"
+}

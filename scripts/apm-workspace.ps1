@@ -4269,7 +4269,8 @@ function Invoke-Doctor {
   }
 }
 
-# The catalog package's lock records: Kind F per deployed_files entry and Kind H (with Hash) per
+# The catalog package's lock records (installed from the repository ref, or from a local path as _local/catalog):
+# Kind F per deployed_files entry and Kind H (with Hash) per
 # deployed_file_hashes entry. Paths are relative to the home directory for a user-scope lock.
 function Get-CatalogLockDeployedEntries {
   param([Parameter(Mandatory = $true)][string]$LockPath)
@@ -4282,7 +4283,8 @@ function Get-CatalogLockDeployedEntries {
     if ($rawLine -match '\A- ' -or $rawLine -match '\A  [a-z_]+:') {
       if ($rawLine -match '\A- ') { $name = ""; $virtualPath = "" }
       $line = $rawLine -replace '\A- ', '  '
-      if ($line -match '\A  name: (.*)\z') { $name = $Matches[1] }
+      if ($line -ceq "  repo_url: _local/$CatalogDirName") { $virtualPath = $CatalogDirName }
+      elseif ($line -match '\A  name: (.*)\z') { $name = $Matches[1] }
       elseif ($line -match '\A  virtual_path: (.*)\z') { $virtualPath = $Matches[1] }
       $mode = if ($line -ceq '  deployed_files:') { "files" } elseif ($line -ceq '  deployed_file_hashes:') { "hashes" } else { "" }
       continue

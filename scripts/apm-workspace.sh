@@ -3082,7 +3082,8 @@ cmd_prune_cache() {
   )
 }
 
-# Prints the catalog package's lock records, tab separated: "F<TAB>path" per deployed_files entry and
+# Prints the catalog package's lock records (installed from the repository ref, or from a local path as
+# _local/catalog), tab separated: "F<TAB>path" per deployed_files entry and
 # "H<TAB>path<TAB>sha256" per deployed_file_hashes entry. Paths are relative to $HOME for a user-scope lock.
 catalog_lock_deployed_entries() {
   awk -v catalog="$CATALOG_DIR_NAME" '
@@ -3090,7 +3091,8 @@ catalog_lock_deployed_entries() {
       if ($0 ~ /^- /) { name = ""; virtual_path = "" }
       line = $0
       sub(/^- /, "  ", line)
-      if (line ~ /^  name: /) name = substr(line, 9)
+      if (line == "  repo_url: _local/" catalog) virtual_path = catalog
+      else if (line ~ /^  name: /) name = substr(line, 9)
       else if (line ~ /^  virtual_path: /) virtual_path = substr(line, 17)
       mode = line ~ /^  deployed_files:$/ ? "files" : line ~ /^  deployed_file_hashes:$/ ? "hashes" : ""
       next
@@ -3104,6 +3106,14 @@ catalog_lock_deployed_entries() {
       if (split_at) printf "H\t%s\t%s\n", substr(record, 1, split_at - 1), substr(record, split_at + 9)
     }
   ' "$1"
+}
+
+file_sha256() {
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$1" | awk '{print $1}'
+  else
+    shasum -a 256 "$1" | awk '{print $1}'
+  fi
 }
 
 # The lock records what APM itself placed for the catalog; a listed path that is gone means the install was undone.
@@ -3121,7 +3131,7 @@ check_catalog_lock_deployed_files() {
         error "Catalog file recorded in apm.lock.yaml is missing: ~/$record_path"
         missing_count=$((missing_count + 1))
       fi
-    elif [ -f "$HOME/$record_path" ] && [ "$(sha256sum "$HOME/$record_path" | awk '{print $1}')" != "$record_hash" ]; then
+    elif [ -f "$HOME/$record_path" ] && [ "$(file_sha256 "$HOME/$record_path")" != "$record_hash" ]; then
       changed_count=$((changed_count + 1))
     fi
   done < <(catalog_lock_deployed_entries "$lock_file")

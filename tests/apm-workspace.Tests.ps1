@@ -3703,6 +3703,12 @@ Describe "catalog lock deployed files" {
       "H .agents/skills/demo/SKILL.md c0ffee", "H .claude/rules/ai-collaboration.md abc123")
   }
 
+  It "also reads a catalog installed from a local path" {
+    $lockPath = Join-Path $TestDrive "local.lock.yaml"
+    [System.IO.File]::WriteAllText($lockPath, "lockfile_version: '1'`ndependencies:`n- repo_url: _local/catalog`n  name: catalog`n  deployed_files:`n  - .claude/rules/ai-collaboration.md`n  source: local`ndeployments:`n- kind: project-relative`n  value: .claude/agents/x.md`n")
+    @(Get-CatalogLockDeployedEntries -LockPath $lockPath | ForEach-Object { "{0} {1}" -f $_.Kind, $_.Path }) | Should -Be @("F .claude/rules/ai-collaboration.md")
+  }
+
   It "returns a recorded file that is gone and only counts a changed one" {
     $homeDir = Join-Path $TestDrive "lock-home"
     New-Item -ItemType Directory -Path (Join-Path $homeDir ".agents/skills/demo"), (Join-Path $homeDir ".claude/rules") -Force | Out-Null
