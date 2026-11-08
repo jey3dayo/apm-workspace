@@ -4014,6 +4014,35 @@ function Reset-TrackedCatalogDir {
   New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
 }
 
+function Test-CatalogApmDirRegularFile {
+  param(
+    [Parameter(Mandatory = $true)]
+    $Item
+  )
+
+  if ($Item.PSIsContainer -or $Item.LinkType) {
+    return $false
+  }
+
+  $unixStat = $Item.PSObject.Properties["UnixStat"]
+  if ($unixStat -and $null -ne $unixStat.Value) {
+    return $unixStat.Value.ItemType -eq "File"
+  }
+
+  if ([System.Environment]::OSVersion.Platform -eq "Win32NT") {
+    return $true
+  }
+
+  # Without UnixStat, ask `test` (no `--`: BSD test rejects it); if it cannot run, fail closed so the entry is claimed.
+  try {
+    & test -f $Item.FullName
+    return $LASTEXITCODE -eq 0
+  }
+  catch {
+    return $false
+  }
+}
+
 function Get-CatalogApmDirClaimedPaths {
   param(
     [Parameter(Mandatory = $true)]
@@ -4033,7 +4062,7 @@ function Get-CatalogApmDirClaimedPaths {
     }
 
     $relativePath = ($item.FullName.Substring($rootFullPath.Length).TrimStart('\', '/')) -replace '\\', '/'
-    if (($relativePath -clike "skills/*" -or $relativePath -clike "agents/*") -and -not $isLink) {
+    if (($relativePath -clike "skills/*" -or $relativePath -clike "agents/*") -and (Test-CatalogApmDirRegularFile -Item $item)) {
       continue
     }
 
