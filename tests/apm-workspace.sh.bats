@@ -3811,6 +3811,21 @@ home_tree_listing() {
   rm -rf "$roots_workspace" "$roots_home"
 }
 
+@test "user_root_state and the guard read a root larger than a pipe buffer under pipefail" {
+  make_roots_fixture
+  large_body="$(printf '# Guide\n'; seq 1 50000)"
+  write_generated_root "$roots_home/.codex/AGENTS.md" "$large_body"
+  [ "$(user_root_state "$roots_home/.codex/AGENTS.md" "")" = generated ]
+  printf 'my own line\n' >>"$roots_home/.codex/AGENTS.md"
+  [ "$(user_root_state "$roots_home/.codex/AGENTS.md" "")" = edited-generated ]
+
+  printf '<!-- note -->\n%s\n' "$large_body" >"$roots_home/.claude/CLAUDE.md"
+  run assert_user_roots_migrated
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"opens with the catalog guide's title (# Guide)"* ]]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
 @test "legacy_catalog_instructions_blobs also recognizes an older committed catalog/AGENTS.md" {
   make_roots_fixture
   git -C "$roots_workspace" init -q

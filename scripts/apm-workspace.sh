@@ -309,11 +309,13 @@ apm_root_lines() {
 }
 
 # Mirrors APM's `content.lstrip().startswith(AGENTS_MD_GENERATED_MARKER)` (apm_cli/compilation/user_root_context.py).
+# One awk reads the file: an early exit behind a pipe would SIGPIPE the writer and fail the pipeline under pipefail.
 apm_root_has_marker() {
-  apm_root_lines "$1" | awk -v marker="$APM_GENERATED_ROOT_MARKER" '
-    NF { sub(/^[ \t]+/, ""); found = index($0, marker) == 1; exit }
+  awk -v marker="$APM_GENERATED_ROOT_MARKER" '
+    { sub(/\r$/, ""); gsub(/\r/, "\n") }
+    NF { sub(/^[ \t\n]+/, ""); found = index($0, marker) == 1; exit }
     END { exit !found }
-  '
+  ' "$1"
 }
 
 # Mirrors apm_cli/compilation/build_id.py has_valid_build_id: the 12-hex Build ID is the sha256 of the file with that
@@ -911,12 +913,12 @@ assert_user_roots_migrated() {
     in_frontmatter { if ($0 == "---") in_frontmatter = 0; next }
     NF { print; exit }
   ' "$(tracked_catalog_instructions_path)")
-  root_title=$(apm_root_lines "$claude_root" | awk -v bom="$(printf '\357\273\277')" '
+  root_title=$(awk -v bom="$(printf '\357\273\277')" '
     NR == 1 && index($0, bom) == 1 { $0 = substr($0, length(bom) + 1) }
-    { sub(/^[ \t]+/, "") }
+    { sub(/\r$/, ""); sub(/^[ \t]+/, "") }
     $0 == "" || /^<!--/ { next }
     { print; exit }
-  ')
+  ' "$claude_root")
   if [ -n "$guide_title" ] && [ "$root_title" = "$guide_title" ]; then
     fail "Refusing to install catalog instructions: $claude_root opens with the catalog guide's title ($guide_title) but matches no known version, so it is an edited or older copy. APM would add the guide under ~/.claude/rules and Claude would load it twice. migrate:roots does not move edited files: move $claude_root aside by hand (keep a .bak), or remove the guide from it, then retry."
   fi
