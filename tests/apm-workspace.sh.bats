@@ -2409,6 +2409,83 @@ make_catalog_fixture() {
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
+@test "assert_catalog_stage_safety refuses a catalog whose .apm holds a symlink to a file" {
+  make_catalog_fixture 2 2
+  mkdir -p "$workspace_dir/catalog/.apm/agents"
+  printf 'agent\n' >"$workspace_dir/outside.md"
+  ln -s "$workspace_dir/outside.md" "$workspace_dir/catalog/.apm/agents/demo.agent.md"
+
+  run assert_catalog_stage_safety 0
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"catalog/.apm holds agents/demo.agent.md"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "assert_catalog_stage_safety refuses a catalog whose .apm holds a symlink to a directory" {
+  make_catalog_fixture 2 2
+  mkdir -p "$workspace_dir/catalog/.apm" "$workspace_dir/outside-agents"
+  ln -s "$workspace_dir/outside-agents" "$workspace_dir/catalog/.apm/agents"
+
+  run assert_catalog_stage_safety 0
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"catalog/.apm holds agents"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "assert_catalog_stage_safety refuses a catalog whose .apm holds a dangling symlink" {
+  make_catalog_fixture 2 2
+  mkdir -p "$workspace_dir/catalog/.apm"
+  ln -s "$workspace_dir/missing-target" "$workspace_dir/catalog/.apm/dangling.md"
+
+  run assert_catalog_stage_safety 0
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"catalog/.apm holds dangling.md"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "assert_catalog_stage_safety refuses a catalog whose .apm placeholder is a symlink" {
+  make_catalog_fixture 2 2
+  mkdir -p "$workspace_dir/catalog/.apm"
+  : >"$workspace_dir/outside-placeholder"
+  ln -s "$workspace_dir/outside-placeholder" "$workspace_dir/catalog/.apm/.gitkeep"
+
+  run assert_catalog_stage_safety 0
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"catalog/.apm holds .gitkeep"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "assert_catalog_stage_safety refuses a catalog whose .apm/skills is a symlink" {
+  make_catalog_fixture 2 2
+  rm -rf "$workspace_dir/catalog/.apm/skills"
+  mkdir -p "$workspace_dir/outside-skills/demo"
+  printf 'skill\n' >"$workspace_dir/outside-skills/demo/SKILL.md"
+  ln -s "$workspace_dir/outside-skills" "$workspace_dir/catalog/.apm/skills"
+
+  run assert_catalog_stage_safety 0
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"catalog/.apm holds skills"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "assert_catalog_stage_safety refuses a catalog whose .apm/skills holds a symlinked skill" {
+  make_catalog_fixture 2 2
+  mkdir -p "$workspace_dir/outside-skill"
+  printf 'skill\n' >"$workspace_dir/outside-skill/SKILL.md"
+  ln -s "$workspace_dir/outside-skill" "$workspace_dir/catalog/.apm/skills/linked"
+
+  run assert_catalog_stage_safety 0
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"catalog/.apm holds skills/linked"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
 @test "assert_catalog_stage_safety allows a tracked catalog whose .apm holds only skills and agents" {
   make_catalog_fixture 2 2
   [ -f "$workspace_dir/catalog/.apm/skills/skill-0/SKILL.md" ]
@@ -2484,6 +2561,19 @@ make_stageable_catalog_fixture() {
   [ ! -e "$workspace_dir/catalog/skills" ]
   [ ! -e "$workspace_dir/catalog/agents" ]
   [ -z "$(catalog_apm_dir_claim_message)" ]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "catalog_apm_dir_claim_message names a symlink under .apm" {
+  make_catalog_fixture 2 2
+  mkdir -p "$workspace_dir/catalog/.apm/agents"
+  printf 'agent\n' >"$workspace_dir/outside.md"
+  ln -s "$workspace_dir/outside.md" "$workspace_dir/catalog/.apm/agents/demo.agent.md"
+
+  run catalog_apm_dir_claim_message
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"catalog/.apm holds agents/demo.agent.md"* ]]
 
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
