@@ -1,7 +1,7 @@
 # authoring source と consumer の global state を分ける（第 1 段階の検証）
 
 - Status: 検証だけ（2026-11-09、APM 0.35.0）。本番の `apm.yml`・`apm.lock.yaml`・`catalog/`・配布の手順は変えていない。分離の実施（第 2 段階。自作の writer の撤去や改名）は承認されていない
-- テスト: `tests/apm-source-consumer-separation.bats`（`mise run test:sh` と pre-push と CI で走る）
+- テスト: `tests/apm-source-consumer-separation.bats`。`mise run test:sh` に含まれ、CI と、対象のファイルを変えた push の pre-push でも走る。テストは APM 0.35.0 であることを確かめ、別のバージョンでは止まる（APM を上げるときは、この文書の内容を確かめ直してからテストの期待値を上げる）。fixture は既定で bats の一時ディレクトリに作り、`APM_SEPARATION_FIXTURE_ROOT` を指定するとその下に作る
 
 ## 何と何を分けるのか
 
@@ -24,7 +24,7 @@
 - consumer は authoring repo の package を SHA で pin して `apm install -g` できる。lock の `resolved_commit` は pin と一致し、authoring repo には lock も `apm_modules` も作られず、`git status` も変わらない
 - 3 つの tool への配布: Claude には skills・agent・rule、Codex には `~/.agents/skills` の skills と `~/.codex/AGENTS.md`、Cursor には agent と `~/.cursor/AGENTS.md` が届く。配布先のファイル一覧が期待と完全に一致する
 - `apm install -g` は root を書かない。`apm compile -g --clean` が Codex と Cursor の root を書き、目印の無い手書きの `~/.claude/CLAUDE.md` は残す
-- install と compile をもう一度実行しても HOME の中身は変わらない。新しい別の HOME で同じ manifest から入れても lock は byte 単位で同じになる
+- install と compile をもう一度実行しても、HOME の中身（cache・receipt・`apm_modules` を除く）は変わらない。新しい別の HOME で同じ manifest から入れても、lock は byte 単位で同じになる
 - authoring repo に commit を足しても、作業ツリーを編集しても、pin を動かすまで consumer には届かない。pin を v2 に動かすと v2 の内容が届き、未 commit の v3 は届かない
 - APM の持ち物ではないファイル（private skill のコピーと symlink、Herdr が置く skill、`~/.codex/config.toml`、`~/.claude/settings.json`、手書きの `CLAUDE.md`）は、install・再実行・pin の更新のあとも変わらない
 - package の `targets` から codex を外すと（`catalog/apm.yml` と同じ形）、制限付きの agent は Codex に配られない。外さないと APM は `~/.codex/agents/*.toml` を書き、`disallowedTools` は落ちる。外す理由は `docs/package-decisions.md` の Codex 変換の却下
@@ -67,13 +67,15 @@ dependencies:
 
 - `env -i` で起動し、渡す環境変数は `HOME`・`TMPDIR`・`PATH`・`LANG`・`PYTHONUTF8`・`GIT_CONFIG_GLOBAL`・`GIT_CONFIG_NOSYSTEM` だけ。呼び出し側が token・proxy・askpass・SSH agent・`XDG_CONFIG_HOME` を export していても届かないことをテストで確かめる
 - git が読む設定は fixture の global config と authoring repo の `.git/config` だけで、system の設定は読まない。credential・include・`http.*`・askpass・`core.sshCommand` の項目が無いこともテストで確かめる。利用者の global git config は読みも書きもしない
-- 依存の host は解決できない `fixture.invalid` で、fixture の git config の `insteadOf` がローカルの repo に向ける。HOME と `TMPDIR` は `BATS_FILE_TMPDIR` の中に置き、HOME がその外や呼び出し元の HOME になると apm を起動しない
-- macOS（`sandbox-exec` がある）: profile が通信と `BATS_FILE_TMPDIR` の外への書込みを拒否する。開始前に外への書込みが失敗することを確かめ、成功したら全テストを止める。外への通信が失敗することもテストで確かめる
+- 依存の host は解決できない `fixture.invalid` で、fixture の git config の `insteadOf` がローカルの repo に向ける。これは通信を不可能にするものではなく、通信先を持たせないための設定である
+- HOME と `TMPDIR` は fixture root の中に置く。HOME は物理パスに直してから比べ、fixture の `homes/` の直下でない（`..` や symlink で外を指す場合を含む）か呼び出し元の HOME なら、何も起動しない。この拒否もテストで確かめる
+- macOS（`sandbox-exec` がある）: profile が通信と fixture root の外への書込みを拒否する。開始前に外への書込みが失敗することを確かめ、成功したら全テストを止める。通信は、sandbox の外では応答する loopback のサーバーに、sandbox の中からは接続できないことで確かめる。外部ホストへの接続は試していない
 - Linux（CI）など `sandbox-exec` が無い環境: 通信も書込みも強制的には止めない。保証できるのは、上の環境変数と git 設定の隔離、HOME のガード、外へ向かう設定や認証情報を持たないことまで。通信のテストは skip になる
 
 確かめていないこと:
 
 - 実際の GitHub からの取得。APM が token のある環境で git 設定を自前の隔離設定に切り替える経路（`core/auth.py`）も通っていない
+- sandbox の無い環境（CI）で、APM が更新確認のほかに外へ通信しないこと
 - APM が持つ skill ディレクトリの中に置いた runtime のリンク（agmsg の `db`・`teams`）。今の apply の save/restore が要るまま
 - Claude Code が rule を実際に読み込むか。Windows での動作
 
