@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 
-// Validates YAML frontmatter in the managed catalog (catalog/agents,
+// Validates YAML frontmatter in the managed catalog (catalog/.apm/agents,
 // catalog/.apm/skills, catalog/commands, catalog/rules). `mise run check` never
 // parsed frontmatter, so an unquoted "key: value: more" in a `description`
 // field (broken YAML: a colon+space inside a plain scalar) passed the gate
@@ -23,7 +23,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "..");
 
-const DEFAULT_TARGET_SUBDIRS = ["catalog/agents", "catalog/.apm/skills", "catalog/commands", "catalog/rules"];
+const DEFAULT_TARGET_SUBDIRS = ["catalog/.apm/agents", "catalog/.apm/skills", "catalog/commands", "catalog/rules"];
 
 // Files under these subdirs must additionally declare `name` and
 // `description` keys in frontmatter (value contents are not checked, only
@@ -31,8 +31,9 @@ const DEFAULT_TARGET_SUBDIRS = ["catalog/agents", "catalog/.apm/skills", "catalo
 function requiresNameAndDescription(filePath: string): boolean {
   const base = path.basename(filePath);
   if (base === "SKILL.md") return true;
-  // Matches catalog/agents/*.md in the real catalog, and an "agents/*.md"
-  // fixture directory in tests (which does not sit under a "catalog" root).
+  // Matches catalog/.apm/agents/*.agent.md in the real catalog, and an
+  // "agents/*.md" fixture directory in tests (which does not sit under a
+  // "catalog" root).
   const parentDir = path.basename(path.dirname(filePath));
   if (parentDir === "agents" && base.endsWith(".md")) return true;
   return false;

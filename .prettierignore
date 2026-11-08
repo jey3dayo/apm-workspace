@@ -2,7 +2,7 @@
 # manual upstream skill copies (see manual-skills/upstreams/).
 # Keep them out of our formatter so their upstream-derived shape is preserved;
 # only our own generated artifacts should be reformatted.
-catalog/agents/
+catalog/.apm/agents/
 manual-skills/.apm/
 
 # Generated / accepted-upstream state, not ours to reformat.

@@ -132,7 +132,7 @@ handoff の実体は `agmsg-delegation` の引き継ぎ（handoff）メッセー
 
 ### agent / skill 定義側のモデル割り当て
 
-- 各 agent のモデルは `catalog/agents/*.md` の frontmatter `model:` に書く。呼び出し時の指定漏れがあっても frontmatter の割り当てで動く
+- 各 agent のモデルは `catalog/.apm/agents/*.agent.md` の frontmatter `model:` に書く。呼び出し時の指定漏れがあっても frontmatter の割り当てで動く
 - Orchestrator 役はメインセッションが担い、agent 化しない
 - 判断の結果が本番反映・承認・却下に直結する agent は `model` を指定せず親モデルを継承させる。read-only の triage も含める（観測して判断を出す時点で結果に効くため）
 - スキル定義の `model:` は、fork 実行され末端で完結し、手順が固定されていて判断を含まないものにだけ書く（`atomic-commit` / `apm-deploy-verify` / `docs-manager` / `polish`）。`context: fork` が無いと `model:` は親のそのターンの残り作業まで降格させるため、`context: fork` + `agent:` + `background: false` を併記してサブエージェントだけに効かせる。fork 側は会話履歴を見ずユーザーにも確認できないので、対象は引数と git 状態から決め、判断は報告で親へ返す

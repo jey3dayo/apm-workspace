@@ -199,7 +199,7 @@ catalog_build_skills_root() {
 }
 
 catalog_build_agents_root() {
-  printf '%s/agents\n' "$(catalog_build_dir)"
+  printf '%s/.apm/agents\n' "$(catalog_build_dir)"
 }
 
 catalog_build_commands_root() {
@@ -235,7 +235,7 @@ private_skills_root() {
 }
 
 tracked_catalog_agents_root() {
-  printf '%s/agents\n' "$(tracked_catalog_dir)"
+  printf '%s/.apm/agents\n' "$(tracked_catalog_dir)"
 }
 
 tracked_catalog_commands_root() {
@@ -258,9 +258,9 @@ tracked_catalog_relative_path() {
   printf '%s\n' "$CATALOG_DIR_NAME"
 }
 
-# The catalog build recreates only catalog/.apm/skills, so prepare:catalog would delete any other primitive
-# there, and APM installs .apm/agents/** whatever the package type while the legacy sync still rewrites
-# the same targets. Prints a message when catalog/.apm holds something other than skills.
+# The catalog build recreates only catalog/.apm/skills and catalog/.apm/agents, so prepare:catalog would delete any other
+# primitive there, and APM installs .apm/<primitive>/** whatever the package type while the legacy sync still rewrites
+# the same targets. Prints a message when catalog/.apm holds something other than skills and agents.
 catalog_apm_dir_claim_message() {
   apm_dir="$(tracked_catalog_dir)/.apm"
   if [ -L "$apm_dir" ]; then
@@ -269,10 +269,10 @@ catalog_apm_dir_claim_message() {
   fi
   [ -d "$apm_dir" ] || return 0
 
-  claimed_entry=$(cd "$apm_dir" && find . -mindepth 1 \( -type l -o \( ! -type d ! \( -type f -path './skills/*' \) \) \) | sed 's#^\./##' | sort | sed -n 1p)
+  claimed_entry=$(cd "$apm_dir" && find . -mindepth 1 \( -type l -o \( ! -type d ! \( -type f \( -path './skills/*' -o -path './agents/*' \) \) \) \) | sed 's#^\./##' | sort | sed -n 1p)
   [ -n "$claimed_entry" ] || return 0
 
-  printf 'catalog/.apm holds %s, but only catalog/.apm/skills is migrated: the legacy catalog sync still owns every other primitive, so prepare:catalog would delete it and APM would install it alongside the sync output. Move a primitive into catalog/.apm only in the change that retires its legacy writer.\n' "$claimed_entry"
+  printf 'catalog/.apm holds %s, but only catalog/.apm/skills and catalog/.apm/agents are migrated: the legacy catalog sync still owns every other primitive, so prepare:catalog would delete it and APM would install it alongside the sync output. Move a primitive into catalog/.apm only in the change that retires its legacy writer.\n' "$claimed_entry"
 }
 
 assert_catalog_apm_dir_unclaimed() {
@@ -1043,6 +1043,7 @@ cmd_apply() {
   normalize_codex_mcp_config "$HOME/.codex/config.toml"
   compile_codex
   sync_managed_catalog_runtime_assets
+  deploy_catalog_agents_via_apm
   sync_pi_instructions
   replace_skill_targets_from_stage "$apply_stage_root"
   # The freshly placed agmsg skill has no db/teams links until restore runs;
@@ -1519,8 +1520,12 @@ print_catalog_summary() {
 # Fields: name|home-relative root|config file|skills root override|agents face.
 # A "-" config file marks a target that reads guidance from elsewhere (OpenCode
 # falls back to ~/.claude/CLAUDE.md); see docs/package-decisions.md.
-# A "-" skills override marks a target with no skills face; a "-" agents face
-# marks one that must not receive the catalog agents/ tree. OpenCode takes both:
+# A "-" skills override marks a target with no skills face. An "apm" agents face
+# marks a target whose agents/ apply fills from an APM render of
+# catalog/.apm/agents (deploy_catalog_agents_via_apm): the sync neither writes
+# nor prunes it, and doctor compares its content. A "-" agents face
+# marks one that must not receive the catalog agents at all (any agents/ is
+# removed). OpenCode takes both "-" faces:
 # it reads skills from ~/.claude/skills and ~/.agents/skills already, and it
 # rejects the Claude-format agents (object `tools`, hex `color`) at startup, so
 # it only gets commands. Codex opts out of agents too: codex-cli
@@ -1531,9 +1536,9 @@ print_catalog_summary() {
 # stage lacks, so two targets on one root delete each other's skills.
 managed_catalog_runtime_targets() {
   cat <<'EOF'
-claude|.claude|CLAUDE.md||
+claude|.claude|CLAUDE.md||apm
 codex|.codex|AGENTS.md|.agents|-
-cursor|.cursor|AGENTS.md||
+cursor|.cursor|AGENTS.md||apm
 opencode|.config/opencode|-|-|-
 EOF
 }
@@ -2397,18 +2402,12 @@ remove_symlink_entries() {
   find "$target_dir" -type l -exec rm -f {} +
 }
 
-replace_managed_catalog_agents_tree() {
-  agents_source="$1"
-  target_agents_root="$2"
-  swap_staged_tree_into_place "$agents_source" "$target_agents_root" agents
-}
-
 # Manifest-tracked sync for a catalog dir (commands/rules) whose deployment
 # target is shared with files the catalog doesn't own (other packages, user
-# files). Unlike replace_managed_catalog_agents_tree's full-tree swap, this
-# only removes files this catalog previously placed and no longer provides,
-# so co-located non-catalog files are never touched. The manifest itself is
-# deploy-target-only state, never written to source.
+# files). Unlike a full-tree swap, this only removes files this catalog
+# previously placed and no longer provides, so co-located non-catalog files are
+# never touched. The manifest itself is deploy-target-only state, never written
+# to source.
 sync_managed_catalog_dir_with_manifest() {
   source_dir="$1"
   target_dir="$2"
@@ -2458,7 +2457,6 @@ sync_managed_catalog_runtime_assets() {
   [ -d "$tracked_dir" ] || fail "Tracked catalog missing: $tracked_dir. Run 'mise run prepare:catalog' first."
 
   instructions_source=$(tracked_catalog_instructions_path)
-  agents_source=$(tracked_catalog_agents_root)
   commands_source=$(tracked_catalog_commands_root)
   rules_source=$(tracked_catalog_rules_root)
   claude_rules_source=$(tracked_catalog_claude_rules_root)
@@ -2475,8 +2473,6 @@ sync_managed_catalog_runtime_assets() {
       if [ -e "$target_root/agents" ] || [ -L "$target_root/agents" ]; then
         rm -rf "$target_root/agents"
       fi
-    elif [ -d "$agents_source" ]; then
-      replace_managed_catalog_agents_tree "$agents_source" "$target_root/agents"
     fi
 
     if [ -d "$commands_source" ]; then
@@ -2495,6 +2491,121 @@ sync_managed_catalog_runtime_assets() {
       fi
     fi
   done
+}
+
+catalog_agents_apm_face_runtimes() {
+  managed_catalog_runtime_targets | while read_runtime_target; do
+    if [ "$RT_AGENTS_FACE" = "apm" ]; then
+      printf '%s|%s\n' "$RT_TARGET_NAME" "$RT_TARGET_DIR"
+    fi
+  done
+}
+
+catalog_agent_names() {
+  tracked_catalog_agent_relative_paths | while IFS= read -r agent_relative_path; do
+    case "$agent_relative_path" in
+      *.agent.md) printf '%s\n' "${agent_relative_path%.agent.md}" ;;
+    esac
+  done
+}
+
+render_catalog_agents_via_apm() {
+  render_root="$1"
+  render_targets="$2"
+  agent_names="$3"
+
+  mkdir -p "$render_root/pkg/.apm/agents" "$render_root/project" || return 1
+  cp "$(tracked_catalog_dir)/apm.yml" "$render_root/pkg/apm.yml" || return 1
+  while IFS= read -r agent_name; do
+    mkdir -p "$(dirname "$render_root/pkg/.apm/agents/$agent_name")"
+    cp "$(tracked_catalog_agents_root)/$agent_name.agent.md" "$render_root/pkg/.apm/agents/$agent_name.agent.md" || return 1
+  done <<<"$agent_names"
+
+  render_log="$render_root/install.log"
+  if ! (cd "$render_root/project" && apm install "$render_root/pkg" --target "$render_targets") >"$render_log" 2>&1; then
+    cat "$render_log"
+    error "apm install failed while rendering catalog agents"
+    return 1
+  fi
+  cat "$render_log"
+  if apm_install_has_diagnostics_failure "$render_log"; then
+    error "apm install reported integration diagnostics while rendering catalog agents"
+    return 1
+  fi
+}
+
+place_catalog_agent() {
+  rendered_agent="$1"
+  target_agent="$2"
+
+  if cmp -s "$rendered_agent" "$target_agent"; then
+    return 0
+  fi
+
+  placement=new
+  if [ -e "$target_agent" ] || [ -L "$target_agent" ]; then
+    placement=replaced
+  fi
+  target_agents_dir=$(dirname "$target_agent")
+  mkdir -p "$target_agents_dir"
+  agent_temp=$(mktemp "$target_agents_dir/.apm-agent.XXXXXX")
+  if ! cp "$rendered_agent" "$agent_temp" || ! chmod 644 "$agent_temp" || ! mv "$agent_temp" "$target_agent"; then
+    rm -f "$agent_temp"
+    error "Failed to place agent: $target_agent"
+    return 1
+  fi
+  log "Updated agent: $target_agent ($placement)"
+}
+
+place_rendered_catalog_agents() {
+  render_root="$1"
+  face_runtimes="$2"
+  agent_names="$3"
+
+  while IFS='|' read -r runtime_name runtime_dir; do
+    rendered_agents_dir="$render_root/project/$runtime_dir/agents"
+    missing_agents=""
+    while IFS= read -r agent_name; do
+      [ -f "$rendered_agents_dir/$agent_name.md" ] || missing_agents="$missing_agents $agent_name.md"
+    done <<<"$agent_names"
+    if [ -n "$missing_agents" ]; then
+      error "apm did not render catalog agents for $runtime_name:$missing_agents"
+      return 1
+    fi
+    while IFS= read -r agent_name; do
+      if [ -d "$HOME/$runtime_dir/agents/$agent_name.md" ]; then
+        error "Cannot place agent: target is a directory: $HOME/$runtime_dir/agents/$agent_name.md"
+        return 1
+      fi
+    done <<<"$agent_names"
+  done <<<"$face_runtimes"
+
+  while IFS='|' read -r runtime_name runtime_dir; do
+    while IFS= read -r agent_name; do
+      place_catalog_agent \
+        "$render_root/project/$runtime_dir/agents/$agent_name.md" \
+        "$HOME/$runtime_dir/agents/$agent_name.md" || return 1
+    done <<<"$agent_names"
+  done <<<"$face_runtimes"
+}
+
+deploy_catalog_agents_via_apm() {
+  agent_names=$(catalog_agent_names)
+  if [ -z "$agent_names" ]; then
+    log "No catalog agents to deploy."
+    return 0
+  fi
+  face_runtimes=$(catalog_agents_apm_face_runtimes)
+  if [ -z "$face_runtimes" ]; then
+    return 0
+  fi
+  face_targets=$(printf '%s\n' "$face_runtimes" | cut -d'|' -f1 | paste -sd, -)
+
+  agents_render_root=$(mktemp -d "${TMPDIR:-/tmp}/apm-agents-render.XXXXXX")
+  trap 'rm -rf "$agents_render_root"; trap - RETURN' RETURN
+
+  render_catalog_agents_via_apm "$agents_render_root" "$face_targets" "$agent_names" || return 1
+  place_rendered_catalog_agents "$agents_render_root" "$face_runtimes" "$agent_names" || return 1
 }
 
 cmd_validate_catalog() {
@@ -2708,6 +2819,19 @@ report_dependency_state() {
   apm_prune_preview
 }
 
+agents_differing_from_catalog() {
+  target_agents_root="$1"
+  agents_root=$(tracked_catalog_agents_root)
+  tracked_catalog_agent_relative_paths | while IFS= read -r agent_relative_path; do
+    case "$agent_relative_path" in
+      *.agent.md) ;;
+      *) continue ;;
+    esac
+    deployed_agent="$target_agents_root/${agent_relative_path%.agent.md}.md"
+    cmp -s "$agents_root/$agent_relative_path" "$deployed_agent" || printf '%s\n' "$deployed_agent"
+  done
+}
+
 cmd_doctor() {
   require_apm
   ensure_workspace_repo
@@ -2771,6 +2895,14 @@ cmd_doctor() {
       if [ -d "$tracked_agents_root" ] && [ "$RT_AGENTS_FACE" != "-" ] && [ ! -d "$target_root/agents" ]; then
         error "Required catalog output is missing or has wrong type (directory): $target_root/agents"
         has_failure=1
+      elif [ "$RT_AGENTS_FACE" = "apm" ]; then
+        differing_agents=$(agents_differing_from_catalog "$target_root/agents")
+        if [ -n "$differing_agents" ]; then
+          printf '%s\n' "$differing_agents" | while IFS= read -r differing_agent; do
+            error "Deployed agent is missing or differs from catalog/.apm/agents (APM skips a locally modified file and still exits 0): $differing_agent"
+          done
+          has_failure=1
+        fi
       fi
       if [ -d "$tracked_commands_root" ] && [ ! -d "$target_root/commands" ]; then
         error "Required catalog output is missing or has wrong type (directory): $target_root/commands"
@@ -2893,7 +3025,7 @@ cmd_smoke_catalog() {
   install_log="$temp_dir.install.log"
   (
     cd "$temp_dir"
-    apm install "$(catalog_build_dir)" --target codex
+    apm install "$(catalog_build_dir)" --target agent-skills
   ) >"$install_log" 2>&1 || {
     cat "$install_log" >&2
     fail "apm install failed for catalog smoke test. Temp workspace: $temp_dir"

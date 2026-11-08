@@ -1,12 +1,12 @@
 # Curated Agents: Placement, Distribution & Sources
 
-Entry-point memo for the curated agents under `catalog/agents/`. It records where curated agents live, how they are distributed, which upstreams they come from, and how to add a new one. Repo-level installability evaluation stays in the `agent-curation` skill registry; this file is the day-to-day placement guide.
+Entry-point memo for the curated agents under `catalog/.apm/agents/`. It records where curated agents live, how they are distributed, which upstreams they come from, and how to add a new one. Repo-level installability evaluation stays in the `agent-curation` skill registry; this file is the day-to-day placement guide.
 
 ## Placement & Distribution
 
-- Location: `catalog/agents/<name>.md` — all curated / vendored agents live here.
-- Distribution: the catalog rollout (`mise run deploy`) copies `catalog/agents/*` into each runtime target's `agents/` dir (`~/.claude/agents`). `~/.agents` is a skills-only target and receives no agents; Codex opts out of the agents face too (`~/.codex/agents` is never populated) because codex-cli only discovers `~/.codex/agents/*.toml`, and the catalog's Claude-format `.md` agent files are silently ignored there.
-- Formatting: `catalog/agents/` is listed in `.prettierignore`, so the formatter leaves curated agent files in their upstream-derived shape. Only our own generated artifacts get reformatted.
+- Location: `catalog/.apm/agents/<name>.agent.md` — all curated / vendored agents live here.
+- Distribution: `mise run apply` renders the tracked `catalog/.apm/agents/<name>.agent.md` with APM in a temporary project, for the runtimes whose agents face is `apm` (`catalog/apm.yml` `targets` omits codex), and places each as `<name>.md` into `~/.claude/agents` and `~/.cursor/agents`. A file whose content differs is overwritten through an atomic rename, files outside the catalog are left alone, and apply fails when APM renders fewer agents than the catalog has. The legacy catalog sync does not write those directories. `mise run doctor` compares content. `~/.agents` is a skills-only target and receives no agents; Codex opts out of the agents face too (`~/.codex/agents` is never populated) because codex-cli only discovers `~/.codex/agents/*.toml`, and the catalog's Claude-format `.md` agent files are silently ignored there.
+- Formatting: `catalog/.apm/agents/` is listed in `.prettierignore`, so the formatter leaves curated agent files in their upstream-derived shape. Only our own generated artifacts get reformatted.
 
 ## Sources
 
@@ -21,11 +21,11 @@ Repo-level detail (APM-installability evidence, upstream Codex lane) lives in th
 
 All rows below are curated (adapted) from `msitarzewski/agency-agents`: renamed and with frontmatter adjusted for Claude Code / Codex (`name`, `tools`, `color`); upstream `emoji` / `vibe` dropped. Not verbatim copies.
 
-| Local agent (`catalog/agents/`) | Upstream path                                   | Consumed by             |
-| ------------------------------- | ----------------------------------------------- | ----------------------- |
-| `frontend-developer.md`         | `engineering/engineering-frontend-developer.md` | general frontend work   |
-| `ui-designer.md`                | `design/design-ui-designer.md`                  | visual design / handoff |
-| `accessibility-auditor.md`      | `testing/testing-accessibility-auditor.md`      | accessibility review    |
+| Local agent (`catalog/.apm/agents/`) | Upstream path                                   | Consumed by             |
+| ------------------------------------ | ----------------------------------------------- | ----------------------- |
+| `frontend-developer.agent.md`        | `engineering/engineering-frontend-developer.md` | general frontend work   |
+| `ui-designer.agent.md`               | `design/design-ui-designer.md`                  | visual design / handoff |
+| `accessibility-auditor.agent.md`     | `testing/testing-accessibility-auditor.md`      | accessibility review    |
 
 ## Retired Agent Contracts
 
@@ -40,7 +40,7 @@ The following verbose persona agents were retired. Their useful contracts are in
 
 ## Adding a Curated Agent
 
-1. Place the adapted agent at `catalog/agents/<name>.md` (rename, trim upstream-specific assumptions).
+1. Place the adapted agent at `catalog/.apm/agents/<name>.agent.md` (rename, trim upstream-specific assumptions).
 2. Add one row to the Per-Agent Mapping above; add a new Sources row if the upstream repo is new.
 3. For upstream evaluation (is it APM-installable?), follow the `agent-curation` skill and record repo-level findings in its registry.
 4. Run `mise run deploy` to distribute.

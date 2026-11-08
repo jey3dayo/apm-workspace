@@ -1052,28 +1052,32 @@ EOF
 
 # --- is_path_under_dir ------------------------------------------------------
 
-@test "sync_managed_catalog_runtime_assets replaces managed agent trees" {
+@test "sync_managed_catalog_runtime_assets leaves agents of an apm-owned target untouched" {
   workspace_dir="$(mktemp -d)"
   runtime_home="$(mktemp -d)"
   target_root="$runtime_home/.claude"
 
-  mkdir -p "$workspace_dir/catalog/agents" "$target_root/agents" "$target_root/commands"
-  printf '%s\n' 'current' >"$workspace_dir/catalog/agents/current.md"
-  printf '%s\n' 'old' >"$target_root/agents/current.md"
-  printf '%s\n' 'stale' >"$target_root/agents/stale.md"
+  mkdir -p "$workspace_dir/catalog/.apm/agents" "$target_root/agents" "$target_root/commands"
+  printf '%s\n' 'catalog' >"$workspace_dir/catalog/.apm/agents/current.agent.md"
+  printf '%s\n' 'apm-placed' >"$target_root/agents/current.md"
+  printf '%s\n' 'mine' >"$target_root/agents/mine.md"
   printf '%s\n' 'outside' >"$target_root/commands/untouched.md"
 
   WORKSPACE_DIR="$workspace_dir"
   HOME="$runtime_home"
+  tracked_catalog_agents_root() { printf '%s\n' "$workspace_dir/catalog/.apm/agents"; }
   managed_catalog_runtime_targets() {
-    printf '%s\n' 'claude|.claude|CLAUDE.md|.claude'
+    printf '%s\n' 'claude|.claude|CLAUDE.md||apm' 'cursor|.cursor|AGENTS.md||apm'
   }
+  mkdir -p "$runtime_home/.cursor/agents"
+  printf '%s\n' 'cursor-mine' >"$runtime_home/.cursor/agents/mine.md"
 
   run sync_managed_catalog_runtime_assets
 
   [ "$status" -eq 0 ]
-  [ "$(<"$target_root/agents/current.md")" = "current" ]
-  [ ! -e "$target_root/agents/stale.md" ]
+  [ "$(<"$target_root/agents/mine.md")" = "mine" ]
+  [ "$(<"$runtime_home/.cursor/agents/mine.md")" = "cursor-mine" ]
+  [ "$(<"$target_root/agents/current.md")" = "apm-placed" ]
   [ "$(<"$target_root/commands/untouched.md")" = "outside" ]
 
   rm -rf "$workspace_dir" "$runtime_home"
@@ -1236,7 +1240,7 @@ make_doctor_fixture() {
   git -C "$doctor_workspace_dir" init -q
   mkdir -p \
     "$doctor_workspace_dir/catalog/.apm/skills" \
-    "$doctor_workspace_dir/catalog/agents" \
+    "$doctor_workspace_dir/catalog/.apm/agents" \
     "$doctor_workspace_dir/catalog/commands" \
     "$doctor_workspace_dir/catalog/rules"
   printf 'dependencies: []\n' >"$doctor_workspace_dir/apm.yml"
@@ -1456,6 +1460,46 @@ EOF
   run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
 
   [ "$status" -eq 0 ]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "doctor succeeds when deployed agents match the catalog and extra agent files are present" {
+  make_doctor_fixture
+  printf 'agent body\n' >"$doctor_workspace_dir/catalog/.apm/agents/reviewer.agent.md"
+  for target_dir in .claude .cursor; do
+    printf 'agent body\n' >"$doctor_home/$target_dir/agents/reviewer.md"
+    printf 'mine\n' >"$doctor_home/$target_dir/agents/mine.md"
+  done
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+
+  [ "$status" -eq 0 ]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "doctor fails on a deployed agent whose content differs from the catalog" {
+  make_doctor_fixture
+  printf 'agent body\n' >"$doctor_workspace_dir/catalog/.apm/agents/reviewer.agent.md"
+  printf 'agent body\n' >"$doctor_home/.claude/agents/reviewer.md"
+  printf 'locally edited\n' >"$doctor_home/.cursor/agents/reviewer.md"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$doctor_home/.cursor/agents/reviewer.md"* ]]
+  [[ "$output" != *"$doctor_home/.claude/agents/reviewer.md"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "doctor fails on a catalog agent missing from an apm-owned target" {
+  make_doctor_fixture
+  printf 'agent body\n' >"$doctor_workspace_dir/catalog/.apm/agents/reviewer.agent.md"
+  printf 'agent body\n' >"$doctor_home/.claude/agents/reviewer.md"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$doctor_home/.cursor/agents/reviewer.md"* ]]
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
 }
 
@@ -2176,8 +2220,7 @@ run_install_pins_with_fixture() {
 @test "sync_managed_catalog_runtime_assets removes the agents tree for an agents-less target" {
   workspace="$(mktemp -d)"
   runtime_home="$(mktemp -d)"
-  mkdir -p "$workspace/catalog/agents"
-  printf '%s\n' 'agent' >"$workspace/catalog/agents/reviewer.md"
+  mkdir -p "$workspace/catalog"
   printf '%s\n' '# instructions' >"$workspace/catalog/CLAUDE.md"
 
   target_root="$runtime_home/.config/opencode"
@@ -2187,7 +2230,6 @@ run_install_pins_with_fixture() {
   HOME="$runtime_home"
   tracked_catalog_dir() { printf '%s\n' "$workspace/catalog"; }
   tracked_catalog_instructions_path() { printf '%s\n' "$workspace/catalog/CLAUDE.md"; }
-  tracked_catalog_agents_root() { printf '%s\n' "$workspace/catalog/agents"; }
   tracked_catalog_commands_root() { printf '%s\n' "$workspace/catalog/commands"; }
   tracked_catalog_rules_root() { printf '%s\n' "$workspace/catalog/rules"; }
   managed_catalog_runtime_targets() {
@@ -2215,7 +2257,6 @@ _stub_opencode_sync_fixture() {
   HOME="$runtime_home"
   tracked_catalog_dir() { printf '%s\n' "$workspace/catalog"; }
   tracked_catalog_instructions_path() { printf '%s\n' "$workspace/catalog/CLAUDE.md"; }
-  tracked_catalog_agents_root() { printf '%s\n' "$workspace/catalog/agents"; }
   tracked_catalog_commands_root() { printf '%s\n' "$workspace/catalog/commands"; }
   tracked_catalog_rules_root() { printf '%s\n' "$workspace/catalog/rules"; }
   managed_catalog_runtime_targets() {
@@ -2238,8 +2279,7 @@ _stub_opencode_sync_fixture() {
 @test "sync_managed_catalog_runtime_assets removes the agents tree for codex" {
   workspace="$(mktemp -d)"
   runtime_home="$(mktemp -d)"
-  mkdir -p "$workspace/catalog/agents"
-  printf '%s\n' 'agent' >"$workspace/catalog/agents/reviewer.md"
+  mkdir -p "$workspace/catalog"
   printf '%s\n' '# instructions' >"$workspace/catalog/AGENTS.md"
 
   target_root="$runtime_home/.codex"
@@ -2249,7 +2289,6 @@ _stub_opencode_sync_fixture() {
   HOME="$runtime_home"
   tracked_catalog_dir() { printf '%s\n' "$workspace/catalog"; }
   tracked_catalog_instructions_path() { printf '%s\n' "$workspace/catalog/AGENTS.md"; }
-  tracked_catalog_agents_root() { printf '%s\n' "$workspace/catalog/agents"; }
   tracked_catalog_commands_root() { printf '%s\n' "$workspace/catalog/commands"; }
   tracked_catalog_rules_root() { printf '%s\n' "$workspace/catalog/rules"; }
   managed_catalog_runtime_targets() {
@@ -2269,7 +2308,7 @@ _stub_opencode_sync_fixture() {
 
 # Builds a temp workspace with a tracked catalog and a matching
 # .catalog-build/catalog tree, both containing $1 skills (and one file each
-# under agents/commands/rules unless suppressed by the caller after the
+# under .apm/agents and commands/rules unless suppressed by the caller after the
 # fact). Sets WORKSPACE_DIR and CATALOG_BUILD_ROOT to point at it, along with
 # FIXTURE_WORKSPACE_DIR for teardown. Must be called directly (not inside a
 # command substitution) so those global assignments are not lost to a
@@ -2282,20 +2321,20 @@ make_catalog_fixture() {
   tracked_dir="$workspace_dir/catalog"
   build_dir="$workspace_dir/.catalog-build/catalog"
 
-  mkdir -p "$tracked_dir/.apm/skills" "$tracked_dir/agents" "$tracked_dir/commands" "$tracked_dir/rules"
-  mkdir -p "$build_dir/.apm/skills" "$build_dir/agents" "$build_dir/commands" "$build_dir/rules"
+  mkdir -p "$tracked_dir/.apm/skills" "$tracked_dir/.apm/agents" "$tracked_dir/commands" "$tracked_dir/rules"
+  mkdir -p "$build_dir/.apm/skills" "$build_dir/.apm/agents" "$build_dir/commands" "$build_dir/rules"
 
   printf 'dependencies: []\n' >"$tracked_dir/apm.yml"
   printf '# catalog\n' >"$tracked_dir/README.md"
   printf '# instructions\n' >"$tracked_dir/AGENTS.md"
-  printf 'agent\n' >"$tracked_dir/agents/sample.md"
+  printf 'agent\n' >"$tracked_dir/.apm/agents/sample.agent.md"
   printf 'command\n' >"$tracked_dir/commands/sample.md"
   printf 'rule\n' >"$tracked_dir/rules/sample.md"
 
   printf 'dependencies: []\n' >"$build_dir/apm.yml"
   printf '# catalog\n' >"$build_dir/README.md"
   printf '# instructions\n' >"$build_dir/AGENTS.md"
-  printf 'agent\n' >"$build_dir/agents/sample.md"
+  printf 'agent\n' >"$build_dir/.apm/agents/sample.agent.md"
   printf 'command\n' >"$build_dir/commands/sample.md"
   printf 'rule\n' >"$build_dir/rules/sample.md"
 
@@ -2360,12 +2399,12 @@ make_catalog_fixture() {
 
 @test "assert_catalog_stage_safety refuses a tracked catalog whose .apm holds a primitive the build would drop" {
   make_catalog_fixture 2 2
-  mkdir -p "$workspace_dir/catalog/.apm/agents"
-  printf 'agent\n' >"$workspace_dir/catalog/.apm/agents/sample.agent.md"
+  mkdir -p "$workspace_dir/catalog/.apm/instructions"
+  printf 'instruction\n' >"$workspace_dir/catalog/.apm/instructions/sample.instructions.md"
 
   run assert_catalog_stage_safety 0
   [ "$status" -ne 0 ]
-  [[ "$output" == *"catalog/.apm holds agents/sample.agent.md"* ]]
+  [[ "$output" == *"catalog/.apm holds instructions/sample.instructions.md"* ]]
 
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
@@ -2445,7 +2484,7 @@ make_catalog_fixture() {
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
-@test "assert_catalog_stage_safety refuses a catalog whose .apm holds a FIFO" {
+@test "assert_catalog_stage_safety refuses a catalog whose .apm/agents holds a FIFO" {
   command -v mkfifo >/dev/null || skip "mkfifo is unavailable"
   make_catalog_fixture 2 2
   mkdir -p "$workspace_dir/catalog/.apm/agents"
@@ -2454,6 +2493,19 @@ make_catalog_fixture() {
   run assert_catalog_stage_safety 0
   [ "$status" -ne 0 ]
   [[ "$output" == *"catalog/.apm holds agents/queue"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "assert_catalog_stage_safety refuses a catalog whose .apm holds a FIFO" {
+  command -v mkfifo >/dev/null || skip "mkfifo is unavailable"
+  make_catalog_fixture 2 2
+  mkdir -p "$workspace_dir/catalog/.apm/instructions"
+  mkfifo "$workspace_dir/catalog/.apm/instructions/queue"
+
+  run assert_catalog_stage_safety 0
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"catalog/.apm holds instructions/queue"* ]]
 
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
@@ -2510,9 +2562,10 @@ make_catalog_fixture() {
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
-@test "assert_catalog_stage_safety allows a tracked catalog whose .apm holds only skills" {
+@test "assert_catalog_stage_safety allows a tracked catalog whose .apm holds only skills and agents" {
   make_catalog_fixture 2 2
   [ -f "$workspace_dir/catalog/.apm/skills/skill-0/SKILL.md" ]
+  [ -f "$workspace_dir/catalog/.apm/agents/sample.agent.md" ]
 
   run assert_catalog_stage_safety 0
   [ "$status" -eq 0 ]
@@ -2520,7 +2573,7 @@ make_catalog_fixture() {
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
-@test "catalog_apm_dir_claim_message is silent when .apm is absent or holds only skills" {
+@test "catalog_apm_dir_claim_message is silent when .apm is absent or holds only skills and agents" {
   make_catalog_fixture 2 2
 
   run catalog_apm_dir_claim_message
@@ -2535,14 +2588,14 @@ make_catalog_fixture() {
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
-@test "catalog_apm_dir_claim_message names the first non-skills primitive found under .apm" {
+@test "catalog_apm_dir_claim_message names the first primitive other than skills and agents found under .apm" {
   make_catalog_fixture 2 2
-  mkdir -p "$workspace_dir/catalog/.apm/agents"
-  printf 'agent\n' >"$workspace_dir/catalog/.apm/agents/sample.agent.md"
+  mkdir -p "$workspace_dir/catalog/.apm/instructions"
+  printf 'instruction\n' >"$workspace_dir/catalog/.apm/instructions/sample.instructions.md"
 
   run catalog_apm_dir_claim_message
   [ "$status" -eq 0 ]
-  [[ "$output" == *"catalog/.apm holds agents/sample.agent.md"* ]]
+  [[ "$output" == *"catalog/.apm holds instructions/sample.instructions.md"* ]]
 
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
@@ -2556,19 +2609,21 @@ make_stageable_catalog_fixture() {
   tracked_catalog_reference() { printf 'owner/repo/catalog#main\n'; }
 }
 
-@test "cmd_seed_catalog_build writes skills under .apm/skills and no top-level skills directory" {
+@test "cmd_seed_catalog_build writes skills and agents under .apm and no top-level skills or agents directory" {
   make_stageable_catalog_fixture
 
   run cmd_seed_catalog_build
   [ "$status" -eq 0 ]
   [ -f "$workspace_dir/.catalog-build/catalog/.apm/skills/skill-0/SKILL.md" ]
   [ -f "$workspace_dir/.catalog-build/catalog/.apm/skills/skill-1/SKILL.md" ]
+  [ -f "$workspace_dir/.catalog-build/catalog/.apm/agents/sample.agent.md" ]
   [ ! -e "$workspace_dir/.catalog-build/catalog/skills" ]
+  [ ! -e "$workspace_dir/.catalog-build/catalog/agents" ]
 
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
-@test "cmd_stage_catalog keeps skills under .apm/skills across repeated prepares" {
+@test "cmd_stage_catalog keeps skills and agents under .apm across repeated prepares" {
   make_stageable_catalog_fixture
 
   run cmd_stage_catalog
@@ -2578,7 +2633,9 @@ make_stageable_catalog_fixture() {
 
   [ -f "$workspace_dir/catalog/.apm/skills/skill-0/SKILL.md" ]
   [ -f "$workspace_dir/catalog/.apm/skills/skill-1/SKILL.md" ]
+  [ -f "$workspace_dir/catalog/.apm/agents/sample.agent.md" ]
   [ ! -e "$workspace_dir/catalog/skills" ]
+  [ ! -e "$workspace_dir/catalog/agents" ]
   [ -z "$(catalog_apm_dir_claim_message)" ]
 
   rm -rf "$FIXTURE_WORKSPACE_DIR"
@@ -2611,7 +2668,7 @@ make_stageable_catalog_fixture() {
 
 @test "assert_catalog_stage_safety refuses a build that would empty agents" {
   make_catalog_fixture 2 2
-  rm -f "$workspace_dir/.catalog-build/catalog/agents/sample.md"
+  rm -f "$workspace_dir/.catalog-build/catalog/.apm/agents/sample.agent.md"
 
   run assert_catalog_stage_safety 0
   [ "$status" -ne 0 ]
@@ -3316,11 +3373,10 @@ EOF
   HOME="$runtime_home"
   tracked_catalog_dir() { printf '%s\n' "$workspace/catalog"; }
   tracked_catalog_instructions_path() { printf '%s\n' "$workspace/catalog/AGENTS.md"; }
-  tracked_catalog_agents_root() { printf '%s\n' "$workspace/catalog/agents"; }
   tracked_catalog_commands_root() { printf '%s\n' "$workspace/catalog/commands"; }
   tracked_catalog_rules_root() { printf '%s\n' "$workspace/catalog/rules"; }
   managed_catalog_runtime_targets() {
-    printf '%s\n' 'claude|.claude|CLAUDE.md||' 'codex|.codex|AGENTS.md|.agents|-'
+    printf '%s\n' 'claude|.claude|CLAUDE.md||apm' 'codex|.codex|AGENTS.md|.agents|-'
   }
 
   run sync_managed_catalog_runtime_assets
@@ -3342,4 +3398,158 @@ EOF
   [ -f "$runtime_home/.claude/rules/shared.md" ]
 
   rm -rf "$workspace" "$runtime_home"
+}
+
+# --- apply: catalog agents rendered by APM into a temp project ---------------
+
+make_catalog_agents_apply_fixture() {
+  AGENTS_APPLY_BASE="$(mktemp -d)"
+  source "$TEST_REPO_ROOT/tests/conformance/build-fixture.sh"
+  build_apply_fixture "$AGENTS_APPLY_BASE"
+  AGENTS_APPLY_HOME="$FIXTURE_HOME"
+  AGENTS_APPLY_WORKSPACE_DIR="$FIXTURE_WORKSPACE_DIR"
+  AGENTS_APPLY_BIN_DIR="$FIXTURE_BIN_DIR"
+  AGENTS_APPLY_CALL_LOG="$FIXTURE_CALL_LOG"
+}
+
+run_catalog_agents_apply() {
+  HOME="$AGENTS_APPLY_HOME" \
+    PATH="$AGENTS_APPLY_BIN_DIR:$PATH" \
+    APM_WORKSPACE_DIR="$AGENTS_APPLY_WORKSPACE_DIR" \
+    FIXTURE_CALL_LOG="$AGENTS_APPLY_CALL_LOG" \
+    bash "$TEST_REPO_ROOT/scripts/apm-workspace.sh" apply
+}
+
+@test "apply places the catalog agents into claude and cursor through an APM render" {
+  make_catalog_agents_apply_fixture
+
+  run run_catalog_agents_apply
+
+  [ "$status" -eq 0 ]
+  source_agent="$AGENTS_APPLY_WORKSPACE_DIR/catalog/.apm/agents/sample.agent.md"
+  cmp -s "$source_agent" "$AGENTS_APPLY_HOME/.claude/agents/sample.md"
+  cmp -s "$source_agent" "$AGENTS_APPLY_HOME/.cursor/agents/sample.md"
+  [[ "$output" == *"Updated agent: $AGENTS_APPLY_HOME/.claude/agents/sample.md"* ]]
+  grep -Eq '^apm install .*/pkg --target claude,cursor$' "$AGENTS_APPLY_CALL_LOG"
+  [ ! -e "$AGENTS_APPLY_HOME/.codex/agents" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply leaves already-matching catalog agents untouched on a second run" {
+  make_catalog_agents_apply_fixture
+  run run_catalog_agents_apply
+  [ "$status" -eq 0 ]
+  inode_before="$(ls -i "$AGENTS_APPLY_HOME/.claude/agents/sample.md" "$AGENTS_APPLY_HOME/.cursor/agents/sample.md")"
+
+  run run_catalog_agents_apply
+
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"Updated agent"* ]]
+  [ "$(ls -i "$AGENTS_APPLY_HOME/.claude/agents/sample.md" "$AGENTS_APPLY_HOME/.cursor/agents/sample.md")" = "$inode_before" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply overwrites a modified catalog agent and keeps agents outside the catalog" {
+  make_catalog_agents_apply_fixture
+  run run_catalog_agents_apply
+  [ "$status" -eq 0 ]
+  printf 'locally edited\n' >"$AGENTS_APPLY_HOME/.claude/agents/sample.md"
+  printf 'hand written\n' >"$AGENTS_APPLY_HOME/.claude/agents/hand-written.md"
+
+  run run_catalog_agents_apply
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Updated agent: $AGENTS_APPLY_HOME/.claude/agents/sample.md"* ]]
+  cmp -s "$AGENTS_APPLY_WORKSPACE_DIR/catalog/.apm/agents/sample.agent.md" "$AGENTS_APPLY_HOME/.claude/agents/sample.md"
+  [ "$(cat "$AGENTS_APPLY_HOME/.claude/agents/hand-written.md")" = "hand written" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply fails naming the runtime and agent when APM renders fewer agents than the catalog has" {
+  make_catalog_agents_apply_fixture
+
+  FIXTURE_APM_AGENTS_DROP="cursor:sample" run run_catalog_agents_apply
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"cursor"*"sample.md"* ]]
+  [ ! -e "$AGENTS_APPLY_HOME/.claude/agents/sample.md" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply fails when the APM agents render command fails" {
+  make_catalog_agents_apply_fixture
+
+  FIXTURE_APM_AGENTS_INSTALL_FAIL=1 run run_catalog_agents_apply
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"apm install failed while rendering catalog agents"* ]]
+  [ ! -e "$AGENTS_APPLY_HOME/.claude/agents/sample.md" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply fails before placing anything when a catalog agent's target is a directory" {
+  make_catalog_agents_apply_fixture
+  mkdir -p "$AGENTS_APPLY_HOME/.cursor/agents/sample.md"
+  mkdir -p "$AGENTS_APPLY_BASE/tmp"
+
+  TMPDIR="$AGENTS_APPLY_BASE/tmp" run run_catalog_agents_apply
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"target is a directory: $AGENTS_APPLY_HOME/.cursor/agents/sample.md"* ]]
+  [ -z "$(ls -A "$AGENTS_APPLY_HOME/.cursor/agents/sample.md")" ]
+  [ ! -e "$AGENTS_APPLY_HOME/.claude/agents/sample.md" ]
+  [ -z "$(find "$AGENTS_APPLY_BASE/tmp" -maxdepth 1 -name 'apm-agents-render.*')" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply fails when a catalog agent's target is a symlink to a directory" {
+  make_catalog_agents_apply_fixture
+  mkdir -p "$AGENTS_APPLY_BASE/elsewhere" "$AGENTS_APPLY_HOME/.claude/agents"
+  ln -s "$AGENTS_APPLY_BASE/elsewhere" "$AGENTS_APPLY_HOME/.claude/agents/sample.md"
+
+  run run_catalog_agents_apply
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"target is a directory: $AGENTS_APPLY_HOME/.claude/agents/sample.md"* ]]
+  [ -z "$(ls -A "$AGENTS_APPLY_BASE/elsewhere")" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply removes the agents render directory when placing an agent fails" {
+  [ "$(id -u)" -ne 0 ] || skip "write permission cannot be removed from root"
+  make_catalog_agents_apply_fixture
+  mkdir -p "$AGENTS_APPLY_BASE/tmp" "$AGENTS_APPLY_HOME/.claude/agents"
+  chmod a-w "$AGENTS_APPLY_HOME/.claude/agents"
+
+  TMPDIR="$AGENTS_APPLY_BASE/tmp" run run_catalog_agents_apply
+  chmod u+w "$AGENTS_APPLY_HOME/.claude/agents"
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"Failed to place agent: $AGENTS_APPLY_HOME/.claude/agents/sample.md"* ]]
+  [ -z "$(find "$AGENTS_APPLY_BASE/tmp" -maxdepth 1 -name 'apm-agents-render.*')" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply never places rendered agents into codex or opencode" {
+  make_catalog_agents_apply_fixture
+
+  FIXTURE_APM_AGENTS_EXTRA_TARGETS="codex opencode" run run_catalog_agents_apply
+
+  [ "$status" -eq 0 ]
+  [ -f "$AGENTS_APPLY_HOME/.claude/agents/sample.md" ]
+  [ ! -e "$AGENTS_APPLY_HOME/.codex/agents" ]
+  [ ! -e "$AGENTS_APPLY_HOME/.config/opencode/agents" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply skips the agents render when the catalog has no agents" {
+  make_catalog_agents_apply_fixture
+  rm -f "$AGENTS_APPLY_WORKSPACE_DIR/catalog/.apm/agents/sample.agent.md"
+
+  run run_catalog_agents_apply
+
+  [ "$status" -eq 0 ]
+  [ -z "$(grep -- '--target claude' "$AGENTS_APPLY_CALL_LOG" || true)" ]
+  [ ! -e "$AGENTS_APPLY_HOME/.claude/agents" ]
+  rm -rf "$AGENTS_APPLY_BASE"
 }

@@ -17,11 +17,11 @@ This registry tracks external agent collections that were evaluated or curated i
 
 ### Hired Agents
 
-| Local agent                               | Source path                                     | Selection reason                                                                                        | Status                                  |
-| ----------------------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| `catalog/agents/frontend-developer.md`    | `engineering/engineering-frontend-developer.md` | General frontend implementation, UI integration, performance, accessibility, and test expectations.     | Curated into workspace-managed catalog. |
-| `catalog/agents/ui-designer.md`           | `design/design-ui-designer.md`                  | Visual design systems, component visual language, UI specifications, and design handoff.                | Curated into workspace-managed catalog. |
-| `catalog/agents/accessibility-auditor.md` | `testing/testing-accessibility-auditor.md`      | WCAG review, assistive technology testing plans, accessibility audit reports, and remediation guidance. | Curated into workspace-managed catalog. |
+| Local agent                                          | Source path                                     | Selection reason                                                                                        | Status                                  |
+| ---------------------------------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| `catalog/.apm/agents/frontend-developer.agent.md`    | `engineering/engineering-frontend-developer.md` | General frontend implementation, UI integration, performance, accessibility, and test expectations.     | Curated into workspace-managed catalog. |
+| `catalog/.apm/agents/ui-designer.agent.md`           | `design/design-ui-designer.md`                  | Visual design systems, component visual language, UI specifications, and design handoff.                | Curated into workspace-managed catalog. |
+| `catalog/.apm/agents/accessibility-auditor.agent.md` | `testing/testing-accessibility-auditor.md`      | WCAG review, assistive technology testing plans, accessibility audit reports, and remediation guidance. | Curated into workspace-managed catalog. |
 
 ### Retired Agent Contracts
 
@@ -31,7 +31,7 @@ These upstream persona files were evaluated at the repository and commit recorde
 | -------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------- |
 | `catalog/agents/agency-evidence-collector.md`      | `testing/testing-evidence-collector.md`              | `optional-skills/review-board/SKILL.md` Evidence Collector overlay       | Retired; visual and browser evidence discipline retained. |
 | `catalog/agents/agency-reality-checker.md`         | `testing/testing-reality-checker.md`                 | `optional-skills/review-board/SKILL.md` readiness judgement              | Retired; evidence-based ship/block judgement retained.    |
-| `catalog/agents/agency-minimal-change-engineer.md` | `engineering/engineering-minimal-change-engineer.md` | `catalog/agents/implementer.md` and Review And Fix Loop                  | Retired; minimal evidence-supported diffs retained.       |
+| `catalog/agents/agency-minimal-change-engineer.md` | `engineering/engineering-minimal-change-engineer.md` | `catalog/.apm/agents/implementer.agent.md` and Review And Fix Loop       | Retired; minimal evidence-supported diffs retained.       |
 | `catalog/agents/agency-test-results-analyzer.md`   | `testing/testing-test-results-analyzer.md`           | `optional-skills/review-board/SKILL.md` evidence and readiness judgement | Retired; test-result patterns and residual risk retained. |
 
 ### Role Split

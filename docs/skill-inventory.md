@@ -23,7 +23,7 @@ Cursor user-scope（`~/.cursor/mcp.json`）は APM 外 — [`package-decisions.m
 
 ## ~/.apm 専用（.apm/skills/）
 
-- `agent-curation` — catalog/agents と採用台帳の運用
+- `agent-curation` — catalog/.apm/agents と採用台帳の運用
 - `skill-auditor` — スキル棚卸し
 - `find-skills` — スキル探索
 

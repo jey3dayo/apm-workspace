@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 
 // Checks the managed catalog for repository-specific values and references to
-// agents that are not present in catalog/agents. Only catalog agents and
+// agents that are not present in catalog/.apm/agents. Only catalog agents and
 // skills are in scope; commands and rules deliberately remain untouched.
 //
 // Organization names must not appear anywhere in this public repository, but
@@ -21,7 +21,7 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "..");
-const DEFAULT_TARGET_SUBDIRS = ["catalog/agents", "catalog/.apm/skills"];
+const DEFAULT_TARGET_SUBDIRS = ["catalog/.apm/agents", "catalog/.apm/skills"];
 
 const EXCLUDED_AGENTS = new Set([
   "Explore",
@@ -74,19 +74,19 @@ function findAgentDirectory(targetDirs: string[]): string {
   if (explicitAgentsDir) return explicitAgentsDir;
 
   const catalogDir = targetDirs.find((targetDir) => path.basename(targetDir) === "catalog");
-  if (catalogDir) return path.join(catalogDir, "agents");
+  if (catalogDir) return path.join(catalogDir, ".apm", "agents");
 
   const siblingAgentsDir = targetDirs
     .map((targetDir) => path.join(path.dirname(targetDir), "agents"))
     .find((candidate) => fs.existsSync(candidate));
   if (siblingAgentsDir) return siblingAgentsDir;
 
-  return path.join(REPO_ROOT, "catalog", "agents");
+  return path.join(REPO_ROOT, "catalog", ".apm", "agents");
 }
 
 function collectAgentNames(agentDirectory: string): Set<string> {
   return new Set(
-    collectMarkdownFiles([agentDirectory]).map((filePath) => path.basename(filePath, ".md")),
+    collectMarkdownFiles([agentDirectory]).map((filePath) => path.basename(filePath).replace(/\.agent\.md$/, "")),
   );
 }
 

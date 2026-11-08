@@ -7,8 +7,8 @@ setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
   SCRIPT_UNDER_TEST="$REPO_ROOT/scripts/lint-catalog-leaks.ts"
   FIXTURE_DIR="$(mktemp -d)"
-  mkdir -p "$FIXTURE_DIR/catalog/agents" "$FIXTURE_DIR/catalog/.apm/skills"
-  touch "$FIXTURE_DIR/catalog/agents/existing-agent.md"
+  mkdir -p "$FIXTURE_DIR/catalog/.apm/agents" "$FIXTURE_DIR/catalog/.apm/skills"
+  touch "$FIXTURE_DIR/catalog/.apm/agents/existing-agent.agent.md"
   # Point at a fixture path so a real local denylist never leaks into tests.
   export APM_LEAK_DENYLIST="$FIXTURE_DIR/denylist.txt"
 }
@@ -18,7 +18,7 @@ teardown() {
 }
 
 run_fixture() {
-  run tsx "$SCRIPT_UNDER_TEST" "$FIXTURE_DIR/catalog/agents" "$FIXTURE_DIR/catalog/.apm/skills"
+  run tsx "$SCRIPT_UNDER_TEST" "$FIXTURE_DIR/catalog/.apm/agents" "$FIXTURE_DIR/catalog/.apm/skills"
 }
 
 @test "fails on an unresolved (use deployment) reference" {
