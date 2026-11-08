@@ -2498,6 +2498,7 @@ make_catalog_fixture() {
 }
 
 @test "assert_catalog_stage_safety refuses a catalog whose .apm holds a FIFO" {
+  command -v mkfifo >/dev/null || skip "mkfifo is unavailable"
   make_catalog_fixture 2 2
   mkdir -p "$workspace_dir/catalog/.apm/instructions"
   mkfifo "$workspace_dir/catalog/.apm/instructions/queue"
