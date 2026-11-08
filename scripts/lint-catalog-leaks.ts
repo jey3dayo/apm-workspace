@@ -1,8 +1,8 @@
 #!/usr/bin/env tsx
 
 // Checks the managed catalog for repository-specific values and references to
-// agents that are not present in catalog/.apm/agents. Only catalog agents and
-// skills are in scope; commands and rules deliberately remain untouched.
+// agents that are not present in catalog/.apm/agents. Only catalog agents,
+// instructions and skills are in scope; commands and rules deliberately remain untouched.
 //
 // Organization names must not appear anywhere in this public repository, but
 // the list of names cannot be committed either. When a local denylist file
@@ -21,7 +21,7 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "..");
-const DEFAULT_TARGET_SUBDIRS = ["catalog/.apm/agents", "catalog/.apm/skills"];
+const DEFAULT_TARGET_SUBDIRS = ["catalog/.apm/agents", "catalog/.apm/instructions", "catalog/.apm/skills"];
 
 const EXCLUDED_AGENTS = new Set([
   "Explore",

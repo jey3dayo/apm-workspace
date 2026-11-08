@@ -23,7 +23,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "..");
 
-const DEFAULT_TARGET_SUBDIRS = ["catalog/.apm/agents", "catalog/.apm/skills", "catalog/commands", "catalog/rules"];
+const DEFAULT_TARGET_SUBDIRS = [
+  "catalog/.apm/agents",
+  "catalog/.apm/instructions",
+  "catalog/.apm/skills",
+  "catalog/commands",
+  "catalog/rules",
+];
 
 // Files under these subdirs must additionally declare `name` and
 // `description` keys in frontmatter (value contents are not checked, only
@@ -37,6 +43,12 @@ function requiresNameAndDescription(filePath: string): boolean {
   const parentDir = path.basename(path.dirname(filePath));
   if (parentDir === "agents" && base.endsWith(".md")) return true;
   return false;
+}
+
+// APM requires a description on every instruction (*.instructions.md), and an instruction without frontmatter is
+// not a valid primitive.
+function isInstruction(filePath: string): boolean {
+  return path.basename(filePath).endsWith(".instructions.md");
 }
 
 interface FrontmatterBlock {
@@ -188,6 +200,9 @@ function main() {
     if (extracted === null) {
       // No frontmatter block: many reference .md files intentionally have
       // none. Not a failure.
+      if (isInstruction(filePath)) {
+        failures.push({ filePath, message: "1:1 instruction has no frontmatter (it needs a 'description')" });
+      }
       continue;
     }
 
@@ -211,6 +226,8 @@ function main() {
       if (!hasKey(extracted.content, "description")) {
         failures.push({ filePath, message: "frontmatter is missing required key 'description'" });
       }
+    } else if (isInstruction(filePath) && !hasKey(extracted.content, "description")) {
+      failures.push({ filePath, message: "frontmatter is missing required key 'description'" });
     }
   }
 

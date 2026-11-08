@@ -96,3 +96,17 @@ EOF
   [[ "$output" == *"SKILL.md"* ]]
   [[ "$output" == *"'description'"* ]]
 }
+
+@test "fails an instruction without a description or without frontmatter, and passes one with a description" {
+  mkdir -p "$FIXTURE_DIR/instructions"
+  printf -- '---\napplyTo: "**"\n---\n\nBody.\n' >"$FIXTURE_DIR/instructions/no-description.instructions.md"
+  printf '# Body only\n' >"$FIXTURE_DIR/instructions/no-frontmatter.instructions.md"
+  printf -- '---\ndescription: Guide\n---\n\nBody.\n' >"$FIXTURE_DIR/instructions/ok.instructions.md"
+
+  run tsx "$SCRIPT_UNDER_TEST" "$FIXTURE_DIR/instructions"
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"no-description.instructions.md:frontmatter is missing required key 'description'"* ]]
+  [[ "$output" == *"no-frontmatter.instructions.md:1:1 instruction has no frontmatter"* ]]
+  [[ "$output" != *"ok.instructions.md"* ]]
+}
