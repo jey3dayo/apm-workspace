@@ -3829,8 +3829,8 @@ home_tree_listing() {
 @test "user_root_state skips the same leading whitespace before the marker as APM's Python lstrip" {
   make_roots_fixture
   write_generated_root "$roots_home/compiled.md" '# compiled'
-  # form feed, U+001C, U+3000 and U+2028 are Python whitespace; U+200B and a BOM are not.
-  for prefix in '\014' '\034' '\343\200\200' '\342\200\250\n'; do
+  # form feed, U+001C, U+0085, U+00A0, U+2000, U+200A, U+3000 and U+2028 are Python whitespace; U+200B and a BOM are not.
+  for prefix in '\014' '\034' '\302\205' '\302\240' '\342\200\200' '\342\200\212' '\343\200\200' '\342\200\250\n'; do
     { printf "$prefix"; cat "$roots_home/compiled.md"; } >"$roots_home/prefixed.md"
     [ "$(user_root_state "$roots_home/prefixed.md" "")" = edited-generated ]
   done
