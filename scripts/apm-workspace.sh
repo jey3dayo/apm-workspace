@@ -275,6 +275,13 @@ catalog_apm_dir_claim_message() {
     printf 'catalog/.apm could not be fully read, so prepare:catalog might delete what it holds. Make every entry under catalog/.apm readable first.\n'
     return 0
   fi
+  # The classification below reads paths line by line, so a name with a newline could pose as SKILL.md; claim it instead.
+  newline=$(printf '\n_')
+  newline=${newline%_}
+  if ! newline_entries=$(cd "$apm_dir" && find . -mindepth 1 -name "*$newline*") || [ -n "$newline_entries" ]; then
+    printf 'catalog/.apm holds an entry whose name contains a newline, which the catalog guard cannot classify. Rename it.\n'
+    return 0
+  fi
 
   claimed_entry=$({
     printf '%s\n' "$non_regular_entries" | sed -n 's#^\./#N #p'

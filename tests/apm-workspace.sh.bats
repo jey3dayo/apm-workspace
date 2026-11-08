@@ -2629,6 +2629,19 @@ make_catalog_fixture() {
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
+@test "catalog_apm_dir_claim_message refuses a name with a newline that would pose as SKILL.md" {
+  make_catalog_fixture 2 2
+  mkdir -p "$workspace_dir/catalog/.apm/skills/draft"
+  : >"$workspace_dir/catalog/.apm/skills/draft/SKILL.md"$'\n'"decoy" || skip "this filesystem rejects a newline in a file name"
+  printf 'draft notes\n' >"$workspace_dir/catalog/.apm/skills/draft/notes.md"
+
+  run catalog_apm_dir_claim_message
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"catalog/.apm holds an entry whose name contains a newline"* ]]
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
 @test "catalog_apm_dir_claim_message names an agent file that is not <name>.agent.md" {
   make_catalog_fixture 2 2
   printf 'legacy\n' >"$workspace_dir/catalog/.apm/agents/legacy-name.md"
