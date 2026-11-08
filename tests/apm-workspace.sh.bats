@@ -3450,15 +3450,15 @@ run_catalog_agents_apply() {
 
 @test "apply fails before placing anything when a catalog agent's target is a directory" {
   make_catalog_agents_apply_fixture
-  mkdir -p "$AGENTS_APPLY_HOME/.claude/agents/sample.md"
+  mkdir -p "$AGENTS_APPLY_HOME/.cursor/agents/sample.md"
   mkdir -p "$AGENTS_APPLY_BASE/tmp"
 
   TMPDIR="$AGENTS_APPLY_BASE/tmp" run run_catalog_agents_apply
 
   [ "$status" -ne 0 ]
-  [[ "$output" == *"target is a directory: $AGENTS_APPLY_HOME/.claude/agents/sample.md"* ]]
-  [ -z "$(ls -A "$AGENTS_APPLY_HOME/.claude/agents/sample.md")" ]
-  [ ! -e "$AGENTS_APPLY_HOME/.cursor/agents/sample.md" ]
+  [[ "$output" == *"target is a directory: $AGENTS_APPLY_HOME/.cursor/agents/sample.md"* ]]
+  [ -z "$(ls -A "$AGENTS_APPLY_HOME/.cursor/agents/sample.md")" ]
+  [ ! -e "$AGENTS_APPLY_HOME/.claude/agents/sample.md" ]
   [ -z "$(find "$AGENTS_APPLY_BASE/tmp" -maxdepth 1 -name 'apm-agents-render.*')" ]
   rm -rf "$AGENTS_APPLY_BASE"
 }
@@ -3477,6 +3477,7 @@ run_catalog_agents_apply() {
 }
 
 @test "apply removes the agents render directory when placing an agent fails" {
+  [ "$(id -u)" -ne 0 ] || skip "write permission cannot be removed from root"
   make_catalog_agents_apply_fixture
   mkdir -p "$AGENTS_APPLY_BASE/tmp" "$AGENTS_APPLY_HOME/.claude/agents"
   chmod a-w "$AGENTS_APPLY_HOME/.claude/agents"

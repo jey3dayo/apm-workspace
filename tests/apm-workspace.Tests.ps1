@@ -1411,11 +1411,11 @@ Describe "public command surface" {
     }
 
     It "throws before placing anything when a catalog agent's target is a directory" {
-      $targetDir = Join-Path $script:agentsHome ".claude/agents/sample.md"
+      $targetDir = Join-Path $script:agentsHome ".cursor/agents/sample.md"
       New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
 
       { Invoke-CatalogAgentsDeploy 6>&1 | Out-Null } | Should -Throw "*target is a directory*sample.md*"
-      Join-Path $script:agentsHome ".cursor/agents/sample.md" | Should -Not -Exist
+      Join-Path $script:agentsHome ".claude/agents/sample.md" | Should -Not -Exist
     }
 
     It "never places rendered agents into codex or opencode" {
