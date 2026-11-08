@@ -26,16 +26,16 @@ setup_file() {
   apm_isolate_git_env
 
   REAL_HOME="$(cd "$HOME" && pwd -P)"
+  export REAL_HOME
   if [ -n "${APM_SEPARATION_FIXTURE_ROOT:-}" ]; then
+    assert_fixture_root_allowed "$APM_SEPARATION_FIXTURE_ROOT" || return 1
     mkdir -p "$APM_SEPARATION_FIXTURE_ROOT"
     FX="$(cd "$(mktemp -d "$APM_SEPARATION_FIXTURE_ROOT/run.XXXXXX")" && pwd -P)"
   else
     FX="$(cd "$BATS_FILE_TMPDIR" && pwd -P)"
   fi
-  export REAL_HOME FX
-  case "$REAL_HOME/" in
-    "$FX"/*) echo "the fixture root $FX must not contain the invoking HOME" >&2 && return 1 ;;
-  esac
+  export FX
+  assert_fixture_root_allowed "$FX" || return 1
   FIXTURE_PATH="$(dirname "$(command -v git)"):/usr/bin:/bin:/usr/sbin:/sbin"
   export FIXTURE_PATH
   mkdir -p "$FX/tmp" "$FX/homes"
@@ -54,6 +54,36 @@ setup_file() {
 
   build_authoring_repo "$FX/src/authoring"
   write_fixture_gitconfig "$FX/gitconfig" "$FX/src/authoring"
+}
+
+# Physical path of $1, resolved through its nearest existing ancestor so a root that does not exist yet is checked
+# before anything is created.
+physical_path() {
+  local path="$1" rest=""
+  while [ ! -d "$path" ]; do
+    rest="/$(basename "$path")$rest"
+    path="$(dirname "$path")"
+  done
+  printf '%s%s\n' "$(cd "$path" && pwd -P)" "$rest"
+}
+
+# A root inside the invoking HOME is allowed (a scratch directory there is fine), but never the HOME itself, one of
+# its ancestors, or a directory where APM or the three tools keep real state.
+assert_fixture_root_allowed() {
+  local root surface
+  case "/$1/" in
+    */../*) echo "the fixture root $1 must not contain '..'" >&2 && return 1 ;;
+  esac
+  root="$(physical_path "$1")"
+  local prefix="${root%/}/"
+  case "$REAL_HOME/" in
+    "$prefix"*) echo "the fixture root $root must not be the invoking HOME or contain it" >&2 && return 1 ;;
+  esac
+  for surface in .apm .claude .codex .cursor .agents .config .cache .local Library; do
+    case "$root/" in
+      "$REAL_HOME/$surface"/*) echo "the fixture root $root must not be inside $REAL_HOME/$surface" >&2 && return 1 ;;
+    esac
+  done
 }
 
 resolve_apm_bin() {
@@ -75,10 +105,11 @@ assert_apm_version() {
     echo "apm at $APM_BIN does not run under the fixture isolation: $version" >&2
     return 1
   }
-  case "$version" in
-    *"$EXPECTED_APM_VERSION"*) ;;
-    *) echo "expected APM $EXPECTED_APM_VERSION, got: $version" >&2 && return 1 ;;
-  esac
+  # `apm --version` prints "Agent Package Manager (APM) CLI version <version>".
+  [ "${version##* }" = "$EXPECTED_APM_VERSION" ] || {
+    echo "expected APM $EXPECTED_APM_VERSION, got: $version" >&2
+    return 1
+  }
 }
 
 write_sandbox_profile() {
@@ -295,6 +326,21 @@ sentinel_snapshot() {
     esac
   done <<<"$output"
   [[ "$output" == *"url.file://$AUTHORING.insteadof=https://fixture.invalid/fixture-owner/fixture-authoring.git"* ]]
+}
+
+@test "a fixture root may sit in a scratch directory of HOME but never on HOME, its ancestors or tool state" {
+  REAL_HOME="$FX/fake-home"
+  mkdir -p "$REAL_HOME/.claude" "$REAL_HOME/scratch"
+  ln -s "$REAL_HOME/.claude" "$REAL_HOME/scratch/claude-link"
+
+  for root in "$REAL_HOME" "$FX" / "$REAL_HOME/.claude/fixtures" "$REAL_HOME/.apm/new/fixtures" \
+    "$REAL_HOME/scratch/claude-link/fixtures" "$REAL_HOME/scratch/../.codex"; do
+    run assert_fixture_root_allowed "$root"
+    [ "$status" -ne 0 ]
+  done
+  assert_fixture_root_allowed "$REAL_HOME/scratch/separation/new"
+  [ ! -e "$REAL_HOME/scratch/separation" ]
+  [ ! -e "$REAL_HOME/.apm" ]
 }
 
 @test "the HOME guard refuses paths that resolve outside the fixture, without running anything" {

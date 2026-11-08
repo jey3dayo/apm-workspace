@@ -1,7 +1,7 @@
 # authoring source と consumer の global state を分ける（第 1 段階の検証）
 
 - Status: 検証だけ（2026-11-09、APM 0.35.0）。本番の `apm.yml`・`apm.lock.yaml`・`catalog/`・配布の手順は変えていない。分離の実施（第 2 段階。自作の writer の撤去や改名）は承認されていない
-- テスト: `tests/apm-source-consumer-separation.bats`。`mise run test:sh` に含まれ、CI と、対象のファイルを変えた push の pre-push でも走る。テストは APM 0.35.0 であることを確かめ、別のバージョンでは止まる（APM を上げるときは、この文書の内容を確かめ直してからテストの期待値を上げる）。fixture は既定で bats の一時ディレクトリに作り、`APM_SEPARATION_FIXTURE_ROOT` を指定するとその下に作る
+- テスト: `tests/apm-source-consumer-separation.bats`。`mise run test:sh` に含まれ、CI と、対象のファイルを変えた push の pre-push でも走る。テストは APM 0.35.0 であることを確かめ、別のバージョンでは止まる（APM を上げるときは、この文書の内容を確かめ直してからテストの期待値を上げる）。fixture は既定で bats の一時ディレクトリに作り、`APM_SEPARATION_FIXTURE_ROOT` を指定するとその下に作る。どちらの場合も、その場所が呼び出し元の HOME そのもの・その祖先、または HOME の `.apm`・`.claude`・`.codex`・`.cursor`・`.agents`・`.config`・`.cache`・`.local`・`Library` の中なら、何も作らずに止まる（HOME の中の作業用ディレクトリは使える）
 
 ## 何と何を分けるのか
 
@@ -24,7 +24,7 @@
 - consumer は authoring repo の package を SHA で pin して `apm install -g` できる。lock の `resolved_commit` は pin と一致し、authoring repo には lock も `apm_modules` も作られず、`git status` も変わらない
 - 3 つの tool への配布: Claude には skills・agent・rule、Codex には `~/.agents/skills` の skills と `~/.codex/AGENTS.md`、Cursor には agent と `~/.cursor/AGENTS.md` が届く。配布先のファイル一覧が期待と完全に一致する
 - `apm install -g` は root を書かない。`apm compile -g --clean` が Codex と Cursor の root を書き、目印の無い手書きの `~/.claude/CLAUDE.md` は残す
-- install と compile をもう一度実行しても、HOME の中身（cache・receipt・`apm_modules` を除く）は変わらない。新しい別の HOME で同じ manifest から入れても、lock は byte 単位で同じになる
+- install と compile をもう一度実行しても、HOME の中のファイルと symlink（パスと内容、リンク先）は変わらない。比べないのは `.cache`・`Library`・`.apm/deployment-receipts`・`.apm/apm_modules` と、空のディレクトリやパーミッション。新しい別の HOME で同じ manifest から入れても、lock は byte 単位で同じになる
 - authoring repo に commit を足しても、作業ツリーを編集しても、pin を動かすまで consumer には届かない。pin を v2 に動かすと v2 の内容が届き、未 commit の v3 は届かない
 - APM の持ち物ではないファイル（private skill のコピーと symlink、Herdr が置く skill、`~/.codex/config.toml`、`~/.claude/settings.json`、手書きの `CLAUDE.md`）は、install・再実行・pin の更新のあとも変わらない
 - package の `targets` から codex を外すと（`catalog/apm.yml` と同じ形）、制限付きの agent は Codex に配られない。外さないと APM は `~/.codex/agents/*.toml` を書き、`disallowedTools` は落ちる。外す理由は `docs/package-decisions.md` の Codex 変換の却下
