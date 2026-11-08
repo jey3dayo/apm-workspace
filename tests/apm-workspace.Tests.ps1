@@ -1235,6 +1235,7 @@ Describe "public command surface" {
     Mock New-TemporaryDirectory { Join-Path $TestDrive "apm-apply" }
     Mock Build-TargetSkillTrees {}
     Mock Sync-ManagedCatalogRuntimeAssets {}
+    Mock Invoke-CatalogAgentsDeploy {}
     Mock Replace-SkillTargetsFromStage {}
     Mock Install-WorkspaceMcpDependencies {}
     Mock Normalize-CodexMcpConfig {}
@@ -1263,6 +1264,7 @@ Describe "public command surface" {
     Mock New-TemporaryDirectory { Join-Path $TestDrive "apm-apply-restore-fail" }
     Mock Build-TargetSkillTrees {}
     Mock Sync-ManagedCatalogRuntimeAssets {}
+    Mock Invoke-CatalogAgentsDeploy {}
     Mock Replace-SkillTargetsFromStage {}
     Mock Install-WorkspaceMcpDependencies {}
     Mock Normalize-CodexMcpConfig {}
@@ -1301,6 +1303,7 @@ Describe "public command surface" {
     Mock New-TemporaryDirectory { Join-Path $TestDrive "apm-apply-original-failure" }
     Mock Build-TargetSkillTrees {}
     Mock Sync-ManagedCatalogRuntimeAssets {}
+    Mock Invoke-CatalogAgentsDeploy {}
     Mock Replace-SkillTargetsFromStage {}
     Mock Install-WorkspaceMcpDependencies {}
     Mock Normalize-CodexMcpConfig {}
@@ -1321,6 +1324,78 @@ Describe "public command surface" {
 
     { Invoke-Apply } | Should -Throw "*boom: apm compile failed*"
     $script:recoveryRestoreCalled | Should -Be $true
+  }
+
+  Context "Invoke-CatalogAgentsDeploy" {
+    BeforeEach {
+      $script:agentsHome = Join-Path $TestDrive "agents-deploy-home"
+      Remove-Item -LiteralPath $script:agentsHome -Recurse -Force -ErrorAction SilentlyContinue
+      $catalogDir = Join-Path $script:WorkspaceDir "catalog"
+      $script:agentSource = Join-Path (Join-Path (Join-Path $catalogDir ".apm") "agents") "sample.agent.md"
+      New-Item -ItemType Directory -Path (Split-Path -Parent $script:agentSource) -Force | Out-Null
+      Set-Content -LiteralPath (Join-Path $catalogDir "apm.yml") -Value "dependencies: []"
+      Set-Content -LiteralPath $script:agentSource -Value "agent body"
+
+      Mock Get-ManagedCatalogRuntimeTargets {
+        @(
+          [pscustomobject]@{ Name = "claude"; Root = (Join-Path $script:agentsHome ".claude"); SkillsRoot = (Join-Path $script:agentsHome ".claude"); AgentsFace = "apm"; ConfigName = "CLAUDE.md" },
+          [pscustomobject]@{ Name = "codex"; Root = (Join-Path $script:agentsHome ".codex"); SkillsRoot = (Join-Path $script:agentsHome ".agents"); AgentsFace = "-"; ConfigName = "AGENTS.md" },
+          [pscustomobject]@{ Name = "cursor"; Root = (Join-Path $script:agentsHome ".cursor"); SkillsRoot = (Join-Path $script:agentsHome ".cursor"); AgentsFace = "apm"; ConfigName = "AGENTS.md" }
+        )
+      }
+
+      $script:apmCalls = New-Object System.Collections.Generic.List[string]
+      $script:droppedAgent = ""
+      $script:extraTargets = @()
+
+      function global:apm {
+        $apmArgs = @($args)
+        $script:apmCalls.Add(($apmArgs -join ' '))
+        $packageAgentsDir = Join-Path (Join-Path $apmArgs[1] ".apm") "agents"
+        foreach ($renderTarget in (@($apmArgs[3] -split ',') + @($script:extraTargets))) {
+          foreach ($packagedAgent in (Get-ChildItem -LiteralPath $packageAgentsDir -Filter "*.agent.md")) {
+            $agentName = $packagedAgent.Name.Substring(0, $packagedAgent.Name.Length - ".agent.md".Length)
+            if ("${renderTarget}:$agentName" -eq $script:droppedAgent) {
+              continue
+            }
+            $renderedDir = Join-Path (Join-Path (Get-Location).Path ".$renderTarget") "agents"
+            New-Item -ItemType Directory -Path $renderedDir -Force | Out-Null
+            Copy-Item -LiteralPath $packagedAgent.FullName -Destination (Join-Path $renderedDir "$agentName.md")
+          }
+        }
+        $global:LASTEXITCODE = 0
+      }
+    }
+
+    AfterEach {
+      Remove-Item Function:\apm -ErrorAction SilentlyContinue
+    }
+
+    It "places the catalog agents into claude and cursor through an APM render" {
+      Invoke-CatalogAgentsDeploy 6>&1 | Out-Null
+
+      foreach ($runtimeDir in @(".claude", ".cursor")) {
+        (Get-Content -LiteralPath (Join-Path $script:agentsHome "$runtimeDir/agents/sample.md") -Raw) | Should -Be (Get-Content -LiteralPath $script:agentSource -Raw)
+      }
+      $script:apmCalls.Count | Should -Be 1
+      $script:apmCalls[0] | Should -Match " --target claude,cursor$"
+    }
+
+    It "throws naming the runtime and agent when APM renders fewer agents than the catalog has" {
+      $script:droppedAgent = "cursor:sample"
+
+      { Invoke-CatalogAgentsDeploy 6>&1 | Out-Null } | Should -Throw "*cursor*sample.md*"
+      Join-Path $script:agentsHome ".claude/agents/sample.md" | Should -Not -Exist
+    }
+
+    It "never places rendered agents into codex or opencode" {
+      $script:extraTargets = @("codex", "opencode")
+
+      Invoke-CatalogAgentsDeploy 6>&1 | Out-Null
+
+      Join-Path $script:agentsHome ".claude/agents/sample.md" | Should -Exist
+      Join-Path $script:agentsHome ".codex/agents" | Should -Not -Exist
+    }
   }
 
   It "installs MCP dependencies with apm install only mcp" {

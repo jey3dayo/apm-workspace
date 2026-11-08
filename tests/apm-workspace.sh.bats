@@ -3323,3 +3323,114 @@ EOF
 
   rm -rf "$workspace" "$runtime_home"
 }
+
+# --- apply: catalog agents rendered by APM into a temp project ---------------
+
+make_catalog_agents_apply_fixture() {
+  AGENTS_APPLY_BASE="$(mktemp -d)"
+  source "$TEST_REPO_ROOT/tests/conformance/build-fixture.sh"
+  build_apply_fixture "$AGENTS_APPLY_BASE"
+  AGENTS_APPLY_HOME="$FIXTURE_HOME"
+  AGENTS_APPLY_WORKSPACE_DIR="$FIXTURE_WORKSPACE_DIR"
+  AGENTS_APPLY_BIN_DIR="$FIXTURE_BIN_DIR"
+  AGENTS_APPLY_CALL_LOG="$FIXTURE_CALL_LOG"
+}
+
+run_catalog_agents_apply() {
+  HOME="$AGENTS_APPLY_HOME" \
+    PATH="$AGENTS_APPLY_BIN_DIR:$PATH" \
+    APM_WORKSPACE_DIR="$AGENTS_APPLY_WORKSPACE_DIR" \
+    FIXTURE_CALL_LOG="$AGENTS_APPLY_CALL_LOG" \
+    bash "$TEST_REPO_ROOT/scripts/apm-workspace.sh" apply
+}
+
+@test "apply places the catalog agents into claude and cursor through an APM render" {
+  make_catalog_agents_apply_fixture
+
+  run run_catalog_agents_apply
+
+  [ "$status" -eq 0 ]
+  source_agent="$AGENTS_APPLY_WORKSPACE_DIR/catalog/.apm/agents/sample.agent.md"
+  cmp -s "$source_agent" "$AGENTS_APPLY_HOME/.claude/agents/sample.md"
+  cmp -s "$source_agent" "$AGENTS_APPLY_HOME/.cursor/agents/sample.md"
+  [[ "$output" == *"Updated agent: $AGENTS_APPLY_HOME/.claude/agents/sample.md"* ]]
+  grep -Eq '^apm install .*/pkg --target claude,cursor$' "$AGENTS_APPLY_CALL_LOG"
+  [ ! -e "$AGENTS_APPLY_HOME/.codex/agents" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply leaves already-matching catalog agents untouched on a second run" {
+  make_catalog_agents_apply_fixture
+  run run_catalog_agents_apply
+  [ "$status" -eq 0 ]
+  inode_before="$(ls -i "$AGENTS_APPLY_HOME/.claude/agents/sample.md" "$AGENTS_APPLY_HOME/.cursor/agents/sample.md")"
+
+  run run_catalog_agents_apply
+
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"Updated agent"* ]]
+  [ "$(ls -i "$AGENTS_APPLY_HOME/.claude/agents/sample.md" "$AGENTS_APPLY_HOME/.cursor/agents/sample.md")" = "$inode_before" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply overwrites a modified catalog agent and keeps agents outside the catalog" {
+  make_catalog_agents_apply_fixture
+  run run_catalog_agents_apply
+  [ "$status" -eq 0 ]
+  printf 'locally edited\n' >"$AGENTS_APPLY_HOME/.claude/agents/sample.md"
+  printf 'hand written\n' >"$AGENTS_APPLY_HOME/.claude/agents/hand-written.md"
+
+  run run_catalog_agents_apply
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Updated agent: $AGENTS_APPLY_HOME/.claude/agents/sample.md"* ]]
+  cmp -s "$AGENTS_APPLY_WORKSPACE_DIR/catalog/.apm/agents/sample.agent.md" "$AGENTS_APPLY_HOME/.claude/agents/sample.md"
+  [ "$(cat "$AGENTS_APPLY_HOME/.claude/agents/hand-written.md")" = "hand written" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply fails naming the runtime and agent when APM renders fewer agents than the catalog has" {
+  make_catalog_agents_apply_fixture
+
+  FIXTURE_APM_AGENTS_DROP="cursor:sample" run run_catalog_agents_apply
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"cursor"*"sample.md"* ]]
+  [ ! -e "$AGENTS_APPLY_HOME/.claude/agents/sample.md" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply fails when the APM agents render command fails" {
+  make_catalog_agents_apply_fixture
+
+  FIXTURE_APM_AGENTS_INSTALL_FAIL=1 run run_catalog_agents_apply
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"apm install failed while rendering catalog agents"* ]]
+  [ ! -e "$AGENTS_APPLY_HOME/.claude/agents/sample.md" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply never places rendered agents into codex or opencode" {
+  make_catalog_agents_apply_fixture
+
+  FIXTURE_APM_AGENTS_EXTRA_TARGETS="codex opencode" run run_catalog_agents_apply
+
+  [ "$status" -eq 0 ]
+  [ -f "$AGENTS_APPLY_HOME/.claude/agents/sample.md" ]
+  [ ! -e "$AGENTS_APPLY_HOME/.codex/agents" ]
+  [ ! -e "$AGENTS_APPLY_HOME/.config/opencode/agents" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply skips the agents render when the catalog has no agents" {
+  make_catalog_agents_apply_fixture
+  rm -f "$AGENTS_APPLY_WORKSPACE_DIR/catalog/.apm/agents/sample.agent.md"
+
+  run run_catalog_agents_apply
+
+  [ "$status" -eq 0 ]
+  [ -z "$(grep -- '--target claude' "$AGENTS_APPLY_CALL_LOG" || true)" ]
+  [ ! -e "$AGENTS_APPLY_HOME/.claude/agents" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}

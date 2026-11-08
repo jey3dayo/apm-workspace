@@ -2170,6 +2170,7 @@ function Invoke-Apply {
       Normalize-CodexMcpConfig -ConfigPath (Join-Path (Join-Path $HOME ".codex") "config.toml")
       Invoke-CodexCompile
       Sync-ManagedCatalogRuntimeAssets
+      Invoke-CatalogAgentsDeploy
       Sync-PiInstructions
       Replace-SkillTargetsFromStage -StageRoot $stageDir
       # Reconcile-SkillsRootFromStage just replaced the deployed agmsg skill
@@ -3072,13 +3073,13 @@ function Write-CatalogSummary {
 }
 
 
-# AgentsFace "apm" marks a target whose agents/ APM installs from
-# catalog/.apm/agents: the sync neither writes nor prunes it, and doctor
-# compares its content. AgentsFace "-" marks a target that must not receive the
-# catalog agents (any agents/ is removed). Codex opts out: codex-cli only
-# discovers `~/.codex/agents/*.toml`,
-# and the catalog's Claude-format `.md` agent files are silently ignored
-# there (or rejected once renamed to `.toml`, on the `tools`/`color` fields).
+# AgentsFace "apm" marks a target whose agents/ apply fills from an APM render
+# of catalog/.apm/agents (Invoke-CatalogAgentsDeploy): the sync neither writes
+# nor prunes it, and doctor compares its content. AgentsFace "-" marks a target
+# that must not receive the catalog agents (any agents/ is removed). Codex opts
+# out: codex-cli only discovers `~/.codex/agents/*.toml`, and the catalog's
+# Claude-format `.md` agent files are silently ignored there (or rejected once
+# renamed to `.toml`, on the `tools`/`color` fields).
 # OpenCode opts out for the same reason (it rejects Claude-format agents at
 # startup) and also has no skills face of its own. ConfigName "-" marks a
 # target that reads guidance from elsewhere (OpenCode reads
@@ -3413,6 +3414,123 @@ function Sync-ManagedCatalogRuntimeAssets {
         }
       }
     }
+  }
+}
+
+function Get-CatalogAgentNames {
+  foreach ($agentRelativePath in (Get-TrackedCatalogAgentRelativePaths)) {
+    if ($agentRelativePath.EndsWith(".agent.md", [System.StringComparison]::Ordinal)) {
+      $agentRelativePath.Substring(0, $agentRelativePath.Length - ".agent.md".Length)
+    }
+  }
+}
+
+function Install-CatalogAgentsIntoRenderProject {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$RenderRoot,
+
+    [Parameter(Mandatory = $true)]
+    [string]$RenderTargets,
+
+    [Parameter(Mandatory = $true)]
+    [string[]]$AgentNames
+  )
+
+  $packageDir = Join-Path $RenderRoot "pkg"
+  $projectDir = Join-Path $RenderRoot "project"
+  $packageAgentsDir = Join-Path (Join-Path $packageDir ".apm") "agents"
+  New-Item -ItemType Directory -Path $packageAgentsDir, $projectDir -Force | Out-Null
+  Copy-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) "apm.yml") -Destination (Join-Path $packageDir "apm.yml")
+  foreach ($agentName in $AgentNames) {
+    $packagedAgent = Join-Path $packageAgentsDir "$agentName.agent.md"
+    New-Item -ItemType Directory -Path (Split-Path -Parent $packagedAgent) -Force | Out-Null
+    Copy-Item -LiteralPath (Join-Path (Get-TrackedCatalogAgentsRoot) "$agentName.agent.md") -Destination $packagedAgent
+  }
+
+  Push-Location $projectDir
+  try {
+    $outputLines = @(& apm install $packageDir --target $RenderTargets 2>&1)
+    foreach ($line in $outputLines) {
+      Write-Host $line
+    }
+    if ($LASTEXITCODE -ne 0) {
+      throw "apm install failed while rendering catalog agents"
+    }
+    if (Test-ApmInstallDiagnosticsFailure -OutputLines $outputLines) {
+      throw "apm install reported integration diagnostics while rendering catalog agents"
+    }
+  }
+  finally {
+    Pop-Location
+  }
+}
+
+function Set-CatalogAgentFile {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$RenderedAgent,
+
+    [Parameter(Mandatory = $true)]
+    [string]$TargetAgent
+  )
+
+  $targetExists = Test-Path -LiteralPath $TargetAgent -PathType Leaf
+  if ($targetExists -and ((Get-FileHash -LiteralPath $RenderedAgent -Algorithm SHA256).Hash -eq (Get-FileHash -LiteralPath $TargetAgent -Algorithm SHA256).Hash)) {
+    return
+  }
+
+  $targetAgentsDir = Split-Path -Parent $TargetAgent
+  New-Item -ItemType Directory -Path $targetAgentsDir -Force | Out-Null
+  $tempAgent = Join-Path $targetAgentsDir (".apm-agent-{0}" -f [guid]::NewGuid().ToString("N"))
+  try {
+    Copy-Item -LiteralPath $RenderedAgent -Destination $tempAgent
+    Move-Item -LiteralPath $tempAgent -Destination $TargetAgent -Force
+  }
+  finally {
+    if (Test-Path -LiteralPath $tempAgent) {
+      Remove-Item -LiteralPath $tempAgent -Force
+    }
+  }
+
+  $placement = if ($targetExists) { "replaced" } else { "new" }
+  Write-Host "Updated agent: $TargetAgent ($placement)"
+}
+
+function Invoke-CatalogAgentsDeploy {
+  $agentNames = @(Get-CatalogAgentNames)
+  if ($agentNames.Count -eq 0) {
+    Write-Host "No catalog agents to deploy."
+    return
+  }
+
+  $faceTargets = @(Get-ManagedCatalogRuntimeTargets | Where-Object { $_.AgentsFace -eq "apm" })
+  if ($faceTargets.Count -eq 0) {
+    return
+  }
+
+  $renderRoot = New-TemporaryDirectory -Prefix "apm-agents-render"
+  try {
+    Install-CatalogAgentsIntoRenderProject -RenderRoot $renderRoot -RenderTargets (($faceTargets | ForEach-Object { $_.Name }) -join ",") -AgentNames $agentNames
+
+    $renderedAgentsDirs = @{}
+    foreach ($target in $faceTargets) {
+      $renderedAgentsDir = Join-Path (Join-Path (Join-Path $renderRoot "project") (Split-Path -Leaf $target.Root)) "agents"
+      $missingAgents = @($agentNames | Where-Object { -not (Test-Path -LiteralPath (Join-Path $renderedAgentsDir "$_.md") -PathType Leaf) } | ForEach-Object { "$_.md" })
+      if ($missingAgents.Count -gt 0) {
+        throw ("apm did not render catalog agents for {0}: {1}" -f $target.Name, ($missingAgents -join " "))
+      }
+      $renderedAgentsDirs[$target.Name] = $renderedAgentsDir
+    }
+
+    foreach ($target in $faceTargets) {
+      foreach ($agentName in $agentNames) {
+        Set-CatalogAgentFile -RenderedAgent (Join-Path $renderedAgentsDirs[$target.Name] "$agentName.md") -TargetAgent (Join-Path (Join-Path $target.Root "agents") "$agentName.md")
+      }
+    }
+  }
+  finally {
+    Remove-Item -LiteralPath $renderRoot -Recurse -Force -ErrorAction SilentlyContinue
   }
 }
 

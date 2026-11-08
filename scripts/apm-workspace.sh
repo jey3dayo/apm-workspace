@@ -1039,6 +1039,7 @@ cmd_apply() {
   normalize_codex_mcp_config "$HOME/.codex/config.toml"
   compile_codex
   sync_managed_catalog_runtime_assets
+  deploy_catalog_agents_via_apm
   sync_pi_instructions
   replace_skill_targets_from_stage "$apply_stage_root"
   # The freshly placed agmsg skill has no db/teams links until restore runs;
@@ -1516,8 +1517,9 @@ print_catalog_summary() {
 # A "-" config file marks a target that reads guidance from elsewhere (OpenCode
 # falls back to ~/.claude/CLAUDE.md); see docs/package-decisions.md.
 # A "-" skills override marks a target with no skills face. An "apm" agents face
-# marks a target whose agents/ APM installs from catalog/.apm/agents: the sync
-# neither writes nor prunes it, and doctor compares its content. A "-" agents face
+# marks a target whose agents/ apply fills from an APM render of
+# catalog/.apm/agents (deploy_catalog_agents_via_apm): the sync neither writes
+# nor prunes it, and doctor compares its content. A "-" agents face
 # marks one that must not receive the catalog agents at all (any agents/ is
 # removed). OpenCode takes both "-" faces:
 # it reads skills from ~/.claude/skills and ~/.agents/skills already, and it
@@ -2485,6 +2487,115 @@ sync_managed_catalog_runtime_assets() {
       fi
     fi
   done
+}
+
+catalog_agents_apm_face_runtimes() {
+  managed_catalog_runtime_targets | while read_runtime_target; do
+    if [ "$RT_AGENTS_FACE" = "apm" ]; then
+      printf '%s|%s\n' "$RT_TARGET_NAME" "$RT_TARGET_DIR"
+    fi
+  done
+}
+
+catalog_agent_names() {
+  tracked_catalog_agent_relative_paths | while IFS= read -r agent_relative_path; do
+    case "$agent_relative_path" in
+      *.agent.md) printf '%s\n' "${agent_relative_path%.agent.md}" ;;
+    esac
+  done
+}
+
+render_catalog_agents_via_apm() {
+  render_root="$1"
+  render_targets="$2"
+  agent_names="$3"
+
+  mkdir -p "$render_root/pkg/.apm/agents" "$render_root/project" || return 1
+  cp "$(tracked_catalog_dir)/apm.yml" "$render_root/pkg/apm.yml" || return 1
+  while IFS= read -r agent_name; do
+    mkdir -p "$(dirname "$render_root/pkg/.apm/agents/$agent_name")"
+    cp "$(tracked_catalog_agents_root)/$agent_name.agent.md" "$render_root/pkg/.apm/agents/$agent_name.agent.md" || return 1
+  done <<<"$agent_names"
+
+  render_log="$render_root/install.log"
+  if ! (cd "$render_root/project" && apm install "$render_root/pkg" --target "$render_targets") >"$render_log" 2>&1; then
+    cat "$render_log"
+    error "apm install failed while rendering catalog agents"
+    return 1
+  fi
+  cat "$render_log"
+  if apm_install_has_diagnostics_failure "$render_log"; then
+    error "apm install reported integration diagnostics while rendering catalog agents"
+    return 1
+  fi
+}
+
+place_catalog_agent() {
+  rendered_agent="$1"
+  target_agent="$2"
+
+  if cmp -s "$rendered_agent" "$target_agent"; then
+    return 0
+  fi
+
+  placement=new
+  if [ -e "$target_agent" ] || [ -L "$target_agent" ]; then
+    placement=replaced
+  fi
+  target_agents_dir=$(dirname "$target_agent")
+  mkdir -p "$target_agents_dir"
+  agent_temp=$(mktemp "$target_agents_dir/.apm-agent.XXXXXX")
+  if ! cp "$rendered_agent" "$agent_temp" || ! chmod 644 "$agent_temp" || ! mv "$agent_temp" "$target_agent"; then
+    rm -f "$agent_temp"
+    error "Failed to place agent: $target_agent"
+    return 1
+  fi
+  log "Updated agent: $target_agent ($placement)"
+}
+
+place_rendered_catalog_agents() {
+  render_root="$1"
+  face_runtimes="$2"
+  agent_names="$3"
+
+  while IFS='|' read -r runtime_name runtime_dir; do
+    rendered_agents_dir="$render_root/project/$runtime_dir/agents"
+    missing_agents=""
+    while IFS= read -r agent_name; do
+      [ -f "$rendered_agents_dir/$agent_name.md" ] || missing_agents="$missing_agents $agent_name.md"
+    done <<<"$agent_names"
+    if [ -n "$missing_agents" ]; then
+      error "apm did not render catalog agents for $runtime_name:$missing_agents"
+      return 1
+    fi
+  done <<<"$face_runtimes"
+
+  while IFS='|' read -r runtime_name runtime_dir; do
+    while IFS= read -r agent_name; do
+      place_catalog_agent \
+        "$render_root/project/$runtime_dir/agents/$agent_name.md" \
+        "$HOME/$runtime_dir/agents/$agent_name.md" || return 1
+    done <<<"$agent_names"
+  done <<<"$face_runtimes"
+}
+
+deploy_catalog_agents_via_apm() {
+  agent_names=$(catalog_agent_names)
+  if [ -z "$agent_names" ]; then
+    log "No catalog agents to deploy."
+    return 0
+  fi
+  face_runtimes=$(catalog_agents_apm_face_runtimes)
+  if [ -z "$face_runtimes" ]; then
+    return 0
+  fi
+  face_targets=$(printf '%s\n' "$face_runtimes" | cut -d'|' -f1 | paste -sd, -)
+
+  agents_render_root=$(mktemp -d "${TMPDIR:-/tmp}/apm-agents-render.XXXXXX")
+  trap 'rm -rf "$agents_render_root"; trap - RETURN' RETURN
+
+  render_catalog_agents_via_apm "$agents_render_root" "$face_targets" "$agent_names" || return 1
+  place_rendered_catalog_agents "$agents_render_root" "$face_runtimes" "$agent_names"
 }
 
 cmd_validate_catalog() {

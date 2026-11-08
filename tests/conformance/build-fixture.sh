@@ -47,7 +47,11 @@ STUB
   # only mkdir -p's the parent dir; it never writes the file itself),
   # `install` has to exit 0 without printing the diagnostics-failure patterns
   # apm_install_has_diagnostics_failure() scans for, and `deps update -g` has
-  # to wipe the deployed agmsg skill dir the way the real CLI does.
+  # to wipe the deployed agmsg skill dir the way the real CLI does. The agents
+  # render (`install <pkg> --target <list>`) copies <pkg>/.apm/agents/*.agent.md
+  # to ./<runtime dir>/agents/<name>.md; FIXTURE_APM_AGENTS_INSTALL_FAIL=1 fails
+  # it, FIXTURE_APM_AGENTS_DROP=<runtime>:<name> omits one output, and
+  # FIXTURE_APM_AGENTS_EXTRA_TARGETS="codex opencode" also renders those runtimes.
   apm_bin="$bin_dir/apm"
   cat >"$apm_bin" <<STUB
 #!/usr/bin/env bash
@@ -70,6 +74,30 @@ fi
 if [ "\$*" = "deps update -g" ] && [ -n "\${HOME:-}" ] && [ -d "\$HOME/.agents/skills/agmsg" ]; then
   rm -rf "\$HOME/.agents/skills/agmsg"
   mkdir -p "\$HOME/.agents/skills/agmsg"
+fi
+
+if [ "\${1:-}" = "install" ] && [ -n "\${2:-}" ] && [ "\${2#-}" = "\$2" ] && [ "\${3:-}" = "--target" ]; then
+  if [ "\${FIXTURE_APM_AGENTS_INSTALL_FAIL:-}" = "1" ]; then
+    echo "fixture: apm install failed" >&2
+    exit 1
+  fi
+  render_targets="\$(printf '%s' "\$4" | tr ',' ' ') \${FIXTURE_APM_AGENTS_EXTRA_TARGETS:-}"
+  for render_target in \$render_targets; do
+    case "\$render_target" in
+      claude) render_dir=.claude ;;
+      cursor) render_dir=.cursor ;;
+      codex) render_dir=.codex ;;
+      opencode) render_dir=.config/opencode ;;
+      *) continue ;;
+    esac
+    for agent_source in "\$2"/.apm/agents/*.agent.md; do
+      [ -f "\$agent_source" ] || continue
+      agent_name="\$(basename "\$agent_source" .agent.md)"
+      [ "\$render_target:\$agent_name" = "\${FIXTURE_APM_AGENTS_DROP:-}" ] && continue
+      mkdir -p "\$render_dir/agents"
+      cp "\$agent_source" "\$render_dir/agents/\$agent_name.md"
+    done
+  done
 fi
 
 exit 0
