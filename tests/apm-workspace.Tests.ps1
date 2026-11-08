@@ -3539,6 +3539,12 @@ Describe "catalog instructions and user root migration" {
     Write-GeneratedRoot -Path $editedPath -Body "# compiled"
     Add-Content -LiteralPath $editedPath -Value "my own line" -NoNewline
     Write-FixtureFile -Path (Join-Path $script:rootsHome "no-build-id.md") -Content "$ApmGeneratedRootMarker`n# compiled`n"
+    $generatedText = [System.IO.File]::ReadAllText((Join-Path $script:rootsHome ".codex/AGENTS.md"))
+    $noteLines = $generatedText -split "`n"
+    $noteLines[0] = $noteLines[0] + " my note"
+    Write-FixtureFile -Path (Join-Path $script:rootsHome "marker-note.md") -Content ($noteLines -join "`n")
+    Write-FixtureFile -Path (Join-Path $script:rootsHome "crlf.md") -Content $generatedText.Replace("`n", "`r`n")
+    [System.IO.File]::WriteAllBytes((Join-Path $script:rootsHome "bom.md"), [byte[]](@(0xEF, 0xBB, 0xBF) + [System.Text.Encoding]::UTF8.GetBytes($generatedText)))
     Write-FixtureFile -Path (Join-Path $script:rootsHome "hand.md") -Content "my own rules`n"
     New-Item -ItemType HardLink -Path (Join-Path $script:rootsHome "hard.md") -Target (Join-Path $script:rootsHome "hand.md") | Out-Null
     Write-FixtureFile -Path (Join-Path $script:rootsHome ".cursor/AGENTS.md") -Content "# Guide`n`nbody line`nmy own addition`n"
@@ -3549,6 +3555,10 @@ Describe "catalog instructions and user root migration" {
     Get-UserRootState -Path (Join-Path $script:rootsHome ".codex/AGENTS.md") -KnownBlobs $known | Should -Be "generated"
     Get-UserRootState -Path $editedPath -KnownBlobs $known | Should -Be "edited-generated"
     Get-UserRootState -Path (Join-Path $script:rootsHome "no-build-id.md") -KnownBlobs $known | Should -Be "edited-generated"
+    # APM's own reading: the marker is a prefix, CRLF is LF, and a BOM hides the marker.
+    Get-UserRootState -Path (Join-Path $script:rootsHome "marker-note.md") -KnownBlobs $known | Should -Be "edited-generated"
+    Get-UserRootState -Path (Join-Path $script:rootsHome "crlf.md") -KnownBlobs $known | Should -Be "generated"
+    Get-UserRootState -Path (Join-Path $script:rootsHome "bom.md") -KnownBlobs $known | Should -Be "hand-written"
     Get-UserRootState -Path (Join-Path $script:rootsHome "hard.md") -KnownBlobs $known | Should -Be "hand-written"
     Get-UserRootState -Path (Join-Path $script:rootsHome ".cursor/AGENTS.md") -KnownBlobs $known | Should -Be "hand-written"
     Get-UserRootState -Path (Join-Path $script:rootsHome "dir.md") -KnownBlobs $known | Should -Be "not-regular"
@@ -3688,6 +3698,45 @@ Describe "catalog instructions and user root migration" {
     Should -Invoke Write-WarnLine -Times 1 -ParameterFilter { $Message -like "*keep APM's marker but were edited after compile*$codexRoot*" }
     [System.IO.File]::ReadAllText($codexRoot) | Should -BeExactly $before
     Remove-Variable -Name apmCalls -Scope Global
+  }
+
+  It "follows a Codex root symlink to an edited output, and leaves an edited Claude root to APM" {
+    Mock Require-Apm {}
+    Mock Test-Path { $true } -ParameterFilter { $LiteralPath -like "*apm_modules" }
+    Mock Write-WarnLine {}
+    $global:apmCalls = New-Object System.Collections.Generic.List[string]
+    function apm { $global:apmCalls.Add(($args -join " ")); $global:LASTEXITCODE = 0 }
+    $claudeRoot = Join-Path $script:rootsHome ".claude/CLAUDE.md"
+    Write-GeneratedRoot -Path $claudeRoot -Body "# compiled"
+    Add-Content -LiteralPath $claudeRoot -Value "my own claude line"
+
+    Invoke-UserRootCompile 6>$null
+    @($global:apmCalls) | Should -Be @("compile -g --clean")
+
+    $realRoot = Join-Path $script:rootsHome ".codex/real.md"
+    Write-GeneratedRoot -Path $realRoot -Body "# compiled"
+    Add-Content -LiteralPath $realRoot -Value "my own codex line"
+    $codexRoot = Join-Path $script:rootsHome ".codex/AGENTS.md"
+    New-Item -ItemType SymbolicLink -Path $codexRoot -Target $realRoot | Out-Null
+    $global:apmCalls.Clear()
+    Invoke-UserRootCompile 6>$null
+
+    $global:apmCalls.Count | Should -Be 0
+    Should -Invoke Write-WarnLine -Times 1 -ParameterFilter { $Message -like "*$codexRoot*" -and $Message -notlike "*$claudeRoot*" }
+    Remove-Variable -Name apmCalls -Scope Global
+  }
+
+  It "refuses a compile output whose marker line was deleted, and a symlink to a compile output" {
+    $compiled = Join-Path $script:rootsHome "compiled.md"
+    Write-GeneratedRoot -Path $compiled -Body ([System.IO.File]::ReadAllText($script:guideBody).TrimEnd("`n"))
+    $claudeRoot = Join-Path $script:rootsHome ".claude/CLAUDE.md"
+    Write-FixtureFile -Path $claudeRoot -Content ((([System.IO.File]::ReadAllText($compiled) -split "`n") | Select-Object -Skip 1) -join "`n")
+    Add-Content -LiteralPath $claudeRoot -Value "my own claude line"
+    { Assert-UserRootsMigrated } | Should -Throw "*opens with the catalog guide's title (# Guide)*"
+
+    Remove-Item -LiteralPath $claudeRoot
+    New-Item -ItemType SymbolicLink -Path $claudeRoot -Target $compiled | Out-Null
+    { Assert-UserRootsMigrated } | Should -Throw "*is a symlink to an apm compile output*Claude would load it twice*"
   }
 
   It "refuses an install while a generated ~/.claude/CLAUDE.md was edited after compile, which --clean keeps" {

@@ -303,21 +303,38 @@ is_legacy_catalog_instructions_copy() {
   grep -qxF -- "$candidate_blob" <<<"$known_blobs"
 }
 
+# APM reads a root with Python's universal newlines, so CRLF and a lone CR count as LF; a BOM is kept as text.
+apm_root_lines() {
+  awk '{ sub(/\r$/, ""); gsub(/\r/, "\n"); print }' "$1"
+}
+
+# Mirrors APM's `content.lstrip().startswith(AGENTS_MD_GENERATED_MARKER)` (apm_cli/compilation/user_root_context.py).
+apm_root_has_marker() {
+  apm_root_lines "$1" | awk -v marker="$APM_GENERATED_ROOT_MARKER" '
+    NF { sub(/^[ \t]+/, ""); found = index($0, marker) == 1; exit }
+    END { exit !found }
+  '
+}
+
 # Mirrors apm_cli/compilation/build_id.py has_valid_build_id: the 12-hex Build ID is the sha256 of the file with that
 # line removed and the remaining lines joined by "\n", so any edit after compile breaks the match.
 has_valid_apm_build_id() {
-  build_id_path="$1"
-  build_id_line='^<!-- Build ID: [0-9a-f]{12} -->$'
-  [ "$(grep -cE -- "$build_id_line" "$build_id_path" || true)" = 1 ] || return 1
-  recorded_build_id=$(grep -E -- "$build_id_line" "$build_id_path" | sed -E 's/^<!-- Build ID: ([0-9a-f]{12}) -->$/\1/')
-  computed_build_id=$({ grep -vE -- "$build_id_line" "$build_id_path" || true; } |
-    awk 'NR > 1 { printf "\n" } { printf "%s", $0 }' | file_sha256 - | cut -c1-12)
+  build_id_line='^<!-- Build ID: [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f] -->$'
+  recorded_build_id=$(apm_root_lines "$1" | awk -v pattern="$build_id_line" '
+    $0 ~ pattern { count++; build_id = substr($0, 16, 12) }
+    END { if (count == 1) print build_id }
+  ')
+  [ -n "$recorded_build_id" ] || return 1
+  computed_build_id=$(apm_root_lines "$1" | awk -v pattern="$build_id_line" '
+    $0 ~ pattern { next }
+    { if (joined++) printf "\n"; printf "%s", $0 }
+  ' | file_sha256 - | cut -c1-12)
   [ "$recorded_build_id" = "$computed_build_id" ]
 }
 
+# Follows a symlink: APM resolves a Codex or Cursor root link inside its deploy root and overwrites the target.
 is_edited_generated_root() {
-  [ -f "$1" ] && [ ! -L "$1" ] && [ "$(awk 'NF { print; exit }' "$1")" = "$APM_GENERATED_ROOT_MARKER" ] &&
-    ! has_valid_apm_build_id "$1"
+  [ -f "$1" ] && apm_root_has_marker "$1" && ! has_valid_apm_build_id "$1"
 }
 
 # Classifies a root context file: absent, not-regular, generated (written by apm compile and unchanged since),
@@ -330,7 +347,7 @@ user_root_state() {
     printf 'absent\n'
   elif [ -L "$root_path" ] || [ ! -f "$root_path" ]; then
     printf 'not-regular\n'
-  elif [ "$(awk 'NF { print; exit }' "$root_path")" = "$APM_GENERATED_ROOT_MARKER" ]; then
+  elif apm_root_has_marker "$root_path"; then
     if has_valid_apm_build_id "$root_path"; then
       printf 'generated\n'
     else
@@ -795,8 +812,8 @@ ensure_workspace_mise_file() {
 }
 
 # User-scope compile never overwrites a root without APM's marker, so a hand-written or legacy root survives; --clean
-# removes only an unchanged APM-generated Claude root that native rules made redundant. APM 0.35.0 still overwrites an
-# edited generated root of a non-Claude target, so the compile is skipped while any root holds such edits.
+# removes only an unchanged APM-generated Claude root that native rules made redundant. APM 0.35.0 keeps an edited
+# Claude root but overwrites an edited Codex or Cursor root, so the compile is skipped while one of those holds edits.
 compile_user_root_contexts() {
   require_apm
   if [ ! -d "$HOME/.apm/apm_modules" ]; then
@@ -818,7 +835,7 @@ To keep your edits, delete the first line (the APM marker) so APM treats the fil
 
 edited_generated_user_roots() {
   while read_runtime_target; do
-    [ "$RT_CONFIG_NAME" != "-" ] || continue
+    [ "$RT_CONFIG_NAME" != "-" ] && [ "$RT_TARGET_NAME" != claude ] || continue
     root_path="$HOME/$RT_TARGET_DIR/$RT_CONFIG_NAME"
     if is_edited_generated_root "$root_path"; then
       printf '  %s\n' "$root_path"
@@ -847,7 +864,7 @@ sync_opencode_instructions() {
         *) log "Not writing $OPENCODE_INSTRUCTIONS_OUTPUT: OpenCode falls back to $HOME/.claude/CLAUDE.md ($claude_state), which is not the catalog guide." ;;
       esac
       ;;
-    *) warn "Leaving $OPENCODE_INSTRUCTIONS_OUTPUT as is ($opencode_state): it is not a copy of the catalog guide, so OpenCode reads it instead of the guide." ;;
+    *) warn "Leaving $OPENCODE_INSTRUCTIONS_OUTPUT as is ($opencode_state): it is not a copy of any committed version of the catalog guide, so OpenCode reads it instead of the guide. If it is a copy deployed from an uncommitted guide, move it aside and re-run apply." ;;
   esac
 }
 
@@ -871,6 +888,9 @@ assert_user_roots_migrated() {
   claude_root="$HOME/.claude/CLAUDE.md"
   [ -f "$claude_root" ] || return 0
   require_command git
+  if [ -L "$claude_root" ] && apm_root_has_marker "$claude_root"; then
+    fail "Refusing to install catalog instructions: $claude_root is a symlink to an apm compile output, which apm compile --clean never removes, and APM would add the guide under ~/.claude/rules, so Claude would load it twice. Move the link aside by hand, then retry."
+  fi
   if is_edited_generated_root "$claude_root"; then
     fail "Refusing to install catalog instructions: $claude_root keeps APM's marker but was edited after compile, so apm compile --clean keeps it, and APM would add the guide under ~/.claude/rules, so Claude would load it twice. To keep your edits, delete the first line (the APM marker) and remove the guide from the file; otherwise move it aside by hand (keep a .bak). Then retry."
   fi
@@ -880,13 +900,24 @@ assert_user_roots_migrated() {
     fi
     fail "Refusing to install catalog instructions: $claude_root is still the copy the legacy catalog sync wrote, and APM would add the same guide under ~/.claude/rules, so Claude would load it twice. Preview the move with 'mise run migrate:roots', then run 'mise run migrate:roots -- --apply'."
   fi
-  # An edited copy, or one older than the git history at hand, is not a byte match but opens with the guide's title.
+  # An unedited compile output is APM's to remove with --clean once the rule is in place; doctor reports one that stays.
+  if apm_root_has_marker "$claude_root" && has_valid_apm_build_id "$claude_root"; then
+    return 0
+  fi
+  # An edited copy, one older than the git history at hand, or a compile output whose marker line was deleted is not
+  # a byte match but opens with the guide's title once a BOM and leading HTML comment lines are skipped.
   guide_title=$(awk '
     NR == 1 && $0 == "---" { in_frontmatter = 1; next }
     in_frontmatter { if ($0 == "---") in_frontmatter = 0; next }
     NF { print; exit }
   ' "$(tracked_catalog_instructions_path)")
-  if [ -n "$guide_title" ] && [ "$(awk 'NF { print; exit }' "$claude_root")" = "$guide_title" ]; then
+  root_title=$(apm_root_lines "$claude_root" | awk -v bom="$(printf '\357\273\277')" '
+    NR == 1 && index($0, bom) == 1 { $0 = substr($0, length(bom) + 1) }
+    { sub(/^[ \t]+/, "") }
+    $0 == "" || /^<!--/ { next }
+    { print; exit }
+  ')
+  if [ -n "$guide_title" ] && [ "$root_title" = "$guide_title" ]; then
     fail "Refusing to install catalog instructions: $claude_root opens with the catalog guide's title ($guide_title) but matches no known version, so it is an edited or older copy. APM would add the guide under ~/.claude/rules and Claude would load it twice. migrate:roots does not move edited files: move $claude_root aside by hand (keep a .bak), or remove the guide from it, then retry."
   fi
 }
@@ -912,7 +943,7 @@ cmd_migrate_roots() {
     case "$(user_root_state "$root_path" "$known_blobs")" in
       absent) log "$RT_TARGET_NAME: $root_path is absent; nothing to move." ;;
       generated) log "$RT_TARGET_NAME: $root_path was written by apm compile; nothing to move." ;;
-      edited-generated) log "$RT_TARGET_NAME: $root_path keeps APM's marker but was edited after compile; left as is. Delete the marker line to keep it as your own file, or move it aside by hand." ;;
+      edited-generated) log "$RT_TARGET_NAME: $root_path keeps APM's marker but was edited after compile; left as is. Delete the marker line to keep it as your own file (for ~/.claude/CLAUDE.md also remove the guide, which the rule provides), or move it aside by hand." ;;
       not-regular) log "$RT_TARGET_NAME: $root_path is not a regular file (symlink or other); left as is. Move it by hand if it points at a copy of the guide." ;;
       hand-written) log "$RT_TARGET_NAME: $root_path differs from every catalog guide version, so it was edited or written by hand; left as is. APM will not write this root while it exists." ;;
       legacy)
@@ -3288,8 +3319,13 @@ cmd_doctor() {
         has_failure=1
       elif [ "$config_state" = legacy ]; then
         warn "$target_root/$RT_CONFIG_NAME is still the copy the legacy catalog sync wrote; preview its move with 'mise run migrate:roots'"
+      elif [ "$config_state" = edited-generated ] && [ "$RT_TARGET_NAME" = claude ]; then
+        warn "$target_root/$RT_CONFIG_NAME keeps APM's marker but was edited after compile, so apm compile --clean keeps it and Claude reads the guide from it as well as from the rule; remove the guide and the marker line, or move it aside"
       elif [ "$config_state" = edited-generated ]; then
         warn "$target_root/$RT_CONFIG_NAME keeps APM's marker but was edited after compile, so apply skips the root compile; delete the marker line to keep it as your own file, or move it aside"
+      elif [ "$RT_TARGET_NAME" = claude ] && [ "$config_state" = generated ] &&
+        [ -f "$target_root/rules/${CATALOG_INSTRUCTIONS_FILE_NAME%.instructions.md}.md" ]; then
+        warn "$target_root/$RT_CONFIG_NAME is an apm compile output that still sits next to the guide rule, so Claude may read the guide twice; run 'mise run apply' so apm compile --clean removes it, and if it stays, it is an older compile output: move it aside"
       elif [ "$RT_TARGET_NAME" = claude ] && [ "$config_state" = absent ] && [ -f "$(tracked_catalog_instructions_path)" ] &&
         [ ! -f "$target_root/rules/${CATALOG_INSTRUCTIONS_FILE_NAME%.instructions.md}.md" ]; then
         warn "Claude has neither $target_root/$RT_CONFIG_NAME nor the guide rule $target_root/rules/${CATALOG_INSTRUCTIONS_FILE_NAME%.instructions.md}.md; run 'mise run install:catalog'"

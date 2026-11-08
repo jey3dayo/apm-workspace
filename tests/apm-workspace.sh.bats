@@ -3789,6 +3789,9 @@ home_tree_listing() {
   write_generated_root "$roots_home/edited.md" '# compiled'
   printf 'my own line\n' >>"$roots_home/edited.md"
   printf '%s\n# compiled\n' "$APM_GENERATED_ROOT_MARKER" >"$roots_home/no-build-id.md"
+  sed '1s/$/ my note/' "$roots_home/.codex/AGENTS.md" >"$roots_home/marker-note.md"
+  sed 's/$/\r/' "$roots_home/.codex/AGENTS.md" >"$roots_home/crlf.md"
+  { printf '\357\273\277'; cat "$roots_home/.codex/AGENTS.md"; } >"$roots_home/bom.md"
   printf '# Guide\n\nbody line\nmy own addition\n' >"$roots_home/.cursor/AGENTS.md"
   ln -s "$roots_home/guide-body.md" "$roots_home/linked.md"
   mkdir "$roots_home/dir.md"
@@ -3797,6 +3800,10 @@ home_tree_listing() {
   [ "$(user_root_state "$roots_home/.codex/AGENTS.md" "$known")" = generated ]
   [ "$(user_root_state "$roots_home/edited.md" "$known")" = edited-generated ]
   [ "$(user_root_state "$roots_home/no-build-id.md" "$known")" = edited-generated ]
+  # APM's own reading: the marker is a prefix, CRLF is LF, and a BOM hides the marker.
+  [ "$(user_root_state "$roots_home/marker-note.md" "$known")" = edited-generated ]
+  [ "$(user_root_state "$roots_home/crlf.md" "$known")" = generated ]
+  [ "$(user_root_state "$roots_home/bom.md" "$known")" = hand-written ]
   [ "$(user_root_state "$roots_home/.claude/CLAUDE.md" "$known")" = legacy ]
   [ "$(user_root_state "$roots_home/.cursor/AGENTS.md" "$known")" = hand-written ]
   [ "$(user_root_state "$roots_home/linked.md" "$known")" = not-regular ]
@@ -3993,6 +4000,29 @@ home_tree_listing() {
   rm -rf "$roots_workspace" "$roots_home"
 }
 
+@test "compile_user_root_contexts follows a Codex root symlink to an edited output, and leaves an edited Claude root to APM" {
+  make_roots_fixture
+  mkdir -p "$roots_home/.apm/apm_modules"
+  apm() { printf 'apm %s\n' "$*"; }
+  write_generated_root "$roots_home/.claude/CLAUDE.md" '# compiled'
+  printf 'my own claude line\n' >>"$roots_home/.claude/CLAUDE.md"
+
+  run compile_user_root_contexts
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"apm compile -g --clean"* ]]
+
+  write_generated_root "$roots_home/.codex/real.md" '# compiled'
+  printf 'my own codex line\n' >>"$roots_home/.codex/real.md"
+  ln -s real.md "$roots_home/.codex/AGENTS.md"
+  run compile_user_root_contexts
+
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"apm compile -g"* ]]
+  [[ "$output" == *"  $roots_home/.codex/AGENTS.md"* ]]
+  [[ "$output" != *"  $roots_home/.claude/CLAUDE.md"* ]]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
 @test "assert_user_roots_migrated refuses a generated ~/.claude/CLAUDE.md edited after compile, which --clean keeps" {
   make_roots_fixture
   write_generated_root "$roots_home/.claude/CLAUDE.md" "$(cat "$roots_home/guide-body.md")"
@@ -4005,6 +4035,24 @@ home_tree_listing() {
   [ "$status" -ne 0 ]
   [[ "$output" == *"keeps APM's marker but was edited after compile"*"Claude would load it twice"* ]]
   [ "$(tail -n 1 "$roots_home/.claude/CLAUDE.md")" = "my own claude line" ]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "assert_user_roots_migrated refuses a compile output whose marker line was deleted, and a symlink to a compile output" {
+  make_roots_fixture
+  write_generated_root "$roots_home/compiled.md" "$(cat "$roots_home/guide-body.md")"
+  sed '1d' "$roots_home/compiled.md" >"$roots_home/.claude/CLAUDE.md"
+  printf 'my own claude line\n' >>"$roots_home/.claude/CLAUDE.md"
+
+  run assert_user_roots_migrated
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"opens with the catalog guide's title (# Guide)"* ]]
+
+  rm "$roots_home/.claude/CLAUDE.md"
+  ln -s ../compiled.md "$roots_home/.claude/CLAUDE.md"
+  run assert_user_roots_migrated
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"is a symlink to an apm compile output"*"Claude would load it twice"* ]]
   rm -rf "$roots_workspace" "$roots_home"
 }
 
@@ -4096,6 +4144,22 @@ home_tree_listing() {
   [[ "$output" == *"codex: config=legacy"* ]]
   [[ "$output" == *"$doctor_home/.codex/AGENTS.md is still the copy the legacy catalog sync wrote"* ]]
   [[ "$output" == *"opencode instructions: "* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "doctor warns when a Claude compile output sits next to the guide rule, and about an edited one" {
+  make_doctor_fixture
+  write_generated_root "$doctor_home/.claude/CLAUDE.md" '# instructions'
+  printf '# instructions\n' >"$doctor_home/.claude/rules/ai-collaboration.md"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+  [[ "$output" == *"claude: config=generated"* ]]
+  [[ "$output" == *"$doctor_home/.claude/CLAUDE.md is an apm compile output that still sits next to the guide rule"* ]]
+
+  printf 'my own line\n' >>"$doctor_home/.claude/CLAUDE.md"
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+  [[ "$output" == *"claude: config=edited-generated"* ]]
+  [[ "$output" == *"Claude reads the guide from it as well as from the rule"* ]]
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
 }
 

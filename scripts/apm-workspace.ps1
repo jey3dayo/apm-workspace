@@ -423,15 +423,15 @@ function Ensure-WorkspaceMiseFile {
 }
 
 # User-scope compile never overwrites a root without APM's marker, so a hand-written or legacy root survives; --clean
-# removes only an unchanged APM-generated Claude root that native rules made redundant. APM 0.35.0 still overwrites an
-# edited generated root of a non-Claude target, so the compile is skipped while any root holds such edits.
+# removes only an unchanged APM-generated Claude root that native rules made redundant. APM 0.35.0 keeps an edited
+# Claude root but overwrites an edited Codex or Cursor root, so the compile is skipped while one of those holds edits.
 function Invoke-UserRootCompile {
   Require-Apm
   if (-not (Test-Path -LiteralPath (Join-Path (Join-Path $HOME ".apm") "apm_modules") -PathType Container)) {
     Write-Host "Skipping user-scope root compile: no APM package is installed at user scope yet (~/.apm/apm_modules)."
     return
   }
-  $editedRoots = @(Get-UserRootTargets | ForEach-Object { Join-Path $_.Root $_.ConfigName } | Where-Object { Test-EditedGeneratedRoot -Path $_ })
+  $editedRoots = @(Get-UserRootTargets | Where-Object Name -ne "claude" | ForEach-Object { Join-Path $_.Root $_.ConfigName } | Where-Object { Test-EditedGeneratedRoot -Path $_ })
   if ($editedRoots.Count -gt 0) {
     Write-WarnLine ("Skipping user-scope root compile: these roots keep APM's marker but were edited after compile, and apm compile would overwrite them:`n{0}`nTo keep your edits, delete the first line (the APM marker) so APM treats the file as hand-written; to let APM regenerate it, move the file aside (keep a .bak). Then re-run apply." -f (($editedRoots | ForEach-Object { "  $_" }) -join "`n"))
     return
@@ -481,7 +481,7 @@ function Sync-OpencodeInstructions {
     }
     return
   }
-  Write-WarnLine ("Leaving {0} as is ({1}): it is not a copy of the catalog guide, so OpenCode reads it instead of the guide." -f $OpencodeInstructionsOutput, $state)
+  Write-WarnLine ("Leaving {0} as is ({1}): it is not a copy of any committed version of the catalog guide, so OpenCode reads it instead of the guide. If it is a copy deployed from an uncommitted guide, move it aside and re-run apply." -f $OpencodeInstructionsOutput, $state)
 }
 
 function Get-UserRootTargets {
@@ -514,6 +514,9 @@ function Assert-UserRootsMigrated {
     return
   }
   Require-Command -Name git
+  if ((Get-Item -LiteralPath $claudeRoot -Force).LinkType -in @("SymbolicLink", "Junction") -and (Test-ApmRootMarker -Path $claudeRoot)) {
+    throw ("Refusing to install catalog instructions: {0} is a symlink to an apm compile output, which apm compile --clean never removes, and APM would add the guide under ~/.claude/rules, so Claude would load it twice. Move the link aside by hand, then retry." -f $claudeRoot)
+  }
   if (Test-EditedGeneratedRoot -Path $claudeRoot) {
     throw ("Refusing to install catalog instructions: {0} keeps APM's marker but was edited after compile, so apm compile --clean keeps it, and APM would add the guide under ~/.claude/rules, so Claude would load it twice. To keep your edits, delete the first line (the APM marker) and remove the guide from the file; otherwise move it aside by hand (keep a .bak). Then retry." -f $claudeRoot)
   }
@@ -523,9 +526,14 @@ function Assert-UserRootsMigrated {
     }
     throw ("Refusing to install catalog instructions: {0} is still the copy the legacy catalog sync wrote, and APM would add the same guide under ~/.claude/rules, so Claude would load it twice. Preview the move with 'mise run migrate:roots', then run 'mise run migrate:roots -- --apply'." -f $claudeRoot)
   }
-  # An edited copy, or one older than the git history at hand, is not a byte match but opens with the guide's title.
+  # An unedited compile output is APM's to remove with --clean once the rule is in place; doctor reports one that stays.
+  if ((Test-ApmRootMarker -Path $claudeRoot) -and (Test-ApmBuildIdValid -Path $claudeRoot)) {
+    return
+  }
+  # An edited copy, one older than the git history at hand, or a compile output whose marker line was deleted is not
+  # a byte match but opens with the guide's title once a BOM and leading HTML comment lines are skipped.
   $guideTitle = (Get-CatalogInstructionsBody -Path (Get-TrackedCatalogInstructionsPath)) -split "`n" | Where-Object { $_.Trim() -ne "" } | Select-Object -First 1
-  $rootTitle = Get-Content -LiteralPath $claudeRoot -Encoding UTF8 | Where-Object { $_.Trim() -ne "" } | Select-Object -First 1
+  $rootTitle = (Get-ApmRootText -Path $claudeRoot).TrimStart([char]0xFEFF) -split "`n" | ForEach-Object { $_.TrimStart(" ", "`t") } | Where-Object { $_ -ne "" -and -not $_.StartsWith("<!--", [System.StringComparison]::Ordinal) } | Select-Object -First 1
   if ($guideTitle -and $rootTitle -ceq $guideTitle) {
     throw ("Refusing to install catalog instructions: {0} opens with the catalog guide's title ({1}) but matches no known version, so it is an edited or older copy. APM would add the guide under ~/.claude/rules and Claude would load it twice. migrate:roots does not move edited files: move {0} aside by hand (keep a .bak), or remove the guide from it, then retry." -f $claudeRoot, $guideTitle)
   }
@@ -554,7 +562,7 @@ function Invoke-MigrateRoots {
     switch (Get-UserRootState -Path $rootPath -KnownBlobs $knownBlobs) {
       "absent" { Write-Host ("{0}: {1} is absent; nothing to move." -f $target.Name, $rootPath) }
       "generated" { Write-Host ("{0}: {1} was written by apm compile; nothing to move." -f $target.Name, $rootPath) }
-      "edited-generated" { Write-Host ("{0}: {1} keeps APM's marker but was edited after compile; left as is. Delete the marker line to keep it as your own file, or move it aside by hand." -f $target.Name, $rootPath) }
+      "edited-generated" { Write-Host ("{0}: {1} keeps APM's marker but was edited after compile; left as is. Delete the marker line to keep it as your own file (for ~/.claude/CLAUDE.md also remove the guide, which the rule provides), or move it aside by hand." -f $target.Name, $rootPath) }
       "not-regular" { Write-Host ("{0}: {1} is not a regular file (symlink or other); left as is. Move it by hand if it points at a copy of the guide." -f $target.Name, $rootPath) }
       "hand-written" { Write-Host ("{0}: {1} differs from every catalog guide version, so it was edited or written by hand; left as is. APM will not write this root while it exists." -f $target.Name, $rootPath) }
       "legacy" {
@@ -2967,12 +2975,27 @@ function Test-LegacyCatalogInstructionsCopy {
   return ([bool]$blobId -and $KnownBlobs.Contains($blobId))
 }
 
+# APM reads a root with Python's universal newlines, so CRLF and a lone CR count as LF; a BOM is kept as text.
+function Get-ApmRootText {
+  param([Parameter(Mandatory = $true)][string]$Path)
+
+  $text = [System.Text.UTF8Encoding]::new($false).GetString([System.IO.File]::ReadAllBytes($Path))
+  return $text.Replace("`r`n", "`n").Replace("`r", "`n")
+}
+
+# Mirrors APM's `content.lstrip().startswith(AGENTS_MD_GENERATED_MARKER)` (apm_cli/compilation/user_root_context.py).
+function Test-ApmRootMarker {
+  param([Parameter(Mandatory = $true)][string]$Path)
+
+  return (Get-ApmRootText -Path $Path).TrimStart().StartsWith($ApmGeneratedRootMarker, [System.StringComparison]::Ordinal)
+}
+
 # Mirrors apm_cli/compilation/build_id.py has_valid_build_id: the 12-hex Build ID is the sha256 of the file with that
 # line removed and the remaining lines joined by "`n", so any edit after compile breaks the match.
 function Test-ApmBuildIdValid {
   param([Parameter(Mandatory = $true)][string]$Path)
 
-  $content = [System.IO.File]::ReadAllText($Path, [System.Text.UTF8Encoding]::new($false))
+  $content = Get-ApmRootText -Path $Path
   if ($content.EndsWith("`n")) { $content = $content.Substring(0, $content.Length - 1) }
   $lines = $content -split "`n"
   $buildIdLines = @($lines | Where-Object { $_ -cmatch '^<!-- Build ID: [0-9a-f]{12} -->$' })
@@ -2989,13 +3012,12 @@ function Test-ApmBuildIdValid {
   return ($buildIdLines[0] -ceq "<!-- Build ID: $computed -->")
 }
 
+# Follows a symlink: APM resolves a Codex or Cursor root link inside its deploy root and overwrites the target.
 function Test-EditedGeneratedRoot {
   param([Parameter(Mandatory = $true)][string]$Path)
 
-  $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
-  if ($null -eq $item -or $item.LinkType -in @("SymbolicLink", "Junction") -or $item.PSIsContainer) { return $false }
-  $firstLine = Get-Content -LiteralPath $Path -Encoding UTF8 | Where-Object { $_.Trim() -ne "" } | Select-Object -First 1
-  return ($firstLine -ceq $ApmGeneratedRootMarker -and -not (Test-ApmBuildIdValid -Path $Path))
+  if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { return $false }
+  return ((Test-ApmRootMarker -Path $Path) -and -not (Test-ApmBuildIdValid -Path $Path))
 }
 
 # Classifies a root context file: absent, not-regular, generated (written by apm compile and unchanged since),
@@ -3011,8 +3033,7 @@ function Get-UserRootState {
   if ($null -eq $item) { return "absent" }
   # pwsh also reports a hard-linked regular file as LinkType HardLink.
   if ($item.LinkType -in @("SymbolicLink", "Junction") -or $item.PSIsContainer) { return "not-regular" }
-  $firstLine = Get-Content -LiteralPath $Path -Encoding UTF8 | Where-Object { $_.Trim() -ne "" } | Select-Object -First 1
-  if ($firstLine -ceq $ApmGeneratedRootMarker) {
+  if (Test-ApmRootMarker -Path $Path) {
     if (Test-ApmBuildIdValid -Path $Path) { return "generated" }
     return "edited-generated"
   }
@@ -4264,8 +4285,14 @@ function Invoke-Doctor {
     elseif ($configState -eq "legacy") {
       Write-WarnLine ("{0} is still the copy the legacy catalog sync wrote; preview its move with 'mise run migrate:roots'" -f $configPath)
     }
+    elseif ($configState -eq "edited-generated" -and $target.Name -eq "claude") {
+      Write-WarnLine ("{0} keeps APM's marker but was edited after compile, so apm compile --clean keeps it and Claude reads the guide from it as well as from the rule; remove the guide and the marker line, or move it aside" -f $configPath)
+    }
     elseif ($configState -eq "edited-generated") {
       Write-WarnLine ("{0} keeps APM's marker but was edited after compile, so apply skips the root compile; delete the marker line to keep it as your own file, or move it aside" -f $configPath)
+    }
+    elseif ($target.Name -eq "claude" -and $configState -eq "generated" -and (Test-Path -LiteralPath (Join-Path $rulesPath ($CatalogInstructionsFileName -replace '\.instructions\.md\z', '.md')) -PathType Leaf)) {
+      Write-WarnLine ("{0} is an apm compile output that still sits next to the guide rule, so Claude may read the guide twice; run 'mise run apply' so apm compile --clean removes it, and if it stays, it is an older compile output: move it aside" -f $configPath)
     }
     elseif ($target.Name -eq "claude" -and $configState -eq "absent" -and (Test-Path -LiteralPath (Get-TrackedCatalogInstructionsPath) -PathType Leaf)) {
       $guideRulePath = Join-Path $rulesPath ($CatalogInstructionsFileName -replace '\.instructions\.md\z', '.md')
