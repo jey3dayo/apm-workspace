@@ -269,9 +269,53 @@ catalog_apm_dir_claim_message() {
   fi
   [ -d "$apm_dir" ] || return 0
 
-  claimed_entry=$(cd "$apm_dir" && find . -mindepth 1 \( -type l -o \( ! -type d ! \( -type f \( -path './skills/*' -o -path './agents/*' \) \) \) \) | sed 's#^\./##' | sort | sed -n 1p)
+  # A failed scan must claim: an unreadable directory would otherwise hide what prepare:catalog deletes.
+  if ! non_regular_entries=$(cd "$apm_dir" && find . -mindepth 1 ! -type d ! -type f) ||
+    ! regular_files=$(cd "$apm_dir" && find . -mindepth 1 -type f); then
+    printf 'catalog/.apm could not be fully read, so prepare:catalog might delete what it holds. Make every entry under catalog/.apm readable first.\n'
+    return 0
+  fi
+
+  claimed_entry=$({
+    printf '%s\n' "$non_regular_entries" | sed -n 's#^\./#N #p'
+    printf '%s\n' "$regular_files" | sed -n 's#^\./#F #p'
+  } | awk '
+    {
+      kind = substr($0, 1, 1)
+      entry = substr($0, 3)
+      entries[++count] = entry
+      kinds[count] = kind
+      if (kind == "F" && entry ~ /^skills\/.+\/SKILL\.md$/) {
+        skill_dir = entry
+        sub(/\/SKILL\.md$/, "", skill_dir)
+        skill_dirs[skill_dir] = 1
+      }
+    }
+    END {
+      for (i = 1; i <= count; i++) {
+        entry = entries[i]
+        if (kinds[i] != "F") { print entry; continue }
+        if (entry ~ /^agents\/[^\/]+\.agent\.md$/) continue
+        enclosed = 0
+        if (entry ~ /^skills\//) {
+          parent = entry
+          while (sub(/\/[^\/]*$/, "", parent)) {
+            if (parent in skill_dirs) { enclosed = 1; break }
+          }
+        }
+        if (!enclosed) print entry
+      }
+    }' | sort | sed -n 1p)
   [ -n "$claimed_entry" ] || return 0
 
+  case "$claimed_entry" in
+    skills/* | agents/*)
+      if [ -f "$apm_dir/$claimed_entry" ] && [ ! -L "$apm_dir/$claimed_entry" ]; then
+        printf 'catalog/.apm holds %s, which the catalog build does not carry: it keeps only files inside a skill directory (one holding SKILL.md) and agents named agents/<name>.agent.md, so prepare:catalog would delete it and apply would not deploy it. Move it into a skill or rename the agent.\n' "$claimed_entry"
+        return 0
+      fi
+      ;;
+  esac
   printf 'catalog/.apm holds %s, but only catalog/.apm/skills and catalog/.apm/agents are migrated: the legacy catalog sync still owns every other primitive, so prepare:catalog would delete it and APM would install it alongside the sync output. Move a primitive into catalog/.apm only in the change that retires its legacy writer.\n' "$claimed_entry"
 }
 
@@ -2573,8 +2617,14 @@ place_rendered_catalog_agents() {
       return 1
     fi
     while IFS= read -r agent_name; do
-      if [ -d "$HOME/$runtime_dir/agents/$agent_name.md" ]; then
-        error "Cannot place agent: target is a directory: $HOME/$runtime_dir/agents/$agent_name.md"
+      target_agent="$HOME/$runtime_dir/agents/$agent_name.md"
+      if [ -d "$target_agent" ]; then
+        error "Cannot place agent: target is a directory: $target_agent"
+        return 1
+      fi
+      # A user's symlink (e.g. into dotfiles) stays when it already matches; replacing it would cut the link.
+      if [ -L "$target_agent" ] && ! cmp -s "$rendered_agents_dir/$agent_name.md" "$target_agent"; then
+        error "Cannot place agent: target is a symlink whose content differs from the catalog: $target_agent"
         return 1
       fi
     done <<<"$agent_names"

@@ -3466,6 +3466,28 @@ function Install-CatalogAgentsIntoRenderProject {
   }
 }
 
+function Test-CatalogAgentContentMatches {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$RenderedAgent,
+
+    [Parameter(Mandatory = $true)]
+    [string]$TargetAgent
+  )
+
+  if (-not (Test-Path -LiteralPath $TargetAgent -PathType Leaf)) {
+    return $false
+  }
+  # Test-Path reports a dangling symlink as a leaf; hashing it then fails, which means it does not match.
+  try {
+    $targetHash = (Get-FileHash -LiteralPath $TargetAgent -Algorithm SHA256 -ErrorAction Stop).Hash
+  }
+  catch {
+    return $false
+  }
+  return (Get-FileHash -LiteralPath $RenderedAgent -Algorithm SHA256).Hash -eq $targetHash
+}
+
 function Set-CatalogAgentFile {
   param(
     [Parameter(Mandatory = $true)]
@@ -3476,7 +3498,7 @@ function Set-CatalogAgentFile {
   )
 
   $targetExists = Test-Path -LiteralPath $TargetAgent -PathType Leaf
-  if ($targetExists -and ((Get-FileHash -LiteralPath $RenderedAgent -Algorithm SHA256).Hash -eq (Get-FileHash -LiteralPath $TargetAgent -Algorithm SHA256).Hash)) {
+  if (Test-CatalogAgentContentMatches -RenderedAgent $RenderedAgent -TargetAgent $TargetAgent) {
     return
   }
 
@@ -3524,6 +3546,11 @@ function Invoke-CatalogAgentsDeploy {
         $targetAgent = Join-Path (Join-Path $target.Root "agents") "$agentName.md"
         if (Test-Path -LiteralPath $targetAgent -PathType Container) {
           throw "Cannot place agent: target is a directory: $targetAgent"
+        }
+        # A user's symlink (e.g. into dotfiles) stays when it already matches; replacing it would cut the link.
+        $targetItem = Get-Item -LiteralPath $targetAgent -Force -ErrorAction SilentlyContinue
+        if ($targetItem -and $targetItem.LinkType -and -not (Test-CatalogAgentContentMatches -RenderedAgent (Join-Path $renderedAgentsDir "$agentName.md") -TargetAgent $targetAgent)) {
+          throw "Cannot place agent: target is a symlink whose content differs from the catalog: $targetAgent"
         }
       }
       $renderedAgentsDirs[$target.Name] = $renderedAgentsDir
@@ -4054,16 +4081,45 @@ function Get-CatalogApmDirClaimedPaths {
   }
 
   $rootFullPath = (Resolve-Path -LiteralPath $ApmDir).Path
-  $result = New-Object System.Collections.Generic.List[string]
-  foreach ($item in Get-ChildItem -LiteralPath $ApmDir -Recurse -Force) {
-    $isLink = [bool]$item.LinkType
-    if ($item.PSIsContainer -and -not $isLink) {
+  # -ErrorAction Stop: an unreadable directory must fail the scan, not hide what prepare:catalog deletes.
+  $entries = foreach ($item in Get-ChildItem -LiteralPath $ApmDir -Recurse -Force -ErrorAction Stop) {
+    if ($item.PSIsContainer -and -not $item.LinkType) {
       continue
     }
+    [pscustomobject]@{
+      RelativePath = ($item.FullName.Substring($rootFullPath.Length).TrimStart('\', '/')) -replace '\\', '/'
+      IsRegularFile = Test-CatalogApmDirRegularFile -Item $item
+    }
+  }
 
-    $relativePath = ($item.FullName.Substring($rootFullPath.Length).TrimStart('\', '/')) -replace '\\', '/'
-    if (($relativePath -clike "skills/*" -or $relativePath -clike "agents/*") -and (Test-CatalogApmDirRegularFile -Item $item)) {
-      continue
+  $skillDirs = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+  foreach ($entry in $entries) {
+    if ($entry.IsRegularFile -and $entry.RelativePath -cmatch '^skills/.+/SKILL\.md$') {
+      [void]$skillDirs.Add($entry.RelativePath.Substring(0, $entry.RelativePath.Length - "/SKILL.md".Length))
+    }
+  }
+
+  $result = New-Object System.Collections.Generic.List[string]
+  foreach ($entry in $entries) {
+    $relativePath = $entry.RelativePath
+    if ($entry.IsRegularFile) {
+      if ($relativePath -cmatch '^agents/[^/]+\.agent\.md$') {
+        continue
+      }
+      if ($relativePath -clike "skills/*") {
+        $enclosed = $false
+        $parent = $relativePath
+        while ($parent.Contains("/")) {
+          $parent = $parent.Substring(0, $parent.LastIndexOf("/"))
+          if ($skillDirs.Contains($parent)) {
+            $enclosed = $true
+            break
+          }
+        }
+        if ($enclosed) {
+          continue
+        }
+      }
     }
 
     $result.Add($relativePath)
@@ -4081,9 +4137,21 @@ function Get-CatalogApmDirClaimMessage {
     return "catalog/.apm is a symlink, but the legacy catalog sync still owns every primitive: prepare:catalog would delete the link. Replace it with a real directory only in the change that retires its legacy writer."
   }
 
-  $claimedEntry = @(Get-CatalogApmDirClaimedPaths -ApmDir $apmDir) | Select-Object -First 1
+  try {
+    $claimedEntry = @(Get-CatalogApmDirClaimedPaths -ApmDir $apmDir) | Select-Object -First 1
+  }
+  catch {
+    return "catalog/.apm could not be fully read, so prepare:catalog might delete what it holds. Make every entry under catalog/.apm readable first."
+  }
   if (-not $claimedEntry) {
     return $null
+  }
+
+  if ($claimedEntry -clike "skills/*" -or $claimedEntry -clike "agents/*") {
+    $claimedItem = Get-Item -LiteralPath (Join-Path $apmDir $claimedEntry) -Force -ErrorAction SilentlyContinue
+    if ($claimedItem -and (Test-CatalogApmDirRegularFile -Item $claimedItem)) {
+      return ("catalog/.apm holds {0}, which the catalog build does not carry: it keeps only files inside a skill directory (one holding SKILL.md) and agents named agents/<name>.agent.md, so prepare:catalog would delete it and apply would not deploy it. Move it into a skill or rename the agent." -f $claimedEntry)
+    }
   }
 
   return ("catalog/.apm holds {0}, but only catalog/.apm/skills and catalog/.apm/agents are migrated: the legacy catalog sync still owns every other primitive, so prepare:catalog would delete it and APM would install it alongside the sync output. Move a primitive into catalog/.apm only in the change that retires its legacy writer." -f $claimedEntry)

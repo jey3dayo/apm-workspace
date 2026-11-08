@@ -125,6 +125,87 @@ scripts: {}
     { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds skills/linked*"
   }
 
+  It "claims a file under .apm/skills that no skill encloses" {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $skillsDir = Join-Path (Join-Path (Get-TrackedCatalogDir) ".apm") "skills"
+    New-Item -ItemType Directory -Path (Join-Path $skillsDir "draft"), (Join-Path $skillsDir "real") -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $skillsDir "real/SKILL.md") -Value "skill"
+    Set-Content -LiteralPath (Join-Path $skillsDir "draft/notes.md") -Value "draft notes"
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds skills/draft/notes.md, which the catalog build does not carry*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds skills/draft/notes.md*"
+  }
+
+  It "claims a file directly under .apm/skills and one in a namespace directory that is not a skill" {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $skillsDir = Join-Path (Join-Path (Get-TrackedCatalogDir) ".apm") "skills"
+    New-Item -ItemType Directory -Path (Join-Path $skillsDir "ns/inner") -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $skillsDir "ns/inner/SKILL.md") -Value "skill"
+    Set-Content -LiteralPath (Join-Path $skillsDir "ns/notes.md") -Value "loose"
+    Set-Content -LiteralPath (Join-Path $skillsDir "README.md") -Value "readme"
+
+    $claimed = @(Get-CatalogApmDirClaimedPaths -ApmDir (Join-Path (Get-TrackedCatalogDir) ".apm"))
+    $claimed.Count | Should -Be 2
+    $claimed | Should -Contain "skills/README.md"
+    $claimed | Should -Contain "skills/ns/notes.md"
+  }
+
+  It "allows nested skill files and files inside a skill's subdirectories" {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
+    New-Item -ItemType Directory -Path (Join-Path $apmDir "skills/one/references"), (Join-Path $apmDir "skills/ns/inner/scripts"), (Join-Path $apmDir "agents") -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $apmDir "skills/one/SKILL.md") -Value "skill"
+    Set-Content -LiteralPath (Join-Path $apmDir "skills/one/references/guide.md") -Value "ref"
+    Set-Content -LiteralPath (Join-Path $apmDir "skills/ns/inner/SKILL.md") -Value "skill"
+    Set-Content -LiteralPath (Join-Path $apmDir "skills/ns/inner/scripts/run.sh") -Value "run"
+    Set-Content -LiteralPath (Join-Path $apmDir "agents/sample.agent.md") -Value "agent"
+
+    Get-CatalogApmDirClaimMessage | Should -BeNullOrEmpty
+  }
+
+  It "claims a symlink inside a skill directory" {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $skillDir = Join-Path (Join-Path (Get-TrackedCatalogDir) ".apm") "skills/one"
+    New-Item -ItemType Directory -Path $skillDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $skillDir "SKILL.md") -Value "skill"
+    $target = Join-Path $TestDrive "outside-reference.md"
+    Set-Content -LiteralPath $target -Value "outside"
+    New-Item -ItemType SymbolicLink -Path (Join-Path $skillDir "link.md") -Target $target | Out-Null
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds skills/one/link.md, but only*"
+  }
+
+  It "claims an agent file that is not <name>.agent.md and an agent nested below .apm/agents" {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $agentsDir = Join-Path (Join-Path (Get-TrackedCatalogDir) ".apm") "agents"
+    New-Item -ItemType Directory -Path (Join-Path $agentsDir "team") -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $agentsDir "good.agent.md") -Value "agent"
+    Set-Content -LiteralPath (Join-Path $agentsDir "legacy-name.md") -Value "legacy"
+    Set-Content -LiteralPath (Join-Path $agentsDir "team/helper.agent.md") -Value "nested"
+
+    $claimed = @(Get-CatalogApmDirClaimedPaths -ApmDir (Join-Path (Get-TrackedCatalogDir) ".apm"))
+    $claimed.Count | Should -Be 2
+    $claimed | Should -Contain "agents/legacy-name.md"
+    $claimed | Should -Contain "agents/team/helper.agent.md"
+    Get-CatalogApmDirClaimMessage | Should -BeLike "*agents/<name>.agent.md*"
+  }
+
+  It "refuses to stage a catalog whose .apm holds a directory it cannot read" -Skip:($IsWindows -eq $true -or ((& id -u) -eq "0")) {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $hiddenDir = Join-Path (Join-Path (Get-TrackedCatalogDir) ".apm") "instructions"
+    New-Item -ItemType Directory -Path $hiddenDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $hiddenDir "a.instructions.md") -Value "hidden"
+    & chmod 000 $hiddenDir
+    try {
+      Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm could not be fully read*"
+      { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm could not be fully read*"
+    }
+    finally {
+      & chmod 755 $hiddenDir
+    }
+    Get-Content -LiteralPath (Join-Path $hiddenDir "a.instructions.md") | Should -Be "hidden"
+  }
+
   It "seeds the catalog build with skills and agents under .apm and no top-level skills or agents directory" {
     $trackedDir = Join-Path $TestDrive "tracked-catalog"
     $buildDir = Join-Path $TestDrive "build-catalog"
@@ -1493,6 +1574,42 @@ Describe "public command surface" {
 
       { Invoke-CatalogAgentsDeploy 6>&1 | Out-Null } | Should -Throw "*target is a directory*sample.md*"
       Join-Path $script:agentsHome ".claude/agents/sample.md" | Should -Not -Exist
+    }
+
+    It "throws before placing anything when a catalog agent's target is a symlink with different content" -Skip:($IsWindows -eq $true) {
+      $dotfile = Join-Path $TestDrive "dotfiles/sample.md"
+      New-Item -ItemType Directory -Path (Split-Path -Parent $dotfile), (Join-Path $script:agentsHome ".cursor/agents") -Force | Out-Null
+      Set-Content -LiteralPath $dotfile -Value "user dotfile version"
+      $targetAgent = Join-Path $script:agentsHome ".cursor/agents/sample.md"
+      New-Item -ItemType SymbolicLink -Path $targetAgent -Target $dotfile | Out-Null
+
+      { Invoke-CatalogAgentsDeploy 6>&1 | Out-Null } | Should -Throw "*target is a symlink whose content differs from the catalog*sample.md*"
+      (Get-Item -LiteralPath $targetAgent -Force).LinkType | Should -Be "SymbolicLink"
+      Get-Content -LiteralPath $dotfile | Should -Be "user dotfile version"
+      Join-Path $script:agentsHome ".claude/agents/sample.md" | Should -Not -Exist
+    }
+
+    It "throws when a catalog agent's target is a dangling symlink" -Skip:($IsWindows -eq $true) {
+      $targetAgent = Join-Path $script:agentsHome ".claude/agents/sample.md"
+      New-Item -ItemType Directory -Path (Split-Path -Parent $targetAgent) -Force | Out-Null
+      New-Item -ItemType SymbolicLink -Path $targetAgent -Target (Join-Path $TestDrive "missing.md") | Out-Null
+
+      { Invoke-CatalogAgentsDeploy 6>&1 | Out-Null } | Should -Throw "*target is a symlink whose content differs from the catalog*sample.md*"
+      (Get-Item -LiteralPath $targetAgent -Force).LinkType | Should -Be "SymbolicLink"
+      Join-Path $TestDrive "missing.md" | Should -Not -Exist
+    }
+
+    It "keeps a catalog agent's target symlink whose content already matches" -Skip:($IsWindows -eq $true) {
+      $dotfile = Join-Path $TestDrive "dotfiles-match/sample.md"
+      New-Item -ItemType Directory -Path (Split-Path -Parent $dotfile), (Join-Path $script:agentsHome ".claude/agents") -Force | Out-Null
+      Copy-Item -LiteralPath $script:agentSource -Destination $dotfile
+      $targetAgent = Join-Path $script:agentsHome ".claude/agents/sample.md"
+      New-Item -ItemType SymbolicLink -Path $targetAgent -Target $dotfile | Out-Null
+
+      Invoke-CatalogAgentsDeploy 6>&1 | Out-Null
+
+      (Get-Item -LiteralPath $targetAgent -Force).LinkType | Should -Be "SymbolicLink"
+      (Get-Content -LiteralPath (Join-Path $script:agentsHome ".cursor/agents/sample.md") -Raw) | Should -Be (Get-Content -LiteralPath $script:agentSource -Raw)
     }
 
     It "never places rendered agents into codex or opencode" {
