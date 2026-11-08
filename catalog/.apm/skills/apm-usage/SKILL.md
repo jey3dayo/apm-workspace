@@ -139,7 +139,7 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
 - Run `mise run deploy` for the normal local rollout from the current manifest and lock.
 - Run `mise run apply` only when deployment is needed without the bundled `check -> doctor` flow.
 - Run `mise run refresh` to pull the checkout (skipped when the tree is dirty) and run `apm deps update -g` (deprecated; superseded by `apm update`): it advances unpinned dependencies, regenerates `apm.lock.yaml`, and rewrites deployed targets, with agmsg links saved/restored, but skips `check`, the workspace apply, and `doctor`.
-- Run `mise run upgrade` to accept newer upstream package content; it runs `apm update -g --yes` then `mise run deploy`.
+- Run `mise run upgrade` to accept newer upstream package content; it runs `mise run check:roots`, `apm update -g --yes`, then `mise run deploy`.
 - Run `mise run refresh:deploy` when you explicitly want `refresh -> deploy`.
 - Run `mise run prepare:catalog` before commit/push when tracked catalog content changed.
 - Run `mise run install:catalog` after commit/push when you want to install the tracked catalog ref.
@@ -287,6 +287,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
      Fast Path 2 instead
    - for global dependencies, work in `~/.apm` and use `apm install -g <package-ref>` or `apm install -g --mcp <name> ...`
    - a bare `apm install -g` bypasses `mise run apply`, so the agmsg roster links it removes are not restored for you; follow the agmsg State section of `~/.apm/AGENTS.md` afterwards, diagnosing with `mise run doctor` before any restore
+   - run `mise run check:roots` before any bare `apm install -g` or `apm update -g`: while `~/.claude/CLAUDE.md` is still the legacy copy of the catalog guide, the install adds the same guide as a Claude rule and Claude loads it twice (`mise run migrate:roots` moves the copy)
    - for repo-local dependencies, work in the target repository and use `apm install <package-ref>` or `apm install --mcp <name> ...`
    - for global changes, run `mise run check`, then `mise run deploy`; for repo-local changes, run that repository's defined APM or project checks
    - for repo-local changes, also confirm `targets:` includes every runtime the

@@ -7,9 +7,13 @@
 
 - Status: 採用（REPO 側。実 HOME の切り替えは本人が `mise run migrate:roots -- --apply` を明示実行する）
 - 正本: `catalog/.apm/instructions/ai-collaboration.instructions.md`（1 ファイル。frontmatter の下の本文は旧 `catalog/AGENTS.md` と byte 一致）
-- 配布: user-scope install が Claude rule `~/.claude/rules/ai-collaboration.md` を置き、apply の `apm compile -g --clean` が `~/.codex/AGENTS.md` と `~/.cursor/AGENTS.md` を書く。旧 sync による root 3 つの上書きコピーと、project-scope の `apm compile --target codex --output` はやめた
+- 配布: user-scope install が Claude rule `~/.claude/rules/ai-collaboration.md` を置き、apply の `apm compile -g --clean` が `~/.codex/AGENTS.md` と `~/.cursor/AGENTS.md` を書く。旧 sync による root 3 つの上書きコピーと、project-scope の `apm compile --target codex --output` はやめた。APM の目印がある root は APM のもので、編集しても compile が書き直す（旧 sync は目印に関係なく毎回上書きしていた）。`--clean` が消すのは、rule と重なる未編集の Claude の生成物だけ（実測）
 - 1 ファイルにした理由: 本文が他の節を位置で参照している（「上の表」、「この文書」）。16 節に分けると参照の意味が変わり、Claude の rule の読み込み順も保証されない。分割は別の判断として残す
-- 既存 root の扱い: APM は目印の無い root を上書きしない。旧 sync のコピー（過去の `catalog/AGENTS.md` と byte 一致）だけを `migrate:roots` が `<name>.<UTC>.bak` へ移す（既定は dry-run）。手書きの root、symlink、APM の生成物は触らない。`~/.claude/CLAUDE.md` が旧コピーのままだと、APM が同じ本文を rule として足し二重に読まれるため、`install:catalog`・`refresh`・`install:pins`・`upgrade` は止まる
+- 既存 root の扱い: APM は目印の無い root を上書きしない。旧 sync のコピー（過去の `catalog/AGENTS.md` と byte 一致）だけを `migrate:roots` が `<name>.<UTC>.bak` へ移す（既定は dry-run）。手書きの root、symlink、APM の生成物は触らない。`~/.claude/CLAUDE.md` が旧コピーのままだと、APM が同じ本文を rule として足し二重に読まれるため、`install:catalog`・`refresh`・`install:pins`・`upgrade` は止まる。題名（本文の先頭行）が同じで byte 一致しない編集済み・旧版のコピーも止める（git 履歴が無い checkout で古い版を見逃さないため）。利用者が直接打つ `apm install -g` は止められない
+- OpenCode: `~/.config/opencode/AGENTS.md` には本文を書く。ただし書くのは、そのファイルがガイドのコピーのとき、または無くて `~/.claude/CLAUDE.md`（OpenCode の fallback）が無い・旧コピー・APM の生成物のときだけ。手書きの `CLAUDE.md` を読んでいる OpenCode の挙動は変えない
+- doctor: `apm.lock.yaml` の catalog の `deployed_files` を実体と照合し、記録された path が無ければエラーにする。内容の差（作業中の catalog や private の上書き）は件数だけ出す。commands と rules は custom sync のままなので、従来の検品も残す
+- lint: `lint-frontmatter` と `lint-catalog-leaks` の対象に `catalog/.apm/instructions` を足した
+- `apm pack`（0.35.0）は配布経路に採らない。既定の claude-plugin 形式は bundle を作れるが、claude と codex の project に入れてもガイドは `.github/instructions` に置かれ Claude の rule にならない。agent-plugin 形式は agents と instructions を持てないとして pack を拒否する。apm 形式は空の bundle になる。そのため `apm-policy.yml` も入れない
 - 互換のために残した書き手: OpenCode は `~/.config/opencode/AGENTS.md` が無いと `~/.claude/CLAUDE.md` を読む（opencode.ai/docs/rules）。APM は host の targets に opencode が無いとこのファイルを書かず、opencode を targets に足すと拒否される agents も配られる。そのため apply が本文を書く（無いとき・旧コピーのときだけ）。Pi の `~/AGENTS.md` も本文のコピーを続ける
 - 残したもの: `claude-md-design` と `model-policy` は custom の rules sync のまま（instruction にすると Codex の root に畳み込まれる）。`claude-md-design` の `paths:` は移動先に合わせた
 - 再検討するなら: APM が user-scope の opencode root を targets と別に書けるようになったら、OpenCode のコピーを外す。分割するなら、本文の位置参照を先に解消する
