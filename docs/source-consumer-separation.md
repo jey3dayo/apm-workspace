@@ -23,7 +23,7 @@
 
 - consumer は authoring repo の package を SHA で pin して `apm install -g` できる。lock の `resolved_commit` は pin と一致し、authoring repo には lock も `apm_modules` も作られず、`git status` も変わらない
 - 3 つの tool への配布: Claude には skills・agent・rule、Codex には `~/.agents/skills` の skills と `~/.codex/AGENTS.md`、Cursor には agent と `~/.cursor/AGENTS.md` が届く。配布先のファイル一覧が期待と完全に一致する
-- `apm install -g` は root を書かない。`apm compile -g --clean` が Codex と Cursor の root を書き、目印の無い手書きの `~/.claude/CLAUDE.md` は残す
+- `apm install -g` は root を書かない（Codex と Cursor の root は作られず、手書きの Claude root も変わらない）。`apm compile -g --clean` が Codex と Cursor の root を書き、目印の無い手書きの `~/.claude/CLAUDE.md` は残す
 - install と compile をもう一度実行しても、HOME の中のファイルと symlink（パスと内容、リンク先）は変わらない。比べないのは `.cache`・`Library`・`.apm/deployment-receipts`・`.apm/apm_modules` と、空のディレクトリやパーミッション。新しい別の HOME で同じ manifest から入れても、lock は byte 単位で同じになる
 - authoring repo に commit を足しても、作業ツリーを編集しても、pin を動かすまで consumer には届かない。pin を v2 に動かすと v2 の内容が届き、未 commit の v3 は届かない
 - APM の持ち物ではないファイル（private skill のコピーと symlink、Herdr が置く skill、`~/.codex/config.toml`、`~/.claude/settings.json`、手書きの `CLAUDE.md`）は、install・再実行・pin の更新のあとも変わらない
@@ -65,8 +65,8 @@ dependencies:
 
 テストの apm と、合成した authoring repo を作る git は、次の条件で動く（git は空の template で `init` し、呼び出し元の hook を持ち込まない）。
 
-- `env -i` で起動し、渡す環境変数は `HOME`・`TMPDIR`・`PATH`・`LANG`・`PYTHONUTF8`・`GIT_CONFIG_GLOBAL`・`GIT_CONFIG_NOSYSTEM` だけ。呼び出し側が token・proxy・askpass・SSH agent・`XDG_CONFIG_HOME` を export していても届かないことをテストで確かめる
-- git が読む設定は fixture の global config と authoring repo の `.git/config` だけで、system の設定は読まない。credential・include・`http.*`・askpass・`core.sshCommand` の項目が無いこともテストで確かめる。利用者の global git config は読みも書きもしない
+- `env -i` で起動し、渡す環境変数は `HOME`・`TMPDIR`・`PATH`・`LANG`・`PYTHONUTF8`・`GIT_CONFIG_GLOBAL`・`GIT_CONFIG_NOSYSTEM`・`GIT_CEILING_DIRECTORIES` だけ。呼び出し側が token・proxy・askpass・SSH agent・`XDG_CONFIG_HOME` を export していても届かないことをテストで確かめる
+- git が読む設定は fixture の global config と authoring repo の `.git/config` だけで、system の設定は読まない。credential・include・`http.*`・askpass・`core.sshCommand` の項目が無いこともテストで確かめる。`GIT_CEILING_DIRECTORIES` を fixture root にして、fixture root を含む checkout があってもその `.git/config` を読まないことも、fixture root に credential helper と proxy を書いた repo を置いて確かめる。利用者の global git config は読みも書きもしない
 - 依存の host は解決できない `fixture.invalid` で、fixture の git config の `insteadOf` がローカルの repo に向ける。これは通信を不可能にするものではなく、通信先を持たせないための設定である
 - HOME と `TMPDIR` は fixture root の中に置く。HOME は物理パスに直してから比べ、fixture の `homes/` の直下でない（`..` や symlink で外を指す場合を含む）か呼び出し元の HOME なら、何も起動しない。この拒否もテストで確かめる
 - macOS（`sandbox-exec` がある）: profile が通信と fixture root の外への書込みを拒否する。開始前に外への書込みが失敗することを確かめ、成功したら全テストを止める。通信は、sandbox の外では応答する loopback のサーバーに、sandbox の中からは接続できないことで確かめる。外部ホストへの接続は試していない

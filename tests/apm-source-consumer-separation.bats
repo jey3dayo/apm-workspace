@@ -243,7 +243,7 @@ fixture_exec() {
   esac
   [ "$home" != "$REAL_HOME" ] || return 97
   local cmd=(env -i HOME="$home" TMPDIR="$FX/tmp" PATH="$FIXTURE_PATH" LANG="${LANG:-C.UTF-8}" PYTHONUTF8=1
-    GIT_CONFIG_GLOBAL="$FX/gitconfig" GIT_CONFIG_NOSYSTEM=1)
+    GIT_CONFIG_GLOBAL="$FX/gitconfig" GIT_CONFIG_NOSYSTEM=1 GIT_CEILING_DIRECTORIES="$FX")
   if [ -n "$SANDBOX_EXEC" ]; then
     cmd+=("$SANDBOX_EXEC" -f "$FX/sandbox.sb")
   fi
@@ -312,7 +312,7 @@ sentinel_snapshot() {
   run fixture_exec "$home" "$home" /usr/bin/env
   [ "$status" -eq 0 ]
   [ "$(printf '%s\n' "$output" | cut -d= -f1 | LC_ALL=C sort | paste -sd' ' -)" = \
-    "GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM HOME LANG PATH PYTHONUTF8 TMPDIR" ]
+    "GIT_CEILING_DIRECTORIES GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM HOME LANG PATH PYTHONUTF8 TMPDIR" ]
   [[ "$output" != *fixture-secret* ]]
 }
 
@@ -332,6 +332,27 @@ sentinel_snapshot() {
     esac
   done <<<"$output"
   [[ "$output" == *"url.file://$AUTHORING.insteadof=https://fixture.invalid/fixture-owner/fixture-authoring.git"* ]]
+}
+
+@test "git inside the wrapper never discovers a checkout that encloses the fixture root" {
+  home="$(new_home ceiling)"
+  # The fixture root may sit under a real checkout; stand one up at the root itself, with config that must not leak.
+  git init -q --template="$FX/empty-git-template" "$FX"
+  git config -f "$FX/.git/config" credential.helper '!echo enclosing-leak'
+  git config -f "$FX/.git/config" http.proxy http://127.0.0.1:9
+
+  run fixture_exec "$home" "$FX/tmp" /usr/bin/env -u GIT_CEILING_DIRECTORIES git config --list --show-scope
+  [ "$status" -eq 0 ]
+  [[ "$output" == *enclosing-leak* ]]
+
+  run fixture_exec "$home" "$FX/tmp" git config --list --show-scope
+  [ "$status" -eq 0 ]
+  [[ "$output" != *enclosing-leak* ]]
+  [[ "$output" != *127.0.0.1:9* ]]
+  run fixture_exec "$home" "$FX/tmp" git rev-parse --git-dir
+  [ "$status" -ne 0 ]
+
+  rm -rf "$FX/.git"
 }
 
 @test "a fixture root may sit in a scratch directory of HOME but never on HOME, its ancestors or tool state" {
@@ -430,6 +451,7 @@ $SHA1" ]
   echo "hand-written root" >"$home/.claude/CLAUDE.md"
 
   apm_in "$home" "$home" install -g
+  [ "$(cat "$home/.claude/CLAUDE.md")" = "hand-written root" ]
   [ ! -e "$home/.codex/AGENTS.md" ]
   [ ! -e "$home/.cursor/AGENTS.md" ]
   run apm_in "$home" "$home" compile -g --clean
