@@ -3608,6 +3608,13 @@ Describe "catalog instructions and user root migration" {
     { Assert-UserRootsMigrated } | Should -Throw "*Claude would load it twice*"
   }
 
+  It "also refuses an edited or history-less older copy that keeps the guide's title" {
+    $claudeRoot = Join-Path $script:rootsHome ".claude/CLAUDE.md"
+    Write-FixtureFile -Path $claudeRoot -Content "# Guide`n`nan older body line`nmy own addition`n"
+    { Assert-UserRootsMigrated } | Should -Throw "*opens with the catalog guide's title (# Guide) but matches no known version*"
+    [System.IO.File]::ReadAllText($claudeRoot) | Should -BeExactly "# Guide`n`nan older body line`nmy own addition`n"
+  }
+
   It "writes the OpenCode guide when absent and leaves a hand-written one" {
     Mock Write-WarnLine {}
     Sync-OpencodeInstructions
@@ -3617,5 +3624,99 @@ Describe "catalog instructions and user root migration" {
     Sync-OpencodeInstructions
     [System.IO.File]::ReadAllText($script:OpencodeInstructionsOutput) | Should -BeExactly "my opencode rules`n"
     Should -Invoke Write-WarnLine -Times 1 -ParameterFilter { $Message -like "*as is (hand-written)*" }
+  }
+
+  It "keeps updating an OpenCode copy written from an earlier committed instruction version" {
+    $instructionPath = Join-Path $script:WorkspaceDir "catalog/.apm/instructions/ai-collaboration.instructions.md"
+    & git -C $script:WorkspaceDir init -q
+    foreach ($version in @("# Guide v2", "# Guide v3")) {
+      Write-FixtureFile -Path $instructionPath -Content "---`ndescription: fixture guide`n---`n`n$version`n"
+      & git -C $script:WorkspaceDir add catalog/.apm/instructions/ai-collaboration.instructions.md
+      & git -C $script:WorkspaceDir -c user.name=t -c user.email=t@example.invalid commit -q -m $version
+    }
+    Write-FixtureFile -Path $script:OpencodeInstructionsOutput -Content "# Guide v2`n"
+
+    Get-UserRootState -Path $script:OpencodeInstructionsOutput -KnownBlobs (Get-LegacyCatalogInstructionsBlobs) | Should -Be "legacy"
+    Sync-OpencodeInstructions
+    [System.IO.File]::ReadAllText($script:OpencodeInstructionsOutput) | Should -BeExactly "# Guide v3`n"
+  }
+
+  It "does not displace a hand-written ~/.claude/CLAUDE.md that OpenCode falls back to" {
+    Write-FixtureFile -Path (Join-Path $script:rootsHome ".claude/CLAUDE.md") -Content "my own claude rules`n"
+    $output = Sync-OpencodeInstructions 6>&1 | Out-String
+    Test-Path -LiteralPath $script:OpencodeInstructionsOutput | Should -Be $false
+    $output | Should -Match "Not writing .*\(hand-written\)"
+  }
+
+  It "migrate:roots accepts the -- that mise run forwards before --apply" {
+    $codexRoot = Join-Path $script:rootsHome ".codex/AGENTS.md"
+    Copy-Item -LiteralPath $script:guideBody -Destination $codexRoot
+    Invoke-MigrateRoots -Arguments @("--", "--apply") 6>$null
+    Test-Path -LiteralPath $codexRoot | Should -Be $false
+    @(Get-ChildItem -LiteralPath (Join-Path $script:rootsHome ".codex") -Filter "AGENTS.md.*.bak").Count | Should -Be 1
+  }
+
+  It "install:catalog, refresh and install-pins run the double-load guard before APM touches the user scope" {
+    foreach ($name in @("Require-Apm", "Ensure-WorkspaceRepo", "Ensure-WorkspaceScaffold", "Ensure-WorkspaceMiseFile", "Refresh-WorkspaceCheckout", "Assert-TrackedCatalogPublished", "Invoke-ValidateCatalog")) {
+      Mock $name {}
+    }
+    Mock Assert-UserRootsMigrated { throw "guard stopped it" }
+    Mock Get-InternalCleanupSkillIds { throw "ran past the guard" }
+    Mock Test-ManifestHasLocalPackages { throw "ran past the guard" }
+    Mock Invoke-AgmsgStateSave { throw "ran past the guard" }
+
+    { Invoke-RegisterCatalog } | Should -Throw "guard stopped it"
+    { Invoke-Update } | Should -Throw "guard stopped it"
+    { Invoke-InstallPins } | Should -Throw "guard stopped it"
+  }
+}
+
+Describe "catalog lock deployed files" {
+  BeforeAll {
+    $env:APM_WORKSPACE_LIB_ONLY = "1"
+    $modulePath = Join-Path (Join-Path $PSScriptRoot "..") "scripts/apm-workspace.ps1"
+    . (Resolve-Path -LiteralPath $modulePath).Path
+    Remove-Item Env:APM_WORKSPACE_LIB_ONLY -ErrorAction SilentlyContinue
+
+    function Write-CatalogLockFixture {
+      param([string]$Path, [string]$RuleHash)
+      $lock = @(
+        "lockfile_version: '2'", "dependencies:",
+        "- repo_url: other/repo", "  name: catalog-lookalike", "  virtual_path: skills/other", "  deployed_files:", "  - .agents/skills/other/SKILL.md",
+        "- repo_url: jey3dayo/apm-workspace", "  name: catalog", "  virtual_path: catalog", "  package_type: apm_package", "  deployed_files:",
+        "  - .agents/skills/demo", "  - .agents/skills/demo/SKILL.md", "  - .claude/rules/ai-collaboration.md", "  deployed_file_hashes:",
+        "    .agents/skills/demo/SKILL.md: sha256:c0ffee", "    .claude/rules/ai-collaboration.md: sha256:$RuleHash",
+        "- repo_url: jey3dayo/apm-workspace", "  name: manual-skills", "  virtual_path: manual-skills", "  deployed_files:", "  - .agents/skills/manual/SKILL.md"
+      ) -join "`n"
+      [System.IO.File]::WriteAllText($Path, "$lock`n", (New-Object System.Text.UTF8Encoding $false))
+    }
+  }
+
+  It "reads only the catalog package's deployed files and hashes" {
+    $lockPath = Join-Path $TestDrive "parse.lock.yaml"
+    Write-CatalogLockFixture -Path $lockPath -RuleHash "abc123"
+
+    $entries = Get-CatalogLockDeployedEntries -LockPath $lockPath
+
+    @($entries | ForEach-Object { "{0} {1} {2}" -f $_.Kind, $_.Path, $_.Hash }) | Should -Be @(
+      "F .agents/skills/demo ", "F .agents/skills/demo/SKILL.md ", "F .claude/rules/ai-collaboration.md ",
+      "H .agents/skills/demo/SKILL.md c0ffee", "H .claude/rules/ai-collaboration.md abc123")
+  }
+
+  It "returns a recorded file that is gone and only counts a changed one" {
+    $homeDir = Join-Path $TestDrive "lock-home"
+    New-Item -ItemType Directory -Path (Join-Path $homeDir ".agents/skills/demo"), (Join-Path $homeDir ".claude/rules") -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $homeDir ".agents/skills/demo/SKILL.md") -Value "edited"
+    $rulePath = Join-Path $homeDir ".claude/rules/ai-collaboration.md"
+    Set-Content -LiteralPath $rulePath -Value "rule"
+    $lockPath = Join-Path $TestDrive "check.lock.yaml"
+    Write-CatalogLockFixture -Path $lockPath -RuleHash (Get-FileHash -LiteralPath $rulePath -Algorithm SHA256).Hash.ToLowerInvariant()
+
+    $output = @(Test-CatalogLockDeployedFiles -LockPath $lockPath -HomeDir $homeDir 6>&1)
+    ($output | Where-Object { $_ -is [System.Management.Automation.InformationRecord] } | Out-String) | Should -Match "listed=3 missing=0 changed=1"
+    @($output | Where-Object { $_ -is [string] }).Count | Should -Be 0
+
+    Move-Item -LiteralPath $rulePath -Destination (Join-Path $homeDir "rule.aside")
+    @(Test-CatalogLockDeployedFiles -LockPath $lockPath -HomeDir $homeDir 6>$null) | Should -Be @(".claude/rules/ai-collaboration.md")
   }
 }

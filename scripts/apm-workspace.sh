@@ -276,19 +276,31 @@ write_catalog_instructions_body() {
   rm -f "$body_path"
 }
 
-# Blob ids of every guide body the legacy sync could have copied into a root: each committed catalog/AGENTS.md
-# and the current instruction body. Outside a git checkout only the current body is known.
+# Blob ids of every guide body this workspace has written into a root: each committed catalog/AGENTS.md, the
+# rendered body of each committed instruction version, and the current body. Outside a git checkout only the
+# current body is known.
 legacy_catalog_instructions_blobs() {
-  catalog_instructions_body "$(tracked_catalog_instructions_path)" | git hash-object --stdin
-  { git -C "$WORKSPACE_DIR" log --all --format= --raw --no-abbrev -- "$CATALOG_DIR_NAME/AGENTS.md" 2>/dev/null || true; } |
-    awk 'NF >= 4 && $4 !~ /^0+$/ { print $4 }' | sort -u
+  instructions_relative_path="$CATALOG_DIR_NAME/.apm/instructions/$CATALOG_INSTRUCTIONS_FILE_NAME"
+  version_body=$(mktemp "${TMPDIR:-/tmp}/apm-instructions-version.XXXXXX")
+  {
+    catalog_instructions_body "$(tracked_catalog_instructions_path)" | git hash-object --stdin
+    { git -C "$WORKSPACE_DIR" log --all --format= --raw --no-abbrev -- "$CATALOG_DIR_NAME/AGENTS.md" 2>/dev/null || true; } |
+      awk 'NF >= 4 && $4 !~ /^0+$/ { print $4 }'
+    { git -C "$WORKSPACE_DIR" log --all --format= --raw --no-abbrev -- "$instructions_relative_path" 2>/dev/null || true; } |
+      awk 'NF >= 4 && $4 !~ /^0+$/ { print $4 }' | sort -u |
+      while IFS= read -r instruction_blob; do
+        git -C "$WORKSPACE_DIR" cat-file blob "$instruction_blob" >"$version_body" 2>/dev/null || continue
+        catalog_instructions_body "$version_body" | git hash-object --stdin
+      done
+  } | sort -u
+  rm -f "$version_body"
 }
 
 is_legacy_catalog_instructions_copy() {
   candidate_path="$1"
   known_blobs="$2"
   candidate_blob=$(git hash-object --no-filters -- "$candidate_path") || return 1
-  printf '%s\n' "$known_blobs" | grep -qxF -- "$candidate_blob"
+  grep -qxF -- "$candidate_blob" <<<"$known_blobs"
 }
 
 # Classifies a root context file: absent, not-regular, generated (written by apm compile), legacy (a byte copy
@@ -781,11 +793,20 @@ sync_pi_instructions() {
 
 # OpenCode reads ~/.config/opencode/AGENTS.md before falling back to ~/.claude/CLAUDE.md, which migrate:roots removes;
 # APM writes that file only for an opencode target, and listing opencode would also hand it the agents it rejects.
+# A hand-written ~/.claude/CLAUDE.md is what OpenCode reads today, so the guide must not displace it.
 sync_opencode_instructions() {
   [ -f "$(tracked_catalog_instructions_path)" ] || return 0
-  opencode_state=$(user_root_state "$OPENCODE_INSTRUCTIONS_OUTPUT" "$(legacy_catalog_instructions_blobs)")
+  known_blobs=$(legacy_catalog_instructions_blobs)
+  opencode_state=$(user_root_state "$OPENCODE_INSTRUCTIONS_OUTPUT" "$known_blobs")
   case "$opencode_state" in
-    absent | legacy) write_catalog_instructions_body "$OPENCODE_INSTRUCTIONS_OUTPUT" ;;
+    legacy) write_catalog_instructions_body "$OPENCODE_INSTRUCTIONS_OUTPUT" ;;
+    absent)
+      claude_state=$(user_root_state "$HOME/.claude/CLAUDE.md" "$known_blobs")
+      case "$claude_state" in
+        absent | legacy | generated) write_catalog_instructions_body "$OPENCODE_INSTRUCTIONS_OUTPUT" ;;
+        *) log "Not writing $OPENCODE_INSTRUCTIONS_OUTPUT: OpenCode falls back to $HOME/.claude/CLAUDE.md ($claude_state), which is not the catalog guide." ;;
+      esac
+      ;;
     *) warn "Leaving $OPENCODE_INSTRUCTIONS_OUTPUT as is ($opencode_state): it is not a copy of the catalog guide, so OpenCode reads it instead of the guide." ;;
   esac
 }
@@ -809,12 +830,26 @@ assert_user_roots_migrated() {
   [ -f "$(tracked_catalog_instructions_path)" ] || return 0
   claude_root="$HOME/.claude/CLAUDE.md"
   [ -f "$claude_root" ] || return 0
+  require_command git
   if is_legacy_catalog_instructions_copy "$claude_root" "$(legacy_catalog_instructions_blobs)"; then
+    if [ -L "$claude_root" ]; then
+      fail "Refusing to install catalog instructions: $claude_root is a symlink to a copy of the catalog guide, and APM would add the same guide under ~/.claude/rules, so Claude would load it twice. migrate:roots does not move symlinks: move the link aside by hand, then retry."
+    fi
     fail "Refusing to install catalog instructions: $claude_root is still the copy the legacy catalog sync wrote, and APM would add the same guide under ~/.claude/rules, so Claude would load it twice. Preview the move with 'mise run migrate:roots', then run 'mise run migrate:roots -- --apply'."
+  fi
+  # An edited copy, or one older than the git history at hand, is not a byte match but opens with the guide's title.
+  guide_title=$(awk '
+    NR == 1 && $0 == "---" { in_frontmatter = 1; next }
+    in_frontmatter { if ($0 == "---") in_frontmatter = 0; next }
+    NF { print; exit }
+  ' "$(tracked_catalog_instructions_path)")
+  if [ -n "$guide_title" ] && [ "$(awk 'NF { print; exit }' "$claude_root")" = "$guide_title" ]; then
+    fail "Refusing to install catalog instructions: $claude_root opens with the catalog guide's title ($guide_title) but matches no known version, so it is an edited or older copy. APM would add the guide under ~/.claude/rules and Claude would load it twice. migrate:roots does not move edited files: move $claude_root aside by hand (keep a .bak), or remove the guide from it, then retry."
   fi
 }
 
 cmd_migrate_roots() {
+  [ "${1:-}" != "--" ] || shift
   apply_mode=0
   case "${1:-}" in
     "") ;;
@@ -852,10 +887,17 @@ cmd_migrate_roots() {
     return 0
   fi
 
+  completed_moves=""
   while IFS='|' read -r root_path backup_path; do
     [ -n "$root_path" ] || continue
     if [ "$apply_mode" -eq 1 ]; then
-      mv -- "$root_path" "$backup_path"
+      if [ -e "$backup_path" ] || [ -L "$backup_path" ] || ! mv -n -- "$root_path" "$backup_path" ||
+        [ -e "$root_path" ] || [ ! -f "$backup_path" ]; then
+        [ -z "$completed_moves" ] || printf 'Already moved; roll back with:\n%s' "$completed_moves" >&2
+        fail "Could not move $root_path to $backup_path without overwriting; stopped."
+      fi
+      completed_moves="$completed_moves  mv '$backup_path' '$root_path'
+"
       log "Moved $root_path -> $backup_path"
     else
       log "Would move $root_path -> $backup_path"
@@ -3040,6 +3082,54 @@ cmd_prune_cache() {
   )
 }
 
+# Prints the catalog package's lock records, tab separated: "F<TAB>path" per deployed_files entry and
+# "H<TAB>path<TAB>sha256" per deployed_file_hashes entry. Paths are relative to $HOME for a user-scope lock.
+catalog_lock_deployed_entries() {
+  awk -v catalog="$CATALOG_DIR_NAME" '
+    /^- / || /^  [a-z_]+:/ {
+      if ($0 ~ /^- /) { name = ""; virtual_path = "" }
+      line = $0
+      sub(/^- /, "  ", line)
+      if (line ~ /^  name: /) name = substr(line, 9)
+      else if (line ~ /^  virtual_path: /) virtual_path = substr(line, 17)
+      mode = line ~ /^  deployed_files:$/ ? "files" : line ~ /^  deployed_file_hashes:$/ ? "hashes" : ""
+      next
+    }
+    /^[^ ]/ { mode = ""; next }
+    name != catalog || virtual_path != catalog { next }
+    mode == "files" && /^  - / { printf "F\t%s\n", substr($0, 5); next }
+    mode == "hashes" && /^    [^ ]/ {
+      record = substr($0, 5)
+      split_at = index(record, ": sha256:")
+      if (split_at) printf "H\t%s\t%s\n", substr(record, 1, split_at - 1), substr(record, split_at + 9)
+    }
+  ' "$1"
+}
+
+# The lock records what APM itself placed for the catalog; a listed path that is gone means the install was undone.
+check_catalog_lock_deployed_files() {
+  lock_file="$WORKSPACE_DIR/apm.lock.yaml"
+  [ -f "$lock_file" ] || return 0
+  listed_count=0
+  missing_count=0
+  changed_count=0
+  tab=$(printf '\t')
+  while IFS="$tab" read -r record_kind record_path record_hash; do
+    if [ "$record_kind" = F ]; then
+      listed_count=$((listed_count + 1))
+      if [ ! -e "$HOME/$record_path" ] && [ ! -L "$HOME/$record_path" ]; then
+        error "Catalog file recorded in apm.lock.yaml is missing: ~/$record_path"
+        missing_count=$((missing_count + 1))
+      fi
+    elif [ -f "$HOME/$record_path" ] && [ "$(sha256sum "$HOME/$record_path" | awk '{print $1}')" != "$record_hash" ]; then
+      changed_count=$((changed_count + 1))
+    fi
+  done < <(catalog_lock_deployed_entries "$lock_file")
+  # changed counts files the skill sync replaced with the working catalog or a private override, which is expected.
+  printf 'catalog lock files: listed=%s missing=%s changed=%s\n' "$listed_count" "$missing_count" "$changed_count"
+  [ "$missing_count" -eq 0 ]
+}
+
 report_dependency_state() {
   local dependency_output normalized
   if dependency_output=$(NO_COLOR=1 COLUMNS=4096 apm deps list -g 2>&1); then
@@ -3132,6 +3222,9 @@ cmd_doctor() {
         has_failure=1
       elif [ "$config_state" = legacy ]; then
         warn "$target_root/$RT_CONFIG_NAME is still the copy the legacy catalog sync wrote; preview its move with 'mise run migrate:roots'"
+      elif [ "$RT_TARGET_NAME" = claude ] && [ "$config_state" = absent ] && [ -f "$(tracked_catalog_instructions_path)" ] &&
+        [ ! -f "$target_root/rules/${CATALOG_INSTRUCTIONS_FILE_NAME%.instructions.md}.md" ]; then
+        warn "Claude has neither $target_root/$RT_CONFIG_NAME nor the guide rule $target_root/rules/${CATALOG_INSTRUCTIONS_FILE_NAME%.instructions.md}.md; run 'mise run install:catalog'"
       fi
       if [ -d "$tracked_agents_root" ] && [ "$RT_AGENTS_FACE" != "-" ] && [ ! -d "$target_root/agents" ]; then
         error "Required catalog output is missing or has wrong type (directory): $target_root/agents"
@@ -3170,6 +3263,7 @@ cmd_doctor() {
       fi
     done < <(managed_catalog_runtime_targets)
     printf 'opencode instructions: %s\n' "$(user_root_state "$OPENCODE_INSTRUCTIONS_OUTPUT" "$known_instruction_blobs")"
+    check_catalog_lock_deployed_files || has_failure=1
     printf 'codex mcp config: %s\n' "$(test -f "$codex_mcp_config" && printf present || printf missing)"
     printf 'target skill inventory: entries=%s\n' "$(awk 'NF { count++ } END { print count + 0 }' "$inventory_file")"
     rm -f "$inventory_file"

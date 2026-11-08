@@ -456,9 +456,23 @@ function Sync-OpencodeInstructions {
   if (-not (Test-Path -LiteralPath (Get-TrackedCatalogInstructionsPath) -PathType Leaf)) {
     return
   }
-  $state = Get-UserRootState -Path $OpencodeInstructionsOutput -KnownBlobs (Get-LegacyCatalogInstructionsBlobs)
-  if ($state -eq "absent" -or $state -eq "legacy") {
+  $knownBlobs = Get-LegacyCatalogInstructionsBlobs
+  $state = Get-UserRootState -Path $OpencodeInstructionsOutput -KnownBlobs $knownBlobs
+  if ($state -eq "legacy") {
     Write-CatalogInstructionsBody -DestinationPath $OpencodeInstructionsOutput
+    return
+  }
+  if ($state -eq "absent") {
+    # A hand-written ~/.claude/CLAUDE.md is what OpenCode reads today, so the guide must not displace it.
+    $claudeTarget = Get-UserRootTargets | Where-Object Name -eq "claude" | Select-Object -First 1
+    $claudeRoot = Join-Path $claudeTarget.Root $claudeTarget.ConfigName
+    $claudeState = Get-UserRootState -Path $claudeRoot -KnownBlobs $knownBlobs
+    if ($claudeState -in @("absent", "legacy", "generated")) {
+      Write-CatalogInstructionsBody -DestinationPath $OpencodeInstructionsOutput
+    }
+    else {
+      Write-Host ("Not writing {0}: OpenCode falls back to {1} ({2}), which is not the catalog guide." -f $OpencodeInstructionsOutput, $claudeRoot, $claudeState)
+    }
     return
   }
   Write-WarnLine ("Leaving {0} as is ({1}): it is not a copy of the catalog guide, so OpenCode reads it instead of the guide." -f $OpencodeInstructionsOutput, $state)
@@ -493,14 +507,25 @@ function Assert-UserRootsMigrated {
   if (-not (Test-Path -LiteralPath $claudeRoot -PathType Leaf)) {
     return
   }
+  Require-Command -Name git
   if (Test-LegacyCatalogInstructionsCopy -Path $claudeRoot -KnownBlobs (Get-LegacyCatalogInstructionsBlobs)) {
+    if ((Get-Item -LiteralPath $claudeRoot -Force).LinkType) {
+      throw ("Refusing to install catalog instructions: {0} is a symlink to a copy of the catalog guide, and APM would add the same guide under ~/.claude/rules, so Claude would load it twice. migrate:roots does not move symlinks: move the link aside by hand, then retry." -f $claudeRoot)
+    }
     throw ("Refusing to install catalog instructions: {0} is still the copy the legacy catalog sync wrote, and APM would add the same guide under ~/.claude/rules, so Claude would load it twice. Preview the move with 'mise run migrate:roots', then run 'mise run migrate:roots -- --apply'." -f $claudeRoot)
+  }
+  # An edited copy, or one older than the git history at hand, is not a byte match but opens with the guide's title.
+  $guideTitle = (Get-CatalogInstructionsBody -Path (Get-TrackedCatalogInstructionsPath)) -split "`n" | Where-Object { $_.Trim() -ne "" } | Select-Object -First 1
+  $rootTitle = Get-Content -LiteralPath $claudeRoot -Encoding UTF8 | Where-Object { $_.Trim() -ne "" } | Select-Object -First 1
+  if ($guideTitle -and $rootTitle -ceq $guideTitle) {
+    throw ("Refusing to install catalog instructions: {0} opens with the catalog guide's title ({1}) but matches no known version, so it is an edited or older copy. APM would add the guide under ~/.claude/rules and Claude would load it twice. migrate:roots does not move edited files: move {0} aside by hand (keep a .bak), or remove the guide from it, then retry." -f $claudeRoot, $guideTitle)
   }
 }
 
 function Invoke-MigrateRoots {
   param([string[]]$Arguments = @())
 
+  if ($Arguments.Count -gt 0 -and $Arguments[0] -ceq "--") { $Arguments = @($Arguments | Select-Object -Skip 1) }
   $applyMode = $false
   if ($Arguments.Count -gt 1 -or ($Arguments.Count -eq 1 -and $Arguments[0] -cne "--apply")) {
     throw "usage: migrate:roots [--apply]"
@@ -537,9 +562,21 @@ function Invoke-MigrateRoots {
     return
   }
 
+  $completedMoves = New-Object System.Collections.Generic.List[object]
   foreach ($move in $plannedMoves) {
     if ($applyMode) {
-      Move-Item -LiteralPath $move.Root -Destination $move.Backup
+      try {
+        if ($null -ne (Get-Item -LiteralPath $move.Backup -Force -ErrorAction SilentlyContinue)) { throw "backup path appeared" }
+        Move-Item -LiteralPath $move.Root -Destination $move.Backup -ErrorAction Stop
+      }
+      catch {
+        if ($completedMoves.Count -gt 0) {
+          Write-Host "Already moved; roll back with:"
+          foreach ($done in $completedMoves) { Write-Host ("  Move-Item -LiteralPath '{0}' -Destination '{1}' -Force" -f $done.Backup, $done.Root) }
+        }
+        throw ("Could not move {0} to {1} without overwriting; stopped." -f $move.Root, $move.Backup)
+      }
+      $completedMoves.Add($move)
       Write-Host ("Moved {0} -> {1}" -f $move.Root, $move.Backup)
     }
     else {
@@ -2883,6 +2920,26 @@ function Get-LegacyCatalogInstructionsBlobs {
       if ($fields.Count -ge 4 -and $fields[3] -notmatch '\A0+\z') { [void]$blobs.Add($fields[3]) }
     }
   }
+  $instructionLines = & git -C $WorkspaceDir log --all --format= --raw --no-abbrev -- "$CatalogDirName/.apm/instructions/$CatalogInstructionsFileName" 2>$null
+  if ($LASTEXITCODE -eq 0) {
+    $versionPath = [System.IO.Path]::GetTempFileName()
+    $renderedPath = [System.IO.Path]::GetTempFileName()
+    try {
+      foreach ($rawLine in @($instructionLines | Select-Object -Unique)) {
+        $fields = ([string]$rawLine) -split '\s+'
+        if ($fields.Count -lt 4 -or $fields[3] -match '\A0+\z') { continue }
+        $versionText = & git -C $WorkspaceDir cat-file blob $fields[3] 2>$null
+        if ($LASTEXITCODE -ne 0) { continue }
+        [System.IO.File]::WriteAllText($versionPath, ((@($versionText) -join "`n") + "`n"), (New-Object System.Text.UTF8Encoding $false))
+        [System.IO.File]::WriteAllText($renderedPath, (Get-CatalogInstructionsBody -Path $versionPath), (New-Object System.Text.UTF8Encoding $false))
+        $versionBlob = Get-GitBlobId -Path $renderedPath
+        if ($versionBlob) { [void]$blobs.Add($versionBlob) }
+      }
+    }
+    finally {
+      Remove-Item -LiteralPath $versionPath, $renderedPath -Force -ErrorAction SilentlyContinue
+    }
+  }
   return , $blobs
 }
 
@@ -4157,6 +4214,12 @@ function Invoke-Doctor {
     elseif ($configState -eq "legacy") {
       Write-WarnLine ("{0} is still the copy the legacy catalog sync wrote; preview its move with 'mise run migrate:roots'" -f $configPath)
     }
+    elseif ($target.Name -eq "claude" -and $configState -eq "absent" -and (Test-Path -LiteralPath (Get-TrackedCatalogInstructionsPath) -PathType Leaf)) {
+      $guideRulePath = Join-Path $rulesPath ($CatalogInstructionsFileName -replace '\.instructions\.md\z', '.md')
+      if (-not (Test-Path -LiteralPath $guideRulePath -PathType Leaf)) {
+        Write-WarnLine ("Claude has neither {0} nor the guide rule {1}; run 'mise run install:catalog'" -f $configPath, $guideRulePath)
+      }
+    }
     if ($hasAgentsFace -and (Test-Path -LiteralPath $trackedAgentsRoot -PathType Container) -and -not (Test-Path -LiteralPath $agentsPath -PathType Container)) {
       $diagnostics.Add("Required catalog output is missing or has wrong type (directory): $agentsPath")
     }
@@ -4187,6 +4250,9 @@ function Invoke-Doctor {
     }
   }
   Write-Host ("opencode instructions: {0}" -f (Get-UserRootState -Path $OpencodeInstructionsOutput -KnownBlobs $knownInstructionBlobs))
+  foreach ($missingPath in @(Test-CatalogLockDeployedFiles -LockPath (Join-Path $WorkspaceDir "apm.lock.yaml") -HomeDir $HOME)) {
+    $diagnostics.Add("Catalog file recorded in apm.lock.yaml is missing: ~/$missingPath")
+  }
   Write-Host ("codex mcp config: {0}" -f $(if (Test-Path $codexMcpConfigPath) { "present" } else { "missing" }))
   Write-Host ("target skill inventory: entries={0}" -f $skillInventory.Count)
   Write-Host ("external pins: unpinned={0}" -f (@(Get-UnpinnedExternalReferences)).Count)
@@ -4201,6 +4267,62 @@ function Invoke-Doctor {
   if ($diagnostics.Count -gt 0) {
     throw ($diagnostics -join "`n")
   }
+}
+
+# The catalog package's lock records: Kind F per deployed_files entry and Kind H (with Hash) per
+# deployed_file_hashes entry. Paths are relative to the home directory for a user-scope lock.
+function Get-CatalogLockDeployedEntries {
+  param([Parameter(Mandatory = $true)][string]$LockPath)
+
+  $entries = New-Object System.Collections.Generic.List[object]
+  $name = ""
+  $virtualPath = ""
+  $mode = ""
+  foreach ($rawLine in [System.IO.File]::ReadAllLines($LockPath)) {
+    if ($rawLine -match '\A- ' -or $rawLine -match '\A  [a-z_]+:') {
+      if ($rawLine -match '\A- ') { $name = ""; $virtualPath = "" }
+      $line = $rawLine -replace '\A- ', '  '
+      if ($line -match '\A  name: (.*)\z') { $name = $Matches[1] }
+      elseif ($line -match '\A  virtual_path: (.*)\z') { $virtualPath = $Matches[1] }
+      $mode = if ($line -ceq '  deployed_files:') { "files" } elseif ($line -ceq '  deployed_file_hashes:') { "hashes" } else { "" }
+      continue
+    }
+    if ($rawLine -match '\A[^ ]') { $mode = ""; continue }
+    if ($name -cne $CatalogDirName -or $virtualPath -cne $CatalogDirName) { continue }
+    if ($mode -eq "files" -and $rawLine -match '\A  - (.*)\z') {
+      $entries.Add([pscustomobject]@{ Kind = "F"; Path = $Matches[1]; Hash = $null })
+    }
+    elseif ($mode -eq "hashes" -and $rawLine -match '\A    (.+): sha256:([0-9a-f]+)\z') {
+      $entries.Add([pscustomobject]@{ Kind = "H"; Path = $Matches[1]; Hash = $Matches[2] })
+    }
+  }
+  return , $entries
+}
+
+# The lock records what APM itself placed for the catalog; a listed path that is gone means the install was undone.
+# changed counts files the skill sync replaced with the working catalog or a private override, which is expected.
+function Test-CatalogLockDeployedFiles {
+  param(
+    [Parameter(Mandatory = $true)][string]$LockPath,
+    [Parameter(Mandatory = $true)][string]$HomeDir
+  )
+
+  if (-not (Test-Path -LiteralPath $LockPath -PathType Leaf)) { return @() }
+  $missing = New-Object System.Collections.Generic.List[string]
+  $listedCount = 0
+  $changedCount = 0
+  foreach ($entry in (Get-CatalogLockDeployedEntries -LockPath $LockPath)) {
+    $fullPath = Join-Path $HomeDir $entry.Path
+    if ($entry.Kind -eq "F") {
+      $listedCount++
+      if ($null -eq (Get-Item -LiteralPath $fullPath -Force -ErrorAction SilentlyContinue)) { $missing.Add($entry.Path) }
+    }
+    elseif ((Test-Path -LiteralPath $fullPath -PathType Leaf) -and ((Get-FileHash -LiteralPath $fullPath -Algorithm SHA256).Hash -ne $entry.Hash.ToUpperInvariant())) {
+      $changedCount++
+    }
+  }
+  Write-Host ("catalog lock files: listed={0} missing={1} changed={2}" -f $listedCount, $missing.Count, $changedCount)
+  return @($missing)
 }
 
 function Get-InternalDeployTargetRoots {

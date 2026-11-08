@@ -3891,6 +3891,19 @@ home_tree_listing() {
   rm -rf "$roots_workspace" "$roots_home"
 }
 
+@test "assert_user_roots_migrated also refuses an edited or history-less older copy that keeps the guide's title" {
+  make_roots_fixture
+  # No git checkout, so the only known version is the current body; this stands for an older or edited copy.
+  printf '# Guide\n\nan older body line\nmy own addition\n' >"$roots_home/.claude/CLAUDE.md"
+
+  run assert_user_roots_migrated
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"opens with the catalog guide's title (# Guide) but matches no known version"* ]]
+  [ "$(cat "$roots_home/.claude/CLAUDE.md")" = "$(printf '# Guide\n\nan older body line\nmy own addition')" ]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
 @test "sync_opencode_instructions writes the body when absent or a legacy copy, and leaves a hand-written file" {
   make_roots_fixture
 
@@ -4033,4 +4046,137 @@ home_tree_listing() {
   [ "$status" -eq 0 ]
   [[ "$output" == *"Would move $roots_home/.claude/CLAUDE.md -> "* ]]
   rm -rf "$roots_workspace" "$roots_home"
+}
+
+write_catalog_lock_fixture() {
+  cat >"$1" <<'LOCK'
+lockfile_version: '2'
+dependencies:
+- repo_url: other/repo
+  name: catalog-lookalike
+  virtual_path: skills/other
+  deployed_files:
+  - .agents/skills/other/SKILL.md
+- repo_url: jey3dayo/apm-workspace
+  name: catalog
+  virtual_path: catalog
+  package_type: apm_package
+  deployed_files:
+  - .agents/skills/demo
+  - .agents/skills/demo/SKILL.md
+  - .claude/rules/ai-collaboration.md
+  deployed_file_hashes:
+    .agents/skills/demo/SKILL.md: sha256:c0ffee
+    .claude/rules/ai-collaboration.md: sha256:RULEHASH
+- repo_url: jey3dayo/apm-workspace
+  name: manual-skills
+  virtual_path: manual-skills
+  deployed_files:
+  - .agents/skills/manual/SKILL.md
+LOCK
+}
+
+@test "catalog_lock_deployed_entries reads only the catalog package's deployed files and hashes" {
+  lock_dir="$(mktemp -d)"
+  write_catalog_lock_fixture "$lock_dir/apm.lock.yaml"
+
+  run catalog_lock_deployed_entries "$lock_dir/apm.lock.yaml"
+
+  [ "$status" -eq 0 ]
+  [ "$output" = "$(printf 'F\t.agents/skills/demo\nF\t.agents/skills/demo/SKILL.md\nF\t.claude/rules/ai-collaboration.md\nH\t.agents/skills/demo/SKILL.md\tc0ffee\nH\t.claude/rules/ai-collaboration.md\tRULEHASH')" ]
+  rm -rf "$lock_dir"
+}
+
+@test "check_catalog_lock_deployed_files fails for a recorded file that is gone and only counts a changed one" {
+  WORKSPACE_DIR="$(mktemp -d)"
+  HOME="$(mktemp -d)"
+  write_catalog_lock_fixture "$WORKSPACE_DIR/apm.lock.yaml"
+  mkdir -p "$HOME/.agents/skills/demo" "$HOME/.claude/rules"
+  printf 'edited\n' >"$HOME/.agents/skills/demo/SKILL.md"
+  printf 'rule\n' >"$HOME/.claude/rules/ai-collaboration.md"
+  rule_hash=$(sha256sum "$HOME/.claude/rules/ai-collaboration.md" | awk '{print $1}')
+  sed -i.orig "s/RULEHASH/$rule_hash/" "$WORKSPACE_DIR/apm.lock.yaml"
+
+  run check_catalog_lock_deployed_files
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"catalog lock files: listed=3 missing=0 changed=1"* ]]
+
+  mv "$HOME/.claude/rules/ai-collaboration.md" "$HOME/rule.aside"
+  run check_catalog_lock_deployed_files
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"Catalog file recorded in apm.lock.yaml is missing: ~/.claude/rules/ai-collaboration.md"* ]]
+  [[ "$output" == *"listed=3 missing=1 changed=1"* ]]
+  rm -rf "$WORKSPACE_DIR" "$HOME"
+}
+
+commit_instruction_version() {
+  printf -- '---\ndescription: fixture guide\n---\n\n%s\n' "$2" \
+    >"$1/catalog/.apm/instructions/ai-collaboration.instructions.md"
+  git -C "$1" add catalog/.apm/instructions/ai-collaboration.instructions.md
+  git -C "$1" -c user.name=t -c user.email=t@example.invalid commit -q -m "$2"
+}
+
+@test "sync_opencode_instructions keeps updating a copy written from an earlier committed instruction version" {
+  make_roots_fixture
+  git -C "$roots_workspace" init -q
+  commit_instruction_version "$roots_workspace" "# Guide v2"
+  commit_instruction_version "$roots_workspace" "# Guide v3"
+  mkdir -p "${OPENCODE_INSTRUCTIONS_OUTPUT%/*}"
+  printf '# Guide v2\n' >"$OPENCODE_INSTRUCTIONS_OUTPUT"
+
+  [ "$(user_root_state "$OPENCODE_INSTRUCTIONS_OUTPUT" "$(legacy_catalog_instructions_blobs)")" = legacy ]
+  run sync_opencode_instructions
+
+  [ "$status" -eq 0 ]
+  [ "$(cat "$OPENCODE_INSTRUCTIONS_OUTPUT")" = "# Guide v3" ]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "sync_opencode_instructions does not displace a hand-written ~/.claude/CLAUDE.md that OpenCode falls back to" {
+  make_roots_fixture
+  printf 'my own claude rules\n' >"$roots_home/.claude/CLAUDE.md"
+
+  run sync_opencode_instructions
+
+  [ "$status" -eq 0 ]
+  [ ! -e "$OPENCODE_INSTRUCTIONS_OUTPUT" ]
+  [[ "$output" == *"Not writing $OPENCODE_INSTRUCTIONS_OUTPUT: OpenCode falls back to $roots_home/.claude/CLAUDE.md (hand-written)"* ]]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "migrate:roots accepts the -- that mise run forwards before --apply" {
+  make_roots_fixture
+  cp "$roots_home/guide-body.md" "$roots_home/.codex/AGENTS.md"
+
+  run cmd_migrate_roots -- --apply
+
+  [ "$status" -eq 0 ]
+  [ ! -e "$roots_home/.codex/AGENTS.md" ]
+  [ -n "$(find "$roots_home/.codex" -name 'AGENTS.md.*.bak')" ]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "install:catalog and refresh run the double-load guard before APM touches the user scope" {
+  require_apm() { :; }
+  ensure_workspace_repo() { :; }
+  ensure_workspace_scaffold() { :; }
+  ensure_workspace_mise_file() { :; }
+  refresh_workspace_checkout() { :; }
+  assert_tracked_catalog_published() { :; }
+  cmd_validate_catalog() { :; }
+  managed_skill_ids() { :; }
+  internal_cleanup_skill_ids() { :; }
+  assert_user_roots_migrated() { fail "guard stopped it"; }
+  register_catalog_dependency() { echo "registered"; }
+  apm() { echo "apm $*"; }
+
+  run cmd_register_catalog
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"guard stopped it"* ]]
+  [[ "$output" != *"registered"* ]]
+
+  run cmd_update
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"guard stopped it"* ]]
+  [[ "$output" != *"apm deps update"* ]]
 }
