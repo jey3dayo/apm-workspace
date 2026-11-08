@@ -2562,6 +2562,127 @@ make_catalog_fixture() {
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
+@test "cmd_stage_catalog refuses and keeps a file under .apm/skills that no skill encloses" {
+  make_stageable_catalog_fixture
+  mkdir -p "$workspace_dir/catalog/.apm/skills/draft"
+  printf 'draft notes\n' >"$workspace_dir/catalog/.apm/skills/draft/notes.md"
+
+  run cmd_stage_catalog
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"catalog/.apm holds skills/draft/notes.md"* ]]
+  [ "$(cat "$workspace_dir/catalog/.apm/skills/draft/notes.md")" = "draft notes" ]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "catalog_apm_dir_claim_message names a file directly under .apm/skills" {
+  make_catalog_fixture 2 2
+  printf 'readme\n' >"$workspace_dir/catalog/.apm/skills/README.md"
+
+  run catalog_apm_dir_claim_message
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"catalog/.apm holds skills/README.md"* ]]
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "catalog_apm_dir_claim_message names a file in a namespace directory that is not itself a skill" {
+  make_catalog_fixture 2 2
+  mkdir -p "$workspace_dir/catalog/.apm/skills/ns/inner"
+  : >"$workspace_dir/catalog/.apm/skills/ns/inner/SKILL.md"
+  printf 'loose\n' >"$workspace_dir/catalog/.apm/skills/ns/notes.md"
+
+  run catalog_apm_dir_claim_message
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"catalog/.apm holds skills/ns/notes.md"* ]]
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "cmd_stage_catalog keeps nested skill files and files inside a skill's subdirectories" {
+  make_stageable_catalog_fixture
+  mkdir -p "$workspace_dir/catalog/.apm/skills/skill-0/references" "$workspace_dir/catalog/.apm/skills/ns/inner/scripts"
+  printf 'ref\n' >"$workspace_dir/catalog/.apm/skills/skill-0/references/guide.md"
+  : >"$workspace_dir/catalog/.apm/skills/ns/inner/SKILL.md"
+  printf 'run\n' >"$workspace_dir/catalog/.apm/skills/ns/inner/scripts/run.sh"
+
+  run cmd_stage_catalog
+
+  [ "$status" -eq 0 ]
+  [ "$(cat "$workspace_dir/catalog/.apm/skills/skill-0/references/guide.md")" = "ref" ]
+  [ "$(cat "$workspace_dir/catalog/.apm/skills/ns/inner/scripts/run.sh")" = "run" ]
+  [ -z "$(catalog_apm_dir_claim_message)" ]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "catalog_apm_dir_claim_message names a symlink inside a skill directory" {
+  make_catalog_fixture 2 2
+  printf 'outside\n' >"$workspace_dir/outside-reference.md"
+  ln -s "$workspace_dir/outside-reference.md" "$workspace_dir/catalog/.apm/skills/skill-0/link.md"
+
+  run catalog_apm_dir_claim_message
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"catalog/.apm holds skills/skill-0/link.md, but only"* ]]
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "catalog_apm_dir_claim_message refuses a name with a newline that would pose as SKILL.md" {
+  make_catalog_fixture 2 2
+  mkdir -p "$workspace_dir/catalog/.apm/skills/draft"
+  : >"$workspace_dir/catalog/.apm/skills/draft/SKILL.md"$'\n'"decoy" || skip "this filesystem rejects a newline in a file name"
+  printf 'draft notes\n' >"$workspace_dir/catalog/.apm/skills/draft/notes.md"
+
+  run catalog_apm_dir_claim_message
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"catalog/.apm holds an entry whose name contains a newline"* ]]
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "catalog_apm_dir_claim_message names an agent file that is not <name>.agent.md" {
+  make_catalog_fixture 2 2
+  printf 'legacy\n' >"$workspace_dir/catalog/.apm/agents/legacy-name.md"
+
+  run catalog_apm_dir_claim_message
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"catalog/.apm holds agents/legacy-name.md"* ]]
+  [[ "$output" == *"<name>.agent.md"* ]]
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "catalog_apm_dir_claim_message names an agent nested below .apm/agents" {
+  make_catalog_fixture 2 2
+  mkdir -p "$workspace_dir/catalog/.apm/agents/team"
+  printf 'nested\n' >"$workspace_dir/catalog/.apm/agents/team/helper.agent.md"
+
+  run catalog_apm_dir_claim_message
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"catalog/.apm holds agents/team/helper.agent.md"* ]]
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "assert_catalog_stage_safety refuses a catalog whose .apm holds a directory it cannot read" {
+  [ "$(id -u)" -ne 0 ] || skip "root reads a directory without read permission"
+  make_catalog_fixture 2 2
+  mkdir -p "$workspace_dir/catalog/.apm/instructions"
+  printf 'hidden\n' >"$workspace_dir/catalog/.apm/instructions/a.instructions.md"
+  chmod 000 "$workspace_dir/catalog/.apm/instructions"
+
+  run assert_catalog_stage_safety 0
+
+  chmod 755 "$workspace_dir/catalog/.apm/instructions"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"catalog/.apm could not be fully read"* ]]
+  [ "$(cat "$workspace_dir/catalog/.apm/instructions/a.instructions.md")" = "hidden" ]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
 @test "assert_catalog_stage_safety allows a tracked catalog whose .apm holds only skills and agents" {
   make_catalog_fixture 2 2
   [ -f "$workspace_dir/catalog/.apm/skills/skill-0/SKILL.md" ]
@@ -3512,6 +3633,51 @@ run_catalog_agents_apply() {
   [ "$status" -ne 0 ]
   [[ "$output" == *"target is a directory: $AGENTS_APPLY_HOME/.claude/agents/sample.md"* ]]
   [ -z "$(ls -A "$AGENTS_APPLY_BASE/elsewhere")" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply fails before placing anything when a catalog agent's target is a symlink with different content" {
+  make_catalog_agents_apply_fixture
+  mkdir -p "$AGENTS_APPLY_BASE/dotfiles" "$AGENTS_APPLY_HOME/.cursor/agents"
+  printf 'user dotfile version\n' >"$AGENTS_APPLY_BASE/dotfiles/sample.md"
+  ln -s "$AGENTS_APPLY_BASE/dotfiles/sample.md" "$AGENTS_APPLY_HOME/.cursor/agents/sample.md"
+
+  run run_catalog_agents_apply
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"target is a symlink whose content differs from the catalog: $AGENTS_APPLY_HOME/.cursor/agents/sample.md"* ]]
+  [ -L "$AGENTS_APPLY_HOME/.cursor/agents/sample.md" ]
+  [ "$(cat "$AGENTS_APPLY_BASE/dotfiles/sample.md")" = "user dotfile version" ]
+  [ ! -e "$AGENTS_APPLY_HOME/.claude/agents/sample.md" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply fails when a catalog agent's target is a dangling symlink" {
+  make_catalog_agents_apply_fixture
+  mkdir -p "$AGENTS_APPLY_HOME/.claude/agents"
+  ln -s "$AGENTS_APPLY_BASE/missing.md" "$AGENTS_APPLY_HOME/.claude/agents/sample.md"
+
+  run run_catalog_agents_apply
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"target is a symlink whose content differs from the catalog: $AGENTS_APPLY_HOME/.claude/agents/sample.md"* ]]
+  [ -L "$AGENTS_APPLY_HOME/.claude/agents/sample.md" ]
+  [ ! -e "$AGENTS_APPLY_BASE/missing.md" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply keeps a catalog agent's target symlink whose content already matches" {
+  make_catalog_agents_apply_fixture
+  mkdir -p "$AGENTS_APPLY_BASE/dotfiles" "$AGENTS_APPLY_HOME/.claude/agents"
+  cp "$AGENTS_APPLY_WORKSPACE_DIR/catalog/.apm/agents/sample.agent.md" "$AGENTS_APPLY_BASE/dotfiles/sample.md"
+  ln -s "$AGENTS_APPLY_BASE/dotfiles/sample.md" "$AGENTS_APPLY_HOME/.claude/agents/sample.md"
+
+  run run_catalog_agents_apply
+
+  [ "$status" -eq 0 ]
+  [ -L "$AGENTS_APPLY_HOME/.claude/agents/sample.md" ]
+  [[ "$output" != *"Updated agent: $AGENTS_APPLY_HOME/.claude/agents/sample.md"* ]]
+  cmp -s "$AGENTS_APPLY_WORKSPACE_DIR/catalog/.apm/agents/sample.agent.md" "$AGENTS_APPLY_HOME/.cursor/agents/sample.md"
   rm -rf "$AGENTS_APPLY_BASE"
 }
 
