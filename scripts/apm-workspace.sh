@@ -262,7 +262,10 @@ tracked_catalog_relative_path() {
 # there, and APM installs .apm/agents/** whatever the package type while the legacy sync still rewrites
 # the same targets. Prints a message when catalog/.apm holds something other than the placeholder.
 catalog_apm_dir_claim_message() {
-  claimed_entry=$(relative_file_list "$(tracked_catalog_dir)/.apm" | awk 'NF && $0 != ".gitkeep" { print; exit }')
+  apm_dir="$(tracked_catalog_dir)/.apm"
+  [ -d "$apm_dir" ] || return 0
+
+  claimed_entry=$(cd "$apm_dir" && find . -mindepth 1 \( -type f -o -type l \) ! \( -path ./.gitkeep -type f \) | sed 's#^\./##' | sort | sed -n 1p)
   [ -n "$claimed_entry" ] || return 0
 
   printf 'catalog/.apm holds %s, but the legacy catalog sync still owns every primitive: prepare:catalog would delete it and APM would install it alongside the sync output. Move a primitive into catalog/.apm only in the change that retires its legacy writer.\n' "$claimed_entry"
