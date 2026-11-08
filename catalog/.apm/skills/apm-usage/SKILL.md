@@ -17,7 +17,7 @@ Route `~/.apm` work by ownership first, then choose the smallest task that match
 ## Ownership
 
 - Edit `~/.apm/.apm/skills/**` for skills that operate only on this APM workspace.
-- Edit `~/.apm/catalog/skills/**` for personal skills that should be available
+- Edit `~/.apm/catalog/.apm/skills/**` for personal skills that should be available
   in the global automatic rollout.
 - Edit `~/.apm/catalog/{AGENTS.md,agents/**,commands/**,rules/**}` for shared guidance. When creating or changing an agent definition, read the model-assignment rules in `orchestrator-worker` first: an agent whose judgement drives a production change, an approval, or a rejection carries no `model:` and inherits the parent's.
 - Edit `~/.apm/optional-skills/<id>/**` for skills that should be tracked
@@ -63,7 +63,7 @@ before installing or creating a skill.
 | `workspace-only`    | APM workspace operations only                                        | `.apm/skills/<id>/`                | Local `.claude/skills/<id>` and `.agents/skills/<id>` bridges                                |
 | `repository-local`  | One repository's runtime, credentials, framework, or workflow        | Target repository's `apm.yml`      | `apm install <package-ref>` in that repository                                               |
 | `optional`          | Workspace-owned skill used by selected repositories                  | `optional-skills/<id>/`            | Direct `apm install jey3dayo/apm-workspace/optional-skills/<id>#main`                        |
-| `global-catalog`    | Personal cross-repository workflow                                   | `catalog/skills/<id>/`             | Global automatic rollout                                                                     |
+| `global-catalog`    | Personal cross-repository workflow                                   | `catalog/.apm/skills/<id>/`        | Global automatic rollout                                                                     |
 | `global-dependency` | External cross-repository foundation                                 | Root `apm.yml` and `apm.lock.yaml` | `apm install -g <package-ref>`                                                               |
 | `private`           | Machine-local overlay (gitignored here, tracked in the private repo) | `private-skills/.apm/skills/<id>/` | `mise run deploy` (same apply stage as the catalog); `apply:skills:local` for a fast refresh |
 | `manual`            | Upstream package that cannot use the managed lane                    | `manual-skills/.apm/skills/<id>/`  | Manual-skills package rollout                                                                |
@@ -107,7 +107,7 @@ Verification section of `~/.apm/AGENTS.md`.
 
 Use `manual-skills/.apm/skills/<id>/` only for upstream skills that do not install or deploy cleanly through the normal managed lane because of symlinks, packaging quirks, missing bundled files, or incompatible upstream layout. Record the reason and provenance under `manual-skills/upstreams/**`.
 
-If a manual skill becomes a workspace-owned skill that will be tuned over time, migrate it into `catalog/skills/<id>/`.
+If a manual skill becomes a workspace-owned skill that will be tuned over time, migrate it into `catalog/.apm/skills/<id>/`.
 
 ## Migration Gate
 
@@ -152,11 +152,11 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
 - If the request is "change a workspace-only skill", edit `.apm/skills/**`.
   Keep its bridge entries as symlinks to that source; do not add it to the
   global catalog or root manifest.
-- If the request is "change a personal skill", edit `catalog/skills/**`; use `writing-for-agents` for new or migrated managed skills.
+- If the request is "change a personal skill", edit `catalog/.apm/skills/**`; use `writing-for-agents` for new or migrated managed skills.
 - If the request is "make a skill repository-specific", edit
   `optional-skills/<id>/**` and keep the skill out of the root `apm.yml`.
-- If the request is "optimize" or "customize" a cross-repository skill for this workspace, treat it as personal skill work and prefer `catalog/skills/<id>/`.
-- If the request is to preserve a reusable implementation judgment from real work, such as "Valibot belongs in schemas", "Result conversion belongs at a boundary", or "DB access belongs in repositories", encode it as a concern -> owner candidates -> caller rule table in the relevant personal skill under `catalog/skills/<id>/`.
+- If the request is "optimize" or "customize" a cross-repository skill for this workspace, treat it as personal skill work and prefer `catalog/.apm/skills/<id>/`.
+- If the request is to preserve a reusable implementation judgment from real work, such as "Valibot belongs in schemas", "Result conversion belongs at a boundary", or "DB access belongs in repositories", encode it as a concern -> owner candidates -> caller rule table in the relevant personal skill under `catalog/.apm/skills/<id>/`.
 - If the user does not specify the target skill id for that reusable judgment, inspect named skills, catalog triggers, and existing examples first; update the closest existing personal skill instead of creating a new skill by default.
 - If the request is "change shared guidance", edit `catalog/**`; use `prepare:catalog` before publish/install.
 - If the request is "change dependency selection", edit or review `apm.yml` / `apm.lock.yaml`, writing entries per `references/manifest-style.md`.
@@ -213,15 +213,15 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
 - Do not pin a self-referencing repo-local skill to a SHA without making the pin
   bump part of the repository's documented change flow. A stale pin fails
   silently — no warning, no drift, old content deployed.
-- Do not manage the same skill in both `catalog/skills/**` and `manual-skills/.apm/skills/**`.
-- Do not manage the same skill in both `catalog/skills/**` and `optional-skills/<id>/**`.
+- Do not manage the same skill in both `catalog/.apm/skills/**` and `manual-skills/.apm/skills/**`.
+- Do not manage the same skill in both `catalog/.apm/skills/**` and `optional-skills/<id>/**`.
 - Do not manage the same skill in `.apm/skills/**` and any global or optional
   skill lane.
 - Do not add the `optional-skills` collection root to the root `apm.yml`; install individual skill refs only in consuming repositories.
-- Do not duplicate an external dependency into `catalog/skills/**` just because a local checkout exists. Keep one source of truth: upstream checkout, managed catalog, manual copy, or private overlay.
+- Do not duplicate an external dependency into `catalog/.apm/skills/**` just because a local checkout exists. Keep one source of truth: upstream checkout, managed catalog, manual copy, or private overlay.
 - Do not add local `./packages/*` refs to `~/.apm/apm.yml`.
 - Do not hand-edit deployed targets such as `~/.claude/`, `~/.codex/`, or `~/.agents/skills`.
-- Do not judge a deployed skill orphaned by its absence from `catalog/skills/**` and `optional-skills/**`; deployed targets are mostly fed by external dependencies, so that test marks most of a healthy target as orphaned. Name the supplier of every entry before it reaches a delete line -- a lock record, `apm_modules/**`, `private-skills/.apm/skills/<id>`, `manual-skills`, or a workspace-only symlink bridge -- and treat only an entry with no supplier as a candidate. A lock record keeps an entry off that line but never proves the skill is still supplied — the lock keeps records for skills the catalog has already retired, so check the manifest, the record's owner, the locator's scope and target, and the deployed path itself before concluding anything about a record.
+- Do not judge a deployed skill orphaned by its absence from `catalog/.apm/skills/**` and `optional-skills/**`; deployed targets are mostly fed by external dependencies, so that test marks most of a healthy target as orphaned. Name the supplier of every entry before it reaches a delete line -- a lock record, `apm_modules/**`, `private-skills/.apm/skills/<id>`, `manual-skills`, or a workspace-only symlink bridge -- and treat only an entry with no supplier as a candidate. A lock record keeps an entry off that line but never proves the skill is still supplied — the lock keeps records for skills the catalog has already retired, so check the manifest, the record's owner, the locator's scope and target, and the deployed path itself before concluding anything about a record.
 - `apm audit --ci` and searching a deployed target: see `references/rollout-fast-paths.md` for the reading and grep-wrapper caveats.
 - Prefer `mise` tasks over ad hoc script entrypoints for normal operation.
 - Before changing user-global `mise` tools, verify the resolved binary path and install tree. `mise latest` can lag or differ because of release-age policy, so compare with the upstream registry when exact latest-version behavior matters.
@@ -239,7 +239,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - run `mise run check`
 
 2. Personal skill changed:
-   - edit `~/.apm/catalog/skills/**`
+   - edit `~/.apm/catalog/.apm/skills/**`
    - optionally run `mise run format:markdown:bold-headings`
    - run `mise run deploy`
    - verify `~/.agents/skills/<id>/` contains the deployed skill
@@ -309,7 +309,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - keep unrelated dirty files in `~/.apm` unstaged unless the user explicitly includes them
 
 8. Manual skill promoted to workspace-owned:
-   - move the skill from `manual-skills/.apm/skills/<id>/` to `catalog/skills/<id>/`
+   - move the skill from `manual-skills/.apm/skills/<id>/` to `catalog/.apm/skills/<id>/`
    - update `manual-skills/upstreams/**` to note the migration
    - run `mise run check`, then `mise run deploy`
    - verify the deployed target contains one copy of the skill

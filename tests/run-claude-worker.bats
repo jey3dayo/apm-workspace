@@ -10,7 +10,7 @@
 
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
-  SCRIPT="$REPO_ROOT/catalog/skills/agmsg-delegation/scripts/run-claude-worker.sh"
+  SCRIPT="$REPO_ROOT/catalog/.apm/skills/agmsg-delegation/scripts/run-claude-worker.sh"
   WORKDIR="$(mktemp -d)"
   PROJECT="$(mktemp -d)"
   PAYLOAD_DIR="$(mktemp -d)"

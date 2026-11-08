@@ -100,12 +100,12 @@ build_apply_fixture() {
 
   workspace_dir="$base_dir/workspace"
   mkdir -p "$workspace_dir/.git"
-  mkdir -p "$workspace_dir/catalog/skills/sample-skill" \
+  mkdir -p "$workspace_dir/catalog/.apm/skills/sample-skill" \
     "$workspace_dir/catalog/agents" \
     "$workspace_dir/catalog/commands" \
     "$workspace_dir/catalog/rules"
 
-  printf '# sample skill\n' >"$workspace_dir/catalog/skills/sample-skill/SKILL.md"
+  printf '# sample skill\n' >"$workspace_dir/catalog/.apm/skills/sample-skill/SKILL.md"
   printf 'agent\n' >"$workspace_dir/catalog/agents/sample.md"
   printf 'command\n' >"$workspace_dir/catalog/commands/sample.md"
   printf 'rule\n' >"$workspace_dir/catalog/rules/sample.md"

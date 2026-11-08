@@ -8,7 +8,7 @@ currently deployed.
 
 | Asset                                      | Source of truth                                               | Rule                                                                                                                                                                                                 |
 | ------------------------------------------ | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Global personal skills and shared guidance | `catalog/**`                                                  | Edit here; shared guidance includes `AGENTS.md`, agents, commands, and rules.                                                                                                                        |
+| Global personal skills and shared guidance | `catalog/**`                                                  | Edit here; personal skills live in `catalog/.apm/skills/<id>/`, shared guidance includes `AGENTS.md`, agents, commands, and rules. `catalog/.apm/` holds only `skills/`.                             |
 | Repository-scoped skills                   | `optional-skills/<id>/**`                                     | The consuming repository installs its direct ref; never add the collection to root `apm.yml`.                                                                                                        |
 | Workspace-only skills                      | `.apm/skills/**`                                              | Maintain child symlinks in `.claude/skills/` and `.agents/skills/`; edit neither bridge.                                                                                                             |
 | Private local overrides                    | `private-skills/.apm/skills/**`                               | Gitignored here, tracked in the private repo; `mise run deploy` syncs it alongside the catalog (`apply:skills:local` is the fast partial path), and it overrides an identically named catalog skill. |
@@ -102,7 +102,7 @@ symlinks resolving to `.apm/skills/<id>/SKILL.md`.
   workspace state.
 - Do not add local `./packages/*` refs to the global manifest.
 - Keep skills carrying runtime assets for `catalog/commands/**` in
-  `catalog/skills/<id>/` with provenance in their `SKILL.md`, even if they are
+  `catalog/.apm/skills/<id>/` with provenance in their `SKILL.md`, even if they are
   otherwise unusual.
 - If a managed upstream skill repeatedly fails packaging or rollout, move it to
   the manual lane rather than patching cache or runtime output.
@@ -114,7 +114,7 @@ symlinks resolving to `.apm/skills/<id>/SKILL.md`.
 - Runtime assets that a skill places at launch have no `targets:` distribution
   route. For `agmsg-review.config.toml` (spawn puts it in the per-run worker
   home, a hand-started pane in `~/.codex`), use the placement contract in
-  `catalog/skills/agmsg-delegation/references/codex-sandbox.md`.
+  `catalog/.apm/skills/agmsg-delegation/references/codex-sandbox.md`.
 
 ## agmsg State
 
@@ -132,7 +132,7 @@ not `cmd_apply`, so the save/restore around apply never runs and the links are
 gone when it finishes; the store under
 `${XDG_STATE_HOME:-~/.local/state}/agmsg/` survives. Diagnose with
 `mise run doctor` before restoring — the plain-path rule in
-`catalog/skills/agmsg-delegation/references/roster-recovery.md` still applies.
+`catalog/.apm/skills/agmsg-delegation/references/roster-recovery.md` still applies.
 Remove this workaround only after upstream `AGMSG_HOME` supports both
 locations.
 

@@ -9,7 +9,7 @@
 
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
-  SCRIPT="$REPO_ROOT/catalog/skills/agmsg-delegation/scripts/launch-worker.sh"
+  SCRIPT="$REPO_ROOT/catalog/.apm/skills/agmsg-delegation/scripts/launch-worker.sh"
   WORKDIR="$(mktemp -d)"
   RUN_DIR="$(mktemp -d "${TMPDIR:-/tmp}/agmsg-delegation.XXXXXX")"
   WRAPPER="$RUN_DIR/worker-wrapper.sh"

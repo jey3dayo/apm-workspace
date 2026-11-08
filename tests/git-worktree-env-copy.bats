@@ -2,7 +2,7 @@
 
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
-  SCRIPT_UNDER_TEST="$REPO_ROOT/catalog/skills/git-worktree/scripts/copy-env-files.sh"
+  SCRIPT_UNDER_TEST="$REPO_ROOT/catalog/.apm/skills/git-worktree/scripts/copy-env-files.sh"
   SOURCE_CHECKOUT="$BATS_TEST_TMPDIR/source"
   DESTINATION_WORKTREE="$BATS_TEST_TMPDIR/destination"
   OUTSIDE_SOURCE="$BATS_TEST_TMPDIR/outside-source"

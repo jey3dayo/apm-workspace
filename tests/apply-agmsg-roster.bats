@@ -82,8 +82,8 @@ seed_agmsg_fixture() {
   workspace_dir="$1"
   home_dir="$2"
 
-  mkdir -p "$workspace_dir/catalog/skills/agmsg"
-  printf '# agmsg\n' >"$workspace_dir/catalog/skills/agmsg/SKILL.md"
+  mkdir -p "$workspace_dir/catalog/.apm/skills/agmsg"
+  printf '# agmsg\n' >"$workspace_dir/catalog/.apm/skills/agmsg/SKILL.md"
 
   FIXTURE_XDG_STATE_HOME="$home_dir/.local/state"
   AGMSG_SKILL_DIR="$home_dir/.agents/skills/agmsg"

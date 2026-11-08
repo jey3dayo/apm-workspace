@@ -51,7 +51,7 @@ glob_matches_path() {
   for path in \
     "scripts/apm-workspace.sh" \
     "tests/gh-fix-ci-job-log.bats" \
-    "catalog/skills/linear-task-ops/scripts/linear_task.py" \
+    "catalog/.apm/skills/linear-task-ops/scripts/linear_task.py" \
     "manual-skills/.apm/skills/gh-fix-ci/scripts/inspect_pr_checks.py"; do
     [ -f "$REPO_ROOT/$path" ]
     glob_matches_path "$path" "${patterns[@]}"

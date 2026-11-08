@@ -7,7 +7,7 @@ bats_require_minimum_version 1.5.0
 
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
-  SCRIPT_UNDER_TEST="$REPO_ROOT/catalog/skills/herdr/scripts/find-agent.sh"
+  SCRIPT_UNDER_TEST="$REPO_ROOT/catalog/.apm/skills/herdr/scripts/find-agent.sh"
   export HERDR_BIN_PATH="$BATS_TEST_TMPDIR/herdr"
   export HOME="$BATS_TEST_TMPDIR/home"
   unset HERDR_SOCKET_PATH

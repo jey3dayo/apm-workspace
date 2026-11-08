@@ -12,12 +12,12 @@ It owns the global manifest (`apm.yml`), the lockfile (`apm.lock.yaml`), the cac
 - `docs/package-decisions.md`: why each package was added, kept, or removed
 - `docs/skill-overlaps.md`: which of several similar skills to use
 - `docs/learning-ledger.md`: changes applied by `learning-intake`, graded on whether they worked
-- `catalog/skills/apm-usage/SKILL.md`: operating guidance for agents
+- `catalog/.apm/skills/apm-usage/SKILL.md`: operating guidance for agents
 - `todo.txt` / `done.txt`: open and finished internal tasks
 
 ## Key rules (details in AGENTS.md)
 
-- Edit personal skills in `catalog/skills/**`, copied skills in `manual-skills/**`, shared guidance in `catalog/**`.
+- Edit personal skills in `catalog/.apm/skills/**`, copied skills in `manual-skills/**`, shared guidance in `catalog/**`.
 - `private-skills/**` is gitignored here; its source of truth is a private repo.
 - Treat `apm.yml` / `apm.lock.yaml` as command-managed; add or remove external skills with `apm install` / `apm uninstall`.
 - Never edit `apm_modules/` or deployed targets in place.

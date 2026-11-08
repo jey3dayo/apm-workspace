@@ -38,3 +38,17 @@ teardown() {
   [ "$status" -eq 0 ]
   [[ "$output" == *"Replaced"*"pattern"* ]]
 }
+
+@test "--dry-run reaches skills under catalog/.apm/skills but still skips other .apm/skills trees" {
+  mkdir -p "$FIXTURE_DIR/catalog/.apm/skills/demo" "$FIXTURE_DIR/manual-skills/.apm/skills/demo"
+  printf '%s\n' '**メリット**:' >"$FIXTURE_DIR/catalog/.apm/skills/demo/SKILL.md"
+  printf '%s\n' '**メリット**:' >"$FIXTURE_DIR/manual-skills/.apm/skills/demo/SKILL.md"
+
+  run tsx "$SCRIPT_UNDER_TEST" "$FIXTURE_DIR/catalog" --dry-run
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"Found 1 bold heading/label pattern(s) across 1 file(s)."* ]]
+
+  run tsx "$SCRIPT_UNDER_TEST" "$FIXTURE_DIR/manual-skills" --dry-run
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"No markdown files found."* ]]
+}

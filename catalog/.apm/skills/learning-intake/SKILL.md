@@ -50,7 +50,7 @@ description: >-
 | 学びの性質                                                                                  | owner                                                                                        | 適用の正本                        |
 | ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------- |
 | その repo だけに効く、機械的に検出できる違反（固定パターン・禁止 API・import 形・配置規則） | 当該 repo の lint 設定 / lefthook / CI。本スキルは `todo.txt`（無ければ issue）への起票まで  | `orchestrator-worker`             |
-| catalog skill の契約破れ・手順の摩擦・実装との食い違い                                      | `catalog/skills/<name>/`                                                                     | `apm-usage` → `apm-deploy-verify` |
+| catalog skill の契約破れ・手順の摩擦・実装との食い違い                                      | `catalog/.apm/skills/<name>/`                                                                | `apm-usage` → `apm-deploy-verify` |
 | 全リポジトリに効く規範・禁止事項・判断基準                                                  | `~/.apm/catalog/AGENTS.md`                                                                   | `apm-usage`                       |
 | owner が今回の許可範囲の外にある（報告経路）                                                | APM 側が owner 候補の行 + drop box `~/.apm/tmp/learning-intake/`                             | 本スキル §5                       |
 | そのリポジトリだけの規約・構成                                                              | 当該 repo の `AGENTS.md` / `CLAUDE.md`                                                       | `docs-review`                     |

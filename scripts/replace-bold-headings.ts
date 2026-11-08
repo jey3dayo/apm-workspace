@@ -65,8 +65,7 @@ function parseArguments(): ParsedArgs {
 function isApmWorkspaceRoot(targetPath: string): boolean {
   return (
     fs.existsSync(path.join(targetPath, "apm.yml")) &&
-    fs.existsSync(path.join(targetPath, "catalog", "skills")) &&
-    fs.existsSync(path.join(targetPath, "catalog", ".apm"))
+    fs.existsSync(path.join(targetPath, "catalog", ".apm", "skills"))
   );
 }
 
@@ -75,7 +74,7 @@ function resolveTargetPaths(userInputs: string[]): string[] {
   if (userInputs.length === 0) {
     const cwd = process.cwd();
     if (isApmWorkspaceRoot(cwd)) {
-      return [path.join(cwd, "catalog", "skills")];
+      return [path.join(cwd, "catalog", ".apm", "skills")];
     }
     return [cwd];
   }
@@ -83,7 +82,7 @@ function resolveTargetPaths(userInputs: string[]): string[] {
   // ユーザー指定のパスを解決
   const resolved = userInputs.map((input) => path.resolve(process.cwd(), input));
   if (resolved.length === 1 && isApmWorkspaceRoot(resolved[0])) {
-    return [path.join(resolved[0], "catalog", "skills")];
+    return [path.join(resolved[0], "catalog", ".apm", "skills")];
   }
   return resolved;
 }
@@ -297,6 +296,9 @@ const SKIP_PATH_SUFFIXES = [
   path.join("agents", "external"),
 ];
 
+// The managed catalog's skills live in an `.apm/skills` directory that the suffix skip above would otherwise hide.
+const CATALOG_SKILLS_SUFFIX = path.join("catalog", ".apm", "skills");
+
 function shouldSkipDir(fullPath: string): boolean {
   const name = path.basename(fullPath);
 
@@ -314,6 +316,7 @@ function shouldSkipDir(fullPath: string): boolean {
   }
 
   // Path-suffix patterns (e.g. agents/external)
+  if (fullPath.endsWith(path.sep + CATALOG_SKILLS_SUFFIX)) return false;
   for (const suffix of SKIP_PATH_SUFFIXES) {
     if (fullPath.endsWith(path.sep + suffix)) return true;
   }
@@ -383,7 +386,7 @@ Examples:
   tsx replace-bold-headings.ts
   mise run format:markdown:bold-headings
 
-  # In ~/.apm workspace roots, "." resolves to ./catalog/skills automatically
+  # In ~/.apm workspace roots, "." resolves to ./catalog/.apm/skills automatically
   tsx replace-bold-headings.ts .
 
   # Process specific directories

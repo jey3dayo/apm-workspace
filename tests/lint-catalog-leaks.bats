@@ -7,7 +7,7 @@ setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
   SCRIPT_UNDER_TEST="$REPO_ROOT/scripts/lint-catalog-leaks.ts"
   FIXTURE_DIR="$(mktemp -d)"
-  mkdir -p "$FIXTURE_DIR/catalog/agents" "$FIXTURE_DIR/catalog/skills"
+  mkdir -p "$FIXTURE_DIR/catalog/agents" "$FIXTURE_DIR/catalog/.apm/skills"
   touch "$FIXTURE_DIR/catalog/agents/existing-agent.md"
   # Point at a fixture path so a real local denylist never leaks into tests.
   export APM_LEAK_DENYLIST="$FIXTURE_DIR/denylist.txt"
@@ -18,11 +18,11 @@ teardown() {
 }
 
 run_fixture() {
-  run tsx "$SCRIPT_UNDER_TEST" "$FIXTURE_DIR/catalog/agents" "$FIXTURE_DIR/catalog/skills"
+  run tsx "$SCRIPT_UNDER_TEST" "$FIXTURE_DIR/catalog/agents" "$FIXTURE_DIR/catalog/.apm/skills"
 }
 
 @test "fails on an unresolved (use deployment) reference" {
-  cat >"$FIXTURE_DIR/catalog/skills/broken.md" <<'EOF'
+  cat >"$FIXTURE_DIR/catalog/.apm/skills/broken.md" <<'EOF'
 (use deployment)
 EOF
 
@@ -32,7 +32,7 @@ EOF
 }
 
 @test "fails on an unresolved decorated Agent reference" {
-  cat >"$FIXTURE_DIR/catalog/skills/broken.md" <<'EOF'
+  cat >"$FIXTURE_DIR/catalog/.apm/skills/broken.md" <<'EOF'
 - 🤖 **Agent: route53-operations** - DNS management
 EOF
 
@@ -42,7 +42,7 @@ EOF
 }
 
 @test "passes an empty Agent label without reading the next line" {
-  cat >"$FIXTURE_DIR/catalog/skills/ok.md" <<'EOF'
+  cat >"$FIXTURE_DIR/catalog/.apm/skills/ok.md" <<'EOF'
 # Example
 
 Agent:
@@ -56,7 +56,7 @@ EOF
 }
 
 @test "fails on a backticked agent reference" {
-  cat >"$FIXTURE_DIR/catalog/skills/broken.md" <<'EOF'
+  cat >"$FIXTURE_DIR/catalog/.apm/skills/broken.md" <<'EOF'
 データベース関連操作は `database-operations` agent へ委譲する。
 EOF
 
@@ -66,7 +66,7 @@ EOF
 }
 
 @test "passes references to existing agents" {
-  cat >"$FIXTURE_DIR/catalog/skills/ok.md" <<'EOF'
+  cat >"$FIXTURE_DIR/catalog/.apm/skills/ok.md" <<'EOF'
 (use existing-agent)
 EOF
 
@@ -75,7 +75,7 @@ EOF
 }
 
 @test "passes excluded built-in agents" {
-  cat >"$FIXTURE_DIR/catalog/skills/ok.md" <<'EOF'
+  cat >"$FIXTURE_DIR/catalog/.apm/skills/ok.md" <<'EOF'
 (use Explore)
 (use general-purpose)
 EOF
@@ -85,7 +85,7 @@ EOF
 }
 
 @test "warns on a concrete profile value" {
-  cat >"$FIXTURE_DIR/catalog/skills/warn.md" <<'EOF'
+  cat >"$FIXTURE_DIR/catalog/.apm/skills/warn.md" <<'EOF'
 aws --profile aws-example-admin-role
 EOF
 
@@ -96,7 +96,7 @@ EOF
 }
 
 @test "does not warn on profile placeholders" {
-  cat >"$FIXTURE_DIR/catalog/skills/ok.md" <<'EOF'
+  cat >"$FIXTURE_DIR/catalog/.apm/skills/ok.md" <<'EOF'
 --profile $AWS_PROFILE
 --profile <your-profile>
 EOF
@@ -107,7 +107,7 @@ EOF
 }
 
 @test "warns on an AWS account ID in an ARN" {
-  cat >"$FIXTURE_DIR/catalog/skills/warn.md" <<'EOF'
+  cat >"$FIXTURE_DIR/catalog/.apm/skills/warn.md" <<'EOF'
 arn:aws:lambda:ap-northeast-1:123456789012:function:x
 EOF
 
@@ -118,7 +118,7 @@ EOF
 }
 
 @test "does not warn on an account-less S3 ARN" {
-  cat >"$FIXTURE_DIR/catalog/skills/ok.md" <<'EOF'
+  cat >"$FIXTURE_DIR/catalog/.apm/skills/ok.md" <<'EOF'
 arn:aws:s3:::example-bucket
 EOF
 
@@ -128,7 +128,7 @@ EOF
 }
 
 @test "warns on an absolute repository checkout path" {
-  cat >"$FIXTURE_DIR/catalog/skills/warn.md" <<'EOF'
+  cat >"$FIXTURE_DIR/catalog/.apm/skills/warn.md" <<'EOF'
 /Users/alice/src/github.com/org/repo
 EOF
 
@@ -139,7 +139,7 @@ EOF
 }
 
 @test "does not warn on a non-checkout user path" {
-  cat >"$FIXTURE_DIR/catalog/skills/ok.md" <<'EOF'
+  cat >"$FIXTURE_DIR/catalog/.apm/skills/ok.md" <<'EOF'
 /Users/alice/.agents/skills/agmsg/scripts/join.sh
 EOF
 
@@ -150,7 +150,7 @@ EOF
 
 @test "fails on a denylisted organization term without echoing it" {
   printf '# comment\nexample-org\n' >"$APM_LEAK_DENYLIST"
-  cat >"$FIXTURE_DIR/catalog/skills/broken.md" <<'EOF'
+  cat >"$FIXTURE_DIR/catalog/.apm/skills/broken.md" <<'EOF'
 Deploy to Example-Org/service first.
 EOF
 
@@ -162,7 +162,7 @@ EOF
 
 @test "does not match a denylisted term inside a longer token" {
   printf 'org\n' >"$APM_LEAK_DENYLIST"
-  cat >"$FIXTURE_DIR/catalog/skills/ok.md" <<'EOF'
+  cat >"$FIXTURE_DIR/catalog/.apm/skills/ok.md" <<'EOF'
 sha256:abcorg123 organization
 EOF
 
@@ -171,7 +171,7 @@ EOF
 }
 
 @test "skips the denylist when the file is absent" {
-  cat >"$FIXTURE_DIR/catalog/skills/ok.md" <<'EOF'
+  cat >"$FIXTURE_DIR/catalog/.apm/skills/ok.md" <<'EOF'
 example-org
 EOF
 
@@ -181,8 +181,8 @@ EOF
 
 @test "redacts denylisted terms from other diagnostics and paths" {
   printf 'example-org\n' >"$APM_LEAK_DENYLIST"
-  mkdir -p "$FIXTURE_DIR/catalog/skills/example-org-skill"
-  cat >"$FIXTURE_DIR/catalog/skills/example-org-skill/SKILL.md" <<'EOF'
+  mkdir -p "$FIXTURE_DIR/catalog/.apm/skills/example-org-skill"
+  cat >"$FIXTURE_DIR/catalog/.apm/skills/example-org-skill/SKILL.md" <<'EOF'
 (use example-org-agent)
 EOF
 
@@ -194,7 +194,7 @@ EOF
 
 @test "checks non-markdown files under explicit targets" {
   printf 'example-org\n' >"$APM_LEAK_DENYLIST"
-  printf 'owner: example-org\n' >"$FIXTURE_DIR/catalog/skills/notes.txt"
+  printf 'owner: example-org\n' >"$FIXTURE_DIR/catalog/.apm/skills/notes.txt"
 
   run_fixture
   [ "$status" -eq 1 ]
@@ -203,7 +203,7 @@ EOF
 
 @test "checks denylisted terms in file names" {
   printf 'example-org\n' >"$APM_LEAK_DENYLIST"
-  printf 'clean\n' >"$FIXTURE_DIR/catalog/skills/example-org-notes.txt"
+  printf 'clean\n' >"$FIXTURE_DIR/catalog/.apm/skills/example-org-notes.txt"
 
   run_fixture
   [ "$status" -eq 1 ]

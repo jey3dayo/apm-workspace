@@ -13,8 +13,8 @@
 
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
-  SCRIPT="$REPO_ROOT/catalog/skills/agmsg-delegation/scripts/run-codex-worker.sh"
-  SKILL="$REPO_ROOT/catalog/skills/orchestrator-worker/SKILL.md"
+  SCRIPT="$REPO_ROOT/catalog/.apm/skills/agmsg-delegation/scripts/run-codex-worker.sh"
+  SKILL="$REPO_ROOT/catalog/.apm/skills/orchestrator-worker/SKILL.md"
   PROJECT="$(mktemp -d)"
   PAYLOAD="$(mktemp)"
   printf 'noop\n' >"$PAYLOAD"
@@ -149,7 +149,7 @@ SH
   [[ "$output" == *"PROFILE_BEGIN"* ]]
   # 正本の中身がそのまま届いている（fail-open で base config へ落ちていない）。
   local marker
-  marker="$(head -1 "$REPO_ROOT/catalog/skills/agmsg-delegation/agmsg-review.config.toml")"
+  marker="$(head -1 "$REPO_ROOT/catalog/.apm/skills/agmsg-delegation/agmsg-review.config.toml")"
   [[ "$output" == *"$marker"* ]]
   # base home も $HOME/.codex も profile の置き場にはしない。
   [ ! -f "$fake_home/codex/agmsg-review.config.toml" ]

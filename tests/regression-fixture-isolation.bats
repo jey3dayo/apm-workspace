@@ -2,7 +2,7 @@
 
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
-  CHECKER="$REPO_ROOT/catalog/skills/orchestrator-worker/scripts/check-fixture-isolation.py"
+  CHECKER="$REPO_ROOT/catalog/.apm/skills/orchestrator-worker/scripts/check-fixture-isolation.py"
   FIXTURE="$BATS_TEST_TMPDIR/fixture"
   mkdir -p "$FIXTURE"
 }

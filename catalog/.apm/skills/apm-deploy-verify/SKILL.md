@@ -80,7 +80,7 @@ fork 実行では会話履歴は見えない。検証対象（変更した skill
 
    roster link が正常なとき doctor は何も出力しない。失敗時だけ（`validate_agmsg_roster_link`）失敗行を出して非 0 で終了する。exit 0 なら通過、非 0 なら doctor の出力から roster link の失敗行を読んで報告する。
 
-   他の face（`~/.claude/skills/agmsg` など）に `db` / `teams` が無いのは仕様であり、張ってはいけない。診断・復旧の判断基準は `catalog/skills/agmsg-delegation/references/roster-recovery.md` が正本——**plain path があれば restore しない**（断線中に書かれた roster を上書きで失いうる）。手で `ln -s` を張らない
+   他の face（`~/.claude/skills/agmsg` など）に `db` / `teams` が無いのは仕様であり、張ってはいけない。診断・復旧の判断基準は `catalog/.apm/skills/agmsg-delegation/references/roster-recovery.md` が正本——**plain path があれば restore しない**（断線中に書かれた roster を上書きで失いうる）。手で `ln -s` を張らない
 
 5. agmsg が導入済みで、かつ `agmsg-delegation` の runtime asset（scripts/・WORKER.md・agmsg-review.config.toml）を変更した場合のみ smoke を実行する。agmsg 未導入なら smoke は実行できないので「agmsg 未導入のため未実行」と報告する。項目と合否基準は `agmsg-delegation` Preflight の「初回利用前の smoke 5点」が正本
 6. smoke の合否判定は worker モデルの自己申告でなく、ファイルシステムの実体で行う（touch したファイルの存在確認、拒否されるべき書込先にファイルが無いこと）。worker は書込失敗時でも成功を報告した実績がある

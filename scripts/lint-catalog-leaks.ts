@@ -21,7 +21,7 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "..");
-const DEFAULT_TARGET_SUBDIRS = ["catalog/agents", "catalog/skills"];
+const DEFAULT_TARGET_SUBDIRS = ["catalog/agents", "catalog/.apm/skills"];
 
 const EXCLUDED_AGENTS = new Set([
   "Explore",

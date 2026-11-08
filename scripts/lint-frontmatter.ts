@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 
 // Validates YAML frontmatter in the managed catalog (catalog/agents,
-// catalog/skills, catalog/commands, catalog/rules). `mise run check` never
+// catalog/.apm/skills, catalog/commands, catalog/rules). `mise run check` never
 // parsed frontmatter, so an unquoted "key: value: more" in a `description`
 // field (broken YAML: a colon+space inside a plain scalar) passed the gate
 // and was distributed as-is (five catalog agent files, fixed in commit
@@ -23,7 +23,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "..");
 
-const DEFAULT_TARGET_SUBDIRS = ["catalog/agents", "catalog/skills", "catalog/commands", "catalog/rules"];
+const DEFAULT_TARGET_SUBDIRS = ["catalog/agents", "catalog/.apm/skills", "catalog/commands", "catalog/rules"];
 
 // Files under these subdirs must additionally declare `name` and
 // `description` keys in frontmatter (value contents are not checked, only

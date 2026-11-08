@@ -7,7 +7,7 @@ bats_require_minimum_version 1.5.0
 
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
-  SCRIPT_UNDER_TEST="$REPO_ROOT/catalog/skills/herdr/scripts/spawn-picker.sh"
+  SCRIPT_UNDER_TEST="$REPO_ROOT/catalog/.apm/skills/herdr/scripts/spawn-picker.sh"
   BIN="$BATS_TEST_TMPDIR/bin"
   export STUB_DIR="$BATS_TEST_TMPDIR/stub"
   mkdir -p "$BIN" "$STUB_DIR"
