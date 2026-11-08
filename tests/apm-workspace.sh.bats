@@ -2420,6 +2420,43 @@ make_catalog_fixture() {
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
+@test "assert_catalog_stage_safety refuses a catalog whose .apm is a symlink to an empty directory" {
+  make_catalog_fixture 2 2
+  rm -rf "$workspace_dir/catalog/.apm"
+  mkdir -p "$workspace_dir/outside-apm"
+  ln -s "$workspace_dir/outside-apm" "$workspace_dir/catalog/.apm"
+
+  run assert_catalog_stage_safety 0
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"catalog/.apm is a symlink"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "assert_catalog_stage_safety refuses a catalog whose .apm is a dangling symlink" {
+  make_catalog_fixture 2 2
+  rm -rf "$workspace_dir/catalog/.apm"
+  ln -s "$workspace_dir/missing-apm" "$workspace_dir/catalog/.apm"
+
+  run assert_catalog_stage_safety 0
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"catalog/.apm is a symlink"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "assert_catalog_stage_safety refuses a catalog whose .apm holds a FIFO" {
+  make_catalog_fixture 2 2
+  mkdir -p "$workspace_dir/catalog/.apm/agents"
+  mkfifo "$workspace_dir/catalog/.apm/agents/queue"
+
+  run assert_catalog_stage_safety 0
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"catalog/.apm holds agents/queue"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
 @test "assert_catalog_stage_safety refuses a catalog whose .apm/skills is a symlink" {
   make_catalog_fixture 2 2
   rm -rf "$workspace_dir/catalog/.apm/skills"

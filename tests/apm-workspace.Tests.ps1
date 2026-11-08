@@ -172,6 +172,28 @@ scripts: {}
     { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds .gitkeep*"
   }
 
+  It "refuses to stage a catalog whose .apm is a symlink to an empty directory" {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
+    $target = Join-Path $TestDrive "outside-apm"
+    New-Item -ItemType Directory -Path $target -Force | Out-Null
+    New-Item -ItemType Directory -Path (Get-TrackedCatalogDir) -Force | Out-Null
+    New-Item -ItemType SymbolicLink -Path $apmDir -Target $target | Out-Null
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm is a symlink*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm is a symlink*"
+  }
+
+  It "refuses to stage a catalog whose .apm is a dangling symlink" {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
+    New-Item -ItemType Directory -Path (Get-TrackedCatalogDir) -Force | Out-Null
+    New-Item -ItemType SymbolicLink -Path $apmDir -Target (Join-Path $TestDrive "missing-apm") | Out-Null
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm is a symlink*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm is a symlink*"
+  }
+
   It "lists skill ids from the managed catalog tree" {
     $skillsRoot = Join-Path (Join-Path $TestDrive "catalog") "skills"
     New-Item -ItemType Directory -Path (Join-Path $skillsRoot "mypc-manager") -Force | Out-Null

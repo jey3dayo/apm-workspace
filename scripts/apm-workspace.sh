@@ -263,9 +263,13 @@ tracked_catalog_relative_path() {
 # the same targets. Prints a message when catalog/.apm holds something other than skills.
 catalog_apm_dir_claim_message() {
   apm_dir="$(tracked_catalog_dir)/.apm"
+  if [ -L "$apm_dir" ]; then
+    printf 'catalog/.apm is a symlink, but the legacy catalog sync still owns every primitive: prepare:catalog would delete the link. Replace it with a real directory only in the change that retires its legacy writer.\n'
+    return 0
+  fi
   [ -d "$apm_dir" ] || return 0
 
-  claimed_entry=$(cd "$apm_dir" && find . -mindepth 1 \( -type l -o \( -type f ! -path './skills/*' \) \) | sed 's#^\./##' | sort | sed -n 1p)
+  claimed_entry=$(cd "$apm_dir" && find . -mindepth 1 \( -type l -o \( ! -type d ! -path './skills/*' \) \) | sed 's#^\./##' | sort | sed -n 1p)
   [ -n "$claimed_entry" ] || return 0
 
   printf 'catalog/.apm holds %s, but only catalog/.apm/skills is migrated: the legacy catalog sync still owns every other primitive, so prepare:catalog would delete it and APM would install it alongside the sync output. Move a primitive into catalog/.apm only in the change that retires its legacy writer.\n' "$claimed_entry"
