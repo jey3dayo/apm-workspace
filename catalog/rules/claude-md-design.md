@@ -1,13 +1,13 @@
 ---
 paths:
-  - "**/catalog/AGENTS.md"
+  - "**/catalog/.apm/instructions/*.instructions.md"
 ---
 
 # CLAUDE.md Design Principles
 
 ## 目的
 
-global 共有ガイド（`catalog/AGENTS.md`、配布先は `~/.claude/CLAUDE.md` と `~/.codex/AGENTS.md`）を汎用的かつ保守しやすく保つための設計原則。各 repo 固有の AGENTS.md / CLAUDE.md には適用しない
+global 共有ガイド（`catalog/.apm/instructions/ai-collaboration.instructions.md`、配布先は `~/.claude/rules/ai-collaboration.md`、`~/.codex/AGENTS.md`、`~/.cursor/AGENTS.md`）を汎用的かつ保守しやすく保つための設計原則。各 repo 固有の AGENTS.md / CLAUDE.md には適用しない
 
 ## 設計原則
 

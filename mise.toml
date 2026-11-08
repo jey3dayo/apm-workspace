@@ -71,9 +71,20 @@ run = "bash ./scripts/agmsg-state.sh restore"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/agmsg-state.ps1 restore"
 
 [tasks.apply]
-description = "Deploy user-scope-compatible APM dependencies and compile Codex output"
+description = "Deploy user-scope-compatible APM dependencies and compile user-scope root contexts"
 run = "bash ./scripts/apm-workspace.sh apply"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 apply"
+
+[tasks."migrate:roots"]
+description = "Preview moving legacy CLAUDE.md / AGENTS.md copies to <name>.<UTC>.bak; pass -- --apply to move them"
+run = "bash ./scripts/apm-workspace.sh migrate:roots"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 migrate:roots"
+
+[tasks."check:roots"]
+description = "Fail when ~/.claude/CLAUDE.md is still the legacy catalog copy, before APM adds the guide as a Claude rule"
+hide = true
+run = "bash ./scripts/apm-workspace.sh check:roots"
+run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 check:roots"
 
 [tasks.refresh]
 description = "Pull the checkout and advance unpinned APM dependencies (apm deps update -g, regenerates apm.lock.yaml); no check/apply/doctor"
@@ -156,7 +167,7 @@ run = [
 # ========================================
 [tasks.upgrade]
 description = "Refresh upstream APM dependencies, run checks, deploy, and inspect the ~/.apm workspace"
-run = ["apm update -g --yes", { task = "deploy" }]
+run = [{ task = "check:roots" }, "apm update -g --yes", { task = "deploy" }]
 
 [tasks."install:pins"]
 description = "Run `apm install -g --only apm` with the agmsg roster preserved; no check/apply/doctor"

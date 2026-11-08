@@ -222,14 +222,14 @@ scripts: {}
   It "seeds the catalog build with skills and agents under .apm and no top-level skills or agents directory" {
     $trackedDir = Join-Path $TestDrive "tracked-catalog"
     $buildDir = Join-Path $TestDrive "build-catalog"
-    foreach ($subdir in @(".apm/agents", "commands", "rules", ".apm/skills/demo")) {
+    foreach ($subdir in @(".apm/agents", "commands", "rules", ".apm/skills/demo", ".apm/instructions")) {
       New-Item -ItemType Directory -Path (Join-Path $trackedDir $subdir) -Force | Out-Null
     }
     Set-Content -LiteralPath (Join-Path $trackedDir ".apm/skills/demo/SKILL.md") -Value "# demo"
     Set-Content -LiteralPath (Join-Path $trackedDir ".apm/agents/sample.agent.md") -Value "agent"
     Set-Content -LiteralPath (Join-Path $trackedDir "apm.yml") -Value "name: catalog"
     Set-Content -LiteralPath (Join-Path $trackedDir "README.md") -Value "# catalog"
-    Set-Content -LiteralPath (Join-Path $trackedDir "AGENTS.md") -Value "# instructions"
+    Set-Content -LiteralPath (Join-Path $trackedDir ".apm/instructions/ai-collaboration.instructions.md") -Value "---`ndescription: guide`n---`n`n# instructions"
 
     Mock Ensure-WorkspaceRepo {}
     Mock Ensure-WorkspaceScaffold {}
@@ -398,7 +398,8 @@ scripts: {}
     New-Item -ItemType Directory -Path $agentsRoot -Force | Out-Null
     New-Item -ItemType Directory -Path $commandsRoot -Force | Out-Null
     New-Item -ItemType Directory -Path (Join-Path $rulesRoot "tools") -Force | Out-Null
-    Set-Content -LiteralPath (Join-Path $catalogRoot "AGENTS.md") -Value "# shared guidance"
+    New-Item -ItemType Directory -Path (Join-Path $catalogRoot ".apm/instructions") -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $catalogRoot ".apm/instructions/ai-collaboration.instructions.md") -Value "---`ndescription: guide`n---`n`n# shared guidance"
     Set-Content -LiteralPath (Join-Path $agentsRoot "code-reviewer.agent.md") -Value "# agent"
     Set-Content -LiteralPath (Join-Path $commandsRoot "review.md") -Value "# review"
     Set-Content -LiteralPath (Join-Path $commandsRoot "setup.md") -Value "# setup"
@@ -1396,7 +1397,7 @@ Describe "public command surface" {
       Mock Remove-InternalTargetReparsePoints {}
       Mock Get-InternalCleanupSkillIds { @() }
       Mock Invoke-WorkspaceInstallCommand {}
-      Mock Invoke-CodexCompile {}
+      Mock Invoke-UserRootCompile {}
       Mock Invoke-Apply {}
       Mock Build-TargetSkillTrees {}
       Mock Replace-SkillTargetsFromStage {}
@@ -1432,7 +1433,7 @@ Describe "public command surface" {
     Mock Replace-SkillTargetsFromStage {}
     Mock Install-WorkspaceMcpDependencies {}
     Mock Normalize-CodexMcpConfig {}
-    Mock Invoke-CodexCompile {}
+    Mock Invoke-UserRootCompile {}
     # Invoke-AgmsgStateSave/Restore(OrThrow) shell out to agmsg-state.ps1
     # against the real $HOME by design (see its own subprocess-based test
     # suite); mocked here so this unit test doesn't touch this machine's real
@@ -1461,7 +1462,7 @@ Describe "public command surface" {
     Mock Replace-SkillTargetsFromStage {}
     Mock Install-WorkspaceMcpDependencies {}
     Mock Normalize-CodexMcpConfig {}
-    Mock Invoke-CodexCompile {}
+    Mock Invoke-UserRootCompile {}
     Mock Invoke-AgmsgStateSave {}
 
     # Invoke-Apply calls Invoke-AgmsgStateRestoreOrThrow twice on a normal
@@ -1504,7 +1505,7 @@ Describe "public command surface" {
     # Fails before the skill-tree swap ever runs, so the mid-apply
     # Invoke-AgmsgStateRestoreOrThrow call never happens either -- only the
     # outer `finally`'s recovery restore should run.
-    Mock Invoke-CodexCompile { throw "boom: apm compile failed" }
+    Mock Invoke-UserRootCompile { throw "boom: apm compile failed" }
 
     $script:recoveryRestoreCalled = $false
     Mock Invoke-AgmsgStateRestore {
@@ -1749,7 +1750,7 @@ id = "preserve other"
       Mock Remove-InternalTargetReparsePoints {}
       Mock Get-InternalCleanupSkillIds { @() }
       Mock Invoke-WorkspaceInstallCommand {}
-      Mock Invoke-CodexCompile {}
+      Mock Invoke-UserRootCompile {}
       Mock Invoke-Apply {}
       Mock Build-TargetSkillTrees {}
       Mock Replace-SkillTargetsFromStage {}
@@ -3087,7 +3088,6 @@ dependencies:
       $exception.Message | Should -Match 'apm deps list -g failed\.'
       foreach ($path in @(
           $nestedSkill | ForEach-Object { Join-Path $_ "SKILL.md" }
-          (Join-Path $targetOneRoot "CLAUDE.md")
           $targetOneAgentsPath
           $targetOneCommandsPath
           $targetOneSkillsPath
@@ -3462,5 +3462,160 @@ Describe "internal cleanup skill ids" {
     $cleanupSkillIds = @(Get-InternalCleanupSkillIds)
 
     $cleanupSkillIds | Should -Be @("brainstorming", "code-review")
+  }
+}
+
+Describe "catalog instructions and user root migration" {
+  BeforeAll {
+    $env:APM_WORKSPACE_LIB_ONLY = "1"
+    $modulePath = Join-Path (Join-Path $PSScriptRoot "..") "scripts/apm-workspace.ps1"
+    . (Resolve-Path -LiteralPath $modulePath).Path
+    Remove-Item Env:APM_WORKSPACE_LIB_ONLY -ErrorAction SilentlyContinue
+
+    function Write-FixtureFile {
+      param([string]$Path, [string]$Content)
+      New-Item -ItemType Directory -Path (Split-Path -Parent $Path) -Force | Out-Null
+      [System.IO.File]::WriteAllText($Path, $Content, (New-Object System.Text.UTF8Encoding $false))
+    }
+
+    function Get-HomeTreeListing {
+      Get-ChildItem -LiteralPath $script:rootsHome -Recurse -Force | Sort-Object FullName | ForEach-Object {
+        if ($_.PSIsContainer -or $_.LinkType) { $_.FullName } else { "{0} {1}" -f $_.FullName, (Get-FileHash -LiteralPath $_.FullName).Hash }
+      }
+    }
+  }
+
+  BeforeEach {
+    # TestDrive lasts for the whole Describe, so each test gets its own workspace and home.
+    $caseRoot = Join-Path $TestDrive ([guid]::NewGuid().ToString("N"))
+    $script:WorkspaceDir = Join-Path $caseRoot "workspace"
+    $WorkspaceDir = $script:WorkspaceDir
+    $global:WorkspaceDir = $script:WorkspaceDir
+    $script:rootsHome = Join-Path $caseRoot "home"
+    Write-FixtureFile -Path (Join-Path $script:WorkspaceDir "catalog/.apm/instructions/ai-collaboration.instructions.md") -Content "---`ndescription: fixture guide`n---`n`n`n# Guide`n`nbody line`n"
+    $script:guideBody = Join-Path $script:rootsHome "guide-body.md"
+    Write-FixtureFile -Path $script:guideBody -Content "# Guide`n`nbody line`n"
+    foreach ($dir in @(".claude", ".codex", ".cursor")) {
+      New-Item -ItemType Directory -Path (Join-Path $script:rootsHome $dir) -Force | Out-Null
+    }
+    $script:OpencodeInstructionsOutput = Join-Path $script:rootsHome ".config/opencode/AGENTS.md"
+    $OpencodeInstructionsOutput = $script:OpencodeInstructionsOutput
+    $global:OpencodeInstructionsOutput = $script:OpencodeInstructionsOutput
+
+    Mock Get-ManagedCatalogRuntimeTargets {
+      @(
+        [pscustomobject]@{ Name = "claude"; Root = (Join-Path $script:rootsHome ".claude"); ConfigName = "CLAUDE.md" },
+        [pscustomobject]@{ Name = "codex"; Root = (Join-Path $script:rootsHome ".codex"); ConfigName = "AGENTS.md" },
+        [pscustomobject]@{ Name = "cursor"; Root = (Join-Path $script:rootsHome ".cursor"); ConfigName = "AGENTS.md" },
+        [pscustomobject]@{ Name = "opencode"; Root = (Join-Path $script:rootsHome ".config/opencode"); ConfigName = "-" }
+      )
+    }
+  }
+
+  AfterEach {
+    Remove-Variable -Name OpencodeInstructionsOutput -Scope Global -ErrorAction SilentlyContinue
+  }
+
+  It "renders the instruction body without frontmatter and leading blank lines, as APM renders a rule" {
+    $body = Get-CatalogInstructionsBody -Path (Get-TrackedCatalogInstructionsPath)
+    $body | Should -BeExactly ([System.IO.File]::ReadAllText($script:guideBody))
+  }
+
+  It "tells absent, generated, legacy, hand-written and directory roots apart" {
+    $known = Get-LegacyCatalogInstructionsBlobs
+    Copy-Item -LiteralPath $script:guideBody -Destination (Join-Path $script:rootsHome ".claude/CLAUDE.md")
+    Write-FixtureFile -Path (Join-Path $script:rootsHome ".codex/AGENTS.md") -Content "$ApmGeneratedRootMarker`n# compiled`n"
+    Write-FixtureFile -Path (Join-Path $script:rootsHome ".cursor/AGENTS.md") -Content "# Guide`n`nbody line`nmy own addition`n"
+    New-Item -ItemType Directory -Path (Join-Path $script:rootsHome "dir.md") | Out-Null
+
+    Get-UserRootState -Path (Join-Path $script:rootsHome "missing.md") -KnownBlobs $known | Should -Be "absent"
+    Get-UserRootState -Path (Join-Path $script:rootsHome ".claude/CLAUDE.md") -KnownBlobs $known | Should -Be "legacy"
+    Get-UserRootState -Path (Join-Path $script:rootsHome ".codex/AGENTS.md") -KnownBlobs $known | Should -Be "generated"
+    Get-UserRootState -Path (Join-Path $script:rootsHome ".cursor/AGENTS.md") -KnownBlobs $known | Should -Be "hand-written"
+    Get-UserRootState -Path (Join-Path $script:rootsHome "dir.md") -KnownBlobs $known | Should -Be "not-regular"
+  }
+
+  It "recognizes an older committed catalog/AGENTS.md as a legacy copy" {
+    Write-FixtureFile -Path (Join-Path $script:WorkspaceDir "catalog/AGENTS.md") -Content "# Old guide`n"
+    & git -C $script:WorkspaceDir init -q
+    & git -C $script:WorkspaceDir add catalog/AGENTS.md
+    & git -C $script:WorkspaceDir -c user.name=t -c user.email=t@example.invalid commit -q -m old
+    & git -C $script:WorkspaceDir rm -q catalog/AGENTS.md
+    & git -C $script:WorkspaceDir -c user.name=t -c user.email=t@example.invalid commit -q -m moved
+    Write-FixtureFile -Path (Join-Path $script:rootsHome ".codex/AGENTS.md") -Content "# Old guide`n"
+
+    Get-UserRootState -Path (Join-Path $script:rootsHome ".codex/AGENTS.md") -KnownBlobs (Get-LegacyCatalogInstructionsBlobs) | Should -Be "legacy"
+  }
+
+  It "migrate:roots without --apply reports the plan and changes nothing" {
+    Copy-Item -LiteralPath $script:guideBody -Destination (Join-Path $script:rootsHome ".claude/CLAUDE.md")
+    Copy-Item -LiteralPath $script:guideBody -Destination (Join-Path $script:rootsHome ".codex/AGENTS.md")
+    Write-FixtureFile -Path (Join-Path $script:rootsHome ".cursor/AGENTS.md") -Content "my cursor rules`n"
+    $before = Get-HomeTreeListing
+
+    $output = Invoke-MigrateRoots 6>&1 | Out-String
+
+    $output | Should -Match ([regex]::Escape("Would move $(Join-Path $script:rootsHome '.claude/CLAUDE.md') -> "))
+    $output | Should -Match "cursor: .* differs from every catalog guide version"
+    $output | Should -Match "Dry run: nothing was changed\."
+    Get-HomeTreeListing | Should -Be $before
+  }
+
+  It "migrate:roots --apply moves only legacy copies to <name>.<UTC>.bak and prints the rollback" {
+    $claudeRoot = Join-Path $script:rootsHome ".claude/CLAUDE.md"
+    Copy-Item -LiteralPath $script:guideBody -Destination $claudeRoot
+    Write-FixtureFile -Path (Join-Path $script:rootsHome ".codex/AGENTS.md") -Content "$ApmGeneratedRootMarker`n# compiled`n"
+    Write-FixtureFile -Path (Join-Path $script:rootsHome ".cursor/AGENTS.md") -Content "my cursor rules`n"
+
+    $output = Invoke-MigrateRoots -Arguments @("--apply") 6>&1 | Out-String
+
+    Test-Path -LiteralPath $claudeRoot | Should -Be $false
+    $backups = @(Get-ChildItem -LiteralPath (Join-Path $script:rootsHome ".claude") -Filter "CLAUDE.md.*.bak")
+    $backups.Count | Should -Be 1
+    $backups[0].Name | Should -Match '\ACLAUDE\.md\.\d{8}T\d{6}Z\.bak\z'
+    [System.IO.File]::ReadAllText($backups[0].FullName) | Should -BeExactly ([System.IO.File]::ReadAllText($script:guideBody))
+    @(Get-ChildItem -LiteralPath (Join-Path $script:rootsHome ".codex"), (Join-Path $script:rootsHome ".cursor") -Filter "*.bak").Count | Should -Be 0
+    $output | Should -Match ([regex]::Escape("Move-Item -LiteralPath '$($backups[0].FullName)' -Destination '$claudeRoot' -Force"))
+    $output | Should -Match "mise run install:catalog"
+
+    Invoke-MigrateRoots -Arguments @("--apply") 6>&1 | Out-String | Should -Match "No root holds a legacy copy of the catalog guide"
+  }
+
+  It "migrate:roots --apply moves nothing when a backup path already exists" {
+    $claudeRoot = Join-Path $script:rootsHome ".claude/CLAUDE.md"
+    $codexRoot = Join-Path $script:rootsHome ".codex/AGENTS.md"
+    Copy-Item -LiteralPath $script:guideBody -Destination $claudeRoot
+    Copy-Item -LiteralPath $script:guideBody -Destination $codexRoot
+    # The stamp comes from the clock, so occupy every second the call can land on.
+    foreach ($offset in 0..5) {
+      Write-FixtureFile -Path ("{0}.{1}.bak" -f $codexRoot, [DateTime]::UtcNow.AddSeconds($offset).ToString("yyyyMMdd'T'HHmmss'Z'")) -Content "older backup`n"
+    }
+
+    { Invoke-MigrateRoots -Arguments @("--apply") 6>$null } | Should -Throw "*Backup path already exists*Nothing was moved*"
+    [System.IO.File]::ReadAllText($claudeRoot) | Should -BeExactly ([System.IO.File]::ReadAllText($script:guideBody))
+    [System.IO.File]::ReadAllText($codexRoot) | Should -BeExactly ([System.IO.File]::ReadAllText($script:guideBody))
+  }
+
+  It "migrate:roots rejects an unknown argument" {
+    { Invoke-MigrateRoots -Arguments @("--force") } | Should -Throw "usage: migrate:roots ``[--apply``]"
+  }
+
+  It "refuses an install only while ~/.claude/CLAUDE.md is a legacy copy" {
+    { Assert-UserRootsMigrated } | Should -Not -Throw
+    Write-FixtureFile -Path (Join-Path $script:rootsHome ".claude/CLAUDE.md") -Content "my own claude rules`n"
+    { Assert-UserRootsMigrated } | Should -Not -Throw
+    Copy-Item -LiteralPath $script:guideBody -Destination (Join-Path $script:rootsHome ".claude/CLAUDE.md") -Force
+    { Assert-UserRootsMigrated } | Should -Throw "*Claude would load it twice*"
+  }
+
+  It "writes the OpenCode guide when absent and leaves a hand-written one" {
+    Mock Write-WarnLine {}
+    Sync-OpencodeInstructions
+    [System.IO.File]::ReadAllText($script:OpencodeInstructionsOutput) | Should -BeExactly ([System.IO.File]::ReadAllText($script:guideBody))
+
+    Write-FixtureFile -Path $script:OpencodeInstructionsOutput -Content "my opencode rules`n"
+    Sync-OpencodeInstructions
+    [System.IO.File]::ReadAllText($script:OpencodeInstructionsOutput) | Should -BeExactly "my opencode rules`n"
+    Should -Invoke Write-WarnLine -Times 1 -ParameterFilter { $Message -like "*as is (hand-written)*" }
   }
 }
