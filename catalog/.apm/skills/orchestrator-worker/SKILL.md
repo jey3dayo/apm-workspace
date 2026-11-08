@@ -300,7 +300,7 @@ Claude では独立タスクを同一レスポンス内で複数呼び出すと�
 
 主張の広さと検証の広さを一致させる。最終 tree が健全だと言うなら最終 SHA を確認すれば足りるが、途中の各 commit も成立すると言うなら各 commit を確認する。「参照が残っていない」と断定するなら、その主張が覆う集合を検索する。1 ファイルを見て全体を語らない。
 
-ファイル・コマンド・タスクの不存在を根拠にするときは、global の共有ガイダンス（正本は `catalog/AGENTS.md`、配布先は `~/.claude/CLAUDE.md` と `~/.codex/AGENTS.md`）の「事実確認」に従う。一覧コマンドの出力に無いことは、存在しないことの証明にはならない。
+ファイル・コマンド・タスクの不存在を根拠にするときは、global の共有ガイダンス（正本は `catalog/.apm/instructions/ai-collaboration.instructions.md`、配布先は `~/.claude/rules/ai-collaboration.md`、`~/.codex/AGENTS.md`、`~/.cursor/AGENTS.md`）の「事実確認」に従う。一覧コマンドの出力に無いことは、存在しないことの証明にはならない。
 
 完了条件: 確認した対象・確認結果・未確認のまま残した範囲を対応させて報告した。
 

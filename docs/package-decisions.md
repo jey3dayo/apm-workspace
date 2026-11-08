@@ -3,6 +3,17 @@
 採用・撤去・見送りにした APM パッケージの意思決定ログ。1 パッケージ 1 セクション。
 「なぜ入れたか / なぜ消したか / 再検討するなら何を見るか」を残す。
 
+## catalog の global ガイドを APM の instruction にする（2026-11-08）
+
+- Status: 採用（REPO 側。実 HOME の切り替えは本人が `mise run migrate:roots -- --apply` を明示実行する）
+- 正本: `catalog/.apm/instructions/ai-collaboration.instructions.md`（1 ファイル。frontmatter の下の本文は旧 `catalog/AGENTS.md` と byte 一致）
+- 配布: user-scope install が Claude rule `~/.claude/rules/ai-collaboration.md` を置き、apply の `apm compile -g --clean` が `~/.codex/AGENTS.md` と `~/.cursor/AGENTS.md` を書く。旧 sync による root 3 つの上書きコピーと、project-scope の `apm compile --target codex --output` はやめた
+- 1 ファイルにした理由: 本文が他の節を位置で参照している（「上の表」、「この文書」）。16 節に分けると参照の意味が変わり、Claude の rule の読み込み順も保証されない。分割は別の判断として残す
+- 既存 root の扱い: APM は目印の無い root を上書きしない。旧 sync のコピー（過去の `catalog/AGENTS.md` と byte 一致）だけを `migrate:roots` が `<name>.<UTC>.bak` へ移す（既定は dry-run）。手書きの root、symlink、APM の生成物は触らない。`~/.claude/CLAUDE.md` が旧コピーのままだと、APM が同じ本文を rule として足し二重に読まれるため、`install:catalog`・`refresh`・`install:pins`・`upgrade` は止まる
+- 互換のために残した書き手: OpenCode は `~/.config/opencode/AGENTS.md` が無いと `~/.claude/CLAUDE.md` を読む（opencode.ai/docs/rules）。APM は host の targets に opencode が無いとこのファイルを書かず、opencode を targets に足すと拒否される agents も配られる。そのため apply が本文を書く（無いとき・旧コピーのときだけ）。Pi の `~/AGENTS.md` も本文のコピーを続ける
+- 残したもの: `claude-md-design` と `model-policy` は custom の rules sync のまま（instruction にすると Codex の root に畳み込まれる）。`claude-md-design` の `paths:` は移動先に合わせた
+- 再検討するなら: APM が user-scope の opencode root を targets と別に書けるようになったら、OpenCode のコピーを外す。分割するなら、本文の位置参照を先に解消する
+
 ## agent-desktop (vercel-labs/agent-desktop)
 
 - Status: 採用・global（2026-10-31、ユーザー判断）
