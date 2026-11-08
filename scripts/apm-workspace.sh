@@ -303,8 +303,26 @@ is_legacy_catalog_instructions_copy() {
   grep -qxF -- "$candidate_blob" <<<"$known_blobs"
 }
 
-# Classifies a root context file: absent, not-regular, generated (written by apm compile), legacy (a byte copy
-# of a catalog guide the legacy sync wrote), or hand-written (anything else, which only its owner may change).
+# Mirrors apm_cli/compilation/build_id.py has_valid_build_id: the 12-hex Build ID is the sha256 of the file with that
+# line removed and the remaining lines joined by "\n", so any edit after compile breaks the match.
+has_valid_apm_build_id() {
+  build_id_path="$1"
+  build_id_line='^<!-- Build ID: [0-9a-f]{12} -->$'
+  [ "$(grep -cE -- "$build_id_line" "$build_id_path" || true)" = 1 ] || return 1
+  recorded_build_id=$(grep -E -- "$build_id_line" "$build_id_path" | sed -E 's/^<!-- Build ID: ([0-9a-f]{12}) -->$/\1/')
+  computed_build_id=$({ grep -vE -- "$build_id_line" "$build_id_path" || true; } |
+    awk 'NR > 1 { printf "\n" } { printf "%s", $0 }' | file_sha256 - | cut -c1-12)
+  [ "$recorded_build_id" = "$computed_build_id" ]
+}
+
+is_edited_generated_root() {
+  [ -f "$1" ] && [ ! -L "$1" ] && [ "$(awk 'NF { print; exit }' "$1")" = "$APM_GENERATED_ROOT_MARKER" ] &&
+    ! has_valid_apm_build_id "$1"
+}
+
+# Classifies a root context file: absent, not-regular, generated (written by apm compile and unchanged since),
+# edited-generated (APM's marker kept but edited after compile), legacy (a byte copy of a catalog guide the legacy
+# sync wrote), or hand-written (anything else, which only its owner may change).
 user_root_state() {
   root_path="$1"
   known_blobs="$2"
@@ -313,7 +331,11 @@ user_root_state() {
   elif [ -L "$root_path" ] || [ ! -f "$root_path" ]; then
     printf 'not-regular\n'
   elif [ "$(awk 'NF { print; exit }' "$root_path")" = "$APM_GENERATED_ROOT_MARKER" ]; then
-    printf 'generated\n'
+    if has_valid_apm_build_id "$root_path"; then
+      printf 'generated\n'
+    else
+      printf 'edited-generated\n'
+    fi
   elif is_legacy_catalog_instructions_copy "$root_path" "$known_blobs"; then
     printf 'legacy\n'
   else
@@ -773,17 +795,35 @@ ensure_workspace_mise_file() {
 }
 
 # User-scope compile never overwrites a root without APM's marker, so a hand-written or legacy root survives; --clean
-# removes only an unchanged APM-generated Claude root that native rules made redundant.
+# removes only an unchanged APM-generated Claude root that native rules made redundant. APM 0.35.0 still overwrites an
+# edited generated root of a non-Claude target, so the compile is skipped while any root holds such edits.
 compile_user_root_contexts() {
   require_apm
   if [ ! -d "$HOME/.apm/apm_modules" ]; then
     log "Skipping user-scope root compile: no APM package is installed at user scope yet (~/.apm/apm_modules)."
     return 0
   fi
+  edited_roots=$(edited_generated_user_roots)
+  if [ -n "$edited_roots" ]; then
+    warn "Skipping user-scope root compile: these roots keep APM's marker but were edited after compile, and apm compile would overwrite them:
+$edited_roots
+To keep your edits, delete the first line (the APM marker) so APM treats the file as hand-written; to let APM regenerate it, move the file aside (keep a .bak). Then re-run apply."
+    return 0
+  fi
   (
     cd "$WORKSPACE_DIR"
     apm compile -g --clean
   )
+}
+
+edited_generated_user_roots() {
+  while read_runtime_target; do
+    [ "$RT_CONFIG_NAME" != "-" ] || continue
+    root_path="$HOME/$RT_TARGET_DIR/$RT_CONFIG_NAME"
+    if is_edited_generated_root "$root_path"; then
+      printf '  %s\n' "$root_path"
+    fi
+  done < <(managed_catalog_runtime_targets)
 }
 
 sync_pi_instructions() {
@@ -831,6 +871,9 @@ assert_user_roots_migrated() {
   claude_root="$HOME/.claude/CLAUDE.md"
   [ -f "$claude_root" ] || return 0
   require_command git
+  if is_edited_generated_root "$claude_root"; then
+    fail "Refusing to install catalog instructions: $claude_root keeps APM's marker but was edited after compile, so apm compile --clean keeps it, and APM would add the guide under ~/.claude/rules, so Claude would load it twice. To keep your edits, delete the first line (the APM marker) and remove the guide from the file; otherwise move it aside by hand (keep a .bak). Then retry."
+  fi
   if is_legacy_catalog_instructions_copy "$claude_root" "$(legacy_catalog_instructions_blobs)"; then
     if [ -L "$claude_root" ]; then
       fail "Refusing to install catalog instructions: $claude_root is a symlink to a copy of the catalog guide, and APM would add the same guide under ~/.claude/rules, so Claude would load it twice. migrate:roots does not move symlinks: move the link aside by hand, then retry."
@@ -869,6 +912,7 @@ cmd_migrate_roots() {
     case "$(user_root_state "$root_path" "$known_blobs")" in
       absent) log "$RT_TARGET_NAME: $root_path is absent; nothing to move." ;;
       generated) log "$RT_TARGET_NAME: $root_path was written by apm compile; nothing to move." ;;
+      edited-generated) log "$RT_TARGET_NAME: $root_path keeps APM's marker but was edited after compile; left as is. Delete the marker line to keep it as your own file, or move it aside by hand." ;;
       not-regular) log "$RT_TARGET_NAME: $root_path is not a regular file (symlink or other); left as is. Move it by hand if it points at a copy of the guide." ;;
       hand-written) log "$RT_TARGET_NAME: $root_path differs from every catalog guide version, so it was edited or written by hand; left as is. APM will not write this root while it exists." ;;
       legacy)
@@ -3117,26 +3161,38 @@ file_sha256() {
 }
 
 # The lock records what APM itself placed for the catalog; a listed path that is gone means the install was undone.
+# Skills and agents are re-synced from the working catalog on every apply, so one deleted there disappears before the
+# push and install:catalog that drop it from the lock; such a path is only counted as stale.
 check_catalog_lock_deployed_files() {
   lock_file="$WORKSPACE_DIR/apm.lock.yaml"
   [ -f "$lock_file" ] || return 0
   listed_count=0
   missing_count=0
+  stale_count=0
   changed_count=0
   tab=$(printf '\t')
   while IFS="$tab" read -r record_kind record_path record_hash; do
     if [ "$record_kind" = F ]; then
       listed_count=$((listed_count + 1))
-      if [ ! -e "$HOME/$record_path" ] && [ ! -L "$HOME/$record_path" ]; then
-        error "Catalog file recorded in apm.lock.yaml is missing: ~/$record_path"
-        missing_count=$((missing_count + 1))
+      if [ -e "$HOME/$record_path" ] || [ -L "$HOME/$record_path" ]; then
+        continue
       fi
+      case "$record_path" in
+        */skills/* | */agents/*) stale_count=$((stale_count + 1)) ;;
+        *)
+          error "Catalog file recorded in apm.lock.yaml is missing: ~/$record_path"
+          missing_count=$((missing_count + 1))
+          ;;
+      esac
     elif [ -f "$HOME/$record_path" ] && [ "$(file_sha256 "$HOME/$record_path")" != "$record_hash" ]; then
       changed_count=$((changed_count + 1))
     fi
   done < <(catalog_lock_deployed_entries "$lock_file")
   # changed counts files the skill sync replaced with the working catalog or a private override, which is expected.
-  printf 'catalog lock files: listed=%s missing=%s changed=%s\n' "$listed_count" "$missing_count" "$changed_count"
+  printf 'catalog lock files: listed=%s missing=%s stale=%s changed=%s\n' "$listed_count" "$missing_count" "$stale_count" "$changed_count"
+  if [ "$stale_count" -gt 0 ]; then
+    warn "$stale_count skill or agent file(s) recorded in apm.lock.yaml are gone, as after deleting them from the working catalog; they leave the lock with the next 'mise run install:catalog' after the push."
+  fi
   [ "$missing_count" -eq 0 ]
 }
 
@@ -3232,6 +3288,8 @@ cmd_doctor() {
         has_failure=1
       elif [ "$config_state" = legacy ]; then
         warn "$target_root/$RT_CONFIG_NAME is still the copy the legacy catalog sync wrote; preview its move with 'mise run migrate:roots'"
+      elif [ "$config_state" = edited-generated ]; then
+        warn "$target_root/$RT_CONFIG_NAME keeps APM's marker but was edited after compile, so apply skips the root compile; delete the marker line to keep it as your own file, or move it aside"
       elif [ "$RT_TARGET_NAME" = claude ] && [ "$config_state" = absent ] && [ -f "$(tracked_catalog_instructions_path)" ] &&
         [ ! -f "$target_root/rules/${CATALOG_INSTRUCTIONS_FILE_NAME%.instructions.md}.md" ]; then
         warn "Claude has neither $target_root/$RT_CONFIG_NAME nor the guide rule $target_root/rules/${CATALOG_INSTRUCTIONS_FILE_NAME%.instructions.md}.md; run 'mise run install:catalog'"

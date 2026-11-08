@@ -3762,6 +3762,12 @@ make_roots_fixture() {
   PI_OUTPUT="$roots_home/AGENTS.md"
 }
 
+# Writes a root the way apm compile does: the Build ID is the sha256 of the other lines joined by "\n".
+write_generated_root() {
+  build_id=$(printf '%s\n%s' "$APM_GENERATED_ROOT_MARKER" "$2" | file_sha256 - | cut -c1-12)
+  printf '%s\n<!-- Build ID: %s -->\n%s\n' "$APM_GENERATED_ROOT_MARKER" "$build_id" "$2" >"$1"
+}
+
 home_tree_listing() {
   (cd "$roots_home" && find . -print | LC_ALL=C sort && find . -type f -exec shasum {} + | LC_ALL=C sort)
 }
@@ -3775,17 +3781,22 @@ home_tree_listing() {
   rm -rf "$roots_workspace" "$roots_home"
 }
 
-@test "user_root_state tells absent, generated, legacy, hand-written and non-regular roots apart" {
+@test "user_root_state tells absent, generated, edited-generated, legacy, hand-written and non-regular roots apart" {
   make_roots_fixture
   known="$(legacy_catalog_instructions_blobs)"
   cp "$roots_home/guide-body.md" "$roots_home/.claude/CLAUDE.md"
-  printf '%s\n# compiled\n' "$APM_GENERATED_ROOT_MARKER" >"$roots_home/.codex/AGENTS.md"
+  write_generated_root "$roots_home/.codex/AGENTS.md" '# compiled'
+  write_generated_root "$roots_home/edited.md" '# compiled'
+  printf 'my own line\n' >>"$roots_home/edited.md"
+  printf '%s\n# compiled\n' "$APM_GENERATED_ROOT_MARKER" >"$roots_home/no-build-id.md"
   printf '# Guide\n\nbody line\nmy own addition\n' >"$roots_home/.cursor/AGENTS.md"
   ln -s "$roots_home/guide-body.md" "$roots_home/linked.md"
   mkdir "$roots_home/dir.md"
 
   [ "$(user_root_state "$roots_home/missing.md" "$known")" = absent ]
   [ "$(user_root_state "$roots_home/.codex/AGENTS.md" "$known")" = generated ]
+  [ "$(user_root_state "$roots_home/edited.md" "$known")" = edited-generated ]
+  [ "$(user_root_state "$roots_home/no-build-id.md" "$known")" = edited-generated ]
   [ "$(user_root_state "$roots_home/.claude/CLAUDE.md" "$known")" = legacy ]
   [ "$(user_root_state "$roots_home/.cursor/AGENTS.md" "$known")" = hand-written ]
   [ "$(user_root_state "$roots_home/linked.md" "$known")" = not-regular ]
@@ -3829,7 +3840,7 @@ home_tree_listing() {
   make_roots_fixture
   date() { printf '20261108T000000Z\n'; }
   cp "$roots_home/guide-body.md" "$roots_home/.claude/CLAUDE.md"
-  printf '%s\n# compiled\n' "$APM_GENERATED_ROOT_MARKER" >"$roots_home/.codex/AGENTS.md"
+  write_generated_root "$roots_home/.codex/AGENTS.md" '# compiled'
   ln -s "$roots_home/guide-body.md" "$roots_home/.cursor/AGENTS.md"
 
   run cmd_migrate_roots --apply
@@ -3960,6 +3971,56 @@ home_tree_listing() {
   rm -rf "$roots_workspace" "$roots_home"
 }
 
+@test "compile_user_root_contexts keeps a generated root edited after compile by skipping the compile" {
+  make_roots_fixture
+  mkdir -p "$roots_home/.apm/apm_modules"
+  apm() { printf 'apm %s\n' "$*"; }
+  write_generated_root "$roots_home/.codex/AGENTS.md" '# compiled'
+
+  run compile_user_root_contexts
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"apm compile -g --clean"* ]]
+
+  printf 'my own codex line\n' >>"$roots_home/.codex/AGENTS.md"
+  cp "$roots_home/.codex/AGENTS.md" "$roots_home/edited.before"
+  run compile_user_root_contexts
+
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"apm compile -g"* ]]
+  [[ "$output" == *"Skipping user-scope root compile: these roots keep APM's marker but were edited after compile"* ]]
+  [[ "$output" == *"  $roots_home/.codex/AGENTS.md"* ]]
+  cmp "$roots_home/.codex/AGENTS.md" "$roots_home/edited.before"
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "assert_user_roots_migrated refuses a generated ~/.claude/CLAUDE.md edited after compile, which --clean keeps" {
+  make_roots_fixture
+  write_generated_root "$roots_home/.claude/CLAUDE.md" "$(cat "$roots_home/guide-body.md")"
+  run assert_user_roots_migrated
+  [ "$status" -eq 0 ]
+
+  printf 'my own claude line\n' >>"$roots_home/.claude/CLAUDE.md"
+  run assert_user_roots_migrated
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"keeps APM's marker but was edited after compile"*"Claude would load it twice"* ]]
+  [ "$(tail -n 1 "$roots_home/.claude/CLAUDE.md")" = "my own claude line" ]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "sync_opencode_instructions does not displace an edited generated ~/.claude/CLAUDE.md that OpenCode falls back to" {
+  make_roots_fixture
+  write_generated_root "$roots_home/.claude/CLAUDE.md" '# compiled'
+  printf 'my own claude line\n' >>"$roots_home/.claude/CLAUDE.md"
+
+  run sync_opencode_instructions
+
+  [ "$status" -eq 0 ]
+  [ ! -e "$OPENCODE_INSTRUCTIONS_OUTPUT" ]
+  [[ "$output" == *"OpenCode falls back to $roots_home/.claude/CLAUDE.md (edited-generated)"* ]]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
 @test "apply leaves a legacy root and a hand-written root unchanged and warns about the legacy one" {
   base="$(mktemp -d)"
   bin_dir="$base/bin"
@@ -4031,6 +4092,7 @@ home_tree_listing() {
 
   [ "$status" -eq 0 ]
   [[ "$output" == *"claude: config=absent"* ]]
+  [[ "$output" == *"Claude has neither $doctor_home/.claude/CLAUDE.md nor the guide rule"* ]]
   [[ "$output" == *"codex: config=legacy"* ]]
   [[ "$output" == *"$doctor_home/.codex/AGENTS.md is still the copy the legacy catalog sync wrote"* ]]
   [[ "$output" == *"opencode instructions: "* ]]
@@ -4099,13 +4161,31 @@ LOCK
 
   run check_catalog_lock_deployed_files
   [ "$status" -eq 0 ]
-  [[ "$output" == *"catalog lock files: listed=3 missing=0 changed=1"* ]]
+  [[ "$output" == *"catalog lock files: listed=3 missing=0 stale=0 changed=1"* ]]
 
   mv "$HOME/.claude/rules/ai-collaboration.md" "$HOME/rule.aside"
   run check_catalog_lock_deployed_files
   [ "$status" -ne 0 ]
   [[ "$output" == *"Catalog file recorded in apm.lock.yaml is missing: ~/.claude/rules/ai-collaboration.md"* ]]
-  [[ "$output" == *"listed=3 missing=1 changed=1"* ]]
+  [[ "$output" == *"listed=3 missing=1 stale=0 changed=1"* ]]
+  rm -rf "$WORKSPACE_DIR" "$HOME"
+}
+
+@test "check_catalog_lock_deployed_files only warns about a skill deleted from the working catalog before install:catalog" {
+  WORKSPACE_DIR="$(mktemp -d)"
+  HOME="$(mktemp -d)"
+  write_catalog_lock_fixture "$WORKSPACE_DIR/apm.lock.yaml"
+  mkdir -p "$HOME/.claude/rules"
+  printf 'rule\n' >"$HOME/.claude/rules/ai-collaboration.md"
+  rule_hash=$(sha256sum "$HOME/.claude/rules/ai-collaboration.md" | awk '{print $1}')
+  sed -i.orig "s/RULEHASH/$rule_hash/" "$WORKSPACE_DIR/apm.lock.yaml"
+
+  run check_catalog_lock_deployed_files
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"listed=3 missing=0 stale=2 changed=0"* ]]
+  [[ "$output" == *"2 skill or agent file(s) recorded in apm.lock.yaml are gone"*"install:catalog"* ]]
+  [[ "$output" != *"is missing"* ]]
   rm -rf "$WORKSPACE_DIR" "$HOME"
 }
 

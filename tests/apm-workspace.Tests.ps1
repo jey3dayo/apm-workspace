@@ -3478,6 +3478,16 @@ Describe "catalog instructions and user root migration" {
       [System.IO.File]::WriteAllText($Path, $Content, (New-Object System.Text.UTF8Encoding $false))
     }
 
+    # Writes a root the way apm compile does: the Build ID is the sha256 of the other lines joined by "`n".
+    function Write-GeneratedRoot {
+      param([string]$Path, [string]$Body)
+      $sha = [System.Security.Cryptography.SHA256]::Create()
+      $digest = $sha.ComputeHash([System.Text.Encoding]::UTF8.GetBytes("$ApmGeneratedRootMarker`n$Body"))
+      $sha.Dispose()
+      $buildId = (($digest | ForEach-Object { $_.ToString("x2") }) -join "").Substring(0, 12)
+      Write-FixtureFile -Path $Path -Content "$ApmGeneratedRootMarker`n<!-- Build ID: $buildId -->`n$Body`n"
+    }
+
     function Get-HomeTreeListing {
       Get-ChildItem -LiteralPath $script:rootsHome -Recurse -Force | Sort-Object FullName | ForEach-Object {
         if ($_.PSIsContainer -or $_.LinkType) { $_.FullName } else { "{0} {1}" -f $_.FullName, (Get-FileHash -LiteralPath $_.FullName).Hash }
@@ -3521,16 +3531,25 @@ Describe "catalog instructions and user root migration" {
     $body | Should -BeExactly ([System.IO.File]::ReadAllText($script:guideBody))
   }
 
-  It "tells absent, generated, legacy, hand-written and directory roots apart" {
+  It "tells absent, generated, edited-generated, legacy, hand-written, hard-linked and directory roots apart" {
     $known = Get-LegacyCatalogInstructionsBlobs
     Copy-Item -LiteralPath $script:guideBody -Destination (Join-Path $script:rootsHome ".claude/CLAUDE.md")
-    Write-FixtureFile -Path (Join-Path $script:rootsHome ".codex/AGENTS.md") -Content "$ApmGeneratedRootMarker`n# compiled`n"
+    Write-GeneratedRoot -Path (Join-Path $script:rootsHome ".codex/AGENTS.md") -Body "# compiled"
+    $editedPath = Join-Path $script:rootsHome "edited.md"
+    Write-GeneratedRoot -Path $editedPath -Body "# compiled"
+    Add-Content -LiteralPath $editedPath -Value "my own line" -NoNewline
+    Write-FixtureFile -Path (Join-Path $script:rootsHome "no-build-id.md") -Content "$ApmGeneratedRootMarker`n# compiled`n"
+    Write-FixtureFile -Path (Join-Path $script:rootsHome "hand.md") -Content "my own rules`n"
+    New-Item -ItemType HardLink -Path (Join-Path $script:rootsHome "hard.md") -Target (Join-Path $script:rootsHome "hand.md") | Out-Null
     Write-FixtureFile -Path (Join-Path $script:rootsHome ".cursor/AGENTS.md") -Content "# Guide`n`nbody line`nmy own addition`n"
     New-Item -ItemType Directory -Path (Join-Path $script:rootsHome "dir.md") | Out-Null
 
     Get-UserRootState -Path (Join-Path $script:rootsHome "missing.md") -KnownBlobs $known | Should -Be "absent"
     Get-UserRootState -Path (Join-Path $script:rootsHome ".claude/CLAUDE.md") -KnownBlobs $known | Should -Be "legacy"
     Get-UserRootState -Path (Join-Path $script:rootsHome ".codex/AGENTS.md") -KnownBlobs $known | Should -Be "generated"
+    Get-UserRootState -Path $editedPath -KnownBlobs $known | Should -Be "edited-generated"
+    Get-UserRootState -Path (Join-Path $script:rootsHome "no-build-id.md") -KnownBlobs $known | Should -Be "edited-generated"
+    Get-UserRootState -Path (Join-Path $script:rootsHome "hard.md") -KnownBlobs $known | Should -Be "hand-written"
     Get-UserRootState -Path (Join-Path $script:rootsHome ".cursor/AGENTS.md") -KnownBlobs $known | Should -Be "hand-written"
     Get-UserRootState -Path (Join-Path $script:rootsHome "dir.md") -KnownBlobs $known | Should -Be "not-regular"
   }
@@ -3564,7 +3583,7 @@ Describe "catalog instructions and user root migration" {
   It "migrate:roots --apply moves only legacy copies to <name>.<UTC>.bak and prints the rollback" {
     $claudeRoot = Join-Path $script:rootsHome ".claude/CLAUDE.md"
     Copy-Item -LiteralPath $script:guideBody -Destination $claudeRoot
-    Write-FixtureFile -Path (Join-Path $script:rootsHome ".codex/AGENTS.md") -Content "$ApmGeneratedRootMarker`n# compiled`n"
+    Write-GeneratedRoot -Path (Join-Path $script:rootsHome ".codex/AGENTS.md") -Body "# compiled"
     Write-FixtureFile -Path (Join-Path $script:rootsHome ".cursor/AGENTS.md") -Content "my cursor rules`n"
 
     $output = Invoke-MigrateRoots -Arguments @("--apply") 6>&1 | Out-String
@@ -3648,6 +3667,47 @@ Describe "catalog instructions and user root migration" {
     $output | Should -Match "Not writing .*\(hand-written\)"
   }
 
+  It "skips the user-scope compile while a generated root was edited after compile, keeping the edits" {
+    Mock Require-Apm {}
+    Mock Test-Path { $true } -ParameterFilter { $LiteralPath -like "*apm_modules" }
+    Mock Write-WarnLine {}
+    $global:apmCalls = New-Object System.Collections.Generic.List[string]
+    function apm { $global:apmCalls.Add(($args -join " ")); $global:LASTEXITCODE = 0 }
+    $codexRoot = Join-Path $script:rootsHome ".codex/AGENTS.md"
+    Write-GeneratedRoot -Path $codexRoot -Body "# compiled"
+
+    Invoke-UserRootCompile 6>$null
+    @($global:apmCalls) | Should -Be @("compile -g --clean")
+
+    Add-Content -LiteralPath $codexRoot -Value "my own codex line"
+    $before = [System.IO.File]::ReadAllText($codexRoot)
+    $global:apmCalls.Clear()
+    Invoke-UserRootCompile 6>$null
+
+    $global:apmCalls.Count | Should -Be 0
+    Should -Invoke Write-WarnLine -Times 1 -ParameterFilter { $Message -like "*keep APM's marker but were edited after compile*$codexRoot*" }
+    [System.IO.File]::ReadAllText($codexRoot) | Should -BeExactly $before
+    Remove-Variable -Name apmCalls -Scope Global
+  }
+
+  It "refuses an install while a generated ~/.claude/CLAUDE.md was edited after compile, which --clean keeps" {
+    $claudeRoot = Join-Path $script:rootsHome ".claude/CLAUDE.md"
+    Write-GeneratedRoot -Path $claudeRoot -Body ([System.IO.File]::ReadAllText($script:guideBody).TrimEnd("`n"))
+    { Assert-UserRootsMigrated } | Should -Not -Throw
+
+    Add-Content -LiteralPath $claudeRoot -Value "my own claude line"
+    { Assert-UserRootsMigrated } | Should -Throw "*keeps APM's marker but was edited after compile*Claude would load it twice*"
+  }
+
+  It "does not displace an edited generated ~/.claude/CLAUDE.md that OpenCode falls back to" {
+    $claudeRoot = Join-Path $script:rootsHome ".claude/CLAUDE.md"
+    Write-GeneratedRoot -Path $claudeRoot -Body "# compiled"
+    Add-Content -LiteralPath $claudeRoot -Value "my own claude line"
+    $output = Sync-OpencodeInstructions 6>&1 | Out-String
+    Test-Path -LiteralPath $script:OpencodeInstructionsOutput | Should -Be $false
+    $output | Should -Match "Not writing .*\(edited-generated\)"
+  }
+
   It "migrate:roots accepts the -- that mise run forwards before --apply" {
     $codexRoot = Join-Path $script:rootsHome ".codex/AGENTS.md"
     Copy-Item -LiteralPath $script:guideBody -Destination $codexRoot
@@ -3719,10 +3779,26 @@ Describe "catalog lock deployed files" {
     Write-CatalogLockFixture -Path $lockPath -RuleHash (Get-FileHash -LiteralPath $rulePath -Algorithm SHA256).Hash.ToLowerInvariant()
 
     $output = @(Test-CatalogLockDeployedFiles -LockPath $lockPath -HomeDir $homeDir 6>&1)
-    ($output | Where-Object { $_ -is [System.Management.Automation.InformationRecord] } | Out-String) | Should -Match "listed=3 missing=0 changed=1"
+    ($output | Where-Object { $_ -is [System.Management.Automation.InformationRecord] } | Out-String) | Should -Match "listed=3 missing=0 stale=0 changed=1"
     @($output | Where-Object { $_ -is [string] }).Count | Should -Be 0
 
     Move-Item -LiteralPath $rulePath -Destination (Join-Path $homeDir "rule.aside")
     @(Test-CatalogLockDeployedFiles -LockPath $lockPath -HomeDir $homeDir 6>$null) | Should -Be @(".claude/rules/ai-collaboration.md")
+  }
+
+  It "only warns about a skill deleted from the working catalog before install:catalog" {
+    Mock Write-WarnLine {}
+    $homeDir = Join-Path $TestDrive "stale-home"
+    New-Item -ItemType Directory -Path (Join-Path $homeDir ".claude/rules") -Force | Out-Null
+    $rulePath = Join-Path $homeDir ".claude/rules/ai-collaboration.md"
+    Set-Content -LiteralPath $rulePath -Value "rule"
+    $lockPath = Join-Path $TestDrive "stale.lock.yaml"
+    Write-CatalogLockFixture -Path $lockPath -RuleHash (Get-FileHash -LiteralPath $rulePath -Algorithm SHA256).Hash.ToLowerInvariant()
+
+    $output = @(Test-CatalogLockDeployedFiles -LockPath $lockPath -HomeDir $homeDir 6>&1)
+
+    @($output | Where-Object { $_ -is [string] }).Count | Should -Be 0
+    ($output | Where-Object { $_ -is [System.Management.Automation.InformationRecord] } | Out-String) | Should -Match "listed=3 missing=0 stale=2 changed=0"
+    Should -Invoke Write-WarnLine -Times 1 -ParameterFilter { $Message -like "2 skill or agent file(s) recorded in apm.lock.yaml are gone*install:catalog*" }
   }
 }

@@ -423,11 +423,17 @@ function Ensure-WorkspaceMiseFile {
 }
 
 # User-scope compile never overwrites a root without APM's marker, so a hand-written or legacy root survives; --clean
-# removes only an unchanged APM-generated Claude root that native rules made redundant.
+# removes only an unchanged APM-generated Claude root that native rules made redundant. APM 0.35.0 still overwrites an
+# edited generated root of a non-Claude target, so the compile is skipped while any root holds such edits.
 function Invoke-UserRootCompile {
   Require-Apm
   if (-not (Test-Path -LiteralPath (Join-Path (Join-Path $HOME ".apm") "apm_modules") -PathType Container)) {
     Write-Host "Skipping user-scope root compile: no APM package is installed at user scope yet (~/.apm/apm_modules)."
+    return
+  }
+  $editedRoots = @(Get-UserRootTargets | ForEach-Object { Join-Path $_.Root $_.ConfigName } | Where-Object { Test-EditedGeneratedRoot -Path $_ })
+  if ($editedRoots.Count -gt 0) {
+    Write-WarnLine ("Skipping user-scope root compile: these roots keep APM's marker but were edited after compile, and apm compile would overwrite them:`n{0}`nTo keep your edits, delete the first line (the APM marker) so APM treats the file as hand-written; to let APM regenerate it, move the file aside (keep a .bak). Then re-run apply." -f (($editedRoots | ForEach-Object { "  $_" }) -join "`n"))
     return
   }
 
@@ -508,8 +514,11 @@ function Assert-UserRootsMigrated {
     return
   }
   Require-Command -Name git
+  if (Test-EditedGeneratedRoot -Path $claudeRoot) {
+    throw ("Refusing to install catalog instructions: {0} keeps APM's marker but was edited after compile, so apm compile --clean keeps it, and APM would add the guide under ~/.claude/rules, so Claude would load it twice. To keep your edits, delete the first line (the APM marker) and remove the guide from the file; otherwise move it aside by hand (keep a .bak). Then retry." -f $claudeRoot)
+  }
   if (Test-LegacyCatalogInstructionsCopy -Path $claudeRoot -KnownBlobs (Get-LegacyCatalogInstructionsBlobs)) {
-    if ((Get-Item -LiteralPath $claudeRoot -Force).LinkType) {
+    if ((Get-Item -LiteralPath $claudeRoot -Force).LinkType -in @("SymbolicLink", "Junction")) {
       throw ("Refusing to install catalog instructions: {0} is a symlink to a copy of the catalog guide, and APM would add the same guide under ~/.claude/rules, so Claude would load it twice. migrate:roots does not move symlinks: move the link aside by hand, then retry." -f $claudeRoot)
     }
     throw ("Refusing to install catalog instructions: {0} is still the copy the legacy catalog sync wrote, and APM would add the same guide under ~/.claude/rules, so Claude would load it twice. Preview the move with 'mise run migrate:roots', then run 'mise run migrate:roots -- --apply'." -f $claudeRoot)
@@ -545,6 +554,7 @@ function Invoke-MigrateRoots {
     switch (Get-UserRootState -Path $rootPath -KnownBlobs $knownBlobs) {
       "absent" { Write-Host ("{0}: {1} is absent; nothing to move." -f $target.Name, $rootPath) }
       "generated" { Write-Host ("{0}: {1} was written by apm compile; nothing to move." -f $target.Name, $rootPath) }
+      "edited-generated" { Write-Host ("{0}: {1} keeps APM's marker but was edited after compile; left as is. Delete the marker line to keep it as your own file, or move it aside by hand." -f $target.Name, $rootPath) }
       "not-regular" { Write-Host ("{0}: {1} is not a regular file (symlink or other); left as is. Move it by hand if it points at a copy of the guide." -f $target.Name, $rootPath) }
       "hand-written" { Write-Host ("{0}: {1} differs from every catalog guide version, so it was edited or written by hand; left as is. APM will not write this root while it exists." -f $target.Name, $rootPath) }
       "legacy" {
@@ -2924,6 +2934,9 @@ function Get-LegacyCatalogInstructionsBlobs {
   if ($LASTEXITCODE -eq 0) {
     $versionPath = [System.IO.Path]::GetTempFileName()
     $renderedPath = [System.IO.Path]::GetTempFileName()
+    # Native output is decoded with the console code page, which is not UTF-8 by default on Windows.
+    $previousOutputEncoding = [Console]::OutputEncoding
+    [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding $false
     try {
       foreach ($rawLine in @($instructionLines | Select-Object -Unique)) {
         $fields = ([string]$rawLine) -split '\s+'
@@ -2937,6 +2950,7 @@ function Get-LegacyCatalogInstructionsBlobs {
       }
     }
     finally {
+      [Console]::OutputEncoding = $previousOutputEncoding
       Remove-Item -LiteralPath $versionPath, $renderedPath -Force -ErrorAction SilentlyContinue
     }
   }
@@ -2953,8 +2967,40 @@ function Test-LegacyCatalogInstructionsCopy {
   return ([bool]$blobId -and $KnownBlobs.Contains($blobId))
 }
 
-# Classifies a root context file: absent, not-regular, generated (written by apm compile), legacy (a byte copy
-# of a catalog guide the legacy sync wrote), or hand-written (anything else, which only its owner may change).
+# Mirrors apm_cli/compilation/build_id.py has_valid_build_id: the 12-hex Build ID is the sha256 of the file with that
+# line removed and the remaining lines joined by "`n", so any edit after compile breaks the match.
+function Test-ApmBuildIdValid {
+  param([Parameter(Mandatory = $true)][string]$Path)
+
+  $content = [System.IO.File]::ReadAllText($Path, [System.Text.UTF8Encoding]::new($false))
+  if ($content.EndsWith("`n")) { $content = $content.Substring(0, $content.Length - 1) }
+  $lines = $content -split "`n"
+  $buildIdLines = @($lines | Where-Object { $_ -cmatch '^<!-- Build ID: [0-9a-f]{12} -->$' })
+  if ($buildIdLines.Count -ne 1) { return $false }
+  $hashInput = ($lines | Where-Object { $_ -cnotmatch '^<!-- Build ID: [0-9a-f]{12} -->$' }) -join "`n"
+  $sha = [System.Security.Cryptography.SHA256]::Create()
+  try {
+    $digest = $sha.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($hashInput))
+  }
+  finally {
+    $sha.Dispose()
+  }
+  $computed = (($digest | ForEach-Object { $_.ToString("x2") }) -join "").Substring(0, 12)
+  return ($buildIdLines[0] -ceq "<!-- Build ID: $computed -->")
+}
+
+function Test-EditedGeneratedRoot {
+  param([Parameter(Mandatory = $true)][string]$Path)
+
+  $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
+  if ($null -eq $item -or $item.LinkType -in @("SymbolicLink", "Junction") -or $item.PSIsContainer) { return $false }
+  $firstLine = Get-Content -LiteralPath $Path -Encoding UTF8 | Where-Object { $_.Trim() -ne "" } | Select-Object -First 1
+  return ($firstLine -ceq $ApmGeneratedRootMarker -and -not (Test-ApmBuildIdValid -Path $Path))
+}
+
+# Classifies a root context file: absent, not-regular, generated (written by apm compile and unchanged since),
+# edited-generated (APM's marker kept but edited after compile), legacy (a byte copy of a catalog guide the legacy
+# sync wrote), or hand-written (anything else, which only its owner may change).
 function Get-UserRootState {
   param(
     [Parameter(Mandatory = $true)][string]$Path,
@@ -2963,9 +3009,13 @@ function Get-UserRootState {
 
   $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
   if ($null -eq $item) { return "absent" }
-  if ($item.LinkType -or $item.PSIsContainer) { return "not-regular" }
+  # pwsh also reports a hard-linked regular file as LinkType HardLink.
+  if ($item.LinkType -in @("SymbolicLink", "Junction") -or $item.PSIsContainer) { return "not-regular" }
   $firstLine = Get-Content -LiteralPath $Path -Encoding UTF8 | Where-Object { $_.Trim() -ne "" } | Select-Object -First 1
-  if ($firstLine -ceq $ApmGeneratedRootMarker) { return "generated" }
+  if ($firstLine -ceq $ApmGeneratedRootMarker) {
+    if (Test-ApmBuildIdValid -Path $Path) { return "generated" }
+    return "edited-generated"
+  }
   if (Test-LegacyCatalogInstructionsCopy -Path $Path -KnownBlobs $KnownBlobs) { return "legacy" }
   return "hand-written"
 }
@@ -4214,6 +4264,9 @@ function Invoke-Doctor {
     elseif ($configState -eq "legacy") {
       Write-WarnLine ("{0} is still the copy the legacy catalog sync wrote; preview its move with 'mise run migrate:roots'" -f $configPath)
     }
+    elseif ($configState -eq "edited-generated") {
+      Write-WarnLine ("{0} keeps APM's marker but was edited after compile, so apply skips the root compile; delete the marker line to keep it as your own file, or move it aside" -f $configPath)
+    }
     elseif ($target.Name -eq "claude" -and $configState -eq "absent" -and (Test-Path -LiteralPath (Get-TrackedCatalogInstructionsPath) -PathType Leaf)) {
       $guideRulePath = Join-Path $rulesPath ($CatalogInstructionsFileName -replace '\.instructions\.md\z', '.md')
       if (-not (Test-Path -LiteralPath $guideRulePath -PathType Leaf)) {
@@ -4302,6 +4355,8 @@ function Get-CatalogLockDeployedEntries {
 }
 
 # The lock records what APM itself placed for the catalog; a listed path that is gone means the install was undone.
+# Skills and agents are re-synced from the working catalog on every apply, so one deleted there disappears before the
+# push and install:catalog that drop it from the lock; such a path is only counted as stale.
 # changed counts files the skill sync replaced with the working catalog or a private override, which is expected.
 function Test-CatalogLockDeployedFiles {
   param(
@@ -4312,18 +4367,24 @@ function Test-CatalogLockDeployedFiles {
   if (-not (Test-Path -LiteralPath $LockPath -PathType Leaf)) { return @() }
   $missing = New-Object System.Collections.Generic.List[string]
   $listedCount = 0
+  $staleCount = 0
   $changedCount = 0
   foreach ($entry in (Get-CatalogLockDeployedEntries -LockPath $LockPath)) {
     $fullPath = Join-Path $HomeDir $entry.Path
     if ($entry.Kind -eq "F") {
       $listedCount++
-      if ($null -eq (Get-Item -LiteralPath $fullPath -Force -ErrorAction SilentlyContinue)) { $missing.Add($entry.Path) }
+      if ($null -ne (Get-Item -LiteralPath $fullPath -Force -ErrorAction SilentlyContinue)) { continue }
+      if ($entry.Path -match '/(skills|agents)/') { $staleCount++ }
+      else { $missing.Add($entry.Path) }
     }
     elseif ((Test-Path -LiteralPath $fullPath -PathType Leaf) -and ((Get-FileHash -LiteralPath $fullPath -Algorithm SHA256).Hash -ne $entry.Hash.ToUpperInvariant())) {
       $changedCount++
     }
   }
-  Write-Host ("catalog lock files: listed={0} missing={1} changed={2}" -f $listedCount, $missing.Count, $changedCount)
+  Write-Host ("catalog lock files: listed={0} missing={1} stale={2} changed={3}" -f $listedCount, $missing.Count, $staleCount, $changedCount)
+  if ($staleCount -gt 0) {
+    Write-WarnLine ("{0} skill or agent file(s) recorded in apm.lock.yaml are gone, as after deleting them from the working catalog; they leave the lock with the next 'mise run install:catalog' after the push." -f $staleCount)
+  }
   return @($missing)
 }
 
