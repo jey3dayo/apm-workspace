@@ -3826,6 +3826,19 @@ home_tree_listing() {
   rm -rf "$roots_workspace" "$roots_home"
 }
 
+@test "user_root_state skips the same leading whitespace before the marker as APM's Python lstrip" {
+  make_roots_fixture
+  write_generated_root "$roots_home/compiled.md" '# compiled'
+  # form feed, U+001C, U+3000 and U+2028 are Python whitespace; U+200B and a BOM are not.
+  for prefix in '\014' '\034' '\343\200\200' '\342\200\250\n'; do
+    { printf "$prefix"; cat "$roots_home/compiled.md"; } >"$roots_home/prefixed.md"
+    [ "$(user_root_state "$roots_home/prefixed.md" "")" = edited-generated ]
+  done
+  { printf '\342\200\213'; cat "$roots_home/compiled.md"; } >"$roots_home/zwsp.md"
+  [ "$(user_root_state "$roots_home/zwsp.md" "")" = hand-written ]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
 @test "legacy_catalog_instructions_blobs also recognizes an older committed catalog/AGENTS.md" {
   make_roots_fixture
   git -C "$roots_workspace" init -q

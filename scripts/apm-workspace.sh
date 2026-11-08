@@ -309,11 +309,15 @@ apm_root_lines() {
 }
 
 # Mirrors APM's `content.lstrip().startswith(AGENTS_MD_GENERATED_MARKER)` (apm_cli/compilation/user_root_context.py).
+# The leading set is Python's str.isspace() in UTF-8 bytes, matched byte-wise under LC_ALL=C.
 # One awk reads the file: an early exit behind a pipe would SIGPIPE the writer and fail the pipeline under pipefail.
 apm_root_has_marker() {
-  awk -v marker="$APM_GENERATED_ROOT_MARKER" '
-    { sub(/\r$/, ""); gsub(/\r/, "\n") }
-    NF { sub(/^[ \t\n]+/, ""); found = index($0, marker) == 1; exit }
+  LC_ALL=C awk -v marker="$APM_GENERATED_ROOT_MARKER" '
+    BEGIN {
+      leading_space = "^([\t\n\v\f\r\034\035\036\037 ]|\302[\205\240]|\341\232\200|\342\200[\200-\212\250\251\257]|\342\201\237|\343\200\200)+"
+    }
+    { sub(/\r$/, ""); gsub(/\r/, "\n"); sub(leading_space, "") }
+    $0 != "" { found = index($0, marker) == 1; exit }
     END { exit !found }
   ' "$1"
 }

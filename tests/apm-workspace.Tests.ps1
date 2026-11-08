@@ -3564,6 +3564,20 @@ Describe "catalog instructions and user root migration" {
     Get-UserRootState -Path (Join-Path $script:rootsHome "dir.md") -KnownBlobs $known | Should -Be "not-regular"
   }
 
+  It "skips the same leading whitespace before the marker as APM's Python lstrip" {
+    $compiled = Join-Path $script:rootsHome "compiled.md"
+    Write-GeneratedRoot -Path $compiled -Body "# compiled"
+    $text = [System.IO.File]::ReadAllText($compiled)
+    $prefixed = Join-Path $script:rootsHome "prefixed.md"
+    # form feed, U+001C, U+3000 and U+2028 are Python whitespace; U+200B is not.
+    foreach ($prefix in @([string][char]0xC, [string][char]0x1C, [string][char]0x3000, ([string][char]0x2028 + "`n"))) {
+      Write-FixtureFile -Path $prefixed -Content ($prefix + $text)
+      Get-UserRootState -Path $prefixed -KnownBlobs (New-Object System.Collections.Generic.HashSet[string]) | Should -Be "edited-generated"
+    }
+    Write-FixtureFile -Path $prefixed -Content ([string][char]0x200B + $text)
+    Get-UserRootState -Path $prefixed -KnownBlobs (New-Object System.Collections.Generic.HashSet[string]) | Should -Be "hand-written"
+  }
+
   It "recognizes an older committed catalog/AGENTS.md as a legacy copy" {
     Write-FixtureFile -Path (Join-Path $script:WorkspaceDir "catalog/AGENTS.md") -Content "# Old guide`n"
     & git -C $script:WorkspaceDir init -q
