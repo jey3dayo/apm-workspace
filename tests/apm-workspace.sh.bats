@@ -2486,12 +2486,12 @@ make_catalog_fixture() {
 
 @test "assert_catalog_stage_safety refuses a catalog whose .apm holds a FIFO" {
   make_catalog_fixture 2 2
-  mkdir -p "$workspace_dir/catalog/.apm/agents"
-  mkfifo "$workspace_dir/catalog/.apm/agents/queue"
+  mkdir -p "$workspace_dir/catalog/.apm/instructions"
+  mkfifo "$workspace_dir/catalog/.apm/instructions/queue"
 
   run assert_catalog_stage_safety 0
   [ "$status" -ne 0 ]
-  [[ "$output" == *"catalog/.apm holds agents/queue"* ]]
+  [[ "$output" == *"catalog/.apm holds instructions/queue"* ]]
 
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
@@ -3445,6 +3445,48 @@ run_catalog_agents_apply() {
   [ "$status" -ne 0 ]
   [[ "$output" == *"apm install failed while rendering catalog agents"* ]]
   [ ! -e "$AGENTS_APPLY_HOME/.claude/agents/sample.md" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply fails before placing anything when a catalog agent's target is a directory" {
+  make_catalog_agents_apply_fixture
+  mkdir -p "$AGENTS_APPLY_HOME/.claude/agents/sample.md"
+  mkdir -p "$AGENTS_APPLY_BASE/tmp"
+
+  TMPDIR="$AGENTS_APPLY_BASE/tmp" run run_catalog_agents_apply
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"target is a directory: $AGENTS_APPLY_HOME/.claude/agents/sample.md"* ]]
+  [ -z "$(ls -A "$AGENTS_APPLY_HOME/.claude/agents/sample.md")" ]
+  [ ! -e "$AGENTS_APPLY_HOME/.cursor/agents/sample.md" ]
+  [ -z "$(find "$AGENTS_APPLY_BASE/tmp" -maxdepth 1 -name 'apm-agents-render.*')" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply fails when a catalog agent's target is a symlink to a directory" {
+  make_catalog_agents_apply_fixture
+  mkdir -p "$AGENTS_APPLY_BASE/elsewhere" "$AGENTS_APPLY_HOME/.claude/agents"
+  ln -s "$AGENTS_APPLY_BASE/elsewhere" "$AGENTS_APPLY_HOME/.claude/agents/sample.md"
+
+  run run_catalog_agents_apply
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"target is a directory: $AGENTS_APPLY_HOME/.claude/agents/sample.md"* ]]
+  [ -z "$(ls -A "$AGENTS_APPLY_BASE/elsewhere")" ]
+  rm -rf "$AGENTS_APPLY_BASE"
+}
+
+@test "apply removes the agents render directory when placing an agent fails" {
+  make_catalog_agents_apply_fixture
+  mkdir -p "$AGENTS_APPLY_BASE/tmp" "$AGENTS_APPLY_HOME/.claude/agents"
+  chmod a-w "$AGENTS_APPLY_HOME/.claude/agents"
+
+  TMPDIR="$AGENTS_APPLY_BASE/tmp" run run_catalog_agents_apply
+  chmod u+w "$AGENTS_APPLY_HOME/.claude/agents"
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"Failed to place agent: $AGENTS_APPLY_HOME/.claude/agents/sample.md"* ]]
+  [ -z "$(find "$AGENTS_APPLY_BASE/tmp" -maxdepth 1 -name 'apm-agents-render.*')" ]
   rm -rf "$AGENTS_APPLY_BASE"
 }
 

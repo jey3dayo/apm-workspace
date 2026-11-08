@@ -2572,6 +2572,12 @@ place_rendered_catalog_agents() {
       error "apm did not render catalog agents for $runtime_name:$missing_agents"
       return 1
     fi
+    while IFS= read -r agent_name; do
+      if [ -d "$HOME/$runtime_dir/agents/$agent_name.md" ]; then
+        error "Cannot place agent: target is a directory: $HOME/$runtime_dir/agents/$agent_name.md"
+        return 1
+      fi
+    done <<<"$agent_names"
   done <<<"$face_runtimes"
 
   while IFS='|' read -r runtime_name runtime_dir; do
@@ -2599,7 +2605,7 @@ deploy_catalog_agents_via_apm() {
   trap 'rm -rf "$agents_render_root"; trap - RETURN' RETURN
 
   render_catalog_agents_via_apm "$agents_render_root" "$face_targets" "$agent_names" || return 1
-  place_rendered_catalog_agents "$agents_render_root" "$face_runtimes" "$agent_names"
+  place_rendered_catalog_agents "$agents_render_root" "$face_runtimes" "$agent_names" || return 1
 }
 
 cmd_validate_catalog() {

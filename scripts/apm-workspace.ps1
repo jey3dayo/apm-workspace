@@ -3520,6 +3520,12 @@ function Invoke-CatalogAgentsDeploy {
       if ($missingAgents.Count -gt 0) {
         throw ("apm did not render catalog agents for {0}: {1}" -f $target.Name, ($missingAgents -join " "))
       }
+      foreach ($agentName in $agentNames) {
+        $targetAgent = Join-Path (Join-Path $target.Root "agents") "$agentName.md"
+        if (Test-Path -LiteralPath $targetAgent -PathType Container) {
+          throw "Cannot place agent: target is a directory: $targetAgent"
+        }
+      }
       $renderedAgentsDirs[$target.Name] = $renderedAgentsDir
     }
 
