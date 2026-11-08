@@ -3885,7 +3885,7 @@ function Get-CatalogApmDirClaimedPaths {
     }
 
     $relativePath = ($item.FullName.Substring($rootFullPath.Length).TrimStart('\', '/')) -replace '\\', '/'
-    if ($relativePath -eq ".gitkeep" -and -not $isLink) {
+    if ($relativePath -ceq ".gitkeep" -and -not $isLink) {
       continue
     }
 
@@ -3898,7 +3898,13 @@ function Get-CatalogApmDirClaimedPaths {
 }
 
 function Get-CatalogApmDirClaimMessage {
-  $claimedEntry = @(Get-CatalogApmDirClaimedPaths -ApmDir (Join-Path (Get-TrackedCatalogDir) ".apm")) | Select-Object -First 1
+  $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
+  $apmDirItem = Get-Item -LiteralPath $apmDir -Force -ErrorAction SilentlyContinue
+  if ($apmDirItem -and $apmDirItem.LinkType) {
+    return "catalog/.apm is a symlink, but the legacy catalog sync still owns every primitive: prepare:catalog would delete the link. Replace it with a real directory only in the change that retires its legacy writer."
+  }
+
+  $claimedEntry = @(Get-CatalogApmDirClaimedPaths -ApmDir $apmDir) | Select-Object -First 1
   if (-not $claimedEntry) {
     return $null
   }
