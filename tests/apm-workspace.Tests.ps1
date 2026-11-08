@@ -91,6 +91,16 @@ scripts: {}
     { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds skills*"
   }
 
+  It "refuses to stage a catalog whose .apm/skills holds a FIFO" -Skip:($IsWindows -eq $true -or -not (Get-Command mkfifo -ErrorAction SilentlyContinue)) {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $skillsDir = Join-Path (Join-Path (Get-TrackedCatalogDir) ".apm") "skills"
+    New-Item -ItemType Directory -Path $skillsDir -Force | Out-Null
+    & mkfifo (Join-Path $skillsDir "queue")
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds skills/queue*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds skills/queue*"
+  }
+
   It "refuses to stage a catalog whose .apm/skills holds a symlinked skill" {
     Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
     $skillsDir = Join-Path (Join-Path (Get-TrackedCatalogDir) ".apm") "skills"
@@ -170,6 +180,63 @@ scripts: {}
 
     Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds .gitkeep*"
     { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds .gitkeep*"
+  }
+
+  It "refuses to stage a catalog whose .apm placeholder is a FIFO" -Skip:($IsWindows -eq $true -or -not (Get-Command mkfifo -ErrorAction SilentlyContinue)) {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
+    New-Item -ItemType Directory -Path $apmDir -Force | Out-Null
+    & mkfifo (Join-Path $apmDir ".gitkeep")
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds .gitkeep*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds .gitkeep*"
+  }
+
+  It "Test-CatalogApmDirRegularFile accepts only a regular file" {
+    $file = Join-Path $TestDrive "regular-file"
+    New-Item -ItemType File -Path $file | Out-Null
+    $directory = Join-Path $TestDrive "regular-directory"
+    New-Item -ItemType Directory -Path $directory | Out-Null
+    $link = Join-Path $TestDrive "file-link"
+    New-Item -ItemType SymbolicLink -Path $link -Target $file | Out-Null
+
+    Test-CatalogApmDirRegularFile -Item (Get-Item -LiteralPath $file -Force) | Should -Be $true
+    Test-CatalogApmDirRegularFile -Item (Get-Item -LiteralPath $directory -Force) | Should -Be $false
+    Test-CatalogApmDirRegularFile -Item (Get-Item -LiteralPath $link -Force) | Should -Be $false
+  }
+
+  It "Test-CatalogApmDirRegularFile rejects a FIFO" -Skip:($IsWindows -eq $true -or -not (Get-Command mkfifo -ErrorAction SilentlyContinue)) {
+    $fifo = Join-Path $TestDrive "fifo"
+    & mkfifo $fifo
+
+    Test-CatalogApmDirRegularFile -Item (Get-Item -LiteralPath $fifo -Force) | Should -Be $false
+  }
+
+  It "Test-CatalogApmDirRegularFile falls back to test -f when the item has no UnixStat" -Skip:($IsWindows -eq $true) {
+    $file = Join-Path $TestDrive "fallback-file"
+    New-Item -ItemType File -Path $file | Out-Null
+
+    Test-CatalogApmDirRegularFile -Item ([pscustomobject]@{ FullName = $file; PSIsContainer = $false; LinkType = $null }) | Should -Be $true
+  }
+
+  It "Test-CatalogApmDirRegularFile rejects a FIFO through the test -f fallback" -Skip:($IsWindows -eq $true -or -not (Get-Command mkfifo -ErrorAction SilentlyContinue)) {
+    $fifo = Join-Path $TestDrive "fallback-fifo"
+    & mkfifo $fifo
+
+    Test-CatalogApmDirRegularFile -Item ([pscustomobject]@{ FullName = $fifo; PSIsContainer = $false; LinkType = $null }) | Should -Be $false
+  }
+
+  It "Test-CatalogApmDirRegularFile fails closed when test cannot run" -Skip:($IsWindows -eq $true) {
+    $file = Join-Path $TestDrive "fail-closed-file"
+    New-Item -ItemType File -Path $file | Out-Null
+    $savedPath = $env:PATH
+    try {
+      $env:PATH = Join-Path $TestDrive "no-such-bin"
+      Test-CatalogApmDirRegularFile -Item ([pscustomobject]@{ FullName = $file; PSIsContainer = $false; LinkType = $null }) | Should -Be $false
+    }
+    finally {
+      $env:PATH = $savedPath
+    }
   }
 
   It "refuses to stage a catalog whose .apm is a symlink to an empty directory" {

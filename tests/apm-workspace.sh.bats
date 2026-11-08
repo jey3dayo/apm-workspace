@@ -2457,6 +2457,29 @@ make_catalog_fixture() {
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
+@test "assert_catalog_stage_safety refuses a catalog whose .apm placeholder is a FIFO" {
+  make_catalog_fixture 2 2
+  mkdir -p "$workspace_dir/catalog/.apm"
+  mkfifo "$workspace_dir/catalog/.apm/.gitkeep"
+
+  run assert_catalog_stage_safety 0
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"catalog/.apm holds .gitkeep"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "assert_catalog_stage_safety refuses a catalog whose .apm/skills holds a FIFO" {
+  make_catalog_fixture 2 2
+  mkfifo "$workspace_dir/catalog/.apm/skills/queue"
+
+  run assert_catalog_stage_safety 0
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"catalog/.apm holds skills/queue"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
 @test "assert_catalog_stage_safety refuses a catalog whose .apm/skills is a symlink" {
   make_catalog_fixture 2 2
   rm -rf "$workspace_dir/catalog/.apm/skills"
