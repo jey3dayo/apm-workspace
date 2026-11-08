@@ -50,6 +50,151 @@ scripts: {}
     Test-ManifestHasCatalogReference | Should -Be $true
   }
 
+  It "reports no .apm claim when catalog/.apm is absent or holds only the placeholder" {
+    Get-CatalogApmDirClaimMessage | Should -BeNullOrEmpty
+
+    $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
+    New-Item -ItemType Directory -Path $apmDir -Force | Out-Null
+    New-Item -ItemType File -Path (Join-Path $apmDir ".gitkeep") | Out-Null
+
+    Get-CatalogApmDirClaimMessage | Should -BeNullOrEmpty
+    { Assert-CatalogApmDirUnclaimed } | Should -Not -Throw
+  }
+
+  It "refuses to stage a catalog whose .apm holds a primitive the build would drop" {
+    $agentsDir = Join-Path (Join-Path (Get-TrackedCatalogDir) ".apm") "agents"
+    New-Item -ItemType Directory -Path $agentsDir -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $agentsDir "sample.agent.md") -Value "agent"
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds agents/sample.agent.md*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds agents/sample.agent.md*"
+  }
+
+  It "refuses to stage a catalog whose .apm holds a symlink to a file" {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $agentsDir = Join-Path (Join-Path (Get-TrackedCatalogDir) ".apm") "agents"
+    New-Item -ItemType Directory -Path $agentsDir -Force | Out-Null
+    $target = Join-Path $TestDrive "outside.md"
+    Set-Content -LiteralPath $target -Value "agent"
+    New-Item -ItemType SymbolicLink -Path (Join-Path $agentsDir "demo.agent.md") -Target $target | Out-Null
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds agents/demo.agent.md*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds agents/demo.agent.md*"
+  }
+
+  It "refuses to stage a catalog whose .apm holds a symlink to a directory" {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
+    New-Item -ItemType Directory -Path $apmDir -Force | Out-Null
+    $target = Join-Path $TestDrive "outside-agents"
+    New-Item -ItemType Directory -Path $target -Force | Out-Null
+    New-Item -ItemType SymbolicLink -Path (Join-Path $apmDir "agents") -Target $target | Out-Null
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds agents*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds agents*"
+  }
+
+  It "refuses to stage a catalog whose .apm holds a dangling symlink" {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
+    New-Item -ItemType Directory -Path $apmDir -Force | Out-Null
+    New-Item -ItemType SymbolicLink -Path (Join-Path $apmDir "dangling.md") -Target (Join-Path $TestDrive "missing-target") | Out-Null
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds dangling.md*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds dangling.md*"
+  }
+
+  It "refuses to stage a catalog whose .apm placeholder is a symlink" {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
+    New-Item -ItemType Directory -Path $apmDir -Force | Out-Null
+    $target = Join-Path $TestDrive "outside-placeholder"
+    New-Item -ItemType File -Path $target | Out-Null
+    New-Item -ItemType SymbolicLink -Path (Join-Path $apmDir ".gitkeep") -Target $target | Out-Null
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds .gitkeep*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds .gitkeep*"
+  }
+
+  It "refuses to stage a catalog whose .apm placeholder is a FIFO" -Skip:($IsWindows -eq $true -or -not (Get-Command mkfifo -ErrorAction SilentlyContinue)) {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
+    New-Item -ItemType Directory -Path $apmDir -Force | Out-Null
+    & mkfifo (Join-Path $apmDir ".gitkeep")
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds .gitkeep*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds .gitkeep*"
+  }
+
+  It "Test-CatalogApmDirRegularFile accepts only a regular file" {
+    $file = Join-Path $TestDrive "regular-file"
+    New-Item -ItemType File -Path $file | Out-Null
+    $directory = Join-Path $TestDrive "regular-directory"
+    New-Item -ItemType Directory -Path $directory | Out-Null
+    $link = Join-Path $TestDrive "file-link"
+    New-Item -ItemType SymbolicLink -Path $link -Target $file | Out-Null
+
+    Test-CatalogApmDirRegularFile -Item (Get-Item -LiteralPath $file -Force) | Should -Be $true
+    Test-CatalogApmDirRegularFile -Item (Get-Item -LiteralPath $directory -Force) | Should -Be $false
+    Test-CatalogApmDirRegularFile -Item (Get-Item -LiteralPath $link -Force) | Should -Be $false
+  }
+
+  It "Test-CatalogApmDirRegularFile rejects a FIFO" -Skip:($IsWindows -eq $true -or -not (Get-Command mkfifo -ErrorAction SilentlyContinue)) {
+    $fifo = Join-Path $TestDrive "fifo"
+    & mkfifo $fifo
+
+    Test-CatalogApmDirRegularFile -Item (Get-Item -LiteralPath $fifo -Force) | Should -Be $false
+  }
+
+  It "Test-CatalogApmDirRegularFile falls back to test -f when the item has no UnixStat" -Skip:($IsWindows -eq $true) {
+    $file = Join-Path $TestDrive "fallback-file"
+    New-Item -ItemType File -Path $file | Out-Null
+
+    Test-CatalogApmDirRegularFile -Item ([pscustomobject]@{ FullName = $file; PSIsContainer = $false; LinkType = $null }) | Should -Be $true
+  }
+
+  It "Test-CatalogApmDirRegularFile rejects a FIFO through the test -f fallback" -Skip:($IsWindows -eq $true -or -not (Get-Command mkfifo -ErrorAction SilentlyContinue)) {
+    $fifo = Join-Path $TestDrive "fallback-fifo"
+    & mkfifo $fifo
+
+    Test-CatalogApmDirRegularFile -Item ([pscustomobject]@{ FullName = $fifo; PSIsContainer = $false; LinkType = $null }) | Should -Be $false
+  }
+
+  It "Test-CatalogApmDirRegularFile fails closed when test cannot run" -Skip:($IsWindows -eq $true) {
+    $file = Join-Path $TestDrive "fail-closed-file"
+    New-Item -ItemType File -Path $file | Out-Null
+    $savedPath = $env:PATH
+    try {
+      $env:PATH = Join-Path $TestDrive "no-such-bin"
+      Test-CatalogApmDirRegularFile -Item ([pscustomobject]@{ FullName = $file; PSIsContainer = $false; LinkType = $null }) | Should -Be $false
+    }
+    finally {
+      $env:PATH = $savedPath
+    }
+  }
+
+  It "refuses to stage a catalog whose .apm is a symlink to an empty directory" {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
+    $target = Join-Path $TestDrive "outside-apm"
+    New-Item -ItemType Directory -Path $target -Force | Out-Null
+    New-Item -ItemType Directory -Path (Get-TrackedCatalogDir) -Force | Out-Null
+    New-Item -ItemType SymbolicLink -Path $apmDir -Target $target | Out-Null
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm is a symlink*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm is a symlink*"
+  }
+
+  It "refuses to stage a catalog whose .apm is a dangling symlink" {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
+    New-Item -ItemType Directory -Path (Get-TrackedCatalogDir) -Force | Out-Null
+    New-Item -ItemType SymbolicLink -Path $apmDir -Target (Join-Path $TestDrive "missing-apm") | Out-Null
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm is a symlink*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm is a symlink*"
+  }
+
   It "lists skill ids from the managed catalog tree" {
     $skillsRoot = Join-Path (Join-Path $TestDrive "catalog") "skills"
     New-Item -ItemType Directory -Path (Join-Path $skillsRoot "mypc-manager") -Force | Out-Null

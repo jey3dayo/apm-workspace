@@ -3466,6 +3466,12 @@ function Invoke-ValidateCatalog {
     $hasFailure = $true
   }
 
+  $apmDirClaimMessage = Get-CatalogApmDirClaimMessage
+  if ($apmDirClaimMessage) {
+    Write-ErrorLine $apmDirClaimMessage
+    $hasFailure = $true
+  }
+
   $claudeRulesRoot = Get-TrackedCatalogClaudeRulesRoot
   $claudeRuleCount = 0
   if (Test-Path -LiteralPath $claudeRulesRoot -PathType Container) {
@@ -3860,6 +3866,88 @@ function Reset-TrackedCatalogDir {
   New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
 }
 
+function Test-CatalogApmDirRegularFile {
+  param(
+    [Parameter(Mandatory = $true)]
+    $Item
+  )
+
+  if ($Item.PSIsContainer -or $Item.LinkType) {
+    return $false
+  }
+
+  $unixStat = $Item.PSObject.Properties["UnixStat"]
+  if ($unixStat -and $null -ne $unixStat.Value) {
+    return $unixStat.Value.ItemType -eq "File"
+  }
+
+  if ([System.Environment]::OSVersion.Platform -eq "Win32NT") {
+    return $true
+  }
+
+  # Without UnixStat, ask `test` (no `--`: BSD test rejects it); if it cannot run, fail closed so the entry is claimed.
+  try {
+    & test -f $Item.FullName
+    return $LASTEXITCODE -eq 0
+  }
+  catch {
+    return $false
+  }
+}
+
+function Get-CatalogApmDirClaimedPaths {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$ApmDir
+  )
+
+  if (-not (Test-Path -LiteralPath $ApmDir)) {
+    return @()
+  }
+
+  $rootFullPath = (Resolve-Path -LiteralPath $ApmDir).Path
+  $result = New-Object System.Collections.Generic.List[string]
+  foreach ($item in Get-ChildItem -LiteralPath $ApmDir -Recurse -Force) {
+    $isLink = [bool]$item.LinkType
+    if ($item.PSIsContainer -and -not $isLink) {
+      continue
+    }
+
+    $relativePath = ($item.FullName.Substring($rootFullPath.Length).TrimStart('\', '/')) -replace '\\', '/'
+    if ($relativePath -ceq ".gitkeep" -and (Test-CatalogApmDirRegularFile -Item $item)) {
+      continue
+    }
+
+    $result.Add($relativePath)
+  }
+
+  $array = $result.ToArray()
+  [Array]::Sort($array)
+  return $array
+}
+
+function Get-CatalogApmDirClaimMessage {
+  $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
+  $apmDirItem = Get-Item -LiteralPath $apmDir -Force -ErrorAction SilentlyContinue
+  if ($apmDirItem -and $apmDirItem.LinkType) {
+    return "catalog/.apm is a symlink, but the legacy catalog sync still owns every primitive: prepare:catalog would delete the link. Replace it with a real directory only in the change that retires its legacy writer."
+  }
+
+  $claimedEntry = @(Get-CatalogApmDirClaimedPaths -ApmDir $apmDir) | Select-Object -First 1
+  if (-not $claimedEntry) {
+    return $null
+  }
+
+  return ("catalog/.apm holds {0}, but the legacy catalog sync still owns every primitive: prepare:catalog would delete it and APM would install it alongside the sync output. Move a primitive into catalog/.apm only in the change that retires its legacy writer." -f $claimedEntry)
+}
+
+function Assert-CatalogApmDirUnclaimed {
+  $claimMessage = Get-CatalogApmDirClaimMessage
+  if ($claimMessage) {
+    throw "Refusing to reset tracked catalog; $claimMessage"
+  }
+}
+
 function Assert-CatalogStageSafety {
   param(
     [string[]]$RequestedSkillIds
@@ -3882,6 +3970,8 @@ function Assert-CatalogStageSafety {
   if (([System.IO.Path]::GetFullPath($trackedDir).TrimEnd('\', '/')).Equals(([System.IO.Path]::GetFullPath($buildDir).TrimEnd('\', '/')), [System.StringComparison]::OrdinalIgnoreCase)) {
     throw "Refusing to stage catalog because source and destination are the same path: $trackedDir"
   }
+
+  Assert-CatalogApmDirUnclaimed
 
   foreach ($requiredPath in @(
       (Join-Path $buildDir "apm.yml"),
