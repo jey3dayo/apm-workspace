@@ -3865,8 +3865,39 @@ function Reset-TrackedCatalogDir {
   New-Item -ItemType Directory -Path $trackedDir -Force | Out-Null
 }
 
+function Get-CatalogApmDirClaimedPaths {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$ApmDir
+  )
+
+  if (-not (Test-Path -LiteralPath $ApmDir)) {
+    return @()
+  }
+
+  $rootFullPath = (Resolve-Path -LiteralPath $ApmDir).Path
+  $result = New-Object System.Collections.Generic.List[string]
+  foreach ($item in Get-ChildItem -LiteralPath $ApmDir -Recurse -Force) {
+    $isLink = [bool]$item.LinkType
+    if ($item.PSIsContainer -and -not $isLink) {
+      continue
+    }
+
+    $relativePath = ($item.FullName.Substring($rootFullPath.Length).TrimStart('\', '/')) -replace '\\', '/'
+    if ($relativePath -clike "skills/*" -and -not $isLink) {
+      continue
+    }
+
+    $result.Add($relativePath)
+  }
+
+  $array = $result.ToArray()
+  [Array]::Sort($array)
+  return $array
+}
+
 function Get-CatalogApmDirClaimMessage {
-  $claimedEntry = @(Get-RelativeFilePaths -RootDir (Join-Path (Get-TrackedCatalogDir) ".apm") -IncludeHidden | Where-Object { $_ -cnotlike "skills/*" }) | Select-Object -First 1
+  $claimedEntry = @(Get-CatalogApmDirClaimedPaths -ApmDir (Join-Path (Get-TrackedCatalogDir) ".apm")) | Select-Object -First 1
   if (-not $claimedEntry) {
     return $null
   }

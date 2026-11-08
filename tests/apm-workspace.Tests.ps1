@@ -79,6 +79,30 @@ scripts: {}
     { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds .gitkeep*"
   }
 
+  It "refuses to stage a catalog whose .apm/skills is a symlink" {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
+    New-Item -ItemType Directory -Path $apmDir -Force | Out-Null
+    $target = Join-Path $TestDrive "outside-skills"
+    New-Item -ItemType Directory -Path $target -Force | Out-Null
+    New-Item -ItemType SymbolicLink -Path (Join-Path $apmDir "skills") -Target $target | Out-Null
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds skills*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds skills*"
+  }
+
+  It "refuses to stage a catalog whose .apm/skills holds a symlinked skill" {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $skillsDir = Join-Path (Join-Path (Get-TrackedCatalogDir) ".apm") "skills"
+    New-Item -ItemType Directory -Path $skillsDir -Force | Out-Null
+    $target = Join-Path $TestDrive "outside-skill"
+    New-Item -ItemType Directory -Path $target -Force | Out-Null
+    New-Item -ItemType SymbolicLink -Path (Join-Path $skillsDir "linked") -Target $target | Out-Null
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds skills/linked*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds skills/linked*"
+  }
+
   It "seeds the catalog build with skills under .apm/skills and no top-level skills directory" {
     $trackedDir = Join-Path $TestDrive "tracked-catalog"
     $buildDir = Join-Path $TestDrive "build-catalog"
@@ -100,6 +124,52 @@ scripts: {}
 
     Test-Path -LiteralPath (Join-Path $buildDir ".apm/skills/demo/SKILL.md") | Should -Be $true
     Test-Path -LiteralPath (Join-Path $buildDir "skills") | Should -Be $false
+  }
+
+  It "refuses to stage a catalog whose .apm holds a symlink to a file" {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $agentsDir = Join-Path (Join-Path (Get-TrackedCatalogDir) ".apm") "agents"
+    New-Item -ItemType Directory -Path $agentsDir -Force | Out-Null
+    $target = Join-Path $TestDrive "outside.md"
+    Set-Content -LiteralPath $target -Value "agent"
+    New-Item -ItemType SymbolicLink -Path (Join-Path $agentsDir "demo.agent.md") -Target $target | Out-Null
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds agents/demo.agent.md*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds agents/demo.agent.md*"
+  }
+
+  It "refuses to stage a catalog whose .apm holds a symlink to a directory" {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
+    New-Item -ItemType Directory -Path $apmDir -Force | Out-Null
+    $target = Join-Path $TestDrive "outside-agents"
+    New-Item -ItemType Directory -Path $target -Force | Out-Null
+    New-Item -ItemType SymbolicLink -Path (Join-Path $apmDir "agents") -Target $target | Out-Null
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds agents*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds agents*"
+  }
+
+  It "refuses to stage a catalog whose .apm holds a dangling symlink" {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
+    New-Item -ItemType Directory -Path $apmDir -Force | Out-Null
+    New-Item -ItemType SymbolicLink -Path (Join-Path $apmDir "dangling.md") -Target (Join-Path $TestDrive "missing-target") | Out-Null
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds dangling.md*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds dangling.md*"
+  }
+
+  It "refuses to stage a catalog whose .apm placeholder is a symlink" {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
+    New-Item -ItemType Directory -Path $apmDir -Force | Out-Null
+    $target = Join-Path $TestDrive "outside-placeholder"
+    New-Item -ItemType File -Path $target | Out-Null
+    New-Item -ItemType SymbolicLink -Path (Join-Path $apmDir ".gitkeep") -Target $target | Out-Null
+
+    Get-CatalogApmDirClaimMessage | Should -BeLike "catalog/.apm holds .gitkeep*"
+    { Assert-CatalogApmDirUnclaimed } | Should -Throw "*catalog/.apm holds .gitkeep*"
   }
 
   It "lists skill ids from the managed catalog tree" {
