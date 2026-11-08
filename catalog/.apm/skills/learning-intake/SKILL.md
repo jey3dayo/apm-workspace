@@ -51,7 +51,7 @@ description: >-
 | ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------- |
 | その repo だけに効く、機械的に検出できる違反（固定パターン・禁止 API・import 形・配置規則） | 当該 repo の lint 設定 / lefthook / CI。本スキルは `todo.txt`（無ければ issue）への起票まで  | `orchestrator-worker`             |
 | catalog skill の契約破れ・手順の摩擦・実装との食い違い                                      | `catalog/.apm/skills/<name>/`                                                                | `apm-usage` → `apm-deploy-verify` |
-| 全リポジトリに効く規範・禁止事項・判断基準                                                  | `~/.apm/catalog/AGENTS.md`                                                                   | `apm-usage`                       |
+| 全リポジトリに効く規範・禁止事項・判断基準                                                  | `~/.apm/catalog/.apm/instructions/ai-collaboration.instructions.md`                          | `apm-usage`                       |
 | owner が今回の許可範囲の外にある（報告経路）                                                | APM 側が owner 候補の行 + drop box `~/.apm/tmp/learning-intake/`                             | 本スキル §5                       |
 | そのリポジトリだけの規約・構成                                                              | 当該 repo の `AGENTS.md` / `CLAUDE.md`                                                       | `docs-review`                     |
 | そのリポジトリだけの、レビュー時に判断する規約                                              | 当該 repo の `.claude/review-guidelines.md`（`code-reviewer` / `github-pr-reviewer` が読む） | 本スキル §4                       |
@@ -59,16 +59,16 @@ description: >-
 
 lint / hook / CI の行と「コード・スクリプトの不具合」の行は、owner が今回の許可範囲内にあるときだけ使う。範囲外（別 repo から見た `~/.apm/scripts` など）は報告経路の行に当て、受入れ側が owner 側の `todo.txt` へ起票する。
 
-機械的に検出できる違反は、規約文の行より lint / hook / CI の行を先に選ぶ。全リポジトリ向けの規範は `~/.apm/catalog/AGENTS.md` の行に置き、各 repo での lint 化は個別に起票する。`/retro` が提案する `CODING_STANDARDS.md` は作らず、この表の行へ読み替える。
+機械的に検出できる違反は、規約文の行より lint / hook / CI の行を先に選ぶ。全リポジトリ向けの規範は `~/.apm/catalog/.apm/instructions/ai-collaboration.instructions.md` の行に置き、各 repo での lint 化は個別に起票する。`/retro` が提案する `CODING_STANDARDS.md` は作らず、この表の行へ読み替える。
 
 ユーザー訂正は行き先が割れるので、次で判別する。
 
-- 全リポジトリで守るべきルールになるもの → `~/.apm/catalog/AGENTS.md`（`~/.claude/CLAUDE.md` はその配布先であって正本ではない）
+- 全リポジトリで守るべきルールになるもの → `~/.apm/catalog/.apm/instructions/ai-collaboration.instructions.md`（`~/.claude/rules/ai-collaboration.md` と各 root の `AGENTS.md` はその配布先であって正本ではない）
 - この環境についての事実（一度きりだが忘れると再度踏む） → ネイティブの memory 機構へ渡し、本スキルでは扱わない
 
 owner が決まらない、または根拠が弱い項目は `保留` にして、何が足りないかを名指しする。憶測で owner を埋めない。
 
-local 経路で `保留` にした項目のうち、owner 候補が APM 側（catalog skill・`~/.apm/catalog/AGENTS.md`・`~/.apm` のスクリプト）のものは、セッションが終わると消えるため、§5 の報告ファイル書式で `status: 未処理` として置き、保留理由は `不足:` 項目に書いて drop box `~/.apm/tmp/learning-intake/` に置く。当該 repo 側が owner 候補のものは報告に残すだけでよい。
+local 経路で `保留` にした項目のうち、owner 候補が APM 側（catalog skill・`~/.apm/catalog/.apm/instructions/ai-collaboration.instructions.md`・`~/.apm` のスクリプト）のものは、セッションが終わると消えるため、§5 の報告ファイル書式で `status: 未処理` として置き、保留理由は `不足:` 項目に書いて drop box `~/.apm/tmp/learning-intake/` に置く。当該 repo 側が owner 候補のものは報告に残すだけでよい。
 
 完了条件: 各項目が `applied` 候補（owner 1つ）か `保留`（不足を明記）のどちらかに分かれている。
 

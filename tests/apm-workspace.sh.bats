@@ -160,15 +160,16 @@ const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
 const taskName = process.argv[1];
 const task = tasks.find(({ name }) => name === taskName);
 const run = task?.run;
-const commandTokens = typeof run?.[0] === "string" ? run[0].trim().split(/\s+/) : [];
+const commandTokens = typeof run?.[1] === "string" ? run[1].trim().split(/\s+/) : [];
 if (
   !Array.isArray(run) ||
-  run.length !== 2 ||
+  run.length !== 3 ||
+  !isDeepStrictEqual(run[0], { task: "check:roots" }) ||
   commandTokens[0] !== "apm" ||
   !commandTokens.includes("update") ||
   !commandTokens.includes("-g") ||
   !commandTokens.includes("--yes") ||
-  !isDeepStrictEqual(run[1], { task: "deploy" })
+  !isDeepStrictEqual(run[2], { task: "deploy" })
 ) {
   process.exit(1);
 }
@@ -184,6 +185,8 @@ const expected = [
   ["apply", "scripts/apm-workspace.sh", "apply"],
   ["apply:skills:local", "scripts/apm-workspace.sh", "apply:skills:local"],
   ["install:pins", "scripts/apm-workspace.sh", "install-pins"],
+  ["migrate:roots", "scripts/apm-workspace.sh", "migrate:roots"],
+  ["check:roots", "scripts/apm-workspace.sh", "check:roots"],
   ["format:markdown:bold-headings", "scripts/format-bold-headings.sh", "write"],
   ["format:markdown:bold-headings:check", "scripts/format-bold-headings.sh", "check"],
 ];
@@ -460,7 +463,7 @@ EOF
   [ "$output" = "second-path" ]
 }
 
-@test "upgrade runs apm update non-interactively so agents and CI can drive it" {
+@test "upgrade checks the Claude root before running apm update non-interactively" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
   run assert_mise_upgrade "$tasks_json"
   [ "$status" -eq 0 ]
@@ -1244,7 +1247,8 @@ make_doctor_fixture() {
     "$doctor_workspace_dir/catalog/commands" \
     "$doctor_workspace_dir/catalog/rules"
   printf 'dependencies: []\n' >"$doctor_workspace_dir/apm.yml"
-  printf '# instructions\n' >"$doctor_workspace_dir/catalog/AGENTS.md"
+  mkdir -p "$doctor_workspace_dir/catalog/.apm/instructions"
+  printf -- '---\ndescription: fixture guide\n---\n\n# instructions\n' >"$doctor_workspace_dir/catalog/.apm/instructions/ai-collaboration.instructions.md"
 
   cat >"$doctor_bin/apm" <<'EOF'
 #!/bin/sh
@@ -1544,7 +1548,7 @@ EOF
   run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
 
   [ "$status" -eq 0 ]
-  [[ "$output" == *"codex: config=present agents=n/a commands=present rules=present skills=present"* ]]
+  [[ "$output" == *"codex: config=hand-written agents=n/a commands=present rules=present skills=present"* ]]
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
 }
 
@@ -2103,6 +2107,22 @@ run_install_pins_with_fixture() {
   rm -rf "$APPLY_FIXTURE_BASE"
 }
 
+@test "install-pins refuses before apm install while ~/.claude/CLAUDE.md is the legacy catalog copy" {
+  make_apply_agmsg_restore_failure_fixture
+  write_install_pins_apm_stub 0
+  mkdir -p "$APPLY_FIXTURE_HOME/.claude"
+  printf '# instructions\n' >"$APPLY_FIXTURE_HOME/.claude/CLAUDE.md"
+
+  run run_install_pins_with_fixture
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"Refusing to install catalog instructions"* ]]
+  [[ "$output" == *"mise run migrate:roots"* ]]
+  ! grep -q '^apm install' "$APPLY_FIXTURE_CALL_LOG"
+  [ "$(cat "$APPLY_FIXTURE_HOME/.claude/CLAUDE.md")" = "# instructions" ]
+  rm -rf "$APPLY_FIXTURE_BASE"
+}
+
 # --- replace_skill_targets_from_stage ---------------------------------------
 
 @test "replace_skill_targets_from_stage does not deploy skills for a target with the skills-less sentinel" {
@@ -2276,7 +2296,7 @@ _stub_opencode_sync_fixture() {
   rm -rf "$workspace" "$runtime_home"
 }
 
-@test "sync_managed_catalog_runtime_assets removes the agents tree for codex" {
+@test "sync_managed_catalog_runtime_assets removes the agents tree for codex and writes no root context" {
   workspace="$(mktemp -d)"
   runtime_home="$(mktemp -d)"
   mkdir -p "$workspace/catalog"
@@ -2299,7 +2319,7 @@ _stub_opencode_sync_fixture() {
 
   [ "$status" -eq 0 ]
   [ ! -e "$target_root/agents" ]
-  [ -f "$target_root/AGENTS.md" ]
+  [ ! -e "$target_root/AGENTS.md" ]
 
   rm -rf "$workspace" "$runtime_home"
 }
@@ -2326,14 +2346,16 @@ make_catalog_fixture() {
 
   printf 'dependencies: []\n' >"$tracked_dir/apm.yml"
   printf '# catalog\n' >"$tracked_dir/README.md"
-  printf '# instructions\n' >"$tracked_dir/AGENTS.md"
+  mkdir -p "$tracked_dir/.apm/instructions"
+  printf -- '---\ndescription: fixture guide\n---\n\n# instructions\n' >"$tracked_dir/.apm/instructions/ai-collaboration.instructions.md"
   printf 'agent\n' >"$tracked_dir/.apm/agents/sample.agent.md"
   printf 'command\n' >"$tracked_dir/commands/sample.md"
   printf 'rule\n' >"$tracked_dir/rules/sample.md"
 
   printf 'dependencies: []\n' >"$build_dir/apm.yml"
   printf '# catalog\n' >"$build_dir/README.md"
-  printf '# instructions\n' >"$build_dir/AGENTS.md"
+  mkdir -p "$build_dir/.apm/instructions"
+  printf -- '---\ndescription: fixture guide\n---\n\n# instructions\n' >"$build_dir/.apm/instructions/ai-collaboration.instructions.md"
   printf 'agent\n' >"$build_dir/.apm/agents/sample.agent.md"
   printf 'command\n' >"$build_dir/commands/sample.md"
   printf 'rule\n' >"$build_dir/rules/sample.md"
@@ -3493,7 +3515,7 @@ EOF
 
   HOME="$runtime_home"
   tracked_catalog_dir() { printf '%s\n' "$workspace/catalog"; }
-  tracked_catalog_instructions_path() { printf '%s\n' "$workspace/catalog/AGENTS.md"; }
+  tracked_catalog_instructions_path() { printf '%s\n' "$workspace/catalog/.apm/instructions/ai-collaboration.instructions.md"; }
   tracked_catalog_commands_root() { printf '%s\n' "$workspace/catalog/commands"; }
   tracked_catalog_rules_root() { printf '%s\n' "$workspace/catalog/rules"; }
   managed_catalog_runtime_targets() {
@@ -3718,4 +3740,626 @@ run_catalog_agents_apply() {
   [ -z "$(grep -- '--target claude' "$AGENTS_APPLY_CALL_LOG" || true)" ]
   [ ! -e "$AGENTS_APPLY_HOME/.claude/agents" ]
   rm -rf "$AGENTS_APPLY_BASE"
+}
+
+# --- catalog instructions and root migration ---------------------------------
+#
+# The guide lives in catalog/.apm/instructions/ai-collaboration.instructions.md.
+# APM writes the roots; the scripts only classify them, move legacy copies on
+# explicit request (migrate:roots), and copy the body to Pi and OpenCode.
+
+make_roots_fixture() {
+  roots_workspace="$(mktemp -d)"
+  roots_home="$(mktemp -d)"
+  mkdir -p "$roots_workspace/catalog/.apm/instructions"
+  printf -- '---\ndescription: fixture guide\n---\n\n\n# Guide\n\nbody line\n' \
+    >"$roots_workspace/catalog/.apm/instructions/ai-collaboration.instructions.md"
+  printf '# Guide\n\nbody line\n' >"$roots_home/guide-body.md"
+  mkdir -p "$roots_home/.claude" "$roots_home/.codex" "$roots_home/.cursor"
+  WORKSPACE_DIR="$roots_workspace"
+  HOME="$roots_home"
+  OPENCODE_INSTRUCTIONS_OUTPUT="$roots_home/.config/opencode/AGENTS.md"
+  PI_OUTPUT="$roots_home/AGENTS.md"
+}
+
+# Writes a root the way apm compile does: the Build ID is the sha256 of the other lines joined by "\n".
+write_generated_root() {
+  build_id=$(printf '%s\n%s' "$APM_GENERATED_ROOT_MARKER" "$2" | file_sha256 - | cut -c1-12)
+  printf '%s\n<!-- Build ID: %s -->\n%s\n' "$APM_GENERATED_ROOT_MARKER" "$build_id" "$2" >"$1"
+}
+
+home_tree_listing() {
+  (cd "$roots_home" && find . -print | LC_ALL=C sort && find . -type f -exec shasum {} + | LC_ALL=C sort)
+}
+
+@test "catalog_instructions_body drops the frontmatter and leading blank lines, as APM renders a rule" {
+  make_roots_fixture
+
+  catalog_instructions_body "$(tracked_catalog_instructions_path)" >"$roots_home/rendered.md"
+
+  cmp "$roots_home/rendered.md" "$roots_home/guide-body.md"
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "user_root_state tells absent, generated, edited-generated, legacy, hand-written and non-regular roots apart" {
+  make_roots_fixture
+  known="$(legacy_catalog_instructions_blobs)"
+  cp "$roots_home/guide-body.md" "$roots_home/.claude/CLAUDE.md"
+  write_generated_root "$roots_home/.codex/AGENTS.md" '# compiled'
+  write_generated_root "$roots_home/edited.md" '# compiled'
+  printf 'my own line\n' >>"$roots_home/edited.md"
+  printf '%s\n# compiled\n' "$APM_GENERATED_ROOT_MARKER" >"$roots_home/no-build-id.md"
+  sed '1s/$/ my note/' "$roots_home/.codex/AGENTS.md" >"$roots_home/marker-note.md"
+  sed 's/$/\r/' "$roots_home/.codex/AGENTS.md" >"$roots_home/crlf.md"
+  { printf '\357\273\277'; cat "$roots_home/.codex/AGENTS.md"; } >"$roots_home/bom.md"
+  printf '# Guide\n\nbody line\nmy own addition\n' >"$roots_home/.cursor/AGENTS.md"
+  ln -s "$roots_home/guide-body.md" "$roots_home/linked.md"
+  mkdir "$roots_home/dir.md"
+
+  [ "$(user_root_state "$roots_home/missing.md" "$known")" = absent ]
+  [ "$(user_root_state "$roots_home/.codex/AGENTS.md" "$known")" = generated ]
+  [ "$(user_root_state "$roots_home/edited.md" "$known")" = edited-generated ]
+  [ "$(user_root_state "$roots_home/no-build-id.md" "$known")" = edited-generated ]
+  # APM's own reading: the marker is a prefix, CRLF is LF, and a BOM hides the marker.
+  [ "$(user_root_state "$roots_home/marker-note.md" "$known")" = edited-generated ]
+  [ "$(user_root_state "$roots_home/crlf.md" "$known")" = generated ]
+  [ "$(user_root_state "$roots_home/bom.md" "$known")" = hand-written ]
+  [ "$(user_root_state "$roots_home/.claude/CLAUDE.md" "$known")" = legacy ]
+  [ "$(user_root_state "$roots_home/.cursor/AGENTS.md" "$known")" = hand-written ]
+  [ "$(user_root_state "$roots_home/linked.md" "$known")" = not-regular ]
+  [ "$(user_root_state "$roots_home/dir.md" "$known")" = not-regular ]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "user_root_state and the guard read a root larger than a pipe buffer under pipefail" {
+  make_roots_fixture
+  large_body="$(printf '# Guide\n'; seq 1 50000)"
+  write_generated_root "$roots_home/.codex/AGENTS.md" "$large_body"
+  [ "$(user_root_state "$roots_home/.codex/AGENTS.md" "")" = generated ]
+  printf 'my own line\n' >>"$roots_home/.codex/AGENTS.md"
+  [ "$(user_root_state "$roots_home/.codex/AGENTS.md" "")" = edited-generated ]
+
+  printf '<!-- note -->\n%s\n' "$large_body" >"$roots_home/.claude/CLAUDE.md"
+  run assert_user_roots_migrated
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"opens with the catalog guide's title (# Guide)"* ]]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "user_root_state skips the same leading whitespace before the marker as APM's Python lstrip" {
+  make_roots_fixture
+  write_generated_root "$roots_home/compiled.md" '# compiled'
+  # form feed, U+001C, U+0085, U+00A0, U+2000, U+200A, U+3000 and U+2028 are Python whitespace; U+200B and a BOM are not.
+  for prefix in '\014' '\034' '\302\205' '\302\240' '\342\200\200' '\342\200\212' '\343\200\200' '\342\200\250\n'; do
+    { printf "$prefix"; cat "$roots_home/compiled.md"; } >"$roots_home/prefixed.md"
+    [ "$(user_root_state "$roots_home/prefixed.md" "")" = edited-generated ]
+  done
+  { printf '\342\200\213'; cat "$roots_home/compiled.md"; } >"$roots_home/zwsp.md"
+  [ "$(user_root_state "$roots_home/zwsp.md" "")" = hand-written ]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "legacy_catalog_instructions_blobs also recognizes an older committed catalog/AGENTS.md" {
+  make_roots_fixture
+  git -C "$roots_workspace" init -q
+  printf '# Old guide\n' >"$roots_workspace/catalog/AGENTS.md"
+  git -C "$roots_workspace" add catalog/AGENTS.md
+  git -C "$roots_workspace" -c user.name=t -c user.email=t@example.invalid commit -q -m old
+  git -C "$roots_workspace" rm -q catalog/AGENTS.md
+  git -C "$roots_workspace" -c user.name=t -c user.email=t@example.invalid commit -q -m moved
+  printf '# Old guide\n' >"$roots_home/.codex/AGENTS.md"
+
+  [ "$(user_root_state "$roots_home/.codex/AGENTS.md" "$(legacy_catalog_instructions_blobs)")" = legacy ]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "migrate:roots without --apply reports the plan and changes nothing" {
+  make_roots_fixture
+  cp "$roots_home/guide-body.md" "$roots_home/.claude/CLAUDE.md"
+  cp "$roots_home/guide-body.md" "$roots_home/.codex/AGENTS.md"
+  printf 'my cursor rules\n' >"$roots_home/.cursor/AGENTS.md"
+  before="$(home_tree_listing)"
+
+  run cmd_migrate_roots
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Would move $roots_home/.claude/CLAUDE.md -> $roots_home/.claude/CLAUDE.md."*".bak"* ]]
+  [[ "$output" == *"Would move $roots_home/.codex/AGENTS.md -> "* ]]
+  [[ "$output" == *"cursor: $roots_home/.cursor/AGENTS.md differs from every catalog guide version"* ]]
+  [[ "$output" == *"Dry run: nothing was changed."* ]]
+  [ "$(home_tree_listing)" = "$before" ]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "migrate:roots --apply moves only legacy copies to <name>.<UTC>.bak and prints the rollback" {
+  make_roots_fixture
+  date() { printf '20261108T000000Z\n'; }
+  cp "$roots_home/guide-body.md" "$roots_home/.claude/CLAUDE.md"
+  write_generated_root "$roots_home/.codex/AGENTS.md" '# compiled'
+  ln -s "$roots_home/guide-body.md" "$roots_home/.cursor/AGENTS.md"
+
+  run cmd_migrate_roots --apply
+
+  [ "$status" -eq 0 ]
+  [ ! -e "$roots_home/.claude/CLAUDE.md" ]
+  cmp "$roots_home/.claude/CLAUDE.md.20261108T000000Z.bak" "$roots_home/guide-body.md"
+  [ "$(head -n 1 "$roots_home/.codex/AGENTS.md")" = "$APM_GENERATED_ROOT_MARKER" ]
+  [ -L "$roots_home/.cursor/AGENTS.md" ]
+  [ -z "$(find "$roots_home/.codex" "$roots_home/.cursor" -name '*.bak')" ]
+  [[ "$output" == *"mv '$roots_home/.claude/CLAUDE.md.20261108T000000Z.bak' '$roots_home/.claude/CLAUDE.md'"* ]]
+  [[ "$output" == *"mise run install:catalog"* ]]
+
+  run cmd_migrate_roots --apply
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"No root holds a legacy copy of the catalog guide"* ]]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "migrate:roots --apply moves nothing when a backup path already exists" {
+  make_roots_fixture
+  date() { printf '20261108T000000Z\n'; }
+  cp "$roots_home/guide-body.md" "$roots_home/.claude/CLAUDE.md"
+  cp "$roots_home/guide-body.md" "$roots_home/.codex/AGENTS.md"
+  printf 'older backup\n' >"$roots_home/.codex/AGENTS.md.20261108T000000Z.bak"
+
+  run cmd_migrate_roots --apply
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"Backup path already exists: $roots_home/.codex/AGENTS.md.20261108T000000Z.bak"* ]]
+  cmp "$roots_home/.claude/CLAUDE.md" "$roots_home/guide-body.md"
+  cmp "$roots_home/.codex/AGENTS.md" "$roots_home/guide-body.md"
+  [ "$(cat "$roots_home/.codex/AGENTS.md.20261108T000000Z.bak")" = "older backup" ]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "migrate:roots rejects an unknown argument" {
+  make_roots_fixture
+  run cmd_migrate_roots --force
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"usage: migrate:roots [--apply]"* ]]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "assert_user_roots_migrated fails only for a legacy copy in ~/.claude/CLAUDE.md" {
+  make_roots_fixture
+
+  run assert_user_roots_migrated
+  [ "$status" -eq 0 ]
+
+  printf 'my own claude rules\n' >"$roots_home/.claude/CLAUDE.md"
+  run assert_user_roots_migrated
+  [ "$status" -eq 0 ]
+
+  cp "$roots_home/guide-body.md" "$roots_home/.claude/CLAUDE.md"
+  run assert_user_roots_migrated
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"Claude would load it twice"* ]]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "assert_user_roots_migrated also refuses an edited or history-less older copy that keeps the guide's title" {
+  make_roots_fixture
+  # No git checkout, so the only known version is the current body; this stands for an older or edited copy.
+  printf '# Guide\n\nan older body line\nmy own addition\n' >"$roots_home/.claude/CLAUDE.md"
+
+  run assert_user_roots_migrated
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"opens with the catalog guide's title (# Guide) but matches no known version"* ]]
+  [ "$(cat "$roots_home/.claude/CLAUDE.md")" = "$(printf '# Guide\n\nan older body line\nmy own addition')" ]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "sync_opencode_instructions writes the body when absent or a legacy copy, and leaves a hand-written file" {
+  make_roots_fixture
+
+  run sync_opencode_instructions
+  [ "$status" -eq 0 ]
+  cmp "$OPENCODE_INSTRUCTIONS_OUTPUT" "$roots_home/guide-body.md"
+
+  printf 'my opencode rules\n' >"$OPENCODE_INSTRUCTIONS_OUTPUT"
+  run sync_opencode_instructions
+  [ "$status" -eq 0 ]
+  [ "$(cat "$OPENCODE_INSTRUCTIONS_OUTPUT")" = "my opencode rules" ]
+  [[ "$output" == *"Leaving $OPENCODE_INSTRUCTIONS_OUTPUT as is (hand-written)"* ]]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "sync_pi_instructions copies the guide body without the instruction frontmatter" {
+  make_roots_fixture
+  run sync_pi_instructions
+  [ "$status" -eq 0 ]
+  cmp "$PI_OUTPUT" "$roots_home/guide-body.md"
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "warn_pending_root_migration names each legacy root and leaves it in place" {
+  make_roots_fixture
+  managed_catalog_runtime_targets() {
+    printf '%s\n' 'claude|.claude|CLAUDE.md||apm' 'codex|.codex|AGENTS.md|.agents|-' 'opencode|.config/opencode|-|-|-'
+  }
+  cp "$roots_home/guide-body.md" "$roots_home/.claude/CLAUDE.md"
+  printf 'mine\n' >"$roots_home/.codex/AGENTS.md"
+
+  run warn_pending_root_migration
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"$roots_home/.claude/CLAUDE.md is still the copy the legacy catalog sync wrote"* ]]
+  [[ "$output" != *".codex/AGENTS.md"* ]]
+  cmp "$roots_home/.claude/CLAUDE.md" "$roots_home/guide-body.md"
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "compile_user_root_contexts skips the compile until a user-scope package is installed" {
+  make_roots_fixture
+  apm() { printf 'apm %s\n' "$*"; }
+
+  run compile_user_root_contexts
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Skipping user-scope root compile"* ]]
+  [[ "$output" != *"apm compile"* ]]
+
+  mkdir -p "$roots_home/.apm/apm_modules"
+  run compile_user_root_contexts
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"apm compile -g --clean"* ]]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "compile_user_root_contexts keeps a generated root edited after compile by skipping the compile" {
+  make_roots_fixture
+  mkdir -p "$roots_home/.apm/apm_modules"
+  apm() { printf 'apm %s\n' "$*"; }
+  write_generated_root "$roots_home/.codex/AGENTS.md" '# compiled'
+
+  run compile_user_root_contexts
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"apm compile -g --clean"* ]]
+
+  printf 'my own codex line\n' >>"$roots_home/.codex/AGENTS.md"
+  cp "$roots_home/.codex/AGENTS.md" "$roots_home/edited.before"
+  run compile_user_root_contexts
+
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"apm compile -g"* ]]
+  [[ "$output" == *"Skipping user-scope root compile: these roots keep APM's marker but were edited after compile"* ]]
+  [[ "$output" == *"  $roots_home/.codex/AGENTS.md"* ]]
+  cmp "$roots_home/.codex/AGENTS.md" "$roots_home/edited.before"
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "compile_user_root_contexts follows a Codex root symlink to an edited output, and leaves an edited Claude root to APM" {
+  make_roots_fixture
+  mkdir -p "$roots_home/.apm/apm_modules"
+  apm() { printf 'apm %s\n' "$*"; }
+  write_generated_root "$roots_home/.claude/CLAUDE.md" '# compiled'
+  printf 'my own claude line\n' >>"$roots_home/.claude/CLAUDE.md"
+
+  run compile_user_root_contexts
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"apm compile -g --clean"* ]]
+
+  write_generated_root "$roots_home/.codex/real.md" '# compiled'
+  printf 'my own codex line\n' >>"$roots_home/.codex/real.md"
+  ln -s real.md "$roots_home/.codex/AGENTS.md"
+  run compile_user_root_contexts
+
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"apm compile -g"* ]]
+  [[ "$output" == *"  $roots_home/.codex/AGENTS.md"* ]]
+  [[ "$output" != *"  $roots_home/.claude/CLAUDE.md"* ]]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "assert_user_roots_migrated refuses a generated ~/.claude/CLAUDE.md edited after compile, which --clean keeps" {
+  make_roots_fixture
+  write_generated_root "$roots_home/.claude/CLAUDE.md" "$(cat "$roots_home/guide-body.md")"
+  run assert_user_roots_migrated
+  [ "$status" -eq 0 ]
+
+  printf 'my own claude line\n' >>"$roots_home/.claude/CLAUDE.md"
+  run assert_user_roots_migrated
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"keeps APM's marker but was edited after compile"*"Claude would load it twice"* ]]
+  [ "$(tail -n 1 "$roots_home/.claude/CLAUDE.md")" = "my own claude line" ]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "assert_user_roots_migrated refuses a compile output whose marker line was deleted, and a symlink to a compile output" {
+  make_roots_fixture
+  write_generated_root "$roots_home/compiled.md" "$(cat "$roots_home/guide-body.md")"
+  sed '1d' "$roots_home/compiled.md" >"$roots_home/.claude/CLAUDE.md"
+  printf 'my own claude line\n' >>"$roots_home/.claude/CLAUDE.md"
+
+  run assert_user_roots_migrated
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"opens with the catalog guide's title (# Guide)"* ]]
+
+  rm "$roots_home/.claude/CLAUDE.md"
+  ln -s ../compiled.md "$roots_home/.claude/CLAUDE.md"
+  run assert_user_roots_migrated
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"is a symlink to an apm compile output"*"Claude would load it twice"* ]]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "sync_opencode_instructions does not displace an edited generated ~/.claude/CLAUDE.md that OpenCode falls back to" {
+  make_roots_fixture
+  write_generated_root "$roots_home/.claude/CLAUDE.md" '# compiled'
+  printf 'my own claude line\n' >>"$roots_home/.claude/CLAUDE.md"
+
+  run sync_opencode_instructions
+
+  [ "$status" -eq 0 ]
+  [ ! -e "$OPENCODE_INSTRUCTIONS_OUTPUT" ]
+  [[ "$output" == *"OpenCode falls back to $roots_home/.claude/CLAUDE.md (edited-generated)"* ]]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "apply leaves a legacy root and a hand-written root unchanged and warns about the legacy one" {
+  base="$(mktemp -d)"
+  bin_dir="$base/bin"
+  source "$TEST_REPO_ROOT/tests/conformance/build-fixture.sh"
+  build_apply_fixture "$base"
+  printf '# instructions\n' >"$FIXTURE_HOME/.codex/AGENTS.md"
+  mkdir -p "$FIXTURE_HOME/.cursor"
+  printf 'my cursor rules\n' >"$FIXTURE_HOME/.cursor/AGENTS.md"
+
+  run env HOME="$FIXTURE_HOME" XDG_STATE_HOME="$FIXTURE_HOME/.local/state" PATH="$FIXTURE_BIN_DIR:$PATH" \
+    APM_WORKSPACE_DIR="$FIXTURE_WORKSPACE_DIR" bash "$TEST_REPO_ROOT/scripts/apm-workspace.sh" apply
+
+  [ "$status" -eq 0 ]
+  [ "$(cat "$FIXTURE_HOME/.codex/AGENTS.md")" = "# instructions" ]
+  [ "$(cat "$FIXTURE_HOME/.cursor/AGENTS.md")" = "my cursor rules" ]
+  [[ "$output" == *"$FIXTURE_HOME/.codex/AGENTS.md is still the copy the legacy catalog sync wrote"* ]]
+  [ ! -e "$FIXTURE_HOME/.claude/CLAUDE.md" ]
+  [ "$(cat "$FIXTURE_HOME/.config/opencode/AGENTS.md")" = "# instructions" ]
+  rm -rf "$base"
+}
+
+@test "catalog_apm_dir_claim_message allows the catalog instruction and claims any other instruction" {
+  workspace="$(mktemp -d)"
+  mkdir -p "$workspace/catalog/.apm/instructions"
+  WORKSPACE_DIR="$workspace"
+  printf -- '---\ndescription: x\n---\n\nbody\n' >"$workspace/catalog/.apm/instructions/ai-collaboration.instructions.md"
+
+  run catalog_apm_dir_claim_message
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+
+  printf 'x\n' >"$workspace/catalog/.apm/instructions/extra.instructions.md"
+  run catalog_apm_dir_claim_message
+  [[ "$output" == *"catalog/.apm holds instructions/extra.instructions.md, which the catalog build does not carry"* ]]
+
+  rm "$workspace/catalog/.apm/instructions/extra.instructions.md"
+  mkdir -p "$workspace/catalog/.apm/instructions/nested"
+  printf 'x\n' >"$workspace/catalog/.apm/instructions/nested/ai-collaboration.instructions.md"
+  run catalog_apm_dir_claim_message
+  [[ "$output" == *"instructions/nested/ai-collaboration.instructions.md"* ]]
+  rm -rf "$workspace"
+}
+
+@test "validate:catalog rejects instructions without a description, a revived catalog/AGENTS.md and a colliding rule name" {
+  make_doctor_fixture
+  instructions="$doctor_workspace_dir/catalog/.apm/instructions/ai-collaboration.instructions.md"
+
+  printf '# no frontmatter\n' >"$instructions"
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" validate:catalog
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"Catalog instructions need YAML frontmatter with a description"* ]]
+
+  printf -- '---\ndescription: guide\n---\n\n# guide\n' >"$instructions"
+  printf '# old\n' >"$doctor_workspace_dir/catalog/AGENTS.md"
+  printf 'rule\n' >"$doctor_workspace_dir/catalog/rules/ai-collaboration.md"
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" validate:catalog
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"catalog/AGENTS.md is no longer deployed"* ]]
+  [[ "$output" == *"Catalog rule collides with the Claude rule APM writes for the catalog instructions"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "doctor warns about a legacy root without failing and accepts a missing Claude root" {
+  make_doctor_fixture
+  rm -f "$doctor_home/.claude/CLAUDE.md"
+  printf '# instructions\n' >"$doctor_home/.codex/AGENTS.md"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"claude: config=absent"* ]]
+  [[ "$output" == *"Claude has neither $doctor_home/.claude/CLAUDE.md nor the guide rule"* ]]
+  [[ "$output" == *"codex: config=legacy"* ]]
+  [[ "$output" == *"$doctor_home/.codex/AGENTS.md is still the copy the legacy catalog sync wrote"* ]]
+  [[ "$output" == *"opencode instructions: "* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "doctor warns when a Claude compile output sits next to the guide rule, and about an edited one" {
+  make_doctor_fixture
+  write_generated_root "$doctor_home/.claude/CLAUDE.md" '# instructions'
+  printf '# instructions\n' >"$doctor_home/.claude/rules/ai-collaboration.md"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+  [[ "$output" == *"claude: config=generated"* ]]
+  [[ "$output" == *"$doctor_home/.claude/CLAUDE.md is an apm compile output that still sits next to the guide rule"* ]]
+
+  printf 'my own line\n' >>"$doctor_home/.claude/CLAUDE.md"
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+  [[ "$output" == *"claude: config=edited-generated"* ]]
+  [[ "$output" == *"Claude reads the guide from it as well as from the rule"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
+@test "migrate:roots runs as a command in a workspace that is not a git checkout" {
+  make_roots_fixture
+  cp "$roots_home/guide-body.md" "$roots_home/.claude/CLAUDE.md"
+
+  run env HOME="$roots_home" APM_WORKSPACE_DIR="$roots_workspace" bash "$SCRIPT_UNDER_TEST" migrate:roots
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Would move $roots_home/.claude/CLAUDE.md -> "* ]]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+write_catalog_lock_fixture() {
+  cat >"$1" <<'LOCK'
+lockfile_version: '2'
+dependencies:
+- repo_url: other/repo
+  name: catalog-lookalike
+  virtual_path: skills/other
+  deployed_files:
+  - .agents/skills/other/SKILL.md
+- repo_url: jey3dayo/apm-workspace
+  name: catalog
+  virtual_path: catalog
+  package_type: apm_package
+  deployed_files:
+  - .agents/skills/demo
+  - .agents/skills/demo/SKILL.md
+  - .claude/rules/ai-collaboration.md
+  deployed_file_hashes:
+    .agents/skills/demo/SKILL.md: sha256:c0ffee
+    .claude/rules/ai-collaboration.md: sha256:RULEHASH
+- repo_url: jey3dayo/apm-workspace
+  name: manual-skills
+  virtual_path: manual-skills
+  deployed_files:
+  - .agents/skills/manual/SKILL.md
+LOCK
+}
+
+@test "catalog_lock_deployed_entries reads only the catalog package's deployed files and hashes" {
+  lock_dir="$(mktemp -d)"
+  write_catalog_lock_fixture "$lock_dir/apm.lock.yaml"
+
+  run catalog_lock_deployed_entries "$lock_dir/apm.lock.yaml"
+
+  [ "$status" -eq 0 ]
+  [ "$output" = "$(printf 'F\t.agents/skills/demo\nF\t.agents/skills/demo/SKILL.md\nF\t.claude/rules/ai-collaboration.md\nH\t.agents/skills/demo/SKILL.md\tc0ffee\nH\t.claude/rules/ai-collaboration.md\tRULEHASH')" ]
+  rm -rf "$lock_dir"
+}
+
+@test "check_catalog_lock_deployed_files fails for a recorded file that is gone and only counts a changed one" {
+  WORKSPACE_DIR="$(mktemp -d)"
+  HOME="$(mktemp -d)"
+  write_catalog_lock_fixture "$WORKSPACE_DIR/apm.lock.yaml"
+  mkdir -p "$HOME/.agents/skills/demo" "$HOME/.claude/rules"
+  printf 'edited\n' >"$HOME/.agents/skills/demo/SKILL.md"
+  printf 'rule\n' >"$HOME/.claude/rules/ai-collaboration.md"
+  rule_hash=$(sha256sum "$HOME/.claude/rules/ai-collaboration.md" | awk '{print $1}')
+  sed -i.orig "s/RULEHASH/$rule_hash/" "$WORKSPACE_DIR/apm.lock.yaml"
+
+  run check_catalog_lock_deployed_files
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"catalog lock files: listed=3 missing=0 stale=0 changed=1"* ]]
+
+  mv "$HOME/.claude/rules/ai-collaboration.md" "$HOME/rule.aside"
+  run check_catalog_lock_deployed_files
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"Catalog file recorded in apm.lock.yaml is missing: ~/.claude/rules/ai-collaboration.md"* ]]
+  [[ "$output" == *"listed=3 missing=1 stale=0 changed=1"* ]]
+  rm -rf "$WORKSPACE_DIR" "$HOME"
+}
+
+@test "check_catalog_lock_deployed_files only warns about a skill deleted from the working catalog before install:catalog" {
+  WORKSPACE_DIR="$(mktemp -d)"
+  HOME="$(mktemp -d)"
+  write_catalog_lock_fixture "$WORKSPACE_DIR/apm.lock.yaml"
+  mkdir -p "$HOME/.claude/rules"
+  printf 'rule\n' >"$HOME/.claude/rules/ai-collaboration.md"
+  rule_hash=$(sha256sum "$HOME/.claude/rules/ai-collaboration.md" | awk '{print $1}')
+  sed -i.orig "s/RULEHASH/$rule_hash/" "$WORKSPACE_DIR/apm.lock.yaml"
+
+  run check_catalog_lock_deployed_files
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"listed=3 missing=0 stale=2 changed=0"* ]]
+  [[ "$output" == *"2 skill or agent file(s) recorded in apm.lock.yaml are gone"*"install:catalog"* ]]
+  [[ "$output" != *"is missing"* ]]
+  rm -rf "$WORKSPACE_DIR" "$HOME"
+}
+
+commit_instruction_version() {
+  printf -- '---\ndescription: fixture guide\n---\n\n%s\n' "$2" \
+    >"$1/catalog/.apm/instructions/ai-collaboration.instructions.md"
+  git -C "$1" add catalog/.apm/instructions/ai-collaboration.instructions.md
+  git -C "$1" -c user.name=t -c user.email=t@example.invalid commit -q -m "$2"
+}
+
+@test "sync_opencode_instructions keeps updating a copy written from an earlier committed instruction version" {
+  make_roots_fixture
+  git -C "$roots_workspace" init -q
+  commit_instruction_version "$roots_workspace" "# Guide v2"
+  commit_instruction_version "$roots_workspace" "# Guide v3"
+  mkdir -p "${OPENCODE_INSTRUCTIONS_OUTPUT%/*}"
+  printf '# Guide v2\n' >"$OPENCODE_INSTRUCTIONS_OUTPUT"
+
+  [ "$(user_root_state "$OPENCODE_INSTRUCTIONS_OUTPUT" "$(legacy_catalog_instructions_blobs)")" = legacy ]
+  run sync_opencode_instructions
+
+  [ "$status" -eq 0 ]
+  [ "$(cat "$OPENCODE_INSTRUCTIONS_OUTPUT")" = "# Guide v3" ]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "sync_opencode_instructions does not displace a hand-written ~/.claude/CLAUDE.md that OpenCode falls back to" {
+  make_roots_fixture
+  printf 'my own claude rules\n' >"$roots_home/.claude/CLAUDE.md"
+
+  run sync_opencode_instructions
+
+  [ "$status" -eq 0 ]
+  [ ! -e "$OPENCODE_INSTRUCTIONS_OUTPUT" ]
+  [[ "$output" == *"Not writing $OPENCODE_INSTRUCTIONS_OUTPUT: OpenCode falls back to $roots_home/.claude/CLAUDE.md (hand-written)"* ]]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "migrate:roots accepts the -- that mise run forwards before --apply" {
+  make_roots_fixture
+  cp "$roots_home/guide-body.md" "$roots_home/.codex/AGENTS.md"
+
+  run cmd_migrate_roots -- --apply
+
+  [ "$status" -eq 0 ]
+  [ ! -e "$roots_home/.codex/AGENTS.md" ]
+  [ -n "$(find "$roots_home/.codex" -name 'AGENTS.md.*.bak')" ]
+  rm -rf "$roots_workspace" "$roots_home"
+}
+
+@test "install:catalog and refresh run the double-load guard before APM touches the user scope" {
+  require_apm() { :; }
+  ensure_workspace_repo() { :; }
+  ensure_workspace_scaffold() { :; }
+  ensure_workspace_mise_file() { :; }
+  refresh_workspace_checkout() { :; }
+  assert_tracked_catalog_published() { :; }
+  cmd_validate_catalog() { :; }
+  managed_skill_ids() { :; }
+  internal_cleanup_skill_ids() { :; }
+  assert_user_roots_migrated() { fail "guard stopped it"; }
+  register_catalog_dependency() { echo "registered"; }
+  apm() { echo "apm $*"; }
+
+  run cmd_register_catalog
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"guard stopped it"* ]]
+  [[ "$output" != *"registered"* ]]
+
+  run cmd_update
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"guard stopped it"* ]]
+  [[ "$output" != *"apm deps update"* ]]
+}
+
+@test "catalog_lock_deployed_entries also reads a catalog installed from a local path" {
+  lock_dir="$(mktemp -d)"
+  printf "lockfile_version: '1'\ndependencies:\n- repo_url: _local/catalog\n  name: catalog\n  package_type: apm_package\n  deployed_files:\n  - .claude/rules/ai-collaboration.md\n  source: local\ndeployments:\n- kind: project-relative\n  value: .claude/agents/x.md\n" >"$lock_dir/apm.lock.yaml"
+
+  run catalog_lock_deployed_entries "$lock_dir/apm.lock.yaml"
+
+  [ "$status" -eq 0 ]
+  [ "$output" = "$(printf 'F\t.claude/rules/ai-collaboration.md')" ]
+  rm -rf "$lock_dir"
 }

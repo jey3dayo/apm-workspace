@@ -5,7 +5,7 @@
 - `~/.apm` is the day-to-day source of truth for APM catalog content, task wiring, and supporting docs.
 - `~/.config` is reference-only for this workflow. It is not the operational source of truth.
 - The bold-heading formatter helper (`replace-bold-headings.ts`) is vendored into this repository at `scripts/replace-bold-headings.ts`; there is no operational exception under `~/.config` for it.
-- Codex guidance is handled as a compile target via `apm compile --target codex --output ~/.codex/AGENTS.md`.
+- The global guide is the catalog instruction `catalog/.apm/instructions/ai-collaboration.instructions.md`. `apply` runs `apm compile -g --clean`, which writes `~/.codex/AGENTS.md` and `~/.cursor/AGENTS.md` and never overwrites a root without the APM marker; Claude reads the guide as the native rule a user-scope install adds. `migrate:roots` moves a legacy root copy aside (dry-run by default).
 - Codex skills deploy separately to `~/.agents/skills`; skill rollout verification must inspect the deployed `SKILL.md` there.
 
 ## Source Of Truth
@@ -46,7 +46,7 @@ Path-by-path ownership (catalog, optional-skills, workspace-only skills, lockfil
 | `mise run install:catalog`            | ○        | ○        | ○        | ○           | ○        | Installs a pushed `catalog` ref; when `apm.yml` already references it, re-resolves the pin with `apm update -g --yes` instead of replaying the lockfile's cached commit, then hard-fails if the local package cache is still stale                                                      |
 | `mise run smoke:catalog`              | ○        | ○        | ○        | ○           | ○        | Performs a temporary-install smoke test                                                                                                                                                                                                                                                 |
 | `mise run validate:catalog`           | ○        | ○        | ○        | ○           | ○        | Public task for drift checks                                                                                                                                                                                                                                                            |
-| `mise run apply` for Codex            | ○        | ○        | ○        | ○           | n/a      | Compiles `~/.codex/AGENTS.md` and syncs Codex-targeted skills into `~/.agents/skills`; deployed skill tree is authoritative.                                                                                                                                                            |
+| `mise run apply` for Codex            | ○        | ○        | ○        | ○           | n/a      | Compiles the user-scope roots (`apm compile -g --clean`) and syncs Codex-targeted skills into `~/.agents/skills`; deployed skill tree is authoritative.                                                                                                                                 |
 | `mise run agmsg:state:restore`        | n/a      | n/a      | n/a      | n/a         | n/a      | Relinks the agmsg roster into the deployed skill directory                                                                                                                                                                                                                              |
 
 ## Task Visibility

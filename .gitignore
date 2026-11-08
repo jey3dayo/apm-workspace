@@ -8,6 +8,8 @@
 !/catalog/.apm/skills/**
 !/catalog/.apm/agents/
 !/catalog/.apm/agents/**
+!/catalog/.apm/instructions/
+!/catalog/.apm/instructions/**
 /.github/skills/
 
 /.apm/*

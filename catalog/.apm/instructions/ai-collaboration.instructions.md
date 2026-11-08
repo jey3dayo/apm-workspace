@@ -1,3 +1,7 @@
+---
+description: AI collaboration guide shared by every repository
+---
+
 # AI 開発協働ガイド
 
 全リポジトリ共通の AI 協働ルール。プロジェクト固有のルールはこの文書に置かず、各リポジトリの AGENTS.md / steering に置く。
