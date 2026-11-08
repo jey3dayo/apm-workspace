@@ -190,6 +190,19 @@ scripts: {}
     Get-CatalogApmDirClaimMessage | Should -BeLike "*agents/<name>.agent.md*"
   }
 
+  It "claims names that end with a newline after SKILL.md or .agent.md" -Skip:($IsWindows -eq $true) {
+    Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
+    $apmDir = Join-Path (Get-TrackedCatalogDir) ".apm"
+    New-Item -ItemType Directory -Path (Join-Path $apmDir "skills/draft"), (Join-Path $apmDir "agents") -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $apmDir "skills/draft/SKILL.md`n") -Value "decoy"
+    Set-Content -LiteralPath (Join-Path $apmDir "skills/draft/notes.md") -Value "draft notes"
+    Set-Content -LiteralPath (Join-Path $apmDir "agents/foo.agent.md`n") -Value "decoy agent"
+
+    $claimed = @(Get-CatalogApmDirClaimedPaths -ApmDir $apmDir)
+    $claimed | Should -Contain "skills/draft/notes.md"
+    $claimed | Should -Contain "agents/foo.agent.md`n"
+  }
+
   It "refuses to stage a catalog whose .apm holds a directory it cannot read" -Skip:($IsWindows -eq $true -or ((& id -u) -eq "0")) {
     Remove-Item -LiteralPath (Join-Path (Get-TrackedCatalogDir) ".apm") -Recurse -Force -ErrorAction SilentlyContinue
     $hiddenDir = Join-Path (Join-Path (Get-TrackedCatalogDir) ".apm") "instructions"

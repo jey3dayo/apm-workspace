@@ -4094,7 +4094,7 @@ function Get-CatalogApmDirClaimedPaths {
 
   $skillDirs = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
   foreach ($entry in $entries) {
-    if ($entry.IsRegularFile -and $entry.RelativePath -cmatch '^skills/.+/SKILL\.md$') {
+    if ($entry.IsRegularFile -and $entry.RelativePath -cmatch '\Askills/.+/SKILL\.md\z') {
       [void]$skillDirs.Add($entry.RelativePath.Substring(0, $entry.RelativePath.Length - "/SKILL.md".Length))
     }
   }
@@ -4103,7 +4103,7 @@ function Get-CatalogApmDirClaimedPaths {
   foreach ($entry in $entries) {
     $relativePath = $entry.RelativePath
     if ($entry.IsRegularFile) {
-      if ($relativePath -cmatch '^agents/[^/]+\.agent\.md$') {
+      if ($relativePath -cmatch '\Aagents/[^/]+\.agent\.md\z') {
         continue
       }
       if ($relativePath -clike "skills/*") {
