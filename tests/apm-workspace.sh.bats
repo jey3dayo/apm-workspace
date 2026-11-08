@@ -2485,6 +2485,7 @@ make_catalog_fixture() {
 }
 
 @test "assert_catalog_stage_safety refuses a catalog whose .apm/agents holds a FIFO" {
+  command -v mkfifo >/dev/null || skip "mkfifo is unavailable"
   make_catalog_fixture 2 2
   mkdir -p "$workspace_dir/catalog/.apm/agents"
   mkfifo "$workspace_dir/catalog/.apm/agents/queue"
@@ -2509,6 +2510,7 @@ make_catalog_fixture() {
 }
 
 @test "assert_catalog_stage_safety refuses a catalog whose .apm placeholder is a FIFO" {
+  command -v mkfifo >/dev/null || skip "mkfifo is unavailable"
   make_catalog_fixture 2 2
   mkdir -p "$workspace_dir/catalog/.apm"
   mkfifo "$workspace_dir/catalog/.apm/.gitkeep"
@@ -2521,6 +2523,7 @@ make_catalog_fixture() {
 }
 
 @test "assert_catalog_stage_safety refuses a catalog whose .apm/skills holds a FIFO" {
+  command -v mkfifo >/dev/null || skip "mkfifo is unavailable"
   make_catalog_fixture 2 2
   mkfifo "$workspace_dir/catalog/.apm/skills/queue"
 
