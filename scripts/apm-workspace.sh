@@ -269,7 +269,7 @@ catalog_apm_dir_claim_message() {
   fi
   [ -d "$apm_dir" ] || return 0
 
-  claimed_entry=$(cd "$apm_dir" && find . -mindepth 1 \( -type l -o \( ! -type d ! -path ./.gitkeep \) \) | sed 's#^\./##' | sort | sed -n 1p)
+  claimed_entry=$(cd "$apm_dir" && find . -mindepth 1 \( -type l -o \( ! -type d ! \( -type f -path ./.gitkeep \) \) \) | sed 's#^\./##' | sort | sed -n 1p)
   [ -n "$claimed_entry" ] || return 0
 
   printf 'catalog/.apm holds %s, but the legacy catalog sync still owns every primitive: prepare:catalog would delete it and APM would install it alongside the sync output. Move a primitive into catalog/.apm only in the change that retires its legacy writer.\n' "$claimed_entry"
