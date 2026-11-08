@@ -12,6 +12,7 @@ It owns the global manifest (`apm.yml`), the lockfile (`apm.lock.yaml`), the cac
 - `docs/package-decisions.md`: why each package was added, kept, or removed
 - `docs/skill-overlaps.md`: which of several similar skills to use
 - `docs/learning-ledger.md`: changes applied by `learning-intake`, graded on whether they worked
+- `docs/source-consumer-separation.md`: what APM 0.35.0 allows when the authoring source and the consumer's `~/.apm` live apart (verified, not adopted)
 - `catalog/.apm/skills/apm-usage/SKILL.md`: operating guidance for agents
 - `todo.txt` / `done.txt`: open and finished internal tasks
 
