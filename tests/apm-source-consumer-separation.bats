@@ -79,10 +79,13 @@ assert_fixture_root_allowed() {
   case "$REAL_HOME/" in
     "$prefix"*) echo "the fixture root $root must not be the invoking HOME or contain it" >&2 && return 1 ;;
   esac
+  # Each surface is compared both as written and resolved, so a symlinked ~/.apm still protects its target.
   for surface in .apm .claude .codex .cursor .agents .config .cache .local Library; do
-    case "$root/" in
-      "$REAL_HOME/$surface"/*) echo "the fixture root $root must not be inside $REAL_HOME/$surface" >&2 && return 1 ;;
-    esac
+    for prefix in "$REAL_HOME/$surface/" "$(physical_path "$REAL_HOME/$surface")/"; do
+      case "$root/" in
+        "$prefix"*) echo "the fixture root $root must not be inside $REAL_HOME/$surface" >&2 && return 1 ;;
+      esac
+    done
   done
 }
 
@@ -137,8 +140,11 @@ assert_sandbox_confines_writes() {
   }
 }
 
+# The authoring repo is built under the same isolation as apm, with an empty template so no caller hook gets in.
 fixture_git() {
-  GIT_AUTHOR_DATE='2026-01-01T00:00:00Z' GIT_COMMITTER_DATE='2026-01-01T00:00:00Z' \
+  mkdir -p "$FX/empty-git-template"
+  fixture_exec "$(new_home author)" "$FX" /usr/bin/env GIT_TEMPLATE_DIR="$FX/empty-git-template" \
+    GIT_AUTHOR_DATE='2026-01-01T00:00:00Z' GIT_COMMITTER_DATE='2026-01-01T00:00:00Z' \
     git -C "$AUTHORING" -c user.name=fixture -c user.email=fixture@example.invalid "$@"
 }
 
@@ -274,7 +280,7 @@ locked_commits() {
 
 assert_authoring_untouched() {
   [ "$(fixture_git rev-parse HEAD)" = "$SHA2" ]
-  [ "$(fixture_git status --porcelain --ignored)" = "$AUTHORING_STATUS" ]
+  [ "$(fixture_git --no-optional-locks status --porcelain --ignored)" = "$AUTHORING_STATUS" ]
 }
 
 seed_sentinels() {
@@ -330,17 +336,20 @@ sentinel_snapshot() {
 
 @test "a fixture root may sit in a scratch directory of HOME but never on HOME, its ancestors or tool state" {
   REAL_HOME="$FX/fake-home"
-  mkdir -p "$REAL_HOME/.claude" "$REAL_HOME/scratch"
+  mkdir -p "$REAL_HOME/.claude" "$REAL_HOME/scratch" "$FX/apm-elsewhere"
   ln -s "$REAL_HOME/.claude" "$REAL_HOME/scratch/claude-link"
+  ln -s "$FX/apm-elsewhere" "$REAL_HOME/.apm"
 
-  for root in "$REAL_HOME" "$FX" / "$REAL_HOME/.claude/fixtures" "$REAL_HOME/.apm/new/fixtures" \
-    "$REAL_HOME/scratch/claude-link/fixtures" "$REAL_HOME/scratch/../.codex"; do
+  for root in "$REAL_HOME" "$FX" / "$REAL_HOME/.claude/fixtures" "$REAL_HOME/.codex/new/fixtures" \
+    "$REAL_HOME/scratch/claude-link/fixtures" "$REAL_HOME/scratch/../.codex" \
+    "$REAL_HOME/.apm" "$REAL_HOME/.apm/new" "$FX/apm-elsewhere/new"; do
     run assert_fixture_root_allowed "$root"
     [ "$status" -ne 0 ]
   done
   assert_fixture_root_allowed "$REAL_HOME/scratch/separation/new"
   [ ! -e "$REAL_HOME/scratch/separation" ]
-  [ ! -e "$REAL_HOME/.apm" ]
+  [ ! -e "$REAL_HOME/.codex" ]
+  [ -z "$(ls -A "$FX/apm-elsewhere")" ]
 }
 
 @test "the HOME guard refuses paths that resolve outside the fixture, without running anything" {

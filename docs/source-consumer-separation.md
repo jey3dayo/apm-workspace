@@ -1,7 +1,7 @@
 # authoring source と consumer の global state を分ける（第 1 段階の検証）
 
 - Status: 検証だけ（2026-11-09、APM 0.35.0）。本番の `apm.yml`・`apm.lock.yaml`・`catalog/`・配布の手順は変えていない。分離の実施（第 2 段階。自作の writer の撤去や改名）は承認されていない
-- テスト: `tests/apm-source-consumer-separation.bats`。`mise run test:sh` に含まれ、CI と、対象のファイルを変えた push の pre-push でも走る。テストは APM 0.35.0 であることを確かめ、別のバージョンでは止まる（APM を上げるときは、この文書の内容を確かめ直してからテストの期待値を上げる）。fixture は既定で bats の一時ディレクトリに作り、`APM_SEPARATION_FIXTURE_ROOT` を指定するとその下に作る。どちらの場合も、その場所が呼び出し元の HOME そのもの・その祖先、または HOME の `.apm`・`.claude`・`.codex`・`.cursor`・`.agents`・`.config`・`.cache`・`.local`・`Library` の中なら、何も作らずに止まる（HOME の中の作業用ディレクトリは使える）
+- テスト: `tests/apm-source-consumer-separation.bats`。`mise run test:sh` に含まれ、CI と、対象のファイルを変えた push の pre-push でも走る。テストは APM 0.35.0 であることを確かめ、別のバージョンでは止まる（APM を上げるときは、この文書の内容を確かめ直してからテストの期待値を上げる）。fixture は既定で bats の一時ディレクトリに作り、`APM_SEPARATION_FIXTURE_ROOT` を指定するとその下に作る。どちらの場合も、その場所が呼び出し元の HOME そのもの・その祖先、または HOME の `.apm`・`.claude`・`.codex`・`.cursor`・`.agents`・`.config`・`.cache`・`.local`・`Library` の中なら、何も作らずに止まる（HOME の中の作業用ディレクトリは使える。守る側のディレクトリが symlink なら、リンク先も同じように守る）。`APM_SEPARATION_FIXTURE_ROOT` の下に作った fixture は検証の記録として残し、消すのは指定した側に任せる
 
 ## 何と何を分けるのか
 
@@ -63,7 +63,7 @@ dependencies:
 
 ## 隔離と保証の範囲
 
-テストの apm は、次の条件で動く。
+テストの apm と、合成した authoring repo を作る git は、次の条件で動く（git は空の template で `init` し、呼び出し元の hook を持ち込まない）。
 
 - `env -i` で起動し、渡す環境変数は `HOME`・`TMPDIR`・`PATH`・`LANG`・`PYTHONUTF8`・`GIT_CONFIG_GLOBAL`・`GIT_CONFIG_NOSYSTEM` だけ。呼び出し側が token・proxy・askpass・SSH agent・`XDG_CONFIG_HOME` を export していても届かないことをテストで確かめる
 - git が読む設定は fixture の global config と authoring repo の `.git/config` だけで、system の設定は読まない。credential・include・`http.*`・askpass・`core.sshCommand` の項目が無いこともテストで確かめる。利用者の global git config は読みも書きもしない
