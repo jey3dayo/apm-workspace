@@ -784,6 +784,42 @@ prepare_migrate() {
   [ "$(roots_snapshot "$home" ".bak-$stamp")" = "$before" ]
 }
 
+@test "a failure to restore the untouched files does not skip the rollback of the roots or the agmsg restore" {
+  local stub="$FX/stub-apm-deploy" sabotage="$FX/stub-apm-sabotage" original
+  write_deploy_stub "$stub"
+  printf '#!/bin/sh\n[ "$1" = install ] || exit 0\nmkdir -p "$HOME/.claude/skills/foo"\necho "deployed by apm" >"$HOME/.claude/skills/foo/SKILL.md"\nrm -f "$HOME"/.agents/skills.bak-*/agmsg/db "$HOME"/.agents/skills.bak-*/agmsg/teams\necho changed >>"$HOME/.codex/config.toml"\nchmod 555 "$HOME/.codex"\n' >"$sabotage"
+  chmod +x "$sabotage"
+
+  prepare_migrate migrate-restore-fails "$stub"
+  original="$(roots_snapshot "$M_HOME")"
+  run real_native_with_stub "$M_HOME" "$sabotage" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
+  chmod 755 "$M_HOME/.codex"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"rolling the roots back"* ]]
+  [[ "$output" == *"were not restored; the copies are in"* ]]
+  [ "$(roots_snapshot "$M_HOME")" = "$original" ]
+  [ "$(readlink "$M_HOME/.agents/skills/agmsg/db")" = "$M_HOME/.local/state/agmsg/db" ]
+  [ "$(readlink "$M_HOME/.agents/skills/agmsg/teams")" = "$M_HOME/.local/state/agmsg/teams" ]
+}
+
+@test "rehearse fails on a broken link or a link that leaves the HOME inside the migrated roots, and names each one" {
+  local home backup="$FX/backups/rehearse-links" stub="$FX/rehearse-links-stub" migrate
+  home="$(new_home rehearse-links)"
+  seed_migrate_home "$home"
+  ln -s "$home/does-not-exist" "$home/.claude/skills/dangling"
+  ln -s /usr/bin "$home/.cursor/agents/leaves-home"
+  write_deploy_stub "$stub"
+  real_native "$home" backup --real-home --backup-dir "$backup"
+  for migrate in --migrate ""; do
+    run real_native_with_stub "$home" "$stub" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only ${migrate:+"$migrate"}
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"$home/.claude/skills/dangling (broken)"* ]]
+    [[ "$output" == *"$home/.cursor/agents/leaves-home -> "* ]]
+    [[ "$output" != *"removed the broken link"* ]]
+  done
+  [ -z "$(compgen -G "$backup/rehearsal-*")" ]
+}
+
 @test "reinstate fails on a broken link and lists it, before it copies anything" {
   local home bak stamp=20261109T000001Z
   home="$(new_home reinstate-broken)"
@@ -1187,29 +1223,86 @@ build_github_fixture() {
   [ "$(roots_snapshot "$home")" = "$original" ]
 }
 
-@test "the old path refuses every command that rewrites a deployment when apm.yml was rendered by native.sh, before apm starts" {
+@test "the old path refuses every command that rewrites a deployment when the HOME consumer apm.yml was rendered by native.sh, before apm starts" {
   local home workspace="$FX/native-workspace" bin="$FX/guard-bin" cmd
   local -a words
   home="$(new_home guard)"
-  mkdir -p "$workspace" "$bin"
-  native "$home" render --source-ref "$SOURCE_SHA" --workspace-only >"$workspace/apm.yml"
+  mkdir -p "$workspace" "$bin" "$home/.apm"
+  native "$home" render --source-ref "$SOURCE_SHA" --workspace-only >"$home/.apm/apm.yml"
   printf '#!/bin/sh\ntouch "%s/apm-ran"\n' "$home" >"$bin/apm"
   chmod +x "$bin/apm"
-  for cmd in apply apply:skills:local refresh install-pins repair:local-package-cache pin-external prune:cache prepare:catalog \
-    install:catalog bundle-catalog smoke:catalog "migrate:roots --apply"; do
+  for cmd in apply apply:skills:local refresh install-pins repair:local-package-cache pin-external prune:cache \
+    install:catalog "migrate:roots --apply"; do
     read -r -a words <<<"$cmd"
-    run fixture_exec "$home" /usr/bin/env APM_WORKSPACE_DIR="$workspace" PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" "${words[@]}"
+    run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" "${words[@]}"
     [ "$status" -ne 0 ]
-    [[ "$output" == *"was rendered by scripts/native.sh"* ]]
+    [[ "$output" == *"$home/.apm/apm.yml was rendered by scripts/native.sh"* ]]
   done
+  run fixture_exec "$home" /usr/bin/env APM_WORKSPACE_DIR="$workspace" PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" apply
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"was rendered by scripts/native.sh"* ]]
   [ ! -e "$home/apm-ran" ]
 
   # Reading commands still work, and a manifest without the header is not refused.
-  run fixture_exec "$home" /usr/bin/env APM_WORKSPACE_DIR="$workspace" PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" help
+  run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" help
   [ "$status" -eq 0 ]
-  run fixture_exec "$home" /usr/bin/env APM_WORKSPACE_DIR="$workspace" PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" migrate:roots
+  run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" migrate:roots
   [[ "$output" != *"was rendered by scripts/native.sh"* ]]
-  printf 'name: hand-written\n' >"$workspace/apm.yml"
-  run fixture_exec "$home" /usr/bin/env APM_WORKSPACE_DIR="$workspace" PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" migrate:roots --apply
+  printf 'name: hand-written\n' >"$home/.apm/apm.yml"
+  run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" migrate:roots --apply
   [[ "$output" != *"was rendered by scripts/native.sh"* ]]
+}
+
+# After the cutover the checkout lives outside HOME (a linked worktree has a .git file) and HOME/.apm is the consumer.
+setup_authoring_checkout() {
+  local authoring="$1" log="$2" bin="$3"
+  mkdir -p "$authoring" "$bin"
+  cp -R "$REPO_ROOT/scripts" "$authoring/scripts"
+  cp "$REPO_ROOT/apm.yml" "$REPO_ROOT/apm.lock.yaml" "$REPO_ROOT/mise.toml" "$authoring/"
+  ln -s "$REPO_ROOT/catalog" "$authoring/catalog"
+  printf 'gitdir: %s/.git/worktrees/authoring\n' "$authoring" >"$authoring/.git"
+  printf '#!/bin/sh\nprintf "%%s|%%s\\n" "$PWD" "$*" >>"%s"\n' "$log" >"$bin/apm"
+  chmod +x "$bin/apm"
+}
+
+@test "from an authoring checkout outside HOME, validate and smoke:catalog run against that checkout while the consumer HOME is untouched" {
+  local home authoring="$FX/authoring" bin="$FX/authoring-bin" log="$FX/authoring-apm.log" consumer_before
+  home="$(new_home authoring-consumer)"
+  mkdir -p "$home/.apm"
+  native "$home" render --source-ref "$SOURCE_SHA" --workspace-only >"$home/.apm/apm.yml"
+  setup_authoring_checkout "$authoring" "$log" "$bin"
+  consumer_before="$(cd "$home/.apm" && find . | LC_ALL=C sort)"
+
+  run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$authoring/scripts/apm-workspace.sh" validate
+  [ "$status" -eq 0 ]
+  grep -qxF "$authoring|compile --validate" "$log"
+
+  run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$authoring/scripts/apm-workspace.sh" smoke:catalog
+  [[ "$output" != *"was rendered by scripts/native.sh"* ]]
+  grep -qF "install $authoring/.catalog-build/catalog --target agent-skills" "$log"
+  [ -d "$authoring/.catalog-build/catalog" ]
+
+  run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$authoring/scripts/apm-workspace.sh" apply
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$home/.apm/apm.yml was rendered by scripts/native.sh"* ]]
+  [ "$(cd "$home/.apm" && find . | LC_ALL=C sort)" = "$consumer_before" ]
+}
+
+@test "when HOME/.apm is a checkout the old path keeps using it, and a catalog without .git is not mistaken for the consumer" {
+  local home authoring="$FX/authoring-old" bin="$FX/authoring-old-bin" log="$FX/authoring-old-apm.log" physical
+  setup_authoring_checkout "$authoring" "$log" "$bin"
+
+  home="$(new_home old-checkout)"
+  mkdir -p "$home/.apm/.git"
+  printf 'name: old-checkout\n' >"$home/.apm/apm.yml"
+  physical="$(cd "$home/.apm" && pwd -P)"
+  run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$authoring/scripts/apm-workspace.sh" validate
+  [ "$status" -eq 0 ]
+  grep -qxF "$physical|compile --validate" "$log"
+
+  home="$(new_home old-catalog-only)"
+  mkdir -p "$home/.apm/catalog"
+  run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$authoring/scripts/apm-workspace.sh" validate
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$home/.apm exists but is not an empty directory or git checkout"* ]]
 }

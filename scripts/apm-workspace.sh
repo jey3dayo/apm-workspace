@@ -7,7 +7,15 @@ if [ "$#" -gt 0 ]; then
 fi
 
 REPO_ROOT=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
-WORKSPACE_DIR="${APM_WORKSPACE_DIR:-$HOME/.apm}"
+# After the native cutover $HOME/.apm is a consumer (apm.yml, apm.lock.yaml, apm_modules), not the authoring checkout.
+default_workspace_dir() {
+  if [ -e "$HOME/.apm/.git" ] || [ -d "$HOME/.apm/catalog" ]; then
+    printf '%s\n' "$HOME/.apm"
+  else
+    printf '%s\n' "$REPO_ROOT"
+  fi
+}
+WORKSPACE_DIR="${APM_WORKSPACE_DIR:-$(default_workspace_dir)}"
 WORKSPACE_REPO="${APM_WORKSPACE_REPO:-https://github.com/jey3dayo/apm-workspace.git}"
 PI_OUTPUT="${APM_PI_OUTPUT:-$HOME/AGENTS.md}"
 OPENCODE_INSTRUCTIONS_OUTPUT="${APM_OPENCODE_OUTPUT:-$HOME/.config/opencode/AGENTS.md}"
@@ -138,7 +146,7 @@ ensure_workspace_repo() {
   if [ ! -e "$WORKSPACE_DIR" ]; then
     log "Cloning $WORKSPACE_REPO into $WORKSPACE_DIR"
     git clone "$WORKSPACE_REPO" "$WORKSPACE_DIR"
-  elif [ -d "$WORKSPACE_DIR" ] && [ ! -d "$WORKSPACE_DIR/.git" ]; then
+  elif [ -d "$WORKSPACE_DIR" ] && [ ! -e "$WORKSPACE_DIR/.git" ]; then
     if [ -n "$(ls -A "$WORKSPACE_DIR" 2>/dev/null)" ]; then
       fail "$WORKSPACE_DIR exists but is not an empty directory or git checkout."
     fi
@@ -152,7 +160,7 @@ ensure_workspace_repo() {
     fail "$WORKSPACE_DIR exists but is not a directory."
   fi
 
-  if [ ! -d "$WORKSPACE_DIR/.git" ]; then
+  if [ ! -e "$WORKSPACE_DIR/.git" ]; then
     fail "$WORKSPACE_DIR exists but is not a git checkout."
   fi
 
@@ -3533,32 +3541,33 @@ Environment overrides:
 EOF
 }
 
-# A workspace whose apm.yml was rendered by scripts/native.sh is a consumer of the native path: apm owns its manifest and
-# lock, and the commands below would rewrite what native.sh deployed from a checkout that is not there.
-native_rendered_workspace() {
+# $HOME/.apm/apm.yml rendered by scripts/native.sh means the real HOME is a consumer of the native path: apm owns its
+# manifest and lock, and the commands below would rewrite what native.sh deployed from a checkout that is not there.
+# The check follows $HOME, not $WORKSPACE_DIR, because these commands write $HOME's deployment targets either way.
+native_rendered_home() {
   local first
-  first="$(head -n 1 "$WORKSPACE_DIR/apm.yml" 2>/dev/null || true)"
+  first="$(head -n 1 "$HOME/.apm/apm.yml" 2>/dev/null || true)"
   case "$first" in
     "# Rendered by scripts/native.sh"*) return 0 ;;
     *) return 1 ;;
   esac
 }
 
-refuse_on_native_workspace() {
+refuse_on_native_home() {
   case "$COMMAND" in
     apply | apply:skills:local | refresh | install-pins | repair:local-package-cache | pin-external | prune:cache | \
-      prepare:catalog | install:catalog | bundle-catalog | smoke:catalog) ;;
+      install:catalog) ;;
     migrate:roots)
       case " $* " in *" --apply "*) ;; *) return 0 ;; esac
       ;;
     *) return 0 ;;
   esac
-  native_rendered_workspace || return 0
-  fail "$WORKSPACE_DIR/apm.yml was rendered by scripts/native.sh, so $COMMAND is refused: the old path would overwrite what the native path deployed. Use scripts/native.sh (docs/native-distribution.md)."
+  native_rendered_home || return 0
+  fail "$HOME/.apm/apm.yml was rendered by scripts/native.sh, so $COMMAND is refused: the old path would overwrite what the native path deployed. Use scripts/native.sh (docs/native-distribution.md)."
 }
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
-  refuse_on_native_workspace "$@"
+  refuse_on_native_home "$@"
   case "$COMMAND" in
     setup:mcp:host) cmd_setup_host_mcp ;;
     apply) cmd_apply ;;

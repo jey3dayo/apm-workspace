@@ -413,6 +413,17 @@ assert_completed_backup() {
   grep -qxF "home=$home" "$BACKUP_DIR/complete" || fail "$BACKUP_DIR is a backup of another HOME"
 }
 
+# The links of the migrated roots that migrate would refuse: broken, or leading outside the HOME (escaping_link_line).
+root_escaping_links() {
+  local home="$1" root link
+  for root in $MIGRATE_ROOTS; do
+    [ -e "$home/$root" ] || [ -L "$home/$root" ] || continue
+    find "$home/$root" -type l | LC_ALL=C sort | while IFS= read -r link; do
+      escaping_link_line "$home" "$link"
+    done
+  done
+}
+
 # Every symlink of the scratch HOME ends up inside it, so nothing apm writes there reaches the real files.
 isolate_scratch_links() {
   local home="$1" scratch="$2" link target resolved orig
@@ -666,12 +677,15 @@ allowed_lost_paths() {
 cmd_rehearse() {
   parse_options "$@"
   [ -n "$SOURCE_REF" ] || fail "rehearse needs --source-ref"
-  local home sha dir rehearsal scratch path manifest shared lost stamp mode=plain
+  local home sha dir rehearsal scratch path manifest shared lost stamp escaping mode=plain
   local install_status=0 compile_status=skipped agmsg_status=0 linked=0 reinstate_status=skipped allowed_lost=0 baseline_skips=0
   home="$(target_home rehearse)"
   assert_default_apm_config "$home"
   assert_no_home_manifest "$home"
   assert_completed_backup "$home"
+  escaping="$(root_escaping_links "$home")"
+  [ -z "$escaping" ] || fail "these links in $MIGRATE_ROOTS of $home are broken or lead outside it, which migrate refuses and a rehearsal would hide by copying or dropping them. Replace each with a copy of its content (docs/native-distribution.md), run backup again, then re-run:
+$escaping"
   sha="$(resolve_source_sha "$SOURCE_REF")"
   dir="$(cd "$BACKUP_DIR" && pwd -P)"
   rehearsal="$(mktemp -d "$dir/rehearsal-$(date -u +%Y%m%dT%H%M%SZ).XXXXXX")"
@@ -850,6 +864,7 @@ migrate_roots_snapshot() {
 }
 
 # Runs from the EXIT trap of cmd_migrate once the roots may have moved: undo the move, keep every file, keep the exit status.
+# Each step runs in its own subshell so that a fail in one cannot skip the next.
 migrate_failure() {
   local status=$?
   trap - EXIT
@@ -858,7 +873,7 @@ migrate_failure() {
     log "rolling the roots back"
     (rollback_roots "$MIGRATE_HOME" "$MIGRATE_STAMP") || log "the automatic rollback failed; fix the cause, then run migrate-rollback --stamp $MIGRATE_STAMP"
     if [ "$MIGRATE_AGMSG_LINKED" = 1 ]; then
-      agmsg_state "$MIGRATE_HOME" restore || log "the agmsg links were not restored; run mise run agmsg:state:restore"
+      (agmsg_state "$MIGRATE_HOME" restore) || log "the agmsg links were not restored; run mise run agmsg:state:restore"
     fi
   fi
   if (restore_untouched "$MIGRATE_HOME" "$MIGRATE_STAMP"); then

@@ -23,7 +23,7 @@
 - 配布と更新を分ける: apply は pin を自分で動かさない。新しい commit を配るときは、`--source-ref` に新しい SHA を渡して実行し直す。外部の依存の pin は、今と同じく root の `apm.yml` で上げる
 - 生成した root（`~/.claude/CLAUDE.md`・`~/.codex/AGENTS.md`・`~/.cursor/AGENTS.md`）が APM の目印を残したまま compile のあとに編集されていたら、何も書かずに止まる。APM の目印は編集を守らず、compile が上書きするため。判定は APM と同じ Build ID の照合（`apm_cli/compilation/build_id.py`）で、APM と同じく末尾の改行だけを足した・消した編集は検出しない
 - `<HOME>/.apm/apm.yml` が描画した manifest とバイト単位で違えば、`apm.yml.<UTC>.bak` に残してから置き換える（同じ名前があれば番号を付け、既存の `.bak` を上書きしない）
-- HOME の外を指す（または壊れた）symlink か、ハードリンクの通常のファイルが HOME の中にあれば、何も書かずに止まる。apm がリンクを通して HOME の外のファイルを書き換えるため（キャッシュの `Library/Caches/apm` のように、配布先より深い場所にも書く）。rehearse は、複製の中のリンクをすべて複製の中へ向け直し、同じ検査を通してから install する
+- HOME の外を指す（または壊れた）symlink か、ハードリンクの通常のファイルが HOME の中にあれば、何も書かずに止まる。apm がリンクを通して HOME の外のファイルを書き換えるため（キャッシュの `Library/Caches/apm` のように、配布先より深い場所にも書く）。rehearse は、実 HOME の 4 つの root（`.agents/skills`・`.claude/skills`・`.claude/agents`・`.cursor/agents`）に壊れたリンクか HOME の外へ出るリンクがあれば、`migrate` と同じ判定（`escaping_link_line`）で、複製を作る前にそのリンクの名前を出して失敗する。root の外のリンクは、複製の中を複製の中へ向け直し（先が無ければ外す。外したリンクの名前は出す）、同じ検査を通してから install する
 - `<HOME>/.apm/config.json` に `default_client` と `prefer_ssh` 以外のキーがあれば、apply も rehearse も止まる。APM は `temp_dir` などの書込み先をここから読むため。`prefer_ssh` は git の URL の形を変えるだけで、書込み先は変えない。キーは APM と同じく JSON としてデコードしてから比べる
 - `<HOME>/apm.yml` があれば、apply・rehearse（実 HOME と複製の両方）・migrate は何も書かずに止まる。user scope の APM は executable の許可を `<HOME>/apm.yml` が在ればそちらから読み、`<HOME>/.apm/apm.yml` の `allowExecutables` を無視するため（`apm_cli/security/executables.py` の `exec_trust_context_for_project`）
 - apm は空の環境に `HOME`・`PATH`・ロケール・git の設定の場所と、HOME の中の `TMPDIR`（`.cache/apm-native-tmp`）だけを渡して起動する。APM は `APM_CACHE_DIR` や `XDG_*`、`TMPDIR` が指す場所にも書き（`APM_CACHE_DIR` と `XDG_CACHE_HOME` はテストで確かめた）、git は token・proxy・askpass を環境から読むため
@@ -43,6 +43,10 @@ backup の対象（rehearse が複製に再現するもの）: `~/.apm/apm.yml`�
 | `catalog/rules`・`catalog/claude/rules` | 自前の同期（`sync_managed_catalog_runtime_assets`）                                                      | 手動（下の表）                                                                                              |
 | 他の tool が置く skill（Herdr など）    | `config/preserved-skills-root-entries.txt` で除外する                                                    | APM は自分の持ち物ではないものに触らない（テストで確かめた）                                                |
 | agmsg の `db`・`teams`                  | apply の中で save/restore する                                                                           | rehearse と migrate が同じ `scripts/agmsg-state.sh` で save/restore する（migrate-rollback もリンクを戻す） |
+
+### 切り替えのあとの authoring checkout
+
+`scripts/apm-workspace.sh` は、`APM_WORKSPACE_DIR` が無いとき、`<HOME>/.apm` に `.git`（linked worktree ではファイル）か `catalog/` があればそれを、無ければこの repo の root（`REPO_ROOT`）を `$WORKSPACE_DIR` にする。切り替えの前は `<HOME>/.apm` が checkout なので挙動は変わらず、切り替えのあとは checkout の外から `validate`・`validate:catalog`・`smoke:catalog` がその checkout に対して動く。`.git` の検査は、worktree の `.git` ファイルも通す。PowerShell 版（`scripts/apm-workspace.ps1` の `$WorkspaceDir`）は今も `<HOME>/.apm` を既定にしているので、Windows で切り替えのあとに使うなら同じ既定へ揃える必要がある（Windows は対象外としているので、揃えていない）。
 
 ## native と手動の境界
 
@@ -74,10 +78,10 @@ backup の対象（rehearse が複製に再現するもの）: `~/.apm/apm.yml`�
 
 ## 既知の問題
 
-- consumer の状態と authoring の checkout が同じ `~/.apm` にある。APM 0.35.0 は user scope を `~/.apm` に固定しているので、checkout のまま実 HOME へ配ると、checkout が追跡している `~/.apm/apm.yml`（と APM が書く `apm.lock.yaml`）を書き換える。main の checkout は dirty になり、`git pull` は止まり、旧経路の `mise run deploy` も描画した manifest を読む。そのため `migrate` は `<HOME>/.apm` に `.git` か `catalog/` があれば何も書かずに止まり、この repo が `<HOME>/.apm` の中にあっても止まる。旧経路の `scripts/apm-workspace.sh` も、`$WORKSPACE_DIR/apm.yml` の 1 行目が `# Rendered by scripts/native.sh` なら、配布を書き換えるコマンド（`apply`・`apply:skills:local`・`refresh`・`install-pins`・`repair:local-package-cache`・`pin-external`・`prune:cache`・`prepare:catalog`・`install:catalog`・`bundle-catalog`・`smoke:catalog`・`migrate:roots --apply`）を apm を起動する前に拒否する
+- consumer の状態と authoring の checkout が同じ `~/.apm` にある。APM 0.35.0 は user scope を `~/.apm` に固定しているので、checkout のまま実 HOME へ配ると、checkout が追跡している `~/.apm/apm.yml`（と APM が書く `apm.lock.yaml`）を書き換える。main の checkout は dirty になり、`git pull` は止まり、旧経路の `mise run deploy` も描画した manifest を読む。そのため `migrate` は `<HOME>/.apm` に `.git` か `catalog/` があれば何も書かずに止まり、この repo が `<HOME>/.apm` の中にあっても止まる。旧経路の `scripts/apm-workspace.sh` も、`<HOME>/.apm/apm.yml`（consumer）の 1 行目が `# Rendered by scripts/native.sh` なら、実 HOME の配布先を書き換えるコマンド（`apply`・`apply:skills:local`・`refresh`・`install-pins`・`repair:local-package-cache`・`pin-external`・`prune:cache`・`install:catalog`・`migrate:roots --apply`）を apm を起動する前に拒否する。`$WORKSPACE_DIR` ではなく `<HOME>` を見るのは、これらが `APM_WORKSPACE_DIR` をどこへ向けても `<HOME>` の配布先を書くため。`validate`・`validate:catalog`・`doctor`・`doctor-intake`・`check:roots`・`migrate:roots`（`--apply` なし）・`bundle-catalog`・`smoke:catalog`・`prepare:catalog` は拒否しない。実 HOME の配布先を書かず、書くのは `$WORKSPACE_DIR` の下（`.catalog-build`、`prepare:catalog` は `catalog/` も）と一時ディレクトリだけで、`pre-push` と `verify` が使うため。切り替えのあとも `mise run check` と `verify` を通すための区別である
 - 目印の無い root（旧経路がコピーした `~/.claude/CLAUDE.md`・`~/.codex/AGENTS.md`・`~/.cursor/AGENTS.md`）は、`compile -g --clean` が上書きしない。Claude には旧い `CLAUDE.md` と native の rule `ai-collaboration.md` の両方が届く。`mise run migrate:roots`（既定は dry-run）で旧いコピーを退避するのは別の手順
 
-- 既存の `smoke:catalog`（pre-push hook と `verify`）が、実 HOME の `~/.apm/deployment-receipts` に一時ディレクトリの receipt を書く。backup の前後を比べるときは、native の副作用と取り違えない
+- 既存の `smoke:catalog`（pre-push hook と `verify`）が、実 HOME の `~/.apm/deployment-receipts` に一時ディレクトリの receipt を書く（APM の `core/deployment_ledger.py` の置き場。切り替えのあとは consumer の `~/.apm` に書く）。backup の前後を比べるときは、native の副作用と取り違えない
 
 ## 実 HOME への切り替えの解き方
 
@@ -143,12 +147,44 @@ rollback（自動も `native:migrate-rollback` も）が戻すのは 4 つの ro
 1. `git clone https://github.com/jey3dayo/apm-workspace.git ~/src/github.com/jey3dayo/apm-workspace`
 2. private-skills は別の repo なので、旧 `~/.apm/private-skills` の remote（`git -C ~/.apm/private-skills remote get-url origin`）を、新しい checkout の `private-skills/` へ clone する。未 push の変更と `tmp/` の中身（learning-intake の drop box など）は、旧 `~/.apm` から手で移す
 3. 新しい checkout の `mise.toml` と `~/.config/mise/config.workstation.toml` の、`~/.apm` を前提にした記述を新しい場所に合わせる（`AGENTS.md` の Editing Rules にあるとおり、active な `apm` の source を変えるときは両方）
-4. 旧 `~/.apm` を `~/.apm.checkout-<UTC>` へ移す。`<HOME>/.apm` は新しい consumer の状態（`apm.yml`・`apm.lock.yaml`・`apm_modules`・`deployment-receipts`）だけになり、`migrate` が作る
-5. 戻すときは逆: `migrate-rollback` で root を戻し、consumer の `~/.apm` を `~/.apm.consumer-<UTC>` のような別名へ移して、`~/.apm.checkout-<UTC>` を `~/.apm` に戻す。clone した checkout は消さない。`mise.toml` と `config.workstation.toml` の更新も戻す
+4. 旧 `~/.apm` を動かす前に、4 つの root の中で `~/.apm` を指すリンクを、中身のコピーに置き換える。動かしたあとはリンクが切れ、`rehearse` は（`migrate` と同じ判定で）壊れたリンクの名前を出して失敗し、動かしたあとの `migrate` も同じリンクで止まるため。一覧は次のコマンドで出す（壊れたリンクも出る。mise task にしないのは、リンクごとに置き換えてよいか人が見るため）
+
+   ```sh
+   apm_home="$(realpath ~/.apm)"
+   for root in ~/.agents/skills ~/.claude/skills ~/.claude/agents ~/.cursor/agents; do
+     find "$root" -type l | while IFS= read -r link; do
+       target="$(realpath "$link" 2>/dev/null)" || { echo "$link (broken)"; continue; }
+       case "$target" in "$apm_home" | "$apm_home"/*) echo "$link -> $target" ;; esac
+     done
+   done
+   ```
+
+   置き換える例（1 リンクずつ。リンク先の中身をコピーしてからリンクを外す）:
+
+   ```sh
+   link=~/.claude/skills/<name>
+   copy="$(mktemp -d)" && cp -RL "$link" "$copy/entry" && rm "$link" && mv "$copy/entry" "$link" && rmdir "$copy"
+   ```
+
+   壊れたリンクは、置き換え先が無いので、外すか直してから進める
+
+5. 旧 `~/.apm` を `~/.apm.checkout-<UTC>` へ移す。`<HOME>/.apm` は新しい consumer の状態（`apm.yml`・`apm.lock.yaml`・`apm_modules`・`deployment-receipts`）だけになり、`migrate` が作る
+6. 戻すときは逆: `migrate-rollback` で root を戻し、consumer の `~/.apm` を `~/.apm.consumer-<UTC>` のような別名へ移して、`~/.apm.checkout-<UTC>` を `~/.apm` に戻す。clone した checkout は消さない。`mise.toml` と `config.workstation.toml` の更新も戻す
 
 2026-11-09 の時点で、実 HOME の `~/.cache/apm/git/checkouts_v1` には上流の切れた symlink がある。そのため `migrate --real-home` の前に `~/.cache/apm` を `~/.cache/apm.native-aside-<UTC>` へ移す（キャッシュなので、install が作り直す）。
 
 `~/.cache/apm` を退避したときの戻し方: 作り直された `~/.cache/apm` を新しい名前（`apm.native-regen-<UTC>` など）へ移し、退避したもの（`apm.native-aside-<UTC>`）を `~/.cache/apm` に戻す。どちらも消さない。2026-11-09 の実 HOME の apply が `.cache/apm` の中の上流の symlink（同じ checkout の中で切れた相対リンクや、上流の絶対パスのリンク）で止まったことは、キャッシュの扱いを直すべき問題として残している。`migrate --real-home` も `.cache/apm` を検査するので、同じリンクがあれば何も書かずに止まる
+
+### 切り替えで直すもの（`~/.apm` を前提にした記述）
+
+checkout を `~/.apm` の外へ移すと、`~/.apm` は consumer になる。次の記述は checkout の場所を `~/.apm` と決めているので、切り替えと同時に新しい場所へ直す（ここは場所の一覧で、書き換えは別の変更で行う）。見つけ直すときは `grep -rIn '~/\.apm\|\$HOME/\.apm' --exclude-dir=.git --exclude-dir=tmp --exclude-dir=apm_modules --exclude-dir=.worktrees .` を checkout で実行する。
+
+- 全ての tool に配られる共通ガイド（正本は `catalog/.apm/instructions/ai-collaboration.instructions.md`。`~/.claude/rules/ai-collaboration.md` と各 root の `AGENTS.md` はその配布先）: learning-intake の drop box（`~/.apm/tmp/learning-intake/`）、SaaS 接続の方針（`~/.apm/docs/saas-connectors.md`）、スキルの不具合の送り先（`~/.apm`）
+- catalog の skill: `apm-usage`（`SKILL.md` と `references/`。編集先と作業場所を `~/.apm` と書く）、`apm-deploy-verify`（検証対象と `mise -C ~/.apm`・`git -C ~/.apm`・ログの置き場）、`learning-intake`（drop box、台帳 `docs/learning-ledger.md`、`done.txt`、catalog の編集先）、`backlog-sweep`（drop box を面に数える記述）、`agmsg-delegation`（`agmsg-review.config.toml` の正本の path、`references/roster-recovery.md`、`references/resident-pool.md`）、`orchestrator-worker/references/models.md`（`models:check` を実行する場所）、`mise`（description）
+- repo の文書: `AGENTS.md`（Ownership、Editing Rules の `mise.toml` と `~/.config/mise/config.workstation.toml`）、`README.md`、`llms.txt`、`catalog/README.md`、`optional-skills/README.md`、`docs/skill-inventory.md`、`docs/package-decisions.md`、`docs/learning-ledger.md`、`docs/apm-task-coverage.md`。`todo.txt` と `done.txt` は履歴なので書き換えない
+- mise task の description（`mise.toml` と `mise/*.toml` の「`~/.apm` workspace」）と、`scripts/apm-workspace.sh`・`scripts/apm-workspace.ps1` の usage 文
+- テスト: `tests/run-cursor-worker.bats` の `cd "$HOME/.apm"`（`~/.apm` があれば consumer へ入って走る。cursor の project entry を持つ場所は checkout のほうなので、新しい場所へ向ける）
+- repo の外（手で確かめる）: `~/.config/mise/config.workstation.toml` と、新しい場所の `mise trust`、`~/.claude/settings.json`・`~/.codex/config.toml`・shell の rc・launchd に書いた `~/.apm/scripts` などの path、Claude Code の project ごとの記憶（`~/.claude/projects/` の下にある、`~/.apm` の path から作った名前の directory。新しい path では別の directory になり、auto-memory は引き継がれない）、新しい clone の lefthook（`lefthook install`）
 
 ## 退役の境界
 
