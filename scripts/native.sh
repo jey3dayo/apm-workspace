@@ -121,6 +121,7 @@ assert_disposable_home() {
   esac
   [ -d "$dir" ] || fail "--home $dir is not an existing directory"
   dir="$(cd "$dir" && pwd -P)"
+  assert_ssh_safe_home "$dir"
   for home in "$(account_home)" "$(user_db_home)"; do
     case "$home/" in
       "${dir%/}/"*) fail "--home $dir is the account's HOME or contains it; the cutover is not part of this script (docs/native-distribution.md)" ;;
@@ -445,14 +446,23 @@ $shared"
 # APM picks cache, config and temp locations from more than HOME (APM_CACHE_DIR, XDG_*, TMPDIR), and git honours
 # tokens, proxies and askpass from the environment, so apm starts from an empty environment plus this allowlist, with
 # its temp directory inside HOME.
+# ssh splits UserKnownHostsFile on whitespace and reads quotes and backslashes, so a HOME holding them would send
+# new host keys to a path outside it.
+assert_ssh_safe_home() {
+  case "$1" in
+    *[[:space:]\"\\]*) fail "$1 contains whitespace, a quote or a backslash, which ssh would split into another path" ;;
+  esac
+}
+
 run_apm() {
   local home="$1" var
   shift
+  assert_ssh_safe_home "$home"
   mkdir -p "$home/.cache/apm-native-tmp"
   # ssh takes its config and known_hosts from the account HOME, not $HOME; new host keys go to the target HOME.
   mkdir -p "$home/.ssh"
   local ssh_cmd
-  ssh_cmd="ssh -F /dev/null -o $(printf '%q' "UserKnownHostsFile=$home/.ssh/known_hosts $(user_db_home)/.ssh/known_hosts")"
+  ssh_cmd="ssh -F /dev/null -o $(printf '%q' "UserKnownHostsFile=$home/.ssh/known_hosts \"$(user_db_home)/.ssh/known_hosts\"")"
   local env_args=(HOME="$home" PATH="$PATH" TMPDIR="$home/.cache/apm-native-tmp" LANG="${LANG:-C.UTF-8}" GIT_SSH_COMMAND="$ssh_cmd")
   for var in LC_ALL TERM PYTHONUTF8 GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM GIT_CEILING_DIRECTORIES; do
     if [ -n "${!var:-}" ]; then env_args+=("$var=${!var}"); fi

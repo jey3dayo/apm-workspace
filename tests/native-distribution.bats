@@ -445,6 +445,22 @@ sentinel_snapshot() {
   [ "$(grep -c "^GIT_SSH_COMMAND=ssh -F /dev/null -o UserKnownHostsFile=$home/.ssh/known_hosts" "$home/apm-env.log")" -eq 2 ]
 }
 
+@test "apply refuses a HOME path that ssh would split, before apm runs" {
+  local parent stub="$FX/stub-apm-ssh-split" dir
+  parent="$(new_home ssh-split)"
+  printf '#!/bin/sh\ntouch "%s/apm-ran"\n' "$parent" >"$stub"
+  chmod +x "$stub"
+  for dir in "$parent/native home" "$parent/quote\"home" "$parent/back\\home"; do
+    mkdir -p "$dir"
+    run fixture_exec "$parent" /usr/bin/env APM_BIN="$stub" /bin/bash "$REPO_ROOT/scripts/native.sh" \
+      apply --home "$dir" --source-ref "$SOURCE_SHA" --workspace-only
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"ssh would split"* ]]
+    [ -z "$(ls -A "$dir")" ]
+  done
+  [ ! -e "$parent/apm-ran" ]
+}
+
 @test "a lone carriage return inserted into a compiled root counts as an edit, as it does for APM" {
   local home
   home="$(new_home edited-cr)"
