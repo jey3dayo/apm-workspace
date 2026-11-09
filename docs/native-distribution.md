@@ -82,7 +82,11 @@ backup の対象（rehearse が複製に再現するもの）: `~/.apm/apm.yml`�
 - backup を複製した使い捨ての HOME で再現した。元の `catalog#main` の manifest でも SHA pin の manifest でも同じように失敗したので、pin の書き方は原因ではない
 - `apm install --dry-run` は、消すファイルを表示しない（APM 自身が「Orphan removals are not previewed」と出す）。事前の確認には `native:rehearse` を使う
 - Codex native plugin の移行は Codex の RPC で plugin を登録する。成功しても Codex 側の状態を書き換えるので、「設定を書き換えない」という条件とぶつかる
-- APM（upstream）の挙動なので、この repo の修正では制御できない。解くには、旧経路の配った skill の置き場をまるごと退避してから配り直すか（private skill は入れ直す）、Codex を targets から外すか、を決める必要がある。どちらもまだ決めていない
+- APM（upstream）の挙動なので、この repo の修正では制御できない。解くには、旧経路の配った skill の置き場をまるごと退避してから配り直すか（private skill は入れ直す）、Codex を targets から外すか、を決める必要がある
+- 退避してから配り直す案（白紙からの配布）を選んだが、保留している。空の使い捨て HOME へ配っても、次の 2 つで install が失敗するため（2026-11-09、APM 0.35.0）
+  - APM は Codex CLI 0.163.0 だけを受け付ける（`apm_cli/codex_plugins/client.py` の `QUALIFIED_CODEX_VERSION`。上書きする手段は無い）。入っている Codex が別の版だと、Codex native plugin を登録する前に止まる
+  - Codex 0.163.0 を PATH に置くと登録までは進む。ただし `nanaism/yomiyasu` の bundle（`.codex-plugin/plugin.json` に名前しか無く、`SKILL.md` が bundle の直下にある）を、Codex が skill として見つけない。APM は「no unambiguous public installed skill path」で止まり、plugin は `enabled = false` のまま残る。yomiyasu は `.agents/skills` にも `.claude/skills` にも配られないので、このまま切り替えると Claude と Codex の両方から yomiyasu が消える
+  - このとき Codex は、`.agents/skills` に配られたほかの skill を読めた（`codex debug prompt-input` の skill 一覧で確かめた）
 
 切り替えの途中で `~/.cache/apm` を退避したときの戻し方: 作り直された `~/.cache/apm` を新しい名前（`apm.native-regen-<UTC>` など）へ移し、退避したもの（`apm.native-aside-<UTC>`）を `~/.cache/apm` に戻す。どちらも消さない。2026-11-09 の実 HOME の apply が `.cache/apm` の中の上流の symlink（同じ checkout の中で切れた相対リンクや、上流の絶対パスのリンク）で止まるのは、この退避ではなくキャッシュの扱いを直すべき問題として残している
 
