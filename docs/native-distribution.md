@@ -161,8 +161,9 @@ rollback（自動も `native:migrate-rollback` も）が戻すのは 4 つの ro
 
 1. `git clone https://github.com/jey3dayo/apm-workspace.git ~/src/github.com/jey3dayo/apm-workspace`
 2. private-skills は別の repo なので、旧 `~/.apm/private-skills` の remote（`git -C ~/.apm/private-skills remote get-url origin`）を、新しい checkout の `private-skills/` へ clone する。未 push の変更と `tmp/` の中身（learning-intake の drop box など）は、旧 `~/.apm` から手で移す
-3. 新しい checkout の `mise.toml` と `~/.config/mise/config.workstation.toml` の、`~/.apm` を前提にした記述を新しい場所に合わせる（`AGENTS.md` の Editing Rules にあるとおり、active な `apm` の source を変えるときは両方）。`APM_WORKSPACE_DIR` を mise の設定（`config.workstation.toml` など）に足さない。旧経路のガードは、この変数が無いときだけ「checkout でも consumer でもない `~/.apm`」を拒否する
-4. 旧 `~/.apm` を動かす前に、実 HOME で APM が書く場所（4 つの root、`.claude/rules`・`.claude/commands`・`.codex/rules`・`.cursor/rules`、compile が書く 3 つの root、`.cache/apm`、`Library/Caches/apm`。root そのものがリンクの場合も含む）の中で `~/.apm` を指すリンクを、中身のコピーに置き換える。動かしたあとはリンクが切れ、`rehearse` は（`migrate` と同じ判定で）壊れたリンクの名前を出して失敗し、動かしたあとの `migrate` も同じリンクで止まるため。一覧は次のコマンドで出す（壊れたリンクも出る。mise task にしないのは、リンクごとに置き換えてよいか人が見るため）
+3. 旧 checkout の `apm_modules/` を新しい checkout へコピーする（APFS では `cp -cR ~/.apm/apm_modules ~/src/github.com/jey3dayo/apm-workspace/apm_modules`。gitignore の対象なので clone では入らない）。`validate` は checkout で `apm compile --validate` を実行し、catalog の instruction を `apm_modules` から読むので、コピーしないと `mise run check` と pre-push hook が「No instruction files found in .apm/ directory」で失敗する
+4. 新しい checkout の `mise.toml` と `~/.config/mise/config.workstation.toml` の、`~/.apm` を前提にした記述を新しい場所に合わせる（`AGENTS.md` の Editing Rules にあるとおり、active な `apm` の source を変えるときは両方）。`APM_WORKSPACE_DIR` を mise の設定（`config.workstation.toml` など）に足さない。旧経路のガードは、この変数が無いときだけ「checkout でも consumer でもない `~/.apm`」を拒否する
+5. 旧 `~/.apm` を動かす前に、実 HOME で APM が書く場所（4 つの root、`.claude/rules`・`.claude/commands`・`.codex/rules`・`.cursor/rules`、compile が書く 3 つの root、`.cache/apm`、`Library/Caches/apm`。root そのものがリンクの場合も含む）の中で `~/.apm` を指すリンクを、中身のコピーに置き換える。動かしたあとはリンクが切れ、`rehearse` は（`migrate` と同じ判定で）壊れたリンクの名前を出して失敗し、動かしたあとの `migrate` も同じリンクで止まるため。一覧は次のコマンドで出す（壊れたリンクも出る。mise task にしないのは、リンクごとに置き換えてよいか人が見るため）
 
    ```sh
    apm_home="$(realpath ~/.apm)"
@@ -199,8 +200,8 @@ rollback（自動も `native:migrate-rollback` も）が戻すのは 4 つの ro
 
    壊れたリンクは、置き換え先が無いので、外すか直してから進める
 
-5. `~/.apm` で動いているセッション（Claude Code、Codex、herdr の pane）を止める。そのうえで旧 `~/.apm` を `~/.apm.checkout-<UTC>` へ移す。`~/.apm/.worktrees` の worktree は、移した先の絶対パスを `.git` に持ったままになるので、新しい checkout で `git worktree repair <worktree の path>...` を実行するか、worktree を作り直す。`<HOME>/.apm` は新しい consumer の状態（`apm.yml`・`apm.lock.yaml`・`apm_modules`・`deployment-receipts`）だけになり、`migrate` が作る
-6. 戻すときは逆: `migrate-rollback` で root を戻し、consumer の `~/.apm` を `~/.apm.consumer-<UTC>` のような別名へ移して、`~/.apm.checkout-<UTC>` を `~/.apm` に戻す。clone した checkout は消さない。`mise.toml` と `config.workstation.toml` の更新も戻す
+6. `~/.apm` で動いているセッション（Claude Code、Codex、herdr の pane）を止める。そのうえで旧 `~/.apm` を `~/.apm.checkout-<UTC>` へ移す。`~/.apm/.worktrees` の worktree は、移した先の絶対パスを `.git` に持ったままになるので、新しい checkout で `git worktree repair <worktree の path>...` を実行するか、worktree を作り直す。`<HOME>/.apm` は新しい consumer の状態（`apm.yml`・`apm.lock.yaml`・`apm_modules`・`deployment-receipts`）だけになり、`migrate` が作る
+7. 戻すときは逆: `migrate-rollback` で root を戻し、consumer の `~/.apm` を `~/.apm.consumer-<UTC>` のような別名へ移して、`~/.apm.checkout-<UTC>` を `~/.apm` に戻す。clone した checkout は消さない。`mise.toml` と `config.workstation.toml` の更新も戻す
 
 2026-11-09 の時点で、実 HOME の `~/.cache/apm/git/checkouts_v1` には上流の切れた symlink がある。そのため `migrate --real-home` の前に `~/.cache/apm` を `~/.cache/apm.native-aside-<UTC>` へ移す（キャッシュなので、install が作り直す）。`Library/Caches/apm` があれば、同じ理由で `Library/Caches/apm.native-aside-<UTC>` へ一緒に移す（`migrate` はこの 2 つも検査し、切れたリンクがあれば何も書かずに止まる）。
 
