@@ -23,7 +23,9 @@ import sys
 from typing import Any
 
 USAGE = "usage: fetch_comments.py [<owner>/<repo>] <number|PR URL>"
-PR_URL_RE = re.compile(r"^https://github\.com/([^/\s]+)/([^/\s]+)/pull/(\d+)(?:[/?#].*)?$")
+# The host is intentionally not pinned to github.com: with GH_HOST set, gh
+# returns GitHub Enterprise URLs, whose path shape is the same.
+PR_URL_RE = re.compile(r"^https://[^/\s]+/([^/\s]+)/([^/\s]+)/pull/(\d+)(?:[/?#].*)?$")
 REPO_RE = re.compile(r"^([^/\s]+)/([^/\s]+)$")
 
 QUERY = """\
