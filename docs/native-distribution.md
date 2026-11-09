@@ -93,6 +93,8 @@ backup の対象（rehearse が複製に再現するもの）: `~/.apm/apm.yml`�
 | 旧経路が配った skill のうち manifest に無いもの（private skill、Herdr などほかの tool が置いた skill、agmsg）が、移したあとの root に無い                                                                                                                                                                         | compile のあとに入れ直す（`reinstate_entries`）。固定のリストは持たず、「`.bak` にあって、install のあとの root に無い top-level の entry」を戻す。すでにあるもの（APM が配った、Herdr や Claude が書き直した）は上書きしない。`.bak` の中の symlink が root の外を指すときは、中身をコピーして戻す（配布先が authoring の checkout に依存しないため）。root の中を指すものはそのまま戻し、切れたリンクは列挙して失敗する。`mise run native:reinstate` として単独でも呼べる |
 | `nanaism/yomiyasu` は Codex native plugin を持つ package で、root の `apm.yml` の書き方（`owner/repo/skills/yomiyasu#<SHA>`）だと plugin として扱われ、移行が止まった                                                                                                                                             | render が構造化した形（`git: nanaism/yomiyasu` / `ref: <SHA>` / `skills: [yomiyasu]`）に変換する。SHA は root の行から読み、行が無ければ render は失敗する                                                                                                                                                                                                                                                                                                                  |
 
+render は `browser-use/browser-harness` を consumer の manifest に入れない（`scripts/native.sh` の `EXCLUDED_EXTERNAL_PACKAGES`）。repo root の package なので、APM が上流の repo 全体を skill の置き場へ配り、Codex が plugin の skill として数えるため。旧経路の entry は migrate の reinstate が `.bak` から戻すので、切り替え後の browser-harness は旧経路の内容のままで、native では更新されない。native で配る方法は未解決で、あとで扱う。
+
 APM は Codex CLI 0.163.0 だけを受け付ける（`apm_cli/codex_plugins/client.py` の `QUALIFIED_CODEX_VERSION`。上書きする手段は無い）。構造化した形が Codex native plugin の経路を通らずに skill として配られるかは、テストが通信しないので、本番の install で初めて確かめる（「確かめていないこと」）。
 
 ### bin/ の許可（`allowExecutables`）
@@ -163,7 +165,8 @@ rollback（自動も `native:migrate-rollback` も）が戻すのは 4 つの ro
      [ -e ~/"$path" ] || [ -L ~/"$path" ] || continue
      { [ -L ~/"$path" ] && echo ~/"$path"; find -H ~/"$path" -type l; } | while IFS= read -r link; do
        target="$(realpath "$link" 2>/dev/null)" || { echo "$link (broken)"; continue; }
-       case "$target" in "$apm_home" | "$apm_home"/*) echo "$link -> $target" ;; esac
+       case "$target" in "$apm_home" | "$apm_home"/*) echo "$link -> $target"; continue ;; esac
+       case "$(readlink "$link")" in "$HOME/.apm" | "$HOME/.apm"/* | "$apm_home" | "$apm_home"/*) echo "$link -> $(readlink "$link") (through ~/.apm)" ;; esac
      done
    done
    ```
@@ -174,6 +177,8 @@ rollback（自動も `native:migrate-rollback` も）が戻すのは 4 つの ro
    link=~/.claude/skills/<name>
    copy="$(mktemp -d)" && cp -RL "$link" "$copy/entry" && rm "$link" && mv "$copy/entry" "$link" && rmdir "$copy"
    ```
+
+   `(through ~/.apm)` と出たリンクは、`~/.apm/private-skills` のように `~/.apm` の中にある別のリンクを経由している。`realpath` は最後の実体を返すので、実体が `~/.apm` の外にあるとそのリンクを外れと判定し、動かしたあとにリンクが切れるため、リンクの値（`readlink`）そのものも見る。実体が HOME の中で `~/.apm` の外にあるときは、コピーせず実体へ張り直してもよい（`ln -sfn "$(realpath "$link")" "$link"`）
 
    壊れたリンクは、置き換え先が無いので、外すか直してから進める
 
@@ -230,6 +235,7 @@ B. 切り替えのたび（新しい SHA を配るときも同じ）
 
 - 本番の HOME での出力が旧経路と同じになるか（skill 数、Herdr など他の tool の skill、private の上書きの組み合わせ）
 - 外部の依存の install（テストは通信しない）。特に、構造化した形の `nanaism/yomiyasu` が Codex native plugin の経路を通らずに skill として配られるか
+- `browser-use/browser-harness` を native で配ること（今は manifest から外し、旧経路の entry を入れ直している）
 - `allowExecutables` の許可が、本物の `github.com/fujibee/agmsg` と `github.com/tt-a1i/archify/archify` で効くか（テストは、同じ形のキーを持つ package を `https://github.com/<owner>/<repo>.git` から git の設定で fixture へ向け直して確かめた）
 - 実 HOME での `migrate`（テストは使い捨ての HOME と実 APM の `--workspace-only` までで、実 HOME の `.cache/apm` や外部の依存を含む install は通らない）
 - 各 tool が実際に rule とガイドを読み込むか

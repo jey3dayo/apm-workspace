@@ -247,6 +247,10 @@ sentinel_snapshot() {
   yomiyasu_sha="$(sed -n 's|^    - nanaism/yomiyasu/skills/yomiyasu#\([0-9a-f]\{40\}\).*|\1|p' "$REPO_ROOT/apm.yml")"
   [ -n "$yomiyasu_sha" ]
   [ "$(grep -c 'nanaism/yomiyasu/skills/yomiyasu' <<<"$rendered")" -eq 0 ]
+
+  # browser-harness is a repo-root package that apm deploys as the whole upstream repository (a Codex plugin skill).
+  [ "$(grep -c 'browser-use/browser-harness' "$REPO_ROOT/apm.yml")" -eq 1 ]
+  [ "$(grep -c 'browser-harness' <<<"$rendered")" -eq 0 ]
   [ "$(grep -A3 '^    - git: nanaism/yomiyasu$' <<<"$rendered")" = "$(printf '    - git: nanaism/yomiyasu\n      ref: %s\n      skills:\n        - yomiyasu' "$yomiyasu_sha")" ]
 
   # The deprecated allowExecutables key, for the two packages whose bin/ the old path deployed, and nothing else.
@@ -256,7 +260,7 @@ sentinel_snapshot() {
   [ "$(sed -n 2p <<<"$rendered")" = "# native-render: workspace_only=0" ]
 
   # Everything else in apm.yml passes through line for line.
-  diff <(grep -vE 'jey3dayo/apm-workspace/(catalog|manual-skills)#main|nanaism/yomiyasu/skills/yomiyasu#' "$REPO_ROOT/apm.yml") \
+  diff <(grep -vE 'jey3dayo/apm-workspace/(catalog|manual-skills)#main|nanaism/yomiyasu/skills/yomiyasu#|browser-use/browser-harness#' "$REPO_ROOT/apm.yml") \
     <(sed 1,2d <<<"$rendered" | sed '/^allowExecutables:/,$d' | sed '/^    - git: nanaism\/yomiyasu$/,+3d' |
       grep -vE "^    - git: $FIXTURE_URL\$|^      path: (catalog|manual-skills)\$|^      ref: $SOURCE_SHA\$")
 

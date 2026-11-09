@@ -29,6 +29,9 @@ REAL_HOME_TOOL_DIRS=".agents .claude .codex .cursor .cache Library Library/Cache
 # attempted): <manifest path>=<git repository>:<skill>. render turns `- <manifest path>#<40-hex SHA>` into
 # `- git: <repository> / ref: <SHA> / skills: [<skill>]`.
 EXTERNAL_PACKAGE_MAP="nanaism/yomiyasu/skills/yomiyasu=nanaism/yomiyasu:yomiyasu"
+# Packages render leaves out of the consumer manifest: a repo-root package that apm deploys as the whole upstream
+# repository, which Codex then lists as a plugin skill. migrate's reinstate keeps the old entry from the moved-aside roots.
+EXCLUDED_EXTERNAL_PACKAGES="browser-use/browser-harness"
 # Packages whose bin/ the old path deployed and that apm may deploy too. render lists them under the deprecated
 # allowExecutables key, the only spelling apm 0.35.0 reads from <HOME>/.apm/apm.yml at user scope
 # (docs/native-distribution.md). The apm.yml entry is <owner>/<repo>[/<path>]#<ref>; apm looks the approval up as
@@ -97,15 +100,15 @@ resolve_source_sha() {
 }
 
 # Rewrites the two floating workspace refs (catalog#main, manual-skills#main) into SHA pins, and the packages in
-# EXTERNAL_PACKAGE_MAP into the structured form, and appends allowExecutables for EXECUTABLE_ALLOW_PACKAGES. The other
-# external dependencies are already pinned in apm.yml and pass through unchanged. A listed package missing from apm.yml
-# fails the render, so a rename there is not skipped silently.
+# EXTERNAL_PACKAGE_MAP into the structured form, drops EXCLUDED_EXTERNAL_PACKAGES, and appends allowExecutables for
+# EXECUTABLE_ALLOW_PACKAGES. The other external dependencies are already pinned in apm.yml and pass through unchanged.
+# A mapped or allowed package missing from apm.yml fails the render, so a rename there is not skipped silently.
 render_manifest() {
   local sha="$1" workspace_only="$2"
   [ -f "$ROOT_MANIFEST" ] || fail "missing $ROOT_MANIFEST"
   printf '# Rendered by scripts/native.sh from apm.yml with this repository pinned at %s. Do not edit; re-render.\n' "$sha"
   printf '# native-render: workspace_only=%s\n' "$workspace_only"
-  awk -v sha="$sha" -v url="$SOURCE_URL" -v only="$workspace_only" -v map="$EXTERNAL_PACKAGE_MAP" -v allow="$EXECUTABLE_ALLOW_PACKAGES" '
+  awk -v sha="$sha" -v url="$SOURCE_URL" -v only="$workspace_only" -v map="$EXTERNAL_PACKAGE_MAP" -v excluded="$EXCLUDED_EXTERNAL_PACKAGES" -v allow="$EXECUTABLE_ALLOW_PACKAGES" '
     function convert(   i, prefix, rest, pin) {
       for (i = 1; i <= n; i++) {
         prefix = "    - " key[i] "#"
@@ -122,6 +125,7 @@ render_manifest() {
     }
     BEGIN {
       na = split(allow, allowed, " ")
+      nx = split(excluded, drop, " ")
       n = split(map, entries, " ")
       for (i = 1; i <= n; i++) {
         split(entries[i], kv, "=")
@@ -139,6 +143,7 @@ render_manifest() {
       pinned[pkg]++
       next
     }
+    !only { for (i = 1; i <= nx; i++) if (index($0, "    - " drop[i] "#") == 1) next }
     !only && convert() { next }
     !only { for (i = 1; i <= na; i++) if (index($0, "    - " allowed[i] "#") == 1) allowed_seen[i]++ }
     only && section == "dependencies" && group == "mcp:" { next }
