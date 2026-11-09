@@ -249,17 +249,22 @@ sentinel_snapshot() {
   [ "$(grep -c 'nanaism/yomiyasu/skills/yomiyasu' <<<"$rendered")" -eq 0 ]
   [ "$(grep -A3 '^    - git: nanaism/yomiyasu$' <<<"$rendered")" = "$(printf '    - git: nanaism/yomiyasu\n      ref: %s\n      skills:\n        - yomiyasu' "$yomiyasu_sha")" ]
 
+  # The deprecated allowExecutables key, for the two packages whose bin/ the old path deployed, and nothing else.
+  [ "$(sed -n '/^allowExecutables:/,$p' <<<"$rendered")" = "$(printf 'allowExecutables:\n  github.com/fujibee/agmsg:\n    bin: true\n  github.com/tt-a1i/archify/archify:\n    bin: true')" ]
+  [ "$(grep -c '^executables:' <<<"$rendered")" -eq 0 ]
+
   # Everything else in apm.yml passes through line for line.
   diff <(grep -vE 'jey3dayo/apm-workspace/(catalog|manual-skills)#main|nanaism/yomiyasu/skills/yomiyasu#' "$REPO_ROOT/apm.yml") \
-    <(sed 1d <<<"$rendered" | sed '/^    - git: nanaism\/yomiyasu$/,+3d' |
+    <(sed 1d <<<"$rendered" | sed '/^allowExecutables:/,$d' | sed '/^    - git: nanaism\/yomiyasu$/,+3d' |
       grep -vE "^    - git: $FIXTURE_URL\$|^      path: (catalog|manual-skills)\$|^      ref: $SOURCE_SHA\$")
 
   rendered="$(native "$home" render --source-ref "$SOURCE_SHA" --workspace-only)"
   [ "$(grep -c '^    - ' <<<"$rendered")" -eq 2 ]
   [ "$(grep -c '^  mcp:' <<<"$rendered")" -eq 0 ]
+  [ "$(grep -c 'xecutables' <<<"$rendered")" -eq 0 ]
 }
 
-@test "render fails when a listed external package is missing from apm.yml, and --workspace-only does not need it" {
+@test "render fails when a listed external or executable package is missing from apm.yml, and --workspace-only does not need it" {
   local home repo="$FX/render-repo"
   home="$(new_home render-missing)"
   mkdir -p "$repo/scripts"
@@ -268,6 +273,13 @@ sentinel_snapshot() {
   run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA"
   [ "$status" -ne 0 ]
   [[ "$output" == *"EXTERNAL_PACKAGE_MAP"* ]]
+  run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -eq 0 ]
+
+  grep -v 'fujibee/agmsg' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
+  run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"EXECUTABLE_ALLOW_PACKAGES"* ]]
   run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA" --workspace-only
   [ "$status" -eq 0 ]
 }
@@ -860,6 +872,94 @@ prepare_migrate() {
   result="$(compgen -G "$backup/rehearsal-*/result.txt")"
   grep -qxF "lost=2" "$result"
   [ "$(cat "$(dirname "$result")/lost.txt")" = "$(printf '.agents/skills/agmsg/bin\n.agents/skills/agmsg/bin/agmsg.js')" ]
+}
+
+@test "apply, rehearse and migrate stop when <HOME>/apm.yml exists, because apm would read its executable approvals instead, before apm runs" {
+  local home backup="$FX/backups/home-manifest" stub="$FX/stub-apm-home-manifest"
+  printf '#!/bin/sh\ntouch "$HOME/apm-ran"\n' >"$stub"
+  chmod +x "$stub"
+  home="$(new_home home-manifest)"
+  seed_migrate_home "$home"
+  real_native "$home" backup --real-home --backup-dir "$backup"
+  echo "name: stray" >"$home/apm.yml"
+
+  run fixture_exec "$home" /usr/bin/env APM_BIN="$stub" /bin/bash "$REPO_ROOT/scripts/native.sh" apply --home "$home" --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$home/apm.yml exists"* ]]
+  run real_native_with_stub "$home" "$stub" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$home/apm.yml exists"* ]]
+  [ -z "$(compgen -G "$backup/rehearsal-*" || true)" ]
+
+  rm "$home/apm.yml"
+  write_deploy_stub "$FX/stub-apm-deploy"
+  real_native_with_stub "$home" "$FX/stub-apm-deploy" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  echo "name: stray" >"$home/apm.yml"
+  run real_native_with_stub "$home" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$(dirname "$(compgen -G "$backup/rehearsal-*/result.txt")")"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$home/apm.yml exists"* ]]
+  [ -z "$(compgen -G "$home/.claude/skills.bak-*" || true)" ]
+  [ ! -e "$home/apm-ran" ]
+}
+
+@test "apply passes --trust-bin to install only, in apply, rehearse and migrate alike" {
+  local home stub="$FX/stub-apm-args"
+  printf '#!/bin/sh\necho "$*" >>"$HOME/apm-args.log"\n' >"$stub"
+  chmod +x "$stub"
+  home="$(new_home trust-bin-args)"
+  fixture_exec "$home" /usr/bin/env APM_BIN="$stub" /bin/bash "$REPO_ROOT/scripts/native.sh" apply --home "$home" --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$(cat "$home/apm-args.log")" = "$(printf 'install -g --only apm --trust-bin\ncompile -g --clean')" ]
+
+  home="$(new_home trust-bin-args-migrate)"
+  seed_migrate_home "$home"
+  real_native "$home" backup --real-home --backup-dir "$FX/backups/trust-bin-args"
+  real_native_with_stub "$home" "$stub" rehearse --real-home --backup-dir "$FX/backups/trust-bin-args" --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  real_native_with_stub "$home" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only \
+    --rehearsal "$(dirname "$(compgen -G "$FX/backups/trust-bin-args/rehearsal-*/result.txt")")"
+  [ "$(grep -c '^install -g --only apm --trust-bin$' "$home/apm-args.log")" -eq 1 ]
+  [ "$(grep -c '^compile -g --clean$' "$home/apm-args.log")" -eq 1 ]
+  [ "$(grep -c -- '--trust-bin' "$home/apm-args.log")" -eq 1 ]
+  [ "$(find "$FX/backups/trust-bin-args"/rehearsal-*/home -name apm-args.log | xargs cat | grep -c -- '--trust-bin')" -eq 1 ]
+}
+
+# A fixture repository served for https://github.com/<owner>/<repo>.git: <skill dir>/SKILL.md and <skill dir>/bin/tool.sh.
+build_github_fixture() {
+  local owner_repo="$1" skill_dir="$2" dir="$FX/src/github/$1"
+  mkdir -p "$dir/$skill_dir/bin"
+  printf -- '---\nname: fixture-skill\ndescription: fixture\n---\nbody\n' >"$dir/$skill_dir/SKILL.md"
+  echo 'echo hi' >"$dir/$skill_dir/bin/tool.sh"
+  fixture_exec "$(new_home author)" /usr/bin/env GIT_TEMPLATE_DIR="$FX/empty-git-template" /bin/sh -c '
+    cd "$1" && git init -q -b main && git add . && git -c user.name=fixture -c user.email=fixture@example.invalid commit -q -m s' sh "$dir"
+  printf '[url "file://%s"]\n\tinsteadOf = https://github.com/%s.git\n' "$dir" "$owner_repo" >>"$FX/gitconfig-github"
+}
+
+@test "apply deploys bin/ for the packages render lists under allowExecutables and not for any other package" {
+  local home repo="$FX/render-bin-repo" entry
+  : >"$FX/gitconfig-github"
+  build_github_fixture fujibee/agmsg .
+  build_github_fixture tt-a1i/archify archify
+  build_github_fixture nanaism/yomiyasu skills/yomiyasu
+  build_github_fixture other/pkg .
+  { printf '[include]\n\tpath = %s\n' "$FX/gitconfig"; cat "$FX/gitconfig-github"; } >"$FX/gitconfig-bin"
+  mkdir -p "$repo/scripts"
+  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
+  {
+    printf 'name: bin-fixture\nversion: 1.0.0\ntargets:\n  - agent-skills\ndependencies:\n  apm:\n'
+    printf '    - jey3dayo/apm-workspace/catalog#main\n    - jey3dayo/apm-workspace/manual-skills#main\n'
+    for entry in nanaism/yomiyasu/skills/yomiyasu=nanaism/yomiyasu fujibee/agmsg=fujibee/agmsg tt-a1i/archify/archify=tt-a1i/archify other/pkg=other/pkg; do
+      printf '    - %s#%s\n' "${entry%%=*}" "$(git -C "$FX/src/github/${entry##*=}" rev-parse HEAD)"
+    done
+    printf 'scripts: {}\n'
+  } >"$repo/apm.yml"
+
+  home="$(new_home bin-allow)"
+  run fixture_exec "$home" /usr/bin/env GIT_CONFIG_GLOBAL="$FX/gitconfig-bin" /bin/bash "$repo/scripts/native.sh" apply --home "$home" --source-ref "$SOURCE_SHA"
+  [ "$status" -eq 0 ]
+  [ "$(cd "$home/.agents/skills" && find . -path '*/bin/tool.sh' | LC_ALL=C sort)" = "$(printf './agmsg/bin/tool.sh\n./archify/bin/tool.sh')" ]
+  # The other packages' skills are deployed, without their bin/.
+  [ "$(find "$home/.agents/skills" -name SKILL.md | wc -l)" -gt 4 ]
+  grep -qx '  exec_status: gated_pending_approval' "$home/.apm/apm.lock.yaml"
+  grep -qx '  exec_status: deployed' "$home/.apm/apm.lock.yaml"
 }
 
 @test "migrate refuses a HOME whose .apm is a checkout, and a repository inside .apm, before anything is written" {

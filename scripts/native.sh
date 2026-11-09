@@ -29,6 +29,11 @@ REAL_HOME_TOOL_DIRS=".agents .claude .codex .cursor .cache Library Library/Cache
 # attempted): <manifest path>=<git repository>:<skill>. render turns `- <manifest path>#<40-hex SHA>` into
 # `- git: <repository> / ref: <SHA> / skills: [<skill>]`.
 EXTERNAL_PACKAGE_MAP="nanaism/yomiyasu/skills/yomiyasu=nanaism/yomiyasu:yomiyasu"
+# Packages whose bin/ the old path deployed and that apm may deploy too. render lists them under the deprecated
+# allowExecutables key, the only spelling apm 0.35.0 reads from <HOME>/.apm/apm.yml at user scope
+# (docs/native-distribution.md). The apm.yml entry is <owner>/<repo>[/<path>]#<ref>; apm looks the approval up as
+# github.com/<owner>/<repo>[/<path>] (str of the dependency in install/exec_gate.py resolve_package_key, without #<ref>).
+EXECUTABLE_ALLOW_PACKAGES="fujibee/agmsg tt-a1i/archify/archify"
 # Files whose content a migrate must leave byte for byte alone.
 MIGRATE_UNTOUCHED_FILES=".codex/config.toml .claude/settings.json"
 # Non-secret paths apply can change; backup copies them and rehearse reproduces them in a scratch HOME. Tool configs that
@@ -51,7 +56,7 @@ Usage: scripts/native.sh <command> [options]
                                                  apm did not deploy (the steps migrate runs), and fails on any lost file
                                                  other than a .apm-pin.
   apply    --home DIR --source-ref REF [--workspace-only]
-                                                 Write the manifest into <HOME>/.apm/apm.yml, then apm install -g --only apm and
+                                                 Write the manifest into <HOME>/.apm/apm.yml, then apm install -g --only apm --trust-bin and
                                                  apm compile -g --clean with that HOME, which must be disposable.
                                                  --real-home is blocked; use migrate.
   migrate  (--home DIR | --real-home) --source-ref REF --rehearsal DIR [--workspace-only]
@@ -92,13 +97,14 @@ resolve_source_sha() {
 }
 
 # Rewrites the two floating workspace refs (catalog#main, manual-skills#main) into SHA pins, and the packages in
-# EXTERNAL_PACKAGE_MAP into the structured form. The other external dependencies are already pinned in apm.yml and pass
-# through unchanged. A listed package missing from apm.yml fails the render, so a rename there is not skipped silently.
+# EXTERNAL_PACKAGE_MAP into the structured form, and appends allowExecutables for EXECUTABLE_ALLOW_PACKAGES. The other
+# external dependencies are already pinned in apm.yml and pass through unchanged. A listed package missing from apm.yml
+# fails the render, so a rename there is not skipped silently.
 render_manifest() {
   local sha="$1" workspace_only="$2"
   [ -f "$ROOT_MANIFEST" ] || fail "missing $ROOT_MANIFEST"
   printf '# Rendered by scripts/native.sh from apm.yml with this repository pinned at %s. Do not edit; re-render.\n' "$sha"
-  awk -v sha="$sha" -v url="$SOURCE_URL" -v only="$workspace_only" -v map="$EXTERNAL_PACKAGE_MAP" '
+  awk -v sha="$sha" -v url="$SOURCE_URL" -v only="$workspace_only" -v map="$EXTERNAL_PACKAGE_MAP" -v allow="$EXECUTABLE_ALLOW_PACKAGES" '
     function convert(   i, prefix, rest, pin) {
       for (i = 1; i <= n; i++) {
         prefix = "    - " key[i] "#"
@@ -114,6 +120,7 @@ render_manifest() {
       return 0
     }
     BEGIN {
+      na = split(allow, allowed, " ")
       n = split(map, entries, " ")
       for (i = 1; i <= n; i++) {
         split(entries[i], kv, "=")
@@ -132,15 +139,21 @@ render_manifest() {
       next
     }
     !only && convert() { next }
+    !only { for (i = 1; i <= na; i++) if (index($0, "    - " allowed[i] "#") == 1) allowed_seen[i]++ }
     only && section == "dependencies" && group == "mcp:" { next }
     only && section == "dependencies" && group == "apm:" && !/^  apm:/ { next }
     { print }
     END {
       ok = (pinned["catalog"] == 1 && pinned["manual-skills"] == 1)
       if (!only) for (i = 1; i <= n; i++) if (converted[i] != 1) ok = 0
+      if (!only) for (i = 1; i <= na; i++) if (allowed_seen[i] != 1) ok = 0
+      if (ok && !only) {
+        print "allowExecutables:"
+        for (i = 1; i <= na; i++) printf "  github.com/%s:\n    bin: true\n", allowed[i]
+      }
       exit !ok
     }
-  ' "$ROOT_MANIFEST" || fail "apm.yml must list jey3dayo/apm-workspace/catalog#main and manual-skills#main exactly once each, and every package of EXTERNAL_PACKAGE_MAP (such as nanaism/yomiyasu/skills/yomiyasu#<40-hex SHA>) exactly once"
+  ' "$ROOT_MANIFEST" || fail "apm.yml must list jey3dayo/apm-workspace/catalog#main and manual-skills#main exactly once each, and every package of EXTERNAL_PACKAGE_MAP (such as nanaism/yomiyasu/skills/yomiyasu#<40-hex SHA>) and EXECUTABLE_ALLOW_PACKAGES (such as fujibee/agmsg#<ref>) exactly once"
 }
 
 physical_path() {
@@ -264,12 +277,13 @@ cmd_plan() {
   cat <<EOF
 
 # apply --home <disposable HOME> --source-ref $sha would run:
-#   1. stop if an APM-generated root there was edited after compile ($COMPILED_ROOTS), or if a symlink or hard link
+#   1. stop if <HOME>/apm.yml exists (apm reads its executable approvals there instead of <HOME>/.apm/apm.yml), if an
+#      APM-generated root there was edited after compile ($COMPILED_ROOTS), or if a symlink or hard link
 #      inside that HOME reaches outside it
 #   2. stop if <HOME>/.apm/config.json holds more than default_client and prefer_ssh; keep a differing
 #      <HOME>/.apm/apm.yml as apm.yml.<UTC>.bak
 #   3. write the manifest above
-#   4. apm install -g --only apm, from an empty environment plus HOME, PATH, locale, git config locations and a
+#   4. apm install -g --only apm --trust-bin, from an empty environment plus HOME, PATH, locale, git config locations and a
 #      TMPDIR in HOME; MCP servers stay as they are
 #   5. apm compile -g --clean, the same way
 # apply --real-home is blocked. The real HOME is switched by migrate --real-home --source-ref $sha --rehearsal <dir>, which
@@ -280,7 +294,7 @@ cmd_plan() {
 #   3. record the sha256 of ${MIGRATE_UNTOUCHED_FILES// /, }; save the agmsg links
 #   4. write the manifest above, move $MIGRATE_ROOTS
 #      to <root>.bak-<UTC> (nothing is deleted)
-#   5. apm install -g --only apm, apm compile -g --clean, then copy back the top-level entries apm did not deploy
+#   5. apm install -g --only apm --trust-bin, apm compile -g --clean, then copy back the top-level entries apm did not deploy
 #      (a link that leaves its root is copied; a broken link fails); restore the agmsg links; compare the sha256
 #   6. on any failure, undo step 4 (migrate-rollback --stamp <UTC> does the same later). It prints the stamp.
 # Not deployed by APM, and left to the manual steps in docs/native-distribution.md: agmsg db/teams links,
@@ -309,6 +323,7 @@ cmd_apply() {
   home="$(assert_disposable_home "$HOME_DIR")"
   sha="$(resolve_source_sha "$SOURCE_REF")"
   assert_default_apm_config "$home"
+  assert_no_home_manifest "$home"
   edited="$(edited_generated_roots "$home")"
   [ -z "$edited" ] || fail "these roots keep APM's marker but were edited after compile, and apm compile would overwrite them:
 $edited
@@ -321,7 +336,7 @@ Move them aside or make them plain directories and files of this HOME."
 
   install_manifest "$home" "$(render_manifest "$sha" "$WORKSPACE_ONLY")"
 
-  run_apm "$home" install -g --only apm
+  run_apm_install "$home"
   run_apm "$home" compile -g --clean
 }
 
@@ -635,6 +650,7 @@ cmd_rehearse() {
   local install_status=0 compile_status=skipped agmsg_status=0 linked=0 reinstate_status=skipped allowed_lost=0 baseline_skips=0
   home="$(target_home rehearse)"
   assert_default_apm_config "$home"
+  assert_no_home_manifest "$home"
   assert_completed_backup "$home"
   sha="$(resolve_source_sha "$SOURCE_REF")"
   dir="$(cd "$BACKUP_DIR" && pwd -P)"
@@ -657,6 +673,7 @@ cmd_rehearse() {
     clone_copy "$dir/agmsg-state" "$scratch/.local/state/agmsg"
   fi
   assert_default_apm_config "$scratch"
+  assert_no_home_manifest "$scratch"
   isolate_scratch_links "$home" "$scratch"
   shared="$(shared_entries "$scratch")"
   [ -z "$shared" ] || fail "the scratch HOME $scratch still shares data with files outside it:
@@ -677,7 +694,7 @@ $shared"
     stamp="$(date -u +%Y%m%dT%H%M%SZ)"
     migrate_roots "$scratch" "$stamp"
   fi
-  run_apm "$scratch" install -g --only apm 2>&1 | tee -a "$rehearsal/apm.log" >&2 || install_status=$?
+  run_apm_install "$scratch" 2>&1 | tee -a "$rehearsal/apm.log" >&2 || install_status=$?
   if [ "$install_status" -eq 0 ]; then
     compile_status=0
     run_apm "$scratch" compile -g --clean 2>&1 | tee -a "$rehearsal/apm.log" >&2 || compile_status=$?
@@ -786,6 +803,7 @@ cmd_migrate() {
   assert_migrate_rehearsal "$home" "$sha" "$(cd "$REHEARSAL" 2>/dev/null && pwd -P || printf '%s' "$REHEARSAL")"
 
   assert_default_apm_config "$home"
+  assert_no_home_manifest "$home"
   edited="$(edited_generated_roots "$home")"
   [ -z "$edited" ] || fail "these roots keep APM's marker but were edited after compile, and apm compile would overwrite them:
 $edited
@@ -807,7 +825,7 @@ Move them aside or make them plain directories and files of this HOME."
   install_manifest "$home" "$manifest"
   trap migrate_failure EXIT
   migrate_roots "$home" "$MIGRATE_STAMP"
-  run_apm "$home" install -g --only apm
+  run_apm_install "$home"
   run_apm "$home" compile -g --clean
   reinstate_entries "$home" "$MIGRATE_STAMP"
   if [ "$MIGRATE_AGMSG_LINKED" = 1 ]; then agmsg_state "$home" restore; fi
@@ -842,6 +860,11 @@ assert_ssh_safe_home() {
   case "$1" in
     *[[:space:]\"\\]*) fail "$1 contains whitespace, a quote or a backslash, which ssh would split into another path" ;;
   esac
+}
+
+# --trust-bin always, so a piped rehearse and a terminal migrate behave alike; allowExecutables limits which packages get bin/.
+run_apm_install() {
+  run_apm "$1" install -g --only apm --trust-bin
 }
 
 run_apm() {
@@ -902,6 +925,14 @@ real_home_shared_entries() {
   set --
   for path in $REAL_HOME_WRITE_PATHS; do set -- "$@" "$home/$path"; done
   shared_entries_in "$home" "$@"
+}
+
+# At user scope apm reads executable approvals from <HOME>/apm.yml when it exists, and only then from <HOME>/.apm/apm.yml
+# (apm_cli/security/executables.py exec_trust_context_for_project), so the allowExecutables render writes would not apply.
+assert_no_home_manifest() {
+  if [ -e "$1/apm.yml" ] || [ -L "$1/apm.yml" ]; then
+    fail "$1/apm.yml exists, and apm would read its executable approvals instead of those of $1/.apm/apm.yml. Move it aside, then re-run."
+  fi
 }
 
 # apm reads ~/.apm/config.json with json.load and takes temp_dir and other locations from it. Decode it the same way

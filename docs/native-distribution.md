@@ -10,7 +10,7 @@
 | ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mise run native:plan`                                                                                                        | 既定の入口。consumer の manifest と、apply が実行する手順を表示する。何も書かない                                                                                                                                                                                                                                                                                                                                                |
 | `mise run native:render -- --source-ref <SHA>`                                                                                | consumer の manifest を標準出力に出す                                                                                                                                                                                                                                                                                                                                                                                            |
-| `mise run native:apply -- --home <使い捨ての HOME> --source-ref <SHA>`                                                        | manifest を `<HOME>/.apm/apm.yml` に書き、`HOME=<HOME>` で `apm install -g --only apm` と `apm compile -g --clean` を実行する                                                                                                                                                                                                                                                                                                    |
+| `mise run native:apply -- --home <使い捨ての HOME> --source-ref <SHA>`                                                        | manifest を `<HOME>/.apm/apm.yml` に書き、`HOME=<HOME>` で `apm install -g --only apm --trust-bin` と `apm compile -g --clean` を実行する                                                                                                                                                                                                                                                                                        |
 | `mise run native:backup -- --real-home --backup-dir <新しいディレクトリ>`                                                     | rehearse の材料として、apply が変え得る非秘密のパス（下の「backup の対象」）と agmsg の store を clone copy する。既存の backup は上書きしない                                                                                                                                                                                                                                                                                   |
 | `mise run native:rehearse -- --real-home --backup-dir <backup> --source-ref <SHA>`                                            | backup を `<backup>/rehearsal-<UTC>/home` に複製し、HOME の外を指すリンクを複製の中へ向け直してから、同じ install と compile を実行する。消えたファイルを `lost.txt` に数え、結果を `result.txt` に書く。install・compile が成功して消えたファイルが 0 件のときだけ成功で終わる。実 HOME には書かない                                                                                                                            |
 | `mise run native:rehearse -- --real-home --backup-dir <backup> --source-ref <SHA> --migrate`                                  | 複製の中で、install の前に 4 つの root を `<root>.bak-<UTC>` へ移し、compile のあとに入れ直す（`migrate` と同じ関数）。消えてよいのは退避した root の中の `.apm-pin` だけで、その件数は `result.txt` の `allowed_lost=` に出る。それ以外が消える、入れ直しが失敗する、`apm.log` に `no trustworthy local deployment baseline` が出る、のどれかなら失敗。`result.txt` は `mode=migrate` になる（`--migrate` なしは `mode=plain`） |
@@ -25,6 +25,7 @@
 - `<HOME>/.apm/apm.yml` が描画した manifest とバイト単位で違えば、`apm.yml.<UTC>.bak` に残してから置き換える（同じ名前があれば番号を付け、既存の `.bak` を上書きしない）
 - HOME の外を指す（または壊れた）symlink か、ハードリンクの通常のファイルが HOME の中にあれば、何も書かずに止まる。apm がリンクを通して HOME の外のファイルを書き換えるため（キャッシュの `Library/Caches/apm` のように、配布先より深い場所にも書く）。rehearse は、複製の中のリンクをすべて複製の中へ向け直し、同じ検査を通してから install する
 - `<HOME>/.apm/config.json` に `default_client` と `prefer_ssh` 以外のキーがあれば、apply も rehearse も止まる。APM は `temp_dir` などの書込み先をここから読むため。`prefer_ssh` は git の URL の形を変えるだけで、書込み先は変えない。キーは APM と同じく JSON としてデコードしてから比べる
+- `<HOME>/apm.yml` があれば、apply・rehearse（実 HOME と複製の両方）・migrate は何も書かずに止まる。user scope の APM は executable の許可を `<HOME>/apm.yml` が在ればそちらから読み、`<HOME>/.apm/apm.yml` の `allowExecutables` を無視するため（`apm_cli/security/executables.py` の `exec_trust_context_for_project`）
 - apm は空の環境に `HOME`・`PATH`・ロケール・git の設定の場所と、HOME の中の `TMPDIR`（`.cache/apm-native-tmp`）だけを渡して起動する。APM は `APM_CACHE_DIR` や `XDG_*`、`TMPDIR` が指す場所にも書き（`APM_CACHE_DIR` と `XDG_CACHE_HOME` はテストで確かめた）、git は token・proxy・askpass を環境から読むため
 - manifest は同じディレクトリの新しいファイルに書いてから名前を置き換える
 - install は `--only apm`。MCP は、旧経路と `setup:mcp:host` が書いた今の設定のまま触らない
@@ -90,6 +91,24 @@ backup の対象（rehearse が複製に再現するもの）: `~/.apm/apm.yml`�
 
 APM は Codex CLI 0.163.0 だけを受け付ける（`apm_cli/codex_plugins/client.py` の `QUALIFIED_CODEX_VERSION`。上書きする手段は無い）。構造化した形が Codex native plugin の経路を通らずに skill として配られるかは、テストが通信しないので、本番の install で初めて確かめる（「確かめていないこと」）。
 
+### bin/ の許可（`allowExecutables`）
+
+APM 0.35.0 は、非対話の install で信頼していない package の `bin/` を配らない。旧経路が実 HOME に置いている `bin/` は `fujibee/agmsg` と `tt-a1i/archify` の 2 つだけなので、render は `--workspace-only` でないとき、manifest の末尾に次を足す（`scripts/native.sh` の `EXECUTABLE_ALLOW_PACKAGES`。この 2 つが root の `apm.yml` に無ければ render は失敗する）。
+
+```yaml
+allowExecutables:
+  github.com/fujibee/agmsg:
+    bin: true
+  github.com/tt-a1i/archify/archify:
+    bin: true
+```
+
+- 許可するのはこの 2 つの `bin/` だけ。`browser-use/browser-harness`・`mattpocock/skills`・`nextlevelbuilder/ui-ux-pro-max-skill`・`shadcn/improve` の `bin/` は、旧経路も配っていないので許可しない
+- `allowExecutables` は APM では deprecated の旧名。user scope の APM は `<HOME>/apm.yml` の `executables:` を読むが、`<HOME>/.apm/apm.yml` の `executables:` は読まず、旧名の `allowExecutables:` だけを読む（`install/template.py` の `_effective_allow`、`models/apm_package.py` の `parse_allow_executables`）。そのため新しい名前では書けない。`apm approve --user` は `config.json` に書いて `assert_default_apm_config` に止められるので使わない
+- 許可のキーは `github.com/<owner>/<repo>[/<path>]`。APM は依存を `str(dep_ref)`（`github.com/<repo>#<ref>`）で引き、`#<ref>` を外した形で照合する（`install/exec_gate.py` の `resolve_package_key`、`security/executables.py` の `_map_grants`）。`apm approve` が出す `fujibee/agmsg` の形は一致しない
+- このブロックを書くと APM の executable のゲートが有効になり、許可していない package の hooks・MCP・LSP・canvas も default-deny になる（今は、ゲートが無いので全部配られる）。install の末尾に `executable primitives parked pending approval` という警告が出るのはこのため。`~/.apm/apm.lock.yaml` の `exec_status` に `gated_pending_approval` と残る。該当するファイルがあれば rehearse の `lost` に出る
+- `apm install` には `--trust-bin` を固定で渡す（compile には渡さない）。許可があっても、stdout が端末でないと APM は `bin/` を飛ばす（`install/exec_gate.py` の `resolve_bin_skip`）。rehearse は出力を `tee` に渡すので端末でなく、migrate は端末で動くので、付けないと 2 つの結果が食い違う。許可の範囲は `allowExecutables` が決めるので、`--trust-bin` で全 package に広がらない
+
 ### rehearse --migrate が見ること
 
 - 複製の中で、`migrate` と同じ `migrate_roots`（install の前）と `reinstate_entries`（compile のあと）を通す。end-to-end の確認は、空の HOME ではなく backup の複製から行う
@@ -109,9 +128,9 @@ APM は Codex CLI 0.163.0 だけを受け付ける（`apm_cli/codex_plugins/clie
 
 1. `<HOME>/.apm` が checkout（`.git` か `catalog/`）なら止まる。この repo が `<HOME>/.apm` の中でも止まる
 2. `--rehearsal` の `result.txt` を確かめる: `mode=migrate`、同じ HOME・`--source-ref`・`--workspace-only`、install・compile・入れ直し・agmsg の status が 0、`lost=0`、`baseline_skips=0`。1 つでも違えば何も書かずに止まる
-3. apply と同じ guard（`config.json`、compile のあとに編集された root）と、HOME の外へ出るリンクと hard link の検査。`--home` は HOME 全体を、`--real-home` は APM の書込み先（退避する 4 つの root、rules、compile が書く root、`.apm`、`.cache/apm`、`Library/Caches/apm`）だけを調べる。tool のディレクトリ（`.claude` など）はリンクのときだけ調べる
+3. apply と同じ guard（`config.json`、`<HOME>/apm.yml` が無いこと、compile のあとに編集された root）と、HOME の外へ出るリンクと hard link の検査。`--home` は HOME 全体を、`--real-home` は APM の書込み先（退避する 4 つの root、rules、compile が書く root、`.apm`、`.cache/apm`、`Library/Caches/apm`）だけを調べる。tool のディレクトリ（`.claude` など）はリンクのときだけ調べる
 4. `~/.codex/config.toml` と `~/.claude/settings.json` の sha256 を記録し、agmsg のリンクがあれば save する
-5. manifest を書く（差があれば前の manifest を `apm.yml.<UTC>.bak` に残す）。4 つの root を `<root>.bak-<UTC>` へ移し、退避した一覧を `<HOME>/.apm/native-migrate-<UTC>.txt` に記録する。`apm install -g --only apm`、`apm compile -g --clean`、入れ直し、agmsg の restore
+5. manifest を書く（差があれば前の manifest を `apm.yml.<UTC>.bak` に残す）。4 つの root を `<root>.bak-<UTC>` へ移し、退避した一覧を `<HOME>/.apm/native-migrate-<UTC>.txt` に記録する。`apm install -g --only apm --trust-bin`、`apm compile -g --clean`、入れ直し、agmsg の restore
 6. sha256 を比べる。変わっていれば失敗する
 7. 5 と 6 のどこかで失敗したら、自動で rollback して非 0 で終わる。成功すると UTC の stamp と rollback のコマンドを表示する
 
@@ -153,6 +172,7 @@ rollback（自動も `native:migrate-rollback` も）が戻すのは 4 つの ro
 
 - 本番の HOME での出力が旧経路と同じになるか（skill 数、Herdr など他の tool の skill、private の上書きの組み合わせ）
 - 外部の依存の install（テストは通信しない）。特に、構造化した形の `nanaism/yomiyasu` が Codex native plugin の経路を通らずに skill として配られるか
+- `allowExecutables` の許可が、本物の `github.com/fujibee/agmsg` と `github.com/tt-a1i/archify/archify` で効くか（テストは、同じ形のキーを持つ package を `https://github.com/<owner>/<repo>.git` から git の設定で fixture へ向け直して確かめた）
 - 実 HOME での `migrate`（テストは使い捨ての HOME と実 APM の `--workspace-only` までで、実 HOME の `.cache/apm` や外部の依存を含む install は通らない）
 - 各 tool が実際に rule とガイドを読み込むか
 - Linux（`sandbox-exec` が無い）では、通信と書込みを強制的には止めない。テストが守るのは HOME のガードと `env -i` の隔離まで
