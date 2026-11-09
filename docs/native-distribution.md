@@ -150,6 +150,11 @@ rollback（自動も `native:migrate-rollback` も）が戻すのは 4 つの ro
 
 `migrate` が失敗して自動で rollback したあとも、`<HOME>/.apm/apm.yml` は描画された manifest のままなので、旧経路（`mise run deploy`）は拒否されたままになる。旧経路へ戻すには、下の「実 HOME の checkout の移設」の最後の手順で、consumer の `~/.apm` を別名へ移し、`~/.apm.checkout-<UTC>` を戻す。migrate のログにも同じ手順が出る。
 
+### 既知の制約（起きにくいが、塞いでいない穴）
+
+- install が root を作る前に失敗した場合、その root には `<root>.native-<UTC>` が無い。このとき `migrate-rollback` が backup を戻してから `restored` の行を書くまでの間に中断すると、再実行は backup が無いと判定して「`<root>.bak-<UTC>` is missing」で止まり、続きから再開できない（`restored_but_unrecorded` は `<root>.native-<UTC>` が在ることを条件にしているため）。root は元の場所に戻っているので、実 HOME の状態を見て人が `restored` の行を足す
+- `rehearse` は backup に含まれない `~/.apm/apm_modules` を、backup からではなく実 HOME から複製する。backup を取ったあとに実 HOME の `apm_modules` が変わると、rehearsal の複製は backup と同じ時点の状態にならない
+
 ### 実 HOME の checkout の移設（手動）
 
 `~/.apm` の下に worktree、他セッション、private-skills の repo、`tmp/learning-intake` があるので、`mv` で動かさず、新しい場所へ clone し直す。
