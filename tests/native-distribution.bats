@@ -643,6 +643,51 @@ seed_agmsg() {
   [ "$(readlink "$home/.agents/skills/agmsg/db")" = "$home/.local/state/agmsg/db" ]
 }
 
+@test "backup records the state of the HOME, and rehearse copies it into result.txt as the expected state" {
+  local home backup="$FX/backups/state-recorded" result
+  home="$(new_home state-recorded)"
+  seed_sentinels "$home"
+  mkdir -p "$home/.apm"
+  : >"$home/.apm/apm.lock.yaml"
+  real_native "$home" backup --real-home --backup-dir "$backup"
+  [ "$(cat "$backup/home-state.txt")" = "$(printf 'previous_lock=present\nhome_apm=consumer')" ]
+
+  printf '#!/bin/sh\nexit 0\n' >"$FX/stub-apm-noop-state"
+  chmod +x "$FX/stub-apm-noop-state"
+  real_native_with_stub "$home" "$FX/stub-apm-noop-state" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  result="$(compgen -G "$backup/rehearsal-*/result.txt")"
+  grep -qxF "previous_lock=present" "$result"
+  grep -qxF "home_apm=consumer" "$result"
+}
+
+@test "rehearse fails when the HOME changed state after the backup, and when the backup records no state" {
+  local home backup="$FX/backups/state-differs"
+  home="$(new_home state-differs)"
+  seed_sentinels "$home"
+  mkdir -p "$home/.apm/catalog"
+  real_native "$home" backup --real-home --backup-dir "$backup"
+  grep -qxF "home_apm=checkout" "$backup/home-state.txt"
+
+  rm -rf "$home/.apm/catalog"
+  run real_native "$home" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"another state"* ]]
+  [[ "$output" == *"home_apm=checkout"* ]]
+  [ -z "$(compgen -G "$backup/rehearsal-*" || true)" ]
+
+  mkdir -p "$home/.apm/catalog"
+  : >"$home/.apm/apm.lock.yaml"
+  run real_native "$home" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"previous_lock=absent"* ]]
+
+  rm -f "$backup/home-state.txt"
+  run real_native "$home" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"older format"* ]]
+  [[ "$output" == *"take a new backup"* ]]
+}
+
 @test "a rehearsal that loses a deployed file fails, lists it and leaves the HOME alone" {
   local home before backup="$FX/backups/real-lost" lost
   home="$(new_home real-lost)"
