@@ -802,6 +802,47 @@ prepare_migrate() {
   [ "$(readlink "$M_HOME/.agents/skills/agmsg/teams")" = "$M_HOME/.local/state/agmsg/teams" ]
 }
 
+@test "a failure while saving the untouched files leaves the files not yet saved where they are" {
+  local stub="$FX/stub-apm-deploy" before
+  write_deploy_stub "$stub"
+  prepare_migrate migrate-save-fails "$stub"
+  before="$(roots_snapshot "$M_HOME")"
+  # .codex/config.toml is saved first; the second copy (.claude/settings.json) cannot be read.
+  chmod 000 "$M_HOME/.claude/settings.json"
+  run real_native_with_stub "$M_HOME" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
+  chmod 600 "$M_HOME/.claude/settings.json"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"cannot copy"* ]]
+  [ "$(cat "$M_HOME/.claude/settings.json")" = '{"fixture": true}' ]
+  [ "$(cat "$M_HOME/.codex/config.toml")" = 'model = "fixture"' ]
+  [ -z "$(compgen -G "$M_HOME/.claude/settings.json.changed-*" || true)" ]
+  [ -z "$(compgen -G "$M_HOME/.codex/config.toml.changed-*" || true)" ]
+  [ "$(roots_snapshot "$M_HOME")" = "$before" ]
+}
+
+@test "a config file that is a link keeps its link when a failed migrate restores it, and the target gets the old content" {
+  local stub="$FX/stub-apm-deploy" touch_config="$FX/stub-apm-touch-link"
+  write_deploy_stub "$stub"
+  printf '#!/bin/sh\n[ "$1" = install ] || exit 0\nmkdir -p "$HOME/.claude/skills/foo"\necho "deployed by apm" >"$HOME/.claude/skills/foo/SKILL.md"\necho changed >>"$HOME/.claude/settings.json"\n' >"$touch_config"
+  chmod +x "$touch_config"
+  M_HOME="$(new_home migrate-config-link)"
+  M_BACKUP="$FX/backups/migrate-config-link"
+  seed_migrate_home "$M_HOME"
+  mkdir -p "$M_HOME/dotfiles"
+  mv "$M_HOME/.claude/settings.json" "$M_HOME/dotfiles/settings.json"
+  ln -s "$M_HOME/dotfiles/settings.json" "$M_HOME/.claude/settings.json"
+  real_native "$M_HOME" backup --real-home --backup-dir "$M_BACKUP"
+  real_native_with_stub "$M_HOME" "$stub" rehearse --real-home --backup-dir "$M_BACKUP" --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  M_REHEARSAL="$(dirname "$(compgen -G "$M_BACKUP/rehearsal-*/result.txt")")"
+
+  run real_native_with_stub "$M_HOME" "$touch_config" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
+  [ "$status" -ne 0 ]
+  [ -L "$M_HOME/.claude/settings.json" ]
+  [ "$(readlink "$M_HOME/.claude/settings.json")" = "$M_HOME/dotfiles/settings.json" ]
+  [ "$(cat "$M_HOME/dotfiles/settings.json")" = '{"fixture": true}' ]
+  [ "$(tail -n 1 "$M_HOME"/.claude/settings.json.changed-*)" = "changed" ]
+}
+
 @test "rehearse fails on a broken link or a link that leaves the HOME inside the migrated roots, and names each one" {
   local home backup="$FX/backups/rehearse-links" stub="$FX/rehearse-links-stub" migrate
   home="$(new_home rehearse-links)"

@@ -804,41 +804,55 @@ assert_migrate_rehearsal() {
   done
 }
 
-# Copies the files migrate must not change (owner-only, permissions kept) so a change can be undone. Contents are never logged.
+# Copies the files migrate must not change (owner-only, permissions kept) so a change can be undone. Contents are never
+# logged. saved.txt lists, one file at a time and only once it is settled, whether the file was there (present, copy
+# finished) or not (absent); a restore touches only the files listed, so a failure part way leaves the others alone.
 save_untouched() {
   local home="$1" stamp="$2" dir path
   dir="$home/.apm/native-migrate-$stamp.untouched"
   (umask 077 && mkdir -p "$dir") || fail "cannot create $dir"
+  : >"$dir/saved.txt"
   for path in $MIGRATE_UNTOUCHED_FILES; do
     if [ -f "$home/$path" ]; then
       (umask 077 && mkdir -p "$(dirname "$dir/$path")") || fail "cannot create $dir/$(dirname "$path")"
       cp -p "$home/$path" "$dir/$path" || fail "cannot copy $home/$path"
+      printf 'present\t%s\n' "$path" >>"$dir/saved.txt"
+    else
+      printf 'absent\t%s\n' "$path" >>"$dir/saved.txt"
     fi
   done
 }
 
 changed_untouched_files() {
-  local home="$1" stamp="$2" dir path
+  local home="$1" stamp="$2" dir kind path
   dir="$home/.apm/native-migrate-$stamp.untouched"
-  for path in $MIGRATE_UNTOUCHED_FILES; do
-    if [ -f "$dir/$path" ]; then
+  [ -f "$dir/saved.txt" ] || return 0
+  while IFS=$'\t' read -r kind path; do
+    [ -n "$path" ] || continue
+    if [ "$kind" = present ]; then
       if [ ! -f "$home/$path" ] || [ "$(sha256 <"$home/$path")" != "$(sha256 <"$dir/$path")" ]; then printf '%s\n' "$path"; fi
     elif [ -e "$home/$path" ] || [ -L "$home/$path" ]; then
       printf '%s\n' "$path"
     fi
-  done
+  done <"$dir/saved.txt"
 }
 
-# Puts the saved copy back; the version migrate left stays beside it as <path>.changed-<stamp>.
+# Puts the saved copy back; the version migrate left stays beside it as <path>.changed-<stamp>. A file that is a working
+# link is written through, so the link stays and its target gets the old content.
 restore_untouched() {
   local home="$1" stamp="$2" dir path
   dir="$home/.apm/native-migrate-$stamp.untouched"
-  [ -d "$dir" ] || return 0
+  [ -f "$dir/saved.txt" ] || return 0
   for path in $(changed_untouched_files "$home" "$stamp"); do
-    if [ -e "$home/$path" ] || [ -L "$home/$path" ]; then
-      mv "$home/$path" "$home/$path.changed-$stamp" || fail "cannot move $home/$path aside"
+    if [ -L "$home/$path" ] && [ -e "$home/$path" ] && [ -f "$dir/$path" ]; then
+      cp -p "$home/$path" "$home/$path.changed-$stamp" || fail "cannot keep $home/$path as $path.changed-$stamp"
+      cat "$dir/$path" >"$home/$path" || fail "cannot restore $home/$path"
+    else
+      if [ -e "$home/$path" ] || [ -L "$home/$path" ]; then
+        mv "$home/$path" "$home/$path.changed-$stamp" || fail "cannot move $home/$path aside"
+      fi
+      if [ -f "$dir/$path" ]; then cp -p "$dir/$path" "$home/$path" || fail "cannot restore $home/$path"; fi
     fi
-    if [ -f "$dir/$path" ]; then cp -p "$dir/$path" "$home/$path" || fail "cannot restore $home/$path"; fi
     log "restored $home/$path; the version migrate left is $home/$path.changed-$stamp"
   done
 }
