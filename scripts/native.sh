@@ -180,7 +180,7 @@ cmd_plan() {
 
 # apply --home <disposable HOME> --source-ref $sha would run, with HOME=<that HOME>:
 #   1. stop if an APM-generated root there was edited after compile ($COMPILED_ROOTS), if a symlink or hard link
-#      apm could write through reaches outside that HOME, or if <HOME>/.apm/config.json sets temp_dir
+#      under that HOME reaches outside it, or if <HOME>/.apm/config.json holds more than apm's default_client
 #   2. keep a differing <HOME>/.apm/apm.yml as apm.yml.<UTC>.bak, then write the manifest above
 #   3. apm install -g, from an empty environment plus HOME, PATH, locale, git config locations and a TMPDIR in HOME
 #   4. apm compile -g --clean, the same way
@@ -202,13 +202,11 @@ cmd_apply() {
 $edited
 Delete the marker line to keep the file as hand-written, or move it aside, then re-run."
 
-  links="$(escaping_links "$home")$(hardlinked_targets "$home")"
+  links="$(shared_entries "$home")"
   [ -z "$links" ] || fail "these entries inside $home may share their data with files outside it, so writing them would change those files:
 $links
-Use a HOME whose write targets are plain directories and files of its own."
-  if [ -f "$home/.apm/config.json" ] && grep -q '"temp_dir"' "$home/.apm/config.json"; then
-    fail "$home/.apm/config.json sets temp_dir, which apm would use instead of a directory inside $home"
-  fi
+Use a HOME made only of directories and files of its own."
+  assert_default_apm_config "$home"
 
   manifest="$(render_manifest "$sha" "$WORKSPACE_ONLY")"
   mkdir -p "$home/.apm"
@@ -246,16 +244,11 @@ run_apm() {
   (cd "$home" && env -i "${env_args[@]}" "$APM_BIN" "$@")
 }
 
-# Links apm could write through: anything within two levels of HOME (.apm, .claude, .codex/AGENTS.md, .agents/skills,
-# ...) and, one level deeper, the names this repository's packages deploy. A link that stays inside HOME is fine.
-escaping_links() {
+# Anything apm could write through to a file outside HOME: a symlink anywhere under HOME that resolves outside it (or is
+# broken), and a regular file with another hard link.
+shared_entries() {
   local home="$1" link target
-  {
-    find "$home" -mindepth 1 -maxdepth 2 -type l
-    deployed_entries | while IFS= read -r link; do
-      if [ -L "$home/$link" ]; then printf '%s\n' "$home/$link"; fi
-    done
-  } | LC_ALL=C sort -u | while IFS= read -r link; do
+  find "$home" -type l | LC_ALL=C sort | while IFS= read -r link; do
     if ! target="$(realpath "$link" 2>/dev/null)"; then
       printf '  %s (broken)\n' "$link"
       continue
@@ -265,35 +258,17 @@ escaping_links() {
       *) printf '  %s -> %s\n' "$link" "$target" ;;
     esac
   done
+  find "$home" -type f -links +1 | LC_ALL=C sort | sed 's/^/  /; s/$/ (hard link)/'
 }
 
-# Regular files with more than one hard link among the same write targets escaping_links checks.
-hardlinked_targets() {
-  local home="$1" entry
-  {
-    find "$home" -mindepth 1 -maxdepth 2 -type f -links +1
-    deployed_entries | while IFS= read -r entry; do
-      if [ -e "$home/$entry" ] && [ ! -L "$home/$entry" ]; then find "$home/$entry" -type f -links +1; fi
-    done
-  } | LC_ALL=C sort -u | sed 's/^/  /; s/$/ (hard link)/'
-}
-
-deployed_entries() {
-  local path name
-  for path in "$REPO_ROOT"/catalog/.apm/skills/*/ "$REPO_ROOT"/manual-skills/.apm/skills/*/; do
-    [ -d "$path" ] || continue
-    name="$(basename "$path")"
-    printf '.claude/skills/%s\n.agents/skills/%s\n' "$name" "$name"
-  done
-  for path in "$REPO_ROOT"/catalog/.apm/agents/*.agent.md; do
-    [ -f "$path" ] || continue
-    name="$(basename "$path" .agent.md)"
-    printf '.claude/agents/%s.md\n.cursor/agents/%s.md\n' "$name" "$name"
-  done
-  for path in "$REPO_ROOT"/catalog/.apm/instructions/*.instructions.md; do
-    [ -f "$path" ] || continue
-    printf '.claude/rules/%s.md\n' "$(basename "$path" .instructions.md)"
-  done
+# apm reads ~/.apm/config.json with json.load and takes temp_dir and other locations from it. Decode it the same way
+# and allow only the key apm writes on its own.
+assert_default_apm_config() {
+  local config="$1/.apm/config.json" extra
+  [ -e "$config" ] || return 0
+  extra="$(python3 -c 'import json, sys; print(" ".join(sorted(set(json.load(open(sys.argv[1], encoding="utf-8"))) - {"default_client"})))' "$config")" ||
+    fail "$config is not a JSON object apm could read"
+  [ -z "$extra" ] || fail "$config sets $extra; a disposable HOME keeps only apm's default_client there"
 }
 
 main() {

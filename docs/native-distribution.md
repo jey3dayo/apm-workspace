@@ -1,6 +1,6 @@
 # APM native の配布（mise 入口、first cut）
 
-- Status: 2026-11-09、APM 0.35.0。使い捨ての HOME にだけ適用できる。本番の切り替え（cutover）は承認されておらず、`scripts/native.sh` は実 HOME とその祖先、その中の tool の状態（`.apm`・`.claude`・`.codex`・`.cursor`・`.agents`・`.config`・`.cache`・`.local`・`Library`）を、何も書く前に拒否する
+- Status: 2026-11-09、APM 0.35.0。使い捨ての HOME にだけ適用できる。これは切り替え（cutover）が未承認なための実装上の制約で、将来の手動の移行と本番の運用は、下の preview に書いた手順のまま実行していない。本番の切り替え（cutover）は承認されておらず、`scripts/native.sh` は実 HOME とその祖先、その中の tool の状態（`.apm`・`.claude`・`.codex`・`.cursor`・`.agents`・`.config`・`.cache`・`.local`・`Library`）を、何も書く前に拒否する
 - テスト: `tests/native-distribution.bats`（`mise run test:sh` に含まれる）。この checkout の `catalog/` と `manual-skills/` を fixture の git repo に入れ、実 APM で使い捨ての HOME へ配る。macOS では `sandbox-exec` が通信と fixture の外への書込みを拒否する。fixture の置き場所は `APM_NATIVE_FIXTURE_ROOT` で変えられる
 
 ## 入口
@@ -13,9 +13,10 @@
 
 - consumer の manifest は、root の `apm.yml` の `jey3dayo/apm-workspace/catalog#main` と `manual-skills#main` の 2 行を、指定した commit SHA への pin に書き換えたもの。外部の依存と MCP はそのまま通す（外部の依存はもともと SHA で pin している）。`--workspace-only` を付けると、この repo の 2 package だけを残す
 - 配布と更新を分ける: apply は pin を自分で動かさない。新しい commit を配るときは、`--source-ref` に新しい SHA を渡して実行し直す。外部の依存の pin は、今と同じく root の `apm.yml` で上げる
-- 生成した root（`~/.claude/CLAUDE.md`・`~/.codex/AGENTS.md`・`~/.cursor/AGENTS.md`）が APM の目印を残したまま compile のあとに編集されていたら、何も書かずに止まる。APM の目印は編集を守らず、compile が上書きするため
+- 生成した root（`~/.claude/CLAUDE.md`・`~/.codex/AGENTS.md`・`~/.cursor/AGENTS.md`）が APM の目印を残したまま compile のあとに編集されていたら、何も書かずに止まる。APM の目印は編集を守らず、compile が上書きするため。判定は APM と同じ Build ID の照合（`apm_cli/compilation/build_id.py`）で、APM と同じく末尾の改行だけを足した・消した編集は検出しない
 - `<HOME>/.apm/apm.yml` が描画した manifest と違えば、`apm.yml.<UTC>.bak` に残してから置き換える（同じ名前があれば番号を付け、既存の `.bak` を上書きしない）
-- HOME の 2 階層目までの symlink と、この repo の package が配る名前（`.claude/skills/<id>` など）の symlink が HOME の外を指しているか、同じ範囲の通常のファイルがハードリンクなら、何も書かずに止まる。apm がリンクを通して HOME の外のファイルを書き換えるため。外部の依存が配る名前は検査していない。`<HOME>/.apm/config.json` が `temp_dir` を指定しているときも止まる
+- HOME の中のどこかに、HOME の外を指す（または壊れた）symlink か、ハードリンクの通常のファイルがあれば、何も書かずに止まる。apm がリンクを通して HOME の外のファイルを書き換えるため（キャッシュの `Library/Caches/apm` のように、配布先より深い場所にも書く）
+- `<HOME>/.apm/config.json` に、APM が自分で書く `default_client` 以外のキーがあれば止まる。APM は `temp_dir` などの場所をここから読むため。キーは APM と同じく JSON としてデコードしてから比べる
 - apm は空の環境に `HOME`・`PATH`・ロケール・git の設定の場所と、HOME の中の `TMPDIR`（`.cache/apm-native-tmp`）だけを渡して起動する。APM は `APM_CACHE_DIR` や `XDG_*`、`TMPDIR` が指す場所にも書き（`APM_CACHE_DIR` と `XDG_CACHE_HOME` はテストで確かめた）、git は token・proxy・askpass を環境から読むため
 - manifest は同じディレクトリの新しいファイルに書いてから名前を置き換える
 

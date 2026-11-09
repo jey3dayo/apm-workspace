@@ -204,10 +204,10 @@ skill_ids() {
 seed_sentinels() {
   local home="$1"
   mkdir -p "$home/.claude/skills/private-copy" "$home/.agents/skills/herdr-automations" "$home/.codex" \
-    "$home/.config/opencode" "$FX/private/$(basename "$home")/private-link"
+    "$home/.config/opencode" "$home/private-skills/private-link"
   echo "private copy" >"$home/.claude/skills/private-copy/SKILL.md"
-  echo "private link target" >"$FX/private/$(basename "$home")/private-link/SKILL.md"
-  ln -s "$FX/private/$(basename "$home")/private-link" "$home/.claude/skills/private-link"
+  echo "private link target" >"$home/private-skills/private-link/SKILL.md"
+  ln -s "$home/private-skills/private-link" "$home/.claude/skills/private-link"
   echo "tool-owned" >"$home/.agents/skills/herdr-automations/SKILL.md"
   echo 'model = "fixture"' >"$home/.codex/config.toml"
   echo '{"fixture": true}' >"$home/.claude/settings.json"
@@ -364,26 +364,29 @@ sentinel_snapshot() {
   [[ "$output" == *"$home/.codex/AGENTS.md (broken)"* ]]
   [ ! -e "$outside/root.md" ]
 
-  # One level deeper only the names this repository deploys count; a private skill link with its own name is fine.
-  home="$(new_home link-skill)"
-  mkdir -p "$home/.claude/skills"
+  # Any depth counts: apm resolves cache paths such as Library/Caches/apm, not only the deploy roots.
+  home="$(new_home link-deep)"
+  mkdir -p "$home/Library/Caches" "$home/.claude/skills"
+  ln -s "$outside/ship" "$home/Library/Caches/apm"
   ln -s "$outside/ship" "$home/.claude/skills/ship"
   run apply_workspace "$home"
   [ "$status" -ne 0 ]
+  [[ "$output" == *"$home/Library/Caches/apm -> $outside/ship"* ]]
   [[ "$output" == *"$home/.claude/skills/ship -> $outside/ship"* ]]
   [ -z "$(ls -A "$outside/ship")" ]
   [ ! -e "$home/.apm" ]
 }
 
 @test "apply hides APM_CACHE_DIR and XDG locations from apm, which would otherwise write there" {
-  local home
-  # Positive control: apm itself follows these variables out of HOME.
-  home="$(new_home env-control)"
-  mkdir -p "$home/.apm"
-  native "$home" render --source-ref "$SOURCE_SHA" --workspace-only >"$home/.apm/apm.yml"
-  fixture_exec "$home" /usr/bin/env APM_CACHE_DIR="$FX/leak/control-apm" XDG_CACHE_HOME="$FX/leak/control-xdg" \
-    "$APM_BIN" install -g >/dev/null 2>&1 || true
-  [ -n "$(ls -A "$FX/leak/control-apm" "$FX/leak/control-xdg" 2>/dev/null)" ]
+  local home var
+  # Positive controls, one variable each: apm itself follows them out of HOME.
+  for var in APM_CACHE_DIR XDG_CACHE_HOME; do
+    home="$(new_home "control-$var")"
+    mkdir -p "$home/.apm"
+    native "$home" render --source-ref "$SOURCE_SHA" --workspace-only >"$home/.apm/apm.yml"
+    fixture_exec "$home" /usr/bin/env "$var=$FX/leak/control-$var" "$APM_BIN" install -g >/dev/null 2>&1 || true
+    [ -n "$(ls -A "$FX/leak/control-$var" 2>/dev/null)" ]
+  done
 
   home="$(new_home env-apply)"
   fixture_exec "$home" /usr/bin/env APM_CACHE_DIR="$FX/leak/apply-apm" XDG_CACHE_HOME="$FX/leak/apply-xdg" \
@@ -407,9 +410,10 @@ sentinel_snapshot() {
   [[ "$output" == *"$home/.apm/apm.yml (hard link)"* ]]
   [ "$(cat "$outside/apm.yml")" = "real manifest" ]
 
+  # Escaped the way JSON allows, so only a decoder sees the key apm reads.
   home="$(new_home temp-dir-config)"
   mkdir -p "$home/.apm"
-  printf '{"temp_dir": "%s"}\n' "$outside" >"$home/.apm/config.json"
+  printf '{"default_client": "vscode", "temp\\u005fdir": "%s"}\n' "$outside" >"$home/.apm/config.json"
   run apply_workspace "$home"
   [ "$status" -ne 0 ]
   [[ "$output" == *"sets temp_dir"* ]]
