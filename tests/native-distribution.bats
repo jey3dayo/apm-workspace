@@ -1134,12 +1134,12 @@ prepare_migrate() {
 }
 
 @test "migrate:roots --apply runs from a new checkout on a HOME without ~/.apm, and moves the legacy guide aside" {
-  local home legacy
+  local home
   home="$(new_home roots-apply)"
   mkdir -p "$home/.claude"
-  legacy="$(git -C "$REPO_ROOT" log --all --format= --raw --no-abbrev -- catalog/AGENTS.md | awk '{ print $3 }' | head -n 1)"
-  [ -n "$legacy" ] || skip "no legacy catalog guide in the history of this checkout"
-  git -C "$REPO_ROOT" cat-file blob "$legacy" >"$home/.claude/CLAUDE.md"
+  # The current guide body is always one of the blobs the script recognises as a legacy copy, so no git history is needed.
+  APM_WORKSPACE_DIR="$REPO_ROOT" /bin/bash -c '. "$1" && catalog_instructions_body "$(tracked_catalog_instructions_path)"' _ "$REPO_ROOT/scripts/apm-workspace.sh" >"$home/.claude/CLAUDE.md"
+  [ -s "$home/.claude/CLAUDE.md" ]
   run fixture_exec "$home" /usr/bin/env APM_WORKSPACE_DIR="$REPO_ROOT" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" migrate:roots --apply
   [ "$status" -eq 0 ]
   [[ "$output" == *"Moved $home/.claude/CLAUDE.md"* ]]
