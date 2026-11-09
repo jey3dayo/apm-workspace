@@ -1,0 +1,347 @@
+#!/usr/bin/env bats
+#
+# Runs scripts/native.sh with the real APM CLI against a disposable HOME. The authoring source is a fixture git
+# repository holding this checkout's catalog/ and manual-skills/, reached through a host that cannot resolve
+# (fixture.invalid) which the fixture's git config redirects to the local repository. docs/native-distribution.md
+# records what is native and what stays manual.
+#
+# Every call gets `env -i` and a HOME under the fixture root. Where sandbox-exec exists (macOS) a profile also
+# denies network access and writes outside the fixture root; elsewhere the HOME guards are the only protection.
+#
+# The fixture root is BATS_FILE_TMPDIR, or a fresh directory under APM_NATIVE_FIXTURE_ROOT when that is set.
+
+bats_require_minimum_version 1.5.0
+
+# docs/native-distribution.md was written against this release; bump it only after re-checking the docs.
+EXPECTED_APM_VERSION=0.35.0
+FIXTURE_URL=https://fixture.invalid/fixture-owner/apm-workspace.git
+
+setup_file() {
+  REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
+  export REPO_ROOT
+  # shellcheck source=../scripts/lib/git-test-env.sh
+  . "$REPO_ROOT/scripts/lib/git-test-env.sh"
+  apm_isolate_git_env
+
+  REAL_HOME="$(cd "$HOME" && pwd -P)"
+  export REAL_HOME
+  if [ -n "${APM_NATIVE_FIXTURE_ROOT:-}" ]; then
+    assert_fixture_root_allowed "$APM_NATIVE_FIXTURE_ROOT" || return 1
+    mkdir -p "$APM_NATIVE_FIXTURE_ROOT"
+    FX="$(cd "$(mktemp -d "$APM_NATIVE_FIXTURE_ROOT/run.XXXXXX")" && pwd -P)"
+  else
+    FX="$(cd "$BATS_FILE_TMPDIR" && pwd -P)"
+  fi
+  export FX
+  assert_fixture_root_allowed "$FX" || return 1
+  mkdir -p "$FX/tmp" "$FX/homes"
+
+  APM_BIN="$(resolve_apm_bin)" || return 1
+  export APM_BIN
+  FIXTURE_PATH="$(dirname "$APM_BIN"):$(dirname "$(command -v git)"):/usr/bin:/bin:/usr/sbin:/sbin"
+  export FIXTURE_PATH
+
+  SANDBOX_EXEC=""
+  if command -v sandbox-exec >/dev/null 2>&1; then
+    SANDBOX_EXEC="$(command -v sandbox-exec)"
+    write_sandbox_profile "$FX/sandbox.sb"
+    assert_sandbox_confines_writes || return 1
+  fi
+  export SANDBOX_EXEC
+
+  assert_apm_version || return 1
+  build_source_repo "$FX/src/apm-workspace"
+  printf '[url "file://%s"]\n\tinsteadOf = %s\n[protocol "file"]\n\tallow = always\n' "$SOURCE_REPO" "$FIXTURE_URL" >"$FX/gitconfig"
+}
+
+physical_path() {
+  local path="$1" rest=""
+  while [ ! -d "$path" ]; do
+    rest="/$(basename "$path")$rest"
+    path="$(dirname "$path")"
+  done
+  printf '%s%s\n' "$(cd "$path" && pwd -P)" "$rest"
+}
+
+# A scratch directory inside HOME is fine; HOME itself, its ancestors and real tool state are not.
+assert_fixture_root_allowed() {
+  local root surface prefix
+  case "/$1/" in
+    */../*) echo "the fixture root $1 must not contain '..'" >&2 && return 1 ;;
+  esac
+  root="$(physical_path "$1")"
+  case "$REAL_HOME/" in
+    "${root%/}/"*) echo "the fixture root $root must not be the invoking HOME or contain it" >&2 && return 1 ;;
+  esac
+  for surface in .apm .claude .codex .cursor .agents .config .cache .local Library; do
+    for prefix in "$REAL_HOME/$surface/" "$(physical_path "$REAL_HOME/$surface")/"; do
+      case "$root/" in
+        "$prefix"*) echo "the fixture root $root must not be inside $REAL_HOME/$surface" >&2 && return 1 ;;
+      esac
+    done
+  done
+}
+
+resolve_apm_bin() {
+  local bin
+  bin="$(command -v apm)" || {
+    echo "apm is not on PATH; mise.toml pins it (pipx:apm-cli)" >&2
+    return 1
+  }
+  case "$bin" in
+    */shims/*) bin="$(mise which apm)" || return 1 ;;
+  esac
+  printf '%s\n' "$bin"
+}
+
+write_sandbox_profile() {
+  cat >"$1" <<EOF
+(version 1)
+(allow default)
+(deny network*)
+(deny file-write*)
+(allow file-write* (subpath "$FX") (literal "/dev/null") (literal "/dev/tty"))
+EOF
+}
+
+# Fail closed: a sandbox that lets a write escape the fixture root would also let apm write to the real HOME.
+assert_sandbox_confines_writes() {
+  local probe="$FX.outside-probe" err
+  "$SANDBOX_EXEC" -f "$FX/sandbox.sb" /usr/bin/touch "$probe" 2>/dev/null
+  if [ -e "$probe" ]; then
+    rm -f "$probe"
+    echo "sandbox-exec did not block a write outside the fixture" >&2
+    return 1
+  fi
+  err="$("$SANDBOX_EXEC" -f "$FX/sandbox.sb" /usr/bin/touch "$FX/tmp/inside-probe" 2>&1)" || {
+    echo "sandbox-exec could not run a write inside the fixture (an enclosing sandbox?): $err" >&2
+    return 1
+  }
+}
+
+# A fresh HOME. The version-check stamp keeps apm from asking GitHub for a newer release.
+new_home() {
+  local home="$FX/homes/$1"
+  mkdir -p "$home/.cache/apm"
+  touch "$home/.cache/apm/last_version_check"
+  printf '%s\n' "$home"
+}
+
+# No inherited environment (tokens, proxies, askpass, SSH agent), git reading only the fixture's global config, and
+# the sandbox when there is one. HOME must be a direct child of $FX/homes.
+fixture_exec() {
+  local home
+  home="$(cd "$1" 2>/dev/null && pwd -P)" || {
+    echo "refusing to run with HOME=$1: not an existing directory" >&2
+    return 97
+  }
+  shift
+  case "$home" in
+    "$FX"/homes/*/*) echo "refusing to run with HOME=$home: not a direct child of $FX/homes" >&2 && return 97 ;;
+    "$FX"/homes/?*) ;;
+    *) echo "refusing to run with HOME=$home outside the fixture" >&2 && return 97 ;;
+  esac
+  [ "$home" != "$REAL_HOME" ] || return 97
+  local cmd=(env -i HOME="$home" TMPDIR="$FX/tmp" PATH="$FIXTURE_PATH" LANG="${LANG:-C.UTF-8}" PYTHONUTF8=1
+    GIT_CONFIG_GLOBAL="$FX/gitconfig" GIT_CONFIG_NOSYSTEM=1 GIT_CEILING_DIRECTORIES="$FX"
+    APM_BIN="$APM_BIN" APM_NATIVE_SOURCE_URL="$FIXTURE_URL")
+  if [ -n "$SANDBOX_EXEC" ]; then
+    cmd+=("$SANDBOX_EXEC" -f "$FX/sandbox.sb")
+  fi
+  (cd "$home" && "${cmd[@]}" "$@")
+}
+
+native() {
+  local home="$1"
+  shift
+  fixture_exec "$home" /bin/bash "$REPO_ROOT/scripts/native.sh" "$@"
+}
+
+assert_apm_version() {
+  local version
+  version="$(fixture_exec "$(new_home version)" "$APM_BIN" --version 2>&1)" || {
+    echo "apm at $APM_BIN does not run under the fixture isolation: $version" >&2
+    return 1
+  }
+  [ "${version##* }" = "$EXPECTED_APM_VERSION" ] || {
+    echo "expected APM $EXPECTED_APM_VERSION, got: $version" >&2
+    return 1
+  }
+}
+
+# The source repository holds this checkout's packages as they are now (committed or not), in one commit.
+build_source_repo() {
+  SOURCE_REPO="$1"
+  mkdir -p "$SOURCE_REPO" "$FX/empty-git-template"
+  cp -R "$REPO_ROOT/catalog" "$REPO_ROOT/manual-skills" "$SOURCE_REPO/"
+  fixture_exec "$(new_home author)" /usr/bin/env GIT_TEMPLATE_DIR="$FX/empty-git-template" \
+    GIT_AUTHOR_DATE='2026-01-01T00:00:00Z' GIT_COMMITTER_DATE='2026-01-01T00:00:00Z' /bin/sh -c '
+    cd "$1" && git init -q -b main && git add catalog manual-skills &&
+      git -c user.name=fixture -c user.email=fixture@example.invalid commit -q -m source' sh "$SOURCE_REPO" || return 1
+  SOURCE_SHA="$(git -C "$SOURCE_REPO" rev-parse HEAD)"
+  export SOURCE_REPO SOURCE_SHA
+}
+
+apply_workspace() {
+  native "$1" apply --home "$1" --source-ref "$SOURCE_SHA" --workspace-only
+}
+
+# Everything apm can touch except caches and receipts (receipt names derive from the HOME path).
+home_snapshot() {
+  (cd "$1" && find . \( -path ./.apm/apm_modules -o -path ./.apm/deployment-receipts -o -path ./.cache -o -path ./Library \) -prune -o \
+    \( -type f -o -type l \) -print | LC_ALL=C sort | while IFS= read -r f; do
+    if [ -L "$f" ]; then printf '%s -> %s\n' "$f" "$(readlink "$f")"; else printf '%s %s\n' "$f" "$(git hash-object "$f")"; fi
+  done)
+}
+
+skill_ids() {
+  local dir
+  for dir in "$REPO_ROOT"/catalog/.apm/skills/*/ "$REPO_ROOT"/manual-skills/.apm/skills/*/; do
+    basename "$dir"
+  done
+}
+
+seed_sentinels() {
+  local home="$1"
+  mkdir -p "$home/.claude/skills/private-copy" "$home/.agents/skills/herdr-automations" "$home/.codex" \
+    "$home/.config/opencode" "$FX/private/$(basename "$home")/private-link"
+  echo "private copy" >"$home/.claude/skills/private-copy/SKILL.md"
+  echo "private link target" >"$FX/private/$(basename "$home")/private-link/SKILL.md"
+  ln -s "$FX/private/$(basename "$home")/private-link" "$home/.claude/skills/private-link"
+  echo "tool-owned" >"$home/.agents/skills/herdr-automations/SKILL.md"
+  echo 'model = "fixture"' >"$home/.codex/config.toml"
+  echo '{"fixture": true}' >"$home/.claude/settings.json"
+  echo "hand-written root" >"$home/.claude/CLAUDE.md"
+  echo "opencode guide" >"$home/.config/opencode/AGENTS.md"
+  echo "pi guide" >"$home/AGENTS.md"
+}
+
+sentinel_snapshot() {
+  (cd "$1" && for f in .claude/skills/private-copy/SKILL.md .claude/skills/private-link .claude/skills/private-link/SKILL.md \
+    .agents/skills/herdr-automations/SKILL.md .codex/config.toml .claude/settings.json .claude/CLAUDE.md \
+    .config/opencode/AGENTS.md AGENTS.md; do
+    if [ -L "$f" ]; then printf '%s -> %s\n' "$f" "$(readlink "$f")"; else printf '%s %s\n' "$f" "$(git hash-object "$f")"; fi
+  done)
+}
+
+@test "plan prints the SHA-pinned manifest and the steps, and writes nothing" {
+  local home before
+  home="$(new_home plan)"
+  before="$(cd "$FX" && find . -path ./tmp -prune -o -print | LC_ALL=C sort)"
+  run native "$home" plan --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"ref: $SOURCE_SHA"* ]]
+  [[ "$output" == *"This plan wrote nothing."* ]]
+  [ "$(cd "$FX" && find . -path ./tmp -prune -o -print | LC_ALL=C sort)" = "$before" ]
+}
+
+@test "render pins catalog and manual-skills by SHA and keeps every external dependency and MCP server" {
+  local home rendered
+  home="$(new_home render)"
+  rendered="$(native "$home" render --source-ref "$SOURCE_SHA")"
+  [ "$(grep -c "^      ref: $SOURCE_SHA\$" <<<"$rendered")" -eq 2 ]
+  [ "$(grep -c 'apm-workspace/.*#main' <<<"$rendered")" -eq 0 ]
+  # Everything else in apm.yml passes through line for line.
+  diff <(grep -vE 'jey3dayo/apm-workspace/(catalog|manual-skills)#main' "$REPO_ROOT/apm.yml") \
+    <(sed 1d <<<"$rendered" | grep -vE "^    - git: $FIXTURE_URL\$|^      path: (catalog|manual-skills)\$|^      ref: $SOURCE_SHA\$")
+
+  rendered="$(native "$home" render --source-ref "$SOURCE_SHA" --workspace-only)"
+  [ "$(grep -c '^    - ' <<<"$rendered")" -eq 2 ]
+  [ "$(grep -c '^  mcp:' <<<"$rendered")" -eq 0 ]
+}
+
+@test "apply refuses a missing HOME or ref, the account HOME, its ancestors and its tool state, before writing" {
+  local home account
+  home="$(new_home refuse)"
+  account="$(cd "$(eval "printf '%s' ~$(id -un)")" && pwd -P)"
+  run native "$home" apply --source-ref "$SOURCE_SHA"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"needs --home"* ]]
+  run native "$home" apply --home "$home"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"needs --source-ref"* ]]
+  run native "$home" apply --home "$account" --source-ref "$SOURCE_SHA"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"account's HOME"* ]]
+  run native "$home" apply --home / --source-ref "$SOURCE_SHA"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"account's HOME"* ]]
+  if [ -d "$account/.claude" ]; then
+    run native "$home" apply --home "$account/.claude" --source-ref "$SOURCE_SHA"
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"is inside"* ]]
+  fi
+  [ ! -e "$home/.apm" ]
+}
+
+@test "apply deploys every workspace skill to Claude and agent-skills, agents to Claude and Cursor only, and both compiled roots" {
+  local home id agent name
+  home="$(new_home deploy)"
+  run apply_workspace "$home"
+  [ "$status" -eq 0 ]
+  while IFS= read -r id; do
+    for dir in "$REPO_ROOT"/catalog/.apm/skills "$REPO_ROOT"/manual-skills/.apm/skills; do
+      [ -f "$dir/$id/SKILL.md" ] || continue
+      cmp "$dir/$id/SKILL.md" "$home/.claude/skills/$id/SKILL.md"
+      cmp "$dir/$id/SKILL.md" "$home/.agents/skills/$id/SKILL.md"
+    done
+  done < <(skill_ids)
+  for agent in "$REPO_ROOT"/catalog/.apm/agents/*.agent.md; do
+    name="$(basename "$agent" .agent.md)"
+    [ -f "$home/.claude/agents/$name.md" ]
+    [ -f "$home/.cursor/agents/$name.md" ]
+  done
+  [ ! -e "$home/.codex/agents" ]
+  head -n 1 "$home/.codex/AGENTS.md" | grep -qF '<!-- Generated by APM CLI from .apm/ primitives -->'
+  head -n 1 "$home/.cursor/AGENTS.md" | grep -qF '<!-- Generated by APM CLI from .apm/ primitives -->'
+  grep -qF '# AI 開発協働ガイド' "$home/.codex/AGENTS.md"
+  grep -q "resolved_commit: $SOURCE_SHA" "$home/.apm/apm.lock.yaml"
+}
+
+@test "rerunning apply changes nothing, and files apm does not own survive both runs" {
+  local home first
+  home="$(new_home rerun)"
+  seed_sentinels "$home"
+  local sentinels
+  sentinels="$(sentinel_snapshot "$home")"
+  apply_workspace "$home"
+  first="$(home_snapshot "$home")"
+  apply_workspace "$home"
+  [ "$(home_snapshot "$home")" = "$first" ]
+  [ "$(sentinel_snapshot "$home")" = "$sentinels" ]
+  [ -z "$(compgen -G "$home/.apm/apm.yml.*.bak" || true)" ]
+}
+
+@test "apply stops before writing when a compiled root was edited after compile" {
+  local home before
+  home="$(new_home edited)"
+  apply_workspace "$home"
+  echo "local edit" >>"$home/.codex/AGENTS.md"
+  before="$(home_snapshot "$home")"
+  run apply_workspace "$home"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *".codex/AGENTS.md"* ]]
+  [ "$(home_snapshot "$home")" = "$before" ]
+}
+
+@test "apply keeps a differing manifest as a .bak before replacing it" {
+  local home
+  home="$(new_home backup)"
+  mkdir -p "$home/.apm"
+  printf 'name: earlier\nversion: 0.0.1\n' >"$home/.apm/apm.yml"
+  apply_workspace "$home"
+  run cat "$home"/.apm/apm.yml.*.bak
+  [ "$output" = $'name: earlier\nversion: 0.0.1' ]
+  grep -q "ref: $SOURCE_SHA" "$home/.apm/apm.yml"
+}
+
+@test "every catalog file APM does not deploy is listed in the manual distribution table" {
+  local f missing=""
+  while IFS= read -r f; do
+    grep -qF "\`$f\`" "$REPO_ROOT/docs/native-distribution.md" || missing+=" $f"
+  done < <(cd "$REPO_ROOT" && git ls-files catalog | grep -vE '^catalog/(\.apm/|apm\.yml$|README\.md$)|/\.gitkeep$')
+  [ -z "$missing" ] || {
+    echo "not listed in docs/native-distribution.md:$missing" >&2
+    return 1
+  }
+}

@@ -1,0 +1,14 @@
+# Native APM distribution (docs/native-distribution.md). Coexists with `deploy` until the cutover is approved,
+# then replaces it; it is not a third permanent distribution path. apply only accepts a disposable HOME.
+
+["native:plan"]
+description = "Print the SHA-pinned consumer manifest and the native install/compile steps; writes nothing"
+run = "bash ./scripts/native.sh plan"
+
+["native:render"]
+description = "Print the consumer manifest for -- --source-ref <SHA>"
+run = "bash ./scripts/native.sh render"
+
+["native:apply"]
+description = "apm install -g + compile -g into -- --home <disposable HOME> --source-ref <SHA>; refuses the real HOME"
+run = "bash ./scripts/native.sh apply"
