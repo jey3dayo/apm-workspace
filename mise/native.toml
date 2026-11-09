@@ -1,5 +1,6 @@
 # Native APM distribution (docs/native-distribution.md). Coexists with `deploy` until it replaces it; it is not a third
-# permanent distribution path. apply targets a disposable HOME only; the real HOME is blocked, backup and rehearse can read it.
+# permanent distribution path. apply targets a disposable HOME only; migrate is the only task that writes the real HOME,
+# after a clean rehearse --migrate. backup and rehearse only read it.
 
 ["native:plan"]
 description = "Print the SHA-pinned consumer manifest and the native install/compile steps; writes nothing"
@@ -10,7 +11,7 @@ description = "Print the consumer manifest for -- --source-ref <SHA>"
 run = "bash ./scripts/native.sh render"
 
 ["native:apply"]
-description = "apm install -g --only apm + compile -g into a disposable HOME: -- --home <dir> --source-ref <SHA> (the real HOME is blocked)"
+description = "apm install -g --only apm + compile -g into a disposable HOME: -- --home <dir> --source-ref <SHA> (the real HOME goes through native:migrate)"
 run = "bash ./scripts/native.sh apply"
 
 ["native:backup"]
@@ -18,5 +19,17 @@ description = "Copy the non-secret paths native:apply can change: -- --real-home
 run = "bash ./scripts/native.sh backup"
 
 ["native:rehearse"]
-description = "Clone a native:backup into a scratch HOME, run the same install + compile there and count lost files: -- --real-home --backup-dir <backup> --source-ref <SHA>"
+description = "Clone a native:backup into a scratch HOME, run the same install + compile there and count lost files: -- --real-home --backup-dir <backup> --source-ref <SHA> [--migrate]"
 run = "bash ./scripts/native.sh rehearse"
+
+["native:migrate"]
+description = "Move the skills/agents roots aside, install + compile, reinstate what apm did not deploy, roll back on failure: -- (--real-home | --home <dir>) --source-ref <SHA> --rehearsal <rehearse --migrate dir>"
+run = "bash ./scripts/native.sh migrate"
+
+["native:migrate-rollback"]
+description = "Undo a native:migrate: current roots to <root>.native-<UTC>, <root>.bak-<UTC> back; deletes nothing: -- (--real-home | --home <dir>) --stamp <UTC>"
+run = "bash ./scripts/native.sh migrate-rollback"
+
+["native:reinstate"]
+description = "Copy the top-level entries of <root>.bak-<UTC> that the current root lacks back into it: -- (--real-home | --home <dir>) --stamp <UTC>"
+run = "bash ./scripts/native.sh reinstate"

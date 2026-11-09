@@ -236,19 +236,40 @@ sentinel_snapshot() {
   [ "$(find "$home" "$SOURCE_REPO" | LC_ALL=C sort)" = "$before" ]
 }
 
-@test "render pins catalog and manual-skills by SHA and keeps every external dependency and MCP server" {
-  local home rendered
+@test "render pins catalog and manual-skills by SHA, converts yomiyasu to the structured form, and keeps every other external dependency and MCP server" {
+  local home rendered yomiyasu_sha
   home="$(new_home render)"
   rendered="$(native "$home" render --source-ref "$SOURCE_SHA")"
   [ "$(grep -c "^      ref: $SOURCE_SHA\$" <<<"$rendered")" -eq 2 ]
   [ "$(grep -c 'apm-workspace/.*#main' <<<"$rendered")" -eq 0 ]
+
+  # The SHA comes from the line of the root manifest.
+  yomiyasu_sha="$(sed -n 's|^    - nanaism/yomiyasu/skills/yomiyasu#\([0-9a-f]\{40\}\).*|\1|p' "$REPO_ROOT/apm.yml")"
+  [ -n "$yomiyasu_sha" ]
+  [ "$(grep -c 'nanaism/yomiyasu/skills/yomiyasu' <<<"$rendered")" -eq 0 ]
+  [ "$(grep -A3 '^    - git: nanaism/yomiyasu$' <<<"$rendered")" = "$(printf '    - git: nanaism/yomiyasu\n      ref: %s\n      skills:\n        - yomiyasu' "$yomiyasu_sha")" ]
+
   # Everything else in apm.yml passes through line for line.
-  diff <(grep -vE 'jey3dayo/apm-workspace/(catalog|manual-skills)#main' "$REPO_ROOT/apm.yml") \
-    <(sed 1d <<<"$rendered" | grep -vE "^    - git: $FIXTURE_URL\$|^      path: (catalog|manual-skills)\$|^      ref: $SOURCE_SHA\$")
+  diff <(grep -vE 'jey3dayo/apm-workspace/(catalog|manual-skills)#main|nanaism/yomiyasu/skills/yomiyasu#' "$REPO_ROOT/apm.yml") \
+    <(sed 1d <<<"$rendered" | sed '/^    - git: nanaism\/yomiyasu$/,+3d' |
+      grep -vE "^    - git: $FIXTURE_URL\$|^      path: (catalog|manual-skills)\$|^      ref: $SOURCE_SHA\$")
 
   rendered="$(native "$home" render --source-ref "$SOURCE_SHA" --workspace-only)"
   [ "$(grep -c '^    - ' <<<"$rendered")" -eq 2 ]
   [ "$(grep -c '^  mcp:' <<<"$rendered")" -eq 0 ]
+}
+
+@test "render fails when a listed external package is missing from apm.yml, and --workspace-only does not need it" {
+  local home repo="$FX/render-repo"
+  home="$(new_home render-missing)"
+  mkdir -p "$repo/scripts"
+  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
+  grep -v 'nanaism/yomiyasu' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
+  run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"EXTERNAL_PACKAGE_MAP"* ]]
+  run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -eq 0 ]
 }
 
 @test "apply refuses a missing HOME or ref, the account HOME, its ancestors and its tool state, before writing" {
@@ -561,6 +582,7 @@ seed_agmsg() {
 
   real_native "$home" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
   result="$(compgen -G "$backup/rehearsal-*/result.txt")"
+  grep -qxF "mode=plain" "$result"
   grep -qxF "lost=0" "$result"
   grep -qxF "install_status=0" "$result"
   grep -qxF "compile_status=0" "$result"
@@ -670,4 +692,319 @@ seed_agmsg() {
   [ "$status" -ne 0 ]
   [[ "$output" == *"sets temp_dir"* ]]
   [ ! -e "$called" ]
+}
+
+# The four roots migrate moves aside, as path and content (or link target) per file, so a round trip is compared byte for byte.
+# A second argument names a moved-aside copy, such as .bak-<stamp>; its files are listed under the original names.
+roots_snapshot() {
+  local home="$1" suffix="${2:-}" root f
+  for root in .agents/skills .claude/skills .claude/agents .cursor/agents; do
+    [ -e "$home/$root$suffix" ] || [ -L "$home/$root$suffix" ] || continue
+    (cd "$home" && find "$root$suffix" \( -type f -o -type l \) | LC_ALL=C sort | while IFS= read -r f; do
+      if [ -L "$f" ]; then
+        printf '%s -> %s\n' "$root${f#"$root$suffix"}" "$(readlink "$f")"
+      else
+        printf '%s %s\n' "$root${f#"$root$suffix"}" "$(git hash-object "$f")"
+      fi
+    done)
+  done
+}
+
+seed_migrate_home() {
+  local home="$1"
+  seed_sentinels "$home"
+  seed_agmsg "$home"
+  mkdir -p "$home/.claude/skills/foo" "$home/.claude/agents" "$home/.cursor/agents"
+  echo "old foo" >"$home/.claude/skills/foo/SKILL.md"
+  echo "pin" >"$home/.claude/skills/foo/.apm-pin"
+  echo "agent" >"$home/.claude/agents/my-agent.md"
+  echo "cursor agent" >"$home/.cursor/agents/my-agent.md"
+}
+
+# Stands in for apm: install deploys foo (without its .apm-pin), everything else succeeds and does nothing.
+write_deploy_stub() {
+  printf '#!/bin/sh\n[ "$1" = install ] || exit 0\nmkdir -p "$HOME/.claude/skills/foo"\necho "deployed by apm" >"$HOME/.claude/skills/foo/SKILL.md"\n' >"$1"
+  chmod +x "$1"
+}
+
+# Sets M_HOME, M_BACKUP, M_REHEARSAL and M_BEFORE (the HOME's backed-up files before the rehearsal): a seeded HOME, its
+# backup, and a clean rehearse --migrate of it.
+prepare_migrate() {
+  local name="$1" stub="$2"
+  M_HOME="$(new_home "$name")"
+  M_BACKUP="$FX/backups/$name"
+  seed_migrate_home "$M_HOME"
+  M_BEFORE="$(backed_up_snapshot "$M_HOME")"
+  real_native "$M_HOME" backup --real-home --backup-dir "$M_BACKUP"
+  if [ "$stub" = real ]; then
+    real_native "$M_HOME" rehearse --real-home --backup-dir "$M_BACKUP" --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  else
+    real_native_with_stub "$M_HOME" "$stub" rehearse --real-home --backup-dir "$M_BACKUP" --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  fi
+  M_REHEARSAL="$(dirname "$(compgen -G "$M_BACKUP/rehearsal-*/result.txt")")"
+}
+
+@test "reinstate copies an entry that left its root, keeps a link inside the root, and never overwrites what the root already has" {
+  local home bak stamp=20261109T000000Z
+  home="$(new_home reinstate)"
+  bak="$home/.claude/skills.bak-$stamp"
+  mkdir -p "$bak/kept" "$bak/existing" "$home/src/outside-skill" "$home/.claude/skills/existing"
+  echo "kept" >"$bak/kept/SKILL.md"
+  echo "old existing" >"$bak/existing/SKILL.md"
+  echo "new existing" >"$home/.claude/skills/existing/SKILL.md"
+  echo "outside" >"$home/src/outside-skill/SKILL.md"
+  ln -s "$home/src/outside-skill" "$bak/outside-link"
+  ln -s ../../src/outside-skill "$bak/relative-outside-link"
+  ln -s ./kept "$bak/inner-link"
+  ln -s "$home/.claude/skills/kept" "$bak/absolute-inner-link"
+  local before
+  before="$(roots_snapshot "$home" ".bak-$stamp")"
+
+  real_native "$home" reinstate --real-home --stamp "$stamp"
+  [ ! -L "$home/.claude/skills/outside-link" ]
+  [ "$(cat "$home/.claude/skills/outside-link/SKILL.md")" = "outside" ]
+  [ ! -L "$home/.claude/skills/relative-outside-link" ]
+  [ "$(cat "$home/.claude/skills/relative-outside-link/SKILL.md")" = "outside" ]
+  [ "$(readlink "$home/.claude/skills/inner-link")" = "./kept" ]
+  [ "$(readlink "$home/.claude/skills/absolute-inner-link")" = "$home/.claude/skills/kept" ]
+  [ "$(cat "$home/.claude/skills/kept/SKILL.md")" = "kept" ]
+  [ "$(cat "$home/.claude/skills/existing/SKILL.md")" = "new existing" ]
+  [ "$(roots_snapshot "$home" ".bak-$stamp")" = "$before" ]
+}
+
+@test "reinstate fails on a broken link and lists it, before it copies anything" {
+  local home bak stamp=20261109T000001Z
+  home="$(new_home reinstate-broken)"
+  bak="$home/.agents/skills.bak-$stamp"
+  mkdir -p "$bak/kept"
+  echo "kept" >"$bak/kept/SKILL.md"
+  ln -s "$home/src/gone" "$bak/dangling"
+  run real_native "$home" reinstate --real-home --stamp "$stamp"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$bak/dangling -> $home/src/gone"* ]]
+  [ ! -e "$home/.agents/skills" ]
+
+  run real_native "$home" reinstate --real-home --stamp 20250101T000000Z
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"no <root>.bak-20250101T000000Z"* ]]
+}
+
+@test "rehearse --migrate is clean when only a .apm-pin disappears, and reports it apart from the lost files" {
+  write_deploy_stub "$FX/stub-apm-deploy"
+  prepare_migrate rehearse-migrate-clean "$FX/stub-apm-deploy"
+  grep -qxF "mode=migrate" "$M_REHEARSAL/result.txt"
+  grep -qxF "lost=0" "$M_REHEARSAL/result.txt"
+  grep -qxF "allowed_lost=1" "$M_REHEARSAL/result.txt"
+  grep -qxF "reinstate_status=0" "$M_REHEARSAL/result.txt"
+  grep -qxF "baseline_skips=0" "$M_REHEARSAL/result.txt"
+  grep -qxF ".claude/skills/foo/.apm-pin" "$M_REHEARSAL/allowed-lost.txt"
+  [ ! -s "$M_REHEARSAL/lost.txt" ]
+  [ "$(backed_up_snapshot "$M_HOME")" = "$M_BEFORE" ]
+}
+
+@test "rehearse --migrate fails on a lost file other than a .apm-pin, and on a skipped baseline" {
+  local home backup="$FX/backups/rehearse-migrate-lost"
+  home="$(new_home rehearse-migrate-lost)"
+  seed_migrate_home "$home"
+  echo "extra" >"$home/.claude/skills/foo/extra.txt"
+  real_native "$home" backup --real-home --backup-dir "$backup"
+  write_deploy_stub "$FX/stub-apm-deploy"
+  run real_native_with_stub "$home" "$FX/stub-apm-deploy" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  [ "$status" -eq 1 ]
+  [[ "$output" == *".claude/skills/foo/extra.txt"* ]]
+  grep -qxF "lost=1" "$(compgen -G "$backup/rehearsal-*/result.txt")"
+  grep -qxF "allowed_lost=1" "$(compgen -G "$backup/rehearsal-*/result.txt")"
+
+  home="$(new_home rehearse-migrate-baseline)"
+  backup="$FX/backups/rehearse-migrate-baseline"
+  seed_migrate_home "$home"
+  real_native "$home" backup --real-home --backup-dir "$backup"
+  printf '#!/bin/sh\n[ "$1" = install ] || exit 0\necho "no trustworthy local deployment baseline for foo" >&2\n' >"$FX/stub-apm-baseline"
+  chmod +x "$FX/stub-apm-baseline"
+  run real_native_with_stub "$home" "$FX/stub-apm-baseline" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  [ "$status" -eq 1 ]
+  grep -qxF "lost=0" "$(compgen -G "$backup/rehearsal-*/result.txt")"
+  grep -qxF "baseline_skips=1" "$(compgen -G "$backup/rehearsal-*/result.txt")"
+}
+
+@test "migrate refuses a HOME whose .apm is a checkout, and a repository inside .apm, before anything is written" {
+  local home before
+  home="$(new_home migrate-checkout)"
+  seed_migrate_home "$home"
+  before="$(find "$home" | LC_ALL=C sort)"
+  mkdir -p "$home/.apm/.git"
+  run real_native "$home" migrate --real-home --source-ref "$SOURCE_SHA" --rehearsal "$FX/none"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"authoring checkout"* ]]
+  rmdir "$home/.apm/.git"
+  mkdir -p "$home/.apm/catalog"
+  run real_native "$home" migrate --real-home --source-ref "$SOURCE_SHA" --rehearsal "$FX/none"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"authoring checkout"* ]]
+  rmdir "$home/.apm/catalog"
+
+  mkdir -p "$home/.apm/scripts"
+  cp "$REPO_ROOT/scripts/native.sh" "$home/.apm/scripts/native.sh"
+  run fixture_exec "$home" /usr/bin/env APM_NATIVE_ACCOUNT_HOME="$home" /bin/bash "$home/.apm/scripts/native.sh" \
+    migrate --real-home --source-ref "$SOURCE_SHA" --rehearsal "$FX/none"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"is inside"* ]]
+  rm -rf "$home/.apm/scripts"
+  rmdir "$home/.apm"
+  [ "$(find "$home" | LC_ALL=C sort)" = "$before" ]
+}
+
+@test "migrate refuses a missing, plain, failed or mismatched rehearsal, and moves nothing" {
+  local home backup before bad stub="$FX/stub-apm-deploy"
+  write_deploy_stub "$stub"
+  prepare_migrate migrate-refuse "$stub"
+  home="$M_HOME"
+  before="$(find "$home" | LC_ALL=C sort)"
+
+  run real_native_with_stub "$home" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"needs --rehearsal"* ]]
+  run real_native_with_stub "$home" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$FX/none"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"has no result.txt"* ]]
+  # Another ref, and a rehearsal made without --workspace-only.
+  run real_native_with_stub "$home" "$stub" migrate --real-home --source-ref 0000000000000000000000000000000000000001 --workspace-only --rehearsal "$M_REHEARSAL"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"does not show source_ref=0000000000000000000000000000000000000001"* ]]
+  run real_native_with_stub "$home" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --rehearsal "$M_REHEARSAL"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"does not show workspace_only=0"* ]]
+
+  # A plain rehearsal, a failed step and a lost file each leave the result without a line migrate needs.
+  for bad in mode=plain lost=1 install_status=1 reinstate_status=1 baseline_skips=2; do
+    cp -R "$M_REHEARSAL" "$M_REHEARSAL.$bad"
+    sed -i.orig "s/^${bad%%=*}=.*/$bad/" "$M_REHEARSAL.$bad/result.txt"
+    run real_native_with_stub "$home" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL.$bad"
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"does not show ${bad%%=*}="* ]]
+  done
+
+  # Another HOME's rehearsal.
+  home="$(new_home migrate-refuse-other)"
+  seed_migrate_home "$home"
+  run real_native_with_stub "$home" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"does not show home=$home"* ]]
+  [ -z "$(compgen -G "$home/.claude/skills.bak-*" || true)" ]
+  [ -z "$(compgen -G "$M_HOME/.claude/skills.bak-*" || true)" ]
+  [ "$(find "$M_HOME" | LC_ALL=C sort)" = "$before" ]
+}
+
+@test "migrate keeps what apm does not deploy, leaves config.toml and settings.json alone, and migrate-rollback restores the roots byte for byte" {
+  local stamp original sentinels listing_bak
+  prepare_migrate migrate-roundtrip real
+  original="$(roots_snapshot "$M_HOME")"
+  sentinels="$(sentinel_snapshot "$M_HOME")"
+  [ -n "$original" ]
+
+  run real_native "$M_HOME" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
+  [ "$status" -eq 0 ]
+  stamp="$(printf '%s\n' "$output" | tail -n 1)"
+  [[ "$stamp" =~ ^[0-9]{8}T[0-9]{6}Z$ ]]
+  [[ "$output" == *"native:migrate-rollback -- --real-home --stamp $stamp"* ]]
+  grep -q "ref: $SOURCE_SHA" "$M_HOME/.apm/apm.yml"
+
+  # apm deployed the workspace skills; what it does not own came back from the moved-aside roots.
+  [ -f "$M_HOME/.claude/skills/ship/SKILL.md" ]
+  [ -f "$M_HOME/.agents/skills/ship/SKILL.md" ]
+  [ "$(cat "$M_HOME/.claude/skills/private-copy/SKILL.md")" = "private copy" ]
+  [ ! -L "$M_HOME/.claude/skills/private-link" ]
+  [ "$(cat "$M_HOME/.claude/skills/private-link/SKILL.md")" = "private link target" ]
+  [ "$(cat "$M_HOME/.agents/skills/herdr-automations/SKILL.md")" = "tool-owned" ]
+  [ "$(cat "$M_HOME/.claude/agents/my-agent.md")" = "agent" ]
+  [ "$(cat "$M_HOME/.cursor/agents/my-agent.md")" = "cursor agent" ]
+  [ "$(readlink "$M_HOME/.agents/skills/agmsg/db")" = "$M_HOME/.local/state/agmsg/db" ]
+  [ "$(cat "$M_HOME/.local/state/agmsg/db/keep")" = "db store" ]
+  [ "$(sentinel_snapshot "$M_HOME" | grep -E 'config.toml|settings.json')" = "$(grep -E 'config.toml|settings.json' <<<"$sentinels")" ]
+  # The moved-aside roots are the originals, and the record lists them.
+  [ "$(roots_snapshot "$M_HOME" ".bak-$stamp")" = "$original" ]
+  [ "$(grep -c '^moved' "$M_HOME/.apm/native-migrate-$stamp.txt")" -eq 4 ]
+
+  real_native "$M_HOME" migrate-rollback --real-home --stamp "$stamp"
+  [ "$(roots_snapshot "$M_HOME")" = "$original" ]
+  [ "$(sentinel_snapshot "$M_HOME")" = "$sentinels" ]
+  [ -f "$M_HOME/.claude/skills.native-$stamp/ship/SKILL.md" ]
+  [ -z "$(compgen -G "$M_HOME/.claude/skills.bak-*" || true)" ]
+  [ "$(readlink "$M_HOME/.agents/skills/agmsg/db")" = "$M_HOME/.local/state/agmsg/db" ]
+
+  # A second rollback finds nothing to move back and changes nothing.
+  listing_bak="$(find "$M_HOME" | LC_ALL=C sort)"
+  run real_native "$M_HOME" migrate-rollback --real-home --stamp "$stamp"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"is missing"* ]]
+  [ "$(find "$M_HOME" | LC_ALL=C sort)" = "$listing_bak" ]
+}
+
+@test "migrate rolls the roots back when a step fails, and fails when config.toml or settings.json would change" {
+  local stub="$FX/stub-apm-deploy" fail_compile="$FX/stub-apm-fail-compile" touch_config="$FX/stub-apm-touch-config"
+  local original
+  write_deploy_stub "$stub"
+  printf '#!/bin/sh\n[ "$1" = install ] || exit 1\nmkdir -p "$HOME/.claude/skills/foo"\necho "deployed by apm" >"$HOME/.claude/skills/foo/SKILL.md"\n' >"$fail_compile"
+  printf '#!/bin/sh\n[ "$1" = install ] || exit 0\nmkdir -p "$HOME/.claude/skills/foo"\necho "deployed by apm" >"$HOME/.claude/skills/foo/SKILL.md"\necho changed >>"$HOME/.claude/settings.json"\n' >"$touch_config"
+  chmod +x "$fail_compile" "$touch_config"
+
+  prepare_migrate migrate-fail-compile "$stub"
+  original="$(roots_snapshot "$M_HOME")"
+  run real_native_with_stub "$M_HOME" "$fail_compile" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"rolling the roots back"* ]]
+  [ "$(roots_snapshot "$M_HOME")" = "$original" ]
+  [ -z "$(compgen -G "$M_HOME/.claude/skills.bak-*" || true)" ]
+  [ "$(cat "$M_HOME"/.claude/skills.native-*/foo/SKILL.md)" = "deployed by apm" ]
+  [ "$(readlink "$M_HOME/.agents/skills/agmsg/db")" = "$M_HOME/.local/state/agmsg/db" ]
+
+  prepare_migrate migrate-touch-config "$stub"
+  original="$(roots_snapshot "$M_HOME")"
+  run real_native_with_stub "$M_HOME" "$touch_config" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"sha256 of .codex/config.toml .claude/settings.json changed"* ]]
+  [ "$(roots_snapshot "$M_HOME")" = "$original" ]
+}
+
+@test "migrate and migrate-rollback take a disposable --home as well" {
+  local home stub="$FX/stub-apm-deploy" original stamp backup="$FX/backups/migrate-home"
+  write_deploy_stub "$stub"
+  home="$(new_home migrate-home)"
+  seed_migrate_home "$home"
+  original="$(roots_snapshot "$home")"
+  native "$home" backup --home "$home" --backup-dir "$backup"
+  fixture_exec "$home" /usr/bin/env APM_BIN="$stub" /bin/bash "$REPO_ROOT/scripts/native.sh" rehearse --home "$home" --backup-dir "$backup"     --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  run fixture_exec "$home" /usr/bin/env APM_BIN="$stub" /bin/bash "$REPO_ROOT/scripts/native.sh" migrate --home "$home"     --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$(dirname "$(compgen -G "$backup/rehearsal-*/result.txt")")"
+  [ "$status" -eq 0 ]
+  stamp="$(printf '%s\n' "$output" | tail -n 1)"
+  [ "$(cat "$home/.claude/skills/foo/SKILL.md")" = "deployed by apm" ]
+  native "$home" migrate-rollback --home "$home" --stamp "$stamp"
+  [ "$(roots_snapshot "$home")" = "$original" ]
+}
+
+@test "the old path refuses every command that rewrites a deployment when apm.yml was rendered by native.sh, before apm starts" {
+  local home workspace="$FX/native-workspace" bin="$FX/guard-bin" cmd
+  local -a words
+  home="$(new_home guard)"
+  mkdir -p "$workspace" "$bin"
+  native "$home" render --source-ref "$SOURCE_SHA" --workspace-only >"$workspace/apm.yml"
+  printf '#!/bin/sh\ntouch "%s/apm-ran"\n' "$home" >"$bin/apm"
+  chmod +x "$bin/apm"
+  for cmd in apply apply:skills:local refresh install-pins repair:local-package-cache pin-external prune:cache prepare:catalog \
+    install:catalog bundle-catalog smoke:catalog "migrate:roots --apply"; do
+    read -r -a words <<<"$cmd"
+    run fixture_exec "$home" /usr/bin/env APM_WORKSPACE_DIR="$workspace" PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" "${words[@]}"
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"was rendered by scripts/native.sh"* ]]
+  done
+  [ ! -e "$home/apm-ran" ]
+
+  # Reading commands still work, and a manifest without the header is not refused.
+  run fixture_exec "$home" /usr/bin/env APM_WORKSPACE_DIR="$workspace" PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" help
+  [ "$status" -eq 0 ]
+  run fixture_exec "$home" /usr/bin/env APM_WORKSPACE_DIR="$workspace" PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" migrate:roots
+  [[ "$output" != *"was rendered by scripts/native.sh"* ]]
+  printf 'name: hand-written\n' >"$workspace/apm.yml"
+  run fixture_exec "$home" /usr/bin/env APM_WORKSPACE_DIR="$workspace" PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" migrate:roots --apply
+  [[ "$output" != *"was rendered by scripts/native.sh"* ]]
 }
