@@ -4,7 +4,7 @@ run = "bash ./scripts/apm-workspace.sh apply:skills:local"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 apply:skills:local"
 
 ["prepare:catalog"]
-description = "Normalize `catalog/` in place inside ~/.apm"
+description = "Normalize `catalog/` in place inside the authoring checkout"
 run = "bash ./scripts/apm-workspace.sh prepare:catalog"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 prepare:catalog"
 

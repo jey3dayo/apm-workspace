@@ -4,7 +4,7 @@ description: >-
   mise.toml task design (run vs depends DAG, [task_config].includes, global vs
   repo-local task placement), tool and npm:/pipx: version pinning, `mise upgrade`
   and minimum_release_age, Windows run_windows, and `mise bootstrap` /
-  `[dotfiles]` / Brewfile migration. For ~/.apm rollout use apm-usage.
+  `[dotfiles]` / Brewfile migration. For APM workspace rollout use apm-usage.
 ---
 
 # mise - Task Runner Configuration

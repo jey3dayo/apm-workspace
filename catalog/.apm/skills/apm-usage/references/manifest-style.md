@@ -1,6 +1,6 @@
 # Manifest Style — How `apm.yml` Entries Are Written
 
-Applies to the root `~/.apm/apm.yml` and to repo-local manifests. The lane a dependency belongs to is decided in `SKILL.md`; this file fixes how the entry is written once the lane is chosen. Field validity is upstream's [manifest schema](https://github.com/microsoft/apm/blob/main/docs/src/content/docs/reference/manifest-schema.md).
+Applies to the APM workspace checkout's root `apm.yml` and to repo-local manifests. The lane a dependency belongs to is decided in `SKILL.md`; this file fixes how the entry is written once the lane is chosen. Field validity is upstream's [manifest schema](https://github.com/microsoft/apm/blob/main/docs/src/content/docs/reference/manifest-schema.md).
 
 ## `dependencies.apm` entries
 

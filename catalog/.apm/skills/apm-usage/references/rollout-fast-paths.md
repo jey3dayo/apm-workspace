@@ -71,7 +71,7 @@ entry, such as the next section header, and folds the gist URL) and deploys
 the gist under its un-aliased hash name. Unlinking the agmsg roster and
 deploying undeclared sub-skills were observed on 0.29.0 and not re-checked.
 Edit `apm.yml` until `git diff` shows only the removed line, follow the agmsg
-State section of `~/.apm/AGENTS.md`, then run `mise run deploy`, which
+State section of the checkout's `AGENTS.md`, then run `mise run deploy`, which
 removes the undeclared entries.
 
 Some deployed skill directories also hold a copy of the package's `.apm-pin`
@@ -88,15 +88,15 @@ and it completes.
 ## Guardrail details
 
 - `apm audit --ci`: read a finding by its check name and by the absolute path
-  it resolves to, never by its count. Run in `~/.apm`, 0.31.0 maps the
-  workspace to the user deploy root, so `deployed-files-present` checks the
+  it resolves to, never by its count. Run in the checkout (observed on 0.31.0 while the checkout was `~/.apm`; not re-checked
+  elsewhere), it maps the workspace to the user deploy root, so `deployed-files-present` checks the
   real `~/.claude/...` and `~/.agents/...` paths. Every relative lock row is
   resolved against `$HOME`, so the missing list mixes three kinds: rows left
   by skills retired from the catalog or by the opted-out
   `~/.config/opencode/skills` face, stale files inside a live skill, and
   workspace rows (`.agents/skills/<bridge>`, `.apm/skills/...`) that exist
-  under `~/.apm` but not under `$HOME`. The target label does not tell them
-  apart, so open each path under both `$HOME` and `~/.apm` before treating
+  under the checkout but not under `$HOME`. The target label does not tell them
+  apart, so open each path under both `$HOME` and the checkout before treating
   it as a missing runtime file. Do not turn that into a standing rule that
   `apm audit --ci` may be ignored.
 - grep wrapper: do not measure what is left on a deployed target with a

@@ -1,6 +1,6 @@
 # yamllint has no ignore file here, so lint:yaml excludes apm.lock.yaml at the fd level.
 ["lint:yaml"]
-description = "Lint YAML files in the ~/.apm workspace"
+description = "Lint YAML files in the authoring checkout"
 hide = true
 run = "fd -e yml -e yaml --exclude apm.lock.yaml -X yamllint"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -e yml -e yaml --exclude apm.lock.yaml -X yamllint\""

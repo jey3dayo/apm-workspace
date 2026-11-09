@@ -1,8 +1,9 @@
 # apm-workspace
 
-Operational workspace for `~/.apm` and the global APM skill rollout. This
-checkout—not `~/.config` or deployed runtime directories—is the daily
-authoring surface. The `apm` CLI is pinned by `mise`.
+Operational workspace for the global APM skill rollout. This checkout
+(`~/src/github.com/jey3dayo/apm-workspace`)—not `~/.config`, deployed runtime
+directories, or the APM consumer state in `~/.apm`—is the daily authoring
+surface. The `apm` CLI is pinned by `mise`.
 
 ## Start Here
 
@@ -40,7 +41,7 @@ add a `<target> <entry>` line to `config/preserved-skills-root-entries.txt`.
 ## Common Commands
 
 ```powershell
-cd ~/.apm
+cd ~/src/github.com/jey3dayo/apm-workspace
 mise bootstrap       # first machine setup
 mise run deploy      # normal stable rollout
 ```
@@ -56,6 +57,10 @@ mise run deploy      # normal stable rollout
 Use `deploy` for a stable rollout; `upgrade` deliberately changes accepted
 upstream content and requires a lockfile review. A Codex skill change is
 verified only after checking `~/.agents/skills/<id>/SKILL.md`.
+
+On the native HOME, `deploy`, `upgrade` and the other tasks that write the
+deployed targets are refused; roll out with section B of
+[`docs/native-distribution.md`](docs/native-distribution.md).
 
 ## External Checkout Changes
 
