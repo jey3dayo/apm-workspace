@@ -18,7 +18,7 @@ COMPILED_ROOTS=".claude/CLAUDE.md .codex/AGENTS.md .cursor/AGENTS.md"
 PROTECTED_SURFACES=".apm .claude .codex .cursor .agents .config .cache .local Library"
 # Non-secret paths apply can change in the real HOME; backup copies them and rollback restores them. Tool configs that
 # may hold credentials (~/.codex/config.toml, MCP configs) are not here, which is why apply installs with --only apm.
-BACKUP_PATHS=".apm/apm.yml .apm/apm.lock.yaml .claude/skills .claude/agents .claude/rules .claude/commands .claude/CLAUDE.md
+BACKUP_PATHS=".apm/apm.yml .apm/apm.lock.yaml .apm/deployment-receipts .claude/skills .claude/agents .claude/rules .claude/commands .claude/CLAUDE.md
 .codex/AGENTS.md .codex/rules .cursor/agents .cursor/rules .cursor/AGENTS.md .agents/skills AGENTS.md .config/opencode/AGENTS.md"
 # Where apm writes in the real HOME: the backed-up paths plus its caches.
 REAL_WRITE_PATHS="$BACKUP_PATHS .cache/apm Library/Caches/apm"
@@ -371,6 +371,10 @@ cmd_rollback() {
     fi
   done < <(cat "$dir/present.txt" "$dir/absent.txt")
   log "restored $home from $dir; the copies it replaced are in $aside"
+  # Other agents keep writing the agmsg store, so restoring the copy would drop their newer messages.
+  if [ -d "$dir/agmsg-state" ]; then
+    log "left the agmsg store in $home/.local/state/agmsg as it is; the copy taken at backup time is $dir/agmsg-state"
+  fi
 }
 
 # APM picks cache, config and temp locations from more than HOME (APM_CACHE_DIR, XDG_*, TMPDIR), and git honours

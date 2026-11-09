@@ -5,14 +5,14 @@
 
 ## 入口
 
-| mise task                                                                       | すること                                                                                                                                                           |
-| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `mise run native:plan`                                                          | 既定の入口。consumer の manifest と、apply が実行する手順を表示する。何も書かない                                                                                  |
-| `mise run native:render -- --source-ref <SHA>`                                  | consumer の manifest を標準出力に出す                                                                                                                              |
-| `mise run native:apply -- --home <使い捨ての HOME> --source-ref <SHA>`          | manifest を `<HOME>/.apm/apm.yml` に書き、`HOME=<HOME>` で `apm install -g --only apm` と `apm compile -g --clean` を実行する                                      |
-| `mise run native:backup -- --real-home --backup-dir <新しいディレクトリ>`       | apply が変え得る非秘密のパス（下の「backup の対象」）と agmsg の store を clone copy し、種類・サイズ・mtime だけの inventory を残す。既存の backup は上書きしない |
-| `mise run native:apply -- --real-home --backup-dir <backup> --source-ref <SHA>` | 実 HOME へ配る。その HOME の完了した backup が無ければ止まる。agmsg の `db`・`teams` のリンクを save し、どの終わり方でも restore して、前と同じリンクか確かめる   |
-| `mise run native:rollback -- --real-home --backup-dir <backup>`                 | backup したパスの今のコピーを `<backup>/pre-rollback-<UTC>/` へ移し、backup を戻す。backup に無かったパスは移すだけ                                                |
+| mise task                                                                       | すること                                                                                                                                                                                                                                                               |
+| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mise run native:plan`                                                          | 既定の入口。consumer の manifest と、apply が実行する手順を表示する。何も書かない                                                                                                                                                                                      |
+| `mise run native:render -- --source-ref <SHA>`                                  | consumer の manifest を標準出力に出す                                                                                                                                                                                                                                  |
+| `mise run native:apply -- --home <使い捨ての HOME> --source-ref <SHA>`          | manifest を `<HOME>/.apm/apm.yml` に書き、`HOME=<HOME>` で `apm install -g --only apm` と `apm compile -g --clean` を実行する                                                                                                                                          |
+| `mise run native:backup -- --real-home --backup-dir <新しいディレクトリ>`       | apply が変え得る非秘密のパス（下の「backup の対象」）と agmsg の store を clone copy し、種類・サイズ・mtime だけの inventory を残す。既存の backup は上書きしない                                                                                                     |
+| `mise run native:apply -- --real-home --backup-dir <backup> --source-ref <SHA>` | 実 HOME へ配る。その HOME の完了した backup が無ければ止まる。agmsg の `db`・`teams` のリンクを save し、どの終わり方でも restore して、前と同じリンクか確かめる                                                                                                       |
+| `mise run native:rollback -- --real-home --backup-dir <backup>`                 | backup したパスの今のコピーを `<backup>/pre-rollback-<UTC>/` へ移し、backup を戻す。backup に無かったパスは移すだけ。agmsg の store は戻さない（他の agent が書き続けているので、古いコピーで上書きすると新しいメッセージが消える）。backup 時のコピーの場所を表示する |
 
 - consumer の manifest は、root の `apm.yml` の `jey3dayo/apm-workspace/catalog#main` と `manual-skills#main` の 2 行を、指定した commit SHA への pin に書き換えたもの。外部の依存と MCP はそのまま通す（外部の依存はもともと SHA で pin している）。`--workspace-only` を付けると、この repo の 2 package だけを残す
 - 配布と更新を分ける: apply は pin を自分で動かさない。新しい commit を配るときは、`--source-ref` に新しい SHA を渡して実行し直す。外部の依存の pin は、今と同じく root の `apm.yml` で上げる
@@ -24,7 +24,7 @@
 - manifest は同じディレクトリの新しいファイルに書いてから名前を置き換える
 - install は `--only apm`。MCP は、旧経路と `setup:mcp:host` が書いた今の設定のまま触らない。`~/.codex/config.toml` などの MCP・認証の設定は backup できない（秘密を含み得る）ため、rollback で戻せないものは書かない
 
-backup の対象: `~/.apm/apm.yml`・`apm.lock.yaml`、`~/.claude/{skills,agents,rules,commands,CLAUDE.md}`、`~/.codex/{AGENTS.md,rules}`、`~/.cursor/{agents,rules,AGENTS.md}`、`~/.agents/skills`、`~/AGENTS.md`、`~/.config/opencode/AGENTS.md`、`~/.local/state/agmsg`（別に取る）
+backup の対象: `~/.apm/apm.yml`・`apm.lock.yaml`・`deployment-receipts`（APM が配った成果物の所有の記録）、`~/.claude/{skills,agents,rules,commands,CLAUDE.md}`、`~/.codex/{AGENTS.md,rules}`、`~/.cursor/{agents,rules,AGENTS.md}`、`~/.agents/skills`、`~/AGENTS.md`、`~/.config/opencode/AGENTS.md`、`~/.local/state/agmsg`（別に取る）
 
 ## 旧経路と新経路
 

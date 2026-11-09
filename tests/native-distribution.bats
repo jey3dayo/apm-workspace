@@ -468,7 +468,7 @@ real_native() {
 
 backed_up_snapshot() {
   local path
-  (cd "$1" && for path in .apm/apm.yml .apm/apm.lock.yaml .claude/skills .claude/agents .claude/rules .claude/commands \
+  (cd "$1" && for path in .apm/apm.yml .apm/apm.lock.yaml .apm/deployment-receipts .claude/skills .claude/agents .claude/rules .claude/commands \
     .claude/CLAUDE.md .codex/AGENTS.md .codex/rules .cursor/agents .cursor/rules .cursor/AGENTS.md .agents/skills \
     AGENTS.md .config/opencode/AGENTS.md; do
     [ -e "$path" ] || [ -L "$path" ] || continue
@@ -517,8 +517,14 @@ seed_agmsg() {
   [ "$(cat "$home/.local/state/agmsg/db/keep")" = "db store" ]
   [ -z "$(compgen -G "$home/.apm/apm.yml.*.bak" || true)" ]
 
-  real_native "$home" rollback --real-home --backup-dir "$FX/backups/real"
+  echo "message written after the backup" >"$home/.local/state/agmsg/db/newer"
+  run real_native "$home" rollback --real-home --backup-dir "$FX/backups/real"
+  [ "$status" -eq 0 ]
   [ "$(backed_up_snapshot "$home")" = "$before" ]
+  [ ! -e "$home/.apm/deployment-receipts" ]
+  # The store keeps what other agents wrote after the backup; rollback names the backup copy instead of restoring it.
+  [ "$(cat "$home/.local/state/agmsg/db/newer")" = "message written after the backup" ]
+  [[ "$output" == *"left the agmsg store"*"$FX/backups/real/agmsg-state"* ]]
   [ -f "$(compgen -G "$FX/backups/real/pre-rollback-*/.claude/skills/ship/SKILL.md")" ]
 }
 
