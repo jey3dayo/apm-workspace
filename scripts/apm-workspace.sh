@@ -3526,7 +3526,7 @@ Commands:
   setup:mcp:host     Configure host-local MCP servers for Codex and Claude
   apply              Offline deploy user-scope-compatible dependencies and compile user-scope root contexts
   migrate:roots      Preview moving legacy root copies (CLAUDE.md / AGENTS.md) to <name>.<UTC>.bak; --apply moves them
-  sync:opencode      Write only ~/.config/opencode/AGENTS.md (the catalog guide); allowed on a native HOME
+  sync:opencode      Write only the OpenCode guide (opencode/AGENTS.md in the user config dir); allowed on a native HOME
   check:roots        Fail when ~/.claude/CLAUDE.md is still the legacy catalog copy, or the old path must not write this HOME (run before any apm install -g)
   apply:skills:local Quick-sync local catalog and private skills into ~/.agents/skills; private skills also link into ~/.claude/skills
   refresh            Refresh the checkout and dependencies only; does not deploy
