@@ -23,6 +23,13 @@ description = "Offline check: every uses: has an actions.lock entry and the lock
 hide = true
 run = "gh-actions-lock --verify-local"
 
+# CI only: coverage is checked offline above, provenance (locked commit still reachable
+# from its ref) needs network and a token that can read every locked action repository.
+["actions-lock:upstream"]
+description = "CI check: actions.lock covers every uses: and each locked commit still verifies upstream (needs network and GH_TOKEN)"
+hide = true
+run = "gh-actions-lock --verify"
+
 ["lint:frontmatter"]
 description = "Validate YAML frontmatter in the managed catalog (agents/skills/commands/rules)"
 hide = true

@@ -3,6 +3,15 @@
 採用・撤去・見送りにした APM パッケージの意思決定ログ。1 パッケージ 1 セクション。
 「なぜ入れたか / なぜ消したか / 再検討するなら何を見るか」を残す。
 
+## opencli (jackwener/opencli)
+
+- Status: 採用・global（2026-11-09、ユーザー判断）
+- 正本: `jackwener/opencli/skills/opencli-usage` と `jackwener/opencli/skills/opencli-browser`（v2.0.3 の commit `9bc5f5ca132ec4d4e48d7ee517d4303bf159e8e8` に pin）。CLI 本体は dotfiles の mise で `npm:@jackwener/opencli` として管理（実体 2.0.3）
+- 理由: ログイン済みブラウザのセッションを再利用して Web サイトを CLI 化する OpenCLI の公式エージェントスキル。usage はコマンドとサイトのリファレンス、browser はアダプタの無いページをその場で操作するためのもの。X のキーワード検索や Amazon など、通常の API やブラウザ経路では届かない読み取りをエージェントから使えるようにする
+- 他のスキル（`opencli-adapter-author`、`opencli-autofix`、`smart-search`）は入れない。アダプタの新規作成や修復が必要になったら、その時点で追加を判断する。なお README に載る `opencli-browser-sitemap` / `opencli-sitemap-author` は現行ツリーに存在しない
+- lock の扱い: この変更の `apm.lock.yaml` は `apm lock`（APM 0.35.0）で再生成した。新規 2 エントリには `deployed_files` がまだ無い（`unslop` のエントリと同じ状態）で、次の `mise run deploy` で記録される
+- 再検討するなら: CLI のバージョンを上げるときは、スキルの pin も同じタグの commit に揃える
+
 ## catalog の global ガイドを APM の instruction にする（2026-11-08）
 
 - Status: 採用（REPO 側。実 HOME の切り替えは本人が `mise run migrate:roots -- --apply` を明示実行する）

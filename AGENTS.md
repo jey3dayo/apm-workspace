@@ -30,8 +30,9 @@ it as `~/.claude/rules/ai-collaboration.md`, and Codex skills deploy to
 `TODO_FILE=todo.txt tuxedo`. Completed internal tasks are archived in the
 sibling `done.txt`. Decision history (why a package or lane was adopted,
 removed, or deferred) belongs in `docs/package-decisions.md`; code-change
-history lives in git log and `plans/`; flat `plans/*.md` files are tracked as
-history documents, while `plans/<tool>/` holds untracked skill output. Do not
+history lives in git log. `plans/` is gitignored and holds local plan output;
+only the `plans/*.md` files tracked before that rule remain as history
+documents. Do not
 introduce `CHANGELOG.md` and do not recreate `TODO.md` for active work — those roles are already covered by
 the three surfaces above.
 
