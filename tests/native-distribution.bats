@@ -1404,7 +1404,8 @@ setup_authoring_checkout() {
   [ "$(cd "$home/.apm" && find . | LC_ALL=C sort)" = "$consumer_before" ]
 }
 
-# The mise tasks run with the repository's tasks but without its [tools], which a fixture HOME cannot install.
+# The mise tasks run with the repository's tasks but without its [tools], which a fixture HOME cannot install. The
+# ceiling keeps mise from reading a mise.toml above the fixture root (APM_NATIVE_FIXTURE_ROOT may sit under one).
 setup_mise_fixture() {
   local dir="$1"
   mkdir -p "$dir"
@@ -1429,7 +1430,7 @@ EOF
   printf '#!/bin/sh\ntouch "%s/apm-ran"\n' "$home" >"$bin/apm"
   chmod +x "$bin/apm"
 
-  run fixture_exec "$home" /usr/bin/env PATH="$bin:$(dirname "$mise_bin"):$FIXTURE_PATH" MISE_TRUSTED_CONFIG_PATHS="$fixture" \
+  run fixture_exec "$home" /usr/bin/env PATH="$bin:$(dirname "$mise_bin"):$FIXTURE_PATH" MISE_TRUSTED_CONFIG_PATHS="$fixture" MISE_CEILING_PATHS="$FX" \
     mise -C "$fixture" run upgrade
   [ "$status" -ne 0 ]
   [[ "$output" == *"was rendered by scripts/native.sh"* ]]
@@ -1438,7 +1439,7 @@ EOF
   # check:roots passes on a HOME whose ~/.apm is a checkout.
   printf 'name: old-checkout\n' >"$home/.apm/apm.yml"
   mkdir -p "$home/.apm/.git"
-  run fixture_exec "$home" /usr/bin/env PATH="$bin:$(dirname "$mise_bin"):$FIXTURE_PATH" MISE_TRUSTED_CONFIG_PATHS="$fixture" \
+  run fixture_exec "$home" /usr/bin/env PATH="$bin:$(dirname "$mise_bin"):$FIXTURE_PATH" MISE_TRUSTED_CONFIG_PATHS="$fixture" MISE_CEILING_PATHS="$FX" \
     mise -C "$fixture" run check:roots
   [ "$status" -eq 0 ]
 }
