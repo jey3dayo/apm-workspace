@@ -1,5 +1,5 @@
 # Native APM distribution (docs/native-distribution.md). Coexists with `deploy` until it replaces it; it is not a third
-# permanent distribution path. apply defaults to a disposable HOME; the real HOME needs --real-home and a backup.
+# permanent distribution path. apply targets a disposable HOME only; the real HOME is blocked, backup and rehearse can read it.
 
 ["native:plan"]
 description = "Print the SHA-pinned consumer manifest and the native install/compile steps; writes nothing"
@@ -10,7 +10,7 @@ description = "Print the consumer manifest for -- --source-ref <SHA>"
 run = "bash ./scripts/native.sh render"
 
 ["native:apply"]
-description = "apm install -g --only apm + compile -g into -- --home <dir> | --real-home --backup-dir <backup>, --source-ref <SHA>"
+description = "apm install -g --only apm + compile -g into a disposable HOME: -- --home <dir> --source-ref <SHA> (the real HOME is blocked)"
 run = "bash ./scripts/native.sh apply"
 
 ["native:backup"]
@@ -18,9 +18,5 @@ description = "Copy the non-secret paths native:apply can change: -- --real-home
 run = "bash ./scripts/native.sh backup"
 
 ["native:rehearse"]
-description = "Clone a native:backup into a scratch HOME, run the same install + compile there and count lost files; real apply needs a clean rehearsal: -- --real-home --backup-dir <backup> --source-ref <SHA>"
+description = "Clone a native:backup into a scratch HOME, run the same install + compile there and count lost files: -- --real-home --backup-dir <backup> --source-ref <SHA>"
 run = "bash ./scripts/native.sh rehearse"
-
-["native:rollback"]
-description = "Put a native:backup back, moving the current copies aside: -- --real-home --backup-dir <backup>"
-run = "bash ./scripts/native.sh rollback"
