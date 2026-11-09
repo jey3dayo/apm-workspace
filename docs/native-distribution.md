@@ -224,7 +224,7 @@ B. 切り替えのたび（新しい SHA を配るときも同じ）
 - B3. `mise run native:rehearse -- --real-home --backup-dir <同じディレクトリ> --source-ref <同じ SHA> --migrate`。成功で終わり、`result.txt` が `mode=migrate`・`lost=0`・`baseline_skips=0` で、`allowed-lost.txt` の path がその表のものだけで、`dropped.txt` が意図した削除（catalog から外した skill）だけであることを確かめる。A1 の前に取った rehearsal は使えないので、必ず A1 のあとに取る
 - B4. `~/.cache/apm` と、あれば `Library/Caches/apm` を `<名前>.native-aside-<UTC>` へ移す（上の「実 HOME の checkout の移設」の最後の段落）。Claude Code と Codex のセッションを閉じる
 - B5. `mise run native:migrate -- --real-home --source-ref <同じ SHA> --rehearsal <backup>/rehearsal-<UTC>.<suffix>`。表示された stamp を控える
-- B6. 確かめる: 配布された skill と agents、`~/.claude/rules/ai-collaboration.md`、manifest 外の skill（private skill、Herdr、agmsg）、agmsg の `db`・`teams` のリンク、`~/.codex/config.toml` と `~/.claude/settings.json` が変わっていないこと
+- B6. 確かめる: 配布された skill と agents、`~/.claude/rules/ai-collaboration.md`、manifest 外の skill（private skill、Herdr、agmsg）、agmsg の `db`・`teams` のリンク、`~/.codex/config.toml` と `~/.claude/settings.json` が変わっていないこと。OpenCode は `~/.config/opencode/AGENTS.md`（無ければ `~/.claude/CLAUDE.md`）を読み、切り替えのあとは両方とも無いので、`mise run native:opencode` でガイドを置く（手書きの `AGENTS.md` は上書きしない。native の HOME でも `apply` と違って拒否されない）
 - B7. 問題があれば `mise run native:migrate-rollback -- --real-home --stamp <UTC>`。移したあとの root は `<root>.native-<UTC>` に残る。問題がなければ、`<root>.bak-<UTC>` と `<root>.native-<UTC>` は手で消すまで残る
 
 ### 切り替えたあとの更新

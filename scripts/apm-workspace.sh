@@ -886,6 +886,12 @@ sync_opencode_instructions() {
   esac
 }
 
+# Writes only the OpenCode guide, so it is not refused on a native HOME where apply is.
+cmd_sync_opencode() {
+  require_command git
+  sync_opencode_instructions
+}
+
 # A root the legacy sync copied stays in place until migrate:roots moves it; until then it shadows the APM output.
 warn_pending_root_migration() {
   [ -f "$(tracked_catalog_instructions_path)" ] || return 0
@@ -3520,6 +3526,7 @@ Commands:
   setup:mcp:host     Configure host-local MCP servers for Codex and Claude
   apply              Offline deploy user-scope-compatible dependencies and compile user-scope root contexts
   migrate:roots      Preview moving legacy root copies (CLAUDE.md / AGENTS.md) to <name>.<UTC>.bak; --apply moves them
+  sync:opencode      Write only ~/.config/opencode/AGENTS.md (the catalog guide); allowed on a native HOME
   check:roots        Fail when ~/.claude/CLAUDE.md is still the legacy catalog copy, or the old path must not write this HOME (run before any apm install -g)
   apply:skills:local Quick-sync local catalog and private skills into ~/.agents/skills; private skills also link into ~/.claude/skills
   refresh            Refresh the checkout and dependencies only; does not deploy
@@ -3584,6 +3591,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     apply) cmd_apply ;;
     migrate:roots) cmd_migrate_roots "$@" ;;
     check:roots) assert_user_roots_migrated ;;
+    sync:opencode) cmd_sync_opencode ;;
     apply:skills:local) cmd_sync_local_skills "$@" ;;
     refresh) cmd_update ;;
     install-pins) cmd_install_pins ;;

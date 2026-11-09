@@ -201,6 +201,11 @@ skill_ids() {
   done
 }
 
+# The guide as the script writes it into a root, taken from the script's own function.
+catalog_guide_body() {
+  APM_WORKSPACE_DIR="$REPO_ROOT" /bin/bash -c '. "$1" && catalog_instructions_body "$(tracked_catalog_instructions_path)"' _ "$REPO_ROOT/scripts/apm-workspace.sh"
+}
+
 seed_sentinels() {
   local home="$1"
   mkdir -p "$home/.claude/skills/private-copy" "$home/.agents/skills/herdr-automations" "$home/.codex" \
@@ -1138,13 +1143,40 @@ prepare_migrate() {
   home="$(new_home roots-apply)"
   mkdir -p "$home/.claude"
   # The current guide body is always one of the blobs the script recognises as a legacy copy, so no git history is needed.
-  APM_WORKSPACE_DIR="$REPO_ROOT" /bin/bash -c '. "$1" && catalog_instructions_body "$(tracked_catalog_instructions_path)"' _ "$REPO_ROOT/scripts/apm-workspace.sh" >"$home/.claude/CLAUDE.md"
+  catalog_guide_body >"$home/.claude/CLAUDE.md"
   [ -s "$home/.claude/CLAUDE.md" ]
   run fixture_exec "$home" /usr/bin/env APM_WORKSPACE_DIR="$REPO_ROOT" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" migrate:roots --apply
   [ "$status" -eq 0 ]
   [[ "$output" == *"Moved $home/.claude/CLAUDE.md"* ]]
   [ ! -e "$home/.claude/CLAUDE.md" ]
   [ ! -e "$home/.apm" ]
+}
+
+# A HOME whose ~/.apm is a native consumer: apm.yml rendered by native.sh, no checkout.
+seed_native_consumer_home() {
+  mkdir -p "$1/.apm"
+  printf '# Rendered by scripts/native.sh from apm.yml with this repository pinned at %s. Do not edit; re-render.\n' "$SOURCE_SHA" >"$1/.apm/apm.yml"
+}
+
+@test "sync:opencode writes the OpenCode guide on a native HOME, leaves a hand-written one alone, while apply stays refused" {
+  local home
+  home="$(new_home opencode-sync)"
+  seed_native_consumer_home "$home"
+
+  run fixture_exec "$home" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" apply
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"so apply is refused"* ]]
+  [ ! -e "$home/.config/opencode/AGENTS.md" ]
+
+  run fixture_exec "$home" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" sync:opencode
+  [ "$status" -eq 0 ]
+  [ "$(cat "$home/.config/opencode/AGENTS.md")" = "$(catalog_guide_body)" ]
+  [ "$(cd "$home" && find . -type f | LC_ALL=C sort)" = "$(printf './.apm/apm.yml\n./.cache/apm/last_version_check\n./.config/opencode/AGENTS.md')" ]
+
+  echo "my own opencode guide" >"$home/.config/opencode/AGENTS.md"
+  run fixture_exec "$home" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" sync:opencode
+  [ "$status" -eq 0 ]
+  [ "$(cat "$home/.config/opencode/AGENTS.md")" = "my own opencode guide" ]
 }
 
 @test "migrate --real-home stops before writing when .cache/apm, Library/Caches/apm or .claude/commands holds a broken link" {
