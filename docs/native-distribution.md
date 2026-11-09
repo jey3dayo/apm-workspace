@@ -119,6 +119,8 @@ rollback（自動も `native:migrate-rollback` も）が戻すのは 4 つの ro
 4. 旧 `~/.apm` を `~/.apm.checkout-<UTC>` へ移す。`<HOME>/.apm` は新しい consumer の状態（`apm.yml`・`apm.lock.yaml`・`apm_modules`・`deployment-receipts`）だけになり、`migrate` が作る
 5. 戻すときは逆: `migrate-rollback` で root を戻し、consumer の `~/.apm` を `~/.apm.consumer-<UTC>` のような別名へ移して、`~/.apm.checkout-<UTC>` を `~/.apm` に戻す。clone した checkout は消さない。`mise.toml` と `config.workstation.toml` の更新も戻す
 
+2026-11-09 の時点で、実 HOME の `~/.cache/apm/git/checkouts_v1` には上流の切れた symlink がある。そのため `migrate --real-home` の前に `~/.cache/apm` を `~/.cache/apm.native-aside-<UTC>` へ移す（キャッシュなので、install が作り直す）。
+
 `~/.cache/apm` を退避したときの戻し方: 作り直された `~/.cache/apm` を新しい名前（`apm.native-regen-<UTC>` など）へ移し、退避したもの（`apm.native-aside-<UTC>`）を `~/.cache/apm` に戻す。どちらも消さない。2026-11-09 の実 HOME の apply が `.cache/apm` の中の上流の symlink（同じ checkout の中で切れた相対リンクや、上流の絶対パスのリンク）で止まったことは、キャッシュの扱いを直すべき問題として残している。`migrate --real-home` も `.cache/apm` を検査するので、同じリンクがあれば何も書かずに止まる
 
 ## 退役の境界
@@ -135,7 +137,7 @@ rollback（自動も `native:migrate-rollback` も）が戻すのは 4 つの ro
 2. `mise run native:plan -- --source-ref <merge 済みの SHA>` で manifest と手順を確かめる。package の pin は merge 済みの commit にする
 3. `mise run native:backup -- --real-home --backup-dir <新しいディレクトリ>`
 4. `mise run native:rehearse -- --real-home --backup-dir <同じディレクトリ> --source-ref <同じ SHA> --migrate`。成功で終わり、`result.txt` が `mode=migrate`・`lost=0`・`baseline_skips=0` で、`allowed-lost.txt` が `.apm-pin` だけであることを確かめる
-5. `mise run native:migrate -- --real-home --source-ref <同じ SHA> --rehearsal <backup>/rehearsal-<UTC>.<suffix>`。表示された stamp を控える
+5. `~/.cache/apm` を `~/.cache/apm.native-aside-<UTC>` へ移し（上の「実 HOME の checkout の移設」の最後の段落）、`mise run native:migrate -- --real-home --source-ref <同じ SHA> --rehearsal <backup>/rehearsal-<UTC>.<suffix>`。表示された stamp を控える
 6. 確かめる: 配布された skill と agents、`~/.claude/rules/ai-collaboration.md`、manifest 外の skill（private skill、Herdr、agmsg）、agmsg の `db`・`teams` のリンク、`~/.codex/config.toml` と `~/.claude/settings.json` が変わっていないこと
 7. 問題があれば `mise run native:migrate-rollback -- --real-home --stamp <UTC>`。移したあとの root は `<root>.native-<UTC>` に残る。問題がなければ、`<root>.bak-<UTC>` と `<root>.native-<UTC>` は手で消すまで残る
 
