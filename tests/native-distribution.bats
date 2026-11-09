@@ -394,3 +394,54 @@ sentinel_snapshot() {
   [ ! -e "$FX/leak/apply-config" ]
   [ -f "$home/.claude/skills/ship/SKILL.md" ]
 }
+
+@test "apply refuses hard-linked write targets and a temp_dir override, and leaves the linked file alone" {
+  local home outside="$FX/outside-hardlink"
+  mkdir -p "$outside"
+  printf 'real manifest\n' >"$outside/apm.yml"
+  home="$(new_home hardlink)"
+  mkdir -p "$home/.apm"
+  ln "$outside/apm.yml" "$home/.apm/apm.yml"
+  run apply_workspace "$home"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$home/.apm/apm.yml (hard link)"* ]]
+  [ "$(cat "$outside/apm.yml")" = "real manifest" ]
+
+  home="$(new_home temp-dir-config)"
+  mkdir -p "$home/.apm"
+  printf '{"temp_dir": "%s"}\n' "$outside" >"$home/.apm/config.json"
+  run apply_workspace "$home"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"sets temp_dir"* ]]
+  [ ! -e "$home/.apm/apm.yml" ]
+}
+
+@test "apm sees only the allowlisted environment, with TMPDIR inside the HOME" {
+  local home stub="$FX/stub-apm"
+  home="$(new_home env-stub)"
+  printf '#!/bin/sh\nenv >>"$HOME/apm-env.log"\n' >"$stub"
+  chmod +x "$stub"
+  fixture_exec "$home" /usr/bin/env APM_BIN="$stub" TMPDIR="$FX/caller-tmp" APM_CACHE_DIR="$FX/caller-cache" \
+    XDG_STATE_HOME="$FX/caller-state" GITHUB_TOKEN=fixture-token /bin/bash "$REPO_ROOT/scripts/native.sh" \
+    apply --home "$home" --source-ref "$SOURCE_SHA" --workspace-only
+  # One block per apm call (install, compile).
+  [ "$(grep -c '^HOME=' "$home/apm-env.log")" -eq 2 ]
+  [ "$(grep -c "^TMPDIR=$home/.cache/apm-native-tmp\$" "$home/apm-env.log")" -eq 2 ]
+  [ "$(grep -cE '^(APM_CACHE_DIR|XDG_STATE_HOME|GITHUB_TOKEN)=' "$home/apm-env.log")" -eq 0 ]
+}
+
+@test "a lone carriage return inserted into a compiled root counts as an edit, as it does for APM" {
+  local home
+  home="$(new_home edited-cr)"
+  apply_workspace "$home"
+  python3 - "$home/.codex/AGENTS.md" <<'PY'
+import sys
+p = sys.argv[1]
+data = open(p, "rb").read()
+i = data.index(b"# AI")
+open(p, "wb").write(data[: i + 4] + b"\r" + data[i + 4 :])
+PY
+  run apply_workspace "$home"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *".codex/AGENTS.md"* ]]
+}

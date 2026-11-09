@@ -15,8 +15,9 @@
 - 配布と更新を分ける: apply は pin を自分で動かさない。新しい commit を配るときは、`--source-ref` に新しい SHA を渡して実行し直す。外部の依存の pin は、今と同じく root の `apm.yml` で上げる
 - 生成した root（`~/.claude/CLAUDE.md`・`~/.codex/AGENTS.md`・`~/.cursor/AGENTS.md`）が APM の目印を残したまま compile のあとに編集されていたら、何も書かずに止まる。APM の目印は編集を守らず、compile が上書きするため
 - `<HOME>/.apm/apm.yml` が描画した manifest と違えば、`apm.yml.<UTC>.bak` に残してから置き換える（同じ名前があれば番号を付け、既存の `.bak` を上書きしない）
-- HOME の 2 階層目までの symlink と、この repo の package が配る名前（`.claude/skills/<id>` など）の symlink が HOME の外を指していれば、何も書かずに止まる。apm がリンクを通して HOME の外へ書くため。外部の依存が配る名前は検査していない
-- apm は空の環境に `HOME`・`PATH`・`TMPDIR`・ロケール・git の設定の場所だけを渡して起動する。APM は `APM_CACHE_DIR` や `XDG_*` が指す場所にも書き（テストで確かめた）、git は token・proxy・askpass を環境から読むため
+- HOME の 2 階層目までの symlink と、この repo の package が配る名前（`.claude/skills/<id>` など）の symlink が HOME の外を指しているか、同じ範囲の通常のファイルがハードリンクなら、何も書かずに止まる。apm がリンクを通して HOME の外のファイルを書き換えるため。外部の依存が配る名前は検査していない。`<HOME>/.apm/config.json` が `temp_dir` を指定しているときも止まる
+- apm は空の環境に `HOME`・`PATH`・ロケール・git の設定の場所と、HOME の中の `TMPDIR`（`.cache/apm-native-tmp`）だけを渡して起動する。APM は `APM_CACHE_DIR` や `XDG_*`、`TMPDIR` が指す場所にも書き（`APM_CACHE_DIR` と `XDG_CACHE_HOME` はテストで確かめた）、git は token・proxy・askpass を環境から読むため
+- manifest は同じディレクトリの新しいファイルに書いてから名前を置き換える
 
 ## 旧経路と新経路
 

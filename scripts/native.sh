@@ -114,9 +114,14 @@ assert_disposable_home() {
   printf '%s\n' "$dir"
 }
 
+# APM reads a root with Python's splitlines(): CRLF and a lone CR both end a line.
+root_lines() {
+  awk '{ sub(/\r$/, ""); gsub(/\r/, "\n"); print }' "$1"
+}
+
 has_marker() {
   local first
-  first="$(LC_ALL=C sed -n '/[^[:space:]]/{p;q;}' "$1" | tr -d '\r')"
+  first="$(root_lines "$1" | LC_ALL=C sed -n '/[^[:space:]]/{p;q;}')"
   [ "${first#"$GENERATED_ROOT_MARKER"}" != "$first" ]
 }
 
@@ -124,9 +129,9 @@ has_marker() {
 # "\n". Any edit after compile breaks the match.
 has_valid_build_id() {
   local pattern='^<!-- Build ID: [0-9a-f]{12} -->$' recorded computed
-  recorded="$(tr -d '\r' <"$1" | grep -E "$pattern" | sed -E 's/^<!-- Build ID: ([0-9a-f]{12}) -->$/\1/')"
+  recorded="$(root_lines "$1" | grep -E "$pattern" | sed -E 's/^<!-- Build ID: ([0-9a-f]{12}) -->$/\1/')"
   [ "$(printf '%s\n' "$recorded" | grep -c .)" = 1 ] || return 1
-  computed="$(tr -d '\r' <"$1" | grep -vE "$pattern" | awk '{ if (n++) printf "\n"; printf "%s", $0 }' | sha256 | cut -c1-12)"
+  computed="$(root_lines "$1" | grep -vE "$pattern" | awk '{ if (n++) printf "\n"; printf "%s", $0 }' | sha256 | cut -c1-12)"
   [ "$recorded" = "$computed" ]
 }
 
@@ -174,10 +179,10 @@ cmd_plan() {
   cat <<EOF
 
 # apply --home <disposable HOME> --source-ref $sha would run, with HOME=<that HOME>:
-#   1. stop if an APM-generated root there was edited after compile ($COMPILED_ROOTS), or if a link apm could
-#      write through leads outside that HOME
+#   1. stop if an APM-generated root there was edited after compile ($COMPILED_ROOTS), if a symlink or hard link
+#      apm could write through reaches outside that HOME, or if <HOME>/.apm/config.json sets temp_dir
 #   2. keep a differing <HOME>/.apm/apm.yml as apm.yml.<UTC>.bak, then write the manifest above
-#   3. apm install -g, from an empty environment plus HOME, PATH, TMPDIR, locale and git config locations
+#   3. apm install -g, from an empty environment plus HOME, PATH, locale, git config locations and a TMPDIR in HOME
 #   4. apm compile -g --clean, the same way
 # Not deployed by APM, and left to the manual steps in docs/native-distribution.md: agmsg db/teams links,
 # catalog/rules and catalog/claude/rules, private skills, OpenCode and Pi instructions, host-local MCP.
@@ -189,7 +194,7 @@ cmd_apply() {
   parse_options "$@"
   [ -n "$HOME_DIR" ] || fail "apply needs --home <disposable HOME>; it never defaults to the real HOME"
   [ -n "$SOURCE_REF" ] || fail "apply needs --source-ref; deploying never moves a pin on its own"
-  local home sha manifest edited links stamp bak n
+  local home sha manifest edited links stamp bak n tmp
   home="$(assert_disposable_home "$HOME_DIR")"
   sha="$(resolve_source_sha "$SOURCE_REF")"
   edited="$(edited_generated_roots "$home")"
@@ -197,10 +202,13 @@ cmd_apply() {
 $edited
 Delete the marker line to keep the file as hand-written, or move it aside, then re-run."
 
-  links="$(escaping_links "$home")"
-  [ -z "$links" ] || fail "these links inside $home lead outside it, so apm would write through them:
+  links="$(escaping_links "$home")$(hardlinked_targets "$home")"
+  [ -z "$links" ] || fail "these entries inside $home may share their data with files outside it, so writing them would change those files:
 $links
-Use a HOME whose write targets are plain directories and files inside it."
+Use a HOME whose write targets are plain directories and files of its own."
+  if [ -f "$home/.apm/config.json" ] && grep -q '"temp_dir"' "$home/.apm/config.json"; then
+    fail "$home/.apm/config.json sets temp_dir, which apm would use instead of a directory inside $home"
+  fi
 
   manifest="$(render_manifest "$sha" "$WORKSPACE_ONLY")"
   mkdir -p "$home/.apm"
@@ -215,18 +223,23 @@ Use a HOME whose write targets are plain directories and files inside it."
     cp -p "$home/.apm/apm.yml" "$bak"
     log "kept the previous manifest as $bak"
   fi
-  printf '%s\n' "$manifest" >"$home/.apm/apm.yml"
+  # A new file renamed into place, so a hard link at apm.yml keeps the other file's contents.
+  tmp="$(mktemp "$home/.apm/.apm.yml.XXXXXX")"
+  printf '%s\n' "$manifest" >"$tmp"
+  mv -f "$tmp" "$home/.apm/apm.yml"
 
   run_apm "$home" install -g
   run_apm "$home" compile -g --clean
 }
 
-# APM picks cache and config locations from more than HOME (APM_CACHE_DIR, XDG_*), and git honours tokens, proxies
-# and askpass from the environment, so apm starts from an empty environment plus this allowlist.
+# APM picks cache, config and temp locations from more than HOME (APM_CACHE_DIR, XDG_*, TMPDIR), and git honours
+# tokens, proxies and askpass from the environment, so apm starts from an empty environment plus this allowlist, with
+# its temp directory inside HOME.
 run_apm() {
   local home="$1" var
   shift
-  local env_args=(HOME="$home" PATH="$PATH" TMPDIR="${TMPDIR:-/tmp}" LANG="${LANG:-C.UTF-8}")
+  mkdir -p "$home/.cache/apm-native-tmp"
+  local env_args=(HOME="$home" PATH="$PATH" TMPDIR="$home/.cache/apm-native-tmp" LANG="${LANG:-C.UTF-8}")
   for var in LC_ALL TERM PYTHONUTF8 GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM GIT_CEILING_DIRECTORIES; do
     if [ -n "${!var:-}" ]; then env_args+=("$var=${!var}"); fi
   done
@@ -252,6 +265,17 @@ escaping_links() {
       *) printf '  %s -> %s\n' "$link" "$target" ;;
     esac
   done
+}
+
+# Regular files with more than one hard link among the same write targets escaping_links checks.
+hardlinked_targets() {
+  local home="$1" entry
+  {
+    find "$home" -mindepth 1 -maxdepth 2 -type f -links +1
+    deployed_entries | while IFS= read -r entry; do
+      if [ -e "$home/$entry" ] && [ ! -L "$home/$entry" ]; then find "$home/$entry" -type f -links +1; fi
+    done
+  } | LC_ALL=C sort -u | sed 's/^/  /; s/$/ (hard link)/'
 }
 
 deployed_entries() {
