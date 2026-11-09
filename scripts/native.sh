@@ -29,9 +29,6 @@ REAL_HOME_TOOL_DIRS=".agents .claude .codex .cursor .cache Library Library/Cache
 # attempted): <manifest path>=<git repository>:<skill>. render turns `- <manifest path>#<40-hex SHA>` into
 # `- git: <repository> / ref: <SHA> / skills: [<skill>]`.
 EXTERNAL_PACKAGE_MAP="nanaism/yomiyasu/skills/yomiyasu=nanaism/yomiyasu:yomiyasu"
-# Packages render leaves out of the consumer manifest: a repo-root package that apm deploys as the whole upstream
-# repository, which Codex then lists as a plugin skill. migrate's reinstate keeps the old entry from the moved-aside roots.
-EXCLUDED_EXTERNAL_PACKAGES="browser-use/browser-harness"
 # Packages whose bin/ the old path deployed and that apm may deploy too. render lists them under the deprecated
 # allowExecutables key, the only spelling apm 0.35.0 reads from <HOME>/.apm/apm.yml at user scope
 # (docs/native-distribution.md). The apm.yml entry is <owner>/<repo>[/<path>]#<ref>; apm looks the approval up as
@@ -100,7 +97,7 @@ resolve_source_sha() {
 }
 
 # Rewrites the two floating workspace refs (catalog#main, manual-skills#main) into SHA pins, and the packages in
-# EXTERNAL_PACKAGE_MAP into the structured form, drops EXCLUDED_EXTERNAL_PACKAGES, and appends allowExecutables for
+# EXTERNAL_PACKAGE_MAP into the structured form, and appends allowExecutables for
 # EXECUTABLE_ALLOW_PACKAGES. The other external dependencies are already pinned in apm.yml and pass through unchanged.
 # A mapped or allowed package missing from apm.yml fails the render, so a rename there is not skipped silently.
 render_manifest() {
@@ -108,7 +105,7 @@ render_manifest() {
   [ -f "$ROOT_MANIFEST" ] || fail "missing $ROOT_MANIFEST"
   printf '# Rendered by scripts/native.sh from apm.yml with this repository pinned at %s. Do not edit; re-render.\n' "$sha"
   printf '# native-render: workspace_only=%s\n' "$workspace_only"
-  awk -v sha="$sha" -v url="$SOURCE_URL" -v only="$workspace_only" -v map="$EXTERNAL_PACKAGE_MAP" -v excluded="$EXCLUDED_EXTERNAL_PACKAGES" -v allow="$EXECUTABLE_ALLOW_PACKAGES" '
+  awk -v sha="$sha" -v url="$SOURCE_URL" -v only="$workspace_only" -v map="$EXTERNAL_PACKAGE_MAP" -v allow="$EXECUTABLE_ALLOW_PACKAGES" '
     function convert(   i, prefix, rest, pin) {
       for (i = 1; i <= n; i++) {
         prefix = "    - " key[i] "#"
@@ -125,7 +122,6 @@ render_manifest() {
     }
     BEGIN {
       na = split(allow, allowed, " ")
-      nx = split(excluded, drop, " ")
       n = split(map, entries, " ")
       for (i = 1; i <= n; i++) {
         split(entries[i], kv, "=")
@@ -143,7 +139,6 @@ render_manifest() {
       pinned[pkg]++
       next
     }
-    !only { for (i = 1; i <= nx; i++) if (index($0, "    - " drop[i] "#") == 1) next }
     !only && convert() { next }
     !only { for (i = 1; i <= na; i++) if (index($0, "    - " allowed[i] "#") == 1) allowed_seen[i]++ }
     only && section == "dependencies" && group == "mcp:" { next }
@@ -404,6 +399,7 @@ cmd_backup() {
     fi
   done
   if [ -d "$home/.local/state/agmsg" ]; then clone_copy "$home/.local/state/agmsg" "$dir/agmsg-state"; fi
+  home_state_lines "$home" >"$dir/home-state.txt"
   printf 'home=%s\ncreated=%s\n' "$home" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >"$dir/complete"
   log "backed up $(wc -l <"$dir/present.txt" | tr -d ' ') paths of $home into $dir"
 }
@@ -418,6 +414,9 @@ assert_completed_backup() {
   [ -n "$BACKUP_DIR" ] || fail "rehearse needs --backup-dir <a completed backup of this HOME>; run backup first"
   [ -f "$BACKUP_DIR/complete" ] || fail "$BACKUP_DIR is not a completed backup"
   grep -qxF "home=$home" "$BACKUP_DIR/complete" || fail "$BACKUP_DIR is a backup of another HOME"
+  [ -f "$BACKUP_DIR/home-state.txt" ] || fail "$BACKUP_DIR does not record the state of the HOME (a backup of an older format); take a new backup with backup, then re-run"
+  [ "$(cat "$BACKUP_DIR/home-state.txt")" = "$(home_state_lines "$home")" ] ||
+    fail "$BACKUP_DIR was taken when the HOME was in another state ($(tr '\n' ' ' <"$BACKUP_DIR/home-state.txt")), and it is now $(home_state_lines "$home" | tr '\n' ' '); the clone would not show what migrate does. Take a new backup, then re-run"
 }
 
 # agmsg-state.sh restores the links under the default store (it runs without XDG_STATE_HOME), so a db or teams link that
@@ -802,7 +801,6 @@ cmd_rehearse() {
   [ -n "$SOURCE_REF" ] || fail "rehearse needs --source-ref"
   local home sha dir rehearsal scratch path manifest shared lost stamp escaping mode=plain
   local install_status=0 compile_status=skipped agmsg_status=0 linked=0 reinstate_status=skipped allowed_lost=0 baseline_skips=0 dropped=0
-  local home_state
   home="$(target_home rehearse)"
   assert_default_apm_config "$home"
   assert_no_home_manifest "$home"
@@ -812,7 +810,6 @@ cmd_rehearse() {
 $escaping"
   assert_default_agmsg_store "$home"
   if [ "$MIGRATE" = 1 ]; then assert_same_render_mode "$home"; fi
-  home_state="$(home_state_lines "$home")"
   sha="$(resolve_source_sha "$SOURCE_REF")"
   dir="$(cd "$BACKUP_DIR" && pwd -P)"
   rehearsal="$(mktemp -d "$dir/rehearsal-$(date -u +%Y%m%dT%H%M%SZ).XXXXXX")"
@@ -885,7 +882,7 @@ $shared"
     : >"$rehearsal/dropped.txt"
   fi
   printf 'mode=%s\nhome=%s\nsource_ref=%s\nworkspace_only=%s\ninstall_status=%s\ncompile_status=%s\nreinstate_status=%s\nagmsg_status=%s\nlost=%s\nallowed_lost=%s\ndropped=%s\nbaseline_skips=%s\n%s\n' \
-    "$mode" "$home" "$sha" "$WORKSPACE_ONLY" "$install_status" "$compile_status" "$reinstate_status" "$agmsg_status" "$lost" "$allowed_lost" "$dropped" "$baseline_skips" "$home_state" \
+    "$mode" "$home" "$sha" "$WORKSPACE_ONLY" "$install_status" "$compile_status" "$reinstate_status" "$agmsg_status" "$lost" "$allowed_lost" "$dropped" "$baseline_skips" "$(cat "$dir/home-state.txt")" \
     >"$rehearsal/result.txt"
 
   if [ "$install_status" = 0 ] && [ "$compile_status" = 0 ] && [ "$agmsg_status" = 0 ] && [ "$lost" = 0 ] &&

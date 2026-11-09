@@ -201,6 +201,11 @@ skill_ids() {
   done
 }
 
+# The guide as the script writes it into a root, taken from the script's own function.
+catalog_guide_body() {
+  APM_WORKSPACE_DIR="$REPO_ROOT" /bin/bash -c '. "$1" && catalog_instructions_body "$(tracked_catalog_instructions_path)"' _ "$REPO_ROOT/scripts/apm-workspace.sh"
+}
+
 seed_sentinels() {
   local home="$1"
   mkdir -p "$home/.claude/skills/private-copy" "$home/.agents/skills/herdr-automations" "$home/.codex" \
@@ -248,9 +253,10 @@ sentinel_snapshot() {
   [ -n "$yomiyasu_sha" ]
   [ "$(grep -c 'nanaism/yomiyasu/skills/yomiyasu' <<<"$rendered")" -eq 0 ]
 
-  # browser-harness is a repo-root package that apm deploys as the whole upstream repository (a Codex plugin skill).
+  # browser-harness is pinned in the virtual-subdirectory form, which apm deploys as the one skill (the repo-root form
+  # deploys the whole upstream repository as a Codex plugin skill); render passes the line through unchanged.
   [ "$(grep -c 'browser-use/browser-harness' "$REPO_ROOT/apm.yml")" -eq 1 ]
-  [ "$(grep -c 'browser-harness' <<<"$rendered")" -eq 0 ]
+  [ "$(grep -E '^    - browser-use/browser-harness/skills/browser-harness#[0-9a-f]{40}( |$)' "$REPO_ROOT/apm.yml")" = "$(grep 'browser-use/browser-harness' <<<"$rendered")" ]
   [ "$(grep -A3 '^    - git: nanaism/yomiyasu$' <<<"$rendered")" = "$(printf '    - git: nanaism/yomiyasu\n      ref: %s\n      skills:\n        - yomiyasu' "$yomiyasu_sha")" ]
 
   # The deprecated allowExecutables key, for the two packages whose bin/ the old path deployed, and nothing else.
@@ -260,7 +266,7 @@ sentinel_snapshot() {
   [ "$(sed -n 2p <<<"$rendered")" = "# native-render: workspace_only=0" ]
 
   # Everything else in apm.yml passes through line for line.
-  diff <(grep -vE 'jey3dayo/apm-workspace/(catalog|manual-skills)#main|nanaism/yomiyasu/skills/yomiyasu#|browser-use/browser-harness#' "$REPO_ROOT/apm.yml") \
+  diff <(grep -vE 'jey3dayo/apm-workspace/(catalog|manual-skills)#main|nanaism/yomiyasu/skills/yomiyasu#' "$REPO_ROOT/apm.yml") \
     <(sed 1,2d <<<"$rendered" | sed '/^allowExecutables:/,$d' | sed '/^    - git: nanaism\/yomiyasu$/,+3d' |
       grep -vE "^    - git: $FIXTURE_URL\$|^      path: (catalog|manual-skills)\$|^      ref: $SOURCE_SHA\$")
 
@@ -621,6 +627,51 @@ seed_agmsg() {
   grep -qxF "compile_status=0" "$result"
   [ "$(backed_up_snapshot "$home")" = "$before" ]
   [ "$(readlink "$home/.agents/skills/agmsg/db")" = "$home/.local/state/agmsg/db" ]
+}
+
+@test "backup records the state of the HOME, and rehearse copies it into result.txt as the expected state" {
+  local home backup="$FX/backups/state-recorded" result
+  home="$(new_home state-recorded)"
+  seed_sentinels "$home"
+  mkdir -p "$home/.apm"
+  : >"$home/.apm/apm.lock.yaml"
+  real_native "$home" backup --real-home --backup-dir "$backup"
+  [ "$(cat "$backup/home-state.txt")" = "$(printf 'previous_lock=present\nhome_apm=consumer')" ]
+
+  printf '#!/bin/sh\nexit 0\n' >"$FX/stub-apm-noop-state"
+  chmod +x "$FX/stub-apm-noop-state"
+  real_native_with_stub "$home" "$FX/stub-apm-noop-state" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  result="$(compgen -G "$backup/rehearsal-*/result.txt")"
+  grep -qxF "previous_lock=present" "$result"
+  grep -qxF "home_apm=consumer" "$result"
+}
+
+@test "rehearse fails when the HOME changed state after the backup, and when the backup records no state" {
+  local home backup="$FX/backups/state-differs"
+  home="$(new_home state-differs)"
+  seed_sentinels "$home"
+  mkdir -p "$home/.apm/catalog"
+  real_native "$home" backup --real-home --backup-dir "$backup"
+  grep -qxF "home_apm=checkout" "$backup/home-state.txt"
+
+  rm -rf "$home/.apm/catalog"
+  run real_native "$home" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"another state"* ]]
+  [[ "$output" == *"home_apm=checkout"* ]]
+  [ -z "$(compgen -G "$backup/rehearsal-*" || true)" ]
+
+  mkdir -p "$home/.apm/catalog"
+  : >"$home/.apm/apm.lock.yaml"
+  run real_native "$home" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"previous_lock=absent"* ]]
+
+  rm -f "$backup/home-state.txt"
+  run real_native "$home" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"older format"* ]]
+  [[ "$output" == *"take a new backup"* ]]
 }
 
 @test "a rehearsal that loses a deployed file fails, lists it and leaves the HOME alone" {
@@ -1088,17 +1139,44 @@ prepare_migrate() {
 }
 
 @test "migrate:roots --apply runs from a new checkout on a HOME without ~/.apm, and moves the legacy guide aside" {
-  local home legacy
+  local home
   home="$(new_home roots-apply)"
   mkdir -p "$home/.claude"
-  legacy="$(git -C "$REPO_ROOT" log --all --format= --raw --no-abbrev -- catalog/AGENTS.md | awk '{ print $3 }' | head -n 1)"
-  [ -n "$legacy" ] || skip "no legacy catalog guide in the history of this checkout"
-  git -C "$REPO_ROOT" cat-file blob "$legacy" >"$home/.claude/CLAUDE.md"
+  # The current guide body is always one of the blobs the script recognises as a legacy copy, so no git history is needed.
+  catalog_guide_body >"$home/.claude/CLAUDE.md"
+  [ -s "$home/.claude/CLAUDE.md" ]
   run fixture_exec "$home" /usr/bin/env APM_WORKSPACE_DIR="$REPO_ROOT" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" migrate:roots --apply
   [ "$status" -eq 0 ]
   [[ "$output" == *"Moved $home/.claude/CLAUDE.md"* ]]
   [ ! -e "$home/.claude/CLAUDE.md" ]
   [ ! -e "$home/.apm" ]
+}
+
+# A HOME whose ~/.apm is a native consumer: apm.yml rendered by native.sh, no checkout.
+seed_native_consumer_home() {
+  mkdir -p "$1/.apm"
+  printf '# Rendered by scripts/native.sh from apm.yml with this repository pinned at %s. Do not edit; re-render.\n' "$SOURCE_SHA" >"$1/.apm/apm.yml"
+}
+
+@test "sync:opencode writes the OpenCode guide on a native HOME, leaves a hand-written one alone, while apply stays refused" {
+  local home
+  home="$(new_home opencode-sync)"
+  seed_native_consumer_home "$home"
+
+  run fixture_exec "$home" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" apply
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"so apply is refused"* ]]
+  [ ! -e "$home/.config/opencode/AGENTS.md" ]
+
+  run fixture_exec "$home" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" sync:opencode
+  [ "$status" -eq 0 ]
+  [ "$(cat "$home/.config/opencode/AGENTS.md")" = "$(catalog_guide_body)" ]
+  [ "$(cd "$home" && find . -type f | LC_ALL=C sort)" = "$(printf './.apm/apm.yml\n./.cache/apm/last_version_check\n./.config/opencode/AGENTS.md')" ]
+
+  echo "my own opencode guide" >"$home/.config/opencode/AGENTS.md"
+  run fixture_exec "$home" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" sync:opencode
+  [ "$status" -eq 0 ]
+  [ "$(cat "$home/.config/opencode/AGENTS.md")" = "my own opencode guide" ]
 }
 
 @test "migrate --real-home stops before writing when .cache/apm, Library/Caches/apm or .claude/commands holds a broken link" {

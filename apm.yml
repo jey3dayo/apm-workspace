@@ -70,7 +70,7 @@ dependencies:
         - ui-ux-pro-max
 
     # --- browser / analysis ---
-    - browser-use/browser-harness#dbf0e4f3a37ebc31aaeaf9d378ab1760b5776c15
+    - browser-use/browser-harness/skills/browser-harness#dbf0e4f3a37ebc31aaeaf9d378ab1760b5776c15
     - jackwener/opencli/skills/opencli-usage#9bc5f5ca132ec4d4e48d7ee517d4303bf159e8e8 # v2.0.3
     - jackwener/opencli/skills/opencli-browser#9bc5f5ca132ec4d4e48d7ee517d4303bf159e8e8 # v2.0.3
     - openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431
