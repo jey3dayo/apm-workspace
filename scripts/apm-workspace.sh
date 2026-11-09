@@ -3533,7 +3533,32 @@ Environment overrides:
 EOF
 }
 
+# A workspace whose apm.yml was rendered by scripts/native.sh is a consumer of the native path: apm owns its manifest and
+# lock, and the commands below would rewrite what native.sh deployed from a checkout that is not there.
+native_rendered_workspace() {
+  local first
+  first="$(head -n 1 "$WORKSPACE_DIR/apm.yml" 2>/dev/null || true)"
+  case "$first" in
+    "# Rendered by scripts/native.sh"*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+refuse_on_native_workspace() {
+  case "$COMMAND" in
+    apply | apply:skills:local | refresh | install-pins | repair:local-package-cache | pin-external | prune:cache | \
+      prepare:catalog | install:catalog | bundle-catalog | smoke:catalog) ;;
+    migrate:roots)
+      case " $* " in *" --apply "*) ;; *) return 0 ;; esac
+      ;;
+    *) return 0 ;;
+  esac
+  native_rendered_workspace || return 0
+  fail "$WORKSPACE_DIR/apm.yml was rendered by scripts/native.sh, so $COMMAND is refused: the old path would overwrite what the native path deployed. Use scripts/native.sh (docs/native-distribution.md)."
+}
+
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+  refuse_on_native_workspace "$@"
   case "$COMMAND" in
     setup:mcp:host) cmd_setup_host_mcp ;;
     apply) cmd_apply ;;
