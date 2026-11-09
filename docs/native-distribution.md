@@ -1,6 +1,6 @@
 # APM native の配布（mise 入口、first cut）
 
-- Status: 2026-11-09、APM 0.35.0。`apply` は使い捨ての HOME だけに配る。実 HOME とその祖先、その中の tool の状態（`.apm`・`.claude`・`.codex`・`.cursor`・`.agents`・`.config`・`.cache`・`.local`・`Library`）を、何も書く前に拒否する。`apply --real-home` は拒否する。実 HOME に書く入口は `migrate` だけで、`rehearse --migrate` が clean に終わった backup の複製があるときに限る（下の「実 HOME への切り替えの解き方」）。MCP・認証・permissions・settings は書き換えない（install は `--only apm`）
+- Status: 2026-11-09、APM 0.35.0。`apply` は使い捨ての HOME だけに配る。実 HOME とその祖先、その中の tool の状態（`.apm`・`.claude`・`.codex`・`.cursor`・`.agents`・`.config`・`.cache`・`.local`・`Library`）を、何も書く前に拒否する。`apply --real-home` は拒否する。実 HOME に書く入口は `migrate` と、その取り消しの `migrate-rollback`・`reinstate`（どれも `.bak-<UTC>` の記録を持つ root だけを動かし、何も消さない）で、`migrate` は `rehearse --migrate` が clean に終わった backup の複製があるときに限る（下の「実 HOME への切り替えの解き方」）。MCP・認証・permissions・settings は書き換えない（install は `--only apm`）
 - 今の位置づけ: 新しい HOME と使い捨ての HOME に配るための経路と、今の実 HOME（旧経路が配った状態）を退避してから切り替える `migrate`。切り替えの前に、authoring の checkout を `~/.apm` の外へ移す（下の「既知の問題」）
 - テスト: `tests/native-distribution.bats`（`mise run test:sh` に含まれる）。この checkout の `catalog/` と `manual-skills/` を fixture の git repo に入れ、実 APM で使い捨ての HOME へ配る。macOS では `sandbox-exec` が通信と fixture の外への書込みを拒否する。fixture の置き場所は `APM_NATIVE_FIXTURE_ROOT` で変えられる
 
@@ -17,7 +17,7 @@
 | `mise run native:migrate -- (--real-home \| --home <HOME>) --source-ref <SHA> --rehearsal <rehearsal-UTC> [--workspace-only]` | 実 HOME を切り替える。順序は下の「migrate の順序」。失敗したら自動で rollback して非 0 で終わる。成功すると UTC の stamp と rollback のコマンドを表示する                                                                                                                                                                                                                                                                                                                  |
 | `mise run native:migrate-rollback -- (--real-home \| --home <HOME>) --stamp <UTC>`                                            | 今の 4 つの root を `<root>.native-<UTC>` へ移し、`<root>.bak-<UTC>` を元の場所へ戻す。どちらも消さない。agmsg のリンクも戻す                                                                                                                                                                                                                                                                                                                                              |
 | `mise run native:reinstate -- (--real-home \| --home <HOME>) --stamp <UTC>`                                                   | `<root>.bak-<UTC>` の top-level の entry のうち、今の root に無いものだけを戻す（`migrate` の入れ直しを単独で呼ぶ）                                                                                                                                                                                                                                                                                                                                                        |
-| `mise run native:apply -- --real-home ...`                                                                                    | 拒否する。実 HOME に書くのは `migrate` だけ。何も書かない                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `mise run native:apply -- --real-home ...`                                                                                    | 拒否する。実 HOME に書くのは `migrate` と、その取り消しの `migrate-rollback`・`reinstate` だけ。何も書かない                                                                                                                                                                                                                                                                                                                                                               |
 
 - consumer の manifest は、root の `apm.yml` の `jey3dayo/apm-workspace/catalog#main` と `manual-skills#main` の 2 行を、指定した commit SHA への pin に書き換えたもの。`nanaism/yomiyasu/skills/yomiyasu#<SHA>` の 1 行は、構造化した形（`git: nanaism/yomiyasu` / `ref: <SHA>` / `skills: [yomiyasu]`）に書き換える。SHA は root の行から読み、対応表（`scripts/native.sh` の `EXTERNAL_PACKAGE_MAP`）の行が root に無ければ render は失敗する。そのほかの外部の依存と MCP はそのまま通す（外部の依存はもともと SHA で pin している）。root の `apm.yml` と `apm.lock.yaml` は変えない。`--workspace-only` を付けると、この repo の 2 package だけを残す（外部の依存ごと落ちるので、yomiyasu の変換も要らない）
 - 配布と更新を分ける: apply は pin を自分で動かさない。新しい commit を配るときは、`--source-ref` に新しい SHA を渡して実行し直す。外部の依存の pin は、今と同じく root の `apm.yml` で上げる
@@ -46,7 +46,7 @@ backup の対象（rehearse が複製に再現するもの）: `~/.apm/apm.yml`�
 
 ### 切り替えのあとの authoring checkout
 
-`scripts/apm-workspace.sh` は、`APM_WORKSPACE_DIR` が無いとき、`<HOME>/.apm` に `.git`（linked worktree ではファイル）か `catalog/` があればそれを、無ければこの repo の root（`REPO_ROOT`）を `$WORKSPACE_DIR` にする。切り替えの前は `<HOME>/.apm` が checkout なので挙動は変わらず、切り替えのあとは checkout の外から `validate`・`validate:catalog`・`smoke:catalog` がその checkout に対して動く。`.git` の検査は、worktree の `.git` ファイルも通す。PowerShell 版（`scripts/apm-workspace.ps1` の `$WorkspaceDir`）は今も `<HOME>/.apm` を既定にしているので、Windows で切り替えのあとに使うなら同じ既定へ揃える必要がある（Windows は対象外としているので、揃えていない）。
+`scripts/apm-workspace.sh` は、`APM_WORKSPACE_DIR` が無いとき、`<HOME>/.apm` に `.git`（linked worktree ではファイル）か `catalog/` があればそれを、無ければこの repo の root（`REPO_ROOT`）を `$WORKSPACE_DIR` にする。切り替えの前は `<HOME>/.apm` が checkout なので挙動は変わらず、切り替えのあとは checkout の外から `validate`・`validate:catalog`・`smoke:catalog` がその checkout に対して動く。`.git` の検査は、worktree の `.git` ファイルも通す。`APM_WORKSPACE_DIR` が無く、`<HOME>/.apm` が checkout でも native の consumer でもない間（checkout を動かしてから最初の `migrate` までの間。`~/.apm` が無い場合も含む）は、`apply`・`refresh`・`check:roots` など実 HOME の配布先を書くコマンドを同じように拒否する。旧経路は checkout が `~/.apm` にあると決めているので、その間に動かすと、割れた workspace で root を書き換え、`backup`・`rehearse` が写す状態を変えてしまうため。`APM_WORKSPACE_DIR` を明示した実行（テスト）は拒否しない。PowerShell 版（`scripts/apm-workspace.ps1` の `$WorkspaceDir`）は今も `<HOME>/.apm` を既定にしているので、Windows で切り替えのあとに使うなら同じ既定へ揃える必要がある（Windows は対象外としているので、揃えていない）。
 
 ## native と手動の境界
 
@@ -78,8 +78,8 @@ backup の対象（rehearse が複製に再現するもの）: `~/.apm/apm.yml`�
 
 ## 既知の問題
 
-- consumer の状態と authoring の checkout が同じ `~/.apm` にある。APM 0.35.0 は user scope を `~/.apm` に固定しているので、checkout のまま実 HOME へ配ると、checkout が追跡している `~/.apm/apm.yml`（と APM が書く `apm.lock.yaml`）を書き換える。main の checkout は dirty になり、`git pull` は止まり、旧経路の `mise run deploy` も描画した manifest を読む。そのため `migrate` は `<HOME>/.apm` に `.git` か `catalog/` があれば何も書かずに止まり、この repo が `<HOME>/.apm` の中にあっても止まる。旧経路の `scripts/apm-workspace.sh` も、`<HOME>/.apm/apm.yml`（consumer）の 1 行目が `# Rendered by scripts/native.sh` なら、実 HOME の配布先を書き換えるコマンド（`apply`・`apply:skills:local`・`refresh`・`install-pins`・`repair:local-package-cache`・`pin-external`・`prune:cache`・`install:catalog`・`migrate:roots --apply`）を apm を起動する前に拒否する。`$WORKSPACE_DIR` ではなく `<HOME>` を見るのは、これらが `APM_WORKSPACE_DIR` をどこへ向けても `<HOME>` の配布先を書くため。`validate`・`validate:catalog`・`doctor`・`doctor-intake`・`check:roots`・`migrate:roots`（`--apply` なし）・`bundle-catalog`・`smoke:catalog`・`prepare:catalog` は拒否しない。実 HOME の配布先を書かず、書くのは `$WORKSPACE_DIR` の下（`.catalog-build`、`prepare:catalog` は `catalog/` も）と一時ディレクトリだけで、`pre-push` と `verify` が使うため。切り替えのあとも `mise run check` と `verify` を通すための区別である
-- 目印の無い root（旧経路がコピーした `~/.claude/CLAUDE.md`・`~/.codex/AGENTS.md`・`~/.cursor/AGENTS.md`）は、`compile -g --clean` が上書きしない。Claude には旧い `CLAUDE.md` と native の rule `ai-collaboration.md` の両方が届く。`mise run migrate:roots`（既定は dry-run）で旧いコピーを退避するのは別の手順
+- consumer の状態と authoring の checkout が同じ `~/.apm` にある。APM 0.35.0 は user scope を `~/.apm` に固定しているので、checkout のまま実 HOME へ配ると、checkout が追跡している `~/.apm/apm.yml`（と APM が書く `apm.lock.yaml`）を書き換える。main の checkout は dirty になり、`git pull` は止まり、旧経路の `mise run deploy` も描画した manifest を読む。そのため `migrate` は `<HOME>/.apm` に `.git` か `catalog/` があれば何も書かずに止まり、この repo が `<HOME>/.apm` の中にあっても止まる。旧経路の `scripts/apm-workspace.sh` も、`<HOME>/.apm/apm.yml`（consumer）の 1 行目が `# Rendered by scripts/native.sh` なら、実 HOME の配布先を書き換えるコマンド（`apply`・`apply:skills:local`・`refresh`・`install-pins`・`repair:local-package-cache`・`pin-external`・`prune:cache`・`install:catalog`・`migrate:roots --apply`）と、`mise run upgrade` が `apm update -g --yes` の前に実行する `check:roots` を、apm を起動する前に拒否する。`upgrade` は apm を直接呼ぶので、`check:roots` が最初の関門になる。`$WORKSPACE_DIR` ではなく `<HOME>` を見るのは、これらが `APM_WORKSPACE_DIR` をどこへ向けても `<HOME>` の配布先を書くため。`validate`・`validate:catalog`・`doctor`・`doctor-intake`・`migrate:roots`（`--apply` なし）・`bundle-catalog`・`smoke:catalog`・`prepare:catalog` は拒否しない。実 HOME の配布先を書かず、書くのは `$WORKSPACE_DIR` の下（`.catalog-build`、`prepare:catalog` は `catalog/` も）と一時ディレクトリだけで、`pre-push` と `verify` が使うため。切り替えのあとも `mise run check` と `verify` を通すための区別である
+- 目印の無い root（旧経路がコピーした `~/.claude/CLAUDE.md`・`~/.codex/AGENTS.md`・`~/.cursor/AGENTS.md`）は、`compile -g --clean` が上書きしない。Claude には旧い `CLAUDE.md` と native の rule `ai-collaboration.md` の両方が届く。`mise run migrate:roots -- --apply`（既定は dry-run）で旧いコピーを退避するのは別の手順で、切り替えのあとは旧経路のガードが拒否するため、checkout を動かす前（切り替えの手順 1）に行う
 
 - 既存の `smoke:catalog`（pre-push hook と `verify`）が、実 HOME の `~/.apm/deployment-receipts` に一時ディレクトリの receipt を書く（APM の `core/deployment_ledger.py` の置き場。切り替えのあとは consumer の `~/.apm` に書く）。backup の前後を比べるときは、native の副作用と取り違えない
 
@@ -118,13 +118,15 @@ allowExecutables:
 - 複製の中で、`migrate` と同じ `migrate_roots`（install の前）と `reinstate_entries`（compile のあと）を通す。end-to-end の確認は、空の HOME ではなく backup の複製から行う
 - 消えてよいのは、`scripts/native.sh` の `allowed_lost_reason` に書いた allowlist だけ。件数は `allowed_lost=` に出し、`allowed-lost.txt` にタブ区切りで path と理由を残す。allowlist 以外の消失（`lost=`）が 0 件のときだけ成功する。同じ skill の別のファイルは対象外で、消えれば失敗する
 
-  | path（HOME からの相対）                                                                                             | 理由                                                                                                                                                                  |
-  | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-  | 退避した root の中の、basename が `.apm-pin` のファイル                                                             | pin の目印                                                                                                                                                            |
-  | `.agents/skills/agmsg/apm.yml`、`.agents/skills/agmsg/.apm`、`.agents/skills/agmsg/.apm/.plugin-skill-sources.json` | 旧経路の stage が作るメタデータで、agmsg の scripts は参照しない                                                                                                      |
-  | `.claude/skills/agmsg/` の下の、上と同じ 3 つ                                                                       | 同上                                                                                                                                                                  |
-  | `.agents/skills/agmsg/run` とその下                                                                                 | agmsg の実行時の状態。旧経路も agmsg のディレクトリを入れ替えて作り直していて、実 HOME で `run/` の作成時刻が skill より後になっている。`.agents/skills` 側だけにある |
+  | path（HOME からの相対）                                                                                                                                              | 理由                                                                                                                                                                  |
+  | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | 退避した root の中の、basename が `.apm-pin` のファイル                                                                                                              | pin の目印                                                                                                                                                            |
+  | `.agents/skills/agmsg/apm.yml`、`.agents/skills/agmsg/.apm`、`.agents/skills/agmsg/.apm/.plugin-skill-sources.json`                                                  | 旧経路の stage が作るメタデータで、agmsg の scripts は参照しない                                                                                                      |
+  | `.claude/skills/agmsg/` の下の、上と同じ 3 つ                                                                                                                        | 同上                                                                                                                                                                  |
+  | `.agents/skills/agmsg/run` とその下                                                                                                                                  | agmsg の実行時の状態。旧経路も agmsg のディレクトリを入れ替えて作り直していて、実 HOME で `run/` の作成時刻が skill より後になっている。`.agents/skills` 側だけにある |
+  | 4 つの root の top-level の entry で、前回の native の `apm.lock.yaml`（`deployed_files`）に載っていて、今回の root に無いもの（catalog から消えた skill）の下の全部 | catalog から消えたので入れ直さない。前回の lock が無い最初の `migrate` では何も該当しない。entry が今も配られていれば対象外                                           |
 
+- `rehearse --migrate` は入れ直した entry を `reinstated.txt`（path と scope）、名前が同じで入れ直さなかった旧い entry を `skipped.txt` に書く。`migrate` は同じ 2 つを `<HOME>/.apm/native-migrate-<UTC>.reinstated.txt`・`.skipped.txt` に書き、`skipped.txt` が空でなければ warning を出す。private skill が catalog の skill と同じ名前で上書きしていた場合は、旧い版を手で戻す
 - `apm.log` に `no trustworthy local deployment baseline` が出たら失敗する（件数は `baseline_skips=`）
 - `result.txt` には `mode=migrate`、`home`、`source_ref`、`workspace_only`、各 step の status、`lost`、`allowed_lost`、`baseline_skips` が入る。`migrate` はこれを読む
 
@@ -135,10 +137,14 @@ allowExecutables:
 3. apply と同じ guard（`config.json`、`<HOME>/apm.yml` が無いこと、compile のあとに編集された root）と、HOME の外へ出るリンクと hard link の検査。`--home` は HOME 全体を、`--real-home` は APM の書込み先（退避する 4 つの root、rules、compile が書く root、`.apm`、`.cache/apm`、`Library/Caches/apm`）だけを調べる。tool のディレクトリ（`.claude` など）はリンクのときだけ調べる
 4. `~/.codex/config.toml` と `~/.claude/settings.json` を、パーミッションを保ったまま `<HOME>/.apm/native-migrate-<UTC>.untouched/`（owner だけが読める）へコピーし、4 つの root の snapshot を取り、agmsg のリンクがあれば save する。中身はログに出さない
 5. manifest を書く（差があれば前の manifest を `apm.yml.<UTC>.bak` に残す）。4 つの root を `<root>.bak-<UTC>` へ移し、退避した一覧を `<HOME>/.apm/native-migrate-<UTC>.txt` に記録する。`apm install -g --only apm --trust-bin`、`apm compile -g --clean`、入れ直し（入れ直しの前に、4 つの root・その `.bak-<UTC>`・`.agents`・`.claude`・`.cursor` が HOME の外を指すリンクや切れたリンクでないことを確かめる。単独の `native:reinstate` も同じ）、agmsg の restore
-6. rehearse と同じ消失の検査を、migrate 自身が 4 つの root の before/after の snapshot と同じ allowlist で行う。表に無いものが消えていれば失敗する（rehearse のあとに足したファイルを、APM が配り直す skill の中で失わないため）。一覧は `<HOME>/.apm/native-migrate-<UTC>.lost.txt` に残る。続けて、手順 4 の 2 つのファイルが変わっていないか比べる
+6. rehearse と同じ消失の検査を、migrate 自身が 4 つの root の before/after の snapshot と同じ allowlist で行う。表に無いものが消えていれば失敗する（rehearse のあとに足したファイルを、APM が配り直す skill の中で失わないため）。検査の範囲は 4 つの root だけで、rehearse が見る `.claude/rules`・`.codex/rules`・compile が書く root などは、`migrate` 自身は見ない（rehearse の時点の結果に頼る）。一覧は `<HOME>/.apm/native-migrate-<UTC>.lost.txt` に残る。続けて、手順 4 の 2 つのファイルが変わっていないか比べる
 7. 5 と 6 のどこかで失敗したら、自動で rollback して非 0 で終わる。2 つのファイルが変わっていたときは、手順 4 のコピーで元に戻し、migrate が残した版を `<ファイル>.changed-<UTC>` として残す。成功すると `.untouched/` を消し、UTC の stamp と rollback のコマンドを表示する
 
-rollback（自動も `native:migrate-rollback` も）が戻すのは 4 つの root だけで、今の root は `<root>.native-<UTC>` に残る。`<HOME>/.apm/apm.yml`・`apm.lock.yaml`・`deployment-receipts`、rules、compile が書いた root は、native が書いたまま残る。これらを元に戻すには、手順 2 の backup（`native:backup`）と `apm.yml.<UTC>.bak` を使う。どちらも名前が既にあれば何も動かさずに失敗する。
+rollback（自動も `native:migrate-rollback` も）が戻すのは 4 つの root だけで、今の root は `<root>.native-<UTC>` に残る。`<HOME>/.apm/apm.yml`・`apm.lock.yaml`・`deployment-receipts`、rules、compile が書いた root は、native が書いたまま残る。これらを元に戻すには、手順 2 の backup（`native:backup`）と `apm.yml.<UTC>.bak` を使う。どちらも名前が既にあれば何も動かさずに失敗する。root の移動は record の行を書いてから行うので、移す前に止まった root は record に載っていても、rollback は「移していない」として触らない。
+
+`migrate` の間は Claude Code と Codex のセッションを閉じる。`~/.codex/config.toml` と `~/.claude/settings.json` が変わると失敗して元の内容を書き戻すので、その間のセッションの書込みが `<ファイル>.changed-<UTC>` に回る。この 2 つが symlink なら、復元はリンクを保ったままリンク先へ元の内容を書き戻す（今の実 HOME では通常のファイル）。
+
+`migrate` が失敗して自動で rollback したあとも、`<HOME>/.apm/apm.yml` は描画された manifest のままなので、旧経路（`mise run deploy`）は拒否されたままになる。旧経路へ戻すには、下の「実 HOME の checkout の移設」の最後の手順で、consumer の `~/.apm` を別名へ移し、`~/.apm.checkout-<UTC>` を戻す。migrate のログにも同じ手順が出る。
 
 ### 実 HOME の checkout の移設（手動）
 
@@ -147,12 +153,14 @@ rollback（自動も `native:migrate-rollback` も）が戻すのは 4 つの ro
 1. `git clone https://github.com/jey3dayo/apm-workspace.git ~/src/github.com/jey3dayo/apm-workspace`
 2. private-skills は別の repo なので、旧 `~/.apm/private-skills` の remote（`git -C ~/.apm/private-skills remote get-url origin`）を、新しい checkout の `private-skills/` へ clone する。未 push の変更と `tmp/` の中身（learning-intake の drop box など）は、旧 `~/.apm` から手で移す
 3. 新しい checkout の `mise.toml` と `~/.config/mise/config.workstation.toml` の、`~/.apm` を前提にした記述を新しい場所に合わせる（`AGENTS.md` の Editing Rules にあるとおり、active な `apm` の source を変えるときは両方）
-4. 旧 `~/.apm` を動かす前に、4 つの root の中で `~/.apm` を指すリンクを、中身のコピーに置き換える。動かしたあとはリンクが切れ、`rehearse` は（`migrate` と同じ判定で）壊れたリンクの名前を出して失敗し、動かしたあとの `migrate` も同じリンクで止まるため。一覧は次のコマンドで出す（壊れたリンクも出る。mise task にしないのは、リンクごとに置き換えてよいか人が見るため）
+4. 旧 `~/.apm` を動かす前に、実 HOME で APM が書く場所（4 つの root、`.claude/rules`・`.claude/commands`・`.codex/rules`・`.cursor/rules`、compile が書く 3 つの root、`.cache/apm`、`Library/Caches/apm`。root そのものがリンクの場合も含む）の中で `~/.apm` を指すリンクを、中身のコピーに置き換える。動かしたあとはリンクが切れ、`rehearse` は（`migrate` と同じ判定で）壊れたリンクの名前を出して失敗し、動かしたあとの `migrate` も同じリンクで止まるため。一覧は次のコマンドで出す（壊れたリンクも出る。mise task にしないのは、リンクごとに置き換えてよいか人が見るため）
 
    ```sh
    apm_home="$(realpath ~/.apm)"
-   for root in ~/.agents/skills ~/.claude/skills ~/.claude/agents ~/.cursor/agents; do
-     find "$root" -type l | while IFS= read -r link; do
+   for path in .agents/skills .claude/skills .claude/agents .cursor/agents .claude/rules .claude/commands .codex/rules .cursor/rules \
+     .claude/CLAUDE.md .codex/AGENTS.md .cursor/AGENTS.md .cache/apm Library/Caches/apm; do
+     [ -e ~/"$path" ] || [ -L ~/"$path" ] || continue
+     { [ -L ~/"$path" ] && echo ~/"$path"; find -H ~/"$path" -type l; } | while IFS= read -r link; do
        target="$(realpath "$link" 2>/dev/null)" || { echo "$link (broken)"; continue; }
        case "$target" in "$apm_home" | "$apm_home"/*) echo "$link -> $target" ;; esac
      done
@@ -168,10 +176,10 @@ rollback（自動も `native:migrate-rollback` も）が戻すのは 4 つの ro
 
    壊れたリンクは、置き換え先が無いので、外すか直してから進める
 
-5. 旧 `~/.apm` を `~/.apm.checkout-<UTC>` へ移す。`<HOME>/.apm` は新しい consumer の状態（`apm.yml`・`apm.lock.yaml`・`apm_modules`・`deployment-receipts`）だけになり、`migrate` が作る
+5. `~/.apm` で動いているセッション（Claude Code、Codex、herdr の pane）を止める。そのうえで旧 `~/.apm` を `~/.apm.checkout-<UTC>` へ移す。`~/.apm/.worktrees` の worktree は、移した先の絶対パスを `.git` に持ったままになるので、新しい checkout で `git worktree repair <worktree の path>...` を実行するか、worktree を作り直す。`<HOME>/.apm` は新しい consumer の状態（`apm.yml`・`apm.lock.yaml`・`apm_modules`・`deployment-receipts`）だけになり、`migrate` が作る
 6. 戻すときは逆: `migrate-rollback` で root を戻し、consumer の `~/.apm` を `~/.apm.consumer-<UTC>` のような別名へ移して、`~/.apm.checkout-<UTC>` を `~/.apm` に戻す。clone した checkout は消さない。`mise.toml` と `config.workstation.toml` の更新も戻す
 
-2026-11-09 の時点で、実 HOME の `~/.cache/apm/git/checkouts_v1` には上流の切れた symlink がある。そのため `migrate --real-home` の前に `~/.cache/apm` を `~/.cache/apm.native-aside-<UTC>` へ移す（キャッシュなので、install が作り直す）。
+2026-11-09 の時点で、実 HOME の `~/.cache/apm/git/checkouts_v1` には上流の切れた symlink がある。そのため `migrate --real-home` の前に `~/.cache/apm` を `~/.cache/apm.native-aside-<UTC>` へ移す（キャッシュなので、install が作り直す）。`Library/Caches/apm` があれば、同じ理由で `Library/Caches/apm.native-aside-<UTC>` へ一緒に移す（`migrate` はこの 2 つも検査し、切れたリンクがあれば何も書かずに止まる）。
 
 `~/.cache/apm` を退避したときの戻し方: 作り直された `~/.cache/apm` を新しい名前（`apm.native-regen-<UTC>` など）へ移し、退避したもの（`apm.native-aside-<UTC>`）を `~/.cache/apm` に戻す。どちらも消さない。2026-11-09 の実 HOME の apply が `.cache/apm` の中の上流の symlink（同じ checkout の中で切れた相対リンクや、上流の絶対パスのリンク）で止まったことは、キャッシュの扱いを直すべき問題として残している。`migrate --real-home` も `.cache/apm` を検査するので、同じリンクがあれば何も書かずに止まる
 
@@ -196,13 +204,17 @@ checkout を `~/.apm` の外へ移すと、`~/.apm` は consumer になる。次
 
 ## 実 HOME を切り替える手順
 
-1. checkout を `~/.apm` の外へ移す（上の「実 HOME の checkout の移設」）
+1. 旧経路の `mise run migrate:roots -- --apply` で、旧いコピーの root（`~/.claude/CLAUDE.md` など）を退避する（切り替えのあとは旧経路のガードが拒否する）。続けて checkout を `~/.apm` の外へ移す（上の「実 HOME の checkout の移設」）
 2. `mise run native:plan -- --source-ref <merge 済みの SHA>` で manifest と手順を確かめる。package の pin は merge 済みの commit にする
 3. `mise run native:backup -- --real-home --backup-dir <新しいディレクトリ>`
 4. `mise run native:rehearse -- --real-home --backup-dir <同じディレクトリ> --source-ref <同じ SHA> --migrate`。成功で終わり、`result.txt` が `mode=migrate`・`lost=0`・`baseline_skips=0` で、`allowed-lost.txt` の path がその表のものだけであることを確かめる
-5. `~/.cache/apm` を `~/.cache/apm.native-aside-<UTC>` へ移し（上の「実 HOME の checkout の移設」の最後の段落）、`mise run native:migrate -- --real-home --source-ref <同じ SHA> --rehearsal <backup>/rehearsal-<UTC>.<suffix>`。表示された stamp を控える
+5. `~/.cache/apm` と、あれば `Library/Caches/apm` を `<名前>.native-aside-<UTC>` へ移し（上の「実 HOME の checkout の移設」の最後の段落）、Claude Code と Codex のセッションを閉じてから、`mise run native:migrate -- --real-home --source-ref <同じ SHA> --rehearsal <backup>/rehearsal-<UTC>.<suffix>`。表示された stamp を控える
 6. 確かめる: 配布された skill と agents、`~/.claude/rules/ai-collaboration.md`、manifest 外の skill（private skill、Herdr、agmsg）、agmsg の `db`・`teams` のリンク、`~/.codex/config.toml` と `~/.claude/settings.json` が変わっていないこと
 7. 問題があれば `mise run native:migrate-rollback -- --real-home --stamp <UTC>`。移したあとの root は `<root>.native-<UTC>` に残る。問題がなければ、`<root>.bak-<UTC>` と `<root>.native-<UTC>` は手で消すまで残る
+
+### 切り替えたあとの更新
+
+切り替えたあとの実 HOME は、`apply` を使わず（実 HOME への `apply` は拒否される）、`mise run upgrade` も使わない（`check:roots` が拒否する）。新しい SHA を配るときは、上の手順の 3〜7 をやり直す: 新しい `--source-ref` で `native:backup`、`native:rehearse -- --migrate`、`native:migrate`。2 回目以降の `migrate` は、前回の native の `<HOME>/.apm/apm.lock.yaml` が載せている entry のうち、今回の catalog が配らなくなったものを入れ直さない（`rehearse --migrate` の `allowed-lost.txt` に、その理由つきで出る）。それ以外で APM が配らなかった旧い entry（private skill など）は、前と同じく入れ直す。
 
 ## 確かめていないこと
 

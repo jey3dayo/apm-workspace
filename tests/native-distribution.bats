@@ -284,6 +284,21 @@ sentinel_snapshot() {
   [ "$status" -eq 0 ]
 }
 
+@test "apply stops when the manifest cannot be rendered, before it writes the manifest or starts apm" {
+  local home repo="$FX/apply-render-repo" stub="$FX/apply-render-stub"
+  home="$(new_home apply-render-fails)"
+  mkdir -p "$repo/scripts"
+  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
+  grep -v 'fujibee/agmsg' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
+  printf '#!/bin/sh\ntouch "%s/apm-ran"\n' "$home" >"$stub"
+  chmod +x "$stub"
+  run fixture_exec "$home" /usr/bin/env APM_BIN="$stub" /bin/bash "$repo/scripts/native.sh" apply --home "$home" --source-ref "$SOURCE_SHA"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"EXECUTABLE_ALLOW_PACKAGES"* ]]
+  [ ! -e "$home/apm-ran" ]
+  [ ! -e "$home/.apm/apm.yml" ]
+}
+
 @test "apply refuses a missing HOME or ref, the account HOME, its ancestors and its tool state, before writing" {
   local home account
   home="$(new_home refuse)"
@@ -843,6 +858,65 @@ prepare_migrate() {
   [ "$(tail -n 1 "$M_HOME"/.claude/settings.json.changed-*)" = "changed" ]
 }
 
+@test "a later migrate does not put back an entry the previous native lock listed and the catalog dropped; rehearse lists what it reinstates and what it skips" {
+  local stub="$FX/stub-apm-deploy" rehearsal
+  write_deploy_stub "$stub"
+  M_HOME="$(new_home migrate-dropped)"
+  M_BACKUP="$FX/backups/migrate-dropped"
+  seed_migrate_home "$M_HOME"
+  mkdir -p "$M_HOME/.claude/skills/removed-upstream" "$M_HOME/.apm"
+  echo "old" >"$M_HOME/.claude/skills/removed-upstream/SKILL.md"
+  printf "lockfile_version: '2'\ndependencies:\n- repo_url: https://github.com/fixture-owner/apm-workspace\n  deployed_files:\n  - .claude/skills/removed-upstream\n  - .claude/skills/removed-upstream/SKILL.md\n  - .claude/skills/foo\n  - .claude/skills/foo/SKILL.md\n  deployed_file_hashes:\n    .claude/skills/removed-upstream/SKILL.md: sha256:00\n" >"$M_HOME/.apm/apm.lock.yaml"
+  real_native "$M_HOME" backup --real-home --backup-dir "$M_BACKUP"
+  real_native_with_stub "$M_HOME" "$stub" rehearse --real-home --backup-dir "$M_BACKUP" --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  rehearsal="$(dirname "$(compgen -G "$M_BACKUP/rehearsal-*/result.txt")")"
+
+  grep -q $'^\.claude/skills/removed-upstream/SKILL.md\t.*removed from the catalog' "$rehearsal/allowed-lost.txt"
+  grep -q $'^\.claude/skills/private-copy\t' "$rehearsal/reinstated.txt"
+  ! grep -q 'removed-upstream' "$rehearsal/reinstated.txt"
+  grep -qx '\.claude/skills/foo' "$rehearsal/skipped.txt"
+
+  run real_native_with_stub "$M_HOME" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$rehearsal"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"share a name with what apm deployed"* ]]
+  [ ! -e "$M_HOME/.claude/skills/removed-upstream" ]
+  [ -f "$M_HOME"/.claude/skills.bak-*/removed-upstream/SKILL.md ]
+  [ -f "$M_HOME/.claude/skills/private-copy/SKILL.md" ]
+  grep -qx '\.claude/skills/foo' "$M_HOME"/.apm/native-migrate-*.skipped.txt
+}
+
+@test "migrate-rollback accepts a record whose root was never moved" {
+  local home stamp=20261109T000000Z
+  home="$(new_home rollback-unmoved)"
+  mkdir -p "$home/.apm" "$home/.agents/skills.bak-$stamp/a" "$home/.agents/skills/new" "$home/.claude/skills/keep"
+  printf 'moved\t.agents/skills\nmoved\t.claude/skills\nabsent\t.claude/agents\nabsent\t.cursor/agents\n' >"$home/.apm/native-migrate-$stamp.txt"
+  run real_native "$home" migrate-rollback --real-home --stamp "$stamp"
+  [ "$status" -eq 0 ]
+  [ -d "$home/.agents/skills/a" ]
+  [ -d "$home/.agents/skills.native-$stamp/new" ]
+  [ -d "$home/.claude/skills/keep" ]
+  [ ! -e "$home/.claude/skills.native-$stamp" ]
+  [[ "$output" == *"was never moved aside"* ]]
+}
+
+@test "migrate --real-home stops before writing when .cache/apm, Library/Caches/apm or .claude/commands holds a broken link" {
+  local stub="$FX/stub-apm-deploy" original link
+  write_deploy_stub "$stub"
+  prepare_migrate migrate-cache-links "$stub"
+  original="$(roots_snapshot "$M_HOME")"
+  mkdir -p "$M_HOME/Library/Caches/apm" "$M_HOME/.claude/commands" "$M_HOME/.cache/apm/git"
+  for link in .cache/apm/git/broken Library/Caches/apm/broken .claude/commands/broken; do
+    ln -s ./gone "$M_HOME/$link"
+    run real_native_with_stub "$M_HOME" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"$M_HOME/$link (broken)"* ]]
+    [ "$(roots_snapshot "$M_HOME")" = "$original" ]
+    [ -z "$(compgen -G "$M_HOME/.claude/skills.bak-*" || true)" ]
+    [ ! -e "$M_HOME/.apm/apm.yml" ]
+    rm "$M_HOME/$link"
+  done
+}
+
 @test "rehearse fails on a broken link or a link that leaves the HOME inside the migrated roots, and names each one" {
   local home backup="$FX/backups/rehearse-links" stub="$FX/rehearse-links-stub" migrate
   home="$(new_home rehearse-links)"
@@ -1209,6 +1283,7 @@ build_github_fixture() {
   run real_native_with_stub "$M_HOME" "$fail_compile" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
   [ "$status" -ne 0 ]
   [[ "$output" == *"rolling the roots back"* ]]
+  [[ "$output" == *"~/.apm.checkout-<UTC>"* ]]
   [ "$(roots_snapshot "$M_HOME")" = "$original" ]
   [ -z "$(compgen -G "$M_HOME/.claude/skills.bak-*" || true)" ]
   [ "$(cat "$M_HOME"/.claude/skills.native-*/foo/SKILL.md)" = "deployed by apm" ]
@@ -1327,6 +1402,62 @@ setup_authoring_checkout() {
   [ "$status" -ne 0 ]
   [[ "$output" == *"$home/.apm/apm.yml was rendered by scripts/native.sh"* ]]
   [ "$(cd "$home/.apm" && find . | LC_ALL=C sort)" = "$consumer_before" ]
+}
+
+# The mise tasks run with the repository's tasks but without its [tools], which a fixture HOME cannot install.
+setup_mise_fixture() {
+  local dir="$1"
+  mkdir -p "$dir"
+  cp -R "$REPO_ROOT/scripts" "$REPO_ROOT/mise" "$dir/"
+  python3 - "$REPO_ROOT/mise.toml" "$dir/mise.toml" <<'EOF'
+import re, sys
+text = open(sys.argv[1]).read()
+text = re.sub(r"\[tools\].*?(?=\n# =+\n# Task Includes)", "", text, flags=re.S)
+open(sys.argv[2], "w").write(text)
+EOF
+  git -C "$dir" init -q 2>/dev/null || mkdir -p "$dir/.git"
+}
+
+@test "mise run upgrade stops before apm update when the HOME consumer was rendered by native.sh" {
+  command -v mise >/dev/null || skip "mise is not installed"
+  local home fixture="$FX/mise-upgrade" bin="$FX/mise-upgrade-bin" mise_bin
+  mise_bin="$(command -v mise)"
+  home="$(new_home upgrade-guard)"
+  mkdir -p "$home/.apm" "$bin"
+  setup_mise_fixture "$fixture"
+  native "$home" render --source-ref "$SOURCE_SHA" --workspace-only >"$home/.apm/apm.yml"
+  printf '#!/bin/sh\ntouch "%s/apm-ran"\n' "$home" >"$bin/apm"
+  chmod +x "$bin/apm"
+
+  run fixture_exec "$home" /usr/bin/env PATH="$bin:$(dirname "$mise_bin"):$FIXTURE_PATH" MISE_TRUSTED_CONFIG_PATHS="$fixture" \
+    mise -C "$fixture" run upgrade
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"was rendered by scripts/native.sh"* ]]
+  [ ! -e "$home/apm-ran" ]
+
+  # check:roots passes on a HOME whose ~/.apm is a checkout.
+  printf 'name: old-checkout\n' >"$home/.apm/apm.yml"
+  mkdir -p "$home/.apm/.git"
+  run fixture_exec "$home" /usr/bin/env PATH="$bin:$(dirname "$mise_bin"):$FIXTURE_PATH" MISE_TRUSTED_CONFIG_PATHS="$fixture" \
+    mise -C "$fixture" run check:roots
+  [ "$status" -eq 0 ]
+}
+
+@test "between moving the checkout away and the first migrate, the old path refuses HOME-writing commands unless APM_WORKSPACE_DIR is set" {
+  local home bin="$FX/half-bin"
+  home="$(new_home half-moved)"
+  mkdir -p "$bin"
+  printf '#!/bin/sh\ntouch "%s/apm-ran"\n' "$home" >"$bin/apm"
+  chmod +x "$bin/apm"
+  for state in none empty; do
+    [ "$state" = none ] || mkdir -p "$home/.apm"
+    run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" apply
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"neither a checkout nor a native consumer"* ]]
+  done
+  [ ! -e "$home/apm-ran" ]
+  run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" validate
+  [[ "$output" != *"neither a checkout nor a native consumer"* ]]
 }
 
 @test "when HOME/.apm is a checkout the old path keeps using it, and a catalog without .git is not mistaken for the consumer" {

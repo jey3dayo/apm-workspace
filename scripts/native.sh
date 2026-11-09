@@ -4,8 +4,8 @@
 # and stays manual; this script adds no sync of its own.
 #
 # apply targets a disposable HOME and refuses the account's real HOME, its ancestors and the tool state inside it.
-# apply --real-home is blocked; migrate is the only command that writes the real HOME, after a clean `rehearse --migrate`
-# (docs/native-distribution.md). backup and rehearse only read it.
+# apply --real-home is blocked; migrate writes the real HOME after a clean `rehearse --migrate`, and migrate-rollback and
+# reinstate undo or complete it (docs/native-distribution.md). backup and rehearse only read it.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -22,7 +22,7 @@ PROTECTED_SURFACES=".apm .claude .codex .cursor .agents .config .cache .local Li
 MIGRATE_ROOTS=".agents/skills .claude/skills .claude/agents .cursor/agents"
 # What apm writes in the real HOME: the migrated roots, rules, the compiled roots, its own state and caches. migrate
 # scans only these for links that leave the HOME.
-REAL_HOME_WRITE_PATHS=".agents/skills .claude/skills .claude/agents .cursor/agents .claude/rules .codex/rules .cursor/rules
+REAL_HOME_WRITE_PATHS=".agents/skills .claude/skills .claude/agents .cursor/agents .claude/rules .claude/commands .codex/rules .cursor/rules
 .claude/CLAUDE.md .codex/AGENTS.md .cursor/AGENTS.md .apm .cache/apm Library/Caches/apm"
 REAL_HOME_TOOL_DIRS=".agents .claude .codex .cursor .cache Library Library/Caches"
 # External dependencies that APM only accepts in the structured form (a Codex native plugin bundle is otherwise
@@ -319,10 +319,10 @@ target_home() {
 
 cmd_apply() {
   parse_options "$@"
-  [ "$REAL_HOME" = 0 ] || fail "applying to the real HOME is blocked: apm install deletes skills the old writer deployed. migrate is the only command that writes the real HOME, after a clean rehearse --migrate (docs/native-distribution.md)."
+  [ "$REAL_HOME" = 0 ] || fail "applying to the real HOME is blocked: apm install deletes skills the old writer deployed. migrate (after a clean rehearse --migrate) is the command that switches the real HOME; migrate-rollback and reinstate only undo or complete it (docs/native-distribution.md)."
   [ -n "$SOURCE_REF" ] || fail "apply needs --source-ref; deploying never moves a pin on its own"
   [ -n "$HOME_DIR" ] || fail "apply needs --home <disposable HOME>"
-  local home sha edited links
+  local home sha edited links manifest
   home="$(assert_disposable_home "$HOME_DIR")"
   sha="$(resolve_source_sha "$SOURCE_REF")"
   assert_default_apm_config "$home"
@@ -337,7 +337,8 @@ Delete the marker line to keep the file as hand-written, or move it aside, then 
 $links
 Move them aside or make them plain directories and files of this HOME."
 
-  install_manifest "$home" "$(render_manifest "$sha" "$WORKSPACE_ONLY")"
+  manifest="$(render_manifest "$sha" "$WORKSPACE_ONLY")"
+  install_manifest "$home" "$manifest"
 
   run_apm_install "$home"
   run_apm "$home" compile -g --clean
@@ -484,7 +485,34 @@ migrate_record() {
   printf '%s/.apm/native-migrate-%s.txt\n' "$1" "$2"
 }
 
-# Moves each of MIGRATE_ROOTS to <root>.bak-<stamp> and records what it did in <HOME>/.apm/native-migrate-<stamp>.txt.
+migrate_deployed_record() {
+  printf '%s/.apm/native-migrate-%s.deployed.txt\n' "$1" "$2"
+}
+
+# "<root><TAB><top-level entry>" for each entry of MIGRATE_ROOTS that the previous apm.lock.yaml of this HOME lists in a
+# deployed_files list (the lock a native deployment left; there is none before the first migrate).
+previous_deployed_entries() {
+  local lock="$1/.apm/apm.lock.yaml"
+  [ -f "$lock" ] || return 0
+  awk -v roots="$MIGRATE_ROOTS" '
+    BEGIN { n = split(roots, root, " ") }
+    /^[[:space:]]*- / {
+      line = $0
+      sub(/^[[:space:]]*- /, "", line)
+      gsub(/["\047]/, "", line)
+      for (i = 1; i <= n; i++) {
+        prefix = root[i] "/"
+        if (index(line, prefix) != 1) continue
+        rest = substr(line, length(prefix) + 1)
+        sub(/\/.*/, "", rest)
+        if (rest != "") print root[i] "\t" rest
+      }
+    }
+  ' "$lock" | LC_ALL=C sort -u
+}
+
+# Moves each of MIGRATE_ROOTS to <root>.bak-<stamp> and records what it did in <HOME>/.apm/native-migrate-<stamp>.txt
+# (the line is written before the move, so a root that was not moved is the only thing a record can overstate).
 # Nothing is deleted. A root that does not exist is recorded as absent; a backup name already taken fails before any move.
 migrate_roots() {
   local home="$1" stamp="$2" root record
@@ -496,11 +524,12 @@ migrate_roots() {
     fi
   done
   mkdir -p "$home/.apm"
+  previous_deployed_entries "$home" >"$(migrate_deployed_record "$home" "$stamp")"
   : >"$record"
   for root in $MIGRATE_ROOTS; do
     if [ -e "$home/$root" ] || [ -L "$home/$root" ]; then
-      mv "$home/$root" "$home/$root.bak-$stamp" || fail "cannot move $home/$root aside"
       printf 'moved\t%s\n' "$root" >>"$record"
+      mv "$home/$root" "$home/$root.bak-$stamp" || fail "cannot move $home/$root aside"
       log "moved $home/$root to $home/$root.bak-$stamp"
     else
       printf 'absent\t%s\n' "$root" >>"$record"
@@ -549,11 +578,14 @@ reinstate_escaping_links() {
   done
 }
 
-# Puts back the top-level entries of each <root>.bak-<stamp> that the root lacks now (apm did not deploy them). An entry
-# that exists is left alone. A link that leaves its root is copied, so nothing in the HOME depends on the place it
-# pointed at; a broken link fails the whole step before anything is copied.
+# Puts back the top-level entries of each <root>.bak-<stamp> that the root lacks now (apm did not deploy them), except
+# the entries the previous native lock listed as deployed (native-migrate-<stamp>.deployed.txt): those were removed from
+# the catalog since. An entry that exists is left alone and listed in <report>skipped.txt. A link that leaves its root is
+# copied, so nothing in the HOME depends on the place it pointed at; a broken link fails the whole step before anything
+# is copied. <report>reinstated.txt lists what was put back.
 reinstate_entries() {
-  local home="$1" stamp="$2" root bak entry name scope found=0 broken="" plan="" escaping
+  local home="$1" stamp="$2" report="${3:-}" root bak entry name scope found=0 broken="" plan="" escaping deployed skipped=""
+  deployed="$(migrate_deployed_record "$home" "$stamp")"
   escaping="$(reinstate_escaping_links "$home" "$stamp")"
   [ -z "$escaping" ] || fail "these links of $home lead outside it or are broken, so copying into the roots would write outside the HOME; nothing was copied:
 $escaping"
@@ -563,7 +595,11 @@ $escaping"
     found=1
     while IFS= read -r -d '' entry; do
       name="$(basename "$entry")"
-      if [ -e "$home/$root/$name" ] || [ -L "$home/$root/$name" ]; then continue; fi
+      if [ -e "$home/$root/$name" ] || [ -L "$home/$root/$name" ]; then
+        skipped="$skipped$root/$name"$'\n'
+        continue
+      fi
+      if [ -f "$deployed" ] && grep -qxF "$root"$'\t'"$name" "$deployed"; then continue; fi
       scope=plain
       if [ -L "$entry" ]; then scope="$(link_scope "$home" "$root" "$bak" "$entry")"; fi
       if [ "$scope" = broken ]; then
@@ -576,6 +612,12 @@ $escaping"
   [ "$found" = 1 ] || fail "no <root>.bak-$stamp of $MIGRATE_ROOTS exists in $home"
   [ -z "$broken" ] || fail "these entries are broken links, so they cannot be put back; nothing was copied:
 $broken"
+  if [ -n "$report" ]; then
+    mkdir -p "$(dirname "${report}x")" || fail "cannot create the directory of ${report}"
+    printf '%s' "$skipped" >"${report}skipped.txt"
+    : >"${report}reinstated.txt"
+    [ -z "$skipped" ] || log "warning: the entries of the old roots listed in ${report}skipped.txt share a name with what apm deployed, so they were not put back; if one is a private override of a catalog skill, put it back by hand"
+  fi
   while IFS=$'\t' read -r root name scope; do
     [ -n "$root" ] || continue
     mkdir -p "$home/$root" || fail "cannot create $home/$root"
@@ -589,7 +631,14 @@ $broken"
       clone_copy "$bak/$name" "$home/$root/$name" || fail "cannot copy $bak/$name"
     fi
     log "reinstated $root/$name ($scope)"
+    if [ -n "$report" ]; then printf '%s/%s\t%s\n' "$root" "$name" "$scope" >>"${report}reinstated.txt"; fi
   done <<<"$plan"
+}
+
+# A "moved" record line whose move did not happen: no backup, the root is still there, and no rollback has parked one.
+root_never_moved() {
+  local current="$1" stamp="$2"
+  { [ -e "$current" ] || [ -L "$current" ]; } && [ ! -e "$current.native-$stamp" ] && [ ! -L "$current.native-$stamp" ]
 }
 
 # Moves the current roots to <root>.native-<stamp> and each <root>.bak-<stamp> back. Nothing is deleted, and a name already
@@ -603,7 +652,7 @@ rollback_roots() {
     current="$home/$root"
     case "$kind" in
       moved)
-        if [ ! -e "$current.bak-$stamp" ] && [ ! -L "$current.bak-$stamp" ]; then
+        if [ ! -e "$current.bak-$stamp" ] && [ ! -L "$current.bak-$stamp" ] && ! root_never_moved "$current" "$stamp"; then
           fail "$current.bak-$stamp is missing. Nothing was changed."
         fi
         ;;
@@ -617,6 +666,10 @@ rollback_roots() {
   while IFS=$'\t' read -r kind root; do
     [ -n "$kind" ] || continue
     current="$home/$root"
+    if [ "$kind" = moved ] && [ ! -e "$current.bak-$stamp" ] && [ ! -L "$current.bak-$stamp" ]; then
+      log "$current was never moved aside (the migrate stopped first); left as it is"
+      continue
+    fi
     if [ -e "$current" ] || [ -L "$current" ]; then
       mv "$current" "$current.native-$stamp" || fail "cannot move $current aside"
       log "moved $current to $current.native-$stamp"
@@ -636,9 +689,23 @@ restore_agmsg_links() {
 }
 
 # The reason a lost path (relative to HOME) is no loss, or nothing. Every entry is a full path under one of MIGRATE_ROOTS,
-# except the .apm-pin basename rule; docs/native-distribution.md lists them. Anything else counts as lost.
+# except the .apm-pin basename rule and the entries dropped from the catalog; docs/native-distribution.md lists them.
+# Anything else counts as lost. $2 is the HOME the roots are read in, $3 the deployed record of migrate_roots.
 allowed_lost_reason() {
-  local path="$1" root
+  local path="$1" home="$2" deployed="$3" root rest name
+  for root in $MIGRATE_ROOTS; do
+    case "$path" in
+      "$root/"*)
+        rest="${path#"$root/"}"
+        name="${rest%%/*}"
+        if [ -f "$deployed" ] && [ ! -e "$home/$root/$name" ] && [ ! -L "$home/$root/$name" ] &&
+          grep -qxF "$root"$'\t'"$name" "$deployed"; then
+          echo "listed by the previous native lock and no longer deployed: removed from the catalog since"
+          return
+        fi
+        ;;
+    esac
+  done
   case "$path" in
     .agents/skills/agmsg/run | .agents/skills/agmsg/run/*)
       echo "agmsg runtime state; the old path rebuilt the agmsg directory too, and apm replaces it"
@@ -663,11 +730,11 @@ allowed_lost_reason() {
   fi
 }
 
-# Tab-separated <path> <reason> for each lost path that is no loss.
+# Tab-separated <path> <reason> for each lost path that is no loss. $2 and $3 are the arguments of allowed_lost_reason.
 allowed_lost_paths() {
   local path reason
   while IFS= read -r path; do
-    reason="$(allowed_lost_reason "$path")"
+    reason="$(allowed_lost_reason "$path" "$2" "$3")"
     if [ -n "$reason" ]; then printf '%s\t%s\n' "$path" "$reason"; fi
   done <"$1"
 }
@@ -735,7 +802,7 @@ $shared"
   fi
   if [ "$MIGRATE" = 1 ] && [ "$install_status" = 0 ] && [ "$compile_status" = 0 ]; then
     reinstate_status=0
-    (reinstate_entries "$scratch" "$stamp") || reinstate_status=$?
+    (reinstate_entries "$scratch" "$stamp" "$rehearsal/") || reinstate_status=$?
   fi
   if [ "$linked" = 1 ]; then agmsg_state "$scratch" restore || agmsg_status=1; fi
   baseline_skips="$(grep -c 'no trustworthy local deployment baseline' "$rehearsal/apm.log" || true)"
@@ -743,7 +810,7 @@ $shared"
   rehearsal_snapshot "$scratch" "$dir/present.txt" >"$rehearsal/after.txt"
   LC_ALL=C comm -23 "$rehearsal/before.txt" "$rehearsal/after.txt" >"$rehearsal/lost-all.txt"
   if [ "$MIGRATE" = 1 ]; then
-    allowed_lost_paths "$rehearsal/lost-all.txt" >"$rehearsal/allowed-lost.txt"
+    allowed_lost_paths "$rehearsal/lost-all.txt" "$scratch" "$(migrate_deployed_record "$scratch" "$stamp")" >"$rehearsal/allowed-lost.txt"
     LC_ALL=C comm -23 "$rehearsal/lost-all.txt" <(cut -f1 "$rehearsal/allowed-lost.txt") >"$rehearsal/lost.txt"
     allowed_lost="$(wc -l <"$rehearsal/allowed-lost.txt" | tr -d ' ')"
   else
@@ -777,7 +844,7 @@ cmd_reinstate() {
   assert_stamp "$STAMP"
   local home
   home="$(target_home reinstate)"
-  reinstate_entries "$home" "$STAMP"
+  reinstate_entries "$home" "$STAMP" "$home/.apm/native-migrate-$STAMP."
 }
 
 assert_not_checkout() {
@@ -866,7 +933,7 @@ assert_no_unexpected_loss() {
   grep -v '^$' <<<"$before" >"$dir/before" || true
   migrate_roots_snapshot "$home" >"$dir/after"
   LC_ALL=C comm -23 "$dir/before" "$dir/after" >"$dir/lost-all"
-  allowed_lost_paths "$dir/lost-all" | cut -f1 >"$dir/allowed"
+  allowed_lost_paths "$dir/lost-all" "$home" "$(migrate_deployed_record "$home" "$stamp")" | cut -f1 >"$dir/allowed"
   LC_ALL=C comm -23 "$dir/lost-all" "$dir/allowed" >"$lost_file"
   rm -rf "$dir"
   [ ! -s "$lost_file" ] || fail "these files of the roots existed before migrate and are gone, and are not in the allowlist (listed in $lost_file; they are kept in <root>.bak-$stamp):
@@ -875,6 +942,13 @@ $(head -n 20 "$lost_file" | sed 's/^/  /')"
 
 migrate_roots_snapshot() {
   rehearsal_snapshot "$1" <(tr ' ' '\n' <<<"$MIGRATE_ROOTS")
+}
+
+manifest_is_rendered() {
+  case "$(head -n 1 "$1/.apm/apm.yml" 2>/dev/null || true)" in
+    "# Rendered by scripts/native.sh"*) return 0 ;;
+    *) return 1 ;;
+  esac
 }
 
 # Runs from the EXIT trap of cmd_migrate once the roots may have moved: undo the move, keep every file, keep the exit status.
@@ -894,6 +968,9 @@ migrate_failure() {
     rm -rf "${MIGRATE_HOME:?}/.apm/native-migrate-$MIGRATE_STAMP.untouched"
   else
     log "the files $MIGRATE_UNTOUCHED_FILES were not restored; the copies are in $MIGRATE_HOME/.apm/native-migrate-$MIGRATE_STAMP.untouched"
+  fi
+  if manifest_is_rendered "$MIGRATE_HOME"; then
+    log "only the roots were rolled back: $MIGRATE_HOME/.apm/apm.yml is still the rendered manifest, so the old path (mise run deploy) stays refused. To use it again, move the consumer ~/.apm aside and put ~/.apm.checkout-<UTC> back (docs/native-distribution.md, the section on moving the checkout)"
   fi
   exit "$status"
 }
@@ -935,7 +1012,7 @@ Move them aside or make them plain directories and files of this HOME."
   migrate_roots "$home" "$MIGRATE_STAMP"
   run_apm_install "$home"
   run_apm "$home" compile -g --clean
-  reinstate_entries "$home" "$MIGRATE_STAMP"
+  reinstate_entries "$home" "$MIGRATE_STAMP" "$home/.apm/native-migrate-$MIGRATE_STAMP."
   if [ "$MIGRATE_AGMSG_LINKED" = 1 ]; then agmsg_state "$home" restore; fi
   assert_no_unexpected_loss "$home" "$MIGRATE_STAMP" "$roots_before"
   changed="$(changed_untouched_files "$home" "$MIGRATE_STAMP")"
