@@ -940,6 +940,19 @@ prepare_migrate() {
   [ "$(find "$M_HOME" | LC_ALL=C sort)" = "$listing_bak" ]
 }
 
+@test "migrate links agmsg db and teams again when apm replaces the agmsg skill directory" {
+  local stub="$FX/stub-apm-replace-agmsg"
+  printf '#!/bin/sh\n[ "$1" = install ] || exit 0\nrm -rf "$HOME/.agents/skills/agmsg"\nmkdir -p "$HOME/.agents/skills/agmsg"\necho "deployed agmsg" >"$HOME/.agents/skills/agmsg/SKILL.md"\n' >"$stub"
+  chmod +x "$stub"
+  prepare_migrate migrate-agmsg "$stub"
+  run real_native_with_stub "$M_HOME" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
+  [ "$status" -eq 0 ]
+  [ "$(cat "$M_HOME/.agents/skills/agmsg/SKILL.md")" = "deployed agmsg" ]
+  [ "$(readlink "$M_HOME/.agents/skills/agmsg/db")" = "$M_HOME/.local/state/agmsg/db" ]
+  [ "$(readlink "$M_HOME/.agents/skills/agmsg/teams")" = "$M_HOME/.local/state/agmsg/teams" ]
+  [ "$(cat "$M_HOME/.local/state/agmsg/db/keep")" = "db store" ]
+}
+
 @test "migrate rolls the roots back when a step fails, and fails when config.toml or settings.json would change" {
   local stub="$FX/stub-apm-deploy" fail_compile="$FX/stub-apm-fail-compile" touch_config="$FX/stub-apm-touch-config"
   local original

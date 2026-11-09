@@ -747,7 +747,9 @@ migrate_failure() {
   if [ -f "$(migrate_record "$MIGRATE_HOME" "$MIGRATE_STAMP")" ]; then
     log "rolling the roots back"
     (rollback_roots "$MIGRATE_HOME" "$MIGRATE_STAMP") || log "the automatic rollback failed; fix the cause, then run migrate-rollback --stamp $MIGRATE_STAMP"
-    (restore_agmsg_links "$MIGRATE_HOME") || log "the agmsg links were not restored; run mise run agmsg:state:restore"
+    if [ "$MIGRATE_AGMSG_LINKED" = 1 ]; then
+      agmsg_state "$MIGRATE_HOME" restore || log "the agmsg links were not restored; run mise run agmsg:state:restore"
+    fi
   fi
   exit "$status"
 }
@@ -774,7 +776,11 @@ Move them aside or make them plain directories and files of this HOME."
 
   manifest="$(render_manifest "$sha" "$WORKSPACE_ONLY")"
   before="$(untouched_hashes "$home")"
-  if [ -L "$home/.agents/skills/agmsg/db" ]; then agmsg_state "$home" save; fi
+  MIGRATE_AGMSG_LINKED=0
+  if [ -L "$home/.agents/skills/agmsg/db" ]; then
+    MIGRATE_AGMSG_LINKED=1
+    agmsg_state "$home" save
+  fi
 
   MIGRATE_HOME="$home" MIGRATE_STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
   install_manifest "$home" "$manifest"
@@ -783,7 +789,7 @@ Move them aside or make them plain directories and files of this HOME."
   run_apm "$home" install -g --only apm
   run_apm "$home" compile -g --clean
   reinstate_entries "$home" "$MIGRATE_STAMP"
-  restore_agmsg_links "$home"
+  if [ "$MIGRATE_AGMSG_LINKED" = 1 ]; then agmsg_state "$home" restore; fi
   after="$(untouched_hashes "$home")"
   [ "$after" = "$before" ] || fail "the sha256 of $MIGRATE_UNTOUCHED_FILES changed during migrate:
 before: $(printf '%s' "$before" | tr '\n' ' ')
