@@ -8,6 +8,7 @@ It owns the global manifest (`apm.yml`), the lockfile (`apm.lock.yaml`), the cac
 - `README.md`: human overview and day-to-day flow
 - `AGENTS.md`: full contract, guardrails, and edit surfaces
 - `docs/apm-task-coverage.md`: every `mise` task and what gates it
+- `docs/native-distribution.md`: the APM-native `native:*` entry point, what stays manual, and the retirement boundary for the legacy apply
 - `docs/skill-inventory.md`: skill lanes (global, catalog, optional, manual, private, repo-local)
 - `docs/package-decisions.md`: why each package was added, kept, or removed
 - `docs/skill-overlaps.md`: which of several similar skills to use
