@@ -953,6 +953,87 @@ prepare_migrate() {
   [ -d "$M_HOME/.agents/skills.bak-$stamp" ]
 }
 
+@test "migrate-rollback finishes a rollback that stopped after moving a root back and before writing restored" {
+  local stub="$FX/stub-apm-deploy" original stamp
+  write_deploy_stub "$stub"
+  prepare_migrate migrate-rollback-unrecorded "$stub"
+  original="$(roots_snapshot "$M_HOME")"
+  run real_native_with_stub "$M_HOME" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
+  [ "$status" -eq 0 ]
+  stamp="$(printf '%s\n' "$output" | tail -n 1)"
+
+  mv "$M_HOME/.agents/skills" "$M_HOME/.agents/skills.native-$stamp"
+  mv "$M_HOME/.agents/skills.bak-$stamp" "$M_HOME/.agents/skills"
+  run real_native "$M_HOME" migrate-rollback --real-home --stamp "$stamp"
+  [ "$status" -eq 0 ]
+  [ "$(roots_snapshot "$M_HOME")" = "$original" ]
+  grep -qx $'restored\t.agents/skills' "$M_HOME/.apm/native-migrate-$stamp.txt"
+  grep -qx $'restored\t.claude/skills' "$M_HOME/.apm/native-migrate-$stamp.txt"
+}
+
+@test "migrate stops when the HOME is in another state than at the rehearsal (previous lock, ~/.apm), and moves nothing" {
+  local stub="$FX/stub-apm-deploy" original
+  write_deploy_stub "$stub"
+  prepare_migrate migrate-stale-state "$stub"
+  grep -qx 'previous_lock=absent' "$M_REHEARSAL/result.txt"
+  grep -qx 'home_apm=absent' "$M_REHEARSAL/result.txt"
+  original="$(roots_snapshot "$M_HOME")"
+
+  mkdir -p "$M_HOME/.apm"
+  run real_native_with_stub "$M_HOME" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"home_apm=consumer"* ]]
+  [ "$(roots_snapshot "$M_HOME")" = "$original" ]
+
+  : >"$M_HOME/.apm/apm.lock.yaml"
+  run real_native_with_stub "$M_HOME" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"previous_lock=present"* ]]
+  [ "$(roots_snapshot "$M_HOME")" = "$original" ]
+  [ -z "$(compgen -G "$M_HOME/.claude/skills.bak-*" || true)" ]
+}
+
+@test "migrate fails and rolls back when it drops other entries than the rehearsal did" {
+  local stub="$FX/stub-apm-deploy" original
+  write_deploy_stub "$stub"
+  prepare_migrate migrate-dropped-differs "$stub"
+  original="$(roots_snapshot "$M_HOME")"
+  printf '.claude/skills/ghost\n' >>"$M_REHEARSAL/dropped.txt"
+  run real_native_with_stub "$M_HOME" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"dropped other entries than the rehearsal did"* ]]
+  [ "$(roots_snapshot "$M_HOME")" = "$original" ]
+  [ -z "$(compgen -G "$M_HOME/.claude/skills.bak-*" || true)" ]
+  [ -f "$(compgen -G "$M_HOME/.apm/native-migrate-*.dropped.txt")" ]
+}
+
+@test "a migrate that draws the stamp of another migrate stops before it moves or rolls back anything of that one" {
+  local stub="$FX/stub-apm-deploy" bin="$FX/date-bin" stamp=20261109T111111Z original record
+  write_deploy_stub "$stub"
+  mkdir -p "$bin"
+  printf '#!/bin/bash\ncase "$*" in "-u +%%Y%%m%%dT%%H%%M%%SZ") echo %s ;; *) exec /bin/date "$@" ;; esac\n' "$stamp" >"$bin/date"
+  chmod +x "$bin/date"
+  M_HOME="$(new_home migrate-same-stamp)"
+  seed_migrate_home "$M_HOME"
+  record="$M_HOME/.apm/native-migrate-$stamp.txt"
+  mkdir -p "$M_HOME/.apm" "$M_HOME/.claude/skills.bak-$stamp"
+  printf 'earlier\n' >"$M_HOME/.claude/skills.bak-$stamp/SKILL.md"
+  printf 'moved\t.claude/skills\ndone\t.claude/skills\n' >"$record"
+  real_native "$M_HOME" backup --real-home --backup-dir "$FX/backups/migrate-same-stamp"
+  real_native_with_stub "$M_HOME" "$stub" rehearse --real-home --backup-dir "$FX/backups/migrate-same-stamp" --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  M_REHEARSAL="$(dirname "$(compgen -G "$FX/backups/migrate-same-stamp/rehearsal-*/result.txt")")"
+  original="$(roots_snapshot "$M_HOME")"
+
+  run fixture_exec "$M_HOME" /usr/bin/env PATH="$bin:$FIXTURE_PATH" APM_NATIVE_ACCOUNT_HOME="$M_HOME" APM_BIN="$stub" /bin/bash "$REPO_ROOT/scripts/native.sh" \
+    migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"another migrate drew the same stamp"* ]]
+  [ "$(roots_snapshot "$M_HOME")" = "$original" ]
+  [ "$(cat "$record")" = "$(printf 'moved\t.claude/skills\ndone\t.claude/skills')" ]
+  [ "$(cat "$M_HOME/.claude/skills.bak-$stamp/SKILL.md")" = "earlier" ]
+  [ ! -e "$M_HOME/.claude/skills.native-$stamp" ]
+}
+
 @test "migrate and rehearse stop before writing when agmsg db or teams links to a store other than the default" {
   local stub="$FX/stub-apm-deploy" original
   write_deploy_stub "$stub"
@@ -1002,7 +1083,7 @@ prepare_migrate() {
   [ -z "$(ls -A "$outside")" ]
 }
 
-@test "migrate:roots --apply runs from a new checkout with the HOME's ~/.apm gone, and reads nothing of ~/.apm" {
+@test "migrate:roots --apply runs from a new checkout on a HOME without ~/.apm, and moves the legacy guide aside" {
   local home legacy
   home="$(new_home roots-apply)"
   mkdir -p "$home/.claude"

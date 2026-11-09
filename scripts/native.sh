@@ -508,6 +508,15 @@ migrate_record() {
   printf '%s/.apm/native-migrate-%s.txt\n' "$1" "$2"
 }
 
+# Creates the record exclusively (noclobber), so only the run that owns a stamp may move roots or roll them back; a second
+# run that drew the same stamp stops here, before it sets the failure trap.
+claim_migrate_record() {
+  local home="$1" stamp="$2" record
+  record="$(migrate_record "$home" "$stamp")"
+  mkdir -p "$home/.apm"
+  (set -o noclobber && : >"$record") 2>/dev/null || fail "$record already exists: another migrate drew the same stamp. Nothing was changed; run again."
+}
+
 migrate_deployed_record() {
   printf '%s/.apm/native-migrate-%s.deployed.txt\n' "$1" "$2"
 }
@@ -535,13 +544,14 @@ previous_deployed_entries() {
 }
 
 # Moves each of MIGRATE_ROOTS to <root>.bak-<stamp> and records what it did in <HOME>/.apm/native-migrate-<stamp>.txt
+# (claimed by claim_migrate_record first)
 # (a "moved" line is written before the move and a "done" line after it, so a root without "done" may not have moved;
 # rollback adds "restored" per root, so it can resume).
 # Nothing is deleted. A root that does not exist is recorded as absent; a backup name already taken fails before any move.
 migrate_roots() {
   local home="$1" stamp="$2" root record
   record="$(migrate_record "$home" "$stamp")"
-  [ ! -e "$record" ] || fail "$record already exists; pick another stamp. Nothing was moved."
+  { [ -f "$record" ] && [ ! -s "$record" ]; } || fail "$record was not claimed (claim_migrate_record). Nothing was moved."
   for root in $MIGRATE_ROOTS; do
     if [ -e "$home/$root.bak-$stamp" ] || [ -L "$home/$root.bak-$stamp" ]; then
       fail "$home/$root.bak-$stamp already exists. Nothing was moved."
@@ -549,7 +559,6 @@ migrate_roots() {
   done
   mkdir -p "$home/.apm"
   previous_deployed_entries "$home" >"$(migrate_deployed_record "$home" "$stamp")"
-  : >"$record"
   for root in $MIGRATE_ROOTS; do
     if [ -e "$home/$root" ] || [ -L "$home/$root" ]; then
       printf 'moved\t%s\n' "$root" >>"$record"
@@ -664,6 +673,12 @@ record_has() {
   grep -qxF "$1"$'\t'"$2" "$3"
 }
 
+# The state a rollback leaves when it stops between moving the backup back and writing "restored": the backup is gone, the
+# root exists, and the root native wrote is kept beside it. A backup deleted by hand leaves no <root>.native-<stamp>.
+restored_but_unrecorded() {
+  { [ -e "$1" ] || [ -L "$1" ]; } && { [ -e "$1.native-$2" ] || [ -L "$1.native-$2" ]; }
+}
+
 # Moves the current roots to <root>.native-<stamp> and each <root>.bak-<stamp> back, and records "restored" per root, so a
 # run that stopped part way is finished by running it again. Nothing is deleted, and a name already taken fails before any
 # move. A root whose move never finished (no "done", no backup) is left as it is; a backup that is gone after "done"
@@ -680,6 +695,7 @@ rollback_roots() {
       moved)
         record_has restored "$root" "$record" && continue
         if [ ! -e "$current.bak-$stamp" ] && [ ! -L "$current.bak-$stamp" ] && record_has "done" "$root" "$record"; then
+          restored_but_unrecorded "$current" "$stamp" && continue
           fail "$current.bak-$stamp is missing. Nothing was changed."
         fi
         ;;
@@ -695,6 +711,11 @@ rollback_roots() {
     case "$kind" in moved | absent) ;; *) continue ;; esac
     current="$home/$root"
     record_has restored "$root" "$record" && continue
+    if [ "$kind" = moved ] && [ ! -e "$current.bak-$stamp" ] && [ ! -L "$current.bak-$stamp" ] && record_has "done" "$root" "$record" && restored_but_unrecorded "$current" "$stamp"; then
+      log "$current is already back in place (a rollback stopped before it wrote the line); recording it"
+      printf 'restored\t%s\n' "$root" >>"$record"
+      continue
+    fi
     if [ "$kind" = moved ] && [ ! -e "$current.bak-$stamp" ] && [ ! -L "$current.bak-$stamp" ]; then
       log "$current was never moved aside (the migrate stopped first); left as it is"
       continue
@@ -776,7 +797,7 @@ cmd_rehearse() {
   [ -n "$SOURCE_REF" ] || fail "rehearse needs --source-ref"
   local home sha dir rehearsal scratch path manifest shared lost stamp escaping mode=plain
   local install_status=0 compile_status=skipped agmsg_status=0 linked=0 reinstate_status=skipped allowed_lost=0 baseline_skips=0 dropped=0
-  local deployed root name
+  local home_state
   home="$(target_home rehearse)"
   assert_default_apm_config "$home"
   assert_no_home_manifest "$home"
@@ -786,6 +807,7 @@ cmd_rehearse() {
 $escaping"
   assert_default_agmsg_store "$home"
   if [ "$MIGRATE" = 1 ]; then assert_same_render_mode "$home"; fi
+  home_state="$(home_state_lines "$home")"
   sha="$(resolve_source_sha "$SOURCE_REF")"
   dir="$(cd "$BACKUP_DIR" && pwd -P)"
   rehearsal="$(mktemp -d "$dir/rehearsal-$(date -u +%Y%m%dT%H%M%SZ).XXXXXX")"
@@ -826,6 +848,7 @@ $shared"
   if [ "$MIGRATE" = 1 ]; then
     mode=migrate
     stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+    claim_migrate_record "$scratch" "$stamp"
     migrate_roots "$scratch" "$stamp"
   fi
   run_apm_install "$scratch" 2>&1 | tee -a "$rehearsal/apm.log" >&2 || install_status=$?
@@ -850,17 +873,14 @@ $shared"
     cp "$rehearsal/lost-all.txt" "$rehearsal/lost.txt"
   fi
   lost="$(wc -l <"$rehearsal/lost.txt" | tr -d ' ')"
-  : >"$rehearsal/dropped.txt"
-  if [ "$MIGRATE" = 1 ] && [ -f "$(migrate_deployed_record "$scratch" "$stamp")" ]; then
-    deployed="$(migrate_deployed_record "$scratch" "$stamp")"
-    while IFS=$'\t' read -r root name; do
-      [ -n "$root" ] || continue
-      if [ ! -e "$scratch/$root/$name" ] && [ ! -L "$scratch/$root/$name" ]; then printf '%s/%s\n' "$root" "$name" >>"$rehearsal/dropped.txt"; fi
-    done <"$deployed"
+  if [ "$MIGRATE" = 1 ]; then
+    dropped_entries "$scratch" "$stamp" >"$rehearsal/dropped.txt"
     dropped="$(wc -l <"$rehearsal/dropped.txt" | tr -d ' ')"
+  else
+    : >"$rehearsal/dropped.txt"
   fi
-  printf 'mode=%s\nhome=%s\nsource_ref=%s\nworkspace_only=%s\ninstall_status=%s\ncompile_status=%s\nreinstate_status=%s\nagmsg_status=%s\nlost=%s\nallowed_lost=%s\ndropped=%s\nbaseline_skips=%s\n' \
-    "$mode" "$home" "$sha" "$WORKSPACE_ONLY" "$install_status" "$compile_status" "$reinstate_status" "$agmsg_status" "$lost" "$allowed_lost" "$dropped" "$baseline_skips" \
+  printf 'mode=%s\nhome=%s\nsource_ref=%s\nworkspace_only=%s\ninstall_status=%s\ncompile_status=%s\nreinstate_status=%s\nagmsg_status=%s\nlost=%s\nallowed_lost=%s\ndropped=%s\nbaseline_skips=%s\n%s\n' \
+    "$mode" "$home" "$sha" "$WORKSPACE_ONLY" "$install_status" "$compile_status" "$reinstate_status" "$agmsg_status" "$lost" "$allowed_lost" "$dropped" "$baseline_skips" "$home_state" \
     >"$rehearsal/result.txt"
 
   if [ "$install_status" = 0 ] && [ "$compile_status" = 0 ] && [ "$agmsg_status" = 0 ] && [ "$lost" = 0 ] &&
@@ -904,6 +924,30 @@ result_has() {
   grep -qxF "$2" "$1/result.txt"
 }
 
+# "<root>/<entry>" for each entry the previous native lock deployed that the roots of $1 lack now.
+dropped_entries() {
+  local home="$1" stamp="$2" deployed root name
+  deployed="$(migrate_deployed_record "$home" "$stamp")"
+  [ -f "$deployed" ] || return 0
+  while IFS=$'\t' read -r root name; do
+    [ -n "$root" ] || continue
+    if [ ! -e "$home/$root/$name" ] && [ ! -L "$home/$root/$name" ]; then printf '%s/%s\n' "$root" "$name"; fi
+  done <"$deployed"
+}
+
+# The two facts of the real HOME that decide what a rehearsal means: whether a previous native lock exists, and what
+# ~/.apm is. A rehearsal taken in another state is not accepted by migrate.
+home_state_lines() {
+  local home="$1" apm_state=absent
+  if [ -e "$home/.apm/.git" ] || [ -d "$home/.apm/catalog" ]; then
+    apm_state=checkout
+  elif [ -e "$home/.apm" ] || [ -L "$home/.apm" ]; then
+    apm_state=consumer
+  fi
+  if [ -f "$home/.apm/apm.lock.yaml" ]; then printf 'previous_lock=present\n'; else printf 'previous_lock=absent\n'; fi
+  printf 'home_apm=%s\n' "$apm_state"
+}
+
 assert_migrate_rehearsal() {
   local home="$1" sha="$2" dir="$3" want
   [ -f "$dir/result.txt" ] || fail "--rehearsal $dir has no result.txt; run rehearse --migrate and pass its rehearsal-<UTC> directory"
@@ -911,6 +955,20 @@ assert_migrate_rehearsal() {
     reinstate_status=0 agmsg_status=0 lost=0 baseline_skips=0; do
     result_has "$dir" "$want" || fail "the rehearsal $dir does not show $want; run rehearse --migrate again for this HOME, --source-ref and --workspace-only until it is clean"
   done
+  for want in $(home_state_lines "$home"); do
+    result_has "$dir" "$want" || fail "the rehearsal $dir was taken when the HOME was in another state (it does not show $want); take a backup and run rehearse --migrate again now"
+  done
+  [ -f "$dir/dropped.txt" ] || fail "the rehearsal $dir has no dropped.txt; run rehearse --migrate again"
+}
+
+# The entries migrate drops must be the ones the rehearsal dropped, because the rehearsal is what allowed them. The rollback
+# that follows a mismatch keeps every file.
+assert_dropped_as_rehearsed() {
+  local home="$1" stamp="$2" dir="$3" actual
+  actual="$home/.apm/native-migrate-$stamp.dropped.txt"
+  dropped_entries "$home" "$stamp" >"$actual"
+  [ "$(sort "$actual")" = "$(sort "$dir/dropped.txt")" ] ||
+    fail "migrate dropped other entries than the rehearsal did (compare $actual with $dir/dropped.txt); the roots are rolled back"
 }
 
 # Copies the files migrate must not change (owner-only, permissions kept) so a change can be undone. Contents are never
@@ -1021,11 +1079,13 @@ cmd_migrate() {
   parse_options "$@"
   [ -n "$SOURCE_REF" ] || fail "migrate needs --source-ref; deploying never moves a pin on its own"
   [ -n "$REHEARSAL" ] || fail "migrate needs --rehearsal <the rehearsal-<UTC> directory of a clean rehearse --migrate>"
-  local home sha edited links manifest roots_before changed
+  local home sha edited links manifest roots_before changed rehearsal_dir
   home="$(target_home migrate)"
   sha="$(resolve_source_sha "$SOURCE_REF")"
   assert_not_checkout "$home"
-  assert_migrate_rehearsal "$home" "$sha" "$(cd "$REHEARSAL" 2>/dev/null && pwd -P || printf '%s' "$REHEARSAL")"
+  assert_same_render_mode "$home"
+  rehearsal_dir="$(cd "$REHEARSAL" 2>/dev/null && pwd -P || printf '%s' "$REHEARSAL")"
+  assert_migrate_rehearsal "$home" "$sha" "$rehearsal_dir"
 
   assert_default_apm_config "$home"
   assert_no_home_manifest "$home"
@@ -1039,17 +1099,16 @@ $links
 Move them aside or make them plain directories and files of this HOME."
 
   assert_default_agmsg_store "$home"
-  assert_same_render_mode "$home"
   manifest="$(render_manifest "$sha" "$WORKSPACE_ONLY")"
   roots_before="$(migrate_roots_snapshot "$home")"
+  MIGRATE_HOME="$home" MIGRATE_STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+  claim_migrate_record "$home" "$MIGRATE_STAMP"
   MIGRATE_AGMSG_LINKED=0
   if [ -L "$home/.agents/skills/agmsg/db" ]; then
     MIGRATE_AGMSG_LINKED=1
     agmsg_state "$home" save
   fi
 
-  MIGRATE_HOME="$home" MIGRATE_STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
-  mkdir -p "$home/.apm"
   trap migrate_failure EXIT
   save_untouched "$home" "$MIGRATE_STAMP"
   install_manifest "$home" "$manifest"
@@ -1058,6 +1117,7 @@ Move them aside or make them plain directories and files of this HOME."
   run_apm "$home" compile -g --clean
   reinstate_entries "$home" "$MIGRATE_STAMP" "$home/.apm/native-migrate-$MIGRATE_STAMP."
   if [ "$MIGRATE_AGMSG_LINKED" = 1 ]; then agmsg_state "$home" restore; fi
+  assert_dropped_as_rehearsed "$home" "$MIGRATE_STAMP" "$rehearsal_dir"
   assert_no_unexpected_loss "$home" "$MIGRATE_STAMP" "$roots_before"
   changed="$(changed_untouched_files "$home" "$MIGRATE_STAMP")"
   [ -z "$changed" ] || fail "migrate changed these files, which it must leave alone (they are put back, and the changed versions kept as <file>.changed-$MIGRATE_STAMP): $(tr '\n' ' ' <<<"$changed")"
