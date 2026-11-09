@@ -345,8 +345,12 @@ metadata_inventory() {
   local home="$1" path
   for path in $BACKUP_PATHS; do
     [ -e "$home/$path" ] || [ -L "$home/$path" ] || continue
-    (cd "$home" && find "$path" -print0 | LC_ALL=C sort -z | xargs -0 stat -f '%HT %z %m %N%SY' 2>/dev/null ||
-      find "$path" -printf '%y %s %T@ %p -> %l\n' | LC_ALL=C sort)
+    # GNU stat -f reports the filesystem (free space included), so GNU find goes first.
+    if (cd "$home" && find "$path" -maxdepth 0 -printf '' 2>/dev/null); then
+      (cd "$home" && find "$path" -printf '%y %s %T@ %p -> %l\n' | LC_ALL=C sort)
+    else
+      (cd "$home" && find "$path" -print0 | LC_ALL=C sort -z | xargs -0 stat -f '%HT %z %m %N%SY')
+    fi
   done
 }
 
@@ -402,7 +406,7 @@ isolate_scratch_links() {
         ln -s "$scratch/.local/state/agmsg/${target#"$store"}" "$link"
         ;;
       *)
-        if ! resolved="$(realpath "$link" 2>/dev/null)"; then
+        if [ ! -e "$link" ] || ! resolved="$(realpath "$link" 2>/dev/null)"; then
           rm -f "$link"
           log "removed the broken link $link -> $target from the scratch HOME"
           continue
@@ -566,7 +570,8 @@ shared_entries() {
   [ ${#roots[@]} -gt 0 ] || return 0
   local link target
   find "${roots[@]}" -type l | LC_ALL=C sort | while IFS= read -r link; do
-    if ! target="$(realpath "$link" 2>/dev/null)"; then
+    # GNU realpath resolves a link whose last component is missing, so test the target first.
+    if [ ! -e "$link" ] || ! target="$(realpath "$link" 2>/dev/null)"; then
       printf '  %s (broken)\n' "$link"
       continue
     fi
