@@ -31,10 +31,13 @@ Usage: scripts/native.sh <command> [options]
   render   --source-ref REF [--workspace-only]    Print the consumer manifest to stdout.
   backup   (--home DIR | --real-home) --backup-dir NEW_DIR
                                                  Copy the non-secret paths apply can change, plus the agmsg store.
+  rehearse (--home DIR | --real-home) --backup-dir DIR --source-ref REF [--workspace-only]
+                                                 Clone a completed backup into a scratch HOME inside DIR, run the same
+                                                 install and compile there, and count the files that disappeared.
   apply    (--home DIR | --real-home --backup-dir DIR) --source-ref REF [--workspace-only]
                                                  Write the manifest into <HOME>/.apm, then apm install -g --only apm and
                                                  apm compile -g --clean with that HOME. --home must be a disposable HOME;
-                                                 --real-home needs a completed backup.
+                                                 --real-home needs a completed backup and a clean rehearse of it.
   rollback (--home DIR | --real-home) --backup-dir DIR
                                                  Move the current copies of the backed-up paths into DIR and put the
                                                  backup back.
@@ -198,7 +201,8 @@ cmd_plan() {
   render_manifest "$sha" "$WORKSPACE_ONLY"
   cat <<EOF
 
-# apply --home <disposable HOME> (or --real-home --backup-dir <completed backup>) --source-ref $sha would run:
+# apply --home <disposable HOME> (or --real-home --backup-dir <completed backup>) --source-ref $sha would run
+# (--real-home first needs a rehearse of that backup at that SHA that lost no file):
 #   1. stop if an APM-generated root there was edited after compile ($COMPILED_ROOTS), or if a symlink or hard link
 #      apm could write through reaches outside that HOME (the whole disposable HOME; apm's write paths in the real one)
 #   2. disposable HOME: stop if <HOME>/.apm/config.json holds more than apm's default_client, and keep a differing
@@ -231,6 +235,7 @@ cmd_apply() {
   home="$(target_home apply)"
   if [ "$REAL_HOME" = 1 ]; then assert_completed_backup "$home"; fi
   sha="$(resolve_source_sha "$SOURCE_REF")"
+  if [ "$REAL_HOME" = 1 ]; then assert_clean_rehearsal "$home" "$sha"; fi
   edited="$(edited_generated_roots "$home")"
   [ -z "$edited" ] || fail "these roots keep APM's marker but were edited after compile, and apm compile would overwrite them:
 $edited
@@ -350,6 +355,127 @@ assert_completed_backup() {
   grep -qxF "home=$home" "$BACKUP_DIR/complete" || fail "$BACKUP_DIR is a backup of another HOME"
 }
 
+assert_clean_rehearsal() {
+  local home="$1" sha="$2" ok="$BACKUP_DIR/rehearsal-ok"
+  if [ -f "$ok" ] && grep -qxF "home=$home" "$ok" && grep -qxF "source_ref=$sha" "$ok" &&
+    grep -qxF "workspace_only=$WORKSPACE_ONLY" "$ok"; then return 0; fi
+  fail "no clean rehearsal of $BACKUP_DIR for $home at $sha; run native:rehearse -- --real-home --backup-dir $BACKUP_DIR --source-ref $SOURCE_REF first"
+}
+
+# Every symlink of the scratch HOME ends up inside it, so nothing apm writes there reaches the real files.
+isolate_scratch_links() {
+  local home="$1" scratch="$2" link target resolved
+  local store="$home/.local/state/agmsg/"
+  while IFS= read -r link; do
+    target="$(readlink "$link")"
+    case "$target" in
+      "$store"*)
+        rm -f "$link"
+        ln -s "$scratch/.local/state/agmsg/${target#"$store"}" "$link"
+        ;;
+      *)
+        if ! resolved="$(realpath "$link" 2>/dev/null)"; then
+          rm -f "$link"
+          log "removed the broken link $link -> $target from the scratch HOME"
+          continue
+        fi
+        case "$resolved/" in
+          "$scratch/"*) ;;
+          *)
+            rm -f "$link"
+            cp -cpRL "$resolved" "$link" 2>/dev/null || {
+              rm -rf "$link"
+              cp -pRL "$resolved" "$link"
+            }
+            ;;
+        esac
+        ;;
+    esac
+  done < <(find "$scratch" -type l | LC_ALL=C sort)
+}
+
+rehearsal_snapshot() {
+  local scratch="$1" present="$2" path
+  (cd "$scratch" && while IFS= read -r path; do
+    [ -n "$path" ] || continue
+    if [ -e "$path" ] || [ -L "$path" ]; then find "$path"; fi
+  done <"$present" | LC_ALL=C sort)
+}
+
+agmsg_state() {
+  env -u XDG_STATE_HOME HOME="$1" bash "$REPO_ROOT/scripts/agmsg-state.sh" "$2" >&2
+}
+
+# apm 0.35.0 deletes deployed files it considers stale and `apm install --dry-run` does not preview that, so the same
+# install and compile run on a clone of the backup first and the files that disappeared are counted.
+cmd_rehearse() {
+  parse_options "$@"
+  [ -n "$SOURCE_REF" ] || fail "rehearse needs --source-ref"
+  local home sha dir rehearsal scratch path manifest shared lost
+  local install_status=0 compile_status=skipped agmsg_status=0 linked=0
+  home="$(target_home rehearse)"
+  assert_completed_backup "$home"
+  sha="$(resolve_source_sha "$SOURCE_REF")"
+  dir="$(cd "$BACKUP_DIR" && pwd -P)"
+  rm -f "$dir/rehearsal-ok"
+  rehearsal="$(mktemp -d "$dir/rehearsal-$(date -u +%Y%m%dT%H%M%SZ).XXXXXX")"
+  scratch="$rehearsal/home"
+  mkdir "$scratch"
+
+  while IFS= read -r path; do
+    [ -n "$path" ] || continue
+    mkdir -p "$(dirname "$scratch/$path")"
+    clone_copy "$dir/home/$path" "$scratch/$path"
+  done <"$dir/present.txt"
+  if [ -e "$home/.apm/apm_modules" ] || [ -L "$home/.apm/apm_modules" ]; then
+    mkdir -p "$scratch/.apm"
+    clone_copy "$home/.apm/apm_modules" "$scratch/.apm/apm_modules"
+  fi
+  if [ -d "$dir/agmsg-state" ]; then
+    mkdir -p "$scratch/.local/state"
+    clone_copy "$dir/agmsg-state" "$scratch/.local/state/agmsg"
+  fi
+  isolate_scratch_links "$home" "$scratch"
+  shared="$(shared_entries "$scratch" .)"
+  [ -z "$shared" ] || fail "the scratch HOME $scratch still shares data with files outside it:
+$shared"
+
+  rehearsal_snapshot "$scratch" "$dir/present.txt" >"$rehearsal/before.txt"
+  manifest="$(render_manifest "$sha" "$WORKSPACE_ONLY")"
+  mkdir -p "$scratch/.apm"
+  rm -f "$scratch/.apm/apm.yml"
+  printf '%s\n' "$manifest" >"$scratch/.apm/apm.yml"
+
+  if [ -L "$scratch/.agents/skills/agmsg/db" ]; then
+    linked=1
+    agmsg_state "$scratch" save
+  fi
+  run_apm "$scratch" install -g --only apm 2>&1 | tee -a "$rehearsal/apm.log" >&2 || install_status=$?
+  if [ "$install_status" -eq 0 ]; then
+    compile_status=0
+    run_apm "$scratch" compile -g --clean 2>&1 | tee -a "$rehearsal/apm.log" >&2 || compile_status=$?
+  fi
+  if [ "$linked" = 1 ]; then agmsg_state "$scratch" restore || agmsg_status=1; fi
+
+  rehearsal_snapshot "$scratch" "$dir/present.txt" >"$rehearsal/after.txt"
+  LC_ALL=C comm -23 "$rehearsal/before.txt" "$rehearsal/after.txt" >"$rehearsal/lost.txt"
+  lost="$(wc -l <"$rehearsal/lost.txt" | tr -d ' ')"
+  printf 'home=%s\nsource_ref=%s\ninstall_status=%s\ncompile_status=%s\nagmsg_status=%s\nlost=%s\n' \
+    "$home" "$sha" "$install_status" "$compile_status" "$agmsg_status" "$lost" >"$rehearsal/result.txt"
+
+  if [ "$install_status" = 0 ] && [ "$compile_status" = 0 ] && [ "$agmsg_status" = 0 ] && [ "$lost" = 0 ]; then
+    printf 'home=%s\nsource_ref=%s\nworkspace_only=%s\n' "$home" "$sha" "$WORKSPACE_ONLY" >"$dir/rehearsal-ok"
+    log "rehearsal clean: install and compile ran on a clone of $dir and lost no file ($rehearsal)"
+    return 0
+  fi
+  log "rehearsal failed: install=$install_status compile=$compile_status agmsg=$agmsg_status lost=$lost ($rehearsal/result.txt)"
+  if [ "$lost" != 0 ]; then
+    log "files that disappeared, all in $rehearsal/lost.txt:"
+    head -n 20 "$rehearsal/lost.txt" | sed 's/^/  /' >&2
+  fi
+  exit 1
+}
+
 cmd_rollback() {
   parse_options "$@"
   local home dir aside path
@@ -436,6 +562,7 @@ main() {
     render) cmd_render "$@" ;;
     apply) cmd_apply "$@" ;;
     backup) cmd_backup "$@" ;;
+    rehearse) cmd_rehearse "$@" ;;
     rollback) cmd_rollback "$@" ;;
     -h | --help | help) usage ;;
     *) usage >&2; exit 2 ;;

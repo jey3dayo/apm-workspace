@@ -17,6 +17,10 @@ run = "bash ./scripts/native.sh apply"
 description = "Copy the non-secret paths native:apply can change: -- --real-home --backup-dir <new dir>"
 run = "bash ./scripts/native.sh backup"
 
+["native:rehearse"]
+description = "Clone a native:backup into a scratch HOME, run the same install + compile there and count lost files; real apply needs a clean rehearsal: -- --real-home --backup-dir <backup> --source-ref <SHA>"
+run = "bash ./scripts/native.sh rehearse"
+
 ["native:rollback"]
 description = "Put a native:backup back, moving the current copies aside: -- --real-home --backup-dir <backup>"
 run = "bash ./scripts/native.sh rollback"
