@@ -441,6 +441,8 @@ sentinel_snapshot() {
   [ "$(grep -c '^HOME=' "$home/apm-env.log")" -eq 2 ]
   [ "$(grep -c "^TMPDIR=$home/.cache/apm-native-tmp\$" "$home/apm-env.log")" -eq 2 ]
   [ "$(grep -cE '^(APM_CACHE_DIR|XDG_STATE_HOME|GITHUB_TOKEN)=' "$home/apm-env.log")" -eq 0 ]
+  # ssh would otherwise read its config from, and add host keys to, the account HOME.
+  [ "$(grep -c "^GIT_SSH_COMMAND=ssh -F /dev/null -o UserKnownHostsFile=$home/.ssh/known_hosts" "$home/apm-env.log")" -eq 2 ]
 }
 
 @test "a lone carriage return inserted into a compiled root counts as an edit, as it does for APM" {
@@ -570,6 +572,24 @@ seed_agmsg() {
   grep -qxF "lost=1" "$(dirname "$lost")/result.txt"
   [ "$(backed_up_snapshot "$home")" = "$before" ]
   [ -f "$home/.claude/skills/victim/SKILL.md" ]
+}
+
+@test "rehearse copies the target of a relative link that leaves the backed-up paths, so losing it would count" {
+  local home backup="$FX/backups/real-rehearse-rel" scratch
+  home="$(new_home real-rehearse-rel)"
+  mkdir -p "$home/src/local-skill" "$home/.claude/skills"
+  echo "local skill" >"$home/src/local-skill/SKILL.md"
+  ln -s ../../src/local-skill "$home/.claude/skills/local"
+  real_native "$home" backup --real-home --backup-dir "$backup"
+  printf '#!/bin/sh\nexit 0\n' >"$FX/stub-apm-noop-rel"
+  chmod +x "$FX/stub-apm-noop-rel"
+
+  real_native_with_stub "$home" "$FX/stub-apm-noop-rel" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  scratch="$(compgen -G "$backup/rehearsal-*/home")"
+  [ ! -L "$scratch/.claude/skills/local" ]
+  [ "$(cat "$scratch/.claude/skills/local/SKILL.md")" = "local skill" ]
+  grep -qxF ".claude/skills/local/SKILL.md" "$(dirname "$scratch")/before.txt"
+  [ "$(readlink "$home/.claude/skills/local")" = "../../src/local-skill" ]
 }
 
 @test "rehearse points the agmsg links into the scratch HOME and leaves the real store alone" {

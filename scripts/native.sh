@@ -322,7 +322,7 @@ assert_completed_backup() {
 
 # Every symlink of the scratch HOME ends up inside it, so nothing apm writes there reaches the real files.
 isolate_scratch_links() {
-  local home="$1" scratch="$2" link target resolved
+  local home="$1" scratch="$2" link target resolved orig
   local store="$home/.local/state/agmsg/"
   while IFS= read -r link; do
     target="$(readlink "$link")"
@@ -333,6 +333,14 @@ isolate_scratch_links() {
         ;;
       *)
         if [ ! -e "$link" ] || ! resolved="$(realpath "$link" 2>/dev/null)"; then
+          # A relative link can point at a file of the HOME that the backup did not copy; resolve it in the HOME.
+          orig="$home${link#"$scratch"}"
+          if [ -e "$orig" ] && resolved="$(realpath "$orig" 2>/dev/null)"; then
+            rm -f "$link"
+            cp -cpRL "$resolved" "$link" 2>/dev/null || cp -pRL "$resolved" "$link" ||
+              fail "cannot reproduce $orig -> $target in the scratch HOME"
+            continue
+          fi
           rm -f "$link"
           log "removed the broken link $link -> $target from the scratch HOME"
           continue
@@ -441,7 +449,11 @@ run_apm() {
   local home="$1" var
   shift
   mkdir -p "$home/.cache/apm-native-tmp"
-  local env_args=(HOME="$home" PATH="$PATH" TMPDIR="$home/.cache/apm-native-tmp" LANG="${LANG:-C.UTF-8}")
+  # ssh takes its config and known_hosts from the account HOME, not $HOME; new host keys go to the target HOME.
+  mkdir -p "$home/.ssh"
+  local ssh_cmd
+  ssh_cmd="ssh -F /dev/null -o $(printf '%q' "UserKnownHostsFile=$home/.ssh/known_hosts $(user_db_home)/.ssh/known_hosts")"
+  local env_args=(HOME="$home" PATH="$PATH" TMPDIR="$home/.cache/apm-native-tmp" LANG="${LANG:-C.UTF-8}" GIT_SSH_COMMAND="$ssh_cmd")
   for var in LC_ALL TERM PYTHONUTF8 GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM GIT_CEILING_DIRECTORIES; do
     if [ -n "${!var:-}" ]; then env_args+=("$var=${!var}"); fi
   done
