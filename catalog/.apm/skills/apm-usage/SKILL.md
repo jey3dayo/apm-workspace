@@ -1,7 +1,7 @@
 ---
 name: apm-usage
 description: >-
-  Owner router for the ~/.apm APM workspace: which lane and path own a skill,
+  Owner router for the APM workspace checkout: which lane and path own a skill,
   agent, rule or MCP change, and which mise task rolls it out (deploy, upgrade,
   install:catalog, 再配布). Covers apm.yml / apm.lock.yaml pins, `apmのバージョンあげて`,
   global MCP add/change/remove including ~/.codex/config.toml and `codex mcp
@@ -12,37 +12,41 @@ description: >-
 
 # APM Usage
 
-Route `~/.apm` work by ownership first, then choose the smallest task that matches the intent.
+Route work in the APM workspace by ownership first, then choose the smallest task that matches the intent.
+
+The authoring checkout (`~/src/github.com/jey3dayo/apm-workspace`; "the checkout" below) is where every edit happens. On the native HOME, `~/.apm` holds only the APM consumer state (rendered manifest, lock, `apm_modules`, migrate records) and is not a git checkout: never edit there.
 
 ## Ownership
 
-- Edit `~/.apm/.apm/skills/**` for skills that operate only on this APM workspace.
-- Edit `~/.apm/catalog/.apm/skills/**` for personal skills that should be available
+Paths in this section are relative to the checkout.
+
+- Edit `.apm/skills/**` for skills that operate only on this APM workspace.
+- Edit `catalog/.apm/skills/**` for personal skills that should be available
   in the global automatic rollout.
-- Edit `~/.apm/catalog/{AGENTS.md,commands/**,rules/**}` for shared guidance and `~/.apm/catalog/.apm/agents/*.agent.md` for agent definitions. When creating or changing an agent definition, read the model-assignment rules in `orchestrator-worker` first: an agent whose judgement drives a production change, an approval, or a rejection carries no `model:` and inherits the parent's.
-- Edit `~/.apm/optional-skills/<id>/**` for skills that should be tracked
+- Edit `catalog/{AGENTS.md,commands/**,rules/**}` for shared guidance and `catalog/.apm/agents/*.agent.md` for agent definitions. When creating or changing an agent definition, read the model-assignment rules in `orchestrator-worker` first: an agent whose judgement drives a production change, an approval, or a rejection carries no `model:` and inherits the parent's.
+- Edit `optional-skills/<id>/**` for skills that should be tracked
   here but installed only by selected repositories.
 - Treat each optional skill directory as an individually installable package;
   the `optional-skills` collection root has no package manifest.
-- Edit `~/.apm/apm.yml` and `~/.apm/apm.lock.yaml` for dependency selection and accepted upstream state.
-- Edit `~/.apm/README.md`, `llms.txt`, and `docs/**` only for workspace-owned prose.
-- Treat `~/.apm/.claude/skills/**` and `~/.apm/.agents/skills/**` as runtime
+- Edit the root `apm.yml` and `apm.lock.yaml` for dependency selection and accepted upstream state.
+- Edit `README.md`, `llms.txt`, and `docs/**` only for workspace-owned prose.
+- Treat `.claude/skills/**` and `.agents/skills/**` as runtime
   bridges for workspace-only skills: create or repoint the per-skill symlinks
   there, but never edit skill content through them.
-- Treat `~/.apm/apm_modules/` and deployed targets as generated state, not editing surfaces.
-- For an external dependency listed in `apm.yml` / `apm.lock.yaml`, edit the upstream repository checkout when that checkout is the user-specified source of truth. Commit and push there first, then accept the new resolved commit through `~/.apm`.
+- Treat `apm_modules/` and deployed targets as generated state, not editing surfaces.
+- For an external dependency listed in `apm.yml` / `apm.lock.yaml`, edit the upstream repository checkout when that checkout is the user-specified source of truth. Commit and push there first, then accept the new resolved commit through the checkout.
 
 ## MCP Ownership Gate
 
 Before any persistent MCP configuration write:
 
-1. If `~/.apm` exists, inspect its root `apm.yml`, ownership guidance, and rollout script first.
+1. Inspect the checkout's root `apm.yml`, ownership guidance, and rollout script first.
 2. Classify the requested path as a source of truth or deployed output before writing.
 3. If the MCP is declared in APM, edit the tracked APM source and redeploy; do not run `codex mcp add` / `codex mcp remove` or hand-edit `~/.codex/config.toml` as the durable change.
 4. For diagnostics, prefer a one-run `codex -c` override and state that it is temporary.
 5. Verify the resolved server with `codex mcp list` and one real tool call before reporting completion.
 
-Repo-local and on-demand placement: keep `tauri-mcp-server`-style runtime MCPs in the repository that needs them, and add screen-control MCPs on demand rather than globally. There is no fixed list of repo-local MCPs — enumerate repositories with `ghq list -p` and read each `apm.yml`. Connection status for SaaS connectors lives in `~/.apm/docs/saas-connectors.md`; removal decisions are recorded in `docs/package-decisions.md`.
+Repo-local and on-demand placement: keep `tauri-mcp-server`-style runtime MCPs in the repository that needs them, and add screen-control MCPs on demand rather than globally. There is no fixed list of repo-local MCPs — enumerate repositories with `ghq list -p` and read each `apm.yml`. Connection status for SaaS connectors lives in `docs/saas-connectors.md` of the checkout; removal decisions are recorded in `docs/package-decisions.md`.
 
 ## Skill Placement
 
@@ -72,7 +76,7 @@ before installing or creating a skill.
 
 Before an install, assign exactly one lane name.
 
-1. Use `workspace-only` when the skill operates `~/.apm` itself.
+1. Use `workspace-only` when the skill operates the APM workspace itself.
 2. Use `repository-local` when it depends on one repository's runtime,
    credentials, framework, browser session, or service.
 3. Use `optional` when this workspace owns the skill but only selected
@@ -103,7 +107,7 @@ Claude Code is one of the repository's runtimes, otherwise every
 repository-local skill or MCP silently misses Claude Code.
 
 The workspace-only bridge contract is the Ownership table and the Rollout and
-Verification section of `~/.apm/AGENTS.md`.
+Verification section of the checkout's `AGENTS.md`.
 
 Use `manual-skills/.apm/skills/<id>/` only for upstream skills that do not install or deploy cleanly through the normal managed lane because of symlinks, packaging quirks, missing bundled files, or incompatible upstream layout. Record the reason and provenance under `manual-skills/upstreams/**`.
 
@@ -134,6 +138,7 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
 
 ## Task Selection
 
+- On the native HOME (`~/.apm/apm.yml` starts with `# Rendered by scripts/native.sh`), `deploy`, `upgrade`, `apply` and the other tasks below that write the deployed targets are refused. Roll out with `docs/native-distribution.md` section B (`native:backup` → `native:rehearse --migrate` → `native:migrate`); the deploy tasks below describe the legacy rollout.
 - Run `mise run check` for a lightweight pre-deploy gate.
 - Run `mise run verify` for `check`, both script suites (`test`), and catalog smoke verification.
 - Run `mise run deploy` for the normal local rollout from the current manifest and lock.
@@ -209,7 +214,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
 
 ## Guardrails
 
-- Do not treat `~/.apm/apm_modules/` as the place to edit managed skills.
+- Do not treat `apm_modules/` as the place to edit managed skills.
 - Do not pin a self-referencing repo-local skill to a SHA without making the pin
   bump part of the repository's documented change flow. A stale pin fails
   silently — no warning, no drift, old content deployed.
@@ -219,7 +224,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
   skill lane.
 - Do not add the `optional-skills` collection root to the root `apm.yml`; install individual skill refs only in consuming repositories.
 - Do not duplicate an external dependency into `catalog/.apm/skills/**` just because a local checkout exists. Keep one source of truth: upstream checkout, managed catalog, manual copy, or private overlay.
-- Do not add local `./packages/*` refs to `~/.apm/apm.yml`.
+- Do not add local `./packages/*` refs to the root `apm.yml`.
 - Do not hand-edit deployed targets such as `~/.claude/`, `~/.codex/`, or `~/.agents/skills`.
 - Do not judge a deployed skill orphaned by its absence from `catalog/.apm/skills/**` and `optional-skills/**`; deployed targets are mostly fed by external dependencies, so that test marks most of a healthy target as orphaned. Name the supplier of every entry before it reaches a delete line -- a lock record, `apm_modules/**`, `private-skills/.apm/skills/<id>`, `manual-skills`, or a workspace-only symlink bridge -- and treat only an entry with no supplier as a candidate. A lock record keeps an entry off that line but never proves the skill is still supplied — the lock keeps records for skills the catalog has already retired, so check the manifest, the record's owner, the locator's scope and target, and the deployed path itself before concluding anything about a record.
 - `apm audit --ci` and searching a deployed target: see `references/rollout-fast-paths.md` for the reading and grep-wrapper caveats.
@@ -239,7 +244,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - run `mise run check`
 
 2. Personal skill changed:
-   - edit `~/.apm/catalog/.apm/skills/**`
+   - edit `catalog/.apm/skills/**`
    - optionally run `mise run format:markdown:bold-headings`
    - run `mise run deploy`
    - verify `~/.agents/skills/<id>/` contains the deployed skill
@@ -252,7 +257,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - verify the consuming repository's directly referenced skill is present after installation
 
 4. Shared guidance changed:
-   - edit `~/.apm/catalog/**`
+   - edit `catalog/**`
    - run `mise run prepare:catalog`
    - review the diff, commit/push, then run `mise run install:catalog`
    - `install:catalog` moves the catalog dependency's pin to the pushed upstream
@@ -285,8 +290,8 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
      `global-dependency`, `private`, or `manual` before installing;
      `global-catalog` is not an install lane — create the skill via
      Fast Path 2 instead
-   - for global dependencies, work in `~/.apm` and use `apm install -g <package-ref>` or `apm install -g --mcp <name> ...`
-   - a bare `apm install -g` bypasses `mise run apply`, so the agmsg roster links it removes are not restored for you; follow the agmsg State section of `~/.apm/AGENTS.md` afterwards, diagnosing with `mise run doctor` before any restore
+   - for global dependencies, work in the checkout and use `apm install -g <package-ref>` or `apm install -g --mcp <name> ...`
+   - a bare `apm install -g` bypasses `mise run apply`, so the agmsg roster links it removes are not restored for you; follow the agmsg State section of the checkout's `AGENTS.md` afterwards, diagnosing with `mise run doctor` before any restore
    - run `mise run check:roots` before any bare `apm install -g` or `apm update -g`: while `~/.claude/CLAUDE.md` is still the legacy copy of the catalog guide, the install adds the same guide as a Claude rule and Claude loads it twice (`mise run migrate:roots` moves the copy)
    - for repo-local dependencies, work in the target repository and use `apm install <package-ref>` or `apm install --mcp <name> ...`
    - for global changes, run `mise run check`, then `mise run deploy`; for repo-local changes, run that repository's defined APM or project checks
@@ -300,14 +305,14 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - edit the external repository checkout that is the source of truth
    - run that repository's relevant checks
    - commit and push the external repository
-   - in `~/.apm`, check how `apm.yml` pins that dependency: if it tracks a branch
+   - in the checkout, check how `apm.yml` pins that dependency: if it tracks a branch
      or tag, run `mise run upgrade`; if it is SHA-pinned, bump the pin and
      follow the SHA-pin bump sequence in `references/rollout-fast-paths.md`
      instead of `mise run upgrade` alone
    - verify `apm.lock.yaml` points the target dependency at the pushed commit
    - check whether `apm.lock.yaml` also changed unrelated unpinned dependencies
    - verify the deployed target such as `~/.agents/skills/<id>` contains the updated content
-   - keep unrelated dirty files in `~/.apm` unstaged unless the user explicitly includes them
+   - keep unrelated dirty files in the checkout unstaged unless the user explicitly includes them
 
 8. Manual skill promoted to workspace-owned:
    - move the skill from `manual-skills/.apm/skills/<id>/` to `catalog/.apm/skills/<id>/`

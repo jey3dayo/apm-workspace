@@ -3,7 +3,7 @@
 Scan the current repository, choose repo-local APM dependencies from concrete source-tree signals, and create or update the repository's `apm.yml` without turning common global preferences into local clutter.
 
 Never edit global APM manifests through this reference. Use the rest of this
-skill for `~/.apm/apm.yml`, global lockfiles, and global deployment.
+skill for the APM workspace's root `apm.yml`, global lockfiles, and global deployment.
 
 ## Policy
 

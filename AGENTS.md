@@ -1,8 +1,11 @@
 # APM Workspace Guide
 
-`~/.apm` is the operational source of truth. Keep authoring inputs, generated
+The authoring checkout (`~/src/github.com/jey3dayo/apm-workspace`; "the checkout"
+below) is the operational source of truth. Keep authoring inputs, generated
 targets, and caches separate; never infer ownership from whichever copy is
-currently deployed.
+currently deployed. On the native HOME, `~/.apm` is not the checkout: it holds
+only the APM consumer state (rendered manifest, lock, `apm_modules`, migrate
+records), so never edit it.
 
 ## Ownership
 
@@ -44,7 +47,13 @@ bundle and install only the required sub-skill from the consuming repository.
 
 ## Rollout and Verification
 
-Classify work before running a rollout:
+Classify work before running a rollout. The table and the paragraph after it
+describe the legacy rollout. On the native HOME (`~/.apm/apm.yml` starts with
+`# Rendered by scripts/native.sh`), `deploy`, `upgrade`, `apply:skills:local` and
+the other tasks that write the deployed targets are refused; roll out a pushed
+commit with `docs/native-distribution.md` section B (`native:backup` →
+`native:rehearse --migrate` → `native:migrate`). `check`, `verify` and `doctor`
+still run.
 
 | Intent                 | Command                       | Constraint                                                                                                   |
 | ---------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------ |
@@ -61,7 +70,9 @@ install:catalog`, and `mise run doctor` for pushed shared-guidance changes.
 
 Shipping here has no PR: commit directly on `main`, run `apm-deploy-verify`
 (it runs format, check, and deploy itself), then push `main` and watch the
-pushed CI run. `ship` reads this as the repository's end point.
+pushed CI run. `ship` reads this as the repository's end point. On the native
+HOME `apm-deploy-verify` skips the refused deploy; after the push, roll the
+pushed commit out with section B of `docs/native-distribution.md`.
 
 `mise.toml` manages required tools except `pwsh` plus Pester, which `test:ps`
 (and therefore `test`/`verify`) requires. The bold-heading formatter helper is
@@ -109,8 +120,8 @@ symlinks resolving to `.apm/skills/<id>/SKILL.md`.
   otherwise unusual.
 - If a managed upstream skill repeatedly fails packaging or rollout, move it to
   the manual lane rather than patching cache or runtime output.
-- When changing the active `apm` source, update both `~/.apm/mise.toml` and
-  `~/.config/mise/config.workstation.toml`.
+- When changing the active `apm` source, update both the checkout's `mise.toml`
+  and `~/.config/mise/config.workstation.toml`.
 - Follow the guide in `catalog/.apm/instructions/ai-collaboration.instructions.md` for MCP placement. Root `apm.yml` contains only
   cross-repository global MCP; use the tracked source and regenerate, never
   edit `~/.codex/config.toml`. Desktop MCP setup belongs to bootstrap.
