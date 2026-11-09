@@ -23,7 +23,11 @@ import sys
 from typing import Any
 
 USAGE = "usage: fetch_comments.py [<owner>/<repo>] <number|PR URL>"
-PR_URL_RE = re.compile(r"^https://github\.com/([^/\s]+)/([^/\s]+)/pull/(\d+)(?:[/?#].*)?$")
+# The host is captured, not pinned to github.com: with GH_HOST set, gh
+# returns GitHub Enterprise URLs, whose path shape is the same. The host is
+# carried into the GraphQL calls so an explicitly passed Enterprise URL is
+# fetched from its own server, not from gh's default host.
+PR_URL_RE = re.compile(r"^https://([^/\s]+)/([^/\s]+)/([^/\s]+)/pull/(\d+)(?:[/?#].*)?$")
 REPO_RE = re.compile(r"^([^/\s]+)/([^/\s]+)$")
 
 QUERY = """\
@@ -134,16 +138,16 @@ def gh_pr_view_json(fields: str) -> dict[str, Any]:
     return _run_json(["gh", "pr", "view", "--json", fields])
 
 
-def _pr_ref_from_url(url: str) -> tuple[str, str, int]:
-    """Parse (owner, repo, number) from a PR URL. The URL names the base
-    repository, where the PR lives; the head repository may be a fork."""
+def _pr_ref_from_url(url: str) -> tuple[str, str, str, int]:
+    """Parse (host, owner, repo, number) from a PR URL. The URL names the
+    base repository, where the PR lives; the head repository may be a fork."""
     m = PR_URL_RE.match(url)
     if not m:
         raise ValueError(f"unexpected PR URL from gh: {url}")
-    return m.group(1), m.group(2), int(m.group(3))
+    return m.group(1), m.group(2), m.group(3), int(m.group(4))
 
 
-def get_current_pr_ref() -> tuple[str, str, int]:
+def get_current_pr_ref() -> tuple[str, str, str, int]:
     """
     Resolve the PR for the current branch (whatever gh considers associated).
     Goes through the PR URL so fork PRs resolve against the base repository,
@@ -152,20 +156,21 @@ def get_current_pr_ref() -> tuple[str, str, int]:
     return _pr_ref_from_url(gh_pr_view_json("url")["url"])
 
 
-def resolve_pr_ref(args: list[str]) -> tuple[str, str, int]:
+def resolve_pr_ref(args: list[str]) -> tuple[str | None, str, str, int]:
     """
-    Resolve (owner, repo, number) from CLI args:
+    Resolve (host, owner, repo, number) from CLI args. The host comes from
+    the PR URL whenever one is involved; it is None for the
+    [<owner>/<repo>, <number>] form, where gh's configured host applies.
       []                        -> PR of the current branch
-      [<url>]                   -> owner/repo/number from the PR URL
+      [<url>]                   -> host/owner/repo/number from the PR URL
       [<number>]                -> base repo as gh resolves it for the PR
       [<owner>/<repo>, <number>]
     """
     if not args:
         return get_current_pr_ref()
     if len(args) == 1:
-        m = PR_URL_RE.match(args[0])
-        if m:
-            return m.group(1), m.group(2), int(m.group(3))
+        if PR_URL_RE.match(args[0]):
+            return _pr_ref_from_url(args[0])
         if args[0].isdigit():
             # The PR URL carries the base repo, where the PR lives (headRepository would be a fork).
             url = _run_json(["gh", "pr", "view", args[0], "--json", "url"])["url"]
@@ -177,7 +182,7 @@ def resolve_pr_ref(args: list[str]) -> tuple[str, str, int]:
             raise ValueError(f"not an <owner>/<repo>: {args[0]}")
         if not args[1].isdigit():
             raise ValueError(f"not a PR number: {args[1]}")
-        return m.group(1), m.group(2), int(args[1])
+        return None, m.group(1), m.group(2), int(args[1])
     raise ValueError("too many arguments")
 
 
@@ -185,6 +190,7 @@ def gh_api_graphql(
     owner: str,
     repo: str,
     number: int,
+    host: str | None = None,
     comments_cursor: str | None = None,
     reviews_cursor: str | None = None,
     threads_cursor: str | None = None,
@@ -192,6 +198,8 @@ def gh_api_graphql(
     """
     Call `gh api graphql` using -F variables, avoiding JSON blobs with nulls.
     Query is passed via stdin using query=@- to avoid shell newline/quoting issues.
+    When host is given, it is passed as --hostname so the request goes to the
+    server the PR URL named, not gh's default host.
     """
     cmd = [
         "gh",
@@ -206,6 +214,8 @@ def gh_api_graphql(
         "-F",
         f"number={number}",
     ]
+    if host:
+        cmd += ["--hostname", host]
     if comments_cursor:
         cmd += ["-F", f"commentsCursor={comments_cursor}"]
     if reviews_cursor:
@@ -216,7 +226,7 @@ def gh_api_graphql(
     return _run_json(cmd, stdin=QUERY)
 
 
-def fetch_all(owner: str, repo: str, number: int) -> dict[str, Any]:
+def fetch_all(host: str | None, owner: str, repo: str, number: int) -> dict[str, Any]:
     conversation_comments: list[dict[str, Any]] = []
     reviews: list[dict[str, Any]] = []
     review_threads: list[dict[str, Any]] = []
@@ -232,6 +242,7 @@ def fetch_all(owner: str, repo: str, number: int) -> dict[str, Any]:
             owner=owner,
             repo=repo,
             number=number,
+            host=host,
             comments_cursor=comments_cursor,
             reviews_cursor=reviews_cursor,
             threads_cursor=threads_cursor,
@@ -283,8 +294,8 @@ def main(argv: list[str]) -> int:
         return 0
     try:
         _ensure_gh_authenticated()
-        owner, repo, number = resolve_pr_ref(argv)
-        result = fetch_all(owner, repo, number)
+        host, owner, repo, number = resolve_pr_ref(argv)
+        result = fetch_all(host, owner, repo, number)
     except (RuntimeError, ValueError, KeyError) as e:
         cause = " ".join(str(e).split()) or type(e).__name__
         print(f"{USAGE}\nerror: {cause}", file=sys.stderr)
