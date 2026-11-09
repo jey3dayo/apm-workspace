@@ -21,12 +21,13 @@
 - 生成した root（`~/.claude/CLAUDE.md`・`~/.codex/AGENTS.md`・`~/.cursor/AGENTS.md`）が APM の目印を残したまま compile のあとに編集されていたら、何も書かずに止まる。APM の目印は編集を守らず、compile が上書きするため。判定は APM と同じ Build ID の照合（`apm_cli/compilation/build_id.py`）で、APM と同じく末尾の改行だけを足した・消した編集は検出しない
 - 使い捨ての HOME では、`<HOME>/.apm/apm.yml` が描画した manifest とバイト単位で違えば、`apm.yml.<UTC>.bak` に残してから置き換える（同じ名前があれば番号を付け、既存の `.bak` を上書きしない）。実 HOME では、前の manifest は backup にあるので、checkout の中に `.bak` を作らない
 - HOME の外を指す（または壊れた）symlink か、ハードリンクの通常のファイルがあれば、何も書かずに止まる。使い捨ての HOME では HOME 全体を、実 HOME では apm の書込み先（backup の対象と `.cache/apm`・`Library/Caches/apm`）を調べる。apm がリンクを通して HOME の外のファイルを書き換えるため（キャッシュの `Library/Caches/apm` のように、配布先より深い場所にも書く）
-- 使い捨ての HOME では、`<HOME>/.apm/config.json` に、APM が自分で書く `default_client` 以外のキーがあれば止まる。APM は `temp_dir` などの場所をここから読むため。キーは APM と同じく JSON としてデコードしてから比べる
+- `<HOME>/.apm/config.json` に `default_client` と `prefer_ssh` 以外のキーがあれば、apply も rehearse も止まる。APM は `temp_dir` などの書込み先をここから読むため。`prefer_ssh` は git の URL の形を変えるだけで、書込み先は変えない。キーは APM と同じく JSON としてデコードしてから比べる
+- 実 HOME の apply は、backup したパスの種類・サイズ・mtime が backup の時点と 1 か所でも違えば止まる。`rehearsal-ok` には、描画した manifest の sha256 と、使う apm の場所と版も記録し、apply のときに同じか確かめる
 - apm は空の環境に `HOME`・`PATH`・ロケール・git の設定の場所と、HOME の中の `TMPDIR`（`.cache/apm-native-tmp`）だけを渡して起動する。APM は `APM_CACHE_DIR` や `XDG_*`、`TMPDIR` が指す場所にも書き（`APM_CACHE_DIR` と `XDG_CACHE_HOME` はテストで確かめた）、git は token・proxy・askpass を環境から読むため
 - manifest は同じディレクトリの新しいファイルに書いてから名前を置き換える
 - install は `--only apm`。MCP は、旧経路と `setup:mcp:host` が書いた今の設定のまま触らない。`~/.codex/config.toml` などの MCP・認証の設定は backup できない（秘密を含み得る）ため、rollback で戻せないものは書かない
 
-backup の対象: `~/.apm/apm.yml`・`apm.lock.yaml`・`deployment-receipts`（APM が配った成果物の所有の記録）、`~/.claude/{skills,agents,rules,commands,CLAUDE.md}`、`~/.codex/{AGENTS.md,rules}`、`~/.cursor/{agents,rules,AGENTS.md}`、`~/.agents/skills`、`~/AGENTS.md`、`~/.config/opencode/AGENTS.md`、`~/.local/state/agmsg`（別に取る）
+backup の対象: `~/.apm/apm.yml`・`config.json`・`apm.lock.yaml`・`deployment-receipts`（APM が配った成果物の所有の記録）、`~/.claude/{skills,agents,rules,commands,CLAUDE.md}`、`~/.codex/{AGENTS.md,rules}`、`~/.cursor/{agents,rules,AGENTS.md}`、`~/.agents/skills`、`~/AGENTS.md`、`~/.config/opencode/AGENTS.md`、`~/.local/state/agmsg`（別に取る）
 
 ## 旧経路と新経路
 

@@ -18,7 +18,7 @@ COMPILED_ROOTS=".claude/CLAUDE.md .codex/AGENTS.md .cursor/AGENTS.md"
 PROTECTED_SURFACES=".apm .claude .codex .cursor .agents .config .cache .local Library"
 # Non-secret paths apply can change in the real HOME; backup copies them and rollback restores them. Tool configs that
 # may hold credentials (~/.codex/config.toml, MCP configs) are not here, which is why apply installs with --only apm.
-BACKUP_PATHS=".apm/apm.yml .apm/apm.lock.yaml .apm/deployment-receipts .claude/skills .claude/agents .claude/rules .claude/commands .claude/CLAUDE.md
+BACKUP_PATHS=".apm/apm.yml .apm/config.json .apm/apm.lock.yaml .apm/deployment-receipts .claude/skills .claude/agents .claude/rules .claude/commands .claude/CLAUDE.md
 .codex/AGENTS.md .codex/rules .cursor/agents .cursor/rules .cursor/AGENTS.md .agents/skills AGENTS.md .config/opencode/AGENTS.md"
 # Where apm writes in the real HOME: the backed-up paths plus its caches.
 REAL_WRITE_PATHS="$BACKUP_PATHS .cache/apm Library/Caches/apm"
@@ -205,8 +205,9 @@ cmd_plan() {
 # (--real-home first needs a rehearse of that backup at that SHA that lost no file):
 #   1. stop if an APM-generated root there was edited after compile ($COMPILED_ROOTS), or if a symlink or hard link
 #      apm could write through reaches outside that HOME (the whole disposable HOME; apm's write paths in the real one)
-#   2. disposable HOME: stop if <HOME>/.apm/config.json holds more than apm's default_client, and keep a differing
-#      <HOME>/.apm/apm.yml as apm.yml.<UTC>.bak; real HOME: the backup holds the previous manifest
+#   2. stop if <HOME>/.apm/config.json holds more than default_client and prefer_ssh; disposable HOME: keep a differing
+#      <HOME>/.apm/apm.yml as apm.yml.<UTC>.bak; real HOME: the backup holds the previous manifest, and any change
+#      under the backed-up paths since the backup stops the apply
 #   3. write the manifest above; with --real-home, save the agmsg db/teams links (restored on every exit)
 #   4. apm install -g --only apm, from an empty environment plus HOME, PATH, locale, git config locations and a
 #      TMPDIR in HOME; MCP servers stay as they are
@@ -236,6 +237,8 @@ cmd_apply() {
   if [ "$REAL_HOME" = 1 ]; then assert_completed_backup "$home"; fi
   sha="$(resolve_source_sha "$SOURCE_REF")"
   if [ "$REAL_HOME" = 1 ]; then assert_clean_rehearsal "$home" "$sha"; fi
+  assert_default_apm_config "$home"
+  if [ "$REAL_HOME" = 1 ]; then assert_unchanged_since_backup "$home"; fi
   edited="$(edited_generated_roots "$home")"
   [ -z "$edited" ] || fail "these roots keep APM's marker but were edited after compile, and apm compile would overwrite them:
 $edited
@@ -245,7 +248,6 @@ Delete the marker line to keep the file as hand-written, or move it aside, then 
   [ -z "$links" ] || fail "these entries inside $home may share their data with files outside it, so writing them would change those files:
 $links
 Move them aside or make them plain directories and files of this HOME."
-  if [ "$REAL_HOME" = 0 ]; then assert_default_apm_config "$home"; fi
 
   manifest="$(render_manifest "$sha" "$WORKSPACE_ONLY")"
   mkdir -p "$home/.apm"
@@ -355,11 +357,37 @@ assert_completed_backup() {
   grep -qxF "home=$home" "$BACKUP_DIR/complete" || fail "$BACKUP_DIR is a backup of another HOME"
 }
 
+# The version comes from a throwaway HOME, so asking apm never writes into the real one.
+apm_identity() {
+  local base apm_home version
+  base="$(cd "$1" && pwd -P)"
+  apm_home="$(mktemp -d "$base/apm-version-home.XXXXXX")"
+  version="$(cd "$apm_home" && env -i HOME="$apm_home" PATH="$PATH" TMPDIR="$apm_home" "$APM_BIN" --version 2>&1 | awk 'NF { last = $0 } END { print last }')"
+  rm -rf "$apm_home"
+  printf '%s %s\n' "$(command -v "$APM_BIN")" "$version"
+}
+
 assert_clean_rehearsal() {
-  local home="$1" sha="$2" ok="$BACKUP_DIR/rehearsal-ok"
+  local home="$1" sha="$2" ok="$BACKUP_DIR/rehearsal-ok" manifest
+  manifest="$(render_manifest "$sha" "$WORKSPACE_ONLY")"
   if [ -f "$ok" ] && grep -qxF "home=$home" "$ok" && grep -qxF "source_ref=$sha" "$ok" &&
-    grep -qxF "workspace_only=$WORKSPACE_ONLY" "$ok"; then return 0; fi
-  fail "no clean rehearsal of $BACKUP_DIR for $home at $sha; run native:rehearse -- --real-home --backup-dir $BACKUP_DIR --source-ref $SOURCE_REF first"
+    grep -qxF "workspace_only=$WORKSPACE_ONLY" "$ok" &&
+    grep -qxF "manifest_sha256=$(printf '%s\n' "$manifest" | sha256)" "$ok" &&
+    grep -qxF "apm=$(apm_identity "$BACKUP_DIR")" "$ok"; then return 0; fi
+  fail "no clean rehearsal of $BACKUP_DIR for $home at $sha with this manifest and this apm; run native:rehearse -- --real-home --backup-dir $BACKUP_DIR --source-ref $SOURCE_REF first"
+}
+
+assert_unchanged_since_backup() {
+  local home="$1" now
+  now="$(mktemp "$BACKUP_DIR/inventory-now.XXXXXX")"
+  metadata_inventory "$home" >"$now"
+  if ! cmp -s "$now" "$BACKUP_DIR/inventory.txt"; then
+    log "the backed-up paths of $home differ from $BACKUP_DIR/inventory.txt (first lines of diff, < backup, > now):"
+    diff "$BACKUP_DIR/inventory.txt" "$now" | head -n 10 >&2 || true
+    rm -f "$now"
+    fail "$home changed since the backup; take a new native:backup and native:rehearse before applying"
+  fi
+  rm -f "$now"
 }
 
 # Every symlink of the scratch HOME ends up inside it, so nothing apm writes there reaches the real files.
@@ -411,9 +439,10 @@ agmsg_state() {
 cmd_rehearse() {
   parse_options "$@"
   [ -n "$SOURCE_REF" ] || fail "rehearse needs --source-ref"
-  local home sha dir rehearsal scratch path manifest shared lost
+  local home sha dir rehearsal scratch path manifest shared lost manifest_sha256 apm
   local install_status=0 compile_status=skipped agmsg_status=0 linked=0
   home="$(target_home rehearse)"
+  assert_default_apm_config "$home"
   assert_completed_backup "$home"
   sha="$(resolve_source_sha "$SOURCE_REF")"
   dir="$(cd "$BACKUP_DIR" && pwd -P)"
@@ -435,6 +464,7 @@ cmd_rehearse() {
     mkdir -p "$scratch/.local/state"
     clone_copy "$dir/agmsg-state" "$scratch/.local/state/agmsg"
   fi
+  assert_default_apm_config "$scratch"
   isolate_scratch_links "$home" "$scratch"
   shared="$(shared_entries "$scratch" .)"
   [ -z "$shared" ] || fail "the scratch HOME $scratch still shares data with files outside it:
@@ -445,6 +475,8 @@ $shared"
   mkdir -p "$scratch/.apm"
   rm -f "$scratch/.apm/apm.yml"
   printf '%s\n' "$manifest" >"$scratch/.apm/apm.yml"
+  manifest_sha256="$(sha256 <"$scratch/.apm/apm.yml")"
+  apm="$(apm_identity "$dir")"
 
   if [ -L "$scratch/.agents/skills/agmsg/db" ]; then
     linked=1
@@ -460,11 +492,13 @@ $shared"
   rehearsal_snapshot "$scratch" "$dir/present.txt" >"$rehearsal/after.txt"
   LC_ALL=C comm -23 "$rehearsal/before.txt" "$rehearsal/after.txt" >"$rehearsal/lost.txt"
   lost="$(wc -l <"$rehearsal/lost.txt" | tr -d ' ')"
-  printf 'home=%s\nsource_ref=%s\ninstall_status=%s\ncompile_status=%s\nagmsg_status=%s\nlost=%s\n' \
-    "$home" "$sha" "$install_status" "$compile_status" "$agmsg_status" "$lost" >"$rehearsal/result.txt"
+  printf 'home=%s\nsource_ref=%s\ninstall_status=%s\ncompile_status=%s\nagmsg_status=%s\nlost=%s\nmanifest_sha256=%s\napm=%s\n' \
+    "$home" "$sha" "$install_status" "$compile_status" "$agmsg_status" "$lost" \
+    "$manifest_sha256" "$apm" >"$rehearsal/result.txt"
 
   if [ "$install_status" = 0 ] && [ "$compile_status" = 0 ] && [ "$agmsg_status" = 0 ] && [ "$lost" = 0 ]; then
-    printf 'home=%s\nsource_ref=%s\nworkspace_only=%s\n' "$home" "$sha" "$WORKSPACE_ONLY" >"$dir/rehearsal-ok"
+    printf 'home=%s\nsource_ref=%s\nworkspace_only=%s\nmanifest_sha256=%s\napm=%s\n' \
+      "$home" "$sha" "$WORKSPACE_ONLY" "$manifest_sha256" "$apm" >"$dir/rehearsal-ok"
     log "rehearsal clean: install and compile ran on a clone of $dir and lost no file ($rehearsal)"
     return 0
   fi
@@ -545,13 +579,13 @@ shared_entries() {
 }
 
 # apm reads ~/.apm/config.json with json.load and takes temp_dir and other locations from it. Decode it the same way
-# and allow only the key apm writes on its own.
+# and allow only default_client and prefer_ssh, which move no write location.
 assert_default_apm_config() {
   local config="$1/.apm/config.json" extra
   [ -e "$config" ] || return 0
-  extra="$(python3 -c 'import json, sys; print(" ".join(sorted(set(json.load(open(sys.argv[1], encoding="utf-8"))) - {"default_client"})))' "$config")" ||
+  extra="$(python3 -c 'import json, sys; print(" ".join(sorted(set(json.load(open(sys.argv[1], encoding="utf-8"))) - {"default_client", "prefer_ssh"})))' "$config")" ||
     fail "$config is not a JSON object apm could read"
-  [ -z "$extra" ] || fail "$config sets $extra; a disposable HOME keeps only apm's default_client there"
+  [ -z "$extra" ] || fail "$config sets $extra; only default_client and prefer_ssh may be set there"
 }
 
 main() {

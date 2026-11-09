@@ -468,7 +468,7 @@ real_native() {
 
 backed_up_snapshot() {
   local path
-  (cd "$1" && for path in .apm/apm.yml .apm/apm.lock.yaml .apm/deployment-receipts .claude/skills .claude/agents .claude/rules .claude/commands \
+  (cd "$1" && for path in .apm/apm.yml .apm/config.json .apm/apm.lock.yaml .apm/deployment-receipts .claude/skills .claude/agents .claude/rules .claude/commands \
     .claude/CLAUDE.md .codex/AGENTS.md .codex/rules .cursor/agents .cursor/rules .cursor/AGENTS.md .agents/skills \
     AGENTS.md .config/opencode/AGENTS.md; do
     [ -e "$path" ] || [ -L "$path" ] || continue
@@ -571,6 +571,15 @@ seed_agmsg() {
   [ "$(cat "$home/.agents/skills/agmsg/db/keep")" = "db store" ]
 }
 
+sha256_of() {
+  if command -v sha256sum >/dev/null 2>&1; then sha256sum | awk '{print $1}'; else shasum -a 256 | awk '{print $1}'; fi
+}
+
+set_ok_field() {
+  sed "s|^$2=.*|$2=$3|" "$1" >"$1.new"
+  mv "$1.new" "$1"
+}
+
 real_native_with_stub() {
   local home="$1" stub="$2"
   shift 2
@@ -593,16 +602,19 @@ real_native_with_stub() {
   printf '#!/bin/sh\nexit 0\n' >"$FX/stub-apm-noop"
   chmod +x "$FX/stub-apm-noop"
   real_native_with_stub "$home" "$FX/stub-apm-noop" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
-  [ "$(cat "$backup/rehearsal-ok")" = "$(printf 'home=%s\nsource_ref=%s\nworkspace_only=1' "$home" "$SOURCE_SHA")" ]
+  [ "$(cat "$backup/rehearsal-ok")" = "$(printf 'home=%s\nsource_ref=%s\nworkspace_only=1\nmanifest_sha256=%s\napm=%s ' "$home" "$SOURCE_SHA" \
+    "$(native "$home" render --source-ref "$SOURCE_SHA" --workspace-only | sha256_of)" "$FX/stub-apm-noop")" ]
+  cp "$backup/rehearsal-ok" "$FX/ok-good-unrehearsed"
 
   run real_native "$home" apply --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA"
   [ "$status" -ne 0 ]
   [[ "$output" == *"native:rehearse"* ]]
-  printf 'home=%s\nsource_ref=%s\nworkspace_only=1\n' "$home" 0000000000000000000000000000000000000000 >"$backup/rehearsal-ok"
+  set_ok_field "$backup/rehearsal-ok" source_ref 0000000000000000000000000000000000000000
   run real_native "$home" apply --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
   [ "$status" -ne 0 ]
   [[ "$output" == *"native:rehearse"* ]]
-  printf 'home=%s\nsource_ref=%s\nworkspace_only=1\n' "$FX/homes/other" "$SOURCE_SHA" >"$backup/rehearsal-ok"
+  cp "$FX/ok-good-unrehearsed" "$backup/rehearsal-ok"
+  set_ok_field "$backup/rehearsal-ok" home "$FX/homes/other"
   run real_native "$home" apply --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
   [ "$status" -ne 0 ]
   [[ "$output" == *"native:rehearse"* ]]
@@ -658,4 +670,124 @@ real_native_with_stub() {
   [ "$(cat "$scratch/.local/state/agmsg/db/keep")" = "db store" ]
   [ "$(readlink "$home/.agents/skills/agmsg/db")" = "$home/.local/state/agmsg/db" ]
   [ "$(cd "$home/.local/state/agmsg" && find . | LC_ALL=C sort)" = "$store_before" ]
+}
+
+@test "the real-HOME apply is refused when a backed-up path changed after the backup and rehearse, and writes nothing" {
+  local home before backup="$FX/backups/real-drift" stub="$FX/stub-apm-drift"
+  home="$(new_home real-drift)"
+  seed_sentinels "$home"
+  printf '#!/bin/sh\nexit 0\n' >"$stub"
+  chmod +x "$stub"
+  real_native "$home" backup --real-home --backup-dir "$backup"
+  real_native_with_stub "$home" "$stub" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  echo "added after the backup" >"$home/.claude/skills/private-copy/late.md"
+  before="$(backed_up_snapshot "$home")"
+
+  run real_native_with_stub "$home" "$stub" apply --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"changed since the backup"* ]]
+  [[ "$output" == *".claude/skills/private-copy/late.md"* ]]
+  [ "$(backed_up_snapshot "$home")" = "$before" ]
+  [ ! -e "$home/.apm/apm.yml" ]
+}
+
+@test "the real-HOME mode accepts a config.json holding only default_client and prefer_ssh, and rehearses it" {
+  local home backup="$FX/backups/real-config-ok" stub="$FX/stub-apm-config-ok" scratch
+  home="$(new_home real-config-ok)"
+  mkdir -p "$home/.apm"
+  printf '{"default_client": "vscode", "prefer_ssh": true}\n' >"$home/.apm/config.json"
+  printf '#!/bin/sh\nexit 0\n' >"$stub"
+  chmod +x "$stub"
+  real_native "$home" backup --real-home --backup-dir "$backup"
+  cmp "$home/.apm/config.json" "$backup/home/.apm/config.json"
+  real_native_with_stub "$home" "$stub" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  scratch="$(compgen -G "$backup/rehearsal-*/home")"
+  cmp "$home/.apm/config.json" "$scratch/.apm/config.json"
+
+  real_native_with_stub "$home" "$stub" apply --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  [ -f "$home/.apm/apm.yml" ]
+  [ "$(cat "$home/.apm/config.json")" = '{"default_client": "vscode", "prefer_ssh": true}' ]
+}
+
+@test "a config.json with temp_dir refuses rehearse and the real-HOME apply before they write" {
+  local home backup called="$FX/stub-apm-config-called" stub="$FX/stub-apm-config-bad"
+  printf '#!/bin/sh\nif [ "$1" = install ]; then echo called >>"%s"; fi\nexit 0\n' "$called" >"$stub"
+  chmod +x "$stub"
+  # Escaped the way JSON allows, so only a decoder sees the key apm reads.
+  local bad='{"default_client": "vscode", "temp_dir": "/elsewhere"}'
+  local good='{"default_client": "vscode"}'
+
+  # The HOME gained temp_dir after the backup: rehearse refuses on the HOME itself.
+  home="$(new_home real-config-home)"
+  backup="$FX/backups/real-config-home"
+  mkdir -p "$home/.apm"
+  printf '%s\n' "$good" >"$home/.apm/config.json"
+  real_native "$home" backup --real-home --backup-dir "$backup"
+  printf '%s\n' "$bad" >"$home/.apm/config.json"
+  run real_native_with_stub "$home" "$stub" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"sets temp_dir"* ]]
+  [ ! -e "$backup/rehearsal-ok" ]
+  [ -z "$(compgen -G "$backup/rehearsal-*" || true)" ]
+
+  # The backup holds temp_dir while the HOME does not: rehearse refuses on the scratch copy.
+  home="$(new_home real-config-backup)"
+  backup="$FX/backups/real-config-backup"
+  mkdir -p "$home/.apm"
+  printf '%s\n' "$good" >"$home/.apm/config.json"
+  real_native "$home" backup --real-home --backup-dir "$backup"
+  printf '%s\n' "$bad" >"$backup/home/.apm/config.json"
+  run real_native_with_stub "$home" "$stub" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"sets temp_dir"* ]]
+  [ ! -e "$backup/rehearsal-ok" ]
+  [ ! -e "$called" ]
+
+  # temp_dir appears after a clean rehearse: apply refuses on it, ahead of the drift check.
+  home="$(new_home real-config-apply)"
+  backup="$FX/backups/real-config-apply"
+  mkdir -p "$home/.apm"
+  printf '%s\n' "$good" >"$home/.apm/config.json"
+  real_native "$home" backup --real-home --backup-dir "$backup"
+  real_native_with_stub "$home" "$stub" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  printf '%s\n' "$bad" >"$home/.apm/config.json"
+  run real_native_with_stub "$home" "$stub" apply --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"sets temp_dir"* ]]
+  [ ! -e "$home/.apm/apm.yml" ]
+}
+
+@test "the real-HOME apply is refused when the rehearsed manifest hash or the apm differs" {
+  local home backup="$FX/backups/real-pin" stub="$FX/stub-apm-pin" other="$FX/stub-apm-pin-other" before
+  home="$(new_home real-pin)"
+  seed_sentinels "$home"
+  printf '#!/bin/sh\n[ "$1" = --version ] && echo "Agent Package Manager (APM) CLI version 1.0.0"\nexit 0\n' >"$stub"
+  cp "$stub" "$other"
+  chmod +x "$stub" "$other"
+  real_native "$home" backup --real-home --backup-dir "$backup"
+  real_native_with_stub "$home" "$stub" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  grep -qxF "apm=$stub Agent Package Manager (APM) CLI version 1.0.0" "$backup/rehearsal-ok"
+  cp "$backup/rehearsal-ok" "$FX/ok-good-pin"
+  before="$(backed_up_snapshot "$home")"
+
+  set_ok_field "$backup/rehearsal-ok" manifest_sha256 0000000000000000000000000000000000000000000000000000000000000000
+  run real_native_with_stub "$home" "$stub" apply --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"native:rehearse"* ]]
+
+  cp "$FX/ok-good-pin" "$backup/rehearsal-ok"
+  printf '#!/bin/sh\n[ "$1" = --version ] && echo "Agent Package Manager (APM) CLI version 2.0.0"\nexit 0\n' >"$stub"
+  run real_native_with_stub "$home" "$stub" apply --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"native:rehearse"* ]]
+
+  run real_native_with_stub "$home" "$other" apply --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"native:rehearse"* ]]
+  [ "$(backed_up_snapshot "$home")" = "$before" ]
+  [ ! -e "$home/.apm/apm.yml" ]
+
+  printf '#!/bin/sh\n[ "$1" = --version ] && echo "Agent Package Manager (APM) CLI version 1.0.0"\nexit 0\n' >"$stub"
+  real_native_with_stub "$home" "$stub" apply --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
+  [ -f "$home/.apm/apm.yml" ]
 }
