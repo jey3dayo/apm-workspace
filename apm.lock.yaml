@@ -1,5 +1,5 @@
 lockfile_version: '2'
-generated_at: '2026-11-05T03:50:26.249216+00:00'
+generated_at: '2026-11-09T05:30:13.875326+00:00'
 apm_version: 0.35.0
 dependencies:
 - repo_url: agavra/tuicr
@@ -2992,6 +2992,26 @@ dependencies:
   - fixing-accessibility
   - fixing-motion-performance
   - improve-ui
+- repo_url: jackwener/opencli
+  name: opencli-browser
+  host: github.com
+  resolved_commit: 9bc5f5ca132ec4d4e48d7ee517d4303bf159e8e8
+  resolved_ref: 9bc5f5ca132ec4d4e48d7ee517d4303bf159e8e8
+  version: unknown
+  virtual_path: skills/opencli-browser
+  is_virtual: true
+  package_type: claude_skill
+  content_hash: sha256:f068262dfac56a4e075a13c47ffe805ed10b8a1658227dbe55dae1ea1aa27568
+- repo_url: jackwener/opencli
+  name: opencli-usage
+  host: github.com
+  resolved_commit: 9bc5f5ca132ec4d4e48d7ee517d4303bf159e8e8
+  resolved_ref: 9bc5f5ca132ec4d4e48d7ee517d4303bf159e8e8
+  version: unknown
+  virtual_path: skills/opencli-usage
+  is_virtual: true
+  package_type: claude_skill
+  content_hash: sha256:ca4e6d595b36eb88601828bdb1eb5d729ef68b229df65bb37cb52909ab30e2a3
 - repo_url: jakubantalik/transitions-dev
   materialization_repo_url: Jakubantalik/transitions-dev
   name: transitions-dev

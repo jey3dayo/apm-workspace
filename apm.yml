@@ -71,6 +71,8 @@ dependencies:
 
     # --- browser / analysis ---
     - browser-use/browser-harness#dbf0e4f3a37ebc31aaeaf9d378ab1760b5776c15
+    - jackwener/opencli/skills/opencli-usage#9bc5f5ca132ec4d4e48d7ee517d4303bf159e8e8 # v2.0.3
+    - jackwener/opencli/skills/opencli-browser#9bc5f5ca132ec4d4e48d7ee517d4303bf159e8e8 # v2.0.3
     - openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431
     - tt-a1i/archify/archify#208acba8d412335185b2056fedf54b3405df43fb # v3.2.0
 
