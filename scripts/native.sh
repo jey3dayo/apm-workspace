@@ -104,6 +104,7 @@ render_manifest() {
   local sha="$1" workspace_only="$2"
   [ -f "$ROOT_MANIFEST" ] || fail "missing $ROOT_MANIFEST"
   printf '# Rendered by scripts/native.sh from apm.yml with this repository pinned at %s. Do not edit; re-render.\n' "$sha"
+  printf '# native-render: workspace_only=%s\n' "$workspace_only"
   awk -v sha="$sha" -v url="$SOURCE_URL" -v only="$workspace_only" -v map="$EXTERNAL_PACKAGE_MAP" -v allow="$EXECUTABLE_ALLOW_PACKAGES" '
     function convert(   i, prefix, rest, pin) {
       for (i = 1; i <= n; i++) {
@@ -414,6 +415,28 @@ assert_completed_backup() {
   grep -qxF "home=$home" "$BACKUP_DIR/complete" || fail "$BACKUP_DIR is a backup of another HOME"
 }
 
+# agmsg-state.sh restores the links under the default store (it runs without XDG_STATE_HOME), so a db or teams link that
+# points anywhere else would be repointed at an empty default store, leaving the history behind.
+assert_default_agmsg_store() {
+  local home="$1" name target
+  for name in db teams; do
+    [ -L "$home/.agents/skills/agmsg/$name" ] || continue
+    target="$(readlink "$home/.agents/skills/agmsg/$name")"
+    [ "$target" = "$home/.local/state/agmsg/$name" ] ||
+      fail "$home/.agents/skills/agmsg/$name points at $target, not at $home/.local/state/agmsg/$name, the only store agmsg-state.sh relinks to. Nothing was changed; move the data to the default store (or relink it) first."
+  done
+}
+
+# The previous rendered manifest records whether it was rendered with --workspace-only; the previous lock lists packages
+# only a full render deploys, so a change of mode would make every external package look dropped.
+assert_same_render_mode() {
+  local home="$1" previous
+  [ -f "$home/.apm/apm.yml" ] || return 0
+  previous="$(sed -n 's/^# native-render: workspace_only=\([01]\)$/\1/p' "$home/.apm/apm.yml" | head -n 1)"
+  [ -z "$previous" ] || [ "$previous" = "$WORKSPACE_ONLY" ] ||
+    fail "the previous manifest of $home was rendered with workspace_only=$previous, this run uses workspace_only=$WORKSPACE_ONLY; the previous lock would make every external package look dropped. Use the same mode."
+}
+
 # The links of the migrated roots that migrate would refuse: broken, or leading outside the HOME (escaping_link_line).
 root_escaping_links() {
   local home="$1" root link
@@ -512,7 +535,8 @@ previous_deployed_entries() {
 }
 
 # Moves each of MIGRATE_ROOTS to <root>.bak-<stamp> and records what it did in <HOME>/.apm/native-migrate-<stamp>.txt
-# (the line is written before the move, so a root that was not moved is the only thing a record can overstate).
+# (a "moved" line is written before the move and a "done" line after it, so a root without "done" may not have moved;
+# rollback adds "restored" per root, so it can resume).
 # Nothing is deleted. A root that does not exist is recorded as absent; a backup name already taken fails before any move.
 migrate_roots() {
   local home="$1" stamp="$2" root record
@@ -530,6 +554,7 @@ migrate_roots() {
     if [ -e "$home/$root" ] || [ -L "$home/$root" ]; then
       printf 'moved\t%s\n' "$root" >>"$record"
       mv "$home/$root" "$home/$root.bak-$stamp" || fail "cannot move $home/$root aside"
+      printf 'done\t%s\n' "$root" >>"$record"
       log "moved $home/$root to $home/$root.bak-$stamp"
     else
       printf 'absent\t%s\n' "$root" >>"$record"
@@ -564,11 +589,11 @@ link_scope() {
   esac
 }
 
-# Links among the directories reinstate writes into and copies from (the roots, their .bak-<stamp> and the tool directories
-# above them) that leave the HOME or are broken: a copy through one would write outside it.
+# Links among the directories reinstate writes into and copies from (the roots, their .bak-<stamp>, the tool directories
+# above them and .apm, where the reports go) that leave the HOME or are broken: a copy through one would write outside it.
 reinstate_escaping_links() {
   local home="$1" stamp="$2" root path
-  for path in .agents .claude .cursor; do
+  for path in .agents .claude .cursor .apm; do
     if [ -L "$home/$path" ]; then escaping_link_line "$home" "$home/$path"; fi
   done
   for root in $MIGRATE_ROOTS; do
@@ -579,8 +604,8 @@ reinstate_escaping_links() {
 }
 
 # Puts back the top-level entries of each <root>.bak-<stamp> that the root lacks now (apm did not deploy them), except
-# the entries the previous native lock listed as deployed (native-migrate-<stamp>.deployed.txt): those were removed from
-# the catalog since. An entry that exists is left alone and listed in <report>skipped.txt. A link that leaves its root is
+# the entries the previous native lock listed as deployed (native-migrate-<stamp>.deployed.txt): those were not deployed this
+# time. An entry that exists is left alone; one whose content differs from the old entry is listed in <report>skipped.txt. A link that leaves its root is
 # copied, so nothing in the HOME depends on the place it pointed at; a broken link fails the whole step before anything
 # is copied. <report>reinstated.txt lists what was put back.
 reinstate_entries() {
@@ -596,7 +621,7 @@ $escaping"
     while IFS= read -r -d '' entry; do
       name="$(basename "$entry")"
       if [ -e "$home/$root/$name" ] || [ -L "$home/$root/$name" ]; then
-        skipped="$skipped$root/$name"$'\n'
+        if ! diff -rq -x .apm-pin "$entry" "$home/$root/$name" >/dev/null 2>&1; then skipped="$skipped$root/$name"$'\n'; fi
         continue
       fi
       if [ -f "$deployed" ] && grep -qxF "$root"$'\t'"$name" "$deployed"; then continue; fi
@@ -616,7 +641,7 @@ $broken"
     mkdir -p "$(dirname "${report}x")" || fail "cannot create the directory of ${report}"
     printf '%s' "$skipped" >"${report}skipped.txt"
     : >"${report}reinstated.txt"
-    [ -z "$skipped" ] || log "warning: the entries of the old roots listed in ${report}skipped.txt share a name with what apm deployed, so they were not put back; if one is a private override of a catalog skill, put it back by hand"
+    [ -z "$skipped" ] || log "warning: the entries of the old roots listed in ${report}skipped.txt share a name with what apm deployed, so they were not put back although their content differs from the old entry; if one is a private override of a catalog skill, put it back by hand"
   fi
   while IFS=$'\t' read -r root name scope; do
     [ -n "$root" ] || continue
@@ -635,37 +660,41 @@ $broken"
   done <<<"$plan"
 }
 
-# A "moved" record line whose move did not happen: no backup, the root is still there, and no rollback has parked one.
-root_never_moved() {
-  local current="$1" stamp="$2"
-  { [ -e "$current" ] || [ -L "$current" ]; } && [ ! -e "$current.native-$stamp" ] && [ ! -L "$current.native-$stamp" ]
+record_has() {
+  grep -qxF "$1"$'\t'"$2" "$3"
 }
 
-# Moves the current roots to <root>.native-<stamp> and each <root>.bak-<stamp> back. Nothing is deleted, and a name already
-# taken fails before any move.
+# Moves the current roots to <root>.native-<stamp> and each <root>.bak-<stamp> back, and records "restored" per root, so a
+# run that stopped part way is finished by running it again. Nothing is deleted, and a name already taken fails before any
+# move. A root whose move never finished (no "done", no backup) is left as it is; a backup that is gone after "done"
+# (deleted by hand) fails before any move.
 rollback_roots() {
-  local home="$1" stamp="$2" record kind root current
+  local home="$1" stamp="$2" record kind root current lines
   record="$(migrate_record "$home" "$stamp")"
   [ -f "$record" ] || fail "$record does not exist; nothing to roll back"
+  lines="$(cat "$record")"
   while IFS=$'\t' read -r kind root; do
     [ -n "$kind" ] || continue
     current="$home/$root"
     case "$kind" in
       moved)
-        if [ ! -e "$current.bak-$stamp" ] && [ ! -L "$current.bak-$stamp" ] && ! root_never_moved "$current" "$stamp"; then
+        record_has restored "$root" "$record" && continue
+        if [ ! -e "$current.bak-$stamp" ] && [ ! -L "$current.bak-$stamp" ] && record_has "done" "$root" "$record"; then
           fail "$current.bak-$stamp is missing. Nothing was changed."
         fi
         ;;
-      absent) ;;
+      absent) record_has restored "$root" "$record" && continue ;;
+      done | restored) continue ;;
       *) fail "$record holds an unknown line: $kind $root" ;;
     esac
     if { [ -e "$current" ] || [ -L "$current" ]; } && { [ -e "$current.native-$stamp" ] || [ -L "$current.native-$stamp" ]; }; then
       fail "$current.native-$stamp already exists. Nothing was changed."
     fi
-  done <"$record"
+  done <<<"$lines"
   while IFS=$'\t' read -r kind root; do
-    [ -n "$kind" ] || continue
+    case "$kind" in moved | absent) ;; *) continue ;; esac
     current="$home/$root"
+    record_has restored "$root" "$record" && continue
     if [ "$kind" = moved ] && [ ! -e "$current.bak-$stamp" ] && [ ! -L "$current.bak-$stamp" ]; then
       log "$current was never moved aside (the migrate stopped first); left as it is"
       continue
@@ -678,7 +707,8 @@ rollback_roots() {
       mv "$current.bak-$stamp" "$current" || fail "cannot move $current.bak-$stamp back"
       log "moved $current.bak-$stamp back to $current"
     fi
-  done <"$record"
+    printf 'restored\t%s\n' "$root" >>"$record"
+  done <<<"$lines"
 }
 
 restore_agmsg_links() {
@@ -700,7 +730,7 @@ allowed_lost_reason() {
         name="${rest%%/*}"
         if [ -f "$deployed" ] && [ ! -e "$home/$root/$name" ] && [ ! -L "$home/$root/$name" ] &&
           grep -qxF "$root"$'\t'"$name" "$deployed"; then
-          echo "listed by the previous native lock and no longer deployed: removed from the catalog since"
+          echo "deployed by the previous native lock and not deployed this time"
           return
         fi
         ;;
@@ -745,7 +775,8 @@ cmd_rehearse() {
   parse_options "$@"
   [ -n "$SOURCE_REF" ] || fail "rehearse needs --source-ref"
   local home sha dir rehearsal scratch path manifest shared lost stamp escaping mode=plain
-  local install_status=0 compile_status=skipped agmsg_status=0 linked=0 reinstate_status=skipped allowed_lost=0 baseline_skips=0
+  local install_status=0 compile_status=skipped agmsg_status=0 linked=0 reinstate_status=skipped allowed_lost=0 baseline_skips=0 dropped=0
+  local deployed root name
   home="$(target_home rehearse)"
   assert_default_apm_config "$home"
   assert_no_home_manifest "$home"
@@ -753,6 +784,8 @@ cmd_rehearse() {
   escaping="$(root_escaping_links "$home")"
   [ -z "$escaping" ] || fail "these links in $MIGRATE_ROOTS of $home are broken or lead outside it, which migrate refuses and a rehearsal would hide by copying or dropping them. Replace each with a copy of its content (docs/native-distribution.md), run backup again, then re-run:
 $escaping"
+  assert_default_agmsg_store "$home"
+  if [ "$MIGRATE" = 1 ]; then assert_same_render_mode "$home"; fi
   sha="$(resolve_source_sha "$SOURCE_REF")"
   dir="$(cd "$BACKUP_DIR" && pwd -P)"
   rehearsal="$(mktemp -d "$dir/rehearsal-$(date -u +%Y%m%dT%H%M%SZ).XXXXXX")"
@@ -817,8 +850,17 @@ $shared"
     cp "$rehearsal/lost-all.txt" "$rehearsal/lost.txt"
   fi
   lost="$(wc -l <"$rehearsal/lost.txt" | tr -d ' ')"
-  printf 'mode=%s\nhome=%s\nsource_ref=%s\nworkspace_only=%s\ninstall_status=%s\ncompile_status=%s\nreinstate_status=%s\nagmsg_status=%s\nlost=%s\nallowed_lost=%s\nbaseline_skips=%s\n' \
-    "$mode" "$home" "$sha" "$WORKSPACE_ONLY" "$install_status" "$compile_status" "$reinstate_status" "$agmsg_status" "$lost" "$allowed_lost" "$baseline_skips" \
+  : >"$rehearsal/dropped.txt"
+  if [ "$MIGRATE" = 1 ] && [ -f "$(migrate_deployed_record "$scratch" "$stamp")" ]; then
+    deployed="$(migrate_deployed_record "$scratch" "$stamp")"
+    while IFS=$'\t' read -r root name; do
+      [ -n "$root" ] || continue
+      if [ ! -e "$scratch/$root/$name" ] && [ ! -L "$scratch/$root/$name" ]; then printf '%s/%s\n' "$root" "$name" >>"$rehearsal/dropped.txt"; fi
+    done <"$deployed"
+    dropped="$(wc -l <"$rehearsal/dropped.txt" | tr -d ' ')"
+  fi
+  printf 'mode=%s\nhome=%s\nsource_ref=%s\nworkspace_only=%s\ninstall_status=%s\ncompile_status=%s\nreinstate_status=%s\nagmsg_status=%s\nlost=%s\nallowed_lost=%s\ndropped=%s\nbaseline_skips=%s\n' \
+    "$mode" "$home" "$sha" "$WORKSPACE_ONLY" "$install_status" "$compile_status" "$reinstate_status" "$agmsg_status" "$lost" "$allowed_lost" "$dropped" "$baseline_skips" \
     >"$rehearsal/result.txt"
 
   if [ "$install_status" = 0 ] && [ "$compile_status" = 0 ] && [ "$agmsg_status" = 0 ] && [ "$lost" = 0 ] &&
@@ -844,7 +886,7 @@ cmd_reinstate() {
   assert_stamp "$STAMP"
   local home
   home="$(target_home reinstate)"
-  reinstate_entries "$home" "$STAMP" "$home/.apm/native-migrate-$STAMP."
+  reinstate_entries "$home" "$STAMP" "$home/.apm/native-reinstate-$STAMP."
 }
 
 assert_not_checkout() {
@@ -996,6 +1038,8 @@ Delete the marker line to keep the file as hand-written, or move it aside, then 
 $links
 Move them aside or make them plain directories and files of this HOME."
 
+  assert_default_agmsg_store "$home"
+  assert_same_render_mode "$home"
   manifest="$(render_manifest "$sha" "$WORKSPACE_ONLY")"
   roots_before="$(migrate_roots_snapshot "$home")"
   MIGRATE_AGMSG_LINKED=0

@@ -1,5 +1,5 @@
 # Native APM distribution (docs/native-distribution.md). Coexists with `deploy` until it replaces it; it is not a third
-# # permanent distribution path. apply targets a disposable HOME only; migrate (after a clean rehearse --migrate) and its undo,
+# permanent distribution path. apply targets a disposable HOME only; migrate (after a clean rehearse --migrate) and its undo,
 # migrate-rollback and reinstate, are the only tasks that write the real HOME. backup and rehearse only read it.
 
 ["native:plan"]
