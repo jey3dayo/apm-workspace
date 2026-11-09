@@ -208,7 +208,7 @@ rollback（自動も `native:migrate-rollback` も）が戻すのは 4 つの ro
 
 ### 切り替えで直すもの（`~/.apm` を前提にした記述）
 
-checkout を `~/.apm` の外へ移すと、`~/.apm` は consumer になる。次の記述は checkout の場所を `~/.apm` と決めているので、切り替えと同時に新しい場所へ直す（ここは場所の一覧で、書き換えは別の変更で行う）。見つけ直すときは `grep -rIn '~/\.apm\|\$HOME/\.apm' --exclude-dir=.git --exclude-dir=tmp --exclude-dir=apm_modules --exclude-dir=.worktrees .` を checkout で実行する。
+checkout を `~/.apm` の外へ移すと、`~/.apm` は consumer になる。次の記述は checkout の場所を `~/.apm` と決めているので、切り替えと同時に新しい場所へ直す。共通ガイド、catalog の skill、repo の文書、mise task の description は直した（checkout の場所は文書ごとに 1 度だけ書き、あとは「checkout」と呼ぶ。場所を動かすときは、その 1 箇所を直す）。残っているのは `scripts/apm-workspace.sh`・`scripts/apm-workspace.ps1` の usage 文、テスト、repo の外である。見つけ直すときは `grep -rIn '~/\.apm\|\$HOME/\.apm' --exclude-dir=.git --exclude-dir=tmp --exclude-dir=apm_modules --exclude-dir=.worktrees .` を checkout で実行する。
 
 - 全ての tool に配られる共通ガイド（正本は `catalog/.apm/instructions/ai-collaboration.instructions.md`。`~/.claude/rules/ai-collaboration.md` と各 root の `AGENTS.md` はその配布先）: learning-intake の drop box（`~/.apm/tmp/learning-intake/`）、SaaS 接続の方針（`~/.apm/docs/saas-connectors.md`）、スキルの不具合の送り先（`~/.apm`）
 - catalog の skill: `apm-usage`（`SKILL.md` と `references/`。編集先と作業場所を `~/.apm` と書き、rollout の節は `mise run upgrade`・`deploy` を案内している）、`apm-deploy-verify`（検証対象と `mise -C ~/.apm`・`git -C ~/.apm`・ログの置き場）、`learning-intake`（drop box、台帳 `docs/learning-ledger.md`、`done.txt`、catalog の編集先）、`backlog-sweep`（drop box を面に数える記述）、`agmsg-delegation`（`agmsg-review.config.toml` の正本の path、`references/roster-recovery.md`、`references/resident-pool.md`）、`orchestrator-worker/references/models.md`（`models:check` を実行する場所）、`mise`（description）

@@ -1,5 +1,5 @@
 ["validate:workspace"]
-description = "Validate the ~/.apm workspace wiring"
+description = "Validate the authoring checkout wiring"
 hide = true
 run = "bash ./scripts/apm-workspace.sh validate"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 validate"
@@ -11,5 +11,5 @@ run = "bash ./scripts/apm-workspace.sh validate:catalog"
 run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 validate:catalog"
 
 ["validate"]
-description = "Validate the ~/.apm workspace and managed catalog wiring"
+description = "Validate the authoring checkout and managed catalog wiring"
 depends = ["validate:workspace", "validate:catalog"]

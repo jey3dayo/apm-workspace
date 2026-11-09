@@ -7,7 +7,7 @@ is not an APM package.
 - Author optional workspace-owned skills under `optional-skills/<id>/`.
 - Add only `jey3dayo/apm-workspace/optional-skills/<id>#main` to a repository's own
   `apm.yml` when that repository needs the skill.
-- Do not add the `optional-skills` collection root to the global `~/.apm/apm.yml`.
+- Do not add the `optional-skills` collection root to the global manifest (the root `apm.yml`).
 
 Example:
 

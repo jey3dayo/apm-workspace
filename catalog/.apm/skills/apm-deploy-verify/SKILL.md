@@ -5,7 +5,7 @@ context: fork
 agent: implementer
 background: false
 description: >-
-  ~/.apm の catalog を変更した後の機械的な検証一式（format / check / deploy:fresh /
+  APM workspace の checkout で catalog を変更した後の機械的な検証一式（format / check / deploy:fresh /
   配布先の内容一致 / agmsg 導入時の roster link と agmsg-delegation runtime asset の smoke）を実行する。
   「配布して検証して」「deploy 検証」「smoke 回して」「配布一致を確認して」で使う。
   何を変更するか・どこが正本かの判断は apm-usage、smoke の合否基準は
@@ -16,16 +16,18 @@ description: >-
 
 catalog 変更後の検証は判断を含まない機械作業なので、Orchestrator（fable / opus）は自分で実行せず本スキルへ委譲する。変更内容の設計判断・修正方針の決定は呼び出し元に返す。
 
-検証対象は呼び出し元の cwd によらず常に `~/.apm` である。他の repo から呼ばれても、以下のコマンドはすべて `cd ~/.apm` したシェルで実行する（`<catalog>` は `~/.apm/catalog`）。
+検証対象は呼び出し元の cwd によらず常に APM workspace の authoring checkout（`~/src/github.com/jey3dayo/apm-workspace`。以下 `<checkout>`）である。他の repo から呼ばれても、以下のコマンドはすべて `cd <checkout>` したシェルで実行する（`<catalog>` は `<checkout>/catalog`）。
 
-fork 実行では会話履歴は見えない。検証対象（変更した skill）は ARGUMENTS があればそれ、無ければ `git -C ~/.apm status --short` / `git -C ~/.apm diff` から決める。
+実 HOME が native（`~/.apm/apm.yml` の 1 行目が `# Rendered by scripts/native.sh`）のとき、`deploy:fresh` は拒否される。手順 2 を飛ばして「native の HOME のため未実行」と報告し、配布は呼び出し元が `docs/native-distribution.md` の B で行う。手順 3 の配布一致は、その B6 のあとに見る。
 
-ログを残すときは `~/.apm/tmp/` に置く（`$HOME` 直下や repo 外には作らない）。ログへ `tee` するコマンドの終了コードは、`set -o pipefail` で取る（pipe の終了コードは最後のコマンドのものになり、失敗を取り逃す）。Bash ツールのシェルは zsh で、`PIPESTATUS` は空になる（zsh は `pipestatus`）。
+fork 実行では会話履歴は見えない。検証対象（変更した skill）は ARGUMENTS があればそれ、無ければ `git -C <checkout> status --short` / `git -C <checkout> diff` から決める。
+
+ログを残すときは `<checkout>/tmp/` に置く（`$HOME` 直下や repo 外には作らない）。ログへ `tee` するコマンドの終了コードは、`set -o pipefail` で取る（pipe の終了コードは最後のコマンドのものになり、失敗を取り逃す）。Bash ツールのシェルは zsh で、`PIPESTATUS` は空になる（zsh は `pipestatus`）。
 
 ## 手順
 
-1. `mise -C ~/.apm run format` → `mise -C ~/.apm run check` を実行する。失敗したら以降へ進まず、失敗ログを添えて報告する
-2. `mise -C ~/.apm run deploy:fresh` を実行する。`install:catalog` 単独では新規追加ファイルが配布先から消えるため使わない。**注意:** opencode は skills face を opt-out しており、`~/.config/opencode/agents` も配布対象外なので deploy は agents face を削除する。catalog が opencode 向けに持つのは config と commands だけになる。exit 0 で出る `apm_modules/tt-a1i/archify/archify/SKILL.md: Referenced file not found: references/<file>.md#<anchor>` の警告（アンカー付きで参照先の実体がある）と `/abs/path/checkout-timing.html`（例文中のリンク）の警告は、失敗扱いにせず既知として1行で報告する。これ以外の `Referenced file not found` は別扱い
+1. `mise -C <checkout> run format` → `mise -C <checkout> run check` を実行する。失敗したら以降へ進まず、失敗ログを添えて報告する
+2. `mise -C <checkout> run deploy:fresh` を実行する。`install:catalog` 単独では新規追加ファイルが配布先から消えるため使わない。**注意:** opencode は skills face を opt-out しており、`~/.config/opencode/agents` も配布対象外なので deploy は agents face を削除する。catalog が opencode 向けに持つのは config と commands だけになる。exit 0 で出る `apm_modules/tt-a1i/archify/archify/SKILL.md: Referenced file not found: references/<file>.md#<anchor>` の警告（アンカー付きで参照先の実体がある）と `/abs/path/checkout-timing.html`（例文中のリンク）の警告は、失敗扱いにせず既知として1行で報告する。これ以外の `Referenced file not found` は別扱い
 3. 変更した skill ごとに配布一致を確認する:
 
    ```bash
@@ -72,10 +74,10 @@ fork 実行では会話履歴は見えない。検証対象（変更した skill
    ! grep -qx '  - opencode' apm.yml
    ```
 
-4. agmsg が導入済み（`~/.agents/skills/agmsg` が存在する）ときだけ、agmsg roster link の到達性を確認する。未導入なら doctor はこの確認を飛ばすので、本手順は「agmsg 未導入のため対象外」と報告して次へ進む。確認対象は canonical face のみ。判定は `db` / `teams` の個別状態を見て `ls -l` でその場で二分するのではなく、両方を見た集約結果を持つ `mise -C ~/.apm run doctor` に一元化する:
+4. agmsg が導入済み（`~/.agents/skills/agmsg` が存在する）ときだけ、agmsg roster link の到達性を確認する。未導入なら doctor はこの確認を飛ばすので、本手順は「agmsg 未導入のため対象外」と報告して次へ進む。確認対象は canonical face のみ。判定は `db` / `teams` の個別状態を見て `ls -l` でその場で二分するのではなく、両方を見た集約結果を持つ `mise -C <checkout> run doctor` に一元化する:
 
    ```bash
-   mise -C ~/.apm run doctor
+   mise -C <checkout> run doctor
    ```
 
    roster link が正常なとき doctor は何も出力しない。失敗時だけ（`validate_agmsg_roster_link`）失敗行を出して非 0 で終了する。exit 0 なら通過、非 0 なら doctor の出力から roster link の失敗行を読んで報告する。

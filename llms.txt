@@ -1,6 +1,6 @@
 # apm-workspace
 
-`~/.apm` is the working copy and operational source of truth for the global APM workspace of `jey3dayo`.
+The authoring checkout (`~/src/github.com/jey3dayo/apm-workspace`) is the working copy and operational source of truth for the global APM workspace of `jey3dayo`. On the native HOME, `~/.apm` holds only the APM consumer state.
 It owns the global manifest (`apm.yml`), the lockfile (`apm.lock.yaml`), the cache-only `apm_modules/`, personal skill sources, and the shared runtime guidance package (`catalog/`).
 
 ## Where to read

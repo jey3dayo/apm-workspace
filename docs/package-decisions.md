@@ -3,6 +3,8 @@
 採用・撤去・見送りにした APM パッケージの意思決定ログ。1 パッケージ 1 セクション。
 「なぜ入れたか / なぜ消したか / 再検討するなら何を見るか」を残す。
 
+各記録は書いた時点の記述のまま残す。2026-11-10 の切り替えまで、authoring checkout は `~/.apm` だった（今は `~/src/github.com/jey3dayo/apm-workspace`）。記録の中の `~/.apm` はその checkout を指し、`mise run deploy` などの手順は切り替え前の rollout である。切り替えのあとの rollout は [`native-distribution.md`](native-distribution.md) の B に従う。
+
 ## opencli (jackwener/opencli)
 
 - Status: 採用・global（2026-11-09、ユーザー判断）

@@ -25,4 +25,4 @@ If a tool is useful in many repositories and does not depend on repo-local runti
 
 ## chrome-devtools Exception Documentation
 
-When a repository keeps `chrome-devtools` as an exception to the global default, record the concrete reason in that repository's own `apm.yml`/`AGENTS.md` (e.g. "uses Lighthouse audits for perf regression checks"), not just "this is a web app". Central `~/.apm` guidance states the default; repo-local docs state the exception and why it does not fit the default.
+When a repository keeps `chrome-devtools` as an exception to the global default, record the concrete reason in that repository's own `apm.yml`/`AGENTS.md` (e.g. "uses Lighthouse audits for perf regression checks"), not just "this is a web app". Central APM workspace guidance states the default; repo-local docs state the exception and why it does not fit the default.

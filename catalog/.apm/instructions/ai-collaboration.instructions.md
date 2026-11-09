@@ -90,9 +90,9 @@ permission や PreToolUse hook のポリシーで拒否されたコマンドは�
 
 ### スキルの不具合・摩擦を owner へ返す
 
-スキルや agent を実運用で使って**不具合・契約の破れ・手順の摩擦**を踏んだら、その場の回避で終わらせずに `~/.apm` へ送る。回避策だけが各リポジトリに散ると、同じ穴を全員が踏み直す。効いた点も送る（残す判断の材料になる）。
+スキルや agent を実運用で使って**不具合・契約の破れ・手順の摩擦**を踏んだら、その場の回避で終わらせずに、APM workspace の authoring checkout（`~/src/github.com/jey3dayo/apm-workspace`。以下 checkout）へ送る。回避策だけが各リポジトリに散ると、同じ穴を全員が踏み直す。効いた点も送る（残す判断の材料になる）。
 
-**何を学びとして拾い、どの owner へ出すかは `learning-intake` が正本。** 別リポジトリで踏んだ APM 側の問題は `~/.apm/tmp/learning-intake/` に1報告1ファイルで置く。この保存先は「ファイル操作原則」の明示された保存先に当たる。書式と片付けは `learning-intake` が正本。
+**何を学びとして拾い、どの owner へ出すかは `learning-intake` が正本。** 別リポジトリで踏んだ APM 側の問題は checkout の `tmp/learning-intake/` に1報告1ファイルで置く。この保存先は「ファイル操作原則」の明示された保存先に当たる。書式と片付けは `learning-intake` が正本。
 
 ## コマンド選択
 
@@ -137,7 +137,7 @@ permission や PreToolUse hook のポリシーで拒否されたコマンドは�
 
 global MCP はリポジトリをまたいで常時使う基盤だけに限定し、それ以外は repo-local または on-demand にする。global の実体は root `apm.yml` の `mcp:` が source of truth で、固定リストはどこにも持たない。
 
-- MCP 設定を永続変更する前に `apm-usage` の MCP ownership gate を通す。SaaS 接続の優先順（アプリ側コネクタ > `apm.yml` > skill）と理由は `~/.apm/docs/saas-connectors.md` が正本
+- MCP 設定を永続変更する前に `apm-usage` の MCP ownership gate を通す。SaaS 接続の優先順（アプリ側コネクタ > `apm.yml` > skill）と理由は APM workspace の checkout の `docs/saas-connectors.md` が正本
 - current docs は `context7`、広い比較調査は `web-research`（URL 取得と Web 検索は「コマンド選択」の表）
 - MCP として repo-local 追加が必要なブラウザ系は `chrome-devtools` のみ（使い分けは上の「ブラウザ操作の選択」表）。デスクトップ / OS レベルのスクリーンショットは `screenshot` スキル
 
