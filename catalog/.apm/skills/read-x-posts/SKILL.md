@@ -31,14 +31,15 @@ Routing the read through it makes a single known post readable for free.
 
 1. Extract the post ID from the URL (`/status/{id}`) or take the handle
    without `@`.
-2. Fetch with the bundled helper from this skill's directory, or with `curl`
-   directly:
-   - One post: `scripts/fx-x-read.sh status <url-or-id>`, which calls
+2. Fetch with the bundled helper from this skill's directory (invoked
+   through `bash`, since the file is not guaranteed to carry the executable
+   bit), or with `curl` directly:
+   - One post: `bash scripts/fx-x-read.sh status <url-or-id>`, which calls
      `GET https://api.fxtwitter.com/2/status/{id}`
-   - Thread: `scripts/fx-x-read.sh thread <url-or-id>`
-   - Profile: `scripts/fx-x-read.sh profile <handle>`, which calls
+   - Thread: `bash scripts/fx-x-read.sh thread <url-or-id>`
+   - Profile: `bash scripts/fx-x-read.sh profile <handle>`, which calls
      `GET https://api.fxtwitter.com/2/profile/{handle}`
-   - Recent posts as RSS: `scripts/fx-x-read.sh feed <handle>`, which calls
+   - Recent posts as RSS: `bash scripts/fx-x-read.sh feed <handle>`, which calls
      `https://fxtwitter.com/{handle}/feed.xml`
 3. Read `status.text`, `status.author`, `status.created_at` and, when the
    post carries an X article, `status.article` (title and preview) from the
