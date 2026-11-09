@@ -74,6 +74,8 @@ backup の対象: `~/.apm/apm.yml`・`config.json`・`apm.lock.yaml`・`deployme
 - consumer の状態と authoring の checkout が同じ `~/.apm` にある。APM 0.35.0 は user scope を `~/.apm` に固定しているので、実 HOME への apply は、checkout が追跡している `~/.apm/apm.yml`（と APM が書く `apm.lock.yaml`）を書き換える。main の checkout は dirty になり、`git pull` は止まり、旧経路の `mise run deploy` も描画した manifest を読む。分けるには checkout を `~/.apm` の外へ移す必要があり、それは別の判断にする
 - 目印の無い root（旧経路がコピーした `~/.claude/CLAUDE.md`・`~/.codex/AGENTS.md`・`~/.cursor/AGENTS.md`）は、`compile -g --clean` が上書きしない。Claude には旧い `CLAUDE.md` と native の rule `ai-collaboration.md` の両方が届く。`mise run migrate:roots`（既定は dry-run）で旧いコピーを退避するのは別の手順
 
+- 実 HOME の apply の「backup のあとの変化」のガードと rehearse は、他の agent が書く agmsg の `run/` や、既存の `smoke:catalog`（pre-push hook と `verify`）が `~/.apm/deployment-receipts` に書く一時ディレクトリの receipt でも止まり得る。backup から apply までのあいだは、これらを動かさない。agmsg の `run/` が最後まで走った install で消えるかは確かめていない
+
 ## 実 HOME への切り替えの blocker
 
 2026-11-09 に実 HOME へ一度 apply し、実害が出たので rollback した（backup した 15 パスは差分 0 に戻った）。
