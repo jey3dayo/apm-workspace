@@ -589,19 +589,40 @@ restore_agmsg_links() {
   fi
 }
 
-# Lost paths that are no loss: a .apm-pin inside a root that migrate moved aside. Anything else counts.
-allowed_lost_paths() {
-  local path root
-  while IFS= read -r path; do
-    [ "$(basename "$path")" = .apm-pin ] || continue
+# The reason a lost path (relative to HOME) is no loss, or nothing. Every entry is a full path under one of MIGRATE_ROOTS,
+# except the .apm-pin basename rule; docs/native-distribution.md lists them. Anything else counts as lost.
+allowed_lost_reason() {
+  local path="$1" root
+  case "$path" in
+    .agents/skills/agmsg/run | .agents/skills/agmsg/run/*)
+      echo "agmsg runtime state; the old path rebuilt the agmsg directory too, and apm replaces it"
+      return
+      ;;
+    .agents/skills/agmsg/apm.yml | .claude/skills/agmsg/apm.yml | \
+      .agents/skills/agmsg/.apm | .claude/skills/agmsg/.apm | \
+      .agents/skills/agmsg/.apm/.plugin-skill-sources.json | .claude/skills/agmsg/.apm/.plugin-skill-sources.json)
+      echo "metadata the old path's stage wrote; the agmsg scripts do not read it"
+      return
+      ;;
+  esac
+  if [ "$(basename "$path")" = .apm-pin ]; then
     for root in $MIGRATE_ROOTS; do
       case "$path" in
         "$root/"*)
-          printf '%s\n' "$path"
-          break
+          echo "pin marker inside a root that migrate moved aside"
+          return
           ;;
       esac
     done
+  fi
+}
+
+# Tab-separated <path> <reason> for each lost path that is no loss.
+allowed_lost_paths() {
+  local path reason
+  while IFS= read -r path; do
+    reason="$(allowed_lost_reason "$path")"
+    if [ -n "$reason" ]; then printf '%s\t%s\n' "$path" "$reason"; fi
   done <"$1"
 }
 
@@ -672,7 +693,7 @@ $shared"
   LC_ALL=C comm -23 "$rehearsal/before.txt" "$rehearsal/after.txt" >"$rehearsal/lost-all.txt"
   if [ "$MIGRATE" = 1 ]; then
     allowed_lost_paths "$rehearsal/lost-all.txt" >"$rehearsal/allowed-lost.txt"
-    LC_ALL=C comm -23 "$rehearsal/lost-all.txt" "$rehearsal/allowed-lost.txt" >"$rehearsal/lost.txt"
+    LC_ALL=C comm -23 "$rehearsal/lost-all.txt" <(cut -f1 "$rehearsal/allowed-lost.txt") >"$rehearsal/lost.txt"
     allowed_lost="$(wc -l <"$rehearsal/allowed-lost.txt" | tr -d ' ')"
   else
     cp "$rehearsal/lost-all.txt" "$rehearsal/lost.txt"

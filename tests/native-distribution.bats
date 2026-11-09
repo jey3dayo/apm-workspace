@@ -797,7 +797,7 @@ prepare_migrate() {
   grep -qxF "allowed_lost=1" "$M_REHEARSAL/result.txt"
   grep -qxF "reinstate_status=0" "$M_REHEARSAL/result.txt"
   grep -qxF "baseline_skips=0" "$M_REHEARSAL/result.txt"
-  grep -qxF ".claude/skills/foo/.apm-pin" "$M_REHEARSAL/allowed-lost.txt"
+  grep -qxF ".claude/skills/foo/.apm-pin"$'\t'"pin marker inside a root that migrate moved aside" "$M_REHEARSAL/allowed-lost.txt"
   [ ! -s "$M_REHEARSAL/lost.txt" ]
   [ "$(backed_up_snapshot "$M_HOME")" = "$M_BEFORE" ]
 }
@@ -825,6 +825,41 @@ prepare_migrate() {
   [ "$status" -eq 1 ]
   grep -qxF "lost=0" "$(compgen -G "$backup/rehearsal-*/result.txt")"
   grep -qxF "baseline_skips=1" "$(compgen -G "$backup/rehearsal-*/result.txt")"
+}
+
+@test "rehearse --migrate allows the agmsg metadata and run state it lists, and fails on any other agmsg file" {
+  local home backup="$FX/backups/rehearse-migrate-agmsg-table" stub="$FX/stub-apm-replace-agmsg" result
+  printf '#!/bin/sh\n[ "$1" = install ] || exit 0\nrm -rf "$HOME/.agents/skills/agmsg" "$HOME/.claude/skills/agmsg"\nmkdir -p "$HOME/.agents/skills/agmsg" "$HOME/.claude/skills/agmsg"\necho deployed >"$HOME/.agents/skills/agmsg/SKILL.md"\necho deployed >"$HOME/.claude/skills/agmsg/SKILL.md"\n' >"$stub"
+  chmod +x "$stub"
+  home="$(new_home rehearse-migrate-agmsg-table)"
+  seed_migrate_home "$home"
+  mkdir -p "$home/.agents/skills/agmsg/.apm" "$home/.agents/skills/agmsg/run" "$home/.claude/skills/agmsg/.apm"
+  for f in apm.yml .apm/.plugin-skill-sources.json run/role-session; do echo x >"$home/.agents/skills/agmsg/$f"; done
+  for f in apm.yml .apm/.plugin-skill-sources.json; do echo x >"$home/.claude/skills/agmsg/$f"; done
+  echo skill >"$home/.claude/skills/agmsg/SKILL.md"
+  real_native "$home" backup --real-home --backup-dir "$backup"
+  real_native_with_stub "$home" "$stub" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  result="$(compgen -G "$backup/rehearsal-*/result.txt")"
+  grep -qxF "lost=0" "$result"
+  # The agmsg run directory and its file, and per root apm.yml, .apm and its metadata file.
+  grep -qxF "allowed_lost=8" "$result"
+  grep -qF ".agents/skills/agmsg/run/role-session"$'\t' "$(dirname "$result")/allowed-lost.txt"
+  [ "$(cut -f2 "$(dirname "$result")/allowed-lost.txt" | grep -c 'agmsg runtime state')" -eq 2 ]
+
+  # The same skill's other files are not in the table.
+  home="$(new_home rehearse-migrate-agmsg-other)"
+  backup="$FX/backups/rehearse-migrate-agmsg-other"
+  seed_migrate_home "$home"
+  mkdir -p "$home/.agents/skills/agmsg/bin"
+  echo x >"$home/.agents/skills/agmsg/bin/agmsg.js"
+  echo x >"$home/.agents/skills/agmsg/apm.yml"
+  real_native "$home" backup --real-home --backup-dir "$backup"
+  run real_native_with_stub "$home" "$stub" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  [ "$status" -eq 1 ]
+  [[ "$output" == *".agents/skills/agmsg/bin/agmsg.js"* ]]
+  result="$(compgen -G "$backup/rehearsal-*/result.txt")"
+  grep -qxF "lost=2" "$result"
+  [ "$(cat "$(dirname "$result")/lost.txt")" = "$(printf '.agents/skills/agmsg/bin\n.agents/skills/agmsg/bin/agmsg.js')" ]
 }
 
 @test "migrate refuses a HOME whose .apm is a checkout, and a repository inside .apm, before anything is written" {

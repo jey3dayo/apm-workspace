@@ -93,7 +93,15 @@ APM は Codex CLI 0.163.0 だけを受け付ける（`apm_cli/codex_plugins/clie
 ### rehearse --migrate が見ること
 
 - 複製の中で、`migrate` と同じ `migrate_roots`（install の前）と `reinstate_entries`（compile のあと）を通す。end-to-end の確認は、空の HOME ではなく backup の複製から行う
-- 消えてよいのは明示の allowlist だけ: 退避した root の中の、basename が `.apm-pin` のファイル。件数は `allowed_lost=` に出し、`allowed-lost.txt` に残す。allowlist 以外の消失（`lost=`）が 0 件のときだけ成功する
+- 消えてよいのは、`scripts/native.sh` の `allowed_lost_reason` に書いた allowlist だけ。件数は `allowed_lost=` に出し、`allowed-lost.txt` にタブ区切りで path と理由を残す。allowlist 以外の消失（`lost=`）が 0 件のときだけ成功する。同じ skill の別のファイルは対象外で、消えれば失敗する
+
+  | path（HOME からの相対）                                                                                             | 理由                                                                                                                                                                  |
+  | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | 退避した root の中の、basename が `.apm-pin` のファイル                                                             | pin の目印                                                                                                                                                            |
+  | `.agents/skills/agmsg/apm.yml`、`.agents/skills/agmsg/.apm`、`.agents/skills/agmsg/.apm/.plugin-skill-sources.json` | 旧経路の stage が作るメタデータで、agmsg の scripts は参照しない                                                                                                      |
+  | `.claude/skills/agmsg/` の下の、上と同じ 3 つ                                                                       | 同上                                                                                                                                                                  |
+  | `.agents/skills/agmsg/run` とその下                                                                                 | agmsg の実行時の状態。旧経路も agmsg のディレクトリを入れ替えて作り直していて、実 HOME で `run/` の作成時刻が skill より後になっている。`.agents/skills` 側だけにある |
+
 - `apm.log` に `no trustworthy local deployment baseline` が出たら失敗する（件数は `baseline_skips=`）
 - `result.txt` には `mode=migrate`、`home`、`source_ref`、`workspace_only`、各 step の status、`lost`、`allowed_lost`、`baseline_skips` が入る。`migrate` はこれを読む
 
