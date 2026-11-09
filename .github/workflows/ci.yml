@@ -89,10 +89,15 @@ jobs:
           mise run format:check
           mise run lint:yaml
           mise run lint:actions
-          mise run actions-lock:verify
           mise run lint:frontmatter
           mise run lint:catalog-leaks
           mise run validate:catalog
+
+      # Every locked action is public, so the job token is enough for `--verify`.
+      - name: Verify actions.lock upstream
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: mise run actions-lock:upstream
 
       - name: Run tests
         shell: bash
