@@ -130,20 +130,26 @@ def _ensure_gh_authenticated() -> None:
 
 
 def gh_pr_view_json(fields: str) -> dict[str, Any]:
-    # fields is a comma-separated list like: "number,headRepositoryOwner,headRepository"
+    # fields is a comma-separated list like: "number,url"
     return _run_json(["gh", "pr", "view", "--json", fields])
+
+
+def _pr_ref_from_url(url: str) -> tuple[str, str, int]:
+    """Parse (owner, repo, number) from a PR URL. The URL names the base
+    repository, where the PR lives; the head repository may be a fork."""
+    m = PR_URL_RE.match(url)
+    if not m:
+        raise ValueError(f"unexpected PR URL from gh: {url}")
+    return m.group(1), m.group(2), int(m.group(3))
 
 
 def get_current_pr_ref() -> tuple[str, str, int]:
     """
     Resolve the PR for the current branch (whatever gh considers associated).
-    Works for cross-repo PRs too, by reading head repository owner/name.
+    Goes through the PR URL so fork PRs resolve against the base repository,
+    not the head (fork) repository.
     """
-    pr = gh_pr_view_json("number,headRepositoryOwner,headRepository")
-    owner = pr["headRepositoryOwner"]["login"]
-    repo = pr["headRepository"]["name"]
-    number = int(pr["number"])
-    return owner, repo, number
+    return _pr_ref_from_url(gh_pr_view_json("url")["url"])
 
 
 def resolve_pr_ref(args: list[str]) -> tuple[str, str, int]:
@@ -163,10 +169,7 @@ def resolve_pr_ref(args: list[str]) -> tuple[str, str, int]:
         if args[0].isdigit():
             # The PR URL carries the base repo, where the PR lives (headRepository would be a fork).
             url = _run_json(["gh", "pr", "view", args[0], "--json", "url"])["url"]
-            m = PR_URL_RE.match(url)
-            if not m:
-                raise ValueError(f"unexpected PR URL from gh: {url}")
-            return m.group(1), m.group(2), int(m.group(3))
+            return _pr_ref_from_url(url)
         raise ValueError(f"not a PR number or URL: {args[0]}")
     if len(args) == 2:
         m = REPO_RE.match(args[0])
