@@ -801,6 +801,37 @@ prepare_migrate() {
   [[ "$output" == *"no <root>.bak-20250101T000000Z"* ]]
 }
 
+@test "reinstate refuses a root or tool directory that links outside the HOME, and writes nothing there" {
+  local home outside="$FX/outside-reinstate" stamp=20261109T000002Z
+  mkdir -p "$outside/skills" "$outside/claude"
+  home="$(new_home reinstate-outside)"
+  mkdir -p "$home/.claude"
+  ln -s "$outside/skills" "$home/.claude/skills"
+  mkdir -p "$home/.claude/skills.bak-$stamp/kept"
+  echo kept >"$home/.claude/skills.bak-$stamp/kept/SKILL.md"
+  run native "$home" reinstate --home "$home" --stamp "$stamp"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$home/.claude/skills -> $outside/skills"* ]]
+  [ -z "$(ls -A "$outside/skills")" ]
+
+  # An ancestor, and a backup that is a link leaving the HOME.
+  home="$(new_home reinstate-outside-ancestor)"
+  ln -s "$outside/claude" "$home/.claude"
+  mkdir -p "$outside/claude/skills.bak-$stamp/kept"
+  run native "$home" reinstate --home "$home" --stamp "$stamp"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$home/.claude -> $outside/claude"* ]]
+  [ ! -e "$outside/claude/skills" ]
+
+  home="$(new_home reinstate-outside-bak)"
+  mkdir -p "$home/.claude/skills" "$outside/bak/kept"
+  ln -s "$outside/bak" "$home/.claude/skills.bak-$stamp"
+  run native "$home" reinstate --home "$home" --stamp "$stamp"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"skills.bak-$stamp -> $outside/bak"* ]]
+  [ -z "$(ls -A "$home/.claude/skills")" ]
+}
+
 @test "rehearse --migrate is clean when only a .apm-pin disappears, and reports it apart from the lost files" {
   write_deploy_stub "$FX/stub-apm-deploy"
   prepare_migrate rehearse-migrate-clean "$FX/stub-apm-deploy"
@@ -1108,10 +1139,36 @@ build_github_fixture() {
 
   prepare_migrate migrate-touch-config "$stub"
   original="$(roots_snapshot "$M_HOME")"
+  chmod 600 "$M_HOME/.claude/settings.json"
   run real_native_with_stub "$M_HOME" "$touch_config" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
   [ "$status" -ne 0 ]
-  [[ "$output" == *"sha256 of .codex/config.toml .claude/settings.json changed"* ]]
+  [[ "$output" == *"migrate changed these files"* ]]
+  [[ "$output" == *".claude/settings.json"* ]]
+  [[ "$output" != *'"fixture"'* ]]
   [ "$(roots_snapshot "$M_HOME")" = "$original" ]
+  # The file is back to what it was, with its permissions; what migrate left is kept beside it.
+  [ "$(cat "$M_HOME/.claude/settings.json")" = '{"fixture": true}' ]
+  [ "$(python3 -c 'import os, sys; print(oct(os.stat(sys.argv[1]).st_mode & 0o777))' "$M_HOME/.claude/settings.json")" = 0o600 ]
+  [ "$(tail -n 1 "$M_HOME"/.claude/settings.json.changed-*)" = "changed" ]
+  [ "$(cat "$M_HOME/.codex/config.toml")" = 'model = "fixture"' ]
+  [ -z "$(compgen -G "$M_HOME/.apm/native-migrate-*.untouched" || true)" ]
+}
+
+@test "migrate fails and rolls back when a file of a root that apm redeploys was added after the rehearsal" {
+  local stub="$FX/stub-apm-deploy" original
+  write_deploy_stub "$stub"
+  prepare_migrate migrate-late-file "$stub"
+  echo "added after the rehearsal" >"$M_HOME/.claude/skills/foo/extra.txt"
+  original="$(roots_snapshot "$M_HOME")"
+  run real_native_with_stub "$M_HOME" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *".claude/skills/foo/extra.txt"* ]]
+  [[ "$output" == *"rolling the roots back"* ]]
+  [ "$(roots_snapshot "$M_HOME")" = "$original" ]
+  [ "$(cat "$M_HOME/.claude/skills/foo/extra.txt")" = "added after the rehearsal" ]
+  grep -qxF ".claude/skills/foo/extra.txt" "$M_HOME"/.apm/native-migrate-*.lost.txt
+  # The .apm-pin of the same skill is in the allowlist and is not listed.
+  ! grep -q 'apm-pin' "$M_HOME"/.apm/native-migrate-*.lost.txt
 }
 
 @test "migrate and migrate-rollback take a disposable --home as well" {

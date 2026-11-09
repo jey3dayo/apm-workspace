@@ -54,7 +54,7 @@ Usage: scripts/native.sh <command> [options]
                                                  install and compile there, and count the files that disappeared.
                                                  --migrate moves the skills and agents roots aside first and puts back what
                                                  apm did not deploy (the steps migrate runs), and fails on any lost file
-                                                 other than a .apm-pin.
+                                                 other than the allowlist (docs/native-distribution.md).
   apply    --home DIR --source-ref REF [--workspace-only]
                                                  Write the manifest into <HOME>/.apm/apm.yml, then apm install -g --only apm --trust-bin and
                                                  apm compile -g --clean with that HOME, which must be disposable.
@@ -290,13 +290,16 @@ cmd_plan() {
 # needs a clean rehearse --migrate of a backup of that HOME first and would run:
 #   1. stop if <HOME>/.apm is a checkout (.git or catalog/) or this repository lies inside it
 #   2. stop unless the rehearsal's result.txt is mode=migrate, for the same HOME and ref, with no failed step, no lost
-#      file other than a .apm-pin, and no skipped baseline; then the guards of apply, over the paths apm writes
-#   3. record the sha256 of ${MIGRATE_UNTOUCHED_FILES// /, }; save the agmsg links
+#      file outside the allowlist, and no skipped baseline; then the guards of apply, over the paths apm writes
+#   3. copy ${MIGRATE_UNTOUCHED_FILES// /, } (owner-only) to <HOME>/.apm/native-migrate-<UTC>.untouched; save the agmsg links
 #   4. write the manifest above, move $MIGRATE_ROOTS
 #      to <root>.bak-<UTC> (nothing is deleted)
 #   5. apm install -g --only apm --trust-bin, apm compile -g --clean, then copy back the top-level entries apm did not deploy
-#      (a link that leaves its root is copied; a broken link fails); restore the agmsg links; compare the sha256
-#   6. on any failure, undo step 4 (migrate-rollback --stamp <UTC> does the same later). It prints the stamp.
+#      (a link that leaves its root is copied; a link that leaves the HOME or is broken fails); restore the agmsg links;
+#      stop if a file of the roots is gone outside the allowlist (the same check as the rehearsal, listed in
+#      <HOME>/.apm/native-migrate-<UTC>.lost.txt) or if the files of step 3 changed
+#   6. on any failure, undo step 4 (migrate-rollback --stamp <UTC> does the same later) and put the files of step 3 back,
+#      keeping what migrate left as <file>.changed-<UTC>. It prints the stamp.
 # Not deployed by APM, and left to the manual steps in docs/native-distribution.md: agmsg db/teams links,
 # catalog/rules and catalog/claude/rules, private skills, OpenCode and Pi instructions, host-local MCP.
 # This plan wrote nothing.
@@ -521,11 +524,28 @@ link_scope() {
   esac
 }
 
+# Links among the directories reinstate writes into and copies from (the roots, their .bak-<stamp> and the tool directories
+# above them) that leave the HOME or are broken: a copy through one would write outside it.
+reinstate_escaping_links() {
+  local home="$1" stamp="$2" root path
+  for path in .agents .claude .cursor; do
+    if [ -L "$home/$path" ]; then escaping_link_line "$home" "$home/$path"; fi
+  done
+  for root in $MIGRATE_ROOTS; do
+    for path in "$root" "$root.bak-$stamp"; do
+      if [ -L "$home/$path" ]; then escaping_link_line "$home" "$home/$path"; fi
+    done
+  done
+}
+
 # Puts back the top-level entries of each <root>.bak-<stamp> that the root lacks now (apm did not deploy them). An entry
 # that exists is left alone. A link that leaves its root is copied, so nothing in the HOME depends on the place it
 # pointed at; a broken link fails the whole step before anything is copied.
 reinstate_entries() {
-  local home="$1" stamp="$2" root bak entry name scope found=0 broken="" plan=""
+  local home="$1" stamp="$2" root bak entry name scope found=0 broken="" plan="" escaping
+  escaping="$(reinstate_escaping_links "$home" "$stamp")"
+  [ -z "$escaping" ] || fail "these links of $home lead outside it or are broken, so copying into the roots would write outside the HOME; nothing was copied:
+$escaping"
   for root in $MIGRATE_ROOTS; do
     bak="$home/$root.bak-$stamp"
     if [ ! -e "$bak" ] && [ ! -L "$bak" ]; then continue; fi
@@ -770,11 +790,63 @@ assert_migrate_rehearsal() {
   done
 }
 
-untouched_hashes() {
-  local home="$1" path
+# Copies the files migrate must not change (owner-only, permissions kept) so a change can be undone. Contents are never logged.
+save_untouched() {
+  local home="$1" stamp="$2" dir path
+  dir="$home/.apm/native-migrate-$stamp.untouched"
+  (umask 077 && mkdir -p "$dir") || fail "cannot create $dir"
   for path in $MIGRATE_UNTOUCHED_FILES; do
-    if [ -f "$home/$path" ]; then printf '%s %s\n' "$path" "$(sha256 <"$home/$path")"; else printf '%s absent\n' "$path"; fi
+    if [ -f "$home/$path" ]; then
+      (umask 077 && mkdir -p "$(dirname "$dir/$path")") || fail "cannot create $dir/$(dirname "$path")"
+      cp -p "$home/$path" "$dir/$path" || fail "cannot copy $home/$path"
+    fi
   done
+}
+
+changed_untouched_files() {
+  local home="$1" stamp="$2" dir path
+  dir="$home/.apm/native-migrate-$stamp.untouched"
+  for path in $MIGRATE_UNTOUCHED_FILES; do
+    if [ -f "$dir/$path" ]; then
+      if [ ! -f "$home/$path" ] || [ "$(sha256 <"$home/$path")" != "$(sha256 <"$dir/$path")" ]; then printf '%s\n' "$path"; fi
+    elif [ -e "$home/$path" ] || [ -L "$home/$path" ]; then
+      printf '%s\n' "$path"
+    fi
+  done
+}
+
+# Puts the saved copy back; the version migrate left stays beside it as <path>.changed-<stamp>.
+restore_untouched() {
+  local home="$1" stamp="$2" dir path
+  dir="$home/.apm/native-migrate-$stamp.untouched"
+  [ -d "$dir" ] || return 0
+  for path in $(changed_untouched_files "$home" "$stamp"); do
+    if [ -e "$home/$path" ] || [ -L "$home/$path" ]; then
+      mv "$home/$path" "$home/$path.changed-$stamp" || fail "cannot move $home/$path aside"
+    fi
+    if [ -f "$dir/$path" ]; then cp -p "$dir/$path" "$home/$path" || fail "cannot restore $home/$path"; fi
+    log "restored $home/$path; the version migrate left is $home/$path.changed-$stamp"
+  done
+}
+
+# Fails, and lists them in <HOME>/.apm/native-migrate-<stamp>.lost.txt, when a path of the roots that existed before migrate
+# is gone and is not in the allowlist of rehearse. The same check as the rehearsal, made on the HOME migrate wrote.
+assert_no_unexpected_loss() {
+  local home="$1" stamp="$2" before="$3" dir lost_file
+  lost_file="$home/.apm/native-migrate-$stamp.lost.txt"
+  dir="$(mktemp -d "$home/.apm/.native-migrate.XXXXXX")" || fail "cannot create a temporary directory in $home/.apm"
+  grep -v '^$' <<<"$before" >"$dir/before" || true
+  migrate_roots_snapshot "$home" >"$dir/after"
+  LC_ALL=C comm -23 "$dir/before" "$dir/after" >"$dir/lost-all"
+  allowed_lost_paths "$dir/lost-all" | cut -f1 >"$dir/allowed"
+  LC_ALL=C comm -23 "$dir/lost-all" "$dir/allowed" >"$lost_file"
+  rm -rf "$dir"
+  [ ! -s "$lost_file" ] || fail "these files of the roots existed before migrate and are gone, and are not in the allowlist (listed in $lost_file; they are kept in <root>.bak-$stamp):
+$(head -n 20 "$lost_file" | sed 's/^/  /')"
+}
+
+migrate_roots_snapshot() {
+  rehearsal_snapshot "$1" <(tr ' ' '\n' <<<"$MIGRATE_ROOTS")
 }
 
 # Runs from the EXIT trap of cmd_migrate once the roots may have moved: undo the move, keep every file, keep the exit status.
@@ -789,6 +861,11 @@ migrate_failure() {
       agmsg_state "$MIGRATE_HOME" restore || log "the agmsg links were not restored; run mise run agmsg:state:restore"
     fi
   fi
+  if (restore_untouched "$MIGRATE_HOME" "$MIGRATE_STAMP"); then
+    rm -rf "${MIGRATE_HOME:?}/.apm/native-migrate-$MIGRATE_STAMP.untouched"
+  else
+    log "the files $MIGRATE_UNTOUCHED_FILES were not restored; the copies are in $MIGRATE_HOME/.apm/native-migrate-$MIGRATE_STAMP.untouched"
+  fi
   exit "$status"
 }
 
@@ -796,7 +873,7 @@ cmd_migrate() {
   parse_options "$@"
   [ -n "$SOURCE_REF" ] || fail "migrate needs --source-ref; deploying never moves a pin on its own"
   [ -n "$REHEARSAL" ] || fail "migrate needs --rehearsal <the rehearsal-<UTC> directory of a clean rehearse --migrate>"
-  local home sha edited links manifest before after
+  local home sha edited links manifest roots_before changed
   home="$(target_home migrate)"
   sha="$(resolve_source_sha "$SOURCE_REF")"
   assert_not_checkout "$home"
@@ -814,7 +891,7 @@ $links
 Move them aside or make them plain directories and files of this HOME."
 
   manifest="$(render_manifest "$sha" "$WORKSPACE_ONLY")"
-  before="$(untouched_hashes "$home")"
+  roots_before="$(migrate_roots_snapshot "$home")"
   MIGRATE_AGMSG_LINKED=0
   if [ -L "$home/.agents/skills/agmsg/db" ]; then
     MIGRATE_AGMSG_LINKED=1
@@ -822,17 +899,19 @@ Move them aside or make them plain directories and files of this HOME."
   fi
 
   MIGRATE_HOME="$home" MIGRATE_STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
-  install_manifest "$home" "$manifest"
+  mkdir -p "$home/.apm"
   trap migrate_failure EXIT
+  save_untouched "$home" "$MIGRATE_STAMP"
+  install_manifest "$home" "$manifest"
   migrate_roots "$home" "$MIGRATE_STAMP"
   run_apm_install "$home"
   run_apm "$home" compile -g --clean
   reinstate_entries "$home" "$MIGRATE_STAMP"
   if [ "$MIGRATE_AGMSG_LINKED" = 1 ]; then agmsg_state "$home" restore; fi
-  after="$(untouched_hashes "$home")"
-  [ "$after" = "$before" ] || fail "the sha256 of $MIGRATE_UNTOUCHED_FILES changed during migrate:
-before: $(printf '%s' "$before" | tr '\n' ' ')
-after: $(printf '%s' "$after" | tr '\n' ' ')"
+  assert_no_unexpected_loss "$home" "$MIGRATE_STAMP" "$roots_before"
+  changed="$(changed_untouched_files "$home" "$MIGRATE_STAMP")"
+  [ -z "$changed" ] || fail "migrate changed these files, which it must leave alone (they are put back, and the changed versions kept as <file>.changed-$MIGRATE_STAMP): $(tr '\n' ' ' <<<"$changed")"
+  rm -rf "${home:?}/.apm/native-migrate-$MIGRATE_STAMP.untouched"
   trap - EXIT
 
   log "migrated $home; the previous roots are kept as <root>.bak-$MIGRATE_STAMP (record: $(migrate_record "$home" "$MIGRATE_STAMP"))"
