@@ -215,7 +215,13 @@ checkout を `~/.apm` の外へ移すと、`~/.apm` は consumer になる。次
 - repo の文書: `AGENTS.md`（Ownership、Rollout の表の `mise run deploy`・`upgrade`、ship の手順の `apm-deploy-verify` → deploy、Editing Rules の `mise.toml` と `~/.config/mise/config.workstation.toml`。切り替えのあとは `deploy` も `upgrade` も拒否される）、`README.md`、`llms.txt`、`catalog/README.md`、`optional-skills/README.md`、`docs/skill-inventory.md`、`docs/package-decisions.md`、`docs/learning-ledger.md`、`docs/apm-task-coverage.md`。`todo.txt` と `done.txt` は履歴なので書き換えない
 - mise task の description（`mise.toml` と `mise/*.toml` の「`~/.apm` workspace」）と、`scripts/apm-workspace.sh`・`scripts/apm-workspace.ps1` の usage 文
 - テスト: `tests/run-cursor-worker.bats` の `cd "$HOME/.apm"`（`~/.apm` があれば consumer へ入って走る。cursor の project entry を持つ場所は checkout のほうなので、新しい場所へ向ける）
-- repo の外（手で確かめる）: `~/.config/mise/config.workstation.toml` と、新しい場所の `mise trust`、`~/.claude/settings.json`・`~/.codex/config.toml`・shell の rc・launchd に書いた `~/.apm/scripts` などの path、Claude Code の project ごとの記憶（`~/.claude/projects/` の下にある、`~/.apm` の path から作った名前の directory。新しい path では別の directory になり、auto-memory は引き継がれない）、新しい clone の lefthook（`lefthook install`）
+- repo の外（手で確かめる）: `~/.config/mise/config.workstation.toml` と、新しい場所の `mise trust`、`~/.claude/settings.json`・`~/.codex/config.toml`・shell の rc・launchd に書いた `~/.apm/scripts` などの path、Claude Code の project ごとの記憶（下の項目）、新しい clone の lefthook（`lefthook install`）
+
+- Claude Code の auto-memory を引き継ぐ: 記憶は `~/.claude/projects/<path から作った名前>/memory` にあり、名前は checkout の絶対パスの `/` と `.` を `-` に替えたもの。新しい path では別の directory になるので、新しい checkout で Claude Code を一度起動して project の directory を作り、`memory` が無いか空であることを確かめてから、旧い project の `memory` へ symlink を張る。旧い checkout の記憶は動かさず、新旧どちらの path からも同じ記憶を読み書きする
+
+  ```sh
+  ln -s ~/.claude/projects/<旧い名前>/memory ~/.claude/projects/<新しい名前>/memory
+  ```
 
 ## 退役の境界
 
