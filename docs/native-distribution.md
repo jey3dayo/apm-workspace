@@ -160,13 +160,24 @@ rollback（自動も `native:migrate-rollback` も）が戻すのは 4 つの ro
 
    ```sh
    apm_home="$(realpath ~/.apm)"
-   for path in .agents/skills .claude/skills .claude/agents .cursor/agents .claude/rules .claude/commands .codex/rules .cursor/rules \
+   lexical_abs() {
+     rest="${1#/}" out=""
+     while [ -n "$rest" ]; do
+       seg="${rest%%/*}"
+       case "$rest" in */*) rest="${rest#*/}" ;; *) rest="" ;; esac
+       case "$seg" in "" | .) ;; ..) out="${out%/*}" ;; *) out="$out/$seg" ;; esac
+     done
+     printf '%s\n' "${out:-/}"
+   }
+   for root in .agents/skills .claude/skills .claude/agents .cursor/agents .claude/rules .claude/commands .codex/rules .cursor/rules \
      .claude/CLAUDE.md .codex/AGENTS.md .cursor/AGENTS.md .cache/apm Library/Caches/apm; do
-     [ -e ~/"$path" ] || [ -L ~/"$path" ] || continue
-     { [ -L ~/"$path" ] && echo ~/"$path"; find -H ~/"$path" -type l; } | while IFS= read -r link; do
+     [ -e ~/"$root" ] || [ -L ~/"$root" ] || continue
+     { [ -L ~/"$root" ] && echo ~/"$root"; find -H ~/"$root" -type l; } | while IFS= read -r link; do
        target="$(realpath "$link" 2>/dev/null)" || { echo "$link (broken)"; continue; }
        case "$target" in "$apm_home" | "$apm_home"/*) echo "$link -> $target"; continue ;; esac
-       case "$(readlink "$link")" in "$HOME/.apm" | "$HOME/.apm"/* | "$apm_home" | "$apm_home"/*) echo "$link -> $(readlink "$link") (through ~/.apm)" ;; esac
+       value="$(readlink "$link")"
+       case "$value" in /*) abs="$value" ;; *) abs="$(lexical_abs "$(cd "$(dirname "$link")" && pwd -P)/$value")" ;; esac
+       case "$abs" in "$HOME/.apm" | "$HOME/.apm"/* | "$apm_home" | "$apm_home"/*) echo "$link -> $value (through ~/.apm)" ;; esac
      done
    done
    ```
@@ -178,7 +189,7 @@ rollback（自動も `native:migrate-rollback` も）が戻すのは 4 つの ro
    copy="$(mktemp -d)" && cp -RL "$link" "$copy/entry" && rm "$link" && mv "$copy/entry" "$link" && rmdir "$copy"
    ```
 
-   `(through ~/.apm)` と出たリンクは、`~/.apm/private-skills` のように `~/.apm` の中にある別のリンクを経由している。`realpath` は最後の実体を返すので、実体が `~/.apm` の外にあるとそのリンクを外れと判定し、動かしたあとにリンクが切れるため、リンクの値（`readlink`）そのものも見る。実体が HOME の中で `~/.apm` の外にあるときは、コピーせず実体へ張り直してもよい（`ln -sfn "$(realpath "$link")" "$link"`）
+   `(through ~/.apm)` と出たリンクは、`~/.apm/private-skills` のように `~/.apm` の中にある別のリンクを経由している。`realpath` は最後の実体を返すので、実体が `~/.apm` の外にあるとそのリンクを外れと判定し、動かしたあとにリンクが切れるため、リンクの値（`readlink`）そのものも見る。相対の値（`../../.apm/private-skills/...` など）は、リンクのある directory を基準に絶対パスへ直し（`.` と `..` は symlink を辿らずに畳む）てから照合する。実体が HOME の中で `~/.apm` の外にあるときは、コピーせず実体へ張り直してもよい（`ln -sfn "$(realpath "$link")" "$link"`）
 
    壊れたリンクは、置き換え先が無いので、外すか直してから進める
 
