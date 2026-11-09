@@ -174,10 +174,11 @@ cmd_plan() {
   cat <<EOF
 
 # apply --home <disposable HOME> --source-ref $sha would run, with HOME=<that HOME>:
-#   1. stop if an APM-generated root there was edited after compile ($COMPILED_ROOTS)
+#   1. stop if an APM-generated root there was edited after compile ($COMPILED_ROOTS), or if a link apm could
+#      write through leads outside that HOME
 #   2. keep a differing <HOME>/.apm/apm.yml as apm.yml.<UTC>.bak, then write the manifest above
-#   3. apm install -g
-#   4. apm compile -g --clean
+#   3. apm install -g, from an empty environment plus HOME, PATH, TMPDIR, locale and git config locations
+#   4. apm compile -g --clean, the same way
 # Not deployed by APM, and left to the manual steps in docs/native-distribution.md: agmsg db/teams links,
 # catalog/rules and catalog/claude/rules, private skills, OpenCode and Pi instructions, host-local MCP.
 # This plan wrote nothing.
@@ -188,7 +189,7 @@ cmd_apply() {
   parse_options "$@"
   [ -n "$HOME_DIR" ] || fail "apply needs --home <disposable HOME>; it never defaults to the real HOME"
   [ -n "$SOURCE_REF" ] || fail "apply needs --source-ref; deploying never moves a pin on its own"
-  local home sha manifest edited stamp
+  local home sha manifest edited links stamp bak n
   home="$(assert_disposable_home "$HOME_DIR")"
   sha="$(resolve_source_sha "$SOURCE_REF")"
   edited="$(edited_generated_roots "$home")"
@@ -196,17 +197,79 @@ cmd_apply() {
 $edited
 Delete the marker line to keep the file as hand-written, or move it aside, then re-run."
 
+  links="$(escaping_links "$home")"
+  [ -z "$links" ] || fail "these links inside $home lead outside it, so apm would write through them:
+$links
+Use a HOME whose write targets are plain directories and files inside it."
+
   manifest="$(render_manifest "$sha" "$WORKSPACE_ONLY")"
   mkdir -p "$home/.apm"
   if [ -f "$home/.apm/apm.yml" ] && [ "$(cat "$home/.apm/apm.yml")" != "$manifest" ]; then
     stamp="$(date -u +%Y%m%dT%H%M%SZ)"
-    cp -p "$home/.apm/apm.yml" "$home/.apm/apm.yml.$stamp.bak"
-    log "kept the previous manifest as $home/.apm/apm.yml.$stamp.bak"
+    bak="$home/.apm/apm.yml.$stamp.bak"
+    n=1
+    while [ -e "$bak" ] || [ -L "$bak" ]; do
+      bak="$home/.apm/apm.yml.$stamp.$n.bak"
+      n=$((n + 1))
+    done
+    cp -p "$home/.apm/apm.yml" "$bak"
+    log "kept the previous manifest as $bak"
   fi
   printf '%s\n' "$manifest" >"$home/.apm/apm.yml"
 
-  (cd "$home" && HOME="$home" "$APM_BIN" install -g)
-  (cd "$home" && HOME="$home" "$APM_BIN" compile -g --clean)
+  run_apm "$home" install -g
+  run_apm "$home" compile -g --clean
+}
+
+# APM picks cache and config locations from more than HOME (APM_CACHE_DIR, XDG_*), and git honours tokens, proxies
+# and askpass from the environment, so apm starts from an empty environment plus this allowlist.
+run_apm() {
+  local home="$1" var
+  shift
+  local env_args=(HOME="$home" PATH="$PATH" TMPDIR="${TMPDIR:-/tmp}" LANG="${LANG:-C.UTF-8}")
+  for var in LC_ALL TERM PYTHONUTF8 GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM GIT_CEILING_DIRECTORIES; do
+    if [ -n "${!var:-}" ]; then env_args+=("$var=${!var}"); fi
+  done
+  (cd "$home" && env -i "${env_args[@]}" "$APM_BIN" "$@")
+}
+
+# Links apm could write through: anything within two levels of HOME (.apm, .claude, .codex/AGENTS.md, .agents/skills,
+# ...) and, one level deeper, the names this repository's packages deploy. A link that stays inside HOME is fine.
+escaping_links() {
+  local home="$1" link target
+  {
+    find "$home" -mindepth 1 -maxdepth 2 -type l
+    deployed_entries | while IFS= read -r link; do
+      if [ -L "$home/$link" ]; then printf '%s\n' "$home/$link"; fi
+    done
+  } | LC_ALL=C sort -u | while IFS= read -r link; do
+    if ! target="$(realpath "$link" 2>/dev/null)"; then
+      printf '  %s (broken)\n' "$link"
+      continue
+    fi
+    case "$target/" in
+      "$home/"*) ;;
+      *) printf '  %s -> %s\n' "$link" "$target" ;;
+    esac
+  done
+}
+
+deployed_entries() {
+  local path name
+  for path in "$REPO_ROOT"/catalog/.apm/skills/*/ "$REPO_ROOT"/manual-skills/.apm/skills/*/; do
+    [ -d "$path" ] || continue
+    name="$(basename "$path")"
+    printf '.claude/skills/%s\n.agents/skills/%s\n' "$name" "$name"
+  done
+  for path in "$REPO_ROOT"/catalog/.apm/agents/*.agent.md; do
+    [ -f "$path" ] || continue
+    name="$(basename "$path" .agent.md)"
+    printf '.claude/agents/%s.md\n.cursor/agents/%s.md\n' "$name" "$name"
+  done
+  for path in "$REPO_ROOT"/catalog/.apm/instructions/*.instructions.md; do
+    [ -f "$path" ] || continue
+    printf '.claude/rules/%s.md\n' "$(basename "$path" .instructions.md)"
+  done
 }
 
 main() {

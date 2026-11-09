@@ -345,3 +345,52 @@ sentinel_snapshot() {
     return 1
   }
 }
+
+@test "apply refuses a HOME whose write targets link outside it, before writing through them" {
+  local home outside="$FX/outside"
+  mkdir -p "$outside/apm-dir" "$outside/ship"
+  home="$(new_home link-apm)"
+  ln -s "$outside/apm-dir" "$home/.apm"
+  run apply_workspace "$home"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$home/.apm -> $outside/apm-dir"* ]]
+  [ -z "$(ls -A "$outside/apm-dir")" ]
+
+  home="$(new_home link-root)"
+  mkdir -p "$home/.codex"
+  ln -s "$outside/root.md" "$home/.codex/AGENTS.md"
+  run apply_workspace "$home"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$home/.codex/AGENTS.md (broken)"* ]]
+  [ ! -e "$outside/root.md" ]
+
+  # One level deeper only the names this repository deploys count; a private skill link with its own name is fine.
+  home="$(new_home link-skill)"
+  mkdir -p "$home/.claude/skills"
+  ln -s "$outside/ship" "$home/.claude/skills/ship"
+  run apply_workspace "$home"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$home/.claude/skills/ship -> $outside/ship"* ]]
+  [ -z "$(ls -A "$outside/ship")" ]
+  [ ! -e "$home/.apm" ]
+}
+
+@test "apply hides APM_CACHE_DIR and XDG locations from apm, which would otherwise write there" {
+  local home
+  # Positive control: apm itself follows these variables out of HOME.
+  home="$(new_home env-control)"
+  mkdir -p "$home/.apm"
+  native "$home" render --source-ref "$SOURCE_SHA" --workspace-only >"$home/.apm/apm.yml"
+  fixture_exec "$home" /usr/bin/env APM_CACHE_DIR="$FX/leak/control-apm" XDG_CACHE_HOME="$FX/leak/control-xdg" \
+    "$APM_BIN" install -g >/dev/null 2>&1 || true
+  [ -n "$(ls -A "$FX/leak/control-apm" "$FX/leak/control-xdg" 2>/dev/null)" ]
+
+  home="$(new_home env-apply)"
+  fixture_exec "$home" /usr/bin/env APM_CACHE_DIR="$FX/leak/apply-apm" XDG_CACHE_HOME="$FX/leak/apply-xdg" \
+    XDG_CONFIG_HOME="$FX/leak/apply-config" /bin/bash "$REPO_ROOT/scripts/native.sh" \
+    apply --home "$home" --source-ref "$SOURCE_SHA" --workspace-only
+  [ ! -e "$FX/leak/apply-apm" ]
+  [ ! -e "$FX/leak/apply-xdg" ]
+  [ ! -e "$FX/leak/apply-config" ]
+  [ -f "$home/.claude/skills/ship/SKILL.md" ]
+}
