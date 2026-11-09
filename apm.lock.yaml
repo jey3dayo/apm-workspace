@@ -45,8 +45,10 @@ dependencies:
   host: github.com
   resolved_commit: dbf0e4f3a37ebc31aaeaf9d378ab1760b5776c15
   resolved_ref: dbf0e4f3a37ebc31aaeaf9d378ab1760b5776c15
-  version: 0.1.0
-  package_type: marketplace_plugin
+  version: unknown
+  virtual_path: skills/browser-harness
+  is_virtual: true
+  package_type: claude_skill
   deployed_files:
   - .agents/skills/browser-harness
   - .agents/skills/browser-harness/SKILL.md
@@ -59,8 +61,7 @@ dependencies:
     .agents/skills/browser-harness/references/install.md: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
     .claude/skills/browser-harness/SKILL.md: sha256:9e25a96375a0e120c16b76ea9d0a57c2fb7a5765813f89d5b9bcdc6dba6ea175
     .claude/skills/browser-harness/references/install.md: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
-  content_hash: sha256:9e5838e21b3b84b955592ef44bfe8198d324db16f68291a74075d4b795383d39
-  declared_license: MIT
+  content_hash: sha256:9070a5175a7a53765b3b827e347bc61ecd6f712af62da186eeb5b5be2eebc767
 - repo_url: coji/natural-japanese
   name: natural-japanese
   host: github.com
@@ -13866,8 +13867,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - browser-use/browser-harness
-  active_owner: browser-use/browser-harness
+  - browser-use/browser-harness/skills/browser-harness
+  active_owner: browser-use/browser-harness/skills/browser-harness
   content_hash: null
 - kind: project-relative
   target: claude
@@ -13875,8 +13876,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - browser-use/browser-harness
-  active_owner: browser-use/browser-harness
+  - browser-use/browser-harness/skills/browser-harness
+  active_owner: browser-use/browser-harness/skills/browser-harness
   content_hash: sha256:9e25a96375a0e120c16b76ea9d0a57c2fb7a5765813f89d5b9bcdc6dba6ea175
 - kind: project-relative
   target: claude
@@ -13884,8 +13885,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - browser-use/browser-harness
-  active_owner: browser-use/browser-harness
+  - browser-use/browser-harness/skills/browser-harness
+  active_owner: browser-use/browser-harness/skills/browser-harness
   content_hash: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
 - kind: project-relative
   target: claude
@@ -26214,8 +26215,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - browser-use/browser-harness
-  active_owner: browser-use/browser-harness
+  - browser-use/browser-harness/skills/browser-harness
+  active_owner: browser-use/browser-harness/skills/browser-harness
   content_hash: null
 - kind: project-relative
   target: codex
@@ -26223,8 +26224,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - browser-use/browser-harness
-  active_owner: browser-use/browser-harness
+  - browser-use/browser-harness/skills/browser-harness
+  active_owner: browser-use/browser-harness/skills/browser-harness
   content_hash: sha256:9e25a96375a0e120c16b76ea9d0a57c2fb7a5765813f89d5b9bcdc6dba6ea175
 - kind: project-relative
   target: codex
@@ -26232,8 +26233,8 @@ deployments:
   runtime: null
   scope: project
   owners:
-  - browser-use/browser-harness
-  active_owner: browser-use/browser-harness
+  - browser-use/browser-harness/skills/browser-harness
+  active_owner: browser-use/browser-harness/skills/browser-harness
   content_hash: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
 - kind: project-relative
   target: codex

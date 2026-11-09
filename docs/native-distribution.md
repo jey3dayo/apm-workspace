@@ -94,7 +94,7 @@ backup の対象（rehearse が複製に再現するもの）: `~/.apm/apm.yml`�
 | 旧経路が配った skill のうち manifest に無いもの（private skill、Herdr などほかの tool が置いた skill、agmsg）が、移したあとの root に無い                                                                                                                                                                         | compile のあとに入れ直す（`reinstate_entries`）。固定のリストは持たず、「`.bak` にあって、install のあとの root に無い top-level の entry」を戻す。すでにあるもの（APM が配った、Herdr や Claude が書き直した）は上書きしない。`.bak` の中の symlink が root の外を指すときは、中身をコピーして戻す（配布先が authoring の checkout に依存しないため）。root の中を指すものはそのまま戻し、切れたリンクは列挙して失敗する。`mise run native:reinstate` として単独でも呼べる |
 | `nanaism/yomiyasu` は Codex native plugin を持つ package で、root の `apm.yml` の書き方（`owner/repo/skills/yomiyasu#<SHA>`）だと plugin として扱われ、移行が止まった                                                                                                                                             | render が構造化した形（`git: nanaism/yomiyasu` / `ref: <SHA>` / `skills: [yomiyasu]`）に変換する。SHA は root の行から読み、行が無ければ render は失敗する                                                                                                                                                                                                                                                                                                                  |
 
-render は `browser-use/browser-harness` を consumer の manifest に入れない（`scripts/native.sh` の `EXCLUDED_EXTERNAL_PACKAGES`）。repo root の package なので、APM が上流の repo 全体を skill の置き場へ配り、Codex が plugin の skill として数えるため。旧経路の entry は migrate の reinstate が `.bak` から戻すので、切り替え後の browser-harness は旧経路の内容のままで、native では更新されない。native で配る方法は未解決で、あとで扱う。
+`browser-use/browser-harness` は root の `apm.yml` で subdirectory の形（`browser-use/browser-harness/skills/browser-harness#<SHA>`）に pin していて、render はこの行をそのまま通す。repo root の形（`browser-use/browser-harness#<SHA>`）だと APM が上流の repo 全体を skill の置き場へ配り、Codex が plugin の skill として数えるため。subdirectory の形なら `SKILL.md` と `references/install.md` だけが `.agents/skills/browser-harness` と `.claude/skills/browser-harness` に入る（`skills:` の絞り込みは、この package では APM が無視するので使えない）。
 
 APM は Codex CLI 0.163.0 だけを受け付ける（`apm_cli/codex_plugins/client.py` の `QUALIFIED_CODEX_VERSION`。上書きする手段は無い）。構造化した形が Codex native plugin の経路を通らずに skill として配られるかは、テストが通信しないので、本番の install で初めて確かめる（「確かめていないこと」）。
 
@@ -132,7 +132,7 @@ allowExecutables:
 - `rehearse --migrate` は入れ直した entry を `reinstated.txt`（path と scope）、名前が同じで中身が旧い entry と違うために入れ直さなかったものを `skipped.txt` に書く（`.apm-pin` を除いて中身が同じものは載せない）。`migrate` は同じ 2 つを `<HOME>/.apm/native-migrate-<UTC>.reinstated.txt`・`.skipped.txt` に書き、`skipped.txt` が空でなければ warning を出す。単独の `reinstate` は `native-reinstate-<UTC>.` の名前で書く。private skill が catalog の skill と同じ名前で上書きしていた場合は、旧い版を手で戻す
 - 前回の native の lock が載せていて、今回は配られなかった entry は、`dropped.txt` に書き、件数を `result.txt` の `dropped=` に出す。意図した削除（catalog から外した skill）だけであることを、B3 で `dropped.txt` を読んで確かめる。前回の `<HOME>/.apm/apm.yml` が `--workspace-only` で描画されたかどうかは manifest の `# native-render:` 行に残り、今回と違えば `rehearse --migrate` も `migrate` も止まる。`migrate` は同じ一覧を `<HOME>/.apm/native-migrate-<UTC>.dropped.txt` に書き、`dropped.txt` と違えば失敗して rollback する
 - `apm.log` に `no trustworthy local deployment baseline` が出たら失敗する（件数は `baseline_skips=`）
-- `result.txt` には `mode=migrate`、`home`、`source_ref`、`workspace_only`、各 step の status、`lost`、`allowed_lost`、`dropped`、`baseline_skips`、`previous_lock=present|absent`（`<HOME>/.apm/apm.lock.yaml` があるか）、`home_apm=checkout|consumer|absent`（`<HOME>/.apm` が checkout か、consumer か、無いか）が入る。`migrate` はこれを読み、`previous_lock` と `home_apm` が今の HOME と違えば何も書かずに止まる。checkout を移す前に取った rehearsal は、移したあとには使えない（`home_apm` が `checkout` のまま）。移したあと（と、`migrate` が失敗して consumer の `~/.apm` が残ったあと）は、backup から rehearse を取り直す
+- `result.txt` には `mode=migrate`、`home`、`source_ref`、`workspace_only`、各 step の status、`lost`、`allowed_lost`、`dropped`、`baseline_skips`、`previous_lock=present|absent`（`<HOME>/.apm/apm.lock.yaml` があるか）、`home_apm=checkout|consumer|absent`（`<HOME>/.apm` が checkout か、consumer か、無いか）が入る。2 つの値は backup が取った時点の HOME から `home-state.txt` に記録したもので、`rehearse` は今の HOME と違えば（checkout を移したあとなど）、記録が無い旧形式の backup と同じく、clone を作らずに失敗する。`migrate` はこれを読み、`previous_lock` と `home_apm` が今の HOME と違えば何も書かずに止まる。checkout を移す前に取った rehearsal は、移したあとには使えない（`home_apm` が `checkout` のまま）。移したあと（と、`migrate` が失敗して consumer の `~/.apm` が残ったあと）は、backup から rehearse を取り直す
 
 ### migrate の順序
 
@@ -248,7 +248,7 @@ B. 切り替えのたび（新しい SHA を配るときも同じ）
 - B3. `mise run native:rehearse -- --real-home --backup-dir <同じディレクトリ> --source-ref <同じ SHA> --migrate`。成功で終わり、`result.txt` が `mode=migrate`・`lost=0`・`baseline_skips=0` で、`allowed-lost.txt` の path がその表のものだけで、`dropped.txt` が意図した削除（catalog から外した skill）だけであることを確かめる。A1 の前に取った rehearsal は使えないので、必ず A1 のあとに取る
 - B4. `~/.cache/apm` と、あれば `Library/Caches/apm` を `<名前>.native-aside-<UTC>` へ移す（上の「実 HOME の checkout の移設」の最後の段落）。Claude Code と Codex のセッションを閉じる
 - B5. `mise run native:migrate -- --real-home --source-ref <同じ SHA> --rehearsal <backup>/rehearsal-<UTC>.<suffix>`。表示された stamp を控える
-- B6. 確かめる: 配布された skill と agents、`~/.claude/rules/ai-collaboration.md`、manifest 外の skill（private skill、Herdr、agmsg）、agmsg の `db`・`teams` のリンク、`~/.codex/config.toml` と `~/.claude/settings.json` が変わっていないこと
+- B6. 確かめる: 配布された skill と agents、`~/.claude/rules/ai-collaboration.md`、manifest 外の skill（private skill、Herdr、agmsg）、agmsg の `db`・`teams` のリンク、`~/.codex/config.toml` と `~/.claude/settings.json` が変わっていないこと。OpenCode は `~/.config/opencode/AGENTS.md`（無ければ `~/.claude/CLAUDE.md`）を読み、切り替えのあとは両方とも無いので、`mise run native:opencode` でガイドを置く（手書きの `AGENTS.md` は上書きしない。native の HOME でも `apply` と違って拒否されない）
 - B7. 問題があれば `mise run native:migrate-rollback -- --real-home --stamp <UTC>`。移したあとの root は `<root>.native-<UTC>` に残る。問題がなければ、`<root>.bak-<UTC>` と `<root>.native-<UTC>` は手で消すまで残る
 
 ### 切り替えたあとの更新
@@ -259,7 +259,6 @@ B. 切り替えのたび（新しい SHA を配るときも同じ）
 
 - 本番の HOME での出力が旧経路と同じになるか（skill 数、Herdr など他の tool の skill、private の上書きの組み合わせ）
 - 外部の依存の install（テストは通信しない）。特に、構造化した形の `nanaism/yomiyasu` が Codex native plugin の経路を通らずに skill として配られるか
-- `browser-use/browser-harness` を native で配ること（今は manifest から外し、旧経路の entry を入れ直している）
 - `allowExecutables` の許可が、本物の `github.com/fujibee/agmsg` と `github.com/tt-a1i/archify/archify` で効くか（テストは、同じ形のキーを持つ package を `https://github.com/<owner>/<repo>.git` から git の設定で fixture へ向け直して確かめた）
 - 実 HOME での `migrate`（テストは使い捨ての HOME と実 APM の `--workspace-only` までで、実 HOME の `.cache/apm` や外部の依存を含む install は通らない）
 - 各 tool が実際に rule とガイドを読み込むか
