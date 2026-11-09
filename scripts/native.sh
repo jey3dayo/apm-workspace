@@ -29,9 +29,6 @@ REAL_HOME_TOOL_DIRS=".agents .claude .codex .cursor .cache Library Library/Cache
 # attempted): <manifest path>=<git repository>:<skill>. render turns `- <manifest path>#<40-hex SHA>` into
 # `- git: <repository> / ref: <SHA> / skills: [<skill>]`.
 EXTERNAL_PACKAGE_MAP="nanaism/yomiyasu/skills/yomiyasu=nanaism/yomiyasu:yomiyasu"
-# Packages render leaves out of the consumer manifest: a repo-root package that apm deploys as the whole upstream
-# repository, which Codex then lists as a plugin skill. migrate's reinstate keeps the old entry from the moved-aside roots.
-EXCLUDED_EXTERNAL_PACKAGES="browser-use/browser-harness"
 # Packages whose bin/ the old path deployed and that apm may deploy too. render lists them under the deprecated
 # allowExecutables key, the only spelling apm 0.35.0 reads from <HOME>/.apm/apm.yml at user scope
 # (docs/native-distribution.md). The apm.yml entry is <owner>/<repo>[/<path>]#<ref>; apm looks the approval up as
@@ -100,15 +97,15 @@ resolve_source_sha() {
 }
 
 # Rewrites the two floating workspace refs (catalog#main, manual-skills#main) into SHA pins, and the packages in
-# EXTERNAL_PACKAGE_MAP into the structured form, drops EXCLUDED_EXTERNAL_PACKAGES, and appends allowExecutables for
+# EXTERNAL_PACKAGE_MAP into the structured form, and appends allowExecutables for
 # EXECUTABLE_ALLOW_PACKAGES. The other external dependencies are already pinned in apm.yml and pass through unchanged.
-# A mapped, excluded or allowed package missing from apm.yml (or listed twice) fails the render, so a rename there is not skipped silently.
+# A mapped or allowed package missing from apm.yml fails the render, so a rename there is not skipped silently.
 render_manifest() {
   local sha="$1" workspace_only="$2"
   [ -f "$ROOT_MANIFEST" ] || fail "missing $ROOT_MANIFEST"
   printf '# Rendered by scripts/native.sh from apm.yml with this repository pinned at %s. Do not edit; re-render.\n' "$sha"
   printf '# native-render: workspace_only=%s\n' "$workspace_only"
-  awk -v sha="$sha" -v url="$SOURCE_URL" -v only="$workspace_only" -v map="$EXTERNAL_PACKAGE_MAP" -v excluded="$EXCLUDED_EXTERNAL_PACKAGES" -v allow="$EXECUTABLE_ALLOW_PACKAGES" '
+  awk -v sha="$sha" -v url="$SOURCE_URL" -v only="$workspace_only" -v map="$EXTERNAL_PACKAGE_MAP" -v allow="$EXECUTABLE_ALLOW_PACKAGES" '
     function convert(   i, prefix, rest, pin) {
       for (i = 1; i <= n; i++) {
         prefix = "    - " key[i] "#"
@@ -125,7 +122,6 @@ render_manifest() {
     }
     BEGIN {
       na = split(allow, allowed, " ")
-      nx = split(excluded, drop, " ")
       n = split(map, entries, " ")
       for (i = 1; i <= n; i++) {
         split(entries[i], kv, "=")
@@ -143,7 +139,6 @@ render_manifest() {
       pinned[pkg]++
       next
     }
-    !only { for (i = 1; i <= nx; i++) if (index($0, "    - " drop[i] "#") == 1) { excluded_seen[i]++; next } }
     !only && convert() { next }
     !only { for (i = 1; i <= na; i++) if (index($0, "    - " allowed[i] "#") == 1) allowed_seen[i]++ }
     only && section == "dependencies" && group == "mcp:" { next }
@@ -153,14 +148,13 @@ render_manifest() {
       ok = (pinned["catalog"] == 1 && pinned["manual-skills"] == 1)
       if (!only) for (i = 1; i <= n; i++) if (converted[i] != 1) ok = 0
       if (!only) for (i = 1; i <= na; i++) if (allowed_seen[i] != 1) ok = 0
-      if (!only) for (i = 1; i <= nx; i++) if (excluded_seen[i] != 1) ok = 0
       if (ok && !only) {
         print "allowExecutables:"
         for (i = 1; i <= na; i++) printf "  github.com/%s:\n    bin: true\n", allowed[i]
       }
       exit !ok
     }
-  ' "$ROOT_MANIFEST" || fail "apm.yml must list jey3dayo/apm-workspace/catalog#main and manual-skills#main exactly once each, and every package of EXTERNAL_PACKAGE_MAP (such as nanaism/yomiyasu/skills/yomiyasu#<40-hex SHA>), EXCLUDED_EXTERNAL_PACKAGES ($EXCLUDED_EXTERNAL_PACKAGES) and EXECUTABLE_ALLOW_PACKAGES (such as fujibee/agmsg#<ref>) exactly once"
+  ' "$ROOT_MANIFEST" || fail "apm.yml must list jey3dayo/apm-workspace/catalog#main and manual-skills#main exactly once each, and every package of EXTERNAL_PACKAGE_MAP (such as nanaism/yomiyasu/skills/yomiyasu#<40-hex SHA>) and EXECUTABLE_ALLOW_PACKAGES (such as fujibee/agmsg#<ref>) exactly once"
 }
 
 physical_path() {
@@ -532,28 +526,12 @@ migrate_deployed_record() {
 }
 
 # "<root><TAB><top-level entry>" for each entry of MIGRATE_ROOTS that the previous apm.lock.yaml of this HOME lists in a
-# deployed_files list (the lock a native deployment left; there is none before the first migrate). Entries listed only by
-# the lock record of an EXCLUDED_EXTERNAL_PACKAGES repository are left out: render excluded that package on purpose, so
-# the old copy is the only one and must be reinstated, not treated as dropped by the catalog. The record is matched by
-# repo_url rather than by skill name, because the lock states what the package really deployed.
+# deployed_files list (the lock a native deployment left; there is none before the first migrate).
 previous_deployed_entries() {
   local lock="$1/.apm/apm.lock.yaml"
   [ -f "$lock" ] || return 0
-  awk -v roots="$MIGRATE_ROOTS" -v excluded="$EXCLUDED_EXTERNAL_PACKAGES" '
-    BEGIN { n = split(roots, root, " "); nx = split(excluded, drop, " ") }
-    /^[^[:space:]-]/ { skip = 0 }
-    /^[[:space:]]*(- )?repo_url:/ {
-      url = $0
-      sub(/^[[:space:]]*(- )?repo_url:[[:space:]]*/, "", url)
-      gsub(/["\047]/, "", url)
-      sub(/^[a-z]+:\/\/[^\/]+\//, "", url)
-      sub(/^github\.com\//, "", url)
-      sub(/\.git$/, "", url)
-      skip = 0
-      for (i = 1; i <= nx; i++) if (url == drop[i]) skip = 1
-      next
-    }
-    /^[[:space:]]*- [a-z_]+:/ { skip = 0; next }
+  awk -v roots="$MIGRATE_ROOTS" '
+    BEGIN { n = split(roots, root, " ") }
     /^[[:space:]]*- / {
       line = $0
       sub(/^[[:space:]]*- /, "", line)
@@ -563,10 +541,9 @@ previous_deployed_entries() {
         if (index(line, prefix) != 1) continue
         rest = substr(line, length(prefix) + 1)
         sub(/\/.*/, "", rest)
-        if (rest != "" && !skip) kept[root[i] "\t" rest] = 1
+        if (rest != "") print root[i] "\t" rest
       }
     }
-    END { for (entry in kept) print entry }
   ' "$lock" | LC_ALL=C sort -u
 }
 

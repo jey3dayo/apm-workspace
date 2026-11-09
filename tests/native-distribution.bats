@@ -248,9 +248,10 @@ sentinel_snapshot() {
   [ -n "$yomiyasu_sha" ]
   [ "$(grep -c 'nanaism/yomiyasu/skills/yomiyasu' <<<"$rendered")" -eq 0 ]
 
-  # browser-harness is a repo-root package that apm deploys as the whole upstream repository (a Codex plugin skill).
+  # browser-harness is pinned in the virtual-subdirectory form, which apm deploys as the one skill (the repo-root form
+  # deploys the whole upstream repository as a Codex plugin skill); render passes the line through unchanged.
   [ "$(grep -c 'browser-use/browser-harness' "$REPO_ROOT/apm.yml")" -eq 1 ]
-  [ "$(grep -c 'browser-harness' <<<"$rendered")" -eq 0 ]
+  [ "$(grep -E '^    - browser-use/browser-harness/skills/browser-harness#[0-9a-f]{40}( |$)' "$REPO_ROOT/apm.yml")" = "$(grep 'browser-use/browser-harness' <<<"$rendered")" ]
   [ "$(grep -A3 '^    - git: nanaism/yomiyasu$' <<<"$rendered")" = "$(printf '    - git: nanaism/yomiyasu\n      ref: %s\n      skills:\n        - yomiyasu' "$yomiyasu_sha")" ]
 
   # The deprecated allowExecutables key, for the two packages whose bin/ the old path deployed, and nothing else.
@@ -260,7 +261,7 @@ sentinel_snapshot() {
   [ "$(sed -n 2p <<<"$rendered")" = "# native-render: workspace_only=0" ]
 
   # Everything else in apm.yml passes through line for line.
-  diff <(grep -vE 'jey3dayo/apm-workspace/(catalog|manual-skills)#main|nanaism/yomiyasu/skills/yomiyasu#|browser-use/browser-harness#' "$REPO_ROOT/apm.yml") \
+  diff <(grep -vE 'jey3dayo/apm-workspace/(catalog|manual-skills)#main|nanaism/yomiyasu/skills/yomiyasu#' "$REPO_ROOT/apm.yml") \
     <(sed 1,2d <<<"$rendered" | sed '/^allowExecutables:/,$d' | sed '/^    - git: nanaism\/yomiyasu$/,+3d' |
       grep -vE "^    - git: $FIXTURE_URL\$|^      path: (catalog|manual-skills)\$|^      ref: $SOURCE_SHA\$")
 
@@ -288,26 +289,6 @@ sentinel_snapshot() {
   [[ "$output" == *"EXECUTABLE_ALLOW_PACKAGES"* ]]
   run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA" --workspace-only
   [ "$status" -eq 0 ]
-}
-
-@test "render fails when an excluded package is missing from apm.yml or listed twice, and names the exclusion list" {
-  local home repo="$FX/render-excluded-repo"
-  home="$(new_home render-excluded)"
-  mkdir -p "$repo/scripts"
-  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
-
-  grep -v 'browser-use/browser-harness' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
-  run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"EXCLUDED_EXTERNAL_PACKAGES (browser-use/browser-harness)"* ]]
-  run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA" --workspace-only
-  [ "$status" -eq 0 ]
-
-  awk '{ print } /^    - browser-use\/browser-harness#/ { print }' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
-  [ "$(grep -c 'browser-use/browser-harness' "$repo/apm.yml")" -eq 2 ]
-  run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"EXCLUDED_EXTERNAL_PACKAGES"* ]]
 }
 
 @test "apply stops when the manifest cannot be rendered, before it writes the manifest or starts apm" {
@@ -959,35 +940,6 @@ prepare_migrate() {
   [ -f "$M_HOME"/.claude/skills.bak-*/removed-upstream/SKILL.md ]
   [ -f "$M_HOME/.claude/skills/private-copy/SKILL.md" ]
   grep -qx '\.claude/skills/foo' "$M_HOME"/.apm/native-migrate-*.skipped.txt
-}
-
-@test "an entry of an excluded package that the previous native lock lists is reinstated, not counted as dropped" {
-  local stub="$FX/stub-apm-deploy" rehearsal
-  write_deploy_stub "$stub"
-  M_HOME="$(new_home migrate-excluded-in-lock)"
-  M_BACKUP="$FX/backups/migrate-excluded-in-lock"
-  seed_migrate_home "$M_HOME"
-  mkdir -p "$M_HOME/.claude/skills/browser-harness" "$M_HOME/.agents/skills/browser-harness" "$M_HOME/.claude/skills/removed-upstream" "$M_HOME/.apm"
-  echo "old harness" >"$M_HOME/.claude/skills/browser-harness/SKILL.md"
-  echo "old harness" >"$M_HOME/.agents/skills/browser-harness/SKILL.md"
-  echo "old" >"$M_HOME/.claude/skills/removed-upstream/SKILL.md"
-  printf "lockfile_version: '2'\ndependencies:\n- repo_url: https://github.com/fixture-owner/apm-workspace\n  deployed_files:\n  - .claude/skills/removed-upstream\n  - .claude/skills/removed-upstream/SKILL.md\n- repo_url: browser-use/browser-harness\n  name: browser-harness\n  deployed_files:\n  - .agents/skills/browser-harness\n  - .agents/skills/browser-harness/SKILL.md\n  - .claude/skills/browser-harness\n  - .claude/skills/browser-harness/SKILL.md\n" >"$M_HOME/.apm/apm.lock.yaml"
-  real_native "$M_HOME" backup --real-home --backup-dir "$M_BACKUP"
-  real_native_with_stub "$M_HOME" "$stub" rehearse --real-home --backup-dir "$M_BACKUP" --source-ref "$SOURCE_SHA" --workspace-only --migrate
-  rehearsal="$(dirname "$(compgen -G "$M_BACKUP/rehearsal-*/result.txt")")"
-
-  grep -q $'^\.claude/skills/browser-harness\t' "$rehearsal/reinstated.txt"
-  grep -q $'^\.agents/skills/browser-harness\t' "$rehearsal/reinstated.txt"
-  ! grep -q 'browser-harness' "$rehearsal/dropped.txt"
-  ! grep -q 'browser-harness' "$rehearsal/allowed-lost.txt"
-  grep -qx '\.claude/skills/removed-upstream' "$rehearsal/dropped.txt"
-  grep -qx 'dropped=1' "$rehearsal/result.txt"
-
-  run real_native_with_stub "$M_HOME" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$rehearsal"
-  [ "$status" -eq 0 ]
-  [ "$(cat "$M_HOME/.claude/skills/browser-harness/SKILL.md")" = "old harness" ]
-  [ "$(cat "$M_HOME/.agents/skills/browser-harness/SKILL.md")" = "old harness" ]
-  [ ! -e "$M_HOME/.claude/skills/removed-upstream" ]
 }
 
 @test "migrate-rollback accepts a record whose root has no done line and no backup" {
