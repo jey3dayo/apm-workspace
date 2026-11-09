@@ -1,18 +1,20 @@
 # APM native の配布（mise 入口、first cut）
 
-- Status: 2026-11-09、APM 0.35.0。`apply` の既定は使い捨ての HOME で、実 HOME とその祖先、その中の tool の状態（`.apm`・`.claude`・`.codex`・`.cursor`・`.agents`・`.config`・`.cache`・`.local`・`Library`）を、何も書く前に拒否する。実 HOME には `--real-home` と、先に取った `backup` が要る。MCP・認証・permissions・settings は書き換えない（install は `--only apm`）
+- Status: 2026-11-09、APM 0.35.0。`apply` の既定は使い捨ての HOME で、実 HOME とその祖先、その中の tool の状態（`.apm`・`.claude`・`.codex`・`.cursor`・`.agents`・`.config`・`.cache`・`.local`・`Library`）を、何も書く前に拒否する。実 HOME には `--real-home` と、先に取った `backup` と、その backup で消えるファイルが 0 件だった `rehearse` が要る。MCP・認証・permissions・settings は書き換えない（install は `--only apm`）
+- 今の位置づけ: 新しい HOME と使い捨ての HOME に配るための経路。今の実 HOME（旧経路が配った状態）への切り替えは、下の「実 HOME への切り替えの blocker」が解けるまで行わない
 - テスト: `tests/native-distribution.bats`（`mise run test:sh` に含まれる）。この checkout の `catalog/` と `manual-skills/` を fixture の git repo に入れ、実 APM で使い捨ての HOME へ配る。macOS では `sandbox-exec` が通信と fixture の外への書込みを拒否する。fixture の置き場所は `APM_NATIVE_FIXTURE_ROOT` で変えられる
 
 ## 入口
 
-| mise task                                                                       | すること                                                                                                                                                                                                                                                               |
-| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `mise run native:plan`                                                          | 既定の入口。consumer の manifest と、apply が実行する手順を表示する。何も書かない                                                                                                                                                                                      |
-| `mise run native:render -- --source-ref <SHA>`                                  | consumer の manifest を標準出力に出す                                                                                                                                                                                                                                  |
-| `mise run native:apply -- --home <使い捨ての HOME> --source-ref <SHA>`          | manifest を `<HOME>/.apm/apm.yml` に書き、`HOME=<HOME>` で `apm install -g --only apm` と `apm compile -g --clean` を実行する                                                                                                                                          |
-| `mise run native:backup -- --real-home --backup-dir <新しいディレクトリ>`       | apply が変え得る非秘密のパス（下の「backup の対象」）と agmsg の store を clone copy し、種類・サイズ・mtime だけの inventory を残す。既存の backup は上書きしない                                                                                                     |
-| `mise run native:apply -- --real-home --backup-dir <backup> --source-ref <SHA>` | 実 HOME へ配る。その HOME の完了した backup が無ければ止まる。agmsg の `db`・`teams` のリンクを save し、どの終わり方でも restore して、前と同じリンクか確かめる                                                                                                       |
-| `mise run native:rollback -- --real-home --backup-dir <backup>`                 | backup したパスの今のコピーを `<backup>/pre-rollback-<UTC>/` へ移し、backup を戻す。backup に無かったパスは移すだけ。agmsg の store は戻さない（他の agent が書き続けているので、古いコピーで上書きすると新しいメッセージが消える）。backup 時のコピーの場所を表示する |
+| mise task                                                                          | すること                                                                                                                                                                                                                                                                     |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mise run native:plan`                                                             | 既定の入口。consumer の manifest と、apply が実行する手順を表示する。何も書かない                                                                                                                                                                                            |
+| `mise run native:render -- --source-ref <SHA>`                                     | consumer の manifest を標準出力に出す                                                                                                                                                                                                                                        |
+| `mise run native:apply -- --home <使い捨ての HOME> --source-ref <SHA>`             | manifest を `<HOME>/.apm/apm.yml` に書き、`HOME=<HOME>` で `apm install -g --only apm` と `apm compile -g --clean` を実行する                                                                                                                                                |
+| `mise run native:backup -- --real-home --backup-dir <新しいディレクトリ>`          | apply が変え得る非秘密のパス（下の「backup の対象」）と agmsg の store を clone copy し、種類・サイズ・mtime だけの inventory を残す。既存の backup は上書きしない                                                                                                           |
+| `mise run native:rehearse -- --real-home --backup-dir <backup> --source-ref <SHA>` | backup を `<backup>/rehearsal-<UTC>/home` に複製し、HOME の外を指すリンクを複製の中へ向け直してから、同じ install と compile を実行する。消えたファイルを `lost.txt` に数え、install・compile が成功して 0 件のときだけ `<backup>/rehearsal-ok` を書く。実 HOME には書かない |
+| `mise run native:apply -- --real-home --backup-dir <backup> --source-ref <SHA>`    | 実 HOME へ配る。その HOME の完了した backup と、同じ HOME・同じ SHA の `rehearsal-ok` が無ければ止まる。agmsg の `db`・`teams` のリンクを save し、どの終わり方でも restore して、前と同じリンクか確かめる                                                                   |
+| `mise run native:rollback -- --real-home --backup-dir <backup>`                    | backup したパスの今のコピーを `<backup>/pre-rollback-<UTC>/` へ移し、backup を戻す。backup に無かったパスは移すだけ。agmsg の store は戻さない（他の agent が書き続けているので、古いコピーで上書きすると新しいメッセージが消える）。backup 時のコピーの場所を表示する       |
 
 - consumer の manifest は、root の `apm.yml` の `jey3dayo/apm-workspace/catalog#main` と `manual-skills#main` の 2 行を、指定した commit SHA への pin に書き換えたもの。外部の依存と MCP はそのまま通す（外部の依存はもともと SHA で pin している）。`--workspace-only` を付けると、この repo の 2 package だけを残す
 - 配布と更新を分ける: apply は pin を自分で動かさない。新しい commit を配るときは、`--source-ref` に新しい SHA を渡して実行し直す。外部の依存の pin は、今と同じく root の `apm.yml` で上げる
@@ -71,6 +73,18 @@ backup の対象: `~/.apm/apm.yml`・`apm.lock.yaml`・`deployment-receipts`（A
 - consumer の状態と authoring の checkout が同じ `~/.apm` にある。APM 0.35.0 は user scope を `~/.apm` に固定しているので、実 HOME への apply は、checkout が追跡している `~/.apm/apm.yml`（と APM が書く `apm.lock.yaml`）を書き換える。main の checkout は dirty になり、`git pull` は止まり、旧経路の `mise run deploy` も描画した manifest を読む。分けるには checkout を `~/.apm` の外へ移す必要があり、それは別の判断にする
 - 目印の無い root（旧経路がコピーした `~/.claude/CLAUDE.md`・`~/.codex/AGENTS.md`・`~/.cursor/AGENTS.md`）は、`compile -g --clean` が上書きしない。Claude には旧い `CLAUDE.md` と native の rule `ai-collaboration.md` の両方が届く。`mise run migrate:roots`（既定は dry-run）で旧いコピーを退避するのは別の手順
 
+## 実 HOME への切り替えの blocker
+
+2026-11-09 に実 HOME へ一度 apply し、実害が出たので rollback した（backup した 15 パスは差分 0 に戻った）。
+
+- `apm install -g --only apm` が、旧経路の配った skill のファイルを消し（stale-file cleanup）、同じファイルの書込みは「no trustworthy local deployment baseline」で飛ばした。最後は Codex native plugin を持つ package（`nanaism/yomiyasu`）の移行で止まった（`apm_cli/install/phases/codex_plugins.py`）。`.agents/skills` に旧経路が置いたファイルが残っていると、APM は移行を拒否する
+- backup を複製した使い捨ての HOME で再現した。元の `catalog#main` の manifest でも SHA pin の manifest でも同じように失敗したので、pin の書き方は原因ではない
+- `apm install --dry-run` は、消すファイルを表示しない（APM 自身が「Orphan removals are not previewed」と出す）。事前の確認には `native:rehearse` を使う
+- Codex native plugin の移行は Codex の RPC で plugin を登録する。成功しても Codex 側の状態を書き換えるので、「設定を書き換えない」という条件とぶつかる
+- APM（upstream）の挙動なので、この repo の修正では制御できない。解くには、旧経路の配った skill の置き場をまるごと退避してから配り直すか（private skill は入れ直す）、Codex を targets から外すか、を決める必要がある。どちらもまだ決めていない
+
+切り替えの途中で `~/.cache/apm` を退避したときの戻し方: 作り直された `~/.cache/apm` を新しい名前（`apm.native-regen-<UTC>` など）へ移し、退避したもの（`apm.native-aside-<UTC>`）を `~/.cache/apm` に戻す。どちらも消さない。`native:apply --real-home` が `.cache/apm` の中の上流の symlink（同じ checkout の中で切れた相対リンクや、上流の絶対パスのリンク）で止まるのは、この退避ではなくキャッシュの扱いを直すべき問題として残している
+
 ## 退役の境界
 
 新経路は旧経路と併存させる。3 つ目の常設の配布経路にはしない。新経路で配ることが定着したら、`native:*` を `deploy` の中身に置き換え、次を退役させる。
@@ -83,8 +97,9 @@ backup の対象: `~/.apm/apm.yml`・`apm.lock.yaml`・`deployment-receipts`（A
 
 1. `mise run native:plan -- --source-ref <merge 済みの SHA>` で manifest を確かめる。package の pin は merge 済みの commit にする
 2. `mise run native:backup -- --real-home --backup-dir <新しいディレクトリ>`
-3. `mise run native:apply -- --real-home --backup-dir <同じディレクトリ> --source-ref <同じ SHA>`
-4. 上の表の手動の項目を確かめ、各 tool での読込を確かめる
+3. `mise run native:rehearse -- --real-home --backup-dir <同じディレクトリ> --source-ref <同じ SHA>`。`lost.txt` が空で `rehearsal-ok` ができたときだけ次へ進む
+4. `mise run native:apply -- --real-home --backup-dir <同じディレクトリ> --source-ref <同じ SHA>`
+5. 上の表の手動の項目を確かめ、各 tool での読込を確かめる
 
 戻し方: `mise run native:rollback -- --real-home --backup-dir <同じディレクトリ>`。MCP と設定は apply が書かないので、戻す対象に入らない。
 
