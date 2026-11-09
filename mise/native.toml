@@ -1,5 +1,5 @@
-# Native APM distribution (docs/native-distribution.md). Coexists with `deploy` until the cutover is approved,
-# then replaces it; it is not a third permanent distribution path. apply only accepts a disposable HOME.
+# Native APM distribution (docs/native-distribution.md). Coexists with `deploy` until it replaces it; it is not a third
+# permanent distribution path. apply defaults to a disposable HOME; the real HOME needs --real-home and a backup.
 
 ["native:plan"]
 description = "Print the SHA-pinned consumer manifest and the native install/compile steps; writes nothing"
@@ -10,5 +10,13 @@ description = "Print the consumer manifest for -- --source-ref <SHA>"
 run = "bash ./scripts/native.sh render"
 
 ["native:apply"]
-description = "apm install -g + compile -g into -- --home <disposable HOME> --source-ref <SHA>; refuses the real HOME"
+description = "apm install -g --only apm + compile -g into -- --home <dir> | --real-home --backup-dir <backup>, --source-ref <SHA>"
 run = "bash ./scripts/native.sh apply"
+
+["native:backup"]
+description = "Copy the non-secret paths native:apply can change: -- --real-home --backup-dir <new dir>"
+run = "bash ./scripts/native.sh backup"
+
+["native:rollback"]
+description = "Put a native:backup back, moving the current copies aside: -- --real-home --backup-dir <backup>"
+run = "bash ./scripts/native.sh rollback"

@@ -227,12 +227,13 @@ sentinel_snapshot() {
 @test "plan prints the SHA-pinned manifest and the steps, and writes nothing" {
   local home before
   home="$(new_home plan)"
-  before="$(cd "$FX" && find . -path ./tmp -prune -o -print | LC_ALL=C sort)"
+  # Only this test's HOME and the source repository: other tests write their own HOMEs in parallel.
+  before="$(find "$home" "$SOURCE_REPO" | LC_ALL=C sort)"
   run native "$home" plan --source-ref "$SOURCE_SHA" --workspace-only
   [ "$status" -eq 0 ]
   [[ "$output" == *"ref: $SOURCE_SHA"* ]]
   [[ "$output" == *"This plan wrote nothing."* ]]
-  [ "$(cd "$FX" && find . -path ./tmp -prune -o -print | LC_ALL=C sort)" = "$before" ]
+  [ "$(find "$home" "$SOURCE_REPO" | LC_ALL=C sort)" = "$before" ]
 }
 
 @test "render pins catalog and manual-skills by SHA and keeps every external dependency and MCP server" {
@@ -333,6 +334,14 @@ sentinel_snapshot() {
   run cat "$home"/.apm/apm.yml.*.bak
   [ "$output" = $'name: earlier\nversion: 0.0.1' ]
   grep -q "ref: $SOURCE_SHA" "$home/.apm/apm.yml"
+
+  # Compared byte for byte: a manifest that differs only in trailing newlines is kept too.
+  home="$(new_home backup-newline)"
+  mkdir -p "$home/.apm"
+  native "$home" render --source-ref "$SOURCE_SHA" --workspace-only >"$home/.apm/apm.yml"
+  printf '\n' >>"$home/.apm/apm.yml"
+  apply_workspace "$home"
+  [ "$(compgen -G "$home/.apm/apm.yml.*.bak" | wc -l | tr -d ' ')" -eq 1 ]
 }
 
 @test "every catalog file APM does not deploy is listed in the manual distribution table" {
@@ -448,4 +457,102 @@ PY
   run apply_workspace "$home"
   [ "$status" -ne 0 ]
   [[ "$output" == *".codex/AGENTS.md"* ]]
+}
+
+# The real-HOME mode, pointed at a fixture HOME through APM_NATIVE_ACCOUNT_HOME.
+real_native() {
+  local home="$1"
+  shift
+  fixture_exec "$home" /usr/bin/env APM_NATIVE_ACCOUNT_HOME="$home" /bin/bash "$REPO_ROOT/scripts/native.sh" "$@"
+}
+
+backed_up_snapshot() {
+  local path
+  (cd "$1" && for path in .apm/apm.yml .apm/apm.lock.yaml .claude/skills .claude/agents .claude/rules .claude/commands \
+    .claude/CLAUDE.md .codex/AGENTS.md .codex/rules .cursor/agents .cursor/rules .cursor/AGENTS.md .agents/skills \
+    AGENTS.md .config/opencode/AGENTS.md; do
+    [ -e "$path" ] || [ -L "$path" ] || continue
+    find "$path" \( -type f -o -type l \) | LC_ALL=C sort | while IFS= read -r f; do
+      if [ -L "$f" ]; then printf '%s -> %s\n' "$f" "$(readlink "$f")"; else printf '%s %s\n' "$f" "$(git hash-object "$f")"; fi
+    done
+  done)
+}
+
+seed_agmsg() {
+  local home="$1" name
+  mkdir -p "$home/.agents/skills/agmsg"
+  echo "agmsg skill" >"$home/.agents/skills/agmsg/SKILL.md"
+  for name in db teams; do
+    mkdir -p "$home/.local/state/agmsg/$name"
+    echo "$name store" >"$home/.local/state/agmsg/$name/keep"
+    ln -s "$home/.local/state/agmsg/$name" "$home/.agents/skills/agmsg/$name"
+  done
+}
+
+@test "the real-HOME mode needs a completed backup, keeps agmsg links, and rollback restores every backed-up path" {
+  local home before
+  home="$(new_home real)"
+  seed_sentinels "$home"
+  seed_agmsg "$home"
+  before="$(backed_up_snapshot "$home")"
+
+  run real_native "$home" apply --real-home --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"needs --backup-dir"* ]]
+  run real_native "$home" apply --real-home --home "$home" --source-ref "$SOURCE_SHA"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"not both"* ]]
+
+  real_native "$home" backup --real-home --backup-dir "$FX/backups/real"
+  [ -f "$FX/backups/real/complete" ]
+  [ "$(cat "$FX/backups/real/agmsg-state/db/keep")" = "db store" ]
+  run real_native "$home" backup --real-home --backup-dir "$FX/backups/real"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"never overwritten"* ]]
+
+  real_native "$home" apply --real-home --backup-dir "$FX/backups/real" --source-ref "$SOURCE_SHA" --workspace-only
+  [ -f "$home/.claude/skills/ship/SKILL.md" ]
+  [ "$(readlink "$home/.agents/skills/agmsg/db")" = "$home/.local/state/agmsg/db" ]
+  [ "$(readlink "$home/.agents/skills/agmsg/teams")" = "$home/.local/state/agmsg/teams" ]
+  [ "$(cat "$home/.local/state/agmsg/db/keep")" = "db store" ]
+  [ -z "$(compgen -G "$home/.apm/apm.yml.*.bak" || true)" ]
+
+  real_native "$home" rollback --real-home --backup-dir "$FX/backups/real"
+  [ "$(backed_up_snapshot "$home")" = "$before" ]
+  [ -f "$(compgen -G "$FX/backups/real/pre-rollback-*/.claude/skills/ship/SKILL.md")" ]
+}
+
+@test "the real-HOME mode checks only apm's write paths for links that lead outside the HOME" {
+  local home outside="$FX/outside-real"
+  mkdir -p "$outside/elsewhere" "$outside/skill"
+  home="$(new_home real-links)"
+  mkdir -p "$home/projects" "$home/.claude/skills"
+  ln -s "$outside/elsewhere" "$home/projects/linked"
+  real_native "$home" backup --real-home --backup-dir "$FX/backups/real-links"
+  real_native "$home" apply --real-home --backup-dir "$FX/backups/real-links" --source-ref "$SOURCE_SHA" --workspace-only
+
+  home="$(new_home real-links-refused)"
+  mkdir -p "$home/.claude/skills"
+  ln -s "$outside/skill" "$home/.claude/skills/ship"
+  real_native "$home" backup --real-home --backup-dir "$FX/backups/real-links-refused"
+  run real_native "$home" apply --real-home --backup-dir "$FX/backups/real-links-refused" --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$home/.claude/skills/ship -> $outside/skill"* ]]
+  [ -z "$(ls -A "$outside/skill")" ]
+}
+
+@test "the real-HOME mode relinks agmsg db and teams after an install that replaces the agmsg skill" {
+  local home stub="$FX/stub-apm-replacing-agmsg"
+  home="$(new_home real-agmsg)"
+  seed_agmsg "$home"
+  # apm replaces a skill it deploys wholesale; this stub does the same to agmsg, dropping the links.
+  printf '#!/bin/sh\n[ "$1" = install ] || exit 0\nrm -rf "$HOME/.agents/skills/agmsg"\nmkdir -p "$HOME/.agents/skills/agmsg"\necho redeployed >"$HOME/.agents/skills/agmsg/SKILL.md"\n' >"$stub"
+  chmod +x "$stub"
+  real_native "$home" backup --real-home --backup-dir "$FX/backups/real-agmsg"
+  fixture_exec "$home" /usr/bin/env APM_NATIVE_ACCOUNT_HOME="$home" APM_BIN="$stub" /bin/bash "$REPO_ROOT/scripts/native.sh" \
+    apply --real-home --backup-dir "$FX/backups/real-agmsg" --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$(cat "$home/.agents/skills/agmsg/SKILL.md")" = redeployed ]
+  [ "$(readlink "$home/.agents/skills/agmsg/db")" = "$home/.local/state/agmsg/db" ]
+  [ "$(readlink "$home/.agents/skills/agmsg/teams")" = "$home/.local/state/agmsg/teams" ]
+  [ "$(cat "$home/.agents/skills/agmsg/db/keep")" = "db store" ]
 }
