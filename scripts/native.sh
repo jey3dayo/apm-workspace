@@ -97,18 +97,23 @@ physical_path() {
 
 # The account's home from the user database, not $HOME, so a HOME override cannot hide the real one.
 # APM_NATIVE_ACCOUNT_HOME stands in for it in tests, which never touch the real one.
-account_home() {
+user_db_home() {
   local user home
-  if [ -n "${APM_NATIVE_ACCOUNT_HOME:-}" ]; then
-    [ -d "$APM_NATIVE_ACCOUNT_HOME" ] || fail "APM_NATIVE_ACCOUNT_HOME=$APM_NATIVE_ACCOUNT_HOME is not a directory"
-    physical_path "$APM_NATIVE_ACCOUNT_HOME"
-    return
-  fi
   user="$(id -un)"
   home="$(eval "printf '%s' ~$user")"
   physical_path "$home"
 }
 
+account_home() {
+  if [ -n "${APM_NATIVE_ACCOUNT_HOME:-}" ]; then
+    [ -d "$APM_NATIVE_ACCOUNT_HOME" ] || fail "APM_NATIVE_ACCOUNT_HOME=$APM_NATIVE_ACCOUNT_HOME is not a directory"
+    physical_path "$APM_NATIVE_ACCOUNT_HOME"
+    return
+  fi
+  user_db_home
+}
+
+# Also checks the user database HOME, so the test override cannot make the real HOME look disposable.
 assert_disposable_home() {
   local dir="$1" home surface prefix
   case "/$dir/" in
@@ -116,15 +121,16 @@ assert_disposable_home() {
   esac
   [ -d "$dir" ] || fail "--home $dir is not an existing directory"
   dir="$(cd "$dir" && pwd -P)"
-  home="$(account_home)"
-  case "$home/" in
-    "${dir%/}/"*) fail "--home $dir is the account's HOME or contains it; the cutover is not part of this script (docs/native-distribution.md)" ;;
-  esac
-  for surface in $PROTECTED_SURFACES; do
-    for prefix in "$home/$surface/" "$(physical_path "$home/$surface")/"; do
-      case "$dir/" in
-        "$prefix"*) fail "--home $dir is inside $home/$surface" ;;
-      esac
+  for home in "$(account_home)" "$(user_db_home)"; do
+    case "$home/" in
+      "${dir%/}/"*) fail "--home $dir is the account's HOME or contains it; the cutover is not part of this script (docs/native-distribution.md)" ;;
+    esac
+    for surface in $PROTECTED_SURFACES; do
+      for prefix in "$home/$surface/" "$(physical_path "$home/$surface")/"; do
+        case "$dir/" in
+          "$prefix"*) fail "--home $dir is inside $home/$surface" ;;
+        esac
+      done
     done
   done
   printf '%s\n' "$dir"

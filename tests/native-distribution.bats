@@ -496,8 +496,12 @@ seed_agmsg() {
   done
 }
 
-@test "apply --real-home is blocked with or without a backup, and writes nothing" {
-  local home before listing backup="$FX/backups/blocked"
+@test "apply --real-home is blocked with or without a backup, as is --home inside the account HOME under the test override, and writes nothing" {
+  local home before listing backup="$FX/backups/blocked" surface=""
+  for surface in .cache .config .local; do
+    surface="$(eval "printf '%s' ~$(id -un)")/$surface"
+    [ -d "$surface" ] && break
+  done
   home="$(new_home real-blocked)"
   seed_sentinels "$home"
   before="$(backed_up_snapshot "$home")"
@@ -513,6 +517,10 @@ seed_agmsg() {
   [ "$status" -ne 0 ]
   [[ "$output" == *"blocked"* ]]
   [[ "$output" == *"docs/native-distribution.md"* ]]
+
+  run real_native "$home" apply --home "$surface" --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"is inside"* ]]
 
   [ "$(backed_up_snapshot "$home")" = "$before" ]
   [ "$(find "$home" | LC_ALL=C sort)" = "$listing" ]
