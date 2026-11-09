@@ -916,6 +916,35 @@ prepare_migrate() {
   grep -qx '\.claude/skills/foo' "$M_HOME"/.apm/native-migrate-*.skipped.txt
 }
 
+@test "an entry of an excluded package that the previous native lock lists is reinstated, not counted as dropped" {
+  local stub="$FX/stub-apm-deploy" rehearsal
+  write_deploy_stub "$stub"
+  M_HOME="$(new_home migrate-excluded-in-lock)"
+  M_BACKUP="$FX/backups/migrate-excluded-in-lock"
+  seed_migrate_home "$M_HOME"
+  mkdir -p "$M_HOME/.claude/skills/browser-harness" "$M_HOME/.agents/skills/browser-harness" "$M_HOME/.claude/skills/removed-upstream" "$M_HOME/.apm"
+  echo "old harness" >"$M_HOME/.claude/skills/browser-harness/SKILL.md"
+  echo "old harness" >"$M_HOME/.agents/skills/browser-harness/SKILL.md"
+  echo "old" >"$M_HOME/.claude/skills/removed-upstream/SKILL.md"
+  printf "lockfile_version: '2'\ndependencies:\n- repo_url: https://github.com/fixture-owner/apm-workspace\n  deployed_files:\n  - .claude/skills/removed-upstream\n  - .claude/skills/removed-upstream/SKILL.md\n- repo_url: browser-use/browser-harness\n  name: browser-harness\n  deployed_files:\n  - .agents/skills/browser-harness\n  - .agents/skills/browser-harness/SKILL.md\n  - .claude/skills/browser-harness\n  - .claude/skills/browser-harness/SKILL.md\n" >"$M_HOME/.apm/apm.lock.yaml"
+  real_native "$M_HOME" backup --real-home --backup-dir "$M_BACKUP"
+  real_native_with_stub "$M_HOME" "$stub" rehearse --real-home --backup-dir "$M_BACKUP" --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  rehearsal="$(dirname "$(compgen -G "$M_BACKUP/rehearsal-*/result.txt")")"
+
+  grep -q $'^\.claude/skills/browser-harness\t' "$rehearsal/reinstated.txt"
+  grep -q $'^\.agents/skills/browser-harness\t' "$rehearsal/reinstated.txt"
+  ! grep -q 'browser-harness' "$rehearsal/dropped.txt"
+  ! grep -q 'browser-harness' "$rehearsal/allowed-lost.txt"
+  grep -qx '\.claude/skills/removed-upstream' "$rehearsal/dropped.txt"
+  grep -qx 'dropped=1' "$rehearsal/result.txt"
+
+  run real_native_with_stub "$M_HOME" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$rehearsal"
+  [ "$status" -eq 0 ]
+  [ "$(cat "$M_HOME/.claude/skills/browser-harness/SKILL.md")" = "old harness" ]
+  [ "$(cat "$M_HOME/.agents/skills/browser-harness/SKILL.md")" = "old harness" ]
+  [ ! -e "$M_HOME/.claude/skills/removed-upstream" ]
+}
+
 @test "migrate-rollback accepts a record whose root has no done line and no backup" {
   local home stamp=20261109T000000Z
   home="$(new_home rollback-unmoved)"

@@ -528,12 +528,28 @@ migrate_deployed_record() {
 }
 
 # "<root><TAB><top-level entry>" for each entry of MIGRATE_ROOTS that the previous apm.lock.yaml of this HOME lists in a
-# deployed_files list (the lock a native deployment left; there is none before the first migrate).
+# deployed_files list (the lock a native deployment left; there is none before the first migrate). Entries listed only by
+# the lock record of an EXCLUDED_EXTERNAL_PACKAGES repository are left out: render excluded that package on purpose, so
+# the old copy is the only one and must be reinstated, not treated as dropped by the catalog. The record is matched by
+# repo_url rather than by skill name, because the lock states what the package really deployed.
 previous_deployed_entries() {
   local lock="$1/.apm/apm.lock.yaml"
   [ -f "$lock" ] || return 0
-  awk -v roots="$MIGRATE_ROOTS" '
-    BEGIN { n = split(roots, root, " ") }
+  awk -v roots="$MIGRATE_ROOTS" -v excluded="$EXCLUDED_EXTERNAL_PACKAGES" '
+    BEGIN { n = split(roots, root, " "); nx = split(excluded, drop, " ") }
+    /^[^[:space:]-]/ { skip = 0 }
+    /^[[:space:]]*(- )?repo_url:/ {
+      url = $0
+      sub(/^[[:space:]]*(- )?repo_url:[[:space:]]*/, "", url)
+      gsub(/["\047]/, "", url)
+      sub(/^[a-z]+:\/\/[^\/]+\//, "", url)
+      sub(/^github\.com\//, "", url)
+      sub(/\.git$/, "", url)
+      skip = 0
+      for (i = 1; i <= nx; i++) if (url == drop[i]) skip = 1
+      next
+    }
+    /^[[:space:]]*- [a-z_]+:/ { skip = 0; next }
     /^[[:space:]]*- / {
       line = $0
       sub(/^[[:space:]]*- /, "", line)
@@ -543,9 +559,10 @@ previous_deployed_entries() {
         if (index(line, prefix) != 1) continue
         rest = substr(line, length(prefix) + 1)
         sub(/\/.*/, "", rest)
-        if (rest != "") print root[i] "\t" rest
+        if (rest != "" && !skip) kept[root[i] "\t" rest] = 1
       }
     }
+    END { for (entry in kept) print entry }
   ' "$lock" | LC_ALL=C sort -u
 }
 
