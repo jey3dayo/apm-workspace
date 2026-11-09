@@ -102,7 +102,7 @@ resolve_source_sha() {
 # Rewrites the two floating workspace refs (catalog#main, manual-skills#main) into SHA pins, and the packages in
 # EXTERNAL_PACKAGE_MAP into the structured form, drops EXCLUDED_EXTERNAL_PACKAGES, and appends allowExecutables for
 # EXECUTABLE_ALLOW_PACKAGES. The other external dependencies are already pinned in apm.yml and pass through unchanged.
-# A mapped or allowed package missing from apm.yml fails the render, so a rename there is not skipped silently.
+# A mapped, excluded or allowed package missing from apm.yml (or listed twice) fails the render, so a rename there is not skipped silently.
 render_manifest() {
   local sha="$1" workspace_only="$2"
   [ -f "$ROOT_MANIFEST" ] || fail "missing $ROOT_MANIFEST"
@@ -143,7 +143,7 @@ render_manifest() {
       pinned[pkg]++
       next
     }
-    !only { for (i = 1; i <= nx; i++) if (index($0, "    - " drop[i] "#") == 1) next }
+    !only { for (i = 1; i <= nx; i++) if (index($0, "    - " drop[i] "#") == 1) { excluded_seen[i]++; next } }
     !only && convert() { next }
     !only { for (i = 1; i <= na; i++) if (index($0, "    - " allowed[i] "#") == 1) allowed_seen[i]++ }
     only && section == "dependencies" && group == "mcp:" { next }
@@ -153,13 +153,14 @@ render_manifest() {
       ok = (pinned["catalog"] == 1 && pinned["manual-skills"] == 1)
       if (!only) for (i = 1; i <= n; i++) if (converted[i] != 1) ok = 0
       if (!only) for (i = 1; i <= na; i++) if (allowed_seen[i] != 1) ok = 0
+      if (!only) for (i = 1; i <= nx; i++) if (excluded_seen[i] != 1) ok = 0
       if (ok && !only) {
         print "allowExecutables:"
         for (i = 1; i <= na; i++) printf "  github.com/%s:\n    bin: true\n", allowed[i]
       }
       exit !ok
     }
-  ' "$ROOT_MANIFEST" || fail "apm.yml must list jey3dayo/apm-workspace/catalog#main and manual-skills#main exactly once each, and every package of EXTERNAL_PACKAGE_MAP (such as nanaism/yomiyasu/skills/yomiyasu#<40-hex SHA>) and EXECUTABLE_ALLOW_PACKAGES (such as fujibee/agmsg#<ref>) exactly once"
+  ' "$ROOT_MANIFEST" || fail "apm.yml must list jey3dayo/apm-workspace/catalog#main and manual-skills#main exactly once each, and every package of EXTERNAL_PACKAGE_MAP (such as nanaism/yomiyasu/skills/yomiyasu#<40-hex SHA>), EXCLUDED_EXTERNAL_PACKAGES ($EXCLUDED_EXTERNAL_PACKAGES) and EXECUTABLE_ALLOW_PACKAGES (such as fujibee/agmsg#<ref>) exactly once"
 }
 
 physical_path() {

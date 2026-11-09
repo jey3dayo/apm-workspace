@@ -290,6 +290,26 @@ sentinel_snapshot() {
   [ "$status" -eq 0 ]
 }
 
+@test "render fails when an excluded package is missing from apm.yml or listed twice, and names the exclusion list" {
+  local home repo="$FX/render-excluded-repo"
+  home="$(new_home render-excluded)"
+  mkdir -p "$repo/scripts"
+  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
+
+  grep -v 'browser-use/browser-harness' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
+  run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"EXCLUDED_EXTERNAL_PACKAGES (browser-use/browser-harness)"* ]]
+  run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA" --workspace-only
+  [ "$status" -eq 0 ]
+
+  awk '{ print } /^    - browser-use\/browser-harness#/ { print }' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
+  [ "$(grep -c 'browser-use/browser-harness' "$repo/apm.yml")" -eq 2 ]
+  run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"EXCLUDED_EXTERNAL_PACKAGES"* ]]
+}
+
 @test "apply stops when the manifest cannot be rendered, before it writes the manifest or starts apm" {
   local home repo="$FX/apply-render-repo" stub="$FX/apply-render-stub"
   home="$(new_home apply-render-fails)"
