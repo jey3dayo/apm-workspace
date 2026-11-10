@@ -98,8 +98,9 @@ Learn more: https://skills.sh/vercel-labs/agent-skills/react-best-practices
 ### Step 6: Offer to Install
 
 If the user wants to adopt it, hand off to `apm-usage`: assign a lane in its
-Install Gate first, then install through that lane (usually `apm install -g
-<package-ref>` for global-dependency, or a repository's `apm.yml`).
+Install Gate first, then install through that lane (for global-dependency,
+add the package to the root `apm.yml` in the checkout and roll out per
+`apm-usage` Fast Path 6; for a repository, its own `apm.yml`).
 `npx skills add` writes straight into deployed targets and bypasses APM.
 
 ## Common Skill Categories

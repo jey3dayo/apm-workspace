@@ -55,9 +55,9 @@ Workspace precedent: `ibelick/ui-skills` (`docs/package-decisions.md`,
 
 ## `apm uninstall -g` side effects (Fast Path 9)
 
-Fast Path 9's default is hand-editing `apm.yml`. `apm uninstall -g
-<manifest-ref>` is the alternative and carries more side effects on 0.31.0, so
-reach for it only when that default does not apply.
+Record from the old path only. On the native HOME do not run `apm uninstall -g`:
+it writes the consumer `~/.apm` and the real HOME, and the next native rollout
+overrides it. Fast Path 9 hand-edits `apm.yml` in the checkout instead.
 
 The uninstall re-integrates the remaining packages by itself.
 On 0.31.0 it rewrites `apm.yml` (drops the comment that follows the removed

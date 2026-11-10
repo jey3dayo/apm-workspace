@@ -177,7 +177,7 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
   package as the source of truth and select it in the consuming repository with
   `apm install <package-ref> --skill <id>`.
 - If the request is to scan an arbitrary repository and create, update, or clean up its repo-local `apm.yml`, read `references/repo-manifest.md`.
-- If the request is to add an MCP server through APM, apply the same scope rule: add cross-repo foundation MCPs under `mcp:` in the root `apm.yml` (Fast Path 6); use repo-local `apm install --mcp <name> ...` for project, framework, UI, database, browser, or app-runtime-specific MCPs.
+- If the request is to add an MCP server through APM, apply the same scope rule: record cross-repo foundation MCPs under `mcp:` in the root `apm.yml` (Fast Path 6), noting that native distribution installs with `--only apm` and does not deliver `mcp:`; use repo-local `apm install --mcp <name> ...` for project, framework, UI, database, browser, or app-runtime-specific MCPs.
 - If the APM workspace has no repo-local MCP distribution lane for a target repository, record the intended placement as guidance and keep the global manifest lightweight. Treat implementing repo-local MCP distribution as a separate workspace-mechanics task.
 - If the request is "change only workspace docs or notes", edit the workspace files directly and do not restage the catalog unless `catalog/**` changed too.
 
@@ -274,7 +274,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
      `global-dependency`, `private`, or `manual` before installing;
      `global-catalog` is not an install lane — create the skill via
      Fast Path 2 instead
-   - for global dependencies, edit the root `apm.yml` in the checkout (a package under `dependencies.apm`, an MCP server under `mcp:`); do not run `apm install -g` or `apm install -g --mcp`: on the native HOME they write the consumer `~/.apm` and the real HOME, and the next native rollout drops the change. No task records a lock entry for a new dependency; report that as the open item in `docs/package-decisions.md` (2026-11-10)
+   - for global dependencies, edit the root `apm.yml` in the checkout (a package under `dependencies.apm`, an MCP server under `mcp:`); native distribution installs with `--only apm` and does not deliver `mcp:`, so keep the host MCP config as it is, change it by hand if needed, and report that the server was recorded but not delivered (boundary table in `docs/native-distribution.md`); do not run `apm install -g` or `apm install -g --mcp`: on the native HOME they write the consumer `~/.apm` and the real HOME, and the next native rollout drops the change. No task records a lock entry for a new dependency; report that as the open item in `docs/package-decisions.md` (2026-11-10)
    - if someone already ran a bare `apm install -g`, it did not save and restore the agmsg roster links; follow the agmsg State section of the checkout's `AGENTS.md`, diagnosing with `mise run doctor` before any restore
    - for repo-local dependencies, work in the target repository and use `apm install <package-ref>` or `apm install --mcp <name> ...`
    - for global changes, run `mise run check`, then roll out with section B; for repo-local changes, run that repository's defined APM or project checks
@@ -305,4 +305,4 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
 9. Global external dependency removed:
    - confirm `git status --short apm.lock.yaml` is clean and delete its `apm.yml` line; no task drops the now-undeclared lock record (Fast Path 5), so report it, then roll out with section B
    - verify the skill is gone from both deployed targets, and record the removal in `docs/package-decisions.md`
-   - `apm uninstall -g <manifest-ref>` is an alternative with more side effects on 0.31.0; see `references/rollout-fast-paths.md`
+   - do not run `apm uninstall -g <manifest-ref>` on the native HOME: it writes the consumer `~/.apm` and the real HOME, and the next native rollout overrides it; `references/rollout-fast-paths.md` keeps its old-path side effects as a record
