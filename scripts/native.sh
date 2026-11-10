@@ -29,11 +29,6 @@ REAL_HOME_TOOL_DIRS=".agents .claude .codex .cursor .cache Library Library/Cache
 # attempted): <manifest path>=<git repository>:<skill>. render turns `- <manifest path>#<40-hex SHA>` into
 # `- git: <repository> / ref: <SHA> / skills: [<skill>]`.
 EXTERNAL_PACKAGE_MAP="nanaism/yomiyasu/skills/yomiyasu=nanaism/yomiyasu:yomiyasu"
-# Packages whose bin/ the old path deployed and that apm may deploy too. render lists them under the deprecated
-# allowExecutables key, the only spelling apm 0.35.0 reads from <HOME>/.apm/apm.yml at user scope
-# (docs/native-distribution.md). The apm.yml entry is <owner>/<repo>[/<path>]#<ref>; apm looks the approval up as
-# github.com/<owner>/<repo>[/<path>] (str of the dependency in install/exec_gate.py resolve_package_key, without #<ref>).
-EXECUTABLE_ALLOW_PACKAGES="fujibee/agmsg tt-a1i/archify/archify"
 # Files whose content a migrate must leave byte for byte alone.
 MIGRATE_UNTOUCHED_FILES=".codex/config.toml .claude/settings.json"
 # Non-secret paths apply can change; backup copies them and rehearse reproduces them in a scratch HOME. Tool configs that
@@ -97,15 +92,13 @@ resolve_source_sha() {
 }
 
 # Rewrites the two floating workspace refs (catalog#main, manual-skills#main) into SHA pins, and the packages in
-# EXTERNAL_PACKAGE_MAP into the structured form, and appends allowExecutables for
-# EXECUTABLE_ALLOW_PACKAGES. The other external dependencies are already pinned in apm.yml and pass through unchanged.
-# A mapped or allowed package missing from apm.yml fails the render, so a rename there is not skipped silently.
+# EXTERNAL_PACKAGE_MAP into the structured form, and converts the root executable approvals for user-scope APM.
 render_manifest() {
   local sha="$1" workspace_only="$2"
   [ -f "$ROOT_MANIFEST" ] || fail "missing $ROOT_MANIFEST"
   printf '# Rendered by scripts/native.sh from apm.yml with this repository pinned at %s. Do not edit; re-render.\n' "$sha"
   printf '# native-render: workspace_only=%s\n' "$workspace_only"
-  awk -v sha="$sha" -v url="$SOURCE_URL" -v only="$workspace_only" -v map="$EXTERNAL_PACKAGE_MAP" -v allow="$EXECUTABLE_ALLOW_PACKAGES" '
+  awk -v sha="$sha" -v url="$SOURCE_URL" -v only="$workspace_only" -v map="$EXTERNAL_PACKAGE_MAP" '
     function convert(   i, prefix, rest, pin) {
       for (i = 1; i <= n; i++) {
         prefix = "    - " key[i] "#"
@@ -121,7 +114,9 @@ render_manifest() {
       return 0
     }
     BEGIN {
-      na = split(allow, allowed, " ")
+      required["github.com/fujibee/agmsg"] = 1
+      required["github.com/ibelick/ui-skills"] = 1
+      required["github.com/tt-a1i/archify/archify"] = 1
       n = split(map, entries, " ")
       for (i = 1; i <= n; i++) {
         split(entries[i], kv, "=")
@@ -129,8 +124,32 @@ render_manifest() {
         key[i] = kv[1]; repo[i] = rs[1]; skill[i] = rs[2]
       }
     }
+    /^[^[:space:]#]/ && $0 !~ /^[A-Za-z_][A-Za-z0-9_-]*:/ { invalid = 1 }
+    /^executables:/ {
+      if ($0 !~ /^executables:[[:space:]]*$/) invalid = 1
+      if (exec_seen++) invalid = 1
+      section = "executables"; group = ""; next
+    }
+    /^allowExecutables:/ { invalid = 1; next }
+    section == "executables" && $0 !~ /^[^ #]/ {
+      if ($0 ~ /^[[:space:]]*(#.*)?$/) next
+      if ($0 == "  allow:") { if (allow_seen++) invalid = 1; next }
+      if ($0 ~ /^    github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.\/-]+:$/) {
+        if (!allow_seen || (current != "" && !bins[current])) invalid = 1
+        current = $0; sub(/^    /, "", current); sub(/:$/, "", current)
+        if (grants[current]++) invalid = 1
+        order[++na] = current; next
+      }
+      if ($0 == "      bin: true" && current != "") { if (bins[current]++) invalid = 1; next }
+      invalid = 1; next
+    }
     /^[^ #]/ { section = $0; sub(/:.*/, "", section); group = "" }
     section == "dependencies" && /^  [a-z]+:/ { group = $1 }
+    section == "dependencies" && group == "apm:" && /^    - / {
+      dep = $0; sub(/^    - /, "", dep); sub(/^git: /, "", dep); sub(/#.*/, "", dep); sub(/[[:space:]].*$/, "", dep)
+      if (dep !~ /:|\// || dep ~ /^https?:/) next_dep = ""
+      else { next_dep = "github.com/" dep; deps[next_dep]++ }
+    }
     /^    - jey3dayo\/apm-workspace\/(catalog|manual-skills)#main[ ]*$/ {
       pkg = $0
       sub(/^.*apm-workspace\//, "", pkg)
@@ -140,21 +159,22 @@ render_manifest() {
       next
     }
     !only && convert() { next }
-    !only { for (i = 1; i <= na; i++) if (index($0, "    - " allowed[i] "#") == 1) allowed_seen[i]++ }
     only && section == "dependencies" && group == "mcp:" { next }
     only && section == "dependencies" && group == "apm:" && !/^  apm:/ { next }
     { print }
     END {
-      ok = (pinned["catalog"] == 1 && pinned["manual-skills"] == 1)
+      ok = (pinned["catalog"] == 1 && pinned["manual-skills"] == 1 && exec_seen == 1 && allow_seen == 1 && na > 0 && !invalid)
+      for (i = 1; i <= na; i++) if (bins[order[i]] != 1) ok = 0
       if (!only) for (i = 1; i <= n; i++) if (converted[i] != 1) ok = 0
-      if (!only) for (i = 1; i <= na; i++) if (allowed_seen[i] != 1) ok = 0
+      if (!only) for (i = 1; i <= na; i++) if (deps[order[i]] != 1) ok = 0
+      if (!only) for (id in required) if (grants[id] != 1) ok = 0
       if (ok && !only) {
         print "allowExecutables:"
-        for (i = 1; i <= na; i++) printf "  github.com/%s:\n    bin: true\n", allowed[i]
+        for (i = 1; i <= na; i++) printf "  %s:\n    bin: true\n", order[i]
       }
       exit !ok
     }
-  ' "$ROOT_MANIFEST" || fail "apm.yml must list jey3dayo/apm-workspace/catalog#main and manual-skills#main exactly once each, and every package of EXTERNAL_PACKAGE_MAP (such as nanaism/yomiyasu/skills/yomiyasu#<40-hex SHA>) and EXECUTABLE_ALLOW_PACKAGES (such as fujibee/agmsg#<ref>) exactly once"
+  ' "$ROOT_MANIFEST" || fail "apm.yml must list the workspace packages and mapped packages exactly once, and contain valid bin-only executable approvals for listed dependencies"
 }
 
 physical_path() {

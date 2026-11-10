@@ -86,20 +86,22 @@ APM は Codex CLI 0.163.0 だけを受け付ける（`apm_cli/codex_plugins/clie
 
 ### bin/ の許可（`allowExecutables`）
 
-APM 0.35.0 は、非対話の install で信頼していない package の `bin/` を配らない。旧経路が実 HOME に置いている `bin/` は `fujibee/agmsg` と `tt-a1i/archify` の 2 つだけなので、render は `--workspace-only` でないとき、manifest の末尾に次を足す（`scripts/native.sh` の `EXECUTABLE_ALLOW_PACKAGES`。この 2 つが root の `apm.yml` に無ければ render は失敗する）。
+APM 0.35.0 は、非対話の install で信頼していない package の `bin/` を配らない。root `apm.yml` の `executables.allow` を正本とし、render は通常配布のときだけ APM の user scope で読まれる `allowExecutables` に変換する。トップレベルのキーは引用なしの通常形式に限り、未掲載の package、重複、`bin: true` 以外は拒否する。現在の承認は次のとおり。
 
 ```yaml
 allowExecutables:
   github.com/fujibee/agmsg:
     bin: true
+  github.com/ibelick/ui-skills:
+    bin: true
   github.com/tt-a1i/archify/archify:
     bin: true
 ```
 
-- 許可するのはこの 2 つの `bin/` だけ。`browser-use/browser-harness`・`mattpocock/skills`・`nextlevelbuilder/ui-ux-pro-max-skill`・`shadcn/improve` の `bin/` は、旧経路も配っていないので許可しない
+- この 3 つの `bin/` は必須であり、承認だけが欠けた場合は render が失敗する。変更するときは `scripts/native.sh` の必須項目も更新する。hooks・MCP・LSP・canvas は承認しない。`--workspace-only` では外部 package の承認を出力しない
 - `allowExecutables` は APM では deprecated の旧名。user scope の APM は `<HOME>/apm.yml` の `executables:` を読むが、`<HOME>/.apm/apm.yml` の `executables:` は読まず、旧名の `allowExecutables:` だけを読む（`install/template.py` の `_effective_allow`、`models/apm_package.py` の `parse_allow_executables`）。そのため新しい名前では書けない。`apm approve --user` は `config.json` に書いて `assert_default_apm_config` に止められるので使わない
 - 許可のキーは `github.com/<owner>/<repo>[/<path>]`。APM は依存を `str(dep_ref)`（`github.com/<repo>#<ref>`）で引き、`#<ref>` を外した形で照合する（`install/exec_gate.py` の `resolve_package_key`、`security/executables.py` の `_map_grants`）。`apm approve` が出す `fujibee/agmsg` の形は一致しない
-- このブロックを書くと APM の executable のゲートが有効になり、許可していない package の hooks・MCP・LSP・canvas も default-deny になる（今は、ゲートが無いので全部配られる）。install の末尾に `executable primitives parked pending approval` という警告が出るのはこのため。`~/.apm/apm.lock.yaml` の `exec_status` に `gated_pending_approval` と残る。該当するファイルがあれば rehearse の `lost` に出る
+- このブロックを書くと APM の executable のゲートが有効になり、許可していない package の hooks・MCP・LSP・canvas も default-deny になる。install の末尾に `executable primitives parked pending approval` という警告が出るのはこのため。`~/.apm/apm.lock.yaml` の `exec_status` に `gated_pending_approval` と残る。該当するファイルがあれば rehearse の `lost` に出る
 - `apm install` には `--trust-bin` を固定で渡す（compile には渡さない）。許可があっても、stdout が端末でないと APM は `bin/` を飛ばす（`install/exec_gate.py` の `resolve_bin_skip`）。rehearse は出力を `tee` に渡すので端末でなく、migrate は端末で動くので、付けないと 2 つの結果が食い違う。許可の範囲は `allowExecutables` が決めるので、`--trust-bin` で全 package に広がらない
 
 ### rehearse --migrate が見ること

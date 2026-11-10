@@ -259,14 +259,14 @@ sentinel_snapshot() {
   [ "$(grep -E '^    - browser-use/browser-harness/skills/browser-harness#[0-9a-f]{40}( |$)' "$REPO_ROOT/apm.yml")" = "$(grep 'browser-use/browser-harness' <<<"$rendered")" ]
   [ "$(grep -A3 '^    - git: nanaism/yomiyasu$' <<<"$rendered")" = "$(printf '    - git: nanaism/yomiyasu\n      ref: %s\n      skills:\n        - yomiyasu' "$yomiyasu_sha")" ]
 
-  # The deprecated allowExecutables key, for the two packages whose bin/ the old path deployed, and nothing else.
-  [ "$(sed -n '/^allowExecutables:/,$p' <<<"$rendered")" = "$(printf 'allowExecutables:\n  github.com/fujibee/agmsg:\n    bin: true\n  github.com/tt-a1i/archify/archify:\n    bin: true')" ]
+  # APM 0.35 user-scope install reads the legacy key; approvals come from root executables.allow.
+  [ "$(sed -n '/^allowExecutables:/,$p' <<<"$rendered")" = "$(printf 'allowExecutables:\n  github.com/fujibee/agmsg:\n    bin: true\n  github.com/ibelick/ui-skills:\n    bin: true\n  github.com/tt-a1i/archify/archify:\n    bin: true')" ]
   [ "$(grep -c '^executables:' <<<"$rendered")" -eq 0 ]
 
   [ "$(sed -n 2p <<<"$rendered")" = "# native-render: workspace_only=0" ]
 
   # Everything else in apm.yml passes through line for line.
-  diff <(grep -vE 'jey3dayo/apm-workspace/(catalog|manual-skills)#main|nanaism/yomiyasu/skills/yomiyasu#' "$REPO_ROOT/apm.yml") \
+  diff <(sed '/^executables:/,$d' "$REPO_ROOT/apm.yml" | grep -vE 'jey3dayo/apm-workspace/(catalog|manual-skills)#main|nanaism/yomiyasu/skills/yomiyasu#') \
     <(sed 1,2d <<<"$rendered" | sed '/^allowExecutables:/,$d' | sed '/^    - git: nanaism\/yomiyasu$/,+3d' |
       grep -vE "^    - git: $FIXTURE_URL\$|^      path: (catalog|manual-skills)\$|^      ref: $SOURCE_SHA\$")
 
@@ -284,16 +284,86 @@ sentinel_snapshot() {
   grep -v 'nanaism/yomiyasu' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
   run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA"
   [ "$status" -ne 0 ]
-  [[ "$output" == *"EXTERNAL_PACKAGE_MAP"* ]]
+  [[ "$output" == *"valid bin-only executable approvals"* ]]
   run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA" --workspace-only
   [ "$status" -eq 0 ]
 
-  grep -v 'fujibee/agmsg' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
+  grep -v '^    - fujibee/agmsg#' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
   run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA"
   [ "$status" -ne 0 ]
-  [[ "$output" == *"EXECUTABLE_ALLOW_PACKAGES"* ]]
+  [[ "$output" == *"valid bin-only executable approvals"* ]]
   run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA" --workspace-only
   [ "$status" -eq 0 ]
+}
+
+@test "render refuses unsupported executable grants and duplicate approvals" {
+  local home repo="$FX/render-exec-invalid"
+  home="$(new_home render-exec-invalid)"
+  mkdir -p "$repo/scripts"
+  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
+  sed 's/bin: true/hooks: true/' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
+  run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"valid bin-only executable approvals"* ]]
+  cp "$REPO_ROOT/apm.yml" "$repo/apm.yml"
+  printf '    github.com/fujibee/agmsg:\n      bin: true\n' >>"$repo/apm.yml"
+  run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"valid bin-only executable approvals"* ]]
+}
+
+@test "render rejects removal of a required bin approval while its dependency remains" {
+  local home repo="$FX/render-exec-missing"
+  home="$(new_home render-exec-missing)"
+  mkdir -p "$repo/scripts"
+  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
+  awk '/^    github[.]com\/ibelick\/ui-skills:$/ { skip=1; next } skip { skip=0; next } { print }' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
+  grep -q '^    - git: ibelick/ui-skills$' "$repo/apm.yml"
+  run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"valid bin-only executable approvals"* ]]
+}
+
+@test "render rejects quoted legacy approval keys for normal and workspace-only installs" {
+  local home repo="$FX/render-exec-quoted" mode
+  home="$(new_home render-exec-quoted)"
+  mkdir -p "$repo/scripts"
+  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
+  cp "$REPO_ROOT/apm.yml" "$repo/apm.yml"
+  printf '"allowExecutables": {github.com/fujibee/agmsg: {bin: true}}\n' >>"$repo/apm.yml"
+  for mode in normal workspace-only; do
+    if [ "$mode" = workspace-only ]; then
+      run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA" --workspace-only
+    else
+      run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA"
+    fi
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"valid bin-only executable approvals"* ]]
+  done
+}
+
+@test "render rejects duplicate flow and anchored executable approvals in both modes" {
+  local home repo="$FX/render-exec-flow" mode form
+  home="$(new_home render-exec-flow)"
+  mkdir -p "$repo/scripts"
+  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
+  for form in flow anchor; do
+    cp "$REPO_ROOT/apm.yml" "$repo/apm.yml"
+    if [ "$form" = flow ]; then
+      printf 'executables: {allow: {github.com/fujibee/agmsg: {hooks: true}}}\n' >>"$repo/apm.yml"
+    else
+      printf 'executables: &extra {allow: {github.com/fujibee/agmsg: {hooks: true}}}\n' >>"$repo/apm.yml"
+    fi
+    for mode in normal workspace-only; do
+      if [ "$mode" = workspace-only ]; then
+        run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA" --workspace-only
+      else
+        run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA"
+      fi
+      [ "$status" -ne 0 ]
+      [[ "$output" == *"valid bin-only executable approvals"* ]]
+    done
+  done
 }
 
 @test "apply stops when the manifest cannot be rendered, before it writes the manifest or starts apm" {
@@ -306,7 +376,7 @@ sentinel_snapshot() {
   chmod +x "$stub"
   run fixture_exec "$home" /usr/bin/env APM_BIN="$stub" /bin/bash "$repo/scripts/native.sh" apply --home "$home" --source-ref "$SOURCE_SHA"
   [ "$status" -ne 0 ]
-  [[ "$output" == *"EXECUTABLE_ALLOW_PACKAGES"* ]]
+  [[ "$output" == *"valid bin-only executable approvals"* ]]
   [ ! -e "$home/apm-ran" ]
   [ ! -e "$home/.apm/apm.yml" ]
 }
@@ -1380,6 +1450,7 @@ build_github_fixture() {
   local home repo="$FX/render-bin-repo" entry
   : >"$FX/gitconfig-github"
   build_github_fixture fujibee/agmsg .
+  build_github_fixture ibelick/ui-skills .
   build_github_fixture tt-a1i/archify archify
   build_github_fixture nanaism/yomiyasu skills/yomiyasu
   build_github_fixture other/pkg .
@@ -1392,13 +1463,14 @@ build_github_fixture() {
     for entry in nanaism/yomiyasu/skills/yomiyasu=nanaism/yomiyasu fujibee/agmsg=fujibee/agmsg tt-a1i/archify/archify=tt-a1i/archify other/pkg=other/pkg; do
       printf '    - %s#%s\n' "${entry%%=*}" "$(git -C "$FX/src/github/${entry##*=}" rev-parse HEAD)"
     done
-    printf 'scripts: {}\n'
+    printf '    - git: ibelick/ui-skills\n      ref: %s\n' "$(git -C "$FX/src/github/ibelick/ui-skills" rev-parse HEAD)"
+    printf 'scripts: {}\nexecutables:\n  allow:\n    github.com/fujibee/agmsg:\n      bin: true\n    github.com/ibelick/ui-skills:\n      bin: true\n    github.com/tt-a1i/archify/archify:\n      bin: true\n'
   } >"$repo/apm.yml"
 
   home="$(new_home bin-allow)"
   run fixture_exec "$home" /usr/bin/env GIT_CONFIG_GLOBAL="$FX/gitconfig-bin" /bin/bash "$repo/scripts/native.sh" apply --home "$home" --source-ref "$SOURCE_SHA"
   [ "$status" -eq 0 ]
-  [ "$(cd "$home/.agents/skills" && find . -path '*/bin/tool.sh' | LC_ALL=C sort)" = "$(printf './agmsg/bin/tool.sh\n./archify/bin/tool.sh')" ]
+  [ "$(cd "$home/.agents/skills" && find . -path '*/bin/tool.sh' | LC_ALL=C sort)" = "$(printf './agmsg/bin/tool.sh\n./archify/bin/tool.sh\n./ui-skills/bin/tool.sh')" ]
   # The other packages' skills are deployed, without their bin/.
   [ "$(find "$home/.agents/skills" -name SKILL.md | wc -l)" -gt 4 ]
   grep -qx '  exec_status: gated_pending_approval' "$home/.apm/apm.lock.yaml"

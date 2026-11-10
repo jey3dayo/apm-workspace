@@ -95,3 +95,11 @@ dependencies:
       transport: http
       url: https://mcp.linear.app/mcp
 scripts: {}
+executables:
+  allow:
+    github.com/fujibee/agmsg:
+      bin: true
+    github.com/ibelick/ui-skills:
+      bin: true
+    github.com/tt-a1i/archify/archify:
+      bin: true
