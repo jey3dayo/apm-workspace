@@ -9,12 +9,12 @@ were observed on 0.29.0 and carried forward.
 
 When you bump a SHA pin in `apm.yml` by hand, `validate:workspace` fails `check`
 while the pin has no matching `resolved_commit` in `apm.lock.yaml`, and names
-the pin. No task moves the lock now: `deploy:pins` (`apm install -g --only
+the pin. No task re-resolves the root lock: `deploy:pins` (`apm install -g --only
 apm`, then `deploy`) and `upgrade` were removed on 2026-11-10 (last version:
-commit `0bcce09`), and the open item is recorded in `docs/package-decisions.md`.
-On the native HOME `apm install -g` works on the consumer `~/.apm`, not on the
-checkout's lock, so do not run it to update the lock. Report the pin as
-blocked on the missing updater.
+commit `0bcce09`). On the native HOME `apm install -g` works on the consumer
+`~/.apm`, not on the checkout's lock, so do not run it to update the lock.
+Update the pinned entries of `apm.lock.yaml` to the same commits as the pin (or
+revert the pin), then review the change with `mise run lock:diff`.
 
 `apm update` rewrites every declared SHA pin whose upstream has an annotated
 semver tag to the highest such tag's commit, which can be older than the pinned

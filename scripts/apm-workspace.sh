@@ -869,9 +869,7 @@ print_catalog_summary() {
 # it only gets commands. Codex opts out of agents too: codex-cli
 # only discovers `~/.codex/agents/*.toml`, and the catalog's Claude-format
 # `.md` agent files are silently ignored there (or rejected once renamed to
-# `.toml`, on the `tools`/`color` fields). Do not point a second target at a
-# shared skills root: reconcile_skills_root_from_stage prunes entries the
-# stage lacks, so two targets on one root delete each other's skills.
+# `.toml`, on the `tools`/`color` fields).
 managed_catalog_runtime_targets() {
   cat <<'EOF'
 claude|.claude|CLAUDE.md||apm
@@ -1254,7 +1252,7 @@ cmd_doctor() {
       elif [ "$config_state" = edited-generated ] && [ "$RT_TARGET_NAME" = claude ]; then
         warn "$target_root/$RT_CONFIG_NAME keeps APM's marker but was edited after compile, so apm compile --clean keeps it and Claude reads the guide from it as well as from the rule; remove the guide and the marker line, or move it aside"
       elif [ "$config_state" = edited-generated ]; then
-        warn "$target_root/$RT_CONFIG_NAME keeps APM's marker but was edited after compile, so a redeploy skips the root compile; delete the marker line to keep it as your own file, or move it aside"
+        warn "$target_root/$RT_CONFIG_NAME keeps APM's marker but was edited after compile, so a redeploy (native.sh) stops on it; delete the marker line to keep it as your own file, or move it aside, then re-run"
       elif [ "$RT_TARGET_NAME" = claude ] && [ "$config_state" = generated ] &&
         [ -f "$target_root/rules/${CATALOG_INSTRUCTIONS_FILE_NAME%.instructions.md}.md" ]; then
         warn "$target_root/$RT_CONFIG_NAME is an apm compile output that still sits next to the guide rule, so Claude may read the guide twice; redeploy with section B of docs/native-distribution.md so apm compile -g --clean removes it, and if it stays, it is an older compile output: move it aside"

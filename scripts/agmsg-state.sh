@@ -2,12 +2,12 @@
 set -euo pipefail
 
 # agmsg resolves db/ and teams/ relative to its own script directory, so both
-# live inside the deployed skill tree that `apm apply` rewrites wholesale —
-# every deploy drops the message history and the roster, and every agent
+# live inside the deployed skill tree that an APM install rewrites wholesale —
+# every redeploy drops the message history and the roster, and every agent
 # silently becomes unaddressable. AGMSG_STORAGE_PATH covers db/ only, and
 # teams/ has no override until upstream fujibee/agmsg#285 (AGMSG_HOME) ships.
 #
-# Keep both outside the deploy target and re-link them after each apply, rather
+# Keep both outside the deploy target and re-link them after each install, rather
 # than copying back and forth: a symlink has no staleness window, so a write
 # that lands between save and restore cannot be lost. Linking db/ as well means
 # a shell that never picked up AGMSG_STORAGE_PATH still writes to the real

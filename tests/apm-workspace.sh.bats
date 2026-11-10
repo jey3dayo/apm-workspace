@@ -2,8 +2,7 @@
 #
 # Behavioral unit tests for scripts/apm-workspace.sh: the pure,
 # side-effect-free helpers, the public command dispatch surface (invoked as a
-# subprocess), and fixture-backed guards such as assert_catalog_stage_safety
-# that protect the tracked catalog from destructive resets. Sourcing the
+# subprocess), and fixture-backed checks of the catalog helpers. Sourcing the
 # script from bats leaves ${BASH_SOURCE[0]} != $0, so the bottom-of-file
 # dispatch guard keeps the command dispatch from running on load.
 
@@ -1256,7 +1255,6 @@ make_stageable_catalog_fixture() {
   printf 'dependencies: []\n' >"$workspace_dir/apm.yml"
   : >"$workspace_dir/mise.toml"
   MISE_DESTINATION="$workspace_dir/mise.toml"
-  tracked_catalog_reference() { printf 'owner/repo/catalog#main\n'; }
 }
 
 @test "cmd_seed_catalog_build writes skills and agents under .apm and no top-level skills or agents directory" {

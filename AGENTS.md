@@ -5,7 +5,8 @@ below) is the operational source of truth. Keep authoring inputs, generated
 targets, and caches separate; never infer ownership from whichever copy is
 currently deployed. On the native HOME, `~/.apm` is not the checkout: it holds
 only the APM consumer state (rendered manifest, lock, `apm_modules`, migrate
-records), so never edit it.
+records), so never edit it; the one exception is placing private skills under
+`~/.apm/skills/` (see the Private local overrides row).
 
 ## Ownership
 
@@ -14,7 +15,7 @@ records), so never edit it.
 | Global personal skills and shared guidance | `catalog/**`                                                  | Edit here; personal skills live in `catalog/.apm/skills/<id>/`, agents in `catalog/.apm/agents/<name>.agent.md`, and shared guidance includes the guide in `catalog/.apm/instructions/ai-collaboration.instructions.md`, commands, and rules. `catalog/.apm/` holds only `skills/`, `agents/` and that instruction. |
 | Repository-scoped skills                   | `optional-skills/<id>/**`                                     | The consuming repository installs its direct ref; never add the collection to root `apm.yml`.                                                                                                                                                                                                                       |
 | Workspace-only skills                      | `.apm/skills/**`                                              | Maintain child symlinks in `.claude/skills/` and `.agents/skills/`; edit neither bridge.                                                                                                                                                                                                                            |
-| Private local overrides                    | `private-skills/.apm/skills/**`                               | Gitignored here, tracked in the private repo. Native distribution does not deliver it (`docs/native-distribution.md`); whether it overrides an identically named catalog skill is unconfirmed.                                                                                                                      |
+| Private local overrides                    | `private-skills/.apm/skills/**`                               | Gitignored here, tracked in the private repo. Native distribution does not deliver it: place it under the consumer `~/.apm/skills/` (the one allowed edit of `~/.apm`; `docs/native-distribution.md` "native と手動の境界"). Whether it overrides an identically named catalog skill is unconfirmed.                |
 | Managed external skills and global MCP     | `apm.yml` + `apm.lock.yaml`                                   | The manifest declares dependencies; the lock records the accepted resolution.                                                                                                                                                                                                                                       |
 | Manual upstream copies                     | `manual-skills/.apm/skills/**` + `manual-skills/upstreams/**` | Use only when the normal managed lane cannot package or deploy the upstream skill.                                                                                                                                                                                                                                  |
 | Host-local MCP                             | `mise.toml` + `scripts/apm-workspace.*`                       | Reconcile through `mise bootstrap`; do not edit runtime config.                                                                                                                                                                                                                                                     |
@@ -55,18 +56,20 @@ version is commit `0bcce09`. Roll out a pushed commit with section B of
 `native:rehearse --migrate`, `native:migrate`); `native:migrate-rollback`
 undoes it.
 
-| Intent            | Command                                              | Constraint                                                                     |
-| ----------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------ |
-| Rollout           | `docs/native-distribution.md` section B (`native:*`) | Rehearse on a backup copy first; only `native:migrate` and its undo write HOME |
-| Validation only   | `mise run check`                                     | Does not roll out.                                                             |
-| Deep verification | `mise run verify`                                    | Runs checks, the script suite, and catalog smoke verification.                 |
-| Inspection        | `mise run doctor`                                    | Read-only.                                                                     |
+| Intent            | Command                                              | Constraint                                                                                                                                                               |
+| ----------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Rollout           | `docs/native-distribution.md` section B (`native:*`) | Rehearse on a backup copy first; `native:migrate` rewrites HOME (undo: `native:migrate-rollback`); `native:reinstate`, `native:opencode`, `setup:mcp:host` also write it |
+| Validation only   | `mise run check`                                     | Does not roll out.                                                                                                                                                       |
+| Deep verification | `mise run verify`                                    | Runs checks, the script suite, and catalog smoke verification.                                                                                                           |
+| Inspection        | `mise run doctor`                                    | Read-only.                                                                                                                                                               |
 
 Shipping here has no PR: commit directly on `main`, run `apm-deploy-verify`
-(it runs format and check, then compares the deployed files with the
-checkout), then push `main` and watch the pushed CI run. `ship` reads this as
-the repository's end point. After the push, roll the pushed commit out with
-section B of `docs/native-distribution.md`.
+before the push for format and check (its distribution-match step applies only
+after the push and B6, so it reports that step as not run before then), then
+push `main` and watch the pushed CI run. `ship` reads this as the repository's
+end point. After the push, roll the pushed commit out with section B of
+`docs/native-distribution.md`, then run `apm-deploy-verify` again for the
+distribution match.
 
 `mise.toml` manages the required tools. The bold-heading formatter helper is
 vendored at `scripts/replace-bold-headings.ts`; a missing helper is a broken

@@ -255,7 +255,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - review the diff, commit and push, then roll the pushed SHA out with section B (`native:plan -- --source-ref <SHA>` first)
 
 5. Upstream refresh:
-   - no task moves dependencies or regenerates `apm.lock.yaml` now (`upgrade` and `deploy:pins` were removed); do not run `apm update -g` or `apm install -g` as a substitute, and report the missing updater
+   - no task re-resolves the root `apm.lock.yaml` (`upgrade` and `deploy:pins` were removed); do not run `apm update -g` or `apm install -g` as a substitute. Update the pinned entries of `apm.lock.yaml` to the same commits as the pin in `apm.yml` (or revert the pin)
    - for a hand-bumped SHA pin, see the SHA-pin bump sequence in
      `references/rollout-fast-paths.md`
    - if the manifest contains `gist.github.com/...#<sha>`, verify its regenerated `apm.lock.yaml` record as the gist Guardrail describes (the shortened `owner/<gist-id>` `repo_url` is the accepted form) before rollout
@@ -290,7 +290,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - in the checkout, bump the SHA pin in `apm.yml` and follow the SHA-pin bump
      sequence in `references/rollout-fast-paths.md`; a dependency that tracks a
      branch or tag has no refresh task now (Fast Path 5)
-   - verify `apm.lock.yaml` points the target dependency at the pushed commit
+   - update the pinned entry of `apm.lock.yaml` to the pushed commit and verify it points the target dependency there
    - check whether `apm.lock.yaml` also changed unrelated unpinned dependencies
    - verify the deployed target such as `~/.agents/skills/<id>` contains the updated content
    - keep unrelated dirty files in the checkout unstaged unless the user explicitly includes them

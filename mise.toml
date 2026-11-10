@@ -63,7 +63,7 @@ hide = true
 run = "bash ./scripts/agmsg-state.sh save"
 
 [tasks."agmsg:state:restore"]
-description = "Recovery adapter: relink an agmsg roster unlinked outside of apply"
+description = "Recovery adapter: relink an agmsg roster unlinked by an install outside the migrate path"
 run = "bash ./scripts/agmsg-state.sh restore"
 
 [tasks.doctor]

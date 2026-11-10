@@ -1072,7 +1072,7 @@ migrate_failure() {
     log "the files $MIGRATE_UNTOUCHED_FILES were not restored; the copies are in $MIGRATE_HOME/.apm/native-migrate-$MIGRATE_STAMP.untouched"
   fi
   if manifest_is_rendered "$MIGRATE_HOME"; then
-    log "only the roots were rolled back: $MIGRATE_HOME/.apm/apm.yml is still the rendered manifest, so the old path (mise run deploy) stays refused. To use it again, move the consumer ~/.apm aside and put ~/.apm.checkout-<UTC> back (docs/native-distribution.md, the section on moving the checkout)"
+    log "only the roots were rolled back: $MIGRATE_HOME/.apm/apm.yml is still the rendered manifest, so ~/.apm stays the native consumer. To go back to the checkout state, move the consumer ~/.apm aside and put ~/.apm.checkout-<UTC> back; the old tools are at commit 0bcce09 (docs/native-distribution.md, the section on moving the checkout)"
   fi
   exit "$status"
 }
