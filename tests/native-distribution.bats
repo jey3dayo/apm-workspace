@@ -1656,12 +1656,12 @@ setup_authoring_checkout() {
   cp "$REPO_ROOT/apm.yml" "$REPO_ROOT/apm.lock.yaml" "$REPO_ROOT/mise.toml" "$authoring/"
   ln -s "$REPO_ROOT/catalog" "$authoring/catalog"
   printf 'gitdir: %s/.git/worktrees/authoring\n' "$authoring" >"$authoring/.git"
-  printf '#!/bin/sh\nprintf "%%s|%%s\\n" "$PWD" "$*" >>"%s"\n' "$log" >"$bin/apm"
+  printf '#!/bin/sh\nprintf "%%s|%%s\\n" "$PWD" "$*" >>"%s"\nprintf "%%s|%%s\\n" "$HOME" "$*" >>"%s.home"\n[ "$1" != install ] || mkdir -p "$HOME/.apm/deployment-receipts"\n' "$log" "$log" >"$bin/apm"
   chmod +x "$bin/apm"
 }
 
 @test "from an authoring checkout outside HOME, validate and smoke:catalog run against that checkout while the consumer HOME is untouched" {
-  local home authoring="$FX/authoring" bin="$FX/authoring-bin" log="$FX/authoring-apm.log" consumer_before
+  local home authoring="$FX/authoring" bin="$FX/authoring-bin" log="$FX/authoring-apm.log" consumer_before install_home
   home="$(new_home authoring-consumer)"
   mkdir -p "$home/.apm"
   native "$home" render --source-ref "$SOURCE_SHA" --workspace-only >"$home/.apm/apm.yml"
@@ -1676,6 +1676,10 @@ setup_authoring_checkout() {
   [[ "$output" != *"was rendered by scripts/native.sh"* ]]
   grep -qF "install $authoring/.catalog-build/catalog --target agent-skills" "$log"
   [ -d "$authoring/.catalog-build/catalog" ]
+  install_home="$(grep -F '|install ' "$log.home" | cut -d'|' -f1)"
+  [ -n "$install_home" ]
+  [ "$install_home" != "$home" ]
+  [ ! -e "$home/.apm/deployment-receipts" ]
 
   run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$authoring/scripts/apm-workspace.sh" apply
   [ "$status" -ne 0 ]

@@ -2254,13 +2254,17 @@ dependencies:
     $bundleSkillRoot = Join-Path (Join-Path $buildSkillsRoot "mattpocock") "wayfinder"
     $bundleRequestedSkillIds = New-Object System.Collections.Generic.List[string]
     $installCalls = New-Object System.Collections.Generic.List[string]
+    $installHomes = New-Object System.Collections.Generic.List[string]
     $previousTemp = $env:TEMP
+    $previousHome = $env:HOME
+    $previousUserProfile = $env:USERPROFILE
     $env:TEMP = $TestDrive
 
     function global:apm {
       $installCalls.Add(($args -join ' '))
 
       if ($args[0] -eq "install") {
+        $installHomes.Add(("{0}|{1}" -f $env:HOME, $env:USERPROFILE))
         $installedSkillRoot = Join-Path (Join-Path $PWD ".agents/skills") "wayfinder"
         New-Item -ItemType Directory -Path (Join-Path $installedSkillRoot "references") -Force | Out-Null
         Set-Content -LiteralPath (Join-Path $installedSkillRoot "SKILL.md") -Value "# wayfinder"
@@ -2290,6 +2294,12 @@ dependencies:
 
       $bundleRequestedSkillIds | Should -Be @("mattpocock:wayfinder")
       $installCalls | Should -Contain ("install {0} --target agent-skills" -f $buildDir)
+      $installHomes.Count | Should -Be 1
+      $installHome, $installUserProfile = $installHomes[0] -split "\|"
+      $installHome | Should -Not -Be $previousHome
+      $installUserProfile | Should -Not -Be $previousUserProfile
+      $env:HOME | Should -Be $previousHome
+      $env:USERPROFILE | Should -Be $previousUserProfile
     }
     finally {
       Remove-Item Function:\apm -ErrorAction SilentlyContinue
