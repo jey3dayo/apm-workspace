@@ -8,7 +8,7 @@ It owns the global manifest (`apm.yml`), the lockfile (`apm.lock.yaml`), the cac
 - `README.md`: human overview and day-to-day flow
 - `AGENTS.md`: full contract, guardrails, and edit surfaces
 - `docs/apm-task-coverage.md`: every `mise` task and what gates it
-- `docs/native-distribution.md`: the APM-native `native:*` entry point, what stays manual, and the retirement boundary for the legacy apply
+- `docs/native-distribution.md`: the APM-native `native:*` rollout, rollback, and what stays manual
 - `docs/skill-inventory.md`: skill lanes (global, catalog, optional, manual, private, repo-local)
 - `docs/package-decisions.md`: why each package was added, kept, or removed
 - `docs/skill-overlaps.md`: which of several similar skills to use
@@ -23,4 +23,4 @@ It owns the global manifest (`apm.yml`), the lockfile (`apm.lock.yaml`), the cac
 - Treat `apm.yml` / `apm.lock.yaml` as command-managed; add or remove external skills with `apm install` / `apm uninstall`.
 - Never edit `apm_modules/` or deployed targets in place.
 - The `apm` version is pinned in `mise.toml`; read it there instead of trusting a quoted version.
-- Routine rollout is `mise run deploy`; run `mise run check` before pushing.
+- Roll out with section B of `docs/native-distribution.md` (`native:*`); run `mise run check` before pushing.

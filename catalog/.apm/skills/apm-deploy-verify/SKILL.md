@@ -5,7 +5,7 @@ context: fork
 agent: implementer
 background: false
 description: >-
-  APM workspace の checkout で catalog を変更した後の機械的な検証一式（format / check / deploy:fresh /
+  APM workspace の checkout で catalog を変更した後の機械的な検証一式（format / check /
   配布先の内容一致 / agmsg 導入時の roster link と agmsg-delegation runtime asset の smoke）を実行する。
   「配布して検証して」「deploy 検証」「smoke 回して」「配布一致を確認して」で使う。
   何を変更するか・どこが正本かの判断は apm-usage、smoke の合否基準は
@@ -18,7 +18,7 @@ catalog 変更後の検証は判断を含まない機械作業なので、Orches
 
 検証対象は呼び出し元の cwd によらず常に APM workspace の authoring checkout（`~/src/github.com/jey3dayo/apm-workspace`。以下 `<checkout>`）である。他の repo から呼ばれても、以下のコマンドはすべて `cd <checkout>` したシェルで実行する（`<catalog>` は `<checkout>/catalog`）。
 
-実 HOME が native（`~/.apm/apm.yml` の 1 行目が `# Rendered by scripts/native.sh`）のとき、`deploy:fresh` は拒否される。手順 2 を飛ばして「native の HOME のため未実行」と報告し、配布は呼び出し元が `docs/native-distribution.md` の B で行う。手順 3 の配布一致は、その B6 のあとに見る。
+実 HOME は native（`~/.apm/apm.yml` の 1 行目が `# Rendered by scripts/native.sh`）で、旧経路の `deploy` 系 task は 2026-11-10 に退役した。本スキルは配布を実行しない。配布は呼び出し元が `docs/native-distribution.md` の B で行い、手順 3 の配布一致は、その B6 のあとに見る。配布がまだなら手順 3 は「配布前のため未実行」と報告する。
 
 fork 実行では会話履歴は見えない。検証対象（変更した skill）は ARGUMENTS があればそれ、無ければ `git -C <checkout> status --short` / `git -C <checkout> diff` から決める。
 
@@ -27,12 +27,12 @@ fork 実行では会話履歴は見えない。検証対象（変更した skill
 ## 手順
 
 1. `mise -C <checkout> run format` → `mise -C <checkout> run check` を実行する。失敗したら以降へ進まず、失敗ログを添えて報告する
-2. `mise -C <checkout> run deploy:fresh` を実行する。`install:catalog` 単独では新規追加ファイルが配布先から消えるため使わない。**注意:** opencode は skills face を opt-out しており、`~/.config/opencode/agents` も配布対象外なので deploy は agents face を削除する。catalog が opencode 向けに持つのは config と commands だけになる。exit 0 で出る `apm_modules/tt-a1i/archify/archify/SKILL.md: Referenced file not found: references/<file>.md#<anchor>` の警告（アンカー付きで参照先の実体がある）と `/abs/path/checkout-timing.html`（例文中のリンク）の警告は、失敗扱いにせず既知として1行で報告する。これ以外の `Referenced file not found` は別扱い
+2. 配布済みであることを呼び出し元に確かめる（B6 まで終わっていること）。未配布なら手順 3 の配布一致は判定できないので、「配布前のため未実行」と報告して手順 4 へ進む。
 3. 変更した skill ごとに配布一致を確認する:
 
    ```bash
    diff -rq ~/.claude/skills/<skill> ~/.agents/skills/<skill>
-   diff -q <catalog>/skills/<skill>/SKILL.md ~/.claude/skills/<skill>/SKILL.md
+   diff -q <catalog>/.apm/skills/<skill>/SKILL.md ~/.claude/skills/<skill>/SKILL.md
    ```
 
    workspace-only skill（`.apm/skills/<id>`）は `~/.claude/skills` / `~/.agents/skills` へ配布されないので上の diff は使わない。代わりに、workspace の `.claude/skills/<id>` と `.agents/skills/<id>` が symlink で、`readlink -f .claude/skills/<id>` / `readlink -f .agents/skills/<id>` がどちらも `.apm/skills/<id>` の絶対パスと一致し、`.apm/skills/<id>/SKILL.md` が存在することを確認する。
@@ -53,22 +53,6 @@ fork 実行では会話履歴は見えない。検証対象（変更した skill
    # `~/.codex/agents/*.toml` しか読まず、catalog agents の Claude 形式 `.md` は
    # 無視されるだけなので、codex も agents face を opt-out している
    [ ! -e ~/.codex/agents ]
-
-   # positive: opencode の commands は catalog が提供するファイルだけを個別比較する。
-   # commands は manifest scope 配布（sync_managed_catalog_dir_with_manifest）のため、
-   # `.managed-catalog-manifest` や同居する非 catalog ファイルが配布先にだけ存在するのは仕様であり、
-   # ディレクトリ全体の厳密一致では必ず失敗する
-   fail=0; checked=0
-   while read -r f; do
-     rel=${f#<catalog>/commands/}
-     diff -q "$f" ~/.config/opencode/commands/"$rel" || fail=1
-     checked=$((checked + 1))
-   done < <(find <catalog>/commands -type f ! -name '.gitkeep')
-   [ "$fail" -eq 0 ]
-   # 比較対象が 0 件（`.gitkeep` のみ）のときループは空振りで通る。件数を必ず出し、
-   # 0 件は「通過」でなく「対象 0 件・未検証」と報告する。`validate:catalog` の
-   # 「N commands」は `.gitkeep` を数えるので、この件数の代わりにしない
-   echo "opencode commands checked: $checked"; [ "$checked" -gt 0 ] || echo "UNVERIFIED: 対象 0 件"
 
    # apm.yml の targets に opencode が再混入していないこと
    ! grep -qx '  - opencode' apm.yml

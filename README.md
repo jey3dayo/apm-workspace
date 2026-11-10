@@ -21,54 +21,45 @@ surface. The `apm` CLI is pinned by `mise`.
 
 Keep this short index here; the inventory above owns the detailed list.
 
-| Need                                            | Authoring surface                  | Delivery                                            |
-| ----------------------------------------------- | ---------------------------------- | --------------------------------------------------- |
-| Global personal skill                           | `catalog/.apm/skills/<id>/`        | normal rollout                                      |
-| Selected repositories only                      | `optional-skills/<id>/`            | consuming repo installs its ref                     |
-| Workspace-only operation                        | `.apm/skills/<id>/`                | tracked runtime bridges                             |
-| Machine-local override                          | `private-skills/.apm/skills/<id>/` | `mise run deploy` (fast path: `apply:skills:local`) |
-| Upstream skill that cannot use the managed lane | `manual-skills/.apm/skills/<id>/`  | manual-skills package                               |
+| Need                                            | Authoring surface                  | Delivery                             |
+| ----------------------------------------------- | ---------------------------------- | ------------------------------------ |
+| Global personal skill                           | `catalog/.apm/skills/<id>/`        | normal rollout                       |
+| Selected repositories only                      | `optional-skills/<id>/`            | consuming repo installs its ref      |
+| Workspace-only operation                        | `.apm/skills/<id>/`                | tracked runtime bridges              |
+| Machine-local override                          | `private-skills/.apm/skills/<id>/` | not delivered by native distribution |
+| Upstream skill that cannot use the managed lane | `manual-skills/.apm/skills/<id>/`  | manual-skills package                |
 
 External global skills and MCP declarations belong in `apm.yml`; their accepted
 resolution is `apm.lock.yaml`. `apm_modules/` and deployed targets (including
 `~/.agents/skills` and `~/.codex/`) are generated/cache state, never edit them
 directly.
 
-`mise run deploy` removes anything under a deployed skills root that it did not
-stage. To keep a folder another tool writes there (e.g. `~/.claude/skills/synced`),
-add a `<target> <entry>` line to `config/preserved-skills-root-entries.txt`.
-
 ## Common Commands
 
 ```powershell
 cd ~/src/github.com/jey3dayo/apm-workspace
 mise bootstrap       # first machine setup
-mise run deploy      # normal stable rollout
 ```
 
-| Intent                                      | Command                                                                   |
-| ------------------------------------------- | ------------------------------------------------------------------------- |
-| Validate without deployment                 | `mise run check`                                                          |
-| Run deep checks                             | `mise run verify`                                                         |
-| Accept upstream updates                     | `mise run upgrade`                                                        |
-| Refresh only local Codex skills             | `mise run apply:skills:local`                                             |
-| Roll out shared guidance after it is pushed | `mise run prepare:catalog`, `mise run install:catalog`, `mise run doctor` |
+| Intent                      | Command                                                                                |
+| --------------------------- | -------------------------------------------------------------------------------------- |
+| Validate without deployment | `mise run check`                                                                       |
+| Run deep checks             | `mise run verify`                                                                      |
+| Inspect deployed state      | `mise run doctor`                                                                      |
+| Roll out a pushed commit    | section B of [`docs/native-distribution.md`](docs/native-distribution.md) (`native:*`) |
 
-Use `deploy` for a stable rollout; `upgrade` deliberately changes accepted
-upstream content and requires a lockfile review. A Codex skill change is
-verified only after checking `~/.agents/skills/<id>/SKILL.md`.
-
-On the native HOME, `deploy`, `upgrade` and the other tasks that write the
-deployed targets are refused; roll out with section B of
-[`docs/native-distribution.md`](docs/native-distribution.md).
+The real HOME is native. The legacy writer (`deploy`, `apply`, `upgrade`,
+`refresh` and their helper tasks) was removed on 2026-11-10; its last version
+is commit `0bcce09`. A Codex skill change is verified only after checking
+`~/.agents/skills/<id>/SKILL.md`.
 
 ## External Checkout Changes
 
 1. Edit, verify, commit, and push the upstream checkout.
-2. Run `mise run upgrade` here and confirm the resulting lockfile commit. It runs
-   unattended; the acceptance gate is that lockfile review, and `apm update -g --dry-run`
-   renders the plan first without changing anything.
-3. Verify the deployed skill, then review unrelated lock drift separately.
+2. Bump the SHA pin in `apm.yml` by hand. No task updates `apm.lock.yaml` now
+   (open item in [`docs/package-decisions.md`](docs/package-decisions.md)).
+3. Roll out with section B of `docs/native-distribution.md`, verify the deployed
+   skill, then review unrelated lock drift separately.
 
 Adding or removing an external dependency also requires a decision record in
 [`docs/package-decisions.md`](docs/package-decisions.md).

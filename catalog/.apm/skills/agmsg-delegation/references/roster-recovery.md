@@ -1,6 +1,6 @@
 # agmsg roster recovery
 
-`~/.agents/skills/agmsg/{db,teams}` が symlink を失ったときの診断と復旧手順。save/restore の実装契約（`mise run apply` がどう save/restore を回すか）は APM workspace の authoring checkout（`~/src/github.com/jey3dayo/apm-workspace`。以下 checkout）の `AGENTS.md` の「agmsg State」が正本で、ここでは扱わない。
+`~/.agents/skills/agmsg/{db,teams}` が symlink を失ったときの診断と復旧手順。save/restore の実装契約（native の rehearse・migrate がどう save/restore を回すか）は APM workspace の authoring checkout（`~/src/github.com/jey3dayo/apm-workspace`。以下 checkout）の `AGENTS.md` の「agmsg State」が正本で、ここでは扱わない。
 
 ## 症状
 

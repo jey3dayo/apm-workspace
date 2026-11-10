@@ -84,7 +84,7 @@ Within `[tasks]`: individual commands → aggregation tasks → aliases/meta-tas
 
 ### Naming
 
-- Single-task commands: action-first names (`format`, `validate`, `prepare:catalog`)
+- Single-task commands: action-first names (`format`, `validate`, `lint`)
 - Orchestration workflows: workflow names (`check`, `verify`, `deploy`, `upgrade`)
 - lowercase-kebab-case, always include `description`, group related tasks with common prefixes
 - Prefix meta-tasks with `+` only when the repository already uses that convention
