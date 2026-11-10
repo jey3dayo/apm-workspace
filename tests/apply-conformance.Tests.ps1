@@ -6,10 +6,8 @@
 #   (4) compile -> (5) runtime asset + pi instructions distribution ->
 #   (6) swap -> (7) legacy cleanup -> (8) private overlay
 #
-# report.md Sec.1 originally found Invoke-Apply drifting from this order
-# (compile ran after swap/cleanup instead of before, and private-skill
-# overlay was missing entirely). plans/apply-core-phase1-ps-parity.md closed
-# both gaps, so every assertion below now runs unskipped.
+# Invoke-Apply must compile before swap/cleanup and apply the private-skill
+# overlay; the assertions below pin that order.
 
 $ErrorActionPreference = "Stop"
 

@@ -5050,12 +5050,19 @@ function Invoke-SmokeCatalog {
   Invoke-BundleCatalog -RequestedSkillIds $skillIds
 
   $tempDir = Join-Path $env:TEMP ("apm-catalog-smoke-{0}" -f ([guid]::NewGuid().ToString("N")))
+  $smokeHome = "$tempDir-home"
   $success = $false
 
   try {
     New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
+    New-Item -ItemType Directory -Path $smokeHome -Force | Out-Null
     Push-Location $tempDir
+    $previousHome = $env:HOME
+    $previousUserProfile = $env:USERPROFILE
     try {
+      # apm writes deployment receipts under Path.home(): HOME on POSIX, USERPROFILE on Windows.
+      $env:HOME = $smokeHome
+      $env:USERPROFILE = $smokeHome
       $installOutput = & apm install (Get-CatalogBuildDir) --target agent-skills 2>&1
       if ($LASTEXITCODE -ne 0) {
         $installOutput | ForEach-Object { Write-Host $_ }
@@ -5063,6 +5070,8 @@ function Invoke-SmokeCatalog {
       }
     }
     finally {
+      $env:HOME = $previousHome
+      $env:USERPROFILE = $previousUserProfile
       Pop-Location
     }
 
@@ -5093,6 +5102,7 @@ function Invoke-SmokeCatalog {
     Write-Host "Smoke verified catalog via temp project install: $($skillIds -join ', ')"
   }
   finally {
+    Remove-Item -LiteralPath $smokeHome -Recurse -Force -ErrorAction SilentlyContinue
     if ($success) {
       Remove-Item -LiteralPath $tempDir -Recurse -Force -ErrorAction SilentlyContinue
     } elseif (Test-Path -LiteralPath $tempDir) {

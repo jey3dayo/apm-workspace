@@ -2,16 +2,14 @@
 #
 # Executes `scripts/apm-workspace.sh apply` as a real subprocess against the
 # shared tests/conformance fixture and asserts the official 8-step apply
-# order (see plans/apply-core-phase3-conformance-fixture.md):
+# order:
 #   (1) stage assembly -> (2) MCP install -> (3) Codex MCP normalize ->
 #   (4) compile -> (5) runtime asset + pi instructions distribution ->
 #   (6) swap -> (7) legacy cleanup -> (8) private overlay
 #
-# The current bash implementation follows this order already (cmd_apply,
-# apm-workspace.sh:960-986), so this suite is expected to be green. The
-# PowerShell counterpart (tests/apply-conformance.Tests.ps1) currently
-# drifts from this order and keeps its matching assertions skipped until
-# plans/apply-core-phase1-ps-parity.md lands.
+# The bash implementation follows this order (cmd_apply,
+# apm-workspace.sh:960-986). The PowerShell counterpart
+# (tests/apply-conformance.Tests.ps1) pins the same order.
 #
 # The 5 success-path assertions below all check the same single apply run,
 # so setup_file() runs it once (macOS pays a Gatekeeper assessment on each
