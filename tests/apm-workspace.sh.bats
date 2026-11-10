@@ -94,6 +94,19 @@ if (!names.every((name) => tasks.some((task) => task.name === name))) {
 ' "$@" <<<"$tasks_json"
 }
 
+assert_mise_tasks_absent() {
+  local tasks_json="$1"
+  shift
+  node_json_assert '
+const fs = require("node:fs");
+const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
+const names = process.argv.slice(1);
+if (names.some((name) => tasks.some((task) => task.name === name))) {
+  process.exit(1);
+}
+' "$@" <<<"$tasks_json"
+}
+
 assert_mise_task_visibility() {
   local public_json="$1"
   local hidden_json="$2"
@@ -151,42 +164,17 @@ if (!task || !isDeepStrictEqual(task.run, expected)) {
 ' "$task_name" "$expected_json" <<<"$tasks_json"
 }
 
-assert_mise_upgrade() {
-  local tasks_json="$1"
-  node_json_assert '
-const fs = require("node:fs");
-const { isDeepStrictEqual } = require("node:util");
-const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
-const taskName = process.argv[1];
-const task = tasks.find(({ name }) => name === taskName);
-const run = task?.run;
-const commandTokens = typeof run?.[1] === "string" ? run[1].trim().split(/\s+/) : [];
-if (
-  !Array.isArray(run) ||
-  run.length !== 3 ||
-  !isDeepStrictEqual(run[0], { task: "check:roots" }) ||
-  commandTokens[0] !== "apm" ||
-  !commandTokens.includes("update") ||
-  !commandTokens.includes("-g") ||
-  !commandTokens.includes("--yes") ||
-  !isDeepStrictEqual(run[2], { task: "deploy" })
-) {
-  process.exit(1);
-}
-' upgrade <<<"$tasks_json"
-}
-
 assert_mise_command_connections() {
   local tasks_json="$1"
   node_json_assert '
 const fs = require("node:fs");
 const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
 const expected = [
-  ["apply", "scripts/apm-workspace.sh", "apply"],
-  ["apply:skills:local", "scripts/apm-workspace.sh", "apply:skills:local"],
-  ["install:pins", "scripts/apm-workspace.sh", "install-pins"],
-  ["migrate:roots", "scripts/apm-workspace.sh", "migrate:roots"],
-  ["check:roots", "scripts/apm-workspace.sh", "check:roots"],
+  ["setup:mcp:host", "scripts/apm-workspace.sh", "setup:mcp:host"],
+  ["doctor:workspace", "scripts/apm-workspace.sh", "doctor"],
+  ["doctor:intake", "scripts/apm-workspace.sh", "doctor-intake"],
+  ["validate:catalog", "scripts/apm-workspace.sh", "validate:catalog"],
+  ["smoke:catalog", "scripts/apm-workspace.sh", "smoke:catalog"],
   ["format:markdown:bold-headings", "scripts/format-bold-headings.sh", "write"],
   ["format:markdown:bold-headings:check", "scripts/format-bold-headings.sh", "check"],
 ];
@@ -289,186 +277,6 @@ add_external_mise_task_fixture() {
   [ "$output" = "wayfinder" ]
 }
 
-# --- workspace_remote_to_repo_reference -------------------------------------
-
-@test "manifest helpers read git dependency subsets" {
-  workspace_dir="$(mktemp -d)"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: nextlevelbuilder/ui-ux-pro-max-skill
-      skills:
-        - design
-        - ui-ux-pro-max
-    - modem-dev/hunk/skills/hunk-review
-EOF
-  WORKSPACE_DIR="$workspace_dir"
-
-  run manifest_external_references
-  [ "$status" -eq 0 ]
-  [ "$output" = $'nextlevelbuilder/ui-ux-pro-max-skill\nmodem-dev/hunk/skills/hunk-review' ]
-
-  subset_output="$(manifest_external_skill_subset "nextlevelbuilder/ui-ux-pro-max-skill")"
-  [ "$subset_output" = $'design\nui-ux-pro-max' ]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "manifest skill subset parsing emits no awk warnings" {
-  workspace_dir="$(mktemp -d)"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: nextlevelbuilder/ui-ux-pro-max-skill
-      skills:
-        - ui-ux-pro-max
-EOF
-  WORKSPACE_DIR="$workspace_dir"
-
-  run manifest_external_skill_subset "nextlevelbuilder/ui-ux-pro-max-skill"
-  [ "$status" -eq 0 ]
-  [ "$output" = "ui-ux-pro-max" ]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "manifest skill subset matches a full URL git: form the same as shorthand" {
-  workspace_dir="$(mktemp -d)"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git
-      skills:
-        - design
-        - ui-ux-pro-max
-EOF
-  WORKSPACE_DIR="$workspace_dir"
-
-  # apm.lock.yaml's repo_url is recorded in canonical form (owner/repo), not
-  # the literal git: value the manifest author wrote, so lookups must match a
-  # full-URL git: entry against that canonical form too.
-  run manifest_external_skill_subset "nextlevelbuilder/ui-ux-pro-max-skill"
-  [ "$status" -eq 0 ]
-  [ "$output" = $'design\nui-ux-pro-max' ]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "manifest object git and path match canonical references for subsets and aliases" {
-  workspace_dir="$BATS_TEST_TMPDIR/manifest-git-path"
-  mkdir -p "$workspace_dir"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: https://github.com/acme/tools.git
-      alias: example-tools
-      path: packages/example
-      skills:
-        - example
-EOF
-  WORKSPACE_DIR="$workspace_dir"
-
-  run manifest_external_references
-  [ "$status" -eq 0 ]
-  [ "$output" = "https://github.com/acme/tools.git/packages/example" ]
-
-  run manifest_external_skill_subset "acme/tools/packages/example"
-  [ "$status" -eq 0 ]
-  [ "$output" = "example" ]
-
-  run manifest_dependency_alias_for_record "acme/tools" "packages/example"
-  [ "$status" -eq 0 ]
-  [ "$output" = "example-tools" ]
-
-  alias_skill_dir="$workspace_dir/apm_modules/example-tools/packages/example"
-  mkdir -p "$alias_skill_dir"
-  printf '%s\n' '# example' >"$alias_skill_dir/SKILL.md"
-
-  run external_skill_id_from_record "acme/tools" "packages/example"
-  [ "$status" -eq 0 ]
-  [ "$output" = "example-tools" ]
-
-  run external_skill_content_dir "acme/tools" "packages/example" "abc123"
-  [ "$status" -eq 0 ]
-  [ "$output" = "$alias_skill_dir" ]
-}
-
-@test "external_skill_content_dir finds a path alias dependency staged flat under apm_modules/<alias>" {
-  workspace_dir="$BATS_TEST_TMPDIR/manifest-git-path-flat"
-  mkdir -p "$workspace_dir"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: acme/tools
-      path: skills/example
-      ref: abc123
-      alias: example-tools
-EOF
-  WORKSPACE_DIR="$workspace_dir"
-
-  alias_skill_dir="$workspace_dir/apm_modules/example-tools"
-  mkdir -p "$alias_skill_dir"
-  printf '%s\n' '# example' >"$alias_skill_dir/SKILL.md"
-
-  run external_skill_content_dir "acme/tools" "skills/example" "abc123"
-  [ "$status" -eq 0 ]
-  [ "$output" = "$alias_skill_dir" ]
-}
-
-@test "manifest path dependencies do not match bare repo or sibling path references" {
-  workspace_dir="$BATS_TEST_TMPDIR/manifest-path-collision"
-  mkdir -p "$workspace_dir"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: https://github.com/acme/tools.git
-      alias: first-path
-      skills:
-        - first
-      path: packages/first
-    - git: https://github.com/acme/tools.git
-      path: packages/second
-      alias: second-path
-      skills:
-        - second
-    - git: https://github.com/acme/tools.git
-      alias: repo-only
-      skills:
-        - root-only
-EOF
-  WORKSPACE_DIR="$workspace_dir"
-
-  run manifest_external_skill_subset "acme/tools"
-  [ "$status" -eq 0 ]
-  [ "$output" = "root-only" ]
-
-  run manifest_external_skill_subset "acme/tools/packages/first"
-  [ "$status" -eq 0 ]
-  [ "$output" = "first" ]
-
-  run manifest_external_skill_subset "acme/tools/packages/second"
-  [ "$status" -eq 0 ]
-  [ "$output" = "second" ]
-
-  run manifest_dependency_alias "acme/tools"
-  [ "$status" -eq 0 ]
-  [ "$output" = "repo-only" ]
-
-  run manifest_dependency_alias "acme/tools/packages/first"
-  [ "$status" -eq 0 ]
-  [ "$output" = "first-path" ]
-
-  run manifest_dependency_alias "acme/tools/packages/second"
-  [ "$status" -eq 0 ]
-  [ "$output" = "second-path" ]
-}
-
-@test "upgrade checks the Claude root before running apm update non-interactively" {
-  tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
-  run assert_mise_upgrade "$tasks_json"
-  [ "$status" -eq 0 ]
-}
-
 # --- host-local MCP bootstrap ----------------------------------------------
 
 @test "resolve_1password_mcp_command prefers a native command" {
@@ -512,8 +320,15 @@ EOF
 @test "mise exposes the expected public task set" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT")"
   run assert_public_mise_tasks "$tasks_json" \
-    apply apply:skills:local check deploy deploy:pins doctor doctor:intake doctor:workspace format \
-    format:check install:catalog prepare:catalog refresh test test:ps test:sh upgrade validate verify
+    check doctor doctor:intake doctor:workspace format format:check test test:ps test:sh validate verify
+  [ "$status" -eq 0 ]
+}
+
+@test "mise no longer exposes the retired legacy writer tasks" {
+  tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
+  run assert_mise_tasks_absent "$tasks_json" \
+    apply apply:skills:local check:roots deploy deploy:fresh deploy:pins install:catalog install:pins \
+    migrate:roots prepare:catalog prune:cache refresh refresh:deploy repair:local-package-cache upgrade
   [ "$status" -eq 0 ]
 }
 
@@ -523,17 +338,11 @@ EOF
   [ "$status" -eq 0 ]
 }
 
-@test "mise keeps deploy verify and refresh-deploy order" {
+@test "mise keeps the doctor and verify run order" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
-  run assert_mise_run_sequence "$tasks_json" deploy '[{"task":"check"},{"task":"apply"},{"task":"doctor"}]'
-  [ "$status" -eq 0 ]
   run assert_mise_run_sequence "$tasks_json" doctor '[{"task":"doctor:workspace"},{"task":"doctor:intake"}]'
   [ "$status" -eq 0 ]
   run assert_mise_run_sequence "$tasks_json" verify '[{"task":"check"},{"task":"test"},{"task":"smoke:catalog"}]'
-  [ "$status" -eq 0 ]
-  run assert_mise_run_sequence "$tasks_json" refresh:deploy '[{"task":"refresh"},{"task":"deploy"}]'
-  [ "$status" -eq 0 ]
-  run assert_mise_run_sequence "$tasks_json" deploy:pins '[{"task":"install:pins"},{"task":"deploy"}]'
   [ "$status" -eq 0 ]
 }
 
@@ -559,8 +368,8 @@ EOF
 @test "negative fixture detects a mise task connected to another script" {
   new_mise_fixture >/dev/null
   rewrite_mise_fixture "$mise_fixture/mise.toml" \
-    'bash \./scripts/apm-workspace\.sh apply' \
-    'bash ./scripts/other.sh apply' ''
+    'bash \./scripts/apm-workspace\.sh doctor"' \
+    'bash ./scripts/other.sh doctor"' ''
   tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
   run assert_mise_command_connections "$tasks_json"
   [ "$status" -ne 0 ]
@@ -569,8 +378,8 @@ EOF
 @test "command connection contract accepts a path without a leading ./" {
   new_mise_fixture >/dev/null
   rewrite_mise_fixture "$mise_fixture/mise.toml" \
-    'bash \./scripts/apm-workspace\.sh apply' \
-    'bash scripts/apm-workspace.sh apply' ''
+    'bash \./scripts/apm-workspace\.sh doctor"' \
+    'bash scripts/apm-workspace.sh doctor"' ''
   tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
   run assert_mise_command_connections "$tasks_json"
   [ "$status" -eq 0 ]
@@ -595,451 +404,7 @@ EOF
   [ "$status" -ne 0 ]
 }
 
-@test "negative fixture detects reordered deploy steps" {
-  new_mise_fixture >/dev/null
-  rewrite_mise_fixture "$mise_fixture/mise.toml" \
-    '\{ task = "check" \}, \{ task = "apply" \}, \{ task = "doctor" \}' \
-    '{ task = "check" }, { task = "doctor" }, { task = "apply" }' ''
-  tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
-  run assert_mise_run_sequence "$tasks_json" deploy '[{"task":"check"},{"task":"apply"},{"task":"doctor"}]'
-  [ "$status" -ne 0 ]
-}
-
-@test "negative fixture detects an interactive upgrade command" {
-  new_mise_fixture >/dev/null
-  rewrite_mise_fixture "$mise_fixture/mise.toml" 'apm update -g --yes' 'apm update -g' ''
-  tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
-  run assert_mise_upgrade "$tasks_json"
-  [ "$status" -ne 0 ]
-}
-
-@test "negative fixture detects a prefixed upgrade command" {
-  new_mise_fixture >/dev/null
-  rewrite_mise_fixture "$mise_fixture/mise.toml" 'apm update -g --yes' 'echo apm update -g --yes' ''
-  tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
-  run assert_mise_upgrade "$tasks_json"
-  [ "$status" -ne 0 ]
-}
-
-@test "normalize_codex_mcp_config removes only top-level MCP identity fields" {
-  workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/.codex"
-  cat >"$workspace_dir/.codex/config.toml" <<'EOF'
-[mcp_servers.context7]
-command = "npx"
-id = ""
-
-[mcp_servers.context7.env]
-id = "preserve nested"
-
-[other]
-id = "preserve"
-EOF
-
-  WORKSPACE_DIR="$workspace_dir"
-  normalize_codex_mcp_config
-  config="$(<"$workspace_dir/.codex/config.toml")"
-
-  [[ "$config" != *'id = ""'* ]]
-  [[ "$config" == *'id = "preserve nested"'* ]]
-  [[ "$config" == *'id = "preserve"'* ]]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "normalize_codex_mcp_config sanitizes a user-global config without touching other sections" {
-  home_dir="$(mktemp -d)"
-  mkdir -p "$home_dir/.codex"
-  cat >"$home_dir/.codex/config.toml" <<'EOF'
-[notice.model_migrations]
-id = "preserve notice"
-
-[mcp_servers.mobbin]
-transport = "http"
-id = ""
-
-[mcp_servers.mobbin.env]
-id = "preserve nested"
-
-[other]
-id = "preserve other"
-EOF
-
-  HOME="$home_dir"
-  normalize_codex_mcp_config "$HOME/.codex/config.toml"
-  config="$(<"$HOME/.codex/config.toml")"
-
-  [[ "$config" != *'id = ""'* ]]
-  [[ "$config" == *'id = "preserve notice"'* ]]
-  [[ "$config" == *'id = "preserve nested"'* ]]
-  [[ "$config" == *'id = "preserve other"'* ]]
-
-  rm -rf "$home_dir"
-}
-
-@test "external lock matching ignores GitHub reference casing" {
-  workspace_dir="$(mktemp -d)"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - Lum1104/Understand-Anything/understand-anything-plugin/skills/understand
-EOF
-  WORKSPACE_DIR="$workspace_dir"
-  locked_external_skill_records() {
-    printf '%s\n' 'lum1104/understand-anything|understand-anything-plugin/skills/understand|abc123|main'
-  }
-  external_skill_content_dir() {
-    printf '%s\n' '/tmp/understand'
-  }
-
-  run collect_external_skill_records
-  [ "$status" -eq 0 ]
-  [ "$output" = $'external\tunderstand\t/tmp/understand\tlum1104/understand-anything/understand-anything-plugin/skills/understand' ]
-
-  locked_external_skill_records() {
-    printf '%s\n' 'lum1104/understand-anything|understand-anything-plugin/skills/Understand|abc123|main'
-  }
-  run collect_external_skill_records
-  [ "$status" -ne 0 ]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "collect_external_skill_records hints apm lock -g when a lock record has no manifest declaration" {
-  workspace_dir="$(mktemp -d)"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm: []
-EOF
-  WORKSPACE_DIR="$workspace_dir"
-  locked_external_skill_records() {
-    printf '%s\n' 'acme/orphaned-dep||abc123|main'
-  }
-
-  run collect_external_skill_records
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"apm lock -g"* ]]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "collect_external_skill_records does not hint apm lock -g when a manifest ref is missing from the lock" {
-  workspace_dir="$(mktemp -d)"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - acme/missing-from-lock
-EOF
-  WORKSPACE_DIR="$workspace_dir"
-  locked_external_skill_records() {
-    :
-  }
-
-  run collect_external_skill_records
-  [ "$status" -ne 0 ]
-  [[ "$output" != *"apm lock -g"* ]]
-
-  rm -rf "$workspace_dir"
-}
-
-# --- alias-aware external skill id / cache resolution -----------------------
-
-@test "external_skill_id_from_record uses the manifest alias instead of the repo_url tail" {
-  workspace_dir="$(mktemp -d)"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
-      alias: japanese-tech-writing
-EOF
-  WORKSPACE_DIR="$workspace_dir"
-
-  # The lockfile records the bare gist key (owner/id) as repo_url, not the
-  # full clone URL that appears in apm.yml's git: field.
-  run external_skill_id_from_record "k16shikano/fd287c3133457c4fd8f5601d34aa817d" ""
-  [ "$status" -eq 0 ]
-  [ "$output" = "japanese-tech-writing" ]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "external_skill_id_from_record keeps the current repo_url-tail derivation when no alias is declared" {
-  workspace_dir="$(mktemp -d)"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
-EOF
-  WORKSPACE_DIR="$workspace_dir"
-
-  run external_skill_id_from_record "k16shikano/fd287c3133457c4fd8f5601d34aa817d" ""
-  [ "$status" -eq 0 ]
-  [ "$output" = "fd287c3133457c4fd8f5601d34aa817d" ]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "external_skill_id_from_record leaves an unrelated, non-aliased dependency's derivation unchanged" {
-  workspace_dir="$(mktemp -d)"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
-      alias: japanese-tech-writing
-    - mattpocock/skills/skills/engineering/codebase-design#hash
-EOF
-  WORKSPACE_DIR="$workspace_dir"
-
-  run external_skill_id_from_record "mattpocock/skills" "skills/engineering/codebase-design"
-  [ "$status" -eq 0 ]
-  [ "$output" = "engineering:codebase-design" ]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "external_skill_id_from_record matches an aliased dependency declared as a full github.com clone URL" {
-  workspace_dir="$(mktemp -d)"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: https://github.com/owner/repo.git
-      alias: foo
-EOF
-  WORKSPACE_DIR="$workspace_dir"
-
-  # apm drops the default github.com host from the lockfile's repo_url, so it
-  # is recorded as the bare "owner/repo", not the full clone URL.
-  run external_skill_id_from_record "owner/repo" ""
-  [ "$status" -eq 0 ]
-  [ "$output" = "foo" ]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "external_skill_id_from_record matches an aliased dependency on a non-default host" {
-  workspace_dir="$(mktemp -d)"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: https://gitlab.com/acme/repo.git
-      alias: foo
-EOF
-  WORKSPACE_DIR="$workspace_dir"
-
-  # Non-default hosts keep their FQDN in the lockfile's repo_url.
-  run external_skill_id_from_record "gitlab.com/acme/repo" ""
-  [ "$status" -eq 0 ]
-  [ "$output" = "foo" ]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "external_skill_id_from_record matches an aliased dependency declared in SCP form" {
-  workspace_dir="$(mktemp -d)"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: git@bitbucket.org:team/standards.git
-      alias: foo
-EOF
-  WORKSPACE_DIR="$workspace_dir"
-
-  run external_skill_id_from_record "bitbucket.org/team/standards" ""
-  [ "$status" -eq 0 ]
-  [ "$output" = "foo" ]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "external_skill_content_dir resolves an aliased dependency via apm_modules/<alias> even when the canonical repo_url copy also exists" {
-  workspace_dir="$(mktemp -d)"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
-      alias: japanese-tech-writing
-EOF
-  mkdir -p "$workspace_dir/apm_modules/japanese-tech-writing"
-  printf '%s\n' '# japanese-tech-writing' >"$workspace_dir/apm_modules/japanese-tech-writing/SKILL.md"
-  # apm also keeps the canonical repo_url copy alongside the alias copy; the
-  # adapter must prefer the alias without treating this as ambiguous.
-  mkdir -p "$workspace_dir/apm_modules/k16shikano/fd287c3133457c4fd8f5601d34aa817d"
-  printf '%s\n' '# japanese-tech-writing' >"$workspace_dir/apm_modules/k16shikano/fd287c3133457c4fd8f5601d34aa817d/SKILL.md"
-  WORKSPACE_DIR="$workspace_dir"
-
-  run external_skill_content_dir "k16shikano/fd287c3133457c4fd8f5601d34aa817d" "" "abc123"
-  [ "$status" -eq 0 ]
-  [ "$output" = "$workspace_dir/apm_modules/japanese-tech-writing" ]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "external_skill_content_dir keeps resolving apm_modules/<repo_url> unchanged when no alias is declared" {
-  workspace_dir="$(mktemp -d)"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
-EOF
-  mkdir -p "$workspace_dir/apm_modules/k16shikano/fd287c3133457c4fd8f5601d34aa817d"
-  printf '%s\n' '# japanese-tech-writing' >"$workspace_dir/apm_modules/k16shikano/fd287c3133457c4fd8f5601d34aa817d/SKILL.md"
-  WORKSPACE_DIR="$workspace_dir"
-
-  run external_skill_content_dir "k16shikano/fd287c3133457c4fd8f5601d34aa817d" "" "abc123"
-  [ "$status" -eq 0 ]
-  [ "$output" = "$workspace_dir/apm_modules/k16shikano/fd287c3133457c4fd8f5601d34aa817d" ]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "collect_external_skill_records deploys an aliased gist dependency under the declared alias" {
-  workspace_dir="$(mktemp -d)"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
-      alias: japanese-tech-writing
-EOF
-  WORKSPACE_DIR="$workspace_dir"
-  locked_external_skill_records() {
-    printf '%s\n' 'k16shikano/fd287c3133457c4fd8f5601d34aa817d||abc123|main'
-  }
-  external_skill_content_dir() {
-    printf '%s\n' '/tmp/japanese-tech-writing'
-  }
-
-  run collect_external_skill_records
-  [ "$status" -eq 0 ]
-  [ "$output" = $'external\tjapanese-tech-writing\t/tmp/japanese-tech-writing\tk16shikano/fd287c3133457c4fd8f5601d34aa817d' ]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "collect_external_skill_records resolves a plain skills/<name> bundle declared with a skills: subset" {
-  workspace_dir="$(mktemp -d)"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: acme/bundle
-      skills:
-        - a
-        - c
-EOF
-  cat >"$workspace_dir/apm.lock.yaml" <<'EOF'
-lockfile_version: '1'
-dependencies:
-- repo_url: acme/bundle
-  host: github.com
-  resolved_commit: 1111111111111111111111111111111111111111
-EOF
-  mkdir -p "$workspace_dir/apm_modules/acme/bundle/skills/a"
-  mkdir -p "$workspace_dir/apm_modules/acme/bundle/skills/b"
-  mkdir -p "$workspace_dir/apm_modules/acme/bundle/skills/c"
-  printf '%s\n' '# a' >"$workspace_dir/apm_modules/acme/bundle/skills/a/SKILL.md"
-  printf '%s\n' '# b' >"$workspace_dir/apm_modules/acme/bundle/skills/b/SKILL.md"
-  printf '%s\n' '# c' >"$workspace_dir/apm_modules/acme/bundle/skills/c/SKILL.md"
-  WORKSPACE_DIR="$workspace_dir"
-
-  run collect_external_skill_records
-  [ "$status" -eq 0 ]
-  expected=$'external\ta\t'"$workspace_dir"$'/apm_modules/acme/bundle/skills/a\tacme/bundle#a\n'
-  expected+=$'external\tc\t'"$workspace_dir"$'/apm_modules/acme/bundle/skills/c\tacme/bundle#c'
-  [ "$output" = "$expected" ]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "collect_external_skill_records prefers .apm/skills over a sibling top-level skills/ directory" {
-  workspace_dir="$(mktemp -d)"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: acme/bundle2
-EOF
-  cat >"$workspace_dir/apm.lock.yaml" <<'EOF'
-lockfile_version: '1'
-dependencies:
-- repo_url: acme/bundle2
-  host: github.com
-  resolved_commit: 2222222222222222222222222222222222222222
-EOF
-  mkdir -p "$workspace_dir/apm_modules/acme/bundle2/.apm/skills/x"
-  mkdir -p "$workspace_dir/apm_modules/acme/bundle2/skills/y"
-  printf '%s\n' '# x' >"$workspace_dir/apm_modules/acme/bundle2/.apm/skills/x/SKILL.md"
-  printf '%s\n' '# y' >"$workspace_dir/apm_modules/acme/bundle2/skills/y/SKILL.md"
-  WORKSPACE_DIR="$workspace_dir"
-
-  run collect_external_skill_records
-  [ "$status" -eq 0 ]
-  [ "$output" = $'external\tx\t'"$workspace_dir"$'/apm_modules/acme/bundle2/.apm/skills/x\tacme/bundle2#x' ]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "collect_external_skill_records does not fall back to skills/ for a repo-root single skill with no subset declared" {
-  workspace_dir="$(mktemp -d)"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - acme/rootskill
-EOF
-  cat >"$workspace_dir/apm.lock.yaml" <<'EOF'
-lockfile_version: '1'
-dependencies:
-- repo_url: acme/rootskill
-  host: github.com
-  resolved_commit: 3333333333333333333333333333333333333333
-EOF
-  mkdir -p "$workspace_dir/apm_modules/acme/rootskill/skills/x"
-  printf '%s\n' '# rootskill' >"$workspace_dir/apm_modules/acme/rootskill/SKILL.md"
-  printf '%s\n' '# x' >"$workspace_dir/apm_modules/acme/rootskill/skills/x/SKILL.md"
-  WORKSPACE_DIR="$workspace_dir"
-
-  run collect_external_skill_records
-  [ "$status" -eq 0 ]
-  [ "$output" = $'external\trootskill\t'"$workspace_dir"$'/apm_modules/acme/rootskill\tacme/rootskill' ]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "external_skill_id_from_record's alias derivation matches the name apm recorded in the lockfile's deployed_files" {
-  workspace_dir="$(mktemp -d)"
-  cat >"$workspace_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
-      alias: japanese-tech-writing
-EOF
-  cat >"$workspace_dir/apm.lock.yaml" <<'EOF'
-lockfile_version: '1'
-generated_at: '2026-09-08T00:00:00.000000+00:00'
-apm_version: 0.29.0
-dependencies:
-- repo_url: k16shikano/fd287c3133457c4fd8f5601d34aa817d
-  name: japanese-tech-writing
-  host: gist.github.com
-  resolved_commit: abc123
-  resolved_ref: main
-  version: unknown
-  package_type: claude_skill
-  deployed_files:
-  - .claude/skills/japanese-tech-writing
-  - .claude/skills/japanese-tech-writing/SKILL.md
-EOF
-  WORKSPACE_DIR="$workspace_dir"
-
-  # Independently derive the name apm actually deployed under from the
-  # lockfile's own deployed_files record (apm's ground truth), then confirm
-  # the adapter's id derivation agrees with it for the same dependency.
-  deployed_name="$(awk -F/ '/^  - \.claude\/skills\// { print $3; exit }' "$workspace_dir/apm.lock.yaml")"
-  [ "$deployed_name" = "japanese-tech-writing" ]
-
-  run external_skill_id_from_record "k16shikano/fd287c3133457c4fd8f5601d34aa817d" ""
-  [ "$status" -eq 0 ]
-  [ "$output" = "$deployed_name" ]
-
-  rm -rf "$workspace_dir"
-}
+# --- workspace_remote_to_repo_reference -------------------------------------
 
 @test "workspace_remote_to_repo_reference parses an https remote" {
   run workspace_remote_to_repo_reference "https://github.com/owner/repo.git"
@@ -1053,184 +418,31 @@ EOF
   [ "$output" = "owner/repo" ]
 }
 
-# --- is_path_under_dir ------------------------------------------------------
-
-@test "sync_managed_catalog_runtime_assets leaves agents of an apm-owned target untouched" {
-  workspace_dir="$(mktemp -d)"
-  runtime_home="$(mktemp -d)"
-  target_root="$runtime_home/.claude"
-
-  mkdir -p "$workspace_dir/catalog/.apm/agents" "$target_root/agents" "$target_root/commands"
-  printf '%s\n' 'catalog' >"$workspace_dir/catalog/.apm/agents/current.agent.md"
-  printf '%s\n' 'apm-placed' >"$target_root/agents/current.md"
-  printf '%s\n' 'mine' >"$target_root/agents/mine.md"
-  printf '%s\n' 'outside' >"$target_root/commands/untouched.md"
-
-  WORKSPACE_DIR="$workspace_dir"
-  HOME="$runtime_home"
-  tracked_catalog_agents_root() { printf '%s\n' "$workspace_dir/catalog/.apm/agents"; }
-  managed_catalog_runtime_targets() {
-    printf '%s\n' 'claude|.claude|CLAUDE.md||apm' 'cursor|.cursor|AGENTS.md||apm'
-  }
-  mkdir -p "$runtime_home/.cursor/agents"
-  printf '%s\n' 'cursor-mine' >"$runtime_home/.cursor/agents/mine.md"
-
-  run sync_managed_catalog_runtime_assets
-
-  [ "$status" -eq 0 ]
-  [ "$(<"$target_root/agents/mine.md")" = "mine" ]
-  [ "$(<"$runtime_home/.cursor/agents/mine.md")" = "cursor-mine" ]
-  [ "$(<"$target_root/agents/current.md")" = "apm-placed" ]
-  [ "$(<"$target_root/commands/untouched.md")" = "outside" ]
-
-  rm -rf "$workspace_dir" "$runtime_home"
-}
-
-# --- sync_managed_catalog_dir_with_manifest ---------------------------------
-
-@test "sync_managed_catalog_dir_with_manifest removes a file the catalog dropped" {
-  source_dir="$(mktemp -d)"
-  target_dir="$(mktemp -d)"
-
-  printf '%s\n' 'kept' >"$source_dir/kept.md"
-  printf '%s\n' 'kept' >"$target_dir/kept.md"
-  printf '%s\n' 'dropped' >"$target_dir/dropped.md"
-  printf '%s\n' $'kept.md\ndropped.md' >"$target_dir/.managed-catalog-manifest"
-
-  run sync_managed_catalog_dir_with_manifest "$source_dir" "$target_dir"
-
-  [ "$status" -eq 0 ]
-  [ -f "$target_dir/kept.md" ]
-  [ ! -e "$target_dir/dropped.md" ]
-  [ "$(cat "$target_dir/.managed-catalog-manifest")" = "kept.md" ]
-
-  rm -rf "$source_dir" "$target_dir"
-}
-
-@test "sync_managed_catalog_dir_with_manifest preserves a file the catalog never owned" {
-  source_dir="$(mktemp -d)"
-  target_dir="$(mktemp -d)"
-
-  printf '%s\n' 'catalog' >"$source_dir/catalog.md"
-  printf '%s\n' 'catalog' >"$target_dir/catalog.md"
-  printf '%s\n' 'mine' >"$target_dir/user-owned.md"
-  printf '%s\n' 'catalog.md' >"$target_dir/.managed-catalog-manifest"
-
-  run sync_managed_catalog_dir_with_manifest "$source_dir" "$target_dir"
-
-  [ "$status" -eq 0 ]
-  [ "$(cat "$target_dir/user-owned.md")" = "mine" ]
-  [ "$(cat "$target_dir/.managed-catalog-manifest")" = "catalog.md" ]
-
-  rm -rf "$source_dir" "$target_dir"
-}
-
-@test "sync_managed_catalog_dir_with_manifest skips deletion on first sync (no manifest yet)" {
-  source_dir="$(mktemp -d)"
-  target_dir="$(mktemp -d)"
-
-  printf '%s\n' 'catalog' >"$source_dir/catalog.md"
-  printf '%s\n' 'pre-existing' >"$target_dir/pre-existing.md"
-
-  run sync_managed_catalog_dir_with_manifest "$source_dir" "$target_dir"
-
-  [ "$status" -eq 0 ]
-  [ -f "$target_dir/pre-existing.md" ]
-  [ -f "$target_dir/catalog.md" ]
-  [ "$(cat "$target_dir/.managed-catalog-manifest")" = "catalog.md" ]
-
-  rm -rf "$source_dir" "$target_dir"
-}
-
-@test "sync_managed_catalog_dir_with_manifest updates the manifest to match the new source" {
-  source_dir="$(mktemp -d)"
-  target_dir="$(mktemp -d)"
-
-  mkdir -p "$source_dir/nested"
-  printf '%s\n' 'a' >"$source_dir/a.md"
-  printf '%s\n' 'b' >"$source_dir/nested/b.md"
-
-  run sync_managed_catalog_dir_with_manifest "$source_dir" "$target_dir"
-
-  [ "$status" -eq 0 ]
-  [ "$(cat "$target_dir/.managed-catalog-manifest")" = "$(printf 'a.md\nnested/b.md')" ]
-
-  rm -rf "$source_dir" "$target_dir"
-}
-
-@test "is_path_under_dir returns 0 for a child path" {
-  parent="$(mktemp -d)"
-  mkdir -p "$parent/child"
-  run is_path_under_dir "$parent/child" "$parent"
-  [ "$status" -eq 0 ]
-  rm -rf "$parent"
-}
-
-@test "is_path_under_dir returns 1 for a sibling outside the directory" {
-  base="$(mktemp -d)"
-  other="$(mktemp -d)"
-  run is_path_under_dir "$other" "$base"
-  [ "$status" -eq 1 ]
-  rm -rf "$base" "$other"
-}
-
-@test "is_path_under_dir returns 0 for identical paths" {
-  dir="$(mktemp -d)"
-  run is_path_under_dir "$dir" "$dir"
-  [ "$status" -eq 0 ]
-  rm -rf "$dir"
-}
-
-@test "is_path_under_dir returns 1 for a sibling whose name has the directory's name as a string prefix" {
-  base="$(mktemp -d)"
-  mkdir -p "$base/b" "$base/bc"
-  run is_path_under_dir "$base/bc" "$base/b"
-  [ "$status" -eq 1 ]
-  rm -rf "$base"
-}
-
-@test "repair_local_package_cache_entry refuses an empty package name (would rm -rf the cache root)" {
-  workspace_dir="$(mktemp -d)"
-  source_dir="$(mktemp -d)"
-  printf '%s\n' 'content' >"$source_dir/file.md"
-  WORKSPACE_DIR="$workspace_dir"
-  mkdir -p "$workspace_dir/apm_modules/jey3dayo/apm-workspace/keep-me"
-
-  run repair_local_package_cache_entry "" "$source_dir"
-
-  [ "$status" -ne 0 ]
-  # The cache root and its existing contents must be untouched.
-  [ -d "$workspace_dir/apm_modules/jey3dayo/apm-workspace/keep-me" ]
-
-  rm -rf "$workspace_dir" "$source_dir"
-}
-
-# --- stage_codex_skill_records ----------------------------------------------
-
-@test "stage_codex_skill_records preserves symlinks inside a skill source instead of dereferencing them" {
-  source_dir="$(mktemp -d)"
-  stage_root="$(mktemp -d)"
-  printf '%s\n' 'real' >"$source_dir/real-file.md"
-  ln -s /nonexistent-target "$source_dir/link.md"
-
-  skill_records=$(printf 'personal\tfoo\t%s\tcatalog\n' "$source_dir")
-  run stage_codex_skill_records "$skill_records" "$stage_root"
-
-  [ "$status" -eq 0 ]
-  staged_skill_path="$stage_root/codex/skills/foo"
-  [ "$(<"$staged_skill_path/real-file.md")" = "real" ]
-  [ -L "$staged_skill_path/link.md" ]
-  [ "$(readlink "$staged_skill_path/link.md")" = "/nonexistent-target" ]
-
-  rm -rf "$source_dir" "$stage_root"
-}
-
 # --- public command dispatch surface ----------------------------------------
 
 @test "unknown command exits non-zero with a diagnosable message" {
   run bash "$SCRIPT_UNDER_TEST" definitely-not-a-command
   [ "$status" -ne 0 ]
   [[ "$output" == *"unknown command"* ]]
+}
+
+@test "the retired legacy writer commands are unknown, write nothing and are absent from help" {
+  scratch_home="$(mktemp -d)"
+  for retired in apply apply:skills:local refresh install-pins repair:local-package-cache pin-external \
+    prune:cache prepare:catalog install:catalog check:roots migrate:roots; do
+    run env HOME="$scratch_home" APM_WORKSPACE_DIR="$TEST_REPO_ROOT" bash "$SCRIPT_UNDER_TEST" "$retired"
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"unknown command: $retired"* ]]
+  done
+  [ -z "$(ls -A "$scratch_home")" ]
+
+  run env HOME="$scratch_home" APM_WORKSPACE_DIR="$TEST_REPO_ROOT" bash "$SCRIPT_UNDER_TEST" help
+  [ "$status" -eq 0 ]
+  for retired in apply refresh install-pins repair:local-package-cache pin-external prune:cache \
+    prepare:catalog install:catalog check:roots migrate:roots; do
+    [[ "$output" != *"$retired"* ]]
+  done
+  rm -rf "$scratch_home"
 }
 
 # --- doctor target outputs --------------------------------------------------
@@ -1309,7 +521,7 @@ dependencies:
 EOF
 }
 
-pin_hint="apm.yml SHA pins differ from apm.lock.yaml; run 'mise run deploy:pins' to re-resolve them before deploying."
+pin_hint="apm.yml SHA pins differ from apm.lock.yaml; update the pinned entries of apm.lock.yaml to the same commits (no task re-resolves the root lock on a native HOME)."
 
 @test "validate passes when every SHA pin, string or object form, is in the lock" {
   write_pin_fixture "    - owner/str/skills/str#aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa # v1.0.0
@@ -1322,7 +534,7 @@ pin_hint="apm.yml SHA pins differ from apm.lock.yaml; run 'mise run deploy:pins'
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
 }
 
-@test "validate fails naming a bumped string SHA pin and prints the deploy:pins hint" {
+@test "validate fails naming a bumped string SHA pin and prints the pin update hint" {
   write_pin_fixture "    - owner/str/skills/str#cccccccccccccccccccccccccccccccccccccccc"
 
   run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" validate
@@ -1746,9 +958,9 @@ run_doctor_intake() {
 # --- doctor agmsg roster link reachability -----------------------------------
 #
 # agmsg resolves db/ and teams/ relative to $HOME/.agents/skills/agmsg, which
-# `apm apply` keeps symlinked into $XDG_STATE_HOME/agmsg (see
+# must stay symlinked into $XDG_STATE_HOME/agmsg (see
 # scripts/agmsg-state.sh:16). If that link is absorbed into a plain dir or
-# dropped by anything outside apply, agmsg's own errors ("Team not found",
+# dropped by anything outside the deploy flow, agmsg's own errors ("Team not found",
 # empty identities) give no hint the link is the actual cause. These tests
 # never touch the real $HOME roster — everything runs inside the fake
 # $doctor_home fixture.
@@ -1883,448 +1095,7 @@ run_doctor_intake() {
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
 }
 
-# --- apply / apply:skills:local agmsg restore failure handling -------------
-#
-# cmd_apply and cmd_sync_local_skills must not swallow an
-# agmsg-state.sh restore failure with `|| true` on the normal-completion
-# path, and must preserve the original failure (only reporting, never
-# masking, a recovery-restore failure) on the abnormal EXIT-trap path. These
-# reuse tests/conformance/build-fixture.sh's build_apply_fixture, the same
-# fixture tests/apply-agmsg-roster.bats drives, but run apply against a
-# private copy of scripts/ so a shim agmsg-state.sh can force `restore` to
-# fail on demand without touching the tracked scripts/agmsg-state.sh.
-
-make_apply_agmsg_restore_failure_fixture() {
-  APPLY_FIXTURE_BASE="$(mktemp -d)"
-  source "$TEST_REPO_ROOT/tests/conformance/build-fixture.sh"
-  build_apply_fixture "$APPLY_FIXTURE_BASE"
-
-  APPLY_FIXTURE_HOME="$FIXTURE_HOME"
-  APPLY_FIXTURE_XDG_STATE_HOME="$FIXTURE_HOME/.local/state"
-  APPLY_FIXTURE_WORKSPACE_DIR="$FIXTURE_WORKSPACE_DIR"
-  APPLY_FIXTURE_BIN_DIR="$FIXTURE_BIN_DIR"
-  APPLY_FIXTURE_CALL_LOG="$FIXTURE_CALL_LOG"
-
-  # agmsg needs to be a managed catalog skill, otherwise
-  # replace_skill_targets_from_stage's stale-removal pass deletes the
-  # deployed agmsg skill dir outright, regardless of the restore wiring
-  # under test.
-  mkdir -p "$APPLY_FIXTURE_WORKSPACE_DIR/catalog/.apm/skills/agmsg"
-  printf '# agmsg\n' >"$APPLY_FIXTURE_WORKSPACE_DIR/catalog/.apm/skills/agmsg/SKILL.md"
-
-  AGMSG_SKILL_DIR="$APPLY_FIXTURE_HOME/.agents/skills/agmsg"
-  AGMSG_STATE_ROOT="$APPLY_FIXTURE_XDG_STATE_HOME/agmsg"
-  mkdir -p "$AGMSG_SKILL_DIR/db" "$AGMSG_SKILL_DIR/teams"
-  echo "message-history" >"$AGMSG_SKILL_DIR/db/messages.db"
-
-  APPLY_FIXTURE_SCRIPTS_DIR="$APPLY_FIXTURE_BASE/repo/scripts"
-  mkdir -p "$APPLY_FIXTURE_SCRIPTS_DIR"
-  cp "$TEST_REPO_ROOT/scripts/apm-workspace.sh" "$APPLY_FIXTURE_SCRIPTS_DIR/apm-workspace.sh"
-  APPLY_FIXTURE_RESTORE_CALL_COUNT_FILE="$APPLY_FIXTURE_BASE/agmsg-restore-call-count"
-}
-
-# Writes a scripts/agmsg-state.sh shim next to the copied apm-workspace.sh
-# that fails `restore` from the $1'th call onward (and every call after
-# that), delegating to the real, tracked agmsg-state.sh otherwise.
-write_agmsg_state_restore_shim() {
-  fail_from_call="$1"
-  printf '0' >"$APPLY_FIXTURE_RESTORE_CALL_COUNT_FILE"
-  cat >"$APPLY_FIXTURE_SCRIPTS_DIR/agmsg-state.sh" <<SHIM
-#!/usr/bin/env bash
-set -euo pipefail
-if [ "\${1:-}" = "restore" ]; then
-  count=\$(( \$(cat "$APPLY_FIXTURE_RESTORE_CALL_COUNT_FILE") + 1 ))
-  printf '%s' "\$count" >"$APPLY_FIXTURE_RESTORE_CALL_COUNT_FILE"
-  if [ "\$count" -ge $fail_from_call ]; then
-    echo "agmsg-state.sh restore: forced failure for test (call \$count)" >&2
-    exit 7
-  fi
-fi
-exec "$TEST_REPO_ROOT/scripts/agmsg-state.sh" "\$@"
-SHIM
-  chmod +x "$APPLY_FIXTURE_SCRIPTS_DIR/agmsg-state.sh"
-}
-
-run_apply_with_shimmed_agmsg_state() {
-  HOME="$APPLY_FIXTURE_HOME" \
-    XDG_STATE_HOME="$APPLY_FIXTURE_XDG_STATE_HOME" \
-    PATH="$APPLY_FIXTURE_BIN_DIR:$PATH" \
-    APM_WORKSPACE_DIR="$APPLY_FIXTURE_WORKSPACE_DIR" \
-    bash "$APPLY_FIXTURE_SCRIPTS_DIR/apm-workspace.sh" apply
-}
-
-# Overrides the fixture's `apm` stub so `apm compile ...` (compile_codex,
-# called partway through cmd_apply, before the agmsg roster is ever
-# relinked) fails, forcing a mid-apply abort. Same override
-# tests/apply-agmsg-roster.bats's fail_apm_compile uses.
-#
-# Exits 3 (not 1) so tests asserting the *original* failure survives a
-# recovery-restore failure (which separately exits 7, see
-# write_agmsg_state_restore_shim) can assert on a status distinct from
-# both a generic failure and the restore shim's own status -- if a
-# regression let the restore failure replace the original one, asserting
-# `-eq 1` for both would pass either way and hide the swap.
-fail_apply_fixture_apm_compile() {
-  cat >"$APPLY_FIXTURE_BIN_DIR/apm" <<STUB
-#!/usr/bin/env bash
-printf 'apm %s\n' "\$*" >>"$APPLY_FIXTURE_CALL_LOG"
-case "\$1" in
-  compile) exit 3 ;;
-esac
-exit 0
-STUB
-  chmod +x "$APPLY_FIXTURE_BIN_DIR/apm"
-}
-
-@test "apply fails when the final agmsg roster restore fails on an otherwise normal run" {
-  make_apply_agmsg_restore_failure_fixture
-  # Call 1 is the mid-apply relink right after the skill-tree swap; call 2 is
-  # the final restore after `trap - EXIT`. Only the final one should fail
-  # here, so this exercises the normal-completion path specifically, not the
-  # EXIT-trap recovery path.
-  write_agmsg_state_restore_shim 2
-
-  run run_apply_with_shimmed_agmsg_state
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"agmsg-state.sh restore: forced failure for test (call 2)"* ]]
-  rm -rf "$APPLY_FIXTURE_BASE"
-}
-
-# Simulates a restore that reports success (exit 0) without actually
-# (re)establishing the roster symlinks -- the exact gap
-# validate_agmsg_roster_link exists to catch, and the reason
-# agmsg_state_restore_or_fail checks the postcondition instead of trusting
-# agmsg-state.sh's exit code alone.
-write_agmsg_state_noop_restore_success_shim() {
-  cat >"$APPLY_FIXTURE_SCRIPTS_DIR/agmsg-state.sh" <<SHIM
-#!/usr/bin/env bash
-set -euo pipefail
-if [ "\${1:-}" = "restore" ]; then
-  exit 0
-fi
-exec "$TEST_REPO_ROOT/scripts/agmsg-state.sh" "\$@"
-SHIM
-  chmod +x "$APPLY_FIXTURE_SCRIPTS_DIR/agmsg-state.sh"
-}
-
-@test "apply fails when the agmsg roster link postcondition is unmet even though restore reported success" {
-  make_apply_agmsg_restore_failure_fixture
-  write_agmsg_state_noop_restore_success_shim
-
-  run run_apply_with_shimmed_agmsg_state
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"agmsg roster link is missing"* ]]
-  rm -rf "$APPLY_FIXTURE_BASE"
-}
-
-@test "apply preserves the original failure and only reports (never swallows) a recovery-restore failure" {
-  make_apply_agmsg_restore_failure_fixture
-  fail_apply_fixture_apm_compile
-  # Fail every restore call, including the one the EXIT trap runs while
-  # recovering from apm compile's failure.
-  write_agmsg_state_restore_shim 1
-
-  run run_apply_with_shimmed_agmsg_state
-
-  # apm compile's stub exits 3 and the restore shim exits 7; that original
-  # failure (3) must survive the trap's own restore attempt failing, not be
-  # replaced by the restore shim's status (7) or any other value. Asserting
-  # the exact status (rather than just non-zero) is what catches a
-  # regression that lets the restore failure overwrite the original one.
-  [ "$status" -eq 3 ]
-  [[ "$output" == *"agmsg roster restore failed while recovering"* ]]
-  rm -rf "$APPLY_FIXTURE_BASE"
-}
-
-# --- install-pins agmsg roster save/restore ---------------------------------
-#
-# `apm install -g --only apm` is the external contract. The stub wipes the
-# deployed agmsg skill dir like the real CLI so only a save before and a
-# restore after leave the roster intact.
-
-write_install_pins_apm_stub() {
-  install_exit="$1"
-  cat >"$APPLY_FIXTURE_BIN_DIR/apm" <<STUB
-#!/usr/bin/env bash
-printf 'apm %s\n' "\$*" >>"$APPLY_FIXTURE_CALL_LOG"
-if [ "\$*" = "install -g --only apm" ]; then
-  rm -rf "\$HOME/.agents/skills/agmsg"
-  mkdir -p "\$HOME/.agents/skills/agmsg"
-  exit $install_exit
-fi
-exit 0
-STUB
-  chmod +x "$APPLY_FIXTURE_BIN_DIR/apm"
-}
-
-write_agmsg_state_logging_shim() {
-  cat >"$APPLY_FIXTURE_SCRIPTS_DIR/agmsg-state.sh" <<SHIM
-#!/usr/bin/env bash
-printf 'agmsg-state %s\n' "\${1:-}" >>"$APPLY_FIXTURE_CALL_LOG"
-exec "$TEST_REPO_ROOT/scripts/agmsg-state.sh" "\$@"
-SHIM
-  chmod +x "$APPLY_FIXTURE_SCRIPTS_DIR/agmsg-state.sh"
-}
-
-run_install_pins_with_fixture() {
-  HOME="$APPLY_FIXTURE_HOME" \
-    XDG_STATE_HOME="$APPLY_FIXTURE_XDG_STATE_HOME" \
-    PATH="$APPLY_FIXTURE_BIN_DIR:$PATH" \
-    APM_WORKSPACE_DIR="$APPLY_FIXTURE_WORKSPACE_DIR" \
-    bash "$APPLY_FIXTURE_SCRIPTS_DIR/apm-workspace.sh" install-pins
-}
-
-@test "install-pins runs apm install -g --only apm between agmsg save and restore and keeps the roster linked" {
-  make_apply_agmsg_restore_failure_fixture
-  write_install_pins_apm_stub 0
-  write_agmsg_state_logging_shim
-
-  run run_install_pins_with_fixture
-
-  [ "$status" -eq 0 ]
-  order="$(grep -E '^(agmsg-state (save|restore)|apm install .*)$' "$APPLY_FIXTURE_CALL_LOG")"
-  [ "$order" = "$(printf 'agmsg-state save\napm install -g --only apm\nagmsg-state restore')" ]
-  [ -L "$AGMSG_SKILL_DIR/db" ]
-  [ -L "$AGMSG_SKILL_DIR/teams" ]
-  [ "$(cat "$AGMSG_STATE_ROOT/db/messages.db")" = "message-history" ]
-  rm -rf "$APPLY_FIXTURE_BASE"
-}
-
-@test "install-pins fails when apm install fails and still restores the agmsg roster" {
-  make_apply_agmsg_restore_failure_fixture
-  write_install_pins_apm_stub 3
-  write_agmsg_state_logging_shim
-
-  run run_install_pins_with_fixture
-
-  [ "$status" -eq 3 ]
-  grep -q '^agmsg-state restore$' "$APPLY_FIXTURE_CALL_LOG"
-  [ -L "$AGMSG_SKILL_DIR/db" ]
-  [ -L "$AGMSG_SKILL_DIR/teams" ]
-  [ "$(cat "$AGMSG_STATE_ROOT/db/messages.db")" = "message-history" ]
-  rm -rf "$APPLY_FIXTURE_BASE"
-}
-
-@test "install-pins refuses before apm install while ~/.claude/CLAUDE.md is the legacy catalog copy" {
-  make_apply_agmsg_restore_failure_fixture
-  write_install_pins_apm_stub 0
-  mkdir -p "$APPLY_FIXTURE_HOME/.claude"
-  printf '# instructions\n' >"$APPLY_FIXTURE_HOME/.claude/CLAUDE.md"
-
-  run run_install_pins_with_fixture
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"Refusing to install catalog instructions"* ]]
-  [[ "$output" == *"mise run migrate:roots"* ]]
-  ! grep -q '^apm install' "$APPLY_FIXTURE_CALL_LOG"
-  [ "$(cat "$APPLY_FIXTURE_HOME/.claude/CLAUDE.md")" = "# instructions" ]
-  rm -rf "$APPLY_FIXTURE_BASE"
-}
-
-# --- replace_skill_targets_from_stage ---------------------------------------
-
-@test "replace_skill_targets_from_stage does not deploy skills for a target with the skills-less sentinel" {
-  stage_root="$(mktemp -d)"
-  runtime_home="$(mktemp -d)"
-  target_root="$runtime_home/.opencode"
-
-  mkdir -p "$target_root/skills/old-skill"
-  printf '%s\n' 'old' >"$target_root/skills/old-skill/SKILL.md"
-  mkdir -p "$stage_root/opencode/skills/new-skill"
-  printf '%s\n' 'new' >"$stage_root/opencode/skills/new-skill/SKILL.md"
-
-  HOME="$runtime_home"
-  managed_catalog_runtime_targets() {
-    printf '%s\n' 'opencode|.opencode|CLAUDE.md|-'
-  }
-
-  run replace_skill_targets_from_stage "$stage_root"
-
-  [ "$status" -eq 0 ]
-  [ ! -e "$target_root/skills" ]
-
-  rm -rf "$stage_root" "$runtime_home"
-}
-
-@test "replace_skill_targets_from_stage still deploys skills for a target without the sentinel" {
-  stage_root="$(mktemp -d)"
-  runtime_home="$(mktemp -d)"
-  target_root="$runtime_home/.claude"
-
-  mkdir -p "$stage_root/claude/skills/new-skill"
-  printf '%s\n' 'new' >"$stage_root/claude/skills/new-skill/SKILL.md"
-
-  HOME="$runtime_home"
-  managed_catalog_runtime_targets() {
-    printf '%s\n' 'claude|.claude|CLAUDE.md|.claude'
-  }
-
-  run replace_skill_targets_from_stage "$stage_root"
-
-  [ "$status" -eq 0 ]
-  [ -f "$target_root/skills/new-skill/SKILL.md" ]
-
-  rm -rf "$stage_root" "$runtime_home"
-}
-
-# --- incremental skill staging ----------------------------------------------
-
-@test "stage_target_skill_records skips an unchanged skill and reconcile leaves it untouched" {
-  home="$(mktemp -d)"
-  source_root="$(mktemp -d)"
-  stage="$(mktemp -d)"
-  mkdir -p "$source_root/demo"
-  printf '%s\n' 'v1' >"$source_root/demo/SKILL.md"
-
-  HOME="$home"
-  managed_catalog_runtime_targets() { printf '%s\n' 'claude|.claude|CLAUDE.md||'; }
-  plan=$(printf 'target_name=claude\ttarget_dir=.claude\tsource_kind=catalog\tsource_skill_id=demo\tdeployed_skill_name=demo\tsource_path=%s\tsource_ref=HEAD\tskills_dir=\n' "$source_root/demo")
-
-  # First deploy: nothing on the target yet, so the skill is staged and swapped.
-  stage_target_skill_records "$plan" "$stage"
-  [ ! -e "$stage/claude/skills/demo/.apm-skill-in-sync" ]
-  reconcile_skills_root_from_stage "$stage/claude/skills" "$home/.claude/skills"
-  [ "$(cat "$home/.claude/skills/demo/SKILL.md")" = "v1" ]
-
-  # Unchanged source: skipped, and the deployed copy is left untouched.
-  stage2="$(mktemp -d)"
-  stage_target_skill_records "$plan" "$stage2"
-  [ -f "$stage2/claude/skills/demo/.apm-skill-in-sync" ]
-  reconcile_skills_root_from_stage "$stage2/claude/skills" "$home/.claude/skills"
-  [ "$(cat "$home/.claude/skills/demo/SKILL.md")" = "v1" ]
-
-  # Changed source: staged and swapped in again.
-  printf '%s\n' 'v2' >"$source_root/demo/SKILL.md"
-  stage3="$(mktemp -d)"
-  stage_target_skill_records "$plan" "$stage3"
-  [ ! -e "$stage3/claude/skills/demo/.apm-skill-in-sync" ]
-  reconcile_skills_root_from_stage "$stage3/claude/skills" "$home/.claude/skills"
-  [ "$(cat "$home/.claude/skills/demo/SKILL.md")" = "v2" ]
-
-  rm -rf "$home" "$source_root" "$stage" "$stage2" "$stage3"
-}
-
-@test "shipped preserved-skills-root-entries keeps Herdr.app skills for claude and codex" {
-  # Herdr.app writes herdr-automations and herdr-gpui-browser into
-  # ~/.claude/skills (claude) and ~/.agents/skills (codex); deploy must not
-  # sweep them.
-  WORKSPACE_DIR="$TEST_REPO_ROOT"
-  for target in claude codex; do
-    entries=$(preserved_skills_root_entries "$target")
-    grep -Fxq herdr-automations <<<"$entries"
-    grep -Fxq herdr-gpui-browser <<<"$entries"
-  done
-  # The codex target is the one whose skills root is ~/.agents/skills.
-  managed_catalog_runtime_targets | grep -Fxq 'codex|.codex|AGENTS.md|.agents|-'
-}
-
-@test "reconcile_skills_root_from_stage names each removed entry, with the root when no target is given" {
-  home="$(mktemp -d)"
-  stage="$(mktemp -d)"
-  mkdir -p "$stage/skills/kept" "$home/skills/kept" "$home/skills/gone"
-
-  run reconcile_skills_root_from_stage "$stage/skills" "$home/skills"
-
-  [ "$status" -eq 0 ]
-  [ ! -e "$home/skills/gone" ]
-  [[ "$output" == *"removed unmanaged skills entry: $home/skills/gone"* ]]
-  [[ "$output" != *"kept"* ]]
-
-  rm -rf "$home" "$stage"
-}
-
-# --- sync_managed_catalog_runtime_assets agents face -------------------------
-
-@test "sync_managed_catalog_runtime_assets removes the agents tree for an agents-less target" {
-  workspace="$(mktemp -d)"
-  runtime_home="$(mktemp -d)"
-  mkdir -p "$workspace/catalog"
-  printf '%s\n' '# instructions' >"$workspace/catalog/CLAUDE.md"
-
-  target_root="$runtime_home/.config/opencode"
-  mkdir -p "$target_root/agents"
-  printf '%s\n' 'stale' >"$target_root/agents/reviewer.md"
-
-  HOME="$runtime_home"
-  tracked_catalog_dir() { printf '%s\n' "$workspace/catalog"; }
-  tracked_catalog_instructions_path() { printf '%s\n' "$workspace/catalog/CLAUDE.md"; }
-  tracked_catalog_commands_root() { printf '%s\n' "$workspace/catalog/commands"; }
-  tracked_catalog_rules_root() { printf '%s\n' "$workspace/catalog/rules"; }
-  managed_catalog_runtime_targets() {
-    printf '%s\n' 'opencode|.config/opencode|-|-|-'
-  }
-
-  run sync_managed_catalog_runtime_assets
-
-  [ "$status" -eq 0 ]
-  [ ! -e "$target_root/agents" ]
-  [ ! -e "$target_root/CLAUDE.md" ]
-
-  rm -rf "$workspace" "$runtime_home"
-}
-
-_stub_opencode_sync_fixture() {
-  workspace="$(mktemp -d)"
-  runtime_home="$(mktemp -d)"
-  mkdir -p "$workspace/catalog/commands"
-  printf '%s\n' 'cmd' >"$workspace/catalog/commands/cmd.md"
-  printf '%s\n' '# instructions' >"$workspace/catalog/CLAUDE.md"
-  target_root="$runtime_home/.config/opencode"
-  mkdir -p "$target_root"
-
-  HOME="$runtime_home"
-  tracked_catalog_dir() { printf '%s\n' "$workspace/catalog"; }
-  tracked_catalog_instructions_path() { printf '%s\n' "$workspace/catalog/CLAUDE.md"; }
-  tracked_catalog_commands_root() { printf '%s\n' "$workspace/catalog/commands"; }
-  tracked_catalog_rules_root() { printf '%s\n' "$workspace/catalog/rules"; }
-  managed_catalog_runtime_targets() {
-    printf '%s\n' 'opencode|.config/opencode|-|-|-'
-  }
-}
-
-@test "sync_managed_catalog_runtime_assets gives opencode commands but writes no CLAUDE.md" {
-  _stub_opencode_sync_fixture
-
-  run sync_managed_catalog_runtime_assets
-
-  [ "$status" -eq 0 ]
-  [ ! -e "$target_root/CLAUDE.md" ]
-  [ -f "$target_root/commands/cmd.md" ]
-
-  rm -rf "$workspace" "$runtime_home"
-}
-
-@test "sync_managed_catalog_runtime_assets removes the agents tree for codex and writes no root context" {
-  workspace="$(mktemp -d)"
-  runtime_home="$(mktemp -d)"
-  mkdir -p "$workspace/catalog"
-  printf '%s\n' '# instructions' >"$workspace/catalog/AGENTS.md"
-
-  target_root="$runtime_home/.codex"
-  mkdir -p "$target_root/agents"
-  printf '%s\n' 'stale' >"$target_root/agents/reviewer.md"
-
-  HOME="$runtime_home"
-  tracked_catalog_dir() { printf '%s\n' "$workspace/catalog"; }
-  tracked_catalog_instructions_path() { printf '%s\n' "$workspace/catalog/AGENTS.md"; }
-  tracked_catalog_commands_root() { printf '%s\n' "$workspace/catalog/commands"; }
-  tracked_catalog_rules_root() { printf '%s\n' "$workspace/catalog/rules"; }
-  managed_catalog_runtime_targets() {
-    printf '%s\n' 'codex|.codex|AGENTS.md|.agents|-'
-  }
-
-  run sync_managed_catalog_runtime_assets
-
-  [ "$status" -eq 0 ]
-  [ ! -e "$target_root/agents" ]
-  [ ! -e "$target_root/AGENTS.md" ]
-
-  rm -rf "$workspace" "$runtime_home"
-}
-
-# --- assert_catalog_stage_safety --------------------------------------------
+# --- catalog_apm_dir_claim_message and catalog fixtures ---------------------
 
 # Builds a temp workspace with a tracked catalog and a matching
 # .catalog-build/catalog tree, both containing $1 skills (and one file each
@@ -2379,225 +1150,6 @@ make_catalog_fixture() {
   FIXTURE_WORKSPACE_DIR="$workspace_dir"
 }
 
-@test "assert_catalog_stage_safety refuses a partial request without the override" {
-  make_catalog_fixture 2 2
-
-  run assert_catalog_stage_safety 1
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"Refusing to prepare a partial catalog"* ]]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety allows a partial request with the shrink override" {
-  make_catalog_fixture 2 2
-
-  APM_ALLOW_CATALOG_SHRINK=1 run assert_catalog_stage_safety 1
-  [ "$status" -eq 0 ]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety refuses a build that would shrink tracked skills" {
-  make_catalog_fixture 2 1
-
-  run assert_catalog_stage_safety 0
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"would shrink skills from"* ]]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety refuses an incomplete catalog build" {
-  make_catalog_fixture 2 2
-  rm -f "$workspace_dir/.catalog-build/catalog/apm.yml"
-
-  run assert_catalog_stage_safety 0
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"catalog build is incomplete"* ]]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety refuses a tracked catalog whose .apm holds a primitive the build would drop" {
-  make_catalog_fixture 2 2
-  mkdir -p "$workspace_dir/catalog/.apm/instructions"
-  printf 'instruction\n' >"$workspace_dir/catalog/.apm/instructions/sample.instructions.md"
-
-  run assert_catalog_stage_safety 0
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"catalog/.apm holds instructions/sample.instructions.md"* ]]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety refuses a catalog whose .apm holds a symlink to a file" {
-  make_catalog_fixture 2 2
-  mkdir -p "$workspace_dir/catalog/.apm/agents"
-  printf 'agent\n' >"$workspace_dir/outside.md"
-  ln -s "$workspace_dir/outside.md" "$workspace_dir/catalog/.apm/agents/demo.agent.md"
-
-  run assert_catalog_stage_safety 0
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"catalog/.apm holds agents/demo.agent.md"* ]]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety refuses a catalog whose .apm holds a symlink to a directory" {
-  make_catalog_fixture 2 2
-  mkdir -p "$workspace_dir/catalog/.apm" "$workspace_dir/outside-agents"
-  ln -s "$workspace_dir/outside-agents" "$workspace_dir/catalog/.apm/agents"
-
-  run assert_catalog_stage_safety 0
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"catalog/.apm holds agents"* ]]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety refuses a catalog whose .apm holds a dangling symlink" {
-  make_catalog_fixture 2 2
-  mkdir -p "$workspace_dir/catalog/.apm"
-  ln -s "$workspace_dir/missing-target" "$workspace_dir/catalog/.apm/dangling.md"
-
-  run assert_catalog_stage_safety 0
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"catalog/.apm holds dangling.md"* ]]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety refuses a catalog whose .apm placeholder is a symlink" {
-  make_catalog_fixture 2 2
-  mkdir -p "$workspace_dir/catalog/.apm"
-  : >"$workspace_dir/outside-placeholder"
-  ln -s "$workspace_dir/outside-placeholder" "$workspace_dir/catalog/.apm/.gitkeep"
-
-  run assert_catalog_stage_safety 0
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"catalog/.apm holds .gitkeep"* ]]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety refuses a catalog whose .apm is a symlink to an empty directory" {
-  make_catalog_fixture 2 2
-  rm -rf "$workspace_dir/catalog/.apm"
-  mkdir -p "$workspace_dir/outside-apm"
-  ln -s "$workspace_dir/outside-apm" "$workspace_dir/catalog/.apm"
-
-  run assert_catalog_stage_safety 0
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"catalog/.apm is a symlink"* ]]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety refuses a catalog whose .apm is a dangling symlink" {
-  make_catalog_fixture 2 2
-  rm -rf "$workspace_dir/catalog/.apm"
-  ln -s "$workspace_dir/missing-apm" "$workspace_dir/catalog/.apm"
-
-  run assert_catalog_stage_safety 0
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"catalog/.apm is a symlink"* ]]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety refuses a catalog whose .apm/agents holds a FIFO" {
-  command -v mkfifo >/dev/null || skip "mkfifo is unavailable"
-  make_catalog_fixture 2 2
-  mkdir -p "$workspace_dir/catalog/.apm/agents"
-  mkfifo "$workspace_dir/catalog/.apm/agents/queue"
-
-  run assert_catalog_stage_safety 0
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"catalog/.apm holds agents/queue"* ]]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety refuses a catalog whose .apm holds a FIFO" {
-  command -v mkfifo >/dev/null || skip "mkfifo is unavailable"
-  make_catalog_fixture 2 2
-  mkdir -p "$workspace_dir/catalog/.apm/instructions"
-  mkfifo "$workspace_dir/catalog/.apm/instructions/queue"
-
-  run assert_catalog_stage_safety 0
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"catalog/.apm holds instructions/queue"* ]]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety refuses a catalog whose .apm placeholder is a FIFO" {
-  command -v mkfifo >/dev/null || skip "mkfifo is unavailable"
-  make_catalog_fixture 2 2
-  mkdir -p "$workspace_dir/catalog/.apm"
-  mkfifo "$workspace_dir/catalog/.apm/.gitkeep"
-
-  run assert_catalog_stage_safety 0
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"catalog/.apm holds .gitkeep"* ]]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety refuses a catalog whose .apm/skills holds a FIFO" {
-  command -v mkfifo >/dev/null || skip "mkfifo is unavailable"
-  make_catalog_fixture 2 2
-  mkfifo "$workspace_dir/catalog/.apm/skills/queue"
-
-  run assert_catalog_stage_safety 0
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"catalog/.apm holds skills/queue"* ]]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety refuses a catalog whose .apm/skills is a symlink" {
-  make_catalog_fixture 2 2
-  rm -rf "$workspace_dir/catalog/.apm/skills"
-  mkdir -p "$workspace_dir/outside-skills/demo"
-  printf 'skill\n' >"$workspace_dir/outside-skills/demo/SKILL.md"
-  ln -s "$workspace_dir/outside-skills" "$workspace_dir/catalog/.apm/skills"
-
-  run assert_catalog_stage_safety 0
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"catalog/.apm holds skills"* ]]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety refuses a catalog whose .apm/skills holds a symlinked skill" {
-  make_catalog_fixture 2 2
-  mkdir -p "$workspace_dir/outside-skill"
-  printf 'skill\n' >"$workspace_dir/outside-skill/SKILL.md"
-  ln -s "$workspace_dir/outside-skill" "$workspace_dir/catalog/.apm/skills/linked"
-
-  run assert_catalog_stage_safety 0
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"catalog/.apm holds skills/linked"* ]]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "cmd_stage_catalog refuses and keeps a file under .apm/skills that no skill encloses" {
-  make_stageable_catalog_fixture
-  mkdir -p "$workspace_dir/catalog/.apm/skills/draft"
-  printf 'draft notes\n' >"$workspace_dir/catalog/.apm/skills/draft/notes.md"
-
-  run cmd_stage_catalog
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"catalog/.apm holds skills/draft/notes.md"* ]]
-  [ "$(cat "$workspace_dir/catalog/.apm/skills/draft/notes.md")" = "draft notes" ]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
 @test "catalog_apm_dir_claim_message names a file directly under .apm/skills" {
   make_catalog_fixture 2 2
   printf 'readme\n' >"$workspace_dir/catalog/.apm/skills/README.md"
@@ -2622,23 +1174,6 @@ make_catalog_fixture() {
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
-@test "cmd_stage_catalog keeps nested skill files and files inside a skill's subdirectories" {
-  make_stageable_catalog_fixture
-  mkdir -p "$workspace_dir/catalog/.apm/skills/skill-0/references" "$workspace_dir/catalog/.apm/skills/ns/inner/scripts"
-  printf 'ref\n' >"$workspace_dir/catalog/.apm/skills/skill-0/references/guide.md"
-  : >"$workspace_dir/catalog/.apm/skills/ns/inner/SKILL.md"
-  printf 'run\n' >"$workspace_dir/catalog/.apm/skills/ns/inner/scripts/run.sh"
-
-  run cmd_stage_catalog
-
-  [ "$status" -eq 0 ]
-  [ "$(cat "$workspace_dir/catalog/.apm/skills/skill-0/references/guide.md")" = "ref" ]
-  [ "$(cat "$workspace_dir/catalog/.apm/skills/ns/inner/scripts/run.sh")" = "run" ]
-  [ -z "$(catalog_apm_dir_claim_message)" ]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
 @test "catalog_apm_dir_claim_message names a symlink inside a skill directory" {
   make_catalog_fixture 2 2
   printf 'outside\n' >"$workspace_dir/outside-reference.md"
@@ -2647,7 +1182,7 @@ make_catalog_fixture() {
   run catalog_apm_dir_claim_message
 
   [ "$status" -eq 0 ]
-  [[ "$output" == *"catalog/.apm holds skills/skill-0/link.md, but only"* ]]
+  [[ "$output" == *"catalog/.apm holds skills/skill-0/link.md, but the catalog package carries only"* ]]
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
@@ -2685,34 +1220,6 @@ make_catalog_fixture() {
 
   [ "$status" -eq 0 ]
   [[ "$output" == *"catalog/.apm holds agents/team/helper.agent.md"* ]]
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety refuses a catalog whose .apm holds a directory it cannot read" {
-  [ "$(id -u)" -ne 0 ] || skip "root reads a directory without read permission"
-  make_catalog_fixture 2 2
-  mkdir -p "$workspace_dir/catalog/.apm/instructions"
-  printf 'hidden\n' >"$workspace_dir/catalog/.apm/instructions/a.instructions.md"
-  chmod 000 "$workspace_dir/catalog/.apm/instructions"
-
-  run assert_catalog_stage_safety 0
-
-  chmod 755 "$workspace_dir/catalog/.apm/instructions"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"catalog/.apm could not be fully read"* ]]
-  [ "$(cat "$workspace_dir/catalog/.apm/instructions/a.instructions.md")" = "hidden" ]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety allows a tracked catalog whose .apm holds only skills and agents" {
-  make_catalog_fixture 2 2
-  [ -f "$workspace_dir/catalog/.apm/skills/skill-0/SKILL.md" ]
-  [ -f "$workspace_dir/catalog/.apm/agents/sample.agent.md" ]
-
-  run assert_catalog_stage_safety 0
-  [ "$status" -eq 0 ]
-
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
@@ -2766,24 +1273,6 @@ make_stageable_catalog_fixture() {
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
-@test "cmd_stage_catalog keeps skills and agents under .apm across repeated prepares" {
-  make_stageable_catalog_fixture
-
-  run cmd_stage_catalog
-  [ "$status" -eq 0 ]
-  run cmd_stage_catalog
-  [ "$status" -eq 0 ]
-
-  [ -f "$workspace_dir/catalog/.apm/skills/skill-0/SKILL.md" ]
-  [ -f "$workspace_dir/catalog/.apm/skills/skill-1/SKILL.md" ]
-  [ -f "$workspace_dir/catalog/.apm/agents/sample.agent.md" ]
-  [ ! -e "$workspace_dir/catalog/skills" ]
-  [ ! -e "$workspace_dir/catalog/agents" ]
-  [ -z "$(catalog_apm_dir_claim_message)" ]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
 @test "catalog_apm_dir_claim_message names a symlink under .apm" {
   make_catalog_fixture 2 2
   mkdir -p "$workspace_dir/catalog/.apm/agents"
@@ -2793,38 +1282,6 @@ make_stageable_catalog_fixture() {
   run catalog_apm_dir_claim_message
   [ "$status" -eq 0 ]
   [[ "$output" == *"catalog/.apm holds agents/demo.agent.md"* ]]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety refuses a build with no skills" {
-  make_catalog_fixture 2 2
-  rm -rf "$workspace_dir/.catalog-build/catalog/.apm/skills"
-  mkdir -p "$workspace_dir/.catalog-build/catalog/.apm/skills"
-
-  run assert_catalog_stage_safety 0
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"catalog build has no skills"* ]]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety refuses a build that would empty agents" {
-  make_catalog_fixture 2 2
-  rm -f "$workspace_dir/.catalog-build/catalog/.apm/agents/sample.agent.md"
-
-  run assert_catalog_stage_safety 0
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"would empty agents"* ]]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
-@test "assert_catalog_stage_safety passes for a fully valid fixture" {
-  make_catalog_fixture 2 2
-
-  run assert_catalog_stage_safety 0
-  [ "$status" -eq 0 ]
 
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
@@ -2855,609 +1312,7 @@ make_stageable_catalog_fixture() {
   rm -rf "$workspace_dir"
 }
 
-# --- remove_internal_target_links --------------------------------------------
-
-@test "remove_internal_target_links removes symlinks but preserves real directories" {
-  runtime_home="$(mktemp -d)"
-  link_source="$(mktemp -d)"
-  HOME="$runtime_home"
-
-  mkdir -p "$runtime_home/.claude/skills"
-  ln -s "$link_source" "$runtime_home/.claude/skills/linked-skill"
-  mkdir -p "$runtime_home/.claude/skills/real-skill"
-  printf 'keep me\n' >"$runtime_home/.claude/skills/real-skill/note.md"
-
-  run remove_internal_target_links "linked-skill"$'\n'"real-skill"
-
-  [ "$status" -eq 0 ]
-  [ ! -e "$runtime_home/.claude/skills/linked-skill" ]
-  [ -d "$runtime_home/.claude/skills/real-skill" ]
-  [ "$(<"$runtime_home/.claude/skills/real-skill/note.md")" = "keep me" ]
-
-  rm -rf "$runtime_home" "$link_source"
-}
-
-# --- cleanup_legacy_workspace_skill_targets ---------------------------------
-
-@test "cleanup_legacy_workspace_skill_targets removes physical skills but preserves bridges and adjacent files" {
-  workspace_dir="$(mktemp -d)"
-  bridge_source="$workspace_dir/.apm/skills/workspace-only"
-  mkdir -p "$bridge_source" "$workspace_dir/.agents/skills/stale-skill" "$workspace_dir/.claude/skills/stale-skill" "$workspace_dir/.agents/skills/notes"
-  printf '# stale\n' >"$workspace_dir/.agents/skills/stale-skill/SKILL.md"
-  printf '# stale\n' >"$workspace_dir/.claude/skills/stale-skill/SKILL.md"
-  printf 'keep me\n' >"$workspace_dir/.agents/skills/notes/README.md"
-  ln -s "$bridge_source" "$workspace_dir/.agents/skills/workspace-only"
-  ln -s "$bridge_source" "$workspace_dir/.claude/skills/workspace-only"
-  WORKSPACE_DIR="$workspace_dir"
-
-  run cleanup_legacy_workspace_skill_targets
-
-  [ "$status" -eq 0 ]
-  [ ! -e "$workspace_dir/.agents/skills/stale-skill" ]
-  [ ! -e "$workspace_dir/.claude/skills/stale-skill" ]
-  [ -L "$workspace_dir/.agents/skills/workspace-only" ]
-  [ -L "$workspace_dir/.claude/skills/workspace-only" ]
-  [ "$(<"$workspace_dir/.agents/skills/notes/README.md")" = "keep me" ]
-
-  rm -rf "$workspace_dir"
-}
-
-# --- assert_catalog_cache_freshness ------------------------------------------
-#
-# The tracked side of the comparison must be git-tracked files (`git
-# ls-files`), never a raw filesystem walk: gitignored build artifacts
-# (.pytest_cache/, __pycache__/, etc.) can exist under catalog/ without ever
-# being part of the deployed package, and must never be reported as missing
-# from the cache. Every fixture below `git init`s the tracked catalog dir and
-# `git add`s the files meant to count as tracked.
-
-_git_track() {
-  dir="$1"
-  git -C "$dir" init -q
-  git -C "$dir" add -A
-}
-
-@test "assert_catalog_cache_freshness cache_freshness passes when cache matches tracked" {
-  workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/.apm/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo"
-  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
-  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo/SKILL.md"
-  _git_track "$workspace_dir/catalog"
-
-  WORKSPACE_DIR="$workspace_dir"
-
-  run assert_catalog_cache_freshness
-
-  [ "$status" -eq 0 ]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "assert_catalog_cache_freshness cache_freshness fails with remedy when a tracked file is missing from cache" {
-  workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/.apm/skills/new-skill" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog"
-  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/new-skill/SKILL.md"
-  _git_track "$workspace_dir/catalog"
-
-  WORKSPACE_DIR="$workspace_dir"
-
-  run assert_catalog_cache_freshness
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"new-skill"* ]]
-  [[ "$output" == *"deploy:fresh"* ]]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "assert_catalog_cache_freshness cache_freshness fails with remedy when the cache directory is absent" {
-  workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/.apm/skills/foo"
-  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
-  _git_track "$workspace_dir/catalog"
-
-  WORKSPACE_DIR="$workspace_dir"
-
-  run assert_catalog_cache_freshness
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"deploy:fresh"* ]]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "assert_catalog_cache_freshness cache_freshness passes when the cache has an extra file not tracked" {
-  workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/.apm/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo"
-  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
-  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo/SKILL.md"
-  printf 'metadata\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo/extra.json"
-  _git_track "$workspace_dir/catalog"
-
-  WORKSPACE_DIR="$workspace_dir"
-
-  run assert_catalog_cache_freshness
-
-  [ "$status" -eq 0 ]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "assert_catalog_cache_freshness cache_freshness truncates the message for many missing files" {
-  workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/.apm/skills" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog"
-  for i in $(seq 1 20); do
-    printf 'a\n' >"$workspace_dir/catalog/.apm/skills/file-$i.md"
-  done
-  _git_track "$workspace_dir/catalog"
-
-  WORKSPACE_DIR="$workspace_dir"
-
-  run assert_catalog_cache_freshness
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"20"* ]]
-  [[ "$output" != *"file-20.md"* ]]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "assert_catalog_cache_freshness cache_freshness ignores gitignored untracked files under tracked_dir" {
-  workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/.apm/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo"
-  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
-  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo/SKILL.md"
-
-  mkdir -p "$workspace_dir/catalog/.apm/skills/foo/__pycache__"
-  printf '*.pyc\n' >"$workspace_dir/catalog/.apm/skills/foo/.gitignore"
-  printf '*.pyc\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo/.gitignore"
-  printf 'compiled\n' >"$workspace_dir/catalog/.apm/skills/foo/__pycache__/module.cpython-314.pyc"
-
-  _git_track "$workspace_dir/catalog"
-
-  WORKSPACE_DIR="$workspace_dir"
-
-  run assert_catalog_cache_freshness
-
-  [ "$status" -eq 0 ]
-  [[ "$output" != *"pycache"* ]]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "assert_catalog_cache_freshness passes when a tracked dotfile is present in the cache" {
-  workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/.apm/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo"
-  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
-  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo/SKILL.md"
-  printf '\n' >"$workspace_dir/catalog/.gitkeep"
-  printf '\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.gitkeep"
-  _git_track "$workspace_dir/catalog"
-
-  WORKSPACE_DIR="$workspace_dir"
-
-  run assert_catalog_cache_freshness
-
-  [ "$status" -eq 0 ]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "assert_catalog_cache_freshness fails when a tracked dotfile is missing from the cache" {
-  workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/.apm/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo"
-  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
-  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo/SKILL.md"
-  printf '\n' >"$workspace_dir/catalog/.gitkeep"
-  _git_track "$workspace_dir/catalog"
-
-  WORKSPACE_DIR="$workspace_dir"
-
-  run assert_catalog_cache_freshness
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *".gitkeep"* ]]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "assert_catalog_cache_freshness fails when a cached file's contents differ from the tracked file" {
-  workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/.apm/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo"
-  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
-  printf 'DIFFERENT\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo/SKILL.md"
-  _git_track "$workspace_dir/catalog"
-
-  WORKSPACE_DIR="$workspace_dir"
-
-  run assert_catalog_cache_freshness
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"different contents"* ]]
-  [[ "$output" == *"deploy:fresh"* ]]
-
-  rm -rf "$workspace_dir"
-}
-
-# --- assert_tracked_catalog_published ----------------------------------------
-
-_setup_published_workspace() {
-  remote_dir="$1"
-  workspace_dir="$2"
-
-  git init -q --bare "$remote_dir"
-  git clone -q "$remote_dir" "$workspace_dir"
-  git -C "$workspace_dir" config user.email "test@example.com"
-  git -C "$workspace_dir" config user.name "Test"
-  git -C "$workspace_dir" checkout -q -b main
-  mkdir -p "$workspace_dir/catalog/.apm/skills/foo"
-  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
-  git -C "$workspace_dir" add -A
-  git -C "$workspace_dir" commit -q -m "init"
-  git -C "$workspace_dir" push -q -u origin main
-}
-
-@test "assert_tracked_catalog_published fails when the tracked catalog has uncommitted changes" {
-  remote_dir="$(mktemp -d)"
-  workspace_dir="$(mktemp -d)"
-  rmdir "$workspace_dir"
-  _setup_published_workspace "$remote_dir" "$workspace_dir"
-
-  printf 'dirty\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
-
-  WORKSPACE_DIR="$workspace_dir"
-
-  run assert_tracked_catalog_published
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"uncommitted changes"* ]]
-
-  rm -rf "$remote_dir" "$workspace_dir"
-}
-
-@test "assert_tracked_catalog_published fails when the tracked catalog has unpushed commits" {
-  remote_dir="$(mktemp -d)"
-  workspace_dir="$(mktemp -d)"
-  rmdir "$workspace_dir"
-  _setup_published_workspace "$remote_dir" "$workspace_dir"
-
-  printf 'b\n' >"$workspace_dir/catalog/.apm/skills/foo/extra.md"
-  git -C "$workspace_dir" add -A
-  git -C "$workspace_dir" commit -q -m "unpushed"
-
-  WORKSPACE_DIR="$workspace_dir"
-
-  run assert_tracked_catalog_published
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"commits not on"* ]]
-
-  rm -rf "$remote_dir" "$workspace_dir"
-}
-
-@test "assert_tracked_catalog_published fails closed when the workspace is not a git repository" {
-  workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/.apm/skills/foo"
-  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
-  # No `git init`: git status/rev-list must fail, and the gate must not treat
-  # that failure as "clean" / "pushed".
-
-  WORKSPACE_DIR="$workspace_dir"
-
-  run assert_tracked_catalog_published
-
-  [ "$status" -ne 0 ]
-
-  rm -rf "$workspace_dir"
-}
-
-@test "assert_catalog_cache_freshness fails closed when git ls-files fails" {
-  workspace_dir="$(mktemp -d)"
-  mkdir -p "$workspace_dir/catalog/.apm/skills/foo" "$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo"
-  printf 'a\n' >"$workspace_dir/catalog/.apm/skills/foo/SKILL.md"
-  printf 'a\n' >"$workspace_dir/apm_modules/jey3dayo/apm-workspace/catalog/.apm/skills/foo/SKILL.md"
-  # Deliberately do NOT git-init the tracked catalog dir: `git ls-files` fails
-  # (not a git repository), and the gate must not treat that as "no tracked
-  # files" and pass vacuously.
-
-  WORKSPACE_DIR="$workspace_dir"
-
-  run assert_catalog_cache_freshness
-
-  [ "$status" -ne 0 ]
-
-  rm -rf "$workspace_dir"
-}
-
-# --- run_workspace_update_command / register_catalog_dependency --------------
-#
-# `apm install -g <ref>` can replay apm.lock.yaml's cached resolved_commit, so
-# an already-referenced catalog must re-resolve its pin via `apm update`.
-
-_write_fake_apm() {
-  bin_dir="$1"
-
-  cat >"$bin_dir/apm" <<'EOF'
-#!/bin/sh
-printf 'apm %s\n' "$*" >>"$FAKE_APM_CALL_LOG"
-if [ -n "${FAKE_APM_OUTPUT:-}" ]; then
-  printf '%s\n' "$FAKE_APM_OUTPUT"
-fi
-exit "${FAKE_APM_EXIT_CODE:-0}"
-EOF
-  chmod +x "$bin_dir/apm"
-}
-
-@test "run_workspace_update_command calls apm update in WORKSPACE_DIR and fails on non-zero exit" {
-  workspace_dir="$(mktemp -d)"
-  fake_bin="$(mktemp -d)"
-  call_log="$(mktemp)"
-  _write_fake_apm "$fake_bin"
-
-  WORKSPACE_DIR="$workspace_dir"
-  FAKE_APM_CALL_LOG="$call_log" FAKE_APM_EXIT_CODE=1 PATH="$fake_bin:$PATH" \
-    run run_workspace_update_command -g --yes some/package
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"apm update failed"* ]]
-  [ "$(cat "$call_log")" = "apm update -g --yes some/package" ]
-
-  rm -rf "$workspace_dir" "$fake_bin"
-  rm -f "$call_log"
-}
-
-@test "run_workspace_update_command fails when apm update reports integration diagnostics" {
-  workspace_dir="$(mktemp -d)"
-  fake_bin="$(mktemp -d)"
-  call_log="$(mktemp)"
-  _write_fake_apm "$fake_bin"
-
-  WORKSPACE_DIR="$workspace_dir"
-  FAKE_APM_CALL_LOG="$call_log" FAKE_APM_EXIT_CODE=0 \
-    FAKE_APM_OUTPUT="Installed 3 packages with 1 error(s)." \
-    PATH="$fake_bin:$PATH" \
-    run run_workspace_update_command -g --yes some/package
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"apm update reported integration diagnostics"* ]]
-
-  rm -rf "$workspace_dir" "$fake_bin"
-  rm -f "$call_log"
-}
-
-@test "register_catalog_dependency runs apm update --yes on the bare package when apm.yml already references the catalog" {
-  workspace_dir="$(mktemp -d)"
-  fake_bin="$(mktemp -d)"
-  call_log="$(mktemp)"
-  _write_fake_apm "$fake_bin"
-
-  printf 'apm:\n  dependencies:\n    - jey3dayo/apm-workspace/catalog#main\n' >"$workspace_dir/apm.yml"
-  WORKSPACE_DIR="$workspace_dir"
-
-  FAKE_APM_CALL_LOG="$call_log" PATH="$fake_bin:$PATH" \
-    run register_catalog_dependency "jey3dayo/apm-workspace/catalog#main"
-
-  [ "$status" -eq 0 ]
-  [ "$(cat "$call_log")" = "apm update -g --yes jey3dayo/apm-workspace/catalog" ]
-
-  rm -rf "$workspace_dir" "$fake_bin"
-  rm -f "$call_log"
-}
-
-@test "register_catalog_dependency runs apm install -g with the full ref when apm.yml has no catalog reference yet" {
-  workspace_dir="$(mktemp -d)"
-  fake_bin="$(mktemp -d)"
-  call_log="$(mktemp)"
-  _write_fake_apm "$fake_bin"
-
-  printf 'apm:\n  dependencies: []\n' >"$workspace_dir/apm.yml"
-  WORKSPACE_DIR="$workspace_dir"
-
-  FAKE_APM_CALL_LOG="$call_log" PATH="$fake_bin:$PATH" \
-    run register_catalog_dependency "jey3dayo/apm-workspace/catalog#main"
-
-  [ "$status" -eq 0 ]
-  [ "$(cat "$call_log")" = "apm install -g jey3dayo/apm-workspace/catalog#main" ]
-
-  rm -rf "$workspace_dir" "$fake_bin"
-  rm -f "$call_log"
-}
-
-# --- pin-external ------------------------------------------------------------
-
-_pin_external_fixture() {
-  pin_external_dir="$(mktemp -d)"
-  git -C "$pin_external_dir" init -q
-}
-
-@test "cmd_pin_external pins a scalar entry that carries a trailing comment" {
-  # Real-world shape: apm.yml:52 keeps a deprecation note after the ref.
-  #   - openai/skills/skills/.curated/screenshot # openai/skills is deprecated; ...
-  # The bare single-token bullet regex used to skip this line entirely, so
-  # 44 of 45 external deps got pinned but this one never did.
-  _pin_external_fixture
-  cat >"$pin_external_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - openai/skills/skills/.curated/screenshot # openai/skills is deprecated; no migrated equivalent found in openai/plugins yet
-EOF
-  cat >"$pin_external_dir/apm.lock.yaml" <<'EOF'
-dependencies:
-  apm:
-  - repo_url: openai/skills
-    virtual_path: skills/.curated/screenshot
-    resolved_commit: 49f948faa9258a0c61caceaf225e179651397431
-EOF
-
-  WORKSPACE_DIR="$pin_external_dir"
-
-  run cmd_pin_external
-  [ "$status" -eq 0 ]
-
-  manifest="$(<"$pin_external_dir/apm.yml")"
-  [[ "$manifest" == *'- openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431 # openai/skills is deprecated; no migrated equivalent found in openai/plugins yet'* ]]
-
-  rm -rf "$pin_external_dir"
-}
-
-@test "cmd_pin_external pins a scalar entry via case-insensitive owner matching without lowercasing the manifest" {
-  # Real-world shape: apm.yml:60 uses the GitHub-displayed owner casing
-  # "Jakubantalik", but the lock's repo_url is lowercase "jakubantalik" (its
-  # materialization_repo_url preserves the original casing separately). A
-  # case-sensitive exact match on the pinned map misses this entry.
-  # Lowercasing the manifest ref itself would be wrong too: apm_modules/
-  # paths are derived from the manifest's owner casing.
-  _pin_external_fixture
-  cat >"$pin_external_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - Jakubantalik/transitions-dev/skills/transitions-dev
-EOF
-  cat >"$pin_external_dir/apm.lock.yaml" <<'EOF'
-dependencies:
-  apm:
-  - repo_url: jakubantalik/transitions-dev
-    virtual_path: skills/transitions-dev
-    resolved_commit: 038b0bdc75375c2beed51d1e824c98cdc7b86f8c
-EOF
-
-  WORKSPACE_DIR="$pin_external_dir"
-
-  run cmd_pin_external
-  [ "$status" -eq 0 ]
-
-  manifest="$(<"$pin_external_dir/apm.yml")"
-  # Owner casing "Jakubantalik" must survive unchanged; only "#<sha>" is appended.
-  [[ "$manifest" == *'- Jakubantalik/transitions-dev/skills/transitions-dev#038b0bdc75375c2beed51d1e824c98cdc7b86f8c'* ]]
-  [[ "$manifest" != *'- jakubantalik/transitions-dev'* ]]
-
-  rm -rf "$pin_external_dir"
-}
-
-@test "cmd_pin_external pins a structured git: mapping entry by adding a sibling ref: key" {
-  # Real-world shape: apm.yml:57-59.
-  #   - git: nextlevelbuilder/ui-ux-pro-max-skill
-  #     skills:
-  #       - ui-ux-pro-max
-  # apm's own reference model (apm_cli/models/dependency/reference.py:1931,
-  # 1943) writes the resolved commit back as a sibling "ref:" key, never as
-  # "#<sha>" appended to the git: value, so pin-external must match that
-  # contract.
-  _pin_external_fixture
-  cat >"$pin_external_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: nextlevelbuilder/ui-ux-pro-max-skill
-      skills:
-        - ui-ux-pro-max
-EOF
-  cat >"$pin_external_dir/apm.lock.yaml" <<'EOF'
-dependencies:
-  apm:
-  - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
-    resolved_commit: 4aad0584d92131626b16d4ff4d77f0455385013c
-EOF
-
-  WORKSPACE_DIR="$pin_external_dir"
-
-  run cmd_pin_external
-  [ "$status" -eq 0 ]
-
-  manifest="$(<"$pin_external_dir/apm.yml")"
-  # The git: value itself must be untouched (no "#<sha>" suffix).
-  [[ "$manifest" != *'- git: nextlevelbuilder/ui-ux-pro-max-skill#'* ]]
-  # ref: must land as the immediate sibling right after git: (before
-  # skills:), matching the layout apm itself writes.
-  expected=$'    - git: nextlevelbuilder/ui-ux-pro-max-skill\n      ref: 4aad0584d92131626b16d4ff4d77f0455385013c\n      skills:\n        - ui-ux-pro-max'
-  [[ "$manifest" == *"$expected"* ]]
-
-  rm -rf "$pin_external_dir"
-}
-
-@test "cmd_pin_external matches a structured git dependency using its sibling path" {
-  _pin_external_fixture
-  cat >"$pin_external_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: https://github.com/acme/tools.git
-      path: packages/example
-      alias: example-tools
-EOF
-  cat >"$pin_external_dir/apm.lock.yaml" <<'EOF'
-dependencies:
-  apm:
-  - repo_url: acme/tools
-    virtual_path: packages/example
-    resolved_commit: 1234567890abcdef1234567890abcdef12345678
-EOF
-
-  WORKSPACE_DIR="$pin_external_dir"
-
-  run cmd_pin_external
-  [ "$status" -eq 0 ]
-
-  manifest="$(<"$pin_external_dir/apm.yml")"
-  expected=$'    - git: https://github.com/acme/tools.git\n      ref: 1234567890abcdef1234567890abcdef12345678\n      path: packages/example\n      alias: example-tools'
-  [[ "$manifest" == *"$expected"* ]]
-
-  rm -rf "$pin_external_dir"
-}
-
-@test "cmd_pin_external does not use a repo-only lock record for a path dependency" {
-  _pin_external_fixture
-  cat >"$pin_external_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: https://github.com/acme/tools.git
-      path: packages/example
-EOF
-  cat >"$pin_external_dir/apm.lock.yaml" <<'EOF'
-dependencies:
-  apm:
-  - repo_url: acme/tools
-    resolved_commit: 1234567890abcdef1234567890abcdef12345678
-EOF
-
-  WORKSPACE_DIR="$pin_external_dir"
-
-  run cmd_pin_external
-  [ "$status" -eq 0 ]
-  [[ "$(<"$pin_external_dir/apm.yml")" != *"ref:"* ]]
-
-  rm -rf "$pin_external_dir"
-}
-
-@test "cmd_pin_external does not duplicate ref: on a structured entry that is already pinned" {
-  _pin_external_fixture
-  cat >"$pin_external_dir/apm.yml" <<'EOF'
-dependencies:
-  apm:
-    - git: nextlevelbuilder/ui-ux-pro-max-skill
-      skills:
-        - ui-ux-pro-max
-      ref: 4aad0584d92131626b16d4ff4d77f0455385013c
-EOF
-  cat >"$pin_external_dir/apm.lock.yaml" <<'EOF'
-dependencies:
-  apm:
-  - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
-    resolved_commit: 4aad0584d92131626b16d4ff4d77f0455385013c
-EOF
-
-  WORKSPACE_DIR="$pin_external_dir"
-  before="$(<"$pin_external_dir/apm.yml")"
-
-  run cmd_pin_external
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"No external dependencies needed pinning."* ]]
-
-  after="$(<"$pin_external_dir/apm.yml")"
-  [ "$before" = "$after" ]
-  ref_count="$(grep -c 'ref: 4aad0584' "$pin_external_dir/apm.yml")"
-  [ "$ref_count" -eq 1 ]
-
-  rm -rf "$pin_external_dir"
-}
+# --- unpinned_external_references -------------------------------------------
 
 @test "unpinned_external_references includes a structured git dependency path but not nested skills" {
   # Regression for the doctor "unpinned" count being inflated: the old awk
@@ -3504,249 +1359,11 @@ EOF
   rm -rf "$workspace_dir"
 }
 
-@test "sync_managed_catalog_runtime_assets deploys claude-only rules to the claude target only" {
-  workspace="$(mktemp -d)"
-  runtime_home="$(mktemp -d)"
-  mkdir -p "$workspace/catalog/rules" "$workspace/catalog/claude/rules"
-  printf '%s\n' 'shared' >"$workspace/catalog/rules/shared.md"
-  printf '%s\n' 'claude' >"$workspace/catalog/claude/rules/model-policy.md"
-  mkdir -p "$runtime_home/.claude/rules"
-  printf '%s\n' 'user' >"$runtime_home/.claude/rules/user.md"
-
-  HOME="$runtime_home"
-  tracked_catalog_dir() { printf '%s\n' "$workspace/catalog"; }
-  tracked_catalog_instructions_path() { printf '%s\n' "$workspace/catalog/.apm/instructions/ai-collaboration.instructions.md"; }
-  tracked_catalog_commands_root() { printf '%s\n' "$workspace/catalog/commands"; }
-  tracked_catalog_rules_root() { printf '%s\n' "$workspace/catalog/rules"; }
-  managed_catalog_runtime_targets() {
-    printf '%s\n' 'claude|.claude|CLAUDE.md||apm' 'codex|.codex|AGENTS.md|.agents|-'
-  }
-
-  run sync_managed_catalog_runtime_assets
-
-  [ "$status" -eq 0 ]
-  [ -f "$runtime_home/.claude/rules/model-policy.md" ]
-  [ -f "$runtime_home/.claude/rules/shared.md" ]
-  [ -f "$runtime_home/.claude/rules/user.md" ]
-  [ "$(cat "$runtime_home/.claude/rules/.managed-claude-rules-manifest")" = "model-policy.md" ]
-  [ "$(cat "$runtime_home/.claude/rules/.managed-catalog-manifest")" = "shared.md" ]
-  [ -f "$runtime_home/.codex/rules/shared.md" ]
-  [ ! -e "$runtime_home/.codex/rules/model-policy.md" ]
-
-  rm -rf "$workspace/catalog/claude"
-  run sync_managed_catalog_runtime_assets
-  [ "$status" -eq 0 ]
-  [ ! -e "$runtime_home/.claude/rules/model-policy.md" ]
-  [ -f "$runtime_home/.claude/rules/user.md" ]
-  [ -f "$runtime_home/.claude/rules/shared.md" ]
-
-  rm -rf "$workspace" "$runtime_home"
-}
-
-# --- apply: catalog agents rendered by APM into a temp project ---------------
-
-make_catalog_agents_apply_fixture() {
-  AGENTS_APPLY_BASE="$(mktemp -d)"
-  source "$TEST_REPO_ROOT/tests/conformance/build-fixture.sh"
-  build_apply_fixture "$AGENTS_APPLY_BASE"
-  AGENTS_APPLY_HOME="$FIXTURE_HOME"
-  AGENTS_APPLY_WORKSPACE_DIR="$FIXTURE_WORKSPACE_DIR"
-  AGENTS_APPLY_BIN_DIR="$FIXTURE_BIN_DIR"
-  AGENTS_APPLY_CALL_LOG="$FIXTURE_CALL_LOG"
-}
-
-run_catalog_agents_apply() {
-  HOME="$AGENTS_APPLY_HOME" \
-    PATH="$AGENTS_APPLY_BIN_DIR:$PATH" \
-    APM_WORKSPACE_DIR="$AGENTS_APPLY_WORKSPACE_DIR" \
-    FIXTURE_CALL_LOG="$AGENTS_APPLY_CALL_LOG" \
-    bash "$TEST_REPO_ROOT/scripts/apm-workspace.sh" apply
-}
-
-@test "apply places the catalog agents into claude and cursor through an APM render" {
-  make_catalog_agents_apply_fixture
-
-  run run_catalog_agents_apply
-
-  [ "$status" -eq 0 ]
-  source_agent="$AGENTS_APPLY_WORKSPACE_DIR/catalog/.apm/agents/sample.agent.md"
-  cmp -s "$source_agent" "$AGENTS_APPLY_HOME/.claude/agents/sample.md"
-  cmp -s "$source_agent" "$AGENTS_APPLY_HOME/.cursor/agents/sample.md"
-  [[ "$output" == *"Updated agent: $AGENTS_APPLY_HOME/.claude/agents/sample.md"* ]]
-  grep -Eq '^apm install .*/pkg --target claude,cursor$' "$AGENTS_APPLY_CALL_LOG"
-  [ ! -e "$AGENTS_APPLY_HOME/.codex/agents" ]
-  rm -rf "$AGENTS_APPLY_BASE"
-}
-
-@test "apply leaves already-matching catalog agents untouched on a second run" {
-  make_catalog_agents_apply_fixture
-  run run_catalog_agents_apply
-  [ "$status" -eq 0 ]
-  inode_before="$(ls -i "$AGENTS_APPLY_HOME/.claude/agents/sample.md" "$AGENTS_APPLY_HOME/.cursor/agents/sample.md")"
-
-  run run_catalog_agents_apply
-
-  [ "$status" -eq 0 ]
-  [[ "$output" != *"Updated agent"* ]]
-  [ "$(ls -i "$AGENTS_APPLY_HOME/.claude/agents/sample.md" "$AGENTS_APPLY_HOME/.cursor/agents/sample.md")" = "$inode_before" ]
-  rm -rf "$AGENTS_APPLY_BASE"
-}
-
-@test "apply overwrites a modified catalog agent and keeps agents outside the catalog" {
-  make_catalog_agents_apply_fixture
-  run run_catalog_agents_apply
-  [ "$status" -eq 0 ]
-  printf 'locally edited\n' >"$AGENTS_APPLY_HOME/.claude/agents/sample.md"
-  printf 'hand written\n' >"$AGENTS_APPLY_HOME/.claude/agents/hand-written.md"
-
-  run run_catalog_agents_apply
-
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"Updated agent: $AGENTS_APPLY_HOME/.claude/agents/sample.md"* ]]
-  cmp -s "$AGENTS_APPLY_WORKSPACE_DIR/catalog/.apm/agents/sample.agent.md" "$AGENTS_APPLY_HOME/.claude/agents/sample.md"
-  [ "$(cat "$AGENTS_APPLY_HOME/.claude/agents/hand-written.md")" = "hand written" ]
-  rm -rf "$AGENTS_APPLY_BASE"
-}
-
-@test "apply fails naming the runtime and agent when APM renders fewer agents than the catalog has" {
-  make_catalog_agents_apply_fixture
-
-  FIXTURE_APM_AGENTS_DROP="cursor:sample" run run_catalog_agents_apply
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"cursor"*"sample.md"* ]]
-  [ ! -e "$AGENTS_APPLY_HOME/.claude/agents/sample.md" ]
-  rm -rf "$AGENTS_APPLY_BASE"
-}
-
-@test "apply fails when the APM agents render command fails" {
-  make_catalog_agents_apply_fixture
-
-  FIXTURE_APM_AGENTS_INSTALL_FAIL=1 run run_catalog_agents_apply
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"apm install failed while rendering catalog agents"* ]]
-  [ ! -e "$AGENTS_APPLY_HOME/.claude/agents/sample.md" ]
-  rm -rf "$AGENTS_APPLY_BASE"
-}
-
-@test "apply fails before placing anything when a catalog agent's target is a directory" {
-  make_catalog_agents_apply_fixture
-  mkdir -p "$AGENTS_APPLY_HOME/.cursor/agents/sample.md"
-  mkdir -p "$AGENTS_APPLY_BASE/tmp"
-
-  TMPDIR="$AGENTS_APPLY_BASE/tmp" run run_catalog_agents_apply
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"target is a directory: $AGENTS_APPLY_HOME/.cursor/agents/sample.md"* ]]
-  [ -z "$(ls -A "$AGENTS_APPLY_HOME/.cursor/agents/sample.md")" ]
-  [ ! -e "$AGENTS_APPLY_HOME/.claude/agents/sample.md" ]
-  [ -z "$(find "$AGENTS_APPLY_BASE/tmp" -maxdepth 1 -name 'apm-agents-render.*')" ]
-  rm -rf "$AGENTS_APPLY_BASE"
-}
-
-@test "apply fails when a catalog agent's target is a symlink to a directory" {
-  make_catalog_agents_apply_fixture
-  mkdir -p "$AGENTS_APPLY_BASE/elsewhere" "$AGENTS_APPLY_HOME/.claude/agents"
-  ln -s "$AGENTS_APPLY_BASE/elsewhere" "$AGENTS_APPLY_HOME/.claude/agents/sample.md"
-
-  run run_catalog_agents_apply
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"target is a directory: $AGENTS_APPLY_HOME/.claude/agents/sample.md"* ]]
-  [ -z "$(ls -A "$AGENTS_APPLY_BASE/elsewhere")" ]
-  rm -rf "$AGENTS_APPLY_BASE"
-}
-
-@test "apply fails before placing anything when a catalog agent's target is a symlink with different content" {
-  make_catalog_agents_apply_fixture
-  mkdir -p "$AGENTS_APPLY_BASE/dotfiles" "$AGENTS_APPLY_HOME/.cursor/agents"
-  printf 'user dotfile version\n' >"$AGENTS_APPLY_BASE/dotfiles/sample.md"
-  ln -s "$AGENTS_APPLY_BASE/dotfiles/sample.md" "$AGENTS_APPLY_HOME/.cursor/agents/sample.md"
-
-  run run_catalog_agents_apply
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"target is a symlink whose content differs from the catalog: $AGENTS_APPLY_HOME/.cursor/agents/sample.md"* ]]
-  [ -L "$AGENTS_APPLY_HOME/.cursor/agents/sample.md" ]
-  [ "$(cat "$AGENTS_APPLY_BASE/dotfiles/sample.md")" = "user dotfile version" ]
-  [ ! -e "$AGENTS_APPLY_HOME/.claude/agents/sample.md" ]
-  rm -rf "$AGENTS_APPLY_BASE"
-}
-
-@test "apply fails when a catalog agent's target is a dangling symlink" {
-  make_catalog_agents_apply_fixture
-  mkdir -p "$AGENTS_APPLY_HOME/.claude/agents"
-  ln -s "$AGENTS_APPLY_BASE/missing.md" "$AGENTS_APPLY_HOME/.claude/agents/sample.md"
-
-  run run_catalog_agents_apply
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"target is a symlink whose content differs from the catalog: $AGENTS_APPLY_HOME/.claude/agents/sample.md"* ]]
-  [ -L "$AGENTS_APPLY_HOME/.claude/agents/sample.md" ]
-  [ ! -e "$AGENTS_APPLY_BASE/missing.md" ]
-  rm -rf "$AGENTS_APPLY_BASE"
-}
-
-@test "apply keeps a catalog agent's target symlink whose content already matches" {
-  make_catalog_agents_apply_fixture
-  mkdir -p "$AGENTS_APPLY_BASE/dotfiles" "$AGENTS_APPLY_HOME/.claude/agents"
-  cp "$AGENTS_APPLY_WORKSPACE_DIR/catalog/.apm/agents/sample.agent.md" "$AGENTS_APPLY_BASE/dotfiles/sample.md"
-  ln -s "$AGENTS_APPLY_BASE/dotfiles/sample.md" "$AGENTS_APPLY_HOME/.claude/agents/sample.md"
-
-  run run_catalog_agents_apply
-
-  [ "$status" -eq 0 ]
-  [ -L "$AGENTS_APPLY_HOME/.claude/agents/sample.md" ]
-  [[ "$output" != *"Updated agent: $AGENTS_APPLY_HOME/.claude/agents/sample.md"* ]]
-  cmp -s "$AGENTS_APPLY_WORKSPACE_DIR/catalog/.apm/agents/sample.agent.md" "$AGENTS_APPLY_HOME/.cursor/agents/sample.md"
-  rm -rf "$AGENTS_APPLY_BASE"
-}
-
-@test "apply removes the agents render directory when placing an agent fails" {
-  [ "$(id -u)" -ne 0 ] || skip "write permission cannot be removed from root"
-  make_catalog_agents_apply_fixture
-  mkdir -p "$AGENTS_APPLY_BASE/tmp" "$AGENTS_APPLY_HOME/.claude/agents"
-  chmod a-w "$AGENTS_APPLY_HOME/.claude/agents"
-
-  TMPDIR="$AGENTS_APPLY_BASE/tmp" run run_catalog_agents_apply
-  chmod u+w "$AGENTS_APPLY_HOME/.claude/agents"
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"Failed to place agent: $AGENTS_APPLY_HOME/.claude/agents/sample.md"* ]]
-  [ -z "$(find "$AGENTS_APPLY_BASE/tmp" -maxdepth 1 -name 'apm-agents-render.*')" ]
-  rm -rf "$AGENTS_APPLY_BASE"
-}
-
-@test "apply never places rendered agents into codex or opencode" {
-  make_catalog_agents_apply_fixture
-
-  FIXTURE_APM_AGENTS_EXTRA_TARGETS="codex opencode" run run_catalog_agents_apply
-
-  [ "$status" -eq 0 ]
-  [ -f "$AGENTS_APPLY_HOME/.claude/agents/sample.md" ]
-  [ ! -e "$AGENTS_APPLY_HOME/.codex/agents" ]
-  [ ! -e "$AGENTS_APPLY_HOME/.config/opencode/agents" ]
-  rm -rf "$AGENTS_APPLY_BASE"
-}
-
-@test "apply skips the agents render when the catalog has no agents" {
-  make_catalog_agents_apply_fixture
-  rm -f "$AGENTS_APPLY_WORKSPACE_DIR/catalog/.apm/agents/sample.agent.md"
-
-  run run_catalog_agents_apply
-
-  [ "$status" -eq 0 ]
-  [ -z "$(grep -- '--target claude' "$AGENTS_APPLY_CALL_LOG" || true)" ]
-  [ ! -e "$AGENTS_APPLY_HOME/.claude/agents" ]
-  rm -rf "$AGENTS_APPLY_BASE"
-}
-
 # --- catalog instructions and root migration ---------------------------------
 #
 # The guide lives in catalog/.apm/instructions/ai-collaboration.instructions.md.
-# APM writes the roots; the scripts only classify them, move legacy copies on
-# explicit request (migrate:roots), and copy the body to Pi and OpenCode.
+# APM writes the roots; the scripts only classify them and copy the body to
+# OpenCode.
 
 make_roots_fixture() {
   roots_workspace="$(mktemp -d)"
@@ -3766,10 +1383,6 @@ make_roots_fixture() {
 write_generated_root() {
   build_id=$(printf '%s\n%s' "$APM_GENERATED_ROOT_MARKER" "$2" | file_sha256 - | cut -c1-12)
   printf '%s\n<!-- Build ID: %s -->\n%s\n' "$APM_GENERATED_ROOT_MARKER" "$build_id" "$2" >"$1"
-}
-
-home_tree_listing() {
-  (cd "$roots_home" && find . -print | LC_ALL=C sort && find . -type f -exec shasum {} + | LC_ALL=C sort)
 }
 
 @test "catalog_instructions_body drops the frontmatter and leading blank lines, as APM renders a rule" {
@@ -3811,18 +1424,13 @@ home_tree_listing() {
   rm -rf "$roots_workspace" "$roots_home"
 }
 
-@test "user_root_state and the guard read a root larger than a pipe buffer under pipefail" {
+@test "user_root_state reads a root larger than a pipe buffer under pipefail" {
   make_roots_fixture
   large_body="$(printf '# Guide\n'; seq 1 50000)"
   write_generated_root "$roots_home/.codex/AGENTS.md" "$large_body"
   [ "$(user_root_state "$roots_home/.codex/AGENTS.md" "")" = generated ]
   printf 'my own line\n' >>"$roots_home/.codex/AGENTS.md"
   [ "$(user_root_state "$roots_home/.codex/AGENTS.md" "")" = edited-generated ]
-
-  printf '<!-- note -->\n%s\n' "$large_body" >"$roots_home/.claude/CLAUDE.md"
-  run assert_user_roots_migrated
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"opens with the catalog guide's title (# Guide)"* ]]
   rm -rf "$roots_workspace" "$roots_home"
 }
 
@@ -3853,103 +1461,6 @@ home_tree_listing() {
   rm -rf "$roots_workspace" "$roots_home"
 }
 
-@test "migrate:roots without --apply reports the plan and changes nothing" {
-  make_roots_fixture
-  cp "$roots_home/guide-body.md" "$roots_home/.claude/CLAUDE.md"
-  cp "$roots_home/guide-body.md" "$roots_home/.codex/AGENTS.md"
-  printf 'my cursor rules\n' >"$roots_home/.cursor/AGENTS.md"
-  before="$(home_tree_listing)"
-
-  run cmd_migrate_roots
-
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"Would move $roots_home/.claude/CLAUDE.md -> $roots_home/.claude/CLAUDE.md."*".bak"* ]]
-  [[ "$output" == *"Would move $roots_home/.codex/AGENTS.md -> "* ]]
-  [[ "$output" == *"cursor: $roots_home/.cursor/AGENTS.md differs from every catalog guide version"* ]]
-  [[ "$output" == *"Dry run: nothing was changed."* ]]
-  [ "$(home_tree_listing)" = "$before" ]
-  rm -rf "$roots_workspace" "$roots_home"
-}
-
-@test "migrate:roots --apply moves only legacy copies to <name>.<UTC>.bak and prints the rollback" {
-  make_roots_fixture
-  date() { printf '20261108T000000Z\n'; }
-  cp "$roots_home/guide-body.md" "$roots_home/.claude/CLAUDE.md"
-  write_generated_root "$roots_home/.codex/AGENTS.md" '# compiled'
-  ln -s "$roots_home/guide-body.md" "$roots_home/.cursor/AGENTS.md"
-
-  run cmd_migrate_roots --apply
-
-  [ "$status" -eq 0 ]
-  [ ! -e "$roots_home/.claude/CLAUDE.md" ]
-  cmp "$roots_home/.claude/CLAUDE.md.20261108T000000Z.bak" "$roots_home/guide-body.md"
-  [ "$(head -n 1 "$roots_home/.codex/AGENTS.md")" = "$APM_GENERATED_ROOT_MARKER" ]
-  [ -L "$roots_home/.cursor/AGENTS.md" ]
-  [ -z "$(find "$roots_home/.codex" "$roots_home/.cursor" -name '*.bak')" ]
-  [[ "$output" == *"mv '$roots_home/.claude/CLAUDE.md.20261108T000000Z.bak' '$roots_home/.claude/CLAUDE.md'"* ]]
-  [[ "$output" == *"mise run install:catalog"* ]]
-
-  run cmd_migrate_roots --apply
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"No root holds a legacy copy of the catalog guide"* ]]
-  rm -rf "$roots_workspace" "$roots_home"
-}
-
-@test "migrate:roots --apply moves nothing when a backup path already exists" {
-  make_roots_fixture
-  date() { printf '20261108T000000Z\n'; }
-  cp "$roots_home/guide-body.md" "$roots_home/.claude/CLAUDE.md"
-  cp "$roots_home/guide-body.md" "$roots_home/.codex/AGENTS.md"
-  printf 'older backup\n' >"$roots_home/.codex/AGENTS.md.20261108T000000Z.bak"
-
-  run cmd_migrate_roots --apply
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"Backup path already exists: $roots_home/.codex/AGENTS.md.20261108T000000Z.bak"* ]]
-  cmp "$roots_home/.claude/CLAUDE.md" "$roots_home/guide-body.md"
-  cmp "$roots_home/.codex/AGENTS.md" "$roots_home/guide-body.md"
-  [ "$(cat "$roots_home/.codex/AGENTS.md.20261108T000000Z.bak")" = "older backup" ]
-  rm -rf "$roots_workspace" "$roots_home"
-}
-
-@test "migrate:roots rejects an unknown argument" {
-  make_roots_fixture
-  run cmd_migrate_roots --force
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"usage: migrate:roots [--apply]"* ]]
-  rm -rf "$roots_workspace" "$roots_home"
-}
-
-@test "assert_user_roots_migrated fails only for a legacy copy in ~/.claude/CLAUDE.md" {
-  make_roots_fixture
-
-  run assert_user_roots_migrated
-  [ "$status" -eq 0 ]
-
-  printf 'my own claude rules\n' >"$roots_home/.claude/CLAUDE.md"
-  run assert_user_roots_migrated
-  [ "$status" -eq 0 ]
-
-  cp "$roots_home/guide-body.md" "$roots_home/.claude/CLAUDE.md"
-  run assert_user_roots_migrated
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"Claude would load it twice"* ]]
-  rm -rf "$roots_workspace" "$roots_home"
-}
-
-@test "assert_user_roots_migrated also refuses an edited or history-less older copy that keeps the guide's title" {
-  make_roots_fixture
-  # No git checkout, so the only known version is the current body; this stands for an older or edited copy.
-  printf '# Guide\n\nan older body line\nmy own addition\n' >"$roots_home/.claude/CLAUDE.md"
-
-  run assert_user_roots_migrated
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"opens with the catalog guide's title (# Guide) but matches no known version"* ]]
-  [ "$(cat "$roots_home/.claude/CLAUDE.md")" = "$(printf '# Guide\n\nan older body line\nmy own addition')" ]
-  rm -rf "$roots_workspace" "$roots_home"
-}
-
 @test "sync_opencode_instructions writes the body when absent or a legacy copy, and leaves a hand-written file" {
   make_roots_fixture
 
@@ -3965,125 +1476,6 @@ home_tree_listing() {
   rm -rf "$roots_workspace" "$roots_home"
 }
 
-@test "sync_pi_instructions copies the guide body without the instruction frontmatter" {
-  make_roots_fixture
-  run sync_pi_instructions
-  [ "$status" -eq 0 ]
-  cmp "$PI_OUTPUT" "$roots_home/guide-body.md"
-  rm -rf "$roots_workspace" "$roots_home"
-}
-
-@test "warn_pending_root_migration names each legacy root and leaves it in place" {
-  make_roots_fixture
-  managed_catalog_runtime_targets() {
-    printf '%s\n' 'claude|.claude|CLAUDE.md||apm' 'codex|.codex|AGENTS.md|.agents|-' 'opencode|.config/opencode|-|-|-'
-  }
-  cp "$roots_home/guide-body.md" "$roots_home/.claude/CLAUDE.md"
-  printf 'mine\n' >"$roots_home/.codex/AGENTS.md"
-
-  run warn_pending_root_migration
-
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"$roots_home/.claude/CLAUDE.md is still the copy the legacy catalog sync wrote"* ]]
-  [[ "$output" != *".codex/AGENTS.md"* ]]
-  cmp "$roots_home/.claude/CLAUDE.md" "$roots_home/guide-body.md"
-  rm -rf "$roots_workspace" "$roots_home"
-}
-
-@test "compile_user_root_contexts skips the compile until a user-scope package is installed" {
-  make_roots_fixture
-  apm() { printf 'apm %s\n' "$*"; }
-
-  run compile_user_root_contexts
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"Skipping user-scope root compile"* ]]
-  [[ "$output" != *"apm compile"* ]]
-
-  mkdir -p "$roots_home/.apm/apm_modules"
-  run compile_user_root_contexts
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"apm compile -g --clean"* ]]
-  rm -rf "$roots_workspace" "$roots_home"
-}
-
-@test "compile_user_root_contexts keeps a generated root edited after compile by skipping the compile" {
-  make_roots_fixture
-  mkdir -p "$roots_home/.apm/apm_modules"
-  apm() { printf 'apm %s\n' "$*"; }
-  write_generated_root "$roots_home/.codex/AGENTS.md" '# compiled'
-
-  run compile_user_root_contexts
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"apm compile -g --clean"* ]]
-
-  printf 'my own codex line\n' >>"$roots_home/.codex/AGENTS.md"
-  cp "$roots_home/.codex/AGENTS.md" "$roots_home/edited.before"
-  run compile_user_root_contexts
-
-  [ "$status" -eq 0 ]
-  [[ "$output" != *"apm compile -g"* ]]
-  [[ "$output" == *"Skipping user-scope root compile: these roots keep APM's marker but were edited after compile"* ]]
-  [[ "$output" == *"  $roots_home/.codex/AGENTS.md"* ]]
-  cmp "$roots_home/.codex/AGENTS.md" "$roots_home/edited.before"
-  rm -rf "$roots_workspace" "$roots_home"
-}
-
-@test "compile_user_root_contexts follows a Codex root symlink to an edited output, and leaves an edited Claude root to APM" {
-  make_roots_fixture
-  mkdir -p "$roots_home/.apm/apm_modules"
-  apm() { printf 'apm %s\n' "$*"; }
-  write_generated_root "$roots_home/.claude/CLAUDE.md" '# compiled'
-  printf 'my own claude line\n' >>"$roots_home/.claude/CLAUDE.md"
-
-  run compile_user_root_contexts
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"apm compile -g --clean"* ]]
-
-  write_generated_root "$roots_home/.codex/real.md" '# compiled'
-  printf 'my own codex line\n' >>"$roots_home/.codex/real.md"
-  ln -s real.md "$roots_home/.codex/AGENTS.md"
-  run compile_user_root_contexts
-
-  [ "$status" -eq 0 ]
-  [[ "$output" != *"apm compile -g"* ]]
-  [[ "$output" == *"  $roots_home/.codex/AGENTS.md"* ]]
-  [[ "$output" != *"  $roots_home/.claude/CLAUDE.md"* ]]
-  rm -rf "$roots_workspace" "$roots_home"
-}
-
-@test "assert_user_roots_migrated refuses a generated ~/.claude/CLAUDE.md edited after compile, which --clean keeps" {
-  make_roots_fixture
-  write_generated_root "$roots_home/.claude/CLAUDE.md" "$(cat "$roots_home/guide-body.md")"
-  run assert_user_roots_migrated
-  [ "$status" -eq 0 ]
-
-  printf 'my own claude line\n' >>"$roots_home/.claude/CLAUDE.md"
-  run assert_user_roots_migrated
-
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"keeps APM's marker but was edited after compile"*"Claude would load it twice"* ]]
-  [ "$(tail -n 1 "$roots_home/.claude/CLAUDE.md")" = "my own claude line" ]
-  rm -rf "$roots_workspace" "$roots_home"
-}
-
-@test "assert_user_roots_migrated refuses a compile output whose marker line was deleted, and a symlink to a compile output" {
-  make_roots_fixture
-  write_generated_root "$roots_home/compiled.md" "$(cat "$roots_home/guide-body.md")"
-  sed '1d' "$roots_home/compiled.md" >"$roots_home/.claude/CLAUDE.md"
-  printf 'my own claude line\n' >>"$roots_home/.claude/CLAUDE.md"
-
-  run assert_user_roots_migrated
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"opens with the catalog guide's title (# Guide)"* ]]
-
-  rm "$roots_home/.claude/CLAUDE.md"
-  ln -s ../compiled.md "$roots_home/.claude/CLAUDE.md"
-  run assert_user_roots_migrated
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"is a symlink to an apm compile output"*"Claude would load it twice"* ]]
-  rm -rf "$roots_workspace" "$roots_home"
-}
-
 @test "sync_opencode_instructions does not displace an edited generated ~/.claude/CLAUDE.md that OpenCode falls back to" {
   make_roots_fixture
   write_generated_root "$roots_home/.claude/CLAUDE.md" '# compiled'
@@ -4095,27 +1487,6 @@ home_tree_listing() {
   [ ! -e "$OPENCODE_INSTRUCTIONS_OUTPUT" ]
   [[ "$output" == *"OpenCode falls back to $roots_home/.claude/CLAUDE.md (edited-generated)"* ]]
   rm -rf "$roots_workspace" "$roots_home"
-}
-
-@test "apply leaves a legacy root and a hand-written root unchanged and warns about the legacy one" {
-  base="$(mktemp -d)"
-  bin_dir="$base/bin"
-  source "$TEST_REPO_ROOT/tests/conformance/build-fixture.sh"
-  build_apply_fixture "$base"
-  printf '# instructions\n' >"$FIXTURE_HOME/.codex/AGENTS.md"
-  mkdir -p "$FIXTURE_HOME/.cursor"
-  printf 'my cursor rules\n' >"$FIXTURE_HOME/.cursor/AGENTS.md"
-
-  run env HOME="$FIXTURE_HOME" XDG_STATE_HOME="$FIXTURE_HOME/.local/state" PATH="$FIXTURE_BIN_DIR:$PATH" \
-    APM_WORKSPACE_DIR="$FIXTURE_WORKSPACE_DIR" bash "$TEST_REPO_ROOT/scripts/apm-workspace.sh" apply
-
-  [ "$status" -eq 0 ]
-  [ "$(cat "$FIXTURE_HOME/.codex/AGENTS.md")" = "# instructions" ]
-  [ "$(cat "$FIXTURE_HOME/.cursor/AGENTS.md")" = "my cursor rules" ]
-  [[ "$output" == *"$FIXTURE_HOME/.codex/AGENTS.md is still the copy the legacy catalog sync wrote"* ]]
-  [ ! -e "$FIXTURE_HOME/.claude/CLAUDE.md" ]
-  [ "$(cat "$FIXTURE_HOME/.config/opencode/AGENTS.md")" = "# instructions" ]
-  rm -rf "$base"
 }
 
 @test "catalog_apm_dir_claim_message allows the catalog instruction and claims any other instruction" {
@@ -4170,7 +1541,7 @@ home_tree_listing() {
   [[ "$output" == *"claude: config=absent"* ]]
   [[ "$output" == *"Claude has neither $doctor_home/.claude/CLAUDE.md nor the guide rule"* ]]
   [[ "$output" == *"codex: config=legacy"* ]]
-  [[ "$output" == *"$doctor_home/.codex/AGENTS.md is still the copy the legacy catalog sync wrote"* ]]
+  [[ "$output" == *"$doctor_home/.codex/AGENTS.md is still the copy the retired legacy catalog sync wrote"* ]]
   [[ "$output" == *"opencode instructions: "* ]]
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
 }
@@ -4189,17 +1560,6 @@ home_tree_listing() {
   [[ "$output" == *"claude: config=edited-generated"* ]]
   [[ "$output" == *"Claude reads the guide from it as well as from the rule"* ]]
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
-}
-
-@test "migrate:roots runs as a command in a workspace that is not a git checkout" {
-  make_roots_fixture
-  cp "$roots_home/guide-body.md" "$roots_home/.claude/CLAUDE.md"
-
-  run env HOME="$roots_home" APM_WORKSPACE_DIR="$roots_workspace" bash "$SCRIPT_UNDER_TEST" migrate:roots
-
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"Would move $roots_home/.claude/CLAUDE.md -> "* ]]
-  rm -rf "$roots_workspace" "$roots_home"
 }
 
 write_catalog_lock_fixture() {
@@ -4263,7 +1623,7 @@ LOCK
   rm -rf "$WORKSPACE_DIR" "$HOME"
 }
 
-@test "check_catalog_lock_deployed_files only warns about a skill deleted from the working catalog before install:catalog" {
+@test "check_catalog_lock_deployed_files only warns about a skill deleted from the working catalog before the lock is next updated" {
   WORKSPACE_DIR="$(mktemp -d)"
   HOME="$(mktemp -d)"
   write_catalog_lock_fixture "$WORKSPACE_DIR/apm.lock.yaml"
@@ -4276,7 +1636,7 @@ LOCK
 
   [ "$status" -eq 0 ]
   [[ "$output" == *"listed=3 missing=0 stale=2 changed=0"* ]]
-  [[ "$output" == *"2 skill or agent file(s) recorded in apm.lock.yaml are gone"*"install:catalog"* ]]
+  [[ "$output" == *"2 skill or agent file(s) recorded in apm.lock.yaml are gone"*"they leave the lock when apm.lock.yaml is next updated"* ]]
   [[ "$output" != *"is missing"* ]]
   rm -rf "$WORKSPACE_DIR" "$HOME"
 }
@@ -4314,43 +1674,6 @@ commit_instruction_version() {
   [ ! -e "$OPENCODE_INSTRUCTIONS_OUTPUT" ]
   [[ "$output" == *"Not writing $OPENCODE_INSTRUCTIONS_OUTPUT: OpenCode falls back to $roots_home/.claude/CLAUDE.md (hand-written)"* ]]
   rm -rf "$roots_workspace" "$roots_home"
-}
-
-@test "migrate:roots accepts the -- that mise run forwards before --apply" {
-  make_roots_fixture
-  cp "$roots_home/guide-body.md" "$roots_home/.codex/AGENTS.md"
-
-  run cmd_migrate_roots -- --apply
-
-  [ "$status" -eq 0 ]
-  [ ! -e "$roots_home/.codex/AGENTS.md" ]
-  [ -n "$(find "$roots_home/.codex" -name 'AGENTS.md.*.bak')" ]
-  rm -rf "$roots_workspace" "$roots_home"
-}
-
-@test "install:catalog and refresh run the double-load guard before APM touches the user scope" {
-  require_apm() { :; }
-  ensure_workspace_repo() { :; }
-  ensure_workspace_scaffold() { :; }
-  ensure_workspace_mise_file() { :; }
-  refresh_workspace_checkout() { :; }
-  assert_tracked_catalog_published() { :; }
-  cmd_validate_catalog() { :; }
-  managed_skill_ids() { :; }
-  internal_cleanup_skill_ids() { :; }
-  assert_user_roots_migrated() { fail "guard stopped it"; }
-  register_catalog_dependency() { echo "registered"; }
-  apm() { echo "apm $*"; }
-
-  run cmd_register_catalog
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"guard stopped it"* ]]
-  [[ "$output" != *"registered"* ]]
-
-  run cmd_update
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"guard stopped it"* ]]
-  [[ "$output" != *"apm deps update"* ]]
 }
 
 @test "catalog_lock_deployed_entries also reads a catalog installed from a local path" {

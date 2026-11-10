@@ -77,50 +77,6 @@ Describe "APM 0.35 cache and doctor safeguards" -Tag "apm035" {
     { Write-DependencyState } | Should -Throw '*preview failed*'
   }
 
-  It "retains canonical gist content when only <Location> declares an alias" -TestCases @(
-    @{ Location = "manifest" }
-    @{ Location = "lock" }
-  ) {
-    param($Location)
-    $script:preview = "[>] Analyzing installed packages vs apm.yml...`n[!] Found 1 orphaned package(s):`n[!]   - owner/gist (would be removed)`n[*] Dry run complete - no changes made"
-    if ($Location -eq "manifest") {
-      Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.yml") -Value "dependencies:`n  apm:`n    - git: https://gist.github.com/owner/gist.git`n      alias: selected"
-    } else {
-      Set-Content -LiteralPath (Join-Path $WorkspaceDir "apm.lock.yaml") -Value "dependencies:`n- repo_url: owner/gist`n  alias: selected"
-    }
-    $output = Invoke-PruneCache 3>&1 6>&1 | Out-String
-    $output | Should -Match "Automatic prune skipped: aliased packages"
-    Test-Path -LiteralPath (Join-Path $WorkspaceDir "apm_modules/owner/gist/SKILL.md") | Should -BeTrue
-  }
-
-  It "retains removal candidates even without a protected alias" {
-    $script:preview = "[>] Analyzing installed packages vs apm.yml...`n[!] Found 1 orphaned package(s):`n[!]   - owner/gist (would be removed)`n[*] Dry run complete - no changes made"
-    $output = Invoke-PruneCache 3>&1 6>&1 | Out-String
-    $output | Should -Match "safety is unverified"
-    Test-Path -LiteralPath (Join-Path $WorkspaceDir "apm_modules/owner/gist/SKILL.md") | Should -BeTrue
-  }
-
-  It "uses only the read-only preview when clean" {
-    $output = Invoke-PruneCache 6>&1 | Out-String
-    $output | Should -Match "native prune was not executed"
-    Test-Path -LiteralPath (Join-Path $WorkspaceDir "apm_modules/owner/gist/SKILL.md") | Should -BeTrue
-  }
-
-  It "fails closed for unknown output and candidate count mismatch" {
-    $script:preview = "unknown preview"
-    { Invoke-PruneCache } | Should -Throw '*Unrecognized prune preview*'
-    $script:preview = "[>] Analyzing installed packages vs apm.yml...`n[!] Found 2 orphaned package(s):`n[!]   - owner/gist (would be removed)`n[*] Dry run complete - no changes made"
-    { Invoke-PruneCache } | Should -Throw '*Unrecognized prune preview*'
-  }
-
-  It "fails closed for symlinked cache content" {
-    $symlinkTarget = Join-Path $TestDrive "guards-cache-symlink-target"
-    $symlinkPath = Join-Path $WorkspaceDir "apm_modules/link"
-    New-Item -ItemType Directory -Path $symlinkTarget -Force | Out-Null
-    New-Item -ItemType SymbolicLink -Path $symlinkPath -Target $symlinkTarget | Out-Null
-    { Invoke-PruneCache } | Should -Throw '*Cache contains symlinks*'
-  }
-
   It "does not convert failed native preview into success" {
     Mock Get-ApmReadOnlyOutput { [pscustomobject]@{ ExitCode = 2; Output = "unsupported --dry-run" } }
     { & $script:realGetPrunePreview } | Should -Throw '*apm prune --dry-run failed*'

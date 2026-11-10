@@ -21,7 +21,6 @@ default_workspace_dir() {
 }
 WORKSPACE_DIR="${APM_WORKSPACE_DIR:-$(default_workspace_dir)}"
 WORKSPACE_REPO="${APM_WORKSPACE_REPO:-https://github.com/jey3dayo/apm-workspace.git}"
-PI_OUTPUT="${APM_PI_OUTPUT:-$HOME/AGENTS.md}"
 OPENCODE_INSTRUCTIONS_OUTPUT="${APM_OPENCODE_OUTPUT:-$HOME/.config/opencode/AGENTS.md}"
 CATALOG_INSTRUCTIONS_FILE_NAME="ai-collaboration.instructions.md"
 # The first line of every root context file `apm compile` writes (apm_cli/compilation/constants.py).
@@ -177,34 +176,6 @@ ensure_workspace_scaffold() {
   fi
 }
 
-# This workspace deploys global skills into the user-level runtime roots. Its
-# project-local skill directories are reserved for symlink bridges to
-# .apm/skills. Older APM project installs left physical skill directories here,
-# which causes a runtime opened in ~/.apm to discover both copies.
-workspace_skill_bridge_roots() {
-  printf '%s\n' \
-    "$WORKSPACE_DIR/.claude/skills" \
-    "$WORKSPACE_DIR/.agents/skills"
-}
-
-cleanup_legacy_workspace_skill_targets() {
-  workspace_skill_bridge_roots | while IFS= read -r bridge_root; do
-    [ -d "$bridge_root" ] || continue
-
-    find "$bridge_root" -mindepth 1 -maxdepth 1 -type d ! -type l -print0 | while IFS= read -r -d '' candidate_path; do
-      [ -f "$candidate_path/SKILL.md" ] || continue
-
-      case "$candidate_path" in
-        "$bridge_root"/*) ;;
-        *) fail "Refusing to remove legacy skill outside bridge root: $candidate_path" ;;
-      esac
-
-      rm -rf -- "$candidate_path"
-      log "Removed legacy project-scope skill target: $candidate_path"
-    done
-  done
-}
-
 catalog_build_dir() {
   printf '%s/%s\n' "$CATALOG_BUILD_ROOT" "$CATALOG_DIR_NAME"
 }
@@ -237,16 +208,8 @@ tracked_catalog_dir() {
   printf '%s/%s\n' "$WORKSPACE_DIR" "$CATALOG_DIR_NAME"
 }
 
-workspace_package_cache_root() {
-  printf '%s/apm_modules/jey3dayo/apm-workspace\n' "$WORKSPACE_DIR"
-}
-
 tracked_catalog_skills_root() {
   printf '%s/.apm/skills\n' "$(tracked_catalog_dir)"
-}
-
-private_skills_root() {
-  printf '%s/private-skills/.apm/skills\n' "$WORKSPACE_DIR"
 }
 
 tracked_catalog_agents_root() {
@@ -350,14 +313,9 @@ has_valid_apm_build_id() {
   [ "$recorded_build_id" = "$computed_build_id" ]
 }
 
-# Follows a symlink: APM resolves a Codex or Cursor root link inside its deploy root and overwrites the target.
-is_edited_generated_root() {
-  [ -f "$1" ] && apm_root_has_marker "$1" && ! has_valid_apm_build_id "$1"
-}
-
 # Classifies a root context file: absent, not-regular, generated (written by apm compile and unchanged since),
-# edited-generated (APM's marker kept but edited after compile), legacy (a byte copy of a catalog guide the legacy
-# sync wrote), or hand-written (anything else, which only its owner may change).
+# edited-generated (APM's marker kept but edited after compile), legacy (a byte copy of a catalog guide the retired
+# legacy sync wrote), or hand-written (anything else, which only its owner may change).
 user_root_state() {
   root_path="$1"
   known_blobs="$2"
@@ -378,25 +336,20 @@ user_root_state() {
   fi
 }
 
-tracked_catalog_relative_path() {
-  printf '%s\n' "$CATALOG_DIR_NAME"
-}
-
-# The catalog build recreates only catalog/.apm/skills, catalog/.apm/agents and the one catalog instruction, so
-# prepare:catalog would delete any other primitive there, and APM installs .apm/<primitive>/** whatever the package type
-# while the legacy sync still rewrites the same targets. Prints a message when catalog/.apm holds anything else.
+# The catalog package carries only catalog/.apm/skills, catalog/.apm/agents and the one catalog instruction, while APM
+# installs .apm/<primitive>/** whatever the package type. Prints a message when catalog/.apm holds anything else.
 catalog_apm_dir_claim_message() {
   apm_dir="$(tracked_catalog_dir)/.apm"
   if [ -L "$apm_dir" ]; then
-    printf 'catalog/.apm is a symlink, but the legacy catalog sync still owns every primitive: prepare:catalog would delete the link. Replace it with a real directory only in the change that retires its legacy writer.\n'
+    printf 'catalog/.apm is a symlink; validate:catalog needs a real directory there. Replace the link with a directory.\n'
     return 0
   fi
   [ -d "$apm_dir" ] || return 0
 
-  # A failed scan must claim: an unreadable directory would otherwise hide what prepare:catalog deletes.
+  # A failed scan must claim: an unreadable directory would otherwise hide what the catalog package would carry.
   if ! non_regular_entries=$(cd "$apm_dir" && find . -mindepth 1 ! -type d ! -type f) ||
     ! regular_files=$(cd "$apm_dir" && find . -mindepth 1 -type f); then
-    printf 'catalog/.apm could not be fully read, so prepare:catalog might delete what it holds. Make every entry under catalog/.apm readable first.\n'
+    printf 'catalog/.apm could not be fully read, so validate:catalog cannot tell what it holds. Make every entry under catalog/.apm readable first.\n'
     return 0
   fi
   # The classification below reads paths line by line, so a name with a newline could pose as SKILL.md; claim it instead.
@@ -443,17 +396,12 @@ catalog_apm_dir_claim_message() {
   case "$claimed_entry" in
     skills/* | agents/* | instructions/*)
       if [ -f "$apm_dir/$claimed_entry" ] && [ ! -L "$apm_dir/$claimed_entry" ]; then
-        printf 'catalog/.apm holds %s, which the catalog build does not carry: it keeps only files inside a skill directory (one holding SKILL.md), agents named agents/<name>.agent.md and instructions/%s, so prepare:catalog would delete it and apply would not deploy it. Move it into a skill, rename the agent, or merge the instruction into instructions/%s.\n' "$claimed_entry" "$CATALOG_INSTRUCTIONS_FILE_NAME" "$CATALOG_INSTRUCTIONS_FILE_NAME"
+        printf 'catalog/.apm holds %s, which the catalog build does not carry: it keeps only files inside a skill directory (one holding SKILL.md), agents named agents/<name>.agent.md and instructions/%s. Move it into a skill, rename the agent, or merge the instruction into instructions/%s.\n' "$claimed_entry" "$CATALOG_INSTRUCTIONS_FILE_NAME" "$CATALOG_INSTRUCTIONS_FILE_NAME"
         return 0
       fi
       ;;
   esac
-  printf 'catalog/.apm holds %s, but only catalog/.apm/skills, catalog/.apm/agents and the catalog instruction are migrated: the legacy catalog sync still owns every other primitive, so prepare:catalog would delete it and APM would install it alongside the sync output. Move a primitive into catalog/.apm only in the change that retires its legacy writer.\n' "$claimed_entry"
-}
-
-assert_catalog_apm_dir_unclaimed() {
-  claim_message=$(catalog_apm_dir_claim_message)
-  [ -z "$claim_message" ] || fail "Refusing to reset tracked catalog; $claim_message"
+  printf 'catalog/.apm holds %s, but the catalog package carries only catalog/.apm/skills, catalog/.apm/agents and the catalog instruction. Move it out of catalog/.apm.\n' "$claimed_entry"
 }
 
 skill_ids_from_root() {
@@ -486,75 +434,6 @@ reset_catalog_build_dir() {
   mkdir -p "$(catalog_build_skills_root)"
 }
 
-reset_tracked_catalog_dir() {
-  destination_dir=$(tracked_catalog_dir)
-  rm -rf "$destination_dir"
-  mkdir -p "$destination_dir"
-}
-
-assert_catalog_stage_safety() {
-  requested_count="$1"
-  tracked_dir=$(tracked_catalog_dir)
-  build_dir=$(catalog_build_dir)
-  tracked_skills_root=$(tracked_catalog_skills_root)
-  build_skills_root=$(catalog_build_skills_root)
-  allow_shrink="${APM_ALLOW_CATALOG_SHRINK:-}"
-
-  if ! is_path_under_dir "$tracked_dir" "$WORKSPACE_DIR"; then
-    fail "Refusing to reset catalog outside workspace: $tracked_dir"
-  fi
-
-  if ! is_path_under_dir "$build_dir" "$CATALOG_BUILD_ROOT"; then
-    fail "Refusing to stage catalog from unexpected build directory: $build_dir"
-  fi
-
-  if [ "$(canonical_path "$tracked_dir")" = "$(canonical_path "$build_dir")" ]; then
-    fail "Refusing to stage catalog because source and destination are the same path: $tracked_dir"
-  fi
-
-  assert_catalog_apm_dir_unclaimed
-
-  for required_path in \
-    "$build_dir/apm.yml" \
-    "$build_dir/README.md" \
-    "$(catalog_build_instructions_path)" \
-    "$build_skills_root" \
-    "$(catalog_build_agents_root)" \
-    "$(catalog_build_commands_root)" \
-    "$(catalog_build_rules_root)"; do
-    [ -e "$required_path" ] || fail "Refusing to reset tracked catalog; catalog build is incomplete: $required_path"
-  done
-
-  tracked_skill_count=$(tracked_catalog_skill_ids | awk 'NF { count++ } END { print count + 0 }')
-  build_skill_count=$(skill_ids_from_root "$build_skills_root" | awk 'NF { count++ } END { print count + 0 }')
-  [ "$tracked_skill_count" -gt 0 ] || fail "Refusing to reset tracked catalog; source catalog has no skills: $tracked_skills_root"
-  [ "$build_skill_count" -gt 0 ] || fail "Refusing to reset tracked catalog; catalog build has no skills: $build_skills_root"
-
-  if [ "$requested_count" -gt 0 ] && [ "$allow_shrink" != "1" ]; then
-    fail "Refusing to prepare a partial catalog because it would remove unrequested tracked skills. Set APM_ALLOW_CATALOG_SHRINK=1 only for an intentional shrink."
-  fi
-
-  if [ "$build_skill_count" -lt "$tracked_skill_count" ] && [ "$allow_shrink" != "1" ]; then
-    fail "Refusing to reset tracked catalog; catalog build would shrink skills from $tracked_skill_count to $build_skill_count. Set APM_ALLOW_CATALOG_SHRINK=1 only for an intentional shrink."
-  fi
-
-  for asset_spec in \
-    "agents|$(tracked_catalog_agents_root)|$(catalog_build_agents_root)" \
-    "commands|$(tracked_catalog_commands_root)|$(catalog_build_commands_root)" \
-    "rules|$(tracked_catalog_rules_root)|$(catalog_build_rules_root)" \
-    "claude-rules|$(tracked_catalog_claude_rules_root)|$(catalog_build_claude_rules_root)"; do
-    asset_label=${asset_spec%%|*}
-    rest=${asset_spec#*|}
-    current_root=${rest%%|*}
-    build_root=${rest#*|}
-    current_count=$(relative_file_list "$current_root" | awk 'NF { count++ } END { print count + 0 }')
-    build_count=$(relative_file_list "$build_root" | awk 'NF { count++ } END { print count + 0 }')
-    if [ "$current_count" -gt 0 ] && [ "$build_count" -eq 0 ] && [ "$allow_shrink" != "1" ]; then
-      fail "Refusing to reset tracked catalog; catalog build would empty $asset_label. Set APM_ALLOW_CATALOG_SHRINK=1 only for an intentional shrink."
-    fi
-  done
-}
-
 workspace_remote_to_repo_reference() {
   remote_url="$1"
 
@@ -576,141 +455,12 @@ workspace_remote_to_repo_reference() {
   esac
 }
 
-workspace_remote_url() {
-  remote_name="${1:-origin}"
-  ensure_workspace_repo
-
-  if remote_url=$(git -C "$WORKSPACE_DIR" remote get-url "$remote_name" 2>/dev/null); then
-    printf '%s\n' "$remote_url"
-    return 0
-  fi
-
-  if [ "$remote_name" = "origin" ]; then
-    printf '%s\n' "$WORKSPACE_REPO"
-    return 0
-  fi
-
-  fail "Could not resolve remote URL for '$remote_name'"
-}
-
-workspace_repo_reference() {
-  remote_name="${1:-origin}"
-  workspace_remote_to_repo_reference "$(workspace_remote_url "$remote_name")"
-}
-
-workspace_tracking_info() {
-  current_branch=$(git -C "$WORKSPACE_DIR" branch --show-current 2>/dev/null || true)
-  [ -n "$current_branch" ] || fail "Cannot register catalog from a detached HEAD. Check out a tracking branch first."
-
-  remote_name=$(git -C "$WORKSPACE_DIR" config --get "branch.$current_branch.remote" 2>/dev/null || true)
-  merge_ref=$(git -C "$WORKSPACE_DIR" config --get "branch.$current_branch.merge" 2>/dev/null || true)
-  [ -n "$remote_name" ] && [ -n "$merge_ref" ] || fail "Branch '$current_branch' has no upstream tracking branch. Push it first."
-
-  merge_branch=${merge_ref#refs/heads/}
-  printf '%s\036%s\n' "$remote_name" "$merge_branch"
-}
-
-tracked_catalog_reference() {
-  tracking_info=$(workspace_tracking_info)
-  remote_name=${tracking_info%%"$(printf '\036')"*}
-  branch_name=${tracking_info#*"$(printf '\036')"}
-  printf '%s/%s#%s\n' "$(workspace_repo_reference "$remote_name")" "$(tracked_catalog_relative_path)" "$branch_name"
-}
-
-assert_tracked_catalog_published() {
-  tracked_relative_path=$(tracked_catalog_relative_path)
-  tracked_dir=$(tracked_catalog_dir)
-
-  [ -d "$tracked_dir" ] || fail "Tracked catalog missing: $tracked_dir. Run 'mise run prepare:catalog' first."
-
-  if ! dirty=$(git -C "$WORKSPACE_DIR" status --porcelain -- "$tracked_relative_path" 2>/dev/null); then
-    fail "Failed to inspect git status for $tracked_relative_path"
-  fi
-  [ -z "$dirty" ] || fail "Tracked catalog has uncommitted changes. Commit and push $tracked_relative_path before registering it."
-
-  tracking_info=$(workspace_tracking_info)
-  remote_name=${tracking_info%%"$(printf '\036')"*}
-  branch_name=${tracking_info#*"$(printf '\036')"}
-  upstream="$remote_name/$branch_name"
-  if ! unpushed=$(git -C "$WORKSPACE_DIR" rev-list "$upstream..HEAD" -- "$tracked_relative_path" 2>/dev/null); then
-    fail "Failed to compare $tracked_relative_path against $upstream"
-  fi
-  [ -z "$unpushed" ] || fail "Tracked catalog has commits not on $upstream. Push the branch before registering it."
-}
-
-assert_catalog_cache_freshness() {
-  tracked_dir=$(tracked_catalog_dir)
-  cache_dir="$(workspace_package_cache_root)/catalog"
-
-  [ -d "$cache_dir" ] || fail "Local package cache missing: $cache_dir. Run 'mise run deploy:fresh' to rebuild it."
-
-  # Compare against git-tracked files only, not the filesystem listing:
-  # gitignored build artifacts (.pytest_cache/, __pycache__/, etc.) are never
-  # part of the deployed package, so they must never count as "missing" from
-  # the cache.
-  if ! tracked_files=$(git -C "$tracked_dir" ls-files 2>/dev/null | sort); then
-    fail "Failed to list git-tracked files in $tracked_dir. Cannot verify cache freshness."
-  fi
-  fresh_count=$(printf '%s\n' "$tracked_files" | grep -c . || true)
-  [ "$fresh_count" -gt 0 ] || fail "Tracked catalog has no git-tracked files: $tracked_dir. Cannot verify cache freshness."
-
-  missing=$(comm -23 <(printf '%s\n' "$tracked_files") <(relative_file_list "$cache_dir"))
-  if [ -n "$missing" ]; then
-    missing_count=$(printf '%s\n' "$missing" | wc -l | tr -d ' ')
-    examples=$(printf '%s\n' "$missing" | head -5 | tr '\n' ',' | sed 's/,$//' | sed 's/,/, /g')
-    fail "Local package cache is stale: $missing_count file(s) tracked in $tracked_dir are missing from $cache_dir (e.g. $examples). Run 'mise run deploy:fresh' to rebuild the cache and redeploy."
-  fi
-
-  mismatched=""
-  mismatched_count=0
-  while IFS= read -r relative_path; do
-    [ -n "$relative_path" ] || continue
-    if ! file_content_equal "$tracked_dir/$relative_path" "$cache_dir/$relative_path"; then
-      mismatched="$mismatched$relative_path"$'\n'
-      mismatched_count=$((mismatched_count + 1))
-    fi
-  done <<EOF
-$tracked_files
-EOF
-
-  if [ "$mismatched_count" -gt 0 ]; then
-    examples=$(printf '%s' "$mismatched" | head -5 | tr '\n' ',' | sed 's/,$//' | sed 's/,/, /g')
-    fail "Local package cache is stale: $mismatched_count file(s) tracked in $tracked_dir have different contents in $cache_dir (e.g. $examples). Run 'mise run deploy:fresh' to rebuild the cache and redeploy."
-  fi
-
-  log "Local package cache matches tracked catalog ($fresh_count files)."
-}
-
 managed_skill_content_dir() {
   skill_path_from_root "$(tracked_catalog_skills_root)" "$1"
   source_dir="$SKILL_PATH"
 
   [ -f "$source_dir/SKILL.md" ] || fail "Managed catalog skill missing SKILL.md: $source_dir"
   printf '%s\n' "$source_dir"
-}
-
-private_skill_content_dir() {
-  skill_path_from_root "$(private_skills_root)" "$1"
-  source_dir="$SKILL_PATH"
-
-  [ -f "$source_dir/SKILL.md" ] || fail "Private skill missing SKILL.md: $source_dir"
-  printf '%s\n' "$source_dir"
-}
-
-local_skill_content_dir() {
-  skill_id="$1"
-  validate_skill_id "$skill_id"
-
-  set +e
-  private_source=$(private_skill_content_dir "$skill_id" 2>/dev/null)
-  private_status=$?
-  set -e
-  if [ "$private_status" -eq 0 ] && [ -n "$private_source" ]; then
-    printf '%s\n' "$private_source"
-    return 0
-  fi
-
-  managed_skill_content_dir "$skill_id"
 }
 
 copy_managed_skill_into_catalog() {
@@ -765,108 +515,13 @@ copy_managed_claude_rule_assets_into_catalog() {
   cp -R "$source_dir"/. "$destination_dir"
 }
 
-legacy_skill_content_dir() {
-  skill_id="$1"
-  validate_skill_id "$skill_id"
-  skill_root="$LEGACY_SKILLS_DIR/$skill_id"
-
-  if [ ! -d "$skill_root" ]; then
-    fail "Legacy skill not found: $skill_root"
-  fi
-
-  if [ -f "$skill_root/SKILL.md" ]; then
-    printf '%s\n' "$skill_root"
-    return 0
-  fi
-
-  if [ -f "$skill_root/skills/SKILL.md" ]; then
-    printf '%s\n' "$skill_root/skills"
-    return 0
-  fi
-
-  fail "Legacy skill content dir missing SKILL.md: $skill_root"
-}
-
-manifest_has_local_packages() {
-  manifest_path="$WORKSPACE_DIR/apm.yml"
-
-  if [ ! -f "$manifest_path" ]; then
-    return 1
-  fi
-
-  grep -qE '^[[:space:]]*-[[:space:]]+\./packages/' "$manifest_path"
-}
-
-refresh_workspace_checkout() {
-  ensure_workspace_repo
-
-  if [ -n "$(git -C "$WORKSPACE_DIR" status --porcelain 2>/dev/null || true)" ]; then
-    warn "$WORKSPACE_DIR has local changes; skipping git pull."
-    return 0
-  fi
-
-  current_branch=$(git -C "$WORKSPACE_DIR" branch --show-current 2>/dev/null || true)
-  remote_name=$(git -C "$WORKSPACE_DIR" config --get "branch.$current_branch.remote" 2>/dev/null || true)
-  merge_ref=$(git -C "$WORKSPACE_DIR" config --get "branch.$current_branch.merge" 2>/dev/null || true)
-  merge_branch=${merge_ref#refs/heads/}
-  upstream="$remote_name/$merge_branch"
-
-  if [ -z "$current_branch" ] || [ -z "$remote_name" ] || [ -z "$merge_ref" ]; then
-    return 0
-  fi
-
-  if ! git -C "$WORKSPACE_DIR" show-ref --verify --quiet "refs/remotes/$upstream"; then
-    return 0
-  fi
-
-  log "Updating $WORKSPACE_DIR from $upstream"
-  git -C "$WORKSPACE_DIR" pull --ff-only
-}
-
 ensure_workspace_mise_file() {
   if [ ! -f "$MISE_DESTINATION" ]; then
     fail "Missing workspace mise.toml: $MISE_DESTINATION"
   fi
 }
 
-# User-scope compile never overwrites a root without APM's marker, so a hand-written or legacy root survives; --clean
-# removes only an unchanged APM-generated Claude root that native rules made redundant. APM 0.35.0 keeps an edited
-# Claude root but overwrites an edited Codex or Cursor root, so the compile is skipped while one of those holds edits.
-compile_user_root_contexts() {
-  require_apm
-  if [ ! -d "$HOME/.apm/apm_modules" ]; then
-    log "Skipping user-scope root compile: no APM package is installed at user scope yet (~/.apm/apm_modules)."
-    return 0
-  fi
-  edited_roots=$(edited_generated_user_roots)
-  if [ -n "$edited_roots" ]; then
-    warn "Skipping user-scope root compile: these roots keep APM's marker but were edited after compile, and apm compile would overwrite them:
-$edited_roots
-To keep your edits, delete the first line (the APM marker) so APM treats the file as hand-written; to let APM regenerate it, move the file aside (keep a .bak). Then re-run apply."
-    return 0
-  fi
-  (
-    cd "$WORKSPACE_DIR"
-    apm compile -g --clean
-  )
-}
-
-edited_generated_user_roots() {
-  while read_runtime_target; do
-    [ "$RT_CONFIG_NAME" != "-" ] && [ "$RT_TARGET_NAME" != claude ] || continue
-    root_path="$HOME/$RT_TARGET_DIR/$RT_CONFIG_NAME"
-    if is_edited_generated_root "$root_path"; then
-      printf '  %s\n' "$root_path"
-    fi
-  done < <(managed_catalog_runtime_targets)
-}
-
-sync_pi_instructions() {
-  [ -f "$(tracked_catalog_instructions_path)" ] || return 0
-  write_catalog_instructions_body "$PI_OUTPUT"
-}
-
-# OpenCode reads ~/.config/opencode/AGENTS.md before falling back to ~/.claude/CLAUDE.md, which migrate:roots removes;
+# OpenCode reads ~/.config/opencode/AGENTS.md before falling back to ~/.claude/CLAUDE.md;
 # APM writes that file only for an opencode target, and listing opencode would also hand it the agents it rejects.
 # A hand-written ~/.claude/CLAUDE.md is what OpenCode reads today, so the guide must not displace it.
 sync_opencode_instructions() {
@@ -882,141 +537,14 @@ sync_opencode_instructions() {
         *) log "Not writing $OPENCODE_INSTRUCTIONS_OUTPUT: OpenCode falls back to $HOME/.claude/CLAUDE.md ($claude_state), which is not the catalog guide." ;;
       esac
       ;;
-    *) warn "Leaving $OPENCODE_INSTRUCTIONS_OUTPUT as is ($opencode_state): it is not a copy of any committed version of the catalog guide, so OpenCode reads it instead of the guide. If it is a copy deployed from an uncommitted guide, move it aside and re-run apply." ;;
+    *) warn "Leaving $OPENCODE_INSTRUCTIONS_OUTPUT as is ($opencode_state): it is not a copy of any committed version of the catalog guide, so OpenCode reads it instead of the guide. If it is a copy deployed from an uncommitted guide, move it aside and re-run sync:opencode." ;;
   esac
 }
 
-# Writes only the OpenCode guide, so it is not refused on a native HOME where apply is.
+# Writes only the OpenCode guide; it is safe on a native HOME.
 cmd_sync_opencode() {
   require_command git
   sync_opencode_instructions
-}
-
-# A root the legacy sync copied stays in place until migrate:roots moves it; until then it shadows the APM output.
-warn_pending_root_migration() {
-  [ -f "$(tracked_catalog_instructions_path)" ] || return 0
-  known_blobs=$(legacy_catalog_instructions_blobs)
-  managed_catalog_runtime_targets | while read_runtime_target; do
-    [ "$RT_CONFIG_NAME" != "-" ] || continue
-    root_path="$HOME/$RT_TARGET_DIR/$RT_CONFIG_NAME"
-    if [ "$(user_root_state "$root_path" "$known_blobs")" = legacy ]; then
-      warn "$root_path is still the copy the legacy catalog sync wrote, so APM leaves it unchanged. Preview the move with 'mise run migrate:roots'."
-    fi
-  done
-}
-
-# APM adds the guide as a native Claude rule on every user-scope install, so a legacy copy in ~/.claude/CLAUDE.md
-# would make Claude load the guide twice.
-assert_user_roots_migrated() {
-  [ -f "$(tracked_catalog_instructions_path)" ] || return 0
-  claude_root="$HOME/.claude/CLAUDE.md"
-  [ -f "$claude_root" ] || return 0
-  require_command git
-  if [ -L "$claude_root" ] && apm_root_has_marker "$claude_root"; then
-    fail "Refusing to install catalog instructions: $claude_root is a symlink to an apm compile output, which apm compile --clean never removes, and APM would add the guide under ~/.claude/rules, so Claude would load it twice. Move the link aside by hand, then retry."
-  fi
-  if is_edited_generated_root "$claude_root"; then
-    fail "Refusing to install catalog instructions: $claude_root keeps APM's marker but was edited after compile, so apm compile --clean keeps it, and APM would add the guide under ~/.claude/rules, so Claude would load it twice. To keep your edits, delete the first line (the APM marker) and remove the guide from the file; otherwise move it aside by hand (keep a .bak). Then retry."
-  fi
-  if is_legacy_catalog_instructions_copy "$claude_root" "$(legacy_catalog_instructions_blobs)"; then
-    if [ -L "$claude_root" ]; then
-      fail "Refusing to install catalog instructions: $claude_root is a symlink to a copy of the catalog guide, and APM would add the same guide under ~/.claude/rules, so Claude would load it twice. migrate:roots does not move symlinks: move the link aside by hand, then retry."
-    fi
-    fail "Refusing to install catalog instructions: $claude_root is still the copy the legacy catalog sync wrote, and APM would add the same guide under ~/.claude/rules, so Claude would load it twice. Preview the move with 'mise run migrate:roots', then run 'mise run migrate:roots -- --apply'."
-  fi
-  # An unedited compile output is APM's to remove with --clean once the rule is in place; doctor reports one that stays.
-  if apm_root_has_marker "$claude_root" && has_valid_apm_build_id "$claude_root"; then
-    return 0
-  fi
-  # An edited copy, one older than the git history at hand, or a compile output whose marker line was deleted is not
-  # a byte match but opens with the guide's title once a BOM and leading HTML comment lines are skipped.
-  guide_title=$(awk '
-    NR == 1 && $0 == "---" { in_frontmatter = 1; next }
-    in_frontmatter { if ($0 == "---") in_frontmatter = 0; next }
-    NF { print; exit }
-  ' "$(tracked_catalog_instructions_path)")
-  root_title=$(awk -v bom="$(printf '\357\273\277')" '
-    NR == 1 && index($0, bom) == 1 { $0 = substr($0, length(bom) + 1) }
-    { sub(/\r$/, ""); sub(/^[ \t]+/, "") }
-    $0 == "" || /^<!--/ { next }
-    { print; exit }
-  ' "$claude_root")
-  if [ -n "$guide_title" ] && [ "$root_title" = "$guide_title" ]; then
-    fail "Refusing to install catalog instructions: $claude_root opens with the catalog guide's title ($guide_title) but matches no known version, so it is an edited or older copy. APM would add the guide under ~/.claude/rules and Claude would load it twice. migrate:roots does not move edited files: move $claude_root aside by hand (keep a .bak), or remove the guide from it, then retry."
-  fi
-}
-
-cmd_migrate_roots() {
-  [ "${1:-}" != "--" ] || shift
-  apply_mode=0
-  case "${1:-}" in
-    "") ;;
-    --apply) apply_mode=1 ;;
-    *) fail "usage: migrate:roots [--apply]" ;;
-  esac
-  [ "$#" -le 1 ] || fail "usage: migrate:roots [--apply]"
-  require_command git
-  [ -f "$(tracked_catalog_instructions_path)" ] || fail "Catalog instructions are missing: $(tracked_catalog_instructions_path)"
-
-  known_blobs=$(legacy_catalog_instructions_blobs)
-  stamp=$(date -u +%Y%m%dT%H%M%SZ)
-  planned_moves=""
-  while read_runtime_target; do
-    [ "$RT_CONFIG_NAME" != "-" ] || continue
-    root_path="$HOME/$RT_TARGET_DIR/$RT_CONFIG_NAME"
-    case "$(user_root_state "$root_path" "$known_blobs")" in
-      absent) log "$RT_TARGET_NAME: $root_path is absent; nothing to move." ;;
-      generated) log "$RT_TARGET_NAME: $root_path was written by apm compile; nothing to move." ;;
-      edited-generated) log "$RT_TARGET_NAME: $root_path keeps APM's marker but was edited after compile; left as is. Delete the marker line to keep it as your own file (for ~/.claude/CLAUDE.md also remove the guide, which the rule provides), or move it aside by hand." ;;
-      not-regular) log "$RT_TARGET_NAME: $root_path is not a regular file (symlink or other); left as is. Move it by hand if it points at a copy of the guide." ;;
-      hand-written) log "$RT_TARGET_NAME: $root_path differs from every catalog guide version, so it was edited or written by hand; left as is. APM will not write this root while it exists." ;;
-      legacy)
-        backup_path="$root_path.$stamp.bak"
-        if [ -e "$backup_path" ] || [ -L "$backup_path" ]; then
-          fail "Backup path already exists: $backup_path. Nothing was moved."
-        fi
-        planned_moves="$planned_moves$root_path|$backup_path
-"
-        ;;
-    esac
-  done < <(managed_catalog_runtime_targets)
-
-  if [ -z "$planned_moves" ]; then
-    log "No root holds a legacy copy of the catalog guide; nothing to migrate."
-    return 0
-  fi
-
-  completed_moves=""
-  while IFS='|' read -r root_path backup_path; do
-    [ -n "$root_path" ] || continue
-    if [ "$apply_mode" -eq 1 ]; then
-      if [ -e "$backup_path" ] || [ -L "$backup_path" ] || ! mv -n -- "$root_path" "$backup_path" ||
-        [ -e "$root_path" ] || [ ! -f "$backup_path" ]; then
-        [ -z "$completed_moves" ] || printf 'Already moved; roll back with:\n%s' "$completed_moves" >&2
-        fail "Could not move $root_path to $backup_path without overwriting; stopped."
-      fi
-      completed_moves="$completed_moves  mv '$backup_path' '$root_path'
-"
-      log "Moved $root_path -> $backup_path"
-    else
-      log "Would move $root_path -> $backup_path"
-    fi
-  done <<EOF
-$planned_moves
-EOF
-
-  if [ "$apply_mode" -eq 0 ]; then
-    log "Dry run: nothing was changed. Run 'mise run migrate:roots -- --apply' to move these files."
-    return 0
-  fi
-  log "Next: run 'mise run install:catalog' (adds the guide as ~/.claude/rules/${CATALOG_INSTRUCTIONS_FILE_NAME%.instructions.md}.md) and 'mise run deploy' (compiles the Codex and Cursor roots)."
-  log "Rollback: move each backup back (this replaces any root APM compiled since). If install:catalog already added ~/.claude/rules/${CATALOG_INSTRUCTIONS_FILE_NAME%.instructions.md}.md, move that rule aside too, or Claude loads the guide twice:"
-  while IFS='|' read -r root_path backup_path; do
-    [ -n "$root_path" ] || continue
-    log "  mv '$backup_path' '$root_path'"
-  done <<EOF
-$planned_moves
-EOF
 }
 
 validate_codex_skill_target_tree() {
@@ -1030,7 +558,7 @@ validate_codex_skill_target_tree() {
 
   if [ -n "$nested_skills" ]; then
     printf '%s\n' "$nested_skills" | sed "s#^\./#$target_skills_root/#" >&2
-    error "Nested Codex skill files found under $target_skills_root. Run 'mise run apply:skills:local' to refresh the target."
+    error "Nested Codex skill files found under $target_skills_root. Redeploy with section B of docs/native-distribution.md."
     return 1
   fi
 }
@@ -1038,7 +566,7 @@ validate_codex_skill_target_tree() {
 # agmsg resolves db/ and teams/ relative to its own script directory
 # ($HOME/.agents/skills/agmsg), so those two entries must stay symlinks into
 # $XDG_STATE_HOME/agmsg (see scripts/agmsg-state.sh:16). If anything outside
-# `apply` replaces a link with a plain dir or removes it, agmsg's error
+# the deploy flow replaces a link with a plain dir or removes it, agmsg's error
 # messages ("Team not found", empty identities) give no hint that the link
 # itself is the problem — the real db/teams data is untouched. Doctor checks
 # the canonical face only; other deployed faces (e.g. ~/.claude/skills/agmsg)
@@ -1103,71 +631,6 @@ validate_agmsg_roster_link() {
   return "$agmsg_link_ok"
 }
 
-# Restore agmsg's roster symlinks and fail the whole command if either the
-# restore script errors or the roster link postcondition
-# (validate_agmsg_roster_link) is not satisfied afterward. A zero exit from
-# agmsg-state.sh alone is not proof the roster ended up linked correctly, so
-# this checks what callers actually depend on instead of trusting the
-# script's own exit code. Use on the normal-completion path only — the
-# EXIT-trap recovery path uses agmsg_state_restore_report_failure below,
-# which must never turn a cleanup step into the reported failure.
-agmsg_state_restore_or_fail() {
-  "$REPO_ROOT/scripts/agmsg-state.sh" restore
-  validate_agmsg_roster_link \
-    || fail "agmsg roster restore ran but the roster link postcondition still fails; see the error above."
-}
-
-# Same restore call, but for use inside an EXIT trap that is recovering from
-# an already-failed command: report a restore failure instead of silently
-# swallowing it, without letting that failure (or `set -e`) overwrite the
-# exit status the trap is preserving. Never call `fail`/`exit` from here.
-agmsg_state_restore_report_failure() {
-  if ! "$REPO_ROOT/scripts/agmsg-state.sh" restore; then
-    error "agmsg roster restore failed while recovering from a failed command; the agmsg db/teams symlinks under \$HOME/.agents/skills/agmsg may be stale. Run 'mise run agmsg:state:restore' manually once the underlying failure is fixed."
-  fi
-}
-
-internal_deploy_target_roots() {
-  printf '%s\n' \
-    "$HOME/.claude/skills" \
-    "$HOME/.cursor/skills" \
-    "$HOME/.copilot/skills"
-}
-
-internal_target_skill_path() {
-  skill_path_from_root "$1" "$2"
-  printf '%s\n' "$SKILL_PATH"
-}
-
-internal_cleanup_skill_ids() {
-  skill_ids="$1"
-
-  printf '%s\n' "$skill_ids" | awk 'NF && !seen[$0]++'
-}
-
-remove_internal_target_links() {
-  skill_ids="$1"
-
-  internal_deploy_target_roots | while IFS= read -r target_root; do
-    [ -d "$target_root" ] || continue
-
-    printf '%s\n' "$skill_ids" | while IFS= read -r skill_id; do
-      [ -n "$skill_id" ] || continue
-      target_path=$(internal_target_skill_path "$target_root" "$skill_id")
-      literal_target_path="$target_root/$skill_id"
-
-      for candidate_path in "$literal_target_path" "$target_path"; do
-        [ -e "$candidate_path" ] || continue
-
-        if [ -L "$candidate_path" ]; then
-          rm -f "$candidate_path"
-          log "Removed existing symlink skill target before APM install: $candidate_path"
-        fi
-      done
-    done
-  done
-}
-
 relative_file_list() {
   root_dir="$1"
   if [ ! -d "$root_dir" ]; then
@@ -1178,89 +641,6 @@ relative_file_list() {
     cd "$root_dir"
     find . -type f | sed 's#^\./##' | sort
   )
-}
-
-canonical_path() {
-  path="$1"
-  if [ -d "$path" ]; then
-    (cd "$path" && pwd -P)
-    return 0
-  fi
-
-  parent_dir=$(dirname "$path")
-  base_name=$(basename "$path")
-  (cd "$parent_dir" && printf '%s/%s\n' "$(pwd -P)" "$base_name")
-}
-
-is_path_under_dir() {
-  path=$(canonical_path "$1")
-  directory=$(canonical_path "$2")
-
-  [ "$path" = "$directory" ] && return 0
-  case "$path" in
-    "$directory"/*) return 0 ;;
-    *) return 1 ;;
-  esac
-}
-
-migrate_package() {
-  package_relative_path="$1"
-  (
-    cd "$WORKSPACE_DIR"
-    apm install "./packages/$package_relative_path"
-  )
-}
-
-apm_install_has_diagnostics_failure() {
-  output_file="$1"
-  grep -Eq '\[[xX]\][[:space:]]+[1-9][0-9]* packages failed:' "$output_file" \
-    || grep -Eq 'Installed .* with [1-9][0-9]* error\(s\)\.' "$output_file"
-}
-
-run_workspace_install_command() {
-  output_file=$(mktemp)
-  pushd "$WORKSPACE_DIR" >/dev/null || fail "Workspace not found: $WORKSPACE_DIR"
-  if apm install "$@" >"$output_file" 2>&1; then
-    status=0
-  else
-    status=$?
-  fi
-  popd >/dev/null || true
-
-  cat "$output_file"
-  if [ "$status" -ne 0 ]; then
-    rm -f "$output_file"
-    fail "apm install failed: $*"
-  fi
-  if apm_install_has_diagnostics_failure "$output_file"; then
-    rm -f "$output_file"
-    fail "apm install reported integration diagnostics: $*"
-  fi
-
-  rm -f "$output_file"
-}
-
-run_workspace_update_command() {
-  output_file=$(mktemp)
-  pushd "$WORKSPACE_DIR" >/dev/null || fail "Workspace not found: $WORKSPACE_DIR"
-  if apm update "$@" >"$output_file" 2>&1; then
-    status=0
-  else
-    status=$?
-  fi
-  popd >/dev/null || true
-
-  cat "$output_file"
-  if [ "$status" -ne 0 ]; then
-    rm -f "$output_file"
-    fail "apm update failed: $*"
-  fi
-  if apm_install_has_diagnostics_failure "$output_file"; then
-    rm -f "$output_file"
-    fail "apm update reported integration diagnostics: $*"
-  fi
-
-  rm -f "$output_file"
 }
 
 resolve_1password_mcp_command() {
@@ -1337,329 +717,6 @@ cmd_setup_host_mcp() {
   log "Host-local 1Password MCP configuration is current."
 }
 
-install_workspace_mcp_dependencies() {
-  run_workspace_install_command -g --only mcp
-}
-
-normalize_codex_mcp_config() {
-  config_path="${1:-$WORKSPACE_DIR/.codex/config.toml}"
-  [ -f "$config_path" ] || return 0
-
-  # APM 0.28.0 emits its registry-only MCP identity field into Codex TOML.
-  # Codex rejects that field under --strict-config, so keep this compatibility
-  # boundary in the workspace rollout rather than editing generated output by hand.
-  sanitized_path=$(mktemp "$config_path.normalize.XXXXXX")
-  trap 'rm -f "$sanitized_path"' RETURN
-
-  awk '
-    /^\[mcp_servers\.[^.]+\]$/ { in_mcp_server = 1 }
-    /^\[/ && $0 !~ /^\[mcp_servers\.[^.]+\]$/ { in_mcp_server = 0 }
-    in_mcp_server && $0 ~ /^[[:space:]]*id[[:space:]]*=/ { next }
-    { print }
-  ' "$config_path" >"$sanitized_path"
-
-  if cmp -s "$config_path" "$sanitized_path"; then
-    return 0
-  fi
-
-  chmod 600 "$sanitized_path"
-  mv "$sanitized_path" "$config_path"
-  log "Removed unsupported Codex MCP identity fields: $config_path"
-}
-
-cmd_apply() {
-  require_apm
-  ensure_workspace_repo
-  ensure_workspace_scaffold
-  cmd_validate_catalog
-  ensure_workspace_mise_file
-
-  if manifest_has_local_packages; then
-    fail "apm 0.8.11 cannot deploy ./packages/* dependencies at user scope yet. Remove local package refs from ~/.apm/apm.yml and keep the global manifest on upstream refs such as jey3dayo/apm-workspace/catalog#main."
-  fi
-
-  apply_stage_root=$(mktemp -d "${TMPDIR:-/tmp}/apm-apply.XXXXXX")
-  # agmsg's roster (db/teams) lives inside the deploy target this command
-  # rewrites wholesale; save it now and bind restore to EXIT (not RETURN) so
-  # it fires on every path, including `fail`'s `exit` and any `set -e`
-  # abort — a RETURN trap never runs on those, only on a normal return. The
-  # trap only reports a failed recovery restore (agmsg_state_restore_report_failure);
-  # it must never mask the failure that triggered the trap in the first place.
-  "$REPO_ROOT/scripts/agmsg-state.sh" save
-  trap 'rm -rf "$apply_stage_root"; agmsg_state_restore_report_failure' EXIT
-
-  build_target_skill_trees "$apply_stage_root"
-  install_workspace_mcp_dependencies
-  normalize_codex_mcp_config
-  normalize_codex_mcp_config "$HOME/.codex/config.toml"
-  compile_user_root_contexts
-  sync_managed_catalog_runtime_assets
-  deploy_catalog_agents_via_apm
-  sync_pi_instructions
-  sync_opencode_instructions
-  warn_pending_root_migration
-  replace_skill_targets_from_stage "$apply_stage_root"
-  # The freshly placed agmsg skill has no db/teams links until restore runs;
-  # relink immediately so the roster window is the child swap itself, not the
-  # seconds the remaining apply steps take. A failed restore or an unmet
-  # link postcondition here aborts the command (via agmsg_state_restore_or_fail),
-  # which is caught by the EXIT trap above rather than left unnoticed.
-  agmsg_state_restore_or_fail
-  cleanup_legacy_workspace_skill_targets
-  sync_private_skills_into_targets
-
-  trap - EXIT
-  rm -rf "$apply_stage_root"
-  agmsg_state_restore_or_fail
-}
-
-requested_personal_skill_records() {
-  skill_ids=$(requested_local_skill_ids "$@")
-
-  printf '%s\n' "$skill_ids" | while IFS= read -r skill_id; do
-    [ -n "$skill_id" ] || continue
-    source_path=$(local_skill_content_dir "$skill_id")
-    printf 'personal\t%s\t%s\tcatalog\n' "$skill_id" "$source_path"
-  done
-}
-
-private_skill_records() {
-  private_skill_ids | while IFS= read -r skill_id; do
-    [ -n "$skill_id" ] || continue
-    source_path=$(private_skill_content_dir "$skill_id")
-    printf 'personal\t%s\t%s\tcatalog\n' "$skill_id" "$source_path"
-  done
-}
-
-# full apply's build_target_skill_trees/replace_skill_targets_from_stage path
-# stages only managed catalog skills, so private skills (private-skills/.apm/skills)
-# are not in the stage. The stale sweep spares the current ones
-# (current_private_skill_entries); this re-syncs them into both targets
-# afterward using the same records/helpers cmd_sync_local_skills uses.
-sync_private_skills_into_targets() {
-  skill_records=$(private_skill_records)
-  if [ -z "$(printf '%s' "$skill_records" | tr -d '[:space:]')" ]; then
-    return 0
-  fi
-
-  stage_root=$(mktemp -d "${TMPDIR:-/tmp}/apm-private-sync.XXXXXX")
-  trap 'rm -rf "$stage_root"' RETURN
-
-  stage_codex_skill_records "$skill_records" "$stage_root"
-  replace_codex_skill_target_from_stage "$stage_root" "$skill_records"
-  sync_claude_skill_symlinks_from_records "$skill_records"
-  cleanup_stale_claude_private_skill_symlinks
-
-  trap - RETURN
-  rm -rf "$stage_root"
-}
-
-stage_codex_skill_records() {
-  skill_records="$1"
-  stage_root="$2"
-  stage_skills_root="$stage_root/codex/skills"
-
-  mkdir -p "$stage_skills_root"
-  printf '%s\n' "$skill_records" | while IFS=$'\t' read -r _source_kind source_skill_id source_path _source_ref; do
-    [ -n "$source_skill_id" ] || continue
-    deployed_skill_name=$(format_skill_name "$source_skill_id")
-    staged_skill_path=$(internal_target_skill_path "$stage_skills_root" "$deployed_skill_name")
-    mkdir -p "$staged_skill_path"
-    cp -R "$source_path"/. "$staged_skill_path"
-  done
-}
-
-replace_codex_skill_target_from_stage() {
-  stage_root="$1"
-  skill_records="$2"
-  target_skills_root="$HOME/.agents/skills"
-  staged_skills_root="$stage_root/codex/skills"
-
-  mkdir -p "$target_skills_root"
-  [ -d "$staged_skills_root" ] || mkdir -p "$staged_skills_root"
-
-  printf '%s\n' "$skill_records" | while IFS=$'\t' read -r _source_kind source_skill_id _source_path _source_ref; do
-    [ -n "$source_skill_id" ] || continue
-    deployed_skill_name=$(format_skill_name "$source_skill_id")
-    staged_skill_path=$(internal_target_skill_path "$staged_skills_root" "$deployed_skill_name")
-    target_skill_path=$(internal_target_skill_path "$target_skills_root" "$deployed_skill_name")
-
-    mkdir -p "$(dirname "$target_skill_path")"
-    rm -rf "$target_skill_path"
-    mkdir -p "$target_skill_path"
-    cp -R "$staged_skill_path"/. "$target_skill_path"
-  done
-}
-
-skill_record_is_private() {
-  source_path="$1"
-  private_root=$(private_skills_root)
-  case "$source_path" in
-    "$private_root"/*) return 0 ;;
-    *) return 1 ;;
-  esac
-}
-
-sync_claude_skill_symlinks_from_records() {
-  skill_records="$1"
-  target_skills_root="$HOME/.claude/skills"
-
-  mkdir -p "$target_skills_root"
-
-  printf '%s\n' "$skill_records" | while IFS=$'\t' read -r _source_kind source_skill_id source_path _source_ref; do
-    [ -n "$source_skill_id" ] || continue
-    skill_record_is_private "$source_path" || continue
-
-    deployed_skill_name=$(format_skill_name "$source_skill_id")
-    target_skill_path=$(internal_target_skill_path "$target_skills_root" "$deployed_skill_name")
-
-    if [ -L "$target_skill_path" ]; then
-      current_link_target=$(readlink "$target_skill_path")
-      if [ "$current_link_target" = "$source_path" ]; then
-        continue
-      fi
-      log "Relinking private skill symlink: $target_skill_path -> $source_path"
-      rm -f "$target_skill_path"
-    elif [ -e "$target_skill_path" ]; then
-      log "Replacing deployed catalog skill with private skill symlink: $target_skill_path"
-      rm -rf "$target_skill_path"
-    fi
-
-    mkdir -p "$(dirname "$target_skill_path")"
-    ln -s "$source_path" "$target_skill_path"
-  done
-}
-
-cleanup_stale_claude_private_skill_symlinks() {
-  target_skills_root="$HOME/.claude/skills"
-  private_root=$(private_skills_root)
-
-  [ -d "$target_skills_root" ] || return 0
-
-  find "$target_skills_root" -type l | while IFS= read -r link_path; do
-    link_target=$(readlink "$link_path")
-    case "$link_target" in
-      "$private_root"/*) ;;
-      *) continue ;;
-    esac
-    [ -e "$link_path" ] && continue
-    log "Removing stale private skill symlink: $link_path"
-    rm -f "$link_path"
-  done
-}
-
-cmd_sync_local_skills() {
-  ensure_workspace_repo
-  ensure_workspace_scaffold
-
-  skill_records=$(requested_personal_skill_records "$@")
-  stage_root=$(mktemp -d "${TMPDIR:-/tmp}/apm-sync-local.XXXXXX")
-  # Same roster-preservation contract as cmd_apply: save before this command
-  # touches the Codex skill target tree, and bind restore to EXIT so it fires
-  # on both normal completion and any `set -e`/`fail` abort. The trap only
-  # reports a failed recovery restore; it must never mask the failure that
-  # triggered it.
-  "$REPO_ROOT/scripts/agmsg-state.sh" save
-  trap 'rm -rf "$stage_root"; agmsg_state_restore_report_failure' EXIT
-
-  stage_codex_skill_records "$skill_records" "$stage_root"
-  replace_codex_skill_target_from_stage "$stage_root" "$skill_records"
-  sync_claude_skill_symlinks_from_records "$skill_records"
-  cleanup_stale_claude_private_skill_symlinks
-
-  trap - EXIT
-  rm -rf "$stage_root"
-  agmsg_state_restore_or_fail
-  log "Synced local catalog/private skills to Codex target: $(printf '%s\n' "$skill_records" | awk -F '\t' 'NF >= 2 { print $2 }' | tr '\n' ',' | sed 's/,$//; s/,/, /g')"
-}
-
-repair_local_package_cache_entry() {
-  package_name="$1"
-  source_dir="$2"
-  cache_root=$(workspace_package_cache_root)
-  destination_dir="$cache_root/$package_name"
-
-  [ -d "$source_dir" ] || fail "Local package source missing: $source_dir"
-
-  mkdir -p "$cache_root"
-  # is_path_under_dir treats path == directory as "under"; an empty package
-  # name would make destination the cache root itself and rm -rf it wholesale,
-  # so require a strict subpath.
-  if [ -z "$package_name" ] \
-    || ! is_path_under_dir "$destination_dir" "$cache_root" \
-    || [ "$(canonical_path "$destination_dir")" = "$(canonical_path "$cache_root")" ]; then
-    fail "Refusing to rebuild cache outside apm_modules: $destination_dir"
-  fi
-  rm -rf "$destination_dir"
-  mkdir -p "$destination_dir"
-  cp -R "$source_dir"/. "$destination_dir"
-  log "Rebuilt APM package cache: $destination_dir"
-}
-
-cmd_repair_local_package_cache() {
-  ensure_workspace_repo
-  ensure_workspace_scaffold
-
-  repair_local_package_cache_entry "catalog" "$(tracked_catalog_dir)"
-  repair_local_package_cache_entry "manual-skills" "$WORKSPACE_DIR/manual-skills"
-}
-
-cmd_update() {
-  require_apm
-  ensure_workspace_repo
-  refresh_workspace_checkout
-  ensure_workspace_scaffold
-  cmd_validate_catalog
-  assert_user_roots_migrated
-
-  if manifest_has_local_packages; then
-    fail "apm 0.8.11 cannot update ./packages/* dependencies at user scope yet. Refresh stopped before deps update; remove local package refs from ~/.apm/apm.yml first."
-  fi
-
-  # `apm deps update -g` redeploys the agmsg skill dir; same save/restore contract as cmd_apply.
-  "$REPO_ROOT/scripts/agmsg-state.sh" save
-  trap 'agmsg_state_restore_report_failure' EXIT
-
-  (
-    cd "$WORKSPACE_DIR"
-    apm deps update -g
-  )
-
-  trap - EXIT
-  agmsg_state_restore_or_fail
-}
-
-cmd_install_pins() {
-  require_apm
-  ensure_workspace_repo
-  ensure_workspace_scaffold
-  assert_user_roots_migrated
-
-  # A bare `apm install -g` redeploys the agmsg skill dir; same save/restore contract as cmd_update.
-  "$REPO_ROOT/scripts/agmsg-state.sh" save
-  trap 'agmsg_state_restore_report_failure' EXIT
-
-  (
-    cd "$WORKSPACE_DIR"
-    apm install -g --only apm
-  )
-
-  trap - EXIT
-  agmsg_state_restore_or_fail
-}
-
-lock_pinned_reference_map() {
-  locked_external_skill_records | awk -F '|' '
-    {
-      canonical = $1
-      if ($2 != "") {
-        canonical = canonical "/" $2
-      }
-      printf "%s\t%s\n", canonical, $3
-    }
-  '
-}
-
 # Reports manifest apm dependency entries that are not yet pinned to a
 # lockfile commit. A structured mapping entry ("- git: <repo>" with a
 # sibling "skills:" list) reports the repo value, never the literal "git:"
@@ -1672,44 +729,8 @@ unpinned_external_references() {
   awk -f "$APM_AWK_DIR/manifest-unpinned-refs.awk" "$manifest_path"
 }
 
-cmd_pin_external() {
-  ensure_workspace_repo
-  ensure_workspace_scaffold
-
-  manifest_path="$WORKSPACE_DIR/apm.yml"
-  [ -f "$manifest_path" ] || fail "Manifest not found: $manifest_path"
-
-  map_file=$(mktemp)
-  lock_pinned_reference_map >"$map_file"
-
-  updated_file=$(mktemp)
-  awk -v map_file="$map_file" -f "$APM_AWK_DIR/pin-external.awk" "$manifest_path" >"$updated_file" 2>"$updated_file.count"
-
-  updated_count=$(tr -d '\r\n' <"$updated_file.count")
-  if [ "${updated_count:-0}" -eq 0 ]; then
-    rm -f "$map_file" "$updated_file" "$updated_file.count"
-    log "No external dependencies needed pinning."
-    return 0
-  fi
-
-  cat "$updated_file" >"$manifest_path"
-  rm -f "$map_file" "$updated_file" "$updated_file.count"
-  log "Pinned $updated_count external dependency references in apm.yml"
-}
-
 managed_skill_ids() {
   skill_ids_from_root "$(tracked_catalog_skills_root)"
-}
-
-private_skill_ids() {
-  skill_ids_from_root "$(private_skills_root)"
-}
-
-local_skill_ids() {
-  {
-    private_skill_ids
-    managed_skill_ids
-  } | awk 'NF > 0 && !seen[$0]++'
 }
 
 requested_catalog_skill_ids() {
@@ -1727,23 +748,7 @@ requested_catalog_skill_ids() {
   tracked_catalog_skill_ids
 }
 
-requested_local_skill_ids() {
-  if [ "$#" -gt 0 ]; then
-    available_skill_ids=$(local_skill_ids)
-    for skill_id in "$@"; do
-      validate_skill_id "$skill_id"
-      if ! printf '%s\n' "$available_skill_ids" | awk -v target="$skill_id" '$0 == target { found = 1; exit } END { exit(found ? 0 : 1) }'; then
-        fail "Requested local skill is not available in catalog/.apm/skills or private-skills: $skill_id"
-      fi
-      printf '%s\n' "$skill_id"
-    done
-    return 0
-  fi
-
-  local_skill_ids
-}
-
-# `apply` stages from apm.lock.yaml records offline, so a hand-bumped SHA pin
+# A deploy installs from apm.lock.yaml records, so a hand-bumped SHA pin
 # in apm.yml that the lock does not carry deploys the old commit with exit 0.
 validate_manifest_sha_pins() {
   manifest_path="$WORKSPACE_DIR/apm.yml"
@@ -1755,7 +760,7 @@ validate_manifest_sha_pins() {
 
   if [ ! -f "$lock_path" ]; then
     error "Lock file not found: $lock_path"
-    fail "apm.yml SHA pins differ from apm.lock.yaml; run 'mise run deploy:pins' to re-resolve them before deploying."
+    fail "apm.yml SHA pins differ from apm.lock.yaml; update the pinned entries of apm.lock.yaml to the same commits (no task re-resolves the root lock on a native HOME)."
   fi
 
   unmatched=$({
@@ -1774,7 +779,7 @@ EOF
   fi
 
   if [ "$unmatched_count" -gt 0 ]; then
-    fail "apm.yml SHA pins differ from apm.lock.yaml; run 'mise run deploy:pins' to re-resolve them before deploying."
+    fail "apm.yml SHA pins differ from apm.lock.yaml; update the pinned entries of apm.lock.yaml to the same commits (no task re-resolves the root lock on a native HOME)."
   fi
 }
 
@@ -1811,30 +816,6 @@ managed_rule_relative_paths() {
 
 tracked_catalog_rule_relative_paths() {
   relative_file_list "$(tracked_catalog_rules_root)"
-}
-
-file_content_equal() {
-  expected_path="$1"
-  actual_path="$2"
-
-  [ -f "$expected_path" ] || return 1
-  [ -f "$actual_path" ] || return 1
-
-  expected_hash=$(sha256sum "$expected_path" | awk '{print $1}')
-  actual_hash=$(sha256sum "$actual_path" | awk '{print $1}')
-  [ "$expected_hash" = "$actual_hash" ]
-}
-
-# True when two directories hold the same files with identical contents; any
-# missing, extra, or differing entry is unequal and falls back to a full swap.
-tree_content_equal() {
-  expected_root="$1"
-  actual_root="$2"
-
-  [ -d "$expected_root" ] || return 1
-  [ -d "$actual_root" ] || return 1
-
-  diff -rq "$expected_root" "$actual_root" >/dev/null 2>&1
 }
 
 tracked_catalog_skill_ids() {
@@ -1874,13 +855,13 @@ print_catalog_summary() {
 
 # Fields: name|home-relative root|config file|skills root override|agents face.
 # The config file is the root context `apm compile -g` writes from the catalog
-# instruction; no sync writes it, and migrate:roots moves a legacy copy aside.
+# instruction; no sync writes it.
 # A "-" config file marks a target without one: OpenCode gets the guide from
 # sync_opencode_instructions; see docs/package-decisions.md.
 # A "-" skills override marks a target with no skills face. An "apm" agents face
-# marks a target whose agents/ apply fills from an APM render of
-# catalog/.apm/agents (deploy_catalog_agents_via_apm): the sync neither writes
-# nor prunes it, and doctor compares its content. A "-" agents face
+# marks a target whose agents/ is filled from an APM render of
+# catalog/.apm/agents: the sync neither writes nor prunes it, and doctor compares
+# its content. A "-" agents face
 # marks one that must not receive the catalog agents at all (any agents/ is
 # removed). OpenCode takes both "-" faces:
 # it reads skills from ~/.claude/skills and ~/.agents/skills already, and it
@@ -1916,827 +897,6 @@ managed_catalog_skill_inventory() {
   done
 }
 
-manifest_external_references() {
-  manifest_path="$WORKSPACE_DIR/apm.yml"
-  [ -f "$manifest_path" ] || return 0
-
-  awk -f "$APM_AWK_DIR/manifest-external-refs.awk" "$manifest_path"
-}
-
-manifest_external_skill_subset() {
-  target_ref="$1"
-  manifest_path="$WORKSPACE_DIR/apm.yml"
-  [ -f "$manifest_path" ] || return 0
-
-  awk -v wanted="$target_ref" -f "$APM_AWK_DIR/manifest-ref-normalize.awk" -f "$APM_AWK_DIR/manifest-skill-subset.awk" "$manifest_path"
-}
-
-# Looks up the `alias:` value declared alongside an object-form dependency
-# entry (`- git: <ref>` ... `alias: <name>`) for the given git ref. apm 0.29.0
-# stages and deploys aliased dependencies under that alias, so the workspace
-# adapter must derive skill ids and search apm_modules the same way instead of
-# falling back to the repo_url/virtual_path tail. Returns empty when the
-# dependency has no object-form entry or no alias field.
-manifest_dependency_alias() {
-  target_ref="$1"
-  manifest_path="$WORKSPACE_DIR/apm.yml"
-  [ -f "$manifest_path" ] || return 0
-
-  awk -v wanted="$target_ref" -f "$APM_AWK_DIR/manifest-ref-normalize.awk" -f "$APM_AWK_DIR/manifest-dependency-alias.awk" "$manifest_path"
-}
-
-manifest_dependency_alias_for_record() {
-  local repo_url="$1"
-  local virtual_path="$2"
-  local target_ref="$repo_url"
-  if [ -n "$virtual_path" ]; then
-    target_ref="$target_ref/$virtual_path"
-  fi
-  manifest_dependency_alias "$target_ref"
-}
-
-manifest_external_reference_keys() {
-  manifest_external_references | awk -f "$APM_AWK_DIR/manifest-ref-normalize.awk" -f "$APM_AWK_DIR/manifest-reference-keys.awk" | awk 'NF && !seen[$0]++'
-}
-
-external_skill_relative_path() {
-  virtual_path="$1"
-
-  if [ -z "$virtual_path" ]; then
-    printf '\n'
-    return 0
-  fi
-
-  case "$virtual_path" in
-    skills/*)
-      relative_path=${virtual_path#skills/}
-      ;;
-    */skills/*)
-      relative_path=${virtual_path#*/skills/}
-      ;;
-    */*)
-      relative_path=$virtual_path
-      ;;
-    [A-Za-z0-9]*)
-      relative_path=$virtual_path
-      ;;
-    *)
-      fail "Invalid external skill virtual path: $virtual_path"
-      ;;
-  esac
-
-  case "$relative_path" in
-    .*/*)
-      relative_path=${relative_path#*/}
-      ;;
-  esac
-
-  [ -n "$relative_path" ] || fail "Invalid external skill virtual path: $virtual_path"
-
-  printf '%s\n' "$relative_path"
-}
-
-external_skill_id_from_virtual_path() {
-  virtual_path="$1"
-  relative_path=$(external_skill_relative_path "$virtual_path")
-
-  [ -n "$relative_path" ] || fail "Invalid external skill virtual path: $virtual_path"
-
-  old_ifs=$IFS
-  IFS='/'
-  # shellcheck disable=SC2086
-  set -- $relative_path
-  IFS=$old_ifs
-  validate_skill_path_segments "$virtual_path" "$@"
-
-  skill_id="$1"
-  shift
-  for segment in "$@"; do
-    skill_id="$skill_id:$segment"
-  done
-  validate_skill_id "$skill_id"
-  printf '%s\n' "$skill_id"
-}
-
-external_skill_id_from_record() {
-  repo_url="$1"
-  virtual_path="$2"
-
-  alias_skill_id=$(manifest_dependency_alias_for_record "$repo_url" "$virtual_path")
-  if [ -n "$alias_skill_id" ]; then
-    validate_skill_id "$alias_skill_id"
-    printf '%s\n' "$alias_skill_id"
-    return 0
-  fi
-
-  if [ -z "$virtual_path" ]; then
-    old_ifs=$IFS
-    IFS='/'
-    # shellcheck disable=SC2086
-    set -- $repo_url
-    IFS=$old_ifs
-    validate_skill_path_segments "$repo_url" "$@"
-    skill_id="${!#}"
-    validate_skill_id "$skill_id"
-    printf '%s\n' "$skill_id"
-    return 0
-  fi
-
-  external_skill_id_from_virtual_path "$virtual_path"
-}
-
-external_skill_content_dir() {
-  repo_url="$1"
-  virtual_path="$2"
-  resolved_commit="$3"
-  apm_modules_root="$WORKSPACE_DIR/apm_modules"
-  relative_path=$(external_skill_relative_path "$virtual_path")
-
-  [ -d "$apm_modules_root" ] || fail "External skill cache missing: $apm_modules_root"
-
-  # apm 0.29.0 stages an aliased dependency under apm_modules/<alias> while
-  # also keeping the canonical apm_modules/<repo_url> copy in place. Try the
-  # alias location first and return as soon as it resolves: folding it into
-  # the single candidate_paths list below would make the two intentionally
-  # duplicated copies look "ambiguous" and abort every alias lookup.
-  alias_id=$(manifest_dependency_alias_for_record "$repo_url" "$virtual_path")
-  if [ -n "$alias_id" ]; then
-    alias_candidate_paths=""
-    if [ -n "$virtual_path" ]; then
-      # apm 0.35 stages a `path:` + `alias:` dependency flat under
-      # apm_modules/<alias>, so the bare alias roots are candidates too.
-      alias_candidate_paths=$(printf '%s\n%s\n%s\n%s\n%s\n%s\n' \
-        "$apm_modules_root/$alias_id/$virtual_path" \
-        "$apm_modules_root/$alias_id/$resolved_commit/$virtual_path" \
-        "$apm_modules_root/$resolved_commit/$alias_id/$virtual_path" \
-        "$apm_modules_root/$alias_id" \
-        "$apm_modules_root/$alias_id/$resolved_commit" \
-        "$apm_modules_root/$resolved_commit/$alias_id")
-    else
-      alias_candidate_paths=$(printf '%s\n%s\n%s\n' \
-        "$apm_modules_root/$alias_id" \
-        "$apm_modules_root/$alias_id/$resolved_commit" \
-        "$apm_modules_root/$resolved_commit/$alias_id")
-    fi
-
-    if [ -n "$relative_path" ] && [ "$relative_path" != "$virtual_path" ]; then
-      alias_candidate_paths=$(printf '%s\n%s\n%s\n%s\n' \
-        "$alias_candidate_paths" \
-        "$apm_modules_root/$alias_id/$relative_path" \
-        "$apm_modules_root/$alias_id/$resolved_commit/$relative_path" \
-        "$apm_modules_root/$resolved_commit/$alias_id/$relative_path")
-    fi
-
-    alias_found_path=""
-    while IFS= read -r candidate_path; do
-      [ -n "$candidate_path" ] || continue
-      [ -f "$candidate_path/SKILL.md" ] || continue
-      if [ -n "$alias_found_path" ] && [ "$alias_found_path" != "$candidate_path" ]; then
-        fail "Ambiguous external skill cache paths for $repo_url/$virtual_path (alias: $alias_id)"
-      fi
-      alias_found_path="$candidate_path"
-    done <<EOF
-$alias_candidate_paths
-EOF
-
-    if [ -n "$alias_found_path" ]; then
-      printf '%s\n' "$alias_found_path"
-      return 0
-    fi
-  fi
-
-  found_path=""
-  candidate_paths=""
-  if [ -n "$virtual_path" ]; then
-    candidate_paths=$(printf '%s\n%s\n%s\n' \
-      "$apm_modules_root/$repo_url/$virtual_path" \
-      "$apm_modules_root/$repo_url/$resolved_commit/$virtual_path" \
-      "$apm_modules_root/$resolved_commit/$repo_url/$virtual_path")
-  else
-    candidate_paths=$(printf '%s\n%s\n%s\n' \
-      "$apm_modules_root/$repo_url" \
-      "$apm_modules_root/$repo_url/$resolved_commit" \
-      "$apm_modules_root/$resolved_commit/$repo_url")
-  fi
-
-  if [ -n "$relative_path" ] && [ "$relative_path" != "$virtual_path" ]; then
-    candidate_paths=$(printf '%s\n%s\n%s\n%s\n' \
-      "$candidate_paths" \
-      "$apm_modules_root/$repo_url/$relative_path" \
-      "$apm_modules_root/$repo_url/$resolved_commit/$relative_path" \
-      "$apm_modules_root/$resolved_commit/$repo_url/$relative_path")
-  fi
-
-  while IFS= read -r candidate_path; do
-    [ -n "$candidate_path" ] || continue
-    [ -f "$candidate_path/SKILL.md" ] || continue
-    if [ -n "$found_path" ] && [ "$found_path" != "$candidate_path" ]; then
-      fail "Ambiguous external skill cache paths for $repo_url/$virtual_path"
-    fi
-    found_path="$candidate_path"
-  done <<EOF
-$candidate_paths
-EOF
-
-  if [ -n "$found_path" ]; then
-    printf '%s\n' "$found_path"
-    return 0
-  fi
-
-  if [ -z "$virtual_path" ]; then
-    fail "Missing external skill cache for $repo_url@$resolved_commit"
-  fi
-
-  search_matches=$(
-    rg --files -uu "$apm_modules_root" -g 'SKILL.md' 2>/dev/null | awk -v root="$apm_modules_root/" -v suffix1="$virtual_path" -v suffix2="$relative_path" -v repo="$repo_url" -v commit="$resolved_commit" '
-      function matches_suffix(rel, suffix, expected) {
-        if (suffix == "") {
-          return 0
-        }
-
-        expected = "/" suffix "/SKILL.md"
-        return length(rel) >= length(expected) && substr(rel, length(rel) - length(expected) + 1) == expected
-      }
-      {
-        rel = $0
-        if (index(rel, root) == 1) {
-          rel = substr(rel, length(root) + 1)
-        }
-        if (!matches_suffix(rel, suffix1) && !matches_suffix(rel, suffix2)) {
-          next
-        }
-
-        score = 0
-        if (index(rel, repo) > 0) {
-          score += 10
-        }
-        if (commit != "" && index(rel, commit) > 0) {
-          score += 1
-        }
-        directory = rel
-        sub(/\/SKILL\.md$/, "", directory)
-        print score "\t" root directory
-      }
-    ' | sort -t "$(printf '\t')" -k1,1nr -k2,2
-  ) || true
-
-  best_match=$(printf '%s\n' "$search_matches" | awk -F '\t' '
-    NR == 1 {
-      best_score = $1
-      best_path = $2
-      top_count = 1
-      next
-    }
-    $1 == best_score {
-      top_count++
-    }
-    END {
-      if (best_path == "") {
-        exit 1
-      }
-      if (top_count != 1) {
-        exit 2
-      }
-      print best_path
-    }
-  ')
-  best_status=$?
-  case "$best_status" in
-    0)
-      printf '%s\n' "$best_match"
-      ;;
-    1)
-      fail "Missing external skill cache for $repo_url/$virtual_path@$resolved_commit"
-      ;;
-    *)
-      fail "Ambiguous external skill cache for $repo_url/$virtual_path@$resolved_commit"
-      ;;
-  esac
-}
-
-external_package_skills_root() {
-  repo_url="$1"
-  virtual_path="$2"
-  resolved_commit="$3"
-  apm_modules_root="$WORKSPACE_DIR/apm_modules"
-
-  [ -d "$apm_modules_root" ] || return 1
-
-  if [ -n "$virtual_path" ]; then
-    candidate_paths=$(printf '%s\n%s\n%s\n' \
-      "$apm_modules_root/$repo_url/$virtual_path" \
-      "$apm_modules_root/$repo_url/$resolved_commit/$virtual_path" \
-      "$apm_modules_root/$resolved_commit/$repo_url/$virtual_path")
-  else
-    candidate_paths=$(printf '%s\n%s\n%s\n' \
-      "$apm_modules_root/$repo_url" \
-      "$apm_modules_root/$repo_url/$resolved_commit" \
-      "$apm_modules_root/$resolved_commit/$repo_url")
-  fi
-
-  allow_plain_skills_fallback=0
-  if [ -z "$virtual_path" ] && [ -n "$(manifest_external_skill_subset "$repo_url")" ]; then
-    allow_plain_skills_fallback=1
-  fi
-
-  found_root=""
-  while IFS= read -r candidate_path; do
-    [ -n "$candidate_path" ] || continue
-    skills_root="$candidate_path/.apm/skills"
-    if [ -d "$skills_root" ]; then
-      resolved_root="$skills_root"
-    elif [ "$allow_plain_skills_fallback" -eq 1 ]; then
-      plain_skills_root="$candidate_path/skills"
-      if [ -d "$plain_skills_root" ] && [ -n "$(skill_ids_from_root "$plain_skills_root")" ]; then
-        resolved_root="$plain_skills_root"
-      else
-        continue
-      fi
-    else
-      continue
-    fi
-    if [ -n "$found_root" ] && [ "$found_root" != "$resolved_root" ]; then
-      fail "Ambiguous external package cache paths for $repo_url/$virtual_path"
-    fi
-    found_root="$resolved_root"
-  done <<EOF
-$candidate_paths
-EOF
-
-  [ -n "$found_root" ] || return 1
-  printf '%s\n' "$found_root"
-}
-
-external_package_skill_source_path() {
-  package_skills_root="$1"
-  skill_id="$2"
-  relative_skill_path=$(skill_id_to_manifest_path "$skill_id")
-
-  case "$package_skills_root" in
-    */.apm/skills)
-      package_root=${package_skills_root%/.apm/skills}
-      claude_skill_path="$package_root/.claude/skills/$relative_skill_path"
-      if [ -f "$claude_skill_path/SKILL.md" ]; then
-        printf '%s\n' "$claude_skill_path"
-        return 0
-      fi
-      ;;
-  esac
-
-  printf '%s\n' "$package_skills_root/$relative_skill_path"
-}
-
-collect_personal_skill_records() {
-  managed_skill_ids | while IFS= read -r skill_id; do
-    [ -n "$skill_id" ] || continue
-    source_path=$(managed_skill_content_dir "$skill_id")
-    printf 'personal\t%s\t%s\tcatalog\n' "$skill_id" "$source_path"
-  done
-}
-
-collect_external_skill_records() {
-  manifest_refs_file=$(mktemp "${TMPDIR:-/tmp}/apm-manifest-refs.XXXXXX")
-  manifest_keys_file=$(mktemp "${TMPDIR:-/tmp}/apm-manifest-keys.XXXXXX")
-  lock_records_file=$(mktemp "${TMPDIR:-/tmp}/apm-lock-records.XXXXXX")
-  matched_keys_file=$(mktemp "${TMPDIR:-/tmp}/apm-lock-matches.XXXXXX")
-  : >"$matched_keys_file"
-
-  manifest_external_references >"$manifest_refs_file"
-  manifest_external_reference_keys >"$manifest_keys_file"
-  locked_external_skill_records >"$lock_records_file"
-
-  if [ ! -s "$manifest_refs_file" ] && [ ! -s "$lock_records_file" ]; then
-    rm -f "$manifest_refs_file" "$manifest_keys_file" "$lock_records_file" "$matched_keys_file"
-    return 0
-  fi
-
-  has_failure=0
-  while IFS='|' read -r repo_url virtual_path resolved_commit resolved_ref; do
-    [ -n "$repo_url" ] || continue
-    canonical_ref="$repo_url"
-    if [ -n "$virtual_path" ]; then
-      canonical_ref="$canonical_ref/$virtual_path"
-    fi
-
-    if [ "$canonical_ref" = "jey3dayo/apm-workspace/catalog" ]; then
-      continue
-    fi
-
-    if ! awk -v key="$canonical_ref" '
-      function normalize_repo(ref, parts, count, i, normalized) {
-        if (index(ref, ":") > 0) return ref
-        count = split(ref, parts, "/")
-        if (count < 2) return ref
-        normalized = tolower(parts[1]) "/" tolower(parts[2])
-        for (i = 3; i <= count; i++) normalized = normalized "/" parts[i]
-        return normalized
-      }
-      normalize_repo($0) == normalize_repo(key) { found = 1; exit }
-      END { exit(found ? 0 : 1) }
-    ' "$manifest_keys_file"; then
-      error "External lock record is not declared in apm.yml: $canonical_ref (removed on purpose? run 'apm lock -g' then 'mise run deploy')"
-      has_failure=1
-      continue
-    fi
-
-    printf '%s\n' "$canonical_ref" >>"$matched_keys_file"
-    printf '%s#%s\n' "$canonical_ref" "$resolved_commit" >>"$matched_keys_file"
-    if [ -n "$resolved_ref" ]; then
-      printf '%s#%s\n' "$canonical_ref" "$resolved_ref" >>"$matched_keys_file"
-    fi
-
-    package_skills_root=$(external_package_skills_root "$repo_url" "$virtual_path" "$resolved_commit" 2>/dev/null || true)
-    if [ -n "$package_skills_root" ]; then
-      skill_subset=$(manifest_external_skill_subset "$repo_url")
-      skill_ids_from_root "$package_skills_root" | while IFS= read -r source_skill_id; do
-        [ -n "$source_skill_id" ] || continue
-        if [ -n "$skill_subset" ] && ! printf '%s\n' "$skill_subset" | awk -v skill_id="$source_skill_id" '$0 == skill_id { found = 1; exit } END { exit(found ? 0 : 1) }'; then
-          continue
-        fi
-        source_path=$(external_package_skill_source_path "$package_skills_root" "$source_skill_id")
-        printf 'external\t%s\t%s\t%s#%s\n' "$source_skill_id" "$source_path" "$canonical_ref" "$source_skill_id"
-      done
-      continue
-    fi
-
-    source_skill_id=$(external_skill_id_from_record "$repo_url" "$virtual_path")
-    source_path=$(external_skill_content_dir "$repo_url" "$virtual_path" "$resolved_commit")
-    printf 'external\t%s\t%s\t%s\n' "$source_skill_id" "$source_path" "$canonical_ref"
-  done <"$lock_records_file"
-
-  while IFS= read -r manifest_ref; do
-    [ -n "$manifest_ref" ] || continue
-    required_keys=$(printf '%s\n' "$manifest_ref")
-    case "$manifest_ref" in
-      https://gist.github.com/*/*.git#*)
-        manifest_base=${manifest_ref%%#*}
-        manifest_ref_suffix=${manifest_ref#*#}
-        gist_key=${manifest_base#https://gist.github.com/}
-        gist_key=${gist_key%.git}
-        required_keys=$(printf '%s\n%s#%s\n%s\n' "$required_keys" "$gist_key" "$manifest_ref_suffix" "$gist_key")
-        ;;
-      https://gist.github.com/*/*.git)
-        gist_key=${manifest_ref#https://gist.github.com/}
-        gist_key=${gist_key%.git}
-        required_keys=$(printf '%s\n%s\n' "$required_keys" "$gist_key")
-        ;;
-      *#*)
-        ;;
-      *)
-        required_keys=$(printf '%s\n%s\n' "$required_keys" "${manifest_ref%%#*}")
-        ;;
-    esac
-
-    required_keys_file=$(mktemp "${TMPDIR:-/tmp}/apm-required-keys.XXXXXX")
-    printf '%s\n' "$required_keys" | awk 'NF && !seen[$0]++' >"$required_keys_file"
-    if ! awk '
-      function normalize_repo(ref, parts, count, i, normalized) {
-        if (index(ref, ":") > 0) return ref
-        count = split(ref, parts, "/")
-        if (count < 2) return ref
-        normalized = tolower(parts[1]) "/" tolower(parts[2])
-        for (i = 3; i <= count; i++) normalized = normalized "/" parts[i]
-        return normalized
-      }
-      NR == FNR { required[normalize_repo($0)] = 1; next }
-      (normalize_repo($0) in required) { found = 1; exit }
-      END { exit(found ? 0 : 1) }
-    ' \
-      "$required_keys_file" "$matched_keys_file"; then
-      error "External manifest ref is missing from apm.lock.yaml: $manifest_ref"
-      has_failure=1
-    fi
-    rm -f "$required_keys_file"
-  done <"$manifest_refs_file"
-
-  rm -f "$manifest_refs_file" "$manifest_keys_file" "$lock_records_file" "$matched_keys_file"
-  [ "$has_failure" -eq 0 ] || fail "External skill state is inconsistent"
-}
-
-deployment_plan_record() {
-  printf 'target_name=%s\ttarget_dir=%s\tsource_kind=%s\tsource_skill_id=%s\tdeployed_skill_name=%s\tsource_path=%s\tsource_ref=%s\tskills_dir=%s\n' \
-    "$1" "$2" "$3" "$4" "$5" "$6" "$7" "$8"
-}
-
-build_deployment_plan_entries() {
-  skill_records="$1"
-
-  printf '%s\n' "$skill_records" | while IFS=$'\t' read -r source_kind source_skill_id source_path source_ref; do
-    [ -n "$source_skill_id" ] || continue
-    managed_catalog_runtime_targets | while read_runtime_target; do
-      deployed_skill_name=$(format_skill_name "$source_skill_id")
-      validate_skill_id "$deployed_skill_name"
-      deployment_plan_record \
-        "$RT_TARGET_NAME" \
-        "$RT_TARGET_DIR" \
-        "$source_kind" \
-        "$source_skill_id" \
-        "$deployed_skill_name" \
-        "$source_path" \
-        "$source_ref" \
-        "$RT_SKILLS_DIR"
-    done
-  done
-}
-
-validate_deployment_collisions() {
-  skill_records="$1"
-  deployment_plan="$2"
-
-  printf '%s\n' "$skill_records" | awk -F '\t' '
-    NF < 4 {
-      next
-    }
-    {
-      if ($2 in seen) {
-        printf "error: duplicate source skill id detected: %s\n", $2 > "/dev/stderr"
-        status = 1
-      }
-      seen[$2] = $1
-    }
-    END {
-      exit status
-    }
-  ' || fail "Deployment source records collided"
-
-  printf '%s\n' "$deployment_plan" | awk -F '\t' '
-    function field_value(name, i, prefix) {
-      prefix = name "="
-      for (i = 1; i <= NF; i++) {
-        if (index($i, prefix) == 1) {
-          return substr($i, length(prefix) + 1)
-        }
-      }
-      return ""
-    }
-    NF == 0 {
-      next
-    }
-    {
-      target_name = field_value("target_name")
-      source_kind = field_value("source_kind")
-      source_skill_id = field_value("source_skill_id")
-      deployed_skill_name = field_value("deployed_skill_name")
-
-      if (deployed_skill_name == "") {
-        printf "error: invalid deployed skill name for %s (%s)\n", source_skill_id, target_name > "/dev/stderr"
-        status = 1
-        next
-      }
-
-      key = target_name "\t" deployed_skill_name
-      owner = source_kind ":" source_skill_id
-      if (key in seen) {
-        printf "error: target skill collision for %s/%s (%s vs %s)\n", target_name, deployed_skill_name, seen[key], owner > "/dev/stderr"
-        status = 1
-      }
-      seen[key] = owner
-    }
-    END {
-      exit status
-    }
-  ' || fail "Deployment target records collided"
-}
-
-stage_target_skill_records() {
-  deployment_plan="$1"
-  stage_root="$2"
-
-  managed_catalog_runtime_targets | while read_runtime_target; do
-    mkdir -p "$stage_root/$RT_TARGET_NAME/skills"
-  done
-
-  printf '%s\n' "$deployment_plan" | while IFS= read -r plan_record; do
-    [ -n "$plan_record" ] || continue
-    # Field order mirrors deployment_plan_record; values are tab-free.
-    IFS=$'\t' read -r f_target_name f_target_dir _f_source_kind _f_source_skill_id \
-      f_deployed f_source_path _f_source_ref f_skills_dir <<<"$plan_record"
-    target_name=${f_target_name#target_name=}
-    target_dir=${f_target_dir#target_dir=}
-    deployed_skill_name=${f_deployed#deployed_skill_name=}
-    source_path=${f_source_path#source_path=}
-    skills_dir=${f_skills_dir#skills_dir=}
-    [ -n "$target_name" ] || continue
-    # Skills-less targets never reconcile staged skills; skip their staging.
-    [ "$skills_dir" != "-" ] || continue
-    skills_root_dir="${skills_dir:-$target_dir}"
-    stage_skills_root="$stage_root/$target_name/skills"
-    staged_skill_path=$(internal_target_skill_path "$stage_skills_root" "$deployed_skill_name")
-    rm -rf "$staged_skill_path"
-
-    # Unchanged and still deployed: mark it so reconcile leaves it alone, and
-    # keep the entry in the stage tree so the stale sweep does not remove it.
-    deployed_skill_path=$(internal_target_skill_path "$HOME/$skills_root_dir/skills" "$deployed_skill_name")
-    if [ -d "$source_path" ] && tree_content_equal "$source_path" "$deployed_skill_path"; then
-      mkdir -p "$staged_skill_path"
-      : >"$staged_skill_path/.apm-skill-in-sync"
-      continue
-    fi
-
-    mkdir -p "$staged_skill_path"
-    cp -R "$source_path"/. "$staged_skill_path"
-  done
-}
-
-build_target_skill_trees() {
-  stage_root="$1"
-  personal_skill_records=$(collect_personal_skill_records)
-  external_skill_records=$(collect_external_skill_records)
-  skill_records=$(printf '%s\n%s\n' "$personal_skill_records" "$external_skill_records" | awk 'NF')
-  deployment_plan=$(build_deployment_plan_entries "$skill_records")
-
-  validate_deployment_collisions "$skill_records" "$deployment_plan"
-  stage_target_skill_records "$deployment_plan" "$stage_root"
-}
-
-swap_staged_tree_into_place() {
-  staged_tree_root="$1"
-  target_tree_root="$2"
-  tree_name="$3"
-  target_parent_dir=$(dirname "$target_tree_root")
-  staging_copy_root="$target_parent_dir/.apm-$tree_name-next.$$"
-  backup_root="$target_parent_dir/.apm-$tree_name-backup.$$"
-
-  mkdir -p "$target_parent_dir"
-  rm -rf "$staging_copy_root" "$backup_root"
-  cp -R "$staged_tree_root" "$staging_copy_root"
-
-  # An unchecked move-aside is not survivable: if it fails the target is still
-  # there, and the promotion below then renames the staging dir *into* it.
-  if [ -e "$target_tree_root" ] || [ -L "$target_tree_root" ]; then
-    if ! mv "$target_tree_root" "$backup_root"; then
-      rm -rf "$staging_copy_root"
-      fail "Failed to move aside $tree_name target: $target_tree_root"
-    fi
-  fi
-
-  # `mv staging target` nests into an existing target and still reports success,
-  # so rename only into a genuinely absent target. A live consumer can re-create
-  # the target inside the rename window (observed 2026-09-14: agmsg watchers
-  # re-created ~/.agents/skills/agmsg mid-swap), so merge when it came back.
-  if [ ! -e "$target_tree_root" ] && [ ! -L "$target_tree_root" ]; then
-    if mv "$staging_copy_root" "$target_tree_root"; then
-      rm -rf "$backup_root"
-      return 0
-    fi
-  elif [ -d "$target_tree_root" ] && [ ! -L "$target_tree_root" ] &&
-    cp -R "$staging_copy_root"/. "$target_tree_root"/; then
-    rm -rf "$staging_copy_root" "$backup_root"
-    return 0
-  fi
-
-  rm -rf "$staging_copy_root"
-  if [ -e "$backup_root" ] || [ -L "$backup_root" ]; then
-    mv "$backup_root" "$target_tree_root" || true
-  fi
-  fail "Failed to replace $tree_name target: $target_tree_root"
-}
-
-# Top-level entries under a runtime skills root that apm-workspace never
-# deploys but another tool owns (e.g. `claude synced`, the folder Claude's own
-# skill sync writes into ~/.claude/skills). The stale sweep in
-# reconcile_skills_root_from_stage leaves them in place. The list lives in
-# config/preserved-skills-root-entries.txt: one `<target> <entry>` pair per
-# line, where <target> is a managed_catalog_runtime_targets name; `#` starts a
-# comment and blank lines are ignored. A missing or empty file preserves
-# nothing. Invalid lines (missing fields, a `/`, `\` or `..` in the entry) are
-# skipped with a warning instead of failing the deploy. Only the stale sweep
-# consults this list, so a catalog or external skill of the same name still
-# replaces the entry. Get-PreservedSkillsRootEntries in apm-workspace.ps1
-# reads the same file with the same rules.
-preserved_skills_root_entries_file() {
-  printf '%s/config/preserved-skills-root-entries.txt\n' "$WORKSPACE_DIR"
-}
-
-preserved_skills_root_entries() {
-  wanted_target="$1"
-  entries_file=$(preserved_skills_root_entries_file)
-  [ -f "$entries_file" ] || return 0
-
-  line_number=0
-  while IFS= read -r raw_line || [ -n "$raw_line" ]; do
-    line_number=$((line_number + 1))
-    line=${raw_line%%#*}
-    line=${line//$'\r'/}
-    entry_target=""
-    entry_name=""
-    entry_extra=""
-    read -r entry_target entry_name entry_extra <<<"$line" || true
-    [ -n "$entry_target" ] || continue
-    if [ -z "$entry_name" ] || [ -n "$entry_extra" ]; then
-      warn "Ignoring $entries_file:$line_number: expected '<target> <entry>'"
-      continue
-    fi
-    [ "$entry_target" = "$wanted_target" ] || continue
-    case "$entry_name" in
-      . | */* | *\\* | *..* | .apm-*)
-        warn "Ignoring $entries_file:$line_number: invalid entry name '$entry_name'"
-        continue
-        ;;
-    esac
-    printf '%s\n' "$entry_name"
-  done <"$entries_file"
-}
-
-# Private skills are deployed after the stage swap, so the stale sweep must
-# spare the current ones: deleting them first leaves them missing if apply
-# fails, and a live agent sees them gone meanwhile. Skills removed from the
-# private source are not listed and are still swept.
-current_private_skill_entries() {
-  case "$1" in
-    claude | codex) ;;
-    *) return 0 ;;
-  esac
-  private_skill_ids | while IFS= read -r skill_id; do
-    [ -n "$skill_id" ] || continue
-    format_skill_name "$skill_id"
-  done
-}
-
-# Reconciling per top-level child keeps the skills root present at all times:
-# a whole-root swap made the root vanish for the two renames, and a live agent
-# polling it mid-command broke. Each child still gets the swap, and stale
-# removal keeps "target matches what's staged".
-reconcile_skills_root_from_stage() {
-  staged_skills_root="$1"
-  target_skills_root="$2"
-  # Optional: the runtime target name, used to look up preserved entries.
-  reconcile_target_name="${3:-}"
-  preserved_entries=""
-  if [ -n "$reconcile_target_name" ]; then
-    preserved_entries=$(
-      preserved_skills_root_entries "$reconcile_target_name"
-      current_private_skill_entries "$reconcile_target_name"
-    )
-  fi
-
-  mkdir -p "$target_skills_root"
-
-  # A crashed prior run can leave .apm-skills-next.<pid> / .apm-skills-backup.<pid>
-  # behind (swap_staged_tree_into_place only cleans these up on the success
-  # and handled-failure paths, not a hard kill mid-swap). The old whole-root
-  # swap incidentally wiped these too, since it replaced the entire root; this
-  # reconcile no longer does that, so it must sweep them explicitly. Safe to
-  # do unconditionally here: this process's own staging/backup dirs for this
-  # call don't exist yet (swap_staged_tree_into_place below creates and
-  # removes them per child), so nothing live is ever swept.
-  rm -rf "$target_skills_root"/.apm-skills-next.* "$target_skills_root"/.apm-skills-backup.*
-  # Residue from a nested promotion sits one level deeper, inside the skill dir
-  # it was meant to replace, where the root-level sweep never reaches.
-  find "$target_skills_root" -mindepth 2 -maxdepth 2 \
-    \( -name '.apm-skills-next.*' -o -name '.apm-skills-backup.*' \) \
-    -exec rm -rf {} +
-
-  find "$staged_skills_root" -mindepth 1 -maxdepth 1 | while IFS= read -r staged_entry; do
-    entry_name=$(basename "$staged_entry")
-    # stage_target_skill_records marks an entry it found already in sync; leave
-    # the deployed copy untouched instead of swapping it for the same content.
-    if [ -f "$staged_entry/.apm-skill-in-sync" ]; then
-      continue
-    fi
-    swap_staged_tree_into_place "$staged_entry" "$target_skills_root/$entry_name" skills
-  done
-
-  find "$target_skills_root" -mindepth 1 -maxdepth 1 | while IFS= read -r target_entry; do
-    entry_name=$(basename "$target_entry")
-    case "$entry_name" in
-      .apm-*) continue ;;
-    esac
-    [ -e "$staged_skills_root/$entry_name" ] && continue
-    if [ -n "$preserved_entries" ] && printf '%s\n' "$preserved_entries" | grep -Fxq -- "$entry_name"; then
-      continue
-    fi
-    rm -rf "$target_entry"
-    # The sweep deletes whatever staging no longer provides, including skills
-    # another tool wrote; say so, so a missing skill can be traced to a deploy.
-    log "removed unmanaged skills entry: ${reconcile_target_name:-$target_skills_root}/$entry_name"
-  done
-}
-
-replace_skill_targets_from_stage() {
-  stage_root="$1"
-
-  managed_catalog_runtime_targets | while read_runtime_target; do
-    target_root="$HOME/$RT_TARGET_DIR"
-    if [ "$RT_SKILLS_DIR" = "-" ]; then
-      target_skills_root="$target_root/skills"
-      if [ -e "$target_skills_root" ] || [ -L "$target_skills_root" ]; then
-        rm -rf "$target_skills_root"
-      fi
-      continue
-    fi
-    skills_root_dir="${RT_SKILLS_DIR:-$RT_TARGET_DIR}"
-    legacy_skills_root="$target_root/skills"
-    target_skills_root="$HOME/$skills_root_dir/skills"
-    staged_skills_root="$stage_root/$RT_TARGET_NAME/skills"
-    [ -d "$staged_skills_root" ] || mkdir -p "$staged_skills_root"
-    if [ "$legacy_skills_root" != "$target_skills_root" ] && { [ -e "$legacy_skills_root" ] || [ -L "$legacy_skills_root" ]; }; then
-      rm -rf "$legacy_skills_root"
-    fi
-    reconcile_skills_root_from_stage "$staged_skills_root" "$target_skills_root" "$RT_TARGET_NAME"
-  done
-}
-
 copy_managed_catalog_file() {
   source_path="$1"
   destination_path="$2"
@@ -2747,223 +907,6 @@ copy_managed_catalog_file() {
     fail "Refusing to replace directory target: $destination_path"
   fi
   cp "$source_path" "$destination_path"
-}
-
-remove_symlink_entries() {
-  target_dir="$1"
-  if [ -L "$target_dir" ]; then
-    rm -f "$target_dir"
-    return 0
-  fi
-  [ -d "$target_dir" ] || return 0
-  find "$target_dir" -type l -exec rm -f {} +
-}
-
-# Manifest-tracked sync for a catalog dir (commands/rules) whose deployment
-# target is shared with files the catalog doesn't own (other packages, user
-# files). Unlike a full-tree swap, this only removes files this catalog
-# previously placed and no longer provides, so co-located non-catalog files are
-# never touched. The manifest itself is deploy-target-only state, never written
-# to source.
-sync_managed_catalog_dir_with_manifest() {
-  source_dir="$1"
-  target_dir="$2"
-  manifest_name="${3:-.managed-catalog-manifest}"
-  manifest_path="$target_dir/$manifest_name"
-
-  mkdir -p "$target_dir"
-  new_manifest=$(relative_file_list "$source_dir")
-
-  if [ -f "$manifest_path" ]; then
-    old_manifest=$(cat "$manifest_path")
-    stale_entries=$(comm -23 <(printf '%s\n' "$old_manifest") <(printf '%s\n' "$new_manifest"))
-    if [ -n "$stale_entries" ]; then
-      printf '%s\n' "$stale_entries" | while IFS= read -r relative_path; do
-        [ -n "$relative_path" ] || continue
-        rm -f "$target_dir/$relative_path"
-      done
-      find "$target_dir" -mindepth 1 -type d -empty -delete
-    fi
-  fi
-
-  remove_symlink_entries "$target_dir"
-  cp -R "$source_dir"/. "$target_dir"
-  printf '%s\n' "$new_manifest" >"$manifest_path"
-}
-
-# Counterpart of the stale-entries branch above for a source dir that vanished
-# entirely: confine removal to what this catalog previously placed (the files
-# the manifest lists), then drop now-empty subdirectories the same way. A
-# missing manifest is not an error — there is nothing this source ever placed.
-cleanup_claude_rules_target_with_manifest() {
-  target_dir="$1"
-  manifest_path="$target_dir/.managed-claude-rules-manifest"
-
-  [ -f "$manifest_path" ] || return 0
-
-  while IFS= read -r relative_path; do
-    [ -n "$relative_path" ] || continue
-    rm -f "$target_dir/$relative_path"
-  done <"$manifest_path"
-  rm -f "$manifest_path"
-  find "$target_dir" -mindepth 1 -type d -empty -delete
-}
-
-sync_managed_catalog_runtime_assets() {
-  tracked_dir=$(tracked_catalog_dir)
-  [ -d "$tracked_dir" ] || fail "Tracked catalog missing: $tracked_dir. Run 'mise run prepare:catalog' first."
-
-  commands_source=$(tracked_catalog_commands_root)
-  rules_source=$(tracked_catalog_rules_root)
-  claude_rules_source=$(tracked_catalog_claude_rules_root)
-
-  managed_catalog_runtime_targets | while read_runtime_target; do
-    target_root="$HOME/$RT_TARGET_DIR"
-    mkdir -p "$target_root"
-
-    if [ "$RT_AGENTS_FACE" = "-" ]; then
-      if [ -e "$target_root/agents" ] || [ -L "$target_root/agents" ]; then
-        rm -rf "$target_root/agents"
-      fi
-    fi
-
-    if [ -d "$commands_source" ]; then
-      sync_managed_catalog_dir_with_manifest "$commands_source" "$target_root/commands"
-    fi
-
-    if [ -d "$rules_source" ]; then
-      sync_managed_catalog_dir_with_manifest "$rules_source" "$target_root/rules"
-    fi
-
-    if [ "$RT_TARGET_NAME" = "claude" ]; then
-      if [ -d "$claude_rules_source" ]; then
-        sync_managed_catalog_dir_with_manifest "$claude_rules_source" "$target_root/rules" ".managed-claude-rules-manifest"
-      else
-        cleanup_claude_rules_target_with_manifest "$target_root/rules"
-      fi
-    fi
-  done
-}
-
-catalog_agents_apm_face_runtimes() {
-  managed_catalog_runtime_targets | while read_runtime_target; do
-    if [ "$RT_AGENTS_FACE" = "apm" ]; then
-      printf '%s|%s\n' "$RT_TARGET_NAME" "$RT_TARGET_DIR"
-    fi
-  done
-}
-
-catalog_agent_names() {
-  tracked_catalog_agent_relative_paths | while IFS= read -r agent_relative_path; do
-    case "$agent_relative_path" in
-      *.agent.md) printf '%s\n' "${agent_relative_path%.agent.md}" ;;
-    esac
-  done
-}
-
-render_catalog_agents_via_apm() {
-  render_root="$1"
-  render_targets="$2"
-  agent_names="$3"
-
-  mkdir -p "$render_root/pkg/.apm/agents" "$render_root/project" || return 1
-  cp "$(tracked_catalog_dir)/apm.yml" "$render_root/pkg/apm.yml" || return 1
-  while IFS= read -r agent_name; do
-    mkdir -p "$(dirname "$render_root/pkg/.apm/agents/$agent_name")"
-    cp "$(tracked_catalog_agents_root)/$agent_name.agent.md" "$render_root/pkg/.apm/agents/$agent_name.agent.md" || return 1
-  done <<<"$agent_names"
-
-  render_log="$render_root/install.log"
-  if ! (cd "$render_root/project" && apm install "$render_root/pkg" --target "$render_targets") >"$render_log" 2>&1; then
-    cat "$render_log"
-    error "apm install failed while rendering catalog agents"
-    return 1
-  fi
-  cat "$render_log"
-  if apm_install_has_diagnostics_failure "$render_log"; then
-    error "apm install reported integration diagnostics while rendering catalog agents"
-    return 1
-  fi
-}
-
-place_catalog_agent() {
-  rendered_agent="$1"
-  target_agent="$2"
-
-  if cmp -s "$rendered_agent" "$target_agent"; then
-    return 0
-  fi
-
-  placement=new
-  if [ -e "$target_agent" ] || [ -L "$target_agent" ]; then
-    placement=replaced
-  fi
-  target_agents_dir=$(dirname "$target_agent")
-  mkdir -p "$target_agents_dir"
-  agent_temp=$(mktemp "$target_agents_dir/.apm-agent.XXXXXX")
-  if ! cp "$rendered_agent" "$agent_temp" || ! chmod 644 "$agent_temp" || ! mv "$agent_temp" "$target_agent"; then
-    rm -f "$agent_temp"
-    error "Failed to place agent: $target_agent"
-    return 1
-  fi
-  log "Updated agent: $target_agent ($placement)"
-}
-
-place_rendered_catalog_agents() {
-  render_root="$1"
-  face_runtimes="$2"
-  agent_names="$3"
-
-  while IFS='|' read -r runtime_name runtime_dir; do
-    rendered_agents_dir="$render_root/project/$runtime_dir/agents"
-    missing_agents=""
-    while IFS= read -r agent_name; do
-      [ -f "$rendered_agents_dir/$agent_name.md" ] || missing_agents="$missing_agents $agent_name.md"
-    done <<<"$agent_names"
-    if [ -n "$missing_agents" ]; then
-      error "apm did not render catalog agents for $runtime_name:$missing_agents"
-      return 1
-    fi
-    while IFS= read -r agent_name; do
-      target_agent="$HOME/$runtime_dir/agents/$agent_name.md"
-      if [ -d "$target_agent" ]; then
-        error "Cannot place agent: target is a directory: $target_agent"
-        return 1
-      fi
-      # A user's symlink (e.g. into dotfiles) stays when it already matches; replacing it would cut the link.
-      if [ -L "$target_agent" ] && ! cmp -s "$rendered_agents_dir/$agent_name.md" "$target_agent"; then
-        error "Cannot place agent: target is a symlink whose content differs from the catalog: $target_agent"
-        return 1
-      fi
-    done <<<"$agent_names"
-  done <<<"$face_runtimes"
-
-  while IFS='|' read -r runtime_name runtime_dir; do
-    while IFS= read -r agent_name; do
-      place_catalog_agent \
-        "$render_root/project/$runtime_dir/agents/$agent_name.md" \
-        "$HOME/$runtime_dir/agents/$agent_name.md" || return 1
-    done <<<"$agent_names"
-  done <<<"$face_runtimes"
-}
-
-deploy_catalog_agents_via_apm() {
-  agent_names=$(catalog_agent_names)
-  if [ -z "$agent_names" ]; then
-    log "No catalog agents to deploy."
-    return 0
-  fi
-  face_runtimes=$(catalog_agents_apm_face_runtimes)
-  if [ -z "$face_runtimes" ]; then
-    return 0
-  fi
-  face_targets=$(printf '%s\n' "$face_runtimes" | cut -d'|' -f1 | paste -sd, -)
-
-  agents_render_root=$(mktemp -d "${TMPDIR:-/tmp}/apm-agents-render.XXXXXX")
-  trap 'rm -rf "$agents_render_root"; trap - RETURN' RETURN
-
-  render_catalog_agents_via_apm "$agents_render_root" "$face_targets" "$agent_names" || return 1
-  place_rendered_catalog_agents "$agents_render_root" "$face_runtimes" "$agent_names" || return 1
 }
 
 cmd_validate_catalog() {
@@ -3146,41 +1089,6 @@ apm_prune_preview() {
   printf '%s\n' "$preview"
 }
 
-cmd_prune_cache() {
-  require_apm
-  (
-    cd "$WORKSPACE_DIR"
-    local cache_links=""
-    if [ -d apm_modules ]; then
-      cache_links=$(find apm_modules -type l -print -quit) || fail "Cannot inspect cache; refusing automatic prune."
-    fi
-    if [ -L apm_modules ] || [ -n "$cache_links" ]; then
-      fail "Cache contains symlinks; refusing automatic prune."
-    fi
-    [ -r apm.yml ] && [ -r apm.lock.yaml ] || fail "Manifest and lockfile are required for the prune preview."
-    local preview preview_state
-    preview=$(apm_prune_preview) || return 1
-    printf '%s\n' "$preview"
-    preview_state=$(printf '%s\n' "$preview" | awk -f "$APM_AWK_DIR/prune-preview.awk") || {
-      error "Unrecognized prune preview; refusing automatic prune."
-      return 1
-    }
-    local alias_status=0
-    grep -E '^[[:space:]]+alias:' apm.yml apm.lock.yaml >/dev/null || alias_status=$?
-    if [ "$alias_status" -gt 1 ]; then
-      error "Cannot read alias declarations; refusing to continue cache recovery."
-      return "$alias_status"
-    fi
-    if [ "$alias_status" -eq 0 ]; then
-      warn "Automatic prune skipped: aliased packages may be falsely classified as orphaned. Cache retained; repair/deploy may continue."
-    elif [ "$preview_state" = changes ]; then
-      warn "Automatic prune skipped: preview proposes cache or ownership changes whose safety is unverified. Cache retained; repair/deploy may continue."
-    else
-      log "Prune preview is clean; native prune was not executed. Automatic cache cleanup is disabled to avoid deleting packages added after the preview."
-    fi
-  )
-}
-
 # Prints the catalog package's lock records (installed from the repository ref, or from a local path as
 # _local/catalog), tab separated: "F<TAB>path" per deployed_files entry and
 # "H<TAB>path<TAB>sha256" per deployed_file_hashes entry. Paths are relative to $HOME for a user-scope lock.
@@ -3216,8 +1124,8 @@ file_sha256() {
 }
 
 # The lock records what APM itself placed for the catalog; a listed path that is gone means the install was undone.
-# Skills and agents are re-synced from the working catalog on every apply, so one deleted there disappears before the
-# push and install:catalog that drop it from the lock; such a path is only counted as stale.
+# A skill or agent deleted from the working catalog disappears before the lock drops it; such a path is only counted
+# as stale.
 check_catalog_lock_deployed_files() {
   lock_file="$WORKSPACE_DIR/apm.lock.yaml"
   [ -f "$lock_file" ] || return 0
@@ -3246,7 +1154,7 @@ check_catalog_lock_deployed_files() {
   # changed counts files the skill sync replaced with the working catalog or a private override, which is expected.
   printf 'catalog lock files: listed=%s missing=%s stale=%s changed=%s\n' "$listed_count" "$missing_count" "$stale_count" "$changed_count"
   if [ "$stale_count" -gt 0 ]; then
-    warn "$stale_count skill or agent file(s) recorded in apm.lock.yaml are gone, as after deleting them from the working catalog; they leave the lock with the next 'mise run install:catalog' after the push."
+    warn "$stale_count skill or agent file(s) recorded in apm.lock.yaml are gone, as after deleting them from the working catalog; they leave the lock when apm.lock.yaml is next updated."
   fi
   [ "$missing_count" -eq 0 ]
 }
@@ -3342,17 +1250,17 @@ cmd_doctor() {
         error "Root context has wrong type (directory): $target_root/$RT_CONFIG_NAME"
         has_failure=1
       elif [ "$config_state" = legacy ]; then
-        warn "$target_root/$RT_CONFIG_NAME is still the copy the legacy catalog sync wrote; preview its move with 'mise run migrate:roots'"
+        warn "$target_root/$RT_CONFIG_NAME is still the copy the retired legacy catalog sync wrote; move it aside by hand (docs/native-distribution.md)"
       elif [ "$config_state" = edited-generated ] && [ "$RT_TARGET_NAME" = claude ]; then
         warn "$target_root/$RT_CONFIG_NAME keeps APM's marker but was edited after compile, so apm compile --clean keeps it and Claude reads the guide from it as well as from the rule; remove the guide and the marker line, or move it aside"
       elif [ "$config_state" = edited-generated ]; then
-        warn "$target_root/$RT_CONFIG_NAME keeps APM's marker but was edited after compile, so apply skips the root compile; delete the marker line to keep it as your own file, or move it aside"
+        warn "$target_root/$RT_CONFIG_NAME keeps APM's marker but was edited after compile, so a redeploy skips the root compile; delete the marker line to keep it as your own file, or move it aside"
       elif [ "$RT_TARGET_NAME" = claude ] && [ "$config_state" = generated ] &&
         [ -f "$target_root/rules/${CATALOG_INSTRUCTIONS_FILE_NAME%.instructions.md}.md" ]; then
-        warn "$target_root/$RT_CONFIG_NAME is an apm compile output that still sits next to the guide rule, so Claude may read the guide twice; run 'mise run apply' so apm compile --clean removes it, and if it stays, it is an older compile output: move it aside"
+        warn "$target_root/$RT_CONFIG_NAME is an apm compile output that still sits next to the guide rule, so Claude may read the guide twice; redeploy with section B of docs/native-distribution.md so apm compile -g --clean removes it, and if it stays, it is an older compile output: move it aside"
       elif [ "$RT_TARGET_NAME" = claude ] && [ "$config_state" = absent ] && [ -f "$(tracked_catalog_instructions_path)" ] &&
         [ ! -f "$target_root/rules/${CATALOG_INSTRUCTIONS_FILE_NAME%.instructions.md}.md" ]; then
-        warn "Claude has neither $target_root/$RT_CONFIG_NAME nor the guide rule $target_root/rules/${CATALOG_INSTRUCTIONS_FILE_NAME%.instructions.md}.md; run 'mise run install:catalog'"
+        warn "Claude has neither $target_root/$RT_CONFIG_NAME nor the guide rule $target_root/rules/${CATALOG_INSTRUCTIONS_FILE_NAME%.instructions.md}.md; redeploy with section B of docs/native-distribution.md"
       fi
       if [ -d "$tracked_agents_root" ] && [ "$RT_AGENTS_FACE" != "-" ] && [ ! -d "$target_root/agents" ]; then
         error "Required catalog output is missing or has wrong type (directory): $target_root/agents"
@@ -3434,52 +1342,6 @@ cmd_bundle_catalog() {
   log "Built catalog package at ~/.apm/.catalog-build/$CATALOG_DIR_NAME"
 }
 
-cmd_stage_catalog() {
-  requested_count=$#
-  cmd_bundle_catalog "$@"
-
-  tracked_dir=$(tracked_catalog_dir)
-  assert_catalog_stage_safety "$requested_count"
-  reset_tracked_catalog_dir
-  cp -R "$(catalog_build_dir)"/. "$tracked_dir"
-
-  reference=$(tracked_catalog_reference)
-  log "Updated ~/.apm/catalog at $tracked_dir"
-  log "Candidate upstream ref: $reference"
-  log "Push the updated apm-workspace repo before using 'apm install -g $reference'."
-}
-
-register_catalog_dependency() {
-  reference="$1"
-
-  if manifest_has_catalog_reference; then
-    package="${reference%%#*}"
-    run_workspace_update_command -g --yes "$package"
-  else
-    run_workspace_install_command -g "$reference"
-  fi
-}
-
-cmd_register_catalog() {
-  require_apm
-  skill_ids=$(managed_skill_ids)
-  cleanup_skill_ids=$(internal_cleanup_skill_ids "$skill_ids")
-  ensure_workspace_repo
-  ensure_workspace_scaffold
-  ensure_workspace_mise_file
-  assert_tracked_catalog_published
-  cmd_validate_catalog
-  assert_user_roots_migrated
-
-  remove_internal_target_links "$cleanup_skill_ids"
-
-  reference=$(tracked_catalog_reference)
-  register_catalog_dependency "$reference"
-  assert_catalog_cache_freshness
-  sync_managed_catalog_runtime_assets
-  log "Registered catalog from upstream ref: $reference"
-}
-
 cmd_smoke_catalog() {
   require_apm
   skill_ids=$(requested_catalog_skill_ids "$@")
@@ -3535,87 +1397,31 @@ Usage: scripts/apm-workspace.sh <command> [args...]
 
 Commands:
   setup:mcp:host     Configure host-local MCP servers for Codex and Claude
-  apply              Offline deploy user-scope-compatible dependencies and compile user-scope root contexts
-  migrate:roots      Preview moving legacy root copies (CLAUDE.md / AGENTS.md) to <name>.<UTC>.bak; --apply moves them
-  sync:opencode      Write only the OpenCode guide (opencode/AGENTS.md in the user config dir); allowed on a native HOME
-  check:roots        Fail when ~/.claude/CLAUDE.md is still the legacy catalog copy, or the old path must not write this HOME (run before any apm install -g)
-  apply:skills:local Quick-sync local catalog and private skills into ~/.agents/skills; private skills also link into ~/.claude/skills
-  refresh            Refresh the checkout and dependencies only; does not deploy
-  install-pins       Re-resolve hand-bumped SHA pins (apm install -g --only apm); does not deploy
-  prune:cache        Preview cache cleanup; skip unverified removals
-  repair:local-package-cache Rebuild workspace-owned package cache from tracked sources
-  pin-external       Pin external manifest refs to lockfile commits
+  sync:opencode      Write only the OpenCode guide (opencode/AGENTS.md in the user config dir)
   validate           Validate the ~/.apm workspace
   validate:catalog   Fail when ~/.apm/catalog is not normalized or missing required assets
   doctor             Inspect workspace and target state
   doctor-intake      Report the learning-intake inbox and warn when pending reports pile up
   bundle-catalog     Build ~/.apm/.catalog-build/catalog as the catalog package artifact
-  prepare:catalog    Rewrite ~/.apm/catalog into its normalized publishable layout and print its upstream ref
-  install:catalog    Install the catalog ref after commit/push
   smoke:catalog      Smoke-test the generated catalog package via temp project install
 
 Environment overrides:
   APM_WORKSPACE_DIR
   APM_WORKSPACE_REPO
   APM_WORKSPACE_NAME
-  APM_PI_OUTPUT
   APM_OPENCODE_OUTPUT
 EOF
 }
 
-# $HOME/.apm/apm.yml rendered by scripts/native.sh means the real HOME is a consumer of the native path: apm owns its
-# manifest and lock, and the commands below would rewrite what native.sh deployed from a checkout that is not there.
-# The check follows $HOME, not $WORKSPACE_DIR, because these commands write $HOME's deployment targets either way.
-native_rendered_home() {
-  local first
-  first="$(head -n 1 "$HOME/.apm/apm.yml" 2>/dev/null || true)"
-  case "$first" in
-    "# Rendered by scripts/native.sh"*) return 0 ;;
-    *) return 1 ;;
-  esac
-}
-
-# check:roots writes nothing: it is the documented first step before a bare apm install -g / update -g, which `mise run
-# upgrade` runs right after it without going through this script.
-refuse_on_native_home() {
-  case "$COMMAND" in
-    apply | apply:skills:local | refresh | install-pins | repair:local-package-cache | pin-external | prune:cache | \
-      install:catalog | check:roots) ;;
-    migrate:roots)
-      case " $* " in *" --apply "*) ;; *) return 0 ;; esac
-      ;;
-    *) return 0 ;;
-  esac
-  if native_rendered_home; then
-    fail "$HOME/.apm/apm.yml was rendered by scripts/native.sh, so $COMMAND is refused: the old path would overwrite what the native path deployed. Use scripts/native.sh (docs/native-distribution.md)."
-  fi
-  # Between moving the checkout away and the first migrate, ~/.apm is neither; the old path would write the roots against a split workspace.
-  if [ -z "${APM_WORKSPACE_DIR:-}" ] && ! home_apm_is_checkout; then
-    fail "$HOME/.apm is neither a checkout nor a native consumer, so $COMMAND is refused: the old path writes $HOME's deployment targets and assumes the checkout is ~/.apm. Finish the cutover with scripts/native.sh, or put the checkout back (docs/native-distribution.md)."
-  fi
-}
-
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
-  refuse_on_native_home "$@"
   case "$COMMAND" in
     setup:mcp:host) cmd_setup_host_mcp ;;
-    apply) cmd_apply ;;
-    migrate:roots) cmd_migrate_roots "$@" ;;
-    check:roots) assert_user_roots_migrated ;;
     sync:opencode) cmd_sync_opencode ;;
-    apply:skills:local) cmd_sync_local_skills "$@" ;;
-    refresh) cmd_update ;;
-    install-pins) cmd_install_pins ;;
-    repair:local-package-cache) cmd_repair_local_package_cache ;;
-    pin-external) cmd_pin_external ;;
     validate) cmd_validate ;;
     validate:catalog) cmd_validate_catalog ;;
     doctor) cmd_doctor ;;
     doctor-intake) cmd_doctor_intake ;;
-    prune:cache) cmd_prune_cache ;;
     bundle-catalog) cmd_bundle_catalog "$@" ;;
-    prepare:catalog) cmd_stage_catalog "$@" ;;
-    install:catalog) cmd_register_catalog "$@" ;;
     smoke:catalog) cmd_smoke_catalog "$@" ;;
     help | -h | --help) cmd_help ;;
     *)

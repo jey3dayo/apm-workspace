@@ -68,3 +68,24 @@ teardown() {
   [ ! -e "$SKILL_DIR" ]
   [ ! -e "$STATE_ROOT" ]
 }
+
+@test "restore after save is idempotent: db and teams stay symlinks into the store with the data intact" {
+  mkdir -p "$SKILL_DIR/teams/sample-team"
+  echo '{"members":[]}' >"$SKILL_DIR/teams/sample-team/config.json"
+  state_env=(env HOME="$FIXTURE_HOME" XDG_STATE_HOME="$FIXTURE_HOME/.local/state")
+
+  run "${state_env[@]}" bash "$SCRIPT_UNDER_TEST" save
+  [ "$status" -eq 0 ]
+  run "${state_env[@]}" bash "$SCRIPT_UNDER_TEST" restore
+  [ "$status" -eq 0 ]
+  run "${state_env[@]}" bash "$SCRIPT_UNDER_TEST" restore
+  [ "$status" -eq 0 ]
+
+  [ -L "$SKILL_DIR/db" ]
+  [ -L "$SKILL_DIR/teams" ]
+  [ "$(readlink "$SKILL_DIR/db")" = "$STATE_ROOT/db" ]
+  [ "$(readlink "$SKILL_DIR/teams")" = "$STATE_ROOT/teams" ]
+  [ "$(cat "$STATE_ROOT/db/messages.db")" = "message-history" ]
+  [ "$(cat "$STATE_ROOT/teams/sample-team/config.json")" = '{"members":[]}' ]
+  [ "$(cat "$SKILL_DIR/db/messages.db")" = "message-history" ]
+}
