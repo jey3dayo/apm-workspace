@@ -59,25 +59,21 @@ Record from the old path only. On the native HOME do not run `apm uninstall -g`:
 it writes the consumer `~/.apm` and the real HOME, and the next native rollout
 overrides it. Fast Path 9 hand-edits `apm.yml` in the checkout instead.
 
-The uninstall re-integrates the remaining packages by itself.
-On 0.31.0 it rewrites `apm.yml` (drops the comment that follows the removed
-entry, such as the next section header, and folds the gist URL) and deploys
+On the old path the uninstall re-integrated the remaining packages by itself.
+On 0.31.0 it rewrote `apm.yml` (dropped the comment that followed the removed
+entry, such as the next section header, and folded the gist URL) and deployed
 the gist under its un-aliased hash name. Unlinking the agmsg roster and
 deploying undeclared sub-skills were observed on 0.29.0 and not re-checked.
-Edit `apm.yml` until `git diff` shows only the removed line, follow the agmsg
-State section of the checkout's `AGENTS.md`, then roll out with section B of
-`docs/native-distribution.md`.
 
-Some deployed skill directories also hold a copy of the package's `.apm-pin`
-cache marker, which the lock does not record. When one does, `apm uninstall`
-removes the tracked files, cannot remove the directory, and aborts listing it
-(`Uninstall could not remove tracked target files`, reproduced on 0.31.0).
-By then it has already removed the package from `apm_modules/` and the
-tracked files; `apm.yml` and the lock still declare it. Confirm each listed
-path under `~/.claude/skills/` and `~/.agents/skills/` is a real directory
-holding only `.apm-pin`, remove that file and the directory, then rerun the
-uninstall. The rerun's `Package ... not found in apm_modules/` is expected
-and it completes.
+Some deployed skill directories also held a copy of the package's `.apm-pin`
+cache marker, which the lock did not record. There `apm uninstall` removed the
+tracked files, could not remove the directory, and aborted listing it
+(`Uninstall could not remove tracked target files`, reproduced on 0.31.0),
+leaving the package declared in `apm.yml` and the lock.
+
+If someone already ran it on the native HOME, discard the consumer change by
+rolling out with section B of `docs/native-distribution.md`, and follow the
+agmsg State section of the checkout's `AGENTS.md`.
 
 ## Guardrail details
 
