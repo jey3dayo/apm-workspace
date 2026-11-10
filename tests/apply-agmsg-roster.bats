@@ -3,9 +3,7 @@
 # Verifies the agmsg roster save/restore contract that `cmd_apply` and
 # `cmd_sync_local_skills` now carry directly (apm-workspace.sh:960-986,
 # 1129-1151), rather than relying on mise's `depends`/`depends_post` (which
-# never fired `agmsg:state:restore` on a failed `apply` — see
-# plans/apply-core-phase2-roster-in-apply.md and
-# tmp/apply-audit-20260821/report.md §3). Reuses the shared
+# never fired `agmsg:state:restore` on a failed `apply`). Reuses the shared
 # tests/conformance fixture and seeds a plain (pre-relink) agmsg roster into
 # its fake $HOME, then forces mid-command failures to prove restore still
 # runs.
