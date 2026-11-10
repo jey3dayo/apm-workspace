@@ -2991,8 +2991,6 @@ dependencies:
   content_hash: sha256:3d771bfaa0c6413c879a1fe5e8963d7543c1a238da1128568d6cffb29e3f788a
   skill_subset:
   - fixing-accessibility
-  - fixing-motion-performance
-  - improve-ui
 - repo_url: jackwener/opencli
   name: opencli-browser
   host: github.com
