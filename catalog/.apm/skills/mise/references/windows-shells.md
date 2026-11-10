@@ -100,7 +100,7 @@ Do not use this pattern for lightweight hooks or formatting tasks if a direct sh
 For repository-owned `mise.toml`, prefer repo-relative paths when possible:
 
 ```toml
-run_windows = "& \"./scripts/apm-workspace.ps1\" validate"
+run_windows = "& \"./scripts/task.ps1\" validate"
 ```
 
 This is usually more portable than embedding user-specific absolute paths.

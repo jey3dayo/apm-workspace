@@ -1,9 +1,3 @@
-["test:ps"]
-description = "Run the Pester behavioral suite for apm-workspace.ps1"
-# Host prerequisite, not mise-managed: pwsh with the Pester module. See AGENTS.md.
-run = "bash ./scripts/run-pester.sh"
-run_windows = "pwsh -NoProfile -Command \"Invoke-Pester -Path tests -CI -Output Detailed\""
-
 ["test:sh"]
 description = "Run bats unit tests for the workspace's bash scripts"
 run = "bash ./scripts/run-bats.sh"
@@ -12,4 +6,3 @@ run = "bash ./scripts/run-bats.sh"
 description = "Smoke-test the generated managed catalog package via a temp install"
 hide = true
 run = "bash ./scripts/apm-workspace.sh smoke:catalog"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 smoke:catalog"

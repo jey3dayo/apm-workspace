@@ -41,10 +41,8 @@ pre-commit:
       stage_fixed: true
 
     - name: workspace-scripts
-      glob: "scripts/apm-workspace.{sh,ps1}"
-      run: |
-        bash -n scripts/apm-workspace.sh
-        pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 help >/dev/null
+      glob: "scripts/apm-workspace.sh"
+      run: bash -n scripts/apm-workspace.sh
 
     - name: jactionlint
       glob: ".github/workflows/*.{yml,yaml}"
@@ -67,11 +65,8 @@ pre-push:
   # (smoke:catalog rebuilds `.catalog-build/<catalog>`).
   jobs:
     - name: workspace-scripts
-      glob: "{scripts/apm-workspace.{sh,ps1},scripts/run-pester.sh}"
-      run: |
-        bash -n scripts/apm-workspace.sh
-        pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 help >/dev/null
-        bash -n scripts/run-pester.sh
+      glob: "scripts/apm-workspace.sh"
+      run: bash -n scripts/apm-workspace.sh
 
     - name: test:sh
       glob: "{scripts/*.sh,scripts/lib/*.awk,scripts/lib/*.sh,catalog/.apm/skills/**/scripts/*.sh,catalog/.apm/skills/**/scripts/*.py,manual-skills/.apm/skills/**/scripts/*.py,tests/*.bats,mise.toml,mise/test.toml}"

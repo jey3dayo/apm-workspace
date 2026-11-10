@@ -18,28 +18,3 @@ command = "mise run check"
 name = "verify"
 icon = "tool"
 command = "mise run verify"
-
-[[actions]]
-name = "deploy"
-icon = "tool"
-command = "mise run deploy"
-
-[[actions]]
-name = "refresh:deploy"
-icon = "tool"
-command = "mise run refresh:deploy"
-
-[[actions]]
-name = "upgrade"
-icon = "tool"
-command = "mise run upgrade"
-
-[[actions]]
-name = "prepare:catalog"
-icon = "tool"
-command = "mise run prepare:catalog"
-
-[[actions]]
-name = "install:catalog"
-icon = "tool"
-command = "mise run install:catalog"

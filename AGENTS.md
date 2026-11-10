@@ -5,7 +5,8 @@ below) is the operational source of truth. Keep authoring inputs, generated
 targets, and caches separate; never infer ownership from whichever copy is
 currently deployed. On the native HOME, `~/.apm` is not the checkout: it holds
 only the APM consumer state (rendered manifest, lock, `apm_modules`, migrate
-records), so never edit it.
+records), so never edit it; the one exception is placing private skills under
+`~/.apm/skills/` (see the Private local overrides row).
 
 ## Ownership
 
@@ -14,7 +15,7 @@ records), so never edit it.
 | Global personal skills and shared guidance | `catalog/**`                                                  | Edit here; personal skills live in `catalog/.apm/skills/<id>/`, agents in `catalog/.apm/agents/<name>.agent.md`, and shared guidance includes the guide in `catalog/.apm/instructions/ai-collaboration.instructions.md`, commands, and rules. `catalog/.apm/` holds only `skills/`, `agents/` and that instruction. |
 | Repository-scoped skills                   | `optional-skills/<id>/**`                                     | The consuming repository installs its direct ref; never add the collection to root `apm.yml`.                                                                                                                                                                                                                       |
 | Workspace-only skills                      | `.apm/skills/**`                                              | Maintain child symlinks in `.claude/skills/` and `.agents/skills/`; edit neither bridge.                                                                                                                                                                                                                            |
-| Private local overrides                    | `private-skills/.apm/skills/**`                               | Gitignored here, tracked in the private repo; `mise run deploy` syncs it alongside the catalog (`apply:skills:local` is the fast partial path), and it overrides an identically named catalog skill.                                                                                                                |
+| Private local overrides                    | `private-skills/.apm/skills/**`                               | Gitignored here, tracked in the private repo. Native distribution does not deliver it: place it under the consumer `~/.apm/skills/` (the one allowed edit of `~/.apm`; `docs/native-distribution.md` "native と手動の境界"). Whether it overrides an identically named catalog skill is unconfirmed.                |
 | Managed external skills and global MCP     | `apm.yml` + `apm.lock.yaml`                                   | The manifest declares dependencies; the lock records the accepted resolution.                                                                                                                                                                                                                                       |
 | Manual upstream copies                     | `manual-skills/.apm/skills/**` + `manual-skills/upstreams/**` | Use only when the normal managed lane cannot package or deploy the upstream skill.                                                                                                                                                                                                                                  |
 | Host-local MCP                             | `mise.toml` + `scripts/apm-workspace.*`                       | Reconcile through `mise bootstrap`; do not edit runtime config.                                                                                                                                                                                                                                                     |
@@ -25,7 +26,7 @@ records), so never edit it.
 delivery surfaces. Regenerate them instead of editing them. `apm compile -g`
 writes the guide to `~/.codex/AGENTS.md` and `~/.cursor/AGENTS.md`, Claude reads
 it as `~/.claude/rules/ai-collaboration.md`, and Codex skills deploy to
-`~/.agents/skills`. Move a legacy root copy only with `mise run migrate:roots`.
+`~/.agents/skills`. Legacy root copies from the old path are covered in the known issues of `docs/native-distribution.md`.
 
 ## Task Tracking
 
@@ -47,35 +48,32 @@ bundle and install only the required sub-skill from the consuming repository.
 
 ## Rollout and Verification
 
-Classify work before running a rollout. The table and the paragraph after it
-describe the legacy rollout. On the native HOME (`~/.apm/apm.yml` starts with
-`# Rendered by scripts/native.sh`), `deploy`, `upgrade`, `apply:skills:local` and
-the other tasks that write the deployed targets are refused; roll out a pushed
-commit with `docs/native-distribution.md` section B (`native:backup` →
-`native:rehearse --migrate` → `native:migrate`). `check`, `verify` and `doctor`
-still run.
+The real HOME is native (`~/.apm/apm.yml` starts with
+`# Rendered by scripts/native.sh`). The legacy writer (`deploy`, `apply`,
+`upgrade`, `refresh` and their helper tasks) was removed on 2026-11-10; its last
+version is commit `0bcce09`. Roll out a pushed commit with section B of
+`docs/native-distribution.md` (`native:plan`, `native:backup`,
+`native:rehearse --migrate`, `native:migrate`); `native:migrate-rollback`
+undoes it.
 
-| Intent                 | Command                       | Constraint                                                                                                   |
-| ---------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Stable rollout         | `mise run deploy`             | Preserves the manifest. Does not force an upstream refresh, but unpinned deps re-resolve when re-downloaded. |
-| Upstream refresh       | `mise run upgrade`            | Intentionally accepts newer content; review `apm.lock.yaml`.                                                 |
-| Local Codex skill sync | `mise run apply:skills:local` | Does not replace a normal rollout.                                                                           |
-| Validation only        | `mise run check`              | Does not deploy.                                                                                             |
-| Deep verification      | `mise run verify`             | Runs checks, both script suites, and catalog smoke verification.                                             |
-
-`mise run deploy` is the normal end-to-end entry point (`check`, `apply`, and
-`doctor`). `mise run refresh:deploy` is broader and should not be substituted
-for normal rollout. Use `mise run prepare:catalog`, then `mise run
-install:catalog`, and `mise run doctor` for pushed shared-guidance changes.
+| Intent            | Command                                              | Constraint                                                                                                                                                               |
+| ----------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Rollout           | `docs/native-distribution.md` section B (`native:*`) | Rehearse on a backup copy first; `native:migrate` rewrites HOME (undo: `native:migrate-rollback`); `native:reinstate`, `native:opencode`, `setup:mcp:host` also write it |
+| Validation only   | `mise run check`                                     | Does not roll out.                                                                                                                                                       |
+| Deep verification | `mise run verify`                                    | Runs checks, the script suite, and catalog smoke verification.                                                                                                           |
+| Inspection        | `mise run doctor`                                    | Read-only.                                                                                                                                                               |
 
 Shipping here has no PR: commit directly on `main`, run `apm-deploy-verify`
-(it runs format, check, and deploy itself), then push `main` and watch the
-pushed CI run. `ship` reads this as the repository's end point. On the native
-HOME `apm-deploy-verify` skips the refused deploy; after the push, roll the
-pushed commit out with section B of `docs/native-distribution.md`.
+with the changed skill names (pass them both times: after the push the tree is
+clean, so it cannot infer them from `git status`) before the push for format
+and check (its distribution-match step applies only after the push and B6, so
+it reports that step as not run before then), then
+push `main` and watch the pushed CI run. `ship` reads this as the repository's
+end point. After the push, roll the pushed commit out with section B of
+`docs/native-distribution.md`, then run `apm-deploy-verify` again for the
+distribution match.
 
-`mise.toml` manages required tools except `pwsh` plus Pester, which `test:ps`
-(and therefore `test`/`verify`) requires. The bold-heading formatter helper is
+`mise.toml` manages the required tools. The bold-heading formatter helper is
 vendored at `scripts/replace-bold-headings.ts`; a missing helper is a broken
 checkout, not an optional dependency.
 
@@ -90,19 +88,12 @@ fixed default: CI runners and local macOS hosts differ by an order of
 magnitude in per-process cost (process spawn overhead, and lock polling when
 neither `flock` nor `shlock` is available), so the same fan-out that helps on
 a developer machine loses to overhead on a CI runner's limited core count.
-`APM_TEST_PARALLEL=0` forces both `test:sh` and `test:ps` to their
-serial/single-process path regardless of the parallel/flock/shlock guard or
-`BATS_JOBS`; CI sets it, leaving local runs at the parallel default (unset or
-`1`).
+`APM_TEST_PARALLEL=0` forces `test:sh` to its serial path regardless of the
+parallel/flock/shlock guard or `BATS_JOBS`; CI sets it, leaving local runs at
+the parallel default (unset or `1`).
 
-The `test:ps` lane is best-effort, not a verified Windows guarantee: CI and
-local runs execute `pwsh` on macOS/Linux, so a green Pester run only confirms
-the script's PowerShell syntax and logic run under those hosts' `pwsh`. It
-does not exercise Windows-specific failure modes such as path separators,
-`$USERPROFILE`, symlink-creation privileges, or CRLF handling, none of which
-have been verified on a Windows host. `test:ps` is not a pre-push gate for
-this reason; `test:sh` is the only workspace-script suite pre-push runs, and
-`test:ps` remains reachable through CI and `mise run test`/`verify`.
+The PowerShell lane (the `.ps1` scripts, their Pester suites and `test:ps`) was
+removed on 2026-11-10; see git history. Windows is out of scope.
 
 Before external sharing, run the repository's full gate. For smaller edits run
 touched-file formatting and the relevant focused check; always run `git diff
@@ -123,8 +114,11 @@ symlinks resolving to `.apm/skills/<id>/SKILL.md`.
 - When changing the active `apm` source, update both the checkout's `mise.toml`
   and `~/.config/mise/config.workstation.toml`.
 - Follow the guide in `catalog/.apm/instructions/ai-collaboration.instructions.md` for MCP placement. Root `apm.yml` contains only
-  cross-repository global MCP; use the tracked source and regenerate, never
-  edit `~/.codex/config.toml`. Desktop MCP setup belongs to bootstrap.
+  cross-repository global MCP; record it in the tracked source, never edit
+  `~/.codex/config.toml`. Native distribution does not deliver
+  `dependencies.mcp` (see the boundary table in `docs/native-distribution.md`);
+  report such a change as recorded, not delivered. Host-local MCP goes through
+  `mise run setup:mcp:host`, and desktop MCP setup belongs to bootstrap.
 - Runtime assets that a skill places at launch have no `targets:` distribution
   route. For `agmsg-review.config.toml` (spawn puts it in the per-run worker
   home, a hand-started pane in `~/.codex`), use the placement contract in
@@ -133,29 +127,24 @@ symlinks resolving to `.apm/skills/<id>/SKILL.md`.
 ## agmsg State
 
 `~/.agents/skills/agmsg/db` and `teams` must remain symlinks to
-`${XDG_STATE_HOME:-~/.local/state}/agmsg/`; `apm apply` would otherwise erase
-the roster and history. `mise run apply` (both `apm-workspace.sh` and
-`apm-workspace.ps1`) saves and restores them automatically on every exit
-path, success or failure — the `agmsg:state:save`/`agmsg:state:restore` mise
-tasks are recovery adapters only, for a roster left unlinked by some other
-process. Run `mise run agmsg:state:restore` by hand to recover from that.
-`mise run refresh` (`cmd_update`/`Invoke-Update`, which runs
-`apm deps update -g`) carries the same save/restore wrapping as apply.
-A bare `apm install -g` is not wrapped: it goes through the upstream CLI,
-not `cmd_apply`, so the save/restore around apply never runs and the links are
-gone when it finishes; the store under
-`${XDG_STATE_HOME:-~/.local/state}/agmsg/` survives. Diagnose with
-`mise run doctor` before restoring — the plain-path rule in
-`catalog/.apm/skills/agmsg-delegation/references/roster-recovery.md` still applies.
-Remove this workaround only after upstream `AGMSG_HOME` supports both
+`${XDG_STATE_HOME:-~/.local/state}/agmsg/`; replacing the skill directory would
+otherwise erase the roster and history. `native:rehearse --migrate` and
+`native:migrate` save and restore the links through `scripts/agmsg-state.sh`,
+and `native:migrate-rollback` relinks them. A bare `apm install -g` does not
+run that save/restore, so the links are gone when it finishes; the store under
+`${XDG_STATE_HOME:-~/.local/state}/agmsg/` survives. For a roster left
+unlinked, diagnose with `mise run doctor`, then run
+`mise run agmsg:state:restore` (`agmsg:state:save` is the counterpart). The
+plain-path rule in
+`catalog/.apm/skills/agmsg-delegation/references/roster-recovery.md` still
+applies. Remove this workaround only after upstream `AGMSG_HOME` supports both
 locations.
 
 ## Cache Recovery
 
 When a deployed `SKILL.md` is tiny, placeholder, or differs from a complete
-tracked source, compare source, cache, and target first. Prefer `mise run
-deploy:fresh`; it previews pruning without deleting packages, repairs workspace
-package caches, then deploys.
+tracked source, compare source, cache, and target first, then repeat
+section B of `docs/native-distribution.md` (B4 sets the APM cache aside).
 
 `apm prune` can miss orphaned owner directories and removed nested skills.
 Compare `apm_modules/` with both manifest and lock; delete only an unreferenced
@@ -169,6 +158,6 @@ artifact; do not report it as a user-facing problem.
 
 ## Review Focus
 
-For workspace-mechanics changes, verify command semantics, the separation of
-`upgrade` from `refresh:deploy`, verification-only `check`, reproducible catalog
-registration, and intentional lockfile changes.
+For workspace-mechanics changes, verify command semantics, verification-only
+`check`, the native rollout order in `docs/native-distribution.md`, and
+intentional lockfile changes.

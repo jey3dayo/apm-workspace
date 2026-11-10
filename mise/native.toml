@@ -1,6 +1,6 @@
-# Native APM distribution (docs/native-distribution.md). Coexists with `deploy` until it replaces it; it is not a third
-# permanent distribution path. apply targets a disposable HOME only; migrate (after a clean rehearse --migrate) and its undo,
-# migrate-rollback and reinstate, are the only tasks that write the real HOME. backup and rehearse only read it.
+# Native APM distribution (docs/native-distribution.md): the distribution path since the legacy `deploy` was removed on
+# 2026-11-10. apply targets a disposable HOME only; migrate (after a clean rehearse --migrate), migrate-rollback, reinstate
+# and opencode (~/.config/opencode) write the real HOME. backup and rehearse only read it.
 
 ["native:plan"]
 description = "Print the SHA-pinned consumer manifest and the native install/compile steps; writes nothing"

@@ -2,8 +2,8 @@
 name: apm-usage
 description: >-
   Owner router for the APM workspace checkout: which lane and path own a skill,
-  agent, rule or MCP change, and which mise task rolls it out (deploy, upgrade,
-  install:catalog, 再配布). Covers apm.yml / apm.lock.yaml pins, `apmのバージョンあげて`,
+  agent, rule or MCP change, and how it is rolled out (native `native:*`
+  rollout, 再配布). Covers apm.yml / apm.lock.yaml pins, `apmのバージョンあげて`,
   global MCP add/change/remove including ~/.codex/config.toml and `codex mcp
   add`/`remove`, repo-local apm.yml creation/cleanup（「repo に apm.yml を置いて」
   「この repo におすすめ skill 入れて」「ローカルスキル整理」）, and manual-skills /
@@ -42,9 +42,17 @@ Before any persistent MCP configuration write:
 
 1. Inspect the checkout's root `apm.yml`, ownership guidance, and rollout script first.
 2. Classify the requested path as a source of truth or deployed output before writing.
-3. If the MCP is declared in APM, edit the tracked APM source and redeploy; do not run `codex mcp add` / `codex mcp remove` or hand-edit `~/.codex/config.toml` as the durable change.
-4. For diagnostics, prefer a one-run `codex -c` override and state that it is temporary.
-5. Verify the resolved server with `codex mcp list` and one real tool call before reporting completion.
+3. Choose the destination and verify its delivery result:
+   - Root native: edit `dependencies.mcp` in the tracked root `apm.yml`. Native distribution installs with `--only apm` and does not apply MCP additions, edits, or removals; during section B's B6 check, confirm the host MCP configuration is unchanged and report the manifest change as recorded, not delivered.
+   - Repository-local: edit the target repository's `apm.yml`.
+     - For a manifest-only request, stop after the edit.
+     - To add and deliver a server, use `apm install --mcp <name> ...` there. To change or remove an existing declaration, edit the manifest and run `apm install --only mcp` to reconcile active targets.
+     - After an addition, confirm the server appears in each intended target's MCP configuration and in lock fields `mcp_servers` / `mcp_target_servers`.
+     - After a change, confirm the target contains the requested configuration and `mcp_configs` plus the target mapping match.
+     - After removal, if no remaining direct or transitive dependency requires it, confirm the server is absent from target configuration and lock fields `mcp_servers`, `mcp_configs`, and `mcp_target_servers`. If it remains transitively required, report that instead of claiming removal.
+     - Judge the tree even when install reports failure.
+   - Host-local: use `mise run setup:mcp:host`, then verify the resolved server with `codex mcp list` and one real tool call.
+4. For diagnostics, prefer a one-run `codex -c` override and state that it is temporary. Do not run `codex mcp add` / `codex mcp remove` or hand-edit `~/.codex/config.toml` as the durable change.
 
 Repo-local and on-demand placement: keep `tauri-mcp-server`-style runtime MCPs in the repository that needs them, and add screen-control MCPs on demand rather than globally. There is no fixed list of repo-local MCPs — enumerate repositories with `ghq list -p` and read each `apm.yml`. Connection status for SaaS connectors lives in `docs/saas-connectors.md` of the checkout; removal decisions are recorded in `docs/package-decisions.md`.
 
@@ -62,15 +70,15 @@ Repo-local and on-demand placement: keep `tauri-mcp-server`-style runtime MCPs i
 Choose the narrowest lane that matches who needs the skill. Name the lane
 before installing or creating a skill.
 
-| Lane                | Scope                                                                | Source of truth                    | Delivery                                                                                     |
-| ------------------- | -------------------------------------------------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------- |
-| `workspace-only`    | APM workspace operations only                                        | `.apm/skills/<id>/`                | Local `.claude/skills/<id>` and `.agents/skills/<id>` bridges                                |
-| `repository-local`  | One repository's runtime, credentials, framework, or workflow        | Target repository's `apm.yml`      | `apm install <package-ref>` in that repository                                               |
-| `optional`          | Workspace-owned skill used by selected repositories                  | `optional-skills/<id>/`            | Direct `apm install jey3dayo/apm-workspace/optional-skills/<id>#main`                        |
-| `global-catalog`    | Personal cross-repository workflow                                   | `catalog/.apm/skills/<id>/`        | Global automatic rollout                                                                     |
-| `global-dependency` | External cross-repository foundation                                 | Root `apm.yml` and `apm.lock.yaml` | `apm install -g <package-ref>`                                                               |
-| `private`           | Machine-local overlay (gitignored here, tracked in the private repo) | `private-skills/.apm/skills/<id>/` | `mise run deploy` (same apply stage as the catalog); `apply:skills:local` for a fast refresh |
-| `manual`            | Upstream package that cannot use the managed lane                    | `manual-skills/.apm/skills/<id>/`  | Manual-skills package rollout                                                                |
+| Lane                | Scope                                                                | Source of truth                    | Delivery                                                                        |
+| ------------------- | -------------------------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------- |
+| `workspace-only`    | APM workspace operations only                                        | `.apm/skills/<id>/`                | Local `.claude/skills/<id>` and `.agents/skills/<id>` bridges                   |
+| `repository-local`  | One repository's runtime, credentials, framework, or workflow        | Target repository's `apm.yml`      | `apm install <package-ref>` in that repository                                  |
+| `optional`          | Workspace-owned skill used by selected repositories                  | `optional-skills/<id>/`            | Direct `apm install jey3dayo/apm-workspace/optional-skills/<id>#main`           |
+| `global-catalog`    | Personal cross-repository workflow                                   | `catalog/.apm/skills/<id>/`        | Global automatic rollout                                                        |
+| `global-dependency` | External cross-repository foundation                                 | Root `apm.yml` and `apm.lock.yaml` | Edit root `apm.yml` in the checkout, roll out with section B                    |
+| `private`           | Machine-local overlay (gitignored here, tracked in the private repo) | `private-skills/.apm/skills/<id>/` | Not delivered by native distribution; place it in the consumer `~/.apm/skills/` |
+| `manual`            | Upstream package that cannot use the managed lane                    | `manual-skills/.apm/skills/<id>/`  | Manual-skills package rollout                                                   |
 
 ## Install Gate
 
@@ -138,19 +146,13 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
 
 ## Task Selection
 
-- On the native HOME (`~/.apm/apm.yml` starts with `# Rendered by scripts/native.sh`), `deploy`, `upgrade`, `apply` and the other tasks below that write the deployed targets are refused. Roll out with `docs/native-distribution.md` section B (`native:backup` → `native:rehearse --migrate` → `native:migrate`); the deploy tasks below describe the legacy rollout.
-- Run `mise run check` for a lightweight pre-deploy gate.
+- The real HOME is native (`~/.apm/apm.yml` starts with `# Rendered by scripts/native.sh`). The legacy writer (`deploy`, `apply`, `upgrade`, `refresh` and their helper tasks) was removed on 2026-11-10; its last version is commit `0bcce09`. Roll out with `docs/native-distribution.md` section B (`native:plan` → `native:backup` → `native:rehearse --migrate` → `native:migrate`); `native:migrate-rollback` undoes it.
+- Run `mise run check` for a lightweight gate before a rollout.
 - Run `mise run verify` for `check`, both script suites (`test`), and catalog smoke verification.
-- Run `mise run deploy` for the normal local rollout from the current manifest and lock.
-- Run `mise run apply` only when deployment is needed without the bundled `check -> doctor` flow.
-- Run `mise run refresh` to pull the checkout (skipped when the tree is dirty) and run `apm deps update -g` (deprecated; superseded by `apm update`): it advances unpinned dependencies, regenerates `apm.lock.yaml`, and rewrites deployed targets, with agmsg links saved/restored, but skips `check`, the workspace apply, and `doctor`.
-- Run `mise run upgrade` to accept newer upstream package content; it runs `mise run check:roots`, `apm update -g --yes`, then `mise run deploy`.
-- Run `mise run refresh:deploy` when you explicitly want `refresh -> deploy`.
-- Run `mise run prepare:catalog` before commit/push when tracked catalog content changed.
-- Run `mise run install:catalog` after commit/push when you want to install the tracked catalog ref.
+- Run `mise run doctor` to inspect deployed state; it is read-only.
 - Run `mise run smoke:catalog` to smoke-test the generated catalog package.
-- Run `mise run apply:skills:local` for a fast sync of catalog/private skills into the Codex target and the Claude private skill links; it does not replace a rollout.
-- For skill creation, updates, installs, or migrations in this workspace, include `mise run deploy` and a deployed target check in the plan unless the user explicitly asks for local-only refresh.
+- No task refreshes upstream dependencies or regenerates `apm.lock.yaml`; this is an open item in `docs/package-decisions.md`.
+- For skill creation, updates, installs, or migrations in this workspace, include section B and a deployed target check in the plan unless the user explicitly asks for a local-only change.
 
 ## Routing
 
@@ -163,13 +165,14 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
 - If the request is "optimize" or "customize" a cross-repository skill for this workspace, treat it as personal skill work and prefer `catalog/.apm/skills/<id>/`.
 - If the request is to preserve a reusable implementation judgment from real work, such as "Valibot belongs in schemas", "Result conversion belongs at a boundary", or "DB access belongs in repositories", encode it as a concern -> owner candidates -> caller rule table in the relevant personal skill under `catalog/.apm/skills/<id>/`.
 - If the user does not specify the target skill id for that reusable judgment, inspect named skills, catalog triggers, and existing examples first; update the closest existing personal skill instead of creating a new skill by default.
-- If the request is "change shared guidance", edit `catalog/**`; use `prepare:catalog` before publish/install.
+- If the request is "change shared guidance", edit `catalog/**`, run `mise run check`, then roll out with section B.
 - If the request is "change dependency selection", edit or review `apm.yml` / `apm.lock.yaml`, writing entries per `references/manifest-style.md`.
 - If the request is about `mise upgrade <tool>`, `minimum_release_age`, latest eligible release selection, or why a non-APM tool version did not update, use the `mise` skill unless the pinned `apm` source, APM manifest, lockfile, or rollout task selection is the actual subject.
 - If the request is to add an individual APM package, assign its lane before
-  running `apm install`. Use `apm install -g <package-ref>` only for the
-  `global-dependency` lane; use `apm install <package-ref>` from the target
-  repository for the `repository-local` lane.
+  running `apm install`. For the `global-dependency` lane, edit the root
+  `apm.yml` in the checkout and roll out with section B (Fast Path 6); use
+  `apm install <package-ref>` from the target repository for the
+  `repository-local` lane.
 - If the request touches a `repository-local` manifest for any reason
   (new dependency, audit, cleanup), also check that `targets:` covers every
   agent runtime actually used in that repository before finishing. Fix a
@@ -182,7 +185,7 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
   package as the source of truth and select it in the consuming repository with
   `apm install <package-ref> --skill <id>`.
 - If the request is to scan an arbitrary repository and create, update, or clean up its repo-local `apm.yml`, read `references/repo-manifest.md`.
-- If the request is to add an MCP server through APM, apply the same scope rule: use `apm install -g --mcp <name> ...` only for cross-repo foundation MCPs; use repo-local `apm install --mcp <name> ...` for project, framework, UI, database, browser, or app-runtime-specific MCPs.
+- If the request is to add an MCP server through APM, apply the same scope rule: record cross-repo foundation MCPs under `dependencies.mcp` in the root `apm.yml` (Fast Path 6), noting that native distribution installs with `--only apm` and does not deliver it; use repo-local `apm install --mcp <name> ...` for project, framework, UI, database, browser, or app-runtime-specific MCPs.
 - If the APM workspace has no repo-local MCP distribution lane for a target repository, record the intended placement as guidance and keep the global manifest lightweight. Treat implementing repo-local MCP distribution as a separate workspace-mechanics task.
 - If the request is "change only workspace docs or notes", edit the workspace files directly and do not restage the catalog unless `catalog/**` changed too.
 
@@ -230,8 +233,8 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
 - `apm audit --ci` and searching a deployed target: see `references/rollout-fast-paths.md` for the reading and grep-wrapper caveats.
 - Prefer `mise` tasks over ad hoc script entrypoints for normal operation.
 - Before changing user-global `mise` tools, verify the resolved binary path and install tree. `mise latest` can lag or differ because of release-age policy, so compare with the upstream registry when exact latest-version behavior matters.
-- Before committing `apm.lock.yaml` after `mise run upgrade`, separate the intended dependency update from unrelated unpinned dependency drift. Report unrelated drift instead of hiding it inside the target dependency change.
-- When `apm.yml` includes a `gist.github.com/...#<sha>` dependency, verify the refreshed `apm.lock.yaml` record after `mise run upgrade` or any lock refresh. The workspace validator accepts APM's shortened `owner/<gist-id>` lock form as the same gist dependency, but the deployed target should still be checked before declaring the rollout complete.
+- Before committing a change to `apm.lock.yaml`, separate the intended dependency update from unrelated unpinned dependency drift. Report unrelated drift instead of hiding it inside the target dependency change.
+- When `apm.yml` includes a `gist.github.com/...#<sha>` dependency, verify the refreshed `apm.lock.yaml` record after any lock refresh. The workspace validator accepts APM's shortened `owner/<gist-id>` lock form as the same gist dependency, but the deployed target should still be checked before declaring the rollout complete.
 - If an upstream skill path is wrong, correct it to the real upstream path and treat the corrected successful install as the main result.
 - Report a deploy warning only when it affects the skill changed in this task, its manifest or lock entry, its `manual-skills` provenance, or the deploy exit code. Known orphaned guidance and unrelated `manual-skills` warnings are residual noise; leave them out of the final report.
 
@@ -246,9 +249,8 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
 2. Personal skill changed:
    - edit `catalog/.apm/skills/**`
    - optionally run `mise run format:markdown:bold-headings`
-   - run `mise run deploy`
+   - run `mise run check`, then roll out with section B
    - verify `~/.agents/skills/<id>/` contains the deployed skill
-   - use `mise run apply:skills:local` only when the user explicitly wants a fast local skill sync
 
 3. Optional repository skill changed:
    - edit `optional-skills/<id>/**`
@@ -258,26 +260,16 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
 
 4. Shared guidance changed:
    - edit `catalog/**`
-   - run `mise run prepare:catalog`
-   - review the diff, commit/push, then run `mise run install:catalog`
-   - `install:catalog` moves the catalog dependency's pin to the pushed upstream
-     commit via `apm update` (falling back to `apm install -g <ref>` on first
-     registration), so a stale cached commit is not silently redeployed
-   - after `install:catalog`, run `git diff apm.yml` — the rewrite can wrap the
-     long `git:` gist URL onto two lines with a trailing space, which fails
-     `lint:yaml` and blocks `check` before `deploy:fresh` ever reaches apply.
-     Fold any wrapped `git:` line back to one line before continuing
+   - run `mise run check`
+   - review the diff, commit and push, then roll the pushed SHA out with section B (`native:plan -- --source-ref <SHA>` first)
 
 5. Upstream refresh:
-   - run `mise run upgrade` to move dependencies that track a branch or tag
-   - for a hand-bumped SHA pin, use the narrower SHA-pin bump sequence in
-     `references/rollout-fast-paths.md` instead of `mise run upgrade`
-   - when upgrade fails with `Invalid APM package` on a SHA-pinned git
-     dependency, triage revision-pin vs annotated tags in
-     `references/rollout-fast-paths.md` before re-pinning by hand
-   - if the manifest contains `gist.github.com/...#<sha>`, verify its regenerated `apm.lock.yaml` record as the gist Guardrail describes (the shortened `owner/<gist-id>` `repo_url` is the accepted form) before deploy
+   - no task re-resolves the root `apm.lock.yaml` (`upgrade` and `deploy:pins` were removed); do not run `apm update -g` or `apm install -g` as a substitute. Update the pinned entries of `apm.lock.yaml` to the same commits as the pin in `apm.yml` (or revert the pin)
+   - for a hand-bumped SHA pin, see the SHA-pin bump sequence in
+     `references/rollout-fast-paths.md`
+   - if the manifest contains `gist.github.com/...#<sha>`, verify its regenerated `apm.lock.yaml` record as the gist Guardrail describes (the shortened `owner/<gist-id>` `repo_url` is the accepted form) before rollout
    - confirm the target dependency's `resolved_commit` and the deployed file's hash
-     before calling the refresh done; a zero exit from `deploy` is not evidence the pin moved
+     before calling the refresh done; a zero exit from `native:migrate` is not evidence the pin moved
    - review `apm.lock.yaml` before commit: start from `mise run lock:diff`
      (moved commits, removed artifacts, per-target counts, other changed
      sections), then read the raw diff of every section it lists as changed
@@ -290,11 +282,10 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
      `global-dependency`, `private`, or `manual` before installing;
      `global-catalog` is not an install lane — create the skill via
      Fast Path 2 instead
-   - for global dependencies, work in the checkout and use `apm install -g <package-ref>` or `apm install -g --mcp <name> ...`
-   - a bare `apm install -g` bypasses `mise run apply`, so the agmsg roster links it removes are not restored for you; follow the agmsg State section of the checkout's `AGENTS.md` afterwards, diagnosing with `mise run doctor` before any restore
-   - run `mise run check:roots` before any bare `apm install -g` or `apm update -g`: while `~/.claude/CLAUDE.md` is still the legacy copy of the catalog guide, the install adds the same guide as a Claude rule and Claude loads it twice (`mise run migrate:roots` moves the copy)
+   - for global dependencies, edit the root `apm.yml` in the checkout (a package under `dependencies.apm`, an MCP server under `dependencies.mcp`); native distribution installs with `--only apm` and does not deliver `dependencies.mcp`, so leave the host MCP config as it is and report that the server was recorded but not delivered (boundary table in `docs/native-distribution.md`); do not run `apm install -g` or `apm install -g --mcp`: on the native HOME they write the consumer `~/.apm` and the real HOME, and the next native rollout drops the change. No task records a lock entry for a new dependency; report that as the open item in `docs/package-decisions.md` (2026-11-10)
+   - if someone already ran a bare `apm install -g`, it did not save and restore the agmsg roster links; follow the agmsg State section of the checkout's `AGENTS.md`, diagnosing with `mise run doctor` before any restore
    - for repo-local dependencies, work in the target repository and use `apm install <package-ref>` or `apm install --mcp <name> ...`
-   - for global changes, run `mise run check`, then `mise run deploy`; for repo-local changes, run that repository's defined APM or project checks
+   - for global changes, run `mise run check`, then roll out with section B; for repo-local changes, run that repository's defined APM or project checks
    - for repo-local changes, also confirm `targets:` includes every runtime the
      repository actually uses (add `claude` if it only lists `codex` but the
      repository uses Claude Code) before running `apm install`
@@ -305,11 +296,10 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - edit the external repository checkout that is the source of truth
    - run that repository's relevant checks
    - commit and push the external repository
-   - in the checkout, check how `apm.yml` pins that dependency: if it tracks a branch
-     or tag, run `mise run upgrade`; if it is SHA-pinned, bump the pin and
-     follow the SHA-pin bump sequence in `references/rollout-fast-paths.md`
-     instead of `mise run upgrade` alone
-   - verify `apm.lock.yaml` points the target dependency at the pushed commit
+   - in the checkout, bump the SHA pin in `apm.yml` and follow the SHA-pin bump
+     sequence in `references/rollout-fast-paths.md`; a dependency that tracks a
+     branch or tag has no refresh task now (Fast Path 5)
+   - update the pinned entry of `apm.lock.yaml` to the pushed commit and verify it points the target dependency there
    - check whether `apm.lock.yaml` also changed unrelated unpinned dependencies
    - verify the deployed target such as `~/.agents/skills/<id>` contains the updated content
    - keep unrelated dirty files in the checkout unstaged unless the user explicitly includes them
@@ -317,11 +307,10 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
 8. Manual skill promoted to workspace-owned:
    - move the skill from `manual-skills/.apm/skills/<id>/` to `catalog/.apm/skills/<id>/`
    - update `manual-skills/upstreams/**` to note the migration
-   - run `mise run check`, then `mise run deploy`
+   - run `mise run check`, then roll out with section B
    - verify the deployed target contains one copy of the skill
 
 9. Global external dependency removed:
-   - confirm `git status --short apm.lock.yaml` is clean, delete its `apm.yml` line, run `apm lock -g` (no `--update`) to drop the now-undeclared lock record, then `mise run deploy`; a bare hand-deleted line without `apm lock -g` leaves the lock record behind and `mise run apply` stops with `External lock record is not declared in apm.yml`
-   - check the diff with `git diff apm.lock.yaml | grep '^[-+]  resolved_commit'`: a lone `-` line is the removed dependency; a `-`/`+` pair is a branch-ref reresolution (expected) unless it lands on a SHA-pinned dependency (stop and investigate)
+   - confirm `git status --short apm.lock.yaml` is clean and delete its `apm.yml` line; no task drops the now-undeclared lock record (Fast Path 5), so report it, then roll out with section B
    - verify the skill is gone from both deployed targets, and record the removal in `docs/package-decisions.md`
-   - `apm uninstall -g <manifest-ref>` is an alternative with more side effects on 0.31.0; see `references/rollout-fast-paths.md`
+   - do not run `apm uninstall -g <manifest-ref>` on the native HOME: it writes the consumer `~/.apm` and the real HOME, and the next native rollout overrides it; `references/rollout-fast-paths.md` keeps its old-path side effects as a record

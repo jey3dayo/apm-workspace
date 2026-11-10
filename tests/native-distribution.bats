@@ -1138,35 +1138,16 @@ prepare_migrate() {
   [ -z "$(ls -A "$outside")" ]
 }
 
-@test "migrate:roots --apply runs from a new checkout on a HOME without ~/.apm, and moves the legacy guide aside" {
-  local home
-  home="$(new_home roots-apply)"
-  mkdir -p "$home/.claude"
-  # The current guide body is always one of the blobs the script recognises as a legacy copy, so no git history is needed.
-  catalog_guide_body >"$home/.claude/CLAUDE.md"
-  [ -s "$home/.claude/CLAUDE.md" ]
-  run fixture_exec "$home" /usr/bin/env APM_WORKSPACE_DIR="$REPO_ROOT" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" migrate:roots --apply
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"Moved $home/.claude/CLAUDE.md"* ]]
-  [ ! -e "$home/.claude/CLAUDE.md" ]
-  [ ! -e "$home/.apm" ]
-}
-
 # A HOME whose ~/.apm is a native consumer: apm.yml rendered by native.sh, no checkout.
 seed_native_consumer_home() {
   mkdir -p "$1/.apm"
   printf '# Rendered by scripts/native.sh from apm.yml with this repository pinned at %s. Do not edit; re-render.\n' "$SOURCE_SHA" >"$1/.apm/apm.yml"
 }
 
-@test "sync:opencode writes the OpenCode guide on a native HOME, leaves a hand-written one alone, while apply stays refused" {
+@test "sync:opencode writes the OpenCode guide on a native HOME and leaves a hand-written one alone" {
   local home
   home="$(new_home opencode-sync)"
   seed_native_consumer_home "$home"
-
-  run fixture_exec "$home" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" apply
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"so apply is refused"* ]]
-  [ ! -e "$home/.config/opencode/AGENTS.md" ]
 
   run fixture_exec "$home" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" sync:opencode
   [ "$status" -eq 0 ]
@@ -1618,36 +1599,6 @@ build_github_fixture() {
   [ "$(roots_snapshot "$home")" = "$original" ]
 }
 
-@test "the old path refuses every command that rewrites a deployment when the HOME consumer apm.yml was rendered by native.sh, before apm starts" {
-  local home workspace="$FX/native-workspace" bin="$FX/guard-bin" cmd
-  local -a words
-  home="$(new_home guard)"
-  mkdir -p "$workspace" "$bin" "$home/.apm"
-  native "$home" render --source-ref "$SOURCE_SHA" --workspace-only >"$home/.apm/apm.yml"
-  printf '#!/bin/sh\ntouch "%s/apm-ran"\n' "$home" >"$bin/apm"
-  chmod +x "$bin/apm"
-  for cmd in apply apply:skills:local refresh install-pins repair:local-package-cache pin-external prune:cache \
-    install:catalog "migrate:roots --apply"; do
-    read -r -a words <<<"$cmd"
-    run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" "${words[@]}"
-    [ "$status" -ne 0 ]
-    [[ "$output" == *"$home/.apm/apm.yml was rendered by scripts/native.sh"* ]]
-  done
-  run fixture_exec "$home" /usr/bin/env APM_WORKSPACE_DIR="$workspace" PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" apply
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"was rendered by scripts/native.sh"* ]]
-  [ ! -e "$home/apm-ran" ]
-
-  # Reading commands still work, and a manifest without the header is not refused.
-  run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" help
-  [ "$status" -eq 0 ]
-  run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" migrate:roots
-  [[ "$output" != *"was rendered by scripts/native.sh"* ]]
-  printf 'name: hand-written\n' >"$home/.apm/apm.yml"
-  run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" migrate:roots --apply
-  [[ "$output" != *"was rendered by scripts/native.sh"* ]]
-}
-
 # After the cutover the checkout lives outside HOME (a linked worktree has a .git file) and HOME/.apm is the consumer.
 setup_authoring_checkout() {
   local authoring="$1" log="$2" bin="$3"
@@ -1673,7 +1624,6 @@ setup_authoring_checkout() {
   grep -qxF "$authoring|compile --validate" "$log"
 
   run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$authoring/scripts/apm-workspace.sh" smoke:catalog
-  [[ "$output" != *"was rendered by scripts/native.sh"* ]]
   grep -qF "install $authoring/.catalog-build/catalog --target agent-skills" "$log"
   [ -d "$authoring/.catalog-build/catalog" ]
   install_home="$(grep -F '|install ' "$log.home" | cut -d'|' -f1)"
@@ -1683,69 +1633,11 @@ setup_authoring_checkout() {
 
   run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$authoring/scripts/apm-workspace.sh" apply
   [ "$status" -ne 0 ]
-  [[ "$output" == *"$home/.apm/apm.yml was rendered by scripts/native.sh"* ]]
+  [[ "$output" == *"unknown command"* ]]
   [ "$(cd "$home/.apm" && find . | LC_ALL=C sort)" = "$consumer_before" ]
 }
 
-# The mise tasks run with the repository's tasks but without its [tools], which a fixture HOME cannot install. The
-# ceiling keeps mise from reading a mise.toml above the fixture root (APM_NATIVE_FIXTURE_ROOT may sit under one).
-setup_mise_fixture() {
-  local dir="$1"
-  mkdir -p "$dir"
-  cp -R "$REPO_ROOT/scripts" "$REPO_ROOT/mise" "$dir/"
-  python3 - "$REPO_ROOT/mise.toml" "$dir/mise.toml" <<'EOF'
-import re, sys
-text = open(sys.argv[1]).read()
-text = re.sub(r"\[tools\].*?(?=\n# =+\n# Task Includes)", "", text, flags=re.S)
-open(sys.argv[2], "w").write(text)
-EOF
-  ! grep -q '^\[tools\]' "$dir/mise.toml" || { echo "setup_mise_fixture: the [tools] section of mise.toml was not removed; update the pattern" >&2 && return 1; }
-  git -C "$dir" init -q 2>/dev/null || mkdir -p "$dir/.git"
-}
-
-@test "mise run upgrade stops before apm update when the HOME consumer was rendered by native.sh" {
-  command -v mise >/dev/null || skip "mise is not installed"
-  local home fixture="$FX/mise-upgrade" bin="$FX/mise-upgrade-bin" mise_bin
-  mise_bin="$(command -v mise)"
-  home="$(new_home upgrade-guard)"
-  mkdir -p "$home/.apm" "$bin"
-  setup_mise_fixture "$fixture"
-  native "$home" render --source-ref "$SOURCE_SHA" --workspace-only >"$home/.apm/apm.yml"
-  printf '#!/bin/sh\ntouch "%s/apm-ran"\n' "$home" >"$bin/apm"
-  chmod +x "$bin/apm"
-
-  run fixture_exec "$home" /usr/bin/env PATH="$bin:$(dirname "$mise_bin"):$FIXTURE_PATH" MISE_TRUSTED_CONFIG_PATHS="$fixture" MISE_CEILING_PATHS="$FX" \
-    mise -C "$fixture" run upgrade
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"was rendered by scripts/native.sh"* ]]
-  [ ! -e "$home/apm-ran" ]
-
-  # check:roots passes on a HOME whose ~/.apm is a checkout.
-  printf 'name: old-checkout\n' >"$home/.apm/apm.yml"
-  mkdir -p "$home/.apm/.git"
-  run fixture_exec "$home" /usr/bin/env PATH="$bin:$(dirname "$mise_bin"):$FIXTURE_PATH" MISE_TRUSTED_CONFIG_PATHS="$fixture" MISE_CEILING_PATHS="$FX" \
-    mise -C "$fixture" run check:roots
-  [ "$status" -eq 0 ]
-}
-
-@test "between moving the checkout away and the first migrate, the old path refuses HOME-writing commands unless APM_WORKSPACE_DIR is set" {
-  local home bin="$FX/half-bin"
-  home="$(new_home half-moved)"
-  mkdir -p "$bin"
-  printf '#!/bin/sh\ntouch "%s/apm-ran"\n' "$home" >"$bin/apm"
-  chmod +x "$bin/apm"
-  for state in none empty; do
-    [ "$state" = none ] || mkdir -p "$home/.apm"
-    run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" apply
-    [ "$status" -ne 0 ]
-    [[ "$output" == *"neither a checkout nor a native consumer"* ]]
-  done
-  [ ! -e "$home/apm-ran" ]
-  run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$REPO_ROOT/scripts/apm-workspace.sh" validate
-  [[ "$output" != *"neither a checkout nor a native consumer"* ]]
-}
-
-@test "when HOME/.apm is a checkout the old path keeps using it, and a catalog without .git is not mistaken for the consumer" {
+@test "when HOME/.apm is a checkout, validate uses it as the workspace, and a catalog without .git is not mistaken for the consumer" {
   local home authoring="$FX/authoring-old" bin="$FX/authoring-old-bin" log="$FX/authoring-old-apm.log" physical
   setup_authoring_checkout "$authoring" "$log" "$bin"
 

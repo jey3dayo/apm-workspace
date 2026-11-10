@@ -7,37 +7,31 @@ were observed on 0.29.0 and carried forward.
 
 ## SHA-pin bump sequence (Fast Path 5 / Fast Path 7)
 
-When you bump a SHA pin in `apm.yml` by hand, `mise run deploy` alone cannot
-pick it up: `apply` stages external skills offline from the existing lock
-records and `apm_modules/`. `validate:workspace` therefore fails `check` while
-a manifest SHA pin has no matching `resolved_commit` in `apm.lock.yaml`, and
-names the pin. Run `mise run deploy:pins`: it runs
-`apm install -g --only apm` with the agmsg roster saved and restored, then
-`deploy`. The install re-resolves a dependency whose manifest ref differs
-from the locked one (`detect_ref_change`, observed on 0.31.0 with a single
-dependency).
+When you bump a SHA pin in `apm.yml` by hand, `validate:workspace` fails `check`
+while the pin has no matching `resolved_commit` in `apm.lock.yaml`, and names
+the pin. No task re-resolves the root lock: `deploy:pins` (`apm install -g --only
+apm`, then `deploy`) and `upgrade` were removed on 2026-11-10 (last version:
+commit `0bcce09`). On the native HOME `apm install -g` works on the consumer
+`~/.apm`, not on the checkout's lock, so do not run it to update the lock.
+Update the pinned entries of `apm.lock.yaml` to the same commits as the pin (or
+revert the pin), then review the change with `mise run lock:diff`.
 
-`mise run upgrade` also moves the lock to a hand-bumped SHA on 0.31.0, but it
-is the wrong tool here. Besides refreshing every unpinned dependency, it
-rewrites every declared SHA pin whose upstream has an annotated semver tag to
-the highest such tag's commit, which can be older than the pinned commit, and
-appends `# <tag>` to that line.
-
-If `deploy:pins` fails at its `deploy` stage, the install has already moved
-the lock and the roster links are restored; fix the failure and rerun
-`mise run deploy` rather than the whole task.
+`apm update` rewrites every declared SHA pin whose upstream has an annotated
+semver tag to the highest such tag's commit, which can be older than the pinned
+commit, and appends `# <tag>` to that line (observed on 0.31.0). A SHA-pinned
+dependency therefore stays pinned by hand.
 
 For a checked-out external dependency (Fast Path 7) that is SHA-pinned, bump
-the pin in `apm.yml` to the pushed commit and follow this same sequence.
+the pin in `apm.yml` to the pushed commit under the same constraint.
 
-## Revision-pin failures on `mise run upgrade` (re-checked 0.31.0)
+## Revision-pin failures on `apm update` (re-checked 0.31.0)
 
 On 0.31.0, `apm update` revision-pin rewrite considers **annotated semver tags
 only** (peeled `refs/tags/*^{}` from `git ls-remote`). Lightweight release tags
 do not count, even when their commits are newer than every annotated tag.
 
 When a SHA-pinned dependency's highest annotated tag points at an old package
-layout, `mise run upgrade` can fail during integration — not only move the pin
+layout, `apm update` can fail during integration — not only move the pin
 backward. A typical symptom is `Invalid APM package … no apm.yml, SKILL.md,
 hooks, or plugin structure` for a dependency that installs cleanly at HEAD.
 
@@ -54,36 +48,32 @@ Triage:
    reason in `docs/package-decisions.md`. The lock still records
    `resolved_commit` at install time.
 4. If the dependency must stay SHA-pinned, bump the pin by hand and use the
-   SHA-pin bump sequence above instead of `mise run upgrade`.
+   SHA-pin bump sequence above instead of `apm update`.
 
 Workspace precedent: `ibelick/ui-skills` (`docs/package-decisions.md`,
 2026-09-28).
 
 ## `apm uninstall -g` side effects (Fast Path 9)
 
-Fast Path 9's default is hand-editing `apm.yml` plus `apm lock -g`. `apm
-uninstall -g <manifest-ref>` is the alternative and carries more side effects
-on 0.31.0, so reach for it only when that default does not apply.
+Record from the old path only. On the native HOME do not run `apm uninstall -g`:
+it writes the consumer `~/.apm` and the real HOME, and the next native rollout
+overrides it. Fast Path 9 hand-edits `apm.yml` in the checkout instead.
 
-The uninstall re-integrates the remaining packages outside `mise run apply`.
-On 0.31.0 it rewrites `apm.yml` (drops the comment that follows the removed
-entry, such as the next section header, and folds the gist URL) and deploys
+On the old path the uninstall re-integrated the remaining packages by itself.
+On 0.31.0 it rewrote `apm.yml` (dropped the comment that followed the removed
+entry, such as the next section header, and folded the gist URL) and deployed
 the gist under its un-aliased hash name. Unlinking the agmsg roster and
 deploying undeclared sub-skills were observed on 0.29.0 and not re-checked.
-Edit `apm.yml` until `git diff` shows only the removed line, follow the agmsg
-State section of the checkout's `AGENTS.md`, then run `mise run deploy`, which
-removes the undeclared entries.
 
-Some deployed skill directories also hold a copy of the package's `.apm-pin`
-cache marker, which the lock does not record. When one does, `apm uninstall`
-removes the tracked files, cannot remove the directory, and aborts listing it
-(`Uninstall could not remove tracked target files`, reproduced on 0.31.0).
-By then it has already removed the package from `apm_modules/` and the
-tracked files; `apm.yml` and the lock still declare it. Confirm each listed
-path under `~/.claude/skills/` and `~/.agents/skills/` is a real directory
-holding only `.apm-pin`, remove that file and the directory, then rerun the
-uninstall. The rerun's `Package ... not found in apm_modules/` is expected
-and it completes.
+Some deployed skill directories also held a copy of the package's `.apm-pin`
+cache marker, which the lock did not record. There `apm uninstall` removed the
+tracked files, could not remove the directory, and aborted listing it
+(`Uninstall could not remove tracked target files`, reproduced on 0.31.0),
+leaving the package declared in `apm.yml` and the lock.
+
+If someone already ran it on the native HOME, discard the consumer change by
+rolling out with section B of `docs/native-distribution.md`, and follow the
+agmsg State section of the checkout's `AGENTS.md`.
 
 ## Guardrail details
 

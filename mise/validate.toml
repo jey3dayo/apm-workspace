@@ -2,13 +2,11 @@
 description = "Validate the authoring checkout wiring"
 hide = true
 run = "bash ./scripts/apm-workspace.sh validate"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 validate"
 
 ["validate:catalog"]
 description = "Fail when the managed catalog package is not normalized or missing required assets"
 hide = true
 run = "bash ./scripts/apm-workspace.sh validate:catalog"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/apm-workspace.ps1 validate:catalog"
 
 ["validate"]
 description = "Validate the authoring checkout and managed catalog wiring"

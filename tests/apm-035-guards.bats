@@ -2,7 +2,6 @@
 
 setup() {
   repo_root="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
-  mise_binary=$(command -v mise)
   fixture="$BATS_TEST_TMPDIR"
   export HOME="$fixture/home" APM_WORKSPACE_DIR="$fixture/workspace"
   export GUARD_CALLS="$fixture/calls" GUARD_PREVIEW="$fixture/preview"
@@ -51,10 +50,6 @@ cmd_doctor
 SH
 }
 
-changes_preview() {
-  printf '[>] Analyzing installed packages vs apm.yml...\n[!] Found 1 orphaned package(s):\n[!]   - %s (would be removed)\n[*] Dry run complete - no changes made\n' "${1:-owner/gist}" >"$GUARD_PREVIEW"
-}
-
 @test "doctor recovers the precise local self-entry error without changing lock or cache" {
   cp "$APM_WORKSPACE_DIR/apm.lock.yaml" "$fixture/before"
   run doctor_fixture
@@ -94,94 +89,4 @@ changes_preview() {
   run doctor_fixture
   [ "$status" -eq 0 ]
   ! grep -q 'deps tree\|prune' "$GUARD_CALLS"
-}
-
-@test "deploy fresh retains declared aliased gist and continues its existing stages" {
-  printf 'dependencies:\n  apm:\n    - git: https://gist.github.com/owner/gist.git\n      alias: chosen\n' >"$APM_WORKSPACE_DIR/apm.yml"
-  changes_preview
-  export GUARD_APM_STUB="$fixture/bin/apm"
-  cat >"$fixture/bash-env" <<'SH'
-apm() { "${GUARD_APM_STUB:?fixture stub not configured}" "$@"; }
-SH
-  mkdir -p "$APM_WORKSPACE_DIR/scripts/lib"
-  cat >"$APM_WORKSPACE_DIR/scripts/apm-stub.sh" <<'SH'
-#!/usr/bin/env bash
-exec "${GUARD_APM_STUB:?fixture stub not configured}" "$@"
-SH
-  cp "$repo_root/scripts/apm-workspace.sh" "$APM_WORKSPACE_DIR/scripts/"
-  if [ -f "$repo_root/scripts/lib/prune-preview.awk" ]; then
-    cp "$repo_root/scripts/lib/prune-preview.awk" "$APM_WORKSPACE_DIR/scripts/lib/"
-  fi
-  awk '
-    /^\[tasks\."(prune:cache|deploy:fresh)"\]/ { active=1 }
-    /^\[/ && !/^\[tasks\."(prune:cache|deploy:fresh)"\]/ { active=0 }
-    active {
-      if ($0 == "  \"apm prune\",") {
-        print "  \"bash ./scripts/apm-stub.sh prune\","
-      } else {
-        print
-      }
-    }
-  ' "$repo_root/mise.toml" >"$APM_WORKSPACE_DIR/mise.toml"
-  cat >>"$APM_WORKSPACE_DIR/mise.toml" <<'TOML'
-[tasks."repair:local-package-cache"]
-run = "echo repaired"
-[tasks.deploy]
-run = "echo deployed"
-TOML
-  run env BASH_ENV="$fixture/bash-env" MISE_TRUSTED_CONFIG_PATHS="$APM_WORKSPACE_DIR" "$mise_binary" -C "$APM_WORKSPACE_DIR" run deploy:fresh
-  [ "$status" -eq 0 ]
-  [ -f "$APM_WORKSPACE_DIR/apm_modules/owner/gist/SKILL.md" ]
-  [[ "$output" == *"Automatic prune skipped: aliased packages"* ]]
-  grep -qx 'prune --dry-run' "$GUARD_CALLS"
-  ! grep -qx prune "$GUARD_CALLS"
-  [[ "$output" == *repaired* && "$output" == *deployed* ]]
-}
-
-@test "prune retains both lock-only alias packages and unprotected removal candidates" {
-  changes_preview transitive/package
-  printf 'dependencies:\n- repo_url: owner/transitive\n  alias: cached\n' >"$APM_WORKSPACE_DIR/apm.lock.yaml"
-  run cmd_prune_cache
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"aliased packages"* ]]
-  printf 'dependencies: []\n' >"$APM_WORKSPACE_DIR/apm.lock.yaml"
-  run cmd_prune_cache
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"safety is unverified"* ]]
-  ! grep -qx prune "$GUARD_CALLS"
-}
-
-@test "prune fails closed for failed unknown or inconsistent previews and symlinks" {
-  export GUARD_PREVIEW_EXIT=2
-  run cmd_prune_cache
-  [ "$status" -ne 0 ]
-  export GUARD_PREVIEW_EXIT=0
-  printf 'new unsupported preview format\n' >"$GUARD_PREVIEW"
-  run cmd_prune_cache
-  [ "$status" -ne 0 ]
-  changes_preview
-  sed -i.bak 's/Found 1/Found 2/' "$GUARD_PREVIEW"
-  run cmd_prune_cache
-  [ "$status" -ne 0 ]
-  ln -s "$fixture" "$APM_WORKSPACE_DIR/apm_modules/link"
-  run cmd_prune_cache
-  [ "$status" -ne 0 ]
-  ! grep -qx prune "$GUARD_CALLS"
-}
-
-@test "prune propagates alias metadata read errors" {
-  grep() { return 2; }
-  run cmd_prune_cache
-  unset -f grep
-  [ "$status" -eq 2 ]
-  [[ "$output" == *"Cannot read alias declarations"* ]]
-  [ -f "$APM_WORKSPACE_DIR/apm_modules/owner/gist/SKILL.md" ]
-}
-
-@test "clean preview retains packages without running native prune" {
-  run cmd_prune_cache
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"native prune was not executed"* ]]
-  [ -f "$APM_WORKSPACE_DIR/apm_modules/owner/gist/SKILL.md" ]
-  ! grep -qx prune "$GUARD_CALLS"
 }

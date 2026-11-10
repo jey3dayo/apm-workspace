@@ -8,7 +8,7 @@ It owns the global manifest (`apm.yml`), the lockfile (`apm.lock.yaml`), the cac
 - `README.md`: human overview and day-to-day flow
 - `AGENTS.md`: full contract, guardrails, and edit surfaces
 - `docs/apm-task-coverage.md`: every `mise` task and what gates it
-- `docs/native-distribution.md`: the APM-native `native:*` entry point, what stays manual, and the retirement boundary for the legacy apply
+- `docs/native-distribution.md`: the APM-native `native:*` rollout, rollback, and what stays manual
 - `docs/skill-inventory.md`: skill lanes (global, catalog, optional, manual, private, repo-local)
 - `docs/package-decisions.md`: why each package was added, kept, or removed
 - `docs/skill-overlaps.md`: which of several similar skills to use
@@ -20,7 +20,7 @@ It owns the global manifest (`apm.yml`), the lockfile (`apm.lock.yaml`), the cac
 
 - Edit personal skills in `catalog/.apm/skills/**`, copied skills in `manual-skills/**`, shared guidance in `catalog/**`.
 - `private-skills/**` is gitignored here; its source of truth is a private repo.
-- Treat `apm.yml` / `apm.lock.yaml` as command-managed; add or remove external skills with `apm install` / `apm uninstall`.
+- Add or remove external skills by editing the root `apm.yml` in the checkout, then roll out with section B. Do not run `apm install -g` / `apm uninstall -g` for this: on the native HOME they write the consumer `~/.apm` and the real HOME, not the checkout, and the next native rollout drops the change. No task re-resolves the root `apm.lock.yaml`: when you change a SHA pin in `apm.yml`, update the pinned entries of `apm.lock.yaml` to the same commits (or revert the pin), and review the lock with `mise run lock:diff`.
 - Never edit `apm_modules/` or deployed targets in place.
 - The `apm` version is pinned in `mise.toml`; read it there instead of trusting a quoted version.
-- Routine rollout is `mise run deploy`; run `mise run check` before pushing.
+- Roll out with section B of `docs/native-distribution.md` (`native:*`); run `mise run check` before pushing.
