@@ -2296,8 +2296,8 @@ dependencies:
       $installCalls | Should -Contain ("install {0} --target agent-skills" -f $buildDir)
       $installHomes.Count | Should -Be 1
       $installHome, $installUserProfile = $installHomes[0] -split "\|"
-      $installHome | Should -Not -Be $previousHome
-      $installUserProfile | Should -Not -Be $previousUserProfile
+      $installHome | Should -BeLike "*apm-catalog-smoke-*-home"
+      $installUserProfile | Should -Be $installHome
       $env:HOME | Should -Be $previousHome
       $env:USERPROFILE | Should -Be $previousUserProfile
     }

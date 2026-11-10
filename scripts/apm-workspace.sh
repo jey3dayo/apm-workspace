@@ -3490,15 +3490,19 @@ cmd_smoke_catalog() {
   install_log="$temp_dir.install.log"
   smoke_home="$temp_dir.home"
   mkdir -p "$smoke_home"
-  # apm writes deployment receipts under $HOME/.apm; mise shims need their real dirs once HOME moves.
+  # apm writes deployment receipts under $HOME/.apm, so it runs under a throwaway HOME.
+  # mise shims still need their real data, config and state dirs.
   mise_data_dir="${MISE_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/mise}"
   mise_config_dir="${MISE_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/mise}"
   mise_state_dir="${MISE_STATE_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/mise}"
+  install_status=0
   (
     cd "$temp_dir"
     env HOME="$smoke_home" MISE_DATA_DIR="$mise_data_dir" MISE_CONFIG_DIR="$mise_config_dir" MISE_STATE_DIR="$mise_state_dir" \
       apm install "$(catalog_build_dir)" --target agent-skills
-  ) >"$install_log" 2>&1 || {
+  ) >"$install_log" 2>&1 || install_status=$?
+  rm -rf "$smoke_home"
+  [ "$install_status" -eq 0 ] || {
     cat "$install_log" >&2
     fail "apm install failed for catalog smoke test. Temp workspace: $temp_dir"
   }
@@ -3521,7 +3525,7 @@ cmd_smoke_catalog() {
     fi
   done
 
-  rm -rf "$temp_dir" "$smoke_home"
+  rm -rf "$temp_dir"
   log "Smoke verified catalog via temp project install: $(printf '%s' "$skill_ids" | tr '\n' ',' | sed 's/,$//; s/,/, /g')"
 }
 

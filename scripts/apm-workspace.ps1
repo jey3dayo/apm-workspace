@@ -5102,8 +5102,9 @@ function Invoke-SmokeCatalog {
     Write-Host "Smoke verified catalog via temp project install: $($skillIds -join ', ')"
   }
   finally {
+    Remove-Item -LiteralPath $smokeHome -Recurse -Force -ErrorAction SilentlyContinue
     if ($success) {
-      Remove-Item -LiteralPath $tempDir, $smokeHome -Recurse -Force -ErrorAction SilentlyContinue
+      Remove-Item -LiteralPath $tempDir -Recurse -Force -ErrorAction SilentlyContinue
     } elseif (Test-Path -LiteralPath $tempDir) {
       Write-WarnLine "Catalog smoke test workspace left at $tempDir for inspection."
     }
