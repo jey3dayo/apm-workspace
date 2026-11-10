@@ -42,9 +42,17 @@ Before any persistent MCP configuration write:
 
 1. Inspect the checkout's root `apm.yml`, ownership guidance, and rollout script first.
 2. Classify the requested path as a source of truth or deployed output before writing.
-3. If the MCP is declared in APM, edit `dependencies.mcp` in the tracked root `apm.yml`; native distribution installs with `--only apm` and does not deliver it, so report the change as recorded but not delivered. Host-local servers go through `mise run setup:mcp:host`. Do not run `codex mcp add` / `codex mcp remove` or hand-edit `~/.codex/config.toml` as the durable change.
-4. For diagnostics, prefer a one-run `codex -c` override and state that it is temporary.
-5. When a host-side change was made (`setup:mcp:host`), verify the resolved server with `codex mcp list` and one real tool call before reporting completion; otherwise report the server as recorded, not delivered.
+3. Choose the destination and verify its delivery result:
+   - Root native: edit `dependencies.mcp` in the tracked root `apm.yml`. Native distribution installs with `--only apm` and does not apply MCP additions, edits, or removals; during section B's B6 check, confirm the host MCP configuration is unchanged and report the manifest change as recorded, not delivered.
+   - Repository-local: edit the target repository's `apm.yml`.
+     - For a manifest-only request, stop after the edit.
+     - To add and deliver a server, use `apm install --mcp <name> ...` there. To change or remove an existing declaration, edit the manifest and run `apm install --only mcp` to reconcile active targets.
+     - After an addition, confirm the server appears in each intended target's MCP configuration and in lock fields `mcp_servers` / `mcp_target_servers`.
+     - After a change, confirm the target contains the requested configuration and `mcp_configs` plus the target mapping match.
+     - After removal, if no remaining direct or transitive dependency requires it, confirm the server is absent from target configuration and lock fields `mcp_servers`, `mcp_configs`, and `mcp_target_servers`. If it remains transitively required, report that instead of claiming removal.
+     - Judge the tree even when install reports failure.
+   - Host-local: use `mise run setup:mcp:host`, then verify the resolved server with `codex mcp list` and one real tool call.
+4. For diagnostics, prefer a one-run `codex -c` override and state that it is temporary. Do not run `codex mcp add` / `codex mcp remove` or hand-edit `~/.codex/config.toml` as the durable change.
 
 Repo-local and on-demand placement: keep `tauri-mcp-server`-style runtime MCPs in the repository that needs them, and add screen-control MCPs on demand rather than globally. There is no fixed list of repo-local MCPs — enumerate repositories with `ghq list -p` and read each `apm.yml`. Connection status for SaaS connectors lives in `docs/saas-connectors.md` of the checkout; removal decisions are recorded in `docs/package-decisions.md`.
 
