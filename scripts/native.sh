@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Native APM distribution: a consumer manifest pins this repository's packages by commit SHA, and `apm install -g`
 # followed by `apm compile -g --clean` deploy them. What APM does not deploy is listed in docs/native-distribution.md
-# and stays manual; this script adds no sync of its own.
+# and stays with the existing manual helpers. sync orchestrates that documented workflow.
 #
 # apply targets a disposable HOME and refuses the account's real HOME, its ancestors and the tool state inside it.
 # apply --real-home is blocked; migrate writes the real HOME after a clean `rehearse --migrate`, and migrate-rollback and
-# reinstate undo or complete it (docs/native-distribution.md). backup and rehearse only read it.
+# reinstate undo or complete it (docs/native-distribution.md). backup and rehearse only read deployment data; all native
+# operations share a persistent lock in .cache/apm-native-operation.lock, outside the caches migrate moves aside.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -40,6 +41,9 @@ usage() {
   cat <<'EOF'
 Usage: scripts/native.sh <command> [options]
 
+  sync     [--source-ref SHA] [--https] [--allow-drop ROOT/ENTRY] [--allow-skip ROOT/ENTRY]
+                                                 Back up, rehearse, migrate and verify the real HOME from pushed main.
+                                                 Run sync --help for the review and recovery options.
   plan     [--source-ref REF] [--workspace-only]  Print the consumer manifest and the steps apply would run. Writes nothing.
   render   --source-ref REF [--workspace-only]    Print the consumer manifest to stdout.
   backup   (--home DIR | --real-home) --backup-dir NEW_DIR
@@ -65,6 +69,7 @@ Usage: scripts/native.sh <command> [options]
   reinstate (--home DIR | --real-home) --stamp UTC
                                                  Copy the top-level entries of <root>.bak-<UTC> that the current root lacks back
                                                  into it. Entries already there are left alone.
+  opencode [--home DIR | --real-home]             Place the guide at <HOME>/.config/opencode/AGENTS.md; defaults to real HOME.
 
 REF is a commit of this repository (or a full 40-hex SHA). --workspace-only keeps only the catalog and manual-skills
 packages and drops external dependencies and MCP servers.
@@ -78,6 +83,33 @@ fail() {
 
 log() {
   printf '%s\n' "$*" >&2
+}
+
+native_lock_held() {
+  [ -n "${APM_NATIVE_LOCK_FD:-}" ] && python3 "$SCRIPT_DIR/native-home.py" check "$1"
+}
+
+native_lock_command() {
+  local home="$1"
+  shift
+  python3 "$SCRIPT_DIR/native-home.py" run "$home" bash "$SCRIPT_DIR/native.sh" "$@"
+}
+
+native_workspace() {
+  local home="$1"
+  shift
+  if [ "$1" = sync:opencode ]; then python3 "$SCRIPT_DIR/native-home.py" check-opencode "$home"; fi
+  HOME="$home" APM_WORKSPACE_DIR="$REPO_ROOT" APM_OPENCODE_OUTPUT="$home/.config/opencode/AGENTS.md" \
+    bash "$SCRIPT_DIR/apm-workspace.sh" "$@"
+}
+
+cmd_opencode() {
+  if [ $# = 0 ]; then set -- --real-home; fi
+  parse_options "$@"
+  local home
+  home="$(target_home opencode)"
+  if ! native_lock_held "$home"; then native_lock_command "$home" opencode "$@"; return; fi
+  native_workspace "$home" sync:opencode
 }
 
 resolve_source_sha() {
@@ -345,6 +377,7 @@ cmd_apply() {
   [ -n "$HOME_DIR" ] || fail "apply needs --home <disposable HOME>"
   local home sha edited links manifest
   home="$(assert_disposable_home "$HOME_DIR")"
+  if ! native_lock_held "$home"; then native_lock_command "$home" apply "$@"; return; fi
   sha="$(resolve_source_sha "$SOURCE_REF")"
   assert_default_apm_config "$home"
   assert_no_home_manifest "$home"
@@ -403,6 +436,7 @@ cmd_backup() {
   [ -n "$BACKUP_DIR" ] || fail "backup needs --backup-dir <new directory>"
   local home dir path
   home="$(target_home backup)"
+  if ! native_lock_held "$home"; then native_lock_command "$home" backup "$@"; return; fi
   dir="$(physical_path "$BACKUP_DIR")"
   assert_backup_dir_outside_targets "$home" "$dir"
   if [ -e "$dir" ] && [ -n "$(ls -A "$dir")" ]; then fail "--backup-dir $dir already has files; backups are never overwritten"; fi
@@ -822,6 +856,7 @@ cmd_rehearse() {
   local home sha dir rehearsal scratch path manifest shared lost stamp escaping mode=plain
   local install_status=0 compile_status=skipped agmsg_status=0 linked=0 reinstate_status=skipped allowed_lost=0 baseline_skips=0 dropped=0
   home="$(target_home rehearse)"
+  if ! native_lock_held "$home"; then native_lock_command "$home" rehearse "$@"; return; fi
   assert_default_apm_config "$home"
   assert_no_home_manifest "$home"
   assert_completed_backup "$home"
@@ -928,6 +963,7 @@ cmd_reinstate() {
   assert_stamp "$STAMP"
   local home
   home="$(target_home reinstate)"
+  if ! native_lock_held "$home"; then native_lock_command "$home" reinstate "$@"; return; fi
   reinstate_entries "$home" "$STAMP" "$home/.apm/native-reinstate-$STAMP."
 }
 
@@ -981,6 +1017,7 @@ assert_migrate_rehearsal() {
     result_has "$dir" "$want" || fail "the rehearsal $dir was taken when the HOME was in another state (it does not show $want); take a backup and run rehearse --migrate again now"
   done
   [ -f "$dir/dropped.txt" ] || fail "the rehearsal $dir has no dropped.txt; run rehearse --migrate again"
+  [ -f "$dir/skipped.txt" ] && [ ! -L "$dir/skipped.txt" ] || fail "the rehearsal $dir has no plain skipped.txt; run rehearse --migrate again"
 }
 
 # The entries migrate drops must be the ones the rehearsal dropped, because the rehearsal is what allowed them. The rollback
@@ -991,6 +1028,14 @@ assert_dropped_as_rehearsed() {
   dropped_entries "$home" "$stamp" >"$actual"
   [ "$(sort "$actual")" = "$(sort "$dir/dropped.txt")" ] ||
     fail "migrate dropped other entries than the rehearsal did (compare $actual with $dir/dropped.txt); the roots are rolled back"
+}
+
+assert_skipped_as_rehearsed() {
+  local home="$1" stamp="$2" dir="$3" actual
+  actual="$home/.apm/native-migrate-$stamp.skipped.txt"
+  [ -f "$actual" ] && [ ! -L "$actual" ] || fail "migrate has no plain skipped.txt; the roots are rolled back"
+  [ "$(LC_ALL=C sort "$actual")" = "$(LC_ALL=C sort "$dir/skipped.txt")" ] ||
+    fail "migrate replaced different entries than the rehearsal did (compare $actual with $dir/skipped.txt); the roots are rolled back"
 }
 
 # Copies the files migrate must not change (owner-only, permissions kept) so a change can be undone. Contents are never
@@ -1105,6 +1150,7 @@ cmd_migrate() {
   home="$(target_home migrate)"
   sha="$(resolve_source_sha "$SOURCE_REF")"
   assert_not_checkout "$home"
+  if ! native_lock_held "$home"; then native_lock_command "$home" migrate "$@"; return; fi
   assert_same_render_mode "$home"
   rehearsal_dir="$(cd "$REHEARSAL" 2>/dev/null && pwd -P || printf '%s' "$REHEARSAL")"
   assert_migrate_rehearsal "$home" "$sha" "$rehearsal_dir"
@@ -1125,6 +1171,7 @@ Move them aside or make them plain directories and files of this HOME."
   roots_before="$(migrate_roots_snapshot "$home")"
   MIGRATE_HOME="$home" MIGRATE_STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
   claim_migrate_record "$home" "$MIGRATE_STAMP"
+  log "native-migrate stamp: $MIGRATE_STAMP"
   MIGRATE_AGMSG_LINKED=0
   if [ -L "$home/.agents/skills/agmsg/db" ]; then
     MIGRATE_AGMSG_LINKED=1
@@ -1140,6 +1187,7 @@ Move them aside or make them plain directories and files of this HOME."
   reinstate_entries "$home" "$MIGRATE_STAMP" "$home/.apm/native-migrate-$MIGRATE_STAMP."
   if [ "$MIGRATE_AGMSG_LINKED" = 1 ]; then agmsg_state "$home" restore; fi
   assert_dropped_as_rehearsed "$home" "$MIGRATE_STAMP" "$rehearsal_dir"
+  assert_skipped_as_rehearsed "$home" "$MIGRATE_STAMP" "$rehearsal_dir"
   assert_no_unexpected_loss "$home" "$MIGRATE_STAMP" "$roots_before"
   changed="$(changed_untouched_files "$home" "$MIGRATE_STAMP")"
   [ -z "$changed" ] || fail "migrate changed these files, which it must leave alone (they are put back, and the changed versions kept as <file>.changed-$MIGRATE_STAMP): $(tr '\n' ' ' <<<"$changed")"
@@ -1157,6 +1205,7 @@ cmd_migrate_rollback() {
   assert_stamp "$STAMP"
   local home
   home="$(target_home migrate-rollback)"
+  if ! native_lock_held "$home"; then native_lock_command "$home" migrate-rollback "$@"; return; fi
   rollback_roots "$home" "$STAMP"
   restore_agmsg_links "$home"
   log "rolled $home back to the roots of $STAMP; the roots native wrote are kept as <root>.native-$STAMP"
@@ -1191,6 +1240,17 @@ run_apm() {
   for var in LC_ALL TERM PYTHONUTF8 GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM GIT_CEILING_DIRECTORIES; do
     if [ -n "${!var:-}" ]; then env_args+=("$var=${!var}"); fi
   done
+  if [ "${APM_NATIVE_HTTPS:-0}" = 1 ] && [ -n "${GIT_CONFIG_SYSTEM:-}" ]; then env_args+=("GIT_CONFIG_SYSTEM=$GIT_CONFIG_SYSTEM"); fi
+  if [ -n "${GIT_CONFIG_COUNT:-}" ]; then
+    [[ "$GIT_CONFIG_COUNT" =~ ^(0|[1-9][0-9]*)$ ]] && [ "$GIT_CONFIG_COUNT" -le 1000 ] || fail "invalid GIT_CONFIG_COUNT"
+    env_args+=("GIT_CONFIG_COUNT=$GIT_CONFIG_COUNT")
+    local i key value
+    for ((i = 0; i < GIT_CONFIG_COUNT; i++)); do
+      key="GIT_CONFIG_KEY_$i" value="GIT_CONFIG_VALUE_$i"
+      [ -n "${!key:-}" ] && [ "${!value+x}" = x ] || fail "incomplete Git config environment at index $i"
+      env_args+=("$key=${!key}" "$value=${!value}")
+    done
+  fi
   (cd "$home" && env -i "${env_args[@]}" "$APM_BIN" "$@")
 }
 
@@ -1260,6 +1320,11 @@ main() {
   local command="${1:-plan}"
   [ $# -eq 0 ] || shift
   case "$command" in
+    sync)
+      # shellcheck source=scripts/native-sync.sh
+      . "$SCRIPT_DIR/native-sync.sh"
+      cmd_sync "$@"
+      ;;
     plan) cmd_plan "$@" ;;
     render) cmd_render "$@" ;;
     apply) cmd_apply "$@" ;;
@@ -1268,9 +1333,10 @@ main() {
     migrate) cmd_migrate "$@" ;;
     migrate-rollback) cmd_migrate_rollback "$@" ;;
     reinstate) cmd_reinstate "$@" ;;
+    opencode) cmd_opencode "$@" ;;
     -h | --help | help) usage ;;
     *) usage >&2; exit 2 ;;
   esac
 }
 
-main "$@"
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then main "$@"; fi

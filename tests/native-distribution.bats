@@ -371,6 +371,7 @@ sentinel_snapshot() {
   home="$(new_home apply-render-fails)"
   mkdir -p "$repo/scripts"
   cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
+  cp "$REPO_ROOT/scripts/native-home.py" "$repo/scripts/native-home.py"
   grep -v 'fujibee/agmsg' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
   printf '#!/bin/sh\ntouch "%s/apm-ran"\n' "$home" >"$stub"
   chmod +x "$stub"
@@ -659,8 +660,11 @@ seed_agmsg() {
   [ "$status" -ne 0 ]
   [[ "$output" == *"blocked"* ]]
   [[ "$output" == *"docs/native-distribution.md"* ]]
+  [ "$(backed_up_snapshot "$home")" = "$before" ]
+  [ "$(find "$home" | LC_ALL=C sort)" = "$listing" ]
 
   real_native "$home" backup --real-home --backup-dir "$backup"
+  listing="$(find "$home" | LC_ALL=C sort)"
   run real_native "$home" apply --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
   [ "$status" -ne 0 ]
   [[ "$output" == *"blocked"* ]]
@@ -1457,6 +1461,7 @@ build_github_fixture() {
   { printf '[include]\n\tpath = %s\n' "$FX/gitconfig"; cat "$FX/gitconfig-github"; } >"$FX/gitconfig-bin"
   mkdir -p "$repo/scripts"
   cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
+  cp "$REPO_ROOT/scripts/native-home.py" "$repo/scripts/native-home.py"
   {
     printf 'name: bin-fixture\nversion: 1.0.0\ntargets:\n  - agent-skills\ndependencies:\n  apm:\n'
     printf '    - jey3dayo/apm-workspace/catalog#main\n    - jey3dayo/apm-workspace/manual-skills#main\n'

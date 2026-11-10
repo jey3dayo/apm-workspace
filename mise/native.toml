@@ -1,6 +1,11 @@
 # Native APM distribution (docs/native-distribution.md): the distribution path since the legacy `deploy` was removed on
 # 2026-11-10. apply targets a disposable HOME only; migrate (after a clean rehearse --migrate), migrate-rollback, reinstate
-# and opencode (~/.config/opencode) write the real HOME. backup and rehearse only read it.
+# and opencode (~/.config/opencode) write the real HOME. backup and rehearse only read deployment data; all share
+# persistent operation-lock metadata in ~/.cache/apm-native-operation.lock.
+
+["native:sync"]
+description = "Back up, rehearse, migrate and verify pushed main in one command; exact removal/override approvals: -- --help"
+run = "bash ./scripts/native.sh sync"
 
 ["native:plan"]
 description = "Print the SHA-pinned consumer manifest and the native install/compile steps; writes nothing"
@@ -32,7 +37,7 @@ run = "bash ./scripts/native.sh migrate-rollback"
 
 ["native:opencode"]
 description = "Write ~/.config/opencode/AGENTS.md from the catalog guide (OpenCode reads it, else ~/.claude/CLAUDE.md, which the native layout does not have); run after native:migrate. Never overwrites a hand-written file"
-run = "bash ./scripts/apm-workspace.sh sync:opencode"
+run = "bash ./scripts/native.sh opencode"
 
 ["native:reinstate"]
 description = "Copy the top-level entries of <root>.bak-<UTC> that the current root lacks back into it: -- (--real-home | --home <dir>) --stamp <UTC>"
