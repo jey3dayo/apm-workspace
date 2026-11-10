@@ -1286,6 +1286,60 @@ make_stageable_catalog_fixture() {
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
+@test "catalog_apm_dir_claim_message claims a .apm that is a symlink to an empty directory" {
+  make_catalog_fixture 2 2
+  rm -rf "$workspace_dir/catalog/.apm"
+  mkdir -p "$workspace_dir/outside-apm"
+  ln -s "$workspace_dir/outside-apm" "$workspace_dir/catalog/.apm"
+
+  run catalog_apm_dir_claim_message
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"catalog/.apm is a symlink"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "catalog_apm_dir_claim_message claims a .apm that is a dangling symlink" {
+  make_catalog_fixture 2 2
+  rm -rf "$workspace_dir/catalog/.apm"
+  ln -s "$workspace_dir/missing-apm" "$workspace_dir/catalog/.apm"
+
+  run catalog_apm_dir_claim_message
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"catalog/.apm is a symlink"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "catalog_apm_dir_claim_message claims a .apm holding a directory it cannot read" {
+  [ "$(id -u)" -ne 0 ] || skip "root reads a directory without read permission"
+  make_catalog_fixture 2 2
+  mkdir -p "$workspace_dir/catalog/.apm/instructions"
+  printf 'hidden\n' >"$workspace_dir/catalog/.apm/instructions/a.instructions.md"
+  chmod 000 "$workspace_dir/catalog/.apm/instructions"
+
+  run catalog_apm_dir_claim_message
+
+  chmod 755 "$workspace_dir/catalog/.apm/instructions"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"catalog/.apm could not be fully read"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
+@test "catalog_apm_dir_claim_message claims a FIFO under .apm/agents" {
+  command -v mkfifo >/dev/null || skip "mkfifo is unavailable"
+  make_catalog_fixture 2 2
+  mkdir -p "$workspace_dir/catalog/.apm/agents"
+  mkfifo "$workspace_dir/catalog/.apm/agents/queue"
+
+  run catalog_apm_dir_claim_message
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"catalog/.apm holds agents/queue"* ]]
+
+  rm -rf "$FIXTURE_WORKSPACE_DIR"
+}
+
 # --- ensure_workspace_scaffold -----------------------------------------------
 
 @test "ensure_workspace_scaffold fails when apm.yml is missing" {
