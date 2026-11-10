@@ -68,7 +68,7 @@ before installing or creating a skill.
 | `repository-local`  | One repository's runtime, credentials, framework, or workflow        | Target repository's `apm.yml`      | `apm install <package-ref>` in that repository                                  |
 | `optional`          | Workspace-owned skill used by selected repositories                  | `optional-skills/<id>/`            | Direct `apm install jey3dayo/apm-workspace/optional-skills/<id>#main`           |
 | `global-catalog`    | Personal cross-repository workflow                                   | `catalog/.apm/skills/<id>/`        | Global automatic rollout                                                        |
-| `global-dependency` | External cross-repository foundation                                 | Root `apm.yml` and `apm.lock.yaml` | `apm install -g <package-ref>`                                                  |
+| `global-dependency` | External cross-repository foundation                                 | Root `apm.yml` and `apm.lock.yaml` | Edit root `apm.yml` in the checkout, roll out with section B                    |
 | `private`           | Machine-local overlay (gitignored here, tracked in the private repo) | `private-skills/.apm/skills/<id>/` | Not delivered by native distribution; place it in the consumer `~/.apm/skills/` |
 | `manual`            | Upstream package that cannot use the managed lane                    | `manual-skills/.apm/skills/<id>/`  | Manual-skills package rollout                                                   |
 
@@ -161,9 +161,10 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
 - If the request is "change dependency selection", edit or review `apm.yml` / `apm.lock.yaml`, writing entries per `references/manifest-style.md`.
 - If the request is about `mise upgrade <tool>`, `minimum_release_age`, latest eligible release selection, or why a non-APM tool version did not update, use the `mise` skill unless the pinned `apm` source, APM manifest, lockfile, or rollout task selection is the actual subject.
 - If the request is to add an individual APM package, assign its lane before
-  running `apm install`. Use `apm install -g <package-ref>` only for the
-  `global-dependency` lane; use `apm install <package-ref>` from the target
-  repository for the `repository-local` lane.
+  running `apm install`. For the `global-dependency` lane, edit the root
+  `apm.yml` in the checkout and roll out with section B (Fast Path 6); use
+  `apm install <package-ref>` from the target repository for the
+  `repository-local` lane.
 - If the request touches a `repository-local` manifest for any reason
   (new dependency, audit, cleanup), also check that `targets:` covers every
   agent runtime actually used in that repository before finishing. Fix a
@@ -176,7 +177,7 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
   package as the source of truth and select it in the consuming repository with
   `apm install <package-ref> --skill <id>`.
 - If the request is to scan an arbitrary repository and create, update, or clean up its repo-local `apm.yml`, read `references/repo-manifest.md`.
-- If the request is to add an MCP server through APM, apply the same scope rule: use `apm install -g --mcp <name> ...` only for cross-repo foundation MCPs; use repo-local `apm install --mcp <name> ...` for project, framework, UI, database, browser, or app-runtime-specific MCPs.
+- If the request is to add an MCP server through APM, apply the same scope rule: add cross-repo foundation MCPs under `mcp:` in the root `apm.yml` (Fast Path 6); use repo-local `apm install --mcp <name> ...` for project, framework, UI, database, browser, or app-runtime-specific MCPs.
 - If the APM workspace has no repo-local MCP distribution lane for a target repository, record the intended placement as guidance and keep the global manifest lightweight. Treat implementing repo-local MCP distribution as a separate workspace-mechanics task.
 - If the request is "change only workspace docs or notes", edit the workspace files directly and do not restage the catalog unless `catalog/**` changed too.
 
@@ -273,8 +274,8 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
      `global-dependency`, `private`, or `manual` before installing;
      `global-catalog` is not an install lane — create the skill via
      Fast Path 2 instead
-   - for global dependencies, work in the checkout and use `apm install -g <package-ref>` or `apm install -g --mcp <name> ...`
-   - a bare `apm install -g` does not save and restore the agmsg roster links, so the links it removes are not restored for you; follow the agmsg State section of the checkout's `AGENTS.md` afterwards, diagnosing with `mise run doctor` before any restore
+   - for global dependencies, edit the root `apm.yml` in the checkout (a package under `dependencies.apm`, an MCP server under `mcp:`); do not run `apm install -g` or `apm install -g --mcp`: on the native HOME they write the consumer `~/.apm` and the real HOME, and the next native rollout drops the change. No task records a lock entry for a new dependency; report that as the open item in `docs/package-decisions.md` (2026-11-10)
+   - if someone already ran a bare `apm install -g`, it did not save and restore the agmsg roster links; follow the agmsg State section of the checkout's `AGENTS.md`, diagnosing with `mise run doctor` before any restore
    - for repo-local dependencies, work in the target repository and use `apm install <package-ref>` or `apm install --mcp <name> ...`
    - for global changes, run `mise run check`, then roll out with section B; for repo-local changes, run that repository's defined APM or project checks
    - for repo-local changes, also confirm `targets:` includes every runtime the

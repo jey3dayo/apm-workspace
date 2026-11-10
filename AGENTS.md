@@ -64,7 +64,8 @@ undoes it.
 | Inspection        | `mise run doctor`                                    | Read-only.                                                                                                                                                               |
 
 Shipping here has no PR: commit directly on `main`, run `apm-deploy-verify`
-before the push for format and check (its distribution-match step applies only
+with the changed skill names (pass them both times: after the push the tree is
+clean, so it cannot infer them from `git status`) before the push for format and check (its distribution-match step applies only
 after the push and B6, so it reports that step as not run before then), then
 push `main` and watch the pushed CI run. `ship` reads this as the repository's
 end point. After the push, roll the pushed commit out with section B of

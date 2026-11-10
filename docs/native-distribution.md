@@ -161,7 +161,7 @@ rollback で旧経路の状態へ戻した HOME は、この branch に無い旧
 
 次の手順 B は、切り替えのたびに行う。最初の切り替えも、あとの更新も、同じ手順を通る。
 
-旧経路が配った HOME を最初に切り替えるときだけ、B の前に、checkout を `~/.apm` の外へ移し（上の「実 HOME の checkout の移設」）、Claude Code と Codex のセッションを閉じる。旧いコピーの root（`~/.claude/CLAUDE.md` など）の退避は、手作業（`<名前>.<UTC>.bak` へ移す）か、commit `0bcce09` の旧ツールで行う。`migrate:roots` はこの branch に無い（2026-11-10 に退役した）ので、`0bcce09` を checkout した clone から、セッションを閉じたまま B の前に次を実行する: `APM_WORKSPACE_DIR=<checkout の絶対パス> bash <checkout の絶対パス>/scripts/apm-workspace.sh migrate:roots --apply`。checkout を `~/.apm` の外へ移したあと、最初の `migrate` までは `~/.apm` が無いので、旧ツールのガードは `APM_WORKSPACE_DIR` を明示しないと拒否する。
+旧経路が配った HOME を最初に切り替えるときだけ、B の前に、checkout を `~/.apm` の外へ移し（上の「実 HOME の checkout の移設」）、Claude Code と Codex のセッションを閉じる。旧いコピーの root（`~/.claude/CLAUDE.md` など）の退避は、手作業（`<名前>.<UTC>.bak` へ移す）か、commit `0bcce09` の旧ツールで行う。`migrate:roots` はこの branch に無い（2026-11-10 に退役した）ので、`0bcce09` を checkout した clone（authoring の checkout とは別に作る）を用意し、セッションを閉じたまま B の前に次を実行する: `APM_WORKSPACE_DIR=<0bcce09 の clone の絶対パス> bash <0bcce09 の clone の絶対パス>/scripts/apm-workspace.sh migrate:roots --apply`。checkout を `~/.apm` の外へ移したあと、最初の `migrate` までは `~/.apm` が無いので、旧ツールのガードは `APM_WORKSPACE_DIR` を明示しないと拒否する。
 
 B. 切り替えのたび（新しい SHA を配るときも同じ）
 
