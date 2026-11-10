@@ -1021,6 +1021,31 @@ prepare_migrate() {
   grep -qx '\.claude/skills/foo' "$M_HOME"/.apm/native-migrate-*.skipped.txt
 }
 
+@test "migrate treats agmsg run/ and a synced-skill cache that a running Claude Code session recreates as runtime state, not as skipped entries" {
+  local stub="$FX/stub-apm-runtime" marker="$FX/live-writer" rehearsal
+  M_HOME="$(new_home migrate-runtime)"
+  M_BACKUP="$FX/backups/migrate-runtime"
+  seed_migrate_home "$M_HOME"
+  mkdir -p "$M_HOME/.agents/skills/agmsg/run" "$M_HOME/.claude/skills/synced/bucket" "$M_HOME/.apm"
+  echo "lastcheck" >"$M_HOME/.agents/skills/agmsg/run/.lastcheck-worker"
+  echo "old sync state" >"$M_HOME/.claude/skills/synced/bucket/manifest.json"
+  echo "old only" >"$M_HOME/.claude/skills/synced/bucket/old-only.json"
+  printf '#!/bin/sh\n[ "$1" = install ] || exit 0\nmkdir -p "$HOME/.claude/skills/foo" "$HOME/.agents/skills/agmsg"\necho "old foo" >"$HOME/.claude/skills/foo/SKILL.md"\necho "agmsg skill" >"$HOME/.agents/skills/agmsg/SKILL.md"\nif [ -e "%s" ]; then mkdir -p "$HOME/.claude/skills/synced/bucket"; echo "live sync state" >"$HOME/.claude/skills/synced/bucket/manifest.json"; fi\n' "$marker" >"$stub"
+  chmod +x "$stub"
+  real_native "$M_HOME" backup --real-home --backup-dir "$M_BACKUP"
+  real_native_with_stub "$M_HOME" "$stub" rehearse --real-home --backup-dir "$M_BACKUP" --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  rehearsal="$(dirname "$(compgen -G "$M_BACKUP/rehearsal-*/result.txt")")"
+  [ ! -s "$rehearsal/skipped.txt" ]
+
+  : >"$marker"
+  run real_native_with_stub "$M_HOME" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$rehearsal"
+  [ "$status" -eq 0 ]
+  [ ! -s "$M_HOME"/.apm/native-migrate-*.skipped.txt ]
+  [ "$(cat "$M_HOME/.claude/skills/synced/bucket/manifest.json")" = "live sync state" ]
+  [ "$(cat "$M_HOME"/.claude/skills.bak-*/synced/bucket/old-only.json)" = "old only" ]
+  [ -L "$M_HOME/.agents/skills/agmsg/db" ]
+}
+
 @test "migrate-rollback accepts a record whose root has no done line and no backup" {
   local home stamp=20261109T000000Z
   home="$(new_home rollback-unmoved)"
