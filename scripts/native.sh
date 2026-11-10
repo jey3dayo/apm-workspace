@@ -670,6 +670,17 @@ reinstate_escaping_links() {
   done
 }
 
+# True when the old entry differs from the one in the root in more than runtime state: agmsg's run/ and its db/teams
+# links (agmsg-state.sh restores them after this step), and the Claude Code synced-skill cache, which the running
+# session recreates while migrate runs.
+reinstate_differs() {
+  case "$3" in
+    .claude/skills/synced) return 1 ;;
+    .agents/skills/agmsg) ! diff -rq -x .apm-pin -x run -x db -x teams "$1" "$2" >/dev/null 2>&1 ;;
+    *) ! diff -rq -x .apm-pin "$1" "$2" >/dev/null 2>&1 ;;
+  esac
+}
+
 # Puts back the top-level entries of each <root>.bak-<stamp> that the root lacks now (apm did not deploy them), except
 # the entries the previous native lock listed as deployed (native-migrate-<stamp>.deployed.txt): those were not deployed this
 # time. An entry that exists is left alone; one whose content differs from the old entry is listed in <report>skipped.txt. A link that leaves its root is
@@ -688,7 +699,7 @@ $escaping"
     while IFS= read -r -d '' entry; do
       name="$(basename "$entry")"
       if [ -e "$home/$root/$name" ] || [ -L "$home/$root/$name" ]; then
-        if ! diff -rq -x .apm-pin "$entry" "$home/$root/$name" >/dev/null 2>&1; then skipped="$skipped$root/$name"$'\n'; fi
+        if reinstate_differs "$entry" "$home/$root/$name" "$root/$name"; then skipped="$skipped$root/$name"$'\n'; fi
         continue
       fi
       if [ -f "$deployed" ] && grep -qxF "$root"$'\t'"$name" "$deployed"; then continue; fi
@@ -818,6 +829,10 @@ allowed_lost_reason() {
   case "$path" in
     .agents/skills/agmsg/run | .agents/skills/agmsg/run/*)
       echo "agmsg runtime state; the old path rebuilt the agmsg directory too, and apm replaces it"
+      return
+      ;;
+    .claude/skills/synced | .claude/skills/synced/*)
+      echo "Claude Code's synced-skill cache; the running session recreates it"
       return
       ;;
     .agents/skills/agmsg/apm.yml | .claude/skills/agmsg/apm.yml | \
