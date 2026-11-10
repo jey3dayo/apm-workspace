@@ -174,7 +174,7 @@ B. 切り替えのたび（新しい SHA を配るときも同じ）
 
 通常の更新は push 済みの checkout で `mise run native:sync` を実行する。local HEAD と配布元の `main` が同じ SHA で、作業ツリーに未コミット変更がないことを確認してから、B1〜B6 を順に行う。毎回新しい backup と migrate rehearsal を作り、キャッシュを削除せず別名へ移す。配布後は OpenCode のガイドを配置し、doctor と intake の確認を行い、4 つの root の top-level entry 数を配布前後で表示する。既存セッションを閉じる操作は行わない。OpenCode の出力先は対象 HOME の `.config/opencode/AGENTS.md` に固定し、継承した `APM_OPENCODE_OUTPUT` は使わない。配置前に親ディレクトリの symlink とガイドの symlink・hard link を拒否する。
 
-rehearsal に `dropped.txt` や `skipped.txt` の entry があれば、実 HOME を書き換える前に止まる。表示されたレポートを読み、意図した削除だけを `--allow-drop <root>/<entry>`、内容の異なる同名 entry の置き換えだけを `--allow-skip <root>/<entry>` で指定して再実行する。どちらも繰り返し指定でき、実際の一覧と完全に一致する場合だけ続行する。余分な指定も拒否する。`allowed-lost.txt` は既存の allowlist と照合し、allowlist 外の消失や deployment baseline の省略は指定で許可できない。
+rehearsal に `dropped.txt` や `skipped.txt` の entry があれば、実 HOME を書き換える前に止まる。表示されたレポートを読み、意図した削除だけを `--allow-drop <root>/<entry>`、内容の異なる同名 entry の置き換えだけを `--allow-skip <root>/<entry>` で指定して再実行する（agmsg の `run/`・`db`・`teams` と `.claude/skills/synced` は実行時の状態として比べないので、これらの `--allow-skip` は要らず、付けると余分な指定として拒否される。比べないのは agmsg の下の名前が `run`・`db`・`teams` のものすべてで、入れ子の同名も含む）。どちらも繰り返し指定でき、実際の一覧と完全に一致する場合だけ続行する。余分な指定も拒否する。`allowed-lost.txt` は既存の allowlist と照合し、allowlist 外の消失や deployment baseline の省略は指定で許可できない。
 
 GitHub の SSH URL を HTTPS へ向けたいときは `mise run native:sync -- --https` を使う。既存の Git 設定ファイルは変更しない。実行専用の config に HTTPS 用の URL ルールを先に置き、既存の system・global 設定を include する。config は checkout の `tmp/native-https/` に残し、参照する環境変数をこの実行と子プロセスだけへ渡す。配布元 URL が HTTPS へ解決されることも実通信前に確認する。SHA を明示する場合は `--source-ref <SHA>` を指定する。指定した SHA も local HEAD と配布元の `main` の両方に一致する必要がある。
 

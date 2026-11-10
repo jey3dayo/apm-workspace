@@ -670,9 +670,8 @@ reinstate_escaping_links() {
   done
 }
 
-# True when the old entry differs from the one in the root in more than runtime state: agmsg's run/ and its db/teams
-# links (agmsg-state.sh restores them after this step), and the Claude Code synced-skill cache, which the running
-# session recreates while migrate runs.
+# True when the old entry differs in more than runtime state: agmsg's run/ db teams (agmsg-state.sh restores the links
+# after this step) and the synced-skill cache that a running Claude Code recreates during migrate.
 reinstate_differs() {
   case "$3" in
     .claude/skills/synced) return 1 ;;
