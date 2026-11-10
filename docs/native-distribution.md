@@ -34,7 +34,7 @@ backup の対象（rehearse が複製に再現するもの）: `~/.apm/apm.yml`�
 
 ## 切り替えのあとの authoring checkout
 
-`scripts/apm-workspace.sh` は、`APM_WORKSPACE_DIR` が無いとき、`<HOME>/.apm` に `.git`（linked worktree ではファイル）か `catalog/` があればそれを、無ければこの repo の root（`REPO_ROOT`）を `$WORKSPACE_DIR` にする。切り替えのあとは checkout の外から `validate`・`validate:catalog`・`smoke:catalog` がその checkout に対して動く。`.git` の検査は、worktree の `.git` ファイルも通す。PowerShell 版（`scripts/apm-workspace.ps1` の `$WorkspaceDir`）は今も `<HOME>/.apm` を既定にしているので、Windows で切り替えのあとに使うなら同じ既定へ揃える必要がある（Windows は対象外としているので、揃えていない）。
+`scripts/apm-workspace.sh` は、`APM_WORKSPACE_DIR` が無いとき、`<HOME>/.apm` に `.git`（linked worktree ではファイル）か `catalog/` があればそれを、無ければこの repo の root（`REPO_ROOT`）を `$WORKSPACE_DIR` にする。切り替えのあとは checkout の外から `validate`・`validate:catalog`・`smoke:catalog` がその checkout に対して動く。`.git` の検査は、worktree の `.git` ファイルも通す。
 
 ## native と手動の境界
 

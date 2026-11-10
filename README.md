@@ -36,7 +36,7 @@ directly.
 
 ## Common Commands
 
-```powershell
+```sh
 cd ~/src/github.com/jey3dayo/apm-workspace
 mise bootstrap       # first machine setup
 ```

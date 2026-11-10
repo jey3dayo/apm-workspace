@@ -59,7 +59,7 @@ undoes it.
 | ----------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------ |
 | Rollout           | `docs/native-distribution.md` section B (`native:*`) | Rehearse on a backup copy first; only `native:migrate` and its undo write HOME |
 | Validation only   | `mise run check`                                     | Does not roll out.                                                             |
-| Deep verification | `mise run verify`                                    | Runs checks, both script suites, and catalog smoke verification.               |
+| Deep verification | `mise run verify`                                    | Runs checks, the script suite, and catalog smoke verification.                 |
 | Inspection        | `mise run doctor`                                    | Read-only.                                                                     |
 
 Shipping here has no PR: commit directly on `main`, run `apm-deploy-verify`
@@ -68,8 +68,7 @@ checkout), then push `main` and watch the pushed CI run. `ship` reads this as
 the repository's end point. After the push, roll the pushed commit out with
 section B of `docs/native-distribution.md`.
 
-`mise.toml` manages required tools except `pwsh` plus Pester, which `test:ps`
-(and therefore `test`/`verify`) requires. The bold-heading formatter helper is
+`mise.toml` manages the required tools. The bold-heading formatter helper is
 vendored at `scripts/replace-bold-headings.ts`; a missing helper is a broken
 checkout, not an optional dependency.
 
@@ -84,19 +83,12 @@ fixed default: CI runners and local macOS hosts differ by an order of
 magnitude in per-process cost (process spawn overhead, and lock polling when
 neither `flock` nor `shlock` is available), so the same fan-out that helps on
 a developer machine loses to overhead on a CI runner's limited core count.
-`APM_TEST_PARALLEL=0` forces both `test:sh` and `test:ps` to their
-serial/single-process path regardless of the parallel/flock/shlock guard or
-`BATS_JOBS`; CI sets it, leaving local runs at the parallel default (unset or
-`1`).
+`APM_TEST_PARALLEL=0` forces `test:sh` to its serial path regardless of the
+parallel/flock/shlock guard or `BATS_JOBS`; CI sets it, leaving local runs at
+the parallel default (unset or `1`).
 
-The `test:ps` lane is best-effort, not a verified Windows guarantee: CI and
-local runs execute `pwsh` on macOS/Linux, so a green Pester run only confirms
-the script's PowerShell syntax and logic run under those hosts' `pwsh`. It
-does not exercise Windows-specific failure modes such as path separators,
-`$USERPROFILE`, symlink-creation privileges, or CRLF handling, none of which
-have been verified on a Windows host. `test:ps` is not a pre-push gate for
-this reason; `test:sh` is the only workspace-script suite pre-push runs, and
-`test:ps` remains reachable through CI and `mise run test`/`verify`.
+The PowerShell lane (the `.ps1` scripts, their Pester suites and `test:ps`) was
+removed on 2026-11-10; see git history. Windows is out of scope.
 
 Before external sharing, run the repository's full gate. For smaller edits run
 touched-file formatting and the relevant focused check; always run `git diff

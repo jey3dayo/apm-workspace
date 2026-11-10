@@ -860,3 +860,9 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - `native:*` は `deploy` の中身に置き換えなかった（ユーザー判断で、置き換えずに削除した）。切り替えは `docs/native-distribution.md` の B を手で通す。
 - 旧経路が配っていた HOME を保守する必要が出たときは、削除前の commit `0bcce09` の旧ツールを使う。
 - 未解決：root の `apm.lock.yaml` を更新する task が無い。`refresh`・`install-pins` は native の HOME ですでに拒否されていたので、削除で新しく失った機能ではないが、SHA pin を上げたあとに lock を合わせる手段は今は無い（`validate:workspace` が pin と lock の不一致で `check` を落とす）。`todo.txt` に載せるかはユーザーが決める。
+
+## 2026-11-10 使っていない PowerShell の lane を削除した
+
+- 削除したもの：`scripts/*.ps1`、`tests/*.Tests.ps1`、`scripts/run-pester.sh`、mise の `run_windows` 行、`test:ps` task、lefthook と CI の `pwsh` 手順。`test` は `test:sh` だけを呼ぶ。
+- 理由：実 HOME は macOS の native 配布で動いていて、Windows は対象外としている。PowerShell 版には native 用の guard も無く、使っていない lane を保守するコストだけが残っていた。
+- 削除前の版が要るときは、削除の直前の commit を git history から辿る。

@@ -320,7 +320,7 @@ EOF
 @test "mise exposes the expected public task set" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT")"
   run assert_public_mise_tasks "$tasks_json" \
-    check doctor doctor:intake doctor:workspace format format:check test test:ps test:sh validate verify
+    check doctor doctor:intake doctor:workspace format format:check test test:sh validate verify
   [ "$status" -eq 0 ]
 }
 

@@ -2,25 +2,21 @@
 description = "Format Markdown files in the authoring checkout"
 hide = true
 run = "fd --hidden -e md -X prettier --write --log-level error >/dev/null"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd --hidden -e md -X prettier --write --log-level error | Out-Null\""
 
 ["format:markdown:check"]
 description = "Check Markdown formatting in the authoring checkout"
 hide = true
 run = "fd --hidden -e md -X prettier --check --log-level warn"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd --hidden -e md -X prettier --check --log-level warn\""
 
 ["format:markdown:bold-headings"]
 description = "Rewrite bold headings inside catalog skill and shared guidance sources"
 hide = true
 run = "bash ./scripts/format-bold-headings.sh write"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/format-bold-headings.ps1 write"
 
 ["format:markdown:bold-headings:check"]
 description = "Check bold heading rewrites inside catalog skill and shared guidance sources"
 hide = true
 run = "bash ./scripts/format-bold-headings.sh check"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/format-bold-headings.ps1 check"
 
 # RUST_LOG=taplo=warn quiets taplo's info logs. POSIX-only on purpose: setting it
 # inside the Windows -Command string depends on which shell mise wraps it in, and
@@ -29,13 +25,11 @@ run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts
 description = "Format TOML files in the authoring checkout"
 hide = true
 run = "fd --hidden -e toml -X env RUST_LOG=taplo=warn taplo format"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd --hidden -e toml -X taplo format\""
 
 ["format:toml:check"]
 description = "Check TOML formatting in the authoring checkout"
 hide = true
 run = "fd --hidden -e toml -X env RUST_LOG=taplo=warn taplo format --check"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd --hidden -e toml -X taplo format --check\""
 
 # apm.lock.yaml needs no --exclude for the prettier tasks: it is listed in
 # .prettierignore, which prettier honors even for explicitly passed paths.
@@ -43,13 +37,11 @@ run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd -
 description = "Format YAML files in the authoring checkout"
 hide = true
 run = "fd --hidden -e yml -e yaml -X prettier --write --log-level error >/dev/null"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd --hidden -e yml -e yaml -X prettier --write --log-level error | Out-Null\""
 
 ["format:yaml:check"]
 description = "Check YAML formatting in the authoring checkout"
 hide = true
 run = "fd --hidden -e yml -e yaml -X prettier --check --log-level warn"
-run_windows = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"fd --hidden -e yml -e yaml -X prettier --check --log-level warn\""
 
 ["format"]
 description = "Format workspace docs and manifests"
