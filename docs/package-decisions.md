@@ -866,3 +866,8 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - 削除したもの：`scripts/*.ps1`、`tests/*.Tests.ps1`、`scripts/run-pester.sh`、mise の `run_windows` 行、`test:ps` task、lefthook と CI の `pwsh` 手順。`test` は `test:sh` だけを呼ぶ。
 - 理由：実 HOME は macOS の native 配布で動いていて、Windows は対象外としている。PowerShell 版には native 用の guard も無く、使っていない lane を保守するコストだけが残っていた。
 - 削除前の版が要るときは、削除の直前の commit を git history から辿る。
+
+## 2026-11-10 ibelick/ui-skills の重複スキルを外した
+
+- 撤去：`improve-ui` と `fixing-motion-performance`。`fixing-accessibility` は残す。
+- モーション性能の診断は `animation-performance` に寄せる。`fixing-motion-performance` と `improve-ui` を残した過去の判断は今回の選択で更新し、ほかの依存は変更しない。

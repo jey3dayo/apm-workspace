@@ -14,7 +14,6 @@
 | モーション taste・レビュー・監査                         | `emil-design-eng` / `review-animations` / `improve-animations` / `find-animation-opportunities`（emilkowalski/skills） |
 | モーション実装スニペット                                 | `transitions-dev`                                                                                                      |
 | UI レビューのレーン選択（lane 1 がデザインシステム準拠） | `review-board`（optional、自作）                                                                                       |
-| 既存 UI の監査 → 実装 plan（read-only）                  | `improve-ui`（ibelick）                                                                                                |
 | デザインドキュメント                                     | `design-md-workflow`（catalog 自作）                                                                                   |
 | コードベース監査→計画（汎用）                            | `improve`（shadcn）                                                                                                    |
 | React 診断                                               | `react-doctor`（millionco）                                                                                            |
@@ -28,7 +27,7 @@
 - UI・フォーム・アクセシビリティ・マルチデバイスのレーン振り分け → `review-board`（optional）
 - コード品質全般 → 組み込み `/code-review` / `thermo-nuclear-code-quality-review`
 - diff を人間が TUI で見てコメントをやり取りする → `tuicr`
-- 改善候補の洗い出し（実装しない）→ `improve`（shadcn、汎用）/ `improve-ui`（UI に限る）
+- 改善候補の洗い出し（実装しない）→ `improve`（shadcn、汎用）
 
 ## 検証中の競合スキル
 

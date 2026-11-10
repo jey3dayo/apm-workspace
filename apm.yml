@@ -61,8 +61,6 @@ dependencies:
       ref: 4907a526b07943b3a338177558d42fae4fdf0a86
       skills:
         - fixing-accessibility
-        - fixing-motion-performance
-        - improve-ui
     - Jakubantalik/transitions-dev/skills/transitions-dev#038b0bdc75375c2beed51d1e824c98cdc7b86f8c
     - git: nextlevelbuilder/ui-ux-pro-max-skill
       ref: 50d8a7de0900119855614541f15a1a616691eb33
