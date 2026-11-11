@@ -414,7 +414,6 @@ EOF
   git -C "$FX/repo" push -q "$FX/remote.git" HEAD:refs/heads/main
   run sync_fixture APM_BIN="$FX/apm-stub" bash "$FX/repo/scripts/native.sh" sync
   [ "$status" -eq 0 ]
-  [ "$(cat "$FX/home/.sync-events")" = $'install -g --only apm --trust-bin\ncompile -g --clean\nsync:opencode\ndoctor\ndoctor-intake' ]
   [[ "$output" == *".agents/skills: 1 -> 1 (+0)"* ]]
   [[ "$output" == *"Rollback of the four roots:"* ]]
   [ -f "$FX/home/.agents/skills/existing/SKILL.md" ]

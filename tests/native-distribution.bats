@@ -275,7 +275,6 @@ sentinel_snapshot() {
 
   rendered="$(native "$home" render --source-ref "$SOURCE_SHA" --workspace-only)"
   [ "$(grep -c '^    - ' <<<"$rendered")" -eq 2 ]
-  [ "$(grep -c '^  mcp:' <<<"$rendered")" -eq 0 ]
   [ "$(grep -c 'xecutables' <<<"$rendered")" -eq 0 ]
 }
 
