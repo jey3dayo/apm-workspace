@@ -2,14 +2,14 @@
 #
 # run-cursor-worker.sh の role/model allowlist と sandbox write/read allowlist を
 # 検証する。cursor は Worker と Reviewer の両方に就ける runtime で、正本は
-# orchestrator-worker の tier 表（cursor 列）。script はその写しである。
+# orchestrator-worker/references/models.md の表（cursor 行）。script はその写しである。
 # 写しは黙ってずれるので、下の drift テストが表と script の両方から model ID を
 # 機械的に取り出して突き合わせる。
 
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
   SCRIPT="$REPO_ROOT/catalog/.apm/skills/agmsg-delegation/scripts/run-cursor-worker.sh"
-  SKILL="$REPO_ROOT/catalog/.apm/skills/orchestrator-worker/SKILL.md"
+  MODELS="$REPO_ROOT/catalog/.apm/skills/orchestrator-worker/references/models.md"
   PROJECT="$(mktemp -d)"
   PAYLOAD="$(mktemp)"
   printf 'noop\n' >"$PAYLOAD"
@@ -29,12 +29,23 @@ teardown() {
   rm -rf -- "$PROJECT" "$PAYLOAD" "$STUB_DIR"
 }
 
-# tier 表の Worker / Reviewer 行から cursor の model ID を取り出す。
+# models.md の Worker / Reviewer 表から cursor の model ID を取り出す。
 # claude-* 系と gpt-5.6-sol-xhigh のみが対象で、Codex 列の gpt-6-sol /
 # gpt-5.6-terra / gpt-6-astra のような2segment id とは正規表現の segment数で
 # 区別される（gpt-[0-9.]+-[a-z]+-[a-z]+ は3segment必須）。
 skill_models_for() {
-  grep -E "^\| $1 " "$SKILL" | grep -oE 'claude-[a-z0-9.-]+|gpt-[0-9.]+-[a-z]+-[a-z]+' | sort -u | tr '\n' ' '
+  awk -F'|' -v role="$1" '
+    $0 == "### Worker（実装者）" { section="Worker"; next }
+    $0 == "### Reviewer（レビュアー）" { section="Reviewer"; next }
+    /^### / { section=""; next }
+    section == role && $2 ~ /^ cursor[[:space:]]*$/ {
+      column = $3
+      while (match(column, /claude-[a-z0-9.-]+|gpt-[0-9.]+-[a-z]+-[a-z]+/)) {
+        print substr(column, RSTART, RLENGTH)
+        column = substr(column, RSTART + RLENGTH)
+      }
+    }
+  ' "$MODELS" | sort -u | tr '\n' ' '
 }
 
 # script が role ごとに許可している model を取り出す
@@ -60,6 +71,7 @@ script_models_for() {
   local script_impl skill_impl script_review skill_review
   script_impl="$(script_models_for implement | tr ' ' '\n' | sort -u | tr '\n' ' ')"
   skill_impl="$(skill_models_for Worker)"
+  [ -n "$script_impl" ] && [ -n "$skill_impl" ]
   [ "$script_impl" = "$skill_impl" ] || {
     printf 'implement drift:\n  script: %s\n  skill : %s\n' "$script_impl" "$skill_impl" >&2
     return 1
@@ -67,6 +79,7 @@ script_models_for() {
 
   script_review="$(script_models_for review | tr ' ' '\n' | sort -u | tr '\n' ' ')"
   skill_review="$(skill_models_for Reviewer)"
+  [ -n "$script_review" ] && [ -n "$skill_review" ]
   [ "$script_review" = "$skill_review" ] || {
     printf 'review drift:\n  script: %s\n  skill : %s\n' "$script_review" "$skill_review" >&2
     return 1
