@@ -8,7 +8,7 @@
 ## parallel (Parallel.ai MCP)
 
 - Status: 採用・global（2026-11-11）
-- 設定: `transport: http`、`https://mcp.parallel.ai/mcp`。認証 header は置かず、無料の `web_search` / `web_fetch` / `web_decisions` を使う
+- 設定: `transport: http`、`https://mcp.parallel.ai/mcp`。`PARALLEL_API_KEY` を Bearer header から参照する。未設定でも install / compile は通るが、MCP 接続は失敗する
 - 理由: Context7 のライブラリ文書検索と分け、一般 Web の検索・取得・判断を扱う
 - 公式: https://docs.parallel.ai/integrations/mcp/quickstart
 - 再検討するなら: 組み込み `WebSearch` / `WebFetch` と役割が重複し、利用実績が乏しい場合
