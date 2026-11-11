@@ -34,14 +34,15 @@ teardown() {
 # gpt-5.6-terra / gpt-6-astra のような2segment id とは正規表現の segment数で
 # 区別される（gpt-[0-9.]+-[a-z]+-[a-z]+ は3segment必須）。
 skill_models_for() {
-  awk -v role="$1" '
-    /^### Worker/ { in_worker=1; in_reviewer=0; next }
-    /^### Reviewer/ { in_reviewer=1; in_worker=0; next }
-    /^###/ { in_worker=0; in_reviewer=0; next }
-    (in_worker && role == "Worker" && /^\| cursor /) || (in_reviewer && role == "Reviewer" && /^\| cursor /) {
-      while (match($0, /claude-[a-z0-9.-]+|gpt-[0-9.]+-[a-z]+-[a-z]+/)) {
-        print substr($0, RSTART, RLENGTH)
-        $0 = substr($0, RSTART + RLENGTH)
+  awk -F'|' -v role="$1" '
+    $0 == "### Worker（実装者）" { section="Worker"; next }
+    $0 == "### Reviewer（レビュアー）" { section="Reviewer"; next }
+    /^### / { section=""; next }
+    section == role && $2 ~ /^ cursor[[:space:]]*$/ {
+      column = $3
+      while (match(column, /claude-[a-z0-9.-]+|gpt-[0-9.]+-[a-z]+-[a-z]+/)) {
+        print substr(column, RSTART, RLENGTH)
+        column = substr(column, RSTART + RLENGTH)
       }
     }
   ' "$MODELS" | sort -u | tr '\n' ' '
@@ -70,6 +71,7 @@ script_models_for() {
   local script_impl skill_impl script_review skill_review
   script_impl="$(script_models_for implement | tr ' ' '\n' | sort -u | tr '\n' ' ')"
   skill_impl="$(skill_models_for Worker)"
+  [ -n "$script_impl" ] && [ -n "$skill_impl" ]
   [ "$script_impl" = "$skill_impl" ] || {
     printf 'implement drift:\n  script: %s\n  skill : %s\n' "$script_impl" "$skill_impl" >&2
     return 1
@@ -77,6 +79,7 @@ script_models_for() {
 
   script_review="$(script_models_for review | tr ' ' '\n' | sort -u | tr '\n' ' ')"
   skill_review="$(skill_models_for Reviewer)"
+  [ -n "$script_review" ] && [ -n "$skill_review" ]
   [ "$script_review" = "$skill_review" ] || {
     printf 'review drift:\n  script: %s\n  skill : %s\n' "$script_review" "$skill_review" >&2
     return 1

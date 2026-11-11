@@ -35,20 +35,10 @@ script_models_for() {
 # models.md の表から Codex 列を取り出し、model ID の前後が区切り文字である場合だけ照合する。
 skill_models_for() {
   awk -F'|' -v role="$1" '
-    /^### Worker/ { in_worker=1; in_reviewer=0; next }
-    /^### Reviewer/ { in_reviewer=1; in_worker=0; next }
-    /^###/ { in_worker=0; in_reviewer=0; next }
-    in_worker && role == "Worker" && /^\| Codex / {
-      column = $3
-      while (match(column, /(^|[^[:alnum:].-])gpt-[0-9]+(\.[0-9]+)?-[a-z]+($|[^[:alnum:].-])/)) {
-        token = substr(column, RSTART, RLENGTH)
-        sub(/^[^[:alnum:].-]+/, "", token)
-        sub(/[^[:alnum:].-]+$/, "", token)
-        if (token ~ /^gpt-[0-9]+(\.[0-9]+)?-[a-z]+$/) print token
-        column = substr(column, RSTART + RLENGTH)
-      }
-    }
-    in_reviewer && role == "Reviewer" && /^\| Codex / {
+    $0 == "### Worker（実装者）" { section="Worker"; next }
+    $0 == "### Reviewer（レビュアー）" { section="Reviewer"; next }
+    /^### / { section=""; next }
+    section == role && $2 ~ /^ Codex[[:space:]]*$/ {
       column = $3
       while (match(column, /(^|[^[:alnum:].-])gpt-[0-9]+(\.[0-9]+)?-[a-z]+($|[^[:alnum:].-])/)) {
         token = substr(column, RSTART, RLENGTH)
@@ -116,6 +106,7 @@ stub_received_model() {
   local script_impl skill_impl script_review skill_review
   script_impl="$(script_models_for implement | tr ' ' '\n' | sort -u | tr '\n' ' ')"
   skill_impl="$(skill_models_for Worker)"
+  [ -n "$script_impl" ] && [ -n "$skill_impl" ]
   [ "$script_impl" = "$skill_impl" ] || {
     printf 'implement drift:\n  script: %s\n  skill : %s\n' "$script_impl" "$skill_impl" >&2
     return 1
@@ -123,6 +114,7 @@ stub_received_model() {
 
   script_review="$(script_models_for review | tr ' ' '\n' | sort -u | tr '\n' ' ')"
   skill_review="$(skill_models_for Reviewer)"
+  [ -n "$script_review" ] && [ -n "$skill_review" ]
   [ "$script_review" = "$skill_review" ] || {
     printf 'review drift:\n  script: %s\n  skill : %s\n' "$script_review" "$skill_review" >&2
     return 1

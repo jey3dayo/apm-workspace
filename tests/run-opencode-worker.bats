@@ -23,13 +23,14 @@ teardown() {
 # models.md の Worker 表から opencode の model ID を取り出す
 # (実在する id は `deepseek/deepseek-flash` のみ)
 skill_opencode_models() {
-  awk '
-    /^### Worker/ { in_worker=1; next }
-    /^###/ { in_worker=0; next }
-    in_worker && /^\| opencode / {
-      while (match($0, /deepseek\/[a-z0-9.-]+/)) {
-        print substr($0, RSTART, RLENGTH)
-        $0 = substr($0, RSTART + RLENGTH)
+  awk -F'|' '
+    $0 == "### Worker（実装者）" { in_worker=1; next }
+    /^### / { in_worker=0; next }
+    in_worker && $2 ~ /^ opencode[[:space:]]*$/ {
+      column = $3
+      while (match(column, /deepseek\/[a-z0-9.-]+/)) {
+        print substr(column, RSTART, RLENGTH)
+        column = substr(column, RSTART + RLENGTH)
       }
     }
   ' "$MODELS" | sort -u | tr '\n' ' '
@@ -70,6 +71,7 @@ skill_opencode_models() {
   local script_models skill_models
   script_models="$(sed -n 's/^allowed_models=(\(.*\))$/\1/p' "$SCRIPT" | tr ' ' '\n' | sort -u | tr '\n' ' ')"
   skill_models="$(skill_opencode_models)"
+  [ -n "$script_models" ] && [ -n "$skill_models" ]
   [ "$script_models" = "$skill_models" ] || {
     printf 'opencode allowlist drift:\n  script: %s\n  skill : %s\n' "$script_models" "$skill_models" >&2
     return 1
