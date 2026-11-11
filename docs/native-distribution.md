@@ -1,6 +1,6 @@
 # APM native の配布（単一 mise 入口）
 
-- Status: 2026-11-11、APM 0.35.0。`mise run native:sync` が唯一の配布入口で、plan・backup・migrate rehearsal・migration・OpenCode・doctor を順に実行する。migration は clean な rehearsal がある場合だけ実 HOME に書き、失敗時は root を自動で戻す。MCP・認証・permissions・settings は書き換えない（install は `--only apm`）
+- Status: 2026-11-11、APM 0.35.0。`mise run native:sync` が唯一の配布入口で、plan・backup・migrate rehearsal・migration・OpenCode・doctor を順に実行する。migration は clean な rehearsal がある場合だけ実 HOME に書き、失敗時は root を自動で戻す
 - 今の位置づけ: 実 HOME は 2026-11-10 に native へ切り替え済みで、authoring の checkout は `~/.apm` の外（`~/src/github.com/jey3dayo/apm-workspace`）にある。内部 stage は sync の一貫した guard・排他・復旧契約を実装するために残すが、個別の mise task や手動配布入口にはしない
 - テスト: `tests/native-distribution.bats`（`mise run test:sh` に含まれる）。この checkout の `catalog/` と `manual-skills/` を fixture の git repo に入れ、実 APM で使い捨ての HOME へ配る。macOS では `sandbox-exec` が通信と fixture の外への書込みを拒否する。fixture の置き場所は `APM_NATIVE_FIXTURE_ROOT` で変えられる
 
@@ -19,7 +19,6 @@ sync と内部 stage は HOME ごとに同じ排他を取る。sync は backup �
 - `<HOME>/apm.yml` があれば、rehearsal（実 HOME と複製の両方）と migration は何も書かずに止まる。user scope の APM は executable の許可を `<HOME>/apm.yml` が在ればそちらから読み、`<HOME>/.apm/apm.yml` の `allowExecutables` を無視するため（`apm_cli/security/executables.py` の `exec_trust_context_for_project`）
 - apm は空の環境に `HOME`・`PATH`・ロケール・git の設定の場所と、HOME の中の `TMPDIR`（`.cache/apm-native-tmp`）だけを渡して起動する。APM は `APM_CACHE_DIR` や `XDG_*`、`TMPDIR` が指す場所にも書き（`APM_CACHE_DIR` と `XDG_CACHE_HOME` はテストで確かめた）、git は token・proxy・askpass を環境から読むため
 - manifest は同じディレクトリの新しいファイルに書いてから名前を置き換える
-- install は `--only apm`。MCP は、`setup:mcp:host` などが書いた今の設定のまま触らない
 
 backup の対象（rehearse が複製に再現するもの）: `~/.apm/apm.yml`・`config.json`・`apm.lock.yaml`・`deployment-receipts`（APM が配った成果物の所有の記録）、`~/.claude/{skills,agents,rules,commands,CLAUDE.md}`、`~/.codex/{AGENTS.md,rules}`、`~/.cursor/{agents,rules,AGENTS.md}`、`~/.agents/skills`、`~/AGENTS.md`、`~/.config/opencode/AGENTS.md`、`~/.local/state/agmsg`（別に取る）
 
