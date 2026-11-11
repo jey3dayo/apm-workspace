@@ -15,6 +15,7 @@ import uuid
 from pathlib import Path
 
 PROMPT = Path(__file__).resolve().parent.parent / "references" / "readonly-sandbox-measure-prompt.md"
+# MODEL は測定用の固定値。選定理由は references/models.md の「Reviewer の選定理由」を参照。
 MODEL, EFFORT, TIMEOUT_SECONDS = "gpt-6.1-terra", "medium", 1200
 PATCH_REJECTED = re.compile(r"patch rejected: writing is blocked by read-only sandbox")
 SPAWN_FAILED = re.compile(r"collab spawn failed")

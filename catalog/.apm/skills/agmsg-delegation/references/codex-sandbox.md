@@ -42,8 +42,10 @@ effort と variant の値は各 helper が検証し、`AGMSG_WORKER_MCP_ALLOW` �
 常駐プールの pane はユーザーが手で起動するが、実装 worker の通常経路は既存 worktree を使う sandboxed pane とする。orchestrator またはユーザーが pane の起動前に worktree を作成し、pane worker は次で起動する:
 
 ```bash
-codex -m gpt-6-luna -a never -s workspace-write
+codex -m <低コスト帯のモデル> -a never -s workspace-write
 ```
+
+具体 model は `orchestrator-worker` の tier 表 Worker 行（Codex 列）と `references/models.md` を参照。
 
 起動後、orchestrator は pane の実 cwd と `git worktree list --porcelain` を照合し、`git -C "$worktree" rev-parse --show-toplevel` と `git -C "$worktree" branch --show-current` が指定した worktree / branch と完全一致することを確認する。さらに開始時点の `git status --short` / `git diff` と worker 後の差分を比較し、タスク定義にない unexpected diff がないことを確認する。
 

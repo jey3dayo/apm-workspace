@@ -248,12 +248,12 @@ Codex native の `spawn_agent` を標準経路とする。native spawn が利用
 
 昇格先は platform ごとに固定する。理由が「難度」か「長文脈」かで行き先が変わる。
 
-| platform | 既定 Worker                                | 難度で詰まったとき                                            | 長文脈リコールの崖                        |
-| -------- | ------------------------------------------ | ------------------------------------------------------------- | ----------------------------------------- |
-| Claude   | `sonnet`                                   | `model: "opus"` を呼び出し時に渡す                            | —                                         |
-| Codex    | `gpt-6-luna` xhigh                         | effort を max へ → `gpt-6.1-sol`（旧版 `gpt-6-sol` も可）     | `gpt-6.1-terra`                           |
-| opencode | `deepseek/deepseek-flash` `--variant high` | 昇格ではなく経路差し替え。既存の Codex Luna 経路へ出す        | 計測まで対象外（既存の Terra 経路へ送る） |
-| cursor   | `claude-sonnet-5-5-high`                   | cursor 内で `claude-opus-5-5-high` へ昇格                     | 計測まで対象外（既存の Codex Terra 経路） |
+| platform | 既定 Worker                                | 難度で詰まったとき                                        | 長文脈リコールの崖                        |
+| -------- | ------------------------------------------ | --------------------------------------------------------- | ----------------------------------------- |
+| Claude   | `sonnet`                                   | `model: "opus"` を呼び出し時に渡す                        | —                                         |
+| Codex    | `gpt-6-luna` xhigh                         | effort を max へ → `gpt-6.1-sol`（旧版 `gpt-6-sol` も可） | `gpt-6.1-terra`                           |
+| opencode | `deepseek/deepseek-flash` `--variant high` | 昇格ではなく経路差し替え。既存の Codex Luna 経路へ出す    | 計測まで対象外（既存の Terra 経路へ送る） |
+| cursor   | `claude-sonnet-5-5-high`                   | cursor 内で `claude-opus-5-5-high` へ昇格                 | 計測まで対象外（既存の Codex Terra 経路） |
 
 Worker の昇格 3 条件に当たるタスクは opencode へ出さず、既存の Claude / Codex 経路へ回す。opencode 行と cursor 行で別経路へ送るのは昇格ではなく経路差し替え。
 
