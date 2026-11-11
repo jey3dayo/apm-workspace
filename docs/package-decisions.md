@@ -8,7 +8,7 @@
 ## parallel (Parallel.ai MCP)
 
 - Status: 採用・global（2026-11-11）
-- 設定: `transport: http`、`https://mcp.parallel.ai/mcp`。`PARALLEL_API_KEY` を Bearer header から参照する。未設定でも install / compile は通るが、MCP 接続は失敗する
+- 設定: `transport: http`、`https://mcp.parallel.ai/mcp`。API key は任意で、必要なら `PARALLEL_API_KEY` を Authorization Bearer header として追加する
 - 理由: Context7 のライブラリ文書検索と分け、一般 Web の検索・取得・判断を扱う
 - 公式: https://docs.parallel.ai/integrations/mcp/quickstart
 - 再検討するなら: 組み込み `WebSearch` / `WebFetch` と役割が重複し、利用実績が乏しい場合
