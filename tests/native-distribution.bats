@@ -12,6 +12,8 @@
 
 bats_require_minimum_version 1.5.0
 
+load 'native-test-helpers'
+
 # docs/native-distribution.md was written against this release; bump it only after re-checking the docs.
 EXPECTED_APM_VERSION=0.35.0
 FIXTURE_URL=https://fixture.invalid/fixture-owner/apm-workspace.git
@@ -21,8 +23,6 @@ setup_file() {
   export REPO_ROOT
   # shellcheck source=../scripts/lib/git-test-env.sh
   . "$REPO_ROOT/scripts/lib/git-test-env.sh"
-  # shellcheck source=native-test-helpers.bash
-  . "$REPO_ROOT/tests/native-test-helpers.bash"
   apm_isolate_git_env
 
   REAL_HOME="$(cd "$HOME" && pwd -P)"
