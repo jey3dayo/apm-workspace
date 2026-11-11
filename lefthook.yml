@@ -61,8 +61,6 @@ pre-commit:
 pre-push:
   # doctor is deliberately not a push gate: it inspects this machine's deployed
   # output, so it fails on any clone that has not run a rollout yet.
-  # Serial on purpose: parallelizing needs a shared-state audit first
-  # (smoke:catalog rebuilds `.catalog-build/<catalog>`).
   jobs:
     - name: workspace-scripts
       glob: "scripts/apm-workspace.sh"
@@ -117,7 +115,3 @@ pre-push:
     # no glob: normalizes/validates the entire managed catalog package tree.
     - name: validate:catalog
       run: mise run validate:catalog
-
-    # no glob: smoke-tests the full catalog package end to end.
-    - name: smoke:catalog
-      run: mise run smoke:catalog

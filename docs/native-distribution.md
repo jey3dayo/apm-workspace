@@ -38,7 +38,7 @@ backup の対象（rehearse が複製に再現するもの）: `~/.apm/apm.yml`�
 
 ## 切り替えのあとの authoring checkout
 
-`scripts/apm-workspace.sh` は、`APM_WORKSPACE_DIR` が無いとき、`<HOME>/.apm` に `.git`（linked worktree ではファイル）か `catalog/` があればそれを、無ければこの repo の root（`REPO_ROOT`）を `$WORKSPACE_DIR` にする。切り替えのあとは checkout の外から `validate`・`validate:catalog`・`smoke:catalog` がその checkout に対して動く。`.git` の検査は、worktree の `.git` ファイルも通す。
+`scripts/apm-workspace.sh` は、`APM_WORKSPACE_DIR` が無いとき、`<HOME>/.apm` に `.git`（linked worktree ではファイル）か `catalog/` があればそれを、無ければこの repo の root（`REPO_ROOT`）を `$WORKSPACE_DIR` にする。切り替えのあとは checkout の外から `validate`・`validate:catalog` がその checkout に対して動く。`.git` の検査は、worktree の `.git` ファイルも通す。
 
 ## native と手動の境界
 
@@ -70,9 +70,9 @@ backup の対象（rehearse が複製に再現するもの）: `~/.apm/apm.yml`�
 
 ## 既知の問題
 
-- APM 0.35.0 は user scope を `~/.apm` に固定している。`~/.apm` が checkout だと、実 HOME へ配ったときに、checkout が追跡している `apm.yml`（と APM が書く `apm.lock.yaml`）を書き換えてしまう。main の checkout は dirty になり、`git pull` は止まる。この状態に戻さないために、`migrate` は `<HOME>/.apm` に `.git` か `catalog/` があるとき、またはこの repo が `<HOME>/.apm` の中にあるときに、何も書かずに止まる。`mise run check` と `verify` は実 HOME の配布先を書かず、`$WORKSPACE_DIR` の下（`.catalog-build`）と一時ディレクトリにだけ書くので、切り替えのあとも通る
+- APM 0.35.0 は user scope を `~/.apm` に固定している。`~/.apm` が checkout だと、実 HOME へ配ったときに、checkout が追跡している `apm.yml`（と APM が書く `apm.lock.yaml`）を書き換えてしまう。main の checkout は dirty になり、`git pull` は止まる。この状態に戻さないために、`migrate` は `<HOME>/.apm` に `.git` か `catalog/` があるとき、またはこの repo が `<HOME>/.apm` の中にあるときに、何も書かずに止まる。`mise run check` と `verify` は実 HOME の配布先を書かず、一時ディレクトリにだけ書くので、切り替えのあとも通る
+- 2026-11-10 より前の `smoke:catalog` は、実 HOME の `~/.apm/deployment-receipts` に一時ディレクトリの receipt（root が `apm-catalog-smoke.*`）を書いていた。その後は一時 HOME を使い、現在はタスク自体を廃止したため、この経路で receipt は増えない。残っている receipt は native 配布の副作用と取り違えない
 - 目印の無い root（旧経路がコピーした `~/.claude/CLAUDE.md`・`~/.codex/AGENTS.md`・`~/.cursor/AGENTS.md`）は、`compile -g --clean` が上書きしない。Claude には旧い `CLAUDE.md` と native の rule `ai-collaboration.md` の両方が届く。旧いコピーを退避する `migrate:roots` は 2026-11-10 に退役した。旧経路のままの HOME で必要なときは、commit `0bcce09` の旧ツールで実行するか、手で `<名前>.<UTC>.bak` へ移す
-- 2026-11-10 より前の `smoke:catalog`（pre-push hook と `verify`）は、実 HOME の `~/.apm/deployment-receipts` に一時ディレクトリの receipt（root が `apm-catalog-smoke.*`）を書いていた。今は一時 HOME で apm を動かすので増えない。残っている receipt は native の副作用と取り違えない
 
 ## 実 HOME への切り替えの解き方
 

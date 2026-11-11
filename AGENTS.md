@@ -59,7 +59,7 @@ option when SSH is unavailable). Section B of
 | ----------------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | Rollout           | `mise run native:sync` | Runs backup and rehearsal before writing HOME; see `docs/native-distribution.md` section B for HTTPS and rollback |
 | Validation only   | `mise run check`       | Does not roll out.                                                                                                |
-| Deep verification | `mise run verify`      | Runs checks, the script suite, and catalog smoke verification.                                                    |
+| Deep verification | `mise run verify`      | Runs checks and the script suite.                                                                                 |
 | Inspection        | `mise run doctor`      | Read-only.                                                                                                        |
 
 Shipping here goes through a PR: work on a feature branch, run

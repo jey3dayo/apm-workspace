@@ -148,9 +148,8 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
 
 - The real HOME is native (`~/.apm/apm.yml` starts with `# Rendered by scripts/native.sh`). The legacy writer (`deploy`, `apply`, `upgrade`, `refresh` and their helper tasks) was removed on 2026-11-10; its last version is commit `0bcce09`. Roll out with `docs/native-distribution.md` section B (`native:plan` → `native:backup` → `native:rehearse --migrate` → `native:migrate`); `native:migrate-rollback` undoes it.
 - Run `mise run check` for a lightweight gate before a rollout.
-- Run `mise run verify` for `check`, both script suites (`test`), and catalog smoke verification.
+- Run `mise run verify` for `check` and the script suite (`test`).
 - Run `mise run doctor` to inspect deployed state; it is read-only.
-- Run `mise run smoke:catalog` to smoke-test the generated catalog package.
 - No task refreshes upstream dependencies or regenerates `apm.lock.yaml`; this is an open item in `docs/package-decisions.md`.
 - For skill creation, updates, installs, or migrations in this workspace, include section B and a deployed target check in the plan unless the user explicitly asks for a local-only change.
 

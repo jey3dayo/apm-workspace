@@ -105,7 +105,7 @@ depends = [
 
 [tasks.verify]
 description = "Run deep verification for the authoring checkout"
-run = [{ task = "check" }, { task = "test" }, { task = "smoke:catalog" }]
+run = [{ task = "check" }, { task = "test" }]
 
 [tasks.test]
 description = "Run the behavioral suite for the workspace scripts"

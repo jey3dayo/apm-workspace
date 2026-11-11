@@ -1713,8 +1713,8 @@ setup_authoring_checkout() {
   chmod +x "$bin/apm"
 }
 
-@test "from an authoring checkout outside HOME, validate and smoke:catalog run against that checkout while the consumer HOME is untouched" {
-  local home authoring="$FX/authoring" bin="$FX/authoring-bin" log="$FX/authoring-apm.log" consumer_before install_home
+@test "from an authoring checkout outside HOME, validate runs against that checkout while the consumer HOME is untouched" {
+  local home authoring="$FX/authoring" bin="$FX/authoring-bin" log="$FX/authoring-apm.log" consumer_before
   home="$(new_home authoring-consumer)"
   mkdir -p "$home/.apm"
   native "$home" render --source-ref "$SOURCE_SHA" --workspace-only >"$home/.apm/apm.yml"
@@ -1724,14 +1724,6 @@ setup_authoring_checkout() {
   run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$authoring/scripts/apm-workspace.sh" validate
   [ "$status" -eq 0 ]
   grep -qxF "$authoring|compile --validate" "$log"
-
-  run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$authoring/scripts/apm-workspace.sh" smoke:catalog
-  grep -qF "install $authoring/.catalog-build/catalog --target agent-skills" "$log"
-  [ -d "$authoring/.catalog-build/catalog" ]
-  install_home="$(grep -F '|install ' "$log.home" | cut -d'|' -f1)"
-  [ -n "$install_home" ]
-  [ "$install_home" != "$home" ]
-  [ ! -e "$home/.apm/deployment-receipts" ]
 
   run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$authoring/scripts/apm-workspace.sh" apply
   [ "$status" -ne 0 ]

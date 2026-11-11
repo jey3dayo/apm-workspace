@@ -37,45 +37,6 @@ MIGRATE_UNTOUCHED_FILES=".codex/config.toml .claude/settings.json"
 BACKUP_PATHS=".apm/apm.yml .apm/config.json .apm/apm.lock.yaml .apm/deployment-receipts .claude/skills .claude/agents .claude/rules .claude/commands .claude/CLAUDE.md
 .codex/AGENTS.md .codex/rules .cursor/agents .cursor/rules .cursor/AGENTS.md .agents/skills AGENTS.md .config/opencode/AGENTS.md"
 
-usage() {
-  cat <<'EOF'
-Usage: scripts/native.sh <command> [options]
-
-  sync     [--source-ref SHA] [--https] [--allow-drop ROOT/ENTRY] [--allow-skip ROOT/ENTRY]
-                                                 Back up, rehearse, migrate and verify the real HOME from pushed main.
-                                                 Run sync --help for the review and recovery options.
-  plan     [--source-ref REF] [--workspace-only]  Print the consumer manifest and the steps apply would run. Writes nothing.
-  render   --source-ref REF [--workspace-only]    Print the consumer manifest to stdout.
-  backup   (--home DIR | --real-home) --backup-dir NEW_DIR
-                                                 Copy the non-secret paths apply can change, plus the agmsg store.
-  rehearse (--home DIR | --real-home) --backup-dir DIR --source-ref REF [--workspace-only] [--migrate]
-                                                 Clone a completed backup into a scratch HOME inside DIR, run the same
-                                                 install and compile there, and count the files that disappeared.
-                                                 --migrate moves the skills and agents roots aside first and puts back what
-                                                 apm did not deploy (the steps migrate runs), and fails on any lost file
-                                                 other than the allowlist (docs/native-distribution.md).
-  apply    --home DIR --source-ref REF [--workspace-only]
-                                                 Write the manifest into <HOME>/.apm/apm.yml, then apm install -g --only apm --trust-bin and
-                                                 apm compile -g --clean with that HOME, which must be disposable.
-                                                 --real-home is blocked; use migrate.
-  migrate  (--home DIR | --real-home) --source-ref REF --rehearsal DIR [--workspace-only]
-                                                 After a clean rehearse --migrate: move the four roots (.agents/skills,
-                                                 .claude/skills, .claude/agents, .cursor/agents) to <root>.bak-<UTC>, install,
-                                                 compile and reinstate. Fails and rolls back on any error. Refuses a
-                                                 <HOME>/.apm that is a checkout. Prints the UTC stamp and the rollback command.
-  migrate-rollback (--home DIR | --real-home) --stamp UTC
-                                                 Move the current roots to <root>.native-<UTC> and the <root>.bak-<UTC> back.
-                                                 Nothing is deleted.
-  reinstate (--home DIR | --real-home) --stamp UTC
-                                                 Copy the top-level entries of <root>.bak-<UTC> that the current root lacks back
-                                                 into it. Entries already there are left alone.
-  opencode [--home DIR | --real-home]             Place the guide at <HOME>/.config/opencode/AGENTS.md; defaults to real HOME.
-
-REF is a commit of this repository (or a full 40-hex SHA). --workspace-only keeps only the catalog and manual-skills
-packages and drops external dependencies and MCP servers.
-EOF
-}
-
 fail() {
   printf 'error: %s\n' "$*" >&2
   exit 1
@@ -1331,8 +1292,8 @@ assert_default_apm_config() {
 }
 
 main() {
-  local command="${1:-plan}"
-  [ $# -eq 0 ] || shift
+  local command="${1:-}"
+  if [ $# -gt 0 ]; then shift; fi
   case "$command" in
     sync)
       # shellcheck source=scripts/native-sync.sh
@@ -1348,8 +1309,7 @@ main() {
     migrate-rollback) cmd_migrate_rollback "$@" ;;
     reinstate) cmd_reinstate "$@" ;;
     opencode) cmd_opencode "$@" ;;
-    -h | --help | help) usage ;;
-    *) usage >&2; exit 2 ;;
+    *) printf 'error: unknown native command: %s\n' "$command" >&2; exit 2 ;;
   esac
 }
 
