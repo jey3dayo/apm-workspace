@@ -147,7 +147,7 @@ Claude reviewer は fable を既定にし、fallback は opus。組み込み sub
 
 ### verdict review の起動と受理
 
-verdict review は、対象 repo を `-C` で渡し、次の flag をすべて付けた新規の `codex exec` で起動する（codex-cli 0.166.0 で確認）。
+verdict review は、対象 repo を `-C` で渡し、次の flag をすべて付けた新規の `codex exec` で起動する。
 
 ```sh
 codex exec --ephemeral --ignore-user-config --ignore-rules \
@@ -174,10 +174,12 @@ verdict は、経路によらず次の共通条件をすべて満たした場合
 経路ごとに次も満たす。
 
 - 上の `codex exec` 経路
-  - 起動側が `codex --version` と起動引数をログに残し、上の flag がすべて揃っていることを確かめている。`codex --disable hooks --disable plugins --disable apps features list` で3つが false であること、ログの JSONL に `mcp_tool_call` が無いこと、`turn.completed` で終わっていることも確かめる
-  - 同じ codex version と同じ flag で、対象 repo 内・repo 外（`/tmp`・`$HOME`）への shell 書込みと `apply_patch` が拒否され、`spawn_agent` で子 agent を起動できず、ファイルが作られないことを scratch の git repo で実測済みである。version か flag を変えたら `scripts/measure-readonly-sandbox.py` で測り直す（プロンプトは [references/readonly-sandbox-measure-prompt.md](references/readonly-sandbox-measure-prompt.md)）
+  - 起動側が `codex --version` と起動引数をログに残し、使用中 version の公式文書・help で上の flag の対応を確認する。`codex --disable hooks --disable plugins --disable apps features list` で3つが false であること、起動引数に全 flag が揃うこと、ログに MCP・子 agent の実行がなく正常終了していることを確かめる。ログの読み方は使用中 version に合わせ、特定のイベント名を受理条件にしない
+  - sandbox や迂回経路の制約に影響する起動設定を変更した場合、または書込み成功・無効化した経路の実行など境界異常の具体的な証拠がある場合だけ、当該経路の verdict 受理を保留し、原因を確認して境界を再検証する。version 更新やログ形式変更だけでは再計測を必須にしない
   - verdict は最後の行の `VERDICT: APPROVE` か `VERDICT: REQUEST_CHANGES` で、blocking 指摘が1件でもあれば REQUEST_CHANGES とする
-- `agmsg-delegation` の review 経路: 同 skill の「7. 報告を受けて検証する」の review 受理条件（`review_mode: verdict` と起動前の強制境界の証拠を含む）をすべて満たし、verdict は同 skill の形式に従う。flag と実測の条件は同 skill の強制境界の証拠で置き換える
+- `agmsg-delegation` の review 経路: 同 skill の「7. 報告を受けて検証する」の review 受理条件（`review_mode: verdict` と起動前の強制境界の証拠を含む）をすべて満たし、verdict は同 skill の形式に従う。flag と起動確認の条件は同 skill の強制境界の証拠で置き換える
+
+codex-cli 0.166.0 では、上の flag で repo 内・repo 外（`/tmp`・`$HOME`）への shell 書込みと `apply_patch` が拒否され、子 agent を起動できず、ファイルが作られないことを実測した。これは参考の実測履歴であり、後続 version の実測を示さない。通常のレビューに再計測や実 HOME への probe は要求しない。境界の診断には `scripts/measure-readonly-sandbox.py` と [検査プロンプト](references/readonly-sandbox-measure-prompt.md) を使える。測定ツールがログ表現の違いで不合格になった場合や認証に失敗した場合は、それだけで境界違反と断定せず、実際の実行結果と分けて扱う。
 
 条件が欠けた結果は advisory とし、出荷工程の通過根拠にしない。ファイル sandbox は外部サービスへの操作を制限しないため、prompt には外部への書込みをしないことも書く。
 
