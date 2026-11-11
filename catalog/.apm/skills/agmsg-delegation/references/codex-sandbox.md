@@ -61,60 +61,60 @@ scoped `--add-dir` は worktree 作成の代替にならない。workspace-write
 
 ## linked worktree での workspace-write
 
-**Codex の `workspace-write` sandbox は、linked git worktree の gitdir（main repo の `.git/worktrees/<name>`）を read-only に保護する。** 親の `.git` や `.git/worktrees` を `writable_roots` へ追加しても read-only 保護は解除されない。この設計により、worktree 内で `git add` / `git commit` が `Operation not permitted` で失敗する（Codex CLI 0.167.1 on macOS、2026-11-10 検証）。
+**Codex の `workspace-write` sandbox は、linked git worktree 内の `.git` pointer と、その pointer が指す gitdir（main repo の `.git/worktrees/<name>`）を read-only に保護する。** `writable_roots` や `--add-dir` で同じ path を追加しても、この protected-path carveout は解除されない。この設計により、worktree 内の `git add` / `git commit` は git metadata を更新できず失敗する。
 
-    70|### 回避策: `--add-dir` による gitdir 書込許可
+### `--add-dir` だけでは回避できない
 
-worktree 内で Codex を起動する場合、起動時に gitdir を明示的に書込可能へ追加する:
+worktree 固有の gitdir だけを書込可能にできたとしても十分ではない。index は worktree 固有の gitdir にある一方、objects、通常の branch refs、hooks などは `git rev-parse --path-format=absolute --git-common-dir` が返す共有 Git directory にある。従って次の指定だけで `git add` / `git commit` が成功するとは扱わない:
 
 ```bash
-codex exec --add-dir "$(git rev-parse --path-format=absolute --git-dir)" -- <command>
+codex exec --add-dir "$(git rev-parse --path-format=absolute --git-dir)" -- "<prompt>"
 ```
 
-`--add-dir` で渡す gitdir は absolute path でなければならないため、`--path-format=absolute` を必須とする。この flag を付けることで、worktree 内での `git add` / `git commit` が成功する。**`codex exec --worktree` だけでは不足**で、gitdir への書込許可が別に必要。
-80|
-参考: [Codex sandbox guide](https://developers.openai.com/codex/sandbox), [GitHub issue #14338](https://github.com/openai/codex/issues/14338)
+`--path-format=absolute` は path の曖昧さをなくすために必要だが、保護解除の flag ではない。**`codex exec --worktree` も Git metadata の書込権限を追加しない。** `-a never` の sandboxed worker には source edit と検証だけを任せ、差分を確認した host 側の orchestrator が stage / commit する。
+
+参考: [Codex sandbox guide](https://developers.openai.com/codex/sandbox) の「Protected paths in writable roots」、未解決の [GitHub issue #14338](https://github.com/openai/codex/issues/14338)
 
 ### 非対話 codex exec での stdin block 回避
 
 非対話モードで `codex exec` を実行する場合、stdin からの入力待ちで無期限に block される問題がある（[GitHub issue #20919](https://github.com/openai/codex/issues/20919)）。回避策として、**stdin を `/dev/null` から redirect する**:
 
 ```bash
-codex exec <args> < /dev/null
+codex exec <args> -- "<prompt>" < /dev/null
 ```
-
-    90|
 
 さらに、外部 timeout でプロセス全体を wrap して、予期しない block への最終保護とする:
 
 ```bash
-timeout 300s codex exec <args> < /dev/null
+timeout 300s codex exec <args> -- "<prompt>" < /dev/null
 ```
+
+`timeout` は GNU coreutils の command。macOS で coreutils の command 名が `gtimeout` の環境では、同じ位置で `gtimeout 300s` を使う。
 
 ### セキュリティ注意: hooks への書込可能化
 
-**gitdir を `--add-dir` や `writable_roots` で書込可能にすると、`.git/hooks` も書込可能になる。** エージェントが hooks を変更すると、以降の git 操作で任意コードが実行される。**エージェントは決して hooks を変更してはならない**。
+承認付きの sandbox 外実行や sandbox 無効化によって共有 Git directory への書込を許すと、hooks も書込可能になる。エージェントが hooks を変更すると、以降の git 操作で任意コードが実行される。**エージェントは hooks を変更してはならない**。
 
-同様に、`$HOME` やリポジトリ root 全体を `writable_roots` へ追加することは禁止する。意図しない範囲への書込を許可し、`.git/hooks` / `~/.config` / `~/.ssh` など機微なファイルへの意図しない変更を招く。
+この制約を迂回するために、共有 Git directory、`$HOME`、または対象 repository 全体を `writable_roots` へ追加してはならない。特に review profile へ対象 repository を追加すると read-only 契約が壊れる。
 
 ### 便利: worktree 用 wrapper (optional)
 
-一部環境では、linked worktree 内で自動的に gitdir を `--add-dir` 経由で渡す個人 helper `codexw` が利用可能である。worktree 外では plain `codex` と同じ動作をする。これは optional convenience であり、常に generic equivalent も機能する:
+一部環境では、linked worktree 内で gitdir を `--add-dir` 経由で渡す個人 helper `codexw` が利用可能である。これは optional convenience であり、Git metadata の protected-path carveout を解除しない。常に generic equivalent を併記する:
 
 ```bash
 # wrapper (optional, personal dotfiles helper)
-codexw exec -- <command>
+codexw exec -- "<prompt>"
 
-# generic equivalent (always works)
-codex exec --add-dir "$(git rev-parse --path-format=absolute --git-dir)" -- <command>
+# generic equivalent
+codex exec --add-dir "$(git rev-parse --path-format=absolute --git-dir)" -- "<prompt>"
 ```
 
 非対話形式:
 
 ```bash
 # wrapper (optional)
-timeout 300s codexw exec <args> < /dev/null
+timeout 300s codexw exec <args> -- "<prompt>" < /dev/null
 
-# generic equivalent (always works)
-timeout 300s codex exec --add-dir "$(git rev-parse --path-format=absolute --git-dir)" <args> < /dev/null
+# generic equivalent
+timeout 300s codex exec --add-dir "$(git rev-parse --path-format=absolute --git-dir)" <args> -- "<prompt>" < /dev/null
 ```
