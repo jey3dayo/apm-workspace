@@ -13,8 +13,3 @@ mise install
 name = "check"
 icon = "tool"
 command = "mise run check"
-
-[[actions]]
-name = "verify"
-icon = "tool"
-command = "mise run verify"

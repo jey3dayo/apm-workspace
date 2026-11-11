@@ -1,8 +1,4 @@
 ["test:sh"]
 description = "Run bats unit tests for the workspace's bash scripts"
-run = "bash ./scripts/run-bats.sh"
-
-["smoke:catalog"]
-description = "Smoke-test the generated managed catalog package via a temp install"
 hide = true
-run = "bash ./scripts/apm-workspace.sh smoke:catalog"
+run = "bash ./scripts/run-bats.sh"

@@ -4,11 +4,7 @@
 
 ## モデルを更改するとき
 
-agmsg-delegation の helper の allowlist が各 provider から取得したモデル一覧（Codex は fetched_at 付きのローカル cache）に載っているかは APM workspace の authoring checkout（`~/src/github.com/jey3dayo/apm-workspace`。以下 checkout）の `mise run models:check` で確認する。
-
-- MISSING: 取得した一覧に未掲載。直ちに直す
-- NEWER: 同系列の新しい版がある。原則として helper の allowlist と tier 表を新しい版へ上げる（価格帯が変わる場合だけ確認する）
-- RETIRING: 廃止予告（Codex の retirement_at または一覧から隠されたモデル / opencode の deprecated）。後継へ切り替える
+agmsg-delegation helper の allowlist を更新するときは、各 provider のモデル一覧と照合する。Codex は `fetched_at` 付きのローカル一覧を確認する。同系列の新しい版がある場合は、価格帯が変わる場合を除き helper の allowlist と tier 表を更新する。廃止予定または一覧から外れたモデルは後継へ切り替える。
 
 tier 表と helper の allowlist の一致は、各 helper の bats テスト（`script allowlist matches the orchestrator-worker tier table`）が見る。表だけ、または helper だけを書き換えるとテストが落ちる。
 

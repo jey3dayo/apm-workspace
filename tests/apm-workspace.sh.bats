@@ -110,7 +110,9 @@ assert_mise_task_visibility() {
   local public_json="$1"
   local hidden_json="$2"
   local task_name
-  for task_name in bootstrap setup:mcp:host; do
+  for task_name in \
+    bootstrap setup:mcp:host doctor format:check test:sh validate:workspace validate:catalog \
+    actions-lock:verify actions-lock:upstream; do
     node_json_assert '
 const fs = require("node:fs");
 const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
@@ -128,12 +130,23 @@ if (tasks.some((task) => task.name === name)) {
 }
 ' "$task_name" <<<"$public_json" || return 1
   done
+  node_json_assert '
+const fs = require("node:fs");
+const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
+if (tasks.some(({ name, hide }) =>
+  ((name.startsWith("native:") && name !== "native:sync") || name.startsWith("agmsg:state:")) && hide !== true
+)) {
+  process.exit(1);
+}
+' <<<"$hidden_json"
 }
 
 assert_mise_check_depends() {
   local tasks_json="$1"
   local required
-  for required in format:check lint:yaml lint:frontmatter lint:catalog-leaks validate; do
+  for required in \
+    format:check lint:yaml lint:actions actions-lock:verify lint:frontmatter lint:catalog-leaks \
+    validate:workspace validate:catalog test:sh; do
     node_json_assert '
 const fs = require("node:fs");
 const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
@@ -144,6 +157,14 @@ if (!task || !Array.isArray(task.depends) || !task.depends.includes(required)) {
 }
 ' check "$required" <<<"$tasks_json" || return 1
   done
+  node_json_assert '
+const fs = require("node:fs");
+const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
+const task = tasks.find(({ name }) => name === "check");
+if (!task || task.depends.includes("validate")) {
+  process.exit(1);
+}
+' <<<"$tasks_json"
 }
 
 assert_mise_run_sequence() {
@@ -170,10 +191,8 @@ const fs = require("node:fs");
 const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
 const expected = [
   ["setup:mcp:host", "scripts/apm-workspace.sh", "setup:mcp:host"],
-  ["doctor:workspace", "scripts/apm-workspace.sh", "doctor"],
-  ["doctor:intake", "scripts/apm-workspace.sh", "doctor-intake"],
+  ["validate:workspace", "scripts/apm-workspace.sh", "validate"],
   ["validate:catalog", "scripts/apm-workspace.sh", "validate:catalog"],
-  ["smoke:catalog", "scripts/apm-workspace.sh", "smoke:catalog"],
   ["format:markdown:bold-headings", "scripts/format-bold-headings.sh", "write"],
   ["format:markdown:bold-headings:check", "scripts/format-bold-headings.sh", "check"],
 ];
@@ -207,59 +226,6 @@ add_external_mise_task_fixture() {
   printf -v includes '  "mise/format.toml",\n  "%s/tasks.toml",\n' "$mise_external_source"
   rewrite_mise_fixture "$mise_fixture/mise.toml" \
     '  "mise/format.toml",\r?\n' "$includes" ''
-}
-
-# --- validate_skill_id -------------------------------------------------------
-
-@test "validate_skill_id accepts a plain, hyphenated, namespaced, or dotted/underscored id" {
-  for id in "foo" "foo-bar" "a:b:c" "a.b_c"; do
-    run validate_skill_id "$id"
-    if [ "$status" -ne 0 ]; then
-      echo "unexpected: $id"
-      false
-    fi
-  done
-}
-
-@test "validate_skill_id rejects empty, dot segments, slashes, colon misuse, spaces, and a leading hyphen" {
-  for id in "" "." ".." "a/b" 'a\b' ":lead" "trail:" "a::b" "bad space" "-leading"; do
-    run validate_skill_id "$id"
-    if [ "$status" -eq 0 ]; then
-      echo "unexpected: $id"
-      false
-    fi
-  done
-}
-
-# --- validate_skill_path_segments -------------------------------------------
-
-@test "validate_skill_path_segments accepts a run of valid segments" {
-  run validate_skill_path_segments "a:b:c" a b c
-  [ "$status" -eq 0 ]
-}
-
-@test "validate_skill_path_segments rejects a run containing .." {
-  run validate_skill_path_segments "a:..:c" a .. c
-  [ "$status" -ne 0 ]
-}
-
-@test "validate_skill_path_segments rejects a run containing an empty segment" {
-  run validate_skill_path_segments "a::c" a "" c
-  [ "$status" -ne 0 ]
-}
-
-# --- skill_id_to_manifest_path ----------------------------------------------
-
-@test "skill_id_to_manifest_path converts a:b:c to a/b/c" {
-  run skill_id_to_manifest_path "a:b:c"
-  [ "$status" -eq 0 ]
-  [ "$output" = "a/b/c" ]
-}
-
-@test "skill_id_to_manifest_path leaves a single segment unchanged" {
-  run skill_id_to_manifest_path "a"
-  [ "$status" -eq 0 ]
-  [ "$output" = "a" ]
 }
 
 # --- format_skill_name ------------------------------------------------------
@@ -309,7 +275,7 @@ EOF
   rm -rf "$fake_bin"
 }
 
-@test "mise bootstrap keeps host MCP setup tasks hidden" {
+@test "mise keeps internal tasks hidden" {
   public_json="$(mise_tasks_json "$TEST_REPO_ROOT")"
   hidden_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
   run assert_mise_task_visibility "$public_json" "$hidden_json"
@@ -318,30 +284,35 @@ EOF
 
 @test "mise exposes the expected public task set" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT")"
-  run assert_public_mise_tasks "$tasks_json" \
-    check doctor doctor:intake doctor:workspace format format:check test test:sh validate verify
-  [ "$status" -eq 0 ]
+  node_json_assert '
+const fs = require("node:fs");
+const { isDeepStrictEqual } = require("node:util");
+const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
+const actual = tasks.map(({ name }) => name).sort();
+if (!isDeepStrictEqual(actual, ["check", "format", "native:sync"])) {
+  process.exit(1);
+}
+' <<<"$tasks_json"
 }
 
 @test "mise no longer exposes the retired legacy writer tasks" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
   run assert_mise_tasks_absent "$tasks_json" \
     apply apply:skills:local check:roots deploy deploy:fresh deploy:pins install:catalog install:pins \
-    migrate:roots prepare:catalog prune:cache refresh refresh:deploy repair:local-package-cache upgrade
+    migrate:roots prepare:catalog prune:cache refresh refresh:deploy repair:local-package-cache upgrade \
+    verify test validate doctor:workspace doctor:intake lock:diff models:check actions-lock:generate native:render
   [ "$status" -eq 0 ]
 }
 
-@test "mise check contains the complete inspection dependency set" {
+@test "mise check contains the complete read-only validation set" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
   run assert_mise_check_depends "$tasks_json"
   [ "$status" -eq 0 ]
 }
 
-@test "mise keeps the doctor and verify run order" {
+@test "mise runs doctor and learning-intake diagnostics in order" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
-  run assert_mise_run_sequence "$tasks_json" doctor '[{"task":"doctor:workspace"},{"task":"doctor:intake"}]'
-  [ "$status" -eq 0 ]
-  run assert_mise_run_sequence "$tasks_json" verify '[{"task":"check"},{"task":"test"},{"task":"smoke:catalog"}]'
+  run assert_mise_run_sequence "$tasks_json" doctor '["bash ./scripts/apm-workspace.sh doctor","bash ./scripts/apm-workspace.sh doctor-intake"]'
   [ "$status" -eq 0 ]
 }
 
@@ -366,9 +337,9 @@ EOF
 
 @test "negative fixture detects a mise task connected to another script" {
   new_mise_fixture >/dev/null
-  rewrite_mise_fixture "$mise_fixture/mise.toml" \
-    'bash \./scripts/apm-workspace\.sh doctor"' \
-    'bash ./scripts/other.sh doctor"' ''
+  rewrite_mise_fixture "$mise_fixture/mise/validate.toml" \
+    'bash \./scripts/apm-workspace\.sh validate"' \
+    'bash ./scripts/other.sh validate"' ''
   tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
   run assert_mise_command_connections "$tasks_json"
   [ "$status" -ne 0 ]
@@ -376,9 +347,9 @@ EOF
 
 @test "command connection contract accepts a path without a leading ./" {
   new_mise_fixture >/dev/null
-  rewrite_mise_fixture "$mise_fixture/mise.toml" \
-    'bash \./scripts/apm-workspace\.sh doctor"' \
-    'bash scripts/apm-workspace.sh doctor"' ''
+  rewrite_mise_fixture "$mise_fixture/mise/validate.toml" \
+    'bash \./scripts/apm-workspace\.sh validate"' \
+    'bash scripts/apm-workspace.sh validate"' ''
   tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
   run assert_mise_command_connections "$tasks_json"
   [ "$status" -eq 0 ]
@@ -394,10 +365,10 @@ EOF
   [ "$status" -ne 0 ]
 }
 
-@test "negative fixture detects a missing check inspection dependency" {
+@test "negative fixture detects a missing direct validation dependency" {
   new_mise_fixture >/dev/null
   rewrite_mise_fixture "$mise_fixture/mise.toml" \
-    '^[ \t]*"lint:frontmatter",\r?\n' '' 'm'
+    '^[ \t]*"validate:workspace",\r?\n' '' 'm'
   tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
   run assert_mise_check_depends "$tasks_json"
   [ "$status" -ne 0 ]
@@ -425,22 +396,16 @@ EOF
   [[ "$output" == *"unknown command"* ]]
 }
 
-@test "the retired legacy writer commands are unknown, write nothing and are absent from help" {
+@test "retired direct commands are unknown and write nothing" {
   scratch_home="$(mktemp -d)"
   for retired in apply apply:skills:local refresh install-pins repair:local-package-cache pin-external \
-    prune:cache prepare:catalog install:catalog check:roots migrate:roots; do
+    prune:cache prepare:catalog install:catalog check:roots migrate:roots bundle-catalog help -h --help; do
     run env HOME="$scratch_home" APM_WORKSPACE_DIR="$TEST_REPO_ROOT" bash "$SCRIPT_UNDER_TEST" "$retired"
     [ "$status" -ne 0 ]
     [[ "$output" == *"unknown command: $retired"* ]]
   done
   [ -z "$(ls -A "$scratch_home")" ]
 
-  run env HOME="$scratch_home" APM_WORKSPACE_DIR="$TEST_REPO_ROOT" bash "$SCRIPT_UNDER_TEST" help
-  [ "$status" -eq 0 ]
-  for retired in apply refresh install-pins repair:local-package-cache pin-external prune:cache \
-    prepare:catalog install:catalog check:roots migrate:roots; do
-    [[ "$output" != *"$retired"* ]]
-  done
   rm -rf "$scratch_home"
 }
 
@@ -1096,23 +1061,14 @@ run_doctor_intake() {
 
 # --- catalog_apm_dir_claim_message and catalog fixtures ---------------------
 
-# Builds a temp workspace with a tracked catalog and a matching
-# .catalog-build/catalog tree, both containing $1 skills (and one file each
-# under .apm/agents and commands/rules unless suppressed by the caller after the
-# fact). Sets WORKSPACE_DIR and CATALOG_BUILD_ROOT to point at it, along with
-# FIXTURE_WORKSPACE_DIR for teardown. Must be called directly (not inside a
-# command substitution) so those global assignments are not lost to a
-# subshell.
+# Builds a temp workspace with a tracked catalog containing $1 skills.
 make_catalog_fixture() {
   tracked_skill_count="$1"
-  build_skill_count="$2"
   workspace_dir="$(mktemp -d)"
 
   tracked_dir="$workspace_dir/catalog"
-  build_dir="$workspace_dir/.catalog-build/catalog"
 
   mkdir -p "$tracked_dir/.apm/skills" "$tracked_dir/.apm/agents" "$tracked_dir/commands" "$tracked_dir/rules"
-  mkdir -p "$build_dir/.apm/skills" "$build_dir/.apm/agents" "$build_dir/commands" "$build_dir/rules"
 
   printf 'dependencies: []\n' >"$tracked_dir/apm.yml"
   printf '# catalog\n' >"$tracked_dir/README.md"
@@ -1122,14 +1078,6 @@ make_catalog_fixture() {
   printf 'command\n' >"$tracked_dir/commands/sample.md"
   printf 'rule\n' >"$tracked_dir/rules/sample.md"
 
-  printf 'dependencies: []\n' >"$build_dir/apm.yml"
-  printf '# catalog\n' >"$build_dir/README.md"
-  mkdir -p "$build_dir/.apm/instructions"
-  printf -- '---\ndescription: fixture guide\n---\n\n# instructions\n' >"$build_dir/.apm/instructions/ai-collaboration.instructions.md"
-  printf 'agent\n' >"$build_dir/.apm/agents/sample.agent.md"
-  printf 'command\n' >"$build_dir/commands/sample.md"
-  printf 'rule\n' >"$build_dir/rules/sample.md"
-
   index=0
   while [ "$index" -lt "$tracked_skill_count" ]; do
     mkdir -p "$tracked_dir/.apm/skills/skill-$index"
@@ -1137,20 +1085,12 @@ make_catalog_fixture() {
     index=$((index + 1))
   done
 
-  index=0
-  while [ "$index" -lt "$build_skill_count" ]; do
-    mkdir -p "$build_dir/.apm/skills/skill-$index"
-    touch "$build_dir/.apm/skills/skill-$index/SKILL.md"
-    index=$((index + 1))
-  done
-
   WORKSPACE_DIR="$workspace_dir"
-  CATALOG_BUILD_ROOT="$workspace_dir/.catalog-build"
   FIXTURE_WORKSPACE_DIR="$workspace_dir"
 }
 
 @test "catalog_apm_dir_claim_message names a file directly under .apm/skills" {
-  make_catalog_fixture 2 2
+  make_catalog_fixture 2
   printf 'readme\n' >"$workspace_dir/catalog/.apm/skills/README.md"
 
   run catalog_apm_dir_claim_message
@@ -1161,7 +1101,7 @@ make_catalog_fixture() {
 }
 
 @test "catalog_apm_dir_claim_message names a file in a namespace directory that is not itself a skill" {
-  make_catalog_fixture 2 2
+  make_catalog_fixture 2
   mkdir -p "$workspace_dir/catalog/.apm/skills/ns/inner"
   : >"$workspace_dir/catalog/.apm/skills/ns/inner/SKILL.md"
   printf 'loose\n' >"$workspace_dir/catalog/.apm/skills/ns/notes.md"
@@ -1174,7 +1114,7 @@ make_catalog_fixture() {
 }
 
 @test "catalog_apm_dir_claim_message names a symlink inside a skill directory" {
-  make_catalog_fixture 2 2
+  make_catalog_fixture 2
   printf 'outside\n' >"$workspace_dir/outside-reference.md"
   ln -s "$workspace_dir/outside-reference.md" "$workspace_dir/catalog/.apm/skills/skill-0/link.md"
 
@@ -1186,7 +1126,7 @@ make_catalog_fixture() {
 }
 
 @test "catalog_apm_dir_claim_message refuses a name with a newline that would pose as SKILL.md" {
-  make_catalog_fixture 2 2
+  make_catalog_fixture 2
   mkdir -p "$workspace_dir/catalog/.apm/skills/draft"
   : >"$workspace_dir/catalog/.apm/skills/draft/SKILL.md"$'\n'"decoy" || skip "this filesystem rejects a newline in a file name"
   printf 'draft notes\n' >"$workspace_dir/catalog/.apm/skills/draft/notes.md"
@@ -1199,7 +1139,7 @@ make_catalog_fixture() {
 }
 
 @test "catalog_apm_dir_claim_message names an agent file that is not <name>.agent.md" {
-  make_catalog_fixture 2 2
+  make_catalog_fixture 2
   printf 'legacy\n' >"$workspace_dir/catalog/.apm/agents/legacy-name.md"
 
   run catalog_apm_dir_claim_message
@@ -1211,7 +1151,7 @@ make_catalog_fixture() {
 }
 
 @test "catalog_apm_dir_claim_message names an agent nested below .apm/agents" {
-  make_catalog_fixture 2 2
+  make_catalog_fixture 2
   mkdir -p "$workspace_dir/catalog/.apm/agents/team"
   printf 'nested\n' >"$workspace_dir/catalog/.apm/agents/team/helper.agent.md"
 
@@ -1223,7 +1163,7 @@ make_catalog_fixture() {
 }
 
 @test "catalog_apm_dir_claim_message is silent when .apm is absent or holds only skills and agents" {
-  make_catalog_fixture 2 2
+  make_catalog_fixture 2
 
   run catalog_apm_dir_claim_message
   [ "$status" -eq 0 ]
@@ -1238,7 +1178,7 @@ make_catalog_fixture() {
 }
 
 @test "catalog_apm_dir_claim_message names the first primitive other than skills and agents found under .apm" {
-  make_catalog_fixture 2 2
+  make_catalog_fixture 2
   mkdir -p "$workspace_dir/catalog/.apm/instructions"
   printf 'instruction\n' >"$workspace_dir/catalog/.apm/instructions/sample.instructions.md"
 
@@ -1249,30 +1189,8 @@ make_catalog_fixture() {
   rm -rf "$FIXTURE_WORKSPACE_DIR"
 }
 
-make_stageable_catalog_fixture() {
-  make_catalog_fixture 2 0
-  mkdir -p "$workspace_dir/.git"
-  printf 'dependencies: []\n' >"$workspace_dir/apm.yml"
-  : >"$workspace_dir/mise.toml"
-  MISE_DESTINATION="$workspace_dir/mise.toml"
-}
-
-@test "cmd_seed_catalog_build writes skills and agents under .apm and no top-level skills or agents directory" {
-  make_stageable_catalog_fixture
-
-  run cmd_seed_catalog_build
-  [ "$status" -eq 0 ]
-  [ -f "$workspace_dir/.catalog-build/catalog/.apm/skills/skill-0/SKILL.md" ]
-  [ -f "$workspace_dir/.catalog-build/catalog/.apm/skills/skill-1/SKILL.md" ]
-  [ -f "$workspace_dir/.catalog-build/catalog/.apm/agents/sample.agent.md" ]
-  [ ! -e "$workspace_dir/.catalog-build/catalog/skills" ]
-  [ ! -e "$workspace_dir/.catalog-build/catalog/agents" ]
-
-  rm -rf "$FIXTURE_WORKSPACE_DIR"
-}
-
 @test "catalog_apm_dir_claim_message names a symlink under .apm" {
-  make_catalog_fixture 2 2
+  make_catalog_fixture 2
   mkdir -p "$workspace_dir/catalog/.apm/agents"
   printf 'agent\n' >"$workspace_dir/outside.md"
   ln -s "$workspace_dir/outside.md" "$workspace_dir/catalog/.apm/agents/demo.agent.md"
@@ -1285,7 +1203,7 @@ make_stageable_catalog_fixture() {
 }
 
 @test "catalog_apm_dir_claim_message claims a .apm that is a symlink to an empty directory" {
-  make_catalog_fixture 2 2
+  make_catalog_fixture 2
   rm -rf "$workspace_dir/catalog/.apm"
   mkdir -p "$workspace_dir/outside-apm"
   ln -s "$workspace_dir/outside-apm" "$workspace_dir/catalog/.apm"
@@ -1298,7 +1216,7 @@ make_stageable_catalog_fixture() {
 }
 
 @test "catalog_apm_dir_claim_message claims a .apm that is a dangling symlink" {
-  make_catalog_fixture 2 2
+  make_catalog_fixture 2
   rm -rf "$workspace_dir/catalog/.apm"
   ln -s "$workspace_dir/missing-apm" "$workspace_dir/catalog/.apm"
 
@@ -1311,7 +1229,7 @@ make_stageable_catalog_fixture() {
 
 @test "catalog_apm_dir_claim_message claims a .apm holding a directory it cannot read" {
   [ "$(id -u)" -ne 0 ] || skip "root reads a directory without read permission"
-  make_catalog_fixture 2 2
+  make_catalog_fixture 2
   mkdir -p "$workspace_dir/catalog/.apm/instructions"
   printf 'hidden\n' >"$workspace_dir/catalog/.apm/instructions/a.instructions.md"
   chmod 000 "$workspace_dir/catalog/.apm/instructions"
@@ -1327,7 +1245,7 @@ make_stageable_catalog_fixture() {
 
 @test "catalog_apm_dir_claim_message claims a FIFO under .apm/agents" {
   command -v mkfifo >/dev/null || skip "mkfifo is unavailable"
-  make_catalog_fixture 2 2
+  make_catalog_fixture 2
   mkdir -p "$workspace_dir/catalog/.apm/agents"
   mkfifo "$workspace_dir/catalog/.apm/agents/queue"
 
@@ -1553,7 +1471,7 @@ write_generated_root() {
 
   printf 'x\n' >"$workspace/catalog/.apm/instructions/extra.instructions.md"
   run catalog_apm_dir_claim_message
-  [[ "$output" == *"catalog/.apm holds instructions/extra.instructions.md, which the catalog build does not carry"* ]]
+  [[ "$output" == *"catalog/.apm holds instructions/extra.instructions.md, which is outside the allowed catalog layout"* ]]
 
   rm "$workspace/catalog/.apm/instructions/extra.instructions.md"
   mkdir -p "$workspace/catalog/.apm/instructions/nested"

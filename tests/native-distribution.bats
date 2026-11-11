@@ -1713,43 +1713,59 @@ setup_authoring_checkout() {
   chmod +x "$bin/apm"
 }
 
-@test "from an authoring checkout outside HOME, validate and smoke:catalog run against that checkout while the consumer HOME is untouched" {
-  local home authoring="$FX/authoring" bin="$FX/authoring-bin" log="$FX/authoring-apm.log" consumer_before install_home
+apm_tree_snapshot() {
+  local home="$1"
+  (
+    cd "$home/.apm"
+    find . -print | LC_ALL=C sort
+    find . -type f -exec cksum {} + | LC_ALL=C sort
+  )
+}
+
+@test "validate checks authoring pins without APM or changing the consumer HOME" {
+  local home authoring="$FX/authoring" bin="$FX/authoring-bin" log="$FX/authoring-apm.log" consumer_before
   home="$(new_home authoring-consumer)"
   mkdir -p "$home/.apm"
   native "$home" render --source-ref "$SOURCE_SHA" --workspace-only >"$home/.apm/apm.yml"
   setup_authoring_checkout "$authoring" "$log" "$bin"
-  consumer_before="$(cd "$home/.apm" && find . | LC_ALL=C sort)"
+  printf 'name: consumer\ndependencies:\n  apm:\n    - owner/consumer/skills/x#dddddddddddddddddddddddddddddddddddddddd\n' >"$home/.apm/apm.yml"
+  consumer_before="$(apm_tree_snapshot "$home")"
 
-  run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$authoring/scripts/apm-workspace.sh" validate
+  run fixture_exec "$home" /usr/bin/env PATH="/usr/bin:/bin:/usr/sbin:/sbin" /bin/bash "$authoring/scripts/apm-workspace.sh" validate
   [ "$status" -eq 0 ]
-  grep -qxF "$authoring|compile --validate" "$log"
+  [ ! -e "$log" ]
+  [ ! -e "$log.home" ]
 
-  run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$authoring/scripts/apm-workspace.sh" smoke:catalog
-  grep -qF "install $authoring/.catalog-build/catalog --target agent-skills" "$log"
-  [ -d "$authoring/.catalog-build/catalog" ]
-  install_home="$(grep -F '|install ' "$log.home" | cut -d'|' -f1)"
-  [ -n "$install_home" ]
-  [ "$install_home" != "$home" ]
-  [ ! -e "$home/.apm/deployment-receipts" ]
+  printf 'name: source-checkout\ndependencies:\n  apm:\n    - owner/source/skills/x#cccccccccccccccccccccccccccccccccccccccc\n' >"$authoring/apm.yml"
+  run fixture_exec "$home" /usr/bin/env PATH="/usr/bin:/bin:/usr/sbin:/sbin" /bin/bash "$authoring/scripts/apm-workspace.sh" validate
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"owner/source/skills/x#cccccccccccccccccccccccccccccccccccccccc"* ]]
+  [[ "$output" != *"owner/consumer/skills/x"* ]]
+  [ ! -e "$log" ]
+  [ ! -e "$log.home" ]
+  [ "$(apm_tree_snapshot "$home")" = "$consumer_before" ]
 
-  run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$authoring/scripts/apm-workspace.sh" apply
+  run fixture_exec "$home" /usr/bin/env PATH="/usr/bin:/bin:/usr/sbin:/sbin" /bin/bash "$authoring/scripts/apm-workspace.sh" apply
   [ "$status" -ne 0 ]
   [[ "$output" == *"unknown command"* ]]
-  [ "$(cd "$home/.apm" && find . | LC_ALL=C sort)" = "$consumer_before" ]
+  [ "$(apm_tree_snapshot "$home")" = "$consumer_before" ]
 }
 
-@test "when HOME/.apm is a checkout, validate uses it as the workspace, and a catalog without .git is not mistaken for the consumer" {
-  local home authoring="$FX/authoring-old" bin="$FX/authoring-old-bin" log="$FX/authoring-old-apm.log" physical
+@test "validate uses HOME/.apm only when it is a checkout and rejects a catalog without .git" {
+  local home authoring="$FX/authoring-old" bin="$FX/authoring-old-bin" log="$FX/authoring-old-apm.log" consumer_before
   setup_authoring_checkout "$authoring" "$log" "$bin"
 
   home="$(new_home old-checkout)"
   mkdir -p "$home/.apm/.git"
-  printf 'name: old-checkout\n' >"$home/.apm/apm.yml"
-  physical="$(cd "$home/.apm" && pwd -P)"
-  run fixture_exec "$home" /usr/bin/env PATH="$bin:$FIXTURE_PATH" /bin/bash "$authoring/scripts/apm-workspace.sh" validate
-  [ "$status" -eq 0 ]
-  grep -qxF "$physical|compile --validate" "$log"
+  printf 'name: old-checkout\ndependencies:\n  apm:\n    - owner/home-checkout/skills/x#eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee\n' >"$home/.apm/apm.yml"
+  printf "lockfile_version: '2'\ndependencies: []\n" >"$home/.apm/apm.lock.yaml"
+  consumer_before="$(apm_tree_snapshot "$home")"
+  run fixture_exec "$home" /usr/bin/env PATH="/usr/bin:/bin:/usr/sbin:/sbin" /bin/bash "$authoring/scripts/apm-workspace.sh" validate
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"owner/home-checkout/skills/x#eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"* ]]
+  [ ! -e "$log" ]
+  [ ! -e "$log.home" ]
+  [ "$(apm_tree_snapshot "$home")" = "$consumer_before" ]
 
   home="$(new_home old-catalog-only)"
   mkdir -p "$home/.apm/catalog"

@@ -7,7 +7,6 @@ setup() {
   MEASURE="$REPO_ROOT/catalog/.apm/skills/orchestrator-worker/scripts/measure-readonly-sandbox.py"
   SKILL="$REPO_ROOT/catalog/.apm/skills/orchestrator-worker/SKILL.md"
   unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE
-  # Importing the script must not leave __pycache__ in catalog/: smoke:catalog would see it as an extra file.
   export PYTHONDONTWRITEBYTECODE=1
 }
 

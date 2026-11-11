@@ -64,33 +64,22 @@ run = "bash ./scripts/agmsg-state.sh save"
 
 [tasks."agmsg:state:restore"]
 description = "Recovery adapter: relink an agmsg roster unlinked by an install outside the migrate path"
+hide = true
 run = "bash ./scripts/agmsg-state.sh restore"
 
 [tasks.doctor]
 description = "Inspect workspace state, deployed targets, and the learning-intake inbox"
-run = [{ task = "doctor:workspace" }, { task = "doctor:intake" }]
-
-[tasks."doctor:workspace"]
-description = "Inspect the authoring checkout state and deployed targets"
-run = "bash ./scripts/apm-workspace.sh doctor"
-
-[tasks."doctor:intake"]
-description = "Report the learning-intake inbox and warn when pending reports pile up"
-run = "bash ./scripts/apm-workspace.sh doctor-intake"
-
-[tasks."lock:diff"]
-description = "Summarize apm.lock.yaml changes against a git ref (resolved commits, removed artifacts, target counts); read-only"
-run = "bash ./scripts/lock-diff.sh"
-
-[tasks."models:check"]
-description = "Compare agmsg-delegation helper model allowlists with each provider's live model list (calls provider CLIs over the network); read-only"
-run = "bash ./scripts/models-check.sh"
+hide = true
+run = [
+  "bash ./scripts/apm-workspace.sh doctor",
+  "bash ./scripts/apm-workspace.sh doctor-intake",
+]
 
 # ========================================
 # Aggregation Tasks
 # ========================================
 [tasks.check]
-description = "Run lightweight pre-deploy checks for the authoring checkout"
+description = "Run the read-only validation gate for the authoring checkout"
 # lint:yaml sits here rather than under format:check: it is a linter, not a
 # formatting check.
 depends = [
@@ -100,13 +89,7 @@ depends = [
   "actions-lock:verify",
   "lint:frontmatter",
   "lint:catalog-leaks",
-  "validate",
+  "validate:workspace",
+  "validate:catalog",
+  "test:sh",
 ]
-
-[tasks.verify]
-description = "Run deep verification for the authoring checkout"
-run = [{ task = "check" }, { task = "test" }, { task = "smoke:catalog" }]
-
-[tasks.test]
-description = "Run the behavioral suite for the workspace scripts"
-depends = ["test:sh"]

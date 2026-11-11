@@ -55,12 +55,11 @@ version is commit `0bcce09`. Roll out a merged commit with `mise run native:sync
 option when SSH is unavailable). Section B of
 `docs/native-distribution.md` also documents the manual steps and rollback.
 
-| Intent            | Command                | Constraint                                                                                                        |
-| ----------------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Rollout           | `mise run native:sync` | Runs backup and rehearsal before writing HOME; see `docs/native-distribution.md` section B for HTTPS and rollback |
-| Validation only   | `mise run check`       | Does not roll out.                                                                                                |
-| Deep verification | `mise run verify`      | Runs checks, the script suite, and catalog smoke verification.                                                    |
-| Inspection        | `mise run doctor`      | Read-only.                                                                                                        |
+| Intent          | Command                | Constraint                                                                                                                           |
+| --------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Rollout         | `mise run native:sync` | Runs backup and rehearsal before writing HOME; see `docs/native-distribution.md` section B for HTTPS and rollback                    |
+| Validation only | `mise run check`       | Runs formatting checks, all linters, offline action-lock verification, manifest and catalog validation, and Bats; does not roll out. |
+| Inspection      | `mise run doctor`      | Hidden read-only diagnostics for workspace state and learning-intake reports.                                                        |
 
 Shipping here goes through a PR: work on a feature branch, run
 `apm-deploy-verify` with the changed skill names (pass them both times: once

@@ -147,10 +147,8 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
 ## Task Selection
 
 - The real HOME is native (`~/.apm/apm.yml` starts with `# Rendered by scripts/native.sh`). The legacy writer (`deploy`, `apply`, `upgrade`, `refresh` and their helper tasks) was removed on 2026-11-10; its last version is commit `0bcce09`. Roll out with `docs/native-distribution.md` section B (`native:plan` → `native:backup` → `native:rehearse --migrate` → `native:migrate`); `native:migrate-rollback` undoes it.
-- Run `mise run check` for a lightweight gate before a rollout.
-- Run `mise run verify` for `check`, both script suites (`test`), and catalog smoke verification.
-- Run `mise run doctor` to inspect deployed state; it is read-only.
-- Run `mise run smoke:catalog` to smoke-test the generated catalog package.
+- Run `mise run check` before a rollout. It performs formatting checks, all linters, offline action-lock verification, workspace and catalog validation, and the full Bats suite.
+- Run the hidden `mise run doctor` task for read-only workspace and deployed-state diagnostics, including learning-intake reports.
 - No task refreshes upstream dependencies or regenerates `apm.lock.yaml`; this is an open item in `docs/package-decisions.md`.
 - For skill creation, updates, installs, or migrations in this workspace, include section B and a deployed target check in the plan unless the user explicitly asks for a local-only change.
 
@@ -270,9 +268,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - if the manifest contains `gist.github.com/...#<sha>`, verify its regenerated `apm.lock.yaml` record as the gist Guardrail describes (the shortened `owner/<gist-id>` `repo_url` is the accepted form) before rollout
    - confirm the target dependency's `resolved_commit` and the deployed file's hash
      before calling the refresh done; a zero exit from `native:migrate` is not evidence the pin moved
-   - review `apm.lock.yaml` before commit: start from `mise run lock:diff`
-     (moved commits, removed artifacts, per-target counts, other changed
-     sections), then read the raw diff of every section it lists as changed
+   - review `apm.lock.yaml` before commit with `git diff apm.lock.yaml`
    - the upstream skill content a refresh or pin bump accepts makes it a
      non-trivial change for `ship`'s independent review, even when `apm.yml`
      moves by one line; give the reviewer the upstream compare of each moved commit
