@@ -138,12 +138,16 @@ umask 077
 } >"$wrapper"
 chmod 700 "$wrapper"
 
+wrapper_xml=${wrapper//&/\&amp;}
+wrapper_xml=${wrapper_xml//</\&lt;}
+wrapper_xml=${wrapper_xml//>/\&gt;}
+
 cat >"$plist" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
   <key>Label</key><string>$label</string>
-  <key>ProgramArguments</key><array><string>/bin/bash</string><string>$wrapper</string></array>
+  <key>ProgramArguments</key><array><string>/bin/bash</string><string>$wrapper_xml</string></array>
   <key>RunAtLoad</key><true/>
   <key>KeepAlive</key><false/>
 </dict></plist>
