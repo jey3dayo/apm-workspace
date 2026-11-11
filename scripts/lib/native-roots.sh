@@ -318,6 +318,12 @@ allowed_lost_reason() {
       return
       ;;
   esac
+  case "$path" in
+    */__pycache__ | */__pycache__/* | *.pyc)
+      echo "Python bytecode cache; regenerable"
+      return
+      ;;
+  esac
   if [ "$(basename "$path")" = .apm-pin ]; then
     for root in $MIGRATE_ROOTS; do
       case "$path" in
