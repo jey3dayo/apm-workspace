@@ -7,7 +7,7 @@
 # Usage: x-search.sh "<question>" [--handles a,b] [--from YYYY-MM-DD] [--to YYYY-MM-DD]
 # --from and --to are both inclusive (UTC days); --to is sent to the API as the next day
 # because xAI's to_date is an exclusive bound.
-# Env: XAI_API_KEY (required), XAI_MODEL (default grok-4.7), XAI_MAX_TURNS (default 2)
+# Env: XAI_API_KEY and XAI_MODEL (required), XAI_MAX_TURNS (default 2)
 set -euo pipefail
 
 config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
@@ -18,7 +18,7 @@ if [ -z "${XAI_API_KEY:-}" ] && [ -z "${_XSEARCH_SECRETS_TRIED:-}" ] && [ -r "$e
   exec dotenvx run --quiet -f "$env_secrets" -- "$0" "$@"
 fi
 
-if [ -z "${XAI_API_KEY:-}" ]; then
+if [ -z "${XAI_API_KEY:-}" ] || [ -z "${XAI_MODEL:-}" ]; then
   exit 2
 fi
 
@@ -43,7 +43,7 @@ if [ -n "$to" ]; then
 fi
 
 body=$(jq -n \
-  --arg model "${XAI_MODEL:-grok-4.7}" \
+  --arg model "$XAI_MODEL" \
   --arg q "$query" \
   --arg handles "$handles" \
   --arg from "$from" \

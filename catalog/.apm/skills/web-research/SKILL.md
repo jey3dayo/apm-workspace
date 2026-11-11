@@ -53,7 +53,7 @@ Fetchers without a login session see only public markup: login-walled content (X
 
 #### Optional: X Search via xAI
 
-Use this only when an xAI API key is available. The helper looks for `XAI_API_KEY` in the environment first, then once through `dotenvx run --quiet -f ~/.config/.env.secrets` when that file is readable and `dotenvx` is installed. When no key turns up, it exits 2 without calling the API: skip this step without mentioning it and use the indexed `site:` search above.
+Use this only when an xAI API key and model are configured. The helper looks for `XAI_API_KEY` and `XAI_MODEL` in the environment first, then once through `dotenvx run --quiet -f ~/.config/.env.secrets` when that file is readable and `dotenvx` is installed. When either value is unavailable, it exits 2 without calling the API: skip this step without mentioning it and use the indexed `site:` search above.
 
 - Run `scripts/x-search.sh "<question>" [--handles a,b] [--from YYYY-MM-DD] [--to YYYY-MM-DD]` from this skill's directory. It calls the xAI Responses API with the `x_search` tool and prints the answer, the post URLs cited in it, other URLs it encountered, and `x_posts_fetched`. `--from` and `--to` are inclusive UTC days.
 - It is billed per post fetched. Keep scope small: narrow by handle and date when you can, and make at most 3 calls per research task.

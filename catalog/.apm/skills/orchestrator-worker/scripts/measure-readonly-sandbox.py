@@ -15,18 +15,34 @@ import uuid
 from pathlib import Path
 
 PROMPT = Path(__file__).resolve().parent.parent / "references" / "readonly-sandbox-measure-prompt.md"
-# MODEL は測定用の固定値。選定理由は references/models.md の「Reviewer の選定理由」を参照。
-MODEL, EFFORT, TIMEOUT_SECONDS = "gpt-6.1-terra", "medium", 1200
+MODELS = Path(__file__).resolve().parent.parent / "references" / "models.md"
 PATCH_REJECTED = re.compile(r"patch rejected: writing is blocked by read-only sandbox")
 SPAWN_FAILED = re.compile(r"collab spawn failed")
 DENIED = re.compile(r"operation not permitted|read-only file system|permission denied", re.IGNORECASE)
 MODEL_PROSE = {"agent_message", "reasoning"}
 ENV = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
+EFFORT, TIMEOUT_SECONDS = "medium", 1200
 GIT_COMMIT = ["git", "-c", "user.name=m", "-c", "user.email=m@example.invalid", "-c", "commit.gpgsign=false",
               "-c", "core.hooksPath=/dev/null", "commit", "-q", "--allow-empty", "-m", "scratch"]
 
 Event = dict[str, object]
 Judgment = tuple[str, list[str]]
+
+
+def default_reviewer_model() -> str:
+    in_reviewer = False
+    for line in MODELS.read_text(encoding="utf-8").splitlines():
+        if line == "### Reviewer（レビュアー）":
+            in_reviewer = True
+            continue
+        if in_reviewer and line.startswith("### "):
+            break
+        columns = line.split("|")
+        if in_reviewer and len(columns) > 2 and columns[1].strip() == "Codex":
+            match = re.search(r"`(gpt-[^`]+)`", columns[2])
+            if match:
+                return match.group(1)
+    raise RuntimeError(f"Codex Reviewer model not found in {MODELS}")
 
 
 def as_dict(value: object) -> Event | None:
@@ -117,9 +133,10 @@ def run(argv: list[str], cwd: Path | None = None) -> str:
 
 
 def codex_command(repo: Path) -> list[str]:
+    model = default_reviewer_model()
     return ["codex", "exec", "--ephemeral", "--ignore-user-config", "--ignore-rules",
             "--disable", "hooks", "--disable", "plugins", "--disable", "apps",
-            "-c", "mcp_servers={}", "-s", "read-only", "-m", MODEL, "-c", f"model_reasoning_effort={EFFORT}",
+            "-c", "mcp_servers={}", "-s", "read-only", "-m", model, "-c", f"model_reasoning_effort={EFFORT}",
             "-C", str(repo), "--json", "-"]
 
 

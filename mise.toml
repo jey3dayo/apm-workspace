@@ -26,7 +26,6 @@ taplo = "0.10.0"
 # npm packages
 "npm:prettier" = "3.9.6"
 "npm:tsx" = "4.23.13"
-uv = "latest"
 
 [tool_alias]
 gh-actions-lock = "github:github/gh-actions-lock"

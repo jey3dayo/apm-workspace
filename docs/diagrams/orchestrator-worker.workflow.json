@@ -286,9 +286,9 @@
       "dot": "violet",
       "title": "モデル帯と役・昇格",
       "items": [
-        "低コスト帯: Sonnet / Codex Luna（既定Worker、effort で段階昇格）",
+        "低コスト帯: Sonnet / Codex Luna xhigh（既定Worker）→ max（第1昇格）",
         "バランス帯: Codex Terra（Review既定 + medium、能力崖・長文脈直行）",
-        "高性能帯: Fable / Opus / Codex Sol（難度の高いReview・Worker昇格）。最上位 Codex Astra は Architect可・Reviewerは明示時のみ、Worker 昇格先にしない。具体 model ID は references/models.md を参照"
+        "高性能帯: Fable / Opus / Codex Sol（難度の高いReview・max後のWorker難度昇格）。最上位 Codex Astra は Architect可・Reviewerは明示時のみ、Worker 昇格先にしない。具体 model ID は catalog/.apm/skills/orchestrator-worker/references/models.md を参照"
       ]
     }
   ]
