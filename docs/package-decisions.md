@@ -8,11 +8,9 @@
 ## parallel (Parallel.ai MCP)
 
 - Status: 採用・global（2026-11-11）
-- 正本: Parallel.ai の hosted MCP server（`https://mcp.parallel.ai/mcp`）
-- 理由: 一般的な Web 検索（`web_search`）、URL からのコンテンツ取得（`web_fetch`）、根拠付き判断（`web_decisions`）、深堀りリサーチ（`web_research`）を提供する hosted MCP サーバー。Context7 がライブラリドキュメント検索を担当するのに対し、Parallel は最新情報の検証や一般的な Web 調査を担当する。役割が異なるため二重管理には当たらない
-- 設定: `transport: http`、`url: https://mcp.parallel.ai/mcp`。`web_search`、`web_fetch`、`web_decisions` は API キー不要で無料利用可能（低レート制限）。`web_research` は認証が必要で、API キー（`PARALLEL_API_KEY` 環境変数）または OAuth（`https://mcp.parallel.ai/mcp?login`）で認証する
-- 公式ドキュメント: https://docs.parallel.ai/integrations/mcp/quickstart (Quickstart), https://docs.parallel.ai/integrations/mcp/programmatic-use (Programmatic Use), https://parallel.ai/mcp (Product Page)
-- 認証: API キーを使う場合は、利用環境で `PARALLEL_API_KEY` 環境変数を設定する。OAuth を使う場合は、MCP クライアント（Claude Code / Codex）から `https://mcp.parallel.ai/mcp?login` へ接続し、ブラウザで認証する
+- 設定: `transport: http`、`https://mcp.parallel.ai/mcp`。認証 header は置かず、無料の `web_search` / `web_fetch` / `web_decisions` を使う
+- 理由: Context7 のライブラリ文書検索と分け、一般 Web の検索・取得・判断を扱う
+- 公式: https://docs.parallel.ai/integrations/mcp/quickstart
 - 再検討するなら: 組み込み `WebSearch` / `WebFetch` と役割が重複し、利用実績が乏しい場合
 
 ## opencli (jackwener/opencli)
