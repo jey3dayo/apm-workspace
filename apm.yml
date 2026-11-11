@@ -18,12 +18,12 @@ dependencies:
     - shadcn/improve#cac56e1ebd3c279aa9153616cfeac7b174ab90f9
 
     # --- engineering / writing ---
-    - coji/natural-japanese/skills/natural-japanese#a88b8e92d38cf5b339950752faba1da5ec1f49f4 # v1.6.2
+    - coji/natural-japanese/skills/natural-japanese#840bd400cbcb64c8b64d492a144da54fc05776c5 # v2.0.0
     - git: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d.git
       ref: 8f2d57610a73efc97d743c9b0b0ecb1002e09fa4
       alias: japanese-tech-writing
     - git: mattpocock/skills
-      ref: d1478fcb140db0b93c0c8df17bcfd311844749d0 # v1.3.2
+      ref: 4ae2317ddb22b046e26455e4f9c9b3aaaf62212d # v1.3.2
       skills:
         - codebase-design
         - domain-modeling
@@ -36,15 +36,15 @@ dependencies:
         - wait-what
         - wayfinder
         - writing-for-agents
-    - nanaism/yomiyasu/skills/yomiyasu#29d67ccb05e370b5958d72920a9cd1aa829dee80 # v2.5.0
+    - nanaism/yomiyasu/skills/yomiyasu#2318a6d0820a58d3f8cfadc75af86978bb739185 # v3.0.1
 
     # --- react ---
-    - millionco/react-doctor/skills/react-doctor#695e46eee203a5d1855020191aa7e9c010a1250e # v2.4.0
-    - vercel-labs/agent-skills/skills/react-best-practices#063bee94c3f4df8453406c830b0a7df0f2860278
+    - millionco/react-doctor/skills/react-doctor#94a349b8a38c4e80f7600a74766b00ef3a76fa39 # v2.4.0
+    - vercel-labs/agent-skills/skills/react-best-practices#1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62
 
     # --- design ---
     - git: emilkowalski/skills
-      ref: a81dbca07f2217b7103e510c0f13f8d5b017afc9
+      ref: 715c1807e08c497cfd1dc4feb450a2a3300ef2a9
       skills:
         - animation-performance
         - apple-design
@@ -55,30 +55,30 @@ dependencies:
         - review-animations
     - git: heydamir/unslop
       path: skills/unslop
-      ref: 4652254daff586ff4739849395a127b56f7f8cc7
+      ref: 97daa3eb365670ea3f87ed85356cbfcee18105a5
       alias: unslop-ui
     - git: ibelick/ui-skills
-      ref: 4907a526b07943b3a338177558d42fae4fdf0a86
+      ref: f511eae41c996e3953fbeabf95d38e4077d40711
       skills:
         - fixing-accessibility
     - Jakubantalik/transitions-dev/skills/transitions-dev#038b0bdc75375c2beed51d1e824c98cdc7b86f8c
     - git: nextlevelbuilder/ui-ux-pro-max-skill
-      ref: 50d8a7de0900119855614541f15a1a616691eb33
+      ref: 6ae86f61f520d6ca229d2f40e070410638c908c5
       skills:
         - ui-ux-pro-max
 
     # --- browser / analysis ---
-    - browser-use/browser-harness/skills/browser-harness#dbf0e4f3a37ebc31aaeaf9d378ab1760b5776c15
+    - browser-use/browser-harness/skills/browser-harness#c7bb3da435477494450aeb4b19a501fd04bb897d
     - jackwener/opencli/skills/opencli-usage#9bc5f5ca132ec4d4e48d7ee517d4303bf159e8e8 # v2.0.3
     - jackwener/opencli/skills/opencli-browser#9bc5f5ca132ec4d4e48d7ee517d4303bf159e8e8 # v2.0.3
     - openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431
-    - tt-a1i/archify/archify#208acba8d412335185b2056fedf54b3405df43fb # v3.2.0
+    - tt-a1i/archify/archify#7e45f36c66de1254d5ad6ba1d878f6499ea269fd # v3.2.0
 
     # --- agent tools ---
-    - vercel-labs/agent-desktop/skills/agent-desktop#a47ed664e0db00d1d4df364eb3fe8a5599882f3c # v1.0.2
-    - agavra/tuicr/skills/tuicr#9175dc95b97a0a7dd290d43d38385745a7fb7d40
-    - fujibee/agmsg#4a712f2aeba8f0b2070f7533b827c7cac78c9fdf # v1.5.1
-    - humanlayer/skills/plugins/show-me/skills/show-me#ca7c8088db69e315a8b2deea43820270457f8f3c
+    - vercel-labs/agent-desktop/skills/agent-desktop#54855b6225aec00da4ac65e2d0362fd41cd9fcb3 # v1.2.0
+    - agavra/tuicr/skills/tuicr#f098fb8f0911f6b9b14c80e23f79ab084cf5ef91 # v0.28.0
+    - fujibee/agmsg#5a42555b172668b13a144a9b261aa0d044a2382e # v1.7.2
+    - humanlayer/skills/plugins/show-me/skills/show-me#4d69d20f6e9b57b4fcf0d501ccfb1be961f0f329
   mcp:
     - name: context7
       registry: false
