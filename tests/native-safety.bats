@@ -84,6 +84,30 @@ native() {
   [[ "$output" == *"ref: $SHA"* ]]
 }
 
+@test "failed automatic rollback prints a directly runnable command with a shell-sensitive HOME path" {
+  local home="$FX/rollback;home" stamp=20261111T120000Z command
+  mkdir -p "$home/.apm"
+  printf 'absent\t.agents/skills\nabsent\t.claude/skills\nabsent\t.claude/agents\nabsent\t.cursor/agents\n' \
+    >"$home/.apm/native-migrate-$stamp.txt"
+
+  run fixture bash -c '. "$1/scripts/native.sh"
+    rollback_roots() { return 1; }
+    MIGRATE_HOME="$2" MIGRATE_STAMP="$3" MIGRATE_AGMSG_LINKED=0 REAL_HOME=0
+    set +e
+    (exit 23)
+    migrate_failure' _ "$FX/repo" "$home" "$stamp"
+
+  [ "$status" -eq 23 ]
+  [[ "$output" == *"the automatic rollback failed; fix the cause, then run:"* ]]
+  command="$(printf '%s\n' "$output" | sed -n 's/^the automatic rollback failed; fix the cause, then run: //p')"
+  [ -n "$command" ]
+
+  run fixture bash -c "$command"
+
+  [ "$status" -eq 0 ]
+  [ "$(grep -c '^restored' "$home/.apm/native-migrate-$stamp.txt")" -eq 4 ]
+}
+
 prepare_rehearsal() {
   native backup --real-home --backup-dir "$FX/backup"
   native rehearse --real-home --backup-dir "$FX/backup" --source-ref "$SHA" --migrate

@@ -1,5 +1,8 @@
-home_flags() {
-  if [ "$REAL_HOME" = 1 ]; then printf '%s' "--real-home"; else printf '%s' "--home $1"; fi
+migrate_rollback_command() {
+  local home="$1" real_home="$2" stamp="$3"
+  printf 'bash %q migrate-rollback ' "$SCRIPT_DIR/native.sh"
+  if [ "$real_home" = 1 ]; then printf '%q ' --real-home; else printf '%q %q ' --home "$home"; fi
+  printf '%q %q' --stamp "$stamp"
 }
 
 assert_not_checkout() {
@@ -161,7 +164,8 @@ migrate_failure() {
   log "migrate failed (exit $status)"
   if [ -f "$(migrate_record "$MIGRATE_HOME" "$MIGRATE_STAMP")" ]; then
     log "rolling the roots back"
-    (rollback_roots "$MIGRATE_HOME" "$MIGRATE_STAMP") || log "the automatic rollback failed; fix the cause, then run migrate-rollback --stamp $MIGRATE_STAMP"
+    (rollback_roots "$MIGRATE_HOME" "$MIGRATE_STAMP") ||
+      log "the automatic rollback failed; fix the cause, then run: $(migrate_rollback_command "$MIGRATE_HOME" "$REAL_HOME" "$MIGRATE_STAMP")"
     if [ "$MIGRATE_AGMSG_LINKED" = 1 ]; then
       (agmsg_state "$MIGRATE_HOME" restore) || log "the agmsg links were not restored; run mise run agmsg:state:restore"
     fi
@@ -230,7 +234,7 @@ Move them aside or make them plain directories and files of this HOME."
   trap - EXIT
 
   log "migrated $home; the previous roots are kept as <root>.bak-$MIGRATE_STAMP (record: $(migrate_record "$home" "$MIGRATE_STAMP"))"
-  log "to undo: bash \"$SCRIPT_DIR/native.sh\" migrate-rollback $(home_flags "$home") --stamp $MIGRATE_STAMP"
+  log "to undo: $(migrate_rollback_command "$home" "$REAL_HOME" "$MIGRATE_STAMP")"
   printf '%s\n' "$MIGRATE_STAMP"
 }
 

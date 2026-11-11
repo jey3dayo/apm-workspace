@@ -1172,7 +1172,7 @@ seed_native_consumer_home() {
 }
 
 @test "migrate keeps what apm does not deploy, leaves config.toml and settings.json alone, and migrate-rollback restores the roots byte for byte" {
-  local stamp original sentinels listing_bak
+  local stamp original sentinels listing_bak rollback_command
   prepare_migrate migrate-roundtrip real
   original="$(roots_snapshot "$M_HOME")"
   sentinels="$(sentinel_snapshot "$M_HOME")"
@@ -1182,7 +1182,8 @@ seed_native_consumer_home() {
   [ "$status" -eq 0 ]
   stamp="$(printf '%s\n' "$output" | tail -n 1)"
   [[ "$stamp" =~ ^[0-9]{8}T[0-9]{6}Z$ ]]
-  [[ "$output" == *"bash \"$REPO_ROOT/scripts/native.sh\" migrate-rollback --real-home --stamp $stamp"* ]]
+  printf -v rollback_command 'bash %q migrate-rollback %q %q %q' "$REPO_ROOT/scripts/native.sh" --real-home --stamp "$stamp"
+  [[ "$output" == *"$rollback_command"* ]]
   grep -q "ref: $SOURCE_SHA" "$M_HOME/.apm/apm.yml"
 
   # apm deployed the workspace skills; what it does not own came back from the moved-aside roots.
