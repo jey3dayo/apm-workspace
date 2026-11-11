@@ -121,6 +121,17 @@ run_sync() {
   sync_fixture "${SYNC_ENV[@]}" bash "$FX/harness" "$@"
 }
 
+@test "native entry loads libraries through a symlink from another cwd" {
+  local entry_dir="$FX/entry" other_cwd="$FX/other-cwd"
+  mkdir -p "$entry_dir" "$other_cwd"
+  ln -s "$FX/repo/scripts/native.sh" "$entry_dir/native"
+
+  run bash -c 'cd "$1" && bash "$2" unknown' _ "$other_cwd" "$entry_dir/native"
+
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"unknown native command: unknown"* ]]
+}
+
 @test "sync --help writes nothing and does not inspect or distribute HOME" {
   local before
   SYNC_ENV=()
