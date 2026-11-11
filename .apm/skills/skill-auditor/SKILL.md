@@ -29,6 +29,9 @@ then generates an interactive HTML report.
 Run all steps sequentially. The coordinator (you) manages data flow between
 scripts and sub-agents.
 
+`${CLAUDE_SKILL_DIR}` is the directory that holds this `SKILL.md`. If it is not
+expanded in your shell, replace it with that absolute path.
+
 ### Step 0: Decide Language and Scope
 
 Do not ask the user. Decide both and state them in your first message of the
@@ -311,13 +314,15 @@ If there's a previous entry, show the delta: "Accuracy changed from X to Y."
 
 ### Step 9: Apply Patches (User Approval)
 
-Show the user a summary from the HTML report. For each patch, resolve the owner lane of `skill_path` first (checkout `AGENTS.md` Ownership table, `apm-usage`). A path under `~/.claude/skills/` or `~/.agents/skills/` is a delivery surface that `native:sync` overwrites: never apply to it. Point the patch at the owner source (`catalog/.apm/skills/<id>/SKILL.md`, `.apm/skills/<id>/`) and roll out per `apm-usage`; for a skill owned upstream or privately, report the patch as a proposal only. Show before/after and cascade risk and let the user approve each. `apply_patches.py` writes to the `skill_path` stored in each patch JSON, so rewrite `skill_path` in every approved patch to the owner path before running it.
+Show the user a summary from the HTML report. For each patch, resolve the owner lane of `skill_path` first (checkout `AGENTS.md` Ownership table, `apm-usage`). A path under `~/.claude/skills/` or `~/.agents/skills/` is a delivery surface that `native:sync` overwrites: never apply to it. Point the patch at the owner source (`catalog/.apm/skills/<id>/SKILL.md`, `.apm/skills/<id>/`) and roll out per `apm-usage`; for a skill owned upstream or privately, report the patch as a proposal only. Show before/after and cascade risk and let the user approve each. `apply_patches.py` writes to the `skill_path` stored in each patch JSON and applies every patch in the directory it is given, so approval is expressed by which files are in that directory.
 
-For approved patches:
+For approved patches, copy only the approved patches, with `skill_path` already rewritten to the owner path, into a new directory, and pass that directory. Leave `<workspace>/patches/` as it is: patches that were not approved, and proposal-only ones (owned upstream or privately), stay there and are never applied.
 
 ```bash
+mkdir -p <workspace>/approved-patches
+# copy each approved <name>.patch.json here, with skill_path set to the owner path
 python3 "${CLAUDE_SKILL_DIR}/scripts/apply_patches.py" \
-  --patches <workspace>/patches/ --confirm \
+  --patches <workspace>/approved-patches/ --confirm \
   --output <workspace>/changelog.md
 ```
 
