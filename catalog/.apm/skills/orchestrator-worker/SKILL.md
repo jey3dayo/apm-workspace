@@ -31,6 +31,7 @@ description: >-
 「Orchestrator」は役ではなく機能。Steward / Architect のうち、後述の許可条件を満たす側が担う。
 
 **制約**:
+
 - opencode は Worker 専用（implement 以外の役には就けない）
 - cursor は Worker と Reviewer の両方に就けるが、Steward / Architect には就けない（Orchestrator 機能を担えない）
 - Codex 側の Steward は明示ポリシーとして常に Orchestrator 機能を持たない（handoff 専用）

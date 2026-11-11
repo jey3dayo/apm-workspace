@@ -6,41 +6,41 @@
 
 ### Steward（執事）
 
-| platform | モデル ID        | 備考                                      |
-| -------- | ---------------- | ----------------------------------------- |
-| Claude   | `sonnet` / `opus` | Opus advisor 併用が既定。Opus も可         |
-| Codex    | `gpt-6-luna`     | 明示ポリシーとして Orchestrator 機能を持たない |
+| platform | モデル ID         | 備考                                           |
+| -------- | ----------------- | ---------------------------------------------- |
+| Claude   | `sonnet` / `opus` | Opus advisor 併用が既定。Opus も可             |
+| Codex    | `gpt-6-luna`      | 明示ポリシーとして Orchestrator 機能を持たない |
 
 ### Architect（設計者）
 
-| platform | モデル ID                                                     | 備考                    |
-| -------- | ------------------------------------------------------------- | ----------------------- |
-| Claude   | `fable` / `opus`                                              | どちらも可              |
-| Codex    | `gpt-6-astra` / `gpt-6.1-sol` / `gpt-6-sol` / `gpt-6.1-terra` | `gpt-6.1-sol` 推奨      |
+| platform | モデル ID                                                     | 備考               |
+| -------- | ------------------------------------------------------------- | ------------------ |
+| Claude   | `fable` / `opus`                                              | どちらも可         |
+| Codex    | `gpt-6-astra` / `gpt-6.1-sol` / `gpt-6-sol` / `gpt-6.1-terra` | `gpt-6.1-sol` 推奨 |
 
 ### Reviewer（レビュアー）
 
-| platform | モデル ID                                                          | effort  | 備考                                             |
-| -------- | ------------------------------------------------------------------ | ------- | ------------------------------------------------ |
-| Claude   | `fable` / `opus`                                                   | —       | fable 既定、fallback opus                        |
-| Codex    | `gpt-6.1-terra` / `gpt-6.1-sol` / `gpt-6-astra`                    | medium  | terra 既定。難度高は sol。astra は明示指定時のみ。旧版 `gpt-6-sol` 不可 |
-| cursor   | `claude-fable-5-1-thinking-xhigh` / `claude-opus-5-5-high` / `gpt-5.6-sol-xhigh` | —       | cursor 経路を明示したときの既定                  |
+| platform | モデル ID                                                                        | effort | 備考                                                                    |
+| -------- | -------------------------------------------------------------------------------- | ------ | ----------------------------------------------------------------------- |
+| Claude   | `fable` / `opus`                                                                 | —      | fable 既定、fallback opus                                               |
+| Codex    | `gpt-6.1-terra` / `gpt-6.1-sol` / `gpt-6-astra`                                  | medium | terra 既定。難度高は sol。astra は明示指定時のみ。旧版 `gpt-6-sol` 不可 |
+| cursor   | `claude-fable-5-1-thinking-xhigh` / `claude-opus-5-5-high` / `gpt-5.6-sol-xhigh` | —      | cursor 経路を明示したときの既定                                         |
 
 ### Worker（実装者）
 
-| platform | モデル ID                                     | effort  | 備考                                  |
-| -------- | --------------------------------------------- | ------- | ------------------------------------- |
-| Claude   | `sonnet` / `opus` / `haiku`                   | —       | sonnet 既定、昇格 opus、機械的検証 haiku |
-| Codex    | `gpt-6-luna` / `gpt-6.1-sol` / `gpt-6-sol` / `gpt-6.1-terra` | xhigh   | luna 既定。難度昇格 sol、長文脈昇格 terra |
-| opencode | `deepseek/deepseek-flash`                     | `--variant high` | Worker 専用                           |
-| cursor   | `claude-sonnet-5-5-high` / `claude-opus-5-5-high` | —       | sonnet 既定、昇格 opus                |
+| platform | モデル ID                                                    | effort           | 備考                                      |
+| -------- | ------------------------------------------------------------ | ---------------- | ----------------------------------------- |
+| Claude   | `sonnet` / `opus` / `haiku`                                  | —                | sonnet 既定、昇格 opus、機械的検証 haiku  |
+| Codex    | `gpt-6-luna` / `gpt-6.1-sol` / `gpt-6-sol` / `gpt-6.1-terra` | xhigh            | luna 既定。難度昇格 sol、長文脈昇格 terra |
+| opencode | `deepseek/deepseek-flash`                                    | `--variant high` | Worker 専用                               |
+| cursor   | `claude-sonnet-5-5-high` / `claude-opus-5-5-high`            | —                | sonnet 既定、昇格 opus                    |
 
 ### Worker の昇格先
 
-| platform | 既定 Worker                                | 難度で昇格                                                | 長文脈で昇格                          |
-| -------- | ------------------------------------------ | --------------------------------------------------------- | ------------------------------------- |
-| Claude   | `sonnet`                                   | `opus`                                                    | —                                     |
-| Codex    | `gpt-6-luna` xhigh                         | effort を max へ → `gpt-6.1-sol`（旧版 `gpt-6-sol` も可） | `gpt-6.1-terra`                       |
+| platform | 既定 Worker                                | 難度で昇格                                                | 長文脈で昇格                         |
+| -------- | ------------------------------------------ | --------------------------------------------------------- | ------------------------------------ |
+| Claude   | `sonnet`                                   | `opus`                                                    | —                                    |
+| Codex    | `gpt-6-luna` xhigh                         | effort を max へ → `gpt-6.1-sol`（旧版 `gpt-6-sol` も可） | `gpt-6.1-terra`                      |
 | opencode | `deepseek/deepseek-flash` `--variant high` | 経路差し替え（Codex Luna 経路へ）                         | 計測まで対象外（Codex Terra 経路へ） |
 | cursor   | `claude-sonnet-5-5-high`                   | `claude-opus-5-5-high`                                    | 計測まで対象外（Codex Terra 経路へ） |
 
