@@ -65,13 +65,20 @@ scoped `--add-dir` は worktree 作成の代替にならない。workspace-write
 
     70|### 回避策: `--add-dir` による gitdir 書込許可
 
-worktree 内で Codex を起動する場合、起動時に gitdir を明示的に書込可能へ追加する:
+worktree 内で Codex を起動する場合、起動時に gitdir と shared Git directory を明示的に書込可能へ追加する:
 
 ```bash
-codex exec --add-dir "$(git rev-parse --path-format=absolute --git-dir)" -- <command>
+codex exec --add-dir "$(git rev-parse --path-format=absolute --git-dir)" \
+           --add-dir "$(git rev-parse --path-format=absolute --git-common-dir)" \
+           -- <command>
 ```
 
-`--add-dir` で渡す gitdir は absolute path でなければならないため、`--path-format=absolute` を必須とする。この flag を付けることで、worktree 内での `git add` / `git commit` が成功する。**`codex exec --worktree` だけでは不足**で、gitdir への書込許可が別に必要。
+**両方の `--add-dir` が必要な理由**:
+
+- `--git-dir`: worktree 固有の metadata（`.git/worktrees/<name>`）への書込を許可
+- `--git-common-dir`: shared metadata（objects, refs/heads など main checkout の `.git` 配下）への書込を許可
+
+linked worktree では objects と branch refs は shared directory に配置されるため（[Git repository-layout](https://git-scm.com/docs/gitrepository-layout)）、両方へのアクセスがなければ `git add` でのオブジェクト書込、`git commit` での ref 更新が失敗する。`--add-dir` で渡すパスは absolute でなければならないため、`--path-format=absolute` を必須とする。**`codex exec --worktree` だけでは不足**で、両 directory への書込許可が別に必要。
 80|
 参考: [Codex sandbox guide](https://developers.openai.com/codex/sandbox), [GitHub issue #14338](https://github.com/openai/codex/issues/14338)
 
@@ -93,20 +100,22 @@ timeout 300s codex exec <args> < /dev/null
 
 ### セキュリティ注意: hooks への書込可能化
 
-**gitdir を `--add-dir` や `writable_roots` で書込可能にすると、`.git/hooks` も書込可能になる。** エージェントが hooks を変更すると、以降の git 操作で任意コードが実行される。**エージェントは決して hooks を変更してはならない**。
+**gitdir と shared Git directory を `--add-dir` や `writable_roots` で書込可能にすると、両方の `.git/hooks`（worktree 固有と shared）も書込可能になる。** エージェントが hooks を変更すると、以降の git 操作で任意コードが実行される。**エージェントは決して hooks を変更してはならない**。
 
-同様に、`$HOME` やリポジトリ root 全体を `writable_roots` へ追加することは禁止する。意図しない範囲への書込を許可し、`.git/hooks` / `~/.config` / `~/.ssh` など機微なファイルへの意図しない変更を招く。
+linked worktree では `--git-common-dir` が main checkout の `.git` を指すため、main checkout の hooks も書込可能になることに注意する。同様に、`$HOME` やリポジトリ root 全体を `writable_roots` へ追加することは禁止する。意図しない範囲への書込を許可し、`.git/hooks` / `~/.config` / `~/.ssh` など機微なファイルへの意図しない変更を招く。
 
 ### 便利: worktree 用 wrapper (optional)
 
-一部環境では、linked worktree 内で自動的に gitdir を `--add-dir` 経由で渡す個人 helper `codexw` が利用可能である。worktree 外では plain `codex` と同じ動作をする。これは optional convenience であり、常に generic equivalent も機能する:
+一部環境では、linked worktree 内で自動的に両 directory を `--add-dir` 経由で渡す個人 helper `codexw` が利用可能である。worktree 外では plain `codex` と同じ動作をする。これは optional convenience であり、常に generic equivalent も機能する:
 
 ```bash
 # wrapper (optional, personal dotfiles helper)
 codexw exec -- <command>
 
 # generic equivalent (always works)
-codex exec --add-dir "$(git rev-parse --path-format=absolute --git-dir)" -- <command>
+codex exec --add-dir "$(git rev-parse --path-format=absolute --git-dir)" \
+           --add-dir "$(git rev-parse --path-format=absolute --git-common-dir)" \
+           -- <command>
 ```
 
 非対話形式:
@@ -116,5 +125,7 @@ codex exec --add-dir "$(git rev-parse --path-format=absolute --git-dir)" -- <com
 timeout 300s codexw exec <args> < /dev/null
 
 # generic equivalent (always works)
-timeout 300s codex exec --add-dir "$(git rev-parse --path-format=absolute --git-dir)" <args> < /dev/null
+timeout 300s codex exec --add-dir "$(git rev-parse --path-format=absolute --git-dir)" \
+                        --add-dir "$(git rev-parse --path-format=absolute --git-common-dir)" \
+                        <args> < /dev/null
 ```
