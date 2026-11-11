@@ -30,9 +30,8 @@ teardown() {
 }
 
 # models.md の Worker / Reviewer 表から cursor の model ID を取り出す。
-# claude-* 系と gpt-5.6-sol-xhigh のみが対象で、Codex 列の gpt-6-sol /
-# gpt-5.6-terra / gpt-6-astra のような2segment id とは正規表現の segment数で
-# 区別される（gpt-[0-9.]+-[a-z]+-[a-z]+ は3segment必須）。
+# claude-* 系と3segmentの gpt-* 系のみが対象で、Codex 列の2segment id とは
+# 正規表現の segment 数で区別される。
 skill_models_for() {
   awk -F'|' -v role="$1" '
     $0 == "### Worker（実装者）" { section="Worker"; next }
