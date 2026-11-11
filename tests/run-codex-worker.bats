@@ -7,14 +7,14 @@
 # review は sol 既定」と書いても、runtime は implement=sol も review=luna も
 # 拒否しなかった（reviewer-sol の design-audit medium 指摘）。
 #
-# 正本は orchestrator-worker の tier 表で、script はその写しである。写しは黙って
-# ずれるので、下の drift テストが表と script の両方から model ID を機械的に
-# 取り出して突き合わせる。表の行が書き換わったらここが落ちる。
+# 正本は orchestrator-worker/references/models.md の表で、script はその写しである。
+# 写しは黙ってずれるので、下の drift テストが表と script の両方から model ID を
+# 機械的に取り出して突き合わせる。表の行が書き換わったらここが落ちる。
 
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
   SCRIPT="$REPO_ROOT/catalog/.apm/skills/agmsg-delegation/scripts/run-codex-worker.sh"
-  SKILL="$REPO_ROOT/catalog/.apm/skills/orchestrator-worker/SKILL.md"
+  MODELS="$REPO_ROOT/catalog/.apm/skills/orchestrator-worker/references/models.md"
   PROJECT="$(mktemp -d)"
   PAYLOAD="$(mktemp)"
   printf 'noop\n' >"$PAYLOAD"
@@ -32,11 +32,14 @@ script_models_for() {
   sed -n "s/^$1) allowed_models=(\(.*\)) ;;$/\1/p" "$SCRIPT"
 }
 
-# tier 表から Codex 列だけを取り出し、model ID の前後が区切り文字である場合だけ照合する。
+# models.md の表から Codex 列を取り出し、model ID の前後が区切り文字である場合だけ照合する。
 skill_models_for() {
   awk -F'|' -v role="$1" '
-    $2 ~ "^ *" role " *$" {
-      column = $5
+    /^### Worker/ { in_worker=1; in_reviewer=0; next }
+    /^### Reviewer/ { in_reviewer=1; in_worker=0; next }
+    /^###/ { in_worker=0; in_reviewer=0; next }
+    in_worker && role == "Worker" && /^\| Codex / {
+      column = $3
       while (match(column, /(^|[^[:alnum:].-])gpt-[0-9]+(\.[0-9]+)?-[a-z]+($|[^[:alnum:].-])/)) {
         token = substr(column, RSTART, RLENGTH)
         sub(/^[^[:alnum:].-]+/, "", token)
@@ -45,7 +48,17 @@ skill_models_for() {
         column = substr(column, RSTART + RLENGTH)
       }
     }
-  ' "$SKILL" | sort -u | tr '\n' ' '
+    in_reviewer && role == "Reviewer" && /^\| Codex / {
+      column = $3
+      while (match(column, /(^|[^[:alnum:].-])gpt-[0-9]+(\.[0-9]+)?-[a-z]+($|[^[:alnum:].-])/)) {
+        token = substr(column, RSTART, RLENGTH)
+        sub(/^[^[:alnum:].-]+/, "", token)
+        sub(/[^[:alnum:].-]+$/, "", token)
+        if (token ~ /^gpt-[0-9]+(\.[0-9]+)?-[a-z]+$/) print token
+        column = substr(column, RSTART + RLENGTH)
+      }
+    }
+  ' "$MODELS" | sort -u | tr '\n' ' '
 }
 
 codex_stub() {

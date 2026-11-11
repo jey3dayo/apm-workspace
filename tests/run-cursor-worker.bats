@@ -2,14 +2,14 @@
 #
 # run-cursor-worker.sh の role/model allowlist と sandbox write/read allowlist を
 # 検証する。cursor は Worker と Reviewer の両方に就ける runtime で、正本は
-# orchestrator-worker の tier 表（cursor 列）。script はその写しである。
+# orchestrator-worker/references/models.md の表（cursor 行）。script はその写しである。
 # 写しは黙ってずれるので、下の drift テストが表と script の両方から model ID を
 # 機械的に取り出して突き合わせる。
 
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
   SCRIPT="$REPO_ROOT/catalog/.apm/skills/agmsg-delegation/scripts/run-cursor-worker.sh"
-  SKILL="$REPO_ROOT/catalog/.apm/skills/orchestrator-worker/SKILL.md"
+  MODELS="$REPO_ROOT/catalog/.apm/skills/orchestrator-worker/references/models.md"
   PROJECT="$(mktemp -d)"
   PAYLOAD="$(mktemp)"
   printf 'noop\n' >"$PAYLOAD"
@@ -29,12 +29,22 @@ teardown() {
   rm -rf -- "$PROJECT" "$PAYLOAD" "$STUB_DIR"
 }
 
-# tier 表の Worker / Reviewer 行から cursor の model ID を取り出す。
+# models.md の Worker / Reviewer 表から cursor の model ID を取り出す。
 # claude-* 系と gpt-5.6-sol-xhigh のみが対象で、Codex 列の gpt-6-sol /
 # gpt-5.6-terra / gpt-6-astra のような2segment id とは正規表現の segment数で
 # 区別される（gpt-[0-9.]+-[a-z]+-[a-z]+ は3segment必須）。
 skill_models_for() {
-  grep -E "^\| $1 " "$SKILL" | grep -oE 'claude-[a-z0-9.-]+|gpt-[0-9.]+-[a-z]+-[a-z]+' | sort -u | tr '\n' ' '
+  awk -v role="$1" '
+    /^### Worker/ { in_worker=1; in_reviewer=0; next }
+    /^### Reviewer/ { in_reviewer=1; in_worker=0; next }
+    /^###/ { in_worker=0; in_reviewer=0; next }
+    (in_worker && role == "Worker" && /^\| cursor /) || (in_reviewer && role == "Reviewer" && /^\| cursor /) {
+      while (match($0, /claude-[a-z0-9.-]+|gpt-[0-9.]+-[a-z]+-[a-z]+/)) {
+        print substr($0, RSTART, RLENGTH)
+        $0 = substr($0, RSTART + RLENGTH)
+      }
+    }
+  ' "$MODELS" | sort -u | tr '\n' ' '
 }
 
 # script が role ごとに許可している model を取り出す

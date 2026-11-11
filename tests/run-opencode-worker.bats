@@ -1,14 +1,14 @@
 #!/usr/bin/env bats
 #
 # run-opencode-worker.sh の role/model allowlist と sandbox write allowlist を
-# 検証する。opencode は Worker 専用 (implement only) で、tier 表 Worker 行の
-# opencode 列と script の allowlist が食い違うと runtime が黙って別 model を
-# 通してしまう。正本は orchestrator-worker の tier 表で、script はその写しである。
+# 検証する。opencode は Worker 専用 (implement only) で、models.md Worker 表の
+# opencode 行と script の allowlist が食い違うと runtime が黙って別 model を
+# 通してしまう。正本は orchestrator-worker/references/models.md で、script はその写しである。
 
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
   SCRIPT="$REPO_ROOT/catalog/.apm/skills/agmsg-delegation/scripts/run-opencode-worker.sh"
-  SKILL="$REPO_ROOT/catalog/.apm/skills/orchestrator-worker/SKILL.md"
+  MODELS="$REPO_ROOT/catalog/.apm/skills/orchestrator-worker/references/models.md"
   PROJECT="$(mktemp -d)"
   PAYLOAD="$(mktemp)"
   printf 'noop\n' >"$PAYLOAD"
@@ -20,10 +20,19 @@ teardown() {
   rm -rf -- "$PROJECT" "$PAYLOAD"
 }
 
-# tier 表の Worker 行から opencode の model ID を取り出す
+# models.md の Worker 表から opencode の model ID を取り出す
 # (実在する id は `deepseek/deepseek-flash` のみ)
 skill_opencode_models() {
-  grep -E '^\| Worker ' "$SKILL" | grep -oE 'deepseek/[a-z0-9.-]+' | sort -u | tr '\n' ' '
+  awk '
+    /^### Worker/ { in_worker=1; next }
+    /^###/ { in_worker=0; next }
+    in_worker && /^\| opencode / {
+      while (match($0, /deepseek\/[a-z0-9.-]+/)) {
+        print substr($0, RSTART, RLENGTH)
+        $0 = substr($0, RSTART + RLENGTH)
+      }
+    }
+  ' "$MODELS" | sort -u | tr '\n' ' '
 }
 
 @test "an unknown model is rejected" {
