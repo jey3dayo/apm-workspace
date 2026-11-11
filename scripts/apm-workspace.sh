@@ -7,18 +7,16 @@ if [ "$#" -gt 0 ]; then
 fi
 
 REPO_ROOT=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
-# After the native cutover $HOME/.apm is a consumer (apm.yml, apm.lock.yaml, apm_modules), not the authoring checkout.
-home_apm_is_checkout() {
-  [ -e "$HOME/.apm/.git" ] || [ -d "$HOME/.apm/catalog" ]
-}
 
-default_workspace_dir() {
-  if home_apm_is_checkout; then
-    printf '%s\n' "$HOME/.apm"
-  else
-    printf '%s\n' "$REPO_ROOT"
-  fi
-}
+# ライブラリを読み込む
+SCRIPT_LIB_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")/lib" && pwd)"
+# shellcheck source=scripts/lib/common.sh
+. "$SCRIPT_LIB_DIR/common.sh"
+# shellcheck source=scripts/lib/catalog-validation.sh
+. "$SCRIPT_LIB_DIR/catalog-validation.sh"
+# shellcheck source=scripts/lib/doctor.sh
+. "$SCRIPT_LIB_DIR/doctor.sh"
+# 以下の関数定義は common.sh, catalog-validation.sh, doctor.sh に移動しました
 WORKSPACE_DIR="${APM_WORKSPACE_DIR:-$(default_workspace_dir)}"
 WORKSPACE_REPO="${APM_WORKSPACE_REPO:-https://github.com/jey3dayo/apm-workspace.git}"
 OPENCODE_INSTRUCTIONS_OUTPUT="${APM_OPENCODE_OUTPUT:-$HOME/.config/opencode/AGENTS.md}"
@@ -33,39 +31,6 @@ LEARNING_INTAKE_PENDING_WARN_THRESHOLD=10
 # Resolved from BASH_SOURCE rather than $0 so the path is also correct when the
 # script is sourced (the bats suite sources it to exercise individual functions).
 APM_AWK_DIR=$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/lib
-
-have_command() {
-  command -v "$1" >/dev/null 2>&1
-}
-
-log() {
-  printf '%s\n' "$*"
-}
-
-warn() {
-  printf 'warning: %s\n' "$*" >&2
-}
-
-error() {
-  printf 'error: %s\n' "$*" >&2
-}
-
-fail() {
-  printf 'error: %s\n' "$*" >&2
-  exit 1
-}
-
-require_command() {
-  if ! have_command "$1"; then
-    fail "$1 not found. Install it first."
-  fi
-}
-
-require_apm() {
-  if ! have_command apm; then
-    fail "apm not found. Run 'cd $WORKSPACE_DIR && mise install' (or install it in another shell) before retrying."
-  fi
-}
 
 validate_skill_id() {
   skill_id="$1"
