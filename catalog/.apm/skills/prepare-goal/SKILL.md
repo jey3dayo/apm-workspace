@@ -85,7 +85,7 @@ Stop immediately after the final block. No follow-up implementation narration, n
 
 When readiness is `needs-clarification` or `not-goal-ready`, do not include any `/goal` block. After the header, give the next best step (clarification question, task split, research step, or a smaller first goal) and at most two blocking questions.
 
-## Examples
+## Examples (illustrative; take validation commands from the target repo's own scripts, never from here)
 
 Action request, ready:
 
@@ -101,7 +101,7 @@ Why:
 - The request asks for a fix and the landing point is a bounded module repair.
 - Immediate request: fix auth.
 - Inferred landing point: auth module repair is complete and verified.
-- Key assumptions: `npm test -- test/auth` and `npm run lint` are the validation commands.
+- Key assumptions: the repo's package scripts define test and lint (read in step 1 of this fictional repo).
 
 Starting goal:
 Auth module repair is complete. Done means the failing auth behavior is fixed, all call sites in scope still use the intended public API, `npm test -- test/auth` exits 0, `npm run lint` exits 0, and the final report lists changed files plus verification output. Scope: auth module and directly related tests only. Task sequence: inspect the failing auth behavior and relevant tests; apply the smallest auth-module fix with direct test coverage; run the named auth test and lint commands; review the diff for unrelated changes. Constraints: do not change public route behavior, do not modify unrelated snapshots, do not edit secret or environment files. Verification commands: `npm test -- test/auth`, `npm run lint`. Verification artifacts/reports: changed-file list, per-unit completed/skipped/blocked report. Stop if the same command fails 3 times with the same root cause, required product behavior is unclear, or a destructive action is needed.

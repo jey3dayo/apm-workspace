@@ -205,15 +205,14 @@ remove incrementally. When the repository uses TSR, load
 
 ### 3-7: Verification (Required)
 
-Run the repository's defined check tasks after every fix step. Prefer tasks
-defined by the repository (mise/pnpm/npm scripts) over ad hoc commands:
+After each fix step, run the focused check for the touched area with the repository's defined tasks (tests for the changed files, plus type-check and lint when types or lint rules are affected). Run the repository's full gate (`check` / `test` / `ci` / `verify`) before sharing. Do not move to the next step while the focused check fails.
+
+Example of a full gate:
 
 ```bash
 # Example for a pnpm repository
 pnpm run type-check && pnpm run lint && pnpm run test
 ```
-
-Do not proceed to the next step until all pass.
 
 ## Related Skills and References
 

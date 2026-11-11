@@ -23,7 +23,7 @@ Paths in this section are relative to the checkout.
 - Edit `.apm/skills/**` for skills that operate only on this APM workspace.
 - Edit `catalog/.apm/skills/**` for personal skills that should be available
   in the global automatic rollout.
-- Edit `catalog/{AGENTS.md,commands/**,rules/**}` for shared guidance and `catalog/.apm/agents/*.agent.md` for agent definitions. When creating or changing an agent definition, read the model-assignment rules in `orchestrator-worker` first: an agent whose judgement drives a production change, an approval, or a rejection carries no `model:` and inherits the parent's.
+- Edit `catalog/.apm/instructions/ai-collaboration.instructions.md` (the global guide), `catalog/commands/**` and `catalog/rules/**` for shared guidance and `catalog/.apm/agents/*.agent.md` for agent definitions. When creating or changing an agent definition, read the model-assignment rules in `orchestrator-worker` first: an agent whose judgement drives a production change, an approval, or a rejection carries no `model:` and inherits the parent's.
 - Edit `optional-skills/<id>/**` for skills that should be tracked
   here but installed only by selected repositories.
 - Treat each optional skill directory as an individually installable package;

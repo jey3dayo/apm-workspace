@@ -51,7 +51,7 @@ bundle and install only the required sub-skill from the consuming repository.
 The real HOME is native (`~/.apm/apm.yml` starts with
 `# Rendered by scripts/native.sh`). The legacy writer (`deploy`, `apply`,
 `upgrade`, `refresh` and their helper tasks) was removed on 2026-11-10; its last
-version is commit `0bcce09`. Roll out a pushed commit with `mise run native:sync` (use the `-- --https`
+version is commit `0bcce09`. Roll out a merged commit with `mise run native:sync` (use the `-- --https`
 option when SSH is unavailable). Section B of
 `docs/native-distribution.md` also documents the manual steps and rollback.
 
@@ -62,14 +62,15 @@ option when SSH is unavailable). Section B of
 | Deep verification | `mise run verify`      | Runs checks, the script suite, and catalog smoke verification.                                                    |
 | Inspection        | `mise run doctor`      | Read-only.                                                                                                        |
 
-Shipping here has no PR: commit directly on `main`, run `apm-deploy-verify`
-with the changed skill names (pass them both times: after the push the tree is
-clean, so it cannot infer them from `git status`) before the push for format
-and check (its distribution-match step applies only after the push and B6, so
-it reports that step as not run before then), then
-push `main` and watch the pushed CI run. `ship` reads this as the repository's
-end point. After the push, roll the pushed commit out with `mise run native:sync`, then
-run `apm-deploy-verify` again for the distribution match.
+Shipping here goes through a PR: work on a feature branch, run
+`apm-deploy-verify` with the changed skill names (pass them both times: once
+the work is committed the tree is clean, so it cannot infer them from
+`git status`) before the push for format and check (its distribution-match step
+applies only after the merge and B6, so it reports that step as not run before
+then), push the branch and open the PR (`ship` runs this sequence), and watch
+its CI run. Merge only when asked. After the PR is merged, update the checkout's `main`, roll
+that commit out with `mise run native:sync`, then run `apm-deploy-verify` again
+for the distribution match.
 
 `mise.toml` manages the required tools. The bold-heading formatter helper is
 vendored at `scripts/replace-bold-headings.ts`; a missing helper is a broken

@@ -19,7 +19,7 @@ Run the project's real commands, not assumptions: the typecheck, lint, and test 
 
 ## Type-safety rules for this workspace
 
-- `any` and type assertions (`as T`) are prohibited (see the workspace CLAUDE.md). Replace `any` with a generic or `unknown` plus narrowing; replace an assertion on external data with schema validation (`safeParse` or the project's equivalent) that returns an error on failure instead of trusting the shape.
+- `any` and type assertions (`as T`) are prohibited (see the global guide: ~/.claude/rules/ai-collaboration.md in Claude Code, ~/.codex/AGENTS.md in Codex). Replace `any` with a generic or `unknown` plus narrowing; replace an assertion on external data with schema validation (`safeParse` or the project's equivalent) that returns an error on failure instead of trusting the shape.
 - Do not silence a lint rule with an inline disable comment. If a rule fires legitimately and persistently, fix the code; if the rule itself is wrong for this project, report it so the parent can adjust the linter configuration.
 - Errors are handled at boundaries and propagated with meaning. Do not wrap a throw in a catch that rethrows or swallows it.
 

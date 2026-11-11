@@ -98,7 +98,7 @@ Manual lock deletion is destructive. Confirm the exact path and get explicit use
 
 ```bash
 # Remove lock file manually
-rm .git/worktrees/locked/locked
+trash .git/worktrees/locked/locked
 
 # Remove worktree
 git wt -d feature/locked
@@ -419,12 +419,6 @@ npm install
 cd /path/to/repo/.worktrees/feature-a
 trash node_modules
 ln -s ../../.cache/node_modules node_modules
-```
-
-##### Clean up build artifacts
-
-```bash
-git config --add wt.deletehook "rm -rf dist .next build"
 ```
 
 ## Git Internal Issues

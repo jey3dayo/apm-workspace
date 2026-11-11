@@ -29,15 +29,19 @@ then generates an interactive HTML report.
 Run all steps sequentially. The coordinator (you) manages data flow between
 scripts and sub-agents.
 
-### Step 0: Initial Questions
+`${CLAUDE_SKILL_DIR}` is the directory that holds this `SKILL.md`. If it is not
+expanded in your shell, replace it with that absolute path.
 
-Before starting, ask the user two questions using AskUserQuestion:
+### Step 0: Decide Language and Scope
 
-1. **Report language**: "レポートの言語は？ (e.g. 日本語, English, 中文, ...)"
-   — Free text input. Default to the user's conversation language if not specified.
-2. **Scope**: "分析範囲はどうしますか？" — Cross-project (all projects) / Current project only
+Do not ask the user. Decide both and state them in your first message of the
+run, before collecting transcripts:
 
-Store these choices. Pass the language choice to all sub-agents as an
+1. **Report language**: the conversation language (Japanese by default).
+2. **Scope**: the current project by default. Use cross-project (all projects)
+   only when the request names it explicitly.
+
+Pass the language choice to all sub-agents as an
 instruction prefix: "Write all output text (health_assessment, detail, reason,
 suggested_fix, etc.) in [chosen language]."
 
@@ -49,21 +53,21 @@ For current-project mode, use `--cwd "$(pwd)"`.
 If cross-project mode was selected:
 
 ```bash
-python3 scripts/collect_transcripts.py all --days 14 \
+python3 "${CLAUDE_SKILL_DIR}/scripts/collect_transcripts.py" all --days 14 \
   --output <workspace>/transcripts.json --verbose
 ```
 
 If current-project mode:
 
 ```bash
-python3 scripts/collect_transcripts.py --cwd "$(pwd)" --days 14 \
+python3 "${CLAUDE_SKILL_DIR}/scripts/collect_transcripts.py" --cwd "$(pwd)" --days 14 \
   --output <workspace>/transcripts.json --verbose
 ```
 
-If auto-detection fails, show the list and ask the user which project to audit.
+If auto-detection fails, stop and report the candidate list; do not guess.
 
-For cross-project mode, base dir: `~/.claude/skill-report/`.
-For current-project mode, base dir: `<project>/.claude/skill-report/`.
+Base dir for both modes: `<repo>/tmp/skill-audit/`, where `<repo>` is the
+current repository root. `health-history.json` lives in the same place.
 
 ### Step 2: Set Up Workspace
 
@@ -86,7 +90,7 @@ Run both scripts. They produce the input files for analysis.
 ```bash
 # Transcripts already collected in Step 1
 
-python3 scripts/collect_skills.py \
+python3 "${CLAUDE_SKILL_DIR}/scripts/collect_skills.py" \
   --output <workspace>/skill-manifest.json --verbose
 ```
 
@@ -221,7 +225,7 @@ Spawn sub-agents in parallel — one per batch:
 ```
 For each batch i:
   Agent tool (general-purpose):
-    "Read agents/routing-analyst.md from the skill-auditor skill directory for
+    "Read ${CLAUDE_SKILL_DIR}/agents/routing-analyst.md for
      your analysis instructions.
      Read <workspace>/skill-manifest.json for skill definitions.
      Read <workspace>/transcripts.json for session data.
@@ -249,7 +253,7 @@ Spawn a portfolio-analyst sub-agent:
 
 ```
 Agent tool (general-purpose):
-  "Read agents/portfolio-analyst.md from the skill-auditor skill directory.
+  "Read ${CLAUDE_SKILL_DIR}/agents/portfolio-analyst.md.
    Read <workspace>/skill-manifest.json for skill definitions and attention budget.
    Read <workspace>/audit-report.json for the routing audit results.
    Write your portfolio analysis as JSON to <workspace>/portfolio-analysis.json."
@@ -261,7 +265,7 @@ Spawn an improvement-planner sub-agent:
 
 ```
 Agent tool (general-purpose):
-  "Read agents/improvement-planner.md from the skill-auditor skill directory.
+  "Read ${CLAUDE_SKILL_DIR}/agents/improvement-planner.md.
    Read <workspace>/audit-report.json for routing audit results.
    Read <workspace>/portfolio-analysis.json for portfolio analysis.
    Read <workspace>/skill-manifest.json for current skill definitions.
@@ -275,7 +279,7 @@ Agent tool (general-purpose):
 ### Step 7: Generate HTML Report
 
 ```bash
-python3 scripts/generate_report.py \
+python3 "${CLAUDE_SKILL_DIR}/scripts/generate_report.py" \
   --workspace <workspace>
 ```
 
@@ -310,14 +314,15 @@ If there's a previous entry, show the delta: "Accuracy changed from X to Y."
 
 ### Step 9: Apply Patches (User Approval)
 
-Show the user a summary from the HTML report. For each patch, show the
-before/after diff and cascade risk. Let the user approve or reject each.
+Show the user a summary from the HTML report. For each patch, resolve the owner lane of `skill_path` first (checkout `AGENTS.md` Ownership table, `apm-usage`). A path under `~/.claude/skills/` or `~/.agents/skills/` is a delivery surface that `native:sync` overwrites: never apply to it. Point the patch at the owner source (`catalog/.apm/skills/<id>/SKILL.md`, `.apm/skills/<id>/`) and roll out per `apm-usage`; for a skill owned upstream or privately, report the patch as a proposal only. Show before/after and cascade risk and let the user approve each. `apply_patches.py` writes to the `skill_path` stored in each patch JSON and applies every patch in the directory it is given, so approval is expressed by which files are in that directory.
 
-For approved patches:
+For approved patches, copy only the approved patches, with `skill_path` already rewritten to the owner path, into a new directory, and pass that directory. Leave `<workspace>/patches/` as it is: patches that were not approved, and proposal-only ones (owned upstream or privately), stay there and are never applied.
 
 ```bash
-python3 scripts/apply_patches.py \
-  --patches <workspace>/patches/ --confirm \
+mkdir -p <workspace>/approved-patches
+# copy each approved <name>.patch.json here, with skill_path set to the owner path
+python3 "${CLAUDE_SKILL_DIR}/scripts/apply_patches.py" \
+  --patches <workspace>/approved-patches/ --confirm \
   --output <workspace>/changelog.md
 ```
 
@@ -375,7 +380,7 @@ listed separately in the report as "explicit-only" skills.
 ## Workspace Structure
 
 ```
-<base_dir>/                          # e.g. ~/.claude/skill-report/
+<base_dir>/                          # e.g. <repo>/tmp/skill-audit/
 ├── health-history.json              # shared across runs (append-only)
 ├── 2026-03-04T18-45-23/             # run 1
 │   ├── transcripts.json

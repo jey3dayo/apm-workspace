@@ -3,7 +3,7 @@ name: review-fix-loop
 description: >-
   Run a managed fix-and-review loop for one complex implementation task (a whole backlog is backlog-sweep): parallel
   subagent investigation feeding a main-session task backlog, evidence-backed
-  triage, and repeated scored reviews until ship quality. Use when the user asks
+  triage, and repeated reviews until ship quality. Use when the user asks
   for a review fix loop / fix-and-review loop, asks to coordinate subagents with
   a task backlog and repeated quality review, or invokes this skill with a
   compact prompt whose conditions must be recovered from prior conversation and
@@ -99,11 +99,11 @@ reproduction step, or diff inspection.
    - Run a review pass after each meaningful integration slice.
    - Triage every review comment with the triage vocabulary before spending fix
      time; apply the Low-Quality Review Filter.
-   - Score the result 0-100 with the Review Rubric. The score that clears the
-     95 gate must come from a reviewer that is a different identity and a
-     separate session from the author (orchestrator-worker "self-review 禁止");
-     a self-score is a draft signal only. Fix `do-now` findings and re-review
-     until that reviewer scores 95+, or a Stop Condition applies.
+   - Review with the Review Rubric. The verdict that clears the gate must come
+     from a reviewer that is a different identity and a separate session from
+     the author (orchestrator-worker "self-review 禁止"); a self-review is a
+     draft signal only. Fix `do-now` findings and re-review until that reviewer
+     approves with no blocking finding, or a Stop Condition applies.
    - When a reviewer finds a contract mismatch between representations, update
      the implementation and its observability surface together (debug displays,
      shared type comments, telemetry), and add a test at the exact conversion
@@ -137,20 +137,12 @@ reproduction step, or diff inspection.
 
 ## Review Rubric
 
-Start from 100 and subtract for concrete issues only:
-
-| Issue class                                                                | Typical deduction |
-| -------------------------------------------------------------------------- | ----------------- |
-| Broken behavior, data loss, security issue, or failed critical requirement | -20 to -40        |
-| Type error, failing test, lint failure, or build failure                   | -10 to -25        |
-| Incomplete edge handling or missing validation in touched behavior         | -5 to -15         |
-| Scope creep, needless refactor, or unmanaged unrelated diff                | -5 to -15         |
-| Weak maintainability that will likely cause near-term rework               | -3 to -10         |
-| Minor style or naming issue with low risk                                  | -1 to -3          |
-
-The score can reach 95 only when no known critical requirement is broken,
-quality gates are clean or explicitly impossible to run, and remaining issues
-are minor.
+Split findings by severity. Blocking: broken behavior, data loss, security
+issue, failed critical requirement, or a type, test, lint, or build failure.
+Should-fix: missing edge handling or validation in touched behavior, scope
+creep, or weak maintainability that will likely cause near-term rework. Minor:
+low-risk style and naming. Approve only when there is no blocking finding and
+quality gates are clean or explicitly impossible to run.
 
 ## Low-Quality Review Filter
 
@@ -194,7 +186,7 @@ Return:
 Stop the loop and report instead of continuing when:
 
 - the same approach failed 3 times (report attempts, errors, alternatives)
-- the review score cannot reach 95 without leaving the requested scope
+- the reviewer's blocking findings cannot be cleared without leaving the requested scope
 - required credentials, environment, or product judgment is unavailable
 - subagent findings conflict and cannot be resolved with local evidence
 - quality gates fail for pre-existing or unrelated reasons the user did not ask
@@ -203,5 +195,5 @@ Stop the loop and report instead of continuing when:
 ## Reporting
 
 Final reports include: owner task completed; subagent-derived tasks accepted,
-parked, or rejected; key evidence for accepted findings; review-loop score and
+parked, or rejected; key evidence for accepted findings; review verdict and
 remaining risk; quality gates run and their results.

@@ -120,6 +120,7 @@ permission や PreToolUse hook のポリシーで拒否されたコマンドは�
 | 成果物やページをターミナルペインでユーザーの隣に出す・そのまま触ってもらう             | `terminal-browser`（kitty graphics 対応ターミナル必須）   |
 | エージェント側で完結するヘッドレス自動化・スクレイピング・反復検証                     | `browser-harness`                                         |
 | Lighthouse・パフォーマンストレース・ヒープスナップショットなど DevTools 固有分析       | `chrome-devtools`（必要な repo だけに repo-local で追加） |
+| ログイン済みサイトの読み取り・API 証拠の採取（アダプタがある／無いページ）             | `opencli-usage` → `opencli-browser`                       |
 
 ## ファイル操作原則
 

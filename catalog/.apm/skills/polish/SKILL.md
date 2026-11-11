@@ -4,13 +4,13 @@ model: sonnet
 context: fork
 agent: implementer
 background: false
-description: PR を出す前に、base との diff で追加・変更した行を global AGENTS.md / CLAUDE.md の開発原則へ揃える（コメント圧縮・テストの実装詳細依存の除去・型逃げ・エラー握りつぶし・過剰な抽象化・不要ファイル）。
+description: PR を出す前に、base との diff で追加・変更した行を global の共有ガイドと repo の AGENTS.md / CLAUDE.md の開発原則へ揃える（コメント圧縮・テストの実装詳細依存の除去・型逃げ・エラー握りつぶし・過剰な抽象化・不要ファイル）。
 argument-hint: "[base-ref] [files...] [intent]"
 ---
 
 # Polish
 
-PR 前に、このブランチで**追加・変更した行だけ**を観点表の全行へ照らして直す。原則の本文は global `AGENTS.md` / `CLAUDE.md` の「開発原則」「禁止事項」「ファイル操作原則」が正本で、ここには写さない。判断に迷ったらそちらを読む。
+PR 前に、このブランチで**追加・変更した行だけ**を観点表の全行へ照らして直す。原則の本文は global の共有ガイド（Claude は ~/.claude/rules/ai-collaboration.md）の「開発原則」「禁止事項」「ファイル操作原則」と、repo の AGENTS.md / CLAUDE.md が正本で、ここには写さない。判断に迷ったらそちらを読む。
 
 lint / format / test のループは対象外（DoD が持つ）。再利用・効率・altitude（root cause の深さ）は built-in `/simplify` が持つ。base より前から存在する行も対象外で、diff の外に気づいた問題は報告に列挙するだけで触らない。
 

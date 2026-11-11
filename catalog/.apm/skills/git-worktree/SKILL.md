@@ -15,7 +15,7 @@ This skill owns command syntax and troubleshooting. 隔離 workspace を新規�
 
 1. `git wt` で既存 worktree と使用中ブランチを確認する
 2. 必要なら `git config --local wt.basedir ".worktrees"` を確認する
-3. メイン checkout を保護し、実作業は worktree 側で行う前提にする
+3. 並行セッションや他 Worker と編集対象が重なりうる、または不明なときは、メイン checkout を保護して実作業を worktree 側で行う（重ならなければ同一 checkout でよい。repo の AGENTS.md が default branch への直接 commit を定めていればそれに従う）
 4. 今回の目的が「新規 branch」「既存 branch」「掃除/診断」のどれか決める
 
 ## Common Operations
@@ -76,7 +76,7 @@ git worktree list
 - 手動でディレクトリを消した後は `git worktree prune` を忘れない
 - `.env` などローカルファイル配布が必要な時だけ `wt.copy` / `--copy` を使う
 - dotenvx 管理のリポジトリでは `.env.keys` が gitignore されているため、`wt.copy` に `.env.keys` を含めないと新 worktree で復号が失敗する（グローバル設定例: `git config --global --add wt.copy ".env.keys"`）
-- main repository を日常作業場所にしない
+- 並行作業で編集対象が重なりうる、または不明なときは、main repository を作業場所にしない
 
 ## Common Mistakes
 

@@ -676,7 +676,7 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 
 - 撤去: `ayghri/i-have-adhd/skills/i-have-adhd`。ユーザーの指示。restore は `apm install -g ayghri/i-have-adhd/skills/i-have-adhd#723af7d9afaf43eb871dbcce6129e2bf80de90d5`（`apm-usage` Fast Path 6）。
 - 取り込み: `manual-skills/.apm/skills/explain-before-shorten/`（manual レーン）。出典は https://zenn.dev/microsoft/articles/explain-before-shorten に載った SKILL.md 全文で、upstream の package が無い。ユーザーが貼った全文を改変せずに置き、来歴は `manual-skills/upstreams/explain-before-shorten/PROVENANCE.md` に残した。skill 名は記事の frontmatter のまま。
-- 注意: 「関連スキルとの分担」の `slide-review` / `markdstage` はこの環境に無い。原文のまま残している。
+- 注意: 「関連スキルとの分担」の `slide-review` / `markdstage` / `markdstage-local` はこの環境に無いので、取り込み後に参照を外した。それ以外は原文のまま。
 - 更新: 記事が 2026-10-29 に否定形のルールを追加している。再取り込みするときは記事の更新履歴を確認する。
 
 ## `i-have-adhd` / `last30days` を global-dependency として採用（2026-09-23）
