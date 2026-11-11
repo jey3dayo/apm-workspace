@@ -152,8 +152,10 @@ The orphan list printed from a temporary deployment compile is not evidence
 about the real workspace. Verify repaired deployed content, then run `mise run
 check`.
 
-`apm doctor`'s orphan-package warning is an expected legacy dependency
-artifact; do not report it as a user-facing problem.
+`apm deps list -g` (apm 0.35.0) calls packages orphaned that `apm prune
+--dry-run` keeps as required package content. `mise run doctor` shows those as
+`retained` and does not suggest a prune for them. A package it still lists as
+orphaned is one `apm prune --dry-run` would remove; preview before acting.
 
 ## Review Focus
 
