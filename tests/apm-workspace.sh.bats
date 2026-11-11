@@ -8,9 +8,8 @@
 
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
-  # Sourcing the script re-derives its own REPO_ROOT from $0 (the bats
-  # runner), clobbering the value above. Subprocess-invocation tests need the
-  # real repo root, so keep a copy that survives sourcing.
+  # Keep a stable repository path for subprocess and fixture checks after the
+  # entry script and its libraries have been sourced.
   TEST_REPO_ROOT="$REPO_ROOT"
   SCRIPT_UNDER_TEST="$REPO_ROOT/scripts/apm-workspace.sh"
   source "$REPO_ROOT/scripts/apm-workspace.sh"

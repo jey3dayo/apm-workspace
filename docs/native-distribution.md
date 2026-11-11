@@ -15,8 +15,8 @@ sync と内部 stage は HOME ごとに同じ排他を取る。sync は backup �
 - 生成した root（`~/.claude/CLAUDE.md`・`~/.codex/AGENTS.md`・`~/.cursor/AGENTS.md`）が APM の目印を残したまま compile のあとに編集されていたら、何も書かずに止まる。APM の目印は編集を守らず、compile が上書きするため。判定は APM と同じ Build ID の照合（`apm_cli/compilation/build_id.py`）で、APM と同じく末尾の改行だけを足した・消した編集は検出しない
 - `<HOME>/.apm/apm.yml` が描画した manifest とバイト単位で違えば、`apm.yml.<UTC>.bak` に残してから置き換える（同じ名前があれば番号を付け、既存の `.bak` を上書きしない）
 - HOME の外を指す（または壊れた）symlink か、ハードリンクの通常のファイルが HOME の中にあれば、何も書かずに止まる。apm がリンクを通して HOME の外のファイルを書き換えるため（キャッシュの `Library/Caches/apm` のように、配布先より深い場所にも書く）。rehearse は、実 HOME の 4 つの root（`.agents/skills`・`.claude/skills`・`.claude/agents`・`.cursor/agents`）に壊れたリンクか HOME の外へ出るリンクがあれば、`migrate` と同じ判定（`escaping_link_line`）で、複製を作る前にそのリンクの名前を出して失敗する。root の外のリンクは、複製の中を複製の中へ向け直し（先が無ければ外す。外したリンクの名前は出す）、同じ検査を通してから install する
-- `<HOME>/.apm/config.json` に `default_client` と `prefer_ssh` 以外のキーがあれば、apply も rehearse も止まる。APM は `temp_dir` などの書込み先をここから読むため。`prefer_ssh` は git の URL の形を変えるだけで、書込み先は変えない。キーは APM と同じく JSON としてデコードしてから比べる
-- `<HOME>/apm.yml` があれば、apply・rehearse（実 HOME と複製の両方）・migrate は何も書かずに止まる。user scope の APM は executable の許可を `<HOME>/apm.yml` が在ればそちらから読み、`<HOME>/.apm/apm.yml` の `allowExecutables` を無視するため（`apm_cli/security/executables.py` の `exec_trust_context_for_project`）
+- `<HOME>/.apm/config.json` に `default_client` と `prefer_ssh` 以外のキーがあれば、rehearsal と migration の内部 stage は止まる。APM は `temp_dir` などの書込み先をここから読むため。`prefer_ssh` は git の URL の形を変えるだけで、書込み先は変えない。キーは APM と同じく JSON としてデコードしてから比べる
+- `<HOME>/apm.yml` があれば、rehearsal（実 HOME と複製の両方）と migration は何も書かずに止まる。user scope の APM は executable の許可を `<HOME>/apm.yml` が在ればそちらから読み、`<HOME>/.apm/apm.yml` の `allowExecutables` を無視するため（`apm_cli/security/executables.py` の `exec_trust_context_for_project`）
 - apm は空の環境に `HOME`・`PATH`・ロケール・git の設定の場所と、HOME の中の `TMPDIR`（`.cache/apm-native-tmp`）だけを渡して起動する。APM は `APM_CACHE_DIR` や `XDG_*`、`TMPDIR` が指す場所にも書き（`APM_CACHE_DIR` と `XDG_CACHE_HOME` はテストで確かめた）、git は token・proxy・askpass を環境から読むため
 - manifest は同じディレクトリの新しいファイルに書いてから名前を置き換える
 - install は `--only apm`。MCP は、`setup:mcp:host` などが書いた今の設定のまま触らない
@@ -89,7 +89,7 @@ allowExecutables:
     bin: true
 ```
 
-- この 3 つの `bin/` は必須であり、承認だけが欠けた場合は render が失敗する。変更するときは `scripts/native.sh` の必須項目も更新する。hooks・MCP・LSP・canvas は承認しない。`--workspace-only` では外部 package の承認を出力しない
+- この 3 つの `bin/` は必須であり、承認だけが欠けた場合は render が失敗する。変更するときは `scripts/lib/native-manifest.sh` の必須項目も更新する。hooks・MCP・LSP・canvas は承認しない。`--workspace-only` では外部 package の承認を出力しない
 - `allowExecutables` は APM では deprecated の旧名。user scope の APM は `<HOME>/apm.yml` の `executables:` を読むが、`<HOME>/.apm/apm.yml` の `executables:` は読まず、旧名の `allowExecutables:` だけを読む（`install/template.py` の `_effective_allow`、`models/apm_package.py` の `parse_allow_executables`）。そのため新しい名前では書けない。`apm approve --user` は `config.json` に書いて `assert_default_apm_config` に止められるので使わない。対話の端末で `apm install` が出す `Trust <package>? [y/N]` に y と答えても、同じ `~/.apm/config.json` の `executables` に保存され、次の `native:sync` は `rehearse` の guard（`sets executables`）で止まる（前回の実行ログと config.json の更新時刻で観測）。y と答えず、承認は `apm.yml` に書く。`native:sync` は `</dev/null` を付けて実行すると質問が出ない（N と答えた場合に何が保存されるかは未確認）。止まったときは `config.json` を複写してから `executables` のキーだけ外す
 - 許可のキーは `github.com/<owner>/<repo>[/<path>]`。APM は依存を `str(dep_ref)`（`github.com/<repo>#<ref>`）で引き、`#<ref>` を外した形で照合する（`install/exec_gate.py` の `resolve_package_key`、`security/executables.py` の `_map_grants`）。`apm approve` が出す `fujibee/agmsg` の形は一致しない
 - このブロックを書くと APM の executable のゲートが有効になり、許可していない package の hooks・MCP・LSP・canvas も default-deny になる。install の末尾に `executable primitives parked pending approval` という警告が出るのはこのため。`~/.apm/apm.lock.yaml` の `exec_status` に `gated_pending_approval` と残る。該当するファイルがあれば rehearse の `lost` に出る
@@ -98,7 +98,7 @@ allowExecutables:
 ### rehearse --migrate が見ること
 
 - 複製の中で、`migrate` と同じ `migrate_roots`（install の前）と `reinstate_entries`（compile のあと）を通す。end-to-end の確認は、空の HOME ではなく backup の複製から行う
-- 消えてよいのは、`scripts/native.sh` の `allowed_lost_reason` に書いた allowlist だけ。件数は `allowed_lost=` に出し、`allowed-lost.txt` にタブ区切りで path と理由を残す。allowlist 以外の消失（`lost=`）が 0 件のときだけ成功する。同じ skill の別のファイルは対象外で、消えれば失敗する
+- 消えてよいのは、`scripts/lib/native-roots.sh` の `allowed_lost_reason` に書いた allowlist だけ。件数は `allowed_lost=` に出し、`allowed-lost.txt` にタブ区切りで path と理由を残す。allowlist 以外の消失（`lost=`）が 0 件のときだけ成功する。同じ skill の別のファイルは対象外で、消えれば失敗する
 
   | path（HOME からの相対）                                                                                                                                              | 理由                                                                                                                                                                                                                                  |
   | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
