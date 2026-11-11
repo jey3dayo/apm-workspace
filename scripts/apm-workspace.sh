@@ -25,6 +25,7 @@ APM_LIB_DIR="$SCRIPT_DIR/lib"
 APM_AWK_DIR="$APM_LIB_DIR"
 
 # After the native cutover $HOME/.apm is a consumer (apm.yml, apm.lock.yaml, apm_modules), not the authoring checkout.
+. "$APM_LIB_DIR/shell-common.sh"
 . "$APM_LIB_DIR/workspace-core.sh"
 
 WORKSPACE_DIR="${APM_WORKSPACE_DIR:-$(default_workspace_dir)}"

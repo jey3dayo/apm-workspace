@@ -48,7 +48,7 @@ cmd_setup_host_mcp() {
     || fail "1Password MCP command not found. Install or enable the 1Password desktop app MCP first."
 
   if codex_1password_mcp_matches "$mcp_command"; then
-    log "Codex 1Password MCP is already configured: $mcp_command"
+    workspace_log "Codex 1Password MCP is already configured: $mcp_command"
   else
     if codex mcp get 1password >/dev/null 2>&1; then
       codex mcp remove 1password
@@ -57,7 +57,7 @@ cmd_setup_host_mcp() {
   fi
 
   if claude_1password_mcp_matches "$mcp_command"; then
-    log "Claude 1Password MCP is already configured: $mcp_command"
+    workspace_log "Claude 1Password MCP is already configured: $mcp_command"
   else
     if claude mcp get 1password >/dev/null 2>&1; then
       claude mcp remove 1password --scope user
@@ -69,5 +69,5 @@ cmd_setup_host_mcp() {
     || fail "Codex 1Password MCP verification failed."
   claude_1password_mcp_matches "$mcp_command" \
     || fail "Claude 1Password MCP verification failed."
-  log "Host-local 1Password MCP configuration is current."
+  workspace_log "Host-local 1Password MCP configuration is current."
 }

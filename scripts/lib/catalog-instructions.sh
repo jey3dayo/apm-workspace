@@ -115,7 +115,7 @@ sync_opencode_instructions() {
       claude_state=$(user_root_state "$HOME/.claude/CLAUDE.md" "$known_blobs")
       case "$claude_state" in
         absent | legacy | generated) write_catalog_instructions_body "$OPENCODE_INSTRUCTIONS_OUTPUT" ;;
-        *) log "Not writing $OPENCODE_INSTRUCTIONS_OUTPUT: OpenCode falls back to $HOME/.claude/CLAUDE.md ($claude_state), which is not the catalog guide." ;;
+        *) workspace_log "Not writing $OPENCODE_INSTRUCTIONS_OUTPUT: OpenCode falls back to $HOME/.claude/CLAUDE.md ($claude_state), which is not the catalog guide." ;;
       esac
       ;;
     *) warn "Leaving $OPENCODE_INSTRUCTIONS_OUTPUT as is ($opencode_state): it is not a copy of any committed version of the catalog guide, so OpenCode reads it instead of the guide. If it is a copy deployed from an uncommitted guide, move it aside and re-run sync:opencode." ;;

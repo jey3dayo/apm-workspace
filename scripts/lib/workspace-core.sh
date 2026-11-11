@@ -14,7 +14,7 @@ have_command() {
   command -v "$1" >/dev/null 2>&1
 }
 
-log() {
+workspace_log() {
   printf '%s\n' "$*"
 }
 
@@ -24,11 +24,6 @@ warn() {
 
 error() {
   printf 'error: %s\n' "$*" >&2
-}
-
-fail() {
-  printf 'error: %s\n' "$*" >&2
-  exit 1
 }
 
 require_command() {
@@ -47,14 +42,14 @@ ensure_workspace_repo() {
   require_command git
 
   if [ ! -e "$WORKSPACE_DIR" ]; then
-    log "Cloning $WORKSPACE_REPO into $WORKSPACE_DIR"
+    workspace_log "Cloning $WORKSPACE_REPO into $WORKSPACE_DIR"
     git clone "$WORKSPACE_REPO" "$WORKSPACE_DIR"
   elif [ -d "$WORKSPACE_DIR" ] && [ ! -e "$WORKSPACE_DIR/.git" ]; then
     if [ -n "$(ls -A "$WORKSPACE_DIR" 2>/dev/null)" ]; then
       fail "$WORKSPACE_DIR exists but is not an empty directory or git checkout."
     fi
 
-    log "Cloning $WORKSPACE_REPO into existing empty directory $WORKSPACE_DIR"
+    workspace_log "Cloning $WORKSPACE_REPO into existing empty directory $WORKSPACE_DIR"
     (
       cd "$WORKSPACE_DIR"
       git clone "$WORKSPACE_REPO" .

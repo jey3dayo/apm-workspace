@@ -69,6 +69,21 @@ native() {
   fixture bash "$FX/repo/scripts/native.sh" "$@"
 }
 
+@test "native entry resolves libraries from its physical path when linked, sourced, and run from another cwd" {
+  mkdir -p "$FX/bin"
+  ln -s ../repo/scripts/native.sh "$FX/bin/native"
+
+  run fixture bash -c 'cd "$1" && bash "$2" render --source-ref "$3" --workspace-only' _ \
+    "$FX/outside" "$FX/bin/native" "$SHA"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"ref: $SHA"* ]]
+
+  run fixture bash -c 'cd "$1" && . "$2" && test "$SCRIPT_DIR" = "$3" && cmd_render --source-ref "$4" --workspace-only' _ \
+    "$FX/outside" "$FX/bin/native" "$FX/repo/scripts" "$SHA"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"ref: $SHA"* ]]
+}
+
 prepare_rehearsal() {
   native backup --real-home --backup-dir "$FX/backup"
   native rehearse --real-home --backup-dir "$FX/backup" --source-ref "$SHA" --migrate

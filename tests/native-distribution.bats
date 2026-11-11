@@ -21,6 +21,8 @@ setup_file() {
   export REPO_ROOT
   # shellcheck source=../scripts/lib/git-test-env.sh
   . "$REPO_ROOT/scripts/lib/git-test-env.sh"
+  # shellcheck source=native-test-helpers.bash
+  . "$REPO_ROOT/tests/native-test-helpers.bash"
   apm_isolate_git_env
 
   REAL_HOME="$(cd "$HOME" && pwd -P)"
@@ -289,8 +291,7 @@ sentinel_snapshot() {
 @test "render fails when a listed external or executable package is missing from apm.yml, and --workspace-only does not need it" {
   local home repo="$FX/render-repo"
   home="$(new_home render-missing)"
-  mkdir -p "$repo/scripts"
-  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
+  copy_native_runtime "$REPO_ROOT" "$repo"
   grep -v 'nanaism/yomiyasu' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
   run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA"
   [ "$status" -ne 0 ]
@@ -309,8 +310,7 @@ sentinel_snapshot() {
 @test "render refuses unsupported executable grants and duplicate approvals" {
   local home repo="$FX/render-exec-invalid"
   home="$(new_home render-exec-invalid)"
-  mkdir -p "$repo/scripts"
-  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
+  copy_native_runtime "$REPO_ROOT" "$repo"
   sed 's/bin: true/hooks: true/' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
   run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA"
   [ "$status" -ne 0 ]
@@ -325,8 +325,7 @@ sentinel_snapshot() {
 @test "render rejects removal of a required bin approval while its dependency remains" {
   local home repo="$FX/render-exec-missing"
   home="$(new_home render-exec-missing)"
-  mkdir -p "$repo/scripts"
-  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
+  copy_native_runtime "$REPO_ROOT" "$repo"
   awk '/^    github[.]com\/ibelick\/ui-skills:$/ { skip=1; next } skip { skip=0; next } { print }' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
   grep -q '^    - git: ibelick/ui-skills$' "$repo/apm.yml"
   run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA"
@@ -337,8 +336,7 @@ sentinel_snapshot() {
 @test "render rejects quoted legacy approval keys for normal and workspace-only installs" {
   local home repo="$FX/render-exec-quoted" mode
   home="$(new_home render-exec-quoted)"
-  mkdir -p "$repo/scripts"
-  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
+  copy_native_runtime "$REPO_ROOT" "$repo"
   cp "$REPO_ROOT/apm.yml" "$repo/apm.yml"
   printf '"allowExecutables": {github.com/fujibee/agmsg: {bin: true}}\n' >>"$repo/apm.yml"
   for mode in normal workspace-only; do
@@ -355,8 +353,7 @@ sentinel_snapshot() {
 @test "render rejects duplicate flow and anchored executable approvals in both modes" {
   local home repo="$FX/render-exec-flow" mode form
   home="$(new_home render-exec-flow)"
-  mkdir -p "$repo/scripts"
-  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
+  copy_native_runtime "$REPO_ROOT" "$repo"
   for form in flow anchor; do
     cp "$REPO_ROOT/apm.yml" "$repo/apm.yml"
     if [ "$form" = flow ]; then
@@ -379,9 +376,7 @@ sentinel_snapshot() {
 @test "apply stops when the manifest cannot be rendered, before it writes the manifest or starts apm" {
   local home repo="$FX/apply-render-repo" stub="$FX/apply-render-stub"
   home="$(new_home apply-render-fails)"
-  mkdir -p "$repo/scripts"
-  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
-  cp "$REPO_ROOT/scripts/native-home.py" "$repo/scripts/native-home.py"
+  copy_native_runtime "$REPO_ROOT" "$repo"
   grep -v 'fujibee/agmsg' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
   printf '#!/bin/sh\ntouch "%s/apm-ran"\n' "$home" >"$stub"
   chmod +x "$stub"
@@ -1494,9 +1489,7 @@ build_github_fixture() {
   build_github_fixture nanaism/yomiyasu skills/yomiyasu
   build_github_fixture other/pkg .
   { printf '[include]\n\tpath = %s\n' "$FX/gitconfig"; cat "$FX/gitconfig-github"; } >"$FX/gitconfig-bin"
-  mkdir -p "$repo/scripts"
-  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
-  cp "$REPO_ROOT/scripts/native-home.py" "$repo/scripts/native-home.py"
+  copy_native_runtime "$REPO_ROOT" "$repo"
   {
     printf 'name: bin-fixture\nversion: 1.0.0\ntargets:\n  - agent-skills\ndependencies:\n  apm:\n'
     printf '    - jey3dayo/apm-workspace/catalog#main\n    - jey3dayo/apm-workspace/manual-skills#main\n'
@@ -1533,8 +1526,7 @@ build_github_fixture() {
   [[ "$output" == *"authoring checkout"* ]]
   rmdir "$home/.apm/catalog"
 
-  mkdir -p "$home/.apm/scripts"
-  cp "$REPO_ROOT/scripts/native.sh" "$home/.apm/scripts/native.sh"
+  copy_native_runtime "$REPO_ROOT" "$home/.apm"
   run fixture_exec "$home" /usr/bin/env APM_NATIVE_ACCOUNT_HOME="$home" /bin/bash "$home/.apm/scripts/native.sh" \
     migrate --real-home --source-ref "$SOURCE_SHA" --rehearsal "$FX/none"
   [ "$status" -ne 0 ]

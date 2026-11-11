@@ -154,5 +154,5 @@ cmd_validate_catalog() {
   source_agent_count=$(printf '%s\n' "$source_agent_paths" | awk 'NF { count++ } END { print count + 0 }')
   source_command_count=$(printf '%s\n' "$source_command_paths" | awk 'NF { count++ } END { print count + 0 }')
   source_rule_count=$(printf '%s\n' "$source_rule_paths" | awk 'NF { count++ } END { print count + 0 }')
-  log "Catalog validation passed ($source_skill_count skills, $source_agent_count agents, $source_command_count commands, $source_rule_count rules, $claude_rule_count claude-rules)"
+  workspace_log "Catalog validation passed ($source_skill_count skills, $source_agent_count agents, $source_command_count commands, $source_rule_count rules, $claude_rule_count claude-rules)"
 }
