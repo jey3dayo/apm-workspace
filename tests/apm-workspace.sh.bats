@@ -8,9 +8,8 @@
 
 setup() {
   REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
-  # Sourcing the script re-derives its own REPO_ROOT from $0 (the bats
-  # runner), clobbering the value above. Subprocess-invocation tests need the
-  # real repo root, so keep a copy that survives sourcing.
+  # Keep a stable repository path for subprocess and fixture checks after the
+  # entry script and its libraries have been sourced.
   TEST_REPO_ROOT="$REPO_ROOT"
   SCRIPT_UNDER_TEST="$REPO_ROOT/scripts/apm-workspace.sh"
   source "$REPO_ROOT/scripts/apm-workspace.sh"
@@ -133,9 +132,8 @@ if (tasks.some((task) => task.name === name)) {
   node_json_assert '
 const fs = require("node:fs");
 const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
-if (tasks.some(({ name, hide }) =>
-  ((name.startsWith("native:") && name !== "native:sync") || name.startsWith("agmsg:state:")) && hide !== true
-)) {
+if (tasks.some(({ name }) => name.startsWith("native:") && name !== "native:sync") ||
+    tasks.some(({ name, hide }) => name.startsWith("agmsg:state:") && hide !== true)) {
   process.exit(1);
 }
 ' <<<"$hidden_json"
@@ -300,7 +298,9 @@ if (!isDeepStrictEqual(actual, ["check", "format", "native:sync"])) {
   run assert_mise_tasks_absent "$tasks_json" \
     apply apply:skills:local check:roots deploy deploy:fresh deploy:pins install:catalog install:pins \
     migrate:roots prepare:catalog prune:cache refresh refresh:deploy repair:local-package-cache upgrade \
-    verify test validate doctor:workspace doctor:intake lock:diff models:check actions-lock:generate native:render
+    verify test validate doctor:workspace doctor:intake lock:diff models:check actions-lock:generate native:render \
+    native:plan native:apply native:backup native:rehearse native:migrate native:migrate-rollback \
+    native:opencode native:reinstate
   [ "$status" -eq 0 ]
 }
 
@@ -394,6 +394,30 @@ if (!isDeepStrictEqual(actual, ["check", "format", "native:sync"])) {
   run bash "$SCRIPT_UNDER_TEST" definitely-not-a-command
   [ "$status" -ne 0 ]
   [[ "$output" == *"unknown command"* ]]
+}
+
+@test "entry script loads libraries through a symlink from another cwd" {
+  entry_dir="$(mktemp -d)"
+  other_cwd="$(mktemp -d)"
+  ln -s "$SCRIPT_UNDER_TEST" "$entry_dir/apm-workspace"
+
+  run bash -c 'cd "$1" && bash "$2" definitely-not-a-command' _ "$other_cwd" "$entry_dir/apm-workspace"
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"unknown command: definitely-not-a-command"* ]]
+  rm -rf "$entry_dir" "$other_cwd"
+}
+
+@test "sourcing a symlink from another cwd resolves the repository and does not dispatch" {
+  entry_dir="$(mktemp -d)"
+  other_cwd="$(mktemp -d)"
+  ln -s "$SCRIPT_UNDER_TEST" "$entry_dir/apm-workspace"
+
+  run bash -c 'cd "$1" && source "$2"; printf "repo=%s\n" "$REPO_ROOT"' _ "$other_cwd" "$entry_dir/apm-workspace"
+
+  [ "$status" -eq 0 ]
+  [ "$output" = "repo=$TEST_REPO_ROOT" ]
+  rm -rf "$entry_dir" "$other_cwd"
 }
 
 @test "retired direct commands are unknown and write nothing" {

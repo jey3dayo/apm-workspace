@@ -146,7 +146,7 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
 
 ## Task Selection
 
-- The real HOME is native (`~/.apm/apm.yml` starts with `# Rendered by scripts/native.sh`). The legacy writer (`deploy`, `apply`, `upgrade`, `refresh` and their helper tasks) was removed on 2026-11-10; its last version is commit `0bcce09`. Roll out with `docs/native-distribution.md` section B (`native:plan` → `native:backup` → `native:rehearse --migrate` → `native:migrate`); `native:migrate-rollback` undoes it.
+- The real HOME is native (`~/.apm/apm.yml` starts with `# Rendered by scripts/native.sh`). The legacy writer (`deploy`, `apply`, `upgrade`, `refresh` and their helper tasks) was removed on 2026-11-10; its last version is commit `0bcce09`. Roll out only with `mise run native:sync`; `docs/native-distribution.md` section B describes its internal stages and the direct rollback command it prints.
 - Run `mise run check` before a rollout. It performs formatting checks, all linters, offline action-lock verification, workspace and catalog validation, and the full Bats suite.
 - Run the hidden `mise run doctor` task for read-only workspace and deployed-state diagnostics, including learning-intake reports.
 - No task refreshes upstream dependencies or regenerates `apm.lock.yaml`; this is an open item in `docs/package-decisions.md`.
@@ -259,7 +259,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
 4. Shared guidance changed:
    - edit `catalog/**`
    - run `mise run check`
-   - review the diff, commit and push, then roll the pushed SHA out with section B (`native:plan -- --source-ref <SHA>` first)
+   - review the diff, commit and push, then roll the pushed SHA out with `mise run native:sync`
 
 5. Upstream refresh:
    - no task re-resolves the root `apm.lock.yaml` (`upgrade` and `deploy:pins` were removed); do not run `apm update -g` or `apm install -g` as a substitute. Update the pinned entries of `apm.lock.yaml` to the same commits as the pin in `apm.yml` (or revert the pin)
@@ -267,7 +267,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
      `references/rollout-fast-paths.md`
    - if the manifest contains `gist.github.com/...#<sha>`, verify its regenerated `apm.lock.yaml` record as the gist Guardrail describes (the shortened `owner/<gist-id>` `repo_url` is the accepted form) before rollout
    - confirm the target dependency's `resolved_commit` and the deployed file's hash
-     before calling the refresh done; a zero exit from `native:migrate` is not evidence the pin moved
+     before calling the refresh done; a zero exit from the migration stage is not evidence the pin moved
    - review `apm.lock.yaml` before commit with `git diff apm.lock.yaml`
    - the upstream skill content a refresh or pin bump accepts makes it a
      non-trivial change for `ship`'s independent review, even when `apm.yml`
