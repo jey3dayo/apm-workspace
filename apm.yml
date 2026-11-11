@@ -87,6 +87,11 @@ dependencies:
       args:
         - -y
         - "@upstash/context7-mcp@latest"
+    # Web search, fetch, and research for general verification and up-to-date information (Context7 covers library docs)
+    - name: parallel
+      registry: false
+      transport: http
+      url: https://mcp.parallel.ai/mcp
     # App-side connectors don't reach the CLI agents; ops rules and GraphQL fallback live in catalog/.apm/skills/linear-task-ops.
     - name: linear
       registry: false
