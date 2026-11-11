@@ -8,7 +8,7 @@
 # Every call gets `env -i` and a HOME under the fixture root. Where sandbox-exec exists (macOS) a profile also
 # denies network access and writes outside the fixture root; elsewhere the HOME guards are the only protection.
 #
-# The fixture root is BATS_FILE_TMPDIR, or a fresh directory under APM_NATIVE_FIXTURE_ROOT when that is set.
+# Shared source setup lives under BATS_FILE_TMPDIR or APM_NATIVE_FIXTURE_ROOT; mutable fixtures are per test.
 
 bats_require_minimum_version 1.5.0
 
@@ -52,6 +52,16 @@ setup_file() {
   assert_apm_version || return 1
   build_source_repo "$FX/src/apm-workspace"
   printf '[url "file://%s"]\n\tinsteadOf = %s\n[protocol "file"]\n\tallow = always\n' "$SOURCE_REPO" "$FIXTURE_URL" >"$FX/gitconfig"
+}
+
+setup() {
+  local file_fx="$FX"
+  FX="$file_fx/tests/$BATS_TEST_NUMBER"
+  mkdir -p "$FX/tmp" "$FX/homes"
+  cp "$file_fx/gitconfig" "$FX/gitconfig"
+  if [ -n "$SANDBOX_EXEC" ]; then
+    write_sandbox_profile "$FX/sandbox.sb"
+  fi
 }
 
 physical_path() {
