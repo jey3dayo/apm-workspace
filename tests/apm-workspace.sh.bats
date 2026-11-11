@@ -133,9 +133,8 @@ if (tasks.some((task) => task.name === name)) {
   node_json_assert '
 const fs = require("node:fs");
 const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
-if (tasks.some(({ name, hide }) =>
-  ((name.startsWith("native:") && name !== "native:sync") || name.startsWith("agmsg:state:")) && hide !== true
-)) {
+if (tasks.some(({ name }) => name.startsWith("native:") && name !== "native:sync") ||
+    tasks.some(({ name, hide }) => name.startsWith("agmsg:state:") && hide !== true)) {
   process.exit(1);
 }
 ' <<<"$hidden_json"
@@ -300,7 +299,9 @@ if (!isDeepStrictEqual(actual, ["check", "format", "native:sync"])) {
   run assert_mise_tasks_absent "$tasks_json" \
     apply apply:skills:local check:roots deploy deploy:fresh deploy:pins install:catalog install:pins \
     migrate:roots prepare:catalog prune:cache refresh refresh:deploy repair:local-package-cache upgrade \
-    verify test validate doctor:workspace doctor:intake lock:diff models:check actions-lock:generate native:render
+    verify test validate doctor:workspace doctor:intake lock:diff models:check actions-lock:generate native:render \
+    native:plan native:apply native:backup native:rehearse native:migrate native:migrate-rollback \
+    native:opencode native:reinstate
   [ "$status" -eq 0 ]
 }
 

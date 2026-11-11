@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 # Native APM distribution: a consumer manifest pins this repository's packages by commit SHA, and `apm install -g`
 # followed by `apm compile -g --clean` deploy them. What APM does not deploy is listed in docs/native-distribution.md
-# and stays with the existing manual helpers. sync orchestrates that documented workflow.
-#
-# apply targets a disposable HOME and refuses the account's real HOME, its ancestors and the tool state inside it.
-# apply --real-home is blocked; migrate writes the real HOME after a clean `rehearse --migrate`, and migrate-rollback and
-# reinstate undo or complete it (docs/native-distribution.md). backup and rehearse only read deployment data; all native
-# operations share a persistent lock in .cache/apm-native-operation.lock, outside the caches migrate moves aside.
+# and stays with the existing manual helpers. sync is the operator entrypoint and orchestrates the internal plan, backup,
+# rehearsal and migration stages. migrate-rollback remains an internal recovery command because sync prints it after a
+# failed migration. All native operations share a persistent lock in .cache/apm-native-operation.lock, outside the
+# caches migrate moves aside.
 set -euo pipefail
 
 SCRIPT_PATH="${BASH_SOURCE[0]}"
@@ -43,8 +41,8 @@ REAL_HOME_TOOL_DIRS=".agents .claude .codex .cursor .cache Library Library/Cache
 EXTERNAL_PACKAGE_MAP="nanaism/yomiyasu/skills/yomiyasu=nanaism/yomiyasu:yomiyasu"
 # Files whose content a migrate must leave byte for byte alone.
 MIGRATE_UNTOUCHED_FILES=".codex/config.toml .claude/settings.json"
-# Non-secret paths apply can change; backup copies them and rehearse reproduces them in a scratch HOME. Tool configs that
-# may hold credentials (~/.codex/config.toml, MCP configs) are not here, which is why apply installs with --only apm.
+# Non-secret paths migration can change; backup copies them and rehearsal reproduces them in a scratch HOME. Tool configs
+# that may hold credentials (~/.codex/config.toml, MCP configs) are not here, which is why installation uses --only apm.
 BACKUP_PATHS=".apm/apm.yml .apm/config.json .apm/apm.lock.yaml .apm/deployment-receipts .claude/skills .claude/agents .claude/rules .claude/commands .claude/CLAUDE.md
 .codex/AGENTS.md .codex/rules .cursor/agents .cursor/rules .cursor/AGENTS.md .agents/skills AGENTS.md .config/opencode/AGENTS.md"
 
@@ -67,13 +65,10 @@ main() {
       ;;
     plan) cmd_plan "$@" ;;
     render) cmd_render "$@" ;;
-    apply) cmd_apply "$@" ;;
     backup) cmd_backup "$@" ;;
     rehearse) cmd_rehearse "$@" ;;
     migrate) cmd_migrate "$@" ;;
     migrate-rollback) cmd_migrate_rollback "$@" ;;
-    reinstate) cmd_reinstate "$@" ;;
-    opencode) cmd_opencode "$@" ;;
     *) printf 'error: unknown native command: %s\n' "$command" >&2; exit 2 ;;
   esac
 }

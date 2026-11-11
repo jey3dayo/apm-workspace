@@ -99,8 +99,8 @@ wait_ready() {
   [ -f "$FX/ready" ]
 }
 
-@test "native HOME lock excludes manual migrate rollback backup rehearsal and reinstate during sync" {
-  local writer migrate_status rollback_status backup_status rehearse_status reinstate_status opencode_status inherited_status
+@test "native HOME lock excludes internal migrate rollback backup and rehearsal stages during sync" {
+  local writer migrate_status rollback_status backup_status rehearse_status inherited_status
   prepare_rehearsal
   printf 'block\n' >"$FX/block"
   native sync >"$FX/writer.log" 2>&1 &
@@ -118,12 +118,6 @@ wait_ready() {
   run native rehearse --real-home --backup-dir "$FX/backup" --source-ref "$SHA" --migrate
   rehearse_status="$status"
   printf '%s\n' "$output" >"$FX/second-rehearse.log"
-  run native reinstate --real-home --stamp 20000101T000000Z
-  reinstate_status="$status"
-  printf '%s\n' "$output" >"$FX/second-reinstate.log"
-  run native opencode --real-home
-  opencode_status="$status"
-  printf '%s\n' "$output" >"$FX/second-opencode.log"
   cat >"$FX/forged-lock-harness" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
@@ -139,11 +133,9 @@ EOF
   [ "$rollback_status" -ne 0 ]
   [ "$backup_status" -ne 0 ]
   [ "$rehearse_status" -ne 0 ]
-  [ "$reinstate_status" -ne 0 ]
-  [ "$opencode_status" -ne 0 ]
   [ "$inherited_status" -ne 0 ]
   local operation
-  for operation in migrate rollback backup rehearse reinstate opencode inherited; do
+  for operation in migrate rollback backup rehearse inherited; do
     [[ "$(cat "$FX/second-$operation.log")" == *"another native operation is active"* ]]
   done
   [ ! -e "$FX/second-backup" ]

@@ -2,16 +2,6 @@ home_flags() {
   if [ "$REAL_HOME" = 1 ]; then printf '%s' "--real-home"; else printf '%s' "--home $1"; fi
 }
 
-cmd_reinstate() {
-  parse_options "$@"
-  [ -n "$STAMP" ] || fail "reinstate needs --stamp <UTC stamp of the migrate>"
-  assert_stamp "$STAMP"
-  local home
-  home="$(target_home reinstate)"
-  if ! native_lock_held "$home"; then native_lock_command "$home" reinstate "$@"; return; fi
-  reinstate_entries "$home" "$STAMP" "$home/.apm/native-reinstate-$STAMP."
-}
-
 assert_not_checkout() {
   local home="$1" repo
   if [ -e "$home/.apm/.git" ] || [ -L "$home/.apm/.git" ] || [ -e "$home/.apm/catalog" ] || [ -L "$home/.apm/catalog" ]; then
@@ -240,7 +230,7 @@ Move them aside or make them plain directories and files of this HOME."
   trap - EXIT
 
   log "migrated $home; the previous roots are kept as <root>.bak-$MIGRATE_STAMP (record: $(migrate_record "$home" "$MIGRATE_STAMP"))"
-  log "to undo: mise run native:migrate-rollback -- $(home_flags "$home") --stamp $MIGRATE_STAMP"
+  log "to undo: bash \"$SCRIPT_DIR/native.sh\" migrate-rollback $(home_flags "$home") --stamp $MIGRATE_STAMP"
   printf '%s\n' "$MIGRATE_STAMP"
 }
 

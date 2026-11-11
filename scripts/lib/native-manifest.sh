@@ -143,25 +143,15 @@ cmd_plan() {
   if [ -z "$(git -C "$REPO_ROOT" branch -r --contains "$sha" 2>/dev/null)" ]; then
     printf '# Warning: no remote branch contains %s yet; apm cannot fetch it until it is pushed.\n' "$sha"
   fi
-  printf '# Consumer manifest (written to <HOME>/.apm/apm.yml by apply):\n\n'
+  printf '# Consumer manifest (written to <HOME>/.apm/apm.yml by the migration stage):\n\n'
   render_manifest "$sha" "$WORKSPACE_ONLY"
   cat <<EOF
 
-# apply --home <disposable HOME> --source-ref $sha would run:
-#   1. stop if <HOME>/apm.yml exists (apm reads its executable approvals there instead of <HOME>/.apm/apm.yml), if an
-#      APM-generated root there was edited after compile ($COMPILED_ROOTS), or if a symlink or hard link
-#      inside that HOME reaches outside it
-#   2. stop if <HOME>/.apm/config.json holds more than default_client and prefer_ssh; keep a differing
-#      <HOME>/.apm/apm.yml as apm.yml.<UTC>.bak
-#   3. write the manifest above
-#   4. apm install -g --only apm --trust-bin, from an empty environment plus HOME, PATH, locale, git config locations and a
-#      TMPDIR in HOME; MCP servers stay as they are
-#   5. apm compile -g --clean, the same way
-# apply --real-home is blocked. The real HOME is switched by migrate --real-home --source-ref $sha --rehearsal <dir>, which
-# needs a clean rehearse --migrate of a backup of that HOME first and would run:
+# native:sync takes a fresh backup, runs a migrate-mode rehearsal, then its migration stage would:
 #   1. stop if <HOME>/.apm is a checkout (.git or catalog/) or this repository lies inside it
 #   2. stop unless the rehearsal's result.txt is mode=migrate, for the same HOME and ref, with no failed step, no lost
-#      file outside the allowlist, and no skipped baseline; then the guards of apply, over the paths apm writes
+#      file outside the allowlist, and no skipped baseline; then check the paths apm writes for edited generated roots
+#      and links that leave HOME
 #   3. copy ${MIGRATE_UNTOUCHED_FILES// /, } (owner-only) to <HOME>/.apm/native-migrate-<UTC>.untouched; save the agmsg links
 #   4. write the manifest above, move $MIGRATE_ROOTS
 #      to <root>.bak-<UTC> (nothing is deleted)
@@ -171,38 +161,10 @@ cmd_plan() {
 #      <HOME>/.apm/native-migrate-<UTC>.lost.txt) or if the files of step 3 changed
 #   6. on any failure, undo step 4 (migrate-rollback --stamp <UTC> does the same later) and put the files of step 3 back,
 #      keeping what migrate left as <file>.changed-<UTC>. It prints the stamp.
-# Not deployed by APM, and left to the manual steps in docs/native-distribution.md: agmsg db/teams links,
-# catalog/rules and catalog/claude/rules, private skills, OpenCode and Pi instructions, host-local MCP.
+# Not deployed by APM: catalog/rules and catalog/claude/rules, private skills, Pi instructions and host-local MCP.
+# native:sync separately preserves agmsg db/teams links and writes the OpenCode guide.
 # This plan wrote nothing.
 EOF
-}
-
-cmd_apply() {
-  parse_options "$@"
-  [ "$REAL_HOME" = 0 ] || fail "applying to the real HOME is blocked: apm install deletes skills the old writer deployed. migrate (after a clean rehearse --migrate) is the command that switches the real HOME; migrate-rollback and reinstate only undo or complete it (docs/native-distribution.md)."
-  [ -n "$SOURCE_REF" ] || fail "apply needs --source-ref; deploying never moves a pin on its own"
-  [ -n "$HOME_DIR" ] || fail "apply needs --home <disposable HOME>"
-  local home sha edited links manifest
-  home="$(assert_disposable_home "$HOME_DIR")"
-  if ! native_lock_held "$home"; then native_lock_command "$home" apply "$@"; return; fi
-  sha="$(resolve_source_sha "$SOURCE_REF")"
-  assert_default_apm_config "$home"
-  assert_no_home_manifest "$home"
-  edited="$(edited_generated_roots "$home")"
-  [ -z "$edited" ] || fail "these roots keep APM's marker but were edited after compile, and apm compile would overwrite them:
-$edited
-Delete the marker line to keep the file as hand-written, or move it aside, then re-run."
-
-  links="$(shared_entries "$home")"
-  [ -z "$links" ] || fail "these entries inside $home may share their data with files outside it, so writing them would change those files:
-$links
-Move them aside or make them plain directories and files of this HOME."
-
-  manifest="$(render_manifest "$sha" "$WORKSPACE_ONLY")"
-  install_manifest "$home" "$manifest"
-
-  run_apm_install "$home"
-  run_apm "$home" compile -g --clean
 }
 
 install_manifest() {

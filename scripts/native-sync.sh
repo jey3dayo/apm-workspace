@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Sourced by native.sh so sync uses the same HOME and loss guards as the manual commands.
+# Sourced by native.sh so sync's internal stages use the same HOME and loss guards.
 
 sync_usage() {
   cat <<'EOF'

@@ -126,9 +126,9 @@ symlinks resolving to `.apm/skills/<id>/SKILL.md`.
 
 `~/.agents/skills/agmsg/db` and `teams` must remain symlinks to
 `${XDG_STATE_HOME:-~/.local/state}/agmsg/`; replacing the skill directory would
-otherwise erase the roster and history. `native:rehearse --migrate` and
-`native:migrate` save and restore the links through `scripts/agmsg-state.sh`,
-and `native:migrate-rollback` relinks them. A bare `apm install -g` does not
+otherwise erase the roster and history. The rehearsal and migration stages
+inside `native:sync` save and restore the links through `scripts/agmsg-state.sh`,
+and sync's rollback recovery relinks them. A bare `apm install -g` does not
 run that save/restore, so the links are gone when it finishes; the store under
 `${XDG_STATE_HOME:-~/.local/state}/agmsg/` survives. For a roster left
 unlinked, diagnose with `mise run doctor`, then run

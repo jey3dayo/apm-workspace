@@ -20,15 +20,6 @@ native_workspace() {
     bash "$SCRIPT_DIR/apm-workspace.sh" "$@"
 }
 
-cmd_opencode() {
-  if [ $# = 0 ]; then set -- --real-home; fi
-  parse_options "$@"
-  local home
-  home="$(target_home opencode)"
-  if ! native_lock_held "$home"; then native_lock_command "$home" opencode "$@"; return; fi
-  native_workspace "$home" sync:opencode
-}
-
 physical_path() {
   local path="$1" rest=""
   while [ ! -d "$path" ]; do
