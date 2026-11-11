@@ -1,3 +1,4 @@
 ["test:sh"]
 description = "Run bats unit tests for the workspace's bash scripts"
+hide = true
 run = "bash ./scripts/run-bats.sh"

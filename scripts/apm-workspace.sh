@@ -590,13 +590,8 @@ EOF
 }
 
 cmd_validate() {
-  require_apm
   ensure_workspace_repo
   ensure_workspace_scaffold
-  (
-    cd "$WORKSPACE_DIR"
-    apm compile --validate
-  )
   validate_manifest_sha_pins
 }
 

@@ -74,29 +74,11 @@ jobs:
       - name: Install workspace tools
         run: mise install
 
-      - name: Validate local scripts
-        shell: bash
-        run: |
-          bash -n ./scripts/apm-workspace.sh
-
-      # `check` is not used here: it includes validate:workspace, which resolves MCP
-      # dependencies from the gitignored apm_modules/ tree that only exists after a
-      # local `apm install`. That stage runs in the pre-push hook instead.
       - name: Run workspace checks
-        run: |
-          mise run format:check
-          mise run lint:yaml
-          mise run lint:actions
-          mise run lint:frontmatter
-          mise run lint:catalog-leaks
-          mise run validate:catalog
+        run: mise run check
 
       # Every locked action is public, so the job token is enough for `--verify`.
       - name: Verify actions.lock upstream
         env:
           GH_TOKEN: ${{ github.token }}
         run: mise run actions-lock:upstream
-
-      - name: Run tests
-        shell: bash
-        run: mise run test

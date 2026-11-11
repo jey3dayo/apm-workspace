@@ -54,6 +54,7 @@ run = [
 
 ["format:check"]
 description = "Check workspace docs and manifest formatting"
+hide = true
 depends = [
   "format:markdown:bold-headings:check",
   "format:markdown:check",

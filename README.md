@@ -41,12 +41,13 @@ cd ~/src/github.com/jey3dayo/apm-workspace
 mise bootstrap       # first machine setup
 ```
 
-| Intent                      | Command                                                                   |
-| --------------------------- | ------------------------------------------------------------------------- |
-| Validate without deployment | `mise run check`                                                          |
-| Run deep checks             | `mise run verify`                                                         |
-| Inspect deployed state      | `mise run doctor`                                                         |
-| Roll out a pushed commit    | `mise run native:sync` (or `mise run native:sync -- --https` without SSH) |
+| Intent                   | Command                                                                   |
+| ------------------------ | ------------------------------------------------------------------------- |
+| Validate without rollout | `mise run check`                                                          |
+| Format workspace files   | `mise run format`                                                         |
+| Roll out a pushed commit | `mise run native:sync` (or `mise run native:sync -- --https` without SSH) |
+
+For deployed-state and learning-intake diagnostics, run the hidden `mise run doctor` task.
 
 The real HOME is native. The legacy writer (`deploy`, `apply`, `upgrade`,
 `refresh` and their helper tasks) was removed on 2026-11-10; its last version

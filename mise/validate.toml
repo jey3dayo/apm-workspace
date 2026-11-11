@@ -7,7 +7,3 @@ run = "bash ./scripts/apm-workspace.sh validate"
 description = "Fail when the managed catalog package is not normalized or missing required assets"
 hide = true
 run = "bash ./scripts/apm-workspace.sh validate:catalog"
-
-["validate"]
-description = "Validate the authoring checkout and managed catalog wiring"
-depends = ["validate:workspace", "validate:catalog"]

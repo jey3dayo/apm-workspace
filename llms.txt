@@ -20,7 +20,7 @@ It owns the global manifest (`apm.yml`), the lockfile (`apm.lock.yaml`), the cac
 
 - Edit personal skills in `catalog/.apm/skills/**`, copied skills in `manual-skills/**`, shared guidance in `catalog/**`.
 - `private-skills/**` is gitignored here; its source of truth is a private repo.
-- Add or remove external skills by editing the root `apm.yml` in the checkout, then roll out with section B. Do not run `apm install -g` / `apm uninstall -g` for this: on the native HOME they write the consumer `~/.apm` and the real HOME, not the checkout, and the next native rollout drops the change. No task re-resolves the root `apm.lock.yaml`: when you change a SHA pin in `apm.yml`, update the pinned entries of `apm.lock.yaml` to the same commits (or revert the pin), and review the lock with `mise run lock:diff`.
+- Add or remove external skills by editing the root `apm.yml` in the checkout, then roll out with section B. Do not run `apm install -g` / `apm uninstall -g` for this: on the native HOME they write the consumer `~/.apm` and the real HOME, not the checkout, and the next native rollout drops the change. No task re-resolves the root `apm.lock.yaml`: when you change a SHA pin in `apm.yml`, update the pinned entries of `apm.lock.yaml` to the same commits (or revert the pin), then review the raw lock diff with `git diff apm.lock.yaml`.
 - Never edit `apm_modules/` or deployed targets in place.
 - The `apm` version is pinned in `mise.toml`; read it there instead of trusting a quoted version.
-- Roll out with section B of `docs/native-distribution.md` (`native:*`); run `mise run check` before pushing.
+- Roll out with section B of `docs/native-distribution.md`; run `mise run check` before pushing.
