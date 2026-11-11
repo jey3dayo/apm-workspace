@@ -146,7 +146,7 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
 
 ## Task Selection
 
-- The real HOME is native (`~/.apm/apm.yml` starts with `# Rendered by scripts/native.sh`). The legacy writer (`deploy`, `apply`, `upgrade`, `refresh` and their helper tasks) was removed on 2026-11-10; its last version is commit `0bcce09`. Roll out with `docs/native-distribution.md` section B (`native:plan` → `native:backup` → `native:rehearse --migrate` → `native:migrate`); `native:migrate-rollback` undoes it.
+- The real HOME is native (`~/.apm/apm.yml` starts with `# Rendered by scripts/native.sh`). The legacy writer (`deploy`, `apply`, `upgrade`, `refresh` and their helper tasks) was removed on 2026-11-10; its last version is commit `0bcce09`. Roll out only with `mise run native:sync`; `docs/native-distribution.md` section B describes its internal stages and the direct rollback command it prints.
 - Run `mise run check` before a rollout. It performs formatting checks, all linters, offline action-lock verification, workspace and catalog validation, and the full Bats suite.
 - Run the hidden `mise run doctor` task for read-only workspace and deployed-state diagnostics, including learning-intake reports.
 - No task refreshes upstream dependencies or regenerates `apm.lock.yaml`; this is an open item in `docs/package-decisions.md`.
@@ -183,7 +183,6 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
   package as the source of truth and select it in the consuming repository with
   `apm install <package-ref> --skill <id>`.
 - If the request is to scan an arbitrary repository and create, update, or clean up its repo-local `apm.yml`, read `references/repo-manifest.md`.
-- If the request is to add an MCP server through APM, apply the same scope rule: record cross-repo foundation MCPs under `dependencies.mcp` in the root `apm.yml` (Fast Path 6), noting that native distribution installs with `--only apm` and does not deliver it; use repo-local `apm install --mcp <name> ...` for project, framework, UI, database, browser, or app-runtime-specific MCPs.
 - If the APM workspace has no repo-local MCP distribution lane for a target repository, record the intended placement as guidance and keep the global manifest lightweight. Treat implementing repo-local MCP distribution as a separate workspace-mechanics task.
 - If the request is "change only workspace docs or notes", edit the workspace files directly and do not restage the catalog unless `catalog/**` changed too.
 
@@ -259,7 +258,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
 4. Shared guidance changed:
    - edit `catalog/**`
    - run `mise run check`
-   - review the diff, commit and push, then roll the pushed SHA out with section B (`native:plan -- --source-ref <SHA>` first)
+   - review the diff, commit and push, then roll the pushed SHA out with `mise run native:sync`
 
 5. Upstream refresh:
    - no task re-resolves the root `apm.lock.yaml` (`upgrade` and `deploy:pins` were removed); do not run `apm update -g` or `apm install -g` as a substitute. Update the pinned entries of `apm.lock.yaml` to the same commits as the pin in `apm.yml` (or revert the pin)
@@ -267,7 +266,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
      `references/rollout-fast-paths.md`
    - if the manifest contains `gist.github.com/...#<sha>`, verify its regenerated `apm.lock.yaml` record as the gist Guardrail describes (the shortened `owner/<gist-id>` `repo_url` is the accepted form) before rollout
    - confirm the target dependency's `resolved_commit` and the deployed file's hash
-     before calling the refresh done; a zero exit from `native:migrate` is not evidence the pin moved
+     before calling the refresh done; a zero exit from the migration stage is not evidence the pin moved
    - review `apm.lock.yaml` before commit with `git diff apm.lock.yaml`
    - the upstream skill content a refresh or pin bump accepts makes it a
      non-trivial change for `ship`'s independent review, even when `apm.yml`
@@ -278,7 +277,6 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
      `global-dependency`, `private`, or `manual` before installing;
      `global-catalog` is not an install lane — create the skill via
      Fast Path 2 instead
-   - for global dependencies, edit the root `apm.yml` in the checkout (a package under `dependencies.apm`, an MCP server under `dependencies.mcp`); native distribution installs with `--only apm` and does not deliver `dependencies.mcp`, so leave the host MCP config as it is and report that the server was recorded but not delivered (boundary table in `docs/native-distribution.md`); do not run `apm install -g` or `apm install -g --mcp`: on the native HOME they write the consumer `~/.apm` and the real HOME, and the next native rollout drops the change. No task records a lock entry for a new dependency; report that as the open item in `docs/package-decisions.md` (2026-11-10)
    - if someone already ran a bare `apm install -g`, it did not save and restore the agmsg roster links; follow the agmsg State section of the checkout's `AGENTS.md`, diagnosing with `mise run doctor` before any restore
    - for repo-local dependencies, work in the target repository and use `apm install <package-ref>` or `apm install --mcp <name> ...`
    - for global changes, run `mise run check`, then roll out with section B; for repo-local changes, run that repository's defined APM or project checks

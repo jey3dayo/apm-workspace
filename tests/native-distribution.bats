@@ -12,6 +12,8 @@
 
 bats_require_minimum_version 1.5.0
 
+load 'native-test-helpers'
+
 # docs/native-distribution.md was written against this release; bump it only after re-checking the docs.
 EXPECTED_APM_VERSION=0.35.0
 FIXTURE_URL=https://fixture.invalid/fixture-owner/apm-workspace.git
@@ -192,25 +194,6 @@ build_source_repo() {
   export SOURCE_REPO SOURCE_SHA
 }
 
-apply_workspace() {
-  native "$1" apply --home "$1" --source-ref "$SOURCE_SHA" --workspace-only
-}
-
-# Everything apm can touch except caches and receipts (receipt names derive from the HOME path).
-home_snapshot() {
-  (cd "$1" && find . \( -path ./.apm/apm_modules -o -path ./.apm/deployment-receipts -o -path ./.cache -o -path ./Library \) -prune -o \
-    \( -type f -o -type l \) -print | LC_ALL=C sort | while IFS= read -r f; do
-    if [ -L "$f" ]; then printf '%s -> %s\n' "$f" "$(readlink "$f")"; else printf '%s %s\n' "$f" "$(git hash-object "$f")"; fi
-  done)
-}
-
-skill_ids() {
-  local dir
-  for dir in "$REPO_ROOT"/catalog/.apm/skills/*/ "$REPO_ROOT"/manual-skills/.apm/skills/*/; do
-    basename "$dir"
-  done
-}
-
 # The guide as the script writes it into a root, taken from the script's own function.
 catalog_guide_body() {
   APM_WORKSPACE_DIR="$REPO_ROOT" /bin/bash -c '. "$1" && catalog_instructions_body "$(tracked_catalog_instructions_path)"' _ "$REPO_ROOT/scripts/apm-workspace.sh"
@@ -251,6 +234,16 @@ sentinel_snapshot() {
   [ "$(find "$home" "$SOURCE_REPO" | LC_ALL=C sort)" = "$before" ]
 }
 
+@test "removed apply, opencode and reinstate commands are unknown" {
+  local home command
+  home="$(new_home removed-commands)"
+  for command in apply opencode reinstate; do
+    run native "$home" "$command"
+    [ "$status" -eq 2 ]
+    [[ "$output" == *"unknown native command: $command"* ]]
+  done
+}
+
 @test "render pins catalog and manual-skills by SHA, converts yomiyasu to the structured form, and keeps every other external dependency and MCP server" {
   local home rendered yomiyasu_sha
   home="$(new_home render)"
@@ -282,15 +275,13 @@ sentinel_snapshot() {
 
   rendered="$(native "$home" render --source-ref "$SOURCE_SHA" --workspace-only)"
   [ "$(grep -c '^    - ' <<<"$rendered")" -eq 2 ]
-  [ "$(grep -c '^  mcp:' <<<"$rendered")" -eq 0 ]
   [ "$(grep -c 'xecutables' <<<"$rendered")" -eq 0 ]
 }
 
 @test "render fails when a listed external or executable package is missing from apm.yml, and --workspace-only does not need it" {
   local home repo="$FX/render-repo"
   home="$(new_home render-missing)"
-  mkdir -p "$repo/scripts"
-  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
+  copy_native_runtime "$REPO_ROOT" "$repo"
   grep -v 'nanaism/yomiyasu' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
   run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA"
   [ "$status" -ne 0 ]
@@ -309,8 +300,7 @@ sentinel_snapshot() {
 @test "render refuses unsupported executable grants and duplicate approvals" {
   local home repo="$FX/render-exec-invalid"
   home="$(new_home render-exec-invalid)"
-  mkdir -p "$repo/scripts"
-  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
+  copy_native_runtime "$REPO_ROOT" "$repo"
   sed 's/bin: true/hooks: true/' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
   run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA"
   [ "$status" -ne 0 ]
@@ -325,8 +315,7 @@ sentinel_snapshot() {
 @test "render rejects removal of a required bin approval while its dependency remains" {
   local home repo="$FX/render-exec-missing"
   home="$(new_home render-exec-missing)"
-  mkdir -p "$repo/scripts"
-  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
+  copy_native_runtime "$REPO_ROOT" "$repo"
   awk '/^    github[.]com\/ibelick\/ui-skills:$/ { skip=1; next } skip { skip=0; next } { print }' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
   grep -q '^    - git: ibelick/ui-skills$' "$repo/apm.yml"
   run fixture_exec "$home" /bin/bash "$repo/scripts/native.sh" render --source-ref "$SOURCE_SHA"
@@ -337,8 +326,7 @@ sentinel_snapshot() {
 @test "render rejects quoted legacy approval keys for normal and workspace-only installs" {
   local home repo="$FX/render-exec-quoted" mode
   home="$(new_home render-exec-quoted)"
-  mkdir -p "$repo/scripts"
-  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
+  copy_native_runtime "$REPO_ROOT" "$repo"
   cp "$REPO_ROOT/apm.yml" "$repo/apm.yml"
   printf '"allowExecutables": {github.com/fujibee/agmsg: {bin: true}}\n' >>"$repo/apm.yml"
   for mode in normal workspace-only; do
@@ -355,8 +343,7 @@ sentinel_snapshot() {
 @test "render rejects duplicate flow and anchored executable approvals in both modes" {
   local home repo="$FX/render-exec-flow" mode form
   home="$(new_home render-exec-flow)"
-  mkdir -p "$repo/scripts"
-  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
+  copy_native_runtime "$REPO_ROOT" "$repo"
   for form in flow anchor; do
     cp "$REPO_ROOT/apm.yml" "$repo/apm.yml"
     if [ "$form" = flow ]; then
@@ -376,115 +363,6 @@ sentinel_snapshot() {
   done
 }
 
-@test "apply stops when the manifest cannot be rendered, before it writes the manifest or starts apm" {
-  local home repo="$FX/apply-render-repo" stub="$FX/apply-render-stub"
-  home="$(new_home apply-render-fails)"
-  mkdir -p "$repo/scripts"
-  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
-  cp "$REPO_ROOT/scripts/native-home.py" "$repo/scripts/native-home.py"
-  grep -v 'fujibee/agmsg' "$REPO_ROOT/apm.yml" >"$repo/apm.yml"
-  printf '#!/bin/sh\ntouch "%s/apm-ran"\n' "$home" >"$stub"
-  chmod +x "$stub"
-  run fixture_exec "$home" /usr/bin/env APM_BIN="$stub" /bin/bash "$repo/scripts/native.sh" apply --home "$home" --source-ref "$SOURCE_SHA"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"valid bin-only executable approvals"* ]]
-  [ ! -e "$home/apm-ran" ]
-  [ ! -e "$home/.apm/apm.yml" ]
-}
-
-@test "apply refuses a missing HOME or ref, the account HOME, its ancestors and its tool state, before writing" {
-  local home account
-  home="$(new_home refuse)"
-  account="$(cd "$(eval "printf '%s' ~$(id -un)")" && pwd -P)"
-  run native "$home" apply --source-ref "$SOURCE_SHA"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"needs --home"* ]]
-  run native "$home" apply --home "$home"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"needs --source-ref"* ]]
-  run native "$home" apply --home "$account" --source-ref "$SOURCE_SHA"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"account's HOME"* ]]
-  run native "$home" apply --home / --source-ref "$SOURCE_SHA"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"account's HOME"* ]]
-  if [ -d "$account/.claude" ]; then
-    run native "$home" apply --home "$account/.claude" --source-ref "$SOURCE_SHA"
-    [ "$status" -ne 0 ]
-    [[ "$output" == *"is inside"* ]]
-  fi
-  [ ! -e "$home/.apm" ]
-}
-
-@test "apply deploys every workspace skill to Claude and agent-skills, agents to Claude and Cursor only, and both compiled roots" {
-  local home id agent name
-  home="$(new_home deploy)"
-  run apply_workspace "$home"
-  [ "$status" -eq 0 ]
-  while IFS= read -r id; do
-    for dir in "$REPO_ROOT"/catalog/.apm/skills "$REPO_ROOT"/manual-skills/.apm/skills; do
-      [ -f "$dir/$id/SKILL.md" ] || continue
-      cmp "$dir/$id/SKILL.md" "$home/.claude/skills/$id/SKILL.md"
-      cmp "$dir/$id/SKILL.md" "$home/.agents/skills/$id/SKILL.md"
-    done
-  done < <(skill_ids)
-  for agent in "$REPO_ROOT"/catalog/.apm/agents/*.agent.md; do
-    name="$(basename "$agent" .agent.md)"
-    [ -f "$home/.claude/agents/$name.md" ]
-    [ -f "$home/.cursor/agents/$name.md" ]
-  done
-  [ ! -e "$home/.codex/agents" ]
-  head -n 1 "$home/.codex/AGENTS.md" | grep -qF '<!-- Generated by APM CLI from .apm/ primitives -->'
-  head -n 1 "$home/.cursor/AGENTS.md" | grep -qF '<!-- Generated by APM CLI from .apm/ primitives -->'
-  grep -qF '# AI 開発協働ガイド' "$home/.codex/AGENTS.md"
-  grep -q "resolved_commit: $SOURCE_SHA" "$home/.apm/apm.lock.yaml"
-}
-
-@test "rerunning apply changes nothing, and files apm does not own survive both runs" {
-  local home first
-  home="$(new_home rerun)"
-  seed_sentinels "$home"
-  local sentinels
-  sentinels="$(sentinel_snapshot "$home")"
-  apply_workspace "$home"
-  first="$(home_snapshot "$home")"
-  apply_workspace "$home"
-  [ "$(home_snapshot "$home")" = "$first" ]
-  [ "$(sentinel_snapshot "$home")" = "$sentinels" ]
-  [ -z "$(compgen -G "$home/.apm/apm.yml.*.bak" || true)" ]
-}
-
-@test "apply stops before writing when a compiled root was edited after compile" {
-  local home before
-  home="$(new_home edited)"
-  apply_workspace "$home"
-  echo "local edit" >>"$home/.codex/AGENTS.md"
-  before="$(home_snapshot "$home")"
-  run apply_workspace "$home"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *".codex/AGENTS.md"* ]]
-  [ "$(home_snapshot "$home")" = "$before" ]
-}
-
-@test "apply keeps a differing manifest as a .bak before replacing it" {
-  local home
-  home="$(new_home backup)"
-  mkdir -p "$home/.apm"
-  printf 'name: earlier\nversion: 0.0.1\n' >"$home/.apm/apm.yml"
-  apply_workspace "$home"
-  run cat "$home"/.apm/apm.yml.*.bak
-  [ "$output" = $'name: earlier\nversion: 0.0.1' ]
-  grep -q "ref: $SOURCE_SHA" "$home/.apm/apm.yml"
-
-  # Compared byte for byte: a manifest that differs only in trailing newlines is kept too.
-  home="$(new_home backup-newline)"
-  mkdir -p "$home/.apm"
-  native "$home" render --source-ref "$SOURCE_SHA" --workspace-only >"$home/.apm/apm.yml"
-  printf '\n' >>"$home/.apm/apm.yml"
-  apply_workspace "$home"
-  [ "$(compgen -G "$home/.apm/apm.yml.*.bak" | wc -l | tr -d ' ')" -eq 1 ]
-}
-
 @test "every catalog file APM does not deploy is listed in the manual distribution table" {
   local f missing=""
   while IFS= read -r f; do
@@ -495,129 +373,6 @@ sentinel_snapshot() {
     return 1
   }
 }
-
-@test "apply refuses a HOME whose write targets link outside it, before writing through them" {
-  local home outside="$FX/outside"
-  mkdir -p "$outside/apm-dir" "$outside/ship"
-  home="$(new_home link-apm)"
-  ln -s "$outside/apm-dir" "$home/.apm"
-  run apply_workspace "$home"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"$home/.apm -> $outside/apm-dir"* ]]
-  [ -z "$(ls -A "$outside/apm-dir")" ]
-
-  home="$(new_home link-root)"
-  mkdir -p "$home/.codex"
-  ln -s "$outside/root.md" "$home/.codex/AGENTS.md"
-  run apply_workspace "$home"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"$home/.codex/AGENTS.md (broken)"* ]]
-  [ ! -e "$outside/root.md" ]
-
-  # Any depth counts: apm resolves cache paths such as Library/Caches/apm, not only the deploy roots.
-  home="$(new_home link-deep)"
-  mkdir -p "$home/Library/Caches" "$home/.claude/skills"
-  ln -s "$outside/ship" "$home/Library/Caches/apm"
-  ln -s "$outside/ship" "$home/.claude/skills/ship"
-  run apply_workspace "$home"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"$home/Library/Caches/apm -> $outside/ship"* ]]
-  [[ "$output" == *"$home/.claude/skills/ship -> $outside/ship"* ]]
-  [ -z "$(ls -A "$outside/ship")" ]
-  [ ! -e "$home/.apm" ]
-}
-
-@test "apply hides APM_CACHE_DIR and XDG locations from apm, which would otherwise write there" {
-  local home var
-  # Positive controls, one variable each: apm itself follows them out of HOME.
-  for var in APM_CACHE_DIR XDG_CACHE_HOME; do
-    home="$(new_home "control-$var")"
-    mkdir -p "$home/.apm"
-    native "$home" render --source-ref "$SOURCE_SHA" --workspace-only >"$home/.apm/apm.yml"
-    fixture_exec "$home" /usr/bin/env "$var=$FX/leak/control-$var" "$APM_BIN" install -g >/dev/null 2>&1 || true
-    [ -n "$(ls -A "$FX/leak/control-$var" 2>/dev/null)" ]
-  done
-
-  home="$(new_home env-apply)"
-  fixture_exec "$home" /usr/bin/env APM_CACHE_DIR="$FX/leak/apply-apm" XDG_CACHE_HOME="$FX/leak/apply-xdg" \
-    XDG_CONFIG_HOME="$FX/leak/apply-config" /bin/bash "$REPO_ROOT/scripts/native.sh" \
-    apply --home "$home" --source-ref "$SOURCE_SHA" --workspace-only
-  [ ! -e "$FX/leak/apply-apm" ]
-  [ ! -e "$FX/leak/apply-xdg" ]
-  [ ! -e "$FX/leak/apply-config" ]
-  [ -f "$home/.claude/skills/ship/SKILL.md" ]
-}
-
-@test "apply refuses hard-linked write targets and a temp_dir override, and leaves the linked file alone" {
-  local home outside="$FX/outside-hardlink"
-  mkdir -p "$outside"
-  printf 'real manifest\n' >"$outside/apm.yml"
-  home="$(new_home hardlink)"
-  mkdir -p "$home/.apm"
-  ln "$outside/apm.yml" "$home/.apm/apm.yml"
-  run apply_workspace "$home"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"$home/.apm/apm.yml (hard link)"* ]]
-  [ "$(cat "$outside/apm.yml")" = "real manifest" ]
-
-  # Escaped the way JSON allows, so only a decoder sees the key apm reads.
-  home="$(new_home temp-dir-config)"
-  mkdir -p "$home/.apm"
-  printf '{"default_client": "vscode", "temp\\u005fdir": "%s"}\n' "$outside" >"$home/.apm/config.json"
-  run apply_workspace "$home"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"sets temp_dir"* ]]
-  [ ! -e "$home/.apm/apm.yml" ]
-}
-
-@test "apm sees only the allowlisted environment, with TMPDIR inside the HOME" {
-  local home stub="$FX/stub-apm"
-  home="$(new_home env-stub)"
-  printf '#!/bin/sh\nenv >>"$HOME/apm-env.log"\n' >"$stub"
-  chmod +x "$stub"
-  fixture_exec "$home" /usr/bin/env APM_BIN="$stub" TMPDIR="$FX/caller-tmp" APM_CACHE_DIR="$FX/caller-cache" \
-    XDG_STATE_HOME="$FX/caller-state" GITHUB_TOKEN=fixture-token /bin/bash "$REPO_ROOT/scripts/native.sh" \
-    apply --home "$home" --source-ref "$SOURCE_SHA" --workspace-only
-  # One block per apm call (install, compile).
-  [ "$(grep -c '^HOME=' "$home/apm-env.log")" -eq 2 ]
-  [ "$(grep -c "^TMPDIR=$home/.cache/apm-native-tmp\$" "$home/apm-env.log")" -eq 2 ]
-  [ "$(grep -cE '^(APM_CACHE_DIR|XDG_STATE_HOME|GITHUB_TOKEN)=' "$home/apm-env.log")" -eq 0 ]
-  # ssh would otherwise read its config from, and add host keys to, the account HOME.
-  [ "$(grep -c "^GIT_SSH_COMMAND=ssh -F /dev/null -o UserKnownHostsFile=$home/.ssh/known_hosts" "$home/apm-env.log")" -eq 2 ]
-}
-
-@test "apply refuses a HOME path that ssh would split, before apm runs" {
-  local parent stub="$FX/stub-apm-ssh-split" dir
-  parent="$(new_home ssh-split)"
-  printf '#!/bin/sh\ntouch "%s/apm-ran"\n' "$parent" >"$stub"
-  chmod +x "$stub"
-  for dir in "$parent/native home" "$parent/quote\"home" "$parent/back\\home"; do
-    mkdir -p "$dir"
-    run fixture_exec "$parent" /usr/bin/env APM_BIN="$stub" /bin/bash "$REPO_ROOT/scripts/native.sh" \
-      apply --home "$dir" --source-ref "$SOURCE_SHA" --workspace-only
-    [ "$status" -ne 0 ]
-    [[ "$output" == *"ssh would split"* ]]
-    [ -z "$(ls -A "$dir")" ]
-  done
-  [ ! -e "$parent/apm-ran" ]
-}
-
-@test "a lone carriage return inserted into a compiled root counts as an edit, as it does for APM" {
-  local home
-  home="$(new_home edited-cr)"
-  apply_workspace "$home"
-  python3 - "$home/.codex/AGENTS.md" <<'PY'
-import sys
-p = sys.argv[1]
-data = open(p, "rb").read()
-i = data.index(b"# AI")
-open(p, "wb").write(data[: i + 4] + b"\r" + data[i + 4 :])
-PY
-  run apply_workspace "$home"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *".codex/AGENTS.md"* ]]
-}
-
 
 # backup and rehearse accept the account's own HOME; the fixture HOME stands in for it through APM_NATIVE_ACCOUNT_HOME.
 real_native() {
@@ -653,40 +408,6 @@ seed_agmsg() {
     echo "$name store" >"$home/.local/state/agmsg/$name/keep"
     ln -s "$home/.local/state/agmsg/$name" "$home/.agents/skills/agmsg/$name"
   done
-}
-
-@test "apply --real-home is blocked with or without a backup, as is --home inside the account HOME under the test override, and writes nothing" {
-  local home before listing backup="$FX/backups/blocked" surface=""
-  for surface in .cache .config .local; do
-    surface="$(eval "printf '%s' ~$(id -un)")/$surface"
-    [ -d "$surface" ] && break
-  done
-  home="$(new_home real-blocked)"
-  seed_sentinels "$home"
-  before="$(backed_up_snapshot "$home")"
-  listing="$(find "$home" | LC_ALL=C sort)"
-
-  run real_native "$home" apply --real-home --source-ref "$SOURCE_SHA" --workspace-only
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"blocked"* ]]
-  [[ "$output" == *"docs/native-distribution.md"* ]]
-  [ "$(backed_up_snapshot "$home")" = "$before" ]
-  [ "$(find "$home" | LC_ALL=C sort)" = "$listing" ]
-
-  real_native "$home" backup --real-home --backup-dir "$backup"
-  listing="$(find "$home" | LC_ALL=C sort)"
-  run real_native "$home" apply --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"blocked"* ]]
-  [[ "$output" == *"docs/native-distribution.md"* ]]
-
-  run real_native "$home" apply --home "$surface" --source-ref "$SOURCE_SHA" --workspace-only
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"is inside"* ]]
-
-  [ "$(backed_up_snapshot "$home")" = "$before" ]
-  [ "$(find "$home" | LC_ALL=C sort)" = "$listing" ]
-  [ ! -e "$home/.apm/apm.yml" ]
 }
 
 @test "backup copies the backed-up paths and the agmsg store, refuses to overwrite, and a clean rehearse loses nothing" {
@@ -910,34 +631,6 @@ prepare_migrate() {
     real_native_with_stub "$M_HOME" "$stub" rehearse --real-home --backup-dir "$M_BACKUP" --source-ref "$SOURCE_SHA" --workspace-only --migrate
   fi
   M_REHEARSAL="$(dirname "$(compgen -G "$M_BACKUP/rehearsal-*/result.txt")")"
-}
-
-@test "reinstate copies an entry that left its root, keeps a link inside the root, and never overwrites what the root already has" {
-  local home bak stamp=20261109T000000Z
-  home="$(new_home reinstate)"
-  bak="$home/.claude/skills.bak-$stamp"
-  mkdir -p "$bak/kept" "$bak/existing" "$home/src/outside-skill" "$home/.claude/skills/existing"
-  echo "kept" >"$bak/kept/SKILL.md"
-  echo "old existing" >"$bak/existing/SKILL.md"
-  echo "new existing" >"$home/.claude/skills/existing/SKILL.md"
-  echo "outside" >"$home/src/outside-skill/SKILL.md"
-  ln -s "$home/src/outside-skill" "$bak/outside-link"
-  ln -s ../../src/outside-skill "$bak/relative-outside-link"
-  ln -s ./kept "$bak/inner-link"
-  ln -s "$home/.claude/skills/kept" "$bak/absolute-inner-link"
-  local before
-  before="$(roots_snapshot "$home" ".bak-$stamp")"
-
-  real_native "$home" reinstate --real-home --stamp "$stamp"
-  [ ! -L "$home/.claude/skills/outside-link" ]
-  [ "$(cat "$home/.claude/skills/outside-link/SKILL.md")" = "outside" ]
-  [ ! -L "$home/.claude/skills/relative-outside-link" ]
-  [ "$(cat "$home/.claude/skills/relative-outside-link/SKILL.md")" = "outside" ]
-  [ "$(readlink "$home/.claude/skills/inner-link")" = "./kept" ]
-  [ "$(readlink "$home/.claude/skills/absolute-inner-link")" = "$home/.claude/skills/kept" ]
-  [ "$(cat "$home/.claude/skills/kept/SKILL.md")" = "kept" ]
-  [ "$(cat "$home/.claude/skills/existing/SKILL.md")" = "new existing" ]
-  [ "$(roots_snapshot "$home" ".bak-$stamp")" = "$before" ]
 }
 
 @test "a failure to restore the untouched files does not skip the rollback of the roots or the agmsg restore" {
@@ -1222,8 +915,8 @@ prepare_migrate() {
   [ -z "$(compgen -G "$FX/backups/migrate-store-2/rehearsal-*" || true)" ]
 }
 
-@test "a rehearsal or migrate with another --workspace-only than the previous manifest stops, and reinstate refuses a .apm link out of the HOME" {
-  local stub="$FX/stub-apm-deploy" home outside
+@test "a rehearsal or migrate with another --workspace-only than the previous manifest stops" {
+  local stub="$FX/stub-apm-deploy"
   write_deploy_stub "$stub"
   prepare_migrate migrate-mode "$stub"
   mkdir -p "$M_HOME/.apm"
@@ -1236,15 +929,6 @@ prepare_migrate() {
   run real_native_with_stub "$M_HOME" "$stub" rehearse --real-home --backup-dir "$FX/backups/migrate-mode-2" --source-ref "$SOURCE_SHA" --workspace-only --migrate
   [ "$status" -ne 0 ]
   [[ "$output" == *"rendered with workspace_only=0"* ]]
-
-  home="$(new_home reinstate-apm-link)"
-  outside="$FX/reinstate-apm-outside"
-  mkdir -p "$outside" "$home/.claude/skills.bak-20261109T000000Z/a"
-  ln -s "$outside" "$home/.apm"
-  run real_native "$home" reinstate --real-home --stamp 20261109T000000Z
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"$home/.apm"* ]]
-  [ -z "$(ls -A "$outside")" ]
 }
 
 # A HOME whose ~/.apm is a native consumer: apm.yml rendered by native.sh, no checkout.
@@ -1303,54 +987,6 @@ seed_native_consumer_home() {
     [[ "$output" != *"removed the broken link"* ]]
   done
   [ -z "$(compgen -G "$backup/rehearsal-*")" ]
-}
-
-@test "reinstate fails on a broken link and lists it, before it copies anything" {
-  local home bak stamp=20261109T000001Z
-  home="$(new_home reinstate-broken)"
-  bak="$home/.agents/skills.bak-$stamp"
-  mkdir -p "$bak/kept"
-  echo "kept" >"$bak/kept/SKILL.md"
-  ln -s "$home/src/gone" "$bak/dangling"
-  run real_native "$home" reinstate --real-home --stamp "$stamp"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"$bak/dangling -> $home/src/gone"* ]]
-  [ ! -e "$home/.agents/skills" ]
-
-  run real_native "$home" reinstate --real-home --stamp 20250101T000000Z
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"no <root>.bak-20250101T000000Z"* ]]
-}
-
-@test "reinstate refuses a root or tool directory that links outside the HOME, and writes nothing there" {
-  local home outside="$FX/outside-reinstate" stamp=20261109T000002Z
-  mkdir -p "$outside/skills" "$outside/claude"
-  home="$(new_home reinstate-outside)"
-  mkdir -p "$home/.claude"
-  ln -s "$outside/skills" "$home/.claude/skills"
-  mkdir -p "$home/.claude/skills.bak-$stamp/kept"
-  echo kept >"$home/.claude/skills.bak-$stamp/kept/SKILL.md"
-  run native "$home" reinstate --home "$home" --stamp "$stamp"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"$home/.claude/skills -> $outside/skills"* ]]
-  [ -z "$(ls -A "$outside/skills")" ]
-
-  # An ancestor, and a backup that is a link leaving the HOME.
-  home="$(new_home reinstate-outside-ancestor)"
-  ln -s "$outside/claude" "$home/.claude"
-  mkdir -p "$outside/claude/skills.bak-$stamp/kept"
-  run native "$home" reinstate --home "$home" --stamp "$stamp"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"$home/.claude -> $outside/claude"* ]]
-  [ ! -e "$outside/claude/skills" ]
-
-  home="$(new_home reinstate-outside-bak)"
-  mkdir -p "$home/.claude/skills" "$outside/bak/kept"
-  ln -s "$outside/bak" "$home/.claude/skills.bak-$stamp"
-  run native "$home" reinstate --home "$home" --stamp "$stamp"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"skills.bak-$stamp -> $outside/bak"* ]]
-  [ -z "$(ls -A "$home/.claude/skills")" ]
 }
 
 @test "rehearse --migrate is clean when only a .apm-pin disappears, and reports it apart from the lost files" {
@@ -1426,7 +1062,7 @@ seed_native_consumer_home() {
   [ "$(cat "$(dirname "$result")/lost.txt")" = "$(printf '.agents/skills/agmsg/bin\n.agents/skills/agmsg/bin/agmsg.js')" ]
 }
 
-@test "apply, rehearse and migrate stop when <HOME>/apm.yml exists, because apm would read its executable approvals instead, before apm runs" {
+@test "rehearse and migrate stop when <HOME>/apm.yml exists, because apm would read its executable approvals instead, before apm runs" {
   local home backup="$FX/backups/home-manifest" stub="$FX/stub-apm-home-manifest"
   printf '#!/bin/sh\ntouch "$HOME/apm-ran"\n' >"$stub"
   chmod +x "$stub"
@@ -1435,9 +1071,6 @@ seed_native_consumer_home() {
   real_native "$home" backup --real-home --backup-dir "$backup"
   echo "name: stray" >"$home/apm.yml"
 
-  run fixture_exec "$home" /usr/bin/env APM_BIN="$stub" /bin/bash "$REPO_ROOT/scripts/native.sh" apply --home "$home" --source-ref "$SOURCE_SHA" --workspace-only
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"$home/apm.yml exists"* ]]
   run real_native_with_stub "$home" "$stub" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only --migrate
   [ "$status" -ne 0 ]
   [[ "$output" == *"$home/apm.yml exists"* ]]
@@ -1454,14 +1087,10 @@ seed_native_consumer_home() {
   [ ! -e "$home/apm-ran" ]
 }
 
-@test "apply passes --trust-bin to install only, in apply, rehearse and migrate alike" {
+@test "rehearse and migrate pass --trust-bin to install only" {
   local home stub="$FX/stub-apm-args"
   printf '#!/bin/sh\necho "$*" >>"$HOME/apm-args.log"\n' >"$stub"
   chmod +x "$stub"
-  home="$(new_home trust-bin-args)"
-  fixture_exec "$home" /usr/bin/env APM_BIN="$stub" /bin/bash "$REPO_ROOT/scripts/native.sh" apply --home "$home" --source-ref "$SOURCE_SHA" --workspace-only
-  [ "$(cat "$home/apm-args.log")" = "$(printf 'install -g --only apm --trust-bin\ncompile -g --clean')" ]
-
   home="$(new_home trust-bin-args-migrate)"
   seed_migrate_home "$home"
   real_native "$home" backup --real-home --backup-dir "$FX/backups/trust-bin-args"
@@ -1472,49 +1101,6 @@ seed_native_consumer_home() {
   [ "$(grep -c '^compile -g --clean$' "$home/apm-args.log")" -eq 1 ]
   [ "$(grep -c -- '--trust-bin' "$home/apm-args.log")" -eq 1 ]
   [ "$(find "$FX/backups/trust-bin-args"/rehearsal-*/home -name apm-args.log | xargs cat | grep -c -- '--trust-bin')" -eq 1 ]
-}
-
-# A fixture repository served for https://github.com/<owner>/<repo>.git: <skill dir>/SKILL.md and <skill dir>/bin/tool.sh.
-build_github_fixture() {
-  local owner_repo="$1" skill_dir="$2" dir="$FX/src/github/$1"
-  mkdir -p "$dir/$skill_dir/bin"
-  printf -- '---\nname: fixture-skill\ndescription: fixture\n---\nbody\n' >"$dir/$skill_dir/SKILL.md"
-  echo 'echo hi' >"$dir/$skill_dir/bin/tool.sh"
-  fixture_exec "$(new_home author)" /usr/bin/env GIT_TEMPLATE_DIR="$FX/empty-git-template" /bin/sh -c '
-    cd "$1" && git init -q -b main && git add . && git -c user.name=fixture -c user.email=fixture@example.invalid commit -q -m s' sh "$dir"
-  printf '[url "file://%s"]\n\tinsteadOf = https://github.com/%s.git\n' "$dir" "$owner_repo" >>"$FX/gitconfig-github"
-}
-
-@test "apply deploys bin/ for the packages render lists under allowExecutables and not for any other package" {
-  local home repo="$FX/render-bin-repo" entry
-  : >"$FX/gitconfig-github"
-  build_github_fixture fujibee/agmsg .
-  build_github_fixture ibelick/ui-skills .
-  build_github_fixture tt-a1i/archify archify
-  build_github_fixture nanaism/yomiyasu skills/yomiyasu
-  build_github_fixture other/pkg .
-  { printf '[include]\n\tpath = %s\n' "$FX/gitconfig"; cat "$FX/gitconfig-github"; } >"$FX/gitconfig-bin"
-  mkdir -p "$repo/scripts"
-  cp "$REPO_ROOT/scripts/native.sh" "$repo/scripts/native.sh"
-  cp "$REPO_ROOT/scripts/native-home.py" "$repo/scripts/native-home.py"
-  {
-    printf 'name: bin-fixture\nversion: 1.0.0\ntargets:\n  - agent-skills\ndependencies:\n  apm:\n'
-    printf '    - jey3dayo/apm-workspace/catalog#main\n    - jey3dayo/apm-workspace/manual-skills#main\n'
-    for entry in nanaism/yomiyasu/skills/yomiyasu=nanaism/yomiyasu fujibee/agmsg=fujibee/agmsg tt-a1i/archify/archify=tt-a1i/archify other/pkg=other/pkg; do
-      printf '    - %s#%s\n' "${entry%%=*}" "$(git -C "$FX/src/github/${entry##*=}" rev-parse HEAD)"
-    done
-    printf '    - git: ibelick/ui-skills\n      ref: %s\n' "$(git -C "$FX/src/github/ibelick/ui-skills" rev-parse HEAD)"
-    printf 'scripts: {}\nexecutables:\n  allow:\n    github.com/fujibee/agmsg:\n      bin: true\n    github.com/ibelick/ui-skills:\n      bin: true\n    github.com/tt-a1i/archify/archify:\n      bin: true\n'
-  } >"$repo/apm.yml"
-
-  home="$(new_home bin-allow)"
-  run fixture_exec "$home" /usr/bin/env GIT_CONFIG_GLOBAL="$FX/gitconfig-bin" /bin/bash "$repo/scripts/native.sh" apply --home "$home" --source-ref "$SOURCE_SHA"
-  [ "$status" -eq 0 ]
-  [ "$(cd "$home/.agents/skills" && find . -path '*/bin/tool.sh' | LC_ALL=C sort)" = "$(printf './agmsg/bin/tool.sh\n./archify/bin/tool.sh\n./ui-skills/bin/tool.sh')" ]
-  # The other packages' skills are deployed, without their bin/.
-  [ "$(find "$home/.agents/skills" -name SKILL.md | wc -l)" -gt 4 ]
-  grep -qx '  exec_status: gated_pending_approval' "$home/.apm/apm.lock.yaml"
-  grep -qx '  exec_status: deployed' "$home/.apm/apm.lock.yaml"
 }
 
 @test "migrate refuses a HOME whose .apm is a checkout, and a repository inside .apm, before anything is written" {
@@ -1533,8 +1119,7 @@ build_github_fixture() {
   [[ "$output" == *"authoring checkout"* ]]
   rmdir "$home/.apm/catalog"
 
-  mkdir -p "$home/.apm/scripts"
-  cp "$REPO_ROOT/scripts/native.sh" "$home/.apm/scripts/native.sh"
+  copy_native_runtime "$REPO_ROOT" "$home/.apm"
   run fixture_exec "$home" /usr/bin/env APM_NATIVE_ACCOUNT_HOME="$home" /bin/bash "$home/.apm/scripts/native.sh" \
     migrate --real-home --source-ref "$SOURCE_SHA" --rehearsal "$FX/none"
   [ "$status" -ne 0 ]
@@ -1586,7 +1171,7 @@ build_github_fixture() {
 }
 
 @test "migrate keeps what apm does not deploy, leaves config.toml and settings.json alone, and migrate-rollback restores the roots byte for byte" {
-  local stamp original sentinels listing_bak
+  local stamp original sentinels listing_bak rollback_command
   prepare_migrate migrate-roundtrip real
   original="$(roots_snapshot "$M_HOME")"
   sentinels="$(sentinel_snapshot "$M_HOME")"
@@ -1596,7 +1181,8 @@ build_github_fixture() {
   [ "$status" -eq 0 ]
   stamp="$(printf '%s\n' "$output" | tail -n 1)"
   [[ "$stamp" =~ ^[0-9]{8}T[0-9]{6}Z$ ]]
-  [[ "$output" == *"native:migrate-rollback -- --real-home --stamp $stamp"* ]]
+  printf -v rollback_command 'bash %q migrate-rollback %q %q %q' "$REPO_ROOT/scripts/native.sh" --real-home --stamp "$stamp"
+  [[ "$output" == *"$rollback_command"* ]]
   grep -q "ref: $SOURCE_SHA" "$M_HOME/.apm/apm.yml"
 
   # apm deployed the workspace skills; what it does not own came back from the moved-aside roots.

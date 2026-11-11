@@ -58,3 +58,63 @@ scoped `--add-dir` は worktree 作成の代替にならない。workspace-write
 `-a` の有効値は `on-request` と `never` のみ。`on-failure` は存在しない（0.149.1 で確認）。
 
 `writable_roots` に symlink 成分があると Codex は sandbox 構築ごと失敗し、agmsg と無関係なコマンドまで起動前に全拒否される。詳細は上記「writable_roots の symlink fail-closed 検査」を参照。
+
+## linked worktree での workspace-write
+
+**Codex の `workspace-write` sandbox は、linked git worktree 内の `.git` pointer と、その pointer が指す gitdir（main repo の `.git/worktrees/<name>`）を read-only に保護する。** `writable_roots` や `--add-dir` で同じ path を追加しても、この protected-path carveout は解除されない。この設計により、worktree 内の `git add` / `git commit` は git metadata を更新できず失敗する。
+
+### `--add-dir` だけでは回避できない
+
+worktree 固有の gitdir だけを書込可能にできたとしても十分ではない。index は worktree 固有の gitdir にある一方、objects、通常の branch refs、hooks などは `git rev-parse --path-format=absolute --git-common-dir` が返す共有 Git directory にある。従って次の指定だけで `git add` / `git commit` が成功するとは扱わない:
+
+```bash
+codex exec --add-dir "$(git rev-parse --path-format=absolute --git-dir)" -- "<prompt>"
+```
+
+`--path-format=absolute` は path の曖昧さをなくすために必要だが、保護解除の flag ではない。**`codex exec --worktree` も Git metadata の書込権限を追加しない。** `-a never` の sandboxed worker には source edit と検証だけを任せ、差分を確認した host 側の orchestrator が stage / commit する。
+
+参考: [Codex sandbox guide](https://developers.openai.com/codex/sandbox) の「Protected paths in writable roots」、未解決の [GitHub issue #14338](https://github.com/openai/codex/issues/14338)
+
+### 非対話 codex exec での stdin block 回避
+
+非対話モードで `codex exec` を実行する場合、stdin からの入力待ちで無期限に block される問題がある（[GitHub issue #20919](https://github.com/openai/codex/issues/20919)）。回避策として、**stdin を `/dev/null` から redirect する**:
+
+```bash
+codex exec <args> -- "<prompt>" < /dev/null
+```
+
+さらに、外部 timeout でプロセス全体を wrap して、予期しない block への最終保護とする:
+
+```bash
+timeout 300s codex exec <args> -- "<prompt>" < /dev/null
+```
+
+`timeout` は GNU coreutils の command。macOS で coreutils の command 名が `gtimeout` の環境では、同じ位置で `gtimeout 300s` を使う。
+
+### セキュリティ注意: hooks への書込可能化
+
+承認付きの sandbox 外実行や sandbox 無効化によって共有 Git directory への書込を許すと、hooks も書込可能になる。エージェントが hooks を変更すると、以降の git 操作で任意コードが実行される。**エージェントは hooks を変更してはならない**。
+
+この制約を迂回するために、共有 Git directory、`$HOME`、または対象 repository 全体を `writable_roots` へ追加してはならない。特に review profile へ対象 repository を追加すると read-only 契約が壊れる。
+
+### 便利: worktree 用 wrapper (optional)
+
+一部環境では、linked worktree 内で gitdir を `--add-dir` 経由で渡す個人 helper `codexw` が利用可能である。これは optional convenience であり、Git metadata の protected-path carveout を解除しない。常に generic equivalent を併記する:
+
+```bash
+# wrapper (optional, personal dotfiles helper)
+codexw exec -- "<prompt>"
+
+# generic equivalent
+codex exec --add-dir "$(git rev-parse --path-format=absolute --git-dir)" -- "<prompt>"
+```
+
+非対話形式:
+
+```bash
+# wrapper (optional)
+timeout 300s codexw exec <args> -- "<prompt>" < /dev/null
+
+# generic equivalent
+timeout 300s codex exec --add-dir "$(git rev-parse --path-format=absolute --git-dir)" <args> -- "<prompt>" < /dev/null
+```

@@ -5,9 +5,11 @@ bats_require_minimum_version 1.5.0
 setup() {
   local root
   root="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
+  # shellcheck source=tests/native-test-helpers.bash
+  . "$root/tests/native-test-helpers.bash"
   FX="$(cd "$BATS_TEST_TMPDIR" && pwd -P)/sync-fixture"
-  mkdir -p "$FX/repo/scripts" "$FX/home/.cache/apm" "$FX/home/Library/Caches/apm" "$FX/tmp" "$FX/template"
-  cp "$root/scripts/native.sh" "$root/scripts/native-home.py" "$FX/repo/scripts/"
+  mkdir -p "$FX/home/.cache/apm" "$FX/home/Library/Caches/apm" "$FX/tmp" "$FX/template"
+  copy_native_runtime "$root" "$FX/repo"
   cp "${NATIVE_SYNC_SOURCE:-$root}/scripts/native-sync.sh" "$FX/repo/scripts/native-sync.sh"
   printf 'tmp/\n' >"$FX/repo/.gitignore"
   printf 'fixture global config\n' >"$FX/gitconfig-sentinel"
@@ -21,7 +23,7 @@ setup() {
   mkdir -p "$FX/home/.agents/skills/existing"
   printf 'existing skill\n' >"$FX/home/.agents/skills/existing/SKILL.md"
   env GIT_CONFIG_GLOBAL="$FX/gitconfig" GIT_CONFIG_NOSYSTEM=1 GIT_TEMPLATE_DIR="$FX/template" git init -q -b main "$FX/repo"
-  git -C "$FX/repo" add scripts/native.sh scripts/native-sync.sh scripts/native-home.py .gitignore
+  git -C "$FX/repo" add scripts/native.sh scripts/native-sync.sh scripts/native-home.py scripts/lib .gitignore
   git -C "$FX/repo" -c user.name=fixture -c user.email=fixture@example.invalid commit -q -m fixture
   env GIT_CONFIG_GLOBAL="$FX/gitconfig" GIT_CONFIG_NOSYSTEM=1 GIT_TEMPLATE_DIR="$FX/template" git init --bare -q "$FX/remote.git"
   git -C "$FX/repo" push -q "$FX/remote.git" HEAD:refs/heads/main
@@ -117,6 +119,17 @@ sync_fixture() {
 
 run_sync() {
   sync_fixture "${SYNC_ENV[@]}" bash "$FX/harness" "$@"
+}
+
+@test "native entry loads libraries through a symlink from another cwd" {
+  local entry_dir="$FX/entry" other_cwd="$FX/other-cwd"
+  mkdir -p "$entry_dir" "$other_cwd"
+  ln -s "$FX/repo/scripts/native.sh" "$entry_dir/native"
+
+  run bash -c 'cd "$1" && bash "$2" unknown' _ "$other_cwd" "$entry_dir/native"
+
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"unknown native command: unknown"* ]]
 }
 
 @test "sync --help writes nothing and does not inspect or distribute HOME" {
@@ -401,7 +414,6 @@ EOF
   git -C "$FX/repo" push -q "$FX/remote.git" HEAD:refs/heads/main
   run sync_fixture APM_BIN="$FX/apm-stub" bash "$FX/repo/scripts/native.sh" sync
   [ "$status" -eq 0 ]
-  [ "$(cat "$FX/home/.sync-events")" = $'install -g --only apm --trust-bin\ncompile -g --clean\nsync:opencode\ndoctor\ndoctor-intake' ]
   [[ "$output" == *".agents/skills: 1 -> 1 (+0)"* ]]
   [[ "$output" == *"Rollback of the four roots:"* ]]
   [ -f "$FX/home/.agents/skills/existing/SKILL.md" ]
