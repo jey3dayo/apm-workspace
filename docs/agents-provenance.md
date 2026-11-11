@@ -43,4 +43,4 @@ The following verbose persona agents were retired. Their useful contracts are in
 1. Place the adapted agent at `catalog/.apm/agents/<name>.agent.md` (rename, trim upstream-specific assumptions).
 2. Add one row to the Per-Agent Mapping above; add a new Sources row if the upstream repo is new.
 3. For upstream evaluation (is it APM-installable?), follow the `agent-curation` skill and record repo-level findings in its registry.
-4. Distribute with native distribution: follow section B of `docs/native-distribution.md`.
+4. Distribute with `mise run native:sync` (use `-- --https` without SSH); see section B of `docs/native-distribution.md`.

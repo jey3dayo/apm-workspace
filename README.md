@@ -41,12 +41,12 @@ cd ~/src/github.com/jey3dayo/apm-workspace
 mise bootstrap       # first machine setup
 ```
 
-| Intent                      | Command                                                                                |
-| --------------------------- | -------------------------------------------------------------------------------------- |
-| Validate without deployment | `mise run check`                                                                       |
-| Run deep checks             | `mise run verify`                                                                      |
-| Inspect deployed state      | `mise run doctor`                                                                      |
-| Roll out a pushed commit    | section B of [`docs/native-distribution.md`](docs/native-distribution.md) (`native:*`) |
+| Intent                      | Command                                                                   |
+| --------------------------- | ------------------------------------------------------------------------- |
+| Validate without deployment | `mise run check`                                                          |
+| Run deep checks             | `mise run verify`                                                         |
+| Inspect deployed state      | `mise run doctor`                                                         |
+| Roll out a pushed commit    | `mise run native:sync` (or `mise run native:sync -- --https` without SSH) |
 
 The real HOME is native. The legacy writer (`deploy`, `apply`, `upgrade`,
 `refresh` and their helper tasks) was removed on 2026-11-10; its last version
@@ -56,10 +56,12 @@ is commit `0bcce09`. A Codex skill change is verified only after checking
 ## External Checkout Changes
 
 1. Edit, verify, commit, and push the upstream checkout.
-2. Bump the SHA pin in `apm.yml` by hand. No task updates `apm.lock.yaml` now
-   (open item in [`docs/package-decisions.md`](docs/package-decisions.md)).
-3. Roll out with section B of `docs/native-distribution.md`, verify the deployed
-   skill, then review unrelated lock drift separately.
+2. Updating the SHA pin remains unresolved: validation requires a matching
+   `apm.lock.yaml`, but no task updates it. See the open item in
+   [`docs/package-decisions.md`](docs/package-decisions.md) before proceeding.
+3. Once the pin and lock are consistent, verify, commit, and push the change.
+4. Roll out with `mise run native:sync` and verify the deployed skill. See
+   [`docs/native-distribution.md`](docs/native-distribution.md) for details and rollback.
 
 Adding or removing an external dependency also requires a decision record in
 [`docs/package-decisions.md`](docs/package-decisions.md).
