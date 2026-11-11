@@ -58,3 +58,63 @@ scoped `--add-dir` は worktree 作成の代替にならない。workspace-write
 `-a` の有効値は `on-request` と `never` のみ。`on-failure` は存在しない（0.149.1 で確認）。
 
 `writable_roots` に symlink 成分があると Codex は sandbox 構築ごと失敗し、agmsg と無関係なコマンドまで起動前に全拒否される。詳細は上記「writable_roots の symlink fail-closed 検査」を参照。
+
+## linked worktree での workspace-write
+
+**Codex の `workspace-write` sandbox は、linked git worktree の gitdir（main repo の `.git/worktrees/<name>`）を read-only に保護する。** 親の `.git` や `.git/worktrees` を `writable_roots` へ追加しても read-only 保護は解除されない。この設計により、worktree 内で `git add` / `git commit` が `Operation not permitted` で失敗する（Codex CLI 0.167.1 on macOS、2026-11-10 検証）。
+
+    70|### 回避策: `--add-dir` による gitdir 書込許可
+
+worktree 内で Codex を起動する場合、起動時に gitdir を明示的に書込可能へ追加する:
+
+```bash
+codex exec --add-dir "$(git rev-parse --path-format=absolute --git-dir)" -- <command>
+```
+
+`--add-dir` で渡す gitdir は absolute path でなければならないため、`--path-format=absolute` を必須とする。この flag を付けることで、worktree 内での `git add` / `git commit` が成功する。**`codex exec --worktree` だけでは不足**で、gitdir への書込許可が別に必要。
+80|
+参考: [Codex sandbox guide](https://developers.openai.com/codex/sandbox), [GitHub issue #14338](https://github.com/openai/codex/issues/14338)
+
+### 非対話 codex exec での stdin block 回避
+
+非対話モードで `codex exec` を実行する場合、stdin からの入力待ちで無期限に block される問題がある（[GitHub issue #20919](https://github.com/openai/codex/issues/20919)）。回避策として、**stdin を `/dev/null` から redirect する**:
+
+```bash
+codex exec <args> < /dev/null
+```
+
+    90|
+
+さらに、外部 timeout でプロセス全体を wrap して、予期しない block への最終保護とする:
+
+```bash
+timeout 300s codex exec <args> < /dev/null
+```
+
+### セキュリティ注意: hooks への書込可能化
+
+**gitdir を `--add-dir` や `writable_roots` で書込可能にすると、`.git/hooks` も書込可能になる。** エージェントが hooks を変更すると、以降の git 操作で任意コードが実行される。**エージェントは決して hooks を変更してはならない**。
+
+同様に、`$HOME` やリポジトリ root 全体を `writable_roots` へ追加することは禁止する。意図しない範囲への書込を許可し、`.git/hooks` / `~/.config` / `~/.ssh` など機微なファイルへの意図しない変更を招く。
+
+### 便利: worktree 用 wrapper (optional)
+
+一部環境では、linked worktree 内で自動的に gitdir を `--add-dir` 経由で渡す個人 helper `codexw` が利用可能である。worktree 外では plain `codex` と同じ動作をする。これは optional convenience であり、常に generic equivalent も機能する:
+
+```bash
+# wrapper (optional, personal dotfiles helper)
+codexw exec -- <command>
+
+# generic equivalent (always works)
+codex exec --add-dir "$(git rev-parse --path-format=absolute --git-dir)" -- <command>
+```
+
+非対話形式:
+
+```bash
+# wrapper (optional)
+timeout 300s codexw exec <args> < /dev/null
+
+# generic equivalent (always works)
+timeout 300s codex exec --add-dir "$(git rev-parse --path-format=absolute --git-dir)" <args> < /dev/null
+```
