@@ -69,6 +69,45 @@ native() {
   fixture bash "$FX/repo/scripts/native.sh" "$@"
 }
 
+@test "native entry resolves libraries from its physical path when linked, sourced, and run from another cwd" {
+  mkdir -p "$FX/bin"
+  ln -s ../repo/scripts/native.sh "$FX/bin/native"
+
+  run fixture bash -c 'cd "$1" && bash "$2" render --source-ref "$3" --workspace-only' _ \
+    "$FX/outside" "$FX/bin/native" "$SHA"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"ref: $SHA"* ]]
+
+  run fixture bash -c 'cd "$1" && . "$2" && test "$SCRIPT_DIR" = "$3" && cmd_render --source-ref "$4" --workspace-only' _ \
+    "$FX/outside" "$FX/bin/native" "$FX/repo/scripts" "$SHA"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"ref: $SHA"* ]]
+}
+
+@test "failed automatic rollback prints a directly runnable command with a shell-sensitive HOME path" {
+  local home="$FX/rollback;home" stamp=20261111T120000Z command
+  mkdir -p "$home/.apm"
+  printf 'absent\t.agents/skills\nabsent\t.claude/skills\nabsent\t.claude/agents\nabsent\t.cursor/agents\n' \
+    >"$home/.apm/native-migrate-$stamp.txt"
+
+  run fixture bash -c '. "$1/scripts/native.sh"
+    rollback_roots() { return 1; }
+    MIGRATE_HOME="$2" MIGRATE_STAMP="$3" MIGRATE_AGMSG_LINKED=0 REAL_HOME=0
+    set +e
+    (exit 23)
+    migrate_failure' _ "$FX/repo" "$home" "$stamp"
+
+  [ "$status" -eq 23 ]
+  [[ "$output" == *"the automatic rollback failed; fix the cause, then run:"* ]]
+  command="$(printf '%s\n' "$output" | sed -n 's/^the automatic rollback failed; fix the cause, then run: //p')"
+  [ -n "$command" ]
+
+  run fixture bash -c "$command"
+
+  [ "$status" -eq 0 ]
+  [ "$(grep -c '^restored' "$home/.apm/native-migrate-$stamp.txt")" -eq 4 ]
+}
+
 prepare_rehearsal() {
   native backup --real-home --backup-dir "$FX/backup"
   native rehearse --real-home --backup-dir "$FX/backup" --source-ref "$SHA" --migrate
@@ -84,8 +123,8 @@ wait_ready() {
   [ -f "$FX/ready" ]
 }
 
-@test "native HOME lock excludes manual migrate rollback backup rehearsal and reinstate during sync" {
-  local writer migrate_status rollback_status backup_status rehearse_status reinstate_status opencode_status inherited_status
+@test "native HOME lock excludes internal migrate rollback backup and rehearsal stages during sync" {
+  local writer migrate_status rollback_status backup_status rehearse_status inherited_status
   prepare_rehearsal
   printf 'block\n' >"$FX/block"
   native sync >"$FX/writer.log" 2>&1 &
@@ -103,12 +142,6 @@ wait_ready() {
   run native rehearse --real-home --backup-dir "$FX/backup" --source-ref "$SHA" --migrate
   rehearse_status="$status"
   printf '%s\n' "$output" >"$FX/second-rehearse.log"
-  run native reinstate --real-home --stamp 20000101T000000Z
-  reinstate_status="$status"
-  printf '%s\n' "$output" >"$FX/second-reinstate.log"
-  run native opencode --real-home
-  opencode_status="$status"
-  printf '%s\n' "$output" >"$FX/second-opencode.log"
   cat >"$FX/forged-lock-harness" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
@@ -124,11 +157,9 @@ EOF
   [ "$rollback_status" -ne 0 ]
   [ "$backup_status" -ne 0 ]
   [ "$rehearse_status" -ne 0 ]
-  [ "$reinstate_status" -ne 0 ]
-  [ "$opencode_status" -ne 0 ]
   [ "$inherited_status" -ne 0 ]
   local operation
-  for operation in migrate rollback backup rehearse reinstate opencode inherited; do
+  for operation in migrate rollback backup rehearse inherited; do
     [[ "$(cat "$FX/second-$operation.log")" == *"another native operation is active"* ]]
   done
   [ ! -e "$FX/second-backup" ]

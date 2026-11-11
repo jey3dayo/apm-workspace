@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Sourced by native.sh so sync uses the same HOME and loss guards as the manual commands.
+# Sourced by native.sh so sync's internal stages use the same HOME and loss guards.
 
 sync_usage() {
   cat <<'EOF'
@@ -196,9 +196,7 @@ sync_finish() {
   stamp="$(sync_migrate_stamp)" || stamp=""
   if [ "$status" != 0 ]; then log "native:sync stopped (exit $status); backup and logs: $SYNC_RUN"; fi
   if [ -n "$stamp" ]; then
-    printf 'Rollback of the four roots: bash %q migrate-rollback ' "$SCRIPT_DIR/native.sh" >&2
-    if [ "$SYNC_REAL_HOME" = 1 ]; then printf '%s ' --real-home >&2; else printf '%s %q ' --home "$SYNC_HOME" >&2; fi
-    printf '%s %q\n' --stamp "$stamp" >&2
+    printf 'Rollback of the four roots: %s\n' "$(migrate_rollback_command "$SYNC_HOME" "$SYNC_REAL_HOME" "$stamp")" >&2
     log "Other native outputs require the backup at $SYNC_RUN/backup (docs/native-distribution.md)."
   elif [ -f "$SYNC_RUN/migrate.log" ]; then
     log "No unique recorded migrate stamp was confirmed; inspect $SYNC_RUN/migrate.log before choosing a rollback."

@@ -1,48 +1,7 @@
-# Native APM distribution (docs/native-distribution.md): the distribution path since the legacy `deploy` was removed on
-# 2026-11-10. apply targets a disposable HOME only; migrate (after a clean rehearse --migrate), migrate-rollback, reinstate
-# and opencode (~/.config/opencode) write the real HOME. backup and rehearse only read deployment data; all share
-# persistent operation-lock metadata in ~/.cache/apm-native-operation.lock.
+# Native APM distribution (docs/native-distribution.md): the sole operator entrypoint since the legacy `deploy` was
+# removed on 2026-11-10. Its internal stages share persistent operation-lock metadata in
+# ~/.cache/apm-native-operation.lock.
 
 ["native:sync"]
 description = "Back up, rehearse, migrate and verify pushed main in one command; exact removal/override approvals: -- --help"
 run = "bash ./scripts/native.sh sync"
-
-["native:plan"]
-description = "Print the SHA-pinned consumer manifest and the native install/compile steps; writes nothing"
-hide = true
-run = "bash ./scripts/native.sh plan"
-
-["native:apply"]
-description = "apm install -g --only apm + compile -g into a disposable HOME: -- --home <dir> --source-ref <SHA> (the real HOME goes through native:migrate)"
-hide = true
-run = "bash ./scripts/native.sh apply"
-
-["native:backup"]
-description = "Copy the non-secret paths native:apply can change: -- --real-home --backup-dir <new dir>"
-hide = true
-run = "bash ./scripts/native.sh backup"
-
-["native:rehearse"]
-description = "Clone a native:backup into a scratch HOME, run the same install + compile there and count lost files: -- --real-home --backup-dir <backup> --source-ref <SHA> [--migrate]"
-hide = true
-run = "bash ./scripts/native.sh rehearse"
-
-["native:migrate"]
-description = "Move the skills/agents roots aside, install + compile, reinstate what apm did not deploy, roll back on failure: -- (--real-home | --home <dir>) --source-ref <SHA> --rehearsal <rehearse --migrate dir>"
-hide = true
-run = "bash ./scripts/native.sh migrate"
-
-["native:migrate-rollback"]
-description = "Undo a native:migrate: current roots to <root>.native-<UTC>, <root>.bak-<UTC> back; deletes nothing: -- (--real-home | --home <dir>) --stamp <UTC>"
-hide = true
-run = "bash ./scripts/native.sh migrate-rollback"
-
-["native:opencode"]
-description = "Write ~/.config/opencode/AGENTS.md from the catalog guide (OpenCode reads it, else ~/.claude/CLAUDE.md, which the native layout does not have); run after native:migrate. Never overwrites a hand-written file"
-hide = true
-run = "bash ./scripts/native.sh opencode"
-
-["native:reinstate"]
-description = "Copy the top-level entries of <root>.bak-<UTC> that the current root lacks back into it: -- (--real-home | --home <dir>) --stamp <UTC>"
-hide = true
-run = "bash ./scripts/native.sh reinstate"

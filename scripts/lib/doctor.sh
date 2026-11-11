@@ -1,0 +1,389 @@
+validate_codex_skill_target_tree() {
+  target_skills_root="$HOME/.agents/skills"
+  [ -d "$target_skills_root" ] || return 0
+
+  nested_skills=$(
+    cd "$target_skills_root"
+    find . -mindepth 4 -type f -name SKILL.md \( -path './*/skills/*/SKILL.md' -o -path './*/.apm/skills/*/SKILL.md' \) | sort
+  )
+
+  if [ -n "$nested_skills" ]; then
+    printf '%s\n' "$nested_skills" | sed "s#^\./#$target_skills_root/#" >&2
+    error "Nested Codex skill files found under $target_skills_root. Redeploy with section B of docs/native-distribution.md."
+    return 1
+  fi
+}
+
+# agmsg resolves db/ and teams/ relative to its own script directory
+# ($HOME/.agents/skills/agmsg), so those two entries must stay symlinks into
+# $XDG_STATE_HOME/agmsg (see scripts/agmsg-state.sh:16). If anything outside
+# the deploy flow replaces a link with a plain dir or removes it, agmsg's error
+# messages ("Team not found", empty identities) give no hint that the link
+# itself is the problem — the real db/teams data is untouched. Doctor checks
+# the canonical face only; other deployed faces (e.g. ~/.claude/skills/agmsg)
+# never carry db/teams and are not examined here.
+# Per-item diagnostics stay separate from the recovery recommendation: db and
+# teams are each judged healthy / plain-path / missing / dangling /
+# wrong-target below, but the recommendation to run `mise run
+# agmsg:state:restore` is emitted at most once, from the aggregate of both
+# items. `agmsg:state:restore` relinks db and teams together, so naming it
+# from a single item's branch is wrong whenever the *other* item is a plain
+# path holding roster writes made while the link was severed: following that
+# per-item advice would run the restore anyway and let its absorb-and-discard
+# path clobber the plain path's contents in favor of the state root. See
+# scripts/agmsg-state.sh absorb_plain_dir.
+validate_agmsg_roster_link() {
+  agmsg_skill_dir="$HOME/.agents/skills/agmsg"
+  [ -e "$agmsg_skill_dir" ] || return 0
+
+  agmsg_state_root="${XDG_STATE_HOME:-$HOME/.local/state}/agmsg"
+  agmsg_link_ok=0
+  agmsg_has_plain_path=0
+  agmsg_has_other_issue=0
+
+  for runtime_dir in db teams; do
+    link_path="$agmsg_skill_dir/$runtime_dir"
+    expected_target="$agmsg_state_root/$runtime_dir"
+    if [ ! -e "$link_path" ] && [ ! -L "$link_path" ]; then
+      error "agmsg roster link is missing: $link_path."
+      agmsg_link_ok=1
+      agmsg_has_other_issue=1
+      continue
+    fi
+    if [ ! -L "$link_path" ]; then
+      # Unlike the other three cases, nothing is lost here yet: a plain
+      # directory can hold roster writes made while the link was severed
+      # (see scripts/agmsg-state.sh absorb_plain_dir).
+      error "agmsg roster link is a plain path, not a symlink: $link_path. This may hold roster updates written while the link was severed."
+      agmsg_link_ok=1
+      agmsg_has_plain_path=1
+      continue
+    fi
+    actual_target=$(readlink "$link_path")
+    if [ "$actual_target" != "$expected_target" ]; then
+      error "agmsg roster link points at the wrong target: $link_path -> $actual_target (expected $expected_target)."
+      agmsg_link_ok=1
+      agmsg_has_other_issue=1
+      continue
+    fi
+    if [ ! -e "$link_path" ]; then
+      error "agmsg roster link is dangling (target does not exist): $link_path -> $actual_target."
+      agmsg_link_ok=1
+      agmsg_has_other_issue=1
+    fi
+  done
+
+  if [ "$agmsg_has_plain_path" -eq 1 ]; then
+    error "agmsg roster link recovery: at least one of db/teams under $agmsg_skill_dir is a plain path that may hold roster updates written while the link was severed. Automatically relinking db and teams together risks discarding those updates by absorbing the plain path into the state root instead of merging it. Inspect its contents and reconcile them with \$XDG_STATE_HOME/agmsg (or \$HOME/.local/state/agmsg) by hand before relinking."
+  elif [ "$agmsg_has_other_issue" -eq 1 ]; then
+    error "agmsg roster link recovery: run 'mise run agmsg:state:restore' to relink db/teams under $agmsg_skill_dir."
+  fi
+
+  return "$agmsg_link_ok"
+}
+
+apm_prune_preview() {
+  local preview
+  if ! preview=$(NO_COLOR=1 COLUMNS=4096 apm prune --dry-run 2>&1); then
+    printf '%s\n' "$preview" >&2
+    error "apm prune --dry-run failed; refusing automatic prune."
+    return 1
+  fi
+  printf '%s\n' "$preview"
+}
+
+# Prints the catalog package's lock records (installed from the repository ref, or from a local path as
+# _local/catalog), tab separated: "F<TAB>path" per deployed_files entry and
+# "H<TAB>path<TAB>sha256" per deployed_file_hashes entry. Paths are relative to $HOME for a user-scope lock.
+catalog_lock_deployed_entries() {
+  awk -v catalog="$CATALOG_DIR_NAME" '
+    /^- / || /^  [a-z_]+:/ {
+      if ($0 ~ /^- /) { name = ""; virtual_path = "" }
+      line = $0
+      sub(/^- /, "  ", line)
+      if (line == "  repo_url: _local/" catalog) virtual_path = catalog
+      else if (line ~ /^  name: /) name = substr(line, 9)
+      else if (line ~ /^  virtual_path: /) virtual_path = substr(line, 17)
+      mode = line ~ /^  deployed_files:$/ ? "files" : line ~ /^  deployed_file_hashes:$/ ? "hashes" : ""
+      next
+    }
+    /^[^ ]/ { mode = ""; next }
+    name != catalog || virtual_path != catalog { next }
+    mode == "files" && /^  - / { printf "F\t%s\n", substr($0, 5); next }
+    mode == "hashes" && /^    [^ ]/ {
+      record = substr($0, 5)
+      split_at = index(record, ": sha256:")
+      if (split_at) printf "H\t%s\t%s\n", substr(record, 1, split_at - 1), substr(record, split_at + 9)
+    }
+  ' "$1"
+}
+
+file_sha256() {
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$1" | awk '{print $1}'
+  else
+    shasum -a 256 "$1" | awk '{print $1}'
+  fi
+}
+
+# The lock records what APM itself placed for the catalog; a listed path that is gone means the install was undone.
+# A skill or agent deleted from the working catalog disappears before the lock drops it; such a path is only counted
+# as stale.
+check_catalog_lock_deployed_files() {
+  lock_file="$WORKSPACE_DIR/apm.lock.yaml"
+  [ -f "$lock_file" ] || return 0
+  listed_count=0
+  missing_count=0
+  stale_count=0
+  changed_count=0
+  tab=$(printf '\t')
+  while IFS="$tab" read -r record_kind record_path record_hash; do
+    if [ "$record_kind" = F ]; then
+      listed_count=$((listed_count + 1))
+      if [ -e "$HOME/$record_path" ] || [ -L "$HOME/$record_path" ]; then
+        continue
+      fi
+      case "$record_path" in
+        */skills/* | */agents/*) stale_count=$((stale_count + 1)) ;;
+        *)
+          error "Catalog file recorded in apm.lock.yaml is missing: ~/$record_path"
+          missing_count=$((missing_count + 1))
+          ;;
+      esac
+    elif [ -f "$HOME/$record_path" ] && [ "$(file_sha256 "$HOME/$record_path")" != "$record_hash" ]; then
+      changed_count=$((changed_count + 1))
+    fi
+  done < <(catalog_lock_deployed_entries "$lock_file")
+  # changed counts files the skill sync replaced with the working catalog or a private override, which is expected.
+  printf 'catalog lock files: listed=%s missing=%s stale=%s changed=%s\n' "$listed_count" "$missing_count" "$stale_count" "$changed_count"
+  if [ "$stale_count" -gt 0 ]; then
+    warn "$stale_count skill or agent file(s) recorded in apm.lock.yaml are gone, as after deleting them from the working catalog; they leave the lock when apm.lock.yaml is next updated."
+  fi
+  [ "$missing_count" -eq 0 ]
+}
+
+# True when every orphan warning block lists as many entries as its header declares.
+orphan_blocks_are_readable() {
+  printf '%s\n' "$1" | awk '
+    function close_block() { if (in_block && entries != declared) bad = 1; in_block = 0 }
+    in_block && /^\[!\]   - / { entries++; next }
+    { close_block() }
+    /^\[!\] [0-9]+ orphaned package\(s\) found/ { in_block = 1; declared = $2; entries = 0 }
+    END { close_block(); exit bad }
+  '
+}
+
+# apm 0.35.0 deps list -g marks packages orphaned that apm prune --dry-run keeps as "required package content". deps list -g
+# reads $HOME/.apm, so the preview runs there; with no manifest there, or an unreadable list, it is printed unchanged.
+reconcile_orphans_with_prune() {
+  local dependency_output="$1" global_dir="$HOME/.apm" preview retained
+  case "$dependency_output" in
+    *"orphaned package(s) found"*) ;;
+    *)
+      printf '%s\n' "$dependency_output"
+      return 0
+      ;;
+  esac
+  if [ ! -f "$global_dir/apm.yml" ]; then
+    warn "$global_dir/apm.yml is missing, so the orphan list cannot be checked against apm prune --dry-run."
+    printf '%s\n' "$dependency_output"
+    return 0
+  fi
+  if ! orphan_blocks_are_readable "$dependency_output"; then
+    warn "The orphan list does not match its count, so it is not checked against apm prune --dry-run."
+    printf '%s\n' "$dependency_output"
+    return 0
+  fi
+  if ! preview=$(cd "$global_dir" && NO_COLOR=1 COLUMNS=4096 apm prune --dry-run 2>&1); then
+    printf '%s\n' "$preview" >&2
+    warn "apm prune --dry-run failed; the orphan list below is not checked against it."
+    printf '%s\n' "$dependency_output"
+    return 0
+  fi
+  retained=$(printf '%s\n' "$preview" | awk '/^\[/ { if (line != "") print line; line = $0; next } { line = line " " $0 } END { if (line != "") print line }' |
+    sed -n 's/^\[i\] Retained \(.*\): required[[:space:]]*package[[:space:]]*content\.$/\1/p')
+  printf '%s\n' "$dependency_output" | RETAINED="$retained" awk '
+    BEGIN {
+      count = split(ENVIRON["RETAINED"], names, "\n")
+      for (i = 1; i <= count; i++) if (names[i] != "") keep[names[i]] = 1
+    }
+    function flush_block(   i, shown) {
+      if (!in_block) return
+      shown = 0
+      for (i = 1; i <= entries; i++) if (!(entry[i] in keep)) shown++
+      if (shown == 0) {
+        printf "[i] %d package(s) that apm deps list reports as orphaned are kept by apm prune --dry-run as required package content; it would remove none of them.\n", entries
+      } else {
+        printf "[!] %d orphaned package(s) found (not in resolved dependency graph):\n", shown
+        for (i = 1; i <= entries; i++) if (!(entry[i] in keep)) printf "[!]   - %s\n", entry[i]
+        if (entries > shown) printf "[i] %d more are kept by apm prune --dry-run as required package content.\n", entries - shown
+        print "[i] Run \047apm prune\047 to remove orphaned packages"
+      }
+      in_block = 0
+      entries = 0
+    }
+    in_block && /^\[!\]   - / { entry[++entries] = substr($0, 9); next }
+    in_block && /^\[i\] Run .apm prune/ { flush_block(); next }
+    { flush_block() }
+    /^\[!\] [0-9]+ orphaned package\(s\) found/ { in_block = 1; entries = 0; next }
+    /^│ / && / orphaned / {
+      split($0, cells, "│")
+      name = cells[2]
+      gsub(/^ +| +$/, "", name)
+      if (name in keep) sub(/ orphaned /, " retained ")
+    }
+    { print }
+    END { flush_block() }
+  '
+}
+
+report_dependency_state() {
+  local dependency_output normalized
+  if dependency_output=$(NO_COLOR=1 COLUMNS=4096 apm deps list -g 2>&1); then
+    reconcile_orphans_with_prune "$dependency_output"
+    return 0
+  fi
+  printf '%s\n' "$dependency_output" >&2
+  normalized=$(printf '%s\n' "$dependency_output" | awk '{$1=$1; printf "%s%s", sep, $0; sep=" "}')
+  if [ "$normalized" != "[x] Error listing dependencies: Invalid local package path '': path segments must not be empty" ] ||
+    ! awk '/^local_deployed_files:$/ { local_files=1; next } local_files && /^ *- / { found=1; exit } local_files && /^[^ ]/ { exit } END { exit !found }' apm.lock.yaml; then
+    error "apm deps list -g failed."
+    return 1
+  fi
+  warn "Known local self-entry failure: using deps tree with reduced orphan detection. Prune preview below is read-only and may include declared packages; no deletion is authorized by this report."
+  apm deps tree -g || return 1
+  apm_prune_preview
+}
+
+agents_differing_from_catalog() {
+  target_agents_root="$1"
+  agents_root=$(tracked_catalog_agents_root)
+  tracked_catalog_agent_relative_paths | while IFS= read -r agent_relative_path; do
+    case "$agent_relative_path" in
+      *.agent.md) ;;
+      *) continue ;;
+    esac
+    deployed_agent="$target_agents_root/${agent_relative_path%.agent.md}.md"
+    cmp -s "$agents_root/$agent_relative_path" "$deployed_agent" || printf '%s\n' "$deployed_agent"
+  done
+}
+
+cmd_doctor() {
+  require_apm
+  ensure_workspace_repo
+  ensure_workspace_scaffold
+  (
+    cd "$WORKSPACE_DIR"
+    printf 'apm: %s\n' "$(apm --version)"
+    printf 'workspace: %s\n' "$WORKSPACE_DIR"
+    printf 'manifest: %s\n' "$(test -f apm.yml && printf present || printf missing)"
+    printf 'branch: %s\n' "$(git branch --show-current 2>/dev/null || printf detached)"
+    printf 'remote:\n'
+    git remote -v || true
+    printf 'targets:\n'
+    inventory_file=$(mktemp "${TMPDIR:-/tmp}/apm-skill-inventory.XXXXXX")
+    codex_mcp_config="$HOME/.codex/config.toml"
+    has_failure=0
+    if ! validate_codex_skill_target_tree; then
+      has_failure=1
+    fi
+    if ! validate_agmsg_roster_link; then
+      has_failure=1
+    fi
+    known_instruction_blobs=""
+    [ -f "$(tracked_catalog_instructions_path)" ] && known_instruction_blobs=$(legacy_catalog_instructions_blobs)
+    tracked_agents_root="$(tracked_catalog_agents_root)"
+    tracked_commands_root="$(tracked_catalog_commands_root)"
+    tracked_rules_root="$(tracked_catalog_rules_root)"
+    managed_catalog_skill_inventory >"$inventory_file"
+    while read_runtime_target; do
+      target_root="$HOME/$RT_TARGET_DIR"
+      skills_root_dir="${RT_SKILLS_DIR:-$RT_TARGET_DIR}"
+      target_skills_root="$HOME/$skills_root_dir/skills"
+      if [ "$RT_CONFIG_NAME" = "-" ]; then
+        config_state=n/a
+      else
+        config_state=$(user_root_state "$target_root/$RT_CONFIG_NAME" "$known_instruction_blobs")
+      fi
+      if [ "$RT_AGENTS_FACE" = "-" ]; then
+        agents_state=n/a
+      elif [ -e "$target_root/agents" ]; then
+        agents_state=present
+      else
+        agents_state=missing
+      fi
+      if [ -e "$target_root/commands" ]; then commands_state=present; else commands_state=missing; fi
+      if [ -e "$target_root/rules" ]; then rules_state=present; else rules_state=missing; fi
+      if [ "$RT_SKILLS_DIR" = "-" ]; then
+        skills_state=n/a
+      elif [ -e "$target_skills_root" ]; then
+        skills_state=present
+      else
+        skills_state=missing
+      fi
+      printf '  %s: config=%s agents=%s commands=%s rules=%s skills=%s\n' "$RT_TARGET_NAME" "$config_state" "$agents_state" "$commands_state" "$rules_state" "$skills_state"
+
+      # A missing root is expected: Claude reads the guide from its native rule, and a hand-written root stays its owner's.
+      if [ "$config_state" = not-regular ] && [ -d "$target_root/$RT_CONFIG_NAME" ]; then
+        error "Root context has wrong type (directory): $target_root/$RT_CONFIG_NAME"
+        has_failure=1
+      elif [ "$config_state" = legacy ]; then
+        warn "$target_root/$RT_CONFIG_NAME is still the copy the retired legacy catalog sync wrote; move it aside by hand (docs/native-distribution.md)"
+      elif [ "$config_state" = edited-generated ] && [ "$RT_TARGET_NAME" = claude ]; then
+        warn "$target_root/$RT_CONFIG_NAME keeps APM's marker but was edited after compile, so apm compile --clean keeps it and Claude reads the guide from it as well as from the rule; remove the guide and the marker line, or move it aside"
+      elif [ "$config_state" = edited-generated ]; then
+        warn "$target_root/$RT_CONFIG_NAME keeps APM's marker but was edited after compile, so a redeploy (native.sh) stops on it; delete the marker line to keep it as your own file, or move it aside, then re-run"
+      elif [ "$RT_TARGET_NAME" = claude ] && [ "$config_state" = generated ] &&
+        [ -f "$target_root/rules/${CATALOG_INSTRUCTIONS_FILE_NAME%.instructions.md}.md" ]; then
+        warn "$target_root/$RT_CONFIG_NAME is an apm compile output that still sits next to the guide rule, so Claude may read the guide twice; redeploy with section B of docs/native-distribution.md so apm compile -g --clean removes it, and if it stays, it is an older compile output: move it aside"
+      elif [ "$RT_TARGET_NAME" = claude ] && [ "$config_state" = absent ] && [ -f "$(tracked_catalog_instructions_path)" ] &&
+        [ ! -f "$target_root/rules/${CATALOG_INSTRUCTIONS_FILE_NAME%.instructions.md}.md" ]; then
+        warn "Claude has neither $target_root/$RT_CONFIG_NAME nor the guide rule $target_root/rules/${CATALOG_INSTRUCTIONS_FILE_NAME%.instructions.md}.md; redeploy with section B of docs/native-distribution.md"
+      fi
+      if [ -d "$tracked_agents_root" ] && [ "$RT_AGENTS_FACE" != "-" ] && [ ! -d "$target_root/agents" ]; then
+        error "Required catalog output is missing or has wrong type (directory): $target_root/agents"
+        has_failure=1
+      elif [ "$RT_AGENTS_FACE" = "apm" ]; then
+        differing_agents=$(agents_differing_from_catalog "$target_root/agents")
+        if [ -n "$differing_agents" ]; then
+          printf '%s\n' "$differing_agents" | while IFS= read -r differing_agent; do
+            error "Deployed agent is missing or differs from catalog/.apm/agents (APM skips a locally modified file and still exits 0): $differing_agent"
+          done
+          has_failure=1
+        fi
+      fi
+      if [ -d "$tracked_commands_root" ] && [ ! -d "$target_root/commands" ]; then
+        error "Required catalog output is missing or has wrong type (directory): $target_root/commands"
+        has_failure=1
+      fi
+      if [ -d "$tracked_rules_root" ] && [ ! -d "$target_root/rules" ]; then
+        error "Required catalog output is missing or has wrong type (directory): $target_root/rules"
+        has_failure=1
+      fi
+      tracked_claude_rules_root=$(tracked_catalog_claude_rules_root)
+      if [ "$RT_TARGET_NAME" = "claude" ] && [ -d "$tracked_claude_rules_root" ]; then
+        for claude_rule_file in "$tracked_claude_rules_root"/*; do
+          [ -f "$claude_rule_file" ] || continue
+          claude_rule_name=${claude_rule_file##*/}
+          if [ ! -f "$target_root/rules/$claude_rule_name" ]; then
+            error "Required catalog output is missing or has wrong type (file): $target_root/rules/$claude_rule_name"
+            has_failure=1
+          fi
+        done
+      fi
+      if [ "$RT_SKILLS_DIR" != "-" ] && [ ! -d "$target_skills_root" ]; then
+        error "Required catalog output is missing or has wrong type (directory): $target_skills_root"
+        has_failure=1
+      fi
+    done < <(managed_catalog_runtime_targets)
+    printf 'opencode instructions: %s\n' "$(user_root_state "$OPENCODE_INSTRUCTIONS_OUTPUT" "$known_instruction_blobs")"
+    check_catalog_lock_deployed_files || has_failure=1
+    printf 'codex mcp config: %s\n' "$(test -f "$codex_mcp_config" && printf present || printf missing)"
+    printf 'target skill inventory: entries=%s\n' "$(awk 'NF { count++ } END { print count + 0 }' "$inventory_file")"
+    rm -f "$inventory_file"
+    printf 'external pins: unpinned=%s\n' "$(unpinned_external_references | awk 'NF { count++ } END { print count + 0 }')"
+    print_catalog_summary
+    report_dependency_state || has_failure=1
+    [ "$has_failure" -eq 0 ] || fail "Doctor found dependency or managed catalog output failures"
+  )
+}
