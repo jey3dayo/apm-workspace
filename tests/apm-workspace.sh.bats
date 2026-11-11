@@ -396,6 +396,30 @@ if (!isDeepStrictEqual(actual, ["check", "format", "native:sync"])) {
   [[ "$output" == *"unknown command"* ]]
 }
 
+@test "entry script loads libraries through a symlink from another cwd" {
+  entry_dir="$(mktemp -d)"
+  other_cwd="$(mktemp -d)"
+  ln -s "$SCRIPT_UNDER_TEST" "$entry_dir/apm-workspace"
+
+  run bash -c 'cd "$1" && bash "$2" definitely-not-a-command' _ "$other_cwd" "$entry_dir/apm-workspace"
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"unknown command: definitely-not-a-command"* ]]
+  rm -rf "$entry_dir" "$other_cwd"
+}
+
+@test "sourcing a symlink from another cwd resolves the repository and does not dispatch" {
+  entry_dir="$(mktemp -d)"
+  other_cwd="$(mktemp -d)"
+  ln -s "$SCRIPT_UNDER_TEST" "$entry_dir/apm-workspace"
+
+  run bash -c 'cd "$1" && source "$2"; printf "repo=%s\n" "$REPO_ROOT"' _ "$other_cwd" "$entry_dir/apm-workspace"
+
+  [ "$status" -eq 0 ]
+  [ "$output" = "repo=$TEST_REPO_ROOT" ]
+  rm -rf "$entry_dir" "$other_cwd"
+}
+
 @test "retired direct commands are unknown and write nothing" {
   scratch_home="$(mktemp -d)"
   for retired in apply apply:skills:local refresh install-pins repair:local-package-cache pin-external \
