@@ -101,3 +101,25 @@ wrapper_lacks() {
 
   [ "$(exported_value MISE_ENV)" = "ci" ]
 }
+
+@test "worker plist escapes XML-special characters in the wrapper path" {
+  local xml_tmpdir="$WORKDIR/tmp&<>xml"
+  local xml_run_dir xml_wrapper
+  mkdir -p "$xml_tmpdir"
+  xml_run_dir="$(mktemp -d "$xml_tmpdir/agmsg-delegation.XXXXXX")"
+  xml_run_dir="$(cd -- "$xml_run_dir" && pwd -P)"
+  xml_wrapper="$xml_run_dir/worker-wrapper.sh"
+
+  run env TMPDIR="$xml_tmpdir" "$SCRIPT" "$xml_run_dir" -- true
+
+  [ "$status" -eq 0 ]
+  python3 - "$xml_run_dir/worker.plist" "$xml_wrapper" <<'PY'
+import plistlib
+import sys
+
+with open(sys.argv[1], "rb") as plist_file:
+    plist = plistlib.load(plist_file)
+
+assert plist["ProgramArguments"] == ["/bin/bash", sys.argv[2]]
+PY
+}
