@@ -5,6 +5,14 @@
 
 各記録は書いた時点の記述のまま残す。2026-11-10 の切り替えまで、authoring checkout は `~/.apm` だった（今は `~/src/github.com/jey3dayo/apm-workspace`）。記録の中の `~/.apm` はその checkout を指し、`mise run deploy` などの手順は切り替え前の rollout である。切り替えのあとの rollout は [`native-distribution.md`](native-distribution.md) の B に従う。
 
+## parallel (Parallel.ai MCP)
+
+- Status: 採用・global（2026-11-11）
+- 設定: `transport: http`、`https://mcp.parallel.ai/mcp`。API key は任意で、必要なら `PARALLEL_API_KEY` を Authorization Bearer header として追加する
+- 理由: Context7 のライブラリ文書検索と分け、一般 Web の検索・取得・判断を扱う
+- 公式: https://docs.parallel.ai/integrations/mcp/quickstart
+- 再検討するなら: 組み込み `WebSearch` / `WebFetch` と役割が重複し、利用実績が乏しい場合
+
 ## opencli (jackwener/opencli)
 
 - Status: 採用・global（2026-11-09、ユーザー判断）
