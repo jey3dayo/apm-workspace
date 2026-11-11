@@ -110,7 +110,9 @@ assert_mise_task_visibility() {
   local public_json="$1"
   local hidden_json="$2"
   local task_name
-  for task_name in bootstrap setup:mcp:host; do
+  for task_name in \
+    bootstrap setup:mcp:host doctor format:check test:sh validate:workspace validate:catalog \
+    actions-lock:verify actions-lock:upstream; do
     node_json_assert '
 const fs = require("node:fs");
 const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
@@ -128,12 +130,23 @@ if (tasks.some((task) => task.name === name)) {
 }
 ' "$task_name" <<<"$public_json" || return 1
   done
+  node_json_assert '
+const fs = require("node:fs");
+const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
+if (tasks.some(({ name, hide }) =>
+  ((name.startsWith("native:") && name !== "native:sync") || name.startsWith("agmsg:state:")) && hide !== true
+)) {
+  process.exit(1);
+}
+' <<<"$hidden_json"
 }
 
 assert_mise_check_depends() {
   local tasks_json="$1"
   local required
-  for required in format:check lint:yaml lint:frontmatter lint:catalog-leaks validate; do
+  for required in \
+    format:check lint:yaml lint:actions actions-lock:verify lint:frontmatter lint:catalog-leaks \
+    validate:workspace validate:catalog test:sh; do
     node_json_assert '
 const fs = require("node:fs");
 const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
@@ -144,6 +157,14 @@ if (!task || !Array.isArray(task.depends) || !task.depends.includes(required)) {
 }
 ' check "$required" <<<"$tasks_json" || return 1
   done
+  node_json_assert '
+const fs = require("node:fs");
+const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
+const task = tasks.find(({ name }) => name === "check");
+if (!task || task.depends.includes("validate")) {
+  process.exit(1);
+}
+' <<<"$tasks_json"
 }
 
 assert_mise_run_sequence() {
@@ -170,8 +191,7 @@ const fs = require("node:fs");
 const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
 const expected = [
   ["setup:mcp:host", "scripts/apm-workspace.sh", "setup:mcp:host"],
-  ["doctor:workspace", "scripts/apm-workspace.sh", "doctor"],
-  ["doctor:intake", "scripts/apm-workspace.sh", "doctor-intake"],
+  ["validate:workspace", "scripts/apm-workspace.sh", "validate"],
   ["validate:catalog", "scripts/apm-workspace.sh", "validate:catalog"],
   ["format:markdown:bold-headings", "scripts/format-bold-headings.sh", "write"],
   ["format:markdown:bold-headings:check", "scripts/format-bold-headings.sh", "check"],
@@ -255,7 +275,7 @@ EOF
   rm -rf "$fake_bin"
 }
 
-@test "mise bootstrap keeps host MCP setup tasks hidden" {
+@test "mise keeps internal tasks hidden" {
   public_json="$(mise_tasks_json "$TEST_REPO_ROOT")"
   hidden_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
   run assert_mise_task_visibility "$public_json" "$hidden_json"
@@ -264,30 +284,35 @@ EOF
 
 @test "mise exposes the expected public task set" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT")"
-  run assert_public_mise_tasks "$tasks_json" \
-    check doctor doctor:intake doctor:workspace format format:check test test:sh validate verify
-  [ "$status" -eq 0 ]
+  node_json_assert '
+const fs = require("node:fs");
+const { isDeepStrictEqual } = require("node:util");
+const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
+const actual = tasks.map(({ name }) => name).sort();
+if (!isDeepStrictEqual(actual, ["check", "format", "native:sync"])) {
+  process.exit(1);
+}
+' <<<"$tasks_json"
 }
 
 @test "mise no longer exposes the retired legacy writer tasks" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
   run assert_mise_tasks_absent "$tasks_json" \
     apply apply:skills:local check:roots deploy deploy:fresh deploy:pins install:catalog install:pins \
-    migrate:roots prepare:catalog prune:cache refresh refresh:deploy repair:local-package-cache upgrade
+    migrate:roots prepare:catalog prune:cache refresh refresh:deploy repair:local-package-cache upgrade \
+    verify test validate doctor:workspace doctor:intake lock:diff models:check actions-lock:generate native:render
   [ "$status" -eq 0 ]
 }
 
-@test "mise check contains the complete inspection dependency set" {
+@test "mise check contains the complete read-only validation set" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
   run assert_mise_check_depends "$tasks_json"
   [ "$status" -eq 0 ]
 }
 
-@test "mise keeps the doctor and verify run order" {
+@test "mise runs doctor and learning-intake diagnostics in order" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
-  run assert_mise_run_sequence "$tasks_json" doctor '[{"task":"doctor:workspace"},{"task":"doctor:intake"}]'
-  [ "$status" -eq 0 ]
-  run assert_mise_run_sequence "$tasks_json" verify '[{"task":"check"},{"task":"test"}]'
+  run assert_mise_run_sequence "$tasks_json" doctor '["bash ./scripts/apm-workspace.sh doctor","bash ./scripts/apm-workspace.sh doctor-intake"]'
   [ "$status" -eq 0 ]
 }
 
@@ -312,9 +337,9 @@ EOF
 
 @test "negative fixture detects a mise task connected to another script" {
   new_mise_fixture >/dev/null
-  rewrite_mise_fixture "$mise_fixture/mise.toml" \
-    'bash \./scripts/apm-workspace\.sh doctor"' \
-    'bash ./scripts/other.sh doctor"' ''
+  rewrite_mise_fixture "$mise_fixture/mise/validate.toml" \
+    'bash \./scripts/apm-workspace\.sh validate"' \
+    'bash ./scripts/other.sh validate"' ''
   tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
   run assert_mise_command_connections "$tasks_json"
   [ "$status" -ne 0 ]
@@ -322,9 +347,9 @@ EOF
 
 @test "command connection contract accepts a path without a leading ./" {
   new_mise_fixture >/dev/null
-  rewrite_mise_fixture "$mise_fixture/mise.toml" \
-    'bash \./scripts/apm-workspace\.sh doctor"' \
-    'bash scripts/apm-workspace.sh doctor"' ''
+  rewrite_mise_fixture "$mise_fixture/mise/validate.toml" \
+    'bash \./scripts/apm-workspace\.sh validate"' \
+    'bash scripts/apm-workspace.sh validate"' ''
   tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
   run assert_mise_command_connections "$tasks_json"
   [ "$status" -eq 0 ]
@@ -340,10 +365,10 @@ EOF
   [ "$status" -ne 0 ]
 }
 
-@test "negative fixture detects a missing check inspection dependency" {
+@test "negative fixture detects a missing direct validation dependency" {
   new_mise_fixture >/dev/null
   rewrite_mise_fixture "$mise_fixture/mise.toml" \
-    '^[ \t]*"lint:frontmatter",\r?\n' '' 'm'
+    '^[ \t]*"validate:workspace",\r?\n' '' 'm'
   tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
   run assert_mise_check_depends "$tasks_json"
   [ "$status" -ne 0 ]
