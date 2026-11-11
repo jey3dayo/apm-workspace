@@ -106,7 +106,7 @@ config が無い repo で、ユーザーが OKF / Open Knowledge Format / YAML f
 
 ## Creating Documents
 
-新しい document を作るときも validation と同じ rules を使う。
+新しい document の骨格（title・metadata・tag）を作るときも validation と同じ rules を使う。本文の執筆は親が行い、この skill は適合だけを担う。
 
 1. effective rules を確定する
 2. `docs_root` 配下の要求された path に作る

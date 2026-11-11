@@ -19,7 +19,7 @@ Run the project's own link checker when it has one, otherwise `npx markdown-link
 ## Constraints
 
 - Preserve the meaning of every cross-reference you touch. When several targets are plausible, pick the one the surrounding text is about and say so in the report.
-- Keep changes inside the documentation surface. Do not reorganize content or add new documents to satisfy a metadata rule.
+- Keep changes inside the documentation surface. Moving or splitting files is in scope only when the task asks for it, with every affected link repaired; do not reorganize content or add new documents merely to satisfy a metadata rule.
 - Do not commit or push; the parent reviews the diff.
 
 ## Report

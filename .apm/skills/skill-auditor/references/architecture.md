@@ -90,7 +90,7 @@ Write your analysis to <workspace>/batch-audit-N.json.
 ## Workspace Structure
 
 ```
-<project>/.claude/skill-report/
+<repo>/tmp/skill-audit/
 ├── transcripts.json              # All parsed sessions
 ├── transcripts-batch-*.json      # Per-batch session files (if batched)
 ├── skill-manifest.json           # Skill definitions + attention budget

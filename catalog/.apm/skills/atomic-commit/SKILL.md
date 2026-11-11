@@ -71,7 +71,7 @@ EOF
 ```
 
 - stage は対象ファイルの明示指定のみ（一括 stage の禁止は global の Git コミット規約が正本）
-- commit 直前に `git diff --cached --name-only` の一覧がグループと完全一致することを確認する。グループ外の staged ファイルは `git restore --staged <file>` で外す
+- commit 直前に `git diff --cached --name-only` の一覧がグループと完全一致することを確認する。グループ外の staged ファイルのうち、この実行で stage したものだけを `git restore --staged <file>` で外す。この実行が積んでいないもの（親や並行セッションの staged hunk）は外さず、保留に回して親へ報告する
 - メッセージは変更内容の簡潔な記述のみ。署名・フッターは付けない
 - commit hook が失敗した、またはファイルを書き換えた場合は停止して報告する。`--no-verify` はユーザーの明示指示がない限り使わない
 

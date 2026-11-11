@@ -328,7 +328,7 @@ Establish team conventions for worktree usage.
 
 1. Base Directory: Always use `.worktrees/`
 2. Naming Convention: `{type}/{description}` (e.g., `feature/user-auth`)
-3. Main Branch Protection: Never work directly in main repository
+3. Main Branch Protection: 並行作業で編集が重なる間は main repository で直接作業しない
 4. Cleanup: Remove worktrees after PR merge
 
 ### Shared Configuration
