@@ -10,9 +10,10 @@
 - Status: 採用・global（2026-11-11）
 - 正本: Parallel.ai の hosted MCP server（`https://mcp.parallel.ai/mcp`）
 - 理由: 一般的な Web 検索（`web_search`）、URL からのコンテンツ取得（`web_fetch`）、根拠付き判断（`web_decisions`）、深堀りリサーチ（`web_research`）を提供する hosted MCP サーバー。Context7 がライブラリドキュメント検索を担当するのに対し、Parallel は最新情報の検証や一般的な Web 調査を担当する。役割が異なるため二重管理には当たらない
-- 設定: `transport: http`、`url: https://mcp.parallel.ai/mcp`。`web_search`、`web_fetch`、`web_decisions` は API キー不要で無料利用可能（低レート制限）。`web_research` は認証が必要で、API キー（`PARALLEL_API_KEY` 環境変数）または OAuth（`https://mcp.parallel.ai/mcp?login`）で認証する
+- 設定: `transport: http`、`url: https://mcp.parallel.ai/mcp`。認証ヘッダーは `Authorization: Bearer ${PARALLEL_API_KEY}` として環境変数名だけを manifest に置く。APM 0.35.0 の native install は `--only apm` なので、`native:sync` の global MCP stage が同じ宣言を Claude Code と Codex の user scope に反映する
+- 認証: `PARALLEL_API_KEY` が空または未設定なら、stage は認証ヘッダーを設定しない。この状態でも `web_search`、`web_fetch`、`web_decisions` などの無料ツールを低いレート制限で利用できる。環境変数が設定済みなら、Claude Code には `${PARALLEL_API_KEY}` の header 参照、Codex には `bearer_token_env_var = "PARALLEL_API_KEY"` を設定し、値は設定ファイルへ書かない。設定後に環境変数の有無を変えた場合は `native:sync` を再実行する
+- OAuth: API key の代わりに OAuth を使う場合は、対応クライアントで `https://mcp.parallel.ai/mcp?login` を個別登録する。これは manifest の既定配布とは別の選択肢
 - 公式ドキュメント: https://docs.parallel.ai/integrations/mcp/quickstart (Quickstart), https://docs.parallel.ai/integrations/mcp/programmatic-use (Programmatic Use), https://parallel.ai/mcp (Product Page)
-- 認証: API キーを使う場合は、利用環境で `PARALLEL_API_KEY` 環境変数を設定する。OAuth を使う場合は、MCP クライアント（Claude Code / Codex）から `https://mcp.parallel.ai/mcp?login` へ接続し、ブラウザで認証する
 - 再検討するなら: 組み込み `WebSearch` / `WebFetch` と役割が重複し、利用実績が乏しい場合
 
 ## opencli (jackwener/opencli)

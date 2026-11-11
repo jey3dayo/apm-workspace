@@ -33,14 +33,14 @@ MIGRATE_ROOTS=".agents/skills .claude/skills .claude/agents .cursor/agents"
 # What apm writes in the real HOME: the migrated roots, rules, the compiled roots, its own state and caches. migrate
 # scans only these for links that leave the HOME.
 REAL_HOME_WRITE_PATHS=".agents/skills .claude/skills .claude/agents .cursor/agents .claude/rules .claude/commands .codex/rules .cursor/rules
-.claude/CLAUDE.md .codex/AGENTS.md .cursor/AGENTS.md .apm .cache/apm Library/Caches/apm"
+.claude/CLAUDE.md .claude.json .codex/AGENTS.md .codex/config.toml .cursor/AGENTS.md .apm .cache/apm Library/Caches/apm"
 REAL_HOME_TOOL_DIRS=".agents .claude .codex .cursor .cache Library Library/Caches"
 # External dependencies that APM only accepts in the structured form (a Codex native plugin bundle is otherwise
 # attempted): <manifest path>=<git repository>:<skill>. render turns `- <manifest path>#<40-hex SHA>` into
 # `- git: <repository> / ref: <SHA> / skills: [<skill>]`.
 EXTERNAL_PACKAGE_MAP="nanaism/yomiyasu/skills/yomiyasu=nanaism/yomiyasu:yomiyasu"
-# Files whose content a migrate must leave byte for byte alone.
-MIGRATE_UNTOUCHED_FILES=".codex/config.toml .claude/settings.json"
+# Files migration leaves byte for byte alone. native:sync snapshots them again around its later Parallel MCP stage.
+MIGRATE_UNTOUCHED_FILES=".codex/config.toml .claude/settings.json .claude.json"
 # Non-secret paths migration can change; backup copies them and rehearsal reproduces them in a scratch HOME. Tool configs
 # that may hold credentials (~/.codex/config.toml, MCP configs) are not here, which is why installation uses --only apm.
 BACKUP_PATHS=".apm/apm.yml .apm/config.json .apm/apm.lock.yaml .apm/deployment-receipts .claude/skills .claude/agents .claude/rules .claude/commands .claude/CLAUDE.md

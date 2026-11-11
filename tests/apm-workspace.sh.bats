@@ -273,6 +273,73 @@ EOF
   rm -rf "$fake_bin"
 }
 
+@test "global Parallel MCP switches between anonymous access and env-bound authentication" {
+  CODEX_URL="" CODEX_ENV="" CLAUDE_URL="" CLAUDE_HEADER=""
+  codex() {
+    [ "$1" = mcp ] || return 2
+    case "$2" in
+      get)
+        [ -n "$CODEX_URL" ] || return 1
+        printf 'url: %s\n' "$CODEX_URL"
+        [ -z "$CODEX_ENV" ] || printf 'bearer_token_env_var: %s\n' "$CODEX_ENV"
+        ;;
+      remove) CODEX_URL="" CODEX_ENV="" ;;
+      add)
+        shift 3
+        while [ $# -gt 0 ]; do
+          case "$1" in
+            --url) CODEX_URL="$2"; shift 2 ;;
+            --bearer-token-env-var) CODEX_ENV="$2"; shift 2 ;;
+            *) return 2 ;;
+          esac
+        done
+        ;;
+      *) return 2 ;;
+    esac
+  }
+  claude() {
+    [ "$1" = mcp ] || return 2
+    case "$2" in
+      get)
+        [ -n "$CLAUDE_URL" ] || return 1
+        printf 'Scope: User config\nURL: %s\n' "$CLAUDE_URL"
+        [ -z "$CLAUDE_HEADER" ] || printf 'Header: %s\n' "$CLAUDE_HEADER"
+        ;;
+      remove) CLAUDE_URL="" CLAUDE_HEADER="" ;;
+      add)
+        shift 2
+        while [ $# -gt 0 ]; do
+          case "$1" in
+            --scope | --transport) shift 2 ;;
+            --header) CLAUDE_HEADER="$2"; shift 2 ;;
+            parallel) CLAUDE_URL="$2"; shift 2 ;;
+            *) return 2 ;;
+          esac
+        done
+        ;;
+      *) return 2 ;;
+    esac
+  }
+
+  unset PARALLEL_API_KEY
+  cmd_sync_global_mcp
+  [ "$CODEX_URL" = "https://mcp.parallel.ai/mcp" ]
+  [ -z "$CODEX_ENV" ]
+  [ "$CLAUDE_URL" = "https://mcp.parallel.ai/mcp" ]
+  [ -z "$CLAUDE_HEADER" ]
+
+  PARALLEL_API_KEY=secret-sentinel
+  cmd_sync_global_mcp
+  [ "$CODEX_ENV" = PARALLEL_API_KEY ]
+  [ "$CLAUDE_HEADER" = 'Authorization: Bearer ${PARALLEL_API_KEY}' ]
+  [[ "$CODEX_ENV$CLAUDE_HEADER" != *secret-sentinel* ]]
+
+  unset PARALLEL_API_KEY
+  cmd_sync_global_mcp
+  [ -z "$CODEX_ENV" ]
+  [ -z "$CLAUDE_HEADER" ]
+}
+
 @test "mise keeps internal tasks hidden" {
   public_json="$(mise_tasks_json "$TEST_REPO_ROOT")"
   hidden_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"

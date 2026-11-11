@@ -43,7 +43,7 @@ Before any persistent MCP configuration write:
 1. Inspect the checkout's root `apm.yml`, ownership guidance, and rollout script first.
 2. Classify the requested path as a source of truth or deployed output before writing.
 3. Choose the destination and verify its delivery result:
-   - Root native: edit `dependencies.mcp` in the tracked root `apm.yml`. Native distribution installs with `--only apm` and does not apply MCP additions, edits, or removals; during section B's B6 check, confirm the host MCP configuration is unchanged and report the manifest change as recorded, not delivered.
+   - Root native: edit `dependencies.mcp` in the tracked root `apm.yml`. Native distribution installs with `--only apm`; the later global MCP stage currently delivers only the `parallel` entry to Claude Code and Codex user scope. For every other entry, confirm during section B's B6 check that host MCP configuration is unchanged and report the manifest change as recorded, not delivered.
    - Repository-local: edit the target repository's `apm.yml`.
      - For a manifest-only request, stop after the edit.
      - To add and deliver a server, use `apm install --mcp <name> ...` there. To change or remove an existing declaration, edit the manifest and run `apm install --only mcp` to reconcile active targets.
@@ -183,7 +183,7 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
   package as the source of truth and select it in the consuming repository with
   `apm install <package-ref> --skill <id>`.
 - If the request is to scan an arbitrary repository and create, update, or clean up its repo-local `apm.yml`, read `references/repo-manifest.md`.
-- If the request is to add an MCP server through APM, apply the same scope rule: record cross-repo foundation MCPs under `dependencies.mcp` in the root `apm.yml` (Fast Path 6), noting that native distribution installs with `--only apm` and does not deliver it; use repo-local `apm install --mcp <name> ...` for project, framework, UI, database, browser, or app-runtime-specific MCPs.
+- If the request is to add an MCP server through APM, apply the same scope rule: record cross-repo foundation MCPs under `dependencies.mcp` in the root `apm.yml` (Fast Path 6). Native distribution installs with `--only apm`; only the separately implemented `parallel` global stage is delivered. Use repo-local `apm install --mcp <name> ...` for project, framework, UI, database, browser, or app-runtime-specific MCPs.
 - If the APM workspace has no repo-local MCP distribution lane for a target repository, record the intended placement as guidance and keep the global manifest lightweight. Treat implementing repo-local MCP distribution as a separate workspace-mechanics task.
 - If the request is "change only workspace docs or notes", edit the workspace files directly and do not restage the catalog unless `catalog/**` changed too.
 
