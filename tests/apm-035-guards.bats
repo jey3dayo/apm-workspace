@@ -102,6 +102,7 @@ SH
   run doctor_fixture
   [ "$status" -eq 0 ]
   [[ "$output" == *"2 package(s) that apm deps list reports as orphaned are kept by apm prune --dry-run"* ]]
+  [[ "$output" == *"it would remove none of them"* ]]
   [[ "$output" == *"│ owner/kept/skills/a │ unknown │ retained |"* ]]
   [[ "$output" == *"│ owner/real/skills/d │ unknown │ github |"* ]]
   [[ "$output" != *"Run 'apm prune'"* ]]
@@ -127,16 +128,32 @@ SH
   ! grep -qx prune "$GUARD_CALLS"
 }
 
-@test "doctor leaves the orphan list untouched when the prune preview fails" {
+@test "doctor leaves the orphan list untouched and says so when the prune preview fails" {
   export GUARD_LIST_MODE=orphans GUARD_PREVIEW_EXIT=3
-  printf '%s\n' '│ owner/kept/skills/a │ unknown │ orphaned |' \
+  printf '%s\n' '│ owner/kept/skills/a │ unknown │ orphaned │' \
     "[!] 1 orphaned package(s) found (not in resolved dependency graph):" '[!]   - owner/kept/skills/a' \
     "[i] Run 'apm prune' to remove orphaned packages" >"$GUARD_LIST_FILE"
+  printf '%s\n' '[i] Retained owner/kept/skills/a: required package content.' >"$GUARD_PREVIEW"
   run doctor_fixture
   [ "$status" -eq 0 ]
+  [[ "$output" == *"apm prune --dry-run failed"* ]]
+  [[ "$output" == *"│ owner/kept/skills/a │ unknown │ orphaned │"* ]]
   [[ "$output" == *"[!] 1 orphaned package(s) found"* ]]
   [[ "$output" == *"Run 'apm prune'"* ]]
   ! grep -qx prune "$GUARD_CALLS"
+}
+
+@test "doctor keeps an orphan block whose entries it cannot count" {
+  export GUARD_LIST_MODE=orphans
+  printf '%s\n' "[!] 2 orphaned package(s) found (not in resolved dependency graph):" '[!]    * owner/kept/skills/a' '[!]    * owner/gone/skills/c' \
+    "[i] Run 'apm prune' to remove orphaned packages" >"$GUARD_LIST_FILE"
+  printf '%s\n' '[i] Retained owner/kept/skills/a: required package content.' >"$GUARD_PREVIEW"
+  run doctor_fixture
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"[!] 2 orphaned package(s) found"* ]]
+  [[ "$output" == *"[!]    * owner/gone/skills/c"* ]]
+  [[ "$output" == *"Run 'apm prune'"* ]]
+  [[ "$output" != *"it would remove none"* ]]
 }
 
 @test "doctor does not run the prune preview when the dependency list has no orphan warning" {

@@ -1157,8 +1157,8 @@ check_catalog_lock_deployed_files() {
   [ "$missing_count" -eq 0 ]
 }
 
-# apm 0.35.0 deps list marks packages orphaned that apm prune --dry-run keeps as "required package content". Report
-# only what prune would remove, so doctor never suggests a prune that does nothing. A failed preview leaves the list as is.
+# apm 0.35.0 deps list marks packages orphaned that apm prune --dry-run (project scope) keeps as "required package
+# content". Report only what the preview would remove; a failed preview or an unreadable block is printed unchanged.
 reconcile_orphans_with_prune() {
   local dependency_output="$1" preview retained
   case "$dependency_output" in
@@ -1169,6 +1169,7 @@ reconcile_orphans_with_prune() {
       ;;
   esac
   if ! preview=$(NO_COLOR=1 COLUMNS=4096 apm prune --dry-run 2>/dev/null); then
+    warn "apm prune --dry-run failed; the orphan list below is not reconciled with it."
     printf '%s\n' "$dependency_output"
     return 0
   fi
@@ -1183,8 +1184,10 @@ reconcile_orphans_with_prune() {
       if (!in_block) return
       shown = 0
       for (i = 1; i <= entries; i++) if (!(entry[i] in keep)) shown++
-      if (shown == 0) {
-        printf "[i] %d package(s) that apm deps list reports as orphaned are kept by apm prune --dry-run as required package content; nothing to prune.\n", entries
+      if (entries == 0 || entries != declared) {
+        for (i = 1; i <= raw_count; i++) print raw[i]
+      } else if (shown == 0) {
+        printf "[i] %d package(s) that apm deps list reports as orphaned are kept by apm prune --dry-run as required package content; it would remove none of them.\n", entries
       } else {
         printf "[!] %d orphaned package(s) found (not in resolved dependency graph):\n", shown
         for (i = 1; i <= entries; i++) if (!(entry[i] in keep)) printf "[!]   - %s\n", entry[i]
@@ -1193,11 +1196,12 @@ reconcile_orphans_with_prune() {
       }
       in_block = 0
       entries = 0
+      raw_count = 0
     }
-    in_block && /^\[!\]   - / { entry[++entries] = substr($0, 9); next }
-    in_block && /^\[i\] Run .apm prune. to remove orphaned packages/ { flush_block(); next }
+    in_block && /^\[!\]   - / { entry[++entries] = substr($0, 9); raw[++raw_count] = $0; next }
+    in_block && /^\[i\] Run .apm prune/ { raw[++raw_count] = $0; flush_block(); next }
     { flush_block() }
-    /^\[!\] [0-9]+ orphaned package\(s\) found/ { in_block = 1; entries = 0; next }
+    /^\[!\] [0-9]+ orphaned package\(s\) found/ { in_block = 1; entries = 0; declared = $2; raw_count = 1; raw[1] = $0; next }
     /^│ / && / orphaned / {
       split($0, cells, "│")
       name = cells[2]

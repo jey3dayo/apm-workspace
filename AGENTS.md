@@ -154,8 +154,9 @@ check`.
 
 `apm deps list -g` (apm 0.35.0) calls packages orphaned that `apm prune
 --dry-run` keeps as required package content. `mise run doctor` shows those as
-`retained` and does not suggest a prune for them. A package it still lists as
-orphaned is one `apm prune --dry-run` would remove; preview before acting.
+`retained` and does not suggest a prune for them. When the preview succeeded, a
+package it still lists as orphaned is one the preview would remove; the preview
+runs in the workspace project scope, so read `apm prune --dry-run` before acting.
 
 ## Review Focus
 
