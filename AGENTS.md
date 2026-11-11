@@ -51,17 +51,16 @@ bundle and install only the required sub-skill from the consuming repository.
 The real HOME is native (`~/.apm/apm.yml` starts with
 `# Rendered by scripts/native.sh`). The legacy writer (`deploy`, `apply`,
 `upgrade`, `refresh` and their helper tasks) was removed on 2026-11-10; its last
-version is commit `0bcce09`. Roll out a pushed commit with section B of
-`docs/native-distribution.md` (`native:plan`, `native:backup`,
-`native:rehearse --migrate`, `native:migrate`); `native:migrate-rollback`
-undoes it.
+version is commit `0bcce09`. Roll out a pushed commit with `mise run native:sync` (use the `-- --https`
+option when SSH is unavailable). Section B of
+`docs/native-distribution.md` also documents the manual steps and rollback.
 
-| Intent            | Command                                              | Constraint                                                                                                                                                               |
-| ----------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Rollout           | `docs/native-distribution.md` section B (`native:*`) | Rehearse on a backup copy first; `native:migrate` rewrites HOME (undo: `native:migrate-rollback`); `native:reinstate`, `native:opencode`, `setup:mcp:host` also write it |
-| Validation only   | `mise run check`                                     | Does not roll out.                                                                                                                                                       |
-| Deep verification | `mise run verify`                                    | Runs checks, the script suite, and catalog smoke verification.                                                                                                           |
-| Inspection        | `mise run doctor`                                    | Read-only.                                                                                                                                                               |
+| Intent            | Command                | Constraint                                                                                                        |
+| ----------------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Rollout           | `mise run native:sync` | Runs backup and rehearsal before writing HOME; see `docs/native-distribution.md` section B for HTTPS and rollback |
+| Validation only   | `mise run check`       | Does not roll out.                                                                                                |
+| Deep verification | `mise run verify`      | Runs checks, the script suite, and catalog smoke verification.                                                    |
+| Inspection        | `mise run doctor`      | Read-only.                                                                                                        |
 
 Shipping here has no PR: commit directly on `main`, run `apm-deploy-verify`
 with the changed skill names (pass them both times: after the push the tree is
@@ -69,9 +68,8 @@ clean, so it cannot infer them from `git status`) before the push for format
 and check (its distribution-match step applies only after the push and B6, so
 it reports that step as not run before then), then
 push `main` and watch the pushed CI run. `ship` reads this as the repository's
-end point. After the push, roll the pushed commit out with section B of
-`docs/native-distribution.md`, then run `apm-deploy-verify` again for the
-distribution match.
+end point. After the push, roll the pushed commit out with `mise run native:sync`, then
+run `apm-deploy-verify` again for the distribution match.
 
 `mise.toml` manages the required tools. The bold-heading formatter helper is
 vendored at `scripts/replace-bold-headings.ts`; a missing helper is a broken
@@ -143,8 +141,9 @@ locations.
 ## Cache Recovery
 
 When a deployed `SKILL.md` is tiny, placeholder, or differs from a complete
-tracked source, compare source, cache, and target first, then repeat
-section B of `docs/native-distribution.md` (B4 sets the APM cache aside).
+tracked source, compare source, cache, and target first, then run
+`mise run native:sync` (it sets the APM cache aside; see section B of
+`docs/native-distribution.md`).
 
 `apm prune` can miss orphaned owner directories and removed nested skills.
 Compare `apm_modules/` with both manifest and lock; delete only an unreferenced
