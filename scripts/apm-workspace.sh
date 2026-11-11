@@ -47,7 +47,6 @@ LEARNING_INTAKE_PENDING_WARN_THRESHOLD=10
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
   case "$COMMAND" in
     setup:mcp:host) cmd_setup_host_mcp ;;
-    sync:mcp:global) cmd_sync_global_mcp ;;
     sync:opencode) cmd_sync_opencode ;;
     validate) cmd_validate ;;
     validate:catalog) cmd_validate_catalog ;;

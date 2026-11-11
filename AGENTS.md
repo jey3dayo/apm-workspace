@@ -113,10 +113,9 @@ symlinks resolving to `.apm/skills/<id>/SKILL.md`.
   and `~/.config/mise/config.workstation.toml`.
 - Follow the guide in `catalog/.apm/instructions/ai-collaboration.instructions.md` for MCP placement. Root `apm.yml` contains only
   cross-repository global MCP; record it in the tracked source, never edit
-  `~/.codex/config.toml`. Native distribution installs with `--only apm`; its
-  separate global MCP stage delivers only the `parallel` entry. Report other
-  `dependencies.mcp` changes as recorded, not delivered (see the boundary
-  table in `docs/native-distribution.md`). Host-local MCP goes through
+  `~/.codex/config.toml`. Native distribution does not deliver
+  `dependencies.mcp` (see the boundary table in `docs/native-distribution.md`);
+  report such a change as recorded, not delivered. Host-local MCP goes through
   `mise run setup:mcp:host`, and desktop MCP setup belongs to bootstrap.
 - Runtime assets that a skill places at launch have no `targets:` distribution
   route. For `agmsg-review.config.toml` (spawn puts it in the per-run worker

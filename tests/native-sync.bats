@@ -96,11 +96,6 @@ sync_native() {
 
 sync_workspace() {
   printf '%s\n' "$1" >>"$SYNC_TEST_CALLS"
-  if [ "${SYNC_TEST_MCP_WRITE:-0}" = 1 ] && [ "$1" = sync:mcp:global ]; then
-    mkdir -p "$HOME/.codex" "$HOME/.claude"
-    printf 'changed codex\n' >"$HOME/.codex/config.toml"
-    printf 'changed claude\n' >"$HOME/.claude.json"
-  fi
   if [ "${SYNC_TEST_FAIL:-}" = "$1" ]; then return 31; fi
 }
 
@@ -171,11 +166,11 @@ EOF
   [[ "$output" == *$'.agents/skills\t3'* ]]
 }
 
-@test "sync orders backup rehearsal cache migration global MCP OpenCode doctor and reports changed entry counts" {
+@test "sync orders backup rehearsal cache migration OpenCode doctor and reports changed entry counts" {
   SYNC_ENV=()
   run run_sync
   [ "$status" -eq 0 ]
-  [ "$(cat "$FX/calls")" = $'plan\nbackup\nrehearse\nmigrate\nsync:mcp:global\nsync:opencode\ndoctor\ndoctor-intake' ]
+  [ "$(cat "$FX/calls")" = $'plan\nbackup\nrehearse\nmigrate\nsync:opencode\ndoctor\ndoctor-intake' ]
   [[ "$output" == *".agents/skills: 1 -> 2 (+1)"* ]]
   [[ "$output" == *"Rollback of the four roots:"*"--real-home --stamp 20261110T120000Z"* ]]
   [ -f "$FX/home/.agents/skills/existing/SKILL.md" ]
@@ -290,26 +285,15 @@ EOF
   done
 }
 
-@test "global MCP OpenCode and doctor failures stop with the confirmed rollback command" {
+@test "OpenCode and doctor failures stop with the confirmed rollback command" {
   local stage
-  for stage in sync:mcp:global sync:opencode doctor doctor-intake; do
+  for stage in sync:opencode doctor doctor-intake; do
     SYNC_ENV=("SYNC_TEST_FAIL=$stage")
     run run_sync
     [ "$status" -ne 0 ]
     [[ "$output" == *"Rollback of the four roots:"*"--stamp 20261110T120000Z"* ]]
     [ "$(tail -n 1 "$FX/calls")" = "$stage" ]
   done
-}
-
-@test "a failure after global MCP setup restores both client configs" {
-  mkdir -p "$FX/home/.codex"
-  printf 'original codex\n' >"$FX/home/.codex/config.toml"
-  printf 'original claude\n' >"$FX/home/.claude.json"
-  SYNC_ENV=(SYNC_TEST_MCP_WRITE=1 SYNC_TEST_FAIL=doctor)
-  run run_sync
-  [ "$status" -ne 0 ]
-  [ "$(cat "$FX/home/.codex/config.toml")" = "original codex" ]
-  [ "$(cat "$FX/home/.claude.json")" = "original claude" ]
 }
 
 @test "sync refuses an unexpected real migration skip and keeps a confirmed rollback command" {
@@ -430,7 +414,7 @@ EOF
   git -C "$FX/repo" push -q "$FX/remote.git" HEAD:refs/heads/main
   run sync_fixture APM_BIN="$FX/apm-stub" bash "$FX/repo/scripts/native.sh" sync
   [ "$status" -eq 0 ]
-  [ "$(cat "$FX/home/.sync-events")" = $'install -g --only apm --trust-bin\ncompile -g --clean\nsync:mcp:global\nsync:opencode\ndoctor\ndoctor-intake' ]
+  [ "$(cat "$FX/home/.sync-events")" = $'install -g --only apm --trust-bin\ncompile -g --clean\nsync:opencode\ndoctor\ndoctor-intake' ]
   [[ "$output" == *".agents/skills: 1 -> 1 (+0)"* ]]
   [[ "$output" == *"Rollback of the four roots:"* ]]
   [ -f "$FX/home/.agents/skills/existing/SKILL.md" ]

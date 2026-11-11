@@ -193,13 +193,6 @@ sync_migrate_stamp() {
 sync_finish() {
   local status=$? stamp="" source destination
   trap - EXIT
-  if [ -n "${SYNC_MCP_SNAPSHOT:-}" ]; then
-    if restore_untouched "$SYNC_HOME" "$SYNC_MCP_SNAPSHOT"; then
-      rm -rf "${SYNC_HOME:?}/.apm/native-migrate-$SYNC_MCP_SNAPSHOT.untouched"
-    else
-      log "Parallel MCP setup changed files that could not be restored; copies remain under $SYNC_HOME/.apm/native-migrate-$SYNC_MCP_SNAPSHOT.untouched"
-    fi
-  fi
   stamp="$(sync_migrate_stamp)" || stamp=""
   if [ "$status" != 0 ]; then log "native:sync stopped (exit $status); backup and logs: $SYNC_RUN"; fi
   if [ -n "$stamp" ]; then
@@ -218,7 +211,7 @@ sync_finish() {
 cmd_sync() (
   local source_ref=HEAD https=0 home_dir="" real_home=1 selected_home="" sha backup rehearsal path stamp
   local sync_args=(sync "$@")
-  SYNC_ALLOW_DROP="" SYNC_ALLOW_SKIP="" SYNC_MCP_SNAPSHOT=""
+  SYNC_ALLOW_DROP="" SYNC_ALLOW_SKIP=""
   while [ $# -gt 0 ]; do
     case "$1" in
       -h | --help)
@@ -295,14 +288,9 @@ cmd_sync() (
   stamp="$(sync_migrate_stamp)" || fail "migrate did not print one valid recorded stamp; inspect $SYNC_RUN/migrate.log"
   sync_review_entries "$SYNC_HOME/.apm/native-migrate-$stamp.dropped.txt" "$SYNC_ALLOW_DROP" drop
   sync_review_entries "$SYNC_HOME/.apm/native-migrate-$stamp.skipped.txt" "$SYNC_ALLOW_SKIP" skip
-  SYNC_MCP_SNAPSHOT="$stamp"
-  save_untouched "$SYNC_HOME" "$stamp"
-  sync_stage global-mcp sync_workspace sync:mcp:global
   sync_stage opencode sync_workspace sync:opencode
   sync_stage doctor sync_workspace doctor
   sync_stage doctor-intake sync_workspace doctor-intake
-  rm -rf "${SYNC_HOME:?}/.apm/native-migrate-$stamp.untouched"
-  SYNC_MCP_SNAPSHOT=""
   sync_counts "$SYNC_HOME" >"$SYNC_RUN/after-counts.txt"
   awk -F '\t' 'NR == FNR { before[$1] = $2; next } { printf "%s: %d -> %d (%+d)\n", $1, before[$1], $2, $2 - before[$1] }' \
     "$SYNC_RUN/before-counts.txt" "$SYNC_RUN/after-counts.txt"

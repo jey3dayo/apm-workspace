@@ -1,12 +1,12 @@
 # APM native の配布（単一 mise 入口）
 
-- Status: 2026-11-11、APM 0.35.0。`mise run native:sync` が唯一の配布入口で、plan・backup・migrate rehearsal・migration・global Parallel MCP・OpenCode・doctor を順に実行する。migration は clean な rehearsal がある場合だけ実 HOME に書き、失敗時は root を自動で戻す。APM install 自体は MCP・認証・permissions・settings を書き換えない（`--only apm`）。Parallel だけは後段の専用 stage が root manifest から同期する
+- Status: 2026-11-11、APM 0.35.0。`mise run native:sync` が唯一の配布入口で、plan・backup・migrate rehearsal・migration・OpenCode・doctor を順に実行する。migration は clean な rehearsal がある場合だけ実 HOME に書き、失敗時は root を自動で戻す。MCP・認証・permissions・settings は書き換えない（install は `--only apm`）
 - 今の位置づけ: 実 HOME は 2026-11-10 に native へ切り替え済みで、authoring の checkout は `~/.apm` の外（`~/src/github.com/jey3dayo/apm-workspace`）にある。内部 stage は sync の一貫した guard・排他・復旧契約を実装するために残すが、個別の mise task や手動配布入口にはしない
 - テスト: `tests/native-distribution.bats`（`mise run test:sh` に含まれる）。この checkout の `catalog/` と `manual-skills/` を fixture の git repo に入れ、実 APM で使い捨ての HOME へ配る。macOS では `sandbox-exec` が通信と fixture の外への書込みを拒否する。fixture の置き場所は `APM_NATIVE_FIXTURE_ROOT` で変えられる
 
 ## 入口
 
-`mise run native:sync` だけが native task です。push 済み main の確認から backup・migrate rehearsal・実配布・global Parallel MCP・OpenCode・doctor まで実行します（下の B）。
+`mise run native:sync` だけが native task です。push 済み main の確認から backup・migrate rehearsal・実配布・OpenCode・doctor まで実行します（下の B）。
 
 sync と内部 stage は HOME ごとに同じ排他を取る。sync は backup の前から配布後の確認まで保持する。backup と rehearsal も排他用の `<HOME>/.cache/apm-native-operation.lock` を作るが、配布対象データは書き換えない。lock は退避する `.cache/apm` の外にあり、親の symlink と lock ファイルの hard link を拒否する。ファイルは削除しない。その lock を継承した全プロセスが終了すると、異常終了の場合も OS が排他を解放する。別のプロセスが保持中の lock ファイルを移動・削除しない。
 
@@ -19,7 +19,7 @@ sync と内部 stage は HOME ごとに同じ排他を取る。sync は backup �
 - `<HOME>/apm.yml` があれば、rehearsal（実 HOME と複製の両方）と migration は何も書かずに止まる。user scope の APM は executable の許可を `<HOME>/apm.yml` が在ればそちらから読み、`<HOME>/.apm/apm.yml` の `allowExecutables` を無視するため（`apm_cli/security/executables.py` の `exec_trust_context_for_project`）
 - apm は空の環境に `HOME`・`PATH`・ロケール・git の設定の場所と、HOME の中の `TMPDIR`（`.cache/apm-native-tmp`）だけを渡して起動する。APM は `APM_CACHE_DIR` や `XDG_*`、`TMPDIR` が指す場所にも書き（`APM_CACHE_DIR` と `XDG_CACHE_HOME` はテストで確かめた）、git は token・proxy・askpass を環境から読むため
 - manifest は同じディレクトリの新しいファイルに書いてから名前を置き換える
-- install は `--only apm`。APM install は MCP に触らない。`native:sync` は migration が成功したあと、root manifest の Parallel 宣言を専用 stage で同期する。ほかの MCP は `setup:mcp:host` などが書いた今の設定のまま触らない
+- install は `--only apm`。MCP は、`setup:mcp:host` などが書いた今の設定のまま触らない
 
 backup の対象（rehearse が複製に再現するもの）: `~/.apm/apm.yml`・`config.json`・`apm.lock.yaml`・`deployment-receipts`（APM が配った成果物の所有の記録）、`~/.claude/{skills,agents,rules,commands,CLAUDE.md}`、`~/.codex/{AGENTS.md,rules}`、`~/.cursor/{agents,rules,AGENTS.md}`、`~/.agents/skills`、`~/AGENTS.md`、`~/.config/opencode/AGENTS.md`、`~/.local/state/agmsg`（別に取る）
 
@@ -42,7 +42,7 @@ backup の対象（rehearse が複製に再現するもの）: `~/.apm/apm.yml`�
 | `catalog/.apm/agents`                                    | native             | Codex には配らない（`docs/package-decisions.md` の Codex 変換の却下）                                                                                                                                                  | 観測（Claude と Cursor に届き、`~/.codex/agents` は作られない）                                      |
 | `catalog/.apm/instructions`                              | native             | compile が Codex と Cursor の root を書く。Claude には rule として届く。手書きの `~/.claude/CLAUDE.md` は残る                                                                                                          | 観測                                                                                                 |
 | root `apm.yml` の外部の依存                              | native             | -                                                                                                                                                                                                                      | 描画だけ確かめた（テストは通信しないので install は未確認）                                          |
-| root `apm.yml` の `mcp:`                                 | 一部 native        | APM install は `--only apm`。Parallel だけを `native:sync` の専用 stage が Claude Code / Codex の user scope へ同期する。ほかの entry は manifest に残すが配らない                                                     | Parallel は匿名・API key の両方をテスト。ほかは未配布                                                |
+| root `apm.yml` の `mcp:`                                 | first cut の外     | manifest には残すが、install は `--only apm` なので配らない。MCP は今の設定のまま                                                                                                                                      | -                                                                                                    |
 | `catalog/rules/claude-md-design.md`                      | 手動（レイアウト） | `~/.claude/rules/` へコピーする。旧経路は Codex・Cursor・OpenCode の `rules/` にも置いていたが、それぞれの tool がそこの `.md` を読むかは確かめていない                                                                | 未確認                                                                                               |
 | `catalog/claude/rules/model-policy.md`                   | 手動（レイアウト） | `~/.claude/rules/` へコピーする。Claude だけに向けた rule で、instructions にすると Codex・Cursor の root にも入る。1 つの instruction を Claude だけに配れるかは確かめていない                                        | 未確認                                                                                               |
 | agmsg の `db`・`teams`（`~/.agents/skills/agmsg/` の中） | 手動（APM 非対応） | APM は skill のディレクトリを置き換えるので、リンクが消える。rehearse と migrate は既存の `scripts/agmsg-state.sh` で save/restore し、migrate-rollback はリンクを戻す。skill の中の `run/` が消えるかは確かめていない | テスト（apm の stub でディレクトリを置き換えて確かめた。migrate はリンクが往復で戻ることを確かめた） |
@@ -119,7 +119,7 @@ allowExecutables:
 1. `<HOME>/.apm` が checkout（`.git` か `catalog/`）なら止まる。この repo が `<HOME>/.apm` の中でも止まる
 2. `--rehearsal` の `result.txt` を確かめる: `mode=migrate`、同じ HOME・`--source-ref`・`--workspace-only`、install・compile・入れ直し・agmsg の status が 0、`lost=0`、`baseline_skips=0`、今の HOME と同じ `previous_lock`・`home_apm`。1 つでも違えば何も書かずに止まる
 3. 共有 guard（`config.json`、`<HOME>/apm.yml` が無いこと、compile のあとに編集された root）と、agmsg の `db`・`teams` のリンクが `<HOME>/.local/state/agmsg/` を指していること（`agmsg-state.sh` は既定の保存先にしか張り直さないので、別の保存先なら何も書かずに止まる。migrate rehearsal も同じ）と、HOME の外へ出るリンクと hard link の検査。`--home` は HOME 全体を、`--real-home` は APM の書込み先（退避する 4 つの root、rules、compile が書く root、`.apm`、`.cache/apm`、`Library/Caches/apm`）だけを調べる。tool のディレクトリ（`.claude` など）はリンクのときだけ調べる
-4. `~/.codex/config.toml`・`~/.claude/settings.json`・`~/.claude.json` を、パーミッションを保ったまま `<HOME>/.apm/native-migrate-<UTC>.untouched/`（owner だけが読める）へコピーし、4 つの root の snapshot を取り、agmsg のリンクがあれば save する。中身はログに出さない
+4. `~/.codex/config.toml` と `~/.claude/settings.json` を、パーミッションを保ったまま `<HOME>/.apm/native-migrate-<UTC>.untouched/`（owner だけが読める）へコピーし、4 つの root の snapshot を取り、agmsg のリンクがあれば save する。中身はログに出さない
 5. manifest を書く（差があれば前の manifest を `apm.yml.<UTC>.bak` に残す）。4 つの root を `<root>.bak-<UTC>` へ移し、退避した一覧を `<HOME>/.apm/native-migrate-<UTC>.txt` に記録する。`apm install -g --only apm --trust-bin`、`apm compile -g --clean`、内部の入れ直し（その前に、4 つの root・その `.bak-<UTC>`・`.agents`・`.claude`・`.cursor` が HOME の外を指すリンクや切れたリンクでないことを確かめる）、agmsg の restore
 6. migrate が落とした entry（前回の native の lock が載せていて、今回は配られなかったもの）の一覧を `<HOME>/.apm/native-migrate-<UTC>.dropped.txt` に書き、rehearse の `dropped.txt` と違えば失敗する。同名 entry の内容が違った一覧（`.skipped.txt`）も rehearse の `skipped.txt` と照合し、違えば同じ自動 rollback で戻す。続けて、rehearse と同じ消失の検査を、migrate 自身が 4 つの root の before/after の snapshot と同じ allowlist で行う。表に無いものが消えていれば失敗する（rehearse のあとに足したファイルを、APM が配り直す skill の中で失わないため）。検査の範囲は 4 つの root だけで、rehearse が見る `.claude/rules`・`.codex/rules`・compile が書く root などは、`migrate` 自身は見ない（rehearse の時点の結果に頼る）。一覧は `<HOME>/.apm/native-migrate-<UTC>.lost.txt` に残る。続けて、手順 4 の 2 つのファイルが変わっていないか比べる
 7. 5 と 6 のどこかで失敗したら、自動で rollback して非 0 で終わる。2 つのファイルが変わっていたときは、手順 4 のコピーで元に戻し、migrate が残した版を `<ファイル>.changed-<UTC>` として残す。成功すると `.untouched/` を消し、UTC の stamp と rollback のコマンドを表示する
@@ -128,7 +128,7 @@ rollback（自動も sync が出す直接 command も）が戻すのは 4 つの
 
 rollback で旧経路の状態へ戻した HOME は、この branch に無い旧ツール（`deploy`・`apply` など）を使って保守する。旧ツールは commit `0bcce09` にある。
 
-`migrate` の間は Claude Code と Codex のセッションを閉じる。`~/.codex/config.toml`・`~/.claude/settings.json`・`~/.claude.json` が変わると失敗して元の内容を書き戻すので、その間のセッションの書込みが `<ファイル>.changed-<UTC>` に回る。symlink なら、復元はリンクを保ったままリンク先へ元の内容を書き戻す。`native:sync` が MCP を同期する `.codex/config.toml` と `.claude.json` は HOME の外を指す symlink を事前に拒否する。
+`migrate` の間は Claude Code と Codex のセッションを閉じる。`~/.codex/config.toml` と `~/.claude/settings.json` が変わると失敗して元の内容を書き戻すので、その間のセッションの書込みが `<ファイル>.changed-<UTC>` に回る。この 2 つが symlink なら、復元はリンクを保ったままリンク先へ元の内容を書き戻す。リンク先が HOME の外（dotfiles の repo など）でも書き戻す（今の実 HOME では通常のファイル）。
 
 `migrate` が失敗して自動で rollback したあとも、`<HOME>/.apm/apm.yml` は描画された manifest のままで、`~/.apm` は consumer の状態のまま残る。切り替え前（`~/.apm` が checkout）の状態へ戻すには、下の「実 HOME の checkout の移設」の「戻す」のとおり、consumer の `~/.apm` を別名へ移し、`~/.apm.checkout-<UTC>` を戻す。migrate のログにも同じ手順が出る。
 
@@ -159,7 +159,7 @@ rollback で旧経路の状態へ戻した HOME は、この branch に無い旧
 
 B. 切り替えのたび（新しい SHA を配るときも同じ）
 
-通常の更新は push 済みの checkout で `mise run native:sync` を実行する。local HEAD と配布元の `main` が同じ SHA で、作業ツリーに未コミット変更がないことを確認してから、B1〜B7 を順に行う。毎回新しい backup と migrate rehearsal を作り、キャッシュを削除せず別名へ移す。migration 後に Parallel MCP を同期し、配布後は OpenCode のガイドを配置して doctor と intake の確認を行い、4 つの root の top-level entry 数を配布前後で表示する。Parallel stage から後ろで失敗した場合は、stage 前の `~/.codex/config.toml` と `~/.claude.json` を owner-only の一時 copy から戻す。成功時は copy を消す。既存セッションを閉じる操作は行わない。OpenCode の出力先は対象 HOME の `.config/opencode/AGENTS.md` に固定し、継承した `APM_OPENCODE_OUTPUT` は使わない。配置前に親ディレクトリの symlink とガイドの symlink・hard link を拒否する。
+通常の更新は push 済みの checkout で `mise run native:sync` を実行する。local HEAD と配布元の `main` が同じ SHA で、作業ツリーに未コミット変更がないことを確認してから、B1〜B7 を順に行う。毎回新しい backup と migrate rehearsal を作り、キャッシュを削除せず別名へ移す。配布後は OpenCode のガイドを配置し、doctor と intake の確認を行い、4 つの root の top-level entry 数を配布前後で表示する。既存セッションを閉じる操作は行わない。OpenCode の出力先は対象 HOME の `.config/opencode/AGENTS.md` に固定し、継承した `APM_OPENCODE_OUTPUT` は使わない。配置前に親ディレクトリの symlink とガイドの symlink・hard link を拒否する。
 
 rehearsal に `dropped.txt` や `skipped.txt` の entry があれば、実 HOME を書き換える前に止まる。表示されたレポートを読み、意図した削除だけを `--allow-drop <root>/<entry>`、内容の異なる同名 entry の置き換えだけを `--allow-skip <root>/<entry>` で指定して再実行する（agmsg の `run/`・`db`・`teams` と `.claude/skills/synced` は実行時の状態として比べないので、これらの `--allow-skip` は要らず、付けると余分な指定として拒否される。比べないのは agmsg の下の名前が `run`・`db`・`teams` のものすべてで、入れ子の同名も含む）。どちらも繰り返し指定でき、実際の一覧と完全に一致する場合だけ続行する。余分な指定も拒否する。`allowed-lost.txt` は既存の allowlist と照合し、allowlist 外の消失や deployment baseline の省略は指定で許可できない。
 
@@ -177,7 +177,7 @@ sync が実行する B1〜B7 は次のとおり。これらは個別 task では
   - キャッシュなので、install が作り直す
   - 戻し方: 作り直された `~/.cache/apm` を別名（`apm.native-regen-<UTC>` など）へ移し、退避した `apm.native-aside-<UTC>` を `~/.cache/apm` に戻す。どちらも消さない
 - B5. 同じ SHA と B3 の rehearsal で migration を実行し、stamp を記録する
-- B6. root manifest の Parallel entry を Claude Code / Codex の user scope に同期する。`PARALLEL_API_KEY` が空または未設定なら Authorization を置かず、設定済みなら値ではなく環境変数名だけを置く。その後に OpenCode のガイドを配置し、doctor と intake を実行し、配布前後の entry 数を表示する。手書きの OpenCode `AGENTS.md` は上書きしない
+- B6. OpenCode のガイドを配置し、doctor と intake を実行し、配布前後の entry 数を表示する。手書きの OpenCode `AGENTS.md` は上書きしない
 - B7. 問題があれば sync が表示した直接の rollback command を実行する。移したあとの root は `<root>.native-<UTC>` に残る。問題がなければ、`<root>.bak-<UTC>` と `<root>.native-<UTC>` は手で消すまで残る
 
 ### 切り替えたあとの更新

@@ -209,7 +209,6 @@ seed_sentinels() {
   echo "tool-owned" >"$home/.agents/skills/herdr-automations/SKILL.md"
   echo 'model = "fixture"' >"$home/.codex/config.toml"
   echo '{"fixture": true}' >"$home/.claude/settings.json"
-  echo '{"fixture": true}' >"$home/.claude.json"
   echo "hand-written root" >"$home/.claude/CLAUDE.md"
   echo "opencode guide" >"$home/.config/opencode/AGENTS.md"
   echo "pi guide" >"$home/AGENTS.md"
@@ -217,7 +216,7 @@ seed_sentinels() {
 
 sentinel_snapshot() {
   (cd "$1" && for f in .claude/skills/private-copy/SKILL.md .claude/skills/private-link .claude/skills/private-link/SKILL.md \
-    .agents/skills/herdr-automations/SKILL.md .codex/config.toml .claude/settings.json .claude.json .claude/CLAUDE.md \
+    .agents/skills/herdr-automations/SKILL.md .codex/config.toml .claude/settings.json .claude/CLAUDE.md \
     .config/opencode/AGENTS.md AGENTS.md; do
     if [ -L "$f" ]; then printf '%s -> %s\n' "$f" "$(readlink "$f")"; else printf '%s %s\n' "$f" "$(git hash-object "$f")"; fi
   done)
@@ -268,8 +267,6 @@ sentinel_snapshot() {
   [ "$(grep -c '^executables:' <<<"$rendered")" -eq 0 ]
 
   [ "$(sed -n 2p <<<"$rendered")" = "# native-render: workspace_only=0" ]
-  [ "$(grep -c '^    - name: parallel$' <<<"$rendered")" -eq 1 ]
-  [ "$(grep -A5 '^    - name: parallel$' <<<"$rendered")" = "$(printf '    - name: parallel\n      registry: false\n      transport: http\n      url: https://mcp.parallel.ai/mcp\n      headers:\n        Authorization: \"Bearer ${PARALLEL_API_KEY}\"')" ]
 
   # Everything else in apm.yml passes through line for line.
   diff <(sed '/^executables:/,$d' "$REPO_ROOT/apm.yml" | grep -vE 'jey3dayo/apm-workspace/(catalog|manual-skills)#main|nanaism/yomiyasu/skills/yomiyasu#') \
