@@ -56,6 +56,25 @@ setup() {
   [ ! -e "$DESTINATION_WORKTREE/source-link/.env" ]
 }
 
+@test "finds the default source checkout when its path contains spaces" {
+  local source_with_space="$BATS_TEST_TMPDIR/source checkout"
+  local default_source_worktree="$BATS_TEST_TMPDIR/default-source-worktree"
+  mkdir -p "$source_with_space"
+  git -C "$source_with_space" init -q
+  git -C "$source_with_space" config user.name "Bats Fixture"
+  git -C "$source_with_space" config user.email "bats-fixture@example.invalid"
+  printf 'fixture\n' >"$source_with_space/README"
+  git -C "$source_with_space" add README
+  git -C "$source_with_space" commit -q -m "fixture commit"
+  git -C "$source_with_space" worktree add -q -b env-copy-test "$default_source_worktree"
+  printf 'fake default source env\n' >"$source_with_space/.env.local"
+
+  run "$SCRIPT_UNDER_TEST" "$default_source_worktree"
+
+  [ "$status" -eq 0 ]
+  [ "$(cat "$default_source_worktree/.env.local")" = "fake default source env" ]
+}
+
 @test "does not follow a destination symlink while creating a nested env path" {
   mkdir -p "$SOURCE_CHECKOUT/project"
   printf 'fake nested env\n' >"$SOURCE_CHECKOUT/project/.env.local"

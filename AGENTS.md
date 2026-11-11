@@ -121,6 +121,12 @@ symlinks resolving to `.apm/skills/<id>/SKILL.md`.
   route. For `agmsg-review.config.toml` (spawn puts it in the per-run worker
   home, a hand-started pane in `~/.codex`), use the placement contract in
   `catalog/.apm/skills/agmsg-delegation/references/codex-sandbox.md`.
+- Do not hard-code versioned model IDs in role or tier guidance in skills,
+  agent definitions, instructions, or docs. Write in terms of role and tier;
+  concrete policy IDs belong in
+  `catalog/.apm/skills/orchestrator-worker/references/models.md`. Runtime helper
+  allowlists and their focused tests are required mirrors and must change with
+  that table. Short aliases in config values (e.g. `model: sonnet`) are allowed.
 
 ## agmsg State
 
