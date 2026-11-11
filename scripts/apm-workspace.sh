@@ -1157,10 +1157,21 @@ check_catalog_lock_deployed_files() {
   [ "$missing_count" -eq 0 ]
 }
 
-# apm 0.35.0 deps list marks packages orphaned that apm prune --dry-run (project scope) keeps as "required package
-# content". Report only what the preview would remove; a failed preview or an unreadable block is printed unchanged.
+# True when every orphan warning block lists as many entries as its header declares.
+orphan_blocks_are_readable() {
+  printf '%s\n' "$1" | awk '
+    function close_block() { if (in_block && entries != declared) bad = 1; in_block = 0 }
+    in_block && /^\[!\]   - / { entries++; next }
+    { close_block() }
+    /^\[!\] [0-9]+ orphaned package\(s\) found/ { in_block = 1; declared = $2; entries = 0 }
+    END { close_block(); exit bad }
+  '
+}
+
+# apm 0.35.0 deps list -g marks packages orphaned that apm prune --dry-run keeps as "required package content". deps list -g
+# reads $HOME/.apm, so the preview runs there; with no manifest there, or an unreadable list, it is printed unchanged.
 reconcile_orphans_with_prune() {
-  local dependency_output="$1" preview retained
+  local dependency_output="$1" global_dir="$HOME/.apm" preview retained
   case "$dependency_output" in
     *"orphaned package(s) found"*) ;;
     *)
@@ -1168,8 +1179,19 @@ reconcile_orphans_with_prune() {
       return 0
       ;;
   esac
-  if ! preview=$(NO_COLOR=1 COLUMNS=4096 apm prune --dry-run 2>/dev/null); then
-    warn "apm prune --dry-run failed; the orphan list below is not reconciled with it."
+  if [ ! -f "$global_dir/apm.yml" ]; then
+    warn "$global_dir/apm.yml is missing, so the orphan list cannot be checked against apm prune --dry-run."
+    printf '%s\n' "$dependency_output"
+    return 0
+  fi
+  if ! orphan_blocks_are_readable "$dependency_output"; then
+    warn "The orphan list does not match its count, so it is not checked against apm prune --dry-run."
+    printf '%s\n' "$dependency_output"
+    return 0
+  fi
+  if ! preview=$(cd "$global_dir" && NO_COLOR=1 COLUMNS=4096 apm prune --dry-run 2>&1); then
+    printf '%s\n' "$preview" >&2
+    warn "apm prune --dry-run failed; the orphan list below is not checked against it."
     printf '%s\n' "$dependency_output"
     return 0
   fi
@@ -1184,9 +1206,7 @@ reconcile_orphans_with_prune() {
       if (!in_block) return
       shown = 0
       for (i = 1; i <= entries; i++) if (!(entry[i] in keep)) shown++
-      if (entries == 0 || entries != declared) {
-        for (i = 1; i <= raw_count; i++) print raw[i]
-      } else if (shown == 0) {
+      if (shown == 0) {
         printf "[i] %d package(s) that apm deps list reports as orphaned are kept by apm prune --dry-run as required package content; it would remove none of them.\n", entries
       } else {
         printf "[!] %d orphaned package(s) found (not in resolved dependency graph):\n", shown
@@ -1196,12 +1216,11 @@ reconcile_orphans_with_prune() {
       }
       in_block = 0
       entries = 0
-      raw_count = 0
     }
-    in_block && /^\[!\]   - / { entry[++entries] = substr($0, 9); raw[++raw_count] = $0; next }
-    in_block && /^\[i\] Run .apm prune/ { raw[++raw_count] = $0; flush_block(); next }
+    in_block && /^\[!\]   - / { entry[++entries] = substr($0, 9); next }
+    in_block && /^\[i\] Run .apm prune/ { flush_block(); next }
     { flush_block() }
-    /^\[!\] [0-9]+ orphaned package\(s\) found/ { in_block = 1; entries = 0; declared = $2; raw_count = 1; raw[1] = $0; next }
+    /^\[!\] [0-9]+ orphaned package\(s\) found/ { in_block = 1; entries = 0; next }
     /^│ / && / orphaned / {
       split($0, cells, "│")
       name = cells[2]
