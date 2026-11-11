@@ -13,7 +13,7 @@ wt="${1:-}"
 [ -d "$wt" ] || { echo "error: worktree not found: $wt" >&2; exit 1; }
 
 # Default source: the main worktree of the same repository.
-src="${2:-$(git -C "$wt" worktree list --porcelain | awk '/^worktree /{print $2; exit}')}"
+src="${2:-$(git -C "$wt" worktree list --porcelain | awk '/^worktree /{sub(/^worktree /, ""); print; exit}')}"
 [ -d "$src" ] || { echo "error: source checkout not found: $src" >&2; exit 1; }
 
 wt_abs=$(cd -P "$wt" && pwd -P)
