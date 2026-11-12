@@ -85,6 +85,8 @@ $escaping"
   fi
   assert_default_apm_config "$scratch"
   assert_no_home_manifest "$scratch"
+  LINKED_ENTRIES_FILE="$rehearsal/linked-entries.txt"
+  entries_with_links "$scratch" >"$LINKED_ENTRIES_FILE"
   isolate_scratch_links "$home" "$scratch"
   shared="$(shared_entries "$scratch")"
   [ -z "$shared" ] || fail "the scratch HOME $scratch still shares data with files outside it:

@@ -165,7 +165,8 @@ reinstate_differs() {
 }
 
 # "<sha256>  <entry>/<path inside it>" for each deployed_file_hashes record of the lock under <root>/<entry> (a single-file
-# entry is its own record). A record with a quoted key is not read, so it shows up as a mismatch.
+# entry is its own record). A record that may belong to the entry but cannot be read (a quoted key, no sha256) adds a line
+# no real hash line equals, so the comparison fails closed.
 lock_entry_hashes() {
   awk -v root="$2" -v name="$3" '
     BEGIN { exact = root "/" name }
@@ -174,7 +175,12 @@ lock_entry_hashes() {
     mode == "hashes" && /^    [^ ]/ {
       record = substr($0, 5)
       split_at = index(record, ": sha256:")
-      if (!split_at) next
+      if (!split_at || record ~ /^["\047]/) {
+        unquoted = record
+        gsub(/["\047]/, "", unquoted)
+        if (index(unquoted, exact) == 1) print "unreadable record of " exact
+        next
+      }
       path = substr(record, 1, split_at - 1)
       if (path != exact && index(path, exact "/") != 1) next
       if (index(path, "/__pycache__/") || path ~ /\/\.apm-pin$/) next
@@ -189,13 +195,26 @@ entry_file_hashes() {
   (cd "$1" && find "$2" -type f -not -path '*/__pycache__/*' -not -name .apm-pin -print0 | xargs -0 -r "${hasher[@]}") | LC_ALL=C sort
 }
 
+# "<root>/<entry>" for each top-level entry of the roots of $1 that holds anything but regular files and directories.
+entries_with_links() {
+  local home="$1" root entry
+  for root in $MIGRATE_ROOTS; do
+    [ -d "$home/$root" ] || continue
+    while IFS= read -r -d '' entry; do
+      if [ -n "$(find "$entry" ! -type f ! -type d -print -quit)" ]; then printf '%s/%s\n' "$root" "${entry##*/}"; fi
+    done < <(find "$home/$root" -mindepth 1 -maxdepth 1 -print0)
+  done
+}
+
 # True when the old entry is what apm itself deployed: every file hashes as the previous lock recorded it, and the lock
 # records no other file. Replacing it loses nothing (it stays in <root>.bak-<stamp>); a link, an unlisted file or a
-# changed byte leaves it to --allow-skip.
+# changed byte leaves it to --allow-skip. A rehearsal materializes links in its scratch HOME (isolate_scratch_links), so
+# it lists the entries that held one before that in LINKED_ENTRIES_FILE and migrate, which sees the links, agrees.
 previous_lock_matches() {
   local home="$1" stamp="$2" root="$3" name="$4" lock expected actual
   lock="$(migrate_previous_lock "$home" "$stamp")"
   [ -f "$lock" ] && [ ! -L "$lock" ] || return 1
+  if [ -n "${LINKED_ENTRIES_FILE:-}" ] && grep -qxF "$root/$name" "$LINKED_ENTRIES_FILE"; then return 1; fi
   [ -z "$(find "$home/$root.bak-$stamp/$name" ! -type f ! -type d -print -quit)" ] || return 1
   expected="$(lock_entry_hashes "$lock" "$root" "$name")"
   [ -n "$expected" ] || return 1

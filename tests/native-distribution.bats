@@ -286,19 +286,31 @@ dependencies:
 EOF
 }
 
-# Deploys foo and, like apm install, replaces the lock, so only a copy taken before install still shows the old hashes.
+# Deploys foo (with a link.md, so a link of that name in the old entry loses nothing) and, like apm install, replaces the
+# lock, so only a copy taken before install still shows the old hashes.
 write_deploy_and_relock_stub() {
-  printf '#!/bin/sh\n[ "$1" = install ] || exit 0\nmkdir -p "$HOME/.claude/skills/foo" "$HOME/.apm"\necho "deployed by apm" >"$HOME/.claude/skills/foo/SKILL.md"\nprintf "lockfile_version: 1\\n" >"$HOME/.apm/apm.lock.yaml"\n' >"$1"
+  printf '#!/bin/sh\n[ "$1" = install ] || exit 0\nmkdir -p "$HOME/.claude/skills/foo" "$HOME/.apm"\necho "deployed by apm" >"$HOME/.claude/skills/foo/SKILL.md"\ncp "$HOME/.claude/skills/foo/SKILL.md" "$HOME/.claude/skills/foo/link.md"\nprintf "lockfile_version: 1\\n" >"$HOME/.apm/apm.lock.yaml"\n' >"$1"
   chmod +x "$1"
 }
 
-# A third argument seeds a previous lock that records that content for .claude/skills/foo/SKILL.md.
+add_quoted_lock_record_of_missing_file() {
+  printf "    '.claude/skills/foo/gone file.md': sha256:0000\n" >>"$1/.apm/apm.lock.yaml"
+}
+
+add_link_to_home_file() {
+  ln -s "$1/private-skills/private-link/SKILL.md" "$1/.claude/skills/foo/link.md"
+  printf '    .claude/skills/foo/link.md: sha256:%s\n' "$(shasum -a 256 <"$1/private-skills/private-link/SKILL.md" | awk '{print $1}')" >>"$1/.apm/apm.lock.yaml"
+}
+
+# A third argument seeds a previous lock that records that content for .claude/skills/foo/SKILL.md; a fourth is a
+# function that then changes the seeded HOME (called with the HOME) before the backup.
 prepare_migrate() {
-  local name="$1" stub="$2" lock_content="${3:-}"
+  local name="$1" stub="$2" lock_content="${3:-}" seed_more="${4:-}"
   M_HOME="$(new_home "$name")"
   M_BACKUP="$FX/backups/$name"
   seed_migrate_home "$M_HOME"
   [ -z "$lock_content" ] || seed_previous_lock "$M_HOME" "$lock_content"
+  [ -z "$seed_more" ] || "$seed_more" "$M_HOME"
   real_native "$M_HOME" backup --real-home --backup-dir "$M_BACKUP"
   if [ "$stub" = real ]; then
     real_native "$M_HOME" rehearse --real-home --backup-dir "$M_BACKUP" --source-ref "$SOURCE_SHA" --workspace-only --migrate
@@ -445,4 +457,22 @@ prepare_migrate() {
   prepare_migrate skip-lock-edited "$stub" "what apm deployed before the hand edit"
   [ "$(cat "$M_REHEARSAL/skipped.txt")" = ".claude/skills/foo" ]
   [ ! -s "$M_REHEARSAL/auto-approved-skips.txt" ]
+}
+
+@test "a lock record that cannot be read, for a file the old entry no longer has, keeps the entry reported for --allow-skip" {
+  local stub="$FX/stub-apm-relock"
+  write_deploy_and_relock_stub "$stub"
+  prepare_migrate skip-lock-quoted "$stub" "old foo" add_quoted_lock_record_of_missing_file
+  [ "$(cat "$M_REHEARSAL/skipped.txt")" = ".claude/skills/foo" ]
+  [ ! -s "$M_REHEARSAL/auto-approved-skips.txt" ]
+}
+
+@test "an old entry holding a link to another file of the HOME is reported by the rehearsal too, so the migrate lists agree" {
+  local stub="$FX/stub-apm-relock"
+  write_deploy_and_relock_stub "$stub"
+  prepare_migrate skip-lock-link "$stub" "old foo" add_link_to_home_file
+  [ "$(cat "$M_REHEARSAL/skipped.txt")" = ".claude/skills/foo" ]
+  [ ! -s "$M_REHEARSAL/auto-approved-skips.txt" ]
+  run real_native_with_stub "$M_HOME" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
+  [ "$status" -eq 0 ]
 }
