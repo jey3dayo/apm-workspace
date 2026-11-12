@@ -879,3 +879,14 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 
 - 撤去：`improve-ui` と `fixing-motion-performance`。`fixing-accessibility` は残す。
 - モーション性能の診断は `animation-performance` に寄せる。`fixing-motion-performance` と `improve-ui` を残した過去の判断は今回の選択で更新し、ほかの依存は変更しない。
+
+## 2026-11-12 agmsg を v1.5.1 に戻した
+
+- Status: 保留（v1.7.2 への更新を取り消し、`4a712f2a`（v1.5.1）に固定）
+- 理由: v1.7.1 から同梱された `app/addons/fileview/app-panes/fileview/web/assets/index-*.js`
+  に U+202E などの双方向制御文字があり、apm 0.35.x が `fujibee/agmsg contains critical
+hidden character(s)` で install を止める。rehearsal が失敗し、`native:sync` が通らなかった。
+- v1.5.1 を選んだ理由: 最後に成功した `native:sync` が実 HOME へ配った版で、戻しても配布内容は
+  変わらない。v1.7.0 は該当 JS を含まないが、未検証。
+- `--force` を使わない理由: install 全体の critical 判定を外すことになるため。
+- 再検討するなら: 上流で該当 JS が外れるか、apm がパッケージ単位で例外を許せるようになったとき。
