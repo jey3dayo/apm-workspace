@@ -286,7 +286,7 @@ $escaping"
     if [ ! -e "$bak" ] && [ ! -L "$bak" ]; then continue; fi
     found=1
     while IFS= read -r -d '' entry; do
-      name="$(basename "$entry")"
+      name="${entry##*/}"
       if [ -e "$home/$root/$name" ] || [ -L "$home/$root/$name" ]; then
         if reinstate_differs "$entry" "$home/$root/$name" "$root/$name"; then
           if pristine_has "$pristine" "$root/$name"; then

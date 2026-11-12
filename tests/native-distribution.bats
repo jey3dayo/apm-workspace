@@ -353,13 +353,21 @@ write_deploy_foo_and_backslash_entry_stub() {
   cat >"$1" <<'EOF'
 #!/bin/sh
 [ "$1" = install ] || exit 0
-mkdir -p "$HOME/.claude/skills/foo" "$HOME/.claude/skills/f\\oo" "$HOME/.apm"
+newline="$(printf '\n.')"
+newline="${newline%.}"
+mkdir -p "$HOME/.claude/skills/foo" "$HOME/.claude/skills/f\\oo" "$HOME/.claude/skills/foo$newline" "$HOME/.apm"
 echo "deployed by apm" >"$HOME/.claude/skills/foo/SKILL.md"
 cp "$HOME/.claude/skills/foo/SKILL.md" "$HOME/.claude/skills/foo/link.md"
 cp "$HOME/.claude/skills/foo/SKILL.md" "$HOME/.claude/skills/f\\oo/SKILL.md"
+cp "$HOME/.claude/skills/foo/SKILL.md" "$HOME/.claude/skills/foo$newline/SKILL.md"
 printf "lockfile_version: 1\n" >"$HOME/.apm/apm.lock.yaml"
 EOF
   chmod +x "$1"
+}
+
+add_hand_edited_newline_entry() {
+  mkdir -p "$1/.claude/skills/foo"$'\n'
+  echo "hand edited" >"$1/.claude/skills/foo"$'\n'/SKILL.md
 }
 
 add_hand_edited_backslash_entry() {
@@ -615,4 +623,12 @@ prepare_migrate() {
   prepare_migrate skip-backslash-name "$stub" "old foo" add_hand_edited_backslash_entry
   [ "$(cat "$M_REHEARSAL/skipped.txt")" = '.claude/skills/f\oo' ]
   [ "$(cat "$M_REHEARSAL/auto-approved-skips.txt")" = ".claude/skills/foo" ]
+}
+
+@test "an entry whose name ends in a newline is not taken for the pristine entry it would read as" {
+  local stub="$FX/stub-apm-newline"
+  write_deploy_foo_and_backslash_entry_stub "$stub"
+  prepare_migrate skip-newline-name "$stub" "old foo" add_hand_edited_newline_entry
+  [ "$(cat "$M_REHEARSAL/auto-approved-skips.txt")" = ".claude/skills/foo" ]
+  [ "$(wc -l <"$M_REHEARSAL/auto-approved-skips.txt" | tr -d ' ')" -eq 1 ]
 }
