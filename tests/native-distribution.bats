@@ -15,7 +15,7 @@ bats_require_minimum_version 1.5.0
 load 'native-test-helpers'
 
 # docs/native-distribution.md was written against this release; bump it only after re-checking the docs.
-EXPECTED_APM_VERSION=0.35.0
+EXPECTED_APM_VERSION=0.35.1
 FIXTURE_URL=https://fixture.invalid/fixture-owner/apm-workspace.git
 
 setup_file() {

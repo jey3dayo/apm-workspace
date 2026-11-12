@@ -19,7 +19,7 @@ fd = "10.5.0"
 gh-actions-lock = { version = "0.4.0", bin = "gh-actions-lock" }
 "github:jdx/jactionlint" = "2.1.0"
 lefthook = "2.1.12"
-"pipx:apm-cli" = "0.35.0"
+"pipx:apm-cli" = "0.35.1"
 "pipx:yamllint" = "1.38.0"
 taplo = "0.10.0"
 
