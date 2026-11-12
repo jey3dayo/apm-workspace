@@ -1,4 +1,5 @@
 # Dependencies that apm.yml must keep pinned to the held commit (checked by validate:workspace).
 # Format: <repo> <held-sha> <reason, with the docs/package-decisions.md heading>
 # To release a hold, delete its line in the same PR and record why in docs/package-decisions.md.
+# The weekly workflow dependency-holds.yml tries newer versions of each held dependency and opens an issue when apm accepts one.
 fujibee/agmsg 4a712f2aeba8f0b2070f7533b827c7cac78c9fdf v1.7.1 以降の同梱 JS の双方向制御文字で apm install が止まる（docs/package-decisions.md「2026-11-12 agmsg を v1.5.1 に戻した」）

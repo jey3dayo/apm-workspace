@@ -61,6 +61,8 @@ option when SSH is unavailable). Section B of
 | Validation only | `mise run check`       | Runs formatting checks, all linters, offline action-lock verification, manifest and catalog validation, and Bats; does not roll out. |
 | Inspection      | `mise run doctor`      | Hidden read-only diagnostics for workspace state and learning-intake reports.                                                        |
 
+A PR that changes `apm.yml` or `apm.lock.yaml` also runs the CI job `dependency-install`, which installs the external dependencies with a real `apm install` in a throwaway HOME (`scripts/probe-dependency-install.sh manifest`), because `check` never fetches them.
+
 Shipping here goes through a PR: work on a feature branch, run
 `apm-deploy-verify` with the changed skill names (pass them both times: once
 the work is committed the tree is clean, so it cannot infer them from
