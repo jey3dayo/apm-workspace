@@ -262,6 +262,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
 
 5. Upstream refresh:
    - no task re-resolves the root `apm.lock.yaml` (`upgrade` and `deploy:pins` were removed); do not run `apm update -g` or `apm install -g` as a substitute. Update the pinned entries of `apm.lock.yaml` to the same commits as the pin in `apm.yml` (or revert the pin)
+   - read `docs/dependency-holds.txt` first and leave a held dependency's pin alone; release a hold by deleting its line in the same PR and recording it in `docs/package-decisions.md`
    - for a hand-bumped SHA pin, see the SHA-pin bump sequence in
      `references/rollout-fast-paths.md`
    - if the manifest contains `gist.github.com/...#<sha>`, verify its regenerated `apm.lock.yaml` record as the gist Guardrail describes (the shortened `owner/<gist-id>` `repo_url` is the accepted form) before rollout

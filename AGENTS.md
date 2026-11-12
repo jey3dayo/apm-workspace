@@ -117,6 +117,9 @@ symlinks resolving to `.apm/skills/<id>/SKILL.md`.
   route. For `agmsg-review.config.toml` (spawn puts it in the per-run worker
   home, a hand-started pane in `~/.codex`), use the placement contract in
   `catalog/.apm/skills/agmsg-delegation/references/codex-sandbox.md`.
+- Read `docs/dependency-holds.txt` before bumping an external dependency. Do not
+  bump a held one; `validate:workspace` fails on it. Release a hold by deleting
+  its line in the same PR and recording the decision in `docs/package-decisions.md`.
 - Do not hard-code versioned model IDs in role or tier guidance in skills,
   agent definitions, instructions, or docs. Write in terms of role and tier;
   concrete policy IDs belong in

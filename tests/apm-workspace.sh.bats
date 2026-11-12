@@ -59,3 +59,54 @@ doctor_fixture_env() {
   [ "$status" -eq 0 ]
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
 }
+
+make_holds_fixture() {
+  holds_workspace_dir="$(mktemp -d)"
+  held_sha="4a712f2aeba8f0b2070f7533b827c7cac78c9fdf"
+  bumped_sha="0123456789abcdef0123456789abcdef01234567"
+
+  git -C "$holds_workspace_dir" init -q
+  mkdir -p "$holds_workspace_dir/docs"
+  printf 'fujibee/agmsg %s hidden character, see docs/package-decisions.md\n' "$held_sha" >"$holds_workspace_dir/docs/dependency-holds.txt"
+}
+
+write_holds_fixture_pin() {
+  printf 'dependencies:\n  apm:\n    - fujibee/agmsg#%s\n' "$1" >"$holds_workspace_dir/apm.yml"
+  printf 'dependencies:\n- repo_url: fujibee/agmsg\n  resolved_commit: %s\n' "$1" >"$holds_workspace_dir/apm.lock.yaml"
+}
+
+@test "validate fails when a held dependency is pinned to a different commit" {
+  make_holds_fixture
+  write_holds_fixture_pin "$bumped_sha"
+
+  run env APM_WORKSPACE_DIR="$holds_workspace_dir" bash "$SCRIPT_UNDER_TEST" validate
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"fujibee/agmsg"* ]]
+  [[ "$output" == *"$held_sha"* ]]
+  [[ "$output" == *"$bumped_sha"* ]]
+  rm -rf "$holds_workspace_dir"
+}
+
+@test "validate fails when a nested dependency of a held repo is pinned to a different commit" {
+  make_holds_fixture
+  printf 'dependencies:\n  apm:\n    - fujibee/agmsg#%s\n    - fujibee/agmsg/skills/extra#%s\n' "$held_sha" "$bumped_sha" >"$holds_workspace_dir/apm.yml"
+  printf 'dependencies:\n- repo_url: fujibee/agmsg\n  resolved_commit: %s\n- repo_url: fujibee/agmsg\n  virtual_path: skills/extra\n  resolved_commit: %s\n' "$held_sha" "$bumped_sha" >"$holds_workspace_dir/apm.lock.yaml"
+
+  run env APM_WORKSPACE_DIR="$holds_workspace_dir" bash "$SCRIPT_UNDER_TEST" validate
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"held dependency fujibee/agmsg"* ]]
+  [[ "$output" == *"$bumped_sha"* ]]
+  rm -rf "$holds_workspace_dir"
+}
+
+@test "validate passes when a held dependency stays on its held commit" {
+  make_holds_fixture
+  write_holds_fixture_pin "$held_sha"
+
+  run env APM_WORKSPACE_DIR="$holds_workspace_dir" bash "$SCRIPT_UNDER_TEST" validate
+
+  [ "$status" -eq 0 ]
+  rm -rf "$holds_workspace_dir"
+}
