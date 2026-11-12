@@ -6,6 +6,9 @@ workflows:
     '.github/workflows/ci.yml':
         - 'actions/checkout@v7.0.1'
         - 'jdx/mise-action@v5.2.4'
+    '.github/workflows/dependency-holds.yml':
+        - 'actions/checkout@v7.0.1'
+        - 'jdx/mise-action@v5.2.4'
 dependencies:
     'actions/checkout@v7.0.1':
         ref: 'v7.0.1'

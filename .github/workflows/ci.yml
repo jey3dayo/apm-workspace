@@ -82,3 +82,38 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: mise run actions-lock:upstream
+
+  # check never fetches dependency contents, so a package that apm refuses to install passes it.
+  dependency-install:
+    runs-on: ubuntu-latest
+    env:
+      APM_WORKSPACE_DIR: ${{ github.workspace }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Detect dependency changes
+        id: scope
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          run=1
+          if [ -n "$BASE_SHA" ] && git diff --quiet "$BASE_SHA" HEAD -- apm.yml apm.lock.yaml; then run=0; fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+
+      - name: Set up mise
+        if: steps.scope.outputs.run == '1'
+        uses: jdx/mise-action@v5.2.4
+        with:
+          cache: true
+
+      - name: Install workspace tools
+        if: steps.scope.outputs.run == '1'
+        run: mise install
+
+      - name: Install external dependencies with apm
+        if: steps.scope.outputs.run == '1'
+        run: bash scripts/probe-dependency-install.sh manifest
