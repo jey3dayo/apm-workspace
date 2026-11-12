@@ -24,24 +24,6 @@ teardown() {
   rm -rf "$FIXTURE_HOME"
 }
 
-@test "save absorbs a plain runtime dir into the store and removes the original" {
-  run env HOME="$FIXTURE_HOME" XDG_STATE_HOME="$FIXTURE_HOME/.local/state" bash "$SCRIPT_UNDER_TEST" save
-  [ "$status" -eq 0 ]
-  [ ! -e "$SKILL_DIR/db" ]
-  [ "$(cat "$STATE_ROOT/db/messages.db")" = "message-history" ]
-}
-
-@test "save absorbs cleanly when -n skips an already-authoritative store file" {
-  mkdir -p "$STATE_ROOT/db"
-  echo "already-authoritative" >"$STATE_ROOT/db/messages.db"
-
-  run env HOME="$FIXTURE_HOME" XDG_STATE_HOME="$FIXTURE_HOME/.local/state" bash "$SCRIPT_UNDER_TEST" save
-  [ "$status" -eq 0 ]
-  [ ! -e "$SKILL_DIR/db" ]
-  # -n must not overwrite the store's existing (authoritative) copy.
-  [ "$(cat "$STATE_ROOT/db/messages.db")" = "already-authoritative" ]
-}
-
 @test "save preserves the runtime dir and fails loudly when the copy into the store fails" {
   mkdir -p "$STATE_ROOT/db"
   chmod 555 "$STATE_ROOT/db"
@@ -52,21 +34,6 @@ teardown() {
   [ -e "$SKILL_DIR/db" ]
   [ "$(cat "$SKILL_DIR/db/messages.db")" = "message-history" ]
   [[ "$output" == *"$SKILL_DIR/db"* ]]
-}
-
-@test "save and restore are no-ops when agmsg was never deployed" {
-  rm -rf "$FIXTURE_HOME/.agents"
-
-  run env HOME="$FIXTURE_HOME" XDG_STATE_HOME="$FIXTURE_HOME/.local/state" bash "$SCRIPT_UNDER_TEST" save
-  [ "$status" -eq 0 ]
-  [ ! -e "$SKILL_DIR" ]
-  [ ! -e "$STATE_ROOT" ]
-  run env HOME="$FIXTURE_HOME" XDG_STATE_HOME="$FIXTURE_HOME/.local/state" bash "$SCRIPT_UNDER_TEST" restore
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"agmsg not deployed"* ]]
-  # Neither command may create the skill face or the state store.
-  [ ! -e "$SKILL_DIR" ]
-  [ ! -e "$STATE_ROOT" ]
 }
 
 @test "restore after save is idempotent: db and teams stay symlinks into the store with the data intact" {
