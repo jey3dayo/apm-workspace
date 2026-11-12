@@ -164,9 +164,26 @@ reinstate_differs() {
   esac
 }
 
+# False unless every line under a deployed_file_hashes: of the lock is the plain form "    <path>: sha256:<64 hex>" (the
+# path does not start with a quote, ?, : or space and holds no quote). Any other form (quoted key, explicit "? key" pair,
+# whatever else a YAML writer may emit) makes the whole lock unreadable here, so nothing is approved from it.
+previous_lock_readable() {
+  awk '
+    /^[^ ]/ { mode = ""; next }
+    /^  [^ ]/ { mode = ($0 == "  deployed_file_hashes:") ? "hashes" : ""; next }
+    mode == "hashes" && /^   / {
+      record = substr($0, 5)
+      split_at = index(record, ": sha256:")
+      hash = substr(record, split_at + 9)
+      if (substr($0, 1, 4) != "    " || split_at < 2 || record ~ /^["\047?: ]/ || substr(record, 1, split_at - 1) ~ /["\047]/ ||
+          length(hash) != 64 || hash !~ /^[0-9a-f]+$/) { bad = 1; exit }
+    }
+    END { exit bad }
+  ' "$1"
+}
+
 # "<sha256>  <entry>/<path inside it>" for each deployed_file_hashes record of the lock under <root>/<entry> (a single-file
-# entry is its own record). A record that may belong to the entry but cannot be read (a quoted key, no sha256) adds a line
-# no real hash line equals, so the comparison fails closed.
+# entry is its own record).
 lock_entry_hashes() {
   awk -v root="$2" -v name="$3" '
     BEGIN { exact = root "/" name }
@@ -175,12 +192,6 @@ lock_entry_hashes() {
     mode == "hashes" && /^    [^ ]/ {
       record = substr($0, 5)
       split_at = index(record, ": sha256:")
-      if (!split_at || record ~ /^["\047]/) {
-        unquoted = record
-        gsub(/["\047]/, "", unquoted)
-        if (index(unquoted, exact) == 1) print "unreadable record of " exact
-        next
-      }
       path = substr(record, 1, split_at - 1)
       if (path != exact && index(path, exact "/") != 1) next
       if (index(path, "/__pycache__/") || path ~ /\/\.apm-pin$/) next
@@ -214,6 +225,7 @@ previous_lock_matches() {
   local home="$1" stamp="$2" root="$3" name="$4" lock expected actual
   lock="$(migrate_previous_lock "$home" "$stamp")"
   [ -f "$lock" ] && [ ! -L "$lock" ] || return 1
+  previous_lock_readable "$lock" || return 1
   if [ -n "${LINKED_ENTRIES_FILE:-}" ] && grep -qxF "$root/$name" "$LINKED_ENTRIES_FILE"; then return 1; fi
   [ -z "$(find "$home/$root.bak-$stamp/$name" ! -type f ! -type d -print -quit)" ] || return 1
   expected="$(lock_entry_hashes "$lock" "$root" "$name")"
@@ -230,6 +242,9 @@ previous_lock_matches() {
 reinstate_entries() {
   local home="$1" stamp="$2" report="${3:-}" root bak entry name scope found=0 broken="" plan="" escaping deployed skipped="" approved=""
   deployed="$(migrate_deployed_record "$home" "$stamp")"
+  if [ -f "$(migrate_previous_lock "$home" "$stamp")" ] && ! previous_lock_readable "$(migrate_previous_lock "$home" "$stamp")"; then
+    log "warning: the previous apm.lock.yaml has a deployed_file_hashes record that is not the plain form, so no skipped entry is auto-approved; every one needs --allow-skip"
+  fi
   escaping="$(reinstate_escaping_links "$home" "$stamp")"
   [ -z "$escaping" ] || fail "these links of $home lead outside it or are broken, so copying into the roots would write outside the HOME; nothing was copied:
 $escaping"

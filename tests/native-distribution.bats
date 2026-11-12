@@ -294,7 +294,11 @@ write_deploy_and_relock_stub() {
 }
 
 add_quoted_lock_record_of_missing_file() {
-  printf "    '.claude/skills/foo/gone file.md': sha256:0000\n" >>"$1/.apm/apm.lock.yaml"
+  printf "    '.claude/skills/foo/gone file.md': sha256:%064d\n" 0 >>"$1/.apm/apm.lock.yaml"
+}
+
+add_explicit_key_lock_record_of_missing_file() {
+  printf '    ? .claude/skills/foo/gone-file-with-a-very-long-name.md\n    : sha256:%064d\n' 0 >>"$1/.apm/apm.lock.yaml"
 }
 
 add_link_to_home_file() {
@@ -459,12 +463,14 @@ prepare_migrate() {
   [ ! -s "$M_REHEARSAL/auto-approved-skips.txt" ]
 }
 
-@test "a lock record that cannot be read, for a file the old entry no longer has, keeps the entry reported for --allow-skip" {
-  local stub="$FX/stub-apm-relock"
+@test "a lock with a record that is not the plain form (quoted key, explicit key) approves nothing, even for a file the old entry no longer has" {
+  local stub="$FX/stub-apm-relock" form
   write_deploy_and_relock_stub "$stub"
-  prepare_migrate skip-lock-quoted "$stub" "old foo" add_quoted_lock_record_of_missing_file
-  [ "$(cat "$M_REHEARSAL/skipped.txt")" = ".claude/skills/foo" ]
-  [ ! -s "$M_REHEARSAL/auto-approved-skips.txt" ]
+  for form in quoted explicit-key; do
+    prepare_migrate "skip-lock-$form" "$stub" "old foo" "add_${form//-/_}_lock_record_of_missing_file"
+    [ "$(cat "$M_REHEARSAL/skipped.txt")" = ".claude/skills/foo" ]
+    [ ! -s "$M_REHEARSAL/auto-approved-skips.txt" ]
+  done
 }
 
 @test "an old entry holding a link to another file of the HOME is reported by the rehearsal too, so the migrate lists agree" {
