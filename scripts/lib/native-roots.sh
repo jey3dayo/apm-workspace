@@ -56,6 +56,10 @@ migrate_deployed_record() {
   printf '%s/.apm/native-migrate-%s.deployed.txt\n' "$1" "$2"
 }
 
+migrate_previous_lock() {
+  printf '%s/.apm/native-migrate-%s.previous-lock.yaml\n' "$1" "$2"
+}
+
 # "<root><TAB><top-level entry>" for each entry of MIGRATE_ROOTS that the previous apm.lock.yaml of this HOME lists in a
 # deployed_files list (the lock a native deployment left; there is none before the first migrate).
 previous_deployed_entries() {
@@ -94,6 +98,9 @@ migrate_roots() {
   done
   mkdir -p "$home/.apm"
   previous_deployed_entries "$home" >"$(migrate_deployed_record "$home" "$stamp")"
+  if [ -f "$home/.apm/apm.lock.yaml" ] && [ ! -L "$home/.apm/apm.lock.yaml" ]; then
+    cp -p "$home/.apm/apm.lock.yaml" "$(migrate_previous_lock "$home" "$stamp")" || fail "cannot copy the previous apm.lock.yaml"
+  fi
   for root in $MIGRATE_ROOTS; do
     if [ -e "$home/$root" ] || [ -L "$home/$root" ]; then
       printf 'moved\t%s\n' "$root" >>"$record"
@@ -157,13 +164,52 @@ reinstate_differs() {
   esac
 }
 
+# "<sha256>  <entry>/<path inside it>" for each deployed_file_hashes record of the lock under <root>/<entry> (a single-file
+# entry is its own record). A record with a quoted key is not read, so it shows up as a mismatch.
+lock_entry_hashes() {
+  awk -v root="$2" -v name="$3" '
+    BEGIN { exact = root "/" name }
+    /^[^ ]/ { mode = ""; next }
+    /^  [A-Za-z_]+:/ { mode = ($0 == "  deployed_file_hashes:") ? "hashes" : ""; next }
+    mode == "hashes" && /^    [^ ]/ {
+      record = substr($0, 5)
+      split_at = index(record, ": sha256:")
+      if (!split_at) next
+      path = substr(record, 1, split_at - 1)
+      if (path != exact && index(path, exact "/") != 1) next
+      if (index(path, "/__pycache__/") || path ~ /\/\.apm-pin$/) next
+      printf "%s  %s\n", substr(record, split_at + 9), substr(path, length(root) + 2)
+    }
+  ' "$1" | LC_ALL=C sort
+}
+
+entry_file_hashes() {
+  local hasher=(shasum -a 256)
+  if command -v sha256sum >/dev/null 2>&1; then hasher=(sha256sum); fi
+  (cd "$1" && find "$2" -type f -not -path '*/__pycache__/*' -not -name .apm-pin -print0 | xargs -0 -r "${hasher[@]}") | LC_ALL=C sort
+}
+
+# True when the old entry is what apm itself deployed: every file hashes as the previous lock recorded it, and the lock
+# records no other file. Replacing it loses nothing (it stays in <root>.bak-<stamp>); a link, an unlisted file or a
+# changed byte leaves it to --allow-skip.
+previous_lock_matches() {
+  local home="$1" stamp="$2" root="$3" name="$4" lock expected actual
+  lock="$(migrate_previous_lock "$home" "$stamp")"
+  [ -f "$lock" ] && [ ! -L "$lock" ] || return 1
+  [ -z "$(find "$home/$root.bak-$stamp/$name" ! -type f ! -type d -print -quit)" ] || return 1
+  expected="$(lock_entry_hashes "$lock" "$root" "$name")"
+  [ -n "$expected" ] || return 1
+  actual="$(entry_file_hashes "$home/$root.bak-$stamp" "$name")" || return 1
+  [ "$expected" = "$actual" ]
+}
+
 # Puts back the top-level entries of each <root>.bak-<stamp> that the root lacks now (apm did not deploy them), except
 # the entries the previous native lock listed as deployed (native-migrate-<stamp>.deployed.txt): those were not deployed this
-# time. An entry that exists is left alone; one whose content differs from the old entry is listed in <report>skipped.txt. A link that leaves its root is
+# time. An entry that exists is left alone; one whose content differs from the old entry is listed in <report>skipped.txt, or in <report>auto-approved-skips.txt when previous_lock_matches. A link that leaves its root is
 # copied, so nothing in the HOME depends on the place it pointed at; a broken link fails the whole step before anything
 # is copied. <report>reinstated.txt lists what was put back.
 reinstate_entries() {
-  local home="$1" stamp="$2" report="${3:-}" root bak entry name scope found=0 broken="" plan="" escaping deployed skipped=""
+  local home="$1" stamp="$2" report="${3:-}" root bak entry name scope found=0 broken="" plan="" escaping deployed skipped="" approved=""
   deployed="$(migrate_deployed_record "$home" "$stamp")"
   escaping="$(reinstate_escaping_links "$home" "$stamp")"
   [ -z "$escaping" ] || fail "these links of $home lead outside it or are broken, so copying into the roots would write outside the HOME; nothing was copied:
@@ -175,7 +221,13 @@ $escaping"
     while IFS= read -r -d '' entry; do
       name="$(basename "$entry")"
       if [ -e "$home/$root/$name" ] || [ -L "$home/$root/$name" ]; then
-        if reinstate_differs "$entry" "$home/$root/$name" "$root/$name"; then skipped="$skipped$root/$name"$'\n'; fi
+        if reinstate_differs "$entry" "$home/$root/$name" "$root/$name"; then
+          if previous_lock_matches "$home" "$stamp" "$root" "$name"; then
+            approved="$approved$root/$name"$'\n'
+          else
+            skipped="$skipped$root/$name"$'\n'
+          fi
+        fi
         continue
       fi
       if [ -f "$deployed" ] && grep -qxF "$root"$'\t'"$name" "$deployed"; then continue; fi
@@ -194,6 +246,7 @@ $broken"
   if [ -n "$report" ]; then
     mkdir -p "$(dirname "${report}x")" || fail "cannot create the directory of ${report}"
     printf '%s' "$skipped" >"${report}skipped.txt"
+    printf '%s' "$approved" >"${report}auto-approved-skips.txt"
     : >"${report}reinstated.txt"
     [ -z "$skipped" ] || log "warning: the entries of the old roots listed in ${report}skipped.txt share a name with what apm deployed, so they were not put back although their content differs from the old entry; if one is a private override of a catalog skill, put it back by hand"
   fi

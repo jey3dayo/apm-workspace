@@ -56,6 +56,7 @@ assert_migrate_rehearsal() {
   done
   [ -f "$dir/dropped.txt" ] || fail "the rehearsal $dir has no dropped.txt; run rehearse --migrate again"
   [ -f "$dir/skipped.txt" ] && [ ! -L "$dir/skipped.txt" ] || fail "the rehearsal $dir has no plain skipped.txt; run rehearse --migrate again"
+  [ -f "$dir/auto-approved-skips.txt" ] && [ ! -L "$dir/auto-approved-skips.txt" ] || fail "the rehearsal $dir has no plain auto-approved-skips.txt; run rehearse --migrate again"
 }
 
 # The entries migrate drops must be the ones the rehearsal dropped, because the rehearsal is what allowed them. The rollback
@@ -69,11 +70,13 @@ assert_dropped_as_rehearsed() {
 }
 
 assert_skipped_as_rehearsed() {
-  local home="$1" stamp="$2" dir="$3" actual
-  actual="$home/.apm/native-migrate-$stamp.skipped.txt"
-  [ -f "$actual" ] && [ ! -L "$actual" ] || fail "migrate has no plain skipped.txt; the roots are rolled back"
-  [ "$(LC_ALL=C sort "$actual")" = "$(LC_ALL=C sort "$dir/skipped.txt")" ] ||
-    fail "migrate replaced different entries than the rehearsal did (compare $actual with $dir/skipped.txt); the roots are rolled back"
+  local home="$1" stamp="$2" dir="$3" name actual
+  for name in skipped auto-approved-skips; do
+    actual="$home/.apm/native-migrate-$stamp.$name.txt"
+    [ -f "$actual" ] && [ ! -L "$actual" ] || fail "migrate has no plain $name.txt; the roots are rolled back"
+    [ "$(LC_ALL=C sort "$actual")" = "$(LC_ALL=C sort "$dir/$name.txt")" ] ||
+      fail "migrate replaced different entries than the rehearsal did (compare $actual with $dir/$name.txt); the roots are rolled back"
+  done
 }
 
 # Copies the files migrate must not change (owner-only, permissions kept) so a change can be undone. Contents are never

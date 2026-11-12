@@ -268,11 +268,37 @@ write_deploy_stub() {
   chmod +x "$1"
 }
 
+# The lock a previous native deployment left: it records the hash apm wrote for .claude/skills/foo/SKILL.md.
+seed_previous_lock() {
+  local home="$1" recorded_content="$2" digest
+  digest="$(printf '%s\n' "$recorded_content" | shasum -a 256 | awk '{print $1}')"
+  mkdir -p "$home/.apm"
+  cat >"$home/.apm/apm.lock.yaml" <<EOF
+lockfile_version: '1'
+dependencies:
+- repo_url: fixture/foo
+  name: foo
+  deployed_files:
+  - .claude/skills/foo
+  - .claude/skills/foo/SKILL.md
+  deployed_file_hashes:
+    .claude/skills/foo/SKILL.md: sha256:$digest
+EOF
+}
+
+# Deploys foo and, like apm install, replaces the lock, so only a copy taken before install still shows the old hashes.
+write_deploy_and_relock_stub() {
+  printf '#!/bin/sh\n[ "$1" = install ] || exit 0\nmkdir -p "$HOME/.claude/skills/foo" "$HOME/.apm"\necho "deployed by apm" >"$HOME/.claude/skills/foo/SKILL.md"\nprintf "lockfile_version: 1\\n" >"$HOME/.apm/apm.lock.yaml"\n' >"$1"
+  chmod +x "$1"
+}
+
+# A third argument seeds a previous lock that records that content for .claude/skills/foo/SKILL.md.
 prepare_migrate() {
-  local name="$1" stub="$2"
+  local name="$1" stub="$2" lock_content="${3:-}"
   M_HOME="$(new_home "$name")"
   M_BACKUP="$FX/backups/$name"
   seed_migrate_home "$M_HOME"
+  [ -z "$lock_content" ] || seed_previous_lock "$M_HOME" "$lock_content"
   real_native "$M_HOME" backup --real-home --backup-dir "$M_BACKUP"
   if [ "$stub" = real ]; then
     real_native "$M_HOME" rehearse --real-home --backup-dir "$M_BACKUP" --source-ref "$SOURCE_SHA" --workspace-only --migrate
@@ -395,4 +421,28 @@ prepare_migrate() {
   [ "$(tail -n 1 "$M_HOME"/.claude/settings.json.changed-*)" = "changed" ]
   [ "$(cat "$M_HOME/.codex/config.toml")" = 'model = "fixture"' ]
   [ -z "$(compgen -G "$M_HOME/.apm/native-migrate-*.untouched" || true)" ]
+}
+
+@test "an old entry that still matches the previous lock's hashes is replaced without an --allow-skip approval" {
+  local stub="$FX/stub-apm-relock" stamp
+  write_deploy_and_relock_stub "$stub"
+  prepare_migrate skip-lock-match "$stub" "old foo"
+  [ ! -s "$M_REHEARSAL/skipped.txt" ]
+  [ "$(cat "$M_REHEARSAL/auto-approved-skips.txt")" = ".claude/skills/foo" ]
+
+  run real_native_with_stub "$M_HOME" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
+  [ "$status" -eq 0 ]
+  stamp="$(printf '%s\n' "$output" | tail -n 1)"
+  [ ! -s "$M_HOME/.apm/native-migrate-$stamp.skipped.txt" ]
+  [ "$(cat "$M_HOME/.apm/native-migrate-$stamp.auto-approved-skips.txt")" = ".claude/skills/foo" ]
+  [ "$(cat "$M_HOME/.claude/skills/foo/SKILL.md")" = "deployed by apm" ]
+  [ "$(cat "$M_HOME/.claude/skills.bak-$stamp/foo/SKILL.md")" = "old foo" ]
+}
+
+@test "an old entry edited after the previous lock recorded it is still reported for --allow-skip" {
+  local stub="$FX/stub-apm-relock"
+  write_deploy_and_relock_stub "$stub"
+  prepare_migrate skip-lock-edited "$stub" "what apm deployed before the hand edit"
+  [ "$(cat "$M_REHEARSAL/skipped.txt")" = ".claude/skills/foo" ]
+  [ ! -s "$M_REHEARSAL/auto-approved-skips.txt" ]
 }
