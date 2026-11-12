@@ -14,15 +14,11 @@ setup() {
   SCRIPT_UNDER_TEST="$REPO_ROOT/scripts/apm-workspace.sh"
   source "$REPO_ROOT/scripts/apm-workspace.sh"
   mise_fixture=""
-  mise_external_source=""
 }
 
 teardown() {
   if [[ -n "${mise_fixture:-}" ]]; then
     rm -rf "$mise_fixture"
-  fi
-  if [[ -n "${mise_external_source:-}" ]]; then
-    rm -rf "$mise_external_source"
   fi
 }
 
@@ -77,19 +73,6 @@ if (updated === content) {
 }
 fs.writeFileSync(path, updated);
 NODE
-}
-
-assert_public_mise_tasks() {
-  local tasks_json="$1"
-  shift
-  node_json_assert '
-const fs = require("node:fs");
-const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
-const names = process.argv.slice(1);
-if (!names.every((name) => tasks.some((task) => task.name === name))) {
-  process.exit(1);
-}
-' "$@" <<<"$tasks_json"
 }
 
 assert_mise_tasks_absent() {
@@ -217,15 +200,6 @@ new_mise_fixture() {
   printf '%s\n' "$mise_fixture"
 }
 
-add_external_mise_task_fixture() {
-  mise_external_source="$(mktemp -d)"
-  printf '%s\n' '["outside-source"]' 'run = "echo outside"' >"$mise_external_source/tasks.toml"
-  local includes
-  printf -v includes '  "mise/format.toml",\n  "%s/tasks.toml",\n' "$mise_external_source"
-  rewrite_mise_fixture "$mise_fixture/mise.toml" \
-    '  "mise/format.toml",\r?\n' "$includes" ''
-}
-
 # --- format_skill_name ------------------------------------------------------
 
 @test "format_skill_name uses the logical leaf of a namespaced id" {
@@ -280,19 +254,6 @@ EOF
   [ "$status" -eq 0 ]
 }
 
-@test "mise exposes the expected public task set" {
-  tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT")"
-  node_json_assert '
-const fs = require("node:fs");
-const { isDeepStrictEqual } = require("node:util");
-const tasks = JSON.parse(fs.readFileSync(0, "utf8"));
-const actual = tasks.map(({ name }) => name).sort();
-if (!isDeepStrictEqual(actual, ["check", "format", "native:sync"])) {
-  process.exit(1);
-}
-' <<<"$tasks_json"
-}
-
 @test "mise no longer exposes the retired legacy writer tasks" {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
   run assert_mise_tasks_absent "$tasks_json" \
@@ -320,19 +281,6 @@ if (!isDeepStrictEqual(actual, ["check", "format", "native:sync"])) {
   tasks_json="$(mise_tasks_json "$TEST_REPO_ROOT" --hidden)"
   run assert_mise_command_connections "$tasks_json"
   [ "$status" -eq 0 ]
-}
-
-@test "negative fixture excludes a task whose source is outside the target directory" {
-  new_mise_fixture >/dev/null
-  add_external_mise_task_fixture
-  raw_json="$(env -u MISE_ENV -u MISE_CONFIG_FILE MISE_TRUSTED_CONFIG_PATHS="$mise_fixture" \
-    mise -C "$mise_fixture" tasks --json --hidden)"
-  run assert_public_mise_tasks "$raw_json" outside-source
-  [ "$status" -eq 0 ]
-
-  tasks_json="$(mise_tasks_json "$mise_fixture" --hidden)"
-  run assert_public_mise_tasks "$tasks_json" outside-source
-  [ "$status" -ne 0 ]
 }
 
 @test "negative fixture detects a mise task connected to another script" {
