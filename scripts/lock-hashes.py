@@ -12,6 +12,7 @@ import sys
 import yaml
 
 HASH = re.compile(r"sha256:([0-9a-f]{64})")
+CONTROL = re.compile(r"[\x00-\x1f\x7f-\x9f]")
 
 
 class StrictLoader(yaml.SafeLoader):
@@ -42,7 +43,7 @@ def records(lock):
         if not isinstance(hashes, dict):
             fail("deployed_file_hashes is not a mapping")
         for path, value in hashes.items():
-            if not isinstance(path, str) or not path or "\n" in path:
+            if not isinstance(path, str) or not path or CONTROL.search(path):
                 fail(f"unusable path: {path!r}")
             match = HASH.fullmatch(value) if isinstance(value, str) else None
             if match is None:

@@ -305,6 +305,13 @@ add_comment_between_lock_record_of_missing_file() {
   printf '# a comment at column 0\n    .claude/skills/foo/gone.md: sha256:%064d\n' 0 >>"$1/.apm/apm.lock.yaml"
 }
 
+# The lock's only record is for a path with a NUL in it, which a shell would read as the old entry's SKILL.md.
+add_nul_path_lock_record_of_missing_file() {
+  local digest
+  digest="$(printf 'old foo\n' | shasum -a 256 | awk '{print $1}')"
+  printf "lockfile_version: '1'\ndependencies:\n- deployed_file_hashes:\n    \"%s\": sha256:%s\n" '.claude/skills/foo/\0SKILL.md' "$digest" >"$1/.apm/apm.lock.yaml"
+}
+
 # The only deployed_file_hashes: in this lock is text of a block scalar; the dependencies hold no record of foo.
 use_lock_with_hashes_only_in_a_block_scalar() {
   local digest
@@ -477,7 +484,7 @@ prepare_migrate() {
 @test "the lock is read as YAML: a record of a file the old entry no longer has blocks the approval however it is spelled" {
   local stub="$FX/stub-apm-relock" form
   write_deploy_and_relock_stub "$stub"
-  for form in quoted explicit-key comment-between; do
+  for form in quoted explicit-key comment-between nul-path; do
     prepare_migrate "skip-lock-$form" "$stub" "old foo" "add_${form//-/_}_lock_record_of_missing_file"
     [ "$(cat "$M_REHEARSAL/skipped.txt")" = ".claude/skills/foo" ]
     [ ! -s "$M_REHEARSAL/auto-approved-skips.txt" ]
