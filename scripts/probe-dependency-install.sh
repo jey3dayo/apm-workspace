@@ -94,7 +94,7 @@ cmd_manifest() {
 
 latest_tag() {
   local refs
-  refs="$(git ls-remote --tags "$1")" || return 2
+  refs="$(git ls-remote --tags "$1")" || indeterminate "git ls-remote --tags failed for $1"
   awk '
     {
       name = $2
@@ -116,7 +116,7 @@ latest_tag() {
 
 default_branch_head() {
   local out
-  out="$(git ls-remote "$1" HEAD)" || return 2
+  out="$(git ls-remote "$1" HEAD)" || indeterminate "git ls-remote HEAD failed for $1"
   awk 'NR == 1 { print $1 }' <<<"$out"
 }
 
@@ -136,18 +136,27 @@ accepted_candidate() {
   esac
 }
 
+# Only a candidate ahead of the held commit counts; identical, behind and diverged ones are not releases.
+is_ahead_of_held() {
+  local repo="$1" held="$2" candidate="$3" comparison
+  comparison="$(gh api "repos/$repo/compare/$held...$candidate" --jq .status)" ||
+    indeterminate "gh api compare failed for $repo $held...$candidate"
+  [ "$comparison" = ahead ]
+}
+
 releasable_candidate() {
   local repo="$1" held="$2" url="https://github.com/$1" tags tag_name="" tag_sha="" head_sha="" found=""
 
-  tags="$(latest_tag "$url")" || indeterminate "git ls-remote --tags failed for $repo"
+  tags="$(latest_tag "$url")" || exit $?
   read -r tag_name tag_sha <<<"$tags"
-  head_sha="$(default_branch_head "$url")" || indeterminate "git ls-remote HEAD failed for $repo"
+  head_sha="$(default_branch_head "$url")" || exit $?
 
-  if [ -n "$tag_sha" ] && [ "$tag_sha" != "$held" ]; then
-    found="$(accepted_candidate "$repo" "$tag_name" "$tag_sha")"
+  if [ -n "$tag_sha" ] && [ "$tag_sha" != "$held" ] && is_ahead_of_held "$repo" "$held" "$tag_sha"; then
+    found="$(accepted_candidate "$repo" "$tag_name" "$tag_sha")" || exit $?
   fi
-  if [ -z "$found" ] && [ -n "$head_sha" ] && [ "$head_sha" != "$held" ] && [ "$head_sha" != "$tag_sha" ]; then
-    found="$(accepted_candidate "$repo" HEAD "$head_sha")"
+  if [ -z "$found" ] && [ -n "$head_sha" ] && [ "$head_sha" != "$held" ] && [ "$head_sha" != "$tag_sha" ] &&
+    is_ahead_of_held "$repo" "$held" "$head_sha"; then
+    found="$(accepted_candidate "$repo" HEAD "$head_sha")" || exit $?
   fi
   printf '%s' "$found"
 }
@@ -166,10 +175,11 @@ cmd_holds() {
   local holds="${1:-$REPO_ROOT/docs/dependency-holds.txt}"
   local repo held reason candidate ref sha titles="" body="" releasable=0
   [ -f "$holds" ] || indeterminate "holds file not found: $holds"
+  command -v gh >/dev/null || indeterminate "gh not found"
 
   while read -r repo held reason; do
     case "$repo" in "" | "#"*) continue ;; esac
-    candidate="$(releasable_candidate "$repo" "$held")"
+    candidate="$(releasable_candidate "$repo" "$held")" || exit $?
     if [ -z "$candidate" ]; then
       printf 'still held: %s (held at %s)\n' "$repo" "$held"
       continue
