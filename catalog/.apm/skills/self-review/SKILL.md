@@ -1,6 +1,9 @@
 ---
 name: self-review
-description: Review an existing PR after it is created and before PR comment follow-up. Classify the exact diff, run a read-only review, and gate a requested merge on the verdict and current CI.
+description: >-
+  「PR作ったから見て」「マージ前にレビュー」「セルフレビュー」と依頼されたときに、
+  既存PRの独立レビューを行う。post-PR専用で、shipの出荷前検証や
+  pr-followupのコメント対応とは別。
 ---
 
 # Self-review
@@ -15,7 +18,7 @@ Run after the PR exists and before `pr-followup` handles comments. This skill ow
 4. Assign the highest applicable tier, in this order:
 
    - **Heavy:** `F >= 10`, `L >= 500`, any file deletion (`D` status in `--name-status`), binary/gitlink/unknown content, or any distribution, sync, deploy, permission, auth, credential, secret, security-boundary, workflow-permission, or shared-agent-instruction path. Treat `.env*`, credential/secret/password files, auth/authorization/permission/security directories, `.github/workflows/**`, deployment/sync scripts and config, and `catalog/.apm/instructions/**` as heavy. Deleted lines count toward `L` but do not independently make a change heavy. A rename counts both paths.
-   - Light: after excluding every heavy condition, either `F <= 3` and `L <= 100` with only docs, version metadata, or lock metadata; or `F = 1` and `L <= 10` with a known, non-risky text path.
+   - Light: after excluding every heavy condition, either `F <= 3` and `L <= 100` with only docs, version metadata, or lock metadata; or `F = 1` and `L <= 10` with a known, non-risky text path. Including lock metadata here is intentional.
    - Ordinary: everything else. A skill `SKILL.md` is agent behavior and is ordinary at minimum. If classification is ambiguous, move up one tier.
 
 Treat a version change as version-only only after comparing parsed base and head metadata with the version field removed and confirming all remaining fields are equal. In particular, any `package.json` script or other field change disqualifies it from version-only. A risk path stays heavy regardless of size or filename.
@@ -24,7 +27,7 @@ Treat a version change as version-only only after comparing parsed base and head
 
 Identify the current provider from the active session identity and its process-specific marker (for example, `CLAUDECODE` or `CODEX_THREAD_ID`); an installed binary alone does not identify the caller. If the active provider is unclear from the session and environment, ask the user which runtime is active.
 
-Use a fresh, standalone session in the opposite provider. For Codex, use [orchestrator-worker's Reviewer tier](../orchestrator-worker/SKILL.md) to select standard or upper difficulty and resolve the current model ID in its [model reference](../orchestrator-worker/references/models.md). Consult the model reference when updating Codex model choices. Use only that model-selection guidance; this skill's review procedure is self-contained. Select the standard tier at medium reasoning for ordinary work and the upper difficulty tier at high reasoning for heavy work. For this skill, use Claude `sonnet` at medium effort for ordinary work and `opus` at high effort for heavy work, regardless of general Reviewer defaults. Do not copy versioned model IDs into this skill.
+Use a fresh, standalone session in the opposite provider. For Codex, use [orchestrator-worker's Reviewer tier](../orchestrator-worker/SKILL.md) to select standard or upper difficulty and resolve the current model ID in its [model reference](../orchestrator-worker/references/models.md). Consult the model reference when updating Codex model choices. Use only that model-selection guidance; this skill's review procedure is self-contained. Select the standard tier at medium reasoning for ordinary work and the upper difficulty tier at high reasoning for heavy work. For this skill, use Claude `sonnet` at medium effort for ordinary work and `opus` at high effort for heavy work, regardless of general Reviewer defaults. This skill's reviewer selection is an explicit exception to orchestrator-worker §1's Reviewer allowlist validation; do not return `BLOCKED` solely because a reviewer selected here is outside that allowlist. Do not copy versioned model IDs into this skill.
 
 If the opposite CLI, its authentication, or its selected model is unavailable, try a fresh standalone session in the current provider at the same tier. Report the fallback provider, model, and reason. A failed or unavailable review is `BLOCKED`, never `OK` or `NG`; if both providers fail, stop and report the blocker. A fallback does not reset the NG count.
 
@@ -69,7 +72,7 @@ These commands provide the snapshot diff as prompt input. Before launch, verify 
 
 - Light: skip model review and report `SKIPPED (light)`, the thresholds, and whether required checks for the current head are green. Do not label a skipped review `VERDICT: OK`. If a merge was explicitly requested, escalate to ordinary review first.
 - Ordinary or heavy: on `OK`, confirm the PR still has the recorded base/head SHAs. On `NG`, the original author fixes the findings, captures the new full PR diff, and reruns the same tier. Stop after the second `NG` and ask the user to decide. A blocked or malformed review is not a verdict and cannot satisfy a merge gate.
-- CI: verify all reported checks apply to the current PR head and are successful. Missing or pending required checks, and any failed check including optional checks, are not green.
-- Merge: merge only when the user explicitly requested it, the latest applicable review has a real `VERDICT: OK`, and all required checks for the current head are green. Never merge after `SKIPPED`, `BLOCKED`, `NG`, or a stale verdict.
+- CI: for the latest commit, require zero failed checks, including both required and optional checks. Every reported check must apply to that commit and be successful; missing or pending required checks are not green.
+- Merge: merge only when the user explicitly requested it, the latest applicable review has a real `VERDICT: OK`, and latest-commit CI is green under the CI rule above (zero failed checks, required or optional). Never merge after `SKIPPED`, `BLOCKED`, `NG`, or a stale verdict.
 
 Report the PR snapshot SHAs, tier and model, verdict or skip/block reason, findings or correction count, and current-head CI state. Keep review outcome, CI state, and any requested merge as separate observed results.
