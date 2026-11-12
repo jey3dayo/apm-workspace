@@ -305,6 +305,22 @@ add_comment_between_lock_record_of_missing_file() {
   printf '# a comment at column 0\n    .claude/skills/foo/gone.md: sha256:%064d\n' 0 >>"$1/.apm/apm.lock.yaml"
 }
 
+add_lock_record_of_missing_file_at() {
+  printf '    %s: sha256:%064d\n' "$2" 0 >>"$1/.apm/apm.lock.yaml"
+}
+
+add_dot_segment_lock_record_of_missing_file() {
+  add_lock_record_of_missing_file_at "$1" .claude/skills/./foo/gone.md
+}
+
+add_double_slash_lock_record_of_missing_file() {
+  add_lock_record_of_missing_file_at "$1" .claude/skills//foo/gone.md
+}
+
+add_pycache_dotdot_lock_record_of_missing_file() {
+  add_lock_record_of_missing_file_at "$1" .claude/skills/foo/__pycache__/../gone.md
+}
+
 # The lock's only record is for a path with a NUL in it, which a shell would read as the old entry's SKILL.md.
 add_nul_path_lock_record_of_missing_file() {
   local digest
@@ -484,7 +500,7 @@ prepare_migrate() {
 @test "the lock is read as YAML: a record of a file the old entry no longer has blocks the approval however it is spelled" {
   local stub="$FX/stub-apm-relock" form
   write_deploy_and_relock_stub "$stub"
-  for form in quoted explicit-key comment-between nul-path; do
+  for form in quoted explicit-key comment-between nul-path dot-segment double-slash pycache-dotdot; do
     prepare_migrate "skip-lock-$form" "$stub" "old foo" "add_${form//-/_}_lock_record_of_missing_file"
     [ "$(cat "$M_REHEARSAL/skipped.txt")" = ".claude/skills/foo" ]
     [ ! -s "$M_REHEARSAL/auto-approved-skips.txt" ]

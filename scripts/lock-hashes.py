@@ -23,6 +23,15 @@ class StrictLoader(yaml.SafeLoader):
         return super().construct_mapping(node, deep)
 
 
+def canonical(path):
+    """A HOME-relative path as one spelling only: callers select records by string prefix."""
+    return (
+        not CONTROL.search(path)
+        and "\\" not in path
+        and all(segment not in ("", ".", "..") for segment in path.split("/"))
+    )
+
+
 def fail(message):
     raise ValueError(message)
 
@@ -43,7 +52,7 @@ def records(lock):
         if not isinstance(hashes, dict):
             fail("deployed_file_hashes is not a mapping")
         for path, value in hashes.items():
-            if not isinstance(path, str) or not path or CONTROL.search(path):
+            if not isinstance(path, str) or not canonical(path):
                 fail(f"unusable path: {path!r}")
             match = HASH.fullmatch(value) if isinstance(value, str) else None
             if match is None:
@@ -59,7 +68,7 @@ def main():
     lines = sorted(
         f"{digest}  {path}"
         for path, digest in found.items()
-        if "/__pycache__/" not in path and path.rsplit("/", 1)[-1] != ".apm-pin"
+        if "__pycache__" not in path.split("/") and path.rsplit("/", 1)[-1] != ".apm-pin"
     )
     sys.stdout.write("".join(line + "\n" for line in lines))
 
