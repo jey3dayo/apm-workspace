@@ -340,6 +340,33 @@ add_link_to_home_file() {
   printf '    .claude/skills/foo/link.md: sha256:%s\n' "$(shasum -a 256 <"$1/private-skills/private-link/SKILL.md" | awk '{print $1}')" >>"$1/.apm/apm.lock.yaml"
 }
 
+add_duplicate_key_lock_record_of_missing_file() {
+  printf '    .claude/skills/foo/SKILL.md: sha256:%064d\n' 0 >>"$1/.apm/apm.lock.yaml"
+}
+
+add_bad_hash_lock_record_of_missing_file() {
+  printf '    .claude/skills/foo/gone.md: sha256:not-a-hash\n' >>"$1/.apm/apm.lock.yaml"
+}
+
+# foo and f\oo are different entries; an awk -v would read the second as the first.
+write_deploy_foo_and_backslash_entry_stub() {
+  cat >"$1" <<'EOF'
+#!/bin/sh
+[ "$1" = install ] || exit 0
+mkdir -p "$HOME/.claude/skills/foo" "$HOME/.claude/skills/f\\oo" "$HOME/.apm"
+echo "deployed by apm" >"$HOME/.claude/skills/foo/SKILL.md"
+cp "$HOME/.claude/skills/foo/SKILL.md" "$HOME/.claude/skills/foo/link.md"
+cp "$HOME/.claude/skills/foo/SKILL.md" "$HOME/.claude/skills/f\\oo/SKILL.md"
+printf "lockfile_version: 1\n" >"$HOME/.apm/apm.lock.yaml"
+EOF
+  chmod +x "$1"
+}
+
+add_hand_edited_backslash_entry() {
+  mkdir -p "$1/.claude/skills/f\\oo"
+  echo "hand edited" >"$1/.claude/skills/f\\oo/SKILL.md"
+}
+
 add_unlisted_file_to_foo() {
   echo "not in the lock" >"$1/.claude/skills/foo/link.md"
 }
@@ -521,7 +548,7 @@ prepare_migrate() {
 @test "the lock is read as YAML: a record of a file the old entry no longer has blocks the approval however it is spelled" {
   local stub="$FX/stub-apm-relock" form
   write_deploy_and_relock_stub "$stub"
-  for form in quoted explicit-key comment-between nul-path dot-segment double-slash pycache-dotdot; do
+  for form in quoted explicit-key comment-between nul-path dot-segment double-slash pycache-dotdot duplicate-key bad-hash; do
     prepare_migrate "skip-lock-$form" "$stub" "old foo" "add_${form//-/_}_lock_record_of_missing_file"
     [ "$(cat "$M_REHEARSAL/skipped.txt")" = ".claude/skills/foo" ]
     [ ! -s "$M_REHEARSAL/auto-approved-skips.txt" ]
@@ -559,7 +586,7 @@ prepare_migrate() {
   done
 }
 
-@test "a pristine entry edited between the rehearsal and the migrate stops the migrate before it moves anything" {
+@test "a pristine entry changed between the rehearsal and the migrate (edited, or edited with the lock rewritten to match) stops the migrate before it moves anything" {
   local stub="$FX/stub-apm-relock" before
   write_deploy_and_relock_stub "$stub"
   prepare_migrate skip-edited-after-rehearsal "$stub" "old foo"
@@ -571,4 +598,21 @@ prepare_migrate() {
   [[ "$output" == *"changed since the rehearsal"* ]]
   [ "$(roots_snapshot "$M_HOME")" = "$before" ]
   [ -z "$(compgen -G "$M_HOME/.claude/skills.bak-*" || true)" ]
+
+  prepare_migrate skip-relocked-after-rehearsal "$stub" "old foo"
+  echo "new content" >"$M_HOME/.claude/skills/foo/SKILL.md"
+  seed_previous_lock "$M_HOME" "new content"
+  before="$(roots_snapshot "$M_HOME")"
+  run real_native_with_stub "$M_HOME" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"changed since the rehearsal"* ]]
+  [ "$(roots_snapshot "$M_HOME")" = "$before" ]
+}
+
+@test "an entry whose name holds a backslash is not taken for the pristine entry it would read as" {
+  local stub="$FX/stub-apm-backslash"
+  write_deploy_foo_and_backslash_entry_stub "$stub"
+  prepare_migrate skip-backslash-name "$stub" "old foo" add_hand_edited_backslash_entry
+  [ "$(cat "$M_REHEARSAL/skipped.txt")" = '.claude/skills/f\oo' ]
+  [ "$(cat "$M_REHEARSAL/auto-approved-skips.txt")" = ".claude/skills/foo" ]
 }

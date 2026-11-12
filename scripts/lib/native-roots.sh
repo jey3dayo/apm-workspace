@@ -204,8 +204,8 @@ load_previous_lock_hashes() {
 # "<sha256>  <entry>/<path inside it>" for each record of PREVIOUS_LOCK_HASHES under <root>/<entry> (a single-file entry
 # is its own record).
 lock_entry_hashes() {
-  printf '%s\n' "$PREVIOUS_LOCK_HASHES" | awk -v root="$1" -v name="$2" '
-    BEGIN { exact = root "/" name }
+  printf '%s\n' "$PREVIOUS_LOCK_HASHES" | ROOT="$1" NAME="$2" awk '
+    BEGIN { root = ENVIRON["ROOT"]; exact = root "/" ENVIRON["NAME"] }
     {
       path = substr($0, 67)
       if (path != exact && index(path, exact "/") != 1) next
@@ -267,7 +267,7 @@ pristine_entries() {
 }
 
 pristine_has() {
-  [ -n "$1" ] && [ -f "$1" ] && awk -F '\t' -v entry="$2" '$1 == entry { found = 1 } END { exit !found }' "$1"
+  [ -n "$1" ] && [ -f "$1" ] && ENTRY="$2" awk -F '\t' '$1 "" == ENVIRON["ENTRY"] "" { found = 1 } END { exit !found }' "$1"
 }
 
 # Puts back the top-level entries of each <root>.bak-<stamp> that the root lacks now (apm did not deploy them), except
