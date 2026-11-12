@@ -228,14 +228,15 @@ entry_file_hashes() {
   (cd "$1" && find "$2" -type f -not -path '*/__pycache__/*' -not -name .apm-pin -print0 | xargs -0 -r "${hasher[@]}") | LC_ALL=C sort
 }
 
-# "<root>/<entry>" for each top-level entry of the roots of $1 that holds anything but regular files and directories.
+# "<root>/<entry>" for each top-level entry of the roots of $1 that holds anything but regular files and directories, and
+# every entry of a root that is itself a link (the find calls do not follow it, so links below it would go unseen).
 entries_with_links() {
   local home="$1" root entry
   for root in $MIGRATE_ROOTS; do
     [ -d "$home/$root" ] || continue
     while IFS= read -r -d '' entry; do
-      if [ -n "$(find "$entry" ! -type f ! -type d -print -quit)" ]; then printf '%s/%s\n' "$root" "${entry##*/}"; fi
-    done < <(find "$home/$root" -mindepth 1 -maxdepth 1 -print0)
+      if [ -L "$home/$root" ] || [ -n "$(find "$entry" ! -type f ! -type d -print -quit)" ]; then printf '%s/%s\n' "$root" "${entry##*/}"; fi
+    done < <(find -H "$home/$root" -mindepth 1 -maxdepth 1 -print0)
   done
 }
 
@@ -246,6 +247,7 @@ entries_with_links() {
 previous_lock_matches() {
   local home="$1" stamp="$2" root="$3" name="$4" expected actual
   [ "${PREVIOUS_LOCK_READ:-0}" = 1 ] || return 1
+  [ ! -L "$home/$root.bak-$stamp" ] || return 1
   if [ -n "${LINKED_ENTRIES_FILE:-}" ] && grep -qxF "$root/$name" "$LINKED_ENTRIES_FILE"; then return 1; fi
   [ -z "$(find "$home/$root.bak-$stamp/$name" ! -type f ! -type d -print -quit)" ] || return 1
   expected="$(lock_entry_hashes "$root" "$name")"

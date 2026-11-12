@@ -340,6 +340,12 @@ add_link_to_home_file() {
   printf '    .claude/skills/foo/link.md: sha256:%s\n' "$(shasum -a 256 <"$1/private-skills/private-link/SKILL.md" | awk '{print $1}')" >>"$1/.apm/apm.lock.yaml"
 }
 
+add_link_to_home_file_under_a_linked_root() {
+  add_link_to_home_file "$1"
+  mv "$1/.claude/skills" "$1/real-skills"
+  ln -s "$1/real-skills" "$1/.claude/skills"
+}
+
 # A third argument seeds a previous lock that records that content for .claude/skills/foo/SKILL.md; a fourth is a
 # function that then changes the seeded HOME (called with the HOME) before the backup.
 prepare_migrate() {
@@ -515,12 +521,14 @@ prepare_migrate() {
   [ ! -s "$M_REHEARSAL/auto-approved-skips.txt" ]
 }
 
-@test "an old entry holding a link to another file of the HOME is reported by the rehearsal too, so the migrate lists agree" {
-  local stub="$FX/stub-apm-relock"
+@test "an old entry holding a link to another file of the HOME, or under a root that is itself a link, is reported by the rehearsal too, so the migrate lists agree" {
+  local stub="$FX/stub-apm-relock" seed
   write_deploy_and_relock_stub "$stub"
-  prepare_migrate skip-lock-link "$stub" "old foo" add_link_to_home_file
-  [ "$(cat "$M_REHEARSAL/skipped.txt")" = ".claude/skills/foo" ]
-  [ ! -s "$M_REHEARSAL/auto-approved-skips.txt" ]
-  run real_native_with_stub "$M_HOME" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
-  [ "$status" -eq 0 ]
+  for seed in add_link_to_home_file add_link_to_home_file_under_a_linked_root; do
+    prepare_migrate "skip-lock-$seed" "$stub" "old foo" "$seed"
+    [ "$(cat "$M_REHEARSAL/skipped.txt")" = ".claude/skills/foo" ]
+    [ ! -s "$M_REHEARSAL/auto-approved-skips.txt" ]
+    run real_native_with_stub "$M_HOME" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
+    [ "$status" -eq 0 ]
+  done
 }
