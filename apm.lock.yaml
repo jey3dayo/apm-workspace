@@ -253,9 +253,9 @@ dependencies:
 - repo_url: fujibee/agmsg
   name: agmsg
   host: github.com
-  resolved_commit: 5a42555b172668b13a144a9b261aa0d044a2382e
-  resolved_ref: 5a42555b172668b13a144a9b261aa0d044a2382e
-  version: 1.7.2
+  resolved_commit: 4a712f2aeba8f0b2070f7533b827c7cac78c9fdf
+  resolved_ref: 4a712f2aeba8f0b2070f7533b827c7cac78c9fdf
+  version: 1.5.1
   package_type: marketplace_plugin
   deployed_files:
   - .agents/skills/agmsg
@@ -2917,7 +2917,7 @@ dependencies:
     .claude/skills/agmsg/tests/test_watch_stuck_map.bats: sha256:8cb4aaa4f1312147e4c3cc60b987466331ecf4a03207e2d1e2ab08cfe13abc58
     .claude/skills/agmsg/tests/test_where.bats: sha256:5677288b66c0a9b312ce7ac87a370fbefc32cddd335094c3bcc28baab1e45260
     .claude/skills/agmsg/uninstall.sh: sha256:45461aaa26d0383c15f58da8601cd2e0b6e769a61a4708388296052bb1e8d4da
-  content_hash: sha256:e87d3e69780aa0613eaddc92c868e3f78b410e392b9cd4631b9e8d0f67b32332
+  content_hash: sha256:cae8415fb0039de3ff1e61ebca51448038562e0b5ebe21bf7c007f036d7af172
   declared_license: MIT
 - repo_url: heydamir/unslop
   alias: unslop-ui
