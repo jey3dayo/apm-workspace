@@ -9,6 +9,9 @@ permissions:
   contents: read
   issues: write
 
+concurrency:
+  group: dependency-holds
+
 jobs:
   probe-holds:
     runs-on: ubuntu-latest
@@ -37,7 +40,8 @@ jobs:
           TITLE: ${{ steps.holds.outputs.title }}
           BODY: ${{ steps.holds.outputs.body }}
         run: |
-          if gh issue list --state open --search "$TITLE in:title" --json title --jq '.[].title' | grep -Fxq "$TITLE"; then
+          open_titles="$(gh issue list --state open --search "$TITLE in:title" --json title --jq '.[].title')"
+          if grep -Fxq -- "$TITLE" <<<"$open_titles"; then
             echo "An open issue already has this title."
             exit 0
           fi

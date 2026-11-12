@@ -1,22 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Runs apm's own user-scope install against a throwaway HOME, with the manifest
-# rendered by scripts/native.sh the way native:sync does, so a dependency that
-# apm refuses to install (for example a critical hidden-character finding) is
-# caught before it reaches native:sync. `apm audit` only sees deployed files, so
-# it cannot stand in for this. This repository's own packages are left out: the
-# commit under test may not be fetchable from the remote yet.
-#
-#   manifest [apm.yml]       install the external dependencies of apm.yml; exit 1 if apm refuses
-#   holds [dependency-holds] try newer candidates of each held dependency; exit 0 with releasable=0|1
-#
-# Exit 2 means the result could not be determined (network, missing tool).
+# Installs the external dependencies with apm itself in a throwaway HOME, using the manifest native.sh renders,
+# because `apm audit` only sees deployed files. Exit 1: apm blocked a package. Exit 2: no verdict (network, tool).
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 PLACEHOLDER_SHA="0000000000000000000000000000000000000000"
+SECURITY_BLOCK_PATTERN='^\[x\][[:space:]]+Blocked: .+ contains critical |[0-9]+ critical security finding\(s\)'
 WORK_DIR=""
 APM_BIN="${APM_BIN:-}"
 PROBE_LOG=""
@@ -46,7 +38,7 @@ render_probe_manifest() {
   cp -R "$SCRIPT_DIR/." "$stage/scripts/"
   cp "$manifest" "$stage/apm.yml"
   bash "$stage/scripts/native.sh" render --source-ref "$PLACEHOLDER_SHA" |
-    awk -v only="$only" -f "$SCRIPT_DIR/lib/manifest-external-deps.awk"
+    awk -v only="$only" -f "$SCRIPT_DIR/lib/manifest-ref-normalize.awk" -f "$SCRIPT_DIR/lib/manifest-external-deps.awk"
 }
 
 # Returns 0 when apm installs the manifest, 1 when apm blocks it, 2 for any other failure.
@@ -61,7 +53,7 @@ probe_install() {
   (
     cd "$home"
     env HOME="$home" TMPDIR="$home" XDG_CONFIG_HOME="$home/.config" XDG_CACHE_HOME="$home/.cache" \
-      XDG_STATE_HOME="$home/.state" XDG_DATA_HOME="$home/.local/share" APM_NON_INTERACTIVE=1 NO_COLOR=1 \
+      XDG_STATE_HOME="$home/.state" XDG_DATA_HOME="$home/.local/share" APM_NON_INTERACTIVE=1 NO_COLOR=1 COLUMNS=500 \
       GIT_TERMINAL_PROMPT=0 GIT_CONFIG_COUNT=2 \
       GIT_CONFIG_KEY_0=url.https://github.com/.insteadOf GIT_CONFIG_VALUE_0=git@github.com: \
       GIT_CONFIG_KEY_1=url.https://github.com/.insteadOf GIT_CONFIG_VALUE_1=ssh://git@github.com/ \
@@ -69,13 +61,13 @@ probe_install() {
   ) >"$PROBE_LOG" 2>&1 || status=$?
 
   [ "$status" -eq 0 ] && return 0
-  if grep -Eiq 'Blocked:|critical' "$PROBE_LOG"; then return 1; fi
+  if grep -Eq "$SECURITY_BLOCK_PATTERN" "$PROBE_LOG"; then return 1; fi
   return 2
 }
 
 print_failure_summary() {
-  if grep -Eiq 'Blocked:|critical' "$PROBE_LOG"; then
-    grep -Ei 'Blocked:|critical' "$PROBE_LOG"
+  if grep -Eq "$SECURITY_BLOCK_PATTERN" "$PROBE_LOG"; then
+    grep -E "$SECURITY_BLOCK_PATTERN" "$PROBE_LOG"
   else
     tail -n 15 "$PROBE_LOG"
   fi
@@ -92,9 +84,12 @@ cmd_manifest() {
     printf 'ok: apm install accepted the external dependencies of %s\n' "$manifest"
     return 0
   fi
-  printf 'error: apm install refused the external dependencies of %s\n' "$manifest" >&2
   print_failure_summary >&2
-  return 1
+  if [ "$status" -eq 1 ]; then
+    printf 'error: apm install blocked the external dependencies of %s\n' "$manifest" >&2
+    return 1
+  fi
+  indeterminate "apm install failed without a security finding for $manifest"
 }
 
 latest_tag() {
@@ -109,8 +104,14 @@ latest_tag() {
       if (name !~ /^v?[0-9]+\.[0-9]+\.[0-9]+$/) next
       if (peeled || !(name in sha)) sha[name] = $1
     }
-    END { for (name in sha) print name, sha[name] }
-  ' <<<"$refs" | LC_ALL=C sort -V -k1,1 | tail -n 1
+    END {
+      for (name in sha) {
+        version = name
+        sub(/^v/, "", version)
+        print version, name, sha[name]
+      }
+    }
+  ' <<<"$refs" | LC_ALL=C sort -V -k1,1 | tail -n 1 | awk '{ print $2, $3 }'
 }
 
 default_branch_head() {
