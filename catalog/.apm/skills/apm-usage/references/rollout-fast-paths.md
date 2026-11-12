@@ -7,6 +7,10 @@ were observed on 0.29.0 and carried forward.
 
 ## SHA-pin bump sequence (Fast Path 5 / Fast Path 7)
 
+Read `docs/dependency-holds.txt` before bumping: a held dependency keeps its pin
+(`check` fails otherwise), and a hold is released by deleting its line in the same
+PR and recording the decision in `docs/package-decisions.md`.
+
 When you bump a SHA pin in `apm.yml` by hand, `check` fails
 while the pin has no matching `resolved_commit` in `apm.lock.yaml`, and names
 the pin. No task re-resolves the root lock: `deploy:pins` (`apm install -g --only

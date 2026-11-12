@@ -888,5 +888,6 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 hidden character(s)` で install を止める。rehearsal が失敗し、`native:sync` が通らなかった。
 - v1.5.1 を選んだ理由: 最後に成功した `native:sync` が実 HOME へ配った版で、戻しても配布内容は
   変わらない。v1.7.0 は該当 JS を含まないが、未検証。
+- 保留は `docs/dependency-holds.txt` で強制する（pin が変わると `validate:workspace` が落ちる）。解除するときは同じ PR でその行を消す。
 - `--force` を使わない理由: install 全体の critical 判定を外すことになるため。
 - 再検討するなら: 上流で該当 JS が外れるか、apm がパッケージ単位で例外を許せるようになったとき。

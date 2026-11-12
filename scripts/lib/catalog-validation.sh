@@ -45,9 +45,31 @@ EOF
   fi
 }
 
+validate_dependency_holds() {
+  manifest_path="$WORKSPACE_DIR/apm.yml"
+  holds_path="$WORKSPACE_DIR/docs/dependency-holds.txt"
+  [ -f "$manifest_path" ] && [ -f "$holds_path" ] || return 0
+
+  pins=$(awk -f "$APM_AWK_DIR/manifest-ref-normalize.awk" -f "$APM_AWK_DIR/manifest-sha-pins.awk" "$manifest_path")
+  violations=$({
+    printf '%s\n' "$pins"
+    printf '@@\n'
+    cat "$holds_path"
+  } | awk -f "$APM_AWK_DIR/dependency-holds-check.awk")
+  [ -n "$violations" ] || return 0
+
+  while IFS='|' read -r held_repo held_sha actual_sha held_reason; do
+    error "held dependency $held_repo: apm.yml pins $actual_sha, expected $held_sha ($held_reason)"
+  done <<EOF
+$violations
+EOF
+  fail "apm.yml does not match docs/dependency-holds.txt; to release a hold, delete its line in the same PR and record the decision in docs/package-decisions.md."
+}
+
 cmd_validate() {
   ensure_workspace_repo
   ensure_workspace_scaffold
+  validate_dependency_holds
   validate_manifest_sha_pins
 }
 
