@@ -351,6 +351,16 @@ prepare_migrate() {
   [ "$(find "$M_HOME" | LC_ALL=C sort)" = "$listing_bak" ]
 }
 
+@test "apm install runs with APM_NON_INTERACTIVE=1 so the Trust prompt cannot hold the lock on a terminal" {
+  local stub="$FX/stub-apm-record-env" seen="$FX/apm-env-seen"
+  printf '#!/bin/sh\n[ "$1" = install ] || exit 0\nprintf "%%s\\n" "${APM_NON_INTERACTIVE-unset}" >>"%s"\nmkdir -p "$HOME/.claude/skills/foo"\necho "deployed by apm" >"$HOME/.claude/skills/foo/SKILL.md"\n' "$seen" >"$stub"
+  chmod +x "$stub"
+
+  prepare_migrate non-interactive "$stub"
+  [ -s "$seen" ]
+  [ "$(sort -u "$seen")" = 1 ]
+}
+
 @test "migrate rolls the roots back when a step fails, and fails when config.toml or settings.json would change" {
   local stub="$FX/stub-apm-deploy" fail_compile="$FX/stub-apm-fail-compile" touch_config="$FX/stub-apm-touch-config"
   local original

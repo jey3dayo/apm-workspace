@@ -124,7 +124,8 @@ run_apm() {
   mkdir -p "$home/.ssh"
   local ssh_cmd
   ssh_cmd="ssh -F /dev/null -o $(printf '%q' "UserKnownHostsFile=$home/.ssh/known_hosts \"$(user_db_home)/.ssh/known_hosts\"")"
-  local env_args=(HOME="$home" PATH="$PATH" TMPDIR="$home/.cache/apm-native-tmp" LANG="${LANG:-C.UTF-8}" GIT_SSH_COMMAND="$ssh_cmd")
+  # Fixed: a y at apm's "Trust <pkg>?" prompt lands in ~/.apm/config.json and halts the next sync, and a waiting terminal holds the lock.
+  local env_args=(HOME="$home" PATH="$PATH" TMPDIR="$home/.cache/apm-native-tmp" LANG="${LANG:-C.UTF-8}" GIT_SSH_COMMAND="$ssh_cmd" APM_NON_INTERACTIVE=1)
   for var in LC_ALL TERM PYTHONUTF8 GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM GIT_CEILING_DIRECTORIES; do
     if [ -n "${!var:-}" ]; then env_args+=("$var=${!var}"); fi
   done
