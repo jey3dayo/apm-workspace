@@ -57,6 +57,7 @@ assert_migrate_rehearsal() {
   [ -f "$dir/dropped.txt" ] || fail "the rehearsal $dir has no dropped.txt; run rehearse --migrate again"
   [ -f "$dir/skipped.txt" ] && [ ! -L "$dir/skipped.txt" ] || fail "the rehearsal $dir has no plain skipped.txt; run rehearse --migrate again"
   [ -f "$dir/auto-approved-skips.txt" ] && [ ! -L "$dir/auto-approved-skips.txt" ] || fail "the rehearsal $dir has no plain auto-approved-skips.txt; run rehearse --migrate again"
+  [ -f "$dir/pristine-entries.txt" ] && [ ! -L "$dir/pristine-entries.txt" ] || fail "the rehearsal $dir has no plain pristine-entries.txt; run rehearse --migrate again"
 }
 
 # The entries migrate drops must be the ones the rehearsal dropped, because the rehearsal is what allowed them. The rollback
@@ -209,6 +210,8 @@ $links
 Move them aside or make them plain directories and files of this HOME."
 
   assert_default_agmsg_store "$home"
+  [ "$(pristine_entries "$home" | LC_ALL=C sort)" = "$(cat "$rehearsal_dir/pristine-entries.txt")" ] ||
+    fail "the entries of the roots that match the previous lock changed since the rehearsal ($rehearsal_dir/pristine-entries.txt); nothing was changed. Take a backup and run rehearse --migrate again"
   manifest="$(render_manifest "$sha" "$WORKSPACE_ONLY")"
   roots_before="$(migrate_roots_snapshot "$home")"
   MIGRATE_HOME="$home" MIGRATE_STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
@@ -226,7 +229,7 @@ Move them aside or make them plain directories and files of this HOME."
   migrate_roots "$home" "$MIGRATE_STAMP"
   run_apm_install "$home"
   run_apm "$home" compile -g --clean
-  reinstate_entries "$home" "$MIGRATE_STAMP" "$home/.apm/native-migrate-$MIGRATE_STAMP."
+  reinstate_entries "$home" "$MIGRATE_STAMP" "$home/.apm/native-migrate-$MIGRATE_STAMP." "$rehearsal_dir/pristine-entries.txt"
   if [ "$MIGRATE_AGMSG_LINKED" = 1 ]; then agmsg_state "$home" restore; fi
   assert_dropped_as_rehearsed "$home" "$MIGRATE_STAMP" "$rehearsal_dir"
   assert_skipped_as_rehearsed "$home" "$MIGRATE_STAMP" "$rehearsal_dir"

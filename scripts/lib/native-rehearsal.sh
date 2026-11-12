@@ -69,6 +69,7 @@ $escaping"
   scratch="$rehearsal/home"
   mkdir "$scratch"
   : >"$rehearsal/apm.log"
+  if [ "$MIGRATE" = 1 ]; then pristine_entries "$home" | LC_ALL=C sort >"$rehearsal/pristine-entries.txt"; fi
 
   while IFS= read -r path; do
     [ -n "$path" ] || continue
@@ -85,8 +86,6 @@ $escaping"
   fi
   assert_default_apm_config "$scratch"
   assert_no_home_manifest "$scratch"
-  LINKED_ENTRIES_FILE="$rehearsal/linked-entries.txt"
-  entries_with_links "$scratch" >"$LINKED_ENTRIES_FILE"
   isolate_scratch_links "$home" "$scratch"
   shared="$(shared_entries "$scratch")"
   [ -z "$shared" ] || fail "the scratch HOME $scratch still shares data with files outside it:
@@ -115,7 +114,7 @@ $shared"
   fi
   if [ "$MIGRATE" = 1 ] && [ "$install_status" = 0 ] && [ "$compile_status" = 0 ]; then
     reinstate_status=0
-    (reinstate_entries "$scratch" "$stamp" "$rehearsal/") || reinstate_status=$?
+    (reinstate_entries "$scratch" "$stamp" "$rehearsal/" "$rehearsal/pristine-entries.txt") || reinstate_status=$?
   fi
   if [ "$linked" = 1 ]; then agmsg_state "$scratch" restore || agmsg_status=1; fi
   baseline_skips="$(grep -c 'no trustworthy local deployment baseline' "$rehearsal/apm.log" || true)"

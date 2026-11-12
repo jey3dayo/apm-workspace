@@ -56,10 +56,6 @@ migrate_deployed_record() {
   printf '%s/.apm/native-migrate-%s.deployed.txt\n' "$1" "$2"
 }
 
-migrate_previous_lock() {
-  printf '%s/.apm/native-migrate-%s.previous-lock.yaml\n' "$1" "$2"
-}
-
 # "<root><TAB><top-level entry>" for each entry of MIGRATE_ROOTS that the previous apm.lock.yaml of this HOME lists in a
 # deployed_files list (the lock a native deployment left; there is none before the first migrate).
 previous_deployed_entries() {
@@ -98,9 +94,6 @@ migrate_roots() {
   done
   mkdir -p "$home/.apm"
   previous_deployed_entries "$home" >"$(migrate_deployed_record "$home" "$stamp")"
-  if [ -f "$home/.apm/apm.lock.yaml" ] && [ ! -L "$home/.apm/apm.lock.yaml" ]; then
-    cp -p "$home/.apm/apm.lock.yaml" "$(migrate_previous_lock "$home" "$stamp")" || fail "cannot copy the previous apm.lock.yaml"
-  fi
   for root in $MIGRATE_ROOTS; do
     if [ -e "$home/$root" ] || [ -L "$home/$root" ]; then
       printf 'moved\t%s\n' "$root" >>"$record"
@@ -189,13 +182,12 @@ lock_python() {
   return 1
 }
 
-# Reads the previous lock once into PREVIOUS_LOCK_HASHES ("<sha256>  <path>" lines, scripts/lock-hashes.py) and sets
+# Reads the lock $1 once into PREVIOUS_LOCK_HASHES ("<sha256>  <path>" lines, scripts/lock-hashes.py) and sets
 # PREVIOUS_LOCK_READ=1. A lock that is missing is no news; one that cannot be read leaves PREVIOUS_LOCK_READ=0 with a
-# warning, and then previous_lock_matches approves nothing.
+# warning, and then pristine_entries lists nothing.
 load_previous_lock_hashes() {
-  local lock python
+  local lock="$1" python
   PREVIOUS_LOCK_HASHES="" PREVIOUS_LOCK_READ=0
-  lock="$(migrate_previous_lock "$1" "$2")"
   [ -f "$lock" ] && [ ! -L "$lock" ] || return 0
   if ! python="$(lock_python)"; then
     log "warning: no python with PyYAML was found (APM_BIN's interpreter, apm on PATH, python3), so the previous apm.lock.yaml cannot be read and no skipped entry is auto-approved; every one needs --allow-skip"
@@ -228,43 +220,64 @@ entry_file_hashes() {
   (cd "$1" && find "$2" -type f -not -path '*/__pycache__/*' -not -name .apm-pin -print0 | xargs -0 -r "${hasher[@]}") | LC_ALL=C sort
 }
 
-# "<root>/<entry>" for each top-level entry of the roots of $1 that holds anything but regular files and directories, and
-# every entry of a root that is itself a link (the find calls do not follow it, so links below it would go unseen).
-entries_with_links() {
-  local home="$1" root entry
+# The first link on the way to a root of MIGRATE_ROOTS, below $1.
+root_path_link() {
+  local home="$1" root path component
+  local -a parts
+  for root in $MIGRATE_ROOTS; do
+    path="$home"
+    IFS=/ read -ra parts <<<"$root"
+    for component in "${parts[@]}"; do
+      path="$path/$component"
+      if [ -L "$path" ]; then
+        printf '%s\n' "$path"
+        return 0
+      fi
+    done
+  done
+  return 1
+}
+
+# "<root>/<entry><TAB><digest of the lock's records for it>" for each top-level entry of the roots of HOME $1 that apm
+# itself deployed and nobody touched: only regular files and directories, and the files and their sha256 are exactly the
+# deployed_file_hashes of the lock $1/.apm/apm.lock.yaml for it. Replacing such an entry loses nothing but the old
+# deployment, which stays in <root>.bak-<stamp>. This is computed in the real HOME before anything moves, never from the
+# rehearsal's clone or the moved-aside roots, where links are already resolved or broken. Nothing is listed when a root or
+# a directory above it is a link, or the lock cannot be read.
+pristine_entries() {
+  local home="$1" link root entry name expected actual
+  if link="$(root_path_link "$home")"; then
+    log "warning: $link is a link, so no skipped entry is auto-approved; every one needs --allow-skip"
+    return 0
+  fi
+  load_previous_lock_hashes "$home/.apm/apm.lock.yaml"
+  [ "$PREVIOUS_LOCK_READ" = 1 ] || return 0
   for root in $MIGRATE_ROOTS; do
     [ -d "$home/$root" ] || continue
     while IFS= read -r -d '' entry; do
-      if [ -L "$home/$root" ] || [ -n "$(find "$entry" ! -type f ! -type d -print -quit)" ]; then printf '%s/%s\n' "$root" "${entry##*/}"; fi
-    done < <(find -H "$home/$root" -mindepth 1 -maxdepth 1 -print0)
+      name="${entry##*/}"
+      [ -z "$(find "$entry" ! -type f ! -type d -print -quit)" ] || continue
+      expected="$(lock_entry_hashes "$root" "$name")"
+      [ -n "$expected" ] || continue
+      actual="$(entry_file_hashes "$home/$root" "$name")" || continue
+      [ "$expected" = "$actual" ] || continue
+      printf '%s/%s\t%s\n' "$root" "$name" "$(printf '%s\n' "$expected" | sha256)"
+    done < <(find "$home/$root" -mindepth 1 -maxdepth 1 -print0)
   done
 }
 
-# True when the old entry is what apm itself deployed: every file hashes as the previous lock recorded it, and the lock
-# records no other file. Replacing it loses nothing (it stays in <root>.bak-<stamp>); a link, an unlisted file or a
-# changed byte leaves it to --allow-skip. A rehearsal materializes links in its scratch HOME (isolate_scratch_links), so
-# it lists the entries that held one before that in LINKED_ENTRIES_FILE and migrate, which sees the links, agrees.
-previous_lock_matches() {
-  local home="$1" stamp="$2" root="$3" name="$4" expected actual
-  [ "${PREVIOUS_LOCK_READ:-0}" = 1 ] || return 1
-  [ ! -L "$home/$root.bak-$stamp" ] || return 1
-  if [ -n "${LINKED_ENTRIES_FILE:-}" ] && grep -qxF "$root/$name" "$LINKED_ENTRIES_FILE"; then return 1; fi
-  [ -z "$(find "$home/$root.bak-$stamp/$name" ! -type f ! -type d -print -quit)" ] || return 1
-  expected="$(lock_entry_hashes "$root" "$name")"
-  [ -n "$expected" ] || return 1
-  actual="$(entry_file_hashes "$home/$root.bak-$stamp" "$name")" || return 1
-  [ "$expected" = "$actual" ]
+pristine_has() {
+  [ -n "$1" ] && [ -f "$1" ] && awk -F '\t' -v entry="$2" '$1 == entry { found = 1 } END { exit !found }' "$1"
 }
 
 # Puts back the top-level entries of each <root>.bak-<stamp> that the root lacks now (apm did not deploy them), except
 # the entries the previous native lock listed as deployed (native-migrate-<stamp>.deployed.txt): those were not deployed this
-# time. An entry that exists is left alone; one whose content differs from the old entry is listed in <report>skipped.txt, or in <report>auto-approved-skips.txt when previous_lock_matches. A link that leaves its root is
+# time. An entry that exists is left alone; one whose content differs from the old entry is listed in <report>skipped.txt, or in <report>auto-approved-skips.txt when the optional pristine list $4 (pristine_entries) has it. A link that leaves its root is
 # copied, so nothing in the HOME depends on the place it pointed at; a broken link fails the whole step before anything
 # is copied. <report>reinstated.txt lists what was put back.
 reinstate_entries() {
-  local home="$1" stamp="$2" report="${3:-}" root bak entry name scope found=0 broken="" plan="" escaping deployed skipped="" approved=""
+  local home="$1" stamp="$2" report="${3:-}" pristine="${4:-}" root bak entry name scope found=0 broken="" plan="" escaping deployed skipped="" approved=""
   deployed="$(migrate_deployed_record "$home" "$stamp")"
-  load_previous_lock_hashes "$home" "$stamp"
   escaping="$(reinstate_escaping_links "$home" "$stamp")"
   [ -z "$escaping" ] || fail "these links of $home lead outside it or are broken, so copying into the roots would write outside the HOME; nothing was copied:
 $escaping"
@@ -276,7 +289,7 @@ $escaping"
       name="$(basename "$entry")"
       if [ -e "$home/$root/$name" ] || [ -L "$home/$root/$name" ]; then
         if reinstate_differs "$entry" "$home/$root/$name" "$root/$name"; then
-          if previous_lock_matches "$home" "$stamp" "$root" "$name"; then
+          if pristine_has "$pristine" "$root/$name"; then
             approved="$approved$root/$name"$'\n'
           else
             skipped="$skipped$root/$name"$'\n'

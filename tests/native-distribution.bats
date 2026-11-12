@@ -287,7 +287,7 @@ EOF
 }
 
 # Deploys foo (with a link.md, so a link of that name in the old entry loses nothing) and, like apm install, replaces the
-# lock, so only a copy taken before install still shows the old hashes.
+# lock, so the old hashes are only usable if they were read before install.
 write_deploy_and_relock_stub() {
   printf '#!/bin/sh\n[ "$1" = install ] || exit 0\nmkdir -p "$HOME/.claude/skills/foo" "$HOME/.apm"\necho "deployed by apm" >"$HOME/.claude/skills/foo/SKILL.md"\ncp "$HOME/.claude/skills/foo/SKILL.md" "$HOME/.claude/skills/foo/link.md"\nprintf "lockfile_version: 1\\n" >"$HOME/.apm/apm.lock.yaml"\n' >"$1"
   chmod +x "$1"
@@ -340,10 +340,24 @@ add_link_to_home_file() {
   printf '    .claude/skills/foo/link.md: sha256:%s\n' "$(shasum -a 256 <"$1/private-skills/private-link/SKILL.md" | awk '{print $1}')" >>"$1/.apm/apm.lock.yaml"
 }
 
-add_link_to_home_file_under_a_linked_root() {
-  add_link_to_home_file "$1"
+add_unlisted_file_to_foo() {
+  echo "not in the lock" >"$1/.claude/skills/foo/link.md"
+}
+
+make_skills_root_an_absolute_link() {
   mv "$1/.claude/skills" "$1/real-skills"
   ln -s "$1/real-skills" "$1/.claude/skills"
+}
+
+# Its target is outside what backup copies, so the link is broken in the rehearsal's clone.
+make_skills_root_a_relative_link() {
+  mv "$1/.claude/skills" "$1/real-skills"
+  ln -s ../real-skills "$1/.claude/skills"
+}
+
+make_claude_directory_a_link() {
+  mv "$1/.claude" "$1/real-claude"
+  ln -s real-claude "$1/.claude"
 }
 
 # A third argument seeds a previous lock that records that content for .claude/skills/foo/SKILL.md; a fourth is a
@@ -485,6 +499,7 @@ prepare_migrate() {
   prepare_migrate skip-lock-match "$stub" "old foo"
   [ ! -s "$M_REHEARSAL/skipped.txt" ]
   [ "$(cat "$M_REHEARSAL/auto-approved-skips.txt")" = ".claude/skills/foo" ]
+  [ "$(cut -f1 "$M_REHEARSAL/pristine-entries.txt")" = ".claude/skills/foo" ]
 
   run real_native_with_stub "$M_HOME" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
   [ "$status" -eq 0 ]
@@ -513,6 +528,17 @@ prepare_migrate() {
   done
 }
 
+@test "a file the lock does not list, or no lock at all, leaves the entry reported for --allow-skip" {
+  local stub="$FX/stub-apm-relock"
+  write_deploy_and_relock_stub "$stub"
+  prepare_migrate skip-unlisted-file "$stub" "old foo" add_unlisted_file_to_foo
+  [ "$(cat "$M_REHEARSAL/skipped.txt")" = ".claude/skills/foo" ]
+  [ ! -s "$M_REHEARSAL/auto-approved-skips.txt" ]
+  prepare_migrate skip-no-lock "$stub"
+  [ "$(cat "$M_REHEARSAL/skipped.txt")" = ".claude/skills/foo" ]
+  [ ! -s "$M_REHEARSAL/auto-approved-skips.txt" ]
+}
+
 @test "text of a block scalar that looks like a deployed_file_hashes section is not a record of the entry" {
   local stub="$FX/stub-apm-relock"
   write_deploy_and_relock_stub "$stub"
@@ -521,14 +547,28 @@ prepare_migrate() {
   [ ! -s "$M_REHEARSAL/auto-approved-skips.txt" ]
 }
 
-@test "an old entry holding a link to another file of the HOME, or under a root that is itself a link, is reported by the rehearsal too, so the migrate lists agree" {
+@test "a link inside the entry, a root that is a link (absolute or relative) or a link above the root approves nothing, and the migrate lists agree with the rehearsal" {
   local stub="$FX/stub-apm-relock" seed
   write_deploy_and_relock_stub "$stub"
-  for seed in add_link_to_home_file add_link_to_home_file_under_a_linked_root; do
-    prepare_migrate "skip-lock-$seed" "$stub" "old foo" "$seed"
+  for seed in add_link_to_home_file make_skills_root_an_absolute_link make_skills_root_a_relative_link make_claude_directory_a_link; do
+    prepare_migrate "skip-link-$seed" "$stub" "old foo" "$seed"
     [ "$(cat "$M_REHEARSAL/skipped.txt")" = ".claude/skills/foo" ]
     [ ! -s "$M_REHEARSAL/auto-approved-skips.txt" ]
     run real_native_with_stub "$M_HOME" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
     [ "$status" -eq 0 ]
   done
+}
+
+@test "a pristine entry edited between the rehearsal and the migrate stops the migrate before it moves anything" {
+  local stub="$FX/stub-apm-relock" before
+  write_deploy_and_relock_stub "$stub"
+  prepare_migrate skip-edited-after-rehearsal "$stub" "old foo"
+  [ "$(cat "$M_REHEARSAL/auto-approved-skips.txt")" = ".claude/skills/foo" ]
+  echo "edited after the rehearsal" >>"$M_HOME/.claude/skills/foo/SKILL.md"
+  before="$(roots_snapshot "$M_HOME")"
+  run real_native_with_stub "$M_HOME" "$stub" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$M_REHEARSAL"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"changed since the rehearsal"* ]]
+  [ "$(roots_snapshot "$M_HOME")" = "$before" ]
+  [ -z "$(compgen -G "$M_HOME/.claude/skills.bak-*" || true)" ]
 }
