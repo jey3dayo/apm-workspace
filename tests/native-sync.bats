@@ -22,7 +22,7 @@ setup() {
   mkdir -p "$FX/home/.agents/skills/existing"
   printf 'existing skill\n' >"$FX/home/.agents/skills/existing/SKILL.md"
   env GIT_CONFIG_GLOBAL="$FX/gitconfig" GIT_CONFIG_NOSYSTEM=1 GIT_TEMPLATE_DIR="$FX/template" git init -q -b main "$FX/repo"
-  git -C "$FX/repo" add scripts/native.sh scripts/native-sync.sh scripts/native-home.py scripts/lib .gitignore
+  git -C "$FX/repo" add scripts/native.sh scripts/native-sync.sh scripts/native-home.py scripts/lock-hashes.py scripts/lib .gitignore
   git -C "$FX/repo" -c user.name=fixture -c user.email=fixture@example.invalid commit -q -m fixture
   env GIT_CONFIG_GLOBAL="$FX/gitconfig" GIT_CONFIG_NOSYSTEM=1 GIT_TEMPLATE_DIR="$FX/template" git init --bare -q "$FX/remote.git"
   git -C "$FX/repo" push -q "$FX/remote.git" HEAD:refs/heads/main

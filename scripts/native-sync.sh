@@ -157,6 +157,9 @@ sync_review_rehearsal() {
   done
   if [ -f "$rehearsal/apm.log" ] && grep -q 'no trustworthy local deployment baseline' "$rehearsal/apm.log"; then fail "rehearsal skipped a deployment baseline; review $rehearsal/apm.log"; fi
   sync_review_entries "$rehearsal/dropped.txt" "$SYNC_ALLOW_DROP" drop
+  if [ -s "$rehearsal/auto-approved-skips.txt" ]; then
+    log "$(wc -l <"$rehearsal/auto-approved-skips.txt" | tr -d ' ') skipped entries need no --allow-skip: their old files match the previous lock's hashes (list: $rehearsal/auto-approved-skips.txt)"
+  fi
   sync_review_entries "$rehearsal/skipped.txt" "$SYNC_ALLOW_SKIP" skip
 }
 
