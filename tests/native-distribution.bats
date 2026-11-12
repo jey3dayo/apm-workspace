@@ -301,6 +301,17 @@ add_explicit_key_lock_record_of_missing_file() {
   printf '    ? .claude/skills/foo/gone-file-with-a-very-long-name.md\n    : sha256:%064d\n' 0 >>"$1/.apm/apm.lock.yaml"
 }
 
+add_comment_between_lock_record_of_missing_file() {
+  printf '# a comment at column 0\n    .claude/skills/foo/gone.md: sha256:%064d\n' 0 >>"$1/.apm/apm.lock.yaml"
+}
+
+# The only deployed_file_hashes: in this lock is text of a block scalar; the dependencies hold no record of foo.
+use_lock_with_hashes_only_in_a_block_scalar() {
+  local digest
+  digest="$(printf 'old foo\n' | shasum -a 256 | awk '{print $1}')"
+  printf "lockfile_version: '1'\ndependencies: []\nnotes: |\n  deployed_file_hashes:\n    .claude/skills/foo/SKILL.md: sha256:%s\n" "$digest" >"$1/.apm/apm.lock.yaml"
+}
+
 add_link_to_home_file() {
   ln -s "$1/private-skills/private-link/SKILL.md" "$1/.claude/skills/foo/link.md"
   printf '    .claude/skills/foo/link.md: sha256:%s\n' "$(shasum -a 256 <"$1/private-skills/private-link/SKILL.md" | awk '{print $1}')" >>"$1/.apm/apm.lock.yaml"
@@ -463,14 +474,22 @@ prepare_migrate() {
   [ ! -s "$M_REHEARSAL/auto-approved-skips.txt" ]
 }
 
-@test "a lock with a record that is not the plain form (quoted key, explicit key) approves nothing, even for a file the old entry no longer has" {
+@test "the lock is read as YAML: a record of a file the old entry no longer has blocks the approval however it is spelled" {
   local stub="$FX/stub-apm-relock" form
   write_deploy_and_relock_stub "$stub"
-  for form in quoted explicit-key; do
+  for form in quoted explicit-key comment-between; do
     prepare_migrate "skip-lock-$form" "$stub" "old foo" "add_${form//-/_}_lock_record_of_missing_file"
     [ "$(cat "$M_REHEARSAL/skipped.txt")" = ".claude/skills/foo" ]
     [ ! -s "$M_REHEARSAL/auto-approved-skips.txt" ]
   done
+}
+
+@test "text of a block scalar that looks like a deployed_file_hashes section is not a record of the entry" {
+  local stub="$FX/stub-apm-relock"
+  write_deploy_and_relock_stub "$stub"
+  prepare_migrate skip-lock-block-scalar "$stub" "old foo" use_lock_with_hashes_only_in_a_block_scalar
+  [ "$(cat "$M_REHEARSAL/skipped.txt")" = ".claude/skills/foo" ]
+  [ ! -s "$M_REHEARSAL/auto-approved-skips.txt" ]
 }
 
 @test "an old entry holding a link to another file of the HOME is reported by the rehearsal too, so the migrate lists agree" {

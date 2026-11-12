@@ -164,40 +164,62 @@ reinstate_differs() {
   esac
 }
 
-# False unless every line under a deployed_file_hashes: of the lock is the plain form "    <path>: sha256:<64 hex>" (the
-# path does not start with a quote, ?, : or space and holds no quote). Any other form (quoted key, explicit "? key" pair,
-# whatever else a YAML writer may emit) makes the whole lock unreadable here, so nothing is approved from it.
-previous_lock_readable() {
-  awk '
-    /^[^ ]/ { mode = ""; next }
-    /^  [^ ]/ { mode = ($0 == "  deployed_file_hashes:") ? "hashes" : ""; next }
-    mode == "hashes" && /^   / {
-      record = substr($0, 5)
-      split_at = index(record, ": sha256:")
-      hash = substr(record, split_at + 9)
-      if (substr($0, 1, 4) != "    " || split_at < 2 || record ~ /^["\047?: ]/ || substr(record, 1, split_at - 1) ~ /["\047]/ ||
-          length(hash) != 64 || hash !~ /^[0-9a-f]+$/) { bad = 1; exit }
-    }
-    END { exit bad }
-  ' "$1"
+# The interpreter apm runs on already has PyYAML, so the lock is read with it instead of adding a dependency: the python in
+# the shebang of APM_BIN (or of the apm on PATH, or behind a mise shim), then python3. The first that imports yaml wins.
+lock_python() {
+  local candidate bin line
+  for bin in "$APM_BIN" apm; do
+    case "$bin" in */*) ;; *) bin="$(command -v "$bin" 2>/dev/null || true)" ;; esac
+    case "$bin" in
+      */shims/*) if command -v mise >/dev/null 2>&1; then bin="$(mise which apm 2>/dev/null || true)"; fi ;;
+    esac
+    [ -f "$bin" ] || continue
+    line="$(head -n 1 "$bin" 2>/dev/null | LC_ALL=C tr -d '\000' || true)"
+    case "$line" in '#!'*python*) candidate="${line#'#!'}" ;; *) continue ;; esac
+    candidate="${candidate%% *}"
+    if [ -x "$candidate" ] && env -i "$candidate" -I -c 'import yaml' >/dev/null 2>&1; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+  if command -v python3 >/dev/null 2>&1 && env -i "$(command -v python3)" -I -c 'import yaml' >/dev/null 2>&1; then
+    command -v python3
+    return 0
+  fi
+  return 1
 }
 
-# "<sha256>  <entry>/<path inside it>" for each deployed_file_hashes record of the lock under <root>/<entry> (a single-file
-# entry is its own record).
+# Reads the previous lock once into PREVIOUS_LOCK_HASHES ("<sha256>  <path>" lines, scripts/lock-hashes.py) and sets
+# PREVIOUS_LOCK_READ=1. A lock that is missing is no news; one that cannot be read leaves PREVIOUS_LOCK_READ=0 with a
+# warning, and then previous_lock_matches approves nothing.
+load_previous_lock_hashes() {
+  local lock python
+  PREVIOUS_LOCK_HASHES="" PREVIOUS_LOCK_READ=0
+  lock="$(migrate_previous_lock "$1" "$2")"
+  [ -f "$lock" ] && [ ! -L "$lock" ] || return 0
+  if ! python="$(lock_python)"; then
+    log "warning: no python with PyYAML was found (APM_BIN's interpreter, apm on PATH, python3), so the previous apm.lock.yaml cannot be read and no skipped entry is auto-approved; every one needs --allow-skip"
+    return 0
+  fi
+  if ! PREVIOUS_LOCK_HASHES="$(env -i "$python" -I "$SCRIPT_DIR/lock-hashes.py" "$lock")"; then
+    PREVIOUS_LOCK_HASHES=""
+    log "warning: the previous apm.lock.yaml could not be read as expected (see lock-hashes above), so no skipped entry is auto-approved; every one needs --allow-skip"
+    return 0
+  fi
+  PREVIOUS_LOCK_READ=1
+}
+
+# "<sha256>  <entry>/<path inside it>" for each record of PREVIOUS_LOCK_HASHES under <root>/<entry> (a single-file entry
+# is its own record).
 lock_entry_hashes() {
-  awk -v root="$2" -v name="$3" '
+  printf '%s\n' "$PREVIOUS_LOCK_HASHES" | awk -v root="$1" -v name="$2" '
     BEGIN { exact = root "/" name }
-    /^[^ ]/ { mode = ""; next }
-    /^  [A-Za-z_]+:/ { mode = ($0 == "  deployed_file_hashes:") ? "hashes" : ""; next }
-    mode == "hashes" && /^    [^ ]/ {
-      record = substr($0, 5)
-      split_at = index(record, ": sha256:")
-      path = substr(record, 1, split_at - 1)
+    {
+      path = substr($0, 67)
       if (path != exact && index(path, exact "/") != 1) next
-      if (index(path, "/__pycache__/") || path ~ /\/\.apm-pin$/) next
-      printf "%s  %s\n", substr(record, split_at + 9), substr(path, length(root) + 2)
+      printf "%s  %s\n", substr($0, 1, 64), substr(path, length(root) + 2)
     }
-  ' "$1" | LC_ALL=C sort
+  ' | LC_ALL=C sort
 }
 
 entry_file_hashes() {
@@ -222,13 +244,11 @@ entries_with_links() {
 # changed byte leaves it to --allow-skip. A rehearsal materializes links in its scratch HOME (isolate_scratch_links), so
 # it lists the entries that held one before that in LINKED_ENTRIES_FILE and migrate, which sees the links, agrees.
 previous_lock_matches() {
-  local home="$1" stamp="$2" root="$3" name="$4" lock expected actual
-  lock="$(migrate_previous_lock "$home" "$stamp")"
-  [ -f "$lock" ] && [ ! -L "$lock" ] || return 1
-  previous_lock_readable "$lock" || return 1
+  local home="$1" stamp="$2" root="$3" name="$4" expected actual
+  [ "${PREVIOUS_LOCK_READ:-0}" = 1 ] || return 1
   if [ -n "${LINKED_ENTRIES_FILE:-}" ] && grep -qxF "$root/$name" "$LINKED_ENTRIES_FILE"; then return 1; fi
   [ -z "$(find "$home/$root.bak-$stamp/$name" ! -type f ! -type d -print -quit)" ] || return 1
-  expected="$(lock_entry_hashes "$lock" "$root" "$name")"
+  expected="$(lock_entry_hashes "$root" "$name")"
   [ -n "$expected" ] || return 1
   actual="$(entry_file_hashes "$home/$root.bak-$stamp" "$name")" || return 1
   [ "$expected" = "$actual" ]
@@ -242,9 +262,7 @@ previous_lock_matches() {
 reinstate_entries() {
   local home="$1" stamp="$2" report="${3:-}" root bak entry name scope found=0 broken="" plan="" escaping deployed skipped="" approved=""
   deployed="$(migrate_deployed_record "$home" "$stamp")"
-  if [ -f "$(migrate_previous_lock "$home" "$stamp")" ] && ! previous_lock_readable "$(migrate_previous_lock "$home" "$stamp")"; then
-    log "warning: the previous apm.lock.yaml has a deployed_file_hashes record that is not the plain form, so no skipped entry is auto-approved; every one needs --allow-skip"
-  fi
+  load_previous_lock_hashes "$home" "$stamp"
   escaping="$(reinstate_escaping_links "$home" "$stamp")"
   [ -z "$escaping" ] || fail "these links of $home lead outside it or are broken, so copying into the roots would write outside the HOME; nothing was copied:
 $escaping"
