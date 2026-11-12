@@ -1,9 +1,16 @@
 # Reads manifest pins ("entry|sha|mode|key" from manifest-sha-pins.awk), a "@@"
 # separator line, then docs/dependency-holds.txt ("<repo> <held-sha> <reason>",
 # "#" comment lines and blank lines skipped). Prints "repo|held-sha|actual|reason"
-# for each hold whose repo is not pinned to the held sha; actual is "(no SHA pin)"
-# when apm.yml carries none. Repos compare case-insensitively. Invoked as:
+# for each hold with a pin (nested path pins included) on a different sha, or
+# with none; actual is "(no SHA pin)" when apm.yml carries none. A pin belongs
+# to a repo by the first two segments of its key ("owner/repo", a leading
+# "github.com/" dropped), compared case-insensitively. Invoked as:
 #   { pins; echo @@; cat holds; } | awk -f scripts/lib/dependency-holds-check.awk
+function repo_id(key, segments) {
+  sub(/^github\.com\//, "", key)
+  split(key, segments, "/")
+  return tolower(segments[1] "/" segments[2])
+}
 /^@@$/ {
   in_holds = 1
   next
@@ -11,7 +18,7 @@
 !in_holds {
   split($0, pin, "|")
   pin_count++
-  pin_key[pin_count] = tolower(pin[4])
+  pin_key[pin_count] = repo_id(pin[4])
   pin_sha[pin_count] = pin[2]
   next
 }
@@ -27,7 +34,7 @@
   held_matches = 0
   actual = ""
   for (i = 1; i <= pin_count; i++) {
-    if (pin_key[i] != tolower(repo)) {
+    if (pin_key[i] != repo_id(repo)) {
       continue
     }
     total++

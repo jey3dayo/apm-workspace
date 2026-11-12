@@ -88,6 +88,19 @@ write_holds_fixture_pin() {
   rm -rf "$holds_workspace_dir"
 }
 
+@test "validate fails when a nested dependency of a held repo is pinned to a different commit" {
+  make_holds_fixture
+  printf 'dependencies:\n  apm:\n    - fujibee/agmsg#%s\n    - fujibee/agmsg/skills/extra#%s\n' "$held_sha" "$bumped_sha" >"$holds_workspace_dir/apm.yml"
+  printf 'dependencies:\n- repo_url: fujibee/agmsg\n  resolved_commit: %s\n- repo_url: fujibee/agmsg\n  virtual_path: skills/extra\n  resolved_commit: %s\n' "$held_sha" "$bumped_sha" >"$holds_workspace_dir/apm.lock.yaml"
+
+  run env APM_WORKSPACE_DIR="$holds_workspace_dir" bash "$SCRIPT_UNDER_TEST" validate
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"held dependency fujibee/agmsg"* ]]
+  [[ "$output" == *"$bumped_sha"* ]]
+  rm -rf "$holds_workspace_dir"
+}
+
 @test "validate passes when a held dependency stays on its held commit" {
   make_holds_fixture
   write_holds_fixture_pin "$held_sha"
