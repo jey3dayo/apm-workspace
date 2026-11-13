@@ -31,7 +31,7 @@ fi
 # 本 allowlist の集合一致を検証する。
 case "$role" in
 implement) allowed_models=(claude-sonnet-5-5-high claude-opus-5-5-high) ;;
-review) allowed_models=(claude-fable-5-1-thinking-xhigh claude-opus-5-5-high gpt-5.6-sol-xhigh) ;;
+review) allowed_models=(claude-fable-5-2-xhigh claude-opus-5-5-high gpt-5.6-sol-xhigh) ;;
 esac
 
 model_allowed=0
