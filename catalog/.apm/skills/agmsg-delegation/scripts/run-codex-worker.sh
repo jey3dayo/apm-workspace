@@ -179,8 +179,7 @@ if [[ "$role" == implement ]]; then
 	fi
 
 	codex_args+=(-C "$project" -s workspace-write)
-	# worker の既定 effort。xhigh が品質/コストの損益分岐（Terra high 相当を最安で達成）。
-	# 昇格時は AGMSG_WORKER_EFFORT=max で上書きする。
+	# implement の既定 effort は model を問わず xhigh。AGMSG_WORKER_EFFORT で上書きする。
 	worker_effort=${AGMSG_WORKER_EFFORT:-xhigh}
 	case "$worker_effort" in
 	none | low | medium | high | xhigh | max) ;;
