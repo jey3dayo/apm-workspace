@@ -1,6 +1,3 @@
-["upgrade:deps"]
-description = "Update apm.yml dependencies and regenerate lock, respecting holds in docs/dependency-holds.txt"
-run = '''
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -14,13 +11,11 @@ HOLDS_FILE="docs/dependency-holds.txt"
 MANIFEST="apm.yml"
 LOCK="apm.lock.yaml"
 
-# Extract held repo names from holds file
 held_repos=()
 while IFS= read -r line; do
   [[ "$line" =~ ^#.*$ || -z "$line" ]] && continue
-  repo=$(echo "$line" | awk '{print $1}')
-  held_repos+=("$repo")
-done < "$HOLDS_FILE"
+  held_repos+=("$(awk '{print $1}' <<<"$line")")
+done <"$HOLDS_FILE"
 
 echo "Held packages (will not be updated):"
 printf '  - %s\n' "${held_repos[@]}"
@@ -35,4 +30,3 @@ else
   echo "✓ Lock updated: $LOCK"
   echo "Note: Verify no held packages were updated with: mise run validate:workspace"
 fi
-'''
