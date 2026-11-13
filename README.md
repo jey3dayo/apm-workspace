@@ -45,13 +45,12 @@ mise bootstrap       # first machine setup
 | ------------------------ | ------------------------------------------------------------------------- |
 | Validate without rollout | `mise run check`                                                          |
 | Format workspace files   | `mise run format`                                                         |
-| Roll out a pushed commit | `mise run native:sync` (or `mise run native:sync -- --https` without SSH) |
+| Roll out a merged commit | `mise run native:sync` (or `mise run native:sync -- --https` without SSH) |
 
 For deployed-state and learning-intake diagnostics, run the hidden `mise run doctor` task.
 
-The real HOME is native. The legacy writer (`deploy`, `apply`, `upgrade`,
-`refresh` and their helper tasks) was removed on 2026-11-10; its last version
-is commit `0bcce09`. A Codex skill change is verified only after checking
+The real HOME is native. See [`docs/native-distribution.md`](docs/native-distribution.md)
+for rollout and recovery details. Verify a Codex skill rollout by checking
 `~/.agents/skills/<id>/SKILL.md`.
 
 ## External Checkout Changes
