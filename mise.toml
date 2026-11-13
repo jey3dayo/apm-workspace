@@ -55,6 +55,10 @@ description = "Configure host-local MCP servers for Codex and Claude"
 hide = true
 run = "bash ./scripts/apm-workspace.sh setup:mcp:host"
 
+[tasks."upgrade:deps"]
+description = "Regenerate apm.lock.yaml after pin updates, listing holds in docs/dependency-holds.txt"
+run = "bash ./scripts/upgrade-deps.sh"
+
 [tasks."agmsg:state:save"]
 description = "Move the agmsg roster out of the deploy target before it is rewritten"
 # Hidden on purpose: running save alone leaves the roster unlinked from the
