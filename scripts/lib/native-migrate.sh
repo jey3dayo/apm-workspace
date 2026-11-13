@@ -48,7 +48,7 @@ assert_migrate_rehearsal() {
   local home="$1" sha="$2" dir="$3" want
   [ -f "$dir/result.txt" ] || fail "--rehearsal $dir has no result.txt; run rehearse --migrate and pass its rehearsal-<UTC> directory"
   for want in mode=migrate "home=$home" "source_ref=$sha" "workspace_only=$WORKSPACE_ONLY" install_status=0 compile_status=0 \
-    reinstate_status=0 agmsg_status=0 lost=0 baseline_skips=0; do
+    reinstate_status=0 lost=0 baseline_skips=0; do
     result_has "$dir" "$want" || fail "the rehearsal $dir does not show $want; run rehearse --migrate again for this HOME, --source-ref and --workspace-only until it is clean"
   done
   for want in $(home_state_lines "$home"); do
@@ -170,9 +170,7 @@ migrate_failure() {
     log "rolling the roots back"
     (rollback_roots "$MIGRATE_HOME" "$MIGRATE_STAMP") ||
       log "the automatic rollback failed; fix the cause, then run: $(migrate_rollback_command "$MIGRATE_HOME" "$REAL_HOME" "$MIGRATE_STAMP")"
-    if [ "$MIGRATE_AGMSG_LINKED" = 1 ]; then
-      (agmsg_state "$MIGRATE_HOME" restore) || log "the agmsg links were not restored; run mise run agmsg:state:restore"
-    fi
+    # agmsg removed
   fi
   if (restore_untouched "$MIGRATE_HOME" "$MIGRATE_STAMP"); then
     rm -rf "${MIGRATE_HOME:?}/.apm/native-migrate-$MIGRATE_STAMP.untouched"
@@ -218,11 +216,7 @@ Move them aside or make them plain directories and files of this HOME."
   MIGRATE_HOME="$home" MIGRATE_STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
   claim_migrate_record "$home" "$MIGRATE_STAMP"
   log "native-migrate stamp: $MIGRATE_STAMP"
-  MIGRATE_AGMSG_LINKED=0
-  if [ -L "$home/.agents/skills/agmsg/db" ]; then
-    MIGRATE_AGMSG_LINKED=1
-    agmsg_state "$home" save
-  fi
+  # agmsg removed
 
   trap migrate_failure EXIT
   save_untouched "$home" "$MIGRATE_STAMP"
@@ -231,7 +225,6 @@ Move them aside or make them plain directories and files of this HOME."
   run_apm_install "$home"
   run_apm "$home" compile -g --clean
   reinstate_entries "$home" "$MIGRATE_STAMP" "$home/.apm/native-migrate-$MIGRATE_STAMP." "$rehearsal_dir/pristine-entries.txt"
-  if [ "$MIGRATE_AGMSG_LINKED" = 1 ]; then agmsg_state "$home" restore; fi
   assert_dropped_as_rehearsed "$home" "$MIGRATE_STAMP" "$rehearsal_dir"
   assert_skipped_as_rehearsed "$home" "$MIGRATE_STAMP" "$rehearsal_dir"
   assert_no_unexpected_loss "$home" "$MIGRATE_STAMP" "$roots_before"

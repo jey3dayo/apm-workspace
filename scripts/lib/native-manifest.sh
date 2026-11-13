@@ -32,7 +32,6 @@ render_manifest() {
       return 0
     }
     BEGIN {
-      required["github.com/fujibee/agmsg"] = 1
       required["github.com/ibelick/ui-skills"] = 1
       required["github.com/tt-a1i/archify/archify"] = 1
       n = split(map, entries, " ")
@@ -152,17 +151,17 @@ cmd_plan() {
 #   2. stop unless the rehearsal's result.txt is mode=migrate, for the same HOME and ref, with no failed step, no lost
 #      file outside the allowlist, and no skipped baseline; then check the paths apm writes for edited generated roots
 #      and links that leave HOME
-#   3. copy ${MIGRATE_UNTOUCHED_FILES// /, } (owner-only) to <HOME>/.apm/native-migrate-<UTC>.untouched; save the agmsg links
+#   3. copy ${MIGRATE_UNTOUCHED_FILES// /, } (owner-only) to <HOME>/.apm/native-migrate-<UTC>.untouched
 #   4. write the manifest above, move $MIGRATE_ROOTS
 #      to <root>.bak-<UTC> (nothing is deleted)
 #   5. apm install -g --only apm --trust-bin, apm compile -g --clean, then copy back the top-level entries apm did not deploy
-#      (a link that leaves its root is copied; a link that leaves the HOME or is broken fails); restore the agmsg links;
+#      (a link that leaves its root is copied; a link that leaves the HOME or is broken fails);
 #      stop if a file of the roots is gone outside the allowlist (the same check as the rehearsal, listed in
 #      <HOME>/.apm/native-migrate-<UTC>.lost.txt) or if the files of step 3 changed
 #   6. on any failure, undo step 4 (migrate-rollback --stamp <UTC> does the same later) and put the files of step 3 back,
 #      keeping what migrate left as <file>.changed-<UTC>. It prints the stamp.
 # Not deployed by APM: catalog/claude/rules, private skills, Pi instructions and host-local MCP.
-# native:sync separately preserves agmsg db/teams links and writes the OpenCode guide.
+# native:sync separately writes the OpenCode guide.
 # This plan wrote nothing.
 EOF
 }
