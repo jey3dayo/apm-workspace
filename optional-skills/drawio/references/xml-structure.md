@@ -57,23 +57,20 @@ draw.io ファイルの基本構造:
 
 ```xml
 <mxGraphModel
-  dx="1422"              <!-- Viewport X offset -->
-  dy="794"               <!-- Viewport Y offset -->
-  grid="1"               <!-- Grid enabled (0 or 1) -->
-  gridSize="10"          <!-- Grid size in pixels -->
-  guides="1"             <!-- Guides enabled -->
-  tooltips="1"           <!-- Tooltips enabled -->
-  connect="1"            <!-- Connection enabled -->
-  arrows="1"             <!-- Arrows enabled -->
-  fold="1"               <!-- Folding enabled -->
-  page="0"               <!-- Page boundaries (0=none, 1=show) -->
-  pageScale="1"          <!-- Page scale factor -->
-  pageWidth="827"        <!-- Page width (A4 = 827) -->
-  pageHeight="1169"      <!-- Page height (A4 = 1169) -->
-  math="0"               <!-- Math typesetting -->
-  shadow="0"             <!-- Default shadow -->
-  defaultFontFamily="Helvetica">  <!-- CRITICAL: Default font -->
+  dx="1422" dy="794" grid="1" gridSize="10"
+  guides="1" tooltips="1" connect="1" arrows="1" fold="1"
+  page="0" pageScale="1" pageWidth="827" pageHeight="1169"
+  math="0" shadow="0" defaultFontFamily="Helvetica">
+</mxGraphModel>
 ```
+
+- `dx`, `dy`: viewport offsets.
+- `grid`, `gridSize`: enable the grid (`0` or `1`) and set its size in pixels.
+- `guides`, `tooltips`, `connect`, `arrows`, `fold`: enable the corresponding editor features.
+- `page`: page boundaries (`0` = hidden, `1` = shown).
+- `pageScale`, `pageWidth`, `pageHeight`: page scale and dimensions (`827` × `1169` for A4).
+- `math`, `shadow`: math typesetting and default shadow.
+- `defaultFontFamily`: critical default font.
 
 ### Critical Settings
 

@@ -149,7 +149,7 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
 - The real HOME is native (`~/.apm/apm.yml` starts with `# Rendered by scripts/native.sh`). The legacy writer (`deploy`, `apply`, `upgrade`, `refresh` and their helper tasks) was removed on 2026-11-10; its last version is commit `0bcce09`. Roll out only with `mise run native:sync`; `docs/native-distribution.md` section B describes its internal stages and the direct rollback command it prints.
 - Run `mise run check` before a rollout. It performs formatting checks, all linters, offline action-lock verification, workspace and catalog validation, and the full Bats suite.
 - Run the hidden `mise run doctor` task for read-only workspace and deployed-state diagnostics, including learning-intake reports.
-- No task refreshes upstream dependencies or regenerates `apm.lock.yaml`; this is an open item in `docs/package-decisions.md`.
+- `mise run upgrade:deps` regenerates the checkout's `apm.lock.yaml` after manifest changes; it does not update manifest pins. Follow [the refresh sequence](references/rollout-fast-paths.md#sha-pin-bump-sequence-fast-path-5--fast-path-7) for holds and lock review.
 - For skill creation, updates, installs, or migrations in this workspace, include section B and a deployed target check in the plan unless the user explicitly asks for a local-only change.
 
 ## Routing
@@ -261,10 +261,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - review the diff, commit and push, then roll the pushed SHA out with `mise run native:sync`
 
 5. Upstream refresh:
-   - no task re-resolves the root `apm.lock.yaml` (`upgrade` and `deploy:pins` were removed); do not run `apm update -g` or `apm install -g` as a substitute. Update the pinned entries of `apm.lock.yaml` to the same commits as the pin in `apm.yml` (or revert the pin)
-   - read `docs/dependency-holds.txt` first and leave a held dependency's pin alone; release a hold by deleting its line in the same PR and recording it in `docs/package-decisions.md`
-   - for a hand-bumped SHA pin, see the SHA-pin bump sequence in
-     `references/rollout-fast-paths.md`
+   - follow [the refresh sequence](references/rollout-fast-paths.md#sha-pin-bump-sequence-fast-path-5--fast-path-7), including holds, manual pin changes, lock regeneration and diff review
    - if the manifest contains `gist.github.com/...#<sha>`, verify its regenerated `apm.lock.yaml` record as the gist Guardrail describes (the shortened `owner/<gist-id>` `repo_url` is the accepted form) before rollout
    - confirm the target dependency's `resolved_commit` and the deployed file's hash
      before calling the refresh done; a zero exit from the migration stage is not evidence the pin moved
@@ -291,10 +288,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - edit the external repository checkout that is the source of truth
    - run that repository's relevant checks
    - commit and push the external repository
-   - in the checkout, bump the SHA pin in `apm.yml` and follow the SHA-pin bump
-     sequence in `references/rollout-fast-paths.md`; a dependency that tracks a
-     branch or tag has no refresh task now (Fast Path 5)
-   - update the pinned entry of `apm.lock.yaml` to the pushed commit and verify it points the target dependency there
+   - in the checkout, follow [the refresh sequence](references/rollout-fast-paths.md#sha-pin-bump-sequence-fast-path-5--fast-path-7) and verify the target lock entry points to the pushed commit
    - check whether `apm.lock.yaml` also changed unrelated unpinned dependencies
    - verify the deployed target such as `~/.agents/skills/<id>` contains the updated content
    - keep unrelated dirty files in the checkout unstaged unless the user explicitly includes them
@@ -306,6 +300,6 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
    - verify the deployed target contains one copy of the skill
 
 9. Global external dependency removed:
-   - confirm `git status --short apm.lock.yaml` is clean and delete its `apm.yml` line; no task drops the now-undeclared lock record (Fast Path 5), so report it, then roll out with section B
+   - confirm `git status --short apm.lock.yaml` is clean, delete its `apm.yml` line, and follow [the lock regeneration and review sequence](references/rollout-fast-paths.md#sha-pin-bump-sequence-fast-path-5--fast-path-7); verify the removed entry and unrelated drift before rollout with section B
    - verify the skill is gone from both deployed targets, and record the removal in `docs/package-decisions.md`
    - do not run `apm uninstall -g <manifest-ref>` on the native HOME: it writes the consumer `~/.apm` and the real HOME, and the next native rollout overrides it; `references/rollout-fast-paths.md` keeps its old-path side effects as a record

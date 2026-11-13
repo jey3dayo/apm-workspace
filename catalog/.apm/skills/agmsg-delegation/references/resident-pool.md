@@ -22,7 +22,7 @@
 | review role | spawn の profile / sandbox で read-only を実行時に強制  | 強制境界を確認できた pane のみ verdict 可。それ以外は advisory                                          |
 | 8. 片付け   | `reset.sh` → `bootout` → 一時ディレクトリ削除           | `reset.sh` で identity を解放するだけ。pane は落とさない                                                |
 
-### 生存契約
+## 生存契約
 
 `$run_dir/worker.log`・`worker.exit`・launchd job label が存在しないため、**crash・長時間コマンド・承認待ちを orchestrator 側だけでは区別できない**。この欠落を heartbeat とユーザーへの委譲で埋める。
 
@@ -33,7 +33,7 @@
 - `WORKING` が10分途切れたら、orchestrator は推測で crash 判定せず、**該当 pane の状態確認をユーザーへ依頼する**（承認プロンプトで停止している可能性がある。pane は対話 TUI なので画面には出ているが、agmsg には何も流れない）
 - 打ち切るときは `STOP(task_id)` を送る。応答が無い場合、spawn 経路のような job 停止手段は無いので、**ユーザーに pane で中断してもらう**
 
-### 安全契約の置き換え
+## 安全契約の置き換え
 
 pane はユーザーが起動するので `run-claude-worker.sh` / `run-codex-worker.sh` を通らず、**macOS sandbox の書込境界も `-a never` も掛からない**。implement worker については次で担保する（reviewer は後述の「強制境界の有無で reviewer を 2 段に分ける」が正本）。
 
@@ -43,7 +43,7 @@ pane はユーザーが起動するので `run-claude-worker.sh` / `run-codex-wo
 
 **Reviewer の起動経路は spawn（`run-*-worker.sh review`）と pane 常駐の 2 つ。どちらも正規。** ただし verdict を出せるかは経路ではなく、**read-only の実行時強制が実際に掛かっているか**で決まる。
 
-### 強制境界の有無で reviewer を 2 段に分ける
+## 強制境界の有無で reviewer を 2 段に分ける
 
 | 区分              | 条件                                               | 出せるもの                                         |
 | ----------------- | -------------------------------------------------- | -------------------------------------------------- |
@@ -55,7 +55,7 @@ pane はユーザーが起動するので `run-claude-worker.sh` / `run-codex-wo
 - **Codex**: 対話起動でも `-p` / `-a` / `-s` を取れるため、scratch を cwd にして `cd "$(mktemp -d)" && codex -p agmsg-review -a never -m <model>` で立てれば spawn 経路と同じ境界になる。ただし `-p` は profile が `CODEX_HOME` 直下に無いと exit 0 で base config へ落ちる（fail-open）。`run-codex-worker.sh` が行っている置き直しと検証は手起動 pane では走らないので、**起動前に自分で置いて `cmp` を通す**。pane は `CODEX_HOME` を差し替えないので置き場所は `~/.codex` 直下になる: `install -m 600 <catalog の agmsg-review.config.toml> "${CODEX_HOME:-$HOME/.codex}/agmsg-review.config.toml"` のうえで `cmp` する。通していない pane は advisory とする。
 - **Claude**: `run-claude-worker.sh` の書込境界は `sandbox-exec` のラップで掛かっており、手で `claude` を起動した pane には掛からない。同等の境界を用意できない限り **advisory 固定**とする。
 
-### status 比較は代替ではなく追加の検知
+## status 比較は代替ではなく追加の検知
 
 REVIEW 受信後の確認 (1) head SHA（+ diff ファイル方式なら checksum）が起動時と一致 (2) `git status --short` と `git ls-files --others --exclude-standard` が review 開始時点と差分なし、は行う。ただしこれは**実行時強制の代わりにならない**。次を検出できない。
 
@@ -67,7 +67,7 @@ REVIEW 受信後の確認 (1) head SHA（+ diff ファイル方式なら checksu
 
 **head SHA が一致していても fabricated approval は成立しうる。** したがって status 比較を根拠に advisory reviewer の所見を approve へ格上げしない。
 
-### approval gate は作者と別 identity・別 session
+## approval gate は作者と別 identity・別 session
 
 approve を受理できる条件（作者と異なる identity かつ別 session / 別 context であること、対象の同一性と判断の独立性が別要件であること）は `orchestrator-worker` の「self-review 禁止（approval gate）」が正本。ここでは pane 常駐経路で追加になる部分だけを書く。
 

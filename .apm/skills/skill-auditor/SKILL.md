@@ -1,15 +1,6 @@
 ---
 name: skill-auditor
-description: >
-  Analyzes Claude Code session transcripts to evaluate skill portfolio health —
-  routing errors, attention competition between descriptions, and coverage gaps.
-  Generates an interactive HTML report with per-skill health cards, competition
-  matrix, attention budget analysis, and actionable patches. Unlike skill-creator
-  which optimizes individual skills in isolation, skill-auditor optimizes the
-  portfolio as a system, detecting cross-skill attention theft and cascade risks.
-  Use when user says "audit my skills", "skill audit", "run skill-auditor",
-  "analyze skill routing", "check skill competition", "portfolio health",
-  "スキル監査", "スキルの精度を分析", "スキルルーティング分析".
+description: Audit Claude Code skill routing and portfolio health from session transcripts.
 disable-model-invocation: true
 ---
 
@@ -45,10 +36,26 @@ Pass the language choice to all sub-agents as an
 instruction prefix: "Write all output text (health_assessment, detail, reason,
 suggested_fix, etc.) in [chosen language]."
 
-For cross-project mode, use `"all"` as the project_path argument in Step 1.
+For cross-project mode, use `"all"` as the project_path argument in Step 2.
 For current-project mode, use `--cwd "$(pwd)"`.
 
-### Step 1: Detect Project
+### Step 1: Set Up Workspace
+
+Base dir for both modes: `<repo>/tmp/skill-audit/`, where `<repo>` is the
+current repository root. Each run gets a timestamped subdirectory so multiple
+runs never collide:
+
+```bash
+RUN_ID=$(date +%Y-%m-%dT%H-%M-%S)
+WORKSPACE=<base_dir>/${RUN_ID}
+mkdir -p ${WORKSPACE}
+```
+
+Use `${WORKSPACE}` as `<workspace>` in all subsequent steps.
+`health-history.json` stays at `<base_dir>/health-history.json` (shared
+across runs — see Step 8).
+
+### Step 2: Detect Project and Collect Transcripts
 
 If cross-project mode was selected:
 
@@ -66,29 +73,12 @@ python3 "${CLAUDE_SKILL_DIR}/scripts/collect_transcripts.py" --cwd "$(pwd)" --da
 
 If auto-detection fails, stop and report the candidate list; do not guess.
 
-Base dir for both modes: `<repo>/tmp/skill-audit/`, where `<repo>` is the
-current repository root. `health-history.json` lives in the same place.
+### Step 3: Collect Skills
 
-### Step 2: Set Up Workspace
-
-Each run gets a timestamped subdirectory so multiple runs never collide:
+Run the skill collection script to complete the input files for analysis.
 
 ```bash
-RUN_ID=$(date +%Y-%m-%dT%H-%M-%S)
-WORKSPACE=<base_dir>/${RUN_ID}
-mkdir -p ${WORKSPACE}
-```
-
-Use `${WORKSPACE}` as `<workspace>` in all subsequent steps.
-`health-history.json` stays at `<base_dir>/health-history.json` (shared
-across runs — see Step 8).
-
-### Step 3: Collect Data
-
-Run both scripts. They produce the input files for analysis.
-
-```bash
-# Transcripts already collected in Step 1
+# Transcripts already collected in Step 2
 
 python3 "${CLAUDE_SKILL_DIR}/scripts/collect_skills.py" \
   --output <workspace>/skill-manifest.json --verbose

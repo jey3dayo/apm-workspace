@@ -13,3 +13,5 @@ Consumer-side repository prerequisites to check before running `apm install` for
 Items 1 and 2 are about directories `apm install` always creates as install targets; they hold regardless of how the lockfile itself is formatted. Item 3 depends on the consuming repository's lint configuration — a repository with no YAML linter, or one whose rules already accept the lockfile's shape, needs nothing.
 
 Treat the lockfile as accepted-upstream state rather than something to reformat. Inline `# yamllint disable` comments do not survive, because `apm lock` and `apm install` regenerate the whole file.
+
+For lock regeneration in the APM workspace checkout, follow [the refresh sequence](rollout-fast-paths.md#sha-pin-bump-sequence-fast-path-5--fast-path-7).
