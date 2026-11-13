@@ -3,7 +3,7 @@
 ## Operational Contract
 
 - The authoring checkout (`~/src/github.com/jey3dayo/apm-workspace`; "the checkout" below) is the day-to-day source of truth for APM catalog content, task wiring, and supporting docs. On the native HOME, `~/.apm` holds only the APM consumer state.
-- The real HOME is native. The sole rollout task is `mise run native:sync` (or `mise run native:sync -- --https` without SSH); its internal stages and direct rollback command are in section B of `docs/native-distribution.md`. `setup:mcp:host` also writes to HOME. The legacy writer (`apply`, `deploy`, `upgrade`, `refresh` and their helpers) was removed on 2026-11-10; its last version is commit `0bcce09`.
+- The real HOME is native. The sole rollout task is `mise run native:sync` (or `mise run native:sync -- --https` without SSH); its internal stages and direct rollback command are in section B of `docs/native-distribution.md`. `setup:mcp:host` also writes to HOME.
 - `~/.config` is reference-only for this workflow. It is not the operational source of truth.
 - The bold-heading formatter helper (`replace-bold-headings.ts`) is vendored into this repository at `scripts/replace-bold-headings.ts`; there is no operational exception under `~/.config` for it.
 - The global guide is the catalog instruction `catalog/.apm/instructions/ai-collaboration.instructions.md`. The migration stage inside `native:sync` runs `apm compile -g --clean`, which writes `~/.codex/AGENTS.md` and `~/.cursor/AGENTS.md` and never overwrites a root without the APM marker; Claude reads the guide as the native rule a user-scope install adds.

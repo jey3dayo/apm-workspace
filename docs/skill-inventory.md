@@ -54,27 +54,12 @@ Cursor user-scope（`~/.cursor/mcp.json`）は APM 外 — [`package-decisions.m
   の各 `plugins/service-integrations/<id>` ref を個別導入する（実際の repo と id は会社マーケットプレイスのプラグイン一覧で確認する）。
 - `aws-credential-helper` — global APM から撤去済み（2026-10-19）。会社マーケットのプラグインで管理（Claude Code / Codex / Grok 共通）。APM の `apm.yml` には載せない。
 
-## repo-local で活用中
+## repo-local / on-demand
 
-global の一覧に無くても廃止ではない。各リポジトリの `apm.yml` が正本（2026-10-02 時点の `ghq` 配下スキャン。パッケージ置き場の `our-apm` は除く）。
-
-| ツール                                                                                     | 利用リポジトリ                                                           | 用途                                          |
-| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ | --------------------------------------------- |
-| `agentation-mcp`（MCP）                                                                    | `ultra-rss-reader`                                                       | Agentation toolbar での UI アノテーション連携 |
-| `agentation` / `agentation-self-driving`（benjitaylor, repo-local のみ）                   | `work-bff`（両方）, `ultra-rss-reader`（`agentation-self-driving` のみ） | repo-local での Agentation 自動レビュー導線   |
-| `tauri-mcp-server`（MCP）                                                                  | `ultra-rss-reader`                                                       | Tauri ランタイム検証                          |
-| `terraform-style-guide` / `terraform-test`（hashicorp）                                    | `work-site`, `work-infra`, `terraform-infra`                             | Terraform 規約・テスト                        |
-| `workers-best-practices` / `wrangler`（cloudflare）                                        | `keep-on`                                                                | Cloudflare Workers                            |
-| `internal-api-a` / `internal-api-b` / `internal-api-d`（work marketplace、repo-local apm） | `work-site`, `work-infra`, `work-bff`                                    | 社内 API 連携                                 |
-| `aws-credential-helper`（work marketplace プラグイン、APM 管理外）                         | Claude Code / Codex / Grok 共通（host 導入）                             | AWS 認証導線                                  |
-| `internal-api-c`（work marketplace）                                                       | `work-site`                                                              | 社内 API 連携                                 |
-| `mcp-server-patterns`, `chatgpt-apps`                                                      | `work-bff`                                                               | MCP / ChatGPT Apps 実装                       |
-| `tauri`（EpicenterHQ）, `rust-best-practices`, `tauri-icon-gen`, `tauri-webview-geometry`  | `ultra-rss-reader`                                                       | Tauri / Rust 実装                             |
-| `marp-slide`, `slide-docs`, `google-forms-survey-builder`（optional）                      | `tech-talks`                                                             | スライド制作・アンケート作成                  |
-| `manga-rss-bridge`                                                                         | `manga-rss-bridge`, `homelab-k3s`                                        | プロジェクト固有運用                          |
+global の一覧に無いことは廃止を意味しない。repo-local の採用状態は各リポジトリの `apm.yml` が正本なので、必要なときに `ghq list -p` で対象リポジトリを探して確認する。一覧の複製は置かない。
 
 ## メンテナンス
 
 - 更新タイミング: レーンの追加・変更、optional / manual / private の出入り、repo-local の新規採用・撤去時（global の追加・撤去だけならこのファイルは触らない）
 - global から repo-local / optional への移管: `apm-usage` の Install Gate と Fast Path 9 に従う
-- repo-local の再スキャン: `ghq list -p` で各リポジトリの `apm.yml` を確認
+- repo-local の採用状態: 各リポジトリの `apm.yml` を確認
