@@ -31,3 +31,4 @@
 | 2026-11-06 | 検証コマンドは repo の `mise` task と CI 定義から確認して写し、独自フラグは理由を書くようにした | `catalog/skills/orchestrator-worker/SKILL.md` | 次の Worker の検証コマンドが repo の gate と一致し、独自フラグの失敗が gate との差として報告される | 未計測 | |
 | 2026-11-06 | `apm-deploy-verify` に、archify の既知の link 警告（アンカー付きと例文中のリンク）を既知として扱う旨を足した | `catalog/skills/apm-deploy-verify/SKILL.md` | 次の deploy 検証の報告で、archify の警告を「原因未調査」と申し送らず、既知の 1 行で済ませる | 未計測 | |
 | 2026-11-06 | `ship` の push 工程に、`push.followTags` で意図しない tag が送られないよう `--dry-run` で確かめ、`--no-follow-tags` を使う手順を足した | `catalog/skills/ship/SKILL.md` | 次に fork や初回の branch へ push するとき、送る ref を事前に確認し、branch 以外の tag が fork に増えない | 未計測 | |
+| 2026-11-13 | `run-codex-worker.sh` の既定 effort コメントから、出典のない「Terra high 相当を最安で達成」の比較を外した | `catalog/.apm/skills/agmsg-delegation/scripts/run-codex-worker.sh` | 次に Worker の既定 model や effort を議論するとき、このコメントを根拠として引かれず、luna xhigh と terra の比較は実測の todo として扱われる | 未計測 | |
