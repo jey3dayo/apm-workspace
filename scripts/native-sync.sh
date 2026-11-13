@@ -198,6 +198,9 @@ sync_finish() {
   trap - EXIT
   stamp="$(sync_migrate_stamp)" || stamp=""
   if [ "$status" != 0 ]; then log "native:sync stopped (exit $status); backup and logs: $SYNC_RUN"; fi
+  if [ "$status" != 0 ] && [ "$SYNC_HTTPS" = 0 ] && grep -qsE 'ssh: connect to host (ssh\.)?github\.com port [0-9]+' "$SYNC_RUN"/*.log; then
+    log "GitHub over SSH failed (the rehearsal's disposable HOME may not load your ~/.ssh/config); retry over HTTPS: mise run native:sync -- --https"
+  fi
   if [ -n "$stamp" ]; then
     printf 'Rollback of the four roots: %s\n' "$(migrate_rollback_command "$SYNC_HOME" "$SYNC_REAL_HOME" "$stamp")" >&2
     log "Other native outputs require the backup at $SYNC_RUN/backup (docs/native-distribution.md)."
@@ -256,6 +259,7 @@ cmd_sync() (
   done
   HOME_DIR="$home_dir" REAL_HOME="$real_home"
   SYNC_HOME="$(target_home sync)" SYNC_REAL_HOME="$real_home"
+  SYNC_HTTPS="$https"
   assert_not_checkout "$SYNC_HOME"
   if ! native_lock_held "$SYNC_HOME"; then
     native_lock_command "$SYNC_HOME" "${sync_args[@]}"

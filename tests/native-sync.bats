@@ -73,3 +73,38 @@ EOF
   [ -f "$FX/home/.agents/skills/existing/SKILL.md" ]
   [ "$(find "$FX/home/.agents" -path '*.bak-*/existing/SKILL.md' | wc -l | tr -d ' ')" -eq 1 ]
 }
+
+failing_ssh_fixture() {
+  local root
+  root="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
+  cp "$root/apm.yml" "$FX/repo/apm.yml"
+  cat >"$FX/apm-stub" <<'EOF'
+#!/usr/bin/env bash
+if [ "$1" = install ]; then
+  printf 'ssh: connect to host github.com port 22: Connection refused\n' >&2
+  printf 'fatal: Could not read from remote repository.\n' >&2
+  exit 1
+fi
+EOF
+  chmod +x "$FX/apm-stub"
+  git -C "$FX/repo" add apm.yml
+  git -C "$FX/repo" -c user.name=fixture -c user.email=fixture@example.invalid commit -q -m ssh-failure
+  git -C "$FX/repo" push -q "$FX/remote.git" HEAD:refs/heads/main
+}
+
+@test "sync suggests --https when a stage log shows an SSH transport failure" {
+  failing_ssh_fixture
+  run sync_fixture APM_BIN="$FX/apm-stub" bash "$FX/repo/scripts/native.sh" sync
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"native:sync stopped"* ]]
+  [[ "$output" == *"retry over HTTPS: mise run native:sync -- --https"* ]]
+}
+
+@test "sync does not suggest --https when --https was already passed" {
+  failing_ssh_fixture
+  run sync_fixture APM_BIN="$FX/apm-stub" bash "$FX/repo/scripts/native.sh" sync --https
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"native:sync stopped"* ]]
+  [[ "$output" == *"ssh: connect to host github.com port 22"* ]]
+  [[ "$output" != *"retry over HTTPS"* ]]
+}
