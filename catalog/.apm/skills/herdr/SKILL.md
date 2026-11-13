@@ -98,7 +98,7 @@ pane=$("$HOME/.agents/skills/herdr/scripts/find-agent.sh" -q --kind claude --tit
 
 pane_id は session ごとの ID。別 session の agent を操作するときは `herdr --session <name> agent ...` と明示する。環境変数で対象を選ぶ場合は、`HERDR_SOCKET_PATH` があればそちらが優先され、未設定なら `HERDR_SESSION` が使われる。pane 内では `HERDR_SOCKET_PATH` が注入されるため、`HERDR_SESSION` だけでは切り替わらない。`-q` は現在と別 session のとき stderr にコマンド例を出す。
 
-全 agent の段階（判断待ち / CI待ち / 作業中 / 停止 / 完了）を一覧にするときは、pane の画面を 1 つずつ読まず `scripts/herd-status.sh` を使う。共通ガイドの `STATUS:` 行を各 pane の末尾から拾って Markdown の表に集計する読み取り専用スクリプトで、STATUS 行のない pane は「STATUS なし」に集まるので、画面を読むのはそれだけにする。表は人が読む用で、pane 列は画面に見える pane タイトルである。agent を操作するときは `--json` の `session` と `pane_id` を使う。
+全 agent の段階（判断待ち / CI待ち / 作業中 / 停止 / 完了）を一覧にするときは、pane の画面を 1 つずつ読まず `scripts/herd-status.sh` を使う。共通ガイドの `STATUS:` 行を各 pane の末尾から拾って Markdown の表に集計する読み取り専用スクリプトで、STATUS 行のない pane は「STATUS なし」に集まる。直近のターンで STATUS を出さなかった pane には前のターンの段階が残りうるので、表の段階は目安として扱い、判断に使う前に気になる行は画面で確かめる。表は人が読む用で、pane 列は画面に見える pane タイトルである。agent を操作するときは `--json` の `session` と `pane_id` を使う。
 
 ```bash
 "$HOME/.agents/skills/herdr/scripts/herd-status.sh"          # 段階ごとの表（自分の pane は除く）

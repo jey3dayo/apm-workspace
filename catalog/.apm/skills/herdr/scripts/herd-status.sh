@@ -33,7 +33,7 @@ command -v jq >/dev/null || { echo "error: jq is required" >&2; exit 2; }
 parse_status() {
   jq -Rs '
     ["判断待ち", "CI待ち", "作業中", "完了", "停止"] as $stages
-    | def trim: sub("^[\\s│┃]+"; "") | sub("[\\s│┃]+$"; "");
+    | def trim: sub("^[\\s│┃]+"; "") | sub("[\\s│┃`*]+$"; "");
     [split("\n")[]
       | capture("^[^\\p{L}\\p{N}]*STATUS:(?<rest>.*)$")
       | (.rest | split("|")) as $parts
