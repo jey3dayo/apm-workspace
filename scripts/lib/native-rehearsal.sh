@@ -1,14 +1,9 @@
 # Every symlink of the scratch HOME ends up inside it, so nothing apm writes there reaches the real files.
 isolate_scratch_links() {
   local home="$1" scratch="$2" link target resolved orig
-  local store="$home/.local/state/agmsg/"
   while IFS= read -r link; do
     target="$(readlink "$link")"
     case "$target" in
-      "$store"*)
-        rm -f "$link"
-        ln -s "$scratch/.local/state/agmsg/${target#"$store"}" "$link"
-        ;;
       *)
         if [ ! -e "$link" ] || ! resolved="$(realpath "$link" 2>/dev/null)"; then
           # A relative link can point at a file of the HOME that the backup did not copy; resolve it in the HOME.
