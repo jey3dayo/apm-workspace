@@ -31,6 +31,10 @@ class StrictLoader(yaml.SafeLoader):
 
 def canonical(path):
     """A HOME-relative path as one spelling only: callers select records by string prefix."""
+    try:
+        path.encode("utf-8")
+    except UnicodeEncodeError:
+        return False
     return (
         not CONTROL.search(path)
         and "\\" not in path

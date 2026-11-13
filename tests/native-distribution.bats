@@ -672,3 +672,23 @@ prepare_migrate() {
       "$(hash_of "$home/.claude/skills/dir/sub/a.txt")  dir/sub/a.txt")"
   )" ]
 }
+
+@test "a lock record whose path is not valid UTF-8 makes the whole lock unreadable, even outside the roots" {
+  local home python digest
+  home="$(new_home pristine-surrogate)"
+  python="$(APM_BIN="$APM_BIN" /bin/bash -c '. "$1/scripts/native.sh"; lock_python' _ "$REPO_ROOT")"
+  mkdir -p "$home/.claude/skills/foo" "$home/.apm"
+  printf 'skill\n' >"$home/.claude/skills/foo/SKILL.md"
+  digest="$(shasum -a 256 <"$home/.claude/skills/foo/SKILL.md" | awk '{print $1}')"
+  printf "lockfile_version: '1'\ndependencies:\n- deployed_file_hashes:\n    .claude/skills/foo/SKILL.md: sha256:%s\n    \"unrelated/\\\\uD800\": sha256:%064d\n" \
+    "$digest" 0 >"$home/.apm/apm.lock.yaml"
+  grep -qF 'unrelated/\uD800' "$home/.apm/apm.lock.yaml"
+
+  run -1 env -i "$python" -I "$REPO_ROOT/scripts/lock-hashes.py" pristine "$home/.apm/apm.lock.yaml" "$home" .claude/skills
+  [ -z "$(env -i "$python" -I "$REPO_ROOT/scripts/lock-hashes.py" pristine "$home/.apm/apm.lock.yaml" "$home" .claude/skills 2>/dev/null)" ]
+
+  run --separate-stderr /bin/bash -c '. "$1/scripts/native.sh"; APM_BIN="$2"; pristine_entries "$3"' _ "$REPO_ROOT" "$APM_BIN" "$home"
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+  [[ "$stderr" == *"could not be read as expected"* ]]
+}
