@@ -167,6 +167,7 @@ global MCP はリポジトリをまたいで常時使う基盤だけに限定し
 - 操作仕様・`.worktrees/` 運用・作成削除手順は `git-worktree` スキルが正本
 - worktree の作成は `git wt` だけで行う。`git worktree add` は deny 済みなので使わない（`--detach` の一時確認も含む）。native `git worktree` は cleanup・診断・復旧（`list` / `remove` / `prune` / `unlock` / `repair` など）のみ
 - コミット分割とメッセージ作成は `atomic-commit` スキルが担当し、worktree 操作の判断を持たせない
+- default branch（`main` / `develop` など）はメイン checkout だけが持つ。メイン checkout を作業ブランチへ切り替えず、worktree では default branch を checkout しない。マージ後の片付けは `git-worktree` スキルの手順に従う
 
 ## コミュニケーション原則
 

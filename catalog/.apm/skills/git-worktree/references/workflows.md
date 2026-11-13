@@ -199,7 +199,7 @@ Use worktrees for parallel CI builds.
 #!/bin/bash
 # ci-parallel-test.sh
 
-BRANCHES=("main" "develop" "feature/new-api")
+BRANCHES=("feature/new-api" "feature/payments")
 
 for branch in "${BRANCHES[@]}"; do
   # Create worktree for each branch
@@ -430,7 +430,7 @@ Leverage worktrees for parallel operations.
 #!/bin/bash
 # parallel-test.sh
 
-BRANCHES=("main" "develop" "feature/new-feature")
+BRANCHES=("feature/new-feature" "feature/payments")
 
 for branch in "${BRANCHES[@]}"; do
   (
