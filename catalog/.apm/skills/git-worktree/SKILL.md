@@ -1,6 +1,6 @@
 ---
 name: git-worktree
-description: Use when managing Git worktrees with `git wt` or `git worktree`, especially for branch isolation, `.worktrees/` layout, parallel work, or diagnosing worktree create/remove errors.
+description: Use when managing Git worktrees with `git wt` or `git worktree`, especially for branch isolation, `.worktrees/` layout, parallel work, cleaning up a worktree after its PR merges, or diagnosing worktree create/remove errors.
 ---
 
 # Git Worktree Management
@@ -9,13 +9,13 @@ description: Use when managing Git worktrees with `git wt` or `git worktree`, es
 
 Use `git wt` for normal list, switch/create, rename, and delete flows. Create worktrees only with `git wt`; `git worktree add` is denied (including `--detach` scratch checkouts). Drop to native `git worktree` only for low-level cleanup, diagnosis, or recovery.
 
-This skill owns command syntax and troubleshooting. 隔離 workspace を新規に作るべきかどうかの判断自体（通常ブランチで足りるか、worktree を分けるか）はこのスキルの対象外で、並行作業やファイル衝突の有無から判断する。PR 作成から統合までの一連フローも対象外。
+This skill owns command syntax, troubleshooting, and the rule that work branches live in worktrees (First Pass). PR 作成から統合までの一連フローと、branch・worktree の削除判断（`git-branch-cleanup`）は対象外。
 
 ## First Pass
 
 1. `git wt` で既存 worktree と使用中ブランチを確認する
 2. 必要なら `git config --local wt.basedir ".worktrees"` を確認する
-3. 並行セッションや他 Worker と編集対象が重なりうる、または不明なときは、メイン checkout を保護して実作業を worktree 側で行う（重ならなければ同一 checkout でよい。repo の AGENTS.md が default branch への直接 commit を定めていればそれに従う）
+3. 作業ブランチは worktree で切り、メイン checkout を切り替えない（repo の AGENTS.md が default branch への直接 commit を定めていれば、メイン checkout の default branch 上で作業してよい）。編集対象が互いに素な Worker が同じ作業用 worktree を共有するのはよい
 4. 今回の目的が「新規 branch」「既存 branch」「掃除/診断」のどれか決める
 
 ## Common Operations
@@ -61,6 +61,18 @@ scripts/copy-env-files.sh <worktree-path>
 scripts/copy-env-files.sh <worktree-path> <source-checkout-path>
 ```
 
+### After the PR Merges
+
+worktree を default branch へ切り替えて使い続けない。default branch の更新はメイン checkout で行う。
+
+```bash
+git -C <main-checkout> branch --show-current
+git -C <main-checkout> rev-parse --abbrev-ref @{upstream}
+git -C <main-checkout> pull --ff-only
+```
+
+1行目が default branch で、2行目がその remote の default branch（`origin/main` など）でなければ pull しない。メイン checkout を切り替えた持ち主を確かめ、戻してよいかをユーザーに聞く。worktree と branch の削除は `git-branch-cleanup` に従う。
+
 ### Diagnose
 
 ```bash
@@ -73,6 +85,7 @@ git worktree list
 
 - `wt.basedir` は repo-local にそろえる
 - 同じ branch を複数 worktree で同時 checkout しない
+- default branch（`main` / `develop` など）はメイン checkout だけが持つ。メイン checkout を作業ブランチへ切り替えず、worktree では default branch を checkout しない。別の worktree が default branch を握ると、メイン checkout が `fatal: 'main' is already used by worktree` で戻れなくなる
 - 手動でディレクトリを消した後は `git worktree prune` を忘れない
 - `.env` などローカルファイル配布が必要な時だけ `wt.copy` / `--copy` を使う
 - dotenvx 管理のリポジトリでは `.env.keys` が gitignore されているため、`wt.copy` に `.env.keys` を含めないと新 worktree で復号が失敗する（グローバル設定例: `git config --global --add wt.copy ".env.keys"`）
