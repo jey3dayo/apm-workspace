@@ -1,4 +1,4 @@
-# The catalog package carries only catalog/.apm/skills, catalog/.apm/agents and the one catalog instruction, while APM
+# The catalog package carries only skills, agents and the two named instructions, while APM
 # installs .apm/<primitive>/** whatever the package type. Prints a message when catalog/.apm holds anything else.
 catalog_apm_dir_claim_message() {
   apm_dir="$(tracked_catalog_dir)/.apm"
@@ -43,6 +43,7 @@ catalog_apm_dir_claim_message() {
         if (kinds[i] != "F") { print entry; continue }
         if (entry ~ /^agents\/[^\/]+\.agent\.md$/) continue
         if (entry == "instructions/" instructions_file) continue
+        if (entry == "instructions/claude-md-design.instructions.md") continue
         enclosed = 0
         if (entry ~ /^skills\//) {
           parent = entry
@@ -58,12 +59,12 @@ catalog_apm_dir_claim_message() {
   case "$claimed_entry" in
     skills/* | agents/* | instructions/*)
       if [ -f "$apm_dir/$claimed_entry" ] && [ ! -L "$apm_dir/$claimed_entry" ]; then
-        printf 'catalog/.apm holds %s, which is outside the allowed catalog layout: it keeps only files inside a skill directory (one holding SKILL.md), agents named agents/<name>.agent.md and instructions/%s. Move it into a skill, rename the agent, or merge the instruction into instructions/%s.\n' "$claimed_entry" "$CATALOG_INSTRUCTIONS_FILE_NAME" "$CATALOG_INSTRUCTIONS_FILE_NAME"
+        printf 'catalog/.apm holds %s, which is outside the allowed catalog layout: it keeps only files inside a skill directory (one holding SKILL.md), agents named agents/<name>.agent.md and the named instructions/%s and instructions/claude-md-design.instructions.md. Move it into a skill, rename the agent, or merge it into the appropriate instruction.\n' "$claimed_entry" "$CATALOG_INSTRUCTIONS_FILE_NAME"
         return 0
       fi
       ;;
   esac
-  printf 'catalog/.apm holds %s, but the catalog package carries only catalog/.apm/skills, catalog/.apm/agents and the catalog instruction. Move it out of catalog/.apm.\n' "$claimed_entry"
+  printf 'catalog/.apm holds %s, but the catalog package carries only catalog/.apm/skills, catalog/.apm/agents and the two named instructions. Move it out of catalog/.apm.\n' "$claimed_entry"
 }
 
 skill_ids_from_root() {

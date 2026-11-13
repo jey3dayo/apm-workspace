@@ -5,6 +5,31 @@ setup() {
   SCRIPT_UNDER_TEST="$REPO_ROOT/scripts/apm-workspace.sh"
 }
 
+@test "catalog instruction allowlist accepts the scoped design rule and still rejects another instruction" {
+  local fixture
+  fixture="$BATS_TEST_TMPDIR/catalog-layout"
+  mkdir -p "$fixture/catalog/.apm/instructions"
+  printf 'guide\n' >"$fixture/catalog/.apm/instructions/ai-collaboration.instructions.md"
+  printf 'design\n' >"$fixture/catalog/.apm/instructions/claude-md-design.instructions.md"
+  run bash -c '
+    WORKSPACE_DIR="$1" CATALOG_DIR_NAME=catalog CATALOG_INSTRUCTIONS_FILE_NAME=ai-collaboration.instructions.md
+    . "$2/scripts/lib/workspace-core.sh"
+    . "$2/scripts/lib/catalog-inventory.sh"
+    catalog_apm_dir_claim_message
+  ' bash "$fixture" "$REPO_ROOT"
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+  printf 'other\n' >"$fixture/catalog/.apm/instructions/other.instructions.md"
+  run bash -c '
+    WORKSPACE_DIR="$1" CATALOG_DIR_NAME=catalog CATALOG_INSTRUCTIONS_FILE_NAME=ai-collaboration.instructions.md
+    . "$2/scripts/lib/workspace-core.sh"
+    . "$2/scripts/lib/catalog-inventory.sh"
+    catalog_apm_dir_claim_message
+  ' bash "$fixture" "$REPO_ROOT"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"instructions/other.instructions.md"* ]]
+}
+
 make_doctor_fixture() {
   doctor_workspace_dir="$(mktemp -d)"
   doctor_home="$(mktemp -d)"

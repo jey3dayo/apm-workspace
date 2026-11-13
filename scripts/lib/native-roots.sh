@@ -182,6 +182,34 @@ lock_python() {
   return 1
 }
 
+# Reads the lock $1 once into PREVIOUS_LOCK_HASHES ("<sha256>  <path>" lines, scripts/lock-hashes.py) and sets
+# PREVIOUS_LOCK_READ=1. A lock that is missing is no news; one that cannot be read leaves PREVIOUS_LOCK_READ=0 with a
+# warning.
+load_previous_lock_hashes() {
+  local lock="$1" python
+  PREVIOUS_LOCK_HASHES="" PREVIOUS_LOCK_READ=0
+  [ -f "$lock" ] && [ ! -L "$lock" ] || return 0
+  if ! python="$(lock_python)"; then
+    log "warning: no python with PyYAML was found (APM_BIN's interpreter, apm on PATH, python3), so the previous apm.lock.yaml cannot be read and no skipped entry is auto-approved; every one needs --allow-skip"
+    return 0
+  fi
+  if ! PREVIOUS_LOCK_HASHES="$(env -i "$python" -I "$SCRIPT_DIR/lock-hashes.py" "$lock")"; then
+    PREVIOUS_LOCK_HASHES=""
+    log "warning: the previous apm.lock.yaml could not be read as expected (see lock-hashes above), so no skipped entry is auto-approved; every one needs --allow-skip"
+    return 0
+  fi
+  PREVIOUS_LOCK_READ=1
+}
+
+assert_design_rule() (
+  local home="$1" sha="$2" previous=""
+  load_previous_lock_hashes "$home/.apm/apm.lock.yaml"
+  if [ "$PREVIOUS_LOCK_READ" = 1 ]; then
+    previous="$(printf '%s\n' "$PREVIOUS_LOCK_HASHES" | awk 'substr($0, 67) == ".claude/rules/claude-md-design.md" { print substr($0, 1, 64) }')"
+  fi
+  python3 "$SCRIPT_DIR/native-home.py" check-design-rule "$home" "$REPO_ROOT" "$sha" "$previous"
+)
+
 # The first link on the way to a root of MIGRATE_ROOTS, below $1.
 root_path_link() {
   local home="$1" root path component

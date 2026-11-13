@@ -64,6 +64,7 @@ $escaping"
   assert_default_agmsg_store "$home"
   if [ "$MIGRATE" = 1 ]; then assert_same_render_mode "$home"; fi
   sha="$(resolve_source_sha "$SOURCE_REF")"
+  assert_design_rule "$home" "$sha"
   dir="$(cd "$BACKUP_DIR" && pwd -P)"
   rehearsal="$(mktemp -d "$dir/rehearsal-$(date -u +%Y%m%dT%H%M%SZ).XXXXXX")"
   scratch="$rehearsal/home"

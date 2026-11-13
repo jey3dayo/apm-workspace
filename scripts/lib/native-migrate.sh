@@ -200,6 +200,7 @@ cmd_migrate() {
 
   assert_default_apm_config "$home"
   assert_no_home_manifest "$home"
+  assert_design_rule "$home" "$sha"
   edited="$(edited_generated_roots "$home")"
   [ -z "$edited" ] || fail "these roots keep APM's marker but were edited after compile, and apm compile would overwrite them:
 $edited
