@@ -121,12 +121,13 @@ cmd_validate_catalog() {
     has_failure=1
   fi
 
-  instruction_rule_name="${CATALOG_INSTRUCTIONS_FILE_NAME%.instructions.md}.md"
-  for rules_root in "$(tracked_catalog_rules_root)" "$(tracked_catalog_claude_rules_root)"; do
-    if [ -e "$rules_root/$instruction_rule_name" ]; then
-      error "Catalog rule collides with the Claude rule APM writes for the catalog instructions: $rules_root/$instruction_rule_name"
-      has_failure=1
-    fi
+  for instruction_rule_name in "${CATALOG_INSTRUCTIONS_FILE_NAME%.instructions.md}.md" claude-md-design.md; do
+    for rules_root in "$(tracked_catalog_rules_root)" "$(tracked_catalog_claude_rules_root)"; do
+      if [ -e "$rules_root/$instruction_rule_name" ]; then
+        error "Catalog rule collides with the Claude rule APM writes for the catalog instructions: $rules_root/$instruction_rule_name"
+        has_failure=1
+      fi
+    done
   done
 
   for required_root in "$(tracked_catalog_skills_root):skills" "$(tracked_catalog_agents_root):agents" "$(tracked_catalog_commands_root):commands" "$(tracked_catalog_rules_root):rules"; do

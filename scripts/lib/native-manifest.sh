@@ -161,7 +161,7 @@ cmd_plan() {
 #      <HOME>/.apm/native-migrate-<UTC>.lost.txt) or if the files of step 3 changed
 #   6. on any failure, undo step 4 (migrate-rollback --stamp <UTC> does the same later) and put the files of step 3 back,
 #      keeping what migrate left as <file>.changed-<UTC>. It prints the stamp.
-# Not deployed by APM: catalog/rules and catalog/claude/rules, private skills, Pi instructions and host-local MCP.
+# Not deployed by APM: catalog/claude/rules, private skills, Pi instructions and host-local MCP.
 # native:sync separately preserves agmsg db/teams links and writes the OpenCode guide.
 # This plan wrote nothing.
 EOF

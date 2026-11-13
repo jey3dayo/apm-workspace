@@ -1,6 +1,6 @@
 ---
-paths:
-  - "**/catalog/.apm/instructions/*.instructions.md"
+description: Keep the global collaboration guide generic and maintainable
+applyTo: "**/catalog/.apm/instructions/*.instructions.md"
 ---
 
 # CLAUDE.md Design Principles

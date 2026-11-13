@@ -413,6 +413,75 @@ prepare_migrate() {
   M_REHEARSAL="$(dirname "$(compgen -G "$M_BACKUP/rehearsal-*/result.txt")")"
 }
 
+prepare_scoped_runtime() {
+  cp -R "$SOURCE_REPO" "$FX/runtime"
+  # shellcheck source=tests/native-test-helpers.bash
+  . "$REPO_ROOT/tests/native-test-helpers.bash"
+  copy_native_runtime "${NATIVE_SCOPED_SOURCE:-$REPO_ROOT}" "$FX/runtime"
+  cp "$REPO_ROOT/apm.yml" "$FX/runtime/apm.yml"
+}
+
+scoped_native() {
+  local home="$1"
+  shift
+  fixture_exec "$home" /usr/bin/env APM_NATIVE_ACCOUNT_HOME="$home" /bin/bash "$FX/runtime/scripts/native.sh" "$@"
+}
+
+seed_design_rule() {
+  mkdir -p "$1/.claude/rules"
+  printf -- '---\npaths:\n  - "**/catalog/.apm/instructions/*.instructions.md"\n---\n\n' >"$1/.claude/rules/claude-md-design.md"
+  awk 'BEGIN { frontmatter = 1 } NR == 1 { next } frontmatter && $0 == "---" { frontmatter = 0; next } !frontmatter { if (!started && $0 == "") next; started = 1; print }' \
+    "$SOURCE_REPO/catalog/.apm/instructions/claude-md-design.instructions.md" >>"$1/.claude/rules/claude-md-design.md"
+}
+
+@test "native scoped design instruction preserves its paths and manual policy without entering global roots" {
+  local home backup="$FX/backup" rehearsal expected
+  prepare_scoped_runtime
+  home="$(new_home scoped-design)"
+  seed_sentinels "$home"
+  seed_design_rule "$home"
+  expected="$(git hash-object "$home/.claude/rules/claude-md-design.md")"
+  printf 'PRIVATE_MODEL_POLICY_MARKER\n' >"$home/.claude/rules/model-policy.md"
+  scoped_native "$home" backup --real-home --backup-dir "$backup"
+  scoped_native "$home" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  rehearsal="$(dirname "$(compgen -G "$backup/rehearsal-*/result.txt")")"
+  scoped_native "$home" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$rehearsal"
+  [ "$(git hash-object "$home/.claude/rules/claude-md-design.md")" = "$expected" ]
+  [ "$(cat "$home/.claude/rules/model-policy.md")" = PRIVATE_MODEL_POLICY_MARKER ]
+  grep -q '^paths:' "$home/.claude/rules/claude-md-design.md"
+  for root in .codex/AGENTS.md .cursor/AGENTS.md; do
+    grep -q 'AI 開発協働ガイド' "$home/$root"
+    ! grep -q 'CLAUDE.md Design Principles\|PRIVATE_MODEL_POLICY_MARKER\|Claude Code のモデル運用' "$home/$root"
+  done
+  [ ! -e "$home/.cursor/rules/claude-md-design.mdc" ]
+}
+
+@test "native refuses an edited design rule before rehearsal and rechecks after a clean rehearsal" {
+  local home backup="$FX/backup" rehearsal edited
+  prepare_scoped_runtime
+  home="$(new_home edited-design)"
+  seed_sentinels "$home"
+  seed_design_rule "$home"
+  printf 'USER_EDIT_MARKER\n' >>"$home/.claude/rules/claude-md-design.md"
+  edited="$(git hash-object "$home/.claude/rules/claude-md-design.md")"
+  scoped_native "$home" backup --real-home --backup-dir "$backup"
+  run scoped_native "$home" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$home/.claude/rules/claude-md-design.md differs"* ]]
+  [ "$(git hash-object "$home/.claude/rules/claude-md-design.md")" = "$edited" ]
+  [ ! -e "$home/.apm/apm.yml" ]
+  seed_design_rule "$home"
+  scoped_native "$home" backup --real-home --backup-dir "$FX/clean-backup"
+  scoped_native "$home" rehearse --real-home --backup-dir "$FX/clean-backup" --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  rehearsal="$(dirname "$(compgen -G "$FX/clean-backup/rehearsal-*/result.txt")")"
+  printf 'USER_EDIT_MARKER\n' >>"$home/.claude/rules/claude-md-design.md"
+  run scoped_native "$home" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$rehearsal"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$home/.claude/rules/claude-md-design.md differs"* ]]
+  [ "$(git hash-object "$home/.claude/rules/claude-md-design.md")" = "$edited" ]
+  [ ! -e "$home/.apm/apm.yml" ]
+}
+
 @test "backup copies the backed-up paths and the agmsg store, refuses to overwrite, and a clean rehearse loses nothing" {
   local home before backup="$FX/backups/real-clean" result
   home="$(new_home real-clean)"
