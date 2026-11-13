@@ -1,24 +1,36 @@
 # Rollout Fast Paths — apm 0.31.0-specific procedures
 
-Detailed, version-specific procedures referenced by `SKILL.md` Fast Paths and
-Guardrails. Re-check these against the installed `apm` version before relying
-on them. Each section says which parts were re-checked on 0.31.0; the rest
-were observed on 0.29.0 and carried forward.
+Detailed procedures referenced by `SKILL.md` Fast Paths and Guardrails. The
+first section follows `mise.toml` and `scripts/upgrade-deps.sh`. Later sections
+record observations from apm 0.31.0 or 0.29.0; re-check them against the
+installed version before relying on them.
 
 ## SHA-pin bump sequence (Fast Path 5 / Fast Path 7)
+
+Use this lock regeneration and review sequence for Fast Path 9 removals too.
 
 Read `docs/dependency-holds.txt` before bumping: a held dependency keeps its pin
 (`check` fails otherwise), and a hold is released by deleting its line in the same
 PR and recording the decision in `docs/package-decisions.md`.
 
-When you bump a SHA pin in `apm.yml` by hand, `check` fails
-while the pin has no matching `resolved_commit` in `apm.lock.yaml`, and names
-the pin. No task re-resolves the root lock: `deploy:pins` (`apm install -g --only
-apm`, then `deploy`) and `upgrade` were removed on 2026-11-10 (last version:
-commit `0bcce09`). On the native HOME `apm install -g` works on the consumer
-`~/.apm`, not on the checkout's lock, so do not run it to update the lock.
-Update the pinned entries of `apm.lock.yaml` to the same commits as the pin (or
-revert the pin), then review the change with `git diff apm.lock.yaml`.
+For a SHA pin, change the intended pin in `apm.yml` by hand. For branch or tag
+tracking, retain or update the intended manifest ref. Then run
+`mise run upgrade:deps` in the checkout to regenerate `apm.lock.yaml` with
+`apm lock`. The task lists
+holds but does not update pins or automatically enforce holds. Preview with
+`mise run upgrade:deps -- --dry-run`, and run `mise run validate:workspace`
+after regeneration to check holds and pin/lock consistency. For a removal, delete
+the manifest entry before regenerating and verify its lock entry is removed.
+
+Review `git diff apm.lock.yaml` for the intended `resolved_commit` and unrelated
+changes before committing. Regeneration can also change version metadata without
+moving commits; the unresolved behavior is tracked in `todo.txt`. Report
+unrelated drift instead of including it silently.
+
+The old `deploy:pins` and `upgrade` tasks were removed on 2026-11-10 (last
+version: commit `0bcce09`). On the native HOME, `apm install -g` operates on the
+consumer `~/.apm`, not the checkout's lock; do not use `apm install -g` or
+`apm update -g` as a substitute for this sequence.
 
 `apm update` rewrites every declared SHA pin whose upstream has an annotated
 semver tag to the highest such tag's commit, which can be older than the pinned
@@ -52,7 +64,7 @@ Triage:
    reason in `docs/package-decisions.md`. The lock still records
    `resolved_commit` at install time.
 4. If the dependency must stay SHA-pinned, bump the pin by hand and use the
-   SHA-pin bump sequence above instead of `apm update`.
+   dependency refresh sequence above instead of `apm update`.
 
 Workspace precedent: `ibelick/ui-skills` (`docs/package-decisions.md`,
 2026-09-28).
