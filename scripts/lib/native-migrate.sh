@@ -200,7 +200,7 @@ cmd_migrate() {
 
   assert_default_apm_config "$home"
   assert_no_home_manifest "$home"
-  python3 "$SCRIPT_DIR/native-home.py" check-design-rule "$home" "$REPO_ROOT" "$sha"
+  assert_design_rule "$home" "$sha"
   edited="$(edited_generated_roots "$home")"
   [ -z "$edited" ] || fail "these roots keep APM's marker but were edited after compile, and apm compile would overwrite them:
 $edited

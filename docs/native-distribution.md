@@ -14,7 +14,7 @@ sync と内部 stage は HOME ごとに同じ排他を取る。sync は backup �
 - consumer の manifest は、root の `apm.yml` の `jey3dayo/apm-workspace/catalog#main` と `manual-skills#main` の 2 行を、指定した commit SHA への pin に書き換えたもの。`nanaism/yomiyasu/skills/yomiyasu#<SHA>` の 1 行は、構造化した形（`git: nanaism/yomiyasu` / `ref: <SHA>` / `skills: [yomiyasu]`）に書き換える。SHA は root の行から読み、対応表（`scripts/native.sh` の `EXTERNAL_PACKAGE_MAP`）の行が root に無ければ render は失敗する。そのほかの外部の依存と MCP はそのまま通す（外部の依存はもともと SHA で pin している）。root の `apm.yml` と `apm.lock.yaml` は変えない。`--workspace-only` を付けると、この repo の 2 package だけを残す（外部の依存ごと落ちるので、yomiyasu の変換も要らない）
 - 配布 pin は sync が勝手に動かさない。新しい commit を配るときは、必要なら `--source-ref` に新しい SHA を渡す。外部の依存の pin は、今と同じく root の `apm.yml` で上げる
 - 生成した root（`~/.claude/CLAUDE.md`・`~/.codex/AGENTS.md`・`~/.cursor/AGENTS.md`）が APM の目印を残したまま compile のあとに編集されていたら、何も書かずに止まる。APM の目印は編集を守らず、compile が上書きするため。判定は APM と同じ Build ID の照合（`apm_cli/compilation/build_id.py`）で、APM と同じく末尾の改行だけを足した・消した編集は検出しない
-- 既存の `~/.claude/rules/claude-md-design.md` は rehearsal と migration の前に検査する。移行前の正本（`f011e52`）と同じ内容か、指定した source SHA の instruction から生成される内容だけを許可する。異なる内容やリンクは上書きせず止まる。既存ファイルがあり、指定 SHA を checkout の Git object から読めない場合も止まる
+- 既存の `~/.claude/rules/claude-md-design.md` は rehearsal と migration の前に検査する。移行前の正本（`f011e52`）、指定した source SHA の生成内容、更新前の consumer lock に記録された同じ path の SHA256 のいずれかと一致すれば許可する。lock は `scripts/lock-hashes.py` の検証を通った記録だけを使う。異なる内容やリンクは上書きせず止まる。既存ファイルがあり、指定 SHA を checkout の Git object から読めない場合も止まる
 - `<HOME>/.apm/apm.yml` が描画した manifest とバイト単位で違えば、`apm.yml.<UTC>.bak` に残してから置き換える（同じ名前があれば番号を付け、既存の `.bak` を上書きしない）
 - HOME の外を指す（または壊れた）symlink か、ハードリンクの通常のファイルが HOME の中にあれば、何も書かずに止まる。apm がリンクを通して HOME の外のファイルを書き換えるため（キャッシュの `Library/Caches/apm` のように、配布先より深い場所にも書く）。rehearse は、実 HOME の 4 つの root（`.agents/skills`・`.claude/skills`・`.claude/agents`・`.cursor/agents`）に壊れたリンクか HOME の外へ出るリンクがあれば、`migrate` と同じ判定（`escaping_link_line`）で、複製を作る前にそのリンクの名前を出して失敗する。root の外のリンクは、複製の中を複製の中へ向け直し（先が無ければ外す。外したリンクの名前は出す）、同じ検査を通してから install する
 - `<HOME>/.apm/config.json` に `default_client` と `prefer_ssh` 以外のキーがあれば、rehearsal と migration の内部 stage は止まる。APM は `temp_dir` などの書込み先をここから読むため。`prefer_ssh` は git の URL の形を変えるだけで、書込み先は変えない。キーは APM と同じく JSON としてデコードしてから比べる
@@ -59,7 +59,7 @@ backup の対象（rehearse が複製に再現するもの）: `~/.apm/apm.yml`�
 
 ### ルールの更新
 
-`claude-md-design` は instruction の正本を変更し、通常の PR と `native:sync` で配る。既存の配布先が上の検査で止まったら、そのファイルと正本を比較する。残す編集は正本へ反映し、既存ファイルを一意な `.bak` 名へ移してから、backup と rehearsal を取り直す。将来の本文更新でも、配布済みの内容が今回の生成内容と移行前の正本のどちらにも一致しなければ、この手順を使う。APM 単独の install は同名 rule を上書きするため、`native:sync` を使う。旧経路が置いた Codex・Cursor・OpenCode の `rules/claude-md-design.md` は自動削除しない。それぞれの tool が読むかは未確認のまま扱う。
+`claude-md-design` は instruction の正本を変更し、通常の PR と `native:sync` で配る。配布先が更新前の lock の記録と一致すれば、以前に生成した内容から新しい本文へそのまま更新できる。独自編集や lock の欠落・不正で検査が止まったら、既存ファイルと正本を比較する。残す編集は正本へ反映し、既存ファイルを一意な `.bak` 名へ移してから、backup と rehearsal を取り直す。APM 単独の install は同名 rule を上書きするため、`native:sync` を使う。旧経路が置いた Codex・Cursor・OpenCode の `rules/claude-md-design.md` は自動削除しない。それぞれの tool が読むかは未確認のまま扱う。
 
 `model-policy` の内容は `catalog/claude/rules/model-policy.md` を正本とする。更新するときは次の順で進める。
 

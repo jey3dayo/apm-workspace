@@ -434,6 +434,56 @@ seed_design_rule() {
     "$SOURCE_REPO/catalog/.apm/instructions/claude-md-design.instructions.md" >>"$1/.claude/rules/claude-md-design.md"
 }
 
+@test "native updates a previous generated design body from the lock baseline and refuses edits or an invalid lock" {
+  local home backup rehearsal old_hash digest
+  prepare_scoped_runtime
+  home="$(new_home previous-design)"
+  seed_sentinels "$home"
+  seed_design_rule "$home"
+  printf 'PREVIOUS_GENERATED_BODY\n' >>"$home/.claude/rules/claude-md-design.md"
+  cp "$home/.claude/rules/claude-md-design.md" "$FX/previous-design.md"
+  old_hash="$(git hash-object "$FX/previous-design.md")"
+  digest="$(shasum -a 256 "$FX/previous-design.md" | awk '{ print $1 }')"
+  mkdir -p "$home/.apm"
+  cat >"$FX/previous-lock.yaml" <<EOF
+lockfile_version: '1'
+dependencies:
+- repo_url: fixture-owner/apm-workspace
+  name: catalog
+  virtual_path: catalog
+  resolved_commit: $SOURCE_SHA
+  deployed_files:
+  - .claude/rules/claude-md-design.md
+  deployed_file_hashes:
+    .claude/rules/claude-md-design.md: sha256:$digest
+EOF
+  cp "$FX/previous-lock.yaml" "$home/.apm/apm.lock.yaml"
+  printf 'USER_EDIT_MARKER\n' >>"$home/.claude/rules/claude-md-design.md"
+  backup="$FX/edited-backup"
+  scoped_native "$home" backup --real-home --backup-dir "$backup"
+  run scoped_native "$home" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$home/.claude/rules/claude-md-design.md differs"* ]]
+  grep -q USER_EDIT_MARKER "$home/.claude/rules/claude-md-design.md"
+  cp "$FX/previous-design.md" "$home/.claude/rules/claude-md-design.md"
+  printf 'dependencies: invalid\n' >"$home/.apm/apm.lock.yaml"
+  backup="$FX/invalid-lock-backup"
+  scoped_native "$home" backup --real-home --backup-dir "$backup"
+  run scoped_native "$home" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"$home/.claude/rules/claude-md-design.md differs"* ]]
+  [ "$(git hash-object "$home/.claude/rules/claude-md-design.md")" = "$old_hash" ]
+  cp "$FX/previous-lock.yaml" "$home/.apm/apm.lock.yaml"
+  backup="$FX/pristine-backup"
+  scoped_native "$home" backup --real-home --backup-dir "$backup"
+  scoped_native "$home" rehearse --real-home --backup-dir "$backup" --source-ref "$SOURCE_SHA" --workspace-only --migrate
+  rehearsal="$(dirname "$(compgen -G "$backup/rehearsal-*/result.txt")")"
+  scoped_native "$home" migrate --real-home --source-ref "$SOURCE_SHA" --workspace-only --rehearsal "$rehearsal"
+  [ "$(git hash-object "$home/.claude/rules/claude-md-design.md")" != "$old_hash" ]
+  grep -q 'CLAUDE.md Design Principles' "$home/.claude/rules/claude-md-design.md"
+  ! grep -q PREVIOUS_GENERATED_BODY "$home/.claude/rules/claude-md-design.md"
+}
+
 @test "native scoped design instruction preserves its paths and manual policy without entering global roots" {
   local home backup="$FX/backup" rehearsal expected
   prepare_scoped_runtime

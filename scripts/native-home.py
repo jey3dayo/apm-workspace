@@ -99,7 +99,7 @@ def check_opencode(home):
         os.close(descriptor)
 
 
-def check_design_rule(home, repository, source_ref):
+def check_design_rule(home, repository, source_ref, previous_digest=""):
     relative = ".claude/rules/claude-md-design.md"
     target = Path(home) / relative
     if not target.exists() and not target.is_symlink():
@@ -139,9 +139,10 @@ def check_design_rule(home, repository, source_ref):
     expected = b'---\npaths:\n  - "**/catalog/.apm/instructions/*.instructions.md"\n---\n\n' + parts[2].lstrip(b"\n")
     # The manual rule at f011e52 predates native instruction delivery; accept only its exact bytes.
     legacy_digest = "a841e2ca8eab805303d65e0acbb4cb6cdee0456120426b6e6e260388acef3fc0"
-    if content == expected or hashlib.sha256(content).hexdigest() == legacy_digest:
+    digest = hashlib.sha256(content).hexdigest()
+    if content == expected or digest in (legacy_digest, previous_digest):
         return
-    fail(f"{target} differs from the pinned native rule and the pristine manual rule; "
+    fail(f"{target} differs from the pinned native rule, the previous deployment and the pristine manual rule; "
          "compare and move it aside before retrying (docs/native-distribution.md). Nothing was overwritten")
 
 

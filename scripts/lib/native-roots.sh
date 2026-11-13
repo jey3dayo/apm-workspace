@@ -201,6 +201,16 @@ load_previous_lock_hashes() {
   PREVIOUS_LOCK_READ=1
 }
 
+# Isolate the lock globals: pristine_entries reads them separately for its own HOME.
+assert_design_rule() (
+  local home="$1" sha="$2" previous=""
+  load_previous_lock_hashes "$home/.apm/apm.lock.yaml"
+  if [ "$PREVIOUS_LOCK_READ" = 1 ]; then
+    previous="$(printf '%s\n' "$PREVIOUS_LOCK_HASHES" | awk 'substr($0, 67) == ".claude/rules/claude-md-design.md" { print substr($0, 1, 64) }')"
+  fi
+  python3 "$SCRIPT_DIR/native-home.py" check-design-rule "$home" "$REPO_ROOT" "$sha" "$previous"
+)
+
 # "<sha256>  <entry>/<path inside it>" for each record of PREVIOUS_LOCK_HASHES under <root>/<entry> (a single-file entry
 # is its own record).
 lock_entry_hashes() {
