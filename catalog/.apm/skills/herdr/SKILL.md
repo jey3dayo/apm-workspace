@@ -98,6 +98,13 @@ pane=$("$HOME/.agents/skills/herdr/scripts/find-agent.sh" -q --kind claude --tit
 
 pane_id は session ごとの ID。別 session の agent を操作するときは `herdr --session <name> agent ...` と明示する。環境変数で対象を選ぶ場合は、`HERDR_SOCKET_PATH` があればそちらが優先され、未設定なら `HERDR_SESSION` が使われる。pane 内では `HERDR_SOCKET_PATH` が注入されるため、`HERDR_SESSION` だけでは切り替わらない。`-q` は現在と別 session のとき stderr にコマンド例を出す。
 
+全 agent の段階（判断待ち / CI待ち / 作業中 / 停止 / 完了）を一覧にするときは、pane の画面を 1 つずつ読まず `scripts/herd-status.sh` を使う。共通ガイドの `STATUS:` 行を各 pane の末尾から拾って Markdown の表に集計する読み取り専用スクリプトで、STATUS 行のない pane は「STATUS なし」に集まるので、画面を読むのはそれだけにする。表は人が読む用で、pane 列は画面に見える pane タイトルである。agent を操作するときは `--json` の `session` と `pane_id` を使う。
+
+```bash
+"$HOME/.agents/skills/herdr/scripts/herd-status.sh"          # 段階ごとの表（自分の pane は除く）
+"$HOME/.agents/skills/herdr/scripts/herd-status.sh" --json   # 分類済みの配列
+```
+
 ### House rules（このスキル固有の運用規約）
 
 - 外部チャネル（inbox / ファイル受け渡しなど）で常駐 agent へタスクを送ったら、送信成功のあと必ず `herdr agent prompt <name> "..." --wait` で起こす。**送信成功 ≠ 到達**。Codex 常駐は delivery が `turn` でない／未設定のとき inbox を自動で読まない（`agmsg-delegation` の resident-pool を参照）。起こす前に `find-agent.sh` で name と pane を読み直す
