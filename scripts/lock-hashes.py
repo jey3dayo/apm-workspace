@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 """Prints "<sha256>  <path>" for every deployed_file_hashes record of an apm.lock.yaml, sorted.
 
+With "pristine <lock> <home> <root>...", prints "<root>/<entry><TAB><digest>" instead for each top-level entry of
+<home>/<root> that holds exactly the files and sha256 the lock records for it (digest: sha256 of those record lines).
+
 Only the top-level dependencies' deployed_file_hashes mappings are read, as YAML structure. Anything unexpected exits
 non-zero (nothing is printed), so a caller that approves from this output approves nothing from a lock it cannot trust.
 Needs PyYAML; run it with the interpreter apm itself runs on.
 """
 
+import hashlib
+import os
 import re
+import stat
 import sys
 
 import yaml
@@ -62,14 +68,79 @@ def records(lock):
     return found
 
 
+def load_records(path):
+    with open(path, encoding="utf-8") as handle:
+        return records(yaml.load(handle, Loader=StrictLoader))
+
+
+def deployed(path):
+    return "__pycache__" not in path.split("/") and path.rsplit("/", 1)[-1] != ".apm-pin"
+
+
+def entry_files(path):
+    """{path relative to the entry's parent: absolute path} of the regular files of an entry that apm records (outside
+    __pycache__, not .apm-pin); None when anything in it is neither a regular file nor a directory, links included."""
+    pending = [(os.path.basename(path), path, False)]
+    files = {}
+    while pending:
+        relative, current, in_cache = pending.pop()
+        mode = os.lstat(current).st_mode
+        if stat.S_ISREG(mode):
+            if not in_cache and os.path.basename(current) != ".apm-pin":
+                files[relative] = current
+        elif stat.S_ISDIR(mode):
+            in_cache = in_cache or (current != path and os.path.basename(current) == "__pycache__")
+            with os.scandir(current) as children:
+                pending.extend((f"{relative}/{child.name}", child.path, in_cache) for child in children)
+        else:
+            return None
+    return files
+
+
+def file_digest(path):
+    digest = hashlib.sha256()
+    with os.fdopen(os.open(path, os.O_RDONLY | os.O_NOFOLLOW), "rb") as handle:
+        for block in iter(lambda: handle.read(1 << 20), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def pristine(lock, home, roots):
+    found = load_records(lock)
+    lines = []
+    for root in roots:
+        top = os.path.join(home, root)
+        if not os.path.isdir(top):
+            continue
+        recorded = {}
+        for path, digest in found.items():
+            if path.startswith(root + "/") and deployed(path):
+                relative = path[len(root) + 1 :]
+                recorded.setdefault(relative.split("/", 1)[0], {})[relative] = digest
+        with os.scandir(top) as children:
+            names = sorted(child.name for child in children)
+        for name in names:
+            expected = recorded.get(name)
+            if not expected:
+                continue
+            try:
+                files = entry_files(os.path.join(top, name))
+                if files is None or files.keys() != expected.keys():
+                    continue
+                if any(file_digest(files[relative]) != digest for relative, digest in expected.items()):
+                    continue
+            except OSError:
+                continue
+            body = "".join(f"{digest}  {relative}\n" for digest, relative in sorted((d, r) for r, d in expected.items()))
+            lines.append(f"{root}/{name}\t{hashlib.sha256(body.encode()).hexdigest()}")
+    sys.stdout.write("".join(line + "\n" for line in sorted(lines)))
+
+
 def main():
-    with open(sys.argv[1], encoding="utf-8") as handle:
-        found = records(yaml.load(handle, Loader=StrictLoader))
-    lines = sorted(
-        f"{digest}  {path}"
-        for path, digest in found.items()
-        if "__pycache__" not in path.split("/") and path.rsplit("/", 1)[-1] != ".apm-pin"
-    )
+    if sys.argv[1] == "pristine":
+        pristine(sys.argv[2], sys.argv[3], sys.argv[4:])
+        return
+    lines = sorted(f"{digest}  {path}" for path, digest in load_records(sys.argv[1]).items() if deployed(path))
     sys.stdout.write("".join(line + "\n" for line in lines))
 
 

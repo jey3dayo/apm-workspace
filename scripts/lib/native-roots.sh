@@ -182,44 +182,6 @@ lock_python() {
   return 1
 }
 
-# Reads the lock $1 once into PREVIOUS_LOCK_HASHES ("<sha256>  <path>" lines, scripts/lock-hashes.py) and sets
-# PREVIOUS_LOCK_READ=1. A lock that is missing is no news; one that cannot be read leaves PREVIOUS_LOCK_READ=0 with a
-# warning, and then pristine_entries lists nothing.
-load_previous_lock_hashes() {
-  local lock="$1" python
-  PREVIOUS_LOCK_HASHES="" PREVIOUS_LOCK_READ=0
-  [ -f "$lock" ] && [ ! -L "$lock" ] || return 0
-  if ! python="$(lock_python)"; then
-    log "warning: no python with PyYAML was found (APM_BIN's interpreter, apm on PATH, python3), so the previous apm.lock.yaml cannot be read and no skipped entry is auto-approved; every one needs --allow-skip"
-    return 0
-  fi
-  if ! PREVIOUS_LOCK_HASHES="$(env -i "$python" -I "$SCRIPT_DIR/lock-hashes.py" "$lock")"; then
-    PREVIOUS_LOCK_HASHES=""
-    log "warning: the previous apm.lock.yaml could not be read as expected (see lock-hashes above), so no skipped entry is auto-approved; every one needs --allow-skip"
-    return 0
-  fi
-  PREVIOUS_LOCK_READ=1
-}
-
-# "<sha256>  <entry>/<path inside it>" for each record of PREVIOUS_LOCK_HASHES under <root>/<entry> (a single-file entry
-# is its own record).
-lock_entry_hashes() {
-  printf '%s\n' "$PREVIOUS_LOCK_HASHES" | ROOT="$1" NAME="$2" awk '
-    BEGIN { root = ENVIRON["ROOT"]; exact = root "/" ENVIRON["NAME"] }
-    {
-      path = substr($0, 67)
-      if (path != exact && index(path, exact "/") != 1) next
-      printf "%s  %s\n", substr($0, 1, 64), substr(path, length(root) + 2)
-    }
-  ' | LC_ALL=C sort
-}
-
-entry_file_hashes() {
-  local hasher=(shasum -a 256)
-  if command -v sha256sum >/dev/null 2>&1; then hasher=(sha256sum); fi
-  (cd "$1" && find "$2" -type f -not -path '*/__pycache__/*' -not -name .apm-pin -print0 | xargs -0 -r "${hasher[@]}") | LC_ALL=C sort
-}
-
 # The first link on the way to a root of MIGRATE_ROOTS, below $1.
 root_path_link() {
   local home="$1" root path component
@@ -245,25 +207,20 @@ root_path_link() {
 # rehearsal's clone or the moved-aside roots, where links are already resolved or broken. Nothing is listed when a root or
 # a directory above it is a link, or the lock cannot be read.
 pristine_entries() {
-  local home="$1" link root entry name expected actual
+  local home="$1" link python lock="$1/.apm/apm.lock.yaml"
+  local -a roots
   if link="$(root_path_link "$home")"; then
     log "warning: $link is a link, so no skipped entry is auto-approved; every one needs --allow-skip"
     return 0
   fi
-  load_previous_lock_hashes "$home/.apm/apm.lock.yaml"
-  [ "$PREVIOUS_LOCK_READ" = 1 ] || return 0
-  for root in $MIGRATE_ROOTS; do
-    [ -d "$home/$root" ] || continue
-    while IFS= read -r -d '' entry; do
-      name="${entry##*/}"
-      [ -z "$(find "$entry" ! -type f ! -type d -print -quit)" ] || continue
-      expected="$(lock_entry_hashes "$root" "$name")"
-      [ -n "$expected" ] || continue
-      actual="$(entry_file_hashes "$home/$root" "$name")" || continue
-      [ "$expected" = "$actual" ] || continue
-      printf '%s/%s\t%s\n' "$root" "$name" "$(printf '%s\n' "$expected" | sha256)"
-    done < <(find "$home/$root" -mindepth 1 -maxdepth 1 -print0)
-  done
+  [ -f "$lock" ] && [ ! -L "$lock" ] || return 0
+  if ! python="$(lock_python)"; then
+    log "warning: no python with PyYAML was found (APM_BIN's interpreter, apm on PATH, python3), so the previous apm.lock.yaml cannot be read and no skipped entry is auto-approved; every one needs --allow-skip"
+    return 0
+  fi
+  read -ra roots <<<"$MIGRATE_ROOTS"
+  env -i "$python" -I "$SCRIPT_DIR/lock-hashes.py" pristine "$lock" "$home" "${roots[@]}" ||
+    log "warning: the previous apm.lock.yaml could not be read as expected (see lock-hashes above), so no skipped entry is auto-approved; every one needs --allow-skip"
 }
 
 pristine_has() {

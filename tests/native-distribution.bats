@@ -632,3 +632,43 @@ prepare_migrate() {
   [ "$(cat "$M_REHEARSAL/auto-approved-skips.txt")" = ".claude/skills/foo" ]
   [ "$(wc -l <"$M_REHEARSAL/auto-approved-skips.txt" | tr -d ' ')" -eq 1 ]
 }
+
+@test "lock-hashes pristine lists the entries that hold exactly what the lock records, ignoring __pycache__ and .apm-pin" {
+  local home python lock out
+  home="$(new_home pristine-mode)"
+  python="$(APM_BIN="$APM_BIN" /bin/bash -c '. "$1/scripts/native.sh"; lock_python' _ "$REPO_ROOT")"
+  hash_of() { shasum -a 256 <"$1" | awk '{print $1}'; }
+  entry_digest() { printf '%s\n' "$@" | LC_ALL=C sort | shasum -a 256 | awk '{print $1}'; }
+
+  mkdir -p "$home/.claude/skills/dir/sub/__pycache__" "$home/.claude/skills/extra" "$home/.claude/skills/linked" "$home/.claude/agents"
+  printf 'skill\n' >"$home/.claude/skills/dir/SKILL.md"
+  printf 'nested\n' >"$home/.claude/skills/dir/sub/a.txt"
+  printf 'cache\n' >"$home/.claude/skills/dir/sub/__pycache__/a.pyc"
+  printf 'pin\n' >"$home/.claude/skills/dir/.apm-pin"
+  printf 'one\n' >"$home/.claude/skills/extra/SKILL.md"
+  printf 'unrecorded\n' >"$home/.claude/skills/extra/more.md"
+  printf 'two\n' >"$home/.claude/skills/linked/SKILL.md"
+  ln -s SKILL.md "$home/.claude/skills/linked/alias.md"
+  printf 'agent\n' >"$home/.claude/agents/single.md"
+  printf 'unrecorded\n' >"$home/.claude/agents/unlocked.md"
+
+  lock="$home/lock.yaml"
+  {
+    printf "lockfile_version: '1'\ndependencies:\n- deployed_file_hashes:\n"
+    printf '    %s: sha256:%s\n' \
+      .claude/skills/dir/SKILL.md "$(hash_of "$home/.claude/skills/dir/SKILL.md")" \
+      .claude/skills/dir/sub/a.txt "$(hash_of "$home/.claude/skills/dir/sub/a.txt")" \
+      .claude/skills/extra/SKILL.md "$(hash_of "$home/.claude/skills/extra/SKILL.md")" \
+      .claude/skills/linked/SKILL.md "$(hash_of "$home/.claude/skills/linked/SKILL.md")" \
+      .claude/skills/linked/alias.md "$(hash_of "$home/.claude/skills/linked/SKILL.md")" \
+      .claude/agents/single.md "$(hash_of "$home/.claude/agents/single.md")"
+  } >"$lock"
+
+  out="$(env -i "$python" -I "$REPO_ROOT/scripts/lock-hashes.py" pristine "$lock" "$home" .claude/skills .claude/agents .cursor/agents)"
+  [ "$out" = "$(
+    printf '.claude/agents/single.md\t%s\n' "$(entry_digest "$(hash_of "$home/.claude/agents/single.md")  single.md")"
+    printf '.claude/skills/dir\t%s\n' "$(entry_digest \
+      "$(hash_of "$home/.claude/skills/dir/SKILL.md")  dir/SKILL.md" \
+      "$(hash_of "$home/.claude/skills/dir/sub/a.txt")  dir/sub/a.txt")"
+  )" ]
+}
