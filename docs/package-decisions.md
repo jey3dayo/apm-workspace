@@ -867,7 +867,7 @@ repo-local 活用状況は [`docs/skill-inventory.md`](skill-inventory.md) に�
 - 理由：実 HOME は 2026-11-10 に native へ切り替え済みで、旧経路が前提にしていた「checkout が `~/.apm` にある」配置が無くなった。native の HOME では旧経路のコマンドはすでに拒否されていたので、拒否するための guard（`refuse_on_native_home`）も一緒に削除した。
 - `native:*` は `deploy` の中身に置き換えなかった（ユーザー判断で、置き換えずに削除した）。切り替えは `docs/native-distribution.md` の B を手で通す。
 - 旧経路が配っていた HOME を保守する必要が出たときは、削除前の commit `0bcce09` の旧ツールを使う。
-- 未解決：root の `apm.lock.yaml` を更新する task が無い。`refresh`・`install-pins` は native の HOME ですでに拒否されていたので、削除で新しく失った機能ではないが、SHA pin を上げたあとに lock を合わせる手段は今は無い（`validate:workspace` が pin と lock の不一致で `check` を落とす）。`todo.txt` に載せるかはユーザーが決める。
+- SHA pin 更新後の lock 再生成は `mise run upgrade:deps` で行う（dry-run は `mise run upgrade:deps -- --dry-run`）。held packages（`docs/dependency-holds.txt`）は手動 pin の対象外とし、`validate:workspace` が pin と lock の不一致で検出する。
 
 ## 2026-11-10 使っていない PowerShell の lane を削除した
 
