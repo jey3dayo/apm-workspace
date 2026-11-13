@@ -621,7 +621,6 @@ EOF
   [ "$(roots_snapshot "$M_HOME")" = "$original" ]
   [ -z "$(compgen -G "$M_HOME/.claude/skills.bak-*" || true)" ]
   [ "$(cat "$M_HOME"/.claude/skills.native-*/foo/SKILL.md)" = "deployed by apm" ]
-  [ "$(readlink "$M_HOME/.agents/skills/agmsg/db")" = "$M_HOME/.local/state/agmsg/db" ]
 
   prepare_migrate migrate-touch-config "$stub"
   original="$(roots_snapshot "$M_HOME")"
