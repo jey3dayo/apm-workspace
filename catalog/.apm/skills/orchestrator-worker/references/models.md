@@ -20,11 +20,11 @@
 
 ### Reviewer（レビュアー）
 
-| platform | モデル ID                                                                        | effort | 備考                                                                                                     |
-| -------- | -------------------------------------------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------- |
-| Claude   | `fable` / `opus`                                                                 | —      | fable 既定、fallback opus                                                                                |
-| Codex    | `gpt-6.1-terra` / `gpt-6.1-sol` / `gpt-6-astra`                                  | medium | terra 既定。難度高は sol へ上げ、必要なら effort も上げる。astra は明示指定時のみ。旧版 `gpt-6-sol` 不可 |
-| cursor   | `claude-fable-5-1-thinking-xhigh` / `claude-opus-5-5-high` / `gpt-5.6-sol-xhigh` | —      | cursor 経路を明示したときだけ使い、fable を既定とする                                                    |
+| platform | モデル ID                                                               | effort | 備考                                                                                                     |
+| -------- | ----------------------------------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------- |
+| Claude   | `fable` / `opus`                                                        | —      | fable 既定、fallback opus                                                                                |
+| Codex    | `gpt-6.1-terra` / `gpt-6.1-sol` / `gpt-6-astra`                         | medium | terra 既定。難度高は sol へ上げ、必要なら effort も上げる。astra は明示指定時のみ。旧版 `gpt-6-sol` 不可 |
+| cursor   | `claude-fable-5-2-xhigh` / `claude-opus-5-5-high` / `gpt-5.6-sol-xhigh` | —      | cursor 経路を明示したときだけ使い、fable を既定とする                                                    |
 
 ### Worker（実装者）
 
