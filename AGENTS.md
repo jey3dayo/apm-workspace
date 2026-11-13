@@ -131,22 +131,6 @@ symlinks resolving to `.apm/skills/<id>/SKILL.md`.
   allowlists and their focused tests are required mirrors and must change with
   that table. Short aliases in config values (e.g. `model: sonnet`) are allowed.
 
-## agmsg State
-
-`~/.agents/skills/agmsg/db` and `teams` must remain symlinks to
-`${XDG_STATE_HOME:-~/.local/state}/agmsg/`; replacing the skill directory would
-otherwise erase the roster and history. The rehearsal and migration stages
-inside `native:sync` save and restore the links through `scripts/agmsg-state.sh`,
-and sync's rollback recovery relinks them. A bare `apm install -g` does not
-run that save/restore, so the links are gone when it finishes; the store under
-`${XDG_STATE_HOME:-~/.local/state}/agmsg/` survives. For a roster left
-unlinked, diagnose with `mise run doctor`, then run
-`mise run agmsg:state:restore` (`agmsg:state:save` is the counterpart). The
-plain-path rule in
-`catalog/.apm/skills/agmsg-delegation/references/roster-recovery.md` still
-applies. Remove this workaround only after upstream `AGMSG_HOME` supports both
-locations.
-
 ## Cache Recovery
 
 When a deployed `SKILL.md` is tiny, placeholder, or differs from a complete

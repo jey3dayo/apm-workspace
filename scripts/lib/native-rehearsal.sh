@@ -52,7 +52,7 @@ cmd_rehearse() {
   parse_options "$@"
   [ -n "$SOURCE_REF" ] || fail "rehearse needs --source-ref"
   local home sha dir rehearsal scratch path manifest shared lost stamp escaping mode=plain
-  local install_status=0 compile_status=skipped agmsg_status=0 linked=0 reinstate_status=skipped allowed_lost=0 baseline_skips=0 dropped=0
+  local install_status=0 compile_status=skipped linked=0 reinstate_status=skipped allowed_lost=0 baseline_skips=0 dropped=0
   home="$(target_home rehearse)"
   if ! native_lock_held "$home"; then native_lock_command "$home" rehearse "$@"; return; fi
   assert_default_apm_config "$home"
@@ -81,10 +81,6 @@ $escaping"
     mkdir -p "$scratch/.apm"
     clone_copy "$home/.apm/apm_modules" "$scratch/.apm/apm_modules"
   fi
-  if [ -d "$dir/agmsg-state" ]; then
-    mkdir -p "$scratch/.local/state"
-    clone_copy "$dir/agmsg-state" "$scratch/.local/state/agmsg"
-  fi
   assert_default_apm_config "$scratch"
   assert_no_home_manifest "$scratch"
   isolate_scratch_links "$home" "$scratch"
@@ -98,10 +94,6 @@ $shared"
   rm -f "$scratch/.apm/apm.yml"
   printf '%s\n' "$manifest" >"$scratch/.apm/apm.yml"
 
-  if [ -L "$scratch/.agents/skills/agmsg/db" ]; then
-    linked=1
-    agmsg_state "$scratch" save
-  fi
   if [ "$MIGRATE" = 1 ]; then
     mode=migrate
     stamp="$(date -u +%Y%m%dT%H%M%SZ)"
@@ -117,7 +109,6 @@ $shared"
     reinstate_status=0
     (reinstate_entries "$scratch" "$stamp" "$rehearsal/" "$rehearsal/pristine-entries.txt") || reinstate_status=$?
   fi
-  if [ "$linked" = 1 ]; then agmsg_state "$scratch" restore || agmsg_status=1; fi
   baseline_skips="$(grep -c 'no trustworthy local deployment baseline' "$rehearsal/apm.log" || true)"
 
   rehearsal_snapshot "$scratch" "$dir/present.txt" >"$rehearsal/after.txt"
@@ -136,16 +127,16 @@ $shared"
   else
     : >"$rehearsal/dropped.txt"
   fi
-  printf 'mode=%s\nhome=%s\nsource_ref=%s\nworkspace_only=%s\ninstall_status=%s\ncompile_status=%s\nreinstate_status=%s\nagmsg_status=%s\nlost=%s\nallowed_lost=%s\ndropped=%s\nbaseline_skips=%s\n%s\n' \
-    "$mode" "$home" "$sha" "$WORKSPACE_ONLY" "$install_status" "$compile_status" "$reinstate_status" "$agmsg_status" "$lost" "$allowed_lost" "$dropped" "$baseline_skips" "$(cat "$dir/home-state.txt")" \
+  printf 'mode=%s\nhome=%s\nsource_ref=%s\nworkspace_only=%s\ninstall_status=%s\ncompile_status=%s\nreinstate_status=%s\nlost=%s\nallowed_lost=%s\ndropped=%s\nbaseline_skips=%s\n%s\n' \
+    "$mode" "$home" "$sha" "$WORKSPACE_ONLY" "$install_status" "$compile_status" "$reinstate_status" "$lost" "$allowed_lost" "$dropped" "$baseline_skips" "$(cat "$dir/home-state.txt")" \
     >"$rehearsal/result.txt"
 
-  if [ "$install_status" = 0 ] && [ "$compile_status" = 0 ] && [ "$agmsg_status" = 0 ] && [ "$lost" = 0 ] &&
+  if [ "$install_status" = 0 ] && [ "$compile_status" = 0 ] && [ "$lost" = 0 ] &&
     { [ "$MIGRATE" = 0 ] || { [ "$reinstate_status" = 0 ] && [ "$baseline_skips" = 0 ]; }; }; then
     log "rehearsal clean ($mode): install and compile ran on a clone of $dir and lost no file ($rehearsal)"
     return 0
   fi
-  log "rehearsal failed ($mode): install=$install_status compile=$compile_status reinstate=$reinstate_status agmsg=$agmsg_status lost=$lost baseline_skips=$baseline_skips ($rehearsal/result.txt)"
+  log "rehearsal failed ($mode): install=$install_status compile=$compile_status reinstate=$reinstate_status lost=$lost baseline_skips=$baseline_skips ($rehearsal/result.txt)"
   if [ "$lost" != 0 ]; then
     log "files that disappeared, all in $rehearsal/lost.txt:"
     head -n 20 "$rehearsal/lost.txt" | sed 's/^/  /' >&2

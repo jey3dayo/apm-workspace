@@ -46,7 +46,7 @@ Reviewer 既定の範囲: cursor reviewer が既定になるのはユーザー�
 
 役を決める前に envelope を検証する。次のいずれかに当たったら `BLOCKED(task_id)` を返す（対話セッションならユーザーへ報告して停止）:
 
-- agmsg 経由で必須 field（`source_role` / `target_role` / `task_id` / `report_contract`）のいずれかが欠けている
+- T3 Code（T3 MCP）経由で必須 field（`source_role` / `target_role` / `task_id` / `report_contract`）のいずれかが欠けている
 - `target_role` と `report_contract` が対応表に反する
 - どちらかの値が対応表に無い
 
@@ -61,8 +61,6 @@ Reviewer 既定の範囲: cursor reviewer が既定になるのはユーザー�
 1. envelope に `target_role` がある → その役
 2. `target_role` が無く、`task_id` + `report_contract` だけがある → 対応表の逆引き
 3. envelope が無い対話セッション → 起動時に宣言された default role。宣言が無ければ、自分のモデルが Steward の許可集合に入るなら Steward、入らないなら Architect
-
-envelope の必須フィールドと書式は `agmsg-delegation` の「envelope」節が正本。
 
 ack 不要と最終結果不要を混同しない。`HANDOFF` で受けた作業は、終わったら送り手へ返す。
 
@@ -126,7 +124,7 @@ Steward は人間が最初に話す相手。どの Steward が Orchestrator 機�
 
 人間が「執事で答えて」「アーキテクトへ」と明示したら、それが上記トリガーによる判定を上書きする。
 
-handoff は `agmsg-delegation` の引き継ぎ書式で Architect pane へ送るか、その書式を添えて人間へ返す。実行中の session のモデル変更ではなく、逆方向（Architect から Steward）は定義しない。
+handoff は T3 Code（T3 MCP）経由で Architect pane へ送るか、その書式を添えて人間へ返す。実行中の session のモデル変更ではなく、逆方向（Architect から Steward）は定義しない。
 
 ### agent / skill 定義側のモデル割り当て
 
@@ -137,7 +135,7 @@ handoff は `agmsg-delegation` の引き継ぎ書式で Architect pane へ送る
 
 ## Reviewer の tier
 
-通常のレビュー・相談は、セッションと同じ runtime の組み込み subagent（Claude は Agent tool、Codex は `spawn_agent`）を既定にし、作者と別 context で起動する。実行時の read-only 境界を証明できない結果は advisory として扱う。verdict を必要とするレビュー（`ship` の非軽微な変更など）は、作者と別の新規セッションで起動する `codex exec -s read-only`（下の「verdict review の起動と受理」）を既定にする。`agmsg-delegation` の review は任意の代替経路で、使うときは同 skill の受理条件にも従う。差分を書いた runtime と別 runtime の Reviewer は、追加の脱相関が必要なときだけ選ぶ。
+通常のレビュー・相談は、セッションと同じ runtime の組み込み subagent（Claude は Agent tool、Codex は `spawn_agent`）を既定にし、作者と別 context で起動する。実行時の read-only 境界を証明できない結果は advisory として扱う。verdict を必要とするレビュー（`ship` の非軽微な変更など）は、作者と別の新規セッションで起動する `codex exec -s read-only`（下の「verdict review の起動と受理」）を既定にする。差分を書いた runtime と別 runtime の Reviewer は、追加の脱相関が必要なときだけ選ぶ。
 
 **Reviewer のモデル選定は [references/models.md](references/models.md) が正本。** 既定の格と、判断の難度で上げる先、明示指定時の格がある。
 
@@ -163,7 +161,7 @@ codex exec --ephemeral --ignore-user-config --ignore-rules \
 - `--ignore-rules`: sandbox 外の実行を許す execpolicy の `.rules` を読まない
 - `--ephemeral`: セッションを残さない
 
-prompt には固定したレビュー対象（適用元 `HEAD` の SHA と diff ファイルの絶対パス・checksum）を書き、その diff ファイルだけをレビュー対象にすること、読んだ diff ファイルの checksum と `HEAD` の SHA を報告に書くことを指示する。diff ファイルは、その経路の強制境界が reviewer の書込みを拒否するパスに置く。`codex exec` 経路では prompt・diff・ログを対象 repo の外に置く。`agmsg-delegation` 経路で拒否されるパスを選べない場合は verdict にしない。
+prompt には固定したレビュー対象（適用元 `HEAD` の SHA と diff ファイルの絶対パス・checksum）を書き、その diff ファイルだけをレビュー対象にすること、読んだ diff ファイルの checksum と `HEAD` の SHA を報告に書くことを指示する。diff ファイルは、その経路の強制境界が reviewer の書込みを拒否するパスに置く。`codex exec` 経路では prompt・diff・ログを対象 repo の外に置く。
 
 verdict は、経路によらず次の共通条件をすべて満たした場合だけ受理する:
 
@@ -189,7 +187,7 @@ Architect / Worker が作成した成果物の **approval gate は、作者と�
 
 対象の同一性（SHA / checksum の固定）と判断の独立性（作者と別の reviewer であること）は別々の要件。SHA を固定しただけの self-review は approval gate を通過しない。
 
-Reviewer は組み込みの subagent（Claude は Agent tool、Codex は `spawn_agent`）で起動するのを既定にし、その結果は advisory として扱う。verdict が要るときは「verdict review の起動と受理」の `codex exec` を使う。pane 常駐の Reviewer や agmsg の helper を使うときは `agmsg-delegation` の経路を使う。
+Reviewer は組み込みの subagent（Claude は Agent tool、Codex は `spawn_agent`）で起動するのを既定にし、その結果は advisory として扱う。verdict が要るときは「verdict review の起動と受理」の `codex exec` を使う。
 
 ## 2. 委譲するか決める
 
@@ -244,13 +242,13 @@ Agent(subagent_type: "implementer", prompt: <タスク定義>)
 
 通常委譲では `model` を渡さない。呼び出し時の指定は agent 定義の frontmatter より優先されるため、渡すと `implementer` に設定済みの既定 tier を上書きしてしまう。
 
-Claude セッションで Codex モデル（`luna` / `terra` / `sol` / `astra`）を指定された場合、Agent tool は使えない。この場合は `agmsg-delegation` の spawn 経路へ切り替える。やむを得ず別の経路や tier を採るときは、起動前に差し替え先と理由をユーザーへ報告し、最終報告にも記す。
+Claude セッションで Codex モデル（`luna` / `terra` / `sol` / `astra`）を指定された場合、Agent tool は使えない。この場合は T3 Code（T3 MCP）経由の spawn 経路へ切り替える。やむを得ず別の経路や tier を採るときは、起動前に差し替え先と理由をユーザーへ報告し、最終報告にも記す。
 
 Codex:
 
 Codex では `spawn_agent` からモデルを明示指定できる。モデル上書き時は `fork_turns: "none"` を使い、leaf worker として実装だけを担当させる。子には collaboration tools が公開されないため、再帰的な委譲・分解・検証は Orchestrator 機能側が担う。`multi_agent_v2 = false` での V1 固定や `model_catalog_json` の上書きは使わない。
 
-Codex native の `spawn_agent` を標準経路とする。native spawn が利用できない環境、別セッション・別プロセスへの引き継ぎ、または native runtime の制約を回避する必要がある場合だけ `agmsg-delegation` へ切り替える。worker の reasoning effort は既定 `xhigh`。別プロセス起動の手順・境界・片付けは `agmsg-delegation` の Lifecycle が正本。
+Codex native の `spawn_agent` を標準経路とする。native spawn が利用できない環境、別セッション・別プロセスへの引き継ぎ、または native runtime の制約を回避する必要がある場合だけ T3 Code（T3 MCP）経由へ切り替える。worker の reasoning effort は既定 `xhigh`。
 
 ### Worker の昇格
 
@@ -271,7 +269,7 @@ Claude では独立タスクを同一レスポンス内で複数呼び出すと�
 起動後の扱い:
 
 - バリアを置かない。先に返った Worker から順に処理する
-- Worker を使い回す。追加指示・スコープ縮小・再実行は、新規 spawn ではなく既存 Worker への追送で行う（Claude は `SendMessage`）。Codex（agmsg-delegation 経由）は worker が headless 1 turn で終了する契約のため使い回せない
+- Worker を使い回す。追加指示・スコープ縮小・再実行は、新規 spawn ではなく既存 Worker への追送で行う（Claude は `SendMessage`）。T3 Code（T3 MCP）経由は worker が headless 1 turn で終了する契約のため使い回せない
 - Codex native の spawn 枠が詰まったら、新規 spawn 前に agent の状態を確認し、目的に合う完了 Worker を再利用する。再利用先が無い場合は不要な完了 agent だけを閉じ、稼働中の無関係な agent は終了させない
 
 1つの依頼を subagent 調査とレビューの反復で仕上げる運用は `review-fix-loop`、複数の plan・台帳をまとめて消化するのは `backlog-sweep` を使う。
@@ -303,6 +301,6 @@ Claude では独立タスクを同一レスポンス内で複数呼び出すと�
 
 - 実行前に Orchestrator 機能側が対象バージョン・手順・影響範囲を確認する
 - 結果の検証（公開されたことの確認）も Orchestrator 機能側が自分で行う
-- 依頼した範囲を、選ぶ実行経路の権限で実際に実行できること。委譲してよい（policy）と実行できる（runtime）は別。境界は role と base 設定が決め、モデルを替えても越えられない。`agmsg-delegation` 経路の照合は同 skill の Preflight に従う
+- 依頼した範囲を、選ぶ実行経路の権限で実際に実行できること。委譲してよい（policy）と実行できる（runtime）は別。境界は role と base 設定が決め、モデルを替えても越えられない
 
 手順が未確立、または判断を伴う公開は自分で扱う。実効境界の外だと分かった場合は、既に権限を持つ経路か Orchestrator 自身へ戻す。指定されたモデルと異なる経路を採るときは §4 のとおり差し替えを明示する。この委譲許可は、worktree 外書込み禁止と Worker の commit / apply 非自動化を解除せず、組み込み subagent にも同じ境界を適用する。

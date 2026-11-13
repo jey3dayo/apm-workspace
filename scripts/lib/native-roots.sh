@@ -1,13 +1,6 @@
-# agmsg-state.sh restores the links under the default store (it runs without XDG_STATE_HOME), so a db or teams link that
-# points anywhere else would be repointed at an empty default store, leaving the history behind.
 assert_default_agmsg_store() {
-  local home="$1" name target
-  for name in db teams; do
-    [ -L "$home/.agents/skills/agmsg/$name" ] || continue
-    target="$(readlink "$home/.agents/skills/agmsg/$name")"
-    [ "$target" = "$home/.local/state/agmsg/$name" ] ||
-      fail "$home/.agents/skills/agmsg/$name points at $target, not at $home/.local/state/agmsg/$name, the only store agmsg-state.sh relinks to. Nothing was changed; move the data to the default store (or relink it) first."
-  done
+  # agmsg removed; no-op
+  :
 }
 
 # The previous rendered manifest records whether it was rendered with --workspace-only; the previous lock lists packages
@@ -32,7 +25,8 @@ root_escaping_links() {
 }
 
 agmsg_state() {
-  env -u XDG_STATE_HOME HOME="$1" bash "$REPO_ROOT/scripts/agmsg-state.sh" "$2" >&2
+  # agmsg removed; no-op
+  :
 }
 
 assert_stamp() {
@@ -147,12 +141,10 @@ reinstate_escaping_links() {
   done
 }
 
-# True when the old entry differs in more than runtime state: agmsg's run/ db teams (agmsg-state.sh restores the links
-# after this step) and the synced-skill cache that a running Claude Code recreates during migrate.
+# True when the old entry differs in more than runtime state: the synced-skill cache that a running Claude Code recreates during migrate.
 reinstate_differs() {
   case "$3" in
     .claude/skills/synced) return 1 ;;
-    .agents/skills/agmsg) ! diff -rq -x .apm-pin -x run -x db -x teams "$1" "$2" >/dev/null 2>&1 ;;
     *) ! diff -rq -x .apm-pin "$1" "$2" >/dev/null 2>&1 ;;
   esac
 }
@@ -383,10 +375,8 @@ rollback_roots() {
 }
 
 restore_agmsg_links() {
-  local home="$1"
-  if [ -L "$home/.agents/skills/agmsg/db" ] || [ -L "$home/.agents/skills/agmsg/teams" ]; then
-    agmsg_state "$home" restore
-  fi
+  # agmsg removed; no-op
+  :
 }
 
 # The reason a lost path (relative to HOME) is no loss, or nothing. Every entry is a full path under one of MIGRATE_ROOTS,
@@ -408,18 +398,8 @@ allowed_lost_reason() {
     esac
   done
   case "$path" in
-    .agents/skills/agmsg/run | .agents/skills/agmsg/run/*)
-      echo "agmsg runtime state; the old path rebuilt the agmsg directory too, and apm replaces it"
-      return
-      ;;
     .claude/skills/synced | .claude/skills/synced/*)
       echo "Claude Code's synced-skill cache; the running session recreates it"
-      return
-      ;;
-    .agents/skills/agmsg/apm.yml | .claude/skills/agmsg/apm.yml | \
-      .agents/skills/agmsg/.apm | .claude/skills/agmsg/.apm | \
-      .agents/skills/agmsg/.apm/.plugin-skill-sources.json | .claude/skills/agmsg/.apm/.plugin-skill-sources.json)
-      echo "metadata the old path's stage wrote; the agmsg scripts do not read it"
       return
       ;;
   esac

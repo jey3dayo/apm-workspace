@@ -28,7 +28,6 @@ cmd_backup() {
       printf '%s\n' "$path" >>"$dir/absent.txt"
     fi
   done
-  if [ -d "$home/.local/state/agmsg" ]; then clone_copy "$home/.local/state/agmsg" "$dir/agmsg-state"; fi
   home_state_lines "$home" >"$dir/home-state.txt"
   printf 'home=%s\ncreated=%s\n' "$home" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >"$dir/complete"
   log "backed up $(wc -l <"$dir/present.txt" | tr -d ' ') paths of $home into $dir"
