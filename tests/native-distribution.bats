@@ -255,7 +255,6 @@ roots_snapshot() {
 seed_migrate_home() {
   local home="$1"
   seed_sentinels "$home"
-  seed_agmsg "$home"
   mkdir -p "$home/.claude/skills/foo" "$home/.claude/agents" "$home/.cursor/agents"
   echo "old foo" >"$home/.claude/skills/foo/SKILL.md"
   echo "pin" >"$home/.claude/skills/foo/.apm-pin"
@@ -532,16 +531,14 @@ EOF
   [ ! -e "$home/.apm/apm.yml" ]
 }
 
-@test "backup copies the backed-up paths and the agmsg store, refuses to overwrite, and a clean rehearse loses nothing" {
+@test "backup copies the backed-up paths, refuses to overwrite, and a clean rehearse loses nothing" {
   local home before backup="$FX/backups/real-clean" result
   home="$(new_home real-clean)"
   seed_sentinels "$home"
-  seed_agmsg "$home"
   before="$(backed_up_snapshot "$home")"
 
   real_native "$home" backup --real-home --backup-dir "$backup"
   [ -f "$backup/complete" ]
-  [ "$(cat "$backup/agmsg-state/db/keep")" = "db store" ]
   run real_native "$home" backup --real-home --backup-dir "$backup"
   [ "$status" -ne 0 ]
   [[ "$output" == *"never overwritten"* ]]
@@ -553,7 +550,6 @@ EOF
   grep -qxF "install_status=0" "$result"
   grep -qxF "compile_status=0" "$result"
   [ "$(backed_up_snapshot "$home")" = "$before" ]
-  [ "$(readlink "$home/.agents/skills/agmsg/db")" = "$home/.local/state/agmsg/db" ]
 }
 
 @test "migrate keeps what apm does not deploy, leaves config.toml and settings.json alone, and migrate-rollback restores the roots byte for byte" {
@@ -580,8 +576,6 @@ EOF
   [ "$(cat "$M_HOME/.agents/skills/herdr-automations/SKILL.md")" = "tool-owned" ]
   [ "$(cat "$M_HOME/.claude/agents/my-agent.md")" = "agent" ]
   [ "$(cat "$M_HOME/.cursor/agents/my-agent.md")" = "cursor agent" ]
-  [ "$(readlink "$M_HOME/.agents/skills/agmsg/db")" = "$M_HOME/.local/state/agmsg/db" ]
-  [ "$(cat "$M_HOME/.local/state/agmsg/db/keep")" = "db store" ]
   [ "$(sentinel_snapshot "$M_HOME" | grep -E 'config.toml|settings.json')" = "$(grep -E 'config.toml|settings.json' <<<"$sentinels")" ]
   # The moved-aside roots are the originals, and the record lists them.
   [ "$(roots_snapshot "$M_HOME" ".bak-$stamp")" = "$original" ]
@@ -592,7 +586,6 @@ EOF
   [ "$(sentinel_snapshot "$M_HOME")" = "$sentinels" ]
   [ -f "$M_HOME/.claude/skills.native-$stamp/ship/SKILL.md" ]
   [ -z "$(compgen -G "$M_HOME/.claude/skills.bak-*" || true)" ]
-  [ "$(readlink "$M_HOME/.agents/skills/agmsg/db")" = "$M_HOME/.local/state/agmsg/db" ]
 
   # A second rollback finds every root already restored and changes nothing.
   listing_bak="$(find "$M_HOME" | LC_ALL=C sort)"
