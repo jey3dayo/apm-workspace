@@ -14,7 +14,7 @@ dependencies:
     - jey3dayo/apm-workspace/manual-skills#main
 
     # --- review ---
-    - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review#d0ef80d86795816da932a153458c5dbe192d294e
+    - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review#3dbd22ff12742fb28c9700b9760baa29ed41dc13
     - shadcn/improve#cac56e1ebd3c279aa9153616cfeac7b174ab90f9
 
     # --- engineering / writing ---
@@ -23,7 +23,7 @@ dependencies:
       ref: 8f2d57610a73efc97d743c9b0b0ecb1002e09fa4
       alias: japanese-tech-writing
     - git: mattpocock/skills
-      ref: 4ae2317ddb22b046e26455e4f9c9b3aaaf62212d # v1.3.2
+      ref: 5863806dd4e15c63174bee4e7515a4256792ecfa # v1.3.2
       skills:
         - codebase-design
         - domain-modeling
@@ -36,15 +36,15 @@ dependencies:
         - wait-what
         - wayfinder
         - writing-for-agents
-    - nanaism/yomiyasu/skills/yomiyasu#2318a6d0820a58d3f8cfadc75af86978bb739185 # v3.0.1
+    - nanaism/yomiyasu/skills/yomiyasu#db78b9bc5e868549b517a037df7a4d1c93edac23 # v3.0.1
 
     # --- react ---
-    - millionco/react-doctor/skills/react-doctor#94a349b8a38c4e80f7600a74766b00ef3a76fa39 # v2.4.0
+    - millionco/react-doctor/skills/react-doctor#661cb187fbfe4e992acc89f76933e4f51244639f # v2.4.0
     - vercel-labs/agent-skills/skills/react-best-practices#1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62
 
     # --- design ---
     - git: emilkowalski/skills
-      ref: 715c1807e08c497cfd1dc4feb450a2a3300ef2a9
+      ref: 0f2e23b32bb1265e84cff8d3e75785fec953fb1b
       skills:
         - animation-performance
         - apple-design
@@ -58,7 +58,7 @@ dependencies:
       ref: 97daa3eb365670ea3f87ed85356cbfcee18105a5
       alias: unslop-ui
     - git: ibelick/ui-skills
-      ref: f511eae41c996e3953fbeabf95d38e4077d40711
+      ref: 65cc0edb4f64fe8bfe7e9c59466074de25bece76
       skills:
         - fixing-accessibility
     - Jakubantalik/transitions-dev/skills/transitions-dev#038b0bdc75375c2beed51d1e824c98cdc7b86f8c
@@ -68,15 +68,15 @@ dependencies:
         - ui-ux-pro-max
 
     # --- browser / analysis ---
-    - browser-use/browser-harness/skills/browser-harness#c7bb3da435477494450aeb4b19a501fd04bb897d
+    - browser-use/browser-harness/skills/browser-harness#f81992a129b1d125ee3fce0a1c48ef1e7b95dad7
     - jackwener/opencli/skills/opencli-usage#9bc5f5ca132ec4d4e48d7ee517d4303bf159e8e8 # v2.0.3
     - jackwener/opencli/skills/opencli-browser#9bc5f5ca132ec4d4e48d7ee517d4303bf159e8e8 # v2.0.3
     - openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431
-    - tt-a1i/archify/archify#7e45f36c66de1254d5ad6ba1d878f6499ea269fd # v3.2.0
+    - tt-a1i/archify/archify#e37848822238e3a61b12739185cdadd49843a620 # v3.2.0
 
     # --- agent tools ---
-    - vercel-labs/agent-desktop/skills/agent-desktop#54855b6225aec00da4ac65e2d0362fd41cd9fcb3 # v1.2.0
-    - agavra/tuicr/skills/tuicr#f098fb8f0911f6b9b14c80e23f79ab084cf5ef91 # v0.28.0
+    - vercel-labs/agent-desktop/skills/agent-desktop#46d2adf885002633b77d5a9956c9464b24f61431 # v1.2.0
+    - agavra/tuicr/skills/tuicr#8b1ab488a895b9c30fa4cd59a684fb4b8099f365 # v0.28.0
     - fujibee/agmsg#4a712f2aeba8f0b2070f7533b827c7cac78c9fdf # v1.5.1
     - humanlayer/skills/plugins/show-me/skills/show-me#4d69d20f6e9b57b4fcf0d501ccfb1be961f0f329
   mcp:

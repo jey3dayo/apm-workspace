@@ -1,12 +1,12 @@
 lockfile_version: '1'
-generated_at: '2026-11-11T13:39:27.565375+00:00'
-apm_version: 0.35.0
+generated_at: '2026-11-14T16:08:08.847649+00:00'
+apm_version: 0.35.1
 dependencies:
 - repo_url: agavra/tuicr
   name: tuicr
   host: github.com
-  resolved_commit: f098fb8f0911f6b9b14c80e23f79ab084cf5ef91
-  resolved_ref: f098fb8f0911f6b9b14c80e23f79ab084cf5ef91
+  resolved_commit: 8b1ab488a895b9c30fa4cd59a684fb4b8099f365
+  resolved_ref: 8b1ab488a895b9c30fa4cd59a684fb4b8099f365
   version: unknown
   virtual_path: skills/tuicr
   is_virtual: true
@@ -43,8 +43,8 @@ dependencies:
 - repo_url: browser-use/browser-harness
   name: browser-harness
   host: github.com
-  resolved_commit: c7bb3da435477494450aeb4b19a501fd04bb897d
-  resolved_ref: c7bb3da435477494450aeb4b19a501fd04bb897d
+  resolved_commit: f81992a129b1d125ee3fce0a1c48ef1e7b95dad7
+  resolved_ref: f81992a129b1d125ee3fce0a1c48ef1e7b95dad7
   version: unknown
   virtual_path: skills/browser-harness
   is_virtual: true
@@ -159,8 +159,8 @@ dependencies:
 - repo_url: cursor/plugins
   name: thermo-nuclear-code-quality-review
   host: github.com
-  resolved_commit: d0ef80d86795816da932a153458c5dbe192d294e
-  resolved_ref: d0ef80d86795816da932a153458c5dbe192d294e
+  resolved_commit: 3dbd22ff12742fb28c9700b9760baa29ed41dc13
+  resolved_ref: 3dbd22ff12742fb28c9700b9760baa29ed41dc13
   version: unknown
   virtual_path: cursor-team-kit/skills/thermo-nuclear-code-quality-review
   is_virtual: true
@@ -177,8 +177,8 @@ dependencies:
 - repo_url: emilkowalski/skills
   name: skills
   host: github.com
-  resolved_commit: 715c1807e08c497cfd1dc4feb450a2a3300ef2a9
-  resolved_ref: 715c1807e08c497cfd1dc4feb450a2a3300ef2a9
+  resolved_commit: 0f2e23b32bb1265e84cff8d3e75785fec953fb1b
+  resolved_ref: 0f2e23b32bb1265e84cff8d3e75785fec953fb1b
   version: 0.0.0
   package_type: skill_bundle
   deployed_files:
@@ -241,7 +241,7 @@ dependencies:
     .claude/skills/improve-animations/SKILL.md: sha256:73962447464433476343e2c12cd08ab39cc99a9e5f3c118c5fb54ed897574ef6
     .claude/skills/review-animations/SKILL.md: sha256:6ff590d29e436766135aa3d137be1fac2a867165c7257fc315b189361f1873af
     .claude/skills/review-animations/STANDARDS.md: sha256:e7d3605034acda54ca13e43aec9e64d65b53de20f75b11b8d694e373012fbe07
-  content_hash: sha256:d657da2fdb1d9cf6b76aa3015b707ef623c831bfbd4f17e063d7e22c2acd842d
+  content_hash: sha256:7add0ae5c2d8fa1cc7246fd7e31228a11743aedbec92e032862ae1b64c92b3b3
   skill_subset:
   - animation-performance
   - apple-design
@@ -2955,8 +2955,8 @@ dependencies:
 - repo_url: ibelick/ui-skills
   name: ui-skills
   host: github.com
-  resolved_commit: f511eae41c996e3953fbeabf95d38e4077d40711
-  resolved_ref: f511eae41c996e3953fbeabf95d38e4077d40711
+  resolved_commit: 65cc0edb4f64fe8bfe7e9c59466074de25bece76
+  resolved_ref: 65cc0edb4f64fe8bfe7e9c59466074de25bece76
   version: 0.0.0
   package_type: skill_bundle
   deployed_files:
@@ -2987,7 +2987,7 @@ dependencies:
     .claude/skills/improve-ui/SKILL.md: sha256:fa2ac808f6d9dab7bb3620880b014d2c18e227e5b006102856038096e573e69a
     .claude/skills/improve-ui/agents/openai.yaml: sha256:933af431364517518cbcfcd4e70eb8e8b390ead920abc48c071a4eedb6747183
     .claude/skills/improve-ui/references/plan-template.md: sha256:8faca7a14659a7f951d3b89fb730a43a4ce99966cc00481bf83d82b90f34b868
-  content_hash: sha256:ab86703bd209b97fa9a4b538bae5c9b52eaa9bed1b428c5b12c2fd9a963b8883
+  content_hash: sha256:cf73f9710dc16fe0a948d890a762a3dd4bc42f69f84ed0346fa124d9ea76e4c8
   skill_subset:
   - fixing-accessibility
 - repo_url: jackwener/opencli
@@ -3739,8 +3739,8 @@ dependencies:
 - repo_url: mattpocock/skills
   name: mattpocock-skills
   host: github.com
-  resolved_commit: 4ae2317ddb22b046e26455e4f9c9b3aaaf62212d
-  resolved_ref: 4ae2317ddb22b046e26455e4f9c9b3aaaf62212d
+  resolved_commit: 5863806dd4e15c63174bee4e7515a4256792ecfa
+  resolved_ref: 5863806dd4e15c63174bee4e7515a4256792ecfa
   version: 1.3.2
   package_type: marketplace_plugin
   deployed_files:
@@ -3907,7 +3907,7 @@ dependencies:
     .claude/skills/writing-for-agents/SKILL-MECHANICS.md: sha256:c768e6307c7c10728c401c213f2c4ba71c542127eeb7ad2956aabd15a0fa0059
     .claude/skills/writing-for-agents/SKILL.md: sha256:551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a
     .claude/skills/writing-for-agents/agents/openai.yaml: sha256:eacb24b2a618cfb81dacb0416f4fdd75ddf3a8060f8ddb99aae1b1e301907e4b
-  content_hash: sha256:85e73a1b3ba5510c07ebd2d2ed51b5eb45f4f5612657d0f713f538fbb972664e
+  content_hash: sha256:68aaa1f0f76b5efe3174e272ece328e606258d096d05013810213531cdee79c2
   skill_subset:
   - codebase-design
   - domain-modeling
@@ -3924,8 +3924,8 @@ dependencies:
 - repo_url: millionco/react-doctor
   name: react-doctor
   host: github.com
-  resolved_commit: 94a349b8a38c4e80f7600a74766b00ef3a76fa39
-  resolved_ref: 94a349b8a38c4e80f7600a74766b00ef3a76fa39
+  resolved_commit: 661cb187fbfe4e992acc89f76933e4f51244639f
+  resolved_ref: 661cb187fbfe4e992acc89f76933e4f51244639f
   version: unknown
   virtual_path: skills/react-doctor
   is_virtual: true
@@ -3946,12 +3946,12 @@ dependencies:
 - repo_url: nanaism/yomiyasu
   name: yomiyasu
   host: github.com
-  resolved_commit: 2318a6d0820a58d3f8cfadc75af86978bb739185
-  resolved_ref: 2318a6d0820a58d3f8cfadc75af86978bb739185
-  version: 0.0.0
+  resolved_commit: db78b9bc5e868549b517a037df7a4d1c93edac23
+  resolved_ref: db78b9bc5e868549b517a037df7a4d1c93edac23
+  version: unknown
   virtual_path: skills/yomiyasu
   is_virtual: true
-  package_type: marketplace_plugin
+  package_type: claude_skill
   deployed_files:
   - .agents/skills/yomiyasu
   - .agents/skills/yomiyasu/.codex-plugin/plugin.json
@@ -4128,7 +4128,7 @@ dependencies:
     .claude/skills/yomiyasu/scripts/yomiyasu_diff.py: sha256:31c46a98bcd987c0a2dda7d9712fb830f3a70b1e0636b6a034ae191530d51ab5
     .claude/skills/yomiyasu/scripts/yomiyasu_hook.py: sha256:689ffbeecbaf0380ac99e37b6093f136364b7c7bbf014ada961c8e0781e8ab8b
     .claude/skills/yomiyasu/scripts/yomiyasu_lint.py: sha256:b02c21464353b726a8c4e366f89bdfd2f341613f7bf75f779e83cc4dfbc54c9e
-  content_hash: sha256:77d443d2cf5421158c67c9aaac2d263dc5bd96775eac1a3a8f33b1f9a9ef7e1d
+  content_hash: sha256:f88b5551d606efdff3a10e1e6b3d5900e373cb25f9cafdbe08840c76af36508b
 - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
   name: ui-ux-pro-max
   host: github.com
@@ -4526,8 +4526,8 @@ dependencies:
 - repo_url: tt-a1i/archify
   name: archify
   host: github.com
-  resolved_commit: 7e45f36c66de1254d5ad6ba1d878f6499ea269fd
-  resolved_ref: 7e45f36c66de1254d5ad6ba1d878f6499ea269fd
+  resolved_commit: e37848822238e3a61b12739185cdadd49843a620
+  resolved_ref: e37848822238e3a61b12739185cdadd49843a620
   version: unknown
   virtual_path: archify
   is_virtual: true
@@ -5324,8 +5324,8 @@ dependencies:
 - repo_url: vercel-labs/agent-desktop
   name: agent-desktop
   host: github.com
-  resolved_commit: 54855b6225aec00da4ac65e2d0362fd41cd9fcb3
-  resolved_ref: 54855b6225aec00da4ac65e2d0362fd41cd9fcb3
+  resolved_commit: 46d2adf885002633b77d5a9956c9464b24f61431
+  resolved_ref: 46d2adf885002633b77d5a9956c9464b24f61431
   version: unknown
   virtual_path: skills/agent-desktop
   is_virtual: true
@@ -5356,7 +5356,7 @@ dependencies:
     .claude/skills/agent-desktop/references/commands-observation.md: sha256:983291f1f8272fe3bea0a099d3faaf1aa6694c4e1f1a36c83362d9a1cd58e2f7
     .claude/skills/agent-desktop/references/commands-system.md: sha256:a99042f2cecf66f315f3bc38e4cf265bf36441ff08a4a4e847c718e1b6f2deb4
     .claude/skills/agent-desktop/references/workflows.md: sha256:e78194d24d3963d10a8069833c90a1bdb932f0ab8f6b645df79149d95471645c
-  content_hash: sha256:58032407daa209b72e7c087ee1885058f8e190b2481795bd7830aba8e70b7cbc
+  content_hash: sha256:cd1e6daa04690612a5e26e2ffd1f01a2dcdc0f2a8c1e4dd1ddb1627863b1c4c0
 - repo_url: vercel-labs/agent-skills
   name: vercel-react-best-practices
   host: github.com
