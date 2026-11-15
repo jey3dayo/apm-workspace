@@ -59,18 +59,6 @@ run = "bash ./scripts/apm-workspace.sh setup:mcp:host"
 description = "Regenerate apm.lock.yaml after pin updates, listing holds in docs/dependency-holds.txt"
 run = "bash ./scripts/upgrade-deps.sh"
 
-[tasks."agmsg:state:save"]
-description = "Move the agmsg roster out of the deploy target before it is rewritten"
-# Hidden on purpose: running save alone leaves the roster unlinked from the
-# deploy target until a restore puts it back.
-hide = true
-run = "bash ./scripts/agmsg-state.sh save"
-
-[tasks."agmsg:state:restore"]
-description = "Recovery adapter: relink an agmsg roster unlinked by an install outside the migrate path"
-hide = true
-run = "bash ./scripts/agmsg-state.sh restore"
-
 [tasks.doctor]
 description = "Inspect workspace state, deployed targets, and the learning-intake inbox"
 hide = true

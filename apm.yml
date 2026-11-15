@@ -77,7 +77,6 @@ dependencies:
     # --- agent tools ---
     - vercel-labs/agent-desktop/skills/agent-desktop#46d2adf885002633b77d5a9956c9464b24f61431 # v1.2.0
     - agavra/tuicr/skills/tuicr#8b1ab488a895b9c30fa4cd59a684fb4b8099f365 # v0.28.0
-    - fujibee/agmsg#4a712f2aeba8f0b2070f7533b827c7cac78c9fdf # v1.5.1
     - humanlayer/skills/plugins/show-me/skills/show-me#4d69d20f6e9b57b4fcf0d501ccfb1be961f0f329
   mcp:
     - name: context7
@@ -100,8 +99,6 @@ dependencies:
 scripts: {}
 executables:
   allow:
-    github.com/fujibee/agmsg:
-      bin: true
     github.com/ibelick/ui-skills:
       bin: true
     github.com/tt-a1i/archify/archify:

@@ -78,8 +78,8 @@ overrides it. Fast Path 9 hand-edits `apm.yml` in the checkout instead.
 On the old path the uninstall re-integrated the remaining packages by itself.
 On 0.31.0 it rewrote `apm.yml` (dropped the comment that followed the removed
 entry, such as the next section header, and folded the gist URL) and deployed
-the gist under its un-aliased hash name. Unlinking the agmsg roster and
-deploying undeclared sub-skills were observed on 0.29.0 and not re-checked.
+the gist under its un-aliased hash name. Deploying undeclared sub-skills was
+observed on 0.29.0 and not re-checked.
 
 Some deployed skill directories also held a copy of the package's `.apm-pin`
 cache marker, which the lock did not record. There `apm uninstall` removed the
@@ -88,8 +88,7 @@ tracked files, could not remove the directory, and aborted listing it
 leaving the package declared in `apm.yml` and the lock.
 
 If someone already ran it on the native HOME, discard the consumer change by
-rolling out with section B of `docs/native-distribution.md`, and follow the
-agmsg State section of the checkout's `AGENTS.md`.
+rolling out with section B of `docs/native-distribution.md`.
 
 ## Guardrail details
 

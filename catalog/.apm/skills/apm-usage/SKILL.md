@@ -228,6 +228,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
 - Do not hand-edit deployed targets such as `~/.claude/`, `~/.codex/`, or `~/.agents/skills`.
 - Do not judge a deployed skill orphaned by its absence from `catalog/.apm/skills/**` and `optional-skills/**`; deployed targets are mostly fed by external dependencies, so that test marks most of a healthy target as orphaned. Name the supplier of every entry before it reaches a delete line -- a lock record, `apm_modules/**`, `private-skills/.apm/skills/<id>`, `manual-skills`, or a workspace-only symlink bridge -- and treat only an entry with no supplier as a candidate. A lock record keeps an entry off that line but never proves the skill is still supplied — the lock keeps records for skills the catalog has already retired, so check the manifest, the record's owner, the locator's scope and target, and the deployed path itself before concluding anything about a record.
 - `apm audit --ci` and searching a deployed target: see `references/rollout-fast-paths.md` for the reading and grep-wrapper caveats.
+- For `executables.allow` approval format: the key is `github.com/<owner>/<repo>[/<path>]` and does not match what `apm approve` outputs. When `apm install` prompts `Trust <package>? [y/N]`, answer No and approve in `apm.yml`; answering y stores the approval in `config.json` where it blocks `native:sync`.
 - Prefer `mise` tasks over ad hoc script entrypoints for normal operation.
 - Before changing user-global `mise` tools, verify the resolved binary path and install tree. `mise latest` can lag or differ because of release-age policy, so compare with the upstream registry when exact latest-version behavior matters.
 - Before committing a change to `apm.lock.yaml`, separate the intended dependency update from unrelated unpinned dependency drift. Report unrelated drift instead of hiding it inside the target dependency change.
@@ -275,7 +276,6 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
      `global-dependency`, `private`, or `manual` before installing;
      `global-catalog` is not an install lane — create the skill via
      Fast Path 2 instead
-   - if someone already ran a bare `apm install -g`, it did not save and restore the agmsg roster links; follow the agmsg State section of the checkout's `AGENTS.md`, diagnosing with `mise run doctor` before any restore
    - for repo-local dependencies, work in the target repository and use `apm install <package-ref>` or `apm install --mcp <name> ...`
    - for global changes, run `mise run check`, then roll out with section B; for repo-local changes, run that repository's defined APM or project checks
    - for repo-local changes, also confirm `targets:` includes every runtime the
