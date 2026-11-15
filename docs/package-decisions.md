@@ -96,10 +96,10 @@
 
 ## Aqua Voice MCP
 
-- Status: host-local user scope として採用（2026-11-15）
-- 設定: Claude Code のみ。`transport: http`、`https://api.aquavoice.com/mcp`。OAuth (DCR+PKCE) 認証はクライアント側の `/mcp` で処理されるため、API key や環境変数の設定は不要
-- 理由: 音声入力の辞書とカスタマイズ設定を管理する。Claude Code 専用のため global APM ではなく host-local で配置
-- 現在の配置: `mise bootstrap` の final hook が Claude の user-scope MCP へ冪等に登録する。APM は同名エントリを所有せず、`~/.claude.json` は生成先として扱う
+- Status: host-local user scope として採用（2026-11-15、Codex への追加は 2026-11-16）
+- 設定: Codex と Claude Code。`transport: http`、`https://api.aquavoice.com/mcp`。OAuth (DCR+PKCE) 認証はクライアント側の `/mcp` で処理されるため、API key や環境変数の設定は不要
+- 理由: 音声入力の辞書とカスタマイズ設定を管理する。Codex と Claude Code の両方で利用するため global APM ではなく host-local で配置
+- 現在の配置: `mise bootstrap` の final hook が Codex と Claude の user-scope MCP へ冪等に登録する。APM は同名エントリを所有せず、`~/.codex/config.toml` と `~/.claude.json` は生成先として扱う
 - 公式: https://aquavoice.com/mcp
 
 ## Jina Reader MCP

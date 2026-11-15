@@ -40,6 +40,12 @@ claude_1password_mcp_matches() {
     && printf '%s\n' "$mcp_details" | grep -Fq -- "Command: $expected_command"
 }
 
+codex_aqua_voice_mcp_matches() {
+  expected_url=$1
+  mcp_details=$(codex mcp get aqua-voice 2>/dev/null) || return 1
+  printf '%s\n' "$mcp_details" | grep -Fq -- "url: $expected_url"
+}
+
 claude_aqua_voice_mcp_matches() {
   expected_url=$1
   mcp_details=$(claude mcp get aqua-voice 2>/dev/null) || return 1
@@ -78,8 +84,17 @@ cmd_setup_host_mcp() {
     || fail "Claude 1Password MCP verification failed."
   workspace_log "Host-local 1Password MCP configuration is current."
 
-  # Aqua Voice MCP (Claude Code only, HTTP transport, OAuth via client)
+  # Aqua Voice MCP (HTTP transport, OAuth via client)
   aqua_voice_url="https://api.aquavoice.com/mcp"
+  if codex_aqua_voice_mcp_matches "$aqua_voice_url"; then
+    workspace_log "Codex Aqua Voice MCP is already configured: $aqua_voice_url"
+  else
+    if codex mcp get aqua-voice >/dev/null 2>&1; then
+      codex mcp remove aqua-voice
+    fi
+    codex mcp add --transport http aqua-voice "$aqua_voice_url"
+  fi
+
   if claude_aqua_voice_mcp_matches "$aqua_voice_url"; then
     workspace_log "Claude Aqua Voice MCP is already configured: $aqua_voice_url"
   else
@@ -89,6 +104,8 @@ cmd_setup_host_mcp() {
     claude mcp add --scope user --transport http aqua-voice "$aqua_voice_url"
   fi
 
+  codex_aqua_voice_mcp_matches "$aqua_voice_url" \
+    || fail "Codex Aqua Voice MCP verification failed."
   claude_aqua_voice_mcp_matches "$aqua_voice_url" \
     || fail "Claude Aqua Voice MCP verification failed."
   workspace_log "Host-local Aqua Voice MCP configuration is current."
