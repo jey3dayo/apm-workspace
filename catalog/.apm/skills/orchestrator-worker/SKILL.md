@@ -46,7 +46,7 @@ Reviewer 既定の範囲: cursor reviewer が既定になるのはユーザー�
 
 役を決める前に envelope を検証する。次のいずれかに当たったら `BLOCKED(task_id)` を返す（対話セッションならユーザーへ報告して停止）:
 
-- T3 Code（T3 MCP）経由で必須 field（`source_role` / `target_role` / `task_id` / `report_contract`）のいずれかが欠けている
+- T3 Code（T3 MCP）経由で必須 field のいずれかが欠けている。必須 field は `source_role`（送り手の役）、`target_role`（受け手に担わせる役）、`task_id`（以後の報告に載せる識別子）、`report_contract`（受け側が返す契約: `DONE` / `REVIEW` / `HANDOFF`）
 - `target_role` と `report_contract` が対応表に反する
 - どちらかの値が対応表に無い
 
@@ -124,7 +124,7 @@ Steward は人間が最初に話す相手。どの Steward が Orchestrator 機�
 
 人間が「執事で答えて」「アーキテクトへ」と明示したら、それが上記トリガーによる判定を上書きする。
 
-handoff は T3 Code（T3 MCP）経由で Architect pane へ送るか、その書式を添えて人間へ返す。実行中の session のモデル変更ではなく、逆方向（Architect から Steward）は定義しない。
+handoff は T3 Code（T3 MCP）経由で Architect pane へ送るか、人間へ返す。実行中の session のモデル変更ではなく、逆方向（Architect から Steward）は定義しない。
 
 ### agent / skill 定義側のモデル割り当て
 
