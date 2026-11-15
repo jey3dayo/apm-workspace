@@ -92,7 +92,7 @@ cmd_setup_host_mcp() {
     if codex mcp get aqua-voice >/dev/null 2>&1; then
       codex mcp remove aqua-voice
     fi
-    codex mcp add --transport http aqua-voice "$aqua_voice_url"
+    codex mcp add aqua-voice --url "$aqua_voice_url"
   fi
 
   if claude_aqua_voice_mcp_matches "$aqua_voice_url"; then
