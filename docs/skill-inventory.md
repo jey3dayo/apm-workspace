@@ -13,7 +13,7 @@
 | workspace 専用         | `.apm/skills/**`                     | この workspace 内の symlink bridge のみ                                                    | APM workspace 自身の運用手順                                       |
 | optional               | `optional-skills/<id>/**`            | 利用リポジトリで個別 ref を直接 install                                                    | 選択リポジトリだけのワークフロー                                   |
 | private                | `private-skills/.apm/skills/**`      | native 配布の対象外（consumer の `~/.apm/skills/` に置く）・この workspace では gitignored | マシンローカルの overlay（正本は private repo）                    |
-| manual                 | `manual-skills/.apm/skills/**`       | 手動配置                                                                                   | 通常レーンで壊れる upstream の受け皿（退役 upstream コピーを収容） |
+| manual                 | `manual-skills/.apm/skills/**`       | manual-skills package を native 配布                                                       | 通常レーンで壊れる upstream の受け皿（退役 upstream コピーを収容） |
 | repo-local             | 各リポジトリの `apm.yml`             | そのリポジトリのみ                                                                         | ランタイム・認証・ブラウザに結び付くもの                           |
 
 ## global の一覧

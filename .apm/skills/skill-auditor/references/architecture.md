@@ -28,15 +28,10 @@ Sub-agents are the right fit because:
 
 ### Batching Strategy
 
-When transcripts exceed what a single sub-agent can analyze effectively:
-
-1. Sort sessions by timestamp
-2. Split into batches (~30 sessions per batch as a guideline)
-3. Each routing-analyst sub-agent gets: full skill manifest + one batch
-4. Coordinator merges results: union of incidents, recalculate per-skill stats
-
-The coordinator manages batching, not the sub-agents. Sub-agents receive their
-data and produce their analysis.
+The coordinator groups sessions by the skills visible to each project, batches
+them, and merges the results. Each routing analyst receives the session indices
+and visible skill names for its batch. The batching procedure and prompt are in
+`SKILL.md` Step 4.
 
 ---
 
@@ -45,8 +40,12 @@ data and produce their analysis.
 ```
 SKILL.md (Coordinator)
   |
-  |-- Step 1-3: Data collection (scripts)
+  |-- Step 1: Set Up Workspace
+  |
+  |-- Step 2: Detect Project and Collect Transcripts
   |     collect_transcripts.py -> transcripts.json
+  |
+  |-- Step 3: Collect Skills
   |     collect_skills.py -> skill-manifest.json
   |
   |-- Step 4: Routing Audit (sub-agents, parallel)
@@ -63,7 +62,9 @@ SKILL.md (Coordinator)
   |     generate_report.py -> skill-audit-report.html
   |     open in browser
   |
-  |-- Step 8: Apply Patches (script, with user approval)
+  |-- Step 8: Update Health History
+  |
+  |-- Step 9: Apply Patches (script, with user approval)
   |     apply_patches.py -> changelog.md
 ```
 
@@ -76,23 +77,16 @@ Each sub-agent is spawned with:
 3. Paths to input data files
 4. Path for output JSON file
 
-The coordinator instructs the sub-agent to:
-
-```
-Read agents/routing-analyst.md for your analysis rubric.
-Read <workspace>/skill-manifest.json for skill definitions.
-Read <workspace>/transcripts-batch-N.json for session data.
-Write your analysis to <workspace>/batch-audit-N.json.
-```
+The routing-analyst prompt also supplies session indices, visible skill names,
+and explicit-only skill names. Use the prompt in `SKILL.md` Step 4.
 
 ---
 
 ## Workspace Structure
 
 ```
-<repo>/tmp/skill-audit/
+<workspace>/                       # Timestamped run directory
 ├── transcripts.json              # All parsed sessions
-├── transcripts-batch-*.json      # Per-batch session files (if batched)
 ├── skill-manifest.json           # Skill definitions + attention budget
 ├── batch-audit-*.json            # Per-batch routing audit results
 ├── audit-report.json             # Merged routing audit
@@ -102,9 +96,11 @@ Write your analysis to <workspace>/batch-audit-N.json.
 │   ├── skill-name.patch.json
 │   └── ...
 ├── skill-audit-report.html       # Interactive HTML report
-├── health-history.json           # Append-only audit history
 └── changelog.md                  # Applied changes log
 ```
+
+`health-history.json` is shared across runs in the parent
+`<repo>/tmp/skill-audit/` directory.
 
 ---
 

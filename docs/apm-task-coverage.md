@@ -2,12 +2,9 @@
 
 ## Operational Contract
 
-- The authoring checkout (`~/src/github.com/jey3dayo/apm-workspace`; "the checkout" below) is the day-to-day source of truth for APM catalog content, task wiring, and supporting docs. On the native HOME, `~/.apm` holds only the APM consumer state.
-- The real HOME is native. The sole rollout task is `mise run native:sync` (or `mise run native:sync -- --https` without SSH); its internal stages and direct rollback command are in section B of `docs/native-distribution.md`. `setup:mcp:host` also writes to HOME.
-- `~/.config` is reference-only for this workflow. It is not the operational source of truth.
-- The bold-heading formatter helper (`replace-bold-headings.ts`) is vendored into this repository at `scripts/replace-bold-headings.ts`; there is no operational exception under `~/.config` for it.
-- The global guide is the catalog instruction `catalog/.apm/instructions/ai-collaboration.instructions.md`. The migration stage inside `native:sync` runs `apm compile -g --clean`, which writes `~/.codex/AGENTS.md` and `~/.cursor/AGENTS.md` and never overwrites a root without the APM marker; Claude reads the guide as the native rule a user-scope install adds.
-- Codex skills deploy separately to `~/.agents/skills`; skill rollout verification must inspect the deployed `SKILL.md` there.
+- The authoring checkout owns task wiring and catalog sources; the root [`AGENTS.md`](../AGENTS.md) describes path ownership and the consumer state in `~/.apm`.
+- `mise run native:sync` is the sole rollout task. [`native-distribution.md`](native-distribution.md) owns its stages, delivery targets, and rollback. `setup:mcp:host` also writes to HOME.
+- The bold-heading formatter helper is vendored at `scripts/replace-bold-headings.ts`; it is not loaded from `~/.config`.
 
 ## Source Of Truth
 
@@ -20,6 +17,7 @@ Path-by-path ownership (catalog, optional-skills, workspace-only skills, lockfil
 | `mise bootstrap`                          | n/a      | n/a      | n/a      | n/a         | n/a      | Runs the hidden final hook that reconciles host-local MCP entries for Codex and Claude                                                                                           |
 | `mise run doctor` (hidden)                | 状態確認 | 状態確認 | 状態確認 | 状態確認    | 状態確認 | Runs workspace and learning-intake diagnostics sequentially; the first failure stops the task                                                                                    |
 | `mise run format`                         | 間接     | 間接     | 間接     | 間接        | 間接     | Formats workspace Markdown / TOML / YAML and may use the documented heading helper                                                                                               |
+| `mise run upgrade:deps`                   | n/a      | n/a      | n/a      | n/a         | n/a      | Lists dependency holds, then regenerates `apm.lock.yaml` with `apm lock`; `-- --dry-run` previews without regenerating it                                                        |
 | `mise run check`                          | ○        | ○        | ○        | ○           | ○        | Sole read-only gate: format checks, all linters, offline action-lock verification, both validation tasks directly, and the full Bats suite                                       |
 | `mise run test:sh` (hidden)               | n/a      | n/a      | n/a      | n/a         | n/a      | Runs the full Bats script suite; also a focused subtask of `check`. `APM_TEST_PARALLEL=0` forces serial execution (CI sets this)                                                 |
 | `mise run format:check` (hidden)          | 間接     | 間接     | 間接     | 間接        | 間接     | Checks workspace Markdown / TOML / YAML formatting without rewriting files; part of `check`                                                                                      |
@@ -34,7 +32,7 @@ Path-by-path ownership (catalog, optional-skills, workspace-only skills, lockfil
 
 ## Task Visibility
 
-The workspace-local public `mise tasks` list is `check`, `format`, and `native:sync`. Hidden tasks remain directly runnable by name:
+The workspace-local public `mise tasks` list is `check`, `format`, `native:sync`, and `upgrade:deps`. Hidden tasks remain directly runnable by name:
 
 - check parts: `format:check`, `test:sh`, `lint:yaml`, `lint:actions`, `actions-lock:verify`, `lint:frontmatter`, `lint:catalog-leaks`, `validate:workspace`, `validate:catalog`; format subtasks: `format:markdown`, `format:markdown:check`, `format:markdown:bold-headings`, `format:markdown:bold-headings:check`, `format:toml`, `format:toml:check`, `format:yaml`, `format:yaml:check`
 - diagnostic: `doctor` runs workspace and learning-intake checks in sequence.

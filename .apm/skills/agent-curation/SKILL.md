@@ -39,7 +39,7 @@ First test whether the upstream is an APM-valid package. If it is not, curate se
    - Keep this registry as the exploration index; do not put non-agent notes in `catalog/.apm/agents/`.
 
 6. Validate the affected delivery surface.
-   - If `catalog/.apm/agents` changed, run `mise run check`, roll out with section B of `docs/native-distribution.md`, and verify the curated agent in its runtime targets.
+   - If `catalog/.apm/agents` changed, run `mise run check` before the PR. After the PR is merged, roll out the merged commit with section B of `docs/native-distribution.md` and verify the curated agent in its runtime targets.
    - If only this workspace-only skill or its registry changed, run `mise run check`; verify both local bridge entries resolve to `.apm/skills/agent-curation/`.
 
 ## Refresh Rules
@@ -55,7 +55,7 @@ First test whether the upstream is an APM-valid package. If it is not, curate se
 - Changed files.
 - Upstream repository, commit, source path, and license for each hired agent.
 - Validation commands with exit status.
-- Curated-agent deployment target checks when agents changed; otherwise, local bridge checks for this workspace-only skill.
+- Curated-agent deployment target checks after rollout, or the rollout status if still pending; otherwise, local bridge checks for this workspace-only skill.
 
 ## References
 

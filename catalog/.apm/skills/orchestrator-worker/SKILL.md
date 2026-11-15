@@ -30,7 +30,7 @@ description: >-
 
 「Orchestrator」は役ではなく機能。Steward / Architect のうち、後述の許可条件を満たす側が担う。
 
-#### 制約
+### 制約
 
 - opencode は Worker 専用（implement 以外の役には就けない）
 - cursor は Worker と Reviewer の両方に就けるが、Steward / Architect には就けない（Orchestrator 機能を担えない）
@@ -175,7 +175,6 @@ verdict は、経路によらず次の共通条件をすべて満たした場合
   - 起動側が `codex --version` と起動引数をログに残し、使用中 version の公式文書・help で上の flag の対応を確認する。`codex --disable hooks --disable plugins --disable apps features list` で3つが false であること、起動引数に全 flag が揃うこと、ログに MCP・子 agent の実行がなく正常終了していることを確かめる
   - sandbox や迂回経路の制約に影響する起動設定を変更した場合、または書込み成功・無効化した経路の実行など境界異常の具体的な証拠がある場合だけ、当該経路の verdict 受理を保留し、原因を確認して境界を再検証する。version 更新やログ形式変更だけでは再計測を必須にしない
   - verdict は最後の行の `VERDICT: APPROVE` か `VERDICT: REQUEST_CHANGES`。blocking 指摘が1件でもあれば REQUEST_CHANGES とする
-- `agmsg-delegation` の review 経路: 同 skill の「7. 報告を受けて検証する」の review 受理条件（`review_mode: verdict` と起動前の強制境界の証拠を含む）をすべて満たし、verdict は同 skill の形式に従う
 
 境界の診断には `scripts/measure-readonly-sandbox.py` を使える。
 

@@ -11,11 +11,22 @@ surface. The `apm` CLI is pinned by `mise`.
   verification requirements.
 - [`todo.txt`](todo.txt): unfinished work managed with tuxedo; [`done.txt`](done.txt)
   archives completed internal tasks.
-- [`docs/skill-inventory.md`](docs/skill-inventory.md): canonical skill-lane
-  inventory and placement decisions.
-- [`docs/skill-overlaps.md`](docs/skill-overlaps.md): which skill to use when roles
-  overlap, and the competing skills still under evaluation.
-- [`docs/apm-task-coverage.md`](docs/apm-task-coverage.md): task ownership.
+- [`docs/skill-inventory.md`](docs/skill-inventory.md): skill lanes and placement.
+- [`docs/skill-overlaps.md`](docs/skill-overlaps.md): overlapping skill roles and
+  combinations under evaluation.
+- [`docs/apm-task-coverage.md`](docs/apm-task-coverage.md): task responsibilities
+  and visibility.
+- [`docs/native-distribution.md`](docs/native-distribution.md): rollout, manual
+  boundaries, and recovery.
+- [`docs/saas-connectors.md`](docs/saas-connectors.md): SaaS connection placement.
+- [`docs/agents-provenance.md`](docs/agents-provenance.md): curated agent sources
+  and distribution.
+- [`docs/diagrams/agent-delegation.md`](docs/diagrams/agent-delegation.md):
+  delegation diagrams and their verification status.
+- [`docs/package-decisions.md`](docs/package-decisions.md): package and lane
+  decision history.
+- [`docs/learning-ledger.md`](docs/learning-ledger.md): learning outcomes and
+  follow-up measurements.
 
 ## Skill Lanes
 
@@ -56,11 +67,15 @@ for rollout and recovery details. Verify a Codex skill rollout by checking
 ## External Checkout Changes
 
 1. Edit, verify, commit, and push the upstream checkout.
-2. Updating the SHA pin remains unresolved: validation requires a matching
-   `apm.lock.yaml`, but no task updates it. See the open item in
-   [`docs/package-decisions.md`](docs/package-decisions.md) before proceeding.
-3. Once the pin and lock are consistent, verify, commit, and push the change.
-4. Roll out with `mise run native:sync` and verify the deployed skill. See
+2. Check `docs/dependency-holds.txt`, update the SHA pin in `apm.yml`, and run
+   `mise run upgrade:deps` to regenerate `apm.lock.yaml`. The task lists holds;
+   it does not select or exclude packages. Use `mise run upgrade:deps -- --dry-run`
+   to preview the command without regenerating the lock.
+3. Review the lock diff and run `mise run validate:workspace` to check pins and
+   holds. Lock regeneration can also change unrelated version metadata; see the
+   open `upgrade:deps` item in [`todo.txt`](todo.txt).
+4. Verify, commit, and push the change through a PR. After merge, roll out with
+   `mise run native:sync` and verify the deployed skill. See
    [`docs/native-distribution.md`](docs/native-distribution.md) for details and rollback.
 
 Adding or removing an external dependency also requires a decision record in
