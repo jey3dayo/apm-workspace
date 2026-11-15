@@ -94,6 +94,14 @@
 - 再検討するなら: APM が MCP エントリ単位の OS / capability 条件を正式サポートした時点で、
   host-local 配置からの再統合を検討する。
 
+## Aqua Voice MCP
+
+- Status: host-local user scope として採用（2026-11-15）
+- 設定: Claude Code のみ。`transport: http`、`https://api.aquavoice.com/mcp`。OAuth (DCR+PKCE) 認証はクライアント側の `/mcp` で処理されるため、API key や環境変数の設定は不要
+- 理由: 音声入力の辞書とカスタマイズ設定を管理する。Claude Code 専用のため global APM ではなく host-local で配置
+- 現在の配置: `mise bootstrap` の final hook が Claude の user-scope MCP へ冪等に登録する。APM は同名エントリを所有せず、`~/.claude.json` は生成先として扱う
+- 公式: https://aquavoice.com/mcp
+
 ## Jina Reader MCP
 
 - Status: global APM から撤去（2026-09-28）。
