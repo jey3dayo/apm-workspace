@@ -114,13 +114,13 @@ permission や PreToolUse hook のポリシーで拒否されたコマンドは�
 
 コマンド仕様は各スキル / ツール側が正本。
 
-| 目的                                                                                   | 推奨                                                      |
-| -------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| ユーザーの画面を共有しながらの操作（クリック・フォーム入力・スクショ・コンソール確認） | `claude-in-chrome` または Codex Chrome アドオン           |
-| 成果物やページをターミナルペインでユーザーの隣に出す・そのまま触ってもらう             | `terminal-browser`（kitty graphics 対応ターミナル必須）   |
-| エージェント側で完結するヘッドレス自動化・スクレイピング・反復検証                     | `browser-harness`                                         |
-| Lighthouse・パフォーマンストレース・ヒープスナップショットなど DevTools 固有分析       | `chrome-devtools`（必要な repo だけに repo-local で追加） |
-| ログイン済みサイトの読み取り・API 証拠の採取（アダプタがある／無いページ）             | `opencli-usage` → `opencli-browser`                       |
+| 目的                                                                                                                             | 推奨                                                                       |
+| -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| ユーザーの画面を共有しながらの操作（クリック・フォーム入力・スクショ・コンソール確認）                                           | `claude-in-chrome` または Codex Chrome アドオン                            |
+| 成果物やページをターミナルペインでユーザーの隣に出す・そのまま触ってもらう                                                       | `terminal-browser`（kitty graphics 対応ターミナル必須）                    |
+| エージェント側で完結するヘッドレス自動化・スクレイピング・反復検証                                                               | `browser-harness`                                                          |
+| Lighthouse・パフォーマンストレース・ヒープスナップショットなど DevTools 固有分析・自分の開発中 repo をログイン済み Chrome で検証 | `chrome-devtools`（global 配布、`--autoConnect` で実行中の Chrome に接続） |
+| ログイン済みサイトの読み取り・API 証拠の採取（アダプタがある／無いページ）                                                       | `opencli-usage` → `opencli-browser`                                        |
 
 ## ファイル操作原則
 
@@ -139,7 +139,7 @@ permission や PreToolUse hook のポリシーで拒否されたコマンドは�
 global MCP はリポジトリをまたいで常時使う基盤だけに限定し、それ以外は repo-local または on-demand にする。global の実体は root `apm.yml` の `mcp:` が source of truth で、固定リストはどこにも持たない。
 
 - MCP 設定を永続変更する前に `apm-usage` の MCP ownership gate を通す。SaaS 接続の優先順（アプリ側コネクタ > `apm.yml` > skill）と理由は APM workspace の checkout の `docs/saas-connectors.md` が正本
-- MCP として repo-local 追加が必要なブラウザ系は `chrome-devtools` のみ（使い分けは上の「ブラウザ操作の選択」表）。デスクトップ / OS レベルのスクリーンショットは `screenshot` スキル
+- ブラウザ系 MCP: `chrome-devtools` は root `apm.yml` から global 配布（`--autoConnect` で実行中のログイン済み Chrome に接続）。使い分けは上の「ブラウザ操作の選択」表を参照。デスクトップ / OS レベルのスクリーンショットは `screenshot` スキル
 
 ## Git コミット規約
 
