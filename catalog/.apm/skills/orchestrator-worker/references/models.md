@@ -46,7 +46,7 @@
 
 ## モデルを更改するとき
 
-agmsg-delegation helper の allowlist を更新するときは、各 provider のモデル一覧と照合する。Codex は `fetched_at` 付きのローカル一覧を確認する。同系列の新しい版がある場合は、価格帯が変わる場合を除き helper の allowlist と tier 表を更新する。廃止予定または一覧から外れたモデルは後継へ切り替える。
+helper の allowlist を更新するときは、各 provider のモデル一覧と照合する。Codex は `fetched_at` 付きのローカル一覧を確認する。同系列の新しい版がある場合は、価格帯が変わる場合を除き helper の allowlist と tier 表を更新する。廃止予定または一覧から外れたモデルは後継へ切り替える。
 
 tier 表と helper の allowlist の一致は、各 helper の bats テスト（`script allowlist matches the orchestrator-worker tier table`）が見る。表だけ、または helper だけを書き換えるとテストが落ちる。
 
