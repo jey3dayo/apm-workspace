@@ -222,7 +222,7 @@ Move them aside or make them plain directories and files of this HOME."
   save_untouched "$home" "$MIGRATE_STAMP"
   install_manifest "$home" "$manifest"
   migrate_roots "$home" "$MIGRATE_STAMP"
-  run_apm_install_real "$home"
+  run_apm_install "$home"
   run_apm "$home" compile -g --clean
   reinstate_entries "$home" "$MIGRATE_STAMP" "$home/.apm/native-migrate-$MIGRATE_STAMP." "$rehearsal_dir/pristine-entries.txt"
   assert_dropped_as_rehearsed "$home" "$MIGRATE_STAMP" "$rehearsal_dir"

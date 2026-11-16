@@ -81,21 +81,27 @@
 - 配布先: 今回は commit / push まで。実環境への deploy は未実施。
 - 再検討するなら: スキル配布の具体的な利用が必要になったとき。
 
-## MCP 配布方針（2026-11-16 更新）
+## 1Password MCP
 
-- Status: APM の公式ベストプラクティスに従い、`apm.yml` の `dependencies.mcp` で管理（2026-11-16）
-- 配布方式: `apm install -g` が manifest の `targets:` に従って Claude Code と Codex へ自動配布
-- 例外: **1Password MCP のみ** `scripts/lib/host-mcp.sh` で個別管理
-  - 理由: コマンドパスが OS ごとに異なる（macOS: `/Applications/1Password.app/...`、Linux: `/opt/1Password/...`、WSL: Windows App Execution Alias）
-  - APM の単一 manifest では OS 条件分岐を表現できないため、ホスト側で解決
+- Status: global APM から撤去・host-local user scope へ移管（2026-07-22）
+- 理由: 1Password デスクトップアプリとローカル承認 UI に依存し、macOS、native Linux、
+  WSL で実行コマンドが異なる。共有 `apm.yml` の macOS 絶対パスを WSL に配布すると
+  MCP startup error になるため、ポータブルな global MCP と分離する。
+- 現在の配置: `mise bootstrap` の final hook がホスト上の MCP コマンドを解決し、Codex / Claude
+  の user-scope MCP を冪等に同期する。native 環境では `onepassword-mcp` / `1password-mcp`、
+  WSL では Windows App Execution Alias の `1password-mcp.exe` を利用する。APM は同名エントリを
+  所有せず、`~/.codex/config.toml` と `~/.claude.json` は生成先として扱う。
+- 再検討するなら: APM が MCP エントリ単位の OS / capability 条件を正式サポートした時点で、
+  host-local 配置からの再統合を検討する。
+
+## MCP 配布方針（2026-11-16）
+
+- Status: APM の公式ベストプラクティスに従い、`apm.yml` の `dependencies.mcp` で管理
+- 配布方式: `mise run native:sync` の migrate 後に `apm install -g --only mcp` で配布
+- 例外: 1Password MCP は `scripts/lib/host-mcp.sh` で個別管理（OS 依存のコマンドパスのため）
 - 出典: https://github.com/microsoft/apm/blob/v0.35.1/docs/src/content/docs/producer/author-primitives/mcp-as-primitive.md
-
-## 現在配布中の MCP サーバー
-
-- **context7** (stdio): ライブラリドキュメント検索
-- **parallel** (HTTP): 一般 Web の検索・取得
-- **linear** (HTTP): Linear 操作と ops ルール（`catalog/.apm/skills/linear-task-ops` が補完）
-- **aqua-voice** (HTTP, OAuth): 音声入力の辞書とカスタマイズ設定（2026-11-16 に apm.yml へ移行）
+- 現在配布中: context7 (stdio), parallel (HTTP), linear (HTTP), aqua-voice (HTTP/OAuth)
+- 公式 (aqua-voice): https://aquavoice.com/mcp
 
 ## Jina Reader MCP
 
