@@ -94,13 +94,14 @@
 - 再検討するなら: APM が MCP エントリ単位の OS / capability 条件を正式サポートした時点で、
   host-local 配置からの再統合を検討する。
 
-## Aqua Voice MCP
+## MCP 配布方針（2026-11-16）
 
-- Status: host-local user scope として採用（2026-11-15、Codex への追加は 2026-11-16）
-- 設定: Codex と Claude Code。`transport: http`、`https://api.aquavoice.com/mcp`。OAuth (DCR+PKCE) 認証はクライアント側の `/mcp` で処理されるため、API key や環境変数の設定は不要
-- 理由: 音声入力の辞書とカスタマイズ設定を管理する。Codex と Claude Code の両方で利用するため global APM ではなく host-local で配置
-- 現在の配置: `mise bootstrap` の final hook が Codex と Claude の user-scope MCP へ冪等に登録する。APM は同名エントリを所有せず、`~/.codex/config.toml` と `~/.claude.json` は生成先として扱う
-- 公式: https://aquavoice.com/mcp
+- Status: APM の公式ベストプラクティスに従い、`apm.yml` の `dependencies.mcp` で管理
+- 配布方式: `mise run native:sync` の migrate 後に `apm install -g --only mcp` で配布
+- 例外: 1Password MCP は `scripts/lib/host-mcp.sh` で個別管理（OS 依存のコマンドパスのため）
+- 出典: https://github.com/microsoft/apm/blob/v0.35.1/docs/src/content/docs/producer/author-primitives/mcp-as-primitive.md
+- 現在配布中: context7 (stdio), parallel (HTTP), linear (HTTP), aqua-voice (HTTP/OAuth)
+- 公式 (aqua-voice): https://aquavoice.com/mcp
 
 ## Jina Reader MCP
 

@@ -42,7 +42,8 @@ EXTERNAL_PACKAGE_MAP="nanaism/yomiyasu/skills/yomiyasu=nanaism/yomiyasu:yomiyasu
 # Files whose content a migrate must leave byte for byte alone.
 MIGRATE_UNTOUCHED_FILES=".codex/config.toml .claude/settings.json"
 # Non-secret paths migration can change; backup copies them and rehearsal reproduces them in a scratch HOME. Tool configs
-# that may hold credentials (~/.codex/config.toml, MCP configs) are not here, which is why installation uses --only apm.
+# that may hold credentials (~/.codex/config.toml, MCP configs) are not in BACKUP_PATHS. Migrate uses --only apm;
+# MCP distribution runs as a separate stage after migrate with its own backups.
 BACKUP_PATHS=".apm/apm.yml .apm/config.json .apm/apm.lock.yaml .apm/deployment-receipts .claude/skills .claude/agents .claude/rules .claude/commands .claude/CLAUDE.md
 .codex/AGENTS.md .codex/rules .cursor/agents .cursor/rules .cursor/AGENTS.md .agents/skills AGENTS.md .config/opencode/AGENTS.md"
 

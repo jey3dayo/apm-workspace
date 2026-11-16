@@ -96,6 +96,11 @@ dependencies:
       registry: false
       transport: http
       url: https://mcp.linear.app/mcp
+    # Voice input dictionary and customization settings (HTTP transport, OAuth via client)
+    - name: aqua-voice
+      registry: false
+      transport: http
+      url: https://api.aquavoice.com/mcp
 scripts: {}
 executables:
   allow:

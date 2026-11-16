@@ -295,6 +295,7 @@ cmd_sync() (
   stamp="$(sync_migrate_stamp)" || fail "migrate did not print one valid recorded stamp; inspect $SYNC_RUN/migrate.log"
   sync_review_entries "$SYNC_HOME/.apm/native-migrate-$stamp.dropped.txt" "$SYNC_ALLOW_DROP" drop
   sync_review_entries "$SYNC_HOME/.apm/native-migrate-$stamp.skipped.txt" "$SYNC_ALLOW_SKIP" skip
+  sync_stage mcp-distribution run_apm_mcp_distribution "$SYNC_HOME"
   sync_stage opencode sync_workspace sync:opencode
   sync_stage doctor sync_workspace doctor
   sync_stage doctor-intake sync_workspace doctor-intake

@@ -111,8 +111,24 @@ assert_ssh_safe_home() {
 }
 
 # --trust-bin always, so a piped rehearse and a terminal migrate behave alike; allowExecutables limits which packages get bin/.
+# --only apm skips MCP integration to avoid touching credential-bearing configs during migrate.
 run_apm_install() {
   run_apm "$1" install -g --only apm --trust-bin
+}
+
+# MCP-only distribution after migrate succeeds. Backs up credential-bearing configs before writing.
+run_apm_mcp_distribution() {
+  local home="$1" backup_suffix timestamp config
+  timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
+  backup_suffix=".pre-apm-mcp-$timestamp"
+  for config in .codex/config.toml .claude.json; do
+    if [ -f "$home/$config" ] && [ ! -L "$home/$config" ]; then
+      cp -p "$home/$config" "$home/$config$backup_suffix"
+      chmod 600 "$home/$config$backup_suffix"
+      log "backed up $config to $config$backup_suffix"
+    fi
+  done
+  run_apm "$home" install -g --only mcp --trust-bin
 }
 
 run_apm() {
