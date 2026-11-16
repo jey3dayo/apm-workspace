@@ -111,8 +111,14 @@ assert_ssh_safe_home() {
 }
 
 # --trust-bin always, so a piped rehearse and a terminal migrate behave alike; allowExecutables limits which packages get bin/.
+# Rehearsal: --only apm skips MCP integration to avoid touching credential-bearing configs.
 run_apm_install() {
   run_apm "$1" install -g --only apm --trust-bin
+}
+
+# Real install: distributes both APM packages and MCP servers per manifest targets.
+run_apm_install_real() {
+  run_apm "$1" install -g --trust-bin
 }
 
 run_apm() {
