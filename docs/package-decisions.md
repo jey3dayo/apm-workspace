@@ -100,7 +100,7 @@
 - 配布方式: `mise run native:sync` の migrate 後に `apm install -g --only mcp` で配布
 - 例外: 1Password MCP は `scripts/lib/host-mcp.sh` で個別管理（OS 依存のコマンドパスのため）
 - 出典: https://github.com/microsoft/apm/blob/v0.35.1/docs/src/content/docs/producer/author-primitives/mcp-as-primitive.md
-- 現在配布中: context7 (stdio), parallel (HTTP), linear (HTTP), aqua-voice (HTTP/OAuth)
+- 現在配布中: context7 (stdio), chrome-devtools (stdio), parallel (HTTP), linear (HTTP), aqua-voice (HTTP/OAuth)
 - 公式 (aqua-voice): https://aquavoice.com/mcp
 
 ## Jina Reader MCP

@@ -86,6 +86,14 @@ dependencies:
       args:
         - -y
         - "@upstash/context7-mcp@latest"
+    - name: chrome-devtools
+      registry: false
+      transport: stdio
+      command: npx
+      args:
+        - -y
+        - "chrome-devtools-mcp@latest"
+        - "--autoConnect"
     # Web search, fetch, and research for general verification and up-to-date information (Context7 covers library docs)
     - name: parallel
       registry: false
