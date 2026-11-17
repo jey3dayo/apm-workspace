@@ -10,9 +10,9 @@ skill for the APM workspace's root `apm.yml`, global lockfiles, and global deplo
 - Keep web/common coding skills global when they match the user's normal day-to-day work.
   - Do not add React, Next.js, TypeScript, UI review, or general frontend best-practice skills to repo-local `apm.yml` by default.
 - Treat browser MCPs separately from web skills.
-  - Do not add `chrome-devtools` just because the repository is a web app.
+  - `chrome-devtools` is already distributed globally.
   - Prefer `claude-in-chrome` or the Codex Chrome addon first for ordinary browser operation (click, form input, screenshot, console check) when available and sufficient.
-  - Add `chrome-devtools` repo-local or on-demand only when the repository needs DevTools-specific depth (Lighthouse audit, performance trace, heap snapshot), project login/session state, local runtime coupling, or repeatable browser verification beyond what `claude-in-chrome`/Codex addon covers.
+  - Use globally distributed `chrome-devtools` for DevTools-specific depth (Lighthouse audit, performance trace, heap snapshot) or repeatable browser verification beyond what `claude-in-chrome`/Codex addon covers.
 - Prefer repo-local dependencies for narrower, runtime-specific, infra-specific, presentation-specific, or credential-scoped tools.
   - Terraform skills belong near repositories that actually own Terraform modules, environments, or `.tftest.hcl` tests.
   - Tauri tools belong near repositories that actually own `src-tauri`.
