@@ -160,8 +160,9 @@ codex exec --ephemeral --ignore-user-config --ignore-rules \
 - `--disable hooks` / `plugins` / `apps` と `-c 'mcp_servers={}'`: 既定で有効な hook・plugin・apps を止め、MCP サーバを空にする
 - `--ignore-rules`: sandbox 外の実行を許す execpolicy の `.rules` を読まない
 - `--ephemeral`: セッションを残さない
+- 対象が git 管理外のときは `--skip-git-repo-check` を足す。足さないと `codex exec` が起動を拒否し、exit code が 0 のまま `turn.completed` が出ないことがあるため、成否は exit code でなくログの `turn.completed` と verdict 行で判定する。git 管理外の対象は受理条件の SHA・checksum 固定を満たせないため、結果は advisory として扱い、出荷工程の通過根拠にしない
 
-prompt には固定したレビュー対象（適用元 `HEAD` の SHA と diff ファイルの絶対パス・checksum）を書き、その diff ファイルだけをレビュー対象にすること、読んだ diff ファイルの checksum と `HEAD` の SHA を報告に書くことを指示する。diff ファイルは、その経路の強制境界が reviewer の書込みを拒否するパスに置く。`codex exec` 経路では prompt・diff・ログを対象 repo の外に置く。
+prompt には固定したレビュー対象（適用元 `HEAD` の SHA と diff ファイルの絶対パス・checksum）を書き、その diff ファイルだけをレビュー対象にすること、読んだ diff ファイルの checksum と `HEAD` の SHA を報告に書くことを指示する。diff ファイルは、その経路の強制境界が reviewer の書込みを拒否するパスに置く。`codex exec` 経路では prompt・ログは対象 repo の外に置くが、diff ファイルは read-only の reviewer が読めるよう対象 worktree 内の未追跡パス（例: `tmp/review/`）に置く。その場合、diff ファイルを開始時の `git status` の対象に含めて前後比較し、レビュー終了後に削除する。
 
 verdict は、経路によらず次の共通条件をすべて満たした場合だけ受理する:
 
@@ -223,7 +224,7 @@ Reviewer は組み込みの subagent（Claude は Agent tool、Codex は `spawn_
 
 assert が業務契約なのか実装詳細なのかは Orchestrator が判断する。テストを機械的に新実装へ合わせさせない。
 
-「検証コマンド」は、そのタスク単体で通す focused gate と、Orchestrator が横断で回す統合 gate を区別して渡す。隔離 worktree には gitignore 済みの `private-skills` なども無い。実ツリーでの配布確認は統合 gate に入れ、Orchestrator が主ツリーで回す。共通の境界を変えるタスクは、focused gate にその境界を縛る architecture / boundary テストを含める。検証コマンドは、先に repo の `mise` task と CI の定義から実コマンドを確認して写す。独自のフラグを足すときは理由を書き、その失敗は repo の gate との差として扱う。worktree の Worker には、検証コマンドごとに実 cwd が指定した worktree だと分かる出力を報告へ含めさせる。
+「検証コマンド」は、そのタスク単体で通す focused gate と、Orchestrator が横断で回す統合 gate を区別して渡す。隔離 worktree には gitignore 済みの `private-skills` なども無い。実ツリーでの配布確認は統合 gate に入れ、Orchestrator が主ツリーで回す。Worker へ検証コマンドを指定する前に、そのコマンドが nested sandbox（`sandbox-exec` を使う bats 等）を含むかを確認し、Worker の隔離内では実行できない検証は Worker に割り当てず、Orchestrator が主ツリーで最後にまとめて1回だけ回す統合 gate へ寄せる。sandbox を理由とする承認を、修正ループのたびに繰り返し求めない。共通の境界を変えるタスクは、focused gate にその境界を縛る architecture / boundary テストを含める。検証コマンドは、先に repo の `mise` task と CI の定義から実コマンドを確認して写す。独自のフラグを足すときは理由を書き、その失敗は repo の gate との差として扱う。worktree の Worker には、検証コマンドごとに実 cwd が指定した worktree だと分かる出力を報告へ含めさせる。
 
 回帰修正で修正前の失敗を証明する場合は、共有 checkout を切り替えずに[固定SHA fixtureを隔離](references/regression-fixtures.md)する。
 
