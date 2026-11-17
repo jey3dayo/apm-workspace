@@ -92,8 +92,8 @@ dependencies:
       command: npx
       args:
         - -y
-        - "chrome-devtools-mcp@latest"
-        - "--autoConnect"
+        - "chrome-devtools-mcp@1.13.0"
+        - "--ignoreDefaultChromeArg=--disable-extensions"
     # Web search, fetch, and research for general verification and up-to-date information (Context7 covers library docs)
     - name: parallel
       registry: false
