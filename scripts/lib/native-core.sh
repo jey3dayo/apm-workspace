@@ -212,11 +212,11 @@ assert_no_home_manifest() {
 }
 
 # apm reads ~/.apm/config.json with json.load and takes temp_dir and other locations from it. Decode it the same way
-# and allow only default_client and prefer_ssh, which move no write location.
+# and allow only default_client, prefer_ssh, and executables, which move no write location.
 assert_default_apm_config() {
   local config="$1/.apm/config.json" extra
   [ -e "$config" ] || return 0
-  extra="$(python3 -c 'import json, sys; print(" ".join(sorted(set(json.load(open(sys.argv[1], encoding="utf-8"))) - {"default_client", "prefer_ssh"})))' "$config")" ||
+  extra="$(python3 -c 'import json, sys; print(" ".join(sorted(set(json.load(open(sys.argv[1], encoding="utf-8"))) - {"default_client", "prefer_ssh", "executables"})))' "$config")" ||
     fail "$config is not a JSON object apm could read"
-  [ -z "$extra" ] || fail "$config sets $extra; only default_client and prefer_ssh may be set there"
+  [ -z "$extra" ] || fail "$config sets $extra; only default_client, prefer_ssh, and executables may be set there"
 }
