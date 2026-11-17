@@ -90,17 +90,33 @@ APM は Codex CLI 0.163.0 だけを受け付ける（`apm_cli/codex_plugins/clie
 
 ### bin/ の許可（`allowExecutables`）
 
-APM 0.35.0 は、非対話の install で信頼していない package の `bin/` を配らない。root `apm.yml` の `executables.allow` を正本とし、render は通常配布のときだけ APM の user scope で読まれる `allowExecutables` に変換する。トップレベルのキーは引用なしの通常形式に限り、未掲載の package、重複、`bin: true` 以外は拒否する。現在の承認は次のとおり。
+APM 0.35.0 は、非対話の install で信頼していない package の `bin/` を配らない。root `apm.yml` の `executables.allow` を正本とし、render は通常配布のときだけ APM の user scope で読まれる `allowExecutables` に変換する。トップレベルのキーは引用なしの通常形式に限り、未掲載の package、重複、`bin: true` または `mcp: true` 以外は拒否する。現在の承認は次のとおり。
 
 ```yaml
 allowExecutables:
   github.com/ibelick/ui-skills:
     bin: true
+  github.com/mattpocock/skills:
+    bin: true
+  github.com/nanaism/yomiyasu/skills/yomiyasu:
+    bin: true
+  github.com/nextlevelbuilder/ui-ux-pro-max-skill:
+    bin: true
   github.com/tt-a1i/archify/archify:
     bin: true
+  aqua-voice:
+    mcp: true
+  chrome-devtools:
+    mcp: true
+  context7:
+    mcp: true
+  linear:
+    mcp: true
+  parallel:
+    mcp: true
 ```
 
-- この 3 つの `bin/` は必須であり、承認だけが欠けた場合は render が失敗する。変更するときは `scripts/lib/native-manifest.sh` の必須項目も更新する。hooks・MCP・LSP・canvas は承認しない。`--workspace-only` では外部 package の承認を出力しない
+- package の `bin/` は必須であり、承認だけが欠けた場合は render が失敗する。変更するときは `scripts/lib/native-manifest.sh` の必須項目も更新する。MCP server は root `apm.yml` で宣言されているものを承認する。hooks・LSP・canvas は承認しない。`--workspace-only` では外部 package の承認を出力しない
 - `allowExecutables` は APM では deprecated の旧名。user scope の APM は `<HOME>/apm.yml` の `executables:` を読むが、`<HOME>/.apm/apm.yml` の `executables:` は読まず、旧名の `allowExecutables:` だけを読む（`install/template.py` の `_effective_allow`、`models/apm_package.py` の `parse_allow_executables`）。そのため新しい名前では書けない。`apm approve --user` は `config.json` に書いて `assert_default_apm_config` に止められるので使わない。対話の端末で `apm install` が出す `Trust <package>? [y/N]` に y と答えても、同じ `~/.apm/config.json` の `executables` に保存され、次の `native:sync` は `rehearse` の guard（`sets executables`）で止まる（前回の実行ログと config.json の更新時刻で観測）。y と答えず、承認は `apm.yml` に書く。`native:*` の中の `apm` は `run_apm` が `APM_NON_INTERACTIVE=1` を固定で渡して動くので、質問は出ず警告だけで続行する（`install/phases/integrate.py`）。素の `apm install -g` を手で叩くと質問が出て、y が `config.json` に保存される。止まったときは `config.json` を複写してから `executables` のキーだけ外す
 - 許可のキーは `github.com/<owner>/<repo>[/<path>]`。APM は依存を `str(dep_ref)`（`github.com/<repo>#<ref>`）で引き、`#<ref>` を外した形で照合する（`install/exec_gate.py` の `resolve_package_key`、`security/executables.py` の `_map_grants`）
 - このブロックを書くと APM の executable のゲートが有効になり、許可していない package の hooks・MCP・LSP・canvas も default-deny になる。install の末尾に `executable primitives parked pending approval` という警告が出るのはこのため。`~/.apm/apm.lock.yaml` の `exec_status` に `gated_pending_approval` と残る。該当するファイルがあれば rehearse の `lost` に出る
