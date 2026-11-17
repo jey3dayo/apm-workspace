@@ -98,7 +98,7 @@ allowExecutables:
     bin: true
   github.com/mattpocock/skills:
     bin: true
-  github.com/nanaism/yomiyasu/skills/yomiyasu:
+  github.com/nanaism/yomiyasu:
     bin: true
   github.com/nextlevelbuilder/ui-ux-pro-max-skill:
     bin: true
@@ -116,6 +116,7 @@ allowExecutables:
     mcp: true
 ```
 
+- render は `EXTERNAL_PACKAGE_MAP` にある package（`nanaism/yomiyasu/skills/yomiyasu`）を、`allowExecutables` へ出力する際に構造化した repo の identity（`github.com/nanaism/yomiyasu`）へ変換する。APM 0.35.1 が依存から計算する承認キーと一致させるため
 - package の `bin/` は必須であり、承認だけが欠けた場合は render が失敗する。変更するときは `scripts/lib/native-manifest.sh` の必須項目も更新する。MCP server は root `apm.yml` で宣言されているものを承認する。hooks・LSP・canvas は承認しない。`--workspace-only` では外部 package の承認を出力しない
 - `allowExecutables` は APM では deprecated の旧名。user scope の APM は `<HOME>/apm.yml` の `executables:` を読むが、`<HOME>/.apm/apm.yml` の `executables:` は読まず、旧名の `allowExecutables:` だけを読む（`install/template.py` の `_effective_allow`、`models/apm_package.py` の `parse_allow_executables`）。そのため新しい名前では書けない。配布用の必須分は `apm.yml` の `allowExecutables` に書く。個人環境での追加承認は `apm approve --user` で `~/.apm/config.json` の `executables` に入れてよい（対話の端末で `apm install` が出す `Trust <package>? [y/N]` に y と答えても同じ）。この個人承認は bin・hooks・MCP・LSP・canvas の executable primitives すべてを package 単位で制御する。`native:*` の中の `apm` は `run_apm` が `APM_NON_INTERACTIVE=1` を固定で渡して動くので、質問は出ず警告だけで続行する（`install/phases/integrate.py`）
 - 許可のキーは `github.com/<owner>/<repo>[/<path>]`。APM は依存を `str(dep_ref)`（`github.com/<repo>#<ref>`）で引き、`#<ref>` を外した形で照合する（`install/exec_gate.py` の `resolve_package_key`、`security/executables.py` の `_map_grants`）
@@ -132,6 +133,7 @@ allowExecutables:
   | 退避した root の中の、basename が `.apm-pin` のファイル                                                                                                              | pin の目印                                                                                                                                                                                                                            |
   | `.claude/skills/synced` とその下                                                                                                                                     | Claude Code が同期する skill の cache。動作中の session が migrate の途中で作り直すため、退避した旧い root の中身と違うことがある。旧い内容は `<root>.bak-<UTC>` に残る                                                               |
   | `__pycache__` ディレクトリとその下、`*.pyc` ファイル                                                                                                                 | Python のバイトコード cache。再生成できる                                                                                                                                                                                             |
+  | `.agents/skills/<skill>/.codex-plugin` とその下、`.claude/skills/<skill>/.codex-plugin` とその下                                                                     | Codex plugin の目印。構造化した形の dependency install では配らない                                                                                                                                                                   |
   | 4 つの root の top-level の entry で、前回の native の `apm.lock.yaml`（`deployed_files`）に載っていて、今回の root に無いもの（catalog から消えた skill）の下の全部 | 前回の native では配られ、今回は配られなかったので入れ直さない（catalog から消えた skill のほか、前回と今回で配る package が違う場合も含む）。前回の lock が無い最初の `migrate` では何も該当しない。entry が今も配られていれば対象外 |
 
 - migrate rehearsal は入れ直した entry を `reinstated.txt`（path と scope）、名前が同じで中身が旧い entry と違うために入れ直さなかったものを `skipped.txt` に書く（`.apm-pin` を除いて中身が同じものは載せない。`.claude/skills/synced`（Claude Code の同期 cache）は実行時の状態として比べない）。migration は同じ 2 つを `<HOME>/.apm/native-migrate-<UTC>.reinstated.txt`・`.skipped.txt` に書き、`skipped.txt` が空でなければ warning を出す。
