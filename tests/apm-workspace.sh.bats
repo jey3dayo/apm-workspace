@@ -68,11 +68,9 @@ EOF
 }
 
 doctor_fixture_env() {
-  # Pin XDG_STATE_HOME into the fixture explicitly: agmsg-state.sh (and the
-  # doctor check mirroring it) fall back to "$HOME/.local/state" only when
-  # XDG_STATE_HOME is unset, but this session's real XDG_STATE_HOME is set
-  # and would otherwise leak in here, making the agmsg roster link check
-  # compare against the live machine's state root instead of the fixture's.
+  # Pin HOME and XDG_STATE_HOME into the fixture explicitly so the session's
+  # real values cannot leak in and make doctor compare against the live
+  # machine's state instead of the fixture's.
   env HOME="$doctor_home" XDG_STATE_HOME="$doctor_home/.local/state" PATH="$doctor_bin:$PATH" APM_WORKSPACE_DIR="$doctor_workspace_dir" "$@"
 }
 
