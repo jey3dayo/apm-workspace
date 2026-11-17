@@ -42,6 +42,7 @@ render_manifest() {
         split(entries[i], kv, "=")
         split(kv[2], rs, ":")
         key[i] = kv[1]; repo[i] = rs[1]; skill[i] = rs[2]
+        map_key["github.com/" key[i]] = "github.com/" repo[i]
       }
     }
     /^[^[:space:]#]/ && $0 !~ /^[A-Za-z_][A-Za-z0-9_-]*:/ { invalid = 1 }
@@ -92,7 +93,8 @@ render_manifest() {
       if (ok && !only) {
         print "allowExecutables:"
         for (i = 1; i <= na; i++) {
-          printf "  %s:\n", order[i]
+          emit_key = (order[i] in map_key) ? map_key[order[i]] : order[i]
+          printf "  %s:\n", emit_key
           if (bins[order[i]]) printf "    bin: true\n"
           if (mcps[order[i]]) printf "    mcp: true\n"
         }

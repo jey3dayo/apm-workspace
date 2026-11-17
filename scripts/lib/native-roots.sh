@@ -419,6 +419,12 @@ allowed_lost_reason() {
       esac
     done
   fi
+  case "$path" in
+    .agents/skills/*/.codex-plugin | .agents/skills/*/.codex-plugin/* | .claude/skills/*/.codex-plugin | .claude/skills/*/.codex-plugin/*)
+      echo "Codex plugin marker; structured-dep install no longer deploys it"
+      return
+      ;;
+  esac
 }
 
 # Tab-separated <path> <reason> for each lost path that is no loss. $2 and $3 are the arguments of allowed_lost_reason.
