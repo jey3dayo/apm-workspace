@@ -93,7 +93,7 @@ dependencies:
       args:
         - -y
         - "chrome-devtools-mcp@latest"
-        - "--autoConnect"
+        - "--ignoreDefaultChromeArg=--disable-extensions"
     # Web search, fetch, and research for general verification and up-to-date information (Context7 covers library docs)
     - name: parallel
       registry: false
