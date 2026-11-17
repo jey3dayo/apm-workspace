@@ -14,74 +14,6 @@ validate_codex_skill_target_tree() {
   fi
 }
 
-# agmsg resolves db/ and teams/ relative to its own script directory
-# ($HOME/.agents/skills/agmsg), so those two entries must stay symlinks into
-# $XDG_STATE_HOME/agmsg (see scripts/agmsg-state.sh:16). If anything outside
-# the deploy flow replaces a link with a plain dir or removes it, agmsg's error
-# messages ("Team not found", empty identities) give no hint that the link
-# itself is the problem — the real db/teams data is untouched. Doctor checks
-# the canonical face only; other deployed faces (e.g. ~/.claude/skills/agmsg)
-# never carry db/teams and are not examined here.
-# Per-item diagnostics stay separate from the recovery recommendation: db and
-# teams are each judged healthy / plain-path / missing / dangling /
-# wrong-target below, but the recommendation to run `mise run
-# agmsg:state:restore` is emitted at most once, from the aggregate of both
-# items. `agmsg:state:restore` relinks db and teams together, so naming it
-# from a single item's branch is wrong whenever the *other* item is a plain
-# path holding roster writes made while the link was severed: following that
-# per-item advice would run the restore anyway and let its absorb-and-discard
-# path clobber the plain path's contents in favor of the state root. See
-# scripts/agmsg-state.sh absorb_plain_dir.
-validate_agmsg_roster_link() {
-  agmsg_skill_dir="$HOME/.agents/skills/agmsg"
-  [ -e "$agmsg_skill_dir" ] || return 0
-
-  agmsg_state_root="${XDG_STATE_HOME:-$HOME/.local/state}/agmsg"
-  agmsg_link_ok=0
-  agmsg_has_plain_path=0
-  agmsg_has_other_issue=0
-
-  for runtime_dir in db teams; do
-    link_path="$agmsg_skill_dir/$runtime_dir"
-    expected_target="$agmsg_state_root/$runtime_dir"
-    if [ ! -e "$link_path" ] && [ ! -L "$link_path" ]; then
-      error "agmsg roster link is missing: $link_path."
-      agmsg_link_ok=1
-      agmsg_has_other_issue=1
-      continue
-    fi
-    if [ ! -L "$link_path" ]; then
-      # Unlike the other three cases, nothing is lost here yet: a plain
-      # directory can hold roster writes made while the link was severed
-      # (see scripts/agmsg-state.sh absorb_plain_dir).
-      error "agmsg roster link is a plain path, not a symlink: $link_path. This may hold roster updates written while the link was severed."
-      agmsg_link_ok=1
-      agmsg_has_plain_path=1
-      continue
-    fi
-    actual_target=$(readlink "$link_path")
-    if [ "$actual_target" != "$expected_target" ]; then
-      error "agmsg roster link points at the wrong target: $link_path -> $actual_target (expected $expected_target)."
-      agmsg_link_ok=1
-      agmsg_has_other_issue=1
-      continue
-    fi
-    if [ ! -e "$link_path" ]; then
-      error "agmsg roster link is dangling (target does not exist): $link_path -> $actual_target."
-      agmsg_link_ok=1
-      agmsg_has_other_issue=1
-    fi
-  done
-
-  if [ "$agmsg_has_plain_path" -eq 1 ]; then
-    error "agmsg roster link recovery: at least one of db/teams under $agmsg_skill_dir is a plain path that may hold roster updates written while the link was severed. Automatically relinking db and teams together risks discarding those updates by absorbing the plain path into the state root instead of merging it. Inspect its contents and reconcile them with \$XDG_STATE_HOME/agmsg (or \$HOME/.local/state/agmsg) by hand before relinking."
-  elif [ "$agmsg_has_other_issue" -eq 1 ]; then
-    error "agmsg roster link recovery: run 'mise run agmsg:state:restore' to relink db/teams under $agmsg_skill_dir."
-  fi
-
-  return "$agmsg_link_ok"
-}
-
 apm_prune_preview() {
   local preview
   if ! preview=$(NO_COLOR=1 COLUMNS=4096 apm prune --dry-run 2>&1); then
@@ -285,9 +217,6 @@ cmd_doctor() {
     codex_mcp_config="$HOME/.codex/config.toml"
     has_failure=0
     if ! validate_codex_skill_target_tree; then
-      has_failure=1
-    fi
-    if ! validate_agmsg_roster_link; then
       has_failure=1
     fi
     known_instruction_blobs=""

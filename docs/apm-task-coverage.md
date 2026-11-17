@@ -27,7 +27,6 @@ Path-by-path ownership (catalog, optional-skills, workspace-only skills, lockfil
 | `mise run actions-lock:upstream` (hidden) | n/a      | n/a      | n/a      | n/a         | n/a      | CI-only `gh-actions-lock --verify`: checks provenance online. Needs network and `GH_TOKEN`; the job's `github.token` suffices while every locked action is public                |
 | `mise run validate:workspace` (hidden)    | ○        | ○        | ○        | ○           | ○        | Ensures the authoring checkout and scaffold exist and checks SHA pins against `apm.lock.yaml`; no APM compile or cache is needed                                                 |
 | `mise run validate:catalog` (hidden)      | ○        | ○        | ○        | ○           | ○        | Checks the managed catalog package tree for normalization and required assets; called directly by `check`                                                                        |
-| `mise run agmsg:state:restore` (hidden)   | n/a      | n/a      | n/a      | n/a         | n/a      | Relinks the agmsg roster into the deployed skill directory during recovery                                                                                                       |
 | `mise run native:sync`                    | ○        | ○        | ○        | ○           | ○        | Checks the pushed source, then runs backup, rehearsal, migration, OpenCode setup and diagnostics; see `docs/native-distribution.md`                                              |
 
 ## Task Visibility
@@ -37,5 +36,4 @@ The workspace-local public `mise tasks` list is `check`, `format`, `native:sync`
 - check parts: `format:check`, `test:sh`, `lint:yaml`, `lint:actions`, `actions-lock:verify`, `lint:frontmatter`, `lint:catalog-leaks`, `validate:workspace`, `validate:catalog`; format subtasks: `format:markdown`, `format:markdown:check`, `format:markdown:bold-headings`, `format:markdown:bold-headings:check`, `format:toml`, `format:toml:check`, `format:yaml`, `format:yaml:check`
 - diagnostic: `doctor` runs workspace and learning-intake checks in sequence.
 - native operations: `native:sync` is the only native task; its plan, backup, rehearsal, migration, OpenCode, and diagnostic stages are internal.
-- recovery-only: `agmsg:state:save`, `agmsg:state:restore` relink a roster unlinked outside the migration path.
 - bootstrap hooks: `bootstrap`, `setup:mcp:host`
