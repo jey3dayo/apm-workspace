@@ -118,9 +118,7 @@ symlinks resolving to `.apm/skills/<id>/SKILL.md`.
 - Follow the guide in `catalog/.apm/instructions/ai-collaboration.instructions.md`
   for MCP placement.
 - Runtime assets that a skill places at launch have no `targets:` distribution
-  route. For `agmsg-review.config.toml` (spawn puts it in the per-run worker
-  home, a hand-started pane in `~/.codex`), use the placement contract in
-  `catalog/.apm/skills/agmsg-delegation/references/codex-sandbox.md`.
+  route.
 - Read `docs/dependency-holds.txt` before bumping an external dependency. Do not
   bump a held one; `validate:workspace` fails on it. Release a hold by deleting
   its line in the same PR and recording the decision in `docs/package-decisions.md`.
