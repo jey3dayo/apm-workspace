@@ -46,7 +46,7 @@ Reviewer 既定の範囲: cursor reviewer が既定になるのはユーザー�
 
 役を決める前に envelope を検証する。次のいずれかに当たったら `BLOCKED(task_id)` を返す（対話セッションならユーザーへ報告して停止）:
 
-- T3 Code（T3 MCP）経由で必須 field のいずれかが欠けている。必須 field は `source_role`（送り手の役）、`target_role`（受け手に担わせる役）、`task_id`（以後の報告に載せる識別子）、`report_contract`（受け側が返す契約: `DONE` / `REVIEW` / `HANDOFF`）
+- T3 Code（T3 MCP）経由で必須 field のいずれかが欠けている。必須 field は `source_role`（送り手の役）、`target_role`（受け手に担わせる役）、`task_id`（以後の報告に載せる識別子）、`report_contract`（受け側が返す契約: `DONE` / `REVIEW` / `HANDOFF`）。ただし、外部の担当bot が `t3-stack` の依頼文形式（対象リポ／ゴール／完了条件／証拠／制約）で launch したスレッドはこの検証の対象外とする。その場合の役は依頼文が明示する目的（設計／実装／レビュー）で決まり、envelope が無いことを理由に止まらない
 - `target_role` と `report_contract` が対応表に反する
 - どちらかの値が対応表に無い
 
@@ -268,7 +268,7 @@ Claude では独立タスクを同一レスポンス内で複数呼び出すと�
 起動後の扱い:
 
 - バリアを置かない。先に返った Worker から順に処理する
-- Worker を使い回す。追加指示・スコープ縮小・再実行は、新規 spawn ではなく既存 Worker への追送で行う（Claude は `SendMessage`）。T3 Code（T3 MCP）経由は worker が headless 1 turn で終了する契約のため使い回せない
+- Worker を使い回す。追加指示・スコープ縮小・再実行は、新規 spawn ではなく既存 Worker への追送で行う（Claude は `SendMessage`）。T3 Code（T3 MCP）経由も同じで、`t3_thread_send` で同じスレッドへ追送して使い回す（手順は `t3-stack`）。独立性が要るレビューだけは新しいスレッドで起動する
 - Codex native の spawn 枠が詰まったら、新規 spawn 前に agent の状態を確認し、目的に合う完了 Worker を再利用する。再利用先が無い場合は不要な完了 agent だけを閉じ、稼働中の無関係な agent は終了させない
 
 1つの依頼を subagent 調査とレビューの反復で仕上げる運用は `review-fix-loop`、複数の plan・台帳をまとめて消化するのは `backlog-sweep` を使う。
