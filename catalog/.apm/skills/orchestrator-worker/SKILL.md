@@ -46,7 +46,7 @@ Reviewer 既定の範囲: cursor reviewer が既定になるのはユーザー�
 
 役を決める前に envelope を検証する。次のいずれかに当たったら `BLOCKED(task_id)` を返す（対話セッションならユーザーへ報告して停止）:
 
-- T3 Code（T3 MCP）経由で必須 field のいずれかが欠けている。必須 field は `source_role`（送り手の役）、`target_role`（受け手に担わせる役）、`task_id`（以後の報告に載せる識別子）、`report_contract`（受け側が返す契約: `DONE` / `REVIEW` / `HANDOFF`）。ただし、外部の担当bot が `t3-stack` の依頼文形式（対象リポ／ゴール／完了条件／証拠／制約）で launch したスレッドはこの検証の対象外とする。その場合の役は依頼文が明示する目的（設計／実装／レビュー）で決まり、envelope が無いことを理由に止まらない
+- T3 Code（T3 MCP）経由で必須 field のいずれかが欠けている。必須 field は `source_role`（送り手の役）、`target_role`（受け手に担わせる役）、`task_id`（以後の報告に載せる識別子）、`report_contract`（受け側が返す契約: `DONE` / `REVIEW` / `HANDOFF`）。ただし、外部の担当bot が T3 で launch したスレッド（依頼文は `t3-stack` の形式。見出しが揃っていなくてもよい）はこの検証の対象外とする。その場合の役は依頼文が明示する目的（設計／実装／レビュー）で決まり、envelope が無いことを理由に止まらない
 - `target_role` と `report_contract` が対応表に反する
 - どちらかの値が対応表に無い
 
