@@ -114,5 +114,21 @@ executables:
   allow:
     github.com/ibelick/ui-skills:
       bin: true
+    github.com/mattpocock/skills:
+      bin: true
+    github.com/nanaism/yomiyasu/skills/yomiyasu:
+      bin: true
+    github.com/nextlevelbuilder/ui-ux-pro-max-skill:
+      bin: true
     github.com/tt-a1i/archify/archify:
       bin: true
+    aqua-voice:
+      mcp: true
+    chrome-devtools:
+      mcp: true
+    context7:
+      mcp: true
+    linear:
+      mcp: true
+    parallel:
+      mcp: true

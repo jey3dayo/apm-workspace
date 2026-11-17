@@ -33,6 +33,9 @@ render_manifest() {
     }
     BEGIN {
       required["github.com/ibelick/ui-skills"] = 1
+      required["github.com/mattpocock/skills"] = 1
+      required["github.com/nanaism/yomiyasu/skills/yomiyasu"] = 1
+      required["github.com/nextlevelbuilder/ui-ux-pro-max-skill"] = 1
       required["github.com/tt-a1i/archify/archify"] = 1
       n = split(map, entries, " ")
       for (i = 1; i <= n; i++) {
@@ -51,13 +54,14 @@ render_manifest() {
     section == "executables" && $0 !~ /^[^ #]/ {
       if ($0 ~ /^[[:space:]]*(#.*)?$/) next
       if ($0 == "  allow:") { if (allow_seen++) invalid = 1; next }
-      if ($0 ~ /^    github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.\/-]+:$/) {
-        if (!allow_seen || (current != "" && !bins[current])) invalid = 1
+      if ($0 ~ /^    [A-Za-z0-9_.-]+:$/ || $0 ~ /^    github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.\/-]+:$/) {
+        if (!allow_seen || (current != "" && !bins[current] && !mcps[current])) invalid = 1
         current = $0; sub(/^    /, "", current); sub(/:$/, "", current)
         if (grants[current]++) invalid = 1
         order[++na] = current; next
       }
       if ($0 == "      bin: true" && current != "") { if (bins[current]++) invalid = 1; next }
+      if ($0 == "      mcp: true" && current != "") { if (mcps[current]++) invalid = 1; next }
       invalid = 1; next
     }
     /^[^ #]/ { section = $0; sub(/:.*/, "", section); group = "" }
@@ -81,17 +85,21 @@ render_manifest() {
     { print }
     END {
       ok = (pinned["catalog"] == 1 && pinned["manual-skills"] == 1 && exec_seen == 1 && allow_seen == 1 && na > 0 && !invalid)
-      for (i = 1; i <= na; i++) if (bins[order[i]] != 1) ok = 0
+      for (i = 1; i <= na; i++) if (bins[order[i]] != 1 && mcps[order[i]] != 1) ok = 0
       if (!only) for (i = 1; i <= n; i++) if (converted[i] != 1) ok = 0
-      if (!only) for (i = 1; i <= na; i++) if (deps[order[i]] != 1) ok = 0
+      if (!only) for (i = 1; i <= na; i++) if (bins[order[i]] && deps[order[i]] != 1) ok = 0
       if (!only) for (id in required) if (grants[id] != 1) ok = 0
       if (ok && !only) {
         print "allowExecutables:"
-        for (i = 1; i <= na; i++) printf "  %s:\n    bin: true\n", order[i]
+        for (i = 1; i <= na; i++) {
+          printf "  %s:\n", order[i]
+          if (bins[order[i]]) printf "    bin: true\n"
+          if (mcps[order[i]]) printf "    mcp: true\n"
+        }
       }
       exit !ok
     }
-  ' "$ROOT_MANIFEST" || fail "apm.yml must list the workspace packages and mapped packages exactly once, and contain valid bin-only executable approvals for listed dependencies"
+  ' "$ROOT_MANIFEST" || fail "apm.yml must list the workspace packages and mapped packages exactly once, and contain valid executable approvals (bin or mcp) for listed dependencies"
 }
 
 # APM reads a root with Python's splitlines(): CRLF and a lone CR both end a line.
