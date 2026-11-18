@@ -900,3 +900,12 @@ hidden character(s)` で install を止める。rehearsal が失敗し、`native
 - 保留は `docs/dependency-holds.txt` で強制する（pin が変わると `validate:workspace` が落ちる）。解除するときは同じ PR でその行を消す。
 - `--force` を使わない理由: install 全体の critical 判定を外すことになるため。
 - 再検討するなら: 上流で該当 JS が外れるか、apm がパッケージ単位で例外を許せるようになったとき。
+
+## `t3dotgg/tstack` を追加し、レビュー・出荷まわりを整理（2026-11-19）
+
+- 追加: `t3dotgg/tstack` を root `apm.yml` に object 形式（`git:` + `ref: 11e37a74d0a6868c121cd0910ab2b3bd9873b92a` + `skills:` subset）で pin し、8件を入れた。`full-send`（実装してマージまで）/ `full-stop`（実装して PR で止める）/ `sol-loop`（レビューループ）/ `council`（複数プロバイダの合議レビュー）/ `babysit-pr`（PR 監視）/ `file-pr`（PR 提出）/ `takeover`（引き継ぎ）/ `modernize`（古い PR・引き継ぎの判定）。
+- 入れない: `leaving-pr-comments`。PR コメントの書式だけのスキルで、返信の書き方は `pr-followup` が推敲込みで持っている。`babysit-pr` / `file-pr` が同スキルを参照する箇所は、`ship` の上書きで `gh-address-comments`（取得）と `pr-followup`（返信・resolve）へ読み替える。
+- 撤去: catalog の `self-review` と `review-fix-loop`。どちらも `sol-loop`（heavy な変更は `council`）へ移行できる二重持ちだったため。参照は付け替えた: 共有ガイドの post-PR レビューと `orchestrator-worker` の案内は `sol-loop` / `council`、`refactoring` の review-loop mechanics は `sol-loop`。`orchestrator-worker` の「self-review 禁止」はスキルではなく概念（作者自身のレビューは approval gate を通らない）なので残す。
+- 撤去: `mattpocock/skills` の subset から `wait-what` を外した。手動起動のみで開発動線に組み込まれておらず、伝わらなかった説明の言い直しはスキルなしで足りる。
+- `ship` のエイリアス化: 名前とトリガーだけ互換で残し、中身は `ship` / `ship pr` → `full-stop`、`ship merge` → `full-send` への委譲にした。本体に残す上書きは4点だけ: 出荷前の `polish` 前段（過剰なコードコメントの圧縮を含む）、マージ gate は `t3-stack` の厳しい方を優先、コメントは取得が `gh-address-comments` で返信・resolve が `pr-followup`、レビューは `sol-loop`（heavy 時は `council`）。旧来の commit / push だけの終点は落とし、受け皿は `atomic-commit`。慣れたら `ship` 自体を廃止する方向。あわせて `pr-followup` の `ship` の工程への参照を、委譲先（`full-stop` / `full-send`）への参照に付け替えた。
+- 残す: `retro` は今回触らない（残すか `learning-intake` に絞るかは別途判断）。

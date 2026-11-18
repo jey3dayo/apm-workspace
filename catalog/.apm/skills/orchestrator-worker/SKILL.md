@@ -272,7 +272,7 @@ Claude では独立タスクを同一レスポンス内で複数呼び出すと�
 - Worker を使い回す。追加指示・スコープ縮小・再実行は、新規 spawn ではなく既存 Worker への追送で行う（Claude は `SendMessage`）。T3 Code（T3 MCP）経由も同じで、`t3_thread_send` で同じスレッドへ追送して使い回す（手順は `t3-stack`）。独立性が要るレビューだけは新しいスレッドで起動する
 - Codex native の spawn 枠が詰まったら、新規 spawn 前に agent の状態を確認し、目的に合う完了 Worker を再利用する。再利用先が無い場合は不要な完了 agent だけを閉じ、稼働中の無関係な agent は終了させない
 
-1つの依頼を subagent 調査とレビューの反復で仕上げる運用は `review-fix-loop`、複数の plan・台帳をまとめて消化するのは `backlog-sweep` を使う。
+1つの依頼をレビューの反復で仕上げる運用は `sol-loop`（heavy な変更は `council`）、複数の plan・台帳をまとめて消化するのは `backlog-sweep` を使う。
 
 完了条件: 全タスクが Worker へ渡り、独立タスクは並列で起動している。
 

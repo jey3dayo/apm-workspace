@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-11-15T16:48:33.001872+00:00'
+generated_at: '2026-11-18T16:50:05.951009+00:00'
 apm_version: 0.35.1
 dependencies:
 - repo_url: agavra/tuicr
@@ -1111,9 +1111,6 @@ dependencies:
   - .agents/skills/setup-matt-pocock-skills/issue-tracker-gitlab.md
   - .agents/skills/setup-matt-pocock-skills/issue-tracker-local.md
   - .agents/skills/setup-matt-pocock-skills/triage-labels.md
-  - .agents/skills/wait-what
-  - .agents/skills/wait-what/SKILL.md
-  - .agents/skills/wait-what/agents/openai.yaml
   - .agents/skills/wayfinder
   - .agents/skills/wayfinder/SKILL.md
   - .agents/skills/wayfinder/agents/openai.yaml
@@ -1157,9 +1154,6 @@ dependencies:
   - .claude/skills/setup-matt-pocock-skills/issue-tracker-gitlab.md
   - .claude/skills/setup-matt-pocock-skills/issue-tracker-local.md
   - .claude/skills/setup-matt-pocock-skills/triage-labels.md
-  - .claude/skills/wait-what
-  - .claude/skills/wait-what/SKILL.md
-  - .claude/skills/wait-what/agents/openai.yaml
   - .claude/skills/wayfinder
   - .claude/skills/wayfinder/SKILL.md
   - .claude/skills/wayfinder/agents/openai.yaml
@@ -1196,8 +1190,6 @@ dependencies:
     .agents/skills/setup-matt-pocock-skills/issue-tracker-gitlab.md: sha256:947602d33a80f98f939fb990995b8f95a3459b114b919c4221d08bd75d7cffe0
     .agents/skills/setup-matt-pocock-skills/issue-tracker-local.md: sha256:7dcda20a2eb4bdc89b95d1143423c0691309921cadae3132e6424f371030506e
     .agents/skills/setup-matt-pocock-skills/triage-labels.md: sha256:ae512af838c78b8750471c42cd2b20fa32319553e61d84c9a23d171b40ce14aa
-    .agents/skills/wait-what/SKILL.md: sha256:d961bb37defd975c539427edb8f450cdbccdcdd552e213c1ece46676a7970905
-    .agents/skills/wait-what/agents/openai.yaml: sha256:b41faadf741d51e4ea184148b2d1854d93f947aaf754c7844f70a00f04194999
     .agents/skills/wayfinder/SKILL.md: sha256:0c9fa96791aebf3b7d654cf35c6aadde97d81f57c17b07d13b27c14d9c46561f
     .agents/skills/wayfinder/agents/openai.yaml: sha256:88bc81a11a6d52ac67aeaa76b8b619e387020d47c5133a4dd4927fd15c4ad073
     .agents/skills/writing-for-agents/SKILL-MECHANICS.md: sha256:c768e6307c7c10728c401c213f2c4ba71c542127eeb7ad2956aabd15a0fa0059
@@ -1231,8 +1223,6 @@ dependencies:
     .claude/skills/setup-matt-pocock-skills/issue-tracker-gitlab.md: sha256:947602d33a80f98f939fb990995b8f95a3459b114b919c4221d08bd75d7cffe0
     .claude/skills/setup-matt-pocock-skills/issue-tracker-local.md: sha256:7dcda20a2eb4bdc89b95d1143423c0691309921cadae3132e6424f371030506e
     .claude/skills/setup-matt-pocock-skills/triage-labels.md: sha256:ae512af838c78b8750471c42cd2b20fa32319553e61d84c9a23d171b40ce14aa
-    .claude/skills/wait-what/SKILL.md: sha256:d961bb37defd975c539427edb8f450cdbccdcdd552e213c1ece46676a7970905
-    .claude/skills/wait-what/agents/openai.yaml: sha256:b41faadf741d51e4ea184148b2d1854d93f947aaf754c7844f70a00f04194999
     .claude/skills/wayfinder/SKILL.md: sha256:0c9fa96791aebf3b7d654cf35c6aadde97d81f57c17b07d13b27c14d9c46561f
     .claude/skills/wayfinder/agents/openai.yaml: sha256:88bc81a11a6d52ac67aeaa76b8b619e387020d47c5133a4dd4927fd15c4ad073
     .claude/skills/writing-for-agents/SKILL-MECHANICS.md: sha256:c768e6307c7c10728c401c213f2c4ba71c542127eeb7ad2956aabd15a0fa0059
@@ -1248,7 +1238,6 @@ dependencies:
   - research
   - retro
   - setup-matt-pocock-skills
-  - wait-what
   - wayfinder
   - writing-for-agents
   declared_license: MIT
@@ -1854,6 +1843,89 @@ dependencies:
     .claude/skills/improve/references/plan-template.md: sha256:7be76dd3c29442288fa7cee4432fc6e95c2fdbf748c9b356344bf647c5f8722e
   content_hash: sha256:2a6562fd5a8af9318ef025919f739ae225f3a94d718da1ebc64fe9dab9552dff
   declared_license: MIT
+- repo_url: t3dotgg/tstack
+  name: tstack
+  host: github.com
+  resolved_commit: 11e37a74d0a6868c121cd0910ab2b3bd9873b92a
+  resolved_ref: 11e37a74d0a6868c121cd0910ab2b3bd9873b92a
+  version: unknown
+  package_type: skill_bundle
+  deployed_files:
+  - .agents/skills/babysit-pr
+  - .agents/skills/babysit-pr/SKILL.md
+  - .agents/skills/babysit-pr/scripts/pr-wait
+  - .agents/skills/council
+  - .agents/skills/council/SKILL.md
+  - .agents/skills/file-pr
+  - .agents/skills/file-pr/SKILL.md
+  - .agents/skills/full-send
+  - .agents/skills/full-send/SKILL.md
+  - .agents/skills/full-send/agents/openai.yaml
+  - .agents/skills/full-stop
+  - .agents/skills/full-stop/SKILL.md
+  - .agents/skills/full-stop/agents/openai.yaml
+  - .agents/skills/modernize
+  - .agents/skills/modernize/SKILL.md
+  - .agents/skills/modernize/agents/openai.yaml
+  - .agents/skills/sol-loop
+  - .agents/skills/sol-loop/SKILL.md
+  - .agents/skills/takeover
+  - .agents/skills/takeover/SKILL.md
+  - .claude/skills/babysit-pr
+  - .claude/skills/babysit-pr/SKILL.md
+  - .claude/skills/babysit-pr/scripts/pr-wait
+  - .claude/skills/council
+  - .claude/skills/council/SKILL.md
+  - .claude/skills/file-pr
+  - .claude/skills/file-pr/SKILL.md
+  - .claude/skills/full-send
+  - .claude/skills/full-send/SKILL.md
+  - .claude/skills/full-send/agents/openai.yaml
+  - .claude/skills/full-stop
+  - .claude/skills/full-stop/SKILL.md
+  - .claude/skills/full-stop/agents/openai.yaml
+  - .claude/skills/modernize
+  - .claude/skills/modernize/SKILL.md
+  - .claude/skills/modernize/agents/openai.yaml
+  - .claude/skills/sol-loop
+  - .claude/skills/sol-loop/SKILL.md
+  - .claude/skills/takeover
+  - .claude/skills/takeover/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/babysit-pr/SKILL.md: sha256:fbe43ba3ab76a466a88ef8b46dca1b41fb8101347d24a396903849865173a6ac
+    .agents/skills/babysit-pr/scripts/pr-wait: sha256:90393f85b95b78bff1b039744bdfb09dc88ff2b430e1c3df687ee6f449c97214
+    .agents/skills/council/SKILL.md: sha256:91cab56e85ca2ce2920961b50931573890e0513adbc5a60b33969b1e2501251c
+    .agents/skills/file-pr/SKILL.md: sha256:174a7ae52e3b9d17f2bd0eaf0a11a89d744d1249164ecbdb0e642359eee75b1b
+    .agents/skills/full-send/SKILL.md: sha256:ba585e47cd901506b0e2de13025b0e39bc02462c136cf27491ad3efbdfe66020
+    .agents/skills/full-send/agents/openai.yaml: sha256:8a1e8ce04a774a8a2e469cecf5e45a9cec4d3438b4c587cf166c2f78206390d2
+    .agents/skills/full-stop/SKILL.md: sha256:f2896ab97c3ffc7e55afbe2ad006b48e30b42abdeaebb0685bb1981fce2a7e6a
+    .agents/skills/full-stop/agents/openai.yaml: sha256:6029e872a883aa06aad3426ab58289df016e4b0d23485719c71152603fec7d35
+    .agents/skills/modernize/SKILL.md: sha256:6172d774c46f535367086da90db1b0aaaaac969ed05ff040444f9afa9a6b1552
+    .agents/skills/modernize/agents/openai.yaml: sha256:6675e91e10f2b264fe1a027072f6d9f46299f781011e248a5ba075fc1f764e09
+    .agents/skills/sol-loop/SKILL.md: sha256:1db1eb4c4a156ee666070e9a12623d520cd1bd9b19c3fc21003fe5a440ba0b10
+    .agents/skills/takeover/SKILL.md: sha256:9f00a7c67bf82603af2e80f56e9ce63f1516a1b4339365b79cf786d9d9055465
+    .claude/skills/babysit-pr/SKILL.md: sha256:fbe43ba3ab76a466a88ef8b46dca1b41fb8101347d24a396903849865173a6ac
+    .claude/skills/babysit-pr/scripts/pr-wait: sha256:90393f85b95b78bff1b039744bdfb09dc88ff2b430e1c3df687ee6f449c97214
+    .claude/skills/council/SKILL.md: sha256:91cab56e85ca2ce2920961b50931573890e0513adbc5a60b33969b1e2501251c
+    .claude/skills/file-pr/SKILL.md: sha256:174a7ae52e3b9d17f2bd0eaf0a11a89d744d1249164ecbdb0e642359eee75b1b
+    .claude/skills/full-send/SKILL.md: sha256:ba585e47cd901506b0e2de13025b0e39bc02462c136cf27491ad3efbdfe66020
+    .claude/skills/full-send/agents/openai.yaml: sha256:8a1e8ce04a774a8a2e469cecf5e45a9cec4d3438b4c587cf166c2f78206390d2
+    .claude/skills/full-stop/SKILL.md: sha256:f2896ab97c3ffc7e55afbe2ad006b48e30b42abdeaebb0685bb1981fce2a7e6a
+    .claude/skills/full-stop/agents/openai.yaml: sha256:6029e872a883aa06aad3426ab58289df016e4b0d23485719c71152603fec7d35
+    .claude/skills/modernize/SKILL.md: sha256:6172d774c46f535367086da90db1b0aaaaac969ed05ff040444f9afa9a6b1552
+    .claude/skills/modernize/agents/openai.yaml: sha256:6675e91e10f2b264fe1a027072f6d9f46299f781011e248a5ba075fc1f764e09
+    .claude/skills/sol-loop/SKILL.md: sha256:1db1eb4c4a156ee666070e9a12623d520cd1bd9b19c3fc21003fe5a440ba0b10
+    .claude/skills/takeover/SKILL.md: sha256:9f00a7c67bf82603af2e80f56e9ce63f1516a1b4339365b79cf786d9d9055465
+  content_hash: sha256:273e6273b64a290a1685b5d39d10a9e38a18c5bd4d332f4baadb97463ae345d3
+  skill_subset:
+  - babysit-pr
+  - council
+  - file-pr
+  - full-send
+  - full-stop
+  - modernize
+  - sol-loop
+  - takeover
 - repo_url: tt-a1i/archify
   name: archify
   host: github.com
@@ -8922,33 +8994,6 @@ deployments:
   content_hash: sha256:a599aa256049cf30954d1f164721b99e453eb7e4cb8241bcab2d5573e6cf58b8
 - kind: project-relative
   target: claude
-  value: .claude/skills/wait-what
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills
-  active_owner: mattpocock/skills
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/wait-what/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills
-  active_owner: mattpocock/skills
-  content_hash: sha256:d961bb37defd975c539427edb8f450cdbccdcdd552e213c1ece46676a7970905
-- kind: project-relative
-  target: claude
-  value: .claude/skills/wait-what/agents/openai.yaml
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills
-  active_owner: mattpocock/skills
-  content_hash: sha256:b41faadf741d51e4ea184148b2d1854d93f947aaf754c7844f70a00f04194999
-- kind: project-relative
-  target: claude
   value: .claude/skills/wayfinder
   runtime: null
   scope: project
@@ -15292,33 +15337,6 @@ deployments:
   - nextlevelbuilder/ui-ux-pro-max-skill
   active_owner: nextlevelbuilder/ui-ux-pro-max-skill
   content_hash: sha256:a599aa256049cf30954d1f164721b99e453eb7e4cb8241bcab2d5573e6cf58b8
-- kind: project-relative
-  target: codex
-  value: .agents/skills/wait-what
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills
-  active_owner: mattpocock/skills
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/wait-what/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills
-  active_owner: mattpocock/skills
-  content_hash: sha256:d961bb37defd975c539427edb8f450cdbccdcdd552e213c1ece46676a7970905
-- kind: project-relative
-  target: codex
-  value: .agents/skills/wait-what/agents/openai.yaml
-  runtime: null
-  scope: project
-  owners:
-  - mattpocock/skills
-  active_owner: mattpocock/skills
-  content_hash: sha256:b41faadf741d51e4ea184148b2d1854d93f947aaf754c7844f70a00f04194999
 - kind: project-relative
   target: codex
   value: .agents/skills/wayfinder
