@@ -109,6 +109,13 @@ T3 の内側では、スレッド同士で読む・送る・文脈を移すこ�
 - レビュー指摘に対応したら、bot のスレッドは対応した側が resolve する。人間のレビュアーのスレッドは勝手に resolve しない。
 - デプロイと本番リリースは毎回人間の OK を取る。
 
+## ブラウザ（chrome-devtools）
+
+- steward が並列に動く product では、ブラウザは `chrome-devtools-mcp` を repo-local で製品別プロファイルにして使う。グローバル宣言は `--userDataDir` が無く全セッションが同じプロファイルを掴むため、同時に Chrome を使えるのは1セッションだけになる（Chromium の SingletonLock による仕様）。設定の正本と手順は `apm-usage` の `references/repo-local-mcp.md`（Parallel Sessions 節）。
+- `claude-in-chrome` は対話 CLI / VS Code 前提で、headless の T3 セッションでは前提にしない。複数セッションの分離も無い。
+- 各プロファイルの初回ログインは人間が headed で1回だけ行う。ワーカー／steward は認証情報を入力しない。
+- 共有ルールを steward へ伝えるときは、説明を貼らずマージ済み PR のリンクで渡す（文脈の節約。受け取った側は PR を読んで把握する）。
+
 ## herdr との併用
 
 - herdr は人間がふだん使うだけで、bot の開発の連絡と作業はすべて T3 に寄せる。
