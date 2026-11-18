@@ -114,6 +114,20 @@ T3 の内側では、スレッド同士で読む・送る・文脈を移すこ�
 - steward が並列に動く product では、ブラウザは `chrome-devtools-mcp` を repo-local で製品別プロファイルにして使う。グローバル宣言は `--userDataDir` が無く全セッションが同じプロファイルを掴むため、同時に Chrome を使えるのは1セッションだけになる（Chromium の SingletonLock による仕様）。設定の正本と手順は `apm-usage` の `references/repo-local-mcp.md`（Parallel Sessions 節）。
 - `claude-in-chrome` は対話 CLI / VS Code 前提で、headless の T3 セッションでは前提にしない。複数セッションの分離も無い。
 - 各プロファイルの初回ログインは人間が headed で1回だけ行う。ワーカー／steward は認証情報を入力しない。
+
+### プロファイルの現状（2026-11-18 時点）
+
+プロファイルは `~/.cache/chrome-devtools-mcp/profiles/<product>`。全 product とも作成済みで、1Password 拡張（8.12.46.29、Chrome ウェブストア経由）が導入済みであることを拡張フォルダの出現で確認した。拡張の導入と 1Password のサインインは人間が行った。エージェントは資格情報を扱わないため、サインイン状態そのものはエージェント側では確認していない（実利用時の CA PASS 通過が確定になる）。
+
+| product    | プロファイル | 1Password 拡張 |
+| ---------- | ------------ | -------------- |
+| loca       | `loca`       | 導入済み       |
+| asta       | `asta`       | 導入済み       |
+| sereca     | `sereca`     | 導入済み       |
+| ca-connect | `ca-connect` | 導入済み       |
+
+注意：同じプロファイルを通常の Chrome（headed）が掴んでいる間は、chrome-devtools-mcp は `The browser is already running` で起動できない。MCP から使う前に headed のウィンドウを閉じる。
+
 - 共有ルールを steward へ伝えるときは、説明を貼らずマージ済み PR のリンクで渡す（文脈の節約。受け取った側は PR を読んで把握する）。
 
 ## herdr との併用
