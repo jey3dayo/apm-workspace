@@ -24,7 +24,7 @@ description: >-
 
 - steward は product ごとに1本だけ置く（名前は「スレッド名」節）。任される範囲（リポ群）の作業は、毎回の明示がなくても受け付けてよい常設の担当範囲として扱う。
 - steward の仕事は、受付、優先度づけ、計画、子スレッドへの委譲、結果の検証、報告、承認待ちの伝達。重い実装・レビュー・調査は自分で抱えず子スレッドへ切り、メインセッションには結論とリンクだけを残す。メインを軽く保つことが長持ちの条件になる。
-- セグメントやタスクの完了で settle しない。settled のスレッドは T3 のデフォルト一覧に出なくなり、人間が「steward がいない」と誤認する（2026-11-18 に LoCA で2回、ASTA で1回実発生）。settle は役割の終了と後継への引き継ぎのときだけ使う。
+- セグメントやタスクの完了で settle しない。settled のスレッドは T3 のデフォルト一覧に出なくなり、人間が「steward がいない」と誤認する（常駐 steward で実発生）。settle は役割の終了と後継への引き継ぎのときだけ使う。
 - 状態の正本はスレッド履歴ではなく状況ファイル（`~/tmp/iw/<product>-steward-status.md`）に置く。現在地、残件、決定事項、承認待ちを書き、セグメントの区切りごとに更新してからターンを閉じる。
 - 文脈の肥大を防ぐため、区切りごとに要約を状況ファイルへ寄せ、生ログや diff は子スレッド側に持たせる。それでも文脈が重くなったら無理に続けず、「スレッド間の連携と引き継ぎ」節の fork で同名の後継へ移り、旧スレッドは settle してから archive する。
 
@@ -68,10 +68,10 @@ T3 の内側では、スレッド同士で読む・送る・文脈を移すこ�
 
 ## スレッド名
 
-- 常駐 steward は product ごとに1本だけとし、名前は `<product>: steward` に統一する（product はリポの短い名前を小文字で。例: `loca: steward`、`sereca: steward`、`ca-connect: steward`）。
+- 常駐 steward は product ごとに1本だけとし、名前は `<product>: steward` に統一する（product はリポの短い名前を小文字で）。
 - 日付、`T3`、（常駐管理）のような説明は名前に付けない。日付は引き継ぎの翌日には実態とずれ、`T3` と常駐管理は steward という語自体で分かるため。
 - steward を後継スレッドへ引き継ぐときは同じ名前を使い、旧スレッドは settle してから archive する。同じ名前の steward が同時に2本見える期間を作らない。
-- ワーカー（子）スレッドの名前も同じ product 接頭辞で始める（例: `sereca: #240 diagnostics ページ削除`）。
+- ワーカー（子）スレッドの名前も同じ product 接頭辞で始める（例: `<product>: #123 <タスク名>`）。
 
 ## 依頼文と分担
 
@@ -114,7 +114,12 @@ T3 の内側では、スレッド同士で読む・送る・文脈を移すこ�
 - steward が並列に動く product では、ブラウザは `chrome-devtools-mcp` を repo-local で製品別プロファイルにして使う。グローバル宣言は `--userDataDir` が無く全セッションが同じプロファイルを掴むため、同時に Chrome を使えるのは1セッションだけになる（Chromium の SingletonLock による仕様）。設定の正本と手順は `apm-usage` の `references/repo-local-mcp.md`（Parallel Sessions 節）。
 - `claude-in-chrome` は対話 CLI / VS Code 前提で、headless の T3 セッションでは前提にしない。複数セッションの分離も無い。
 - 各プロファイルの初回ログインは人間が headed で1回だけ行う。ワーカー／steward は認証情報を入力しない。
-- 共有ルールを steward へ伝えるときは、説明を貼らずマージ済み PR のリンクで渡す（文脈の節約。受け取った側は PR を読んで把握する）。
+
+### プロファイルの現状（2026-11-18 時点）
+
+プロファイルは `~/.cache/chrome-devtools-mcp/profiles/<product>`。全 steward product 分が作成済みで、1Password 拡張（Chrome ウェブストア経由）が導入済みであることを拡張フォルダの出現で確認した。拡張の導入と 1Password のサインインは人間が行った。エージェントは資格情報を扱わないため、サインイン状態そのものはエージェント側では確認していない（実利用時の認証通過が確定になる）。
+
+注意：同じプロファイルを通常の Chrome（headed）が掴んでいる間は、chrome-devtools-mcp は `The browser is already running` で起動できない。MCP から使う前に headed のウィンドウを閉じる。
 
 ## herdr との併用
 
