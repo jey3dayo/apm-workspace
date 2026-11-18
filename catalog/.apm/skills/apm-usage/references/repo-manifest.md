@@ -13,7 +13,7 @@ skill for the APM workspace's root `apm.yml`, global lockfiles, and global deplo
   - `chrome-devtools` is already distributed globally.
   - Prefer `claude-in-chrome` or the Codex Chrome addon first for ordinary browser operation (click, form input, screenshot, console check) when available and sufficient.
   - Use globally distributed `chrome-devtools` for DevTools-specific depth (Lighthouse audit, performance trace, heap snapshot) or repeatable browser verification beyond what `claude-in-chrome`/Codex addon covers.
-  - Exception: repositories operated by parallel T3 stewards use repo-local `chrome-devtools` with a per-product profile as the main line for authenticated verification, regardless of `claude-in-chrome` availability. The priority is stated in the always-loaded `ai-collaboration` instructions; the parallel-session details are in `repo-local-mcp.md`.
+  - Exception: repositories operated by parallel T3 stewards use repo-local `chrome-devtools` with a per-product profile as the main line for authenticated verification, regardless of runtime Chrome-integration availability (`claude-in-chrome` in Claude sessions, the Codex Chrome addon in Codex sessions). The priority is stated in the always-loaded `ai-collaboration` instructions; the parallel-session details are in `repo-local-mcp.md`.
 - Prefer repo-local dependencies for narrower, runtime-specific, infra-specific, presentation-specific, or credential-scoped tools.
   - Terraform skills belong near repositories that actually own Terraform modules, environments, or `.tftest.hcl` tests.
   - Tauri tools belong near repositories that actually own `src-tauri`.

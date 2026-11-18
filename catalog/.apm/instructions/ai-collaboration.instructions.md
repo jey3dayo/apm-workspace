@@ -116,8 +116,8 @@ permission や PreToolUse hook のポリシーで拒否されたコマンドは�
 
 優先度（上から順に、最初に当たったものを使う）:
 
-1. T3 の steward／ワーカーが product の認証付きページを検証する → 製品別プロファイルの `chrome-devtools`（repo-local、`~/.cache/chrome-devtools-mcp/profiles/<product>`）。`claude-in-chrome` の有無で置き換えない。ログイン済みページを開く・リロードする・コンソール／ネットワーク／ログを確認するのは検証であり、エージェント自身が MCP で行う。人間に頼めるのは、そのプロファイルで未ログインかつプロファイル内のパスワード管理拡張でも通過できないときの初回サインイン（対象プロファイルでの1回）だけであり、人間が普段使う Chrome でページを開く操作は代替にならない。詳細は `t3-stack` のブラウザ節
-2. ユーザーの画面を共有しながらの操作 → `claude-in-chrome` または Codex Chrome アドオン
+1. T3 の steward／ワーカーが product の認証付きページを検証する → 製品別プロファイルの `chrome-devtools`（repo-local、`~/.cache/chrome-devtools-mcp/profiles/<product>`）。この指示は Claude／Codex 両方へ配布され、優先度はどちらのセッションでも同じ。実行ランタイム側の Chrome 連携（Claude の `claude-in-chrome`、Codex の Chrome アドオン）の有無で置き換えない。`chrome-devtools` は両ランタイムへ配布され、製品別プロファイルの指定は両方の配布先（Claude の MCP 設定と Codex の MCP 設定）で効かせる。ログイン済みページを開く・リロードする・コンソール／ネットワーク／ログを確認するのは検証であり、エージェント自身が MCP で行う。人間に頼めるのは、そのプロファイルで未ログインかつプロファイル内のパスワード管理拡張でも通過できないときの初回サインイン（対象プロファイルでの1回）だけであり、人間が普段使う Chrome でページを開く操作は代替にならない。詳細は `t3-stack` のブラウザ節
+2. ユーザーの画面を共有しながらの操作 → 実行ランタイムの Chrome 連携（Claude では `claude-in-chrome`、Codex では Codex Chrome アドオン）
 3. それ以外の通常のブラウザ操作・検証 → 下の表
 
 | 目的                                                                                                                             | 推奨                                                                                                                                                                                                                                                                                                                    |

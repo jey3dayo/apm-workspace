@@ -31,7 +31,7 @@ When a repository keeps `chrome-devtools` as an exception to the global default,
 
 The global declaration distributes `chrome-devtools` without `--userDataDir`, so every session shares the default profile (`~/.cache/chrome-devtools-mcp/chrome-profile`). Chromium allows only one browser process per user data directory (SingletonLock), so parallel sessions cannot use Chrome at the same time. This is by design, not a defect.
 
-`claude-in-chrome` is not the fleet mechanism for headless T3 sessions: it is documented for the interactive CLI and VS Code, stays off under API-key / `setup-token` authentication, and has no multi-session isolation (concurrent sessions compete for the same browser). Do not build parallel-agent browser work on it.
+`claude-in-chrome` is not the fleet mechanism for headless T3 sessions: it is documented for the interactive CLI and VS Code, stays off under API-key / `setup-token` authentication, and has no multi-session isolation (concurrent sessions compete for the same browser). Do not build parallel-agent browser work on it. The same applies to the Codex Chrome addon in Codex sessions: it is the interactive counterpart, not a fleet mechanism, and Codex workers must not be given `claude-in-chrome`-based procedures. The per-product `chrome-devtools` profile is the shared main line for both runtimes, and the repo-local declaration must be verified in both deployed target configurations (Claude and Codex MCP settings).
 
 Exception for repositories operated by parallel long-lived agents (product stewards):
 

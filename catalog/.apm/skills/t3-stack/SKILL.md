@@ -121,8 +121,9 @@ T3 の内側では、スレッド同士で読む・送る・文脈を移すこ�
 
 ## ブラウザ（chrome-devtools）
 
-- steward が並列に動く product では、ブラウザは `chrome-devtools-mcp` を repo-local で製品別プロファイルにして使う。これが steward の認証付き検証の本線で、`claude-in-chrome` の有無で置き換えない。グローバル宣言は `--userDataDir` が無く全セッションが同じプロファイルを掴むため、同時に Chrome を使えるのは1セッションだけになる（Chromium の SingletonLock による仕様）。設定の正本と手順は `apm-usage` の `references/repo-local-mcp.md`（Parallel Sessions 節）。
-- `claude-in-chrome` は対話 CLI / VS Code で人間の画面を共有する操作のもので、headless の T3 セッションでは前提にしない。複数セッションの分離も無い。
+- steward が並列に動く product では、ブラウザは `chrome-devtools-mcp` を repo-local で製品別プロファイルにして使う。これが steward の認証付き検証の本線で、ワーカーの実行ランタイム（Claude Code／Codex）を問わず共通にする。実行ランタイム側の Chrome 連携の有無で置き換えない。グローバル宣言は `--userDataDir` が無く全セッションが同じプロファイルを掴むため、同時に Chrome を使えるのは1セッションだけになる（Chromium の SingletonLock による仕様）。設定の正本と手順は `apm-usage` の `references/repo-local-mcp.md`（Parallel Sessions 節）。
+- ランタイム側の Chrome 連携（Claude の `claude-in-chrome`、Codex の Chrome アドオン）は、どちらも対話セッションで人間の画面を共有する操作のもので、headless の T3 セッションでは前提にしない。複数セッションの分離も無い。Codex のワーカーにも `claude-in-chrome` 前提の手順を持ち込まない。
+- repo-local の製品別プロファイル宣言は、Claude と Codex の両方の配布先（MCP 設定）で効いていることを確認する。片方だけに効いている状態は未完了として扱う。
 - ログイン済みページを開く・リロードする・SSR を動かす・コンソール／ネットワーク／ログを確認するのは検証行為であり、資格情報の入力ではない。steward／ワーカーが自分のセッションの chrome-devtools MCP で行う。検証用の子セッションの有無で判断せず、子がいなければ自分で行う。
 - 各プロファイルの初回ログインだけは人間が headed で1回だけ行う。対象は製品別プロファイルであり、人間が普段使う Chrome ではない。ワーカー／steward は認証情報を入力しない。人間に頼めるのは「そのプロファイルでその origin に未ログインで、プロファイル内のパスワード管理拡張でも通過できない」ときの初回サインインだけで、ログイン済みのページを開く操作は人間に頼まない。
 - chrome-devtools のツールが現在のセッションに見えないときは、セッションのツール構成の問題として、新規セッションの作成や開き直しを手配して報告する。人間にページを開かせて代替しない。
