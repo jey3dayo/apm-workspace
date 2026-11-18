@@ -99,7 +99,7 @@ When the diagnostic surface is broad enough to split safely, dispatch parallel
 workers per track (React diagnostics, duplicate/similarity, boundary
 ownership, dead-code surface). Load `references/parallel_dispatch.md` for the
 track definitions and the subagent result contract, and use the
-`review-fix-loop` skill for review-loop mechanics.
+`sol-loop` skill for review-loop mechanics.
 
 ## Phase 2: Analyze & Plan
 
@@ -222,7 +222,7 @@ pnpm run type-check && pnpm run lint && pnpm run test
 | Large lint / type-safety cleanup                 | `references/code_quality_cleanup.md` |
 | Dead code removal with TSR                       | `references/dead_code_tsr.md`        |
 | React-specific pattern diagnosis                 | `react-doctor` skill (if installed)  |
-| Parallel diagnostics / bounded slice review loop | `../review-fix-loop/SKILL.md`        |
+| Parallel diagnostics / bounded slice review loop | `sol-loop` skill                     |
 | Impact scope / reference tracking                | `rg` for full reference listing      |
 | Interface / seam design vocabulary               | `codebase-design` skill              |
 
