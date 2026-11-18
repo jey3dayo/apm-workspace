@@ -131,7 +131,7 @@ T3 の内側では、スレッド同士で読む・送る・文脈を移すこ�
 
 ### プロファイルの現状（2026-11-18 時点）
 
-プロファイルは `~/.cache/chrome-devtools-mcp/profiles/<product>`。全 steward product 分が作成済みで、1Password 拡張（Chrome ウェブストア経由）が導入済みであることを拡張フォルダの出現で確認した。拡張の導入と 1Password のサインインは人間が行った。エージェントは資格情報を扱わないため、サインイン状態そのものはエージェント側では確認していない（実利用時の認証通過が確定になる）。
+プロファイルは `~/.cache/chrome-devtools-mcp/profiles/<product>`。全 steward product 分が作成済みで、1Password 拡張（Chrome ウェブストア経由）が導入済みであることを拡張フォルダの出現で確認した。拡張の導入と 1Password のサインインは人間が行った。サインイン状態そのものは、2026-11-18 時点ではエージェント側でまだ確認していない（確認方法は上の箇条書きのとおりで、実利用時の認証通過が確定になる）。
 
 注意：同じプロファイルを通常の Chrome（headed）が掴んでいる間は、chrome-devtools-mcp は `The browser is already running` で起動できない。MCP から使う前に headed のウィンドウを閉じる。
 
