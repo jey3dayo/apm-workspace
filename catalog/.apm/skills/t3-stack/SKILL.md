@@ -29,6 +29,13 @@ description: >-
 
 外部の担当bot は `create_threads` と `delegate_task` を使えない。外部からの委任は launch が正路。T3 の内側のセッションが子を立てるときは逆で、`delegate_task`（`runtimeMode: "auto"` を明示）を使い、`t3_thread_launch` は使わない。ターンの送受信に `t3` CLI（`t3 thread start` / `t3 thread send`）は使わない。CLI 経由は full access で動いたことがある。
 
+## スレッド名
+
+- 常駐 steward は product ごとに1本だけとし、名前は `<product>: steward` に統一する（product はリポの短い名前を小文字で。例: `loca: steward`、`sereca: steward`、`ca-connect: steward`）。
+- 日付、`T3`、（常駐管理）のような説明は名前に付けない。日付は引き継ぎの翌日には実態とずれ、`T3` と常駐管理は steward という語自体で分かるため。
+- steward を後継スレッドへ引き継ぐときは同じ名前を使い、旧スレッドは settle してから archive する。同じ名前の steward が同時に2本見える期間を作らない。
+- ワーカー（子）スレッドの名前も同じ product 接頭辞で始める（例: `sereca: #240 diagnostics ページ削除`）。
+
 ## 依頼文と分担
 
 - 依頼文には、対象リポ、ゴール、確かめられる完了条件、見せてほしい証拠（変更ファイル一覧、commit、検証結果）、制約を書く。作業合意が固まっている相手には、対象・作業・モデルの effort だけの短い形で足りる。この形が T3 経路の契約で、orchestrator-worker の envelope（`source_role` 等）を付ける必要はない。ワーカーは envelope が無いことを理由に止まらない。
