@@ -94,9 +94,19 @@ T3 の内側では、スレッド同士で読む・送る・文脈を移すこ�
 - 表示上のモードと実際のモードがずれることがある（pingdotgg/t3code#29632）。画面でモードを変えても、composer から1通送るまでは反映されず、MCP 経由の指示は古いモードのまま動く。モードを変えたら、人間にそのスレッドの composer から1通送ってもらう。実際のモードは `t3_thread_configure`（`threadId` を指定）か read の `runtimeMode` で読む。
 - 子の承認要求は T3 の画面に出る。担当bot はそれを押せないので、どのスレッドで何の承認が待っているかを人間へ伝える。権限、購入、予算、ログイン切れ、仕様の分かれ目に来たら、ワーカーは止まって報告し、担当bot は人間にやってほしいことを1つにまとめて伝える。
 
+## worktree のセットアップ
+
+- T3 は worktree 作成時に、リポ直下の `t3.json` で `runOnWorktreeCreate: true` を付けたスクリプト（最初の1つだけ）を setup として実行する。スクリプトには `T3CODE_PROJECT_ROOT`（メイン側の checkout）と `T3CODE_WORKTREE_PATH`（新しい worktree）が環境変数で渡る。
+- ただし setup の自動実行は、リンク（MCP relay）経由で起動され full access 未満のスレッドでは起きない（`skipped-for-link`、2026-11-18 実測、T3 本体のソースで確認）。担当bot が起動するスレッドと、steward が `auto` で立てる子スレッドはこれに当たる。setup が走った前提で作業を始めてはいけない。
+- そのため、新しい worktree で作業する側は、開始直後に setup の実行済みを確かめ、未実行ならリポの setup スクリプトを手動で実行する。手動実行時は `T3CODE_PROJECT_ROOT` と `T3CODE_WORKTREE_PATH` を自分で設定する。steward は子スレッドへの依頼文にこの一手間を明記する。
+- T3 に組み込みの dotenv 同期は無い（公式 Issue #764 は not_planned でクローズ）。env ファイルの受け渡しは setup スクリプトでやる。git-wt 等の外部ツールで worktree を作るときのコピー設定は、T3 が作る worktree には効かない。
+- リポ側 setup スクリプトの標準形: メイン側 checkout から、gitignore 対象の env ファイル（dotenvx 管理のリポでは `.env` と `.env.keys`）を symlink で渡す。実ファイルは上書きせず、symlink だけを置き換える。バックアップ類（`.env.*.backup` 等）は渡さない。秘密の値は読まない・出力しない。ツール導入（mise 等）は trust を確認し、未信頼なら install をスキップする（fail-closed、trust は付与しない）。途中で失敗しても worktree 作成自体は止めず、最後は exit 0 で終える。
+- `t3.json` はリポにコミットする共有物なので、個人パスやマシン固有の値、秘密そのものは書かない。パスは `T3CODE_PROJECT_ROOT` 経由で解決する。
+
 ## ワーカー側の決まり
 
 - 自分の worktree の外を触らない。他のスレッドの作業と混ぜない。
+- 新しい worktree では、作業開始前に setup の実行済みを確かめる（「worktree のセットアップ」節）。未実行なら手動で実行してから始める。
 - 他のスレッドの文脈が要るときは、`t3_thread_read` / `t3_thread_search` で自分で読みに行く。担当bot や人間に引き継ぎ資料を作らせない（スレッド間の連携と引き継ぎの節）。
 - 仕事の終わりは、依頼が求めた場合は開いた PR、それ以外は commit まで進めたうえでの報告か、依頼で定めた報告書。デプロイしない。
 - マージは自分ではしない（次節）。レビュー指摘の修正は担当bot が同じスレッドへ差し戻すのが既定で、公式の「小さな指摘は自分で直す」より優先する。自分で抱え込まず、差し戻しを待つ。
