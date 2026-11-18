@@ -102,6 +102,12 @@ T3 の内側では、スレッド同士で読む・送る・文脈を移すこ�
 - T3 に組み込みの dotenv 同期は無い（公式 Issue #764 は not_planned でクローズ）。env ファイルの受け渡しは setup スクリプトでやる。git-wt 等の外部ツールで worktree を作るときのコピー設定は、T3 が作る worktree には効かない。
 - リポ側 setup スクリプトの標準形: メイン側 checkout から、gitignore 対象の env ファイル（dotenvx 管理のリポでは `.env` と `.env.keys`）を symlink で渡す。実ファイルは上書きせず、symlink だけを置き換える。バックアップ類（`.env.*.backup` 等）は渡さない。秘密の値は読まない・出力しない。ツール導入（mise 等）は trust を確認し、未信頼なら install をスキップする（fail-closed、trust は付与しない）。途中で失敗しても worktree 作成自体は止めず、最後は exit 0 で終える。
 - `t3.json` はリポにコミットする共有物なので、個人パスやマシン固有の値、秘密そのものは書かない。パスは `T3CODE_PROJECT_ROOT` 経由で解決する。
+- agent 経由のスレッドでも env を自動で届ける恒久対策は、git の `post-checkout` フックでやる（2026-11-19 実測で有効化済み）。T3 の worktree 作成は本物の `git worktree add` なので、起動経路によらず発火する。設計は次のとおり。
+  - フック本体は個人環境側に1本だけ置く（例: `~/.config/git/hooks/post-checkout`）。有効化は `init.templateDir` 経由で各 clone の `.git/hooks` へ複写する形にし、全域の `core.hooksPath` は使わない（lefthook 等が `.git/hooks` に置く既存フックが読まれなくなり、新規 clone での lefthook 導入も拒否されるため）。リポ側には何も足さない。
+  - フックの仕事は env ファイルの symlink コピーだけにする。新規のリンク worktree でのみ、メイン側 checkout の gitignore 対象の `.env` 系ファイル（バックアップ類は除く）を symlink で渡す。ガードは3つ: メイン側 checkout では動かない、worktree に `.env.keys` が既にあれば動かない、メイン側に `.env.keys` が無ければ動かない。実ファイルは上書きせず、`.env` の中身は読まず、常に exit 0 で checkout を壊さない。依存 install や trust の処理はフックに入れない。
+  - 既存 clone へは `git init`（再初期化）で template を行き渡らせる。再初期化は既存フックを上書きしない。同名フックが既にある clone（husky 等が管理している場合）は上書きせず、そのフック管理側から本体を呼ぶ形で統合する。
+  - mise の trust は現行版（v2026.7.5 以降）ではメイン側 checkout の trust を worktree が引き継ぐので、原則として worktree ごとの対応は要らない。聞かれる場合は `trusted_config_paths` に T3 の worktree の置き場所（既定は `~/.t3/worktrees`）を足す。
+  - このフックが入っている環境では、手動実行はフォールバックになる。入っていない環境では、従来どおり開始直後の確認と手動実行が要る。
 
 ## ワーカー側の決まり
 
