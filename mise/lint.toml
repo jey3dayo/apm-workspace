@@ -30,3 +30,17 @@ run = "bash ./scripts/lint-frontmatter.sh"
 description = "Detect repository-specific values and unresolved agent references in the managed catalog"
 hide = true
 run = "bash ./scripts/lint-catalog-leaks.sh"
+
+# jev-lint is opt-in and deliberately NOT part of `check`: a run sends the
+# judged code to the TypeSafe API and needs TYPESAFE_API_KEY in the
+# environment. The dry-run plans and prices a run without sending anything
+# and needs no key.
+["jev:dry-run"]
+description = "Plan and price a jev-lint run without sending code (no API key needed)"
+hide = true
+run = "jev-lint check --dry-run"
+
+["jev:check"]
+description = "Run jev-lint semantic checks (sends judged code to the TypeSafe API; needs TYPESAFE_API_KEY)"
+hide = true
+run = "jev-lint check"

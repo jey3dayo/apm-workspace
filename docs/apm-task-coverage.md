@@ -28,6 +28,8 @@ Path-by-path ownership (catalog, optional-skills, workspace-only skills, lockfil
 | `mise run validate:workspace` (hidden)    | ○        | ○        | ○        | ○           | ○        | Ensures the authoring checkout and scaffold exist and checks SHA pins against `apm.lock.yaml`; no APM compile or cache is needed                                                 |
 | `mise run validate:catalog` (hidden)      | ○        | ○        | ○        | ○           | ○        | Checks the managed catalog package tree for normalization and required assets; called directly by `check`                                                                        |
 | `mise run native:sync`                    | ○        | ○        | ○        | ○           | ○        | Checks the pushed source, then runs backup, rehearsal, migration, OpenCode setup and diagnostics; see `docs/native-distribution.md`                                              |
+| `mise run jev:dry-run` (hidden)           | n/a      | n/a      | n/a      | n/a         | n/a      | Plans and prices a jev-lint run from `.jev-lint.yaml` without sending code; no API key needed. Not part of `check`                                                               |
+| `mise run jev:check` (hidden)             | n/a      | n/a      | n/a      | n/a         | n/a      | Opt-in semantic lint (mizchi/jev-lint): sends the judged code to the TypeSafe API, so it needs `TYPESAFE_API_KEY` and never runs in `check` or CI                                |
 
 ## Task Visibility
 
@@ -35,5 +37,6 @@ The workspace-local public `mise tasks` list is `check`, `format`, `native:sync`
 
 - check parts: `format:check`, `test:sh`, `lint:yaml`, `lint:actions`, `actions-lock:verify`, `lint:frontmatter`, `lint:catalog-leaks`, `validate:workspace`, `validate:catalog`; format subtasks: `format:markdown`, `format:markdown:check`, `format:markdown:bold-headings`, `format:markdown:bold-headings:check`, `format:toml`, `format:toml:check`, `format:yaml`, `format:yaml:check`
 - diagnostic: `doctor` runs workspace and learning-intake checks in sequence.
+- opt-in semantic lint: `jev:dry-run`, `jev:check` (not part of `check`; `jev:check` needs `TYPESAFE_API_KEY`).
 - native operations: `native:sync` is the only native task; its plan, backup, rehearsal, migration, OpenCode, and diagnostic stages are internal.
 - bootstrap hooks: `bootstrap`, `setup:mcp:host`
