@@ -24,6 +24,7 @@ lefthook = "2.1.12"
 taplo = "0.10.0"
 
 # npm packages
+"npm:jev-lint" = "0.9.0"
 "npm:prettier" = "3.9.6"
 "npm:tsx" = "4.23.13"
 

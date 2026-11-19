@@ -44,3 +44,6 @@ apm_modules/
 # Python bytecode left by tests that import catalog scripts
 __pycache__/
 *.pyc
+
+# jev-lint verdict cache and run records (local state; the config is .jev-lint.yaml)
+/.jev-lint/
