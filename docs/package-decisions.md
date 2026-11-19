@@ -390,7 +390,7 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 - 再検討するなら: claude.ai コネクタが使えない環境（headless / cron /
   コネクタ未認証のマシン）での CLI 作業が常態化した場合のみ、
   repo-local への追加を検討する。
-- Sentry は上記のまま撤去を維持する。Linear は下記のとおり復活した。
+- Sentry は当面上記のまま撤去を維持した（2026-11-19 に下記のとおり MCP のみ復活）。Linear は下記のとおり復活した。
 
 ## linear MCP + linear-task-ops（復活）
 
@@ -411,6 +411,20 @@ ponytail 固有ではない、hooks を持つ任意のパッケージに再発�
 - 一般則の更新: 「コネクタ提供サービスは二重管理しない」は、**コネクタが
   当該操作を全部カバーしている場合**に限る。CLI 側で必要かつコネクタで
   不足する操作があるなら global APM 管理でよい。
+
+## sentry MCP（復活）
+
+- Status: global 復活（2026-11-19、MCP のみ。スキルは復活しない）
+- 経緯: リリース後の error issue 確認が CLI 側（Claude Code / Codex）の
+  セッションで必要になったが、アプリ側コネクタは CLI エージェントに
+  届かないため、確認が毎回人手に落ちていた。Linear 復活時の一般則
+  （CLI 側で必要かつコネクタで不足するなら global APM 管理でよい）に該当する。
+- 構成: MCP は root `apm.yml` の `mcp:` に `sentry`
+  （`http` / `https://mcp.sentry.dev/mcp`、OAuth はクライアント側）として登録。
+  特定の organization / project には scope せず、対象は会話ごとに選ぶ。
+- 二重管理にならない理由: アプリ側コネクタはアプリ内チャット専用で、
+  CLI セッションにはツール自体が現れない。APM 側は CLI 専用の到達経路であり、
+  役割が重ならない。
 
 ## skill-auditor / find-skills
 

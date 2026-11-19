@@ -114,6 +114,8 @@ allowExecutables:
     mcp: true
   parallel:
     mcp: true
+  sentry:
+    mcp: true
 ```
 
 - render は `EXTERNAL_PACKAGE_MAP` にある package（`nanaism/yomiyasu/skills/yomiyasu`）を、`allowExecutables` へ出力する際に構造化した repo の identity（`github.com/nanaism/yomiyasu`）へ変換する。APM 0.35.1 が依存から計算する承認キーと一致させるため
