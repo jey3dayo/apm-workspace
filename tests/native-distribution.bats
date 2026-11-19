@@ -729,17 +729,12 @@ EOF
   [ "$(roots_snapshot "$M_HOME")" = "$before" ]
 }
 
-@test "an entry whose name holds a backslash is not taken for the pristine entry it would read as" {
+@test "an entry whose name holds a backslash or a newline is not taken for the pristine entry it would read as" {
   local stub="$FX/stub-apm-backslash"
   write_deploy_foo_and_backslash_entry_stub "$stub"
   prepare_migrate skip-backslash-name "$stub" "old foo" add_hand_edited_backslash_entry
   [ "$(cat "$M_REHEARSAL/skipped.txt")" = '.claude/skills/f\oo' ]
   [ "$(cat "$M_REHEARSAL/auto-approved-skips.txt")" = ".claude/skills/foo" ]
-}
-
-@test "an entry whose name ends in a newline is not taken for the pristine entry it would read as" {
-  local stub="$FX/stub-apm-newline"
-  write_deploy_foo_and_backslash_entry_stub "$stub"
   prepare_migrate skip-newline-name "$stub" "old foo" add_hand_edited_newline_entry
   [ "$(cat "$M_REHEARSAL/auto-approved-skips.txt")" = ".claude/skills/foo" ]
   [ "$(wc -l <"$M_REHEARSAL/auto-approved-skips.txt" | tr -d ' ')" -eq 1 ]
