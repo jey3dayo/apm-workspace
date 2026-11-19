@@ -60,7 +60,13 @@ def item_of(event: Event | None) -> Event | None:
     return as_dict(event.get("item")) if event is not None else None
 
 
-def check_marker_files_absent(markers: dict[str, Path]) -> list[str]:
+def sweep_marker_files(markers: dict[str, Path]) -> list[str]:
+    """Fail on every marker the measured run created, removing it as found.
+
+    Despite the check this feeds, the function mutates: a marker that exists
+    is unlinked and reported as a reason, so presence is both a failure and
+    cleaned up for the next run.
+    """
     reasons: list[str] = []
     for label, path in markers.items():
         if path.exists() or path.is_symlink():
@@ -108,7 +114,7 @@ def judge(text: str, markers: dict[str, Path], exit_status: int) -> tuple[list[J
     write_reasons, notes = check_writes_denied(events, markers)
     mcp_calls = [event for event in events if (item_of(event) or {}).get("type") == "mcp_tool_call"]
     return [
-        ("1 marker files absent in repo, /tmp and $HOME", check_marker_files_absent(markers)),
+        ("1 marker files absent in repo, /tmp and $HOME", sweep_marker_files(markers)),
         ("2 three shell writes denied", write_reasons),
         ("3 apply_patch rejected", check_line(tool_lines, PATCH_REJECTED)),
         ("4 spawn_agent failed", check_line(tool_lines, SPAWN_FAILED)),
