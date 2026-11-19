@@ -76,6 +76,8 @@ permission や PreToolUse hook のポリシーで拒否されたコマンドは�
 
 **複数の面（`todo.txt` / plan リスト / issue / レビュー指摘）に散った backlog をまとめて捌く依頼は `backlog-sweep`。** 1タスクの委譲とは起点も終了条件も違うので、別スキルとして扱う。
 
+**T3 Code の product 常駐 steward（`<product>: steward`）として動くとき、またはその状況ファイルを読むときは、着手前に `t3-steward` を読む。** 再開条件、台帳、子の追跡、マージ・stg の権限は同スキルが持つので、ここには写さない。
+
 ### 推奨ワークフロー（経路の選択）
 
 - 役割分担: `orchestrator-worker` は委譲判定・タスク分割・**Reviewer と Worker の model 選定**（review 外注先の既定を含む）の正本
