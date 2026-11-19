@@ -83,7 +83,10 @@ function collectMarkdownFiles(targetDirs: string[]): string[] {
     let entries: fs.Dirent[];
     try {
       entries = fs.readdirSync(currentDir, { withFileTypes: true });
-    } catch {
+    } catch (error) {
+      console.error(
+        `warning: skipping unreadable directory ${currentDir}: ${error instanceof Error ? error.message : String(error)}`,
+      );
       return;
     }
     for (const entry of entries) {
