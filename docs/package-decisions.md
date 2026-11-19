@@ -316,11 +316,10 @@
 
 ### premortem
 
-- Status: 個別プロジェクト向けへ移管（2026-07-21）
-- 正本: `optional-skills/premortem/`
-- 理由: 実装前の失敗条件分析を必要とするリポジトリで明示導入すればよく、通常の全リポジトリへ global rollout する必要がないため。
-- 再導入: 利用リポジトリで
-  `jey3dayo/apm-workspace/optional-skills/premortem#main` を追加する。
+- Status: 削除（2026-11-20、ユーザー判断）
+- 旧正本: `optional-skills/premortem/`
+- 理由: 実利用がなく、残置する理由が薄いため source を削除する。2026-07-21 に global catalog から optional へ移管した経緯は git history と done.txt に残る。
+- 再検討するなら: 実利用するリポジトリを特定してから、git history から復元する。
 
 ### predictive-analysis
 

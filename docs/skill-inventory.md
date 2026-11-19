@@ -37,7 +37,6 @@ Cursor user-scope（`~/.cursor/mcp.json`）は APM 外 — [`package-decisions.m
 
 - `google-forms-survey-builder` — 利用例: `tech-talks`
 - `slack-app-management` — Slack App を持つリポジトリのみ
-- `premortem` — 実装前の失敗条件分析が必要なリポジトリのみ
 - `scheduled-audit-ops` — 利用例: `work-site`（`docs/prompts/config.toml` を持つリポジトリのみ）
 - `review-board` — UI レビューのレーン振り分けが要るリポジトリのみ
 - `drawio` — draw.io 図を管理するリポジトリのみ
