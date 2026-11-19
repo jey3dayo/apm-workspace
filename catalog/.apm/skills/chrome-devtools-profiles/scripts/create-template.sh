@@ -23,7 +23,7 @@ export PROFILES_DIR
 
 SITE_FILES=(
   "History" "Favicons" "Top Sites" "Shortcuts" "Web Data" "Account Web Data"
-  "Login Data" "Login Data For Account" "Affiliation Database"
+  "Cookies" "Login Data" "Login Data For Account" "Affiliation Database"
   "Network Action Predictor" "DIPS" "DIPS-wal" "Device Bound Sessions"
   "ServerCertificate" "heavy_ad_intervention_opt_out.db"
   "declarative_performance_observer.db"
