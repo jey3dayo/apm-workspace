@@ -18,7 +18,7 @@ sync と内部 stage は HOME ごとに同じ排他を取る。sync は backup �
 - `<HOME>/.apm/apm.yml` が描画した manifest とバイト単位で違えば、`apm.yml.<UTC>.bak` に残してから置き換える（同じ名前があれば番号を付け、既存の `.bak` を上書きしない）
 - HOME の外を指す（または壊れた）symlink か、ハードリンクの通常のファイルが HOME の中にあれば、何も書かずに止まる。apm がリンクを通して HOME の外のファイルを書き換えるため（キャッシュの `Library/Caches/apm` のように、配布先より深い場所にも書く）。rehearse は、実 HOME の 4 つの root（`.agents/skills`・`.claude/skills`・`.claude/agents`・`.cursor/agents`）に壊れたリンクか HOME の外へ出るリンクがあれば、`migrate` と同じ判定（`escaping_link_line`）で、複製を作る前にそのリンクの名前を出して失敗する。root の外のリンクは、複製の中を複製の中へ向け直し（先が無ければ外す。外したリンクの名前は出す）、同じ検査を通してから install する
 - `<HOME>/.apm/config.json` に `default_client`、`prefer_ssh`、`executables` 以外のキーがあれば、rehearsal と migration の内部 stage は止まる。APM は `temp_dir` などの書込み先をここから読むため。`prefer_ssh` は git の URL の形を変えるだけで、書込み先は変えない。`executables` は `apm approve --user` が書く実行ファイルの承認で、書込み先を変えない。キーは APM と同じく JSON としてデコードしてから比べる
-- `<HOME>/apm.yml` があれば、rehearsal（実 HOME と複製の両方）と migration は何も書かずに止まる。user scope の APM は executable の許可を `<HOME>/apm.yml` が在ればそちらから読み、`<HOME>/.apm/apm.yml` の `allowExecutables` を無視するため（`apm_cli/security/executables.py` の `exec_trust_context_for_project`）
+- `<HOME>/apm.yml` があれば、rehearsal（実 HOME と複製の両方）と migration は何も書かずに止まる。user scope の APM は executable の許可を `<HOME>/apm.yml` が在ればそちらから読み、`<HOME>/.apm/apm.yml` の `executables.allow` を無視するため（`apm_cli/security/executables.py` の `exec_trust_context_for_project`）
 - apm は空の環境に必要な値だけを渡して起動する。`HOME`・`PATH`・ロケール・Git の設定に加え、対話確認を止める `APM_NON_INTERACTIVE=1` と、HOME 内の `TMPDIR`（`.cache/apm-native-tmp`）を設定する。APM は `APM_CACHE_DIR` や `XDG_*`、`TMPDIR` が指す場所にも書き（`APM_CACHE_DIR` と `XDG_CACHE_HOME` はテストで確かめた）、Git は token・proxy・askpass を環境から読むため
 - manifest は同じディレクトリの新しいファイルに書いてから名前を置き換える
 
@@ -38,21 +38,21 @@ backup の対象（rehearse が複製に再現するもの）: `~/.apm/apm.yml`�
 - **APM 外の補完**: `native:sync` が APM の install/compile と別に配置または保全する
 - **first cut の外**: 今回は扱わない
 
-| 対象                                                         | 分類               | 手順・理由                                                                                                                                                                                                                                        | 確認状況                                                                                                                                                     |
-| ------------------------------------------------------------ | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `catalog/.apm/skills`・`manual-skills/.apm/skills`           | native             | -                                                                                                                                                                                                                                                 | 観測（使い捨ての HOME で、Claude と `~/.agents/skills` の `SKILL.md` が元と byte 単位で一致）                                                                |
-| `catalog/.apm/agents`                                        | native             | Codex には配らない（`docs/package-decisions.md` の Codex 変換の却下）                                                                                                                                                                             | 観測（Claude と Cursor に届き、`~/.codex/agents` は作られない）                                                                                              |
-| `catalog/.apm/instructions/ai-collaboration.instructions.md` | native             | compile が Codex と Cursor の root を書く。Claude には rule として届く。手書きの `~/.claude/CLAUDE.md` は残る                                                                                                                                     | 観測                                                                                                                                                         |
-| root `apm.yml` の外部の依存                                  | native             | -                                                                                                                                                                                                                                                 | CI の `dependency-install` は `apm.yml` / `apm.lock.yaml` 変更時に使い捨て HOME で install 成功を確認。native 配布内容と `allowExecutables` の実効性は未確認 |
-| root `apm.yml` の `mcp:`                                     | first cut の外     | manifest には残すが、install は `--only apm` なので配らない。MCP は今の設定のまま                                                                                                                                                                 | -                                                                                                                                                            |
-| `catalog/.apm/instructions/claude-md-design.instructions.md` | native             | `applyTo` を Claude の `paths` に変換し、`~/.claude/rules/claude-md-design.md` に配る。Codex の global root には入らない。Cursor には `applyTo` を `globs` に変換した `~/.cursor/rules/claude-md-design.mdc` が生成されるが、常時適用にはならない | APM 0.36.1 の使い捨て HOME で確認。Claude の `paths` と本文は旧 rule と byte 単位で一致                                                                      |
-| `catalog/claude/rules/model-policy.md`                       | 手動（レイアウト） | Claude 専用のまま `~/.claude/rules/model-policy.md` へ置く。APM 0.35.1 は instruction 単位の `targets: [claude]` を使わず、global instruction にすると Codex・Cursor の root にも入るため                                                         | APM 0.35.1 の使い捨て HOME で確認。手動配置は下の手順で比較して更新する                                                                                      |
-| private skills（`private-skills/.apm/skills`）               | first cut の外     | consumer の `~/.apm/skills/` に置けば local content として配られる（PR79 で観測）。同名の catalog skill を上書きできるかは確かめていない                                                                                                          | 未確認                                                                                                                                                       |
-| OpenCode（`~/.config/opencode/AGENTS.md`）                   | APM 外の補完       | APM の opencode target は制限付きの agent を受け付けないため targets に入れない。`native:sync` が `sync:opencode` でガイドを配置し、手書きの内容は保護する                                                                                        | ソース（`native-sync.sh` と `sync_opencode_instructions`）                                                                                                   |
-| Pi（`~/AGENTS.md`）                                          | first cut の外     | ガイドを手で置く。APM に Pi の target があるかは確かめていない                                                                                                                                                                                    | 未確認                                                                                                                                                       |
-| host-local の MCP                                            | 手動（APM 非対応） | 今と同じく `mise run setup:mcp:host`（`mise bootstrap`）                                                                                                                                                                                          | ソース                                                                                                                                                       |
-| Cursor の `~/.cursor/mcp.json`                               | 手動（APM 非対応） | 今と同じく手で管理する                                                                                                                                                                                                                            | ソース                                                                                                                                                       |
-| この repo の `.apm/skills`、`optional-skills/`               | first cut の外     | 配布ではない（作業用の bridge と、使う repo が入れる skill）                                                                                                                                                                                      | -                                                                                                                                                            |
+| 対象                                                         | 分類               | 手順・理由                                                                                                                                                                                                                                        | 確認状況                                                                                                                                                              |
+| ------------------------------------------------------------ | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `catalog/.apm/skills`・`manual-skills/.apm/skills`           | native             | -                                                                                                                                                                                                                                                 | 観測（使い捨ての HOME で、Claude と `~/.agents/skills` の `SKILL.md` が元と byte 単位で一致）                                                                         |
+| `catalog/.apm/agents`                                        | native             | Codex には配らない（`docs/package-decisions.md` の Codex 変換の却下）                                                                                                                                                                             | 観測（Claude と Cursor に届き、`~/.codex/agents` は作られない）                                                                                                       |
+| `catalog/.apm/instructions/ai-collaboration.instructions.md` | native             | compile が Codex と Cursor の root を書く。Claude には rule として届く。手書きの `~/.claude/CLAUDE.md` は残る                                                                                                                                     | 観測                                                                                                                                                                  |
+| root `apm.yml` の外部の依存                                  | native             | -                                                                                                                                                                                                                                                 | CI の `dependency-install` は `apm.yml` / `apm.lock.yaml` 変更時に使い捨て HOME で install 成功を確認。native 配布内容と `executables.allow` の実効性は CI では未確認 |
+| root `apm.yml` の `mcp:`                                     | first cut の外     | manifest には残すが、install は `--only apm` なので配らない。MCP は今の設定のまま                                                                                                                                                                 | -                                                                                                                                                                     |
+| `catalog/.apm/instructions/claude-md-design.instructions.md` | native             | `applyTo` を Claude の `paths` に変換し、`~/.claude/rules/claude-md-design.md` に配る。Codex の global root には入らない。Cursor には `applyTo` を `globs` に変換した `~/.cursor/rules/claude-md-design.mdc` が生成されるが、常時適用にはならない | APM 0.36.1 の使い捨て HOME で確認。Claude の `paths` と本文は旧 rule と byte 単位で一致                                                                               |
+| `catalog/claude/rules/model-policy.md`                       | 手動（レイアウト） | Claude 専用のまま `~/.claude/rules/model-policy.md` へ置く。APM 0.35.1 は instruction 単位の `targets: [claude]` を使わず、global instruction にすると Codex・Cursor の root にも入るため                                                         | APM 0.35.1 の使い捨て HOME で確認。手動配置は下の手順で比較して更新する                                                                                               |
+| private skills（`private-skills/.apm/skills`）               | first cut の外     | consumer の `~/.apm/skills/` に置けば local content として配られる（PR79 で観測）。同名の catalog skill を上書きできるかは確かめていない                                                                                                          | 未確認                                                                                                                                                                |
+| OpenCode（`~/.config/opencode/AGENTS.md`）                   | APM 外の補完       | APM の opencode target は制限付きの agent を受け付けないため targets に入れない。`native:sync` が `sync:opencode` でガイドを配置し、手書きの内容は保護する                                                                                        | ソース（`native-sync.sh` と `sync_opencode_instructions`）                                                                                                            |
+| Pi（`~/AGENTS.md`）                                          | first cut の外     | ガイドを手で置く。APM に Pi の target があるかは確かめていない                                                                                                                                                                                    | 未確認                                                                                                                                                                |
+| host-local の MCP                                            | 手動（APM 非対応） | 今と同じく `mise run setup:mcp:host`（`mise bootstrap`）                                                                                                                                                                                          | ソース                                                                                                                                                                |
+| Cursor の `~/.cursor/mcp.json`                               | 手動（APM 非対応） | 今と同じく手で管理する                                                                                                                                                                                                                            | ソース                                                                                                                                                                |
+| この repo の `.apm/skills`、`optional-skills/`               | first cut の外     | 配布ではない（作業用の bridge と、使う repo が入れる skill）                                                                                                                                                                                      | -                                                                                                                                                                     |
 
 手動の項目のために、新しい同期の処理は足さない。
 
@@ -88,42 +88,43 @@ backup の対象（rehearse が複製に再現するもの）: `~/.apm/apm.yml`�
 
 APM は Codex CLI 0.163.0 だけを受け付ける（`apm_cli/codex_plugins/client.py` の `QUALIFIED_CODEX_VERSION`。上書きする手段は無い）。構造化した形が Codex native plugin の経路を通らずに skill として配られるかは、テストが通信しないので、本番の install で初めて確かめる（「確かめていないこと」）。
 
-### bin/ の許可（`allowExecutables`）
+### bin/ の許可（`executables.allow`）
 
-APM 0.35.0 は、非対話の install で信頼していない package の `bin/` を配らない。root `apm.yml` の `executables.allow` を正本とし、render は通常配布のときだけ APM の user scope で読まれる `allowExecutables` に変換する。トップレベルのキーは引用なしの通常形式に限り、未掲載の package、重複、`bin: true` または `mcp: true` 以外は拒否する。現在の承認は次のとおり。
+APM は、非対話の install で信頼していない package の `bin/` を配らない。root `apm.yml` の `executables.allow` を正本とし、render は通常配布のときだけ、そのまま `executables.allow` として出力する（APM 0.36.1 では user scope の `<HOME>/.apm/apm.yml` でも新名を読む。旧名 `allowExecutables` は同ファイルでは効かないことを 2026-11-19 に実測した）。トップレベルのキーは引用なしの通常形式に限り、未掲載の package、重複、`bin: true` または `mcp: true` 以外は拒否する。現在の承認は次のとおり。
 
 ```yaml
-allowExecutables:
-  github.com/ibelick/ui-skills:
-    bin: true
-  github.com/mattpocock/skills:
-    bin: true
-  github.com/nanaism/yomiyasu:
-    bin: true
-  github.com/nextlevelbuilder/ui-ux-pro-max-skill:
-    bin: true
-  github.com/tt-a1i/archify/archify:
-    bin: true
-  aqua-voice:
-    mcp: true
-  chrome-devtools:
-    mcp: true
-  context7:
-    mcp: true
-  linear:
-    mcp: true
-  parallel:
-    mcp: true
-  sentry:
-    mcp: true
+executables:
+  allow:
+    github.com/ibelick/ui-skills:
+      bin: true
+    github.com/mattpocock/skills:
+      bin: true
+    github.com/nanaism/yomiyasu:
+      bin: true
+    github.com/nextlevelbuilder/ui-ux-pro-max-skill:
+      bin: true
+    github.com/tt-a1i/archify/archify:
+      bin: true
+    aqua-voice:
+      mcp: true
+    chrome-devtools:
+      mcp: true
+    context7:
+      mcp: true
+    linear:
+      mcp: true
+    parallel:
+      mcp: true
+    sentry:
+      mcp: true
 ```
 
-- render は `EXTERNAL_PACKAGE_MAP` にある package（`nanaism/yomiyasu/skills/yomiyasu`）を、`allowExecutables` へ出力する際に構造化した repo の identity（`github.com/nanaism/yomiyasu`）へ変換する。APM 0.35.1 が依存から計算する承認キーと一致させるため
+- render は `EXTERNAL_PACKAGE_MAP` にある package（`nanaism/yomiyasu/skills/yomiyasu`）を、`executables.allow` へ出力する際に構造化した repo の identity（`github.com/nanaism/yomiyasu`）へ変換する。APM が依存から計算する承認キーと一致させるため
 - package の `bin/` は必須であり、承認だけが欠けた場合は render が失敗する。変更するときは `scripts/lib/native-manifest.sh` の必須項目も更新する。MCP server は root `apm.yml` で宣言されているものを承認する。hooks・LSP・canvas は承認しない。`--workspace-only` では外部 package の承認を出力しない
-- `allowExecutables` は APM では deprecated の旧名。user scope の APM は `<HOME>/apm.yml` の `executables:` を読むが、`<HOME>/.apm/apm.yml` の `executables:` は読まず、旧名の `allowExecutables:` だけを読む（`install/template.py` の `_effective_allow`、`models/apm_package.py` の `parse_allow_executables`）。そのため新しい名前では書けない。配布用の必須分は `apm.yml` の `allowExecutables` に書く。個人環境での追加承認は `apm approve --user` で `~/.apm/config.json` の `executables` に入れてよい（対話の端末で `apm install` が出す `Trust <package>? [y/N]` に y と答えても同じ）。この個人承認は bin・hooks・MCP・LSP・canvas の executable primitives すべてを package 単位で制御する。`native:*` の中の `apm` は `run_apm` が `APM_NON_INTERACTIVE=1` を固定で渡して動くので、質問は出ず警告だけで続行する（`install/phases/integrate.py`）
+- `allowExecutables` は APM では deprecated の旧名。APM 0.35.1 の user scope は `<HOME>/.apm/apm.yml` では旧名だけを読んだが、0.36.1 では新名 `executables.allow` を読み、旧名は効かない（2026-11-19、使い捨て HOME で実測：旧名のみでは archify と ui-skills の `bin/` が `gated_pending_approval` で止まり、`apm approve` が移行した新名では配布された）。配布用の必須分は render が `executables.allow` で書く。個人環境での追加承認は `apm approve --user` で `~/.apm/config.json` の `executables` に入れてよい（対話の端末で `apm install` が出す `Trust <package>? [y/N]` に y と答えても同じ）。この個人承認は bin・hooks・MCP・LSP・canvas の executable primitives すべてを package 単位で制御する。`native:*` の中の `apm` は `run_apm` が `APM_NON_INTERACTIVE=1` を固定で渡して動くので、質問は出ず警告だけで続行する（`install/phases/integrate.py`）
 - 許可のキーは `github.com/<owner>/<repo>[/<path>]`。APM は依存を `str(dep_ref)`（`github.com/<repo>#<ref>`）で引き、`#<ref>` を外した形で照合する（`install/exec_gate.py` の `resolve_package_key`、`security/executables.py` の `_map_grants`）
 - このブロックを書くと APM の executable のゲートが有効になり、許可していない package の hooks・MCP・LSP・canvas も default-deny になる。install の末尾に `executable primitives parked pending approval` という警告が出るのはこのため。`~/.apm/apm.lock.yaml` の `exec_status` に `gated_pending_approval` と残る。該当するファイルがあれば rehearse の `lost` に出る
-- `apm install` には `--trust-bin` を固定で渡す（compile には渡さない）。許可があっても、stdout が端末でないと APM は `bin/` を飛ばす（`install/exec_gate.py` の `resolve_bin_skip`）。rehearse は出力を `tee` に渡すので端末でなく、migrate は端末で動くので、付けないと 2 つの結果が食い違う。許可の範囲は `allowExecutables` が決めるので、`--trust-bin` で全 package に広がらない
+- `apm install` には `--trust-bin` を固定で渡す（compile には渡さない）。許可があっても、stdout が端末でないと APM は `bin/` を飛ばす（`install/exec_gate.py` の `resolve_bin_skip`）。rehearse は出力を `tee` に渡すので端末でなく、migrate は端末で動くので、付けないと 2 つの結果が食い違う。許可の範囲は `executables.allow` が決めるので、`--trust-bin` で全 package に広がらない
 
 ### rehearse --migrate が見ること
 
@@ -219,7 +220,7 @@ sync が実行する B1〜B7 は次のとおり。これらは個別 task では
 ## 確かめていないこと
 
 - native 配布後に外部依存が各 tool へ届く内容と、各 tool が rule・guide を読み込むか。CI は `apm.yml` / `apm.lock.yaml` の変更時に使い捨て HOME で `apm install -g --only apm --trust-bin` の成功を確認するが、native 配布先の内容は確認しない
-- `allowExecutables` の許可が、本物の `github.com/tt-a1i/archify/archify` で効くか。CI probe は `--trust-bin` を使うため、許可の実効性は確認しない。Bats は、同じ形のキーを持つ package を `https://github.com/<owner>/<repo>.git` から git の設定で fixture へ向け直して確かめる
+- 許可の実効性は CI では自動確認しない。CI probe は `--trust-bin` を使うため install の成功しか見ない（本物の `github.com/tt-a1i/archify/archify` で `executables.allow` が効くことは、APM 0.36.1 の使い捨て HOME で 2026-11-19 に実測済み）。Bats は、同じ形のキーを持つ package を `https://github.com/<owner>/<repo>.git` から git の設定で fixture へ向け直して確かめる
 - 構造化した形の `nanaism/yomiyasu` が Codex native plugin の経路を通らずに skill として配られるか
 - Linux（`sandbox-exec` が無い）では、通信と書込みを強制的には止めない。テストが守るのは HOME のガードと `env -i` の隔離まで
 - Windows（対象外）

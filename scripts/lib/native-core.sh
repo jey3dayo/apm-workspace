@@ -110,7 +110,7 @@ assert_ssh_safe_home() {
   esac
 }
 
-# --trust-bin always, so a piped rehearse and a terminal migrate behave alike; allowExecutables limits which packages get bin/.
+# --trust-bin always, so a piped rehearse and a terminal migrate behave alike; executables.allow limits which packages get bin/.
 # --only apm skips MCP integration to avoid touching credential-bearing configs during migrate.
 run_apm_install() {
   run_apm "$1" install -g --only apm --trust-bin
@@ -204,7 +204,7 @@ real_home_shared_entries() {
 }
 
 # At user scope apm reads executable approvals from <HOME>/apm.yml when it exists, and only then from <HOME>/.apm/apm.yml
-# (apm_cli/security/executables.py exec_trust_context_for_project), so the allowExecutables render writes would not apply.
+# (apm_cli/security/executables.py exec_trust_context_for_project), so the executables.allow render writes would not apply.
 assert_no_home_manifest() {
   if [ -e "$1/apm.yml" ] || [ -L "$1/apm.yml" ]; then
     fail "$1/apm.yml exists, and apm would read its executable approvals instead of those of $1/.apm/apm.yml. Move it aside, then re-run."

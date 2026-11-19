@@ -91,12 +91,13 @@ render_manifest() {
       if (!only) for (i = 1; i <= na; i++) if (bins[order[i]] && deps[order[i]] != 1) ok = 0
       if (!only) for (id in required) if (grants[id] != 1) ok = 0
       if (ok && !only) {
-        print "allowExecutables:"
+        print "executables:"
+        print "  allow:"
         for (i = 1; i <= na; i++) {
           emit_key = (order[i] in map_key) ? map_key[order[i]] : order[i]
-          printf "  %s:\n", emit_key
-          if (bins[order[i]]) printf "    bin: true\n"
-          if (mcps[order[i]]) printf "    mcp: true\n"
+          printf "    %s:\n", emit_key
+          if (bins[order[i]]) printf "      bin: true\n"
+          if (mcps[order[i]]) printf "      mcp: true\n"
         }
       }
       exit !ok
