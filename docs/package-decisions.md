@@ -5,6 +5,15 @@
 
 各記録は書いた時点の記述のまま残す。2026-11-10 の切り替えまで、authoring checkout は `~/.apm` だった（今は `~/src/github.com/jey3dayo/apm-workspace`）。記録の中の `~/.apm` はその checkout を指し、`mise run deploy` などの手順は切り替え前の rollout である。切り替えのあとの rollout は [`native-distribution.md`](native-distribution.md) の B に従う。
 
+## jev-lint (mizchi/jev-lint)
+
+- Status: 採用・opt-in（2026-11-20、ユーザー判断）
+- 正本: CLI 本体は mise で `npm:jev-lint` 0.9.0 に pin。設定は root `.jev-lint.yaml`（`rules:` は allowlist）、実行は hidden タスク `jev:dry-run` / `jev:check`
+- 理由: 決定的なリンタでは表現できない意味的な指摘（コメントと実装の食い違い、エージェント向け指示の不明瞭さ、シェルスクリプトの見えない副作用）を、Jev（TypeSafe AI）の確率判定で拾う。主な対象は `.apm` 配下の SKILL.md 等の指示・文章で、走査はドットディレクトリを降りないため設定で明示列挙している
+- 境界: 判定対象のコードを TypeSafe API へ送信するため、`check` と CI には入れない。キーは環境変数 `TYPESAFE_API_KEY` でのみ渡し、設定ファイルには書かない。閾値は上流コーパスで調整されたものなので、指摘は人の判断候補として扱う
+- 公式: https://github.com/mizchi/jev-lint
+- 再検討するなら: 全量実行は dry-run 実測で約 $0.30（188 ファイル / 6,684 subjects）。利用実績が乏しい、または誤検出の精査コストが見合わなければ外す
+
 ## parallel (Parallel.ai MCP)
 
 - Status: 採用・global（2026-11-11）
