@@ -33,7 +33,9 @@ files:
     AGENTS.md,
     README.md,
   ]
-exclude: [apm_modules, tmp, "**/fixtures/**"]
+# The diagrams HTML is a generated artifact with bundled JavaScript; judging
+# it judges library code, not prose or scripts written here.
+exclude: [apm_modules, tmp, "**/fixtures/**", "docs/diagrams/*.html"]
 
 rules:
   # Markdown: instructions an agent must be able to follow, and prose
