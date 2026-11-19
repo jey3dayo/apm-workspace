@@ -119,6 +119,11 @@ dependencies:
       registry: false
       transport: http
       url: https://api.aquavoice.com/mcp
+    # App-side connectors don't reach the CLI agents; CLI agents need this to check error issues during development and releases (OAuth via client, unscoped so the project is chosen per conversation)
+    - name: sentry
+      registry: false
+      transport: http
+      url: https://mcp.sentry.dev/mcp
 scripts: {}
 executables:
   allow:
@@ -141,4 +146,6 @@ executables:
     linear:
       mcp: true
     parallel:
+      mcp: true
+    sentry:
       mcp: true
