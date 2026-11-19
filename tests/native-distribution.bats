@@ -483,7 +483,7 @@ EOF
   ! grep -q PREVIOUS_GENERATED_BODY "$home/.claude/rules/claude-md-design.md"
 }
 
-@test "native scoped design instruction preserves its paths and manual policy without entering global roots" {
+@test "native scoped design instruction preserves its paths and manual policy, entering Cursor only as a glob-scoped rule" {
   local home backup="$FX/backup" rehearsal expected
   prepare_scoped_runtime
   home="$(new_home scoped-design)"
@@ -502,7 +502,13 @@ EOF
     grep -q 'AI 開発協働ガイド' "$home/$root"
     ! grep -q 'CLAUDE.md Design Principles\|PRIVATE_MODEL_POLICY_MARKER\|Claude Code のモデル運用' "$home/$root"
   done
-  [ ! -e "$home/.cursor/rules/claude-md-design.mdc" ]
+  # APM 0.36 deploys user-scope instructions to Cursor (upstream fix for a
+  # silent omission); the scoped applyTo must survive as globs, never as an
+  # always-on rule.
+  [ -f "$home/.cursor/rules/claude-md-design.mdc" ]
+  grep -q '^globs:' "$home/.cursor/rules/claude-md-design.mdc"
+  grep -qF 'catalog/.apm/instructions' "$home/.cursor/rules/claude-md-design.mdc"
+  ! grep -q 'alwaysApply: true' "$home/.cursor/rules/claude-md-design.mdc"
 }
 
 @test "native refuses an edited design rule before rehearsal and rechecks after a clean rehearsal" {
