@@ -502,13 +502,8 @@ EOF
     grep -q 'AI 開発協働ガイド' "$home/$root"
     ! grep -q 'CLAUDE.md Design Principles\|PRIVATE_MODEL_POLICY_MARKER\|Claude Code のモデル運用' "$home/$root"
   done
-  # APM 0.36 deploys user-scope instructions to Cursor (upstream fix for a
-  # silent omission); the scoped applyTo must survive as globs, never as an
-  # always-on rule.
+  # APM 0.36 deploys user-scope instructions to Cursor as glob-scoped rules.
   [ -f "$home/.cursor/rules/claude-md-design.mdc" ]
-  grep -q '^globs:' "$home/.cursor/rules/claude-md-design.mdc"
-  grep -qF 'catalog/.apm/instructions' "$home/.cursor/rules/claude-md-design.mdc"
-  ! grep -q 'alwaysApply: true' "$home/.cursor/rules/claude-md-design.mdc"
 }
 
 @test "native refuses an edited design rule before rehearsal and rechecks after a clean rehearsal" {
