@@ -1,12 +1,12 @@
 lockfile_version: '1'
-generated_at: '2026-11-18T16:50:05.951009+00:00'
-apm_version: 0.35.1
+generated_at: '2026-11-19T13:40:11.601684+00:00'
+apm_version: 0.36.1
 dependencies:
 - repo_url: agavra/tuicr
   name: tuicr
   host: github.com
-  resolved_commit: 8b1ab488a895b9c30fa4cd59a684fb4b8099f365
-  resolved_ref: 8b1ab488a895b9c30fa4cd59a684fb4b8099f365
+  resolved_commit: a8185f2c701ed213c8407b8bda79dd6487d302ec
+  resolved_ref: a8185f2c701ed213c8407b8bda79dd6487d302ec
   version: unknown
   virtual_path: skills/tuicr
   is_virtual: true
@@ -40,11 +40,15 @@ dependencies:
     .claude/skills/tuicr/tuicr-wrapper-zellij.sh: sha256:e442e97902abaa4924ab295707de455a15371f0d72e89c1b76f0563bbf43125a
     .claude/skills/tuicr/tuicr-wrapper.sh: sha256:69ba7c046e36058a8c5431ac2df1258bf1547df8844ffbbf3c68112d7b546784
   content_hash: sha256:4cb9040d93e463ea9c7eb5f5db4cf7226296252a1b1af139ad99ddfa10165bd6
+  carried_licenses:
+  - path: LICENSE
+    source: LICENSE
+    hash: sha256:18c718aa7aa0337a9f7717b65c60129d1491d676714d016df8cbd6b62239b261
 - repo_url: browser-use/browser-harness
   name: browser-harness
   host: github.com
-  resolved_commit: f81992a129b1d125ee3fce0a1c48ef1e7b95dad7
-  resolved_ref: f81992a129b1d125ee3fce0a1c48ef1e7b95dad7
+  resolved_commit: fe4a2cd3dd308e8de929621e64e7f284d7a124d7
+  resolved_ref: fe4a2cd3dd308e8de929621e64e7f284d7a124d7
   version: unknown
   virtual_path: skills/browser-harness
   is_virtual: true
@@ -61,7 +65,11 @@ dependencies:
     .agents/skills/browser-harness/references/install.md: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
     .claude/skills/browser-harness/SKILL.md: sha256:9e25a96375a0e120c16b76ea9d0a57c2fb7a5765813f89d5b9bcdc6dba6ea175
     .claude/skills/browser-harness/references/install.md: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
-  content_hash: sha256:9aa26ad951ae87c6074e68ff6e510ecfde7c525bbfac52d3ab533c9eaf962331
+  content_hash: sha256:3c1db2846104885b7714210aef913905a7f6008d448915b6e1710c3cd1e88bbd
+  carried_licenses:
+  - path: LICENSE
+    source: LICENSE
+    hash: sha256:5afa3d97bf1e6f998d587fa101e3fe0d0c416840b7fe77bcd6ae97690a334631
 - repo_url: coji/natural-japanese
   name: natural-japanese
   host: github.com
@@ -159,8 +167,8 @@ dependencies:
 - repo_url: cursor/plugins
   name: thermo-nuclear-code-quality-review
   host: github.com
-  resolved_commit: 3dbd22ff12742fb28c9700b9760baa29ed41dc13
-  resolved_ref: 3dbd22ff12742fb28c9700b9760baa29ed41dc13
+  resolved_commit: e58dd043600587dbaf58ba315e7f2b38373eeb43
+  resolved_ref: e58dd043600587dbaf58ba315e7f2b38373eeb43
   version: unknown
   virtual_path: cursor-team-kit/skills/thermo-nuclear-code-quality-review
   is_virtual: true
@@ -174,12 +182,16 @@ dependencies:
     .agents/skills/thermo-nuclear-code-quality-review/SKILL.md: sha256:7faca08b51b643b2ddd0836f92af15574444024685dcc1e677dbbb39ae8c9e8f
     .claude/skills/thermo-nuclear-code-quality-review/SKILL.md: sha256:7faca08b51b643b2ddd0836f92af15574444024685dcc1e677dbbb39ae8c9e8f
   content_hash: sha256:9052b01b46b1d8dbf94c45f9313ec1983443f9a460e83d49cdc7fe0f640ca476
+  carried_licenses:
+  - path: LICENSE
+    source: cursor-team-kit/LICENSE
+    hash: sha256:702f5f331b56aff0e33d8c7826df5202559f894145eb70355c6477b55b5bb8a0
 - repo_url: emilkowalski/skills
   name: skills
   host: github.com
-  resolved_commit: 0f2e23b32bb1265e84cff8d3e75785fec953fb1b
-  resolved_ref: 0f2e23b32bb1265e84cff8d3e75785fec953fb1b
-  version: unknown
+  resolved_commit: 64eb3deb9a5fbfa041faf783e0bc3fd635872e9c
+  resolved_ref: 64eb3deb9a5fbfa041faf783e0bc3fd635872e9c
+  version: 0.0.0
   package_type: skill_bundle
   deployed_files:
   - .agents/skills/animation-performance
@@ -241,7 +253,7 @@ dependencies:
     .claude/skills/improve-animations/SKILL.md: sha256:73962447464433476343e2c12cd08ab39cc99a9e5f3c118c5fb54ed897574ef6
     .claude/skills/review-animations/SKILL.md: sha256:6ff590d29e436766135aa3d137be1fac2a867165c7257fc315b189361f1873af
     .claude/skills/review-animations/STANDARDS.md: sha256:e7d3605034acda54ca13e43aec9e64d65b53de20f75b11b8d694e373012fbe07
-  content_hash: sha256:7add0ae5c2d8fa1cc7246fd7e31228a11743aedbec92e032862ae1b64c92b3b3
+  content_hash: sha256:fa23ceb139cf1a8ceef6828a50c204dbafdac2998633784b449be8d9d7326159
   skill_subset:
   - animation-performance
   - apple-design
@@ -250,17 +262,82 @@ dependencies:
   - find-animation-opportunities
   - improve-animations
   - review-animations
+  carried_licenses:
+  - path: skills/animate-expo/LICENSE
+    source: LICENSE
+    hash: sha256:4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b
+  - path: skills/animate/LICENSE
+    source: LICENSE
+    hash: sha256:4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b
+  - path: skills/animation-performance/LICENSE
+    source: LICENSE
+    hash: sha256:4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b
+  - path: skills/animation-vocabulary/LICENSE
+    source: LICENSE
+    hash: sha256:4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b
+  - path: skills/apple-design/LICENSE
+    source: LICENSE
+    hash: sha256:4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b
+  - path: skills/ask-emil/LICENSE
+    source: LICENSE
+    hash: sha256:4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b
+  - path: skills/ask-sonner/LICENSE
+    source: LICENSE
+    hash: sha256:4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b
+  - path: skills/break-ui/LICENSE
+    source: LICENSE
+    hash: sha256:4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b
+  - path: skills/choreograph/LICENSE
+    source: LICENSE
+    hash: sha256:4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b
+  - path: skills/emil-design-eng/LICENSE
+    source: LICENSE
+    hash: sha256:4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b
+  - path: skills/find-animation-opportunities/LICENSE
+    source: LICENSE
+    hash: sha256:4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b
+  - path: skills/gestures/LICENSE
+    source: LICENSE
+    hash: sha256:4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b
+  - path: skills/improve-animations/LICENSE
+    source: LICENSE
+    hash: sha256:4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b
+  - path: skills/learn-taste/LICENSE
+    source: LICENSE
+    hash: sha256:4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b
+  - path: skills/mobile-native/LICENSE
+    source: LICENSE
+    hash: sha256:4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b
+  - path: skills/pick-ui-library/LICENSE
+    source: LICENSE
+    hash: sha256:4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b
+  - path: skills/prototype/LICENSE
+    source: LICENSE
+    hash: sha256:4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b
+  - path: skills/remove-animations/LICENSE
+    source: LICENSE
+    hash: sha256:4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b
+  - path: skills/review-animations/LICENSE
+    source: LICENSE
+    hash: sha256:4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b
+  - path: skills/write-swift/LICENSE
+    source: LICENSE
+    hash: sha256:4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b
 - repo_url: heydamir/unslop
   alias: unslop-ui
   name: unslop
   host: github.com
-  resolved_commit: 97daa3eb365670ea3f87ed85356cbfcee18105a5
-  resolved_ref: 97daa3eb365670ea3f87ed85356cbfcee18105a5
+  resolved_commit: 620163eedb3529d9cd23a3994ed8d287d06f760d
+  resolved_ref: 620163eedb3529d9cd23a3994ed8d287d06f760d
   version: unknown
   virtual_path: skills/unslop
   is_virtual: true
   package_type: claude_skill
-  content_hash: sha256:775a1aff90b6e9fd86b6271e9323f6917c6970430a708bb4ec6e7978866d6f14
+  content_hash: sha256:8bd4303a6318c6fa3955ec30dea317e620cbfe49b52263c9d201be3ae587c386
+  carried_licenses:
+  - path: LICENSE
+    source: LICENSE
+    hash: sha256:9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411
 - repo_url: humanlayer/skills
   name: show-me
   host: github.com
@@ -286,9 +363,9 @@ dependencies:
 - repo_url: ibelick/ui-skills
   name: ui-skills
   host: github.com
-  resolved_commit: 65cc0edb4f64fe8bfe7e9c59466074de25bece76
-  resolved_ref: 65cc0edb4f64fe8bfe7e9c59466074de25bece76
-  version: unknown
+  resolved_commit: 347d3189830f8ec3c4c041421bce19182a79dc7a
+  resolved_ref: 347d3189830f8ec3c4c041421bce19182a79dc7a
+  version: 0.0.0
   package_type: skill_bundle
   deployed_files:
   - .agents/skills/fixing-accessibility
@@ -318,9 +395,40 @@ dependencies:
     .claude/skills/improve-ui/SKILL.md: sha256:fa2ac808f6d9dab7bb3620880b014d2c18e227e5b006102856038096e573e69a
     .claude/skills/improve-ui/agents/openai.yaml: sha256:933af431364517518cbcfcd4e70eb8e8b390ead920abc48c071a4eedb6747183
     .claude/skills/improve-ui/references/plan-template.md: sha256:8faca7a14659a7f951d3b89fb730a43a4ce99966cc00481bf83d82b90f34b868
-  content_hash: sha256:cf73f9710dc16fe0a948d890a762a3dd4bc42f69f84ed0346fa124d9ea76e4c8
+  content_hash: sha256:c894fd3ff9d2d80323d15aa92f53008d528c989d916b34d333802afd5c3d6b04
   skill_subset:
   - fixing-accessibility
+  carried_licenses:
+  - path: skills/baseline-ui/LICENSE
+    source: LICENSE
+    hash: sha256:c615621c4cc1676ccde194e7a01b6469ba477780251bd71e007fc473a49c2c2b
+  - path: skills/component-canvas/LICENSE
+    source: LICENSE
+    hash: sha256:c615621c4cc1676ccde194e7a01b6469ba477780251bd71e007fc473a49c2c2b
+  - path: skills/create-canvas/LICENSE
+    source: LICENSE
+    hash: sha256:c615621c4cc1676ccde194e7a01b6469ba477780251bd71e007fc473a49c2c2b
+  - path: skills/create-design-md/LICENSE
+    source: LICENSE
+    hash: sha256:c615621c4cc1676ccde194e7a01b6469ba477780251bd71e007fc473a49c2c2b
+  - path: skills/device-frames/LICENSE
+    source: LICENSE
+    hash: sha256:c615621c4cc1676ccde194e7a01b6469ba477780251bd71e007fc473a49c2c2b
+  - path: skills/fixing-accessibility/LICENSE
+    source: LICENSE
+    hash: sha256:c615621c4cc1676ccde194e7a01b6469ba477780251bd71e007fc473a49c2c2b
+  - path: skills/fixing-metadata/LICENSE
+    source: LICENSE
+    hash: sha256:c615621c4cc1676ccde194e7a01b6469ba477780251bd71e007fc473a49c2c2b
+  - path: skills/fixing-motion-performance/LICENSE
+    source: LICENSE
+    hash: sha256:c615621c4cc1676ccde194e7a01b6469ba477780251bd71e007fc473a49c2c2b
+  - path: skills/improve-ui/LICENSE
+    source: LICENSE
+    hash: sha256:c615621c4cc1676ccde194e7a01b6469ba477780251bd71e007fc473a49c2c2b
+  - path: skills/ui-skills-root/LICENSE
+    source: LICENSE
+    hash: sha256:c615621c4cc1676ccde194e7a01b6469ba477780251bd71e007fc473a49c2c2b
 - repo_url: jackwener/opencli
   name: opencli-browser
   host: github.com
@@ -1070,8 +1178,8 @@ dependencies:
 - repo_url: mattpocock/skills
   name: mattpocock-skills
   host: github.com
-  resolved_commit: 5863806dd4e15c63174bee4e7515a4256792ecfa
-  resolved_ref: 5863806dd4e15c63174bee4e7515a4256792ecfa
+  resolved_commit: abeeaf95660ba9e8b7c753eb38f441ca707a8823
+  resolved_ref: abeeaf95660ba9e8b7c753eb38f441ca707a8823
   version: 1.3.2
   package_type: marketplace_plugin
   deployed_files:
@@ -1228,7 +1336,7 @@ dependencies:
     .claude/skills/writing-for-agents/SKILL-MECHANICS.md: sha256:c768e6307c7c10728c401c213f2c4ba71c542127eeb7ad2956aabd15a0fa0059
     .claude/skills/writing-for-agents/SKILL.md: sha256:551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a
     .claude/skills/writing-for-agents/agents/openai.yaml: sha256:eacb24b2a618cfb81dacb0416f4fdd75ddf3a8060f8ddb99aae1b1e301907e4b
-  content_hash: sha256:68aaa1f0f76b5efe3174e272ece328e606258d096d05013810213531cdee79c2
+  content_hash: sha256:003e20f3b138e75d099763bc2377361fd99072c2af9cb34cb73e383cf15cec9a
   skill_subset:
   - codebase-design
   - domain-modeling
@@ -1241,6 +1349,205 @@ dependencies:
   - wayfinder
   - writing-for-agents
   declared_license: MIT
+  carried_licenses:
+  - path: .apm/skills/ask-matt/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/code-review/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/codebase-design/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/diagnosing-bugs/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/domain-modeling/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/grill-me/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/grill-with-docs/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/grilling/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/handoff/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/implement-spec/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/implement/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/improve-codebase-architecture/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/pr/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/prototype/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/research/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/retro/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/setup-matt-pocock-skills/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/tdd/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/teach/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/to-questionnaire/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/to-spec/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/to-tickets/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/triage/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/wait-what/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/wayfinder/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/wizard/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: .apm/skills/writing-for-agents/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/engineering/ask-matt/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/engineering/code-review/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/engineering/codebase-design/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/engineering/diagnosing-bugs/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/engineering/domain-modeling/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/engineering/grill-with-docs/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/engineering/implement-spec/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/engineering/implement/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/engineering/improve-codebase-architecture/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/engineering/pr/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/engineering/prototype/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/engineering/research/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/engineering/retro/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/engineering/setup-matt-pocock-skills/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/engineering/tdd/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/engineering/to-spec/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/engineering/to-tickets/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/engineering/triage/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/engineering/wayfinder/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/engineering/wizard/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/in-progress/chief-of-staff/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/in-progress/claude-handoff/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/in-progress/loop-me/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/in-progress/setup-ts-deep-modules/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/in-progress/software-factory/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/in-progress/writing-beats/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/in-progress/writing-fragments/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/in-progress/writing-shape/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/misc/git-guardrails-claude-code/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/misc/migrate-to-shoehorn/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/misc/scaffold-exercises/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/misc/setup-pre-commit/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/productivity/grill-me/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/productivity/grilling/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/productivity/handoff/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/productivity/teach/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/productivity/to-questionnaire/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/productivity/wait-what/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
+  - path: skills/productivity/writing-for-agents/LICENSE
+    source: LICENSE
+    hash: sha256:0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5
 - repo_url: millionco/react-doctor
   name: react-doctor
   host: github.com
@@ -1266,8 +1573,8 @@ dependencies:
 - repo_url: nanaism/yomiyasu
   name: yomiyasu
   host: github.com
-  resolved_commit: db78b9bc5e868549b517a037df7a4d1c93edac23
-  resolved_ref: db78b9bc5e868549b517a037df7a4d1c93edac23
+  resolved_commit: c9b9a6d1bb0795356c0e34dc50f501424069d837
+  resolved_ref: c9b9a6d1bb0795356c0e34dc50f501424069d837
   version: unknown
   virtual_path: skills/yomiyasu
   is_virtual: true
@@ -1448,12 +1755,12 @@ dependencies:
     .claude/skills/yomiyasu/scripts/yomiyasu_diff.py: sha256:31c46a98bcd987c0a2dda7d9712fb830f3a70b1e0636b6a034ae191530d51ab5
     .claude/skills/yomiyasu/scripts/yomiyasu_hook.py: sha256:689ffbeecbaf0380ac99e37b6093f136364b7c7bbf014ada961c8e0781e8ab8b
     .claude/skills/yomiyasu/scripts/yomiyasu_lint.py: sha256:b02c21464353b726a8c4e366f89bdfd2f341613f7bf75f779e83cc4dfbc54c9e
-  content_hash: sha256:f88b5551d606efdff3a10e1e6b3d5900e373cb25f9cafdbe08840c76af36508b
+  content_hash: sha256:1d01a773bb0721bb28d7d5a585cd7acaeb0c9b16db79cad59213edeefccdd5be
 - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
   name: ui-ux-pro-max
   host: github.com
-  resolved_commit: 6ae86f61f520d6ca229d2f40e070410638c908c5
-  resolved_ref: 6ae86f61f520d6ca229d2f40e070410638c908c5
+  resolved_commit: 2de1134dc4d1cfe112934611ae5803ae17a1bd7e
+  resolved_ref: 2de1134dc4d1cfe112934611ae5803ae17a1bd7e
   version: 2.15.0
   package_type: marketplace_plugin
   deployed_files:
@@ -1752,10 +2059,62 @@ dependencies:
     .claude/skills/ui-ux-pro-max/scripts/tests/test_text_layout_resilience.py: sha256:b51d32ee8a15505b87cb81957fb2d1b385e041e8beb4463c311d236bfd29ebd4
     .claude/skills/ui-ux-pro-max/scripts/tests/test_web_stack_freshness.py: sha256:74897571398585f27e2c35d09d81b0a531c8c774f4a2967e5e1b1d1b05a483d9
     .claude/skills/ui-ux-pro-max/scripts/validate_data.py: sha256:a599aa256049cf30954d1f164721b99e453eb7e4cb8241bcab2d5573e6cf58b8
-  content_hash: sha256:d2802d7379a4423df18902fe5136c1c516aa2d6137a72be2f5ec9caf6be4b785
+  content_hash: sha256:3396644fe31719cae8996b0ad89b70d233b7707679b2dc68f99a126994f48040
   skill_subset:
   - ui-ux-pro-max
   declared_license: MIT
+  carried_licenses:
+  - path: .apm/skills/banner-design/LICENSE
+    source: LICENSE
+    hash: sha256:738f69dfa83db5c347c678fb9d90e560877059f0de93a327c39001bff92dc014
+  - path: .apm/skills/brand/LICENSE
+    source: LICENSE
+    hash: sha256:738f69dfa83db5c347c678fb9d90e560877059f0de93a327c39001bff92dc014
+  - path: .apm/skills/design-system/LICENSE
+    source: LICENSE
+    hash: sha256:738f69dfa83db5c347c678fb9d90e560877059f0de93a327c39001bff92dc014
+  - path: .apm/skills/design/LICENSE
+    source: LICENSE
+    hash: sha256:738f69dfa83db5c347c678fb9d90e560877059f0de93a327c39001bff92dc014
+  - path: .apm/skills/slides/LICENSE
+    source: LICENSE
+    hash: sha256:738f69dfa83db5c347c678fb9d90e560877059f0de93a327c39001bff92dc014
+  - path: .apm/skills/ui-ux-pro-max/LICENSE
+    source: LICENSE
+    hash: sha256:738f69dfa83db5c347c678fb9d90e560877059f0de93a327c39001bff92dc014
+  - path: .claude/skills/banner-design/LICENSE
+    source: LICENSE
+    hash: sha256:738f69dfa83db5c347c678fb9d90e560877059f0de93a327c39001bff92dc014
+  - path: .claude/skills/brand/LICENSE
+    source: LICENSE
+    hash: sha256:738f69dfa83db5c347c678fb9d90e560877059f0de93a327c39001bff92dc014
+  - path: .claude/skills/design-system/LICENSE
+    source: LICENSE
+    hash: sha256:738f69dfa83db5c347c678fb9d90e560877059f0de93a327c39001bff92dc014
+  - path: .claude/skills/design/LICENSE
+    source: LICENSE
+    hash: sha256:738f69dfa83db5c347c678fb9d90e560877059f0de93a327c39001bff92dc014
+  - path: .claude/skills/slides/LICENSE
+    source: LICENSE
+    hash: sha256:738f69dfa83db5c347c678fb9d90e560877059f0de93a327c39001bff92dc014
+  - path: .claude/skills/ui-ux-pro-max/LICENSE
+    source: LICENSE
+    hash: sha256:738f69dfa83db5c347c678fb9d90e560877059f0de93a327c39001bff92dc014
+  - path: cli/assets/skills/banner-design/LICENSE
+    source: LICENSE
+    hash: sha256:738f69dfa83db5c347c678fb9d90e560877059f0de93a327c39001bff92dc014
+  - path: cli/assets/skills/brand/LICENSE
+    source: LICENSE
+    hash: sha256:738f69dfa83db5c347c678fb9d90e560877059f0de93a327c39001bff92dc014
+  - path: cli/assets/skills/design-system/LICENSE
+    source: LICENSE
+    hash: sha256:738f69dfa83db5c347c678fb9d90e560877059f0de93a327c39001bff92dc014
+  - path: cli/assets/skills/design/LICENSE
+    source: LICENSE
+    hash: sha256:738f69dfa83db5c347c678fb9d90e560877059f0de93a327c39001bff92dc014
+  - path: cli/assets/skills/slides/LICENSE
+    source: LICENSE
+    hash: sha256:738f69dfa83db5c347c678fb9d90e560877059f0de93a327c39001bff92dc014
 - repo_url: openai/skills
   name: screenshot
   host: github.com
@@ -1929,8 +2288,8 @@ dependencies:
 - repo_url: tt-a1i/archify
   name: archify
   host: github.com
-  resolved_commit: e37848822238e3a61b12739185cdadd49843a620
-  resolved_ref: e37848822238e3a61b12739185cdadd49843a620
+  resolved_commit: 44781293f38728baf04dbad33ce1a0cef8c39cca
+  resolved_ref: 44781293f38728baf04dbad33ce1a0cef8c39cca
   version: unknown
   virtual_path: archify
   is_virtual: true
@@ -2727,8 +3086,8 @@ dependencies:
 - repo_url: vercel-labs/agent-desktop
   name: agent-desktop
   host: github.com
-  resolved_commit: 46d2adf885002633b77d5a9956c9464b24f61431
-  resolved_ref: 46d2adf885002633b77d5a9956c9464b24f61431
+  resolved_commit: b0b7277bea09b770ef9d1fb45aad667bc432cd57
+  resolved_ref: b0b7277bea09b770ef9d1fb45aad667bc432cd57
   version: unknown
   virtual_path: skills/agent-desktop
   is_virtual: true
@@ -2759,7 +3118,11 @@ dependencies:
     .claude/skills/agent-desktop/references/commands-observation.md: sha256:983291f1f8272fe3bea0a099d3faaf1aa6694c4e1f1a36c83362d9a1cd58e2f7
     .claude/skills/agent-desktop/references/commands-system.md: sha256:a99042f2cecf66f315f3bc38e4cf265bf36441ff08a4a4e847c718e1b6f2deb4
     .claude/skills/agent-desktop/references/workflows.md: sha256:e78194d24d3963d10a8069833c90a1bdb932f0ab8f6b645df79149d95471645c
-  content_hash: sha256:cd1e6daa04690612a5e26e2ffd1f01a2dcdc0f2a8c1e4dd1ddb1627863b1c4c0
+  content_hash: sha256:58032407daa209b72e7c087ee1885058f8e190b2481795bd7830aba8e70b7cbc
+  carried_licenses:
+  - path: LICENSE
+    source: LICENSE
+    hash: sha256:cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30
 - repo_url: vercel-labs/agent-skills
   name: vercel-react-best-practices
   host: github.com
@@ -5241,6 +5604,33 @@ deployments:
   content_hash: sha256:65174f651d6fef1cec55bc744eb11662f6e81f3c6a3b48ee45db29cb05841dfa
 - kind: project-relative
   target: claude
+  value: .claude/skills/babysit-pr
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/babysit-pr/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:fbe43ba3ab76a466a88ef8b46dca1b41fb8101347d24a396903849865173a6ac
+- kind: project-relative
+  target: claude
+  value: .claude/skills/babysit-pr/scripts/pr-wait
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:90393f85b95b78bff1b039744bdfb09dc88ff2b430e1c3df687ee6f449c97214
+- kind: project-relative
+  target: claude
   value: .claude/skills/backlog-sweep
   runtime: null
   scope: project
@@ -5410,6 +5800,24 @@ deployments:
   - mattpocock/skills
   active_owner: mattpocock/skills
   content_hash: sha256:edebc9e4fcfe102114012575eaa9600b9b5fd08c311664f389c36e7bc717740f
+- kind: project-relative
+  target: claude
+  value: .claude/skills/council
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/council/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:91cab56e85ca2ce2920961b50931573890e0513adbc5a60b33969b1e2501251c
 - kind: project-relative
   target: claude
   value: .claude/skills/design-md-workflow
@@ -5736,6 +6144,24 @@ deployments:
   content_hash: sha256:bb96bfb03fad06636c2977f3bc3792c733afe4bbf486bc96af2b0cbfbc77f19e
 - kind: project-relative
   target: claude
+  value: .claude/skills/file-pr
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/file-pr/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:174a7ae52e3b9d17f2bd0eaf0a11a89d744d1249164ecbdb0e642359eee75b1b
+- kind: project-relative
+  target: claude
   value: .claude/skills/find-animation-opportunities
   runtime: null
   scope: project
@@ -5788,6 +6214,60 @@ deployments:
   - ibelick/ui-skills
   active_owner: ibelick/ui-skills
   content_hash: sha256:0a2d654902bc04263ce68c8c02967ef03f17b482e855360a5463211d99d7baa9
+- kind: project-relative
+  target: claude
+  value: .claude/skills/full-send
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/full-send/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:ba585e47cd901506b0e2de13025b0e39bc02462c136cf27491ad3efbdfe66020
+- kind: project-relative
+  target: claude
+  value: .claude/skills/full-send/agents/openai.yaml
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:8a1e8ce04a774a8a2e469cecf5e45a9cec4d3438b4c587cf166c2f78206390d2
+- kind: project-relative
+  target: claude
+  value: .claude/skills/full-stop
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/full-stop/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:f2896ab97c3ffc7e55afbe2ad006b48e30b42abdeaebb0685bb1981fce2a7e6a
+- kind: project-relative
+  target: claude
+  value: .claude/skills/full-stop/agents/openai.yaml
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:6029e872a883aa06aad3426ab58289df016e4b0d23485719c71152603fec7d35
 - kind: project-relative
   target: claude
   value: .claude/skills/gh-address-comments
@@ -6463,6 +6943,33 @@ deployments:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
   content_hash: sha256:165dd9449fe4c8467bd5f0de32e74d7806786b215ad2dcde658b30c606657fce
+- kind: project-relative
+  target: claude
+  value: .claude/skills/modernize
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/modernize/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:6172d774c46f535367086da90db1b0aaaaac969ed05ff040444f9afa9a6b1552
+- kind: project-relative
+  target: claude
+  value: .claude/skills/modernize/agents/openai.yaml
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:6675e91e10f2b264fe1a027072f6d9f46299f781011e248a5ba075fc1f764e09
 - kind: project-relative
   target: claude
   value: .claude/skills/natural-japanese
@@ -8047,6 +8554,42 @@ deployments:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
   content_hash: sha256:3188868e0decf956df49933ceb253f52e590cb6c19af5fdfecf6aedc46ced55c
+- kind: project-relative
+  target: claude
+  value: .claude/skills/sol-loop
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/sol-loop/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:1db1eb4c4a156ee666070e9a12623d520cd1bd9b19c3fc21003fe5a440ba0b10
+- kind: project-relative
+  target: claude
+  value: .claude/skills/takeover
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/takeover/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:9f00a7c67bf82603af2e80f56e9ce63f1516a1b4339365b79cf786d9d9055465
 - kind: project-relative
   target: claude
   value: .claude/skills/terminal-browser
@@ -11586,6 +12129,33 @@ deployments:
   content_hash: sha256:65174f651d6fef1cec55bc744eb11662f6e81f3c6a3b48ee45db29cb05841dfa
 - kind: project-relative
   target: codex
+  value: .agents/skills/babysit-pr
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/babysit-pr/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:fbe43ba3ab76a466a88ef8b46dca1b41fb8101347d24a396903849865173a6ac
+- kind: project-relative
+  target: codex
+  value: .agents/skills/babysit-pr/scripts/pr-wait
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:90393f85b95b78bff1b039744bdfb09dc88ff2b430e1c3df687ee6f449c97214
+- kind: project-relative
+  target: codex
   value: .agents/skills/backlog-sweep
   runtime: null
   scope: project
@@ -11755,6 +12325,24 @@ deployments:
   - mattpocock/skills
   active_owner: mattpocock/skills
   content_hash: sha256:edebc9e4fcfe102114012575eaa9600b9b5fd08c311664f389c36e7bc717740f
+- kind: project-relative
+  target: codex
+  value: .agents/skills/council
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/council/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:91cab56e85ca2ce2920961b50931573890e0513adbc5a60b33969b1e2501251c
 - kind: project-relative
   target: codex
   value: .agents/skills/design-md-workflow
@@ -12081,6 +12669,24 @@ deployments:
   content_hash: sha256:bb96bfb03fad06636c2977f3bc3792c733afe4bbf486bc96af2b0cbfbc77f19e
 - kind: project-relative
   target: codex
+  value: .agents/skills/file-pr
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/file-pr/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:174a7ae52e3b9d17f2bd0eaf0a11a89d744d1249164ecbdb0e642359eee75b1b
+- kind: project-relative
+  target: codex
   value: .agents/skills/find-animation-opportunities
   runtime: null
   scope: project
@@ -12133,6 +12739,60 @@ deployments:
   - ibelick/ui-skills
   active_owner: ibelick/ui-skills
   content_hash: sha256:0a2d654902bc04263ce68c8c02967ef03f17b482e855360a5463211d99d7baa9
+- kind: project-relative
+  target: codex
+  value: .agents/skills/full-send
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/full-send/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:ba585e47cd901506b0e2de13025b0e39bc02462c136cf27491ad3efbdfe66020
+- kind: project-relative
+  target: codex
+  value: .agents/skills/full-send/agents/openai.yaml
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:8a1e8ce04a774a8a2e469cecf5e45a9cec4d3438b4c587cf166c2f78206390d2
+- kind: project-relative
+  target: codex
+  value: .agents/skills/full-stop
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/full-stop/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:f2896ab97c3ffc7e55afbe2ad006b48e30b42abdeaebb0685bb1981fce2a7e6a
+- kind: project-relative
+  target: codex
+  value: .agents/skills/full-stop/agents/openai.yaml
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:6029e872a883aa06aad3426ab58289df016e4b0d23485719c71152603fec7d35
 - kind: project-relative
   target: codex
   value: .agents/skills/gh-address-comments
@@ -12808,6 +13468,33 @@ deployments:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
   content_hash: sha256:165dd9449fe4c8467bd5f0de32e74d7806786b215ad2dcde658b30c606657fce
+- kind: project-relative
+  target: codex
+  value: .agents/skills/modernize
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/modernize/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:6172d774c46f535367086da90db1b0aaaaac969ed05ff040444f9afa9a6b1552
+- kind: project-relative
+  target: codex
+  value: .agents/skills/modernize/agents/openai.yaml
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:6675e91e10f2b264fe1a027072f6d9f46299f781011e248a5ba075fc1f764e09
 - kind: project-relative
   target: codex
   value: .agents/skills/natural-japanese
@@ -14392,6 +15079,42 @@ deployments:
   - jey3dayo/apm-workspace/catalog
   active_owner: jey3dayo/apm-workspace/catalog
   content_hash: sha256:3188868e0decf956df49933ceb253f52e590cb6c19af5fdfecf6aedc46ced55c
+- kind: project-relative
+  target: codex
+  value: .agents/skills/sol-loop
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/sol-loop/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:1db1eb4c4a156ee666070e9a12623d520cd1bd9b19c3fc21003fe5a440ba0b10
+- kind: project-relative
+  target: codex
+  value: .agents/skills/takeover
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/takeover/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - t3dotgg/tstack
+  active_owner: t3dotgg/tstack
+  content_hash: sha256:9f00a7c67bf82603af2e80f56e9ce63f1516a1b4339365b79cf786d9d9055465
 - kind: project-relative
   target: codex
   value: .agents/skills/terminal-browser
