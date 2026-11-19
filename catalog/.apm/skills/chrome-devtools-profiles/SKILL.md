@@ -13,10 +13,11 @@ Secure Preferences の `extensions.settings.<ID>` にある Web Store 拡張の�
 
 ## 境界
 
-- 稼働中のプロファイルには触らない。3 つのスクリプトは `Singleton*` と `--user-data-dir=` を持つプロセスを見て中止する。
+- 稼働中のプロファイルには触らない。3 つのスクリプトは `Singleton*` と `--user-data-dir=` を持つプロセスを見て中止する。`PROFILES_DIR` は末尾の `/` や `./` を正規化してから使う。
 - 素のフラグで Chrome を起動しない。Chrome アプリ全体も終了しない（`pkill` / `killall` / `open -a` を使わない）。verify は自分が起動した PID だけを止める。
 - `Local Extension Settings` の中身を読まない。復旧では対象プロファイル自身の拡張設定データ（`Local Extension Settings` / `Managed Extension Settings` / `IndexedDB` ほか）を保持する。
-- `restore-extension.sh` は `Secure Preferences` をテンプレのものでファイルごと置き換える。対象にだけある他の拡張の登録は失われる（元のファイルは `$BACKUP_DIR` に残る）。
+- `restore-extension.sh` は `Secure Preferences` をテンプレのものでファイルごと置き換える。対象にだけある他の拡張の登録は失われ、tracked prefs（起動ページ・ホーム・検索エンジンなど）もテンプレ側の値に戻る。元の `Secure Preferences` と `Preferences` は `$BACKUP_DIR` に残り、失敗時の巻き戻し対象になる。
+- 対象に `Default/Extensions/<ID>` が既にあれば、`$BACKUP_DIR/<target>-<ts>/Extensions-<ID>/` へ退避してからテンプレの実体に差し替える。巻き戻しでは退避した実体を元の場所へ戻す。
 
 ## スクリプト
 
@@ -24,15 +25,23 @@ Secure Preferences の `extensions.settings.<ID>` にある Web Store 拡張の�
 
 ```bash
 S="$HOME/.agents/skills/chrome-devtools-profiles/scripts"
-"$S/create-template.sh" <source-profile> [template-name=_template]  # ログイン済みプロファイルからサイトデータを除いたテンプレを作り、verify する
+"$S/create-template.sh" <source-profile> [template-name=_template]  # 許可リストのデータだけをコピーしてテンプレを作り、verify する
 "$S/verify-profile.sh" <profile>                                    # MCP 相当フラグで 2 回起動し、登録・実体・exit_type を確認する
 "$S/restore-extension.sh" <target-profile> [template-name=_template] # テンプレの拡張と Secure Preferences を戻す。バックアップは $BACKUP_DIR
 ```
 
+`create-template.sh` は、残すものだけを `$PROFILES_DIR/.<template>.partial-<pid>` へコピーする許可リスト方式で、サイトデータを消す方式ではない。`Preferences` を整えて partial を verify し、通ったときだけ本名へ移す。失敗すると partial が一時名のまま残る。元プロファイル由来のデータを含むため、不要になったら削除する。
+
+## 新規 `<product>` の作成
+
+1. テンプレが未稼働であることを確認する。`_template/Singleton*` が無く、`--user-data-dir=` に `_template` を持つプロセスも無いこと。
+2. `rsync -a --exclude='Singleton*' "$PROFILES_DIR/_template/" "$PROFILES_DIR/<product>/"`
+3. `"$S/verify-profile.sh" <product>`
+
 ## 合格条件
 
-- `verify-profile.sh`: 2 サイクルとも拡張の登録・`Extensions` 配下の実体・`exit_type` が OK で、最終行が `VERIFY OK <profile>`。
-- `restore-extension.sh`: 最終行が `RESTORE OK <target>`。失敗時は Secure Preferences と復旧した拡張が巻き戻され、バックアップが残る。
+- `verify-profile.sh`: 2 サイクルとも拡張の登録・`disable_reasons` が空（無い・`[]`・`0`）・`Extensions` 配下の実体と `manifest.json`・`exit_type` が OK で、最終行が `VERIFY OK <profile>`。
+- `restore-extension.sh`: 最終行が `RESTORE OK <target>`。失敗時は `Secure Preferences` / `Preferences` と拡張の実体が巻き戻され、バックアップが残る。
 - `create-template.sh`: verify が通り、最終行が `CREATE OK <template>`。
 
 並列セッションでのプロファイル運用は `apm-usage` の `references/repo-local-mcp.md`「chrome-devtools Parallel Sessions」節を参照する。

@@ -5,119 +5,71 @@ usage() {
   cat >&2 <<'USAGE'
 usage: create-template.sh <source-profile> [template-name=_template]
 
-  Copies $PROFILES_DIR/<source-profile> to $PROFILES_DIR/<template-name>, strips
-  site data and personal preferences, then runs verify-profile.sh on the copy.
-  Both profiles must be stopped; the template must not exist yet.
+  Builds $PROFILES_DIR/<template-name> from $PROFILES_DIR/<source-profile> by
+  copying only an allowlist into $PROFILES_DIR/.<template-name>.partial-<pid>,
+  cleaning Default/Preferences, running verify-profile.sh on it, and then
+  renaming it to <template-name>. Both profiles must be stopped; the template
+  must not exist yet.
+
+  Kept (when present):
+    Default/: Extensions, Local Extension Settings, Managed Extension Settings,
+              Extension State, Extension Rules, Extension Scripts, Preferences,
+              Secure Preferences, IndexedDB/chrome-extension_*
+    profile root: the ROOT_FILES list in this script (empty)
+  Everything else (cookies, history, sync extension data, ...) is not copied.
 
 env: PROFILES_DIR  (default: $HOME/.cache/chrome-devtools-mcp/profiles)
      CHROME_BIN    (read by verify-profile.sh)
 
-exit: 0 created and verified, 1 failed (a failed copy is kept for inspection),
-      2 usage or validation error, 3 profile in use
+exit: 0 created and verified, 1 failed (the partial copy is kept and holds data
+      from the source profile), 2 usage or validation error, 3 profile in use
 USAGE
   exit 2
 }
 
-PROFILES_DIR="${PROFILES_DIR:-$HOME/.cache/chrome-devtools-mcp/profiles}"
-export PROFILES_DIR
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+# shellcheck source=lib.sh
+. "$script_dir/lib.sh"
 
-SITE_FILES=(
-  "History" "Favicons" "Top Sites" "Shortcuts" "Web Data" "Account Web Data"
-  "Cookies" "Login Data" "Login Data For Account" "Affiliation Database"
-  "Network Action Predictor" "DIPS" "DIPS-wal" "Device Bound Sessions"
-  "ServerCertificate" "heavy_ad_intervention_opt_out.db"
-  "declarative_performance_observer.db"
+ROOT_FILES=()
+
+DEFAULT_ENTRIES=(
+  "Extensions" "Local Extension Settings" "Managed Extension Settings"
+  "Extension State" "Extension Rules" "Extension Scripts"
+  "Preferences" "Secure Preferences"
 )
 
-SITE_DIRS=(
-  "Network" "Sessions" "Sessions_Encrypted" "Session Storage" "Local Storage"
-  "Service Worker" "WebStorage" "Storage" "Shared Dictionary"
-  "Site Characteristics Database" "shared_proto_db" "blob_storage" "Cache"
-  "Code Cache" "GPUCache" "Download Service" "ClientCertificates" "Sync Data"
-  "AutofillStrikeDatabase" "AutofillAiModelCache" "Web Applications"
-  "PersistentOriginTrials" "chrome_cart_db" "commerce_subscription_db"
-  "discounts_db" "discount_infos_db" "parcel_tracking_db"
-)
-
-die() {
-  echo "error: $1" >&2
-  exit "${2:-1}"
+copy_entry() {
+  local from=$1/$2 to=$3
+  if [ -L "$from" ]; then
+    die "refusing to copy symlink: $from"
+  fi
+  [ -e "$from" ] || return 0
+  rsync -a -- "$from" "$to/" || die "copy failed: $from"
 }
 
-validate_name() {
-  case "$1" in
-    "" | . | -* | */* | *..*) die "invalid profile name: '$1'" 2 ;;
-  esac
-}
-
-singleton_present() {
-  local f
-  for f in SingletonLock SingletonSocket SingletonCookie; do
-    if [ -L "$1/$f" ] || [ -e "$1/$f" ]; then
-      return 0
-    fi
+copy_allowlist() {
+  local name entry
+  for name in ${ROOT_FILES[@]+"${ROOT_FILES[@]}"}; do
+    copy_entry "$src" "$name" "$partial"
   done
-  return 1
-}
-
-process_uses_dir() {
-  local needle="--user-data-dir=$1" ps_out line rest
-  ps_out=$(ps -axo pid=,command=) || die "ps failed; cannot check running Chrome" 3
-  while IFS= read -r line; do
-    rest=$line
-    while [[ $rest == *"$needle"* ]]; do
-      rest=${rest#*"$needle"}
-      if [ -z "$rest" ] || [[ $rest == " "* ]]; then
-        return 0
-      fi
+  if [ -L "$src/Default" ]; then
+    die "refusing to copy symlink: $src/Default"
+  fi
+  mkdir -p "$partial/Default"
+  for name in "${DEFAULT_ENTRIES[@]}"; do
+    copy_entry "$src/Default" "$name" "$partial/Default"
+  done
+  if [ -L "$src/Default/IndexedDB" ]; then
+    die "refusing to copy symlink: $src/Default/IndexedDB"
+  fi
+  if [ -d "$src/Default/IndexedDB" ]; then
+    mkdir -p "$partial/Default/IndexedDB"
+    for entry in "$src/Default/IndexedDB"/chrome-extension_*; do
+      [ -e "$entry" ] || [ -L "$entry" ] || continue
+      copy_entry "$src/Default/IndexedDB" "${entry##*/}" "$partial/Default/IndexedDB"
     done
-  done <<<"$ps_out"
-  return 1
-}
-
-assert_not_running() {
-  if singleton_present "$1"; then
-    die "profile in use (Singleton* present): $1" 3
   fi
-  if process_uses_dir "$1"; then
-    die "profile in use (Chrome process holds --user-data-dir): $1" 3
-  fi
-}
-
-remove_entry() {
-  local base=$1 name=$2
-  [ -n "$base" ] && [ -n "$name" ] || die "empty path component"
-  case "$base" in
-    "$dest" | "$dest"/*) ;;
-    *) die "refusing to delete outside $dest: $base" ;;
-  esac
-  case "$name" in
-    . | .. | */*) die "invalid entry name: $name" ;;
-  esac
-  [ ! -L "$base" ] || die "refusing to delete through symlink: $base"
-  if [ -L "$base/$name" ] || [ -e "$base/$name" ]; then
-    rm -rf -- "${base:?}/${name:?}"
-  fi
-}
-
-strip_site_data() {
-  local default=$1/Default name entry
-  for name in "${SITE_FILES[@]}"; do
-    remove_entry "$default" "$name"
-    remove_entry "$default" "$name-journal"
-  done
-  for name in "${SITE_DIRS[@]}"; do
-    remove_entry "$default" "$name"
-  done
-  remove_entry "$1" "BrowserMetrics"
-  remove_entry "$1" "BrowserMetrics-spare.pma"
-  for entry in "$default"/IndexedDB/*; do
-    name=${entry##*/}
-    case "$name" in
-      chrome-extension_*) continue ;;
-    esac
-    remove_entry "$default/IndexedDB" "$name"
-  done
 }
 
 clean_preferences() {
@@ -206,6 +158,16 @@ for change in changes:
 PY
 }
 
+partial_made=""
+
+on_exit() {
+  local rc=$?
+  if [ "$rc" -ne 0 ] && [ -n "$partial_made" ]; then
+    echo "partial template kept at $partial; it holds data from $src, delete it if not needed" >&2
+  fi
+  exit "$rc"
+}
+
 [ $# -ge 1 ] && [ $# -le 2 ] || usage
 case "$1" in -h | --help) usage ;; esac
 source_name=$1
@@ -213,24 +175,35 @@ template_name=${2:-_template}
 validate_name "$source_name"
 validate_name "$template_name"
 [ "$source_name" != "$template_name" ] || die "source and template must differ" 2
+normalize_profiles_dir
 
 src="$PROFILES_DIR/$source_name"
 dest="$PROFILES_DIR/$template_name"
+partial_name=".$template_name.partial-$$"
+partial="$PROFILES_DIR/$partial_name"
 
 [ -d "$src" ] || die "source profile not found: $src"
 if [ -L "$dest" ] || [ -e "$dest" ]; then
   die "template already exists: $dest"
 fi
+if [ -L "$partial" ] || [ -e "$partial" ]; then
+  die "partial template already exists: $partial"
+fi
 assert_not_running "$src"
 assert_not_running "$dest"
 command -v rsync >/dev/null 2>&1 || die "rsync is required"
 
-rsync -a --exclude=SingletonLock --exclude=SingletonSocket --exclude=SingletonCookie "$src/" "$dest/" ||
-  die "copy failed; partial template left at $dest"
-strip_site_data "$dest"
-[ -f "$dest/Default/Preferences" ] || die "Preferences missing in template: $dest/Default/Preferences"
-clean_preferences "$dest/Default/Preferences" || die "Preferences cleanup failed; template left at $dest"
+mkdir "$partial"
+partial_made=1
+trap on_exit EXIT
+copy_allowlist
+[ -f "$partial/Default/Preferences" ] || die "Preferences missing in template: $partial/Default/Preferences"
+clean_preferences "$partial/Default/Preferences" || die "Preferences cleanup failed"
 
-script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-"$script_dir/verify-profile.sh" "$template_name" || die "verification failed; template left at $dest for inspection"
+"$script_dir/verify-profile.sh" "$partial_name" || die "verification failed"
+if [ -L "$dest" ] || [ -e "$dest" ]; then
+  die "template appeared during creation: $dest"
+fi
+mv -- "$partial" "$dest"
+partial_made=""
 echo "CREATE OK $template_name"
