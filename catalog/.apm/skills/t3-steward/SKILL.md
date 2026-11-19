@@ -81,7 +81,7 @@ steward は完了や区切りで settle しない（`t3-stack` と同じ）。se
 ## 6. レビューとマージ
 
 - verdict が要るレビュー（マージ条件の blocking 0）は、`orchestrator-worker`「verdict review の起動と受理」の `codex exec -s read-only` を既定にする。T3 スレッドへの読み取り専用依頼は、実行時に強制されないので advisory 止まり。
-- 差し戻しは同じ子へ `t3_thread_send`。再レビューは新規の `delegate_task`（依頼文に前回の指摘と反論を書く）。公式の「小さなレビュー指摘は親が直す」は採らず、差し戻して子に直させる（公式より優先）。
+- 差し戻しは同じ子へ `t3_thread_send`。再レビューも新規セッションの verdict 経路（`codex exec -s read-only`）で行い、固定する SHA は修正後の `HEAD` に取り直す。prompt に前回の指摘と反論を書く。T3 スレッド（`delegate_task`）の再レビューは advisory で、マージ gate の承認にならない。公式の「小さなレビュー指摘は親が直す」は採らず、差し戻して子に直させる（公式より優先）。
 - steward のマージ権限は担当bot と同じ条件（`t3-stack`「マージとデプロイ」）: 人間の常設許可か、そのタスクでの条件付き許可があり、かつ verdict の承認で blocking 0、bot のレビューを含むコメントを確認済み、CI 緑、CLEAN。`--admin` は使わない。
 - 反映の範囲: stg への反映は常設の許可、production は都度人間の承認。product ごとに、この範囲を台帳の冒頭へ明記する。
 - PR の作成は `file-pr` に従う。tstack の `full-send` は verdict gate（`codex exec -s read-only`、CI、CLEAN）と衝突するので、人間が明示したときだけ使う。
