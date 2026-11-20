@@ -21,7 +21,7 @@ product ごとに1本置く常駐メインセッションの運営手順。stewa
 
 状態の持ち主はスレッド履歴ではなく状況ファイル `~/tmp/iw/<product>-steward-status.md`。冒頭に次を置く。
 
-- 現在の owner を1行（スレッドのリンクと交代日時）。
+- 現在の owner を1行（スレッドの threadId とリンク、交代日時）。外側の triage はこの threadId を保護リストと照合するので、リンクだけにしない。
 - 「このファイルを読む者は `t3-steward` に従う」の1行。
 - product の許可範囲（§6）と、受け入れ確認の環境（§5）。
 
@@ -40,6 +40,8 @@ product ごとに1本置く常駐メインセッションの運営手順。stewa
 台帳は作業の区切りではなく、子の起動・push・マージ・デプロイの前後に更新する。起動前に行と base を書き、起動直後に threadId を書く。後継の steward は他人の子を `task_status` で読めないので、台帳の threadId から `t3_thread_read` / `t3_thread_wait` で拾い直す。台帳に無い子は、後継からは存在しないものになる。
 
 文脈が重くなったら、区切りごとに要約を台帳へ寄せ、生ログや diff は子に持たせる。それでも重ければ §8 の交代へ進む。
+
+外側の triage や担当bot の操作で子が settle されていたら、それは行方不明ではなく片付け済みとして扱い、台帳の行を閉じる。settle されたことを理由に、同じ仕事の子を再起動しない。
 
 ## 3. 再開条件（心拍）
 
@@ -77,6 +79,7 @@ steward は完了や区切りで settle しない（`t3-stack` と同じ）。se
 - 枠の管理: 検証が終わった子は、証拠のパスを受け取ったあと steward が settle する。settle するまでブラウザの枠は空かない（idle ではロックが外れない。実測は `t3-stack` のブラウザ節）。掴めなかった子は `BLOCKED(browser busy)` で返す。待機・再試行・既定プロファイルや `--isolated` への切り替えはさせない。待機している子はブラウザを握らずにターンを閉じ、枠が空いたら steward が同じスレッドへ追送して再開させる。
 - 受け入れ確認の環境は product ごとに台帳へ書く。localhost／プレビュー／stg のどれか、origin も含める。develop から stg へ流れる product ではマージ前に stg を確認できない。localhost は別途ログインが要り、dev server のポートも競合しうる。production での確認は読み取りだけを must にする。
 - 子の受け取り検証は `orchestrator-worker` §5 に従う。子の `DONE` は未検証の申告として扱い、SHA と差分を自分で照合する。
+- 子の settle は steward の責任: 受け入れた子は、完了報告を受領し、検証と受け入れを終えたら steward が settle する。外側の triage は steward 配下の子を対象にしない（台帳を読めるのは steward だけのため）ので、steward が settle しなければ子は一覧に残り続ける。
 
 ## 6. レビューとマージ
 
