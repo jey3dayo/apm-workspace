@@ -5,7 +5,8 @@ description: >-
   values computed during render, key resets, URL state, useEffect anti-patterns (You Might Not Need an Effect),
   React 19 Actions with useOptimistic / useActionState / useFormStatus, use + Suspense data reads,
   useEffectEvent limits, state placement and Suspense boundaries, React Compiler memoization defaults,
-  and the eslint-plugin-react-hooks recommended gate.
+  and the eslint-plugin-react-hooks recommended gate. Hook selection and
+  useEffect patterns only; general refactoring orchestration is `refactoring`.
 ---
 
 # React Hooks Refactoring

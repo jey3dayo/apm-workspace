@@ -1,10 +1,11 @@
 ---
 name: todo-changelog-ops
 description: >-
-  Maintain a repository's TODO.md and CHANGELOG.md: add, close or prune TODO entries,
-  move landed work (from TODO.md, todo.txt, issues or PRs) into CHANGELOG, set up
-  tracking in a repo with none, and decide where a task belongs (todo.txt / issue /
-  docs / TODO.md). Release version sections belong to the release workflow.
+  Decide where a task belongs (todo.txt / issue / docs / TODO.md), and maintain a
+  repository's TODO.md and CHANGELOG.md: add, close or prune TODO entries, move
+  landed work (from TODO.md, todo.txt, issues or PRs) into CHANGELOG, and set up
+  tracking in a repo with none. Release version sections belong to the release
+  workflow.
 ---
 
 # TODO / CHANGELOG Ops

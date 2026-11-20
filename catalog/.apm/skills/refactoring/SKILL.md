@@ -1,10 +1,11 @@
 ---
 name: refactoring
 description: >-
-  Plan and execute TS/JS/React refactoring: duplicate code (similarity-ts), react-doctor
-  diagnostics, dead code and unused exports, helper extraction, and validation /
-  Result / repository boundary ownership（「リファクタ」「重複コード」「コード整理」）.
-  Not for feature work.
+  Plan and execute TS/JS/React refactoring orchestration: react-doctor diagnostics,
+  dead code and unused exports, helper extraction, and validation / Result /
+  repository boundary ownership（「リファクタ」「コード整理」）. Duplicate-code
+  detection itself is `similarity`; this skill consumes its report. Not for
+  feature work.
 ---
 
 # Refactoring - Integrated TypeScript/JavaScript/React Refactoring Workflow
