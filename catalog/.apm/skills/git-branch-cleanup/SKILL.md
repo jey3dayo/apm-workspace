@@ -189,7 +189,7 @@ The plan format lives in [references/plan-format.md](references/plan-format.md).
 
 ## Revalidate and execute confirmed rows
 
-Execution lives in [references/execution-revalidation.md](references/execution-revalidation.md). Only the parent session reads that file, and only after the user answers y to the plan just shown: it defines the per-row live revalidation gate, the worktree → local → remote execution order, and the per-action outcome reporting. The planning subagent never reads or runs this phase.
+Execution lives in [references/execution-revalidation.md](references/execution-revalidation.md). Only the parent session reads that file, and only after the user answers y to the plan just shown: it defines the per-row live revalidation gate, the worktree → local → remote execution order, and the per-action outcome reporting. Its gate reuses two planning definitions (the same-repository partition and the all-page rules query), so the parent also reads those sections of [references/candidate-construction.md](references/candidate-construction.md) at that point. The planning subagent never reads or runs this phase.
 
 ## Script decision
 

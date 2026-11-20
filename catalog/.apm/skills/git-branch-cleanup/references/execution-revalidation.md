@@ -1,6 +1,6 @@
 # Execution revalidation (git-branch-cleanup reference)
 
-This reference is part of `git-branch-cleanup`. The parent session reads it together with `SKILL.md` only after the user confirms a plan with y. The planning subagent never reads or runs this phase.
+This reference is part of `git-branch-cleanup`. The parent session reads it together with `SKILL.md` only after the user confirms a plan with y. The planning subagent never reads or runs this phase. Two definitions this phase reuses live in [candidate-construction.md](candidate-construction.md), so read those sections before running the gate below: the same-repository partition rule (step 1 of candidate construction) and the all-page rules query with its exit-status, array, and flatten checks (step 3).
 
 Only after the user's y, process the proposed rows one at a time. Immediately
 before each deletion, independently re-resolve and compare the live state with
@@ -17,7 +17,8 @@ that row:
   `git -C <checkout> ls-remote --heads <resolved-remote> <validated-upstream:remoteref>`,
   re-confirming `remote-absent` when the fresh query returns no row;
 - candidate-level rules from a fresh run of the all-page rules query defined
-  above, with the same exit-status, array, and flatten checks;
+  in [candidate-construction.md](candidate-construction.md) (step 3), with the
+  same exit-status, array, and flatten checks;
 - every branch-name-matching PR from a fresh targeted query:
 
   ```bash
