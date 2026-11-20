@@ -3,7 +3,9 @@ name: gh-address-comments
 description: >-
   Work through GitHub PR review feedback: read unresolved review threads and inline
   comments (bundled GraphQL script for thread state), cluster them, and implement
-  the selected fixes. Never replies or resolves threads unless asked.
+  the selected fixes. Never replies or resolves threads unless asked. Usually
+  entered via `pr-followup` or `ship`; use directly only when fixes without
+  reply/resolve are wanted.
 metadata:
   author: OpenAI
   source: openai/plugins plugins/github/skills/gh-address-comments@11c74d6 (retired upstream in 33bd952; salvaged 2026-08-28, connector references replaced with gh CLI)
