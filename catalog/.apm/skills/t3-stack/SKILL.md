@@ -25,6 +25,8 @@ description: >-
 
 steward の運営（状況ファイル、再開条件、子の依頼文と追跡、マージ・stg の権限、引き継ぎ・交代）は `t3-steward` が持つ。本スキルは steward と担当bot の両方が使う共通基盤を持つ。
 
+スレッド一覧の外側 triage（終わったスレッドの settle 候補の抽出と、停滞の通知）の手順は、担当bot 側の共有スキル（Drive `ai-memory/skills/t3-thread-triage.md`、https://drive.google.com/file/d/1Qt9VVblBQfFWEOl_qUZE22wwx7xhmTKB/view ）が正本で、ここには写さない。steward 配下の子は triage の対象外で、子の settle は steward が行う。
+
 ## 起動する側（担当bot）の流れ
 
 1. `orchestrator_capabilities` で上限の `runtimeMode` を先に確かめる。上限がタスクに足りなければ起動せず、人間に伝える。上限はトークン発行時に焼き込まれ、後からは上げられない。
