@@ -14,7 +14,7 @@ dependencies:
     - jey3dayo/apm-workspace/manual-skills#main
 
     # --- review ---
-    - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review#e58dd043600587dbaf58ba315e7f2b38373eeb43
+    - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review#7a583913eb1b8d1a0ee76753d1a2cf072e7b54f9
     - shadcn/improve#cac56e1ebd3c279aa9153616cfeac7b174ab90f9
 
     # --- engineering / writing ---
@@ -35,7 +35,7 @@ dependencies:
         - setup-matt-pocock-skills
         - wayfinder
         - writing-for-agents
-    - nanaism/yomiyasu/skills/yomiyasu#c9b9a6d1bb0795356c0e34dc50f501424069d837 # v3.2.1
+    - nanaism/yomiyasu/skills/yomiyasu#8831b14a5c2c12d41096495f0b8fe52d46d390c6 # v3.3.0
     - git: t3dotgg/tstack
       ref: 11e37a74d0a6868c121cd0910ab2b3bd9873b92a
       skills:
@@ -49,8 +49,8 @@ dependencies:
         - takeover
 
     # --- react ---
-    - millionco/react-doctor/skills/react-doctor#661cb187fbfe4e992acc89f76933e4f51244639f # v2.4.0
-    - vercel-labs/agent-skills/skills/react-best-practices#1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62
+    - millionco/react-doctor/skills/react-doctor#b6ba66ef427bf81995555e380eeba679f8b5d305 # v2.4.0
+    - vercel-labs/agent-skills/skills/react-best-practices#5a37a6329fbad3666c3207392a6a7c0110e92efb
 
     # --- design ---
     - git: emilkowalski/skills
@@ -68,21 +68,21 @@ dependencies:
       ref: 620163eedb3529d9cd23a3994ed8d287d06f760d
       alias: unslop-ui
     - git: ibelick/ui-skills
-      ref: 347d3189830f8ec3c4c041421bce19182a79dc7a
+      ref: 7ef0076fce1dfa39dd2bc43b7dc13add6eda8a41
       skills:
         - fixing-accessibility
     - Jakubantalik/transitions-dev/skills/transitions-dev#038b0bdc75375c2beed51d1e824c98cdc7b86f8c
     - git: nextlevelbuilder/ui-ux-pro-max-skill
-      ref: 2de1134dc4d1cfe112934611ae5803ae17a1bd7e
+      ref: 6ec2bb58334ca3014573c4cbd4834ee3a40afd9d
       skills:
         - ui-ux-pro-max
 
     # --- browser / analysis ---
-    - browser-use/browser-harness/skills/browser-harness#fe4a2cd3dd308e8de929621e64e7f284d7a124d7
+    - browser-use/browser-harness/skills/browser-harness#797f2d05e30e58b217ff621a99d302d712dc38da
     - jackwener/opencli/skills/opencli-usage#9bc5f5ca132ec4d4e48d7ee517d4303bf159e8e8 # v2.0.3
     - jackwener/opencli/skills/opencli-browser#9bc5f5ca132ec4d4e48d7ee517d4303bf159e8e8 # v2.0.3
     - openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431
-    - tt-a1i/archify/archify#44781293f38728baf04dbad33ce1a0cef8c39cca # after v3.2.0
+    - tt-a1i/archify/archify#6cafc5a9875a795c6932ac0c196dacf3097fafe6 # after v3.3.0
 
     # --- agent tools ---
     - vercel-labs/agent-desktop/skills/agent-desktop#b0b7277bea09b770ef9d1fb45aad667bc432cd57 # v1.3.1

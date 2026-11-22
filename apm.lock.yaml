@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-11-19T13:40:11.601684+00:00'
+generated_at: '2026-11-22T23:03:43.982440+00:00'
 apm_version: 0.36.1
 dependencies:
 - repo_url: agavra/tuicr
@@ -47,8 +47,8 @@ dependencies:
 - repo_url: browser-use/browser-harness
   name: browser-harness
   host: github.com
-  resolved_commit: fe4a2cd3dd308e8de929621e64e7f284d7a124d7
-  resolved_ref: fe4a2cd3dd308e8de929621e64e7f284d7a124d7
+  resolved_commit: 797f2d05e30e58b217ff621a99d302d712dc38da
+  resolved_ref: 797f2d05e30e58b217ff621a99d302d712dc38da
   version: unknown
   virtual_path: skills/browser-harness
   is_virtual: true
@@ -167,8 +167,8 @@ dependencies:
 - repo_url: cursor/plugins
   name: thermo-nuclear-code-quality-review
   host: github.com
-  resolved_commit: e58dd043600587dbaf58ba315e7f2b38373eeb43
-  resolved_ref: e58dd043600587dbaf58ba315e7f2b38373eeb43
+  resolved_commit: 7a583913eb1b8d1a0ee76753d1a2cf072e7b54f9
+  resolved_ref: 7a583913eb1b8d1a0ee76753d1a2cf072e7b54f9
   version: unknown
   virtual_path: cursor-team-kit/skills/thermo-nuclear-code-quality-review
   is_virtual: true
@@ -191,7 +191,7 @@ dependencies:
   host: github.com
   resolved_commit: 64eb3deb9a5fbfa041faf783e0bc3fd635872e9c
   resolved_ref: 64eb3deb9a5fbfa041faf783e0bc3fd635872e9c
-  version: 0.0.0
+  version: unknown
   package_type: skill_bundle
   deployed_files:
   - .agents/skills/animation-performance
@@ -363,8 +363,8 @@ dependencies:
 - repo_url: ibelick/ui-skills
   name: ui-skills
   host: github.com
-  resolved_commit: 347d3189830f8ec3c4c041421bce19182a79dc7a
-  resolved_ref: 347d3189830f8ec3c4c041421bce19182a79dc7a
+  resolved_commit: 7ef0076fce1dfa39dd2bc43b7dc13add6eda8a41
+  resolved_ref: 7ef0076fce1dfa39dd2bc43b7dc13add6eda8a41
   version: 0.0.0
   package_type: skill_bundle
   deployed_files:
@@ -395,7 +395,7 @@ dependencies:
     .claude/skills/improve-ui/SKILL.md: sha256:fa2ac808f6d9dab7bb3620880b014d2c18e227e5b006102856038096e573e69a
     .claude/skills/improve-ui/agents/openai.yaml: sha256:933af431364517518cbcfcd4e70eb8e8b390ead920abc48c071a4eedb6747183
     .claude/skills/improve-ui/references/plan-template.md: sha256:8faca7a14659a7f951d3b89fb730a43a4ce99966cc00481bf83d82b90f34b868
-  content_hash: sha256:c894fd3ff9d2d80323d15aa92f53008d528c989d916b34d333802afd5c3d6b04
+  content_hash: sha256:0bc175395e5fb9bf0a08e96cb119c4b1bbdd850f59e50c07290c5852d7c14135
   skill_subset:
   - fixing-accessibility
   carried_licenses:
@@ -1551,8 +1551,8 @@ dependencies:
 - repo_url: millionco/react-doctor
   name: react-doctor
   host: github.com
-  resolved_commit: 661cb187fbfe4e992acc89f76933e4f51244639f
-  resolved_ref: 661cb187fbfe4e992acc89f76933e4f51244639f
+  resolved_commit: b6ba66ef427bf81995555e380eeba679f8b5d305
+  resolved_ref: b6ba66ef427bf81995555e380eeba679f8b5d305
   version: unknown
   virtual_path: skills/react-doctor
   is_virtual: true
@@ -1569,12 +1569,16 @@ dependencies:
     .agents/skills/react-doctor/references/explain.md: sha256:237dd81672c858c8c52325bafeefdde2d5b842c9a98c2ea6a820534a0df8e927
     .claude/skills/react-doctor/SKILL.md: sha256:9efaa6a77162e0aafa75bcb1ac18f162631a9028d646a3cb2367423073517927
     .claude/skills/react-doctor/references/explain.md: sha256:237dd81672c858c8c52325bafeefdde2d5b842c9a98c2ea6a820534a0df8e927
-  content_hash: sha256:406bd06c38629c95b6df4213c166116a16fcda8d1d9fa1e8daf579e0d24408c8
+  content_hash: sha256:a9ce727f0abcf699d57ba1ec902da2a5899189df258ea971caf9669a2d9a5a91
+  carried_licenses:
+  - path: LICENSE
+    source: LICENSE
+    hash: sha256:aa9b278de35d20d320e40789db8b3e242096ed4a89c5aaf8fbe23a5e55c08ff1
 - repo_url: nanaism/yomiyasu
   name: yomiyasu
   host: github.com
-  resolved_commit: c9b9a6d1bb0795356c0e34dc50f501424069d837
-  resolved_ref: c9b9a6d1bb0795356c0e34dc50f501424069d837
+  resolved_commit: 8831b14a5c2c12d41096495f0b8fe52d46d390c6
+  resolved_ref: 8831b14a5c2c12d41096495f0b8fe52d46d390c6
   version: unknown
   virtual_path: skills/yomiyasu
   is_virtual: true
@@ -1755,12 +1759,12 @@ dependencies:
     .claude/skills/yomiyasu/scripts/yomiyasu_diff.py: sha256:31c46a98bcd987c0a2dda7d9712fb830f3a70b1e0636b6a034ae191530d51ab5
     .claude/skills/yomiyasu/scripts/yomiyasu_hook.py: sha256:689ffbeecbaf0380ac99e37b6093f136364b7c7bbf014ada961c8e0781e8ab8b
     .claude/skills/yomiyasu/scripts/yomiyasu_lint.py: sha256:b02c21464353b726a8c4e366f89bdfd2f341613f7bf75f779e83cc4dfbc54c9e
-  content_hash: sha256:1d01a773bb0721bb28d7d5a585cd7acaeb0c9b16db79cad59213edeefccdd5be
+  content_hash: sha256:85119d7ba3692a7fd8b31bce7edc268fec489ca5e2a86261d37dd48990da0114
 - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
   name: ui-ux-pro-max
   host: github.com
-  resolved_commit: 2de1134dc4d1cfe112934611ae5803ae17a1bd7e
-  resolved_ref: 2de1134dc4d1cfe112934611ae5803ae17a1bd7e
+  resolved_commit: 6ec2bb58334ca3014573c4cbd4834ee3a40afd9d
+  resolved_ref: 6ec2bb58334ca3014573c4cbd4834ee3a40afd9d
   version: 2.15.0
   package_type: marketplace_plugin
   deployed_files:
@@ -2059,7 +2063,7 @@ dependencies:
     .claude/skills/ui-ux-pro-max/scripts/tests/test_text_layout_resilience.py: sha256:b51d32ee8a15505b87cb81957fb2d1b385e041e8beb4463c311d236bfd29ebd4
     .claude/skills/ui-ux-pro-max/scripts/tests/test_web_stack_freshness.py: sha256:74897571398585f27e2c35d09d81b0a531c8c774f4a2967e5e1b1d1b05a483d9
     .claude/skills/ui-ux-pro-max/scripts/validate_data.py: sha256:a599aa256049cf30954d1f164721b99e453eb7e4cb8241bcab2d5573e6cf58b8
-  content_hash: sha256:3396644fe31719cae8996b0ad89b70d233b7707679b2dc68f99a126994f48040
+  content_hash: sha256:200a445f3939a688f8cf899c93e23fbbedffdd52fce915b7f705a66bbdc60ee2
   skill_subset:
   - ui-ux-pro-max
   declared_license: MIT
@@ -2288,8 +2292,8 @@ dependencies:
 - repo_url: tt-a1i/archify
   name: archify
   host: github.com
-  resolved_commit: 44781293f38728baf04dbad33ce1a0cef8c39cca
-  resolved_ref: 44781293f38728baf04dbad33ce1a0cef8c39cca
+  resolved_commit: 6cafc5a9875a795c6932ac0c196dacf3097fafe6
+  resolved_ref: 6cafc5a9875a795c6932ac0c196dacf3097fafe6
   version: unknown
   virtual_path: archify
   is_virtual: true
@@ -3082,7 +3086,7 @@ dependencies:
     .claude/skills/archify/scripts/render-examples.mjs: sha256:c2c99c4153cf21f0526cf3f041c1d81716017be182d404173f8961fa494e8c8c
     .claude/skills/archify/scripts/update-contract.mjs: sha256:b6eb5e18ebea770c0a0c2cf2ba45d122d85abe61e94b9a5426602a9f84910b31
     .claude/skills/archify/skill-release.json: sha256:1ea25551e0359e547267d40e83812ffd1a7bdf7398826b65f2a2fcf1a11ba596
-  content_hash: sha256:3cee46ba2453fe0fb2a35bb6152fdea9579b33b449b2d54f177f6c3ef59db987
+  content_hash: sha256:d2edb8621f591ed5b32d67a62885d6d40b8658ad3c7a69d409923e79dc7f41cd
 - repo_url: vercel-labs/agent-desktop
   name: agent-desktop
   host: github.com
@@ -3126,8 +3130,8 @@ dependencies:
 - repo_url: vercel-labs/agent-skills
   name: vercel-react-best-practices
   host: github.com
-  resolved_commit: 1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62
-  resolved_ref: 1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62
+  resolved_commit: 5a37a6329fbad3666c3207392a6a7c0110e92efb
+  resolved_ref: 5a37a6329fbad3666c3207392a6a7c0110e92efb
   version: unknown
   virtual_path: skills/react-best-practices
   is_virtual: true
