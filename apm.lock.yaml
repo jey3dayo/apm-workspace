@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-11-22T23:03:43.982440+00:00'
+generated_at: '2026-11-23T00:35:38.271796+00:00'
 apm_version: 0.36.1
 dependencies:
 - repo_url: agavra/tuicr
@@ -2292,8 +2292,8 @@ dependencies:
 - repo_url: tt-a1i/archify
   name: archify
   host: github.com
-  resolved_commit: 6cafc5a9875a795c6932ac0c196dacf3097fafe6
-  resolved_ref: 6cafc5a9875a795c6932ac0c196dacf3097fafe6
+  resolved_commit: 44781293f38728baf04dbad33ce1a0cef8c39cca
+  resolved_ref: 44781293f38728baf04dbad33ce1a0cef8c39cca
   version: unknown
   virtual_path: archify
   is_virtual: true
@@ -3086,7 +3086,7 @@ dependencies:
     .claude/skills/archify/scripts/render-examples.mjs: sha256:c2c99c4153cf21f0526cf3f041c1d81716017be182d404173f8961fa494e8c8c
     .claude/skills/archify/scripts/update-contract.mjs: sha256:b6eb5e18ebea770c0a0c2cf2ba45d122d85abe61e94b9a5426602a9f84910b31
     .claude/skills/archify/skill-release.json: sha256:1ea25551e0359e547267d40e83812ffd1a7bdf7398826b65f2a2fcf1a11ba596
-  content_hash: sha256:d2edb8621f591ed5b32d67a62885d6d40b8658ad3c7a69d409923e79dc7f41cd
+  content_hash: sha256:3cee46ba2453fe0fb2a35bb6152fdea9579b33b449b2d54f177f6c3ef59db987
 - repo_url: vercel-labs/agent-desktop
   name: agent-desktop
   host: github.com

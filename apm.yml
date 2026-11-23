@@ -82,7 +82,7 @@ dependencies:
     - jackwener/opencli/skills/opencli-usage#9bc5f5ca132ec4d4e48d7ee517d4303bf159e8e8 # v2.0.3
     - jackwener/opencli/skills/opencli-browser#9bc5f5ca132ec4d4e48d7ee517d4303bf159e8e8 # v2.0.3
     - openai/skills/skills/.curated/screenshot#49f948faa9258a0c61caceaf225e179651397431
-    - tt-a1i/archify/archify#6cafc5a9875a795c6932ac0c196dacf3097fafe6 # after v3.3.0
+    - tt-a1i/archify/archify#44781293f38728baf04dbad33ce1a0cef8c39cca # after v3.2.0
 
     # --- agent tools ---
     - vercel-labs/agent-desktop/skills/agent-desktop#b0b7277bea09b770ef9d1fb45aad667bc432cd57 # v1.3.1
