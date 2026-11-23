@@ -931,3 +931,12 @@ hidden character(s)` で install を止める。rehearsal が失敗し、`native
 - 撤去: `mattpocock/skills` の subset から `wait-what` を外した。手動起動のみで開発動線に組み込まれておらず、伝わらなかった説明の言い直しはスキルなしで足りる。
 - `ship` のエイリアス化: 名前とトリガーだけ互換で残し、中身は `ship` / `ship pr` → `full-stop`、`ship merge` → `full-send` への委譲にした。本体に残す上書きは4点だけ: 出荷前の `polish` 前段（過剰なコードコメントの圧縮を含む）、マージ gate は `t3-stack` の厳しい方を優先、コメントは取得が `gh-address-comments` で返信・resolve が `pr-followup`、レビューは `sol-loop`（heavy 時は `council`）。旧来の commit / push だけの終点は落とし、受け皿は `atomic-commit`。慣れたら `ship` 自体を廃止する方向。あわせて `pr-followup` の `ship` の工程への参照を、委譲先（`full-stop` / `full-send`）への参照に付け替えた。
 - 残す: `retro` は今回触らない（残すか `learning-intake` に絞るかは別途判断）。
+
+## 2026-11-23 archify を after v3.2.0 に保留した
+
+- Status: 保留（after v3.3.0 への更新を取り消し、`44781293`（after v3.2.0）に固定）
+- 理由: after v3.3.0（`6cafc5a`）で上流が `.agents/skills/archify/examples/` と `.claude/skills/archify/examples/` の生成済み example files を削除した。スキル自体は残るため `scripts/lib/native-roots.sh` の喪失自動許可（スキル全体の消失）に当たらず、`native:sync` の rehearsal が `lost=32` で失敗し、週次 pin 更新（b686ada）の配布が止まった。
+- 対応: archify の pin だけを `44781293` へ戻す follow-up（93556fa）を main へ直接 push し、残り7件の pin 更新とあわせて `native:sync` を通した（rehearsal lost=0、配布完了）。
+- 保留は `docs/dependency-holds.txt` で強制する（pin が変わると `validate:workspace` が落ちる）。解除するときは同じ PR でその行を消す。
+- 注意: 週次の dependency-holds ワークフローが見る「apm が受け入れるか」では after v3.3.0 は合格する（lock 再生成は通った）。解除の可否は apm の受理ではなく rehearsal の lost 判定で見ること。
+- 再検討するなら: example files の削除を正として取り込む判断をするとき（`native-roots.sh` の allowlist 追加とセットで）、または上流が example files を戻したとき。
