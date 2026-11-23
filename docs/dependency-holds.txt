@@ -2,3 +2,4 @@
 # Format: <repo> <held-sha> <reason, with the docs/package-decisions.md heading>
 # To release a hold, delete its line in the same PR and record why in docs/package-decisions.md.
 # The weekly workflow dependency-holds.yml tries newer versions of each held dependency and opens an issue when apm accepts one.
+tt-a1i/archify 44781293f38728baf04dbad33ce1a0cef8c39cca after v3.3.0 で生成済み example files が上流から削除され native:sync の rehearsal が lost=32 で止まる（docs/package-decisions.md「2026-11-23 archify を after v3.2.0 に保留した」）
