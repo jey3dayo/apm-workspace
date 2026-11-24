@@ -12,7 +12,7 @@ argument-hint: "[base-ref] [files...] [intent]"
 
 PR 前に、このブランチで**追加・変更した行だけ**を観点表の全行へ照らして直す。原則の本文は global の共有ガイド（Claude は ~/.claude/rules/ai-collaboration.md）の「開発原則」「禁止事項」「ファイル操作原則」と、repo の AGENTS.md / CLAUDE.md が正本で、ここには写さない。判断に迷ったらそちらを読む。
 
-lint / format / test のループは対象外（DoD が持つ）。再利用・効率・altitude（root cause の深さ）は built-in `/simplify` が持つ。コメントと suppression の保持可否の全件判定は `no-comments`（comment-sicko）が持つ（例外リスト方式の厳格な keep / kill で、ファイル単位で渡せば既存分も対象になる）。ここでは追加・変更したコメントの圧縮と追加行の suppression だけを扱い、判定が割れたら `no-comments` 側を優先する。base より前から存在する行も対象外で、diff の外に気づいた問題は報告に列挙するだけで触らない。
+lint / format / test のループは対象外（DoD が持つ）。再利用・効率・altitude（root cause の深さ）は built-in `/simplify` が持つ。コメントと suppression の保持可否の全件判定は `no-comments`（comment-sicko）が持つ（例外リスト方式の厳格な keep / kill で、ファイル単位で渡せば既存分も対象になる。ただし comment-sicko が配布されるのは Claude / Cursor だけで、Codex ではこの委譲は使えない）。ここでは追加・変更したコメントの圧縮と追加行の suppression だけを扱い、判定が割れたら `no-comments` 側を優先する。base より前から存在する行も対象外で、diff の外に気づいた問題は報告に列挙するだけで触らない。
 
 ## 手順
 
@@ -72,7 +72,7 @@ touched file の format と、変更箇所に関連するテストを実行す�
 - 観点ごとの件数: 直した / 残した（残した理由を 1 行）
 - 判定に迷い触らなかった箇所
 - diff の外で気づいた既存の違反（触っていない）
-- コメント / suppression の全件監査が要ると判断したら、`no-comments` の実行をユーザーへ提案する（本スキルからは起動しない）
+- コメント / suppression の全件監査が要ると判断したら、`no-comments` の実行をユーザーへ提案する（本スキルからは起動しない）。提案には、polish が残した例外（型の負例テストが拒否を検証する保証など）も全件監査では再判定される旨を添える
 - 回帰テストの red → green 確認は本スキルでは検証できない。未確認ならその旨を 1 行
 
 commit / push / PR 作成は行わない。commit は `atomic-commit` に渡す。
