@@ -25,6 +25,9 @@ unless the user specifies another location.
 | React + TypeScript/JS (`"react"` in package.json) | react-doctor + similarity-ts + dead-code scan |
 | TypeScript/JS (non-React, has `tsconfig.json`)    | similarity-ts + dead-code scan                |
 
+For React projects, choosing hooks / `useEffect` patterns themselves is
+`react-hooks-refactoring`; this skill only digests `react-doctor` diagnostics.
+
 ## Phase 1: Diagnose
 
 For broad cleanup requests, default to parallel diagnosis and evidence
@@ -47,18 +50,20 @@ The report includes a 0-100 score; use it in the Phase 2 plan.
 
 ### 1-B: Duplicate Code Detection (All TS/JS Projects)
 
-If `similarity-ts` is not on PATH, read the `similarity` skill
-(`../similarity/SKILL.md`) first for install and invocation guidance.
+Run duplicate detection by following the `similarity` skill
+(`../similarity/SKILL.md`): it is the source of truth for `similarity-ts`
+installation, invocation, thresholds, and their pitfalls, so this skill does
+not restate those commands. It only consumes the report: save the severe
+duplicates scan (90%+) as `tmp/refactoring/similarity-report.md`, and — when
+collecting low-priority future candidates for the Phase 2 matrix — the
+optional default-threshold scan as `tmp/refactoring/similarity-default.md`.
+Classify the results with the Phase 2 priority matrix; threshold selection
+and interpretation stay with `similarity`.
+
+One scan this workflow adds on top of the `similarity` defaults:
 
 ```bash
-# Scan at 90%+ similarity (start with severe duplicates)
-similarity-ts --threshold 0.9 . > tmp/refactoring/similarity-report.md
-
-# Optional: broader scan at the tool default (0.87) to collect
-# low-priority future candidates for the Phase 2 matrix
-similarity-ts . > tmp/refactoring/similarity-default.md
-
-# Optional: duplicate type definitions (skip if src/types/ does not exist)
+# Optional: duplicate type definitions at 95%+ (skip if src/types/ does not exist)
 similarity-ts --types --threshold 0.95 src/types/ >> tmp/refactoring/similarity-report.md
 ```
 
