@@ -22,7 +22,7 @@ hide = true
 run = "gh-actions-lock --verify"
 
 ["lint:frontmatter"]
-description = "Validate YAML frontmatter in the managed catalog (agents/skills/commands/rules)"
+description = "Validate YAML frontmatter in the managed catalog and the optional/manual skill lanes"
 hide = true
 run = "bash ./scripts/lint-frontmatter.sh"
 

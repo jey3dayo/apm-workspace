@@ -1,7 +1,8 @@
 #!/usr/bin/env tsx
 
 // Validates YAML frontmatter in the managed catalog (catalog/.apm/agents,
-// catalog/.apm/skills, catalog/commands, catalog/rules). `mise run check` never
+// catalog/.apm/skills, catalog/commands, catalog/rules) and in the
+// optional-skills and manual-skills lanes. `mise run check` never
 // parsed frontmatter, so an unquoted "key: value: more" in a `description`
 // field (broken YAML: a colon+space inside a plain scalar) passed the gate
 // and was distributed as-is (five catalog agent files, fixed in commit
@@ -29,6 +30,8 @@ const DEFAULT_TARGET_SUBDIRS = [
   "catalog/.apm/skills",
   "catalog/commands",
   "catalog/rules",
+  "manual-skills/.apm/skills",
+  "optional-skills",
 ];
 
 // Files under these subdirs must additionally declare `name` and
