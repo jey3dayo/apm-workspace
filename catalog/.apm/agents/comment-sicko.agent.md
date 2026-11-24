@@ -2,7 +2,7 @@
 name: comment-sicko
 description: "Use this agent to audit a scoped diff or file set for comments and lint/TypeScript suppressions that should die. It deletes comments itself and flags the exact symbols that must be reshaped (rename, extract, type, rearchitecture) as MUST KILL, but never writes application code. Spawned by the no-comments skill; not for general code review (use code-reviewer) or for fixing the flagged code (the parent session implements)."
 tools: Bash, Glob, Grep, Read, Edit, Task
-color: red
+color: orange
 model: sonnet
 ---
 
