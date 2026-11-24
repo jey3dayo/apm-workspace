@@ -48,7 +48,25 @@ T3 Code 経由のレビューは本表の既定より `t3-stack` の指定（Cla
 
 ## モデルを更改するとき
 
-tier 表を更新するときは、各 provider のモデル一覧と照合する。Codex は `fetched_at` 付きのローカル一覧を確認する。同系列の新しい版がある場合は、価格帯が変わる場合を除き tier 表を更新する。廃止予定または一覧から外れたモデルは後継へ切り替える。
+版付きモデル ID を変える場所はこのファイルだけである。他のスキル・agent・`catalog/claude/rules/model-policy.md` は `sonnet` / `opus` 等のエイリアスで書く決まり（リポの AGENTS.md）なので、版が上がっても触らない。ランタイム側に helper の allowlist がある場合は、この表と揃えるのが mirror 側の作業になる。
+
+照合先は provider ごとに決まっている。汎用の検索結果や他 provider の一覧で代用しない。
+
+| 対象         | 照合先                                                                        |
+| ------------ | ----------------------------------------------------------------------------- |
+| Claude       | [Claude Models overview](https://platform.claude.com/docs/en/models/overview) |
+| OpenAI API   | [OpenAI API Models](https://developers.openai.com/api/docs/models)            |
+| Codex client | [Codex Models](https://developers.openai.com/codex/models)                    |
+| cursor の行  | [Cursor Models & Pricing](https://cursor.com/docs/models-and-pricing)         |
+
+手順は次のとおり。
+
+1. 上の照合先で現行ラインナップを確認する。Codex client の推奨ページは API カタログより反映が遅れることがあるため、API 側の版を正とし、client 側で使えない場合の代替は「Codex Sol の版と代替」に従う。
+2. 同系列の新しい版がある場合は、価格帯が変わる場合を除き tier 表を更新する。廃止予定または一覧から外れたモデルは後継へ切り替える。
+3. cursor の行は Cursor 独自のモデル名で照合する。API カタログに合わせて書き換えない（例: 2026-11-24 照合時点で Cursor の OpenAI 最新は GPT-5.6 系で、`gpt-5.6-sol` は現行。API の GPT-6.2 系は Cursor 一覧に無い）。
+4. 更新したら、この節末尾の最終照合日を当日に書き換える。
+
+最終照合: 2026-11-24（Claude Fable 5.2 / Opus 5.5 / Sonnet 5.5、OpenAI GPT-6.2 Astra / Sol・GPT-6.1 Terra・GPT-6 Luna、Cursor GPT-5.6 Sol を各照合先で確認し、tier 表と一致）
 
 ## Codex Sol の版と代替
 
