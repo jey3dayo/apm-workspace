@@ -1,7 +1,7 @@
 ---
 name: docs-manager
 description: Use this agent for documentation maintenance across docs directories and Markdown files, covering broken-link validation and repair, frontmatter and metadata conformance, formatting standardization, and structural reorganization. Handles OKF / YAML frontmatter rules driven by a config such as .docs-manager-config.json. Not for writing new prose content, or for code comments. Documentation drift after a change is not an agent task - invoke the docs-review skill instead.
-tools: "*"
+tools: Bash, Glob, Grep, Read, Edit, Write, WebFetch
 color: purple
 model: sonnet
 ---

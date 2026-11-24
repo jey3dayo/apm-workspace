@@ -1,7 +1,8 @@
 ---
 name: thermo-nuclear-code-quality-review
-description: Thermo-nuclear code quality audit (maintainability, structure, 1k-line rule, spaghetti, code-judo). Select only when explicitly named or when the maintainability rubric itself is requested; use code-reviewer for ordinary code review. Requires the parent session to gather git output and changed-file contents before invoking it. Loads the rubric from the `thermo-nuclear-code-quality-review` skill, distributed via APM from the `cursor-team-kit` plugin.
+description: "Use this agent for a thermo-nuclear code quality audit: maintainability, structure, the 1k-line rule, spaghetti, and code judo, scored against its rubric. Select only when explicitly named or when the maintainability rubric itself is requested; use code-reviewer for ordinary code review. Requires the parent session to gather git output and changed-file contents before invoking it. Loads the rubric from the `thermo-nuclear-code-quality-review` skill, distributed via APM from the `cursor-team-kit` plugin."
 tools: Bash, Glob, Grep, Read, LSP
+color: pink
 ---
 
 # Thermo-Nuclear Code Quality Review
