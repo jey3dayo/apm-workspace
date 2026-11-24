@@ -940,3 +940,11 @@ hidden character(s)` で install を止める。rehearsal が失敗し、`native
 - 保留は `docs/dependency-holds.txt` で強制する（pin が変わると `validate:workspace` が落ちる）。解除するときは同じ PR でその行を消す。
 - 注意: 週次の dependency-holds ワークフローが見る「apm が受け入れるか」では after v3.3.0 は合格する（lock 再生成は通った）。解除の可否は apm の受理ではなく rehearsal の lost 判定で見ること。
 - 再検討するなら: example files の削除を正として取り込む判断をするとき（`native-roots.sh` の allowlist 追加とセットで）、または上流が example files を戻したとき。
+
+## `cursor/plugins` の pstack から `no-comments` 一式を採用（2026-11-25）
+
+- 追加: root `apm.yml` に subdirectory 形式で5件を pin（`ca782ed8`、pstack v0.15.48）。対象の `no-comments` と、そこと `comment-sicko` が直接参照する `why` / `architect` / `principle-fix-root-causes` / `principle-redesign-from-first-principles`。同 repo の `cursor-team-kit` と同じ pin 形式で、隔離した APM プロジェクトで5件とも install が通ることを実測してから入れた。
+- agent: `no-comments` の実働は `Task` で spawn する `comment-sicko` エージェントで、スキル pin では届かない。`agent-curation` の手順で `catalog/.apm/agents/comment-sicko.agent.md` へ curation した（provenance はファイル冒頭と `docs/agents-provenance.md`、台帳は agent-curation の registry）。配布は catalog 経由で Claude / Cursor のみ（Codex へ agents は配られない既定どおり）。
+- 入れない: `poteto-mode`。返信様式・自律ルールまで含む作動様式そのもので、この workspace の `orchestrator-worker` の方針と衝突する。モデル選択も Cursor 専用の `~/.cursor/rules/pstack-models.mdc`（`setup-pstack` が書く）前提で配布できない。`no-comments` からの参照は subagent の reasoning level 付けの1点だけで、そこは `orchestrator-worker` の models 表で代替する。あわせて `architect` の任意分岐先 `arena` も入れない（`poteto-mode` と追加の principle 群を引くため）。残りの pstack スキル（全57件）も一括では入れない。
+- 制約として残るもの: 制約コメント（`do not remove` 等）を型・テスト・lint へ encode する提案は `no-comments` 手順5の対話承認が前提。この workspace では従来どおり判断は利用者側に残る。
+- 再検討するなら: `poteto-mode` 式の作動様式を採りたくなったとき（その場合は衝突する既存方針の棚卸しとセット）、または上流が `comment-sicko` を APM で配れる形にしたとき。
