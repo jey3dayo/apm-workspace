@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-11-23T00:35:38.271796+00:00'
+generated_at: '2026-11-24T15:32:20.528840+00:00'
 apm_version: 0.36.1
 dependencies:
 - repo_url: agavra/tuicr
@@ -186,6 +186,76 @@ dependencies:
   - path: LICENSE
     source: cursor-team-kit/LICENSE
     hash: sha256:702f5f331b56aff0e33d8c7826df5202559f894145eb70355c6477b55b5bb8a0
+- repo_url: cursor/plugins
+  name: architect
+  host: github.com
+  resolved_commit: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  resolved_ref: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  version: unknown
+  virtual_path: pstack/skills/architect
+  is_virtual: true
+  package_type: claude_skill
+  content_hash: sha256:31a2f5974d7de7ee001123e9ff65be1e3ab2a0a56fe950be7df0657e767a7b98
+  carried_licenses:
+  - path: LICENSE
+    source: pstack/LICENSE
+    hash: sha256:bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e
+- repo_url: cursor/plugins
+  name: no-comments
+  host: github.com
+  resolved_commit: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  resolved_ref: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  version: unknown
+  virtual_path: pstack/skills/no-comments
+  is_virtual: true
+  package_type: claude_skill
+  content_hash: sha256:990102b5f8433d3cffd4626ad90736ad543e77b8165e69e47082544b7df84c77
+  carried_licenses:
+  - path: LICENSE
+    source: pstack/LICENSE
+    hash: sha256:bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e
+- repo_url: cursor/plugins
+  name: principle-fix-root-causes
+  host: github.com
+  resolved_commit: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  resolved_ref: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  version: unknown
+  virtual_path: pstack/skills/principle-fix-root-causes
+  is_virtual: true
+  package_type: claude_skill
+  content_hash: sha256:8765301148b527f0273c0d041019cc1b64ab61b44567c95d4c8936726a5ecb82
+  carried_licenses:
+  - path: LICENSE
+    source: pstack/LICENSE
+    hash: sha256:bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e
+- repo_url: cursor/plugins
+  name: principle-redesign-from-first-principles
+  host: github.com
+  resolved_commit: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  resolved_ref: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  version: unknown
+  virtual_path: pstack/skills/principle-redesign-from-first-principles
+  is_virtual: true
+  package_type: claude_skill
+  content_hash: sha256:f627292d04bdd447c5e1dcce7b8fbd28906d9cbab44498c81a9d8c017d055ae4
+  carried_licenses:
+  - path: LICENSE
+    source: pstack/LICENSE
+    hash: sha256:bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e
+- repo_url: cursor/plugins
+  name: why
+  host: github.com
+  resolved_commit: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  resolved_ref: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  version: unknown
+  virtual_path: pstack/skills/why
+  is_virtual: true
+  package_type: claude_skill
+  content_hash: sha256:c09c97721117820ce2e6fdeed000cae74e822cfac82d039b1812189626385489
+  carried_licenses:
+  - path: LICENSE
+    source: pstack/LICENSE
+    hash: sha256:bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e
 - repo_url: emilkowalski/skills
   name: skills
   host: github.com

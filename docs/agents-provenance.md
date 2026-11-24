@@ -16,16 +16,18 @@ Repo-level detail (APM-installability evidence, upstream Codex lane) lives in th
 | Upstream repo                                   | Commit                                     | License                           |
 | ----------------------------------------------- | ------------------------------------------ | --------------------------------- |
 | <https://github.com/msitarzewski/agency-agents> | `24485830cd4b3c63a4a357b0664d9dedbab9653a` | MIT (2025 AgentLand Contributors) |
+| <https://github.com/cursor/plugins>             | `ca782ed8b3c2c521cead8e1720d55c3a5dbf2347` | MIT (2026 Lauren Tan)             |
 
 ## Per-Agent Mapping
 
-All rows below are curated (adapted) from `msitarzewski/agency-agents`: renamed and with frontmatter adjusted for Claude Code / Codex (`name`, `tools`, `color`); upstream `emoji` / `vibe` dropped. Not verbatim copies.
+The `msitarzewski/agency-agents` rows are curated (adapted) from that repo: renamed and with frontmatter adjusted for Claude Code / Codex (`name`, `tools`, `color`); upstream `emoji` / `vibe` dropped. Not verbatim copies. Rows naming another upstream in their path follow the same curation shape for that source.
 
-| Local agent (`catalog/.apm/agents/`) | Upstream path                                   | Consumed by             |
-| ------------------------------------ | ----------------------------------------------- | ----------------------- |
-| `frontend-developer.agent.md`        | `engineering/engineering-frontend-developer.md` | general frontend work   |
-| `ui-designer.agent.md`               | `design/design-ui-designer.md`                  | visual design / handoff |
-| `accessibility-auditor.agent.md`     | `testing/testing-accessibility-auditor.md`      | accessibility review    |
+| Local agent (`catalog/.apm/agents/`) | Upstream path                                     | Consumed by             |
+| ------------------------------------ | ------------------------------------------------- | ----------------------- |
+| `frontend-developer.agent.md`        | `engineering/engineering-frontend-developer.md`   | general frontend work   |
+| `ui-designer.agent.md`               | `design/design-ui-designer.md`                    | visual design / handoff |
+| `accessibility-auditor.agent.md`     | `testing/testing-accessibility-auditor.md`        | accessibility review    |
+| `comment-sicko.agent.md`             | `pstack/agents/comment-sicko.md` (cursor/plugins) | `no-comments` skill     |
 
 ## Retired Agent Contracts
 

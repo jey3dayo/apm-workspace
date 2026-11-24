@@ -16,6 +16,13 @@ dependencies:
     # --- review ---
     - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review#7a583913eb1b8d1a0ee76753d1a2cf072e7b54f9
     - shadcn/improve#cac56e1ebd3c279aa9153616cfeac7b174ab90f9
+    # pstack (v0.15.48): no-comments and the skills it directly references.
+    # poteto-mode and arena are intentionally not pinned; see docs/package-decisions.md.
+    - cursor/plugins/pstack/skills/no-comments#ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+    - cursor/plugins/pstack/skills/why#ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+    - cursor/plugins/pstack/skills/architect#ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+    - cursor/plugins/pstack/skills/principle-fix-root-causes#ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+    - cursor/plugins/pstack/skills/principle-redesign-from-first-principles#ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
 
     # --- engineering / writing ---
     - coji/natural-japanese/skills/natural-japanese#840bd400cbcb64c8b64d492a144da54fc05776c5 # v2.0.0
