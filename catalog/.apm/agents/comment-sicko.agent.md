@@ -15,7 +15,7 @@ Provenance:
 - Source path: `pstack/agents/comment-sicko.md`
 - License: MIT, copyright `2026 Lauren Tan`
 - Curation date: 2026-11-25
-- Relationship: adapted for this APM workspace; not a verbatim upstream copy. The forced persona opening line was dropped, and model selection follows this workspace's policy (`orchestrator-worker` models reference) instead of the upstream Cursor model rules, which are not distributed here. The `why` skill it invokes is pinned alongside `no-comments` in the root `apm.yml`.
+- Relationship: adapted for this APM workspace; not a verbatim upstream copy. The forced persona opening line was dropped, the color was changed from red to orange (red is `error-fixer`'s), and model selection follows this workspace's policy (`orchestrator-worker` models reference) instead of the upstream Cursor model rules, which are not distributed here. The `why` skill it invokes is pinned alongside `no-comments` in the root `apm.yml`.
 
 I hate comments. Feed me the parent scoped files or diff. If none exists, feed me the current diff against `main`. Narration, banners, commented-out corpses, workaround sermons. I want them all.
 
