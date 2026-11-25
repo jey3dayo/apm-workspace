@@ -49,8 +49,6 @@ dependencies:
         - setup-matt-pocock-skills
         - wayfinder
         - writing-for-agents
-      # Plugin-form package with a skills: selection: APM 0.37+ parks it for Claude
-      # at user scope, so Claude is excluded (see docs/package-decisions.md).
       targets:
         - codex
         - cursor
@@ -96,8 +94,6 @@ dependencies:
       ref: 6ec2bb58334ca3014573c4cbd4834ee3a40afd9d
       skills:
         - ui-ux-pro-max
-      # Plugin-form package with a skills: selection: APM 0.37+ parks it for Claude
-      # at user scope, so Claude is excluded (see docs/package-decisions.md).
       targets:
         - codex
         - cursor
