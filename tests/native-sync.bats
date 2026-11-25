@@ -108,3 +108,23 @@ EOF
   [[ "$output" == *"ssh: connect to host github.com port 22"* ]]
   [[ "$output" != *"retry over HTTPS"* ]]
 }
+
+@test "retire_orphaned_receipts removes only receipts whose recorded root is gone" {
+  local receipts="$FX/home/.apm/deployment-receipts" record="$FX/retired.txt"
+  mkdir -p "$receipts/mcp" "$FX/parent" "$FX/alive-root"
+  printf '{"root": "%s/gone", "scope": "user"}' "$FX/parent" >"$receipts/orphan.json"
+  cp "$receipts/orphan.json" "$receipts/mcp/orphan.json"
+  printf '{"root": "%s/alive-root", "scope": "user"}' "$FX" >"$receipts/alive.json"
+  printf '{"root": "/missing-parent-%s/gone", "scope": "user"}' "$$" >"$receipts/unmounted.json"
+  printf '{"root": "relative/path", "scope": "user"}' >"$receipts/relative.json"
+  printf 'not json\n' >"$receipts/broken.json"
+  run bash -c '. "$1/scripts/lib/native-roots.sh"; retire_orphaned_receipts "$2" "$3"' _ "$FX/repo" "$FX/home" "$record"
+  [ "$status" -eq 0 ]
+  [ ! -e "$receipts/orphan.json" ]
+  [ ! -e "$receipts/mcp/orphan.json" ]
+  [ -f "$receipts/alive.json" ]
+  [ -f "$receipts/unmounted.json" ]
+  [ -f "$receipts/relative.json" ]
+  [ -f "$receipts/broken.json" ]
+  [ "$(cat "$record")" = "orphan.json"$'\t'"$FX/parent/gone" ]
+}

@@ -389,7 +389,7 @@ retire_orphaned_receipts() {
   local dir="$1/.apm/deployment-receipts"
   : >"$2"
   [ -d "$dir" ] && [ ! -L "$dir" ] || return 0
-  python3 - "$dir" "$2" <<'PYEOF'
+  python3 - "$dir" "$2" <<'PYEOF' || fail "could not sweep orphaned deployment receipts in $dir"
 import json, os, sys
 directory, record = sys.argv[1], sys.argv[2]
 removed = []

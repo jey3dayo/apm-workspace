@@ -129,7 +129,7 @@ executables:
 ### rehearse --migrate が見ること
 
 - 複製の中で、`migrate` と同じ `migrate_roots`（install の前）と `reinstate_entries`（compile のあと）を通します。end-to-end の確認は backup の複製から行います（空の HOME は使いません）。
-- snapshot の前に、記録先の root が消えた deployment receipt を複製から取り除きます（条件と記録の残し方は「既知の問題」の receipt の項を参照）。receipt は APM が管理する台帳であり、内容ではないため、消失として数えません。
+- snapshot の前に、記録先の root が消えた deployment receipt を複製から取り除きます（通常・`--migrate` の両モード。条件と記録の残し方は「既知の問題」の receipt の項を参照）。receipt は APM が管理する台帳であり、内容ではないため、消失として数えません。
 - 消えてよいのは `scripts/lib/native-roots.sh` の `allowed_lost_reason` に書いた allowlist だけです。件数は `allowed_lost=` に出し、`allowed-lost.txt` にタブ区切りで path と理由を残します。allowlist 以外の消失（`lost=`）が 0 件のときだけ成功します。同じ skill の別のファイルは対象外で、消えれば失敗します。
 
   | path（HOME からの相対）                                                                                                                                              | 理由                                                                                                                                                                                                                                              |
