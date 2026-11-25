@@ -1,8 +1,9 @@
 lockfile_version: '4'
-generated_at: '2026-11-25T04:17:12.069045+00:00'
+generated_at: '2026-11-25T11:34:28.613167+00:00'
 apm_version: 0.38.1
 manifest_targets:
 - agent-skills
+- antigravity
 - claude
 - codex
 - cursor
@@ -243,6 +244,34 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   content_hash: sha256:651d528568f52cc5e9cd0e2fdae76ba4f05d557ab3ebe52e731fc3900a6492dd
+  carried_licenses:
+  - path: LICENSE
+    source: pstack/LICENSE
+    hash: sha256:bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e
+- repo_url: cursor/plugins
+  name: reframe
+  host: github.com
+  resolved_commit: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  resolved_ref: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  version: unknown
+  virtual_path: pstack/skills/reframe
+  is_virtual: true
+  package_type: claude_skill
+  content_hash: sha256:9b25777f4f19c04c1c49e5f296cbc40275fc91425499d6935e578bf5b2a60283
+  carried_licenses:
+  - path: LICENSE
+    source: pstack/LICENSE
+    hash: sha256:bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e
+- repo_url: cursor/plugins
+  name: sharpen
+  host: github.com
+  resolved_commit: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  resolved_ref: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  version: unknown
+  virtual_path: pstack/skills/sharpen
+  is_virtual: true
+  package_type: claude_skill
+  content_hash: sha256:d73167f93c7b527a2a1cbe60fe46064aa0e48dc590fc461f328106f3a2bd6d24
   carried_licenses:
   - path: LICENSE
     source: pstack/LICENSE
