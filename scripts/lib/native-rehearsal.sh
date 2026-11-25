@@ -83,6 +83,7 @@ $escaping"
   [ -z "$shared" ] || fail "the scratch HOME $scratch still shares data with files outside it:
 $shared"
 
+  retire_orphaned_receipts "$scratch" "$rehearsal/retired-receipts.txt"
   rehearsal_snapshot "$scratch" "$dir/present.txt" >"$rehearsal/before.txt"
   manifest="$(render_manifest "$sha" "$WORKSPACE_ONLY")"
   mkdir -p "$scratch/.apm"

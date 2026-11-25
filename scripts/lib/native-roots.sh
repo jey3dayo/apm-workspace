@@ -379,6 +379,43 @@ restore_agmsg_links() {
   :
 }
 
+# APM 0.38+ retires deployment receipts whose recorded project root is gone during install
+# (retire_receipts_of_missing_projects in apm_cli/core/deployment_ledger.py). A receipt like that is a
+# stale ledger entry, not content, so the rehearsal removes it from the clone before the snapshot and
+# the retirement never reads as loss. The criterion mirrors APM's: the recorded root is absolute, no
+# longer exists, and its parent still does (an unmounted volume must not look deleted). Any doubt keeps
+# the receipt. Removed file names and their recorded roots are written to $2, one per line.
+retire_orphaned_receipts() {
+  local dir="$1/.apm/deployment-receipts"
+  : >"$2"
+  [ -d "$dir" ] && [ ! -L "$dir" ] || return 0
+  python3 - "$dir" "$2" <<'PYEOF'
+import json, os, sys
+directory, record = sys.argv[1], sys.argv[2]
+removed = []
+for name in sorted(os.listdir(directory)):
+    path = os.path.join(directory, name)
+    if not name.endswith(".json") or os.path.islink(path) or not os.path.isfile(path):
+        continue
+    try:
+        with open(path, encoding="utf-8") as fh:
+            root = json.load(fh)["root"]
+        if not isinstance(root, str):
+            continue
+    except Exception:
+        continue
+    if os.path.isabs(root) and not os.path.lexists(root) and os.path.isdir(os.path.dirname(root)):
+        os.unlink(path)
+        mcp = os.path.join(directory, "mcp", name)
+        if os.path.isfile(mcp) and not os.path.islink(mcp):
+            os.unlink(mcp)
+        removed.append(name + "\t" + root)
+with open(record, "w", encoding="utf-8") as fh:
+    for line in removed:
+        fh.write(line + "\n")
+PYEOF
+}
+
 # The reason a lost path (relative to HOME) is no loss, or nothing. Every entry is a full path under one of MIGRATE_ROOTS,
 # except the .apm-pin basename rule and the entries dropped from the catalog; docs/native-distribution.md lists them.
 # Anything else counts as lost. $2 is the HOME the roots are read in, $3 the deployed record of migrate_roots.
