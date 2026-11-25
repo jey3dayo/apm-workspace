@@ -69,7 +69,7 @@ EOF
   run sync_fixture APM_BIN="$FX/apm-stub" bash "$FX/repo/scripts/native.sh" sync
   [ "$status" -eq 0 ]
   [[ "$output" == *".agents/skills: 1 -> 1 (+0)"* ]]
-  [[ "$output" == *"Rollback of the four roots:"* ]]
+  [[ "$output" == *"Rollback of the migrated roots:"* ]]
   [ -f "$FX/home/.agents/skills/existing/SKILL.md" ]
   [ "$(find "$FX/home/.agents" -path '*.bak-*/existing/SKILL.md' | wc -l | tr -d ' ')" -eq 1 ]
 }
