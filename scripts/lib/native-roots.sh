@@ -380,11 +380,9 @@ restore_agmsg_links() {
 }
 
 # APM 0.38+ retires deployment receipts whose recorded project root is gone during install
-# (retire_receipts_of_missing_projects in apm_cli/core/deployment_ledger.py). A receipt like that is a
-# stale ledger entry, not content, so the rehearsal removes it from the clone before the snapshot and
-# the retirement never reads as loss. The criterion mirrors APM's: the recorded root is absolute, no
-# longer exists, and its parent still does (an unmounted volume must not look deleted). Any doubt keeps
-# the receipt. Removed file names and their recorded roots are written to $2, one per line.
+# (retire_receipts_of_missing_projects in apm_cli/core/deployment_ledger.py). Receipts whose
+# recorded root is absolute, no longer exists, and whose parent still does (an unmounted
+# volume must not look deleted) are removed from the rehearsal clone before the snapshot.
 retire_orphaned_receipts() {
   local dir="$1/.apm/deployment-receipts"
   : >"$2"

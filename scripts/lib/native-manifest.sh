@@ -10,8 +10,7 @@ resolve_source_sha() {
 }
 
 # Rewrites the two floating workspace refs (catalog#main, manual-skills#main) into SHA pins, and the packages in
-# EXTERNAL_PACKAGE_MAP into the structured form (with Claude excluded: they are plugin-form packages, and
-# APM 0.37+ parks or plugin-registers those for Claude at user scope), and converts the root executable
+# EXTERNAL_PACKAGE_MAP into the structured form, and converts the root executable
 # approvals for user-scope APM.
 render_manifest() {
   local sha="$1" workspace_only="$2"
