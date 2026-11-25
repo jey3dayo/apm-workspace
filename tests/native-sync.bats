@@ -128,3 +128,20 @@ EOF
   [ -f "$receipts/broken.json" ]
   [ "$(cat "$record")" = "orphan.json"$'\t'"$FX/parent/gone" ]
 }
+
+@test "the link guards flag a symlinked intermediate directory above a migrated root" {
+  mkdir -p "$FX/outside/skills" "$FX/home/.gemini"
+  ln -s "$FX/outside" "$FX/home/.gemini/antigravity-cli"
+  run bash -c '
+    MIGRATE_ROOTS=".agents/skills .claude/skills .claude/agents .cursor/agents .gemini/antigravity-cli/skills"
+    REAL_HOME_TOOL_DIRS=".agents .claude .codex .cursor .gemini .cache Library Library/Caches"
+    REAL_HOME_WRITE_PATHS=".gemini/antigravity-cli/skills"
+    . "$1/scripts/lib/native-core.sh"
+    . "$1/scripts/lib/native-roots.sh"
+    root_escaping_links "$2"
+    real_home_shared_entries "$2"
+    reinstate_escaping_links "$2" 20260101T000000Z
+  ' _ "$FX/repo" "$FX/home"
+  [ "$status" -eq 0 ]
+  [ "$(printf '%s\n' "$output" | grep -c "antigravity-cli -> ")" -eq 3 ]
+}
