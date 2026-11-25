@@ -1,9 +1,8 @@
 # Package Decisions
 
-採用・撤去・見送りにした APM パッケージの意思決定ログ。1 パッケージ 1 セクション。
-「なぜ入れたか / なぜ消したか / 再検討するなら何を見るか」を残す。
+採用・撤去・見送りにした APM パッケージの意思決定ログです。1 パッケージにつき 1 セクションとし、「なぜ入れたか / なぜ消したか / 再検討するなら何を見るか」を残します。
 
-各記録は書いた時点の記述のまま残す。2026-11-10 の切り替えまで、authoring checkout は `~/.apm` だった（今は `~/src/github.com/jey3dayo/apm-workspace`）。記録の中の `~/.apm` はその checkout を指し、`mise run deploy` などの手順は切り替え前の rollout である。切り替えのあとの rollout は [`native-distribution.md`](native-distribution.md) の B に従う。
+各記録は書いた時点の記述のまま残します。2026-11-10 の切り替えまで authoring checkout は `~/.apm` でした（現在は `~/src/github.com/jey3dayo/apm-workspace` です）。記録の中の `~/.apm` は当時の checkout を指し、`mise run deploy` などの手順は切り替え前の rollout です。切り替え後の rollout は [`native-distribution.md`](native-distribution.md) の手順 B に従います。
 
 ## plugin 形式 package の Claude 配布（2026-11-25）
 
