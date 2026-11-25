@@ -15,7 +15,7 @@ runs doctor, and reports before/after entry counts. Existing native guards remai
 before real migration; review the reports printed on failure, then re-run with the intended paths only.
 --https uses invocation-only Git config to keep GitHub URLs on HTTPS. Original Git config files are unchanged.
 Logs, the backup and rehearsal remain under tmp/native-sync/ in this checkout. Caches are moved, never deleted.
-Failures after migrate has claimed a stamp print its rollback command; rollback restores only the four roots.
+Failures after migrate has claimed a stamp print its rollback command; rollback restores only the migrated roots.
 Use the backup and docs/native-distribution.md for the other files and for restoring caches.
 EOF
 }
@@ -202,7 +202,7 @@ sync_finish() {
     log "GitHub over SSH failed (the rehearsal's disposable HOME may not load your ~/.ssh/config); retry over HTTPS: mise run native:sync -- --https"
   fi
   if [ -n "$stamp" ]; then
-    printf 'Rollback of the four roots: %s\n' "$(migrate_rollback_command "$SYNC_HOME" "$SYNC_REAL_HOME" "$stamp")" >&2
+    printf 'Rollback of the migrated roots: %s\n' "$(migrate_rollback_command "$SYNC_HOME" "$SYNC_REAL_HOME" "$stamp")" >&2
     log "Other native outputs require the backup at $SYNC_RUN/backup (docs/native-distribution.md)."
   elif [ -f "$SYNC_RUN/migrate.log" ]; then
     log "No unique recorded migrate stamp was confirmed; inspect $SYNC_RUN/migrate.log before choosing a rollback."
