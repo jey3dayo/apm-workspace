@@ -10,7 +10,9 @@ resolve_source_sha() {
 }
 
 # Rewrites the two floating workspace refs (catalog#main, manual-skills#main) into SHA pins, and the packages in
-# EXTERNAL_PACKAGE_MAP into the structured form, and converts the root executable approvals for user-scope APM.
+# EXTERNAL_PACKAGE_MAP into the structured form (with Claude excluded: they are plugin-form packages, and
+# APM 0.37+ parks or plugin-registers those for Claude at user scope), and converts the root executable
+# approvals for user-scope APM.
 render_manifest() {
   local sha="$1" workspace_only="$2"
   [ -f "$ROOT_MANIFEST" ] || fail "missing $ROOT_MANIFEST"
@@ -25,24 +27,24 @@ render_manifest() {
         pin = substr(rest, 1, 40)
         if (length(pin) != 40 || pin !~ /^[0-9a-f]+$/) continue
         if (length(rest) > 40 && substr(rest, 41, 1) != " ") continue
-        printf "    - git: %s\n      ref: %s\n      skills:\n        - %s\n", repo[i], pin, skill[i]
+        printf "    - git: %s\n      ref: %s\n      skills:\n        - %s\n      targets:\n        - codex\n        - cursor\n        - agent-skills\n", repo[i], pin, skill[i]
         converted[i]++
         return 1
       }
       return 0
     }
     BEGIN {
-      required["github.com/ibelick/ui-skills"] = 1
-      required["github.com/mattpocock/skills"] = 1
-      required["github.com/nanaism/yomiyasu/skills/yomiyasu"] = 1
-      required["github.com/nextlevelbuilder/ui-ux-pro-max-skill"] = 1
-      required["github.com/tt-a1i/archify/archify"] = 1
+      required["ibelick/ui-skills"] = 1
+      required["mattpocock/skills"] = 1
+      required["nanaism/yomiyasu/skills/yomiyasu"] = 1
+      required["nextlevelbuilder/ui-ux-pro-max-skill"] = 1
+      required["tt-a1i/archify/archify"] = 1
       n = split(map, entries, " ")
       for (i = 1; i <= n; i++) {
         split(entries[i], kv, "=")
         split(kv[2], rs, ":")
         key[i] = kv[1]; repo[i] = rs[1]; skill[i] = rs[2]
-        map_key["github.com/" key[i]] = "github.com/" repo[i]
+        map_key[key[i]] = repo[i]
       }
     }
     /^[^[:space:]#]/ && $0 !~ /^[A-Za-z_][A-Za-z0-9_-]*:/ { invalid = 1 }
@@ -55,7 +57,7 @@ render_manifest() {
     section == "executables" && $0 !~ /^[^ #]/ {
       if ($0 ~ /^[[:space:]]*(#.*)?$/) next
       if ($0 == "  allow:") { if (allow_seen++) invalid = 1; next }
-      if ($0 ~ /^    [A-Za-z0-9_.-]+:$/ || $0 ~ /^    github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.\/-]+:$/) {
+      if ($0 ~ /^    [A-Za-z0-9_.-]+:$/ || $0 ~ /^    [A-Za-z0-9_.-]+\/[A-Za-z0-9_.\/-]+:$/) {
         if (!allow_seen || (current != "" && !bins[current] && !mcps[current])) invalid = 1
         current = $0; sub(/^    /, "", current); sub(/:$/, "", current)
         if (grants[current]++) invalid = 1
@@ -70,7 +72,7 @@ render_manifest() {
     section == "dependencies" && group == "apm:" && /^    - / {
       dep = $0; sub(/^    - /, "", dep); sub(/^git: /, "", dep); sub(/#.*/, "", dep); sub(/[[:space:]].*$/, "", dep)
       if (dep !~ /:|\// || dep ~ /^https?:/) next_dep = ""
-      else { next_dep = "github.com/" dep; deps[next_dep]++ }
+      else { next_dep = dep; deps[next_dep]++ }
     }
     /^    - jey3dayo\/apm-workspace\/(catalog|manual-skills)#main[ ]*$/ {
       pkg = $0

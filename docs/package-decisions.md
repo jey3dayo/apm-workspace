@@ -5,6 +5,14 @@
 
 各記録は書いた時点の記述のまま残す。2026-11-10 の切り替えまで、authoring checkout は `~/.apm` だった（今は `~/src/github.com/jey3dayo/apm-workspace`）。記録の中の `~/.apm` はその checkout を指し、`mise run deploy` などの手順は切り替え前の rollout である。切り替えのあとの rollout は [`native-distribution.md`](native-distribution.md) の B に従う。
 
+## plugin 形式 package の Claude 配布（2026-11-25）
+
+- Status: 採用（APM 0.38.1 更新に伴うユーザー判断）。対象は `mattpocock/skills`、`nanaism/yomiyasu`、`nextlevelbuilder/ui-ux-pro-max-skill`、`shadcn/improve` の 4 package
+- 内容: この 4 つは依存ごとに `targets: [codex, cursor, agent-skills]` を付け、Claude へは配らない。Codex / Cursor / `.agents/skills` には従来どおり配る（yomiyasu は render の構造化変換側で targets を付ける）
+- 理由: APM 0.37+ は plugin 形式の package を user scope で Claude native plugin として扱う。`skills:` の絞り込みがある 3 つは parked されて Claude に一切届かず、絞り込みのない `shadcn/improve` は `~/.claude/settings.json` へ plugin 登録を書き込む。後者は native 配布が settings.json を「変更されたら失敗させる」対象にしていることと衝突する。代替案は、(A) 絞り込みを外して whole plugin として登録する（mattpocock の 10 件への絞り込みが崩れる）、(C) manual-skills へ複写して loose skill のまま配る（週次 pin 更新の自動化から外れる）。2026-11-25 に使い捨て HOME で 0.38.1 の挙動（parked・settings.json 書込み・`--legacy-skill-paths` で回避できないこと・依存ごとの `targets:` で Claude だけ外せること）を実測したうえで、ユーザーが B（Claude だけ対象から外す）を選んだ
+- 代償: Claude Code ではこの 13 スキル（mattpocock の 10、yomiyasu、ui-ux-pro-max、improve）が使えなくなる。必要になったら、その package だけ manual lane への複写（案 C）を個別に判断する
+- 再検討するなら: APM が user scope でも `skills:` の絞り込みを loose skill として配れるようになったら、`targets:` を外して Claude へ戻す
+
 ## jev-lint (mizchi/jev-lint)
 
 - Status: 採用・opt-in（2026-11-20、ユーザー判断）
