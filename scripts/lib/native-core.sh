@@ -121,7 +121,7 @@ run_apm_mcp_distribution() {
   local home="$1" backup_suffix timestamp config
   timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
   backup_suffix=".pre-apm-mcp-$timestamp"
-  for config in .codex/config.toml .claude.json; do
+  for config in .codex/config.toml .claude.json .gemini/config/mcp_config.json; do
     if [ -f "$home/$config" ] && [ ! -L "$home/$config" ]; then
       cp -p "$home/$config" "$home/$config$backup_suffix"
       chmod 600 "$home/$config$backup_suffix"

@@ -14,7 +14,7 @@ assert_same_render_mode() {
 }
 
 # Every directory above a migrated root, and the root itself, as HOME-relative paths. A root can sit more
-# than one level below the HOME (.gemini/antigravity-cli/skills), and a link in an intermediate directory
+# than one level below the HOME (.gemini/config/skills), and a link in an intermediate directory
 # lets a rename or copy through it write outside the HOME, so the guards check every ancestor, not only
 # the tool directory and the root.
 root_ancestors() {
