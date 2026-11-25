@@ -71,7 +71,7 @@ backup の対象（rehearse が複製に再現するもの）は `~/.apm/apm.yml
 ## 既知の問題
 
 - APM 0.35.0 は user scope を `~/.apm` に固定しています。`~/.apm` が checkout だと、実 HOME へ配ったときに checkout が追跡している `apm.yml`（と APM が書く `apm.lock.yaml`）を書き換えてしまいます。その結果 main の checkout が dirty になり、`git pull` が止まります。この状態に戻さないため、`migrate` は `<HOME>/.apm` に `.git` か `catalog/` があるとき、またはこの repo が `<HOME>/.apm` の中にあるときに何も書かずに止まります。`mise run check` は実 HOME の配布先に書かず一時ディレクトリにだけ書くため、切り替えのあとも通ります。
-- 2026-11-10 より前の `smoke:catalog` は実 HOME の `~/.apm/deployment-receipts` に一時ディレクトリの receipt（root が `apm-catalog-smoke.*`）を書いていました。その後は一時 HOME を使うようになり、現在はタスク自体を廃止したため、この経路で receipt は増えません。残っている receipt は native 配布の副作用と取り違えないでください。
+- 2026-11-10 より前の `smoke:catalog` は実 HOME の `~/.apm/deployment-receipts` に一時ディレクトリの receipt（root が `apm-catalog-smoke.*`）を書いていました。その後は一時 HOME を使うようになり、現在はタスク自体を廃止したため、この経路で receipt は増えません。残っている receipt は native 配布の副作用と取り違えないでください。APM 0.38+ は記録先の root が消えた receipt を install のときに掃除するため、残骸が rehearsal の lost に出るようになりました。rehearsal は snapshot の前に、APM と同じ条件（記録された root が絶対パスで、存在せず、親ディレクトリは残っている）で孤児になった receipt を複製から取り除き、`retired-receipts.txt` にファイル名と記録されていた root を残します。実 HOME 側の残骸は migrate の install で APM が掃除します。
 - 目印のない root（旧経路がコピーした `~/.claude/CLAUDE.md`・`~/.codex/AGENTS.md`・`~/.cursor/AGENTS.md`）は、`compile -g --clean` が上書きしません。Claude には古い `CLAUDE.md` と native の rule `ai-collaboration.md` の両方が届きます。古いコピーを退避する `migrate:roots` は 2026-11-10 に退役しました。旧経路のままの HOME で必要なときは、commit `0bcce09` の旧ツールで実行するか、手動で `<名前>.<UTC>.bak` へ移します。
 
 ## 実 HOME への切り替えの解き方
@@ -129,6 +129,7 @@ executables:
 ### rehearse --migrate が見ること
 
 - 複製の中で、`migrate` と同じ `migrate_roots`（install の前）と `reinstate_entries`（compile のあと）を通します。end-to-end の確認は backup の複製から行います（空の HOME は使いません）。
+- snapshot の前に、記録先の root が消えた deployment receipt を複製から取り除きます（通常・`--migrate` の両モード。条件と記録の残し方は「既知の問題」の receipt の項を参照）。receipt は APM が管理する台帳であり、内容ではないため、消失として数えません。
 - 消えてよいのは `scripts/lib/native-roots.sh` の `allowed_lost_reason` に書いた allowlist だけです。件数は `allowed_lost=` に出し、`allowed-lost.txt` にタブ区切りで path と理由を残します。allowlist 以外の消失（`lost=`）が 0 件のときだけ成功します。同じ skill の別のファイルは対象外で、消えれば失敗します。
 
   | path（HOME からの相対）                                                                                                                                              | 理由                                                                                                                                                                                                                                              |

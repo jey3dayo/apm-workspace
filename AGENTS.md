@@ -118,7 +118,7 @@ symlinks resolving to `.apm/skills/<id>/SKILL.md`.
 - If a managed upstream skill repeatedly fails packaging or rollout, move it to
   the manual lane rather than patching cache or runtime output.
 - When changing the active `apm` source, update both the checkout's `mise.toml`
-  and `~/.config/mise/config.workstation.toml`.
+  and `~/.config/mise/config.dev.toml`.
 - Follow the guide in `catalog/.apm/instructions/ai-collaboration.instructions.md`
   for MCP placement.
 - Runtime assets that a skill places at launch have no `targets:` distribution
