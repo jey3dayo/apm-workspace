@@ -13,9 +13,36 @@ assert_same_render_mode() {
     fail "the previous manifest of $home was rendered with workspace_only=$previous, this run uses workspace_only=$WORKSPACE_ONLY; the previous lock would make every external package look dropped. Use the same mode."
 }
 
+# Every directory above a migrated root, and the root itself, as HOME-relative paths. A root can sit more
+# than one level below the HOME (.gemini/antigravity-cli/skills), and a link in an intermediate directory
+# lets a rename or copy through it write outside the HOME, so the guards check every ancestor, not only
+# the tool directory and the root.
+root_ancestors() {
+  local root rest path
+  for root in $MIGRATE_ROOTS; do
+    path="" rest="$root"
+    while [ -n "$rest" ]; do
+      case "$rest" in
+        */*)
+          path="${path:+$path/}${rest%%/*}"
+          rest="${rest#*/}"
+          ;;
+        *)
+          path="${path:+$path/}$rest"
+          rest=""
+          ;;
+      esac
+      printf '%s\n' "$path"
+    done
+  done | LC_ALL=C sort -u
+}
+
 # The links of the migrated roots that migrate would refuse: broken, or leading outside the HOME (escaping_link_line).
 root_escaping_links() {
-  local home="$1" root link
+  local home="$1" root link path
+  for path in $(root_ancestors); do
+    if [ -L "$home/$path" ]; then escaping_link_line "$home" "$home/$path"; fi
+  done
   for root in $MIGRATE_ROOTS; do
     [ -e "$home/$root" ] || [ -L "$home/$root" ] || continue
     find "$home/$root" -type l | LC_ALL=C sort | while IFS= read -r link; do
@@ -127,17 +154,16 @@ link_scope() {
   esac
 }
 
-# Links among the directories reinstate writes into and copies from (the roots, their .bak-<stamp>, the tool directories
-# above them and .apm, where the reports go) that leave the HOME or are broken: a copy through one would write outside it.
+# Links among the directories reinstate writes into and copies from (the roots and every directory above
+# them, their .bak-<stamp>, and .apm, where the reports go) that leave the HOME or are broken: a copy
+# through one would write outside it.
 reinstate_escaping_links() {
   local home="$1" stamp="$2" root path
-  for path in .agents .claude .cursor .apm; do
+  for path in .apm $(root_ancestors); do
     if [ -L "$home/$path" ]; then escaping_link_line "$home" "$home/$path"; fi
   done
   for root in $MIGRATE_ROOTS; do
-    for path in "$root" "$root.bak-$stamp"; do
-      if [ -L "$home/$path" ]; then escaping_link_line "$home" "$home/$path"; fi
-    done
+    if [ -L "$home/$root.bak-$stamp" ]; then escaping_link_line "$home" "$home/$root.bak-$stamp"; fi
   done
 }
 

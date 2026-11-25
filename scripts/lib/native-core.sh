@@ -198,6 +198,9 @@ real_home_shared_entries() {
   for path in $REAL_HOME_TOOL_DIRS; do
     if [ -L "$home/$path" ]; then escaping_link_line "$home" "$home/$path"; fi
   done
+  for path in $(root_ancestors); do
+    if [ -L "$home/$path" ]; then escaping_link_line "$home" "$home/$path"; fi
+  done
   set --
   for path in $REAL_HOME_WRITE_PATHS; do set -- "$@" "$home/$path"; done
   shared_entries_in "$home" "$@"
