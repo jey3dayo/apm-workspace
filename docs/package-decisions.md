@@ -955,3 +955,10 @@ hidden character(s)` で install を止める。rehearsal が失敗し、`native
 - 入れない: `poteto-mode`。返信様式・自律ルールまで含む作動様式そのもので、この workspace の `orchestrator-worker` の方針と衝突する。モデル選択も Cursor 専用の `~/.cursor/rules/pstack-models.mdc`（`setup-pstack` が書く）前提で配布できない。`no-comments` からの参照は subagent の reasoning level 付けの1点だけで、そこは `orchestrator-worker` の models 表で代替する。あわせて `architect` の任意分岐先 `arena` も入れない（`poteto-mode` と追加の principle 群を引くため）。残りの pstack スキル（全57件）も一括では入れない。
 - 制約として残るもの: 制約コメント（`do not remove` 等）を型・テスト・lint へ encode する提案は `no-comments` 手順5の対話承認が前提。この workspace では従来どおり判断は利用者側に残る。
 - 再検討するなら: `poteto-mode` 式の作動様式を採りたくなったとき（その場合は衝突する既存方針の棚卸しとセット）、または上流が `comment-sicko` を APM で配れる形にしたとき。
+
+## `cursor/plugins` の pstack から `reframe` / `sharpen` を追加採用（2026-11-25）
+
+- 追加: root `apm.yml` に subdirectory 形式で2件を pin（`ca782ed8`、pstack v0.15.48、既存 pstack pin と同 commit）。`reframe` は上流で 2026-11-23 に追加された新スキル（`2dd5c0c` / `9e278fe`）で、既存 pin の commit に既に含まれていたため pin の版上げは不要だった。
+- `reframe`: やりたいことは分かっているが言語化が曖昧なときに、専門用語を教えて隣接分野の語彙を借り、説明文を書き直す。単体で完結し、他の pstack スキルを参照しない。
+- `sharpen`: タスクを大きくではなく深くしてプロンプトを書き直す。利用者本人が「`reframe` と組み合わせると効果抜群」という紹介を受けて追加を指示した組み合わせで、`reframe` だけではその動線が成立しないため同時に入れた。こちらも単体で完結する。
+- 残りの pstack スキルは従来どおり一括では入れない。個別に必要になったものだけ再検討する。

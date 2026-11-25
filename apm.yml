@@ -24,13 +24,15 @@ dependencies:
         - codex
         - cursor
         - agent-skills
-    # pstack (v0.15.48): no-comments and the skills it directly references.
+    # pstack (v0.15.48): no-comments and the skills it directly references, plus reframe / sharpen.
     # poteto-mode and arena are intentionally not pinned; see docs/package-decisions.md.
     - cursor/plugins/pstack/skills/no-comments#ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
     - cursor/plugins/pstack/skills/why#ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
     - cursor/plugins/pstack/skills/architect#ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
     - cursor/plugins/pstack/skills/principle-fix-root-causes#ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
     - cursor/plugins/pstack/skills/principle-redesign-from-first-principles#ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+    - cursor/plugins/pstack/skills/reframe#ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+    - cursor/plugins/pstack/skills/sharpen#ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
 
     # --- engineering / writing ---
     - coji/natural-japanese/skills/natural-japanese#840bd400cbcb64c8b64d492a144da54fc05776c5 # v2.0.0

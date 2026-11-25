@@ -8,7 +8,7 @@ This registry tracks external agent collections that were evaluated or curated i
 - Observed commit: `ca782ed8b3c2c521cead8e1720d55c3a5dbf2347` (pstack v0.15.48)
 - License: MIT, copyright `2026 Lauren Tan`
 - APM direct dependency status: the pstack skills are directly installable as subdirectory skill pins (verified 2026-11-25 in an isolated APM project: `apm install` of the five pins below succeeded and integrated each into `.agents/skills/` and `.claude/skills/`). The agents are not: APM distributes skills, and `pstack/agents/*.md` are plain agent files with no `.agent.md` package shape, so the one agent `no-comments` needs is curated into the catalog instead.
-- Pinned skills (root `apm.yml`): `no-comments`, `why`, `architect`, `principle-fix-root-causes`, `principle-redesign-from-first-principles` — the target skill plus the ones it and `comment-sicko` directly reference.
+- Pinned skills (root `apm.yml`): `no-comments`, `why`, `architect`, `principle-fix-root-causes`, `principle-redesign-from-first-principles` — the target skill plus the ones it and `comment-sicko` directly reference. Added 2026-11-25 at the same commit: `reframe` and `sharpen`, a standalone pair the user asked for (reframe teaches the expert words for a vague description; sharpen deepens a task before rewriting its prompt).
 - Not pinned: `poteto-mode` (a whole operating style whose autonomy and reply rules conflict with this workspace's own orchestrator policy, and whose model selection depends on Cursor-only `~/.cursor/rules/pstack-models.mdc` written by `setup-pstack`) and `arena` (an optional branch from `architect` that pulls in `poteto-mode` and further principles). `no-comments` references `poteto-mode` only for subagent reasoning-level selection; that is covered here by the `orchestrator-worker` models reference.
 
 ### Hired Agents
@@ -19,7 +19,7 @@ This registry tracks external agent collections that were evaluated or curated i
 
 ### Related Candidates
 
-- The remaining pstack skills (57 total) were not adopted. Revisit individually if a workflow needs one; do not bulk-import the bundle.
+- The remaining pstack skills (52 of 59 total) were not adopted. Revisit individually if a workflow needs one; do not bulk-import the bundle.
 - `pstack/agents/poteto-agent.md` was not hired: it is the general worker for `poteto-mode`, which is not adopted.
 
 ## msitarzewski/agency-agents
