@@ -11,7 +11,7 @@
 
 sync と内部 stage は HOME ごとに同じ排他ロックを取ります。sync は backup の前から配布後の確認までロックを保持します。backup と rehearsal も排他用の `<HOME>/.cache/apm-native-operation.lock` を作りますが、配布対象データは書き換えません。ロックは退避する `.cache/apm` の外にあり、親の symlink とロックファイルの hard link を拒否します。ロックファイルは削除しません。そのロックを継承した全プロセスが終了すると、異常終了した場合も OS が排他を解放します。別のプロセスが保持中のロックファイルを移動・削除しないでください。
 
-- consumer の manifest は、root の `apm.yml` にある `jey3dayo/apm-workspace/catalog#main` と `manual-skills#main` の 2 行を、指定した commit SHA への pin に書き換えたものです。`nanaism/yomiyasu/skills/yomiyasu#<SHA>` の 1 行は構造化した形（`git: nanaism/yomiyasu` / `ref: <SHA>` / `skills: [yomiyasu]`）に書き換えます。SHA は root の行から読み、対応表（`scripts/native.sh` の `EXTERNAL_PACKAGE_MAP`）の行が root になければ render は失敗します。そのほかの外部依存と MCP はそのまま通します（外部依存はもともと SHA で pin しています）。root の `apm.yml` と `apm.lock.yaml` は変えません。`--workspace-only` を付けると、この repo の 2 package だけを残します（外部依存ごと落ちるため、yomiyasu の変換も不要です）。
+- consumer の manifest は、root の `apm.yml` にある `jey3dayo/apm-workspace/catalog#main` と `manual-skills#main` の 2 行を、指定した commit SHA への pin に書き換えたものです。`nanaism/yomiyasu/skills/yomiyasu#<SHA>` の 1 行は構造化した形（`git: nanaism/yomiyasu` / `ref: <SHA>` / `skills: [yomiyasu]` / `targets: [codex, cursor, agent-skills]`）に書き換えます。targets で Claude を外すのは、plugin 形式の package を APM 0.37+ が user scope で Claude native plugin として扱い、`skills:` の絞り込みがあるものは parked して配らないためです（判断の記録は `docs/package-decisions.md`）。SHA は root の行から読み、対応表（`scripts/native.sh` の `EXTERNAL_PACKAGE_MAP`）の行が root になければ render は失敗します。そのほかの外部依存と MCP はそのまま通します（外部依存はもともと SHA で pin しています）。root の `apm.yml` と `apm.lock.yaml` は変えません。`--workspace-only` を付けると、この repo の 2 package だけを残します（外部依存ごと落ちるため、yomiyasu の変換も不要です）。
 - 配布 pin は sync が勝手に動かしません。新しい commit を配るときは、必要なら `--source-ref` に新しい SHA を渡します。外部依存の pin はこれまでどおり root の `apm.yml` で上げます。
 - 生成した root（`~/.claude/CLAUDE.md`・`~/.codex/AGENTS.md`・`~/.cursor/AGENTS.md`）が APM の目印を残したまま compile のあとに編集されていた場合は、何も書かずに止まります。APM の目印は編集を守らず、compile が上書きしてしまうためです。判定は APM と同じ Build ID の照合（`apm_cli/compilation/build_id.py`）で行うため、APM と同じく末尾の改行だけを足した・消した編集は検出しません。
 - 既存の `~/.claude/rules/claude-md-design.md` は rehearsal と migration の前に検査します。移行前の管理元（`f011e52`）、指定した source SHA の生成内容、更新前の consumer lock に記録された同じ path の SHA256 のいずれかと一致すれば許可します。lock は `scripts/lock-hashes.py` の検証を通った記録だけを使います。異なる内容やリンクは上書きせず止まります。既存ファイルがあり、指定 SHA を checkout の Git object から読めない場合も止まります。
@@ -82,7 +82,7 @@ backup の対象（rehearse が複製に再現するもの）は `~/.apm/apm.yml
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `apm install -g --only apm` が旧経路の配った skill のファイルを消し（stale-file cleanup）、同じファイルの書き込みは「no trustworthy local deployment baseline」で飛ばしました。`.agents/skills` に旧経路のファイルが残っていると、Codex native plugin の移行も拒否されました（`apm_cli/install/phases/codex_plugins.py`） | 4 つの root（`~/.agents/skills`・`~/.claude/skills`・`~/.claude/agents`・`~/.cursor/agents`）を、install の前に `<root>.bak-<UTC>` へ移します（削除しません）。rules と compile が書く root（`CLAUDE.md`・`AGENTS.md`）は移しません。APM は空の root へ配ります                                                                                                                                                                                  |
 | 旧経路が配った skill のうち manifest にないもの（private skill、Herdr などほかの tool が置いた skill）が、移したあとの root にありませんでした                                                                                                                                                                            | compile のあとに内部の `reinstate_entries` で入れ直します。固定リストは持たず、「`.bak` にあって install のあとの root にない top-level の entry」を戻します。既にあるもの（APM が配ったもの、Herdr や Claude が書き直したもの）は上書きしません。`.bak` の中の symlink が root の外を指すときは中身をコピーして戻します（配布先が authoring の checkout に依存しないため）。root の中を指すものはそのまま戻し、切れたリンクは列挙して失敗します |
-| `nanaism/yomiyasu` は Codex native plugin を持つ package で、root の `apm.yml` の書き方（`owner/repo/skills/yomiyasu#<SHA>`）だと plugin として扱われ、移行が止まりました                                                                                                                                                 | render が構造化した形（`git: nanaism/yomiyasu` / `ref: <SHA>` / `skills: [yomiyasu]`）に変換します。SHA は root の行から読み、行がなければ render は失敗します                                                                                                                                                                                                                                                                                   |
+| `nanaism/yomiyasu` は Codex native plugin を持つ package で、root の `apm.yml` の書き方（`owner/repo/skills/yomiyasu#<SHA>`）だと plugin として扱われ、移行が止まりました                                                                                                                                                 | render が構造化した形（`git: nanaism/yomiyasu` / `ref: <SHA>` / `skills: [yomiyasu]` / `targets: [codex, cursor, agent-skills]`）に変換します。SHA は root の行から読み、行がなければ render は失敗します                                                                                                                                                                                                                                        |
 
 `browser-use/browser-harness` は root の `apm.yml` で subdirectory の形（`browser-use/browser-harness/skills/browser-harness#<SHA>`）に pin しており、render はこの行をそのまま通します。repo root の形（`browser-use/browser-harness#<SHA>`）だと APM が上流の repo 全体を skill の置き場へ配り、Codex が plugin の skill として数えてしまうためです。subdirectory の形なら `SKILL.md` と `references/install.md` だけが `.agents/skills/browser-harness` と `.claude/skills/browser-harness` に入ります（`skills:` の絞り込みはこの package では APM が無視するため使えません）。
 
@@ -90,20 +90,20 @@ APM は Codex CLI 0.163.0 だけを受け付けます（`apm_cli/codex_plugins/c
 
 ### bin/ の許可（`executables.allow`）
 
-APM は非対話の install で信頼していない package の `bin/` を配りません。root `apm.yml` の `executables.allow` を管理元とし、render は通常配布のときだけそのまま `executables.allow` として出力します（APM 0.36.1 では user scope の `<HOME>/.apm/apm.yml` でも新名を読みます。旧名 `allowExecutables` は同ファイルでは効かないことを 2026-11-19 に実測しました）。トップレベルのキーは引用なしの通常形式に限り、未掲載の package、重複、`bin: true` または `mcp: true` 以外は拒否します。現在の承認は次のとおりです。
+APM は非対話の install で信頼していない package の `bin/` を配りません。root `apm.yml` の `executables.allow` を管理元とし、render は通常配布のときだけそのまま `executables.allow` として出力します（APM 0.36.1 では user scope の `<HOME>/.apm/apm.yml` でも新名を読みます。旧名 `allowExecutables` は同ファイルでは効かないことを 2026-11-19 に実測しました）。トップレベルのキーは引用なしの通常形式に限り、未掲載の package、重複、`bin: true` または `mcp: true` 以外は拒否します。現在の承認は次のとおりです（これは render の出力形です。root 側の yomiyasu のキーは `nanaism/yomiyasu/skills/yomiyasu` で、下の変換でこの形になります）。
 
 ```yaml
 executables:
   allow:
-    github.com/ibelick/ui-skills:
+    ibelick/ui-skills:
       bin: true
-    github.com/mattpocock/skills:
+    mattpocock/skills:
       bin: true
-    github.com/nanaism/yomiyasu:
+    nanaism/yomiyasu:
       bin: true
-    github.com/nextlevelbuilder/ui-ux-pro-max-skill:
+    nextlevelbuilder/ui-ux-pro-max-skill:
       bin: true
-    github.com/tt-a1i/archify/archify:
+    tt-a1i/archify/archify:
       bin: true
     aqua-voice:
       mcp: true
@@ -119,10 +119,10 @@ executables:
       mcp: true
 ```
 
-- render は `EXTERNAL_PACKAGE_MAP` にある package（`nanaism/yomiyasu/skills/yomiyasu`）を `executables.allow` へ出力する際、構造化した repo の identity（`github.com/nanaism/yomiyasu`）へ変換します。APM が依存から計算する承認キーと一致させるためです。
+- render は `EXTERNAL_PACKAGE_MAP` にある package（`nanaism/yomiyasu/skills/yomiyasu`）を `executables.allow` へ出力する際、構造化した repo の identity（`nanaism/yomiyasu`）へ変換します。APM が依存から計算する承認キーと一致させるためです。
 - package の `bin/` は必須であり、承認だけが欠けた場合は render が失敗します。変更するときは `scripts/lib/native-manifest.sh` の必須項目も更新します。MCP server は root `apm.yml` で宣言されているものを承認します。hooks・LSP・canvas は承認しません。`--workspace-only` では外部 package の承認を出力しません。
 - `allowExecutables` は APM では deprecated の旧名です。APM 0.35.1 の user scope は `<HOME>/.apm/apm.yml` で旧名だけを読んでいましたが、0.36.1 では新名 `executables.allow` を読み、旧名は効きません（2026-11-19 に使い捨て HOME で実測済み。旧名のみでは archify と ui-skills の `bin/` が `gated_pending_approval` で止まり、`apm approve` が移行した新名では配布されました）。配布用の必須分は render が `executables.allow` で書きます。個人環境での追加承認は `apm approve --user` で `~/.apm/config.json` の `executables` に入れて構いません（対話端末で `apm install` が出す `Trust <package>? [y/N]` に y と答えても同じです）。この個人承認は bin・hooks・MCP・LSP・canvas の executable primitives すべてを package 単位で制御します。`native:*` の中の `apm` は `run_apm` が `APM_NON_INTERACTIVE=1` を固定で渡して動くため、質問は出ず警告だけで続行します（`install/phases/integrate.py`）。
-- 許可のキーは `github.com/<owner>/<repo>[/<path>]` です。APM は依存を `str(dep_ref)`（`github.com/<repo>#<ref>`）で引き、`#<ref>` を外した形で照合します（`install/exec_gate.py` の `resolve_package_key`、`security/executables.py` の `_map_grants`）。
+- 許可のキーは `<owner>/<repo>[/<path>]`（host の接頭辞なし）です。APM 0.36.1 までは `github.com/<owner>/<repo>[/<path>]` の形で照合していましたが、0.38.1 ではその形は一致せず、project scope でも user scope でも `bin/` が parked になります（2026-11-25 に使い捨て HOME と一時 project で実測済み。短いキーでは初回 install で配布され、`github.com/` 形では配布されませんでした）。0.38.1 の承認は内容 pin が推奨形で、型だけの承認（`bin: true`）は「not pinned to content」の警告が出ますが配布はされます。`apm approve -g <package>` は短いキーを consumer manifest へ書き、内容 pin を consumer lock へ記録します。render が manifest を毎回書き直すため、配布用の承認は root 側のキーを管理元とし、approve の追記には頼りません。
 - このブロックを書くと APM の executable 承認チェックが有効になり、許可していない package の hooks・MCP・LSP・canvas も default-deny になります。install の末尾に `executable primitives parked pending approval` という警告が出るのはこのためです。`~/.apm/apm.lock.yaml` の `exec_status` には `gated_pending_approval` と残ります。該当するファイルがあれば rehearse の `lost` に出ます。
 - `apm install` には `--trust-bin` を固定で渡します（compile には渡しません）。許可があっても、stdout が端末でないと APM は `bin/` を飛ばします（`install/exec_gate.py` の `resolve_bin_skip`）。rehearse は出力を `tee` に渡すため端末にならず、migrate は端末で動くため、付けないと 2 つの結果が食い違います。許可の範囲は `executables.allow` が決めるため、`--trust-bin` で全 package に広がることはありません。
 
@@ -220,7 +220,7 @@ sync が実行する B1〜B7 は次のとおりです。これらは 1 回の `m
 ## 確かめていないこと
 
 - native 配布後に外部依存が各 tool へ届く内容と、各 tool が rule・guide を読み込むかどうか。CI は `apm.yml` / `apm.lock.yaml` の変更時に使い捨て HOME で `apm install -g --only apm --trust-bin` の成功を確認しますが、native 配布先の内容は確認しません。
-- 許可の実効性は CI では自動確認しません。CI probe は `--trust-bin` を使うため install の成功しか見ません（本物の `github.com/tt-a1i/archify/archify` で `executables.allow` が効くことは、APM 0.36.1 の使い捨て HOME で 2026-11-19 に実測済みです）。Bats は同じ形のキーを持つ package を `https://github.com/<owner>/<repo>.git` から git の設定で fixture へ向け直して確かめます。
+- 許可の実効性は CI では自動確認しません。CI probe は `--trust-bin` を使うため install の成功しか見ません（本物の `tt-a1i/archify/archify` で短いキーの `executables.allow` が効くことは、APM 0.38.1 の使い捨て HOME と一時 project で 2026-11-25 に実測済みです）。Bats は同じ形のキーを持つ package を `https://github.com/<owner>/<repo>.git` から git の設定で fixture へ向け直して確かめます。
 - 構造化した形の `nanaism/yomiyasu` が Codex native plugin の経路を通らずに skill として配られるかどうか。
 - Linux（`sandbox-exec` がない環境）では、通信と書き込みを強制的には止めません。テストが守るのは HOME のガードと `env -i` の隔離までです。
 - Windows（対象外）。

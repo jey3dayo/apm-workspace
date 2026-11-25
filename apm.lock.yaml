@@ -1,6 +1,11 @@
-lockfile_version: '1'
-generated_at: '2026-11-24T15:32:20.528840+00:00'
-apm_version: 0.36.1
+lockfile_version: '4'
+generated_at: '2026-11-25T04:17:12.069045+00:00'
+apm_version: 0.38.1
+manifest_targets:
+- agent-skills
+- claude
+- codex
+- cursor
 dependencies:
 - repo_url: agavra/tuicr
   name: tuicr
@@ -39,7 +44,7 @@ dependencies:
     .claude/skills/tuicr/tuicr-wrapper-herdr.sh: sha256:cb8e9713b049508324cae24d4252b591cf6216307982ce35ed1e646b51e132c0
     .claude/skills/tuicr/tuicr-wrapper-zellij.sh: sha256:e442e97902abaa4924ab295707de455a15371f0d72e89c1b76f0563bbf43125a
     .claude/skills/tuicr/tuicr-wrapper.sh: sha256:69ba7c046e36058a8c5431ac2df1258bf1547df8844ffbbf3c68112d7b546784
-  content_hash: sha256:4cb9040d93e463ea9c7eb5f5db4cf7226296252a1b1af139ad99ddfa10165bd6
+  content_hash: sha256:09e44dcb9a8b8ff06201fd34a4993bb1b5761287afe8c1af4a9c8bf456393f24
   carried_licenses:
   - path: LICENSE
     source: LICENSE
@@ -65,7 +70,7 @@ dependencies:
     .agents/skills/browser-harness/references/install.md: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
     .claude/skills/browser-harness/SKILL.md: sha256:9e25a96375a0e120c16b76ea9d0a57c2fb7a5765813f89d5b9bcdc6dba6ea175
     .claude/skills/browser-harness/references/install.md: sha256:292e8ef0dbd391e19964ba5b3a230664e6e3baa22c37b6ed9a858ee37f8b7305
-  content_hash: sha256:3c1db2846104885b7714210aef913905a7f6008d448915b6e1710c3cd1e88bbd
+  content_hash: sha256:4302369d751a5a14d74d4aeeb60bd43361d2ab787b0d466b1b108d32a513115d
   carried_licenses:
   - path: LICENSE
     source: LICENSE
@@ -163,7 +168,7 @@ dependencies:
     .claude/skills/natural-japanese/scripts/semantic.py: sha256:47c1faebe503821c1c55d3b42703bc870f6b936deee0a7eccad5b8438e3b7ce8
     .claude/skills/natural-japanese/scripts/terms.py: sha256:75d935ee37c597946838f62d888563074ae60012fa24bdcf9cb580052f90b19c
     .claude/skills/natural-japanese/scripts/textcore.py: sha256:eee242215e94dfbd2340ccb682b3253546152848c973846d6ea86555469be721
-  content_hash: sha256:0316f0059e00aa413d5de355ce20d5dfeb93ad7877186d86a69f5ae59a8a084c
+  content_hash: sha256:eaa53d80ac36ba184b6ea60de632d3645ed7cfc375b4cea1b3cbf602080e5783
 - repo_url: cursor/plugins
   name: thermo-nuclear-code-quality-review
   host: github.com
@@ -181,7 +186,7 @@ dependencies:
   deployed_file_hashes:
     .agents/skills/thermo-nuclear-code-quality-review/SKILL.md: sha256:7faca08b51b643b2ddd0836f92af15574444024685dcc1e677dbbb39ae8c9e8f
     .claude/skills/thermo-nuclear-code-quality-review/SKILL.md: sha256:7faca08b51b643b2ddd0836f92af15574444024685dcc1e677dbbb39ae8c9e8f
-  content_hash: sha256:9052b01b46b1d8dbf94c45f9313ec1983443f9a460e83d49cdc7fe0f640ca476
+  content_hash: sha256:e4ddbf2e7dacd1503b9e02701cd953fef3abeccb04b718aefe701f1921ff4db9
   carried_licenses:
   - path: LICENSE
     source: cursor-team-kit/LICENSE
@@ -195,7 +200,7 @@ dependencies:
   virtual_path: pstack/skills/architect
   is_virtual: true
   package_type: claude_skill
-  content_hash: sha256:31a2f5974d7de7ee001123e9ff65be1e3ab2a0a56fe950be7df0657e767a7b98
+  content_hash: sha256:81b89a1deeae80c2d7329f56b8dbe9bc75f4499099d65c18561c8d8ccf726440
   carried_licenses:
   - path: LICENSE
     source: pstack/LICENSE
@@ -209,7 +214,7 @@ dependencies:
   virtual_path: pstack/skills/no-comments
   is_virtual: true
   package_type: claude_skill
-  content_hash: sha256:990102b5f8433d3cffd4626ad90736ad543e77b8165e69e47082544b7df84c77
+  content_hash: sha256:e3d90a5df8d27c742a4b22af649f2a8e0cbaddc470c0226fd6b29b387d04a441
   carried_licenses:
   - path: LICENSE
     source: pstack/LICENSE
@@ -223,7 +228,7 @@ dependencies:
   virtual_path: pstack/skills/principle-fix-root-causes
   is_virtual: true
   package_type: claude_skill
-  content_hash: sha256:8765301148b527f0273c0d041019cc1b64ab61b44567c95d4c8936726a5ecb82
+  content_hash: sha256:f79bf18f5300d0f3635ba338b46d2e6235e39d8ab77512b8813cb0432b9f83a0
   carried_licenses:
   - path: LICENSE
     source: pstack/LICENSE
@@ -237,7 +242,7 @@ dependencies:
   virtual_path: pstack/skills/principle-redesign-from-first-principles
   is_virtual: true
   package_type: claude_skill
-  content_hash: sha256:f627292d04bdd447c5e1dcce7b8fbd28906d9cbab44498c81a9d8c017d055ae4
+  content_hash: sha256:651d528568f52cc5e9cd0e2fdae76ba4f05d557ab3ebe52e731fc3900a6492dd
   carried_licenses:
   - path: LICENSE
     source: pstack/LICENSE
@@ -251,7 +256,7 @@ dependencies:
   virtual_path: pstack/skills/why
   is_virtual: true
   package_type: claude_skill
-  content_hash: sha256:c09c97721117820ce2e6fdeed000cae74e822cfac82d039b1812189626385489
+  content_hash: sha256:eafa41781e629b5d403fee5e4c953e0cb88322900957bf992de4bde4a0bab298
   carried_licenses:
   - path: LICENSE
     source: pstack/LICENSE
@@ -323,7 +328,7 @@ dependencies:
     .claude/skills/improve-animations/SKILL.md: sha256:73962447464433476343e2c12cd08ab39cc99a9e5f3c118c5fb54ed897574ef6
     .claude/skills/review-animations/SKILL.md: sha256:6ff590d29e436766135aa3d137be1fac2a867165c7257fc315b189361f1873af
     .claude/skills/review-animations/STANDARDS.md: sha256:e7d3605034acda54ca13e43aec9e64d65b53de20f75b11b8d694e373012fbe07
-  content_hash: sha256:fa23ceb139cf1a8ceef6828a50c204dbafdac2998633784b449be8d9d7326159
+  content_hash: sha256:59d8abda3ccdb759a2068a9c3963429c97ecf68382ffcd39676b267334f7db5f
   skill_subset:
   - animation-performance
   - apple-design
@@ -403,7 +408,7 @@ dependencies:
   virtual_path: skills/unslop
   is_virtual: true
   package_type: claude_skill
-  content_hash: sha256:8bd4303a6318c6fa3955ec30dea317e620cbfe49b52263c9d201be3ae587c386
+  content_hash: sha256:f59fee3f6feee3992b051ce2a3b35a042676861e38a99dec59ee7fd3836bf5d4
   carried_licenses:
   - path: LICENSE
     source: LICENSE
@@ -429,13 +434,13 @@ dependencies:
     .agents/skills/show-me/agents/openai.yaml: sha256:a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94
     .claude/skills/show-me/SKILL.md: sha256:434a2346cc95e313b0d367d477dda2e23ba642dd2181757415a09500664af100
     .claude/skills/show-me/agents/openai.yaml: sha256:a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94
-  content_hash: sha256:2756b5bd62fd54b18e98e1f7a9b90855cd5d5b27935be516bb44720f824e6573
+  content_hash: sha256:093b6841835acd9106bc530314a58e4c5c31318eb51fee493f37f3ca39cb7595
 - repo_url: ibelick/ui-skills
   name: ui-skills
   host: github.com
   resolved_commit: 7ef0076fce1dfa39dd2bc43b7dc13add6eda8a41
   resolved_ref: 7ef0076fce1dfa39dd2bc43b7dc13add6eda8a41
-  version: 0.0.0
+  version: unknown
   package_type: skill_bundle
   deployed_files:
   - .agents/skills/fixing-accessibility
@@ -465,7 +470,7 @@ dependencies:
     .claude/skills/improve-ui/SKILL.md: sha256:fa2ac808f6d9dab7bb3620880b014d2c18e227e5b006102856038096e573e69a
     .claude/skills/improve-ui/agents/openai.yaml: sha256:933af431364517518cbcfcd4e70eb8e8b390ead920abc48c071a4eedb6747183
     .claude/skills/improve-ui/references/plan-template.md: sha256:8faca7a14659a7f951d3b89fb730a43a4ce99966cc00481bf83d82b90f34b868
-  content_hash: sha256:0bc175395e5fb9bf0a08e96cb119c4b1bbdd850f59e50c07290c5852d7c14135
+  content_hash: sha256:d899aaf187be6656aa6ed0286612d72d61077e065de4e72970a09927898a100a
   skill_subset:
   - fixing-accessibility
   carried_licenses:
@@ -508,7 +513,7 @@ dependencies:
   virtual_path: skills/opencli-browser
   is_virtual: true
   package_type: claude_skill
-  content_hash: sha256:f068262dfac56a4e075a13c47ffe805ed10b8a1658227dbe55dae1ea1aa27568
+  content_hash: sha256:256bf992b55b177b2460498d6798c9342b26f38090d01f3e2ff25d2cd3bb49d3
 - repo_url: jackwener/opencli
   name: opencli-usage
   host: github.com
@@ -518,7 +523,7 @@ dependencies:
   virtual_path: skills/opencli-usage
   is_virtual: true
   package_type: claude_skill
-  content_hash: sha256:ca4e6d595b36eb88601828bdb1eb5d729ef68b229df65bb37cb52909ab30e2a3
+  content_hash: sha256:4d65f199909839eea2a4885171f94e0e1de750bfaece42bfa37d59932fe883ad
 - repo_url: jakubantalik/transitions-dev
   materialization_repo_url: Jakubantalik/transitions-dev
   name: transitions-dev
@@ -589,7 +594,7 @@ dependencies:
     .claude/skills/transitions-dev/12-error-state-shake.md: sha256:063429750d2b5d6510890ff98dba2f13eaf9bf5c2f3b648fa17c8498d0bf92bc
     .claude/skills/transitions-dev/SKILL.md: sha256:a62129f3a894a79678f60276ca34838b46357820639d5755cf932e390d1bb735
     .claude/skills/transitions-dev/_root.css: sha256:6ed248a269da79f623729708dabcc3719485d400615a0d91b9f5e9fd307aa33f
-  content_hash: sha256:8cf9ba1ed0d52741e4ed1dafc6ee4543e32f1e516f958d750e81412bfc36dd13
+  content_hash: sha256:e96027de3db1f75a59fc66b23f869fe4585427575f2e58ffde8df8395d049b07
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
@@ -1157,7 +1162,7 @@ dependencies:
     .claude/skills/web-research/SKILL.md: sha256:772219f47d837c6e768732cdd5ede41aa6986c623127e378d930592a8fc0b7d5
     .claude/skills/web-research/agents/openai.yaml: sha256:50536a04fbc72b0f71fc9975a7e041893912ebfcaf9c671439843d20172e1264
     .claude/skills/web-research/scripts/x-search.sh: sha256:6f2c23afcf1d63fa02b4d00d448423a85488887b59bc929b8b8df24b162f9b6f
-  content_hash: sha256:418e09cedab295b7fb27953f9b3db6fc046cf05e3694906139bd822fd2f2af9c
+  content_hash: sha256:779d37cec49d85d9af7d2ddd4316fa6d2dd9b255a4e2967271d30e13691fab1d
 - repo_url: jey3dayo/apm-workspace
   name: manual-skills
   host: github.com
@@ -1227,7 +1232,7 @@ dependencies:
     .claude/skills/gh-fix-ci/assets/github-small.svg: sha256:ee05e92d373d4d84f4612af3c1090ef67698d421bbe30896a4ed5a00cb86a069
     .claude/skills/gh-fix-ci/assets/github.png: sha256:d55a9baa41798d8b5108e3058df3a5bda09914ea9fd73b49929cc38a8832424f
     .claude/skills/gh-fix-ci/scripts/inspect_pr_checks.py: sha256:3bdf92c3ef5fcae825748d1a3f3bfd9bb2f9e567334f2addeb2d9dd54e31a272
-  content_hash: sha256:f2b66885a3403cf4736c1dd8185ca41713278c8d34850865d7747c192a45d5da
+  content_hash: sha256:037625410be27a17518d616b512b3365bb080f2e1e93e07f9da87d9dba4047cf
 - repo_url: k16shikano/fd287c3133457c4fd8f5601d34aa817d
   alias: japanese-tech-writing
   name: japanese-tech-writing
@@ -1244,7 +1249,7 @@ dependencies:
   deployed_file_hashes:
     .agents/skills/japanese-tech-writing/SKILL.md: sha256:ad350e0e6f5630fd94d8ab98a6aee194053b0096fdc944c23e271d6dfa09ee68
     .claude/skills/japanese-tech-writing/SKILL.md: sha256:ad350e0e6f5630fd94d8ab98a6aee194053b0096fdc944c23e271d6dfa09ee68
-  content_hash: sha256:9ddea7db32f38a243da9ff3c08f19fa1f4eb39f9cc27f3a966842cfb323376f3
+  content_hash: sha256:9ab4ebef4f2911953f4edc581369b41f7642c6cf9bac87096c4aacb50aa92fc4
 - repo_url: mattpocock/skills
   name: mattpocock-skills
   host: github.com
@@ -1406,7 +1411,7 @@ dependencies:
     .claude/skills/writing-for-agents/SKILL-MECHANICS.md: sha256:c768e6307c7c10728c401c213f2c4ba71c542127eeb7ad2956aabd15a0fa0059
     .claude/skills/writing-for-agents/SKILL.md: sha256:551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a
     .claude/skills/writing-for-agents/agents/openai.yaml: sha256:eacb24b2a618cfb81dacb0416f4fdd75ddf3a8060f8ddb99aae1b1e301907e4b
-  content_hash: sha256:003e20f3b138e75d099763bc2377361fd99072c2af9cb34cb73e383cf15cec9a
+  content_hash: sha256:5a06a413c5d6c1d4b268625852203a00a6faf4dcfdb105702bf9c966a8aec7d8
   skill_subset:
   - codebase-design
   - domain-modeling
@@ -1418,6 +1423,10 @@ dependencies:
   - setup-matt-pocock-skills
   - wayfinder
   - writing-for-agents
+  target_subset:
+  - agent-skills
+  - codex
+  - cursor
   declared_license: MIT
   carried_licenses:
   - path: .apm/skills/ask-matt/LICENSE
@@ -1639,7 +1648,7 @@ dependencies:
     .agents/skills/react-doctor/references/explain.md: sha256:237dd81672c858c8c52325bafeefdde2d5b842c9a98c2ea6a820534a0df8e927
     .claude/skills/react-doctor/SKILL.md: sha256:9efaa6a77162e0aafa75bcb1ac18f162631a9028d646a3cb2367423073517927
     .claude/skills/react-doctor/references/explain.md: sha256:237dd81672c858c8c52325bafeefdde2d5b842c9a98c2ea6a820534a0df8e927
-  content_hash: sha256:a9ce727f0abcf699d57ba1ec902da2a5899189df258ea971caf9669a2d9a5a91
+  content_hash: sha256:a2934dce62ea091587b93ae1feab1df279d597d3878eeafabcc9c68e952ee5dd
   carried_licenses:
   - path: LICENSE
     source: LICENSE
@@ -1829,7 +1838,7 @@ dependencies:
     .claude/skills/yomiyasu/scripts/yomiyasu_diff.py: sha256:31c46a98bcd987c0a2dda7d9712fb830f3a70b1e0636b6a034ae191530d51ab5
     .claude/skills/yomiyasu/scripts/yomiyasu_hook.py: sha256:689ffbeecbaf0380ac99e37b6093f136364b7c7bbf014ada961c8e0781e8ab8b
     .claude/skills/yomiyasu/scripts/yomiyasu_lint.py: sha256:b02c21464353b726a8c4e366f89bdfd2f341613f7bf75f779e83cc4dfbc54c9e
-  content_hash: sha256:85119d7ba3692a7fd8b31bce7edc268fec489ca5e2a86261d37dd48990da0114
+  content_hash: sha256:ba184657a6528702dae5988d5ae8c121405fd837eacceae1163ddc20a040338d
 - repo_url: nextlevelbuilder/ui-ux-pro-max-skill
   name: ui-ux-pro-max
   host: github.com
@@ -2133,9 +2142,13 @@ dependencies:
     .claude/skills/ui-ux-pro-max/scripts/tests/test_text_layout_resilience.py: sha256:b51d32ee8a15505b87cb81957fb2d1b385e041e8beb4463c311d236bfd29ebd4
     .claude/skills/ui-ux-pro-max/scripts/tests/test_web_stack_freshness.py: sha256:74897571398585f27e2c35d09d81b0a531c8c774f4a2967e5e1b1d1b05a483d9
     .claude/skills/ui-ux-pro-max/scripts/validate_data.py: sha256:a599aa256049cf30954d1f164721b99e453eb7e4cb8241bcab2d5573e6cf58b8
-  content_hash: sha256:200a445f3939a688f8cf899c93e23fbbedffdd52fce915b7f705a66bbdc60ee2
+  content_hash: sha256:a734f72d3b00cf96187d30f422bc41b2b65a18e85a2b27ed4a053212eddc4f6f
   skill_subset:
   - ui-ux-pro-max
+  target_subset:
+  - agent-skills
+  - codex
+  - cursor
   declared_license: MIT
   carried_licenses:
   - path: .apm/skills/banner-design/LICENSE
@@ -2246,7 +2259,7 @@ dependencies:
     .claude/skills/screenshot/scripts/macos_window_info.swift: sha256:c7faff7913d6072284b7ef1e5d26c524ab861ad32afc0c066f24ba95ae3f3597
     .claude/skills/screenshot/scripts/take_screenshot.ps1: sha256:a31a2242e41fd1c5471651afbcced660f98fbc884f11e531218348f700a3f826
     .claude/skills/screenshot/scripts/take_screenshot.py: sha256:56eeabe2dac5d23915b9a0fb57a07431fad2d310c5444f60f71f09299899232b
-  content_hash: sha256:59bd54a88ecfb293a88187164e8bdf9f27f8f28eb746a4cefcdb8f6084fde99e
+  content_hash: sha256:effa96d4adcf4c5216271d9672c12ab64f6fdd305b4151b91d1de535340ef33c
 - repo_url: shadcn/improve
   name: improve
   host: github.com
@@ -2274,7 +2287,11 @@ dependencies:
     .claude/skills/improve/references/audit-playbook.md: sha256:587c1b927070f3c28139ad95ac34cc21a7da32618cfeb966cb774e58a865d4c8
     .claude/skills/improve/references/closing-the-loop.md: sha256:5d526bb378e1783bbeb68d7af527776cbe98cde27a1aeccbd13e818e5b73b454
     .claude/skills/improve/references/plan-template.md: sha256:7be76dd3c29442288fa7cee4432fc6e95c2fdbf748c9b356344bf647c5f8722e
-  content_hash: sha256:2a6562fd5a8af9318ef025919f739ae225f3a94d718da1ebc64fe9dab9552dff
+  content_hash: sha256:823757aa7312db7ee0f41b78188eabb1032955568247f9b4a52a306ea7eab22f
+  target_subset:
+  - agent-skills
+  - codex
+  - cursor
   declared_license: MIT
 - repo_url: t3dotgg/tstack
   name: tstack
@@ -2349,7 +2366,7 @@ dependencies:
     .claude/skills/modernize/agents/openai.yaml: sha256:6675e91e10f2b264fe1a027072f6d9f46299f781011e248a5ba075fc1f764e09
     .claude/skills/sol-loop/SKILL.md: sha256:1db1eb4c4a156ee666070e9a12623d520cd1bd9b19c3fc21003fe5a440ba0b10
     .claude/skills/takeover/SKILL.md: sha256:9f00a7c67bf82603af2e80f56e9ce63f1516a1b4339365b79cf786d9d9055465
-  content_hash: sha256:273e6273b64a290a1685b5d39d10a9e38a18c5bd4d332f4baadb97463ae345d3
+  content_hash: sha256:cfffbeae2465ffac52ff0c2623330b1adf09ec41737ee1ec04965cfe3a0ffac0
   skill_subset:
   - babysit-pr
   - council
@@ -3156,7 +3173,7 @@ dependencies:
     .claude/skills/archify/scripts/render-examples.mjs: sha256:c2c99c4153cf21f0526cf3f041c1d81716017be182d404173f8961fa494e8c8c
     .claude/skills/archify/scripts/update-contract.mjs: sha256:b6eb5e18ebea770c0a0c2cf2ba45d122d85abe61e94b9a5426602a9f84910b31
     .claude/skills/archify/skill-release.json: sha256:1ea25551e0359e547267d40e83812ffd1a7bdf7398826b65f2a2fcf1a11ba596
-  content_hash: sha256:3cee46ba2453fe0fb2a35bb6152fdea9579b33b449b2d54f177f6c3ef59db987
+  content_hash: sha256:efb45ca4a3cd27c9a573f883d8bab6dfd4b88cf081f51d01a2eca8d8443bcc28
 - repo_url: vercel-labs/agent-desktop
   name: agent-desktop
   host: github.com
@@ -3192,7 +3209,7 @@ dependencies:
     .claude/skills/agent-desktop/references/commands-observation.md: sha256:983291f1f8272fe3bea0a099d3faaf1aa6694c4e1f1a36c83362d9a1cd58e2f7
     .claude/skills/agent-desktop/references/commands-system.md: sha256:a99042f2cecf66f315f3bc38e4cf265bf36441ff08a4a4e847c718e1b6f2deb4
     .claude/skills/agent-desktop/references/workflows.md: sha256:e78194d24d3963d10a8069833c90a1bdb932f0ab8f6b645df79149d95471645c
-  content_hash: sha256:58032407daa209b72e7c087ee1885058f8e190b2481795bd7830aba8e70b7cbc
+  content_hash: sha256:3796beca0aeb0bed60137ddc34cd4f14e9229eb042c78ebd97e8e8c98e42baf9
   carried_licenses:
   - path: LICENSE
     source: LICENSE
@@ -3514,7 +3531,7 @@ dependencies:
     .claude/skills/react-best-practices/rules/server-parallel-fetching.md: sha256:569a2e9fc04f9606686cd75c5894ef8781b502786a7fffe241396846c7733472
     .claude/skills/react-best-practices/rules/server-parallel-nested-fetching.md: sha256:ad5d9656984d4a959997a2367bf59cc6632297b4634a1dd13a087939d83f30b3
     .claude/skills/react-best-practices/rules/server-serialization.md: sha256:f4c7d68b29c82381baad059c4a7f09e868e71ec9c3115a26ad3ae7d24c0dfe1f
-  content_hash: sha256:74f142d28d360d78e8bac4f239a84c87f0ced9015729bc72b5458d82ff45b015
+  content_hash: sha256:bb6e0b8c9463da1d8712a88d2903ae4c915f1a5037bc2bf22fd59a0adccf8f11
 deployments:
 - kind: project-relative
   target: claude

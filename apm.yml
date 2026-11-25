@@ -15,7 +15,14 @@ dependencies:
 
     # --- review ---
     - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review#7a583913eb1b8d1a0ee76753d1a2cf072e7b54f9
-    - shadcn/improve#cac56e1ebd3c279aa9153616cfeac7b174ab90f9
+    # Plugin-form package: APM 0.37+ would register it as a Claude native plugin and
+    # rewrite ~/.claude/settings.json, so Claude is excluded (see docs/package-decisions.md).
+    - git: shadcn/improve
+      ref: cac56e1ebd3c279aa9153616cfeac7b174ab90f9
+      targets:
+        - codex
+        - cursor
+        - agent-skills
     # pstack (v0.15.48): no-comments and the skills it directly references.
     # poteto-mode and arena are intentionally not pinned; see docs/package-decisions.md.
     - cursor/plugins/pstack/skills/no-comments#ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
@@ -42,6 +49,12 @@ dependencies:
         - setup-matt-pocock-skills
         - wayfinder
         - writing-for-agents
+      # Plugin-form package with a skills: selection: APM 0.37+ parks it for Claude
+      # at user scope, so Claude is excluded (see docs/package-decisions.md).
+      targets:
+        - codex
+        - cursor
+        - agent-skills
     - nanaism/yomiyasu/skills/yomiyasu#8831b14a5c2c12d41096495f0b8fe52d46d390c6 # v3.3.0
     - git: t3dotgg/tstack
       ref: 11e37a74d0a6868c121cd0910ab2b3bd9873b92a
@@ -83,6 +96,12 @@ dependencies:
       ref: 6ec2bb58334ca3014573c4cbd4834ee3a40afd9d
       skills:
         - ui-ux-pro-max
+      # Plugin-form package with a skills: selection: APM 0.37+ parks it for Claude
+      # at user scope, so Claude is excluded (see docs/package-decisions.md).
+      targets:
+        - codex
+        - cursor
+        - agent-skills
 
     # --- browser / analysis ---
     - browser-use/browser-harness/skills/browser-harness#797f2d05e30e58b217ff621a99d302d712dc38da
@@ -134,15 +153,15 @@ dependencies:
 scripts: {}
 executables:
   allow:
-    github.com/ibelick/ui-skills:
+    ibelick/ui-skills:
       bin: true
-    github.com/mattpocock/skills:
+    mattpocock/skills:
       bin: true
-    github.com/nanaism/yomiyasu/skills/yomiyasu:
+    nanaism/yomiyasu/skills/yomiyasu:
       bin: true
-    github.com/nextlevelbuilder/ui-ux-pro-max-skill:
+    nextlevelbuilder/ui-ux-pro-max-skill:
       bin: true
-    github.com/tt-a1i/archify/archify:
+    tt-a1i/archify/archify:
       bin: true
     aqua-voice:
       mcp: true
