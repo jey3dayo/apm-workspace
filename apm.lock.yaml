@@ -795,8 +795,6 @@ dependencies:
   - .agents/skills/herdr/scripts/find-agent.sh
   - .agents/skills/herdr/scripts/spawn-agent.sh
   - .agents/skills/herdr/scripts/spawn-picker.sh
-  - .agents/skills/learning-intake
-  - .agents/skills/learning-intake/SKILL.md
   - .agents/skills/linear-task-ops
   - .agents/skills/linear-task-ops/SKILL.md
   - .agents/skills/linear-task-ops/references/asana-to-linear-mapping.md
@@ -844,9 +842,6 @@ dependencies:
   - .agents/skills/refactoring/references/dead_code_tsr.md
   - .agents/skills/refactoring/references/helper_extraction.md
   - .agents/skills/refactoring/references/parallel_dispatch.md
-  - .agents/skills/review-fix-loop
-  - .agents/skills/review-fix-loop/SKILL.md
-  - .agents/skills/review-fix-loop/agents/openai.yaml
   - .agents/skills/ship
   - .agents/skills/ship/SKILL.md
   - .agents/skills/ship/agents/openai.yaml
@@ -936,8 +931,6 @@ dependencies:
   - .claude/skills/herdr/scripts/find-agent.sh
   - .claude/skills/herdr/scripts/spawn-agent.sh
   - .claude/skills/herdr/scripts/spawn-picker.sh
-  - .claude/skills/learning-intake
-  - .claude/skills/learning-intake/SKILL.md
   - .claude/skills/linear-task-ops
   - .claude/skills/linear-task-ops/SKILL.md
   - .claude/skills/linear-task-ops/references/asana-to-linear-mapping.md
@@ -985,9 +978,6 @@ dependencies:
   - .claude/skills/refactoring/references/dead_code_tsr.md
   - .claude/skills/refactoring/references/helper_extraction.md
   - .claude/skills/refactoring/references/parallel_dispatch.md
-  - .claude/skills/review-fix-loop
-  - .claude/skills/review-fix-loop/SKILL.md
-  - .claude/skills/review-fix-loop/agents/openai.yaml
   - .claude/skills/ship
   - .claude/skills/ship/SKILL.md
   - .claude/skills/ship/agents/openai.yaml
@@ -1064,7 +1054,6 @@ dependencies:
     .agents/skills/herdr/scripts/find-agent.sh: sha256:b1c284795a0e08eb1a3024546e1a72727f23fedf3a5a0d63eaf6ddcf48afdf5c
     .agents/skills/herdr/scripts/spawn-agent.sh: sha256:6a3297549e202bb6b82dccf96072cbdf15944ad88495b5b2ecd26942c3502215
     .agents/skills/herdr/scripts/spawn-picker.sh: sha256:c6f54db7a13f6253818ab25b0056e6c1f13737487c16d277dee0264a730260a0
-    .agents/skills/learning-intake/SKILL.md: sha256:11aa5d63949003e4289a47fe193aa19b70ca43697ca9090d99322ae479feb462
     .agents/skills/linear-task-ops/SKILL.md: sha256:67d27217ca48ab05ac797aa6408caa226ce95d6c6ff43664d32dc6bcacd13fd6
     .agents/skills/linear-task-ops/references/asana-to-linear-mapping.md: sha256:1691e00b02c9172cf28e9b4c1aca3aaf8e2b6d90f6371736000a240bc4e68840
     .agents/skills/linear-task-ops/references/linear-labels-jey.md: sha256:5f988e9da4a4d0588633497533237a685d1f7c24aa535e262c1039d33eba9cfd
@@ -1103,8 +1092,6 @@ dependencies:
     .agents/skills/refactoring/references/dead_code_tsr.md: sha256:3ca03e5ae296c2e0a67d45a6bda7da57329f06f4c56fa66099943de29dac0285
     .agents/skills/refactoring/references/helper_extraction.md: sha256:041609dbbd6d27e004e80bc0590c3c1a1482267306570fe07f12e6f338311930
     .agents/skills/refactoring/references/parallel_dispatch.md: sha256:4588d7ac3e700bc72f0b54a78537a0d248684e5924f3b9aa45f0e573a8adab49
-    .agents/skills/review-fix-loop/SKILL.md: sha256:aaffd8263eb2bb46e64b7a3c107b41f314d82a052dfe30820a5300e8ad18c9c9
-    .agents/skills/review-fix-loop/agents/openai.yaml: sha256:2ebea0b8282c864b31d92a942df6e46c9b6ab54a2bd51e38878c7f732ec3004d
     .agents/skills/ship/SKILL.md: sha256:1d459e0073e770df0c6dc232629dc8ceb10c51020da61bb7a5c95ce827675103
     .agents/skills/ship/agents/openai.yaml: sha256:cfb4b0d4885329be778d0c05b8ed00e3ec6c0285c0008f40d1aed19eef7ba424
     .agents/skills/similarity/SKILL.md: sha256:b34b03b003c842dd5b5ff77b373d9442decfc0224eeb19d6c6542e8b671db31d
@@ -1174,7 +1161,6 @@ dependencies:
     .claude/skills/herdr/scripts/find-agent.sh: sha256:b1c284795a0e08eb1a3024546e1a72727f23fedf3a5a0d63eaf6ddcf48afdf5c
     .claude/skills/herdr/scripts/spawn-agent.sh: sha256:6a3297549e202bb6b82dccf96072cbdf15944ad88495b5b2ecd26942c3502215
     .claude/skills/herdr/scripts/spawn-picker.sh: sha256:c6f54db7a13f6253818ab25b0056e6c1f13737487c16d277dee0264a730260a0
-    .claude/skills/learning-intake/SKILL.md: sha256:11aa5d63949003e4289a47fe193aa19b70ca43697ca9090d99322ae479feb462
     .claude/skills/linear-task-ops/SKILL.md: sha256:67d27217ca48ab05ac797aa6408caa226ce95d6c6ff43664d32dc6bcacd13fd6
     .claude/skills/linear-task-ops/references/asana-to-linear-mapping.md: sha256:1691e00b02c9172cf28e9b4c1aca3aaf8e2b6d90f6371736000a240bc4e68840
     .claude/skills/linear-task-ops/references/linear-labels-jey.md: sha256:5f988e9da4a4d0588633497533237a685d1f7c24aa535e262c1039d33eba9cfd
@@ -1213,8 +1199,6 @@ dependencies:
     .claude/skills/refactoring/references/dead_code_tsr.md: sha256:3ca03e5ae296c2e0a67d45a6bda7da57329f06f4c56fa66099943de29dac0285
     .claude/skills/refactoring/references/helper_extraction.md: sha256:041609dbbd6d27e004e80bc0590c3c1a1482267306570fe07f12e6f338311930
     .claude/skills/refactoring/references/parallel_dispatch.md: sha256:4588d7ac3e700bc72f0b54a78537a0d248684e5924f3b9aa45f0e573a8adab49
-    .claude/skills/review-fix-loop/SKILL.md: sha256:aaffd8263eb2bb46e64b7a3c107b41f314d82a052dfe30820a5300e8ad18c9c9
-    .claude/skills/review-fix-loop/agents/openai.yaml: sha256:2ebea0b8282c864b31d92a942df6e46c9b6ab54a2bd51e38878c7f732ec3004d
     .claude/skills/ship/SKILL.md: sha256:1d459e0073e770df0c6dc232629dc8ceb10c51020da61bb7a5c95ce827675103
     .claude/skills/ship/agents/openai.yaml: sha256:cfb4b0d4885329be778d0c05b8ed00e3ec6c0285c0008f40d1aed19eef7ba424
     .claude/skills/similarity/SKILL.md: sha256:b34b03b003c842dd5b5ff77b373d9442decfc0224eeb19d6c6542e8b671db31d
@@ -6826,24 +6810,6 @@ deployments:
   content_hash: sha256:ad350e0e6f5630fd94d8ab98a6aee194053b0096fdc944c23e271d6dfa09ee68
 - kind: project-relative
   target: claude
-  value: .claude/skills/learning-intake
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/learning-intake/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:11aa5d63949003e4289a47fe193aa19b70ca43697ca9090d99322ae479feb462
-- kind: project-relative
-  target: claude
   value: .claude/skills/linear-task-ops
   runtime: null
   scope: project
@@ -8327,33 +8293,6 @@ deployments:
   - emilkowalski/skills
   active_owner: emilkowalski/skills
   content_hash: sha256:e7d3605034acda54ca13e43aec9e64d65b53de20f75b11b8d694e373012fbe07
-- kind: project-relative
-  target: claude
-  value: .claude/skills/review-fix-loop
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/review-fix-loop/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:aaffd8263eb2bb46e64b7a3c107b41f314d82a052dfe30820a5300e8ad18c9c9
-- kind: project-relative
-  target: claude
-  value: .claude/skills/review-fix-loop/agents/openai.yaml
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:2ebea0b8282c864b31d92a942df6e46c9b6ab54a2bd51e38878c7f732ec3004d
 - kind: project-relative
   target: claude
   value: .claude/skills/screenshot
@@ -13225,24 +13164,6 @@ deployments:
   content_hash: sha256:ad350e0e6f5630fd94d8ab98a6aee194053b0096fdc944c23e271d6dfa09ee68
 - kind: project-relative
   target: codex
-  value: .agents/skills/learning-intake
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/learning-intake/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:11aa5d63949003e4289a47fe193aa19b70ca43697ca9090d99322ae479feb462
-- kind: project-relative
-  target: codex
   value: .agents/skills/linear-task-ops
   runtime: null
   scope: project
@@ -14726,33 +14647,6 @@ deployments:
   - emilkowalski/skills
   active_owner: emilkowalski/skills
   content_hash: sha256:e7d3605034acda54ca13e43aec9e64d65b53de20f75b11b8d694e373012fbe07
-- kind: project-relative
-  target: codex
-  value: .agents/skills/review-fix-loop
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/review-fix-loop/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:aaffd8263eb2bb46e64b7a3c107b41f314d82a052dfe30820a5300e8ad18c9c9
-- kind: project-relative
-  target: codex
-  value: .agents/skills/review-fix-loop/agents/openai.yaml
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:2ebea0b8282c864b31d92a942df6e46c9b6ab54a2bd51e38878c7f732ec3004d
 - kind: project-relative
   target: codex
   value: .agents/skills/screenshot
