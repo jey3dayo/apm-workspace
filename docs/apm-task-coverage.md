@@ -15,7 +15,7 @@ Path-by-path ownership (catalog, optional-skills, workspace-only skills, lockfil
 | task / command                            | skills   | agents   | rules    | `AGENTS.md` | commands | Coverage summary                                                                                                                                                                 |
 | ----------------------------------------- | -------- | -------- | -------- | ----------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mise bootstrap`                          | n/a      | n/a      | n/a      | n/a         | n/a      | Runs the hidden final hook that reconciles host-local MCP entries for Codex and Claude                                                                                           |
-| `mise run doctor` (hidden)                | 状態確認 | 状態確認 | 状態確認 | 状態確認    | 状態確認 | Runs workspace and learning-intake diagnostics sequentially; the first failure stops the task                                                                                    |
+| `mise run doctor` (hidden)                | 状態確認 | 状態確認 | 状態確認 | 状態確認    | 状態確認 | Runs workspace and intake diagnostics sequentially; the first failure stops the task                                                                                             |
 | `mise run format`                         | 間接     | 間接     | 間接     | 間接        | 間接     | Formats workspace Markdown / TOML / YAML and may use the documented heading helper                                                                                               |
 | `mise run upgrade:deps`                   | n/a      | n/a      | n/a      | n/a         | n/a      | Lists dependency holds, then regenerates `apm.lock.yaml` with `apm lock`; `-- --dry-run` previews without regenerating it                                                        |
 | `mise run check`                          | ○        | ○        | ○        | ○           | ○        | Sole read-only gate: format checks, all linters, offline action-lock verification, both validation tasks directly, and the full Bats suite                                       |
@@ -36,7 +36,7 @@ Path-by-path ownership (catalog, optional-skills, workspace-only skills, lockfil
 The workspace-local public `mise tasks` list is `check`, `format`, `native:sync`, and `upgrade:deps`. Hidden tasks remain directly runnable by name:
 
 - check parts: `format:check`, `test:sh`, `lint:yaml`, `lint:actions`, `actions-lock:verify`, `lint:frontmatter`, `lint:catalog-leaks`, `validate:workspace`, `validate:catalog`; format subtasks: `format:markdown`, `format:markdown:check`, `format:markdown:bold-headings`, `format:markdown:bold-headings:check`, `format:toml`, `format:toml:check`, `format:yaml`, `format:yaml:check`
-- diagnostic: `doctor` runs workspace and learning-intake checks in sequence.
+- diagnostic: `doctor` runs workspace and intake checks in sequence.
 - opt-in semantic lint: `jev:dry-run`, `jev:check` (not part of `check`; `jev:check` needs `TYPESAFE_API_KEY`).
 - native operations: `native:sync` is the only native task; its plan, backup, rehearsal, migration, OpenCode, and diagnostic stages are internal.
 - bootstrap hooks: `bootstrap`, `setup:mcp:host`

@@ -58,7 +58,7 @@ mise bootstrap       # first machine setup
 | Format workspace files   | `mise run format`                                                         |
 | Roll out a merged commit | `mise run native:sync` (or `mise run native:sync -- --https` without SSH) |
 
-For deployed-state and learning-intake diagnostics, run the hidden `mise run doctor` task.
+For deployed-state and intake diagnostics, run the hidden `mise run doctor` task.
 
 The real HOME is native. See [`docs/native-distribution.md`](docs/native-distribution.md)
 for rollout and recovery details. Verify a Codex skill rollout by checking

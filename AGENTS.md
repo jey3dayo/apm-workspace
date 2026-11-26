@@ -59,7 +59,7 @@ option when SSH is unavailable). Section B of
 | --------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | Rollout         | `mise run native:sync` | Runs backup and rehearsal before writing HOME; see `docs/native-distribution.md` section B for HTTPS and rollback                    |
 | Validation only | `mise run check`       | Runs formatting checks, all linters, offline action-lock verification, manifest and catalog validation, and Bats; does not roll out. |
-| Inspection      | `mise run doctor`      | Hidden read-only diagnostics for workspace state and learning-intake reports.                                                        |
+| Inspection      | `mise run doctor`      | Hidden read-only diagnostics for workspace state and intake reports.                                                                 |
 
 A PR that changes `apm.yml` or `apm.lock.yaml` also runs the CI job `dependency-install`, which installs the external dependencies with a real `apm install` in a throwaway HOME (`scripts/probe-dependency-install.sh manifest`), because `check` never fetches them.
 
