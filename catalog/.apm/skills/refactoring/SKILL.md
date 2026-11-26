@@ -2,10 +2,11 @@
 name: refactoring
 description: >-
   Plan and execute TS/JS/React refactoring orchestration: react-doctor diagnostics,
-  dead code and unused exports, helper extraction, and validation / Result /
-  repository boundary ownership（「リファクタ」「コード整理」）. Duplicate-code
-  detection itself is `similarity`; this skill consumes its report. Not for
-  feature work.
+  dead code and unused exports, helper extraction, mutation-testing test-safety
+  checks, and validation / Result / repository boundary ownership（「リファクタ」
+  「コード整理」）. Duplicate-code detection itself is `similarity` and test-safety
+  auditing itself is `mutation-testing-audit`; this skill consumes their reports.
+  Not for feature work.
 ---
 
 # Refactoring - Integrated TypeScript/JavaScript/React Refactoring Workflow
@@ -103,9 +104,29 @@ Load the `codebase-design` skill for the vocabulary (module, interface, seam).
 
 When the diagnostic surface is broad enough to split safely, dispatch parallel
 workers per track (React diagnostics, duplicate/similarity, boundary
-ownership, dead-code surface). Load `references/parallel_dispatch.md` for the
+ownership, dead-code surface, test safety when 1-F applies). Load `references/parallel_dispatch.md` for the
 track definitions and the subagent result contract, and use the
 `sol-loop` skill for review-loop mechanics.
+
+### 1-F: Test-Safety Spot Check (Conditional)
+
+When the refactoring scope includes pure-logic modules that already have unit
+tests (sorting, parsing, date math, classification), audit whether those tests
+actually pin the behavior before planning to move or consolidate the code.
+This matters most for 3-3, where tests are replaced at a consolidated owner's
+interface and the old ones deleted: "tests exist" says nothing about whether
+they would notice a behavior change.
+
+Run the audit by following the `mutation-testing-audit` skill
+(`../mutation-testing-audit/SKILL.md`): it is the source of truth for tool
+setup, survivor classification, and test-writing rules, so this skill does
+not restate them. It only consumes the classification: save the audit brief
+as `tmp/refactoring/mutation-audit.md` and carry the real-gap count into the
+Phase 2 plan.
+
+Skip this track when the scope has no pure-logic module with unit tests, or
+when no machine fast enough for the dry run is available; mark it `not run`
+in the plan instead of guessing at test quality.
 
 ## Phase 2: Analyze & Plan
 
@@ -116,14 +137,15 @@ evidence already collected.
 
 ### Priority Matrix
 
-| Priority | Condition                                                                                        | Action                          |
-| -------- | ------------------------------------------------------------------------------------------------ | ------------------------------- |
-| Critical | react-doctor errors AND similarity 95%+                                                          | Fix immediately (this session)  |
-| Critical | DB/query/transaction logic leaks into UI, route, or feature code while a repository owner exists | Move behind repository/db owner |
-| High     | react-doctor warnings OR similarity 90-95%                                                       | Plan fix (high priority)        |
-| High     | Schema or Result/error conversion is duplicated outside the discovered owner boundary            | Consolidate behind owner export |
-| Low      | similarity 87-90% (from the optional default-threshold scan)                                     | Future candidate (needs review) |
-| Low      | Test-only, mock, seed, migration, or thin wrapper boundary exceptions                            | Review and document if needed   |
+| Priority | Condition                                                                                        | Action                                                                 |
+| -------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| Critical | react-doctor errors AND similarity 95%+                                                          | Fix immediately (this session)                                         |
+| Critical | DB/query/transaction logic leaks into UI, route, or feature code while a repository owner exists | Move behind repository/db owner                                        |
+| High     | react-doctor warnings OR similarity 90-95%                                                       | Plan fix (high priority)                                               |
+| High     | Schema or Result/error conversion is duplicated outside the discovered owner boundary            | Consolidate behind owner export                                        |
+| High     | Mutation audit (1-F) finds real gaps in the tests of a module in scope                           | Write the adversarial tests before moving or consolidating that module |
+| Low      | similarity 87-90% (from the optional default-threshold scan)                                     | Future candidate (needs review)                                        |
+| Low      | Test-only, mock, seed, migration, or thin wrapper boundary exceptions                            | Review and document if needed                                          |
 
 ### Plan Output Format
 
@@ -135,6 +157,7 @@ evidence already collected.
 - react-doctor score: XX/100 (75+ = Great, 50-74 = Needs work, 0-49 = Critical)
 - Duplicate code pairs: XX (95%+: X pairs, 90-95%: X pairs)
 - Boundary ownership findings: XX (schema/validation: X, Result/error: X, DB/repository: X)
+- Mutation audit (when run): XX% score, X real gaps in scope
 
 ### Subagent Findings Summary (when dispatch was used)
 
@@ -220,11 +243,17 @@ Example of a full gate:
 pnpm run type-check && pnpm run lint && pnpm run test
 ```
 
+When tests were consolidated at a new owner interface (3-3), or adversarial
+tests were added under the Phase 2 mutation-audit row, re-run the 1-F spot
+check on the touched modules before sharing and confirm the targeted
+survivors are gone.
+
 ## Related Skills and References
 
 | Problem Area                                     | Skill or reference                   |
 | ------------------------------------------------ | ------------------------------------ |
 | Detailed duplicate code analysis                 | `../similarity/SKILL.md`             |
+| Test quality of modules in scope                 | `../mutation-testing-audit/SKILL.md` |
 | Large lint / type-safety cleanup                 | `references/code_quality_cleanup.md` |
 | Dead code removal with TSR                       | `references/dead_code_tsr.md`        |
 | React-specific pattern diagnosis                 | `react-doctor` skill (if installed)  |
