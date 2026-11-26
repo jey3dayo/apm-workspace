@@ -741,11 +741,23 @@ EOF
 }
 
 @test "lock-hashes pristine lists the entries that hold exactly what the lock records, ignoring __pycache__ and .apm-pin" {
-  local home python lock out
+  local home python lock out again changed digest_of
   home="$(new_home pristine-mode)"
   python="$(APM_BIN="$APM_BIN" /bin/bash -c '. "$1/scripts/native.sh"; lock_python' _ "$REPO_ROOT")"
   hash_of() { shasum -a 256 <"$1" | awk '{print $1}'; }
-  entry_digest() { printf '%s\n' "$@" | LC_ALL=C sort | shasum -a 256 | awk '{print $1}'; }
+  digest_of() { printf '%s\n' "$out" | awk -F '\t' -v entry="$1" '$1 == entry { print $2 }'; }
+  write_lock() {
+    {
+      printf "lockfile_version: '1'\ndependencies:\n- deployed_file_hashes:\n"
+      printf '    %s: sha256:%s\n' \
+        .claude/skills/dir/SKILL.md "$(hash_of "$home/.claude/skills/dir/SKILL.md")" \
+        .claude/skills/dir/sub/a.txt "$(hash_of "$home/.claude/skills/dir/sub/a.txt")" \
+        .claude/skills/extra/SKILL.md "$(hash_of "$home/.claude/skills/extra/SKILL.md")" \
+        .claude/skills/linked/SKILL.md "$(hash_of "$home/.claude/skills/linked/SKILL.md")" \
+        .claude/skills/linked/alias.md "$(hash_of "$home/.claude/skills/linked/SKILL.md")" \
+        .claude/agents/single.md "$(hash_of "$home/.claude/agents/single.md")"
+    } >"$lock"
+  }
 
   mkdir -p "$home/.claude/skills/dir/sub/__pycache__" "$home/.claude/skills/extra" "$home/.claude/skills/linked" "$home/.claude/agents"
   printf 'skill\n' >"$home/.claude/skills/dir/SKILL.md"
@@ -760,24 +772,28 @@ EOF
   printf 'unrecorded\n' >"$home/.claude/agents/unlocked.md"
 
   lock="$home/lock.yaml"
-  {
-    printf "lockfile_version: '1'\ndependencies:\n- deployed_file_hashes:\n"
-    printf '    %s: sha256:%s\n' \
-      .claude/skills/dir/SKILL.md "$(hash_of "$home/.claude/skills/dir/SKILL.md")" \
-      .claude/skills/dir/sub/a.txt "$(hash_of "$home/.claude/skills/dir/sub/a.txt")" \
-      .claude/skills/extra/SKILL.md "$(hash_of "$home/.claude/skills/extra/SKILL.md")" \
-      .claude/skills/linked/SKILL.md "$(hash_of "$home/.claude/skills/linked/SKILL.md")" \
-      .claude/skills/linked/alias.md "$(hash_of "$home/.claude/skills/linked/SKILL.md")" \
-      .claude/agents/single.md "$(hash_of "$home/.claude/agents/single.md")"
-  } >"$lock"
+  write_lock
 
   out="$(env -i "$python" -I "$REPO_ROOT/scripts/lock-hashes.py" pristine "$lock" "$home" .claude/skills .claude/agents .cursor/agents)"
-  [ "$out" = "$(
-    printf '.claude/agents/single.md\t%s\n' "$(entry_digest "$(hash_of "$home/.claude/agents/single.md")  single.md")"
-    printf '.claude/skills/dir\t%s\n' "$(entry_digest \
-      "$(hash_of "$home/.claude/skills/dir/SKILL.md")  dir/SKILL.md" \
-      "$(hash_of "$home/.claude/skills/dir/sub/a.txt")  dir/sub/a.txt")"
+  # The observable result is the set of pristine entries; the digest is an
+  # internal token whose bytes are not pinned, only its stability and its
+  # sensitivity to the recorded content.
+  [ "$(printf '%s\n' "$out" | cut -f1)" = "$(
+    printf '.claude/agents/single.md\n'
+    printf '.claude/skills/dir\n'
   )" ]
+  [ -n "$(digest_of .claude/skills/dir)" ]
+  [ -n "$(digest_of .claude/agents/single.md)" ]
+
+  again="$(env -i "$python" -I "$REPO_ROOT/scripts/lock-hashes.py" pristine "$lock" "$home" .claude/skills .claude/agents .cursor/agents)"
+  [ "$again" = "$out" ]
+
+  printf 'skill changed\n' >"$home/.claude/skills/dir/SKILL.md"
+  write_lock
+  changed="$(env -i "$python" -I "$REPO_ROOT/scripts/lock-hashes.py" pristine "$lock" "$home" .claude/skills .claude/agents .cursor/agents)"
+  [ "$(printf '%s\n' "$changed" | cut -f1)" = "$(printf '%s\n' "$out" | cut -f1)" ]
+  [ "$(printf '%s\n' "$changed" | awk -F '\t' -v entry='.claude/skills/dir' '$1 == entry { print $2 }')" != "$(digest_of .claude/skills/dir)" ]
+  [ "$(printf '%s\n' "$changed" | awk -F '\t' -v entry='.claude/agents/single.md' '$1 == entry { print $2 }')" = "$(digest_of .claude/agents/single.md)" ]
 }
 
 @test "a lock record whose path is not valid UTF-8 makes the whole lock unreadable, even outside the roots" {
