@@ -8,25 +8,27 @@ setup() {
 @test "catalog instruction allowlist accepts the scoped design rule and still rejects another instruction" {
   local fixture
   fixture="$BATS_TEST_TMPDIR/catalog-layout"
-  mkdir -p "$fixture/catalog/.apm/instructions"
-  printf 'guide\n' >"$fixture/catalog/.apm/instructions/ai-collaboration.instructions.md"
+  mkdir -p \
+    "$fixture/catalog/.apm/instructions" \
+    "$fixture/catalog/.apm/skills/example" \
+    "$fixture/catalog/.apm/agents" \
+    "$fixture/catalog/commands" \
+    "$fixture/catalog/rules"
+  git -C "$fixture" init -q
+  printf 'dependencies:\n  apm:\n    - jey3dayo/apm-workspace/catalog#main\n' >"$fixture/apm.yml"
+  printf 'name: catalog\n' >"$fixture/catalog/apm.yml"
+  printf '# catalog\n' >"$fixture/catalog/README.md"
+  printf -- '---\ndescription: fixture guide\n---\n\nguide\n' >"$fixture/catalog/.apm/instructions/ai-collaboration.instructions.md"
   printf 'design\n' >"$fixture/catalog/.apm/instructions/claude-md-design.instructions.md"
-  run bash -c '
-    WORKSPACE_DIR="$1" CATALOG_DIR_NAME=catalog CATALOG_INSTRUCTIONS_FILE_NAME=ai-collaboration.instructions.md
-    . "$2/scripts/lib/workspace-core.sh"
-    . "$2/scripts/lib/catalog-inventory.sh"
-    catalog_apm_dir_claim_message
-  ' bash "$fixture" "$REPO_ROOT"
+  printf 'skill\n' >"$fixture/catalog/.apm/skills/example/SKILL.md"
+
+  run env APM_WORKSPACE_DIR="$fixture" bash "$SCRIPT_UNDER_TEST" validate:catalog
   [ "$status" -eq 0 ]
-  [ -z "$output" ]
+  [[ "$output" == *"Catalog validation passed"* ]]
+
   printf 'other\n' >"$fixture/catalog/.apm/instructions/other.instructions.md"
-  run bash -c '
-    WORKSPACE_DIR="$1" CATALOG_DIR_NAME=catalog CATALOG_INSTRUCTIONS_FILE_NAME=ai-collaboration.instructions.md
-    . "$2/scripts/lib/workspace-core.sh"
-    . "$2/scripts/lib/catalog-inventory.sh"
-    catalog_apm_dir_claim_message
-  ' bash "$fixture" "$REPO_ROOT"
-  [ "$status" -eq 0 ]
+  run env APM_WORKSPACE_DIR="$fixture" bash "$SCRIPT_UNDER_TEST" validate:catalog
+  [ "$status" -ne 0 ]
   [[ "$output" == *"instructions/other.instructions.md"* ]]
 }
 
