@@ -963,6 +963,17 @@ hidden character(s)` で install を止める。rehearsal が失敗し、`native
 - `sharpen`: タスクを大きくではなく深くしてプロンプトを書き直す。利用者本人が「`reframe` と組み合わせると効果抜群」という紹介を受けて追加を指示した組み合わせで、`reframe` だけではその動線が成立しないため同時に入れた。こちらも単体で完結する。
 - 残りの pstack スキルは従来どおり一括では入れない。個別に必要になったものだけ再検討する。
 
+## `cursor/plugins` の pstack から `correct` セットと `how` を追加採用（2026-11-26）
+
+- 追加: root `apm.yml` に subdirectory 形式で5件を pin（`ca782ed8`、pstack v0.15.48、既存 pstack pin と同 commit）。残りの pstack スキルを精査して利用者が選んだものだけを入れた（一括採用はしない従来方針のまま）。
+- `correct`: エージェントが繰り返すミスを、アーキテクチャ→型→lint→テストの順で再発不可能に寄せる。利用者の「教訓は構造へ encode する」運用と一致するため採用。
+- `principle-test-behavior-not-implementation`: テストは振る舞いを守り、実装や正本データの鏡写しを固定しない。利用者のテスト方針（鏡写しテストは守る価値がない）と同旨。
+- `principle-prove-it-works`: 完了宣言の前に実物（実値・diff・実走）で確かめる。利用者の実測主義と、stg 検証を完了条件にする運用と一致。
+- `blast-radius`: 出荷前に変更の影響範囲を作文でなく実コードの実行で証明する。参照先の `how` / `why` のうち `why` は採用済み、`how` は本 PR で同時採用。任意分岐の `arena` と清書先の `unslop`（pstack 版）への参照は任意のものとして扱い、従来どおり `arena` は入れない。
+- `how`: 「どう動くか／どこに置くべきか」の walkthrough。採用済み `why`（意図）と対になり、`blast-radius` の companion でもあるため同時に入れた。
+- 見送り（精査済み）: `reflect` は考え方が `learning-intake` と一致するが、編集先が `.cursor/skills/` の配布コピー前提で、正本はチェックアウトというこの workspace のルールと衝突する。`recall` は transcript の置き場所が Cursor 前提で、subagent の推論レベルを `poteto-mode` に参照する。`ketchup` は参照先の `bro` / `/visualize` が未採用で、判断待ちの集約は既存の仕組みで足りる。`interrogate` / `swarm` / `figure-it-out` は `council` / `sol-loop` / `orchestrator-worker` と重なる。
+- 残りの pstack スキル（47 of 59）は未採用のまま。個別に必要になったものだけ再検討する。
+
 ## catalog skill `learning-intake` を `intake` へ改名（2026-11-26）
 
 - 理由: 利用者が短い名前を希望した。`intake`（学びの受け入れ窓口）で意味は変わらない。中身・契約は無変更で、名前と参照だけの改名。
