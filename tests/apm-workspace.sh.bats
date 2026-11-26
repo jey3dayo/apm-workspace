@@ -85,6 +85,18 @@ doctor_fixture_env() {
   rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
 }
 
+@test "doctor fails when a required catalog output is missing" {
+  make_doctor_fixture
+
+  rm -rf "$doctor_home/.claude/agents"
+
+  run doctor_fixture_env bash "$SCRIPT_UNDER_TEST" doctor
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *".claude/agents"* ]]
+  rm -rf "$doctor_workspace_dir" "$doctor_home" "$doctor_bin"
+}
+
 make_holds_fixture() {
   holds_workspace_dir="$(mktemp -d)"
   held_sha="4a712f2aeba8f0b2070f7533b827c7cac78c9fdf"
