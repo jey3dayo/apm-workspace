@@ -18,8 +18,10 @@ intake_report_date() {
 
 cmd_doctor_intake() {
   local inbox_dir="$WORKSPACE_DIR/tmp/intake"
+  local legacy_dir="$WORKSPACE_DIR/tmp/learning-intake"
   local pending_count=0 deferred_count=0 unreadable_count=0 undated_count=0
   local oldest_date="" report_file report_date grep_status listing
+  local legacy_count=0 legacy_file legacy_listing
 
   if [ -d "$inbox_dir" ]; then
     if ! listing=$(find "$inbox_dir" -maxdepth 1 -name '*.md' ! -name '.*' 2>/dev/null); then
@@ -59,5 +61,16 @@ cmd_doctor_intake() {
   fi
   if [ "$pending_count" -ge "$INTAKE_PENDING_WARN_THRESHOLD" ]; then
     warn "intake: 未処理 $pending_count 件が溜まっています（閾値 $INTAKE_PENDING_WARN_THRESHOLD）。tmp/intake/ を intake の受入れ経路で処理してください"
+  fi
+  if [ -d "$legacy_dir" ]; then
+    if legacy_listing=$(find "$legacy_dir" -maxdepth 1 -name '*.md' ! -name '.*' 2>/dev/null); then
+      while IFS= read -r legacy_file; do
+        [ -n "$legacy_file" ] && [ -f "$legacy_file" ] || continue
+        legacy_count=$((legacy_count + 1))
+      done <<<"$legacy_listing"
+    fi
+    if [ "$legacy_count" -gt 0 ]; then
+      warn "intake: 旧 drop box tmp/learning-intake/ に報告 $legacy_count 件が残っています（上の件数に含めていません）。tmp/intake/ へ移してください"
+    fi
   fi
 }
