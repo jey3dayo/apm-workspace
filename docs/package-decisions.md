@@ -973,3 +973,11 @@ hidden character(s)` で install を止める。rehearsal が失敗し、`native
 - `how`: 「どう動くか／どこに置くべきか」の walkthrough。採用済み `why`（意図）と対になり、`blast-radius` の companion でもあるため同時に入れた。
 - 見送り（精査済み）: `reflect` は考え方が `learning-intake` と一致するが、編集先が `.cursor/skills/` の配布コピー前提で、正本はチェックアウトというこの workspace のルールと衝突する。`recall` は transcript の置き場所が Cursor 前提で、subagent の推論レベルを `poteto-mode` に参照する。`ketchup` は参照先の `bro` / `/visualize` が未採用で、判断待ちの集約は既存の仕組みで足りる。`interrogate` / `swarm` / `figure-it-out` は `council` / `sol-loop` / `orchestrator-worker` と重なる。
 - 残りの pstack スキル（47 of 59）は未採用のまま。個別に必要になったものだけ再検討する。
+
+## catalog skill `learning-intake` を `intake` へ改名（2026-11-26）
+
+- 理由: 利用者が短い名前を希望した。`intake`（学びの受け入れ窓口）で意味は変わらない。中身・契約は無変更で、名前と参照だけの改名。
+- 対象: スキル本体（`catalog/.apm/skills/learning-intake/` → `intake/`）、doctor 用スクリプト（`scripts/lib/learning-intake.sh` → `intake.sh`、関数・閾値変数・警告文も追随）、drop box の path（`tmp/learning-intake/` → `tmp/intake/`）、名前で参照する現行文書（instructions、`apm-usage`、`backlog-sweep`、`rule-propagation`、README、AGENTS.md、`docs/learning-ledger.md` の運用ルール部、`docs/apm-task-coverage.md`、`llms.txt`、`mise.toml` の doctor 説明）。
+- 触らないもの: `docs/package-decisions.md` の過去エントリ、`docs/learning-ledger.md` の過去行、`done.txt` / `todo.txt` の記録は履歴として旧名のまま残す。
+- 配布上の注意: 配布面では旧名が消えて新名が生える。マージ後は native:sync で配布するまで、他リポジトリのセッションから旧名 `/learning-intake` で呼ぶと Unknown skill になる。あわせて root は catalog を `jey3dayo/apm-workspace/catalog#main` のリモート依存として消費しているため、`apm.lock.yaml` の配布ファイル一覧が新名へ切り替わるのは、マージ後に main で lock を再生成した時点になる（本 PR では lock は無変更）。
+- pstack の `reflect` は引き続き未採用（考え方は本スキルと一致するが、編集先が `.cursor/skills/` の配布コピー前提で、正本はチェックアウトというルールと衝突するため）。

@@ -6,7 +6,7 @@ description: >-
   「古いルールが残っていないか全部見て」のような依頼で使う。対象は apm-workspace の
   スキル群、Muse ローカルのスキル・コネクタ・メモリ、Google Drive の ai-memory
   （howto / sources / profile）、Grok Bot 側の案内で、正本の置き場と更新経路は
-  サーフェスごとに違う。学びを規範へ落とす learning-intake が入口側で、本スキルは
+  サーフェスごとに違う。学びを規範へ落とす intake が入口側で、本スキルは
   決まった規範を配る伝播側。
 ---
 
