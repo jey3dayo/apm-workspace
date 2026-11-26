@@ -16,17 +16,27 @@ and closing exactly those.
 
 ## Preconditions
 
-- Vitest 5 and Node 24+.
+- Vitest 5 recommended; Vitest 4.1 also verified working (manga-rss-bridge
+  trial, 2026-11-26). Node 24+.
 - A fast machine. The dry run collects coverage over the whole test suite; on a
   slow VM it can take 15+ minutes and makes the audit impractical. Run on the
   fastest machine available. Splitting execution (an agent runs it) from
   analysis is fine.
+- On a slow machine, point the audit at a mutator-only Vitest config that
+  raises `testTimeout` / `hookTimeout` (e.g. 60s). With the 5s default,
+  timing-sensitive baseline tests fail with no mutant applied and the run
+  aborts ("tests fail without mutants") before executing a single mutant.
+  Run audits serially on shared-CPU machines; parallel suites distort the
+  Timeout counts.
 
 ## Setup
 
 Work in a throwaway worktree/branch; the setup changes are never committed.
 
-1. `pnpm add -D @mizchi/mutator`
+1. `pnpm add -D @mizchi/mutator`. A repository `minimumReleaseAge` policy
+   (pnpm-workspace.yaml) can reject a freshly published mutator release; in
+   the throwaway worktree only, add the package to
+   `minimumReleaseAgeExclude` — never commit that change.
 2. `mutator.config.ts`:
 
    ```ts
@@ -41,6 +51,10 @@ Work in a throwaway worktree/branch; the setup changes are never committed.
 
 3. Add `.mutator/` to `.gitignore`.
 4. Run with `pnpm exec mutator` (there is no `run` subcommand).
+5. While it runs, judge progress by the run log and the report directory,
+   not by a matching process name: wrapper shells match process searches
+   too, and an aborted run can leave its launcher behind while the log has
+   been stale for a long time.
 
 ## Target selection
 
@@ -68,8 +82,17 @@ Every survivor gets exactly one class, decided by reading the code:
   before claiming it — typical proofs: a downstream fallback returns the same
   value; the mutated condition is always true at the point it is reached; a
   comparator stage is structurally redundant because its keys are a function of
-  the earlier keys, so it can never decide alone. Document equivalents in the
+  the earlier keys, so it can never decide alone; a removed early return is
+  reconstructed by the general path, which already produces the identical
+  result for every input the guard covers. Document equivalents in the
   PR/brief; do not write tests for them and do not chase the score.
+- When a regex or parsing mutant merely _looks_ equivalent, do not settle it
+  by reading alone: run the original and the mutated code over a corpus of
+  100+ inputs (valid, boundary, and garbage) and diff the outputs. One
+  discriminating input promotes it to a real gap; zero diffs over a broad
+  corpus is evidence for equivalent. (In the browser-toolkit trial this
+  flipped all six regex mutants of a numeric parser from suspected-equivalent
+  to real gaps.)
 - Timeout: detected; see above.
 
 ## Writing tests that kill mutants
@@ -98,8 +121,16 @@ Every survivor gets exactly one class, decided by reading the code:
    documented.
 3. Production code stays unchanged. If classification proves code redundant,
    report it as a finding; simplifying it is a separate decision.
+4. On a slow machine a full re-run may be impractical. Substitute per-mutant
+   manual verification: apply each targeted mutation by hand, run the
+   covering test file and confirm it fails, revert and confirm it passes.
+   Record the per-cluster result in the brief; for the targeted set this is
+   at least as precise as a re-run, and it can overturn the initial
+   classification in either direction.
 
 ## Reporting
 
 Before/after score, the per-survivor classification table, which tests killed
 which mutants, and what was deliberately not done (equivalents and why).
+Report the machine conditions with the score (CPU class, Timeout count); a
+Timeout-heavy run's score is a reference value, not a measurement.
