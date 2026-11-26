@@ -1,6 +1,6 @@
 lockfile_version: '4'
-generated_at: '2026-11-25T11:34:28.613167+00:00'
-apm_version: 0.38.1
+generated_at: '2026-11-26T01:44:59.918631+00:00'
+apm_version: 0.39.0
 manifest_targets:
 - agent-skills
 - antigravity
@@ -170,6 +170,10 @@ dependencies:
     .claude/skills/natural-japanese/scripts/terms.py: sha256:75d935ee37c597946838f62d888563074ae60012fa24bdcf9cb580052f90b19c
     .claude/skills/natural-japanese/scripts/textcore.py: sha256:eee242215e94dfbd2340ccb682b3253546152848c973846d6ea86555469be721
   content_hash: sha256:eaa53d80ac36ba184b6ea60de632d3645ed7cfc375b4cea1b3cbf602080e5783
+  carried_licenses:
+  - path: LICENSE
+    source: LICENSE
+    hash: sha256:fb3dd814f7b2807de2a812446c61643cf235e731bbf8cf908c0a5962d8917121
 - repo_url: cursor/plugins
   name: thermo-nuclear-code-quality-review
   host: github.com
@@ -464,6 +468,10 @@ dependencies:
     .claude/skills/show-me/SKILL.md: sha256:434a2346cc95e313b0d367d477dda2e23ba642dd2181757415a09500664af100
     .claude/skills/show-me/agents/openai.yaml: sha256:a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94
   content_hash: sha256:093b6841835acd9106bc530314a58e4c5c31318eb51fee493f37f3ca39cb7595
+  carried_licenses:
+  - path: LICENSE
+    source: LICENSE
+    hash: sha256:5f13c18ea00ea5c1384f41745feeca774079164f7f59a92e4ac0899ad217b26f
 - repo_url: ibelick/ui-skills
   name: ui-skills
   host: github.com
@@ -543,6 +551,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   content_hash: sha256:256bf992b55b177b2460498d6798c9342b26f38090d01f3e2ff25d2cd3bb49d3
+  carried_licenses:
+  - path: LICENSE
+    source: LICENSE
+    hash: sha256:0210b8b66cf00358242cb921ba2be3a46dfe0190159b1b952388a3880ce1ff54
 - repo_url: jackwener/opencli
   name: opencli-usage
   host: github.com
@@ -553,6 +565,10 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   content_hash: sha256:4d65f199909839eea2a4885171f94e0e1de750bfaece42bfa37d59932fe883ad
+  carried_licenses:
+  - path: LICENSE
+    source: LICENSE
+    hash: sha256:0210b8b66cf00358242cb921ba2be3a46dfe0190159b1b952388a3880ce1ff54
 - repo_url: jakubantalik/transitions-dev
   materialization_repo_url: Jakubantalik/transitions-dev
   name: transitions-dev
@@ -624,6 +640,10 @@ dependencies:
     .claude/skills/transitions-dev/SKILL.md: sha256:a62129f3a894a79678f60276ca34838b46357820639d5755cf932e390d1bb735
     .claude/skills/transitions-dev/_root.css: sha256:6ed248a269da79f623729708dabcc3719485d400615a0d91b9f5e9fd307aa33f
   content_hash: sha256:e96027de3db1f75a59fc66b23f869fe4585427575f2e58ffde8df8395d049b07
+  carried_licenses:
+  - path: LICENSE
+    source: LICENSE
+    hash: sha256:d543c8f8692bbcfaaaba11ab0c1f2e958e8da7a736e7d9dcc65f2eefdc022eda
 - repo_url: jey3dayo/apm-workspace
   name: catalog
   host: github.com
@@ -2322,6 +2342,13 @@ dependencies:
   - codex
   - cursor
   declared_license: MIT
+  carried_licenses:
+  - path: .apm/skills/improve/LICENSE.md
+    source: LICENSE.md
+    hash: sha256:00ff8408e93e2ecc4d90c0edeabdf434100c3aff50acc5d330e17eccd4a3faa5
+  - path: skills/improve/LICENSE.md
+    source: LICENSE.md
+    hash: sha256:00ff8408e93e2ecc4d90c0edeabdf434100c3aff50acc5d330e17eccd4a3faa5
 - repo_url: t3dotgg/tstack
   name: tstack
   host: github.com
@@ -2405,6 +2432,34 @@ dependencies:
   - modernize
   - sol-loop
   - takeover
+  carried_licenses:
+  - path: skills/babysit-pr/LICENSE
+    source: LICENSE
+    hash: sha256:8095f9a9f97d074131f6a2ce09b952d12c18b36f09f4e5df0517c4e64e82c851
+  - path: skills/council/LICENSE
+    source: LICENSE
+    hash: sha256:8095f9a9f97d074131f6a2ce09b952d12c18b36f09f4e5df0517c4e64e82c851
+  - path: skills/file-pr/LICENSE
+    source: LICENSE
+    hash: sha256:8095f9a9f97d074131f6a2ce09b952d12c18b36f09f4e5df0517c4e64e82c851
+  - path: skills/full-send/LICENSE
+    source: LICENSE
+    hash: sha256:8095f9a9f97d074131f6a2ce09b952d12c18b36f09f4e5df0517c4e64e82c851
+  - path: skills/full-stop/LICENSE
+    source: LICENSE
+    hash: sha256:8095f9a9f97d074131f6a2ce09b952d12c18b36f09f4e5df0517c4e64e82c851
+  - path: skills/leaving-pr-comments/LICENSE
+    source: LICENSE
+    hash: sha256:8095f9a9f97d074131f6a2ce09b952d12c18b36f09f4e5df0517c4e64e82c851
+  - path: skills/modernize/LICENSE
+    source: LICENSE
+    hash: sha256:8095f9a9f97d074131f6a2ce09b952d12c18b36f09f4e5df0517c4e64e82c851
+  - path: skills/sol-loop/LICENSE
+    source: LICENSE
+    hash: sha256:8095f9a9f97d074131f6a2ce09b952d12c18b36f09f4e5df0517c4e64e82c851
+  - path: skills/takeover/LICENSE
+    source: LICENSE
+    hash: sha256:8095f9a9f97d074131f6a2ce09b952d12c18b36f09f4e5df0517c4e64e82c851
 - repo_url: tt-a1i/archify
   name: archify
   host: github.com
