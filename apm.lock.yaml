@@ -1,5 +1,5 @@
 lockfile_version: '4'
-generated_at: '2026-11-25T11:34:28.613167+00:00'
+generated_at: '2026-11-26T03:45:44.219020+00:00'
 apm_version: 0.38.1
 manifest_targets:
 - agent-skills
@@ -207,6 +207,48 @@ dependencies:
     source: pstack/LICENSE
     hash: sha256:bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e
 - repo_url: cursor/plugins
+  name: blast-radius
+  host: github.com
+  resolved_commit: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  resolved_ref: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  version: unknown
+  virtual_path: pstack/skills/blast-radius
+  is_virtual: true
+  package_type: claude_skill
+  content_hash: sha256:b681a4ebae1969ce32b2c993ecaf8f676469f0a0d8e956441c52871a175ec193
+  carried_licenses:
+  - path: LICENSE
+    source: pstack/LICENSE
+    hash: sha256:bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e
+- repo_url: cursor/plugins
+  name: correct
+  host: github.com
+  resolved_commit: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  resolved_ref: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  version: unknown
+  virtual_path: pstack/skills/correct
+  is_virtual: true
+  package_type: claude_skill
+  content_hash: sha256:cf2dd7020417f054f1425f0892b2b071a22edb72491e9843c4dd9f0e98da536f
+  carried_licenses:
+  - path: LICENSE
+    source: pstack/LICENSE
+    hash: sha256:bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e
+- repo_url: cursor/plugins
+  name: how
+  host: github.com
+  resolved_commit: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  resolved_ref: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  version: unknown
+  virtual_path: pstack/skills/how
+  is_virtual: true
+  package_type: claude_skill
+  content_hash: sha256:92bf9bf7e00b70651b129eff746f12f0c808b555cc080427947afd32f6a07cf7
+  carried_licenses:
+  - path: LICENSE
+    source: pstack/LICENSE
+    hash: sha256:bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e
+- repo_url: cursor/plugins
   name: no-comments
   host: github.com
   resolved_commit: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
@@ -235,6 +277,20 @@ dependencies:
     source: pstack/LICENSE
     hash: sha256:bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e
 - repo_url: cursor/plugins
+  name: principle-prove-it-works
+  host: github.com
+  resolved_commit: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  resolved_ref: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  version: unknown
+  virtual_path: pstack/skills/principle-prove-it-works
+  is_virtual: true
+  package_type: claude_skill
+  content_hash: sha256:9e9bd5152516dfe17cd6a5298857f77b538994ab20eeb3f96bf6d89ef6ed32b3
+  carried_licenses:
+  - path: LICENSE
+    source: pstack/LICENSE
+    hash: sha256:bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e
+- repo_url: cursor/plugins
   name: principle-redesign-from-first-principles
   host: github.com
   resolved_commit: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
@@ -244,6 +300,20 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   content_hash: sha256:651d528568f52cc5e9cd0e2fdae76ba4f05d557ab3ebe52e731fc3900a6492dd
+  carried_licenses:
+  - path: LICENSE
+    source: pstack/LICENSE
+    hash: sha256:bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e
+- repo_url: cursor/plugins
+  name: principle-test-behavior-not-implementation
+  host: github.com
+  resolved_commit: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  resolved_ref: ca782ed8b3c2c521cead8e1720d55c3a5dbf2347
+  version: unknown
+  virtual_path: pstack/skills/principle-test-behavior-not-implementation
+  is_virtual: true
+  package_type: claude_skill
+  content_hash: sha256:efa3211999ef72d82dde691a29839a9c58013ce38f9b3594fad6128fe1639c52
   carried_licenses:
   - path: LICENSE
     source: pstack/LICENSE
