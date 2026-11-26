@@ -61,7 +61,7 @@ description = "Regenerate apm.lock.yaml after pin updates, listing holds in docs
 run = "bash ./scripts/upgrade-deps.sh"
 
 [tasks.doctor]
-description = "Inspect workspace state, deployed targets, and the learning-intake inbox"
+description = "Inspect workspace state, deployed targets, and the intake inbox"
 hide = true
 run = [
   "bash ./scripts/apm-workspace.sh doctor",

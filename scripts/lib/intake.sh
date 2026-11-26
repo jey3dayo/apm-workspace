@@ -1,4 +1,4 @@
-learning_intake_report_date() {
+intake_report_date() {
   local report_name="$1"
   local year month day
   if [[ "$report_name" =~ ^([0-9]{4})([0-9]{2})([0-9]{2})- ]]; then
@@ -17,13 +17,15 @@ learning_intake_report_date() {
 }
 
 cmd_doctor_intake() {
-  local inbox_dir="$WORKSPACE_DIR/tmp/learning-intake"
+  local inbox_dir="$WORKSPACE_DIR/tmp/intake"
+  local legacy_dir="$WORKSPACE_DIR/tmp/learning-intake"
   local pending_count=0 deferred_count=0 unreadable_count=0 undated_count=0
   local oldest_date="" report_file report_date grep_status listing
+  local legacy_count=0 legacy_file legacy_listing
 
   if [ -d "$inbox_dir" ]; then
     if ! listing=$(find "$inbox_dir" -maxdepth 1 -name '*.md' ! -name '.*' 2>/dev/null); then
-      warn "learning-intake: tmp/learning-intake/ を一覧できません（件数を数えていません）"
+      warn "intake: tmp/intake/ を一覧できません（件数を数えていません）"
       return 0
     fi
     while IFS= read -r report_file; do
@@ -36,7 +38,7 @@ cmd_doctor_intake() {
         unreadable_count=$((unreadable_count + 1))
       else
         pending_count=$((pending_count + 1))
-        if report_date=$(learning_intake_report_date "${report_file##*/}"); then
+        if report_date=$(intake_report_date "${report_file##*/}"); then
           if [ -z "$oldest_date" ] || [[ "$report_date" < "$oldest_date" ]]; then
             oldest_date="$report_date"
           fi
@@ -47,7 +49,7 @@ cmd_doctor_intake() {
     done <<<"$listing"
   fi
 
-  printf 'learning-intake inbox: 未処理 %s / 保留 %s\n' "$pending_count" "$deferred_count"
+  printf 'intake inbox: 未処理 %s / 保留 %s\n' "$pending_count" "$deferred_count"
   if [ "$pending_count" -gt 0 ] && [ -n "$oldest_date" ]; then
     printf '  最古の未処理: %s\n' "$oldest_date"
   fi
@@ -55,9 +57,20 @@ cmd_doctor_intake() {
     printf '  日付不明: %s 件\n' "$undated_count"
   fi
   if [ "$unreadable_count" -gt 0 ]; then
-    warn "learning-intake: 読み取り不能な報告 $unreadable_count 件（未処理・保留の件数に含めていない）"
+    warn "intake: 読み取り不能な報告 $unreadable_count 件（未処理・保留の件数に含めていない）"
   fi
-  if [ "$pending_count" -ge "$LEARNING_INTAKE_PENDING_WARN_THRESHOLD" ]; then
-    warn "learning-intake: 未処理 $pending_count 件が溜まっています（閾値 $LEARNING_INTAKE_PENDING_WARN_THRESHOLD）。tmp/learning-intake/ を learning-intake の受入れ経路で処理してください"
+  if [ "$pending_count" -ge "$INTAKE_PENDING_WARN_THRESHOLD" ]; then
+    warn "intake: 未処理 $pending_count 件が溜まっています（閾値 $INTAKE_PENDING_WARN_THRESHOLD）。tmp/intake/ を intake の受入れ経路で処理してください"
+  fi
+  if [ -d "$legacy_dir" ]; then
+    if legacy_listing=$(find "$legacy_dir" -maxdepth 1 -name '*.md' ! -name '.*' 2>/dev/null); then
+      while IFS= read -r legacy_file; do
+        [ -n "$legacy_file" ] && [ -f "$legacy_file" ] || continue
+        legacy_count=$((legacy_count + 1))
+      done <<<"$legacy_listing"
+    fi
+    if [ "$legacy_count" -gt 0 ]; then
+      warn "intake: 旧 drop box tmp/learning-intake/ に報告 $legacy_count 件が残っています（上の件数に含めていません）。tmp/intake/ へ移してください"
+    fi
   fi
 }

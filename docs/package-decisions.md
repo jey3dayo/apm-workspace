@@ -962,3 +962,11 @@ hidden character(s)` で install を止める。rehearsal が失敗し、`native
 - `reframe`: やりたいことは分かっているが言語化が曖昧なときに、専門用語を教えて隣接分野の語彙を借り、説明文を書き直す。単体で完結し、他の pstack スキルを参照しない。
 - `sharpen`: タスクを大きくではなく深くしてプロンプトを書き直す。利用者本人が「`reframe` と組み合わせると効果抜群」という紹介を受けて追加を指示した組み合わせで、`reframe` だけではその動線が成立しないため同時に入れた。こちらも単体で完結する。
 - 残りの pstack スキルは従来どおり一括では入れない。個別に必要になったものだけ再検討する。
+
+## catalog skill `learning-intake` を `intake` へ改名（2026-11-26）
+
+- 理由: 利用者が短い名前を希望した。`intake`（学びの受け入れ窓口）で意味は変わらない。中身・契約は無変更で、名前と参照だけの改名。
+- 対象: スキル本体（`catalog/.apm/skills/learning-intake/` → `intake/`）、doctor 用スクリプト（`scripts/lib/learning-intake.sh` → `intake.sh`、関数・閾値変数・警告文も追随）、drop box の path（`tmp/learning-intake/` → `tmp/intake/`）、名前で参照する現行文書（instructions、`apm-usage`、`backlog-sweep`、`rule-propagation`、README、AGENTS.md、`docs/learning-ledger.md` の運用ルール部、`docs/apm-task-coverage.md`、`llms.txt`、`mise.toml` の doctor 説明）。
+- 触らないもの: `docs/package-decisions.md` の過去エントリ、`docs/learning-ledger.md` の過去行、`done.txt` / `todo.txt` の記録は履歴として旧名のまま残す。
+- 配布上の注意: 配布面では旧名が消えて新名が生える。マージ後は native:sync で配布するまで、他リポジトリのセッションから旧名 `/learning-intake` で呼ぶと Unknown skill になる。あわせて root は catalog を `jey3dayo/apm-workspace/catalog#main` のリモート依存として消費しているため、`apm.lock.yaml` の配布ファイル一覧が新名へ切り替わるのは、マージ後に main で lock を再生成した時点になる（本 PR では lock は無変更）。
+- pstack の `reflect` は引き続き未採用（考え方は本スキルと一致するが、編集先が `.cursor/skills/` の配布コピー前提で、正本はチェックアウトというルールと衝突するため）。

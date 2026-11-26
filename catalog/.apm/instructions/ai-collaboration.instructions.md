@@ -94,7 +94,7 @@ permission や PreToolUse hook のポリシーで拒否されたコマンドは�
 
 スキルや agent を実運用で使って**不具合・契約の破れ・手順の摩擦**を踏んだら、その場の回避で終わらせずに、APM workspace の authoring checkout（`~/src/github.com/jey3dayo/apm-workspace`。以下 checkout）へ送る。回避策だけが各リポジトリに散ると、同じ穴を全員が踏み直す。効いた点も送る（残す判断の材料になる）。
 
-**何を学びとして拾い、どの owner へ出すかは `learning-intake` が正本。** 別リポジトリで踏んだ APM 側の問題は checkout の `tmp/learning-intake/` に1報告1ファイルで置く。この保存先は「ファイル操作原則」の明示された保存先に当たる。書式と片付けは `learning-intake` が正本。
+**何を学びとして拾い、どの owner へ出すかは `intake` が正本。** 別リポジトリで踏んだ APM 側の問題は checkout の `tmp/intake/` に1報告1ファイルで置く。この保存先は「ファイル操作原則」の明示された保存先に当たる。書式と片付けは `intake` が正本。
 
 ## コマンド選択
 

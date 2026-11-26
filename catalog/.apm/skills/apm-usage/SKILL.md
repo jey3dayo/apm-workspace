@@ -148,7 +148,7 @@ A one-time gate does not stop the copy from rotting again once it lives repo-loc
 
 - The real HOME is native (`~/.apm/apm.yml` starts with `# Rendered by scripts/native.sh`). The legacy writer (`deploy`, `apply`, `upgrade`, `refresh` and their helper tasks) was removed on 2026-11-10; its last version is commit `0bcce09`. Roll out only with `mise run native:sync`; `docs/native-distribution.md` section B describes its internal stages and the direct rollback command it prints.
 - Run `mise run check` before a rollout. It performs formatting checks, all linters, offline action-lock verification, workspace and catalog validation, and the full Bats suite.
-- Run the hidden `mise run doctor` task for read-only workspace and deployed-state diagnostics, including learning-intake reports.
+- Run the hidden `mise run doctor` task for read-only workspace and deployed-state diagnostics, including intake reports.
 - `mise run upgrade:deps` regenerates the checkout's `apm.lock.yaml` after manifest changes; it does not update manifest pins. Follow [the refresh sequence](references/rollout-fast-paths.md#sha-pin-bump-sequence-fast-path-5--fast-path-7) for holds and lock review.
 - For skill creation, updates, installs, or migrations in this workspace, include section B and a deployed target check in the plan unless the user explicitly asks for a local-only change.
 
