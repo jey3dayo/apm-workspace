@@ -298,7 +298,9 @@ Claude では独立タスクを同一レスポンス内で複数呼び出すと�
 tstack の `full-stop`（PR まで）/ `full-send`（マージまで）の既定より、次を優先する。
 
 - 変更を仕上げる前に `polish` を呼ぶ（base-ref、自分の変更ファイル、変更の意図を引数で渡す）。追加したコードコメントの圧縮も polish が担い、削除候補の判断は親が行う。polish が差分を書き換えたら、gate をそこから回し直す。
-- マージ gate は `full-send` の自律マージの既定でなく、`t3-stack` の gate のうち厳しい方に従う。
+- マージ gate は `full-send` の自律マージの既定でなく、`t3-stack`「マージとデプロイ」の gate のうち厳しい方に従う（ワーカーはマージしない、bot のマージ条件、`--admin` は使わない）。
+- PR コメントは、取得を `gh-address-comments`、返信と resolve を `pr-followup` が担う（resolve は bot の修正済みスレッドだけ、人間のスレッドは resolve しない）。`full-stop` / `full-send` が参照する `leaving-pr-comments` はこの workspace に無いので、この2つへ読み替える。
+- レビュー工程は `sol-loop` で行い、変更が heavy（ファイル数・行数が大きい、削除を含む、配布・権限・認証・セキュリティ境界に触れる）なときは `council` へ上げる。
 
 ## 委譲しない例外
 
