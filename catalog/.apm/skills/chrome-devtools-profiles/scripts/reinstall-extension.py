@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import json, os, signal, subprocess, sys, time, re, shutil, sqlite3, hashlib, tempfile
+import json, os, select, signal, subprocess, sys, time, re, shutil, sqlite3, hashlib, tempfile
 USAGE = """usage: reinstall-extension.py <pre|edit|install|check> <profile>
 
 Reinstalls the 1Password extension through Chrome itself. Chrome 158 discards a
@@ -45,9 +45,25 @@ class Session:
         cmd = ['sh', '-c', 'exec npx -y chrome-devtools-mcp@latest --userDataDir="%s" --ignoreDefaultChromeArg=--disable-extensions --chromeArg=--enable-logging --chromeArg=--v=0 --chromeArg=--vmodule=extension*=2 %s' % (self.profile, flags)]
         self.proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, start_new_session=True)
         self.mid = 0
+        self.buf = b''
         r = self.rpc('initialize', {'protocolVersion': '2024-11-05', 'capabilities': {}, 'clientInfo': {'name': 'profile-exp', 'version': '0'}})
         assert 'result' in r, r
         self.rpc('notifications/initialized', notify=True)
+
+    def _readline(self, end):
+        fd = self.proc.stdout.fileno()
+        while b'\n' not in self.buf:
+            left = end - time.time()
+            if left <= 0:
+                return None
+            if not select.select([fd], [], [], left)[0]:
+                return None
+            chunk = os.read(fd, 65536)
+            if not chunk:
+                return ''
+            self.buf += chunk
+        line, self.buf = self.buf.split(b'\n', 1)
+        return line.decode('utf-8', 'replace')
 
     def rpc(self, method, params=None, notify=False, timeout=90):
         msg = {'jsonrpc': '2.0', 'method': method}
@@ -61,8 +77,10 @@ class Session:
         if notify:
             return None
         end = time.time() + timeout
-        while time.time() < end:
-            line = self.proc.stdout.readline()
+        while True:
+            line = self._readline(end)
+            if line is None:
+                break
             if not line:
                 return {'error': 'eof'}
             try:
@@ -195,8 +213,8 @@ if cmd == 'pre':
     s = snapshot()
     print('BASELINE', json.dumps(s, ensure_ascii=False))
     print('AUTH_URL_HOST', au and au.split('/')[2])
-    json.dump(dict(s, auth_url=au, ts=ts), open('%s/%s.baseline.json' % (STATE, name), 'w'))
     os.makedirs(BK, exist_ok=True)
+    json.dump(dict(s, auth_url=au, ts=ts), open('%s/%s.baseline.json' % (STATE, name), 'w'))
     dst = os.path.join(BK, '%s-%s' % (name, ts))
     subprocess.run(['cp', '-Rc', P, dst], check=True)
     print('BACKUP', dst, du(dst), 'KB vs', du(P))
