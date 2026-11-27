@@ -27,6 +27,12 @@ For scheduled audit prompt operations in repositories with `docs/prompts/config.
 apm install jey3dayo/apm-workspace/optional-skills/scheduled-audit-ops#main
 ```
 
+For UI review lane routing, use:
+
+```bash
+apm install jey3dayo/apm-workspace/optional-skills/review-board#main
+```
+
 For draw.io diagram authoring (AWS architecture, flowcharts, sequence, ER), use:
 
 ```bash

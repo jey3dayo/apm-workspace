@@ -10,8 +10,11 @@ It owns the global manifest (`apm.yml`), the lockfile (`apm.lock.yaml`), the cac
 - `docs/apm-task-coverage.md`: every `mise` task and what gates it
 - `docs/native-distribution.md`: the APM-native `native:*` rollout, rollback, and what stays manual
 - `docs/skill-inventory.md`: skill lanes (global, catalog, optional, manual, private, repo-local)
-- `docs/package-decisions.md`: why each package was added, kept, or removed
 - `docs/skill-overlaps.md`: which of several similar skills to use
+- `docs/saas-connectors.md`: SaaS connection placement priority
+- `docs/agents-provenance.md`: curated agent sources and distribution
+- `docs/diagrams/agent-delegation.md`: delegation flow diagrams and verification status
+- `docs/package-decisions.md`: why each package was added, kept, or removed
 - `docs/learning-ledger.md`: changes applied by `intake`, graded on whether they worked
 - `catalog/.apm/skills/apm-usage/SKILL.md`: operating guidance for agents
 - `todo.txt` / `done.txt`: open and finished internal tasks
@@ -20,7 +23,7 @@ It owns the global manifest (`apm.yml`), the lockfile (`apm.lock.yaml`), the cac
 
 - Edit personal skills in `catalog/.apm/skills/**`, copied skills in `manual-skills/**`, shared guidance in `catalog/**`.
 - `private-skills/**` is gitignored here; its source of truth is a private repo.
-- Add or remove external skills by editing the root `apm.yml` in the checkout, then roll out with section B. Do not run `apm install -g` / `apm uninstall -g` for this: on the native HOME they write the consumer `~/.apm` and the real HOME, not the checkout, and the next native rollout drops the change. No task re-resolves the root `apm.lock.yaml`: when you change a SHA pin in `apm.yml`, update the pinned entries of `apm.lock.yaml` to the same commits (or revert the pin), then review the raw lock diff with `git diff apm.lock.yaml`.
+- Add or remove external skills by editing the root `apm.yml` in the checkout, then regenerating `apm.lock.yaml` with `mise run upgrade:deps` (preview with `-- --dry-run`), reviewing `git diff apm.lock.yaml`, and validating pins and holds (`docs/dependency-holds.txt`) with `mise run validate:workspace`. Do not run `apm install -g` / `apm uninstall -g` for this: on the native HOME they write the consumer `~/.apm` and the real HOME, not the checkout, and the next native rollout drops the change.
 - Never edit `apm_modules/` or deployed targets in place.
 - The `apm` version is pinned in `mise.toml`; read it there instead of trusting a quoted version.
-- Roll out with section B of `docs/native-distribution.md`; run `mise run check` before pushing.
+- Run `mise run check` before pushing; roll out merged commits with `mise run native:sync` (details and rollback in section B of `docs/native-distribution.md`).
