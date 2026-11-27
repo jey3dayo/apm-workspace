@@ -4,7 +4,7 @@ description: >-
   Work through GitHub PR review feedback: read unresolved review threads and inline
   comments (bundled GraphQL script for thread state), cluster them, and implement
   the selected fixes. Never replies or resolves threads unless asked. Usually
-  entered via `pr-followup` or `ship`; use directly only when fixes without
+  entered via `pr-followup`; use directly only when fixes without
   reply/resolve are wanted.
 metadata:
   author: OpenAI

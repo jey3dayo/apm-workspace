@@ -268,7 +268,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
      before calling the refresh done; a zero exit from the migration stage is not evidence the pin moved
    - review `apm.lock.yaml` before commit with `git diff apm.lock.yaml`
    - the upstream skill content a refresh or pin bump accepts makes it a
-     non-trivial change for `ship`'s independent review, even when `apm.yml`
+     non-trivial change for the independent review before sharing, even when `apm.yml`
      moves by one line; give the reviewer the upstream compare of each moved commit
 
 6. Individual package or MCP added:
