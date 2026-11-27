@@ -43,7 +43,7 @@ Before any persistent MCP configuration write:
 1. Inspect the checkout's root `apm.yml`, ownership guidance, and rollout script first.
 2. Classify the requested path as a source of truth or deployed output before writing.
 3. Choose the destination and verify its delivery result:
-   - Root native: edit `dependencies.mcp` in the tracked root `apm.yml`. Native distribution installs with `--only apm` and does not apply MCP additions, edits, or removals; during section B's B6 check, confirm the host MCP configuration is unchanged and report the manifest change as recorded, not delivered.
+   - Root native: edit `dependencies.mcp` in the tracked root `apm.yml`. The migrate stage installs with `--only apm` and does not deliver MCP itself; after a successful migrate, native:sync's MCP stage runs `apm install -g --only mcp` and delivers the root `mcp:` servers, backing up the host MCP configuration files first (see the boundary table in `docs/native-distribution.md`). Confirm the delivered host MCP configuration matches the manifest, including removals.
    - Repository-local: edit the target repository's `apm.yml`.
      - For a manifest-only request, stop after the edit.
      - To add and deliver a server, use `apm install --mcp <name> ...` there. To change or remove an existing declaration, edit the manifest and run `apm install --only mcp` to reconcile active targets.
@@ -227,6 +227,7 @@ skipped bump as a defect, not a cosmetic lag. When nobody owns that discipline,
 - Do not add local `./packages/*` refs to the root `apm.yml`.
 - Do not hand-edit deployed targets such as `~/.claude/`, `~/.codex/`, or `~/.agents/skills`.
 - Do not judge a deployed skill orphaned by its absence from `catalog/.apm/skills/**` and `optional-skills/**`; deployed targets are mostly fed by external dependencies, so that test marks most of a healthy target as orphaned. Name the supplier of every entry before it reaches a delete line -- a lock record, `apm_modules/**`, `private-skills/.apm/skills/<id>`, `manual-skills`, or a workspace-only symlink bridge -- and treat only an entry with no supplier as a candidate. A lock record keeps an entry off that line but never proves the skill is still supplied — the lock keeps records for skills the catalog has already retired, so check the manifest, the record's owner, the locator's scope and target, and the deployed path itself before concluding anything about a record.
+- For manual `apm_modules/` cache cleanup: `apm prune` can miss orphaned owner directories and removed nested skills. Compare `apm_modules/` against both the manifest and the lock, and delete an unreferenced path only after proving its resolved absolute path remains under `apm_modules/`. An orphan list printed from a temporary deployment compile is not evidence about the real workspace.
 - `apm audit --ci` and searching a deployed target: see `references/rollout-fast-paths.md` for the reading and grep-wrapper caveats.
 - For `executables.allow` approval format: the key is `github.com/<owner>/<repo>[/<path>]` and does not match what `apm approve` outputs. When `apm install` prompts `Trust <package>? [y/N]`, answer No and approve in `apm.yml`; answering y stores the approval in `config.json` where it blocks `native:sync`.
 - Prefer `mise` tasks over ad hoc script entrypoints for normal operation.
