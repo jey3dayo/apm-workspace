@@ -37,8 +37,9 @@ history lives in git log. `plans/` is gitignored and holds local plan output.
 Do not introduce `CHANGELOG.md` and do not recreate `TODO.md` for active work —
 those roles are already covered by the three surfaces above.
 
-For the lane inventory and placement rules, use
-[`docs/skill-inventory.md`](docs/skill-inventory.md).
+For the lane inventory, use [`docs/skill-inventory.md`](docs/skill-inventory.md);
+for placement rules, use the Install Gate in
+`catalog/.apm/skills/apm-usage/SKILL.md`.
 
 ## Rollout and Verification
 
@@ -104,7 +105,8 @@ tracked source, compare source, cache, and target first, then run
 `mise run native:sync` (it sets the APM cache aside; see section B of
 `docs/native-distribution.md`). The conditions for manually deleting entries
 under `apm_modules/` are in the Guardrails of
-`catalog/.apm/skills/apm-usage/SKILL.md`.
+`catalog/.apm/skills/apm-usage/SKILL.md`. After a repair, verify the deployed
+content, then run `mise run check`.
 
 ## Review Focus
 

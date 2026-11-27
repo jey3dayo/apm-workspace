@@ -7,7 +7,7 @@ surface. The `apm` CLI is pinned by `mise`.
 
 ## Start Here
 
-- [`AGENTS.md`](AGENTS.md): operational rules, ownership, and
+- [`AGENTS.md`](AGENTS.md): operational rules, ownership, recovery, and
   verification requirements.
 - [`todo.txt`](todo.txt): unfinished work managed with tuxedo; [`done.txt`](done.txt)
   archives completed internal tasks.

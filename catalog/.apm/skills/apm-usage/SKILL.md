@@ -43,7 +43,7 @@ Before any persistent MCP configuration write:
 1. Inspect the checkout's root `apm.yml`, ownership guidance, and rollout script first.
 2. Classify the requested path as a source of truth or deployed output before writing.
 3. Choose the destination and verify its delivery result:
-   - Root native: edit `dependencies.mcp` in the tracked root `apm.yml`. The migrate stage installs with `--only apm` and does not deliver MCP itself; after a successful migrate, native:sync's MCP stage runs `apm install -g --only mcp` and delivers the root `mcp:` servers, backing up the host MCP configuration files first (see the boundary table in `docs/native-distribution.md`). Confirm the delivered host MCP configuration matches the manifest.
+   - Root native: edit `dependencies.mcp` in the tracked root `apm.yml`. The migrate stage installs with `--only apm` and does not deliver MCP itself; after a successful migrate, native:sync's MCP stage runs `apm install -g --only mcp` and delivers the root `mcp:` servers, backing up the host MCP configuration files first (see the boundary table in `docs/native-distribution.md`). Confirm the delivered host MCP configuration matches the manifest, including removals.
    - Repository-local: edit the target repository's `apm.yml`.
      - For a manifest-only request, stop after the edit.
      - To add and deliver a server, use `apm install --mcp <name> ...` there. To change or remove an existing declaration, edit the manifest and run `apm install --only mcp` to reconcile active targets.
