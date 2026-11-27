@@ -842,9 +842,6 @@ dependencies:
   - .agents/skills/refactoring/references/dead_code_tsr.md
   - .agents/skills/refactoring/references/helper_extraction.md
   - .agents/skills/refactoring/references/parallel_dispatch.md
-  - .agents/skills/ship
-  - .agents/skills/ship/SKILL.md
-  - .agents/skills/ship/agents/openai.yaml
   - .agents/skills/similarity
   - .agents/skills/similarity/SKILL.md
   - .agents/skills/similarity/agents/openai.yaml
@@ -978,9 +975,6 @@ dependencies:
   - .claude/skills/refactoring/references/dead_code_tsr.md
   - .claude/skills/refactoring/references/helper_extraction.md
   - .claude/skills/refactoring/references/parallel_dispatch.md
-  - .claude/skills/ship
-  - .claude/skills/ship/SKILL.md
-  - .claude/skills/ship/agents/openai.yaml
   - .claude/skills/similarity
   - .claude/skills/similarity/SKILL.md
   - .claude/skills/similarity/agents/openai.yaml
@@ -1092,8 +1086,6 @@ dependencies:
     .agents/skills/refactoring/references/dead_code_tsr.md: sha256:3ca03e5ae296c2e0a67d45a6bda7da57329f06f4c56fa66099943de29dac0285
     .agents/skills/refactoring/references/helper_extraction.md: sha256:041609dbbd6d27e004e80bc0590c3c1a1482267306570fe07f12e6f338311930
     .agents/skills/refactoring/references/parallel_dispatch.md: sha256:4588d7ac3e700bc72f0b54a78537a0d248684e5924f3b9aa45f0e573a8adab49
-    .agents/skills/ship/SKILL.md: sha256:1d459e0073e770df0c6dc232629dc8ceb10c51020da61bb7a5c95ce827675103
-    .agents/skills/ship/agents/openai.yaml: sha256:cfb4b0d4885329be778d0c05b8ed00e3ec6c0285c0008f40d1aed19eef7ba424
     .agents/skills/similarity/SKILL.md: sha256:b34b03b003c842dd5b5ff77b373d9442decfc0224eeb19d6c6542e8b671db31d
     .agents/skills/similarity/agents/openai.yaml: sha256:256ce2d2a4a3f6ac024a9a08b2665de766232278500894c27c2c83569b778598
     .agents/skills/similarity/references/report-analysis.md: sha256:3188868e0decf956df49933ceb253f52e590cb6c19af5fdfecf6aedc46ced55c
@@ -1199,8 +1191,6 @@ dependencies:
     .claude/skills/refactoring/references/dead_code_tsr.md: sha256:3ca03e5ae296c2e0a67d45a6bda7da57329f06f4c56fa66099943de29dac0285
     .claude/skills/refactoring/references/helper_extraction.md: sha256:041609dbbd6d27e004e80bc0590c3c1a1482267306570fe07f12e6f338311930
     .claude/skills/refactoring/references/parallel_dispatch.md: sha256:4588d7ac3e700bc72f0b54a78537a0d248684e5924f3b9aa45f0e573a8adab49
-    .claude/skills/ship/SKILL.md: sha256:1d459e0073e770df0c6dc232629dc8ceb10c51020da61bb7a5c95ce827675103
-    .claude/skills/ship/agents/openai.yaml: sha256:cfb4b0d4885329be778d0c05b8ed00e3ec6c0285c0008f40d1aed19eef7ba424
     .claude/skills/similarity/SKILL.md: sha256:b34b03b003c842dd5b5ff77b373d9442decfc0224eeb19d6c6542e8b671db31d
     .claude/skills/similarity/agents/openai.yaml: sha256:256ce2d2a4a3f6ac024a9a08b2665de766232278500894c27c2c83569b778598
     .claude/skills/similarity/references/report-analysis.md: sha256:3188868e0decf956df49933ceb253f52e590cb6c19af5fdfecf6aedc46ced55c
@@ -8475,33 +8465,6 @@ deployments:
   content_hash: sha256:ae512af838c78b8750471c42cd2b20fa32319553e61d84c9a23d171b40ce14aa
 - kind: project-relative
   target: claude
-  value: .claude/skills/ship
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: null
-- kind: project-relative
-  target: claude
-  value: .claude/skills/ship/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:1d459e0073e770df0c6dc232629dc8ceb10c51020da61bb7a5c95ce827675103
-- kind: project-relative
-  target: claude
-  value: .claude/skills/ship/agents/openai.yaml
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:cfb4b0d4885329be778d0c05b8ed00e3ec6c0285c0008f40d1aed19eef7ba424
-- kind: project-relative
-  target: claude
   value: .claude/skills/show-me
   runtime: null
   scope: project
@@ -14827,33 +14790,6 @@ deployments:
   - mattpocock/skills
   active_owner: mattpocock/skills
   content_hash: sha256:ae512af838c78b8750471c42cd2b20fa32319553e61d84c9a23d171b40ce14aa
-- kind: project-relative
-  target: codex
-  value: .agents/skills/ship
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/ship/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:1d459e0073e770df0c6dc232629dc8ceb10c51020da61bb7a5c95ce827675103
-- kind: project-relative
-  target: codex
-  value: .agents/skills/ship/agents/openai.yaml
-  runtime: null
-  scope: project
-  owners:
-  - jey3dayo/apm-workspace/catalog
-  active_owner: jey3dayo/apm-workspace/catalog
-  content_hash: sha256:cfb4b0d4885329be778d0c05b8ed00e3ec6c0285c0008f40d1aed19eef7ba424
 - kind: project-relative
   target: codex
   value: .agents/skills/show-me
