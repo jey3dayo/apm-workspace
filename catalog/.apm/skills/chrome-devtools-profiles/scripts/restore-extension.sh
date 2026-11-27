@@ -6,7 +6,9 @@ usage() {
 usage: restore-extension.sh <target-profile> [template-name=_template]
 
   Copies Default/Extensions/<ext-id> and Default/Secure Preferences from the
-  template into the target, then runs verify-profile.sh on the target. The
+  template into the target, then runs verify-profile.sh on the target. Chrome 158
+  discards a restored registration at startup; use reinstall-extension.py to
+  recover a registration. The
   target's Secure Preferences and Preferences go to
   $BACKUP_DIR/<target>-<timestamp>/. An existing Default/Extensions/<ext-id> in
   the target is moved to $BACKUP_DIR/<target>-<timestamp>/Extensions-<ext-id>/
