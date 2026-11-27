@@ -1,7 +1,6 @@
 ---
 name: implementer
 description: Use when delegating well-specified implementation work as a Worker in the Orchestrator-Worker model — code generation/editing, related tests, and mechanical refactoring where the design decisions are already made. Do not use for requirements analysis, architecture decisions, or ambiguous tasks that need design judgment.
-tools: "*"
 color: green
 model: sonnet
 ---
