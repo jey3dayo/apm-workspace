@@ -67,7 +67,7 @@ Shipping here goes through a PR: work on a feature branch, run
 the work is committed the tree is clean, so it cannot infer them from
 `git status`) before the push for format and check (its distribution-match step
 applies only after the merge and B6, so it reports that step as not run before
-then), push the branch and open the PR (`ship` runs this sequence), and watch
+then), push the branch and open the PR (`full-stop` runs this sequence), and watch
 its CI run. Merge only when asked. Exception: the recurring external-pin bump
 routine (weekly, or the same update run manually) commits `apm.yml` /
 `apm.lock.yaml` directly to `main` without a PR when every gate passes, and

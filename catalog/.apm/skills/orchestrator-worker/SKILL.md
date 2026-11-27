@@ -135,7 +135,7 @@ handoff は T3 Code（T3 MCP）経由で Architect pane へ送るか、人間へ
 
 ## Reviewer の tier
 
-通常のレビュー・相談は、セッションと同じ runtime の組み込み subagent（Claude は Agent tool、Codex は `spawn_agent`）を既定にし、作者と別 context で起動する。実行時の read-only 境界を証明できない結果は advisory として扱う。verdict を必要とするレビュー（`ship` の非軽微な変更など）は、作者と別の新規セッションで起動する `codex exec -s read-only`（下の「verdict review の起動と受理」）を既定にする。差分を書いた runtime と別 runtime の Reviewer は、追加の脱相関が必要なときだけ選ぶ。
+通常のレビュー・相談は、セッションと同じ runtime の組み込み subagent（Claude は Agent tool、Codex は `spawn_agent`）を既定にし、作者と別 context で起動する。実行時の read-only 境界を証明できない結果は advisory として扱う。verdict を必要とするレビュー（`full-stop` / `full-send` の非軽微な変更など）は、作者と別の新規セッションで起動する `codex exec -s read-only`（下の「verdict review の起動と受理」）を既定にする。差分を書いた runtime と別 runtime の Reviewer は、追加の脱相関が必要なときだけ選ぶ。
 
 **Reviewer のモデル選定は [references/models.md](references/models.md) が正本。** 既定の格と、判断の難度で上げる先、明示指定時の格がある。
 
@@ -292,6 +292,13 @@ Claude では独立タスクを同一レスポンス内で複数呼び出すと�
 ファイル・コマンド・タスクの不存在を根拠にするときは、global の共有ガイダンスの「事実確認」に従う。一覧コマンドの出力に無いことは、存在しないことの証明にはならない。
 
 完了条件: 確認した対象・確認結果・未確認のまま残した範囲を対応させて報告した。
+
+## 出荷（full-stop / full-send）時の上書き
+
+tstack の `full-stop`（PR まで）/ `full-send`（マージまで）の既定より、次を優先する。
+
+- 変更を仕上げる前に `polish` を呼ぶ（base-ref、自分の変更ファイル、変更の意図を引数で渡す）。追加したコードコメントの圧縮も polish が担い、削除候補の判断は親が行う。polish が差分を書き換えたら、gate をそこから回し直す。
+- マージ gate は `full-send` の自律マージの既定でなく、`t3-stack` の gate のうち厳しい方に従う。
 
 ## 委譲しない例外
 

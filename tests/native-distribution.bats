@@ -569,8 +569,8 @@ EOF
   grep -q "ref: $SOURCE_SHA" "$M_HOME/.apm/apm.yml"
 
   # apm deployed the workspace skills; what it does not own came back from the moved-aside roots.
-  [ -f "$M_HOME/.claude/skills/ship/SKILL.md" ]
-  [ -f "$M_HOME/.agents/skills/ship/SKILL.md" ]
+  [ -f "$M_HOME/.claude/skills/polish/SKILL.md" ]
+  [ -f "$M_HOME/.agents/skills/polish/SKILL.md" ]
   [ "$(cat "$M_HOME/.claude/skills/private-copy/SKILL.md")" = "private copy" ]
   [ ! -L "$M_HOME/.claude/skills/private-link" ]
   [ "$(cat "$M_HOME/.claude/skills/private-link/SKILL.md")" = "private link target" ]
@@ -585,7 +585,7 @@ EOF
   real_native "$M_HOME" migrate-rollback --real-home --stamp "$stamp"
   [ "$(roots_snapshot "$M_HOME")" = "$original" ]
   [ "$(sentinel_snapshot "$M_HOME")" = "$sentinels" ]
-  [ -f "$M_HOME/.claude/skills.native-$stamp/ship/SKILL.md" ]
+  [ -f "$M_HOME/.claude/skills.native-$stamp/polish/SKILL.md" ]
   [ -z "$(compgen -G "$M_HOME/.claude/skills.bak-*" || true)" ]
 
   # A second rollback finds every root already restored and changes nothing.

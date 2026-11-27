@@ -981,3 +981,11 @@ hidden character(s)` で install を止める。rehearsal が失敗し、`native
 - 触らないもの: `docs/package-decisions.md` の過去エントリ、`docs/learning-ledger.md` の過去行、`done.txt` / `todo.txt` の記録は履歴として旧名のまま残す。
 - 配布上の注意: 配布面では旧名が消えて新名が生える。マージ後は native:sync で配布するまで、他リポジトリのセッションから旧名 `/learning-intake` で呼ぶと Unknown skill になる。あわせて root は catalog を `jey3dayo/apm-workspace/catalog#main` のリモート依存として消費しているため、`apm.lock.yaml` の配布ファイル一覧が新名へ切り替わるのは、マージ後に main で lock を再生成した時点になる（本 PR では lock は無変更）。
 - pstack の `reflect` は引き続き未採用（考え方は本スキルと一致するが、編集先が `.cursor/skills/` の配布コピー前提で、正本はチェックアウトというルールと衝突するため）。
+
+## catalog skill `ship` を廃止（2026-11-27）
+
+- 理由: Claude Code 組み込みの `/ship` に遮られて Not loaded になっていた。中身は `full-stop`（PR まで）/ `full-send`（マージまで）への委譲だけの互換エイリアスで、残す価値がない。
+- 対応: `catalog/.apm/skills/ship/` を削除し、現役の参照を `full-stop` / `full-send` への直接参照に置き換えた（共有ガイド、`apm-usage`、`orchestrator-worker`、`pr-followup`、`rule-propagation`、`AGENTS.md`、`gh-address-comments` の description）。
+- 上書きの移設: `ship` が持っていた2点（出荷前に `polish` を呼ぶ、マージ gate は `t3-stack` の厳しい方に従う）は `orchestrator-worker` の「出荷（full-stop / full-send）時の上書き」へ移した。コメントの取得・返信と、レビューを `sol-loop`（heavy 時は `council`）で行う点は、前者が `pr-followup`、後者が tstack 側の既定で足りるため移さない。
+- 触らないもの: 過去エントリ、`docs/learning-ledger.md`、`done.txt` の `ship` の言及は履歴として残す。
+- 配布上の注意: root は catalog を `jey3dayo/apm-workspace/catalog#main` のリモート依存として消費しているため、`apm.lock.yaml` の配布ファイル一覧から `ship` が消えるのはマージ後に main で lock を再生成した時点になる（本 PR では lock は無変更）。
