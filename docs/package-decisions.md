@@ -955,6 +955,7 @@ hidden character(s)` で install を止める。rehearsal が失敗し、`native
 - 入れない: `poteto-mode`。返信様式・自律ルールまで含む作動様式そのもので、この workspace の `orchestrator-worker` の方針と衝突する。モデル選択も Cursor 専用の `~/.cursor/rules/pstack-models.mdc`（`setup-pstack` が書く）前提で配布できない。`no-comments` からの参照は subagent の reasoning level 付けの1点だけで、そこは `orchestrator-worker` の models 表で代替する。あわせて `architect` の任意分岐先 `arena` も入れない（`poteto-mode` と追加の principle 群を引くため）。残りの pstack スキル（全57件）も一括では入れない。
 - 制約として残るもの: 制約コメント（`do not remove` 等）を型・テスト・lint へ encode する提案は `no-comments` 手順5の対話承認が前提。この workspace では従来どおり判断は利用者側に残る。
 - 再検討するなら: `poteto-mode` 式の作動様式を採りたくなったとき（その場合は衝突する既存方針の棚卸しとセット）、または上流が `comment-sicko` を APM で配れる形にしたとき。
+- 再検討の記録（2026-11-27）: relay ルール（`reframe` → `sharpen`）の導入を機に、作動様式としての採用を再検討した。一次資料（`SKILL.md` 全文、`worker.md`、playbooks）と `orchestrator-worker` を対照した結果、衝突は委譲の既定（fresh subagent 既定 vs Worker 再利用）、自律の範囲（人に質問を見せない主義 vs 質問スペース集約・リリースゲート）、返信様式、`worker.md` の伝播規則に及ぶことを確認した。あわせて frontmatter の `disable-model-invocation: true` によりエージェントからは起動できないため、「呼び出して空振りしたら入れる」式の運用は成立しないことも確認した。結論は見送り維持で確定し、再検討条件は従来どおりとする。
 
 ## `cursor/plugins` の pstack から `reframe` / `sharpen` を追加採用（2026-11-25）
 
