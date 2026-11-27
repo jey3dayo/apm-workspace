@@ -1,7 +1,6 @@
 ---
 name: error-fixer
 description: Use this agent for mechanical error resolution where the fix is determined by the diagnostic, such as type errors, lint violations, and type-safety cleanups such as removing any and unchecked assertions. Works from compiler and linter output rather than from judgment. Not for design decisions, for failures whose root cause is unknown (use researcher), or for review that produces findings rather than edits (use code-reviewer).
-tools: "*"
 color: red
 model: sonnet
 ---

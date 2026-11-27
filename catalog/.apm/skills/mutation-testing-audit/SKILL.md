@@ -16,8 +16,7 @@ and closing exactly those.
 
 ## Preconditions
 
-- Vitest 5 recommended; Vitest 4.1 also verified working (manga-rss-bridge
-  trial, 2026-11-26). Node 24+.
+- Vitest 5 recommended; Vitest 4.1 also verified working. Node 24+.
 - A fast machine. The dry run collects coverage over the whole test suite; on a
   slow VM it can take 15+ minutes and makes the audit impractical. Run on the
   fastest machine available. Splitting execution (an agent runs it) from
