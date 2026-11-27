@@ -27,8 +27,8 @@ changes before committing. Regeneration can also change version metadata without
 moving commits; the unresolved behavior is tracked in `todo.txt`. Report
 unrelated drift instead of including it silently.
 
-The old `deploy:pins` and `upgrade` tasks were removed on 2026-11-10 (last
-version: commit `0bcce09`). On the native HOME, `apm install -g` operates on the
+The old `deploy:pins` and `upgrade` tasks were removed (last version: commit
+`0bcce09`). On the native HOME, `apm install -g` operates on the
 consumer `~/.apm`, not the checkout's lock; do not use `apm install -g` or
 `apm update -g` as a substitute for this sequence.
 

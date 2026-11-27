@@ -48,10 +48,10 @@ bundle and install only the required sub-skill from the consuming repository.
 ## Rollout and Verification
 
 The real HOME is native (`~/.apm/apm.yml` starts with
-`# Rendered by scripts/native.sh`). The legacy writer (`deploy`, `apply`,
-`upgrade`, `refresh` and their helper tasks) was removed on 2026-11-10; its last
-version is commit `0bcce09`. Roll out a merged commit with `mise run native:sync` (use the `-- --https`
-option when SSH is unavailable). Section B of
+`# Rendered by scripts/native.sh`). Roll out a merged commit with
+`mise run native:sync` (use the `-- --https` option when SSH is unavailable).
+The legacy writer tasks (`deploy`, `apply`, `upgrade`, `refresh`) no longer
+exist; their last version is commit `0bcce09`. Section B of
 `docs/native-distribution.md` also documents the manual steps and rollback.
 
 | Intent          | Command                | Constraint                                                                                                                           |
@@ -98,7 +98,7 @@ parallel/flock/shlock guard or `BATS_JOBS`; CI sets it, leaving local runs at
 the parallel default (unset or `1`).
 
 The PowerShell lane (the `.ps1` scripts, their Pester suites and `test:ps`) was
-removed on 2026-11-10; see git history. Windows is out of scope.
+removed; see git history. Windows is out of scope.
 
 Before external sharing, run the repository's full gate. For smaller edits run
 touched-file formatting and the relevant focused check; always run `git diff
